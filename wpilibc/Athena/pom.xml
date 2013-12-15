@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>edu.wpi.first.wpilib.cpp</groupId>
+  <artifactId>libWPILibAthena</artifactId>
+  <packaging>a</packaging>
+
+  <parent>
+    <groupId>edu.wpi.first.wpilib.templates.athena</groupId>
+    <artifactId>static-library</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+  </parent>
+  
+  <repositories>
+    <repository>
+      <id>WPILib Repository</id>
+      <url>http://frcbuilder.wpi.edu:8348/</url>
+    </repository>
+  </repositories>
+  
+  <dependencies>
+    <dependency>
+	  <groupId>edu.wpi.first.wpilib.hal</groupId>
+	  <artifactId>include</artifactId>
+      <version>0.1.0-SNAPSHOT</version>
+      <type>inczip</type>
+    </dependency>
+    <dependency>
+	  <groupId>edu.wpi.first.wpilib.networktables.cpp</groupId>
+	  <artifactId>include</artifactId>
+	  <version>0.1.0-SNAPSHOT</version>
+      <type>inczip</type>
+    </dependency>
+  </dependencies>
+
+  <build>
+	<plugins>
+	  <plugin>
+		<groupId>org.codehaus.mojo</groupId>
+		<artifactId>native-maven-plugin</artifactId>
+		<configuration>
+		  <sources>
+			<source>
+			  <directory>../src/main/native</directory>
+			  <includes>
+                <include>**/*.cpp</include>
+              </includes>
+			  <excludes>
+			  	<exclude>Vision/*</exclude>
+			  </excludes>
+			</source>
+			<source>
+			  <directory>../src/main/include</directory>
+              <!-- use this to have maven deploying header files with a .inczip type -->
+              <!-- typically used to for library artifacts header files -->
+              <deployable>true</deployable>
+			</source>
+		  </sources>
+		</configuration>
+	  </plugin>
+	</plugins>
+  </build>
+</project>

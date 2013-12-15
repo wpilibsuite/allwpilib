@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<examples>
+  <tagDescription>
+    <name>Simple Robot</name>
+    <description>Examples for simple robot programs.</description>
+  </tagDescription>
+  <tagDescription>
+    <name>Network Tables</name>
+    <description>Examples of how to use Network Tables to accomplish a
+    variety of tasks such as sending and receiving values to both
+    dashboards and co-processors..</description>
+  </tagDescription>
+  
+  <example>
+    <name>Simple Robot Example</name>
+    <description>The simplest possible program that compiles. This
+    shows the structure of a simple program that does nothing at
+    all.</description>
+    <tags>
+      <tag>Simple Robot</tag>
+    </tags>
+    <packages>
+      <package>src/$package-dir</package>
+    </packages>
+    <files>
+      <file source="examples/Simple Robot Example/Robot.java" destination="src/$package-dir/Robot.java" />
+    </files>
+  </example>
+  
+  <example>
+    <name>Network Table Counter</name>
+    <description>A simple program that increments a network table
+    variable once every second. This shows the structure of a simple
+    program that only uses network tables.</description>
+    <tags>
+      <tag>Simple Robot</tag>
+      <tag>Network Tables</tag>
+    </tags>
+    <packages>
+      <package>src/$package-dir</package>
+    </packages>
+    <files>
+      <file source="examples/Network Table Counter/Robot.java" destination="src/$package-dir/Robot.java" />
+    </files>
+  </example>
+  
+</examples>

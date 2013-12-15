@@ -1,0 +1,37 @@
+
+* Purpose
+NetworkTables is a HashTable synchronized across the network. It
+provides a simple interface for sharing numbers, booleans, strings
+and homogeneous arrays of those components between the robot,
+driverstation, co-processor and any other computer teams wish to
+have provide or consume data.
+
+* Contributing
+1. Checkout
+2. Edit
+3. Commit
+4. Push using =git push origin HEAD:refs/for/master=
+5. Wait for code review, checking for comments.
+
+* Editing
+You can always use any text editor and then build with Maven. Eclipse
+support works well with the m2eclipse plugin. Individual components
+may have there own project files.
+
+* Building with Maven
+Currently, Maven only builds NetworkTables Java and C++. The various
+table viewer projects have not been migrated yet. 
+
+There are multiple build targets that NetworkTables supports. To build
+it, it is assumed that the toolchains have been setup as described in
+the WPILib development documentation. In both Java and C++ there are
+three build targets, Desktop, Azalea and Athena. For Java the Athena
+and Desktop builds are identical. Building the Desktop versions will
+run UnitTests on the platform.
+
+1. =cd= into the root directory if you want to build both languages.
+   Otherwise, =cd= into the language you want to build.
+2. Run =mvn install= if you want to build and install everything.
+3. That's it. You can build only for a specific platform by using
+   Maven profiles. For example, just add =-Pdesktop= when developing
+   to run the unit tests without compiling for other platforms.

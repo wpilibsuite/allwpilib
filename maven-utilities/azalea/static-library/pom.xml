@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>edu.wpi.first.wpilib.templates.azalea</groupId>
+  <artifactId>static-library</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  
+  <properties>
+	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	<project.resources.sourceEncoding>UTF-8</project.resources.sourceEncoding>
+	<local-repository>C:/Users/wpilibj-buildmaster/maven-repository</local-repository>
+  </properties>
+
+  <build>
+    <pluginManagement>
+	  <plugins>
+		<plugin>
+		  <groupId>org.codehaus.mojo</groupId>
+		  <artifactId>native-maven-plugin</artifactId>
+		  <version>1.0-alpha-7</version>
+		  <extensions>true</extensions>
+		  <configuration>
+			<!-- Must be on windows path: C:\WindRiver\gnu\3.4.4-vxworks-6.3\x86-win32\bin-->
+			<compilerExecutable>ccppc</compilerExecutable>
+  			<linkerProvider>ar</linkerProvider>
+			<linkerExecutable>arppc</linkerExecutable>*
+
+			<compilerStartOptions>
+              <compilerStartOption>-g -mcpu=603 -mstrict-align -mno-implicit-fp -mlongcall -ansi -Wall -mlongcall  -IC:/WindRiver/vxworks-6.3/target/h/wrn/coreip</compilerStartOption>
+			</compilerStartOptions>
+			<compilerMiddleOptions>
+              <compilerMiddleOption>-DCPU=PPC603 -DTOOL_FAMILY=gnu -DTOOL=gnu -D_WRS_KERNEL</compilerMiddleOption>
+			</compilerMiddleOptions>
+			
+			<linkerStartOptions>
+              <linkerStartOption>crus</linkerStartOption>
+			</linkerStartOptions>
+			
+			<sources>
+			  <source>
+				<directory>src/main/native</directory>
+				<includes>
+				  <include>**/*.cpp</include>
+				</includes>
+			  </source>
+			  <source>
+				<directory>src/main/include</directory>
+				<!-- use this to have maven deploying header files with a .inczip type -->
+				<!-- typically used to for library artifacts header files -->
+				<deployable>true</deployable>
+			  </source>
+			</sources>
+		  </configuration>
+		</plugin>
+	  </plugins>
+    </pluginManagement>
+  </build>
+
+  <profiles>
+	<profile>
+	  <id>jenkins</id>
+	  <distributionManagement>
+		<repository>
+		  <id>myrepository</id>
+		  <url>file:${local-repository}</url>
+		</repository>
+	  </distributionManagement>
+	</profile>
+  </profiles>
+</project>

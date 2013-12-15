@@ -1,0 +1,15 @@
+-dontCastConstants
+-runtime JNAerator
+-direct
+-M__java=true
+
+-package edu.wpi.first.wpilibj.communication
+
+-library FRC_NetworkCommunications
+
+../src/main/include/NetworkCommunication/AICalibration.h
+../src/main/include/NetworkCommunication/LoadOut.h
+../src/main/include/NetworkCommunication/symModuleLink.h
+../src/main/include/NetworkCommunication/UsageReporting.h
+../src/main/include/NetworkCommunication/FRCComm.h
+

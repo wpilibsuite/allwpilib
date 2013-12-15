@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane id="BorderPane" disable="false" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" padding="$x1" prefHeight="150.0" prefWidth="350.0" visible="true" xmlns:fx="http://javafx.com/fxml" fx:controller="edu.wpi.first.tableviewer.popup.PreferencesDialog">
+  <bottom>
+    <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="-1.0" prefWidth="350.0" spacing="10.0" BorderPane.alignment="CENTER">
+      <children>
+        <Button alignment="CENTER" contentDisplay="CENTER" maxWidth="-1.0" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleStartClientAction" prefHeight="25.0" prefWidth="100.0" text="Start Client" textAlignment="CENTER" HBox.hgrow="NEVER" />
+        <Button contentDisplay="CENTER" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleStartServerAction" prefHeight="25.0" prefWidth="100.0" text="Start Server" textAlignment="CENTER" wrapText="false" HBox.hgrow="NEVER" />
+        <Button cancelButton="true" contentDisplay="CENTER" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleCancelAction" prefHeight="25.0" prefWidth="100.0" text="Cancel" textAlignment="CENTER" HBox.hgrow="NEVER" />
+      </children>
+      <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" fx:id="x1" />
+      </padding>
+    </HBox>
+  </bottom>
+  <right>
+    <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="250.0" spacing="15.0" BorderPane.alignment="CENTER" BorderPane.margin="$x2">
+      <children>
+        <Label text="IP Address">
+          <font>
+            <Font name="System Bold" size="12.0" />
+          </font>
+        </Label>
+        <TextField fx:id="addressField" alignment="CENTER_LEFT" onAction="#handleAddressEntered" prefWidth="-1.0" promptText="Host" text="127.0.0.1" />
+      </children>
+      <padding>
+        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" fx:id="x2" />
+      </padding>
+    </HBox>
+  </right>
+  <stylesheets>
+    <URL value="@PreferencesDialog.css" />
+  </stylesheets>
+</BorderPane>

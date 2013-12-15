@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: WPILib_Java_Robot_Development
+Bundle-SymbolicName: edu.wpi.first.wpilib.plugins.java;singleton:=true
+Bundle-Version: 0.1.0.qualifier
+Bundle-Activator: edu.wpi.first.wpilib.plugins.java.WPILibJavaPlugin
+Bundle-Vendor: Worcester Polytechnic Institute
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources;bundle-version="3.8.1",
+ edu.wpi.first.wpilib.plugins.core;bundle-version="0.1.0",
+ org.eclipse.jdt;bundle-version="3.8.0",
+ org.eclipse.jdt.core;bundle-version="3.8.2",
+ org.eclipse.jdt.debug;bundle-version="3.7.101",
+ org.eclipse.jdt.debug.ui;bundle-version="3.6.100",
+ org.eclipse.jdt.launching;bundle-version="3.6.100",
+ org.eclipse.jdt.ui;bundle-version="3.8.1",
+ org.eclipse.debug.core;bundle-version="3.7.100",
+ org.eclipse.debug.ui;bundle-version="3.8.1",
+ org.eclipse.ui.editors;bundle-version="3.8.0",
+ org.eclipse.ui.ide;bundle-version="3.8.1"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy

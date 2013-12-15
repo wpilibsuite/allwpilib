@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+
+    This is a sample netbeans project file for a Sun Spot Application project.
+    You may edit it freely, it doesn't affect the ant-powered build.
+
+ --><project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.ant.freeform</type>
+    <configuration>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
+            <name>RunTestsProject</name>
+            <properties>
+                <property-file>${user.home}/.sunspotfrc.properties</property-file>
+                <property-file>build.properties</property-file>
+                <property-file>${sunspot.home}/default.properties</property-file>
+            </properties>
+            <folders>
+                <source-folder>
+                    <label>src</label>
+                    <type>java</type>
+                    <location>src</location>
+                </source-folder>
+            </folders>
+            <ide-actions>
+                <action name="build">
+                    <target>jar-app</target>
+                </action>
+                <action name="clean">
+                    <target>clean</target>
+                </action>
+                <action name="run">
+                    <target>deploy</target>
+                    <target>run</target>
+                </action>
+                <action name="rebuild">
+                    <target>clean</target>
+                    <target>jar-app</target>
+                </action>
+                <action name="debug">
+                    <target>deploy</target>
+                    <target>debug-run</target>
+                </action>
+                <action name="javadoc">
+                    <target>javadoc</target>
+                </action>
+            </ide-actions>
+            <export>
+                <type>folder</type>
+                <location>build</location>
+                <build-target>jar-app</build-target>
+            </export>
+            <view>
+                <items>
+                    <source-folder style="packages">
+                        <label>src</label>
+                        <location>src</location>
+                    </source-folder>
+                    <source-file>
+                        <location>build.xml</location>
+                    </source-file>
+                </items>
+                <context-menu>
+                    <ide-action name="build"/>
+                    <ide-action name="clean"/>
+                    <ide-action name="run"/>
+                    <ide-action name="rebuild"/>
+                    <ide-action name="debug"/>
+                    <ide-action name="javadoc"/>
+                    <action>
+                        <label>Sun SPOT-deploy</label>
+                        <target>deploy</target>
+                    </action>
+                    <action>
+                        <label>Sun SPOT-jar-deploy</label>
+                        <target>jar-deploy</target>
+                    </action>
+                    <separator/>
+                </context-menu>
+            </view>
+            <subprojects/>
+        </general-data>
+        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/1">
+            <compilation-unit>
+                <package-root>src</package-root>
+                <classpath mode="boot">${sunspot.home}\lib\squawk.jar</classpath>
+                <classpath mode="compile">D:\Projects\WPILibJ-trunk\WPILibJ\dist\lib\wpilibj.jar;D:\Projects\NetworkTables2.0\trunk\java\dist\lib\networktables-crio.jar;${sunspot.home}\lib\sunit-server.jar</classpath>
+                <built-to>build</built-to>
+                <source-level>1.4</source-level>
+            </compilation-unit>
+        </java-data>
+    </configuration>
+</project>

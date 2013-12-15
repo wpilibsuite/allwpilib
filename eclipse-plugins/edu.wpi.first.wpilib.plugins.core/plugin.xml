@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
+         name="FRCProjectNature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature">
+         </run>
+      </runtime>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="edu.wpi.first.wpilib.plugins.core.actionSet"
+            label="WPILib Action Set"
+            visible="true">
+         <menu
+               id="edu.wpi.first.wpilib.plugins.core.menu"
+               label="WPI&amp;Lib">
+            <separator
+                  name="edu.wpi.first.wpilib.plugins.core.actions">
+            </separator>
+         </menu>
+         <action
+               class="edu.wpi.first.wpilib.plugins.core.actions.RunSmartDashboardAction"
+               icon="icons/smartdashboard16x16.png"
+               id="edu.wpi.first.wpilib.plugins.core.actions.RunSmartDashboardAction"
+               label="Run &amp;SmartDashboard"
+               menubarPath="edu.wpi.first.wpilib.plugins.core.menu/edu.wpi.first.wpilib.plugins.core.actions"
+               toolbarPath="WPILib"
+               tooltip="Launch the SmartDashboard to get feedback from the robot.">
+         </action>
+         <action
+               class="edu.wpi.first.wpilib.plugins.core.actions.RunRobotBuilderAction"
+               icon="icons/robotbuilder16x16.png"
+               id="edu.wpi.first.wpilib.plugins.core.actions.RunRobotBuilderAction"
+               label="Run &amp;RobotBuilder"
+               menubarPath="edu.wpi.first.wpilib.plugins.core.menu/edu.wpi.first.wpilib.plugins.core.actions"
+               toolbarPath="WPILib"
+               tooltip="Launch the RobotBuilder to help develop command-based programs.">
+         </action>
+         <action
+               class="edu.wpi.first.wpilib.plugins.core.actions.RunSFXDashboardAction"
+               icon="icons/sfxdashboard16x16.png"
+               id="edu.wpi.first.wpilib.plugins.core.actions.RunSFXDashboardAction"
+               label="Run &amp;SFX Dashboard"
+               menubarPath="edu.wpi.first.wpilib.plugins.core.menu/edu.wpi.first.wpilib.plugins.core.actions"
+               toolbarPath="WPILib"
+               tooltip="Launch the SFX Dashboard to get feedback from the robot.">
+         </action>
+         <action
+               class="edu.wpi.first.wpilib.plugins.core.actions.RunOutlineViewerAction"
+               icon="icons/outlineviewer16x16.png"
+               id="edu.wpi.first.wpilib.plugins.core.actions.RunOutlineViewerAction"
+               label="Run &amp;Outline Viewer"
+               menubarPath="edu.wpi.first.wpilib.plugins.core.menu/edu.wpi.first.wpilib.plugins.core.actions"
+               toolbarPath="WPILib"
+               tooltip="Launch the Outline Viewer to see the raw feedback from the robot.">
+         </action>
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="edu.wpi.first.wpilib.plugins.core.preferences.WPILibPreferencePage"
+            id="edu.wpi.first.wpilib.plugins.core.preferences.WPILibPreferencePage"
+            name="WPILib Preferences">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="edu.wpi.first.wpilib.plugins.core.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.intro.configExtension">
+      <configExtension
+            configId="org.eclipse.ui.intro.universalConfig"
+            content="WPILib Intro/sample.xml">
+      </configExtension>
+   </extension>
+
+</plugin>

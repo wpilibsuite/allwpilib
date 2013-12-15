@@ -1,0 +1,48 @@
+
+<project name="Network_Tables_2.0 cRIO">
+
+	<!-- crio build properties -->
+	<property name="crio.build.dir" value="${build.dir}/crio" />
+	<property name="src.crio.build.dir" value="${build.dir}/crio-src" />
+	<property name="crio.dist.suffix" value="-crio" />
+	<property name="crio.dist.filename" value="${jar-base-name}${crio.dist.suffix}${jar-suffix}.jar" />
+	<property name="crio.src.dist.filename" value="${jar-base-name}${crio.dist.suffix}${jar-suffix}.src.zip" />
+	<path id="crio.source.path">
+		<fileset dir="${crio.src.dir}"/>
+		<fileset dir="${src.dir}"/>
+	</path>
+	
+	
+	
+	
+	
+	<!-- crio build -->
+	<target name="build-crio">
+		<delete dir="${crio.build.dir}" />
+		<mkdir dir="${src.crio.build.dir}" />
+		<copy todir="${src.crio.build.dir}">
+			<path refid="crio.source.path" />
+		</copy>
+		
+		
+		<mkdir dir="${build.dir}/crio-resources/META-INF"/>
+		<manifest file="${build.dir}/crio-resources/META-INF/MANIFEST.MF">
+			<attribute name="Build-Number" value="${BUILD_NUMBER}"/>
+			<attribute name="Built-On" value="${BUILD_ID}"/>
+			<attribute name="Built-From" value="SVN r${SVN_REVISION}"/>
+			<attribute name="Build-Type" value="${BUILD_TYPE}"/>
+			<attribute name="Build-Target" value="cRIO"/>
+		</manifest>
+		<ant antfile="${sunspot.home}/build.xml">
+			<property name="src.dir" value="${src.crio.build.dir}"/>
+			<property name="resources.dir" value="${build.dir}/crio-resources"/>
+			<property name="build.dir" value="${crio.build.dir}"/>
+			<property name="app.jar.file" value="${dist.dir}/lib/${crio.dist.filename}"/>
+			<property name="app.src.zip.file" value="${dist.dir}/lib/${crio.src.dist.filename}"/>
+			<property name="preverify.exclude.library.jars" value="true"/>
+			<property name="alternate.networktables.archive" value=""/>
+			<target name="jar"/>
+			<target name="archive-source"/>
+		</ant>
+	</target>
+</project>

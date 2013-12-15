@@ -1,0 +1,15 @@
+-dontCastConstants
+-runtime JNAerator
+-direct
+// -reification
+-M__java=true
+
+-package edu.wpi.first.wpilibj.hal
+// -entryClass HAL
+
+-library HAL
+-Itarget/native/include/
+
+target/native/include/HAL/HAL.h
+// include/HAL/Errors.h
+

@@ -1,0 +1,17 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>edu.wpi.first.wpilib</groupId>
+  <artifactId>aggregator-pom</artifactId>
+  <version>1.0.0</version>
+  <packaging>pom</packaging>
+  
+  <modules>
+    <module>eclipse-plugins</module>
+    <module>hal</module>
+    <module>maven-utilities</module>
+    <module>networktables</module>
+    <module>ni-libraries</module>
+    <module>wpilibc</module>
+    <module>wpilibj</module>
+  </modules>
+</project>

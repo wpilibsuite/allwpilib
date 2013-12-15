@@ -1,0 +1,15 @@
+
+* Purpose
+This project contains a number of utilities for using maven with
+wpilib. Currently it only contains a number of useful parents to
+inherit from.
+
+* List of possible parents
+- edu.wpi.first.wpilib.templates.athena:static-library :: Create a
+     static library (*.a) to run on the Athena platform.
+- edu.wpi.first.wpilib.templates.athena:shared-library :: Create a
+     shared library (*.so) to run on the Athena platform.
+- edu.wpi.first.wpilib.templates.azalea:static-library :: Create a
+     static library (*.a) to run on the Azalea platform.
+- edu.wpi.first.wpilib.templates:include :: Create a set of headers
+     that can be included with the native-maven-plugin.

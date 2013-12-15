@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>edu.wpi.first.wpilib.templates.athena</groupId>
+  <artifactId>static-library</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  
+  <properties>
+	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	<project.resources.sourceEncoding>UTF-8</project.resources.sourceEncoding>
+	<local-repository>C:/Users/wpilibj-buildmaster/maven-repository</local-repository>
+  </properties>
+
+  <build>
+    <pluginManagement>
+	  <plugins>
+		<plugin>
+		  <groupId>org.codehaus.mojo</groupId>
+		  <artifactId>native-maven-plugin</artifactId>
+		  <version>1.0-alpha-7</version>
+		  <extensions>true</extensions>
+		  <configuration>
+			<!-- Must be on path:
+				 export PATH=$HOME/wpilib/toolchains/arm-none-linux-gnueabi-4.4.1/bin/:$PATH -->
+			<compilerExecutable>arm-none-linux-gnueabi-g++</compilerExecutable>
+			<compilerStartOptions>
+              <compilerStartOption>-march=armv7 -mcpu=cortex-a9 -mfloat-abi=softfp -fPIC</compilerStartOption>
+			</compilerStartOptions>
+			<compilerMiddleOptions>
+			  <compilerMiddleOption>-O0 -g3 -Wall</compilerMiddleOption>
+			</compilerMiddleOptions>
+			
+			<linkerExecutable>arm-none-linux-gnueabi-ar</linkerExecutable>*
+			<linkerStartOptions>
+			  <linkerStartOption>-r</linkerStartOption>
+			</linkerStartOptions>
+			
+			<sources>
+			  <source>
+				<directory>src/main/native</directory>
+				<includes>
+				  <include>**/*.cpp</include>
+				</includes>
+			  </source>
+			  <source>
+				<directory>src/main/include</directory>
+				<!-- use this to have maven deploying header files with a .inczip type -->
+				<!-- typically used to for library artifacts header files -->
+				<deployable>true</deployable>
+			  </source>
+			</sources>
+		  </configuration>
+		</plugin>
+
+		<!-- Stuff to play nice with M2Eclipse -->
+        <!--This plugin's configuration is used to store Eclipse 
+            m2e settings only. It has no influence on the Maven build itself. -->
+        <plugin>
+		  <groupId>org.eclipse.m2e</groupId>
+		  <artifactId>lifecycle-mapping</artifactId>
+		  <version>1.0.0</version>
+		  <configuration>
+            <lifecycleMappingMetadata>
+			  <pluginExecutions>
+                <pluginExecution>
+				  <pluginExecutionFilter>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>native-maven-plugin</artifactId>
+					<versionRange>[0.0,)</versionRange>
+                    <goals>
+					  <goal>unzipinc</goal>
+					  <goal>initialize</goal>
+					  <goal>compile</goal>
+					  <goal>link</goal>
+					  <goal>javah</goal>
+                    </goals>
+				  </pluginExecutionFilter>
+				  <action>
+                    <execute />
+				  </action>
+                </pluginExecution>
+			  </pluginExecutions>
+            </lifecycleMappingMetadata>
+		  </configuration>
+        </plugin>
+	  </plugins>
+    </pluginManagement>
+  </build>
+  
+  <profiles>
+	<profile>
+	  <id>jenkins</id>
+	  <distributionManagement>
+		<repository>
+		  <id>myrepository</id>
+		  <url>file:${local-repository}</url>
+		</repository>
+	  </distributionManagement>
+	</profile>
+  </profiles>
+</project>

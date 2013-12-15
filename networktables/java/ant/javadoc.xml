@@ -1,0 +1,18 @@
+
+	
+<project name="Network_Tables_2.0 Javadoc">
+	
+	<!-- javadoc build properties -->
+	<property name="javadoc.dir" value="${desktop.build.dir}/javadoc" />
+	<target name="javadoc">
+		<mkdir dir="${javadoc.dir}" />
+		<javadoc sourcepath="${src.dir}" destdir="${javadoc.dir}" author="true" version="true" use="true" windowtitle="Network Tables 2.0">
+			<doctitle>
+				<![CDATA[
+				<h1>Network Tables 2.0</h1>
+				]]>
+			</doctitle>
+		</javadoc>
+		<zip destfile="${dist.dir}/desktop-lib/networktables-desktop.javadoc.zip" basedir="${javadoc.dir}" />
+	</target>
+</project>

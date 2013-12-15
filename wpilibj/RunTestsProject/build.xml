@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+SDK Test Runner Script
+
+by Mitchell Wills
+mwills@wpi.edu
+
+ -->
+ 
+<project name="WPILibJ Test Runner" default="test">
+    <property file="${user.home}/.sunspotfrc.properties"/>
+	<import file="${sunspot.home}/build.xml"/>
+	<import file="${sunspot.home}/ant/driver-station.xml"/>
+	<import file="${sunspot.home}/ant/configure.xml"/>
+	
+	<property name="remoteaddress" value="10.1.90.2"/>
+		
+	<target name="test" depends="deploy">
+		<delete dir="test" />
+		<mkdir dir="test"/>
+		
+		
+		<crio-reboot remoteaddress="${remoteaddress}" />
+		<parallel>
+			<sequential>
+				<echo>ENABLING IN 30 SECONDS - Starting headless driver station in 30 seconds...</echo>
+				<sleep milliseconds="30000" />
+				<start-driverstation remoteaddress="${remoteaddress}"/>
+				<sleep milliseconds="60000" />
+				<kill-driverstation />
+			</sequential>
+			<sequential>
+				<frctest remoteaddress="${remoteaddress}" 
+					 syncwithprompttimeout="10"
+					 reboottarget="false"/>
+			</sequential>
+		</parallel>
+	</target>
+	
+</project>

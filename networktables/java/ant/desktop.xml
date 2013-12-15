@@ -1,0 +1,51 @@
+
+<project name="Network_Tables_2.0 Desktop">
+	
+	
+	<!-- desktop build properties -->
+	<property name="desktop.build.dir" value="${build.dir}/desktop" />
+	<property name="src.desktop.build.dir" value="${desktop.build.dir}/src" />
+	<property name="classes.desktop.build.dir" value="${desktop.build.dir}/classes" />
+	<property name="desktop.dist.suffix" value="-desktop" />
+	<property name="desktop.dist.filename" value="${jar-base-name}${desktop.dist.suffix}${jar-suffix}.jar" />
+	<property name="desktop.dist.jar.file" value="${dist.dir}/desktop-lib/${desktop.dist.filename}" />
+	<property name="desktop.src.dist.filename" value="${jar-base-name}${desktop.dist.suffix}${jar-suffix}.src.zip" />
+	<path id="desktop.source.path">
+		<fileset dir="${desktop.src.dir}"/>
+		<fileset dir="${src.dir}"/>
+	</path>
+	
+	
+
+	<!-- desktop build -->
+	<target name="build-desktop">
+		<!-- copy source -->
+		<mkdir dir="${src.desktop.build.dir}" />
+		<copy todir="${src.desktop.build.dir}">
+			<path refid="desktop.source.path" />
+		</copy>
+		<zip destfile="${dist.dir}/desktop-lib/${desktop.src.dist.filename}" basedir="${src.desktop.build.dir}"/>
+		
+		
+		<!-- compile source -->
+		<mkdir dir="${classes.desktop.build.dir}" />
+		<javac target="1.6" source="1.6" srcdir="${src.desktop.build.dir}" destdir="${classes.desktop.build.dir}" includeAntRuntime="false" >
+			<compilerarg value="-Xlint"/>
+			<compilerarg line="-Xlint:-serial"/>
+			<compilerarg line="-Xlint:-rawtypes"/>
+		</javac>
+		
+		
+		<!-- build desktop jar -->
+		<jar destfile="${desktop.dist.jar.file}" basedir="${classes.desktop.build.dir}" >
+			<manifest>
+				<attribute name="Build-Number" value="${BUILD_NUMBER}"/>
+				<attribute name="Built-On" value="${BUILD_ID}"/>
+				<attribute name="Built-From" value="SVN r${SVN_REVISION}"/>
+				<attribute name="Build-Type" value="${BUILD_TYPE}"/>
+				<attribute name="Build-Target" value="Desktop"/>
+			</manifest>
+		</jar>
+	</target>
+
+</project>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.ni.first.libraries</groupId>
+  <artifactId>parent</artifactId>
+  <packaging>pom</packaging>
+  <version>0.1.0-SNAPSHOT</version>
+
+  <properties>
+	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	<project.resources.sourceEncoding>UTF-8</project.resources.sourceEncoding>
+	<local-repository>C:/Users/wpilibj-buildmaster/maven-repository</local-repository>
+  </properties>
+  
+  <build>
+    <plugins>
+	  <plugin>
+		<groupId>org.codehaus.mojo</groupId>
+		<artifactId>native-maven-plugin</artifactId>
+		<version>1.0-alpha-7</version>
+		<extensions>true</extensions>
+		<configuration>
+		  <linkerProvider>ar</linkerProvider>
+		  <compilerExecutable>echo</compilerExecutable>
+		  <linkerExecutable>cp</linkerExecutable>
+		  
+          <linkerStartOptions>
+            <linkerStartOption>${library}</linkerStartOption>
+          </linkerStartOptions>
+		</configuration>
+	  </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+	<profile>
+	  <id>jenkins</id>
+	  <distributionManagement>
+		<repository>
+		  <id>myrepository</id>
+		  <url>file:${local-repository}</url>
+		</repository>
+	  </distributionManagement>
+	</profile>
+	<profile>
+	  <id>windows-builder</id>
+      <activation>
+		<os>
+          <family>Windows</family>
+		</os>
+      </activation>
+	  <build>
+		<plugins>
+		  <plugin>
+			<groupId>org.codehaus.mojo</groupId>
+			<artifactId>native-maven-plugin</artifactId>
+			<extensions>true</extensions>
+			<configuration>
+			  <linkerExecutable>copy</linkerExecutable>
+			</configuration>
+		  </plugin>
+		</plugins>
+	  </build>
+	</profile>
+  </profiles>
+</project>

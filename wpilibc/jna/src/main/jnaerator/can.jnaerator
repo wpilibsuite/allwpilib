@@ -1,0 +1,11 @@
+-dontCastConstants
+-runtime JNAerator
+-direct
+-M__java=true
+
+-package edu.wpi.first.wpilibj.can
+
+-library CAN
+
+../src/main/include/CAN/JaguarCANDriver.h
+../src/main/include/CAN/can_proto.h

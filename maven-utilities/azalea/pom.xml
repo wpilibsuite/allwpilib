@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>edu.wpi.first.wpilib.templates</groupId>
+  <artifactId>azalea</artifactId>
+  <packaging>pom</packaging>
+  <version>0.1.0-SNAPSHOT</version>
+
+  <modules>
+    <module>static-library</module>
+    <module>cpp-executable</module>
+    <module>library-jar</module>
+  </modules>
+
+  <properties>
+	<local-repository>C:/Users/wpilibj-buildmaster/maven-repository</local-repository>
+  </properties>
+  <profiles>
+	<profile>
+	  <id>jenkins</id>
+	  <distributionManagement>
+		<repository>
+		  <id>myrepository</id>
+		  <url>file:${local-repository}</url>
+		</repository>
+	  </distributionManagement>
+	</profile>
+  </profiles>
+</project>

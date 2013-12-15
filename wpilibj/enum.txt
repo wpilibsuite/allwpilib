@@ -1,0 +1,20 @@
+//Going to use this pattern for enumeration classes, since they are otherwise unsupported
+
+//The typesafe enum pattern
+public class Suit {
+    public final int value;
+
+    protected static final int CLUBS_VAL = 0;
+    protected static final int DIAMONDS_VAL = 1;
+    protected static final int HEARTS_VAL = 2;
+    protected static final int SPADES_VAL = 3;
+
+    public static final Suit CLUBS = new Suit(CLUBS_VAL);
+    public static final Suit DIAMONDS = new Suit(DIAMONDS_VAL);
+    public static final Suit HEARTS = new Suit(HEARTS_VAL);
+    public static final Suit SPADES = new Suit(SPADES_VAL);
+
+    private Suit(int value){
+        this.value = value;
+    }
+}

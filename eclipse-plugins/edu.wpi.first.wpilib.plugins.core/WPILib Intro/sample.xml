@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<introContent>
+  	<extensionContent id="WPILibRobotDevelopment-introExtension" style="css/sample.css" name="Sample Extension" path="overview/@">
+		<group style-id="content-group" id="WPILibRobotDevelopment-introLink-group">
+       		<link label="WPILib Documentation" url="http://wpilib.screenstepslive.com/s/3120" id="WPILibRobotDevelopment-introLink" style-id="content-link">
+          		<text>Documentation of how WPILib and it's associated tools work. (Internet Connection Needed)</text>
+       		</link>
+       	</group>
+  	</extensionContent>
+</introContent>

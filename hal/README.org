@@ -1,0 +1,94 @@
+
+* Purpose
+The HAL is a hardware abstraction layer that provides a uniform
+interface that can be used to access a number of primarily I/O
+features in the underlying platform. The features include:
+- Analog input, accumulation and triggers
+- PWM, Relay and Solenoid output
+- Digital input and output
+- I2C and SPI communication
+- Encoders and counters
+- Interrupts and Notifiers
+
+The initial goal is to allow a higher level like WPILib to support
+both the CRIO and the upcoming Athena platform only by changing which
+version of the HAL it's running on.
+
+* Editing
+You can always use any text editor and then build with Maven. There
+are also eclipse project files so that it can be edited in the same
+eclipse environment that teams develop with. For the AthenaXX, this
+can be found in the =root= directory of this project. It imports as an
+FRC Robot C++ Eclipse project. The Windriver project can be imported
+from the =src= directory.
+
+* Building with Maven
+There are multiple build targets that the HAL supports. Instructions
+for setting up the environment and building each of these is described
+below. Current targets are listed below:
+- All: All of the following targets.
+- include: The header files for the HAL.
+- Azalea: CRIO C++ build.
+- AthenaXX: Athena Dos Equis C++ build.
+- AthenaXXJava: Athena Dos Equis Java build with auto-generated JNA
+  wrappers.
+
+Output from each build target is placed in the directory
+=target/<target-name>=. So, the Azalea output is placed in
+=target/Azalea=.
+
+** All
+Note: Windows only due to the Windriver requirement.
+1. Ensure that =C:\WindRiver\gnu\3.4.4-vxworks-6.3\x86-win32\bin= is
+   on the system path so that =ccppc= and =arppc= can be accessed.
+2. Set the environment variable =WIND_BASE= to =C:\WindRiver\vxworks-6.3=.
+3. Ensure that
+   =$HOME/wpilib/toolchains/arm-none-linux-gnueabi-4.4.1/bin/= is on
+   the system path so that =arm-none-linux-gnueabi-g++= and
+   =arm-none-linux-gnueabi-ar= can be accessed.
+4. Checkout and install the NI-Libraries from Github:
+   [[https://github.com/first/NI-Libraries]].
+5. Run the following maven command:
+   =mvn clean install=
+6. Success
+
+** include
+1. =cd= into the include directory: =cd include=
+2. Run the following maven command:
+   =mvn clean install=
+3. Success
+
+** Azalea
+Note: Windows only.
+1. Ensure that =C:\WindRiver\gnu\3.4.4-vxworks-6.3\x86-win32\bin= is
+   on the system path so that =ccppc= and =arppc= can be accessed.
+2. Set the environment variable =WIND_BASE= to =C:\WindRiver\vxworks-6.3=.
+3. =cd= into the AthenaXX directory: =cd AthenaXX=
+4. =cd= into the Azalea directory:  =cd Azalea=
+5. Run the following maven command:
+   =mvn clean install=
+6. Success
+
+** AthenaXX
+1. Ensure that
+   =$HOME/wpilib/toolchains/arm-none-linux-gnueabi-4.4.1/bin/= is on
+   the system path so that =arm-none-linux-gnueabi-g++= and
+   =arm-none-linux-gnueabi-ar= can be accessed.
+2. Install the include target.
+3. =cd= into the AthenaXX directory: =cd AthenaXX=
+4. Run the following maven command:
+   =mvn clean install=
+5. Success
+
+** AthenaXXJava
+1. Ensure that
+   =$HOME/wpilib/toolchains/arm-none-linux-gnueabi-4.4.1/bin/= is on
+   the system path so that =arm-none-linux-gnueabi-g++= and
+   =arm-none-linux-gnueabi-ar= can be accessed.
+2. Checkout and install the NI-Libraries from Github:
+   [[https://github.com/first/NI-Libraries]].
+3. Install the include target.
+4. =cd= into the AthenaXXJava directory: =cd AthenaXXJava=
+5. Run the following maven command:
+   =mvn clean install=
+6. Success

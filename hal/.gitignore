@@ -1,0 +1,10 @@
+*~
+*#
+PPC603gnu/
+Debug/
+target/
+tmp/
+GPATH
+GRTAGS
+GSYMS
+GTAGS

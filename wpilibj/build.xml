@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." name="WPILibJ" default="dist">
+	
+    <property name="wpilibj.jar.out" value="dist/lib/wpilibj.jar"/>
+    <property name="app.jar.file" location="${wpilibj.jar.out}"/>
+    <property name="app.project.zip.file" location="dist/lib/wpilibj.project.zip"/>
+    <property name="app.src.zip.file" location="dist/lib/wpilibj.src.zip"/>
+	
+    <property name="user.properties.file" value="build.properties"/>
+    <property file="${user.home}/.sunspotfrc.properties"/>
+	
+	
+	<!-- Import enviornment properties and set defaults -->
+	<property environment="env"/>
+	<condition property="BUILD_NUMBER" value="${env.BUILD_NUMBER}" else="LOCAL">
+		<isset property="env.BUILD_NUMBER"/>
+	</condition>
+	<tstamp>
+		<format property="BUILD_START" pattern="yyyy-MM-dd_hh-mm-ss" locale="en,US"/>
+	</tstamp>
+	<condition property="BUILD_ID" value="${env.BUILD_ID}" else="${BUILD_START}">
+		<isset property="env.BUILD_ID"/>
+	</condition>
+	<condition property="SVN_REVISION" value="${env.SVN_REVISION}" else="LOCAL">
+		<isset property="env.SVN_REVISION"/>
+	</condition>
+	<condition property="BUILD_TYPE" value="${env.BUILD_TYPE}" else="CUSTOM">
+		<isset property="env.BUILD_TYPE"/>
+	</condition>
+	
+	
+	
+	<echo>Building NetworkTables 2.0</echo>
+	<echo>Build Number: ${BUILD_NUMBER}</echo>
+	<echo>Build Time: ${BUILD_ID}</echo>
+	<echo>SVN Revision: ${SVN_REVISION}</echo>
+	<echo>Build Type: ${BUILD_TYPE}</echo>
+	
+	
+	<property name="resources.dir" value="${build.dir}/resources"/>
+    <target name="make-manifest">
+		<mkdir dir="${build.dir}/resources/META-INF"/>
+		<manifest file="${build.dir}/resources/META-INF/MANIFEST.MF">
+			<attribute name="Build-Number" value="${BUILD_NUMBER}"/>
+			<attribute name="Built-On" value="${BUILD_ID}"/>
+			<attribute name="Built-From" value="SVN r${SVN_REVISION}"/>
+			<attribute name="Build-Type" value="${BUILD_TYPE}"/>
+			<attribute name="Build-Target" value="cRIO"/>
+			
+			<attribute name="MIDlet-Name" value="WPILibJ"/>
+			<attribute name="MIDlet-Version" value="1.0.0"/>
+			<attribute name="MIDlet-Vendor" value="FIRST"/>
+			<attribute name="MIDlet-1" value="WPILibJTest, , edu.wpi.first.wpilibj.WPILibJTest"/>
+			<attribute name="MicroEdition-Profile" value="IMP-1.0"/>
+			<attribute name="MicroEdition-Configuration" value="CLDC-1.1"/>
+		</manifest>
+	</target>
+	
+	
+	
+    <import file="${sunspot.home}/build.xml"/>
+	
+
+    <target name="dist" depends="clean,clean-dist,make-dist-dir,make-manifest,jar,archive-project,archive-source"/>
+	
+    <target name="make-dist-dir">
+		<mkdir dir="dist"/>
+	</target>
+    <target name="clean-dist">
+		<delete dir="dist"/>
+	</target>
+	
+    <target name="deploy-tests" depends="dist,test"/>
+	
+    <target name="test">
+		<ant antfile="build.xml" dir="RunTestsProject" inheritAll="false">
+			<property name="alternate.wpilibj.archive" value="${app.jar.file}"/>
+			<property name="sunspot.home" value="${sunspot.home}"/>
+		</ant>
+	</target>
+	
+</project>

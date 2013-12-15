@@ -1,0 +1,107 @@
+<project name="networktables-cpp" default="build-and-test">
+  <condition property="WINDOWS">
+	<os family="windows"/>
+  </condition>
+
+  <property name="cpptasks.jar" value="ant/cpptasks.jar"/>
+  <!-- Load AntCPP library for building cpp stuff -->
+  <taskdef resource="net/sf/antcontrib/cpptasks/antlib.xml">
+    <classpath>
+      <pathelement location="${cpptasks.jar}"></pathelement>
+    </classpath>
+  </taskdef>
+
+  <property name="root" value="../../.."/>
+  <property name="build" value="${root}/target"/>
+  <property name="src" value="../native"/>
+  
+  <property name="nt.root" value="../../../.."/>
+  <property name="nt.include" value="${root}/target/native/include"/>
+  <property name="nt.src.common" value="${nt.root}/parent/src/main/native"/>
+  <property name="nt.src.desktop" value="${nt.root}/Athena/src/main/native"/>
+  
+  <!-- Define common paths -->
+  <property name="gmock.root" value="${src}/gmock-1.6.0"/>
+  <property name="gmock.src" value="${gmock.root}/src"/>
+  <property name="gmock.gtest.root" value="${gmock.root}/gtest"/>
+  <property name="gmock.gtest.src" value="${gmock.gtest.root}/src"/>
+  
+  <path id="gtest.includepath">
+	<pathelement path="${gmock.gtest.root}/include"/>
+  </path>
+  <path id="gmock.includepath">
+	<path refid="gtest.includepath"/>
+	<pathelement path="${gmock.root}/include"/>
+  </path>
+
+  <target name="build-and-test" depends="build-tests,run-tests"/>
+  
+  <!-- Run tests -->
+  <target name="run-tests"> <!-- depends="build-tests" -->
+    <exec executable="${build}/tests/runtests">
+	  <arg value="--gtest_output=xml:${build}/tests/results.xml"/>
+    </exec>
+  </target>
+  
+  <!-- Build -->
+  <target name="build-tests" depends="build-gmock">
+    <mkdir dir="${build}/tests/obj"/>
+    <!-- Creates an executable at the root of build/tests -->
+    <cc outtype="executable" outfile="${build}/tests/runtests" objdir="${build}/tests/obj">
+      <compiler name="g++"/>
+
+      <compilerarg value="-g" location="start"/>
+      
+      <!-- Include gmock library -->
+      <libset dir="${build}" libs="gmock" />
+      
+      <!-- Include libs -->
+      <libset libs="stdc++"/>
+      <libset libs="pthread"/>
+      <libset libs="wsock32" if="WINDOWS"/>
+      
+      <!-- Include common sources and includes -->
+      <fileset dir="${nt.src.common}" includes="**/*.cpp"/>
+      <fileset dir="${nt.src.desktop}" includes="**/*.cpp"/>
+      <includepath path="${nt.include}"/>
+      
+      <!-- Include tests -->
+      <fileset dir="${src}/desktop-test/tests" includes="**/*.cpp"/>
+      <includepath path="${src}/desktop-test/include"/>
+	  
+      <includepath>
+		<path refid="gmock.includepath"/>
+	  </includepath>
+    </cc>
+  </target>
+  
+  <target name="build-gmock">
+    <mkdir dir="${build}/gmock/obj"/>
+    <!-- Creates a .a file at the root of build -->
+    <cc outtype="static" outfile="${build}/gmock" objdir="${build}/gmock/obj" debug="true">
+      <compiler name="g++"/>
+
+      <compilerarg value="-g" location="start"/>
+      
+      <!--- Include libs -->
+      <libset libs="pthread"/>
+      <libset libs="stdc++"/>
+      
+      <!-- gtest sources -->
+      <fileset file="${gmock.gtest.src}/gtest-all.cc"/>
+      <includepath path="${gmock.gtest.root}"/>
+      <includepath>
+		<path refid="gmock.includepath"/>
+	  </includepath>
+
+      <!-- gmock sources -->
+      <fileset file="${gmock.src}/gmock-all.cc"/>
+      <fileset file="${gmock.src}/gmock_main.cc"/>
+      <includepath path="${gmock.root}"/>
+    </cc>
+  </target>
+  
+  <target name="clean">
+    <delete dir="${build}"/>
+  </target>
+</project>

@@ -1,0 +1,59 @@
+<project name="Network Tables 2.0 C++ builder" default="run-tests">
+	<import file="test.xml"/>
+
+	<target name="build-server">
+	  <mkdir dir="build/server/obj"/>
+	  <!-- Creates an executable at the root of build/tests -->
+	  <cc outtype="executable" outfile="build/server/server" objdir="build/server/obj" debug="true">
+            <compiler name="g++"/>
+
+	    <compilerarg value="-g" location="start"/>
+            
+            <!-- Include libs -->
+            <libset libs="stdc++"/>
+            <libset libs="pthread"/>
+            <libset libs="wsock32" if="WINDOWS"/>
+
+	    <!-- Include common sources and includes -->
+	    <fileset dir="${nt.src.common}" includes="**/*.cpp"/>
+	    <fileset dir="${nt.src.desktop}" includes="**/*.cpp"/>
+	    <includepath path="${nt.include}"/>
+	    
+	    <!-- Include tests -->
+	    <fileset dir="${src}/test-server" includes="**/*.cpp"/>
+
+	  </cc>
+	</target>
+	<target name="run-server" depends="build-server">
+	  <exec executable="build/server/server">
+	  </exec>
+	</target>
+	
+	<target name="build-client">
+	  <mkdir dir="build/client/obj"/>
+	  <!-- Creates an executable at the root of build/tests -->
+	  <cc outtype="executable" outfile="build/client/client" objdir="build/client/obj" debug="true">
+            <compiler name="g++"/>
+            
+	    <compilerarg value="-g" location="start"/>
+
+            <!-- Include libs -->
+            <libset libs="stdc++"/>
+            <libset libs="pthread"/>
+            <libset libs="wsock32" if="WINDOWS"/>
+
+	    <!-- Include common sources and includes -->
+	    <fileset dir="${nt.src.common}" includes="**/*.cpp"/>
+	    <fileset dir="${nt.src.desktop}" includes="**/*.cpp"/>
+	    <includepath path="${nt.include}"/>
+	    
+	    <!-- Include tests -->
+	    <fileset dir="${src}/test-client" includes="**/*.cpp"/>
+
+	  </cc>
+	</target>
+	<target name="run-client" depends="build-client">
+	  <exec executable="build/client/client">
+	  </exec>
+	</target>
+</project>

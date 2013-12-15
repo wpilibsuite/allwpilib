@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?fileVersion 4.0.0?>
+
+<cproject>
+<storageModule moduleId="org.eclipse.cdt.core.settings">
+<cconfiguration id="org.eclipse.cdt.core.default.config.1075613688">
+<storageModule buildSystemId="org.eclipse.cdt.core.defaultConfigDataProvider" id="org.eclipse.cdt.core.default.config.1075613688" moduleId="org.eclipse.cdt.core.settings" name="Configuration">
+<externalSettings/>
+<extensions>
+<extension id="com.windriver.ide.core.WRScannerInfoProvider" point="org.eclipse.cdt.core.ScannerInfoProvider"/>
+<extension id="com.windriver.ide.core.WRElfParserVxWorks" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+</extensions>
+</storageModule>
+<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+
+<storageModule moduleId="scannerConfiguration"/>
+<storageModule moduleId="userdefinedContainer">
+<indexAllFiles value="false"/>
+<initialized value="true"/>
+</storageModule>
+<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+<storageModule moduleId="org.eclipse.cdt.core.pathentry">
+<pathentry excluding="PPC603gnu/|.svn/|.settings/" kind="src" path=""/>
+<pathentry kind="out" path=""/>
+<pathentry kind="con" path="com.windriver.ide.core.WR_CONTAINER"/>
+<pathentry kind="con" path="com.windriver.ide.core.build.model.WR_USERDEFINED_CONTAINER"/>
+</storageModule>
+</cconfiguration>
+</storageModule>
+</cproject>

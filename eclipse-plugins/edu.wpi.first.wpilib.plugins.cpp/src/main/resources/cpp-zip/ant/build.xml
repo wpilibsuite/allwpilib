@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="athena-project-build" default="deploy">
+
+  <!-- Load Tasks -->
+  <taskdef resource="net/sf/antcontrib/antlib.xml">
+    <classpath>
+      <pathelement location="${wpilib.ant.dir}/ant-contrib.jar"/>
+    </classpath>
+  </taskdef>
+  <taskdef resource="net/jtools/classloadertask/antlib.xml" classpath="${classloadertask.jar}"/>
+  <classloader loader="system" classpath="${jsch.jar}"/>
+
+  <target name="clean" description="Clean up all build and distribution artifacts.">
+    <delete dir="${build.dir}"/>
+    <delete dir="${dist.dir}"/>
+  </target>
+
+  <!-- Targets -->
+
+  <target name="get-target-ip">
+    <math result="ip.upper" operand1="${team-number}" operation="/" operand2="100" datatype="int"/>
+    <math result="ip.lower" operand1="${team-number}" operation="%" operand2="100" datatype="int"/>
+    <property name="target" value="10.${ip.upper}.${ip.lower}.2" />
+     <echo>Target IP: ${target}</echo>
+  </target>
+  
+  <!-- <target name="compile" description="Compile the source code."> -->
+  <!--   <mkdir dir="${build.dir}"/> -->
+  <!--   <echo>[athena-compile] Compiling ${src.dir} with classpath=${classpath} to ${build.dir}</echo> -->
+    
+  <!--   <javac srcdir="${src.dir}" -->
+  <!-- 	   destdir="${build.dir}" -->
+  <!-- 	   includeAntRuntime="no" -->
+  <!-- 	   includeJavaRuntime="no" -->
+  <!-- 	   classpath="${classpath}" -->
+  <!-- 	   target="1.7" -->
+  <!-- 	   source="1.7" -->
+  <!-- 	   debug="true"> -->
+  <!--   </javac> -->
+  <!-- </target> -->
+  
+  <!-- <target name="jar" depends="compile"> -->
+  <!--   <echo>[athena-jar] Making jar ${dist.jar}.</echo> -->
+  <!--   <mkdir dir="${dist.dir}" /> -->
+  <!--   <jar destfile="${dist.jar}" update="false"> -->
+  <!--     <manifest> -->
+  <!--   	<attribute name="Main-Class" value="${main}"/> -->
+  <!--   	<attribute name="Class-Path" value="."/> -->
+  <!--     </manifest> -->
+		
+  <!--     <fileset dir="${build.dir}" includes="**"/> -->
+      
+  <!--     <zipgroupfileset file="${networktables.jar}" />  -->
+  <!--   </jar> -->
+  <!-- </target> -->
+
+  <target name="deploy" depends="get-target-ip" description="Deploy the progam and start it running.">
+    <echo>[athena-deploy] Killing running program</echo>
+    <sshexec host="${target}"
+             username="${username}"
+             password="${password}"
+             trust="true"
+             command="killall FRCUserProgram; sleep 1"/>
+    <echo>[athena-deploy] Copying code over.</echo>
+    <scp file="${out.exe}" todir="${username}@${target}:${deploy.dir}"
+	 password="${password}" trust="true"/>
+    <scp file="${wpilib.ant.dir}/runcppprogram" todir="${username}@${target}:${deploy.dir}"
+	 password="${password}" trust="true"/>
+    <scp file="${wpilib.ant.dir}/runjavaprogram" todir="${username}@${target}:${deploy.dir}"
+	 password="${password}" trust="true"/>
+    <echo>[athena-deploy] Starting program.</echo>
+    <sshexec host="${target}"
+	     username="${username}"
+	     password="${password}"
+	     trust="true"
+	     command="chmod a+x run*program; ${deploy.run.command}"/>
+  </target>
+
+  <target name="debug-deploy" depends="get-target-ip" description="Deploy the jar and start the program running in debug mode.">
+    <echo>[athena-deploy] Killing running program</echo>
+    <sshexec host="${target}"
+             username="${username}"
+             password="${password}"
+             trust="true"
+             command="killall FRCUserProgram; sleep 1"/>
+    <echo>[athena-debug-deploy] Copying code over.</echo>
+    <scp file="${dist.jar}" todir="${username}@${target}:${deploy.dir}"
+	 password="${password}" trust="true"/>
+    <scp file="${wpilib.ant.dir}/debugcppprogram" todir="${username}@${target}:${deploy.dir}"
+	 password="${password}" trust="true"/>
+    <scp file="${wpilib.ant.dir}/debugjavaprogram" todir="${username}@${target}:${deploy.dir}"
+	 password="${password}" trust="true"/>
+    <echo>[athena-debug-deploy] Starting program.</echo>
+    <sshexec host="${target}"
+	     username="${username}"
+	     password="${password}"
+	     trust="true"
+	     command="chmod a+x debug*program; ${deploy.debug.command}"/>
+  </target>
+</project> 

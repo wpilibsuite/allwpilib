@@ -1,0 +1,6 @@
+#. ./.profile
+killall java
+sleep 1
+nohup java -Djna.library.path=$LD_LIBRARY_PATH -Xmx32M -agentlib:jdwp=transport=dt_socket,address=8348,server=y,suspend=y -jar FRCUserProgram.jar edu.wpi.first.wpilibj.unittests.RunTests
+
+

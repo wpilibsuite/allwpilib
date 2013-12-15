@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>JNAWrappers</artifactId>
+  <groupId>edu.wpi.first.wpilibj</groupId>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.nativelibs4java</groupId>
+      <artifactId>jnaerator-runtime</artifactId>
+      <version>0.12-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+  
+  <repositories>
+    <repository>
+      <id>sonatype</id>
+      <name>Sonatype OSS Snapshots Repository</name>
+      <url>http://oss.sonatype.org/content/groups/public</url>
+    </repository>
+    <!-- For old snapshots, please use groupId `com.jnaerator` and the following repo -->
+    <repository>
+      <id>nativelibs4java-repo</id>
+      <url>http://nativelibs4java.sourceforge.net/maven</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>sonatype</id>
+      <name>Sonatype OSS Snapshots Repository</name>
+      <url>http://oss.sonatype.org/content/groups/public</url>
+    </pluginRepository>
+    <!-- For old snapshots, please use groupId `com.jnaerator` and the following repo -->
+    <pluginRepository>
+      <id>nativelibs4java-repo</id>
+      <url>http://nativelibs4java.sourceforge.net/maven</url>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <build>
+    <plugins>
+	  <plugin>
+        <groupId>com.nativelibs4java</groupId>
+        <artifactId>maven-jnaerator-plugin</artifactId>
+        <version>0.12-SNAPSHOT</version>
+		<extensions>true</extensions>
+        <executions>
+          <execution>
+			<id>network-communications</id>
+			<phase>process-classes</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+			<configuration>
+			  <config>src/main/jnaerator/networkcommunications.jnaerator</config>
+			</configuration>
+          </execution>
+          <execution>
+			<id>can</id>
+			<phase>process-classes</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+			<configuration>
+			  <config>src/main/jnaerator/can.jnaerator</config>
+			</configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
