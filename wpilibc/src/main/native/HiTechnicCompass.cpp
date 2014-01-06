@@ -7,7 +7,7 @@
 #include "HiTechnicCompass.h"
 #include "DigitalModule.h"
 #include "I2C.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 
@@ -45,7 +45,7 @@ HiTechnicCompass::HiTechnicCompass(uint8_t moduleNumber)
 			wpi_setWPIError(CompassTypeError);
 		}
 
-		nUsageReporting::report(nUsageReporting::kResourceType_HiTechnicCompass, moduleNumber - 1);
+		HALReport(HALUsageReporting::kResourceType_HiTechnicCompass, moduleNumber - 1);
 		LiveWindow::GetInstance()->AddSensor("HiTechnicCompass", moduleNumber, 0, this);
 	}
 }

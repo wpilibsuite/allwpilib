@@ -8,11 +8,10 @@
 package edu.wpi.first.wpilibj;
 
 import java.nio.IntBuffer;
+import java.nio.ByteBuffer;
 
-import com.sun.jna.Pointer;
-
-import edu.wpi.first.wpilibj.hal.HALLibrary;
-import edu.wpi.first.wpilibj.hal.HALLibrary.InterruptHandlerFunction;
+import edu.wpi.first.wpilibj.hal.InterruptJNI;
+import edu.wpi.first.wpilibj.hal.InterruptJNI.InterruptHandlerFunction;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 
 /**
@@ -23,7 +22,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
 	/**
 	 * The interrupt resource
 	 */
-	protected Pointer m_interrupt;
+	protected ByteBuffer m_interrupt;
 	/**
 	 * The interrupt manager resource
 	 */
@@ -35,7 +34,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
 	/**
 	 * Resource manager
 	 */
-	protected static Resource interrupts = new Resource(HALLibrary.interrupt_kNumSystems.get());
+	protected static Resource interrupts = new Resource(8);
 
 	/**
 	 * Create a new InterrupatableSensorBase
@@ -57,7 +56,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
 		}
 		// Expects the calling leaf class to allocate an interrupt index.
 		IntBuffer status = IntBuffer.allocate(1);
-		m_interrupt = HALLibrary.initializeInterrupts(m_interruptIndex,
+		m_interrupt = InterruptJNI.initializeInterrupts(m_interruptIndex,
 				(byte) (watcher ? 1 : 0), status);
 		HALUtil.checkStatus(status);
 	}
@@ -71,7 +70,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
 			throw new IllegalStateException();
 		}
 		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.cleanInterrupts(m_interrupt, status);
+		InterruptJNI.cleanInterrupts(m_interrupt, status);
 		HALUtil.checkStatus(status);
 		
 	}
@@ -87,7 +86,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
 			throw new IllegalStateException();
 		}
 		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.waitForInterrupt(m_interrupt, (float) timeout, status);
+		InterruptJNI.waitForInterrupt(m_interrupt, (float) timeout, status);
 		HALUtil.checkStatus(status);
 	}
 
@@ -101,7 +100,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
 			throw new IllegalStateException();
 		}
 		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.enableInterrupts(m_interrupt, status);
+		InterruptJNI.enableInterrupts(m_interrupt, status);
 		HALUtil.checkStatus(status);
 	}
 
@@ -113,7 +112,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
 			throw new IllegalStateException();
 		}
 		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.disableInterrupts(m_interrupt, status);
+		InterruptJNI.disableInterrupts(m_interrupt, status);
 		HALUtil.checkStatus(status);
 	}
 
@@ -128,7 +127,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
 			throw new IllegalStateException();
 		}
 		IntBuffer status = IntBuffer.allocate(1);
-		double timestamp = HALLibrary.readInterruptTimestamp(m_interrupt, status);
+		double timestamp = InterruptJNI.readInterruptTimestamp(m_interrupt, status);
 		HALUtil.checkStatus(status);
 		return timestamp;
 	}

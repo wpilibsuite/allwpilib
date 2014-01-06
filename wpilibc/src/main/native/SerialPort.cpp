@@ -6,7 +6,7 @@
 
 #include "SerialPort.h"
 
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "visa/visa.h"
 #include <stdarg.h>
 
@@ -57,7 +57,7 @@ SerialPort::SerialPort(uint32_t baudRate, uint8_t dataBits, SerialPort::Parity p
 	//viInstallHandler(m_portHandle, VI_EVENT_IO_COMPLETION, ioCompleteHandler, this);
 	//viEnableEvent(m_portHandle, VI_EVENT_IO_COMPLETION, VI_HNDLR, VI_NULL);
 
-	nUsageReporting::report(nUsageReporting::kResourceType_SerialPort, 0);
+	HALReport(HALUsageReporting::kResourceType_SerialPort, 0);
 }
 
 /**

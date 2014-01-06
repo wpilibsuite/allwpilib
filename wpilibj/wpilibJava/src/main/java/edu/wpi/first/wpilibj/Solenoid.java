@@ -8,12 +8,10 @@
 package edu.wpi.first.wpilibj;
 
 import java.nio.IntBuffer;
+import java.nio.ByteBuffer;
 
-import com.sun.jna.Pointer;
-
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary.tResourceType;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
-import edu.wpi.first.wpilibj.hal.HALLibrary;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
@@ -31,30 +29,30 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
 public class Solenoid extends SolenoidBase implements LiveWindowSendable {
 
     private int m_channel; ///< The channel on the module to control.
-    private Pointer m_port;
+    private ByteBuffer m_port;
 
     /**
      * Common function to implement constructor behavior.
      */
     private synchronized void initSolenoid() {
-        checkSolenoidModule(m_moduleNumber);
-        checkSolenoidChannel(m_channel);
-
-        try {
-            m_allocated.allocate((m_moduleNumber - 1) * kSolenoidChannels + m_channel - 1);
-        } catch (CheckedAllocationException e) {
-            throw new AllocationException(
-                "Solenoid channel " + m_channel + " on module " + m_moduleNumber + " is already allocated");
-        }
-        
-        IntBuffer status = IntBuffer.allocate(1);
-        m_port = HALLibrary.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
-        HALUtil.checkStatus(status);
-        HALLibrary.initializeSolenoidPort(m_port, status);
-        HALUtil.checkStatus(status);
-
-        LiveWindow.addActuator("Solenoid", m_moduleNumber, m_channel, this);
-        UsageReporting.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber - 1);
+//        checkSolenoidModule(m_moduleNumber);
+//        checkSolenoidChannel(m_channel);
+//
+//        try {
+//            m_allocated.allocate((m_moduleNumber - 1) * kSolenoidChannels + m_channel - 1);
+//        } catch (CheckedAllocationException e) {
+//            throw new AllocationException(
+//                "Solenoid channel " + m_channel + " on module " + m_moduleNumber + " is already allocated");
+//        }
+//        
+//        IntBuffer status = IntBuffer.allocate(1);
+//        m_port = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
+//        HALUtil.checkStatus(status);
+//        SolenoidJNI.initializeSolenoidPort(m_port, status);
+//        HALUtil.checkStatus(status);
+//
+//        LiveWindow.addActuator("Solenoid", m_moduleNumber, m_channel, this);
+//        UsageReporting.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber - 1);
     }
 
     /**
@@ -84,7 +82,7 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
      * Destructor.
      */
     public synchronized void free() {
-        m_allocated.free((m_moduleNumber - 1) * kSolenoidChannels + m_channel - 1);
+  //      m_allocated.free((m_moduleNumber - 1) * kSolenoidChannels + m_channel - 1);
     }
 
     /**
@@ -93,9 +91,9 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
      * @param on Turn the solenoid output off or on.
      */
     public void set(boolean on) {
-    	IntBuffer status = IntBuffer.allocate(1);
-    	HALLibrary.setSolenoid(m_port, (byte) (on ? 1 : 0), status);
-    	HALUtil.checkStatus(status);
+//    	IntBuffer status = IntBuffer.allocate(1);
+//    	SolenoidJNI.setSolenoid(m_port, (byte) (on ? 1 : 0), status);
+//    	HALUtil.checkStatus(status);
     }
 
     /**
@@ -104,9 +102,10 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
      * @return The current value of the solenoid.
      */
     public boolean get() {
-    	IntBuffer status = IntBuffer.allocate(1);
-    	boolean value = HALLibrary.getSolenoid(m_port, status) != 0;
-    	HALUtil.checkStatus(status);
+    	boolean value = false;
+//    	IntBuffer status = IntBuffer.allocate(1);
+//    	boolean value = SolenoidJNI.getSolenoid(m_port, status) != 0;
+//    	HALUtil.checkStatus(status);
     	return value;
     }
 

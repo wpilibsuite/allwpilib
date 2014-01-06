@@ -5,7 +5,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "PIDController.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "Notifier.h"
 #include "PIDSource.h"
 #include "PIDOutput.h"
@@ -63,7 +63,7 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
 {
 	m_table = NULL;
 	
-	m_semaphore = initializeMutex(SEMAPHORE_Q_PRIORITY);
+	m_semaphore = initializeMutexNormal();
 
 	m_controlLoop = new Notifier(PIDController::CallCalculate, this);
 
@@ -96,7 +96,7 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
 
 	static int32_t instances = 0;
 	instances++;
-	nUsageReporting::report(nUsageReporting::kResourceType_PIDController, instances);
+	HALReport(HALUsageReporting::kResourceType_PIDController, instances);
 	
 	m_toleranceType = kNoTolerance;
 }
@@ -106,7 +106,7 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
  */
 PIDController::~PIDController()
 {
-	takeMutex(m_semaphore, SEMAPHORE_WAIT_FOREVER);
+	takeMutex(m_semaphore);
 	deleteMutex(m_semaphore);
 	delete m_controlLoop;
 }

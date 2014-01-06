@@ -8,7 +8,7 @@ package edu.wpi.first.wpilibj;
 
 import java.util.Stack;
 
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary.tResourceType;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.parsing.IInputOutput;
 

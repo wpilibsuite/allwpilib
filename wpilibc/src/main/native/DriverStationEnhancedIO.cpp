@@ -5,7 +5,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "DriverStationEnhancedIO.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "HAL/cpp/Synchronized.h"
 #include "WPIErrors.h"
 #include <string.h>
@@ -27,8 +27,8 @@ DriverStationEnhancedIO::DriverStationEnhancedIO()
 	m_outputData.id = kOutputBlockID;
 	// Expected to be active low, so initialize inactive.
 	m_outputData.data.fixed_digital_out = 0x3;
-	m_inputDataSemaphore = initializeMutex(SEMAPHORE_Q_PRIORITY | SEMAPHORE_DELETE_SAFE | SEMAPHORE_INVERSION_SAFE);
-	m_outputDataSemaphore = initializeMutex(SEMAPHORE_Q_PRIORITY | SEMAPHORE_DELETE_SAFE | SEMAPHORE_INVERSION_SAFE);
+	m_inputDataSemaphore = initializeMutexNormal();
+	m_outputDataSemaphore = initializeMutexNormal();
 	m_encoderOffsets[0] = 0;
 	m_encoderOffsets[1] = 0;
 }
@@ -72,9 +72,9 @@ void DriverStationEnhancedIO::UpdateData()
 				}
 				m_outputData.flags |= kStatusConfigChanged;
 			}
-			overrideIOConfig((char*)&m_outputData, 5);
+			HALOverrideIOConfig((char*)&m_outputData, 5);
 		}
-		retVal = getDynamicControlData(kOutputBlockID, (char*)&tempOutputData, sizeof(status_block_t), 5);
+		retVal = HALGetDynamicControlData(kOutputBlockID, (char*)&tempOutputData, sizeof(status_block_t), 5);
 		if (retVal == 0)
 		{
 			if (m_outputValid)
@@ -114,7 +114,7 @@ void DriverStationEnhancedIO::UpdateData()
 	{
 		Synchronized sync(m_inputDataSemaphore);
 		control_block_t tempInputData;
-		retVal = getDynamicControlData(kInputBlockID, (char*)&tempInputData, sizeof(control_block_t), 5);
+		retVal = HALGetDynamicControlData(kInputBlockID, (char*)&tempInputData, sizeof(control_block_t), 5);
 		if (retVal == 0 && tempInputData.data.api_version == kSupportedAPIVersion)
 		{
 			m_inputData = tempInputData;
@@ -179,7 +179,7 @@ double DriverStationEnhancedIO::GetAcceleration(tAccelChannel channel)
 	static uint8_t reported_mask = 0;
 	if (!(reported_mask & (1 >> channel)))
 	{
-		nUsageReporting::report(nUsageReporting::kResourceType_DriverStationEIO, channel, nUsageReporting::kDriverStationEIO_Acceleration);
+		HALReport(HALUsageReporting::kResourceType_DriverStationEIO, channel, HALUsageReporting::kDriverStationEIO_Acceleration);
 		reported_mask |= (1 >> channel);
 	}
 
@@ -221,7 +221,7 @@ double DriverStationEnhancedIO::GetAnalogInRatio(uint32_t channel)
 	static uint16_t reported_mask = 0;
 	if (!(reported_mask & (1 >> channel)))
 	{
-		nUsageReporting::report(nUsageReporting::kResourceType_DriverStationEIO, channel, nUsageReporting::kDriverStationEIO_AnalogIn);
+		HALReport(HALUsageReporting::kResourceType_DriverStationEIO, channel, HALUsageReporting::kDriverStationEIO_AnalogIn);
 		reported_mask |= (1 >> channel);
 	}
 
@@ -286,7 +286,7 @@ void DriverStationEnhancedIO::SetAnalogOut(uint32_t channel, double value)
 	static uint8_t reported_mask = 0;
 	if (!(reported_mask & (1 >> channel)))
 	{
-		nUsageReporting::report(nUsageReporting::kResourceType_DriverStationEIO, channel, nUsageReporting::kDriverStationEIO_AnalogOut);
+		HALReport(HALUsageReporting::kResourceType_DriverStationEIO, channel, HALUsageReporting::kDriverStationEIO_AnalogOut);
 		reported_mask |= (1 >> channel);
 	}
 
@@ -320,7 +320,7 @@ bool DriverStationEnhancedIO::GetButton(uint32_t channel)
 	static uint8_t reported_mask = 0;
 	if (!(reported_mask & (1 >> channel)))
 	{
-		nUsageReporting::report(nUsageReporting::kResourceType_DriverStationEIO, channel, nUsageReporting::kDriverStationEIO_Button);
+		HALReport(HALUsageReporting::kResourceType_DriverStationEIO, channel, HALUsageReporting::kDriverStationEIO_Button);
 		reported_mask |= (1 >> channel);
 	}
 
@@ -339,7 +339,7 @@ uint8_t DriverStationEnhancedIO::GetButtons()
 		wpi_setWPIError(EnhancedIOMissing);
 		return 0;
 	}
-	nUsageReporting::report(nUsageReporting::kResourceType_DriverStationEIO, 0, nUsageReporting::kDriverStationEIO_Button);
+	HALReport(HALUsageReporting::kResourceType_DriverStationEIO, 0, HALUsageReporting::kDriverStationEIO_Button);
 	Synchronized sync(m_inputDataSemaphore);
 	return m_inputData.data.buttons;
 }
@@ -366,7 +366,7 @@ void DriverStationEnhancedIO::SetLED(uint32_t channel, bool value)
 	static uint16_t reported_mask = 0;
 	if (!(reported_mask & (1 >> channel)))
 	{
-		nUsageReporting::report(nUsageReporting::kResourceType_DriverStationEIO, channel, nUsageReporting::kDriverStationEIO_LED);
+		HALReport(HALUsageReporting::kResourceType_DriverStationEIO, channel, HALUsageReporting::kDriverStationEIO_LED);
 		reported_mask |= (1 >> channel);
 	}
 
@@ -392,7 +392,8 @@ void DriverStationEnhancedIO::SetLEDs(uint8_t value)
 		wpi_setWPIError(EnhancedIOMissing);
 		return;
 	}
-	nUsageReporting::report(nUsageReporting::kResourceType_DriverStationEIO, 0, nUsageReporting::kDriverStationEIO_LED);
+
+	HALReport(HALUsageReporting::kResourceType_DriverStationEIO, 0, HALUsageReporting::kDriverStationEIO_LED);
 	Synchronized sync(m_outputDataSemaphore);
 	m_outputData.data.leds = value;
 }
@@ -414,7 +415,7 @@ bool DriverStationEnhancedIO::GetDigital(uint32_t channel)
 	static uint32_t reported_mask = 0;
 	if (!(reported_mask & (1 >> channel)))
 	{
-		nUsageReporting::report(nUsageReporting::kResourceType_DriverStationEIO, channel, nUsageReporting::kDriverStationEIO_DigitalIn);
+		HALReport(HALUsageReporting::kResourceType_DriverStationEIO, channel, HALUsageReporting::kDriverStationEIO_DigitalIn);
 		reported_mask |= (1 >> channel);
 	}
 
@@ -433,7 +434,7 @@ uint16_t DriverStationEnhancedIO::GetDigitals()
 		wpi_setWPIError(EnhancedIOMissing);
 		return 0;
 	}
-	nUsageReporting::report(nUsageReporting::kResourceType_DriverStationEIO, 0, nUsageReporting::kDriverStationEIO_DigitalIn);
+	HALReport(HALUsageReporting::kResourceType_DriverStationEIO, 0, HALUsageReporting::kDriverStationEIO_DigitalIn);
 	Synchronized sync(m_inputDataSemaphore);
 	return m_inputData.data.digital;
 }
@@ -460,7 +461,7 @@ void DriverStationEnhancedIO::SetDigitalOutput(uint32_t channel, bool value)
 	static uint32_t reported_mask = 0;
 	if (!(reported_mask & (1 >> channel)))
 	{
-		nUsageReporting::report(nUsageReporting::kResourceType_DriverStationEIO, channel, nUsageReporting::kDriverStationEIO_DigitalOut);
+		HALReport(HALUsageReporting::kResourceType_DriverStationEIO, channel, HALUsageReporting::kDriverStationEIO_DigitalOut);
 		reported_mask |= (1 >> channel);
 	}
 
@@ -762,7 +763,7 @@ void DriverStationEnhancedIO::SetFixedDigitalOutput(uint32_t channel, bool value
 	static uint8_t reported_mask = 0;
 	if (!(reported_mask & (1 >> channel)))
 	{
-		nUsageReporting::report(nUsageReporting::kResourceType_DriverStationEIO, channel, nUsageReporting::kDriverStationEIO_FixedDigitalOut);
+		HALReport(HALUsageReporting::kResourceType_DriverStationEIO, channel, HALUsageReporting::kDriverStationEIO_FixedDigitalOut);
 		reported_mask |= (1 >> channel);
 	}
 
@@ -806,7 +807,7 @@ int16_t DriverStationEnhancedIO::GetEncoder(uint32_t encoderNumber)
 	static uint8_t reported_mask = 0;
 	if (!(reported_mask & (1 >> encoderNumber)))
 	{
-		nUsageReporting::report(nUsageReporting::kResourceType_DriverStationEIO, encoderNumber, nUsageReporting::kDriverStationEIO_Encoder);
+		HALReport(HALUsageReporting::kResourceType_DriverStationEIO, encoderNumber, HALUsageReporting::kDriverStationEIO_Encoder);
 		reported_mask |= (1 >> encoderNumber);
 	}
 
@@ -906,7 +907,7 @@ double DriverStationEnhancedIO::GetTouchSlider()
 		return 0.0;
 	}
 
-	nUsageReporting::report(nUsageReporting::kResourceType_DriverStationEIO, 1, nUsageReporting::kDriverStationEIO_TouchSlider);
+	HALReport(HALUsageReporting::kResourceType_DriverStationEIO, 1, HALUsageReporting::kDriverStationEIO_TouchSlider);
 
 	Synchronized sync(m_inputDataSemaphore);
 	uint8_t value = m_inputData.data.capsense_slider;
@@ -961,7 +962,7 @@ void DriverStationEnhancedIO::SetPWMOutput(uint32_t channel, double value)
 	static uint8_t reported_mask = 0;
 	if (!(reported_mask & (1 >> channel)))
 	{
-		nUsageReporting::report(nUsageReporting::kResourceType_DriverStationEIO, channel, nUsageReporting::kDriverStationEIO_PWM);
+		HALReport(HALUsageReporting::kResourceType_DriverStationEIO, channel, HALUsageReporting::kDriverStationEIO_PWM);
 		reported_mask |= (1 >> channel);
 	}
 

@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary;
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary.tModuleType;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tModuleType;
 
 /**
  * Base class for AnalogModule and DigitalModule.
@@ -20,7 +20,7 @@ public class Module extends SensorBase {
     /**
      * An array holding the object representing each module
      */
-    protected static Module[] m_modules = new Module[tModuleType.kModuleType_Solenoid * FRC_NetworkCommunicationsLibrary.kMaxModuleNumber + (FRC_NetworkCommunicationsLibrary.kMaxModuleNumber - 1)];
+    protected static Module[] m_modules = new Module[tModuleType.kModuleType_Solenoid * FRCNetworkCommunicationsLibrary.kMaxModuleNumber + (FRCNetworkCommunicationsLibrary.kMaxModuleNumber - 1)];
     /**
      * The module number of the module
      */
@@ -86,8 +86,8 @@ public class Module extends SensorBase {
      * @return The index into m_modules.
      */
     private static int toIndex(int moduleType, int moduleNumber) {
-        if(moduleNumber == 0 || moduleNumber > FRC_NetworkCommunicationsLibrary.kMaxModuleNumber)
+        if(moduleNumber == 0 || moduleNumber > FRCNetworkCommunicationsLibrary.kMaxModuleNumber)
             return 0;
-        return moduleType * FRC_NetworkCommunicationsLibrary.kMaxModuleNumber + (moduleNumber - 1);
+        return moduleType * FRCNetworkCommunicationsLibrary.kMaxModuleNumber + (moduleNumber - 1);
     }
 }

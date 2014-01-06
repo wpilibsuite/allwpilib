@@ -8,12 +8,20 @@
 #include "AnalogChannel.h"
 #include "HAL/cpp/Synchronized.h"
 #include "Timer.h"
-#include "NetworkCommunication/FRCComm.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/FRCComm.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "MotorSafetyHelper.h"
 #include "Utility.h"
 #include "WPIErrors.h"
 #include <string.h>
+#include "Log.h"
+
+// set the logging level
+TLogLevel dsLogLevel = logDEBUG;
+
+#define DS_LOG(level) \
+    if (level > dsLogLevel) ; \
+    else Log().Get(level)
 
 const uint32_t DriverStation::kBatteryModuleNumber;
 const uint32_t DriverStation::kBatteryChannel;
@@ -32,7 +40,7 @@ DriverStation::DriverStation()
 	: m_controlData (NULL)
 	, m_digitalOut (0)
 	, m_batteryChannel (NULL)
-	, m_statusDataSemaphore (initializeMutex(SEMAPHORE_Q_PRIORITY | SEMAPHORE_DELETE_SAFE | SEMAPHORE_INVERSION_SAFE))
+	, m_statusDataSemaphore (initializeMutexNormal())
 	, m_task ("DriverStation", (FUNCPTR)DriverStation::InitTask)
 	, m_dashboardHigh(m_statusDataSemaphore)
 	, m_dashboardLow(m_statusDataSemaphore)
@@ -49,16 +57,16 @@ DriverStation::DriverStation()
 	, m_userInTest(false)
 {
 	// Create a new semaphore
-	m_packetDataAvailableSem = initializeMutex(SEMAPHORE_Q_PRIORITY);
-	m_newControlData = initializeSemaphore(SEMAPHORE_Q_FIFO, SEMAPHORE_EMPTY);
+	m_packetDataAvailableSem = initializeMutexNormal();
+	m_newControlData = initializeSemaphore(SEMAPHORE_EMPTY);
 
 	// Register that semaphore with the network communications task.
 	// It will signal when new packet data is available. 
-	setNewDataSem(m_packetDataAvailableSem);
+	HALSetNewDataSem(m_packetDataAvailableSem);
 
 	m_waitForDataSem = initializeMultiWait();
 
-	m_controlData = new FRCCommonControlData;
+	m_controlData = new HALCommonControlData;
 
 	// initialize packet number and control words to zero;
 	m_controlData->packetIndex = 0;
@@ -104,7 +112,7 @@ DriverStation::~DriverStation()
 	m_instance = NULL;
 	deleteMultiWait(m_waitForDataSem);
 	// Unregister our semaphore.
-	setNewDataSem(0);
+	HALSetNewDataSem(0);
 	deleteMutex(m_packetDataAvailableSem);
 }
 
@@ -118,7 +126,7 @@ void DriverStation::Run()
 	int period = 0;
 	while (true)
 	{
-		takeMutex(m_packetDataAvailableSem, SEMAPHORE_WAIT_FOREVER);
+		takeMutex(m_packetDataAvailableSem);
 		SetData();
 		m_enhancedIO.UpdateData();
 		GetData();
@@ -129,13 +137,13 @@ void DriverStation::Run()
 			period = 0;
 		}
 		if (m_userInDisabled)
-			FRC_NetworkCommunication_observeUserProgramDisabled();
+			HALNetworkCommunicationObserveUserProgramDisabled();
 		if (m_userInAutonomous)
-			FRC_NetworkCommunication_observeUserProgramAutonomous();
+			HALNetworkCommunicationObserveUserProgramAutonomous();
         if (m_userInTeleop)
-            FRC_NetworkCommunication_observeUserProgramTeleop();
+            HALNetworkCommunicationObserveUserProgramTeleop();
         if (m_userInTest)
-            FRC_NetworkCommunication_observeUserProgramTest();
+            HALNetworkCommunicationObserveUserProgramTest();
 	}
 }
 
@@ -159,7 +167,9 @@ DriverStation* DriverStation::GetInstance()
 void DriverStation::GetData()
 {
 	static bool lastEnabled = false;
-	getCommonControlData(m_controlData, HAL_WAIT_FOREVER);
+
+	HALGetCommonControlData(m_controlData, HAL_WAIT_FOREVER);
+
 	if (!lastEnabled && IsEnabled()) 
 	{
 		// If starting teleop, assume that autonomous just took up 15 seconds
@@ -190,7 +200,7 @@ void DriverStation::SetData()
 
 	m_dashboardInUseHigh->GetStatusBuffer(&userStatusDataHigh, &userStatusDataHighSize);
 	m_dashboardInUseLow->GetStatusBuffer(&userStatusDataLow, &userStatusDataLowSize);
-	setStatusData(GetBatteryVoltage(), m_digitalOut, m_updateNumber,
+	HALSetStatusData(GetBatteryVoltage(), m_digitalOut, m_updateNumber,
 		userStatusDataHigh, userStatusDataHighSize, userStatusDataLow, userStatusDataLowSize, HAL_WAIT_FOREVER);
 	
 	m_dashboardInUseHigh->Flush();
@@ -311,7 +321,7 @@ float DriverStation::GetAnalogIn(uint32_t channel)
 	static uint8_t reported_mask = 0;
 	if (!(reported_mask & (1 >> channel)))
 	{
-		nUsageReporting::report(nUsageReporting::kResourceType_DriverStationCIO, channel, nUsageReporting::kDriverStationCIO_Analog);
+		HALReport(HALUsageReporting::kResourceType_DriverStationCIO, channel, HALUsageReporting::kDriverStationCIO_Analog);
 		reported_mask |= (1 >> channel);
 	}
 
@@ -343,7 +353,7 @@ bool DriverStation::GetDigitalIn(uint32_t channel)
 	static uint8_t reported_mask = 0;
 	if (!(reported_mask & (1 >> channel)))
 	{
-		nUsageReporting::report(nUsageReporting::kResourceType_DriverStationCIO, channel, nUsageReporting::kDriverStationCIO_DigitalIn);
+		HALReport(HALUsageReporting::kResourceType_DriverStationCIO, channel, HALUsageReporting::kDriverStationCIO_DigitalIn);
 		reported_mask |= (1 >> channel);
 	}
 
@@ -367,7 +377,7 @@ void DriverStation::SetDigitalOut(uint32_t channel, bool value)
 	static uint8_t reported_mask = 0;
 	if (!(reported_mask & (1 >> channel)))
 	{
-		nUsageReporting::report(nUsageReporting::kResourceType_DriverStationCIO, channel, nUsageReporting::kDriverStationCIO_DigitalOut);
+		HALReport(HALUsageReporting::kResourceType_DriverStationCIO, channel,HALUsageReporting::kDriverStationCIO_DigitalOut);
 		reported_mask |= (1 >> channel);
 	}
 
@@ -421,7 +431,7 @@ bool DriverStation::IsTest()
  */
 bool DriverStation::IsNewControlData()
 {
-	return takeSemaphore(m_newControlData, SEMAPHORE_NO_WAIT) == 0;
+	return tryTakeSemaphore(m_newControlData) == 0;
 }
 
 /**

@@ -6,7 +6,7 @@
 
 #include "DigitalOutput.h"
 #include "DigitalModule.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
 #include "WPIErrors.h"
 
@@ -38,7 +38,7 @@ void DigitalOutput::InitDigitalOutput(uint8_t moduleNumber, uint32_t channel)
 	m_module = DigitalModule::GetInstance(moduleNumber);
 	m_module->AllocateDIO(m_channel, false);
 
-	nUsageReporting::report(nUsageReporting::kResourceType_DigitalOutput, channel, moduleNumber - 1);
+	HALReport(HALUsageReporting::kResourceType_DigitalOutput, channel, moduleNumber - 1);
 }
 
 /**

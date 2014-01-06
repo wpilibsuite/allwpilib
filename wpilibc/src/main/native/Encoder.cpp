@@ -6,7 +6,7 @@
 
 #include "Encoder.h"
 #include "DigitalInput.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
@@ -62,7 +62,7 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType)
 	m_distancePerPulse = 1.0;
 	m_pidSource = kDistance;
 
-	nUsageReporting::report(nUsageReporting::kResourceType_Encoder, index, encodingType);
+	HALReport(HALUsageReporting::kResourceType_Encoder, index, encodingType);
 	LiveWindow::GetInstance()->AddSensor("Encoder", m_aSource->GetModuleForRouting(), m_aSource->GetChannelForRouting(), this);
 }
 

@@ -19,21 +19,21 @@ Synchronized::Synchronized(MUTEX_ID semaphore)
 {
 	m_mutex = semaphore;
 	m_semaphore = NULL;
-	takeMutex(m_mutex, SEMAPHORE_WAIT_FOREVER);
+	takeMutex(m_mutex);
 }
 
 Synchronized::Synchronized(SEMAPHORE_ID semaphore)
 {
 	m_mutex = NULL;
 	m_semaphore = semaphore;
-	takeSemaphore(m_semaphore, SEMAPHORE_WAIT_FOREVER);
+	takeSemaphore(m_semaphore);
 }
 
 Synchronized::Synchronized(ReentrantSemaphore& semaphore)
 {
 	m_mutex = semaphore.m_semaphore;
 	m_semaphore = NULL;
-	takeMutex(m_mutex, SEMAPHORE_WAIT_FOREVER);
+	takeMutex(m_mutex);
 }
 
 /**

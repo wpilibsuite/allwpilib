@@ -38,7 +38,7 @@
   </build>
   
   <properties>
-	<local-repository>C:/Users/wpilibj-buildmaster/maven-repository</local-repository>
+	<!-- local-repository>C:/Users/wpilibj-buildmaster/maven-repository</local-repository-->
   </properties>
   <profiles>
 	<profile>

@@ -5,7 +5,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Solenoid.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 
@@ -38,7 +38,7 @@ void Solenoid::InitSolenoid()
 	}
 
 	LiveWindow::GetInstance()->AddActuator("Solenoid", m_moduleNumber, m_channel, this);
-	nUsageReporting::report(nUsageReporting::kResourceType_Solenoid, m_channel, m_moduleNumber - 1);
+	HALReport(HALUsageReporting::kResourceType_Solenoid, m_channel, m_moduleNumber - 1);
 }
 
 /**

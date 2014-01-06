@@ -6,14 +6,17 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
+import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import java.nio.ByteBuffer;
 
-import com.sun.jna.Pointer;
+//import com.sun.jna.Pointer;
 
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary.tResourceType;
+
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
-import edu.wpi.first.wpilibj.hal.HALLibrary;
+import edu.wpi.first.wpilibj.hal.AnalogJNI;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
@@ -42,7 +45,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	private static final int kAccumulatorSlot = 1;
 	private static Resource channels = new Resource(kAnalogModules
 			* kAnalogChannels);
-	private Pointer m_port;
+	private ByteBuffer m_port;
 	private int m_moduleNumber, m_channel;
 	private static final int[] kAccumulatorChannels = { 1, 2 };
 	private long m_accumulatorOffset;
@@ -66,39 +69,38 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 *            The channel number to represent.
 	 */
 	public AnalogChannel(final int moduleNumber, final int channel) {
-		System.out.println("Module Number: " + moduleNumber + " Channel: "
-				+ channel);
-		System.out.println(Thread.currentThread().getStackTrace());
 		m_channel = channel;
 		m_moduleNumber = moduleNumber;
-		if (HALLibrary.checkAnalogModule((byte) moduleNumber) == 0) {
+		if (AnalogJNI.checkAnalogModule((byte)moduleNumber) == 0) {
 			throw new AllocationException("Analog channel " + m_channel
 					+ " on module " + m_moduleNumber
 					+ " cannot be allocated. Module is not present.");
 		}
-		if (HALLibrary.checkAnalogChannel(channel) == 0) {
+		if (AnalogJNI.checkAnalogChannel(channel) == 0) {
 			throw new AllocationException("Analog channel " + m_channel
 					+ " on module " + m_moduleNumber
 					+ " cannot be allocated. Channel is not present.");
 		}
 		try {
-			channels.allocate((moduleNumber - 1) * kAnalogChannels + m_channel
+			channels.allocate((moduleNumber - 1) * kAnalogChannels + channel
 					- 1);
 		} catch (CheckedAllocationException e) {
 			throw new AllocationException("Analog channel " + m_channel
 					+ " on module " + m_moduleNumber + " is already allocated");
 		}
 
-		Pointer port_pointer = HALLibrary.getPortWithModule(
+		ByteBuffer port_pointer = AnalogJNI.getPortWithModule(
 				(byte) moduleNumber, (byte) channel);
-		IntBuffer status = IntBuffer.allocate(1);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
 		// XXX: Uncomment when Analog has been fixed
-		m_port = HALLibrary.initializeAnalogPort(port_pointer, status);
-		HALUtil.checkStatus(status);
+		m_port = AnalogJNI.initializeAnalogPort(port_pointer, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 
 		LiveWindow.addSensor("Analog", moduleNumber, channel, this);
 		UsageReporting.report(tResourceType.kResourceType_AnalogChannel,
-				channel, m_moduleNumber - 1);
+				channel, moduleNumber - 1);
 	}
 
 	/**
@@ -129,9 +131,11 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * @return A sample straight from this channel on the module.
 	 */
 	public int getValue() {
-		IntBuffer status = IntBuffer.allocate(1);
-		int value = HALLibrary.getAnalogValue(m_port, status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		int value = AnalogJNI.getAnalogValue(m_port, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 		return value;
 	}
 
@@ -147,9 +151,11 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * @return A sample from the oversample and average engine for this channel.
 	 */
 	public int getAverageValue() {
-		IntBuffer status = IntBuffer.allocate(1);
-		int value = HALLibrary.getAnalogAverageValue(m_port, status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		int value = AnalogJNI.getAnalogAverageValue(m_port, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 		return value;
 	}
 
@@ -161,9 +167,11 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * @return A scaled sample straight from this channel on the module.
 	 */
 	public double getVoltage() {
-		IntBuffer status = IntBuffer.allocate(1);
-		double value = Float.intBitsToFloat(HALLibrary.getAnalogVoltageIntHack(m_port, status));
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		double value = AnalogJNI.getAnalogVoltage(m_port, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 		return value;
 	}
 
@@ -179,9 +187,11 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 *         engine for this channel.
 	 */
 	public double getAverageVoltage() {
-		IntBuffer status = IntBuffer.allocate(1);
-		double value = Float.intBitsToFloat(HALLibrary.getAnalogAverageVoltageIntHack(m_port, status));
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		double value = AnalogJNI.getAnalogAverageVoltage(m_port, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 		return value;
 	}
 
@@ -195,9 +205,11 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * @return Least significant bit weight.
 	 */
 	public long getLSBWeight() {
-		IntBuffer status = IntBuffer.allocate(1);
-		long value = HALLibrary.getAnalogLSBWeight(m_port, status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		long value = AnalogJNI.getAnalogLSBWeight(m_port, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 		return value;
 	}
 
@@ -211,9 +223,11 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * @return Offset constant.
 	 */
 	public int getOffset() {
-		IntBuffer status = IntBuffer.allocate(1);
-		int value = HALLibrary.getAnalogOffset(m_port, status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		int value = AnalogJNI.getAnalogOffset(m_port, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 		return value;
 	}
 
@@ -244,9 +258,11 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 *            The number of averaging bits.
 	 */
 	public void setAverageBits(final int bits) {
-		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.setAnalogAverageBits(m_port, bits, status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		AnalogJNI.setAnalogAverageBits(m_port, bits, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/**
@@ -257,9 +273,11 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * @return The number of averaging bits.
 	 */
 	public int getAverageBits() {
-		IntBuffer status = IntBuffer.allocate(1);
-		int value = HALLibrary.getAnalogAverageBits(m_port, status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		int value = AnalogJNI.getAnalogAverageBits(m_port, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 		return value;
 	}
 
@@ -272,9 +290,11 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 *            The number of oversample bits.
 	 */
 	public void setOversampleBits(final int bits) {
-		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.setAnalogOversampleBits(m_port, bits, status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		AnalogJNI.setAnalogOversampleBits(m_port, bits, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/**
@@ -285,9 +305,11 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * @return The number of oversample bits.
 	 */
 	public int getOversampleBits() {
-		IntBuffer status = IntBuffer.allocate(1);
-		int value = HALLibrary.getAnalogOversampleBits(m_port, status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		int value = AnalogJNI.getAnalogOversampleBits(m_port, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 		return value;
 	}
 
@@ -303,9 +325,11 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 							+ kAccumulatorChannels[1]);
 		}
 		m_accumulatorOffset = 0;
-		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.initAccumulator(m_port, status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		AnalogJNI.initAccumulator(m_port, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/**
@@ -324,9 +348,11 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * Resets the accumulator to the initial value.
 	 */
 	public void resetAccumulator() {
-		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.resetAccumulator(m_port, status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		AnalogJNI.resetAccumulator(m_port, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/**
@@ -342,18 +368,22 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * affect the size of the value for this field.
 	 */
 	public void setAccumulatorCenter(int center) {
-		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.setAccumulatorCenter(m_port, center, status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		AnalogJNI.setAccumulatorCenter(m_port, center, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/**
 	 * Set the accumulator's deadband.
 	 */
 	public void setAccumulatorDeadband(int deadband) {
-		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.setAccumulatorDeadband(m_port, deadband, status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		AnalogJNI.setAccumulatorDeadband(m_port, deadband, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/**
@@ -365,9 +395,11 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * @return The 64-bit value accumulated since the last Reset().
 	 */
 	public long getAccumulatorValue() {
-		IntBuffer status = IntBuffer.allocate(1);
-		long value = HALLibrary.getAccumulatorValue(m_port, status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		long value = AnalogJNI.getAccumulatorValue(m_port, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 		return value + m_accumulatorOffset;
 	}
 
@@ -380,9 +412,11 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * @return The number of times samples from the channel were accumulated.
 	 */
 	public long getAccumulatorCount() {
-		IntBuffer status = IntBuffer.allocate(1);
-		long value = HALLibrary.getAccumulatorCount(m_port, status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		long value = AnalogJNI.getAccumulatorCount(m_port, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 		return value;
 	}
 
@@ -405,13 +439,19 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 					+ " on module " + m_moduleNumber
 					+ " is not an accumulator channel.");
 		}
-		LongBuffer value = LongBuffer.allocate(1);
-		IntBuffer count = IntBuffer.allocate(1);
-		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.getAccumulatorOutput(m_port, value, count, status);
-		result.value = value.get(0) + m_accumulatorOffset;
-		result.count = count.get(0);
-		HALUtil.checkStatus(status);
+		ByteBuffer value = ByteBuffer.allocateDirect(8);
+		// set the byte order
+		value.order(ByteOrder.LITTLE_ENDIAN);
+		ByteBuffer count = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		count.order(ByteOrder.LITTLE_ENDIAN);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		AnalogJNI.getAccumulatorOutput(m_port, value.asLongBuffer(), count.asIntBuffer(), status.asIntBuffer());
+		result.value = value.asLongBuffer().get(0) + m_accumulatorOffset;
+		result.count = count.asIntBuffer().get(0);
+		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/**
@@ -434,9 +474,11 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	public void setSampleRate(final double samplesPerSecond) {
 		// TODO: This will change when variable size scan lists are implemented.
 		// TODO: Need float comparison with epsilon.
-		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.setAnalogSampleRate((float) samplesPerSecond, status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		AnalogJNI.setAnalogSampleRate((float) samplesPerSecond, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/**

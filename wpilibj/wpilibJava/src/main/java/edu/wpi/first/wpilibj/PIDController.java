@@ -8,7 +8,7 @@ package edu.wpi.first.wpilibj;
 
 import java.util.TimerTask;
 
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary.tResourceType;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.parsing.IUtility;
@@ -201,7 +201,7 @@ public class PIDController implements IUtility, LiveWindowSendable, Controller {
      * This should only be called by the PIDTask
      * and is created during initialization.
      */
-    protected void calculate() {
+    private void calculate() {
         boolean enabled;
         PIDSource pidInput;
 

@@ -7,12 +7,11 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.IntBuffer;
+import java.nio.ByteOrder;
+import java.nio.ByteBuffer;
 
-import com.sun.jna.Pointer;
-
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary.tModuleType;
-import edu.wpi.first.wpilibj.hal.HALLibrary;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tModuleType;
+import edu.wpi.first.wpilibj.hal.AnalogJNI;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 
 /**
@@ -40,7 +39,7 @@ public class AnalogModule extends Module {
      * The default sample rate
      */
     public static final double kDefaultSampleRate = 50000.0;
-    private Pointer[] m_ports;
+    private ByteBuffer[] m_ports;
 
     /**
      * Get an instance of an Analog Module.
@@ -70,13 +69,15 @@ public class AnalogModule extends Module {
     protected AnalogModule(final int moduleNumber) {
         super(tModuleType.kModuleType_Analog, moduleNumber);
 
-        m_ports = new Pointer[8];
+        m_ports = new ByteBuffer[8];
         for (int i = 0; i < SensorBase.kAnalogChannels; i++) {
-            Pointer port_pointer = HALLibrary.getPortWithModule((byte) moduleNumber, (byte) (i+1));
-            IntBuffer status = IntBuffer.allocate(1);
+            ByteBuffer port_pointer = AnalogJNI.getPortWithModule((byte) moduleNumber, (byte) (i+1));
+            ByteBuffer status = ByteBuffer.allocateDirect(4);
+    		// set the byte order
+    		status.order(ByteOrder.LITTLE_ENDIAN);
 	    // XXX: Uncomment when analogchannel has been fixed
 //            m_ports[i] = HALLibrary.initializeAnalogPort(port_pointer, status);
-            HALUtil.checkStatus(status);
+            HALUtil.checkStatus(status.asIntBuffer());
         }
     }
 
@@ -91,9 +92,11 @@ public class AnalogModule extends Module {
     public void setSampleRate(final double samplesPerSecond) {
         // TODO: This will change when variable size scan lists are implemented.
         // TODO: Need float comparison with epsilon.
-        IntBuffer status = IntBuffer.allocate(1);
-        HALLibrary.setAnalogSampleRateWithModule((byte) m_moduleNumber, (float) samplesPerSecond, status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        AnalogJNI.setAnalogSampleRateWithModule((byte) m_moduleNumber, (float) samplesPerSecond, status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
     }
 
     /**
@@ -105,9 +108,11 @@ public class AnalogModule extends Module {
      * @return Sample rate.
      */
     public double getSampleRate() {
-        IntBuffer status = IntBuffer.allocate(1);
-        double value = HALLibrary.getAnalogSampleRateWithModule((byte) m_moduleNumber, status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        double value = AnalogJNI.getAnalogSampleRateWithModule((byte) m_moduleNumber, status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 
@@ -123,9 +128,11 @@ public class AnalogModule extends Module {
      *            Number of bits to average.
      */
     public void setAverageBits(final int channel, final int bits) {
-        IntBuffer status = IntBuffer.allocate(1);
-        HALLibrary.setAnalogAverageBits(m_ports[channel], bits, status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        AnalogJNI.setAnalogAverageBits(m_ports[channel], bits, status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
     }
 
     /**
@@ -139,9 +146,11 @@ public class AnalogModule extends Module {
      * @return Bits to average.
      */
     public int getAverageBits(final int channel) {
-        IntBuffer status = IntBuffer.allocate(1);
-        int value = HALLibrary.getAnalogAverageBits(m_ports[channel], status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        int value = AnalogJNI.getAnalogAverageBits(m_ports[channel], status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 
@@ -156,9 +165,11 @@ public class AnalogModule extends Module {
      * @param bits Number of bits to oversample.
      */
     public void setOversampleBits(final int channel, final int bits) {
-        IntBuffer status = IntBuffer.allocate(1);
-        HALLibrary.setAnalogOversampleBits(m_ports[channel], bits, status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        AnalogJNI.setAnalogOversampleBits(m_ports[channel], bits, status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
     }
 
     /**
@@ -172,9 +183,11 @@ public class AnalogModule extends Module {
      * @return Bits to oversample.
      */
     public int getOversampleBits(final int channel) {
-        IntBuffer status = IntBuffer.allocate(1);
-        int value = HALLibrary.getAnalogOversampleBits(m_ports[channel], status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        int value = AnalogJNI.getAnalogOversampleBits(m_ports[channel], status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 
@@ -187,9 +200,11 @@ public class AnalogModule extends Module {
      * @return Raw value.
      */
     public int getValue(final int channel) {
-        IntBuffer status = IntBuffer.allocate(1);
-        int value = HALLibrary.getAnalogValue(m_ports[channel], status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        int value = AnalogJNI.getAnalogValue(m_ports[channel], status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 
@@ -200,9 +215,11 @@ public class AnalogModule extends Module {
      * @return The averaged and oversampled raw value.
      */
     public int getAverageValue(final int channel) {
-        IntBuffer status = IntBuffer.allocate(1);
-        int value = HALLibrary.getAnalogAverageValue(m_ports[channel], status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        int value = AnalogJNI.getAnalogAverageValue(m_ports[channel], status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 
@@ -222,9 +239,11 @@ public class AnalogModule extends Module {
      */
     public int voltsToValue(final int channel, final double voltage) {
         // wpi_assert(voltage >= -10.0 && voltage <= 10.0);
-        IntBuffer status = IntBuffer.allocate(1);
-        int value = HALLibrary.getAnalogVoltsToValue(m_ports[channel], (float) voltage, status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocate(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        int value = AnalogJNI.getAnalogVoltsToValue(m_ports[channel], (float) voltage, status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 
@@ -237,9 +256,11 @@ public class AnalogModule extends Module {
      * @return The scaled voltage from the channel.
      */
     public double getVoltage(final int channel) {
-        IntBuffer status = IntBuffer.allocate(1);
-        double value = HALLibrary.getAnalogVoltage(m_ports[channel], status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        double value = AnalogJNI.getAnalogVoltage(m_ports[channel], status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 
@@ -252,9 +273,11 @@ public class AnalogModule extends Module {
      * @return The scaled averaged and oversampled voltage from the channel.
      */
     public double getAverageVoltage(final int channel) {
-        IntBuffer status = IntBuffer.allocate(1);
-        double value = HALLibrary.getAnalogAverageVoltage(m_ports[channel], status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        double value = AnalogJNI.getAnalogAverageVoltage(m_ports[channel], status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 
@@ -266,9 +289,11 @@ public class AnalogModule extends Module {
      */
     public long getLSBWeight(final int channel) {
         // TODO: add scaling to make this worth while.
-        IntBuffer status = IntBuffer.allocate(1);
-        long value = HALLibrary.getAnalogLSBWeight(m_ports[channel], status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        long value = AnalogJNI.getAnalogLSBWeight(m_ports[channel], status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 
@@ -281,9 +306,11 @@ public class AnalogModule extends Module {
     public int getOffset(final int channel) {
         // TODO: add scaling to make this worth while.
         // TODO: actually use this function.
-        IntBuffer status = IntBuffer.allocate(1);
-        int value = HALLibrary.getAnalogOffset(m_ports[channel], status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        int value = AnalogJNI.getAnalogOffset(m_ports[channel], status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 }

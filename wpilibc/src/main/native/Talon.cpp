@@ -7,7 +7,7 @@
 #include "Talon.h"
 
 #include "DigitalModule.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "LiveWindow/LiveWindow.h"
 
 /**
@@ -29,7 +29,7 @@ void Talon::InitTalon() {
 	SetPeriodMultiplier(kPeriodMultiplier_2X);
 	SetRaw(m_centerPwm);
 
-	nUsageReporting::report(nUsageReporting::kResourceType_Talon, GetChannel(), GetModuleNumber() - 1);
+	HALReport(HALUsageReporting::kResourceType_Talon, GetChannel(), GetModuleNumber() - 1);
 	LiveWindow::GetInstance()->AddActuator("Talon", GetModuleNumber(), GetChannel(), this);
 }
 

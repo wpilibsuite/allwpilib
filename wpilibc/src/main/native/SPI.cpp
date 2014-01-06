@@ -9,7 +9,7 @@
 #include "DigitalModule.h"
 #include "DigitalInput.h"
 #include "DigitalOutput.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "HAL/cpp/Synchronized.h"
 #include "WPIErrors.h"
 
@@ -122,7 +122,7 @@ void SPI::Init(DigitalOutput *clk, DigitalOutput *mosi, DigitalInput *miso)
 
 	static int32_t instances = 0;
 	instances++;
-	nUsageReporting::report(nUsageReporting::kResourceType_SPI, instances);
+	HALReport(HALUsageReporting::kResourceType_SPI, instances);
 }
 
 /**

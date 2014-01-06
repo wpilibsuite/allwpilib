@@ -7,7 +7,7 @@
 #include "IterativeRobot.h"
 
 #include "DriverStation.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "HAL/HAL.h"
 #include "SmartDashboard/SmartDashboard.h"
 #include "LiveWindow/LiveWindow.h"
@@ -92,7 +92,7 @@ double IterativeRobot::GetLoopsPerSec()
  */
 void IterativeRobot::StartCompetition()
 {
-	nUsageReporting::report(nUsageReporting::kResourceType_Framework, nUsageReporting::kFramework_Iterative);
+	HALReport(HALUsageReporting::kResourceType_Framework, HALUsageReporting::kFramework_Iterative);
 
 	LiveWindow *lw = LiveWindow::GetInstance();
 	// first and one-time initialization
@@ -121,7 +121,7 @@ void IterativeRobot::StartCompetition()
 			}
 			if (NextPeriodReady())
 			{
-				FRC_NetworkCommunication_observeUserProgramDisabled();
+				HALNetworkCommunicationObserveUserProgramDisabled();
 				DisabledPeriodic();
 			}
 		}
@@ -141,7 +141,7 @@ void IterativeRobot::StartCompetition()
 			}
 			if (NextPeriodReady())
 			{
-				FRC_NetworkCommunication_observeUserProgramAutonomous();
+				HALNetworkCommunicationObserveUserProgramAutonomous();
 				AutonomousPeriodic();
 			}
 		}
@@ -161,7 +161,7 @@ void IterativeRobot::StartCompetition()
             }
             if (NextPeriodReady())
             {
-                FRC_NetworkCommunication_observeUserProgramTest();
+                HALNetworkCommunicationObserveUserProgramTest();
                 TestPeriodic();
             }
         }
@@ -182,7 +182,7 @@ void IterativeRobot::StartCompetition()
 			}
 			if (NextPeriodReady())
 			{
-				FRC_NetworkCommunication_observeUserProgramTeleop();
+				HALNetworkCommunicationObserveUserProgramTeleop();
 				TeleopPeriodic();
 			}
 		}

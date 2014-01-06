@@ -6,12 +6,18 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
+import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+import java.nio.ByteBuffer;
 
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
+//import com.sun.jna.Pointer;
+//import com.sun.jna.ptr.IntByReference;
 
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary.tModuleType;
+
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tModuleType;
+import edu.wpi.first.wpilibj.hal.DIOJNI;
+import edu.wpi.first.wpilibj.hal.PWMJNI;
+import edu.wpi.first.wpilibj.hal.RelayJNI;
 import edu.wpi.first.wpilibj.hal.HALLibrary;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 
@@ -27,9 +33,9 @@ public class DigitalModule extends Module {
      */
     public static final int kExpectedLoopTiming = 260;
     private int m_module;
-    private Pointer[] m_digital_ports;
-    private Pointer[] m_relay_ports;
-    private Pointer[] m_pwm_ports;
+    private ByteBuffer[] m_digital_ports;
+    private ByteBuffer[] m_relay_ports;
+    private ByteBuffer[] m_pwm_ports;
 
     /**
      * Get an instance of an Digital Module. Singleton digital module creation
@@ -47,32 +53,6 @@ public class DigitalModule extends Module {
     }
 
     /**
-     * @deprecated
-     * Convert a channel to its fpga reference
-     *
-     * @param channel
-     *            the channel to convert
-     * @return the converted channel
-     */
-    public static int remapDigitalChannel(final int channel) {
-        System.err.println("This is going away for compatability reasons.  Don't use it.");
-        return SensorBase.kDigitalChannels - channel;
-    }
-
-    /**
-     * @deprecated
-     * Convert a channel from it's fpga reference
-     *
-     * @param channel
-     *            the channel to convert
-     * @return the converted channel
-     */
-    public static int unmapDigitalChannel(final int channel) {
-        System.err.println("This is going away for compatability reasons.  Don't use it.");
-        return SensorBase.kDigitalChannels - channel;
-    }
-
-    /**
      * Create a new digital module
      *
      * @param moduleNumber
@@ -82,33 +62,39 @@ public class DigitalModule extends Module {
         super(tModuleType.kModuleType_Digital, moduleNumber);
         m_module = moduleNumber;
 
-        m_digital_ports = new Pointer[SensorBase.kDigitalChannels];
+        m_digital_ports = new ByteBuffer[SensorBase.kDigitalChannels];
         for (int i = 0; i < SensorBase.kDigitalChannels; i++) {
-            Pointer port_pointer = HALLibrary.getPortWithModule(
+            ByteBuffer port_pointer = DIOJNI.getPortWithModule(
                                        (byte) moduleNumber, (byte) (i + 1));
-            IntBuffer status = IntBuffer.allocate(1);
-            m_digital_ports[i] = HALLibrary.initializeDigitalPort(port_pointer,
-                               status);
-            HALUtil.checkStatus(status);
+            ByteBuffer status = ByteBuffer.allocateDirect(4);
+    		// set the byte order
+    		status.order(ByteOrder.LITTLE_ENDIAN);
+            m_digital_ports[i] = DIOJNI.initializeDigitalPort(port_pointer,
+                               status.asIntBuffer());
+            HALUtil.checkStatus(status.asIntBuffer());
         }
 
-        m_relay_ports = new Pointer[SensorBase.kRelayChannels];
+        m_relay_ports = new ByteBuffer[SensorBase.kRelayChannels];
         for (int i = 0; i < SensorBase.kRelayChannels; i++) {
-            Pointer port_pointer = HALLibrary.getPortWithModule(
+            ByteBuffer port_pointer = RelayJNI.getPortWithModule(
                                        (byte) moduleNumber, (byte) (i + 1));
-            IntBuffer status = IntBuffer.allocate(1);
-            m_relay_ports[i] = HALLibrary.initializeDigitalPort(port_pointer,
-                               status);
-            HALUtil.checkStatus(status);
+            ByteBuffer status = ByteBuffer.allocateDirect(4);
+    		// set the byte order
+    		status.order(ByteOrder.LITTLE_ENDIAN);
+            m_relay_ports[i] = RelayJNI.initializeDigitalPort(port_pointer,
+                               status.asIntBuffer());
+            HALUtil.checkStatus(status.asIntBuffer());
         }
-        m_pwm_ports = new Pointer[SensorBase.kPwmChannels];
+        m_pwm_ports = new ByteBuffer[SensorBase.kPwmChannels];
         for (int i = 0; i < SensorBase.kPwmChannels; i++) {
-            Pointer port_pointer = HALLibrary.getPortWithModule(
+            ByteBuffer port_pointer = PWMJNI.getPortWithModule(
                                        (byte) moduleNumber, (byte) (i + 1));
-            IntBuffer status = IntBuffer.allocate(1);
-            m_pwm_ports[i] = HALLibrary.initializeDigitalPort(port_pointer,
-                               status);
-            HALUtil.checkStatus(status);
+            ByteBuffer status = ByteBuffer.allocateDirect(4);
+    		// set the byte order
+    		status.order(ByteOrder.LITTLE_ENDIAN);
+            m_pwm_ports[i] = PWMJNI.initializeDigitalPort(port_pointer,
+                               status.asIntBuffer());
+            HALUtil.checkStatus(status.asIntBuffer());
         }
 
     }
@@ -123,9 +109,11 @@ public class DigitalModule extends Module {
      *            The PWM value to set.
      */
     public void setPWM(final int channel, final int value) {
-        IntBuffer status = IntBuffer.allocate(1);
-        HALLibrary.setPWM(m_pwm_ports[channel - 1], (short) value, status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        PWMJNI.setPWM(m_pwm_ports[channel - 1], (short) value, status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
     }
 
     /**
@@ -136,9 +124,11 @@ public class DigitalModule extends Module {
      * @return The raw PWM value.
      */
     public int getPWM(final int channel) {
-        IntBuffer status = IntBuffer.allocate(1);
-        int value = (int) HALLibrary.getPWM(m_pwm_ports[channel - 1], status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        int value = (int) PWMJNI.getPWM(m_pwm_ports[channel - 1], status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 
@@ -151,10 +141,12 @@ public class DigitalModule extends Module {
      *            The 2-bit mask of outputs to squelch.
      */
     public void setPWMPeriodScale(final int channel, final int squelchMask) {
-        IntBuffer status = IntBuffer.allocate(1);
-        HALLibrary.setPWMPeriodScale(m_pwm_ports[channel - 1], squelchMask,
-                                     status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        PWMJNI.setPWMPeriodScale(m_pwm_ports[channel - 1], squelchMask,
+                                     status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
     }
 
     /**
@@ -167,10 +159,12 @@ public class DigitalModule extends Module {
      *            Indicates whether to set the relay to the On state.
      */
     public void setRelayForward(final int channel, final boolean on) {
-        IntBuffer status = IntBuffer.allocate(1);
-        HALLibrary.setRelayForward(m_relay_ports[channel - 1], (byte) (on ? 1
-                                   : 0), status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        RelayJNI.setRelayForward(m_relay_ports[channel - 1], (byte) (on ? 1
+                                   : 0), status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
     }
 
     /**
@@ -183,10 +177,12 @@ public class DigitalModule extends Module {
      *            Indicates whether to set the relay to the On state.
      */
     public void setRelayReverse(final int channel, final boolean on) {
-        IntBuffer status = IntBuffer.allocate(1);
-        HALLibrary.setRelayReverse(m_relay_ports[channel - 1], (byte) (on ? 1
-                                   : 0), status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        RelayJNI.setRelayReverse(m_relay_ports[channel - 1], (byte) (on ? 1
+                                   : 0), status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
     }
 
     /**
@@ -197,10 +193,12 @@ public class DigitalModule extends Module {
      * @return The current state of the relay.
      */
     public boolean getRelayForward(int channel) {
-        IntBuffer status = IntBuffer.allocate(1);
-        boolean value = HALLibrary.getRelayForward(m_relay_ports[channel - 1],
-                        status) != 0;
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        boolean value = RelayJNI.getRelayForward(m_relay_ports[channel - 1],
+                        status.asIntBuffer()) != 0;
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 
@@ -212,11 +210,13 @@ public class DigitalModule extends Module {
      */
     public byte getRelayForward() {
         byte value = 0;
-        IntBuffer status = IntBuffer.allocate(1);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
         for (int i = 0; i < SensorBase.kRelayChannels; i++) {
-            value |= HALLibrary.getRelayForward(m_relay_ports[i], status) << i;
+            value |= RelayJNI.getRelayForward(m_relay_ports[i], status.asIntBuffer()) << i;
         }
-        HALUtil.checkStatus(status);
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 
@@ -228,10 +228,12 @@ public class DigitalModule extends Module {
      * @return The current statte of the relay
      */
     public boolean getRelayReverse(int channel) {
-        IntBuffer status = IntBuffer.allocate(1);
-        boolean value = HALLibrary.getRelayReverse(m_relay_ports[channel - 1],
-                        status) != 0;
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        boolean value = RelayJNI.getRelayReverse(m_relay_ports[channel - 1],
+                        status.asIntBuffer()) != 0;
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 
@@ -243,11 +245,13 @@ public class DigitalModule extends Module {
      */
     public byte getRelayReverse() {
         byte value = 0;
-        IntBuffer status = IntBuffer.allocate(1);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
         for (int i = 0; i < SensorBase.kRelayChannels; i++) {
-            value |= HALLibrary.getRelayReverse(m_relay_ports[i], status) << i;
+            value |= RelayJNI.getRelayReverse(m_relay_ports[i], status.asIntBuffer()) << i;
         }
-        HALUtil.checkStatus(status);
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 
@@ -264,10 +268,12 @@ public class DigitalModule extends Module {
      * @return True if the I/O pin was allocated, false otherwise.
      */
     public boolean allocateDIO(final int channel, final boolean input) {
-        IntBuffer status = IntBuffer.allocate(1);
-        boolean allocated = HALLibrary.allocateDIO(
-                                m_digital_ports[channel - 1], (byte) (input ? 1 : 0), status) != 0;
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        boolean allocated = DIOJNI.allocateDIO(
+                                m_digital_ports[channel - 1], (byte) (input ? 1 : 0), status.asIntBuffer()) != 0;
+        HALUtil.checkStatus(status.asIntBuffer());
         return allocated;
     }
 
@@ -278,9 +284,11 @@ public class DigitalModule extends Module {
      *            The channel whose resources should be freed.
      */
     public void freeDIO(final int channel) {
-        IntBuffer status = IntBuffer.allocate(1);
-        HALLibrary.freeDIO(m_digital_ports[channel - 1], status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        DIOJNI.freeDIO(m_digital_ports[channel - 1], status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
     }
 
     /**
@@ -293,10 +301,12 @@ public class DigitalModule extends Module {
      *            The value to set.
      */
     public void setDIO(final int channel, final boolean value) {
-        IntBuffer status = IntBuffer.allocate(1);
-        HALLibrary.setDIO(m_digital_ports[channel - 1], (byte) (value ? 1 : 0),
-                          status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        DIOJNI.setDIO(m_digital_ports[channel - 1], (byte) (value ? 1 : 0),
+                          status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
     }
 
     /**
@@ -308,9 +318,11 @@ public class DigitalModule extends Module {
      * @return The value of the selected channel
      */
     public boolean getDIO(final int channel) {
-        IntBuffer status = IntBuffer.allocate(1);
-        boolean value = HALLibrary.getDIO(m_digital_ports[channel - 1], status) != 0;
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        boolean value = DIOJNI.getDIO(m_digital_ports[channel - 1], status.asIntBuffer()) != 0;
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 
@@ -321,12 +333,14 @@ public class DigitalModule extends Module {
      * @return The state of all the Digital IO lines in hardware order
      */
     public short getAllDIO() {
-        byte value = 0;
-        IntBuffer status = IntBuffer.allocate(1);
+        short value = 0;
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
         for (int i = 0; i < SensorBase.kDigitalChannels; i++) {
-            value |= HALLibrary.getDIO(m_digital_ports[i], status) << i;
+            value |= DIOJNI.getDIO(m_digital_ports[i], status.asIntBuffer()) << i;
         }
-        HALUtil.checkStatus(status);
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 
@@ -339,10 +353,12 @@ public class DigitalModule extends Module {
      *         it is an input
      */
     public boolean getDIODirection(int channel) {
-        IntBuffer status = IntBuffer.allocate(1);
-        boolean value = HALLibrary.getDIODirection(
-                            m_digital_ports[channel - 1], status) != 0;
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        boolean value = DIOJNI.getDIODirection(
+                            m_digital_ports[channel - 1], status.asIntBuffer()) != 0;
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 
@@ -355,11 +371,13 @@ public class DigitalModule extends Module {
      */
     public short getDIODirection() {
         byte value = 0;
-        IntBuffer status = IntBuffer.allocate(1);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
         for (int i = 0; i < SensorBase.kDigitalChannels; i++) {
-            value |= HALLibrary.getDIODirection(m_digital_ports[i], status) << i;
+            value |= DIOJNI.getDIODirection(m_digital_ports[i], status.asIntBuffer()) << i;
         }
-        HALUtil.checkStatus(status);
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 
@@ -373,9 +391,11 @@ public class DigitalModule extends Module {
      *            The length of the pulse.
      */
     public void pulse(final int channel, final float pulseLength) {
-        IntBuffer status = IntBuffer.allocate(1);
-        HALLibrary.pulse(m_digital_ports[channel - 1], pulseLength, status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        DIOJNI.pulse(m_digital_ports[channel - 1], pulseLength, status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
     }
 
     /**
@@ -389,13 +409,14 @@ public class DigitalModule extends Module {
      *            The length of the pulse.
      */
     public void pulse(final int channel, final int pulseLength) {
-        IntBuffer status = IntBuffer.allocate(1);
-        float convertedPulse = (float) (pulseLength / 1.0e9 * (HALLibrary
-                                        .getLoopTiming(status) * 25));
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        float convertedPulse = (float) (pulseLength / 1.0e9 * (DIOJNI.getLoopTiming(status.asIntBuffer()) * 25));
         System.err
         .println("You should use the float version of pulse for portability.  This is deprecated");
-        HALLibrary.pulse(m_digital_ports[channel - 1], convertedPulse, status);
-        HALUtil.checkStatus(status);
+        DIOJNI.pulse(m_digital_ports[channel - 1], convertedPulse, status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
     }
 
     /**
@@ -406,10 +427,12 @@ public class DigitalModule extends Module {
      * @return True if the channel is pulsing, false otherwise.
      */
     public boolean isPulsing(final int channel) {
-        IntBuffer status = IntBuffer.allocate(1);
-        boolean value = HALLibrary.isPulsing(m_digital_ports[channel - 1],
-                                             status) != 0;
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        boolean value = DIOJNI.isPulsing(m_digital_ports[channel - 1],
+                                             status.asIntBuffer()) != 0;
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 
@@ -420,9 +443,11 @@ public class DigitalModule extends Module {
      */
     public boolean isPulsing() {
         boolean value;
-        IntBuffer status = IntBuffer.allocate(1);
-        value = HALLibrary.isAnyPulsingWithModule((byte) m_module, status) != 0;
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        value = DIOJNI.isAnyPulsingWithModule((byte) m_module, status.asIntBuffer()) != 0;
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 
@@ -430,22 +455,24 @@ public class DigitalModule extends Module {
      * Allocate a DO PWM Generator. Allocate PWM generators so that they are not
      * accidently reused.
      */
-    public int allocateDO_PWM() {
-        IntBuffer status = IntBuffer.allocate(1);
-        int value = HALLibrary.allocatePWMWithModule((byte) m_module, status)
-                    .getInt(0); // XXX: Hacky, needs heavy testing
-        HALUtil.checkStatus(status);
+    public ByteBuffer allocateDO_PWM() {
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        ByteBuffer value = PWMJNI.allocatePWMWithModule((byte) m_module, status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 
     /**
      * Free the resource associated with a DO PWM generator.
      */
-    public void freeDO_PWM(int pwmGenerator) {
-        IntBuffer status = IntBuffer.allocate(1);
-        Pointer pointer = new IntByReference(pwmGenerator).getPointer();
-        HALLibrary.freePWMWithModule((byte) m_module, pointer, status);
-        HALUtil.checkStatus(status);
+    public void freeDO_PWM(ByteBuffer pwmGenerator) {
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        PWMJNI.freePWMWithModule((byte) m_module, pwmGenerator, status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
     }
 
     /**
@@ -459,9 +486,11 @@ public class DigitalModule extends Module {
      *            module.
      */
     public void setDO_PWMRate(double rate) {
-        IntBuffer status = IntBuffer.allocate(1);
-        HALLibrary.setPWMRateWithModuleIntHack((byte) m_module, Float.floatToIntBits((float) rate), status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        PWMJNI.setPWMRateWithModule((byte) m_module, rate, status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
     }
 
     /**
@@ -472,12 +501,13 @@ public class DigitalModule extends Module {
      * @param channel
      *            The Digital Output channel to output on
      */
-    public void setDO_PWMOutputChannel(int pwmGenerator, int channel) {
-        IntBuffer status = IntBuffer.allocate(1);
-        Pointer pointer = new IntByReference(pwmGenerator).getPointer();
-        HALLibrary.setPWMOutputChannelWithModule((byte) m_module, pointer,
-                channel, status);
-        HALUtil.checkStatus(status);
+    public void setDO_PWMOutputChannel(ByteBuffer pwmGenerator, int channel) {
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        PWMJNI.setPWMOutputChannelWithModule((byte) m_module, pwmGenerator,
+                channel, status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
     }
 
     /**
@@ -488,12 +518,12 @@ public class DigitalModule extends Module {
      * @param dutyCycle
      *            The percent duty cycle to output [0..1].
      */
-    public void setDO_PWMDutyCycle(int pwmGenerator, double dutyCycle) {
-        IntBuffer status = IntBuffer.allocate(1);
-        Pointer pointer = new IntByReference(pwmGenerator).getPointer();
-        HALLibrary.setPWMDutyCycleWithModuleIntHack((byte) m_module, pointer,
-                                                    Float.floatToIntBits((float) dutyCycle), status);
-        HALUtil.checkStatus(status);
+    public void setDO_PWMDutyCycle(ByteBuffer pwmGenerator, double dutyCycle) {
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        PWMJNI.setPWMDutyCycleWithModule((byte) m_module, pwmGenerator, dutyCycle, status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
     }
 
     /**
@@ -513,9 +543,11 @@ public class DigitalModule extends Module {
      * @return The number of clock ticks per DIO loop
      */
     public int getLoopTiming() {
-        IntBuffer status = IntBuffer.allocate(1);
-        int value = HALLibrary.getLoopTiming(status);
-        HALUtil.checkStatus(status);
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        int value = DIOJNI.getLoopTiming(status.asIntBuffer());
+        HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
 }

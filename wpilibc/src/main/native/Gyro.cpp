@@ -7,7 +7,7 @@
 #include "Gyro.h"
 #include "AnalogChannel.h"
 #include "AnalogModule.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "Timer.h"
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
@@ -66,7 +66,7 @@ void Gyro::InitGyro()
 	
 	SetPIDSourceParameter(kAngle);
 
-	nUsageReporting::report(nUsageReporting::kResourceType_Gyro, m_analog->GetChannel(), m_analog->GetModuleNumber() - 1);
+	HALReport(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel(), m_analog->GetModuleNumber() - 1);
 	LiveWindow::GetInstance()->AddSensor("Gyro", m_analog->GetModuleNumber(), m_analog->GetChannel(), this);
 }
 

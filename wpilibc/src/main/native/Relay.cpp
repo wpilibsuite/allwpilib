@@ -7,7 +7,7 @@
 #include "Relay.h"
 
 #include "DigitalModule.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
@@ -50,7 +50,7 @@ void Relay::InitRelay (uint8_t moduleNumber)
 			return;
 		}
 
-		nUsageReporting::report(nUsageReporting::kResourceType_Relay, m_channel, moduleNumber - 1);
+		HALReport(HALUsageReporting::kResourceType_Relay, m_channel, moduleNumber - 1);
 	}
 	if (m_direction == kBothDirections || m_direction == kReverseOnly)
 	{
@@ -61,7 +61,7 @@ void Relay::InitRelay (uint8_t moduleNumber)
 			return;
 		}
 
-		nUsageReporting::report(nUsageReporting::kResourceType_Relay, m_channel + 128, moduleNumber - 1);
+		HALReport(HALUsageReporting::kResourceType_Relay, m_channel + 128, moduleNumber - 1);
 	}
 	m_module = DigitalModule::GetInstance(moduleNumber);
 	m_module->SetRelayForward(m_channel, false);

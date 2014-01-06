@@ -108,4 +108,5 @@ public class Resource {
             throw new AllocationException("No resource available to be freed");
         m_numAllocated[index] = false;
     }
+    
 }

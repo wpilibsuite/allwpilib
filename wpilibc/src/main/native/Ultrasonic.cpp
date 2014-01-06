@@ -9,7 +9,7 @@
 #include "Counter.h"
 #include "DigitalInput.h"
 #include "DigitalOutput.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "Timer.h"
 #include "Utility.h"
 #include "WPIErrors.h"
@@ -58,9 +58,9 @@ void Ultrasonic::Initialize()
 {
 	m_table = NULL;
 	bool originalMode = m_automaticEnabled;
-	if (m_semaphore == 0) m_semaphore = initializeSemaphore(SEMAPHORE_Q_PRIORITY, SEMAPHORE_FULL);
+	if (m_semaphore == 0) m_semaphore = initializeSemaphore(SEMAPHORE_FULL);
 	SetAutomaticMode(false); // kill task when adding a new sensor
-	takeSemaphore(m_semaphore, SEMAPHORE_WAIT_FOREVER); // link this instance on the list
+	takeSemaphore(m_semaphore); // link this instance on the list
 	{
 		m_nextSensor = m_firstSensor;
 		m_firstSensor = this;
@@ -77,7 +77,7 @@ void Ultrasonic::Initialize()
 
 	static int instances = 0;
 	instances++;
-	nUsageReporting::report(nUsageReporting::kResourceType_Ultrasonic, instances);
+	HALReport(HALUsageReporting::kResourceType_Ultrasonic, instances);
 	LiveWindow::GetInstance()->AddSensor("Ultrasonic", m_echoChannel->GetModuleForRouting(), m_echoChannel->GetChannel(), this);
 }
 
@@ -176,7 +176,7 @@ Ultrasonic::~Ultrasonic()
 	}
 	wpi_assert(m_firstSensor != NULL);
 
-	takeSemaphore(m_semaphore, SEMAPHORE_WAIT_FOREVER);
+	takeSemaphore(m_semaphore);
 	{
 		if (this == m_firstSensor)
 		{

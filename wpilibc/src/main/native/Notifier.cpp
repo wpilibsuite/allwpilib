@@ -30,7 +30,7 @@ Notifier::Notifier(TimerEventHandler handler, void *param)
 	m_period = 0;
 	m_nextEvent = NULL;
 	m_queued = false;
-	m_handlerSemaphore = initializeSemaphore(SEMAPHORE_Q_PRIORITY, SEMAPHORE_FULL);
+	m_handlerSemaphore = initializeSemaphore(SEMAPHORE_FULL);
 	{
 		Synchronized sync(queueSemaphore);
 		// do the first time intialization of static variables
@@ -66,7 +66,7 @@ Notifier::~Notifier()
 
 	// Acquire the semaphore; this makes certain that the handler is 
 	// not being executed by the interrupt manager.
-	takeSemaphore(m_handlerSemaphore, SEMAPHORE_WAIT_FOREVER);
+	takeSemaphore(m_handlerSemaphore);
 	// Delete while holding the semaphore so there can be no race.
 	deleteSemaphore(m_handlerSemaphore);
 }
@@ -122,7 +122,7 @@ void Notifier::ProcessQueue(uint32_t mask, void *params)
 			}
 			// Take handler semaphore while holding queue semaphore to make sure
 			//  the handler will execute to completion in case we are being deleted.
-			takeSemaphore(current->m_handlerSemaphore, SEMAPHORE_WAIT_FOREVER);
+			takeSemaphore(current->m_handlerSemaphore);
 		}
 
 		current->m_handler(current->m_param);	// call the event handler

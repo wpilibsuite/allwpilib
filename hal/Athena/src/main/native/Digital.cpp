@@ -67,15 +67,15 @@ void initializeDigital(int32_t *status) {
   if (digitalSystemsInitialized) return;
 
   // Create a semaphore to protect changes to the digital output values
-  digitalDIOSemaphore = initializeMutex(SEMAPHORE_Q_PRIORITY | SEMAPHORE_DELETE_SAFE | SEMAPHORE_INVERSION_SAFE);
+  digitalDIOSemaphore = initializeMutexRecursive();
 
   // Create a semaphore to protect changes to the relay values
-  digitalRelaySemaphore = initializeMutex(SEMAPHORE_Q_PRIORITY | SEMAPHORE_DELETE_SAFE | SEMAPHORE_INVERSION_SAFE);
+  digitalRelaySemaphore = initializeMutexRecursive();
 
   // Create a semaphore to protect changes to the DO PWM config
-  digitalPwmSemaphore = initializeMutex(SEMAPHORE_Q_PRIORITY | SEMAPHORE_DELETE_SAFE | SEMAPHORE_INVERSION_SAFE);
+  digitalPwmSemaphore = initializeMutexRecursive();
 
-  digitalI2CSemaphore = initializeMutex(SEMAPHORE_Q_PRIORITY | SEMAPHORE_DELETE_SAFE | SEMAPHORE_INVERSION_SAFE);
+  digitalI2CSemaphore = initializeMutexRecursive();
   
   Resource::CreateResourceObject(&DIOChannels, tDIO::kNumSystems * kDigitalPins);
   Resource::CreateResourceObject(&DO_PWMGenerators, tDIO::kNumPWMDutyCycleElements);
@@ -420,9 +420,9 @@ bool allocateDIO(void* digital_port_pointer, bool input, int32_t *status) {
     uint32_t bitToSet = 1 << (remapDigitalChannel(port->port.pin - 1, status));
     tDIO::tOutputEnable outputEnable = digitalSystem->readOutputEnable(status);
     if (input) {
-      outputEnable.value = outputEnable.value & (~bitToSet); // clear the bit for read
+      outputEnable.Headers = outputEnable.Headers & (~bitToSet); // clear the bit for read
     } else {
-      outputEnable.value = outputEnable.value | bitToSet; // set the bit for write
+      outputEnable.Headers = outputEnable.Headers | bitToSet; // set the bit for write
     }
     digitalSystem->writeOutputEnable(outputEnable, status);
   }
@@ -497,7 +497,7 @@ bool getDIODirection(void* digital_port_pointer, int32_t *status) {
   //AND it against the currentOutputEnable
   //if it == 0, then return false
   //else return true
-  return ((currentOutputEnable.value >> remapDigitalChannel(port->port.pin - 1, status)) & 1) != 0;
+  return ((currentOutputEnable.Headers >> remapDigitalChannel(port->port.pin - 1, status)) & 1) != 0;
 }
 
 /**
@@ -510,7 +510,7 @@ bool getDIODirection(void* digital_port_pointer, int32_t *status) {
 void pulse(void* digital_port_pointer, double pulseLength, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   tDIO::tPulse pulse;
-  pulse.value = 1 << remapDigitalChannel(port->port.pin - 1, status);
+  pulse.Headers = 1 << remapDigitalChannel(port->port.pin - 1, status);
   digitalSystem->writePulseLength((uint8_t)(1.0e9 * pulseLength / (pwmSystem->readLoopTiming(status) * 25)), status);
   digitalSystem->writePulse(pulse, status);
 }
@@ -524,7 +524,7 @@ bool isPulsing(void* digital_port_pointer, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   uint16_t mask = 1 << remapDigitalChannel(port->port.pin - 1, status);
   tDIO::tPulse pulseRegister = digitalSystem->readPulse(status);
-  return (pulseRegister.value & mask) != 0;
+  return (pulseRegister.Headers & mask) != 0;
 }
 
 /**
@@ -543,7 +543,7 @@ bool isAnyPulsing(int32_t *status) {
  */
 bool isAnyPulsingWithModule(uint8_t module, int32_t *status) {
   tDIO::tPulse pulseRegister = digitalSystem->readPulse(status);
-  return pulseRegister.value != 0;
+  return pulseRegister.Headers != 0;
 }
 
 

@@ -7,7 +7,7 @@
 #include "Counter.h"
 #include "AnalogTrigger.h"
 #include "DigitalInput.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
 #include "WPIErrors.h"
 
@@ -29,7 +29,7 @@ void Counter::InitCounter(Mode mode)
 	m_allocatedUpSource = false;
 	m_allocatedDownSource = false;
 
-	nUsageReporting::report(nUsageReporting::kResourceType_Counter, index, mode);
+	HALReport(HALUsageReporting::kResourceType_Counter, index, mode);
 }
 
 /**

@@ -6,7 +6,7 @@
 
 #include "Task.h"
 
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "WPIErrors.h"
 #include <errno.h>
 #include <string.h>
@@ -33,7 +33,7 @@ Task::Task(const char* name, FUNCPTR function, int32_t priority, uint32_t stackS
 
 	static int32_t instances = 0;
 	instances++;
-	nUsageReporting::report(nUsageReporting::kResourceType_Task, instances, 0, m_taskName);
+	HALReport(HALUsageReporting::kResourceType_Task, instances, 0, m_taskName);
 }
 
 Task::~Task()

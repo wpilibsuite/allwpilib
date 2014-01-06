@@ -7,9 +7,9 @@
 #include "RobotBase.h"
 
 #include "DriverStation.h"
-#include "NetworkCommunication/FRCComm.h"
-#include "NetworkCommunication/symModuleLink.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/FRCComm.h"
+//#include "NetworkCommunication/symModuleLink.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "Utility.h"
 #include <cstring>
 #include "HAL/HAL.h"
@@ -192,10 +192,10 @@ void RobotBase::startRobotTask(FUNCPTR factory)
 #endif
 
 	// Let the framework know that we are starting a new user program so the Driver Station can disable.
-	FRC_NetworkCommunication_observeUserProgramStarting();
+	HALNetworkCommunicationObserveUserProgramStarting();
 
 	// Let the Usage Reporting framework know that there is a C++ program running
-	nUsageReporting::report(nUsageReporting::kResourceType_Language, nUsageReporting::kLanguage_CPlusPlus);
+	HALReport(HALUsageReporting::kResourceType_Language, HALUsageReporting::kLanguage_CPlusPlus);
 
 	// Start robot task
 	// This is done to ensure that the C++ robot task is spawned with the floating point

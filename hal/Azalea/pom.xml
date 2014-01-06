@@ -10,6 +10,7 @@
     <groupId>edu.wpi.first.wpilib.templates.azalea</groupId>
     <artifactId>static-library</artifactId>
     <version>0.1.0-SNAPSHOT</version>
+    <relativePath>../../maven-utilities/azalea/static-library</relativePath>
   </parent>
 
   <repositories>

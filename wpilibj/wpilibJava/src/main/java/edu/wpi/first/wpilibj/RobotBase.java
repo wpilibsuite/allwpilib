@@ -9,14 +9,16 @@ package edu.wpi.first.wpilibj;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 import java.util.Enumeration;
 import java.util.jar.Manifest;
 
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary;
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary.tInstances;
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary.tResourceType;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
-import edu.wpi.first.wpilibj.hal.HALLibrary;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 /**
@@ -39,6 +41,7 @@ public abstract class RobotBase {
     public final static String ERRORS_TO_DRIVERSTATION_PROP = "first.driverstation.senderrors";
 
     protected final DriverStation m_ds;
+    private final Watchdog m_watchdog = Watchdog.getInstance();
 
     /**
      * Constructor for a generic robot program.
@@ -58,6 +61,7 @@ public abstract class RobotBase {
 //        }
         NetworkTable.setServerMode();//must be before b
         m_ds = DriverStation.getInstance();
+        m_watchdog.setEnabled(false);
         NetworkTable.getTable("");  // forces network tables to initialize
         NetworkTable.getTable("LiveWindow").getSubTable("~STATUS~").putBoolean("LW Enabled", false);
     }
@@ -69,13 +73,23 @@ public abstract class RobotBase {
     }
 
     /**
-     * @deprecated This has been deprecated in favor of {@link #isEnabled()}
      * Check on the overall status of the system.
      *
      * @return Is the system active (i.e. PWM motor outputs, etc. enabled)?
      */
     public boolean isSystemActive() {
-    	return isEnabled();
+        return m_watchdog.isSystemActive();
+    }
+
+    /**
+     * Return the instance of the Watchdog timer.
+     * Get the watchdog timer so the user program can either disable it or feed it when
+     * necessary.
+     *
+     * @return The Watchdog timer.
+     */
+    public Watchdog getWatchdog() {
+        return m_watchdog;
     }
 
     /**
@@ -152,9 +166,108 @@ public abstract class RobotBase {
      */
     public static void main(String args[]) { // TODO: expose main to teams?{
         boolean errorOnExit = false;
+        
+        /* JNI Testing */
+        boolean booleanTest = true;
+        byte byteTest = (byte)0xa5;
+        char charTest = 'X';
+        short shortTest = 12346;
+        int intTest = 2987654;
+        long longTest = 897678665;
+        float floatTest = 45.123456f;
+        double doubleTest = 234E16;
+        
+        FRCNetworkCommunicationsLibrary.JNIValueParameterTest(booleanTest, byteTest, charTest, shortTest,
+        		intTest, longTest, floatTest, doubleTest);
+        
+        boolean booleanReturn = FRCNetworkCommunicationsLibrary.JNIValueReturnBooleanTest(booleanTest);
+        System.out.println("Boolean Return: " + booleanReturn );
 
-        HALLibrary.FRC_NetworkCommunication_Reserve();
-        FRC_NetworkCommunicationsLibrary.FRC_NetworkCommunication_observeUserProgramStarting();
+        byte byteReturn = FRCNetworkCommunicationsLibrary.JNIValueReturnByteTest(byteTest);
+        System.out.println("Byte Return: " + byteReturn );
+        
+        char charReturn = FRCNetworkCommunicationsLibrary.JNIValueReturnCharTest(charTest);
+        System.out.println("Char Return: " + charReturn );
+        
+        short shortReturn = FRCNetworkCommunicationsLibrary.JNIValueReturnShortTest(shortTest);
+        System.out.println("Short Return: " + shortReturn );
+        
+        int intReturn = FRCNetworkCommunicationsLibrary.JNIValueReturnIntTest(intTest);
+        System.out.println("Int Return: " + intReturn );
+        
+        long longReturn = FRCNetworkCommunicationsLibrary.JNIValueReturnLongTest(longTest);
+        System.out.println("Long Return: " + longReturn );
+        
+        float floatReturn = FRCNetworkCommunicationsLibrary.JNIValueReturnFloatTest(floatTest);
+        System.out.println("Float Return: " + floatReturn );
+        
+        double doubleReturn = FRCNetworkCommunicationsLibrary.JNIValueReturnDoubleTest(doubleTest);
+        System.out.println("Double Return: " + doubleReturn );
+        
+        
+        
+        String testValue = "This is a test string";
+        
+        String returnValue = FRCNetworkCommunicationsLibrary.JNIObjectReturnStringTest(testValue);
+        
+        System.out.println("String Return:" + returnValue);
+        
+        ByteBuffer directBuffer = ByteBuffer.allocateDirect(4);
+        
+        directBuffer.put(0, (byte)0xFA);
+        directBuffer.put(1, (byte)0xAB);
+        directBuffer.put(2, (byte)0xB4);
+        directBuffer.put(3, (byte)0xCD);
+        
+        ByteBuffer returnBuffer1 = FRCNetworkCommunicationsLibrary.JNIObjectReturnByteBufferTest(directBuffer);
+        
+        System.out.println("Return Buffer Capacity: " + returnBuffer1.capacity());
+        System.out.println("ByteBuffer1 Return0: " + returnBuffer1.get(0) );
+        System.out.println("ByteBuffer1 Return1: " + returnBuffer1.get(1) );
+        System.out.println("ByteBuffer1 Return2: " + returnBuffer1.get(2) );
+        System.out.println("ByteBuffer1 Return3: " + returnBuffer1.get(3) );
+        
+        
+        ByteBuffer directByteBuffer = ByteBuffer.allocateDirect(4);
+        // set to little endian for C++
+        directByteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+        
+        directByteBuffer.putInt(0,2874933);
+        
+        System.out.println("Param In: " + directByteBuffer.getInt(0));
+        System.out.println("Param In Byte0: " + directByteBuffer.get(0) );
+        System.out.println("Param In Byte1: " + directByteBuffer.get(1) );
+        System.out.println("Param In Byte2: " + directByteBuffer.get(2) );
+        System.out.println("Param In Byte3: " + directByteBuffer.get(3) );
+        
+        
+        ByteBuffer returnBuffer2 = FRCNetworkCommunicationsLibrary.JNIObjectAndParamReturnIntBufferTest(directByteBuffer.asIntBuffer());
+        
+        System.out.println("Param Out: " + directByteBuffer.getInt(0));
+        
+        
+        
+        System.out.println("Return Buffer Capacity: " + returnBuffer2.capacity());
+        System.out.println("ByteBuffer2 Return0: " + returnBuffer2.get(0) );
+        System.out.println("ByteBuffer2 Return1: " + returnBuffer2.get(1) );
+        System.out.println("ByteBuffer2 Return2: " + returnBuffer2.get(2) );
+        System.out.println("ByteBuffer2 Return3: " + returnBuffer2.get(3) );
+        
+        System.out.println("Byte Order from C++" + returnBuffer2.order().toString());
+        System.out.println("ByteBuffer2 as Int" + returnBuffer2.getInt(0));
+        // change to little endian
+        returnBuffer2.order(ByteOrder.LITTLE_ENDIAN);
+        System.out.println("ByteBuffer2 as Int" + returnBuffer2.getInt(0));
+        
+        
+        
+        
+        
+        /* End JNI Testing */
+        FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationReserve();
+        FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
+        Watchdog.getInstance().setExpiration(0.1);
+        Watchdog.getInstance().setEnabled(false);
 
         UsageReporting.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
 

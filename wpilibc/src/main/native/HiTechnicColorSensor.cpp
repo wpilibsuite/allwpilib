@@ -7,7 +7,7 @@
 #include "HiTechnicColorSensor.h"
 #include "DigitalModule.h"
 #include "I2C.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "networktables2/type/NumberArray.h"
 #include "WPIErrors.h"
 
@@ -54,7 +54,7 @@ HiTechnicColorSensor::HiTechnicColorSensor(uint8_t moduleNumber)
 			wpi_setWPIError(CompassTypeError);
 		}
 		
-		nUsageReporting::report(nUsageReporting::kResourceType_HiTechnicColorSensor, moduleNumber - 1);
+		HALReport(HALUsageReporting::kResourceType_HiTechnicColorSensor, moduleNumber - 1);
 	}
 }
 

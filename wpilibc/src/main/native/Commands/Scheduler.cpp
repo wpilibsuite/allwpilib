@@ -8,7 +8,7 @@
 
 #include "Buttons/ButtonScheduler.h"
 #include "Commands/Subsystem.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "HAL/cpp/Synchronized.h"
 #include "WPIErrors.h"
 #include <iostream>
@@ -19,23 +19,21 @@ Scheduler *Scheduler::_instance = NULL;
 
 Scheduler::Scheduler() :
 	m_buttonsLock(NULL), m_additionsLock(NULL), m_adding(false) {
-	m_buttonsLock = initializeMutex(
-			SEMAPHORE_Q_PRIORITY | SEMAPHORE_INVERSION_SAFE | SEMAPHORE_DELETE_SAFE);
-	m_additionsLock = initializeMutex(
-			SEMAPHORE_Q_PRIORITY | SEMAPHORE_INVERSION_SAFE | SEMAPHORE_DELETE_SAFE);
+	m_buttonsLock = initializeMutexNormal();
+	m_additionsLock = initializeMutexNormal();
 
-	nUsageReporting::report(nUsageReporting::kResourceType_Command,
-			nUsageReporting::kCommand_Scheduler);
+	HALReport(HALUsageReporting::kResourceType_Command,
+			HALUsageReporting::kCommand_Scheduler);
 
 	m_table = NULL;
 	m_enabled = true;
 }
 
 Scheduler::~Scheduler() {
-	takeMutex(m_additionsLock, SEMAPHORE_WAIT_FOREVER);
+	takeMutex(m_additionsLock);
 	deleteMutex(m_additionsLock);
 
-	takeMutex(m_buttonsLock, SEMAPHORE_WAIT_FOREVER);
+	takeMutex(m_buttonsLock);
 	deleteMutex(m_buttonsLock);
 }
 

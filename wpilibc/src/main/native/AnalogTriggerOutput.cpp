@@ -6,7 +6,7 @@
 
 #include "AnalogTriggerOutput.h"
 #include "AnalogTrigger.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "WPIErrors.h"
 
 /**
@@ -22,7 +22,7 @@ AnalogTriggerOutput::AnalogTriggerOutput(AnalogTrigger *trigger, AnalogTriggerTy
 	: m_trigger (trigger)
 	, m_outputType (outputType)
 {
-	nUsageReporting::report(nUsageReporting::kResourceType_AnalogTriggerOutput, trigger->GetIndex(), outputType);
+	HALReport(HALUsageReporting::kResourceType_AnalogTriggerOutput, trigger->GetIndex(), outputType);
 }
 
 AnalogTriggerOutput::~AnalogTriggerOutput()

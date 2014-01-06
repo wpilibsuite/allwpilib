@@ -8,10 +8,8 @@
 package edu.wpi.first.wpilibj;
 
 import java.nio.IntBuffer;
+import java.nio.ByteBuffer;
 
-import com.sun.jna.Pointer;
-
-import edu.wpi.first.wpilibj.hal.HALLibrary;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.parsing.IDeviceController;
 
@@ -21,10 +19,10 @@ import edu.wpi.first.wpilibj.parsing.IDeviceController;
  */
 public abstract class SolenoidBase extends SensorBase implements IDeviceController {
 
-    private Pointer[] m_ports;
+    private ByteBuffer[] m_ports;
     protected int m_moduleNumber; ///< The number of the solenoid module being used.
     // XXX: Move this to be both HAL calls
-    protected Resource m_allocated = new Resource(HALLibrary.solenoid_kNumDO7_0Elements.get() * SensorBase.kSolenoidChannels);
+    //protected Resource m_allocated = new Resource(SolenoidJNI.getModuleCount() * SensorBase.kSolenoidChannels);
 
     /**
      * Constructor.
@@ -32,14 +30,14 @@ public abstract class SolenoidBase extends SensorBase implements IDeviceControll
      * @param moduleNumber The number of the solenoid module to use.
      */
     public SolenoidBase(final int moduleNumber) {
-        m_moduleNumber = moduleNumber;
-        m_ports = new Pointer[SensorBase.kSolenoidChannels];
-        for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
-            Pointer port = HALLibrary.getPortWithModule((byte) moduleNumber, (byte) (i+1));
-            IntBuffer status = IntBuffer.allocate(1);
-            m_ports[i] = HALLibrary.initializeSolenoidPort(port, status);
-            HALUtil.checkStatus(status);
-        }
+//        m_moduleNumber = moduleNumber;
+//        m_ports = new ByteBuffer[SensorBase.kSolenoidChannels];
+//        for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
+//            ByteBuffer port = SolenoidJNI.getPortWithModule((byte) moduleNumber, (byte) (i+1));
+//            IntBuffer status = IntBuffer.allocate(1);
+//            m_ports[i] = SolenoidJNI.initializeSolenoidPort(port, status);
+//            HALUtil.checkStatus(status);
+//        }
     }
 
     /**
@@ -49,13 +47,13 @@ public abstract class SolenoidBase extends SensorBase implements IDeviceControll
      * @param mask The channels you want to be affected.
      */
     protected synchronized void set(int value, int mask) {
-        IntBuffer status = IntBuffer.allocate(1);
-        for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
-            int local_mask = 1 << i;
-            if ((mask & local_mask) != 0)
-                HALLibrary.setSolenoid(m_ports[i], (byte) (value & local_mask), status);
-        }
-        HALUtil.checkStatus(status);
+//        IntBuffer status = IntBuffer.allocate(1);
+//        for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
+//            int local_mask = 1 << i;
+//            if ((mask & local_mask) != 0)
+//                SolenoidJNI.setSolenoid(m_ports[i], (byte) (value & local_mask), status);
+//        }
+//        HALUtil.checkStatus(status);
     }
 
     /**
@@ -65,11 +63,11 @@ public abstract class SolenoidBase extends SensorBase implements IDeviceControll
      */
     public byte getAll() {
         byte value = 0;
-        IntBuffer status = IntBuffer.allocate(1);
-        for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
-            value |= HALLibrary.getSolenoid(m_ports[i], status) << i;
-        }
-        HALUtil.checkStatus(status);
+//        IntBuffer status = IntBuffer.allocate(1);
+//        for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
+//            value |= SolenoidJNI.getSolenoid(m_ports[i], status) << i;
+//        }
+//        HALUtil.checkStatus(status);
         return value;
     }
 
@@ -88,7 +86,9 @@ public abstract class SolenoidBase extends SensorBase implements IDeviceControll
      * @return The current value of all 8 solenoids on the specified module.
      */
     public static byte getAllFromModule(int moduleNumber) {
-        checkSolenoidModule(moduleNumber);
-        throw new RuntimeException("Not supported right now.");
+    	byte value = 0;
+//        checkSolenoidModule(moduleNumber);
+//        throw new RuntimeException("Not supported right now.");
+    	return value;
     }
 }

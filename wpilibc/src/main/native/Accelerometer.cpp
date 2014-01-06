@@ -6,7 +6,7 @@
 
 #include "Accelerometer.h"
 #include "AnalogModule.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 
@@ -18,7 +18,7 @@ void Accelerometer::InitAccelerometer()
 	m_table = NULL;
 	m_voltsPerG = 1.0;
 	m_zeroGVoltage = 2.5;
-	nUsageReporting::report(nUsageReporting::kResourceType_Accelerometer, m_analogChannel->GetChannel(), m_analogChannel->GetModuleNumber() - 1);
+	HALReport(HALUsageReporting::kResourceType_Accelerometer, m_analogChannel->GetChannel(), m_analogChannel->GetModuleNumber() - 1);
 	LiveWindow::GetInstance()->AddSensor("Accelerometer", m_analogChannel->GetModuleNumber(), m_analogChannel->GetChannel(), this);
 }
 

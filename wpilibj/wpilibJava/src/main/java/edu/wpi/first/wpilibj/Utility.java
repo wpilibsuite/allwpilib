@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
 import edu.wpi.first.wpilibj.hal.HALLibrary;
@@ -27,9 +29,11 @@ public class Utility implements IUtility {
 	 * @return FPGA Version number.
 	 */
 	int getFPGAVersion() {
-		IntBuffer status = IntBuffer.allocate(1);
-		int value = HALLibrary.getFPGAVersion(status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		int value = HALUtil.getFPGAVersion(status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 		return value;
 	}
 
@@ -41,9 +45,11 @@ public class Utility implements IUtility {
 	 * @return FPGA Revision number.
 	 */
 	long getFPGARevision() {
-		IntBuffer status = IntBuffer.allocate(1);
-		int value = HALLibrary.getFPGARevision(status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		int value = HALUtil.getFPGARevision(status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 		return (long) value;
 	}
 
@@ -53,10 +59,13 @@ public class Utility implements IUtility {
 	 * @return The current time in microseconds according to the FPGA.
 	 */
 	public static long getFPGATime() {
-		IntBuffer status = IntBuffer.allocate(1);
-		int value = HALLibrary.getFPGATime(status);
-		HALUtil.checkStatus(status);
-		return (long) value;
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		
+		long value = HALUtil.getFPGATime(status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		return value;
 	}
 
 	/**

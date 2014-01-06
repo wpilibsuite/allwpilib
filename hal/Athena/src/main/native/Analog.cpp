@@ -44,7 +44,7 @@ bool analogSystemInitialized = false;
  */
 void initializeAnalog(int32_t *status) {
   if (analogSystemInitialized) return;
-  analogRegisterWindowSemaphore = initializeMutex(SEMAPHORE_Q_PRIORITY | SEMAPHORE_DELETE_SAFE | SEMAPHORE_INVERSION_SAFE);
+  analogRegisterWindowSemaphore = initializeMutexRecursive();
   analogSystem = tAI::create(status);
   setAnalogNumChannelsToActivate(kAnalogPins);
   setAnalogSampleRate(kDefaultSampleRate, status);

@@ -8,10 +8,11 @@
 package edu.wpi.first.wpilibj;
 
 import java.nio.IntBuffer;
+import java.nio.ByteBuffer;
 
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary.tResourceType;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
-import edu.wpi.first.wpilibj.hal.HALLibrary;
+import edu.wpi.first.wpilibj.hal.AnalogJNI;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.parsing.IInputOutput;
 
@@ -99,7 +100,7 @@ public class AnalogTriggerOutput extends DigitalSource implements IInputOutput {
 	 */
 	public boolean get() {
 		IntBuffer status = IntBuffer.allocate(1);
-		byte value = HALLibrary.getAnalogTriggerOutput(m_trigger.m_port,
+		byte value = AnalogJNI.getAnalogTriggerOutput(m_trigger.m_port,
 				m_outputType, status);
 		HALUtil.checkStatus(status);
 		return value != 0;

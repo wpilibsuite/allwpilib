@@ -7,7 +7,7 @@
 #include "PWM.h"
 
 #include "DigitalModule.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
 #include "Utility.h"
 #include "WPIErrors.h"
@@ -54,7 +54,7 @@ void PWM::InitPWM(uint8_t moduleNumber, uint32_t channel)
 	m_module->SetPWM(m_channel, kPwmDisabled);
 	m_eliminateDeadband = false;
 
-	nUsageReporting::report(nUsageReporting::kResourceType_PWM, channel, moduleNumber - 1);
+	HALReport(HALUsageReporting::kResourceType_PWM, channel, moduleNumber - 1);
 }
 
 /**

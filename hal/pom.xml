@@ -11,10 +11,6 @@
     <module>include</module>
   </modules>
 
-  <properties>
-	<local-repository>C:/Users/wpilibj-buildmaster/maven-repository</local-repository>
-  </properties>
-  
   <profiles>
 	<profile>
 	  <id>jenkins</id>
@@ -32,9 +28,6 @@
       </activation>
 	  <modules>
 		<module>Athena</module>
-		<module>AthenaJava</module>
-		<module>AthenaXX</module>
-		<module>AthenaXXJava</module>
 	  </modules>
 	</profile>
 	<profile>

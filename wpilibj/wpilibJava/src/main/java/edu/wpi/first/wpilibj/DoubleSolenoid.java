@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary.tResourceType;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
@@ -50,28 +50,28 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
      * Common function to implement constructor behavior.
      */
     private synchronized void initSolenoid() {
-        checkSolenoidModule(m_moduleNumber);
-        checkSolenoidChannel(m_forwardChannel);
-        checkSolenoidChannel(m_reverseChannel);
-
-        try {
-            m_allocated.allocate((m_moduleNumber - 1) * kSolenoidChannels + m_forwardChannel - 1);
-        } catch (CheckedAllocationException e) {
-            throw new AllocationException(
-                "Solenoid channel " + m_forwardChannel + " on module " + m_moduleNumber + " is already allocated");
-        }
-        try {
-            m_allocated.allocate((m_moduleNumber - 1) * kSolenoidChannels + m_reverseChannel - 1);
-        } catch (CheckedAllocationException e) {
-            throw new AllocationException(
-                "Solenoid channel " + m_reverseChannel + " on module " + m_moduleNumber + " is already allocated");
-        }
-        m_forwardMask = (byte) (1 << (m_forwardChannel - 1));
-        m_reverseMask = (byte) (1 << (m_reverseChannel - 1));
-
-        UsageReporting.report(tResourceType.kResourceType_Solenoid, m_forwardChannel, m_moduleNumber-1);
-        UsageReporting.report(tResourceType.kResourceType_Solenoid, m_reverseChannel, m_moduleNumber-1);
-        LiveWindow.addActuator("DoubleSolenoid", m_moduleNumber, m_forwardChannel, this);
+//        checkSolenoidModule(m_moduleNumber);
+//        checkSolenoidChannel(m_forwardChannel);
+//        checkSolenoidChannel(m_reverseChannel);
+//
+//        try {
+//            m_allocated.allocate((m_moduleNumber - 1) * kSolenoidChannels + m_forwardChannel - 1);
+//        } catch (CheckedAllocationException e) {
+//            throw new AllocationException(
+//                "Solenoid channel " + m_forwardChannel + " on module " + m_moduleNumber + " is already allocated");
+//        }
+//        try {
+//            m_allocated.allocate((m_moduleNumber - 1) * kSolenoidChannels + m_reverseChannel - 1);
+//        } catch (CheckedAllocationException e) {
+//            throw new AllocationException(
+//                "Solenoid channel " + m_reverseChannel + " on module " + m_moduleNumber + " is already allocated");
+//        }
+//        m_forwardMask = (byte) (1 << (m_forwardChannel - 1));
+//        m_reverseMask = (byte) (1 << (m_reverseChannel - 1));
+//
+//        UsageReporting.report(tResourceType.kResourceType_Solenoid, m_forwardChannel, m_moduleNumber-1);
+//        UsageReporting.report(tResourceType.kResourceType_Solenoid, m_reverseChannel, m_moduleNumber-1);
+//        LiveWindow.addActuator("DoubleSolenoid", m_moduleNumber, m_forwardChannel, this);
     }
 
     /**
@@ -105,8 +105,8 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
      * Destructor.
      */
     public synchronized void free() {
-        m_allocated.free((m_moduleNumber - 1) * kSolenoidChannels + m_forwardChannel - 1);
-        m_allocated.free((m_moduleNumber - 1) * kSolenoidChannels + m_reverseChannel - 1);
+//        m_allocated.free((m_moduleNumber - 1) * kSolenoidChannels + m_forwardChannel - 1);
+//        m_allocated.free((m_moduleNumber - 1) * kSolenoidChannels + m_reverseChannel - 1);
     }
 
     /**

@@ -14,7 +14,7 @@
 #include <errno.h>
 #include <cstdio>
 
-MUTEX_ID ErrorBase::_globalErrorMutex = initializeMutex(SEMAPHORE_Q_PRIORITY | SEMAPHORE_DELETE_SAFE | SEMAPHORE_INVERSION_SAFE);
+MUTEX_ID ErrorBase::_globalErrorMutex = initializeMutexNormal();
 Error ErrorBase::_globalError;
 /**
  * @brief Initialize the instance status to 0 for now.

@@ -6,7 +6,7 @@
 
 
 #include "Jaguar.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "DigitalModule.h"
 #include "LiveWindow/LiveWindow.h"
 
@@ -28,7 +28,7 @@ void Jaguar::InitJaguar()
 	SetPeriodMultiplier(kPeriodMultiplier_1X);
 	SetRaw(m_centerPwm);
 
-	nUsageReporting::report(nUsageReporting::kResourceType_Jaguar, GetChannel(), GetModuleNumber() - 1);
+	HALReport(HALUsageReporting::kResourceType_Jaguar, GetChannel(), GetModuleNumber() - 1);
 	LiveWindow::GetInstance()->AddActuator("Jaguar", GetModuleNumber(), GetChannel(), this);
 }
 

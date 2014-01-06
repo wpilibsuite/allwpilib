@@ -12,7 +12,7 @@
 #include "SensorBase.h"
 #include "Task.h"
 
-struct FRCCommonControlData;
+struct HALCommonControlData;
 class AnalogChannel;
 
 /**
@@ -109,7 +109,7 @@ private:
 
 	void Run();
 
-	struct FRCCommonControlData *m_controlData;
+	struct HALCommonControlData *m_controlData;
 	uint8_t m_digitalOut;
 	AnalogChannel *m_batteryChannel;
 	MUTEX_ID m_statusDataSemaphore;

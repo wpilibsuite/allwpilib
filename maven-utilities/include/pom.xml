@@ -10,7 +10,7 @@
   <properties>
 	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	<project.resources.sourceEncoding>UTF-8</project.resources.sourceEncoding>
-	<local-repository>C:/Users/wpilibj-buildmaster/maven-repository</local-repository>
+	<!-- local-repository>C:/Users/wpilibj-buildmaster/maven-repository</local-repository-->
   </properties>
 
   <build>

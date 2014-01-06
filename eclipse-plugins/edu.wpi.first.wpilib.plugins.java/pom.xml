@@ -18,16 +18,16 @@
   </properties>
   
   <repositories>
-    <repository>
+    <!-- repository>
       <id>sonatype</id>
       <name>Sonatype OSS Snapshots Repository</name>
       <url>http://oss.sonatype.org/content/groups/public</url>
-    </repository>
+    </repository-->
     <!-- For old snapshots, please use groupId `com.jnaerator` and the following repo -->
-    <repository>
+    <!-- repository>
       <id>nativelibs4java-repo</id>
       <url>http://nativelibs4java.sourceforge.net/maven</url>
-    </repository>
+    </repository-->
 	
     <repository>
       <id>WPILib Repository</id>
@@ -92,28 +92,28 @@
 				  <outputDirectory>${java-zip}/lib</outputDirectory>
                 </artifactItem>
                 <artifactItem>
-				  <groupId>edu.wpi.first.wpilib</groupId>
-				  <artifactId>WPILibJ</artifactId>
+				  <groupId>edu.wpi.first.wpilibj</groupId>
+				  <artifactId>wpilibJavaFinal</artifactId>
 				  <version>0.1.0-SNAPSHOT</version>
 				  <type>jar</type>
 				  <destFileName>WPILib.jar</destFileName>
 				  <outputDirectory>${java-zip}/lib</outputDirectory>
                 </artifactItem>
-				<artifactItem>
+				<!-- artifactItem>
 				  <groupId>net.java.dev.jna</groupId>
 				  <artifactId>jna</artifactId>
 				  <version>4.0.0</version>
 				  <type>jar</type>
 				  <outputDirectory>${java-zip}/lib</outputDirectory>
-				</artifactItem>
-				<artifactItem>
+				</artifactItem-->
+				<!-- artifactItem>
 				  <groupId>com.nativelibs4java</groupId>
 				  <artifactId>jnaerator-runtime</artifactId>
 				  <version>0.12-SNAPSHOT</version>
 				  <type>jar</type>
 				  <destFileName>jnaerator-runtime.jar</destFileName>
 				  <outputDirectory>${java-zip}/lib</outputDirectory>
-				</artifactItem>
+				</artifactItem-->
 				<!-- Library sources for debugging WPILib on the Athena -->
                 <artifactItem>
 				  <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
@@ -124,8 +124,8 @@
 				  <destFileName>NetworkTables-sources.jar</destFileName>
                 </artifactItem>
                 <artifactItem>
-				  <groupId>edu.wpi.first.wpilib</groupId>
-				  <artifactId>WPILibJ</artifactId>
+				  <groupId>edu.wpi.first.wpilibj</groupId>
+				  <artifactId>wpilibJava</artifactId>
 				  <version>0.1.0-SNAPSHOT</version>
 				  <classifier>sources</classifier>
 				  <outputDirectory>${java-zip}/lib</outputDirectory>
@@ -134,8 +134,8 @@
 
 				<!-- Javadoc -->
                 <artifactItem>
-				  <groupId>edu.wpi.first.wpilib</groupId>
-				  <artifactId>WPILibJ</artifactId>
+				  <groupId>edu.wpi.first.wpilibj</groupId>
+				  <artifactId>wpilibJava</artifactId>
 				  <version>0.1.0-SNAPSHOT</version>
 				  <type>javadoc</type>
 				  <outputDirectory>${java-zip}/javadoc-jar</outputDirectory>
@@ -230,23 +230,23 @@
 			  <type>jar</type>
 	</dependency>
 	<dependency>
-			  <groupId>edu.wpi.first.wpilib</groupId>
-			  <artifactId>WPILibJ</artifactId>
+			  <groupId>edu.wpi.first.wpilibj</groupId>
+			  <artifactId>wpilibJavaFinal</artifactId>
 			  <version>0.1.0-SNAPSHOT</version>
 			  <type>jar</type>
 	</dependency>
-	<dependency>
+	<!-- dependency>
 			  <groupId>net.java.dev.jna</groupId>
 			  <artifactId>jna</artifactId>
 			  <version>4.0.0</version>
 			  <type>jar</type>
-	</dependency>
-	<dependency>
+	</dependency-->
+	<!-- dependency>
 			  <groupId>com.nativelibs4java</groupId>
 			  <artifactId>jnaerator-runtime</artifactId>
 			  <version>0.12-SNAPSHOT</version>
 			  <type>jar</type>
-	</dependency>
+	</dependency-->
 	
 	<!-- Library sources for debugging WPILib on the Athena -->
 	<dependency>
@@ -256,16 +256,16 @@
 			  <classifier>sources</classifier>
 	</dependency>
 	<dependency>
-			  <groupId>edu.wpi.first.wpilib</groupId>
-			  <artifactId>WPILibJ</artifactId>
+			  <groupId>edu.wpi.first.wpilibj</groupId>
+			  <artifactId>wpilibJava</artifactId>
 			  <version>0.1.0-SNAPSHOT</version>
 			  <classifier>sources</classifier>
 	</dependency>
 
 	<!-- Javadoc -->
 	<dependency>
-			  <groupId>edu.wpi.first.wpilib</groupId>
-			  <artifactId>WPILibJ</artifactId>
+			  <groupId>edu.wpi.first.wpilibj</groupId>
+			  <artifactId>wpilibJava</artifactId>
 			  <version>0.1.0-SNAPSHOT</version>
 			  <type>javadoc</type>
 	</dependency>

@@ -7,13 +7,17 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+import java.nio.ByteBuffer;
 
-import com.sun.jna.Pointer;
+//import com.sun.jna.Pointer;
 
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary.tResourceType;
+
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
-import edu.wpi.first.wpilibj.hal.HALLibrary;
+import edu.wpi.first.wpilibj.hal.DIOJNI;
+import edu.wpi.first.wpilibj.hal.PWMJNI;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.parsing.IInputOutput;
@@ -28,7 +32,7 @@ import edu.wpi.first.wpilibj.tables.ITableListener;
 public class DigitalOutput extends DigitalSource implements IInputOutput,
 		LiveWindowSendable {
 
-	private Pointer m_pwmGenerator;
+	private ByteBuffer m_pwmGenerator;
 
 	/**
 	 * Create an instance of a digital output. Create an instance of a digital
@@ -75,9 +79,11 @@ public class DigitalOutput extends DigitalSource implements IInputOutput,
 	 *            true is on, off is false
 	 */
 	public void set(boolean value) {
-		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.setDIO(m_port, (short) (value ? 1 : 0), status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		DIOJNI.setDIO(m_port, (short) (value ? 1 : 0), status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/**
@@ -97,9 +103,11 @@ public class DigitalOutput extends DigitalSource implements IInputOutput,
 	 *            The length of the pulse.
 	 */
 	public void pulse(final int channel, final float pulseLength) {
-		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.pulse(m_port, pulseLength, status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		DIOJNI.pulse(m_port, pulseLength, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/**
@@ -113,13 +121,14 @@ public class DigitalOutput extends DigitalSource implements IInputOutput,
 	 *            The length of the pulse.
 	 */
 	public void pulse(final int channel, final int pulseLength) {
-		IntBuffer status = IntBuffer.allocate(1);
-		float convertedPulse = (float) (pulseLength / 1.0e9 * (HALLibrary
-				.getLoopTiming(status) * 25));
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		float convertedPulse = (float) (pulseLength / 1.0e9 * (DIOJNI.getLoopTiming(status.asIntBuffer()) * 25));
 		System.err
 				.println("You should use the float version of pulse for portability.  This is deprecated");
-		HALLibrary.pulse(m_port, convertedPulse, status);
-		HALUtil.checkStatus(status);
+		DIOJNI.pulse(m_port, convertedPulse, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/**
@@ -129,9 +138,11 @@ public class DigitalOutput extends DigitalSource implements IInputOutput,
 	 * @return true if pulsing
 	 */
 	public boolean isPulsing() {
-		IntBuffer status = IntBuffer.allocate(1);
-		boolean value = HALLibrary.isPulsing(m_port, status) != 0;
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		boolean value = DIOJNI.isPulsing(m_port, status.asIntBuffer()) != 0;
+		HALUtil.checkStatus(status.asIntBuffer());
 		return value;
 	}
 
@@ -148,10 +159,12 @@ public class DigitalOutput extends DigitalSource implements IInputOutput,
 	 *            module.
 	 */
 	public void setPWMRate(double rate) {
-		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.setPWMRateWithModule((byte) m_moduleNumber, (float) rate,
-				status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		PWMJNI.setPWMRateWithModule((byte) m_moduleNumber, rate,
+				status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/**
@@ -171,15 +184,17 @@ public class DigitalOutput extends DigitalSource implements IInputOutput,
 	public void enablePWM(double initialDutyCycle) {
 		if (m_pwmGenerator == null)
 			return;
-		IntBuffer status = IntBuffer.allocate(1);
-		m_pwmGenerator = HALLibrary.allocatePWMWithModule(
-				(byte) m_moduleNumber, status);
-		HALUtil.checkStatus(status);
-		HALLibrary.setPWMDutyCycle(m_pwmGenerator, (float) initialDutyCycle,
-				status);
-		HALUtil.checkStatus(status);
-		HALLibrary.setPWMOutputChannelWithModule((byte) m_moduleNumber,
-				m_pwmGenerator, m_channel, status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		m_pwmGenerator = PWMJNI.allocatePWMWithModule(
+				(byte) m_moduleNumber, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		PWMJNI.setPWMDutyCycle(m_pwmGenerator, initialDutyCycle,
+				status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		PWMJNI.setPWMOutputChannelWithModule((byte) m_moduleNumber,
+				m_pwmGenerator, m_channel, status.asIntBuffer());
 	}
 
 	/**
@@ -189,12 +204,13 @@ public class DigitalOutput extends DigitalSource implements IInputOutput,
 	 */
 	public void disablePWM() {
 		// Disable the output by routing to a dead bit.
-		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary
-				.setPWMOutputChannel(m_pwmGenerator, kDigitalChannels, status);
-		HALUtil.checkStatus(status);
-		HALLibrary.freePWMWithModule((byte) m_moduleNumber, m_pwmGenerator,
-				status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		PWMJNI.setPWMOutputChannel(m_pwmGenerator, kDigitalChannels, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		PWMJNI.freePWMWithModule((byte) m_moduleNumber, m_pwmGenerator,
+				status.asIntBuffer());
 		m_pwmGenerator = null;
 	}
 
@@ -208,10 +224,12 @@ public class DigitalOutput extends DigitalSource implements IInputOutput,
 	 *            The duty-cycle to change to. [0..1]
 	 */
 	public void updateDutyCycle(double dutyCycle) {
-		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.setPWMDutyCycleWithModule((byte) m_moduleNumber,
-				m_pwmGenerator, (float) dutyCycle, status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		PWMJNI.setPWMDutyCycleWithModule((byte) m_moduleNumber,
+				m_pwmGenerator, dutyCycle, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/*

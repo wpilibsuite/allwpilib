@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary.tResourceType;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
-import edu.wpi.first.wpilibj.hal.HALLibrary;
+import edu.wpi.first.wpilibj.hal.PWMJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
@@ -39,7 +39,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
 	 * tests running for the first time.
 	 */
 	
-    private static Resource allocated = new Resource((HALLibrary.dio_kNumSystems.get() * kPwmChannels));
+    private static Resource allocated = new Resource( kPwmChannels);
 
     /**
      * Represents the amount to multiply the minimum servo-pulse pwm period by.

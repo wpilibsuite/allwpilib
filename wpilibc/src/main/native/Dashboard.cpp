@@ -6,7 +6,7 @@
 
 #include "Dashboard.h"
 #include "DriverStation.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "HAL/cpp/Synchronized.h"
 #include "WPIErrors.h"
 #include <string.h>
@@ -33,7 +33,7 @@ Dashboard::Dashboard(MUTEX_ID statusDataSem)
 	m_localPrintBuffer = new char[kMaxDashboardDataSize * 2];
 	m_localPrintBuffer[0] = 0;
 	m_packPtr = m_localBuffer;
-	m_printSemaphore = initializeMutex(SEMAPHORE_Q_PRIORITY | SEMAPHORE_DELETE_SAFE | SEMAPHORE_INVERSION_SAFE);
+	m_printSemaphore = initializeMutexNormal();
 }
 
 /**
@@ -307,7 +307,7 @@ int32_t Dashboard::Finalize()
 	static bool reported = false;
 	if (!reported)
 	{
-		nUsageReporting::report(nUsageReporting::kResourceType_Dashboard, 0);
+		HALReport(HALUsageReporting::kResourceType_Dashboard, 0);
 		reported = true;
 	}
 

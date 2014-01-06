@@ -8,7 +8,7 @@
 #define __DRIVER_STATION_ENHANCED_IO_H__
 
 #include "ErrorBase.h"
-#include "NetworkCommunication/FRCComm.h"
+//#include "NetworkCommunication/FRCComm.h"
 #include <stack>
 #include <vector>
 #include "HAL/HAL.h"
@@ -91,8 +91,8 @@ class DriverStationEnhancedIO : public ErrorBase
 
 	enum tBlockID
 	{
-		kInputBlockID = kFRC_NetworkCommunication_DynamicType_DSEnhancedIO_Input,
-		kOutputBlockID = kFRC_NetworkCommunication_DynamicType_DSEnhancedIO_Output,
+		kInputBlockID = HALFRC_NetworkCommunication_DynamicType_DSEnhancedIO_Input,
+		kOutputBlockID = HALFRC_NetworkCommunication_DynamicType_DSEnhancedIO_Output,
 	};
 	enum tStatusFlags {kStatusValid = 0x01, kStatusConfigChanged = 0x02, kForceEnhancedMode = 0x04};
 

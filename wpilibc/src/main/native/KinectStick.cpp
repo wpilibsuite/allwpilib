@@ -8,15 +8,15 @@
 
 #include "DriverStation.h"
 #include "Joystick.h"
-#include "NetworkCommunication/FRCComm.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/FRCComm.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "Utility.h"
 #include "WPIErrors.h"
 
 uint32_t KinectStick::_recentPacketNumber = 0;
 KinectStick::KinectStickData KinectStick::_sticks;
 
-#define kJoystickBundleID kFRC_NetworkCommunication_DynamicType_Kinect_Joystick
+#define kJoystickBundleID HALFRC_NetworkCommunication_DynamicType_Kinect_Joystick
 #define kTriggerMask 1
 #define kTopMask 2
 
@@ -34,7 +34,7 @@ KinectStick::KinectStick(int id)
 	}
 	m_id = id;
 
-	nUsageReporting::report(nUsageReporting::kResourceType_KinectStick, id);
+	HALReport(HALUsageReporting::kResourceType_KinectStick, id);
 }
 
 /**
@@ -169,7 +169,7 @@ void KinectStick::GetData()
 	if (_recentPacketNumber != packetNumber)
 	{
 		_recentPacketNumber = packetNumber;
-		int retVal = getDynamicControlData(kJoystickBundleID, _sticks.data, sizeof(_sticks.data), 5);
+		int retVal = HALGetDynamicControlData(kJoystickBundleID, _sticks.data, sizeof(_sticks.data), 5);
 		if (retVal == 0)
 		{
 			wpi_assert(_sticks.formatted.size == sizeof(_sticks.data) - 1);

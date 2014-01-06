@@ -9,10 +9,11 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary.tResourceType;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.HALLibrary;
 import edu.wpi.first.wpilibj.hal.HALUtil;
+import edu.wpi.first.wpilibj.hal.I2CJNI;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
 /**
@@ -80,12 +81,12 @@ public class I2C extends SensorBase {
 		ByteBuffer dataReceivedBuffer = ByteBuffer.allocate(1);
 		IntBuffer status = IntBuffer.allocate(1);
 
-		aborted = HALLibrary
+		aborted = I2CJNI
 				.doI2CTransactionWithModule((byte) m_module.m_moduleNumber,
 						(byte) m_deviceAddress, (byte) (m_compatibilityMode ? 1
 								: 0), dataToSendBuffer, (byte) sendSize,
 						dataReceivedBuffer, (byte) receiveSize, status) != 0;
-		if (status.get() == HALLibrary.PARAMETER_OUT_OF_RANGE) {
+		if (status.get() == HALUtil.PARAMETER_OUT_OF_RANGE) {
 			if (sendSize > 6) {
 				throw new BoundaryException(BoundaryException.getMessage(
 						sendSize, 0, 6));

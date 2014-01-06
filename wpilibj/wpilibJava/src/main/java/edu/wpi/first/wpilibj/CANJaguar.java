@@ -8,12 +8,14 @@
 package edu.wpi.first.wpilibj;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
+import edu.wpi.first.wpilibj.can.CANExceptionFactory;
 import edu.wpi.first.wpilibj.can.CANJaguarVersionException;
-import edu.wpi.first.wpilibj.can.CANLibrary;
+import edu.wpi.first.wpilibj.can.CANJNI;
 import edu.wpi.first.wpilibj.can.CANTimeoutException;
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary.tResourceType;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.HALLibrary;
 import edu.wpi.first.wpilibj.hal.HALUtil;
@@ -354,29 +356,29 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 
         switch (m_controlMode.value) {
         case ControlMode.kPercentVbus_val:
-            messageID = CANLibrary.LM_API_VOLT_T_SET;
+            messageID = CANJNI.LM_API_VOLT_T_SET;
             if (outputValue > 1.0) outputValue = 1.0;
             if (outputValue < -1.0) outputValue = -1.0;
             packPercentage(dataBuffer, outputValue);
             dataSize = 2;
             break;
         case ControlMode.kSpeed_val: {
-            messageID = CANLibrary.LM_API_SPD_T_SET;
+            messageID = CANJNI.LM_API_SPD_T_SET;
             dataSize = packFXP16_16(dataBuffer, outputValue);
         }
         break;
         case ControlMode.kPosition_val: {
-            messageID = CANLibrary.LM_API_POS_T_SET;
+            messageID = CANJNI.LM_API_POS_T_SET;
             dataSize = packFXP16_16(dataBuffer, outputValue);
         }
         break;
         case ControlMode.kCurrent_val: {
-            messageID = CANLibrary.LM_API_ICTRL_T_SET;
+            messageID = CANJNI.LM_API_ICTRL_T_SET;
             dataSize = packFXP8_8(dataBuffer, outputValue);
         }
         break;
         case ControlMode.kVoltage_val: {
-            messageID = CANLibrary.LM_API_VCOMP_T_SET;
+            messageID = CANJNI.LM_API_VCOMP_T_SET;
             dataSize = packFXP8_8(dataBuffer, outputValue);
         }
         break;
@@ -424,31 +426,31 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 
         switch (m_controlMode.value) {
         case ControlMode.kPercentVbus_val:
-            dataSize = getTransaction(CANLibrary.LM_API_VOLT_SET, dataBuffer);
+            dataSize = getTransaction(CANJNI.LM_API_VOLT_SET, dataBuffer);
             if (dataSize == 2) {
                 return unpackPercentage(dataBuffer);
             }
             break;
         case ControlMode.kSpeed_val:
-            dataSize = getTransaction(CANLibrary.LM_API_SPD_SET, dataBuffer);
+            dataSize = getTransaction(CANJNI.LM_API_SPD_SET, dataBuffer);
             if (dataSize == 4) {
                 return unpackFXP16_16(dataBuffer);
             }
             break;
         case ControlMode.kPosition_val:
-            dataSize = getTransaction(CANLibrary.LM_API_POS_SET, dataBuffer);
+            dataSize = getTransaction(CANJNI.LM_API_POS_SET, dataBuffer);
             if (dataSize == 4) {
                 return unpackFXP16_16(dataBuffer);
             }
             break;
         case ControlMode.kCurrent_val:
-            dataSize = getTransaction(CANLibrary.LM_API_ICTRL_SET, dataBuffer);
+            dataSize = getTransaction(CANJNI.LM_API_ICTRL_SET, dataBuffer);
             if (dataSize == 2) {
                 return unpackFXP8_8(dataBuffer);
             }
             break;
         case ControlMode.kVoltage_val:
-            dataSize = getTransaction(CANLibrary.LM_API_VCOMP_SET, dataBuffer);
+            dataSize = getTransaction(CANJNI.LM_API_VCOMP_SET, dataBuffer);
             if (dataSize == 2) {
                 return unpackFXP8_8(dataBuffer);
             }
@@ -548,7 +550,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
     long unpackINT32(byte[] buffer) {
         return unpack32(buffer,0);
     }
-    private static final byte[] sendTrustedDataBuffer = new byte[kMaxMessageDataSize];
+    private static final ByteBuffer sendTrustedDataBuffer = ByteBuffer.allocateDirect(kMaxMessageDataSize);
 
     /**
      * Send a message on the CAN bus through the CAN driver in FRC_NetworkCommunication
@@ -562,33 +564,58 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
      */
     protected static void sendMessage(int messageID, byte[] data, int dataSize) throws CANTimeoutException {
         final int[] kTrustedMessages = {
-        		CANLibrary.LM_API_VOLT_T_EN, CANLibrary.LM_API_VOLT_T_SET,
-        		CANLibrary.LM_API_SPD_T_EN, CANLibrary.LM_API_SPD_T_SET,
-        		CANLibrary.LM_API_VCOMP_T_EN, CANLibrary.LM_API_VCOMP_T_SET,
-        		CANLibrary.LM_API_POS_T_EN, CANLibrary.LM_API_POS_T_SET,
-        		CANLibrary.LM_API_ICTRL_T_EN, CANLibrary.LM_API_ICTRL_T_SET
+        		CANJNI.LM_API_VOLT_T_EN, CANJNI.LM_API_VOLT_T_SET,
+        		CANJNI.LM_API_SPD_T_EN, CANJNI.LM_API_SPD_T_SET,
+        		CANJNI.LM_API_VCOMP_T_EN, CANJNI.LM_API_VCOMP_T_SET,
+        		CANJNI.LM_API_POS_T_EN, CANJNI.LM_API_POS_T_SET,
+        		CANJNI.LM_API_ICTRL_T_EN, CANJNI.LM_API_ICTRL_T_SET
         };
 
         byte i;
         for (i = 0; i < kTrustedMessages.length; i++) {
-            if ((kFullMessageIDMask & messageID) == kTrustedMessages[i]) {
-                sendTrustedDataBuffer[0] = 0;
-                sendTrustedDataBuffer[1] = 0;
+            if ((kFullMessageIDMask & messageID) == kTrustedMessages[i])
+            {
                 // Make sure the data will still fit after adjusting for the token.
                 if (dataSize > kMaxMessageDataSize - 2) {
                     throw new RuntimeException("CAN message has too much data.");
                 }
 
+                ByteBuffer trustedBuffer = ByteBuffer.allocateDirect(dataSize+2);
+                trustedBuffer.put(0, (byte)0);
+                trustedBuffer.put(1, (byte)0);
+
                 byte j;
                 for (j = 0; j < dataSize; j++) {
-                    sendTrustedDataBuffer[j + 2] = data[j];
+                    trustedBuffer.put(j+2, data[j]);
                 }
 
-                CANLibrary.FRC_NetworkCommunication_JaguarCANDriver_sendMessage(messageID, sendTrustedDataBuffer, (byte) sendTrustedDataBuffer.length, IntBuffer.wrap(new int[]{dataSize + 2}));
+                
+        		ByteBuffer status = ByteBuffer.allocateDirect(4);
+        		// set the byte order
+        		status.order(ByteOrder.LITTLE_ENDIAN);
+        		status.asIntBuffer().put(0,dataSize+2);
+        
+        		
+        		CANJNI.FRCNetworkCommunicationJaguarCANDriverSendMessage(messageID, trustedBuffer, status.asIntBuffer());
                 return;
             }
         }
-        CANLibrary.FRC_NetworkCommunication_JaguarCANDriver_sendMessage(messageID, data, (byte) data.length, IntBuffer.wrap(new int[]{dataSize}));
+
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		status.asIntBuffer().put(0,dataSize);
+		
+		ByteBuffer dataBuffer = null;
+		if( dataSize > 0)
+		{
+			dataBuffer = ByteBuffer.allocateDirect(dataSize);
+			dataBuffer.put(data);
+		} 
+
+		CANJNI.FRCNetworkCommunicationJaguarCANDriverSendMessage(messageID, dataBuffer, status.asIntBuffer());
+
+		CANExceptionFactory.checkStatus(status.asIntBuffer().get(0), messageID);
     }
 
     /**
@@ -599,17 +626,36 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
      * @param timeout Specify how long to wait for a message (in seconds)
      */
     protected static byte receiveMessage(int messageID, byte[] data, double timeout) throws CANTimeoutException {
-		IntBuffer status = IntBuffer.allocate(1);
-		ByteBuffer dataSize = ByteBuffer.wrap(new byte[]{(byte) data.length});
-		CANLibrary.FRC_NetworkCommunication_JaguarCANDriver_receiveMessage(
-				IntBuffer.wrap(new int[]{messageID}), ByteBuffer.wrap(data), 
-				dataSize, (int) timeout, status);
-        HALUtil.checkStatus(status);
-        return dataSize.get();
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		
+		ByteBuffer messageIDBuffer = ByteBuffer.allocateDirect(4);
+		messageIDBuffer.order(ByteOrder.LITTLE_ENDIAN);
+		messageIDBuffer.asIntBuffer().put(0,messageID);
+		
+		ByteBuffer dataBuffer = CANJNI.FRCNetworkCommunicationJaguarCANDriverReceiveMessage(
+				messageIDBuffer.asIntBuffer(), (int) (timeout*1000), status.asIntBuffer());
+		
+		CANExceptionFactory.checkStatus(status.asIntBuffer().get(0), messageID);
+		
+        byte returnValue = 0;
+        
+        if( dataBuffer != null )
+        {
+        	returnValue = (byte)dataBuffer.capacity();
+        	for(int index = 0; index < returnValue; index++)
+        	{
+        		data[index] = dataBuffer.get(index);
+        	}
+        }
+        
+        return returnValue;
     }
 
     protected static byte receiveMessage(int messageID, byte[] data) throws CANTimeoutException {
-        return receiveMessage(messageID, data, 0.01);
+        //return receiveMessage(messageID, data, 0.01);
+        return receiveMessage(messageID, data, 0.1);
     }
 
     /**
@@ -623,7 +669,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
      * @param dataSize Specify how much of the data in "data" to send
      */
     protected byte setTransaction(int messageID, byte[] data, byte dataSize) throws CANTimeoutException {
-        int ackMessageID = CANLibrary.LM_API_ACK | m_deviceNumber;
+        int ackMessageID = CANJNI.LM_API_ACK | m_deviceNumber;
 
         // Make sure we don't have more than one transaction with the same Jaguar outstanding.
         synchronized (m_transactionMutex) {
@@ -674,7 +720,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte[] dataBuffer = new byte[8];
 
         dataBuffer[0] = reference.value;
-        setTransaction(CANLibrary.LM_API_SPD_REF, dataBuffer, (byte) 1);
+        setTransaction(CANJNI.LM_API_SPD_REF, dataBuffer, (byte) 1);
     }
 
     /**
@@ -686,7 +732,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte[] dataBuffer = new byte[8];
         byte dataSize = 0;
 
-        dataSize = getTransaction(CANLibrary.LM_API_SPD_REF, dataBuffer);
+        dataSize = getTransaction(CANJNI.LM_API_SPD_REF, dataBuffer);
         if (dataSize == 1) {
             switch (dataBuffer[0]) {
             case SpeedReference.kEncoder_val:
@@ -714,7 +760,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte[] dataBuffer = new byte[8];
 
         dataBuffer[0] = reference.value;
-        setTransaction(CANLibrary.LM_API_POS_REF, dataBuffer, (byte) 1);
+        setTransaction(CANJNI.LM_API_POS_REF, dataBuffer, (byte) 1);
     }
 
     /**
@@ -726,7 +772,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte[] dataBuffer = new byte[8];
         byte dataSize = 0;
 
-        dataSize = getTransaction(CANLibrary.LM_API_POS_REF, dataBuffer);
+        dataSize = getTransaction(CANJNI.LM_API_POS_REF, dataBuffer);
         if (dataSize == 1) {
             switch (dataBuffer[0]) {
             case PositionReference.kPotentiometer_val:
@@ -758,27 +804,27 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
             break;
         case ControlMode.kSpeed_val:
             dataSize = packFXP16_16(dataBuffer, p);
-            setTransaction(CANLibrary.LM_API_SPD_PC, dataBuffer, dataSize);
+            setTransaction(CANJNI.LM_API_SPD_PC, dataBuffer, dataSize);
             dataSize = packFXP16_16(dataBuffer, i);
-            setTransaction(CANLibrary.LM_API_SPD_IC, dataBuffer, dataSize);
+            setTransaction(CANJNI.LM_API_SPD_IC, dataBuffer, dataSize);
             dataSize = packFXP16_16(dataBuffer, d);
-            setTransaction(CANLibrary.LM_API_SPD_DC, dataBuffer, dataSize);
+            setTransaction(CANJNI.LM_API_SPD_DC, dataBuffer, dataSize);
             break;
         case ControlMode.kPosition_val:
             dataSize = packFXP16_16(dataBuffer, p);
-            setTransaction(CANLibrary.LM_API_POS_PC, dataBuffer, dataSize);
+            setTransaction(CANJNI.LM_API_POS_PC, dataBuffer, dataSize);
             dataSize = packFXP16_16(dataBuffer, i);
-            setTransaction(CANLibrary.LM_API_POS_IC, dataBuffer, dataSize);
+            setTransaction(CANJNI.LM_API_POS_IC, dataBuffer, dataSize);
             dataSize = packFXP16_16(dataBuffer, d);
-            setTransaction(CANLibrary.LM_API_POS_DC, dataBuffer, dataSize);
+            setTransaction(CANJNI.LM_API_POS_DC, dataBuffer, dataSize);
             break;
         case ControlMode.kCurrent_val:
             dataSize = packFXP16_16(dataBuffer, p);
-            setTransaction(CANLibrary.LM_API_ICTRL_PC, dataBuffer, dataSize);
+            setTransaction(CANJNI.LM_API_ICTRL_PC, dataBuffer, dataSize);
             dataSize = packFXP16_16(dataBuffer, i);
-            setTransaction(CANLibrary.LM_API_ICTRL_IC, dataBuffer, dataSize);
+            setTransaction(CANJNI.LM_API_ICTRL_IC, dataBuffer, dataSize);
             dataSize = packFXP16_16(dataBuffer, d);
-            setTransaction(CANLibrary.LM_API_ICTRL_DC, dataBuffer, dataSize);
+            setTransaction(CANJNI.LM_API_ICTRL_DC, dataBuffer, dataSize);
             break;
         }
     }
@@ -798,19 +844,19 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
             // TODO: Error, Not Valid
             break;
         case ControlMode.kSpeed_val:
-            dataSize = getTransaction(CANLibrary.LM_API_SPD_PC, dataBuffer);
+            dataSize = getTransaction(CANJNI.LM_API_SPD_PC, dataBuffer);
             if (dataSize == 4) {
                 return unpackFXP16_16(dataBuffer);
             }
             break;
         case ControlMode.kPosition_val:
-            dataSize = getTransaction(CANLibrary.LM_API_POS_PC, dataBuffer);
+            dataSize = getTransaction(CANJNI.LM_API_POS_PC, dataBuffer);
             if (dataSize == 4) {
                 return unpackFXP16_16(dataBuffer);
             }
             break;
         case ControlMode.kCurrent_val:
-            dataSize = getTransaction(CANLibrary.LM_API_ICTRL_PC, dataBuffer);
+            dataSize = getTransaction(CANJNI.LM_API_ICTRL_PC, dataBuffer);
             if (dataSize == 4) {
                 return unpackFXP16_16(dataBuffer);
             }
@@ -834,19 +880,19 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
             // TODO: Error, Not Valid
             break;
         case ControlMode.kSpeed_val:
-            dataSize = getTransaction(CANLibrary.LM_API_SPD_IC, dataBuffer);
+            dataSize = getTransaction(CANJNI.LM_API_SPD_IC, dataBuffer);
             if (dataSize == 4) {
                 return unpackFXP16_16(dataBuffer);
             }
             break;
         case ControlMode.kPosition_val:
-            dataSize = getTransaction(CANLibrary.LM_API_POS_IC, dataBuffer);
+            dataSize = getTransaction(CANJNI.LM_API_POS_IC, dataBuffer);
             if (dataSize == 4) {
                 return unpackFXP16_16(dataBuffer);
             }
             break;
         case ControlMode.kCurrent_val:
-            dataSize = getTransaction(CANLibrary.LM_API_ICTRL_IC, dataBuffer);
+            dataSize = getTransaction(CANJNI.LM_API_ICTRL_IC, dataBuffer);
             if (dataSize == 4) {
                 return unpackFXP16_16(dataBuffer);
             }
@@ -870,19 +916,19 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
             // TODO: Error, Not Valid
             break;
         case ControlMode.kSpeed_val:
-            dataSize = getTransaction(CANLibrary.LM_API_SPD_DC, dataBuffer);
+            dataSize = getTransaction(CANJNI.LM_API_SPD_DC, dataBuffer);
             if (dataSize == 4) {
                 return unpackFXP16_16(dataBuffer);
             }
             break;
         case ControlMode.kPosition_val:
-            dataSize = getTransaction(CANLibrary.LM_API_POS_DC, dataBuffer);
+            dataSize = getTransaction(CANJNI.LM_API_POS_DC, dataBuffer);
             if (dataSize == 4) {
                 return unpackFXP16_16(dataBuffer);
             }
             break;
         case ControlMode.kCurrent_val:
-            dataSize = getTransaction(CANLibrary.LM_API_ICTRL_DC, dataBuffer);
+            dataSize = getTransaction(CANJNI.LM_API_ICTRL_DC, dataBuffer);
             if (dataSize == 4) {
                 return unpackFXP16_16(dataBuffer);
             }
@@ -915,20 +961,20 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 
         switch (m_controlMode.value) {
         case ControlMode.kPercentVbus_val:
-            setTransaction(CANLibrary.LM_API_VOLT_T_EN, dataBuffer, dataSize);
+            setTransaction(CANJNI.LM_API_VOLT_T_EN, dataBuffer, dataSize);
             break;
         case ControlMode.kSpeed_val:
-            setTransaction(CANLibrary.LM_API_SPD_T_EN, dataBuffer, dataSize);
+            setTransaction(CANJNI.LM_API_SPD_T_EN, dataBuffer, dataSize);
             break;
         case ControlMode.kPosition_val:
             dataSize = packFXP16_16(dataBuffer, encoderInitialPosition);
-            setTransaction(CANLibrary.LM_API_POS_T_EN, dataBuffer, dataSize);
+            setTransaction(CANJNI.LM_API_POS_T_EN, dataBuffer, dataSize);
             break;
         case ControlMode.kCurrent_val:
-            setTransaction(CANLibrary.LM_API_ICTRL_T_EN, dataBuffer, dataSize);
+            setTransaction(CANJNI.LM_API_ICTRL_T_EN, dataBuffer, dataSize);
             break;
         case ControlMode.kVoltage_val:
-            setTransaction(CANLibrary.LM_API_VCOMP_T_EN, dataBuffer, dataSize);
+            setTransaction(CANJNI.LM_API_VCOMP_T_EN, dataBuffer, dataSize);
             break;
         }
     }
@@ -944,19 +990,19 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 
         switch (m_controlMode.value) {
         case ControlMode.kPercentVbus_val:
-            setTransaction(CANLibrary.LM_API_VOLT_DIS, dataBuffer, dataSize);
+            setTransaction(CANJNI.LM_API_VOLT_DIS, dataBuffer, dataSize);
             break;
         case ControlMode.kSpeed_val:
-            setTransaction(CANLibrary.LM_API_SPD_DIS, dataBuffer, dataSize);
+            setTransaction(CANJNI.LM_API_SPD_DIS, dataBuffer, dataSize);
             break;
         case ControlMode.kPosition_val:
-            setTransaction(CANLibrary.LM_API_POS_DIS, dataBuffer, dataSize);
+            setTransaction(CANJNI.LM_API_POS_DIS, dataBuffer, dataSize);
             break;
         case ControlMode.kCurrent_val:
-            setTransaction(CANLibrary.LM_API_ICTRL_DIS, dataBuffer, dataSize);
+            setTransaction(CANJNI.LM_API_ICTRL_DIS, dataBuffer, dataSize);
             break;
         case ControlMode.kVoltage_val:
-            setTransaction(CANLibrary.LM_API_VCOMP_DIS, dataBuffer, dataSize);
+            setTransaction(CANJNI.LM_API_VCOMP_DIS, dataBuffer, dataSize);
             break;
         }
     }
@@ -991,7 +1037,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte[] dataBuffer = new byte[8];
         byte dataSize = 0;
 
-        dataSize = getTransaction(CANLibrary.LM_API_STATUS_CMODE, dataBuffer);
+        dataSize = getTransaction(CANJNI.LM_API_STATUS_CMODE, dataBuffer);
         if (dataSize == 1) {
             switch (dataBuffer[0]) {
             case ControlMode.kPercentVbus_val:
@@ -1018,7 +1064,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte[] dataBuffer = new byte[8];
         byte dataSize = 0;
 
-        dataSize = getTransaction(CANLibrary.LM_API_STATUS_VOLTBUS, dataBuffer);
+        dataSize = getTransaction(CANJNI.LM_API_STATUS_VOLTBUS, dataBuffer);
         if (dataSize == 2) {
             return unpackFXP8_8(dataBuffer);
         }
@@ -1035,7 +1081,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte dataSize = 0;
 
         // Read the volt out which is in Volts units.
-        dataSize = getTransaction(CANLibrary.LM_API_STATUS_VOUT, dataBuffer);
+        dataSize = getTransaction(CANJNI.LM_API_STATUS_VOUT, dataBuffer);
         if (dataSize == 2) {
             return unpackFXP8_8(dataBuffer);
         }
@@ -1051,7 +1097,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte[] dataBuffer = new byte[8];
         byte dataSize;
 
-        dataSize = getTransaction(CANLibrary.LM_API_STATUS_CURRENT, dataBuffer);
+        dataSize = getTransaction(CANJNI.LM_API_STATUS_CURRENT, dataBuffer);
         if (dataSize == 2) {
             return unpackFXP8_8(dataBuffer);
         }
@@ -1068,7 +1114,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte[] dataBuffer = new byte[8];
         byte dataSize;
 
-        dataSize = getTransaction(CANLibrary.LM_API_STATUS_TEMP, dataBuffer);
+        dataSize = getTransaction(CANJNI.LM_API_STATUS_TEMP, dataBuffer);
         if (dataSize == 2) {
             return unpackFXP8_8(dataBuffer);
         }
@@ -1084,7 +1130,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte[] dataBuffer = new byte[8];
         byte dataSize;
 
-        dataSize = getTransaction(CANLibrary.LM_API_STATUS_POS, dataBuffer);
+        dataSize = getTransaction(CANJNI.LM_API_STATUS_POS, dataBuffer);
         if (dataSize == 4) {
             return unpackFXP16_16(dataBuffer);
         }
@@ -1100,7 +1146,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte[] dataBuffer = new byte[8];
         byte dataSize;
 
-        dataSize = getTransaction(CANLibrary.LM_API_STATUS_SPD, dataBuffer);
+        dataSize = getTransaction(CANJNI.LM_API_STATUS_SPD, dataBuffer);
         if (dataSize == 4) {
             return unpackFXP16_16(dataBuffer);
         }
@@ -1116,7 +1162,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte[] dataBuffer = new byte[8];
         byte dataSize;
 
-        dataSize = getTransaction(CANLibrary.LM_API_STATUS_LIMIT, dataBuffer);
+        dataSize = getTransaction(CANJNI.LM_API_STATUS_LIMIT, dataBuffer);
         if (dataSize == 1) {
             return (dataBuffer[0] & Limits.kForwardLimit_val) != 0;
         }
@@ -1132,7 +1178,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte[] dataBuffer = new byte[8];
         byte dataSize;
 
-        dataSize = getTransaction(CANLibrary.LM_API_STATUS_LIMIT, dataBuffer);
+        dataSize = getTransaction(CANJNI.LM_API_STATUS_LIMIT, dataBuffer);
         if (dataSize == 1) {
             return (dataBuffer[0] & Limits.kReverseLimit_val) != 0;
         }
@@ -1148,7 +1194,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte[] dataBuffer = new byte[8];
         byte dataSize;
 
-        dataSize = getTransaction(CANLibrary.LM_API_STATUS_FAULT, dataBuffer);
+        dataSize = getTransaction(CANJNI.LM_API_STATUS_FAULT, dataBuffer);
         if (dataSize == 2) {
             return (short)unpackINT16(dataBuffer);
         }
@@ -1167,14 +1213,14 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte[] dataBuffer = new byte[8];
         byte dataSize;
 
-        dataSize = getTransaction(CANLibrary.LM_API_STATUS_POWER, dataBuffer);
+        dataSize = getTransaction(CANJNI.LM_API_STATUS_POWER, dataBuffer);
         if (dataSize == 1) {
             boolean powerCycled = dataBuffer[0] != 0;
 
             // Clear the power cycled bit now that we've accessed it
             if (powerCycled) {
                 dataBuffer[0] = 1;
-                setTransaction(CANLibrary.LM_API_STATUS_POWER, dataBuffer, (byte) 1);
+                setTransaction(CANJNI.LM_API_STATUS_POWER, dataBuffer, (byte) 1);
             }
 
             return powerCycled;
@@ -1197,11 +1243,11 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         switch (m_controlMode.value) {
         case ControlMode.kPercentVbus_val:
             dataSize = packPercentage(dataBuffer, rampRate / (m_maxOutputVoltage * kControllerRate));
-            setTransaction(CANLibrary.LM_API_VOLT_SET_RAMP, dataBuffer, dataSize);
+            setTransaction(CANJNI.LM_API_VOLT_SET_RAMP, dataBuffer, dataSize);
             break;
         case ControlMode.kVoltage_val:
             dataSize = packFXP8_8(dataBuffer, rampRate / kControllerRate);
-            setTransaction(CANLibrary.LM_API_VCOMP_IN_RAMP, dataBuffer, dataSize);
+            setTransaction(CANJNI.LM_API_VCOMP_IN_RAMP, dataBuffer, dataSize);
             break;
         default:
             return;
@@ -1218,7 +1264,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte dataSize;
 
         // Set the MSB to tell the 2CAN that this is a remote message.
-        dataSize = getTransaction(0x80000000 | CANLibrary.CAN_MSGID_API_FIRMVER, dataBuffer);
+        dataSize = getTransaction(0x80000000 | CANJNI.CAN_MSGID_API_FIRMVER, dataBuffer);
         if (dataSize == 4) {
             return (int)unpackINT32(dataBuffer);
         }
@@ -1234,14 +1280,14 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte[] dataBuffer = new byte[8];
         byte dataSize;
 
-        dataSize = getTransaction(CANLibrary.LM_API_HWVER, dataBuffer);
+        dataSize = getTransaction(CANJNI.LM_API_HWVER, dataBuffer);
         if (dataSize == 1 + 1) {
             if (dataBuffer[0] == m_deviceNumber) {
                 return dataBuffer[1];
             }
         }
         // Assume Gray Jag if there is no response
-        return CANLibrary.LM_HWVER_JAG_1_0;
+        return CANJNI.LM_HWVER_JAG_1_0;
     }
 
     /**
@@ -1255,7 +1301,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte[] dataBuffer = new byte[8];
 
         dataBuffer[0] = mode.value;
-        setTransaction(CANLibrary.LM_API_CFG_BRAKE_COAST, dataBuffer, (byte) 1);
+        setTransaction(CANJNI.LM_API_CFG_BRAKE_COAST, dataBuffer, (byte) 1);
     }
 
     /**
@@ -1268,7 +1314,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte dataSize;
 
         dataSize = packINT16(dataBuffer, (short)codesPerRev);
-        setTransaction(CANLibrary.LM_API_CFG_ENC_LINES, dataBuffer, dataSize);
+        setTransaction(CANJNI.LM_API_CFG_ENC_LINES, dataBuffer, dataSize);
     }
 
     /**
@@ -1284,7 +1330,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte dataSize;
 
         dataSize = packINT16(dataBuffer, (short)turns);
-        setTransaction(CANLibrary.LM_API_CFG_POT_TURNS, dataBuffer, dataSize);
+        setTransaction(CANJNI.LM_API_CFG_POT_TURNS, dataBuffer, dataSize);
     }
 
     /**
@@ -1303,14 +1349,14 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 
         dataSize = packFXP16_16(dataBuffer, forwardLimitPosition);
         dataBuffer[dataSize++] = (forwardLimitPosition > reverseLimitPosition) ? (byte) 1 : (byte) 0;
-        setTransaction(CANLibrary.LM_API_CFG_LIMIT_FWD, dataBuffer, dataSize);
+        setTransaction(CANJNI.LM_API_CFG_LIMIT_FWD, dataBuffer, dataSize);
 
         dataSize = packFXP16_16(dataBuffer, reverseLimitPosition);
         dataBuffer[dataSize++] = forwardLimitPosition <= reverseLimitPosition ? (byte) 1 : (byte) 0;
-        setTransaction(CANLibrary.LM_API_CFG_LIMIT_REV, dataBuffer, dataSize);
+        setTransaction(CANJNI.LM_API_CFG_LIMIT_REV, dataBuffer, dataSize);
 
         dataBuffer[0] = LimitMode.kSoftPositionLimit_val;
-        setTransaction(CANLibrary.LM_API_CFG_LIMIT_MODE, dataBuffer, (byte) 1);
+        setTransaction(CANJNI.LM_API_CFG_LIMIT_MODE, dataBuffer, (byte) 1);
     }
 
     /**
@@ -1322,7 +1368,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte[] dataBuffer = new byte[8];
 
         dataBuffer[0] = LimitMode.kSwitchInputsOnly_val;
-        setTransaction(CANLibrary.LM_API_CFG_LIMIT_MODE, dataBuffer, (byte) 1);
+        setTransaction(CANJNI.LM_API_CFG_LIMIT_MODE, dataBuffer, (byte) 1);
     }
 
     /**
@@ -1339,7 +1385,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 
         m_maxOutputVoltage = voltage;
         dataSize = packFXP8_8(dataBuffer, voltage);
-        setTransaction(CANLibrary.LM_API_CFG_MAX_VOUT, dataBuffer, dataSize);
+        setTransaction(CANJNI.LM_API_CFG_MAX_VOUT, dataBuffer, dataSize);
     }
 
     /**
@@ -1356,7 +1402,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 
         // Message takes ms
         dataSize = packINT16(dataBuffer, (short) (faultTime * 1000.0));
-        setTransaction(CANLibrary.LM_API_CFG_FAULT_TIME, dataBuffer, dataSize);
+        setTransaction(CANJNI.LM_API_CFG_FAULT_TIME, dataBuffer, dataSize);
     }
 
     /**
@@ -1368,7 +1414,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         byte[] dataBuffer = new byte[8];
 
         dataBuffer[0] = syncGroup;
-        sendMessage(CANLibrary.CAN_MSGID_API_SYNC, dataBuffer, 1);
+        sendMessage(CANJNI.CAN_MSGID_API_SYNC, dataBuffer, 1);
     }
 
 

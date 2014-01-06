@@ -7,7 +7,7 @@
 #include "Victor.h"
 
 #include "DigitalModule.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "LiveWindow/LiveWindow.h"
 
 /**
@@ -32,7 +32,7 @@ void Victor::InitVictor() {
 	SetRaw(m_centerPwm);
 
 	LiveWindow::GetInstance()->AddActuator("Victor", GetModuleNumber(), GetChannel(), this);
-	nUsageReporting::report(nUsageReporting::kResourceType_Victor, GetChannel(), GetModuleNumber() - 1);
+	HALReport(HALUsageReporting::kResourceType_Victor, GetChannel(), GetModuleNumber() - 1);
 }
 
 /**

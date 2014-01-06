@@ -6,7 +6,7 @@
 
 #include "AnalogChannel.h"
 #include "AnalogModule.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
@@ -53,7 +53,7 @@ void AnalogChannel::InitChannel(uint8_t moduleNumber, uint32_t channel)
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
 	LiveWindow::GetInstance()->AddSensor("AnalogChannel",channel, GetModuleNumber(), this);
-	nUsageReporting::report(nUsageReporting::kResourceType_AnalogChannel, channel, GetModuleNumber() - 1);
+	HALReport(HALUsageReporting::kResourceType_AnalogChannel, channel, GetModuleNumber() - 1);
 }
 
 /**

@@ -7,11 +7,11 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+import java.nio.ByteBuffer;
 
-import com.sun.jna.Pointer;
-
-import edu.wpi.first.wpilibj.hal.HALLibrary;
+import edu.wpi.first.wpilibj.hal.DIOJNI;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.util.AllocationException;
 import edu.wpi.first.wpilibj.util.CheckedAllocationException;
@@ -27,14 +27,14 @@ public abstract class DigitalSource extends InterruptableSensorBase {
 
 	protected static Resource channels = new Resource(kDigitalChannels
 			* kDigitalModules);
-	protected Pointer m_port;
+	protected ByteBuffer m_port;
 	protected int m_moduleNumber, m_channel;
 
 	protected void initDigitalPort(int moduleNumber, int channel, boolean input) {
 
 		m_channel = channel;
 		m_moduleNumber = moduleNumber;
-		if (HALLibrary.checkDigitalModule((byte) m_moduleNumber) != 1) {
+		if (DIOJNI.checkDigitalModule((byte) m_moduleNumber) != 1) {
 			throw new AllocationException("Digital input " + m_channel
 					+ " on module " + m_moduleNumber
 					+ " cannot be allocated. Module is not present.");
@@ -51,20 +51,24 @@ public abstract class DigitalSource extends InterruptableSensorBase {
 					+ " on module " + m_moduleNumber + " is already allocated");
 		}
 
-		Pointer port_pointer = HALLibrary.getPortWithModule(
+		ByteBuffer port_pointer = DIOJNI.getPortWithModule(
 				(byte) moduleNumber, (byte) channel);
-		IntBuffer status = IntBuffer.allocate(1);
-		m_port = HALLibrary.initializeDigitalPort(port_pointer, status);
-		HALUtil.checkStatus(status);
-		HALLibrary.allocateDIO(m_port, (byte) (input ? 1 : 0), status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		m_port = DIOJNI.initializeDigitalPort(port_pointer, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		DIOJNI.allocateDIO(m_port, (byte) (input ? 1 : 0), status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	public void free() {
 		channels.free(((m_moduleNumber - 1) * kDigitalChannels + m_channel - 1));
-		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.freeDIO(m_port, status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		DIOJNI.freeDIO(m_port, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 		m_channel = 0;
 		m_moduleNumber = 0;
 	}
@@ -75,10 +79,7 @@ public abstract class DigitalSource extends InterruptableSensorBase {
 	 * @return channel routing number
 	 */
 	public int getChannelForRouting() {
-		IntBuffer status = IntBuffer.allocate(1);
-		int channel = HALLibrary.remapDigitalChannel(m_channel - 1, status);
-		HALUtil.checkStatus(status);
-		return channel;
+		return m_channel - 1;
 	}
 
 	/**

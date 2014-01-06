@@ -7,7 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.HALLibrary;
+import edu.wpi.first.wpilibj.hal.DIOJNI;
+import edu.wpi.first.wpilibj.hal.AnalogJNI;
 
 /**
  * Base class for all sensors.
@@ -27,20 +28,20 @@ public abstract class SensorBase { // TODO: Refactor
     /**
      * Number of digital channels per digital sidecar
      */
-    public static final int kDigitalChannels = 14;
+    public static final int kDigitalChannels = 10;
     /**
      * Number of digital modules
      * XXX: This number is incorrect.  We need to find the correct number.
      */
-    public static final int kDigitalModules = 2;
+    public static final int kDigitalModules = 1;
     /**
      * Number of analog channels per module
      */
-    public static final int kAnalogChannels = 8;
+    public static final int kAnalogChannels = 4;
     /**
      * Number of analog modules
      */
-    public static final int kAnalogModules = 2;
+    public static final int kAnalogModules = 1;
     /**
      * Number of solenoid channels per module
      */
@@ -56,7 +57,7 @@ public abstract class SensorBase { // TODO: Refactor
     /**
      * Number of relay channels per sidecar
      */
-    public static final int kRelayChannels = 8;
+    public static final int kRelayChannels = 4;
 
     private static int m_defaultAnalogModule = 1;
     private static int m_defaultDigitalModule = 1;
@@ -111,7 +112,7 @@ public abstract class SensorBase { // TODO: Refactor
      * @param moduleNumber The digital module module number to check.
      */
     protected static void checkDigitalModule(final int moduleNumber) {
-        if(HALLibrary.checkDigitalModule((byte) moduleNumber) != 1)
+        if(DIOJNI.checkDigitalModule((byte) moduleNumber) != 1)
             System.err.println("Digital module " + moduleNumber + " is not present.");
     }
 
@@ -142,7 +143,7 @@ public abstract class SensorBase { // TODO: Refactor
      * @param moduleNumber The analog module module number to check.
      */
     protected static void checkAnalogModule(final int moduleNumber) {
-        if(HALLibrary.checkAnalogModule((byte) (moduleNumber - 1)) != 0) {
+        if(AnalogJNI.checkAnalogModule((byte) (moduleNumber - 1)) != 0) {
             System.err.println("Analog module " + moduleNumber + " is not present.");
         }
     }
@@ -154,9 +155,9 @@ public abstract class SensorBase { // TODO: Refactor
      * @param moduleNumber The solenoid module module number to check.
      */
     protected static void checkSolenoidModule(final int moduleNumber) {
-        if(HALLibrary.checkSolenoidModule((byte) (moduleNumber - 1)) != 0) {
-            System.err.println("Solenoid module " + moduleNumber + " is not present.");
-        }
+//        if(HALLibrary.checkSolenoidModule((byte) (moduleNumber - 1)) != 0) {
+//            System.err.println("Solenoid module " + moduleNumber + " is not present.");
+//        }
     }
 
     /**

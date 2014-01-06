@@ -6,7 +6,7 @@
 
 #include "Compressor.h"
 #include "DigitalInput.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "Timer.h"
 #include "WPIErrors.h"
 
@@ -52,7 +52,7 @@ void Compressor::InitCompressor(uint8_t pressureSwitchModuleNumber,
 	m_pressureSwitch = new DigitalInput(pressureSwitchModuleNumber, pressureSwitchChannel);
 	m_relay = new Relay(compresssorRelayModuleNumber, compressorRelayChannel, Relay::kForwardOnly);
 
-	nUsageReporting::report(nUsageReporting::kResourceType_Compressor, 0);
+	HALReport(HALUsageReporting::kResourceType_Compressor, 0);
 
 	if (!m_task.Start((int32_t)this))
 	{

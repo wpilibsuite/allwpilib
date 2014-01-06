@@ -6,7 +6,7 @@
 
 #include "Servo.h"
 
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "LiveWindow/LiveWindow.h"
 
 constexpr float Servo::kMaxServoAngle;
@@ -25,7 +25,7 @@ void Servo::InitServo()
 	SetPeriodMultiplier(kPeriodMultiplier_4X);
 
 	LiveWindow::GetInstance()->AddActuator("Servo", GetModuleNumber(), GetChannel(), this);
-	nUsageReporting::report(nUsageReporting::kResourceType_Servo, GetChannel(), GetModuleNumber() - 1);
+	HALReport(HALUsageReporting::kResourceType_Servo, GetChannel(), GetModuleNumber() - 1);
 }
 
 /**

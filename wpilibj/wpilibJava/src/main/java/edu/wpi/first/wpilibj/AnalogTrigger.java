@@ -8,12 +8,13 @@
 package edu.wpi.first.wpilibj;
 
 import java.nio.IntBuffer;
+import java.nio.ByteBuffer;
 
-import com.sun.jna.Pointer;
+//import com.sun.jna.Pointer;
 
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary.tResourceType;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
-import edu.wpi.first.wpilibj.hal.HALLibrary;
+import edu.wpi.first.wpilibj.hal.AnalogJNI;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.parsing.IInputOutput;
 import edu.wpi.first.wpilibj.util.BoundaryException;
@@ -45,7 +46,7 @@ public class AnalogTrigger implements IInputOutput {
 	/**
 	 * Where the analog trigger is attached
 	 */
-	protected Pointer m_port;
+	protected ByteBuffer m_port;
 	protected int m_index;
 
 	/**
@@ -59,7 +60,7 @@ public class AnalogTrigger implements IInputOutput {
 	 *            the port to use for the analog trigger
 	 */
 	protected void initTrigger(final int moduleNumber, final int channel) {
-		Pointer port_pointer = HALLibrary.getPortWithModule(
+		ByteBuffer port_pointer = AnalogJNI.getPortWithModule(
 				(byte) moduleNumber, (byte) channel);
 		IntBuffer status = IntBuffer.allocate(1);
 		IntBuffer index = IntBuffer.allocate(1);
@@ -114,7 +115,7 @@ public class AnalogTrigger implements IInputOutput {
 	 */
 	public void free() {
 		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.cleanAnalogTrigger(m_port, status);
+		AnalogJNI.cleanAnalogTrigger(m_port, status);
 		HALUtil.checkStatus(status);
 		m_port = null;
 	}
@@ -134,7 +135,7 @@ public class AnalogTrigger implements IInputOutput {
 			throw new BoundaryException("Lower bound is greater than upper");
 		}
 		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.setAnalogTriggerLimitsRaw(m_port, lower, upper, status);
+		AnalogJNI.setAnalogTriggerLimitsRaw(m_port, lower, upper, status);
 		HALUtil.checkStatus(status);
 	}
 
@@ -155,7 +156,7 @@ public class AnalogTrigger implements IInputOutput {
 		// TODO: This depends on the averaged setting. Only raw values will work
 		// as is.
 		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.setAnalogTriggerLimitsVoltage(m_port, (float) lower,
+		AnalogJNI.setAnalogTriggerLimitsVoltage(m_port, (float) lower,
 				(float) upper, status);
 		HALUtil.checkStatus(status);
 	}
@@ -170,7 +171,7 @@ public class AnalogTrigger implements IInputOutput {
 	 */
 	public void setAveraged(boolean useAveragedValue) {
 		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.setAnalogTriggerAveraged(m_port,
+		AnalogJNI.setAnalogTriggerAveraged(m_port,
 				(byte) (useAveragedValue ? 1 : 0), status);
 		HALUtil.checkStatus(status);
 	}
@@ -186,7 +187,7 @@ public class AnalogTrigger implements IInputOutput {
 	 */
 	public void setFiltered(boolean useFilteredValue) {
 		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.setAnalogTriggerFiltered(m_port,
+		AnalogJNI.setAnalogTriggerFiltered(m_port,
 				(byte) (useFilteredValue ? 1 : 0), status);
 		HALUtil.checkStatus(status);
 	}
@@ -209,7 +210,7 @@ public class AnalogTrigger implements IInputOutput {
 	 */
 	public boolean getInWindow() {
 		IntBuffer status = IntBuffer.allocate(1);
-		byte value = HALLibrary.getAnalogTriggerInWindow(m_port, status);
+		byte value = AnalogJNI.getAnalogTriggerInWindow(m_port, status);
 		HALUtil.checkStatus(status);
 		return value != 0;
 	}
@@ -223,7 +224,7 @@ public class AnalogTrigger implements IInputOutput {
 	 */
 	public boolean getTriggerState() {
 		IntBuffer status = IntBuffer.allocate(1);
-		byte value = HALLibrary.getAnalogTriggerTriggerState(m_port, status);
+		byte value = AnalogJNI.getAnalogTriggerTriggerState(m_port, status);
 		HALUtil.checkStatus(status);
 		return value != 0;
 	}

@@ -65,7 +65,7 @@ Timer::Timer()
 {
 	//Creates a semaphore to control access to critical regions.
 	//Initially 'open'
-	m_semaphore = initializeMutex(SEMAPHORE_Q_PRIORITY | SEMAPHORE_DELETE_SAFE | SEMAPHORE_INVERSION_SAFE);
+	m_semaphore = initializeMutexNormal();
 	Reset();
 }
 

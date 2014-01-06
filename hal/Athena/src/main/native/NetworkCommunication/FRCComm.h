@@ -188,6 +188,8 @@ extern "C" {
 	void EXPORT_FUNC FRC_NetworkCommunication_observeUserProgramAutonomous(void);
 	void EXPORT_FUNC FRC_NetworkCommunication_observeUserProgramTeleop(void);
 	void EXPORT_FUNC FRC_NetworkCommunication_observeUserProgramTest(void);
+	void EXPORT_FUNC FRC_NetworkCommunication_Reserve();
+
 };
 
 #endif

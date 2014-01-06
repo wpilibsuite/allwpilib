@@ -8,8 +8,8 @@
 
 //#include <algorithm>
 #include <string.h>
-#include "NetworkCommunication/FRCComm.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/FRCComm.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "HAL/cpp/Synchronized.h"
 #include "WPIErrors.h"
 #undef min
@@ -29,14 +29,14 @@ DriverStationLCD::DriverStationLCD()
 	: m_textBuffer (NULL)
 	, m_textBufferSemaphore (NULL)
 {
-	m_textBuffer = new char[USER_DS_LCD_DATA_SIZE];
-	memset(m_textBuffer, ' ', USER_DS_LCD_DATA_SIZE);
+	m_textBuffer = new char[HAL_USER_DS_LCD_DATA_SIZE];
+	memset(m_textBuffer, ' ', HAL_USER_DS_LCD_DATA_SIZE);
 
 	*((uint16_t *)m_textBuffer) = kFullDisplayTextCommand;
 
-	m_textBufferSemaphore = initializeMutex(SEMAPHORE_DELETE_SAFE);
+	m_textBufferSemaphore = initializeMutexNormal();
 
-	nUsageReporting::report(nUsageReporting::kResourceType_DriverStationLCD, 0);
+	HALReport(HALUsageReporting::kResourceType_DriverStationLCD, 0);
 
 	AddToSingletonList();
 }
@@ -66,7 +66,7 @@ DriverStationLCD* DriverStationLCD::GetInstance()
 void DriverStationLCD::UpdateLCD()
 {
 	Synchronized sync(m_textBufferSemaphore);
-	setUserDsLcdData(m_textBuffer, USER_DS_LCD_DATA_SIZE, kSyncTimeout_ms);
+	HALSetUserDsLcdData(m_textBuffer, HAL_USER_DS_LCD_DATA_SIZE, kSyncTimeout_ms);
 }
 
 /**

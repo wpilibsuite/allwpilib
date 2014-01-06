@@ -6,7 +6,7 @@
 
 #include "Preferences.h"
 
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "HAL/cpp/Synchronized.h"
 #include "WPIErrors.h"
 
@@ -36,22 +36,22 @@ Preferences::Preferences() :
 	m_readTask("PreferencesReadTask", (FUNCPTR)Preferences::InitReadTask),
 	m_writeTask("PreferencesWriteTask", (FUNCPTR)Preferences::InitWriteTask)
 {
-	m_fileLock = initializeMutex(SEMAPHORE_Q_PRIORITY | SEMAPHORE_INVERSION_SAFE | SEMAPHORE_DELETE_SAFE);
-	m_fileOpStarted = initializeSemaphore (SEMAPHORE_Q_PRIORITY, SEMAPHORE_EMPTY);
-	m_tableLock = initializeMutex(SEMAPHORE_Q_PRIORITY | SEMAPHORE_INVERSION_SAFE | SEMAPHORE_DELETE_SAFE);
+	m_fileLock = initializeMutexNormal();
+	m_fileOpStarted = initializeSemaphore (SEMAPHORE_EMPTY);
+	m_tableLock = initializeMutexNormal();
 
 	Synchronized sync(m_fileLock);
 	m_readTask.Start((uint32_t)this);
-	takeSemaphore(m_fileOpStarted, SEMAPHORE_WAIT_FOREVER);
+	takeSemaphore(m_fileOpStarted);
 
-	nUsageReporting::report(nUsageReporting::kResourceType_Preferences, 0);
+	HALReport(HALUsageReporting::kResourceType_Preferences, 0);
 }
 
 Preferences::~Preferences()
 {
-	takeMutex(m_tableLock, SEMAPHORE_WAIT_FOREVER);
+	takeMutex(m_tableLock);
 	deleteMutex(m_tableLock);
-	takeMutex(m_fileLock, SEMAPHORE_WAIT_FOREVER);
+	takeMutex(m_fileLock);
 	deleteSemaphore(m_fileOpStarted);
 	deleteMutex(m_fileLock);
 }
@@ -325,7 +325,7 @@ void Preferences::Save()
 {
 	Synchronized sync(m_fileLock);
 	m_writeTask.Start((uint32_t)this);
-	takeSemaphore(m_fileOpStarted, SEMAPHORE_WAIT_FOREVER);
+	takeSemaphore(m_fileOpStarted);
 }
 
 /**

@@ -4,6 +4,8 @@
 #include "Port.h"
 #include "HAL/Errors.h"
 #include "ChipObject.h"
+#include "NetworkCommunication/FRCComm.h"
+#include "NetworkCommunication/UsageReporting.h"
 
 // XXX: What to do with solenoids? const uint32_t solenoid_kNumDO7_0Elements = tSolenoid::kNumDO7_0Elements;
 const uint32_t dio_kNumSystems = tDIO::kNumSystems;
@@ -106,6 +108,80 @@ int32_t getFPGALED(int32_t *status) {
   // return ledValue;
   return 0; // XXX: Dummy value
 }
+
+int HALSetErrorData(const char *errors, int errorsLength, int wait_ms)
+{
+	return setErrorData(errors, errorsLength, wait_ms);
+}
+
+int HALSetUserDsLcdData(const char *userDsLcdData, int userDsLcdDataLength, int wait_ms)
+{
+	return setUserDsLcdData(userDsLcdData, userDsLcdDataLength, wait_ms);
+}
+
+int HALOverrideIOConfig(const char *ioConfig, int wait_ms)
+{
+	return overrideIOConfig(ioConfig, wait_ms);
+}
+
+int HALGetDynamicControlData(uint8_t type, char *dynamicData, int32_t maxLength, int wait_ms)
+{
+	return getDynamicControlData( type, dynamicData, maxLength, wait_ms);
+}
+
+int HALGetCommonControlData(HALCommonControlData *data, int wait_ms)
+{
+	return getCommonControlData( (FRCCommonControlData*)data, wait_ms );
+}
+
+void HALSetNewDataSem(pthread_mutex_t * param)
+{
+	setNewDataSem(param);
+}
+
+int HALSetStatusData(float battery, uint8_t dsDigitalOut, uint8_t updateNumber,
+			const char *userDataHigh, int userDataHighLength,
+			const char *userDataLow, int userDataLowLength, int wait_ms)
+{
+	return setStatusData(battery, dsDigitalOut, updateNumber, userDataHigh, userDataHighLength, userDataLow, userDataLowLength, wait_ms);
+}
+
+
+void HALNetworkCommunicationReserve()
+{
+	FRC_NetworkCommunication_Reserve();
+}
+
+void HALNetworkCommunicationObserveUserProgramStarting(void)
+{
+	FRC_NetworkCommunication_observeUserProgramStarting();
+}
+
+void HALNetworkCommunicationObserveUserProgramDisabled(void)
+{
+	FRC_NetworkCommunication_observeUserProgramDisabled();
+}
+
+void HALNetworkCommunicationObserveUserProgramAutonomous(void)
+{
+	FRC_NetworkCommunication_observeUserProgramAutonomous();
+}
+
+void HALNetworkCommunicationObserveUserProgramTeleop(void)
+{
+	FRC_NetworkCommunication_observeUserProgramTeleop();
+}
+
+void HALNetworkCommunicationObserveUserProgramTest(void)
+{
+	FRC_NetworkCommunication_observeUserProgramTest();
+}
+
+uint32_t HALReport(uint8_t resource, uint8_t instanceNumber, uint8_t context, const char *feature)
+{
+	return FRC_NetworkCommunication_nUsageReporting_report( resource, instanceNumber, context, feature);
+}
+
 
 // TODO: HACKS
 void NumericArrayResize() {}

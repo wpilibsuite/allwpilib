@@ -6,9 +6,9 @@
 
 #include "CANJaguar.h"
 #define tNIRIO_i32 int
-#include "CAN/JaguarCANDriver.h"
+//#include "CAN/JaguarCANDriver.h"
 #include "CAN/can_proto.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "WPIErrors.h"
 #include <stdio.h>
 #include "LiveWindow/LiveWindow.h"
@@ -31,7 +31,7 @@ constexpr double CANJaguar::kApproxBusVoltage;
 void CANJaguar::InitCANJaguar()
 {
 	m_table = NULL;
-	m_transactionSemaphore = initializeMutex(SEMAPHORE_Q_PRIORITY | SEMAPHORE_INVERSION_SAFE | SEMAPHORE_DELETE_SAFE);
+	m_transactionSemaphore = initializeMutexNormal();
 	if (m_deviceNumber < 1 || m_deviceNumber > 63)
 	{
 		char buf[256];
@@ -69,7 +69,7 @@ void CANJaguar::InitCANJaguar()
 	}
 	m_safetyHelper = new MotorSafetyHelper(this);
 
-	nUsageReporting::report(nUsageReporting::kResourceType_CANJaguar, m_deviceNumber, m_controlMode);
+	HALReport(HALUsageReporting::kResourceType_CANJaguar, m_deviceNumber, m_controlMode);
 	LiveWindow::GetInstance()->AddActuator("CANJaguar", m_deviceNumber, 0, this);
 }
 
@@ -405,7 +405,7 @@ void CANJaguar::setTransaction(uint32_t messageID, const uint8_t *data, uint8_t 
 		return;
 
 	// Make sure we don't have more than one transaction with the same Jaguar outstanding.
-	takeMutex(m_transactionSemaphore, SEMAPHORE_WAIT_FOREVER);
+	takeMutex(m_transactionSemaphore);
 
 	// Throw away any stale acks.
 	receiveMessage(&ackMessageID, NULL, 0, 0.0f);
@@ -444,7 +444,7 @@ void CANJaguar::getTransaction(uint32_t messageID, uint8_t *data, uint8_t *dataS
 	}
 
 	// Make sure we don't have more than one transaction with the same Jaguar outstanding.
-	takeMutex(m_transactionSemaphore, SEMAPHORE_WAIT_FOREVER);
+	takeMutex(m_transactionSemaphore);
 
 	// Throw away any stale responses.
 	receiveMessage(&targetedMessageID, NULL, 0, 0.0f);
@@ -778,7 +778,7 @@ void CANJaguar::ChangeControlMode(ControlMode controlMode)
 	// Update the local mode
 	m_controlMode = controlMode;
 
-	nUsageReporting::report(nUsageReporting::kResourceType_CANJaguar, m_deviceNumber, m_controlMode);
+	HALReport(HALUsageReporting::kResourceType_CANJaguar, m_deviceNumber, m_controlMode);
 }
 
 /**

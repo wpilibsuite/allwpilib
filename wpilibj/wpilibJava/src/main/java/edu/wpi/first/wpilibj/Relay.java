@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary.tResourceType;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.HALLibrary;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -122,8 +122,7 @@ public class Relay extends SensorBase implements IDeviceController,
 	private int m_channel;
 	private Direction m_direction;
 	private DigitalModule m_module;
-	private static Resource relayChannels = new Resource(
-			HALLibrary.dio_kNumSystems.get() * kRelayChannels * 2);
+	private static Resource relayChannels = new Resource(kRelayChannels * 2);
 
 	/**
 	 * Common relay initialization method. This code is common to all Relay

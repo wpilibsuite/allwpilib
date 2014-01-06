@@ -6,7 +6,7 @@
 
 #include "Utility.h"
 
-#include "NetworkCommunication/FRCComm.h"
+//#include "NetworkCommunication/FRCComm.h"
 #include "HAL/HAL.h"
 #include "HAL/cpp/StackTrace.h"
 #include "Task.h"
@@ -75,7 +75,7 @@ bool wpi_assert_impl(bool conditionValue,
 		
 		// Print to console and send to remote dashboard
 		printf("\n\n>>>>%s", error);
-		setErrorData(error, strlen(error), 100);
+		HALSetErrorData(error, strlen(error), 100);
 		
 		wpi_handleTracing();
 		if (suspendOnAssertEnabled) suspendTask(0);
@@ -111,7 +111,7 @@ void wpi_assertEqual_common_impl(int valueA,
 	
 	// Print to console and send to remote dashboard
 	printf("\n\n>>>>%s", error);
-	setErrorData(error, strlen(error), 100);
+	HALSetErrorData(error, strlen(error), 100);
 	
 	wpi_handleTracing();
 	if (suspendOnAssertEnabled) suspendTask(0);

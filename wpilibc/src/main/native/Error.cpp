@@ -10,7 +10,7 @@
 #include <cstdio>
 #include <cstring>
 
-#include "NetworkCommunication/FRCComm.h"
+//#include "NetworkCommunication/FRCComm.h"
 #include "Timer.h"
 #include "Utility.h"
 bool Error::m_stackTraceEnabled = false;
@@ -94,7 +94,7 @@ void Error::Report()
 	// TODO: Add logging to disk
 
 	// Send to the DriverStation
-	setErrorData(error_with_code, strlen(error_with_code), 100);
+	HALSetErrorData(error_with_code, strlen(error_with_code), 100);
 
 	delete [] error_with_code;
 

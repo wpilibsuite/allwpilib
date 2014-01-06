@@ -7,7 +7,7 @@
 #include "SimpleRobot.h"
 
 #include "DriverStation.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "Timer.h"
 #include "SmartDashboard/SmartDashboard.h"
 #include "LiveWindow/LiveWindow.h"
@@ -100,7 +100,7 @@ void SimpleRobot::StartCompetition()
 {
 	LiveWindow *lw = LiveWindow::GetInstance();
 
-	nUsageReporting::report(nUsageReporting::kResourceType_Framework, nUsageReporting::kFramework_Simple);
+	HALReport(HALUsageReporting::kResourceType_Framework, HALUsageReporting::kFramework_Simple);
 
 	SmartDashboard::init();
 	NetworkTable::GetTable("LiveWindow")->GetSubTable("~STATUS~")->PutBoolean("LW Enabled", false);

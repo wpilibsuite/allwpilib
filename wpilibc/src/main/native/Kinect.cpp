@@ -7,16 +7,16 @@
 #include "Kinect.h"
 
 #include "DriverStation.h"
-#include "NetworkCommunication/FRCComm.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/FRCComm.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "Skeleton.h"
 #include "HAL/cpp/Synchronized.h"
 #include "WPIErrors.h"
 #include <cstring>
 
-#define kHeaderBundleID kFRC_NetworkCommunication_DynamicType_Kinect_Header
-#define kSkeletonExtraBundleID kFRC_NetworkCommunication_DynamicType_Kinect_Extra1
-#define kSkeletonBundleID kFRC_NetworkCommunication_DynamicType_Kinect_Vertices1
+#define kHeaderBundleID HALFRC_NetworkCommunication_DynamicType_Kinect_Header
+#define kSkeletonExtraBundleID HALFRC_NetworkCommunication_DynamicType_Kinect_Extra1
+#define kSkeletonBundleID HALFRC_NetworkCommunication_DynamicType_Kinect_Vertices1
 
 Kinect *Kinect::_instance = NULL;
 
@@ -25,14 +25,14 @@ Kinect::Kinect() :
 	m_numberOfPlayers(0)
 {
 	AddToSingletonList();
-	m_dataLock = initializeMutex(SEMAPHORE_Q_PRIORITY | SEMAPHORE_INVERSION_SAFE | SEMAPHORE_DELETE_SAFE);
+	m_dataLock = initializeMutexNormal();
 
-	nUsageReporting::report(nUsageReporting::kResourceType_Kinect, 0);
+	HALReport(HALUsageReporting::kResourceType_Kinect, 0);
 }
 
 Kinect::~Kinect()
 {
-	takeMutex(m_dataLock, SEMAPHORE_WAIT_FOREVER);
+	takeMutex(m_dataLock);
 	deleteMutex(m_dataLock);
 }
 
@@ -156,7 +156,7 @@ void Kinect::UpdateData()
 	if (m_recentPacketNumber != packetNumber)
 	{
 		m_recentPacketNumber = packetNumber;
-		int retVal = getDynamicControlData(kHeaderBundleID, m_rawHeader, sizeof(m_rawHeader), 5);
+		int retVal = HALGetDynamicControlData(kHeaderBundleID, m_rawHeader, sizeof(m_rawHeader), 5);
 		if(retVal == 0)
 		{
 			m_numberOfPlayers = (int)m_rawHeader[13];
@@ -169,7 +169,7 @@ void Kinect::UpdateData()
 			memcpy(&m_gravityNormal.z, &m_rawHeader[42], 4);
 		}
 
-		retVal = getDynamicControlData(kSkeletonExtraBundleID, m_rawSkeletonExtra, sizeof(m_rawSkeletonExtra), 5);
+		retVal = HALGetDynamicControlData(kSkeletonExtraBundleID, m_rawSkeletonExtra, sizeof(m_rawSkeletonExtra), 5);
 		if(retVal == 0)
 		{
 			memcpy(&m_position[0].x, &m_rawSkeletonExtra[22], 4);
@@ -179,7 +179,7 @@ void Kinect::UpdateData()
 			memcpy(&m_trackingState[0], &m_rawSkeletonExtra[38], 4);
 		}
 
-		retVal = getDynamicControlData(kSkeletonBundleID, m_rawSkeleton, sizeof(m_rawSkeleton), 5);
+		retVal = HALGetDynamicControlData(kSkeletonBundleID, m_rawSkeleton, sizeof(m_rawSkeleton), 5);
 		if(retVal == 0)
 		{
 			for(int i=0; i < Skeleton::JointCount; i++)

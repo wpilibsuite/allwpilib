@@ -7,12 +7,14 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.IntBuffer;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary.tResourceType;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
-import edu.wpi.first.wpilibj.hal.HALLibrary;
-import edu.wpi.first.wpilibj.hal.HALLibrary.InterruptHandlerFunction;
+import edu.wpi.first.wpilibj.hal.InterruptJNI;
+import edu.wpi.first.wpilibj.hal.DIOJNI;
+import edu.wpi.first.wpilibj.hal.InterruptJNI.InterruptHandlerFunction;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.parsing.IInputOutput;
@@ -64,9 +66,11 @@ public class DigitalInput extends DigitalSource implements IInputOutput,
 	 * @return the stats of the digital input
 	 */
 	public boolean get() {
-		IntBuffer status = IntBuffer.allocate(1);
-		boolean value = HALLibrary.getDIO(m_port, status) != 0;
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		boolean value = DIOJNI.getDIO(m_port, status.asIntBuffer()) != 0;
+		HALUtil.checkStatus(status.asIntBuffer());
 		return value;
 	}
 
@@ -106,13 +110,15 @@ public class DigitalInput extends DigitalSource implements IInputOutput,
 
 		allocateInterrupts(false);
 
-		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.requestInterrupts(m_interrupt, (byte) getModuleForRouting(),
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		InterruptJNI.requestInterrupts(m_interrupt, (byte) getModuleForRouting(),
 				getChannelForRouting(),
-				(byte) (getAnalogTriggerForRouting() ? 1 : 0), status);
+				(byte) (getAnalogTriggerForRouting() ? 1 : 0), status.asIntBuffer());
 		setUpSourceEdge(true, false);
-		HALLibrary.attachInterruptHandler(m_interrupt, handler, null, status);
-		HALUtil.checkStatus(status);
+		InterruptJNI.attachInterruptHandler(m_interrupt, handler, null, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/**
@@ -131,11 +137,13 @@ public class DigitalInput extends DigitalSource implements IInputOutput,
 
 		allocateInterrupts(true);
 
-		IntBuffer status = IntBuffer.allocate(1);
-		HALLibrary.requestInterrupts(m_interrupt, (byte) getModuleForRouting(),
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		InterruptJNI.requestInterrupts(m_interrupt, (byte) getModuleForRouting(),
 				getChannelForRouting(),
-				(byte) (getAnalogTriggerForRouting() ? 1 : 0), status);
-		HALUtil.checkStatus(status);
+				(byte) (getAnalogTriggerForRouting() ? 1 : 0), status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 		setUpSourceEdge(true, false);
 
 	}
@@ -150,11 +158,13 @@ public class DigitalInput extends DigitalSource implements IInputOutput,
 	 */
 	public void setUpSourceEdge(boolean risingEdge, boolean fallingEdge) {
 		if (m_interrupt != null) {
-			IntBuffer status = IntBuffer.allocate(1);
-			HALLibrary.setInterruptUpSourceEdge(m_interrupt,
+			ByteBuffer status = ByteBuffer.allocateDirect(4);
+			// set the byte order
+			status.order(ByteOrder.LITTLE_ENDIAN);
+			InterruptJNI.setInterruptUpSourceEdge(m_interrupt,
 					(byte) (risingEdge ? 1 : 0), (byte) (fallingEdge ? 1 : 0),
-					status);
-			HALUtil.checkStatus(status);
+					status.asIntBuffer());
+			HALUtil.checkStatus(status.asIntBuffer());
 		} else {
 			throw new IllegalArgumentException(
 					"You must call RequestInterrupts before setUpSourceEdge");

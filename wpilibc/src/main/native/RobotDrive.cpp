@@ -10,7 +10,7 @@
 #include "GenericHID.h"
 #include "Joystick.h"
 #include "Jaguar.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "Utility.h"
 #include "WPIErrors.h"
 #include <math.h>
@@ -204,7 +204,7 @@ void RobotDrive::Drive(float outputMagnitude, float curve)
 	static bool reported = false;
 	if (!reported)
 	{
-		nUsageReporting::report(nUsageReporting::kResourceType_RobotDrive, GetNumMotors(), nUsageReporting::kRobotDrive_ArcadeRatioCurve);
+		HALReport(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(), HALUsageReporting::kRobotDrive_ArcadeRatioCurve);
 		reported = true;
 	}
 
@@ -292,7 +292,7 @@ void RobotDrive::TankDrive(float leftValue, float rightValue, bool squaredInputs
 	static bool reported = false;
 	if (!reported)
 	{
-		nUsageReporting::report(nUsageReporting::kResourceType_RobotDrive, GetNumMotors(), nUsageReporting::kRobotDrive_Tank);
+		HALReport(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(), HALUsageReporting::kRobotDrive_Tank);
 		reported = true;
 	}
 
@@ -405,7 +405,7 @@ void RobotDrive::ArcadeDrive(float moveValue, float rotateValue, bool squaredInp
 	static bool reported = false;
 	if (!reported)
 	{
-		nUsageReporting::report(nUsageReporting::kResourceType_RobotDrive, GetNumMotors(), nUsageReporting::kRobotDrive_ArcadeStandard);
+		HALReport(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(), HALUsageReporting::kRobotDrive_ArcadeStandard);
 		reported = true;
 	}
 
@@ -487,7 +487,7 @@ void RobotDrive::MecanumDrive_Cartesian(float x, float y, float rotation, float 
 	static bool reported = false;
 	if (!reported)
 	{
-		nUsageReporting::report(nUsageReporting::kResourceType_RobotDrive, GetNumMotors(), nUsageReporting::kRobotDrive_MecanumCartesian);
+		HALReport(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(), HALUsageReporting::kRobotDrive_MecanumCartesian);
 		reported = true;
 	}
 
@@ -536,7 +536,7 @@ void RobotDrive::MecanumDrive_Polar(float magnitude, float direction, float rota
 	static bool reported = false;
 	if (!reported)
 	{
-		nUsageReporting::report(nUsageReporting::kResourceType_RobotDrive, GetNumMotors(), nUsageReporting::kRobotDrive_MecanumPolar);
+		HALReport(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(), HALUsageReporting::kRobotDrive_MecanumPolar);
 		reported = true;
 	}
 

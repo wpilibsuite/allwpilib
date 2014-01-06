@@ -33,7 +33,7 @@ class DriverStation;
 #define START_ROBOT_CLASS(_ClassName_) \
   int main() \
   { \
-    FRC_NetworkCommunication_Reserve();	\
+    HALNetworkCommunicationReserve();	\
 	RobotBase* robot = new _ClassName_(); \
 	robot->StartCompetition(); \
 	return 0; \

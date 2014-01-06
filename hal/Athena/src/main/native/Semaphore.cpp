@@ -2,6 +2,14 @@
 #include "HAL/Semaphore.h"
 
 #include "ChipObject.h"
+#include "Log.h"
+
+// set the logging level
+TLogLevel semaphoreLogLevel = logDEBUG;
+
+#define SEMAPHORE_LOG(level) \
+    if (level > semaphoreLogLevel) ; \
+    else Log().Get(level)
 
 // See: http://www.vxdev.com/docs/vx55man/vxworks/ref/semMLib.html
 const uint32_t SEMAPHORE_Q_FIFO= 0x01; // TODO: Support
@@ -15,7 +23,8 @@ const int32_t SEMAPHORE_WAIT_FOREVER = -1;
 const uint32_t SEMAPHORE_EMPTY = 0;
 const uint32_t SEMAPHORE_FULL = 1;
 
-MUTEX_ID initializeMutex(uint32_t flags) {
+MUTEX_ID initializeMutexRecursive()
+{
   pthread_mutexattr_t attr;
   pthread_mutexattr_init(&attr);
   pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -25,38 +34,47 @@ MUTEX_ID initializeMutex(uint32_t flags) {
   return sem;
 }
 
-void deleteMutex(MUTEX_ID sem) {
-  pthread_mutex_destroy(sem);
-  delete sem;
+MUTEX_ID initializeMutexNormal()
+{
+  pthread_mutexattr_t attr;
+  pthread_mutexattr_init(&attr);
+  pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_NORMAL);
+  MUTEX_ID sem = new pthread_mutex_t();
+  pthread_mutex_init(sem, &attr);
+  pthread_mutexattr_destroy(&attr);
+  return sem;
+}
+
+void deleteMutex(MUTEX_ID sem)
+{
+	pthread_mutex_destroy(sem);
+	delete sem;
 }
 
 /**
  * Lock the semaphore, blocking until it's available.
  * @return 0 for success, -1 for error. If -1, the error will be in errno.
  */
-int8_t takeMutex(MUTEX_ID sem, int32_t timeout) {
-  if (timeout == SEMAPHORE_NO_WAIT) {
-    return pthread_mutex_trylock(sem);
-  } else if (timeout == SEMAPHORE_WAIT_FOREVER) {
+int8_t takeMutex(MUTEX_ID sem)
+{
     return pthread_mutex_lock(sem);
-  } else {
-    // struct timespec test;
-    // return pthread_mutex_timedlock(sem, );
-    return -1; // TODO: implement timed wait
-  }
+}
+
+int8_t tryTakeMutex(MUTEX_ID sem)
+{
+    return pthread_mutex_trylock(sem);
 }
 
 /**
  * Unlock the semaphore.
  * @return 0 for success, -1 for error. If -1, the error will be in errno.
  */
-int8_t giveMutex(MUTEX_ID sem) {
-  // return semGive(sem);
-  // return sem_post(sem);
-  return pthread_mutex_unlock(sem);
+int8_t giveMutex(MUTEX_ID sem)
+{
+	return pthread_mutex_unlock(sem);
 }
 
-SEMAPHORE_ID initializeSemaphore(uint32_t flags, uint32_t initial_value) {
+SEMAPHORE_ID initializeSemaphore(uint32_t initial_value) {
   SEMAPHORE_ID sem = new sem_t;
   sem_init(sem, 0, initial_value);
   return sem;
@@ -71,22 +89,22 @@ void deleteSemaphore(SEMAPHORE_ID sem) {
  * Lock the semaphore, blocking until it's available.
  * @return 0 for success, -1 for error. If -1, the error will be in errno.
  */
-int8_t takeSemaphore(SEMAPHORE_ID sem, int32_t timeout) {
-  if (timeout == SEMAPHORE_NO_WAIT) {
-    return sem_trywait(sem);
-  } else if (timeout == SEMAPHORE_WAIT_FOREVER) {
+int8_t takeSemaphore(SEMAPHORE_ID sem)
+{
     return sem_wait(sem);
-  } else {
-    // return sem_timedwait(sem, );
-    return -1; // TODO: implement timed wait
-  }
+}
+
+int8_t tryTakeSemaphore(SEMAPHORE_ID sem)
+{
+    return sem_trywait(sem);
 }
 
 /**
  * Unlock the semaphore.
  * @return 0 for success, -1 for error. If -1, the error will be in errno.
  */
-int8_t giveSemaphore(SEMAPHORE_ID sem) {
+int8_t giveSemaphore(SEMAPHORE_ID sem)
+{
   return sem_post(sem);
 }
 
@@ -106,8 +124,8 @@ void deleteMultiWait(MULTIWAIT_ID sem) {
 }
 
 int8_t takeMultiWait(MULTIWAIT_ID sem, int32_t timeout) {
-  MUTEX_ID m = initializeMutex(NULL);
-  takeMutex(m, SEMAPHORE_WAIT_FOREVER);
+  MUTEX_ID m = initializeMutexNormal();
+  takeMutex(m);
   int8_t val = pthread_cond_wait(sem, m);
   deleteMutex(m);
   return val;

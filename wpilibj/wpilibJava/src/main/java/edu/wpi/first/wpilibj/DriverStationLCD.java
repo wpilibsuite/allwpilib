@@ -10,8 +10,8 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary;
-import edu.wpi.first.wpilibj.communication.FRC_NetworkCommunicationsLibrary.tResourceType;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.parsing.IInputOutput;
 
@@ -111,9 +111,9 @@ public class DriverStationLCD extends SensorBase implements IInputOutput {
      * This is only called once the first time GetInstance() is called
      */
     private DriverStationLCD() {
-        m_textBuffer = new byte[FRC_NetworkCommunicationsLibrary.USER_DS_LCD_DATA_SIZE];
+        m_textBuffer = new byte[FRCNetworkCommunicationsLibrary.USER_DS_LCD_DATA_SIZE];
 
-        for (int i = 0; i < FRC_NetworkCommunicationsLibrary.USER_DS_LCD_DATA_SIZE; i++) {
+        for (int i = 0; i < FRCNetworkCommunicationsLibrary.USER_DS_LCD_DATA_SIZE; i++) {
             m_textBuffer[i] = ' ';
         }
 
@@ -127,7 +127,7 @@ public class DriverStationLCD extends SensorBase implements IInputOutput {
      * Send the text data to the Driver Station.
      */
     public synchronized void updateLCD() {
-    	FRC_NetworkCommunicationsLibrary.setUserDsLcdData(new String(m_textBuffer), FRC_NetworkCommunicationsLibrary.USER_DS_LCD_DATA_SIZE, kSyncTimeout_ms);
+    	FRCNetworkCommunicationsLibrary.setUserDsLcdData(new String(m_textBuffer), FRCNetworkCommunicationsLibrary.USER_DS_LCD_DATA_SIZE, kSyncTimeout_ms);
     }
 
     /**

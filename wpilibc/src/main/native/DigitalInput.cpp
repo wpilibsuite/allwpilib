@@ -6,7 +6,7 @@
 
 #include "DigitalInput.h"
 #include "DigitalModule.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
 #include "WPIErrors.h"
 
@@ -39,7 +39,7 @@ void DigitalInput::InitDigitalInput(uint8_t moduleNumber, uint32_t channel)
 	m_module = DigitalModule::GetInstance(moduleNumber);
 	m_module->AllocateDIO(channel, true);
 
-	nUsageReporting::report(nUsageReporting::kResourceType_DigitalInput, channel, moduleNumber - 1);
+	HALReport(HALUsageReporting::kResourceType_DigitalInput, channel, moduleNumber - 1);
 }
 
 /**

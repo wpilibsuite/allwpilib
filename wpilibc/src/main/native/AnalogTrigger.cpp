@@ -8,7 +8,7 @@
 
 #include "AnalogChannel.h"
 #include "AnalogModule.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
 #include "WPIErrors.h"
 
@@ -25,7 +25,7 @@ void AnalogTrigger::InitTrigger(uint8_t moduleNumber, uint32_t channel)
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	m_index = index;
 	
-	nUsageReporting::report(nUsageReporting::kResourceType_AnalogTrigger, channel, moduleNumber - 1);
+	HALReport(HALUsageReporting::kResourceType_AnalogTrigger, channel, moduleNumber - 1);
 }
 
 /**

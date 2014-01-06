@@ -8,7 +8,7 @@
 #define __DASHBOARD_H__
 
 #include "DashboardBase.h"
-#include "NetworkCommunication/FRCComm.h"
+//#include "NetworkCommunication/FRCComm.h"
 #include <stack>
 #include <vector>
 #include "HAL/HAL.h"
@@ -50,7 +50,7 @@ public:
 	void GetStatusBuffer(char** userStatusData, int32_t* userStatusDataSize);
 	void Flush() {}
 private:
-	static const int32_t kMaxDashboardDataSize = USER_STATUS_DATA_SIZE - sizeof(uint32_t) * 3 - sizeof(uint8_t); // 13 bytes needed for 3 size parameters and the sequence number
+	static const int32_t kMaxDashboardDataSize = HAL_USER_STATUS_DATA_SIZE - sizeof(uint32_t) * 3 - sizeof(uint8_t); // 13 bytes needed for 3 size parameters and the sequence number
 
 	// Usage Guidelines...
 	DISALLOW_COPY_AND_ASSIGN(Dashboard);

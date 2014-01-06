@@ -36,7 +36,7 @@ class ReentrantSemaphore
 {
 public:
 	explicit ReentrantSemaphore() {
-		m_semaphore = initializeMutex(SEMAPHORE_Q_PRIORITY | SEMAPHORE_DELETE_SAFE);
+		m_semaphore = initializeMutexRecursive();
 	}
 	~ReentrantSemaphore() {
 		deleteMutex(m_semaphore);
@@ -47,7 +47,7 @@ public:
 	 * @return 0 for success, -1 for error. If -1, the error will be in errno.
 	 */
 	int take() {
-		return takeMutex(m_semaphore, SEMAPHORE_WAIT_FOREVER);
+		return takeMutex(m_semaphore);
 	}
 
 	/**

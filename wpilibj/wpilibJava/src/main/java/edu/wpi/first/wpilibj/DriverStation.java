@@ -6,10 +6,13 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
-import com.sun.jna.Pointer;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
-import edu.wpi.first.wpilibj.communication.*;
-import edu.wpi.first.wpilibj.hal.HALLibrary;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
+import edu.wpi.first.wpilibj.communication.FRCCommonControlData;
+import edu.wpi.first.wpilibj.communication.FRCCommonControlMasks;
+import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.parsing.IInputOutput;
 
 /**
@@ -20,7 +23,7 @@ public class DriverStation implements IInputOutput {
     /**
      * The size of the user status data
      */
-    public static final int USER_STATUS_DATA_SIZE = FRC_NetworkCommunicationsLibrary.USER_STATUS_DATA_SIZE;
+    public static final int USER_STATUS_DATA_SIZE = FRCNetworkCommunicationsLibrary.USER_STATUS_DATA_SIZE;
     /**
      * Slot for the analog module to read the battery
      */
@@ -100,7 +103,7 @@ public class DriverStation implements IInputOutput {
     private boolean m_userInTeleop = false;
     private boolean m_userInTest = false;
     private boolean m_newControlData;
-    private final Pointer m_packetDataAvailableSem;
+    private final ByteBuffer m_packetDataAvailableSem;
     // XXX: Add DriverStationEnhancedIO back
     // private DriverStationEnhancedIO m_enhancedIO = new DriverStationEnhancedIO();
 
@@ -132,8 +135,12 @@ public class DriverStation implements IInputOutput {
 	// XXX: Uncomment when analogChannel is fixed
         //m_batteryChannel = new AnalogChannel(kBatterySlot, kBatteryChannel);
 
-        m_packetDataAvailableSem = HALLibrary.initializeMutex(HALLibrary.SEMAPHORE_Q_PRIORITY.get());
-        FRC_NetworkCommunicationsLibrary.setNewDataSem(m_packetDataAvailableSem);
+        m_packetDataAvailableSem = HALUtil.initializeMutexNormal();
+        
+        // set the byte order
+        m_packetDataAvailableSem.order(ByteOrder.LITTLE_ENDIAN);
+        
+        FRCNetworkCommunicationsLibrary.setNewDataSem(m_packetDataAvailableSem);
 
         m_thread = new Thread(new DriverStationTask(this), "FRCDriverStation");
         m_thread.setPriority((Thread.NORM_PRIORITY + Thread.MAX_PRIORITY) / 2);
@@ -154,7 +161,7 @@ public class DriverStation implements IInputOutput {
     private void task() {
         int safetyCounter = 0;
         while (m_thread_keepalive) {
-        	HALLibrary.takeMutex(m_packetDataAvailableSem, HALLibrary.SEMAPHORE_WAIT_FOREVER.get());
+        	HALUtil.takeMutex(m_packetDataAvailableSem);
         	synchronized (this) {
                 getData();
                 // XXX: Add DriverStationEnhancedIO back
@@ -170,16 +177,16 @@ public class DriverStation implements IInputOutput {
                 safetyCounter = 0;
             }
             if (m_userInDisabled) {
-                FRC_NetworkCommunicationsLibrary.FRC_NetworkCommunication_observeUserProgramDisabled();
+                FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramDisabled();
             }
             if (m_userInAutonomous) {
-            	FRC_NetworkCommunicationsLibrary.FRC_NetworkCommunication_observeUserProgramAutonomous();
+            	FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramAutonomous();
             }
             if (m_userInTeleop) {
-            	FRC_NetworkCommunicationsLibrary.FRC_NetworkCommunication_observeUserProgramTeleop();
+            	FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramTeleop();
             }
             if (m_userInTest) {
-            	FRC_NetworkCommunicationsLibrary.FRC_NetworkCommunication_observeUserProgramTest();
+            	FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramTest();
             }
         }
     }
@@ -213,7 +220,7 @@ public class DriverStation implements IInputOutput {
      * the data will be copied from the DS polling loop.
      */
     protected synchronized void getData() {
-    	FRC_NetworkCommunicationsLibrary.getCommonControlData(m_controlData, HALLibrary.SEMAPHORE_WAIT_FOREVER.get());
+    	FRCNetworkCommunicationsLibrary.getCommonControlData(m_controlData);
 
         if (!lastEnabled && isEnabled()) {
             // If starting teleop, assume that autonomous just took up 15 seconds
@@ -236,14 +243,13 @@ public class DriverStation implements IInputOutput {
      */
     protected void setData() {
         synchronized (m_semaphore) {
-            FRC_NetworkCommunicationsLibrary.setStatusData((float) getBatteryVoltage(),
+            FRCNetworkCommunicationsLibrary.setStatusData((float) getBatteryVoltage(),
             						 (byte) m_digitalOut,
                                      (byte) m_updateNumber,
                                      new String(m_dashboardInUseHigh.getBytes()),
                                      m_dashboardInUseHigh.getBytesLength(),
                                      new String(m_dashboardInUseLow.getBytes()),
-                                     m_dashboardInUseLow.getBytesLength(),
-                                     HALLibrary.SEMAPHORE_WAIT_FOREVER.get());
+                                     m_dashboardInUseLow.getBytesLength());
             m_dashboardInUseHigh.flush();
             m_dashboardInUseLow.flush();
         }
@@ -282,16 +288,16 @@ public class DriverStation implements IInputOutput {
         int value;
         switch (stick) {
         case 1:
-            value = m_controlData.field2.stick0Axes[axis - 1];
+            value = m_controlData.stick0Axes[axis - 1];
             break;
         case 2:
-            value = m_controlData.field3.stick1Axes[axis - 1];
+            value = m_controlData.stick1Axes[axis - 1];
             break;
         case 3:
-            value = m_controlData.field4.stick2Axes[axis - 1];
+            value = m_controlData.stick2Axes[axis - 1];
             break;
         case 4:
-            value = m_controlData.field5.stick3Axes[axis - 1];
+            value = m_controlData.stick3Axes[axis - 1];
             break;
         default:
             return 0.0;
@@ -400,7 +406,7 @@ public class DriverStation implements IInputOutput {
      * @return True if the robot is enabled, false otherwise.
      */
     public boolean isEnabled() {
-        return (m_controlData.field1.control & FRCCommonControlMasks.ENABLED) != 0;
+        return (m_controlData.control & FRCCommonControlMasks.ENABLED) != 0;
     }
 
     /**
@@ -420,7 +426,7 @@ public class DriverStation implements IInputOutput {
      * @return True if autonomous mode should be enabled, false otherwise.
      */
     public boolean isAutonomous() {
-        return (m_controlData.field1.control & FRCCommonControlMasks.AUTONOMOUS) != 0;
+        return (m_controlData.control & FRCCommonControlMasks.AUTONOMOUS) != 0;
     }
 
     /**
@@ -429,7 +435,7 @@ public class DriverStation implements IInputOutput {
      * @return True if test mode should be enabled, false otherwise.
      */
     public boolean isTest() {
-        return (m_controlData.field1.control & FRCCommonControlMasks.TEST) != 0;
+        return (m_controlData.control & FRCCommonControlMasks.TEST) != 0;
     }
 
     /**
@@ -588,7 +594,7 @@ public class DriverStation implements IInputOutput {
      * @return True if the robot is competing on a field being controlled by a Field Management System
      */
     public boolean isFMSAttached() {
-        return (m_controlData.field1.control & FRCCommonControlMasks.FMS_ATTATCHED) > 0;
+        return (m_controlData.control & FRCCommonControlMasks.FMS_ATTATCHED) > 0;
     }
 
     /**
