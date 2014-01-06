@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>wpilibJavaJNI</artifactId>
+  <groupId>edu.wpi.first.wpilibj</groupId>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>so</packaging>
+
+  <parent>
+    <groupId>edu.wpi.first.wpilib.templates.athena</groupId>
+    <artifactId>shared-library</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <relativePath>../../maven-utilities/athena/shared-library</relativePath>
+  </parent>
+
+  <dependencies>
+  	<dependency>
+ 		<groupId>com.ni.first.libraries</groupId>
+  		<artifactId>libFRC_NetworkCommunication</artifactId>
+  		<type>so</type>
+  		<version>0.1.0-SNAPSHOT</version>
+  	</dependency>
+   	<dependency>
+    	<groupId>edu.wpi.first.wpilib.hal</groupId>
+  		<artifactId>libHALAthena</artifactId>
+  		<version>0.1.0-SNAPSHOT</version>
+  		<type>a</type>
+  	</dependency>
+	<dependency>
+	  <groupId>edu.wpi.first.wpilib.hal</groupId>
+	  <artifactId>include</artifactId>
+	  <version>0.1.0-SNAPSHOT</version>
+      <type>inczip</type>
+    </dependency>
+    <dependency>
+  	<groupId>edu.wpi.first.wpilibj</groupId>
+  	<artifactId>wpilibJava</artifactId>
+  	<version>0.1.0-SNAPSHOT</version>
+  	<type>jar</type>
+  	</dependency>    
+  </dependencies>
+  
+  <repositories>
+    
+  </repositories>
+  <pluginRepositories>
+    
+  </pluginRepositories>
+
+  <build>
+    <plugins>
+	  <plugin>
+         <groupId>org.codehaus.mojo</groupId>
+         <artifactId>native-maven-plugin</artifactId>
+         <version>1.0-alpha-7</version>
+         <extensions>true</extensions>
+         <configuration>
+			<javahOS>linux</javahOS>
+			<jdkIncludePath>C:\Users/charris/embeddedJDK/jdk-7u45-linux-arm-vfp-sflt/jdk1.7.0_45/include</jdkIncludePath>
+		  <sources>
+			<source>
+			  <directory>src/main/native</directory>
+			  <includes>
+				<include>**/*.cpp</include>
+			  </includes>
+			</source>
+		  </sources>
+        </configuration>
+		<executions>
+			<execution>
+				<id>javah</id>
+				<phase>generate-sources</phase>
+				<configuration>
+           			<!-- trigger javah execution -->         
+           			<javahClassNames>
+             			<javahClassName>edu.wpi.first.wpilibj.can.CANJNI</javahClassName>
+             			<javahClassName>edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary</javahClassName>              
+             			<javahClassName>edu.wpi.first.wpilibj.hal.HALUtil</javahClassName>
+             			<javahClassName>edu.wpi.first.wpilibj.hal.JNIWrapper</javahClassName>
+             			<javahClassName>edu.wpi.first.wpilibj.hal.AnalogJNI</javahClassName>
+             			<javahClassName>edu.wpi.first.wpilibj.hal.CounterJNI</javahClassName>
+             			<javahClassName>edu.wpi.first.wpilibj.hal.DIOJNI</javahClassName>
+             			<javahClassName>edu.wpi.first.wpilibj.hal.EncoderJNI</javahClassName>
+             			<javahClassName>edu.wpi.first.wpilibj.hal.I2CJNI</javahClassName>
+             			<javahClassName>edu.wpi.first.wpilibj.hal.InterruptJNI</javahClassName>
+             			<javahClassName>edu.wpi.first.wpilibj.hal.PWMJNI</javahClassName>
+             			<javahClassName>edu.wpi.first.wpilibj.hal.RelayJNI</javahClassName>
+             			<javahClassName>edu.wpi.first.wpilibj.hal.SPIJNI</javahClassName>
+             			<javahClassName>edu.wpi.first.wpilibj.hal.WatchdogJNI</javahClassName>
+             		</javahClassNames>
+           			<!-- enable additional javah interface in dependencies list -->
+           			<!-- javahSearchJNIFromDependencies>true</javahSearchJNIFromDependencies -->
+           			<!-- 
+            			| Add jdk include directories to system include path
+            			| Override ${jkdIncludePath} If your jdk does not conform to Sun JDK layout
+            			-->
+           			<javahOS>linux</javahOS>
+           			<javahOutputDirectory>${project.build.directory}/jni/include</javahOutputDirectory>
+           			<javahProvider>default</javahProvider>
+           			<javahVerbose>true</javahVerbose>
+				</configuration>
+				<goals>	
+					<goal>javah</goal>
+				</goals>
+			</execution>
+		</executions>
+	  </plugin>
+	  
+    </plugins>
+  </build>
+</project>

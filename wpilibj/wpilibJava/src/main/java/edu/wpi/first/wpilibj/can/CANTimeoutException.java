@@ -17,4 +17,7 @@ public class CANTimeoutException extends IOException {
     public CANTimeoutException() {
         super();
     }
+    public CANTimeoutException(String message) {
+        super(message);
+    }
 }

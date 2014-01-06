@@ -2,141 +2,15 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>edu.wpi.first.wpilib</groupId>
-  <artifactId>WPILibJ</artifactId>
-  <packaging>jar</packaging>
+  <groupId>edu.wpi.first.wpilibj</groupId>
+  <artifactId>wpilibj</artifactId>
+  <packaging>pom</packaging>
   <version>0.1.0-SNAPSHOT</version>
   
-  <parent>
-    <groupId>edu.wpi.first.wpilib.templates.athena</groupId>
-    <artifactId>library-jar</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
-  </parent>
-
-  <repositories>
-    <repository>
-      <id>sonatype</id>
-      <name>Sonatype OSS Snapshots Repository</name>
-      <url>http://oss.sonatype.org/content/groups/public</url>
-    </repository>
-    <!-- For old snapshots, please use groupId `com.jnaerator` and the following repo -->
-    <repository>
-      <id>nativelibs4java-repo</id>
-      <url>http://nativelibs4java.sourceforge.net/maven</url>
-    </repository>
-	
-    <repository>
-      <id>WPILib Repository</id>
-      <url>http://frcbuilder.wpi.edu:8348/</url>
-    </repository>
-  </repositories>
-
-  <build>
-	<plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-		  <excludes>
-			<exclude>edu/wpi/first/wpilibj/image/</exclude>
-			<exclude>edu/wpi/first/wpilibj/camera/</exclude>
-			<exclude>edu/wpi/first/wpilibj/visa/</exclude>
-			<exclude>edu/wpi/first/wpilibj/SerialPort.java</exclude>
-			<exclude>edu/wpi/first/wpilibj/Kinect.java</exclude>
-			<exclude>edu/wpi/first/wpilibj/KinectStick.java</exclude>
-			<exclude>edu/wpi/first/wpilibj/DriverStationEnhancedIO.java</exclude>
-			<exclude>edu/wpi/first/wpilibj/buttons/DigitalIOButton.java</exclude>
-			<exclude>edu/wpi/first/wpilibj/buttons/AnalogIOButton.java</exclude>
-		  </excludes>
-        </configuration>
-      </plugin>
-	  <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.8</version>
-        <executions>
-          <execution>
-            <id>fetch-sunspotfrcsdk-dependencies</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-				  <groupId>edu.wpi.first.wpilib.hal</groupId>
-				  <artifactId>libHALAthenaJava</artifactId>
-				  <version>0.1.0-SNAPSHOT</version>
-				  <type>so</type>
-				  <destFileName>libHALAthenaJava.so</destFileName>
-				  <outputDirectory>${project.build.directory}/classes/linux-arm</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-              <overWriteReleases>false</overWriteReleases>
-              <overWriteSnapshots>true</overWriteSnapshots>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-	  <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-	  </plugin>
-	  <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-		  <sourceFileExcludes>
-			<exclude>edu/wpi/first/wpilibj/image/</exclude>
-			<exclude>edu/wpi/first/wpilibj/camera/</exclude>
-			<exclude>edu/wpi/first/wpilibj/visa/</exclude>
-			<exclude>edu/wpi/first/wpilibj/SerialPort.java</exclude>
-			<exclude>edu/wpi/first/wpilibj/Kinect.java</exclude>
-			<exclude>edu/wpi/first/wpilibj/KinectStick.java</exclude>
-			<exclude>edu/wpi/first/wpilibj/DriverStationEnhancedIO.java</exclude>
-			<exclude>edu/wpi/first/wpilibj/buttons/DigitalIOButton.java</exclude>
-			<exclude>edu/wpi/first/wpilibj/buttons/AnalogIOButton.java</exclude>
-		  </sourceFileExcludes>
-        </configuration>
-	  </plugin>
-	</plugins>
-  </build>
+  <modules>
+    <module>wpilibJava</module>
+    <module>wpilibJavaJNI</module>
+    <module>wpilibJavaFinal</module>
+  </modules>
   
-  <dependencies>
-      <dependency>
-	  <groupId>net.java.dev.jna</groupId>
-	  <artifactId>jna</artifactId>
-	  <version>4.0.0</version>
-	</dependency>
-	<dependency>
-      <groupId>com.nativelibs4java</groupId>
-      <artifactId>jnaerator-runtime</artifactId>
-      <version>0.12-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
-
-	<dependency>
-	  <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
-	  <artifactId>NetworkTables</artifactId>
-	  <version>0.1.0-SNAPSHOT</version>
-	</dependency>
-      
-      <!-- Add fake dependencies to inform Maven of the correct
-      order it should build projects in during a multi-module build.
-      
-      This list should match the list in the invocation of
-      maven-dependency-plugin:copy above.
-      
-      It may be possible to avoid this duplication by using the 
-      maven-assembly-plugin instead.-->
-    <dependency>
-	  <groupId>edu.wpi.first.wpilib.hal</groupId>
-	  <artifactId>libHALAthenaJava</artifactId>
-	  <version>0.1.0-SNAPSHOT</version>
-	  <type>so</type>
-    </dependency>
-  </dependencies>
 </project>

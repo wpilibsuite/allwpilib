@@ -6,7 +6,7 @@
 
 #include "ADXL345_I2C.h"
 #include "DigitalModule.h"
-#include "NetworkCommunication/UsageReporting.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "I2C.h"
 
 const uint8_t ADXL345_I2C::kAddress;
@@ -34,7 +34,7 @@ ADXL345_I2C::ADXL345_I2C(uint8_t moduleNumber, ADXL345_I2C::DataFormat_Range ran
 		// Specify the data format to read
 		m_i2c->Write(kDataFormatRegister, kDataFormat_FullRes | (uint8_t)range);
 
-		nUsageReporting::report(nUsageReporting::kResourceType_ADXL345, nUsageReporting::kADXL345_I2C, moduleNumber - 1);
+		HALReport(HALUsageReporting::kResourceType_ADXL345, HALUsageReporting::kADXL345_I2C, moduleNumber - 1);
 	}
 }
 

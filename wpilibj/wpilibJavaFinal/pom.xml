@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>edu.wpi.first.wpilibj</groupId>
+  <artifactId>wpilibJavaFinal</artifactId>
+  <packaging>jar</packaging>
+  <version>0.1.0-SNAPSHOT</version>
+  
+  <parent>
+    <groupId>edu.wpi.first.wpilib.templates.athena</groupId>
+    <artifactId>library-jar</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <relativePath>../../maven-utilities/athena/library-jar</relativePath>
+  </parent>
+
+  <repositories>
+    <!-- repository>
+      <id>sonatype</id>
+      <name>Sonatype OSS Snapshots Repository</name>
+      <url>http://oss.sonatype.org/content/groups/public</url>
+    </repository -->
+    <!-- For old snapshots, please use groupId `com.jnaerator` and the following repo -->
+    <!-- repository>
+      <id>nativelibs4java-repo</id>
+      <url>http://nativelibs4java.sourceforge.net/maven</url>
+    </repository -->
+	
+    <!-- repository>
+      <id>WPILib Repository</id>
+      <url>http://frcbuilder.wpi.edu:8348/</url>
+    </repository-->
+  </repositories>
+  
+  <dependencies>
+	<dependency>
+		<groupId>edu.wpi.first.wpilibj</groupId>
+		<artifactId>wpilibJava</artifactId>
+		<version>0.1.0-SNAPSHOT</version>
+	</dependency>
+	<dependency>
+		<groupId>edu.wpi.first.wpilibj</groupId>
+		<artifactId>wpilibJavaJNI</artifactId>
+		<version>0.1.0-SNAPSHOT</version>
+		<type>so</type>
+	</dependency>
+  </dependencies>
+
+  <build>
+	<plugins>
+	  <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.8</version>
+        <executions>
+        <execution>
+        <id>unpack</id>
+        <phase>generate-sources</phase>
+        <goals>
+        <goal>unpack</goal>
+        </goals>
+        <configuration>
+        <artifactItems>
+        <artufactItem>
+				  <groupId>edu.wpi.first.wpilibj</groupId>
+				  <artifactId>wpilibJava</artifactId>
+				  <version>0.1.0-SNAPSHOT</version>
+				  <type>jar</type>
+        </artufactItem>
+        </artifactItems>
+        <outputDirectory>${project.build.directory}/classes</outputDirectory>
+        </configuration>
+        </execution>
+         <execution>
+            <id>fetch-dependencies</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+				  <groupId>edu.wpi.first.wpilibj</groupId>
+				  <artifactId>wpilibJavaJNI</artifactId>
+				  <version>0.1.0-SNAPSHOT</version>
+				  <type>so</type>
+				  <destFileName>libwpilibJavaJNI.so</destFileName>
+				  <outputDirectory>${project.build.directory}/classes/linux-arm</outputDirectory>
+                </artifactItem>
+               <!-- artifactItem>
+				  <groupId>edu.wpi.first.wpilib.hal</groupId>
+				  <artifactId>libHALAthenaJava</artifactId>
+				  <version>0.1.0-SNAPSHOT</version>
+				  <type>so</type>
+				  <destFileName>libHALAthenaJava.so</destFileName>
+				  <outputDirectory>${project.build.directory}/classes/linux-arm</outputDirectory>
+                </artifactItem-->
+              </artifactItems>
+              <overWriteReleases>false</overWriteReleases>
+              <overWriteSnapshots>true</overWriteSnapshots>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-install-plugin</artifactId>
+      <version>2.5.1</version>
+      <executions>
+      <execution>
+      <id>install-jar</id>
+      <phase>install</phase>
+      <goals>
+      <goal>install</goal>
+      </goals>
+      </execution>
+      </executions>
+      </plugin>
+	</plugins>
+  </build>
+</project>
