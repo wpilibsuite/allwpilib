@@ -10,6 +10,7 @@
     <groupId>edu.wpi.first.wpilib.templates</groupId>
     <artifactId>include</artifactId>
     <version>0.1.0-SNAPSHOT</version>
+    <relativePath>../../../maven-utilities/include</relativePath>
   </parent>
   
   <repositories>
