@@ -29,7 +29,7 @@
 	<profile>
 	  <id>azalea</id>
       <activation>
-		<activeByDefault>true</activeByDefault>
+		<activeByDefault>false</activeByDefault>
       </activation>
 	  <modules>
 		<module>Azalea</module>
