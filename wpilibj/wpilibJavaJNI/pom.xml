@@ -49,8 +49,8 @@
   </pluginRepositories>
   
   <properties>
-    <embeddedJDKHome>${user.home}/jdk-linux-arm-vfp-slft/jdk1.7.0_45</embeddedJDKHome>
-    <embeddedJDKIncludePath>${embeddedJDKHome}/include</embeddedJDKIncludePath>
+    <embeddedJDKHome>${user.home}${file.separator}jdk-linux-arm-vfp-slft${file.separator}jdk1.7.0_45</embeddedJDKHome>
+    <embeddedJDKIncludePath>${embeddedJDKHome}${file.separator}include</embeddedJDKIncludePath>
   </properties>
 
   <build>
