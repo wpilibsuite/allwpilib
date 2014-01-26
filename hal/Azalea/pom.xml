@@ -12,13 +12,6 @@
     <version>0.1.0-SNAPSHOT</version>
     <relativePath>../../maven-utilities/azalea/static-library/pom.xml</relativePath>
   </parent>
-
-  <repositories>
-    <repository>
-      <id>WPILib Repository</id>
-      <url>http://frcbuilder.wpi.edu:8348/</url>
-    </repository>
-  </repositories>
   
   <dependencies>
     <dependency>

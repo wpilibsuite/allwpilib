@@ -14,13 +14,6 @@
     <relativePath>../../../maven-utilities/azalea/library-jar</relativePath>
   </parent>
 
-  <repositories>
-    <repository>
-      <id>WPILib Repository</id>
-      <url>http://frcbuilder.wpi.edu:8348/</url>
-    </repository>
-  </repositories>
-
   <dependencies>
 	<dependency>
 	  <groupId>com.sun.squawk</groupId>

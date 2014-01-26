@@ -9,13 +9,6 @@
   <packaging>pom</packaging>
   <version>0.1.0-SNAPSHOT</version>
 
-  <repositories>
-    <repository>
-      <id>WPILib Repository</id>
-      <url>http://frcbuilder.wpi.edu:8348/</url>
-    </repository>
-  </repositories>
-  
   <build>
 	<plugins>
 	  <plugin>

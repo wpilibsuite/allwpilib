@@ -12,13 +12,6 @@
     <relativePath>..</relativePath>
   </parent>
 
-  <repositories>
-    <repository>
-      <id>WPILib Repository</id>
-      <url>http://frcbuilder.wpi.edu:8348/</url>
-    </repository>
-  </repositories>
-  
   <properties>
 	<build-number>DEVELOPMENT</build-number>
 	<cpp-zip>${project.build.directory}/cpp-zip</cpp-zip>

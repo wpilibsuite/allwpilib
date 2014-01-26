@@ -45,11 +45,8 @@
       <url>http://nativelibs4java.sourceforge.net/maven</url>
     </repository>
 
-    <repository>
-      <id>WPILib Repository</id>
-      <url>http://frcbuilder.wpi.edu:8348/</url>
-    </repository>
   </repositories>
+
   <pluginRepositories>
     <pluginRepository>
       <id>sonatype</id>

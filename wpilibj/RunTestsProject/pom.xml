@@ -20,13 +20,6 @@
 	</dependency>
   </dependencies>
 
-  <repositories>
-    <repository>
-      <id>WPILib Repository</id>
-      <url>http://frcbuilder.wpi.edu:8348/</url>
-    </repository>
-  </repositories>
-
   <build>
 	<plugins>
       <plugin>
