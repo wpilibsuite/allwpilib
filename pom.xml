@@ -36,6 +36,10 @@
                   3.1.0 due to http://jira.codehaus.org/browse/MNG-5503
                   -->
                   <version>[3.0.0,3.1.0), (3.1.0,)</version>
+                  <message>WPILib has been tested with Maven 3.0.0+. 
+Note: Maven 3.1.0 is not supported due to Maven bug MNG-5503 (http://jira.codehaus.org/browse/MNG-5503). Please upgrade
+to Maven 3.1.1 or later.
+                  </message>
                 </requireMavenVersion>
               </rules>    
             </configuration>

@@ -62,6 +62,7 @@
 	      <rules>
 		<requireJavaVersion>
 		  <version>1.7.0</version>
+		  <message>WPILib has been tested with Java 7 (aka. 1.7.0).</message>
 		</requireJavaVersion>
 	      </rules>    
 	    </configuration>
