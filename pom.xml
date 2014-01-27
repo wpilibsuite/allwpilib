@@ -16,4 +16,32 @@
     <module>wpilibc</module>
     <module>wpilibj</module>
   </modules>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>1.3.1</version>
+        <executions>
+          <execution>
+            <id>enforce-maven</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <!-- Require Maven version > 3.0.0, but exclude
+                  3.1.0 due to http://jira.codehaus.org/browse/MNG-5503
+                  -->
+                  <version>[3.0.0,3.1.0), (3.1.0,)</version>
+                </requireMavenVersion>
+              </rules>    
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
