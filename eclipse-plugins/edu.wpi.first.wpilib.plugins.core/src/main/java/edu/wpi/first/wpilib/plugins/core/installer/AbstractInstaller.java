@@ -105,7 +105,8 @@ public abstract class AbstractInstaller {
 		}
 			
 		installLocation.mkdirs();
-		if (System.getProperty("os.name").startsWith("Mac OS X")) { // MACs are special...
+		final String osName = System.getProperty("os.name");
+		if (osName.startsWith("Mac OS X") || osName.startsWith("Linux")) { // Unix-like OSes must preserve the executable bit; call unzip
 			InputStream zip = getInstallResourceStream();
 			File tmpFile = File.createTempFile(getFeatureName()+"-", ".zip");
 			FileOutputStream fout = new FileOutputStream(tmpFile);
