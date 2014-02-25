@@ -29,3 +29,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: edu.wpi.first.wpilib.plugins.cpp,
  edu.wpi.first.wpilib.plugins.cpp.preferences
+Bundle-Vendor: WPI & FIRST

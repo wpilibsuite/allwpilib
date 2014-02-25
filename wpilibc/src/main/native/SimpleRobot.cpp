@@ -16,7 +16,6 @@
 SimpleRobot::SimpleRobot()
 	: m_robotMainOverridden (true)
 {
-	m_watchdog.SetEnabled(false);
 }
 
 /**

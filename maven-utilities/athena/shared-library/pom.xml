@@ -26,7 +26,7 @@
 				 export PATH=$HOME/wpilib/toolchains/arm-none-linux-gnueabi-4.4.1/bin/:$PATH -->
 			<compilerExecutable>arm-none-linux-gnueabi-g++</compilerExecutable>
 			<compilerStartOptions>
-              <compilerStartOption>-march=armv7 -mcpu=cortex-a9 -mfloat-abi=softfp -fPIC</compilerStartOption>
+              <compilerStartOption>-march=armv7-a -mcpu=cortex-a9 -mfloat-abi=softfp -fPIC</compilerStartOption>
 			</compilerStartOptions>
 			<compilerMiddleOptions>
               <compilerMiddleOption>-O0 -g3 -Wall</compilerMiddleOption>

@@ -28,7 +28,6 @@ IterativeRobot::IterativeRobot()
 	, m_testInitialized (false)
 	, m_period (kDefaultPeriod)
 {
-	m_watchdog.SetEnabled(false);
 }
 
 /**

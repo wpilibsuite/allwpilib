@@ -86,7 +86,6 @@
 #include "Utility.h"
 #include "Victor.h"
 // XXX: #include "Vision/AxisCamera.h"
-#include "Watchdog.h"
 #include "WPIErrors.h"
 
 #endif /*WPILIB_H_*/

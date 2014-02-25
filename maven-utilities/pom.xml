@@ -9,22 +9,7 @@
 
   <modules>
     <module>athena</module>
-    <module>azalea</module>
     <module>include</module>
   </modules>
 
-  <properties>
-	<!-- local-repository>C:/Users/wpilibj-buildmaster/maven-repository</local-repository-->
-  </properties>
-  <profiles>
-	<profile>
-	  <id>jenkins</id>
-	  <distributionManagement>
-		<repository>
-		  <id>myrepository</id>
-		  <url>file:${local-repository}</url>
-		</repository>
-	  </distributionManagement>
-	</profile>
-  </profiles>
 </project>

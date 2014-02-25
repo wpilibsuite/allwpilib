@@ -119,7 +119,6 @@ this default location, specify a value for the 'embeddedJDKHome' property at the
              			<javahClassName>edu.wpi.first.wpilibj.hal.PWMJNI</javahClassName>
              			<javahClassName>edu.wpi.first.wpilibj.hal.RelayJNI</javahClassName>
              			<javahClassName>edu.wpi.first.wpilibj.hal.SPIJNI</javahClassName>
-             			<javahClassName>edu.wpi.first.wpilibj.hal.WatchdogJNI</javahClassName>
              		</javahClassNames>
            			<!-- enable additional javah interface in dependencies list -->
            			<!-- javahSearchJNIFromDependencies>true</javahSearchJNIFromDependencies -->

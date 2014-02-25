@@ -10,7 +10,6 @@
   <properties>
 	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	<project.resources.sourceEncoding>UTF-8</project.resources.sourceEncoding>
-	<!-- local-repository>C:/Users/wpilibj-buildmaster/maven-repository</local-repository-->
   </properties>
   
   <build>
@@ -34,15 +33,6 @@
   </build>
 
   <profiles>
-	<profile>
-	  <id>jenkins</id>
-	  <distributionManagement>
-		<repository>
-		  <id>myrepository</id>
-		  <url>file:${local-repository}</url>
-		</repository>
-	  </distributionManagement>
-	</profile>
 	<profile>
 	  <id>windows-builder</id>
       <activation>

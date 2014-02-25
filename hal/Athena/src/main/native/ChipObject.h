@@ -8,10 +8,13 @@
 #define __ChipObject_h__
 
 #include <stdint.h>
-#include "ChipObject/NiRio.h"
 #include "ChipObject/RoboRIO_FRC_ChipObject_Aliases.h"
-#include "ChipObject/FRC_FPGA_ChipObject_Aliases.h"
+#include "ChipObject/tDMAManager.h"
+#include "ChipObject/tInterruptManager.h"
+#include "ChipObject/tSystem.h"
+#include "ChipObject/tSystemInterface.h"
 
+#include "ChipObject/nInterfaceGlobals.h"
 #include "ChipObject/tAccel.h"
 #include "ChipObject/tAccumulator.h"
 #include "ChipObject/tAI.h"
@@ -25,11 +28,11 @@
 #include "ChipObject/tEncoder.h"
 #include "ChipObject/tGlobal.h"
 #include "ChipObject/tInterrupt.h"
-#include "ChipObject/tInterruptManager.h"
 #include "ChipObject/tPower.h"
 #include "ChipObject/tPWM.h"
 #include "ChipObject/tRelay.h"
-#include "ChipObject/tWatchdog.h"
+#include "ChipObject/tSPI.h"
+#include "ChipObject/tSysWatchdog.h"
 
 using namespace nFPGA;
 using namespace nRoboRIO_FPGANamespace;

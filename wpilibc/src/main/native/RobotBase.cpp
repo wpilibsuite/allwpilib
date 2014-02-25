@@ -63,26 +63,6 @@ RobotBase::~RobotBase()
 }
 
 /**
- * Check on the overall status of the system.
- * 
- * @return Is the system active (i.e. PWM motor outputs, etc. enabled)?
- */
-bool RobotBase::IsSystemActive()
-{
-	return m_watchdog.IsSystemActive();
-}
-
-/**
- * Return the instance of the Watchdog timer.
- * Get the watchdog timer so the user program can either disable it or feed it when
- * necessary.
- */
-Watchdog &RobotBase::GetWatchdog()
-{
-	return m_watchdog;
-}
-
-/**
  * Determine if the Robot is currently enabled.
  * @return True if the Robot is currently enabled by the field controls.
  */

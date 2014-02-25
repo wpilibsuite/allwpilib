@@ -12,9 +12,9 @@ public:
    tSystemInterface(){}
    virtual ~tSystemInterface(){}
 
-   virtual const uint16_t getExpectedFPGAVersion()=0;
-   virtual const uint32_t getExpectedFPGARevision()=0;
-   virtual const uint32_t * const getExpectedFPGASignature()=0;
+   virtual uint16_t getExpectedFPGAVersion()=0;
+   virtual uint32_t getExpectedFPGARevision()=0;
+   virtual uint32_t * getExpectedFPGASignature()=0;
    virtual void getHardwareFpgaSignature(uint32_t *guid_ptr, tRioStatusCode *status)=0;
    virtual uint32_t getLVHandle(tRioStatusCode *status)=0;
    virtual uint32_t getHandle()=0;

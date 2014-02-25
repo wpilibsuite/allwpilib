@@ -6,6 +6,8 @@
 #include "ChipObject.h"
 #include "NetworkCommunication/FRCComm.h"
 #include "NetworkCommunication/UsageReporting.h"
+#include "NetworkCommunication/LoadOut.h"
+#include "ChipObject/nInterfaceGlobals.h"
 
 // XXX: What to do with solenoids? const uint32_t solenoid_kNumDO7_0Elements = tSolenoid::kNumDO7_0Elements;
 const uint32_t dio_kNumSystems = tDIO::kNumSystems;
@@ -149,7 +151,7 @@ int HALSetStatusData(float battery, uint8_t dsDigitalOut, uint8_t updateNumber,
 
 void HALNetworkCommunicationReserve()
 {
-	FRC_NetworkCommunication_Reserve();
+  nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass = nLoadOut::kTargetClass_RoboRIO;
 }
 
 void HALNetworkCommunicationObserveUserProgramStarting(void)
@@ -179,7 +181,8 @@ void HALNetworkCommunicationObserveUserProgramTest(void)
 
 uint32_t HALReport(uint8_t resource, uint8_t instanceNumber, uint8_t context, const char *feature)
 {
-	return FRC_NetworkCommunication_nUsageReporting_report( resource, instanceNumber, context, feature);
+	//return FRC_NetworkCommunication_nUsageReporting_report( resource, instanceNumber, context, feature);
+  return 0;
 }
 
 

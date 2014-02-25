@@ -11,27 +11,15 @@
 	<module>parent</module>
 	<module>libFRC_NetworkCommunication</module>
 	<module>libRoboRIO_FRC_ChipObject</module>
-    	<module>libFRC_FPGA_ChipObject</module>
+	<module>libFRC_FPGA_ChipObject</module>
 	<module>libNiFpga</module>
 	<module>libni_emb</module>
 	<module>libNiFpgaLv</module>
 	<module>libNiRioSrv</module>
 	<module>libni_rtlog</module>
 	<module>libnirio_emb_can</module>
+	<module>libfrccansae</module>
+	<module>libi2c</module>
+	<module>libspi</module>
   </modules>
-
-  <properties>
-	<!-- local-repository>C:/Users/wpilibj-buildmaster/maven-repository</local-repository-->
-  </properties>
-  <profiles>
-	<profile>
-	  <id>jenkins</id>
-	  <distributionManagement>
-		<repository>
-		  <id>myrepository</id>
-		  <url>file:${local-repository}</url>
-		</repository>
-	  </distributionManagement>
-	</profile>
-  </profiles>
 </project>

@@ -9,7 +9,6 @@
 
 #include "Base.h"
 #include "Task.h"
-#include "Watchdog.h"
 
 class DriverStation;
 
@@ -59,9 +58,7 @@ public:
 	bool IsAutonomous();
 	bool IsOperatorControl();
     bool IsTest();
-	bool IsSystemActive();
 	bool IsNewDataAvailable();
-	Watchdog &GetWatchdog();
 	static void startRobotTask(FUNCPTR factory);
 	static void robotTask(FUNCPTR factory, Task *task);
 	virtual void StartCompetition() = 0;
@@ -71,7 +68,6 @@ protected:
 	RobotBase();
 
 	Task *m_task;
-	Watchdog m_watchdog;
 	DriverStation *m_ds;
 
 private:

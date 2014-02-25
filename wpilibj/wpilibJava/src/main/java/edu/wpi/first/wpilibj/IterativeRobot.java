@@ -129,7 +129,6 @@ public class IterativeRobot extends RobotBase {
                     m_disabledInitialized = false;
                 }
                 if (nextPeriodReady()) {
-                    getWatchdog().feed();
                     FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramAutonomous();
                     autonomousPeriodic();
                     didAutonomousPeriodic = true;
@@ -146,7 +145,6 @@ public class IterativeRobot extends RobotBase {
                     m_disabledInitialized = false;
                 }
                 if (nextPeriodReady()) {
-                    getWatchdog().feed();
                     FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramTeleop();
                     teleopPeriodic();
                     didTeleopPeriodic = true;

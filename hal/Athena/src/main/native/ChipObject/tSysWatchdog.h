@@ -1,14 +1,14 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2015_1_0_2_SysWatchdog_h__
-#define __nFRC_2015_1_0_2_SysWatchdog_h__
+#ifndef __nFRC_2015_1_0_4_SysWatchdog_h__
+#define __nFRC_2015_1_0_4_SysWatchdog_h__
 
 #include "tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2015_1_0_2
+namespace nFRC_2015_1_0_4
 {
 
 class tSysWatchdog
@@ -25,7 +25,37 @@ public:
       kNumSystems = 1,
    } tIfaceConstants;
 
+   typedef
+   union{
+      struct{
+#ifdef __vxworks
+         unsigned SystemActive : 1;
+         unsigned PowerAlive : 1;
+         unsigned SysDisableCount : 15;
+         unsigned PowerDisableCount : 15;
+#else
+         unsigned PowerDisableCount : 15;
+         unsigned SysDisableCount : 15;
+         unsigned PowerAlive : 1;
+         unsigned SystemActive : 1;
+#endif
+      };
+      struct{
+         unsigned value : 32;
+      };
+   } tStatus;
 
+
+
+   typedef enum
+   {
+   } tStatus_IfaceConstants;
+
+   virtual tStatus readStatus(tRioStatusCode *status) = 0;
+   virtual bool readStatus_SystemActive(tRioStatusCode *status) = 0;
+   virtual bool readStatus_PowerAlive(tRioStatusCode *status) = 0;
+   virtual unsigned short readStatus_SysDisableCount(tRioStatusCode *status) = 0;
+   virtual unsigned short readStatus_PowerDisableCount(tRioStatusCode *status) = 0;
 
 
    typedef enum
@@ -68,4 +98,4 @@ private:
 }
 }
 
-#endif // __nFRC_2015_1_0_2_SysWatchdog_h__
+#endif // __nFRC_2015_1_0_4_SysWatchdog_h__

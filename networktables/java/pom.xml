@@ -1,52 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>edu.wpi.first.wpilib.networktables</groupId>
   <artifactId>java</artifactId>
   <packaging>pom</packaging>
   <version>0.1.0-SNAPSHOT</version>
   
-  <properties>
-	<!-- local-repository>C:/Users/wpilibj-buildmaster/maven-repository</local-repository-->
-  </properties>
+  <modules>
+    <module>Athena</module>
+  </modules>
+
   <profiles>
-	<profile>
-	  <id>jenkins</id>
-	  <distributionManagement>
-		<repository>
-		  <id>myrepository</id>
-		  <url>file:${local-repository}</url>
-		</repository>
-	  </distributionManagement>
-	</profile>
-	<profile>
-	  <id>desktop</id>
+    <profile>
+      <id>desktop</id>
       <activation>
-		<activeByDefault>true</activeByDefault>
+	<activeByDefault>true</activeByDefault>
       </activation>
-	  <modules>
-		<module>Athena</module>
-	  </modules>
-	</profile>
-	<profile>
-	  <id>athena</id>
-      <activation>
-		<activeByDefault>true</activeByDefault>
-      </activation>
-	  <modules>
-		<module>Athena</module>
-	  </modules>
-	</profile>
-  	<profile>
-  	  <id>azalea</id>
-      <activation>
-  		<activeByDefault>false</activeByDefault>
-      </activation>
-  	  <modules>
-  		<module>Azalea</module>
-  		<module>dist-old</module>
-  	  </modules>
-  	</profile>
+      <modules>
+	<module>Athena</module>
+      </modules>
+    </profile>
   </profiles>
 </project>

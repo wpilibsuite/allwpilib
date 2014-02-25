@@ -1,46 +1,37 @@
-//============================================================================
-// Name        : Robot.cpp
-// Author      :
-// Version     :
-// Copyright   :
-// Description : Hello World in C++, Ansi-style
-//============================================================================
-
-//============================================================================
-// Name        : Robot.cpp
-// Author      :
-// Version     :
-// Copyright   :
-// Description : Hello World in C++, Ansi-style
-//============================================================================
-
 #include "WPILib.h"
 
-class Robot : public IterativeRobot {
+class Robot: public IterativeRobot
+{
 private:
 	LiveWindow *lw;
-	
-	virtual void RobotInit() {
+
+	void RobotInit()
+	{
 		lw = LiveWindow::GetInstance();
 	}
-	
-	virtual void AutonomousInit() {
+
+	void AutonomousInit()
+	{
 
 	}
-	
-	virtual void AutonomousPeriodic() {
+
+	void AutonomousPeriodic()
+	{
 
 	}
-	
-	virtual void TeleopInit() {
-	  
-	}
-	
-	virtual void TeleopPeriodic() {
+
+	void TeleopInit()
+	{
 
 	}
-	
-	virtual void TestPeriodic() {
+
+	void TeleopPeriodic()
+	{
+
+	}
+
+	void TestPeriodic()
+	{
 		lw->Run();
 	}
 };

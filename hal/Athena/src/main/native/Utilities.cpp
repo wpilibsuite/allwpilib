@@ -23,7 +23,7 @@ void delayMillis(double ms) {
 
 void delaySeconds(double s) {
   struct timespec test, remaining;
-  test.tv_sec = 0;
-  test.tv_nsec = s * 1000000000.0;
+  test.tv_sec = (int) s;
+  test.tv_nsec = (s - (int)s) * 1000000000.0;
   nanosleep(&test, &remaining);
 }

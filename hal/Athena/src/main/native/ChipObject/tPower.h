@@ -1,14 +1,14 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2015_1_0_2_Power_h__
-#define __nFRC_2015_1_0_2_Power_h__
+#ifndef __nFRC_2015_1_0_4_Power_h__
+#define __nFRC_2015_1_0_4_Power_h__
 
 #include "tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2015_1_0_2
+namespace nFRC_2015_1_0_4
 {
 
 class tPower
@@ -31,15 +31,15 @@ public:
 #ifdef __vxworks
          unsigned User3V3 : 8;
          unsigned User5V : 8;
-         signed User6V : 16;
+         unsigned User6V : 8;
 #else
-         signed User6V : 16;
+         unsigned User6V : 8;
          unsigned User5V : 8;
          unsigned User3V3 : 8;
 #endif
       };
       struct{
-         unsigned value : 32;
+         unsigned value : 24;
       };
    } tStatus;
    typedef
@@ -69,7 +69,7 @@ public:
    virtual tStatus readStatus(tRioStatusCode *status) = 0;
    virtual unsigned char readStatus_User3V3(tRioStatusCode *status) = 0;
    virtual unsigned char readStatus_User5V(tRioStatusCode *status) = 0;
-   virtual signed short readStatus_User6V(tRioStatusCode *status) = 0;
+   virtual unsigned char readStatus_User6V(tRioStatusCode *status) = 0;
 
 
    typedef enum
@@ -104,4 +104,4 @@ private:
 }
 }
 
-#endif // __nFRC_2015_1_0_2_Power_h__
+#endif // __nFRC_2015_1_0_4_Power_h__

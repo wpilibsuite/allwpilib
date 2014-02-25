@@ -78,7 +78,7 @@ void initializeDigital(int32_t *status) {
   digitalI2CSemaphore = initializeMutexRecursive();
   
   Resource::CreateResourceObject(&DIOChannels, tDIO::kNumSystems * kDigitalPins);
-  Resource::CreateResourceObject(&DO_PWMGenerators, tDIO::kNumPWMDutyCycleElements);
+  Resource::CreateResourceObject(&DO_PWMGenerators, tDIO::kNumPWMDutyCycleAElements + tDIO::kNumPWMDutyCycleBElements);
   digitalSystem = tDIO::create(status);
 
   // Relay Setup
@@ -273,7 +273,7 @@ void setPWMRateWithModule(uint8_t module, double rate, int32_t *status) {
   // Currently rounding in the log rate domain... heavy weight toward picking a higher freq.
   // TODO: Round in the linear rate domain.
   uint8_t pwmPeriodPower = (uint8_t)(log(1.0 / (pwmSystem->readLoopTiming(status) * 0.25E-6 * rate))/log(2.0) + 0.5);
-  digitalSystem->writePWMConfig_PeriodPower(pwmPeriodPower, status);
+  digitalSystem->writePWMPeriodPower(pwmPeriodPower, status);
 }
 
 /**
@@ -301,12 +301,13 @@ void setPWMDutyCycleWithModule(uint8_t module, void* pwmGenerator, double dutyCy
   if (rawDutyCycle > 255.5) rawDutyCycle = 255.5;
   {
     Synchronized sync(digitalPwmSemaphore);
-    uint8_t pwmPeriodPower = digitalSystem->readPWMConfig_PeriodPower(status);
+    uint8_t pwmPeriodPower = digitalSystem->readPWMPeriodPower(status);
     if (pwmPeriodPower < 4) {
 	  // The resolution of the duty cycle drops close to the highest frequencies.
 	  rawDutyCycle = rawDutyCycle / pow(2.0, 4 - pwmPeriodPower);
 	}
-    digitalSystem->writePWMDutyCycle(id, (uint8_t)rawDutyCycle, status);
+    digitalSystem->writePWMDutyCycleA(id, (uint8_t)rawDutyCycle, status);
+    digitalSystem->writePWMDutyCycleB(id, (uint8_t)rawDutyCycle, status);
   }
 }
 
@@ -331,16 +332,22 @@ void setPWMOutputChannelWithModule(uint8_t module, void* pwmGenerator, uint32_t 
   if (id == ~0ul) return;
   switch(id) {
   case 0:
-    digitalSystem->writePWMConfig_OutputSelect_0(remapDigitalChannel(pin - 1, status), status);
+    digitalSystem->writePWMOutputSelect(0, remapDigitalChannel(pin - 1, status), status);
     break;
   case 1:
-    digitalSystem->writePWMConfig_OutputSelect_1(remapDigitalChannel(pin - 1, status), status);
+    digitalSystem->writePWMOutputSelect(1, remapDigitalChannel(pin - 1, status), status);
     break;
   case 2:
-    digitalSystem->writePWMConfig_OutputSelect_2(remapDigitalChannel(pin - 1, status), status);
+    digitalSystem->writePWMOutputSelect(2, remapDigitalChannel(pin - 1, status), status);
     break;
   case 3:
-    digitalSystem->writePWMConfig_OutputSelect_3(remapDigitalChannel(pin - 1, status), status);
+    digitalSystem->writePWMOutputSelect(3, remapDigitalChannel(pin - 1, status), status);
+    break;
+  case 4:
+    digitalSystem->writePWMOutputSelect(4, remapDigitalChannel(pin - 1, status), status);
+    break;
+  case 5:
+    digitalSystem->writePWMOutputSelect(5, remapDigitalChannel(pin - 1, status), status);
     break;
   }
 }

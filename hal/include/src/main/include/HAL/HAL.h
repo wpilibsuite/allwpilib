@@ -9,11 +9,11 @@
 #else
 #include <stdint.h>
 #endif
+#include <cmath>
 
 #include "Analog.h"
 #include "Digital.h"
 #include "Solenoid.h"
-#include "Watchdog.h"
 #include "Notifier.h"
 #include "Interrupts.h"
 #include "Errors.h"
@@ -244,11 +244,11 @@ struct HALCommonControlData{
 
 
 inline float intToFloat(int value) {
-  return *(float*) &value;
+  return (float)value;
 }
 
 inline int floatToInt(float value) {
-  return *(int*) &value;
+  return round(value);
 }
 
 extern "C" {

@@ -52,15 +52,6 @@
   </build>
 
   <profiles>
-	<profile>
-	  <id>jenkins</id>
-	  <distributionManagement>
-		<repository>
-		  <id>myrepository</id>
-		  <url>file:${local-repository}</url>
-		</repository>
-	  </distributionManagement>
-	</profile>
     <!-- TODO: Sign the jars for verification. -->
     <!-- Currently disabled since eclipse runs out of memory verifying the -->
     <!-- signatures of the toolchains. -->
