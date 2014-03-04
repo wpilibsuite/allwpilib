@@ -15,6 +15,7 @@
 #include <iolib.h>
 #else
 #include <unistd.h>
+#include <fcntl.h>
 #endif
 #include <stdio.h>
 
@@ -24,6 +25,13 @@ FDIOStream::FDIOStream(int _fd){
   //	f = fdopen(_fd, "rbwb");
   //	if(f==NULL)
   //		throw IOException("Could not open stream from file descriptor", errno);
+  // Set the TCP socket to be non-blocking
+  int flags = fcntl(fd, F_GETFL, 0);
+  if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) < 0)
+  {
+    ::close(fd);
+    throw IOException("Could not set socket to non-blocking mode");
+  }
 }
 FDIOStream::~FDIOStream(){
 	close();
@@ -66,14 +74,35 @@ int FDIOStream::read(void* ptr, int numbytes){
 	return totalRead;
 }
 int FDIOStream::write(const void* ptr, int numbytes){
-  int numWrote = ::write(fd, (char*)ptr, numbytes);//TODO: this is bad
-  //int numWrote = fwrite(ptr, 1, numbytes, f);
-  if(numWrote==numbytes)
-    return numWrote;
-  perror("write error: ");
-  fflush(stderr);
-  throw IOException("Could not write all bytes to fd stream");
-	
+	int numWrote = ::write(fd, (char*)ptr, numbytes);
+	if(numWrote==numbytes)
+		return numWrote;
+
+	if (numWrote == -1 && (errno == EWOULDBLOCK || errno == EAGAIN))
+	{
+		// see if write timeout expires
+		struct timeval timeout;
+		fd_set fdSet;
+
+		FD_ZERO(&fdSet);
+		FD_SET(fd, &fdSet);
+		timeout.tv_sec = 1;		// wait 1 second for the other side to connect
+		timeout.tv_usec = 0;
+
+		int select_result = select(FD_SETSIZE, NULL, &fdSet, NULL, &timeout);
+		if ( select_result < 0)
+			throw IOException("Select returned an error on write");
+
+		if (FD_ISSET(fd, &fdSet)) {
+			numWrote = ::write(fd, (char*)ptr, numbytes);
+			if(numWrote==numbytes)
+				return numWrote;
+		}
+	}
+ 	
+	perror("write error: ");
+	fflush(stderr);
+	throw IOException("Could not write all bytes to fd stream");
 }
 void FDIOStream::flush(){
   //if(fflush(f)==EOF)

@@ -42,6 +42,7 @@ public:
 	
 	NetworkTableEntry(std::string& name, NetworkTableEntryType* type, EntryValue value);
 	NetworkTableEntry(EntryId id, std::string& name, SequenceNumber sequenceNumber, NetworkTableEntryType* type, EntryValue value);
+	NetworkTableEntry(const NetworkTableEntry &);
 	virtual ~NetworkTableEntry();
 
 	EntryId GetId();

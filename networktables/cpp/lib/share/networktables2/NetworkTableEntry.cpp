@@ -20,6 +20,17 @@ NetworkTableEntry::NetworkTableEntry(EntryId _id, std::string& _name, SequenceNu
 	m_isDirty = false;
 }
 
+NetworkTableEntry::NetworkTableEntry(const NetworkTableEntry &other) :
+	name(other.name),
+	id(other.id),
+	sequenceNumber(other.sequenceNumber),
+	type(other.type),
+	m_isNew(other.m_isNew),
+	m_isDirty(other.m_isDirty)
+{
+	value = type->copyValue(other.value);
+}
+
 NetworkTableEntry::~NetworkTableEntry(){
   type->deleteValue(value);
 }
