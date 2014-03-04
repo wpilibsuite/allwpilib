@@ -20,6 +20,13 @@
 
 FDIOStream::FDIOStream(int _fd){
   fd = _fd;
+  // Set the TCP socket to be non-blocking
+  u_long on = 1;
+  if (ioctlsocket(fd, FIONBIO, &on))
+  {
+    ::close(fd);
+    throw IOException("Could not set socket to non-blocking mode");
+  }
 }
 
 FDIOStream::~FDIOStream(){
@@ -79,13 +86,35 @@ int Send( int sockfd,char* Data, size_t sizeData )
 
 int FDIOStream::write(const void* ptr, int numbytes)
 {
-  int numWrote = Send(fd,(char *)ptr,numbytes);
-  if(numWrote==numbytes)
-    return numWrote;
-  perror("write error: ");
-  fflush(stderr);
-  throw IOException("Could not write all bytes to fd stream");
-	
+	int numWrote = ::write(fd, (char*)ptr, numbytes);
+	if(numWrote==numbytes)
+		return numWrote;
+
+	if (numWrote == -1 && (errno == EWOULDBLOCK || errno == EAGAIN))
+	{
+		// see if write timeout expires
+		struct timeval timeout;
+		fd_set fdSet;
+
+		FD_ZERO(&fdSet);
+		FD_SET(fd, &fdSet);
+		timeout.tv_sec = 1;		// wait 1 second for the other side to connect
+		timeout.tv_usec = 0;
+
+		int select_result = select(FD_SETSIZE, NULL, &fdSet, NULL, &timeout);
+		if ( select_result < 0)
+			throw IOException("Select returned an error on write");
+
+		if (FD_ISSET(fd, &fdSet)) {
+			numWrote = ::write(fd, (char*)ptr, numbytes);
+			if(numWrote==numbytes)
+				return numWrote;
+		}
+	}
+ 	
+	perror("write error: ");
+	fflush(stderr);
+	throw IOException("Could not write all bytes to fd stream");
 }
 
 void FDIOStream::flush(){

@@ -97,10 +97,17 @@ void WriteManager::run() {
 		entry = ((std::queue<NetworkTableEntry*>*)outgoingAssignmentQueue)->front();
 		((std::queue<NetworkTableEntry*>*)outgoingAssignmentQueue)->pop();
 		{
-			NTSynchronized sync(entryStore.LOCK);
-			entry->MakeClean();
-			wrote = true;
-			receiver.offerOutgoingAssignment(entry);
+			NetworkTableEntry * entryCopy;
+
+			{
+				NTSynchronized sync(entryStore.LOCK);
+				entry->MakeClean();
+				wrote = true;
+				entryCopy = new NetworkTableEntry(*entry);
+			}
+
+			receiver.offerOutgoingAssignment(entryCopy);
+			delete entryCopy;
 		}
 	}
 	
@@ -108,10 +115,17 @@ void WriteManager::run() {
 		entry = ((std::queue<NetworkTableEntry*>*)outgoingUpdateQueue)->front();
 		((std::queue<NetworkTableEntry*>*)outgoingUpdateQueue)->pop();
 		{ 
-			NTSynchronized sync(entryStore.LOCK);
-			entry->MakeClean();
-			wrote = true;
-			receiver.offerOutgoingUpdate(entry);
+			NetworkTableEntry * entryCopy;
+
+			{
+				NTSynchronized sync(entryStore.LOCK);
+				entry->MakeClean();
+				wrote = true;
+				entryCopy = new NetworkTableEntry(*entry);
+			}
+
+			receiver.offerOutgoingUpdate(entryCopy);
+			delete entryCopy;
 		}
 	}
 	
