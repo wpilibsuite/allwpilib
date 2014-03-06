@@ -7,6 +7,7 @@
 
 #include "networktables2/server/ServerIncomingStreamMonitor.h"
 #include "networktables2/stream/IOStream.h"
+#include "networktables2/util/System.h"
 
 ServerIncomingStreamMonitor::ServerIncomingStreamMonitor(IOStreamProvider& _streamProvider, ServerNetworkTableEntryStore& _entryStore,
 		ServerIncomingConnectionListener& _incomingListener, ServerAdapterManager& _adapterListener, NetworkTableEntryTypeManager& _typeManager,
@@ -69,6 +70,7 @@ void ServerIncomingStreamMonitor::run()
 				ServerConnectionAdapter* connectionAdapter = new ServerConnectionAdapter(newStream, entryStore, entryStore, adapterListener, typeManager, threadManager);
 				incomingListener.OnNewConnection(*connectionAdapter);
 			}
+			sleep_ms(100); //avoid busy wait
 		}
 	}
 	catch (IOException& e)

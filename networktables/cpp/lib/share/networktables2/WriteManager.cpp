@@ -54,10 +54,15 @@ void WriteManager::stop(){
 
 void WriteManager::offerOutgoingAssignment(NetworkTableEntry* entry) {
 	{ 
-		NTSynchronized sync(transactionsLock);
-		((std::queue<NetworkTableEntry*>*)incomingAssignmentQueue)->push(entry);
-		
-		if(((std::queue<NetworkTableEntry*>*)incomingAssignmentQueue)->size()>=queueSize){
+		bool test_queue_overflow=false;
+		{
+			NTSynchronized sync(transactionsLock);
+			((std::queue<NetworkTableEntry*>*)incomingAssignmentQueue)->push(entry);
+
+			test_queue_overflow=(((std::queue<NetworkTableEntry*>*)incomingAssignmentQueue)->size()>=queueSize);
+		}
+		if (test_queue_overflow)
+		{
 			run();
 			writeWarning("assignment queue overflowed. decrease the rate at which you create new entries or increase the write buffer size");
 		}
@@ -67,9 +72,15 @@ void WriteManager::offerOutgoingAssignment(NetworkTableEntry* entry) {
 
 void WriteManager::offerOutgoingUpdate(NetworkTableEntry* entry) {
 	{ 
-		NTSynchronized sync(transactionsLock);
-		((std::queue<NetworkTableEntry*>*)incomingUpdateQueue)->push(entry);
-		if(((std::queue<NetworkTableEntry*>*)incomingUpdateQueue)->size()>=queueSize){
+		bool test_queue_overflow=false;
+		{
+			NTSynchronized sync(transactionsLock);
+			((std::queue<NetworkTableEntry*>*)incomingUpdateQueue)->push(entry);
+			test_queue_overflow=(((std::queue<NetworkTableEntry*>*)incomingUpdateQueue)->size()>=queueSize);
+
+		}
+		if (test_queue_overflow)
+		{
 			run();
 			writeWarning("update queue overflowed. decrease the rate at which you update entries or increase the write buffer size");
 		}
