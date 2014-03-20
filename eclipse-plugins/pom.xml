@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>edu.wpi.first.wpilib.plugins</groupId>
   <artifactId>edu.wpi.first.wpilib.plugins</artifactId>
@@ -24,20 +24,20 @@
   </modules>
   
   <properties>
-	<!-- local-repository>C:/Users/wpilibj-buildmaster/maven-repository</local-repository-->
+    <!-- local-repository>C:/Users/wpilibj-buildmaster/maven-repository</local-repository-->
     <tycho-version>0.18.1</tycho-version>
   </properties>
 
   <repositories>
-   <repository>
-     <id>juno</id>
-     <layout>p2</layout>
-     <url>http://download.eclipse.org/releases/juno</url>
-   </repository>
-   <repository>
-     <id>FRC Binaries</id>
-     <url>http://first.wpi.edu/FRC/c/maven/</url>
-   </repository>
+    <repository>
+      <id>juno</id>
+      <layout>p2</layout>
+      <url>http://download.eclipse.org/releases/juno</url>
+    </repository>
+    <repository>
+      <id>FRC Binaries</id>
+      <url>http://first.wpi.edu/FRC/c/maven/</url>
+    </repository>
   </repositories>
   
   <build>
@@ -80,5 +80,24 @@
     <!--         </plugins> -->
     <!--     </build> -->
     <!-- </profile> -->
+    <profile>
+      <id>docline-java8-disable</id>
+      <activation>
+	<jdk>[1.8,</jdk>
+      </activation>
+
+      <build>
+	<plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <additionalparam>-Xdoclint:none</additionalparam>
+            </configuration>
+          </plugin>
+	</plugins>
+      </build>
+    </profile>
+
   </profiles>
 </project>
