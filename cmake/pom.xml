@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>edu.wpi.first.wpilib.cmake</groupId>
+	<artifactId>cpp-root</artifactId>
+	<version>1.0.0</version>
+	<packaging>jar</packaging>
+	<properties>
+		<cmakeGenerator>Unix Makefiles</cmakeGenerator>
+	</properties>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.googlecode.cmake-maven-project</groupId>
+				<artifactId>cmake-maven-plugin</artifactId>
+				<version>2.8.11-b4</version>
+				<executions>
+					<execution>
+						<id>cmake</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<options>
+								<option>-DCMAKE_TOOLCHAIN_FILE=../../../arm-toolchain.cmake</option>
+								<option>-DCMAKE_INSTALL_PREFIX=target-root</option>
+							</options>
+						</configuration>
+					</execution>
+					<execution>
+						<id>cmake2</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<configuration>
+							<target>install</target>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<sourcePath>..</sourcePath>
+					<targetPath>${project.build.directory}/cmake</targetPath>
+					<projectDirectory>${project.build.directory}/cmake</projectDirectory>
+					<generator>${cmakeGenerator}</generator>
+					<buildType>release</buildType>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<!-- Set time stamp and version properties. -->
+					<execution>
+						<id>set-version-info</id>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<phase>process-sources</phase>
+						<configuration>
+							<target>
+								<tstamp>
+									<format property="timestamp" pattern="yyyy/MM/dd HH:mm:ss z"/>
+								</tstamp>
+								<tstamp>
+									<format property="version-info" pattern="yyyy.MM"/>
+								</tstamp>
+								<property name="version" value="${version-info}.${build-number}"/>
+							</target>
+							<exportAntProperties>true</exportAntProperties>
+						</configuration>
+					</execution>
+					<!-- Unzip the include files for cpp.zip. -->
+					<execution>
+						<id>unzip-cpp-includes</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<zip destfile="${project.build.directory}/cpp-root-1.0.0.jar" basedir="${project.build.directory}/cmake/target-root" />
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

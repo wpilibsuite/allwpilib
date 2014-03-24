@@ -1,143 +1,228 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>wpilibJavaJNI</artifactId>
-  <groupId>edu.wpi.first.wpilibj</groupId>
-  <version>0.1.0-SNAPSHOT</version>
-  <packaging>so</packaging>
-
-  <parent>
-    <groupId>edu.wpi.first.wpilib.templates.athena</groupId>
-    <artifactId>shared-library</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
-    <relativePath>../../maven-utilities/athena/shared-library/pom.xml</relativePath>
-  </parent>
-
-  <dependencies>
-  	<dependency>
- 		<groupId>com.ni.first.libraries</groupId>
-  		<artifactId>libFRC_NetworkCommunication</artifactId>
-  		<type>so</type>
-  		<version>0.1.0-SNAPSHOT</version>
-  	</dependency>
-   	<dependency>
-    	<groupId>edu.wpi.first.wpilib.hal</groupId>
-  		<artifactId>libHALAthena</artifactId>
-  		<version>0.1.0-SNAPSHOT</version>
-  		<type>a</type>
-  	</dependency>
-	<dependency>
-	  <groupId>edu.wpi.first.wpilib.hal</groupId>
-	  <artifactId>include</artifactId>
-	  <version>0.1.0-SNAPSHOT</version>
-      <type>inczip</type>
-    </dependency>
-    <dependency>
-  	<groupId>edu.wpi.first.wpilibj</groupId>
-  	<artifactId>wpilibJava</artifactId>
-  	<version>0.1.0-SNAPSHOT</version>
-  	<type>jar</type>
-  	</dependency>    
-  </dependencies>
-  
-  <repositories>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>wpilibJavaJNI</artifactId>
+	<groupId>edu.wpi.first.wpilibj</groupId>
+	<version>0.1.0-SNAPSHOT</version>
+	<dependencies>
+		<dependency>
+			<groupId>edu.wpi.first.wpilib.cmake</groupId>
+			<artifactId>cpp-root</artifactId>
+			<version>1.0.0</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>edu.wpi.first.wpilibj</groupId>
+			<artifactId>wpilibJava</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+			<type>jar</type>
+		</dependency>
+	</dependencies>
+	<repositories>
     
   </repositories>
-  <pluginRepositories>
+	<pluginRepositories>
     
   </pluginRepositories>
-  
-  <properties>
-    <embeddedJDKHome>${user.home}${file.separator}jdk-linux-arm-vfp-sflt${file.separator}jdk1.7.0_45</embeddedJDKHome>
-    <embeddedJDKIncludePath>${embeddedJDKHome}${file.separator}include</embeddedJDKIncludePath>
-  </properties>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.3.1</version>
-        <executions>
-          <execution>
-            <id>enforce-property</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-		<requireFilesExist>
-                  <files>
-                   <file>${embeddedJDKIncludePath}</file>
-                  </files>
-		  <message>A copy of the 'Linux ARM v6/v7 Soft Float ABI' JDK must be extracted to '${embeddedJDKHome}' and
+	<properties>
+		<embeddedJDKHome>${user.home}${file.separator}jdk-linux-arm-vfp-sflt${file.separator}jdk1.7.0_45</embeddedJDKHome>
+		<cmakeGenerator>Unix Makefiles</cmakeGenerator>
+		<embeddedJDKIncludePath>${embeddedJDKHome}${file.separator}include</embeddedJDKIncludePath>
+	</properties>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>1.3.1</version>
+				<executions>
+					<execution>
+						<id>enforce-property</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireFilesExist>
+									<files>
+										<file>${embeddedJDKIncludePath}</file>
+									</files>
+									<message>A copy of the 'Linux ARM v6/v7 Soft Float ABI' JDK must be extracted to '${embeddedJDKHome}' and
 the folder '${embeddedJDKIncludePath}' must exist to build this module. You must use Java 7 u45. This JDK may be downloaded from 
 http://www.oracle.com/technetwork/java/javase/downloads/java-archive-downloads-javase7-521261.html#jdk-7u45-oth-JPR. To override
 this default location, specify a value for the 'embeddedJDKHome' property at the command line, like 'mvn -DembeddedJDKHome=path/to/jdk'</message>
-                </requireFilesExist>
-              </rules>
-              <fail>true</fail>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-	  <plugin>
-         <groupId>org.codehaus.mojo</groupId>
-         <artifactId>native-maven-plugin</artifactId>
-         <version>1.0-alpha-7</version>
-         <extensions>true</extensions>
-         <configuration>
-			<javahOS>linux</javahOS>
-			<jdkIncludePath>${embeddedJDKIncludePath}</jdkIncludePath>
-		  <sources>
-			<source>
-			  <directory>src/main/native</directory>
-			  <includes>
-				<include>**/*.cpp</include>
-			  </includes>
-			</source>
-		  </sources>
-        </configuration>
-		<executions>
-			<execution>
-				<id>javah</id>
-				<phase>generate-sources</phase>
+								</requireFilesExist>
+							</rules>
+							<fail>true</fail>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>native-maven-plugin</artifactId>
+				<version>1.0-alpha-7</version>
+				<extensions>true</extensions>
 				<configuration>
-           			<!-- trigger javah execution -->         
-           			<javahClassNames>
-             			<javahClassName>edu.wpi.first.wpilibj.can.CANJNI</javahClassName>
-             			<javahClassName>edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary</javahClassName>              
-             			<javahClassName>edu.wpi.first.wpilibj.hal.HALUtil</javahClassName>
-             			<javahClassName>edu.wpi.first.wpilibj.hal.JNIWrapper</javahClassName>
-             			<javahClassName>edu.wpi.first.wpilibj.hal.AnalogJNI</javahClassName>
-             			<javahClassName>edu.wpi.first.wpilibj.hal.CounterJNI</javahClassName>
-             			<javahClassName>edu.wpi.first.wpilibj.hal.DIOJNI</javahClassName>
-             			<javahClassName>edu.wpi.first.wpilibj.hal.EncoderJNI</javahClassName>
-             			<javahClassName>edu.wpi.first.wpilibj.hal.I2CJNI</javahClassName>
-             			<javahClassName>edu.wpi.first.wpilibj.hal.InterruptJNI</javahClassName>
-             			<javahClassName>edu.wpi.first.wpilibj.hal.PWMJNI</javahClassName>
-             			<javahClassName>edu.wpi.first.wpilibj.hal.RelayJNI</javahClassName>
-             			<javahClassName>edu.wpi.first.wpilibj.hal.SPIJNI</javahClassName>
-             		</javahClassNames>
-           			<!-- enable additional javah interface in dependencies list -->
-           			<!-- javahSearchJNIFromDependencies>true</javahSearchJNIFromDependencies -->
-           			<!-- 
+					<javahOS>linux</javahOS>
+					<jdkIncludePath>${embeddedJDKIncludePath}</jdkIncludePath>
+				</configuration>
+				<executions>
+					<execution>
+						<id>javah</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<!-- trigger javah execution -->
+							<javahClassNames>
+								<javahClassName>edu.wpi.first.wpilibj.can.CANJNI</javahClassName>
+								<javahClassName>edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary</javahClassName>
+								<javahClassName>edu.wpi.first.wpilibj.hal.HALUtil</javahClassName>
+								<javahClassName>edu.wpi.first.wpilibj.hal.JNIWrapper</javahClassName>
+								<javahClassName>edu.wpi.first.wpilibj.hal.AnalogJNI</javahClassName>
+								<javahClassName>edu.wpi.first.wpilibj.hal.CounterJNI</javahClassName>
+								<javahClassName>edu.wpi.first.wpilibj.hal.DIOJNI</javahClassName>
+								<javahClassName>edu.wpi.first.wpilibj.hal.EncoderJNI</javahClassName>
+								<javahClassName>edu.wpi.first.wpilibj.hal.I2CJNI</javahClassName>
+								<javahClassName>edu.wpi.first.wpilibj.hal.InterruptJNI</javahClassName>
+								<javahClassName>edu.wpi.first.wpilibj.hal.PWMJNI</javahClassName>
+								<javahClassName>edu.wpi.first.wpilibj.hal.RelayJNI</javahClassName>
+								<javahClassName>edu.wpi.first.wpilibj.hal.SPIJNI</javahClassName>
+							</javahClassNames>
+							<!-- enable additional javah interface in dependencies list -->
+							<!-- javahSearchJNIFromDependencies>true</javahSearchJNIFromDependencies -->
+							<!-- 
             			| Add jdk include directories to system include path
             			| Override ${jkdIncludePath} If your jdk does not conform to Sun JDK layout
             			-->
-           			<javahOS>linux</javahOS>
-           			<javahOutputDirectory>${project.build.directory}/jni/include</javahOutputDirectory>
-           			<javahProvider>default</javahProvider>
-           			<javahVerbose>true</javahVerbose>
+							<javahOS>linux</javahOS>
+							<javahOutputDirectory>${project.build.directory}/include</javahOutputDirectory>
+							<javahProvider>default</javahProvider>
+							<javahVerbose>true</javahVerbose>
+						</configuration>
+						<goals>
+							<goal>javah</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- TODO: currently we just call cmake which uses relative include paths. Use maven inflation? -->
+			<plugin>
+				<groupId>com.googlecode.cmake-maven-project</groupId>
+				<artifactId>cmake-maven-plugin</artifactId>
+				<version>2.8.11-b4</version>
+				<executions>
+					<execution>
+						<id>cmake</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<options>
+								<option>-DCMAKE_TOOLCHAIN_FILE=../../arm-toolchain.cmake</option>
+								<option>-DCMAKE_INSTALL_PREFIX=../../</option>
+								<option>-DembeddedJDKHome=${embeddedJDKHome}</option>
+							</options>
+							<environmentVariables>
+								<VERBOSE>1</VERBOSE>
+							</environmentVariables>
+						</configuration>
+					</execution>
+					<execution>
+						<id>cmake2</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<configuration>
+							<target>install</target>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<sourcePath>.</sourcePath>
+					<targetPath>${project.build.directory}/cmake</targetPath>
+					<projectDirectory>${project.build.directory}/cmake</projectDirectory>
+					<generator>${cmakeGenerator}</generator>
+					<buildType>release</buildType>
 				</configuration>
-				<goals>	
-					<goal>javah</goal>
-				</goals>
-			</execution>
-		</executions>
-	  </plugin>
-	  
-    </plugins>
-  </build>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.8</version>
+				<executions>
+					<!-- Fetch the dependencies needed to build the cpp.zip file. -->
+					<execution>
+						<id>fetch-cpp-zip-dependencies</id>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>edu.wpi.first.wpilib.cmake</groupId>
+									<artifactId>cpp-root</artifactId>
+									<version>1.0.0</version>
+									<type>jar</type>
+									<destFileName>cpp-root.jar</destFileName>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+							<prependGroupId>false</prependGroupId>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<!-- Set time stamp and version properties. -->
+					<execution>
+						<id>set-version-info</id>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<phase>process-sources</phase>
+						<configuration>
+							<target>
+								<tstamp>
+									<format property="timestamp" pattern="yyyy/MM/dd HH:mm:ss z"/>
+								</tstamp>
+								<tstamp>
+									<format property="version-info" pattern="yyyy.MM"/>
+								</tstamp>
+								<property name="version" value="${version-info}.${build-number}"/>
+								
+								<unzip dest="${project.build.directory}">
+									<fileset dir="${project.build.directory}">
+										<include name="cpp-root*.jar"/>
+									</fileset>
+								</unzip>
+							</target>
+							<exportAntProperties>true</exportAntProperties>
+						</configuration>
+					</execution>
+					<!-- Unzip the include files for cpp.zip. -->
+					<execution>
+						<id>unzip-cpp-includes</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<zip includes="libwpilibJavaJNI.so" basedir="${project.build.directory}/" destfile="${project.build.directory}/wpilibJavaJNI-0.1.0.SNAPSHOT.jar" />
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

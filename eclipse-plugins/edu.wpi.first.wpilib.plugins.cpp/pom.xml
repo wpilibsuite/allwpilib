@@ -1,358 +1,145 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>edu.wpi.first.wpilib.plugins.cpp</artifactId>
-  <packaging>eclipse-plugin</packaging>
-
-  <parent>
-    <groupId>edu.wpi.first.wpilib.plugins</groupId>
-    <artifactId>edu.wpi.first.wpilib.plugins</artifactId>
-    <version>0.1.0.qualifier</version>
-    <relativePath>..</relativePath>
-  </parent>
-
-  <properties>
-	<build-number>DEVELOPMENT</build-number>
-	<cpp-zip>${project.build.directory}/cpp-zip</cpp-zip>
-  </properties>
-
-  <build>
-	<resources>
-	  <resource>
-		<directory>.</directory>
-        <includes>
-          <include>resources/configuration.properties</include>
-        </includes>
-		<filtering>true</filtering>
-      </resource>
-	</resources>
-	<plugins>
-	  <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>2.6</version>
-        <executions>
-          <execution>
-            <id>copy-ant-resources-to-cpp-zip</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${cpp-zip}</outputDirectory>
-              <resources>          
-                <resource>
-                  <directory>src/main/resources/cpp-zip</directory>
-                </resource>
-              </resources>              
-            </configuration>            
-          </execution>
-        </executions>
-      </plugin>
-	  <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.8</version>
-        <executions>
-		  
-		  <!-- Fetch the dependencies needed to build the cpp.zip file. -->
-          <execution>
-            <id>fetch-cpp-zip-dependencies</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-				<!-- Libraries needed to link against for WPILib on the Athena -->
-                <artifactItem>
-				  <groupId>edu.wpi.first.wpilib.networktables.cpp</groupId>
-				  <artifactId>libNetworkTablesAthena</artifactId>
-				  <version>0.1.0-SNAPSHOT</version>
-				  <type>a</type>
-				  <destFileName>libNetworkTables.a</destFileName>
-                </artifactItem>
-                <artifactItem>
-				  <groupId>edu.wpi.first.wpilib.hal</groupId>
-				  <artifactId>libHALAthena</artifactId>
-				  <version>0.1.0-SNAPSHOT</version>
-				  <type>a</type>
-				  <destFileName>libHAL.a</destFileName>
-                </artifactItem>
-                <artifactItem>
-				  <groupId>edu.wpi.first.wpilib.cpp</groupId>
-				  <artifactId>libWPILibAthena</artifactId>
-				  <version>0.1.0-SNAPSHOT</version>
-				  <type>a</type>
-				  <destFileName>libWPILib.a</destFileName>
-                </artifactItem>
-                <artifactItem>
-				  <groupId>com.ni.first.libraries</groupId>
-				  <artifactId>libFRC_NetworkCommunication</artifactId>
-				  <version>0.1.0-SNAPSHOT</version>
-				  <type>so</type>
-				  <destFileName>libFRC_NetworkCommunication.so</destFileName>
-                </artifactItem>
-
-				<artifactItem>
-  				  <groupId>com.ni.first.libraries</groupId>
-  				  <artifactId>libRoboRIO_FRC_ChipObject</artifactId>
-  				  <version>0.1.0-SNAPSHOT</version>
-				  <type>so</type>
-				  <destFileName>libRoboRIO_FRC_ChipObject.so</destFileName>
-				</artifactItem>
-				<artifactItem>
-  				  <groupId>com.ni.first.libraries</groupId>
-  				  <artifactId>libFRC_FPGA_ChipObject</artifactId>
-  				  <version>0.1.0-SNAPSHOT</version>
-				  <type>so</type>
-				  <destFileName>libFRC_FPGA_ChipObject.so</destFileName>
-				</artifactItem>
-				<artifactItem>
-  				  <groupId>com.ni.first.libraries</groupId>
-  				  <artifactId>libNiFpga</artifactId>
-  				  <version>0.1.0-SNAPSHOT</version>
-				  <type>so</type>
-				  <destFileName>libNiFpga.so</destFileName>
-				</artifactItem>
-				<artifactItem>
-  				  <groupId>com.ni.first.libraries</groupId>
-  				  <artifactId>libni_emb</artifactId>
-  				  <version>0.1.0-SNAPSHOT</version>
-				  <type>so</type>
-				  <destFileName>libni_emb.so</destFileName>
-				</artifactItem>
-				<artifactItem>
-  				  <groupId>com.ni.first.libraries</groupId>
-  				  <artifactId>libnirio_emb_can</artifactId>
-  				  <version>0.1.0-SNAPSHOT</version>
-				  <type>so</type>
-				  <destFileName>libnirio_emb_can.so</destFileName>
-				</artifactItem>
-				<artifactItem>
-  				  <groupId>com.ni.first.libraries</groupId>
-  				  <artifactId>libNiFpgaLv</artifactId>
-  				  <version>0.1.0-SNAPSHOT</version>
-				  <type>so</type>
-				  <destFileName>libNiFpgaLv.so</destFileName>
-				</artifactItem>
-				<artifactItem>
-  				  <groupId>com.ni.first.libraries</groupId>
-  				  <artifactId>libNiRioSrv</artifactId>
-  				  <version>0.1.0-SNAPSHOT</version>
-				  <type>so</type>
-				  <destFileName>libNiRioSrv.so</destFileName>
-				</artifactItem>
-				<artifactItem>
-  				  <groupId>com.ni.first.libraries</groupId>
-  				  <artifactId>libni_rtlog</artifactId>
-  				  <version>0.1.0-SNAPSHOT</version>
-				  <type>so</type>
-				  <destFileName>libni_rtlog.so</destFileName>
-				</artifactItem>
-
-				<!-- Includes needed to compile against for WPILib on the Athena -->				
-                <artifactItem>
-		  		  <groupId>edu.wpi.first.wpilib.hal</groupId>
-		  		  <artifactId>include</artifactId>
-		  		  <version>0.1.0-SNAPSHOT</version>
-		  		  <type>inczip</type>
-				  <outputDirectory>${cpp-zip}/inczip</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-		  		  <groupId>edu.wpi.first.wpilib.networktables.cpp</groupId>
-		  		  <artifactId>include</artifactId>
-		  		  <version>0.1.0-SNAPSHOT</version>
-		  		  <type>inczip</type>
-				  <outputDirectory>${cpp-zip}/inczip</outputDirectory>
-		  		</artifactItem>
-                <artifactItem>
-				  <groupId>edu.wpi.first.wpilib.cpp</groupId>
-				  <artifactId>libWPILibAthena</artifactId>
-				  <version>0.1.0-SNAPSHOT</version>
-				  <type>inczip</type>
-				  <outputDirectory>${cpp-zip}/inczip</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>${cpp-zip}/lib</outputDirectory>
-              <overWriteReleases>false</overWriteReleases>
-              <overWriteSnapshots>true</overWriteSnapshots>
-    		  <prependGroupId>true</prependGroupId>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-	  <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-antrun-plugin</artifactId>
-		<version>1.7</version>
-		<executions>
-		  
-		  <!-- Set time stamp and version properties. -->
-		  <execution>
-			<id>set-version-info</id>
-			<goals>
-			  <goal>run</goal>
-			</goals>
-			<phase>process-sources</phase>
-			<configuration>
-			  <target>
-				<tstamp>
-				  <format property="timestamp" pattern="yyyy/MM/dd HH:mm:ss z"/>
-				</tstamp>
-				<tstamp>
-				  <format property="version-info" pattern="yyyy.MM"/>
-				</tstamp>
-				<property name="version" value="${version-info}.${build-number}"/>
-			  </target>
-			  <exportAntProperties>true</exportAntProperties>
-			</configuration>
-		  </execution>
-
-		  <!-- Unzip the include files for cpp.zip. -->
-		  <execution>
-			<id>unzip-cpp-includes</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-			<configuration>
-			  <target>
-				<unzip dest="${cpp-zip}/include">
-				  <patternset>
-					<include name="**/*.h"/>
-				  </patternset>
-				  <fileset dir="${cpp-zip}/inczip">
-					<include name="*.inczip"/>
-				  </fileset>
-				</unzip>
-				<delete dir="${cpp-zip}/inczip"/>
-			  </target>
-			</configuration>
-		  </execution>
-		  
-		  <!-- Generate zip file to unzip for the user. -->
-		  <execution>
-			<id>generate-cpp-zip</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-			<configuration>
-			  <target>
-				<zip destfile="${project.build.directory}/classes/resources/cpp.zip"
-					 basedir="${cpp-zip}"
-					 update="true" />
-			  </target>
-			</configuration>
-		  </execution>
-		</executions>
-	  </plugin>
-    </plugins>
-  </build>
-  
-  <dependencies>
-      <!-- Add fake dependencies to inform Maven of the correct
-      order it should build projects in during a multi-module build.
-      
-      This list should match the list in the invocation of
-      maven-dependency-plugin:copy above.
-      
-      It may be possible to avoid this duplication by using the 
-      maven-assembly-plugin instead.-->
-      <!-- Libraries needed to link against for WPILib on the Athena -->
-	<dependency>
-			  <groupId>edu.wpi.first.wpilib.networktables.cpp</groupId>
-			  <artifactId>libNetworkTablesAthena</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <type>a</type>
-	</dependency>
-	<dependency>
-			  <groupId>edu.wpi.first.wpilib.hal</groupId>
-			  <artifactId>libHALAthena</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <type>a</type>
-	</dependency>
-	<dependency>
-			  <groupId>edu.wpi.first.wpilib.cpp</groupId>
-			  <artifactId>libWPILibAthena</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <type>a</type>
-	</dependency>
-	<dependency>
-			  <groupId>com.ni.first.libraries</groupId>
-			  <artifactId>libFRC_NetworkCommunication</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <type>so</type>
-	</dependency>
-	<dependency>
-			  <groupId>com.ni.first.libraries</groupId>
-			  <artifactId>libRoboRIO_FRC_ChipObject</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <type>so</type>
-	</dependency>
-	<dependency>
-			  <groupId>com.ni.first.libraries</groupId>
-			  <artifactId>libFRC_FPGA_ChipObject</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <type>so</type>
-	</dependency>
-	<dependency>
-			  <groupId>com.ni.first.libraries</groupId>
-			  <artifactId>libNiFpga</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <type>so</type>
-	</dependency>
-	<dependency>
-			  <groupId>com.ni.first.libraries</groupId>
-			  <artifactId>libni_emb</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <type>so</type>
-	</dependency>
-	<dependency>
-			  <groupId>com.ni.first.libraries</groupId>
-			  <artifactId>libnirio_emb_can</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <type>so</type>
-	</dependency>
-	<dependency>
-			  <groupId>com.ni.first.libraries</groupId>
-			  <artifactId>libNiFpgaLv</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <type>so</type>
-	</dependency>
-	<dependency>
-			  <groupId>com.ni.first.libraries</groupId>
-			  <artifactId>libNiRioSrv</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <type>so</type>
-	</dependency>
-	<dependency>
-			  <groupId>com.ni.first.libraries</groupId>
-			  <artifactId>libni_rtlog</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <type>so</type>
-	</dependency>
-
-	<!-- Includes needed to compile against for WPILib on the Athena -->				
-	<dependency>
-			  <groupId>edu.wpi.first.wpilib.hal</groupId>
-			  <artifactId>include</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <type>inczip</type>
-	</dependency>
-	<dependency>
-			  <groupId>edu.wpi.first.wpilib.networktables.cpp</groupId>
-			  <artifactId>include</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <type>inczip</type>
-	</dependency>
-	<dependency>
-			  <groupId>edu.wpi.first.wpilib.cpp</groupId>
-			  <artifactId>libWPILibAthena</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <type>inczip</type>
-	</dependency>
-  </dependencies>
-  
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>edu.wpi.first.wpilib.plugins.cpp</artifactId>
+	<packaging>eclipse-plugin</packaging>
+	<parent>
+		<groupId>edu.wpi.first.wpilib.plugins</groupId>
+		<artifactId>edu.wpi.first.wpilib.plugins</artifactId>
+		<version>0.1.0.qualifier</version>
+		<relativePath>..</relativePath>
+	</parent>
+	<properties>
+		<build-number>DEVELOPMENT</build-number>
+		<cpp-zip>${project.build.directory}/cpp-zip</cpp-zip>
+	</properties>
+	<build>
+		<resources>
+			<resource>
+				<directory>.</directory>
+				<includes>
+					<include>resources/configuration.properties</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
+						<id>copy-ant-resources-to-cpp-zip</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${cpp-zip}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/resources/cpp-zip</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.8</version>
+				<executions>
+					<!-- Fetch the dependencies needed to build the cpp.zip file. -->
+					<execution>
+						<id>fetch-cpp-zip-dependencies</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>edu.wpi.first.wpilib.cmake</groupId>
+									<artifactId>cpp-root</artifactId>
+									<version>1.0.0</version>
+									<type>jar</type>
+									<destFileName>cpp-root.jar</destFileName>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+							<prependGroupId>true</prependGroupId>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<!-- Set time stamp and version properties. -->
+					<execution>
+						<id>set-version-info</id>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<phase>process-sources</phase>
+						<configuration>
+							<target>
+								<tstamp>
+									<format property="timestamp" pattern="yyyy/MM/dd HH:mm:ss z"/>
+								</tstamp>
+								<tstamp>
+									<format property="version-info" pattern="yyyy.MM"/>
+								</tstamp>
+								<property name="version" value="${version-info}.${build-number}"/>
+							</target>
+							<exportAntProperties>true</exportAntProperties>
+						</configuration>
+					</execution>
+					<!-- Unzip the include files for cpp.zip. -->
+					<execution>
+						<id>unzip-cpp-includes</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<unzip dest="${cpp-zip}">
+									<fileset dir="${project.build.directory}">
+										<include name="cpp-root.jar"/>
+									</fileset>
+								</unzip>
+							</target>
+						</configuration>
+					</execution>
+					<!-- Generate zip file to unzip for the user. -->
+					<execution>
+						<id>generate-cpp-zip</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<zip destfile="${project.build.directory}/classes/resources/cpp.zip" basedir="${cpp-zip}" update="true"/>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>edu.wpi.first.wpilib.cmake</groupId>
+			<artifactId>cpp-root</artifactId>
+			<version>1.0.0</version>
+			<type>jar</type>
+		</dependency>
+	</dependencies>
 </project>

@@ -2,4 +2,5 @@
 target/
 build/
 dist/
+cpp/build/
 /OutlineViewer/nbproject/private/

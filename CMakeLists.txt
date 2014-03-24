@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 2.8)
+project(All-WPILib)
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wformat=2 -Wextra -Wno-unused-parameter")
+SET(CMAKE_SKIP_BUILD_RPATH TRUE)
+
+file(GLOB_RECURSE NI_LIBS ni-libraries/*.so*)
+get_filename_component(HAL_API_INCLUDES hal/include REALPATH)
+get_filename_component(NWT_API_INCLUDES networktables/cpp/include REALPATH)
+add_subdirectory(hal)
+add_subdirectory(networktables/cpp)
+add_subdirectory(wpilibc)

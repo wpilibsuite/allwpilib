@@ -1,24 +1,13 @@
-# auto-generated from .gitignore files by build-hgignore.py
 syntax: re
 ^\.hgignore$
-.*/.*~$                                          # '*~' in 'eclipse-plugins'
-eclipse-plugins/.*/target(?:/|$)                                 # 'target/' in 'eclipse-plugins'
-eclipse-plugins/.*/bin(?:/|$)                                    # 'bin/' in 'eclipse-plugins'
-eclipse-plugins/.*/\.settings(?:/|$)                             # '.settings/' in 'eclipse-plugins'
-networktables/.*/target(?:/|$)                                   # 'target/' in 'networktables'
-networktables/.*/build(?:/|$)                                    # 'build/' in 'networktables'
-networktables/.*/dist(?:/|$)                                     # 'dist/' in 'networktables'
-^networktables/OutlineViewer/nbproject/private(?:/|$)        # '/OutlineViewer/nbproject/private/' in 'networktables'
-maven-utilities/.*/target(?:/|$)                                 # 'target/' in 'maven-utilities'
-hal/.*/.*#$                                                      # '*#' in 'hal'
-hal/.*/PPC603gnu(?:/|$)                                          # 'PPC603gnu/' in 'hal'
-hal/.*/Debug(?:/|$)                                              # 'Debug/' in 'hal'
-hal/.*/target(?:/|$)                                             # 'target/' in 'hal'
-hal/.*/tmp(?:/|$)                                                # 'tmp/' in 'hal'
-hal/.*/GPATH$                                                    # 'GPATH' in 'hal'
-hal/.*/GRTAGS$                                                   # 'GRTAGS' in 'hal'
-hal/.*/GSYMS$                                                    # 'GSYMS' in 'hal'
-hal/.*/GTAGS$                                                    # 'GTAGS' in 'hal'
-ni-libraries/.*/target(?:/|$)                                    # 'target/' in 'ni-libraries'
-wpilib.?/.*/target(?:/|$)     
+.*/target(?:/|$)
+.*/dist(?:/|$)
+eclipse-plugins/.*/bin(?:/|$)
 
+syntax: glob
+wpilibc/build/
+hal/build/
+networktables/cpp/build/
+build/
+networktables/OutlineViewer/nbproject/private
+*~

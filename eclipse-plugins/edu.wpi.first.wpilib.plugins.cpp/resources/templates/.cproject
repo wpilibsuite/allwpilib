@@ -38,22 +38,11 @@
 							    <listOptionValue builtIn="false" value="$cpp-location/lib"/>
 							  </option>
 							  <option id="gnu.cpp.link.option.libs.1072058280" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-								<listOptionValue builtIn="false" value="WPILib"/>
-								<listOptionValue builtIn="false" value="HAL"/>
-								<listOptionValue builtIn="false" value="FRC_NetworkCommunication"/>
-								<listOptionValue builtIn="false" value="RoboRIO_FRC_ChipObject"/>
-								<listOptionValue builtIn="false" value="FRC_FPGA_ChipObject"/>
-								<listOptionValue builtIn="false" value="NiFpga"/>
-								<listOptionValue builtIn="false" value="ni_emb"/>
-								<listOptionValue builtIn="false" value="nirio_emb_can"/>
-								<listOptionValue builtIn="false" value="NiFpgaLv"/>
-								<listOptionValue builtIn="false" value="NiRioSrv"/>
-								<listOptionValue builtIn="false" value="ni_rtlog"/>
-								<listOptionValue builtIn="false" value="NetworkTables"/>
+								<listOptionValue builtIn="false" value="WPILibAthena"/>
 								<listOptionValue builtIn="false" value="dl"/>
 								<listOptionValue builtIn="false" value="pthread"/>
-								<listOptionValue builtIn="false" value="HAL"/>
-							  </option>
+								</option>
+								<option id="gnu.cpp.link.option.flags.1747959472" superClass="gnu.cpp.link.option.flags" value="-Wl,-rpath-link,$cpp-location/lib" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1757265359" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
