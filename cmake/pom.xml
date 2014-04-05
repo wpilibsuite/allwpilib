@@ -24,12 +24,35 @@
 						<configuration>
 							<options>
 								<option>-DCMAKE_TOOLCHAIN_FILE=../../../arm-toolchain.cmake</option>
-								<option>-DCMAKE_INSTALL_PREFIX=target-root</option>
+								<option>-DCMAKE_INSTALL_PREFIX=/usr/local/frc/</option>
+								<option>-DCPACK_PACKAGE_VERSION=${version-info}</option>
 							</options>
 						</configuration>
 					</execution>
 					<execution>
 						<id>cmake2</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<configuration>
+							<target>package</target>
+						</configuration>
+					</execution>
+					<execution>
+						<id>cmake3</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<options>
+								<option>-DCMAKE_INSTALL_PREFIX=target-root</option>
+							</options>
+						</configuration>
+					</execution>
+					<execution>
+						<id>cmake4</id>
 						<phase>generate-resources</phase>
 						<goals>
 							<goal>compile</goal>
@@ -65,7 +88,7 @@
 									<format property="timestamp" pattern="yyyy/MM/dd HH:mm:ss z"/>
 								</tstamp>
 								<tstamp>
-									<format property="version-info" pattern="yyyy.MM"/>
+									<format property="version-info" pattern="yyyy.MMdd.HHmmss"/>
 								</tstamp>
 								<property name="version" value="${version-info}.${build-number}"/>
 							</target>
@@ -81,7 +104,10 @@
 						</goals>
 						<configuration>
 							<target>
+								<echo file="${project.build.directory}/cmake/target-root/so.properties">cpp-sos=${version-info}</echo>
+								<move file="${project.build.directory}/cmake/wpilib_${version-info}_armv7a-vfp.deb" todir="${project.build.directory}/cmake/target-root" />
 								<zip destfile="${project.build.directory}/cpp-root-1.0.0.jar" basedir="${project.build.directory}/cmake/target-root" />
+								<move file="${project.build.directory}/cmake/target-root/wpilib_${version-info}_armv7a-vfp.deb" todir="${project.build.directory}/cmake/" />
 							</target>
 						</configuration>
 					</execution>

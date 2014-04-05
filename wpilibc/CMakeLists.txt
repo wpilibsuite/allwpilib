@@ -5,8 +5,8 @@ file(GLOB_RECURSE SRC_FILES lib/*.cpp)
 include_directories(include/ ${HAL_API_INCLUDES} ${NWT_API_INCLUDES})
 add_library(WPILibAthena SHARED ${SRC_FILES})
 target_link_libraries(WPILibAthena HALAthena NetworkTables ${NI_LIBS})
-INSTALL(TARGETS WPILibAthena LIBRARY DESTINATION lib)
-INSTALL(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX})
+INSTALL(TARGETS WPILibAthena LIBRARY DESTINATION lib COMPONENT lib)
+INSTALL(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT headers)
 # lib/ c m gcc_s ld-linux
 # usr/lib stdc++
 # ni_emb
