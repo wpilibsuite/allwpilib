@@ -109,7 +109,7 @@ ${md5.hal} usr/local/frc/lib/libHALAthena.so</echo>
 				</tarfileset>
 			</tar>
 			<gzip destfile="${wpilib.ant.dir}/control.tar.gz" src="${wpilib.ant.dir}/control.tar"/>
-			<exec command="arm-linux-gnueabi-ar -r ${opkg.name}_${cpp-sos}_${opkg.arch}.deb debian-binary control.tar.gz data.tar.gz" dir="${wpilib.ant.dir}"/>
+			<exec command="arm-none-linux-gnueabi-ar -r ${opkg.name}_${cpp-sos}_${opkg.arch}.deb debian-binary control.tar.gz data.tar.gz" dir="${wpilib.ant.dir}"/>
 		    <scp file="${wpilib.ant.dir}/${opkg.name}_${cpp-sos}_${opkg.arch}.deb" todir="${username}@${target}:/tmp"
 				 password="${password}" trust="true"/>
 			<sshexec host="${target}"
