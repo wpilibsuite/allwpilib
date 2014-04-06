@@ -27,9 +27,43 @@
   </pluginRepositories>
 	<properties>
 		<embeddedJDKHome>${user.home}${file.separator}jdk-linux-arm-vfp-sflt${file.separator}jdk1.7.0_45</embeddedJDKHome>
-		<cmakeGenerator>Unix Makefiles</cmakeGenerator>
 		<embeddedJDKIncludePath>${embeddedJDKHome}${file.separator}include</embeddedJDKIncludePath>
 	</properties>
+	<profiles>
+		<profile>
+			<id>unix-properties</id>
+			<properties>
+				<cmakeGenerator>Unix Makefiles</cmakeGenerator>
+			</properties>
+			<activation>
+				<os>
+					<family>unix</family>
+				</os>
+			</activation>
+		</profile>
+		<profile>
+			<id>MAC-properties</id>
+			<properties>
+				<cmakeGenerator>Unix Makefiles</cmakeGenerator>
+			</properties>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os>
+			</activation>
+		</profile>
+		<profile>
+			<id>windows-properties</id>
+			<properties>
+				<cmakeGenerator>MSYS Makefiles</cmakeGenerator>
+			</properties>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+		</profile>
+	</profiles>
 	<build>
 		<plugins>
 			<plugin>

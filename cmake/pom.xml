@@ -5,9 +5,41 @@
 	<artifactId>cpp-root</artifactId>
 	<version>1.0.0</version>
 	<packaging>pom</packaging>
-	<properties>
-		<cmakeGenerator>Unix Makefiles</cmakeGenerator>
-	</properties>
+	<profiles>
+		<profile>
+			<id>unix-properties</id>
+			<properties>
+				<cmakeGenerator>Unix Makefiles</cmakeGenerator>
+			</properties>
+			<activation>
+				<os>
+					<family>unix</family>
+				</os>
+			</activation>
+		</profile>
+		<profile>
+			<id>MAC-properties</id>
+			<properties>
+				<cmakeGenerator>Unix Makefiles</cmakeGenerator>
+			</properties>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os>
+			</activation>
+		</profile>
+		<profile>
+			<id>windows-properties</id>
+			<properties>
+				<cmakeGenerator>MSYS Makefiles</cmakeGenerator>
+			</properties>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+		</profile>
+	</profiles>
 	<build>
 		<plugins>
 			<plugin>
