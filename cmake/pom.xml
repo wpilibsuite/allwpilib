@@ -4,7 +4,7 @@
 	<groupId>edu.wpi.first.wpilib.cmake</groupId>
 	<artifactId>cpp-root</artifactId>
 	<version>1.0.0</version>
-	<packaging>jar</packaging>
+	<packaging>pom</packaging>
 	<properties>
 		<cmakeGenerator>Unix Makefiles</cmakeGenerator>
 	</properties>
@@ -82,12 +82,38 @@
 						<configuration>
 							<target>
 								<echo file="${project.build.directory}/cmake/target-root/so.properties">cpp-sos=${version-info}</echo>
-								<zip destfile="${project.build.directory}/cpp-root-1.0.0.jar" basedir="${project.build.directory}/cmake/target-root" />
+								<zip destfile="${project.build.directory}/${project.build.finalName}.zip" basedir="${project.build.directory}/cmake/target-root" />
 							</target>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-		</plugins>
+			      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.2</version>
+        <executions>
+        <execution>
+						<id>zip-cpp-includes</id>
+						<phase>package</phase>
+						<goals>
+							<goal>attach-artifact</goal>
+						</goals>
+            <configuration>
+              <artifacts>
+                <artifact>
+                  <file>${project.build.directory}/${project.build.finalName}.zip</file>
+                  <type>zip</type>
+                </artifact>
+                <artifact>
+                  <file>${project.build.directory}/cmake/target-root/lib/libHALAthena.so</file>
+                  <type>so</type>
+                </artifact>
+              </artifacts>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
 	</build>
 </project>

@@ -63,7 +63,7 @@
 									<groupId>edu.wpi.first.wpilib.cmake</groupId>
 									<artifactId>cpp-root</artifactId>
 									<version>1.0.0</version>
-									<type>jar</type>
+									<type>zip</type>
 									<destFileName>cpp-root.jar</destFileName>
 								</artifactItem>
 							</artifactItems>
@@ -139,7 +139,7 @@
 			<groupId>edu.wpi.first.wpilib.cmake</groupId>
 			<artifactId>cpp-root</artifactId>
 			<version>1.0.0</version>
-			<type>jar</type>
+			<type>zip</type>
 		</dependency>
 	</dependencies>
 </project>

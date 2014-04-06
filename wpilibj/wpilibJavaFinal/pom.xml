@@ -37,7 +37,7 @@
 		<groupId>edu.wpi.first.wpilibj</groupId>
 		<artifactId>wpilibJavaJNI</artifactId>
 		<version>0.1.0-SNAPSHOT</version>
-		<type>jar</type>
+		<type>so</type>
 	</dependency>
   </dependencies>
 
@@ -78,7 +78,7 @@
 				  <groupId>edu.wpi.first.wpilibj</groupId>
 				  <artifactId>wpilibJavaJNI</artifactId>
 				  <version>0.1.0-SNAPSHOT</version>
-				  <type>jar</type>
+				  <type>so</type>
 				  <destFileName>libwpilibJavaJNI.so</destFileName>
 				  <outputDirectory>${project.build.directory}/classes/linux-arm</outputDirectory>
                 </artifactItem>
