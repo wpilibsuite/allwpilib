@@ -238,6 +238,8 @@ public abstract class RobotBase {
         // System.out.println("ByteBuffer2 as Int" + returnBuffer2.getInt(0));
         
         /* End JNI Testing */
+
+        FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationReserve();
         FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
 
         UsageReporting.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);

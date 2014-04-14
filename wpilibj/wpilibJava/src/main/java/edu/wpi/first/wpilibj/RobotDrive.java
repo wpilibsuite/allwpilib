@@ -71,7 +71,7 @@ public class RobotDrive implements MotorSafety, IUtility {
     protected SpeedController m_rearLeftMotor;
     protected SpeedController m_rearRightMotor;
     protected boolean m_allocatedSpeedControllers;
-    protected boolean m_isCANInitialized = true;
+    protected boolean m_isCANInitialized = false;//TODO: fix can
     protected static boolean kArcadeRatioCurve_Reported = false;
     protected static boolean kTank_Reported = false;
     protected static boolean kArcadeStandard_Reported = false;
