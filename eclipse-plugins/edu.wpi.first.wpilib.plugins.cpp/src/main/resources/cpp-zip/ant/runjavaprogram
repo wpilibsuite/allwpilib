@@ -2,4 +2,5 @@
 killall java
 killall FRCUserProgram
 sleep 1
-nohup java -Djna.library.path=$LD_LIBRARY_PATH -Xmx32M -jar FRCUserProgram.jar
+nohup /usr/local/frc/JRE/bin/java -jar FRCUserProgram.jar
+#nohup /usr/local/frc/JRE/bin/java -Djna.library.path=$LD_LIBRARY_PATH -Xmx32M -jar FRCUserProgram.jar
