@@ -71,12 +71,14 @@
     <echo>[athena-deploy] Copying code over.</echo>
     <scp file="${dist.jar}" todir="${username}@${target}:${deploy.dir}"
 	 password="${password}" trust="true"/>
+    <scp file="${wpilib.ant.dir}/runjavaprogram" todir="${username}@${target}:${deploy.dir}"
+   password="${password}" trust="true"/>
     <echo>[athena-deploy] Starting program.</echo>
     <sshexec host="${target}"
-	     username="${username}"
-	     password="${password}"
-	     trust="true"
-	     command="${deploy.run.command}"/>
+       username="${username}"
+       password="${password}"
+       trust="true"
+       command="chmod a+x run*program; ${deploy.run.command}"/>
   </target>
 
   <target name="debug-deploy" depends="get-target-ip,jar" description="Deploy the jar and start the program running in debug mode.">

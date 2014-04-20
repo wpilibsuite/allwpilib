@@ -109,7 +109,7 @@ ${md5.hal} usr/local/frc/lib/libHALAthena.so</echo>
 				</tarfileset>
 			</tar>
 			<gzip destfile="${wpilib.ant.dir}/control.tar.gz" src="${wpilib.ant.dir}/control.tar"/>
-			<exec command="~\wpilib\toolchains\arm-none-linux-gnueabi-4.4.1\bin\arm-none-linux-gnueabi-ar -r ${opkg.name}_${cpp-sos}_${opkg.arch}.deb debian-binary control.tar.gz data.tar.gz" dir="${wpilib.ant.dir}"/>
+			<exec command="${wpilib.ant.dir}\..\..\..\toolchains\arm-none-linux-gnueabi-4.4.1\bin\arm-none-linux-gnueabi-ar -r ${opkg.name}_${cpp-sos}_${opkg.arch}.deb debian-binary control.tar.gz data.tar.gz" dir="${wpilib.ant.dir}"/>
 		    <scp file="${wpilib.ant.dir}/${opkg.name}_${cpp-sos}_${opkg.arch}.deb" todir="${username}@${target}:/tmp"
 				 password="${password}" trust="true"/>
 			<sshexec host="${target}"
@@ -120,8 +120,6 @@ ${md5.hal} usr/local/frc/lib/libHALAthena.so</echo>
 		</else>
 	</if>
     <scp file="${wpilib.ant.dir}/runcppprogram" todir="${username}@${target}:${deploy.dir}"
-	 password="${password}" trust="true"/>
-    <scp file="${wpilib.ant.dir}/runjavaprogram" todir="${username}@${target}:${deploy.dir}"
 	 password="${password}" trust="true"/>
     <echo>[athena-deploy] Starting program.</echo>
     <sshexec host="${target}"
