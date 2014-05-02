@@ -3,22 +3,21 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
+#pragma once
 
-#ifndef __DASHBOARDBASE_H__
-#define __DASHBOARDBASE_H__
-
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 #include "ErrorBase.h"
 
-class DashboardBase : public ErrorBase {
+class DashboardBase : public ErrorBase
+{
 public:
 	virtual void GetStatusBuffer(char** userStatusData, int32_t* userStatusDataSize) = 0;
 	virtual void Flush() = 0;
 	virtual ~DashboardBase() {}
 protected:
-	DashboardBase() {}
+	DashboardBase()
+	{
+	}
 private:
 	DISALLOW_COPY_AND_ASSIGN(DashboardBase);
 };
-
-#endif

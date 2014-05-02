@@ -150,7 +150,7 @@
             description="Deploy the WPILib project to the athena board."
             icon="resources/icons/wpi.ico"
             id="edu.wpi.first.wpilib.plugins.cpp.launching.deploy"
-            label="WPILib Deploy"
+            label="WPILib Deploy Configure Builder"
             modes="run,debug">
             <contextualLaunch>
             <enablement>

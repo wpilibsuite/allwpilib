@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef __KINECT_STICK_H__
-#define __KINECT_STICK_H__
+#pragma once
 
 #include "ErrorBase.h"
 #include "GenericHID.h"
@@ -56,6 +54,3 @@ private:
 	static uint32_t _recentPacketNumber;
 	static KinectStickData _sticks;
 };
-
-#endif
-

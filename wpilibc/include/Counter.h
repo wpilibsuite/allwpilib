@@ -3,11 +3,9 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
+#pragma once
 
-#ifndef CPPCOUNTER_H_
-#define CPPCOUNTER_H_
-
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 #include "AnalogTriggerOutput.h"
 #include "CounterBase.h"
 #include "SensorBase.h"
@@ -22,7 +20,6 @@
 class Counter : public SensorBase, public CounterBase, public LiveWindowSendable
 {
 public:
-	/* typedef enum {kTwoPulse=0, kSemiperiod=1, kPulseLength=2, kExternalDirection=3} Mode; */
 
 	Counter();
 	explicit Counter(uint32_t channel);
@@ -31,7 +28,8 @@ public:
 	explicit Counter(DigitalSource &source);
 	explicit Counter(AnalogTrigger *trigger);
 	explicit Counter(AnalogTrigger &trigger);
-	Counter(EncodingType encodingType, DigitalSource *upSource, DigitalSource *downSource, bool inverted);
+	Counter(EncodingType encodingType, DigitalSource *upSource, DigitalSource *downSource,
+			bool inverted);
 	virtual ~Counter();
 
 	void SetUpSource(uint32_t channel);
@@ -71,8 +69,10 @@ public:
 	bool GetDirection();
 	void SetSamplesToAverage(int samplesToAverage);
 	int GetSamplesToAverage();
-	uint32_t GetIndex() {return m_index;}
-	
+	uint32_t GetIndex()
+	{
+		return m_index;
+	}
 	
 	void UpdateTable();
 	void StartLiveWindowMode();
@@ -93,5 +93,3 @@ private:
 	
 	ITable *m_table;
 };
-
-#endif

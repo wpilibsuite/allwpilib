@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef __DRIVER_STATION_H__
-#define __DRIVER_STATION_H__
+#pragma once
 
 #include "Dashboard.h"
 #include "DriverStationEnhancedIO.h"
@@ -21,7 +19,12 @@ class AnalogChannel;
 class DriverStation : public SensorBase
 {
 public:
-	enum Alliance {kRed, kBlue, kInvalid};
+	enum Alliance
+	{
+		kRed,
+		kBlue,
+		kInvalid
+	};
 
 	virtual ~DriverStation();
 	static DriverStation *GetInstance();
@@ -41,9 +44,9 @@ public:
 
 	bool IsEnabled();
 	bool IsDisabled();
-    bool IsAutonomous();
+	bool IsAutonomous();
 	bool IsOperatorControl();
-    bool IsTest();
+	bool IsTest();
 	bool IsNewControlData();
 	bool IsFMSAttached();
 
@@ -59,40 +62,79 @@ public:
 	// a call to SetHigh|LowPriorityDashboardPackerToUse() changes which packer
 	// is in use. You can restore the default high priority packer by calling
 	// SetHighPriorityDashboardPackerToUse(&GetHighPriorityDashboardPacker()).
-	Dashboard& GetHighPriorityDashboardPacker() { return m_dashboardHigh; }
-	Dashboard& GetLowPriorityDashboardPacker() { return m_dashboardLow; }
+	Dashboard& GetHighPriorityDashboardPacker()
+	{
+		return m_dashboardHigh;
+	}
+	Dashboard& GetLowPriorityDashboardPacker()
+	{
+		return m_dashboardLow;
+	}
 
 	// Get/set the dashboard packers to use. This can sideline or restore the
 	// default packers. Initializing SmartDashboard changes the high priority
 	// packer in use so beware that the default packer will then be idle. These
 	// methods support any kind of DashboardBase, e.g. a Dashboard or a
 	// SmartDashboard.
-	DashboardBase* GetHighPriorityDashboardPackerInUse() { return m_dashboardInUseHigh; }
-	DashboardBase* GetLowPriorityDashboardPackerInUse() { return m_dashboardInUseLow; }
-	void SetHighPriorityDashboardPackerToUse(DashboardBase* db) { m_dashboardInUseHigh = db; }
-	void SetLowPriorityDashboardPackerToUse(DashboardBase* db) { m_dashboardInUseLow = db; }
+	DashboardBase* GetHighPriorityDashboardPackerInUse()
+	{
+		return m_dashboardInUseHigh;
+	}
+	DashboardBase* GetLowPriorityDashboardPackerInUse()
+	{
+		return m_dashboardInUseLow;
+	}
+	void SetHighPriorityDashboardPackerToUse(DashboardBase* db)
+	{
+		m_dashboardInUseHigh = db;
+	}
+	void SetLowPriorityDashboardPackerToUse(DashboardBase* db)
+	{
+		m_dashboardInUseLow = db;
+	}
 
-	DriverStationEnhancedIO& GetEnhancedIO() { return m_enhancedIO; }
+	DriverStationEnhancedIO& GetEnhancedIO()
+	{
+		return m_enhancedIO;
+	}
 
-	void IncrementUpdateNumber() { m_updateNumber++; }
-	MUTEX_ID GetUserStatusDataSem() { return m_statusDataSemaphore; }
+	void IncrementUpdateNumber()
+	{
+		m_updateNumber++;
+	}
+	MUTEX_ID GetUserStatusDataSem()
+	{
+		return m_statusDataSemaphore;
+	}
 
 	/** Only to be used to tell the Driver Station what code you claim to be executing
 	 *   for diagnostic purposes only
 	 * @param entering If true, starting disabled code; if false, leaving disabled code */
-	void InDisabled(bool entering) {m_userInDisabled=entering;}
+	void InDisabled(bool entering)
+	{
+		m_userInDisabled = entering;
+	}
 	/** Only to be used to tell the Driver Station what code you claim to be executing
 	 *   for diagnostic purposes only
 	 * @param entering If true, starting autonomous code; if false, leaving autonomous code */
-	void InAutonomous(bool entering) {m_userInAutonomous=entering;}
-    /** Only to be used to tell the Driver Station what code you claim to be executing
-     *   for diagnostic purposes only
-     * @param entering If true, starting teleop code; if false, leaving teleop code */
-    void InOperatorControl(bool entering) {m_userInTeleop=entering;}
-    /** Only to be used to tell the Driver Station what code you claim to be executing
-     *   for diagnostic purposes only
-     * @param entering If true, starting test code; if false, leaving test code */
-    void InTest(bool entering) {m_userInTest=entering;}
+	void InAutonomous(bool entering)
+	{
+		m_userInAutonomous = entering;
+	}
+	/** Only to be used to tell the Driver Station what code you claim to be executing
+	 *   for diagnostic purposes only
+	 * @param entering If true, starting teleop code; if false, leaving teleop code */
+	void InOperatorControl(bool entering)
+	{
+		m_userInTeleop = entering;
+	}
+	/** Only to be used to tell the Driver Station what code you claim to be executing
+	 *   for diagnostic purposes only
+	 * @param entering If true, starting test code; if false, leaving test code */
+	void InTest(bool entering)
+	{
+		m_userInTest = entering;
+	}
 
 protected:
 	DriverStation();
@@ -125,9 +167,6 @@ private:
 	double m_approxMatchTimeOffset;
 	bool m_userInDisabled;
 	bool m_userInAutonomous;
-    bool m_userInTeleop;
-    bool m_userInTest;
+	bool m_userInTeleop;
+	bool m_userInTest;
 };
-
-#endif
-

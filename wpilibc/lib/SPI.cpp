@@ -10,7 +10,7 @@
 #include "DigitalInput.h"
 #include "DigitalOutput.h"
 //#include "NetworkCommunication/UsageReporting.h"
-#include "HAL/cpp/Synchronized.h"
+#include "HAL/cpp/Synchronized.hpp"
 #include "WPIErrors.h"
 
 #include <math.h>

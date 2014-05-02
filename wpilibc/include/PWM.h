@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef PWM_H_
-#define PWM_H_
+#pragma once
 
 #include "SensorBase.h"
 #include "LiveWindow/LiveWindowSendable.h"
@@ -33,7 +31,12 @@ class PWM : public SensorBase, public ITableListener, public LiveWindowSendable
 {
 	friend class DigitalModule;
 public:
-	typedef enum {kPeriodMultiplier_1X = 1, kPeriodMultiplier_2X = 2, kPeriodMultiplier_4X = 4} PeriodMultiplier;
+	enum PeriodMultiplier
+	{
+		kPeriodMultiplier_1X = 1,
+		kPeriodMultiplier_2X = 2,
+		kPeriodMultiplier_4X = 4
+	};
 
 	explicit PWM(uint32_t channel);
 	PWM(uint8_t moduleNumber, uint32_t channel);
@@ -42,37 +45,41 @@ public:
 	virtual unsigned short GetRaw();
 	void SetPeriodMultiplier(PeriodMultiplier mult);
 	void EnableDeadbandElimination(bool eliminateDeadband);
-	void SetBounds(int32_t max, int32_t deadbandMax, int32_t center, int32_t deadbandMin, int32_t min);
+	void SetBounds(int32_t max, int32_t deadbandMax, int32_t center, int32_t deadbandMin,
+			int32_t min);
 	void SetBounds(double max, double deadbandMax, double center, double deadbandMin, double min);
-	uint32_t GetChannel() {return m_channel;}
+	uint32_t GetChannel()
+	{
+		return m_channel;
+	}
 	uint32_t GetModuleNumber();
 
 protected:
-    /**
-     * kDefaultPwmPeriod is in ms
-     *
-     * - 20ms periods (50 Hz) are the "safest" setting in that this works for all devices
-     * - 20ms periods seem to be desirable for Vex Motors
-     * - 20ms periods are the specified period for HS-322HD servos, but work reliably down
-     *      to 10.0 ms; starting at about 8.5ms, the servo sometimes hums and get hot;
-     *      by 5.0ms the hum is nearly continuous
-     * - 10ms periods work well for Victor 884
-     * - 5ms periods allows higher update rates for Luminary Micro Jaguar speed controllers.
-     *      Due to the shipping firmware on the Jaguar, we can't run the update period less
-     *      than 5.05 ms.
-     *
-     * kDefaultPwmPeriod is the 1x period (5.05 ms).  In hardware, the period scaling is implemented as an
-     * output squelch to get longer periods for old devices.
-     */
-    static constexpr float kDefaultPwmPeriod = 5.05;
-    /**
-     * kDefaultPwmCenter is the PWM range center in ms
-     */
-    static constexpr float kDefaultPwmCenter = 1.5;
-    /**
-     * kDefaultPWMStepsDown is the number of PWM steps below the centerpoint
-     */
-    static const int32_t kDefaultPwmStepsDown = 1000;
+	/**
+	 * kDefaultPwmPeriod is in ms
+	 *
+	 * - 20ms periods (50 Hz) are the "safest" setting in that this works for all devices
+	 * - 20ms periods seem to be desirable for Vex Motors
+	 * - 20ms periods are the specified period for HS-322HD servos, but work reliably down
+	 *      to 10.0 ms; starting at about 8.5ms, the servo sometimes hums and get hot;
+	 *      by 5.0ms the hum is nearly continuous
+	 * - 10ms periods work well for Victor 884
+	 * - 5ms periods allows higher update rates for Luminary Micro Jaguar speed controllers.
+	 *      Due to the shipping firmware on the Jaguar, we can't run the update period less
+	 *      than 5.05 ms.
+	 *
+	 * kDefaultPwmPeriod is the 1x period (5.05 ms).  In hardware, the period scaling is implemented as an
+	 * output squelch to get longer periods for old devices.
+	 */
+	static constexpr float kDefaultPwmPeriod = 5.05;
+	/**
+	 * kDefaultPwmCenter is the PWM range center in ms
+	 */
+	static constexpr float kDefaultPwmCenter = 1.5;
+	/**
+	 * kDefaultPWMStepsDown is the number of PWM steps below the centerpoint
+	 */
+	static const int32_t kDefaultPwmStepsDown = 1000;
 	static const int32_t kPwmDisabled = 0;
 
 	virtual void SetPosition(float pos);
@@ -94,21 +101,43 @@ protected:
 	std::string GetSmartDashboardType();
 	void InitTable(ITable *subTable);
 	ITable * GetTable();
-	
+
 	ITable *m_table;
 
 private:
 	void InitPWM(uint8_t moduleNumber, uint32_t channel);
 	uint32_t m_channel;
 	DigitalModule *m_module;
-	int32_t GetMaxPositivePwm() { return m_maxPwm; };
-	int32_t GetMinPositivePwm() { return m_eliminateDeadband ? m_deadbandMaxPwm : m_centerPwm + 1; };
-	int32_t GetCenterPwm() { return m_centerPwm; };
-	int32_t GetMaxNegativePwm() { return m_eliminateDeadband ? m_deadbandMinPwm : m_centerPwm - 1; };
-	int32_t GetMinNegativePwm() { return m_minPwm; };
-	int32_t GetPositiveScaleFactor() {return GetMaxPositivePwm() - GetMinPositivePwm();} ///< The scale for positive speeds.
-	int32_t GetNegativeScaleFactor() {return GetMaxNegativePwm() - GetMinNegativePwm();} ///< The scale for negative speeds.
-	int32_t GetFullRangeScaleFactor() {return GetMaxPositivePwm() - GetMinNegativePwm();} ///< The scale for positions.
+	int32_t GetMaxPositivePwm()
+	{
+		return m_maxPwm;
+	}
+	int32_t GetMinPositivePwm()
+	{
+		return m_eliminateDeadband ? m_deadbandMaxPwm : m_centerPwm + 1;
+	}
+	int32_t GetCenterPwm()
+	{
+		return m_centerPwm;
+	}
+	int32_t GetMaxNegativePwm()
+	{
+		return m_eliminateDeadband ? m_deadbandMinPwm : m_centerPwm - 1;
+	}
+	int32_t GetMinNegativePwm()
+	{
+		return m_minPwm;
+	}
+	int32_t GetPositiveScaleFactor()
+	{
+		return GetMaxPositivePwm() - GetMinPositivePwm();
+	} ///< The scale for positive speeds.
+	int32_t GetNegativeScaleFactor()
+	{
+		return GetMaxNegativePwm() - GetMinNegativePwm();
+	} ///< The scale for negative speeds.
+	int32_t GetFullRangeScaleFactor()
+	{
+		return GetMaxPositivePwm() - GetMinNegativePwm();
+	} ///< The scale for positions.
 };
-
-#endif

@@ -3,20 +3,19 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef SOLENOID_BASE_H_
-#define SOLENOID_BASE_H_
+#pragma once
 
 #include "Resource.h"
 #include "SensorBase.h"
-#include "HAL/HAL.h"
-#include "HAL/cpp/Synchronized.h"
+#include "HAL/HAL.hpp"
+#include "HAL/cpp/Synchronized.hpp"
 
 /**
  * SolenoidBase class is the common base class for the Solenoid and
  * DoubleSolenoid classes.
  */
-class SolenoidBase : public SensorBase {
+class SolenoidBase : public SensorBase
+{
 public:
 	virtual ~SolenoidBase();
 	uint8_t GetAll();
@@ -32,5 +31,3 @@ protected:
 private:
 	void* m_ports[kSolenoidChannels];
 };
-
-#endif

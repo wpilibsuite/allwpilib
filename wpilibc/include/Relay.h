@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef RELAY_H_
-#define RELAY_H_
+#pragma once
 
 #include "SensorBase.h"
 #include "tables/ITableListener.h"
@@ -23,10 +21,22 @@ class DigitalModule;
  * variable speed.  It also allows the two channels (forward and reverse) to be used independently
  * for something that does not care about voltage polatiry (like a solenoid).
  */
-class Relay : public SensorBase, public ITableListener, public LiveWindowSendable {
+class Relay : public SensorBase, public ITableListener, public LiveWindowSendable
+{
 public:
-	typedef enum {kOff, kOn, kForward, kReverse} Value;
-	typedef enum {kBothDirections, kForwardOnly, kReverseOnly} Direction;
+	enum Value
+	{
+		kOff,
+		kOn,
+		kForward,
+		kReverse
+	};
+	enum Direction
+	{
+		kBothDirections,
+		kForwardOnly,
+		kReverseOnly
+	};
 
 	Relay(uint32_t channel, Direction direction = kBothDirections);
 	Relay(uint8_t moduleNumber, uint32_t channel, Direction direction = kBothDirections);
@@ -34,7 +44,7 @@ public:
 
 	void Set(Value value);
 	Value Get();
-	
+
 	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
 	void UpdateTable();
 	void StartLiveWindowMode();
@@ -42,7 +52,7 @@ public:
 	std::string GetSmartDashboardType();
 	void InitTable(ITable *subTable);
 	ITable * GetTable();
-	
+
 	ITable *m_table;
 
 private:
@@ -52,5 +62,3 @@ private:
 	Direction m_direction;
 	DigitalModule *m_module;
 };
-
-#endif

@@ -9,7 +9,7 @@
 #include "Buttons/ButtonScheduler.h"
 #include "Commands/Subsystem.h"
 //#include "NetworkCommunication/UsageReporting.h"
-#include "HAL/cpp/Synchronized.h"
+#include "HAL/cpp/Synchronized.hpp"
 #include "WPIErrors.h"
 #include <iostream>
 #include <set>

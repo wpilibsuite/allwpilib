@@ -1,3 +1,4 @@
+#pragma once
 
 #ifdef __vxworks
 #include <vxWorks.h>
@@ -7,20 +8,18 @@
 #include <semaphore.h>
 #endif
 
-#ifndef HAL_SEMAPHORE_H
-#define HAL_SEMAPHORE_H
-
-extern "C" {
 #ifdef __vxworks
-	typedef SEM_ID MUTEX_ID;
-	typedef SEM_ID SEMAPHORE_ID;
-	typedef SEM_ID MULTIWAIT_ID;
+typedef SEM_ID MUTEX_ID;
+typedef SEM_ID SEMAPHORE_ID;
+typedef SEM_ID MULTIWAIT_ID;
 #else
-	typedef pthread_mutex_t* MUTEX_ID;
-	typedef sem_t* SEMAPHORE_ID;
-	typedef pthread_cond_t* MULTIWAIT_ID;
+typedef pthread_mutex_t* MUTEX_ID;
+typedef sem_t* SEMAPHORE_ID;
+typedef pthread_cond_t* MULTIWAIT_ID;
 #endif
 
+extern "C"
+{
 	extern const uint32_t SEMAPHORE_Q_FIFO;
 	extern const uint32_t SEMAPHORE_Q_PRIORITY;
 	extern const uint32_t SEMAPHORE_DELETE_SAFE;
@@ -51,4 +50,3 @@ extern "C" {
 	int8_t giveMultiWait(MULTIWAIT_ID sem);
 }
 
-#endif

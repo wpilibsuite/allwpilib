@@ -3,14 +3,12 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef __KINECT_H__
-#define __KINECT_H__
+#pragma once
 
 #include "SensorBase.h"
 #include "Skeleton.h"
 
-#include "HAL/Semaphore.h"
+#include "HAL/Semaphore.hpp"
 
 #define kNumSkeletons 1
 
@@ -24,15 +22,26 @@
 class Kinect : public SensorBase
 {
 public:
-	typedef enum {kNotTracked, kPositionOnly, kTracked} SkeletonTrackingState;
-	typedef enum {kClippedRight = 1, kClippedLeft = 2, kClippedTop = 4, kClippedBottom = 8} SkeletonQuality;
-	typedef struct
+	enum SkeletonTrackingState
+	{
+		kNotTracked,
+		kPositionOnly,
+		kTracked
+	};
+	enum SkeletonQuality
+	{
+		kClippedRight = 1,
+		kClippedLeft = 2,
+		kClippedTop = 4,
+		kClippedBottom = 8
+	};
+	struct Point4
 	{
 		float x;
 		float y;
 		float z;
 		float w;
-	} Point4;
+	};
 
 	int GetNumberOfPlayers();
 	Point4 GetFloorClipPlane();
@@ -68,6 +77,3 @@ private:
 
 	static Kinect *_instance;
 };
-
-#endif
-

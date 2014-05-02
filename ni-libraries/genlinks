@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# this file should generate symlinks (POSIX, TODO) or LD scripts (POSIX or windows) to enable standard version linking
+
+for lib in lib*.so.*; do
+	libout="${lib%.*}"
+	rm -rf $libout
+	echo "OUTPUT_FORMAT(elf32-littlearm)" > $libout
+	echo "GROUP ( $lib )" >> $libout
+	echo "Generated LD link $libout -> $lib"
+done

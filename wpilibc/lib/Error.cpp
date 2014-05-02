@@ -6,7 +6,7 @@
 
 #include "Error.h"
 
-#include "HAL/cpp/StackTrace.h"
+#include "HAL/cpp/StackTrace.hpp"
 #include <cstdio>
 #include <cstring>
 

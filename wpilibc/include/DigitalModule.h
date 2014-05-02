@@ -3,18 +3,16 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
+#pragma once
 
-#ifndef DIGITAL_MODULE_H_
-#define DIGITAL_MODULE_H_
-
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 #include "Module.h"
 
 class I2C;
 
 const uint32_t kExpectedLoopTiming = 260;
 
-class DigitalModule: public Module
+class DigitalModule : public Module
 {
 	friend class I2C;
 	friend class Module;
@@ -53,8 +51,14 @@ public:
 	I2C* GetI2C(uint32_t address);
 
 	static DigitalModule* GetInstance(uint8_t moduleNumber);
-	static uint8_t RemapDigitalChannel(uint32_t channel) { return 15 - channel; }; // TODO: Need channel validation
-	static uint8_t UnmapDigitalChannel(uint32_t channel) { return 15 - channel; }; // TODO: Need channel validation
+	static uint8_t RemapDigitalChannel(uint32_t channel)
+	{
+		return 15 - channel;
+	} // TODO: Need channel validation
+	static uint8_t UnmapDigitalChannel(uint32_t channel)
+	{
+		return 15 - channel;
+	} // TODO: Need channel validation
 
 private:
 	uint8_t m_module;
@@ -62,6 +66,3 @@ private:
 	void* m_relay_ports[kRelayChannels];
 	void* m_pwm_ports[kPwmChannels];
 };
-
-#endif
-

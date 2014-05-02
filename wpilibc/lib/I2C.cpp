@@ -7,7 +7,7 @@
 #include "I2C.h"
 #include "DigitalModule.h"
 //#include "NetworkCommunication/UsageReporting.h"
-#include "HAL/cpp/Synchronized.h"
+#include "HAL/cpp/Synchronized.hpp"
 #include "WPIErrors.h"
 
 MUTEX_ID I2C::m_semaphore = NULL;

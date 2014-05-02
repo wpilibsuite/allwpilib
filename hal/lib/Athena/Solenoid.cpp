@@ -1,10 +1,10 @@
 
-#include "HAL/Solenoid.h"
+#include "HAL/Solenoid.hpp"
 
 #include "Port.h"
-#include "HAL/Errors.h"
+#include "HAL/Errors.hpp"
 #include "ChipObject.h"
-#include "HAL/cpp/Synchronized.h"
+#include "HAL/cpp/Synchronized.hpp"
 #include "NetworkCommunication/LoadOut.h"
 
 // XXX No solenoid abstraction :(

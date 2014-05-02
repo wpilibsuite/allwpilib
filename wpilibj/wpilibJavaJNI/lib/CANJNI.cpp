@@ -1,10 +1,10 @@
 #include <jni.h>
 #include <assert.h>
-#include "Log.h"
+#include "Log.hpp"
 
 #include "edu_wpi_first_wpilibj_can_CANJNI.h"
 
-#include "HAL/CAN.h"
+#include "HAL/CAN.hpp"
 #include "NetworkCommunication/JaguarCANDriver.h"
 
 // set the logging level

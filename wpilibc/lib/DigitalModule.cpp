@@ -7,7 +7,7 @@
 #include "DigitalModule.h"
 #include "I2C.h"
 #include "PWM.h"
-#include "HAL/cpp/Synchronized.h"
+#include "HAL/cpp/Synchronized.hpp"
 #include "WPIErrors.h"
 #include <math.h>
 

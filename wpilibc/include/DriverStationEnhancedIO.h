@@ -3,17 +3,14 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef __DRIVER_STATION_ENHANCED_IO_H__
-#define __DRIVER_STATION_ENHANCED_IO_H__
+#pragma once
 
 #include "ErrorBase.h"
-//#include "NetworkCommunication/FRCComm.h"
 #include <stack>
 #include <vector>
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 
-#include "HAL/Semaphore.h"
+#include "HAL/Semaphore.hpp"
 
 #define kAnalogInputResolution ((double)((1<<14)-1))
 #define kAnalogInputReference 3.3
@@ -148,6 +145,3 @@ private:
 	bool m_requestEnhancedEnable;
 	int16_t m_encoderOffsets[2];
 };
-
-#endif
-

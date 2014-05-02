@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef __HiTechnicColorSensor_h__
-#define __HiTechnicColorSensor_h__
+#pragma once
 
 #include "SensorBase.h"
 #include "LiveWindow/LiveWindowSendable.h"
@@ -26,12 +24,18 @@ class I2C;
 class HiTechnicColorSensor : public SensorBase
 {
 public:
-	enum tColorMode {kActive = 0, kPassive = 1, kRaw = 3};
-	typedef struct{
+	enum tColorMode
+	{
+		kActive = 0,
+		kPassive = 1,
+		kRaw = 3
+	};
+	struct RGB
+	{
 		uint16_t red;
 		uint16_t blue;
 		uint16_t green;
-	}RGB;
+	};
 	explicit HiTechnicColorSensor(uint8_t moduleNumber);
 	virtual ~HiTechnicColorSensor();
 	uint8_t GetColor();
@@ -44,15 +48,14 @@ public:
 	uint16_t GetRawBlue();
 	RGB GetRawRGB();
 	void SetMode(tColorMode mode);
-	
-	
+
 	//LiveWindowSendable interface
 	virtual std::string GetType();
 	virtual void InitTable(ITable *subtable);
 	virtual void UpdateTable();
 	virtual ITable* GetTable();
 	virtual void StartLiveWindowMode();
-	virtual void StopLiveWindowMode(); 
+	virtual void StopLiveWindowMode();
 
 private:
 	static const uint8_t kAddress = 0x02;
@@ -68,11 +71,8 @@ private:
 	static const uint8_t kRawRedRegister = 0x43;
 	static const uint8_t kRawGreenRegister = 0x45;
 	static const uint8_t kRawBlueRegister = 0x47;
-	
+
 	int m_mode;
 	I2C* m_i2c;
 	ITable *m_table;
 };
-
-#endif
-

@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef DIGITAL_OUTPUT_H_
-#define DIGITAL_OUTPUT_H_
+#pragma once
 
 #include "DigitalSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
@@ -41,7 +39,7 @@ public:
 	virtual void RequestInterrupts();
 
 	void SetUpSourceEdge(bool risingEdge, bool fallingEdge);
-	
+
 	virtual void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
 	void UpdateTable();
 	void StartLiveWindowMode();
@@ -56,8 +54,6 @@ private:
 	uint32_t m_channel;
 	uint32_t m_pwmGenerator;
 	DigitalModule *m_module;
-	
+
 	ITable *m_table;
 };
-
-#endif

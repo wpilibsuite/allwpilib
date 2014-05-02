@@ -1,6 +1,4 @@
-
-#ifndef HAL_ERRORS_H
-#define HAL_ERRORS_H
+#pragma once
 
 #define SAMPLE_RATE_TOO_HIGH 1
 #define SAMPLE_RATE_TOO_HIGH_MESSAGE "Analog module sample rate is too high"
@@ -26,5 +24,3 @@
 #define ANALOG_TRIGGER_PULSE_OUTPUT_ERROR_MESSAGE "Attempted to read AnalogTrigger pulse output."
 #define PARAMETER_OUT_OF_RANGE -28
 #define PARAMETER_OUT_OF_RANGE_MESSAGE "A parameter is out of range."
-
-#endif

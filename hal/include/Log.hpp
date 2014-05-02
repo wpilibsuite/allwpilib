@@ -1,5 +1,4 @@
-#ifndef __LOG_H__
-#define __LOG_H__
+#pragma once
 
 #include <sstream>
 #include <iomanip>
@@ -102,5 +101,3 @@ inline std::string NowTime()
     sprintf(result, "%s.%03ld", buffer, (long)tv.tv_usec / 1000);
     return result;
 }
-
-#endif //__LOG_H__

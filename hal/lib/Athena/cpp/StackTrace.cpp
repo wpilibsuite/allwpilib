@@ -1,7 +1,7 @@
 
-#include "HAL/cpp/StackTrace.h"
+#include "HAL/cpp/StackTrace.hpp"
 
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 #include "../ChipObject.h"
 #include <stdio.h>
 

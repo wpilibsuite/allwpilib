@@ -83,6 +83,7 @@ private:
 	std::exception& e;
 	char msg[100];
 public:
+	virtual ~ClientConnectionState_Error(){}
 	/**
 	 * Create a new error state
 	 * @param e

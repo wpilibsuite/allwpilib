@@ -3,23 +3,24 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
+#pragma once
 
-#ifndef GENERIC_HID_H
-#define GENERIC_HID_H
-
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 
 /** GenericHID Interface
  */
 class GenericHID
 {
 public:
-	typedef enum {
+	enum JoystickHand
+	{
 		kLeftHand = 0,
 		kRightHand = 1
-	} JoystickHand;
+	};
 
-	virtual ~GenericHID() {}
+	virtual ~GenericHID()
+	{
+	}
 
 	virtual float GetX(JoystickHand hand = kRightHand) = 0;
 	virtual float GetY(JoystickHand hand = kRightHand) = 0;
@@ -33,6 +34,3 @@ public:
 	virtual bool GetBumper(JoystickHand hand = kRightHand) = 0;
 	virtual bool GetRawButton(uint32_t button) = 0;
 };
-
-#endif
-

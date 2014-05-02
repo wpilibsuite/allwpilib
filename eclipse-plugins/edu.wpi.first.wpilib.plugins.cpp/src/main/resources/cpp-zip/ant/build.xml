@@ -30,14 +30,13 @@
   </target>
   
   <target name="deploy" depends="get-target-ip" description="Deploy the progam and start it running.">
-    <echo>[athena-deploy] Killing running program</echo>
     <sshexec host="${target}"
-             username="${username}"
-             password="${password}"
-             trust="true"
-             command="killall FRCUserProgram; sleep 1"/>
+	     username="${username}"
+	     password="${password}"
+	     trust="true"
+	     command="rm ${deploy.dir}/FRCUserProgram" />
     <echo>[athena-deploy] Copying code over.</echo>
-    <scp file="${out.exe}" todir="${username}@${target}:${deploy.dir}"
+    <scp file="${out.exe}" sftp="true" todir="${username}@${target}:${deploy.dir}"
 	 password="${password}" trust="true"/>
     <sshexec host="${target}"
 	     username="${username}"
@@ -119,14 +118,12 @@ ${md5.hal} usr/local/frc/lib/libHALAthena.so</echo>
 				 command="opkg install /tmp/${opkg.name}_${cpp-sos}_${opkg.arch}.deb; sh -c 'rm -rf /tmp/wpilib*.deb'"/>
 		</else>
 	</if>
-    <scp file="${wpilib.ant.dir}/runcppprogram" todir="${username}@${target}:${deploy.dir}"
-	 password="${password}" trust="true"/>
     <echo>[athena-deploy] Starting program.</echo>
     <sshexec host="${target}"
 	     username="${username}"
 	     password="${password}"
 	     trust="true"
-	     command="chmod a+x run*program; ${deploy.run.command}"/>
+	     command="chmod +x ${deploy.dir}/FRCUserProgram; ${deploy.dir}/FRCUserProgram"/>
   </target>
 
   <target name="debug-deploy" depends="get-target-ip" description="Deploy the jar and start the program running in debug mode.">

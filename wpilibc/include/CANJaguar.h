@@ -3,18 +3,15 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-
-#ifndef CANJAGUAR_H
-#define CANJAGUAR_H
+#pragma once
 
 #include "ErrorBase.h"
 #include "MotorSafety.h"
 #include "MotorSafetyHelper.h"
 #include "PIDOutput.h"
 #include "SpeedController.h"
-#include "HAL/Semaphore.h"
-#include "HAL/HAL.h"
+#include "HAL/Semaphore.hpp"
+#include "HAL/HAL.hpp"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITable.h"
 
@@ -135,5 +132,3 @@ protected:
 private:
 	void InitCANJaguar();
 };
-#endif
-

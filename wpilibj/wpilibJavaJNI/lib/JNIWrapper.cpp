@@ -1,10 +1,10 @@
 #include <jni.h>
 #include <assert.h>
-#include "Log.h"
+#include "Log.hpp"
 
 #include "edu_wpi_first_wpilibj_hal_JNIWrapper.h"
 
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_JNIWrapper

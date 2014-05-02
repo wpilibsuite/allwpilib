@@ -3,16 +3,13 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef __DASHBOARD_H__
-#define __DASHBOARD_H__
+#pragma once
 
 #include "DashboardBase.h"
-//#include "NetworkCommunication/FRCComm.h"
 #include <stack>
 #include <vector>
-#include "HAL/HAL.h"
-#include "HAL/Semaphore.h"
+#include "HAL/HAL.hpp"
+#include "HAL/Semaphore.hpp"
 
 /**
  * Pack data into the "user data" field that gets sent to the dashboard laptop
@@ -71,6 +68,3 @@ private:
 	MUTEX_ID m_printSemaphore;
 	MUTEX_ID m_statusDataSemaphore;
 };
-
-#endif
-

@@ -3,12 +3,10 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef __DRIVER_STATION_LCD_H__
-#define __DRIVER_STATION_LCD_H__
+#pragma once
 
 #include "SensorBase.h"
-#include "HAL/Semaphore.h"
+#include "HAL/Semaphore.hpp"
 #include <stdarg.h>
 
 /**
@@ -25,7 +23,16 @@ public:
 	static const uint16_t kFullDisplayTextCommand = 0x9FFF;
 	static const int32_t kLineLength = 21;
 	static const int32_t kNumLines = 6;
-	enum Line {kMain_Line6=0, kUser_Line1=0, kUser_Line2=1, kUser_Line3=2, kUser_Line4=3, kUser_Line5=4, kUser_Line6=5};
+	enum Line
+	{
+		kMain_Line6 = 0,
+		kUser_Line1 = 0,
+		kUser_Line2 = 1,
+		kUser_Line3 = 2,
+		kUser_Line4 = 3,
+		kUser_Line5 = 4,
+		kUser_Line6 = 5
+	};
 
 	virtual ~DriverStationLCD();
 	static DriverStationLCD *GetInstance();
@@ -35,7 +42,7 @@ public:
 	void VPrintf(Line line, int32_t startingColumn, const char *writeFmt, va_list args);
 	void PrintfLine(Line line, const char *writeFmt, ...);
 	void VPrintfLine(Line line, const char *writeFmt, va_list args);
- 
+
 	void Clear();
 
 protected:
@@ -44,11 +51,8 @@ protected:
 private:
 	static void InitTask(DriverStationLCD *ds);
 	static DriverStationLCD *m_instance;
-	DISALLOW_COPY_AND_ASSIGN(DriverStationLCD);
 
+	DISALLOW_COPY_AND_ASSIGN(DriverStationLCD);
 	char *m_textBuffer;
 	MUTEX_ID m_textBufferSemaphore;
 };
-
-#endif
-

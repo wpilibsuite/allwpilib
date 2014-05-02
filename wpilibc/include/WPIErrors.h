@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef __WPI_ERRORS_H__
-#define __WPI_ERRORS_H__
+#pragma once
 
 #ifdef WPI_ERRORS_DEFINE_STRINGS
 #define S(label, offset, message) const char *wpi_error_s_##label = message ;
@@ -75,4 +73,3 @@ S(IncompatibleState, 15, "Incompatible State: The operation cannot be completed"
 
 #undef S
 
-#endif // __WPI_ERRORS_H__

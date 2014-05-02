@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef __SAFE_PWM__
-#define __SAFE_PWM__
+#pragma once
 
 #include "MotorSafety.h"
 #include "PWM.h"
@@ -19,7 +17,7 @@ class MotorSafetyHelper;
  * This delegates the actual work to a MotorSafetyHelper object that is used for all
  * objects that implement MotorSafety.
  */
-class SafePWM: public PWM, public MotorSafety
+class SafePWM : public PWM, public MotorSafety
 {
 public:
 	explicit SafePWM(uint32_t channel);
@@ -39,5 +37,3 @@ private:
 	void InitSafePWM();
 	MotorSafetyHelper *m_safetyHelper;
 };
-
-#endif

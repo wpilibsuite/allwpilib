@@ -3,11 +3,9 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
+#pragma once
 
-#ifndef ANALOG_CHANNEL_H_
-#define ANALOG_CHANNEL_H_
-
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 #include "SensorBase.h"
 #include "PIDSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
@@ -65,9 +63,9 @@ public:
 	int64_t GetAccumulatorValue();
 	uint32_t GetAccumulatorCount();
 	void GetAccumulatorOutput(int64_t *value, uint32_t *count);
-	
+
 	double PIDGet();
-	
+
 	void UpdateTable();
 	void StartLiveWindowMode();
 	void StopLiveWindowMode();
@@ -80,8 +78,6 @@ private:
 	uint32_t m_channel, m_module;
 	void* m_port;
 	int64_t m_accumulatorOffset;
-	
+
 	ITable *m_table;
 };
-
-#endif

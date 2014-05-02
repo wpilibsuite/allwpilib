@@ -3,14 +3,12 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef __PREFERENCES_H__
-#define __PREFERENCES_H__
+#pragma once
 
 #include "ErrorBase.h"
 #include "Task.h"
 #include <map>
-#include "HAL/Semaphore.h"
+#include "HAL/Semaphore.hpp"
 #include <string>
 #include <vector>
 #include "tables/ITableListener.h"
@@ -53,7 +51,7 @@ public:
 	void Save();
 	bool ContainsKey(const char *key);
 	void Remove(const char *key);
-	
+
 	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
 
 protected:
@@ -67,8 +65,16 @@ private:
 	void ReadTaskRun();
 	void WriteTaskRun();
 
-	static int InitReadTask(Preferences *obj) {obj->ReadTaskRun();return 0;}
-	static int InitWriteTask(Preferences *obj) {obj->WriteTaskRun();return 0;}
+	static int InitReadTask(Preferences *obj)
+	{
+		obj->ReadTaskRun();
+		return 0;
+	}
+	static int InitWriteTask(Preferences *obj)
+	{
+		obj->WriteTaskRun();
+		return 0;
+	}
 
 	static Preferences *_instance;
 
@@ -90,5 +96,3 @@ private:
 	Task m_readTask;
 	Task m_writeTask;
 };
-
-#endif

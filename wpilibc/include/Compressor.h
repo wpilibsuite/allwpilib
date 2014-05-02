@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef COMPRESSOR_H_
-#define COMPRESSOR_H_
+#pragma once
 
 #define COMPRESSOR_PRIORITY 90
 
@@ -22,8 +20,8 @@ class DigitalInput;
  * relay for a FIRST robot pneumatics system. The Compressor object starts a task which runs in the
  * backround and periodically polls the pressure sensor and operates the relay that controls the
  * compressor.
- */ 
-class Compressor: public SensorBase, public LiveWindowSendable
+ */
+class Compressor : public SensorBase, public LiveWindowSendable
 {
 public:
 	Compressor(uint32_t pressureSwitchChannel, uint32_t compressorRelayChannel);
@@ -36,7 +34,7 @@ public:
 	bool Enabled();
 	uint32_t GetPressureSwitchValue();
 	void SetRelayValue(Relay::Value relayValue);
-	
+
 	void UpdateTable();
 	void StartLiveWindowMode();
 	void StopLiveWindowMode();
@@ -46,15 +44,12 @@ public:
 
 private:
 	void InitCompressor(uint8_t pressureSwitchModuleNumber, uint32_t pressureSwitchChannel,
-				uint8_t compresssorRelayModuleNumber, uint32_t compressorRelayChannel);
+			uint8_t compresssorRelayModuleNumber, uint32_t compressorRelayChannel);
 
 	DigitalInput *m_pressureSwitch;
 	Relay *m_relay;
 	bool m_enabled;
 	Task m_task;
-	
+
 	ITable *m_table;
 };
-
-#endif
-

@@ -6,7 +6,7 @@
 
 #include "DriverStation.h"
 #include "AnalogChannel.h"
-#include "HAL/cpp/Synchronized.h"
+#include "HAL/cpp/Synchronized.hpp"
 #include "Timer.h"
 //#include "NetworkCommunication/FRCComm.h"
 //#include "NetworkCommunication/UsageReporting.h"
@@ -14,7 +14,7 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 #include <string.h>
-#include "Log.h"
+#include "Log.hpp"
 
 // set the logging level
 TLogLevel dsLogLevel = logDEBUG;

@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef SERVO_H
-#define SERVO_H
+#pragma once
 
 #include "SafePWM.h"
 #include "SpeedController.h"
@@ -27,9 +25,15 @@ public:
 	float Get();
 	void SetAngle(float angle);
 	float GetAngle();
-	static float GetMaxAngle() { return kMaxServoAngle; };
-	static float GetMinAngle() { return kMinServoAngle; };
-	
+	static float GetMaxAngle()
+	{
+		return kMaxServoAngle;
+	}
+	static float GetMinAngle()
+	{
+		return kMinServoAngle;
+	}
+
 	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
 	void UpdateTable();
 	void StartLiveWindowMode();
@@ -37,16 +41,16 @@ public:
 	std::string GetSmartDashboardType();
 	void InitTable(ITable *subTable);
 	ITable * GetTable();
-	
+
 	ITable *m_table;
 
 private:
 	void InitServo();
-	float GetServoAngleRange() {return kMaxServoAngle - kMinServoAngle;}
+	float GetServoAngleRange()
+	{
+		return kMaxServoAngle - kMinServoAngle;
+	}
 
 	static constexpr float kMaxServoAngle = 170.0;
 	static constexpr float kMinServoAngle = 0.0;
 };
-
-#endif
-

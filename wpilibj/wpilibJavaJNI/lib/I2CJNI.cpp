@@ -1,6 +1,6 @@
 #include <jni.h>
 #include <assert.h>
-#include "Log.h"
+#include "Log.hpp"
 
 #include "edu_wpi_first_wpilibj_hal_I2CJNI.h"
 

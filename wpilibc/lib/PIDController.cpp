@@ -10,7 +10,7 @@
 #include "PIDSource.h"
 #include "PIDOutput.h"
 #include <math.h>
-#include "HAL/cpp/Synchronized.h"
+#include "HAL/cpp/Synchronized.hpp"
 
 static const char *kP = "p";
 static const char *kI = "i";

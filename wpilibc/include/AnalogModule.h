@@ -3,11 +3,9 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
+#pragma once
 
-#ifndef ANALOG_MODULE_H_
-#define ANALOG_MODULE_H_
-
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 #include "Module.h"
 
 /**
@@ -17,9 +15,9 @@
  * The accumulator is attached to the output of the oversample and average engine so that the center
  * value can be specified in higher resolution resulting in less error.
  */
-class AnalogModule: public Module
-{ 
-    friend class Module;
+class AnalogModule : public Module
+{
+	friend class Module;
 
 public:
 	static const long kTimebase = 40000000; ///< 40 MHz clock
@@ -52,5 +50,3 @@ private:
 	uint8_t m_moduleNumber;
 	void* m_ports[kAnalogChannels];
 };
-
-#endif

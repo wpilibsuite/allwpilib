@@ -4,8 +4,8 @@
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/cpp/Synchronized.h"
-#include "HAL/Semaphore.h"
+#include "HAL/cpp/Synchronized.hpp"
+#include "HAL/Semaphore.hpp"
 
 /**
  * Synchronized class deals with critical regions.

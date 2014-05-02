@@ -12,7 +12,7 @@
 //#include "NetworkCommunication/UsageReporting.h"
 #include "Utility.h"
 #include <cstring>
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 
 #ifdef __vxworks
 // VXWorks needs som special unloading code

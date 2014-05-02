@@ -138,8 +138,8 @@
                   <type>zip</type>
                 </artifact>
                 <artifact>
-                  <file>${project.build.directory}/cmake/target-root/lib/libHALAthena.so</file>
-                  <type>so</type>
+                  <file>${project.build.directory}/cmake/target-root/lib/libHALAthena.a</file>
+                  <type>a</type>
                 </artifact>
               </artifacts>
             </configuration>

@@ -1,10 +1,10 @@
 #include <jni.h>
 #include <assert.h>
-#include "Log.h"
+#include "Log.hpp"
 
 #include "edu_wpi_first_wpilibj_hal_AnalogJNI.h"
 
-#include "HAL/Analog.h"
+#include "HAL/Analog.hpp"
 
 // set the logging level
 TLogLevel analogJNILogLevel = logWARNING;

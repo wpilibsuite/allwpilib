@@ -3,11 +3,9 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
+#pragma once
 
-#ifndef QUAD_ENCODER_H_
-#define QUAD_ENCODER_H_
-
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 #include "CounterBase.h"
 #include "SensorBase.h"
 #include "Counter.h"
@@ -25,14 +23,18 @@ class DigitalSource;
  * generates negative values. Quadrature encoders have two digital outputs, an A Channel and a B Channel
  * that are out of phase with each other to allow the FPGA to do direction sensing. 
  */
-class Encoder: public SensorBase, public CounterBase, public PIDSource, public LiveWindowSendable
+class Encoder : public SensorBase, public CounterBase, public PIDSource, public LiveWindowSendable
 {
 public:
 
-	Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection=false, EncodingType encodingType = k4X);
-	Encoder(uint8_t aModuleNumber, uint32_t aChannel, uint8_t bModuleNumber, uint32_t _bChannel, bool reverseDirection=false, EncodingType encodingType = k4X);
-	Encoder(DigitalSource *aSource, DigitalSource *bSource, bool reverseDirection=false, EncodingType encodingType = k4X);
-	Encoder(DigitalSource &aSource, DigitalSource &bSource, bool reverseDirection=false, EncodingType encodingType = k4X);
+	Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection = false,
+			EncodingType encodingType = k4X);
+	Encoder(uint8_t aModuleNumber, uint32_t aChannel, uint8_t bModuleNumber, uint32_t _bChannel,
+			bool reverseDirection = false, EncodingType encodingType = k4X);
+	Encoder(DigitalSource *aSource, DigitalSource *bSource, bool reverseDirection = false,
+			EncodingType encodingType = k4X);
+	Encoder(DigitalSource &aSource, DigitalSource &bSource, bool reverseDirection = false,
+			EncodingType encodingType = k4X);
 	virtual ~Encoder();
 
 	// CounterBase interface
@@ -54,7 +56,7 @@ public:
 	int GetSamplesToAverage();
 	void SetPIDSourceParameter(PIDSourceParameter pidSource);
 	double PIDGet();
-	
+
 	void UpdateTable();
 	void StartLiveWindowMode();
 	void StopLiveWindowMode();
@@ -74,10 +76,7 @@ private:
 	double m_distancePerPulse;		// distance of travel for each encoder tick
 	Counter *m_counter;				// Counter object for 1x and 2x encoding
 	EncodingType m_encodingType;	// Encoding type
-	PIDSourceParameter m_pidSource;// Encoder parameter that sources a PID controller
+	PIDSourceParameter m_pidSource;	// Encoder parameter that sources a PID controller
 	
 	ITable *m_table;
 };
-
-#endif
-

@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef GEAR_TOOTH_H_
-#define GEAR_TOOTH_H_
+#pragma once
 
 #include "Counter.h"
 
@@ -26,9 +24,6 @@ public:
 	GearTooth(DigitalSource &source, bool directionSensitive = false);
 	virtual ~GearTooth();
 	void EnableDirectionSensing(bool directionSensitive);
-	
+
 	virtual std::string GetSmartDashboardType();
 };
-
-
-#endif

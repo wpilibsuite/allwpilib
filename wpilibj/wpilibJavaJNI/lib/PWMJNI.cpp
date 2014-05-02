@@ -1,10 +1,10 @@
 #include <jni.h>
 #include <assert.h>
-#include "Log.h"
+#include "Log.hpp"
 
 #include "edu_wpi_first_wpilibj_hal_PWMJNI.h"
 
-#include "HAL/Digital.h"
+#include "HAL/Digital.hpp"
 
 // set the logging level
 TLogLevel pwmJNILogLevel = logERROR;

@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef __ChipObject_h__
-#define __ChipObject_h__
+#pragma once
 
 #include <stdint.h>
 #include "ChipObject/RoboRIO_FRC_ChipObject_Aliases.h"
@@ -34,6 +32,6 @@
 #include "ChipObject/tSPI.h"
 #include "ChipObject/tSysWatchdog.h"
 
+// FIXME: these should not be here!
 using namespace nFPGA;
 using namespace nRoboRIO_FPGANamespace;
-#endif

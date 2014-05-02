@@ -7,7 +7,7 @@
 #include "Preferences.h"
 
 //#include "NetworkCommunication/UsageReporting.h"
-#include "HAL/cpp/Synchronized.h"
+#include "HAL/cpp/Synchronized.hpp"
 #include "WPIErrors.h"
 
 #include <stdio.h>

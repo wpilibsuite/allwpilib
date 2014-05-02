@@ -7,8 +7,8 @@
 #include "Utility.h"
 
 //#include "NetworkCommunication/FRCComm.h"
-#include "HAL/HAL.h"
-#include "HAL/cpp/StackTrace.h"
+#include "HAL/HAL.hpp"
+#include "HAL/cpp/StackTrace.hpp"
 #include "Task.h"
 #include <stdio.h>
 #include <string.h>

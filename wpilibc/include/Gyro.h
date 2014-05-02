@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef GYRO_H_
-#define GYRO_H_
+#pragma once
 
 #include "SensorBase.h"
 #include "PIDSource.h"
@@ -46,7 +44,7 @@ public:
 
 	// PIDSource interface
 	double PIDGet();
-	
+
 	void UpdateTable();
 	void StartLiveWindowMode();
 	void StopLiveWindowMode();
@@ -63,7 +61,6 @@ private:
 	bool m_channelAllocated;
 	uint32_t m_center;
 	PIDSourceParameter m_pidSource;
-	
+
 	ITable *m_table;
 };
-#endif

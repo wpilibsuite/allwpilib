@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef WPILIB_H_
-#define WPILIB_H_
+#pragma once
 
 #include "string.h"
 #include <iostream>
@@ -78,7 +76,7 @@
 #include "Solenoid.h"
 #include "SpeedController.h"
 #include "SPI.h"
-#include "HAL/cpp/Synchronized.h"
+#include "HAL/cpp/Synchronized.hpp"
 #include "Talon.h"
 #include "Task.h"
 #include "Timer.h"
@@ -88,4 +86,3 @@
 // XXX: #include "Vision/AxisCamera.h"
 #include "WPIErrors.h"
 
-#endif /*WPILIB_H_*/

@@ -1,12 +1,12 @@
 
-#include "HAL/Analog.h"
+#include "HAL/Analog.hpp"
 
 #include "Port.h"
-#include "HAL/Errors.h"
-#include "HAL/Semaphore.h"
+#include "HAL/Errors.hpp"
+#include "HAL/Semaphore.hpp"
 #include "ChipObject.h"
-#include "HAL/cpp/Synchronized.h"
-#include "HAL/cpp/Resource.h"
+#include "HAL/cpp/Synchronized.hpp"
+#include "HAL/cpp/Resource.hpp"
 #include "NetworkCommunication/AICalibration.h"
 #include "NetworkCommunication/LoadOut.h"
 
@@ -19,11 +19,10 @@ static const uint32_t kAnalogPins = 8;
 static const uint32_t kAccumulatorNumChannels = 2;
 static const uint32_t kAccumulatorChannels[] = {1, 2};
 
-struct analog_port_t {
+struct AnalogPort {
   Port port;
   tAccumulator *accumulator;
 };
-typedef struct analog_port_t AnalogPort;
 
 bool analogSampleRateSet = false;
 MUTEX_ID analogRegisterWindowSemaphore = NULL;

@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef __ADXL345_SPI_h__
-#define __ADXL345_SPI_h__
+#pragma once
 
 #include "SensorBase.h"
 
@@ -62,6 +60,3 @@ protected:
 	DigitalOutput *m_cs;
 	SPI* m_spi;
 };
-
-#endif
-

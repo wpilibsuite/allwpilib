@@ -1,8 +1,8 @@
 #include <jni.h>
 #include <assert.h>
-#include "Log.h"
+#include "Log.hpp"
 #include "edu_wpi_first_wpilibj_hal_HALUtil.h"
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 
 // set the logging level
 TLogLevel halUtilLogLevel = logDEBUG;

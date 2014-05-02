@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef ACCELEROMETER_H_
-#define ACCELEROMETER_H_
+#pragma once
 
 #include "AnalogChannel.h"
 #include "SensorBase.h"
@@ -47,5 +45,3 @@ private:
 	
 	ITable *m_table;
 };
-
-#endif

@@ -3,12 +3,10 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef __TASK_H__
-#define __TASK_H__
+#pragma once
 
 #include "ErrorBase.h"
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 
 /**
  * WPI task is a wrapper for the native Task object.
@@ -19,11 +17,13 @@ class Task : public ErrorBase
 public:
 	static const uint32_t kDefaultPriority = 101;
 
-	Task(const char* name, FUNCPTR function, int32_t priority = kDefaultPriority, uint32_t stackSize = 20000);
+	Task(const char* name, FUNCPTR function, int32_t priority = kDefaultPriority,
+			uint32_t stackSize = 20000);
 	virtual ~Task();
 
-	bool Start(uint32_t arg0 = 0, uint32_t arg1 = 0, uint32_t arg2 = 0, uint32_t arg3 = 0, uint32_t arg4 = 0, 
-			uint32_t arg5 = 0, uint32_t arg6 = 0, uint32_t arg7 = 0, uint32_t arg8 = 0, uint32_t arg9 = 0);
+	bool Start(uint32_t arg0 = 0, uint32_t arg1 = 0, uint32_t arg2 = 0, uint32_t arg3 = 0,
+			uint32_t arg4 = 0, uint32_t arg5 = 0, uint32_t arg6 = 0, uint32_t arg7 = 0,
+			uint32_t arg8 = 0, uint32_t arg9 = 0);
 	bool Restart();
 	bool Stop();
 
@@ -50,4 +50,3 @@ private:
 	DISALLOW_COPY_AND_ASSIGN(Task);
 };
 
-#endif // __TASK_H__

@@ -3,11 +3,9 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
+#pragma once
 
-#ifndef CONTROLLER_H
-#define CONTROLLER_H
-
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 
 /**
  * Interface for Controllers
@@ -30,6 +28,3 @@ public:
 	 */
 	virtual void Disable() = 0;
 };
-
-#endif
-

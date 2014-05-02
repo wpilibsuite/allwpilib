@@ -3,18 +3,16 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
+#pragma once
 
-#ifndef ANALOG_TRIGGER_H_
-#define ANALOG_TRIGGER_H_
-
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 #include "AnalogTriggerOutput.h"
 #include "SensorBase.h"
 
 class AnalogChannel;
 class AnalogModule;
 
-class AnalogTrigger: public SensorBase
+class AnalogTrigger : public SensorBase
 {
 	friend class AnalogTriggerOutput;
 public:
@@ -38,6 +36,3 @@ private:
 	uint8_t m_index;
 	void* m_trigger;
 };
-
-#endif
-

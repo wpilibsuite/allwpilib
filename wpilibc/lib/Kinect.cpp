@@ -10,7 +10,7 @@
 //#include "NetworkCommunication/FRCComm.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "Skeleton.h"
-#include "HAL/cpp/Synchronized.h"
+#include "HAL/cpp/Synchronized.hpp"
 #include "WPIErrors.h"
 #include <cstring>
 

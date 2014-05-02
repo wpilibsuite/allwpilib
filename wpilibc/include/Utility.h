@@ -3,11 +3,9 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code  */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib. */
 /*---------------------------------------------------------------------------*/
+#pragma once
 
-#include "HAL/HAL.h"
-
-#ifndef UTILITY_H_
-#define UTILITY_H_
+#include "HAL/HAL.hpp"
 
 #define wpi_assert(condition) wpi_assert_impl(condition, #condition, NULL, __FILE__, __LINE__, __FUNCTION__)
 #define wpi_assertWithMessage(condition, message) wpi_assert_impl(condition, #condition, message, __FILE__, __LINE__, __FUNCTION__)
@@ -36,4 +34,3 @@ void SetRIO_FPGA_LED(uint32_t state);
 int32_t GetRIO_FPGA_LED();
 int32_t ToggleRIO_FPGA_LED();
 
-#endif // UTILITY_H_

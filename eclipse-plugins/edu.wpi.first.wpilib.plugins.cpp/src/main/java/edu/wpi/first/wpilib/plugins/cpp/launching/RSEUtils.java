@@ -2,6 +2,9 @@ package edu.wpi.first.wpilib.plugins.cpp.launching;
 
 import java.util.Arrays;
 
+import org.eclipse.cdt.debug.core.ICDTLaunchConfigurationConstants;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.rse.core.IRSESystemType;
 import org.eclipse.rse.core.PasswordPersistenceManager;
 import org.eclipse.rse.core.RSECorePlugin;
@@ -15,7 +18,7 @@ public class RSEUtils {
 	public static IHost getTarget(int teamNumber) {
 		// The ip address based on the team number
         String hostName = "10."+(teamNumber/100)+"."+(teamNumber%100)+".2";
-        String connectionName = "Team "+teamNumber;
+        String connectionName = hostName; //"Team "+teamNumber;
    
         // get the singleton RSE registry
         try {
@@ -42,7 +45,7 @@ public class RSEUtils {
             			"The remote target for debugging the robot for team "+teamNumber+".");
             	host.setDefaultUserId("admin");
             	SystemSignonInformation info = new SystemSignonInformation(hostName, "admin",
-            			"XX", systemType);
+            			"", systemType);
     			PasswordPersistenceManager.getInstance().add(info, true, false);
             } catch (Exception e) {
                 e.printStackTrace();

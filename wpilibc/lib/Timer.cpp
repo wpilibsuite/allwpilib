@@ -8,8 +8,8 @@
 
 #include <time.h>
 
-#include "HAL/HAL.h"
-#include "HAL/cpp/Synchronized.h"
+#include "HAL/HAL.hpp"
+#include "HAL/cpp/Synchronized.hpp"
 #include "Utility.h"
 
 /**

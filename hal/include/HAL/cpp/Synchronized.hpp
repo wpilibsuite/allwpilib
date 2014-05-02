@@ -3,11 +3,9 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
+#pragma once
 
-#ifndef SYNCHRONIZED_H
-#define SYNCHRONIZED_H
-
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 
 // A macro to disallow the copy constructor and operator= functions
 // This should be used in the private: declarations for a class
@@ -17,6 +15,8 @@
 
 #define CRITICAL_REGION(s) { Synchronized _sync(s);
 #define END_REGION }
+// TODO: is this Better?
+#define SYNCHRONIZE(s) for (Synchronized _sync(s), int _i=0;i < 1; i++)
 
 class Synchronized;
 
@@ -35,10 +35,12 @@ class Synchronized;
 class ReentrantSemaphore
 {
 public:
-	explicit ReentrantSemaphore() {
+	explicit ReentrantSemaphore()
+	{
 		m_semaphore = initializeMutexRecursive();
 	}
-	~ReentrantSemaphore() {
+	~ReentrantSemaphore()
+	{
 		deleteMutex(m_semaphore);
 	}
 
@@ -46,7 +48,8 @@ public:
 	 * Lock the semaphore, blocking until it's available.
 	 * @return 0 for success, -1 for error. If -1, the error will be in errno.
 	 */
-	int take() {
+	int take()
+	{
 		return takeMutex(m_semaphore);
 	}
 
@@ -54,15 +57,15 @@ public:
 	 * Unlock the semaphore.
 	 * @return 0 for success, -1 for error. If -1, the error will be in errno.
 	 */
-	int give() {
+	int give()
+	{
 		return giveMutex(m_semaphore);
 	}
 
 private:
 	MUTEX_ID m_semaphore;
 
-	friend class Synchronized;
-	DISALLOW_COPY_AND_ASSIGN(ReentrantSemaphore);
+	friend class Synchronized;DISALLOW_COPY_AND_ASSIGN(ReentrantSemaphore);
 };
 
 /**
@@ -99,4 +102,3 @@ private:
 	DISALLOW_COPY_AND_ASSIGN(Synchronized);
 };
 
-#endif

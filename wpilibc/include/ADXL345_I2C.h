@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef __ADXL345_I2C_h__
-#define __ADXL345_I2C_h__
+#pragma once
 
 #include "SensorBase.h"
 
@@ -48,6 +46,3 @@ public:
 protected:
 	I2C* m_i2c;
 };
-
-#endif
-

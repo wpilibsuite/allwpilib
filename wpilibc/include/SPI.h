@@ -3,11 +3,9 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
+#pragma once
 
-#ifndef __SPI_H__
-#define __SPI_H__
-
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 #include "SensorBase.h"
 
 class DigitalOutput;
@@ -42,9 +40,9 @@ public:
 	void SetSampleDataOnFalling();
 	void SetSampleDataOnRising();
 
-	void SetSlaveSelect(DigitalOutput *ss, tFrameMode mode=kChipSelect, bool activeLow=false);
-	void SetSlaveSelect(DigitalOutput &ss, tFrameMode mode=kChipSelect, bool activeLow=false);
-	DigitalOutput *GetSlaveSelect(tFrameMode *mode=NULL, bool *activeLow=NULL);
+	void SetSlaveSelect(DigitalOutput *ss, tFrameMode mode = kChipSelect, bool activeLow = false);
+	void SetSlaveSelect(DigitalOutput &ss, tFrameMode mode = kChipSelect, bool activeLow = false);
+	DigitalOutput *GetSlaveSelect(tFrameMode *mode = NULL, bool *activeLow = NULL);
 
 	void SetClockActiveLow();
 	void SetClockActiveHigh();
@@ -72,5 +70,3 @@ private:
 
 	DISALLOW_COPY_AND_ASSIGN(SPI);
 };
-
-#endif

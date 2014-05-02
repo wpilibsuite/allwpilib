@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef __SKELETON_H__
-#define __SKELETON_H__
+#pragma once
 
 /**
  * Represents Skeleton data from a Kinect device connected to the 
@@ -16,7 +14,7 @@ class Skeleton
 {
 	friend class Kinect;
 public:
-	typedef enum
+	enum JointTypes
 	{
 		HipCenter = 0,
 		Spine = 1,
@@ -39,17 +37,22 @@ public:
 		AnkleRight = 18,
 		FootRight = 19,
 		JointCount = 20
-	} JointTypes;
+	};
 
-	typedef enum {kNotTracked, kInferred, kTracked} JointTrackingState;
+	enum JointTrackingState
+	{
+		kNotTracked,
+		kInferred,
+		kTracked
+	};
 
-	typedef struct
+	struct Joint
 	{
 		float x;
 		float y;
 		float z;
 		JointTrackingState trackingState;
-	} Joint;
+	};
 
 	Joint GetHandRight() { return m_joints[HandRight]; }
 	Joint GetHandLeft() { return m_joints[HandLeft]; }
@@ -76,6 +79,3 @@ public:
 private:
 	Joint m_joints[20];
 };
-
-#endif
-

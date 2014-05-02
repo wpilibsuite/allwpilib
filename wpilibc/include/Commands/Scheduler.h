@@ -14,7 +14,7 @@
 #include "networktables2/type/NumberArray.h"
 #include "networktables2/type/StringArray.h"
 #include "SmartDashboard/SmartDashboard.h"
-#include "HAL/Semaphore.h"
+#include "HAL/Semaphore.hpp"
 #include <list>
 #include <map>
 #include <set>

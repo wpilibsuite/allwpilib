@@ -3,13 +3,11 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef RESOURCE_H_
-#define RESOURCE_H_
+#pragma once
 
 #include "ErrorBase.h"
-#include "HAL/cpp/Synchronized.h"
-#include "HAL/HAL.h"
+#include "HAL/cpp/Synchronized.hpp"
+#include "HAL/HAL.hpp"
 
 /**
  * The Resource class is a convenient way to track allocated resources.
@@ -40,5 +38,3 @@ private:
 
 	DISALLOW_COPY_AND_ASSIGN(Resource);
 };
-
-#endif

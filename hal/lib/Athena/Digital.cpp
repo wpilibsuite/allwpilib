@@ -1,11 +1,11 @@
 
-#include "HAL/Digital.h"
+#include "HAL/Digital.hpp"
 
 #include "Port.h"
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 #include "ChipObject.h"
-#include "HAL/cpp/Synchronized.h"
-#include "HAL/cpp/Resource.h"
+#include "HAL/cpp/Synchronized.hpp"
+#include "HAL/cpp/Resource.hpp"
 #include "NetworkCommunication/LoadOut.h"
 #include <stdio.h>
 #include <math.h>
@@ -41,11 +41,10 @@ static const float kDefaultPwmCenter = 1.5;
 static const int32_t kDefaultPwmStepsDown = 1000;
 static const int32_t kPwmDisabled = 0;
 
-struct digital_port_t {
+struct DigitalPort {
   Port port;
   uint32_t PWMGeneratorID;
 };
-typedef struct digital_port_t DigitalPort;
 
 // XXX: Set these back to static once we figure out the memory clobbering issue
 MUTEX_ID digitalDIOSemaphore = NULL;
@@ -142,23 +141,17 @@ void* initializeDigitalPort(void* port_pointer, int32_t *status) {
 }
 
 bool checkDigitalModule(uint8_t module) {
-  if (nLoadOut::getModulePresence(nLoadOut::kModuleType_Digital, module - 1))
-    return true;
-  return false;
+  return nLoadOut::getModulePresence(nLoadOut::kModuleType_Digital, module - 1);
 }
 
 bool checkPWMChannel(void* digital_port_pointer) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
-  if (port->port.pin > 0 && port->port.pin <= kPwmPins)
-    return true;
-  return false;
+  return (port->port.pin > 0 && port->port.pin <= kPwmPins);
 }
 
 bool checkRelayChannel(void* digital_port_pointer) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
-  if (port->port.pin > 0 && port->port.pin <= kRelayPins)
-    return true;
-  return false;
+  return (port->port.pin > 0 && port->port.pin <= kRelayPins);
 }
 
 uint8_t remapDigitalChannel(uint32_t pin, int32_t *status) {

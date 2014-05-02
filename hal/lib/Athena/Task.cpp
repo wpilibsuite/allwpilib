@@ -1,7 +1,7 @@
 
-#include "HAL/Task.h"
+#include "HAL/Task.hpp"
 
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 #include "ChipObject.h"
 
 #include <stdio.h>
@@ -14,13 +14,13 @@ const int32_t HAL_taskLib_ILLEGAL_OPTIONS = -1; // TODO: update to relevant Task
 const int32_t HAL_memLib_NOT_ENOUGH_MEMORY = -1; // TODO: update to relevant TaskMemoryError
 const int32_t HAL_taskLib_ILLEGAL_PRIORITY = -1; // TODO: update to relevant TaskPriorityError
 
-typedef struct task_args_t {
+struct TaskArgs {
 	FUNCPTR fun;
 	char* name;
 	pthread_t** task;
 	uint32_t arg0, arg1, arg2, arg3, arg4,
 	         arg5, arg6, arg7, arg8, arg9;
-} TaskArgs;
+};
 
 void* startRoutine(void* data) {
 	TaskArgs* args = (TaskArgs*) data;

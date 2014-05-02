@@ -6,7 +6,7 @@
 
 #include "DriverStationEnhancedIO.h"
 //#include "NetworkCommunication/UsageReporting.h"
-#include "HAL/cpp/Synchronized.h"
+#include "HAL/cpp/Synchronized.hpp"
 #include "WPIErrors.h"
 #include <string.h>
 

@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef JOYSTICK_H_
-#define JOYSTICK_H_
+#pragma once
 
 #include "GenericHID.h"
 #include "ErrorBase.h"
@@ -26,23 +24,30 @@ public:
 	static const uint32_t kDefaultZAxis = 3;
 	static const uint32_t kDefaultTwistAxis = 4;
 	static const uint32_t kDefaultThrottleAxis = 3;
-	typedef enum
+	enum AxisType
 	{
-		kXAxis, kYAxis, kZAxis, kTwistAxis, kThrottleAxis, kNumAxisTypes
-	} AxisType;
+		kXAxis,
+		kYAxis,
+		kZAxis,
+		kTwistAxis,
+		kThrottleAxis,
+		kNumAxisTypes
+	};
 	static const uint32_t kDefaultTriggerButton = 1;
 	static const uint32_t kDefaultTopButton = 2;
-	typedef enum
+	enum ButtonType
 	{
-		kTriggerButton, kTopButton, kNumButtonTypes
-	} ButtonType;
+		kTriggerButton,
+		kTopButton,
+		kNumButtonTypes
+	};
 
 	explicit Joystick(uint32_t port);
 	Joystick(uint32_t port, uint32_t numAxisTypes, uint32_t numButtonTypes);
 	virtual ~Joystick();
 
 	uint32_t GetAxisChannel(AxisType axis);
-	void SetAxisChannel(AxisType axis, uint32_t channel); 
+	void SetAxisChannel(AxisType axis, uint32_t channel);
 
 	virtual float GetX(JoystickHand hand = kRightHand);
 	virtual float GetY(JoystickHand hand = kRightHand);
@@ -58,7 +63,7 @@ public:
 	virtual bool GetButton(ButtonType button);
 	bool GetRawButton(uint32_t button);
 	static Joystick* GetStickForPort(uint32_t port);
-	
+
 	virtual float GetMagnitude();
 	virtual float GetDirectionRadians();
 	virtual float GetDirectionDegrees();
@@ -72,6 +77,3 @@ private:
 	uint32_t *m_axes;
 	uint32_t *m_buttons;
 };
-
-#endif
- 

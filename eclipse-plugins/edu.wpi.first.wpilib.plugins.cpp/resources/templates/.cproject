@@ -5,10 +5,10 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.cross.exe.debug.418253318" moduleId="org.eclipse.cdt.core.settings" name="Debug">
 				<externalSettings/>
 				<extensions>
-					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -34,15 +34,31 @@
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1367166630" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
 							<tool command="g++" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cross.cpp.linker.1568604896" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker">
-							  <option id="gnu.cpp.link.option.paths.1928585110" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-							    <listOptionValue builtIn="false" value="$cpp-location/lib"/>
-							  </option>
-							  <option id="gnu.cpp.link.option.libs.1072058280" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-								<listOptionValue builtIn="false" value="WPILibAthena"/>
-								<listOptionValue builtIn="false" value="dl"/>
-								<listOptionValue builtIn="false" value="pthread"/>
+								<option id="gnu.cpp.link.option.paths.1928585110" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="$cpp-location/lib"/>
 								</option>
-								<option id="gnu.cpp.link.option.flags.1747959472" superClass="gnu.cpp.link.option.flags" value="-Wl,-rpath-link,$cpp-location/lib" valueType="string"/>
+								<option id="gnu.cpp.link.option.libs.1072058280" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" value="WPILibAthena"/>
+									<listOptionValue builtIn="false" value="HALAthena"/>
+									<listOptionValue builtIn="false" value="NetworkTables"/>
+									<listOptionValue builtIn="false" value="FRC_FPGA_ChipObject"/>
+									<listOptionValue builtIn="false" value="FRC_NetworkCommunication"/>
+									<listOptionValue builtIn="false" value="i2c"/>
+									<listOptionValue builtIn="false" value="ni_emb"/>
+									<listOptionValue builtIn="false" value="NiFpgaLv"/>
+									<listOptionValue builtIn="false" value="NiFpga"/>
+									<listOptionValue builtIn="false" value="nirio_emb_can"/>
+									<listOptionValue builtIn="false" value="NiRioSrv"/>
+									<listOptionValue builtIn="false" value="ni_rtlog"/>
+									<listOptionValue builtIn="false" value="RoboRIO_FRC_ChipObject"/>
+									<listOptionValue builtIn="false" value="spi"/>
+									<listOptionValue builtIn="false" value="visa"/>
+									<listOptionValue builtIn="false" value="dl"/>
+									<listOptionValue builtIn="false" value="pthread"/>
+								</option>
+								<option id="gnu.cpp.link.option.flags.1747959472" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-Wl,-rpath-link,$cpp-location/lib" valueType="string"/>
+								<option id="gnu.cpp.link.option.other.1891020896" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other" valueType="stringList">
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1757265359" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -66,12 +82,12 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.cross.exe.release.1534660163" moduleId="org.eclipse.cdt.core.settings" name="Release">
 				<externalSettings/>
 				<extensions>
-					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">

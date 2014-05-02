@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef VICTOR_H
-#define VICTOR_H
+#pragma once
 
 #include "SafePWM.h"
 #include "SpeedController.h"
@@ -20,7 +18,7 @@ public:
 	explicit Victor(uint32_t channel);
 	Victor(uint8_t moduleNumber, uint32_t channel);
 	virtual ~Victor();
-	virtual void Set(float value, uint8_t syncGroup=0);
+	virtual void Set(float value, uint8_t syncGroup = 0);
 	virtual float Get();
 	virtual void Disable();
 
@@ -29,6 +27,3 @@ public:
 private:
 	void InitVictor();
 };
-
-#endif
-

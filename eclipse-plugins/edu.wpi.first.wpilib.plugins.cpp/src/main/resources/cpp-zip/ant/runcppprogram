@@ -1,6 +1,0 @@
-#. ./.profile
-killall java
-killall FRCUserProgram
-sleep 1
-chmod +x ./FRCUserProgram
-./FRCUserProgram

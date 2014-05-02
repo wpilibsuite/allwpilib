@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef SENSORBASE_H_
-#define SENSORBASE_H_
+#pragma once
 
 #include "ErrorBase.h"
 #include <stdio.h>
@@ -16,14 +14,24 @@
  * Stores most recent status information as well as containing utility functions for checking
  * channels and error processing.
  */
-class SensorBase: public ErrorBase {
+class SensorBase : public ErrorBase
+{
 public:
 	SensorBase();
 	virtual ~SensorBase();
 	static void DeleteSingletons();
-	static uint32_t GetDefaultAnalogModule() { return 1; }
-	static uint32_t GetDefaultDigitalModule() { return 1; }
-	static uint32_t GetDefaultSolenoidModule() { return 1; }
+	static uint32_t GetDefaultAnalogModule()
+	{
+		return 1;
+	}
+	static uint32_t GetDefaultDigitalModule()
+	{
+		return 1;
+	}
+	static uint32_t GetDefaultSolenoidModule()
+	{
+		return 1;
+	}
 	static bool CheckAnalogModule(uint8_t moduleNumber);
 	static bool CheckDigitalModule(uint8_t moduleNumber);
 	static bool CheckPWMModule(uint8_t moduleNumber);
@@ -52,6 +60,3 @@ private:
 	static SensorBase *m_singletonList;
 	SensorBase *m_nextSingleton;
 };
-
-
-#endif

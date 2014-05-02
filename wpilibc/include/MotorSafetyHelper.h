@@ -3,12 +3,10 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef __MOTOR_SAFETY_HELPER__
-#define __MOTOR_SAFETY_HELPER__
+#pragma once
 
 #include "ErrorBase.h"
-#include "HAL/cpp/Synchronized.h"
+#include "HAL/cpp/Synchronized.hpp"
 
 class MotorSafety;
 
@@ -35,5 +33,3 @@ private:
 	static MotorSafetyHelper *m_headHelper; // the head of the list of MotorSafetyHelper objects
 	static ReentrantSemaphore m_listMutex;	// protect accesses to the list of helpers
 };
-
-#endif

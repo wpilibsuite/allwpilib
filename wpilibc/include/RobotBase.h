@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef ROBOT_H_
-#define ROBOT_H_
+#pragma once
 
 #include "Base.h"
 #include "Task.h"
@@ -30,13 +28,12 @@ class DriverStation;
 	}
 #else
 #define START_ROBOT_CLASS(_ClassName_) \
-  int main() \
-  { \
-    HALNetworkCommunicationReserve();	\
-	RobotBase* robot = new _ClassName_(); \
-	robot->StartCompetition(); \
-	return 0; \
-  }
+	int main() \
+	{ \
+		if (!HALInitialize()){std::cerr<<"FATAL ERROR: HAL could not be initialized"<<std::endl;return -1;}	\
+		(new _ClassName_())->StartCompetition(); \
+		return 0; \
+	}
 #endif
 
 /**
@@ -47,7 +44,8 @@ class DriverStation;
  * completion before the OperatorControl code could start. In the future the Autonomous code
  * might be spawned as a task, then killed at the end of the Autonomous period.
  */
-class RobotBase {
+class RobotBase
+{
 	friend class RobotDeleter;
 public:
 	static RobotBase &getInstance();
@@ -57,7 +55,7 @@ public:
 	bool IsDisabled();
 	bool IsAutonomous();
 	bool IsOperatorControl();
-    bool IsTest();
+	bool IsTest();
 	bool IsNewDataAvailable();
 	static void startRobotTask(FUNCPTR factory);
 	static void robotTask(FUNCPTR factory, Task *task);
@@ -72,8 +70,6 @@ protected:
 
 private:
 	static RobotBase *m_instance;
+
 	DISALLOW_COPY_AND_ASSIGN(RobotBase);
 };
-
-#endif
-

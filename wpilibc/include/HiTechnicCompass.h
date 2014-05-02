@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef __HiTechnicCompass_h__
-#define __HiTechnicCompass_h__
+#pragma once
 
 #include "SensorBase.h"
 #include "LiveWindow/LiveWindowSendable.h"
@@ -50,6 +48,3 @@ private:
 	
 	ITable *m_table;
 };
-
-#endif
-

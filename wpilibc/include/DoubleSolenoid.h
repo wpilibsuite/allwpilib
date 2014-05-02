@@ -3,14 +3,11 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef DOUBLE_SOLENOID_H_
-#define DOUBLE_SOLENOID_H_
+#pragma once
 
 #include "SolenoidBase.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITableListener.h"
-
 
 /**
  * DoubleSolenoid class for running 2 channels of high voltage Digital Output
@@ -19,16 +16,22 @@
  * The DoubleSolenoid class is typically used for pneumatics solenoids that
  * have two positions controlled by two separate channels.
  */
-class DoubleSolenoid : public SolenoidBase, public LiveWindowSendable, public ITableListener {
+class DoubleSolenoid : public SolenoidBase, public LiveWindowSendable, public ITableListener
+{
 public:
-	typedef enum {kOff, kForward, kReverse} Value;
+	enum Value
+	{
+		kOff,
+		kForward,
+		kReverse
+	};
 
 	explicit DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel);
 	DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel, uint32_t reverseChannel);
 	virtual ~DoubleSolenoid();
 	virtual void Set(Value value);
 	virtual Value Get();
-	
+
 	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
 	void UpdateTable();
 	void StartLiveWindowMode();
@@ -47,5 +50,3 @@ private:
 	
 	ITable *m_table;
 };
-
-#endif

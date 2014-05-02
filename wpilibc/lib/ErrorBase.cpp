@@ -5,8 +5,8 @@
 /*----------------------------------------------------------------------------*/
 
 #include "ErrorBase.h"
-#include "HAL/cpp/Synchronized.h"
-#include "HAL/cpp/StackTrace.h"
+#include "HAL/cpp/Synchronized.hpp"
+#include "HAL/cpp/StackTrace.hpp"
 #include "nivision.h"
 #define WPI_ERRORS_DEFINE_STRINGS
 #include "WPIErrors.h"
@@ -97,7 +97,7 @@ void ErrorBase::SetImaqError(int success, const char *contextMessage, const char
 {
 	//  If there was an error
 	if (success <= 0) {
-		char err[256];
+		//TODO: ??? char err[256];
 		// XXX: sprintf(err, "%s: %s", contextMessage, imaqGetErrorText(imaqGetLastError()));
 
 		//  Set the current error information for this object.

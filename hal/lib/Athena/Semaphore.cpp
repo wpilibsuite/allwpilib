@@ -1,8 +1,8 @@
 
-#include "HAL/Semaphore.h"
+#include "HAL/Semaphore.hpp"
 
 #include "ChipObject.h"
-#include "Log.h"
+#include "Log.hpp"
 
 // set the logging level
 TLogLevel semaphoreLogLevel = logDEBUG;

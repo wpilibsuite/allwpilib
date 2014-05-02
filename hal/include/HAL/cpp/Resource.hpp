@@ -3,12 +3,10 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
+#pragma once
 
-#ifndef RESOURCE_H_
-#define RESOURCE_H_
-
-#include "../Errors.h"
-#include "Synchronized.h"
+#include "../Errors.hpp"
+#include "Synchronized.hpp"
 #ifdef __vxworks
 #include <vxWorks.h>
 #else
@@ -45,4 +43,3 @@ private:
 	DISALLOW_COPY_AND_ASSIGN(Resource);
 };
 
-#endif

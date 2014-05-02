@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef ANALOG_TRIGGER_OUTPUT_H_
-#define ANALOG_TRIGGER_OUTPUT_H_
+#pragma once
 
 #include "DigitalSource.h"
 
@@ -38,7 +36,7 @@ class AnalogTrigger;
  * is not sharp / clean enough.  Using the averaging engine may help with this, but rotational speeds of
  * the sensor will then be limited.
  */
-class AnalogTriggerOutput: public DigitalSource
+class AnalogTriggerOutput : public DigitalSource
 {
 	friend class AnalogTrigger;
 public:
@@ -50,7 +48,7 @@ public:
 	virtual uint32_t GetChannelForRouting();
 	virtual uint32_t GetModuleForRouting();
 	virtual bool GetAnalogTriggerForRouting();
-	virtual void RequestInterrupts(InterruptHandlerFunction handler, void *param=NULL); ///< Asynchronus handler version.
+	virtual void RequestInterrupts(InterruptHandlerFunction handler, void *param = NULL); ///< Asynchronus handler version.
 	virtual void RequestInterrupts();		///< Synchronus Wait version.
 protected:
 	AnalogTriggerOutput(AnalogTrigger *trigger, AnalogTriggerType outputType);
@@ -59,6 +57,3 @@ private:
 	AnalogTrigger *m_trigger;
 	AnalogTriggerType m_outputType;
 };
-
-
-#endif

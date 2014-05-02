@@ -1,9 +1,9 @@
 #include <jni.h>
 #include <assert.h>
-#include "Log.h"
+#include "Log.hpp"
 
 #include "edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary.h"
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 //#include "NetworkCommunication/FRCComm.h"
 //#include "NetworkCommunication/UsageReporting.h"
 
@@ -501,7 +501,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetworkCommunicationReserve
   (JNIEnv *, jclass)
 {
-	HALNetworkCommunicationReserve();
+	assert(1 == HALInitialize(0));
 }
 
 /*

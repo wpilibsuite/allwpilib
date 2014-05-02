@@ -4,8 +4,8 @@
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/cpp/Resource.h"
-#include "HAL/Errors.h"
+#include "HAL/cpp/Resource.hpp"
+#include "HAL/Errors.hpp"
 #include <cstddef>
 
 ReentrantSemaphore Resource::m_createLock;
