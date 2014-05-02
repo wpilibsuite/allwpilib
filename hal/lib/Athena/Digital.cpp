@@ -1464,7 +1464,7 @@ bool hadSPIReceiveOverflow(void* spi_pointer, int32_t *status) {
   return false;
 }
 void writeSPI(void* spi_pointer, uint32_t data, int32_t *status) {}
-uint32_t readSPI(void* spi_pointer, bool initiate, int32_t *status) {}
+uint32_t readSPI(void* spi_pointer, bool initiate, int32_t *status) {return 0;}
 void resetSPI(void* spi_pointer, int32_t *status) {}
 void clearSPIReceivedData(void* spi_pointer, int32_t *status) {}
 

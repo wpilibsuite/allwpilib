@@ -157,7 +157,7 @@ double ADXL345_SPI::GetAcceleration(ADXL345_SPI::Axes axis)
  */
 ADXL345_SPI::AllAxes ADXL345_SPI::GetAccelerations()
 {
-	AllAxes data = {0.0};
+	AllAxes data = AllAxes();
 	int16_t rawData[3];
 	if (m_spi)
 	{

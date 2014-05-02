@@ -188,15 +188,3 @@ extern "C"
 	uint32_t niTimestamp32(void);
 	uint64_t niTimestamp64(void);
 }
-
-/*
- * Return the PowerPC timestamp since boot in seconds.
- * 
- * This is lower overhead than GetFPGATimestamp() but not synchronized with other FPGA timestamps.
- * @returns Robot running time in seconds.
- */
-double Timer::GetPPCTimestamp()
-{
-	// PPC system clock is 33MHz
-	// XXX: return niTimestamp64() / 33.0e6;
-}

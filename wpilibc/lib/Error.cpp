@@ -85,7 +85,7 @@ void Error::Report()
 		snprintf(error, 256, "%s: status = %d (0x%08X) %s ...in %s() in %s at line %d\n",
 				m_code < 0 ? "ERROR" : "WARNING", (int32_t)m_code, (uint32_t)m_code, m_message.c_str(),
 				m_function.c_str(), m_filename.c_str(), m_lineNumber);
-		sprintf(error_with_code,"<Code>%ld %s", (int32_t)m_code, error);
+		sprintf(error_with_code,"<Code>%d %s", (int32_t)m_code, error);
 	} else {
 		snprintf(error, 256, "ERROR: %s ...in %s() in %s at line %d\n", m_message.c_str(),
 				m_function.c_str(), m_filename.c_str(), m_lineNumber);

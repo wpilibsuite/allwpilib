@@ -73,7 +73,7 @@ double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis)
  */
 ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations()
 {
-	AllAxes data = {0.0};
+	AllAxes data = AllAxes();
 	int16_t rawData[3];
 	if (m_i2c)
 	{

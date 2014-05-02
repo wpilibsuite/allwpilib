@@ -16,7 +16,7 @@ PrintCommand::PrintCommand(const char *message) :
 
 void PrintCommand::Initialize()
 {
-	printf(m_message.c_str());
+	printf("%s", m_message.c_str());
 }
 
 void PrintCommand::Execute()
