@@ -1,14 +1,14 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2015_1_0_4_AO_h__
-#define __nFRC_2015_1_0_4_AO_h__
+#ifndef __nFRC_2015_1_0_5_AO_h__
+#define __nFRC_2015_1_0_5_AO_h__
 
 #include "tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2015_1_0_4
+namespace nFRC_2015_1_0_5
 {
 
 class tAO
@@ -47,4 +47,4 @@ private:
 }
 }
 
-#endif // __nFRC_2015_1_0_4_AO_h__
+#endif // __nFRC_2015_1_0_5_AO_h__

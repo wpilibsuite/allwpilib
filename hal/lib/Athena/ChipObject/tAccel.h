@@ -1,14 +1,14 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2015_1_0_4_Accel_h__
-#define __nFRC_2015_1_0_4_Accel_h__
+#ifndef __nFRC_2015_1_0_5_Accel_h__
+#define __nFRC_2015_1_0_5_Accel_h__
 
 #include "tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2015_1_0_4
+namespace nFRC_2015_1_0_5
 {
 
 class tAccel
@@ -30,23 +30,63 @@ public:
 
    typedef enum
    {
-   } tX_IfaceConstants;
+   } tSTAT_IfaceConstants;
 
-   virtual signed short readX(tRioStatusCode *status) = 0;
-
-
-   typedef enum
-   {
-   } tY_IfaceConstants;
-
-   virtual signed short readY(tRioStatusCode *status) = 0;
+   virtual unsigned char readSTAT(tRioStatusCode *status) = 0;
 
 
    typedef enum
    {
-   } tZ_IfaceConstants;
+   } tCNTR_IfaceConstants;
 
-   virtual signed short readZ(tRioStatusCode *status) = 0;
+   virtual void writeCNTR(unsigned char value, tRioStatusCode *status) = 0;
+   virtual unsigned char readCNTR(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
+   } tDATO_IfaceConstants;
+
+   virtual void writeDATO(unsigned char value, tRioStatusCode *status) = 0;
+   virtual unsigned char readDATO(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
+   } tCNFG_IfaceConstants;
+
+   virtual void writeCNFG(unsigned char value, tRioStatusCode *status) = 0;
+   virtual unsigned char readCNFG(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
+   } tCNTL_IfaceConstants;
+
+   virtual void writeCNTL(unsigned char value, tRioStatusCode *status) = 0;
+   virtual unsigned char readCNTL(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
+   } tDATI_IfaceConstants;
+
+   virtual unsigned char readDATI(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
+   } tGO_IfaceConstants;
+
+   virtual void strobeGO(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
+   } tADDR_IfaceConstants;
+
+   virtual void writeADDR(unsigned char value, tRioStatusCode *status) = 0;
+   virtual unsigned char readADDR(tRioStatusCode *status) = 0;
 
 
 
@@ -59,4 +99,4 @@ private:
 }
 }
 
-#endif // __nFRC_2015_1_0_4_Accel_h__
+#endif // __nFRC_2015_1_0_5_Accel_h__

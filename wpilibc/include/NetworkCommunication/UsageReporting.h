@@ -5,8 +5,12 @@
 #ifdef SIMULATION
 #include <vxWorks_compat.h>
 #define EXPORT_FUNC __declspec(dllexport) __cdecl
+#elif defined (__vxworks)
+#include <vxWorks.h>
+#define EXPORT_FUNC
 #else
-#include "HAL/HAL.h"
+#include <stdint.h>
+#include <stdlib.h>
 #define EXPORT_FUNC
 #endif
 
@@ -64,7 +68,7 @@ namespace nUsageReporting
         kResourceType_HiTechnicColorSensor,
         kResourceType_HiTechnicAccel,
         kResourceType_HiTechnicCompass,
-        kResourceType_SRF08,
+		kResourceType_SRF08,
     } tResourceType;
 
     typedef enum

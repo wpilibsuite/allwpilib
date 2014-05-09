@@ -2,7 +2,7 @@
 #ifndef __AICalibration_h__
 #define __AICalibration_h__
 
-#include "HAL/HAL.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C"

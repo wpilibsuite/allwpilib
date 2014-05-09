@@ -16,7 +16,11 @@
 
 #ifdef SIMULATION
 #include <vxWorks_compat.h>
+#ifdef USE_THRIFT
+#define EXPORT_FUNC
+#else
 #define EXPORT_FUNC __declspec(dllexport) __cdecl
+#endif
 #else
 #if defined(__vxworks)
 #include <vxWorks.h>
@@ -145,12 +149,14 @@ struct FRCCommonControlData{
 #define kFRC_NetworkCommunication_DynamicType_Kinect_Joystick 24
 #define kFRC_NetworkCommunication_DynamicType_Kinect_Custom 25
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 #ifndef SIMULATION
 	void EXPORT_FUNC getFPGAHardwareVersion(uint16_t *fpgaVersion, uint32_t *fpgaRevision);
 #endif
-	int EXPORT_FUNC getCommonControlData(FRCCommonControlData *data, int wait_ms);
-	int EXPORT_FUNC getRecentCommonControlData(FRCCommonControlData *commonData, int wait_ms);
+	int EXPORT_FUNC getCommonControlData(struct FRCCommonControlData *data, int wait_ms);
+	int EXPORT_FUNC getRecentCommonControlData(struct FRCCommonControlData *commonData, int wait_ms);
 	int EXPORT_FUNC getRecentStatusData(uint8_t *batteryInt, uint8_t *batteryDec, uint8_t *dsDigitalOut, int wait_ms);
 	int EXPORT_FUNC getDynamicControlData(uint8_t type, char *dynamicData, int32_t maxLength, int wait_ms);
 	int EXPORT_FUNC setStatusData(float battery, uint8_t dsDigitalOut, uint8_t updateNumber,
@@ -162,7 +168,7 @@ extern "C" {
 	int EXPORT_FUNC setErrorData(const char *errors, int errorsLength, int wait_ms);
 	int EXPORT_FUNC setUserDsLcdData(const char *userDsLcdData, int userDsLcdDataLength, int wait_ms);
 	int EXPORT_FUNC overrideIOConfig(const char *ioConfig, int wait_ms);
-
+	
 #ifdef SIMULATION
 	void EXPORT_FUNC setNewDataSem(HANDLE);
 #else
@@ -188,6 +194,8 @@ extern "C" {
 	void EXPORT_FUNC FRC_NetworkCommunication_observeUserProgramAutonomous(void);
 	void EXPORT_FUNC FRC_NetworkCommunication_observeUserProgramTeleop(void);
 	void EXPORT_FUNC FRC_NetworkCommunication_observeUserProgramTest(void);
-};
+#ifdef __cplusplus
+}
+#endif
 
 #endif
