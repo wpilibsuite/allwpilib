@@ -56,12 +56,12 @@
         </goals>
         <configuration>
         <artifactItems>
-        <artufactItem>
+        <artifactItem>
 				  <groupId>edu.wpi.first.wpilibj</groupId>
 				  <artifactId>wpilibJava</artifactId>
 				  <version>0.1.0-SNAPSHOT</version>
 				  <type>jar</type>
-        </artufactItem>
+        </artifactItem>
         </artifactItems>
         <outputDirectory>${project.build.directory}/classes</outputDirectory>
         </configuration>

@@ -200,8 +200,8 @@ this default location, specify a value for the 'embeddedJDKHome' property at the
 									<groupId>edu.wpi.first.wpilib.cmake</groupId>
 									<artifactId>cpp-root</artifactId>
 									<version>1.0.0</version>
-									<type>jar</type>
-									<destFileName>cpp-root.jar</destFileName>
+									<type>zip</type>
+									<destFileName>cpp-root.zip</destFileName>
 								</artifactItem>
 							</artifactItems>
 							<outputDirectory>${project.build.directory}</outputDirectory>
