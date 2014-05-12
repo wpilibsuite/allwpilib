@@ -7,10 +7,10 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>cmake</module>
-		<module>eclipse-plugins</module>
 		<module>maven-utilities</module>
 		<module>networktables</module>
 		<module>wpilibj</module>
+		<module>eclipse-plugins</module>
 	</modules>
 	<build>
 		<plugins>
