@@ -3,6 +3,7 @@ hal/build/
 networktables/cpp/build/
 build/
 networktables/OutlineViewer/nbproject/private
+*~
 target/
 dist/
 bin/

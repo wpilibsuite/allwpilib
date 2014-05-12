@@ -11,6 +11,7 @@
 		<module>networktables</module>
 		<module>wpilibj</module>
 		<module>eclipse-plugins</module>
+		<module>driver-station</module>
 	</modules>
 	<build>
 		<plugins>
