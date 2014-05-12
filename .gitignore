@@ -3,7 +3,9 @@ hal/build/
 networktables/cpp/build/
 build/
 networktables/OutlineViewer/nbproject/private
-*~
-.*/target(?:/|$)
-.*/dist(?:/|$)
-eclipse-plugins/.*/bin(?:/|$)
+target/
+dist/
+bin/
+.project
+.settings/
+.classpath
