@@ -40,6 +40,7 @@
 		<filtering>true</filtering>
       </resource>
 	</resources>
+	<pluginManagement>
 	<plugins>
 	  <plugin>
         <artifactId>maven-resources-plugin</artifactId>
@@ -206,6 +207,7 @@
 		</executions>
 	  </plugin>
     </plugins>
+	</pluginManagement>
   </build>
   
   <dependencies>
