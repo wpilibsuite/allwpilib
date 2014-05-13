@@ -11,6 +11,7 @@
     <module>wpilibJava</module>
     <module>wpilibJavaJNI</module>
     <module>wpilibJavaFinal</module>
+    <module>wpilibJavaIntegrationTests</module>
   </modules>
   
 </project>
