@@ -53,8 +53,8 @@ public:
 	I2C* GetI2C(uint32_t address);
 
 	static DigitalModule* GetInstance(uint8_t moduleNumber);
-	static uint8_t RemapDigitalChannel(uint32_t channel) { return 15 - channel; }; // TODO: Need channel validation
-	static uint8_t UnmapDigitalChannel(uint32_t channel) { return 15 - channel; }; // TODO: Need channel validation
+	static uint8_t RemapDigitalChannel(uint32_t channel) { return channel; }; // TODO: Need channel validation
+	static uint8_t UnmapDigitalChannel(uint32_t channel) { return channel; }; // TODO: Need channel validation
 
 private:
 	uint8_t m_module;
