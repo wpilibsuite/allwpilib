@@ -105,7 +105,7 @@ uint32_t DigitalInput::GetChannel()
  */
 uint32_t DigitalInput::GetChannelForRouting()
 {
-	return DigitalModule::RemapDigitalChannel(GetChannel() - 1);
+	return GetChannel() - 1;
 }
 
 /**
