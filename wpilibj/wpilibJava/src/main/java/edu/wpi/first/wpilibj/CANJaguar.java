@@ -5,12 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj;
+package com.first.team190.robot;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
+import edu.wpi.first.wpilibj.MotorSafety;
+import edu.wpi.first.wpilibj.MotorSafetyHelper;
+import edu.wpi.first.wpilibj.PIDOutput;
+import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.can.CANExceptionFactory;
 import edu.wpi.first.wpilibj.can.CANJaguarVersionException;
 import edu.wpi.first.wpilibj.can.CANJNI;
@@ -170,58 +174,18 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
     private MotorSafetyHelper m_safetyHelper;
     private static final byte[] kNoData = new byte[0];
 
-    private final static int swap16(int x) {
-        return ((((x) >>> 8) & 0x00FF) | (((x) << 8) & 0xFF00));
-    }
-
-    private final static long swap32(long x) {
-        return ((((x) >> 24) & 0x000000FF) | (((x) >> 8) & 0x0000FF00) | (((x) << 8) & 0x00FF0000) | (((x) << 24) & 0xFF000000));
-    }
-
     private final static int swap16(int x, byte[] buffer) {
-        buffer[0] = (byte) x;
-        buffer[1] = (byte) ((x >>> 8) & 0x00FF);
+        buffer[0] = (byte) ((x >>> 8) & 0x00FF);
+        buffer[1] = (byte) x;
         return ((((x) >>> 8) & 0x00FF) | (((x) << 8) & 0xFF00));
     }
 
     private final static long swap32(long x, byte[] buffer) {
-        buffer[0] = (byte) x;
-        buffer[1] = (byte) ((x >>> 8) & 0x00FF);
-        buffer[2] = (byte) ((x >>> 16) & 0x00FF);
-        buffer[3] = (byte) ((x >>> 24) & 0x00FF);
+        buffer[0] = (byte) ((x >>> 24) & 0x00FF);
+        buffer[1] = (byte) ((x >>> 16) & 0x00FF);
+        buffer[2] = (byte) ((x >>> 8) & 0x00FF);
+        buffer[3] = (byte) x;
         return ((((x) >> 24) & 0x000000FF) | (((x) >> 8) & 0x0000FF00) | (((x) << 8) & 0x00FF0000) | (((x) << 24) & 0xFF000000));
-    }
-
-    private final static int swap16(byte[] buffer) {
-        return ((((buffer[1]) >>> 8) & 0x00FF) | (((buffer[0]) << 8) & 0xFF00));
-    }
-
-    private final static long swap32(byte[] buffer) {
-        return ((((buffer[3]) >> 24) & 0x000000FF) | (((buffer[2]) >> 8) & 0x0000FF00) | (((buffer[1]) << 8) & 0x00FF0000) | (((buffer[0]) << 24) & 0xFF000000));
-    }
-
-    /**
-     * Pack 16-bit data in little-endian byte order
-     * @param data The data to be packed
-     * @param buffer The buffer to pack into
-     * @param offset The offset into data to pack the variable
-     */
-    private static final void pack16(short data, byte[] buffer, int offset) {
-        buffer[offset] = (byte) (data & 0xFF);
-        buffer[offset + 1] = (byte) ((data >>> 8) & 0xFF);
-    }
-
-    /**
-     * Pack 32-bit data in little-endian byte order
-     * @param data The data to be packed
-     * @param buffer The buffer to pack into
-     * @param offset The offset into data to pack the variable
-     */
-    private static final void pack32(int data, byte[] buffer, int offset) {
-        buffer[offset] = (byte) (data & 0xFF);
-        buffer[offset + 1] = (byte) ((data >>> 8) & 0xFF);
-        buffer[offset + 2] = (byte) ((data >>> 16) & 0xFF);
-        buffer[offset + 3] = (byte) ((data >>> 24) & 0xFF);
     }
 
     /**
@@ -458,6 +422,59 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         }
         return 0.0;
 
+    }
+    
+    public void setNoAck(float value, byte syncGroup) throws CANTimeoutException {
+    	int messageID;
+        byte[] dataBuffer = new byte[8];
+        byte dataSize = 0;
+
+        if (!m_safetyHelper.isAlive()) {
+            enableControl();
+        }
+
+        switch (m_controlMode.value) {
+        case ControlMode.kPercentVbus_val:
+            messageID = CANJNI.LM_API_VOLT_T_SET_NO_ACK;
+            if (value > 1.0) value = 1.0f;
+            if (value < -1.0) value = -1.0f;
+            packPercentage(dataBuffer, value);
+            dataSize = 2;
+            break;
+        case ControlMode.kSpeed_val: {
+            messageID = CANJNI.LM_API_SPD_T_SET;
+            dataSize = packFXP16_16(dataBuffer, value);
+        }
+        break;
+        case ControlMode.kPosition_val: {
+            messageID = CANJNI.LM_API_POS_T_SET;
+            dataSize = packFXP16_16(dataBuffer, value);
+        }
+        break;
+        case ControlMode.kCurrent_val: {
+            messageID = CANJNI.LM_API_ICTRL_T_SET;
+            dataSize = packFXP8_8(dataBuffer, value);
+        }
+        break;
+        case ControlMode.kVoltage_val: {
+            messageID = CANJNI.LM_API_VCOMP_T_SET_NO_ACK;
+            dataSize = packFXP8_8(dataBuffer, value);
+        }
+        break;
+        default:
+            return;
+        }
+        
+        if (syncGroup != 0) {
+            dataBuffer[dataSize] = syncGroup;
+            dataSize++;
+        }
+        
+        synchronized(m_transactionMutex) {
+        	sendMessage(messageID | m_deviceNumber, dataBuffer, dataSize);
+        }
+        
+        m_safetyHelper.feed();
     }
 
     /**

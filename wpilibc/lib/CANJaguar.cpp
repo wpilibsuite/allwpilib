@@ -6,24 +6,41 @@
 
 #include "CANJaguar.h"
 #define tNIRIO_i32 int
-//#include "CAN/JaguarCANDriver.h"
+#include "CAN/JaguarCANDriver.h"
 #include "CAN/can_proto.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "WPIErrors.h"
 #include <stdio.h>
 #include "LiveWindow/LiveWindow.h"
 
-#define swap16(x) ( (((x)>>8) &0x00FF) \
-                  | (((x)<<8) &0xFF00) )
-#define swap32(x) ( (((x)>>24)&0x000000FF) \
-                  | (((x)>>8) &0x0000FF00) \
-                  | (((x)<<8) &0x00FF0000) \
-                  | (((x)<<24)&0xFF000000) )
+/* we are on ARM now, not Freescale so no need to swap */
+#define swap16(x)	(x)
+#define swap32(x)	(x)
+//#define swap16(x) ( (((x)>>8) &0x00FF) \
+//                  | (((x)<<8) &0xFF00) )
+//#define swap32(x) ( (((x)>>24)&0x000000FF) \
+//                  | (((x)>>8) &0x0000FF00) \
+//                  | (((x)<<8) &0x00FF0000) \
+//                  | (((x)<<24)&0xFF000000) )
 
 #define kFullMessageIDMask (CAN_MSGID_API_M | CAN_MSGID_MFR_M | CAN_MSGID_DTYPE_M)
 
 const int32_t CANJaguar::kControllerRate;
 constexpr double CANJaguar::kApproxBusVoltage;
+
+
+
+void _sendMessage(uint32_t messageID, const uint8_t *data, uint8_t dataSize, int32_t *status)
+{
+	FRC_NetworkCommunication_JaguarCANDriver_sendMessage(messageID,data,dataSize,status);
+}
+void _receiveMessage(uint32_t *messageID, uint8_t *data, uint8_t *dataSize, uint32_t timeoutMs, int32_t *status)
+{
+	FRC_NetworkCommunication_JaguarCANDriver_receiveMessage(messageID,data,dataSize,timeoutMs,status);
+
+}
+
+
 
 /**
  * Common initialization code called by all constructors.
@@ -163,6 +180,90 @@ void CANJaguar::Set(float outputValue, uint8_t syncGroup)
 		dataSize++;
 	}
 	setTransaction(messageID, dataBuffer, dataSize);
+	if (m_safetyHelper) m_safetyHelper->Feed();
+}
+void CANJaguar::SetNoAck(float outputValue, uint8_t syncGroup)
+{
+	uint32_t messageID;
+	uint8_t dataBuffer[8];
+	uint8_t dataSize;
+
+	if (m_safetyHelper && !m_safetyHelper->IsAlive())
+	{
+		EnableControl();
+	}
+
+	switch(m_controlMode)
+	{
+	case kPercentVbus:
+		{
+			messageID = LM_API_VOLT_T_SET_NO_ACK; //LM_API_VOLT_T_SET;
+			if (outputValue > 1.0) outputValue = 1.0;
+			if (outputValue < -1.0) outputValue = -1.0;
+			dataSize = packPercentage(dataBuffer, outputValue);
+		}
+		break;
+	case kSpeed:
+		{
+			messageID = LM_API_SPD_T_SET;
+			dataSize = packFXP16_16(dataBuffer, outputValue);
+		}
+		break;
+	case kPosition:
+		{
+			messageID = LM_API_POS_T_SET;
+			dataSize = packFXP16_16(dataBuffer, outputValue);
+		}
+		break;
+	case kCurrent:
+		{
+			messageID = LM_API_ICTRL_T_SET;
+			dataSize = packFXP8_8(dataBuffer, outputValue);
+		}
+		break;
+	case kVoltage:
+		{
+			messageID = LM_API_VCOMP_T_SET_NO_ACK; // LM_API_VCOMP_T_SET;
+			dataSize = packFXP8_8(dataBuffer, outputValue);
+		}
+		break;
+	default:
+		return;
+	}
+	if (syncGroup != 0)
+	{
+		dataBuffer[dataSize] = syncGroup;
+		dataSize++;
+	}
+	{	//setTransaction(messageID, dataBuffer, dataSize);
+	
+		//uint32_t ackMessageID = LM_API_ACK | m_deviceNumber;
+		int32_t localStatus = 0;
+
+		// If there was an error on this object and it wasn't a timeout, refuse to talk to the device
+		// Call ClearError() on the object to try again
+		//if (StatusIsFatal() && GetError().GetCode() != -44087)
+		//	return;
+
+		// Make sure we don't have more than one transaction with the same Jaguar outstanding.
+		takeMutex(m_transactionSemaphore);
+
+		// Throw away any stale acks.
+		//receiveMessage(&ackMessageID, NULL, 0, 0.0f);
+		
+		// Send the message with the data.
+		localStatus = sendMessage(messageID | m_deviceNumber, dataBuffer, dataSize);
+		wpi_setErrorWithContext(localStatus, "sendMessage");
+		
+		// Wait for an ack.
+		//localStatus = receiveMessage(&ackMessageID, NULL, 0);
+		//wpi_setErrorWithContext(localStatus, "receiveMessage");
+
+		// Transaction complete.
+		giveMutex(m_transactionSemaphore);
+	}
+	
+	
 	if (m_safetyHelper) m_safetyHelper->Feed();
 }
 
@@ -357,12 +458,12 @@ int32_t CANJaguar::sendMessage(uint32_t messageID, const uint8_t *data, uint8_t 
 				dataBuffer[j + 2] = data[j];
 			}
 //TODO: put this back when CAN shows up
-			//			FRC_NetworkCommunication_JaguarCANDriver_sendMessage(messageID, dataBuffer, dataSize + 2, &status);
+						_sendMessage(messageID, dataBuffer, dataSize + 2, &status);
 			return status;
 		}
 	}
 	//TODO: put this back when CAN shows up
-	//	FRC_NetworkCommunication_JaguarCANDriver_sendMessage(messageID, data, dataSize, &status);
+		_sendMessage(messageID, data, dataSize, &status);
 	return status;
 }
 
@@ -379,8 +480,8 @@ int32_t CANJaguar::receiveMessage(uint32_t *messageID, uint8_t *data, uint8_t *d
 {
 	int32_t status = 0;
 	//TODO: put this back when CAN shows up
-	//	FRC_NetworkCommunication_JaguarCANDriver_receiveMessage(messageID, data, dataSize,
-	//		(uint32_t)(timeout * 1000), &status);
+		_receiveMessage(messageID, data, dataSize,
+			(uint32_t)(timeout * 1000), &status);
 	return status;
 }
 
@@ -1116,6 +1217,7 @@ void CANJaguar::ConfigPotentiometerTurns(uint16_t turns)
  * that are based on the position feedback.  If the position limit is reached or the
  * switch is opened, that direction will be disabled.
  * 
+
  * @param forwardLimitPosition The position that if exceeded will disable the forward direction.
  * @param reverseLimitPosition The position that if exceeded will disable the reverse direction.
  */
