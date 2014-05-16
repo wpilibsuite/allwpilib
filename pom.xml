@@ -10,9 +10,24 @@
 		<module>maven-utilities</module>
 		<module>networktables</module>
 		<module>wpilibj</module>
-		<module>eclipse-plugins</module>
 		<module>driver-station</module>
 	</modules>
+
+
+	<profiles>
+		<profile>
+			<activation>
+		      <property>
+		        <name>with-eclipse-plugins</name>
+		      </property>
+		    </activation>
+		    
+		    <modules>
+		    	<module>eclipse-plugins</module>
+		    </modules>
+		</profile>
+	</profiles>
+
 	<build>
 		<plugins>
 			<plugin>

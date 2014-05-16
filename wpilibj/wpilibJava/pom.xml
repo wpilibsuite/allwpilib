@@ -129,20 +129,20 @@
         <artifactId>maven-source-plugin</artifactId>
       </plugin>
       <plugin>
-	<groupId>org.apache.maven.plugins</groupId>
-	<artifactId>maven-javadoc-plugin</artifactId>
+      	<groupId>org.apache.maven.plugins</groupId>
+      	<artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
-	  <sourceFileExcludes>
-	    <exclude>edu/wpi/first/wpilibj/image/</exclude>
-	    <exclude>edu/wpi/first/wpilibj/camera/</exclude>
-	    <exclude>edu/wpi/first/wpilibj/visa/</exclude>
-	    <exclude>edu/wpi/first/wpilibj/SerialPort.java</exclude>
-	    <exclude>edu/wpi/first/wpilibj/Kinect.java</exclude>
-	    <exclude>edu/wpi/first/wpilibj/KinectStick.java</exclude>
-	    <exclude>edu/wpi/first/wpilibj/DriverStationEnhancedIO.java</exclude>
-	    <exclude>edu/wpi/first/wpilibj/buttons/DigitalIOButton.java</exclude>
-	    <exclude>edu/wpi/first/wpilibj/buttons/AnalogIOButton.java</exclude>
-	  </sourceFileExcludes>
+      	  <sourceFileExcludes>
+      	    <exclude>edu/wpi/first/wpilibj/image/</exclude>
+      	    <exclude>edu/wpi/first/wpilibj/camera/</exclude>
+      	    <exclude>edu/wpi/first/wpilibj/visa/</exclude>
+      	    <exclude>edu/wpi/first/wpilibj/SerialPort.java</exclude>
+      	    <exclude>edu/wpi/first/wpilibj/Kinect.java</exclude>
+      	    <exclude>edu/wpi/first/wpilibj/KinectStick.java</exclude>
+      	    <exclude>edu/wpi/first/wpilibj/DriverStationEnhancedIO.java</exclude>
+      	    <exclude>edu/wpi/first/wpilibj/buttons/DigitalIOButton.java</exclude>
+      	    <exclude>edu/wpi/first/wpilibj/buttons/AnalogIOButton.java</exclude>
+      	  </sourceFileExcludes>
         </configuration>
       </plugin>
     </plugins>
