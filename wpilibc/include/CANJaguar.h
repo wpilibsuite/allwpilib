@@ -46,6 +46,7 @@ public:
 	// SpeedController interface
 	virtual float Get();
 	virtual void Set(float value, uint8_t syncGroup=0);
+	void SetNoAck(float value, uint8_t syncGroup=0);
 	virtual void Disable();
 
 	// PIDOutput interface
@@ -110,7 +111,9 @@ protected:
 	virtual void getTransaction(uint32_t messageID, uint8_t *data, uint8_t *dataSize);
 
 	static int32_t sendMessage(uint32_t messageID, const uint8_t *data, uint8_t dataSize);
-	static int32_t receiveMessage(uint32_t *messageID, uint8_t *data, uint8_t *dataSize, float timeout = 0.02);
+	//#define kTimeoutCan 0.02
+	#define kTimeoutCan 0.0
+	static int32_t receiveMessage(uint32_t *messageID, uint8_t *data, uint8_t *dataSize, float timeout = kTimeoutCan);
 
 	uint8_t m_deviceNumber;
 	ControlMode m_controlMode;
