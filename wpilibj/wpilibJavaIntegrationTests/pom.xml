@@ -15,6 +15,11 @@
 			<version>0.1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
+			<groupId>edu.wpi.first.wpilib.networktables.java</groupId>
+			<artifactId>NetworkTables</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.11</version>
@@ -74,6 +79,12 @@
 								<artifactItem>
 									<groupId>edu.wpi.first.wpilibj</groupId>
 									<artifactId>wpilibJavaFinal</artifactId>
+									<version>0.1.0-SNAPSHOT</version>
+									<type>jar</type>
+								</artifactItem>
+								<artifactItem>
+									<groupId>edu.wpi.first.wpilib.networktables.java</groupId>
+									<artifactId>NetworkTables</artifactId>
 									<version>0.1.0-SNAPSHOT</version>
 									<type>jar</type>
 								</artifactItem>

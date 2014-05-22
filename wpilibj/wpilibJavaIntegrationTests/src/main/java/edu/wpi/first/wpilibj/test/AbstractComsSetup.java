@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
  * This class serves as a superclass for all tests that involve the hardware on
@@ -41,6 +42,7 @@ public abstract class AbstractComsSetup {
 			FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationReserve();
 			FRCNetworkCommunicationsLibrary
 					.FRCNetworkCommunicationObserveUserProgramStarting();
+			LiveWindow.setEnabled(false);
 			System.out.println("Started coms");
 
 			// Wait until the robot is enabled before starting the tests
