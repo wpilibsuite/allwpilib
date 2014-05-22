@@ -10,8 +10,6 @@
 #include "NetworkCommunication/AICalibration.h"
 #include "NetworkCommunication/LoadOut.h"
 
-#include <stdio.h> // TODO: remove printf for debugging
-
 static const long kTimebase = 40000000; ///< 40 MHz clock
 static const long kDefaultOversampleBits = 0;
 static const long kDefaultAverageBits = 7;
@@ -540,7 +538,6 @@ uint32_t getAccumulatorCount(void* analog_port_pointer, int32_t *status) {
  * @param count Pointer to the number of accumulation cycles.
  */
 void getAccumulatorOutput(void* analog_port_pointer, int64_t *value, uint32_t *count, int32_t *status) {
-  printf("[HAL] getAccumulatorOutput()\n");
   AnalogPort* port = (AnalogPort*) analog_port_pointer;
   if (port->accumulator == NULL) {
     *status = NULL_PARAMETER;
@@ -551,12 +548,8 @@ void getAccumulatorOutput(void* analog_port_pointer, int64_t *value, uint32_t *c
     return;
   }
 
-  printf("[HAL]\t Getting output...\n");
   tAccumulator::tOutput output = port->accumulator->readOutput(status);
-  
-  printf("[HAL]\t Status: %d, Value: %lld, Count: %d.\n", *status, output.Value, output.Count);
-  printf("[HAL]\t value: %d, value2: %d, value3: %d.\n", output.value, output.value2, output.value3);
-  printf("[HAL]\t Value: %lld, Count: %d.\n", port->accumulator->readOutput_Value(status), port->accumulator->readOutput_Count(status)); 
+
   *value = output.Value;
   *count = output.Count;
 }
