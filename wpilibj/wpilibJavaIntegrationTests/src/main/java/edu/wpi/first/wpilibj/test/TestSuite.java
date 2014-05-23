@@ -5,7 +5,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+
+import edu.wpi.first.wpilibj.MotorEncoderTest;
 import edu.wpi.first.wpilibj.SampleTest;
+import edu.wpi.first.wpilibj.TimerTest;
 
 /**
  * The WPILibJ Integeration Test Suite collects all of the tests to be run by
@@ -14,7 +17,7 @@ import edu.wpi.first.wpilibj.SampleTest;
  * suite classes annotation.
  */
 @RunWith(Suite.class)
-@SuiteClasses({ SampleTest.class })
+@SuiteClasses({ SampleTest.class, MotorEncoderTest.class, TimerTest.class })
 public class TestSuite {
 
 	public static void main(String[] args) {
