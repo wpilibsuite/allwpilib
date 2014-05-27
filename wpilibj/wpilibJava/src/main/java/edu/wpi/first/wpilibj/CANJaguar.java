@@ -174,18 +174,16 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
     private MotorSafetyHelper m_safetyHelper;
     private static final byte[] kNoData = new byte[0];
 
-    private final static int swap16(int x, byte[] buffer) {
-        buffer[0] = (byte) ((x >>> 8) & 0x00FF);
-        buffer[1] = (byte) x;
-        return ((((x) >>> 8) & 0x00FF) | (((x) << 8) & 0xFF00));
+    private final static void swap16(int x, byte[] buffer) {
+    	buffer[0] = (byte)(x & 0xff);
+    	buffer[1] = (byte)((x>>8) & 0xff);
     }
 
-    private final static long swap32(long x, byte[] buffer) {
-        buffer[0] = (byte) ((x >>> 24) & 0x00FF);
-        buffer[1] = (byte) ((x >>> 16) & 0x00FF);
-        buffer[2] = (byte) ((x >>> 8) & 0x00FF);
-        buffer[3] = (byte) x;
-        return ((((x) >> 24) & 0x000000FF) | (((x) >> 8) & 0x0000FF00) | (((x) << 8) & 0x00FF0000) | (((x) << 24) & 0xFF000000));
+    private final static void swap32(long x, byte[] buffer) {
+    	buffer[0] = (byte)(x & 0xff);
+    	buffer[1] = (byte)((x>>8) & 0xff);
+    	buffer[2] = (byte)((x>>16) & 0xff);
+    	buffer[3] = (byte)((x>>24) & 0xff);
     }
 
     /**

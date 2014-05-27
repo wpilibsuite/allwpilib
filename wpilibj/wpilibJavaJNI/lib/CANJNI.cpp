@@ -5,6 +5,7 @@
 #include "edu_wpi_first_wpilibj_can_CANJNI.h"
 
 #include "HAL/CAN.h"
+#include "NetworkCommunication/JaguarCANDriver.h"
 
 // set the logging level
 TLogLevel canJNILogLevel = logDEBUG;
@@ -46,7 +47,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetworkCommunica
 
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	//CANJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	JaguarCANSendMessage((uint32_t) messageID, (const uint8_t*)dataPtr, (uint8_t)dataCapacity, statusPtr);
+	FRC_NetworkCommunication_JaguarCANDriver_sendMessage((uint32_t) messageID, (const uint8_t*)dataPtr, (uint8_t)dataCapacity, statusPtr);
 	CANJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
 
@@ -68,7 +69,7 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetworkCommun
 	jbyte* dataPtr = new jbyte[8];
 	//CANJNI_LOG(logDEBUG) << "Original MessageSize = " << (jint)dataSize;
 	//CANJNI_LOG(logDEBUG) << "Original MessagePtr = " << (jint*)dataPtr;
-	JaguarCANReceiveMessage((uint32_t*)messageIDPtr, (uint8_t*)dataPtr, &dataSize, timeout, statusPtr);
+	FRC_NetworkCommunication_JaguarCANDriver_receiveMessage((uint32_t*)messageIDPtr, (uint8_t*)dataPtr, &dataSize, timeout, statusPtr);
 
 	//CANJNI_LOG(logDEBUG) << "MessageID Out = " << std::hex << *messageIDPtr;
 	CANJNI_LOG(logDEBUG) << "MessageSize = " << (jint)dataSize;
