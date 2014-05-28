@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
+/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -201,7 +201,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
     * @param deadbandMin The low end of the deadband pulse width in ms
     * @param min The minimum pulse width in ms
     */
-    void setBounds(double max, double deadbandMax, double center, double deadbandMin, double min) {
+    protected void setBounds(double max, double deadbandMax, double center, double deadbandMin, double min) {
         double loopTime = m_module.getLoopTiming()/(kSystemClockTicksPerMicrosecond*1e3);
 
         m_maxPwm = (int)((max-kDefaultPwmCenter)/loopTime+kDefaultPwmStepsDown-1);
