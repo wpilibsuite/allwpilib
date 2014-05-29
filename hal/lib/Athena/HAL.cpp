@@ -11,7 +11,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <signal.h> // linux for kill
-const uint32_t solenoid_kNumDO7_0Elements = 0;
+const uint32_t solenoid_kNumDO7_0Elements = 8;
 const uint32_t dio_kNumSystems = tDIO::kNumSystems;
 const uint32_t interrupt_kNumSystems = tInterrupt::kNumSystems;
 const uint32_t kSystemClockTicksPerMicrosecond = 40;

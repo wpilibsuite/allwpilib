@@ -6,81 +6,56 @@
 #include "ChipObject.h"
 #include "HAL/cpp/Synchronized.hpp"
 #include "NetworkCommunication/LoadOut.h"
+#include "ctre/PCM.h"
+#include <iostream>
 
-// XXX No solenoid abstraction :(
+bool pcmModulesInitialized = false;
 
-// struct solenoid_port_t {
-//   Port port;
-//   tSolenoid *module;
-//   uint32_t PWMGeneratorID;
-// };
-// typedef struct solenoid_port_t SolenoidPort;
+static const int NUM_PCMS = 2;
+PCM *modules[NUM_PCMS];
 
-// static ReentrantSemaphore solenoidSemaphore;
-// static tSolenoid* solenoidModules[2] = {NULL, NULL};
+struct solenoid_port_t {
+	PCM *module;
+	uint32_t pin;
+};
 
-// bool solenoidModulesInitialized = false;
+void initializePCM() {
+	if(!pcmModulesInitialized) {
+		modules[0] = new PCM(50);
+		modules[1] = new PCM(51);
+	
+		pcmModulesInitialized = true;
+	}
+}
 
-// /**
-//  * Initialize the digital modules.
-//  */
-// void initializeSolenoid(int32_t *status) {
-//   if (solenoidModulesInitialized) return;
+void* initializeSolenoidPort(void *port_pointer, int32_t *status) {
+	initializePCM();
+	
+	Port* port = (Port*) port_pointer;
+	
+	solenoid_port_t *solenoid_port = new solenoid_port_t;
+	solenoid_port->module = modules[port->module - 1];
+	solenoid_port->pin = port->pin;
+	
+	return solenoid_port;
+}
 
-//   for (unsigned int i = 0; i < (sizeof(solenoidModules)/sizeof(solenoidModules[0])); i++) {
-// 	Synchronized sync(solenoidSemaphore);
-// 	solenoidModules[i] = tSolenoid::create(status);
-//   }
-//   solenoidModulesInitialized = true;
-// }
+bool checkSolenoidModule(uint8_t module) {
+	return module > 0 and module <= NUM_PCMS;
+}
 
-// void* initializeSolenoidPort(void* port_pointer, int32_t *status) {
-//   initializeSolenoid(status);
-//   Port* port = (Port*) port_pointer;
+bool getSolenoid(void* solenoid_port_pointer, int32_t *status) {
+	solenoid_port_t* port = (solenoid_port_t*) solenoid_port_pointer;
+	bool value;
+	
+	*status = port->module->GetSolenoid(port->pin, value);
+	
+	return value;
+}
 
-//   // Initialize port structure
-//   SolenoidPort* solenoid_port = new SolenoidPort();
-//   solenoid_port->port = *port;
-//   solenoid_port->module = solenoidModules[solenoid_port->port.module-1];
-
-//   return solenoid_port;
-// }
-
-// bool checkSolenoidModule(uint8_t module) {
-//   if (nLoadOut::getModulePresence(nLoadOut::kModuleType_Solenoid, module - 1))
-// 	return true;
-//   return false;
-// }
-
-// bool getSolenoid(void* solenoid_port_pointer, int32_t *status) {
-//   SolenoidPort* port = (SolenoidPort*) solenoid_port_pointer;
-//   if (checkSolenoidModule(port->port.module)) {
-// 	uint8_t mask = 1 << (port->port.pin - 1);
-// 	return (mask & port->module->readDO7_0(port->port.module - 1, status));
-//   }
-//   return false;
-// }
-
-// void setSolenoid(void* solenoid_port_pointer, bool value, int32_t *status) {
-//   SolenoidPort* port = (SolenoidPort*) solenoid_port_pointer;
-//   if (checkSolenoidModule(port->port.module)) {
-// 	Synchronized sync(solenoidSemaphore);
-// 	uint8_t currentValue = port->module->readDO7_0(port->port.module - 1, status);
-// 	uint8_t mask = 1 << (port->port.pin - 1);
-// 	if (value) currentValue = currentValue | mask; // Flip the bit on
-// 	else currentValue = currentValue & ~mask; // Flip the bit off
-// 	port->module->writeDO7_0(port->port.module - 1, currentValue, status);
-//   }
-// }
-
-// XXX No solenoid abstraction :(
-
-/**
- * Initialize the digital modules.
- */
-void initializeSolenoid(int32_t *status) {}
-void* initializeSolenoidPort(void* port_pointer, int32_t *status) { return NULL; }
-bool checkSolenoidModule(uint8_t module) { return false; }
-bool getSolenoid(void* solenoid_port_pointer, int32_t *status) { return false; }
-void setSolenoid(void* solenoid_port_pointer, bool value, int32_t *status) {}
+void setSolenoid(void* solenoid_port_pointer, bool value, int32_t *status) {
+	solenoid_port_t* port = (solenoid_port_t*) solenoid_port_pointer;
+	
+	*status = port->module->SetSolenoid(port->pin, value);
+}
 
