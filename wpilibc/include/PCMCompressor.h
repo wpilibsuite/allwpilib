@@ -5,7 +5,7 @@
 #ifndef PCMCOMPRESSOR_H_
 #define PCMCOMPRESSOR_H_
 
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 #include "SensorBase.h"
 #include "tables/ITableListener.h"
 #include "LiveWindow/LiveWindowSendable.h"

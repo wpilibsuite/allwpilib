@@ -1,3 +1,5 @@
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+
 #include "PCM.h"
 #include "NetworkCommunication/JaguarCANDriver.h"
 #include <string.h> // memset

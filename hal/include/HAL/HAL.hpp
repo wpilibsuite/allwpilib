@@ -13,6 +13,7 @@
 #include <cmath>
 
 #include "Analog.hpp"
+#include "Compressor.hpp"
 #include "Digital.hpp"
 #include "Solenoid.hpp"
 #include "Notifier.hpp"
