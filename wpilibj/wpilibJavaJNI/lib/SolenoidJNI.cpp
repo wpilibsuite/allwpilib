@@ -1,6 +1,6 @@
 #include <jni.h>
-#include "Log.h"
-#include "HAL/HAL.h"
+#include "Log.hpp"
+#include "HAL/HAL.hpp"
 
 #include "edu_wpi_first_wpilibj_hal_SolenoidJNI.h"
 

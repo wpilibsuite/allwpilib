@@ -7,7 +7,6 @@
 #include "HAL/cpp/Synchronized.hpp"
 #include "NetworkCommunication/LoadOut.h"
 #include "ctre/PCM.h"
-#include <iostream>
 
 bool pcmModulesInitialized = false;
 

@@ -1,6 +1,6 @@
-#include "Log.h"
+#include "Log.hpp"
 #include "edu_wpi_first_wpilibj_hal_CompressorJNI.h"
-#include "HAL/HAL.h"
+#include "HAL/HAL.hpp"
 
 typedef void *VoidPointer;
 
