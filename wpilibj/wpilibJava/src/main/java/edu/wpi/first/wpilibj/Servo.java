@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
+/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -22,17 +22,21 @@ import edu.wpi.first.wpilibj.tables.ITableListener;
  */
 public class Servo extends PWM implements IDevice {
 
-    private static final double kMaxServoAngle = 170.0;
+    private static final double kMaxServoAngle = 180.0;
     private static final double kMinServoAngle = 0.0;
+    
+    private static final double kDefaultMaxServoPWM = 2.4;
+    private static final double kDefaultMinServoPWM = .6;
 
     /**
      * Common initialization code called by all constructors.
      *
      * InitServo() assigns defaults for the period multiplier for the servo PWM control signal, as
      * well as the minimum and maximum PWM values supported by the servo.
+     * 
      */
     private void initServo() {
-        setBounds(2.27, 0, 0, 0, .743);
+        setBounds(kDefaultMaxServoPWM, 0, 0, 0, kDefaultMinServoPWM);
         setPeriodMultiplier(PeriodMultiplier.k4X);
 
         LiveWindow.addActuator("Servo", getModuleNumber(), getChannel(), this);
@@ -40,7 +44,10 @@ public class Servo extends PWM implements IDevice {
     }
 
     /**
-     * Constructor that assumes the default digital module.
+     * Constructor that assumes the default digital module.<br>
+     * 
+     * By default {@value #kDefaultMaxServoPWM} ms is used as the maxPWM value<br>
+     * By default {@value #kDefaultMinServoPWM} ms is used as the minPWM value<br>
      *
      * @param channel The PWM channel on the digital module to which the servo is attached.
      */
@@ -50,8 +57,11 @@ public class Servo extends PWM implements IDevice {
     }
 
     /**
-     * Constructor that specifies the digital module.
+     * Constructor that specifies the digital module.<br>
      *
+     * By default {@value #kDefaultMaxServoPWM} ms is used as the maxPWM value<br>
+     * By default {@value #kDefaultMinServoPWM} ms is used as the minPWM value<br>
+     * 
      * @param slot The slot in the chassis that the digital module is plugged into.
      * @param channel The PWM channel on the digital module to which the servo is attached.
      */
@@ -59,8 +69,9 @@ public class Servo extends PWM implements IDevice {
         super(slot, channel);
         initServo();
     }
+    
 
-    /**
+	/**
      * Set the servo position.
      *
      * Servo values range from 0.0 to 1.0 corresponding to the range of full left to full right.
