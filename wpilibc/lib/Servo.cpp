@@ -12,6 +12,9 @@
 constexpr float Servo::kMaxServoAngle;
 constexpr float Servo::kMinServoAngle;
 
+constexpr float Servo::kDefaultMaxServoPWM;
+constexpr float Servo::kDefaultMinServoPWM;
+
 /**
  * Common initialization code called by all constructors.
  *
@@ -21,7 +24,7 @@ constexpr float Servo::kMinServoAngle;
 void Servo::InitServo()
 {
 	m_table = NULL;
-	SetBounds(2.27, 1.513, 1.507, 1.5, .743);
+	SetBounds(kDefaultMaxServoPWM, 0.0, 0.0, 0.0, kDefaultMinServoPWM);
 	SetPeriodMultiplier(kPeriodMultiplier_4X);
 
 	LiveWindow::GetInstance()->AddActuator("Servo", GetModuleNumber(), GetChannel(), this);
