@@ -7,7 +7,7 @@
 #include "HAL/Digital.hpp"
 
 // set the logging level
-TLogLevel dioJNILogLevel = logDEBUG;
+TLogLevel dioJNILogLevel = logWARNING;
 
 #define DIOJNI_LOG(level) \
     if (level > dioJNILogLevel) ; \

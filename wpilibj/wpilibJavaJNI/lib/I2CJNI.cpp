@@ -6,7 +6,7 @@
 
 
 // set the logging level
-TLogLevel i2cJNILogLevel = logDEBUG;
+TLogLevel i2cJNILogLevel = logWARNING;
 
 #define I2CJNI_LOG(level) \
     if (level > i2cJNILogLevel) ; \

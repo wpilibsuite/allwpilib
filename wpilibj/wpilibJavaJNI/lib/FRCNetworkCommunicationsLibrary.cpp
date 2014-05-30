@@ -7,6 +7,14 @@
 //#include "NetworkCommunication/FRCComm.h"
 //#include "NetworkCommunication/UsageReporting.h"
 
+// set the logging level
+TLogLevel netCommLogLevel = logWARNING;
+
+#define NETCOMM_LOG(level) \
+    if (level > netCommLogLevel) ; \
+    else Log().Get(level)
+
+
 
 /*
  * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
@@ -91,7 +99,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetworkCommunicationUsageReportingReport
   (JNIEnv * paramEnv, jclass, jbyte paramResource, jbyte paramInstanceNumber, jbyte paramContext, jstring paramFeature)
 {
-	FILE_LOG(logDEBUG) << "Calling FRCNetworkCommunicationsLibrary report " << "res:"<< (unsigned int)paramResource << " instance:" << (unsigned int)paramInstanceNumber << " context:" << (unsigned int)paramContext << " feature:" << paramFeature;
+	NETCOMM_LOG(logDEBUG) << "Calling FRCNetworkCommunicationsLibrary report " << "res:"<< (unsigned int)paramResource << " instance:" << (unsigned int)paramInstanceNumber << " context:" << (unsigned int)paramContext << " feature:" << paramFeature;
 	const char * featureStr = paramEnv->GetStringUTFChars(paramFeature, NULL);
 	jint returnValue = HALReport(paramResource, paramInstanceNumber, paramContext, featureStr);
 	paramEnv->ReleaseStringUTFChars(paramFeature,featureStr);
@@ -153,7 +161,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
 
 	int returnValue = HALGetCommonControlData(&controlDataNative, HAL_WAIT_FOREVER);
 
-	//FILE_LOG(logDEBUG) << "PacketIndex: " << (void*)controlDataNative.packetIndex << " Control: " << (void*)controlDataNative.control << " ReturnValue: " << (void*)returnValue;
+	//NETCOMM_LOG(logDEBUG) << "PacketIndex: " << (void*)controlDataNative.packetIndex << " Control: " << (void*)controlDataNative.control << " ReturnValue: " << (void*)returnValue;
 
 	if(!initializeComplete)
 	{
@@ -212,9 +220,9 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
 		initializeComplete = true;
 	}
 
-	//FILE_LOG(logDEBUG) << "PacketIndex  : " << (short)controlDataNative.packetIndex;
+	//NETCOMM_LOG(logDEBUG) << "PacketIndex  : " << (short)controlDataNative.packetIndex;
 	env->SetShortField(controlData,packetIndexFieldID, controlDataNative.packetIndex);
-	//FILE_LOG(logDEBUG) << "Control  : " << (short)controlDataNative.control;
+	//NETCOMM_LOG(logDEBUG) << "Control  : " << (short)controlDataNative.control;
 	env->SetByteField(controlData,controlFieldID, controlDataNative.control);
 	env->SetByteField(controlData,dsDigitalInFieldID, controlDataNative.dsDigitalIn);
 	env->SetShortField(controlData,teamIDFieldID, controlDataNative.teamID);
@@ -352,7 +360,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_setStatusData
   (JNIEnv * env, jclass, jfloat paramBattery, jbyte param1, jbyte param2, jstring paramUserDataHigh, jint param4, jstring paramUserDataLow, jint param6)
 {
-	//FILE_LOG(logDEBUG) << "Voltage - " << paramBattery;
+	//NETCOMM_LOG(logDEBUG) << "Voltage - " << paramBattery;
 	const char * userDataHighStr = env->GetStringUTFChars(paramUserDataHigh, NULL);
 	const char * userDataLowStr = env->GetStringUTFChars(paramUserDataLow, NULL);
 	jint returnValue = HALSetStatusData(paramBattery, param1, param2, userDataHighStr, param4, userDataLowStr, param6, HAL_WAIT_FOREVER );
@@ -513,7 +521,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
   (JNIEnv * env, jclass, jobject id )
 {
 	MUTEX_ID* javaId = (MUTEX_ID*)env->GetDirectBufferAddress(id);
-	FILE_LOG(logDEBUG) << "Mutex Ptr = " << *javaId;
+	NETCOMM_LOG(logDEBUG) << "Mutex Ptr = " << *javaId;
 	HALSetNewDataSem(*javaId);
 }
 
@@ -525,14 +533,14 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueParameterTest
   (JNIEnv *, jclass, jboolean booleanParam, jbyte byteParam, jchar charParam, jshort shortParam, jint intParam, jlong longParam, jfloat floatParam, jdouble doubleParam)
 {
-	FILE_LOG(logDEBUG) << "Boolean: " << booleanParam;
-	FILE_LOG(logDEBUG) << "Byte   : " << byteParam;
-	FILE_LOG(logDEBUG) << "Char   : " << charParam;
-	FILE_LOG(logDEBUG) << "Short  : " << shortParam;
-	FILE_LOG(logDEBUG) << "Int    : " << intParam;
-	FILE_LOG(logDEBUG) << "Long   : " << longParam;
-	FILE_LOG(logDEBUG) << "Float  : " << floatParam;
-	FILE_LOG(logDEBUG) << "Double : " << doubleParam;
+	NETCOMM_LOG(logDEBUG) << "Boolean: " << booleanParam;
+	NETCOMM_LOG(logDEBUG) << "Byte   : " << byteParam;
+	NETCOMM_LOG(logDEBUG) << "Char   : " << charParam;
+	NETCOMM_LOG(logDEBUG) << "Short  : " << shortParam;
+	NETCOMM_LOG(logDEBUG) << "Int    : " << intParam;
+	NETCOMM_LOG(logDEBUG) << "Long   : " << longParam;
+	NETCOMM_LOG(logDEBUG) << "Float  : " << floatParam;
+	NETCOMM_LOG(logDEBUG) << "Double : " << doubleParam;
 }
 
 /*
@@ -543,7 +551,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnBooleanTest
   (JNIEnv *, jclass, jboolean booleanParam )
 {
-	FILE_LOG(logDEBUG) << "Boolean: " << booleanParam;
+	NETCOMM_LOG(logDEBUG) << "Boolean: " << booleanParam;
 	return !booleanParam;
 }
 
@@ -555,7 +563,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCo
 JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnByteTest
   (JNIEnv *, jclass, jbyte byteParam)
 {
-	FILE_LOG(logDEBUG) << "Byte: " << byteParam;
+	NETCOMM_LOG(logDEBUG) << "Byte: " << byteParam;
 	return byteParam+1;
 }
 
@@ -567,7 +575,7 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommu
 JNIEXPORT jchar JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnCharTest
   (JNIEnv *, jclass, jchar charParam)
 {
-	FILE_LOG(logDEBUG) << "Char: " << charParam;
+	NETCOMM_LOG(logDEBUG) << "Char: " << charParam;
 	return charParam+1;
 }
 
@@ -579,7 +587,7 @@ JNIEXPORT jchar JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommu
 JNIEXPORT jshort JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnShortTest
   (JNIEnv *, jclass, jshort shortParam)
 {
-	FILE_LOG(logDEBUG) << "Short: " << shortParam;
+	NETCOMM_LOG(logDEBUG) << "Short: " << shortParam;
 	return shortParam+1;
 }
 
@@ -591,7 +599,7 @@ JNIEXPORT jshort JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkComm
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnIntTest
   (JNIEnv *, jclass, jint intParam)
 {
-	FILE_LOG(logDEBUG) << "Int: " << intParam;
+	NETCOMM_LOG(logDEBUG) << "Int: " << intParam;
 	return intParam+1;
 }
 
@@ -603,7 +611,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
 JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnLongTest
   (JNIEnv *, jclass, jlong longParam)
 {
-	FILE_LOG(logDEBUG) << "Long: " << longParam;
+	NETCOMM_LOG(logDEBUG) << "Long: " << longParam;
 	return longParam+1;
 }
 
@@ -615,7 +623,7 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommu
 JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnFloatTest
   (JNIEnv *, jclass, jfloat floatParam)
 {
-	FILE_LOG(logDEBUG) << "Float: " << floatParam;
+	NETCOMM_LOG(logDEBUG) << "Float: " << floatParam;
 	return floatParam/100.0f;
 }
 
@@ -627,7 +635,7 @@ JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkComm
 JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnDoubleTest
   (JNIEnv *, jclass, jdouble doubleParam)
 {
-	FILE_LOG(logDEBUG) << "Double: " << doubleParam;
+	NETCOMM_LOG(logDEBUG) << "Double: " << doubleParam;
 	return doubleParam * 100.0;
 }
 
@@ -640,7 +648,7 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCom
   (JNIEnv * env, jclass, jstring stringParam)
 {
 	const char * stringParamLocal = env->GetStringUTFChars(stringParam, NULL);
-	FILE_LOG(logDEBUG) << "String: " << stringParamLocal;
+	NETCOMM_LOG(logDEBUG) << "String: " << stringParamLocal;
 	env->ReleaseStringUTFChars(stringParam,stringParamLocal);
 
 	char returnStringLocal[] = "this is the return string";
@@ -657,13 +665,13 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCom
   (JNIEnv * env, jclass, jobject byteArrayIn )
 {
 	jbyte * byteArray = (jbyte*)env->GetDirectBufferAddress(byteArrayIn);
-	FILE_LOG(logDEBUG) << "Ptr: " << (long)byteArray;
+	NETCOMM_LOG(logDEBUG) << "Ptr: " << (long)byteArray;
 	jlong byteArrayLength = env->GetDirectBufferCapacity(byteArrayIn);
-	FILE_LOG(logDEBUG) << "Capacity: " << byteArrayLength;
-	FILE_LOG(logDEBUG) << "Byte0: " << (short)byteArray[0];
-	FILE_LOG(logDEBUG) << "Byte1: " << (short)byteArray[1];
-	FILE_LOG(logDEBUG) << "Byte2: " << (short)byteArray[2];
-	FILE_LOG(logDEBUG) << "Byte3: " << (short)byteArray[3];
+	NETCOMM_LOG(logDEBUG) << "Capacity: " << byteArrayLength;
+	NETCOMM_LOG(logDEBUG) << "Byte0: " << (short)byteArray[0];
+	NETCOMM_LOG(logDEBUG) << "Byte1: " << (short)byteArray[1];
+	NETCOMM_LOG(logDEBUG) << "Byte2: " << (short)byteArray[2];
+	NETCOMM_LOG(logDEBUG) << "Byte3: " << (short)byteArray[3];
 
 	jbyte * returnByteArray = new jbyte[4];
 	returnByteArray[0] = byteArray[0];
@@ -684,14 +692,14 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCom
 {
 	jint * intArray = (jint*)env->GetDirectBufferAddress(intArrayIn);
 	jbyte * byteArray = (jbyte*)env->GetDirectBufferAddress(intArrayIn);
-	FILE_LOG(logDEBUG) << "Ptr: " << (long)intArray;
+	NETCOMM_LOG(logDEBUG) << "Ptr: " << (long)intArray;
 	jlong byteArrayLength = env->GetDirectBufferCapacity(intArrayIn);
-	FILE_LOG(logDEBUG) << "Capacity: " << byteArrayLength;
-	FILE_LOG(logDEBUG) << "Int0: " << intArray[0];
-	FILE_LOG(logDEBUG) << "Byte0: " << (short)byteArray[0];
-	FILE_LOG(logDEBUG) << "Byte1: " << (short)byteArray[1];
-	FILE_LOG(logDEBUG) << "Byte2: " << (short)byteArray[2];
-	FILE_LOG(logDEBUG) << "Byte3: " << (short)byteArray[3];
+	NETCOMM_LOG(logDEBUG) << "Capacity: " << byteArrayLength;
+	NETCOMM_LOG(logDEBUG) << "Int0: " << intArray[0];
+	NETCOMM_LOG(logDEBUG) << "Byte0: " << (short)byteArray[0];
+	NETCOMM_LOG(logDEBUG) << "Byte1: " << (short)byteArray[1];
+	NETCOMM_LOG(logDEBUG) << "Byte2: " << (short)byteArray[2];
+	NETCOMM_LOG(logDEBUG) << "Byte3: " << (short)byteArray[3];
 
 	// increment the param
 	intArray[0]++;

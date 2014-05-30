@@ -6,7 +6,7 @@
 
 
 // set the logging level
-TLogLevel spiJNILogLevel = logDEBUG;
+TLogLevel spiJNILogLevel = logWARNING;
 
 #define SPIJNI_LOG(level) \
     if (level > spiJNILogLevel) ; \

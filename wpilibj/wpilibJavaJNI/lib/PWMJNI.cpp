@@ -7,7 +7,7 @@
 #include "HAL/Digital.hpp"
 
 // set the logging level
-TLogLevel pwmJNILogLevel = logERROR;
+TLogLevel pwmJNILogLevel = logWARNING;
 
 #define PWMJNI_LOG(level) \
     if (level > pwmJNILogLevel) ; \

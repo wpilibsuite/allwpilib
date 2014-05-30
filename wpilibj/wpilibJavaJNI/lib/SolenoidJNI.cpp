@@ -4,7 +4,7 @@
 
 #include "edu_wpi_first_wpilibj_hal_SolenoidJNI.h"
 
-TLogLevel solenoidJNILogLevel = logERROR;
+TLogLevel solenoidJNILogLevel = logWARNING;
 
 #define SOLENOIDJNI_LOG(level) \
     if (level > solenoidJNILogLevel) ; \

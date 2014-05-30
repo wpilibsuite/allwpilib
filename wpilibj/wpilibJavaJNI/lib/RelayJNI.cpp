@@ -7,7 +7,7 @@
 #include "HAL/Digital.hpp"
 
 // set the logging level
-TLogLevel relayJNILogLevel = logDEBUG;
+TLogLevel relayJNILogLevel = logWARNING;
 
 #define RELAYJNI_LOG(level) \
     if (level > relayJNILogLevel) ; \

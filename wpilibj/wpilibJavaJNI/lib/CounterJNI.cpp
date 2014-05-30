@@ -7,7 +7,7 @@
 #include "HAL/Digital.hpp"
 
 // set the logging level
-TLogLevel counterJNILogLevel = logDEBUG;
+TLogLevel counterJNILogLevel = logWARNING;
 
 #define COUNTERJNI_LOG(level) \
     if (level > counterJNILogLevel) ; \

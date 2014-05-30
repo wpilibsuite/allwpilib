@@ -8,7 +8,7 @@
 #include "NetworkCommunication/JaguarCANDriver.h"
 
 // set the logging level
-TLogLevel canJNILogLevel = logDEBUG;
+TLogLevel canJNILogLevel = logWARNING;
 
 #define CANJNI_LOG(level) \
     if (level > canJNILogLevel) ; \

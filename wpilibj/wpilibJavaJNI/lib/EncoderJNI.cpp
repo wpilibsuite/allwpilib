@@ -7,7 +7,7 @@
 #include "HAL/Digital.hpp"
 
 // set the logging level
-TLogLevel encoderJNILogLevel = logDEBUG;
+TLogLevel encoderJNILogLevel = logWARNING;
 
 #define ENCODERJNI_LOG(level) \
     if (level > encoderJNILogLevel) ; \

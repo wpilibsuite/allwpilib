@@ -5,7 +5,7 @@
 #include "HAL/HAL.hpp"
 
 // set the logging level
-TLogLevel halUtilLogLevel = logDEBUG;
+TLogLevel halUtilLogLevel = logWARNING;
 
 #define HALUTIL_LOG(level) \
     if (level > halUtilLogLevel) ; \
