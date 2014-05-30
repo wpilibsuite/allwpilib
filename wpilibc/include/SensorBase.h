@@ -42,6 +42,7 @@ public:
 	static bool CheckPWMChannel(uint32_t channel);
 	static bool CheckAnalogChannel(uint32_t channel);
 	static bool CheckSolenoidChannel(uint32_t channel);
+	static bool CheckPDPChannel(uint32_t channel);
 
 	static const uint32_t kDigitalChannels = 14;
 	static const uint32_t kAnalogChannels = 8;
@@ -51,6 +52,7 @@ public:
 	static const uint32_t kSolenoidModules = 2;
 	static const uint32_t kPwmChannels = 10;
 	static const uint32_t kRelayChannels = 8;
+	static const uint32_t kPDPChannels = 16;
 	static const uint32_t kChassisSlots = 8;
 protected:
 	void AddToSingletonList();

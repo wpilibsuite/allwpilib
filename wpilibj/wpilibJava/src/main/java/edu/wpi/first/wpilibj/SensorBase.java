@@ -58,6 +58,10 @@ public abstract class SensorBase { // TODO: Refactor
      * Number of relay channels per sidecar
      */
     public static final int kRelayChannels = 4;
+    /**
+     * Number of power distribution channels
+     */
+    public static final int kPDPChannels = 16;
 
     private static int m_defaultAnalogModule = 1;
     private static int m_defaultDigitalModule = 1;
@@ -222,6 +226,18 @@ public abstract class SensorBase { // TODO: Refactor
      */
     protected static void checkSolenoidChannel(final int channel) {
         if (channel <= 0 || channel > kSolenoidChannels) {
+            System.err.println("Requested solenoid channel number is out of range.");
+        }
+    }
+
+    /**
+     * Verify that the power distribution channel number is within limits. 
+     * Channel numbers are 1-based.
+     *
+     * @param channel The channel number to check.
+     */
+    protected static void checkPDPChannel(final int channel) {
+        if (channel <= 0 || channel > kPDPChannels) {
             System.err.println("Requested solenoid channel number is out of range.");
         }
     }

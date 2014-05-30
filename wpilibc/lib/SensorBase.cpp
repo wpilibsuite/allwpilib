@@ -17,6 +17,7 @@ const uint32_t SensorBase::kSolenoidChannels;
 const uint32_t SensorBase::kSolenoidModules;
 const uint32_t SensorBase::kPwmChannels;
 const uint32_t SensorBase::kRelayChannels;
+const uint32_t SensorBase::kPDPChannels;
 const uint32_t SensorBase::kChassisSlots;
 SensorBase *SensorBase::m_singletonList = NULL;
 
@@ -185,6 +186,18 @@ bool SensorBase::CheckAnalogChannel(uint32_t channel)
 bool SensorBase::CheckSolenoidChannel(uint32_t channel)
 {
 	if (channel > 0 && channel <= kSolenoidChannels)
+		return true;
+	return false;
+}
+
+/**
+ * Verify that the power distribution channel number is within limits.
+ * 
+ * @return Solenoid channel is valid
+ */
+bool SensorBase::CheckPDPChannel(uint32_t channel)
+{
+	if (channel > 0 && channel <= kPDPChannels)
 		return true;
 	return false;
 }

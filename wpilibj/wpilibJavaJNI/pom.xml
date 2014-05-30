@@ -124,6 +124,7 @@ this default location, specify a value for the 'embeddedJDKHome' property at the
 								<javahClassName>edu.wpi.first.wpilibj.hal.SPIJNI</javahClassName>
 								<javahClassName>edu.wpi.first.wpilibj.hal.SolenoidJNI</javahClassName>
 								<javahClassName>edu.wpi.first.wpilibj.hal.CompressorJNI</javahClassName>
+								<javahClassName>edu.wpi.first.wpilibj.hal.PDPJNI</javahClassName>
 							</javahClassNames>
 							<!-- enable additional javah interface in dependencies list -->
 							<!-- javahSearchJNIFromDependencies>true</javahSearchJNIFromDependencies -->
