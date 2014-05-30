@@ -51,6 +51,9 @@ private:
 		return kMaxServoAngle - kMinServoAngle;
 	}
 
-	static constexpr float kMaxServoAngle = 170.0;
+	static constexpr float kMaxServoAngle = 180.0;
 	static constexpr float kMinServoAngle = 0.0;
+
+	static constexpr float kDefaultMaxServoPWM = 2.4;
+	static constexpr float kDefaultMinServoPWM = .6;
 };
