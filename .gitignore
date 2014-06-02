@@ -8,6 +8,7 @@ target/
 dist/
 bin/
 .project
+.cproject
 .settings/
 .classpath
 
