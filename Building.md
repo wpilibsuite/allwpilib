@@ -15,7 +15,7 @@ make # multicore add -j(num of cpu cores + 1), so -j3 on dual core for faster co
 make install DESTDIR=/some/dir/you/want/to/put/all/headers/and/libs #optional
 ``
 
-Alternatively, if you like IDE's, you can import it directly into QtDeveloper, or a number of other IDE's such as Code::Blocks or Eclipse. See CMake documentation for details.
+Alternatively, if you like IDEs, you can import it directly into QtDeveloper, or a number of other IDEs such as Code::Blocks or Eclipse. See CMake documentation for details.
 Eclipse demo:
 ```
 cd ..
