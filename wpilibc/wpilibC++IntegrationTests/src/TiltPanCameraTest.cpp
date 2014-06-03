@@ -7,42 +7,21 @@
 
 #include "WPILib.h"
 #include "gtest/gtest.h"
+#include "fixtures/TiltPanCameraFixture.h"
+#include "TestBench.h"
 
-/**
- * A class to represent the camera with tilt and pan servos and a gyro
- * 
- * @author Thomas Clark
- */
 class TiltPanCameraTest : public testing::Test {
 protected:	
-	Servo *m_tilt, *m_pan;
-	Gyro *m_gyro;
-	
-	static const double RESET_TIME = 1.0;
+	TiltPanCameraFixture *m_fixture;
 	
 	virtual void SetUp() {
-		m_gyro = new Gyro(1);
-		m_gyro->SetSensitivity(0.007);
+		m_fixture = TestBench::GetTiltPanCamera();
 		
-		Wait(RESET_TIME);
-		
-		m_tilt = new Servo(10);
-		m_pan = new Servo(9);
+		m_fixture->SetUp();
 	}
 	
 	virtual void TearDown() {
-		delete m_tilt;
-		delete m_pan;
-		delete m_gyro;
-	}
-	
-	void Reset() {
-		m_tilt->SetAngle(0.0);
-		m_pan->SetAngle(0.0);
-		
-		Wait(RESET_TIME);
-		
-		m_gyro->Reset();
+		m_fixture->TearDown();
 	}
 };
 
@@ -53,14 +32,14 @@ protected:
 TEST_F(TiltPanCameraTest, GyroAngle) {
 	const double TEST_ANGLE = 180.0;
 	
-	Reset();
+	m_fixture->Reset();
 	
 	for(int i = 0; i < 100; i++) {
-		m_pan->Set(i / 100.0);
+		m_fixture->GetPan()->Set(i / 100.0);
 		Wait(0.05);
 	}
 	
-	double gyroAngle = m_gyro->GetAngle();
+	double gyroAngle = m_fixture->GetGyro()->GetAngle();
 	
 	double error = std::abs(TEST_ANGLE - gyroAngle);
 	
