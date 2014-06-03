@@ -21,6 +21,7 @@ public class FakeCounterSource
     private int m_count;
     private int m_mSec;
     private DigitalOutput m_output;
+    private boolean m_allocated;
 
     /**
      * Thread object that allows emulation of an encoder
@@ -52,6 +53,17 @@ public class FakeCounterSource
             }
         }
     }
+    
+    /**
+     * Create a fake encoder on a given port
+     * @param output the port to output the given signal to
+     */
+    public FakeCounterSource(DigitalOutput output)
+    {
+        m_output = output;
+        m_allocated = false;
+        initEncoder();
+    }
 
     /**
      * Create a fake encoder on a given port
@@ -60,6 +72,7 @@ public class FakeCounterSource
     public FakeCounterSource(int port)
     {
         m_output = new DigitalOutput(port);
+        m_allocated = true;
         initEncoder();
     }
 
@@ -71,6 +84,7 @@ public class FakeCounterSource
     public FakeCounterSource(int slot, int port)
     {
         m_output = new DigitalOutput(slot, port);
+        m_allocated = true;
         initEncoder();
     }
 
@@ -80,7 +94,11 @@ public class FakeCounterSource
     public void free()
     {
         m_task = null;
-        m_output.free();
+        if(m_allocated){
+        	m_output.free();
+        	m_output = null;
+        	m_allocated = false;
+        }
     }
 
     /**

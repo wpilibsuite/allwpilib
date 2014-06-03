@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.test.TestBench;
 
 public class MotorEncoderTest extends AbstractComsSetup {
 	
-	private static final double MOTOR_RUNTIME = .5;
+	private static final double MOTOR_RUNTIME = .25;
 	
 	private static final List<MotorEncoderFixture> pairs = new ArrayList<MotorEncoderFixture>();
 	

@@ -22,25 +22,33 @@ public class TiltPanCameraTest extends AbstractComsSetup {
 	
 	public static final double TEST_ANGLE = 180.0;
 	
-	private TiltPanCameraFixture tpcam;
+	private static TiltPanCameraFixture tpcam;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
+		tpcam = TestBench.getInstance().getTiltPanCam();
+		
 	}
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
+		tpcam.teardown();
 	}
 
 	@Before
 	public void setUp() throws Exception {
-		tpcam = TestBench.getInstance().getTiltPanCam();
 		tpcam.reset();
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		tpcam.teardown();
+		tpcam.reset();
+	}
+	
+	@Test
+	public void testInitial(){
+		double angle = tpcam.getGyro().getAngle();
+		assertTrue(errorMessage(angle, 0), Math.abs(angle) < 0.5); 
 	}
 
 	/**
@@ -50,6 +58,7 @@ public class TiltPanCameraTest extends AbstractComsSetup {
 	public void testGyroAngle() {
 		for(double i = 0; i < 1.0; i+=.01){
 			//System.out.println("i: " + i);
+			System.out.println("Angle " + tpcam.getGyro().getAngle());
 			tpcam.getPan().set(i);
 			Timer.delay(.05);
 		}
@@ -61,9 +70,11 @@ public class TiltPanCameraTest extends AbstractComsSetup {
 		double diff = Math.abs(difference);
 		
 		
-		assertTrue("Gryo angle skewed " + difference + " deg away from target " + TEST_ANGLE, diff < 4.0);
-		
-		
+		assertTrue(errorMessage(diff, TEST_ANGLE), diff < 4.0);
+	}
+	
+	private String errorMessage(double difference, double target){
+		return "Gryo angle skewed " + difference + " deg away from target " + target;
 	}
 
 }
