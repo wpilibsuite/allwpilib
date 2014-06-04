@@ -27,17 +27,17 @@ public class PCMCompressor extends SensorBase implements IDevice, LiveWindowSend
 		m_pcm = CompressorJNI.initializeCompressor((byte)module);
 	}
 	
-	void start() {
+	public void start() {
 		setClosedLoopControl(false);
 		setCompressor(true);
 	}
 	
-	void stop() {
+	public void stop() {
 		setClosedLoopControl(false);
 		setCompressor(false);
 	}
 	
-	boolean enabled() {
+	public boolean enabled() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
 		
@@ -47,7 +47,7 @@ public class PCMCompressor extends SensorBase implements IDevice, LiveWindowSend
 		return on;
 	}
 	
-	boolean getPressureSwitchValue() {
+	public boolean getPressureSwitchValue() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
 		
@@ -57,7 +57,7 @@ public class PCMCompressor extends SensorBase implements IDevice, LiveWindowSend
 		return on;
 	}
 	
-	float getCompressorCurrent() {
+	public float getCompressorCurrent() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
 		
@@ -67,7 +67,7 @@ public class PCMCompressor extends SensorBase implements IDevice, LiveWindowSend
 		return current;
 	}
 	
-	void setClosedLoopControl(boolean on) {
+	public void setClosedLoopControl(boolean on) {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
 		
@@ -75,7 +75,7 @@ public class PCMCompressor extends SensorBase implements IDevice, LiveWindowSend
 		HALUtil.checkStatus(status.asIntBuffer());
 	}
 	
-	boolean getClosedLoopControl() {
+	public boolean getClosedLoopControl() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
 		
