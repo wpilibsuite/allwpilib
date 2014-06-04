@@ -319,7 +319,7 @@ float PWM::GetSpeed()
  * 
  * Write a raw value to a PWM channel.
  * 
- * @param value Raw PWM value.  Range 0 - 255.
+ * @param value Raw PWM value.
  */
 void PWM::SetRaw(unsigned short value)
 {
@@ -332,7 +332,7 @@ void PWM::SetRaw(unsigned short value)
  * 
  * Read a raw value from a PWM channel.
  * 
- * @return Raw PWM control value.  Range: 0 - 255.
+ * @return Raw PWM control value.
  */
 unsigned short PWM::GetRaw()
 {

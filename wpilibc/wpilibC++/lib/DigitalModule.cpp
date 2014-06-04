@@ -91,7 +91,7 @@ void DigitalModule::SetPWM(uint32_t channel, unsigned short value)
 }
 
 /**
- * Get a value from a PWM channel. The values range from 0 to 255.
+ * Get a value from a PWM channel.
  * 
  * @param channel The PWM channel to read from.
  * @return The raw PWM value.
@@ -99,7 +99,7 @@ void DigitalModule::SetPWM(uint32_t channel, unsigned short value)
 unsigned short DigitalModule::GetPWM(uint32_t channel)
 {
   	int32_t status = 0;
-	uint8_t value = getPWM(m_pwm_ports[channel-1], &status);
+	uint16_t value = getPWM(m_pwm_ports[channel-1], &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	return value;
 }
