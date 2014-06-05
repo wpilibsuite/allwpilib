@@ -108,10 +108,10 @@ public class MotorEncoderFixture implements ITestFixture {
 			c.reset();
 		}
 		
-		wasReset &= motor.get() == 0;
-		wasReset &= encoder.get() == 0;
+		wasReset = wasReset && motor.get() == 0;
+		wasReset = wasReset && encoder.get() == 0;
 		for(Counter c : counters){
-			wasReset &= c.get() == 0;
+			wasReset = wasReset && c.get() == 0;
 		}
 		
 		return wasReset;

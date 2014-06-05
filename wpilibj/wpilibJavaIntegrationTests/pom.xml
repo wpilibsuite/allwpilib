@@ -26,11 +26,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-all</artifactId>
+			<artifactId>hamcrest-core</artifactId>
 			<version>1.3</version>
 		</dependency>
 	</dependencies>
-
+	
 	<profiles>
 		<profile>
 			<id>docline-java8-disable</id>
@@ -52,7 +52,16 @@
 		</profile>
 	</profiles>
 
-	<build>
+	<build>  
+		<resources>
+			<!-- Package the logging.properties file with the jar-->
+	        <resource>
+	            <directory>src/main/java</directory>
+	            <includes>
+	                <include>**/*.properties</include>
+	            </includes>
+	        </resource>
+	    </resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -96,14 +105,13 @@
 								</artifactItem>
 								<artifactItem>
 									<groupId>org.hamcrest</groupId>
-									<artifactId>hamcrest-all</artifactId>
+									<artifactId>hamcrest-core</artifactId>
 									<version>1.3</version>
 									<type>jar</type>
 								</artifactItem>
 							</artifactItems>
 							<outputDirectory>${project.build.directory}/classes</outputDirectory>
 						</configuration>
-
 					</execution>
 				</executions>
 			</plugin>

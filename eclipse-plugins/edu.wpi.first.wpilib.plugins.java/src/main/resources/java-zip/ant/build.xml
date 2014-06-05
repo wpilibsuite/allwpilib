@@ -36,6 +36,7 @@
 	   classpath="${classpath}"
 	   target="1.7"
 	   source="1.7"
+     compiler="javac1.7"
 	   debug="true">
     </javac>
   </target>

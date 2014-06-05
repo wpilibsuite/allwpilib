@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.Timer;
  */
 public class TiltPanCameraFixture implements ITestFixture {
 	
-	public static final double RESET_TIME = 3.0;
+	public static final double RESET_TIME = 3.5;
 	
 	private final Gyro gyro;
 	private final Servo tilt;
