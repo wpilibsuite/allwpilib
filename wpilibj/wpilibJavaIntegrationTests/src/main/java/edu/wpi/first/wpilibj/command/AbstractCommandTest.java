@@ -7,7 +7,10 @@
 package edu.wpi.first.wpilibj.command;
 
 import static org.junit.Assert.assertEquals;
-import edu.wpi.first.wpilibj.Timer;
+import static org.junit.Assert.fail;
+
+import org.junit.Before;
+
 import edu.wpi.first.wpilibj.mocks.MockCommand;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
@@ -16,8 +19,23 @@ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
  *
  */
 public abstract class AbstractCommandTest extends AbstractComsSetup {
+	
+	@Before
+	public void commandSetup(){
+		Scheduler.getInstance().removeAll();
+		Scheduler.getInstance().enable();
+	}
+	
 	public class ASubsystem extends Subsystem {
+		Command command;
         protected void initDefaultCommand(){
+        	if(command != null){
+        		setDefaultCommand(command);
+        	}
+        }
+        
+        public void init(Command command) {
+            this.command = command;
         }
     }
 	
@@ -30,6 +48,10 @@ public abstract class AbstractCommandTest extends AbstractComsSetup {
 	 }
 	
 	public void sleep(int time){
-		Timer.delay(time);
+		try {
+            Thread.sleep(time);
+        } catch (InterruptedException ex) {
+            fail("Sleep Interrupted!?!?!?!?");
+        }
 	}
 }

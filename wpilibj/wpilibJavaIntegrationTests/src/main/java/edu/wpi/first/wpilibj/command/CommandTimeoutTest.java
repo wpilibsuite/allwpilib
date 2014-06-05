@@ -17,11 +17,10 @@ import org.junit.Test;
 import edu.wpi.first.wpilibj.mocks.MockCommand;
 
 /**
- * Ported from the old CrioTest Classes
- * @author Mitchell
- * @author Jonathan Leitschuh
+ * @author jonathanleitschuh
+ *
  */
-public class CommandScheduleTest extends AbstractCommandTest {
+public class CommandTimeoutTest extends AbstractCommandTest {
 
 	/**
 	 * @throws java.lang.Exception
@@ -52,33 +51,25 @@ public class CommandScheduleTest extends AbstractCommandTest {
 	}
 
 	/**
-	 * Simple scheduling of a command and making sure the command is run and successfully terminates
+	 * Command 2 second Timeout Test
 	 */
 	@Test
-	public void testRunAndTerminate() {
-		MockCommand command = new MockCommand();
-        command.start();
-        assertCommandState(command, 0, 0, 0, 0, 0);
-        Scheduler.getInstance().run();
-        assertCommandState(command, 0, 0, 0, 0, 0);
-        Scheduler.getInstance().run();
-        assertCommandState(command, 1, 1, 1, 0, 0);
-        Scheduler.getInstance().run();
-        assertCommandState(command, 1, 2, 2, 0, 0);
-        command.setHasFinished(true);
-        assertCommandState(command, 1, 2, 2, 0, 0);
-        Scheduler.getInstance().run();
-        assertCommandState(command, 1, 3, 3, 1, 0);
-        Scheduler.getInstance().run();
-        assertCommandState(command, 1, 3, 3, 1, 0);
-	}
-	
-	/**
-	 * Simple scheduling of a command and making sure the command is run and cancels correctly
-	 */
-	@Test
-	public void testRunAndCancel(){
-		 MockCommand command = new MockCommand();
+	public void testTwoSecondTimeout() {
+		 final ASubsystem subsystem = new ASubsystem();
+
+
+         MockCommand command = new MockCommand() {
+             {
+                 requires(subsystem);
+                 setTimeout(2);
+             }
+             
+             @Override
+             public boolean isFinished(){
+                 return super.isFinished() || isTimedOut();
+             }
+         };
+         
          command.start();
          assertCommandState(command, 0, 0, 0, 0, 0);
          Scheduler.getInstance().run();
@@ -89,11 +80,11 @@ public class CommandScheduleTest extends AbstractCommandTest {
          assertCommandState(command, 1, 2, 2, 0, 0);
          Scheduler.getInstance().run();
          assertCommandState(command, 1, 3, 3, 0, 0);
-         command.cancel();
-         assertCommandState(command, 1, 3, 3, 0, 0);
+         sleep(2000);
          Scheduler.getInstance().run();
-         assertCommandState(command, 1, 3, 3, 0, 1);
+         assertCommandState(command, 1, 4, 4, 1, 0);
          Scheduler.getInstance().run();
-         assertCommandState(command, 1, 3, 3, 0, 1);
+         assertCommandState(command, 1, 4, 4, 1, 0);
 	}
+
 }

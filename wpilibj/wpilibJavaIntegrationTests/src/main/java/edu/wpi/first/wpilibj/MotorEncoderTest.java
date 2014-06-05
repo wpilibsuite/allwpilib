@@ -34,7 +34,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
 		pairs.add(TestBench.getInstance().getTalonPair());
 		pairs.add(TestBench.getInstance().getVictorPair());
 		pairs.add(TestBench.getInstance().getJaguarPair());
-		pairs.add(TestBench.getInstance().getCanJaguarPair());
+		//pairs.add(TestBench.getInstance().getCanJaguarPair());
 		
 		for(MotorEncoderFixture me : pairs){
 			me.reset();
@@ -47,7 +47,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
 	 * @return true if this motor encoder has an encoder attached to it
 	 */
 	boolean shouldRunTest(MotorEncoderFixture me){
-		return me.getType().equals(Victor.class.getSimpleName()) || me.getType().equals(Talon.class.getSimpleName());
+		return true;//me.getType().equals(Victor.class.getSimpleName()) || me.getType().equals(Talon.class.getSimpleName());
 	}
 
 	@Before

@@ -18,8 +18,9 @@ import edu.wpi.first.wpilibj.mocks.MockCommand;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
 /**
- * @author jonathanleitschuh
- * 
+ * Ported from the old CrioTest Classes
+ * @author Mitchell
+ * @author Jonathan Leitschuh
  */
 public class CommandParallelGroupTest extends AbstractCommandTest {
 

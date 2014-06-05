@@ -40,7 +40,7 @@ public final class TestBench {
 	 * The time that it takes to have a motor go from rotating at full speed to
 	 * completely stopped
 	 */
-	public static final double MOTOR_STOP_TIME = 0.50;
+	public static final double MOTOR_STOP_TIME = 0.15;
 	
 	
 	//THESE MUST BE IN INCREMENTING ORDER

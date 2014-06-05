@@ -131,7 +131,7 @@ public class FakeCounterSource
         {
         }
         m_task = new EncoderThread(this);
-        Timer.delay(.5);
+        Timer.delay(.1);
     }
 
     /**

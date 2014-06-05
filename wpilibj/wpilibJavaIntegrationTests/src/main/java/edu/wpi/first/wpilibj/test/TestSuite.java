@@ -25,6 +25,10 @@ import edu.wpi.first.wpilibj.TiltPanCameraTest;
 import edu.wpi.first.wpilibj.TimerTest;
 import edu.wpi.first.wpilibj.command.CommandParallelGroupTest;
 import edu.wpi.first.wpilibj.command.CommandScheduleTest;
+import edu.wpi.first.wpilibj.command.CommandSequentialGroupTest;
+import edu.wpi.first.wpilibj.command.CommandSupersedeTest;
+import edu.wpi.first.wpilibj.command.CommandTimeoutTest;
+import edu.wpi.first.wpilibj.command.DefaultCommandTest;
 
 /**
  * The WPILibJ Integeration Test Suite collects all of the tests to be run by
@@ -41,6 +45,10 @@ import edu.wpi.first.wpilibj.command.CommandScheduleTest;
 				MotorEncoderTest.class,
 				CommandParallelGroupTest.class,
 				CommandScheduleTest.class,
+				CommandSequentialGroupTest.class,
+				CommandSupersedeTest.class,
+				CommandTimeoutTest.class,
+				DefaultCommandTest.class,
 				TimerTest.class
 				})
 //NOTE: THESE ARE EACH LISTED ON SEPERATE LINES TO PREVENT GIT MERGE CONFLICTS!
@@ -57,11 +65,13 @@ public class TestSuite {
 		    Logger.getAnonymousLogger().severe("Could not load default logging.properties file");
 		    Logger.getAnonymousLogger().severe(e.getMessage());
 		}
+		
 		System.out.println("Starting Tests");
 	}
+	private static final Logger WPILIBJ_ROOT_LOGGER = Logger.getLogger("edu.wpi.first.wpilibj");
+	private static final Logger WPILIBJ_COMMAND_ROOT_LOGGER = Logger.getLogger("edu.wpi.first.wpilibj.command");
 
 	public static void main(String[] args) {
-		
 		JUnitCore.main("edu.wpi.first.wpilibj.test.TestSuite");
 	}
 
