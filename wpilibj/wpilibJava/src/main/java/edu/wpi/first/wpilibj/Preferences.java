@@ -53,7 +53,7 @@ public class Preferences {
     /**
      * The file to save to
      */
-    private static final String FILE_NAME = "file:///wpilib-preferences.ini";
+    private static final String FILE_NAME = "wpilib-preferences.ini";
     /**
      * The characters to put between a field and value
      */
