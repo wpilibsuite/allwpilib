@@ -7,21 +7,39 @@
 
 #include "WPILib.h"
 #include "gtest/gtest.h"
-#include "fixtures/TiltPanCameraFixture.h"
 #include "TestBench.h"
 
+static constexpr double kResetTime = 1.0;
+static constexpr double kTestAngle = 180.0;
+	
+/**
+ * A fixture for the camera with two servos and a gyro
+ * @author Thomas Clark
+ */
 class TiltPanCameraTest : public testing::Test {
-protected:	
-	TiltPanCameraFixture *m_fixture;
+protected:
+	Servo *m_tilt, *m_pan;
+	Gyro *m_gyro;
 	
 	virtual void SetUp() {
-		m_fixture = TestBench::GetTiltPanCamera();
-		
-		m_fixture->SetUp();
+		m_tilt = new Servo(TestBench::kCameraTiltChannel);
+		m_pan = new Servo(TestBench::kCameraPanChannel);
+		m_gyro = new Gyro(TestBench::kCameraGyroChannel);
 	}
 	
 	virtual void TearDown() {
-		m_fixture->TearDown();
+		delete m_tilt;
+		delete m_pan;
+		delete m_gyro;
+	}
+	
+	void Reset() {
+		m_tilt->Set(0.0);
+		m_pan->Set(0.0);
+
+		Wait(kResetTime);
+
+		m_gyro->Reset();
 	}
 };
 
@@ -30,21 +48,17 @@ protected:
  * Test if the servo turns 180 degrees and the gyroscope measures this angle
  */
 TEST_F(TiltPanCameraTest, GyroAngle) {
-	const double TEST_ANGLE = 180.0;
-	
-	m_fixture->Reset();
+	Reset();
 	
 	for(int i = 0; i < 100; i++) {
-		m_fixture->GetPan()->Set(i / 100.0);
+		m_pan->Set(i / 100.0);
 		Wait(0.05);
 	}
 	
-	double gyroAngle = m_fixture->GetGyro()->GetAngle();
+	double gyroAngle = m_gyro->GetAngle();
 	
-	double error = std::abs(TEST_ANGLE - gyroAngle);
-	
-	ASSERT_LE(error, 10.0) << "Gyro measured " << gyroAngle
-		<< " degrees, servo should have turned " << TEST_ANGLE <<  " degrees"; 
+	EXPECT_NEAR(gyroAngle, kTestAngle, 20.0) << "Gyro measured " << gyroAngle
+		<< " degrees, servo should have turned " << kTestAngle <<  " degrees"; 
 }
 
 
