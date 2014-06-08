@@ -158,7 +158,7 @@ int HALGetDynamicControlData(uint8_t type, char *dynamicData, int32_t maxLength,
 
 int HALGetCommonControlData(HALCommonControlData *data, int wait_ms)
 {
-	return getCommonControlData((FRCCommonControlData*) data, wait_ms);
+	return getRecentCommonControlData((FRCCommonControlData*) data, wait_ms);
 }
 
 void HALSetNewDataSem(pthread_mutex_t * param)
