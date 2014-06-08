@@ -31,6 +31,8 @@ class DriverStation;
 	int main() \
 	{ \
 		if (!HALInitialize()){std::cerr<<"FATAL ERROR: HAL could not be initialized"<<std::endl;return -1;}	\
+		HALNetworkCommunicationObserveUserProgramStarting(); \
+		HALReport(HALUsageReporting::kResourceType_Language, HALUsageReporting::kLanguage_CPlusPlus); \
 		(new _ClassName_())->StartCompetition(); \
 		return 0; \
 	}
