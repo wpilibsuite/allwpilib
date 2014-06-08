@@ -99,6 +99,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 			break;
 		}
 		m_distancePerPulse = 1.0;
+		m_pidSource = PIDSourceParameter.kDistance;
 
 		UsageReporting.report(tResourceType.kResourceType_Encoder,
 				m_index, m_encodingType.value);
