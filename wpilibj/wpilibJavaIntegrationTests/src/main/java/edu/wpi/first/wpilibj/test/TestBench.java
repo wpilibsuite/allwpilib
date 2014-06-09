@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.can.CANTimeoutException;
@@ -40,7 +41,7 @@ public final class TestBench {
 	 * The time that it takes to have a motor go from rotating at full speed to
 	 * completely stopped
 	 */
-	public static final double MOTOR_STOP_TIME = 0.15;
+	public static final double MOTOR_STOP_TIME = 0.20;
 	
 	
 	//THESE MUST BE IN INCREMENTING ORDER
@@ -69,12 +70,20 @@ public final class TestBench {
 	 * @return a freshly allocated Talon, Encoder pair
 	 */
 	public MotorEncoderFixture getTalonPair() {
-		Talon talon = new Talon(0);
-		DigitalInput encA1 = new DigitalInput(0);
-		DigitalInput encB1 = new DigitalInput(1);
-
-		MotorEncoderFixture talonPair = new MotorEncoderFixture(talon, encA1,
-				encB1);
+		MotorEncoderFixture talonPair = new MotorEncoderFixture(){
+			@Override
+			protected SpeedController giveSpeedController() {
+				return new Talon(1);
+			}
+			@Override
+			protected DigitalInput giveDigitalInputA() {
+				return new DigitalInput(0);
+			}
+			@Override
+			protected DigitalInput giveDigitalInputB() {
+				return new DigitalInput(1);
+			}
+		};
 		return talonPair;
 	}
 
@@ -85,10 +94,23 @@ public final class TestBench {
 	 * @return a freshly allocated Victor, Encoder pair
 	 */
 	public MotorEncoderFixture getVictorPair() {
-		Victor vic = new Victor(1);
-		DigitalInput encA2 = new DigitalInput(2);
-		DigitalInput encB2 = new DigitalInput(3);
-		MotorEncoderFixture vicPair = new MotorEncoderFixture(vic, encA2, encB2);
+
+		MotorEncoderFixture vicPair = new MotorEncoderFixture(){
+			@Override
+			protected SpeedController giveSpeedController() {
+				return new Victor(1);
+			}
+
+			@Override
+			protected DigitalInput giveDigitalInputA() {
+				return new DigitalInput(2);
+			}
+
+			@Override
+			protected DigitalInput giveDigitalInputB() {
+				return new DigitalInput(3);
+			}
+		};
 		return vicPair;
 	}
 
@@ -99,10 +121,22 @@ public final class TestBench {
 	 * @return a freshly allocated Jaguar, Encoder pair
 	 */
 	public MotorEncoderFixture getJaguarPair() {
-		Jaguar jag = new Jaguar(2);
-		DigitalInput encA3 = new DigitalInput(4);
-		DigitalInput encB3 = new DigitalInput(5);
-		MotorEncoderFixture jagPair = new MotorEncoderFixture(jag, encA3, encB3);
+		MotorEncoderFixture jagPair = new MotorEncoderFixture(){
+			@Override
+			protected SpeedController giveSpeedController() {
+				return new Jaguar(2);
+			}
+
+			@Override
+			protected DigitalInput giveDigitalInputA() {
+				return new DigitalInput(4);
+			}
+
+			@Override
+			protected DigitalInput giveDigitalInputB() {
+				return new DigitalInput(5);
+			}
+		};
 		return jagPair;
 	}
 
@@ -115,9 +149,6 @@ public final class TestBench {
 	 * @return an existing CANJaguar and a freshly allocated Encoder
 	 */
 	public MotorEncoderFixture getCanJaguarPair() {
-
-		DigitalInput encA4 = new DigitalInput(6);
-		DigitalInput encB4 = new DigitalInput(7);
 		MotorEncoderFixture canPair;
 		if (canJag == null) { // Again this is because the CanJaguar does not
 								// have a free method
@@ -127,7 +158,20 @@ public final class TestBench {
 				e.printStackTrace();
 			}
 		}
-		canPair = new MotorEncoderFixture(canJag, encA4, encB4);
+		canPair = new MotorEncoderFixture(){
+			@Override
+			protected SpeedController giveSpeedController() {
+				return canJag;
+			}
+			@Override
+			protected DigitalInput giveDigitalInputA() {
+				return new DigitalInput(6);
+			}
+			@Override
+			protected DigitalInput giveDigitalInputB() {
+				return new DigitalInput(7);
+			}
+		};
 		assert canPair != null;
 		return canPair;
 	}

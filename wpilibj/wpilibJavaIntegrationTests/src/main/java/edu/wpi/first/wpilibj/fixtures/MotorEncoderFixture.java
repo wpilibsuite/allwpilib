@@ -23,13 +23,14 @@ import edu.wpi.first.wpilibj.test.TestBench;
  * @author Jonathan Leitschuh
  *
  */
-public class MotorEncoderFixture implements ITestFixture {
-	
-	private final SpeedController motor;
-	private final Encoder encoder;
-	private final Counter counters[] = new Counter[2];
-	private final DigitalInput aSource; //Stored so it can be freed at tear down
-	private final DigitalInput bSource;
+public abstract class MotorEncoderFixture implements ITestFixture {
+	private boolean initialized = false;
+	private boolean tornDown = false;
+	protected SpeedController motor;
+	private Encoder encoder;
+	private Counter counters[] = new Counter[2];
+	protected DigitalInput aSource; //Stored so it can be freed at tear down
+	protected DigitalInput bSource;
 	
 	/**
 	 * Default constructor for a MotorEncoderFixture
@@ -37,24 +38,51 @@ public class MotorEncoderFixture implements ITestFixture {
 	 * @param aSource One of the inputs for the encoder
 	 * @param bSource The other input for the encoder
 	 */
-	public MotorEncoderFixture(SpeedController motor, DigitalInput aSource, DigitalInput bSource){
-		this.aSource = aSource;
-		this.bSource = bSource;
-		
-		this.motor = motor;
-		
-		this.encoder = new Encoder(aSource, bSource);
-		counters[0] = new Counter(aSource);
-		counters[1] = new Counter(bSource);
-		for(Counter c: counters){
-			c.start();
+	public MotorEncoderFixture(){
+	}
+	
+	/**
+	 * Where the implementer of this class should pass the speed controller
+	 * Constructor should only be called from outside this class if the Speed controller 
+	 * is not also an implementation of PWM interface
+	 * @return
+	 */
+	abstract protected SpeedController giveSpeedController();
+	/**
+	 * Where the implementer of this class should pass one of the digital inputs<br>
+	 * CONSTRUCTOR SHOULD NOT BE CALLED FROM OUTSIDE THIS CLASS!
+	 * @return
+	 */
+	abstract protected DigitalInput giveDigitalInputA();
+	/**
+	 * Where the implementer fo this class should pass the other digital input<br>
+	 * CONSTRUCTOR SHOULD NOT BE CALLED FROM OUTSIDE THIS CLASS!
+	 * @return Input B to be used when this class is instantiated
+	 */
+	abstract protected DigitalInput giveDigitalInputB();
+	
+	final private void initialize(){
+		if(!initialized){
+			aSource = giveDigitalInputA();
+			bSource = giveDigitalInputB();
+			
+			motor = giveSpeedController();
+			
+			encoder = new Encoder(aSource, bSource);
+			counters[0] = new Counter(aSource);
+			counters[1] = new Counter(bSource);
+			for(Counter c: counters){
+				c.start();
+			}
+			initialized = true;
 		}
-		encoder.start();
 	}
 	
 	@Override
 	public boolean setup() {
-		return reset();
+		initialize();
+		encoder.start();
+		return true;
 	}
 	
 	/**
@@ -62,6 +90,7 @@ public class MotorEncoderFixture implements ITestFixture {
 	 * @return the motor this object refers too
 	 */
 	public SpeedController getMotor(){
+		initialize();
 		return motor;
 	}
 	
@@ -70,10 +99,12 @@ public class MotorEncoderFixture implements ITestFixture {
 	 * @return the encoder that this object refers too
 	 */
 	public Encoder getEncoder(){
+		initialize();
 		return encoder;
 	}
 	
 	public Counter[] getCounters(){
+		initialize();
 		return counters;
 	}
 	
@@ -82,6 +113,7 @@ public class MotorEncoderFixture implements ITestFixture {
 	 * @return The simple name of the motor {@link Class#getSimpleName()}
 	 */
 	public String getType(){
+		initialize();
 		return motor.getClass().getSimpleName();
 	}
 	
@@ -94,11 +126,13 @@ public class MotorEncoderFixture implements ITestFixture {
 	 * {@code Math.abs((Math.abs(motor.get()) - Math.abs(value))) < Math.abs(accuracy)}
 	 */
 	public boolean isMotorSpeedWithinRange(double value, double accuracy){
+		initialize();
 		return Math.abs((Math.abs(motor.get()) - Math.abs(value))) < Math.abs(accuracy);
 	}
 	
 	@Override
 	public boolean reset(){
+		initialize();
 		boolean wasReset = true;
 		
 		motor.set(0);
@@ -121,17 +155,25 @@ public class MotorEncoderFixture implements ITestFixture {
 
 	@Override
 	public boolean teardown() {
-		reset();
-		if(motor instanceof PWM){
-			((PWM) motor).free();
+		if(!tornDown){
+			initialize();
+			reset();
+			if(motor instanceof PWM){
+				((PWM) motor).free();
+			}
+			motor = null;
+			encoder.free();
+			counters[0].free();
+			counters[0] = null;
+			counters[1].free();
+			counters[1] = null;
+			
+			aSource.free();
+			aSource = null;
+			bSource.free();
+			bSource = null;
+			tornDown = true;
 		}
-		encoder.free();
-		for(Counter c : counters){
-			c.free();
-		}
-		
-		aSource.free();
-		bSource.free();
 		
 		return true;
 	}
