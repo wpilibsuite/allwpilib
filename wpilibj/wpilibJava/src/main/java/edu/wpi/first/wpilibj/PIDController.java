@@ -47,6 +47,7 @@ public class PIDController implements IUtility, LiveWindowSendable, Controller {
     PIDSource m_pidInput;
     PIDOutput m_pidOutput;
     java.util.Timer m_controlLoop;
+    private boolean m_freed = false;
     private boolean m_usingPercentTolerance;
 
     /**
@@ -102,7 +103,17 @@ public class PIDController implements IUtility, LiveWindowSendable, Controller {
         }
 
         public void run() {
-            m_controller.calculate();
+        	boolean freed;
+        	synchronized (this){
+        		freed = m_freed;
+        	}
+        	if(!freed){
+        		m_controller.calculate();
+        	} else {
+        		cancel();
+        		m_controlLoop.cancel();
+        		m_controlLoop.purge();
+        	}
         }
     }
 
@@ -192,7 +203,12 @@ public class PIDController implements IUtility, LiveWindowSendable, Controller {
      * Free the PID object
      */
     public void free() {
+    	synchronized (this) {
+    		m_freed = true;
+		}
         m_controlLoop.cancel();
+        m_pidInput = null;
+    	m_pidOutput = null;
         m_controlLoop = null;
     }
 
@@ -217,10 +233,12 @@ public class PIDController implements IUtility, LiveWindowSendable, Controller {
         }
 
         if (enabled) {
-            double input = pidInput.pidGet();
+        	double input;
             double result;
             PIDOutput pidOutput = null;
-
+            synchronized (this){
+            	input = pidInput.pidGet();
+            }
             synchronized (this) {
                 m_error = m_setpoint - input;
                 if (m_continuous) {
@@ -259,7 +277,7 @@ public class PIDController implements IUtility, LiveWindowSendable, Controller {
                 pidOutput = m_pidOutput;
                 result = m_result;
             }
-
+            
             pidOutput.pidWrite(result);
         }
     }
@@ -458,7 +476,7 @@ public class PIDController implements IUtility, LiveWindowSendable, Controller {
     /**
      * Set the absolute error which is considered tolerable for use with
      * OnTarget.
-     * @param absolute error which is tolerable in the units of the input object
+     * @param absvalue absolute error which is tolerable in the units of the input object
      */
     public synchronized void setAbsoluteTolerance(double absvalue) {
         m_tolerance = new AbsoluteTolerance(absvalue);
@@ -467,7 +485,7 @@ public class PIDController implements IUtility, LiveWindowSendable, Controller {
     /**
      * Set the percentage error which is considered tolerable for use with
      * OnTarget. (Input of 15.0 = 15 percent)
-     * @param percent error which is tolerable
+     * @param percentage percent error which is tolerable
      */
     public synchronized void setPercentTolerance(double percentage) {
         m_tolerance = new PercentageTolerance(percentage);
