@@ -1,55 +1,55 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
-/*----------------------------------------------------------------------------*/
-#pragma once
+/*
+ * Compressor.h
+ */
 
-#define COMPRESSOR_PRIORITY 90
+#ifndef Compressor_H_
+#define Compressor_H_
 
+#include "HAL/HAL.hpp"
 #include "SensorBase.h"
-#include "Relay.h"
-#include "Task.h"
+#include "tables/ITableListener.h"
 #include "LiveWindow/LiveWindowSendable.h"
 
-class DigitalInput;
-
 /**
- * Compressor object.
- * The Compressor object is designed to handle the operation of the compressor, pressure sensor and
- * relay for a FIRST robot pneumatics system. The Compressor object starts a task which runs in the
- * backround and periodically polls the pressure sensor and operates the relay that controls the
- * compressor.
+ * CAN pneumatic control module compressor
+ *
+ *  Created on: May 28, 2014
+ *      Author: Thomas Clark
+ *
  */
-class Compressor : public SensorBase, public LiveWindowSendable
-{
+class Compressor: public SensorBase, public LiveWindowSendable, public ITableListener {
 public:
-	Compressor(uint32_t pressureSwitchChannel, uint32_t compressorRelayChannel);
-	Compressor(uint8_t pressureSwitchModuleNumber, uint32_t pressureSwitchChannel,
-			uint8_t compresssorRelayModuleNumber, uint32_t compressorRelayChannel);
+	Compressor(uint8_t module);
+	Compressor();
 	~Compressor();
 
 	void Start();
 	void Stop();
 	bool Enabled();
-	uint32_t GetPressureSwitchValue();
-	void SetRelayValue(Relay::Value relayValue);
+
+	bool GetPressureSwitchValue();
+	
+	float GetCompressorCurrent();
+
+	void SetClosedLoopControl(bool on);
+	bool GetClosedLoopControl();
 
 	void UpdateTable();
 	void StartLiveWindowMode();
 	void StopLiveWindowMode();
 	std::string GetSmartDashboardType();
 	void InitTable(ITable *subTable);
-	ITable * GetTable();
+	ITable *GetTable();
+	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
+
+protected:
+	void *m_pcm_pointer;
 
 private:
-	void InitCompressor(uint8_t pressureSwitchModuleNumber, uint32_t pressureSwitchChannel,
-			uint8_t compresssorRelayModuleNumber, uint32_t compressorRelayChannel);
-
-	DigitalInput *m_pressureSwitch;
-	Relay *m_relay;
-	bool m_enabled;
-	Task m_task;
+	void InitCompressor(uint8_t module);
+	void SetCompressor(bool on);
 
 	ITable *m_table;
 };
+
+#endif /* Compressor_H_ */

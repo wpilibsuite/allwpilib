@@ -1,183 +1,158 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
-/*----------------------------------------------------------------------------*/
+/*
+ * Compressor.cpp
+ */
 
 #include "Compressor.h"
-#include "DigitalInput.h"
-//#include "NetworkCommunication/UsageReporting.h"
-#include "Timer.h"
 #include "WPIErrors.h"
 
+void Compressor::InitCompressor(uint8_t module) {
+	m_table = 0;
+	m_pcm_pointer = initializeCompressor(module);
+
+	SetClosedLoopControl(true);
+}
+
 /**
- * Internal task.
- * 
- * Task which checks the compressor pressure switch and operates the relay as necessary
- * depending on the pressure.
- * 
- * Do not call this function directly.
+ * Constructor
+ *
+ * Uses the default solenoid module number
  */
-static void CompressorChecker(Compressor *c)
-{
-	while (1)
-	{
-		if (c->Enabled())
-		{
-			c->SetRelayValue( c->GetPressureSwitchValue() == 0 ? Relay::kOn : Relay::kOff );
-		}
-		else
-		{
-			c->SetRelayValue(Relay::kOff);
-		}
-		Wait(0.5);
+Compressor::Compressor() {
+	InitCompressor(GetDefaultSolenoidModule());
+}
+
+/**
+ * Constructor
+ *
+ * @param module The module number to use (1 or 2)
+ */
+Compressor::Compressor(uint8_t module) {
+	InitCompressor(module);
+}
+
+Compressor::~Compressor() {
+
+}
+
+/**
+ *  Starts the compressor and disables automatic closed-loop control
+ */
+void Compressor::Start() {
+	SetClosedLoopControl(false);
+	SetCompressor(true);
+}
+
+/**
+ *  Stops the compressor and disables automatic closed-loop control
+ */
+void Compressor::Stop() {
+	SetClosedLoopControl(false);
+	SetCompressor(false);
+}
+
+void Compressor::SetCompressor(bool on) {
+	int32_t status = 0;
+
+	setCompressor(m_pcm_pointer, on, &status);
+
+	if(status) {
+		wpi_setWPIError(Timeout);
+	}
+}
+
+
+/**
+ * @return true if the compressor is on
+ */
+bool Compressor::Enabled() {
+	int32_t status = 0;
+	bool value;
+
+	value = getCompressor(m_pcm_pointer, &status);
+
+	if(status) {
+		wpi_setWPIError(Timeout);
+	}
+
+	return value;
+}
+
+/**
+ * @return true if pressure is low
+ */
+bool Compressor::GetPressureSwitchValue() {
+	int32_t status = 0;
+	bool value;
+
+	value = getPressureSwitch(m_pcm_pointer, &status);
+
+	if(status) {
+		wpi_setWPIError(Timeout);
+	}
+
+	return value;
+}
+
+
+/**
+ * @return The current through the compressor, in amps
+ */
+float Compressor::GetCompressorCurrent() {
+	int32_t status = 0;
+	float value;
+
+	value = getCompressorCurrent(m_pcm_pointer, &status);
+
+	if(status) {
+		wpi_setWPIError(Timeout);
+	}
+
+	return value;
+}
+
+
+/**
+ * Enables or disables automatically turning the compressor on when the
+ * pressure is low.
+ */
+void Compressor::SetClosedLoopControl(bool on) {
+	int32_t status = 0;
+
+	setClosedLoopControl(m_pcm_pointer, on, &status);
+
+	if(status) {
+		wpi_setWPIError(Timeout);
 	}
 }
 
 /**
- * Initialize the Compressor object.
- * This method is the common initialization code for all the constructors for the Compressor
- * object. It takes the relay channel and pressure switch channel and spawns a task that polls the
- * compressor and sensor.
- * 
- * You MUST start the compressor by calling the Start() method.
+ * Returns true if the compressor will automatically turn on when the
+ * pressure is low.
  */
-void Compressor::InitCompressor(uint8_t pressureSwitchModuleNumber,
-		uint32_t pressureSwitchChannel,
-		uint8_t compresssorRelayModuleNumber,
-		uint32_t compressorRelayChannel)
-{
-	m_table = NULL;
-	m_enabled = false;
-	m_pressureSwitch = new DigitalInput(pressureSwitchModuleNumber, pressureSwitchChannel);
-	m_relay = new Relay(compresssorRelayModuleNumber, compressorRelayChannel, Relay::kForwardOnly);
+bool Compressor::GetClosedLoopControl() {
+	int32_t status = 0;
+	bool value;
 
-	HALReport(HALUsageReporting::kResourceType_Compressor, 0);
+	value = getClosedLoopControl(m_pcm_pointer, &status);
 
-	if (!m_task.Start((int32_t)this))
-	{
-		wpi_setWPIError(CompressorTaskError);
+	if(status) {
+		wpi_setWPIError(Timeout);
 	}
-}
 
-/**
- * Compressor constructor.
- * Given a fully specified relay channel and pressure switch channel, initialize the Compressor object.
- * 
- * You MUST start the compressor by calling the Start() method.
- * 
- * @param pressureSwitchModuleNumber The digital module that the pressure switch is attached to.
- * @param pressureSwitchChannel The GPIO channel that the pressure switch is attached to.
- * @param compresssorRelayModuleNumber The digital module that the compressor relay is attached to.
- * @param compressorRelayChannel The relay channel that the compressor relay is attached to.
- */
-Compressor::Compressor(uint8_t pressureSwitchModuleNumber,
-		uint32_t pressureSwitchChannel,
-		uint8_t compresssorRelayModuleNumber,
-		uint32_t compressorRelayChannel)
-	: m_task ("Compressor", (FUNCPTR)CompressorChecker)
-{
-	InitCompressor(pressureSwitchModuleNumber,
-		pressureSwitchChannel,
-		compresssorRelayModuleNumber,
-		compressorRelayChannel);
-}
-
-/**
- * Compressor constructor.
- * Given a relay channel and pressure switch channel (both in the default digital module), initialize
- * the Compressor object.
- * 
- * You MUST start the compressor by calling the Start() method.
- * 
- * @param pressureSwitchChannel The GPIO channel that the pressure switch is attached to.
- * @param compressorRelayChannel The relay channel that the compressor relay is attached to.
- */
-Compressor::Compressor(uint32_t pressureSwitchChannel, uint32_t compressorRelayChannel)
-	: m_task ("Compressor", (FUNCPTR)CompressorChecker)
-{
-	InitCompressor(GetDefaultDigitalModule(),
-			pressureSwitchChannel,
-			GetDefaultDigitalModule(),
-			compressorRelayChannel);
-}
-
-/**
- * Delete the Compressor object.
- * Delete the allocated resources for the compressor and kill the compressor task that is polling
- * the pressure switch.
- */
-Compressor::~Compressor()
-{
-	delete m_pressureSwitch;
-	delete m_relay;
-}
-
-/**
- * Operate the relay for the compressor.
- * Change the value of the relay output that is connected to the compressor motor.
- * This is only intended to be called by the internal polling thread.
- */
-void Compressor::SetRelayValue(Relay::Value relayValue)
-{
-	m_relay->Set(relayValue);
-}
-
-/**
- * Get the pressure switch value.
- * Read the pressure switch digital input.
- * 
- * @return The current state of the pressure switch.
- */
-uint32_t Compressor::GetPressureSwitchValue()
-{
-	return m_pressureSwitch->Get();
-}
-
-/**
- * Start the compressor.
- * This method will allow the polling loop to actually operate the compressor. The
- * is stopped by default and won't operate until starting it.
- */
-void Compressor::Start()
-{
-	m_enabled = true;
-}
-
-/**
- * Stop the compressor.
- * This method will stop the compressor from turning on.
- */
-void Compressor::Stop()
-{
-	m_enabled = false;
-}
-
-/**
- * Get the state of the enabled flag.
- * Return the state of the enabled flag for the compressor and pressure switch
- * combination.
- * 
- * @return The state of the compressor thread's enable flag.
- */
-bool Compressor::Enabled()
-{
-	return m_enabled;
+	return value;
 }
 
 void Compressor::UpdateTable() {
-	if (m_table != NULL) {
-		m_table->PutBoolean("Enabled", m_enabled);
+	if(m_table) {
+		m_table->PutBoolean("Enabled", Enabled());
 		m_table->PutBoolean("Pressure switch", GetPressureSwitchValue());
 	}
 }
 
 void Compressor::StartLiveWindowMode() {
-	
 }
 
 void Compressor::StopLiveWindowMode() {
-	
 }
 
 std::string Compressor::GetSmartDashboardType() {
@@ -189,7 +164,13 @@ void Compressor::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable * Compressor::GetTable() {
+ITable *Compressor::GetTable() {
 	return m_table;
+}
+
+void Compressor::ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) {
+	if(value.b) Start();
+	else Stop();
+
 }
 
