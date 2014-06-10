@@ -107,7 +107,7 @@ void initializeDigital(int32_t *status) {
   pwmSystem->writeConfig_MinHigh(minHigh, status);
 //  printf("MinHigh: %d\n", minHigh);
   // Ensure that PWM output values are set to OFF
-  for (uint32_t pwm_index = 1; pwm_index <= kPwmPins; pwm_index++) {
+  for (uint32_t pwm_index = 0; pwm_index < kPwmPins; pwm_index++) {
 	// Initialize port structure
 	DigitalPort* digital_port = new DigitalPort();
 	digital_port->port.pin = pwm_index;
@@ -146,12 +146,12 @@ bool checkDigitalModule(uint8_t module) {
 
 bool checkPWMChannel(void* digital_port_pointer) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
-  return (port->port.pin > 0 && port->port.pin <= kPwmPins);
+  return (port->port.pin >= 0 && port->port.pin < kPwmPins);
 }
 
 bool checkRelayChannel(void* digital_port_pointer) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
-  return (port->port.pin > 0 && port->port.pin <= kRelayPins);
+  return (port->port.pin >= 0 && port->port.pin < kRelayPins);
 }
 
 uint8_t remapDigitalChannel(uint32_t pin, int32_t *status) {
@@ -173,7 +173,7 @@ void setPWM(void* digital_port_pointer, unsigned short value, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   checkPWMChannel(port);
 //  printf("Value:%d\n", value);
-  pwmSystem->writeHdr(port->port.pin - 1, value, status); // XXX: Support MXP
+  pwmSystem->writeHdr(port->port.pin, value, status); // XXX: Support MXP
 }
 
 /**
@@ -185,7 +185,7 @@ void setPWM(void* digital_port_pointer, unsigned short value, int32_t *status) {
 unsigned short getPWM(void* digital_port_pointer, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   checkPWMChannel(port);
-  return pwmSystem->readHdr(port->port.pin - 1, status); // XXX: Support MXP
+  return pwmSystem->readHdr(port->port.pin, status); // XXX: Support MXP
 }
 
 /**
@@ -197,7 +197,7 @@ unsigned short getPWM(void* digital_port_pointer, int32_t *status) {
 void setPWMPeriodScale(void* digital_port_pointer, uint32_t squelchMask, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   checkPWMChannel(port);
-  pwmSystem->writePeriodScaleHdr(port->port.pin - 1, squelchMask, status); // XXX: Support MXP
+  pwmSystem->writePeriodScaleHdr(port->port.pin, squelchMask, status); // XXX: Support MXP
 }
 
 /**
@@ -325,22 +325,22 @@ void setPWMOutputChannelWithModule(uint8_t module, void* pwmGenerator, uint32_t 
   if (id == ~0ul) return;
   switch(id) {
   case 0:
-    digitalSystem->writePWMOutputSelect(0, remapDigitalChannel(pin - 1, status), status);
+    digitalSystem->writePWMOutputSelect(0, remapDigitalChannel(pin, status), status);
     break;
   case 1:
-    digitalSystem->writePWMOutputSelect(1, remapDigitalChannel(pin - 1, status), status);
+    digitalSystem->writePWMOutputSelect(1, remapDigitalChannel(pin, status), status);
     break;
   case 2:
-    digitalSystem->writePWMOutputSelect(2, remapDigitalChannel(pin - 1, status), status);
+    digitalSystem->writePWMOutputSelect(2, remapDigitalChannel(pin, status), status);
     break;
   case 3:
-    digitalSystem->writePWMOutputSelect(3, remapDigitalChannel(pin - 1, status), status);
+    digitalSystem->writePWMOutputSelect(3, remapDigitalChannel(pin, status), status);
     break;
   case 4:
-    digitalSystem->writePWMOutputSelect(4, remapDigitalChannel(pin - 1, status), status);
+    digitalSystem->writePWMOutputSelect(4, remapDigitalChannel(pin, status), status);
     break;
   case 5:
-    digitalSystem->writePWMOutputSelect(5, remapDigitalChannel(pin - 1, status), status);
+    digitalSystem->writePWMOutputSelect(5, remapDigitalChannel(pin, status), status);
     break;
   }
 }
@@ -357,9 +357,9 @@ void setRelayForward(void* digital_port_pointer, bool on, int32_t *status) {
     Synchronized sync(digitalRelaySemaphore);
     uint8_t forwardRelays = relaySystem->readValue_Forward(status);
     if (on)
-      forwardRelays |= 1 << (port->port.pin - 1);
+      forwardRelays |= 1 << port->port.pin;
     else
-      forwardRelays &= ~(1 << (port->port.pin - 1));
+      forwardRelays &= ~(1 << port->port.pin);
     relaySystem->writeValue_Forward(forwardRelays, status);
   }
 }
@@ -376,9 +376,9 @@ void setRelayReverse(void* digital_port_pointer, bool on, int32_t *status) {
     Synchronized sync(digitalRelaySemaphore);
     uint8_t reverseRelays = relaySystem->readValue_Reverse(status);
     if (on)
-      reverseRelays |= 1 << (port->port.pin - 1);
+      reverseRelays |= 1 << port->port.pin;
     else
-      reverseRelays &= ~(1 << (port->port.pin - 1));
+      reverseRelays &= ~(1 << port->port.pin);
     relaySystem->writeValue_Reverse(reverseRelays, status);
   }
 }
@@ -389,7 +389,7 @@ void setRelayReverse(void* digital_port_pointer, bool on, int32_t *status) {
 bool getRelayForward(void* digital_port_pointer, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   uint8_t forwardRelays = relaySystem->readValue_Forward(status);
-  return (forwardRelays & (1 << (port->port.pin - 1))) != 0;
+  return (forwardRelays & (1 << port->port.pin)) != 0;
 }
 
 /**
@@ -398,7 +398,7 @@ bool getRelayForward(void* digital_port_pointer, int32_t *status) {
 bool getRelayReverse(void* digital_port_pointer, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   uint8_t reverseRelays = relaySystem->readValue_Reverse(status);
-  return (reverseRelays & (1 << (port->port.pin - 1))) != 0;
+  return (reverseRelays & (1 << port->port.pin)) != 0;
 }
 
 /**
@@ -414,10 +414,10 @@ bool allocateDIO(void* digital_port_pointer, bool input, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   char buf[64];
   snprintf(buf, 64, "DIO %d (Module %d)", port->port.pin, port->port.module);
-  if (DIOChannels->Allocate(kDigitalPins * (port->port.module - 1) + port->port.pin - 1, buf) == ~0ul) return false;
+  if (DIOChannels->Allocate(kDigitalPins * (port->port.module - 1) + port->port.pin, buf) == ~0ul) return false;
   {
     Synchronized sync(digitalDIOSemaphore);
-    uint32_t bitToSet = 1 << (remapDigitalChannel(port->port.pin - 1, status));
+    uint32_t bitToSet = 1 << (remapDigitalChannel(port->port.pin, status));
     tDIO::tOutputEnable outputEnable = digitalSystem->readOutputEnable(status);
     if (input) {
       outputEnable.Headers = outputEnable.Headers & (~bitToSet); // clear the bit for read
@@ -436,7 +436,7 @@ bool allocateDIO(void* digital_port_pointer, bool input, int32_t *status) {
  */
 void freeDIO(void* digital_port_pointer, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
-  DIOChannels->Free(kDigitalPins * (port->port.module - 1) + port->port.pin - 1);
+  DIOChannels->Free(kDigitalPins * (port->port.module - 1) + port->port.pin);
 }
 
 /**
@@ -456,9 +456,9 @@ void setDIO(void* digital_port_pointer, short value, int32_t *status) {
     Synchronized sync(digitalDIOSemaphore);
     tDIO::tDO currentDIO = digitalSystem->readDO(status);
     if(value == 0) {
-      currentDIO.Headers = currentDIO.Headers & ~(1 << remapDigitalChannel(port->port.pin - 1, status));
+      currentDIO.Headers = currentDIO.Headers & ~(1 << remapDigitalChannel(port->port.pin, status));
     } else if (value == 1) {
-      currentDIO.Headers = currentDIO.Headers | (1 << remapDigitalChannel(port->port.pin - 1, status));
+      currentDIO.Headers = currentDIO.Headers | (1 << remapDigitalChannel(port->port.pin, status));
     } 
     digitalSystem->writeDO(currentDIO, status);
   }
@@ -479,7 +479,7 @@ bool getDIO(void* digital_port_pointer, int32_t *status) {
   //if it == 0, then return false
   //else return true
 
-  return ((currentDIO.Headers >> remapDigitalChannel(port->port.pin - 1, status)) & 1) != 0;
+  return ((currentDIO.Headers >> remapDigitalChannel(port->port.pin, status)) & 1) != 0;
 }
 
 /**
@@ -497,7 +497,7 @@ bool getDIODirection(void* digital_port_pointer, int32_t *status) {
   //AND it against the currentOutputEnable
   //if it == 0, then return false
   //else return true
-  return ((currentOutputEnable.Headers >> remapDigitalChannel(port->port.pin - 1, status)) & 1) != 0;
+  return ((currentOutputEnable.Headers >> remapDigitalChannel(port->port.pin, status)) & 1) != 0;
 }
 
 /**
@@ -510,7 +510,7 @@ bool getDIODirection(void* digital_port_pointer, int32_t *status) {
 void pulse(void* digital_port_pointer, double pulseLength, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   tDIO::tPulse pulse;
-  pulse.Headers = 1 << remapDigitalChannel(port->port.pin - 1, status);
+  pulse.Headers = 1 << remapDigitalChannel(port->port.pin, status);
   digitalSystem->writePulseLength((uint8_t)(1.0e9 * pulseLength / (pwmSystem->readLoopTiming(status) * 25)), status);
   digitalSystem->writePulse(pulse, status);
 }
@@ -522,7 +522,7 @@ void pulse(void* digital_port_pointer, double pulseLength, int32_t *status) {
  */
 bool isPulsing(void* digital_port_pointer, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
-  uint16_t mask = 1 << remapDigitalChannel(port->port.pin - 1, status);
+  uint16_t mask = 1 << remapDigitalChannel(port->port.pin, status);
   tDIO::tPulse pulseRegister = digitalSystem->readPulse(status);
   return (pulseRegister.Headers & mask) != 0;
 }

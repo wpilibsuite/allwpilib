@@ -131,7 +131,7 @@ bool SensorBase::CheckSolenoidModule(uint8_t moduleNumber)
  */
 bool SensorBase::CheckDigitalChannel(uint32_t channel)
 {
-	if (channel > 0 && channel <= kDigitalChannels)
+	if (channel >= 0 && channel < kDigitalChannels)
 		return true;
 	return false;
 }
@@ -145,7 +145,7 @@ bool SensorBase::CheckDigitalChannel(uint32_t channel)
  */
 bool SensorBase::CheckRelayChannel(uint32_t channel)
 {
-	if (channel > 0 && channel <= kRelayChannels)
+	if (channel >= 0 && channel < kRelayChannels)
 		return true;
 	return false;
 }
@@ -159,7 +159,7 @@ bool SensorBase::CheckRelayChannel(uint32_t channel)
  */
 bool SensorBase::CheckPWMChannel(uint32_t channel)
 {
-	if (channel > 0 && channel <= kPwmChannels)
+	if (channel >= 0 && channel < kPwmChannels)
 		return true;
 	return false;
 }
@@ -173,7 +173,7 @@ bool SensorBase::CheckPWMChannel(uint32_t channel)
  */
 bool SensorBase::CheckAnalogChannel(uint32_t channel)
 {
-	if (channel > 0 && channel <= kAnalogChannels)
+	if (channel >= 0 && channel < kAnalogChannels)
 		return true;
 	return false;
 }

@@ -15,7 +15,7 @@ static Resource *channels = NULL;
 
 const uint8_t AnalogChannel::kAccumulatorModuleNumber;
 const uint32_t AnalogChannel::kAccumulatorNumChannels;
-const uint32_t AnalogChannel::kAccumulatorChannels[] = {1, 2};
+const uint32_t AnalogChannel::kAccumulatorChannels[] = {0, 1};
 
 /**
  * Common initialization.
@@ -39,7 +39,7 @@ void AnalogChannel::InitChannel(uint8_t moduleNumber, uint32_t channel)
 	}
 
 	snprintf(buf, 64, "Analog Input %d (Module: %d)", channel, moduleNumber);
-	if (channels->Allocate((moduleNumber - 1) * kAnalogChannels + channel - 1, buf) == ~0ul)
+	if (channels->Allocate((moduleNumber - 1) * kAnalogChannels + channel, buf) == ~0ul)
 	{
 		CloneError(channels);
 		return;
@@ -82,7 +82,7 @@ AnalogChannel::AnalogChannel(uint32_t channel)
  */
 AnalogChannel::~AnalogChannel()
 {
-	channels->Free((m_module - 1) * kAnalogChannels + m_channel - 1);
+	channels->Free((m_module - 1) * kAnalogChannels + m_channel);
 }
 
 /**

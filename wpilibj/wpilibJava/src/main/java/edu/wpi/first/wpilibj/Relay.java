@@ -139,14 +139,14 @@ public class Relay extends SensorBase implements IDeviceController,
 			if (m_direction == Direction.kBoth
 					|| m_direction == Direction.kForward) {
 				relayChannels.allocate(((moduleNumber - 1) * kRelayChannels
-						+ m_channel - 1) * 2);
+						+ m_channel) * 2);
 				UsageReporting.report(tResourceType.kResourceType_Relay,
 						m_channel, moduleNumber - 1);
 			}
 			if (m_direction == Direction.kBoth
 					|| m_direction == Direction.kReverse) {
 				relayChannels.allocate(((moduleNumber - 1) * kRelayChannels
-						+ m_channel - 1) * 2 + 1);
+						+ m_channel) * 2 + 1);
 				UsageReporting.report(tResourceType.kResourceType_Relay,
 						m_channel + 128, moduleNumber - 1);
 			}
@@ -229,15 +229,15 @@ public class Relay extends SensorBase implements IDeviceController,
 
 		if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
 			relayChannels.free(((m_module.getModuleNumber() - 1)
-					* kRelayChannels + m_channel - 1) * 2);
+					* kRelayChannels + m_channel) * 2);
 			m_module.freeDIO(((m_module.getModuleNumber() - 1) * kRelayChannels
-					+ m_channel - 1) * 2);
+					+ m_channel) * 2);
 		}
 		if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
 			relayChannels.free(((m_module.getModuleNumber() - 1)
-					* kRelayChannels + m_channel - 1) * 2 + 1);
+					* kRelayChannels + m_channel) * 2 + 1);
 			m_module.freeDIO(((m_module.getModuleNumber() - 1) * kRelayChannels
-					+ m_channel - 1) * 2 + 1);
+					+ m_channel) * 2 + 1);
 		}
 	}
 

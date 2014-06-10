@@ -47,7 +47,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 			* kAnalogChannels);
 	private ByteBuffer m_port;
 	private int m_moduleNumber, m_channel;
-	private static final int[] kAccumulatorChannels = { 1, 2 };
+	private static final int[] kAccumulatorChannels = { 0, 1 };
 	private long m_accumulatorOffset;
 
 	/**
@@ -82,8 +82,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 					+ " cannot be allocated. Channel is not present.");
 		}
 		try {
-			channels.allocate((moduleNumber - 1) * kAnalogChannels + channel
-					- 1);
+			channels.allocate((moduleNumber - 1) * kAnalogChannels + channel);
 		} catch (CheckedAllocationException e) {
 			throw new AllocationException("Analog channel " + m_channel
 					+ " on module " + m_moduleNumber + " is already allocated");
@@ -107,7 +106,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * Channel destructor.
 	 */
 	public void free() {
-		channels.free(((m_moduleNumber - 1) * kAnalogChannels + m_channel - 1));
+		channels.free(((m_moduleNumber - 1) * kAnalogChannels + m_channel));
 		m_channel = 0;
 		m_moduleNumber = 0;
 		m_accumulatorOffset = 0;

@@ -30,7 +30,7 @@ public:
 	static DriverStation *GetInstance();
 
 	static const uint32_t kBatteryModuleNumber = 1;
-	static const uint32_t kBatteryChannel = 8;
+	static const uint32_t kBatteryChannel = 7;
 	static const uint32_t kJoystickPorts = 4;
 	static const uint32_t kJoystickAxes = 6;
 

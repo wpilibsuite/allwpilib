@@ -44,7 +44,7 @@ void PWM::InitPWM(uint8_t moduleNumber, uint32_t channel)
 	}
 
 	snprintf(buf, 64, "PWM %d (Module: %d)", channel, moduleNumber);
-	if (allocated->Allocate((moduleNumber - 1) * kPwmChannels + channel - 1, buf) == ~0ul)
+	if (allocated->Allocate((moduleNumber - 1) * kPwmChannels + channel, buf) == ~0ul)
 	{
 		CloneError(allocated);
 		return;
@@ -94,7 +94,7 @@ PWM::~PWM()
 	if (m_module)
 	{
 		m_module->SetPWM(m_channel, kPwmDisabled);
-		allocated->Free((m_module->GetNumber() - 1) * kPwmChannels + m_channel - 1);
+		allocated->Free((m_module->GetNumber() - 1) * kPwmChannels + m_channel);
 	}
 }
 

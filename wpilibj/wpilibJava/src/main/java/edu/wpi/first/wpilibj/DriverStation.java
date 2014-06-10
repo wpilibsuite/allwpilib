@@ -31,7 +31,7 @@ public class DriverStation implements IInputOutput {
     /**
      * Analog channel to read the battery
      */
-    public static final int kBatteryChannel = 8;
+    public static final int kBatteryChannel = 7;
     /**
      * Number of Joystick Ports
      */

@@ -45,7 +45,7 @@ public abstract class DigitalSource extends InterruptableSensorBase {
 
 		try {
 			channels.allocate((m_moduleNumber - 1) * kDigitalChannels
-					+ m_channel - 1);
+					+ m_channel);
 		} catch (CheckedAllocationException ex) {
 			throw new AllocationException("Digital input " + m_channel
 					+ " on module " + m_moduleNumber + " is already allocated");
@@ -63,7 +63,7 @@ public abstract class DigitalSource extends InterruptableSensorBase {
 	}
 
 	public void free() {
-		channels.free(((m_moduleNumber - 1) * kDigitalChannels + m_channel - 1));
+		channels.free(((m_moduleNumber - 1) * kDigitalChannels + m_channel));
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
@@ -79,7 +79,7 @@ public abstract class DigitalSource extends InterruptableSensorBase {
 	 * @return channel routing number
 	 */
 	public int getChannelForRouting() {
-		return m_channel - 1;
+		return m_channel;
 	}
 
 	/**

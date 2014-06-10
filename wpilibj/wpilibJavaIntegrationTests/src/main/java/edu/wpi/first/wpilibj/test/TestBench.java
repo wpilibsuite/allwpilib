@@ -44,10 +44,10 @@ public final class TestBench {
 	
 	
 	//THESE MUST BE IN INCREMENTING ORDER
-	public static final int DIOCrossConnectA1 = 7;
-	public static final int DIOCrossConnectA2 = 8;
-	public static final int DIOCrossConnectB1 = 9;
-	public static final int DIOCrossConnectB2 = 10;
+	public static final int DIOCrossConnectA1 = 6;
+	public static final int DIOCrossConnectA2 = 7;
+	public static final int DIOCrossConnectB1 = 8;
+	public static final int DIOCrossConnectB2 = 9;
 	
 	/** The Singleton instance of the Test Bench */
 	private static TestBench instance = null;
@@ -69,9 +69,9 @@ public final class TestBench {
 	 * @return a freshly allocated Talon, Encoder pair
 	 */
 	public MotorEncoderFixture getTalonPair() {
-		Talon talon = new Talon(1);
-		DigitalInput encA1 = new DigitalInput(1);
-		DigitalInput encB1 = new DigitalInput(2);
+		Talon talon = new Talon(0);
+		DigitalInput encA1 = new DigitalInput(0);
+		DigitalInput encB1 = new DigitalInput(1);
 
 		MotorEncoderFixture talonPair = new MotorEncoderFixture(talon, encA1,
 				encB1);
@@ -85,9 +85,9 @@ public final class TestBench {
 	 * @return a freshly allocated Victor, Encoder pair
 	 */
 	public MotorEncoderFixture getVictorPair() {
-		Victor vic = new Victor(2);
-		DigitalInput encA2 = new DigitalInput(3);
-		DigitalInput encB2 = new DigitalInput(4);
+		Victor vic = new Victor(1);
+		DigitalInput encA2 = new DigitalInput(2);
+		DigitalInput encB2 = new DigitalInput(3);
 		MotorEncoderFixture vicPair = new MotorEncoderFixture(vic, encA2, encB2);
 		return vicPair;
 	}
@@ -99,9 +99,9 @@ public final class TestBench {
 	 * @return a freshly allocated Jaguar, Encoder pair
 	 */
 	public MotorEncoderFixture getJaguarPair() {
-		Jaguar jag = new Jaguar(3);
-		DigitalInput encA3 = new DigitalInput(5);
-		DigitalInput encB3 = new DigitalInput(6);
+		Jaguar jag = new Jaguar(2);
+		DigitalInput encA3 = new DigitalInput(4);
+		DigitalInput encB3 = new DigitalInput(5);
 		MotorEncoderFixture jagPair = new MotorEncoderFixture(jag, encA3, encB3);
 		return jagPair;
 	}
@@ -116,8 +116,8 @@ public final class TestBench {
 	 */
 	public MotorEncoderFixture getCanJaguarPair() {
 
-		DigitalInput encA4 = new DigitalInput(7);
-		DigitalInput encB4 = new DigitalInput(8);
+		DigitalInput encA4 = new DigitalInput(6);
+		DigitalInput encB4 = new DigitalInput(7);
 		MotorEncoderFixture canPair;
 		if (canJag == null) { // Again this is because the CanJaguar does not
 								// have a free method
@@ -138,12 +138,12 @@ public final class TestBench {
 	 * @return a freshly allocated Servo's and a freshly allocated Gyroscope
 	 */
 	public TiltPanCameraFixture getTiltPanCam() {
-		Gyro gyro = new Gyro(1);
+		Gyro gyro = new Gyro(0);
 		gyro.setSensitivity(.007); // If a different gyroscope is used this
 									// value will be different
 
-		Servo tilt = new Servo(10);
-		Servo pan = new Servo(9);
+		Servo tilt = new Servo(9);
+		Servo pan = new Servo(8);
 
 		TiltPanCameraFixture tpcam = new TiltPanCameraFixture(tilt, pan, gyro);
 

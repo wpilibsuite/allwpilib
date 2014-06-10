@@ -65,7 +65,7 @@ public class DigitalModule extends Module {
         m_digital_ports = new ByteBuffer[SensorBase.kDigitalChannels];
         for (int i = 0; i < SensorBase.kDigitalChannels; i++) {
             ByteBuffer port_pointer = DIOJNI.getPortWithModule(
-                                       (byte) moduleNumber, (byte) (i + 1));
+                                       (byte) moduleNumber, (byte) i);
             ByteBuffer status = ByteBuffer.allocateDirect(4);
     		// set the byte order
     		status.order(ByteOrder.LITTLE_ENDIAN);
@@ -77,7 +77,7 @@ public class DigitalModule extends Module {
         m_relay_ports = new ByteBuffer[SensorBase.kRelayChannels];
         for (int i = 0; i < SensorBase.kRelayChannels; i++) {
             ByteBuffer port_pointer = RelayJNI.getPortWithModule(
-                                       (byte) moduleNumber, (byte) (i + 1));
+                                       (byte) moduleNumber, (byte) i);
             ByteBuffer status = ByteBuffer.allocateDirect(4);
     		// set the byte order
     		status.order(ByteOrder.LITTLE_ENDIAN);
@@ -88,7 +88,7 @@ public class DigitalModule extends Module {
         m_pwm_ports = new ByteBuffer[SensorBase.kPwmChannels];
         for (int i = 0; i < SensorBase.kPwmChannels; i++) {
             ByteBuffer port_pointer = PWMJNI.getPortWithModule(
-                                       (byte) moduleNumber, (byte) (i + 1));
+                                       (byte) moduleNumber, (byte) i);
             ByteBuffer status = ByteBuffer.allocateDirect(4);
     		// set the byte order
     		status.order(ByteOrder.LITTLE_ENDIAN);
@@ -112,7 +112,7 @@ public class DigitalModule extends Module {
         ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
-        PWMJNI.setPWM(m_pwm_ports[channel - 1], (short) value, status.asIntBuffer());
+        PWMJNI.setPWM(m_pwm_ports[channel], (short) value, status.asIntBuffer());
         HALUtil.checkStatus(status.asIntBuffer());
     }
 
@@ -127,7 +127,7 @@ public class DigitalModule extends Module {
         ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
-        int value = (int) PWMJNI.getPWM(m_pwm_ports[channel - 1], status.asIntBuffer());
+        int value = (int) PWMJNI.getPWM(m_pwm_ports[channel], status.asIntBuffer());
         HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
@@ -144,7 +144,7 @@ public class DigitalModule extends Module {
         ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
-        PWMJNI.setPWMPeriodScale(m_pwm_ports[channel - 1], squelchMask,
+        PWMJNI.setPWMPeriodScale(m_pwm_ports[channel], squelchMask,
                                      status.asIntBuffer());
         HALUtil.checkStatus(status.asIntBuffer());
     }
@@ -162,7 +162,7 @@ public class DigitalModule extends Module {
         ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
-        RelayJNI.setRelayForward(m_relay_ports[channel - 1], (byte) (on ? 1
+        RelayJNI.setRelayForward(m_relay_ports[channel], (byte) (on ? 1
                                    : 0), status.asIntBuffer());
         HALUtil.checkStatus(status.asIntBuffer());
     }
@@ -180,7 +180,7 @@ public class DigitalModule extends Module {
         ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
-        RelayJNI.setRelayReverse(m_relay_ports[channel - 1], (byte) (on ? 1
+        RelayJNI.setRelayReverse(m_relay_ports[channel], (byte) (on ? 1
                                    : 0), status.asIntBuffer());
         HALUtil.checkStatus(status.asIntBuffer());
     }
@@ -196,7 +196,7 @@ public class DigitalModule extends Module {
         ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
-        boolean value = RelayJNI.getRelayForward(m_relay_ports[channel - 1],
+        boolean value = RelayJNI.getRelayForward(m_relay_ports[channel],
                         status.asIntBuffer()) != 0;
         HALUtil.checkStatus(status.asIntBuffer());
         return value;
@@ -231,7 +231,7 @@ public class DigitalModule extends Module {
         ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
-        boolean value = RelayJNI.getRelayReverse(m_relay_ports[channel - 1],
+        boolean value = RelayJNI.getRelayReverse(m_relay_ports[channel],
                         status.asIntBuffer()) != 0;
         HALUtil.checkStatus(status.asIntBuffer());
         return value;
@@ -272,7 +272,7 @@ public class DigitalModule extends Module {
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
         boolean allocated = DIOJNI.allocateDIO(
-                                m_digital_ports[channel - 1], (byte) (input ? 1 : 0), status.asIntBuffer()) != 0;
+                                m_digital_ports[channel], (byte) (input ? 1 : 0), status.asIntBuffer()) != 0;
         HALUtil.checkStatus(status.asIntBuffer());
         return allocated;
     }
@@ -287,7 +287,7 @@ public class DigitalModule extends Module {
         ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
-        DIOJNI.freeDIO(m_digital_ports[channel - 1], status.asIntBuffer());
+        DIOJNI.freeDIO(m_digital_ports[channel], status.asIntBuffer());
         HALUtil.checkStatus(status.asIntBuffer());
     }
 
@@ -304,7 +304,7 @@ public class DigitalModule extends Module {
         ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
-        DIOJNI.setDIO(m_digital_ports[channel - 1], (byte) (value ? 1 : 0),
+        DIOJNI.setDIO(m_digital_ports[channel], (byte) (value ? 1 : 0),
                           status.asIntBuffer());
         HALUtil.checkStatus(status.asIntBuffer());
     }
@@ -321,7 +321,7 @@ public class DigitalModule extends Module {
         ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
-        boolean value = DIOJNI.getDIO(m_digital_ports[channel - 1], status.asIntBuffer()) != 0;
+        boolean value = DIOJNI.getDIO(m_digital_ports[channel], status.asIntBuffer()) != 0;
         HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
@@ -357,7 +357,7 @@ public class DigitalModule extends Module {
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
         boolean value = DIOJNI.getDIODirection(
-                            m_digital_ports[channel - 1], status.asIntBuffer()) != 0;
+                            m_digital_ports[channel], status.asIntBuffer()) != 0;
         HALUtil.checkStatus(status.asIntBuffer());
         return value;
     }
@@ -394,7 +394,7 @@ public class DigitalModule extends Module {
         ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
-        DIOJNI.pulse(m_digital_ports[channel - 1], pulseLength, status.asIntBuffer());
+        DIOJNI.pulse(m_digital_ports[channel], pulseLength, status.asIntBuffer());
         HALUtil.checkStatus(status.asIntBuffer());
     }
 
@@ -415,7 +415,7 @@ public class DigitalModule extends Module {
         float convertedPulse = (float) (pulseLength / 1.0e9 * (DIOJNI.getLoopTiming(status.asIntBuffer()) * 25));
         System.err
         .println("You should use the float version of pulse for portability.  This is deprecated");
-        DIOJNI.pulse(m_digital_ports[channel - 1], convertedPulse, status.asIntBuffer());
+        DIOJNI.pulse(m_digital_ports[channel], convertedPulse, status.asIntBuffer());
         HALUtil.checkStatus(status.asIntBuffer());
     }
 
@@ -430,7 +430,7 @@ public class DigitalModule extends Module {
         ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
-        boolean value = DIOJNI.isPulsing(m_digital_ports[channel - 1],
+        boolean value = DIOJNI.isPulsing(m_digital_ports[channel],
                                              status.asIntBuffer()) != 0;
         HALUtil.checkStatus(status.asIntBuffer());
         return value;

@@ -17,7 +17,7 @@ static const float kDefaultSampleRate = 50000.0;
 static const uint32_t kAnalogPins = 8;
 
 static const uint32_t kAccumulatorNumChannels = 2;
-static const uint32_t kAccumulatorChannels[] = {1, 2};
+static const uint32_t kAccumulatorChannels[] = {0, 1};
 
 struct AnalogPort {
   Port port;
@@ -59,11 +59,11 @@ void* initializeAnalogPort(void* port_pointer, int32_t *status) {
   AnalogPort* analog_port = new AnalogPort();
   analog_port->port = *port;
   if (isAccumulatorChannel(analog_port, status)) {
-    analog_port->accumulator = tAccumulator::create(port->pin - 1, status);
+    analog_port->accumulator = tAccumulator::create(port->pin, status);
   } else analog_port->accumulator = NULL;
 
   // Set default configuration
-  analogSystem->writeScanList(port->pin - 1, port->pin - 1, status);
+  analogSystem->writeScanList(port->pin, port->pin, status);
   setAnalogAverageBits(analog_port, kDefaultAverageBits, status);
   setAnalogOversampleBits(analog_port, kDefaultOversampleBits, status);
   return analog_port;
@@ -82,12 +82,12 @@ bool checkAnalogModule(uint8_t module) {
 /**
  * Check that the analog channel number is value.
  * Verify that the analog channel number is one of the legal channel numbers. Channel numbers
- * are 1-based.
+ * are 0-based.
  * 
  * @return Analog channel is valid
  */
 bool checkAnalogChannel(uint32_t pin) {
-  if (pin > 0 && pin <= kAnalogPins)
+  if (pin >= 0 && pin < kAnalogPins)
     return true;
   return false;
 }
@@ -184,7 +184,7 @@ float getAnalogSampleRateWithModule(uint8_t module, int32_t *status) {
  */
 void setAnalogAverageBits(void* analog_port_pointer, uint32_t bits, int32_t *status) {
   AnalogPort* port = (AnalogPort*) analog_port_pointer;
-  analogSystem->writeAverageBits(port->port.pin - 1, bits, status);
+  analogSystem->writeAverageBits(port->port.pin, bits, status);
 }
 
 /**
@@ -198,7 +198,7 @@ void setAnalogAverageBits(void* analog_port_pointer, uint32_t bits, int32_t *sta
  */
 uint32_t getAnalogAverageBits(void* analog_port_pointer, int32_t *status) {
   AnalogPort* port = (AnalogPort*) analog_port_pointer;
-  uint32_t result = analogSystem->readAverageBits(port->port.pin - 1, status);
+  uint32_t result = analogSystem->readAverageBits(port->port.pin, status);
   return result;
 }
 
@@ -214,7 +214,7 @@ uint32_t getAnalogAverageBits(void* analog_port_pointer, int32_t *status) {
  */
 void setAnalogOversampleBits(void* analog_port_pointer, uint32_t bits, int32_t *status) {
   AnalogPort* port = (AnalogPort*) analog_port_pointer;
-  analogSystem->writeOversampleBits(port->port.pin - 1, bits, status);
+  analogSystem->writeOversampleBits(port->port.pin, bits, status);
 }
 
 
@@ -229,7 +229,7 @@ void setAnalogOversampleBits(void* analog_port_pointer, uint32_t bits, int32_t *
  */
 uint32_t getAnalogOversampleBits(void* analog_port_pointer, int32_t *status) {
   AnalogPort* port = (AnalogPort*) analog_port_pointer;
-  uint32_t result = analogSystem->readOversampleBits(port->port.pin - 1, status);
+  uint32_t result = analogSystem->readOversampleBits(port->port.pin, status);
   return result;
 }
 
@@ -248,7 +248,7 @@ int16_t getAnalogValue(void* analog_port_pointer, int32_t *status) {
   checkAnalogChannel(port->port.pin);
 
   tAI::tReadSelect readSelect;
-  readSelect.Channel = port->port.pin - 1;
+  readSelect.Channel = port->port.pin;
   readSelect.Averaged = false;
 
   {
@@ -279,7 +279,7 @@ int32_t getAnalogAverageValue(void* analog_port_pointer, int32_t *status) {
   checkAnalogChannel(port->port.pin);
 
   tAI::tReadSelect readSelect;
-  readSelect.Channel = port->port.pin - 1;
+  readSelect.Channel = port->port.pin;
   readSelect.Averaged = true;
 
   {
@@ -366,7 +366,7 @@ int32_t getAnalogVoltsToValue(void* analog_port_pointer, double voltage, int32_t
  */
 uint32_t getAnalogLSBWeight(void* analog_port_pointer, int32_t *status) {
   AnalogPort* port = (AnalogPort*) analog_port_pointer;
-  uint32_t lsbWeight = FRC_NetworkCommunication_nAICalibration_getLSBWeight(0, port->port.pin - 1, status); // XXX: aiSystemIndex == 0?
+  uint32_t lsbWeight = FRC_NetworkCommunication_nAICalibration_getLSBWeight(0, port->port.pin, status); // XXX: aiSystemIndex == 0?
   return lsbWeight;
 }
 
@@ -382,7 +382,7 @@ uint32_t getAnalogLSBWeight(void* analog_port_pointer, int32_t *status) {
  */
 int32_t getAnalogOffset(void* analog_port_pointer, int32_t *status) {
   AnalogPort* port = (AnalogPort*) analog_port_pointer;
-  int32_t offset = FRC_NetworkCommunication_nAICalibration_getOffset(0, port->port.pin - 1, status); // XXX: aiSystemIndex == 0?
+  int32_t offset = FRC_NetworkCommunication_nAICalibration_getOffset(0, port->port.pin, status); // XXX: aiSystemIndex == 0?
   return offset;
 }
 
@@ -574,7 +574,7 @@ void* initializeAnalogTrigger(void* port_pointer, uint32_t *index, int32_t *stat
   // TODO: if (index == ~0ul) { CloneError(triggers); return; }
 
   trigger->trigger = tAnalogTrigger::create(trigger->index, status);
-  trigger->trigger->writeSourceSelect_Channel(port->pin - 1, status);
+  trigger->trigger->writeSourceSelect_Channel(port->pin, status);
 
   return trigger;
 }

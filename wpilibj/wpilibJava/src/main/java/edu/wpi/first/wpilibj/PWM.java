@@ -116,7 +116,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
         checkPWMModule(moduleNumber);
         checkPWMChannel(channel);
         try {
-            allocated.allocate((moduleNumber - 1) * kPwmChannels + channel - 1);
+            allocated.allocate((moduleNumber - 1) * kPwmChannels + channel);
         } catch (CheckedAllocationException e) {
             throw new AllocationException(
                 "PWM channel " + channel + " on module " + moduleNumber + " is already allocated");
@@ -159,7 +159,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
     public void free() {
         m_module.setPWM(m_channel, kPwmDisabled);
         m_module.freeDIO(m_channel);
-        allocated.free((m_module.getModuleNumber() - 1) * kPwmChannels + m_channel - 1);
+        allocated.free((m_module.getModuleNumber() - 1) * kPwmChannels + m_channel);
     }
 
     /**

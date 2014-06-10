@@ -50,21 +50,21 @@ DigitalModule::DigitalModule(uint8_t moduleNumber)
   	m_module = moduleNumber;
   	for (uint32_t i = 0; i < kDigitalChannels; i++)
 	{
-	  void* port = getPortWithModule(moduleNumber, i+1);
+	  void* port = getPortWithModule(moduleNumber, i);
 	  int32_t status = 0;
 	  m_digital_ports[i] = initializeDigitalPort(port, &status);
 	  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
   	for (uint32_t i = 0; i < kRelayChannels; i++)
 	{
-	  void* port = getPortWithModule(moduleNumber, i+1);
+	  void* port = getPortWithModule(moduleNumber, i);
 	  int32_t status = 0;
 	  m_relay_ports[i] = initializeDigitalPort(port, &status);
 	  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
   	for (uint32_t i = 0; i < kPwmChannels; i++)
 	{
-	  void* port = getPortWithModule(moduleNumber, i+1);
+	  void* port = getPortWithModule(moduleNumber, i);
 	  int32_t status = 0;
 	  m_pwm_ports[i] = initializeDigitalPort(port, &status);
 	  wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -86,7 +86,7 @@ DigitalModule::~DigitalModule()
 void DigitalModule::SetPWM(uint32_t channel, unsigned short value)
 {
   	int32_t status = 0;
-	setPWM(m_pwm_ports[channel-1], value, &status);
+	setPWM(m_pwm_ports[channel], value, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
@@ -99,7 +99,7 @@ void DigitalModule::SetPWM(uint32_t channel, unsigned short value)
 unsigned short DigitalModule::GetPWM(uint32_t channel)
 {
   	int32_t status = 0;
-	uint16_t value = getPWM(m_pwm_ports[channel-1], &status);
+	uint16_t value = getPWM(m_pwm_ports[channel], &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	return value;
 }
@@ -113,7 +113,7 @@ unsigned short DigitalModule::GetPWM(uint32_t channel)
 void DigitalModule::SetPWMPeriodScale(uint32_t channel, uint32_t squelchMask)
 {
 	int32_t status = 0;
-	setPWMPeriodScale(m_pwm_ports[channel-1], squelchMask, &status);
+	setPWMPeriodScale(m_pwm_ports[channel], squelchMask, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
@@ -125,7 +125,7 @@ void DigitalModule::SetPWMPeriodScale(uint32_t channel, uint32_t squelchMask)
 void DigitalModule::SetRelayForward(uint32_t channel, bool on)
 {
 	int32_t status = 0;
-	setRelayForward(m_relay_ports[channel-1], on, &status);
+	setRelayForward(m_relay_ports[channel], on, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
@@ -137,7 +137,7 @@ void DigitalModule::SetRelayForward(uint32_t channel, bool on)
 void DigitalModule::SetRelayReverse(uint32_t channel, bool on)
 {
 	int32_t status = 0;
-	setRelayReverse(m_relay_ports[channel-1], on, &status);
+	setRelayReverse(m_relay_ports[channel], on, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
@@ -147,7 +147,7 @@ void DigitalModule::SetRelayReverse(uint32_t channel, bool on)
 bool DigitalModule::GetRelayForward(uint32_t channel)
 {
 	int32_t status = 0;
-	bool on = getRelayForward(m_relay_ports[channel-1], &status);
+	bool on = getRelayForward(m_relay_ports[channel], &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	return on;
 }
@@ -159,7 +159,7 @@ uint8_t DigitalModule::GetRelayForward()
 {
 	uint8_t value = 0;
 	for (unsigned int i = 0; i < kRelayChannels; i++) {
-		value |= GetRelayForward(i+1) << i;
+		value |= GetRelayForward(i) << i;
 	}
 	return value;
 }
@@ -170,7 +170,7 @@ uint8_t DigitalModule::GetRelayForward()
 bool DigitalModule::GetRelayReverse(uint32_t channel)
 {
 	int32_t status = 0;
-	bool on = getRelayReverse(m_relay_ports[channel-1], &status);
+	bool on = getRelayReverse(m_relay_ports[channel], &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	return on;
 }
@@ -182,7 +182,7 @@ uint8_t DigitalModule::GetRelayReverse()
 {
 	uint8_t value = 0;
 	for (unsigned int i = 0; i < kRelayChannels; i++) {
-		value |= GetRelayReverse(i+1) << i;
+		value |= GetRelayReverse(i) << i;
 	}
 	return value;
 }
@@ -200,7 +200,7 @@ uint8_t DigitalModule::GetRelayReverse()
 bool DigitalModule::AllocateDIO(uint32_t channel, bool input)
 {
 	int32_t status = 0;
-	bool allocated = allocateDIO(m_digital_ports[channel-1], input, &status);
+	bool allocated = allocateDIO(m_digital_ports[channel], input, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	return allocated;
 }
@@ -213,7 +213,7 @@ bool DigitalModule::AllocateDIO(uint32_t channel, bool input)
 void DigitalModule::FreeDIO(uint32_t channel)
 {
 	int32_t status = 0;
-	freeDIO(m_digital_ports[channel-1], &status);
+	freeDIO(m_digital_ports[channel], &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
@@ -227,7 +227,7 @@ void DigitalModule::FreeDIO(uint32_t channel)
 void DigitalModule::SetDIO(uint32_t channel, short value)
 {
 	int32_t status = 0;
-	setDIO(m_digital_ports[channel-1], value, &status);
+	setDIO(m_digital_ports[channel], value, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
@@ -241,7 +241,7 @@ void DigitalModule::SetDIO(uint32_t channel, short value)
 bool DigitalModule::GetDIO(uint32_t channel)
 {
 	int32_t status = 0;
-	bool value = getDIO(m_digital_ports[channel-1], &status);
+	bool value = getDIO(m_digital_ports[channel], &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	return value;
 }
@@ -254,7 +254,7 @@ uint16_t DigitalModule::GetDIO()
 {
 	uint16_t value = 0;
 	for (unsigned int i = 0; i < kDigitalChannels; i++) {
-		value |= GetDIO(i+1) << i;
+		value |= GetDIO(i) << i;
 	}
 	return value;
 }
@@ -269,7 +269,7 @@ uint16_t DigitalModule::GetDIO()
 bool DigitalModule::GetDIODirection(uint32_t channel)
 {
 	int32_t status = 0;
-	bool value = getDIODirection(m_digital_ports[channel-1], &status);
+	bool value = getDIODirection(m_digital_ports[channel], &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	return value;
 }
@@ -283,7 +283,7 @@ uint16_t DigitalModule::GetDIODirection()
 {
 	uint16_t value = 0;
 	for (unsigned int i = 0; i < kDigitalChannels; i++) {
-		value |= GetDIODirection(i+1) << i;
+		value |= GetDIODirection(i) << i;
 	}
 	return value;
 }
@@ -298,7 +298,7 @@ uint16_t DigitalModule::GetDIODirection()
 void DigitalModule::Pulse(uint32_t channel, float pulseLength)
 {
 	int32_t status = 0;
-	pulse(m_digital_ports[channel-1], pulseLength, &status);
+	pulse(m_digital_ports[channel], pulseLength, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
@@ -310,7 +310,7 @@ void DigitalModule::Pulse(uint32_t channel, float pulseLength)
 bool DigitalModule::IsPulsing(uint32_t channel)
 {
 	int32_t status = 0;
-	bool value = isPulsing(m_digital_ports[channel-1], &status);
+	bool value = isPulsing(m_digital_ports[channel], &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	return value;
 }
