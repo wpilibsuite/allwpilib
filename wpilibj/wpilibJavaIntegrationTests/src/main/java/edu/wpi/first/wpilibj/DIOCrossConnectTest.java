@@ -95,7 +95,7 @@ public class DIOCrossConnectTest extends AbstractComsSetup {
 	public void testSetHigh() {
 		dio.getOutput().set(true);
 		assertTrue("DIO Not High after no delay", dio.getInput().get());
-		Timer.delay(.05);
+		Timer.delay(.02);
 		assertTrue("DIO Not High after .05s delay", dio.getInput().get());
 	}
 	
@@ -106,7 +106,7 @@ public class DIOCrossConnectTest extends AbstractComsSetup {
 	public void testSetLow() {
 		dio.getOutput().set(false);
 		assertFalse("DIO Not Low after no delay", dio.getInput().get());
-		Timer.delay(.05);
+		Timer.delay(.02);
 		assertFalse("DIO Not Low after .05s delay", dio.getInput().get());
 	}
 }

@@ -8,6 +8,8 @@ package edu.wpi.first.wpilibj;
 
 import static org.junit.Assert.*;
 
+import java.util.logging.Logger;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -20,12 +22,15 @@ import edu.wpi.first.wpilibj.test.TestBench;
 
 public class TiltPanCameraTest extends AbstractComsSetup {
 	
-	public static final double TEST_ANGLE = 180.0;
+	private static final Logger logger = Logger.getLogger(TiltPanCameraTest.class.getName());
+	
+	public static final double TEST_ANGLE = 185.0;
 	
 	private static TiltPanCameraFixture tpcam;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
+		logger.fine("Setup: TiltPan camera");
 		tpcam = TestBench.getInstance().getTiltPanCam();
 		
 	}
@@ -48,7 +53,7 @@ public class TiltPanCameraTest extends AbstractComsSetup {
 	@Test
 	public void testInitial(){
 		double angle = tpcam.getGyro().getAngle();
-		assertTrue(errorMessage(angle, 0), Math.abs(angle) < 0.5); 
+		assertEquals(errorMessage(angle, 0), 0, angle, .5); 
 	}
 
 	/**
@@ -58,11 +63,11 @@ public class TiltPanCameraTest extends AbstractComsSetup {
 	public void testGyroAngle() {
 		for(double i = 0; i < 1.0; i+=.01){
 			//System.out.println("i: " + i);
-			System.out.println("Angle " + tpcam.getGyro().getAngle());
+			//System.out.println("Angle " + tpcam.getGyro().getAngle());
 			tpcam.getPan().set(i);
 			Timer.delay(.05);
 		}
-		Timer.delay(TiltPanCameraFixture.RESET_TIME);
+		//Timer.delay(TiltPanCameraFixture.RESET_TIME);
 		double angle = tpcam.getGyro().getAngle();
 		
 		double difference = TEST_ANGLE - angle;
@@ -70,7 +75,7 @@ public class TiltPanCameraTest extends AbstractComsSetup {
 		double diff = Math.abs(difference);
 		
 		
-		assertTrue(errorMessage(diff, TEST_ANGLE), diff < 4.0);
+		assertEquals(errorMessage(diff, TEST_ANGLE), TEST_ANGLE, angle, 8);
 	}
 	
 	private String errorMessage(double difference, double target){

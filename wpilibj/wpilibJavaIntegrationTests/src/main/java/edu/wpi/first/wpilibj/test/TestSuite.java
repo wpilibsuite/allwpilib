@@ -20,15 +20,19 @@ import edu.wpi.first.wpilibj.CounterTest;
 import edu.wpi.first.wpilibj.DIOCrossConnectTest;
 import edu.wpi.first.wpilibj.EncoderTest;
 import edu.wpi.first.wpilibj.MotorEncoderTest;
+import edu.wpi.first.wpilibj.PIDTest;
+import edu.wpi.first.wpilibj.PrefrencesTest;
 import edu.wpi.first.wpilibj.SampleTest;
 import edu.wpi.first.wpilibj.TiltPanCameraTest;
 import edu.wpi.first.wpilibj.TimerTest;
+import edu.wpi.first.wpilibj.command.ButtonTest;
 import edu.wpi.first.wpilibj.command.CommandParallelGroupTest;
 import edu.wpi.first.wpilibj.command.CommandScheduleTest;
 import edu.wpi.first.wpilibj.command.CommandSequentialGroupTest;
 import edu.wpi.first.wpilibj.command.CommandSupersedeTest;
 import edu.wpi.first.wpilibj.command.CommandTimeoutTest;
 import edu.wpi.first.wpilibj.command.DefaultCommandTest;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTest;
 
 /**
  * The WPILibJ Integeration Test Suite collects all of the tests to be run by
@@ -38,11 +42,15 @@ import edu.wpi.first.wpilibj.command.DefaultCommandTest;
  */
 @RunWith(Suite.class)
 @SuiteClasses({ SampleTest.class,
+				SmartDashboardTest.class,
 				DIOCrossConnectTest.class,
 				CounterTest.class,
 				EncoderTest.class,
+				PIDTest.class,
 				TiltPanCameraTest.class,
 				MotorEncoderTest.class,
+				PrefrencesTest.class,
+				ButtonTest.class,
 				CommandParallelGroupTest.class,
 				CommandScheduleTest.class,
 				CommandSequentialGroupTest.class,
@@ -57,10 +65,11 @@ public class TestSuite {
 		final InputStream inputStream = TestSuite.class.getResourceAsStream("/logging.properties");
 		try
 		{
+			if(inputStream == null ) throw new NullPointerException("./logging.properties was not loaded");
 		    LogManager.getLogManager().readConfiguration(inputStream);
 		    Logger.getAnonymousLogger().info("Loaded");
 		}
-		catch (final IOException e)
+		catch (final IOException | NullPointerException e)
 		{
 		    Logger.getAnonymousLogger().severe("Could not load default logging.properties file");
 		    Logger.getAnonymousLogger().severe(e.getMessage());

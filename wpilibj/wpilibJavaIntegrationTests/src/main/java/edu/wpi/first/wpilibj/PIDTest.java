@@ -115,7 +115,7 @@ public class PIDTest extends AbstractComsSetup {
 
 	@Test (timeout = 6000)
 	public void testRotateToTarget() {
-		double setpoint = 2500;
+		double setpoint = 2500.0;
 		System.out.println("Entering testRotateToTarget");
 		assertEquals("PID did not start at 0", 0, controller.get(), 0);
 		controller.setSetpoint(setpoint);
@@ -123,7 +123,7 @@ public class PIDTest extends AbstractComsSetup {
 		controller.enable();
 		Timer.delay(5);
 		controller.disable();
-		assertTrue(controller.onTarget());
+		assertTrue("PID Controller Error: " + controller.getError(), controller.onTarget());
 	}
 	
 }

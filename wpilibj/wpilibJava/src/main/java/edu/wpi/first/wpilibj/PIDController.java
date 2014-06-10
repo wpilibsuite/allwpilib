@@ -103,16 +103,10 @@ public class PIDController implements IUtility, LiveWindowSendable, Controller {
         }
 
         public void run() {
-        	boolean freed;
-        	synchronized (this){
-        		freed = m_freed;
-        	}
-        	if(!freed){
+        	if(!m_freed){
         		m_controller.calculate();
         	} else {
         		cancel();
-        		m_controlLoop.cancel();
-        		m_controlLoop.purge();
         	}
         }
     }
