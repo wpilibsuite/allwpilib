@@ -21,22 +21,17 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
  * @author Fredric Silberberg
  */
 public abstract class AbstractComsSetup {
-
 	/** Stores whether network coms have been initialized */
 	private static boolean initialized = false;
-
+	
 	/**
 	 * This sets up the network communications library to enable the driver
 	 * station. After starting network coms, it will loop until the driver
 	 * station returns that the robot is enabled, to ensure that tests will be
 	 * able to run on the hardware.
 	 * 
-	 * @throws InterruptedException
-	 *             If we failed to sleep while waiting for the driver station to
-	 *             enable.
 	 */
-	@BeforeClass
-	public static void setupNetworkComs() throws InterruptedException {
+	static{
 		if (!initialized) {
 			// Start up the network communications
 			FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationReserve();
@@ -47,7 +42,11 @@ public abstract class AbstractComsSetup {
 
 			// Wait until the robot is enabled before starting the tests
 			while (!DriverStation.getInstance().isEnabled()) {
-				Thread.sleep(100);
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 				System.out.println("Waiting for enable");
 			}
 
@@ -56,4 +55,5 @@ public abstract class AbstractComsSetup {
 			System.out.println("Running!");
 		}
 	}
+
 }

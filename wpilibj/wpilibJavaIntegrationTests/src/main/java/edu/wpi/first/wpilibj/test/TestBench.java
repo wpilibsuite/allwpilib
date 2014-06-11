@@ -70,10 +70,11 @@ public final class TestBench {
 	 * @return a freshly allocated Talon, Encoder pair
 	 */
 	public MotorEncoderFixture getTalonPair() {
+
 		MotorEncoderFixture talonPair = new MotorEncoderFixture(){
 			@Override
 			protected SpeedController giveSpeedController() {
-				return new Talon(1);
+				return new Talon(0);
 			}
 			@Override
 			protected DigitalInput giveDigitalInputA() {

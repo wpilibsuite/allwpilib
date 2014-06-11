@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.AfterClass;
@@ -18,12 +19,11 @@ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
 public class TimerTest extends AbstractComsSetup {
 	
-	private static double TIMER_TOLARANCE = 0.005;
-	private static double TIMER_RUNTIME = 5.0;
+	private static final long TIMER_TOLARANCE = 5 * 1000;
+	private static final long TIMER_RUNTIME = 5 * 1000000;
 	
 	@BeforeClass
 	public static void classSetup() {
-		
 	}
 	
 	@Before
@@ -39,16 +39,15 @@ public class TimerTest extends AbstractComsSetup {
 	
 	@Test
 	public void delayTest(){
-		double startTime = Timer.getFPGATimestamp();
-		Timer.delay(TIMER_RUNTIME);
-		double endTime =Timer.getFPGATimestamp();
+		long startTime = Utility.getFPGATime();
+		Timer.delay(TIMER_RUNTIME/1000000);
+		long endTime = Utility.getFPGATime();
 		
-		double difference  = endTime - startTime;
+		long difference  = endTime - startTime;
 		
-		double offset = difference - TIMER_RUNTIME;
+		long offset = difference - TIMER_RUNTIME;
 		
-		assertTrue("Timer.delay ran " + offset + " seconds too long", Math.abs(offset) < TIMER_TOLARANCE);
-		
+		assertEquals("Timer.delay ran " + offset + " seconds too long", 0,  Math.abs(offset), TIMER_TOLARANCE);
 	}
 
 }

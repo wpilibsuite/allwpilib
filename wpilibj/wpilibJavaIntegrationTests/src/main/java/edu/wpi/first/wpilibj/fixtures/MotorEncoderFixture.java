@@ -155,6 +155,7 @@ public abstract class MotorEncoderFixture implements ITestFixture {
 
 	@Override
 	public boolean teardown() {
+		String type = getType();
 		if(!tornDown){
 			initialize();
 			reset();
@@ -173,6 +174,8 @@ public abstract class MotorEncoderFixture implements ITestFixture {
 			bSource.free();
 			bSource = null;
 			tornDown = true;
+		} else {
+			throw new RuntimeException(type + " Motor Encoder torn down multiple times");
 		}
 		
 		return true;

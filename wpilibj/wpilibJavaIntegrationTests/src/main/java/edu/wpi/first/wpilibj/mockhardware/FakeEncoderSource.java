@@ -139,7 +139,7 @@ public class FakeEncoderSource
         {
         }
         m_task = new QuadEncoderThread(this);
-        Timer.delay(.1);
+        Timer.delay(.01);
     }
 
     /**
