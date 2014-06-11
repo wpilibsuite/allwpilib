@@ -1,0 +1,5 @@
+#. ./.profile
+killall java
+sleep 1
+/usr/local/frc/JRE/bin/java -XX:+UsePerfData -agentlib:jdwp=transport=dt_socket,address=8348,server=y,suspend=y -jar FRCUserProgram.jar
+#nohup java -Djna.library.path=$LD_LIBRARY_PATH -Xmx32M -agentlib:jdwp=transport=dt_socket,address=8348,server=y,suspend=y -jar FRCUserProgram.jar

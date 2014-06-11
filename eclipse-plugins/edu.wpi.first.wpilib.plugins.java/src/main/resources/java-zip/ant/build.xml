@@ -30,14 +30,14 @@
     <echo>[athena-compile] Compiling ${src.dir} with classpath=${classpath} to ${build.dir}</echo>
     
     <javac srcdir="${src.dir}"
-	   destdir="${build.dir}"
-	   includeAntRuntime="no"
-	   includeJavaRuntime="no"
-	   classpath="${classpath}"
-	   target="1.7"
-	   source="1.7"
+     destdir="${build.dir}"
+     includeAntRuntime="no"
+     includeJavaRuntime="no"
+     classpath="${classpath}"
+     target="1.7"
+     source="1.7"
      compiler="javac1.7"
-	   debug="true">
+     debug="true">
     </javac>
   </target>
   
@@ -46,32 +46,32 @@
     <mkdir dir="${dist.dir}" />
     <mkdir dir="${build.jars}" />
 
-	<echo>[athena-jar] Copying jars from ${classpath} to ${build.jars}.</echo>
-	<copy todir="${build.jars}" flatten="true">
-	  <path>
-		<pathelement path="${classpath}"/>
-	  </path>
-	</copy>
-	
+  <echo>[athena-jar] Copying jars from ${classpath} to ${build.jars}.</echo>
+  <copy todir="${build.jars}" flatten="true">
+    <path>
+    <pathelement path="${classpath}"/>
+    </path>
+  </copy>
+  
     <jar destfile="${dist.jar}" update="false">
       <manifest>
-    	<attribute name="Main-Class" value="edu.wpi.first.wpilibj.RobotBase"/>
-    	<attribute name="Robot-Class" value="${main}"/>
-    	<attribute name="Class-Path" value="."/>
+      <attribute name="Main-Class" value="edu.wpi.first.wpilibj.RobotBase"/>
+      <attribute name="Robot-Class" value="${main}"/>
+      <attribute name="Class-Path" value="."/>
       </manifest>
-		
+    
       <fileset dir="${build.dir}" includes="**/*.class"/>
       
-	  <zipgroupfileset dir="${build.jars}">
-	  	<include name="**/*.jar" />
-	  </zipgroupfileset>
+    <zipgroupfileset dir="${build.jars}">
+      <include name="**/*.jar" />
+    </zipgroupfileset>
     </jar>
   </target>
 
   <target name="deploy" depends="get-target-ip,jar" description="Deploy the jar and start the program running.">
     <echo>[athena-deploy] Copying code over.</echo>
     <scp file="${dist.jar}" todir="${username}@${target}:${deploy.dir}"
-	 password="${password}" trust="true"/>
+   password="${password}" trust="true"/>
     <scp file="${wpilib.ant.dir}/runjavaprogram" todir="${username}@${target}:${deploy.dir}"
    password="${password}" trust="true"/>
     <echo>[athena-deploy] Starting program.</echo>
@@ -85,12 +85,15 @@
   <target name="debug-deploy" depends="get-target-ip,jar" description="Deploy the jar and start the program running in debug mode.">
     <echo>[athena-debug-deploy] Copying code over.</echo>
     <scp file="${dist.jar}" todir="${username}@${target}:${deploy.dir}"
-	 password="${password}" trust="true"/>
+   password="${password}" trust="true"/>
+   <echo>[athena-debug-deploy] Copying Debug Script Over.</echo>
+   <scp file="${wpilib.ant.dir}/debugjavaprogram" todir="${username}@${target}:${deploy.dir}"
+   password="${password}" trust="true"/>
     <echo>[athena-debug-deploy] Starting program.</echo>
     <sshexec host="${target}"
-	     username="${username}"
-	     password="${password}"
-	     trust="true"
-	     command="${deploy.debug.command}"/>
+       username="${username}"
+       password="${password}"
+       trust="true"
+       command="chmod a+x debug*program; ${deploy.debug.command}"/>
   </target>
 </project>
