@@ -57,7 +57,7 @@ AnalogModule::AnalogModule(uint8_t moduleNumber)
 	{
 	  void* port = getPortWithModule(moduleNumber, i);
 	  int32_t status = 0;
-	  m_ports[i] = initializeAnalogPort(port, &status);
+	  m_ports[i] = initializeAnalogInputPort(port, &status);
 	  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
 

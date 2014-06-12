@@ -30,8 +30,6 @@ extern "C"
 	bool checkDigitalModule(uint8_t module);
 	bool checkPWMChannel(void* digital_port_pointer);
 	bool checkRelayChannel(void* digital_port_pointer);
-	uint8_t remapDigitalChannel(uint32_t pin, int32_t *status);
-	uint8_t unmapDigitalChannel(uint32_t pin, int32_t *status);
 
 	void setPWM(void* digital_port_pointer, unsigned short value, int32_t *status);
 	unsigned short getPWM(void* digital_port_pointer, int32_t *status);

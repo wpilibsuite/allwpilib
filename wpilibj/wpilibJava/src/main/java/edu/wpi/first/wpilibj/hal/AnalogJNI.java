@@ -20,9 +20,13 @@ public class AnalogJNI extends JNIWrapper {
 		public static final int kFallingPulse = 3;
 	};
 
-	public static native ByteBuffer initializeAnalogPort(ByteBuffer port_pointer, IntBuffer status);
+	public static native ByteBuffer initializeAnalogInputPort(ByteBuffer port_pointer, IntBuffer status);
+	public static native ByteBuffer initializeAnalogOutputPort(ByteBuffer port_pointer, IntBuffer status);
 	public static native byte checkAnalogModule(byte module);
-	public static native byte checkAnalogChannel(int pin);
+	public static native byte checkAnalogInputChannel(int pin);
+	public static native byte checkAnalogOutputChannel(int pin);
+	public static native void setAnalogOutput(ByteBuffer port_pointer, double voltage, IntBuffer status);
+	public static native double getAnalogOutput(ByteBuffer port_pointer, IntBuffer status);
 	public static native void setAnalogSampleRate(double samplesPerSecond, IntBuffer status);
 	public static native double getAnalogSampleRate(IntBuffer status);
 	public static native void setAnalogSampleRateWithModule(byte module, double samplesPerSecond, IntBuffer status);

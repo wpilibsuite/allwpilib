@@ -14,7 +14,8 @@ static const long kTimebase = 40000000; ///< 40 MHz clock
 static const long kDefaultOversampleBits = 0;
 static const long kDefaultAverageBits = 7;
 static const float kDefaultSampleRate = 50000.0;
-static const uint32_t kAnalogPins = 8;
+static const uint32_t kAnalogInputPins = 8;
+static const uint32_t kAnalogOutputPins = 2;
 
 static const uint32_t kAccumulatorNumChannels = 2;
 static const uint32_t kAccumulatorChannels[] = {0, 1};
@@ -43,15 +44,15 @@ void initializeAnalog(int32_t *status) {
   if (analogSystemInitialized) return;
   analogRegisterWindowSemaphore = initializeMutexRecursive();
   analogSystem = tAI::create(status);
-  setAnalogNumChannelsToActivate(kAnalogPins);
+  setAnalogNumChannelsToActivate(kAnalogInputPins);
   setAnalogSampleRate(kDefaultSampleRate, status);
   analogSystemInitialized = true;
 }
   
 /**
- * Initialize the analog port using the given port object.
+ * Initialize the analog input port using the given port object.
  */
-void* initializeAnalogPort(void* port_pointer, int32_t *status) {
+void* initializeAnalogInputPort(void* port_pointer, int32_t *status) {
   initializeAnalog(status);
   Port* port = (Port*) port_pointer;
 
@@ -68,6 +69,19 @@ void* initializeAnalogPort(void* port_pointer, int32_t *status) {
   setAnalogOversampleBits(analog_port, kDefaultOversampleBits, status);
   return analog_port;
 }
+  
+/**
+ * Initialize the analog output port using the given port object.
+ */
+void* initializeAnalogOutputPort(void* port_pointer, int32_t *status) {
+  initializeAnalog(status);
+  Port* port = (Port*) port_pointer;
+
+  // Initialize port structure
+  AnalogPort* analog_port = new AnalogPort();
+  analog_port->port = *port;
+  return analog_port;
+}
 
 
 /**
@@ -80,14 +94,27 @@ bool checkAnalogModule(uint8_t module) {
 }
 
 /**
- * Check that the analog channel number is value.
+ * Check that the analog output channel number is value.
  * Verify that the analog channel number is one of the legal channel numbers. Channel numbers
  * are 0-based.
  * 
  * @return Analog channel is valid
  */
-bool checkAnalogChannel(uint32_t pin) {
-  if (pin >= 0 && pin < kAnalogPins)
+bool checkAnalogInputChannel(uint32_t pin) {
+  if (pin >= 0 && pin < kAnalogInputPins)
+    return true;
+  return false;
+}
+
+/**
+ * Check that the analog output channel number is value.
+ * Verify that the analog channel number is one of the legal channel numbers. Channel numbers
+ * are 0-based.
+ * 
+ * @return Analog channel is valid
+ */
+bool checkAnalogOutputChannel(uint32_t pin) {
+  if (pin >= 0 && pin < kAnalogOutputPins)
     return true;
   return false;
 }
@@ -245,7 +272,7 @@ uint32_t getAnalogOversampleBits(void* analog_port_pointer, int32_t *status) {
 int16_t getAnalogValue(void* analog_port_pointer, int32_t *status) {
   AnalogPort* port = (AnalogPort*) analog_port_pointer;
   int16_t value;
-  checkAnalogChannel(port->port.pin);
+  checkAnalogInputChannel(port->port.pin);
 
   tAI::tReadSelect readSelect;
   readSelect.Channel = port->port.pin;
@@ -276,7 +303,7 @@ int16_t getAnalogValue(void* analog_port_pointer, int32_t *status) {
 int32_t getAnalogAverageValue(void* analog_port_pointer, int32_t *status) {
   AnalogPort* port = (AnalogPort*) analog_port_pointer;
   int16_t value;
-  checkAnalogChannel(port->port.pin);
+  checkAnalogInputChannel(port->port.pin);
 
   tAI::tReadSelect readSelect;
   readSelect.Channel = port->port.pin;
@@ -568,7 +595,7 @@ void* initializeAnalogTrigger(void* port_pointer, uint32_t *index, int32_t *stat
   Resource::CreateResourceObject(&triggers, tAnalogTrigger::kNumSystems);
 
   AnalogTrigger* trigger = new AnalogTrigger();
-  trigger->port = (AnalogPort*) initializeAnalogPort(port, status);
+  trigger->port = (AnalogPort*) initializeAnalogInputPort(port, status);
   trigger->index = triggers->Allocate("Analog Trigger");
   *index = trigger->index;
   // TODO: if (index == ~0ul) { CloneError(triggers); return; }

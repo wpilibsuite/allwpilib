@@ -16,10 +16,17 @@ enum AnalogTriggerType
 
 extern "C"
 {
-	void* initializeAnalogPort(void* port_pointer, int32_t *status);
-	bool checkAnalogModule(uint8_t module);
-	bool checkAnalogChannel(uint32_t pin);
+	// Analog output functions
+	void* initializeAnalogOutputPort(void* port_pointer, int32_t *status);
+	void setAnalogOutput(void* analog_port_pointer, double voltage, int32_t *status);
+	double getAnalogOutput(void* analog_port_pointer, int32_t *status);
+	bool checkAnalogOutputChannel(uint32_t pin);
 
+	// Analog input functions
+	void* initializeAnalogInputPort(void* port_pointer, int32_t *status);
+	bool checkAnalogModule(uint8_t module);
+	bool checkAnalogInputChannel(uint32_t pin);
+	
 	void setAnalogSampleRate(double samplesPerSecond, int32_t *status);
 	float getAnalogSampleRate(int32_t *status);
 	void setAnalogSampleRateWithModule(uint8_t module, double samplesPerSecond, int32_t *status);
