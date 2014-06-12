@@ -22,6 +22,7 @@ import org.junit.runners.Suite.SuiteClasses;
 				EncoderTest.class,
 				MotorEncoderTest.class,
 				PIDTest.class,
+				PCMTest.class,
 				PrefrencesTest.class,
 				RelayCrossConnectTest.class,
 				SampleTest.class,

@@ -11,7 +11,7 @@
 
 /* The PCM switches the compressor up to 2 seconds after the pressure switch
   changes. */
-static const double kCompressoDelayTime = 2.0;
+static const double kCompressorDelayTime = 2.0;
 
 /* Solenoids should change much more quickly */
 static const double kSolenoidDelayTime = 0.1;
@@ -72,13 +72,13 @@ TEST_F(PCMTest, PressureSwitch) {
 
   // Turn on the compressor
   m_fakePressureSwitch->Set(true);
-  Wait(kCompressoDelayTime);
+  Wait(kCompressorDelayTime);
   EXPECT_NEAR(kCompressorOnVoltage, m_fakeCompressor->GetVoltage(), 0.1)
     << "Compressor did not turn on when the pressure switch turned on.";
 
   // Turn off the compressor
   m_fakePressureSwitch->Set(false);
-  Wait(kCompressoDelayTime);
+  Wait(kCompressorDelayTime);
   EXPECT_NEAR(kCompressorOffVoltage, m_fakeCompressor->GetVoltage(), 0.1)
     << "Compressor did not turn off when the pressure switch turned off.";
 }
@@ -104,11 +104,11 @@ TEST_F(PCMTest, Solenoid) {
   EXPECT_TRUE(m_fakeSolenoid2->Get()) << "Solenoid #2 did not turn off";
 
   // Turn one solenoid on and one off
-  m_solenoid1->Set(true);
-  m_solenoid2->Set(false);
+  m_solenoid1->Set(false);
+  m_solenoid2->Set(true);
   Wait(kSolenoidDelayTime);
-  EXPECT_FALSE(m_fakeSolenoid1->Get()) << "Solenoid #1 did not turn on";
-  EXPECT_TRUE(m_fakeSolenoid2->Get()) << "Solenoid #2 did not turn off";
+  EXPECT_TRUE(m_fakeSolenoid1->Get()) << "Solenoid #1 did not turn off";
+  EXPECT_FALSE(m_fakeSolenoid2->Get()) << "Solenoid #2 did not turn on";
 
   // Turn both on
   m_solenoid1->Set(true);

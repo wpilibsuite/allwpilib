@@ -16,7 +16,7 @@
 static Resource *relayChannels = NULL;
 
 /**
- * Common relay intitialization methode.
+ * Common relay initialization method.
  * This code is common to all Relay constructors and initializes the relay and reserves
  * all resources that need to be locked. Initially the relay is set to both lines at 0v.
  */

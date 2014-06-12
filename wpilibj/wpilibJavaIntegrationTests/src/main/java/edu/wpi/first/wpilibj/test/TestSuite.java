@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.CounterTest;
 import edu.wpi.first.wpilibj.DIOCrossConnectTest;
 import edu.wpi.first.wpilibj.EncoderTest;
 import edu.wpi.first.wpilibj.MotorEncoderTest;
+import edu.wpi.first.wpilibj.PCMTest;
 import edu.wpi.first.wpilibj.PIDTest;
 import edu.wpi.first.wpilibj.PrefrencesTest;
 import edu.wpi.first.wpilibj.RelayCrossConnectTest;
@@ -46,7 +47,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTestSuite;
  * suite classes annotation.
  */
 @RunWith(Suite.class)
-@SuiteClasses({ 
+@SuiteClasses({
 				WpiLibJTestSuite.class,
 				CommandTestSuite.class,
 				SmartDashboardTestSuite.class
@@ -67,7 +68,7 @@ public class TestSuite {
 		    Logger.getAnonymousLogger().severe("Could not load default logging.properties file");
 		    Logger.getAnonymousLogger().severe(e.getMessage());
 		}
-		
+
 		System.out.println("Starting Tests");
 	}
 	private static final Logger WPILIBJ_ROOT_LOGGER = Logger.getLogger("edu.wpi.first.wpilibj");

@@ -1,0 +1,71 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#include "WPILib.h"
+#include "gtest/gtest.h"
+#include "TestBench.h"
+#include "Relay.h"
+
+class RelayTest : public testing::Test {
+protected:
+	Relay *m_relay;
+	DigitalInput *m_forward;
+	DigitalInput *m_reverse;
+
+
+	virtual void SetUp() {
+		m_relay = new Relay(TestBench::kRelayChannel);
+		m_forward = new DigitalInput(TestBench::kFakeRelayForward);
+		m_reverse = new DigitalInput(TestBench::kFakeRelayReverse);
+	}
+
+	virtual void TearDown() {
+		delete m_relay;
+		delete m_forward;
+		delete m_reverse;
+	}
+
+	virtual void Reset() {
+		m_relay->Set(Relay::kOff);
+	}
+};
+	/**
+	 * Test the relay by setting it forward, reverse, off, and on.
+	 */
+	TEST_F(RelayTest, Relay) {
+		Reset();
+
+		//set the relay to forward
+		m_relay->Set(Relay::kForward);
+		EXPECT_TRUE(m_forward->Get())
+		<<"Relay did not set forward";
+		EXPECT_FALSE(m_reverse->Get())
+		<<"Relay did not set forward";
+
+
+		//set the relay to reverse
+		m_relay->Set(Relay::kReverse);
+		EXPECT_TRUE(m_reverse->Get())
+		<<"Relay did not set reverse";
+		EXPECT_FALSE(m_forward->Get())
+		<<"Relay did not set reverse";
+
+		//set the relay to off
+		m_relay->Set(Relay::kOff);
+		EXPECT_FALSE(m_forward->Get())
+		<<"Relay did not set off";
+		EXPECT_FALSE(m_reverse->Get())
+		<<"Relay did not set off";
+
+
+		//set the relay to on
+		m_relay->Set(Relay::kOn);
+		EXPECT_TRUE(m_forward->Get())
+		<<"Relay did not set on";
+		EXPECT_TRUE(m_reverse->Get())
+		<<"Relay did not set on";
+	}
