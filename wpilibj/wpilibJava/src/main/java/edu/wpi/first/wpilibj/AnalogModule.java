@@ -70,7 +70,7 @@ public class AnalogModule extends Module {
         super(tModuleType.kModuleType_Analog, moduleNumber);
 
         m_ports = new ByteBuffer[8];
-        for (int i = 0; i < SensorBase.kAnalogChannels; i++) {
+        for (int i = 0; i < SensorBase.kAnalogInputChannels; i++) {
             ByteBuffer port_pointer = AnalogJNI.getPortWithModule((byte) moduleNumber, (byte) i);
             ByteBuffer status = ByteBuffer.allocateDirect(4);
     		// set the byte order

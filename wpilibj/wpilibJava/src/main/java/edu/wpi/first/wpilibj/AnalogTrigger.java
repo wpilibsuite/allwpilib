@@ -106,7 +106,7 @@ public class AnalogTrigger implements IInputOutput {
 	 * @param channel
 	 *            the AnalogChannel to use for the analog trigger
 	 */
-	public AnalogTrigger(AnalogChannel channel) {
+	public AnalogTrigger(AnalogInput channel) {
 		initTrigger(channel.getModuleNumber(), channel.getChannel());
 	}
 

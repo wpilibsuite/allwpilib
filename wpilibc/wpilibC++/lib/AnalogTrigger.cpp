@@ -6,7 +6,7 @@
 
 #include "AnalogTrigger.h"
 
-#include "AnalogChannel.h"
+#include "AnalogInput.h"
 #include "AnalogModule.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
@@ -55,7 +55,7 @@ AnalogTrigger::AnalogTrigger(uint8_t moduleNumber, uint32_t channel)
  * This should be used in the case of sharing an analog channel between the trigger
  * and an analog input object.
  */
-AnalogTrigger::AnalogTrigger(AnalogChannel *channel)
+AnalogTrigger::AnalogTrigger(AnalogInput *channel)
 {
 	InitTrigger(channel->GetModuleNumber(), channel->GetChannel());
 }

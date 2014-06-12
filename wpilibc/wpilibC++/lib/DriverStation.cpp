@@ -5,7 +5,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "DriverStation.h"
-#include "AnalogChannel.h"
+#include "AnalogInput.h"
 #include "HAL/cpp/Synchronized.hpp"
 #include "Timer.h"
 //#include "NetworkCommunication/FRCComm.h"
@@ -93,7 +93,7 @@ DriverStation::DriverStation()
 	m_controlData->analog4 = 0;
 	m_controlData->dsDigitalIn = 0;
 
-	m_batteryChannel = new AnalogChannel(kBatteryModuleNumber, kBatteryChannel);
+	m_batteryChannel = new AnalogInput(kBatteryModuleNumber, kBatteryChannel);
 
 	AddToSingletonList();
 
@@ -208,7 +208,7 @@ void DriverStation::SetData()
 }
 
 /**
- * Read the battery voltage from the specified AnalogChannel.
+ * Read the battery voltage from the specified AnalogInput.
  * 
  * This accessor assumes that the battery voltage is being measured
  * through the voltage divider on an analog breakout.

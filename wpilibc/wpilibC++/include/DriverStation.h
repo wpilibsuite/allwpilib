@@ -11,7 +11,7 @@
 #include "Task.h"
 
 struct HALCommonControlData;
-class AnalogChannel;
+class AnalogInput;
 
 /**
  * Provide access to the network communication data to / from the Driver Station.
@@ -153,7 +153,7 @@ private:
 
 	struct HALCommonControlData *m_controlData;
 	uint8_t m_digitalOut;
-	AnalogChannel *m_batteryChannel;
+	AnalogInput *m_batteryChannel;
 	MUTEX_ID m_statusDataSemaphore;
 	Task m_task;
 	Dashboard m_dashboardHigh;  // the default dashboard packers

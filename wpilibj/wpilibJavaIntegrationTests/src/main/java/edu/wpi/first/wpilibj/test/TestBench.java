@@ -30,9 +30,9 @@ import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
  * This class provides access to all of the elements on the test bench, for use
  * in fixtures. This class is a singleton, you should use {@link #getInstance()}
  * to obtain a reference to the {@code TestBench}.
- * 
+ *
  * TODO: This needs to be updated to the most recent test bench setup.
- * 
+ *
  * @author Fredric Silberberg
  */
 public final class TestBench {
@@ -42,14 +42,14 @@ public final class TestBench {
 	 * completely stopped
 	 */
 	public static final double MOTOR_STOP_TIME = 0.20;
-	
-	
+
+
 	//THESE MUST BE IN INCREMENTING ORDER
 	public static final int DIOCrossConnectA1 = 6;
 	public static final int DIOCrossConnectA2 = 7;
 	public static final int DIOCrossConnectB1 = 8;
 	public static final int DIOCrossConnectB2 = 9;
-	
+
 	/** The Singleton instance of the Test Bench */
 	private static TestBench instance = null;
 
@@ -66,7 +66,7 @@ public final class TestBench {
 	/**
 	 * Constructs a new set of objects representing a connected set of Talon
 	 * controlled Motors and an encoder
-	 * 
+	 *
 	 * @return a freshly allocated Talon, Encoder pair
 	 */
 	public MotorEncoderFixture getTalonPair() {
@@ -91,7 +91,7 @@ public final class TestBench {
 	/**
 	 * Constructs a new set of objects representing a connected set of Victor
 	 * controlled Motors and an encoder
-	 * 
+	 *
 	 * @return a freshly allocated Victor, Encoder pair
 	 */
 	public MotorEncoderFixture getVictorPair() {
@@ -118,7 +118,7 @@ public final class TestBench {
 	/**
 	 * Constructs a new set of objects representing a connected set of Jaguar
 	 * controlled Motors and an encoder
-	 * 
+	 *
 	 * @return a freshly allocated Jaguar, Encoder pair
 	 */
 	public MotorEncoderFixture getJaguarPair() {
@@ -146,7 +146,7 @@ public final class TestBench {
 	 * controlled Motors and an encoder<br>
 	 * Note: The CANJaguar is not freshly allocated because the CANJaguar lacks
 	 * a free() method
-	 * 
+	 *
 	 * @return an existing CANJaguar and a freshly allocated Encoder
 	 */
 	public MotorEncoderFixture getCanJaguarPair() {
@@ -179,7 +179,7 @@ public final class TestBench {
 
 	/**
 	 * Constructs a new set of two Servo's and a Gyroscope.
-	 * 
+	 *
 	 * @return a freshly allocated Servo's and a freshly allocated Gyroscope
 	 */
 	public TiltPanCameraFixture getTiltPanCam() {
@@ -200,7 +200,7 @@ public final class TestBench {
 		DIOCrossConnectFixture dio = new DIOCrossConnectFixture(inputPort, outputPort);
 		return dio;
 	}
-	
+
 	/**
 	 * Gets two lists of possible DIO pairs for the two pairs
 	 * @return
@@ -212,7 +212,7 @@ public final class TestBench {
 			{ new Integer(DIOCrossConnectA2), new Integer(DIOCrossConnectA1) }
 		});
 		pairs.add(setA);
-		
+
 		List<Integer[]> setB = Arrays.asList(new Integer[][] {
 			{ new Integer(DIOCrossConnectB1), new Integer(DIOCrossConnectB2) },
 			{ new Integer(DIOCrossConnectB2), new Integer(DIOCrossConnectB1) }
@@ -233,7 +233,7 @@ public final class TestBench {
 		}
 		return pairs;
 	}
-	
+
 	/**
 	 * Gets an array of pairs for the encoder to use using two different lists
 	 * @param listA
@@ -254,7 +254,7 @@ public final class TestBench {
 				inputs[3] = portPairsB[1]; 	// OutputB
 				inputs [4] = flip? 0 : 1;  	// The flip bit
 			}
-			
+
 			construtorInput.add(inputs);
 
 			inputs = inputs.clone();
@@ -268,7 +268,7 @@ public final class TestBench {
 		}
 		return encoderPortPairs;
 	}
-	
+
 	/**
 	 * Constructs the list of inputs to be used for the encoder test
 	 * @return A collection of different input pairs to use for the encoder
@@ -286,7 +286,7 @@ public final class TestBench {
 	 * Gets the singleton of the TestBench. If the TestBench is not already
 	 * allocated in constructs an new instance of it. Otherwise it returns the
 	 * existing instance.
-	 * 
+	 *
 	 * @return The Singleton instance of the TestBench
 	 */
 	public static TestBench getInstance() {

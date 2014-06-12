@@ -9,7 +9,7 @@
 #include "PIDSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
 
-class AnalogChannel;
+class AnalogInput;
 class AnalogModule;
 
 /**
@@ -20,7 +20,7 @@ class AnalogModule;
  * where it samples the gyro while at rest to determine the default offset. This is
  * subtracted from each sample to determine the heading. This gyro class must be used 
  * with a channel that is assigned one of the Analog accumulators from the FPGA. See
- * AnalogChannel for the current accumulator assignments.
+ * AnalogInput for the current accumulator assignments.
  */
 class Gyro : public SensorBase, public PIDSource, public LiveWindowSendable
 {
@@ -33,8 +33,8 @@ public:
 
 	Gyro(uint8_t moduleNumber, uint32_t channel);
 	explicit Gyro(uint32_t channel);
-	explicit Gyro(AnalogChannel *channel);
-	explicit Gyro(AnalogChannel &channel);
+	explicit Gyro(AnalogInput *channel);
+	explicit Gyro(AnalogInput &channel);
 	virtual ~Gyro();
 	virtual float GetAngle();
 	virtual double GetRate();
@@ -55,7 +55,7 @@ public:
 private:
 	void InitGyro();
 
-	AnalogChannel *m_analog;
+	AnalogInput *m_analog;
 	float m_voltsPerDegreePerSecond;
 	float m_offset;
 	bool m_channelAllocated;

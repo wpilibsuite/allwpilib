@@ -14,13 +14,13 @@ import edu.wpi.first.wpilibj.hal.AnalogJNI;
  * Base class for all sensors.
  * Stores most recent status information as well as containing utility functions for checking
  * channels and error processing.
- * 
+ *
  * XXX: Wait, there's no exception thrown if we try to allocate a non-existent module?  It that behavior correct?
  */
 public abstract class SensorBase { // TODO: Refactor
 
 	// TODO: Move this to the HAL
-	
+
     /**
      * Ticks per microsecond
      */
@@ -35,9 +35,13 @@ public abstract class SensorBase { // TODO: Refactor
      */
     public static final int kDigitalModules = 1;
     /**
-     * Number of analog channels per module
+     * Number of analog input channels per module
      */
-    public static final int kAnalogChannels = 4;
+    public static final int kAnalogInputChannels = 8;
+    /**
+     * Number of analog output channels per module
+     */
+    public static final int kAnalogOutputChannels = 2;
     /**
      * Number of analog modules
      */
@@ -206,14 +210,27 @@ public abstract class SensorBase { // TODO: Refactor
     }
 
     /**
-     * Check that the analog channel number is value.
-     * Verify that the analog channel number is one of the legal channel numbers. Channel numbers
-     * are 1-based.
+     * Check that the analog input number is value.
+     * Verify that the analog input number is one of the legal channel numbers. Channel numbers
+     * are 0-based.
      *
      * @param channel The channel number to check.
      */
-    protected static void checkAnalogChannel(final int channel) {
-        if (channel <= 0 || channel > kAnalogChannels) {
+    protected static void checkAnalogInputChannel(final int channel) {
+        if (channel <= 0 || channel > kAnalogInputChannels) {
+            System.err.println("Requested analog channel number is out of range.");
+        }
+    }
+
+    /**
+     * Check that the analog input number is value.
+     * Verify that the analog input number is one of the legal channel numbers. Channel numbers
+     * are 0-based.
+     *
+     * @param channel The channel number to check.
+     */
+    protected static void checkAnalogOutputChannel(final int channel) {
+        if (channel <= 0 || channel > kAnalogOutputChannels) {
             System.err.println("Requested analog channel number is out of range.");
         }
     }
@@ -231,7 +248,7 @@ public abstract class SensorBase { // TODO: Refactor
     }
 
     /**
-     * Verify that the power distribution channel number is within limits. 
+     * Verify that the power distribution channel number is within limits.
      * Channel numbers are 1-based.
      *
      * @param channel The channel number to check.

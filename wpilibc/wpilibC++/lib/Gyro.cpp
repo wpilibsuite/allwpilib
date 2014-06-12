@@ -5,7 +5,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Gyro.h"
-#include "AnalogChannel.h"
+#include "AnalogInput.h"
 #include "AnalogModule.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "Timer.h"
@@ -78,7 +78,7 @@ void Gyro::InitGyro()
  */
 Gyro::Gyro(uint8_t moduleNumber, uint32_t channel)
 {
-	m_analog = new AnalogChannel(moduleNumber, channel);
+	m_analog = new AnalogInput(moduleNumber, channel);
 	m_channelAllocated = true;
 	InitGyro();
 }
@@ -92,7 +92,7 @@ Gyro::Gyro(uint8_t moduleNumber, uint32_t channel)
  */
 Gyro::Gyro(uint32_t channel)
 {
-	m_analog = new AnalogChannel(channel);
+	m_analog = new AnalogInput(channel);
 	m_channelAllocated = true;
 	InitGyro();
 }
@@ -100,10 +100,10 @@ Gyro::Gyro(uint32_t channel)
 /**
  * Gyro constructor with a precreated analog channel object.
  * Use this constructor when the analog channel needs to be shared. There
- * is no reference counting when an AnalogChannel is passed to the gyro.
- * @param channel The AnalogChannel object that the gyro is connected to.
+ * is no reference counting when an AnalogInput is passed to the gyro.
+ * @param channel The AnalogInput object that the gyro is connected to.
  */
-Gyro::Gyro(AnalogChannel *channel)
+Gyro::Gyro(AnalogInput *channel)
 {
 	m_analog = channel;
 	m_channelAllocated = false;
@@ -117,7 +117,7 @@ Gyro::Gyro(AnalogChannel *channel)
 	}
 }
 
-Gyro::Gyro(AnalogChannel &channel)
+Gyro::Gyro(AnalogInput &channel)
 {
 	m_analog = &channel;
 	m_channelAllocated = false;

@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.tables.ITable;
  */
 public class Accelerometer extends SensorBase implements PIDSource, ISensor, LiveWindowSendable {
 
-    private AnalogChannel m_analogChannel;
+    private AnalogInput m_analogChannel;
     private double m_voltsPerG = 1.0;
     private double m_zeroGVoltage = 2.5;
     private boolean m_allocatedChannel;
@@ -45,7 +45,7 @@ public class Accelerometer extends SensorBase implements PIDSource, ISensor, Liv
      */
     public Accelerometer(final int channel) {
         m_allocatedChannel = true;
-        m_analogChannel = new AnalogChannel(channel);
+        m_analogChannel = new AnalogInput(channel);
         initAccelerometer();
     }
 
@@ -59,7 +59,7 @@ public class Accelerometer extends SensorBase implements PIDSource, ISensor, Liv
      */
     public Accelerometer(final int slot, final int channel) {
         m_allocatedChannel = true;
-        m_analogChannel = new AnalogChannel(slot, channel);
+        m_analogChannel = new AnalogInput(slot, channel);
         initAccelerometer();
     }
 
@@ -70,7 +70,7 @@ public class Accelerometer extends SensorBase implements PIDSource, ISensor, Liv
      * the Accelerometer class.
      * @param channel an already initialized analog channel
      */
-    public Accelerometer(AnalogChannel channel) {
+    public Accelerometer(AnalogInput channel) {
         m_allocatedChannel = false;
         if (channel == null)
             throw new NullPointerException("Analog Channel given was null");

@@ -9,7 +9,7 @@
 #include "AnalogTriggerOutput.h"
 #include "SensorBase.h"
 
-class AnalogChannel;
+class AnalogInput;
 class AnalogModule;
 
 class AnalogTrigger : public SensorBase
@@ -18,7 +18,7 @@ class AnalogTrigger : public SensorBase
 public:
 	AnalogTrigger(uint8_t moduleNumber, uint32_t channel);
 	explicit AnalogTrigger(uint32_t channel);
-	explicit AnalogTrigger(AnalogChannel *channel);
+	explicit AnalogTrigger(AnalogInput *channel);
 	virtual ~AnalogTrigger();
 
 	void SetLimitsVoltage(float lower, float upper);

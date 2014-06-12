@@ -18,8 +18,8 @@ void Accelerometer::InitAccelerometer()
 	m_table = NULL;
 	m_voltsPerG = 1.0;
 	m_zeroGVoltage = 2.5;
-	HALReport(HALUsageReporting::kResourceType_Accelerometer, m_analogChannel->GetChannel(), m_analogChannel->GetModuleNumber() - 1);
-	LiveWindow::GetInstance()->AddSensor("Accelerometer", m_analogChannel->GetModuleNumber(), m_analogChannel->GetChannel(), this);
+	HALReport(HALUsageReporting::kResourceType_Accelerometer, m_AnalogInput->GetChannel(), m_AnalogInput->GetModuleNumber() - 1);
+	LiveWindow::GetInstance()->AddSensor("Accelerometer", m_AnalogInput->GetModuleNumber(), m_AnalogInput->GetChannel(), this);
 }
 
 /**
@@ -30,7 +30,7 @@ void Accelerometer::InitAccelerometer()
  */
 Accelerometer::Accelerometer(uint32_t channel)
 {
-	m_analogChannel = new AnalogChannel(channel);
+	m_AnalogInput = new AnalogInput(channel);
 	m_allocatedChannel = true;
 	InitAccelerometer();
 }
@@ -46,18 +46,18 @@ Accelerometer::Accelerometer(uint32_t channel)
  */
 Accelerometer::Accelerometer(uint8_t moduleNumber, uint32_t channel)
 {
-	m_analogChannel = new AnalogChannel(moduleNumber, channel);
+	m_AnalogInput = new AnalogInput(moduleNumber, channel);
 	m_allocatedChannel = true;
 	InitAccelerometer();
 }
 
 /**
- * Create a new instance of Accelerometer from an existing AnalogChannel.
- * Make a new instance of accelerometer given an AnalogChannel. This is particularly
+ * Create a new instance of Accelerometer from an existing AnalogInput.
+ * Make a new instance of accelerometer given an AnalogInput. This is particularly
  * useful if the port is going to be read as an analog channel as well as through
  * the Accelerometer class.
  */
-Accelerometer::Accelerometer(AnalogChannel *channel)
+Accelerometer::Accelerometer(AnalogInput *channel)
 {
 	if (channel == NULL)
 	{
@@ -65,7 +65,7 @@ Accelerometer::Accelerometer(AnalogChannel *channel)
 	}
 	else
 	{
-		m_analogChannel = channel;
+		m_AnalogInput = channel;
 		InitAccelerometer();
 	}
 	m_allocatedChannel = false;
@@ -78,7 +78,7 @@ Accelerometer::~Accelerometer()
 {
 	if (m_allocatedChannel)
 	{
-		delete m_analogChannel;
+		delete m_AnalogInput;
 	}
 }
 
@@ -91,7 +91,7 @@ Accelerometer::~Accelerometer()
  */
 float Accelerometer::GetAcceleration()
 {
-	return (m_analogChannel->GetAverageVoltage() - m_zeroGVoltage) / m_voltsPerG;
+	return (m_AnalogInput->GetAverageVoltage() - m_zeroGVoltage) / m_voltsPerG;
 }
 
 /**

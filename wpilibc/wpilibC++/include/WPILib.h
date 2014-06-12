@@ -11,7 +11,8 @@
 #include "Accelerometer.h"
 #include "ADXL345_I2C.h"
 #include "ADXL345_SPI.h"
-#include "AnalogChannel.h"
+#include "AnalogInput.h"
+#include "AnalogOutput.h"
 #include "AnalogModule.h"
 #include "AnalogTrigger.h"
 #include "AnalogTriggerOutput.h"
@@ -85,4 +86,3 @@
 #include "Victor.h"
 // XXX: #include "Vision/AxisCamera.h"
 #include "WPIErrors.h"
-

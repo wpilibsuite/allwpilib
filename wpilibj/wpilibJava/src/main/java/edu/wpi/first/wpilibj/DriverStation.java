@@ -86,7 +86,7 @@ public class DriverStation implements IInputOutput {
 
     private static DriverStation instance = new DriverStation();
     private FRCCommonControlData m_controlData;
-    private AnalogChannel m_batteryChannel;
+    private AnalogInput m_batteryChannel;
     private Thread m_thread;
     private final Object m_semaphore;
     private final Object m_dataSem;
