@@ -42,9 +42,8 @@ typedef struct _PcmControl_t{
 	/* Byte 2 */
 	unsigned solenoidBits:8;
 	/* Byte 3*/
-	unsigned reserved:4;
-	unsigned closeLoopOutput:1;
-	unsigned compressorOn:1;
+	unsigned reserved:5;
+	unsigned CompressorOn_deprecated:1; //!< This is ignored by PCM firm now.
 	unsigned closedLoopEnable:1;
 	unsigned clearStickyFaults:1;
 }PcmControl_t;
@@ -78,34 +77,20 @@ public:
     ~PCM();
     
     /* Set PCM solenoid state
-     *
      * @Return	-	CTR_Code	-	Error code (if any) for setting solenoid
-     *
      * @Param 	-	idx			- 	ID of solenoid (1-8)
      * @Param 	-	en			- 	Enable / Disable identified solenoid
      */
     CTR_Code 	SetSolenoid(unsigned char idx, bool en);
 
-    /* Set Compressor state
-     *
-     * @Return	-	CTR_Code	-	Error code (if any) for setting solenoid
-     *
-     * @Param 	-	en		- 	Enable / Disable compressor
-     */
-    CTR_Code 	SetCompressor(bool en);
-
     /* Enables PCM Closed Loop Control of Compressor via pressure switch
-     *
      * @Return	-	CTR_Code	-	Error code (if any) for setting solenoid
-     *
      * @Param 	-	en		- 	Enable / Disable Closed Loop Control
      */
     CTR_Code 	SetClosedLoopControl(bool en);
 
     /* Clears PCM sticky faults (indicators of past faults
-     *
      * @Return	-	CTR_Code	-	Error code (if any) for setting solenoid
-     *
      * @Param 	-	clr		- 	Clear / do not clear faults
      */
     CTR_Code 	ClearStickyFaults(bool clr);
@@ -113,107 +98,77 @@ public:
     /* Get solenoid state
      *
      * @Return	-	CTR_Code	-	Error code (if any)
-     *
      * @Param 	-	idx		- 	ID of solenoid (1-8) to return status of
-     *
-     * @Param	-	status	-	True if solenoid enabled, false otherwise
+     * @Param	-	status	-	True if solenoid output is set to be enabled, false otherwise.
+     *                          If the phsyical output led still isn't on, then check webdash for
+     *                          any faults/is PCM enabled.
      */
     CTR_Code 	GetSolenoid(UINT8 idx, bool &status);
 
     /* Get pressure switch state
-     *
      * @Return	-	CTR_Code	-	Error code (if any)
-     *
      * @Param	-	status		-	True if pressure adequate, false if low
      */
     CTR_Code 	GetPressure(bool &status);
 
     /* Get compressor state
-     *
      * @Return	-	CTR_Code	-	Error code (if any)
-     *
-     * @Param	-	status		-	True if enabled, false if otherwise
+     * @Param	-	status		-	True if compress ouput is on, false if otherwise
      */
     CTR_Code	GetCompressor(bool &status);
 
     /* Get closed loop control state
-     *
      * @Return	-	CTR_Code	-	Error code (if any)
-     *
      * @Param	-	status	-	True if closed loop enabled, false if otherwise
      */
     CTR_Code 	GetClosedLoopControl(bool &status);
 
     /* Get compressor current draw
-     *
      * @Return	-	CTR_Code	-	Error code (if any)
-     *
      * @Param	-	status		-	Compressor current returned in Amperes (A)
      */
     CTR_Code 	GetCompressorCurrent(float &status);
 
-    /* Get suggested compressor state determined by Closed Loop logic
-     *
-     * @Return	-	CTR_Code	-	Error code (if any)
-     *
-     * @Param	-	status		-	True if closed loop suggests enabling compressor, false if otherwise
-     */
-    CTR_Code 	GetClosedLoopSuggestedOutput(bool &status);
-
     /* Get voltage across solenoid rail
-     *
      * @Return	-	CTR_Code	-	Error code (if any)
-     *
      * @Param	-	status		-	Voltage across solenoid rail in Volts (V)
      */
     CTR_Code 	GetSolenoidVoltage(float &status);
 
     /* Get hardware fault value
-     *
      * @Return	-	CTR_Code	-	Error code (if any)
-     *
      * @Param	-	status		-	True if hardware failure detected, false if otherwise
      */
     CTR_Code 	GetHardwareFault(bool &status);
 
     /* Get compressor fault value
-     *
      * @Return	-	CTR_Code	-	Error code (if any)
-     *
      * @Param	-	status		-	True if shorted compressor detected, false if otherwise
      */
     CTR_Code 	GetCompressorFault(bool &status);
 
     /* Get solenoid fault value
-     *
      * @Return	-	CTR_Code	-	Error code (if any)
-     *
      * @Param	-	status		-	True if shorted solenoid detected, false if otherwise
      */
     CTR_Code 	GetSolenoidFault(bool &status);
 
     /* Get compressor sticky fault value
-     *
      * @Return	-	CTR_Code	-	Error code (if any)
-     *
      * @Param	-	status		-	True if solenoid had previously been shorted
      * 								(and sticky fault was not cleared), false if otherwise
      */
     CTR_Code 	GetCompressorStickyFault(bool &status);
 
     /* Get solenoid sticky fault value
-     *
      * @Return	-	CTR_Code	-	Error code (if any)
-     *
      * @Param	-	status		-	True if compressor had previously been shorted
      * 								(and sticky fault was not cleared), false if otherwise
      */
     CTR_Code 	GetSolenoidStickyFault(bool &status);
 
     /* Get battery voltage
-     *
      * @Return	-	CTR_Code	-	Error code (if any)
-     *
      * @Param	-	status		-	Voltage across PCM power ports in Volts (V)
      */
     CTR_Code 	GetBatteryVoltage(float &status);
@@ -223,31 +178,7 @@ public:
      * @Param	-	deviceNumber	-	Device number of PCM to control
      */
     void	SetDeviceNumber(UINT8 deviceNumber);
-
-    /* Seek PCM Status Frames on CAN bus
-     * @Return	-	void
-     * @Param	-	en	-	Enable / Disable seeking of PCM Status Frame
-     * @Notes	-	Status Frames identify
-     */
-    void 	EnableSeekStatusFrames(bool en);
-
-    /* Seek PCM Status Fault Frames on CAN bus
-     * @Return	-	void
-     * @Param	-	en	-	Enable / Disable seeking of PCM Status Fault Frame
-     * @Notes	-	Status Fault Frames identify Blacklisted Solenoids
-     */
-    void 	EnableSeekStatusFaultFrames(bool en);
-
-    /* Seek PCM Debug Frames on CAN bus
-     *
-     * @Return	-	void
-     * @Param	-	en	-	Enable / Disable seeking of PCM Debug Frame
-     * @Notes	-	Debug Frames identify the number of failed tokens (for exclusive, secure control of PCM by RoboRIO)
-     */
-    void 	EnableSeekDebugFrames(bool en);
-    
     /* Get number of total failed PCM Control Frame
-     *
      * @Return	-	CTR_Code	-	Error code (if any)
      * @Param	-	status		-	Number of failed control frames (tokenization fails)
      * @WARNING	-	Return only valid if [SeekDebugFrames] is enabled
@@ -257,12 +188,9 @@ public:
 	CTR_Code GetNumberOfFailedControlFrames(UINT16 &status);
     
     /* Get raw Solenoid Blacklist
-     *
      * @Return	-	CTR_Code	-	Error code (if any)
-     *
      * @Param	-	status		-	Raw binary breakdown of Solenoid Blacklist
      * 								BIT7 = Solenoid 1, BIT6 = Solenoid 2, etc.
-     *
      * @WARNING	-	Return only valid if [SeekStatusFaultFrames] is enabled
      * 				See function SeekStatusFaultFrames
      * 				See function EnableSeekStatusFaultFrames
@@ -271,13 +199,9 @@ public:
 
     /* Get solenoid Blacklist status
      * - Blacklisted solenoids cannot be enabled until PCM is power cycled
-     *
      * @Return	-	CTR_Code	-	Error code (if any)
-     *
      * @Param	-	idx			-	ID of solenoid
-     *
      * @Param	-	status		-	True if Solenoid is blacklisted, false if otherwise
-     *
      * @WARNING	-	Return only valid if [SeekStatusFaultFrames] is enabled
      * 				See function SeekStatusFaultFrames
      * 				See function EnableSeekStatusFaultFrames
@@ -300,6 +224,27 @@ public:
 	 */
 	int GetTimeSinceLastRx(void) { return _timeSinceLastRx;}
 private:
+
+	    /* Seek PCM Status Frames on CAN bus
+	     * @Return	-	void
+	     * @Param	-	en	-	Enable / Disable seeking of PCM Status Frame
+	     * @Notes	-	Status Frames identify
+	     */
+	    void 	EnableSeekStatusFrames(bool en);
+
+	    /* Seek PCM Status Fault Frames on CAN bus
+	     * @Return	-	void
+	     * @Param	-	en	-	Enable / Disable seeking of PCM Status Fault Frame
+	     * @Notes	-	Status Fault Frames identify Blacklisted Solenoids
+	     */
+	    void 	EnableSeekStatusFaultFrames(bool en);
+
+	    /* Seek PCM Debug Frames on CAN bus
+	     * @Return	-	void
+	     * @Param	-	en	-	Enable / Disable seeking of PCM Debug Frame
+	     * @Notes	-	Debug Frames identify the number of failed tokens (for exclusive, secure control of PCM by RoboRIO)
+	     */
+	    void 	EnableSeekDebugFrames(bool en);
 	/* frames to receive */
 	PcmDebug_t 			_PcmDebug;
 	PcmStatus_t 		_PcmStatus;
@@ -337,7 +282,6 @@ private:
 extern "C" {
 	void * c_PCM_Init(void);
 	CTR_Code c_SetSolenoid(void * handle,unsigned char idx,INT8 param);
-	CTR_Code c_SetCompressor(void * handle,INT8 param);
 	CTR_Code c_SetClosedLoopControl(void * handle,INT8 param);
 	CTR_Code c_ClearStickyFaults(void * handle,INT8 param);
 	CTR_Code c_GetSolenoid(void * handle,UINT8 idx,INT8 * status);
@@ -345,7 +289,6 @@ extern "C" {
 	CTR_Code c_GetCompressor(void * handle,INT8 * status);
 	CTR_Code c_GetClosedLoopControl(void * handle,INT8 * status);
 	CTR_Code c_GetCompressorCurrent(void * handle,float * status);
-	CTR_Code c_GetClosedLoopSuggestedOutput(void * handle,INT8 * status);
 	CTR_Code c_GetSolenoidVoltage(void * handle,float*status);
 	CTR_Code c_GetHardwareFault(void * handle,INT8*status);
 	CTR_Code c_GetCompressorFault(void * handle,INT8*status);

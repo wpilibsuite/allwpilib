@@ -29,19 +29,6 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_CompressorJNI_checkCom
 	return checkCompressorModule(module);
 }
 
-/*
- * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI
- * Method:    setCompressor
- * Signature: (Ljava/nio/ByteBuffer;ZLjava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CompressorJNI_setCompressor
-  (JNIEnv *env, jclass, jobject pcm_pointer_object, jboolean value, jobject status)
-{
-	VoidPointer *pcm_pointer = (VoidPointer *)env->GetDirectBufferAddress(pcm_pointer_object);
-	jint *status_pointer = (jint *)env->GetDirectBufferAddress(status);
-	
-	setCompressor(*pcm_pointer, value, status_pointer);
-}
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI

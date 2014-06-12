@@ -17,13 +17,6 @@ bool checkCompressorModule(uint8_t module) {
 }
 
 
-void setCompressor(void *pcm_pointer, bool value, int32_t *status) {
-	PCM *module = (PCM *)pcm_pointer;
-	
-	*status = module->SetCompressor(value);
-}
-
-
 bool getCompressor(void *pcm_pointer, int32_t *status) {
 	PCM *module = (PCM *)pcm_pointer;
 	bool value;

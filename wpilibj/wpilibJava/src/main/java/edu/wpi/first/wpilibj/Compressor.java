@@ -28,13 +28,11 @@ public class Compressor extends SensorBase implements IDevice, LiveWindowSendabl
 	}
 	
 	public void start() {
-		setClosedLoopControl(false);
-		setCompressor(true);
+		setClosedLoopControl(true);
 	}
 	
 	public void stop() {
 		setClosedLoopControl(false);
-		setCompressor(false);
 	}
 	
 	public boolean enabled() {
@@ -91,14 +89,6 @@ public class Compressor extends SensorBase implements IDevice, LiveWindowSendabl
 
 	@Override
 	public void stopLiveWindowMode() {
-	}
-	
-	private void setCompressor(boolean on) {
-		ByteBuffer status = ByteBuffer.allocateDirect(4);
-		status.order(ByteOrder.LITTLE_ENDIAN);
-		
-		CompressorJNI.setCompressor(m_pcm, on, status.asIntBuffer());
-		HALUtil.checkStatus(status.asIntBuffer());
 	}
 	
 	@Override

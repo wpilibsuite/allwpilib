@@ -35,31 +35,18 @@ Compressor::~Compressor() {
 }
 
 /**
- *  Starts the compressor and disables automatic closed-loop control
+ *  Starts closed-loop control
  */
 void Compressor::Start() {
-	SetClosedLoopControl(false);
-	SetCompressor(true);
+	SetClosedLoopControl(true);
 }
 
 /**
- *  Stops the compressor and disables automatic closed-loop control
+ *  Stops closed-loop control
  */
 void Compressor::Stop() {
 	SetClosedLoopControl(false);
-	SetCompressor(false);
 }
-
-void Compressor::SetCompressor(bool on) {
-	int32_t status = 0;
-
-	setCompressor(m_pcm_pointer, on, &status);
-
-	if(status) {
-		wpi_setWPIError(Timeout);
-	}
-}
-
 
 /**
  * @return true if the compressor is on

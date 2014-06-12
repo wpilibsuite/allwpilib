@@ -7,7 +7,6 @@ public class CompressorJNI extends JNIWrapper {
 	public static native ByteBuffer initializeCompressor(byte module);
 	public static native boolean checkCompressorModule(byte module);
 	
-	public static native void setCompressor(ByteBuffer pcm_pointer, boolean value, IntBuffer status);
 	public static native boolean getCompressor(ByteBuffer pcm_pointer, IntBuffer status);
 	
 	public static native void setClosedLoopControl(ByteBuffer pcm_pointer, boolean value, IntBuffer status);

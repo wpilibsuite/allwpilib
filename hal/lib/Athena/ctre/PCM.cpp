@@ -93,19 +93,6 @@ CTR_Code PCM::SetClosedLoopControl(bool en) {
 	return CTR_OKAY;
 }
 
-/* Set Compressor state
- * 
- * @Return	-	void
- * 
- * @Param 	-	en		- 	Enable / Disable compressor
- */
-CTR_Code PCM::SetCompressor(bool en) {
-	_PcmControl.compressorOn = en;
-	if (GetTimeSinceLastTx() >= 50)
-		return CTR_TxTimeout;
-	return CTR_OKAY;
-}
-
 /* Get solenoid state
  * 
  * @Return	-	True/False	-	True if solenoid enabled, false otherwise
@@ -158,21 +145,10 @@ CTR_Code PCM::GetClosedLoopControl(bool &status) {
  * @Return	-	Amperes	-	Compressor current 
  */
 CTR_Code PCM::GetCompressorCurrent(float &status) {
-	uint8_t bt = _PcmStatus.compressorCurrentTop6;
+	uint16_t bt = _PcmStatus.compressorCurrentTop6;
 	bt <<= 4;
 	bt |=  _PcmStatus.compressorCurrentBtm4;
-	status = 20.1612903225806 * bt;
-	if (GetTimeSinceLastRx() >= 50)
-		return CTR_RxTimeout;
-	return CTR_OKAY;
-}
-
-/* Get suggested compressor state determined by Closed Loop logic
- * 
- * @Return	-	True/False	-	True if closed loop suggests enabling compressor, false if otherwise
- */
-CTR_Code PCM::GetClosedLoopSuggestedOutput(bool &status) {
-	status = _PcmStatus.closedLoopOutput;
+	status = 0.0201612903225806 * bt;
 	if (GetTimeSinceLastRx() >= 50)
 		return CTR_RxTimeout;
 	return CTR_OKAY;
@@ -409,9 +385,6 @@ extern "C" {
 	CTR_Code c_SetSolenoid(void * handle, unsigned char idx, INT8 param) {
 		return ((PCM*) handle)->SetSolenoid(idx, param);
 	}
-	CTR_Code c_SetCompressor(void * handle, INT8 param) {
-		return ((PCM*) handle)->SetCompressor(param);
-	}
 	CTR_Code c_SetClosedLoopControl(void * handle, INT8 param) {
 		return ((PCM*) handle)->SetClosedLoopControl(param);
 	}
@@ -444,12 +417,6 @@ extern "C" {
 	}
 	CTR_Code c_GetCompressorCurrent(void * handle, float * status) {
 		CTR_Code retval = ((PCM*) handle)->GetCompressorCurrent(*status);
-		return retval;
-	}
-	CTR_Code c_GetClosedLoopSuggestedOutput(void * handle, INT8 * status) {
-		bool bstatus;
-		CTR_Code retval = ((PCM*) handle)->GetClosedLoopSuggestedOutput(bstatus);
-		*status = bstatus;
 		return retval;
 	}
 
