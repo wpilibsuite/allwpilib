@@ -31,7 +31,7 @@ public class Gyro extends SensorBase implements PIDSource, ISensor,
 	static final double kSamplesPerSecond = 50.0;
 	static final double kCalibrationSampleTime = 5.0;
 	static final double kDefaultVoltsPerDegreePerSecond = 0.007;
-	AnalogChannel m_analog;
+	AnalogInput m_analog;
 	double m_voltsPerDegreePerSecond;
 	double m_offset;
 	int m_center;
@@ -94,7 +94,7 @@ public class Gyro extends SensorBase implements PIDSource, ISensor,
 	 *            The analog channel the gyro is connected to.
 	 */
 	public Gyro(int slot, int channel) {
-		m_analog = new AnalogChannel(slot, channel);
+		m_analog = new AnalogInput(slot, channel);
 		m_channelAllocated = true;
 		initGyro();
 	}
@@ -108,7 +108,7 @@ public class Gyro extends SensorBase implements PIDSource, ISensor,
 	 *            The analog channel the gyro is connected to.
 	 */
 	public Gyro(int channel) {
-		m_analog = new AnalogChannel(channel);
+		m_analog = new AnalogInput(channel);
 		m_channelAllocated = true;
 		initGyro();
 	}
@@ -121,7 +121,7 @@ public class Gyro extends SensorBase implements PIDSource, ISensor,
 	 * @param channel
 	 *            The AnalogChannel object that the gyro is connected to.
 	 */
-	public Gyro(AnalogChannel channel) {
+	public Gyro(AnalogInput channel) {
 		m_analog = channel;
 		if (m_analog == null) {
 			System.err

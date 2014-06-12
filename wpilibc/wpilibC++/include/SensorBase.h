@@ -40,12 +40,14 @@ public:
 	static bool CheckDigitalChannel(uint32_t channel);
 	static bool CheckRelayChannel(uint32_t channel);
 	static bool CheckPWMChannel(uint32_t channel);
-	static bool CheckAnalogChannel(uint32_t channel);
+	static bool CheckAnalogInput(uint32_t channel);
+    static bool CheckAnalogOutput(uint32_t channel);
 	static bool CheckSolenoidChannel(uint32_t channel);
 	static bool CheckPDPChannel(uint32_t channel);
 
 	static const uint32_t kDigitalChannels = 20;
-	static const uint32_t kAnalogChannels = 8;
+	static const uint32_t kAnalogInputs = 8;
+    static const uint32_t kAnalogOutputs = 2;
 	static const uint32_t kAnalogModules = 2;
 	static const uint32_t kDigitalModules = 2;
 	static const uint32_t kSolenoidChannels = 8;

@@ -26,7 +26,7 @@ namespace nUsageReporting
         kResourceType_CANPlugin,
         kResourceType_Accelerometer,
         kResourceType_ADXL345,
-        kResourceType_AnalogChannel,
+        kResourceType_AnalogInput,
         kResourceType_AnalogTrigger,
         kResourceType_AnalogTriggerOutput,
         kResourceType_CANJaguar,

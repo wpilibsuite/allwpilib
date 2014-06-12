@@ -11,9 +11,13 @@
 
 class TestBench {
 public:
-	/* Analog channels */
+	/* Analog input channels */
 	static const uint32_t kCameraGyroChannel = 0;
 	static const uint32_t kFakeCompressorChannel = 1;
+	static const uint32_t kFakeAnalogOutputChannel = 2;
+
+	/* Analog output channels */
+	static const uint32_t kAnalogOutputChannel = 0;
 
 	/* DIO channels */
 	static const uint32_t kTalonEncoderChannelA = 0;

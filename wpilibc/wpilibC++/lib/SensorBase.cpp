@@ -10,7 +10,7 @@
 #include "WPIErrors.h"
 
 const uint32_t SensorBase::kDigitalChannels;
-const uint32_t SensorBase::kAnalogChannels;
+const uint32_t SensorBase::kAnalogInputs;
 const uint32_t SensorBase::kAnalogModules;
 const uint32_t SensorBase::kDigitalModules;
 const uint32_t SensorBase::kSolenoidChannels;
@@ -68,7 +68,7 @@ void SensorBase::DeleteSingletons()
 
 /**
  * Check that the analog module number is valid.
- * 
+ *
  * @return Analog module is valid and present
  */
 bool SensorBase::CheckAnalogModule(uint8_t moduleNumber)
@@ -80,7 +80,7 @@ bool SensorBase::CheckAnalogModule(uint8_t moduleNumber)
 
 /**
  * Check that the digital module number is valid.
- * 
+ *
  * @return Digital module is valid and present
  */
 bool SensorBase::CheckDigitalModule(uint8_t moduleNumber)
@@ -92,7 +92,7 @@ bool SensorBase::CheckDigitalModule(uint8_t moduleNumber)
 
 /**
  * Check that the digital module number is valid.
- * 
+ *
  * @return Digital module is valid and present
  */
 bool SensorBase::CheckPWMModule(uint8_t moduleNumber)
@@ -102,7 +102,7 @@ bool SensorBase::CheckPWMModule(uint8_t moduleNumber)
 
 /**
  * Check that the digital module number is valid.
- * 
+ *
  * @return Digital module is valid and present
  */
 bool SensorBase::CheckRelayModule(uint8_t moduleNumber)
@@ -112,7 +112,7 @@ bool SensorBase::CheckRelayModule(uint8_t moduleNumber)
 
 /**
  * Check that the solenoid module number is valid.
- * 
+ *
  * @return Solenoid module is valid and present
  */
 bool SensorBase::CheckSolenoidModule(uint8_t moduleNumber)
@@ -126,12 +126,12 @@ bool SensorBase::CheckSolenoidModule(uint8_t moduleNumber)
  * Check that the digital channel number is valid.
  * Verify that the channel number is one of the legal channel numbers. Channel numbers are
  * 1-based.
- * 
+ *
  * @return Digital channel is valid
  */
 bool SensorBase::CheckDigitalChannel(uint32_t channel)
 {
-	if (channel >= 0 && channel < kDigitalChannels)
+	if (channel < kDigitalChannels)
 		return true;
 	return false;
 }
@@ -140,12 +140,12 @@ bool SensorBase::CheckDigitalChannel(uint32_t channel)
  * Check that the digital channel number is valid.
  * Verify that the channel number is one of the legal channel numbers. Channel numbers are
  * 1-based.
- * 
+ *
  * @return Relay channel is valid
  */
 bool SensorBase::CheckRelayChannel(uint32_t channel)
 {
-	if (channel >= 0 && channel < kRelayChannels)
+	if (channel < kRelayChannels)
 		return true;
 	return false;
 }
@@ -154,33 +154,47 @@ bool SensorBase::CheckRelayChannel(uint32_t channel)
  * Check that the digital channel number is valid.
  * Verify that the channel number is one of the legal channel numbers. Channel numbers are
  * 1-based.
- * 
+ *
  * @return PWM channel is valid
  */
 bool SensorBase::CheckPWMChannel(uint32_t channel)
 {
-	if (channel >= 0 && channel < kPwmChannels)
+	if (channel < kPwmChannels)
 		return true;
 	return false;
 }
 
 /**
- * Check that the analog channel number is value.
- * Verify that the analog channel number is one of the legal channel numbers. Channel numbers
- * are 1-based.
- * 
+ * Check that the analog input number is value.
+ * Verify that the analog input number is one of the legal channel numbers. Channel numbers
+ * are 0-based.
+ *
  * @return Analog channel is valid
  */
-bool SensorBase::CheckAnalogChannel(uint32_t channel)
+bool SensorBase::CheckAnalogInput(uint32_t channel)
 {
-	if (channel >= 0 && channel < kAnalogChannels)
+	if (channel < kAnalogInputs)
 		return true;
 	return false;
+}
+
+/**
+ * Check that the analog output number is value.
+ * Verify that the analog output number is one of the legal channel numbers. Channel numbers
+ * are 0-based.
+ *
+ * @return Analog channel is valid
+ */
+bool SensorBase::CheckAnalogOutput(uint32_t channel)
+{
+    if (channel < kAnalogOutputs)
+        return true;
+    return false;
 }
 
 /**
  * Verify that the solenoid channel number is within limits.
- * 
+ *
  * @return Solenoid channel is valid
  */
 bool SensorBase::CheckSolenoidChannel(uint32_t channel)
@@ -192,7 +206,7 @@ bool SensorBase::CheckSolenoidChannel(uint32_t channel)
 
 /**
  * Verify that the power distribution channel number is within limits.
- * 
+ *
  * @return Solenoid channel is valid
  */
 bool SensorBase::CheckPDPChannel(uint32_t channel)
@@ -201,4 +215,3 @@ bool SensorBase::CheckPDPChannel(uint32_t channel)
 		return true;
 	return false;
 }
-

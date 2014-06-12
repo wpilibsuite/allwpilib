@@ -26,10 +26,10 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
 
 /**
  * Analog channel class.
- * 
+ *
  * Each analog channel is read from hardware as a 12-bit number representing
  * -10V to 10V.
- * 
+ *
  * Connected to each analog channel is an averaging and oversampling engine.
  * This engine accumulates the specified ( by setAverageBits() and
  * setOversampleBits() ) number of samples before returning a new value. This is
@@ -39,12 +39,12 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
  * are divided by the number of samples to retain the resolution, but get more
  * stable values.
  */
-public class AnalogChannel extends SensorBase implements PIDSource,
+public class AnalogInput extends SensorBase implements PIDSource,
 		LiveWindowSendable {
 
 	private static final int kAccumulatorSlot = 1;
 	private static Resource channels = new Resource(kAnalogModules
-			* kAnalogChannels);
+			* kAnalogInputChannels);
 	private ByteBuffer m_port;
 	private int m_moduleNumber, m_channel;
 	private static final int[] kAccumulatorChannels = { 0, 1 };
@@ -52,39 +52,39 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 
 	/**
 	 * Construct an analog channel on the default module.
-	 * 
+	 *
 	 * @param channel
 	 *            The channel number to represent.
 	 */
-	public AnalogChannel(final int channel) {
+	public AnalogInput(final int channel) {
 		this(getDefaultAnalogModule(), channel);
 	}
 
 	/**
 	 * Construct an analog channel on a specified module.
-	 * 
+	 *
 	 * @param moduleNumber
 	 *            The digital module to use (1 or 2).
 	 * @param channel
 	 *            The channel number to represent.
 	 */
-	public AnalogChannel(final int moduleNumber, final int channel) {
+	public AnalogInput(final int moduleNumber, final int channel) {
 		m_channel = channel;
 		m_moduleNumber = moduleNumber;
 		if (AnalogJNI.checkAnalogModule((byte)moduleNumber) == 0) {
-			throw new AllocationException("Analog channel " + m_channel
+			throw new AllocationException("Analog input channel " + m_channel
 					+ " on module " + m_moduleNumber
 					+ " cannot be allocated. Module is not present.");
 		}
 		if (AnalogJNI.checkAnalogInputChannel(channel) == 0) {
-			throw new AllocationException("Analog channel " + m_channel
+			throw new AllocationException("Analog input channel " + m_channel
 					+ " on module " + m_moduleNumber
 					+ " cannot be allocated. Channel is not present.");
 		}
 		try {
-			channels.allocate((moduleNumber - 1) * kAnalogChannels + channel);
+			channels.allocate((moduleNumber - 1) * kAnalogInputChannels + channel);
 		} catch (CheckedAllocationException e) {
-			throw new AllocationException("Analog channel " + m_channel
+			throw new AllocationException("Analog input channel " + m_channel
 					+ " on module " + m_moduleNumber + " is already allocated");
 		}
 
@@ -97,7 +97,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 		m_port = AnalogJNI.initializeAnalogInputPort(port_pointer, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
 
-		LiveWindow.addSensor("Analog", moduleNumber, channel, this);
+		LiveWindow.addSensor("AnalogInput", moduleNumber, channel, this);
 		UsageReporting.report(tResourceType.kResourceType_AnalogChannel,
 				channel, moduleNumber - 1);
 	}
@@ -106,7 +106,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * Channel destructor.
 	 */
 	public void free() {
-		channels.free(((m_moduleNumber - 1) * kAnalogChannels + m_channel));
+		channels.free(((m_moduleNumber - 1) * kAnalogInputChannels + m_channel));
 		m_channel = 0;
 		m_moduleNumber = 0;
 		m_accumulatorOffset = 0;
@@ -114,7 +114,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 
 	/**
 	 * Get the analog module that this channel is on.
-	 * 
+	 *
 	 * @return The AnalogModule that this channel is on.
 	 */
 	public AnalogModule getModule() {
@@ -126,7 +126,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * 12-bit value representing the -10V to 10V range of the A/D converter in
 	 * the module. The units are in A/D converter codes. Use GetVoltage() to get
 	 * the analog value in calibrated units.
-	 * 
+	 *
 	 * @return A sample straight from this channel on the module.
 	 */
 	public int getValue() {
@@ -146,7 +146,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * sliding window. The sample will not change until 2**(OversamplBits +
 	 * AverageBits) samples have been acquired from the module on this channel.
 	 * Use getAverageVoltage() to get the analog value in calibrated units.
-	 * 
+	 *
 	 * @return A sample from the oversample and average engine for this channel.
 	 */
 	public int getAverageValue() {
@@ -162,7 +162,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * Get a scaled sample straight from this channel on the module. The value
 	 * is scaled to units of Volts using the calibrated scaling data from
 	 * getLSBWeight() and getOffset().
-	 * 
+	 *
 	 * @return A scaled sample straight from this channel on the module.
 	 */
 	public double getVoltage() {
@@ -181,7 +181,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * oversampling will cause this value to be higher resolution, but it will
 	 * update more slowly. Using averaging will cause this value to be more
 	 * stable, but it will update more slowly.
-	 * 
+	 *
 	 * @return A scaled sample from the output of the oversample and average
 	 *         engine for this channel.
 	 */
@@ -198,9 +198,9 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * Get the factory scaling least significant bit weight constant. The least
 	 * significant bit weight constant for the channel that was calibrated in
 	 * manufacturing and stored in an eeprom in the module.
-	 * 
+	 *
 	 * Volts = ((LSB_Weight * 1e-9) * raw) - (Offset * 1e-9)
-	 * 
+	 *
 	 * @return Least significant bit weight.
 	 */
 	public long getLSBWeight() {
@@ -216,9 +216,9 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * Get the factory scaling offset constant. The offset constant for the
 	 * channel that was calibrated in manufacturing and stored in an eeprom in
 	 * the module.
-	 * 
+	 *
 	 * Volts = ((LSB_Weight * 1e-9) * raw) - (Offset * 1e-9)
-	 * 
+	 *
 	 * @return Offset constant.
 	 */
 	public int getOffset() {
@@ -232,7 +232,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 
 	/**
 	 * Get the channel number.
-	 * 
+	 *
 	 * @return The channel number.
 	 */
 	public int getChannel() {
@@ -241,7 +241,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 
 	/**
 	 * Gets the number of the analog module this channel is on.
-	 * 
+	 *
 	 * @return The module number of the analog module this channel is on.
 	 */
 	public int getModuleNumber() {
@@ -252,7 +252,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * Set the number of averaging bits. This sets the number of averaging bits.
 	 * The actual number of averaged samples is 2**bits. The averaging is done
 	 * automatically in the FPGA.
-	 * 
+	 *
 	 * @param bits
 	 *            The number of averaging bits.
 	 */
@@ -268,7 +268,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * Get the number of averaging bits. This gets the number of averaging bits
 	 * from the FPGA. The actual number of averaged samples is 2**bits. The
 	 * averaging is done automatically in the FPGA.
-	 * 
+	 *
 	 * @return The number of averaging bits.
 	 */
 	public int getAverageBits() {
@@ -284,7 +284,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * Set the number of oversample bits. This sets the number of oversample
 	 * bits. The actual number of oversampled values is 2**bits. The
 	 * oversampling is done automatically in the FPGA.
-	 * 
+	 *
 	 * @param bits
 	 *            The number of oversample bits.
 	 */
@@ -300,7 +300,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * Get the number of oversample bits. This gets the number of oversample
 	 * bits from the FPGA. The actual number of oversampled values is 2**bits.
 	 * The oversampling is done automatically in the FPGA.
-	 * 
+	 *
 	 * @return The number of oversample bits.
 	 */
 	public int getOversampleBits() {
@@ -333,9 +333,9 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 
 	/**
 	 * Set an inital value for the accumulator.
-	 * 
+	 *
 	 * This will be added to all values returned to the user.
-	 * 
+	 *
 	 * @param initialValue
 	 *            The value that the accumulator should start from when reset.
 	 */
@@ -356,12 +356,12 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 
 	/**
 	 * Set the center value of the accumulator.
-	 * 
+	 *
 	 * The center value is subtracted from each A/D value before it is added to
 	 * the accumulator. This is used for the center value of devices like gyros
 	 * and accelerometers to make integration work and to take the device offset
 	 * into account when integrating.
-	 * 
+	 *
 	 * This center value is based on the output of the oversampled and averaged
 	 * source from channel 1. Because of this, any non-zero oversample bits will
 	 * affect the size of the value for this field.
@@ -387,10 +387,10 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 
 	/**
 	 * Read the accumulated value.
-	 * 
+	 *
 	 * Read the value that has been accumulating on channel 1. The accumulator
 	 * is attached after the oversample and average engine.
-	 * 
+	 *
 	 * @return The 64-bit value accumulated since the last Reset().
 	 */
 	public long getAccumulatorValue() {
@@ -404,10 +404,10 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 
 	/**
 	 * Read the number of accumulated values.
-	 * 
+	 *
 	 * Read the count of the accumulated values since the accumulator was last
 	 * Reset().
-	 * 
+	 *
 	 * @return The number of times samples from the channel were accumulated.
 	 */
 	public long getAccumulatorCount() {
@@ -422,10 +422,10 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	/**
 	 * Read the accumulated value and the number of accumulated values
 	 * atomically.
-	 * 
+	 *
 	 * This function reads the value and count from the FPGA atomically. This
 	 * can be used for averaging.
-	 * 
+	 *
 	 * @param result
 	 *            AccumulatorResult object to store the results in.
 	 */
@@ -455,7 +455,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 
 	/**
 	 * Is the channel attached to an accumulator.
-	 * 
+	 *
 	 * @return The analog channel is attached to an accumulator.
 	 */
 	public boolean isAccumulatorChannel() {
@@ -482,7 +482,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 
 	/**
 	 * Get the average value for usee with PIDController
-	 * 
+	 *
 	 * @return the average value
 	 */
 	public double pidGet() {

@@ -5,7 +5,7 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-#include "AnalogChannel.h"
+#include "AnalogInput.h"
 #include "SensorBase.h"
 #include "PIDSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
@@ -20,7 +20,7 @@ class Accelerometer : public SensorBase, public PIDSource, public LiveWindowSend
 public:
 	explicit Accelerometer(uint32_t channel);
 	Accelerometer(uint8_t moduleNumber, uint32_t channel);
-	explicit Accelerometer(AnalogChannel *channel);
+	explicit Accelerometer(AnalogInput *channel);
 	virtual ~Accelerometer();
 
 	float GetAcceleration();
@@ -38,7 +38,7 @@ public:
 private:
 	void InitAccelerometer();
 
-	AnalogChannel *m_analogChannel;
+	AnalogInput *m_AnalogInput;
 	float m_voltsPerG;
 	float m_zeroGVoltage;
 	bool m_allocatedChannel;

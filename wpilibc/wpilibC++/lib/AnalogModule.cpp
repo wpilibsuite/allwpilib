@@ -53,7 +53,7 @@ AnalogModule::AnalogModule(uint8_t moduleNumber)
 	, m_moduleNumber(moduleNumber)
 	, m_ports()
 {
-	for (uint32_t i = 0; i < kAnalogChannels; i++)
+	for (uint32_t i = 0; i < kAnalogInputs; i++)
 	{
 	  void* port = getPortWithModule(moduleNumber, i);
 	  int32_t status = 0;

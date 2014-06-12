@@ -103,7 +103,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogOutput
 {
 	void ** javaId = (void**)env->GetDirectBufferAddress(id);
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	setAnalogOutput(javaId, voltage, statusPtr);
+	setAnalogOutput(*javaId, voltage, statusPtr);
 }
 
 /*
@@ -116,7 +116,7 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogOutp
 {
 	void ** javaId = (void**)env->GetDirectBufferAddress(id);
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	return getAnalogOutput(javaId, statusPtr);
+	return getAnalogOutput(*javaId, statusPtr);
 }
 
 /*

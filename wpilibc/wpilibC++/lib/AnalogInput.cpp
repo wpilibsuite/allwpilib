@@ -1,30 +1,30 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+/* Copyright (c) FIRST 2008. All Rights Reserved.							                */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
-#include "AnalogChannel.h"
+#include "AnalogInput.h"
 #include "AnalogModule.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 
-static Resource *channels = NULL;
+static Resource *inputs = NULL;
 
-const uint8_t AnalogChannel::kAccumulatorModuleNumber;
-const uint32_t AnalogChannel::kAccumulatorNumChannels;
-const uint32_t AnalogChannel::kAccumulatorChannels[] = {0, 1};
+const uint8_t AnalogInput::kAccumulatorModuleNumber;
+const uint32_t AnalogInput::kAccumulatorNumChannels;
+const uint32_t AnalogInput::kAccumulatorChannels[] = {0, 1};
 
 /**
  * Common initialization.
  */
-void AnalogChannel::InitChannel(uint8_t moduleNumber, uint32_t channel)
+void AnalogInput::InitAnalogInput(uint8_t moduleNumber, uint32_t channel)
 {
 	m_table = NULL;
 	char buf[64];
-	Resource::CreateResourceObject(&channels, kAnalogModules * kAnalogChannels);
+	Resource::CreateResourceObject(&inputs, kAnalogModules * kAnalogInputs);
 	if (!checkAnalogModule(moduleNumber))
 	{
 		snprintf(buf, 64, "Analog Module %d", moduleNumber);
@@ -33,63 +33,63 @@ void AnalogChannel::InitChannel(uint8_t moduleNumber, uint32_t channel)
 	}
 	if (!checkAnalogInputChannel(channel))
 	{
-		snprintf(buf, 64, "Analog Channel %d", channel);
+		snprintf(buf, 64, "analog input %d", channel);
 		wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
 		return;
 	}
 
 	snprintf(buf, 64, "Analog Input %d (Module: %d)", channel, moduleNumber);
-	if (channels->Allocate((moduleNumber - 1) * kAnalogChannels + channel, buf) == ~0ul)
+	if (inputs->Allocate((moduleNumber - 1) * kAnalogInputs + channel, buf) == ~0ul)
 	{
-		CloneError(channels);
+		CloneError(inputs);
 		return;
 	}
 	m_channel = channel;
 	m_module = moduleNumber;
-	
+
 	void* port = getPortWithModule(moduleNumber, channel);
 	int32_t status = 0;
 	m_port = initializeAnalogInputPort(port, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
-	LiveWindow::GetInstance()->AddSensor("AnalogChannel",channel, GetModuleNumber(), this);
+	LiveWindow::GetInstance()->AddSensor("AnalogInput",channel, GetModuleNumber(), this);
 	HALReport(HALUsageReporting::kResourceType_AnalogChannel, channel, GetModuleNumber() - 1);
 }
 
 /**
- * Construct an analog channel on a specified module.
- * 
+ * Construct an analog input on a specified module.
+ *
  * @param moduleNumber The analog module (1 or 2).
  * @param channel The channel number to represent.
  */
-AnalogChannel::AnalogChannel(uint8_t moduleNumber, uint32_t channel)
+AnalogInput::AnalogInput(uint8_t moduleNumber, uint32_t channel)
 {
-	InitChannel(moduleNumber, channel);
+	InitAnalogInput(moduleNumber, channel);
 }
 
 /**
- * Construct an analog channel on the default module.
- * 
+ * Construct an analog input on the default module.
+ *
  * @param channel The channel number to represent.
  */
-AnalogChannel::AnalogChannel(uint32_t channel)
+AnalogInput::AnalogInput(uint32_t channel)
 {
-	InitChannel(GetDefaultAnalogModule(), channel);
+	InitAnalogInput(GetDefaultAnalogModule(), channel);
 }
 
 /**
  * Channel destructor.
  */
-AnalogChannel::~AnalogChannel()
+AnalogInput::~AnalogInput()
 {
-	channels->Free((m_module - 1) * kAnalogChannels + m_channel);
+	inputs->Free((m_module - 1) * kAnalogInputs + m_channel);
 }
 
 /**
  * Get the analog module that this channel is on.
  * @return A pointer to the AnalogModule that this channel is on.
  */
-AnalogModule *AnalogChannel::GetModule()
+AnalogModule *AnalogInput::GetModule()
 {
 	if (StatusIsFatal()) return NULL;
 	return AnalogModule::GetInstance(m_module);
@@ -101,7 +101,7 @@ AnalogModule *AnalogChannel::GetModule()
  * The units are in A/D converter codes.  Use GetVoltage() to get the analog value in calibrated units.
  * @return A sample straight from this channel on the module.
  */
-int16_t AnalogChannel::GetValue()
+int16_t AnalogInput::GetValue()
 {
 	if (StatusIsFatal()) return 0;
 	int32_t status = 0;
@@ -119,7 +119,7 @@ int16_t AnalogChannel::GetValue()
  * Use GetAverageVoltage() to get the analog value in calibrated units.
  * @return A sample from the oversample and average engine for this channel.
  */
-int32_t AnalogChannel::GetAverageValue()
+int32_t AnalogInput::GetAverageValue()
 {
 	if (StatusIsFatal()) return 0;
 	int32_t status = 0;
@@ -133,7 +133,7 @@ int32_t AnalogChannel::GetAverageValue()
  * The value is scaled to units of Volts using the calibrated scaling data from GetLSBWeight() and GetOffset().
  * @return A scaled sample straight from this channel on the module.
  */
-float AnalogChannel::GetVoltage()
+float AnalogInput::GetVoltage()
 {
 	if (StatusIsFatal()) return 0.0f;
 	int32_t status = 0;
@@ -149,7 +149,7 @@ float AnalogChannel::GetVoltage()
  * Using averaging will cause this value to be more stable, but it will update more slowly.
  * @return A scaled sample from the output of the oversample and average engine for this channel.
  */
-float AnalogChannel::GetAverageVoltage()
+float AnalogInput::GetAverageVoltage()
 {
 	if (StatusIsFatal()) return 0.0f;
 	int32_t status = 0;
@@ -162,12 +162,12 @@ float AnalogChannel::GetAverageVoltage()
  * Get the factory scaling least significant bit weight constant.
  * The least significant bit weight constant for the channel that was calibrated in
  * manufacturing and stored in an eeprom in the module.
- * 
+ *
  * Volts = ((LSB_Weight * 1e-9) * raw) - (Offset * 1e-9)
- * 
+ *
  * @return Least significant bit weight.
  */
-uint32_t AnalogChannel::GetLSBWeight()
+uint32_t AnalogInput::GetLSBWeight()
 {
 	if (StatusIsFatal()) return 0;
 	int32_t status = 0;
@@ -180,12 +180,12 @@ uint32_t AnalogChannel::GetLSBWeight()
  * Get the factory scaling offset constant.
  * The offset constant for the channel that was calibrated in manufacturing and stored
  * in an eeprom in the module.
- * 
+ *
  * Volts = ((LSB_Weight * 1e-9) * raw) - (Offset * 1e-9)
- * 
+ *
  * @return Offset constant.
  */
-int32_t AnalogChannel::GetOffset()
+int32_t AnalogInput::GetOffset()
 {
 	if (StatusIsFatal()) return 0;
 	int32_t status = 0;
@@ -198,7 +198,7 @@ int32_t AnalogChannel::GetOffset()
  * Get the channel number.
  * @return The channel number.
  */
-uint32_t AnalogChannel::GetChannel()
+uint32_t AnalogInput::GetChannel()
 {
 	if (StatusIsFatal()) return 0;
 	return m_channel;
@@ -208,7 +208,7 @@ uint32_t AnalogChannel::GetChannel()
  * Get the module number.
  * @return The module number.
  */
-uint8_t AnalogChannel::GetModuleNumber()
+uint8_t AnalogInput::GetModuleNumber()
 {
 	if (StatusIsFatal()) return 0;
 	return m_module;
@@ -219,10 +219,10 @@ uint8_t AnalogChannel::GetModuleNumber()
  * This sets the number of averaging bits. The actual number of averaged samples is 2**bits.
  * Use averaging to improve the stability of your measurement at the expense of sampling rate.
  * The averaging is done automatically in the FPGA.
- * 
+ *
  * @param bits Number of bits of averaging.
  */
-void AnalogChannel::SetAverageBits(uint32_t bits)
+void AnalogInput::SetAverageBits(uint32_t bits)
 {
 	if (StatusIsFatal()) return;
 	int32_t status = 0;
@@ -234,10 +234,10 @@ void AnalogChannel::SetAverageBits(uint32_t bits)
  * Get the number of averaging bits previously configured.
  * This gets the number of averaging bits from the FPGA. The actual number of averaged samples is 2**bits.
  * The averaging is done automatically in the FPGA.
- * 
+ *
  * @return Number of bits of averaging previously configured.
  */
-uint32_t AnalogChannel::GetAverageBits()
+uint32_t AnalogInput::GetAverageBits()
 {
 	int32_t status = 0;
 	int32_t averageBits = getAnalogAverageBits(m_port, &status);
@@ -250,10 +250,10 @@ uint32_t AnalogChannel::GetAverageBits()
  * This sets the number of oversample bits. The actual number of oversampled values is 2**bits.
  * Use oversampling to improve the resolution of your measurements at the expense of sampling rate.
  * The oversampling is done automatically in the FPGA.
- * 
+ *
  * @param bits Number of bits of oversampling.
  */
-void AnalogChannel::SetOversampleBits(uint32_t bits)
+void AnalogInput::SetOversampleBits(uint32_t bits)
 {
 	if (StatusIsFatal()) return;
 	int32_t status = 0;
@@ -265,10 +265,10 @@ void AnalogChannel::SetOversampleBits(uint32_t bits)
  * Get the number of oversample bits previously configured.
  * This gets the number of oversample bits from the FPGA. The actual number of oversampled values is
  * 2**bits. The oversampling is done automatically in the FPGA.
- * 
+ *
  * @return Number of bits of oversampling previously configured.
  */
-uint32_t AnalogChannel::GetOversampleBits()
+uint32_t AnalogInput::GetOversampleBits()
 {
 	if (StatusIsFatal()) return 0;
 	int32_t status = 0;
@@ -279,10 +279,10 @@ uint32_t AnalogChannel::GetOversampleBits()
 
 /**
  * Is the channel attached to an accumulator.
- * 
- * @return The analog channel is attached to an accumulator.
+ *
+ * @return The analog input is attached to an accumulator.
  */
-bool AnalogChannel::IsAccumulatorChannel()
+bool AnalogInput::IsAccumulatorChannel()
 {
 	if (StatusIsFatal()) return false;
 	int32_t status = 0;
@@ -294,7 +294,7 @@ bool AnalogChannel::IsAccumulatorChannel()
 /**
  * Initialize the accumulator.
  */
-void AnalogChannel::InitAccumulator()
+void AnalogInput::InitAccumulator()
 {
 	if (StatusIsFatal()) return;
 	m_accumulatorOffset = 0;
@@ -306,11 +306,11 @@ void AnalogChannel::InitAccumulator()
 
 /**
  * Set an inital value for the accumulator.
- * 
+ *
  * This will be added to all values returned to the user.
  * @param initialValue The value that the accumulator should start from when reset.
  */
-void AnalogChannel::SetAccumulatorInitialValue(int64_t initialValue)
+void AnalogInput::SetAccumulatorInitialValue(int64_t initialValue)
 {
 	if (StatusIsFatal()) return;
 	m_accumulatorOffset = initialValue;
@@ -319,7 +319,7 @@ void AnalogChannel::SetAccumulatorInitialValue(int64_t initialValue)
 /**
  * Resets the accumulator to the initial value.
  */
-void AnalogChannel::ResetAccumulator()
+void AnalogInput::ResetAccumulator()
 {
 	if (StatusIsFatal()) return;
 	int32_t status = 0;
@@ -329,15 +329,15 @@ void AnalogChannel::ResetAccumulator()
 
 /**
  * Set the center value of the accumulator.
- * 
+ *
  * The center value is subtracted from each A/D value before it is added to the accumulator. This
  * is used for the center value of devices like gyros and accelerometers to make integration work
  * and to take the device offset into account when integrating.
- * 
+ *
  * This center value is based on the output of the oversampled and averaged source from channel 1.
  * Because of this, any non-zero oversample bits will affect the size of the value for this field.
  */
-void AnalogChannel::SetAccumulatorCenter(int32_t center)
+void AnalogInput::SetAccumulatorCenter(int32_t center)
 {
 	if (StatusIsFatal()) return;
 	int32_t status = 0;
@@ -348,7 +348,7 @@ void AnalogChannel::SetAccumulatorCenter(int32_t center)
 /**
  * Set the accumulator's deadband.
  */
-void AnalogChannel::SetAccumulatorDeadband(int32_t deadband)
+void AnalogInput::SetAccumulatorDeadband(int32_t deadband)
 {
 	if (StatusIsFatal()) return;
 	int32_t status = 0;
@@ -358,13 +358,13 @@ void AnalogChannel::SetAccumulatorDeadband(int32_t deadband)
 
 /**
  * Read the accumulated value.
- * 
+ *
  * Read the value that has been accumulating on channel 1.
  * The accumulator is attached after the oversample and average engine.
- * 
+ *
  * @return The 64-bit value accumulated since the last Reset().
  */
-int64_t AnalogChannel::GetAccumulatorValue()
+int64_t AnalogInput::GetAccumulatorValue()
 {
 	if (StatusIsFatal()) return 0;
 	int32_t status = 0;
@@ -375,12 +375,12 @@ int64_t AnalogChannel::GetAccumulatorValue()
 
 /**
  * Read the number of accumulated values.
- * 
+ *
  * Read the count of the accumulated values since the accumulator was last Reset().
- * 
+ *
  * @return The number of times samples from the channel were accumulated.
  */
-uint32_t AnalogChannel::GetAccumulatorCount()
+uint32_t AnalogInput::GetAccumulatorCount()
 {
 	if (StatusIsFatal()) return 0;
 	int32_t status = 0;
@@ -392,14 +392,14 @@ uint32_t AnalogChannel::GetAccumulatorCount()
 
 /**
  * Read the accumulated value and the number of accumulated values atomically.
- * 
+ *
  * This function reads the value and count from the FPGA atomically.
  * This can be used for averaging.
- * 
+ *
  * @param value Pointer to the 64-bit accumulated output.
  * @param count Pointer to the number of accumulation cycles.
  */
-void AnalogChannel::GetAccumulatorOutput(int64_t *value, uint32_t *count)
+void AnalogInput::GetAccumulatorOutput(int64_t *value, uint32_t *count)
 {
 	if (StatusIsFatal()) return;
 	int32_t status = 0;
@@ -410,40 +410,38 @@ void AnalogChannel::GetAccumulatorOutput(int64_t *value, uint32_t *count)
 
 /**
  * Get the Average value for the PID Source base object.
- * 
+ *
  * @return The average voltage.
  */
-double AnalogChannel::PIDGet() 
+double AnalogInput::PIDGet()
 {
 	if (StatusIsFatal()) return 0.0;
 	return GetAverageValue();
 }
 
-void AnalogChannel::UpdateTable() {
+void AnalogInput::UpdateTable() {
 	if (m_table != NULL) {
 		m_table->PutNumber("Value", GetAverageVoltage());
 	}
 }
 
-void AnalogChannel::StartLiveWindowMode() {
-	
+void AnalogInput::StartLiveWindowMode() {
+
 }
 
-void AnalogChannel::StopLiveWindowMode() {
-	
+void AnalogInput::StopLiveWindowMode() {
+
 }
 
-std::string AnalogChannel::GetSmartDashboardType() {
+std::string AnalogInput::GetSmartDashboardType() {
 	return "Analog Input";
 }
 
-void AnalogChannel::InitTable(ITable *subTable) {
+void AnalogInput::InitTable(ITable *subTable) {
 	m_table = subTable;
 	UpdateTable();
 }
 
-ITable * AnalogChannel::GetTable() {
+ITable * AnalogInput::GetTable() {
 	return m_table;
 }
-
-

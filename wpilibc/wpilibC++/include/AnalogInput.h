@@ -13,9 +13,7 @@
 class AnalogModule;
 
 /**
- * Analog channel class.
- * 
- * Each analog channel is read from hardware as a 12-bit number representing -10V to 10V.
+ * Analog input class.
  * 
  * Connected to each analog channel is an averaging and oversampling engine.  This engine accumulates
  * the specified ( by SetAverageBits() and SetOversampleBits() ) number of samples before returning a new
@@ -24,16 +22,16 @@ class AnalogModule;
  * resolution, while the averaged samples are divided by the number of samples to retain the resolution,
  * but get more stable values.
  */
-class AnalogChannel : public SensorBase, public PIDSource, public LiveWindowSendable
+class AnalogInput : public SensorBase, public PIDSource, public LiveWindowSendable
 {
 public:
 	static const uint8_t kAccumulatorModuleNumber = 1;
 	static const uint32_t kAccumulatorNumChannels = 2;
 	static const uint32_t kAccumulatorChannels[kAccumulatorNumChannels];
 
-	AnalogChannel(uint8_t moduleNumber, uint32_t channel);
-	explicit AnalogChannel(uint32_t channel);
-	virtual ~AnalogChannel();
+	AnalogInput(uint8_t moduleNumber, uint32_t channel);
+	explicit AnalogInput(uint32_t channel);
+	virtual ~AnalogInput();
 
 	AnalogModule *GetModule();
 
@@ -74,7 +72,7 @@ public:
 	ITable * GetTable();
 
 private:
-	void InitChannel(uint8_t moduleNumber, uint32_t channel);
+	void InitAnalogInput(uint8_t moduleNumber, uint32_t channel);
 	uint32_t m_channel, m_module;
 	void* m_port;
 	int64_t m_accumulatorOffset;

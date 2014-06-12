@@ -27,7 +27,8 @@ struct AnalogPort {
 
 bool analogSampleRateSet = false;
 MUTEX_ID analogRegisterWindowSemaphore = NULL;
-tAI* analogSystem = NULL;
+tAI* analogInputSystem = NULL;
+tAO* analogOutputSystem = NULL;
 uint32_t analogNumChannelsToActivate = 0;
 
 // Utility methods defined below.
@@ -43,12 +44,13 @@ bool analogSystemInitialized = false;
 void initializeAnalog(int32_t *status) {
   if (analogSystemInitialized) return;
   analogRegisterWindowSemaphore = initializeMutexRecursive();
-  analogSystem = tAI::create(status);
+  analogInputSystem = tAI::create(status);
+  analogOutputSystem = tAO::create(status);
   setAnalogNumChannelsToActivate(kAnalogInputPins);
   setAnalogSampleRate(kDefaultSampleRate, status);
   analogSystemInitialized = true;
 }
-  
+
 /**
  * Initialize the analog input port using the given port object.
  */
@@ -64,12 +66,12 @@ void* initializeAnalogInputPort(void* port_pointer, int32_t *status) {
   } else analog_port->accumulator = NULL;
 
   // Set default configuration
-  analogSystem->writeScanList(port->pin, port->pin, status);
+  analogInputSystem->writeScanList(port->pin, port->pin, status);
   setAnalogAverageBits(analog_port, kDefaultAverageBits, status);
   setAnalogOversampleBits(analog_port, kDefaultOversampleBits, status);
   return analog_port;
 }
-  
+
 /**
  * Initialize the analog output port using the given port object.
  */
@@ -86,7 +88,7 @@ void* initializeAnalogOutputPort(void* port_pointer, int32_t *status) {
 
 /**
  * Check that the analog module number is valid.
- * 
+ *
  * @return Analog module is valid and present
  */
 bool checkAnalogModule(uint8_t module) {
@@ -97,7 +99,7 @@ bool checkAnalogModule(uint8_t module) {
  * Check that the analog output channel number is value.
  * Verify that the analog channel number is one of the legal channel numbers. Channel numbers
  * are 0-based.
- * 
+ *
  * @return Analog channel is valid
  */
 bool checkAnalogInputChannel(uint32_t pin) {
@@ -110,13 +112,32 @@ bool checkAnalogInputChannel(uint32_t pin) {
  * Check that the analog output channel number is value.
  * Verify that the analog channel number is one of the legal channel numbers. Channel numbers
  * are 0-based.
- * 
+ *
  * @return Analog channel is valid
  */
 bool checkAnalogOutputChannel(uint32_t pin) {
   if (pin >= 0 && pin < kAnalogOutputPins)
     return true;
   return false;
+}
+
+void setAnalogOutput(void* analog_port_pointer, double voltage, int32_t *status) {
+  AnalogPort* port = (AnalogPort*) analog_port_pointer;
+
+  uint16_t rawValue = (uint16_t)(voltage / 5.0 * 0x1000);
+
+  if(voltage < 0.0) rawValue = 0;
+  else if(voltage > 5.0) rawValue = 0x1000;
+
+  analogOutputSystem->writeMXP(port->port.pin, rawValue, status);
+}
+
+double getAnalogOutput(void* analog_port_pointer, int32_t *status) {
+  AnalogPort* port = (AnalogPort*) analog_port_pointer;
+
+  uint16_t rawValue = analogOutputSystem->readMXP(port->port.pin, status);
+
+  return rawValue * 5.0 / 0x1000;
 }
 
 /**
@@ -145,7 +166,7 @@ void setAnalogSampleRate(double samplesPerSecond, int32_t *status) {
   tAI::tConfig config;
   config.ScanSize = getAnalogNumChannelsToActivate(status);
   config.ConvertRate = ticksPerConversion;
-  analogSystem->writeConfig(config, status);
+  analogInputSystem->writeConfig(config, status);
 
   // Indicate that the scan size has been commited to hardware.
   setAnalogNumChannelsToActivate(0);
@@ -160,7 +181,7 @@ void setAnalogSampleRate(double samplesPerSecond, int32_t *status) {
  * @return Sample rate.
  */
 float getAnalogSampleRate(int32_t *status) {
-  uint32_t ticksPerConversion = analogSystem->readLoopTiming(status);
+  uint32_t ticksPerConversion = analogInputSystem->readLoopTiming(status);
   uint32_t ticksPerSample = ticksPerConversion * getAnalogNumActiveChannels(status);
   return (float)kTimebase / (float)ticksPerSample;
 }
@@ -211,7 +232,7 @@ float getAnalogSampleRateWithModule(uint8_t module, int32_t *status) {
  */
 void setAnalogAverageBits(void* analog_port_pointer, uint32_t bits, int32_t *status) {
   AnalogPort* port = (AnalogPort*) analog_port_pointer;
-  analogSystem->writeAverageBits(port->port.pin, bits, status);
+  analogInputSystem->writeAverageBits(port->port.pin, bits, status);
 }
 
 /**
@@ -225,7 +246,7 @@ void setAnalogAverageBits(void* analog_port_pointer, uint32_t bits, int32_t *sta
  */
 uint32_t getAnalogAverageBits(void* analog_port_pointer, int32_t *status) {
   AnalogPort* port = (AnalogPort*) analog_port_pointer;
-  uint32_t result = analogSystem->readAverageBits(port->port.pin, status);
+  uint32_t result = analogInputSystem->readAverageBits(port->port.pin, status);
   return result;
 }
 
@@ -241,7 +262,7 @@ uint32_t getAnalogAverageBits(void* analog_port_pointer, int32_t *status) {
  */
 void setAnalogOversampleBits(void* analog_port_pointer, uint32_t bits, int32_t *status) {
   AnalogPort* port = (AnalogPort*) analog_port_pointer;
-  analogSystem->writeOversampleBits(port->port.pin, bits, status);
+  analogInputSystem->writeOversampleBits(port->port.pin, bits, status);
 }
 
 
@@ -256,7 +277,7 @@ void setAnalogOversampleBits(void* analog_port_pointer, uint32_t bits, int32_t *
  */
 uint32_t getAnalogOversampleBits(void* analog_port_pointer, int32_t *status) {
   AnalogPort* port = (AnalogPort*) analog_port_pointer;
-  uint32_t result = analogSystem->readOversampleBits(port->port.pin, status);
+  uint32_t result = analogInputSystem->readOversampleBits(port->port.pin, status);
   return result;
 }
 
@@ -280,9 +301,9 @@ int16_t getAnalogValue(void* analog_port_pointer, int32_t *status) {
 
   {
     Synchronized sync(analogRegisterWindowSemaphore);
-    analogSystem->writeReadSelect(readSelect, status);
-    analogSystem->strobeLatchOutput(status);
-    value = (int16_t) analogSystem->readOutput(status);
+    analogInputSystem->writeReadSelect(readSelect, status);
+    analogInputSystem->strobeLatchOutput(status);
+    value = (int16_t) analogInputSystem->readOutput(status);
   }
 
   return value;
@@ -311,9 +332,9 @@ int32_t getAnalogAverageValue(void* analog_port_pointer, int32_t *status) {
 
   {
     Synchronized sync(analogRegisterWindowSemaphore);
-    analogSystem->writeReadSelect(readSelect, status);
-    analogSystem->strobeLatchOutput(status);
-    value = (int16_t) analogSystem->readOutput(status);
+    analogInputSystem->writeReadSelect(readSelect, status);
+    analogInputSystem->strobeLatchOutput(status);
+    value = (int16_t) analogInputSystem->readOutput(status);
   }
 
   return value;
@@ -416,11 +437,11 @@ int32_t getAnalogOffset(void* analog_port_pointer, int32_t *status) {
 
 /**
  * Return the number of channels on the module in use.
- * 
+ *
  * @return Active channels.
  */
 uint32_t getAnalogNumActiveChannels(int32_t *status) {
-  uint32_t scanSize = analogSystem->readConfig_ScanSize(status);
+  uint32_t scanSize = analogInputSystem->readConfig_ScanSize(status);
   if (scanSize == 0)
     return 8;
   return scanSize;
@@ -428,13 +449,13 @@ uint32_t getAnalogNumActiveChannels(int32_t *status) {
 
 /**
  * Get the number of active channels.
- * 
- * This is an internal function to allow the atomic update of both the 
+ *
+ * This is an internal function to allow the atomic update of both the
  * number of active channels and the sample rate.
- * 
+ *
  * When the number of channels changes, use the new value.  Otherwise,
  * return the curent value.
- * 
+ *
  * @return Value to write to the active channels field.
  */
 uint32_t getAnalogNumChannelsToActivate(int32_t *status) {
@@ -444,10 +465,10 @@ uint32_t getAnalogNumChannelsToActivate(int32_t *status) {
 
 /**
  * Set the number of active channels.
- * 
+ *
  * Store the number of active channels to set.  Don't actually commit to hardware
  * until SetSampleRate().
- * 
+ *
  * @param channels Number of active channels.
  */
 void setAnalogNumChannelsToActivate(uint32_t channels) {
@@ -458,7 +479,7 @@ void setAnalogNumChannelsToActivate(uint32_t channels) {
 
 /**
  * Is the channel attached to an accumulator.
- * 
+ *
  * @return The analog channel is attached to an accumulator.
  */
 bool isAccumulatorChannel(void* analog_port_pointer, int32_t *status) {
@@ -491,11 +512,11 @@ void resetAccumulator(void* analog_port_pointer, int32_t *status) {
 
 /**
  * Set the center value of the accumulator.
- * 
+ *
  * The center value is subtracted from each A/D value before it is added to the accumulator. This
  * is used for the center value of devices like gyros and accelerometers to make integration work
  * and to take the device offset into account when integrating.
- * 
+ *
  * This center value is based on the output of the oversampled and averaged source from channel 1.
  * Because of this, any non-zero oversample bits will affect the size of the value for this field.
  */
@@ -522,10 +543,10 @@ void setAccumulatorDeadband(void* analog_port_pointer, int32_t deadband, int32_t
 
 /**
  * Read the accumulated value.
- * 
+ *
  * Read the value that has been accumulating on channel 1.
  * The accumulator is attached after the oversample and average engine.
- * 
+ *
  * @return The 64-bit value accumulated since the last Reset().
  */
 int64_t getAccumulatorValue(void* analog_port_pointer, int32_t *status) {
@@ -540,9 +561,9 @@ int64_t getAccumulatorValue(void* analog_port_pointer, int32_t *status) {
 
 /**
  * Read the number of accumulated values.
- * 
+ *
  * Read the count of the accumulated values since the accumulator was last Reset().
- * 
+ *
  * @return The number of times samples from the channel were accumulated.
  */
 uint32_t getAccumulatorCount(void* analog_port_pointer, int32_t *status) {
@@ -556,10 +577,10 @@ uint32_t getAccumulatorCount(void* analog_port_pointer, int32_t *status) {
 
 /**
  * Read the accumulated value and the number of accumulated values atomically.
- * 
+ *
  * This function reads the value and count from the FPGA atomically.
  * This can be used for averaging.
- * 
+ *
  * @param value Pointer to the 64-bit accumulated output.
  * @param count Pointer to the number of accumulation cycles.
  */
@@ -728,7 +749,7 @@ int getAnalogAverageVoltageIntHack(void* analog_port_pointer, int32_t *status) {
   return floatToInt(getAnalogAverageVoltage(analog_port_pointer, status));
 }
 
-  
+
 // Doubles
 void setAnalogSampleRateIntHack(int samplesPerSecond, int32_t *status) {
   setAnalogSampleRate(intToFloat(samplesPerSecond), status);

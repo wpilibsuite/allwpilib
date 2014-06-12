@@ -23,7 +23,7 @@ public:
 	static const long kTimebase = 40000000; ///< 40 MHz clock
 	static const long kDefaultOversampleBits = 0;
 	static const long kDefaultAverageBits = 7;
-	static const uint32_t kAnalogChannels = 8;
+	static const uint32_t kAnalogInputs = 8;
 	static constexpr float kDefaultSampleRate = 50000.0;
 
 	void SetSampleRate(float samplesPerSecond);
@@ -48,5 +48,5 @@ protected:
 
 private:
 	uint8_t m_moduleNumber;
-	void* m_ports[kAnalogChannels];
+	void* m_ports[kAnalogInputs];
 };
