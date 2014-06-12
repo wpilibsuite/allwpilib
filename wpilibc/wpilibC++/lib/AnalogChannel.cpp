@@ -31,7 +31,7 @@ void AnalogChannel::InitChannel(uint8_t moduleNumber, uint32_t channel)
 		wpi_setWPIErrorWithContext(ModuleIndexOutOfRange, buf);
 		return;
 	}
-	if (!checkAnalogChannel(channel))
+	if (!checkAnalogInputChannel(channel))
 	{
 		snprintf(buf, 64, "Analog Channel %d", channel);
 		wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
@@ -49,7 +49,7 @@ void AnalogChannel::InitChannel(uint8_t moduleNumber, uint32_t channel)
 	
 	void* port = getPortWithModule(moduleNumber, channel);
 	int32_t status = 0;
-	m_port = initializeAnalogPort(port, &status);
+	m_port = initializeAnalogInputPort(port, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
 	LiveWindow::GetInstance()->AddSensor("AnalogChannel",channel, GetModuleNumber(), this);

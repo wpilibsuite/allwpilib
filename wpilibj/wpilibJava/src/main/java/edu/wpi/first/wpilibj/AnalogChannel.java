@@ -76,7 +76,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 					+ " on module " + m_moduleNumber
 					+ " cannot be allocated. Module is not present.");
 		}
-		if (AnalogJNI.checkAnalogChannel(channel) == 0) {
+		if (AnalogJNI.checkAnalogInputChannel(channel) == 0) {
 			throw new AllocationException("Analog channel " + m_channel
 					+ " on module " + m_moduleNumber
 					+ " cannot be allocated. Channel is not present.");
@@ -94,7 +94,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
 		// XXX: Uncomment when Analog has been fixed
-		m_port = AnalogJNI.initializeAnalogPort(port_pointer, status.asIntBuffer());
+		m_port = AnalogJNI.initializeAnalogInputPort(port_pointer, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
 
 		LiveWindow.addSensor("Analog", moduleNumber, channel, this);

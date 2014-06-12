@@ -15,10 +15,10 @@ TLogLevel analogJNILogLevel = logWARNING;
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
- * Method:    initializeAnalogPort
+ * Method:    initializeAnalogInputPort
  * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)Ljava/nio/ByteBuffer;
  */
-JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogPort
+JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogInputPort
   (JNIEnv * env, jclass, jobject id, jobject status)
 {
 	void ** javaId = (void**)env->GetDirectBufferAddress(id);
@@ -26,7 +26,26 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAna
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	ANALOGJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
 	void** analogPtr = (void**)new unsigned char[4];
-	*analogPtr = initializeAnalogPort(*javaId, statusPtr);
+	*analogPtr = initializeAnalogInputPort(*javaId, statusPtr);
+	ANALOGJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << *analogPtr;
+	return env->NewDirectByteBuffer( analogPtr, 4);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Method:    initializeAnalogOutputPort
+ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)Ljava/nio/ByteBuffer;
+ */
+JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogOutputPort
+  (JNIEnv * env, jclass, jobject id, jobject status)
+{
+	void ** javaId = (void**)env->GetDirectBufferAddress(id);
+	ANALOGJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	ANALOGJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	void** analogPtr = (void**)new unsigned char[4];
+	*analogPtr = initializeAnalogOutputPort(*javaId, statusPtr);
 	ANALOGJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << *analogPtr;
 	return env->NewDirectByteBuffer( analogPtr, 4);
@@ -48,16 +67,56 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogModu
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
- * Method:    checkAnalogChannel
+ * Method:    checkAnalogInputChannel
  * Signature: (I)B
  */
-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogChannel
+JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogInputChannel
   (JNIEnv *, jclass, jint value)
 {
 	//ANALOGJNI_LOG(logDEBUG) << "Channel = " << value;
-	jbyte returnValue = checkAnalogChannel( value );
+	jbyte returnValue = checkAnalogInputChannel( value );
 	//ANALOGJNI_LOG(logDEBUG) << "checkAnalogChannelResult = " << (jint)returnValue;
 	return returnValue;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Method:    checkAnalogOutputChannel
+ * Signature: (I)B
+ */
+JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogOutputChannel
+  (JNIEnv *, jclass, jint value)
+{
+	//ANALOGJNI_LOG(logDEBUG) << "Channel = " << value;
+	jbyte returnValue = checkAnalogOutputChannel( value );
+	//ANALOGJNI_LOG(logDEBUG) << "checkAnalogChannelResult = " << (jint)returnValue;
+	return returnValue;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Method:    setAnalogOutput
+ * Signature: (Ljava/nio/ByteBuffer;DLjava/nio/IntBuffer;)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogOutput
+  (JNIEnv * env, jclass, jobject id, jdouble voltage, jobject status)
+{
+	void ** javaId = (void**)env->GetDirectBufferAddress(id);
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	setAnalogOutput(javaId, voltage, statusPtr);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Method:    getAnalogOutput
+ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)D
+ */
+JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogOutput
+  (JNIEnv * env, jclass, jobject id, jobject status)
+{
+	void ** javaId = (void**)env->GetDirectBufferAddress(id);
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	return getAnalogOutput(javaId, statusPtr);
 }
 
 /*

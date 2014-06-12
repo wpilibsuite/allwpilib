@@ -11,9 +11,11 @@
 #include <math.h>
 
 static const uint32_t kExpectedLoopTiming = 40;
-static const uint32_t kDigitalPins = 14;
-static const uint32_t kPwmPins = 10;
+static const uint32_t kDigitalPins = 20;
+static const uint32_t kPwmPins = 20;
 static const uint32_t kRelayPins = 8;
+static const uint32_t kNumHeaders = 10; // Number of non-MXP pins
+
 /**
  * kDefaultPwmPeriod is in ms
  *
@@ -108,12 +110,12 @@ void initializeDigital(int32_t *status) {
 //  printf("MinHigh: %d\n", minHigh);
   // Ensure that PWM output values are set to OFF
   for (uint32_t pwm_index = 0; pwm_index < kPwmPins; pwm_index++) {
-	// Initialize port structure
-	DigitalPort* digital_port = new DigitalPort();
-	digital_port->port.pin = pwm_index;
-      
-	setPWM(digital_port, kPwmDisabled, status);
-	setPWMPeriodScale(digital_port, 3, status); // Set all to 4x by default.
+    // Initialize port structure
+    DigitalPort* digital_port = new DigitalPort();
+    digital_port->port.pin = pwm_index;
+    
+    setPWM(digital_port, kPwmDisabled, status);
+    setPWMPeriodScale(digital_port, 3, status); // Set all to 4x by default.
   }
   
   digitalSystemsInitialized = true;
@@ -146,20 +148,24 @@ bool checkDigitalModule(uint8_t module) {
 
 bool checkPWMChannel(void* digital_port_pointer) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
-  return (port->port.pin >= 0 && port->port.pin < kPwmPins);
+  return port->port.pin < kPwmPins;
 }
 
 bool checkRelayChannel(void* digital_port_pointer) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
-  return (port->port.pin >= 0 && port->port.pin < kRelayPins);
+  return port->port.pin < kRelayPins;
 }
 
-uint8_t remapDigitalChannel(uint32_t pin, int32_t *status) {
-  return pin; // TODO: No mapping needed anymore
-}
-
-uint8_t unmapDigitalChannel(uint32_t pin, int32_t *status) {
-  return pin; // TODO: No mapping needed anymore
+/**
+ * Map DIO pin numbers from their physical number (10 to 19) to their position
+ * in the bit field.
+ */
+uint32_t remapMXPChannel(uint32_t pin) {
+  if(pin < 14) {
+    return pin - 10; // First four digital headers
+  } else {
+    return pin - 6; // Last 8 digital headers, not counting the SPI pins
+  }
 }
 
 /**
@@ -172,8 +178,17 @@ uint8_t unmapDigitalChannel(uint32_t pin, int32_t *status) {
 void setPWM(void* digital_port_pointer, unsigned short value, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   checkPWMChannel(port);
-//  printf("Value:%d\n", value);
-  pwmSystem->writeHdr(port->port.pin, value, status); // XXX: Support MXP
+  
+  if(port->port.pin < tPWM::kNumHdrRegisters) {
+    pwmSystem->writeHdr(port->port.pin, value, status);
+  } else {
+    pwmSystem->writeMXP(port->port.pin - tPWM::kNumHdrRegisters, value, status);
+    
+    // Enable special functions on this pin
+    uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
+    short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
+    digitalSystem->writeEnableMXPSpecialFunction(specialFunctions | bitToSet, status);
+  }
 }
 
 /**
@@ -185,7 +200,12 @@ void setPWM(void* digital_port_pointer, unsigned short value, int32_t *status) {
 unsigned short getPWM(void* digital_port_pointer, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   checkPWMChannel(port);
-  return pwmSystem->readHdr(port->port.pin, status); // XXX: Support MXP
+  
+  if(port->port.pin < tPWM::kNumHdrRegisters) {
+    return pwmSystem->readHdr(port->port.pin, status);
+  } else {
+    return pwmSystem->readMXP(port->port.pin - tPWM::kNumHdrRegisters, status);
+  }
 }
 
 /**
@@ -197,7 +217,12 @@ unsigned short getPWM(void* digital_port_pointer, int32_t *status) {
 void setPWMPeriodScale(void* digital_port_pointer, uint32_t squelchMask, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   checkPWMChannel(port);
-  pwmSystem->writePeriodScaleHdr(port->port.pin, squelchMask, status); // XXX: Support MXP
+  
+  if(port->port.pin < tPWM::kNumPeriodScaleHdrElements) {
+    pwmSystem->writePeriodScaleHdr(port->port.pin, squelchMask, status);
+  } else {
+    pwmSystem->writePeriodScaleMXP(port->port.pin - tPWM::kNumPeriodScaleHdrElements, squelchMask, status);
+  }
 }
 
 /**
@@ -325,22 +350,22 @@ void setPWMOutputChannelWithModule(uint8_t module, void* pwmGenerator, uint32_t 
   if (id == ~0ul) return;
   switch(id) {
   case 0:
-    digitalSystem->writePWMOutputSelect(0, remapDigitalChannel(pin, status), status);
+    digitalSystem->writePWMOutputSelect(0, pin, status);
     break;
   case 1:
-    digitalSystem->writePWMOutputSelect(1, remapDigitalChannel(pin, status), status);
+    digitalSystem->writePWMOutputSelect(1, pin, status);
     break;
   case 2:
-    digitalSystem->writePWMOutputSelect(2, remapDigitalChannel(pin, status), status);
+    digitalSystem->writePWMOutputSelect(2, pin, status);
     break;
   case 3:
-    digitalSystem->writePWMOutputSelect(3, remapDigitalChannel(pin, status), status);
+    digitalSystem->writePWMOutputSelect(3, pin, status);
     break;
   case 4:
-    digitalSystem->writePWMOutputSelect(4, remapDigitalChannel(pin, status), status);
+    digitalSystem->writePWMOutputSelect(4, pin, status);
     break;
   case 5:
-    digitalSystem->writePWMOutputSelect(5, remapDigitalChannel(pin, status), status);
+    digitalSystem->writePWMOutputSelect(5, pin, status);
     break;
   }
 }
@@ -417,13 +442,30 @@ bool allocateDIO(void* digital_port_pointer, bool input, int32_t *status) {
   if (DIOChannels->Allocate(kDigitalPins * (port->port.module - 1) + port->port.pin, buf) == ~0ul) return false;
   {
     Synchronized sync(digitalDIOSemaphore);
-    uint32_t bitToSet = 1 << (remapDigitalChannel(port->port.pin, status));
+    
     tDIO::tOutputEnable outputEnable = digitalSystem->readOutputEnable(status);
-    if (input) {
-      outputEnable.Headers = outputEnable.Headers & (~bitToSet); // clear the bit for read
+    
+    if(port->port.pin < kNumHeaders) {
+      uint32_t bitToSet = 1 << port->port.pin;
+      if (input) {
+        outputEnable.Headers = outputEnable.Headers & (~bitToSet); // clear the bit for read
+      } else {
+        outputEnable.Headers = outputEnable.Headers | bitToSet; // set the bit for write
+      }
     } else {
-      outputEnable.Headers = outputEnable.Headers | bitToSet; // set the bit for write
+      uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
+      
+      // Disable special functions on this pin
+      short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
+      digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet, status);
+      
+      if (input) {
+        outputEnable.MXP = outputEnable.MXP & (~bitToSet); // clear the bit for read
+      } else {
+        outputEnable.MXP = outputEnable.MXP | bitToSet; // set the bit for write
+      }
     }
+    
     digitalSystem->writeOutputEnable(outputEnable, status);
   }
   return true;
@@ -455,10 +497,23 @@ void setDIO(void* digital_port_pointer, short value, int32_t *status) {
   {
     Synchronized sync(digitalDIOSemaphore);
     tDIO::tDO currentDIO = digitalSystem->readDO(status);
-    if(value == 0) {
-      currentDIO.Headers = currentDIO.Headers & ~(1 << remapDigitalChannel(port->port.pin, status));
-    } else if (value == 1) {
-      currentDIO.Headers = currentDIO.Headers | (1 << remapDigitalChannel(port->port.pin, status));
+    
+    if(port->port.pin < kNumHeaders) {
+      if(value == 0) {
+        currentDIO.Headers = currentDIO.Headers & ~(1 << port->port.pin);
+      } else if (value == 1) {
+        currentDIO.Headers = currentDIO.Headers | (1 << port->port.pin);
+      }
+    } else {
+      if(value == 0) {
+        currentDIO.MXP = currentDIO.MXP & ~(1 << remapMXPChannel(port->port.pin));
+      } else if (value == 1) {
+        currentDIO.MXP = currentDIO.MXP | (1 << remapMXPChannel(port->port.pin));
+      }
+      
+      uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
+      short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
+      digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet, status);
     } 
     digitalSystem->writeDO(currentDIO, status);
   }
@@ -479,7 +534,16 @@ bool getDIO(void* digital_port_pointer, int32_t *status) {
   //if it == 0, then return false
   //else return true
 
-  return ((currentDIO.Headers >> remapDigitalChannel(port->port.pin, status)) & 1) != 0;
+  if(port->port.pin < kNumHeaders) {
+    return ((currentDIO.Headers >> port->port.pin) & 1) != 0;
+  } else {
+    // Disable special functions
+    uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
+    short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
+    digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet, status);
+    
+    return ((currentDIO.MXP >> remapMXPChannel(port->port.pin)) & 1) != 0;
+  }
 }
 
 /**
@@ -492,12 +556,16 @@ bool getDIO(void* digital_port_pointer, int32_t *status) {
 bool getDIODirection(void* digital_port_pointer, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   tDIO::tOutputEnable currentOutputEnable = digitalSystem->readOutputEnable(status);
-	
-  //Shift 00000001 over port->port.pin-1 places.
+	//Shift 00000001 over port->port.pin-1 places.
   //AND it against the currentOutputEnable
   //if it == 0, then return false
   //else return true
-  return ((currentOutputEnable.Headers >> remapDigitalChannel(port->port.pin, status)) & 1) != 0;
+  
+  if(port->port.pin < kNumHeaders) {
+    return ((currentOutputEnable.Headers >> port->port.pin) & 1) != 0;
+  } else {
+    return ((currentOutputEnable.MXP >> remapMXPChannel(port->port.pin)) & 1) != 0;
+  }
 }
 
 /**
@@ -510,7 +578,13 @@ bool getDIODirection(void* digital_port_pointer, int32_t *status) {
 void pulse(void* digital_port_pointer, double pulseLength, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   tDIO::tPulse pulse;
-  pulse.Headers = 1 << remapDigitalChannel(port->port.pin, status);
+  
+  if(port->port.pin < kNumHeaders) {
+    pulse.Headers = 1 << port->port.pin;
+  } else {
+    pulse.MXP = 1 << remapMXPChannel(port->port.pin);
+  }
+  
   digitalSystem->writePulseLength((uint8_t)(1.0e9 * pulseLength / (pwmSystem->readLoopTiming(status) * 25)), status);
   digitalSystem->writePulse(pulse, status);
 }
@@ -522,9 +596,13 @@ void pulse(void* digital_port_pointer, double pulseLength, int32_t *status) {
  */
 bool isPulsing(void* digital_port_pointer, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
-  uint16_t mask = 1 << remapDigitalChannel(port->port.pin, status);
   tDIO::tPulse pulseRegister = digitalSystem->readPulse(status);
-  return (pulseRegister.Headers & mask) != 0;
+  
+  if(port->port.pin < kNumHeaders) {
+    return (pulseRegister.Headers & (1 << port->port.pin)) != 0;
+  } else {
+    return (pulseRegister.MXP & (1 << remapMXPChannel(port->port.pin))) != 0;
+  }
 }
 
 /**
@@ -543,7 +621,7 @@ bool isAnyPulsing(int32_t *status) {
  */
 bool isAnyPulsingWithModule(uint8_t module, int32_t *status) {
   tDIO::tPulse pulseRegister = digitalSystem->readPulse(status);
-  return pulseRegister.Headers != 0;
+  return pulseRegister.Headers != 0 && pulseRegister.MXP != 0;
 }
 
 
