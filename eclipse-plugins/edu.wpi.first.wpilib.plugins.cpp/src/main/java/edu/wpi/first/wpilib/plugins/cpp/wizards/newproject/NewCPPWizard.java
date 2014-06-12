@@ -72,11 +72,12 @@ public class NewCPPWizard extends Wizard implements INewWizard {
 		final String projectName = page.getProjectName();
 		final String teamNumber = TeamNumberPage.getTeamNumberFromPage(teamNumberPage);
 		final ProjectType projectType = page.getProjectType();
+		final String worldName = page.getWorld();
 		System.out.println("Project: "+projectName+" Project Type: "+projectType);
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
-					doFinish(projectName, teamNumber, projectType, monitor);
+					doFinish(projectName, teamNumber, projectType, worldName, monitor);
 				} catch (CoreException e) {
 					throw new InvocationTargetException(e);
 				} finally {
@@ -102,11 +103,11 @@ public class NewCPPWizard extends Wizard implements INewWizard {
 	 * the editor on the newly created file.
 	 */
 
-	private void doFinish(String projectName, String teamNumber, ProjectType projectType, IProgressMonitor monitor) throws CoreException {
+	private void doFinish(String projectName, String teamNumber, ProjectType projectType, String worldName, IProgressMonitor monitor) throws CoreException {
     	Properties props = WPILibCore.getDefault().getProjectProperties(null);
     	props.setProperty("team-number", teamNumber);
     	WPILibCore.getDefault().saveGlobalProperties(props);
-		ProjectCreationUtils.createProject(new WPIRobotCPPProjectCreator(projectName, projectType));
+		ProjectCreationUtils.createProject(new WPIRobotCPPProjectCreator(projectName, projectType, worldName));
 	}
 
 	/**

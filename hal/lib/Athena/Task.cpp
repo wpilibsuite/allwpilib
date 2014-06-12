@@ -1,9 +1,6 @@
 
 #include "HAL/Task.hpp"
 
-#include "HAL/HAL.hpp"
-#include "ChipObject.h"
-
 #include <stdio.h>
 #include <signal.h>
 

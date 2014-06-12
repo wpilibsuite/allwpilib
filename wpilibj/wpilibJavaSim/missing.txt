@@ -1,0 +1,46 @@
+Specific Issues
+===============
+
+- SimpleRobot.java (support for telling the DriverStation the current mode)
+- Iterative.java (support for telling the DriverStation the current mode and nextPeriodReady())
+- command/WaitUntilCommand.java (Needs DriverStation)
+- command/Command.java (XXX Issue with DriverStation)
+- RobotBase.java (support for getting current DriverStation state)
+- buttons/AnalogIOButton.java (Needs DriverStationEnhancedIO)
+- buttons/DigitalIOButton.java (Needs DriverStationEnhancedIO)
+- MotorSafetyHelper.java (Support for check() when disabled needs DriverStation)
+
+-----------------------------------------------------------------------------------------------
+
+General Items
+=============
+
+- Jaguar and Victor
+- Potentiometer
+  public interface AngleSensor {
+  	double getAngle();
+	void setOffset(double offset);
+  }
+- Encoder
+- Limit Switch
+  public interface Switch {
+	bool isTriggered();
+	void setReversed(bool reversed);
+  }
+- DriverStation
+- Joystick
+
+- Preferences
+- Relay
+- Ultrasonic
+- Watchdog
+- Servo
+- Gyro
+- Rangefinder
+- Accelerometer
+- CAN Jaguar
+- Compressor
+- Counter
+- Gear Tooth Sensor
+- HiTechnic Color Sensor
+- HiTechnic Compass

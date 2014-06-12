@@ -22,10 +22,12 @@ import edu.wpi.first.wpilib.plugins.cpp.WPILibCPPPlugin;
 public class WPIRobotCPPProjectCreator implements IProjectCreator {
 	String projectName;
 	ProjectType projectType;
+	private String worldName;
 	
-	public WPIRobotCPPProjectCreator(String projectName, ProjectType projectType) {
+	public WPIRobotCPPProjectCreator(String projectName, ProjectType projectType, String worldName) {
 		this.projectName = projectName;
 		this.projectType = projectType;
+		this.worldName = worldName;
 	}
 
 	@Override
@@ -44,6 +46,7 @@ public class WPIRobotCPPProjectCreator implements IProjectCreator {
 		vals.put("$project", projectName);
 		vals.put("$toolchain", WPILibCPPPlugin.getDefault().getToolchain());
 		vals.put("$cpp-location", WPILibCPPPlugin.getDefault().getCPPDir());
+		vals.put("$world", worldName);
 		return vals;
 	}
 

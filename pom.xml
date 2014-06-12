@@ -11,6 +11,7 @@
 		<module>networktables</module>
 		<module>wpilibj</module>
 		<module>driver-station</module>
+		<module>simulation</module>
 	</modules>
 
 
@@ -23,6 +24,7 @@
 		    </activation>
 		    
 		    <modules>
+		    	<module>wpilibc/wpilibC++Sim</module>
 		    	<module>eclipse-plugins</module>
 		    </modules>
 		</profile>

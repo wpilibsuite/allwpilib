@@ -64,8 +64,8 @@ public class AntPropertiesParser {
 		        		matcher.appendReplacement(sb, Matcher.quoteReplacement(props.getProperty(prop)));
 		        	} else if (prop.equals("user.home")) {
 		        		matcher.appendReplacement(sb, Matcher.quoteReplacement(System.getProperty("user.home")));
-		        	} else {
-		        		throw new CoreException(new Status(0, "WPI", "Could not parse build.properties file, unsupported property: "+prop));
+ 		        	} else {
+		        		matcher.appendReplacement(sb, Matcher.quoteReplacement(matcher.group()));
 		        	}
 		        }
 		        matcher.appendTail( sb );

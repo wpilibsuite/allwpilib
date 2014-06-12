@@ -179,6 +179,41 @@
                mode="debug">
          </description>
       </shortcut>
+      <shortcut
+            class="edu.wpi.first.wpilib.plugins.java.launching.SimulateLaunchShortcut"
+            description="Test your WPILib program with the Gazebo simulator."
+            icon="resources/icons/Gazebo.png"
+            id="edu.wpi.first.wpilib.plugins.java.launching.simulate"
+            label="WPILib Simulation"
+            modes="run,debug">
+            <contextualLaunch>
+            <enablement>
+               <with
+                     variable="selection">
+                  <iterate>
+                     <and>
+                        <test
+                            args="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
+                            property="org.eclipse.jdt.launching.hasProjectNature">
+                        </test>
+                        <test
+                            args="org.eclipse.jdt.core.javanature"
+                            property="org.eclipse.jdt.launching.hasProjectNature">
+                        </test>
+                     </and>
+                  </iterate>
+               </with>
+            </enablement>
+         </contextualLaunch>
+         <description
+               description="Test your WPILib program with the Gazebo simulator."
+               mode="run">
+         </description>
+         <description
+               description="Test your WPILib program with the Gazebo simulator and use the debugger to debug."
+               mode="debug">
+         </description>
+      </shortcut>
    </extension>
    <extension
          point="org.eclipse.ui.startup">

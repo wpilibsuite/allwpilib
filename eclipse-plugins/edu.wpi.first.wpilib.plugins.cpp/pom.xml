@@ -63,8 +63,15 @@
 									<groupId>edu.wpi.first.wpilib.cmake</groupId>
 									<artifactId>cpp-root</artifactId>
 									<version>1.0.0</version>
-									<type>zip</type>
+								    <type>zip</type>
 									<destFileName>cpp-root.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+  			                        <groupId>edu.wpi.first.wpilibc.simulation</groupId>
+ 			                        <artifactId>WPILibCSim</artifactId>
+			                        <version>0.1.0</version>
+			                        <type>zip</type>
+									<destFileName>sim-include.zip</destFileName>
 								</artifactItem>
 							</artifactItems>
 							<outputDirectory>${project.build.directory}</outputDirectory>
@@ -73,6 +80,38 @@
 							<prependGroupId>true</prependGroupId>
 						</configuration>
 					</execution>
+                    
+                    <!-- Simulation -->
+                    <execution>
+                      <id>fetch-sim-jar-zip-dependencies</id>
+                      <phase>compile</phase>
+                      <goals>
+                        <goal>copy</goal>
+                      </goals>
+                      <configuration>
+			            <outputDirectory>${cpp-zip}/sim/lib</outputDirectory>
+                        <overWriteReleases>false</overWriteReleases>
+                        <overWriteSnapshots>true</overWriteSnapshots>
+                        
+                        <artifactItems>
+                          <artifactItem>
+                            <groupId>net.java.jinput</groupId>
+                            <artifactId>jinput-platform</artifactId>
+                            <version>2.0.5</version>
+                            <classifier>natives-linux</classifier>
+                            <type>jar</type>
+                          </artifactItem>
+
+                          <artifactItem>
+                            <groupId>edu.wpi.first.wpilibj.simulation</groupId>
+                            <artifactId>SimDS</artifactId>
+                            <version>0.1.0-SNAPSHOT</version>
+				            <destFileName>SimDS.jar</destFileName>
+                            <outputDirectory>${cpp-zip}/sim/tools</outputDirectory>
+                          </artifactItem>
+                        </artifactItems>
+                      </configuration>
+                    </execution>
 				</executions>
 			</plugin>
 			<plugin>
@@ -80,6 +119,7 @@
 				<artifactId>maven-antrun-plugin</artifactId>
 				<version>1.7</version>
 				<executions>
+                  
 					<!-- Set time stamp and version properties. -->
 					<execution>
 						<id>set-version-info</id>
@@ -100,6 +140,7 @@
 							<exportAntProperties>true</exportAntProperties>
 						</configuration>
 					</execution>
+                    
 					<!-- Unzip the include files for cpp.zip. -->
 					<execution>
 						<id>unzip-cpp-includes</id>
@@ -112,11 +153,29 @@
 								<unzip dest="${cpp-zip}">
 									<fileset dir="${project.build.directory}">
 										<include name="cpp-root.jar"/>
+										<include name="sim-include.zip"/>
 									</fileset>
 								</unzip>
 							</target>
 						</configuration>
 					</execution>
+
+                    <!-- Unzip jinput *.so's -->
+		            <execution>
+			          <id>unzip-jinput-libs</id>
+                      <phase>compile</phase>
+                      <goals>
+                        <goal>run</goal>
+                      </goals>
+			          <configuration>
+			            <target>
+				          <unzip src="${cpp-zip}/sim/lib/jinput-platform-2.0.5-natives-linux.jar"
+					             dest="${cpp-zip}/sim/lib"
+					             overwrite="true" />
+			            </target>
+			          </configuration>
+		            </execution>
+          
 					<!-- Generate zip file to unzip for the user. -->
 					<execution>
 						<id>generate-cpp-zip</id>
@@ -139,6 +198,12 @@
 			<groupId>edu.wpi.first.wpilib.cmake</groupId>
 			<artifactId>cpp-root</artifactId>
 			<version>1.0.0</version>
+			<type>zip</type>
+		</dependency>
+		<dependency>
+			<groupId>edu.wpi.first.wpilibc.simulation</groupId>
+			<artifactId>WPILibCSim</artifactId>
+			<version>0.1.0</version>
 			<type>zip</type>
 		</dependency>
 	</dependencies>

@@ -8,7 +8,15 @@
     <name>Network Tables</name>
     <description>Examples of how to use Network Tables to accomplish a
     variety of tasks such as sending and receiving values to both
-    dashboards and co-processors..</description>
+    dashboards and co-processors.</description>
+  </tagDescription>
+  <tagDescription>
+    <name>CommandBased Robot</name>
+    <description>Examples for CommandBased robot programs.</description>
+  </tagDescription>
+  <tagDescription>
+    <name>Simulation</name>
+    <description>Examples that can be run in simulation.</description>
   </tagDescription>
   
   <example>
@@ -43,5 +51,92 @@
       <file source="examples/Network Table Counter/Robot.cpp" destination="src/Robot.cpp" />
     </files>
   </example>
+
+  <example>
+    <name>GearsBot</name>
+    <description>A fully functional example CommandBased program for
+    WPIs GearsBot robot. This code can run on your computer if it
+    supports simulation.</description>
+    <tags>
+      <tag>CommandBased Robot</tag>
+      <tag>Simulation</tag>
+    </tags>
+    <packages>
+      <package>src</package>
+      <package>src/Commands</package>
+      <package>src/Subsystems</package>
+    </packages>
+    <files>
+      <file source="examples/GearsBot/src/Commands/Autonomous.cpp"
+            destination="src/Commands/Autonomous.cpp"></file>
+      <file source="examples/GearsBot/src/Commands/Autonomous.h"
+            destination="src/Commands/Autonomous.h"></file>
+      <file source="examples/GearsBot/src/Commands/CloseClaw.cpp"
+            destination="src/Commands/CloseClaw.cpp"></file>
+      <file source="examples/GearsBot/src/Commands/CloseClaw.h"
+            destination="src/Commands/CloseClaw.h"></file>
+      <file source="examples/GearsBot/src/Commands/DriveStraight.cpp"
+            destination="src/Commands/DriveStraight.cpp"></file>
+      <file source="examples/GearsBot/src/Commands/DriveStraight.h"
+            destination="src/Commands/DriveStraight.h"></file>
+      <file source="examples/GearsBot/src/Commands/OpenClaw.cpp"
+            destination="src/Commands/OpenClaw.cpp"></file>
+      <file source="examples/GearsBot/src/Commands/OpenClaw.h"
+            destination="src/Commands/OpenClaw.h"></file>
+      <file source="examples/GearsBot/src/Commands/Pickup.cpp"
+            destination="src/Commands/Pickup.cpp"></file>
+      <file source="examples/GearsBot/src/Commands/Pickup.h"
+            destination="src/Commands/Pickup.h"></file>
+      <file source="examples/GearsBot/src/Commands/Place.cpp"
+            destination="src/Commands/Place.cpp"></file>
+      <file source="examples/GearsBot/src/Commands/Place.h"
+            destination="src/Commands/Place.h"></file>
+      <file source="examples/GearsBot/src/Commands/PrepareToPickup.cpp"
+            destination="src/Commands/PrepareToPickup.cpp"></file>
+      <file source="examples/GearsBot/src/Commands/PrepareToPickup.h"
+            destination="src/Commands/PrepareToPickup.h"></file>
+      <file source="examples/GearsBot/src/Commands/SetDistanceToBox.cpp"
+            destination="src/Commands/SetDistanceToBox.cpp"></file>
+      <file source="examples/GearsBot/src/Commands/SetDistanceToBox.h"
+            destination="src/Commands/SetDistanceToBox.h"></file>
+      <file source="examples/GearsBot/src/Commands/SetElevatorSetpoint.cpp"
+            destination="src/Commands/SetElevatorSetpoint.cpp"></file>
+      <file source="examples/GearsBot/src/Commands/SetElevatorSetpoint.h"
+            destination="src/Commands/SetElevatorSetpoint.h"></file>
+      <file source="examples/GearsBot/src/Commands/SetWristSetpoint.cpp"
+            destination="src/Commands/SetWristSetpoint.cpp"></file>
+      <file source="examples/GearsBot/src/Commands/SetWristSetpoint.h"
+            destination="src/Commands/SetWristSetpoint.h"></file>
+      <file source="examples/GearsBot/src/Commands/TankDriveWithJoystick.cpp"
+            destination="src/Commands/TankDriveWithJoystick.cpp"></file>
+      <file source="examples/GearsBot/src/Commands/TankDriveWithJoystick.h"
+            destination="src/Commands/TankDriveWithJoystick.h"></file>
+      <file source="examples/GearsBot/src/OI.cpp"
+            destination="src/OI.cpp"></file>
+      <file source="examples/GearsBot/src/OI.h"
+            destination="src/OI.h"></file>
+      <file source="examples/GearsBot/src/Robot.cpp"
+            destination="src/Robot.cpp"></file>
+      <file source="examples/GearsBot/src/Robot.h"
+            destination="src/Robot.h"></file>
+      <file source="examples/GearsBot/src/Subsystems/Claw.cpp"
+            destination="src/Subsystems/Claw.cpp"></file>
+      <file source="examples/GearsBot/src/Subsystems/Claw.h"
+            destination="src/Subsystems/Claw.h"></file>
+      <file source="examples/GearsBot/src/Subsystems/DriveTrain.cpp"
+            destination="src/Subsystems/DriveTrain.cpp"></file>
+      <file source="examples/GearsBot/src/Subsystems/DriveTrain.h"
+            destination="src/Subsystems/DriveTrain.h"></file>
+      <file source="examples/GearsBot/src/Subsystems/Elevator.cpp"
+            destination="src/Subsystems/Elevator.cpp"></file>
+      <file source="examples/GearsBot/src/Subsystems/Elevator.h"
+            destination="src/Subsystems/Elevator.h"></file>
+      <file source="examples/GearsBot/src/Subsystems/Wrist.cpp"
+            destination="src/Subsystems/Wrist.cpp"></file>
+      <file source="examples/GearsBot/src/Subsystems/Wrist.h"
+            destination="src/Subsystems/Wrist.h"></file>
+    </files>
+  </example>
+
   
 </examples>

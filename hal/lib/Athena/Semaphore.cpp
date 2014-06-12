@@ -1,7 +1,6 @@
 
 #include "HAL/Semaphore.hpp"
 
-#include "ChipObject.h"
 #include "Log.hpp"
 
 // set the logging level

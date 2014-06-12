@@ -35,7 +35,8 @@ public class ExampleJavaWizard extends ExampleWizard {
     	
 		final String projectName = detailsPage.getProjectName();
 		final String packageName = detailsPage.getPackage();
-		ProjectCreationUtils.createProject(new WPIRobotJavaProjectCreator(projectName, packageName, ex));
+		final String worldName = detailsPage.getWorld();
+		ProjectCreationUtils.createProject(new WPIRobotJavaProjectCreator(projectName, packageName, ex, worldName));
 	}
 
 	@Override

@@ -25,8 +25,6 @@
 	+ ((n & 0x01000000LU) ? 64 : 0) \
 	+ ((n & 0x10000000LU) ? 128 : 0))
 	
-#define b(n) ((unsigned char)BINARY_LITERAL_VIA_HEX__(TO_HEX__(n)))
-
 class DataIOStream{
 public:
 	DataIOStream(IOStream* stream);
@@ -49,3 +47,4 @@ public:
 
 
 #endif
+

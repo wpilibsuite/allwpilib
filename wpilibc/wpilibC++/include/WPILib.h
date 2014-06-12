@@ -5,6 +5,8 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
+#define REAL
+
 #include "string.h"
 #include <iostream>
 
@@ -13,6 +15,7 @@
 #include "ADXL345_SPI.h"
 #include "AnalogInput.h"
 #include "AnalogOutput.h"
+#include "AnalogPotentiometer.h"
 #include "AnalogModule.h"
 #include "AnalogTrigger.h"
 #include "AnalogTriggerOutput.h"
@@ -51,6 +54,7 @@
 #include "Gyro.h"
 #include "HiTechnicCompass.h"
 #include "HiTechnicColorSensor.h"
+#include "interfaces/Potentiometer.h"
 #include "I2C.h"
 #include "IterativeRobot.h"
 #include "InterruptableSensorBase.h"

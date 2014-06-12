@@ -55,9 +55,9 @@
   
     <jar destfile="${dist.jar}" update="false">
       <manifest>
-      <attribute name="Main-Class" value="edu.wpi.first.wpilibj.RobotBase"/>
-      <attribute name="Robot-Class" value="${main}"/>
-      <attribute name="Class-Path" value="."/>
+    	<attribute name="Main-Class" value="edu.wpi.first.wpilibj.RobotBase"/>
+    	<attribute name="Robot-Class" value="${robot.class}"/>
+    	<attribute name="Class-Path" value="."/>
       </manifest>
     
       <fileset dir="${build.dir}" includes="**/*.class"/>
@@ -95,5 +95,74 @@
        password="${password}"
        trust="true"
        command="chmod a+x debug*program; ${deploy.debug.command}"/>
+  </target>
+
+  <!-- Simulate -->
+  <target name="jar-for-simulation" depends="compile">
+	<echo>[jar-for-simulation] Building jar.</echo>
+	
+	<jar destfile="${simulation.dist.jar}">
+	  <manifest>
+		<attribute name="Built-By" value="${user.name}"/>
+		<attribute name="Robot-Class" value="${robot.class}"/>
+		<attribute name="Main-Class" value="edu.wpi.first.wpilibj.RobotBase"/>
+	  </manifest>
+	  <fileset dir="${build.dir}" />
+	  <zipgroupfileset dir="${wpilib.sim.lib}">
+	  	<include name="**/*.jar" />
+	  </zipgroupfileset>
+	</jar>
+  </target>
+
+  <target name="simulate" depends="jar-for-simulation">
+    <parallel>
+      <sequential>
+	    <echo>[simulate] Running Gazebo.</echo>
+	    <exec executable="frcsim">
+	      <arg value="${simulation.world.file}"/>
+	    </exec>
+      </sequential>
+      <sequential>
+        <sleep seconds="5"/>
+	    <echo>[simulate] Running DriverStation.</echo>
+	    <java jar="${wpilib.sim.tools}/SimDS.jar" fork="true">
+          <jvmarg value="-Djava.library.path=${wpilib.sim.lib}" />
+        </java>
+      </sequential>
+      <sequential>
+        <sleep seconds="5"/>
+	    <echo>[simulate] Running Code.</echo>
+	    <java jar="${simulation.dist.jar}" fork="true">
+          <jvmarg value="-Djava.library.path=${wpilib.sim.lib}" />
+        </java>
+      </sequential>
+    </parallel>
+  </target>
+
+  <target name="debug-simulate" depends="jar-for-simulation">
+    <parallel>
+      <sequential>
+	    <echo>[debug-simulate] Running Gazebo.</echo>
+	    <exec executable="frcsim">
+	      <arg value="${simulation.world.file}"/>
+	    </exec>
+      </sequential>
+      <sequential>
+        <sleep seconds="5"/>
+	    <echo>[debug-simulate] Running DriverStation.</echo>
+	    <java jar="${wpilib.sim.tools}/SimDS.jar" fork="true">
+          <jvmarg value="-Djava.library.path=${wpilib.sim.lib}" />
+        </java>
+      </sequential>
+      <sequential>
+        <sleep seconds="5"/>
+	    <echo>[debug-simulate] Running Code.</echo>
+	    <java jar="${simulation.dist.jar}" fork="true">
+          <jvmarg value="-Xdebug" />
+          <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8348" />
+          <jvmarg value="-Djava.library.path=${wpilib.sim.lib}" />
+        </java>
+      </sequential>
+    </parallel>
   </target>
 </project>

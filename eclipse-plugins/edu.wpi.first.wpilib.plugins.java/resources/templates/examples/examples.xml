@@ -5,10 +5,18 @@
     <description>Examples for simple robot programs.</description>
   </tagDescription>
   <tagDescription>
+    <name>CommandBased Robot</name>
+    <description>Examples for CommandBased robot programs.</description>
+  </tagDescription>
+  <tagDescription>
+    <name>Simulation</name>
+    <description>Examples that can be run in simulation.</description>
+  </tagDescription>
+  <tagDescription>
     <name>Network Tables</name>
     <description>Examples of how to use Network Tables to accomplish a
     variety of tasks such as sending and receiving values to both
-    dashboards and co-processors..</description>
+    dashboards and co-processors.</description>
   </tagDescription>
   
   <example>
@@ -43,5 +51,37 @@
       <file source="examples/Network Table Counter/Robot.java" destination="src/$package-dir/Robot.java" />
     </files>
   </example>
-  
+
+  <example>
+    <name>GearsBot</name>
+    <description>A fully functional example CommandBased program for WPIs GearsBot robot. This code can run on your computer if it supports simulation.</description>
+    <tags>
+      <tag>CommandBased Robot</tag>
+      <tag>Simulation</tag>
+    </tags>
+    <packages>
+      <package>src/$package-dir</package>
+      <package>src/$package-dir/commands</package>
+      <package>src/$package-dir/subsystems</package>
+    </packages>
+    <files>
+      <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/OI.java" destination="src/$package-dir/OI.java"></file>
+      <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/Robot.java" destination="src/$package-dir/Robot.java"></file>
+      <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/Autonomous.java" destination="src/$package-dir/commands/Autonomous.java"></file>
+      <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/CloseClaw.java" destination="src/$package-dir/commands/CloseClaw.java"></file>
+      <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/DriveStraight.java" destination="src/$package-dir/commands/DriveStraight.java"></file>
+      <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/OpenClaw.java" destination="src/$package-dir/commands/OpenClaw.java"></file>
+      <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/Pickup.java" destination="src/$package-dir/commands/Pickup.java"></file>
+      <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/Place.java" destination="src/$package-dir/commands/Place.java"></file>
+      <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/PrepareToPickup.java" destination="src/$package-dir/commands/PrepareToPickup.java"></file>
+      <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/SetDistanceToBox.java" destination="src/$package-dir/commands/SetDistanceToBox.java"></file>
+      <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/SetElevatorSetpoint.java" destination="src/$package-dir/commands/SetElevatorSetpoint.java"></file>
+      <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/SetWristSetpoint.java" destination="src/$package-dir/commands/SetWristSetpoint.java"></file>
+      <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/TankDriveWithJoystick.java" destination="src/$package-dir/commands/TankDriveWithJoystick.java"></file>
+      <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/subsystems/Claw.java" destination="src/$package-dir/subsystems/Claw.java"></file>
+      <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/subsystems/DriveTrain.java" destination="src/$package-dir/subsystems/DriveTrain.java"></file>
+      <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/subsystems/Elevator.java" destination="src/$package-dir/subsystems/Elevator.java"></file>
+      <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/subsystems/Wrist.java" destination="src/$package-dir/subsystems/Wrist.java"></file>
+    </files>
+  </example>
 </examples>

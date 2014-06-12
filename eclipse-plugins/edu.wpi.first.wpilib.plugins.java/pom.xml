@@ -16,19 +16,6 @@
 	<build-number>DEVELOPMENT</build-number>
 	<java-zip>${project.build.directory}/java-zip</java-zip>
   </properties>
-  
-  <repositories>
-    <!-- repository>
-      <id>sonatype</id>
-      <name>Sonatype OSS Snapshots Repository</name>
-      <url>http://oss.sonatype.org/content/groups/public</url>
-    </repository-->
-    <!-- For old snapshots, please use groupId `com.jnaerator` and the following repo -->
-    <!-- repository>
-      <id>nativelibs4java-repo</id>
-      <url>http://nativelibs4java.sourceforge.net/maven</url>
-    </repository-->
-  </repositories>
 
   <build>
 	<resources>
@@ -88,27 +75,12 @@
                 </artifactItem>
                 <artifactItem>
 				  <groupId>edu.wpi.first.wpilibj</groupId>
-				  <artifactId>wpilibJavaFinal</artifactId>
+				  <artifactId>wpilibJava</artifactId>
 				  <version>0.1.0-SNAPSHOT</version>
 				  <type>jar</type>
 				  <destFileName>WPILib.jar</destFileName>
 				  <outputDirectory>${java-zip}/lib</outputDirectory>
                 </artifactItem>
-				<!-- artifactItem>
-				  <groupId>net.java.dev.jna</groupId>
-				  <artifactId>jna</artifactId>
-				  <version>4.0.0</version>
-				  <type>jar</type>
-				  <outputDirectory>${java-zip}/lib</outputDirectory>
-				</artifactItem-->
-				<!-- artifactItem>
-				  <groupId>com.nativelibs4java</groupId>
-				  <artifactId>jnaerator-runtime</artifactId>
-				  <version>0.12-SNAPSHOT</version>
-				  <type>jar</type>
-				  <destFileName>jnaerator-runtime.jar</destFileName>
-				  <outputDirectory>${java-zip}/lib</outputDirectory>
-				</artifactItem-->
 				<!-- Library sources for debugging WPILib on the Athena -->
                 <artifactItem>
 				  <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
@@ -136,8 +108,74 @@
 				  <outputDirectory>${java-zip}/javadoc-jar</outputDirectory>
                 </artifactItem>
               </artifactItems>
+              
               <overWriteReleases>false</overWriteReleases>
               <overWriteSnapshots>true</overWriteSnapshots>
+            </configuration>
+          </execution>
+
+          <!-- Simulation -->
+          <execution>
+            <id>fetch-sim-jar-zip-dependencies</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+			  <outputDirectory>${java-zip}/sim/lib</outputDirectory>
+              <overWriteReleases>false</overWriteReleases>
+              <overWriteSnapshots>true</overWriteSnapshots>
+              
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.gazebosim</groupId>
+                  <artifactId>JavaGazebo</artifactId>
+                  <version>0.1.0-SNAPSHOT</version>
+                </artifactItem>
+                <artifactItem>
+				  <groupId>edu.wpi.first.wpilibj</groupId>
+				  <artifactId>wpilibJavaSim</artifactId>
+				  <version>0.1.0-SNAPSHOT</version>
+				  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+	              <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
+	              <artifactId>NetworkTables</artifactId>
+	              <version>0.1.0-SNAPSHOT</version>
+                </artifactItem>
+                
+                <artifactItem>
+                  <groupId>net.java.jinput</groupId>
+                  <artifactId>jinput</artifactId>
+                  <version>2.0.5</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>net.java.jinput</groupId>
+                  <artifactId>jinput-platform</artifactId>
+                  <version>2.0.5</version>
+                  <classifier>natives-linux</classifier>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>net.java.jutils</groupId>
+                  <artifactId>jutils</artifactId>
+                  <version>1.0.0</version>
+                </artifactItem>
+
+                <artifactItem>
+    	          <groupId>com.google.protobuf</groupId>
+    	          <artifactId>protobuf-java</artifactId>
+    	          <version>2.5.0</version>
+                </artifactItem>
+
+                <artifactItem>
+                  <groupId>edu.wpi.first.wpilibj.simulation</groupId>
+                  <artifactId>SimDS</artifactId>
+                  <version>0.1.0-SNAPSHOT</version>
+				  <destFileName>SimDS.jar</destFileName>
+                  <outputDirectory>${java-zip}/sim/tools</outputDirectory>
+                </artifactItem>
+              </artifactItems>
             </configuration>
           </execution>
         </executions>
@@ -187,7 +225,23 @@
 			  </target>
 			</configuration>
 		  </execution>
-		  
+
+		  <!-- Unzip jinput *.so's -->
+		  <execution>
+			<id>unzip-jinput-libs</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+			<configuration>
+			  <target>
+				<unzip src="${java-zip}/sim/lib/jinput-platform-2.0.5-natives-linux.jar"
+					   dest="${java-zip}/sim/lib"
+					   overwrite="true" />
+			  </target>
+			</configuration>
+		  </execution>
+          
 		  <!-- Generate zip file to unzip for the user. -->
 		  <execution>
 			<id>generate-jar-zip</id>
@@ -259,7 +313,13 @@
 	</dependency>
 	<dependency>
 			  <groupId>edu.wpi.first.wpilibj</groupId>
-			  <artifactId>wpilibJavaFinal</artifactId>
+			  <artifactId>wpilibJava</artifactId>
+			  <version>0.1.0-SNAPSHOT</version>
+			  <type>jar</type>
+	</dependency>
+	<dependency>
+			  <groupId>edu.wpi.first.wpilibj</groupId>
+			  <artifactId>wpilibJavaSim</artifactId>
 			  <version>0.1.0-SNAPSHOT</version>
 			  <type>jar</type>
 	</dependency>
@@ -287,7 +347,6 @@
 			  <groupId>edu.wpi.first.wpilibj</groupId>
 			  <artifactId>wpilibJava</artifactId>
 			  <version>0.1.0-SNAPSHOT</version>
-			  <classifier>sources</classifier>
 	</dependency>
 
 	<!-- Javadoc -->

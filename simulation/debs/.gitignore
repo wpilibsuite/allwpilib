@@ -1,0 +1,42 @@
+# General
+*.log
+build/
+screensteps/
+trash/
+
+# TMP
+*/*/debian/files
+*/*/models/
+*/*/worlds
+*/*/plugins/
+*/*/features/
+*/*/src/
+*/*/devel/
+*/*/.*
+*/*/include/
+*/*/msgs/
+
+# General Build Artifacts
+*.dsc
+*.deb
+*.orig.tar.gz
+*.debian.tar.gz
+*.changes
+*.build
+*.substvars
+*/*/debian/*/DEBIAN/
+
+# Specific Build Artifacts
+frcsim-gazebo-plugins/frcsim-gazebo-plugins/debian/frcsim-gazebo-plugins/
+frcsim-gazebo-models/frcsim-gazebo-models/debian/frcsim-gazebo-models/
+frcsim-eclipse-plugins/frcsim-eclipse-plugins/debian/frcsim-eclipse-plugins/
+frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/frcsim-eclipse-toolchain-plugin/
+frcsim/frcsim/debian/frcsim/
+frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/debian/frcsim-libwpilibsim-cpp/
+
+frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/Makefile
+frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/CMakeLists.txt
+
+# Generated Repository
+repository/db/
+repository/dists/

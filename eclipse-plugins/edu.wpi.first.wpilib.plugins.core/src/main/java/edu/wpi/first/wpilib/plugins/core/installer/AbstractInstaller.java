@@ -12,7 +12,6 @@ import javax.swing.JOptionPane;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
-import org.omg.CORBA.Environment;
 
 import edu.wpi.first.wpilib.plugins.core.WPILibCore;
 

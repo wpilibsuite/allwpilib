@@ -9,9 +9,9 @@
   
   <modules>
     <module>wpilibJava</module>
+    <module>wpilibJavaSim</module>
     <module>wpilibJavaJNI</module>
     <module>wpilibJavaFinal</module>
     <module>wpilibJavaIntegrationTests</module>
   </modules>
-  
 </project>

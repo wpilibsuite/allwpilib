@@ -2,8 +2,7 @@
 #include "HAL/Analog.hpp"
 
 #include "Port.h"
-#include "HAL/Errors.hpp"
-#include "HAL/Semaphore.hpp"
+#include "HAL/HAL.hpp"
 #include "ChipObject.h"
 #include "HAL/cpp/Synchronized.hpp"
 #include "HAL/cpp/Resource.hpp"

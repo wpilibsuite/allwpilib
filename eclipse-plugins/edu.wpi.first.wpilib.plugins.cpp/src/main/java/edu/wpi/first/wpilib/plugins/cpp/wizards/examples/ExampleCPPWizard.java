@@ -34,7 +34,7 @@ public class ExampleCPPWizard extends ExampleWizard {
     	WPILibCore.getDefault().saveGlobalProperties(props);
     	
 		final String projectName = detailsPage.getProjectName();
-		ProjectCreationUtils.createProject(new WPIRobotCPPProjectCreator(projectName, ex));
+		ProjectCreationUtils.createProject(new WPIRobotCPPProjectCreator(projectName, ex, detailsPage.getWorld()));
 	}
 
 	@Override

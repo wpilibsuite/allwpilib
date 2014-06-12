@@ -2,6 +2,7 @@ package edu.wpi.first.wpilib.plugins.core.wizards;
 
 import java.util.Map;
 
+import javax.activation.FileDataSource;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -11,10 +12,14 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -29,6 +34,8 @@ public class NewProjectMainPage extends WizardPage {
 	private Text projectNameText;
 	private Text packageText;
 	Map<String, ProjectType> types;
+	private Text worldText;
+	private Button worldButton;
 
 	Button simpleRobot, iterativeRobot, commandRobot;
 	private boolean showPackage;
@@ -113,6 +120,32 @@ public class NewProjectMainPage extends WizardPage {
 			gd.widthHint = 300;
 			commandRobot.setLayoutData(gd);
 		}
+
+		label = new Label(container, SWT.NULL);
+		label.setText("Simulation &World:");
+		
+
+		Composite comp = new Composite(container, SWT.NULL);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		comp.setLayoutData(gd);
+		GridLayout groupLayout = new GridLayout();
+		groupLayout.numColumns = 2;
+		comp.setLayout(groupLayout);
+		worldText = new Text(comp, SWT.BORDER | SWT.SINGLE);
+		worldText.setLayoutData(gd);
+ 		worldText.setText("/usr/share/frcsim/worlds/GearsBotDemo.world");
+		worldText.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				dialogChanged();
+			}
+		});
+		worldButton = new Button(comp, SWT.NULL);
+		worldButton.setText("Browse");
+		worldButton.addSelectionListener(new SelectionAdapter() {
+			@Override public void widgetSelected(SelectionEvent e) {
+				browse();
+			}
+		});
 		
 		initialize();
 		dialogChanged();
@@ -125,12 +158,12 @@ public class NewProjectMainPage extends WizardPage {
 	private void initialize() {
 		String teamNumber = TeamNumberPage.getTeamNumberFromPage(teamNumberPage);
 		if (showPackage) {
-			packageText.setText("com.first.team"+teamNumber+".robot");
+			packageText.setText("org.usfirst.frc.team"+teamNumber+".robot");
 			if (teamNumberPage != null) {
 				teamNumberPage.registerChangeListener(new ChangeListener() {
 					@Override public void stateChanged(ChangeEvent e) {
 						String teamNumber = TeamNumberPage.getTeamNumberFromPage(teamNumberPage);
-						packageText.setText("com.first.team"+teamNumber+".robot");
+						packageText.setText("org.usfirst.frc.team"+teamNumber+".robot");
 						
 					}
 				});
@@ -159,7 +192,20 @@ public class NewProjectMainPage extends WizardPage {
 			updateStatus("Must be valid java package");
 			return;
 		}
+		
 		updateStatus(null);
+	}
+
+	private void browse() {
+		FileDialog dialog = new FileDialog(getShell(), SWT.OPEN);
+		dialog.setText("Pick a World to Simulate");
+		dialog.setFileName(worldText.getText());
+		dialog.setFilterNames(new String[] { "World Files", "All Files (*.*)" });
+	    dialog.setFilterExtensions(new String[] { "*.world", "*.*" });
+		String result = dialog.open();
+		if (result != null) {
+			worldText.setText(result);
+		}	
 	}
 
 	private void updateStatus(String message) {
@@ -180,6 +226,10 @@ public class NewProjectMainPage extends WizardPage {
 		else if (simpleRobot.getSelection()) return types.get(ProjectType.SIMPLE);
 		else if (iterativeRobot.getSelection()) return types.get(ProjectType.ITERATIVE);
 		else return types.get(ProjectType.COMMAND_BASED);
+	}
+
+	public String getWorld() {
+		return worldText.getText().replace(System.getenv("HOME"), "${user.home}");
 	}
 
 	public void setShowPackage(boolean bool) {

@@ -147,4 +147,28 @@ ${md5.hal} usr/local/frc/lib/libHALAthena.so</echo>
 	     trust="true"
 	     command="chmod a+x debug*program; ${deploy.debug.command}"/>
   </target>
+
+  <!-- Simulation support -->
+  <target name="simulate">
+    <parallel>
+      <sequential>
+	    <echo>[simulate] Running Gazebo.</echo>
+	    <exec executable="frcsim">
+	      <arg value="${simulation.world.file}"/>
+	    </exec>
+      </sequential>
+      <sequential>
+        <sleep seconds="5"/>
+	    <echo>[simulate] Running DriverStation.</echo>
+	    <java jar="${sim.tools}/SimDS.jar" fork="true">
+          <jvmarg value="-Djava.library.path=${sim.lib}" />
+        </java>
+      </sequential>
+      <sequential>
+        <sleep seconds="5"/>
+	    <echo>[simulate] Running Code.</echo>
+	    <exec executable="${sim.exe}"></exec>
+      </sequential>
+    </parallel>
+  </target>
 </project> 

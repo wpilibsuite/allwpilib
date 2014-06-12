@@ -1,0 +1,1 @@
+protoc --cpp_out=src/ msgs/float64.proto

@@ -1,0 +1,12 @@
+Origin: users.wpi.edu
+Label: FRCSim
+Codename: trusty
+Architectures: i386 amd64 source
+Components: main
+Description: Repository for simulating FRC robots using WPILibSim and the Gazebo simualtor.
+SignWith: yes
+DebOverride: override.trusty
+DscOverride: override.trusty
+DebIndices: Packages Release . .gz
+UDebIndices: Packages . .gz
+DscIndices: Sources Release . .gz

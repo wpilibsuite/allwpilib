@@ -73,6 +73,7 @@ public class WPILibJavaPlugin extends AbstractUIPlugin implements IStartup {
 				return props.getProperty("version");
 			}
 		} catch (CoreException e) {
+			e.printStackTrace(System.err);
 			return "DEVELOPMENT";
 		}
 	}

@@ -72,11 +72,12 @@ public class NewJavaWizard extends Wizard implements INewWizard {
 		final String teamNumber = TeamNumberPage.getTeamNumberFromPage(teamNumberPage);
 		final String packageName = page.getPackage();
 		final ProjectType projectType = page.getProjectType();
+		final String worldName = page.getWorld();
 		System.out.println("Project: "+projectName+" Package: "+packageName+" Project Type: "+projectType);
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
-					doFinish(projectName, teamNumber, packageName, projectType, monitor);
+					doFinish(projectName, teamNumber, packageName, projectType, worldName, monitor);
 				} catch (CoreException e) {
 					throw new InvocationTargetException(e);
 				} finally {
@@ -102,11 +103,11 @@ public class NewJavaWizard extends Wizard implements INewWizard {
 	 * the editor on the newly created file.
 	 */
 
-	private void doFinish(String projectName, String teamNumber, String packageName, ProjectType projectType, IProgressMonitor monitor) throws CoreException {
+	private void doFinish(String projectName, String teamNumber, String packageName, ProjectType projectType, String worldName, IProgressMonitor monitor) throws CoreException {
     	Properties props = WPILibCore.getDefault().getProjectProperties(null);
     	props.setProperty("team-number", teamNumber);
     	WPILibCore.getDefault().saveGlobalProperties(props);
-		ProjectCreationUtils.createProject(new WPIRobotJavaProjectCreator(projectName, packageName, projectType));
+		ProjectCreationUtils.createProject(new WPIRobotJavaProjectCreator(projectName, packageName, projectType, worldName));
 	}
 
 	/**

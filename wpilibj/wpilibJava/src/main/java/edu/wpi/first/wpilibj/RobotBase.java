@@ -71,6 +71,20 @@ public abstract class RobotBase {
     }
 
     /**
+     * @return If the robot is running in simulation.
+     */
+    public static boolean isSimulation() {
+        return false;
+    }
+
+    /**
+     * @return If the robot is running in the real world.
+     */
+    public static boolean isReal() {
+        return true;
+    }
+
+    /**
      * Determine if the Robot is currently disabled.
      * @return True if the Robot is currently disabled by the field controls.
      */
