@@ -13,7 +13,8 @@ class TestBench {
 public:
 	/* Analog channels */
 	static const uint32_t kCameraGyroChannel = 0;
-	
+	static const uint32_t kFakeCompressorChannel = 1;
+
 	/* DIO channels */
 	static const uint32_t kTalonEncoderChannelA = 0;
 	static const uint32_t kTalonEncoderChannelB = 1;
@@ -25,12 +26,16 @@ public:
 	static const uint32_t kLoop1InputChannel = 7;
 	static const uint32_t kLoop2OutputChannel = 8;
 	static const uint32_t kLoop2InputChannel = 9;
-	
+
 	/* PWM channels */
-	static const uint32_t kTalonChannel = 0;
 	static const uint32_t kVictorChannel = 1;
 	static const uint32_t kJaguarChannel = 2;
 	static const uint32_t kCameraPanChannel = 8;
 	static const uint32_t kCameraTiltChannel = 9;
-};
 
+	/* MXP digital channels */
+	static const uint32_t kTalonChannel = 10;
+	static const uint32_t kFakePressureSwitchChannel = 11;
+	static const uint32_t kFakeSolenoid1Channel = 12;
+	static const uint32_t kFakeSolenoid2Channel = 13;
+};
