@@ -197,9 +197,8 @@ public class PIDController implements IUtility, LiveWindowSendable, Controller {
      * Free the PID object
      */
     public void free() {
-    	synchronized (this) {
-    		m_freed = true;
-		}
+    	m_freed = true;
+    	if(this.table!=null) table.removeTableListener(listener);
         m_controlLoop.cancel();
         m_pidInput = null;
     	m_pidOutput = null;
@@ -450,21 +449,10 @@ public class PIDController implements IUtility, LiveWindowSendable, Controller {
      * Set the percentage error which is considered tolerable for use with
      * OnTarget. (Input of 15.0 = 15 percent)
      * @param percent error which is tolerable
-     * @deprecated Use setTolerance(Tolerance), i.e. setTolerance(new PIDController.PercentageTolerance(15))
+     * @deprecated Use {@link #setPercentTolerance(double) or {@link #setAbsoluteTolerance(double)} instead.
      */
     public synchronized void setTolerance(double percent) {
         m_tolerance = new PercentageTolerance(percent);
-    }
-
-    /** Set the PID tolerance using a Tolerance object.
-     * Tolerance can be specified as a percentage of the range or as an absolute
-     * value. The Tolerance object encapsulates those options in an object. Use it by
-     * creating the type of tolerance that you want to use: setTolerance(new PIDController.AbsoluteTolerance(0.1))
-     * @param tolerance a tolerance object of the right type, e.g. PercentTolerance
-     * or AbsoluteTolerance
-     */
-    private void setTolerance(Tolerance tolerance) {
-        m_tolerance = tolerance;
     }
 
     /**
