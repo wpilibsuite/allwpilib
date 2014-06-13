@@ -657,7 +657,6 @@ public class Preferences {
                                 comment = null;
                             }
 
-                            System.out.println(name + "=" + values.get(name));
 
                             if (shouldBreak) {
                                 break;
