@@ -22,17 +22,17 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 
 	/**
 	 * Construct an analog channel on the default module.
-	 * 
+	 *
 	 * @param channel
 	 *            The channel number to represent.
 	 */
 	public AnalogChannel(final int channel) {
-		this(getDefaultAnalogModule(), channel);
+		this(1, channel);
 	}
 
 	/**
 	 * Construct an analog channel on a specified module.
-	 * 
+	 *
 	 * @param moduleNumber
 	 *            The digital module to use (1 or 2).
 	 * @param channel
@@ -58,7 +58,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * Get a scaled sample straight from this channel on the module. The value
 	 * is scaled to units of Volts using the calibrated scaling data from
 	 * getLSBWeight() and getOffset().
-	 * 
+	 *
 	 * @return A scaled sample straight from this channel on the module.
 	 */
 	public double getVoltage() {
@@ -72,7 +72,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 * oversampling will cause this value to be higher resolution, but it will
 	 * update more slowly. Using averaging will cause this value to be more
 	 * stable, but it will update more slowly.
-	 * 
+	 *
 	 * @return A scaled sample from the output of the oversample and average
 	 *         engine for this channel.
 	 */
@@ -82,7 +82,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 
 	/**
 	 * Get the channel number.
-	 * 
+	 *
 	 * @return The channel number.
 	 */
 	public int getChannel() {
@@ -91,7 +91,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 
 	/**
 	 * Gets the number of the analog module this channel is on.
-	 * 
+	 *
 	 * @return The module number of the analog module this channel is on.
 	 */
 	public int getModuleNumber() {
@@ -100,7 +100,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 
 	/*
 	 * Get the average value for use with PIDController
-	 * 
+	 *
 	 * @return the average value
 	 */
 	public double pidGet() {

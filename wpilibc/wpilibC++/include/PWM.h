@@ -13,12 +13,12 @@ class DigitalModule;
 
 /**
  * Class implements the PWM generation in the FPGA.
- * 
+ *
  * The values supplied as arguments for PWM outputs range from -1.0 to 1.0. They are mapped
  * to the hardware dependent values, in this case 0-255 for the FPGA.
  * Changes are immediately sent to the FPGA, and the update occurs at the next
  * FPGA cycle. There is no delay.
- * 
+ *
  * As of revision 0.1.10 of the FPGA, the FPGA interprets the 0-255 values as follows:
  *   - 255 = full "forward"
  *   - 254 to 129 = linear scaling from "full forward" to "center"
@@ -39,7 +39,6 @@ public:
 	};
 
 	explicit PWM(uint32_t channel);
-	PWM(uint8_t moduleNumber, uint32_t channel);
 	virtual ~PWM();
 	virtual void SetRaw(unsigned short value);
 	virtual unsigned short GetRaw();
@@ -52,7 +51,6 @@ public:
 	{
 		return m_channel;
 	}
-	uint32_t GetModuleNumber();
 
 protected:
 	/**
@@ -105,7 +103,7 @@ protected:
 	ITable *m_table;
 
 private:
-	void InitPWM(uint8_t moduleNumber, uint32_t channel);
+	void InitPWM(uint32_t channel);
 	uint32_t m_channel;
 	DigitalModule *m_module;
 	int32_t GetMaxPositivePwm()

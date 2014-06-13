@@ -13,7 +13,7 @@ class SPI;
 
 /**
  * ADXL345 Accelerometer on SPI.
- * 
+ *
  * This class alows access to an Analog Devices ADXL345 3-axis accelerometer via SPI.
  * This class assumes the sensor is wired in 4-wire SPI mode.
  */
@@ -44,7 +44,7 @@ public:
 		DigitalOutput &cs, DataFormat_Range range=kRange_2G);
 	ADXL345_SPI(DigitalOutput *clk, DigitalOutput *mosi, DigitalInput *miso,
 		DigitalOutput *cs, DataFormat_Range range=kRange_2G);
-	ADXL345_SPI(uint8_t moduleNumber, uint32_t clk, uint32_t mosi, uint32_t miso, uint32_t cs,
+	ADXL345_SPI(uint32_t clk, uint32_t mosi, uint32_t miso, uint32_t cs,
 		DataFormat_Range range=kRange_2G);
 	virtual ~ADXL345_SPI();
 	virtual double GetAcceleration(Axes axis);

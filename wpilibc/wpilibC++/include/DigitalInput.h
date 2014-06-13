@@ -21,7 +21,6 @@ class DigitalInput : public DigitalSource, public LiveWindowSendable
 {
 public:
 	explicit DigitalInput(uint32_t channel);
-	DigitalInput(uint8_t moduleNumber, uint32_t channel);
 	virtual ~DigitalInput();
 	uint32_t Get();
 	uint32_t GetChannel();
@@ -44,7 +43,7 @@ public:
 	ITable * GetTable();
 
 private:
-	void InitDigitalInput(uint8_t moduleNumber, uint32_t channel);
+	void InitDigitalInput(uint32_t channel);
 	uint32_t m_channel;
 	DigitalModule *m_module;
 	bool m_lastValue;

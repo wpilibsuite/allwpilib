@@ -32,34 +32,19 @@ public class Accelerometer extends SensorBase implements PIDSource, ISensor, Liv
      * Common initialization
      */
     private void initAccelerometer() {
-        UsageReporting.report(tResourceType.kResourceType_Accelerometer, m_analogChannel.getChannel(), m_analogChannel.getModuleNumber()-1);
-        LiveWindow.addSensor("Accelerometer", m_analogChannel.getModuleNumber(), m_analogChannel.getChannel(), this);
+        UsageReporting.report(tResourceType.kResourceType_Accelerometer, m_analogChannel.getChannel());
+        LiveWindow.addSensor("Accelerometer", m_analogChannel.getChannel(), this);
     }
 
     /**
      * Create a new instance of an accelerometer.
      *
-     * The accelerometer is assumed to be in the first analog module in the given analog channel. The
-     * constructor allocates desired analog channel.
-     * @param channel the port that the accelerometer is on on the default module
+     * The constructor allocates desired analog channel.
+     * @param channel the port that the accelerometer is on
      */
     public Accelerometer(final int channel) {
         m_allocatedChannel = true;
         m_analogChannel = new AnalogInput(channel);
-        initAccelerometer();
-    }
-
-    /**
-     * Create new instance of accelerometer.
-     *
-     * Make a new instance of the accelerometer given a module and channel. The constructor allocates
-     * the desired analog channel from the specified module
-     * @param slot the slot that the module is in
-     * @param channel the port that the Accelerometer is on on the module
-     */
-    public Accelerometer(final int slot, final int channel) {
-        m_allocatedChannel = true;
-        m_analogChannel = new AnalogInput(slot, channel);
         initAccelerometer();
     }
 

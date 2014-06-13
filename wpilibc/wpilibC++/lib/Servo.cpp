@@ -27,30 +27,17 @@ void Servo::InitServo()
 	SetBounds(kDefaultMaxServoPWM, 0.0, 0.0, 0.0, kDefaultMinServoPWM);
 	SetPeriodMultiplier(kPeriodMultiplier_4X);
 
-	LiveWindow::GetInstance()->AddActuator("Servo", GetModuleNumber(), GetChannel(), this);
-	HALReport(HALUsageReporting::kResourceType_Servo, GetChannel(), GetModuleNumber() - 1);
+	LiveWindow::GetInstance()->AddActuator("Servo", GetChannel(), this);
+	HALReport(HALUsageReporting::kResourceType_Servo, GetChannel());
 }
 
 /**
- * Constructor that assumes the default digital module.
- *
- * @param channel The PWM channel on the digital module to which the servo is attached.
+ * @param channel The PWM channel to which the servo is attached.
  */
 Servo::Servo(uint32_t channel) : SafePWM(channel)
 {
 	InitServo();
 //	printf("Done initializing servo %d\n", channel);
-}
-
-/**
- * Constructor that specifies the digital module.
- *
- * @param moduleNumber The digital module (1 or 2).
- * @param channel The PWM channel on the digital module to which the servo is attached (1..10).
- */
-Servo::Servo(uint8_t moduleNumber, uint32_t channel) : SafePWM(moduleNumber, channel)
-{
-	InitServo();
 }
 
 Servo::~Servo()
@@ -71,7 +58,7 @@ void Servo::Set(float value)
 
 /**
  * Set the servo to offline.
- * 
+ *
  * Set the servo raw value to 0 (undriven)
  */
 void Servo::SetOffline() {
@@ -160,5 +147,3 @@ void Servo::InitTable(ITable *subTable) {
 ITable * Servo::GetTable() {
 	return m_table;
 }
-
-

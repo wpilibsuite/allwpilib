@@ -1,6 +1,8 @@
-/*
- * Compressor.h
- */
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+/*----------------------------------------------------------------------------*/
 
 #ifndef Compressor_H_
 #define Compressor_H_
@@ -11,24 +13,20 @@
 #include "LiveWindow/LiveWindowSendable.h"
 
 /**
- * CAN pneumatic control module compressor
- *
- *  Created on: May 28, 2014
- *      Author: Thomas Clark
- *
+ * PCM compressor
  */
 class Compressor: public SensorBase, public LiveWindowSendable, public ITableListener {
 public:
-	Compressor(uint8_t module);
+	explicit Compressor(uint8_t pcmID);
 	Compressor();
-	~Compressor();
+	virtual ~Compressor();
 
 	void Start();
 	void Stop();
 	bool Enabled();
 
 	bool GetPressureSwitchValue();
-	
+
 	float GetCompressorCurrent();
 
 	void SetClosedLoopControl(bool on);

@@ -10,7 +10,6 @@
 #include "LiveWindow/LiveWindowSendable.h"
 
 class AnalogInput;
-class AnalogModule;
 
 /**
  * Use a rate gyro to return the robots heading relative to a starting position.
@@ -18,7 +17,7 @@ class AnalogModule;
  * rotates the new heading is computed by integrating the rate of rotation returned
  * by the sensor. When the class is instantiated, it does a short calibration routine
  * where it samples the gyro while at rest to determine the default offset. This is
- * subtracted from each sample to determine the heading. This gyro class must be used 
+ * subtracted from each sample to determine the heading. This gyro class must be used
  * with a channel that is assigned one of the Analog accumulators from the FPGA. See
  * AnalogInput for the current accumulator assignments.
  */
@@ -31,7 +30,6 @@ public:
 	static constexpr float kCalibrationSampleTime = 5.0;
 	static constexpr float kDefaultVoltsPerDegreePerSecond = 0.007;
 
-	Gyro(uint8_t moduleNumber, uint32_t channel);
 	explicit Gyro(uint32_t channel);
 	explicit Gyro(AnalogInput *channel);
 	explicit Gyro(AnalogInput &channel);

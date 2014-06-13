@@ -5,7 +5,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Accelerometer.h"
-#include "AnalogModule.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
@@ -18,35 +17,18 @@ void Accelerometer::InitAccelerometer()
 	m_table = NULL;
 	m_voltsPerG = 1.0;
 	m_zeroGVoltage = 2.5;
-	HALReport(HALUsageReporting::kResourceType_Accelerometer, m_AnalogInput->GetChannel(), m_AnalogInput->GetModuleNumber() - 1);
-	LiveWindow::GetInstance()->AddSensor("Accelerometer", m_AnalogInput->GetModuleNumber(), m_AnalogInput->GetChannel(), this);
+	HALReport(HALUsageReporting::kResourceType_Accelerometer, m_AnalogInput->GetChannel());
+	LiveWindow::GetInstance()->AddSensor("Accelerometer", m_AnalogInput->GetChannel(), this);
 }
 
 /**
  * Create a new instance of an accelerometer.
- * 
- * The accelerometer is assumed to be in the first analog module in the given analog channel. The
- * constructor allocates desired analog channel.
+ *
+ * The constructor allocates desired analog input.
  */
 Accelerometer::Accelerometer(uint32_t channel)
 {
 	m_AnalogInput = new AnalogInput(channel);
-	m_allocatedChannel = true;
-	InitAccelerometer();
-}
-
-/**
- * Create new instance of accelerometer.
- * 
- * Make a new instance of the accelerometer given a module and channel. The constructor allocates
- * the desired analog channel from the specified module
- *
- * @param moduleNumber The analog module (1 or 2).
- * @param channel The analog channel (1..8)
- */
-Accelerometer::Accelerometer(uint8_t moduleNumber, uint32_t channel)
-{
-	m_AnalogInput = new AnalogInput(moduleNumber, channel);
 	m_allocatedChannel = true;
 	InitAccelerometer();
 }
@@ -70,7 +52,7 @@ Accelerometer::Accelerometer(AnalogInput *channel)
 	}
 	m_allocatedChannel = false;
 }
-	
+
 /**
  * Delete the analog components used for the accelerometer.
  */
@@ -84,9 +66,9 @@ Accelerometer::~Accelerometer()
 
 /**
  * Return the acceleration in Gs.
- * 
+ *
  * The acceleration is returned units of Gs.
- * 
+ *
  * @return The current acceleration of the sensor in Gs.
  */
 float Accelerometer::GetAcceleration()
@@ -96,10 +78,10 @@ float Accelerometer::GetAcceleration()
 
 /**
  * Set the accelerometer sensitivity.
- * 
+ *
  * This sets the sensitivity of the accelerometer used for calculating the acceleration.
  * The sensitivity varys by accelerometer model. There are constants defined for various models.
- * 
+ *
  * @param sensitivity The sensitivity of accelerometer in Volts per G.
  */
 void Accelerometer::SetSensitivity(float sensitivity)
@@ -109,9 +91,9 @@ void Accelerometer::SetSensitivity(float sensitivity)
 
 /**
  * Set the voltage that corresponds to 0 G.
- * 
+ *
  * The zero G voltage varys by accelerometer model. There are constants defined for various models.
- * 
+ *
  * @param zero The zero G voltage.
  */
 void Accelerometer::SetZero(float zero)
@@ -121,9 +103,9 @@ void Accelerometer::SetZero(float zero)
 
 /**
  * Get the Acceleration for the PID Source parent.
- * 
+ *
  * @return The current acceleration in Gs.
- */ 
+ */
 double Accelerometer::PIDGet()
 {
 	return GetAcceleration();
@@ -153,4 +135,3 @@ void Accelerometer::InitTable(ITable *subTable) {
 ITable * Accelerometer::GetTable() {
 	return m_table;
 }
-

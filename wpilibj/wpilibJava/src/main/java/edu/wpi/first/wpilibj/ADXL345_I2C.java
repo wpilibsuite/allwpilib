@@ -74,11 +74,10 @@ public class ADXL345_I2C extends SensorBase {
     /**
      * Constructor.
      *
-     * @param module The slot of the digital module that the sensor is plugged into.
      * @param range The range (+ or -) that the accelerometer will measure.
      */
-    public ADXL345_I2C(int moduleNumber, DataFormat_Range range) {
-        DigitalModule module = DigitalModule.getInstance(moduleNumber);
+    public ADXL345_I2C(DataFormat_Range range) {
+        DigitalModule module = DigitalModule.getInstance(1);
         m_i2c = module.getI2C(kAddress);
 
         // Turn on the measurements
@@ -86,7 +85,7 @@ public class ADXL345_I2C extends SensorBase {
         // Specify the data format to read
         m_i2c.write(kDataFormatRegister, kDataFormat_FullRes | range.value);
 
-        UsageReporting.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_I2C, moduleNumber-1);
+        UsageReporting.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_I2C);
     }
 
     /**

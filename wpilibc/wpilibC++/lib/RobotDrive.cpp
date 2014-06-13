@@ -47,8 +47,8 @@ void RobotDrive::InitRobotDrive() {
  * Set up parameters for a two wheel drive system where the
  * left and right motor pwm channels are specified in the call.
  * This call assumes Jaguars for controlling the motors.
- * @param leftMotorChannel The PWM channel number on the default digital module that drives the left motor.
- * @param rightMotorChannel The PWM channel number on the default digital module that drives the right motor.
+ * @param leftMotorChannel The PWM channel number that drives the left motor.
+ * @param rightMotorChannel The PWM channel number that drives the right motor.
  */
 RobotDrive::RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel)
 {
@@ -68,10 +68,10 @@ RobotDrive::RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel)
  * Set up parameters for a four wheel drive system where all four motor
  * pwm channels are specified in the call.
  * This call assumes Jaguars for controlling the motors.
- * @param frontLeftMotor Front left motor channel number on the default digital module
- * @param rearLeftMotor Rear Left motor channel number on the default digital module
- * @param frontRightMotor Front right motor channel number on the default digital module
- * @param rearRightMotor Rear Right motor channel number on the default digital module
+ * @param frontLeftMotor Front left motor channel number
+ * @param rearLeftMotor Rear Left motor channel number
+ * @param frontRightMotor Front right motor channel number
+ * @param rearRightMotor Rear Right motor channel number
  */
 RobotDrive::RobotDrive(uint32_t frontLeftMotor, uint32_t rearLeftMotor,
 		uint32_t frontRightMotor, uint32_t rearRightMotor)
@@ -472,7 +472,7 @@ void RobotDrive::ArcadeDrive(float moveValue, float rotateValue, bool squaredInp
  * A method for driving with Mecanum wheeled robots. There are 4 wheels
  * on the robot, arranged so that the front and back wheels are toed in 45 degrees.
  * When looking at the wheels from the top, the roller axles should form an X across the robot.
- * 
+ *
  * This is designed to be directly driven by joystick axes.
  *
  * @param x The speed that the robot should drive in the X direction. [-1.0..1.0]
@@ -514,7 +514,7 @@ void RobotDrive::MecanumDrive_Cartesian(float x, float y, float rotation, float 
 	m_rearRightMotor->Set(wheelSpeeds[kRearRightMotor] * m_invertedMotors[kRearRightMotor] * m_maxOutput, syncGroup);
 
 	CANJaguar::UpdateSyncGroup(syncGroup);
-	
+
 	m_safetyHelper->Feed();
 }
 
@@ -563,7 +563,7 @@ void RobotDrive::MecanumDrive_Polar(float magnitude, float direction, float rota
 	m_rearRightMotor->Set(wheelSpeeds[kRearRightMotor] * m_invertedMotors[kRearRightMotor] * m_maxOutput, syncGroup);
 
 	CANJaguar::UpdateSyncGroup(syncGroup);
-	
+
 	m_safetyHelper->Feed();
 }
 
@@ -679,7 +679,7 @@ void RobotDrive::SetInvertedMotor(MotorType motor, bool isInverted)
 
 /**
  * Set the turning sensitivity.
- * 
+ *
  * This only impacts the Drive() entry-point.
  * @param sensitivity Effectively sets the turning sensitivity (or turn radius for a given value)
  */

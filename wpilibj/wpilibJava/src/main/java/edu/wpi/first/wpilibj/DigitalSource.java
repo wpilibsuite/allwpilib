@@ -25,34 +25,26 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
  */
 public abstract class DigitalSource extends InterruptableSensorBase {
 
-	protected static Resource channels = new Resource(kDigitalChannels
-			* kDigitalModules);
+	protected static Resource channels = new Resource(kDigitalChannels);
 	protected ByteBuffer m_port;
-	protected int m_moduleNumber, m_channel;
+	protected int m_channel;
 
-	protected void initDigitalPort(int moduleNumber, int channel, boolean input) {
+	protected void initDigitalPort(int channel, boolean input) {
 
 		m_channel = channel;
-		m_moduleNumber = moduleNumber;
-		if (DIOJNI.checkDigitalModule((byte) m_moduleNumber) != 1) {
-			throw new AllocationException("Digital input " + m_channel
-					+ " on module " + m_moduleNumber
-					+ " cannot be allocated. Module is not present.");
-		}
+
 		checkDigitalChannel(m_channel); // XXX: Replace with
 										// HALLibrary.checkDigitalChannel when
 										// implemented
 
 		try {
-			channels.allocate((m_moduleNumber - 1) * kDigitalChannels
-					+ m_channel);
+			channels.allocate(m_channel);
 		} catch (CheckedAllocationException ex) {
 			throw new AllocationException("Digital input " + m_channel
-					+ " on module " + m_moduleNumber + " is already allocated");
+					+ " is already allocated");
 		}
 
-		ByteBuffer port_pointer = DIOJNI.getPortWithModule(
-				(byte) moduleNumber, (byte) channel);
+		ByteBuffer port_pointer = DIOJNI.getPortWithModule((byte) 1, (byte) channel);
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
@@ -63,19 +55,18 @@ public abstract class DigitalSource extends InterruptableSensorBase {
 	}
 
 	public void free() {
-		channels.free(((m_moduleNumber - 1) * kDigitalChannels + m_channel));
+		channels.free(m_channel);
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
 		DIOJNI.freeDIO(m_port, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
 		m_channel = 0;
-		m_moduleNumber = 0;
 	}
 
 	/**
 	 * Get the channel routing number
-	 * 
+	 *
 	 * @return channel routing number
 	 */
 	public int getChannelForRouting() {
@@ -84,16 +75,16 @@ public abstract class DigitalSource extends InterruptableSensorBase {
 
 	/**
 	 * Get the module routing number
-	 * 
-	 * @return module routing number
+	 *
+	 * @return 0
 	 */
 	public int getModuleForRouting() {
-		return m_moduleNumber - 1;
+		return 0;
 	}
 
 	/**
 	 * Is this an analog trigger
-	 * 
+	 *
 	 * @return true if this is an analog trigger
 	 */
 	public boolean getAnalogTriggerForRouting() {

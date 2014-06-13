@@ -34,16 +34,6 @@ public class SafePWM extends PWM implements MotorSafety {
         initSafePWM();
     }
 
-    /**
-     * Constructor for a SafePWM object taking channel and slot numbers.
-     * @param slot The slot number of the digital module for this PWM object
-     * @param channel The channel number in the module for this PWM object
-     */
-    public SafePWM(final int slot, final int channel) {
-        super(slot, channel);
-        initSafePWM();
-    }
-
     /*
      * Set the expiration time for the PWM object
      * @param timeout The timeout (in seconds) for this motor object
@@ -100,7 +90,7 @@ public class SafePWM extends PWM implements MotorSafety {
     }
 
     public String getDescription() {
-        return "PWM "+getChannel()+" on module "+getModuleNumber();
+        return "PWM "+getChannel();
     }
 
     public void disable() {

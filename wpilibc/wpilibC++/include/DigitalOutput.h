@@ -20,7 +20,6 @@ class DigitalOutput : public DigitalSource, public ITableListener, public LiveWi
 {
 public:
 	explicit DigitalOutput(uint32_t channel);
-	DigitalOutput(uint8_t moduleNumber, uint32_t channel);
 	virtual ~DigitalOutput();
 	void Set(uint32_t value);
 	uint32_t GetChannel();
@@ -49,7 +48,7 @@ public:
 	ITable * GetTable();
 
 private:
-	void InitDigitalOutput(uint8_t moduleNumber, uint32_t channel);
+	void InitDigitalOutput(uint32_t channel);
 
 	uint32_t m_channel;
 	uint32_t m_pwmGenerator;

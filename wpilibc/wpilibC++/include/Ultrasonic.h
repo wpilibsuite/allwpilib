@@ -36,8 +36,6 @@ public:
 	Ultrasonic(DigitalOutput *pingChannel, DigitalInput *echoChannel, DistanceUnit units = kInches);
 	Ultrasonic(DigitalOutput &pingChannel, DigitalInput &echoChannel, DistanceUnit units = kInches);
 	Ultrasonic(uint32_t pingChannel, uint32_t echoChannel, DistanceUnit units = kInches);
-	Ultrasonic(uint8_t pingModuleNumber, uint32_t pingChannel, uint8_t echoModuleNumber,
-			uint32_t echoChannel, DistanceUnit units = kInches);
 	virtual ~Ultrasonic();
 
 	void Ping();
@@ -53,7 +51,7 @@ public:
 	{
 		m_enabled = enable;
 	}
-	
+
 	double PIDGet();
 	void SetDistanceUnits(DistanceUnit units);
 	DistanceUnit GetDistanceUnits();
@@ -90,4 +88,3 @@ private:
 
 	ITable *m_table;
 };
-

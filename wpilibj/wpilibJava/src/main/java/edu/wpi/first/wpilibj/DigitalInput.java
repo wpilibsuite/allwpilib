@@ -34,35 +34,21 @@ public class DigitalInput extends DigitalSource implements IInputOutput,
 
 	/**
 	 * Create an instance of a Digital Input class. Creates a digital input
-	 * given a channel and uses the default module.
-	 * 
+	 * given a channel.
+	 *
 	 * @param channel
 	 *            the port for the digital input
 	 */
 	public DigitalInput(int channel) {
-		this(getDefaultDigitalModule(), channel);
-	}
+        initDigitalPort(channel, true);
 
-	/**
-	 * Create an instance of a Digital Input class. Creates a digital input
-	 * given an channel and module.
-	 * 
-	 * @param moduleNumber
-	 *            The number of the digital module to use for this input
-	 * @param channel
-	 *            the port for the digital input
-	 */
-	public DigitalInput(int moduleNumber, int channel) {
-		initDigitalPort(moduleNumber, channel, true);
-
-		UsageReporting.report(tResourceType.kResourceType_DigitalInput,
-				channel, moduleNumber - 1);
+        UsageReporting.report(tResourceType.kResourceType_DigitalInput, channel);
 	}
 
 	/**
 	 * Get the value from a digital input channel. Retrieve the value of a
 	 * single digital input channel from the FPGA.
-	 * 
+	 *
 	 * @return the stats of the digital input
 	 */
 	public boolean get() {
@@ -76,7 +62,7 @@ public class DigitalInput extends DigitalSource implements IInputOutput,
 
 	/**
 	 * Get the channel of the digital input
-	 * 
+	 *
 	 * @return The GPIO channel number that this object represents.
 	 */
 	public int getChannel() {
@@ -89,7 +75,7 @@ public class DigitalInput extends DigitalSource implements IInputOutput,
 
 	/**
 	 * Request interrupts asynchronously on this digital input.
-	 * 
+	 *
 	 * @param handler
 	 *            The address of the interrupt handler function of type
 	 *            tInterruptHandler that will be called whenever there is an
@@ -150,7 +136,7 @@ public class DigitalInput extends DigitalSource implements IInputOutput,
 
 	/**
 	 * Set which edge to trigger interrupts on
-	 * 
+	 *
 	 * @param risingEdge
 	 *            true to interrupt on rising edge
 	 * @param fallingEdge

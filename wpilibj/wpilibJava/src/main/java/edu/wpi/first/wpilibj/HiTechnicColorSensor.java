@@ -109,7 +109,7 @@ public class HiTechnicColorSensor extends SensorBase implements ISensor, LiveWin
             throw new ColorSensorException("Invalid Sensor type");
         }
 
-        LiveWindow.addSensor("HiTechnicColorSensor", slot, 0, this);
+        LiveWindow.addSensor("HiTechnicColorSensor", slot, this);
         UsageReporting.report(tResourceType.kResourceType_HiTechnicColorSensor, module.getModuleNumber()-1);
     }
 

@@ -5,9 +5,9 @@
 #include "Compressor.h"
 #include "WPIErrors.h"
 
-void Compressor::InitCompressor(uint8_t module) {
+void Compressor::InitCompressor(uint8_t pcmID) {
 	m_table = 0;
-	m_pcm_pointer = initializeCompressor(module);
+	m_pcm_pointer = initializeCompressor(pcmID);
 
 	SetClosedLoopControl(true);
 }
@@ -26,8 +26,8 @@ Compressor::Compressor() {
  *
  * @param module The module number to use (1 or 2)
  */
-Compressor::Compressor(uint8_t module) {
-	InitCompressor(module);
+Compressor::Compressor(uint8_t pcmID) {
+	InitCompressor(pcmID);
 }
 
 Compressor::~Compressor() {
@@ -160,4 +160,3 @@ void Compressor::ValueChanged(ITable* source, const std::string& key, EntryValue
 	else Stop();
 
 }
-

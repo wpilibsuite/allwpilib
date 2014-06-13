@@ -82,12 +82,12 @@ void CANJaguar::InitCANJaguar()
 	m_safetyHelper = new MotorSafetyHelper(this);
 
 	HALReport(HALUsageReporting::kResourceType_CANJaguar, m_deviceNumber, m_controlMode);
-	LiveWindow::GetInstance()->AddActuator("CANJaguar", m_deviceNumber, 0, this);
+	LiveWindow::GetInstance()->AddActuator("CANJaguar", m_deviceNumber, this);
 }
 
 /**
  * Constructor
- * 
+ *
  * @param deviceNumber The the address of the Jaguar on the CAN bus.
  */
 CANJaguar::CANJaguar(uint8_t deviceNumber, ControlMode controlMode)
@@ -109,15 +109,15 @@ CANJaguar::~CANJaguar()
 }
 
 /**
- * Set the output set-point value.  
- * 
+ * Set the output set-point value.
+ *
  * The scale and the units depend on the mode the Jaguar is in.
  * In PercentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWM Jaguar).
  * In Voltage Mode, the outputValue is in Volts.
  * In Current Mode, the outputValue is in Amps.
  * In Speed Mode, the outputValue is in Rotations/Minute.
  * In Position Mode, the outputValue is in Rotations.
- * 
+ *
  * @param outputValue The set-point to sent to the motor controller.
  * @param syncGroup The update group to add this Set() to, pending UpdateSyncGroup().  If 0, update immediately.
  */
@@ -231,7 +231,7 @@ void CANJaguar::SetNoAck(float outputValue, uint8_t syncGroup)
 		dataSize++;
 	}
 	{	//setTransaction(messageID, dataBuffer, dataSize);
-	
+
 		//uint32_t ackMessageID = LM_API_ACK | m_deviceNumber;
 		int32_t localStatus = 0;
 
@@ -245,11 +245,11 @@ void CANJaguar::SetNoAck(float outputValue, uint8_t syncGroup)
 
 		// Throw away any stale acks.
 		//receiveMessage(&ackMessageID, NULL, 0, 0.0f);
-		
+
 		// Send the message with the data.
 		localStatus = sendMessage(messageID | m_deviceNumber, dataBuffer, dataSize);
 		wpi_setErrorWithContext(localStatus, "sendMessage");
-		
+
 		// Wait for an ack.
 		//localStatus = receiveMessage(&ackMessageID, NULL, 0);
 		//wpi_setErrorWithContext(localStatus, "receiveMessage");
@@ -257,21 +257,21 @@ void CANJaguar::SetNoAck(float outputValue, uint8_t syncGroup)
 		// Transaction complete.
 		giveMutex(m_transactionSemaphore);
 	}
-	
-	
+
+
 	if (m_safetyHelper) m_safetyHelper->Feed();
 }
 
 /**
  * Get the recently set outputValue setpoint.
- * 
+ *
  * The scale and the units depend on the mode the Jaguar is in.
  * In PercentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWM Jaguar).
  * In Voltage Mode, the outputValue is in Volts.
  * In Current Mode, the outputValue is in Amps.
  * In Speed Mode, the outputValue is in Rotations/Minute.
  * In Position Mode, the outputValue is in Rotations.
- * 
+ *
  * @return The most recently set outputValue setpoint.
  */
 float CANJaguar::Get()
@@ -322,7 +322,7 @@ float CANJaguar::Get()
 
 /**
  * Common interface for disabling a motor.
- * 
+ *
  * @deprecated Call DisableControl instead.
  */
 void CANJaguar::Disable()
@@ -332,9 +332,9 @@ void CANJaguar::Disable()
 
 /**
  * Write out the PID value as seen in the PIDOutput base object.
- * 
+ *
  * @deprecated Call Set instead.
- * 
+ *
  * @param output Write out the PercentVbus value as was computed by the PIDController
  */
 void CANJaguar::PIDWrite(float output)
@@ -417,10 +417,10 @@ int32_t CANJaguar::unpackint32_t(uint8_t *buffer)
 
 /**
  * Send a message on the CAN bus through the CAN driver in FRC_NetworkCommunication
- * 
+ *
  * Trusted messages require a 2-byte token at the beginning of the data payload.
  * If the message being sent is trusted, make space for the token.
- * 
+ *
  * @param messageID The messageID to be used on the CAN bus
  * @param data The up to 8 bytes of data to be sent with the message
  * @param dataSize Specify how much of the data in "data" to send
@@ -464,7 +464,7 @@ int32_t CANJaguar::sendMessage(uint32_t messageID, const uint8_t *data, uint8_t 
 
 /**
  * Receive a message from the CAN bus through the CAN driver in FRC_NetworkCommunication
- * 
+ *
  * @param messageID The messageID to read from the CAN bus
  * @param data The up to 8 bytes of data that was received with the message
  * @param dataSize Indicates how much data was received
@@ -482,10 +482,10 @@ int32_t CANJaguar::receiveMessage(uint32_t *messageID, uint8_t *data, uint8_t *d
 
 /**
  * Execute a transaction with a Jaguar that sets some property.
- * 
+ *
  * Jaguar always acks when it receives a message.  If we don't wait for an ack,
  * the message object in the Jaguar could get overwritten before it is handled.
- * 
+ *
  * @param messageID The messageID to be used on the CAN bus (device number is added internally)
  * @param data The up to 8 bytes of data to be sent with the message
  * @param dataSize Specify how much of the data in "data" to send
@@ -518,9 +518,9 @@ void CANJaguar::setTransaction(uint32_t messageID, const uint8_t *data, uint8_t 
 
 /**
  * Execute a transaction with a Jaguar that gets some property.
- * 
+ *
  * Jaguar always generates a message with the same message ID when replying.
- * 
+ *
  * @param messageID The messageID to read from the CAN bus (device number is added internally)
  * @param data The up to 8 bytes of data that was received with the message
  * @param dataSize Indicates how much data was received
@@ -559,9 +559,9 @@ void CANJaguar::getTransaction(uint32_t messageID, uint8_t *data, uint8_t *dataS
 
 /**
  * Set the reference source device for speed controller mode.
- * 
+ *
  * Choose encoder as the source of speed feedback when in speed control mode.
- * 
+ *
  * @param reference Specify a SpeedReference.
  */
 void CANJaguar::SetSpeedReference(SpeedReference reference)
@@ -574,7 +574,7 @@ void CANJaguar::SetSpeedReference(SpeedReference reference)
 
 /**
  * Get the reference source device for speed controller mode.
- * 
+ *
  * @return A SpeedReference indicating the currently selected reference device for speed controller mode.
  */
 CANJaguar::SpeedReference CANJaguar::GetSpeedReference()
@@ -592,10 +592,10 @@ CANJaguar::SpeedReference CANJaguar::GetSpeedReference()
 
 /**
  * Set the reference source device for position controller mode.
- * 
+ *
  * Choose between using and encoder and using a potentiometer
  * as the source of position feedback when in position control mode.
- * 
+ *
  * @param reference Specify a PositionReference.
  */
 void CANJaguar::SetPositionReference(PositionReference reference)
@@ -608,7 +608,7 @@ void CANJaguar::SetPositionReference(PositionReference reference)
 
 /**
  * Get the reference source device for position controller mode.
- * 
+ *
  * @return A PositionReference indicating the currently selected reference device for position controller mode.
  */
 CANJaguar::PositionReference CANJaguar::GetPositionReference()
@@ -626,7 +626,7 @@ CANJaguar::PositionReference CANJaguar::GetPositionReference()
 
 /**
  * Set the P, I, and D constants for the closed loop modes.
- * 
+ *
  * @param p The proportional gain of the Jaguar's PID controller.
  * @param i The integral gain of the Jaguar's PID controller.
  * @param d The differential gain of the Jaguar's PID controller.
@@ -671,7 +671,7 @@ void CANJaguar::SetPID(double p, double i, double d)
 
 /**
  * Get the Proportional gain of the controller.
- * 
+ *
  * @return The proportional gain.
  */
 double CANJaguar::GetP()
@@ -712,7 +712,7 @@ double CANJaguar::GetP()
 
 /**
  * Get the Intregral gain of the controller.
- * 
+ *
  * @return The integral gain.
  */
 double CANJaguar::GetI()
@@ -753,7 +753,7 @@ double CANJaguar::GetI()
 
 /**
  * Get the Differential gain of the controller.
- * 
+ *
  * @return The differential gain.
  */
 double CANJaguar::GetD()
@@ -794,12 +794,12 @@ double CANJaguar::GetD()
 
 /**
  * Enable the closed loop controller.
- * 
+ *
  * Start actually controlling the output based on the feedback.
  * If starting a position controller with an encoder reference,
  * use the encoderInitialPosition parameter to initialize the
  * encoder state.
- * 
+ *
  * @param encoderInitialPosition Encoder position to set if position with encoder reference.  Ignored otherwise.
  */
 void CANJaguar::EnableControl(double encoderInitialPosition)
@@ -830,7 +830,7 @@ void CANJaguar::EnableControl(double encoderInitialPosition)
 
 /**
  * Disable the closed loop controller.
- * 
+ *
  * Stop driving the output based on the feedback.
  */
 void CANJaguar::DisableControl()
@@ -860,10 +860,10 @@ void CANJaguar::DisableControl()
 
 /**
  * Change the control mode of this Jaguar object.
- * 
+ *
  * After changing modes, configure any PID constants or other settings needed
  * and then EnableControl() to actually change the mode on the Jaguar.
- * 
+ *
  * @param controlMode The new mode.
  */
 void CANJaguar::ChangeControlMode(ControlMode controlMode)
@@ -879,9 +879,9 @@ void CANJaguar::ChangeControlMode(ControlMode controlMode)
 
 /**
  * Get the active control mode from the Jaguar.
- * 
+ *
  * Ask the Jag what mode it is in.
- * 
+ *
  * @return ControlMode that the Jag is in.
  */
 CANJaguar::ControlMode CANJaguar::GetControlMode()
@@ -899,7 +899,7 @@ CANJaguar::ControlMode CANJaguar::GetControlMode()
 
 /**
  * Get the voltage at the battery input terminals of the Jaguar.
- * 
+ *
  * @return The bus voltage in Volts.
  */
 float CANJaguar::GetBusVoltage()
@@ -917,7 +917,7 @@ float CANJaguar::GetBusVoltage()
 
 /**
  * Get the voltage being output from the motor terminals of the Jaguar.
- * 
+ *
  * @return The output voltage in Volts.
  */
 float CANJaguar::GetOutputVoltage()
@@ -936,7 +936,7 @@ float CANJaguar::GetOutputVoltage()
 
 /**
  * Get the current through the motor terminals of the Jaguar.
- * 
+ *
  * @return The output current in Amps.
  */
 float CANJaguar::GetOutputCurrent()
@@ -954,7 +954,7 @@ float CANJaguar::GetOutputCurrent()
 
 /**
  * Get the internal temperature of the Jaguar.
- * 
+ *
  * @return The temperature of the Jaguar in degrees Celsius.
  */
 float CANJaguar::GetTemperature()
@@ -972,7 +972,7 @@ float CANJaguar::GetTemperature()
 
 /**
  * Get the position of the encoder or potentiometer.
- * 
+ *
  * @return The position of the motor in rotations based on the configured feedback.
  */
 double CANJaguar::GetPosition()
@@ -990,7 +990,7 @@ double CANJaguar::GetPosition()
 
 /**
  * Get the speed of the encoder.
- * 
+ *
  * @return The speed of the motor in RPM based on the configured feedback.
  */
 double CANJaguar::GetSpeed()
@@ -1008,7 +1008,7 @@ double CANJaguar::GetSpeed()
 
 /**
  * Get the status of the forward limit switch.
- * 
+ *
  * @return The motor is allowed to turn in the forward direction when true.
  */
 bool CANJaguar::GetForwardLimitOK()
@@ -1026,7 +1026,7 @@ bool CANJaguar::GetForwardLimitOK()
 
 /**
  * Get the status of the reverse limit switch.
- * 
+ *
  * @return The motor is allowed to turn in the reverse direction when true.
  */
 bool CANJaguar::GetReverseLimitOK()
@@ -1044,7 +1044,7 @@ bool CANJaguar::GetReverseLimitOK()
 
 /**
  * Get the status of any faults the Jaguar has detected.
- * 
+ *
  * @return A bit-mask of faults defined by the "Faults" enum.
  */
 uint16_t CANJaguar::GetFaults()
@@ -1062,10 +1062,10 @@ uint16_t CANJaguar::GetFaults()
 
 /**
  * Check if the Jaguar's power has been cycled since this was last called.
- * 
+ *
  * This should return true the first time called after a Jaguar power up,
  * and false after that.
- * 
+ *
  * @return The Jaguar was power cycled since the last call to this function.
  */
 bool CANJaguar::GetPowerCycled()
@@ -1092,10 +1092,10 @@ bool CANJaguar::GetPowerCycled()
 
 /**
  * Set the maximum voltage change rate.
- * 
+ *
  * When in PercentVbus or Voltage output mode, the rate at which the voltage changes can
  * be limited to reduce current spikes.  Set this to 0.0 to disable rate limiting.
- * 
+ *
  * @param rampRate The maximum rate of voltage change in Percent Voltage mode in V/s.
  */
 void CANJaguar::SetVoltageRampRate(double rampRate)
@@ -1120,7 +1120,7 @@ void CANJaguar::SetVoltageRampRate(double rampRate)
 
 /**
  * Get the version of the firmware running on the Jaguar.
- * 
+ *
  * @return The firmware version.  0 if the device did not respond.
  */
 uint32_t CANJaguar::GetFirmwareVersion()
@@ -1139,7 +1139,7 @@ uint32_t CANJaguar::GetFirmwareVersion()
 
 /**
  * Get the version of the Jaguar hardware.
- * 
+ *
  * @return The hardware version. 1: Jaguar,  2: Black Jaguar
  */
 uint8_t CANJaguar::GetHardwareVersion()
@@ -1161,9 +1161,9 @@ uint8_t CANJaguar::GetHardwareVersion()
 
 /**
  * Configure what the controller does to the H-Bridge when neutral (not driving the output).
- * 
+ *
  * This allows you to override the jumper configuration for brake or coast.
- * 
+ *
  * @param mode Select to use the jumper setting or to override it to coast or brake.
  */
 void CANJaguar::ConfigNeutralMode(NeutralMode mode)
@@ -1176,7 +1176,7 @@ void CANJaguar::ConfigNeutralMode(NeutralMode mode)
 
 /**
  * Configure how many codes per revolution are generated by your encoder.
- * 
+ *
  * @param codesPerRev The number of counts per revolution in 1X mode.
  */
 void CANJaguar::ConfigEncoderCodesPerRev(uint16_t codesPerRev)
@@ -1190,10 +1190,10 @@ void CANJaguar::ConfigEncoderCodesPerRev(uint16_t codesPerRev)
 
 /**
  * Configure the number of turns on the potentiometer.
- * 
+ *
  * There is no special support for continuous turn potentiometers.
  * Only integer numbers of turns are supported.
- * 
+ *
  * @param turns The number of turns of the potentiometer
  */
 void CANJaguar::ConfigPotentiometerTurns(uint16_t turns)
@@ -1207,11 +1207,11 @@ void CANJaguar::ConfigPotentiometerTurns(uint16_t turns)
 
 /**
  * Configure Soft Position Limits when in Position Controller mode.
- * 
+ *
  * When controlling position, you can add additional limits on top of the limit switch inputs
  * that are based on the position feedback.  If the position limit is reached or the
  * switch is opened, that direction will be disabled.
- * 
+ *
 
  * @param forwardLimitPosition The position that if exceeded will disable the forward direction.
  * @param reverseLimitPosition The position that if exceeded will disable the reverse direction.
@@ -1235,7 +1235,7 @@ void CANJaguar::ConfigSoftPositionLimits(double forwardLimitPosition, double rev
 
 /**
  * Disable Soft Position Limits if previously enabled.
- * 
+ *
  * Soft Position Limits are disabled by default.
  */
 void CANJaguar::DisableSoftPositionLimits()
@@ -1248,10 +1248,10 @@ void CANJaguar::DisableSoftPositionLimits()
 
 /**
  * Configure the maximum voltage that the Jaguar will ever output.
- * 
+ *
  * This can be used to limit the maximum output voltage in all modes so that
  * motors which cannot withstand full bus voltage can be used safely.
- * 
+ *
  * @param voltage The maximum voltage output by the Jaguar.
  */
 void CANJaguar::ConfigMaxOutputVoltage(double voltage)
@@ -1266,10 +1266,10 @@ void CANJaguar::ConfigMaxOutputVoltage(double voltage)
 
 /**
  * Configure how long the Jaguar waits in the case of a fault before resuming operation.
- * 
+ *
  * Faults include over temerature, over current, and bus under voltage.
  * The default is 3.0 seconds, but can be reduced to as low as 0.5 seconds.
- * 
+ *
  * @param faultTime The time to wait before resuming operation, in seconds.
  */
 void CANJaguar::ConfigFaultTime(float faultTime)
@@ -1284,7 +1284,7 @@ void CANJaguar::ConfigFaultTime(float faultTime)
 
 /**
  * Update all the motors that have pending sets in the syncGroup.
- * 
+ *
  * @param syncGroup A bitmask of groups to generate synchronous output.
  */
 void CANJaguar::UpdateSyncGroup(uint8_t syncGroup)
@@ -1329,7 +1329,7 @@ void CANJaguar::GetDescription(char *desc)
 /**
  * Common interface for stopping the motor
  * Part of the MotorSafety interface
- * 
+ *
  * @deprecated Call DisableControl instead.
  */
 void CANJaguar::StopMotor()
@@ -1371,5 +1371,3 @@ void CANJaguar::InitTable(ITable *subTable) {
 ITable * CANJaguar::GetTable() {
 	return m_table;
 }
-
-

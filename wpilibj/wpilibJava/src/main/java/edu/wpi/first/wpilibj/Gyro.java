@@ -79,31 +79,13 @@ public class Gyro extends SensorBase implements PIDSource, ISensor,
 
 		setPIDSourceParameter(PIDSourceParameter.kAngle);
 
-		UsageReporting.report(tResourceType.kResourceType_Gyro,
-				m_analog.getChannel(), m_analog.getModuleNumber() - 1);
-		LiveWindow.addSensor("Gyro", m_analog.getModuleNumber(),
-				m_analog.getChannel(), this);
-	}
-
-	/**
-	 * Gyro constructor given a slot and a channel. .
-	 * 
-	 * @param slot
-	 *            The cRIO slot for the analog module the gyro is connected to.
-	 * @param channel
-	 *            The analog channel the gyro is connected to.
-	 */
-	public Gyro(int slot, int channel) {
-		m_analog = new AnalogInput(slot, channel);
-		m_channelAllocated = true;
-		initGyro();
+		UsageReporting.report(tResourceType.kResourceType_Gyro, m_analog.getChannel());
+		LiveWindow.addSensor("Gyro", m_analog.getChannel(), this);
 	}
 
 	/**
 	 * Gyro constructor with only a channel.
-	 * 
-	 * Use the default analog module slot.
-	 * 
+	 *
 	 * @param channel
 	 *            The analog channel the gyro is connected to.
 	 */
@@ -117,7 +99,7 @@ public class Gyro extends SensorBase implements PIDSource, ISensor,
 	 * Gyro constructor with a precreated analog channel object. Use this
 	 * constructor when the analog channel needs to be shared. There is no
 	 * reference counting when an AnalogChannel is passed to the gyro.
-	 * 
+	 *
 	 * @param channel
 	 *            The AnalogChannel object that the gyro is connected to.
 	 */
@@ -156,13 +138,13 @@ public class Gyro extends SensorBase implements PIDSource, ISensor,
 
 	/**
 	 * Return the actual angle in degrees that the robot is currently facing.
-	 * 
+	 *
 	 * The angle is based on the current accumulator value corrected by the
 	 * oversampling rate, the gyro type and the A/D calibration values. The
 	 * angle is continuous, that is can go beyond 360 degrees. This make
 	 * algorithms that wouldn't want to see a discontinuity in the gyro output
 	 * as it sweeps past 0 on the second time around.
-	 * 
+	 *
 	 * @return the current heading of the robot in degrees. This heading is
 	 *         based on integration of the returned rate from the gyro.
 	 */
@@ -186,9 +168,9 @@ public class Gyro extends SensorBase implements PIDSource, ISensor,
 
 	/**
 	 * Return the rate of rotation of the gyro
-	 * 
+	 *
 	 * The rate is based on the most recent reading of the gyro analog value
-	 * 
+	 *
 	 * @return the current rate in degrees per second
 	 */
 	public double getRate() {
@@ -206,7 +188,7 @@ public class Gyro extends SensorBase implements PIDSource, ISensor,
 	 * Set the gyro type based on the sensitivity. This takes the number of
 	 * volts/degree/second sensitivity of the gyro and uses it in subsequent
 	 * calculations to allow the code to work with multiple gyros.
-	 * 
+	 *
 	 * @param voltsPerDegreePerSecond
 	 *            The type of gyro specified as the voltage that represents one
 	 *            degree/second.
@@ -218,7 +200,7 @@ public class Gyro extends SensorBase implements PIDSource, ISensor,
 	/**
 	 * Set which parameter of the encoder you are using as a process control
 	 * variable. The Gyro class supports the rate and angle parameters
-	 * 
+	 *
 	 * @param pidSource
 	 *            An enum to select the parameter.
 	 */
@@ -229,7 +211,7 @@ public class Gyro extends SensorBase implements PIDSource, ISensor,
 
 	/**
 	 * Get the angle of the gyro for use with PIDControllers
-	 * 
+	 *
 	 * @return the current angle according to the gyro
 	 */
 	public double pidGet() {

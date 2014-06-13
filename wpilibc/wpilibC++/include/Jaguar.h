@@ -16,7 +16,6 @@ class Jaguar : public SafePWM, public SpeedController
 {
 public:
 	explicit Jaguar(uint32_t channel);
-	Jaguar(uint8_t moduleNumber, uint32_t channel);
 	virtual ~Jaguar();
 	virtual void Set(float value, uint8_t syncGroup = 0);
 	virtual float Get();

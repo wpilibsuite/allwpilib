@@ -20,22 +20,12 @@ public:
 	SensorBase();
 	virtual ~SensorBase();
 	static void DeleteSingletons();
-	static uint32_t GetDefaultAnalogModule()
+
+    static uint32_t GetDefaultSolenoidModule()
 	{
 		return 1;
 	}
-	static uint32_t GetDefaultDigitalModule()
-	{
-		return 1;
-	}
-	static uint32_t GetDefaultSolenoidModule()
-	{
-		return 1;
-	}
-	static bool CheckAnalogModule(uint8_t moduleNumber);
-	static bool CheckDigitalModule(uint8_t moduleNumber);
-	static bool CheckPWMModule(uint8_t moduleNumber);
-	static bool CheckRelayModule(uint8_t moduleNumber);
+
 	static bool CheckSolenoidModule(uint8_t moduleNumber);
 	static bool CheckDigitalChannel(uint32_t channel);
 	static bool CheckRelayChannel(uint32_t channel);
@@ -48,8 +38,6 @@ public:
 	static const uint32_t kDigitalChannels = 20;
 	static const uint32_t kAnalogInputs = 8;
     static const uint32_t kAnalogOutputs = 2;
-	static const uint32_t kAnalogModules = 2;
-	static const uint32_t kDigitalModules = 2;
 	static const uint32_t kSolenoidChannels = 8;
 	static const uint32_t kSolenoidModules = 2;
 	static const uint32_t kPwmChannels = 20;

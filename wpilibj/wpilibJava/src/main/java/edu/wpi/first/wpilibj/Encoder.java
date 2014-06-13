@@ -103,152 +103,11 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 
 		UsageReporting.report(tResourceType.kResourceType_Encoder,
 				m_index, m_encodingType.value);
-		LiveWindow.addSensor("Encoder", m_aSource.getModuleForRouting(),
-				m_aSource.getChannelForRouting(), this);
+		LiveWindow.addSensor("Encoder", m_aSource.getChannelForRouting(), this);
 	}
 
 	/**
-	 * Encoder constructor. Construct a Encoder given a and b modules and
-	 * channels fully specified.
-	 * 
-	 * @param aSlot
-	 *            The a channel digital input module.
-	 * @param aChannel
-	 *            The a channel digital input channel.
-	 * @param bSlot
-	 *            The b channel digital input module.
-	 * @param bChannel
-	 *            The b channel digital input channel.
-	 * @param reverseDirection
-	 *            represents the orientation of the encoder and inverts the
-	 *            output values if necessary so forward represents positive
-	 *            values.
-	 */
-	public Encoder(final int aSlot, final int aChannel, final int bSlot,
-			final int bChannel, boolean reverseDirection) {
-		m_allocatedA = true;
-		m_allocatedB = true;
-		m_allocatedI = false;
-		m_aSource = new DigitalInput(aSlot, aChannel);
-		m_bSource = new DigitalInput(bSlot, bChannel);
-		initEncoder(reverseDirection);
-	}
-
-	/**
-	 * Encoder constructor. Construct a Encoder given a and b modules and
-	 * channels fully specified.
-	 * 
-	 * @param aSlot
-	 *            The a channel digital input module.
-	 * @param aChannel
-	 *            The a channel digital input channel.
-	 * @param bSlot
-	 *            The b channel digital input module.
-	 * @param bChannel
-	 *            The b channel digital input channel.
-	 */
-	public Encoder(final int aSlot, final int aChannel, final int bSlot,
-			final int bChannel) {
-		this(aSlot, aChannel, bSlot, bChannel, false);
-	}
-
-	/**
-	 * Encoder constructor. Construct a Encoder given a and b modules and
-	 * channels fully specified.
-	 * 
-	 * @param aSlot
-	 *            The a channel digital input module.
-	 * @param aChannel
-	 *            The a channel digital input channel.
-	 * @param bSlot
-	 *            The b channel digital input module.
-	 * @param bChannel
-	 *            The b channel digital input channel.
-	 * @param reverseDirection
-	 *            represents the orientation of the encoder and inverts the
-	 *            output values if necessary so forward represents positive
-	 *            values.
-	 * @param encodingType
-	 *            either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If
-	 *            4X is selected, then an encoder FPGA object is used and the
-	 *            returned counts will be 4x the encoder spec'd value since all
-	 *            rising and falling edges are counted. If 1X or 2X are selected
-	 *            then a counter object will be used and the returned value will
-	 *            either exactly match the spec'd count or be double (2x) the
-	 *            spec'd count.
-	 */
-	public Encoder(final int aSlot, final int aChannel, final int bSlot,
-			final int bChannel, boolean reverseDirection,
-			final EncodingType encodingType) {
-		m_allocatedA = true;
-		m_allocatedB = true;
-		m_allocatedI = false;
-		m_aSource = new DigitalInput(aSlot, aChannel);
-		m_bSource = new DigitalInput(bSlot, bChannel);
-		if (encodingType == null)
-			throw new NullPointerException("Given encoding type was null");
-		m_encodingType = encodingType;
-		initEncoder(reverseDirection);
-	}
-
-	/**
-	 * Encoder constructor. Construct a Encoder given a and b modules and
-	 * channels fully specified. Using the index pulse forces 4x encoding.
-	 * 
-	 * @param aSlot
-	 *            The a channel digital input module.
-	 * @param aChannel
-	 *            The a channel digital input channel.
-	 * @param bSlot
-	 *            The b channel digital input module.
-	 * @param bChannel
-	 *            The b channel digital input channel.
-	 * @param indexSlot
-	 *            The index channel digital input module.
-	 * @param indexChannel
-	 *            The index channel digital input channel.
-	 * @param reverseDirection
-	 *            represents the orientation of the encoder and inverts the
-	 *            output values if necessary so forward represents positive
-	 *            values.
-	 */
-	public Encoder(final int aSlot, final int aChannel, final int bSlot,
-			final int bChannel, final int indexSlot, final int indexChannel,
-			boolean reverseDirection) {
-		m_allocatedA = true;
-		m_allocatedB = true;
-		m_allocatedI = true;
-		m_aSource = new DigitalInput(aSlot, aChannel);
-		m_bSource = new DigitalInput(bSlot, bChannel);
-		m_indexSource = new DigitalInput(indexSlot, indexChannel);
-		initEncoder(reverseDirection);
-	}
-
-	/**
-	 * Encoder constructor. Construct a Encoder given a and b modules and
-	 * channels fully specified. Using the index pulse forces 4x encoding.
-	 * 
-	 * @param aSlot
-	 *            The a channel digital input module.
-	 * @param aChannel
-	 *            The a channel digital input channel.
-	 * @param bSlot
-	 *            The b channel digital input module.
-	 * @param bChannel
-	 *            The b channel digital input channel.
-	 * @param indexSlot
-	 *            The index channel digital input module.
-	 * @param indexChannel
-	 *            The index channel digital input channel.
-	 */
-	public Encoder(final int aSlot, final int aChannel, final int bSlot,
-			final int bChannel, final int indexSlot, final int indexChannel) {
-		this(aSlot, aChannel, bSlot, bChannel, indexSlot, indexChannel, false);
-	}
-
-	/**
-	 * Encoder constructor. Construct a Encoder given a and b channels assuming
-	 * the default module.
+	 * Encoder constructor. Construct a Encoder given a and b channels.
 	 * 
 	 * @param aChannel
 	 *            The a channel digital input channel.
@@ -270,8 +129,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	}
 
 	/**
-	 * Encoder constructor. Construct a Encoder given a and b channels assuming
-	 * the default module.
+	 * Encoder constructor. Construct a Encoder given a and b channels.
 	 * 
 	 * @param aChannel
 	 *            The a channel digital input channel.
@@ -283,8 +141,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	}
 
 	/**
-	 * Encoder constructor. Construct a Encoder given a and b channels assuming
-	 * the default module.
+	 * Encoder constructor. Construct a Encoder given a and b channels.
 	 * 
 	 * @param aChannel
 	 *            The a channel digital input channel.
@@ -317,8 +174,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	}
 
 	/**
-	 * Encoder constructor. Construct a Encoder given a and b channels assuming
-	 * the default module. Using an index pulse forces 4x encoding
+	 * Encoder constructor. Construct a Encoder given a and b channels.
+	 * Using an index pulse forces 4x encoding
 	 * 
 	 * @param aChannel
 	 *            The a channel digital input channel.
@@ -343,8 +200,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	}
 
 	/**
-	 * Encoder constructor. Construct a Encoder given a and b channels assuming
-	 * the default module. Using an index pulse forces 4x encoding
+	 * Encoder constructor. Construct a Encoder given a and b channels.
+	 * Using an index pulse forces 4x encoding
 	 * 
 	 * @param aChannel
 	 *            The a channel digital input channel.

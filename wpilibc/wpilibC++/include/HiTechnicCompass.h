@@ -12,23 +12,23 @@ class I2C;
 
 /**
  * HiTechnic NXT Compass.
- * 
+ *
  * This class alows access to a HiTechnic NXT Compass on an I2C bus.
  * These sensors to not allow changing addresses so you cannot have more
  *   than one on a single bus.
- * 
+ *
  * Details on the sensor can be found here:
  *   http://www.hitechnic.com/index.html?lang=en-us&target=d17.html
- * 
+ *
  * @todo Implement a calibration method for the sensor.
  */
 class HiTechnicCompass : public SensorBase, public LiveWindowSendable
 {
 public:
-	explicit HiTechnicCompass(uint8_t moduleNumber);
+	HiTechnicCompass();
 	virtual ~HiTechnicCompass();
 	float GetAngle();
-	
+
 	void UpdateTable();
 	void StartLiveWindowMode();
 	void StopLiveWindowMode();
@@ -45,6 +45,6 @@ private:
 	static const uint8_t kHeadingRegister = 0x44;
 
 	I2C* m_i2c;
-	
+
 	ITable *m_table;
 };

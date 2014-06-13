@@ -24,7 +24,7 @@ public class Servo extends PWM implements IDevice {
 
     private static final double kMaxServoAngle = 180.0;
     private static final double kMinServoAngle = 0.0;
-    
+
     private static final double kDefaultMaxServoPWM = 2.4;
     private static final double kDefaultMinServoPWM = .6;
 
@@ -33,43 +33,29 @@ public class Servo extends PWM implements IDevice {
      *
      * InitServo() assigns defaults for the period multiplier for the servo PWM control signal, as
      * well as the minimum and maximum PWM values supported by the servo.
-     * 
+     *
      */
     private void initServo() {
         setBounds(kDefaultMaxServoPWM, 0, 0, 0, kDefaultMinServoPWM);
         setPeriodMultiplier(PeriodMultiplier.k4X);
 
-        LiveWindow.addActuator("Servo", getModuleNumber(), getChannel(), this);
-        UsageReporting.report(tResourceType.kResourceType_Servo, getChannel(), getModuleNumber()-1);
+        LiveWindow.addActuator("Servo", getChannel(), this);
+        UsageReporting.report(tResourceType.kResourceType_Servo, getChannel());
     }
 
     /**
-     * Constructor that assumes the default digital module.<br>
-     * 
+     * Constructor.<br>
+     *
      * By default {@value #kDefaultMaxServoPWM} ms is used as the maxPWM value<br>
      * By default {@value #kDefaultMinServoPWM} ms is used as the minPWM value<br>
      *
-     * @param channel The PWM channel on the digital module to which the servo is attached.
+     * @param channel The PWM channel to which the servo is attached.
      */
     public Servo(final int channel) {
         super(channel);
         initServo();
     }
 
-    /**
-     * Constructor that specifies the digital module.<br>
-     *
-     * By default {@value #kDefaultMaxServoPWM} ms is used as the maxPWM value<br>
-     * By default {@value #kDefaultMinServoPWM} ms is used as the minPWM value<br>
-     * 
-     * @param slot The slot in the chassis that the digital module is plugged into.
-     * @param channel The PWM channel on the digital module to which the servo is attached.
-     */
-    public Servo(final int slot, final int channel) {
-        super(slot, channel);
-        initServo();
-    }
-    
 
 	/**
      * Set the servo position.

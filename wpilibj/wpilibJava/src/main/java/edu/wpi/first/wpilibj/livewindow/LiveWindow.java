@@ -169,22 +169,36 @@ public class LiveWindow {
     }
 
     /**
-     * Add Sensor to LiveWindow. The components are shown with the module type,
-     * slot and channel like this: Gyro[1, 2] for a gyro object connected to the
-     * first analog module in channel 2
+     * Add Sensor to LiveWindow. The components are shown with the type and
+     * channel like this: Gyro[1] for a gyro object connected to the first
+     * analog channel.
      *
      * @param moduleType A string indicating the type of the module used in the
      * naming (above)
-     * @param moduleNumber The number of the particular module type
      * @param channel The channel number the device is connected to
      * @param component A reference to the object being added
      */
-    public static void addSensor(String moduleType, int moduleNumber, int channel, LiveWindowSendable component) {
-        addSensor("Ungrouped", moduleType + "[" + moduleNumber + "," + channel + "]", component);
+    public static void addSensor(String moduleType, int channel, LiveWindowSendable component) {
+        addSensor("Ungrouped", moduleType + "[" + channel + "]", component);
         if (sensors.contains(component)) {
             sensors.removeElement(component);
         }
         sensors.addElement(component);
+    }
+
+    /**
+     * Add Actuator to LiveWindow. The components are shown with the module
+     * type, slot and channel like this: Servo[1,2] for a servo object connected
+     * to the first digital module and PWM port 2.
+     *
+     * @param moduleType A string that defines the module name in the label for
+     * the value
+     * @param channel The channel number the device is plugged into (usually
+     * PWM)
+     * @param component The reference to the object being added
+     */
+    public static void addActuator(String moduleType, int channel, LiveWindowSendable component) {
+        addActuator("Ungrouped", moduleType + "[" + channel + "]", component);
     }
 
     /**

@@ -53,11 +53,9 @@ public class HiTechnicCompass extends SensorBase implements ISensor, LiveWindowS
 
     /**
      * Constructor.
-     *
-     * @param slot The slot of the digital module that the sensor is plugged into.
      */
-    public HiTechnicCompass(int slot) {
-        DigitalModule module = DigitalModule.getInstance(slot);
+    public HiTechnicCompass() {
+        DigitalModule module = DigitalModule.getInstance(1);
         m_i2c = module.getI2C(kAddress);
 
         // Verify Sensor
@@ -70,8 +68,8 @@ public class HiTechnicCompass extends SensorBase implements ISensor, LiveWindowS
             throw new CompassException("Invalid Sensor type");
         }
 
-        UsageReporting.report(tResourceType.kResourceType_HiTechnicCompass, module.getModuleNumber()-1);
-        LiveWindow.addSensor("HiTechnicCompass", slot, 0, this);
+        UsageReporting.report(tResourceType.kResourceType_HiTechnicCompass, 1);
+        LiveWindow.addSensor("HiTechnicCompass", 1, this);
     }
 
     /**

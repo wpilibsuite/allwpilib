@@ -38,28 +38,17 @@ public class Victor extends SafePWM implements SpeedController, IDeviceControlle
         setPeriodMultiplier(PeriodMultiplier.k2X);
         setRaw(m_centerPwm);
 
-        LiveWindow.addActuator("Victor", getModuleNumber(), getChannel(), this);
-        UsageReporting.report(tResourceType.kResourceType_Victor, getChannel(), getModuleNumber()-1);
+        LiveWindow.addActuator("Victor", getChannel(), this);
+        UsageReporting.report(tResourceType.kResourceType_Victor, getChannel());
     }
 
     /**
-     * Constructor that assumes the default digital module.
+     * Constructor.
      *
-     * @param channel The PWM channel on the digital module that the Victor is attached to.
+     * @param channel The PWM channel that the Victor is attached to.
      */
     public Victor(final int channel) {
         super(channel);
-        initVictor();
-    }
-
-    /**
-     * Constructor that specifies the digital module.
-     *
-     * @param slot The slot in the chassis that the digital module is plugged into.
-     * @param channel The PWM channel on the digital module that the Victor is attached to.
-     */
-    public Victor(final int slot, final int channel) {
-        super(slot, channel);
         initVictor();
     }
 

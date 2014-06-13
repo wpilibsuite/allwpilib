@@ -17,7 +17,7 @@ constexpr double ADXL345_SPI::kGsPerLSB;
 
 /**
  * Constructor.
- * 
+ *
  * @param clk The GPIO the clock signal is wired to.
  * @param mosi The GPIO the MOSI (Master Out Slave In) signal is wired to.
  * @param miso The GPIO the MISO (Master In Slave Out) signal is wired to.
@@ -37,7 +37,7 @@ ADXL345_SPI::ADXL345_SPI(DigitalOutput &clk, DigitalOutput &mosi, DigitalInput &
 
 /**
  * Constructor.
- * 
+ *
  * @param clk The GPIO the clock signal is wired to.
  * @param mosi The GPIO the MOSI (Master Out Slave In) signal is wired to.
  * @param miso The GPIO the MISO (Master In Slave Out) signal is wired to.
@@ -57,15 +57,14 @@ ADXL345_SPI::ADXL345_SPI(DigitalOutput *clk, DigitalOutput *mosi, DigitalInput *
 
 /**
  * Constructor.
- * 
- * @param moduleNumber The digital module with the sensor attached.
+ *
  * @param clk The GPIO the clock signal is wired to.
  * @param mosi The GPIO the MOSI (Master Out Slave In) signal is wired to.
  * @param miso The GPIO the MISO (Master In Slave Out) signal is wired to.
  * @param cs The GPIO the CS (Chip Select) signal is wired to.
  * @param range The range (+ or -) that the accelerometer will measure.
  */
-ADXL345_SPI::ADXL345_SPI(uint8_t moduleNumber, uint32_t clk, uint32_t mosi, uint32_t miso,
+ADXL345_SPI::ADXL345_SPI(uint32_t clk, uint32_t mosi, uint32_t miso,
 		uint32_t cs, ADXL345_SPI::DataFormat_Range range)
 	: m_clk (NULL)
 	, m_mosi (NULL)
@@ -73,10 +72,10 @@ ADXL345_SPI::ADXL345_SPI(uint8_t moduleNumber, uint32_t clk, uint32_t mosi, uint
 	, m_cs (NULL)
 	, m_spi (NULL)
 {
-	m_clk = new DigitalOutput(moduleNumber, clk);
-	m_mosi = new DigitalOutput(moduleNumber, mosi);
-	m_miso = new DigitalInput(moduleNumber, miso);
-	m_cs = new DigitalOutput(moduleNumber, cs);
+	m_clk = new DigitalOutput(clk);
+	m_mosi = new DigitalOutput(mosi);
+	m_miso = new DigitalInput(miso);
+	m_cs = new DigitalOutput(cs);
 	Init(m_clk, m_mosi, m_miso, m_cs, range);
 }
 
@@ -132,7 +131,7 @@ ADXL345_SPI::~ADXL345_SPI()
 
 /**
  * Get the acceleration of one axis in Gs.
- * 
+ *
  * @param axis The axis to read from.
  * @return Acceleration of the ADXL345 in Gs.
  */
@@ -152,7 +151,7 @@ double ADXL345_SPI::GetAcceleration(ADXL345_SPI::Axes axis)
 
 /**
  * Get the acceleration of all axes in Gs.
- * 
+ *
  * @return Acceleration measured on all axes of the ADXL345 in Gs.
  */
 ADXL345_SPI::AllAxes ADXL345_SPI::GetAccelerations()
@@ -210,4 +209,3 @@ ADXL345_SPI::AllAxes ADXL345_SPI::GetAccelerations()
 	}
 	return data;
 }
-

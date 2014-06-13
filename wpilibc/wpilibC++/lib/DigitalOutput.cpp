@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+/* Copyright (c) FIRST 2008. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
@@ -14,19 +14,14 @@ extern Resource *interruptsResource;
 
 /**
  * Create an instance of a DigitalOutput.
- * Creates a digital output given a slot and channel. Common creation routine
- * for all constructors.
+ * Creates a digital output given a channel. Common creation routine for all
+ * constructors.
  */
-void DigitalOutput::InitDigitalOutput(uint8_t moduleNumber, uint32_t channel)
+void DigitalOutput::InitDigitalOutput(uint32_t channel)
 {
 	m_table = NULL;
 	char buf[64];
-	if (!CheckDigitalModule(moduleNumber))
-	{
-		snprintf(buf, 64, "Digital Module %d", moduleNumber);
-		wpi_setWPIErrorWithContext(ModuleIndexOutOfRange, buf);
-		return;
-	}
+
 	if (!CheckDigitalChannel(channel))
 	{
 		snprintf(buf, 64, "Digital Channel %d", channel);
@@ -35,33 +30,21 @@ void DigitalOutput::InitDigitalOutput(uint8_t moduleNumber, uint32_t channel)
 	}
 	m_channel = channel;
 	m_pwmGenerator = ~0ul;
-	m_module = DigitalModule::GetInstance(moduleNumber);
+	m_module = DigitalModule::GetInstance(1);
 	m_module->AllocateDIO(m_channel, false);
 
-	HALReport(HALUsageReporting::kResourceType_DigitalOutput, channel, moduleNumber - 1);
+	HALReport(HALUsageReporting::kResourceType_DigitalOutput, channel);
 }
 
 /**
  * Create an instance of a digital output.
- * Create a digital output given a channel. The default module is used.
+ * Create a digital output given a channel.
  *
- * @param channel The digital channel (1..14).
+ * @param channel The digital channel (0..19)
  */
 DigitalOutput::DigitalOutput(uint32_t channel)
 {
-	InitDigitalOutput(GetDefaultDigitalModule(), channel);
-}
-
-/**
- * Create an instance of a digital output.
- * Create an instance of a digital output given a module number and channel.
- *
- * @param moduleNumber The digital module (1 or 2).
- * @param channel The digital channel (1..14).
- */
-DigitalOutput::DigitalOutput(uint8_t moduleNumber, uint32_t channel)
-{
-	InitDigitalOutput(moduleNumber, channel);
+	InitDigitalOutput(channel);
 }
 
 /**
@@ -117,11 +100,11 @@ bool DigitalOutput::IsPulsing()
 
 /**
  * Change the PWM frequency of the PWM output on a Digital Output line.
- * 
+ *
  * The valid range is from 0.6 Hz to 19 kHz.  The frequency resolution is logarithmic.
- * 
+ *
  * There is only one PWM frequency per digital module.
- * 
+ *
  * @param rate The frequency to output all digital output PWM signals on this module.
  */
 void DigitalOutput::SetPWMRate(float rate)
@@ -132,14 +115,14 @@ void DigitalOutput::SetPWMRate(float rate)
 
 /**
  * Enable a PWM Output on this line.
- * 
+ *
  * Allocate one of the 4 DO PWM generator resources from this module.
- * 
+ *
  * Supply the initial duty-cycle to output so as to avoid a glitch when first starting.
- * 
+ *
  * The resolution of the duty cycle is 8-bit for low frequencies (1kHz or less)
  * but is reduced the higher the frequency of the PWM signal is.
- * 
+ *
  * @param initialDutyCycle The duty-cycle to start generating. [0..1]
  */
 void DigitalOutput::EnablePWM(float initialDutyCycle)
@@ -153,7 +136,7 @@ void DigitalOutput::EnablePWM(float initialDutyCycle)
 
 /**
  * Change this line from a PWM output back to a static Digital Output line.
- * 
+ *
  * Free up one of the 4 DO PWM generator resources that were in use.
  */
 void DigitalOutput::DisablePWM()
@@ -167,10 +150,10 @@ void DigitalOutput::DisablePWM()
 
 /**
  * Change the duty-cycle that is being generated on the line.
- * 
+ *
  * The resolution of the duty cycle is 8-bit for low frequencies (1kHz or less)
  * but is reduced the higher the frequency of the PWM signal is.
- * 
+ *
  * @param dutyCycle The duty-cycle to change to. [0..1]
  */
 void DigitalOutput::UpdateDutyCycle(float dutyCycle)
@@ -192,8 +175,8 @@ uint32_t DigitalOutput::GetChannelForRouting()
  */
 uint32_t DigitalOutput::GetModuleForRouting()
 {
-	if (StatusIsFatal()) return 0;
-	return m_module->GetNumber() - 1;
+    if (StatusIsFatal()) return 0;
+    return m_module->GetNumber() - 1;
 }
 
 /**
@@ -227,7 +210,7 @@ void DigitalOutput::RequestInterrupts(InterruptHandlerFunction handler, void *pa
 	AllocateInterrupts(false);
 
 	int32_t status = 0;
-	requestInterrupts(m_interrupt, GetModuleForRouting(), GetChannelForRouting(),
+    	requestInterrupts(m_interrupt, 1, GetChannelForRouting(),
 					  GetAnalogTriggerForRouting(), &status);
 	SetUpSourceEdge(true, false);
 	attachInterruptHandler(m_interrupt, handler, param, &status);
@@ -307,5 +290,3 @@ void DigitalOutput::InitTable(ITable *subTable) {
 ITable * DigitalOutput::GetTable() {
 	return m_table;
 }
-
-

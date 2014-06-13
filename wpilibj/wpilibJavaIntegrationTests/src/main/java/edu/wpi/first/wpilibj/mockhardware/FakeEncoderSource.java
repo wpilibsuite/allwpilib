@@ -74,14 +74,6 @@ public class FakeEncoderSource
         }
     }
 
-    public FakeEncoderSource(int slotA, int portA, int slotB, int portB)
-    {
-        m_outputA = new DigitalOutput(slotA, portA);
-        m_outputB = new DigitalOutput(slotB, portB);
-        allocatedOutputs = true;
-        initQuadEncoder();
-    }
-
     public FakeEncoderSource(int portA, int portB)
     {
         m_outputA = new DigitalOutput(portA);

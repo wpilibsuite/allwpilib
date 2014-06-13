@@ -53,7 +53,7 @@ public class FakeCounterSource
             }
         }
     }
-    
+
     /**
      * Create a fake encoder on a given port
      * @param output the port to output the given signal to
@@ -72,18 +72,6 @@ public class FakeCounterSource
     public FakeCounterSource(int port)
     {
         m_output = new DigitalOutput(port);
-        m_allocated = true;
-        initEncoder();
-    }
-
-    /**
-     * Create a new fake encoder on the indicated slot and port
-     * @param slot Slot to create on
-     * @param port THe port that the encoder is supposably on
-     */
-    public FakeCounterSource(int slot, int port)
-    {
-        m_output = new DigitalOutput(slot, port);
         m_allocated = true;
         initEncoder();
     }
@@ -162,4 +150,3 @@ public class FakeCounterSource
         m_mSec = mSec;
     }
 }
-

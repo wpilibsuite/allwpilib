@@ -11,7 +11,7 @@ class I2C;
 
 /**
  * ADXL345 Accelerometer on I2C.
- * 
+ *
  * This class alows access to a Analog Devices ADXL345 3-axis accelerometer on an I2C bus.
  * This class assumes the default (not alternate) sensor address of 0x3A (8-bit address).
  */
@@ -38,7 +38,7 @@ public:
 	};
 
 public:
-	explicit ADXL345_I2C(uint8_t moduleNumber, DataFormat_Range range=kRange_2G);
+	explicit ADXL345_I2C(DataFormat_Range range=kRange_2G);
 	virtual ~ADXL345_I2C();
 	virtual double GetAcceleration(Axes axis);
 	virtual AllAxes GetAccelerations();

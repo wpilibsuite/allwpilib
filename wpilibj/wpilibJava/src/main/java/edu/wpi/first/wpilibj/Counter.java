@@ -106,7 +106,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * Create an instance of a counter from a Digital Input. This is used if an
 	 * existing digital input is to be shared by multiple other objects such as
 	 * encoders.
-	 * 
+	 *
 	 * @param source
 	 *            the digital source to count
 	 */
@@ -119,8 +119,8 @@ public class Counter extends SensorBase implements CounterBase,
 
 	/**
 	 * Create an instance of a Counter object. Create an up-Counter instance
-	 * given a channel. The default digital module is assumed.
-	 * 
+	 * given a channel.
+	 *
 	 * @param channel
 	 *            the digital input channel to count
 	 */
@@ -130,24 +130,10 @@ public class Counter extends SensorBase implements CounterBase,
 	}
 
 	/**
-	 * Create an instance of a Counter object. Create an instance of an
-	 * up-Counter given a digital module and a channel.
-	 * 
-	 * @param slot
-	 *            The cRIO chassis slot for the digital module used
-	 * @param channel
-	 *            The channel in the digital module
-	 */
-	public Counter(int slot, int channel) {
-		initCounter(Mode.kTwoPulse);
-		setUpSource(slot, channel);
-	}
-
-	/**
 	 * Create an instance of a Counter object. Create an instance of a simple
 	 * up-Counter given an analog trigger. Use the trigger state output from the
 	 * analog trigger.
-	 * 
+	 *
 	 * @param encodingType
 	 *            which edges to count
 	 * @param upSource
@@ -188,7 +174,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * Create an instance of a Counter object. Create an instance of a simple
 	 * up-Counter given an analog trigger. Use the trigger state output from the
 	 * analog trigger.
-	 * 
+	 *
 	 * @param trigger
 	 *            the analog trigger to count
 	 */
@@ -214,22 +200,8 @@ public class Counter extends SensorBase implements CounterBase,
 	}
 
 	/**
-	 * Set the up source for the counter as digital input channel and slot.
-	 * 
-	 * @param slot
-	 *            the location of the digital module to use
-	 * @param channel
-	 *            the digital port to count
-	 */
-	public void setUpSource(int slot, int channel) {
-		setUpSource(new DigitalInput(slot, channel));
-		m_allocatedUpSource = true;
-	}
-
-	/**
-	 * Set the upsource for the counter as a digital input channel. The slot
-	 * will be the default digital module slot.
-	 * 
+	 * Set the upsource for the counter as a digital input channel.
+	 *
 	 * @param channel
 	 *            the digital port to count
 	 */
@@ -241,7 +213,7 @@ public class Counter extends SensorBase implements CounterBase,
 	/**
 	 * Set the source object that causes the counter to count up. Set the up
 	 * counting DigitalSource.
-	 * 
+	 *
 	 * @param source
 	 *            the digital source to count
 	 */
@@ -262,7 +234,7 @@ public class Counter extends SensorBase implements CounterBase,
 
 	/**
 	 * Set the up counting source to be an analog trigger.
-	 * 
+	 *
 	 * @param analogTrigger
 	 *            The analog trigger object that is used for the Up Source
 	 * @param triggerType
@@ -276,7 +248,7 @@ public class Counter extends SensorBase implements CounterBase,
 	/**
 	 * Set the edge sensitivity on an up counting source. Set the up source to
 	 * either detect rising edges or falling edges.
-	 * 
+	 *
 	 * @param risingEdge
 	 *            true to count rising edge
 	 * @param fallingEdge
@@ -311,9 +283,8 @@ public class Counter extends SensorBase implements CounterBase,
 	}
 
 	/**
-	 * Set the down counting source to be a digital input channel. The slot will
-	 * be set to the default digital module slot.
-	 * 
+	 * Set the down counting source to be a digital input channel.
+	 *
 	 * @param channel
 	 *            the digital port to count
 	 */
@@ -323,22 +294,9 @@ public class Counter extends SensorBase implements CounterBase,
 	}
 
 	/**
-	 * Set the down counting source to be a digital input slot and channel.
-	 * 
-	 * @param slot
-	 *            the location of the digital module to use
-	 * @param channel
-	 *            the digital port to count
-	 */
-	public void setDownSource(int slot, int channel) {
-		setDownSource(new DigitalInput(slot, channel));
-		m_allocatedDownSource = true;
-	}
-
-	/**
 	 * Set the source object that causes the counter to count down. Set the down
 	 * counting DigitalSource.
-	 * 
+	 *
 	 * @param source
 	 *            the digital source to count
 	 */
@@ -363,7 +321,7 @@ public class Counter extends SensorBase implements CounterBase,
 
 	/**
 	 * Set the down counting source to be an analog trigger.
-	 * 
+	 *
 	 * @param analogTrigger
 	 *            The analog trigger object that is used for the Down Source
 	 * @param triggerType
@@ -377,7 +335,7 @@ public class Counter extends SensorBase implements CounterBase,
 	/**
 	 * Set the edge sensitivity on a down counting source. Set the down source
 	 * to either detect rising edges or falling edges.
-	 * 
+	 *
 	 * @param risingEdge
 	 *            true to count the rising edge
 	 * @param fallingEdge
@@ -435,7 +393,7 @@ public class Counter extends SensorBase implements CounterBase,
 	/**
 	 * Set Semi-period mode on this counter. Counts up on both rising and
 	 * falling edges.
-	 * 
+	 *
 	 * @param highSemiPeriod
 	 *            true to count up on both rising and falling
 	 */
@@ -451,7 +409,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * Configure the counter to count in up or down based on the length of the
 	 * input pulse. This mode is most useful for direction sensitive gear tooth
 	 * sensors.
-	 * 
+	 *
 	 * @param threshold
 	 *            The pulse length beyond which the counter counts the opposite
 	 *            direction. Units are seconds.
@@ -492,7 +450,7 @@ public class Counter extends SensorBase implements CounterBase,
 	/**
 	 * Read the current scaled counter value. Read the value at this instant,
 	 * scaled by the distance per pulse (defaults to 1).
-	 * 
+	 *
 	 * @return
 	 */
 	public double getDistance() {
@@ -527,7 +485,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * Sets the maximum period where the device is considered moving. This value
 	 * is used to determine the "stopped" state of the counter using the
 	 * GetStopped method.
-	 * 
+	 *
 	 * @param maxPeriod
 	 *            The maximum period where the counted device is considered
 	 *            moving in seconds.
@@ -552,7 +510,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * been no events since an FPGA reset) and you will likely not see the
 	 * stopped bit become true (since it is updated at the end of an average and
 	 * there are no samples to average).
-	 * 
+	 *
 	 * @param enabled
 	 *            true to continue updating
 	 */
@@ -569,7 +527,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * stopped based on the MaxPeriod value set using the SetMaxPeriod method.
 	 * If the clock exceeds the MaxPeriod, then the device (and counter) are
 	 * assumed to be stopped and it returns true.
-	 * 
+	 *
 	 * @return Returns true if the most recent counter period exceeds the
 	 *         MaxPeriod value set by SetMaxPeriod.
 	 */
@@ -583,7 +541,7 @@ public class Counter extends SensorBase implements CounterBase,
 
 	/**
 	 * The last direction the counter value changed.
-	 * 
+	 *
 	 * @return The last direction the counter value changed.
 	 */
 	public boolean getDirection() {
@@ -598,7 +556,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * Set the Counter to return reversed sensing on the direction. This allows
 	 * counters to change the direction they are counting in the case of 1X and
 	 * 2X quadrature encoding only. Any other counter mode isn't supported.
-	 * 
+	 *
 	 * @param reverseDirection
 	 *            true if the value counted should be negated.
 	 */
@@ -614,7 +572,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * Get the Period of the most recent count. Returns the time interval of the
 	 * most recent count. This can be used for velocity calculations to
 	 * determine shaft speed.
-	 * 
+	 *
 	 * @returns The period of the last two pulses in units of seconds.
 	 */
 	public double getPeriod() {
@@ -629,7 +587,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * Get the current rate of the Counter. Read the current rate of the counter
 	 * accounting for the distance per pulse value. The default value for
 	 * distance per pulse (1) yields units of pulses per second.
-	 * 
+	 *
 	 * @return The rate in units/sec
 	 */
 	public double getRate() {
@@ -641,7 +599,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * timer to average when calculating the period. Perform averaging to
 	 * account for mechanical imperfections or as oversampling to increase
 	 * resolution.
-	 * 
+	 *
 	 * @param samplesToAverage
 	 *            The number of samples to average from 1 to 127.
 	 */
@@ -662,7 +620,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * timer to average when calculating the period. Perform averaging to
 	 * account for mechanical imperfections or as oversampling to increase
 	 * resolution.
-	 * 
+	 *
 	 * @return SamplesToAverage The number of samples being averaged (from 1 to
 	 *         127)
 	 */
@@ -680,7 +638,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * encoder. Set this value based on the Pulses per Revolution and factor in
 	 * any gearing reductions. This distance can be in any units you like,
 	 * linear or angular.
-	 * 
+	 *
 	 * @param distancePerPulse
 	 *            The scale factor that will be used to convert pulses to useful
 	 *            units.
@@ -692,7 +650,7 @@ public class Counter extends SensorBase implements CounterBase,
 	/**
 	 * Set which parameter of the encoder you are using as a process control
 	 * variable. The counter class supports the rate and distance parameters.
-	 * 
+	 *
 	 * @param pidSource
 	 *            An enum to select the parameter.
 	 */

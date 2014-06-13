@@ -1,11 +1,10 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008. All Rights Reserved.							                */
+/* Copyright (c) FIRST 2008. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
 #include "AnalogInput.h"
-#include "AnalogModule.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
 #include "WPIErrors.h"
@@ -20,61 +19,45 @@ const uint32_t AnalogInput::kAccumulatorChannels[] = {0, 1};
 /**
  * Common initialization.
  */
-void AnalogInput::InitAnalogInput(uint8_t moduleNumber, uint32_t channel)
+void AnalogInput::InitAnalogInput(uint32_t channel)
 {
 	m_table = NULL;
 	char buf[64];
-	Resource::CreateResourceObject(&inputs, kAnalogModules * kAnalogInputs);
-	if (!checkAnalogModule(moduleNumber))
-	{
-		snprintf(buf, 64, "Analog Module %d", moduleNumber);
-		wpi_setWPIErrorWithContext(ModuleIndexOutOfRange, buf);
-		return;
-	}
-	if (!checkAnalogInputChannel(channel))
+	Resource::CreateResourceObject(&inputs, kAnalogInputs);
+
+    if (!checkAnalogInputChannel(channel))
 	{
 		snprintf(buf, 64, "analog input %d", channel);
 		wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
 		return;
 	}
 
-	snprintf(buf, 64, "Analog Input %d (Module: %d)", channel, moduleNumber);
-	if (inputs->Allocate((moduleNumber - 1) * kAnalogInputs + channel, buf) == ~0ul)
+	snprintf(buf, 64, "Analog Input %d", channel);
+	if (inputs->Allocate(channel, buf) == ~0ul)
 	{
 		CloneError(inputs);
 		return;
 	}
-	m_channel = channel;
-	m_module = moduleNumber;
 
-	void* port = getPortWithModule(moduleNumber, channel);
+    m_channel = channel;
+
+	void* port = getPort(channel);
 	int32_t status = 0;
 	m_port = initializeAnalogInputPort(port, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
-	LiveWindow::GetInstance()->AddSensor("AnalogInput",channel, GetModuleNumber(), this);
-	HALReport(HALUsageReporting::kResourceType_AnalogChannel, channel, GetModuleNumber() - 1);
+	LiveWindow::GetInstance()->AddSensor("AnalogInput",channel, this);
+	HALReport(HALUsageReporting::kResourceType_AnalogChannel, channel);
 }
 
 /**
- * Construct an analog input on a specified module.
- *
- * @param moduleNumber The analog module (1 or 2).
- * @param channel The channel number to represent.
- */
-AnalogInput::AnalogInput(uint8_t moduleNumber, uint32_t channel)
-{
-	InitAnalogInput(moduleNumber, channel);
-}
-
-/**
- * Construct an analog input on the default module.
+ * Construct an analog input.
  *
  * @param channel The channel number to represent.
  */
 AnalogInput::AnalogInput(uint32_t channel)
 {
-	InitAnalogInput(GetDefaultAnalogModule(), channel);
+	InitAnalogInput(channel);
 }
 
 /**
@@ -82,24 +65,14 @@ AnalogInput::AnalogInput(uint32_t channel)
  */
 AnalogInput::~AnalogInput()
 {
-	inputs->Free((m_module - 1) * kAnalogInputs + m_channel);
+	inputs->Free(m_channel);
 }
 
 /**
- * Get the analog module that this channel is on.
- * @return A pointer to the AnalogModule that this channel is on.
- */
-AnalogModule *AnalogInput::GetModule()
-{
-	if (StatusIsFatal()) return NULL;
-	return AnalogModule::GetInstance(m_module);
-}
-
-/**
- * Get a sample straight from this channel on the module.
+ * Get a sample straight from this channel.
  * The sample is a 12-bit value representing the -10V to 10V range of the A/D converter in the module.
  * The units are in A/D converter codes.  Use GetVoltage() to get the analog value in calibrated units.
- * @return A sample straight from this channel on the module.
+ * @return A sample straight from this channel.
  */
 int16_t AnalogInput::GetValue()
 {
@@ -129,9 +102,9 @@ int32_t AnalogInput::GetAverageValue()
 }
 
 /**
- * Get a scaled sample straight from this channel on the module.
+ * Get a scaled sample straight from this channel.
  * The value is scaled to units of Volts using the calibrated scaling data from GetLSBWeight() and GetOffset().
- * @return A scaled sample straight from this channel on the module.
+ * @return A scaled sample straight from this channel.
  */
 float AnalogInput::GetVoltage()
 {
@@ -160,8 +133,6 @@ float AnalogInput::GetAverageVoltage()
 
 /**
  * Get the factory scaling least significant bit weight constant.
- * The least significant bit weight constant for the channel that was calibrated in
- * manufacturing and stored in an eeprom in the module.
  *
  * Volts = ((LSB_Weight * 1e-9) * raw) - (Offset * 1e-9)
  *
@@ -178,8 +149,6 @@ uint32_t AnalogInput::GetLSBWeight()
 
 /**
  * Get the factory scaling offset constant.
- * The offset constant for the channel that was calibrated in manufacturing and stored
- * in an eeprom in the module.
  *
  * Volts = ((LSB_Weight * 1e-9) * raw) - (Offset * 1e-9)
  *
@@ -202,16 +171,6 @@ uint32_t AnalogInput::GetChannel()
 {
 	if (StatusIsFatal()) return 0;
 	return m_channel;
-}
-
-/**
- * Get the module number.
- * @return The module number.
- */
-uint8_t AnalogInput::GetModuleNumber()
-{
-	if (StatusIsFatal()) return 0;
-	return m_module;
 }
 
 /**

@@ -82,8 +82,8 @@ public class RobotDrive implements MotorSafety, IUtility {
      * Set up parameters for a two wheel drive system where the
      * left and right motor pwm channels are specified in the call.
      * This call assumes Jaguars for controlling the motors.
-     * @param leftMotorChannel The PWM channel number on the default digital module that drives the left motor.
-     * @param rightMotorChannel The PWM channel number on the default digital module that drives the right motor.
+     * @param leftMotorChannel The PWM channel number that drives the left motor.
+     * @param rightMotorChannel The PWM channel number that drives the right motor.
      */
     public RobotDrive(final int leftMotorChannel, final int rightMotorChannel) {
         m_sensitivity = kDefaultSensitivity;
@@ -105,10 +105,10 @@ public class RobotDrive implements MotorSafety, IUtility {
      * Set up parameters for a four wheel drive system where all four motor
      * pwm channels are specified in the call.
      * This call assumes Jaguars for controlling the motors.
-     * @param frontLeftMotor Front left motor channel number on the default digital module
-     * @param rearLeftMotor Rear Left motor channel number on the default digital module
-     * @param frontRightMotor Front right motor channel number on the default digital module
-     * @param rearRightMotor Rear Right motor channel number on the default digital module
+     * @param frontLeftMotor Front left motor channel number
+     * @param rearLeftMotor Rear Left motor channel number
+     * @param frontRightMotor Front right motor channel number
+     * @param rearRightMotor Rear Right motor channel number
      */
     public RobotDrive(final int frontLeftMotor, final int rearLeftMotor,
                       final int frontRightMotor, final int rearRightMotor) {

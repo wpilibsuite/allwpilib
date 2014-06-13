@@ -36,28 +36,17 @@ public class Talon extends SafePWM implements SpeedController, IDeviceController
         setPeriodMultiplier(PeriodMultiplier.k2X);
         setRaw(m_centerPwm);
 
-        LiveWindow.addActuator("Talon", getModuleNumber(), getChannel(), this);
-        UsageReporting.report(tResourceType.kResourceType_Talon, getChannel(), getModuleNumber()-1);
+        LiveWindow.addActuator("Talon", getChannel(), this);
+        UsageReporting.report(tResourceType.kResourceType_Talon, getChannel());
     }
 
     /**
-     * Constructor that assumes the default digital module.
+     * Constructor.
      *
-     * @param channel The PWM channel on the digital module that the Victor is attached to.
+     * @param channel The PWM channel that the Victor is attached to.
      */
     public Talon(final int channel) {
         super(channel);
-        initTalon();
-    }
-
-    /**
-     * Constructor that specifies the digital module.
-     *
-     * @param slot The slot in the chassis that the digital module is plugged into.
-     * @param channel The PWM channel on the digital module that the Victor is attached to.
-     */
-    public Talon(final int slot, final int channel) {
-        super(slot, channel);
         initTalon();
     }
 

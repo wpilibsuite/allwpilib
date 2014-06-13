@@ -20,18 +20,16 @@ const uint8_t HiTechnicCompass::kHeadingRegister;
 
 /**
  * Constructor.
- * 
- * @param moduleNumber The digital module that the sensor is plugged into (1 or 2).
  */
-HiTechnicCompass::HiTechnicCompass(uint8_t moduleNumber)
+HiTechnicCompass::HiTechnicCompass()
 	: m_i2c (NULL)
 {
 	m_table = NULL;
-	DigitalModule *module = DigitalModule::GetInstance(moduleNumber);
+	DigitalModule *module = DigitalModule::GetInstance(1);
 	if (module)
 	{
 		m_i2c = module->GetI2C(kAddress);
-	
+
 		// Verify Sensor
 		const uint8_t kExpectedManufacturer[] = "HiTechnc";
 		const uint8_t kExpectedSensorType[] = "Compass ";
@@ -45,8 +43,8 @@ HiTechnicCompass::HiTechnicCompass(uint8_t moduleNumber)
 			wpi_setWPIError(CompassTypeError);
 		}
 
-		HALReport(HALUsageReporting::kResourceType_HiTechnicCompass, moduleNumber - 1);
-		LiveWindow::GetInstance()->AddSensor("HiTechnicCompass", moduleNumber, 0, this);
+		HALReport(HALUsageReporting::kResourceType_HiTechnicCompass, 0);
+		LiveWindow::GetInstance()->AddSensor("HiTechnicCompass", 1, this);
 	}
 }
 
@@ -61,9 +59,9 @@ HiTechnicCompass::~HiTechnicCompass()
 
 /**
  * Get the compass angle in degrees.
- * 
+ *
  * The resolution of this reading is 1 degree.
- * 
+ *
  * @return Angle of the compass in degrees.
  */
 float HiTechnicCompass::GetAngle()
@@ -86,11 +84,11 @@ void HiTechnicCompass::UpdateTable() {
 }
 
 void HiTechnicCompass::StartLiveWindowMode() {
-	
+
 }
 
 void HiTechnicCompass::StopLiveWindowMode() {
-	
+
 }
 
 std::string HiTechnicCompass::GetSmartDashboardType() {
@@ -105,4 +103,3 @@ void HiTechnicCompass::InitTable(ITable *subTable) {
 ITable * HiTechnicCompass::GetTable() {
 	return m_table;
 }
-

@@ -18,10 +18,10 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
 
 /**
  * I2C bus interface class.
- * 
+ *
  * This class is intended to be used by sensor (and other I2C device) drivers.
  * It probably should not be used directly.
- * 
+ *
  * It is constructed by calling DigitalModule::GetI2C() on a DigitalModule
  * object.
  */
@@ -31,25 +31,24 @@ public class I2C extends SensorBase {
 	private int m_deviceAddress;
 	private boolean m_compatibilityMode;
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param module
-	 *            The Digital Module to which the device is connected.
-	 * @param deviceAddress
-	 *            The address of the device on the I2C bus.
-	 */
-	public I2C(DigitalModule module, int deviceAddress) {
-		if (module == null) {
-			throw new NullPointerException("Digital Module given was null");
-		}
-		m_module = module;
-		m_deviceAddress = deviceAddress;
-		m_compatibilityMode = true;
+    /**
+     * Constructor.
+     *
+     * @param module
+     *            The Digital Module to which the device is connected.
+     * @param deviceAddress
+     *            The address of the device on the I2C bus.
+     */
+    public I2C(DigitalModule module, int deviceAddress) {
+        if (module == null) {
+            throw new NullPointerException("Digital Module given was null");
+        }
+        m_module = module;
+        m_deviceAddress = deviceAddress;
+        m_compatibilityMode = true;
 
-		UsageReporting.report(tResourceType.kResourceType_I2C, deviceAddress,
-				module.getModuleNumber()-1);
-	}
+        UsageReporting.report(tResourceType.kResourceType_I2C, deviceAddress);
+    }
 
 	/**
 	 * Destructor.
@@ -59,10 +58,10 @@ public class I2C extends SensorBase {
 
 	/**
 	 * Generic transaction.
-	 * 
+	 *
 	 * This is a lower-level interface to the I2C hardware giving you more
 	 * control over each transaction.
-	 * 
+	 *
 	 * @param dataToSend
 	 *            Buffer of data to send as part of the transaction.
 	 * @param sendSize
@@ -105,10 +104,10 @@ public class I2C extends SensorBase {
 
 	/**
 	 * Attempt to address a device on the I2C bus.
-	 * 
+	 *
 	 * This allows you to figure out if there is a device on the I2C bus that
 	 * responds to the address specified in the constructor.
-	 * 
+	 *
 	 * @return Transfer Aborted... false for success, true for aborted.
 	 */
 	public boolean addressOnly() {
@@ -117,10 +116,10 @@ public class I2C extends SensorBase {
 
 	/**
 	 * Execute a write transaction with the device.
-	 * 
+	 *
 	 * Write a single byte to a register on a device and wait until the
 	 * transaction is complete.
-	 * 
+	 *
 	 * @param registerAddress
 	 *            The address of the register on the device to be written.
 	 * @param data
@@ -135,11 +134,11 @@ public class I2C extends SensorBase {
 
 	/**
 	 * Execute a read transaction with the device.
-	 * 
+	 *
 	 * Read 1 to 7 bytes from a device. Most I2C devices will auto-increment the
 	 * register pointer internally allowing you to read up to 7 consecutive
 	 * registers on a device in a single transaction.
-	 * 
+	 *
 	 * @param registerAddress
 	 *            The register to read first in the transaction.
 	 * @param count
@@ -163,9 +162,9 @@ public class I2C extends SensorBase {
 
 	/**
 	 * Send a broadcast write to all devices on the I2C bus.
-	 * 
+	 *
 	 * This is not currently implemented!
-	 * 
+	 *
 	 * @param registerAddress
 	 *            The register to write on all devices on the bus.
 	 * @param data
@@ -176,30 +175,30 @@ public class I2C extends SensorBase {
 
 	/**
 	 * SetCompatabilityMode
-	 * 
+	 *
 	 * Enables bitwise clock skewing detection. This will reduce the I2C
 	 * interface speed, but will allow you to communicate with devices that skew
 	 * the clock at abnormal times. Compatability mode is enabled by default.
-	 * 
+	 *
 	 * @param enable
 	 *            Enable compatability mode for this sensor or not.
 	 */
 	public void setCompatabilityMode(boolean enable) {
 		m_compatibilityMode = enable;
 		UsageReporting.report(tResourceType.kResourceType_I2C,
-				m_deviceAddress, m_module.getModuleNumber() - 1, "C");
+				m_deviceAddress, 1, "C");
 	}
 
 	/**
 	 * Verify that a device's registers contain expected values.
-	 * 
+	 *
 	 * Most devices will have a set of registers that contain a known value that
 	 * can be used to identify them. This allows an I2C device driver to easily
 	 * verify that the device contains the expected value.
-	 * 
+	 *
 	 * @pre The device must support and be configured to use register
 	 *      auto-increment.
-	 * 
+	 *
 	 * @param registerAddress
 	 *            The base register to start reading from the device.
 	 * @param count

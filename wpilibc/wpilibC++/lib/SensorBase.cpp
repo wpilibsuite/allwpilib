@@ -11,8 +11,6 @@
 
 const uint32_t SensorBase::kDigitalChannels;
 const uint32_t SensorBase::kAnalogInputs;
-const uint32_t SensorBase::kAnalogModules;
-const uint32_t SensorBase::kDigitalModules;
 const uint32_t SensorBase::kSolenoidChannels;
 const uint32_t SensorBase::kSolenoidModules;
 const uint32_t SensorBase::kPwmChannels;
@@ -64,50 +62,6 @@ void SensorBase::DeleteSingletons()
 		delete tmp;
 	}
 	m_singletonList = NULL;
-}
-
-/**
- * Check that the analog module number is valid.
- *
- * @return Analog module is valid and present
- */
-bool SensorBase::CheckAnalogModule(uint8_t moduleNumber)
-{
-	if (nLoadOut::getModulePresence(nLoadOut::kModuleType_Analog, moduleNumber - 1))
-		return true;
-	return false;
-}
-
-/**
- * Check that the digital module number is valid.
- *
- * @return Digital module is valid and present
- */
-bool SensorBase::CheckDigitalModule(uint8_t moduleNumber)
-{
-	if (nLoadOut::getModulePresence(nLoadOut::kModuleType_Digital, moduleNumber - 1))
-		return true;
-	return false;
-}
-
-/**
- * Check that the digital module number is valid.
- *
- * @return Digital module is valid and present
- */
-bool SensorBase::CheckPWMModule(uint8_t moduleNumber)
-{
-	return CheckDigitalModule(moduleNumber);
-}
-
-/**
- * Check that the digital module number is valid.
- *
- * @return Digital module is valid and present
- */
-bool SensorBase::CheckRelayModule(uint8_t moduleNumber)
-{
-	return CheckDigitalModule(moduleNumber);
 }
 
 /**

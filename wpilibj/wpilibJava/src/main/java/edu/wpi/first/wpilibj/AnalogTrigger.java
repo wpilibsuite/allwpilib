@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
 
 /**
  * Class for creating and configuring Analog Triggers
- * 
+ *
  * @author dtjones
  */
 public class AnalogTrigger implements IInputOutput {
@@ -33,7 +33,7 @@ public class AnalogTrigger implements IInputOutput {
 
 		/**
 		 * Create a new exception with the given message
-		 * 
+		 *
 		 * @param message
 		 *            the message to pass with the exception
 		 */
@@ -50,18 +50,13 @@ public class AnalogTrigger implements IInputOutput {
 	protected int m_index;
 
 	/**
-	 * Initialize an analog trigger from a module number and channel. This is
-	 * the common code for the two constructors that use a module number and
-	 * channel.
-	 * 
-	 * @param moduleNumber
-	 *            The number of the analog module to create this trigger on.
+	 * Initialize an analog trigger from a channel.
+     *
 	 * @param channel
 	 *            the port to use for the analog trigger
 	 */
-	protected void initTrigger(final int moduleNumber, final int channel) {
-		ByteBuffer port_pointer = AnalogJNI.getPortWithModule(
-				(byte) moduleNumber, (byte) channel);
+	protected void initTrigger(final int channel) {
+		ByteBuffer port_pointer = AnalogJNI.getPortWithModule((byte) 1, (byte) channel);
 		IntBuffer status = IntBuffer.allocate(1);
 		IntBuffer index = IntBuffer.allocate(1);
 		// XXX: Uncomment when analog has been fixed
@@ -70,44 +65,29 @@ public class AnalogTrigger implements IInputOutput {
 		//HALUtil.checkStatus(status);
 		//m_index = index.get(0);
 
-		UsageReporting.report(tResourceType.kResourceType_AnalogTrigger,
-				channel, moduleNumber-1);
+		UsageReporting.report(tResourceType.kResourceType_AnalogTrigger, channel);
 	}
 
 	/**
-	 * Constructor for an analog trigger given a channel number. The default
-	 * module is used in this case.
-	 * 
+	 * Constructor for an analog trigger given a channel number.
+	 *
 	 * @param channel
 	 *            the port to use for the analog trigger
 	 */
 	public AnalogTrigger(final int channel) {
-		initTrigger(AnalogModule.getDefaultAnalogModule(), channel);
-	}
-
-	/**
-	 * Constructor for an analog trigger given both the module number and
-	 * channel.
-	 * 
-	 * @param moduleNumber
-	 *            The number of the analog module to create this trigger on.
-	 * @param channel
-	 *            the port to use for the analog trigger
-	 */
-	public AnalogTrigger(final int moduleNumber, final int channel) {
-		initTrigger(moduleNumber, channel);
+		initTrigger(channel);
 	}
 
 	/**
 	 * Construct an analog trigger given an analog channel. This should be used
 	 * in the case of sharing an analog channel between the trigger and an
 	 * analog input object.
-	 * 
+	 *
 	 * @param channel
-	 *            the AnalogChannel to use for the analog trigger
+	 *            the AnalogInput to use for the analog trigger
 	 */
 	public AnalogTrigger(AnalogInput channel) {
-		initTrigger(channel.getModuleNumber(), channel.getChannel());
+		initTrigger(channel.getChannel());
 	}
 
 	/**
@@ -124,7 +104,7 @@ public class AnalogTrigger implements IInputOutput {
 	 * Set the upper and lower limits of the analog trigger. The limits are
 	 * given in ADC codes. If oversampling is used, the units must be scaled
 	 * appropriately.
-	 * 
+	 *
 	 * @param lower
 	 *            the lower raw limit
 	 * @param upper
@@ -142,7 +122,7 @@ public class AnalogTrigger implements IInputOutput {
 	/**
 	 * Set the upper and lower limits of the analog trigger. The limits are
 	 * given as floating point voltage values.
-	 * 
+	 *
 	 * @param lower
 	 *            the lower voltage limit
 	 * @param upper
@@ -165,7 +145,7 @@ public class AnalogTrigger implements IInputOutput {
 	 * Configure the analog trigger to use the averaged vs. raw values. If the
 	 * value is true, then the averaged value is selected for the analog
 	 * trigger, otherwise the immediate value is used.
-	 * 
+	 *
 	 * @param useAveragedValue
 	 *            true to use an averaged value, false otherwise
 	 */
@@ -181,7 +161,7 @@ public class AnalogTrigger implements IInputOutput {
 	 * will operate with a 3 point average rejection filter. This is designed to
 	 * help with 360 degree pot applications for the period where the pot
 	 * crosses through zero.
-	 * 
+	 *
 	 * @param useFilteredValue
 	 *            true to use a filterd value, false otherwise
 	 */
@@ -195,7 +175,7 @@ public class AnalogTrigger implements IInputOutput {
 	/**
 	 * Return the index of the analog trigger. This is the FPGA index of this
 	 * analog trigger instance.
-	 * 
+	 *
 	 * @return The index of the analog trigger.
 	 */
 	public int getIndex() {
@@ -205,7 +185,7 @@ public class AnalogTrigger implements IInputOutput {
 	/**
 	 * Return the InWindow output of the analog trigger. True if the analog
 	 * input is between the upper and lower limits.
-	 * 
+	 *
 	 * @return The InWindow output of the analog trigger.
 	 */
 	public boolean getInWindow() {
@@ -219,7 +199,7 @@ public class AnalogTrigger implements IInputOutput {
 	 * Return the TriggerState output of the analog trigger. True if above upper
 	 * limit. False if below lower limit. If in Hysteresis, maintain previous
 	 * state.
-	 * 
+	 *
 	 * @return The TriggerState output of the analog trigger.
 	 */
 	public boolean getTriggerState() {
@@ -233,7 +213,7 @@ public class AnalogTrigger implements IInputOutput {
 	 * Creates an AnalogTriggerOutput object. Gets an output object that can be
 	 * used for routing. Caller is responsible for deleting the
 	 * AnalogTriggerOutput object.
-	 * 
+	 *
 	 * @param type
 	 *            An enum of the type of output object to create.
 	 * @return A pointer to a new AnalogTriggerOutput object.

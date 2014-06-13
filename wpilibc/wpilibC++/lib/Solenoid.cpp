@@ -43,7 +43,7 @@ void Solenoid::InitSolenoid()
 
 /**
  * Constructor.
- * 
+ *
  * @param channel The channel on the solenoid module to control (1..8).
  */
 Solenoid::Solenoid(uint32_t channel)
@@ -55,7 +55,7 @@ Solenoid::Solenoid(uint32_t channel)
 
 /**
  * Constructor.
- * 
+ *
  * @param moduleNumber The solenoid module (1 or 2).
  * @param channel The channel on the solenoid module to control (1..8).
  */
@@ -79,7 +79,7 @@ Solenoid::~Solenoid()
 
 /**
  * Set the value of a solenoid.
- * 
+ *
  * @param on Turn the solenoid output off or on.
  */
 void Solenoid::Set(bool on)
@@ -93,7 +93,7 @@ void Solenoid::Set(bool on)
 
 /**
  * Read the current value of the solenoid.
- * 
+ *
  * @return The current value of the solenoid.
  */
 bool Solenoid::Get()
@@ -140,4 +140,3 @@ void Solenoid::InitTable(ITable *subTable) {
 ITable * Solenoid::GetTable() {
 	return m_table;
 }
-

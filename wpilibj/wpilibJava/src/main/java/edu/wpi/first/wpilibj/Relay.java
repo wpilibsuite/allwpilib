@@ -30,13 +30,6 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
  */
 public class Relay extends SensorBase implements IDeviceController,
 		LiveWindowSendable {
-
-	/*
-	 * XXX: Refactor to no longer depend on the DigitalModule, and move all
-	 * resource tracking into the HAL. This will wait until we get the unit
-	 * tests running for the first time.
-	 */
-
 	/**
 	 * This class represents errors in trying to set relay values contradictory
 	 * to the direction to which the relay is set.
@@ -45,7 +38,7 @@ public class Relay extends SensorBase implements IDeviceController,
 
 		/**
 		 * Create a new exception with the given message
-		 * 
+		 *
 		 * @param message
 		 *            the message to pass with the exception
 		 */
@@ -128,62 +121,34 @@ public class Relay extends SensorBase implements IDeviceController,
 	 * Common relay initialization method. This code is common to all Relay
 	 * constructors and initializes the relay and reserves all resources that
 	 * need to be locked. Initially the relay is set to both lines at 0v.
-	 * 
-	 * @param moduleNumber
-	 *            The number of the digital module to use.
 	 */
-	private void initRelay(final int moduleNumber) {
-		SensorBase.checkRelayModule(moduleNumber);
+	private void initRelay() {
 		SensorBase.checkRelayChannel(m_channel);
 		try {
 			if (m_direction == Direction.kBoth
 					|| m_direction == Direction.kForward) {
-				relayChannels.allocate(((moduleNumber - 1) * kRelayChannels
-						+ m_channel) * 2);
-				UsageReporting.report(tResourceType.kResourceType_Relay,
-						m_channel, moduleNumber - 1);
+				relayChannels.allocate(m_channel * 2);
+				UsageReporting.report(tResourceType.kResourceType_Relay, m_channel);
 			}
 			if (m_direction == Direction.kBoth
 					|| m_direction == Direction.kReverse) {
-				relayChannels.allocate(((moduleNumber - 1) * kRelayChannels
-						+ m_channel) * 2 + 1);
-				UsageReporting.report(tResourceType.kResourceType_Relay,
-						m_channel + 128, moduleNumber - 1);
+				relayChannels.allocate(m_channel * 2 + 1);
+				UsageReporting.report(tResourceType.kResourceType_Relay, m_channel + 128);
 			}
 		} catch (CheckedAllocationException e) {
-			throw new AllocationException("Relay channel " + m_channel
-					+ " on module " + moduleNumber + " is already allocated");
+			throw new AllocationException("Relay channel " + m_channel + " is already allocated");
 		}
-		m_module = DigitalModule.getInstance(moduleNumber);
+		m_module = DigitalModule.getInstance(1);
 		m_module.setRelayForward(m_channel, false);
 		m_module.setRelayReverse(m_channel, false);
-		LiveWindow.addActuator("Relay", moduleNumber, m_channel, this);
+		LiveWindow.addActuator("Relay", m_channel, this);
 	}
 
 	/**
-	 * Relay constructor given the module and the channel.
-	 * 
-	 * @param moduleNumber
-	 *            The number of the digital module to use.
+	 * Relay constructor given a channel.
+	 *
 	 * @param channel
-	 *            The channel number within the module for this relay.
-	 * @param direction
-	 *            The direction that the Relay object will control.
-	 */
-	public Relay(final int moduleNumber, final int channel, Direction direction) {
-		if (direction == null)
-			throw new NullPointerException("Null Direction was given");
-		m_channel = channel;
-		m_direction = direction;
-		initRelay(moduleNumber);
-	}
-
-	/**
-	 * Relay constructor given a channel only where the default digital module
-	 * is used.
-	 * 
-	 * @param channel
-	 *            The channel number within the default module for this relay.
+	 *            The channel number for this relay.
 	 * @param direction
 	 *            The direction that the Relay object will control.
 	 */
@@ -192,35 +157,19 @@ public class Relay extends SensorBase implements IDeviceController,
 			throw new NullPointerException("Null Direction was given");
 		m_channel = channel;
 		m_direction = direction;
-		initRelay(getDefaultDigitalModule());
+		initRelay();
 	}
 
 	/**
-	 * Relay constructor given the module and the channel, allowing both
-	 * directions.
-	 * 
-	 * @param moduleNumber
-	 *            The number of the digital module to use.
+	 * Relay constructor given a channel, allowing both directions.
+	 *
 	 * @param channel
-	 *            The channel number within the module for this relay.
-	 */
-	public Relay(final int moduleNumber, final int channel) {
-		m_channel = channel;
-		m_direction = Direction.kBoth;
-		initRelay(moduleNumber);
-	}
-
-	/**
-	 * Relay constructor given a channel only where the default digital module
-	 * is used, allowing both directions.
-	 * 
-	 * @param channel
-	 *            The channel number within the default module for this relay.
+	 *            The channel number for this relay.
 	 */
 	public Relay(final int channel) {
 		m_channel = channel;
 		m_direction = Direction.kBoth;
-		initRelay(getDefaultDigitalModule());
+		initRelay();
 	}
 
 	public void free() {
@@ -243,17 +192,17 @@ public class Relay extends SensorBase implements IDeviceController,
 
 	/**
 	 * Set the relay state.
-	 * 
+	 *
 	 * Valid values depend on which directions of the relay are controlled by
 	 * the object.
-	 * 
+	 *
 	 * When set to kBothDirections, the relay can be set to any of the four
 	 * states: 0v-0v, 12v-0v, 0v-12v, 12v-12v
-	 * 
+	 *
 	 * When set to kForwardOnly or kReverseOnly, you can specify the constant
 	 * for the direction or you can simply specify kOff_val and kOn_val. Using
 	 * only kOff_val and kOn_val is recommended.
-	 * 
+	 *
 	 * @param value
 	 *            The state to set the relay.
 	 */
@@ -310,12 +259,12 @@ public class Relay extends SensorBase implements IDeviceController,
 
 	/**
 	 * Get the Relay State
-	 * 
+	 *
 	 * Gets the current state of the relay.
-	 * 
+	 *
 	 * When set to kForwardOnly or kReverseOnly, value is returned as kOn/kOff
 	 * not kForward/kReverse (per the recommendation in Set)
-	 * 
+	 *
 	 * @return The current state of the relay as a Relay::Value
 	 */
 	public Value get() {
@@ -344,12 +293,12 @@ public class Relay extends SensorBase implements IDeviceController,
 
 	/**
 	 * Set the Relay Direction
-	 * 
+	 *
 	 * Changes which values the relay can be set to depending on which direction
 	 * is used
-	 * 
+	 *
 	 * Valid inputs are kBothDirections, kForwardOnly, and kReverseOnly
-	 * 
+	 *
 	 * @param direction
 	 *            The direction for the relay to operate in
 	 */
@@ -364,7 +313,7 @@ public class Relay extends SensorBase implements IDeviceController,
 
 		m_direction = direction;
 
-		initRelay(m_module.getModuleNumber());
+		initRelay();
 	}
 
 	/*

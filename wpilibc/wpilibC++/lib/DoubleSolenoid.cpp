@@ -54,12 +54,12 @@ void DoubleSolenoid::InitSolenoid()
 
 	HALReport(HALUsageReporting::kResourceType_Solenoid, m_forwardChannel, m_moduleNumber - 1);
 	HALReport(HALUsageReporting::kResourceType_Solenoid, m_reverseChannel, m_moduleNumber - 1);
-	LiveWindow::GetInstance()->AddActuator("DoubleSolenoid", m_moduleNumber, m_forwardChannel, this);
+	LiveWindow::GetInstance()->AddActuator("DoubleSolenoid", m_forwardChannel, this);
 }
 
 /**
  * Constructor.
- * 
+ *
  * @param forwardChannel The forward channel on the module to control.
  * @param reverseChannel The reverse channel on the module to control.
  */
@@ -73,7 +73,7 @@ DoubleSolenoid::DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel)
 
 /**
  * Constructor.
- * 
+ *
  * @param moduleNumber The solenoid module (1 or 2).
  * @param forwardChannel The forward channel on the module to control.
  * @param reverseChannel The reverse channel on the module to control.
@@ -100,7 +100,7 @@ DoubleSolenoid::~DoubleSolenoid()
 
 /**
  * Set the value of a solenoid.
- * 
+ *
  * @param value Move the solenoid to forward, reverse, or don't move it.
  */
 void DoubleSolenoid::Set(Value value)
@@ -126,7 +126,7 @@ void DoubleSolenoid::Set(Value value)
 
 /**
  * Read the current value of the solenoid.
- * 
+ *
  * @return The current value of the solenoid.
  */
 DoubleSolenoid::Value DoubleSolenoid::Get()
@@ -181,4 +181,3 @@ void DoubleSolenoid::InitTable(ITable *subTable) {
 ITable * DoubleSolenoid::GetTable() {
 	return m_table;
 }
-

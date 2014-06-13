@@ -11,13 +11,13 @@ package edu.wpi.first.wpilibj;
  * Base class for all sensors.
  * Stores most recent status information as well as containing utility functions for checking
  * channels and error processing.
- * 
+ *
  * XXX: Wait, there's no exception thrown if we try to allocate a non-existent module?  It that behavior correct?
  */
 public abstract class SensorBase { // TODO: Refactor
 
 	// TODO: Move this to the HAL
-	
+
     /**
      * Ticks per microsecond
      */
@@ -27,24 +27,15 @@ public abstract class SensorBase { // TODO: Refactor
      */
     public static final int kDigitalChannels = 14;
     /**
-     * Number of digital modules
-     * XXX: This number is incorrect.  We need to find the correct number.
-     */
-    public static final int kDigitalModules = 2;
-    /**
      * Number of analog channels per module
      */
     public static final int kAnalogChannels = 8;
-    /**
-     * Number of analog modules
-     */
-    public static final int kAnalogModules = 2;
     /**
      * Number of solenoid channels per module
      */
     public static final int kSolenoidChannels = 8;
     /**
-     * Number of analog modules
+     * Number of solenoid modules
      */
     public static final int kSolenoidModules = 2;
     /**
@@ -56,40 +47,12 @@ public abstract class SensorBase { // TODO: Refactor
      */
     public static final int kRelayChannels = 8;
 
-    private static int m_defaultAnalogModule = 1;
-    private static int m_defaultDigitalModule = 1;
     private static int m_defaultSolenoidModule = 1;
 
     /**
      * Creates an instance of the sensor base and gets an FPGA handle
      */
     public SensorBase() {
-    }
-
-    /**
-     * Sets the default Digital Module.
-     * This sets the default digital module to use for objects that are created without
-     * specifying the digital module in the constructor. The default module is initialized
-     * to the first module in the chassis.
-     *
-     * @param moduleNumber The number of the digital module to use.
-     */
-    public static void setDefaultDigitalModule(final int moduleNumber) {
-        checkDigitalModule(moduleNumber);
-        SensorBase.m_defaultDigitalModule = moduleNumber;
-    }
-
-    /**
-     * Sets the default Analog module.
-     * This sets the default analog module to use for objects that are created without
-     * specifying the analog module in the constructor. The default module is initialized
-     * to the first module in the chassis.
-     *
-     * @param moduleNumber The number of the analog module to use.
-     */
-    public static void setDefaultAnalogModule(final int moduleNumber) {
-        checkAnalogModule(moduleNumber);
-        SensorBase.m_defaultAnalogModule = moduleNumber;
     }
 
     /**
@@ -100,51 +63,6 @@ public abstract class SensorBase { // TODO: Refactor
     public static void setDefaultSolenoidModule(final int moduleNumber) {
         checkSolenoidModule(moduleNumber);
         SensorBase.m_defaultSolenoidModule = moduleNumber;
-    }
-
-    /**
-     * Check that the digital module number is valid.
-     * Module numbers are 1 or 2 (they are no longer real cRIO slots).
-     *
-     * @param moduleNumber The digital module module number to check.
-     */
-    protected static void checkDigitalModule(final int moduleNumber) {
-    	// TODO: fix
-        if(moduleNumber == 1 || moduleNumber == 2)
-            System.err.println("Digital module " + moduleNumber + " is not present.");
-    }
-
-    /**
-     * Check that the digital module number is valid.
-     * Module numbers are 1 or 2 (they are no longer real cRIO slots).
-     *
-     * @param moduleNumber The digital module module number to check.
-     */
-    protected static void checkRelayModule(final int moduleNumber) {
-        checkDigitalModule(moduleNumber);
-    }
-
-    /**
-     * Check that the digital module number is valid.
-     * Module numbers are 1 or 2 (they are no longer real cRIO slots).
-     *
-     * @param moduleNumber The digital module module number to check.
-     */
-    protected static void checkPWMModule(final int moduleNumber) {
-        checkDigitalModule(moduleNumber);
-    }
-
-    /**
-     * Check that the analog module number is valid.
-     * Module numbers are 1 or 2 (they are no longer real cRIO slots).
-     *
-     * @param moduleNumber The analog module module number to check.
-     */
-    protected static void checkAnalogModule(final int moduleNumber) {
-    	// TODO: fix
-        if(moduleNumber == 1 || moduleNumber == 2) {
-            System.err.println("Analog module " + moduleNumber + " is not present.");
-        }
     }
 
     /**
@@ -224,24 +142,6 @@ public abstract class SensorBase { // TODO: Refactor
         if (channel <= 0 || channel > kSolenoidChannels) {
             System.err.println("Requested solenoid channel number is out of range.");
         }
-    }
-
-    /**
-     * Get the number of the default analog module.
-     *
-     * @return The number of the default analog module.
-     */
-    public static int getDefaultAnalogModule() {
-        return SensorBase.m_defaultAnalogModule;
-    }
-
-    /**
-     * Get the number of the default analog module.
-     *
-     * @return The number of the default analog module.
-     */
-    public static int getDefaultDigitalModule() {
-        return SensorBase.m_defaultDigitalModule;
     }
 
     /**

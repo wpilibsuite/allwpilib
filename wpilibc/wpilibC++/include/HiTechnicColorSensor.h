@@ -36,7 +36,7 @@ public:
 		uint16_t blue;
 		uint16_t green;
 	};
-	explicit HiTechnicColorSensor(uint8_t moduleNumber);
+	HiTechnicColorSensor();
 	virtual ~HiTechnicColorSensor();
 	uint8_t GetColor();
 	uint8_t GetRed();

@@ -38,7 +38,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
 	 * resource tracking into the HAL. This will wait until we get the unit
 	 * tests running for the first time.
 	 */
-	
+
     private static Resource allocated = new Resource( kPwmChannels);
 
     /**
@@ -106,49 +106,35 @@ public class PWM extends SensorBase implements LiveWindowSendable {
     int m_minPwm;
 
     /**
-     * Initialize PWMs given an module and channel.
+     * Initialize PWMs given a channel.
      *
      * This method is private and is the common path for all the constructors for creating PWM
      * instances. Checks module and channel value ranges and allocates the appropriate channel.
      * The allocation is only done to help users ensure that they don't double assign channels.
      */
-    private void initPWM(final int moduleNumber, final int channel) {
-        checkPWMModule(moduleNumber);
+    private void initPWM(final int channel) {
         checkPWMChannel(channel);
         try {
-            allocated.allocate((moduleNumber - 1) * kPwmChannels + channel);
+            allocated.allocate(channel);
         } catch (CheckedAllocationException e) {
             throw new AllocationException(
-                "PWM channel " + channel + " on module " + moduleNumber + " is already allocated");
+                "PWM channel " + channel  + " is already allocated");
         }
         m_channel = channel;
-        m_module = DigitalModule.getInstance(moduleNumber);
+        m_module = DigitalModule.getInstance(1);
         m_module.setPWM(m_channel, kPwmDisabled);
         m_eliminateDeadband = false;
 
-        UsageReporting.report(tResourceType.kResourceType_PWM, channel, moduleNumber-1);
+        UsageReporting.report(tResourceType.kResourceType_PWM, channel);
     }
 
     /**
-     * Allocate a PWM given a module and channel.
-     * Allocate a PWM using a module and channel number.
+     * Allocate a PWM given a channel.
      *
-     * @param moduleNumber The module number of the digital module to use.
-     * @param channel The PWM channel on the digital module.
-     */
-    public PWM(final int moduleNumber, final int channel) {
-        initPWM(moduleNumber, channel);
-    }
-
-    /**
-     * Allocate a PWM in the default module given a channel.
-     *
-     * Using a default module allocate a PWM given the channel number.
-     *
-     * @param channel The PWM channel on the digital module.
+     * @param channel The PWM channel.
      */
     public PWM(final int channel) {
-        initPWM(getDefaultDigitalModule(), channel);
+        initPWM(channel);
     }
 
     /**
@@ -159,7 +145,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
     public void free() {
         m_module.setPWM(m_channel, kPwmDisabled);
         m_module.freeDIO(m_channel);
-        allocated.free((m_module.getModuleNumber() - 1) * kPwmChannels + m_channel);
+        allocated.free(m_channel);
     }
 
     /**
@@ -209,15 +195,6 @@ public class PWM extends SensorBase implements LiveWindowSendable {
         m_centerPwm = (int)((center-kDefaultPwmCenter)/loopTime+kDefaultPwmStepsDown-1);
         m_deadbandMinPwm = (int)((deadbandMin-kDefaultPwmCenter)/loopTime+kDefaultPwmStepsDown-1);
         m_minPwm = (int)((min-kDefaultPwmCenter)/loopTime+kDefaultPwmStepsDown-1);
-    }
-
-    /**
-     * Gets the module number associated with the PWM Object.
-     *
-     * @return The module's number.
-     */
-    public int getModuleNumber() {
-        return m_module.getModuleNumber();
     }
 
     /**

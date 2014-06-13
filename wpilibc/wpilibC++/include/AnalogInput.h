@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+/* Copyright (c) FIRST 2008. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
@@ -9,12 +9,11 @@
 #include "SensorBase.h"
 #include "PIDSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
-
-class AnalogModule;
+#include "AnalogModule.h"
 
 /**
  * Analog input class.
- * 
+ *
  * Connected to each analog channel is an averaging and oversampling engine.  This engine accumulates
  * the specified ( by SetAverageBits() and SetOversampleBits() ) number of samples before returning a new
  * value.  This is not a sliding window average.  The only difference between the oversampled samples and
@@ -29,11 +28,10 @@ public:
 	static const uint32_t kAccumulatorNumChannels = 2;
 	static const uint32_t kAccumulatorChannels[kAccumulatorNumChannels];
 
-	AnalogInput(uint8_t moduleNumber, uint32_t channel);
 	explicit AnalogInput(uint32_t channel);
 	virtual ~AnalogInput();
 
-	AnalogModule *GetModule();
+    AnalogModule *GetModule() { return AnalogModule::GetInstance(1); }
 
 	int16_t GetValue();
 	int32_t GetAverageValue();
@@ -41,7 +39,6 @@ public:
 	float GetVoltage();
 	float GetAverageVoltage();
 
-	uint8_t GetModuleNumber();
 	uint32_t GetChannel();
 
 	void SetAverageBits(uint32_t bits);
@@ -72,8 +69,8 @@ public:
 	ITable * GetTable();
 
 private:
-	void InitAnalogInput(uint8_t moduleNumber, uint32_t channel);
-	uint32_t m_channel, m_module;
+	void InitAnalogInput(uint32_t channel);
+	uint32_t m_channel;
 	void* m_port;
 	int64_t m_accumulatorOffset;
 

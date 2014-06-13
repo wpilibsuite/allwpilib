@@ -6,7 +6,6 @@
 
 #include "Talon.h"
 
-#include "DigitalModule.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "LiveWindow/LiveWindow.h"
 
@@ -17,7 +16,7 @@
  * most controllers, but if users experience issues such as asymmetric behavior around
  * the deadband or inability to saturate the controller in either direction, calibration is recommended.
  * The calibration procedure can be found in the Talon User Manual available from CTRE.
- * 
+ *
  *   - 211 = full "forward"
  *   - 133 = the "high end" of the deadband range
  *   - 129 = center of the deadband range (off)
@@ -29,27 +28,14 @@ void Talon::InitTalon() {
 	SetPeriodMultiplier(kPeriodMultiplier_2X);
 	SetRaw(m_centerPwm);
 
-	HALReport(HALUsageReporting::kResourceType_Talon, GetChannel(), GetModuleNumber() - 1);
-	LiveWindow::GetInstance()->AddActuator("Talon", GetModuleNumber(), GetChannel(), this);
+	HALReport(HALUsageReporting::kResourceType_Talon, GetChannel());
+	LiveWindow::GetInstance()->AddActuator("Talon", GetChannel(), this);
 }
 
 /**
- * Constructor that assumes the default digital module.
- * 
- * @param channel The PWM channel on the digital module that the Talon is attached to.
+ * @param channel The PWM channel that the Talon is attached to.
  */
 Talon::Talon(uint32_t channel) : SafePWM(channel)
-{
-	InitTalon();
-}
-
-/**
- * Constructor that specifies the digital module.
- * 
- * @param moduleNumber The digital module (1 or 2).
- * @param channel The PWM channel on the digital module that the Talon is attached to (1..10).
- */
-Talon::Talon(uint8_t moduleNumber, uint32_t channel) : SafePWM(moduleNumber, channel)
 {
 	InitTalon();
 }
@@ -59,11 +45,11 @@ Talon::~Talon()
 }
 
 /**
- * Set the PWM value.  
- * 
+ * Set the PWM value.
+ *
  * The PWM value is set using a range of -1.0 to 1.0, appropriately
  * scaling the value for the FPGA.
- * 
+ *
  * @param speed The speed value between -1.0 and 1.0 to set.
  * @param syncGroup Unused interface.
  */
@@ -74,7 +60,7 @@ void Talon::Set(float speed, uint8_t syncGroup)
 
 /**
  * Get the recently set value of the PWM.
- * 
+ *
  * @return The most recently set value for the PWM between -1.0 and 1.0.
  */
 float Talon::Get()
@@ -92,11 +78,10 @@ void Talon::Disable()
 
 /**
  * Write out the PID value as seen in the PIDOutput base object.
- * 
+ *
  * @param output Write out the PWM value as was found in the PIDController
  */
-void Talon::PIDWrite(float output) 
+void Talon::PIDWrite(float output)
 {
 	Set(output);
 }
-

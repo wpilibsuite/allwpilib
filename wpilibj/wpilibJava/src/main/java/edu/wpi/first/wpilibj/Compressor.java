@@ -12,74 +12,74 @@ import edu.wpi.first.wpilibj.tables.ITable;
 
 public class Compressor extends SensorBase implements IDevice, LiveWindowSendable {
 	private ByteBuffer m_pcm;
-	
-	public Compressor(int module) {
-		initCompressor(module);
+
+	public Compressor(int pcmId) {
+		initCompressor(pcmId);
 	}
-	
+
 	public Compressor() {
 		initCompressor(getDefaultSolenoidModule());
 	}
-	
+
 	private void initCompressor(int module) {
 		m_table = null;
-		
+
 		m_pcm = CompressorJNI.initializeCompressor((byte)module);
 	}
-	
+
 	public void start() {
 		setClosedLoopControl(true);
 	}
-	
+
 	public void stop() {
 		setClosedLoopControl(false);
 	}
-	
+
 	public boolean enabled() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
-		
+
 		boolean on = CompressorJNI.getCompressor(m_pcm, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
-		
+
 		return on;
 	}
-	
+
 	public boolean getPressureSwitchValue() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
-		
+
 		boolean on = CompressorJNI.getPressureSwitch(m_pcm, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
-		
+
 		return on;
 	}
-	
+
 	public float getCompressorCurrent() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
-		
+
 		float current = CompressorJNI.getCompressorCurrent(m_pcm, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
-		
+
 		return current;
 	}
-	
+
 	public void setClosedLoopControl(boolean on) {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
-		
+
 		CompressorJNI.setClosedLoopControl(m_pcm, on, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
 	}
-	
+
 	public boolean getClosedLoopControl() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
-		
+
 		boolean on = CompressorJNI.getClosedLoopControl(m_pcm, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
-		
+
 		return on;
 	}
 
@@ -90,7 +90,7 @@ public class Compressor extends SensorBase implements IDevice, LiveWindowSendabl
 	@Override
 	public void stopLiveWindowMode() {
 	}
-	
+
 	@Override
 	public String getSmartDashboardType() {
 		return "Compressor";
@@ -103,7 +103,7 @@ public class Compressor extends SensorBase implements IDevice, LiveWindowSendabl
 		m_table = subtable;
 		updateTable();
 	}
-	
+
 	@Override
 	public ITable getTable() {
 		return m_table;

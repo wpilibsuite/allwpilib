@@ -78,7 +78,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, ISensor,
 	 * Background task that goes through the list of ultrasonic sensors and
 	 * pings each one in turn. The counter is configured to read the timing of
 	 * the returned echo pulse.
-	 * 
+	 *
 	 * DANGER WILL ROBINSON, DANGER WILL ROBINSON: This code runs as a task and
 	 * assumes that none of the ultrasonic sensors will change while it's
 	 * running. If one does, then this will certainly break. Make sure to
@@ -133,16 +133,14 @@ public class Ultrasonic extends SensorBase implements PIDSource, ISensor,
 		m_instances++;
 		UsageReporting.report(tResourceType.kResourceType_Ultrasonic,
 				m_instances);
-		LiveWindow.addSensor("Ultrasonic", m_echoChannel.getModuleForRouting(),
-				m_echoChannel.getChannel(), this);
+		LiveWindow.addSensor("Ultrasonic", m_echoChannel.getChannel(), this);
 	}
 
 	/**
-	 * Create an instance of the Ultrasonic Sensor using the default module.
+	 * Create an instance of the Ultrasonic Sensor.
 	 * This is designed to supchannel the Daventech SRF04 and Vex ultrasonic
-	 * sensors. This constructor assumes that both digital I/O channels are in
-	 * the default digital module.
-	 * 
+	 * sensors.
+	 *
 	 * @param pingChannel
 	 *            The digital output channel that sends the pulse to initiate
 	 *            the sensor sending the ping.
@@ -162,11 +160,11 @@ public class Ultrasonic extends SensorBase implements PIDSource, ISensor,
 	}
 
 	/**
-	 * Create an instance of the Ultrasonic Sensor using the default module.
+	 * Create an instance of the Ultrasonic Sensor.
 	 * This is designed to supchannel the Daventech SRF04 and Vex ultrasonic
 	 * sensors. This constructor assumes that both digital I/O channels are in
 	 * the default digital module. Default unit is inches.
-	 * 
+	 *
 	 * @param pingChannel
 	 *            The digital output channel that sends the pulse to initiate
 	 *            the sensor sending the ping.
@@ -182,7 +180,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, ISensor,
 	/**
 	 * Create an instance of an Ultrasonic Sensor from a DigitalInput for the
 	 * echo channel and a DigitalOutput for the ping channel.
-	 * 
+	 *
 	 * @param pingChannel
 	 *            The digital output object that starts the sensor doing a ping.
 	 *            Requires a 10uS pulse to start.
@@ -208,7 +206,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, ISensor,
 	 * Create an instance of an Ultrasonic Sensor from a DigitalInput for the
 	 * echo channel and a DigitalOutput for the ping channel. Default unit is
 	 * inches.
-	 * 
+	 *
 	 * @param pingChannel
 	 *            The digital output object that starts the sensor doing a ping.
 	 *            Requires a 10uS pulse to start.
@@ -218,58 +216,6 @@ public class Ultrasonic extends SensorBase implements PIDSource, ISensor,
 	 */
 	public Ultrasonic(DigitalOutput pingChannel, DigitalInput echoChannel) {
 		this(pingChannel, echoChannel, Unit.kInches);
-	}
-
-	/**
-	 * Create an instance of the Ultrasonic sensor using specified modules. This
-	 * is designed to supchannel the Daventech SRF04 and Vex ultrasonic sensors.
-	 * This constructors takes the channel and module slot for each of the
-	 * required digital I/O channels.
-	 * 
-	 * @param pingSlot
-	 *            The digital module that the pingChannel is in.
-	 * @param pingChannel
-	 *            The digital output channel that sends the pulse to initiate
-	 *            the sensor sending the ping.
-	 * @param echoSlot
-	 *            The digital module that the echoChannel is in.
-	 * @param echoChannel
-	 *            The digital input channel that receives the echo. The length
-	 *            of time that the echo is high represents the round trip time
-	 *            of the ping, and the distance.
-	 * @param units
-	 *            The units returned in either kInches or kMilliMeters
-	 */
-	public Ultrasonic(final int pingSlot, final int pingChannel,
-			final int echoSlot, final int echoChannel, Unit units) {
-		m_pingChannel = new DigitalOutput(pingSlot, pingChannel);
-		m_echoChannel = new DigitalInput(echoSlot, echoChannel);
-		m_allocatedChannels = true;
-		m_units = units;
-		initialize();
-	}
-
-	/**
-	 * Create an instance of the Ultrasonic sensor using specified modules. This
-	 * is designed to supchannel the Daventech SRF04 and Vex ultrasonic sensors.
-	 * This constructors takes the channel and module slot for each of the
-	 * required digital I/O channels. Defualt unit is inches.
-	 * 
-	 * @param pingSlot
-	 *            The digital module that the pingChannel is in.
-	 * @param pingChannel
-	 *            The digital output channel that sends the pulse to initiate
-	 *            the sensor sending the ping.
-	 * @param echoSlot
-	 *            The digital module that the echoChannel is in.
-	 * @param echoChannel
-	 *            The digital input channel that receives the echo. The length
-	 *            of time that the echo is high represents the round trip time
-	 *            of the ping, and the distance.
-	 */
-	public Ultrasonic(final int pingSlot, final int pingChannel,
-			final int echoSlot, final int echoChannel) {
-		this(pingSlot, pingChannel, echoSlot, echoChannel, Unit.kInches);
 	}
 
 	/**
@@ -320,7 +266,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, ISensor,
 	/**
 	 * Turn Automatic mode on/off. When in Automatic mode, all sensors will fire
 	 * in round robin, waiting a set time between each sensor.
-	 * 
+	 *
 	 * @param enabling
 	 *            Set to true if round robin scheduling should start for all the
 	 *            ultrasonic sensors. This scheduling method assures that the
@@ -385,7 +331,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, ISensor,
 	 * in a counter that will increment on each edge of the echo (return)
 	 * signal. If the count is not at least 2, then the range has not yet been
 	 * measured, and is invalid.
-	 * 
+	 *
 	 * @return true if the range is valid
 	 */
 	public boolean isRangeValid() {
@@ -394,7 +340,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, ISensor,
 
 	/**
 	 * Get the range in inches from the ultrasonic sensor.
-	 * 
+	 *
 	 * @return double Range in inches of the target returned from the ultrasonic
 	 *         sensor. If there is no valid value yet, i.e. at least one
 	 *         measurement hasn't completed, then return 0.
@@ -409,7 +355,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, ISensor,
 
 	/**
 	 * Get the range in millimeters from the ultrasonic sensor.
-	 * 
+	 *
 	 * @return double Range in millimeters of the target returned by the
 	 *         ultrasonic sensor. If there is no valid value yet, i.e. at least
 	 *         one measurement hasn't complted, then return 0.
@@ -420,7 +366,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, ISensor,
 
 	/**
 	 * Get the range in the current DistanceUnit for the PIDSource base object.
-	 * 
+	 *
 	 * @return The range in DistanceUnit
 	 */
 	public double pidGet() {
@@ -437,7 +383,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, ISensor,
 	/**
 	 * Set the current DistanceUnit that should be used for the PIDSource base
 	 * object.
-	 * 
+	 *
 	 * @param units
 	 *            The DistanceUnit that should be used.
 	 */
@@ -447,7 +393,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, ISensor,
 
 	/**
 	 * Get the current DistanceUnit that is used for the PIDSource base object.
-	 * 
+	 *
 	 * @return The type of DistanceUnit that is being used.
 	 */
 	public Unit getDistanceUnits() {
@@ -456,7 +402,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, ISensor,
 
 	/**
 	 * Is the ultrasonic enabled
-	 * 
+	 *
 	 * @return true if the ultrasonic is enabled
 	 */
 	public boolean isEnabled() {
@@ -465,7 +411,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, ISensor,
 
 	/**
 	 * Set if the ultrasonic is enabled
-	 * 
+	 *
 	 * @param enable
 	 *            set to true to enable the ultrasonic
 	 */

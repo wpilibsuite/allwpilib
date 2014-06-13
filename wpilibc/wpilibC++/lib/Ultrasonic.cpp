@@ -27,7 +27,7 @@ SEMAPHORE_ID Ultrasonic::m_semaphore = 0;
 /**
  * Background task that goes through the list of ultrasonic sensors and pings each one in turn. The counter
  * is configured to read the timing of the returned echo pulse.
- * 
+ *
  * DANGER WILL ROBINSON, DANGER WILL ROBINSON:
  * This code runs as a task and assumes that none of the ultrasonic sensors will change while it's
  * running. If one does, then this will certainly break. Make sure to disable automatic mode before changing
@@ -78,13 +78,12 @@ void Ultrasonic::Initialize()
 	static int instances = 0;
 	instances++;
 	HALReport(HALUsageReporting::kResourceType_Ultrasonic, instances);
-	LiveWindow::GetInstance()->AddSensor("Ultrasonic", m_echoChannel->GetModuleForRouting(), m_echoChannel->GetChannel(), this);
+	LiveWindow::GetInstance()->AddSensor("Ultrasonic", m_echoChannel->GetChannel(), this);
 }
 
 /**
- * Create an instance of the Ultrasonic Sensor using the default module.
- * This is designed to supchannel the Daventech SRF04 and Vex ultrasonic sensors. This
- * constructor assumes that both digital I/O channels are in the default digital module.
+ * Create an instance of the Ultrasonic Sensor
+ * This is designed to supchannel the Daventech SRF04 and Vex ultrasonic sensors.
  * @param pingChannel The digital output channel that sends the pulse to initiate the sensor sending
  * the ping.
  * @param echoChannel The digital input channel that receives the echo. The length of time that the
@@ -133,28 +132,6 @@ Ultrasonic::Ultrasonic(DigitalOutput &pingChannel, DigitalInput &echoChannel, Di
 	m_allocatedChannels = false;
 	m_pingChannel = &pingChannel;
 	m_echoChannel = &echoChannel;
-	m_units = units;
-	Initialize();
-}
-
-/**
- * Create an instance of the Ultrasonic sensor using specified modules.
- * This is designed to supchannel the Daventech SRF04 and Vex ultrasonic sensors. This
- * constructors takes the channel and module slot for each of the required digital I/O channels.
- * @param pingModuleNumber The digital module that the pingChannel is on.
- * @param pingChannel The digital output channel that sends the pulse to initiate the sensor
- * sending the ping.
- * @param echoModuleNumber The digital module that the echoChannel is on.
- * @param echoChannel The digital input channel that receives the echo. The length of time
- * that the echo is high represents the round trip time of the ping, and the distance.
- * @param units The units returned in either kInches or kMilliMeters
- */
-Ultrasonic::Ultrasonic(uint8_t pingModuleNumber, uint32_t pingChannel,
-		uint8_t echoModuleNumber, uint32_t echoChannel, DistanceUnit units)
-{
-	m_pingChannel = new DigitalOutput(pingModuleNumber, pingChannel);
-	m_echoChannel = new DigitalInput(echoModuleNumber, echoChannel);
-	m_allocatedChannels = true;
 	m_units = units;
 	Initialize();
 }
@@ -296,12 +273,12 @@ double Ultrasonic::GetRangeMM()
 
 /**
  * Get the range in the current DistanceUnit for the PIDSource base object.
- * 
+ *
  * @return The range in DistanceUnit
  */
 double Ultrasonic::PIDGet()
 {
-	switch(m_units) 
+	switch(m_units)
 	{
 	case Ultrasonic::kInches:
 		return GetRangeInches();
@@ -314,7 +291,7 @@ double Ultrasonic::PIDGet()
 
 /**
  * Set the current DistanceUnit that should be used for the PIDSource base object.
- * 
+ *
  * @param units The DistanceUnit that should be used.
  */
 void Ultrasonic::SetDistanceUnits(DistanceUnit units)
@@ -324,7 +301,7 @@ void Ultrasonic::SetDistanceUnits(DistanceUnit units)
 
 /**
  * Get the current DistanceUnit that is used for the PIDSource base object.
- * 
+ *
  * @return The type of DistanceUnit that is being used.
  */
 Ultrasonic::DistanceUnit Ultrasonic::GetDistanceUnits()
@@ -339,11 +316,11 @@ void Ultrasonic::UpdateTable() {
 }
 
 void Ultrasonic::StartLiveWindowMode() {
-	
+
 }
 
 void Ultrasonic::StopLiveWindowMode() {
-	
+
 }
 
 std::string Ultrasonic::GetSmartDashboardType() {
@@ -358,4 +335,3 @@ void Ultrasonic::InitTable(ITable *subTable) {
 ITable * Ultrasonic::GetTable() {
 	return m_table;
 }
-

@@ -32,7 +32,7 @@ void Gyro::InitGyro()
 	if (!m_analog->IsAccumulatorChannel())
 	{
 		wpi_setWPIErrorWithContext(ParameterOutOfRange,
-				"moduleNumber and/or channel (must be accumulator channel)");
+            " channel (must be accumulator channel)");
 		if (m_channelAllocated)
 		{
 			delete m_analog;
@@ -44,7 +44,7 @@ void Gyro::InitGyro()
 	m_voltsPerDegreePerSecond = kDefaultVoltsPerDegreePerSecond;
 	m_analog->SetAverageBits(kAverageBits);
 	m_analog->SetOversampleBits(kOversampleBits);
-	float sampleRate = kSamplesPerSecond * 
+	float sampleRate = kSamplesPerSecond *
 		(1 << (kAverageBits + kOversampleBits));
 	m_analog->GetModule()->SetSampleRate(sampleRate);
 	Wait(1.0);
@@ -63,31 +63,16 @@ void Gyro::InitGyro()
 	m_analog->SetAccumulatorCenter(m_center);
 	m_analog->SetAccumulatorDeadband(0); ///< TODO: compute / parameterize this
 	m_analog->ResetAccumulator();
-	
+
 	SetPIDSourceParameter(kAngle);
 
-	HALReport(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel(), m_analog->GetModuleNumber() - 1);
-	LiveWindow::GetInstance()->AddSensor("Gyro", m_analog->GetModuleNumber(), m_analog->GetChannel(), this);
+	HALReport(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel());
+	LiveWindow::GetInstance()->AddSensor("Gyro", m_analog->GetChannel(), this);
 }
 
 /**
- * Gyro constructor given a slot and a channel.
- * 
- * @param moduleNumber The analog module the gyro is connected to (1).
- * @param channel The analog channel the gyro is connected to (1 or 2).
- */
-Gyro::Gyro(uint8_t moduleNumber, uint32_t channel)
-{
-	m_analog = new AnalogInput(moduleNumber, channel);
-	m_channelAllocated = true;
-	InitGyro();
-}
-
-/**
- * Gyro constructor with only a channel.
- * 
- * Use the default analog module slot.
- * 
+ * Gyro constructor with only a channel..
+ *
  * @param channel The analog channel the gyro is connected to.
  */
 Gyro::Gyro(uint32_t channel)
@@ -145,12 +130,12 @@ Gyro::~Gyro()
 
 /**
  * Return the actual angle in degrees that the robot is currently facing.
- * 
+ *
  * The angle is based on the current accumulator value corrected by the oversampling rate, the
  * gyro type and the A/D calibration values.
  * The angle is continuous, that is can go beyond 360 degrees. This make algorithms that wouldn't
  * want to see a discontinuity in the gyro output as it sweeps past 0 on the second time around.
- * 
+ *
  * @return the current heading of the robot in degrees. This heading is based on integration
  * of the returned rate from the gyro.
  */
@@ -171,14 +156,14 @@ float Gyro::GetAngle( void )
 
 /**
  * Return the rate of rotation of the gyro
- * 
+ *
  * The rate is based on the most recent reading of the gyro analog value
- * 
+ *
  * @return the current rate in degrees per second
  */
 double Gyro::GetRate( void )
 {
-	return (m_analog->GetAverageValue() - ((double)m_center + m_offset)) * 1e-9 * m_analog->GetLSBWeight() 
+	return (m_analog->GetAverageValue() - ((double)m_center + m_offset)) * 1e-9 * m_analog->GetLSBWeight()
 			/ ((1 << m_analog->GetOversampleBits()) * m_voltsPerDegreePerSecond);
 }
 
@@ -187,7 +172,7 @@ double Gyro::GetRate( void )
  * Set the gyro type based on the sensitivity.
  * This takes the number of volts/degree/second sensitivity of the gyro and uses it in subsequent
  * calculations to allow the code to work with multiple gyros.
- * 
+ *
  * @param voltsPerDegreePerSecond The type of gyro specified as the voltage that represents one degree/second.
  */
 void Gyro::SetSensitivity( float voltsPerDegreePerSecond )
@@ -204,7 +189,7 @@ void Gyro::SetPIDSourceParameter(PIDSourceParameter pidSource)
 
 /**
  * Get the angle in degrees for the PIDSource base object.
- * 
+ *
  * @return The angle in degrees.
  */
 double Gyro::PIDGet()
@@ -226,11 +211,11 @@ void Gyro::UpdateTable() {
 }
 
 void Gyro::StartLiveWindowMode() {
-	
+
 }
 
 void Gyro::StopLiveWindowMode() {
-	
+
 }
 
 std::string Gyro::GetSmartDashboardType() {
@@ -245,4 +230,3 @@ void Gyro::InitTable(ITable *subTable) {
 ITable * Gyro::GetTable() {
 	return m_table;
 }
-

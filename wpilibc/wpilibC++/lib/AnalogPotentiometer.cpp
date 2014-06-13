@@ -1,35 +1,30 @@
 
 #include "AnalogPotentiometer.h"
 
-void AnalogPotentiometer::initPot(int slot, int channel, double scale, double offset) {
-    m_module = slot;
+void AnalogPotentiometer::initPot(int channel, double scale, double offset) {
     m_channel = channel;
     m_scale = scale;
     m_offset = offset;
-    m_analog_channel = new AnalogInput(slot, channel);
-}
-
-AnalogPotentiometer::AnalogPotentiometer(int slot, int channel, double scale, double offset) {
-    initPot(slot, channel, scale, offset);
+    m_analog_channel = new AnalogInput(channel);
 }
 
 AnalogPotentiometer::AnalogPotentiometer(int channel, double scale, double offset) {
-    initPot(1, channel, scale, offset);
+    initPot(channel, scale, offset);
 }
 
 AnalogPotentiometer::AnalogPotentiometer(int channel, double scale) {
-    initPot(1, channel, scale, 0);
+    initPot(channel, scale, 0);
 }
 
 AnalogPotentiometer::AnalogPotentiometer(int channel) {
-    initPot(1, channel, 1, 0);
+    initPot(channel, 1, 0);
 }
 
 
 double AnalogPotentiometer::Get() {
     return m_analog_channel->GetVoltage() * m_scale + m_offset;
 }
-    
+
 double AnalogPotentiometer::PIDGet() {
     return Get();
 }

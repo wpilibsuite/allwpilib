@@ -34,28 +34,17 @@ public class Jaguar extends SafePWM implements SpeedController, IDeviceControlle
         setPeriodMultiplier(PeriodMultiplier.k1X);
         setRaw(m_centerPwm);
 
-        UsageReporting.report(tResourceType.kResourceType_Jaguar, getChannel(), getModuleNumber()-1);
-        LiveWindow.addActuator("Jaguar", getModuleNumber(), getChannel(), this);
+        UsageReporting.report(tResourceType.kResourceType_Jaguar, getChannel());
+        LiveWindow.addActuator("Jaguar", getChannel(), this);
     }
 
     /**
-     * Constructor that assumes the default digital module.
+     * Constructor.
      *
-     * @param channel The PWM channel on the digital module that the Jaguar is attached to.
+     * @param channel The PWM channel that the Jaguar is attached to.
      */
     public Jaguar(final int channel) {
         super(channel);
-        initJaguar();
-    }
-
-    /**
-     * Constructor that specifies the digital module.
-     *
-     * @param slot The slot in the chassis that the digital module is plugged into.
-     * @param channel The PWM channel on the digital module that the Jaguar is attached to.
-     */
-    public Jaguar(final int slot, final int channel) {
-        super(slot, channel);
         initJaguar();
     }
 

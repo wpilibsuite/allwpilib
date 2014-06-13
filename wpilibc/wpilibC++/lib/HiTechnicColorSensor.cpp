@@ -27,20 +27,18 @@ const uint8_t HiTechnicColorSensor::kRawBlueRegister;
 
 /**
  * Constructor.
- * 
- * @param moduleNumber The digital module that the sensor is plugged into (1 or 2).
  */
-HiTechnicColorSensor::HiTechnicColorSensor(uint8_t moduleNumber)
+HiTechnicColorSensor::HiTechnicColorSensor()
 	: m_i2c (NULL)
 {
 	m_table = NULL;
-	DigitalModule *module = DigitalModule::GetInstance(moduleNumber);
+	DigitalModule *module = DigitalModule::GetInstance(1);
 	m_mode = kActive;
-	
+
 	if (module)
 	{
 		m_i2c = module->GetI2C(kAddress);
-	
+
 		// Verify Sensor
 		const uint8_t kExpectedManufacturer[] = "HiTechnc";
 		const uint8_t kExpectedSensorType[] = "ColorPD ";
@@ -53,8 +51,8 @@ HiTechnicColorSensor::HiTechnicColorSensor(uint8_t moduleNumber)
 		{
 			wpi_setWPIError(CompassTypeError);
 		}
-		
-		HALReport(HALUsageReporting::kResourceType_HiTechnicColorSensor, moduleNumber - 1);
+
+		HALReport(HALUsageReporting::kResourceType_HiTechnicColorSensor, 0);
 	}
 }
 
@@ -79,7 +77,7 @@ HiTechnicColorSensor::~HiTechnicColorSensor()
 uint8_t HiTechnicColorSensor::GetColor()
 {
 	uint8_t color = 0;
-	
+
 	if(m_mode != kActive)
 	{
 		SetMode(kActive);
@@ -95,7 +93,7 @@ uint8_t HiTechnicColorSensor::GetColor()
  * Get the Red value.
  *
  * Gets the (0-255) red value from the sensor.
- * 
+ *
  * The sensor must be in active mode to access the regular RGB data
  * if the sensor is not in active mode, it will be placed into active
  * mode by this method.
@@ -105,7 +103,7 @@ uint8_t HiTechnicColorSensor::GetColor()
 uint8_t HiTechnicColorSensor::GetRed()
 {
 	uint8_t red = 0;
-	
+
 	if(m_mode != kActive)
 	{
 		SetMode(kActive);
@@ -121,17 +119,17 @@ uint8_t HiTechnicColorSensor::GetRed()
  * Get the Green value.
  *
  * Gets the(0-255) green value from the sensor.
- * 
+ *
  * The sensor must be in active mode to access the regular RGB data
  * if the sensor is not in active mode, it will be placed into active
  * mode by this method.
- * 
+ *
  * @return The Green sensor value.
  */
 uint8_t HiTechnicColorSensor::GetGreen()
 {
 	uint8_t green = 0;
-	
+
 	if(m_mode != kActive)
 	{
 		SetMode(kActive);
@@ -147,17 +145,17 @@ uint8_t HiTechnicColorSensor::GetGreen()
  * Get the Blue value.
  *
  * Gets the raw (0-255) blue value from the sensor.
- * 
+ *
  * The sensor must be in active mode to access the regular RGB data
  * if the sensor is not in active mode, it will be placed into active
  * mode by this method.
- * 
+ *
  * @return The Blue sensor value.
  */
 uint8_t HiTechnicColorSensor::GetBlue()
 {
 	uint8_t blue = 0;
-	
+
 	if(m_mode != kActive)
 	{
 		SetMode(kActive);
@@ -174,18 +172,18 @@ uint8_t HiTechnicColorSensor::GetBlue()
  * Using this method ensures that all three values come from the
  * same sensor reading, using the individual color methods provides
  * no such guarantee.
- * 
+ *
  * The sensor must be in active mode to access the regular RGB data.
  * If the sensor is not in active mode, it will be placed into active
  * mode by this method.
- * 
+ *
  * @return RGB object with the three color values
  */
 HiTechnicColorSensor::RGB HiTechnicColorSensor::GetRGB()
 {
 	uint8_t colors[3] = {0,0,0};
 	RGB result;
-	
+
 	if(m_mode != kActive)
 	{
 		SetMode(kActive);
@@ -194,11 +192,11 @@ HiTechnicColorSensor::RGB HiTechnicColorSensor::GetRGB()
 	{
 		m_i2c->Read(kRawRedRegister, sizeof(colors), (uint8_t*)&colors);
 	}
-	
+
 	result.red = colors[0];
 	result.green = colors[1];
 	result.blue = colors[2];
-	
+
 	return result;
 }
 
@@ -206,7 +204,7 @@ HiTechnicColorSensor::RGB HiTechnicColorSensor::GetRGB()
  * Get the Raw Red value.
  *
  * Gets the (0-65536) raw red value from the sensor.
- * 
+ *
  * The sensor must be in raw or passive mode to access the regular RGB data
  * if the sensor is not in raw or passive mode, it will be placed into raw
  * mode by this method.
@@ -216,7 +214,7 @@ HiTechnicColorSensor::RGB HiTechnicColorSensor::GetRGB()
 uint16_t HiTechnicColorSensor::GetRawRed()
 {
 	uint16_t rawRed = 0;
-	
+
 	if(m_mode == kActive)
 	{
 		SetMode(kRaw);
@@ -232,7 +230,7 @@ uint16_t HiTechnicColorSensor::GetRawRed()
    * Get the Raw Green value.
    *
    * Gets the (0-65536) raw green value from the sensor.
-   * 
+   *
    * The sensor must be in raw or passive mode to access the regular RGB data
    * if the sensor is not in raw or passive mode, it will be placed into raw
    * mode by this method.
@@ -242,7 +240,7 @@ uint16_t HiTechnicColorSensor::GetRawRed()
 uint16_t HiTechnicColorSensor::GetRawGreen()
 {
 	uint16_t rawGreen = 0;
-	
+
 	if(m_mode == kActive)
 	{
 		SetMode(kRaw);
@@ -258,7 +256,7 @@ uint16_t HiTechnicColorSensor::GetRawGreen()
  * Get the Raw Blue value.
  *
  * Gets the (0-65536) raw blue value from the sensor.
- * 
+ *
  * The sensor must be in raw or passive mode to access the regular RGB data
  * if the sensor is not in raw or passive mode, it will be placed into raw
  * mode by this method.
@@ -268,7 +266,7 @@ uint16_t HiTechnicColorSensor::GetRawGreen()
 uint16_t HiTechnicColorSensor::GetRawBlue()
 {
 	uint16_t rawBlue = 0;
-	
+
 	if(m_mode == kActive)
 	{
 		SetMode(kRaw);
@@ -287,7 +285,7 @@ uint16_t HiTechnicColorSensor::GetRawBlue()
  * no such guarantee.
  *
  * Gets the (0-65536) raw color values from the sensor.
- * 
+ *
  * The sensor must be in raw or passive mode to access the regular RGB data
  * if the sensor is not in raw or passive mode, it will be placed into raw
  * mode by this method.
@@ -298,7 +296,7 @@ HiTechnicColorSensor::RGB HiTechnicColorSensor::GetRawRGB()
 {
 	uint8_t colors[6] = {0,0,0,0,0,0};
 	RGB result;
-	
+
 	if(m_mode != kActive)
 	{
 		SetMode(kActive);
@@ -307,11 +305,11 @@ HiTechnicColorSensor::RGB HiTechnicColorSensor::GetRawRGB()
 	{
 		m_i2c->Read(kRedRegister, sizeof(colors), (uint8_t*)&colors);
 	}
-	
+
 	result.red = (colors[0]<<8) + colors[1];
 	result.green = (colors[2]<<8) + colors[3];
 	result.blue = (colors[4]<<8) + colors[5];
-	
+
 	return result;
 }
 
@@ -376,7 +374,7 @@ ITable* HiTechnicColorSensor::GetTable()
  */
 void HiTechnicColorSensor::StartLiveWindowMode()
 {
-	
+
 }
 
 /**
@@ -384,5 +382,5 @@ void HiTechnicColorSensor::StartLiveWindowMode()
  */
 void HiTechnicColorSensor::StopLiveWindowMode()
 {
-	
+
 }

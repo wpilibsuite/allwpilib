@@ -19,7 +19,6 @@ public:
 	/// 55 uSec for threshold
 	static constexpr double kGearToothThreshold = 55e-6;
 	GearTooth(uint32_t channel, bool directionSensitive = false);
-	GearTooth(uint8_t moduleNumber, uint32_t channel, bool directionSensitive = false);
 	GearTooth(DigitalSource *source, bool directionSensitive = false);
 	GearTooth(DigitalSource &source, bool directionSensitive = false);
 	virtual ~GearTooth();

@@ -15,20 +15,15 @@ Resource *interruptsResource = NULL;
 
 /**
  * Create an instance of a DigitalInput.
- * Creates a digital input given a slot and channel. Common creation routine
- * for all constructors.
+ * Creates a digital input given a channel. Common creation routine for all
+ * constructors.
  */
-void DigitalInput::InitDigitalInput(uint8_t moduleNumber, uint32_t channel)
+void DigitalInput::InitDigitalInput(uint32_t channel)
 {
 	m_table = NULL;
 	char buf[64];
 	Resource::CreateResourceObject(&interruptsResource, interrupt_kNumSystems);
-	if (!CheckDigitalModule(moduleNumber))
-	{
-		snprintf(buf, 64, "Digital Module %d", moduleNumber);
-		wpi_setWPIErrorWithContext(ModuleIndexOutOfRange, buf);
-		return;
-	}
+
 	if (!CheckDigitalChannel(channel))
 	{
 		snprintf(buf, 64, "Digital Channel %d", channel);
@@ -36,33 +31,21 @@ void DigitalInput::InitDigitalInput(uint8_t moduleNumber, uint32_t channel)
 		return;
 	}
 	m_channel = channel;
-	m_module = DigitalModule::GetInstance(moduleNumber);
+	m_module = DigitalModule::GetInstance(1);
 	m_module->AllocateDIO(channel, true);
 
-	HALReport(HALUsageReporting::kResourceType_DigitalInput, channel, moduleNumber - 1);
+	HALReport(HALUsageReporting::kResourceType_DigitalInput, channel);
 }
 
 /**
  * Create an instance of a Digital Input class.
- * Creates a digital input given a channel and uses the default module.
+ * Creates a digital input given a channel.
  *
- * @param channel The digital channel (1..14).
+ * @param channel The digital channel (0..19).
  */
 DigitalInput::DigitalInput(uint32_t channel)
 {
-	InitDigitalInput(GetDefaultDigitalModule(), channel);
-}
-
-/**
- * Create an instance of a Digital Input class.
- * Creates a digital input given an channel and module.
- *
- * @param moduleNumber The digital module (1 or 2).
- * @param channel The digital channel (1..14).
- */
-DigitalInput::DigitalInput(uint8_t moduleNumber, uint32_t channel)
-{
-	InitDigitalInput(moduleNumber, channel);
+	InitDigitalInput(channel);
 }
 
 /**
@@ -204,11 +187,11 @@ void DigitalInput::UpdateTable() {
 }
 
 void DigitalInput::StartLiveWindowMode() {
-	
+
 }
 
 void DigitalInput::StopLiveWindowMode() {
-	
+
 }
 
 std::string DigitalInput::GetSmartDashboardType() {

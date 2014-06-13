@@ -43,53 +43,33 @@ public class AnalogInput extends SensorBase implements PIDSource,
 		LiveWindowSendable {
 
 	private static final int kAccumulatorSlot = 1;
-	private static Resource channels = new Resource(kAnalogModules
-			* kAnalogInputChannels);
+	private static Resource channels = new Resource(kAnalogInputChannels);
 	private ByteBuffer m_port;
-	private int m_moduleNumber, m_channel;
+	private int m_channel;
 	private static final int[] kAccumulatorChannels = { 0, 1 };
 	private long m_accumulatorOffset;
 
 	/**
-	 * Construct an analog channel on the default module.
+	 * Construct an analog channel.
 	 *
 	 * @param channel
 	 *            The channel number to represent.
 	 */
 	public AnalogInput(final int channel) {
-		this(getDefaultAnalogModule(), channel);
-	}
-
-	/**
-	 * Construct an analog channel on a specified module.
-	 *
-	 * @param moduleNumber
-	 *            The digital module to use (1 or 2).
-	 * @param channel
-	 *            The channel number to represent.
-	 */
-	public AnalogInput(final int moduleNumber, final int channel) {
 		m_channel = channel;
-		m_moduleNumber = moduleNumber;
-		if (AnalogJNI.checkAnalogModule((byte)moduleNumber) == 0) {
-			throw new AllocationException("Analog input channel " + m_channel
-					+ " on module " + m_moduleNumber
-					+ " cannot be allocated. Module is not present.");
-		}
+
 		if (AnalogJNI.checkAnalogInputChannel(channel) == 0) {
 			throw new AllocationException("Analog input channel " + m_channel
-					+ " on module " + m_moduleNumber
 					+ " cannot be allocated. Channel is not present.");
 		}
 		try {
-			channels.allocate((moduleNumber - 1) * kAnalogInputChannels + channel);
+			channels.allocate(channel);
 		} catch (CheckedAllocationException e) {
 			throw new AllocationException("Analog input channel " + m_channel
-					+ " on module " + m_moduleNumber + " is already allocated");
+					 + " is already allocated");
 		}
 
-		ByteBuffer port_pointer = AnalogJNI.getPortWithModule(
-				(byte) moduleNumber, (byte) channel);
+		ByteBuffer port_pointer = AnalogJNI.getPortWithModule((byte) 1, (byte) channel);
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
@@ -97,28 +77,26 @@ public class AnalogInput extends SensorBase implements PIDSource,
 		m_port = AnalogJNI.initializeAnalogInputPort(port_pointer, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
 
-		LiveWindow.addSensor("AnalogInput", moduleNumber, channel, this);
-		UsageReporting.report(tResourceType.kResourceType_AnalogChannel,
-				channel, moduleNumber - 1);
+		LiveWindow.addSensor("AnalogInput", channel, this);
+		UsageReporting.report(tResourceType.kResourceType_AnalogChannel, channel);
 	}
 
 	/**
 	 * Channel destructor.
 	 */
 	public void free() {
-		channels.free(((m_moduleNumber - 1) * kAnalogInputChannels + m_channel));
+		channels.free(m_channel);
 		m_channel = 0;
-		m_moduleNumber = 0;
 		m_accumulatorOffset = 0;
 	}
 
 	/**
-	 * Get the analog module that this channel is on.
+	 * Get the analog module.
 	 *
-	 * @return The AnalogModule that this channel is on.
+	 * @return The AnalogModule.
 	 */
 	public AnalogModule getModule() {
-		return AnalogModule.getInstance(m_moduleNumber);
+		return AnalogModule.getInstance(1);
 	}
 
 	/**
@@ -237,15 +215,6 @@ public class AnalogInput extends SensorBase implements PIDSource,
 	 */
 	public int getChannel() {
 		return m_channel;
-	}
-
-	/**
-	 * Gets the number of the analog module this channel is on.
-	 *
-	 * @return The module number of the analog module this channel is on.
-	 */
-	public int getModuleNumber() {
-		return m_moduleNumber;
 	}
 
 	/**
@@ -435,7 +404,6 @@ public class AnalogInput extends SensorBase implements PIDSource,
 		}
 		if (!isAccumulatorChannel()) {
 			throw new IllegalArgumentException("Channel " + m_channel
-					+ " on module " + m_moduleNumber
 					+ " is not an accumulator channel.");
 		}
 		ByteBuffer value = ByteBuffer.allocateDirect(8);
@@ -459,9 +427,6 @@ public class AnalogInput extends SensorBase implements PIDSource,
 	 * @return The analog channel is attached to an accumulator.
 	 */
 	public boolean isAccumulatorChannel() {
-		if (m_moduleNumber != kAccumulatorSlot) {
-			return false;
-		}
 		for (int i = 0; i < kAccumulatorChannels.length; i++) {
 			if (m_channel == kAccumulatorChannels[i]) {
 				return true;

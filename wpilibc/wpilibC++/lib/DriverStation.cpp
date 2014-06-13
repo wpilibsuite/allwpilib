@@ -23,7 +23,6 @@ TLogLevel dsLogLevel = logDEBUG;
     if (level > dsLogLevel) ; \
     else Log().Get(level)
 
-const uint32_t DriverStation::kBatteryModuleNumber;
 const uint32_t DriverStation::kBatteryChannel;
 const uint32_t DriverStation::kJoystickPorts;
 const uint32_t DriverStation::kJoystickAxes;
@@ -33,7 +32,7 @@ uint8_t DriverStation::m_updateNumber = 0;
 
 /**
  * DriverStation contructor.
- * 
+ *
  * This is only called once the first time GetInstance() is called
  */
 DriverStation::DriverStation()
@@ -61,7 +60,7 @@ DriverStation::DriverStation()
 	m_newControlData = initializeSemaphore(SEMAPHORE_EMPTY);
 
 	// Register that semaphore with the network communications task.
-	// It will signal when new packet data is available. 
+	// It will signal when new packet data is available.
 	HALSetNewDataSem(m_packetDataAvailableSem);
 
 	m_waitForDataSem = initializeMultiWait();
@@ -93,7 +92,7 @@ DriverStation::DriverStation()
 	m_controlData->analog4 = 0;
 	m_controlData->dsDigitalIn = 0;
 
-	m_batteryChannel = new AnalogInput(kBatteryModuleNumber, kBatteryChannel);
+	m_batteryChannel = new AnalogInput(kBatteryChannel);
 
 	AddToSingletonList();
 
@@ -170,7 +169,7 @@ void DriverStation::GetData()
 
 	HALGetCommonControlData(m_controlData, HAL_WAIT_FOREVER);
 
-	if (!lastEnabled && IsEnabled()) 
+	if (!lastEnabled && IsEnabled())
 	{
 		// If starting teleop, assume that autonomous just took up 15 seconds
 		if (IsAutonomous())
@@ -202,17 +201,17 @@ void DriverStation::SetData()
 	m_dashboardInUseLow->GetStatusBuffer(&userStatusDataLow, &userStatusDataLowSize);
 	HALSetStatusData(GetBatteryVoltage(), m_digitalOut, m_updateNumber,
 		userStatusDataHigh, userStatusDataHighSize, userStatusDataLow, userStatusDataLowSize, HAL_WAIT_FOREVER);
-	
+
 	m_dashboardInUseHigh->Flush();
 	m_dashboardInUseLow->Flush();
 }
 
 /**
  * Read the battery voltage from the specified AnalogInput.
- * 
+ *
  * This accessor assumes that the battery voltage is being measured
  * through the voltage divider on an analog breakout.
- * 
+ *
  * @return The battery voltage.
  */
 float DriverStation::GetBatteryVoltage()
@@ -229,7 +228,7 @@ float DriverStation::GetBatteryVoltage()
 /**
  * Get the value of the axis on a joystick.
  * This depends on the mapping of the joystick connected to the specified port.
- * 
+ *
  * @param stick The joystick to read.
  * @param axis The analog axis value to read from the joystick.
  * @return The value of the axis on the joystick.
@@ -261,7 +260,7 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
 			wpi_setWPIError(BadJoystickIndex);
 			return 0.0;
 	}
-	
+
 	float result;
 	if (value < 0)
 		result = ((float) value) / 128.0;
@@ -278,7 +277,7 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
 /**
  * The state of the buttons on the joystick.
  * 12 buttons (4 msb are unused) from the joystick.
- * 
+ *
  * @param stick The joystick to read.
  * @return The state of the buttons on the joystick.
  */
@@ -309,7 +308,7 @@ short DriverStation::GetStickButtons(uint32_t stick)
  * The analog values are returned as voltage values for the Driver Station analog inputs.
  * These inputs are typically used for advanced operator interfaces consisting of potentiometers
  * or resistor networks representing values on a rotary switch.
- * 
+ *
  * @param channel The analog input channel on the driver station to read from. Valid range is 1 - 4.
  * @return The analog voltage on the input.
  */
@@ -362,14 +361,14 @@ bool DriverStation::GetDigitalIn(uint32_t channel)
 
 /**
  * Set a value for the digital outputs on the Driver Station.
- * 
+ *
  * Control digital outputs on the Drivers Station. These values are typically used for
  * giving feedback on a custom operator station such as LEDs.
- * 
+ *
  * @param channel The digital output to set. Valid range is 1 - 8.
  * @param value The state to set the digital output.
  */
-void DriverStation::SetDigitalOut(uint32_t channel, bool value) 
+void DriverStation::SetDigitalOut(uint32_t channel, bool value)
 {
 	if (channel < 1 || channel > 8)
 		wpi_setWPIErrorWithContext(ParameterOutOfRange, "channel must be between 1 and 8");
@@ -390,7 +389,7 @@ void DriverStation::SetDigitalOut(uint32_t channel, bool value)
  * @param channel The digital ouput to monitor. Valid range is 1 through 8.
  * @return A digital value being output on the Drivers Station.
  */
-bool DriverStation::GetDigitalOut(uint32_t channel) 
+bool DriverStation::GetDigitalOut(uint32_t channel)
 {
 	if (channel < 1 || channel > 8)
 		wpi_setWPIErrorWithContext(ParameterOutOfRange, "channel must be between 1 and 8");

@@ -21,7 +21,7 @@ public:
 	uint8_t GetAll();
 
 protected:
-	explicit SolenoidBase(uint8_t moduleNumber);
+	explicit SolenoidBase(uint8_t pcmID);
 	void Set(uint8_t value, uint8_t mask);
 	virtual void InitSolenoid() = 0;
 

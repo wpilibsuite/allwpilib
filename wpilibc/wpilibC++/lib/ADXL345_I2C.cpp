@@ -17,14 +17,13 @@ constexpr double ADXL345_I2C::kGsPerLSB;
 
 /**
  * Constructor.
- * 
- * @param moduleNumber The digital module that the sensor is plugged into (1 or 2).
+ *
  * @param range The range (+ or -) that the accelerometer will measure.
  */
-ADXL345_I2C::ADXL345_I2C(uint8_t moduleNumber, ADXL345_I2C::DataFormat_Range range)
+ADXL345_I2C::ADXL345_I2C(ADXL345_I2C::DataFormat_Range range)
 	: m_i2c (NULL)
 {
-	DigitalModule *module = DigitalModule::GetInstance(moduleNumber);
+	DigitalModule *module = DigitalModule::GetInstance(1);
 	if (module)
 	{
 		m_i2c = module->GetI2C(kAddress);
@@ -34,7 +33,7 @@ ADXL345_I2C::ADXL345_I2C(uint8_t moduleNumber, ADXL345_I2C::DataFormat_Range ran
 		// Specify the data format to read
 		m_i2c->Write(kDataFormatRegister, kDataFormat_FullRes | (uint8_t)range);
 
-		HALReport(HALUsageReporting::kResourceType_ADXL345, HALUsageReporting::kADXL345_I2C, moduleNumber - 1);
+		HALReport(HALUsageReporting::kResourceType_ADXL345, HALUsageReporting::kADXL345_I2C, 0);
 	}
 }
 
@@ -49,7 +48,7 @@ ADXL345_I2C::~ADXL345_I2C()
 
 /**
  * Get the acceleration of one axis in Gs.
- * 
+ *
  * @param axis The axis to read from.
  * @return Acceleration of the ADXL345 in Gs.
  */
@@ -68,7 +67,7 @@ double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis)
 
 /**
  * Get the acceleration of all axes in Gs.
- * 
+ *
  * @return Acceleration measured on all axes of the ADXL345 in Gs.
  */
 ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations()
@@ -91,4 +90,3 @@ ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations()
 	}
 	return data;
 }
-

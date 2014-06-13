@@ -13,51 +13,38 @@
 #include "WPIErrors.h"
 
 /**
- * Initialize an analog trigger from a slot and channel.
- * This is the common code for the two constructors that use a slot and channel.
+ * Initialize an analog trigger from a channel.
  */
-void AnalogTrigger::InitTrigger(uint8_t moduleNumber, uint32_t channel)
+void AnalogTrigger::InitTrigger(uint32_t channel)
 {
-	void* port = getPortWithModule(moduleNumber, channel);
+	void* port = getPort(channel);
 	int32_t status = 0;
 	uint32_t index = 0;
 	m_trigger = initializeAnalogTrigger(port, &index, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	m_index = index;
-	
-	HALReport(HALUsageReporting::kResourceType_AnalogTrigger, channel, moduleNumber - 1);
+
+	HALReport(HALUsageReporting::kResourceType_AnalogTrigger, channel);
 }
 
 /**
  * Constructor for an analog trigger given a channel number.
- * The default module is used in this case.
  *
- * @param channel The analog channel (1..8).
+ * @param channel The analog channel (0..7).
  */
 AnalogTrigger::AnalogTrigger(uint32_t channel)
 {
-	InitTrigger(GetDefaultAnalogModule(), channel);
+	InitTrigger(channel);
 }
 
 /**
- * Constructor for an analog trigger given both the slot and channel.
- *
- * @param moduleNumber The analog module (1 or 2).
- * @param channel The analog channel (1..8).
+ * Construct an analog trigger given an analog input.
+ * This should be used in the case of sharing an analog channel between the
+ * trigger and an analog input object.
  */
-AnalogTrigger::AnalogTrigger(uint8_t moduleNumber, uint32_t channel)
+AnalogTrigger::AnalogTrigger(AnalogInput *input)
 {
-	InitTrigger(moduleNumber, channel);
-}
-
-/**
- * Construct an analog trigger given an analog channel.
- * This should be used in the case of sharing an analog channel between the trigger
- * and an analog input object.
- */
-AnalogTrigger::AnalogTrigger(AnalogInput *channel)
-{
-	InitTrigger(channel->GetModuleNumber(), channel->GetChannel());
+	InitTrigger(input->GetChannel());
 }
 
 AnalogTrigger::~AnalogTrigger()
@@ -171,4 +158,3 @@ AnalogTriggerOutput *AnalogTrigger::CreateOutput(AnalogTriggerType type)
 	if (StatusIsFatal()) return NULL;
 	return new AnalogTriggerOutput(this, type);
 }
-

@@ -18,20 +18,10 @@ void SafePWM::InitSafePWM()
 }
 
 /**
- * Constructor for a SafePWM object taking a channel number
- * @param channel The channel number to be used for the underlying PWM object
+ * Constructor for a SafePWM object taking a channel number.
+ * @param channel The PWM channel number (0..19).
  */
 SafePWM::SafePWM(uint32_t channel): PWM(channel)
-{
-	InitSafePWM();
-}
-
-/**
- * Constructor for a SafePWM object taking channel and slot numbers.
- * @param moduleNumber The digital module (1 or 2).
- * @param channel The PWM channel number on the module (1..10).
- */
-SafePWM::SafePWM(uint8_t moduleNumber, uint32_t channel): PWM(moduleNumber, channel)
 {
 	InitSafePWM();
 }
@@ -100,7 +90,7 @@ bool SafePWM::IsSafetyEnabled()
 
 void SafePWM::GetDescription(char *desc)
 {
-	sprintf(desc, "PWM %d on module %d", GetChannel(), GetModuleNumber());
+	sprintf(desc, "PWM %d", GetChannel());
 }
 
 /**
@@ -114,4 +104,3 @@ void SafePWM::SetSpeed(float speed)
 	PWM::SetSpeed(speed);
 	m_safetyHelper->Feed();
 }
-

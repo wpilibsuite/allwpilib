@@ -19,23 +19,18 @@ const int32_t PWM::kPwmDisabled;
 static Resource *allocated = NULL;
 
 /**
- * Initialize PWMs given an module and channel.
- * 
+ * Initialize PWMs given a channel.
+ *
  * This method is private and is the common path for all the constructors for creating PWM
- * instances. Checks module and channel value ranges and allocates the appropriate channel.
+ * instances. Checks channel value range and allocates the appropriate channel.
  * The allocation is only done to help users ensure that they don't double assign channels.
  */
-void PWM::InitPWM(uint8_t moduleNumber, uint32_t channel)
+void PWM::InitPWM(uint32_t channel)
 {
 	m_table = NULL;
 	char buf[64];
-	Resource::CreateResourceObject(&allocated, dio_kNumSystems * kPwmChannels);
-	if (!CheckPWMModule(moduleNumber))
-	{
-		snprintf(buf, 64, "Digital Module %d", moduleNumber);
-		wpi_setWPIErrorWithContext(ModuleIndexOutOfRange, buf);
-		return;
-	}
+	Resource::CreateResourceObject(&allocated, kPwmChannels);
+
 	if (!CheckPWMChannel(channel))
 	{
 		snprintf(buf, 64, "PWM Channel %d", channel);
@@ -43,50 +38,34 @@ void PWM::InitPWM(uint8_t moduleNumber, uint32_t channel)
 		return;
 	}
 
-	snprintf(buf, 64, "PWM %d (Module: %d)", channel, moduleNumber);
-	if (allocated->Allocate((moduleNumber - 1) * kPwmChannels + channel, buf) == ~0ul)
+	snprintf(buf, 64, "PWM %d", channel);
+	if (allocated->Allocate(channel, buf) == ~0ul)
 	{
 		CloneError(allocated);
 		return;
 	}
 	m_channel = channel;
-	m_module = DigitalModule::GetInstance(moduleNumber);
+	m_module = DigitalModule::GetInstance(1);
 	m_module->SetPWM(m_channel, kPwmDisabled);
 	m_eliminateDeadband = false;
 
-	HALReport(HALUsageReporting::kResourceType_PWM, channel, moduleNumber - 1);
+	HALReport(HALUsageReporting::kResourceType_PWM, channel);
 }
 
 /**
- * Allocate a PWM given a module and channel.
- * Allocate a PWM using a module and channel number.
- * 
- * @param moduleNumber The digital module (1 or 2).
- * @param channel The PWM channel on the digital module (1..10).
- */
-PWM::PWM(uint8_t moduleNumber, uint32_t channel)
-	: m_module(NULL)
-{
-	InitPWM(moduleNumber, channel);
-}
-
-/**
- * Allocate a PWM in the default module given a channel.
- * 
- * Using a default module allocate a PWM given the channel number.  The default module is the first
- * slot numerically in the cRIO chassis.
- * 
- * @param channel The PWM channel on the digital module.
+ * Allocate a PWM given a channel number.
+ *
+ * @param channel The PWM channel.
  */
 PWM::PWM(uint32_t channel)
 	: m_module(NULL)
 {
-	InitPWM(GetDefaultDigitalModule(), channel);
+	InitPWM(channel);
 }
 
 /**
  * Free the PWM channel.
- * 
+ *
  * Free the resource associated with the PWM channel and set the value to 0.
  */
 PWM::~PWM()
@@ -94,7 +73,7 @@ PWM::~PWM()
 	if (m_module)
 	{
 		m_module->SetPWM(m_channel, kPwmDisabled);
-		allocated->Free((m_module->GetNumber() - 1) * kPwmChannels + m_channel);
+		allocated->Free(m_channel);
 	}
 }
 
@@ -155,19 +134,14 @@ void PWM::SetBounds(double max, double deadbandMax, double center, double deadba
 //    printf("Calculated m_minPwm: %d min: %lf  loopTime: %lf  defaultStepsDown: %d\n", m_minPwm, min, loopTime, kDefaultPwmStepsDown);
 }
 
-uint32_t PWM::GetModuleNumber()
-{
-	return m_module->GetNumber();
-}
-
 /**
  * Set the PWM value based on a position.
- * 
+ *
  * This is intended to be used by servos.
- * 
+ *
  * @pre SetMaxPositivePwm() called.
  * @pre SetMinNegativePwm() called.
- * 
+ *
  * @param pos The position to set the servo between 0.0 and 1.0.
  */
 void PWM::SetPosition(float pos)
@@ -195,12 +169,12 @@ void PWM::SetPosition(float pos)
 
 /**
  * Get the PWM value in terms of a position.
- * 
+ *
  * This is intended to be used by servos.
- * 
+ *
  * @pre SetMaxPositivePwm() called.
  * @pre SetMinNegativePwm() called.
- * 
+ *
  * @return The position the servo is set to between 0.0 and 1.0.
  */
 float PWM::GetPosition()
@@ -223,15 +197,15 @@ float PWM::GetPosition()
 
 /**
  * Set the PWM value based on a speed.
- * 
+ *
  * This is intended to be used by speed controllers.
- * 
+ *
  * @pre SetMaxPositivePwm() called.
  * @pre SetMinPositivePwm() called.
  * @pre SetCenterPwm() called.
  * @pre SetMaxNegativePwm() called.
  * @pre SetMinNegativePwm() called.
- * 
+ *
  * @param speed The speed to set the speed controller between -1.0 and 1.0.
  */
 void PWM::SetSpeed(float speed)
@@ -274,14 +248,14 @@ void PWM::SetSpeed(float speed)
 
 /**
  * Get the PWM value in terms of speed.
- * 
+ *
  * This is intended to be used by speed controllers.
- * 
+ *
  * @pre SetMaxPositivePwm() called.
  * @pre SetMinPositivePwm() called.
  * @pre SetMaxNegativePwm() called.
  * @pre SetMinNegativePwm() called.
- * 
+ *
  * @return The most recently set speed between -1.0 and 1.0.
  */
 float PWM::GetSpeed()
@@ -316,9 +290,9 @@ float PWM::GetSpeed()
 
 /**
  * Set the PWM value directly to the hardware.
- * 
+ *
  * Write a raw value to a PWM channel.
- * 
+ *
  * @param value Raw PWM value.
  */
 void PWM::SetRaw(unsigned short value)
@@ -329,9 +303,9 @@ void PWM::SetRaw(unsigned short value)
 
 /**
  * Get the PWM value directly from the hardware.
- * 
+ *
  * Read a raw value from a PWM channel.
- * 
+ *
  * @return Raw PWM control value.
  */
 unsigned short PWM::GetRaw()
@@ -342,7 +316,7 @@ unsigned short PWM::GetRaw()
 
 /**
  * Slow down the PWM signal for old devices.
- * 
+ *
  * @param mult The period multiplier to apply to this channel
  */
 void PWM::SetPeriodMultiplier(PeriodMultiplier mult)
@@ -401,4 +375,3 @@ void PWM::InitTable(ITable *subTable) {
 ITable * PWM::GetTable() {
 	return m_table;
 }
-

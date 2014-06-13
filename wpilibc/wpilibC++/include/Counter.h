@@ -23,7 +23,6 @@ public:
 
 	Counter();
 	explicit Counter(uint32_t channel);
-	Counter(uint8_t moduleNumber, uint32_t channel);
 	explicit Counter(DigitalSource *source);
 	explicit Counter(DigitalSource &source);
 	explicit Counter(AnalogTrigger *trigger);
@@ -33,7 +32,6 @@ public:
 	virtual ~Counter();
 
 	void SetUpSource(uint32_t channel);
-	void SetUpSource(uint8_t moduleNumber, uint32_t channel);
 	void SetUpSource(AnalogTrigger *analogTrigger, AnalogTriggerType triggerType);
 	void SetUpSource(AnalogTrigger &analogTrigger, AnalogTriggerType triggerType);
 	void SetUpSource(DigitalSource *source);
@@ -42,7 +40,6 @@ public:
 	void ClearUpSource();
 
 	void SetDownSource(uint32_t channel);
-	void SetDownSource(uint8_t moduleNumber, uint32_t channel);
 	void SetDownSource(AnalogTrigger *analogTrigger, AnalogTriggerType triggerType);
 	void SetDownSource(AnalogTrigger &analogTrigger, AnalogTriggerType triggerType);
 	void SetDownSource(DigitalSource *source);
@@ -73,7 +70,7 @@ public:
 	{
 		return m_index;
 	}
-	
+
 	void UpdateTable();
 	void StartLiveWindowMode();
 	void StopLiveWindowMode();
@@ -83,13 +80,13 @@ public:
 protected:
 	DigitalSource *m_upSource;		///< What makes the counter count up.
 	DigitalSource *m_downSource;	///< What makes the counter count down.
-	void* m_counter;				///< The FPGA counter object.	
+	void* m_counter;				///< The FPGA counter object.
 private:
 	void InitCounter(Mode mode = kTwoPulse);
 
 	bool m_allocatedUpSource;		///< Was the upSource allocated locally?
 	bool m_allocatedDownSource;	///< Was the downSource allocated locally?
 	uint32_t m_index;					///< The index of this counter.
-	
+
 	ITable *m_table;
 };

@@ -10,7 +10,7 @@
 
 /**
  * Standard hobby style servo.
- * 
+ *
  * The range parameters default to the appropriate values for the Hitec HS-322HD servo provided
  * in the FIRST Kit of Parts in 2008.
  */
@@ -18,7 +18,6 @@ class Servo : public SafePWM
 {
 public:
 	explicit Servo(uint32_t channel);
-	Servo(uint8_t moduleNumber, uint32_t channel);
 	virtual ~Servo();
 	void Set(float value);
 	void SetOffline();

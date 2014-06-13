@@ -34,9 +34,18 @@ public class GearTooth extends Counter implements ISensor {
     /**
      * Construct a GearTooth sensor given a channel.
      *
-     * The default module is assumed.
+     * No direction sensing is assumed.
      *
-     * @param channel The GPIO channel on the digital module that the sensor is connected to.
+     * @param channel The GPIO channel that the sensor is connected to.
+     */
+    public GearTooth(final int channel) {
+        this(channel,false);
+    }
+
+    /**
+     * Construct a GearTooth sensor given a channel.
+     *
+     * @param channel The GPIO channel that the sensor is connected to.
      * @param directionSensitive Enable the pulse length decoding in hardware to specify count direction.
      */
     public GearTooth(final int channel, boolean directionSensitive) {
@@ -47,48 +56,7 @@ public class GearTooth extends Counter implements ISensor {
         } else {
             UsageReporting.report(tResourceType.kResourceType_GearTooth, channel, DigitalModule.getDefaultDigitalModule()-1);
         }
-    }
-
-    /**
-     * Construct a GearTooth sensor given a channel.
-     *
-     * The default module is assumed.
-     * No direction sensing is assumed.
-     *
-     * @param channel The GPIO channel on the digital module that the sensor is connected to.
-     */
-    public GearTooth(final int channel) {
-        this(channel,false);
-    }
-
-    /**
-     * Construct a GearTooth sensor given a channel and module.
-     *
-     * @param slot The slot in the chassis that the digital module is plugged in to.
-     * @param channel The GPIO channel on the digital module that the sensor is connected to.
-     * @param directionSensitive Enable the pulse length decoding in hardware to specify count direction.
-     */
-    public GearTooth(final int slot, final int channel, boolean directionSensitive) {
-        super(slot, channel);
-        enableDirectionSensing(directionSensitive);
-        if(directionSensitive) {
-            UsageReporting.report(tResourceType.kResourceType_GearTooth, channel, DigitalModule.getDefaultDigitalModule()-1, "D");
-        } else {
-            UsageReporting.report(tResourceType.kResourceType_GearTooth, channel, DigitalModule.getDefaultDigitalModule()-1);
-        }
-        LiveWindow.addSensor("GearTooth", slot, channel, this);
-    }
-
-    /**
-     * Construct a GearTooth sensor given a channel and module.
-     *
-     * No direction sensing is assumed.
-     *
-     * @param slot The slot in the chassis that the digital module is plugged in to.
-     * @param channel The GPIO channel on the digital module that the sensor is connected to.
-     */
-    public GearTooth(final int slot, final int channel) {
-        this(slot, channel,false);
+        LiveWindow.addSensor("GearTooth", channel, this);
     }
 
     /**

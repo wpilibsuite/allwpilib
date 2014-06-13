@@ -1,7 +1,7 @@
 
 #include "AnalogInput.h"
 #include "interfaces/Potentiometer.h"
-#include "LiveWindow/LiveWindowSendable.h" 
+#include "LiveWindow/LiveWindowSendable.h"
 
 /**
  * Class for reading analog potentiometers. Analog potentiometers read
@@ -13,23 +13,6 @@
  */
 class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
 public:
-    /**
-     * AnalogPotentiometer constructor.
-     *
-     * Use the scaling and offset values so that the output produces
-     * meaningful values. I.E: you have a 270 degree potentiometer and
-     * you want the output to be degrees with the halfway point as 0
-     * degrees. The scale value is 270.0(degrees)/5.0(volts) and the
-     * offset is -135.0 since the halfway point after scaling is 135
-     * degrees.
-     *
-     * @param slot The analog module this potentiometer is plugged into.
-     * @param channel The analog channel this potentiometer is plugged into.
-     * @param scale The scaling to multiply the voltage by to get a meaningful unit.
-     * @param offset The offset to add to the scaled value for controlling the zero value
-     */
-    AnalogPotentiometer(int slot, int channel, double scale, double offset);
-
     /**
      * AnalogPotentiometer constructor.
      *
@@ -82,7 +65,7 @@ public:
      * @return The current reading.
      */
     virtual double PIDGet();
-    
+
     /*
      * Live Window code, only does anything if live window is activated.
      */
@@ -95,14 +78,14 @@ public:
      * AnalogPotentiometers don't have to do anything special when entering the LiveWindow.
      */
     virtual void StartLiveWindowMode() {}
-    
+
     /**
      * AnalogPotentiometers don't have to do anything special when exiting the LiveWindow.
      */
     virtual void StopLiveWindowMode() {}
-  
+
 private:
-    int m_module, m_channel;
+    int m_channel;
     double m_scale, m_offset;
     AnalogInput* m_analog_channel;
     ITable* m_table;
@@ -110,5 +93,5 @@ private:
     /**
      * Common initialization code called by all constructors.
      */
-    void initPot(int slot, int channel, double scale, double offset);
+    void initPot(int channel, double scale, double offset);
 };

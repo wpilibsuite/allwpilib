@@ -10,7 +10,7 @@
 #include "PIDSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
 
-/** 
+/**
  * Handle operation of the accelerometer.
  * The accelerometer reads acceleration directly through the sensor. Many sensors have
  * multiple axis and can be treated as multiple devices. Each is calibrated by finding
@@ -19,7 +19,6 @@
 class Accelerometer : public SensorBase, public PIDSource, public LiveWindowSendable {
 public:
 	explicit Accelerometer(uint32_t channel);
-	Accelerometer(uint8_t moduleNumber, uint32_t channel);
 	explicit Accelerometer(AnalogInput *channel);
 	virtual ~Accelerometer();
 
@@ -42,6 +41,6 @@ private:
 	float m_voltsPerG;
 	float m_zeroGVoltage;
 	bool m_allocatedChannel;
-	
+
 	ITable *m_table;
 };

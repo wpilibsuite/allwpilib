@@ -18,12 +18,12 @@
 void Counter::InitCounter(Mode mode)
 {
 	m_table = NULL;
-	
+
 	int32_t status = 0;
 	uint32_t index = 0;
 	m_counter = initializeCounter(mode, &index, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
-	
+
 	m_upSource = NULL;
 	m_downSource = NULL;
 	m_allocatedUpSource = false;
@@ -72,7 +72,7 @@ Counter::Counter(DigitalSource &source) :
 
 /**
  * Create an instance of a Counter object.
- * Create an up-Counter instance given a channel. The default digital module is assumed.
+ * Create an up-Counter instance given a channel.
  */
 Counter::Counter(uint32_t channel) :
 	m_upSource(NULL),
@@ -81,22 +81,6 @@ Counter::Counter(uint32_t channel) :
 {
 	InitCounter();
 	SetUpSource(channel);
-	ClearDownSource();
-}
-
-/**
- * Create an instance of a Counter object.
- * Create an instance of an up-Counter given a digital module and a channel.
- * @param moduleNumber The digital module (1 or 2).
- * @param channel The channel in the digital module
- */
-Counter::Counter(uint8_t moduleNumber, uint32_t channel) :
-	m_upSource(NULL),
-	m_downSource(NULL),
-	m_counter(NULL)
-{
-	InitCounter();
-	SetUpSource(moduleNumber, channel);
 	ClearDownSource();
 }
 
@@ -173,7 +157,7 @@ Counter::~Counter()
 		delete m_downSource;
 		m_downSource = NULL;
 	}
-	
+
 	int32_t status = 0;
 	freeCounter(m_counter, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -181,27 +165,13 @@ Counter::~Counter()
 }
 
 /**
- * Set the up source for the counter as digital input channel and slot.
- *
- * @param moduleNumber The digital module (1 or 2).
- * @param channel The digital channel (1..14).
- */
-void Counter::SetUpSource(uint8_t moduleNumber, uint32_t channel)
-{
-	if (StatusIsFatal()) return;
-	SetUpSource(new DigitalInput(moduleNumber, channel));
-	m_allocatedUpSource = true;
-}
-
-/**
  * Set the upsource for the counter as a digital input channel.
- * The slot will be the default digital module slot.
  */
 void Counter::SetUpSource(uint32_t channel)
 {
-	if (StatusIsFatal()) return;
-	SetUpSource(GetDefaultDigitalModule(), channel);
-	m_allocatedUpSource = true;
+    if (StatusIsFatal()) return;
+    SetUpSource(new DigitalInput(channel));
+    m_allocatedUpSource = true;
 }
 
 /**
@@ -297,25 +267,11 @@ void Counter::ClearUpSource()
 
 /**
  * Set the down counting source to be a digital input channel.
- * The slot will be set to the default digital module slot.
  */
 void Counter::SetDownSource(uint32_t channel)
 {
 	if (StatusIsFatal()) return;
 	SetDownSource(new DigitalInput(channel));
-	m_allocatedDownSource = true;
-}
-
-/**
- * Set the down counting source to be a digital input slot and channel.
- *
- * @param moduleNumber The digital module (1 or 2).
- * @param channel The digital channel (1..14).
- */
-void Counter::SetDownSource(uint8_t moduleNumber, uint32_t channel)
-{
-	if (StatusIsFatal()) return;
-	SetDownSource(new DigitalInput(moduleNumber, channel));
 	m_allocatedDownSource = true;
 }
 
@@ -437,7 +393,7 @@ void Counter::SetExternalDirectionMode()
 
 /**
  * Set Semi-period mode on this counter.
- * Counts up on both rising and falling edges. 
+ * Counts up on both rising and falling edges.
  */
 void Counter::SetSemiPeriodMode(bool highSemiPeriod)
 {
@@ -460,10 +416,10 @@ void Counter::SetPulseLengthMode(float threshold)
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
-    
+
 /**
- * Get the Samples to Average which specifies the number of samples of the timer to 
- * average when calculating the period. Perform averaging to account for 
+ * Get the Samples to Average which specifies the number of samples of the timer to
+ * average when calculating the period. Perform averaging to account for
  * mechanical imperfections or as oversampling to increase resolution.
  * @return SamplesToAverage The number of samples being averaged (from 1 to 127)
  */
@@ -476,8 +432,8 @@ int Counter::GetSamplesToAverage()
 }
 
 /**
- * Set the Samples to Average which specifies the number of samples of the timer to 
- * average when calculating the period. Perform averaging to account for 
+ * Set the Samples to Average which specifies the number of samples of the timer to
+ * average when calculating the period. Perform averaging to account for
  * mechanical imperfections or as oversampling to increase resolution.
  * @param samplesToAverage The number of samples to average from 1 to 127.
  */
@@ -645,11 +601,11 @@ void Counter::UpdateTable() {
 }
 
 void Counter::StartLiveWindowMode() {
-	
+
 }
 
 void Counter::StopLiveWindowMode() {
-	
+
 }
 
 std::string Counter::GetSmartDashboardType() {
@@ -664,4 +620,3 @@ void Counter::InitTable(ITable *subTable) {
 ITable * Counter::GetTable() {
 	return m_table;
 }
-
