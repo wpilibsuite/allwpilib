@@ -8,6 +8,8 @@ package edu.wpi.first.wpilibj.smartdashboard;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.logging.Logger;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -24,7 +26,12 @@ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
  *
  */
 public class SmartDashboardTest extends AbstractComsSetup {
+	private static final Logger logger = Logger.getLogger(SmartDashboardTest.class.getName());
 	private static final NetworkTable table = NetworkTable.getTable("SmartDashboard");
+	
+	protected Logger getClassLogger(){
+		return logger;
+	}
 	
 	/**
 	 * @throws java.lang.Exception

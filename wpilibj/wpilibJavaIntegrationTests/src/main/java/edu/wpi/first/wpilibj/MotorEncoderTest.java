@@ -35,6 +35,10 @@ public class MotorEncoderTest extends AbstractComsSetup {
 	//private static final List<MotorEncoderFixture> pairs = new ArrayList<MotorEncoderFixture>();
 	private static MotorEncoderFixture me = null;
 	
+	protected Logger getClassLogger(){
+		return logger;
+	}
+	
 	public MotorEncoderTest(MotorEncoderFixture mef){
 		logger.fine("Constructor with: " + mef.getType());
 		if(me != null && !me.equals(mef)) me.teardown();

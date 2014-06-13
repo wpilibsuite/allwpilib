@@ -8,6 +8,8 @@ package edu.wpi.first.wpilibj;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.logging.Logger;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -26,10 +28,12 @@ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
  * @author Fredric Silberberg
  */
 public class SampleTest extends AbstractComsSetup {
+	private static final Logger logger = Logger.getLogger(SampleTest.class.getName());
 
 	static SampleFixture fixture = new SampleFixture();
 
-	public SampleTest() {
+	protected Logger getClassLogger(){
+		return logger;
 	}
 
 	@BeforeClass

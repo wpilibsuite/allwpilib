@@ -25,6 +25,8 @@ public class TiltPanCameraFixture implements ITestFixture {
 	private final Servo tilt;
 	private final Servo pan;
 	
+	private double lastResetTimeGyro = 0;
+	
 	/**
 	 * Constructs the TiltPanCamera
 	 * @param tilt
@@ -37,26 +39,50 @@ public class TiltPanCameraFixture implements ITestFixture {
 		this.tilt = tilt;
 		this.pan = pan;
 		this.gyro = gyro;
-		
 	}
 	
 	@Override
 	public boolean setup() {
-		return reset();
+		boolean wasSetup = true;
+		pan.set(0.0);
+		tilt.set(0.0);
+		Timer.delay(RESET_TIME);
+		gyro.reset();
+		double startTime = Timer.getFPGATimestamp();
+		while(Math.abs(gyro.getAngle()) > 0.1){
+			Timer.delay(.0001);
+		}
+		double endTime = Timer.getFPGATimestamp();
+		lastResetTimeGyro = endTime - startTime;
+		//System.out.println("Gyro reset in " + lastResetTimeGyro + " seconds");
+		
+		wasSetup = wasSetup && Math.abs(pan.get()) < 0.01;
+		wasSetup = wasSetup && Math.abs(tilt.get()) < 0.01;
+		wasSetup = wasSetup && Math.abs(gyro.getAngle()) < .2;
+		return wasSetup;
+	}
+	
+	/**
+	 * When resetting the gyroscope the reset time is stored as a variable that can be retrieved with this method
+	 * @return The last time that it took to reset the gyroscope
+	 */
+	public double getLastResetTimeGyro() {
+		return lastResetTimeGyro;
+	}
+	
+	public String getSetupError(){
+		StringBuilder error = new StringBuilder("SETUP ERROR: ");
+		if(Math.abs(pan.get()) >= 0.01) error.append("Pan " + pan.get() + ", ");
+		if(Math.abs(tilt.get()) >= 0.01) error.append("Tilt " + tilt.get() + ", ");
+		if(Math.abs(gyro.getAngle()) >= 0.2) error.append("Gyro " + gyro.getAngle() + ", ");
+		error.delete(error.length()-2, error.length());
+		return error.toString();
 	}
 	
 	@Override
 	public boolean reset(){
-		boolean wasReset = true;
-		pan.setAngle(0);
-		tilt.set(0);
-		Timer.delay(RESET_TIME);
 		gyro.reset();
-		
-		wasReset &= pan.get() == 0;
-		wasReset &= tilt.get() == 0;
-		wasReset &= gyro.getAngle() == 0;
-		return wasReset;
+		return true;
 	}
 	
 	public Servo getTilt() {
@@ -73,8 +99,7 @@ public class TiltPanCameraFixture implements ITestFixture {
 
 	@Override
 	public boolean teardown() {
-		reset();
-		
+		setup();
 		tilt.free();
 		pan.free();
 		gyro.free();

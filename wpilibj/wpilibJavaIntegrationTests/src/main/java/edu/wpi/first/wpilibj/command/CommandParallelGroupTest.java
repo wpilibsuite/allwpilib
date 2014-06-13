@@ -8,6 +8,8 @@ package edu.wpi.first.wpilibj.command;
 
 import static org.junit.Assert.*;
 
+import java.util.logging.Logger;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -23,6 +25,11 @@ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
  * @author Jonathan Leitschuh
  */
 public class CommandParallelGroupTest extends AbstractCommandTest {
+	private static final Logger logger = Logger.getLogger(CommandParallelGroupTest.class.getName());
+	
+	protected Logger getClassLogger(){
+		return logger;
+	}
 
 	/**
 	 * @throws java.lang.Exception

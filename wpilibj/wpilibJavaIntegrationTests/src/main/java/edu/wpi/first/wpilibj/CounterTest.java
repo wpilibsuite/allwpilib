@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
+import java.util.logging.Logger;
 
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -31,9 +32,14 @@ import edu.wpi.first.wpilibj.test.TestBench;
 @RunWith(Parameterized.class)
 public class CounterTest extends AbstractComsSetup {
 	private static FakeCounterFixture counter = null;
+	private static final Logger logger = Logger.getLogger(CounterTest.class.getName());
 	
 	Integer input;
 	Integer output;
+	
+	protected Logger getClassLogger(){
+		return logger;
+	}
 	
 	/**
 	 * Constructs a Counter Test with the given inputs

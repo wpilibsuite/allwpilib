@@ -126,7 +126,7 @@ TEST_P(MotorEncoderTest, PIDController) {
 	Reset();
 	
 	PIDController pid(0.003f, 0.001f, 0.0f, m_encoder, m_speedController);
-	pid.SetAbsoluteTolerance(15.0f);
+	pid.SetAbsoluteTolerance(20.0f);
 	pid.SetOutputRange(-0.2f, 0.2f);
 	pid.SetSetpoint(2500);
 	

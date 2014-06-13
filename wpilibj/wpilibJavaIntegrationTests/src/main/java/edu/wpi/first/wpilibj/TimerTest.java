@@ -9,6 +9,8 @@ package edu.wpi.first.wpilibj;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.logging.Logger;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -18,9 +20,14 @@ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
 
 public class TimerTest extends AbstractComsSetup {
+	private static final Logger logger = Logger.getLogger(TimerTest.class.getName());
 	
 	private static final long TIMER_TOLARANCE = 5 * 1000;
 	private static final long TIMER_RUNTIME = 5 * 1000000;
+	
+	protected Logger getClassLogger(){
+		return logger;
+	}
 	
 	@BeforeClass
 	public static void classSetup() {

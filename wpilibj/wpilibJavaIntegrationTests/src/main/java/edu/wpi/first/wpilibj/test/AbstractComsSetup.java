@@ -6,7 +6,12 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj.test;
 
+import java.util.logging.Logger;
+
 import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
@@ -55,5 +60,19 @@ public abstract class AbstractComsSetup {
 			System.out.println("Running!");
 		}
 	}
+	
+	
+	protected abstract Logger getClassLogger();
+	
+	/** This causes a stack trace to be printed as the test is running as well as at the end */
+	@Rule
+	public TestWatcher testWatcher = new TestWatcher() {
+		protected void failed(Throwable e, Description description) {
+			System.out.println();
+			getClassLogger().severe("" + description.getDisplayName() + " failed " + e.getMessage());
+			e.printStackTrace();
+			super.failed(e, description);
+		}
+	};
 
 }

@@ -28,6 +28,11 @@ public class TiltPanCameraTest extends AbstractComsSetup {
 	
 	private static TiltPanCameraFixture tpcam;
 
+	
+	protected Logger getClassLogger(){
+		return logger;
+	}
+	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		logger.fine("Setup: TiltPan camera");
@@ -42,7 +47,10 @@ public class TiltPanCameraTest extends AbstractComsSetup {
 
 	@Before
 	public void setUp() throws Exception {
-		tpcam.reset();
+		boolean setupSucsess = tpcam.setup();
+		assertTrue(tpcam.getSetupError(), setupSucsess);
+		double resetTime = tpcam.getLastResetTimeGyro();
+		assertEquals("The Gyroscoe reset time was " + resetTime + " seconds", 0, resetTime, .03);
 	}
 
 	@After
@@ -53,7 +61,7 @@ public class TiltPanCameraTest extends AbstractComsSetup {
 	@Test
 	public void testInitial(){
 		double angle = tpcam.getGyro().getAngle();
-		assertEquals(errorMessage(angle, 0), 0, angle, .5); 
+		assertEquals(errorMessage(angle, 0), 0, angle, .5);
 	}
 
 	/**
@@ -76,6 +84,15 @@ public class TiltPanCameraTest extends AbstractComsSetup {
 		
 		
 		assertEquals(errorMessage(diff, TEST_ANGLE), TEST_ANGLE, angle, 8);
+	}
+	
+	@Test
+	public void testDeviationOverTime(){
+		double angle = tpcam.getGyro().getAngle();
+		assertEquals(errorMessage(angle, 0), 0, angle, .5);
+		Timer.delay(5);
+		angle = tpcam.getGyro().getAngle();
+		assertEquals(errorMessage(angle, 0), 0, angle, .5);
 	}
 	
 	private String errorMessage(double difference, double target){

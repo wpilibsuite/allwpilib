@@ -8,6 +8,8 @@ package edu.wpi.first.wpilibj.command;
 
 import static org.junit.Assert.*;
 
+import java.util.logging.Logger;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -21,6 +23,11 @@ import edu.wpi.first.wpilibj.mocks.MockCommand;
  *
  */
 public class DefaultCommandTest extends AbstractCommandTest {
+	private static final Logger logger = Logger.getLogger(DefaultCommandTest.class.getName());
+	
+	protected Logger getClassLogger(){
+		return logger;
+	}
 
 	/**
 	 * @throws java.lang.Exception

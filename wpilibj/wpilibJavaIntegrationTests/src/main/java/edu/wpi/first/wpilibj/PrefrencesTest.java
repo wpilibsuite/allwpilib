@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Logger;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -27,11 +28,16 @@ import edu.wpi.first.wpilibj.networktables.NetworkTable;
  *
  */
 public class PrefrencesTest extends AbstractCommandTest {
+	private static final Logger logger = Logger.getLogger(PrefrencesTest.class.getName());
 	
 	private NetworkTable prefTable;
 	private Preferences pref;
 	private long check;
 
+	protected Logger getClassLogger(){
+		return logger;
+	}
+	
 	/**
 	 * @throws java.lang.Exception
 	 */

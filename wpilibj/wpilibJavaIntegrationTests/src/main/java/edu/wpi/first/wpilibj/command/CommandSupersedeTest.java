@@ -6,6 +6,8 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj.command;
 
+import java.util.logging.Logger;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -21,6 +23,11 @@ import edu.wpi.first.wpilibj.mocks.MockCommand;
  * @author Jonathan Leitschuh
  */
 public class CommandSupersedeTest extends AbstractCommandTest {
+	private static final Logger logger = Logger.getLogger(CommandSupersedeTest.class.getName());
+	
+	protected Logger getClassLogger(){
+		return logger;
+	}
 
 	/**
 	 * @throws java.lang.Exception

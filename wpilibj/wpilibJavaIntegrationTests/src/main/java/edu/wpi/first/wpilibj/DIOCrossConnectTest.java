@@ -10,6 +10,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
+import java.util.logging.Logger;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -31,8 +32,13 @@ import edu.wpi.first.wpilibj.test.TestBench;
  */
 @RunWith(Parameterized.class)
 public class DIOCrossConnectTest extends AbstractComsSetup {
+	private static final Logger logger = Logger.getLogger(DIOCrossConnectTest.class.getName());
 
 	private static DIOCrossConnectFixture dio = null;
+	
+	protected Logger getClassLogger(){
+		return logger;
+	}
 
 	/**
 	 * Default constructor for the DIOCrossConnectTest

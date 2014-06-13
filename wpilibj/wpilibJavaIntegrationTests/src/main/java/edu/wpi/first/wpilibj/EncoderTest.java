@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj;
 import static org.junit.Assert.*;
 
 import java.util.Collection;
+import java.util.logging.Logger;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -33,7 +34,7 @@ import edu.wpi.first.wpilibj.test.TestBench;
  */
 @RunWith(Parameterized.class)
 public class EncoderTest extends AbstractComsSetup {
-	
+	private static final Logger logger = Logger.getLogger(EncoderTest.class.getName());
 	private static FakeEncoderFixture encoder = null;
 	
 	private final boolean flip; //Does this test need to flip the inputs
@@ -41,6 +42,10 @@ public class EncoderTest extends AbstractComsSetup {
 	private final int inputB;
 	private final int outputA;
 	private final int outputB;
+	
+	protected Logger getClassLogger(){
+		return logger;
+	}
 	
 	/**
 	 * Test data generator. This method is called the the JUnit

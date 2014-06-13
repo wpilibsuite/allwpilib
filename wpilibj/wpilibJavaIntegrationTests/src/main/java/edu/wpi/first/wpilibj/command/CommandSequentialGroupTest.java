@@ -23,8 +23,11 @@ import edu.wpi.first.wpilibj.mocks.MockCommand;
  * @author Jonathan Leitschuh
  */
 public class CommandSequentialGroupTest extends AbstractCommandTest {
-	
 	private static final Logger logger = Logger.getLogger(CommandSequentialGroupTest.class.getName());
+	
+	protected Logger getClassLogger(){
+		return logger;
+	}
 	
 	/**
 	 * @throws java.lang.Exception
