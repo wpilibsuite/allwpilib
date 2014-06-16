@@ -1,7 +1,7 @@
 #ifndef PCM_H_
 #define PCM_H_
 #include "ctre.h"				//BIT Defines + Typedefs
-#include <NetworkCommunication/JaguarCANDriver.h>	//CAN Comm
+#include <NetworkCommunication/CANSessionMux.h>	//CAN Comm
 #include <pthread.h>
 /* encoder/decoders */
 typedef struct _PcmStatus_t{
@@ -75,7 +75,7 @@ class PCM
 public:
     PCM(UINT8 deviceNumber=50);
     ~PCM();
-    
+
     /* Set PCM solenoid state
      * @Return	-	CTR_Code	-	Error code (if any) for setting solenoid
      * @Param 	-	idx			- 	ID of solenoid (1-8)
@@ -94,7 +94,7 @@ public:
      * @Param 	-	clr		- 	Clear / do not clear faults
      */
     CTR_Code 	ClearStickyFaults(bool clr);
-    
+
     /* Get solenoid state
      *
      * @Return	-	CTR_Code	-	Error code (if any)
@@ -172,7 +172,7 @@ public:
      * @Param	-	status		-	Voltage across PCM power ports in Volts (V)
      */
     CTR_Code 	GetBatteryVoltage(float &status);
-    
+
     /* Set PCM Device Number and according CAN frame IDs
      * @Return	-	void
      * @Param	-	deviceNumber	-	Device number of PCM to control
@@ -186,7 +186,7 @@ public:
      * 				See function EnableSeekDebugFrames
      */
 	CTR_Code GetNumberOfFailedControlFrames(UINT16 &status);
-    
+
     /* Get raw Solenoid Blacklist
      * @Return	-	CTR_Code	-	Error code (if any)
      * @Param	-	status		-	Raw binary breakdown of Solenoid Blacklist

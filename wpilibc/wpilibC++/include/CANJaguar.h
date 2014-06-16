@@ -15,6 +15,8 @@
 #include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITable.h"
 
+#include <utility>
+
 /**
  * Luminary Micro Jaguar Speed Control
  */
@@ -43,7 +45,6 @@ public:
 	// SpeedController interface
 	virtual float Get();
 	virtual void Set(float value, uint8_t syncGroup=0);
-	void SetNoAck(float value, uint8_t syncGroup=0);
 	virtual void Disable();
 
 	// PIDOutput interface
@@ -71,7 +72,6 @@ public:
 	bool GetForwardLimitOK();
 	bool GetReverseLimitOK();
 	uint16_t GetFaults();
-	bool GetPowerCycled();
 	void SetVoltageRampRate(double rampRate);
 	virtual uint32_t GetFirmwareVersion();
 	uint8_t GetHardwareVersion();
@@ -105,17 +105,51 @@ protected:
 	int16_t unpackint16_t(uint8_t *buffer);
 	int32_t unpackint32_t(uint8_t *buffer);
 	virtual void setTransaction(uint32_t messageID, const uint8_t *data, uint8_t dataSize);
-	virtual void getTransaction(uint32_t messageID, uint8_t *data, uint8_t *dataSize);
+	virtual bool getTransaction(uint32_t messageID, uint8_t *data, uint8_t *dataSize);
 
 	static int32_t sendMessage(uint32_t messageID, const uint8_t *data, uint8_t dataSize);
-	//#define kTimeoutCan 0.02
-	#define kTimeoutCan 0.0
-	static int32_t receiveMessage(uint32_t *messageID, uint8_t *data, uint8_t *dataSize, float timeout = kTimeoutCan);
+	static int32_t receiveMessage(uint32_t *messageID, uint8_t *data, uint8_t *dataSize);
 
 	uint8_t m_deviceNumber;
 	ControlMode m_controlMode;
 	MUTEX_ID m_transactionSemaphore;
 	double m_maxOutputVoltage;
+
+    enum CANValue {
+        CAN_VALUE = 0x1,
+        CAN_SPEED_REFERENCE = 0x2,
+        CAN_POSITION_REFERENCE = 0x4,
+        CAN_P = 0x8, CAN_I = 0x10, CAN_D = 0x20,
+        CAN_BUS_VOLTAGE = 0x40,
+        CAN_OUTPUT_VOLTAGE = 0x80,
+        CAN_OUTPUT_CURRENT = 0x100,
+        CAN_TEMPERATURE = 0x200,
+        CAN_POSITION = 0x400,
+        CAN_SPEED = 0x800,
+        CAN_LIMITS = 0x1000,
+        CAN_FAULTS = 0x2000,
+        CAN_FIRMWARE_VERSION = 0x4000,
+        CAN_HARDWARE_VERSION = 0x8000,
+        CAN_EVERYTHING = 0xffff
+    };
+
+    bool isUnverified(CANValue value) const;
+    void verifyCANValues();
+
+    // Keep track of what cached CAN values have been verified.
+    CANValue m_verified_values;
+
+    // Cached CAN data
+    float m_value;
+    SpeedReference m_speedReference;
+    PositionReference m_positionReference;
+    double m_p, m_i, m_d;
+    float m_busVoltage, m_outputVoltage, m_outputCurrent, m_temperature;
+    double m_position, m_speed;
+    uint8_t m_limits;
+    uint16_t m_faults;
+    uint32_t m_firmwareVersion;
+    uint8_t m_hardwareVersion;
 
 	MotorSafetyHelper *m_safetyHelper;
 
@@ -126,7 +160,7 @@ protected:
 	std::string GetSmartDashboardType();
 	void InitTable(ITable *subTable);
 	ITable * GetTable();
-	
+
 	ITable *m_table;
 
 private:

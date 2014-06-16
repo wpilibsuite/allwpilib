@@ -1,13 +1,21 @@
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 
 #include "PCM.h"
-#include "NetworkCommunication/JaguarCANDriver.h"
+#include "NetworkCommunication/CANSessionMux.h"
 #include <string.h> // memset
 #include <unistd.h> // usleep
+
+static const UINT32 kFullMessageIDMask = 0x1fffffff;
+
+/* This can be a constant, as long as nobody needs to updatie solenoids within
+    1/50 of a second. */
+static const INT32 kCANPeriod = 20;
+
+
 /* PCM Constructor - Clears all vars, establishes default settings, starts PCM background process
- * 
+ *
  * @Return	-	void
- * 
+ *
  * @Param 	-	deviceNumber	- 	Device ID of PCM to be controlled
  */
 PCM::PCM(UINT8 deviceNumber)
@@ -94,9 +102,9 @@ CTR_Code PCM::SetClosedLoopControl(bool en) {
 }
 
 /* Get solenoid state
- * 
+ *
  * @Return	-	True/False	-	True if solenoid enabled, false otherwise
- * 
+ *
  * @Param 	-	idx		- 	ID of solenoid (1-8) to return status of
  */
 CTR_Code PCM::GetSolenoid(UINT8 idx, bool &status) {
@@ -108,7 +116,7 @@ CTR_Code PCM::GetSolenoid(UINT8 idx, bool &status) {
 }
 
 /* Get pressure switch state
- * 
+ *
  * @Return	-	True/False	-	True if pressure adequate, false if low
  */
 CTR_Code PCM::GetPressure(bool &status) {
@@ -119,7 +127,7 @@ CTR_Code PCM::GetPressure(bool &status) {
 }
 
 /* Get compressor state
- * 
+ *
  * @Return	-	True/False	-	True if enabled, false if otherwise
  */
 CTR_Code PCM::GetCompressor(bool &status) {
@@ -130,7 +138,7 @@ CTR_Code PCM::GetCompressor(bool &status) {
 }
 
 /* Get closed loop control state
- * 
+ *
  * @Return	-	True/False	-	True if closed loop enabled, false if otherwise
  */
 CTR_Code PCM::GetClosedLoopControl(bool &status) {
@@ -141,8 +149,8 @@ CTR_Code PCM::GetClosedLoopControl(bool &status) {
 }
 
 /* Get compressor current draw
- * 
- * @Return	-	Amperes	-	Compressor current 
+ *
+ * @Return	-	Amperes	-	Compressor current
  */
 CTR_Code PCM::GetCompressorCurrent(float &status) {
 	uint16_t bt = _PcmStatus.compressorCurrentTop6;
@@ -155,7 +163,7 @@ CTR_Code PCM::GetCompressorCurrent(float &status) {
 }
 
 /* Get voltage across solenoid rail
- * 
+ *
  * @Return	-	Volts	-	Voltage across solenoid rail
  */
 CTR_Code PCM::GetSolenoidVoltage(float &status) {
@@ -169,7 +177,7 @@ CTR_Code PCM::GetSolenoidVoltage(float &status) {
 }
 
 /* Get hardware fault value
- * 
+ *
  * @Return	-	True/False	-	True if hardware failure detected, false if otherwise
  */
 CTR_Code PCM::GetHardwareFault(bool &status) {
@@ -180,7 +188,7 @@ CTR_Code PCM::GetHardwareFault(bool &status) {
 }
 
 /* Get compressor fault value
- * 
+ *
  * @Return	-	True/False	-	True if shorted compressor detected, false if otherwise
  */
 CTR_Code PCM::GetCompressorFault(bool &status) {
@@ -191,7 +199,7 @@ CTR_Code PCM::GetCompressorFault(bool &status) {
 }
 
 /* Get solenoid fault value
- * 
+ *
  * @Return	-	True/False	-	True if shorted solenoid detected, false if otherwise
  */
 CTR_Code PCM::GetSolenoidFault(bool &status) {
@@ -203,7 +211,7 @@ CTR_Code PCM::GetSolenoidFault(bool &status) {
 //			Past Faults
 
 /* Get compressor sticky fault value
- * 
+ *
  * @Return	-	True/False	-	True if solenoid had previously been shorted
  * 								(and sticky fault was not cleared), false if otherwise
  */
@@ -215,7 +223,7 @@ CTR_Code PCM::GetCompressorStickyFault(bool &status) {
 }
 
 /* Get solenoid sticky fault value
- * 
+ *
  * @Return	-	True/False	-	True if compressor had previously been shorted
  * 								(and sticky fault was not cleared), false if otherwise
  */
@@ -226,7 +234,7 @@ CTR_Code PCM::GetSolenoidStickyFault(bool &status) { /* fix this */
 	return CTR_OKAY;
 }
 /* Get battery voltage
- * 
+ *
  * @Return	-	Volts	-	Voltage across PCM power ports
  */
 CTR_Code PCM::GetBatteryVoltage(float &status) {
@@ -236,9 +244,9 @@ CTR_Code PCM::GetBatteryVoltage(float &status) {
 	return CTR_OKAY;
 }
 /* Get number of total failed PCM Control Frame
- * 
+ *
  * @Return	-	Failed Control Frames	-	Number of failed control frames (tokenization fails)
- * 
+ *
  * @WARNING	-	Return only valid if [SeekDebugFrames] is enabled
  * 				See function SeekDebugFrames
  * 				See function EnableSeekDebugFrames
@@ -252,10 +260,10 @@ CTR_Code PCM::GetNumberOfFailedControlFrames(UINT16 &status) {
 	return CTR_OKAY;
 }
 /* Get raw Solenoid Blacklist
- * 
+ *
  * @Return	-	BINARY	-	Raw binary breakdown of Solenoid Blacklist
  * 							BIT7 = Solenoid 1, BIT6 = Solenoid 2, etc.
- * 
+ *
  * @WARNING	-	Return only valid if [SeekStatusFaultFrames] is enabled
  * 				See function SeekStatusFaultFrames
  * 				See function EnableSeekStatusFaultFrames
@@ -268,11 +276,11 @@ CTR_Code PCM::GetSolenoidBlackList(UINT8 &status) {
 }
 /* Get solenoid Blacklist status
  * - Blacklisted solenoids cannot be enabled until PCM is power cycled
- * 
+ *
  * @Return	-	True/False	-	True if Solenoid is blacklisted, false if otherwise
- * 
+ *
  * @Param	-	idx			-	ID of solenoid
- * 
+ *
  * @WARNING	-	Return only valid if [SeekStatusFaultFrames] is enabled
  * 				See function SeekStatusFaultFrames
  * 				See function EnableSeekStatusFaultFrames
@@ -313,7 +321,8 @@ void PCM::ReadStatusFrame(void) {
 	PcmStatus_t frame = {0};
 	UINT8 size = 0;
 	INT32 status = 0;
-	FRC_NetworkCommunication_JaguarCANDriver_receiveMessage(&PCM_settings.statusFrameID, (uint8_t *)&frame, &size, 0 , &status);
+    UINT32 timeStamp = 0;
+    FRC_NetworkCommunication_CANSessionMux_receiveMessage(&PCM_settings.statusFrameID, kFullMessageIDMask, (uint8_t *)&frame, &size, &timeStamp, &status);
 	if (status == 0) {
 		_timeSinceLastRx = 0;
 		_PcmStatus = frame;
@@ -326,7 +335,8 @@ void PCM::ReadStatusFaultFrame(void) {
 	PcmStatusFault_t frame= {0};
 	UINT8 size = 0;
 	INT32 status = 0;
-	FRC_NetworkCommunication_JaguarCANDriver_receiveMessage(&PCM_settings.statusFaultFrameID, (uint8_t *)&frame, &size, 0, &status);
+    UINT32 timeStamp = 0;
+    FRC_NetworkCommunication_CANSessionMux_receiveMessage(&PCM_settings.statusFaultFrameID, kFullMessageIDMask, (uint8_t *)&frame, &size, &timeStamp, &status);
 	if (status == 0) {
 		_timeSinceLastRx = 0;
 		_PcmStatusFault = frame;
@@ -339,7 +349,8 @@ void PCM::ReadDebugFrame(void) {
 	PcmDebug_t frame= {0};
 	UINT8 size = 0;
 	INT32 status = 0;
-	FRC_NetworkCommunication_JaguarCANDriver_receiveMessage(&PCM_settings.debugFrameID, (uint8_t *)&frame, &size, 0, &status);
+    UINT32 timeStamp = 0;
+	FRC_NetworkCommunication_CANSessionMux_receiveMessage(&PCM_settings.debugFrameID, kFullMessageIDMask, (uint8_t *)&frame, &size, &timeStamp, &status);
 	if (status == 0) {
 		_timeSinceLastRx = 0;
 		_PcmDebug = frame;
@@ -351,7 +362,7 @@ void * PCM::ThreadFunc()
 {
 	while(_threadIsRunning){
 		int32_t status = 0;
-		FRC_NetworkCommunication_JaguarCANDriver_sendMessage(PCM_settings.controlFrameID, (const uint8_t *)&_PcmControl, sizeof(_PcmControl), &status);
+        FRC_NetworkCommunication_CANSessionMux_sendMessage(PCM_settings.controlFrameID, (const uint8_t *)&_PcmControl, sizeof(_PcmControl), kCANPeriod, &status);
 		if(status == 0){
 			/* success */
 			_timeSinceLastTx = 0;
@@ -473,4 +484,3 @@ extern "C" {
 		return retval;
 	}
 }
-

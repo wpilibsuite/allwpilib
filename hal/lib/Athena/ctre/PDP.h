@@ -1,7 +1,7 @@
 #ifndef PDP_H_
 #define PDP_H_
 #include "ctre.h"				//BIT Defines + Typedefs
-#include <NetworkCommunication/JaguarCANDriver.h>	//CAN Comm
+#include <NetworkCommunication/CANSessionMux.h>	//CAN Comm
 #include <pthread.h>
 /* encoder/decoders */
 typedef struct _PdpStatus1_t{

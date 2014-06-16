@@ -1,7 +1,10 @@
 #include "PDP.h"
-#include "NetworkCommunication/JaguarCANDriver.h"
+#include "NetworkCommunication/CANSessionMux.h"	//CAN Comm
 #include <string.h> // memset
 #include <unistd.h> // usleep
+
+#define kFullMessageIDMask 0x1fffffff
+
 PDP::PDP(UINT8 deviceNumber)
 {
     memset(&_status1, 0, sizeof(_status1));
@@ -107,7 +110,9 @@ uint64_t PDP::ReadCurrents(uint8_t api)
 	uint64_t frame = 0;
 	UINT8 size = 0;
 	INT32 status = 0;
-	FRC_NetworkCommunication_JaguarCANDriver_receiveMessage(&PDP_Settings.frameIDs[api], (uint8_t *)&frame, &size, 0 , &status);
+    UINT32 timeStamp = 0;
+
+    FRC_NetworkCommunication_CANSessionMux_receiveMessage(&PDP_Settings.frameIDs[api], kFullMessageIDMask, (uint8_t *)&frame, &size, &timeStamp, &status);
 	if (status == 0) {
 		_timeSinceLastRx = 0;
 	} else {

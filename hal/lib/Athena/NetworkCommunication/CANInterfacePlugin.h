@@ -11,7 +11,9 @@
 #include <stdint.h>
 
 #define CAN_IS_FRAME_REMOTE 0x80000000
-#define CAN_MESSAGE_ID_MASK 0x1FFFFFFF
+#define CAN_IS_FRAME_11BIT  0x40000000
+#define CAN_29BIT_MESSAGE_ID_MASK 0x1FFFFFFF
+#define CAN_11BIT_MESSAGE_ID_MASK 0x000007FF
 
 class CANInterfacePlugin
 {
@@ -56,6 +58,6 @@ public:
  * @param interface A pointer to an object that inherits from CANInterfacePlugin and implements
  * the pure virtual interface.  If NULL, unregister the current plugin.
  */
-void FRC_NetworkCommunication_JaguarCANDriver_registerInterface(CANInterfacePlugin* interface);
+void FRC_NetworkCommunication_CANSessionMux_registerInterface(CANInterfacePlugin* interface);
 
 #endif // __CANInterfacePlugin_h__

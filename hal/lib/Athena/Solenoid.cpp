@@ -22,20 +22,20 @@ void initializePCM() {
 	if(!pcmModulesInitialized) {
 		modules[0] = new PCM(50);
 		modules[1] = new PCM(51);
-	
+
 		pcmModulesInitialized = true;
 	}
 }
 
 void* initializeSolenoidPort(void *port_pointer, int32_t *status) {
 	initializePCM();
-	
+
 	Port* port = (Port*) port_pointer;
-	
+
 	solenoid_port_t *solenoid_port = new solenoid_port_t;
 	solenoid_port->module = modules[port->module - 1];
 	solenoid_port->pin = port->pin;
-	
+
 	return solenoid_port;
 }
 
@@ -46,15 +46,14 @@ bool checkSolenoidModule(uint8_t module) {
 bool getSolenoid(void* solenoid_port_pointer, int32_t *status) {
 	solenoid_port_t* port = (solenoid_port_t*) solenoid_port_pointer;
 	bool value;
-	
+
 	*status = port->module->GetSolenoid(port->pin, value);
-	
+
 	return value;
 }
 
 void setSolenoid(void* solenoid_port_pointer, bool value, int32_t *status) {
 	solenoid_port_t* port = (solenoid_port_t*) solenoid_port_pointer;
-	
-	*status = port->module->SetSolenoid(port->pin, value);
-}
 
+	port->module->SetSolenoid(port->pin, value);
+}

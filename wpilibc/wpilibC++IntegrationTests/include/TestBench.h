@@ -42,4 +42,7 @@ public:
 	static const uint32_t kFakePressureSwitchChannel = 11;
 	static const uint32_t kFakeSolenoid1Channel = 12;
 	static const uint32_t kFakeSolenoid2Channel = 13;
+
+	/* CAN IDs */
+	static const uint32_t kCANJaguarID = 1;
 };
