@@ -611,7 +611,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
         		status.asIntBuffer().put(0,dataSize+2);
 
 
-        		CANJNI.FRCNetworkCommunicationJaguarCANDriverSendMessage(messageID, trustedBuffer, status.asIntBuffer());
+        		CANJNI.FRCNetworkCommunicationCANSessionMuxSendMessage(messageID, trustedBuffer, 0, status.asIntBuffer());
                 return;
             }
         }
@@ -620,6 +620,16 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
 		status.asIntBuffer().put(0,dataSize);
+		
+		ByteBuffer timeStamp = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		timeStamp.order(ByteOrder.LITTLE_ENDIAN);
+		
+		ByteBuffer messageIDBuffer = ByteBuffer.allocate(4);
+		//set the byte order
+		messageIDBuffer.order(ByteOrder.LITTLE_ENDIAN);
+		messageIDBuffer.asIntBuffer().put(messageID);
+		
 
 		ByteBuffer dataBuffer = null;
 		if( dataSize > 0)
@@ -627,8 +637,10 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 			dataBuffer = ByteBuffer.allocateDirect(dataSize);
 			dataBuffer.put(data);
 		}
-
-		CANJNI.FRCNetworkCommunicationJaguarCANDriverSendMessage(messageID, dataBuffer, status.asIntBuffer());
+		
+		int messageIDmask = 0x1fffffff;
+		
+		dataBuffer = CANJNI.FRCNetworkCommunicationCANSessionMuxReceiveMessage(messageIDBuffer.asIntBuffer(), messageIDmask, timeStamp, status.asIntBuffer());
 
 		CANExceptionFactory.checkStatus(status.asIntBuffer().get(0), messageID);
     }
@@ -648,10 +660,11 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 		ByteBuffer messageIDBuffer = ByteBuffer.allocateDirect(4);
 		messageIDBuffer.order(ByteOrder.LITTLE_ENDIAN);
 		messageIDBuffer.asIntBuffer().put(0,messageID);
-
-		ByteBuffer dataBuffer = CANJNI.FRCNetworkCommunicationJaguarCANDriverReceiveMessage(
+		
+		
+		ByteBuffer dataBuffer = null; /*CANJNI.FRCNetworkCommunicationJaguarCANDriverReceiveMessage(
 				messageIDBuffer.asIntBuffer(), (int) (timeout*1000), status.asIntBuffer());
-
+				*/
 		CANExceptionFactory.checkStatus(status.asIntBuffer().get(0), messageID);
 
         byte returnValue = 0;

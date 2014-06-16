@@ -453,6 +453,6 @@ public class CANJNI extends JNIWrapper{
 	/** <i>native declaration : src\main\include\CAN\can_proto.h</i> */
 	public static final int LM_STATUS_LIMIT_STKY_SFWD = 0x40;
 
-	public static native void FRCNetworkCommunicationJaguarCANDriverSendMessage(int messageID, ByteBuffer data, IntBuffer status);
-	public static native ByteBuffer FRCNetworkCommunicationJaguarCANDriverReceiveMessage(IntBuffer messageID, int timeoutMs, IntBuffer status);
+	public static native void FRCNetworkCommunicationCANSessionMuxSendMessage(int messageID, ByteBuffer data, int periodMs, IntBuffer status);
+	public static native ByteBuffer FRCNetworkCommunicationCANSessionMuxReceiveMessage(IntBuffer messageID, int messageIDMask, ByteBuffer timeStamp, IntBuffer status);
 }
