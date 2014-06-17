@@ -12,12 +12,13 @@ package edu.wpi.first.wpilibj;
  * Stores most recent status information as well as containing utility functions for checking
  * channels and error processing.
  *
+ * 
  * XXX: Wait, there's no exception thrown if we try to allocate a non-existent module?  It that behavior correct?
  */
 public abstract class SensorBase { // TODO: Refactor
 
 	// TODO: Move this to the HAL
-
+  
     /**
      * Ticks per microsecond
      */

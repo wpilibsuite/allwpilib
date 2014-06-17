@@ -5,7 +5,7 @@ void AnalogPotentiometer::initPot(int channel, double scale, double offset) {
     m_channel = channel;
     m_scale = scale;
     m_offset = offset;
-    m_analog_channel = new AnalogInput(channel);
+    m_analog_input = new AnalogInput(channel);
 }
 
 AnalogPotentiometer::AnalogPotentiometer(int channel, double scale, double offset) {
@@ -22,7 +22,7 @@ AnalogPotentiometer::AnalogPotentiometer(int channel) {
 
 
 double AnalogPotentiometer::Get() {
-    return m_analog_channel->GetVoltage() * m_scale + m_offset;
+    return m_analog_input->GetVoltage() * m_scale + m_offset;
 }
 
 double AnalogPotentiometer::PIDGet() {

@@ -98,7 +98,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 		return m_moduleNumber;
 	}
 
-	/*
+    /**
 	 * Get the average value for use with PIDController
 	 *
 	 * @return the average value
@@ -107,7 +107,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 		return getAverageVoltage();
 	}
 
-	/*
+    /**
 	 * Live Window code, only does anything if live window is activated.
 	 */
 	public String getSmartDashboardType() {

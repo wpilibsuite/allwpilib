@@ -43,7 +43,7 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
     public AnalogPotentiometer(final int channel, double scale, double offset) {
         initPot(channel, scale, offset);
     }
-
+    
     /**
      * AnalogPotentiometer constructor.
      *
@@ -79,7 +79,6 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
         return m_analog_input.getVoltage() * m_scale + m_offset;
     }
 
-
     /**
      * Implement the PIDSource interface.
      *
@@ -88,6 +87,7 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
     public double pidGet() {
         return get();
     }
+
 
     /*
      * Live Window code, only does anything if live window is activated.
