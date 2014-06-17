@@ -16,23 +16,28 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import edu.wpi.first.wpilibj.AnalogCrossConnectTest;
 import edu.wpi.first.wpilibj.CounterTest;
 import edu.wpi.first.wpilibj.DIOCrossConnectTest;
 import edu.wpi.first.wpilibj.EncoderTest;
 import edu.wpi.first.wpilibj.MotorEncoderTest;
 import edu.wpi.first.wpilibj.PIDTest;
 import edu.wpi.first.wpilibj.PrefrencesTest;
+import edu.wpi.first.wpilibj.RelayCrossConnectTest;
 import edu.wpi.first.wpilibj.SampleTest;
 import edu.wpi.first.wpilibj.TiltPanCameraTest;
 import edu.wpi.first.wpilibj.TimerTest;
+import edu.wpi.first.wpilibj.WpiLibJTestSuite;
 import edu.wpi.first.wpilibj.command.ButtonTest;
 import edu.wpi.first.wpilibj.command.CommandParallelGroupTest;
 import edu.wpi.first.wpilibj.command.CommandScheduleTest;
 import edu.wpi.first.wpilibj.command.CommandSequentialGroupTest;
 import edu.wpi.first.wpilibj.command.CommandSupersedeTest;
+import edu.wpi.first.wpilibj.command.CommandTestSuite;
 import edu.wpi.first.wpilibj.command.CommandTimeoutTest;
 import edu.wpi.first.wpilibj.command.DefaultCommandTest;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTest;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTestSuite;
 
 /**
  * The WPILibJ Integeration Test Suite collects all of the tests to be run by
@@ -41,25 +46,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTest;
  * suite classes annotation.
  */
 @RunWith(Suite.class)
-@SuiteClasses({ SampleTest.class,
-				SmartDashboardTest.class,
-				DIOCrossConnectTest.class,
-				CounterTest.class,
-				EncoderTest.class,
-				PIDTest.class,
-				TiltPanCameraTest.class,
-				MotorEncoderTest.class,
-				PrefrencesTest.class,
-				ButtonTest.class,
-				CommandParallelGroupTest.class,
-				CommandScheduleTest.class,
-				CommandSequentialGroupTest.class,
-				CommandSupersedeTest.class,
-				CommandTimeoutTest.class,
-				DefaultCommandTest.class,
-				TimerTest.class
+@SuiteClasses({ 
+				WpiLibJTestSuite.class,
+				CommandTestSuite.class,
+				SmartDashboardTestSuite.class
 				})
 //NOTE: THESE ARE EACH LISTED ON SEPERATE LINES TO PREVENT GIT MERGE CONFLICTS!
+@SuppressWarnings("unused")
 public class TestSuite {
 	static{
 		final InputStream inputStream = TestSuite.class.getResourceAsStream("/logging.properties");

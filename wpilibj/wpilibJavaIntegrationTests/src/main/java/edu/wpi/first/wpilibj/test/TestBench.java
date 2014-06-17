@@ -12,18 +12,23 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.AnalogOutput;
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.Jaguar;
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.can.CANTimeoutException;
+import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
+import edu.wpi.first.wpilibj.fixtures.RelayCrossConnectFxiture;
 import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
 
 /**
@@ -220,6 +225,42 @@ public final class TestBench {
 		pairs.add(setB);
 		//NOTE: IF MORE DIOCROSSCONNECT PAIRS ARE ADDED ADD THEM HERE
 		return pairs;
+	}
+	
+	public static AnalogCrossConnectFixture getAnalogCrossConnectFixture(){
+		AnalogCrossConnectFixture analogIO = new AnalogCrossConnectFixture() {
+			@Override
+			protected AnalogOutput giveAnalogOutput() {
+				return new AnalogOutput(0);
+			}
+			
+			@Override
+			protected AnalogInput giveAnalogInput() {
+				return new AnalogInput(2);
+			}
+		};
+		return analogIO;
+	}
+	
+	public static RelayCrossConnectFxiture getRelayCrossConnectFixture(){
+		RelayCrossConnectFxiture relay = new RelayCrossConnectFxiture() {
+			
+			@Override
+			protected Relay giveRelay() {
+				return new Relay(0);
+			}
+			
+			@Override
+			protected DigitalInput giveInputTwo() {
+				return new DigitalInput(14);
+			}
+			
+			@Override
+			protected DigitalInput giveInputOne() {
+				return new DigitalInput(15);
+			}
+		};
+		return relay;
 	}
 
 	/**

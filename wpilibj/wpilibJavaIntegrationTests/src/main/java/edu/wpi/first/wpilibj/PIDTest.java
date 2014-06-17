@@ -76,7 +76,7 @@ public class PIDTest extends AbstractComsSetup {
 		double kp = 0.003;
 		double ki = 0.0015;
 		double kd = 0.0;
-		for(int i = 0; i < 5; i++){
+		for(int i = 0; i < 1; i++){
 			data.addAll(Arrays.asList(new Object[][]{
 				 {kp, ki, kd, TestBench.getInstance().getTalonPair()},
 				 {kp, ki, kd, TestBench.getInstance().getVictorPair()},

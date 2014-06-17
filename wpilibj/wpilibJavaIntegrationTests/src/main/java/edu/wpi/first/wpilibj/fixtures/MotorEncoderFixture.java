@@ -62,19 +62,21 @@ public abstract class MotorEncoderFixture implements ITestFixture {
 	abstract protected DigitalInput giveDigitalInputB();
 
 	final private void initialize(){
-		if(!initialized){
-			aSource = giveDigitalInputA();
-			bSource = giveDigitalInputB();
-
-			motor = giveSpeedController();
-
-			encoder = new Encoder(aSource, bSource);
-			counters[0] = new Counter(aSource);
-			counters[1] = new Counter(bSource);
-			for(Counter c: counters){
-				c.start();
+		synchronized(this){
+			if(!initialized){
+				aSource = giveDigitalInputA();
+				bSource = giveDigitalInputB();
+				
+				motor = giveSpeedController();
+				
+				encoder = new Encoder(aSource, bSource);
+				counters[0] = new Counter(aSource);
+				counters[1] = new Counter(bSource);
+				for(Counter c: counters){
+					c.start();
+				}
+				initialized = true;
 			}
-			initialized = true;
 		}
 	}
 
@@ -122,8 +124,7 @@ public abstract class MotorEncoderFixture implements ITestFixture {
 	 * This is used instead of equals() because doubles can have inaccuracies.
 	 * @param value The value to compare against
 	 * @param acuracy The accuracy range to check against to see if the
-	 * @return true if the range of values between motors speed accuracy contains the 'value'<br>
-	 * {@code Math.abs((Math.abs(motor.get()) - Math.abs(value))) < Math.abs(accuracy)}
+	 * @return true if the range of values between motors speed accuracy contains the 'value'.
 	 */
 	public boolean isMotorSpeedWithinRange(double value, double accuracy){
 		initialize();
