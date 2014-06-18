@@ -1,38 +1,67 @@
 
 #include "AnalogPotentiometer.h"
 
-void AnalogPotentiometer::initPot(int channel, double scale, double offset) {
-    m_channel = channel;
+/**
+ * Common initialization code called by all constructors.
+ */
+void AnalogPotentiometer::initPot(AnalogInput *input, double scale, double offset) {
+//    m_channel = channel;
     m_scale = scale;
     m_offset = offset;
-    m_analog_input = new AnalogInput(channel);
+    m_analog_input = input;
 }
 
 AnalogPotentiometer::AnalogPotentiometer(int channel, double scale, double offset) {
-    initPot(channel, scale, offset);
+    m_init_analog_input = true;
+    initPot(new AnalogInput(channel), scale, offset);
 }
 
-AnalogPotentiometer::AnalogPotentiometer(int channel, double scale) {
-    initPot(channel, scale, 0);
+AnalogPotentiometer::AnalogPotentiometer(AnalogInput *input, double scale, double offset) {
+    m_init_analog_input = false;
+    initPot(input, scale, offset);
 }
 
-AnalogPotentiometer::AnalogPotentiometer(int channel) {
-    initPot(channel, 1, 0);
+AnalogPotentiometer::AnalogPotentiometer(AnalogInput &input, double scale, double offset) {
+    m_init_analog_input = false;
+    initPot(&input, scale, offset);
 }
 
+AnalogPotentiometer::~AnalogPotentiometer() {
+  if(m_init_analog_input){
+    delete m_analog_input;
+    m_init_analog_input = false;
+  }
+}
 
+/**
+ * Get the current reading of the potentiomere.
+ *
+ * @return The current position of the potentiometer.
+ */
 double AnalogPotentiometer::Get() {
     return m_analog_input->GetVoltage() * m_scale + m_offset;
 }
 
+/**
+ * Implement the PIDSource interface.
+ *
+ * @return The current reading.
+ */
 double AnalogPotentiometer::PIDGet() {
     return Get();
 }
 
+
+/**
+ * @return the Smart Dashboard Type
+ */
 std::string AnalogPotentiometer::GetSmartDashboardType() {
     return "Analog Input";
 }
 
+/**
+ * Live Window code, only does anything if live window is activated.
+ */
 void AnalogPotentiometer::InitTable(ITable *subtable) {
     m_table = subtable;
     UpdateTable();
