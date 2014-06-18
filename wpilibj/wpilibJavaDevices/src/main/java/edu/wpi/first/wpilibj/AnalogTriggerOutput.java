@@ -65,7 +65,7 @@ public class AnalogTriggerOutput extends DigitalSource {
 	}
 
 	private AnalogTrigger m_trigger;
-	private int m_outputType; // define in HALLibrary.AnalogTriggerType
+	private AnalogTriggerType m_outputType;
 
 	/**
 	 * Create an object that represents one of the four outputs from an analog
@@ -79,14 +79,14 @@ public class AnalogTriggerOutput extends DigitalSource {
 	 * @param outputType
 	 *            An enum that specifies the output on the trigger to represent.
 	 */
-	public AnalogTriggerOutput(AnalogTrigger trigger, final int outputType) {
+	public AnalogTriggerOutput(AnalogTrigger trigger, final AnalogTriggerType outputType) {
 		if (trigger == null)
 			throw new NullPointerException("Analog Trigger given was null");
 		m_trigger = trigger;
 		m_outputType = outputType;
 
 		UsageReporting.report(tResourceType.kResourceType_AnalogTriggerOutput,
-				trigger.getIndex(), outputType);
+				trigger.getIndex(), outputType.value);
 	}
 
 	public void free() {
@@ -100,13 +100,13 @@ public class AnalogTriggerOutput extends DigitalSource {
 	public boolean get() {
 		IntBuffer status = IntBuffer.allocate(1);
 		byte value = AnalogJNI.getAnalogTriggerOutput(m_trigger.m_port,
-				m_outputType, status);
+				m_outputType.value, status);
 		HALUtil.checkStatus(status);
 		return value != 0;
 	}
 
 	public int getChannelForRouting() {
-		return (m_trigger.m_index << 2) + m_outputType;
+		return (m_trigger.m_index << 2) + m_outputType.value;
 	}
 
 	public int getModuleForRouting() {
@@ -137,4 +137,21 @@ public class AnalogTriggerOutput extends DigitalSource {
 	// public void requestInterrupts() {
 	// TODO: throw exception
 	// }
+	
+	/**
+	 * Defines the state in which the AnalogTrigger triggers
+	 * @author jonathanleitschuh
+	 */
+	public enum AnalogTriggerType{
+		IN_WINDOW(AnalogJNI.AnalogTriggerType.kInWindow),
+		STATE(AnalogJNI.AnalogTriggerType.kState),
+		RISING_PULSE(AnalogJNI.AnalogTriggerType.kRisingPulse),
+		FALLING_PULSE(AnalogJNI.AnalogTriggerType.kFallingPulse);
+		
+		private final int value;
+		
+		private AnalogTriggerType(int value){
+			this.value = value;
+		}
+	}
 }

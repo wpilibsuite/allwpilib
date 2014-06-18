@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
@@ -198,7 +199,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 */
 	public Counter(AnalogTrigger trigger) {
 		initCounter(Mode.kTwoPulse);
-		setUpSource(trigger.createOutput(AnalogJNI.AnalogTriggerType.kState));
+		setUpSource(trigger.createOutput(AnalogTriggerType.STATE));
 	}
 
 	public void free() {
@@ -258,7 +259,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * @param triggerType
 	 *            The analog trigger output that will trigger the counter.
 	 */
-	public void setUpSource(AnalogTrigger analogTrigger, int triggerType) {
+	public void setUpSource(AnalogTrigger analogTrigger, AnalogTriggerType triggerType) {
 		analogTrigger.createOutput(triggerType);
 		m_allocatedUpSource = true;
 	}
@@ -345,7 +346,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * @param triggerType
 	 *            The analog trigger output that will trigger the counter.
 	 */
-	public void setDownSource(AnalogTrigger analogTrigger, int triggerType) {
+	public void setDownSource(AnalogTrigger analogTrigger, AnalogTriggerType triggerType) {
 		setDownSource(analogTrigger.createOutput(triggerType));
 		m_allocatedDownSource = true;
 	}

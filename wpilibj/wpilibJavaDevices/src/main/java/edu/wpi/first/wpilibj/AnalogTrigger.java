@@ -12,6 +12,8 @@ import java.nio.ByteBuffer;
 
 //import com.sun.jna.Pointer;
 
+
+import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
@@ -214,7 +216,7 @@ public class AnalogTrigger {
 	 *            An enum of the type of output object to create.
 	 * @return A pointer to a new AnalogTriggerOutput object.
 	 */
-	AnalogTriggerOutput createOutput(int type) {
+	AnalogTriggerOutput createOutput(AnalogTriggerType type) {
 		return new AnalogTriggerOutput(this, type);
 	}
 }
