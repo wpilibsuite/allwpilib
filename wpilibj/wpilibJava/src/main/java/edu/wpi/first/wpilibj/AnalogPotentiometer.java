@@ -1,3 +1,9 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
@@ -12,18 +18,20 @@ import edu.wpi.first.wpilibj.tables.ITable;
  * @author Alex Henning
  */
 public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
-    private int m_channel;
     private double m_scale, m_offset;
     private AnalogInput m_analog_input;
+    private boolean m_init_analog_input;
 
     /**
      * Common initialization code called by all constructors.
+     * @param input The {@link AnalogInput} this potentiometer is plugged into.
+     * @param scale The scaling to multiply the voltage by to get a meaningful unit.
+     * @param offset The offset to add to the scaled value for controlling the zero value
      */
-    private void initPot(final int channel, double scale, double offset) {
-        this.m_channel = channel;
+    private void initPot(final AnalogInput input, double scale, double offset) {
         this.m_scale = scale;
         this.m_offset = offset;
-        m_analog_input = new AnalogInput(channel);
+        m_analog_input = input;
     }
 
     /**
@@ -41,7 +49,28 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
      * @param offset The offset to add to the scaled value for controlling the zero value
      */
     public AnalogPotentiometer(final int channel, double scale, double offset) {
-        initPot(channel, scale, offset);
+    	AnalogInput input = new AnalogInput(channel);
+    	m_init_analog_input = true;
+        initPot(input, scale, offset);
+    }
+    
+    /**
+     * AnalogPotentiometer constructor.
+     *
+     * Use the scaling and offset values so that the output produces
+     * meaningful values. I.E: you have a 270 degree potentiometer and
+     * you want the output to be degrees with the halfway point as 0
+     * degrees. The scale value is 270.0(degrees)/5.0(volts) and the
+     * offset is -135.0 since the halfway point after scaling is 135
+     * degrees.
+     *
+     * @param input The {@link AnalogInput} this potentiometer is plugged into.
+     * @param scale The scaling to multiply the voltage by to get a meaningful unit.
+     * @param offset The offset to add to the scaled value for controlling the zero value
+     */
+    public AnalogPotentiometer(final AnalogInput input, double scale, double offset) {
+    	m_init_analog_input = false;
+    	initPot(input, scale, offset);
     }
     
     /**
@@ -58,7 +87,24 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
      * @param scale The scaling to multiply the voltage by to get a meaningful unit.
      */
     public AnalogPotentiometer(final int channel, double scale) {
-        initPot(channel, scale, 0);
+        this(channel, scale, 0);
+    }
+    
+    /**
+     * AnalogPotentiometer constructor.
+     *
+     * Use the scaling and offset values so that the output produces
+     * meaningful values. I.E: you have a 270 degree potentiometer and
+     * you want the output to be degrees with the halfway point as 0
+     * degrees. The scale value is 270.0(degrees)/5.0(volts) and the
+     * offset is -135.0 since the halfway point after scaling is 135
+     * degrees.
+     *
+     * @param input The {@link AnalogInput} this potentiometer is plugged into.
+     * @param scale The scaling to multiply the voltage by to get a meaningful unit.
+     */
+    public AnalogPotentiometer(final AnalogInput input, double scale) {
+        this(input, scale, 0);
     }
 
     /**
@@ -67,7 +113,16 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
      * @param channel The analog channel this potentiometer is plugged into.
      */
     public AnalogPotentiometer(final int channel) {
-        initPot(channel, 1, 0);
+    	this(channel, 1, 0);
+    }
+    
+    /**
+     * AnalogPotentiometer constructor.
+     *
+     * @param input The {@link AnalogInput} this potentiometer is plugged into.
+     */
+    public AnalogPotentiometer(final AnalogInput input) {
+    	this(input, 1, 0);
     }
 
     /**
@@ -89,7 +144,7 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
     }
 
 
-    /*
+    /**
      * Live Window code, only does anything if live window is activated.
      */
     public String getSmartDashboardType(){
@@ -119,6 +174,14 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
      */
     public ITable getTable(){
         return m_table;
+    }
+    
+    public void free(){
+    	if(m_init_analog_input){
+    		m_analog_input.free();
+    		m_analog_input = null;
+    		m_init_analog_input = false;
+    	}
     }
 
     /**

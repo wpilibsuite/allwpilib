@@ -17,6 +17,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
 				AnalogCrossConnectTest.class,
+				AnalogPotentiometerTest.class,
 				CounterTest.class,
 				DIOCrossConnectTest.class,
 				EncoderTest.class,
