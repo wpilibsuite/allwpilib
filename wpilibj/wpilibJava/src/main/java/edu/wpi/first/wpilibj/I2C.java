@@ -6,8 +6,10 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+import java.nio.ByteBuffer;
+
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
@@ -22,14 +24,22 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
  * This class is intended to be used by sensor (and other I2C device) drivers.
  * It probably should not be used directly.
  *
- * It is constructed by calling DigitalModule::GetI2C() on a DigitalModule
- * object.
  */
 public class I2C extends SensorBase {
+	public enum Port {kOnboard(0), kMXP(1);
+		private int value;
+		
+		private Port(int value){
+			this.value = value;
+		}
+		
+		public int getValue(){
+			return this.value;
+		}
+	};
 
-	private DigitalModule m_module;
+	private Port m_port;
 	private int m_deviceAddress;
-	private boolean m_compatibilityMode;
 
     /**
      * Constructor.
@@ -39,14 +49,16 @@ public class I2C extends SensorBase {
      * @param deviceAddress
      *            The address of the device on the I2C bus.
      */
-    public I2C(DigitalModule module, int deviceAddress) {
-        if (module == null) {
-            throw new NullPointerException("Digital Module given was null");
-        }
-        m_module = module;
+    public I2C(Port port, int deviceAddress) {
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+	
+        m_port = port;
         m_deviceAddress = deviceAddress;
-        m_compatibilityMode = true;
-
+		
+		I2CJNI.i2CInitialize((byte)m_port.getValue(), status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		
         UsageReporting.report(tResourceType.kResourceType_I2C, deviceAddress);
     }
 
@@ -76,16 +88,15 @@ public class I2C extends SensorBase {
 			byte[] dataReceived, int receiveSize) {
 		boolean aborted = true;
 
-		ByteBuffer dataToSendBuffer = ByteBuffer.wrap(dataToSend);
-		ByteBuffer dataReceivedBuffer = ByteBuffer.allocate(1);
-		IntBuffer status = IntBuffer.allocate(1);
+		ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(sendSize);
+		dataToSendBuffer.put(dataToSend);
+		ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(receiveSize);
 
 		aborted = I2CJNI
-				.doI2CTransactionWithModule((byte) m_module.m_moduleNumber,
-						(byte) m_deviceAddress, (byte) (m_compatibilityMode ? 1
-								: 0), dataToSendBuffer, (byte) sendSize,
-						dataReceivedBuffer, (byte) receiveSize, status) != 0;
-		if (status.get() == HALUtil.PARAMETER_OUT_OF_RANGE) {
+				.i2CTransaction((byte) m_port.getValue(), (byte) m_deviceAddress, 
+					dataToSendBuffer, (byte) sendSize,
+					dataReceivedBuffer, (byte) receiveSize) != 0;
+		/*if (status.get() == HALUtil.PARAMETER_OUT_OF_RANGE) {
 			if (sendSize > 6) {
 				throw new BoundaryException(BoundaryException.getMessage(
 						sendSize, 0, 6));
@@ -97,7 +108,7 @@ public class I2C extends SensorBase {
 						HALLibrary.PARAMETER_OUT_OF_RANGE_MESSAGE);
 			}
 		}
-		HALUtil.checkStatus(status);
+		HALUtil.checkStatus(status);*/
 		dataReceivedBuffer.get(dataReceived);
 		return aborted;
 	}
@@ -129,7 +140,27 @@ public class I2C extends SensorBase {
 		byte[] buffer = new byte[2];
 		buffer[0] = (byte) registerAddress;
 		buffer[1] = (byte) data;
-		return transaction(buffer, buffer.length, null, 0);
+		
+		ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(2);
+		dataToSendBuffer.put(buffer);
+		
+		return I2CJNI.i2CWrite((byte)m_port.getValue(), (byte) m_deviceAddress, dataToSendBuffer, (byte)buffer.length) < 0;
+	}
+	
+	/**
+	 * Execute a write transaction with the device.
+	 *
+	 * Write multiple bytes to a register on a device and wait until the
+	 * transaction is complete.
+	 *
+	 * @param data
+	 *            The data to write to the device.
+	 */
+	public synchronized boolean writeBulk(byte[] data) {		
+		ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(data.length);
+		dataToSendBuffer.put(data);
+		
+		return I2CJNI.i2CWrite((byte)m_port.getValue(), (byte) m_deviceAddress, dataToSendBuffer, (byte)data.length) < 0;
 	}
 
 	/**
@@ -159,6 +190,32 @@ public class I2C extends SensorBase {
 		return transaction(registerAddressArray, registerAddressArray.length,
 				buffer, count);
 	}
+	
+	/**
+	 * Execute a read only transaction with the device.
+	 *
+	 * Read 1 to 7 bytes from a device. This method does not write any data to prompt
+	 * the device.
+	 *
+	 * @param buffer
+	 *            A pointer to the array of bytes to store the data read from
+	 *            the device.
+	 * @param count
+	 *            The number of bytes to read in the transaction. [1..7]
+	 * @return Transfer Aborted... false for success, true for aborted.
+	 */
+	public boolean readOnly(byte[] buffer, int count) {
+		BoundaryException.assertWithinBounds(count, 1, 7);
+		if (buffer == null) {
+			throw new NullPointerException("Null return buffer was given");
+		}
+		
+		ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(count);
+		
+		int retVal = I2CJNI.i2CRead((byte)m_port.getValue(), (byte) m_deviceAddress, dataReceivedBuffer, (byte)count);
+		dataReceivedBuffer.get(buffer);
+		return retVal < 0;
+	}
 
 	/**
 	 * Send a broadcast write to all devices on the I2C bus.
@@ -171,22 +228,6 @@ public class I2C extends SensorBase {
 	 *            The value to write to the devices.
 	 */
 	public void broadcast(int registerAddress, int data) {
-	}
-
-	/**
-	 * SetCompatabilityMode
-	 *
-	 * Enables bitwise clock skewing detection. This will reduce the I2C
-	 * interface speed, but will allow you to communicate with devices that skew
-	 * the clock at abnormal times. Compatability mode is enabled by default.
-	 *
-	 * @param enable
-	 *            Enable compatability mode for this sensor or not.
-	 */
-	public void setCompatabilityMode(boolean enable) {
-		m_compatibilityMode = enable;
-		UsageReporting.report(tResourceType.kResourceType_I2C,
-				m_deviceAddress, 1, "C");
 	}
 
 	/**

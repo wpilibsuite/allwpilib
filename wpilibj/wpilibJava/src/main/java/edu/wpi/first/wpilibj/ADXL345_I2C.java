@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
  */
 public class ADXL345_I2C extends SensorBase {
 
-    private static final byte kAddress = 0x3A;
+    private static final byte kAddress = 0x1D;
     private static final byte kPowerCtlRegister = 0x2D;
     private static final byte kDataFormatRegister = 0x31;
     private static final byte kDataRegister = 0x32;
@@ -76,10 +76,9 @@ public class ADXL345_I2C extends SensorBase {
      *
      * @param range The range (+ or -) that the accelerometer will measure.
      */
-    public ADXL345_I2C(DataFormat_Range range) {
-        DigitalModule module = DigitalModule.getInstance(1);
-        m_i2c = module.getI2C(kAddress);
-
+    public ADXL345_I2C(I2C.Port port, DataFormat_Range range) {
+        m_i2c = new I2C(port, kAddress);
+		
         // Turn on the measurements
         m_i2c.write(kPowerCtlRegister, kPowerCtl_Measure);
         // Specify the data format to read

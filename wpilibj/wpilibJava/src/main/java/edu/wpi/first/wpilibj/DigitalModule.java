@@ -527,17 +527,6 @@ public class DigitalModule extends Module {
     }
 
     /**
-     * Return an I2C object for this digital module
-     *
-     * @param address
-     *            The device address.
-     * @return The associated I2C object.
-     */
-    public I2C getI2C(final int address) {
-        return new I2C(this, address);
-    }
-
-    /**
      * Get the loop timing of the Digital Module
      *
      * @return The number of clock ticks per DIO loop

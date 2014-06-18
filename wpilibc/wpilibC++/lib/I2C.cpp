@@ -7,30 +7,24 @@
 #include "I2C.h"
 #include "DigitalModule.h"
 //#include "NetworkCommunication/UsageReporting.h"
-#include "HAL/cpp/Synchronized.hpp"
+#include "HAL/Digital.hpp"
 #include "WPIErrors.h"
-
-MUTEX_ID I2C::m_semaphore = NULL;
-uint32_t I2C::m_objCount = 0;
 
 /**
  * Constructor.
  * 
- * @param module The Digital Module to which the device is conneted.
+ * @param Port The I2C port to which the device is connected.
  * @param deviceAddress The address of the device on the I2C bus.
  */
-I2C::I2C(DigitalModule *module, uint8_t deviceAddress)
-	: m_module (module)
+I2C::I2C(Port port, uint8_t deviceAddress) :
+	m_port (port)
 	, m_deviceAddress (deviceAddress)
-	, m_compatibilityMode (true)
 {
-	if (m_semaphore == NULL)
-	{
-		m_semaphore = initializeMutexNormal();
-	}
-	m_objCount++;
+	int32_t status = 0;
+	i2CInitialize(m_port, &status);
+	//wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
-	HALReport(HALUsageReporting::kResourceType_I2C, deviceAddress, module->GetNumber() - 1);
+	HALReport(HALUsageReporting::kResourceType_I2C, deviceAddress);
 }
 
 /**
@@ -38,12 +32,7 @@ I2C::I2C(DigitalModule *module, uint8_t deviceAddress)
  */
 I2C::~I2C()
 {
-	m_objCount--;
-	if (m_objCount <= 0)
-	{
-		deleteMutex(m_semaphore);
-		m_semaphore = NULL;
-	}
+	i2CClose(m_port);
 }
 
 /**
@@ -54,7 +43,7 @@ I2C::~I2C()
  * @param dataToSend Buffer of data to send as part of the transaction.
  * @param sendSize Number of bytes to send as part of the transaction. [0..6]
  * @param dataReceived Buffer to read data into.
- * @param receiveSize Number of byted to read from the device. [0..7]
+ * @param receiveSize Number of bytes to read from the device. [0..7]
  * @return Transfer Aborted... false for success, true for aborted.
  */
 bool I2C::Transaction(uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived, uint8_t receiveSize)
@@ -71,10 +60,10 @@ bool I2C::Transaction(uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceiv
 	}
 
 	int32_t status = 0;
-	bool value = doI2CTransactionWithModule(m_module->m_module, m_deviceAddress, m_compatibilityMode,
-											dataToSend, sendSize, dataReceived, receiveSize, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
-	return value;
+	status = i2CTransaction(m_port, m_deviceAddress,
+											dataToSend, sendSize, dataReceived, receiveSize);
+	//wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	return status < 0;
 }
 
 /**
@@ -87,7 +76,9 @@ bool I2C::Transaction(uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceiv
  */
 bool I2C::AddressOnly()
 {
-	return Transaction(NULL, 0, NULL, 0);
+	int32_t status = 0;
+	status = Transaction(NULL, 0, NULL, 0);
+	return status < 0;
 }
 
 /**
@@ -105,7 +96,26 @@ bool I2C::Write(uint8_t registerAddress, uint8_t data)
 	uint8_t buffer[2];
 	buffer[0] = registerAddress;
 	buffer[1] = data;
-	return Transaction(buffer, sizeof(buffer), NULL, 0);
+	int32_t status = 0;
+	status = i2CWrite(m_port, m_deviceAddress, buffer, sizeof(buffer));
+	return status < 0;
+}
+
+/**
+ * Execute a bulk write transaction with the device.
+ *
+ * Write multiple bytes to a device and wait until the
+ *   transaction is complete.
+ *
+ * @param data The data to write to the register on the device.
+ * @param count The number of bytes to be written.
+ * @return Transfer Aborted... false for success, true for aborted.
+ */
+bool I2C::WriteBulk(uint8_t* data, uint8_t count)
+{
+	int32_t status = 0;
+	status = i2CWrite(m_port, m_deviceAddress, data, count);
+	return status < 0;
 }
 
 /**
@@ -133,8 +143,39 @@ bool I2C::Read(uint8_t registerAddress, uint8_t count, uint8_t *buffer)
 		wpi_setWPIErrorWithContext(NullParameter, "buffer");
 		return true;
 	}
+	int32_t status = 0;
+	status = Transaction(&registerAddress, sizeof(registerAddress), buffer, count);
+	return status < 0;
+}
 
-	return Transaction(&registerAddress, sizeof(registerAddress), buffer, count);
+/**
+ * Execute a read only transaction with the device.
+ *
+ * Read 1 to 7 bytes from a device. This method does not write any data to prompt
+ * the device.
+ *
+ * @param buffer
+ *            A pointer to the array of bytes to store the data read from
+ *            the device.
+ * @param count
+ *            The number of bytes to read in the transaction. [1..7]
+ * @return Transfer Aborted... false for success, true for aborted.
+ */
+bool I2C::ReadOnly(uint8_t count, uint8_t *buffer)
+{
+	if (count < 1 || count > 7)
+	{
+		wpi_setWPIErrorWithContext(ParameterOutOfRange, "count");
+		return true;
+	}
+	if (buffer == NULL)
+	{
+		wpi_setWPIErrorWithContext(NullParameter, "buffer");
+		return true;
+	}
+	int32_t status = 0;
+	status = i2CRead(m_port, m_deviceAddress, buffer, count);
+	return status < 0;
 }
 
 /**
@@ -147,23 +188,6 @@ bool I2C::Read(uint8_t registerAddress, uint8_t count, uint8_t *buffer)
  */
 void I2C::Broadcast(uint8_t registerAddress, uint8_t data)
 {
-}
-
-/**
- * SetCompatibilityMode
- * 
- * Enables bitwise clock skewing detection.  This will reduce the I2C interface speed,
- * but will allow you to communicate with devices that skew the clock at abnormal times.
- * Compatability mode is enabled by default. 
- * @param enable Enable compatibility mode for this sensor or not.
- */
-void I2C::SetCompatibilityMode(bool enable)
-{
-	m_compatibilityMode = enable;
-
-	const char *cm = NULL;
-	if (m_compatibilityMode) cm = "C";
-	HALReport(HALUsageReporting::kResourceType_I2C, m_deviceAddress, m_module->GetNumber() - 1, cm);
 }
 
 /**

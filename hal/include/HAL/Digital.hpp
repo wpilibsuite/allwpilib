@@ -141,11 +141,11 @@ extern "C"
 	void resetSPI(void* spi_pointer, int32_t *status);
 	void clearSPIReceivedData(void* spi_pointer, int32_t *status);
 
-	bool doI2CTransaction(uint8_t address, bool compatibilityMode, uint8_t *dataToSend,
-			uint8_t sendSize, uint8_t *dataReceived, uint8_t receiveSize, int32_t *status);
-	bool doI2CTransactionWithModule(uint8_t module, uint8_t address, bool compatibilityMode,
-			uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived, uint8_t receiveSize,
-			int32_t *status);
+	void i2CInitialize(uint8_t port, int32_t *status);
+	int i2CTransaction(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived, uint8_t receiveSize);
+	int i2CWrite(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend, uint8_t sendSize);
+	int i2CRead(uint8_t port, uint8_t deviceAddress, uint8_t *buffer, uint8_t count);
+	void i2CClose(uint8_t port);
 
 	//// Float JNA Hack
 	// double

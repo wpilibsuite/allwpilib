@@ -5,20 +5,18 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-#include "SensorBase.h"
-
-class I2C;
+#include "I2C.h"
 
 /**
  * ADXL345 Accelerometer on I2C.
  *
- * This class alows access to a Analog Devices ADXL345 3-axis accelerometer on an I2C bus.
- * This class assumes the default (not alternate) sensor address of 0x3A (8-bit address).
+ * This class allows access to a Analog Devices ADXL345 3-axis accelerometer on an I2C bus.
+ * This class assumes the default (not alternate) sensor address of 0x1D (7-bit address).
  */
-class ADXL345_I2C : public SensorBase
+class ADXL345_I2C : public I2C
 {
 protected:
-	static const uint8_t kAddress = 0x3A;
+	static const uint8_t kAddress = 0x1D;
 	static const uint8_t kPowerCtlRegister = 0x2D;
 	static const uint8_t kDataFormatRegister = 0x31;
 	static const uint8_t kDataRegister = 0x32;
@@ -38,11 +36,11 @@ public:
 	};
 
 public:
-	explicit ADXL345_I2C(DataFormat_Range range=kRange_2G);
+	ADXL345_I2C(Port port, DataFormat_Range range=kRange_2G);
 	virtual ~ADXL345_I2C();
 	virtual double GetAcceleration(Axes axis);
 	virtual AllAxes GetAccelerations();
 
 protected:
-	I2C* m_i2c;
+	//I2C* m_i2c;
 };
