@@ -18,6 +18,7 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PlatformUI;
 
 import edu.wpi.first.wpilib.plugins.core.launching.AntLauncher;
+import edu.wpi.first.wpilib.plugins.cpp.WPILibCPPPlugin;
 
 /**
  * Launch shortcut base functionality, common for deploying to the robot.
@@ -95,8 +96,8 @@ public class SimulateLaunchShortcut implements ILaunchShortcut {
 		}
 		
 		if((lastDeploy != null)&&(!lastDeploy.isTerminated())){
-			System.out.println("Last deploy running");
-			//Find the server connection thread and kill it
+			WPILibCPPPlugin.logInfo("Last deploy running");
+			// Find the server connection thread and kill it
 			Vector<ThreadGroup> threadGroups = new Vector<ThreadGroup>();
 	        ThreadGroup root = Thread.currentThread().getThreadGroup().getParent();
 	        while (root.getParent() != null) {root = root.getParent();}
@@ -109,24 +110,25 @@ public class SimulateLaunchShortcut implements ILaunchShortcut {
             for(Thread current: threads){
             	if(current != null){
             		if(current.getName().equals(ANT_SERVER_THREAD_NAME)){
-            			try{
-            				//Manually end thread and then try terminating launch
+            			try {
+            				// Manually end thread and then try terminating launch
             				Method stopMethod = current.getClass().getMethod("stop");
             				stopMethod.invoke(current);
             				lastDeploy.terminate();
             				break;
-            			}catch(Exception e){e.printStackTrace();}
+            			} catch(Exception e){
+                          WPILibCPPPlugin.logError("Error killing ant thread.", e);
+                        }
             		}
             	}
             }
             
-            System.out.println("Waiting");
+            WPILibCPPPlugin.logInfo("Waiting");
             try{wait(1000);}catch(Exception e){}
-               
 		}
 		
-		System.out.println("Running ant file: " + activeProj.getLocation().toOSString() + File.separator + "build.xml");
-		System.out.println("Targets: " + targets + ", Mode: " + mode);
+		WPILibCPPPlugin.logInfo("Running ant file: " + activeProj.getLocation().toOSString() + File.separator + "build.xml");
+		WPILibCPPPlugin.logInfo("Targets: " + targets + ", Mode: " + mode);
 		lastDeploy = AntLauncher.runAntFile(new File (activeProj.getLocation().toOSString() + File.separator + "build.xml"), targets, null, mode);
 		
 		try {

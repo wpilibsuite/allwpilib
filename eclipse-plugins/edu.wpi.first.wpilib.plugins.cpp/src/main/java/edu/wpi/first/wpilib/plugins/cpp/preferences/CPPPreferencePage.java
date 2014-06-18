@@ -99,7 +99,7 @@ public class CPPPreferencePage
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
 	public void init(IWorkbench workbench) {
-		System.out.println("Preferences initialized.");
+		WPILibCPPPlugin.logInfo("Preferences initialized.");
 		Properties props = WPILibCore.getDefault().getProjectProperties(null);
 		getPreferenceStore().setValue(PreferenceConstants.LIBRARY_VERSION,
 				props.getProperty("cpp-version", WPILibCPPPlugin.getDefault().getCurrentVersion()));

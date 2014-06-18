@@ -22,6 +22,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
+import edu.wpi.first.wpilib.plugins.core.WPILibCore;
+
 /**
  * Utilities for creating a new project and files from templates. Uses
  * IProjectCreator to provide hooks for generating the directory
@@ -51,7 +53,7 @@ public class ProjectCreationUtils {
 			addFilesToProject(project, creator);
 			creator.finalize(project);
 		} catch (CoreException e) {
-            e.printStackTrace();
+            WPILibCore.logError("Error creating project "+creator.getName(), e);
             project = null;
         }
 		
@@ -75,7 +77,7 @@ public class ProjectCreationUtils {
 					newProject.open(null);
 				}
 			} catch (CoreException e) {
-	            e.printStackTrace();
+                WPILibCore.logError("Can't create new project.", e);
 			}
 		}
 		
@@ -121,8 +123,7 @@ public class ProjectCreationUtils {
 				URL url = new URL(creator.getProjectType().getBaseURL(), e.getValue());
 				createTemplateFile(project, e.getKey(), url, creator.getValues());
 			} catch (MalformedURLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+                WPILibCore.logError("Error adding file "+e.toString()+" to project.", e1);
 			}
 		}
 	}
@@ -150,9 +151,9 @@ public class ProjectCreationUtils {
 		try {
 			return makeTemplateInputStream(url.openStream(), vals);
 		} catch (final MalformedURLException e) {
-			e.printStackTrace();
+            WPILibCore.logError("Malformed URL "+url, e);
 		} catch (final IOException e) {
-			e.printStackTrace();
+            WPILibCore.logError("Issue opening input stream.", e);
 		}
 		return null;
 	}
@@ -163,7 +164,7 @@ public class ProjectCreationUtils {
 			str = readInput(stream);
 			stream.close();
 		} catch (final IOException e) {
-			e.printStackTrace();
+            WPILibCore.logError("Error reading template.", e);
 			return null;
 		}
 		
@@ -183,11 +184,10 @@ public class ProjectCreationUtils {
 			while ((ch = in.read()) > -1) {
 				buffer.append((char)ch);
 			}
-			System.out.print("\n");
 			in.close();
 			return buffer.toString();
 		} catch (IOException e) {
-			e.printStackTrace();
+            WPILibCore.logError("Error reading input.", e);
 			return null;
 		}
 	}

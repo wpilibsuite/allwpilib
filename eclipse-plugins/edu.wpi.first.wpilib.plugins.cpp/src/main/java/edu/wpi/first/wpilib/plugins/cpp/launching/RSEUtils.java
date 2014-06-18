@@ -2,9 +2,6 @@ package edu.wpi.first.wpilib.plugins.cpp.launching;
 
 import java.util.Arrays;
 
-import org.eclipse.cdt.debug.core.ICDTLaunchConfigurationConstants;
-import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.rse.core.IRSESystemType;
 import org.eclipse.rse.core.PasswordPersistenceManager;
 import org.eclipse.rse.core.RSECorePlugin;
@@ -12,6 +9,8 @@ import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.model.ISystemProfile;
 import org.eclipse.rse.core.model.ISystemRegistry;
 import org.eclipse.rse.core.model.SystemSignonInformation;
+
+import edu.wpi.first.wpilib.plugins.cpp.WPILibCPPPlugin;
 
 public class RSEUtils {
 
@@ -23,14 +22,13 @@ public class RSEUtils {
         // get the singleton RSE registry
         try {
 			RSECorePlugin.waitForInitCompletion();
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (InterruptedException e) {
+            WPILibCPPPlugin.logError("Error initializing RSE", e);
 		}
         ISystemRegistry registry = RSECorePlugin.getDefault().getSystemRegistry();
    
         // get the default profile, used to store connections
-        System.out.println("Profiles: "+Arrays.toString(registry.getActiveSystemProfiles()));
+        WPILibCPPPlugin.logInfo("Profiles: "+Arrays.toString(registry.getActiveSystemProfiles()));
         ISystemProfile profile = registry.getActiveSystemProfiles()[0];
    
         // see if a host object already exists for "build.eclipse.org"
@@ -48,7 +46,7 @@ public class RSEUtils {
             			"", systemType);
     			PasswordPersistenceManager.getInstance().add(info, true, false);
             } catch (Exception e) {
-                e.printStackTrace();
+                WPILibCPPPlugin.logError("Error connecting to RoboRIO.", e);
             }
         }
         return host;

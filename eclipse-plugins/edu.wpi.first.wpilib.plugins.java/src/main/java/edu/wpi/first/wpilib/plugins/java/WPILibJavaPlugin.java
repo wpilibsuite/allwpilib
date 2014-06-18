@@ -10,6 +10,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.ui.IStartup;
@@ -73,7 +74,7 @@ public class WPILibJavaPlugin extends AbstractUIPlugin implements IStartup {
 				return props.getProperty("version");
 			}
 		} catch (CoreException e) {
-			e.printStackTrace(System.err);
+            WPILibJavaPlugin.logError("Error getting properties.", e);
 			return "DEVELOPMENT";
 		}
 	}
@@ -85,7 +86,7 @@ public class WPILibJavaPlugin extends AbstractUIPlugin implements IStartup {
 			File file = new File(WPILibCore.getDefault().getWPILibBaseDir()+"/java/"+getCurrentVersion()+"/ant/build.properties");
 			props = new AntPropertiesParser(new FileInputStream(file)).getProperties(defaults);
 		} catch (Exception e) {
-			e.printStackTrace();
+            WPILibJavaPlugin.logError("Error getting properties.", e);
 			props = new Properties(defaults);
 		}
 		return props;
@@ -102,7 +103,7 @@ public class WPILibJavaPlugin extends AbstractUIPlugin implements IStartup {
 	      try {
 	    	  updateVariables(project);
 	      } catch (CoreException e) {
-	        e.printStackTrace();
+            WPILibJavaPlugin.logError("Error updating projects.", e);
 	      }
 	    }
 	}
@@ -116,12 +117,21 @@ public class WPILibJavaPlugin extends AbstractUIPlugin implements IStartup {
 			JavaCore.setClasspathVariable("networktables", new Path(props.getProperty("networktables.jar")), null);
 			JavaCore.setClasspathVariable("networktables.sources", new Path(props.getProperty("networktables.sources")), null);
 		} catch (JavaModelException e) {
-			e.printStackTrace(); // Classpath variables didn't get set
+            // Classpath variables didn't get set
+            WPILibJavaPlugin.logError("Error setting classpath..", e);
 		}
 	}
 
 	@Override
 	public void earlyStartup() {
 		new JavaInstaller(getCurrentVersion()).installIfNecessary();
+	}
+
+	public static void logInfo(String msg) {
+		getDefault().getLog().log(new Status(Status.INFO, PLUGIN_ID, Status.OK, msg, null));
+	}
+
+	public static void logError(String msg, Exception e) {
+		getDefault().getLog().log(new Status(Status.ERROR, PLUGIN_ID, Status.OK, msg, e));
 	}
 }

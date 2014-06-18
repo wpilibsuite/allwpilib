@@ -11,6 +11,7 @@ import java.util.Properties;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -29,7 +30,7 @@ public class WPILibCore extends AbstractUIPlugin {
 
 	// The shared instance
 	private static WPILibCore plugin;
-	
+
 	/**
 	 * The constructor
 	 */
@@ -38,18 +39,24 @@ public class WPILibCore extends AbstractUIPlugin {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
+	 * )
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		
+
 		new ToolsInstaller(getDefaultVersion()).installIfNecessary();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
+	 * )
 	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
@@ -58,7 +65,7 @@ public class WPILibCore extends AbstractUIPlugin {
 
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
 	public static WPILibCore getDefault() {
@@ -66,58 +73,63 @@ public class WPILibCore extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns an image descriptor for the image file at the given
-	 * plug-in relative path
-	 *
-	 * @param path the path
+	 * Returns an image descriptor for the image file at the given plug-in
+	 * relative path
+	 * 
+	 * @param path
+	 *            the path
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
-	
+
 	public Properties getProjectProperties(IProject project) {
 		List<InputStream> streams = new ArrayList<InputStream>();
 		try {
 			if (project != null) {
 				try {
-					streams.add(project.getFile("build.properties").getContents());
-				} catch (CoreException e) {} // No properties file
+					streams.add(project.getFile("build.properties")
+							.getContents());
+				} catch (CoreException e) {
+				} // No properties file
 			}
-			File file = new File(getWPILibBaseDir()+"/wpilib.properties");
+			File file = new File(getWPILibBaseDir() + "/wpilib.properties");
 			streams.add(new FileInputStream(file));
 			return new AntPropertiesParser(streams).getProperties();
 		} catch (Exception e) {
-			e.printStackTrace();
+            WPILibCore.logError("Error loading project properties.", e);
 			return new Properties();
 		}
 	}
-    
-    public void saveGlobalProperties(Properties props) {
-    	try {
-			props.store(new FileOutputStream(new File(WPILibCore.getDefault().getWPILibBaseDir()+"/wpilib.properties")),
+
+	public void saveGlobalProperties(Properties props) {
+		try {
+			props.store(new FileOutputStream(new File(WPILibCore.getDefault()
+					.getWPILibBaseDir() + "/wpilib.properties")),
 					"Don't add new properties, they will be deleted by the eclipse plugin.");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            WPILibCore.logError("Error saving global properties.", e);
 		}
-    }
-	
-	public int getTeamNumber(IProject project) {
-		return Integer.parseInt(getProjectProperties(project).getProperty("team-number", "0"));
 	}
-	
+
+	public int getTeamNumber(IProject project) {
+		return Integer.parseInt(getProjectProperties(project).getProperty(
+				"team-number", "0"));
+	}
+
 	public String getTargetIP(IProject project) {
 		String target = getProjectProperties(project).getProperty("target");
-		if (target != null) return target;
+		if (target != null)
+			return target;
 		else {
 			int teamNumber = getTeamNumber(project);
-			return "10."+(teamNumber/100)+"."+(teamNumber%100)+".2";
+			return "10." + (teamNumber / 100) + "." + (teamNumber % 100) + ".2";
 		}
 	}
 
 	public String getWPILibBaseDir() {
-		return System.getProperty("user.home")+"/wpilib";
+		return System.getProperty("user.home") + "/wpilib";
 	}
 
 	public String getDefaultVersion() {
@@ -125,6 +137,15 @@ public class WPILibCore extends AbstractUIPlugin {
 	}
 
 	public String getCurrentVersion() {
-		return getPreferenceStore().getString(PreferenceConstants.TOOLS_VERSION);
+		return getPreferenceStore()
+				.getString(PreferenceConstants.TOOLS_VERSION);
+	}
+
+	public static void logInfo(String msg) {
+		getDefault().getLog().log(new Status(Status.INFO, PLUGIN_ID, Status.OK, msg, null));
+	}
+
+	public static void logError(String msg, Exception e) {
+		getDefault().getLog().log(new Status(Status.ERROR, PLUGIN_ID, Status.OK, msg, e));
 	}
 }

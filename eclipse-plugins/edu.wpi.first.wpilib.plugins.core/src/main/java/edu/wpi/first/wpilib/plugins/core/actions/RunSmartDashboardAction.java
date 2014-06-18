@@ -39,7 +39,7 @@ public class RunSmartDashboardAction implements IWorkbenchWindowActionDelegate {
 		try {
 			DebugPlugin.exec(cmd, new File(System.getProperty("user.home")));
 		} catch (CoreException e) {
-			e.printStackTrace();
+            WPILibCore.logError("Error running SmartDashboard.", e);
 		}
 	}
 

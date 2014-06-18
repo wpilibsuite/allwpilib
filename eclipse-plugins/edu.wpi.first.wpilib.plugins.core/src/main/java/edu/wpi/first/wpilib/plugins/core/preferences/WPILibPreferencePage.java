@@ -79,7 +79,7 @@ public class WPILibPreferencePage
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
 	public void init(IWorkbench workbench) {
-		System.out.println("Preferences initialized.");
+		WPILibCore.logInfo("Preferences initialized.");
 		Properties props = WPILibCore.getDefault().getProjectProperties(null);
 		getPreferenceStore().setValue(PreferenceConstants.TEAM_NUMBER,
 				Integer.parseInt(props.getProperty("team-number", "0")));

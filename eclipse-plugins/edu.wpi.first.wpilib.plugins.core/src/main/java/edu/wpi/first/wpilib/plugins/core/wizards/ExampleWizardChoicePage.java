@@ -28,6 +28,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import edu.wpi.first.wpilib.plugins.core.WPILibCore;
+
 /**
  * The "New" wizard page allows setting the container for the new file as well
  * as the file name. The page will only accept file name without the extension
@@ -113,8 +115,8 @@ public class ExampleWizardChoicePage extends WizardPage {
 			}
 		}
 
-		System.out.println(examples);
-		System.out.println(tags);
+		WPILibCore.logInfo(examples.toString());
+		WPILibCore.logInfo(tags.toString());
 		
 		// Generate the tags tree
 		for (Tag tag : tags) {
@@ -169,7 +171,7 @@ public class ExampleWizardChoicePage extends WizardPage {
 		try {
 			url = new URL(installURL, filename);
 		} catch (final MalformedURLException e) {
-			e.printStackTrace();
+            WPILibCore.logError("loadXMLResource()", e);
 			return null;
 		}
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -179,13 +181,13 @@ public class ExampleWizardChoicePage extends WizardPage {
 			dBuilder = dbFactory.newDocumentBuilder();
 			doc = dBuilder.parse(url.openStream());
 		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
+            WPILibCore.logError("Error parsing "+filename, e);
 			return null;
 		} catch (SAXException e) {
-			e.printStackTrace();
+            WPILibCore.logError("SAX issue with "+filename, e);
 			return null;
 		} catch (IOException e) {
-			e.printStackTrace();
+            WPILibCore.logError("Error reading "+filename, e);
 			return null;
 		}
 		doc.getDocumentElement().normalize();

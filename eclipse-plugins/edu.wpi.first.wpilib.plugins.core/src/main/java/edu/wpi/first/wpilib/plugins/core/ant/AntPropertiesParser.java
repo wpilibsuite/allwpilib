@@ -11,6 +11,8 @@ import java.util.regex.Pattern;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Status;
 
+import edu.wpi.first.wpilib.plugins.core.WPILibCore;
+
 public class AntPropertiesParser {
 	List<InputStream> files;
 
@@ -44,9 +46,8 @@ public class AntPropertiesParser {
 		else props = new Properties(defaults);
 		try {
 			props.load(resource);
-		} catch (IOException e1) {
-			System.out.println("Issue loading file: "+resource);
-			e1.printStackTrace();
+		} catch (IOException e) {
+            WPILibCore.logError("Error loading property file: "+resource, e);
 			return null;
 		}
 		

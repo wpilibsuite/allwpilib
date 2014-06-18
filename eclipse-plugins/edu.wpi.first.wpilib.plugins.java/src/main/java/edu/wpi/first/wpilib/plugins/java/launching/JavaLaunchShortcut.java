@@ -20,7 +20,6 @@ import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.ILaunchShortcut;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jdt.launching.IVMConnector;
 import org.eclipse.jdt.launching.JavaRuntime;
@@ -34,6 +33,7 @@ import com.sun.jdi.connect.Connector.Argument;
 
 import edu.wpi.first.wpilib.plugins.core.WPILibCore;
 import edu.wpi.first.wpilib.plugins.core.launching.AntLauncher;
+import edu.wpi.first.wpilib.plugins.java.WPILibJavaPlugin;
 
 @SuppressWarnings("restriction")
 public abstract class JavaLaunchShortcut implements ILaunchShortcut {
@@ -54,35 +54,36 @@ public abstract class JavaLaunchShortcut implements ILaunchShortcut {
 	public String getLaunchType() {return DEPLOY_TYPE;}
 
 	public void launch(ISelection selection, String mode) {
-		//Extract resource from selection
+		// Extract resource from selection
 		StructuredSelection sel = (StructuredSelection)selection;
 		IProject activeProject = null;
-		//NOTE:  This caused issues earlier, as the sel return was treated as a workspace, instead of a project
-		//When it is a valid FIRST project, the selection is always a JavaProject
-		if(sel.getFirstElement() instanceof IJavaProject){
-			activeProject = ((IJavaProject)sel.getFirstElement()).getProject();
-		}else if(sel.getFirstElement() instanceof IJavaElement){
+		// NOTE:  This caused issues earlier, as the sel return was treated as a workspace, instead of a project
+		// When it is a valid FIRST project, the selection is always a JavaProject
+		if(sel.getFirstElement() instanceof IProject) {
+			activeProject = ((IProject)sel.getFirstElement()).getProject();
+		} else if(sel.getFirstElement() instanceof IJavaElement) {
 			activeProject = ((IJavaElement)sel.getFirstElement()).getJavaProject().getProject();
-		}else{
+		} else {
+			WPILibJavaPlugin.logError("Selection isn't a project: "+sel.toString(), null);
 			return;
 		}
         
-        //Run config using project found in extracted resource, with indicated mode
+        // Run config using project found in extracted resource, with indicated mode
         runConfig(activeProject, mode);
 	}
 
 	@Override
 	public void launch(IEditorPart editor, String mode) {
-		//Extract resource from editor
-		if(editor  != null){
+		// Extract resource from editor
+		if (editor  != null) {
 		    IFileEditorInput input = (IFileEditorInput)editor.getEditorInput();
 		    IFile file = input.getFile();
 		    IProject activeProject = file.getProject();
 		    
-		    //If editor existed, run config using extracted resource in indicated mode
+		    // If editor existed, run config using extracted resource in indicated mode
 		    runConfig(activeProject, mode);
-		}else{
-			System.err.println("editor was null");
+		} else {
+			WPILibJavaPlugin.logError("Editor was null.", null);
 		}
 
 	}
@@ -117,7 +118,7 @@ public abstract class JavaLaunchShortcut implements ILaunchShortcut {
 		}
 		
 		if((lastDeploy != null)&&(!lastDeploy.isTerminated())){
-			System.out.println("Last deploy running");
+			WPILibJavaPlugin.logInfo("Last deploy running");
 			//Find the server connection thread and kill it
 			Vector<ThreadGroup> threadGroups = new Vector<ThreadGroup>();
 	        ThreadGroup root = Thread.currentThread().getThreadGroup().getParent();
@@ -137,18 +138,20 @@ public abstract class JavaLaunchShortcut implements ILaunchShortcut {
             				stopMethod.invoke(current);
             				lastDeploy.terminate();
             				break;
-            			}catch(Exception e){e.printStackTrace();}
+            			}  catch(Exception e) {
+                            WPILibJavaPlugin.logError("Error stopping ant", e);
+                        }
             		}
             	}
             }
             
-            System.out.println("Waiting");
+            WPILibJavaPlugin.logInfo("Waiting");
             try{wait(1000);}catch(Exception e){}
                
 		}
 		
-		System.out.println("Running ant file: " + activeProj.getLocation().toOSString() + File.separator + "build.xml");
-		System.out.println("Targets: " + targets + ", Mode: " + mode);
+		WPILibJavaPlugin.logInfo("Running ant file: " + activeProj.getLocation().toOSString() + File.separator + "build.xml");
+		WPILibJavaPlugin.logInfo("Targets: " + targets + ", Mode: " + mode);
 		lastDeploy = AntLauncher.runAntFile(new File (activeProj.getLocation().toOSString() + File.separator + "build.xml"), targets, null, mode);
 		
 		if((mode.equals(ILaunchManager.DEBUG_MODE))&&(getLaunchType().equals(DEPLOY_TYPE))) {
@@ -157,8 +160,7 @@ public abstract class JavaLaunchShortcut implements ILaunchShortcut {
 				config = getRemoteDebugConfig(activeProj);
 				startDebugConfig(config, lastDeploy);
 			} catch (CoreException e) {
-				System.err.println("Debug attach failed.");
-				e.printStackTrace();
+                WPILibJavaPlugin.logError("Debug attach failed", e);
 			}
 		}
 		
@@ -179,7 +181,7 @@ public abstract class JavaLaunchShortcut implements ILaunchShortcut {
 		Map<String, String> argMap = new HashMap<String, String>(def.size());
 		argMap.put("hostname", getHostname(activeProj));
 		argMap.put("port", "8348");
-		System.out.println(argMap);
+		WPILibJavaPlugin.logInfo(argMap.toString());
 		config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_CONNECT_MAP, argMap);
 		return config;
 	}
@@ -196,8 +198,7 @@ public abstract class JavaLaunchShortcut implements ILaunchShortcut {
 					try {
 						config.launch(ILaunchManager.DEBUG_MODE, null);
 					} catch (CoreException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+                        WPILibJavaPlugin.logError("Error starting debug config..", e);
 					}
 					monitor.removeListener(this);
 				}
