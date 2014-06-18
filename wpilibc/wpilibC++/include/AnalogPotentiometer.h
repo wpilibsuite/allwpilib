@@ -27,29 +27,13 @@ public:
      * @param scale The scaling to multiply the voltage by to get a meaningful unit.
      * @param offset The offset to add to the scaled value for controlling the zero value
      */
-    AnalogPotentiometer(int channel, double scale, double offset);
+    AnalogPotentiometer(int channel, double scale = 1.0, double offset = 0.0);
 
-    /**
-     * AnalogPotentiometer constructor.
-     *
-     * Use the scaling and offset values so that the output produces
-     * meaningful values. I.E: you have a 270 degree potentiometer and
-     * you want the output to be degrees with the halfway point as 0
-     * degrees. The scale value is 270.0(degrees)/5.0(volts) and the
-     * offset is -135.0 since the halfway point after scaling is 135
-     * degrees.
-     *
-     * @param channel The analog channel this potentiometer is plugged into.
-     * @param scale The scaling to multiply the voltage by to get a meaningful unit.
-     */
-    AnalogPotentiometer(int channel, double scale);
+    AnalogPotentiometer(AnalogInput *input, double scale = 1.0, double offset = 0.0);
 
-    /**
-     * AnalogPotentiometer constructor.
-     *
-     * @param channel The analog channel this potentiometer is plugged into.
-     */
-    AnalogPotentiometer(int channel);
+    AnalogPotentiometer(AnalogInput &input, double scale = 1.0, double offset = 0.0);
+
+    virtual ~AnalogPotentiometer();
 
     /**
      * Get the current reading of the potentiomere.
@@ -90,9 +74,10 @@ private:
     double m_scale, m_offset;
     AnalogInput* m_analog_input;
     ITable* m_table;
+    bool m_init_analog_input;
 
     /**
      * Common initialization code called by all constructors.
      */
-    void initPot(int channel, double scale, double offset);
+    void initPot(AnalogInput *input, double scale, double offset);
 };
