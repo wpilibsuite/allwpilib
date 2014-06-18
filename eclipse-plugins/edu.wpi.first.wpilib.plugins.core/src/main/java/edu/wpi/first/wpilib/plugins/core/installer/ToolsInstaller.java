@@ -23,7 +23,7 @@ public class ToolsInstaller extends AbstractInstaller {
 	protected void updateInstalledVersion(String version) {
 		IPreferenceStore prefs = WPILibCore.getDefault().getPreferenceStore();
 		if (prefs.getBoolean(PreferenceConstants.UPDATE_TOOLS_VERSION)) {
-			System.out.println("Forcing library version to "+version);
+			WPILibCore.logInfo("Forcing library version to "+version);
 	    	Properties props = WPILibCore.getDefault().getProjectProperties(null);
 	    	props.setProperty("version", version);
 	    	WPILibCore.getDefault().saveGlobalProperties(props);

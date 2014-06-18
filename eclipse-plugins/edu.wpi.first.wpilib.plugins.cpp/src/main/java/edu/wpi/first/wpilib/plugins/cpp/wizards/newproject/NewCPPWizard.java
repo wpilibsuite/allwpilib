@@ -19,6 +19,7 @@ import edu.wpi.first.wpilib.plugins.core.wizards.NewProjectMainPage;
 import edu.wpi.first.wpilib.plugins.core.wizards.ProjectCreationUtils;
 import edu.wpi.first.wpilib.plugins.core.wizards.ProjectType;
 import edu.wpi.first.wpilib.plugins.core.wizards.TeamNumberPage;
+import edu.wpi.first.wpilib.plugins.cpp.WPILibCPPPlugin;
 
 /**
  * 
@@ -73,7 +74,7 @@ public class NewCPPWizard extends Wizard implements INewWizard {
 		final String teamNumber = TeamNumberPage.getTeamNumberFromPage(teamNumberPage);
 		final ProjectType projectType = page.getProjectType();
 		final String worldName = page.getWorld();
-		System.out.println("Project: "+projectName+" Project Type: "+projectType);
+		WPILibCPPPlugin.logInfo("Project: "+projectName+" Project Type: "+projectType);
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {

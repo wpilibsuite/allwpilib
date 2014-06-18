@@ -76,7 +76,7 @@ public class JavaPreferencePage
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
 	public void init(IWorkbench workbench) {
-		System.out.println("Preferences initialized.");
+		WPILibJavaPlugin.logInfo("Preferences initialized.");
 		Properties props = WPILibCore.getDefault().getProjectProperties(null);
 		getPreferenceStore().setValue(PreferenceConstants.LIBRARY_VERSION,
 				props.getProperty("version", WPILibJavaPlugin.getDefault().getCurrentVersion()));

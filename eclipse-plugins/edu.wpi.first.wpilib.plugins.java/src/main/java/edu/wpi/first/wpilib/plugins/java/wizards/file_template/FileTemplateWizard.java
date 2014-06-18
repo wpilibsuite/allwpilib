@@ -61,7 +61,7 @@ public class FileTemplateWizard extends Wizard implements INewWizard {
 		final IProject project = page.getProject();
 		final String className = page.getClassName();
 		final String packageName = page.getPackage();
-		System.out.println("Class: "+className+" Package: "+packageName);
+		WPILibJavaPlugin.logInfo("Class: "+className+" Package: "+packageName);
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
@@ -99,8 +99,7 @@ public class FileTemplateWizard extends Wizard implements INewWizard {
 			URL url = new URL(WPILibJavaPlugin.getDefault().getBundle().getEntry("/resources/templates/"), source);
 			ProjectCreationUtils.createTemplateFile(project, filepath, url, map);
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            WPILibJavaPlugin.logError("Error finishing making file: "+className, e);
 		}
 	}
 
@@ -111,9 +110,9 @@ public class FileTemplateWizard extends Wizard implements INewWizard {
 	 */
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		this.selection = selection;
-		System.out.println(selection);
+		WPILibJavaPlugin.logInfo(selection.toString());
 		Object element = ((StructuredSelection) selection).getFirstElement();
-		if (element != null) System.out.println(element.getClass());
+		if (element != null) WPILibJavaPlugin.logInfo(element.getClass().toString());
 		if (element instanceof IResource) {
 			project = ((IResource) element).getProject();
 		} else if (element instanceof IPackageFragment) {
@@ -122,6 +121,6 @@ public class FileTemplateWizard extends Wizard implements INewWizard {
 			project = ((IPackageFragmentRoot) element).getJavaProject().getProject();
 		} else if (element instanceof ICompilationUnit) {
 			project = ((ICompilationUnit) element).getJavaProject().getProject();
-		} else System.out.println("Element not instance of IResource");
+		} else WPILibJavaPlugin.logInfo("Element not instance of IResource");
 	}
 }

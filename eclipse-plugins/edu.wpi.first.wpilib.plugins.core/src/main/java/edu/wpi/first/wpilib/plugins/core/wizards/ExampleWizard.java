@@ -13,6 +13,8 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
 
+import edu.wpi.first.wpilib.plugins.core.WPILibCore;
+
 public abstract class ExampleWizard extends Wizard implements INewWizard {
 	private ExampleWizardChoicePage page1;
 	private IWizardPage page2;
@@ -71,7 +73,7 @@ public abstract class ExampleWizard extends Wizard implements INewWizard {
 		try {
 			doFinish(page1.getExampleProject(), TeamNumberPage.getTeamNumberFromPage(teamNumberPage));
 		} catch (CoreException e) {
-			e.printStackTrace();
+            WPILibCore.logError("Error finishing example.", e);
 			MessageDialog.openError(getShell(), "Error", e.getMessage());
 			return false;
 		}

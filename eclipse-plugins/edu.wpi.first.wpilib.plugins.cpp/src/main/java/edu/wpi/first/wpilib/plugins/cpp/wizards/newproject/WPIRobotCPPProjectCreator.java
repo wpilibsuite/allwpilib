@@ -72,8 +72,7 @@ public class WPIRobotCPPProjectCreator implements IProjectCreator {
 			CCorePlugin.getDefault().createCDTProject(project.getDescription(), project, null);
 			project.open(null);
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            WPILibCPPPlugin.logError("Error intializing FRC C++ project.", e);
 		}
 		
 		//config.getToolChain().getOptionById("cdt.managedbuild.option.gnu.cross.prefix").setValue(prefix);

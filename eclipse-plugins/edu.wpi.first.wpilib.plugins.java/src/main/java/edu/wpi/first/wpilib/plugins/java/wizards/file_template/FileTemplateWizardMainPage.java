@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Text;
 import edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature;
 import edu.wpi.first.wpilib.plugins.core.wizards.IProjectFilter;
 import edu.wpi.first.wpilib.plugins.core.wizards.ProjectComboField;
+import edu.wpi.first.wpilib.plugins.java.WPILibJavaPlugin;
 
 /**
  * The "New" wizard page allows setting the container for the new file as well
@@ -68,7 +69,7 @@ public class FileTemplateWizardMainPage extends WizardPage {
 							return project.hasNature(FRCProjectNature.FRC_PROJECT_NATURE)
 									&& project.hasNature(JavaCore.NATURE_ID);
 						} catch (CoreException e) {
-							e.printStackTrace();
+                            WPILibJavaPlugin.logError("Error looking for FRCJava project.", e);
 							return false;
 						}
 					}
@@ -177,7 +178,7 @@ public class FileTemplateWizardMainPage extends WizardPage {
 	}
 	
 	public String getDefaultPackage() {
-		System.out.println("Project: "+project);
+		WPILibJavaPlugin.logInfo("Project: "+project);
 		String defaultPackage = null;
 		if (project != null) {
 			try {
@@ -193,8 +194,7 @@ public class FileTemplateWizardMainPage extends WizardPage {
 				}
 				if (defaultPackage == null) defaultPackage = backupPackage;
 			} catch (JavaModelException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+                WPILibJavaPlugin.logError("Error getting default package.", e);
 			}
 		}
 		if (defaultPackage != null) return defaultPackage;

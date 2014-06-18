@@ -62,7 +62,7 @@ public class FileTemplateWizard extends Wizard implements INewWizard {
 		final IProject project = page.getProject();
 		final String className = page.getClassName();
 		final String folderName = page.getFolder();
-		System.out.println("Class: "+className+" Folder: "+folderName);
+		WPILibCPPPlugin.logInfo("Class: "+className+" Folder: "+folderName);
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
@@ -105,8 +105,7 @@ public class FileTemplateWizard extends Wizard implements INewWizard {
 			url = new URL(WPILibCPPPlugin.getDefault().getBundle().getEntry("/resources/templates/"), source+".cpp");
 			ProjectCreationUtils.createTemplateFile(project, filepath+".cpp", url, map);
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            WPILibCPPPlugin.logError("Malforemd URL: "+WPILibCPPPlugin.getDefault().getBundle().getEntry("/resources/templates/")+"/"+source+".h", e);
 		}
 	}
 
@@ -117,9 +116,9 @@ public class FileTemplateWizard extends Wizard implements INewWizard {
 	 */
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		this.selection = selection;
-		System.out.println(selection);
+		WPILibCPPPlugin.logInfo(selection.toString());
 		Object element = ((StructuredSelection) selection).getFirstElement();
-		System.out.println(element.getClass());
+		WPILibCPPPlugin.logInfo(element.getClass().toString());
 		if (element instanceof IResource) {
 			project = ((IResource) element).getProject();
 		} else if (element instanceof ISourceRoot) {
@@ -130,6 +129,6 @@ public class FileTemplateWizard extends Wizard implements INewWizard {
 			project = ((ISourceRoot) element).getCProject().getProject();
 		} else if (element instanceof ICContainer) {
 			project = ((ICContainer) element).getCProject().getProject();
-		} else System.out.println("Element not instance of IResource: "+element.getClass());
+		} else WPILibCPPPlugin.logInfo("Element not instance of IResource: "+element.getClass());
 	}
 }

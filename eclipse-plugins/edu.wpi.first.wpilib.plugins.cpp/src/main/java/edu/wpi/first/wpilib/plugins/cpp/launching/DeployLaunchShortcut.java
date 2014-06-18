@@ -1,39 +1,23 @@
 package edu.wpi.first.wpilib.plugins.cpp.launching;
 
-import java.io.File;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Vector;
 
 import org.eclipse.cdt.debug.core.ICDTLaunchConfigurationConstants;
 import org.eclipse.cdt.debug.core.executables.Executable;
 import org.eclipse.cdt.debug.core.executables.ExecutablesManager;
-import org.eclipse.cdt.debug.mi.core.IGDBServerMILaunchConfigurationConstants;
-import org.eclipse.cdt.debug.mi.core.IMIConstants;
 import org.eclipse.cdt.debug.mi.core.IMILaunchConfigurationConstants;
 import org.eclipse.cdt.launch.remote.IRemoteConnectionConfigurationConstants;
-import org.eclipse.cdt.launch.remote.IRemoteConnectionHostConstants;
-import org.eclipse.cdt.ui.ICDTConstants;
 import org.eclipse.core.internal.resources.Resource;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.debug.internal.ui.launchConfigurations.LaunchHistory;
 import org.eclipse.debug.ui.DebugUITools;
-import org.eclipse.debug.ui.IDebugUIConstants;
-import org.eclipse.debug.ui.ILaunchGroup;
 import org.eclipse.debug.ui.ILaunchShortcut;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -43,7 +27,6 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PlatformUI;
 
 import edu.wpi.first.wpilib.plugins.core.WPILibCore;
-import edu.wpi.first.wpilib.plugins.core.launching.AntLauncher;
 import edu.wpi.first.wpilib.plugins.cpp.WPILibCPPPlugin;
 
 /**
@@ -77,11 +60,10 @@ public class DeployLaunchShortcut implements ILaunchShortcut
 		// Extract resource from selection
 		StructuredSelection sel = (StructuredSelection) selection;
 		IProject activeProject = null;
-		if (sel.getFirstElement() instanceof IProject)
-		{
+		if (sel.getFirstElement() instanceof IProject) {
 			activeProject = (IProject) sel.getFirstElement();
-		} else
-		{
+		} else {
+			WPILibCPPPlugin.logError("Selection isn't a project: "+sel.toString(), null);
 			return;
 		}
 		
@@ -94,8 +76,7 @@ public class DeployLaunchShortcut implements ILaunchShortcut
 	public void launch(IEditorPart editor, String mode)
 	{
 		// Extract resource from editor
-		if (editor != null)
-		{
+		if (editor != null)	{
 			IFileEditorInput input = (IFileEditorInput) editor.getEditorInput();
 			IFile file = input.getFile();
 			IProject activeProject = file.getProject();
@@ -103,9 +84,8 @@ public class DeployLaunchShortcut implements ILaunchShortcut
 			// If editor existed, run config using extracted resource in
 			// indicated mode
 			runConfig(activeProject, mode, editor.getSite().getWorkbenchWindow().getShell());
-		} else
-		{
-			System.err.println("editor was null");
+		} else {
+			WPILibCPPPlugin.logError("Editor was null.", null);
 		}
 		
 	}
@@ -118,11 +98,10 @@ public class DeployLaunchShortcut implements ILaunchShortcut
 	 *            The mode it will be run in (ILaunchManager.RUN_MODE or
 	 *            ILaunchManager.DEBUG_MODE)
 	 */
-	public void runConfig(IProject activeProj, String mode, Shell shell) //TODO: figure out UI issues. tjats why this is undocumented""
-	{	
+	public void runConfig(IProject activeProj, String mode, Shell shell) {
+        // TODO: figure out UI issues. that's why this is undocumented
 		ILaunchConfigurationWorkingCopy config;
-		try
-		{
+		try {
 			config = getRemoteDebugConfig(activeProj);
 			//config.doSave(); // NOTE: For debugging
 			//org.eclipse.debug.core.DebugPlugin.getDefault().getLaunchManager().addLaunch(config.launch(mode, null));
@@ -130,18 +109,13 @@ public class DeployLaunchShortcut implements ILaunchShortcut
 			//DebugUITools.openLaunchConfigurationPropertiesDialog(shell, config, "org.eclipse.cdt.launch.launchGroup");
 			//config.launch(mode, new NullProgressMonitor(), false, true);
 			DebugUITools.launch(config, mode);
-		} catch (CoreException e)
-		{
-			System.err.println("Debug attach failed.");
-			e.printStackTrace();
+		} catch (CoreException e) {
+			WPILibCPPPlugin.logError("Debug attach failed.", e);
 		}
 		
-		try
-		{
+		try {
 			activeProj.refreshLocal(Resource.DEPTH_INFINITE, null);
-		} catch (Exception e)
-		{
-		}
+		} catch (Exception e) {}
 	}
 	
 	private ILaunchConfigurationWorkingCopy getRemoteDebugConfig(IProject activeProj) throws CoreException

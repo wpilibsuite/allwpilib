@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Properties;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -89,4 +90,12 @@ public class WPILibCPPPlugin extends AbstractUIPlugin implements IStartup {
 		new CPPInstaller(getCurrentVersion()).installIfNecessary();
 	}
 
+
+	public static void logInfo(String msg) {
+		getDefault().getLog().log(new Status(Status.INFO, PLUGIN_ID, Status.OK, msg, null));
+	}
+
+	public static void logError(String msg, Exception e) {
+		getDefault().getLog().log(new Status(Status.ERROR, PLUGIN_ID, Status.OK, msg, e));
+	}
 }

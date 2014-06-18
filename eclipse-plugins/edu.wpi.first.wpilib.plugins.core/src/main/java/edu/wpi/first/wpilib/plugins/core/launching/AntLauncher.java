@@ -18,6 +18,8 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.console.IConsoleConstants;
 
+import edu.wpi.first.wpilib.plugins.core.WPILibCore;
+
 /**
  * Contains functions to launch ant scripts while having the output sent to the
  * console.  Allows for the use of arguments, the specification of targets, and
@@ -125,13 +127,15 @@ public class AntLauncher {
 		    launcher = workingCopy.doSave();
 		    
 		   //Launch the modified configuration in the specified mode
-		   try{ret = launcher.launch(mode, null, true, true);}catch(Exception e){
+		   try {
+			   ret = launcher.launch(mode, null, true, true);
+		   } catch(Exception e) {
 			   //Does not need Output, handled and resolved internally
-			   e.printStackTrace();
+               WPILibCore.logError("Error running launch.", e);
 			   return null;
 		   }
-		}catch(Exception e){
-			e.printStackTrace();
+		} catch(Exception e) {
+            WPILibCore.logError("Error running ant file", e);
 			return null;
 		}
 		

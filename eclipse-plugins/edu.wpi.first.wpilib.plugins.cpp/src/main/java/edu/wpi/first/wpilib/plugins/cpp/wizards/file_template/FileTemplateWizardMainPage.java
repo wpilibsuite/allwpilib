@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Text;
 import edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature;
 import edu.wpi.first.wpilib.plugins.core.wizards.IProjectFilter;
 import edu.wpi.first.wpilib.plugins.core.wizards.ProjectComboField;
+import edu.wpi.first.wpilib.plugins.cpp.WPILibCPPPlugin;
 
 /**
  * The "New" wizard page allows setting the container for the new file as well
@@ -67,7 +68,7 @@ public class FileTemplateWizardMainPage extends WizardPage {
 					return project.hasNature(FRCProjectNature.FRC_PROJECT_NATURE)
 							&& project.hasNature(CCProjectNature.C_NATURE_ID);
 				} catch (CoreException e) {
-					e.printStackTrace();
+                    WPILibCPPPlugin.logError("Error checking for FRC C++ project.", e);
 					return false;
 				}
 			}
@@ -173,7 +174,7 @@ public class FileTemplateWizardMainPage extends WizardPage {
 	}
 	
 	public String getDefaultFolder() {
-		System.out.println("Project: "+project);
+		WPILibCPPPlugin.logInfo("Project: "+project);
 		return "src"+File.separator+ending;
 	}
 }

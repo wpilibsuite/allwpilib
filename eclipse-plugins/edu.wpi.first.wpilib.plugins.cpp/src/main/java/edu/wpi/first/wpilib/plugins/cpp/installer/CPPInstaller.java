@@ -31,7 +31,7 @@ public class CPPInstaller extends AbstractInstaller {
 	protected void updateInstalledVersion(String version) {
 		IPreferenceStore prefs = WPILibCPPPlugin.getDefault().getPreferenceStore();
 		if (prefs.getBoolean(PreferenceConstants.UPDATE_LIBRARY_VERSION)) {
-			System.out.println("Forcing library version to "+version);
+			WPILibCPPPlugin.logInfo("Forcing library version to "+version);
 	    	Properties props = WPILibCore.getDefault().getProjectProperties(null);
 	    	props.setProperty("cpp-version", version);
 	    	WPILibCore.getDefault().saveGlobalProperties(props);
