@@ -67,6 +67,7 @@
 #include "PIDOutput.h"
 #include "PIDSource.h"
 #include "Preferences.h"
+#include "PowerDistributionPanel.h"
 #include "PWM.h"
 #include "Relay.h"
 #include "Resource.h"
