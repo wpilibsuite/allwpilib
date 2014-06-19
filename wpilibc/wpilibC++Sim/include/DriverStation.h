@@ -36,7 +36,8 @@ public:
 	static const uint32_t kJoystickAxes = 6;
 
 	float GetStickAxis(uint32_t stick, uint32_t axis);
-	bool GetStickButtons(uint32_t stick, uint32_t button);
+	bool GetStickButton(uint32_t stick, uint32_t button);
+	short GetStickButtons(uint32_t stick);
 
 	float GetAnalogIn(uint32_t channel);
 	bool GetDigitalIn(uint32_t channel);

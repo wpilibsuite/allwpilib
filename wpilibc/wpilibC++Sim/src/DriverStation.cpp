@@ -115,18 +115,42 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
 		wpi_setWPIError(BadJoystickAxis);
 		return 0.0;
 	}
-    if (stick < 1 || stick > 4) {
-        wpi_setWPIErrorWithContext(ParameterOutOfRange, "stick must be between 1 and 4");
+	if (stick < 1 || stick > 4)
+	{
+		wpi_setWPIError(BadJoystickIndex);
 		return 0.0;
-    }
-    CRITICAL_REGION(m_joystickSemaphore)
-    if (axis >= joysticks[stick-1]->axes().size()) {
-        wpi_setWPIErrorWithContext(ParameterOutOfRange, "invalid axis");
-		return false;
-    }
+	}
+	CRITICAL_REGION(m_joystickSemaphore)
+	if (joysticks[stick-1] == NULL || axis >= joysticks[stick-1]->axes().size())
+	{
+		return 0.0;
+	}
+	return joysticks[stick-1]->axes(axis-1);
+	END_REGION
+}
 
-    return joysticks[stick-1] != NULL ? joysticks[stick-1]->axes(axis-1) : 0.0;
-    END_REGION
+/**
+ * The state of a specific button (1 - 12) on the joystick.
+ * This method only works in simulation, but is more efficient than GetStickButtons.
+ * 
+ * @param stick The joystick to read.
+ * @param button The button number to check.
+ * @return If the button is pressed.
+ */
+bool DriverStation::GetStickButton(uint32_t stick, uint32_t button)
+{
+	if (stick < 1 || stick > 4)
+	{
+		wpi_setWPIErrorWithContext(ParameterOutOfRange, "stick must be between 1 and 4");
+		return false;
+	}
+	CRITICAL_REGION(m_joystickSemaphore)
+	if (joysticks[stick-1] == NULL || button >= joysticks[stick-1]->buttons().size())
+	{
+	        return false;
+	}
+	return joysticks[stick-1]->buttons(button-1);
+	END_REGION
 }
 
 /**
@@ -136,20 +160,25 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
  * @param stick The joystick to read.
  * @return The state of the buttons on the joystick.
  */
-bool DriverStation::GetStickButtons(uint32_t stick, uint32_t button)
+short DriverStation::GetStickButtons(uint32_t stick)
 {
-    if (stick < 1 || stick > 4) {
+	if (stick < 1 || stick > 4)
+	{
 		wpi_setWPIErrorWithContext(ParameterOutOfRange, "stick must be between 1 and 4");
-        return false;
-    }
-    CRITICAL_REGION(m_joystickSemaphore)
-    if (button >= joysticks[stick-1]->buttons().size()) {
-        wpi_setWPIErrorWithContext(ParameterOutOfRange, "invalid button");
 		return false;
-    }
-
-    return joysticks[stick-1] != NULL ? joysticks[stick-1]->buttons(button-1) : false;
-    END_REGION
+	}
+	short btns = 0, btnid;
+	CRITICAL_REGION(m_joystickSemaphore)
+	msgs::JoystickPtr joy = joysticks[stick-1];
+	for (btnid = 0; btnid < joy->buttons().size() && btnid < 12; btnid++)
+	{
+		if (joysticks[stick-1]->buttons(btnid))
+		{
+			btns |= (1 << btnid);
+		}
+	}
+	return btns;
+	END_REGION
 }
 
 // 5V divided by 10 bits
