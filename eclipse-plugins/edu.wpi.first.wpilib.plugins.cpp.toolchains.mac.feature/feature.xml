@@ -3,7 +3,8 @@
       id="edu.wpi.first.wpilib.plugins.cpp.toolchains.mac.feature"
       label="Mac Toolchain for Robot C++ Development"
       version="0.2.0"
-      provider-name="Worcester Polytechnic Institute">
+      provider-name="Worcester Polytechnic Institute"
+      os="macosx">
 
    <description>
       The C++ toolchain to build Athena programs on a Mac.

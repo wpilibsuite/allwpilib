@@ -3,7 +3,8 @@
       id="edu.wpi.first.wpilib.plugins.cpp.toolchains.linux.feature"
       label="Linux Toolchain for Robot C++ Development"
       version="0.2.0"
-      provider-name="Worcester Polytechnic Institute">
+      provider-name="Worcester Polytechnic Institute"
+      os="linux">
 
    <description>
       The C++ toolchain to build Athena programs on Linux.
