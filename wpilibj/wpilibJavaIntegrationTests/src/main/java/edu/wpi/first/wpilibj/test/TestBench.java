@@ -47,13 +47,17 @@ public final class TestBench {
 	 * completely stopped
 	 */
 	public static final double MOTOR_STOP_TIME = 0.20;
-
+	
+	/* PowerDistributionPanel channels */
+	public static final int kJaguarPDPChannel = 7;
+	public static final int kVictorPDPChannel = 11;
+	public static final int kTalonPDPChannel = 12;
 
 	//THESE MUST BE IN INCREMENTING ORDER
-	public static final int DIOCrossConnectA1 = 6;
-	public static final int DIOCrossConnectA2 = 7;
-	public static final int DIOCrossConnectB1 = 8;
 	public static final int DIOCrossConnectB2 = 9;
+	public static final int DIOCrossConnectB1 = 8;
+	public static final int DIOCrossConnectA2 = 7;
+	public static final int DIOCrossConnectA1 = 6;
 
 	/** The Singleton instance of the Test Bench */
 	private static TestBench instance = null;

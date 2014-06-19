@@ -28,7 +28,8 @@ import org.junit.runners.Suite.SuiteClasses;
 				RelayCrossConnectTest.class,
 				SampleTest.class,
 				TiltPanCameraTest.class,
-				TimerTest.class
+				TimerTest.class,
+				PDPTest.class
 				})
 public class WpiLibJTestSuite {
 
