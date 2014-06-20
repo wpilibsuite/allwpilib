@@ -3,13 +3,21 @@ package edu.wpi.first.wpilibj.simulation.ds;
 import org.gazebosim.transport.Node;
 
 public class Main {
-    public static void main(String args[]) {
-    	Node node = new Node("frc");
-    	JoystickProvider provider = new JoystickProvider();
-        @SuppressWarnings("unused")
+	public static void main(String args[]) {
+		Node node = new Node("frc");
+		try {
+			node.waitForConnection();
+		} catch (Throwable thr) {
+			System.err.println("Could not connect to Gazebo.");
+			thr.printStackTrace();
+			System.exit(1);
+			return;
+		}
+
+		JoystickProvider provider = new JoystickProvider();
 		DS ds = new DS(provider);
-        ds.advertise(node);
-        
+		ds.advertise(node);
+
 		while (true) {
 			ds.publish();
 			for (int i = 0; i < provider.getJoysticks().size(); i++) {
@@ -25,5 +33,5 @@ public class Main {
 				e.printStackTrace();
 			}
 		}
-    }
+	}
 }

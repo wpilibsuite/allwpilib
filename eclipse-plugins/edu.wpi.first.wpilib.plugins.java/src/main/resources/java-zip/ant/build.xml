@@ -123,14 +123,12 @@
 	    </exec>
       </sequential>
       <sequential>
-        <sleep seconds="5"/>
 	    <echo>[simulate] Running DriverStation.</echo>
 	    <java jar="${wpilib.sim.tools}/SimDS.jar" fork="true">
           <jvmarg value="-Djava.library.path=${wpilib.sim.lib}" />
         </java>
       </sequential>
       <sequential>
-        <sleep seconds="5"/>
 	    <echo>[simulate] Running Code.</echo>
 	    <java jar="${simulation.dist.jar}" fork="true">
           <jvmarg value="-Djava.library.path=${wpilib.sim.lib}" />
@@ -148,14 +146,12 @@
 	    </exec>
       </sequential>
       <sequential>
-        <sleep seconds="5"/>
 	    <echo>[debug-simulate] Running DriverStation.</echo>
 	    <java jar="${wpilib.sim.tools}/SimDS.jar" fork="true">
           <jvmarg value="-Djava.library.path=${wpilib.sim.lib}" />
         </java>
       </sequential>
       <sequential>
-        <sleep seconds="5"/>
 	    <echo>[debug-simulate] Running Code.</echo>
 	    <java jar="${simulation.dist.jar}" fork="true">
           <jvmarg value="-Xdebug" />

@@ -4,12 +4,14 @@ import gazebo.msgs.GzPacket.Packet;
 import gazebo.msgs.GzTime.Time;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Message;
@@ -34,15 +36,28 @@ public class Connection {
 	private OutputStream os;
 	
 	private static final Logger LOG = Logger.getLogger("Gazebo Transport");
-	
-	public Connection() {
-		
-	}
-	
+
 	public void connect(String host, int port) throws UnknownHostException, IOException {
 		this.host = host;
 		this.port = port;
 		socket = new Socket(host, port);
+		is = socket.getInputStream();
+		os = socket.getOutputStream();
+	}
+
+	public void connectAndWait(String host, int port) throws IOException, InterruptedException {
+		this.host = host;
+		this.port = port;
+		while (true) {
+			try {
+				socket = new Socket(host, port);
+				break;
+			} catch (ConnectException ex) {
+				// Retry.
+				LOG.log(Level.WARNING, "Cannot connect, retrying in five seconds.", ex);
+				Thread.sleep(5000);
+			}
+		}
 		is = socket.getInputStream();
 		os = socket.getOutputStream();
 	}
@@ -52,8 +67,9 @@ public class Connection {
 		host = ssocket.getInetAddress().getHostAddress(); // TODO: get globally addressable name.
 		port = ssocket.getLocalPort();
 
-		new Thread(new Runnable() {
-			@Override public void run() {
+		new Thread("Gazebo Server Thread") {
+			@Override
+			public void run() {
 				LOG.config("Listening on "+host+":"+port);
 				while (true) {
 					Connection conn = new Connection();
@@ -64,12 +80,11 @@ public class Connection {
 						LOG.info("Handling connect from "+conn.socket.getInetAddress());
 						cb.handle(conn);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						LOG.log(Level.WARNING, "Cannot handle client", e);
 					}
 				}
 			}
-		}).start();
+		}.start();
 	}
 
 	public void close() throws IOException {

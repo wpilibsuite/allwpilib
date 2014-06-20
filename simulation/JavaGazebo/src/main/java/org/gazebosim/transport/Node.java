@@ -25,50 +25,36 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 
 public class Node implements Runnable, ServerCallback {
-	private String name;
-	private Connection master;
-	private Connection server;
-	private List<String> namespaces;
-	private Map<String, PublisherRecord> publishers;
+	private final String name;
+	private final Connection master = new Connection();
+	private final Connection server = new Connection();
+	private final List<String> namespaces = new LinkedList<>();
+	private final Map<String, PublisherRecord> publishers = new HashMap<>();
 	@SuppressWarnings("rawtypes")
-	private Map<String, Subscriber> subscriptions;
+	private final Map<String, Subscriber> subscriptions = new HashMap<>();
 	private static final Logger LOG = Logger.getLogger("Gazebo Transport");
+	static {
+		// Get rid of the excess information
+		LOG.setLevel(Level.WARNING);
+		Handler[] handlers = LOG.getParent().getHandlers();
+		if (handlers[0] instanceof ConsoleHandler) {
+			((ConsoleHandler) handlers[0]).setFormatter(new Formatter() {
+				@Override
+				public String format(LogRecord record) {
+					return String.format("%s|%s: %s\n", record.getLevel(), record.getLoggerName(), record.getMessage());
+				}
+			});
+		}
+	}
 
 	public Node(String name) {
 		this.name = name;
-		namespaces = new LinkedList<>();
-		publishers = new HashMap<>();
-		subscriptions = new HashMap<>();
-		
-		// Get rid of the excessive information
-		LOG.setLevel(Level.WARNING);
-	    Handler[] handlers = LOG.getParent().getHandlers();
-	    if (handlers[0] instanceof ConsoleHandler) {
-	    	((ConsoleHandler) handlers[0]).setFormatter(new Formatter() {
-	    		@Override public String format(LogRecord record) {
-	    			return String.format("%s|%s: %s\n", record.getLevel(), record.getLoggerName(), record.getMessage());
-	    		}
-	    	});
-	    }
-		
-		try {
-			master = new Connection(); 
-			master.connect("localhost", 11345);
-			server = new Connection();
-			server.serve(this);
-		
-			initializeConnection();
-		} catch (SocketException e ) {
-			LOG.severe("Socket error: " + e);
-			return;
-		} catch (UnknownHostException e ) {
-			LOG.severe("Invalid Host");
-			return;
-		} catch (IOException e ) {
-			LOG.severe("I/O error: " + e);
-			LOG.severe(e.getStackTrace().toString());
-			return;
-		}
+	}
+
+	public void waitForConnection() throws IOException, InterruptedException {
+		server.serve(this);
+		master.connectAndWait("localhost", 11345);
+		initializeConnection();
 		
 		new Thread(this).start();
 	}
@@ -120,7 +106,7 @@ public class Node implements Runnable, ServerCallback {
 
 	@Override
 	public void run() {
-		try	{
+		try {
 			while (true) {
 				Packet packet = master.read();
 				if (packet == null) {

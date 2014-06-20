@@ -12,6 +12,8 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.jar.Manifest;
 
+import edu.wpi.first.wpilibj.simulation.MainNode;
+
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 /**
@@ -175,8 +177,17 @@ public abstract class RobotBase {
      * the robot.
      * @throws javax.microedition.midlet.MIDletStateChangeException
      */
-    public static void main(String args[]) { // TODO: expose main to teams?{
+    public static void main(String args[]) { // TODO: expose main to teams?
         boolean errorOnExit = false;
+
+        try {
+            MainNode.openGazeboConnection();
+        } catch (Throwable e) {
+            System.err.println("Could not connect to Gazebo.");
+            e.printStackTrace();
+            System.exit(1);
+            return;
+        }
 
         ds = DriverStation.getInstance();
 
