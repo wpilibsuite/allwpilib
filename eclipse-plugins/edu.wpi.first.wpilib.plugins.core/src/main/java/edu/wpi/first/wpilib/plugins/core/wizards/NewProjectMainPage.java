@@ -227,7 +227,7 @@ public class NewProjectMainPage extends WizardPage {
 	}
 
 	public String getWorld() {
-		return worldText.getText().replace(System.getenv("HOME"), "${user.home}");
+		return worldText.getText().replace(System.getProperty("user.home"), "${user.home}");
 	}
 
 	public void setShowPackage(boolean bool) {
