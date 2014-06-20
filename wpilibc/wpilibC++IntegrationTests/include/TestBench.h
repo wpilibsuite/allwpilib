@@ -18,6 +18,7 @@ public:
 
 	/* Analog output channels */
 	static const uint32_t kAnalogOutputChannel = 0;
+	static const uint32_t kFakeJaguarPotentiometer = 1;
 
 	/* DIO channels */
 	static const uint32_t kTalonEncoderChannelA = 0;
@@ -44,12 +45,14 @@ public:
 	static const uint32_t kFakeSolenoid2Channel = 13;
 	static const uint32_t kFakeRelayForward = 14;
 	static const uint32_t kFakeRelayReverse = 15;
+	static const uint32_t kFakeJaguarForwardLimit = 16;
+	static const uint32_t kFakeJaguarReverseLimit = 17;
 
 	/* Relay channels */
 	static const uint32_t kRelayChannel = 0;
 
 	/* CAN IDs */
-	static const uint32_t kCANJaguarID = 1;
+	static const uint32_t kCANJaguarID = 2;
 
 	/* PDP channels */
 	static const uint32_t kJaguarPDPChannel = 7;
