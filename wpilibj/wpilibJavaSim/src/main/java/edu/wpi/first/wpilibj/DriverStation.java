@@ -12,11 +12,12 @@ import gazebo.msgs.GzDriverStation.DriverStation.State;
 import gazebo.msgs.GzJoystick.Joystick;
 
 import org.gazebosim.transport.SubscriberCallback;
+import edu.wpi.first.wpilibj.parsing.IInputOutput;
 
 /**
  * Provide access to the network communication data to / from the Driver Station.
  */
-public class DriverStation {
+public class DriverStation implements IInputOutput {
     /**
      * Slot for the analog module to read the battery
      */
@@ -24,7 +25,7 @@ public class DriverStation {
     /**
      * Analog channel to read the battery
      */
-    public static final int kBatteryChannel = 8;
+    public static final int kBatteryChannel = 7;
     /**
      * Number of Joystick Ports
      */
@@ -33,6 +34,10 @@ public class DriverStation {
      * Number of Joystick Axes
      */
     public static final int kJoystickAxes = 6;
+    /**
+     * Convert from raw values to volts
+     */
+    public static final double kDSAnalogInScaling = 5.0 / 1023.0;
 
     /**
      * The robot alliance that the robot is a part of
@@ -79,7 +84,7 @@ public class DriverStation {
         return DriverStation.instance;
     }
 
-	/**
+    /**
      * DriverStation constructor.
      *
      * The single DriverStation instance is created statically with the
@@ -155,8 +160,11 @@ public class DriverStation {
      * @return The value of the axis on the joystick.
      */
     public double getStickAxis(int stick, int axis) {
-        if (axis < 1 || axis > kJoystickAxes || joysticks[stick] == null) {
-            return 0.0;    		
+        if (axis < 1 || axis > kJoystickAxes) {
+            return 0.0;
+        }
+        if (stick < 0 || stick >= joysticks.length || joysticks[stick] == null) {
+            return 0.0;
     	}
     	return joysticks[stick].getAxes(axis - 1);
     }
@@ -169,56 +177,10 @@ public class DriverStation {
      * @return The state of the buttons on the joystick.
      */
     public boolean getStickButton(int stick, int button) {
-    	if (joysticks[stick] == null) {
-            return false;    		
+    	if (stick < 0 || stick >= joysticks.length || joysticks[stick] == null) {
+            return false;
     	}
     	return joysticks[stick].getButtons(button - 1);
-    }
-
-    /**
-     * Get an analog voltage from the Driver Station.
-     * The analog values are returned as voltage values for the Driver Station analog inputs.
-     * These inputs are typically used for advanced operator interfaces consisting of potentiometers
-     * or resistor networks representing values on a rotary switch.
-     *
-     * @param channel The analog input channel on the driver station to read from. Valid range is 1 - 4.
-     * @return The analog voltage on the input.
-     */
-    public double getAnalogIn(final int channel) {
-    	throw new RuntimeException("The simulated DriverStation doesn't have analog inputs");
-    }
-
-    /**
-     * Get values from the digital inputs on the Driver Station.
-     * Return digital values from the Drivers Station. These values are typically used for buttons
-     * and switches on advanced operator interfaces.
-     * @param channel The digital input to get. Valid range is 1 - 8.
-     * @return The value of the digital input
-     */
-    public boolean getDigitalIn(final int channel) {
-    	throw new RuntimeException("The simulated DriverStation doesn't have digital inputs");
-    }
-
-    /**
-     * Set a value for the digital outputs on the Driver Station.
-     *
-     * Control digital outputs on the Drivers Station. These values are typically used for
-     * giving feedback on a custom operator station such as LEDs.
-     *
-     * @param channel The digital output to set. Valid range is 1 - 8.
-     * @param value The state to set the digital output.
-     */
-    public void setDigitalOut(final int channel, final boolean value) {
-    	throw new RuntimeException("The simulated DriverStation doesn't have digital outputs");
-    }
-
-    /**
-     * Get a value that was set for the digital outputs on the Driver Station.
-     * @param channel The digital ouput to monitor. Valid range is 1 through 8.
-     * @return A digital value being output on the Drivers Station.
-     */
-    public boolean getDigitalOut(final int channel) {
-    	throw new RuntimeException("The simulated DriverStation doesn't have digital outputs");
     }
 
     /**
@@ -311,7 +273,7 @@ public class DriverStation {
     public int getTeamNumber() {
         return 348; // TODO
     }
-    
+
     /**
      * Is the driver station attached to a Field Management System?
      * Note: This does not work with the Blue DS.
@@ -319,20 +281,6 @@ public class DriverStation {
      */
     public boolean isFMSAttached() {
         return false;
-    }
-
-    /**
-     * Return the approximate match time
-     * The FMS does not currently send the official match time to the robots
-     * This returns the time since the enable signal sent from the Driver Station
-     * At the beginning of autonomous, the time is reset to 0.0 seconds
-     * At the beginning of teleop, the time is reset to +15.0 seconds
-     * If the robot is disabled, this returns 0.0 seconds
-     * Warning: This is not an official time (so it cannot be used to argue with referees)
-     * @return Match time in seconds since the beginning of autonomous
-     */
-    public double getMatchTime() {
-    	throw new RuntimeException("The simulated DriverStation doesn't support match times"); // TODO:
     }
 
     /** Only to be used to tell the Driver Station what code you claim to be executing

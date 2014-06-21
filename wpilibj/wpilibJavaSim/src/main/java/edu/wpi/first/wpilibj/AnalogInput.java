@@ -13,37 +13,36 @@ import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
  * Analog channel class.
+ *
+ * Each analog channel is read from hardware as a 12-bit number representing
+ * -10V to 10V.
+ *
+ * Connected to each analog channel is an averaging and oversampling engine.
+ * This engine accumulates the specified ( by setAverageBits() and
+ * setOversampleBits() ) number of samples before returning a new value. This is
+ * not a sliding window average. The only difference between the oversampled
+ * samples and the averaged samples is that the oversampled samples are simply
+ * accumulated effectively increasing the resolution, while the averaged samples
+ * are divided by the number of samples to retain the resolution, but get more
+ * stable values.
  */
-public class AnalogChannel extends SensorBase implements PIDSource,
+public class AnalogInput extends SensorBase implements PIDSource,
 		LiveWindowSendable {
 
 	private SimFloatInput m_impl;
-	private int m_moduleNumber, m_channel;
+	private int m_channel;
 
 	/**
-	 * Construct an analog channel on the default module.
+	 * Construct an analog channel.
 	 *
 	 * @param channel
 	 *            The channel number to represent.
 	 */
-	public AnalogChannel(final int channel) {
-		this(1, channel);
-	}
-
-	/**
-	 * Construct an analog channel on a specified module.
-	 *
-	 * @param moduleNumber
-	 *            The digital module to use (1 or 2).
-	 * @param channel
-	 *            The channel number to represent.
-	 */
-	public AnalogChannel(final int moduleNumber, final int channel) {
+	public AnalogInput(final int channel) {
 		m_channel = channel;
-		m_moduleNumber = moduleNumber;
-		m_impl = new SimFloatInput("simulator/analog/"+moduleNumber+"/"+channel);
+		m_impl = new SimFloatInput("simulator/analog/1/"+channel); // TODO: If module numbers cannot be specified, remove them from the communication system.
 
-		LiveWindow.addSensor("Analog", moduleNumber, channel, this);
+		LiveWindow.addSensor("AnalogInput", channel, this);
 	}
 
 	/**
@@ -51,7 +50,6 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	 */
 	public void free() {
 		m_channel = 0;
-		m_moduleNumber = 0;
 	}
 
 	/**
@@ -90,15 +88,6 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 	}
 
 	/**
-	 * Gets the number of the analog module this channel is on.
-	 *
-	 * @return The module number of the analog module this channel is on.
-	 */
-	public int getModuleNumber() {
-		return m_moduleNumber;
-	}
-
-    /**
 	 * Get the average value for use with PIDController
 	 *
 	 * @return the average value
@@ -107,7 +96,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
 		return getAverageVoltage();
 	}
 
-    /**
+	/**
 	 * Live Window code, only does anything if live window is activated.
 	 */
 	public String getSmartDashboardType() {

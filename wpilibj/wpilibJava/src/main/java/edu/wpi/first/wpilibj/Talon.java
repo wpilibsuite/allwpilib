@@ -43,7 +43,7 @@ public class Talon extends SafePWM implements SpeedController, IDeviceController
     /**
      * Constructor.
      *
-     * @param channel The PWM channel that the Victor is attached to.
+     * @param channel The PWM channel that the Talon is attached to.
      */
     public Talon(final int channel) {
         super(channel);

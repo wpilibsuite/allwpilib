@@ -6,6 +6,8 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.wpilibj.parsing.IUtility;
+
 /**
  * Utility class for handling Robot drive based on a definition of the motor configuration.
  * The robot drive class handles basic driving for a robot. Currently, 2 and 4 motor standard
@@ -14,7 +16,7 @@ package edu.wpi.first.wpilibj;
  * used for either the drive function (intended for hand created drive code, such as autonomous)
  * or with the Tank/Arcade functions intended to be used for Operator Control driving.
  */
-public class RobotDrive implements MotorSafety {
+public class RobotDrive implements MotorSafety, IUtility {
 
     protected MotorSafetyHelper m_safetyHelper;
 
@@ -64,7 +66,7 @@ public class RobotDrive implements MotorSafety {
     protected SpeedController m_rearLeftMotor;
     protected SpeedController m_rearRightMotor;
     protected boolean m_allocatedSpeedControllers;
-    protected boolean m_isCANInitialized = true;
+    protected boolean m_isCANInitialized = false;//TODO: fix can
     protected static boolean kArcadeRatioCurve_Reported = false;
     protected static boolean kTank_Reported = false;
     protected static boolean kArcadeStandard_Reported = false;
@@ -75,16 +77,16 @@ public class RobotDrive implements MotorSafety {
      * Set up parameters for a two wheel drive system where the
      * left and right motor pwm channels are specified in the call.
      * This call assumes Jaguars for controlling the motors.
-     * @param leftMotorChannel The PWM channel number on the default digital module that drives the left motor.
-     * @param rightMotorChannel The PWM channel number on the default digital module that drives the right motor.
+     * @param leftMotorChannel The PWM channel number that drives the left motor.
+     * @param rightMotorChannel The PWM channel number that drives the right motor.
      */
     public RobotDrive(final int leftMotorChannel, final int rightMotorChannel) {
         m_sensitivity = kDefaultSensitivity;
         m_maxOutput = kDefaultMaxOutput;
         m_frontLeftMotor = null;
-        m_rearLeftMotor = new Talon(leftMotorChannel);
+        m_rearLeftMotor = new Jaguar(leftMotorChannel);
         m_frontRightMotor = null;
-        m_rearRightMotor = new Talon(rightMotorChannel);
+        m_rearRightMotor = new Jaguar(rightMotorChannel);
         for (int i = 0; i < kMaxNumberOfMotors; i++) {
             m_invertedMotors[i] = 1;
         }
@@ -98,19 +100,19 @@ public class RobotDrive implements MotorSafety {
      * Set up parameters for a four wheel drive system where all four motor
      * pwm channels are specified in the call.
      * This call assumes Jaguars for controlling the motors.
-     * @param frontLeftMotor Front left motor channel number on the default digital module
-     * @param rearLeftMotor Rear Left motor channel number on the default digital module
-     * @param frontRightMotor Front right motor channel number on the default digital module
-     * @param rearRightMotor Rear Right motor channel number on the default digital module
+     * @param frontLeftMotor Front left motor channel number
+     * @param rearLeftMotor Rear Left motor channel number
+     * @param frontRightMotor Front right motor channel number
+     * @param rearRightMotor Rear Right motor channel number
      */
     public RobotDrive(final int frontLeftMotor, final int rearLeftMotor,
                       final int frontRightMotor, final int rearRightMotor) {
         m_sensitivity = kDefaultSensitivity;
         m_maxOutput = kDefaultMaxOutput;
-        m_rearLeftMotor = new Talon(rearLeftMotor);
-        m_rearRightMotor = new Talon(rearRightMotor);
-        m_frontLeftMotor = new Talon(frontLeftMotor);
-        m_frontRightMotor = new Talon(frontRightMotor);
+        m_rearLeftMotor = new Jaguar(rearLeftMotor);
+        m_rearRightMotor = new Jaguar(rearRightMotor);
+        m_frontLeftMotor = new Jaguar(frontLeftMotor);
+        m_frontRightMotor = new Jaguar(frontRightMotor);
         for (int i = 0; i < kMaxNumberOfMotors; i++) {
             m_invertedMotors[i] = 1;
         }
@@ -190,7 +192,6 @@ public class RobotDrive implements MotorSafety {
         double leftOutput, rightOutput;
 
         if(!kArcadeRatioCurve_Reported) {
-            // UsageReporting.report(tResourceType.kResourceType_RobotDrive, getNumMotors(), tInstances.kRobotDrive_ArcadeRatioCurve);
             kArcadeRatioCurve_Reported = true;
         }
         if (curve < 0) {
@@ -290,7 +291,6 @@ public class RobotDrive implements MotorSafety {
     public void tankDrive(double leftValue, double rightValue, boolean squaredInputs) {
 
         if(!kTank_Reported) {
-            // UsageReporting.report(tResourceType.kResourceType_RobotDrive, getNumMotors(), tInstances.kRobotDrive_Tank);
             kTank_Reported = true;
         }
 
@@ -391,7 +391,6 @@ public class RobotDrive implements MotorSafety {
     public void arcadeDrive(double moveValue, double rotateValue, boolean squaredInputs) {
         // local variables to hold the computed PWM values for the motors
         if(!kArcadeStandard_Reported) {
-            // UsageReporting.report(tResourceType.kResourceType_RobotDrive, getNumMotors(), tInstances.kRobotDrive_ArcadeStandard);
             kArcadeStandard_Reported = true;
         }
 
@@ -464,7 +463,6 @@ public class RobotDrive implements MotorSafety {
      */
     public void mecanumDrive_Cartesian(double x, double y, double rotation, double gyroAngle) {
         if(!kMecanumCartesian_Reported) {
-            // UsageReporting.report(tResourceType.kResourceType_RobotDrive, getNumMotors(), tInstances.kRobotDrive_MecanumCartesian);
             kMecanumCartesian_Reported = true;
         }
         double xIn = x;
@@ -509,7 +507,6 @@ public class RobotDrive implements MotorSafety {
      */
     public void mecanumDrive_Polar(double magnitude, double direction, double rotation) {
         if(!kMecanumPolar_Reported) {
-            // UsageReporting.report(tResourceType.kResourceType_RobotDrive, getNumMotors(), tInstances.kRobotDrive_MecanumPolar);
             kMecanumPolar_Reported = true;
         }
         double frontLeftSpeed, rearLeftSpeed, frontRightSpeed, rearRightSpeed;
@@ -657,7 +654,6 @@ public class RobotDrive implements MotorSafety {
      * Free the speed controllers if they were allocated locally
      */
     public void free() {
-        
     }
 
     public void setExpiration(double timeout) {

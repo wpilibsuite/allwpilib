@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.parsing.IInputOutput;
 
 /**
  * Handle input from standard Joysticks connected to the Driver Station.
@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.GenericHID;
  * the most recent value is returned. There is a single class instance for each joystick and the mapping
  * of ports to hardware buttons depends on the code in the driver station.
  */
-public class Joystick extends GenericHID {
+public class Joystick extends GenericHID implements IInputOutput {
 
     static final byte kDefaultXAxis = 1;
     static final byte kDefaultYAxis = 2;
@@ -98,6 +98,7 @@ public class Joystick extends GenericHID {
             this.value = value;
         }
     }
+    private DriverStation m_ds;
     private final int m_port;
     private final byte[] m_axes;
     private final byte[] m_buttons;
@@ -120,7 +121,6 @@ public class Joystick extends GenericHID {
         m_buttons[ButtonType.kTrigger.value] = kDefaultTriggerButton;
         m_buttons[ButtonType.kTop.value] = kDefaultTopButton;
 
-        //UsageReporting.report(tResourceType.kResourceType_Joystick, port);
     }
 
     /**
@@ -134,6 +134,7 @@ public class Joystick extends GenericHID {
      * @param numButtonTypes The number of button types in the enum.
      */
     protected Joystick(int port, int numAxisTypes, int numButtonTypes) {
+        m_ds = DriverStation.getInstance();
         m_axes = new byte[numAxisTypes];
         m_buttons = new byte[numButtonTypes];
         m_port = port;
@@ -199,7 +200,7 @@ public class Joystick extends GenericHID {
      * @return The value of the axis.
      */
     public double getRawAxis(final int axis) {
-        return DriverStation.getInstance().getStickAxis(m_port, axis);
+        return m_ds.getStickAxis(m_port, axis);
     }
 
     /**
@@ -273,7 +274,7 @@ public class Joystick extends GenericHID {
      * @return The state of the button.
      */
     public boolean getRawButton(final int button) {
-        return DriverStation.getInstance().getStickButton(m_port, button);
+        return m_ds.getStickButton(m_port, button);
     }
 
     /**

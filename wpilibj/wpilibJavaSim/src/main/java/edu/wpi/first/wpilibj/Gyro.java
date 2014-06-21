@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.simulation.SimGyro;
+import edu.wpi.first.wpilibj.parsing.ISensor;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
@@ -21,11 +22,9 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
  * determine the default offset. This is subtracted from each sample to
  * determine the heading.
  */
-public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+public class Gyro extends SensorBase implements PIDSource, ISensor,
+		LiveWindowSendable {
 
-	double m_offset;
-	int m_center;
-	boolean m_channelAllocated;
 	private PIDSourceParameter m_pidSource;
 	private SimGyro impl;
 
@@ -37,41 +36,23 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 	 * calculations are in progress, this is typically done when the robot is
 	 * first turned on while it's sitting at rest before the competition starts.
 	 */
-	private void initGyro(int slot, int channel) {
-		impl = new SimGyro("simulator/analog/"+slot+"/"+channel);
-		
+	private void initGyro(int channel) {
+		impl = new SimGyro("simulator/analog/1/"+channel);
+
 		reset();
 		setPIDSourceParameter(PIDSourceParameter.kAngle);
 
-		//UsageReporting.report(tResourceType.kResourceType_Gyro,
-		//  m_analog.getChannel(), m_analog.getModuleNumber() - 1);
-		LiveWindow.addSensor("Gyro", slot, channel, this);
-	}
-
-	/**
-	 * Gyro constructor given a slot and a channel. .
-	 * 
-	 * @param slot
-	 *            The cRIO slot for the analog module the gyro is connected to.
-	 * @param channel
-	 *            The analog channel the gyro is connected to.
-	 */
-	public Gyro(int slot, int channel) {
-		m_channelAllocated = true;
-		initGyro(slot, channel);
+		LiveWindow.addSensor("Gyro", channel, this);
 	}
 
 	/**
 	 * Gyro constructor with only a channel.
-	 * 
-	 * Use the default analog module slot.
-	 * 
+	 *
 	 * @param channel
 	 *            The analog channel the gyro is connected to.
 	 */
 	public Gyro(int channel) {
-		m_channelAllocated = true;
-		initGyro(1, channel);
+		initGyro(channel);
 	}
 
 	/**
@@ -102,13 +83,13 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 
 	/**
 	 * Return the actual angle in degrees that the robot is currently facing.
-	 * 
+	 *
 	 * The angle is based on the current accumulator value corrected by the
 	 * oversampling rate, the gyro type and the A/D calibration values. The
 	 * angle is continuous, that is can go beyond 360 degrees. This make
 	 * algorithms that wouldn't want to see a discontinuity in the gyro output
 	 * as it sweeps past 0 on the second time around.
-	 * 
+	 *
 	 * @return the current heading of the robot in degrees. This heading is
 	 *         based on integration of the returned rate from the gyro.
 	 */
@@ -118,9 +99,9 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 
 	/**
 	 * Return the rate of rotation of the gyro
-	 * 
+	 *
 	 * The rate is based on the most recent reading of the gyro analog value
-	 * 
+	 *
 	 * @return the current rate in degrees per second
 	 */
 	public double getRate() {
@@ -128,22 +109,9 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 	}
 
 	/**
-	 * Set the gyro type based on the sensitivity. This takes the number of
-	 * volts/degree/second sensitivity of the gyro and uses it in subsequent
-	 * calculations to allow the code to work with multiple gyros.
-	 * 
-	 * @param voltsPerDegreePerSecond
-	 *            The type of gyro specified as the voltage that represents one
-	 *            degree/second.
-	 */
-	public void setSensitivity(double voltsPerDegreePerSecond) {
-		throw new UnsupportedOperationException("Simulation doesn't currently support setting the sensitivity.");
-	}
-
-	/**
 	 * Set which parameter of the encoder you are using as a process control
 	 * variable. The Gyro class supports the rate and angle parameters
-	 * 
+	 *
 	 * @param pidSource
 	 *            An enum to select the parameter.
 	 */
@@ -154,7 +122,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 
 	/**
 	 * Get the angle of the gyro for use with PIDControllers
-	 * 
+	 *
 	 * @return the current angle according to the gyro
 	 */
 	public double pidGet() {

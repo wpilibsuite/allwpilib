@@ -11,47 +11,47 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.simulation.SimSpeedController;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
  * CTRE Talon Speed Controller
  */
 public class Talon implements SpeedController, PIDOutput, MotorSafety, LiveWindowSendable {
-	private int module, channel;
+	private int channel;
 	private SimSpeedController impl;
 
     /**
      * Common initialization code called by all constructors.
+     *
+     * Note that the Talon uses the following bounds for PWM values. These values should work reasonably well for
+     * most controllers, but if users experience issues such as asymmetric behavior around
+     * the deadband or inability to saturate the controller in either direction, calibration is recommended.
+     * The calibration procedure can be found in the Talon User Manual available from CTRE.
+     *
+     *   - 2.037ms = full "forward"
+     *   - 1.539ms = the "high end" of the deadband range
+     *   - 1.513ms = center of the deadband range (off)
+     *   - 1.487ms = the "low end" of the deadband range
+     *   - .989ms = full "reverse"
      */
-    private void initTalon(final int slot, final int channel) {
-    	this.module = slot;
+    private void initTalon(final int channel) {
     	this.channel = channel;
-    	impl = new SimSpeedController("simulator/pwm/"+slot+"/"+channel);
-    	
+    	impl = new SimSpeedController("simulator/pwm/1/"+channel);
+
         m_safetyHelper = new MotorSafetyHelper(this);
         m_safetyHelper.setExpiration(0.0);
         m_safetyHelper.setSafetyEnabled(false);
-        
-        // LiveWindow.addActuator("Talon", getModuleNumber(), getChannel(), this);
-        // UsageReporting.report(tResourceType.kResourceType_Talon, getChannel(), getModuleNumber()-1);
+
+        LiveWindow.addActuator("Talon", channel, this);
     }
 
     /**
-     * Constructor that assumes the default digital module.
+     * Constructor.
      *
-     * @param channel The PWM channel on the digital module that the Victor is attached to.
+     * @param channel The PWM channel that the Talon is attached to.
      */
     public Talon(final int channel) {
-        initTalon(1, channel);
-    }
-
-    /**
-     * Constructor that specifies the digital module.
-     *
-     * @param slot The slot in the chassis that the digital module is plugged into.
-     * @param channel The PWM channel on the digital module that the Victor is attached to.
-     */
-    public Talon(final int slot, final int channel) {
-        initTalon(slot, channel);
+        initTalon(channel);
     }
 
     /**
@@ -66,7 +66,7 @@ public class Talon implements SpeedController, PIDOutput, MotorSafety, LiveWindo
      * @param syncGroup The update group to add this Set() to, pending UpdateSyncGroup().  If 0, update immediately.
      */
     public void set(double speed, byte syncGroup) {
-    	impl.set(speed, syncGroup);
+        impl.set(speed, syncGroup);
     }
 
     /**
@@ -78,7 +78,7 @@ public class Talon implements SpeedController, PIDOutput, MotorSafety, LiveWindo
      * @param speed The speed value between -1.0 and 1.0 to set.
      */
     public void set(double speed) {
-    	impl.set(speed);
+        impl.set(speed);
     }
 
     /**
@@ -89,7 +89,7 @@ public class Talon implements SpeedController, PIDOutput, MotorSafety, LiveWindo
     public double get() {
         return impl.get();
     }
-	
+
     /**
      * Disable the speed controller
      */
@@ -141,7 +141,7 @@ public class Talon implements SpeedController, PIDOutput, MotorSafety, LiveWindo
 
 	@Override
 	public String getDescription() {
-        return "PWM "+channel+" on module "+module;
+        return "PWM "+channel+" on module 1";
 	}
 
 	//// LiveWindow Methods

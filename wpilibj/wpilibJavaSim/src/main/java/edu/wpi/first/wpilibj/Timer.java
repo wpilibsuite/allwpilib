@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.wpilibj.parsing.IUtility;
+
 /**
  * Timer objects measure accumulated time in milliseconds.
  * The timer object functions like a stopwatch. It can be started, stopped, and cleared. When the
@@ -14,7 +16,7 @@ package edu.wpi.first.wpilibj;
  * value. The implementation simply records the time when started and subtracts the current time
  * whenever the value is requested.
  */
-public class Timer {
+public class Timer implements IUtility {
 
     private long m_startTime;
     private double m_accumulatedTime;
@@ -44,7 +46,6 @@ public class Timer {
      * @return Robot running time in microseconds.
      */
     public static long getUsClock() {
-    	
         return System.nanoTime() / 1000;
     }
 

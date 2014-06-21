@@ -108,8 +108,6 @@ public class SimpleRobot extends RobotBase {
      * to be enabled again.
      */
     public void startCompetition() {
-        // UsageReporting.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Simple);
-
         robotMain();
         if (!m_robotMainOverridden) {
             // first and one-time initialization
@@ -118,42 +116,33 @@ public class SimpleRobot extends RobotBase {
 
             while (true) {
                 if (isDisabled()) {
-                    // TODO: m_ds.InDisabled(true);
+                    m_ds.InDisabled(true);
                     disabled();
-                    // TODO: m_ds.InDisabled(false);
+                    m_ds.InDisabled(false);
                     while (isDisabled()) {
-                    	try {
-							Thread.sleep(10);
-						} catch (InterruptedException e) {}
+                        Timer.delay(0.01);
                     }
                 } else if (isAutonomous()) {
-                    // TODO: m_ds.InAutonomous(true);
+                    m_ds.InAutonomous(true);
                     autonomous();
-                    // TODO: m_ds.InAutonomous(false);
+                    m_ds.InAutonomous(false);
                     while (isAutonomous() && !isDisabled()) {
-                    	try {
-							Thread.sleep(10);
-						} catch (InterruptedException e) {}
+                        Timer.delay(0.01);
                     }
                 } else if (isTest()) {
                     LiveWindow.setEnabled(true);
-                    // TODO: m_ds.InTest(true);
+                    m_ds.InTest(true);
                     test();
-                    // TODO: m_ds.InTest(false);
-                    while (isTest() && isEnabled()) {
-                    	try {
-							Thread.sleep(10);
-						} catch (InterruptedException e) {}
-                    }
+                    m_ds.InTest(false);
+                    while (isTest() && isEnabled())
+                        Timer.delay(0.01);
                     LiveWindow.setEnabled(false);
                 } else {
-                    // TODO: m_ds.InOperatorControl(true);
+                    m_ds.InOperatorControl(true);
                     operatorControl();
-                    // TODO: m_ds.InOperatorControl(false);
+                    m_ds.InOperatorControl(false);
                     while (isOperatorControl() && !isDisabled()) {
-                    	try {
-							Thread.sleep(10);
-						} catch (InterruptedException e) {}
+                        Timer.delay(0.01);
                     }
                 }
             } /* while loop */

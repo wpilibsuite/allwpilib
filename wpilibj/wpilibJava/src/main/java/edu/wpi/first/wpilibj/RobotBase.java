@@ -156,7 +156,7 @@ public abstract class RobotBase {
      * the robot.
      * @throws javax.microedition.midlet.MIDletStateChangeException
      */
-    public static void main(String args[]) { // TODO: expose main to teams?{
+    public static void main(String args[]) { // TODO: expose main to teams?
         boolean errorOnExit = false;
         
         // /* JNI Testing */

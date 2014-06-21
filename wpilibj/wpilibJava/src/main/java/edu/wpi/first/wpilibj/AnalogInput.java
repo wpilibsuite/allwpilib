@@ -446,7 +446,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 	}
 
 	/**
-	 * Get the average value for usee with PIDController
+	 * Get the average value for use with PIDController
 	 *
 	 * @return the average value
 	 */
@@ -454,7 +454,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 		return getAverageValue();
 	}
 
-	/*
+	/**
 	 * Live Window code, only does anything if live window is activated.
 	 */
 	public String getSmartDashboardType() {

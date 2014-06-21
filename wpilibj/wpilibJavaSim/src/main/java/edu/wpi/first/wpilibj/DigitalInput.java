@@ -1,43 +1,44 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.simulation.SimDigitalInput;
+import edu.wpi.first.wpilibj.parsing.IInputOutput;
 import edu.wpi.first.wpilibj.tables.ITable;
 
-public class DigitalInput implements LiveWindowSendable {
+/**
+ * Class to read a digital input. This class will read digital inputs and return
+ * the current value on the channel. Other devices such as encoders, gear tooth
+ * sensors, etc. that are implemented elsewhere will automatically allocate
+ * digital inputs and outputs as required. This class is only for devices like
+ * switches etc. that aren't implemented anywhere else.
+ */
+public class DigitalInput implements IInputOutput,
+		LiveWindowSendable {
 	private SimDigitalInput impl;
-	private int m_moduleNumber, m_channel;
+	private int m_channel;
 
 	/**
 	 * Create an instance of a Digital Input class. Creates a digital input
-	 * given a channel and uses the default module.
-	 * 
+	 * given a channel.
+	 *
 	 * @param channel
 	 *            the port for the digital input
 	 */
 	public DigitalInput(int channel) {
-		this(1, channel);
-	}
-
-	/**
-	 * Create an instance of a Digital Input class. Creates a digital input
-	 * given an channel and module.
-	 * 
-	 * @param moduleNumber
-	 *            The number of the digital module to use for this input
-	 * @param channel
-	 *            the port for the digital input
-	 */
-	public DigitalInput(int moduleNumber, int channel) {
-		impl = new SimDigitalInput("simulator/dio/"+moduleNumber+"/"+channel);
-		m_moduleNumber = moduleNumber;
+		impl = new SimDigitalInput("simulator/dio/1/"+channel);
 		m_channel = channel;
 	}
 
 	/**
 	 * Get the value from a digital input channel. Retrieve the value of a
 	 * single digital input channel from the FPGA.
-	 * 
+	 *
 	 * @return the stats of the digital input
 	 */
 	public boolean get() {
@@ -46,7 +47,7 @@ public class DigitalInput implements LiveWindowSendable {
 
 	/**
 	 * Get the channel of the digital input
-	 * 
+	 *
 	 * @return The GPIO channel number that this object represents.
 	 */
 	public int getChannel() {

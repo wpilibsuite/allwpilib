@@ -11,47 +11,50 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.simulation.SimSpeedController;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
- * CTRE Talon Speed Controller
+ * VEX Robotics Victor Speed Controller
  */
 public class Victor implements SpeedController, PIDOutput, MotorSafety, LiveWindowSendable {
-	private int module, channel;
+	private int channel;
 	private SimSpeedController impl;
 
     /**
      * Common initialization code called by all constructors.
+     *
+     * Note that the Victor uses the following bounds for PWM values.  These values were determined
+     * empirically and optimized for the Victor 888. These values should work reasonably well for
+     * Victor 884 controllers also but if users experience issues such as asymmetric behavior around
+     * the deadband or inability to saturate the controller in either direction, calibration is recommended.
+     * The calibration procedure can be found in the Victor 884 User Manual available from VEX Robotics:
+     * http://content.vexrobotics.com/docs/ifi-v884-users-manual-9-25-06.pdf
+     *
+     *   - 2.027ms = full "forward"
+     *   - 1.525ms = the "high end" of the deadband range
+     *   - 1.507ms = center of the deadband range (off)
+     *   - 1.49ms = the "low end" of the deadband range
+     *   - 1.026ms = full "reverse"
      */
-    private void initTalon(final int slot, final int channel) {
-    	this.module = slot;
+    private void initVictor(final int channel) {
     	this.channel = channel;
-    	impl = new SimSpeedController("simulator/pwm/"+slot+"/"+channel);
+    	impl = new SimSpeedController("simulator/pwm/1/"+channel);
     	
         m_safetyHelper = new MotorSafetyHelper(this);
         m_safetyHelper.setExpiration(0.0);
         m_safetyHelper.setSafetyEnabled(false);
         
-        // LiveWindow.addActuator("Talon", getModuleNumber(), getChannel(), this);
+        LiveWindow.addActuator("Victor", channel, this);
         // UsageReporting.report(tResourceType.kResourceType_Talon, getChannel(), getModuleNumber()-1);
     }
 
     /**
-     * Constructor that assumes the default digital module.
+     * Constructor.
      *
-     * @param channel The PWM channel on the digital module that the Victor is attached to.
+     * @param channel The PWM channel that the Victor is attached to.
      */
     public Victor(final int channel) {
-        initTalon(1, channel);
-    }
-
-    /**
-     * Constructor that specifies the digital module.
-     *
-     * @param slot The slot in the chassis that the digital module is plugged into.
-     * @param channel The PWM channel on the digital module that the Victor is attached to.
-     */
-    public Victor(final int slot, final int channel) {
-        initTalon(slot, channel);
+        initVictor(channel);
     }
 
     /**
@@ -66,7 +69,7 @@ public class Victor implements SpeedController, PIDOutput, MotorSafety, LiveWind
      * @param syncGroup The update group to add this Set() to, pending UpdateSyncGroup().  If 0, update immediately.
      */
     public void set(double speed, byte syncGroup) {
-    	impl.set(speed, syncGroup);
+        impl.set(speed, syncGroup);
     }
 
     /**
@@ -78,7 +81,7 @@ public class Victor implements SpeedController, PIDOutput, MotorSafety, LiveWind
      * @param speed The speed value between -1.0 and 1.0 to set.
      */
     public void set(double speed) {
-    	impl.set(speed);
+        impl.set(speed);
     }
 
     /**
@@ -141,7 +144,7 @@ public class Victor implements SpeedController, PIDOutput, MotorSafety, LiveWind
 
 	@Override
 	public String getDescription() {
-        return "PWM "+channel+" on module "+module;
+        return "PWM "+channel+" on module 1";
 	}
 
 	//// LiveWindow Methods

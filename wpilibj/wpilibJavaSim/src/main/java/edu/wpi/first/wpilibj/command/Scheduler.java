@@ -88,7 +88,6 @@ public class Scheduler implements NamedSendable {
      * Instantiates a {@link Scheduler}.
      */
     private Scheduler() {
-        // UsageReporting.report(tResourceType.kResourceType_Command, tInstances.kCommand_Scheduler);
     }
 
     /**

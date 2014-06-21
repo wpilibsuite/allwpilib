@@ -11,47 +11,36 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.simulation.SimSpeedController;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
- * CTRE Talon Speed Controller
+ * VEX Robotics Jaguar Speed Control
  */
 public class Jaguar implements SpeedController, PIDOutput, MotorSafety, LiveWindowSendable {
-	private int module, channel;
+	private int channel;
 	private SimSpeedController impl;
 
     /**
      * Common initialization code called by all constructors.
      */
-    private void initTalon(final int slot, final int channel) {
-    	this.module = slot;
+    private void initJaguar(final int channel) {
     	this.channel = channel;
-    	impl = new SimSpeedController("simulator/pwm/"+slot+"/"+channel);
-    	
+        impl = new SimSpeedController("simulator/pwm/1/"+channel);
+
         m_safetyHelper = new MotorSafetyHelper(this);
         m_safetyHelper.setExpiration(0.0);
         m_safetyHelper.setSafetyEnabled(false);
-        
-        // LiveWindow.addActuator("Talon", getModuleNumber(), getChannel(), this);
-        // UsageReporting.report(tResourceType.kResourceType_Talon, getChannel(), getModuleNumber()-1);
+
+        LiveWindow.addActuator("Jaguar", channel, this);
     }
 
     /**
-     * Constructor that assumes the default digital module.
+     * Constructor.
      *
-     * @param channel The PWM channel on the digital module that the Victor is attached to.
+     * @param channel The PWM channel that the Jaguar is attached to.
      */
     public Jaguar(final int channel) {
-        initTalon(1, channel);
-    }
-
-    /**
-     * Constructor that specifies the digital module.
-     *
-     * @param slot The slot in the chassis that the digital module is plugged into.
-     * @param channel The PWM channel on the digital module that the Victor is attached to.
-     */
-    public Jaguar(final int slot, final int channel) {
-        initTalon(slot, channel);
+        initJaguar(channel);
     }
 
     /**
@@ -89,7 +78,7 @@ public class Jaguar implements SpeedController, PIDOutput, MotorSafety, LiveWind
     public double get() {
         return impl.get();
     }
-	
+
     /**
      * Disable the speed controller
      */
@@ -141,7 +130,7 @@ public class Jaguar implements SpeedController, PIDOutput, MotorSafety, LiveWind
 
 	@Override
 	public String getDescription() {
-        return "PWM "+channel+" on module "+module;
+        return "PWM "+channel+" on module 1";
 	}
 
 	//// LiveWindow Methods

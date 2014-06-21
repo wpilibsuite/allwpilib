@@ -13,7 +13,6 @@ import java.util.Enumeration;
 import java.util.jar.Manifest;
 
 import edu.wpi.first.wpilibj.simulation.MainNode;
-
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 /**
@@ -25,8 +24,6 @@ import edu.wpi.first.wpilibj.networktables.NetworkTable;
  * might be spawned as a task, then killed at the end of the Autonomous period.
  */
 public abstract class RobotBase {
-	private static DriverStation ds;
-	
     /**
      * The VxWorks priority that robot code should work at (so Java code should run at)
      */
@@ -37,8 +34,7 @@ public abstract class RobotBase {
      */
     public final static String ERRORS_TO_DRIVERSTATION_PROP = "first.driverstation.senderrors";
 
-    // TODO: protected final DriverStation m_ds;
-    // TODO: private final Watchdog m_watchdog = Watchdog.getInstance();
+    protected final DriverStation m_ds;
 
     /**
      * Constructor for a generic robot program.
@@ -57,7 +53,7 @@ public abstract class RobotBase {
 //            Utility.sendErrorStreamToDriverStation(true);
 //        }
         NetworkTable.setServerMode();//must be before b
-        // TODO: m_watchdog.setEnabled(false);
+        m_ds = DriverStation.getInstance();
         NetworkTable.getTable("");  // forces network tables to initialize
         NetworkTable.getTable("LiveWindow").getSubTable("~STATUS~").putBoolean("LW Enabled", false);
     }
@@ -67,29 +63,6 @@ public abstract class RobotBase {
      */
     public void free() {
     }
-
-    /**
-     * Check on the overall status of the system.
-     *
-     * @return Is the system active (i.e. PWM motor outputs, etc. enabled)?
-     */
-    public boolean isSystemActive() {
-        // TODO: return m_watchdog.isSystemActive();
-        return true;
-    }
-
-    /**
-     * Return the instance of the Watchdog timer.
-     * Get the watchdog timer so the user program can either disable it or feed it when
-     * necessary.
-     *
-     * @return The Watchdog timer.
-     */
-    // TODO: No watchdog supportr
-    // public Watchdog getWatchdog() {
-    //    return m_watchdog;
-    //}
-    
 
     /**
      * @return If the robot is running in simulation.
@@ -110,7 +83,7 @@ public abstract class RobotBase {
      * @return True if the Robot is currently disabled by the field controls.
      */
     public boolean isDisabled() {
-    	return ds.isDisabled();
+        return m_ds.isDisabled();
     }
 
     /**
@@ -118,7 +91,7 @@ public abstract class RobotBase {
      * @return True if the Robot is currently enabled by the field controls.
      */
     public boolean isEnabled() {
-    	return ds.isEnabled();
+        return m_ds.isEnabled();
     }
 
     /**
@@ -126,7 +99,7 @@ public abstract class RobotBase {
      * @return True if the robot is currently operating Autonomously as determined by the field controls.
      */
     public boolean isAutonomous() {
-    	return ds.isAutonomous();
+        return m_ds.isAutonomous();
     }
 
     /**
@@ -134,7 +107,7 @@ public abstract class RobotBase {
      * @return True if the robot is currently operating in Test mode as determined by the driver station.
      */
     public boolean isTest() {
-    	return ds.isTest();
+        return m_ds.isTest();
     }
 
     /**
@@ -142,7 +115,7 @@ public abstract class RobotBase {
      * @return True if the robot is currently operating in Tele-Op mode as determined by the field controls.
      */
     public boolean isOperatorControl() {
-    	return ds.isOperatorControl();
+        return m_ds.isOperatorControl();
     }
 
     /**
@@ -150,7 +123,7 @@ public abstract class RobotBase {
      * @return Has new data arrived over the network since the last time this function was called?
      */
     public boolean isNewDataAvailable() {
-    	return ds.isNewControlData();
+        return m_ds.isNewControlData();
     }
 
     /**
@@ -188,8 +161,6 @@ public abstract class RobotBase {
             System.exit(1);
             return;
         }
-
-        ds = DriverStation.getInstance();
 
 		String robotName = "";
 		Enumeration<URL> resources = null;

@@ -60,8 +60,6 @@ public class IterativeRobot extends RobotBase {
      *
      */
     public void startCompetition() {
-        // UsageReporting.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Iterative);
-
         robotInit();
 
         // tracing support:
@@ -125,7 +123,6 @@ public class IterativeRobot extends RobotBase {
                     m_disabledInitialized = false;
                 }
                 if (nextPeriodReady()) {
-                    // TODO: getWatchdog().feed();
                     // TODO: FRC_NetworkCommunicationsLibrary.FRC_NetworkCommunication_observeUserProgramAutonomous();
                     autonomousPeriodic();
                     didAutonomousPeriodic = true;
@@ -142,7 +139,6 @@ public class IterativeRobot extends RobotBase {
                     m_disabledInitialized = false;
                 }
                 if (nextPeriodReady()) {
-                    // TODO: getWatchdog().feed();
                     // TODO: FRC_NetworkCommunicationsLibrary.FRC_NetworkCommunication_observeUserProgramTeleop();
                     teleopPeriodic();
                     didTeleopPeriodic = true;
@@ -158,7 +154,7 @@ public class IterativeRobot extends RobotBase {
     private boolean nextPeriodReady() {
         // TODO: return m_ds.isNewControlData();
         try {
-            Thread.sleep(20);
+            Thread.sleep(20); // TODO: Find a better solution. This one is way too hacky!
         } catch (InterruptedException ex) {}
     	return true;
     }
