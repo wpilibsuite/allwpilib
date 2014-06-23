@@ -59,8 +59,11 @@ public class CommandParallelGroupTest extends AbstractCommandTest {
 	public void tearDown() throws Exception {
 	}
 
+	/**
+	 * Simple Parallel Command Group With 2 commands one command terminates first
+	 */
 	@Test
-	public void test() {
+	public void testParallelCommandGroupWithTwoCommands() {
 		MockCommand command1 = new MockCommand();
 		MockCommand command2 = new MockCommand();
 
