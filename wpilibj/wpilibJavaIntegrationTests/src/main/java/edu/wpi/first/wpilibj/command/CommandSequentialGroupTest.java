@@ -60,7 +60,6 @@ public class CommandSequentialGroupTest extends AbstractCommandTest {
 	/**
 	 * Simple Command Group With 3 commands that all depend on a subsystem. Some commands have a timeout
 	 */
-	//@Ignore("This currently hangs the tests, needs work")
 	@Test(timeout = 20000)
 	public void testThreeCommandOnSubSystem() {
 		logger.fine("Begining Test");

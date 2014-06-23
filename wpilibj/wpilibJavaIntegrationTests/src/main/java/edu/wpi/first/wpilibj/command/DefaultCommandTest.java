@@ -58,10 +58,10 @@ public class DefaultCommandTest extends AbstractCommandTest {
 	}
 
 	/**
-	 * Testing of default commands where the interrupting command is ends itself
+	 * Testing of default commands where the interrupting command ends itself
 	 */
 	@Test
-	public void test() {
+	public void testDefaultCommandWhereTheInteruptingCommandEndsItself() {
 		final ASubsystem subsystem = new ASubsystem();
 
 
