@@ -1,5 +1,5 @@
 /*
- * SimSpeedController.cpp
+ * SimFloatInput.cpp
  *
  *  Created on: May 28, 2014
  *      Author: alex

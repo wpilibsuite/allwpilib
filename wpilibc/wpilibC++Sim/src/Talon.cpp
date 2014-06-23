@@ -25,7 +25,7 @@
 void Talon::InitTalon(int slot, int channel) {
     char buffer[50];
     int n = sprintf(buffer, "pwm/%d/%d", slot, channel);
-    impl = new SimSpeedController(buffer);
+    impl = new SimContinuousOutput(buffer);
 
 	// TODO: LiveWindow::GetInstance()->AddActuator("Talon", slot, channel, this);
 }
@@ -84,7 +84,7 @@ float Talon::Get()
  */
 void Talon::Disable()
 {
-    impl->Disable();
+    impl->Set(0);
 }
 
 /**

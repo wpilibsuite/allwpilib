@@ -7,7 +7,7 @@
 #ifndef Talon_H
 #define Talon_H
 
-#include "simulation/SimSpeedController.h"
+#include "simulation/SimContinuousOutput.h"
 #include "SpeedController.h"
 #include "PIDOutput.h"
 
@@ -28,7 +28,7 @@ public:
 
 private:
 	void InitTalon(int slot, int channel);
-    SimSpeedController* impl;
+    SimContinuousOutput* impl;
 };
 
 #endif

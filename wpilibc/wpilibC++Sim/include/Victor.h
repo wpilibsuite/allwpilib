@@ -7,7 +7,7 @@
 #ifndef VICTOR_H
 #define VICTOR_H
 
-#include "simulation/SimSpeedController.h"
+#include "simulation/SimContinuousOutput.h"
 #include "SpeedController.h"
 #include "PIDOutput.h"
 
@@ -28,7 +28,7 @@ public:
 
 private:
 	void InitVictor(int slot, int channel);
-    SimSpeedController* impl;
+    SimContinuousOutput* impl;
 };
 
 #endif

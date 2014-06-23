@@ -10,6 +10,27 @@
 
 #define SIMULATION "gazebo"
 
+#include "Buttons/Trigger.h"
+#include "Buttons/Button.h"
+#include "Buttons/InternalButton.h"
+#include "Buttons/JoystickButton.h"
+#include "Buttons/NetworkButton.h"
+
+#include "Commands/Command.h"
+#include "Commands/CommandGroup.h"
+#include "Commands/PIDCommand.h"
+#include "Commands/PIDSubsystem.h"
+#include "Commands/PrintCommand.h"
+#include "Commands/Scheduler.h"
+#include "Commands/StartCommand.h"
+#include "Commands/Subsystem.h"
+#include "Commands/WaitCommand.h"
+#include "Commands/WaitForChildren.h"
+#include "Commands/WaitUntilCommand.h"
+
+#include "SmartDashboard/SendableChooser.h"
+#include "SmartDashboard/SmartDashboard.h"
+
 #include "RobotBase.h"
 #include "SimpleRobot.h"
 #include "IterativeRobot.h"
@@ -17,6 +38,8 @@
 #include "Talon.h"
 #include "Victor.h"
 #include "Jaguar.h"
+#include "Solenoid.h"
+#include "DoubleSolenoid.h"
 #include "interfaces/Potentiometer.h"
 #include "AnalogChannel.h"
 #include "AnalogPotentiometer.h"
@@ -28,13 +51,6 @@
 #include "Joystick.h"
 #include "PIDController.h"
 #include "RobotDrive.h"
-#include "SmartDashboard/SmartDashboard.h"
 #include "LiveWindow/LiveWindow.h"
-
-#include "Buttons/Trigger.h"
-#include "Buttons/Button.h"
-#include "Buttons/InternalButton.h"
-#include "Buttons/JoystickButton.h"
-#include "Buttons/NetworkButton.h"
 
 #endif /* WPILIB_H_ */

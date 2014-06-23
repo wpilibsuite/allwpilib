@@ -26,7 +26,7 @@
 void Victor::InitVictor(int slot, int channel) {
     char buffer[50];
     int n = sprintf(buffer, "pwm/%d/%d", slot, channel);
-    impl = new SimSpeedController(buffer);
+    impl = new SimContinuousOutput(buffer);
     
 	// TODO: LiveWindow::GetInstance()->AddActuator("Victor", slot, channel, this);
 }
@@ -85,7 +85,7 @@ float Victor::Get()
  */
 void Victor::Disable()
 {
-    impl->Disable();
+    impl->Set(0);
 }
 
 /**
