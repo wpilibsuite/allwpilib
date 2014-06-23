@@ -3,6 +3,7 @@ package org.gazebosim.transport;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.google.protobuf.Message;
 
@@ -13,7 +14,9 @@ public class Publisher<T extends Message> implements PublisherRecord {
 	private List<Connection> listeners;
 	private boolean latching = false;
 	private T lastMsg = null;
-
+	
+	private static final Logger LOG = Logger.getLogger("Gazebo Transport");
+	
 	public Publisher(String topic, String msgType, String localHost, int localPort) {
 		this.topic = topic;
 		this.msgType = msgType;
@@ -24,15 +27,20 @@ public class Publisher<T extends Message> implements PublisherRecord {
 
 	public synchronized void publish(T msg) {
 		lastMsg = msg;
+		List<Connection> toRemove = new LinkedList<>();
 		for (Connection listener : listeners) {
 			try {
 				listener.write(msg);
 			} catch (IOException e) {
-				try {
-					listener.close();
-				} catch (IOException e1) { /* Closing failed, probably not a big deal. */}
-				listeners.remove(listener);
+				toRemove.add(listener);
 			}
+		}
+		for (Connection listener : toRemove) {
+			LOG.info("Removing listener from topic="+topic);
+			try {
+				listener.close();
+			} catch (IOException e1) { /* Closing failed, probably not a big deal. */}
+			listeners.remove(listener);
 		}
 	}
 
@@ -58,11 +66,16 @@ public class Publisher<T extends Message> implements PublisherRecord {
 
 	@Override
 	public synchronized void connect(Connection conn) {
+		LOG.fine("Handling subscriber connection for topic: "+topic);
 		if (latching && lastMsg != null) {
 			try {
 				conn.write(lastMsg);
 			} catch (IOException e) {
-				return; // TODO: Log
+				LOG.warning("Writing latched message failed on topic="+topic);
+				try {
+					conn.close();
+				} catch (IOException e1) { /* Closing failed, probably not a big deal. */}
+				return;
 			}
 		}
 		listeners.add(conn);

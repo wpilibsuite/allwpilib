@@ -2,6 +2,7 @@
 #include "RobotMapParser.h"
 
 #include "components/Motor.h"
+#include "components/Piston.h"
 #include "components/Potentiometer.h"
 #include "components/Encoder.h"
 #include "components/Gyro.h"
@@ -13,7 +14,7 @@
 #include <boost/pointer_cast.hpp>
 #include <sdf/sdf.hh>
 
-RobotMapParser::RobotMapParser(std::string robot, std::string filename, physics::ModelPtr model) {
+RobotMapParser::RobotMapParser(string robot, string filename, physics::ModelPtr model) {
   this->robot = robot;
   this->filename = filename;
   this->model = model;
@@ -23,7 +24,7 @@ RobotMapParser::RobotMapParser(std::string robot, std::string filename, physics:
 /*
  * Parse the file and return a list of robot components for the robot
  */
-void RobotMapParser::parse(std::vector<RobotComponentPtr> &components) {
+void RobotMapParser::parse(vector<RobotComponentPtr> &components) {
   // Load an xml document with <robotmap> root tag
   XMLDocument doc;
   doc.LoadFile(filename.c_str());
@@ -35,6 +36,8 @@ void RobotMapParser::parse(std::vector<RobotComponentPtr> &components) {
       // We don't care about comments and other non-element types
     } else if (strcmp(current->Value(), "motor") == 0) {
       components.push_back(parseMotor(current->ToElement()));
+    } else if (strcmp(current->Value(), "piston") == 0) {
+      components.push_back(parsePiston(current->ToElement()));
     } else if (strcmp(current->Value(), "potentiometer") == 0) {
       components.push_back(parsePotentiometer(current->ToElement()));
     } else if (strcmp(current->Value(), "encoder") == 0) {
@@ -48,7 +51,7 @@ void RobotMapParser::parse(std::vector<RobotComponentPtr> &components) {
     } else if (strcmp(current->Value(), "rangefinder") == 0) {
       components.push_back(parseRangefinder(current->ToElement()));
     } else {
-      std::cerr << "Unknown element: " << current->Value() << std::endl;
+      cerr << "Unknown element: " << current->Value() << endl;
     }
   }
 }
@@ -67,11 +70,39 @@ void RobotMapParser::parse(std::vector<RobotComponentPtr> &components) {
  *  </motor>
  */
 RobotComponentPtr RobotMapParser::parseMotor(XMLElement *node) {
-  std::string location = locationToPath(node->FirstChildElement("location"));
+  string location = locationToPath(node->FirstChildElement("location"));
   physics::JointPtr joint = getJoint(node);
-  double multiplier = boost::lexical_cast<double>(getTagValue(
+  double multiplier = boost::lexical_cast<double>(getChildTagValue(
       node->FirstChildElement("parameters"), "multiplier").c_str());
   return new Motor(location, joint, multiplier);
+}
+
+/**
+ * Parse a piston tag. Piston tags have a joint the act on, a location
+ * they're "plugged into", the area of the cylinder and optionally a
+ * direction. The template of a piston| tag is as follows:
+ *
+ *  <piston>
+ *    <joint>{{ joint name (string) }}</joint>
+ *    <location>{{ location (see below for formats }}</location>
+ *    <area units="{{ square inches (default) or square meters}}">
+ *      {{ area in proper units (number) }}
+ *    </area>
+ *    <forward-force>{{ area in newtons (number) }}</forward-force>
+ *    <reverse-force>{{ area in newtons (number) }}</reverse-force>
+ *    <direction>{{ forward (default) or reversed }}</direction>
+ *  </piston>
+ */
+RobotComponentPtr RobotMapParser::parsePiston(XMLElement *node) {
+  string location = locationToPath(node->FirstChildElement("location"));
+  physics::JointPtr joint = getJoint(node);
+  double forward = boost::lexical_cast<double>(getChildTagValue(node, "forward-force").c_str());
+  double reverse = boost::lexical_cast<double>(getChildTagValue(node, "reverse-force").c_str());
+  if (getChildTagValue(node, "direction") == "reversed") {
+    forward = -forward;
+    reverse = -reverse;
+  }
+  return new Piston(location, joint, forward, reverse);
 }
 
 /**
@@ -87,10 +118,10 @@ RobotComponentPtr RobotMapParser::parseMotor(XMLElement *node) {
  *  </potentiometer>
  */
 RobotComponentPtr RobotMapParser::parsePotentiometer(XMLElement *node) {
-  std::string location = locationToPath(node->FirstChildElement("location"));
+  string location = locationToPath(node->FirstChildElement("location"));
   physics::JointPtr joint = getJoint(node);
 
-  std::string radians_str = getTagValue(node, "type", "degrees");
+  string radians_str = getChildTagValue(node, "type", "degrees");
   bool radians;
   if (radians_str == "linear" || radians_str == "radians") {
     radians = true;
@@ -112,7 +143,7 @@ RobotComponentPtr RobotMapParser::parsePotentiometer(XMLElement *node) {
  *  </encoder>
  */
 RobotComponentPtr RobotMapParser::parseEncoder(XMLElement *node) {
-  std::string location = locationToPath(node->FirstChildElement("location"));
+  string location = locationToPath(node->FirstChildElement("location"));
   physics::JointPtr joint = getJoint(node);
   return new Encoder(location, joint);
 }
@@ -129,10 +160,10 @@ RobotComponentPtr RobotMapParser::parseEncoder(XMLElement *node) {
  *  </gyro>
  */
 RobotComponentPtr RobotMapParser::parseGyro(XMLElement *node) {
-  std::string location = locationToPath(node->FirstChildElement("location"));
+  string location = locationToPath(node->FirstChildElement("location"));
   physics::LinkPtr link = getLink(node);
   ROTATION axis;
-  std::string axisString = getTagValue(node, "axis");
+  string axisString = getChildTagValue(node, "axis");
   if (axisString == "roll") axis = Roll;
   if (axisString == "pitch") axis = Pitch;
   if (axisString == "yaw") axis = Yaw;
@@ -153,13 +184,13 @@ RobotComponentPtr RobotMapParser::parseGyro(XMLElement *node) {
  *  </internal-limit-switch>
  */
 RobotComponentPtr RobotMapParser::parseInternalLimitSwitch(XMLElement *node) {
-  std::string location = locationToPath(node->FirstChildElement("location"));
+  string location = locationToPath(node->FirstChildElement("location"));
   physics::JointPtr joint = getJoint(node);
 
-  double min = boost::lexical_cast<double>(getTagValue(node, "min", "0"));
-  double max = boost::lexical_cast<double>(getTagValue(node, "max", "1"));
+  double min = boost::lexical_cast<double>(getChildTagValue(node, "min", "0"));
+  double max = boost::lexical_cast<double>(getChildTagValue(node, "max", "1"));
 
-  std::string radians_str = getTagValue(node, "type", "degrees");
+  string radians_str = getChildTagValue(node, "type", "degrees");
   bool radians;
   if (radians_str == "linear" || radians_str == "radians") {
     radians = true;
@@ -180,7 +211,7 @@ RobotComponentPtr RobotMapParser::parseInternalLimitSwitch(XMLElement *node) {
  *  </external-limit-switch>
  */
 RobotComponentPtr RobotMapParser::parseExternalLimitSwitch(XMLElement *node) {
-  std::string location = locationToPath(node->FirstChildElement("location"));
+  string location = locationToPath(node->FirstChildElement("location"));
   sensors::ContactSensorPtr sensor =
     boost::dynamic_pointer_cast<sensors::ContactSensor>(getSensor(node));
   return new ExternalLimitSwitch(location, sensor);
@@ -197,18 +228,19 @@ RobotComponentPtr RobotMapParser::parseExternalLimitSwitch(XMLElement *node) {
  *  </rangefinder>
  */
 RobotComponentPtr RobotMapParser::parseRangefinder(XMLElement *node) {
-  std::string location = locationToPath(node->FirstChildElement("location"));
+  string location = locationToPath(node->FirstChildElement("location"));
   sensors::SonarSensorPtr sensor =
     boost::dynamic_pointer_cast<sensors::SonarSensor>(getSensor(node));
   return new Rangefinder(location, sensor);
 }
+
 
 /**
  * Convert the location tag to a topic name to subscribe/publish
  * to. Currently, there are two supported location styles: double_port
  * and single port.
  */
-std::string RobotMapParser::locationToPath(XMLElement *location) {
+string RobotMapParser::locationToPath(XMLElement *location) {
   if (location == NULL)
     return "";
   else if (location->Attribute("style", "double_port"))
@@ -217,24 +249,24 @@ std::string RobotMapParser::locationToPath(XMLElement *location) {
     return portLocationToPath(location);
 }
 
-std::string RobotMapParser::portLocationToPath(XMLElement *location) {
-  std::string type = getTagValue(location, "type");
-  std::string module = getTagValue(location, "module");
-  std::string pin = getTagValue(location, "pin");
+string RobotMapParser::portLocationToPath(XMLElement *location) {
+  string type = getChildTagValue(location, "type");
+  string module = getChildTagValue(location, "module");
+  string pin = getChildTagValue(location, "pin");
   return "~/" + robot + "/" + type + "/" + module + "/" + pin;
 }
 
 
-std::string RobotMapParser::doublePortLocationToPath(XMLElement *location) {
-  std::string type = getTagValue(location, "type");
-  std::string module1 = getTagValue(location, "module1");
-  std::string pin1 = getTagValue(location, "pin1");
-  std::string module2 = getTagValue(location, "module2");
-  std::string pin2 = getTagValue(location, "pin2");
+string RobotMapParser::doublePortLocationToPath(XMLElement *location) {
+  string type = getChildTagValue(location, "type");
+  string module1 = getChildTagValue(location, "module1");
+  string pin1 = getChildTagValue(location, "pin1");
+  string module2 = getChildTagValue(location, "module2");
+  string pin2 = getChildTagValue(location, "pin2");
   // Swap pins if needed, to maintain consistent ordering
   if ((module2 < module1) || ((module2 == module1) && (pin2 < pin1))) { 
-    std::string module = module2;
-    std::string pin = pin2;
+    string module = module2;
+    string pin = pin2;
     module2 = module1;
     pin2 = pin1;
     module1 = module;
@@ -243,7 +275,11 @@ std::string RobotMapParser::doublePortLocationToPath(XMLElement *location) {
   return "~/" + robot + "/" + type + "/" + module1 + "/" + pin1 + "/" + module2 + "/" + pin2;
 }
 
-std::string RobotMapParser::getTagValue(XMLElement *node, std::string tag, std::string default_value) {
+/**
+ * Returns the value of the first child tag element of the given node
+ * with the matching tag name.
+ */
+string RobotMapParser::getChildTagValue(XMLElement *node, string tag, string default_value) {
   if (node->FirstChildElement(tag.c_str()) != NULL) {
     return node->FirstChildElement(tag.c_str())->FirstChild()->Value();
   } else {
@@ -251,23 +287,49 @@ std::string RobotMapParser::getTagValue(XMLElement *node, std::string tag, std::
   }
 }
 
+/**
+ * Returns the matching attribute of the given node.
+ */
+string RobotMapParser::getTagAttribute(XMLElement *node, string attr, string default_value) {
+  if (node->Attribute(attr.c_str())) {
+    return node->Attribute(attr.c_str());
+  } else {
+    return default_value;
+  }
+}
+
+/**
+ * Returns the matching attribute of the first child tag element of the given node
+ * with the matching tag name.
+ */
+string RobotMapParser::getChildTagAttribute(XMLElement *node, string tag,
+                                       string attr, string default_value) {
+  if (node->FirstChildElement(tag.c_str()) != NULL) {
+    string value = node->FirstChildElement(tag.c_str())->Attribute(attr.c_str());
+    if (value != "") {
+      return value;
+    }
+  }
+  return default_value;
+}
+
 physics::JointPtr RobotMapParser::getJoint(XMLElement *node) {
-  std::string joint_name = node->FirstChildElement("joint")->FirstChild()->Value();
+  string joint_name = node->FirstChildElement("joint")->FirstChild()->Value();
   physics::JointPtr joint = model->GetJoint(joint_name);
-  if (joint == NULL) std::cerr << "Joint doesn't exist: " << joint_name << std::endl;
+  if (joint == NULL) cerr << "Joint doesn't exist: " << joint_name << endl;
   return joint;
 }
 
 physics::LinkPtr RobotMapParser::getLink(XMLElement *node) {
-  std::string link_name = node->FirstChildElement("link")->FirstChild()->Value();
+  string link_name = node->FirstChildElement("link")->FirstChild()->Value();
   physics::LinkPtr link = model->GetLink(link_name);
-  if (link == NULL) std::cerr << "Link doesn't exist: " << link_name << std::endl;
+  if (link == NULL) cerr << "Link doesn't exist: " << link_name << endl;
   return link;
 }
 
 sensors::SensorPtr RobotMapParser::getSensor(XMLElement *node) {
-  std::string sensor_name = node->FirstChildElement("sensor")->FirstChild()->Value();
+  string sensor_name = node->FirstChildElement("sensor")->FirstChild()->Value();
   sensors::SensorPtr sensor = sensors::get_sensor(sensor_name);
-  if (sensor == NULL) std::cerr << "Sensor doesn't exist: " << sensor_name << std::endl;
+  if (sensor == NULL) cerr << "Sensor doesn't exist: " << sensor_name << endl;
   return sensor;
 }

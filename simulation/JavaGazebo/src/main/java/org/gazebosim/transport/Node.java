@@ -57,9 +57,10 @@ public class Node implements Runnable, ServerCallback {
 		initializeConnection();
 		
 		new Thread(this).start();
+		LOG.info("Serving on: "+server.host+":"+server.port);
 	}
 
-	public <T extends Message> Publisher<T> advertise(String topic, T defaultMessage) {
+	public synchronized <T extends Message> Publisher<T> advertise(String topic, T defaultMessage) {
 		topic = fixTopic(topic);
 		LOG.info("ADV "+topic);
 		String type = defaultMessage.getDescriptorForType().getFullName();
@@ -76,7 +77,7 @@ public class Node implements Runnable, ServerCallback {
 		return pub;
 	}
 	
-	public <T extends Message> Subscriber<T>
+	public synchronized <T extends Message> Subscriber<T>
 			subscribe(String topic, T defaultMessage, SubscriberCallback<T> cb) {
 		topic = fixTopic(topic);
 		LOG.info("SUB "+topic);
@@ -122,7 +123,7 @@ public class Node implements Runnable, ServerCallback {
 		}
 	}
 	
-	private void initializeConnection() throws IOException {
+	private synchronized void initializeConnection() throws IOException {
 		Packet initData = master.read();
 		if (!initData.getType().equals("version_init")) {
 			throw new IOException("Expected 'version_init' packet, got '"+initData.getType()+"'.");
@@ -148,7 +149,7 @@ public class Node implements Runnable, ServerCallback {
 		}
 	}
 	
-	public void processPacket(Packet packet) throws InvalidProtocolBufferException {
+	public synchronized void processPacket(Packet packet) throws InvalidProtocolBufferException {
 		if (packet.getType().equals("publisher_add")) {
 			PublisherRecord pub = new RemotePublisherRecord(Publish.parseFrom(packet.getSerializedData()));
 
@@ -158,6 +159,7 @@ public class Node implements Runnable, ServerCallback {
 			}
 			
 			LOG.info("New Publisher: "+pub.getTopic());
+			LOG.fine("Publisher: "+Publish.parseFrom(packet.getSerializedData()));
 			publishers.put(pub.getTopic(), pub);
 		} else if (packet.getType().equals("publisher_subscribe") ||
 				   packet.getType().equals("publisher_advertise")) {
@@ -169,6 +171,7 @@ public class Node implements Runnable, ServerCallback {
 			}
 			
 			LOG.info("PUBSUB found for "+pub.getTopic());
+			LOG.fine("Publisher: "+Publish.parseFrom(packet.getSerializedData()));
 			subscriptions.get(pub.getTopic()).connect(pub);
 		} else if (packet.getType().equals("topic_namespace_add")) {
 			namespaces.add(GzString.String.parseFrom(packet.getSerializedData()).getData());
@@ -183,9 +186,10 @@ public class Node implements Runnable, ServerCallback {
 
 	@Override
 	public void handle(Connection conn) throws IOException {
+		LOG.fine("Handling new connection");
 		Packet msg = conn.read();
 		if (msg == null) {
-			LOG.severe("Read null message.");
+			LOG.warning("Read null message.");
 			return;
 		}
 			
@@ -196,6 +200,7 @@ public class Node implements Runnable, ServerCallback {
 						+ sub.getTopic());
 				return;
 			}
+			LOG.fine("New connection for topic="+sub.getTopic());
 
 			PublisherRecord pub = publishers.get(sub.getTopic());
 			if (!pub.getMsgType().equals(sub.getMsgType())) {
@@ -204,7 +209,7 @@ public class Node implements Runnable, ServerCallback {
 				return;
 			}
 
-			LOG.info("PUB " + sub.getTopic());
+			LOG.info("CONN " + sub.getTopic());
 			pub.connect(conn);
 		} else {
 			LOG.warning("Unknown message type: " + msg.getType());

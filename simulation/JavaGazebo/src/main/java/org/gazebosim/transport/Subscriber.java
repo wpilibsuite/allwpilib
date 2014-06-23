@@ -66,7 +66,7 @@ public class Subscriber<T extends Message> {
 			}
 		} catch (IOException e) {
 			// FIXME: Connection lost, let's make sure it's closed and complain.
-			// Hopefully they the reconnect, maybe we should try to recover better?
+			// Hopefully they try to reconnect, maybe we should try to recover better?
 			try {
 				conn.close();
 			} catch (IOException e1) {
