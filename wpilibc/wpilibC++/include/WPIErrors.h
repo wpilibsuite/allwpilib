@@ -45,6 +45,7 @@ S(LineNotOutput, -27, "Cannot SetDigitalOutput for a line not configured for out
 S(ParameterOutOfRange, -28, "A parameter is out of range.");
 S(SPIClockRateTooLow, -29, "SPI clock rate was below the minimum supported");
 S(JaguarVersionError, -30, "Jaguar firmware version error");
+S(JaguarMessageNotFound, -31, "Jaguar message not found");
 S(NetworkTablesReadError, -40, "Error reading NetworkTables socket");
 S(NetworkTablesBufferFull, -41, "Buffer full writing to NetworkTables socket");
 S(NetworkTablesWrongType, -42, "The wrong type was read from the NetworkTables entry");
@@ -72,4 +73,3 @@ S(SPIReadNoData, 14, "No data available to read from SPI");
 S(IncompatibleState, 15, "Incompatible State: The operation cannot be completed");
 
 #undef S
-
