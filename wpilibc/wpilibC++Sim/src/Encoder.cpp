@@ -19,62 +19,33 @@
  * a counter object will be used and the returned value will either exactly match the spec'd count
  * or be double (2x) the spec'd count.
  */
-void Encoder::InitEncoder(int slotA, int channelA, int slotB, int channelB,
-                          bool reverseDirection, EncodingType encodingType)
+void Encoder::InitEncoder(int channelA, int channelB, bool reverseDirection, EncodingType encodingType)
 {
-    this->slotA = slotA;
+	m_table = NULL;
     this->channelA = channelA;
-    this->slotB = slotB;
     this->channelB = channelB;
     reversed = reverseDirection;
 	m_encodingType = encodingType;
- 
-	m_table = NULL;   
+
 	int32_t index = 0;
 	m_distancePerPulse = 1.0;
 	m_pidSource = kDistance;
 
-	LiveWindow::GetInstance()->AddSensor("Encoder", slotA, channelA, this);
+	LiveWindow::GetInstance()->AddSensor("Encoder", channelA, this);
 
-    if ((slotB < slotA) || ((slotB == slotA) && (channelB < channelA))) { // Swap ports
-        int slot = slotB;
+    if (channelB < channelA) { // Swap ports
         int channel = channelB;
-        slotB = slotA;
         channelB = channelA;
-        slotA = slot;
         channelA = channel;
     }
     char buffer[50];
-    int n = sprintf(buffer, "dio/%d/%d/%d/%d", slotA, channelA, slotB, channelB);
+    int n = sprintf(buffer, "dio/1/%d/1/%d", channelA, channelB);
     impl = new SimEncoder(buffer);
 }
 
 /**
  * Encoder constructor.
- * Construct a Encoder given a and b modules and channels fully specified.
- * @param aModuleNumber The a channel digital input module.
- * @param aChannel The a channel digital input channel.
- * @param bModuleNumber The b channel digital input module.
- * @param bChannel The b channel digital input channel.
- * @param reverseDirection represents the orientation of the encoder and inverts the output values
- * if necessary so forward represents positive values.
- * @param encodingType either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is
- * selected, then an encoder FPGA object is used and the returned counts will be 4x the encoder
- * spec'd value since all rising and falling edges are counted. If 1X or 2X are selected then
- * a counter object will be used and the returned value will either exactly match the spec'd count
- * or be double (2x) the spec'd count.
- */
-Encoder::Encoder(uint8_t aModuleNumber, uint32_t aChannel,
-						uint8_t bModuleNumber, uint32_t bChannel,
-						bool reverseDirection, EncodingType encodingType)
-{
-    InitEncoder(aModuleNumber, aChannel, bModuleNumber, bChannel,
-                reverseDirection, encodingType);
-}
-
-/**
- * Encoder constructor.
- * Construct a Encoder given a and b channels assuming the default module.
+ * Construct a Encoder given a and b channels.
  * @param aChannel The a channel digital input channel.
  * @param bChannel The b channel digital input channel.
  * @param reverseDirection represents the orientation of the encoder and inverts the output values
@@ -87,7 +58,7 @@ Encoder::Encoder(uint8_t aModuleNumber, uint32_t aChannel,
  */
 Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection, EncodingType encodingType)
 {
-    InitEncoder(1, aChannel, 1, bChannel, reverseDirection, encodingType);
+    InitEncoder(aChannel, bChannel, reverseDirection, encodingType);
 }
 
 /**
@@ -216,12 +187,66 @@ double Encoder::DecodingScaleFactor()
 		return 0.25;
 	default:
 		return 0.0;
-	}	
+	}
+}
+
+/**
+ * Gets the raw value from the encoder.
+ * The raw value is the actual count unscaled by the 1x, 2x, or 4x scale
+ * factor.
+ * @return Current raw count from the encoder
+ */
+int32_t Encoder::GetRaw()
+{
+	throw "Simulation doesn't currently support this method.";
+}
+
+/**
+ * Gets the current count.
+ * Returns the current count on the Encoder.
+ * This method compensates for the decoding type.
+ *
+ * @return Current count from the Encoder adjusted for the 1x, 2x, or 4x scale factor.
+ */
+int32_t Encoder::Get()
+{
+	throw "Simulation doesn't currently support this method.";
+}
+
+/**
+ * Returns the period of the most recent pulse.
+ * Returns the period of the most recent Encoder pulse in seconds.
+ * This method compenstates for the decoding type.
+ *
+ * @deprecated Use GetRate() in favor of this method.  This returns unscaled periods and GetRate() scales using value from SetDistancePerPulse().
+ *
+ * @return Period in seconds of the most recent pulse.
+ */
+double Encoder::GetPeriod()
+{
+	throw "Simulation doesn't currently support this method.";
+}
+
+/**
+ * Sets the maximum period for stopped detection.
+ * Sets the value that represents the maximum period of the Encoder before it will assume
+ * that the attached device is stopped. This timeout allows users to determine if the wheels or
+ * other shaft has stopped rotating.
+ * This method compensates for the decoding type.
+ *
+ * @deprecated Use SetMinRate() in favor of this method.  This takes unscaled periods and SetMinRate() scales using value from SetDistancePerPulse().
+ *
+ * @param maxPeriod The maximum time between rising and falling edges before the FPGA will
+ * report the device stopped. This is expressed in seconds.
+ */
+void Encoder::SetMaxPeriod(double maxPeriod)
+{
+	throw "Simulation doesn't currently support this method.";
 }
 
 /**
  * Get the distance the robot has driven since the last reset.
- * 
+ *
  * @return The distance driven since the last reset as scaled by the value from SetDistancePerPulse().
  */
 double Encoder::GetDistance()
@@ -232,7 +257,7 @@ double Encoder::GetDistance()
 /**
  * Get the current rate of the encoder.
  * Units are distance per second as scaled by the value from SetDistancePerPulse().
- * 
+ *
  * @return The current rate of the encoder.
  */
 double Encoder::GetRate()
@@ -242,7 +267,7 @@ double Encoder::GetRate()
 
 /**
  * Set the minimum rate of the device before the hardware reports it stopped.
- * 
+ *
  * @param minRate The minimum rate.  The units are in distance per second as scaled by the value from SetDistancePerPulse().
  */
 void Encoder::SetMinRate(double minRate)
@@ -258,7 +283,7 @@ void Encoder::SetMinRate(double minRate)
  * Set this value based on the encoder's rated Pulses per Revolution and
  * factor in gearing reductions following the encoder shaft.
  * This distance can be in any units you like, linear or angular.
- * 
+ *
  * @param distancePerPulse The scale factor that will be used to convert pulses to useful units.
  */
 void Encoder::SetDistancePerPulse(double distancePerPulse)
@@ -279,7 +304,7 @@ void Encoder::SetReverseDirection(bool reverseDirection)
 
 /**
  * Set which parameter of the encoder you are using as a process control variable.
- * 
+ *
  * @param pidSource An enum to select the parameter.
  */
 void Encoder::SetPIDSourceParameter(PIDSourceParameter pidSource)
@@ -289,7 +314,7 @@ void Encoder::SetPIDSourceParameter(PIDSourceParameter pidSource)
 
 /**
  * Implement the PIDSource interface.
- * 
+ *
  * @return The current value of the selected source parameter.
  */
 double Encoder::PIDGet()
@@ -314,11 +339,11 @@ void Encoder::UpdateTable() {
 }
 
 void Encoder::StartLiveWindowMode() {
-	
+
 }
 
 void Encoder::StopLiveWindowMode() {
-	
+
 }
 
 std::string Encoder::GetSmartDashboardType() {
@@ -336,4 +361,3 @@ void Encoder::InitTable(ITable *subTable) {
 ITable * Encoder::GetTable() {
 	return m_table;
 }
-

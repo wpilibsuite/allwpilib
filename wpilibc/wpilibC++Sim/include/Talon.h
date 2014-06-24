@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef Talon_H
-#define Talon_H
+#pragma once
 
 #include "simulation/SimContinuousOutput.h"
 #include "SpeedController.h"
@@ -18,18 +16,14 @@ class Talon : public SpeedController
 {
 public:
 	explicit Talon(uint32_t channel);
-	Talon(uint8_t moduleNumber, uint32_t channel);
 	virtual ~Talon();
-	virtual void Set(float value, uint8_t syncGroup=0);
+	virtual void Set(float value, uint8_t syncGroup = 0);
 	virtual float Get();
 	virtual void Disable();
 
 	virtual void PIDWrite(float output);
 
 private:
-	void InitTalon(int slot, int channel);
-    SimContinuousOutput* impl;
+	void InitTalon(int channel);
+	SimContinuousOutput* impl;
 };
-
-#endif
-

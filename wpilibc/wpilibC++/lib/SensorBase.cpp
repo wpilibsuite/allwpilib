@@ -133,7 +133,7 @@ bool SensorBase::CheckAnalogInput(uint32_t channel)
 }
 
 /**
- * Check that the analog output number is value.
+ * Check that the analog output number is valid.
  * Verify that the analog output number is one of the legal channel numbers. Channel numbers
  * are 0-based.
  *
@@ -161,7 +161,7 @@ bool SensorBase::CheckSolenoidChannel(uint32_t channel)
 /**
  * Verify that the power distribution channel number is within limits.
  *
- * @return Solenoid channel is valid
+ * @return PDP channel is valid
  */
 bool SensorBase::CheckPDPChannel(uint32_t channel)
 {

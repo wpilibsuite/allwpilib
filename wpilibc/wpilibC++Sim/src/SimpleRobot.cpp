@@ -8,8 +8,6 @@
 
 #include <stdio.h>
 #include <unistd.h>
-
-// #include "DriverStation.h"
 #include "Timer.h"
 #include "SmartDashboard/SmartDashboard.h"
 #include "LiveWindow/LiveWindow.h"
@@ -99,49 +97,49 @@ void SimpleRobot::RobotMain()
  */
 void SimpleRobot::StartCompetition()
 {
-    LiveWindow *lw = LiveWindow::GetInstance();
+	LiveWindow *lw = LiveWindow::GetInstance();
 
-  	SmartDashboard::init();
+	SmartDashboard::init();
 	NetworkTable::GetTable("LiveWindow")->GetSubTable("~STATUS~")->PutBoolean("LW Enabled", false);
-  
+
 	RobotMain();
 	
 	if (!m_robotMainOverridden)
 	{
 		// first and one-time initialization
-		//lw->SetEnabled(false);
+		lw->SetEnabled(false);
 		RobotInit();
 
 		while (true)
 		{
 			if (IsDisabled())
 			{
-				// TODO: m_ds->InDisabled(true);
+				m_ds->InDisabled(true);
 				Disabled();
-				// TODO: m_ds->InDisabled(false);
+				m_ds->InDisabled(false);
 				while (IsDisabled()) sleep(1); //m_ds->WaitForData();
 			}
 			else if (IsAutonomous())
 			{
-				// TODO: m_ds->InAutonomous(true);
+				m_ds->InAutonomous(true);
 				Autonomous();
-				// TODO: m_ds->InAutonomous(false);
+				m_ds->InAutonomous(false);
 				while (IsAutonomous() && IsEnabled()) sleep(1); //m_ds->WaitForData();
 			}
             else if (IsTest())
             {
-            	// lw->SetEnabled(true);
-            	// TODO: m_ds->InTest(true);
+            	lw->SetEnabled(true);
+            	m_ds->InTest(true);
                 Test();
-                // TODO: m_ds->InTest(false);
+                m_ds->InTest(false);
                 while (IsTest() && IsEnabled()) sleep(1); //m_ds->WaitForData();
-                //lw->SetEnabled(false);
+                lw->SetEnabled(false);
             }
 			else
 			{
-				// TODO: m_ds->InOperatorControl(true);
+				m_ds->InOperatorControl(true);
 				OperatorControl();
-				// TODO: m_ds->InOperatorControl(false);
+				m_ds->InOperatorControl(false);
 				while (IsOperatorControl() && IsEnabled()) sleep(1); //m_ds->WaitForData();
 			}
 		}

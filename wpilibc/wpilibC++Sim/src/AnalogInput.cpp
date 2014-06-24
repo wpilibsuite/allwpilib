@@ -1,62 +1,51 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+/* Copyright (c) FIRST 2008. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
-#include "AnalogChannel.h"
+#include "AnalogInput.h"
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 
 /**
  * Common initialization.
  */
-void AnalogChannel::InitChannel(uint8_t moduleNumber, uint32_t channel)
+void AnalogInput::InitAnalogInput(uint32_t channel)
 {
 	m_table = NULL;
-    m_module = moduleNumber;
-    m_channel = channel;
-    char buffer[50];
-    int n = sprintf(buffer, "analog/%d/%d", moduleNumber, channel);
-    m_impl = new SimFloatInput(buffer);
 
-	LiveWindow::GetInstance()->AddSensor("AnalogChannel",channel, GetModuleNumber(), this);
+	m_channel = channel;
+	char buffer[50];
+	int n = sprintf(buffer, "analog/1/%d", channel);
+	m_impl = new SimFloatInput(buffer);
+
+	LiveWindow::GetInstance()->AddSensor("AnalogInput", channel, this);
 }
 
 /**
- * Construct an analog channel on a specified module.
- * 
- * @param moduleNumber The analog module (1 or 2).
- * @param channel The channel number to represent.
- */
-AnalogChannel::AnalogChannel(uint8_t moduleNumber, uint32_t channel)
-{
-	InitChannel(moduleNumber, channel);
-}
-
-/**
- * Construct an analog channel on the default module.
+ * Construct an analog input.
  * 
  * @param channel The channel number to represent.
  */
-AnalogChannel::AnalogChannel(uint32_t channel)
+AnalogInput::AnalogInput(uint32_t channel)
 {
-	InitChannel(GetDefaultAnalogModule(), channel);
+	InitAnalogInput(channel);
 }
 
 /**
  * Channel destructor.
  */
-AnalogChannel::~AnalogChannel()
+AnalogInput::~AnalogInput()
 {
 }
 
 /**
- * Get a scaled sample straight from this channel on the module.
+ * Get a scaled sample straight from this channel.
  * The value is scaled to units of Volts using the calibrated scaling data from GetLSBWeight() and GetOffset().
- * @return A scaled sample straight from this channel on the module.
+ * @return A scaled sample straight from this channel.
  */
-float AnalogChannel::GetVoltage()
+float AnalogInput::GetVoltage()
 {
     return m_impl->Get();
 }
@@ -68,7 +57,7 @@ float AnalogChannel::GetVoltage()
  * Using averaging will cause this value to be more stable, but it will update more slowly.
  * @return A scaled sample from the output of the oversample and average engine for this channel.
  */
-float AnalogChannel::GetAverageVoltage()
+float AnalogInput::GetAverageVoltage()
 {
     return m_impl->Get();
 }
@@ -77,18 +66,9 @@ float AnalogChannel::GetAverageVoltage()
  * Get the channel number.
  * @return The channel number.
  */
-uint32_t AnalogChannel::GetChannel()
+uint32_t AnalogInput::GetChannel()
 {
 	return m_channel;
-}
-
-/**
- * Get the module number.
- * @return The module number.
- */
-uint8_t AnalogChannel::GetModuleNumber()
-{
-	return m_module;
 }
 
 /**
@@ -96,36 +76,34 @@ uint8_t AnalogChannel::GetModuleNumber()
  * 
  * @return The average voltage.
  */
-double AnalogChannel::PIDGet() 
+double AnalogInput::PIDGet() 
 {
 	return GetAverageVoltage();
 }
 
-void AnalogChannel::UpdateTable() {
+void AnalogInput::UpdateTable() {
 	if (m_table != NULL) {
 		m_table->PutNumber("Value", GetAverageVoltage());
 	}
 }
 
-void AnalogChannel::StartLiveWindowMode() {
+void AnalogInput::StartLiveWindowMode() {
 	
 }
 
-void AnalogChannel::StopLiveWindowMode() {
+void AnalogInput::StopLiveWindowMode() {
 	
 }
 
-std::string AnalogChannel::GetSmartDashboardType() {
+std::string AnalogInput::GetSmartDashboardType() {
 	return "Analog Input";
 }
 
-void AnalogChannel::InitTable(ITable *subTable) {
+void AnalogInput::InitTable(ITable *subTable) {
 	m_table = subTable;
 	UpdateTable();
 }
 
-ITable * AnalogChannel::GetTable() {
+ITable * AnalogInput::GetTable() {
 	return m_table;
 }
-
-

@@ -39,7 +39,7 @@ void WaitUntilCommand::Execute()
  */
 bool WaitUntilCommand::IsFinished()
 {
-  return DriverStation::GetInstance()->GetMatchTime() >= m_time;
+    return DriverStation::GetInstance()->GetMatchTime() >= m_time;
 }
 
 void WaitUntilCommand::End()

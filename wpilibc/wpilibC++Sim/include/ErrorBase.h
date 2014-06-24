@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef _ERROR_BASE_H
-#define _ERROR_BASE_H
+#pragma once
 
 #include "Base.h"
 #include "Error.h"
@@ -39,21 +37,21 @@ public:
 	virtual ~ErrorBase();
 	virtual Error& GetError();
 	virtual const Error& GetError() const;
-	virtual void SetErrnoError(const char *contextMessage,
-		const char* filename, const char* function, uint32_t lineNumber) const;
-	virtual void SetImaqError(int success, const char *contextMessage,
-        const char* filename, const char* function, uint32_t lineNumber) const;
-	virtual void SetError(Error::Code code, const char *contextMessage,
-		const char* filename, const char* function, uint32_t lineNumber) const;
+	virtual void SetErrnoError(const char *contextMessage, const char* filename,
+			const char* function, uint32_t lineNumber) const;
+	virtual void SetImaqError(int success, const char *contextMessage, const char* filename,
+			const char* function, uint32_t lineNumber) const;
+	virtual void SetError(Error::Code code, const char *contextMessage, const char* filename,
+			const char* function, uint32_t lineNumber) const;
 	virtual void SetWPIError(const char *errorMessage, const char *contextMessage,
-		const char* filename, const char* function, uint32_t lineNumber) const;
+			const char* filename, const char* function, uint32_t lineNumber) const;
 	virtual void CloneError(ErrorBase *rhs) const;
 	virtual void ClearError() const;
 	virtual bool StatusIsFatal() const;
-	static void SetGlobalError(Error::Code code, const char *contextMessage,
-		const char* filename, const char* function, uint32_t lineNumber);
+	static void SetGlobalError(Error::Code code, const char *contextMessage, const char* filename,
+			const char* function, uint32_t lineNumber);
 	static void SetGlobalWPIError(const char *errorMessage, const char *contextMessage,
-		const char* filename, const char* function, uint32_t lineNumber);
+			const char* filename, const char* function, uint32_t lineNumber);
 	static Error& GetGlobalError();
 protected:
 	mutable Error m_error;
@@ -64,5 +62,3 @@ protected:
 private:
 	DISALLOW_COPY_AND_ASSIGN(ErrorBase);
 };
-
-#endif

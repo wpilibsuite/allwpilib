@@ -25,7 +25,7 @@ void AnalogInput::InitAnalogInput(uint32_t channel)
 	char buf[64];
 	Resource::CreateResourceObject(&inputs, kAnalogInputs);
 
-    if (!checkAnalogInputChannel(channel))
+	if (!checkAnalogInputChannel(channel))
 	{
 		snprintf(buf, 64, "analog input %d", channel);
 		wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
@@ -39,14 +39,14 @@ void AnalogInput::InitAnalogInput(uint32_t channel)
 		return;
 	}
 
-    m_channel = channel;
+	m_channel = channel;
 
 	void* port = getPort(channel);
 	int32_t status = 0;
 	m_port = initializeAnalogInputPort(port, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
-	LiveWindow::GetInstance()->AddSensor("AnalogInput",channel, this);
+	LiveWindow::GetInstance()->AddSensor("AnalogInput", channel, this);
 	HALReport(HALUsageReporting::kResourceType_AnalogChannel, channel);
 }
 

@@ -3,19 +3,15 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef __DRIVER_STATION_H__
-#define __DRIVER_STATION_H__
+#pragma once
 
 #include "simulation/msgs/msgs.h"
 #include <gazebo/transport/transport.hh>
-//#include "Dashboard.h"
-//#include "DriverStationEnhancedIO.h"
 #include "SensorBase.h"
 #include "Task.h"
 
 struct HALCommonControlData;
-class AnalogChannel;
+class AnalogInput;
 
 using namespace gazebo;
 
@@ -25,13 +21,17 @@ using namespace gazebo;
 class DriverStation : public SensorBase
 {
 public:
-	enum Alliance {kRed, kBlue, kInvalid};
+	enum Alliance
+	{
+		kRed,
+		kBlue,
+		kInvalid
+	};
 
 	virtual ~DriverStation();
 	static DriverStation *GetInstance();
 
-	static const uint32_t kBatteryModuleNumber = 1;
-	static const uint32_t kBatteryChannel = 8;
+	static const uint32_t kBatteryChannel = 7;
 	static const uint32_t kJoystickPorts = 4;
 	static const uint32_t kJoystickAxes = 6;
 
@@ -46,9 +46,9 @@ public:
 
 	bool IsEnabled();
 	bool IsDisabled();
-    bool IsAutonomous();
+	bool IsAutonomous();
 	bool IsOperatorControl();
-    bool IsTest();
+	bool IsTest();
 	bool IsFMSAttached();
 
 	uint32_t GetPacketNumber();
@@ -59,24 +59,39 @@ public:
 	float GetBatteryVoltage();
 	uint16_t GetTeamNumber();
 
-	void IncrementUpdateNumber() { m_updateNumber++; }
+	void IncrementUpdateNumber()
+	{
+		m_updateNumber++;
+	}
 
 	/** Only to be used to tell the Driver Station what code you claim to be executing
 	 *   for diagnostic purposes only
 	 * @param entering If true, starting disabled code; if false, leaving disabled code */
-	void InDisabled(bool entering) {m_userInDisabled=entering;}
+	void InDisabled(bool entering)
+	{
+		m_userInDisabled = entering;
+	}
 	/** Only to be used to tell the Driver Station what code you claim to be executing
 	 *   for diagnostic purposes only
 	 * @param entering If true, starting autonomous code; if false, leaving autonomous code */
-	void InAutonomous(bool entering) {m_userInAutonomous=entering;}
-    /** Only to be used to tell the Driver Station what code you claim to be executing
-     *   for diagnostic purposes only
-     * @param entering If true, starting teleop code; if false, leaving teleop code */
-    void InOperatorControl(bool entering) {m_userInTeleop=entering;}
-    /** Only to be used to tell the Driver Station what code you claim to be executing
-     *   for diagnostic purposes only
-     * @param entering If true, starting test code; if false, leaving test code */
-    void InTest(bool entering) {m_userInTest=entering;}
+	void InAutonomous(bool entering)
+	{
+		m_userInAutonomous = entering;
+	}
+	/** Only to be used to tell the Driver Station what code you claim to be executing
+	*   for diagnostic purposes only
+	* @param entering If true, starting teleop code; if false, leaving teleop code */
+	void InOperatorControl(bool entering)
+	{
+		m_userInTeleop = entering;
+	}
+	/** Only to be used to tell the Driver Station what code you claim to be executing
+	*   for diagnostic purposes only
+	* @param entering If true, starting test code; if false, leaving test code */
+	void InTest(bool entering)
+	{
+		m_userInTest = entering;
+	}
 
 protected:
 	DriverStation();
@@ -102,14 +117,11 @@ private:
 	double m_approxMatchTimeOffset;
 	bool m_userInDisabled;
 	bool m_userInAutonomous;
-    bool m_userInTeleop;
-    bool m_userInTest;
+	bool m_userInTeleop;
+	bool m_userInTest;
 
     transport::SubscriberPtr stateSub;
     transport::SubscriberPtr joysticksSub[4];
     msgs::DriverStationPtr state;
     msgs::JoystickPtr joysticks[4];
 };
-
-#endif
-

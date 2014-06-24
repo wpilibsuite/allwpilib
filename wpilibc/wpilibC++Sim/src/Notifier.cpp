@@ -31,15 +31,13 @@ Notifier::Notifier(TimerEventHandler handler, void *param)
 	m_nextEvent = NULL;
 	m_queued = false;
 	m_handlerSemaphore = initializeSemaphore(SEMAPHORE_FULL);
-
-    {
+	{
 		Synchronized sync(queueSemaphore);
 		// do the first time intialization of static variables
 		if (refcount == 0)
 		{
-            task = new Task("NotifierTask", (FUNCPTR)Notifier::Run,
-                            Task::kDefaultPriority, 64000);
-            task->Start();
+			task = new Task("NotifierTask", (FUNCPTR)Notifier::Run, Task::kDefaultPriority, 64000);
+			task->Start();
 		}
 		refcount++;
 	}
@@ -56,11 +54,11 @@ Notifier::~Notifier()
 		Synchronized sync(queueSemaphore);
 		DeleteFromQueue();
 
-        // Delete the static variables when the last one is going away
+		// Delete the static variables when the last one is going away
 		if (!(--refcount))
 		{
-            task->Stop();
-            delete task;
+			task->Stop();
+			delete task;
 		}
 	}
 
@@ -144,7 +142,7 @@ void Notifier::InsertInQueue(bool reschedule)
 	}
 	else
 	{
-      m_expirationTime = GetClock() + m_period;
+		m_expirationTime = GetClock() + m_period;
 	}
 	if (timerQueueHead == NULL || timerQueueHead->m_expirationTime >= this->m_expirationTime)
 	{
@@ -186,7 +184,7 @@ void Notifier::DeleteFromQueue()
 	if (m_queued)
 	{
 		m_queued = false;
-        wpi_assert(timerQueueHead != NULL);
+		wpi_assert(timerQueueHead != NULL);
 		if (timerQueueHead == this)
 		{
 			// remove the first item in the list - update the alarm

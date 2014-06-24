@@ -3,14 +3,12 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef PIDCONTROLLER_H_
-#define PIDCONTROLLER_H_
+#pragma once
 
 #include "Base.h"
-#include "HAL/Semaphore.hpp"
 #include "Controller.h"
 #include "LiveWindow/LiveWindow.h"
+#include <pthread.h>
 
 class PIDOutput;
 class PIDSource;
@@ -26,12 +24,10 @@ class Notifier;
 class PIDController : public LiveWindowSendable, public Controller, public ITableListener
 {
 public:
-	PIDController(float p, float i, float d,
-					PIDSource *source, PIDOutput *output,
-					float period = 0.05);
-	PIDController(float p, float i, float d, float f,
-					PIDSource *source, PIDOutput *output,
-					float period = 0.05);
+	PIDController(float p, float i, float d, PIDSource *source, PIDOutput *output, float period =
+			0.05);
+	PIDController(float p, float i, float d, float f, PIDSource *source, PIDOutput *output,
+			float period = 0.05);
 	virtual ~PIDController();
 	virtual float Get();
 	virtual void SetContinuous(bool continuous = true);
@@ -43,23 +39,23 @@ public:
 	virtual float GetI();
 	virtual float GetD();
 	virtual float GetF();
-	
+
 	virtual void SetSetpoint(float setpoint);
 	virtual float GetSetpoint();
 
 	virtual float GetError();
-	
+
 	virtual void SetTolerance(float percent);
 	virtual void SetAbsoluteTolerance(float absValue);
 	virtual void SetPercentTolerance(float percentValue);
 	virtual bool OnTarget();
-	
+
 	virtual void Enable();
 	virtual void Disable();
 	virtual bool IsEnabled();
-	
+
 	virtual void Reset();
-	
+
 	virtual void InitTable(ITable* table);
 
 private:
@@ -75,7 +71,12 @@ private:
 	bool m_enabled; 			//is the pid controller enabled
 	float m_prevError;	// the prior sensor input (used to compute velocity)
 	double m_totalError; //the sum of the errors for use in the integral calc
-	enum {kAbsoluteTolerance, kPercentTolerance, kNoTolerance} m_toleranceType;
+	enum
+	{
+		kAbsoluteTolerance,
+		kPercentTolerance,
+		kNoTolerance
+	} m_toleranceType;
 	float m_tolerance;	//the percetage or absolute error that is considered on target
 	float m_setpoint;
 	float m_error;
@@ -88,11 +89,10 @@ private:
 	PIDOutput *m_pidOutput;
 	Notifier *m_controlLoop;
 
-	void Initialize(float p, float i, float d, float f,
-					PIDSource *source, PIDOutput *output,
-					float period = 0.05);
+	void Initialize(float p, float i, float d, float f, PIDSource *source, PIDOutput *output,
+			float period = 0.05);
 	static void CallCalculate(void *controller);
-	
+
 	virtual ITable* GetTable();
 	virtual std::string GetSmartDashboardType();
 	virtual void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
@@ -105,5 +105,3 @@ protected:
 
 	DISALLOW_COPY_AND_ASSIGN(PIDController);
 };
-
-#endif

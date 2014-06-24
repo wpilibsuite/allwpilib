@@ -70,7 +70,6 @@ public:
     virtual void StopLiveWindowMode() {}
 
 private:
-    int m_module, m_channel;
     double m_scale, m_offset;
     AnalogInput* m_analog_input;
     ITable* m_table;

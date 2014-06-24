@@ -129,7 +129,7 @@ double Command::TimeSinceInitialized()
 	if (m_startTime < 0.0)
 		return 0.0;
 	else
-        return Timer::GetFPGATimestamp() - m_startTime;
+		return Timer::GetFPGATimestamp() - m_startTime;
 }
 
 /**
@@ -239,7 +239,7 @@ void Command::_End()
  */
 void Command::StartTiming()
 {
-    m_startTime = Timer::GetFPGATimestamp();
+	m_startTime = Timer::GetFPGATimestamp();
 }
 
 /**

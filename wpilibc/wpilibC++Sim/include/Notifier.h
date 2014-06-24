@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef NOTIFIER_H
-#define NOTIFIER_H
+#pragma once
 
 #include "ErrorBase.h"
 #include "Task.h"
@@ -37,12 +35,10 @@ private:
 	Notifier *m_nextEvent;					// next Nofifier event
 	bool m_periodic;						// true if this is a periodic event
 	bool m_queued;							// indicates if this entry is queued
-	SEMAPHORE_ID m_handlerSemaphore;				// held by interrupt manager task while handler call is in progress 
+	SEMAPHORE_ID m_handlerSemaphore;		// held by interrupt manager task while handler call is in progress
+
 	DISALLOW_COPY_AND_ASSIGN(Notifier);
 
-private:
-    static Task *task;
-    static void Run();
+	static Task *task;
+	static void Run();
 };
-
-#endif

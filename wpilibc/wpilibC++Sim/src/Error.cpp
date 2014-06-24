@@ -12,7 +12,6 @@
 
 #include "Timer.h"
 #include "Utility.h"
-
 bool Error::m_stackTraceEnabled = false;
 bool Error::m_suspendOnErrorEnabled = false;
 

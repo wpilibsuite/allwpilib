@@ -23,7 +23,7 @@ public:
 	
 	static void PutData(std::string key, Sendable *data);
 	static void PutData(NamedSendable *value);
-	static Sendable* GetData(std::string keyName);
+	//static Sendable* GetData(std::string keyName);
 	
 	static void PutBoolean(std::string keyName, bool value);
 	static bool GetBoolean(std::string keyName);
