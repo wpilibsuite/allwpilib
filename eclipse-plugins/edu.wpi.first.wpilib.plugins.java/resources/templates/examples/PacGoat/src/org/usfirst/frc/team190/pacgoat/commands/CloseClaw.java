@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.command.Command;
 /**
  * Close the claw.
  * 
- * NOTE: It doesn't wait for the claw to close since their is no sensor to
+ * NOTE: It doesn't wait for the claw to close since there is no sensor to
  * detect that.
  */
 public class CloseClaw extends Command {
