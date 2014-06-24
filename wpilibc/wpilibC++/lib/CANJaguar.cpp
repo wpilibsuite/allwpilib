@@ -135,6 +135,8 @@ void CANJaguar::InitCANJaguar()
 	requestMessage(CAN_IS_FRAME_REMOTE | CAN_MSGID_API_FIRMVER);
 	requestMessage(LM_API_HWVER);
 
+	Wait(0.003);
+
 	if(getMessage(CAN_MSGID_API_FIRMVER, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
 		m_firmwareVersion = unpackint32_t(dataBuffer);
 	else

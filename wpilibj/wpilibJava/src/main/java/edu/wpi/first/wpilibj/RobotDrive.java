@@ -7,7 +7,6 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.can.CANNotInitializedException;
-import edu.wpi.first.wpilibj.can.CANTimeoutException;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
@@ -503,7 +502,7 @@ public class RobotDrive implements MotorSafety, IUtility {
                 CANJaguar.updateSyncGroup(syncGroup);
             } catch (CANNotInitializedException e) {
                 m_isCANInitialized = false;
-            } catch (CANTimeoutException e) {}
+            }
         }
 
         if (m_safetyHelper != null) m_safetyHelper.feed();
@@ -555,7 +554,7 @@ public class RobotDrive implements MotorSafety, IUtility {
                 CANJaguar.updateSyncGroup(syncGroup);
             } catch (CANNotInitializedException e) {
                 m_isCANInitialized = false;
-            } catch (CANTimeoutException e) {}
+            }
         }
 
         if (m_safetyHelper != null) m_safetyHelper.feed();
@@ -605,7 +604,7 @@ public class RobotDrive implements MotorSafety, IUtility {
                 CANJaguar.updateSyncGroup(syncGroup);
             } catch (CANNotInitializedException e) {
                 m_isCANInitialized = false;
-            } catch (CANTimeoutException e) {}
+            }
         }
 
         if (m_safetyHelper != null) m_safetyHelper.feed();

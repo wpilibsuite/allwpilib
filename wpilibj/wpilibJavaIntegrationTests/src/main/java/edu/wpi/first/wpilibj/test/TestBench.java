@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Victor;
-import edu.wpi.first.wpilibj.can.CANTimeoutException;
+import edu.wpi.first.wpilibj.can.CANMessageNotFoundException;
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
@@ -47,7 +47,7 @@ public final class TestBench {
 	 * completely stopped
 	 */
 	public static final double MOTOR_STOP_TIME = 0.20;
-	
+
 	/* PowerDistributionPanel channels */
 	public static final int kJaguarPDPChannel = 7;
 	public static final int kVictorPDPChannel = 11;
@@ -164,7 +164,7 @@ public final class TestBench {
 								// have a free method
 			try {
 				canJag = new CANJaguar(1);
-			} catch (CANTimeoutException e) {
+			} catch (CANMessageNotFoundException e) {
 				e.printStackTrace();
 			}
 		}
@@ -230,14 +230,14 @@ public final class TestBench {
 		//NOTE: IF MORE DIOCROSSCONNECT PAIRS ARE ADDED ADD THEM HERE
 		return pairs;
 	}
-	
+
 	public static AnalogCrossConnectFixture getAnalogCrossConnectFixture(){
 		AnalogCrossConnectFixture analogIO = new AnalogCrossConnectFixture() {
 			@Override
 			protected AnalogOutput giveAnalogOutput() {
 				return new AnalogOutput(0);
 			}
-			
+
 			@Override
 			protected AnalogInput giveAnalogInput() {
 				return new AnalogInput(2);
@@ -245,20 +245,20 @@ public final class TestBench {
 		};
 		return analogIO;
 	}
-	
+
 	public static RelayCrossConnectFxiture getRelayCrossConnectFixture(){
 		RelayCrossConnectFxiture relay = new RelayCrossConnectFxiture() {
-			
+
 			@Override
 			protected Relay giveRelay() {
 				return new Relay(0);
 			}
-			
+
 			@Override
 			protected DigitalInput giveInputTwo() {
 				return new DigitalInput(14);
 			}
-			
+
 			@Override
 			protected DigitalInput giveInputOne() {
 				return new DigitalInput(15);

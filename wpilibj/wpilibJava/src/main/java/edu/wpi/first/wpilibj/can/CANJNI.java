@@ -16,12 +16,6 @@ import java.nio.IntBuffer;
  * For help, please visit <a href="http://nativelibs4java.googlecode.com/">NativeLibs4Java</a> , <a href="http://rococoa.dev.java.net/">Rococoa</a>, or <a href="http://jna.dev.java.net/">JNA</a>.
  */
 public class CANJNI extends JNIWrapper{
-	//public static final String JNA_LIBRARY_NAME = LibraryExtractor.getLibraryPath("CAN", true, CANLibrary.class);
-	//public static final NativeLibrary JNA_NATIVE_LIB = NativeLibrary.getInstance(CANLibrary.JNA_LIBRARY_NAME, MangledFunctionMapper.DEFAULT_OPTIONS);
-	//static {
-	//	System.loadLibrary("JNIWrappers");
-		//Native.register(CANLibrary.class, CANLibrary.JNA_NATIVE_LIB);
-	//}
 	/** <i>native declaration : src\main\include\CAN\can_proto.h</i> */
 	public static final int LM_STATUS_LIMIT_REV = 0x02;
 	/** <i>native declaration : src\main\include\CAN\can_proto.h</i> */
@@ -452,6 +446,13 @@ public class CANJNI extends JNIWrapper{
 	public static final int LM_API_VCOMP_T_EN = ((0x00020000 | 0x02000000 | 0x00000800) | (5 << 6));
 	/** <i>native declaration : src\main\include\CAN\can_proto.h</i> */
 	public static final int LM_STATUS_LIMIT_STKY_SFWD = 0x40;
+	
+	public static final int CAN_SEND_PERIOD_NO_REPEAT = 0;
+	public static final int CAN_SEND_PERIOD_STOP_REPEATING = -1;
+
+	/* Flags in the upper bits of the messageID */
+	public static final int CAN_IS_FRAME_REMOTE = 0x80000000;
+	public static final int CAN_IS_FRAME_11BIT = 0x40000000;
 
 	public static native void FRCNetworkCommunicationCANSessionMuxSendMessage(int messageID, ByteBuffer data, int periodMs, IntBuffer status);
 	public static native ByteBuffer FRCNetworkCommunicationCANSessionMuxReceiveMessage(IntBuffer messageID, int messageIDMask, ByteBuffer timeStamp, IntBuffer status);
