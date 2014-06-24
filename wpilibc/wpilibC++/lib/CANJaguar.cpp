@@ -1360,7 +1360,11 @@ void CANJaguar::SetVoltageRampRate(double rampRate)
 		dataSize = packFXP8_8(dataBuffer, rampRate / kControllerRate);
 		message = LM_API_VCOMP_IN_RAMP;
 		break;
+	case kCurrent:
+	case kSpeed:
+	case kPosition:
 	default:
+		wpi_setWPIErrorWithContext(IncompatibleMode, "SetVoltageRampRate only applies in Voltage and Percent mode");
 		return;
 	}
 
