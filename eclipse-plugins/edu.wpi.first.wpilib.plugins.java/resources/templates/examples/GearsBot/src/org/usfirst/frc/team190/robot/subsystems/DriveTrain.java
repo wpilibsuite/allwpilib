@@ -1,6 +1,6 @@
 package $package.subsystems;
 
-import edu.wpi.first.wpilibj.AnalogChannel;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick.AxisType;
 import edu.wpi.first.wpilibj.Gyro;
@@ -24,7 +24,7 @@ public class DriveTrain extends Subsystem {
 							front_right_motor, back_right_motor;
 	private RobotDrive drive;
 	private Encoder left_encoder, right_encoder;
-	private AnalogChannel rangefinder;
+	private AnalogInput rangefinder;
 	private Gyro gyro;
 
 	public DriveTrain() {
@@ -55,7 +55,7 @@ public class DriveTrain extends Subsystem {
 		left_encoder.start();
 		right_encoder.start();
 
-		rangefinder = new AnalogChannel(6);
+		rangefinder = new AnalogInput(6);
 		gyro = new Gyro(1);
 
 		// Let's show everything on the LiveWindow
