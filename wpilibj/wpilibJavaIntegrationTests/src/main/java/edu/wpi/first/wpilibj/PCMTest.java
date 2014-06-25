@@ -100,11 +100,17 @@ public class PCMTest extends AbstractComsSetup {
 		reset();
 		compressor.setClosedLoopControl(true);
 
-		  // Turn on the compressor
-		  fakePressureSwitch.set(true);
-		  Timer.delay(kCompressorDelayTime);
-		  assertEquals("Compressor did not turn on when the pressure switch turned on.",
-				  kCompressorOnVoltage, fakeCompressor.getVoltage(), range);
+		// Turn on the compressor
+		fakePressureSwitch.set(true);
+		Timer.delay(kCompressorDelayTime);
+		assertEquals("Compressor did not turn on when the pressure switch turned on.",
+			kCompressorOnVoltage, fakeCompressor.getVoltage(), range);
+
+		// Turn on the compressor
+		fakePressureSwitch.set(false);
+		Timer.delay(kCompressorDelayTime);
+		assertEquals("Compressor did not turn off when the pressure switch turned off.",
+			kCompressorOffVoltage, fakeCompressor.getVoltage(), range);
 	}
 
 	/**
@@ -116,11 +122,9 @@ public class PCMTest extends AbstractComsSetup {
 
 		solenoid1.set(false);
 		solenoid2.set(false);
-
 		Timer.delay(kSolenoidDelayTime);
-
-		assertTrue("Solenoid did not turn off.",solenoid1.get());
-		assertTrue("Solenoid did not turn off.",solenoid2.get());
+		assertTrue("Solenoid #1 did not turn on",fakeSolenoid1.get());
+		assertTrue("Solenoid #2 did not turn off",fakeSolenoid2.get());
 
 		// Turn Solenoid #1 on, and turn Solenoid #2 off
 		solenoid1.set(true);
