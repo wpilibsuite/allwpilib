@@ -32,15 +32,18 @@ public:
 	static const int32_t kControllerRate = 1000;
 	static constexpr double kApproxBusVoltage = 12.0;
 
-	typedef enum {kPercentVbus, kCurrent, kSpeed, kPosition, kVoltage} ControlMode;
+	// Control mode tags
+	static const struct NoneStruct          {} None;
+	static const struct EncoderStruct       {} Encoder;
+	static const struct QuadEncoderStruct   {} QuadEncoder;
+	static const struct PotentiometerStruct {} Potentiometer;
+
 	typedef enum {kCurrentFault = 1, kTemperatureFault = 2, kBusVoltageFault = 4, kGateDriverFault = 8} Faults;
 	typedef enum {kForwardLimit = 1, kReverseLimit = 2} Limits;
-	typedef enum {kPosRef_QuadEncoder = 0, kPosRef_Potentiometer = 1, kPosRef_None = 0xFF} PositionReference;
-	typedef enum {kSpeedRef_Encoder = 0, kSpeedRef_InvEncoder = 2, kSpeedRef_QuadEncoder = 3, kSpeedRef_None = 0xFF} SpeedReference;
 	typedef enum {kNeutralMode_Jumper = 0, kNeutralMode_Brake = 1, kNeutralMode_Coast = 2} NeutralMode;
 	typedef enum {kLimitMode_SwitchInputsOnly = 0, kLimitMode_SoftPositionLimits = 1} LimitMode;
 
-	explicit CANJaguar(uint8_t deviceNumber, ControlMode controlMode = kPercentVbus);
+	explicit CANJaguar(uint8_t deviceNumber);
 	virtual ~CANJaguar();
 
 	// SpeedController interface
@@ -51,11 +54,32 @@ public:
 	// PIDOutput interface
 	virtual void PIDWrite(float output);
 
+	// Control mode methods
+	void EnableControl(double encoderInitialPosition = 0.0);
+	void DisableControl();
+
+	void SetPercentMode();
+	void SetPercentMode(EncoderStruct, uint16_t codesPerRev);
+	void SetPercentMode(QuadEncoderStruct, uint16_t codesPerRev);
+	void SetPercentMode(PotentiometerStruct);
+
+	void SetCurrentMode(double p, double i, double d);
+	void SetCurrentMode(EncoderStruct, uint16_t codesPerRev, double p, double i, double d);
+	void SetCurrentMode(QuadEncoderStruct, uint16_t codesPerRev, double p, double i, double d);
+	void SetCurrentMode(PotentiometerStruct, double p, double i, double d);
+
+	void SetSpeedMode(EncoderStruct, uint16_t codesPerRev, double p, double i, double d);
+	void SetSpeedMode(QuadEncoderStruct, uint16_t codesPerRev, double p, double i, double d);
+
+	void SetPositionMode(QuadEncoderStruct, uint16_t codesPerRev, double p, double i, double d);
+	void SetPositionMode(PotentiometerStruct, double p, double i, double d);
+
+	void SetVoltageMode();
+	void SetVoltageMode(EncoderStruct, uint16_t codesPerRev);
+	void SetVoltageMode(QuadEncoderStruct, uint16_t codesPerRev);
+	void SetVoltageMode(PotentiometerStruct);
+
 	// Other Accessors
-	void SetSpeedReference(SpeedReference reference);
-	SpeedReference GetSpeedReference();
-	void SetPositionReference(PositionReference reference);
-	PositionReference GetPositionReference();
 	void SetP(double p);
 	void SetI(double i);
 	void SetD(double d);
@@ -63,10 +87,6 @@ public:
 	double GetP();
 	double GetI();
 	double GetD();
-	void EnableControl(double encoderInitialPosition = 0.0);
-	void DisableControl();
-	void ChangeControlMode(ControlMode controlMode);
-	ControlMode GetControlMode();
 	float GetBusVoltage();
 	float GetOutputVoltage();
 	float GetOutputCurrent();
@@ -101,6 +121,18 @@ public:
 	void GetDescription(char *desc);
 
 protected:
+	// Control mode helpers
+	typedef enum {kPercentVbus, kCurrent, kSpeed, kPosition, kVoltage} ControlMode;
+
+	void ChangeControlMode(ControlMode controlMode);
+	ControlMode GetControlMode();
+
+	void SetSpeedReference(uint8_t reference);
+	uint8_t GetSpeedReference();
+
+	void SetPositionReference(uint8_t reference);
+	uint8_t GetPositionReference();
+
 	uint8_t packPercentage(uint8_t *buffer, double value);
 	uint8_t packFXP8_8(uint8_t *buffer, double value);
 	uint8_t packFXP16_16(uint8_t *buffer, double value);
@@ -112,7 +144,6 @@ protected:
 	int16_t unpackint16_t(uint8_t *buffer);
 	int32_t unpackint32_t(uint8_t *buffer);
 
-
 	void sendMessage(uint32_t messageID, const uint8_t *data, uint8_t dataSize, int32_t period = CAN_SEND_PERIOD_NO_REPEAT);
 	void requestMessage(uint32_t messageID, int32_t period = CAN_SEND_PERIOD_NO_REPEAT);
 	bool getMessage(uint32_t messageID, uint32_t mask, uint8_t *data, uint8_t *dataSize);
@@ -122,8 +153,8 @@ protected:
 
 	// Parameters/configuration
 	ControlMode m_controlMode;
-	SpeedReference m_speedReference;
-	PositionReference m_positionReference;
+	uint8_t m_speedReference;
+	uint8_t m_positionReference;
 	double m_p;
 	double m_i;
 	double m_d;
