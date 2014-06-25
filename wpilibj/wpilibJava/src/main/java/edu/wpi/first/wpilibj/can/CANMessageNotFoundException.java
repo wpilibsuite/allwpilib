@@ -7,17 +7,13 @@
 
 package edu.wpi.first.wpilibj.can;
 
-import java.io.IOException;
-
 /**
- * Exception indicating that the CAN device did not respond
- * within the timeout period specified.
+ * Exception indicating that a can message is not available from Network
+ * Communications.  This usually just means we already have the most recent
+ * value cached locally.
  */
-public class CANTimeoutException extends IOException {
-    public CANTimeoutException() {
+public class CANMessageNotFoundException extends RuntimeException {
+    public CANMessageNotFoundException() {
         super();
-    }
-    public CANTimeoutException(String message) {
-        super(message);
     }
 }

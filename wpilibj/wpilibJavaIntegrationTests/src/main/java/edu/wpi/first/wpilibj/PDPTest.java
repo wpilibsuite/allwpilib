@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import edu.wpi.first.wpilibj.can.CANTimeoutException;
+import edu.wpi.first.wpilibj.can.CANMessageNotFoundException;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
 
@@ -19,14 +19,14 @@ public class PDPTest extends AbstractComsSetup {
 	private static final Logger logger = Logger.getLogger(PCMTest.class.getName());
 	/* The current returned when the motor is not being driven */
 	protected static final double  kLowCurrent =  1.52;
-	
+
 	protected static final double  kCurrentTolerance =  0.1;
-	
+
 	private static PowerDistributionPanel pdp;
 	private static Talon talon;
 	private static Victor victor;
 	private static Jaguar jaguar;
-	
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		pdp = new PowerDistributionPanel();
@@ -54,7 +54,7 @@ public class PDPTest extends AbstractComsSetup {
 	@After
 	public void tearDown() throws Exception {
 	}
-	
+
 	/**
 	 * Test if the current changes when the motor is driven using a talon
 	 */
@@ -62,27 +62,27 @@ public class PDPTest extends AbstractComsSetup {
 	public void CheckCurrentTalon() {
 		/* The Current should be kLowCurrent */
 		try {
-			assertEquals("The low current was not within the expected range.", 
+			assertEquals("The low current was not within the expected range.",
 					kLowCurrent, pdp.getCurrent(TestBench.kTalonPDPChannel), kCurrentTolerance);
-		} catch (CANTimeoutException e) {
+		} catch (CANMessageNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		Timer.delay(0.02);
-		
+
 		/* Set the motor to full forward */
 		talon.set(1.0);
 		Timer.delay(0.02);
 		/* The current should now be greater than the low current */
 		try {
-			assertThat("The driven current is not greater than the resting current.", 
+			assertThat("The driven current is not greater than the resting current.",
 					pdp.getCurrent(TestBench.kTalonPDPChannel), is(greaterThan(kLowCurrent)));
-		} catch (CANTimeoutException e) {
+		} catch (CANMessageNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Test if the current changes when the motor is driven using a victor
 	 */
@@ -90,27 +90,27 @@ public class PDPTest extends AbstractComsSetup {
 	public void CheckCurrentVictor() {
 		/* The Current should be kLowCurrent */
 		try {
-			assertEquals("The low current was not within the expected range.", 
+			assertEquals("The low current was not within the expected range.",
 					kLowCurrent, pdp.getCurrent(TestBench.kVictorPDPChannel), kCurrentTolerance);
-		} catch (CANTimeoutException e) {
+		} catch (CANMessageNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		Timer.delay(0.02);
-		
+
 		/* Set the motor to full forward */
 		victor.set(1.0);
 		Timer.delay(0.02);
 		/* The current should now be greater than the low current */
 		try {
-			assertThat("The driven current is not greater than the resting current.", 
+			assertThat("The driven current is not greater than the resting current.",
 					pdp.getCurrent(TestBench.kVictorPDPChannel), is(greaterThan(kLowCurrent)));
-		} catch (CANTimeoutException e) {
+		} catch (CANMessageNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Test if the current changes when the motor is driven using a jaguar
 	 */
@@ -118,23 +118,23 @@ public class PDPTest extends AbstractComsSetup {
 	public void CheckCurrentJaguar() {
 		/* The Current should be kLowCurrent */
 		try {
-			assertEquals("The low current was not within the expected range.", 
+			assertEquals("The low current was not within the expected range.",
 					kLowCurrent, pdp.getCurrent(TestBench.kJaguarPDPChannel), kCurrentTolerance);
-		} catch (CANTimeoutException e) {
+		} catch (CANMessageNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		Timer.delay(0.02);
-		
+
 		/* Set the motor to full forward */
 		jaguar.set(1.0);
 		Timer.delay(0.02);
-		
+
 		/* The current should now be greater than the low current */
 		try {
-			assertThat("The driven current is not greater than the resting current.", 
+			assertThat("The driven current is not greater than the resting current.",
 					pdp.getCurrent(TestBench.kJaguarPDPChannel), is(greaterThan(kLowCurrent)));
-		} catch (CANTimeoutException e) {
+		} catch (CANMessageNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

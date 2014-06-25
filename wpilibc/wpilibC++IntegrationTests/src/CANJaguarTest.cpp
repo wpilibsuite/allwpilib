@@ -109,6 +109,7 @@ TEST_F(CANJaguarTest, EncoderPositionPID) {
 TEST_F(CANJaguarTest, FakePotentiometerPosition) {
     m_jaguar->SetPositionReference(CANJaguar::kPosRef_Potentiometer);
     m_jaguar->ConfigPotentiometerTurns(1);
+    m_jaguar->EnableControl();
 
     m_fakePotentiometer->SetVoltage(0.0f);
     Wait(kPotentiometerSettlingTime);
