@@ -110,7 +110,7 @@
 								</artifactItem>
 								<artifactItem>
 									<groupId>org.hamcrest</groupId>
-									<artifactId>hamcrest-core</artifactId>
+									<artifactId>hamcrest-all</artifactId>
 									<version>1.3</version>
 									<type>jar</type>
 								</artifactItem>
