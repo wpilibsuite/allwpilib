@@ -33,7 +33,6 @@ public:
 	static constexpr double kApproxBusVoltage = 12.0;
 
 	// Control mode tags
-	static const struct NoneStruct          {} None;
 	static const struct EncoderStruct       {} Encoder;
 	static const struct QuadEncoderStruct   {} QuadEncoder;
 	static const struct PotentiometerStruct {} Potentiometer;
