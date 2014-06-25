@@ -24,13 +24,8 @@ protected:
     DigitalOutput *m_fakeForwardLimit, *m_fakeReverseLimit;
     AnalogOutput *m_fakePotentiometer;
 
-    double m_initialPosition;
-
     virtual void SetUp() {
         m_jaguar = new CANJaguar(TestBench::kCANJaguarID);
-        m_jaguar->ChangeControlMode(CANJaguar::kPercentVbus);
-        m_jaguar->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
-        m_jaguar->ConfigEncoderCodesPerRev(360);
 
         m_fakeForwardLimit = new DigitalOutput(TestBench::kFakeJaguarForwardLimit);
         m_fakeForwardLimit->Set(0);
@@ -42,8 +37,7 @@ protected:
         m_fakePotentiometer->SetVoltage(0.0f);
 
         /* The motor might still have momentum from the previous test. */
-        Wait(kEncoderSettlingTime);
-        m_initialPosition = m_jaguar->GetPosition();
+        //Wait(kEncoderSettlingTime);
     }
 
     virtual void TearDown() {
@@ -54,17 +48,36 @@ protected:
     }
 };
 
+/*TEST_F(CANJaguarTest, QuickTest) {
+    m_jaguar->SetPercentMode(CANJaguar::Encoder, 360);
+
+    while(DriverStation::GetInstance()->IsEnabled()) {
+        std::cout << m_jaguar->GetPosition() << std::endl;
+        std::cout << m_jaguar->GetSpeed() << std::endl;
+        Wait(0.02);
+    }
+}*/
+
 /**
  * Test if we can drive the motor in percentage mode and get a position back
  */
 TEST_F(CANJaguarTest, PercentForwards) {
+    m_jaguar->SetPercentMode(CANJaguar::QuadEncoder, 360);
+    m_jaguar->EnableControl();
+    m_jaguar->Set(0.0f);
+
+    /* The motor might still have momentum from the previous test. */
+    Wait(kEncoderSettlingTime);
+
+    double initialPosition = m_jaguar->GetPosition();
+
     /* Drive the speed controller briefly to move the encoder */
     m_jaguar->Set(1.0f);
     Wait(kMotorTime);
     m_jaguar->Set(0.0f);
 
     /* The position should have increased */
-    EXPECT_GT(m_jaguar->GetPosition(), m_initialPosition)
+    EXPECT_GT(m_jaguar->GetPosition(), initialPosition)
         << "CAN Jaguar position should have increased after the motor moved";
 }
 
@@ -73,13 +86,22 @@ TEST_F(CANJaguarTest, PercentForwards) {
  * position back
  */
 TEST_F(CANJaguarTest, PercentReverse) {
+    m_jaguar->SetPercentMode(CANJaguar::QuadEncoder, 360);
+    m_jaguar->EnableControl();
+    m_jaguar->Set(0.0f);
+
+    /* The motor might still have momentum from the previous test. */
+    Wait(kEncoderSettlingTime);
+
+    double initialPosition = m_jaguar->GetPosition();
+
     /* Drive the speed controller briefly to move the encoder */
     m_jaguar->Set(-1.0f);
     Wait(kMotorTime);
     m_jaguar->Set(0.0f);
 
     /* The position should have decreased */
-    EXPECT_LT(m_jaguar->GetPosition(), m_initialPosition)
+    EXPECT_LT(m_jaguar->GetPosition(), initialPosition)
         << "CAN Jaguar position should have decreased after the motor moved";
 }
 
@@ -88,15 +110,14 @@ TEST_F(CANJaguarTest, PercentReverse) {
  * the Jaguar.
  */
 TEST_F(CANJaguarTest, EncoderPositionPID) {
-    m_jaguar->ChangeControlMode(CANJaguar::kPosition);
-    m_jaguar->SetPID(5.0f, 0.1f, 2.0f);
+    m_jaguar->SetPositionMode(CANJaguar::QuadEncoder, 360, 5.0f, 0.1f, 2.0f);
     m_jaguar->EnableControl();
 
-    double setpoint = m_initialPosition + 10.0f;
+    double setpoint = m_jaguar->GetPosition() + 10.0f;
 
-    /* It should get to the setpoint within 5 seconds */
+    /* It should get to the setpoint within 10 seconds */
     m_jaguar->Set(setpoint);
-    Wait(5.0f);
+    Wait(10.0f);
 
     EXPECT_NEAR(setpoint, m_jaguar->GetPosition(), kEncoderPositionTolerance)
         << "CAN Jaguar should have reached setpoint with PID control";
@@ -107,8 +128,7 @@ TEST_F(CANJaguarTest, EncoderPositionPID) {
  * as a fake potentiometer.
  */
 TEST_F(CANJaguarTest, FakePotentiometerPosition) {
-    m_jaguar->SetPositionReference(CANJaguar::kPosRef_Potentiometer);
-    m_jaguar->ConfigPotentiometerTurns(1);
+    m_jaguar->SetPercentMode(CANJaguar::Potentiometer);
     m_jaguar->EnableControl();
 
     m_fakePotentiometer->SetVoltage(0.0f);
@@ -137,9 +157,20 @@ TEST_F(CANJaguarTest, FakePotentiometerPosition) {
  * limit switch.
  */
 TEST_F(CANJaguarTest, FakeLimitSwitchForwards) {
+    m_jaguar->SetPercentMode(CANJaguar::QuadEncoder, 360);
     m_jaguar->ConfigLimitMode(CANJaguar::kLimitMode_SwitchInputsOnly);
     m_fakeForwardLimit->Set(1);
     m_fakeReverseLimit->Set(0);
+    m_jaguar->EnableControl();
+
+    m_jaguar->Set(0.0f);
+    Wait(kEncoderSettlingTime);
+
+    /* Make sure we limits are recognized by the Jaguar. */
+    ASSERT_FALSE(m_jaguar->GetForwardLimitOK());
+    ASSERT_TRUE(m_jaguar->GetReverseLimitOK());
+
+    double initialPosition = m_jaguar->GetPosition();
 
     /* Drive the speed controller briefly to move the encoder.  If the limit
          switch is recognized, it shouldn't actually move. */
@@ -148,10 +179,8 @@ TEST_F(CANJaguarTest, FakeLimitSwitchForwards) {
     m_jaguar->Set(0.0f);
 
     /* The position should be the same, since the limit switch was on. */
-    EXPECT_NEAR(m_initialPosition, m_jaguar->GetPosition(), kEncoderPositionTolerance)
+    EXPECT_NEAR(initialPosition, m_jaguar->GetPosition(), kEncoderPositionTolerance)
         << "CAN Jaguar should not have moved with the limit switch pressed";
-
-    Wait(kEncoderSettlingTime);
 
     /* Drive the speed controller in the other direction.  It should actually
          move, since only the forward switch is activated.*/
@@ -160,7 +189,7 @@ TEST_F(CANJaguarTest, FakeLimitSwitchForwards) {
     m_jaguar->Set(0.0f);
 
     /* The position should have decreased */
-    EXPECT_LT(m_jaguar->GetPosition(), m_initialPosition)
+    EXPECT_LT(m_jaguar->GetPosition(), initialPosition)
         << "CAN Jaguar should have moved in reverse while the forward limit was on";
 }
 
@@ -169,9 +198,20 @@ TEST_F(CANJaguarTest, FakeLimitSwitchForwards) {
  * switch.
  */
 TEST_F(CANJaguarTest, FakeLimitSwitchReverse) {
+    m_jaguar->SetPercentMode(CANJaguar::QuadEncoder, 360);
     m_jaguar->ConfigLimitMode(CANJaguar::kLimitMode_SwitchInputsOnly);
     m_fakeForwardLimit->Set(0);
     m_fakeReverseLimit->Set(1);
+    m_jaguar->EnableControl();
+
+    m_jaguar->Set(0.0f);
+    Wait(kEncoderSettlingTime);
+
+    /* Make sure we limits are recognized by the Jaguar. */
+    ASSERT_TRUE(m_jaguar->GetForwardLimitOK());
+    ASSERT_FALSE(m_jaguar->GetReverseLimitOK());
+
+    double initialPosition = m_jaguar->GetPosition();
 
     /* Drive the speed controller backwards briefly to move the encoder.  If
          the limit switch is recognized, it shouldn't actually move. */
@@ -180,7 +220,7 @@ TEST_F(CANJaguarTest, FakeLimitSwitchReverse) {
     m_jaguar->Set(0.0f);
 
     /* The position should be the same, since the limit switch was on. */
-    EXPECT_NEAR(m_initialPosition, m_jaguar->GetPosition(), kEncoderPositionTolerance)
+    EXPECT_NEAR(initialPosition, m_jaguar->GetPosition(), kEncoderPositionTolerance)
         << "CAN Jaguar should not have moved with the limit switch pressed";
 
     Wait(kEncoderSettlingTime);
@@ -192,6 +232,6 @@ TEST_F(CANJaguarTest, FakeLimitSwitchReverse) {
     m_jaguar->Set(0.0f);
 
     /* The position should have increased */
-    EXPECT_GT(m_jaguar->GetPosition(), m_initialPosition)
+    EXPECT_GT(m_jaguar->GetPosition(), initialPosition)
         << "CAN Jaguar should have moved forwards while the reverse limit was on";
 }
