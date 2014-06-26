@@ -49,7 +49,7 @@ public class TiltPanCameraFixture implements ITestFixture {
 		Timer.delay(RESET_TIME);
 		gyro.reset();
 		double startTime = Timer.getFPGATimestamp();
-		while(Math.abs(gyro.getAngle()) > 0.1){
+		for(int i = 0; i < 100 && Math.abs(gyro.getAngle()) > 0.1; i++){
 			Timer.delay(.0001);
 		}
 		double endTime = Timer.getFPGATimestamp();
