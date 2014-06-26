@@ -12,24 +12,26 @@ import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * @author jonathanleitschuh
- *
+ * Holds all of the tests in the roor wpilibj directory
+ * Please list alphabetically so that it is easy to determine if a test is missing from the list
  */
 @RunWith(Suite.class)
 @SuiteClasses({
 				AnalogCrossConnectTest.class,
 				AnalogPotentiometerTest.class,
+				CANJaguarTest.class,
 				CounterTest.class,
 				DIOCrossConnectTest.class,
 				EncoderTest.class,
 				MotorEncoderTest.class,
-				PIDTest.class,
 				PCMTest.class,
+				PIDTest.class,
+				PDPTest.class,
 				PrefrencesTest.class,
 				RelayCrossConnectTest.class,
 				SampleTest.class,
 				TiltPanCameraTest.class,
-				TimerTest.class,
-				PDPTest.class
+				TimerTest.class
 				})
 public class WpiLibJTestSuite {
 

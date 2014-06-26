@@ -26,10 +26,12 @@ import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.can.CANMessageNotFoundException;
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
+import edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture;
 import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.fixtures.RelayCrossConnectFxiture;
 import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
+import edu.wpi.first.wpilibj.mockhardware.FakePotentiometerSource;
 
 /**
  * This class provides access to all of the elements on the test bench, for use
@@ -47,11 +49,22 @@ public final class TestBench {
 	 * completely stopped
 	 */
 	public static final double MOTOR_STOP_TIME = 0.20;
+	
+	public static final int kTalonChannel = 10;
+	public static final int kVictorChannel = 1;
+	public static final int kJaguarChannel = 2;
+	
 
 	/* PowerDistributionPanel channels */
 	public static final int kJaguarPDPChannel = 7;
 	public static final int kVictorPDPChannel = 11;
 	public static final int kTalonPDPChannel = 12;
+	
+	/* CAN ASSOICATED CHANNELS */
+	public static final int kFakeJaguarPotentiometer = 1;
+	public static final int kFakeJaguarForwardLimit = 16;
+	public static final int kFakeJaguarReverseLimit = 17;
+	public static final int kCANJaguarID = 2;
 
 	//THESE MUST BE IN INCREMENTING ORDER
 	public static final int DIOCrossConnectB2 = 9;
@@ -62,14 +75,11 @@ public final class TestBench {
 	/** The Singleton instance of the Test Bench */
 	private static TestBench instance = null;
 
-	private CANJaguar canJag = null; // This is declared externally because it
-										// does not have a free method
-
 	/**
 	 * The single constructor for the TestBench. This method is private in order
 	 * to prevent multiple TestBench objects from being allocated
 	 */
-	private TestBench() {
+	protected TestBench() {
 	}
 
 	/**
@@ -78,12 +88,12 @@ public final class TestBench {
 	 *
 	 * @return a freshly allocated Talon, Encoder pair
 	 */
-	public MotorEncoderFixture getTalonPair() {
+	public MotorEncoderFixture<Talon> getTalonPair() {
 
-		MotorEncoderFixture talonPair = new MotorEncoderFixture(){
+		MotorEncoderFixture<Talon> talonPair = new MotorEncoderFixture<Talon>(){
 			@Override
-			protected SpeedController giveSpeedController() {
-				return new Talon(10);
+			protected Talon giveSpeedController() {
+				return new Talon(kTalonChannel);
 			}
 			@Override
 			protected DigitalInput giveDigitalInputA() {
@@ -103,12 +113,12 @@ public final class TestBench {
 	 *
 	 * @return a freshly allocated Victor, Encoder pair
 	 */
-	public MotorEncoderFixture getVictorPair() {
+	public MotorEncoderFixture<Victor> getVictorPair() {
 
-		MotorEncoderFixture vicPair = new MotorEncoderFixture(){
+		MotorEncoderFixture<Victor> vicPair = new MotorEncoderFixture<Victor>(){
 			@Override
-			protected SpeedController giveSpeedController() {
-				return new Victor(1);
+			protected Victor giveSpeedController() {
+				return new Victor(kVictorChannel);
 			}
 
 			@Override
@@ -130,11 +140,11 @@ public final class TestBench {
 	 *
 	 * @return a freshly allocated Jaguar, Encoder pair
 	 */
-	public MotorEncoderFixture getJaguarPair() {
-		MotorEncoderFixture jagPair = new MotorEncoderFixture(){
+	public MotorEncoderFixture<Jaguar> getJaguarPair() {
+		MotorEncoderFixture<Jaguar> jagPair = new MotorEncoderFixture<Jaguar>(){
 			@Override
-			protected SpeedController giveSpeedController() {
-				return new Jaguar(2);
+			protected Jaguar giveSpeedController() {
+				return new Jaguar(kJaguarChannel);
 			}
 
 			@Override
@@ -149,6 +159,33 @@ public final class TestBench {
 		};
 		return jagPair;
 	}
+	
+	public class BaseCANMotorEncoderFixture extends CANMotorEncoderFixture{
+		@Override
+		protected CANJaguar giveSpeedController() {
+			return new CANJaguar(kCANJaguarID);
+		}
+		@Override
+		protected DigitalInput giveDigitalInputA() {
+			return new DigitalInput(18);
+		}
+		@Override
+		protected DigitalInput giveDigitalInputB() {
+			return new DigitalInput(19);
+		}
+		@Override
+		protected FakePotentiometerSource giveFakePotentiometerSource() {
+			return new FakePotentiometerSource(kFakeJaguarPotentiometer, 360);
+		}
+		@Override
+		protected DigitalOutput giveFakeForwardLimit() {
+			return new DigitalOutput(kFakeJaguarForwardLimit);
+		}
+		@Override
+		protected DigitalOutput giveFakeReverseLimit() {
+			return new DigitalOutput(kFakeJaguarReverseLimit);
+		}
+	}
 
 	/**
 	 * Constructs a new set of objects representing a connected set of CANJaguar
@@ -158,31 +195,8 @@ public final class TestBench {
 	 *
 	 * @return an existing CANJaguar and a freshly allocated Encoder
 	 */
-	public MotorEncoderFixture getCanJaguarPair() {
-		MotorEncoderFixture canPair;
-		if (canJag == null) { // Again this is because the CanJaguar does not
-								// have a free method
-			try {
-				canJag = new CANJaguar(1);
-			} catch (CANMessageNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-		canPair = new MotorEncoderFixture(){
-			@Override
-			protected SpeedController giveSpeedController() {
-				return canJag;
-			}
-			@Override
-			protected DigitalInput giveDigitalInputA() {
-				return new DigitalInput(6);
-			}
-			@Override
-			protected DigitalInput giveDigitalInputB() {
-				return new DigitalInput(7);
-			}
-		};
-		assert canPair != null;
+	public CANMotorEncoderFixture getCanJaguarPair() {
+		CANMotorEncoderFixture canPair = new BaseCANMotorEncoderFixture();
 		return canPair;
 	}
 

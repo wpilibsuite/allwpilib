@@ -14,12 +14,19 @@ import edu.wpi.first.wpilibj.AnalogOutput;
  */
 public class FakePotentiometerSource {
 	private AnalogOutput output;
+	private boolean m_init_output;
 	private double potMaxAngle;
 	private final double defaultPotMaxAngle;
 	public FakePotentiometerSource(AnalogOutput output, double defaultPotMaxAngle){
 		this.defaultPotMaxAngle = defaultPotMaxAngle;
 		potMaxAngle = defaultPotMaxAngle;
 		this.output = output;
+		m_init_output = false;
+	}
+	
+	public FakePotentiometerSource(int port, double defaultPotMaxAngle){
+		this(new AnalogOutput(port), defaultPotMaxAngle);
+		m_init_output = true;
 	}
 	
 	public void setRange(double range){
@@ -33,5 +40,20 @@ public class FakePotentiometerSource {
 	
 	public void setAngle(double angle){
 		output.setVoltage((5.0/potMaxAngle)*angle);
+	}
+	
+	public void setVoltage(double voltage){
+		output.setVoltage(voltage);
+	}
+	
+	public double getVoltage(){
+		return output.getVoltage();
+	}
+	
+	public void free(){
+		if(m_init_output){
+			output.free();
+			m_init_output = false;
+		}
 	}
 }
