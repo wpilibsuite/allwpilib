@@ -23,39 +23,26 @@ constexpr float Gyro::kDefaultVoltsPerDegreePerSecond;
  * in progress, this is typically done when the robot is first turned on while it's sitting at
  * rest before the competition starts.
  */
-void Gyro::InitGyro(int slot, int channel)
+void Gyro::InitGyro(int channel)
 {
 	m_table = NULL;
 	SetPIDSourceParameter(kAngle);
 
-    char buffer[50];
-    int n = sprintf(buffer, "analog/%d/%d", slot, channel);
-    impl = new SimGyro(buffer);
+	char buffer[50];
+	int n = sprintf(buffer, "analog/1/%d", channel);
+	impl = new SimGyro(buffer);
     
-	LiveWindow::GetInstance()->AddSensor("Gyro", slot, channel, this);
+	LiveWindow::GetInstance()->AddSensor("Gyro", channel, this);
 }
 
 /**
- * Gyro constructor given a slot and a channel.
- * 
- * @param moduleNumber The analog module the gyro is connected to (1).
- * @param channel The analog channel the gyro is connected to (1 or 2).
- */
-Gyro::Gyro(uint8_t moduleNumber, uint32_t channel)
-{
-	InitGyro(moduleNumber, channel);
-}
-
-/**
- * Gyro constructor with only a channel.
- * 
- * Use the default analog module slot.
- * 
+ * Gyro constructor with only a channel..
+ *
  * @param channel The analog channel the gyro is connected to.
  */
 Gyro::Gyro(uint32_t channel)
 {
-    InitGyro(1, channel);
+    InitGyro(channel);
 }
 
 /**
@@ -73,7 +60,6 @@ void Gyro::Reset()
  */
 Gyro::~Gyro()
 {
-
 }
 
 /**
@@ -95,9 +81,9 @@ float Gyro::GetAngle( void )
 
 /**
  * Return the rate of rotation of the gyro
- * 
+ *
  * The rate is based on the most recent reading of the gyro analog value
- * 
+ *
  * @return the current rate in degrees per second
  */
 double Gyro::GetRate( void )
@@ -114,7 +100,7 @@ void Gyro::SetPIDSourceParameter(PIDSourceParameter pidSource)
 
 /**
  * Get the angle in degrees for the PIDSource base object.
- * 
+ *
  * @return The angle in degrees.
  */
 double Gyro::PIDGet()
@@ -136,11 +122,11 @@ void Gyro::UpdateTable() {
 }
 
 void Gyro::StartLiveWindowMode() {
-	
+
 }
 
 void Gyro::StopLiveWindowMode() {
-	
+
 }
 
 std::string Gyro::GetSmartDashboardType() {
@@ -155,4 +141,3 @@ void Gyro::InitTable(ITable *subTable) {
 ITable * Gyro::GetTable() {
 	return m_table;
 }
-

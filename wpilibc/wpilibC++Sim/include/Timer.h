@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef TIMER_H_
-#define TIMER_H_
+#pragma once
 
 #include "HAL/Semaphore.hpp"
 #include "Base.h"
@@ -15,7 +13,6 @@ typedef void (*TimerInterruptHandler)(void *param);
 void Wait(double seconds);
 double GetClock();
 double GetTime();
-
 
 /**
  * Timer objects measure accumulated time in seconds.
@@ -45,5 +42,3 @@ private:
 	MUTEX_ID m_semaphore;
 	DISALLOW_COPY_AND_ASSIGN(Timer);
 };
-
-#endif

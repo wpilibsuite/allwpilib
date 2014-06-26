@@ -9,16 +9,16 @@
 
 /**
  * Create an instance of a DigitalInput.
- * Creates a digital input given a slot and channel. Common creation routine
- * for all constructors.
+ * Creates a digital input given a channel. Common creation routine for all
+ * constructors.
  */
-void DigitalInput::InitDigitalInput(uint8_t moduleNumber, uint32_t channel)
+void DigitalInput::InitDigitalInput(uint32_t channel)
 {
 	m_table = NULL;
+	char buf[64];
 	m_channel = channel;
-    char buffer[50];
-    int n = sprintf(buffer, "dio/%d/%d", moduleNumber, channel);
-    m_impl = new SimDigitalInput(buffer);
+	int n = sprintf(buf, "dio/1/%d", channel);
+	m_impl = new SimDigitalInput(buf);
 }
 
 /**
@@ -29,19 +29,7 @@ void DigitalInput::InitDigitalInput(uint8_t moduleNumber, uint32_t channel)
  */
 DigitalInput::DigitalInput(uint32_t channel)
 {
-	InitDigitalInput(1, channel);
-}
-
-/**
- * Create an instance of a Digital Input class.
- * Creates a digital input given an channel and module.
- *
- * @param moduleNumber The digital module (1 or 2).
- * @param channel The digital channel (1..14).
- */
-DigitalInput::DigitalInput(uint8_t moduleNumber, uint32_t channel)
-{
-	InitDigitalInput(moduleNumber, channel);
+	InitDigitalInput(channel);
 }
 
 /**
@@ -75,11 +63,11 @@ void DigitalInput::UpdateTable() {
 }
 
 void DigitalInput::StartLiveWindowMode() {
-	
+
 }
 
 void DigitalInput::StopLiveWindowMode() {
-	
+
 }
 
 std::string DigitalInput::GetSmartDashboardType() {

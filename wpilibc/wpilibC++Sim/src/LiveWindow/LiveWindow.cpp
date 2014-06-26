@@ -102,10 +102,10 @@ void LiveWindow::AddActuator(const char *subsystem, const char *name,
 /**
  * INTERNAL
  */
-void LiveWindow::AddSensor(std::string type, int module, int channel, LiveWindowSendable *component)
+void LiveWindow::AddSensor(std::string type, int channel, LiveWindowSendable *component)
 {
 	std::ostringstream oss;
-	oss << type << "[" << module << "," << channel << "]";
+	oss << type << "[" << channel << "]";
 	std::string types(oss.str());
 	char* cc = new char[types.size() + 1];
 	types.copy(cc, types.size());
@@ -118,15 +118,29 @@ void LiveWindow::AddSensor(std::string type, int module, int channel, LiveWindow
 /**
  * INTERNAL
  */
-void LiveWindow::AddActuator(std::string type, int module, int channel, LiveWindowSendable *component)
+void LiveWindow::AddActuator(std::string type, int channel, LiveWindowSendable *component)
 {
 	std::ostringstream oss;
-	oss << type << "[" << module << "," << channel << "]";
+	oss << type << "[" << channel << "]";
 	std::string types(oss.str());
 	char* cc = new char[types.size() + 1];
 	types.copy(cc, types.size());
 	cc[types.size()]='\0';
 	AddActuator("Ungrouped", cc, component);
+}
+
+/**
+ * INTERNAL
+ */
+void LiveWindow::AddActuator(std::string type, int module, int channel, LiveWindowSendable *component)
+{
+    std::ostringstream oss;
+    oss << type << "[" << module << "," << channel << "]";
+    std::string types(oss.str());
+    char* cc = new char[types.size() + 1];
+    types.copy(cc, types.size());
+    cc[types.size()]='\0';
+    AddActuator("Ungrouped", cc, component);
 }
 
 /**
@@ -184,4 +198,3 @@ void LiveWindow::InitializeLiveWindowComponents()
 		}
 	}
 }
-

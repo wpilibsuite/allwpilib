@@ -12,7 +12,7 @@
 class Pneumatics: public Subsystem
 {
 private:
-	AnalogChannel* pressureSensor;
+	AnalogInput* pressureSensor;
 	#ifdef REAL
 		Compressor* compressor;
 	#endif

@@ -162,6 +162,5 @@ uint32_t GetFPGATime()
 {
     boost::posix_time::ptime time = boost::posix_time::microsec_clock::universal_time();
 	return time.time_of_day().total_microseconds();
-    // return 0;
 }
 

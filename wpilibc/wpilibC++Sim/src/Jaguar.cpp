@@ -11,7 +11,7 @@
 /**
  * Common initialization code called by all constructors.
  */
-void Jaguar::InitJaguar(int slot, int channel)
+void Jaguar::InitJaguar(int channel)
 {
 	/*
 	 * Input profile defined by Luminary Micro.
@@ -22,32 +22,19 @@ void Jaguar::InitJaguar(int slot, int channel)
 	 * Proportional forward ranges from 1.5517922ms to 2.3027789ms
 	 * Full forward ranges from 2.3027789ms to 2.328675ms
 	 */
-    char buffer[50];
-    int n = sprintf(buffer, "pwm/%d/%d", slot, channel);
-    impl = new SimContinuousOutput(buffer);
+	char buffer[50];
+	int n = sprintf(buffer, "pwm/1/%d", channel);
+	impl = new SimContinuousOutput(buffer);
 
-	// TODO: LiveWindow::GetInstance()->AddActuator("Jaguar", GetModuleNumber(), GetChannel(), this);
+	// TODO: LiveWindow::GetInstance()->AddActuator("Jaguar", GetChannel(), this);
 }
 
 /**
- * Constructor that assumes the default digital module.
- * 
- * @param channel The PWM channel on the digital module that the Jaguar is attached to.
+ * @param channel The PWM channel that the Jaguar is attached to.
  */
 Jaguar::Jaguar(uint32_t channel)
 {
-    InitJaguar(1, channel);
-}
-
-/**
- * Constructor that specifies the digital module.
- * 
- * @param moduleNumber The digital module (1 or 2).
- * @param channel The PWM channel on the digital module that the Jaguar is attached to.
- */
-Jaguar::Jaguar(uint8_t moduleNumber, uint32_t channel)
-{
-    InitJaguar(moduleNumber, channel);
+    InitJaguar(channel);
 }
 
 Jaguar::~Jaguar()
@@ -55,11 +42,11 @@ Jaguar::~Jaguar()
 }
 
 /**
- * Set the PWM value.  
- * 
+ * Set the PWM value.
+ *
  * The PWM value is set using a range of -1.0 to 1.0, appropriately
  * scaling the value for the FPGA.
- * 
+ *
  * @param speed The speed value between -1.0 and 1.0 to set.
  * @param syncGroup Unused interface.
  */
@@ -70,7 +57,7 @@ void Jaguar::Set(float speed, uint8_t syncGroup)
 
 /**
  * Get the recently set value of the PWM.
- * 
+ *
  * @return The most recently set value for the PWM between -1.0 and 1.0.
  */
 float Jaguar::Get()
@@ -88,7 +75,7 @@ void Jaguar::Disable()
 
 /**
  * Write out the PID value as seen in the PIDOutput base object.
- * 
+ *
  * @param output Write out the PWM value as was found in the PIDController
  */
 void Jaguar::PIDWrite(float output)

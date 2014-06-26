@@ -29,7 +29,7 @@ DriveTrain::DriveTrain() : Subsystem("DriveTrain") {
 	left_encoder->Start();
 	right_encoder->Start();
 
-	rangefinder = new AnalogChannel(6);
+	rangefinder = new AnalogInput(6);
 	gyro = new Gyro(1);
 
 	// Let's show everything on the LiveWindow

@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef PID_SOURCE_H
-#define PID_SOURCE_H
+#pragma once
 
 /**
  * PIDSource interface is a generic sensor source for the PID class.
@@ -15,8 +13,6 @@
 class PIDSource
 {	
 public:
-	typedef enum {kDistance, kRate, kAngle} PIDSourceParameter;
+	enum PIDSourceParameter {kDistance, kRate, kAngle};
 	virtual double PIDGet() = 0;
 };
-
-#endif

@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef CPPCOUNTER_H_
-#define CPPCOUNTER_H_
+#pragma once
 
 #include "CounterBase.h"
 #include "SensorBase.h"
@@ -20,25 +18,27 @@
 class Counter : public SensorBase, public CounterBase, public LiveWindowSendable
 {
 public:
-	/* typedef enum {kTwoPulse=0, kSemiperiod=1, kPulseLength=2, kExternalDirection=3} Mode; */
 
 	Counter();
 	explicit Counter(uint32_t channel);
-	Counter(uint8_t moduleNumber, uint32_t channel);
-    // TODO: [Not Supported] explicit Counter(DigitalSource *source);
+	// TODO: [Not Supported] explicit Counter(DigitalSource *source);
 	// TODO: [Not Supported] explicit Counter(DigitalSource &source);
+	// TODO: [Not Supported] explicit Counter(AnalogTrigger *source);
+	// TODO: [Not Supported] explicit Counter(AnalogTrigger &source);
 	// TODO: [Not Supported] Counter(EncodingType encodingType, DigitalSource *upSource, DigitalSource *downSource, bool inverted);
 	virtual ~Counter();
 
 	void SetUpSource(uint32_t channel);
-	void SetUpSource(uint8_t moduleNumber, uint32_t channel);
+	// TODO: [Not Supported] void SetUpSource(AnalogTrigger *analogTrigger, AnalogTriggerType triggerType);
+	// TODO: [Not Supported] void SetUpSource(AnalogTrigger &analogTrigger, AnalogTriggerType triggerType);
 	// TODO: [Not Supported] void SetUpSource(DigitalSource *source);
 	// TODO: [Not Supported] void SetUpSource(DigitalSource &source);
 	void SetUpSourceEdge(bool risingEdge, bool fallingEdge);
 	void ClearUpSource();
 
 	void SetDownSource(uint32_t channel);
-	void SetDownSource(uint8_t moduleNumber, uint32_t channel);
+	// TODO: [Not Supported] void SetDownSource(AnalogTrigger *analogTrigger, AnalogTriggerType triggerType);
+	// TODO: [Not Supported] void SetDownSource(AnalogTrigger &analogTrigger, AnalogTriggerType triggerType);
 	// TODO: [Not Supported] void SetDownSource(DigitalSource *source);
 	// TODO: [Not Supported] void SetDownSource(DigitalSource &source);
 	void SetDownSourceEdge(bool risingEdge, bool fallingEdge);
@@ -63,9 +63,11 @@ public:
 	bool GetDirection();
 	void SetSamplesToAverage(int samplesToAverage);
 	int GetSamplesToAverage();
-	uint32_t GetIndex() {return m_index;}
-	
-	
+	uint32_t GetIndex()
+	{
+		return m_index;
+	}
+
 	void UpdateTable();
 	void StartLiveWindowMode();
 	void StopLiveWindowMode();
@@ -82,8 +84,6 @@ private:
 	bool m_allocatedUpSource;		///< Was the upSource allocated locally?
 	bool m_allocatedDownSource;	///< Was the downSource allocated locally?
 	uint32_t m_index;					///< The index of this counter.
-	
+
 	ITable *m_table;
 };
-
-#endif

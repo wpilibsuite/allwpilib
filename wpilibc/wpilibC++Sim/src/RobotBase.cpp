@@ -30,8 +30,9 @@ RobotBase &RobotBase::getInstance()
  * This must be used to ensure that the communications code starts. In the future it would be
  * nice to put this code into it's own task that loads on boot so ensure that it runs.
  */
-RobotBase::RobotBase() {
-    m_ds = DriverStation::GetInstance();
+RobotBase::RobotBase()
+{
+	m_ds = DriverStation::GetInstance();
 }
 
 /**
@@ -39,7 +40,9 @@ RobotBase::RobotBase() {
  * This includes deleting all classes that might have been allocated as Singletons to they
  * would never be deleted except here.
  */
-RobotBase::~RobotBase() {}
+RobotBase::~RobotBase()
+{
+}
 
 /**
  * Determine if the Robot is currently enabled.
@@ -83,7 +86,7 @@ bool RobotBase::IsOperatorControl()
  */
 bool RobotBase::IsTest()
 {
-	return m_ds->IsTest();
+    return m_ds->IsTest();
 }
 
 /**

@@ -4,10 +4,10 @@ Collector::Collector() :
 		Subsystem("Collector")
 {
 	// Configure devices
-	rollerMotor = new Victor(1, 6);
-	ballDetector = new DigitalInput(1, 10);
-	openDetector = new DigitalInput(1, 6);
-	piston = new Solenoid(1, 1);
+	rollerMotor = new Victor(6);
+	ballDetector = new DigitalInput(10);
+	openDetector = new DigitalInput(6);
+	piston = new Solenoid(1);
 
 	// Put everything to the LiveWindow for testing.
 	// XXX: LiveWindow::GetInstance()->AddActuator("Collector", "Roller Motor", (Victor) rollerMotor);

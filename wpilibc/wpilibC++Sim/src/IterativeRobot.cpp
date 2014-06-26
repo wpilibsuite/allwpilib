@@ -10,7 +10,6 @@
 #include "SmartDashboard/SmartDashboard.h"
 #include "LiveWindow/LiveWindow.h"
 #include "networktables/NetworkTable.h"
-
 #include <unistd.h>
 
 constexpr double IterativeRobot::kDefaultPeriod;
@@ -118,7 +117,7 @@ void IterativeRobot::StartCompetition()
 			}
 			if (NextPeriodReady())
 			{
-                // TODO: HALNetworkCommunicationObserveUserProgramDisabled();
+				// TODO: HALNetworkCommunicationObserveUserProgramDisabled();
 				DisabledPeriodic();
 			}
 		}
@@ -184,7 +183,7 @@ void IterativeRobot::StartCompetition()
 			}
 		}
 		// wait for driver station data so the loop doesn't hog the CPU
-        m_ds->WaitForData();
+		m_ds->WaitForData();
 	}	
 }
 

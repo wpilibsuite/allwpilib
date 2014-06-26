@@ -22,7 +22,6 @@ TLogLevel dsLogLevel = logDEBUG;
     if (level > dsLogLevel) ; \
     else Log().Get(level)
 
-const uint32_t DriverStation::kBatteryModuleNumber;
 const uint32_t DriverStation::kBatteryChannel;
 const uint32_t DriverStation::kJoystickPorts;
 const uint32_t DriverStation::kJoystickAxes;
@@ -36,7 +35,7 @@ uint8_t DriverStation::m_updateNumber = 0;
  * This is only called once the first time GetInstance() is called
  */
 DriverStation::DriverStation()
-    : m_digitalOut (0)
+	: m_digitalOut (0)
 	, m_waitForDataSem(0)
 	, m_approxMatchTimeOffset(-1.0)
 	, m_userInDisabled(false)
@@ -46,25 +45,25 @@ DriverStation::DriverStation()
 {
 	// Create a new semaphore
 	m_waitForDataSem = initializeMultiWait();
-    m_stateSemaphore = initializeMutexRecursive();
-    m_joystickSemaphore = initializeMutexRecursive();
+	m_stateSemaphore = initializeMutexRecursive();
+	m_joystickSemaphore = initializeMutexRecursive();
 
-    state = msgs::DriverStationPtr(new msgs::DriverStation());
-    stateSub = MainNode::Subscribe("~/ds/state",
-                                   &DriverStation::stateCallback, this);
-    // TODO: for loop + boost bind
-    joysticks[0] = msgs::JoystickPtr(new msgs::Joystick());
-    joysticksSub[0] =  MainNode::Subscribe("~/ds/joysticks/1",
-                                           &DriverStation::joystickCallback1, this);
-    joysticks[1] = msgs::JoystickPtr(new msgs::Joystick());
-    joysticksSub[1] =  MainNode::Subscribe("~/ds/joysticks/2",
-                                           &DriverStation::joystickCallback2, this);
-    joysticks[2] = msgs::JoystickPtr(new msgs::Joystick());
-    joysticksSub[2] =  MainNode::Subscribe("~/ds/joysticks/3",
-                                           &DriverStation::joystickCallback3, this);
-    joysticks[3] = msgs::JoystickPtr(new msgs::Joystick());
-    joysticksSub[3] =  MainNode::Subscribe("~/ds/joysticks/4",
-                                           &DriverStation::joystickCallback4, this);
+	state = msgs::DriverStationPtr(new msgs::DriverStation());
+	stateSub = MainNode::Subscribe("~/ds/state",
+		                   &DriverStation::stateCallback, this);
+	// TODO: for loop + boost bind
+	joysticks[0] = msgs::JoystickPtr(new msgs::Joystick());
+	joysticksSub[0] =  MainNode::Subscribe("~/ds/joysticks/1",
+		                           &DriverStation::joystickCallback1, this);
+	joysticks[1] = msgs::JoystickPtr(new msgs::Joystick());
+	joysticksSub[1] =  MainNode::Subscribe("~/ds/joysticks/2",
+		                           &DriverStation::joystickCallback2, this);
+	joysticks[2] = msgs::JoystickPtr(new msgs::Joystick());
+	joysticksSub[2] =  MainNode::Subscribe("~/ds/joysticks/3",
+		                           &DriverStation::joystickCallback3, this);
+	joysticks[3] = msgs::JoystickPtr(new msgs::Joystick());
+	joysticksSub[3] =  MainNode::Subscribe("~/ds/joysticks/4",
+	                                   &DriverStation::joystickCallback4, this);
 
 	AddToSingletonList();
 }
@@ -73,6 +72,7 @@ DriverStation::~DriverStation()
 {
 	m_instance = NULL;
 	deleteMultiWait(m_waitForDataSem);
+	// TODO: Release m_stateSemaphore and m_joystickSemaphore?
 }
 
 /**
@@ -88,16 +88,16 @@ DriverStation* DriverStation::GetInstance()
 }
 
 /**
- * Read the battery voltage from the specified AnalogChannel.
- * 
+ * Read the battery voltage from the specified AnalogInput.
+ *
  * This accessor assumes that the battery voltage is being measured
  * through the voltage divider on an analog breakout.
- * 
+ *
  * @return The battery voltage.
  */
 float DriverStation::GetBatteryVoltage()
 {
-    return 12.0; // 12 volts all the time!
+	return 12.0; // 12 volts all the time!
 }
 
 /**
@@ -156,7 +156,7 @@ bool DriverStation::GetStickButton(uint32_t stick, uint32_t button)
 /**
  * The state of the buttons on the joystick.
  * 12 buttons (4 msb are unused) from the joystick.
- * 
+ *
  * @param stick The joystick to read.
  * @return The state of the buttons on the joystick.
  */
@@ -189,14 +189,14 @@ short DriverStation::GetStickButtons(uint32_t stick)
  * The analog values are returned as voltage values for the Driver Station analog inputs.
  * These inputs are typically used for advanced operator interfaces consisting of potentiometers
  * or resistor networks representing values on a rotary switch.
- * 
+ *
  * @param channel The analog input channel on the driver station to read from. Valid range is 1 - 4.
  * @return The analog voltage on the input.
  */
 float DriverStation::GetAnalogIn(uint32_t channel)
 {
-    wpi_setWPIErrorWithContext(UnsupportedInSimulation, "GetAnalogIn");
-    return 0.0;
+	wpi_setWPIErrorWithContext(UnsupportedInSimulation, "GetAnalogIn");
+	return 0.0;
 }
 
 /**
@@ -207,8 +207,8 @@ float DriverStation::GetAnalogIn(uint32_t channel)
  */
 bool DriverStation::GetDigitalIn(uint32_t channel)
 {
-    wpi_setWPIErrorWithContext(UnsupportedInSimulation, "GetDigitalIn");
-    return false;
+	wpi_setWPIErrorWithContext(UnsupportedInSimulation, "GetDigitalIn");
+	return false;
 }
 
 /**
@@ -220,7 +220,7 @@ bool DriverStation::GetDigitalIn(uint32_t channel)
  * @param channel The digital output to set. Valid range is 1 - 8.
  * @param value The state to set the digital output.
  */
-void DriverStation::SetDigitalOut(uint32_t channel, bool value) 
+void DriverStation::SetDigitalOut(uint32_t channel, bool value)
 {
     wpi_setWPIErrorWithContext(UnsupportedInSimulation, "SetDigitalOut");
 }
@@ -230,7 +230,7 @@ void DriverStation::SetDigitalOut(uint32_t channel, bool value)
  * @param channel The digital ouput to monitor. Valid range is 1 through 8.
  * @return A digital value being output on the Drivers Station.
  */
-bool DriverStation::GetDigitalOut(uint32_t channel) 
+bool DriverStation::GetDigitalOut(uint32_t channel)
 {
     wpi_setWPIErrorWithContext(UnsupportedInSimulation, "GetDigitalOut");
 }

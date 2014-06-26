@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef ROBOTDRIVE_H_
-#define ROBOTDRIVE_H_
+#pragma once
 
 #include "ErrorBase.h"
 #include <stdlib.h>
@@ -21,38 +19,42 @@ class GenericHID;
  * used for either the Drive function (intended for hand created drive code, such as autonomous)
  * or with the Tank/Arcade functions intended to be used for Operator Control driving.
  */
-class RobotDrive: public ErrorBase
+class RobotDrive : public ErrorBase
 {
 public:
-	typedef enum
+	enum MotorType
 	{
 		kFrontLeftMotor = 0,
 		kFrontRightMotor = 1,
 		kRearLeftMotor = 2,
 		kRearRightMotor = 3
-	} MotorType;
+	};
 
 	RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel);
 	RobotDrive(uint32_t frontLeftMotorChannel, uint32_t rearLeftMotorChannel,
-				uint32_t frontRightMotorChannel, uint32_t rearRightMotorChannel);
+			uint32_t frontRightMotorChannel, uint32_t rearRightMotorChannel);
 	RobotDrive(SpeedController *leftMotor, SpeedController *rightMotor);
 	RobotDrive(SpeedController &leftMotor, SpeedController &rightMotor);
 	RobotDrive(SpeedController *frontLeftMotor, SpeedController *rearLeftMotor,
-				SpeedController *frontRightMotor, SpeedController *rearRightMotor);
+			SpeedController *frontRightMotor, SpeedController *rearRightMotor);
 	RobotDrive(SpeedController &frontLeftMotor, SpeedController &rearLeftMotor,
-				SpeedController &frontRightMotor, SpeedController &rearRightMotor);
+			SpeedController &frontRightMotor, SpeedController &rearRightMotor);
 	virtual ~RobotDrive();
 
 	void Drive(float outputMagnitude, float curve);
 	void TankDrive(GenericHID *leftStick, GenericHID *rightStick, bool squaredInputs = true);
 	void TankDrive(GenericHID &leftStick, GenericHID &rightStick, bool squaredInputs = true);
-	void TankDrive(GenericHID *leftStick, uint32_t leftAxis, GenericHID *rightStick, uint32_t rightAxis, bool squaredInputs = true);
-	void TankDrive(GenericHID &leftStick, uint32_t leftAxis, GenericHID &rightStick, uint32_t rightAxis, bool squaredInputs = true);
+	void TankDrive(GenericHID *leftStick, uint32_t leftAxis, GenericHID *rightStick,
+			uint32_t rightAxis, bool squaredInputs = true);
+	void TankDrive(GenericHID &leftStick, uint32_t leftAxis, GenericHID &rightStick,
+			uint32_t rightAxis, bool squaredInputs = true);
 	void TankDrive(float leftValue, float rightValue, bool squaredInputs = true);
 	void ArcadeDrive(GenericHID *stick, bool squaredInputs = true);
 	void ArcadeDrive(GenericHID &stick, bool squaredInputs = true);
-	void ArcadeDrive(GenericHID *moveStick, uint32_t moveChannel, GenericHID *rotateStick, uint32_t rotateChannel, bool squaredInputs = true);
-	void ArcadeDrive(GenericHID &moveStick, uint32_t moveChannel, GenericHID &rotateStick, uint32_t rotateChannel, bool squaredInputs = true);
+	void ArcadeDrive(GenericHID *moveStick, uint32_t moveChannel, GenericHID *rotateStick,
+			uint32_t rotateChannel, bool squaredInputs = true);
+	void ArcadeDrive(GenericHID &moveStick, uint32_t moveChannel, GenericHID &rotateStick,
+			uint32_t rotateChannel, bool squaredInputs = true);
 	void ArcadeDrive(float moveValue, float rotateValue, bool squaredInputs = true);
 	void MecanumDrive_Cartesian(float x, float y, float rotation, float gyroAngle = 0.0);
 	void MecanumDrive_Polar(float magnitude, float direction, float rotation);
@@ -86,20 +88,21 @@ protected:
 	SpeedController *m_frontRightMotor;
 	SpeedController *m_rearLeftMotor;
 	SpeedController *m_rearRightMotor;
-    // FIXME: MotorSafetyHelper *m_safetyHelper;
-	
+	// FIXME: MotorSafetyHelper *m_safetyHelper;
+
 private:
 	int32_t GetNumMotors()
 	{
 		int motors = 0;
-		if (m_frontLeftMotor) motors++;
-		if (m_frontRightMotor) motors++;
-		if (m_rearLeftMotor) motors++;
-		if (m_rearRightMotor) motors++;
+		if (m_frontLeftMotor)
+			motors++;
+		if (m_frontRightMotor)
+			motors++;
+		if (m_rearLeftMotor)
+			motors++;
+		if (m_rearRightMotor)
+			motors++;
 		return motors;
 	}
 	DISALLOW_COPY_AND_ASSIGN(RobotDrive);
 };
-
-#endif
-

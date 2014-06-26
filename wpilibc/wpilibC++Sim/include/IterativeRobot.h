@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef ROBOT_ITERATIVE_H_
-#define ROBOT_ITERATIVE_H_
+#pragma once
 
 #include "Timer.h"
 #include "RobotBase.h"
@@ -38,27 +36,28 @@
  * 
  */
 
-class IterativeRobot : public RobotBase {
+class IterativeRobot : public RobotBase
+{
 public:
 	/*
 	 * The default period for the periodic function calls (seconds)
 	 * Setting the period to 0.0 will cause the periodic functions to follow
 	 * the Driver Station packet rate of about 50Hz.
 	 */
-	static const double kDefaultPeriod = 0.0;
+	static constexpr double kDefaultPeriod = 0.0;
 
 	virtual void StartCompetition();
 
 	virtual void RobotInit();
 	virtual void DisabledInit();
 	virtual void AutonomousInit();
-    virtual void TeleopInit();
-    virtual void TestInit();
+	virtual void TeleopInit();
+	virtual void TestInit();
 
 	virtual void DisabledPeriodic();
 	virtual void AutonomousPeriodic();
-    virtual void TeleopPeriodic();
-    virtual void TestPeriodic();
+	virtual void TeleopPeriodic();
+	virtual void TestPeriodic();
 
 	void SetPeriod(double period);
 	double GetPeriod();
@@ -73,11 +72,8 @@ private:
 
 	bool m_disabledInitialized;
 	bool m_autonomousInitialized;
-    bool m_teleopInitialized;
-    bool m_testInitialized;
+	bool m_teleopInitialized;
+	bool m_testInitialized;
 	double m_period;
-    Timer m_mainLoopTimer;
+	Timer m_mainLoopTimer;
 };
-
-#endif
-

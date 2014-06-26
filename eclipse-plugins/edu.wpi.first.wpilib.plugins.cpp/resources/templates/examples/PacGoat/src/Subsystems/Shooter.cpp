@@ -4,12 +4,12 @@ Shooter::Shooter() :
 		Subsystem("Shooter")
 {
 	// Configure Devices
-	hotGoalSensor = new DigitalInput(1, 3);
-	piston1 = new DoubleSolenoid(1, 3, 4);
-	piston2 = new DoubleSolenoid(1, 5, 6);
+	hotGoalSensor = new DigitalInput(3);
+	piston1 = new DoubleSolenoid(3, 4);
+	piston2 = new DoubleSolenoid(5, 6);
 	latchPiston = new Solenoid(1, 2);
-	piston1ReedSwitchFront = new DigitalInput(1, 9);
-	piston1ReedSwitchBack = new DigitalInput(1, 11);
+	piston1ReedSwitchFront = new DigitalInput(9);
+	piston1ReedSwitchBack = new DigitalInput(11);
 
 	// Put everything to the LiveWindow for testing.
 	LiveWindow::GetInstance()->AddSensor("Shooter", "Hot Goal Sensor", hotGoalSensor);

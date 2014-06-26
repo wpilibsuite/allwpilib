@@ -4,11 +4,12 @@
  *  Created on: May 29, 2014
  *      Author: alex
  */
-
-#ifndef WPILIB_H_
-#define WPILIB_H_
+#pragma once
 
 #define SIMULATION "gazebo"
+
+#include "string.h"
+#include <iostream>
 
 #include "Buttons/Trigger.h"
 #include "Buttons/Button.h"
@@ -41,7 +42,7 @@
 #include "Solenoid.h"
 #include "DoubleSolenoid.h"
 #include "interfaces/Potentiometer.h"
-#include "AnalogChannel.h"
+#include "AnalogInput.h"
 #include "AnalogPotentiometer.h"
 #include "Counter.h"
 #include "DigitalInput.h"
@@ -53,4 +54,3 @@
 #include "RobotDrive.h"
 #include "LiveWindow/LiveWindow.h"
 
-#endif /* WPILIB_H_ */

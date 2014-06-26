@@ -15,7 +15,7 @@ private:
 					*front_right_motor, *back_right_motor;
 	RobotDrive* drive;
 	Encoder *left_encoder, *right_encoder;
-	AnalogChannel* rangefinder;
+	AnalogInput* rangefinder;
 	Gyro* gyro;
 
 public:

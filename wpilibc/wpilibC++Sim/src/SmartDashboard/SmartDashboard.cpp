@@ -58,7 +58,7 @@ void SmartDashboard::PutData(NamedSendable *value)
  * @param keyName the key
  * @return the value
  */
-Sendable *SmartDashboard::GetData(std::string key)
+/*Sendable *SmartDashboard::GetData(std::string key)
 {
 	ITable* subtable = m_table->GetSubTable(key);
 	Sendable *data = m_tablesToData[subtable];
@@ -68,7 +68,7 @@ Sendable *SmartDashboard::GetData(std::string key)
 		return NULL;
 	}
     return data;
-}
+}*/
 
 /**
  * Maps the specified key to the specified complex value (such as an array) in this table.

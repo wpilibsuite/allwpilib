@@ -96,7 +96,7 @@ void ErrorBase::SetImaqError(int success, const char *contextMessage, const char
 {
 	//  If there was an error
 	if (success <= 0) {
-		char err[256];
+		//TODO: ??? char err[256];
 		// XXX: sprintf(err, "%s: %s", contextMessage, imaqGetErrorText(imaqGetLastError()));
 
 		//  Set the current error information for this object.

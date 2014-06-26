@@ -6,10 +6,10 @@
 DriveTrain::DriveTrain() :
 		Subsystem("DriveTrain") {
 	// Configure drive motors
-	frontLeftCIM = new Victor(1, 1);
-	frontRightCIM = new Victor(1, 2);
-	backLeftCIM = new Victor(1, 3);
-	backRightCIM = new Victor(1, 4);
+	frontLeftCIM = new Victor(1);
+	frontRightCIM = new Victor(2);
+	backLeftCIM = new Victor(3);
+	backRightCIM = new Victor(4);
 	// XXX: LiveWindow::GetInstance()->AddActuator("DriveTrain", "Front Left CIM", (Victor) frontLeftCIM);
 	// XXX: LiveWindow::GetInstance()->AddActuator("DriveTrain", "Front Right CIM", (Victor) frontRightCIM);
 	// XXX: LiveWindow::GetInstance()->AddActuator("DriveTrain", "Back Left CIM", (Victor) backLeftCIM);
@@ -28,8 +28,8 @@ DriveTrain::DriveTrain() :
 	drive->SetInvertedMotor(RobotDrive::kRearRightMotor, true);
 
 	// Configure encoders
-	rightEncoder = new Encoder(1, 1, 1, 2, true, Encoder::k4X);
-	leftEncoder = new Encoder(2, 5, 2, 6, false, Encoder::k4X);
+	rightEncoder = new Encoder(1, 2, true, Encoder::k4X);
+	leftEncoder = new Encoder(5, 6, false, Encoder::k4X); // TODO: Correct encoder module.
 	rightEncoder->SetPIDSourceParameter(PIDSource::kDistance);
 	leftEncoder->SetPIDSourceParameter(PIDSource::kDistance);
 
@@ -49,7 +49,7 @@ DriveTrain::DriveTrain() :
 	LiveWindow::GetInstance()->AddSensor("DriveTrain", "Left Encoder", leftEncoder);
 
 	// Configure gyro
-	gyro = new Gyro(1, 2);
+	gyro = new Gyro(2);
     #ifdef REAL
 		gyro->SetSensitivity(0.007); // TODO: Handle more gracefully?
     #endif

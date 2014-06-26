@@ -3,9 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
-#ifndef __WPI_ERRORS_H__
-#define __WPI_ERRORS_H__
+#pragma once
 
 #ifdef WPI_ERRORS_DEFINE_STRINGS
 #define S(label, offset, message) const char *wpi_error_s_##label = message ;
@@ -47,6 +45,7 @@ S(LineNotOutput, -27, "Cannot SetDigitalOutput for a line not configured for out
 S(ParameterOutOfRange, -28, "A parameter is out of range.");
 S(SPIClockRateTooLow, -29, "SPI clock rate was below the minimum supported");
 S(JaguarVersionError, -30, "Jaguar firmware version error");
+S(JaguarMessageNotFound, -31, "Jaguar message not found");
 S(NetworkTablesReadError, -40, "Error reading NetworkTables socket");
 S(NetworkTablesBufferFull, -41, "Buffer full writing to NetworkTables socket");
 S(NetworkTablesWrongType, -42, "The wrong type was read from the NetworkTables entry");
@@ -75,5 +74,3 @@ S(SPIReadNoData, 14, "No data available to read from SPI");
 S(IncompatibleState, 15, "Incompatible State: The operation cannot be completed");
 
 #undef S
-
-#endif // __WPI_ERRORS_H__
