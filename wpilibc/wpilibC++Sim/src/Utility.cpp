@@ -7,8 +7,8 @@
 #include "Utility.h"
 
 #include "HAL/cpp/StackTrace.hpp"
-#include <boost/date_time/posix_time/posix_time_types.hpp>
 #include "Task.h"
+#include "Timer.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -160,7 +160,6 @@ bool wpi_assertNotEqual_impl(int valueA,
  */
 uint32_t GetFPGATime()
 {
-    boost::posix_time::ptime time = boost::posix_time::microsec_clock::universal_time();
-	return time.time_of_day().total_microseconds();
+	return wpilib::internal::simTime * 1e6;
 }
 

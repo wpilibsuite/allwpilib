@@ -33,6 +33,8 @@ private:
 
   transport::SubscriberPtr sub;
   volatile bool enabled;
+  transport::PublisherPtr time_pub;
+  msgs::Float64 seconds_msg;
   void dsCallback(const msgs::ConstDriverStationPtr &msg);
 };
 

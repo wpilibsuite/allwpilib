@@ -7,7 +7,12 @@
 
 package edu.wpi.first.wpilibj;
 
+import org.gazebosim.transport.Msgs;
+import org.gazebosim.transport.SubscriberCallback;
+
 import edu.wpi.first.wpilibj.parsing.IUtility;
+import edu.wpi.first.wpilibj.simulation.MainNode;
+import gazebo.msgs.GzFloat64.Float64;
 
 /**
  * Timer objects measure accumulated time in milliseconds.
@@ -21,6 +26,19 @@ public class Timer implements IUtility {
     private long m_startTime;
     private double m_accumulatedTime;
     private boolean m_running;
+    private static double simTime;
+    private static Object time_notifier = new Object();
+    static {
+    	MainNode.subscribe("time", Msgs.Float64(),
+			new SubscriberCallback<Float64>() {
+				@Override
+				public void callback(Float64 msg) {
+					simTime = msg.getData();
+					synchronized(time_notifier) { time_notifier.notifyAll(); } // Ew, this is nested too deep... Refactor?
+				}
+			}
+		);
+    }
 
     /**
      * Pause the thread for a specified time. Pause the execution of the
@@ -32,10 +50,17 @@ public class Timer implements IUtility {
      * @param seconds Length of time to pause
      */
     public static void delay(final double seconds) {
-        try {
-            Thread.sleep((long) (seconds * 1e3));
-        } catch (final InterruptedException e) {
-        }
+    	final double start = simTime;
+    	
+    	while ((simTime - start) < seconds) {
+    		synchronized(time_notifier) {
+    			try {
+    				time_notifier.wait(); // Block until time progresses
+    			} catch (InterruptedException e) {
+    				e.printStackTrace();
+    			}
+    		}
+		}
     }
 
     /**
@@ -46,7 +71,7 @@ public class Timer implements IUtility {
      * @return Robot running time in microseconds.
      */
     public static long getUsClock() {
-        return System.nanoTime() / 1000;
+        return (long) (simTime * 1e6);
     }
 
     /**
@@ -57,7 +82,7 @@ public class Timer implements IUtility {
      * @return Robot running time in milliseconds.
      */
     static long getMsClock() {
-        return System.currentTimeMillis();
+        return (long) (simTime * 1e3);
     }
 
     /**
@@ -67,7 +92,7 @@ public class Timer implements IUtility {
      * @return Robot running time in seconds.
      */
     public static double getFPGATimestamp() {
-        return System.currentTimeMillis() / 1000.0;
+        return simTime;
     }
 
     /**

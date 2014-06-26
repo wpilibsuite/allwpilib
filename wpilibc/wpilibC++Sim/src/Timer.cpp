@@ -22,11 +22,13 @@
  */
 void Wait(double seconds)
 {
-	if (seconds < 0.0) return;
-    struct timespec test, remaining;
-    test.tv_sec = (int) seconds;
-    test.tv_nsec = (seconds - (int)seconds) * 1000000000.0;
-    nanosleep(&test, &remaining);
+    if (seconds < 0.0) return;
+
+    double start = wpilib::internal::simTime;
+    	
+    while ((wpilib::internal::simTime - start) < seconds) {
+        takeMultiWait(wpilib::internal::time_wait, 0);
+    }
 }
 
 /*
@@ -41,16 +43,11 @@ double GetClock()
 
 /**
  * @brief Gives real-time clock system time with nanosecond resolution
- * @return The time, just in case you want the robot to start autonomous at 8pm on Saturday.
+ * @return The time, just in case you want the robot to start autonomous at 8pm on Saturday (except in simulation).
 */
-double GetTime()  
+double GetTime()
 {
-	struct timespec tp;
-	
-	clock_gettime(CLOCK_REALTIME,&tp);
-	double realTime = (double)tp.tv_sec + (double)((double)tp.tv_nsec*1e-9);
-	
-	return (realTime);
+    return Timer::GetFPGATimestamp(); // The epoch starts when Gazebo starts
 }
 
 /**
@@ -181,7 +178,7 @@ double Timer::GetFPGATimestamp()
 {
 	// FPGA returns the timestamp in microseconds
 	// Call the helper GetFPGATime() in Utility.cpp
-	return GetFPGATime() * 1.0e-6;
+	return wpilib::internal::simTime;
 }
 
 // Internal function that reads the PPC timestamp counter.
@@ -190,3 +187,18 @@ extern "C"
 	uint32_t niTimestamp32(void);
 	uint64_t niTimestamp64(void);
 }
+
+// Internal stuff
+#include "simulation/SimFloatInput.h"
+#include "simulation/MainNode.h"
+namespace wpilib { namespace internal {
+    double simTime = 0;
+    MULTIWAIT_ID time_wait = initializeMultiWait();
+
+    void time_callback(const msgs::ConstFloat64Ptr &msg) {
+        simTime = msg->data();
+        giveMultiWait(time_wait);
+    }
+
+    transport::SubscriberPtr time_pub = MainNode::Subscribe("~/time", &time_callback);
+}}

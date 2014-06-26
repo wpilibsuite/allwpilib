@@ -96,8 +96,10 @@ public class DriverStation implements IInputOutput {
         MainNode.subscribe("ds/state", GzDriverStation.DriverStation.getDefaultInstance(),
     		new SubscriberCallback<GzDriverStation.DriverStation>() {
 				@Override public void callback(GzDriverStation.DriverStation msg) {
+					state = msg;
+					m_newControlData = true;
 					synchronized (m_dataSem) {
-						state = msg;
+						m_dataSem.notifyAll();
 					}
 				}
 			}

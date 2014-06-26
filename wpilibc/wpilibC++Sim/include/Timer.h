@@ -14,6 +14,12 @@ void Wait(double seconds);
 double GetClock();
 double GetTime();
 
+namespace wpilib { namespace internal {
+    extern double simTime;
+	extern MULTIWAIT_ID time_wait;
+    // transport::SubscriberPtr time_sub;
+}}
+
 /**
  * Timer objects measure accumulated time in seconds.
  * The timer object functions like a stopwatch. It can be started, stopped, and cleared. When the

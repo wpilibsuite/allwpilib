@@ -46,6 +46,7 @@ void FRCPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   }
   enabled = false;
   sub = gzNode->Subscribe("~/ds/state", &FRCPlugin::dsCallback, this);
+  time_pub = gzNode->Advertise<msgs::Float64>("~/time");
 
   // Connect to the world update event.
   // This will trigger the Update function every Gazebo iteration
@@ -54,6 +55,9 @@ void FRCPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
 
 // Update all RobotComponents
 void FRCPlugin::Update(const common::UpdateInfo &_info) {
+  seconds_msg.set_data(_info.simTime.Double());
+  time_pub->Publish(seconds_msg);
+  
   for (int i = 0; i < components.size(); i++) {
     components[i]->update(enabled);
   }
