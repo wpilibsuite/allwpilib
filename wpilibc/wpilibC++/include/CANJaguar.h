@@ -196,6 +196,16 @@ protected:
 	uint32_t m_firmwareVersion;
 	uint8_t m_hardwareVersion;
 
+	// Which status values have we received at least once?
+	bool m_receivedBusVoltage;
+	bool m_receivedOutputVoltage;
+	bool m_receivedOutputCurrent;
+	bool m_receivedTemperature;
+	bool m_receivedPosition;
+	bool m_receivedSpeed;
+	bool m_receivedLimits;
+	bool m_receivedFaults;
+
 	void verify();
 
 	MotorSafetyHelper *m_safetyHelper;

@@ -30,6 +30,8 @@ constexpr double CANJaguar::kApproxBusVoltage;
 static const int32_t kSendMessagePeriod = 20;
 static const uint32_t kFullMessageIDMask = (CAN_MSGID_API_M | CAN_MSGID_MFR_M | CAN_MSGID_DTYPE_M);
 
+static const int32_t kReceiveStatusAttempts = 5000;
+
 static int32_t sendMessageHelper(uint32_t messageID, const uint8_t *data, uint8_t dataSize, int32_t period)
 {
 	static const uint32_t kTrustedMessages[] = {
@@ -135,7 +137,41 @@ void CANJaguar::InitCANJaguar()
 	requestMessage(CAN_IS_FRAME_REMOTE | CAN_MSGID_API_FIRMVER);
 	requestMessage(LM_API_HWVER);
 
-	Wait(0.003);
+	m_receivedBusVoltage = false;
+	m_receivedOutputVoltage = false;
+	m_receivedOutputCurrent = false;
+	m_receivedTemperature = false;
+	m_receivedPosition = false;
+	m_receivedSpeed = false;
+	m_receivedLimits = false;
+	m_receivedFaults = false;
+
+	// Wait until we've gotten all of the status data at least once.
+	for(int i = 0; i < kReceiveStatusAttempts; i++)
+	{
+		Wait(0.001);
+
+		GetBusVoltage();
+		GetOutputVoltage();
+		GetOutputCurrent();
+		GetTemperature();
+		GetPosition();
+		GetSpeed();
+		GetForwardLimitOK();
+		GetFaults();
+
+		if(m_receivedBusVoltage &&
+			m_receivedOutputVoltage &&
+			m_receivedOutputCurrent &&
+			m_receivedTemperature &&
+			m_receivedPosition &&
+			m_receivedSpeed &&
+			m_receivedLimits &&
+			m_receivedFaults)
+		{
+			break;
+		}
+	}
 
 	if(getMessage(CAN_MSGID_API_FIRMVER, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
 		m_firmwareVersion = unpackint32_t(dataBuffer);
@@ -1431,6 +1467,7 @@ float CANJaguar::GetBusVoltage()
 	if(getMessage(LM_API_STATUS_VOLTBUS, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
 	{
 		m_busVoltage = unpackFXP8_8(dataBuffer);
+		m_receivedBusVoltage = true;
 	}
 
 	return m_busVoltage;
@@ -1449,6 +1486,7 @@ float CANJaguar::GetOutputVoltage()
 	if(getMessage(LM_API_STATUS_VOUT, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
 	{
 		m_outputVoltage = unpackFXP8_8(dataBuffer);
+		m_receivedOutputVoltage = true;
 	}
 
 	return m_outputVoltage;
@@ -1467,6 +1505,7 @@ float CANJaguar::GetOutputCurrent()
 	if(getMessage(LM_API_STATUS_CURRENT, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
 	{
 		m_outputCurrent = unpackFXP8_8(dataBuffer);
+		m_receivedOutputCurrent = true;
 	}
 
 	return m_outputCurrent;
@@ -1485,6 +1524,7 @@ float CANJaguar::GetTemperature()
 	if(getMessage(LM_API_STATUS_TEMP, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
 	{
 		m_temperature = unpackFXP8_8(dataBuffer);
+		m_receivedTemperature = true;
 	}
 
 	return m_temperature;
@@ -1503,6 +1543,7 @@ double CANJaguar::GetPosition()
 	if(getMessage(LM_API_STATUS_POS, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
 	{
 		m_position = unpackFXP16_16(dataBuffer);
+		m_receivedPosition = true;
 	}
 
 	return m_position;
@@ -1521,6 +1562,7 @@ double CANJaguar::GetSpeed()
 	if(getMessage(LM_API_STATUS_SPD, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
 	{
 		m_speed = unpackFXP16_16(dataBuffer);
+		m_receivedSpeed = true;
 	}
 
 	return m_speed;
@@ -1539,6 +1581,7 @@ bool CANJaguar::GetForwardLimitOK()
 	if(getMessage(LM_API_STATUS_LIMIT, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
 	{
 		m_limits = dataBuffer[0];
+		m_receivedLimits = true;
 	}
 
 	return m_limits & kForwardLimit;
@@ -1557,6 +1600,7 @@ bool CANJaguar::GetReverseLimitOK()
 	if(getMessage(LM_API_STATUS_LIMIT, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
 	{
 		m_limits = dataBuffer[0];
+		m_receivedLimits = true;
 	}
 
 	return m_limits & kReverseLimit;
@@ -1575,6 +1619,7 @@ uint16_t CANJaguar::GetFaults()
 	if(getMessage(LM_API_STATUS_FAULT, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
 	{
 		m_faults = unpackint16_t(dataBuffer);
+		m_receivedFaults = true;
 	}
 
 	return m_faults;

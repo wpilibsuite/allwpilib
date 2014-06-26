@@ -51,17 +51,6 @@ protected:
     }
 };
 
-/*TEST_F(CANJaguarTest, QuickTest) {
-    m_jaguar->SetSpeedMode(CANJaguar::Encoder, 360, 0.0, 0.0, 0.0);
-
-    while(DriverStation::GetInstance()->IsEnabled()) {
-        std::cout << m_jaguar->GetPosition() << std::endl;
-        std::cout << m_jaguar->GetSpeed() << std::endl;
-        std::cout << m_jaguar->GetTemperature() << std::endl;
-        Wait(0.02);
-    }
-}*/
-
 /**
  * Checks the default status data for reasonable values to confirm that we're
  * really getting status data from the Jaguar.
@@ -78,7 +67,7 @@ TEST_F(CANJaguarTest, InitialStatus) {
     EXPECT_FLOAT_EQ(m_jaguar->GetOutputCurrent(), 0.0)
         << "Output current is non-zero.";
 
-    EXPECT_NEAR(m_jaguar->GetTemperature(), kTempe, 5.0)
+    EXPECT_NEAR(m_jaguar->GetTemperature(), kExpectedTemperature, 5.0)
         << "Temperature is not a plausible value.";
 
     EXPECT_EQ(m_jaguar->GetFaults(), 0)
