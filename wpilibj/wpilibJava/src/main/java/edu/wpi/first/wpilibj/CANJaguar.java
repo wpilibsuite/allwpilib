@@ -140,7 +140,32 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 		requestMessage(CANJNI.CAN_IS_FRAME_REMOTE | CANJNI.CAN_MSGID_API_FIRMVER);
 		requestMessage(CANJNI.LM_API_HWVER);
 
-		Timer.delay(0.003);
+		// Wait until we've gotten all of the status data at least once.
+		for(int i = 0; i < kReceiveStatusAttempts; i++)
+		{
+			Timer.delay(0.001);
+			
+			getBusVoltage();
+			getOutputVoltage();
+			getOutputCurrent();
+			getTemperature();
+			getPosition();
+			getSpeed();
+			getForwardLimitOK();
+			getFaults();
+
+			if(m_receivedBusVoltage &&
+				m_receivedOutputVoltage &&
+				m_receivedOutputCurrent &&
+				m_receivedTemperature &&
+				m_receivedPosition &&
+				m_receivedSpeed &&
+				m_receivedLimits &&
+				m_receivedFaults)
+			{
+				break;
+			}
+		}
 
 		// Don't catch the CANMessageNotFoundException - we need to know the
 		// firmware version to continue.
@@ -1227,6 +1252,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 
 		try {
 			getMessage(CANJNI.LM_API_STATUS_VOLTBUS, CANJNI.CAN_MSGID_FULL_M, data);
+			m_receivedBusVoltage = true;
 			m_busVoltage = unpackFXP8_8(data);
 		} catch(CANMessageNotFoundException e) {}
 
@@ -1243,6 +1269,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 
 		try {
 			getMessage(CANJNI.LM_API_STATUS_VOUT, CANJNI.CAN_MSGID_FULL_M, data);
+			m_receivedOutputVoltage = true;
 			m_outputVoltage = unpackFXP8_8(data);
 		} catch(CANMessageNotFoundException e) {}
 
@@ -1259,6 +1286,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 
 		try {
 			getMessage(CANJNI.LM_API_STATUS_CURRENT, CANJNI.CAN_MSGID_FULL_M, data);
+			m_receivedOutputCurrent = true;
 			m_outputCurrent = unpackFXP8_8(data);
 		} catch(CANMessageNotFoundException e) {}
 
@@ -1275,6 +1303,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 
 		try {
 			getMessage(CANJNI.LM_API_STATUS_TEMP, CANJNI.CAN_MSGID_FULL_M, data);
+			m_receivedTemperature = true;
 			m_temperature = unpackFXP8_8(data);
 		} catch(CANMessageNotFoundException e) {}
 
@@ -1291,6 +1320,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 
 		try {
 			getMessage(CANJNI.LM_API_STATUS_POS, CANJNI.CAN_MSGID_FULL_M, data);
+			m_receivedPosition = true;
 			m_position = unpackFXP16_16(data);
 		} catch(CANMessageNotFoundException e) {}
 
@@ -1307,6 +1337,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 
 		try {
 			getMessage(CANJNI.LM_API_STATUS_SPD, CANJNI.CAN_MSGID_FULL_M, data);
+			m_receivedSpeed = true;
 			m_speed = unpackFXP16_16(data);
 		} catch(CANMessageNotFoundException e) {}
 
@@ -1323,6 +1354,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 
 		try {
 			getMessage(CANJNI.LM_API_STATUS_LIMIT, CANJNI.CAN_MSGID_FULL_M, data);
+			m_receivedLimits = true;
 			m_limits = data[0];
 		} catch(CANMessageNotFoundException e) {}
 
@@ -1339,6 +1371,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 
 		try {
 			getMessage(CANJNI.LM_API_STATUS_LIMIT, CANJNI.CAN_MSGID_FULL_M, data);
+			m_receivedLimits = true;
 			m_limits = data[0];
 		} catch(CANMessageNotFoundException e) {}
 
@@ -1359,6 +1392,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 
 		try {
 			getMessage(CANJNI.LM_API_STATUS_FAULT, CANJNI.CAN_MSGID_FULL_M, data);
+			m_receivedFaults = true;
 			m_faults = unpackINT16(data);
 		} catch(CANMessageNotFoundException e) {}
 
@@ -1611,6 +1645,18 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	short m_faults = (short)0;
 	int m_firmwareVersion = 0;
 	byte m_hardwareVersion = (byte)0;
+
+	// Which status values have we received at least once?
+	boolean m_receivedBusVoltage = false;
+	boolean m_receivedOutputVoltage = false;
+	boolean m_receivedOutputCurrent = false;
+	boolean m_receivedTemperature = false;
+	boolean m_receivedPosition = false;
+	boolean m_receivedSpeed = false;
+	boolean m_receivedLimits = false;
+	boolean m_receivedFaults = false;
+
+	static final int kReceiveStatusAttempts = 50;
 
 	static void sendMessageHelper(int messageID, byte[] data, int dataSize, int period) throws CANMessageNotFoundException {
 		final int[] kTrustedMessages = {
