@@ -23,10 +23,10 @@ import edu.wpi.first.wpilibj.test.TestBench;
  * @author Jonathan Leitschuh
  *
  */
-public abstract class MotorEncoderFixture implements ITestFixture {
+public abstract class MotorEncoderFixture <T extends SpeedController> implements ITestFixture {
 	private boolean initialized = false;
 	private boolean tornDown = false;
-	protected SpeedController motor;
+	protected T motor;
 	private Encoder encoder;
 	private Counter counters[] = new Counter[2];
 	protected DigitalInput aSource; //Stored so it can be freed at tear down
@@ -47,7 +47,7 @@ public abstract class MotorEncoderFixture implements ITestFixture {
 	 * is not also an implementation of PWM interface
 	 * @return
 	 */
-	abstract protected SpeedController giveSpeedController();
+	abstract protected T giveSpeedController();
 	/**
 	 * Where the implementer of this class should pass one of the digital inputs<br>
 	 * CONSTRUCTOR SHOULD NOT BE CALLED FROM OUTSIDE THIS CLASS!
@@ -64,10 +64,11 @@ public abstract class MotorEncoderFixture implements ITestFixture {
 	final private void initialize(){
 		synchronized(this){
 			if(!initialized){
+				motor = giveSpeedController();
+				
 				aSource = giveDigitalInputA();
 				bSource = giveDigitalInputB();
 				
-				motor = giveSpeedController();
 				
 				encoder = new Encoder(aSource, bSource);
 				counters[0] = new Counter(aSource);
@@ -91,7 +92,7 @@ public abstract class MotorEncoderFixture implements ITestFixture {
 	 * Gets the motor for this Object
 	 * @return the motor this object refers too
 	 */
-	public SpeedController getMotor(){
+	public T getMotor(){
 		initialize();
 		return motor;
 	}
@@ -162,8 +163,8 @@ public abstract class MotorEncoderFixture implements ITestFixture {
 			reset();
 			if(motor instanceof PWM){
 				((PWM) motor).free();
+				motor = null;
 			}
-			motor = null;
 			encoder.free();
 			counters[0].free();
 			counters[0] = null;

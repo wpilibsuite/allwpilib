@@ -67,12 +67,20 @@ public abstract class AbstractComsSetup {
 	/** This causes a stack trace to be printed as the test is running as well as at the end */
 	@Rule
 	public TestWatcher testWatcher = new TestWatcher() {
+		@Override
 		protected void failed(Throwable e, Description description) {
 			System.out.println();
 			getClassLogger().severe("" + description.getDisplayName() + " failed " + e.getMessage());
 			e.printStackTrace();
 			super.failed(e, description);
 		}
+		
+		@Override
+	    protected void starting( Description description ) {
+			System.out.println();
+	        getClassLogger().info( description.getDisplayName());
+	        super.starting(description);
+	    }
 	};
 
 }
