@@ -9,6 +9,7 @@
 #include "NetworkCommunication/LoadOut.h"
 #include <stdio.h>
 #include <math.h>
+#include "i2clib/i2c-lib.h"
 
 static const uint32_t kExpectedLoopTiming = 40;
 static const uint32_t kDigitalPins = 20;
@@ -52,7 +53,9 @@ struct DigitalPort {
 MUTEX_ID digitalDIOSemaphore = NULL;
 MUTEX_ID digitalRelaySemaphore = NULL;
 MUTEX_ID digitalPwmSemaphore = NULL;
-MUTEX_ID digitalI2CSemaphore = NULL;
+MUTEX_ID digitalI2COnBoardSemaphore = NULL;
+MUTEX_ID digitalI2CMXPSemaphore = NULL;
+
 tDIO* digitalSystem = NULL;
 tRelay* relaySystem = NULL;
 tPWM* pwmSystem = NULL;
@@ -60,6 +63,11 @@ Resource *DIOChannels = NULL;
 Resource *DO_PWMGenerators = NULL;
 
 bool digitalSystemsInitialized = false;
+
+uint8_t i2COnboardObjCount = 0;
+uint8_t i2CMXPObjCount = 0;
+uint8_t i2COnBoardHandle = 0;
+uint8_t i2CMXPHandle = 0;
 
 /**
  * Initialize the digital modules.
@@ -76,7 +84,8 @@ void initializeDigital(int32_t *status) {
   // Create a semaphore to protect changes to the DO PWM config
   digitalPwmSemaphore = initializeMutexRecursive();
 
-  digitalI2CSemaphore = initializeMutexRecursive();
+  digitalI2COnBoardSemaphore = initializeMutexRecursive();
+  digitalI2CMXPSemaphore = initializeMutexRecursive();
   
   Resource::CreateResourceObject(&DIOChannels, tDIO::kNumSystems * kDigitalPins);
   Resource::CreateResourceObject(&DO_PWMGenerators, tDIO::kNumPWMDutyCycleAElements + tDIO::kNumPWMDutyCycleBElements);
@@ -1539,86 +1548,153 @@ uint32_t readSPI(void* spi_pointer, bool initiate, int32_t *status) {return 0;}
 void resetSPI(void* spi_pointer, int32_t *status) {}
 void clearSPIReceivedData(void* spi_pointer, int32_t *status) {}
 
-/**
- * Generic transaction.
- * 
- * This is a lower-level interface to the I2C hardware giving you more control over each transaction.
- * 
- * @param dataToSend Buffer of data to send as part of the transaction.
- * @param sendSize Number of bytes to send as part of the transaction. [0..6]
- * @param dataReceived Buffer to read data into.
- * @param receiveSize Number of byted to read from the device. [0..7]
- * @return Transfer Aborted... false for success, true for aborted.
+/*
+ * Initialize the I2C port. Opens the port if necessary and saves the handle.
+ * If opening the MXP port, also sets up the pin functions appropriately
+ * @param port The port to open, 0 for the on-board, 1 for the MXP.
  */
-bool doI2CTransaction(uint8_t address, bool compatibilityMode, uint8_t *dataToSend,
-					  uint8_t sendSize, uint8_t *dataReceived, uint8_t receiveSize,
-					  int32_t *status) {
-  return doI2CTransactionWithModule(1, address, compatibilityMode, dataToSend, sendSize,
-									dataReceived, receiveSize, status);
+void i2CInitialize(uint8_t port, int32_t *status) {
+	if(port > 1)
+	{
+		//Set port out of range error here
+		return;
+	}
+
+	MUTEX_ID lock = port == 0 ? digitalI2COnBoardSemaphore:digitalI2CMXPSemaphore;
+	{
+		Synchronized sync(lock);
+		if(port == 0) {
+			i2COnboardObjCount++;
+			if (i2COnBoardHandle > 0) return;
+			i2COnBoardHandle = i2clib_open("/dev/i2c-2");
+		} else if(port == 1) {
+			i2CMXPObjCount++;
+			if (i2CMXPHandle > 0) return;
+			initializeDigital(status);
+			digitalSystem->writeEnableMXPSpecialFunction(digitalSystem->readEnableMXPSpecialFunction(status)|0xC000, status);
+			i2CMXPHandle = i2clib_open("/dev/i2c-1");
+		}
+	return;
+	}
 }
 
 /**
  * Generic transaction.
- * 
+ *
  * This is a lower-level interface to the I2C hardware giving you more control over each transaction.
- * 
+ *
  * @param dataToSend Buffer of data to send as part of the transaction.
  * @param sendSize Number of bytes to send as part of the transaction. [0..6]
  * @param dataReceived Buffer to read data into.
- * @param receiveSize Number of byted to read from the device. [0..7]
+ * @param receiveSize Number of bytes to read from the device. [0..7]
  * @return Transfer Aborted... false for success, true for aborted.
  */
-bool doI2CTransactionWithModule(uint8_t module, uint8_t address, bool compatibilityMode,
-								uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived,
-								uint8_t receiveSize, int32_t *status) {
-  // initializeDigital(status);
-  // if (sendSize > 6) {
-  // 	*status = PARAMETER_OUT_OF_RANGE;
-  // 	// TODO: wpi_setWPIErrorWithContext(ParameterOutOfRange, "sendSize");
-  // 	return true;
-  // }
-  // if (receiveSize > 7) {
-  // 	*status = PARAMETER_OUT_OF_RANGE;
-  // 	// TODO: wpi_setWPIErrorWithContext(ParameterOutOfRange, "receiveSize");
-  // 	return true;
-  // }
+int i2CTransaction(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived, uint8_t receiveSize)
+{
+	if(port > 1) {
+		//Set port out of range error here
+		return -1;
+	}
+	/*if (sendSize > 6) // Optional, provides better error message.	TODO: Are these limits still right? Implement error. Check for null buffer
+	{
+		wpi_setWPIErrorWithContext(ParameterOutOfRange, "sendSize");
+		return true;
+	}
+	if (receiveSize > 7) // Optional, provides better error message.
+	{
+		wpi_setWPIErrorWithContext(ParameterOutOfRange, "receiveSize");
+		return true;
+	}*/
+	int32_t handle = port == 0 ? i2COnBoardHandle:i2CMXPHandle;
+	MUTEX_ID lock = port == 0 ? digitalI2COnBoardSemaphore:digitalI2CMXPSemaphore;
 
-  // uint32_t data=0;
-  // uint32_t dataHigh=0;
-  // uint32_t i;
-  // for(i=0; i<sendSize && i<sizeof(data); i++) {
-  // 	data |= (uint32_t)dataToSend[i] << (8*i);
-  // }
-  // for(; i<sendSize; i++) {
-  // 	dataHigh |= (uint32_t)dataToSend[i] << (8*(i-sizeof(data)));
-  // }
+	{
+		Synchronized sync(lock);
+		return i2clib_writeread(handle, deviceAddress, (const char*) dataToSend, (int32_t) sendSize, (char*) dataReceived, (int32_t) receiveSize);
+	}
+}
 
-  // bool aborted = true;
-  // {
-  // 	Synchronized sync(digitalI2CSemaphore);
-  // 	digitalModules[module]->writeI2CConfig_Address(address, status);
-  // 	digitalModules[module]->writeI2CConfig_BytesToWrite(sendSize, status);
-  // 	digitalModules[module]->writeI2CConfig_BytesToRead(receiveSize, status);
-  // 	if (sendSize > 0) digitalModules[module]->writeI2CDataToSend(data, status);
-  // 	if (sendSize > sizeof(data)) digitalModules[module]->writeI2CConfig_DataToSendHigh(dataHigh, status);
-  // 	digitalModules[module]->writeI2CConfig_BitwiseHandshake(compatibilityMode, status);
-  // 	uint8_t transaction = digitalModules[module]->readI2CStatus_Transaction(status);
-  // 	digitalModules[module]->strobeI2CStart(status);
-  // 	while(transaction == digitalModules[module]->readI2CStatus_Transaction(status)) delayTicks(1);
-  // 	while(!digitalModules[module]->readI2CStatus_Done(status)) delayTicks(1);
-  // 	aborted = digitalModules[module]->readI2CStatus_Aborted(status);
-  // 	if (receiveSize > 0) data = digitalModules[module]->readI2CDataReceived(status);
-  // 	if (receiveSize > sizeof(data)) dataHigh = digitalModules[module]->readI2CStatus_DataReceivedHigh(status);
-  // }
+/**
+ * Execute a write transaction with the device.
+ *
+ * Write a single byte to a register on a device and wait until the
+ *   transaction is complete.
+ *
+ * @param registerAddress The address of the register on the device to be written.
+ * @param data The byte to write to the register on the device.
+ * @return Transfer Aborted... false for success, true for aborted.
+ */
+int i2CWrite(uint8_t port, uint8_t deviceAddress, uint8_t* dataToSend, uint8_t sendSize)
+{
+	if(port > 1) {
+		//Set port out of range error here
+		return -1;
+	}
+	/*if (sendSize > 6) // Optional, provides better error message.	TODO: Are these limits still right? Implement error. Check for null buffer
+	{
+		wpi_setWPIErrorWithContext(ParameterOutOfRange, "sendSize");
+		return true;
+	}*/
+	int32_t handle = port == 0 ? i2COnBoardHandle:i2CMXPHandle;
+	MUTEX_ID lock = port == 0 ? digitalI2COnBoardSemaphore:digitalI2CMXPSemaphore;
+	{
+		Synchronized sync(lock);
+		return i2clib_write(handle, deviceAddress, (const char*) dataToSend, (int32_t) sendSize);
+	}
+}
 
-  // for(i=0; i<receiveSize && i<sizeof(data); i++) {
-  // 	dataReceived[i] = (data >> (8*i)) & 0xFF;
-  // }
-  // for(; i<receiveSize; i++) {
-  // 	dataReceived[i] = (dataHigh >> (8*(i-sizeof(data)))) & 0xFF;
-  // }
-  // return aborted;
-  return false; // XXX: What happened to I2C?
+/**
+ * Execute a read transaction with the device.
+ *
+ * Read 1 to 7 bytes from a device.
+ * Most I2C devices will auto-increment the register pointer internally
+ *   allowing you to read up to 7 consecutive registers on a device in a
+ *   single transaction.
+ *
+ * @param registerAddress The register to read first in the transaction.
+ * @param count The number of bytes to read in the transaction. [1..7]
+ * @param buffer A pointer to the array of bytes to store the data read from the device.
+ * @return Transfer Aborted... false for success, true for aborted.
+ */
+int i2CRead(uint8_t port, uint8_t deviceAddress, uint8_t *buffer, uint8_t count)
+{
+	if(port > 1) {
+		//Set port out of range error here
+		return -1;
+	}
+	/*	if (count < 1 || count > 7) Todo: Are these limits still right? Implement error
+		{
+			wpi_setWPIErrorWithContext(ParameterOutOfRange, "count");
+			return true;
+		}
+		if (buffer == NULL)
+		{
+			wpi_setWPIErrorWithContext(NullParameter, "buffer");
+			return true;
+		}*/
+	int32_t handle = port == 0 ? i2COnBoardHandle:i2CMXPHandle;
+	MUTEX_ID lock = port == 0 ? digitalI2COnBoardSemaphore:digitalI2CMXPSemaphore;
+	{
+		Synchronized sync(lock);
+		return i2clib_read(handle, deviceAddress, (char*) buffer, (int32_t) count);
+	}
+
+}
+
+void i2CClose(uint8_t port) {
+	if(port > 1) {
+		//Set port out of range error here
+		return;
+	}
+	MUTEX_ID lock = port == 0 ? digitalI2COnBoardSemaphore:digitalI2CMXPSemaphore;
+	{
+		Synchronized sync(lock);
+		if((port == 0 ? i2COnboardObjCount--:i2CMXPObjCount--) == 0) {
+			int32_t handle = port == 0 ? i2COnBoardHandle:i2CMXPHandle;
+			i2clib_close(handle);
+		}
+	}
+	return;
 }
 
 

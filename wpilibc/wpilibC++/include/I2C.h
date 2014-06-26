@@ -6,7 +6,6 @@
 #pragma once
 
 #include "SensorBase.h"
-#include "HAL/Semaphore.hpp"
 
 class DigitalModule;
 
@@ -16,29 +15,26 @@ class DigitalModule;
  * This class is intended to be used by sensor (and other I2C device) drivers.
  * It probably should not be used directly.
  * 
- * It is constructed by calling DigitalModule::GetI2C() on a DigitalModule object.
  */
 class I2C : SensorBase
 {
-	friend class DigitalModule;
 public:
+	enum Port {kOnboard, kMXP};
+
+	I2C(Port port, uint8_t deviceAddress);
 	virtual ~I2C();
+
 	bool Transaction(uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived,
 			uint8_t receiveSize);
 	bool AddressOnly();
 	bool Write(uint8_t registerAddress, uint8_t data);
+	bool WriteBulk(uint8_t* data, uint8_t count);
 	bool Read(uint8_t registerAddress, uint8_t count, uint8_t *data);
+	bool ReadOnly(uint8_t count, uint8_t *buffer);
 	void Broadcast(uint8_t registerAddress, uint8_t data);
-	void SetCompatibilityMode(bool enable);
-
 	bool VerifySensor(uint8_t registerAddress, uint8_t count, const uint8_t *expected);
 private:
-	static MUTEX_ID m_semaphore;
-	static uint32_t m_objCount;
 
-	I2C(DigitalModule *module, uint8_t deviceAddress);
-
-	DigitalModule *m_module;
+	Port m_port;
 	uint8_t m_deviceAddress;
-	bool m_compatibilityMode;
 };

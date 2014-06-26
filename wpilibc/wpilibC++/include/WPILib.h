@@ -52,8 +52,6 @@
 #include "GearTooth.h"
 #include "GenericHID.h"
 #include "Gyro.h"
-#include "HiTechnicCompass.h"
-#include "HiTechnicColorSensor.h"
 #include "interfaces/Potentiometer.h"
 #include "I2C.h"
 #include "IterativeRobot.h"

@@ -410,16 +410,4 @@ uint16_t DigitalModule::GetLoopTiming()
 	return timing;
 }
 
-/**
- * Return a pointer to an I2C object for this digital module
- * The caller is responsible for deleting the pointer.
- * 
- * @param address The address of the device on the I2C bus
- * @return A pointer to an I2C object to talk to the device at address
- */
-I2C* DigitalModule::GetI2C(uint32_t address)
-{
-	return new I2C(this, address);
-}
-
 

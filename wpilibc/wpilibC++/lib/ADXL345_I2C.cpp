@@ -20,21 +20,17 @@ constexpr double ADXL345_I2C::kGsPerLSB;
  *
  * @param range The range (+ or -) that the accelerometer will measure.
  */
-ADXL345_I2C::ADXL345_I2C(ADXL345_I2C::DataFormat_Range range)
-	: m_i2c (NULL)
+ADXL345_I2C::ADXL345_I2C(Port port, ADXL345_I2C::DataFormat_Range range):
+		I2C(port, kAddress)
 {
-	DigitalModule *module = DigitalModule::GetInstance(1);
-	if (module)
-	{
-		m_i2c = module->GetI2C(kAddress);
+		//m_i2c = new I2C((I2C::Port)port, kAddress);
 
 		// Turn on the measurements
-		m_i2c->Write(kPowerCtlRegister, kPowerCtl_Measure);
+		Write(kPowerCtlRegister, kPowerCtl_Measure);
 		// Specify the data format to read
-		m_i2c->Write(kDataFormatRegister, kDataFormat_FullRes | (uint8_t)range);
+		Write(kDataFormatRegister, kDataFormat_FullRes | (uint8_t)range);
 
 		HALReport(HALUsageReporting::kResourceType_ADXL345, HALUsageReporting::kADXL345_I2C, 0);
-	}
 }
 
 /**
@@ -42,8 +38,8 @@ ADXL345_I2C::ADXL345_I2C(ADXL345_I2C::DataFormat_Range range)
  */
 ADXL345_I2C::~ADXL345_I2C()
 {
-	delete m_i2c;
-	m_i2c = NULL;
+	//delete m_i2c;
+	//m_i2c = NULL;
 }
 
 /**
@@ -55,13 +51,10 @@ ADXL345_I2C::~ADXL345_I2C()
 double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis)
 {
 	int16_t rawAccel = 0;
-	if(m_i2c)
-	{
-		m_i2c->Read(kDataRegister + (uint8_t)axis, sizeof(rawAccel), (uint8_t *)&rawAccel);
-
-		// Sensor is little endian... swap bytes
-		rawAccel = ((rawAccel >> 8) & 0xFF) | (rawAccel << 8);
-	}
+	//if(m_i2c)
+	//{
+		Read(kDataRegister + (uint8_t)axis, sizeof(rawAccel), (uint8_t *)&rawAccel);
+	//}
 	return rawAccel * kGsPerLSB;
 }
 
@@ -74,19 +67,13 @@ ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations()
 {
 	AllAxes data = AllAxes();
 	int16_t rawData[3];
-	if (m_i2c)
-	{
-		m_i2c->Read(kDataRegister, sizeof(rawData), (uint8_t*)rawData);
-
-		// Sensor is little endian... swap bytes
-		for (int32_t i=0; i<3; i++)
-		{
-			rawData[i] = ((rawData[i] >> 8) & 0xFF) | (rawData[i] << 8);
-		}
+	//if (m_i2c)
+	//{
+		Read(kDataRegister, sizeof(rawData), (uint8_t*)rawData);
 
 		data.XAxis = rawData[0] * kGsPerLSB;
 		data.YAxis = rawData[1] * kGsPerLSB;
 		data.ZAxis = rawData[2] * kGsPerLSB;
-	}
+	//}
 	return data;
 }

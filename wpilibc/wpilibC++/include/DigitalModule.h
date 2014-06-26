@@ -48,8 +48,6 @@ public:
 	void SetDO_PWMOutputChannel(uint32_t pwmGenerator, uint32_t channel);
 	uint16_t GetLoopTiming();
 
-	I2C* GetI2C(uint32_t address);
-
 	static DigitalModule* GetInstance(uint8_t moduleNumber);
 	static uint8_t RemapDigitalChannel(uint32_t channel)
 	{
