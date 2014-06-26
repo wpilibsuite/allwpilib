@@ -1,6 +1,6 @@
 #ifndef PCM_H_
 #define PCM_H_
-#include "ctre.h"				//BIT Defines + Typedefs
+#include "ctre.h"				//BIT Defines +  Typedefs
 #include <NetworkCommunication/CANSessionMux.h>	//CAN Comm
 #include <pthread.h>
 /* encoder/decoders */
