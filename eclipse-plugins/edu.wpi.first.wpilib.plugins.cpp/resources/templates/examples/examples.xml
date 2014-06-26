@@ -137,6 +137,110 @@
             destination="src/Subsystems/Wrist.h"></file>
     </files>
   </example>
-
   
+  <example>
+    <name>PacGoat</name>
+    <description>A fully functional example CommandBased program for FRC Team 190&#39;s 2014 robot. This code can run on your computer if it supports simulation.</description>
+    <tags>
+      <tag>CommandBased Robot</tag>
+      <tag>Simulation</tag>
+      <tag>2014 Season</tag>
+    </tags>
+    <packages>
+      <package>src</package>
+      <package>src/Commands</package>
+      <package>src/Subsystems</package>
+      <package>src/Triggers</package>
+    </packages>
+    <files>
+      <file source="examples/PacGoat/src/Commands/CheckForHotGoal.cpp"
+            destination="src/Commands/CheckForHotGoal.cpp"></file>
+      <file source="examples/PacGoat/src/Commands/CheckForHotGoal.h"
+            destination="src/Commands/CheckForHotGoal.h"></file>
+      <file source="examples/PacGoat/src/Commands/CloseClaw.cpp"
+           destination="src/Commands/CloseClaw.cpp"></file>
+      <file source="examples/PacGoat/src/Commands/CloseClaw.h"
+            destination="src/Commands/CloseClaw.h"></file>
+      <file source="examples/PacGoat/src/Commands/Collect.cpp"
+            destination="src/Commands/Collect.cpp"></file>
+      <file source="examples/PacGoat/src/Commands/Collect.h"
+            destination="src/Commands/Collect.h"></file>
+      <file source="examples/PacGoat/src/Commands/DriveAndShootAutonomous.cpp"
+            destination="src/Commands/DriveAndShootAutonomous.cpp"></file>
+      <file source="examples/PacGoat/src/Commands/DriveAndShootAutonomous.h"
+            destination="src/Commands/DriveAndShootAutonomous.h"></file>
+      <file source="examples/PacGoat/src/Commands/DriveForward.cpp"
+            destination="src/Commands/DriveForward.cpp"></file>
+      <file source="examples/PacGoat/src/Commands/DriveForward.h"
+            destination="src/Commands/DriveForward.h"></file>
+      <file source="examples/PacGoat/src/Commands/DriveWithJoystick.cpp"
+            destination="src/Commands/DriveWithJoystick.cpp"></file>
+      <file source="examples/PacGoat/src/Commands/DriveWithJoystick.h"
+            destination="src/Commands/DriveWithJoystick.h"></file>
+      <file source="examples/PacGoat/src/Commands/ExtendShooter.cpp"
+            destination="src/Commands/ExtendShooter.cpp"></file>
+      <file source="examples/PacGoat/src/Commands/ExtendShooter.h"
+            destination="src/Commands/ExtendShooter.h"></file>
+      <file source="examples/PacGoat/src/Commands/LowGoal.cpp"
+            destination="src/Commands/LowGoal.cpp"></file>
+      <file source="examples/PacGoat/src/Commands/LowGoal.h"
+            destination="src/Commands/LowGoal.h"></file>
+      <file source="examples/PacGoat/src/Commands/OpenClaw.cpp"
+            destination="src/Commands/OpenClaw.cpp"></file>
+      <file source="examples/PacGoat/src/Commands/OpenClaw.h"
+            destination="src/Commands/OpenClaw.h"></file>
+      <file source="examples/PacGoat/src/Commands/SetCollectionSpeed.cpp"
+            destination="src/Commands/SetCollectionSpeed.cpp"></file>
+      <file source="examples/PacGoat/src/Commands/SetCollectionSpeed.h"
+            destination="src/Commands/SetCollectionSpeed.h"></file>
+      <file source="examples/PacGoat/src/Commands/SetPivotSetpoint.cpp"
+            destination="src/Commands/SetPivotSetpoint.cpp"></file>
+      <file source="examples/PacGoat/src/Commands/SetPivotSetpoint.h"
+            destination="src/Commands/SetPivotSetpoint.h"></file>
+      <file source="examples/PacGoat/src/Commands/Shoot.cpp"
+            destination="src/Commands/Shoot.cpp"></file>
+      <file source="examples/PacGoat/src/Commands/Shoot.h"
+            destination="src/Commands/Shoot.h"></file>
+      <file source="examples/PacGoat/src/Commands/WaitForBall.cpp"
+            destination="src/Commands/WaitForBall.cpp"></file>
+      <file source="examples/PacGoat/src/Commands/WaitForBall.h"
+            destination="src/Commands/WaitForBall.h"></file>
+      <file source="examples/PacGoat/src/Commands/WaitForPressure.cpp"
+            destination="src/Commands/WaitForPressure.cpp"></file>
+      <file source="examples/PacGoat/src/Commands/WaitForPressure.h"
+            destination="src/Commands/WaitForPressure.h"></file>
+      <file source="examples/PacGoat/src/OI.cpp"
+            destination="src/OI.cpp"></file>
+      <file source="examples/PacGoat/src/OI.h"
+            destination="src/OI.h"></file>
+      <file source="examples/PacGoat/src/Robot.cpp"
+            destination="src/Robot.cpp"></file>
+      <file source="examples/PacGoat/src/Robot.h"
+            destination="src/Robot.h"></file>
+      <file source="examples/PacGoat/src/Subsystems/Collector.cpp"
+            destination="src/Subsystems/Collector.cpp"></file>
+      <file source="examples/PacGoat/src/Subsystems/Collector.h"
+            destination="src/Subsystems/Collector.h"></file>
+      <file source="examples/PacGoat/src/Subsystems/DriveTrain.cpp"
+            destination="src/Subsystems/DriveTrain.cpp"></file>
+      <file source="examples/PacGoat/src/Subsystems/DriveTrain.h"
+            destination="src/Subsystems/DriveTrain.h"></file>
+      <file source="examples/PacGoat/src/Subsystems/Pivot.cpp"
+            destination="src/Subsystems/Pivot.cpp"></file>
+      <file source="examples/PacGoat/src/Subsystems/Pivot.h"
+            destination="src/Subsystems/Pivot.h"></file>
+      <file source="examples/PacGoat/src/Subsystems/Pneumatics.cpp"
+            destination="src/Subsystems/Pneumatics.cpp"></file>
+      <file source="examples/PacGoat/src/Subsystems/Pneumatics.h"
+            destination="src/Subsystems/Pneumatics.h"></file>
+      <file source="examples/PacGoat/src/Subsystems/Shooter.cpp"
+            destination="src/Subsystems/Shooter.cpp"></file>
+      <file source="examples/PacGoat/src/Subsystems/Shooter.h"
+            destination="src/Subsystems/Shooter.h"></file>
+      <file source="examples/PacGoat/src/Triggers/DoubleButton.cpp"
+            destination="src/Triggers/DoubleButton.cpp"></file>
+      <file source="examples/PacGoat/src/Triggers/DoubleButton.h"
+            destination="src/Triggers/DoubleButton.h"></file>
+    </files>
+  </example>
 </examples>
