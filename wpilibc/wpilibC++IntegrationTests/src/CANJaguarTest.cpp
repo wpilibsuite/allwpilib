@@ -9,6 +9,9 @@
 #include "gtest/gtest.h"
 #include "TestBench.h"
 
+static constexpr double kExpectedBusVoltage = 14.0;
+static constexpr double kExpectedTemperature = 25.0;
+
 static constexpr double kMotorTime = 0.5;
 
 static constexpr double kEncoderSettlingTime = 0.25;
@@ -49,14 +52,38 @@ protected:
 };
 
 /*TEST_F(CANJaguarTest, QuickTest) {
-    m_jaguar->SetPercentMode(CANJaguar::Encoder, 360);
+    m_jaguar->SetSpeedMode(CANJaguar::Encoder, 360, 0.0, 0.0, 0.0);
 
     while(DriverStation::GetInstance()->IsEnabled()) {
         std::cout << m_jaguar->GetPosition() << std::endl;
         std::cout << m_jaguar->GetSpeed() << std::endl;
+        std::cout << m_jaguar->GetTemperature() << std::endl;
         Wait(0.02);
     }
 }*/
+
+/**
+ * Checks the default status data for reasonable values to confirm that we're
+ * really getting status data from the Jaguar.
+ */
+TEST_F(CANJaguarTest, InitialStatus) {
+    m_jaguar->SetPercentMode();
+
+    EXPECT_NEAR(m_jaguar->GetBusVoltage(), kExpectedBusVoltage, 3.0)
+        << "Bus voltage is not a plausible value.";
+
+    EXPECT_FLOAT_EQ(m_jaguar->GetOutputVoltage(), 0.0)
+        << "Output voltage is non-zero.";
+
+    EXPECT_FLOAT_EQ(m_jaguar->GetOutputCurrent(), 0.0)
+        << "Output current is non-zero.";
+
+    EXPECT_NEAR(m_jaguar->GetTemperature(), kTempe, 5.0)
+        << "Temperature is not a plausible value.";
+
+    EXPECT_EQ(m_jaguar->GetFaults(), 0)
+        << "Jaguar has one or more fault set.";
+}
 
 /**
  * Test if we can drive the motor in percentage mode and get a position back
