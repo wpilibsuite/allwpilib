@@ -18,23 +18,21 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import edu.wpi.first.wpilibj.can.ICANData;
+import edu.wpi.first.wpilibj.can.AbstractCANTest;
 import edu.wpi.first.wpilibj.command.AbstractCommandTest;
 import edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
+import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
 
 /**
  * @author jonathanleitschuh
  *
  */
-public class CANJaguarTest extends AbstractCommandTest {
+public class CANJaguarTest extends AbstractComsSetup implements ICANData{
 	private static final Logger logger = Logger.getLogger(CANJaguarTest.class.getName());
 	private CANMotorEncoderFixture me;
-	private static final double kPotentiometerSettlingTime = 0.05;
-	private static final double kMotorTime = 0.5;
-	private static final double kEncoderSettlingTime = 0.25;
-	private static final double kEncoderPositionTolerance = 5.0/360.0; // +/-5 degrees
-	private static final double kPotentiometerPositionTolerance = 10.0/360.0; // +/-10 degrees
 	
 	@Override
 	protected Logger getClassLogger() {
@@ -110,49 +108,6 @@ public class CANJaguarTest extends AbstractCommandTest {
 		assertEquals(0, me.getMotor().getFaults());
 	}
 	
-	@Test
-	public void testPercentForwards() {
-	    me.getMotor().setPercentMode(CANJaguar.kQuadEncoder, 360);
-	    me.getMotor().enableControl();
-	    me.getMotor().set(0.0f);
-
-	    /* The motor might still have momentum from the previous test. */
-	    Timer.delay(kEncoderSettlingTime);
-
-	    double initialPosition = me.getMotor().getPosition();
-
-	    /* Drive the speed controller briefly to move the encoder */
-	    me.getMotor().set(1.0f);
-	    Timer.delay(kMotorTime);
-	    me.getMotor().set(0.0f);
-
-	    /* The position should have increased */
-	    assertThat("CAN Jaguar position should have increased after the motor moved", me.getMotor().getPosition(), is(greaterThan(initialPosition)));
-	}
-
-	/**
-	 * Test if we can drive the motor backwards in percentage mode and get a
-	 * position back
-	 */
-	@Test
-	public void testPercentReverse() {
-	    me.getMotor().setPercentMode(CANJaguar.kQuadEncoder, 360);
-	    me.getMotor().enableControl();
-	    me.getMotor().set(0.0f);
-
-	    /* The motor might still have momentum from the previous test. */
-	   Timer.delay(kEncoderSettlingTime);
-
-	    double initialPosition = me.getMotor().getPosition();
-
-	    /* Drive the speed controller briefly to move the encoder */
-	    me.getMotor().set(-1.0f);
-	    Timer.delay(kMotorTime);
-	    me.getMotor().set(0.0f);
-
-	    /* The position should have decreased */
-	    assertThat( "CAN Jaguar position should have decreased after the motor moved", me.getMotor().getPosition(), is(lessThan(initialPosition)));
-	}
 
 	/**
 	 * Test if we can set a position and reach that position with PID control on
@@ -279,4 +234,5 @@ public class CANJaguarTest extends AbstractCommandTest {
 	    /* The position should have increased */
 	    assertThat("CAN Jaguar should have moved forwards while the reverse limit was on", me.getMotor().getPosition(), is(greaterThan(initialPosition)));
 	}
+	
 }

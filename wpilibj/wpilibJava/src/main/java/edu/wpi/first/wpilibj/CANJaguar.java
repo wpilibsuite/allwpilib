@@ -245,15 +245,15 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	}
 
 	/**
-	 * set the output set-point value.
-	 *
-	 * The scale and the units depend on the mode the Jaguar is in.
-	 * In PercentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWM Jaguar).
-	 * In Voltage Mode, the outputValue is in Volts.
-	 * In Current Mode, the outputValue is in Amps.
-	 * In Speed Mode, the outputValue is in Rotations/Minute.
+	 * Sets the output set-point value.
+	 * 
+	 * The scale and the units depend on the mode the Jaguar is in.<br>
+	 * In PercentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWMJaguar).<br>
+	 * In Voltage Mode, the outputValue is in Volts. <br>
+	 * In Current Mode, the outputValue is in Amps. In Speed Mode, the outputValue is in 
+	 * Rotations/Minute.<br>
 	 * In Position Mode, the outputValue is in Rotations.
-	 *
+	 * 
 	 * @param outputValue The set-point to sent to the motor controller.
 	 * @param syncGroup The update group to add this set() to, pending UpdateSyncGroup().  If 0, update immediately.
 	 */
@@ -306,6 +306,19 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 		verify();
 	}
 
+	/**
+	 * Sets the output set-point value.
+	 * 
+	 * The scale and the units depend on the mode the Jaguar is in.<br>
+	 * In PercentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWMJaguar).<br>
+	 * In Voltage Mode, the outputValue is in Volts. <br>
+	 * In Current Mode, the outputValue is in Amps. In Speed Mode, the outputValue is in 
+	 * Rotations/Minute.<br>
+	 * In Position Mode, the outputValue is in Rotations.
+	 * 
+	 * @param value
+	 *            The set-point to sent to the motor controller.
+	 */
 	public void set(double value) {
 		set(value, (byte)0);
 	}

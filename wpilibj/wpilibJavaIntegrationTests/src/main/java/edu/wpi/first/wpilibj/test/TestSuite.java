@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.SampleTest;
 import edu.wpi.first.wpilibj.TiltPanCameraTest;
 import edu.wpi.first.wpilibj.TimerTest;
 import edu.wpi.first.wpilibj.WpiLibJTestSuite;
+import edu.wpi.first.wpilibj.can.CANTestSuite;
 import edu.wpi.first.wpilibj.command.ButtonTest;
 import edu.wpi.first.wpilibj.command.CommandParallelGroupTest;
 import edu.wpi.first.wpilibj.command.CommandScheduleTest;
@@ -49,6 +50,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTestSuite;
 @RunWith(Suite.class)
 @SuiteClasses({
 				WpiLibJTestSuite.class,
+				CANTestSuite.class,
 				CommandTestSuite.class,
 				SmartDashboardTestSuite.class
 				})

@@ -34,9 +34,6 @@ public abstract class MotorEncoderFixture <T extends SpeedController> implements
 
 	/**
 	 * Default constructor for a MotorEncoderFixture
-	 * @param motor The SpeedControler for this MotorEncoder pair
-	 * @param aSource One of the inputs for the encoder
-	 * @param bSource The other input for the encoder
 	 */
 	public MotorEncoderFixture(){
 	}
@@ -155,27 +152,47 @@ public abstract class MotorEncoderFixture <T extends SpeedController> implements
 
 
 
+	/**
+	 * Safely tears down the MotorEncoder Fixture in a way that makes sure that even if an object fails
+	 * to initialize the reset of the fixture can still be torn down and the resources deallocated
+	 */
 	@Override
 	public boolean teardown() {
 		String type = getType();
 		if(!tornDown){
+			boolean wasNull = false;
 			initialize();
 			reset();
-			if(motor instanceof PWM){
+			if(motor instanceof PWM && motor != null){
 				((PWM) motor).free();
 				motor = null;
-			}
-			encoder.free();
-			counters[0].free();
-			counters[0] = null;
-			counters[1].free();
-			counters[1] = null;
-
-			aSource.free();
-			aSource = null;
-			bSource.free();
-			bSource = null;
+			} else if(motor == null) wasNull = true;
+			if(encoder != null){
+				encoder.free();
+				encoder = null;
+			} else wasNull = true;
+			if(counters[0] != null){
+				counters[0].free();
+				counters[0] = null;
+			} else wasNull = true;
+			if(counters[1] != null){
+				counters[1].free();
+				counters[1] = null;
+			} else wasNull = true;
+			if(aSource != null){
+				aSource.free();
+				aSource = null;
+			} else wasNull = true;
+			if(bSource != null){
+				bSource.free();
+				bSource = null;
+			} else wasNull = true;
+			
 			tornDown = true;
+			
+			if(wasNull){
+				throw new NullPointerException("MotorEncoderFixture had null params at teardown");
+			}
 		} else {
 			throw new RuntimeException(type + " Motor Encoder torn down multiple times");
 		}
