@@ -24,11 +24,11 @@
     <property name="target" value="10.${ip.upper}.${ip.lower}.2" />
      <echo>Target IP: ${target}</echo>
   </target>
-  
+
   <target name="compile" description="Compile the source code.">
     <mkdir dir="${build.dir}"/>
     <echo>[athena-compile] Compiling ${src.dir} with classpath=${classpath} to ${build.dir}</echo>
-    
+
     <javac srcdir="${src.dir}"
      destdir="${build.dir}"
      includeAntRuntime="no"
@@ -40,7 +40,7 @@
      debug="true">
     </javac>
   </target>
-  
+
   <target name="jar" depends="compile">
     <echo>[athena-jar] Making jar ${dist.jar}.</echo>
     <mkdir dir="${dist.dir}" />
@@ -52,55 +52,67 @@
     <pathelement path="${classpath}"/>
     </path>
   </copy>
-  
+
     <jar destfile="${dist.jar}" update="false">
       <manifest>
     	<attribute name="Main-Class" value="edu.wpi.first.wpilibj.RobotBase"/>
     	<attribute name="Robot-Class" value="${robot.class}"/>
     	<attribute name="Class-Path" value="."/>
       </manifest>
-    
+
       <fileset dir="${build.dir}" includes="**/*.class"/>
-      
+
     <zipgroupfileset dir="${build.jars}">
       <include name="**/*.jar" />
     </zipgroupfileset>
     </jar>
   </target>
 
-  <target name="deploy" depends="get-target-ip,jar" description="Deploy the jar and start the program running.">
+  <target name="kill" depends="get-target-ip" description="Kill any previously running program.">
+      <echo>[athena-deploy] Killing current program.</echo>
+      <sshexec host="${target}"
+         username="${username}"
+         password="${password}"
+         trust="true"
+         command=". /etc/profile.d/natinst-path.sh; chmod a+x run*program; ${deploy.kill.command}"/>
+  </target>
+
+  <target name="deploy" depends="get-target-ip,jar,kill" description="Deploy the jar and start the program running.">
     <echo>[athena-deploy] Copying code over.</echo>
-    <scp file="${dist.jar}" todir="${username}@${target}:${deploy.dir}"
-   password="${password}" trust="true"/>
-    <scp file="${wpilib.ant.dir}/runjavaprogram" todir="${username}@${target}:${deploy.dir}"
-   password="${password}" trust="true"/>
+    <scp file="${dist.jar}" todir="${username}@${target}:${deploy.dir}" password="${password}" trust="true"/>
+    <scp file="${wpilib.ant.dir}/robotCommand" todir="${username}@${target}:${command.dir}" password="${password}" trust="true"/>
+
+    <sshexec host="${target}"
+       username="${username}"
+       password="${password}"
+       trust="true"
+       failonerror="false"
+       command=". /etc/profile.d/natinst-path.sh; rm ${deploy.debug.file}"/>
+
     <echo>[athena-deploy] Starting program.</echo>
     <sshexec host="${target}"
        username="${username}"
        password="${password}"
        trust="true"
-       command="chmod a+x run*program; ${deploy.run.command}"/>
+       command=". /etc/profile.d/natinst-path.sh; ${deploy.run.command}"/>
   </target>
 
-  <target name="debug-deploy" depends="get-target-ip,jar" description="Deploy the jar and start the program running in debug mode.">
-    <echo>[athena-debug-deploy] Copying code over.</echo>
-    <scp file="${dist.jar}" todir="${username}@${target}:${deploy.dir}"
-   password="${password}" trust="true"/>
-   <echo>[athena-debug-deploy] Copying Debug Script Over.</echo>
-   <scp file="${wpilib.ant.dir}/debugjavaprogram" todir="${username}@${target}:${deploy.dir}"
-   password="${password}" trust="true"/>
-    <echo>[athena-debug-deploy] Starting program.</echo>
+  <target name="debug-deploy" depends="get-target-ip,jar,kill" description="Deploy the jar and start the program running.">
+    <echo>[athena-deploy] Copying code over.</echo>
+    <scp file="${dist.jar}" todir="${username}@${target}:${deploy.dir}" password="${password}" trust="true"/>
+
+    <echo>[athena-deploy] Starting program.</echo>
     <sshexec host="${target}"
        username="${username}"
        password="${password}"
        trust="true"
-       command="chmod a+x debug*program; ${deploy.debug.command}"/>
+       command=". /etc/profile.d/natinst-path.sh; ${deploy.debug.command}"/>
   </target>
 
   <!-- Simulate -->
   <target name="jar-for-simulation" depends="compile">
 	<echo>[jar-for-simulation] Building jar.</echo>
-	
+
 	<jar destfile="${simulation.dist.jar}">
 	  <manifest>
 		<attribute name="Built-By" value="${user.name}"/>
@@ -123,12 +135,14 @@
 	    </exec>
       </sequential>
       <sequential>
+        <sleep seconds="5"/>
 	    <echo>[simulate] Running DriverStation.</echo>
 	    <java jar="${wpilib.sim.tools}/SimDS.jar" fork="true">
           <jvmarg value="-Djava.library.path=${wpilib.sim.lib}" />
         </java>
       </sequential>
       <sequential>
+        <sleep seconds="5"/>
 	    <echo>[simulate] Running Code.</echo>
 	    <java jar="${simulation.dist.jar}" fork="true">
           <jvmarg value="-Djava.library.path=${wpilib.sim.lib}" />
@@ -146,12 +160,14 @@
 	    </exec>
       </sequential>
       <sequential>
+        <sleep seconds="5"/>
 	    <echo>[debug-simulate] Running DriverStation.</echo>
 	    <java jar="${wpilib.sim.tools}/SimDS.jar" fork="true">
           <jvmarg value="-Djava.library.path=${wpilib.sim.lib}" />
         </java>
       </sequential>
       <sequential>
+        <sleep seconds="5"/>
 	    <echo>[debug-simulate] Running Code.</echo>
 	    <java jar="${simulation.dist.jar}" fork="true">
           <jvmarg value="-Xdebug" />
@@ -162,3 +178,4 @@
     </parallel>
   </target>
 </project>
+
