@@ -10,14 +10,14 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
  */
 public class DriveAndShootAutonomous extends CommandGroup {
     public DriveAndShootAutonomous() {
+        addSequential(new CloseClaw());
         addSequential(new WaitForPressure(), 2);
         if (Robot.isReal()) {
         	// NOTE: Simulation doesn't currently have the concept of hot. 
         	addSequential(new CheckForHotGoal(2));
-        }	
-        addSequential(new CloseClaw());
+        }
         addSequential(new SetPivotSetpoint(45));
-        addSequential(new DriveForward(8, 0.4));
+        addSequential(new DriveForward(8, 0.3));
         addSequential(new Shoot());
     }
 }

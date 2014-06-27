@@ -11,9 +11,9 @@ import edu.wpi.first.wpilibj.command.Command;
 public class DriveForward extends Command {
 	private double driveForwardSpeed;
 	private double distance;
-	private final double tolerance = .1; // TODO: Was 5
 	private double error;
-	private final double Kp = -1.0 / 5.0;
+	private final double TOLERANCE = .1;
+	private final double KP = -1.0 / 5.0;
 
 	public DriveForward() {
 		this(10, 0.5);
@@ -36,16 +36,16 @@ public class DriveForward extends Command {
 
 	protected void execute() {
 		error = (distance - Robot.drivetrain.getRightEncoder().getDistance());
-		if (driveForwardSpeed * Kp * error >= driveForwardSpeed) {
+		if (driveForwardSpeed * KP * error >= driveForwardSpeed) {
 			Robot.drivetrain.tankDrive(driveForwardSpeed, driveForwardSpeed);
 		} else {
-			Robot.drivetrain.tankDrive(driveForwardSpeed * Kp * error,
-					driveForwardSpeed * Kp * error);
+			Robot.drivetrain.tankDrive(driveForwardSpeed * KP * error,
+					driveForwardSpeed * KP * error);
 		}
 	}
 
 	protected boolean isFinished() {
-		return (Math.abs(error) <= tolerance) || isTimedOut();
+		return (Math.abs(error) <= TOLERANCE) || isTimedOut();
 	}
 
 	protected void end() {

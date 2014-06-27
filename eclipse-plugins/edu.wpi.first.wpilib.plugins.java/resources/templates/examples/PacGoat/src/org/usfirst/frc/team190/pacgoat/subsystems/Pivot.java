@@ -29,8 +29,8 @@ public class Pivot extends PIDSubsystem {
 		setAbsoluteTolerance(0.005);
 		getPIDController().setContinuous(false);
 		if (Robot.isSimulation()) { // PID is different in simulation.
-			getPIDController().setPID(0.5, 0.00001, 4.5);
-			setAbsoluteTolerance(2.5);
+			getPIDController().setPID(0.5, 0.001, 2);
+			setAbsoluteTolerance(5);
 		}
 		
 		// Motor to move the pivot.

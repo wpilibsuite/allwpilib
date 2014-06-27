@@ -29,7 +29,7 @@ DriveTrain::DriveTrain() :
 
 	// Configure encoders
 	rightEncoder = new Encoder(1, 2, true, Encoder::k4X);
-	leftEncoder = new Encoder(5, 6, false, Encoder::k4X); // TODO: Correct encoder module.
+	leftEncoder = new Encoder(3, 4, false, Encoder::k4X);
 	rightEncoder->SetPIDSourceParameter(PIDSource::kDistance);
 	leftEncoder->SetPIDSourceParameter(PIDSource::kDistance);
 
