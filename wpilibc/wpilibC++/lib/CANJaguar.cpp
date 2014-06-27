@@ -30,7 +30,7 @@ constexpr double CANJaguar::kApproxBusVoltage;
 static const int32_t kSendMessagePeriod = 20;
 static const uint32_t kFullMessageIDMask = (CAN_MSGID_API_M | CAN_MSGID_MFR_M | CAN_MSGID_DTYPE_M);
 
-static const int32_t kReceiveStatusAttempts = 5000;
+static const int32_t kReceiveStatusAttempts = 50;
 
 static int32_t sendMessageHelper(uint32_t messageID, const uint8_t *data, uint8_t dataSize, int32_t period)
 {
