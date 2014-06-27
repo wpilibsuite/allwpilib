@@ -1554,6 +1554,8 @@ void clearSPIReceivedData(void* spi_pointer, int32_t *status) {}
  * @param port The port to open, 0 for the on-board, 1 for the MXP.
  */
 void i2CInitialize(uint8_t port, int32_t *status) {
+	initializeDigital(status);
+
 	if(port > 1)
 	{
 		//Set port out of range error here
@@ -1570,7 +1572,6 @@ void i2CInitialize(uint8_t port, int32_t *status) {
 		} else if(port == 1) {
 			i2CMXPObjCount++;
 			if (i2CMXPHandle > 0) return;
-			initializeDigital(status);
 			digitalSystem->writeEnableMXPSpecialFunction(digitalSystem->readEnableMXPSpecialFunction(status)|0xC000, status);
 			i2CMXPHandle = i2clib_open("/dev/i2c-1");
 		}
