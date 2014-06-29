@@ -46,13 +46,15 @@ typedef enum {
 								 *	the last 50ms. Function returns the latest received data
 								 *	but may be STALE DATA.
 								 */
-		CTR_TxTimeout			/*
+		CTR_TxTimeout,			/*
 								 *	Transmission Timeout
 								 *
 								 *		No module-specific CAN frames were transmitted in
 								 *	the last 50ms. Parameters passed in by the user are loaded
 								 *	for next transmission but have not sent.
 								 */
+		CTR_InvalidParamValue,
+		CTR_UnexpectedArbId,
 }CTR_Code;
 
 #endif
