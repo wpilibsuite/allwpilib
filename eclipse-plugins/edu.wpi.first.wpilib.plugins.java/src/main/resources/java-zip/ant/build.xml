@@ -68,36 +68,26 @@
     </jar>
   </target>
 
-  <target name="kill" depends="get-target-ip" description="Kill any previously running program.">
-      <echo>[athena-deploy] Killing current program.</echo>
-      <sshexec host="${target}"
-         username="${username}"
-         password="${password}"
-         trust="true"
-         command=". /etc/profile.d/natinst-path.sh; chmod a+x run*program; ${deploy.kill.command}"/>
-  </target>
-
-  <target name="deploy" depends="get-target-ip,jar,kill" description="Deploy the jar and start the program running.">
+  <target name="deploy" depends="get-target-ip,jar" description="Deploy the jar and start the program running.">
     <echo>[athena-deploy] Copying code over.</echo>
     <scp file="${dist.jar}" todir="${username}@${target}:${deploy.dir}" password="${password}" trust="true"/>
     <scp file="${wpilib.ant.dir}/robotCommand" todir="${username}@${target}:${command.dir}" password="${password}" trust="true"/>
-
-    <sshexec host="${target}"
-       username="${username}"
-       password="${password}"
-       trust="true"
-       failonerror="false"
-       command=". /etc/profile.d/natinst-path.sh; rm ${deploy.debug.file}"/>
 
     <echo>[athena-deploy] Starting program.</echo>
     <sshexec host="${target}"
        username="${username}"
        password="${password}"
        trust="true"
-       command=". /etc/profile.d/natinst-path.sh; ${deploy.run.command}"/>
+       command=". /etc/profile.d/natinst-path.sh; chmod a+x run*program; ${deploy.kill.command};"/>
+
+    <sshexec host="${target}"
+       username="${username}"
+       password="${password}"
+       trust="true"
+       command="tail -f -s 0 -n 1 ${deploy.log.file}"/>
   </target>
 
-  <target name="debug-deploy" depends="get-target-ip,jar,kill" description="Deploy the jar and start the program running.">
+  <target name="debug-deploy" depends="get-target-ip,jar" description="Deploy the jar and start the program running.">
     <echo>[athena-deploy] Copying code over.</echo>
     <scp file="${dist.jar}" todir="${username}@${target}:${deploy.dir}" password="${password}" trust="true"/>
 
@@ -178,4 +168,3 @@
     </parallel>
   </target>
 </project>
-
