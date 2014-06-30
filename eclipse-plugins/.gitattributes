@@ -1,3 +1,4 @@
 *runcppprogram text eol=lf
 *runjavaprogram text eol=lf
-
+*robotCommand text eol=lf
+*robotDebugCommand text eol=lf
