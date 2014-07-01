@@ -147,6 +147,9 @@ protected:
 	void requestMessage(uint32_t messageID, int32_t period = CAN_SEND_PERIOD_NO_REPEAT);
 	bool getMessage(uint32_t messageID, uint32_t mask, uint8_t *data, uint8_t *dataSize);
 
+	void setupPeriodicStatus();
+	void updatePeriodicStatus();
+
 	uint8_t m_deviceNumber;
 	float m_value;
 
@@ -196,15 +199,10 @@ protected:
 	uint32_t m_firmwareVersion;
 	uint8_t m_hardwareVersion;
 
-	// Which status values have we received at least once?
-	bool m_receivedBusVoltage;
-	bool m_receivedOutputVoltage;
-	bool m_receivedOutputCurrent;
-	bool m_receivedTemperature;
-	bool m_receivedPosition;
-	bool m_receivedSpeed;
-	bool m_receivedLimits;
-	bool m_receivedFaults;
+	// Which periodic status messages have we received at least once?
+	bool m_receivedStatusMessage0;
+	bool m_receivedStatusMessage1;
+	bool m_receivedStatusMessage2;
 
 	void verify();
 

@@ -119,64 +119,49 @@ void CANJaguar::InitCANJaguar()
 	m_voltageRampRateVerified = true;
 	m_faultTimeVerified = true;
 
+	m_receivedStatusMessage0 = false;
+	m_receivedStatusMessage1 = false;
+	m_receivedStatusMessage2 = false;
+
+	bool receivedFirmwareVersion = false;
 	uint8_t dataBuffer[8];
 	uint8_t dataSize;
-
-	// Request all status data periodically
-	requestMessage(LM_API_STATUS_VOLTBUS, kSendMessagePeriod);
-	requestMessage(LM_API_STATUS_VOUT, kSendMessagePeriod);
-	requestMessage(LM_API_STATUS_CURRENT, kSendMessagePeriod);
-	requestMessage(LM_API_STATUS_TEMP, kSendMessagePeriod);
-	requestMessage(LM_API_STATUS_POS, kSendMessagePeriod);
-	requestMessage(LM_API_STATUS_SPD, kSendMessagePeriod);
-	requestMessage(LM_API_STATUS_LIMIT, kSendMessagePeriod);
-	requestMessage(LM_API_STATUS_FAULT, kSendMessagePeriod);
-	requestMessage(LM_API_STATUS_POWER, kSendMessagePeriod);
 
 	// Request firmware and hardware version only once
 	requestMessage(CAN_IS_FRAME_REMOTE | CAN_MSGID_API_FIRMVER);
 	requestMessage(LM_API_HWVER);
-
-	m_receivedBusVoltage = false;
-	m_receivedOutputVoltage = false;
-	m_receivedOutputCurrent = false;
-	m_receivedTemperature = false;
-	m_receivedPosition = false;
-	m_receivedSpeed = false;
-	m_receivedLimits = false;
-	m_receivedFaults = false;
 
 	// Wait until we've gotten all of the status data at least once.
 	for(int i = 0; i < kReceiveStatusAttempts; i++)
 	{
 		Wait(0.001);
 
-		GetBusVoltage();
-		GetOutputVoltage();
-		GetOutputCurrent();
-		GetTemperature();
-		GetPosition();
-		GetSpeed();
-		GetForwardLimitOK();
-		GetFaults();
+		setupPeriodicStatus();
+		updatePeriodicStatus();
 
-		if(m_receivedBusVoltage &&
-			m_receivedOutputVoltage &&
-			m_receivedOutputCurrent &&
-			m_receivedTemperature &&
-			m_receivedPosition &&
-			m_receivedSpeed &&
-			m_receivedLimits &&
-			m_receivedFaults)
+		if(!receivedFirmwareVersion &&
+		   getMessage(CAN_MSGID_API_FIRMVER, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
+		{
+			m_firmwareVersion = unpackint32_t(dataBuffer);
+			receivedFirmwareVersion = true;
+		}
+
+		if(m_receivedStatusMessage0 &&
+		   m_receivedStatusMessage1 &&
+		   m_receivedStatusMessage2 &&
+		   receivedFirmwareVersion)
 		{
 			break;
 		}
 	}
 
-	if(getMessage(CAN_MSGID_API_FIRMVER, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
-		m_firmwareVersion = unpackint32_t(dataBuffer);
-	else
-		wpi_setWPIErrorWithContext(JaguarMessageNotFound, "getMessage");
+	if(!m_receivedStatusMessage0 ||
+	   !m_receivedStatusMessage1 ||
+	   !m_receivedStatusMessage2 ||
+	   !receivedFirmwareVersion)
+	{
+		wpi_setWPIErrorWithContext(JaguarMessageNotFound, "Status data not found");
+	}
 
 	if(getMessage(LM_API_HWVER, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
 		m_hardwareVersion = dataBuffer[0];
@@ -509,6 +494,81 @@ bool CANJaguar::getMessage(uint32_t messageID, uint32_t messageMask, uint8_t *da
 }
 
 /**
+ * Enables periodic status updates from the Jaguar
+ */
+void CANJaguar::setupPeriodicStatus() {
+	uint8_t data[8];
+	uint8_t dataSize;
+
+	// Message 0 returns bus voltage, output voltage, output current, and
+	// temperature.
+	static const uint8_t kMessage0Data[] = {
+		LM_PSTAT_VOLTBUS_B0, LM_PSTAT_VOLTBUS_B1,
+		LM_PSTAT_VOLTOUT_B0, LM_PSTAT_VOLTOUT_B1,
+		LM_PSTAT_CURRENT_B0, LM_PSTAT_CURRENT_B1,
+		LM_PSTAT_TEMP_B0, LM_PSTAT_TEMP_B1
+	};
+
+	// Message 1 returns position and speed
+	static const uint8_t kMessage1Data[] = {
+		LM_PSTAT_POS_B0, LM_PSTAT_POS_B1, LM_PSTAT_POS_B2, LM_PSTAT_POS_B3,
+		LM_PSTAT_SPD_B0, LM_PSTAT_SPD_B1, LM_PSTAT_SPD_B2, LM_PSTAT_SPD_B3
+	};
+
+	// Message 2 returns limits and faults
+	static const uint8_t kMessage2Data[] = {
+		LM_PSTAT_LIMIT_CLR,
+		LM_PSTAT_FAULT,
+		LM_PSTAT_END
+	};
+
+	dataSize = packint16_t(data, kSendMessagePeriod / 10);
+	sendMessage(LM_API_PSTAT_PER_EN_S0, data, dataSize);
+	sendMessage(LM_API_PSTAT_PER_EN_S1, data, dataSize);
+	sendMessage(LM_API_PSTAT_PER_EN_S2, data, dataSize);
+
+	dataSize = 8;
+	sendMessage(LM_API_PSTAT_CFG_S0, kMessage0Data, dataSize);
+	sendMessage(LM_API_PSTAT_CFG_S1, kMessage1Data, dataSize);
+	sendMessage(LM_API_PSTAT_CFG_S2, kMessage2Data, dataSize);
+}
+
+/**
+ * Check for new periodic status updates and unpack them into local variables
+ */
+void CANJaguar::updatePeriodicStatus() {
+	uint8_t data[8];
+	uint8_t dataSize;
+
+	// Check if a new bus voltage/output voltage/current/temperature message
+	// has arrived and unpack the values into the cached member variables
+	if(getMessage(LM_API_PSTAT_DATA_S0, CAN_MSGID_FULL_M, data, &dataSize)) {
+		m_busVoltage    = unpackFXP8_8(data);
+		m_outputVoltage = unpackFXP8_8(data + 2);
+		m_outputCurrent = unpackFXP8_8(data + 4);
+		m_temperature   = unpackFXP8_8(data + 6);
+
+		m_receivedStatusMessage0 = true;
+	}
+
+	// Check if a new position/speed message has arrived and do the same
+	if(getMessage(LM_API_PSTAT_DATA_S1, CAN_MSGID_FULL_M, data, &dataSize)) {
+		m_position = unpackFXP16_16(data);
+		m_speed    = unpackFXP16_16(data + 4);
+
+		m_receivedStatusMessage1 = true;
+	}
+
+	// Check if a new limits/faults message has arrived and do the same
+	if(getMessage(LM_API_PSTAT_DATA_S2, CAN_MSGID_FULL_M, data, &dataSize)) {
+		m_limits = data[0];
+		m_faults = data[1];
+
+		m_receivedStatusMessage2 = true;
+	}
+}
+
+/**
  * Check all unverified params and make sure they're equal to their local
  * cached versions. If a value isn't available, it gets requested.  If a value
  * doesn't match up, it gets set again.
@@ -551,15 +611,7 @@ void CANJaguar::verify()
 			if(m_controlMode == kVoltage || m_controlMode == kPercentVbus)
 				SetVoltageRampRate(m_voltageRampRate);
 
-			requestMessage(LM_API_STATUS_VOLTBUS, kSendMessagePeriod);
-			requestMessage(LM_API_STATUS_VOUT, kSendMessagePeriod);
-			requestMessage(LM_API_STATUS_CURRENT, kSendMessagePeriod);
-			requestMessage(LM_API_STATUS_TEMP, kSendMessagePeriod);
-			requestMessage(LM_API_STATUS_POS, kSendMessagePeriod);
-			requestMessage(LM_API_STATUS_SPD, kSendMessagePeriod);
-			requestMessage(LM_API_STATUS_LIMIT, kSendMessagePeriod);
-			requestMessage(LM_API_STATUS_FAULT, kSendMessagePeriod);
-			requestMessage(LM_API_STATUS_POWER, kSendMessagePeriod);
+			setupPeriodicStatus();
 		}
 	}
 
@@ -1461,14 +1513,7 @@ CANJaguar::ControlMode CANJaguar::GetControlMode()
  */
 float CANJaguar::GetBusVoltage()
 {
-	uint8_t dataBuffer[8];
-	uint8_t dataSize;
-
-	if(getMessage(LM_API_STATUS_VOLTBUS, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
-	{
-		m_busVoltage = unpackFXP8_8(dataBuffer);
-		m_receivedBusVoltage = true;
-	}
+	updatePeriodicStatus();
 
 	return m_busVoltage;
 }
@@ -1480,14 +1525,7 @@ float CANJaguar::GetBusVoltage()
  */
 float CANJaguar::GetOutputVoltage()
 {
-	uint8_t dataBuffer[8];
-	uint8_t dataSize;
-
-	if(getMessage(LM_API_STATUS_VOUT, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
-	{
-		m_outputVoltage = unpackFXP8_8(dataBuffer);
-		m_receivedOutputVoltage = true;
-	}
+	updatePeriodicStatus();
 
 	return m_outputVoltage;
 }
@@ -1499,14 +1537,7 @@ float CANJaguar::GetOutputVoltage()
  */
 float CANJaguar::GetOutputCurrent()
 {
-	uint8_t dataBuffer[8];
-	uint8_t dataSize;
-
-	if(getMessage(LM_API_STATUS_CURRENT, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
-	{
-		m_outputCurrent = unpackFXP8_8(dataBuffer);
-		m_receivedOutputCurrent = true;
-	}
+	updatePeriodicStatus();
 
 	return m_outputCurrent;
 }
@@ -1518,14 +1549,7 @@ float CANJaguar::GetOutputCurrent()
  */
 float CANJaguar::GetTemperature()
 {
-	uint8_t dataBuffer[8];
-	uint8_t dataSize;
-
-	if(getMessage(LM_API_STATUS_TEMP, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
-	{
-		m_temperature = unpackFXP8_8(dataBuffer);
-		m_receivedTemperature = true;
-	}
+	updatePeriodicStatus();
 
 	return m_temperature;
 }
@@ -1537,14 +1561,7 @@ float CANJaguar::GetTemperature()
  */
 double CANJaguar::GetPosition()
 {
-	uint8_t dataBuffer[8];
-	uint8_t dataSize;
-
-	if(getMessage(LM_API_STATUS_POS, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
-	{
-		m_position = unpackFXP16_16(dataBuffer);
-		m_receivedPosition = true;
-	}
+	updatePeriodicStatus();
 
 	return m_position;
 }
@@ -1556,14 +1573,7 @@ double CANJaguar::GetPosition()
  */
 double CANJaguar::GetSpeed()
 {
-	uint8_t dataBuffer[8];
-	uint8_t dataSize;
-
-	if(getMessage(LM_API_STATUS_SPD, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
-	{
-		m_speed = unpackFXP16_16(dataBuffer);
-		m_receivedSpeed = true;
-	}
+	updatePeriodicStatus();
 
 	return m_speed;
 }
@@ -1575,14 +1585,7 @@ double CANJaguar::GetSpeed()
  */
 bool CANJaguar::GetForwardLimitOK()
 {
-	uint8_t dataBuffer[8];
-	uint8_t dataSize;
-
-	if(getMessage(LM_API_STATUS_LIMIT, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
-	{
-		m_limits = dataBuffer[0];
-		m_receivedLimits = true;
-	}
+	updatePeriodicStatus();
 
 	return m_limits & kForwardLimit;
 }
@@ -1594,14 +1597,7 @@ bool CANJaguar::GetForwardLimitOK()
  */
 bool CANJaguar::GetReverseLimitOK()
 {
-	uint8_t dataBuffer[8];
-	uint8_t dataSize;
-
-	if(getMessage(LM_API_STATUS_LIMIT, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
-	{
-		m_limits = dataBuffer[0];
-		m_receivedLimits = true;
-	}
+	updatePeriodicStatus();
 
 	return m_limits & kReverseLimit;
 }
@@ -1613,14 +1609,7 @@ bool CANJaguar::GetReverseLimitOK()
  */
 uint16_t CANJaguar::GetFaults()
 {
-	uint8_t dataBuffer[8];
-	uint8_t dataSize;
-
-	if(getMessage(LM_API_STATUS_FAULT, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
-	{
-		m_faults = unpackint16_t(dataBuffer);
-		m_receivedFaults = true;
-	}
+	updatePeriodicStatus();
 
 	return m_faults;
 }
