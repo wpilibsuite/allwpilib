@@ -7,8 +7,8 @@ Pivot::Pivot() :
 	GetPIDController()->SetContinuous(false);
 	#ifdef SIMULATION
 		// PID is different in simulation.
-		GetPIDController()->SetPID(0.5, 0.00001, 4.5);
-		SetAbsoluteTolerance(2.5);
+		GetPIDController()->SetPID(0.5, 0.001, 2);
+		SetAbsoluteTolerance(5);
 	#endif
 
 	// Motor to move the pivot.

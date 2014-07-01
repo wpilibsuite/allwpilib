@@ -51,7 +51,7 @@ public class DriveTrain extends Subsystem {
 
 		// Configure encoders
 		rightEncoder = new Encoder(1, 2, true, EncodingType.k4X);
-		leftEncoder = new Encoder(5, 6, false, EncodingType.k4X); // XXX: Module 2
+		leftEncoder = new Encoder(3, 4, false, EncodingType.k4X);
 		rightEncoder.setPIDSourceParameter(PIDSourceParameter.kDistance);
 		leftEncoder.setPIDSourceParameter(PIDSourceParameter.kDistance);
 
