@@ -140,7 +140,7 @@ void Timer::Stop()
 	Synchronized sync(m_semaphore);
 	if (m_running)
 	{
-		m_accumulatedTime = temp;	
+		m_accumulatedTime = temp;
 		m_running = false;
 	}
 }

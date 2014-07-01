@@ -16,6 +16,19 @@ trash/
 */*/include/
 */*/msgs/
 
+*/*/clock/
+*/*/dc_motor/
+*/*/docs/
+*/*/encoder/
+*/*/*.doxy
+*/*/gyro/
+*/*/limit_switch/
+*/*/pneumatic_piston/
+*/*/potentiometer/
+*/*/rangefinder/
+*/*/*.gradle
+frcsim-gazebo-plugins/frcsim-gazebo-plugins/Makefile
+
 # General Build Artifacts
 *.dsc
 *.deb

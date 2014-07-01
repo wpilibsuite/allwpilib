@@ -29,7 +29,7 @@ void Gyro::InitGyro(int channel)
 	SetPIDSourceParameter(kAngle);
 
 	char buffer[50];
-	int n = sprintf(buffer, "analog/1/%d", channel);
+	int n = sprintf(buffer, "analog/%d", channel);
 	impl = new SimGyro(buffer);
     
 	LiveWindow::GetInstance()->AddSensor("Gyro", channel, this);

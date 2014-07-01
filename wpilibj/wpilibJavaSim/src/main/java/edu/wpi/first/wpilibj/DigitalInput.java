@@ -31,7 +31,7 @@ public class DigitalInput implements IInputOutput,
 	 *            the port for the digital input
 	 */
 	public DigitalInput(int channel) {
-		impl = new SimDigitalInput("simulator/dio/1/"+channel);
+		impl = new SimDigitalInput("simulator/dio/"+channel);
 		m_channel = channel;
 	}
 

@@ -1,20 +1,19 @@
 codename=trusty
 allwpilib=../..
 
-version=0.1
-package-version=1
-gazebo-plugins-version=$(version)
-gazebo-plugins-package-version=$(gazebo-plugins-version)-$(package-version)
-gazebo-models-version=$(version)
-gazebo-models-package-version=$(gazebo-models-version)-$(package-version)
-eclipse-plugins-version=$(version)
-eclipse-plugins-package-version=$(eclipse-plugins-version)-$(package-version)
-eclipse-toolchain-version=$(version)
-eclipse-toolchain-package-version=$(eclipse-toolchain-version)-$(package-version)
-libwpilibsim-version=$(version)
-libwpilibsim-package-version=$(libwpilibsim-version)-$(package-version)
-frcsim-version=$(version)
-frcsim-package-version=$(frcsim-version)-$(package-version)
+package-version = 1
+gazebo-plugins-version = 0.2
+gazebo-plugins-package-version = $(gazebo-plugins-version)-$(package-version)
+gazebo-models-version = 0.2
+gazebo-models-package-version = $(gazebo-models-version)-$(package-version)
+eclipse-plugins-version = 0.1
+eclipse-plugins-package-version = $(eclipse-plugins-version)-$(package-version)
+eclipse-toolchain-version = 0.1
+eclipse-toolchain-package-version = $(eclipse-toolchain-version)-$(package-version)
+libwpilibsim-version = 0.1
+libwpilibsim-package-version = $(libwpilibsim-version)-$(package-version)
+frcsim-version = 0.1
+frcsim-package-version = $(frcsim-version)-$(package-version)
 
 all: debs update-repository
 
@@ -89,7 +88,7 @@ clean: pre-orig-clean
 pull: clean pull-gazebo-plugins pull-eclipse-plugins pull-libwpilibsim-cpp orig
 
 pull-gazebo-plugins:
-	cp -rf -t frcsim-gazebo-plugins/frcsim-gazebo-plugins/ $(allwpilib)/simulation/frc_gazebo_plugin/*
+	cp -rf -t frcsim-gazebo-plugins/frcsim-gazebo-plugins/ $(allwpilib)/simulation/frc_gazebo_plugins/*
 	echo Increment version?
 
 pull-eclipse-plugins:

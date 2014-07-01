@@ -41,7 +41,7 @@ void Encoder::InitEncoder(int channelA, int channelB, bool reverseDirection, Enc
         m_reverseDirection = reverseDirection;
     }
     char buffer[50];
-    int n = sprintf(buffer, "dio/1/%d/1/%d", channelA, channelB);
+    int n = sprintf(buffer, "dio/%d/%d", channelA, channelB);
     impl = new SimEncoder(buffer);
 }
 

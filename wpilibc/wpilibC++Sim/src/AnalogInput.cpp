@@ -17,7 +17,7 @@ void AnalogInput::InitAnalogInput(uint32_t channel)
 
 	m_channel = channel;
 	char buffer[50];
-	int n = sprintf(buffer, "analog/1/%d", channel);
+	int n = sprintf(buffer, "analog/%d", channel);
 	m_impl = new SimFloatInput(buffer);
 
 	LiveWindow::GetInstance()->AddSensor("AnalogInput", channel, this);

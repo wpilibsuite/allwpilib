@@ -37,7 +37,7 @@ public class Gyro extends SensorBase implements PIDSource, ISensor,
 	 * first turned on while it's sitting at rest before the competition starts.
 	 */
 	private void initGyro(int channel) {
-		impl = new SimGyro("simulator/analog/1/"+channel);
+		impl = new SimGyro("simulator/analog/"+channel);
 
 		reset();
 		setPIDSourceParameter(PIDSourceParameter.kAngle);

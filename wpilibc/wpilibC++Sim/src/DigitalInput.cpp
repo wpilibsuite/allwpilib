@@ -17,7 +17,7 @@ void DigitalInput::InitDigitalInput(uint32_t channel)
 	m_table = NULL;
 	char buf[64];
 	m_channel = channel;
-	int n = sprintf(buf, "dio/1/%d", channel);
+	int n = sprintf(buf, "dio/%d", channel);
 	m_impl = new SimDigitalInput(buf);
 }
 

@@ -64,7 +64,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 		} else {
 			m_reverseDirection = reverseDirection;
 		}
-		impl = new SimEncoder("simulator/dio/1/"+aChannel+"/1/"+bChannel);
+		impl = new SimEncoder("simulator/dio/"+aChannel+"/"+bChannel);
 		setDistancePerPulse(1);
 
 	}

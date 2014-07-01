@@ -40,7 +40,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 	 */
 	public AnalogInput(final int channel) {
 		m_channel = channel;
-		m_impl = new SimFloatInput("simulator/analog/1/"+channel); // TODO: If module numbers cannot be specified, remove them from the communication system.
+		m_impl = new SimFloatInput("simulator/analog/"+channel);
 
 		LiveWindow.addSensor("AnalogInput", channel, this);
 	}

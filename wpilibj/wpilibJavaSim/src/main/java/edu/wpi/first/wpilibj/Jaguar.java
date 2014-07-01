@@ -25,7 +25,7 @@ public class Jaguar implements SpeedController, PIDOutput, MotorSafety, LiveWind
      */
     private void initJaguar(final int channel) {
     	this.channel = channel;
-        impl = new SimSpeedController("simulator/pwm/1/"+channel);
+        impl = new SimSpeedController("simulator/pwm/"+channel);
 
         m_safetyHelper = new MotorSafetyHelper(this);
         m_safetyHelper.setExpiration(0.0);
