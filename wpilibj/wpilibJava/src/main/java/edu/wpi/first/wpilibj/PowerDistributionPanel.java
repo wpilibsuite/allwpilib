@@ -47,7 +47,7 @@ public class PowerDistributionPanel extends SensorBase {
 	}
 
 	/**
-	 * @return The current of one of the PDP channels (channels 1-16) in Amperes
+	 * @return The current of one of the PDP channels (channels 0-15) in Amperes
 	 */
 	public double getCurrent(int channel) {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);

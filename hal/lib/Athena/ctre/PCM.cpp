@@ -1,4 +1,3 @@
-#if 0
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 
 #include "PCM.h"
@@ -453,4 +452,3 @@ extern "C" {
 		return retval;
 	}
 }
-#endif

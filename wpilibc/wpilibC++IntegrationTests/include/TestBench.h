@@ -55,7 +55,7 @@ public:
 	static const uint32_t kCANJaguarID = 2;
 
 	/* PDP channels */
-	static const uint32_t kJaguarPDPChannel = 7;
-	static const uint32_t kVictorPDPChannel = 11;
-	static const uint32_t kTalonPDPChannel = 12;
+	static const uint32_t kJaguarPDPChannel = 6;
+	static const uint32_t kVictorPDPChannel = 10;
+	static const uint32_t kTalonPDPChannel = 11;
 };

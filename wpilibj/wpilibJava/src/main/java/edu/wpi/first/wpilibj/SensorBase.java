@@ -69,7 +69,7 @@ public abstract class SensorBase { // TODO: Refactor
 
     private static int m_defaultAnalogModule = 1;
     private static int m_defaultDigitalModule = 1;
-    private static int m_defaultSolenoidModule = 1;
+    private static int m_defaultSolenoidModule = 0;
 
     /**
      * Creates an instance of the sensor base and gets an FPGA handle
@@ -242,7 +242,7 @@ public abstract class SensorBase { // TODO: Refactor
      * @param channel The channel number to check.
      */
     protected static void checkSolenoidChannel(final int channel) {
-        if (channel <= 0 || channel > kSolenoidChannels) {
+        if (channel < 0 || channel >= kSolenoidChannels) {
             System.err.println("Requested solenoid channel number is out of range.");
         }
     }
@@ -254,7 +254,7 @@ public abstract class SensorBase { // TODO: Refactor
      * @param channel The channel number to check.
      */
     protected static void checkPDPChannel(final int channel) {
-        if (channel <= 0 || channel > kPDPChannels) {
+        if (channel < 0 || channel >= kPDPChannels) {
             System.err.println("Requested solenoid channel number is out of range.");
         }
     }

@@ -37,8 +37,8 @@ protected:
     m_fakePressureSwitch = new DigitalOutput(TestBench::kFakePressureSwitchChannel);
     m_fakeCompressor = new AnalogInput(TestBench::kFakeCompressorChannel);
 
-    m_solenoid1 = new Solenoid(1);
-    m_solenoid2 = new Solenoid(2);
+    m_solenoid1 = new Solenoid(0);
+    m_solenoid2 = new Solenoid(1);
 
     m_fakeSolenoid1 = new DigitalInput(TestBench::kFakeSolenoid1Channel);
     m_fakeSolenoid2 = new DigitalInput(TestBench::kFakeSolenoid2Channel);

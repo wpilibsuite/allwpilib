@@ -23,7 +23,7 @@ public:
 
     static uint32_t GetDefaultSolenoidModule()
 	{
-		return 1;
+		return 0;
 	}
 
 	static bool CheckSolenoidModule(uint8_t moduleNumber);

@@ -19,7 +19,7 @@ SolenoidBase::SolenoidBase(uint8_t moduleNumber)
 {
   	for (uint32_t i = 0; i < kSolenoidChannels; i++)
 	{
-	  void* port = getPortWithModule(moduleNumber, i+1);
+	  void* port = getPortWithModule(moduleNumber, i);
 	  int32_t status = 0;
 	  m_ports[i] = initializeSolenoidPort(port, &status);
 	  wpi_setErrorWithContext(status, getHALErrorMessage(status));

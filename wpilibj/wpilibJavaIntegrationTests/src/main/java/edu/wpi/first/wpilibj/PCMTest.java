@@ -54,8 +54,8 @@ public class PCMTest extends AbstractComsSetup {
 	    fakePressureSwitch = new DigitalOutput(11);
 	    fakeCompressor = new AnalogInput(1);
 
-	    solenoid1 = new Solenoid(1);
-	    solenoid2 = new Solenoid(2);
+	    solenoid1 = new Solenoid(0);
+	    solenoid2 = new Solenoid(1);
 
 	    fakeSolenoid1 = new DigitalInput(12);
 	    fakeSolenoid2 = new DigitalInput(13);
