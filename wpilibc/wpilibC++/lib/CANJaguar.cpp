@@ -504,7 +504,7 @@ void CANJaguar::setupPeriodicStatus() {
 	// temperature.
 	static const uint8_t kMessage0Data[] = {
 		LM_PSTAT_VOLTBUS_B0, LM_PSTAT_VOLTBUS_B1,
-		LM_PSTAT_VOLTOUT_B0, LM_PSTAT_VOLTOUT_B1,
+		LM_PSTAT_VOUT_B0, LM_PSTAT_VOUT_B1,
 		LM_PSTAT_CURRENT_B0, LM_PSTAT_CURRENT_B1,
 		LM_PSTAT_TEMP_B0, LM_PSTAT_TEMP_B1
 	};
