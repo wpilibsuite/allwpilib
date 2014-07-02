@@ -5,14 +5,14 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-#include "simulation/SimContinuousOutput.h"
+#include "SafePWM.h"
 #include "SpeedController.h"
 #include "PIDOutput.h"
 
 /**
  * CTRE Talon Speed Controller
  */
-class Talon : public SpeedController
+class Talon : public SafePWM, public SpeedController
 {
 public:
 	explicit Talon(uint32_t channel);
@@ -24,6 +24,5 @@ public:
 	virtual void PIDWrite(float output);
 
 private:
-	void InitTalon(int channel);
-	SimContinuousOutput* impl;
+	void InitTalon();
 };

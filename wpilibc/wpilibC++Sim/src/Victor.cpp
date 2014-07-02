@@ -6,6 +6,7 @@
 
 #include "Victor.h"
 
+//#include "NetworkCommunication/UsageReporting.h"
 #include "LiveWindow/LiveWindow.h"
 
 /**
@@ -23,20 +24,21 @@
  *   - 125 = the "low end" of the deadband range
  *   - 56 = full "reverse"
  */
-void Victor::InitVictor(int channel) {
-	char buffer[50];
-	int n = sprintf(buffer, "pwm/1/%d", channel);
-	impl = new SimContinuousOutput(buffer);
+void Victor::InitVictor() {
+	SetBounds(2.027, 1.525, 1.507, 1.49, 1.026);
 
-	// TODO: LiveWindow::GetInstance()->AddActuator("Victor", slot, channel, this);
+	SetPeriodMultiplier(kPeriodMultiplier_2X);
+	SetRaw(m_centerPwm);
+
+	LiveWindow::GetInstance()->AddActuator("Victor", GetChannel(), this);
 }
 
 /**
  * @param channel The PWM channel that the Victor is attached to.
  */
-Victor::Victor(uint32_t channel)
+Victor::Victor(uint32_t channel) : SafePWM(channel)
 {
-    InitVictor(channel);
+	InitVictor();
 }
 
 Victor::~Victor()
@@ -48,13 +50,13 @@ Victor::~Victor()
  *
  * The PWM value is set using a range of -1.0 to 1.0, appropriately
  * scaling the value for the FPGA.
- * 
+ *
  * @param speed The speed value between -1.0 and 1.0 to set.
  * @param syncGroup Unused interface.
  */
 void Victor::Set(float speed, uint8_t syncGroup)
 {
-	impl->Set(speed);
+	SetSpeed(speed);
 }
 
 /**
@@ -64,7 +66,7 @@ void Victor::Set(float speed, uint8_t syncGroup)
  */
 float Victor::Get()
 {
-	return impl->Get();
+	return GetSpeed();
 }
 
 /**
@@ -72,7 +74,7 @@ float Victor::Get()
  */
 void Victor::Disable()
 {
-    impl->Set(0);
+	SetRaw(kPwmDisabled);
 }
 
 /**
