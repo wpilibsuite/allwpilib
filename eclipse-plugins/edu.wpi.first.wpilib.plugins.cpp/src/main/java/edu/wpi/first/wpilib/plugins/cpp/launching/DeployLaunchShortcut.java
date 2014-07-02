@@ -3,6 +3,7 @@ package edu.wpi.first.wpilib.plugins.cpp.launching;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.io.File;
 
 import org.eclipse.cdt.debug.core.ICDTLaunchConfigurationConstants;
 import org.eclipse.cdt.debug.core.executables.Executable;
@@ -28,12 +29,13 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.wpi.first.wpilib.plugins.core.WPILibCore;
 import edu.wpi.first.wpilib.plugins.cpp.WPILibCPPPlugin;
+import edu.wpi.first.wpilib.plugins.core.launching.AntLauncher;
 
 /**
  * Launch shortcut base functionality, common for deploying to the robot.
  * Retrieves the project the operation is being called on, and runs the correct
  * ant targets based on polymorphically determined data values
- * 
+ *
  * @author Ryan O'Meara
  * @author Alex Henning
  */
@@ -46,7 +48,7 @@ public class DeployLaunchShortcut implements ILaunchShortcut
 	/**
 	 * Returns the launch type of the shortcut that was used, one of the
 	 * constants defined in BaseLaunchShortcut
-	 * 
+	 *
 	 * @return Launch shortcut type
 	 */
 	public String getLaunchType()
@@ -91,7 +93,7 @@ public class DeployLaunchShortcut implements ILaunchShortcut
 	}
 	
 	/**
-	 * 
+	 *
 	 * @param activeProj
 	 *            The project that the script will be run on/from
 	 * @param mode
@@ -99,23 +101,34 @@ public class DeployLaunchShortcut implements ILaunchShortcut
 	 *            ILaunchManager.DEBUG_MODE)
 	 */
 	public void runConfig(IProject activeProj, String mode, Shell shell) {
-        // TODO: figure out UI issues. that's why this is undocumented
-		ILaunchConfigurationWorkingCopy config;
-		try {
-			config = getRemoteDebugConfig(activeProj);
-			//config.doSave(); // NOTE: For debugging
-			//org.eclipse.debug.core.DebugPlugin.getDefault().getLaunchManager().addLaunch(config.launch(mode, null));
-			//THIS IS MADDENING! we want to add to the recent history, but I can't seem to find a public api to do so, so lets just launch the config dialog
-			//DebugUITools.openLaunchConfigurationPropertiesDialog(shell, config, "org.eclipse.cdt.launch.launchGroup");
-			//config.launch(mode, new NullProgressMonitor(), false, true);
-			DebugUITools.launch(config, mode);
-		} catch (CoreException e) {
-			WPILibCPPPlugin.logError("Debug attach failed.", e);
+		if(mode.equals(ILaunchManager.RUN_MODE)) {
+			// Regular deploys are done with an ant script for now, for both
+			// C++ and Java.
+			WPILibCPPPlugin.logInfo("Running ant file: " + activeProj.getLocation().toOSString() + File.separator + "build.xml");
+			WPILibCPPPlugin.logInfo("Targets: deploy, Mode: " + mode);
+			AntLauncher.runAntFile(new File (activeProj.getLocation().toOSString() + File.separator + "build.xml"), "deploy", null, mode);
+		} else {
+			// Debug deploys are done with the Eclipse Remote System Explorer,
+			// which lets it work with Eclipse's C++ debugger.
+			
+			// TODO: figure out UI issues. that's why this is undocumented
+			ILaunchConfigurationWorkingCopy config;
+			try {
+				config = getRemoteDebugConfig(activeProj);
+				//config.doSave(); // NOTE: For debugging
+				//org.eclipse.debug.core.DebugPlugin.getDefault().getLaunchManager().addLaunch(config.launch(mode, null));
+				//THIS IS MADDENING! we want to add to the recent history, but I can't seem to find a public api to do so, so lets just launch the config dialog
+				//DebugUITools.openLaunchConfigurationPropertiesDialog(shell, config, "org.eclipse.cdt.launch.launchGroup");
+				//config.launch(mode, new NullProgressMonitor(), false, true);
+				DebugUITools.launch(config, mode);
+			} catch (CoreException e) {
+				WPILibCPPPlugin.logError("Debug attach failed.", e);
+			}
+			
+			try {
+				activeProj.refreshLocal(Resource.DEPTH_INFINITE, null);
+			} catch (Exception e) {}
 		}
-		
-		try {
-			activeProj.refreshLocal(Resource.DEPTH_INFINITE, null);
-		} catch (Exception e) {}
 	}
 	
 	private ILaunchConfigurationWorkingCopy getRemoteDebugConfig(IProject activeProj) throws CoreException
@@ -128,7 +141,7 @@ public class DeployLaunchShortcut implements ILaunchShortcut
 		ILaunchConfigurationWorkingCopy config = type.newInstance(null, activeProj.getName());
 		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, activeProj.getName());
 		Collection<Executable> exes = ExecutablesManager.getExecutablesManager().getExecutablesForProject(activeProj);
-		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME, 
+		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME,
 				exes.size() > 0 ? exes.toArray(new Executable[0])[0].getPath().makeRelativeTo(activeProj.getLocation()).toString():
 			 "Debug/FRCUserProgram");
 		config.setAttribute(IRemoteConnectionConfigurationConstants.ATTR_REMOTE_PATH, "/home/admin/FRCUserProgram");
