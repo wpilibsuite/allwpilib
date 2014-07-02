@@ -1,84 +1,19 @@
 #ifndef PCM_H_
 #define PCM_H_
-#include "ctre.h"				//BIT Defines +  Typedefs
+#include "ctre.h"				//BIT Defines + Typedefs
 #include <NetworkCommunication/CANSessionMux.h>	//CAN Comm
+#include "CtreCanNode.h"
 #include <pthread.h>
-/* encoder/decoders */
-typedef struct _PcmStatus_t{
-	/* Byte 0 */
-	unsigned SolenoidBits:8;
-	/* Byte 1 */
-	unsigned compressorOn:1;
-	unsigned stickyFaultFuseTripped:1;
-	unsigned stickyFaultCompCurrentTooHigh:1;
-	unsigned faultCompCurrentTooHigh:1;
-	unsigned faultFuseTripped:1;
-	unsigned faultHardwareFailure:1;
-	unsigned isCloseloopEnabled:1;
-	unsigned pressureSwitchEn:1;
-	/* Byte 2*/
-	unsigned battVoltage:8;
-	/* Byte 3 */
-	unsigned solenoidVoltageTop8:8;
-	/* Byte 4 */
-	unsigned compressorCurrentTop6:6;
-	unsigned solenoidVoltageBtm2:2;
-	/* Byte 5 */
-	unsigned reserved:2;
-	unsigned moduleEnabled:1;
-	unsigned closedLoopOutput:1;
-	unsigned compressorCurrentBtm4:4;
-	/* Byte 6 */
-	unsigned tokenSeedTop8:8;
-	/* Byte 7 */
-	unsigned tokenSeedBtm8:8;
-}PcmStatus_t;
-
-typedef struct _PcmControl_t{
-	/* Byte 0 */
-	unsigned tokenTop8:8;
-	/* Byte 1 */
-	unsigned tokenBtm8:8;
-	/* Byte 2 */
-	unsigned solenoidBits:8;
-	/* Byte 3*/
-	unsigned reserved:5;
-	unsigned CompressorOn_deprecated:1; //!< This is ignored by PCM firm now.
-	unsigned closedLoopEnable:1;
-	unsigned clearStickyFaults:1;
-}PcmControl_t;
-
-typedef struct _PcmStatusFault_t{
-	/* Byte 0 */
-	unsigned SolenoidBlacklist:8;
-	/* Byte 1 */
-	unsigned reserved1:8;
-	unsigned reserved2:8;
-	unsigned reserved3:8;
-	unsigned reserved4:8;
-	unsigned reserved5:8;
-	unsigned reserved6:8;
-	unsigned reserved7:8;
-}PcmStatusFault_t;
-
-typedef struct _PcmDebug_t{
-	unsigned tokFailsTop8:8;
-	unsigned tokFailsBtm8:8;
-	unsigned lastFailedTokTop8:8;
-	unsigned lastFailedTokBtm8:8;
-	unsigned tokSuccessTop8:8;
-	unsigned tokSuccessBtm8:8;
-}PcmDebug_t;
-
-class PCM
+class PCM : public CtreCanNode
 {
 public:
-    PCM(UINT8 deviceNumber=50);
+    PCM(UINT8 deviceNumber=0);
     ~PCM();
-
+    
     /* Set PCM solenoid state
+     *
      * @Return	-	CTR_Code	-	Error code (if any) for setting solenoid
-     * @Param 	-	idx			- 	ID of solenoid (1-8)
+     * @Param 	-	idx			- 	ID of solenoid (0-7)
      * @Param 	-	en			- 	Enable / Disable identified solenoid
      */
     CTR_Code 	SetSolenoid(unsigned char idx, bool en);
@@ -94,14 +29,12 @@ public:
      * @Param 	-	clr		- 	Clear / do not clear faults
      */
     CTR_Code 	ClearStickyFaults(bool clr);
-
+    
     /* Get solenoid state
      *
      * @Return	-	CTR_Code	-	Error code (if any)
-     * @Param 	-	idx		- 	ID of solenoid (1-8) to return status of
-     * @Param	-	status	-	True if solenoid output is set to be enabled, false otherwise.
-     *                          If the phsyical output led still isn't on, then check webdash for
-     *                          any faults/is PCM enabled.
+     * @Param 	-	idx		- 	ID of solenoid (0-7) to return if solenoid is on.
+     * @Param	-	status	-	OK if solenoid enabled, false otherwise
      */
     CTR_Code 	GetSolenoid(UINT8 idx, bool &status);
 
@@ -172,7 +105,7 @@ public:
      * @Param	-	status		-	Voltage across PCM power ports in Volts (V)
      */
     CTR_Code 	GetBatteryVoltage(float &status);
-
+    
     /* Set PCM Device Number and according CAN frame IDs
      * @Return	-	void
      * @Param	-	deviceNumber	-	Device number of PCM to control
@@ -186,7 +119,7 @@ public:
      * 				See function EnableSeekDebugFrames
      */
 	CTR_Code GetNumberOfFailedControlFrames(UINT16 &status);
-
+    
     /* Get raw Solenoid Blacklist
      * @Return	-	CTR_Code	-	Error code (if any)
      * @Param	-	status		-	Raw binary breakdown of Solenoid Blacklist
@@ -200,7 +133,7 @@ public:
     /* Get solenoid Blacklist status
      * - Blacklisted solenoids cannot be enabled until PCM is power cycled
      * @Return	-	CTR_Code	-	Error code (if any)
-     * @Param	-	idx			-	ID of solenoid
+     * @Param	-	idx			-	ID of solenoid [0,7]
      * @Param	-	status		-	True if Solenoid is blacklisted, false if otherwise
      * @WARNING	-	Return only valid if [SeekStatusFaultFrames] is enabled
      * 				See function SeekStatusFaultFrames
@@ -213,70 +146,6 @@ public:
      * @Param	-	status		-	Returns TRUE if PCM is enabled, FALSE if disabled
      */
     CTR_Code	isModuleEnabled(bool &status);
-
-    /* Get time since last sent frame
-	 * @Return	-	int		-	Returns time in milliseconds (ms) since last sent PCM frame
-	 */
-	int GetTimeSinceLastTx(void) { return _timeSinceLastTx;}
-
-	/* Get time since last received frame
-	 * @Return	-	int		-	Returns time in milliseconds (ms) since last received PCM frame
-	 */
-	int GetTimeSinceLastRx(void) { return _timeSinceLastRx;}
-private:
-
-	    /* Seek PCM Status Frames on CAN bus
-	     * @Return	-	void
-	     * @Param	-	en	-	Enable / Disable seeking of PCM Status Frame
-	     * @Notes	-	Status Frames identify
-	     */
-	    void 	EnableSeekStatusFrames(bool en);
-
-	    /* Seek PCM Status Fault Frames on CAN bus
-	     * @Return	-	void
-	     * @Param	-	en	-	Enable / Disable seeking of PCM Status Fault Frame
-	     * @Notes	-	Status Fault Frames identify Blacklisted Solenoids
-	     */
-	    void 	EnableSeekStatusFaultFrames(bool en);
-
-	    /* Seek PCM Debug Frames on CAN bus
-	     * @Return	-	void
-	     * @Param	-	en	-	Enable / Disable seeking of PCM Debug Frame
-	     * @Notes	-	Debug Frames identify the number of failed tokens (for exclusive, secure control of PCM by RoboRIO)
-	     */
-	    void 	EnableSeekDebugFrames(bool en);
-	/* frames to receive */
-	PcmDebug_t 			_PcmDebug;
-	PcmStatus_t 		_PcmStatus;
-	PcmStatusFault_t 	_PcmStatusFault;
-	/* frames to send */
-	PcmControl_t 		_PcmControl;
-	/* tracking health and error info */
-	uint32_t _timeSinceLastRx;
-	uint32_t _timeSinceLastTx;
-	uint32_t _numFailedRxs;
-	uint32_t _numFailedTxs;
-	/* threading */
-	pthread_t _thread;
-	int _threadErr;
-	int _threadIsRunning;
-	/** arbids */
-    struct PCM_SETTINGS{
-    	UINT8 deviceNumber;
-    	UINT32 controlFrameID;
-    	UINT32 statusFrameID;
-    	UINT32 statusFaultFrameID;
-    	UINT32 debugFrameID;
-    }PCM_settings;
-    void ReadStatusFrame(void);
-    void ReadStatusFaultFrame(void);
-    void ReadDebugFrame(void);
-    void GetErrorInfo(	uint32_t * timeSinceLastRx,
-						uint32_t * timeSinceLastTx,
-						uint32_t * numFailedRxs,
-						uint32_t * numFailedTxs);
-    static void * ThreadFunc(void *);
-    void * ThreadFunc();
 };
 //------------------ C interface --------------------------------------------//
 extern "C" {
