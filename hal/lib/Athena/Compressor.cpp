@@ -2,20 +2,19 @@
 #include "ctre/PCM.h"
 #include <iostream>
 
-static const int NUM_PCMS = 2;
-extern PCM *modules[NUM_PCMS];
-extern void initializePCM();
+static const int NUM_MODULE_NUMBERS = 63;
+extern PCM *modules[NUM_MODULE_NUMBERS];
+extern void initializePCM(int module);
 
 void *initializeCompressor(uint8_t module) {
-	initializePCM();
+	initializePCM(module);
 	
-	return modules[module - 1];
+	return modules[module];
 }
 
 bool checkCompressorModule(uint8_t module) {
-	return module > 0 and module <= NUM_PCMS;
+	return module < NUM_MODULE_NUMBERS;
 }
-
 
 bool getCompressor(void *pcm_pointer, int32_t *status) {
 	PCM *module = (PCM *)pcm_pointer;

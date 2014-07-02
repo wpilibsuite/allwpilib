@@ -153,7 +153,7 @@ bool SensorBase::CheckAnalogOutput(uint32_t channel)
  */
 bool SensorBase::CheckSolenoidChannel(uint32_t channel)
 {
-	if (channel > 0 && channel <= kSolenoidChannels)
+	if (channel < kSolenoidChannels)
 		return true;
 	return false;
 }
@@ -165,7 +165,7 @@ bool SensorBase::CheckSolenoidChannel(uint32_t channel)
  */
 bool SensorBase::CheckPDPChannel(uint32_t channel)
 {
-	if (channel > 0 && channel <= kPDPChannels)
+	if (channel < kPDPChannels)
 		return true;
 	return false;
 }

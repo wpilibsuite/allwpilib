@@ -31,14 +31,14 @@ void Solenoid::InitSolenoid()
 	Resource::CreateResourceObject(&m_allocated, solenoid_kNumDO7_0Elements * kSolenoidChannels);
 
 	snprintf(buf, 64, "Solenoid %d (Module: %d)", m_channel, m_moduleNumber);
-	if (m_allocated->Allocate((m_moduleNumber - 1) * kSolenoidChannels + m_channel - 1, buf) == ~0ul)
+	if (m_allocated->Allocate(m_moduleNumber * kSolenoidChannels + m_channel, buf) == ~0ul)
 	{
 		CloneError(m_allocated);
 		return;
 	}
 
 	LiveWindow::GetInstance()->AddActuator("Solenoid", m_moduleNumber, m_channel, this);
-	HALReport(HALUsageReporting::kResourceType_Solenoid, m_channel, m_moduleNumber - 1);
+	HALReport(HALUsageReporting::kResourceType_Solenoid, m_channel, m_moduleNumber);
 }
 
 /**
@@ -73,7 +73,7 @@ Solenoid::~Solenoid()
 {
 	if (CheckSolenoidModule(m_moduleNumber))
 	{
-		m_allocated->Free((m_moduleNumber - 1) * kSolenoidChannels + m_channel - 1);
+		m_allocated->Free(m_moduleNumber * kSolenoidChannels + m_channel);
 	}
 }
 
@@ -86,7 +86,7 @@ void Solenoid::Set(bool on)
 {
 	if (StatusIsFatal()) return;
 	uint8_t value = on ? 0xFF : 0x00;
-	uint8_t mask = 1 << (m_channel - 1);
+	uint8_t mask = 1 << m_channel;
 
 	SolenoidBase::Set(value, mask);
 }
@@ -99,7 +99,7 @@ void Solenoid::Set(bool on)
 bool Solenoid::Get()
 {
 	if (StatusIsFatal()) return false;
-	uint8_t value = GetAll() & ( 1 << (m_channel - 1));
+	uint8_t value = GetAll() & ( 1 << m_channel);
 	return (value != 0);
 }
 

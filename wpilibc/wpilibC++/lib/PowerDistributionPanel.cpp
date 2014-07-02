@@ -47,7 +47,7 @@ PowerDistributionPanel::GetTemperature() {
 }
 
 /**
- * @return The current of one of the PDP channels (channels 1-16) in Amperes
+ * @return The current of one of the PDP channels (channels 0-15) in Amperes
  */
 double
 PowerDistributionPanel::GetCurrent(uint8_t channel) {

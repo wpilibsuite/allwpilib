@@ -30,7 +30,7 @@ public abstract class SolenoidBase extends SensorBase implements IDeviceControll
      * @param moduleNumber The number of the solenoid module to use.
      */
     public SolenoidBase(final int moduleNumber) {
-//        m_moduleNumber = moduleNumber;
+        m_moduleNumber = moduleNumber;
 //        m_ports = new ByteBuffer[SensorBase.kSolenoidChannels];
 //        for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
 //            ByteBuffer port = SolenoidJNI.getPortWithModule((byte) moduleNumber, (byte) (i+1));

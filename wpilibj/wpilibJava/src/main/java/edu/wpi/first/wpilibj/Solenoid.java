@@ -54,7 +54,7 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
         HALUtil.checkStatus(status.asIntBuffer());
 
         LiveWindow.addActuator("Solenoid", m_moduleNumber, m_channel, this);
-        UsageReporting.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber - 1);
+        UsageReporting.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber);
     }
 
     /**

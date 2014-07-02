@@ -51,7 +51,7 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPortWith
   (JNIEnv *env, jclass, jbyte module, jbyte channel)
 {
 	VoidPointer *port_pointer = new VoidPointer;
-	*port_pointer = getPortWithModule(module + 1, channel);
+	*port_pointer = getPortWithModule(module, channel);
 	
 	return env->NewDirectByteBuffer(port_pointer, 4);
 }
