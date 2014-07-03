@@ -70,7 +70,7 @@ private:
 	double m_distancePerPulse;		// distance of travel for each encoder tick
 	EncodingType m_encodingType;	// Encoding type
 	PIDSourceParameter m_pidSource;	// Encoder parameter that sources a PID controller
-	bool reversed;
+	bool m_reverseDirection;
 	SimEncoder* impl;
 
 	ITable *m_table;

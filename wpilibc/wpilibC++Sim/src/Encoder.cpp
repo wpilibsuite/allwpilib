@@ -24,7 +24,6 @@ void Encoder::InitEncoder(int channelA, int channelB, bool reverseDirection, Enc
 	m_table = NULL;
     this->channelA = channelA;
     this->channelB = channelB;
-    reversed = reverseDirection;
 	m_encodingType = encodingType;
 
 	int32_t index = 0;
@@ -37,6 +36,9 @@ void Encoder::InitEncoder(int channelA, int channelB, bool reverseDirection, Enc
         int channel = channelB;
         channelB = channelA;
         channelA = channel;
+        m_reverseDirection = !reverseDirection;
+    } else {
+        m_reverseDirection = reverseDirection;
     }
     char buffer[50];
     int n = sprintf(buffer, "dio/1/%d/1/%d", channelA, channelB);
@@ -288,7 +290,11 @@ void Encoder::SetMinRate(double minRate)
  */
 void Encoder::SetDistancePerPulse(double distancePerPulse)
 {
-	m_distancePerPulse = distancePerPulse;
+	if (m_reverseDirection) {
+		m_distancePerPulse = -distancePerPulse;
+	} else {
+		m_distancePerPulse = distancePerPulse;
+	}
 }
 
 /**
@@ -334,7 +340,7 @@ void Encoder::UpdateTable() {
 	if (m_table != NULL) {
         m_table->PutNumber("Speed", GetRate());
         m_table->PutNumber("Distance", GetDistance());
-        m_table->PutNumber("Distance per Tick", m_distancePerPulse);
+        m_table->PutNumber("Distance per Tick", m_reverseDirection ? -m_distancePerPulse : m_distancePerPulse);
 	}
 }
 
