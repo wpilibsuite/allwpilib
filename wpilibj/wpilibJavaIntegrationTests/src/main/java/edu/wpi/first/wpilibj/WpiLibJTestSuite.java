@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj.test.AbstractTestSuite;
 @SuiteClasses({
 				AnalogCrossConnectTest.class,
 				AnalogPotentiometerTest.class,
-				CANJaguarTest.class,
 				CounterTest.class,
 				DIOCrossConnectTest.class,
 				EncoderTest.class,

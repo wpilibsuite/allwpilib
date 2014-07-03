@@ -17,11 +17,13 @@ import edu.wpi.first.wpilibj.test.AbstractTestSuite;
  *
  */
 @RunWith(Suite.class)
-@SuiteClasses({ CurrentQuadEncoderModeTest.class,
-				PercentQuadEncoderModeTest.class,
-				PositionQuadEncoderModeTest.class,
-				SpeedQuadEncoderModeTest.class,
-				VoltageQuadEncoderModeTest.class
+@SuiteClasses({ CANCurrentQuadEncoderModeTest.class,
+				CANDefaultTest.class,
+				CANPercentQuadEncoderModeTest.class,
+				CANPositionPotentiometerModeTest.class,
+				CANPositionQuadEncoderModeTest.class,
+				CANSpeedQuadEncoderModeTest.class,
+				CANVoltageQuadEncoderModeTest.class
 			})
 public class CANTestSuite extends AbstractTestSuite {
 

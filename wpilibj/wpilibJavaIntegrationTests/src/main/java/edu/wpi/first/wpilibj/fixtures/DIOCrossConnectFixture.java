@@ -53,7 +53,6 @@ public class DIOCrossConnectFixture implements ITestFixture {
 	@Override
 	public boolean reset() {
 		output.set(false);
-		assert input.get();
 		return true;
 	}
 

@@ -6,73 +6,92 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj.can;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.lessThan;
-import static org.junit.Assert.assertThat;
-
 import org.junit.After;
+import org.junit.Before;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+import edu.wpi.first.wpilibj.test.TestBench;
 
 /**
+ * Provides a base implementation for CAN Tests that forces a test of a particular mode to provide tests of a certain type.
+ * This also allows for a standardized base setup for each test.
  * @author jonathanleitschuh
  *
  */
-public abstract class AbstractCANTest extends AbstractComsSetup implements ICANData{
-	protected CANMotorEncoderFixture me;
+public abstract class AbstractCANTest extends AbstractComsSetup{
+	public static final double kMotorStopTime = 2;
+	public static final double kMotorTime = 3;
+	public static final double kMotorTimeSettling = 10;
+	public static final double kPotentiometerSettlingTime = 10.0;
+	public static final double kEncoderSettlingTime = 0.50;
+	public static final double kEncoderSpeedTolerance = 30.0;
+	public static final double kLimitSettlingTime = 20.0; //timeout in seconds
+	public static final double kStartupTime = 0.50;
+	public static final double kEncoderPositionTolerance = .75;
+	public static final double kPotentiometerPositionTolerance = 10.0/360.0; // +/-10 degrees
+	public static final double kCurrentTolerance = 0.1;
+	
+	
+	/** Stores the status value for the previous test. This is set immediately after a failure or success and before the me is torn down. */
+	private String status = "";
 	/**
-	 * Tests that CAN in a certain mode will rotate forwards. The implementation of this method is left up to the extending class because each will require difrent values.
-	 * Should call {@link AbstractCANTest#testRotateForward(double, double)}
+	 * Extends the default test watcher in order to provide more information about a tests failure at runtime.
+	 * @author jonathanleitschuh
+	 *
 	 */
-	abstract public void testRotateForward();
+	public class CANTestWatcher extends DefaultTestWatcher{
+		@Override
+		protected void failed(Throwable e, Description description) {
+			super.failed(e, description, status);
+		}
+	}
+	@Override
+	protected TestWatcher getOverridenTestWatcher(){
+		return new CANTestWatcher();
+	}
+	
+	/** The Fixture under test */
+	private CANMotorEncoderFixture me;
 	
 	/**
-	 * Tests that CAN in a certain mode will rotate forwards. The implementation of this method is left up to the extending class because each will require difrent values.
-	 * Should call {@link AbstractCANTest#testRotateReverse(double, double)}
+	 * Retrieves the CANMotorEncoderFixture
+	 * @return the CANMotorEncoderFixture for this test.
 	 */
-	abstract public void testRotateReverse();
+	public CANMotorEncoderFixture getME(){
+		return me;
+	}
 	
+	/**
+	 * This runs BEFORE the setup of the inherited class
+	 */
+	@Before
+	public final void preSetup(){
+		status = "";
+		me = TestBench.getInstance().getCanJaguarPair();
+		me.setup();
+		me.getMotor().setSafetyEnabled(false);
+	}
 	
 	@After
 	public final void tearDown() throws Exception {
-		me.teardown();
+		try{
+			//Stores the status data before tearing it down.
+			//If the test fails unexpectedly then this could cause an exception.
+			status = me.printStatus();
+		} finally{
+			me.teardown();
+		}
+		me = null;
 	}
 	
-	/**
-	 * Tests that a CANMotorEncoderFixture can rotate forward.
-	 * Called by extending TestClasses
-	 * @param stoppedValue the value where the motor will not be spinning in the current mode
-	 * @param runningValue the value where the motor will be spinning in the current mode
-	 */
-	protected void testRotateForward(double stoppedValue, double runningValue){
-		double initialPosition = me.getMotor().getPosition();
-	    /* Drive the speed controller briefly to move the encoder */
-	    me.getMotor().set(runningValue);
-	    Timer.delay(kMotorTime);
-	    me.getMotor().set(stoppedValue);
-
-	    /* The position should have increased */
-	    assertThat("CAN Jaguar position should have increased after the motor moved", me.getMotor().getPosition(), is(greaterThan(initialPosition)));
-	}
-	
-	
-	/**
-	 * Tests that a CANMotorEncoderFixture can rotate in reverse.
-	 * Called by extending TestClasses
-	 * @param stoppedValue the value where the motor will not be spinning in the current mode
-	 * @param runningValue the value where the motor will be spinning in the current mode
-	 */
-	protected void testRotateReverse(double stoppedValue, double runningValue){
-		double initialPosition = me.getMotor().getPosition();
-	    /* Drive the speed controller briefly to move the encoder */
-	    me.getMotor().set(runningValue);
-	    Timer.delay(kMotorTime);
-	    me.getMotor().set(stoppedValue);
-
-	    /* The position should have decreased */
-	    assertThat( "CAN Jaguar position should have decreased after the motor moved", me.getMotor().getPosition(), is(lessThan(initialPosition)));
+	protected void setCANJaguar(double seconds, double value){
+		for(int i = 0; i < 50; i++) {
+			getME().getMotor().set(value);
+			Timer.delay(seconds / 50.0);
+		}
 	}
 }
