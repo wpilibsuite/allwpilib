@@ -2,4 +2,4 @@
 killall java
 killall FRCUserProgram
 sleep 1
-/usr/local/frc/JRE/bin/java -jar wpilibJavaIntegrationTests-0.1.0-SNAPSHOT.jar -ea
+/usr/local/frc/JRE/bin/java -ea -jar wpilibJavaIntegrationTests-0.1.0-SNAPSHOT.jar $@
