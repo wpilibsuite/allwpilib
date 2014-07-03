@@ -33,14 +33,36 @@ public:
 	static constexpr double kApproxBusVoltage = 12.0;
 
 	// Control mode tags
+	/** Sets an encoder as the speed reference only. <br> Passed as the "tag" when setting the control mode.*/
 	static const struct EncoderStruct       {} Encoder;
+	/** Sets a quadrature encoder as the position and speed reference. <br> Passed as the "tag" when setting the control mode.*/
 	static const struct QuadEncoderStruct   {} QuadEncoder;
+	/** Sets a potentiometer as the position reference only. <br> Passed as the "tag" when setting the control mode. */
 	static const struct PotentiometerStruct {} Potentiometer;
 
 	typedef enum {kCurrentFault = 1, kTemperatureFault = 2, kBusVoltageFault = 4, kGateDriverFault = 8} Faults;
 	typedef enum {kForwardLimit = 1, kReverseLimit = 2} Limits;
-	typedef enum {kNeutralMode_Jumper = 0, kNeutralMode_Brake = 1, kNeutralMode_Coast = 2} NeutralMode;
-	typedef enum {kLimitMode_SwitchInputsOnly = 0, kLimitMode_SoftPositionLimits = 1} LimitMode;
+	typedef enum {
+					kNeutralMode_Jumper = 0, /** Use the NeutralMode that is set by the jumper wire on the CAN device */
+					kNeutralMode_Brake = 1,  /** Stop the motor's rotation by applying a force. */
+					kNeutralMode_Coast = 2   /** Do not attempt to stop the motor. Instead allow it to coast to a stop without applying resistance. */
+				} NeutralMode;
+	typedef enum {
+				/**
+				 * Disables the soft position limits and only uses the limit switches to limit rotation.
+				 * @see CANJaguar#GetForwardLimitOK()
+				 * @see CANJaguar#GetReverseLimitOK()
+				 *
+				 */
+					kLimitMode_SwitchInputsOnly = 0,
+				/**
+				 * Enables the soft position limits on the Jaguar.
+				 * These will be used in addition to the limit switches. This does not disable the behavior
+				 * of the limit switch input.
+				 * @see CANJaguar#ConfigSoftPositionLimits(double, double)
+				 */
+					kLimitMode_SoftPositionLimits = 1
+				} LimitMode;
 
 	explicit CANJaguar(uint8_t deviceNumber);
 	virtual ~CANJaguar();

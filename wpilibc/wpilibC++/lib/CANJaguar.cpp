@@ -209,9 +209,27 @@ void CANJaguar::InitCANJaguar()
 }
 
 /**
- * Constructor
+ * Constructor for the CANJaguar device.<br>
+ * By default the device is configured in Percent mode.
+ * The control mode can be changed by calling one of the control modes listed below.
  *
- * @param deviceNumber The the address of the Jaguar on the CAN bus.
+ * @param deviceNumber The address of the Jaguar on the CAN bus.
+ * @see CANJaguar#SetCurrentMode(double, double, double)
+ * @see CANJaguar#SetCurrentMode(PotentiometerTag, double, double, double)
+ * @see CANJaguar#SetCurrentMode(EncoderTag, int, double, double, double)
+ * @see CANJaguar#SetCurrentMode(QuadEncoderTag, int, double, double, double)
+ * @see CANJaguar#SetPercentMode()
+ * @see CANJaguar#SetPercentMode(PotentiometerTag)
+ * @see CANJaguar#SetPercentMode(EncoderTag, int)
+ * @see CANJaguar#SetPercentMode(QuadEncoderTag, int)
+ * @see CANJaguar#SetPositionMode(PotentiometerTag, double, double, double)
+ * @see CANJaguar#SetPositionMode(QuadEncoderTag, int, double, double, double)
+ * @see CANJaguar#SetSpeedMode(EncoderTag, int, double, double, double)
+ * @see CANJaguar#SetSpeedMode(QuadEncoderTag, int, double, double, double)
+ * @see CANJaguar#SetVoltageMode()
+ * @see CANJaguar#SetVoltageMode(PotentiometerTag)
+ * @see CANJaguar#SetVoltageMode(EncoderTag, int)
+ * @see CANJaguar#SetVoltageMode(QuadEncoderTag, int)
  */
 CANJaguar::CANJaguar(uint8_t deviceNumber)
 	: m_deviceNumber (deviceNumber)
@@ -220,6 +238,7 @@ CANJaguar::CANJaguar(uint8_t deviceNumber)
 {
 	SetPercentMode();
 	InitCANJaguar();
+	ConfigMaxOutputVoltage(kApproxBusVoltage);
 }
 
 CANJaguar::~CANJaguar()
@@ -243,14 +262,14 @@ CANJaguar::~CANJaguar()
 }
 
 /**
- * Set the output set-point value.
+ * Sets the output set-point value.
  *
- * The scale and the units depend on the mode the Jaguar is in.
- * In PercentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWM Jaguar).
- * In Voltage Mode, the outputValue is in Volts.
- * In Current Mode, the outputValue is in Amps.
- * In Speed Mode, the outputValue is in Rotations/Minute.
- * In Position Mode, the outputValue is in Rotations.
+ * The scale and the units depend on the mode the Jaguar is in.<br>
+ * In percentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWM Jaguar).<br>
+ * In voltage Mode, the outputValue is in volts. <br>
+ * In current Mode, the outputValue is in amps. <br>
+ * In speed Mode, the outputValue is in rotations/minute.<br>
+ * In position Mode, the outputValue is in rotations.
  *
  * @param outputValue The set-point to sent to the motor controller.
  * @param syncGroup The update group to add this Set() to, pending UpdateSyncGroup().  If 0, update immediately.
@@ -321,12 +340,12 @@ void CANJaguar::Set(float outputValue, uint8_t syncGroup)
 /**
  * Get the recently set outputValue setpoint.
  *
- * The scale and the units depend on the mode the Jaguar is in.
- * In PercentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWM Jaguar).
- * In Voltage Mode, the outputValue is in Volts.
- * In Current Mode, the outputValue is in Amps.
- * In Speed Mode, the outputValue is in Rotations/Minute.
- * In Position Mode, the outputValue is in Rotations.
+ * The scale and the units depend on the mode the Jaguar is in.<br>
+ * In percentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWM Jaguar).<br>
+ * In voltage Mode, the outputValue is in volts.<br>
+ * In current Mode, the outputValue is in amps.<br>
+ * In speed Mode, the outputValue is in rotations/minute.<br>
+ * In position Mode, the outputValue is in rotations.<br>
  *
  * @return The most recently set outputValue setpoint.
  */
@@ -336,10 +355,10 @@ float CANJaguar::Get()
 }
 
 /**
- * Common interface for disabling a motor.
- *
- * @deprecated Call DisableControl instead.
- */
+* Common interface for disabling a motor.
+*
+* @deprecated Call {@link #DisableControl()} instead.
+*/
 void CANJaguar::Disable()
 {
 	DisableControl();
@@ -494,7 +513,7 @@ bool CANJaguar::getMessage(uint32_t messageID, uint32_t messageMask, uint8_t *da
 }
 
 /**
- * Enables periodic status updates from the Jaguar
+ * Enables periodic status updates from the Jaguar.
  */
 void CANJaguar::setupPeriodicStatus() {
 	uint8_t data[8];
@@ -1237,7 +1256,8 @@ case kVoltage:
 
 /**
  * Enable controlling the motor voltage as a percentage of the bus voltage
- * without any position or speed feedback.
+ * without any position or speed feedback.<br>
+ * After calling this you must call {@link CANJaguar#EnableControl()} or {@link CANJaguar#EnableControl(double)} to enable the device.
  */
 void CANJaguar::SetPercentMode()
 {
@@ -1248,9 +1268,10 @@ void CANJaguar::SetPercentMode()
 
 /**
  * Enable controlling the motor voltage as a percentage of the bus voltage,
- * and enable speed sensing from a non-quadrature encoder.
+ * and enable speed sensing from a non-quadrature encoder.<br>
+ * After calling this you must call {@link CANJaguar#EnableControl()} or {@link CANJaguar#EnableControl(double)} to enable the device.
  *
- * @param encoder The constant CANJaguar::Encoder
+ * @param tag The constant CANJaguar::Encoder
  * @param codesPerRev The counts per revolution on the encoder
  */
 void CANJaguar::SetPercentMode(CANJaguar::EncoderStruct, uint16_t codesPerRev)
@@ -1262,12 +1283,13 @@ void CANJaguar::SetPercentMode(CANJaguar::EncoderStruct, uint16_t codesPerRev)
 }
 
 /**
-* Enable controlling the motor voltage as a percentage of the bus voltage,
-* and enable position and speed sensing from a quadrature encoder
-*
-* @param encoder The constant CANJaguar::QuadEncoder
-* @param codesPerRev The counts per revolution on the encoder
-*/
+ * Enable controlling the motor voltage as a percentage of the bus voltage,
+ * and enable speed sensing from a non-quadrature encoder.<br>
+ * After calling this you must call {@link CANJaguar#EnableControl()} or {@link CANJaguar#EnableControl(double)} to enable the device.
+ *
+ * @param tag The constant CANJaguar::QuadEncoder
+ * @param codesPerRev The counts per revolution on the encoder
+ */
 void CANJaguar::SetPercentMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev)
 {
 	ChangeControlMode(kPercentVbus);
@@ -1278,7 +1300,8 @@ void CANJaguar::SetPercentMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRe
 
 /**
 * Enable controlling the motor voltage as a percentage of the bus voltage,
-* and enable position sensing from a potentiometer and no speed feedback.
+* and enable position sensing from a potentiometer and no speed feedback.<br>
+* After calling this you must call {@link CANJaguar#EnableControl()} or {@link CANJaguar#EnableControl(double)} to enable the device.
 *
 * @param potentiometer The constant CANJaguar::Potentiometer
 */
@@ -1291,7 +1314,8 @@ void CANJaguar::SetPercentMode(CANJaguar::PotentiometerStruct)
 }
 
 /**
- * Enable controlling the motor current with a PID loop.
+ * Enable controlling the motor current with a PID loop.<br>
+ * After calling this you must call {@link CANJaguar#EnableControl()} or {@link CANJaguar#EnableControl(double)} to enable the device.
  *
  * @param p The proportional gain of the Jaguar's PID controller.
  * @param i The integral gain of the Jaguar's PID controller.
@@ -1307,7 +1331,8 @@ void CANJaguar::SetCurrentMode(double p, double i, double d)
 
 /**
 * Enable controlling the motor current with a PID loop, and enable speed
-* sensing from a non-quadrature encoder.
+* sensing from a non-quadrature encoder.<br>
+* After calling this you must call {@link CANJaguar#EnableControl()} or {@link CANJaguar#EnableControl(double)} to enable the device.
 *
 * @param encoder The constant CANJaguar::Encoder
 * @param p The proportional gain of the Jaguar's PID controller.
@@ -1325,7 +1350,8 @@ void CANJaguar::SetCurrentMode(CANJaguar::EncoderStruct, uint16_t codesPerRev, d
 
 /**
 * Enable controlling the motor current with a PID loop, and enable speed and
-* position sensing from a quadrature encoder.
+* position sensing from a quadrature encoder.<br>
+* After calling this you must call {@link CANJaguar#EnableControl()} or {@link CANJaguar#EnableControl(double)} to enable the device.
 *
 * @param endoer The constant CANJaguar::QuadEncoder
 * @param p The proportional gain of the Jaguar's PID controller.
@@ -1343,7 +1369,8 @@ void CANJaguar::SetCurrentMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRe
 
 /**
 * Enable controlling the motor current with a PID loop, and enable position
-* sensing from a potentiometer.
+* sensing from a potentiometer.<br>
+* After calling this you must call {@link CANJaguar#EnableControl()} or {@link CANJaguar#EnableControl(double)} to enable the device.
 *
 * @param potentiometer The constant CANJaguar::Potentiometer
 * @param p The proportional gain of the Jaguar's PID controller.
@@ -1361,10 +1388,11 @@ void CANJaguar::SetCurrentMode(CANJaguar::PotentiometerStruct, double p, double 
 
 /**
  * Enable controlling the speed with a feedback loop from a non-quadrature
- * encoder.
+ * encoder.<br>
+ * After calling this you must call {@link CANJaguar#EnableControl()} or {@link CANJaguar#EnableControl(double)} to enable the device.
  *
  * @param encoder The constant CANJaguar::Encoder
- * @param codesPerRev The counts per revolution on the encoder
+ * @param codesPerRev The counts per revolution on the encoder.
  * @param p The proportional gain of the Jaguar's PID controller.
  * @param i The integral gain of the Jaguar's PID controller.
  * @param d The differential gain of the Jaguar's PID controller.
@@ -1379,10 +1407,11 @@ void CANJaguar::SetSpeedMode(CANJaguar::EncoderStruct, uint16_t codesPerRev, dou
 }
 
 /**
-* Enable controlling the speed with a feedback loop from a quadrature encoder.
+* Enable controlling the speed with a feedback loop from a quadrature encoder.<br>
+* After calling this you must call {@link CANJaguar#EnableControl()} or {@link CANJaguar#EnableControl(double)} to enable the device.
 *
 * @param encoder The constant CANJaguar::QuadEncoder
-* @param codesPerRev The counts per revolution on the encoder
+* @param codesPerRev The counts per revolution on the encoder.
 * @param p The proportional gain of the Jaguar's PID controller.
 * @param i The integral gain of the Jaguar's PID controller.
 * @param d The differential gain of the Jaguar's PID controller.
@@ -1397,9 +1426,14 @@ void CANJaguar::SetSpeedMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev,
 }
 
 /**
- * Enable controlling the position with a feedback loop using an encoder
+ * Enable controlling the position with a feedback loop using an encoder.<br>
+ * After calling this you must call {@link CANJaguar#EnableControl()} or {@link CANJaguar#EnableControl(double)} to enable the device.
  *
  * @param encoder The constant CANJaguar::QuadEncoder
+ * @param codesPerRev The counts per revolution on the encoder.
+ * @param p The proportional gain of the Jaguar's PID controller.
+ * @param i The integral gain of the Jaguar's PID controller.
+ * @param d The differential gain of the Jaguar's PID controller.
  *
  */
 void CANJaguar::SetPositionMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev, double p, double i, double d)
@@ -1411,7 +1445,11 @@ void CANJaguar::SetPositionMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerR
 }
 
 /**
-* Enable controlling the position with a feedback loop using a potentiometer
+* Enable controlling the position with a feedback loop using a potentiometer.<br>
+* After calling this you must call {@link CANJaguar#EnableControl()} or {@link CANJaguar#EnableControl(double)} to enable the device.
+* @param p The proportional gain of the Jaguar's PID controller.
+* @param i The integral gain of the Jaguar's PID controller.
+* @param d The differential gain of the Jaguar's PID controller.
 */
 void CANJaguar::SetPositionMode(CANJaguar::PotentiometerStruct, double p, double i, double d)
 {
@@ -1422,7 +1460,8 @@ void CANJaguar::SetPositionMode(CANJaguar::PotentiometerStruct, double p, double
 }
 
 /**
-* Enable controlling the motor voltage without any position or speed feedback.
+* Enable controlling the motor voltage without any position or speed feedback.<br>
+* After calling this you must call {@link CANJaguar#EnableControl()} or {@link CANJaguar#EnableControl(double)} to enable the device.
 */
 void CANJaguar::SetVoltageMode()
 {
@@ -1433,7 +1472,8 @@ void CANJaguar::SetVoltageMode()
 
 /**
 * Enable controlling the motor voltage with speed feedback from a
-* non-quadrature encoder and no position feedback.
+* non-quadrature encoder and no position feedback.<br>
+* After calling this you must call {@link CANJaguar#EnableControl()} or {@link CANJaguar#EnableControl(double)} to enable the device.
 *
 * @param encoder The constant CANJaguar::Encoder
 * @param codesPerRev The counts per revolution on the encoder
@@ -1448,7 +1488,8 @@ void CANJaguar::SetVoltageMode(CANJaguar::EncoderStruct, uint16_t codesPerRev)
 
 /**
 * Enable controlling the motor voltage with position and speed feedback from a
-* quadrature encoder
+* quadrature encoder.<br>
+* After calling this you must call {@link CANJaguar#EnableControl()} or {@link CANJaguar#EnableControl(double)} to enable the device.
 *
 * @param encoder The constant CANJaguar::QuadEncoder
 * @param codesPerRev The counts per revolution on the encoder
@@ -1463,7 +1504,8 @@ void CANJaguar::SetVoltageMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRe
 
 /**
 * Enable controlling the motor voltage with position feedback from a
-* potentiometer and no speed feedback.
+* potentiometer and no speed feedback.<br>
+* After calling this you must call {@link CANJaguar#EnableControl()} or {@link CANJaguar#EnableControl(double)} to enable the device.
 *
 * @param potentiometer The constant CANJaguar::Potentiometer
 */
@@ -1476,6 +1518,7 @@ void CANJaguar::SetVoltageMode(CANJaguar::PotentiometerStruct)
 }
 
 /**
+ * Used internally. In order to set the control mode see the methods listed below.
  * Change the control mode of this Jaguar object.
  *
  * After changing modes, configure any PID constants or other settings needed
@@ -1509,7 +1552,7 @@ CANJaguar::ControlMode CANJaguar::GetControlMode()
 /**
  * Get the voltage at the battery input terminals of the Jaguar.
  *
- * @return The bus voltage in Volts.
+ * @return The bus voltage in volts.
  */
 float CANJaguar::GetBusVoltage()
 {
@@ -1521,7 +1564,7 @@ float CANJaguar::GetBusVoltage()
 /**
  * Get the voltage being output from the motor terminals of the Jaguar.
  *
- * @return The output voltage in Volts.
+ * @return The output voltage in volts.
  */
 float CANJaguar::GetOutputVoltage()
 {
@@ -1533,7 +1576,7 @@ float CANJaguar::GetOutputVoltage()
 /**
  * Get the current through the motor terminals of the Jaguar.
  *
- * @return The output current in Amps.
+ * @return The output current in amps.
  */
 float CANJaguar::GetOutputCurrent()
 {
@@ -1558,6 +1601,8 @@ float CANJaguar::GetTemperature()
  * Get the position of the encoder or potentiometer.
  *
  * @return The position of the motor in rotations based on the configured feedback.
+ * @see CANJaguar#ConfigPotentiometerTurns(int)
+ * @see CANJaguar#ConfigEncoderCodesPerRev(int)
  */
 double CANJaguar::GetPosition()
 {
@@ -1606,6 +1651,10 @@ bool CANJaguar::GetReverseLimitOK()
  * Get the status of any faults the Jaguar has detected.
  *
  * @return A bit-mask of faults defined by the "Faults" enum.
+ * @see #kCurrentFault
+ * @see #kBusVoltageFault
+ * @see #kTemperatureFault
+ * @see #kGateDriverFault
  */
 uint16_t CANJaguar::GetFaults()
 {
@@ -1711,7 +1760,7 @@ void CANJaguar::ConfigEncoderCodesPerRev(uint16_t codesPerRev)
  * There is no special support for continuous turn potentiometers.
  * Only integer numbers of turns are supported.
  *
- * @param turns The number of turns of the potentiometer
+ * @param turns The number of turns of the potentiometer.
  */
 void CANJaguar::ConfigPotentiometerTurns(uint16_t turns)
 {

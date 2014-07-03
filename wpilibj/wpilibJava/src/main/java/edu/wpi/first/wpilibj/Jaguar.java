@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.parsing.IDeviceController;
 
 /**
- * VEX Robotics Jaguar Speed Control
+ * Texas Instruments Jaguar Speed Controller as a PWM device.
  */
 public class Jaguar extends SafePWM implements SpeedController, IDeviceController {
 
@@ -59,7 +59,9 @@ public class Jaguar extends SafePWM implements SpeedController, IDeviceControlle
      * @param speed The speed to set.  Value should be between -1.0 and 1.0.
      * @param syncGroup The update group to add this Set() to, pending UpdateSyncGroup().  If 0, update immediately.
      */
-    public void set(double speed, byte syncGroup) {
+    @Deprecated
+	@Override
+	public void set(double speed, byte syncGroup) {
         setSpeed(speed);
         Feed();
     }
@@ -72,7 +74,8 @@ public class Jaguar extends SafePWM implements SpeedController, IDeviceControlle
      *
      * @param speed The speed value between -1.0 and 1.0 to set.
      */
-    public void set(double speed) {
+    @Override
+	public void set(double speed) {
         setSpeed(speed);
         Feed();
     }
@@ -82,7 +85,8 @@ public class Jaguar extends SafePWM implements SpeedController, IDeviceControlle
      *
      * @return The most recently set value for the PWM between -1.0 and 1.0.
      */
-    public double get() {
+    @Override
+	public double get() {
         return getSpeed();
     }
 
@@ -91,7 +95,8 @@ public class Jaguar extends SafePWM implements SpeedController, IDeviceControlle
      *
      * @param output Write out the PWM value as was found in the PIDController
      */
-    public void pidWrite(double output) {
+    @Override
+	public void pidWrite(double output) {
         set(output);
     }
 }
