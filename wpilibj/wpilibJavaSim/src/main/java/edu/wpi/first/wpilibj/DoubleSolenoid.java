@@ -45,6 +45,7 @@ public class DoubleSolenoid implements LiveWindowSendable {
     private int m_forwardChannel; ///< The forward channel on the module to control.
     private int m_reverseChannel; ///< The reverse channel on the module to control.
     private int m_moduleNumber;
+    private boolean m_reverseDirection;
     private SimSpeedController m_impl;
     private Value m_value;
 
@@ -61,6 +62,7 @@ public class DoubleSolenoid implements LiveWindowSendable {
         	int channel = forwardChannel;
         	forwardChannel = reverseChannel;
         	reverseChannel = channel;
+        	m_reverseDirection = true;
         }
     	m_impl = new SimSpeedController("simulator/pneumatic/"+moduleNumber+"/"+forwardChannel+"/"+moduleNumber+"/"+reverseChannel);
     }
@@ -103,10 +105,10 @@ public class DoubleSolenoid implements LiveWindowSendable {
     		m_impl.set(0);
     		break;
     	case Value.kForward_val:
-    		m_impl.set(1);
+    		m_impl.set(m_reverseDirection ? -1 : 1);
     		break;
     	case Value.kReverse_val:
-    		m_impl.set(-1);
+    		m_impl.set(m_reverseDirection ? 1 : -1);
     		break;
     	}
     }

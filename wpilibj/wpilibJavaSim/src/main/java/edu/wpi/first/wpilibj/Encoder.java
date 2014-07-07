@@ -31,6 +31,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	private boolean m_allocatedA;
 	private boolean m_allocatedB;
 	private boolean m_allocatedI;
+	private boolean m_reverseDirection;
 	private PIDSourceParameter m_pidSource;
 	private SimEncoder impl;
 
@@ -59,6 +60,9 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 			int channel = bChannel;
 			bChannel = aChannel;
 			aChannel = channel;
+			m_reverseDirection = !reverseDirection;
+		} else {
+			m_reverseDirection = reverseDirection;
 		}
 		impl = new SimEncoder("simulator/dio/1/"+aChannel+"/1/"+bChannel);
 		setDistancePerPulse(1);
@@ -243,7 +247,11 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	 */
 	public void setDistancePerPulse(double distancePerPulse) {
 		System.err.println("NOTE|WPILibJSim: Encoder.setDistancePerPulse() assumes 360 pulses per revolution in simulation.");
-		m_distancePerPulse = distancePerPulse;
+		if (m_reverseDirection) {
+			m_distancePerPulse = -distancePerPulse;
+		} else {
+			m_distancePerPulse = distancePerPulse;
+		}
 	}
 
 	/**
@@ -309,7 +317,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 		if (m_table != null) {
 			m_table.putNumber("Speed", getRate());
 			m_table.putNumber("Distance", getDistance());
-			m_table.putNumber("Distance per Tick", m_distancePerPulse);
+			m_table.putNumber("Distance per Tick", m_reverseDirection ? -m_distancePerPulse : m_distancePerPulse);
 		}
 	}
 
