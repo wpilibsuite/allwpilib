@@ -6,35 +6,36 @@
 
 
 #include "Jaguar.h"
+//#include "NetworkCommunication/UsageReporting.h"
 #include "LiveWindow/LiveWindow.h"
 
 /**
  * Common initialization code called by all constructors.
  */
-void Jaguar::InitJaguar(int channel)
+void Jaguar::InitJaguar()
 {
 	/*
 	 * Input profile defined by Luminary Micro.
-	 * 
+	 *
 	 * Full reverse ranges from 0.671325ms to 0.6972211ms
 	 * Proportional reverse ranges from 0.6972211ms to 1.4482078ms
 	 * Neutral ranges from 1.4482078ms to 1.5517922ms
 	 * Proportional forward ranges from 1.5517922ms to 2.3027789ms
 	 * Full forward ranges from 2.3027789ms to 2.328675ms
 	 */
-	char buffer[50];
-	int n = sprintf(buffer, "pwm/1/%d", channel);
-	impl = new SimContinuousOutput(buffer);
+	SetBounds(2.31, 1.55, 1.507, 1.454, .697);
+	SetPeriodMultiplier(kPeriodMultiplier_1X);
+	SetRaw(m_centerPwm);
 
-	// TODO: LiveWindow::GetInstance()->AddActuator("Jaguar", GetChannel(), this);
+	LiveWindow::GetInstance()->AddActuator("Jaguar", GetChannel(), this);
 }
 
 /**
  * @param channel The PWM channel that the Jaguar is attached to.
  */
-Jaguar::Jaguar(uint32_t channel)
+Jaguar::Jaguar(uint32_t channel) : SafePWM(channel)
 {
-    InitJaguar(channel);
+	InitJaguar();
 }
 
 Jaguar::~Jaguar()
@@ -52,7 +53,7 @@ Jaguar::~Jaguar()
  */
 void Jaguar::Set(float speed, uint8_t syncGroup)
 {
-	impl->Set(speed);
+	SetSpeed(speed);
 }
 
 /**
@@ -62,7 +63,7 @@ void Jaguar::Set(float speed, uint8_t syncGroup)
  */
 float Jaguar::Get()
 {
-	return impl->Get();
+	return GetSpeed();
 }
 
 /**
@@ -70,7 +71,7 @@ float Jaguar::Get()
  */
 void Jaguar::Disable()
 {
-    impl->Set(0);
+	SetRaw(kPwmDisabled);
 }
 
 /**
@@ -82,4 +83,3 @@ void Jaguar::PIDWrite(float output)
 {
 	Set(output);
 }
-

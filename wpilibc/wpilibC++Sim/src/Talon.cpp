@@ -6,6 +6,7 @@
 
 #include "Talon.h"
 
+//#include "NetworkCommunication/UsageReporting.h"
 #include "LiveWindow/LiveWindow.h"
 
 /**
@@ -22,20 +23,20 @@
  *   - 125 = the "low end" of the deadband range
  *   - 49 = full "reverse"
  */
-void Talon::InitTalon(int channel) {
-	char buffer[50];
-	int n = sprintf(buffer, "pwm/1/%d", channel);
-	impl = new SimContinuousOutput(buffer);
+void Talon::InitTalon() {
+	SetBounds(2.037, 1.539, 1.513, 1.487, .989);
+	SetPeriodMultiplier(kPeriodMultiplier_2X);
+	SetRaw(m_centerPwm);
 
-	// TODO: LiveWindow::GetInstance()->AddActuator("Talon", slot, channel, this);
+	LiveWindow::GetInstance()->AddActuator("Talon", GetChannel(), this);
 }
 
 /**
  * @param channel The PWM channel that the Talon is attached to.
  */
-Talon::Talon(uint32_t channel)
+Talon::Talon(uint32_t channel) : SafePWM(channel)
 {
-    InitTalon(channel);
+	InitTalon();
 }
 
 Talon::~Talon()
@@ -53,7 +54,7 @@ Talon::~Talon()
  */
 void Talon::Set(float speed, uint8_t syncGroup)
 {
-    impl->Set(speed);
+	SetSpeed(speed);
 }
 
 /**
@@ -63,7 +64,7 @@ void Talon::Set(float speed, uint8_t syncGroup)
  */
 float Talon::Get()
 {
-    return impl->Get();
+	return GetSpeed();
 }
 
 /**
@@ -71,7 +72,7 @@ float Talon::Get()
  */
 void Talon::Disable()
 {
-    impl->Set(0);
+	SetRaw(kPwmDisabled);
 }
 
 /**

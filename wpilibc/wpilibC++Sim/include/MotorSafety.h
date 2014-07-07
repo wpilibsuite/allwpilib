@@ -5,24 +5,16 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-#include "SafePWM.h"
-#include "SpeedController.h"
-#include "PIDOutput.h"
+#define DEFAULT_SAFETY_EXPIRATION 0.1
 
-/**
- * Luminary Micro Jaguar Speed Control
- */
-class Jaguar : public SafePWM, public SpeedController
+class MotorSafety
 {
 public:
-	explicit Jaguar(uint32_t channel);
-	virtual ~Jaguar();
-	virtual void Set(float value, uint8_t syncGroup = 0);
-	virtual float Get();
-	virtual void Disable();
-
-	virtual void PIDWrite(float output);
-
-private:
-	void InitJaguar();
+	virtual void SetExpiration(float timeout) = 0;
+	virtual float GetExpiration() = 0;
+	virtual bool IsAlive() = 0;
+	virtual void StopMotor() = 0;
+	virtual void SetSafetyEnabled(bool enabled) = 0;
+	virtual bool IsSafetyEnabled() = 0;
+	virtual void GetDescription(char *desc) = 0;
 };

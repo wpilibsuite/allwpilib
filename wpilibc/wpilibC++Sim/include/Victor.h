@@ -5,14 +5,14 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-#include "simulation/SimContinuousOutput.h"
+#include "SafePWM.h"
 #include "SpeedController.h"
 #include "PIDOutput.h"
 
 /**
  * IFI Victor Speed Controller
  */
-class Victor : public SpeedController
+class Victor : public SafePWM, public SpeedController
 {
 public:
 	explicit Victor(uint32_t channel);
@@ -24,6 +24,5 @@ public:
 	virtual void PIDWrite(float output);
 
 private:
-	void InitVictor(int channel);
-	SimContinuousOutput* impl;
+	void InitVictor();
 };
