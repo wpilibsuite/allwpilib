@@ -1,15 +1,26 @@
 #pragma once
 
-#ifdef __vxworks
-#include <vxWorks.h>
-#else
 #include <stdint.h>
-#endif
+#include "NetworkCommunication/CANSessionMux.h"
 
-extern "C"
-{
-	void JaguarCANSendMessage(uint32_t messageID, const uint8_t *data, uint8_t dataSize,
-			int32_t *status);
-	void JaguarCANReceiveMessage(uint32_t *messageID, uint8_t *data, uint8_t *dataSize,
-			uint32_t timeoutMs, int32_t *status);
-}
+void canTxSend(uint32_t arbID, uint8_t length, int32_t period = CAN_SEND_PERIOD_NO_REPEAT);
+
+void canTxPackInt8 (uint32_t arbID, uint8_t offset, uint8_t  value);
+void canTxPackInt16(uint32_t arbID, uint8_t offset, uint16_t value);
+void canTxPackInt32(uint32_t arbID, uint8_t offset, uint32_t value);
+void canTxPackFXP16(uint32_t arbID, uint8_t offset, double   value);
+void canTxPackFXP32(uint32_t arbID, uint8_t offset, double   value);
+
+uint8_t  canTxUnpackInt8 (uint32_t arbID, uint8_t offset);
+uint32_t canTxUnpackInt32(uint32_t arbID, uint8_t offset);
+uint16_t canTxUnpackInt16(uint32_t arbID, uint8_t offset);
+double   canTxUnpackFXP16(uint32_t arbID, uint8_t offset);
+double   canTxUnpackFXP32(uint32_t arbID, uint8_t offset);
+
+bool canRxReceive(uint32_t arbID);
+
+uint8_t  canRxUnpackInt8 (uint32_t arbID, uint8_t offset);
+uint16_t canRxUnpackInt16(uint32_t arbID, uint8_t offset);
+uint32_t canRxUnpackInt32(uint32_t arbID, uint8_t offset);
+double   canRxUnpackFXP16(uint32_t arbID, uint8_t offset);
+double   canRxUnpackFXP32(uint32_t arbID, uint8_t offset);
