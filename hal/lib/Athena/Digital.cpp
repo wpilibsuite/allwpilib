@@ -681,6 +681,11 @@ void setCounterUpSourceWithModule(void* counter_pointer, uint8_t module, uint32_
 								  bool analogTrigger, int32_t *status) {
   Counter* counter = (Counter*) counter_pointer;
   
+  if(pin >= kNumHeaders) {
+    pin = remapMXPChannel(pin);
+    module = 1;
+  }
+  
   counter->counter->writeConfig_UpSource_Module(module, status);
   counter->counter->writeConfig_UpSource_Channel(pin, status);
   counter->counter->writeConfig_UpSource_AnalogTrigger(analogTrigger, status);
@@ -730,6 +735,12 @@ void setCounterDownSourceWithModule(void* counter_pointer, uint8_t module, uint3
 	*status = PARAMETER_OUT_OF_RANGE;
 	return;
   }
+  
+  if(pin >= kNumHeaders) {
+    pin = remapMXPChannel(pin);
+    module = 1;
+  }
+  
   counter->counter->writeConfig_DownSource_Module(module, status);
   counter->counter->writeConfig_DownSource_Channel(pin, status);
   counter->counter->writeConfig_DownSource_AnalogTrigger(analogTrigger, status);
@@ -973,6 +984,16 @@ void* initializeEncoder(uint8_t port_a_module, uint32_t port_a_pin, bool port_a_
 
   // Initialize encoder structure
   Encoder* encoder = new Encoder();
+  
+  if(port_a_pin >= kNumHeaders) {
+    port_a_pin = remapMXPChannel(port_a_pin);
+    port_a_module = 1;
+  }
+
+  if(port_b_pin >= kNumHeaders) {
+    port_b_pin = remapMXPChannel(port_b_pin);
+    port_b_module = 1;
+  }
   
   Resource::CreateResourceObject(&quadEncoders, tEncoder::kNumSystems);
   encoder->index = quadEncoders->Allocate("4X Encoder");
