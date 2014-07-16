@@ -4,6 +4,8 @@
 
 #include "edu_wpi_first_wpilibj_hal_SPIJNI.h"
 
+#include "HAL/Digital.hpp"
+
 
 // set the logging level
 TLogLevel spiJNILogLevel = logWARNING;
@@ -14,276 +16,155 @@ TLogLevel spiJNILogLevel = logWARNING;
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    initializeSPI
- * Signature: (BIBIBILjava/nio/IntBuffer;)Ljava/nio/ByteBuffer;
+ * Method:    spiInitialize
+ * Signature: (BLjava/nio/IntBuffer;)V
  */
-JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_initializeSPI
-  (JNIEnv *, jclass, jbyte, jint, jbyte, jint, jbyte, jint, jobject)
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiInitialize
+  (JNIEnv * env, jclass, jbyte port, jobject status)
 {
-	assert(false);
+	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiInitialize";
+	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	spiInitialize(port, statusPtr);
+	SPIJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    cleanSPI
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+ * Method:    spiTransaction
+ * Signature: (BLjava/nio/ByteBuffer;Ljava/nio/ByteBuffer;B)I
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_cleanSPI
-  (JNIEnv *, jclass, jobject, jobject)
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiTransaction
+  (JNIEnv * env, jclass, jbyte port, jobject dataToSend, jobject dataReceived, jbyte size)
 {
-	assert(false);
+	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiTransaction";
+	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
+	jbyte * dataToSendPtr = NULL;
+	jbyte * dataReceivedPtr = NULL;
+	if(dataToSend != 0){
+		dataToSendPtr = (jbyte*)env->GetDirectBufferAddress(dataToSend);
+	}
+	dataReceivedPtr = (jbyte*)env->GetDirectBufferAddress(dataReceived);
+	SPIJNI_LOG(logDEBUG) << "Size = " << (jint)size;
+	SPIJNI_LOG(logDEBUG) << "DataToSendPtr = " << (jint*)dataToSendPtr;
+	SPIJNI_LOG(logDEBUG) << "DataReceivedPtr = " << (jint*) dataReceivedPtr;
+	jbyte retVal = spiTransaction(port, (uint8_t*)dataToSendPtr, (uint8_t*)dataReceivedPtr, size);
+	SPIJNI_LOG(logDEBUG) << "ReturnValue = " << (jint)retVal;
+	return retVal;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    setSPIBitsPerWord
- * Signature: (Ljava/nio/ByteBuffer;ILjava/nio/IntBuffer;)V
+ * Method:    spiWrite
+ * Signature: (BLjava/nio/ByteBuffer;B)I
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPIBitsPerWord
-  (JNIEnv *, jclass, jobject, jint, jobject)
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiWrite
+  (JNIEnv * env, jclass, jbyte port, jobject dataToSend, jbyte size)
 {
-	assert(false);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    getSPIBitsPerWord
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_getSPIBitsPerWord
-  (JNIEnv *, jclass, jobject, jobject)
-{
-	assert(false);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    setSPIClockRate
- * Signature: (Ljava/nio/ByteBuffer;DLjava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPIClockRate
-  (JNIEnv *, jclass, jobject, jdouble, jobject)
-{
-	assert(false);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    setSPIMSBFirst
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPIMSBFirst
-  (JNIEnv *, jclass, jobject, jobject)
-{
-	assert(false);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    setSPILSBFirst
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPILSBFirst
-  (JNIEnv *, jclass, jobject, jobject)
-{
-	assert(false);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    setSPISampleDataOnFalling
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPISampleDataOnFalling
-  (JNIEnv *, jclass, jobject, jobject)
-{
-	assert(false);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    setSPISampleDataOnRising
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPISampleDataOnRising
-  (JNIEnv *, jclass, jobject, jobject)
-{
-	assert(false);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    setSPISlaveSelect
- * Signature: (Ljava/nio/ByteBuffer;BILjava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPISlaveSelect
-  (JNIEnv *, jclass, jobject, jbyte, jint, jobject)
-{
-	assert(false);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    setSPILatchMode
- * Signature: (Ljava/nio/ByteBuffer;ILjava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPILatchMode
-  (JNIEnv *, jclass, jobject, jint, jobject)
-{
-	assert(false);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    getSPILatchMode
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_getSPILatchMode
-  (JNIEnv *, jclass, jobject, jobject)
-{
-	assert(false);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    setSPIFramePolarity
- * Signature: (Ljava/nio/ByteBuffer;BLjava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPIFramePolarity
-  (JNIEnv *, jclass, jobject, jbyte, jobject)
-{
-	assert(false);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    getSPIFramePolarity
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)B
- */
-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_getSPIFramePolarity
-  (JNIEnv *, jclass, jobject, jobject)
-{
-	assert(false);
+	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiWrite";
+	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
+	jbyte * dataToSendPtr = NULL;
+	if(dataToSend != 0){
+		dataToSendPtr = (jbyte*)env->GetDirectBufferAddress(dataToSend);
+	}
+	SPIJNI_LOG(logDEBUG) << "Size = " << (jint)size;
+	SPIJNI_LOG(logDEBUG) << "DataToSendPtr = " << (jint*)dataToSendPtr;
+	jbyte retVal = spiWrite(port, (uint8_t*)dataToSendPtr, size);
+	SPIJNI_LOG(logDEBUG) << "ReturnValue = " << (jint)retVal;
+	return retVal;
 }
 
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    setSPIClockActiveLow
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+ * Method:    spiRead
+ * Signature: (BLjava/nio/ByteBuffer;B)I
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPIClockActiveLow
-  (JNIEnv *, jclass, jobject, jobject)
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiRead
+  (JNIEnv * env, jclass, jbyte port, jobject dataReceived, jbyte size)
 {
-	assert(false);
+	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiRead";
+	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
+	jbyte * dataReceivedPtr = NULL;
+	dataReceivedPtr = (jbyte*)env->GetDirectBufferAddress(dataReceived);
+	SPIJNI_LOG(logDEBUG) << "Size = " << (jint)size;
+	SPIJNI_LOG(logDEBUG) << "DataReceivedPtr = " << (jint*) dataReceivedPtr;
+	jbyte retVal = spiRead(port, (uint8_t*)dataReceivedPtr, size);
+	SPIJNI_LOG(logDEBUG) << "ReturnValue = " << (jint)retVal;
+	return retVal;
+}
+
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Method:    spiClose
+ * Signature: (B)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiClose
+  (JNIEnv *, jclass, jbyte port)
+{
+	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiClose";
+	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
+	spiClose(port);
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    setSPIClockActiveHigh
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+ * Method:    spiSetSpeed
+ * Signature: (BI)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPIClockActiveHigh
-  (JNIEnv *, jclass, jobject, jobject)
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetSpeed
+  (JNIEnv *, jclass, jbyte port, jint speed)
 {
-	assert(false);
+	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetSpeed";
+	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
+	SPIJNI_LOG(logDEBUG) << "Speed = " << (jint) speed;
+	spiSetSpeed(port, speed);
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    applySPIConfig
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+ * Method:    spiSetOpts
+ * Signature: (BIII)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_applySPIConfig
-  (JNIEnv *, jclass, jobject, jobject)
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetOpts
+  (JNIEnv *, jclass, jbyte port, jint msb_first, jint sample_on_trailing, jint clk_idle_high)
 {
-	assert(false);
+	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetOpts";
+	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
+	SPIJNI_LOG(logDEBUG) << "msb_first = " << msb_first;
+	SPIJNI_LOG(logDEBUG) << "sample_on_trailing = " << sample_on_trailing;
+	SPIJNI_LOG(logDEBUG) << "clk_idle_high = " << clk_idle_high;
+	spiSetOpts(port, msb_first, sample_on_trailing, clk_idle_high);
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    getSPIOutputFIFOAvailable
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)S
+ * Method:    spiSetChipSelectActiveHigh
+ * Signature: (BLjava/nio/IntBuffer;)V
  */
-JNIEXPORT jshort JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_getSPIOutputFIFOAvailable
-  (JNIEnv *, jclass, jobject, jobject)
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectActiveHigh
+  (JNIEnv * env, jclass, jbyte port, jobject status)
 {
-	assert(false);
+	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetCSActiveHigh";
+	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	spiSetChipSelectActiveHigh(port, statusPtr);
+	SPIJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    getSPINumReceived
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)S
+ * Method:    spiSetChipSelectActiveLow
+ * Signature: (BLjava/nio/IntBuffer;)V
  */
-JNIEXPORT jshort JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_getSPINumReceived
-  (JNIEnv *, jclass, jobject, jobject)
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectActiveLow
+  (JNIEnv * env, jclass, jbyte port, jobject status)
 {
-	assert(false);
+	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetCSActiveLow";
+	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	spiSetChipSelectActiveLow(port, statusPtr);
+	SPIJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
 
-/*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    isSPIDone
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)B
- */
-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_isSPIDone
-  (JNIEnv *, jclass, jobject, jobject)
-{
-	assert(false);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    hadSPIReceiveOverflow
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)B
- */
-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_hadSPIReceiveOverflow
-  (JNIEnv *, jclass, jobject, jobject)
-{
-	assert(false);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    writeSPI
- * Signature: (Ljava/nio/ByteBuffer;ILjava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_writeSPI
-  (JNIEnv *, jclass, jobject, jint, jobject)
-{
-	assert(false);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    readSPI
- * Signature: (Ljava/nio/ByteBuffer;BLjava/nio/IntBuffer;)I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_readSPI
-  (JNIEnv *, jclass, jobject, jbyte, jobject)
-{
-	assert(false);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    resetSPI
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_resetSPI
-  (JNIEnv *, jclass, jobject, jobject)
-{
-	assert(false);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
- * Method:    clearSPIReceivedData
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_clearSPIReceivedData
-  (JNIEnv *, jclass, jobject, jobject)
-{
-	assert(false);
-}
