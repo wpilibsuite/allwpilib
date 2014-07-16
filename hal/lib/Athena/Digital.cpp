@@ -1578,22 +1578,3 @@ void i2CClose(uint8_t port) {
 	}
 	return;
 }
-
-
-//// Float JNA Hack
-// double
-void setPWMRateIntHack(int32_t rate, int32_t *status) {
-  setPWMRate(intToFloat(rate), status);
-}
-
-void setPWMRateWithModuleIntHack(uint8_t module, int32_t rate, int32_t *status) {
-  setPWMRateWithModule(module, intToFloat(rate), status);
-}
-
-void setPWMDutyCycleIntHack(void* pwmGenerator, int32_t dutyCycle, int32_t *status) {
-  setPWMDutyCycle(pwmGenerator, intToFloat(dutyCycle), status);
-}
-
-void setPWMDutyCycleWithModuleIntHack(uint8_t module, void* pwmGenerator, int32_t dutyCycle, int32_t *status) {
-  setPWMDutyCycleWithModule(module, pwmGenerator, dutyCycle, status);
-}
