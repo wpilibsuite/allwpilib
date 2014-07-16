@@ -922,7 +922,7 @@ void CANJaguar::verify()
 		}
 		else if(m_controlMode == kVoltage)
 		{
-			if(getMessage(LM_API_VCOMP_IN_RAMP, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
+			if(getMessage(LM_API_VCOMP_COMP_RAMP, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
 			{
 				double rate = unpackFXP8_8(dataBuffer);
 
@@ -937,7 +937,7 @@ void CANJaguar::verify()
 			else
 			{
 				// Verification is needed but not available - request it again.
-				requestMessage(LM_API_VCOMP_IN_RAMP);
+				requestMessage(LM_API_VCOMP_COMP_RAMP);
 			}
 		}
 	}
@@ -1271,7 +1271,7 @@ void CANJaguar::SetPercentMode(CANJaguar::EncoderStruct, uint16_t codesPerRev)
 void CANJaguar::SetPercentMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev)
 {
 	ChangeControlMode(kPercentVbus);
-	SetPositionReference(LM_REF_QUAD_ENCODER);
+	SetPositionReference(LM_REF_ENCODER);
 	SetSpeedReference(LM_REF_QUAD_ENCODER);
 	ConfigEncoderCodesPerRev(codesPerRev);
 }
@@ -1335,7 +1335,7 @@ void CANJaguar::SetCurrentMode(CANJaguar::EncoderStruct, uint16_t codesPerRev, d
 void CANJaguar::SetCurrentMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev, double p, double i, double d)
 {
 	ChangeControlMode(kCurrent);
-	SetPositionReference(LM_REF_QUAD_ENCODER);
+	SetPositionReference(LM_REF_ENCODER);
 	SetSpeedReference(LM_REF_QUAD_ENCODER);
 	ConfigEncoderCodesPerRev(codesPerRev);
 	SetPID(p, i, d);
@@ -1390,7 +1390,7 @@ void CANJaguar::SetSpeedMode(CANJaguar::EncoderStruct, uint16_t codesPerRev, dou
 void CANJaguar::SetSpeedMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev, double p, double i, double d)
 {
 	ChangeControlMode(kSpeed);
-	SetPositionReference(LM_REF_QUAD_ENCODER);
+	SetPositionReference(LM_REF_ENCODER);
 	SetSpeedReference(LM_REF_QUAD_ENCODER);
 	ConfigEncoderCodesPerRev(codesPerRev);
 	SetPID(p, i, d);
@@ -1405,7 +1405,7 @@ void CANJaguar::SetSpeedMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev,
 void CANJaguar::SetPositionMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev, double p, double i, double d)
 {
 	ChangeControlMode(kPosition);
-	SetPositionReference(LM_REF_QUAD_ENCODER);
+	SetPositionReference(LM_REF_ENCODER);
 	ConfigEncoderCodesPerRev(codesPerRev);
 	SetPID(p, i, d);
 }
@@ -1456,7 +1456,7 @@ void CANJaguar::SetVoltageMode(CANJaguar::EncoderStruct, uint16_t codesPerRev)
 void CANJaguar::SetVoltageMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev)
 {
 	ChangeControlMode(kVoltage);
-	SetPositionReference(LM_REF_QUAD_ENCODER);
+	SetPositionReference(LM_REF_ENCODER);
 	SetSpeedReference(LM_REF_QUAD_ENCODER);
 	ConfigEncoderCodesPerRev(codesPerRev);
 }
@@ -1636,7 +1636,7 @@ void CANJaguar::SetVoltageRampRate(double rampRate)
 		break;
 	case kVoltage:
 		dataSize = packFXP8_8(dataBuffer, rampRate / kControllerRate);
-		message = LM_API_VCOMP_IN_RAMP;
+		message = LM_API_VCOMP_COMP_RAMP;
 		break;
 	default:
 		wpi_setWPIErrorWithContext(IncompatibleMode, "SetVoltageRampRate only applies in Voltage and Percent mode");

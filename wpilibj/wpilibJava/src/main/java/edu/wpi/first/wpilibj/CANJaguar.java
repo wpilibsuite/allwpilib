@@ -679,7 +679,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 			}
 		} else if(m_controlMode == ControlMode.Voltage) {
 			try {
-				getMessage(CANJNI.LM_API_VCOMP_IN_RAMP, CANJNI.CAN_MSGID_FULL_M, data);
+				getMessage(CANJNI.LM_API_VCOMP_COMP_RAMP, CANJNI.CAN_MSGID_FULL_M, data);
 
 				double rate = unpackFXP8_8(data);
 
@@ -692,7 +692,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 
 			} catch(CANMessageNotFoundException e) {
 				// Verification is needed but not available - request it again.
-				requestMessage(CANJNI.LM_API_VCOMP_IN_RAMP);
+				requestMessage(CANJNI.LM_API_VCOMP_COMP_RAMP);
 			}
 		}
 	}
@@ -1005,7 +1005,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	public void setPercentMode(QuadEncoderTag tag, int codesPerRev)
 	{
 		changeControlMode(ControlMode.PercentVbus);
-		setPositionReference(CANJNI.LM_REF_QUAD_ENCODER);
+		setPositionReference(CANJNI.LM_REF_ENCODER);
 		setSpeedReference(CANJNI.LM_REF_QUAD_ENCODER);
 		configEncoderCodesPerRev(codesPerRev);
 	}
@@ -1069,7 +1069,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	public void setCurrentMode(QuadEncoderTag tag, int codesPerRev, double p, double i, double d)
 	{
 		changeControlMode(ControlMode.Current);
-		setPositionReference(CANJNI.LM_REF_QUAD_ENCODER);
+		setPositionReference(CANJNI.LM_REF_ENCODER);
 		setSpeedReference(CANJNI.LM_REF_QUAD_ENCODER);
 		configEncoderCodesPerRev(codesPerRev);
 		setPID(p, i, d);
@@ -1124,7 +1124,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	public void setSpeedMode(QuadEncoderTag tag, int codesPerRev, double p, double i, double d)
 	{
 		changeControlMode(ControlMode.Speed);
-		setPositionReference(CANJNI.LM_REF_QUAD_ENCODER);
+		setPositionReference(CANJNI.LM_REF_ENCODER);
 		setSpeedReference(CANJNI.LM_REF_QUAD_ENCODER);
 		configEncoderCodesPerRev(codesPerRev);
 		setPID(p, i, d);
@@ -1139,7 +1139,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	public void setPositionMode(QuadEncoderTag tag, int codesPerRev, double p, double i, double d)
 	{
 		changeControlMode(ControlMode.Position);
-		setPositionReference(CANJNI.LM_REF_QUAD_ENCODER);
+		setPositionReference(CANJNI.LM_REF_ENCODER);
 		configEncoderCodesPerRev(codesPerRev);
 		setPID(p, i, d);
 	}
@@ -1190,7 +1190,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	public void setVoltageMode(QuadEncoderTag tag, int codesPerRev)
 	{
 		changeControlMode(ControlMode.Voltage);
-		setPositionReference(CANJNI.LM_REF_QUAD_ENCODER);
+		setPositionReference(CANJNI.LM_REF_ENCODER);
 		setSpeedReference(CANJNI.LM_REF_QUAD_ENCODER);
 		configEncoderCodesPerRev(codesPerRev);
 	}
@@ -1359,7 +1359,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 			break;
 		case Voltage:
 			dataSize = packFXP8_8(data, rampRate / kControllerRate);
-			message = CANJNI.LM_API_VCOMP_IN_RAMP;
+			message = CANJNI.LM_API_VCOMP_COMP_RAMP;
 			break;
 		default:
 			throw new IllegalStateException("Voltage ramp rate only applies in Percentage and Voltage modes");
