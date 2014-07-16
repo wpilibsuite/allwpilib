@@ -13,7 +13,7 @@
 #include "spilib/spi-lib.h"
 
 static const uint32_t kExpectedLoopTiming = 40;
-static const uint32_t kDigitalPins = 20;
+static const uint32_t kDigitalPins = 26;
 static const uint32_t kPwmPins = 20;
 static const uint32_t kRelayPins = 8;
 static const uint32_t kNumHeaders = 10; // Number of non-MXP pins
