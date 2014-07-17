@@ -173,7 +173,7 @@ public abstract class SensorBase { // TODO: Refactor
      * @param channel The channel number to check.
      */
     protected static void checkDigitalChannel(final int channel) {
-        if (channel < 0 || channel >= kDigitalChannels) {
+        if (channel <= 0 || channel > kDigitalChannels) {
             System.err.println("Requested digital channel number is out of range.");
         }
     }
@@ -186,7 +186,7 @@ public abstract class SensorBase { // TODO: Refactor
      * @param channel The channel number to check.
      */
     protected static void checkRelayChannel(final int channel) {
-        if (channel < 0 || channel >= kRelayChannels) {
+        if (channel <= 0 || channel > kRelayChannels) {
             System.err.println("Requested relay channel number is out of range.");
             throw new IndexOutOfBoundsException("Requested relay channel number is out of range.");
         }
@@ -200,7 +200,7 @@ public abstract class SensorBase { // TODO: Refactor
      * @param channel The channel number to check.
      */
     protected static void checkPWMChannel(final int channel) {
-        if (channel < 0 || channel >= kPwmChannels) {
+        if (channel <= 0 || channel > kPwmChannels) {
             System.err.println("Requested PWM channel number is out of range.");
             throw new IndexOutOfBoundsException("Requested PWM channel number is out of range.");
         }
