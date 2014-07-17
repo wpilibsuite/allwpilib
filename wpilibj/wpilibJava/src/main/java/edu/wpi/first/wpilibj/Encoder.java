@@ -649,7 +649,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 			status.order(ByteOrder.LITTLE_ENDIAN);
 			EncoderJNI.setEncoderSamplesToAverage(m_encoder, samplesToAverage,
 					status.asIntBuffer());
-			if (status.get() == HALUtil.PARAMETER_OUT_OF_RANGE) {
+			if (status.duplicate().get() == HALUtil.PARAMETER_OUT_OF_RANGE) {
 				throw new BoundaryException(BoundaryException.getMessage(
 						samplesToAverage, 1, 127));
 			}
