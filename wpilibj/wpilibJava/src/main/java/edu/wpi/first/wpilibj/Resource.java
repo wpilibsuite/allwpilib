@@ -86,7 +86,7 @@ public class Resource {
      * @throws CheckedAllocationException If there are no resources available to be allocated.
      */
     public int allocate(final int index) throws CheckedAllocationException {
-        if (index >= m_size) {
+        if (index >= m_size || index < 0) {
             throw new CheckedAllocationException("Index " + index + " out of range");
         }
         if (m_numAllocated[index] == true) {
