@@ -6,119 +6,23 @@
 
 #include "SPI.h"
 
-#include "DigitalModule.h"
-#include "DigitalInput.h"
-#include "DigitalOutput.h"
-//#include "NetworkCommunication/UsageReporting.h"
-#include "HAL/cpp/Synchronized.hpp"
 #include "WPIErrors.h"
+#include "HAL/Digital.hpp"
 
-#include <math.h>
+#include <string.h>
+
 
 /**
- * Constructor for input and output.
+ * Constructor
  *
- * @param clk	The digital output for the clock signal.
- * @param mosi	The digital output for the written data to the slave
- *				(master-out slave-in).
- * @param miso	The digital input for the input data from the slave
- *				(master-in slave-out).
+ * @param SPIport the physical SPI port
  */
-SPI::SPI(DigitalOutput &clk, DigitalOutput &mosi, DigitalInput &miso)
+SPI::SPI(Port SPIport)
 {
-	Init(&clk, &mosi, &miso);
-}
-
-/**
- * Constructor for input and output.
- *
- * @param clk	The digital output for the clock signal.
- * @param mosi	The digital output for the written data to the slave
- *				(master-out slave-in).
- * @param miso	The digital input for the input data from the slave
- *				(master-in slave-out).
- */
-SPI::SPI(DigitalOutput *clk, DigitalOutput *mosi, DigitalInput *miso)
-{
-	Init(clk, mosi, miso);
-}
-
-/**
- * Constructor for output only.
- *
- * @param clk	The digital output for the clock signal.
- * @param mosi	The digital output for the written data to the slave
- *				(master-out slave-in).
- */
-SPI::SPI(DigitalOutput &clk, DigitalOutput &mosi)
-{
-	Init(&clk, &mosi, NULL);
-}
-
-/**
- * Constructor for output only.
- *
- * @param clk	The digital output for the clock signal.
- * @param mosi	The digital output for the written data to the slave
- *				(master-out slave-in).
- */
-SPI::SPI(DigitalOutput *clk, DigitalOutput *mosi)
-{
-	Init(clk, mosi, NULL);
-}
-
-/**
- * Constructor for input only.
- *
- * @param clk	The digital output for the clock signal.
- * @param miso	The digital input for the input data from the slave
- *				(master-in slave-out).
- */
-SPI::SPI(DigitalOutput &clk, DigitalInput &miso)
-{
-	Init(&clk, NULL, &miso);
-}
-
-/**
- * Constructor for input only.
- *
- * @param clk	The digital output for the clock signal.
- * @param miso	The digital input for the input data from the slave
- *				(master-in slave-out).
- */
-SPI::SPI(DigitalOutput *clk, DigitalInput *miso)
-{
-	Init(clk, NULL, miso);
-}
-
-/**
- * Destructor.
- */
-SPI::~SPI()
-{
-	int32_t status = 0;
-	cleanSPI(m_spi, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
-}
-
-/**
- * Initialize SPI channel configuration.
- *
- * @param clk	The digital output for the clock signal.
- * @param mosi	The digital output for the written data to the slave
- *				(master-out slave-in).
- * @param miso	The digital input for the input data from the slave
- *				(master-in slave-out).
- */
-void SPI::Init(DigitalOutput *clk, DigitalOutput *mosi, DigitalInput *miso)
-{
+	m_port = SPIport;
   	int32_t status = 0;
-	m_spi = initializeSPI(clk->GetModuleForRouting(), clk->GetChannelForRouting(),
-						  mosi->GetModuleForRouting(), mosi->GetChannelForRouting(),
-						  miso->GetModuleForRouting(), miso->GetChannelForRouting(), &status);
+  	spiInitialize(m_port, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
-
-	m_ss = NULL;
 
 	static int32_t instances = 0;
 	instances++;
@@ -126,43 +30,23 @@ void SPI::Init(DigitalOutput *clk, DigitalOutput *mosi, DigitalInput *miso)
 }
 
 /**
- * Configure the number of bits from each word that the slave transmits
- * or receives.
- *
- * @param bits	The number of bits in one frame (1 to 32 bits).
+ * Destructor.
  */
-void SPI::SetBitsPerWord(uint32_t bits)
+SPI::~SPI()
 {
-	int32_t status = 0;
-	setSPIBitsPerWord(m_spi, bits, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));	
-}
-
-/**
- * Get the number of bits from each word that the slave transmits
- * or receives.
- *
- * @return The number of bits in one frame (1 to 32 bits).
- */
-uint32_t SPI::GetBitsPerWord()
-{
-	int32_t status = 0;
-	uint32_t bits = getSPIBitsPerWord(m_spi, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));	
-	return bits;
+	spiClose(m_port);
 }
 
 /**
  * Configure the rate of the generated clock signal.
- * The default and maximum value is 76,628.4 Hz.
+ * The default and maximum value is 500,000 Hz.
  *
  * @param hz	The clock rate in Hertz.
  */
 void SPI::SetClockRate(double hz)
 {
-	int32_t status = 0;
-	setSPIClockRate(m_spi, hz, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	int32_t retVal = 0;
+	spiSetSpeed(m_port, hz);
 }
 
 /**
@@ -171,9 +55,9 @@ void SPI::SetClockRate(double hz)
  */
 void SPI::SetMSBFirst()
 {
-	int32_t status = 0;
-	setSPIMSBFirst(m_spi, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	int32_t retVal = 0;
+	m_msbFirst = true;
+	spiSetOpts(m_port, (int) m_msbFirst, (int) m_sampleOnTrailing, (int) m_clk_idle_high);
 }
 
 /**
@@ -182,9 +66,9 @@ void SPI::SetMSBFirst()
  */
 void SPI::SetLSBFirst()
 {
-	int32_t status = 0;
-	setSPILSBFirst(m_spi, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	int32_t retVal = 0;
+	m_msbFirst = false;
+	spiSetOpts(m_port, (int) m_msbFirst, (int) m_sampleOnTrailing, (int) m_clk_idle_high);
 }
 
 /**
@@ -193,9 +77,9 @@ void SPI::SetLSBFirst()
  */
 void SPI::SetSampleDataOnFalling()
 {
-	int32_t status = 0;
-	setSPISampleDataOnFalling(m_spi, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	int32_t retVal = 0;
+	m_sampleOnTrailing = true;
+	spiSetOpts(m_port, (int) m_msbFirst, (int) m_sampleOnTrailing, (int) m_clk_idle_high);
 }
 
 /**
@@ -204,182 +88,66 @@ void SPI::SetSampleDataOnFalling()
  */
 void SPI::SetSampleDataOnRising()
 {
-	int32_t status = 0;
-	setSPISampleDataOnRising(m_spi, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
-}
-
-/**
- * Configure the slave select line behavior.
- *
- * @param ss slave select digital output.
- * @param mode Frame mode:
- *			   kChipSelect: active for the duration of the frame.
- *			   kPreLatchPulse: pulses before the transfer of each frame.
- *			   kPostLatchPulse: pulses after the transfer of each frame.
- *			   kPreAndPostLatchPulse: pulses before and after each frame.
- * @param activeLow True if slave select line is active low.
- */
-void SPI::SetSlaveSelect(DigitalOutput *ss, tFrameMode mode, bool activeLow)
-{
-	int32_t status = 0;
-
-	if (ss)
-	{
-		setSPISlaveSelect(m_spi, ss->GetModuleForRouting(), ss->GetChannelForRouting(), &status);
-	}
-	else
-	{
-		setSPISlaveSelect(m_spi, 0, 0, &status);
-	}
-	m_ss = ss;
-
-	setSPILatchMode(m_spi, mode, &status);
-	setSPIFramePolarity(m_spi, activeLow, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
-}
-
-/**
- * Configure the slave select line behavior.
- *
- * @param ss slave select digital output.
- * @param mode Frame mode:
- *			   kChipSelect: active for the duration of the frame.
- *			   kPreLatchPulse: pulses before the transfer of each frame.
- *			   kPostLatchPulse: pulses after the transfer of each frame.
- *			   kPreAndPostLatchPulse: pulses before and after each frame.
- * @param activeLow True if slave select line is active low.
- */
-void SPI::SetSlaveSelect(DigitalOutput &ss, tFrameMode mode, bool activeLow)
-{
-	SetSlaveSelect(&ss, mode, activeLow);
-}
-
-/**
- * Get the slave select line behavior.
- *
- * @param mode Frame mode:
- *			   kChipSelect: active for the duration of the frame.
- *			   kPreLatchPulse: pulses before the transfer of each frame.
- *			   kPostLatchPulse: pulses after the transfer of each frame.
- *			   kPreAndPostLatchPulse: pulses before and after each frame.
- * @param activeLow True if slave select line is active low.
- * @return The slave select digital output.
- */
-DigitalOutput *SPI::GetSlaveSelect(tFrameMode *mode, bool *activeLow)
-{
-	int32_t status = 0;
-	if (mode != NULL)
-	{
-		*mode = getSPILatchMode(m_spi, &status);
-	}
-	if (activeLow != NULL)
-	{
-		*activeLow = getSPIFramePolarity(m_spi, &status);
-	}
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
-	return m_ss;
+	int32_t retVal = 0;
+	m_sampleOnTrailing = false;
+	spiSetOpts(m_port, (int) m_msbFirst, (int) m_sampleOnTrailing, (int) m_clk_idle_high);
 }
 
 /**
  * Configure the clock output line to be active low.
- * This is sometimes called clock polarity high.
+ * This is sometimes called clock polarity high or clock idle high.
  */
 void SPI::SetClockActiveLow()
 {
-	int32_t status = 0;
-	setSPIClockActiveLow(m_spi, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	int32_t retVal = 0;
+	m_clk_idle_high = true;
+	spiSetOpts(m_port, (int) m_msbFirst, (int) m_sampleOnTrailing, (int) m_clk_idle_high);
 }
 
 /**
  * Configure the clock output line to be active high.
- * This is sometimes called clock polarity low.
+ * This is sometimes called clock polarity low or clock idle low.
  */
 void SPI::SetClockActiveHigh()
 {
-	int32_t status = 0;
-	setSPIClockActiveHigh(m_spi, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	int32_t retVal = 0;
+	m_clk_idle_high = false;
+	spiSetOpts(m_port, (int) m_msbFirst, (int) m_sampleOnTrailing, (int) m_clk_idle_high);
 }
 
 /**
- * Apply configuration settings and reset the SPI logic.
+ * Configure the chip select line to be active high.
  */
-void SPI::ApplyConfig()
+void SPI::SetChipSelectActiveHigh()
 {
 	int32_t status = 0;
-	applySPIConfig(m_spi, &status);
+	spiSetChipSelectActiveHigh(m_port, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
- * Get the number of words that can currently be stored before being
- * transmitted to the device.
- *
- * @return The number of words available to be written.
+ * Configure the chip select line to be active low.
  */
-uint16_t SPI::GetOutputFIFOAvailable()
+void SPI::SetChipSelectActiveLow()
 {
 	int32_t status = 0;
-	uint16_t result = getSPIOutputFIFOAvailable(m_spi, &status);
+	spiSetChipSelectActiveLow(m_port, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
-	return result;
 }
 
-/**
- * Get the number of words received and currently available to be read from
- * the receive FIFO.
- *
- * @return The number of words available to read.
- */
-uint16_t SPI::GetNumReceived()
-{
-	int32_t status = 0;
-	uint16_t result = getSPINumReceived(m_spi, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
-	return result;
-}
 
 /**
- * Have all pending transfers completed?
- *
- * @return True if no transfers are pending.
- */
-bool SPI::IsDone()
-{
-	int32_t status = 0;
-	bool result = isSPIDone(m_spi, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
-	return result;
-}
-
-/**
- * Determine if the receive FIFO was full when attempting to add new data at
- * end of a transfer.
- *
- * @return True if the receive FIFO overflowed.
- */
-bool SPI::HadReceiveOverflow()
-{
-	int32_t status = 0;
-	bool result = hadSPIReceiveOverflow(m_spi, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
-	return result;
-}
-
-/**
- * Write a word to the slave device.  Blocks until there is space in the
+ * Write data to the slave device.  Blocks until there is space in the
  * output FIFO.
  *
  * If not running in output only mode, also saves the data received
  * on the MISO input during the transfer into the receive FIFO.
  */
-void SPI::Write(uint32_t data)
+int32_t SPI::Write(uint8_t* data, uint8_t size)
 {
-	int32_t status = 0;
-	writeSPI(m_spi, data, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	int32_t retVal = 0;
+	retVal = spiWrite(m_port, data, size);
+	return retVal;
 }
 
 /**
@@ -395,30 +163,29 @@ void SPI::Write(uint32_t data)
  *				    If false, this function assumes that data is
  *				    already in the receive FIFO from a previous write.
  */
-uint32_t SPI::Read(bool initiate)
+int32_t SPI::Read(bool initiate, uint8_t* dataReceived, uint8_t size)
 {
-	int32_t status = 0;
-	uint32_t value = readSPI(m_spi, initiate, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
-	return value;
+	int32_t retVal = 0;
+	if(initiate){
+		uint8_t* dataToSend = new uint8_t[size];
+		memset(dataToSend, 0, size);
+		retVal = spiTransaction(m_port, dataToSend, dataReceived, size);
+	}
+	else
+		retVal = spiRead(m_port, dataReceived, size);
+	return retVal;
 }
 
 /**
- * Stop any transfer in progress and empty the transmit FIFO.
+ * Perform a simultaneous read/write transaction with the device
+ *
+ * @param dataToSend The data to be written out to the device
+ * @param dataReceived Buffer to receive data from the device
+ * @param size The length of the transaction, in bytes
  */
-void SPI::Reset()
-{
-	int32_t status = 0;
-	resetSPI(m_spi, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+int32_t SPI::Transaction(uint8_t* dataToSend, uint8_t* dataReceived, uint8_t size){
+	int32_t retVal = 0;
+	retVal = spiTransaction(m_port, dataToSend, dataReceived, size);
+	return retVal;
 }
 
-/**
- * Empty the receive FIFO.
- */
-void SPI::ClearReceivedData()
-{
-	int32_t status = 0;
-	clearSPIReceivedData(m_spi, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
-}

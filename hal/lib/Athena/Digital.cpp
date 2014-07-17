@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "i2clib/i2c-lib.h"
+#include "spilib/spi-lib.h"
 
 static const uint32_t kExpectedLoopTiming = 40;
 static const uint32_t kDigitalPins = 20;
@@ -68,6 +69,15 @@ uint8_t i2COnboardObjCount = 0;
 uint8_t i2CMXPObjCount = 0;
 uint8_t i2COnBoardHandle = 0;
 uint8_t i2CMXPHandle = 0;
+
+int32_t m_spiCS0Handle = 0;
+int32_t m_spiCS1Handle = 0;
+int32_t m_spiCS2Handle = 0;
+int32_t m_spiCS3Handle = 0;
+int32_t m_spiMXPHandle = 0;
+MUTEX_ID spiOnboardSemaphore = NULL;
+MUTEX_ID spiMXPSemaphore = NULL;
+tSPI *spiSystem;
 
 /**
  * Initialize the digital modules.
@@ -1173,401 +1183,251 @@ uint16_t getLoopTimingWithModule(uint8_t module, int32_t *status) {
   return pwmSystem->readLoopTiming(status);
 }
 
-// XXX: What happened to SPI?
-// struct spi_t {
-//   tSPI* spi;
-//   tSPI::tConfig config;
-//   tSPI::tChannels channels;
-//   MUTEX_ID semaphore;
-// };
-// typedef struct spi_t SPI;
 
-// void* initializeSPI(uint8_t sclk_routing_module, uint32_t sclk_routing_pin,
-// 					uint8_t mosi_routing_module, uint32_t mosi_routing_pin,
-// 					uint8_t miso_routing_module, uint32_t miso_routing_pin, int32_t *status) {
-//   SPI* spi = new SPI();
-  
-//   spi->semaphore = initializeMutex(SEMAPHORE_Q_PRIORITY | SEMAPHORE_DELETE_SAFE | SEMAPHORE_INVERSION_SAFE);
-  
-//   spi->spi = tSPI::create(status);
-
-//   spi->config.BusBitWidth = 8;
-//   spi->config.ClockHalfPeriodDelay = 0;
-//   spi->config.MSBfirst = 0;
-//   spi->config.DataOnFalling = 0;
-//   spi->config.LatchFirst = 0;
-//   spi->config.LatchLast = 0;
-//   spi->config.FramePolarity = 0;
-//   spi->config.WriteOnly = miso_routing_pin ? 0 : 1;
-//   spi->config.ClockPolarity = 0;
-
-//   spi->channels.SCLK_Channel = sclk_routing_pin;
-//   spi->channels.SCLK_Module = sclk_routing_module;
-//   spi->channels.SS_Channel = 0;
-//   spi->channels.SS_Module = 0;
-
-//   if (mosi_routing_pin) {
-// 	spi->channels.MOSI_Channel = mosi_routing_pin;
-// 	spi->channels.MOSI_Module = mosi_routing_module;
-//   } else {
-// 	spi->channels.MOSI_Channel = 0;
-// 	spi->channels.MOSI_Module = 0;
-//   }
-
-//   if (miso_routing_pin) {
-// 	spi->channels.MISO_Channel = miso_routing_pin;
-// 	spi->channels.MISO_Module = miso_routing_module;
-//   } else {
-// 	spi->channels.MISO_Channel = 0;
-// 	spi->channels.MISO_Module = 0;
-//   }
-//   return spi;
-// }
-
-// void cleanSPI(void* spi_pointer, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   delete spi->spi;
-//   delete spi;
-// }
-
-// /**
-//  * Configure the number of bits from each word that the slave transmits
-//  * or receives.
-//  *
-//  * @param bits	The number of bits in one frame (1 to 32 bits).
-//  */
-// void setSPIBitsPerWord(void* spi_pointer, uint32_t bits, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   spi->config.BusBitWidth = bits;
-// }
-
-// /**
-//  * Get the number of bits from each word that the slave transmits
-//  * or receives.
-//  *
-//  * @return The number of bits in one frame (1 to 32 bits).
-//  */
-// uint32_t getSPIBitsPerWord(void* spi_pointer, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   return spi->config.BusBitWidth;
-// }
-
-// /**
-//  * Configure the rate of the generated clock signal.
-//  * The default and maximum value is 76,628.4 Hz.
-//  *
-//  * @param hz	The clock rate in Hertz.
-//  */
-// void setSPIClockRate(void* spi_pointer, double hz, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   int delay = 0;
-//   int loopTiming = getLoopTimingWithModule(spi->spi->readChannels_SCLK_Module(status), status);
-//   double v = (1.0 / hz) / (2 * loopTiming / (kSystemClockTicksPerMicrosecond * 1e6));
-//   if (v < 1) {
-// 	// TODO: wpi_setWPIErrorWithContext(ParameterOutOfRange, "SPI Clock too high");
-//   }
-//   delay = (int) (v + .5);
-//   if (delay > 255) {
-// 	// TODO: wpi_setWPIErrorWithContext(ParameterOutOfRange, "SPI Clock too low");
-//   }
-
-//   spi->config.ClockHalfPeriodDelay = delay;
-// }
-
-// /**
-//  * Configure the order that bits are sent and received on the wire
-//  * to be most significant bit first.
-//  */
-// void setSPIMSBFirst(void* spi_pointer, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   spi->config.MSBfirst = 1;
-// }
-
-// /**
-//  * Configure the order that bits are sent and received on the wire
-//  * to be least significant bit first.
-//  */
-// void setSPILSBFirst(void* spi_pointer, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   spi->config.MSBfirst = 0;
-// }
-
-// /**
-//  * Configure that the data is stable on the falling edge and the data
-//  * changes on the rising edge.
-//  */
-// void setSPISampleDataOnFalling(void* spi_pointer, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   spi->config.DataOnFalling = 1;
-// }
-
-// /**
-//  * Configure that the data is stable on the rising edge and the data
-//  * changes on the falling edge.
-//  */
-// void setSPISampleDataOnRising(void* spi_pointer, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   spi->config.DataOnFalling = 0;
-// }
-
-// void setSPISlaveSelect(void* spi_pointer, uint8_t ss_routing_module, uint32_t ss_routing_pin,
-// 					   int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   spi->channels.SS_Channel = ss_routing_pin;
-//   spi->channels.SS_Module = ss_routing_module;
-// }
-
-// void setSPILatchMode(void* spi_pointer, tFrameMode mode, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   switch (mode) {
-//   case kChipSelect:
-// 	spi->config.LatchFirst = 0;
-// 	spi->config.LatchLast = 0;
-// 	break;
-//   case kPreLatchPulse:
-// 	spi->config.LatchFirst = 1;
-// 	spi->config.LatchLast = 0;
-// 	break;
-//   case kPostLatchPulse:
-// 	spi->config.LatchFirst = 0;
-// 	spi->config.LatchLast = 1;
-// 	break;
-//   case kPreAndPostLatchPulse:
-// 	spi->config.LatchFirst = 1;
-// 	spi->config.LatchLast = 1;
-// 	break;
-//   }
-// }
-
-// tFrameMode getSPILatchMode(void* spi_pointer, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   return (tFrameMode) (spi->config.LatchFirst | (spi->config.LatchLast << 1));
-// }
-
-// void setSPIFramePolarity(void* spi_pointer, bool activeLow, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   spi->config.FramePolarity = activeLow ? 1 : 0;
-// }
-
-// bool getSPIFramePolarity(void* spi_pointer, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   return spi->config.FramePolarity != 0;
-// }
-
-// /**
-//  * Configure the clock output line to be active low.
-//  * This is sometimes called clock polarity high.
-//  */
-// void setSPIClockActiveLow(void* spi_pointer, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   spi->config.ClockPolarity = 1;
-// }
-
-// /**
-//  * Configure the clock output line to be active high.
-//  * This is sometimes called clock polarity low.
-//  */
-// void setSPIClockActiveHigh(void* spi_pointer, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   spi->config.ClockPolarity = 0;
-// }
-
-
-// /**
-//  * Apply configuration settings and reset the SPI logic.
-//  */
-// void applySPIConfig(void* spi_pointer, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   Synchronized sync(spi->semaphore);
-
-//   spi->spi->writeConfig(spi->config, status);
-//   spi->spi->writeChannels(spi->channels, status);
-//   spi->spi->strobeReset(status);
-// }
-
-// /**
-//  * Get the number of words that can currently be stored before being
-//  * transmitted to the device.
-//  *
-//  * @return The number of words available to be written.
-//  */
-// uint16_t getSPIOutputFIFOAvailable(void* spi_pointer, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   uint16_t result = spi->spi->readAvailableToLoad(status);
-//   return result;
-// }
-
-// /**
-//  * Get the number of words received and currently available to be read from
-//  * the receive FIFO.
-//  *
-//  * @return The number of words available to read.
-//  */
-// uint16_t getSPINumReceived(void* spi_pointer, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   uint16_t result = spi->spi->readReceivedElements(status);
-//   return result;
-// }
-
-// /**
-//  * Have all pending transfers completed?
-//  *
-//  * @return True if no transfers are pending.
-//  */
-// bool isSPIDone(void* spi_pointer, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   bool result = spi->spi->readStatus_Idle(status);
-//   return result;
-// }
-
-
-// /**
-//  * Determine if the receive FIFO was full when attempting to add new data at
-//  * end of a transfer.
-//  *
-//  * @return True if the receive FIFO overflowed.
-//  */
-// bool hadSPIReceiveOverflow(void* spi_pointer, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   bool result = spi->spi->readStatus_ReceivedDataOverflow(status);
-//   return result;
-// }
-
-// /**
-//  * Write a word to the slave device.  Blocks until there is space in the
-//  * output FIFO.
-//  *
-//  * If not running in output only mode, also saves the data received
-//  * on the MISO input during the transfer into the receive FIFO.
-//  */
-// void writeSPI(void* spi_pointer, uint32_t data, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   if (spi->channels.MOSI_Channel == 0 && spi->channels.MOSI_Module == 0) {
-// 	*status = SPI_WRITE_NO_MOSI;
-// 	return;
-//   }
-
-//   Synchronized sync(spi->semaphore);
-
-//   while (getSPIOutputFIFOAvailable(spi_pointer, status) == 0)
-// 	delayTicks(HAL_NO_WAIT);
-
-//   spi->spi->writeDataToLoad(data, status);
-//   spi->spi->strobeLoad(status);
-// }
-
-// /**
-//  * Read a word from the receive FIFO.
-//  *
-//  * Waits for the current transfer to complete if the receive FIFO is empty.
-//  *
-//  * If the receive FIFO is empty, there is no active transfer, and initiate
-//  * is false, errors.
-//  *
-//  * @param initiate	If true, this function pushes "0" into the
-//  *				    transmit buffer and initiates a transfer.
-//  *				    If false, this function assumes that data is
-//  *				    already in the receive FIFO from a previous write.
-//  */
-// uint32_t readSPI(void* spi_pointer, bool initiate, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   if (spi->channels.MISO_Channel == 0 && spi->channels.MISO_Module == 0) {
-// 	*status = SPI_READ_NO_MISO;
-// 	return 0;
-//   }
-
-//   uint32_t data;
-//   {
-// 	Synchronized sync(spi->semaphore);
-
-// 	if (initiate) {
-// 	  spi->spi->writeDataToLoad(0, status);
-// 	  spi->spi->strobeLoad(status);
-// 	}
-
-// 	// Do we have anything ready to read?
-// 	if (getSPINumReceived(spi_pointer, status) == 0) {
-// 	  if (!initiate && isSPIDone(spi_pointer, status)
-// 		  && getSPIOutputFIFOAvailable(spi_pointer, status) == kTransmitFIFODepth) {
-// 		// Nothing to read: error out
-// 		*status = SPI_READ_NO_DATA;
-// 		return 0;
-// 	  }
-
-// 	  // Wait for the transaction to complete
-// 	  while (getSPINumReceived(spi_pointer, status) == 0)
-// 		delayTicks(HAL_NO_WAIT);
-// 	}
-
-// 	spi->spi->strobeReadReceivedData(status);
-// 	data = spi->spi->readReceivedData(status);
-//   }
-
-//   return data;
-// }
-
-// /**
-//  * Stop any transfer in progress and empty the transmit FIFO.
-//  */
-// void resetSPI(void* spi_pointer, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   spi->spi->strobeReset(status);
-// }
-
-// /**
-//  * Empty the receive FIFO.
-//  */
-// void clearSPIReceivedData(void* spi_pointer, int32_t *status) {
-//   SPI* spi = (SPI*) spi_pointer;
-//   spi->spi->strobeClearReceivedData(status);
-// }
-
-
-
-void* initializeSPI(uint8_t sclk_routing_module, uint32_t sclk_routing_pin,
-					uint8_t mosi_routing_module, uint32_t mosi_routing_pin,
-					uint8_t miso_routing_module, uint32_t miso_routing_pin, int32_t *status) {
-  return NULL;
+/*
+ * Initialize the spi port. Opens the port if necessary and saves the handle.
+ * If opening the MXP port, also sets up the pin functions appropriately
+ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
+ */
+void spiInitialize(uint8_t port, int32_t *status) {
+	if(spiSystem == NULL)
+		spiSystem = tSPI::create(status);
+	if(spiGetSemaphore(port) == NULL)
+		spiSetSemaphore(port, initializeMutexRecursive());
+	if(spiGetHandle(port) !=0 ) return;
+	switch(port){
+	case 0:
+		spiSetHandle(0, spilib_open("/dev/spidev0.0"));
+		break;
+	case 1:
+		spiSetHandle(1, spilib_open("/dev/spidev0.1"));
+		break;
+	case 2:
+		spiSetHandle(2, spilib_open("/dev/spidev0.2"));
+		break;
+	case 3:
+		spiSetHandle(3, spilib_open("/dev/spidev0.3"));
+		break;
+	case 4:
+		initializeDigital(status);
+		if(!allocateDIO(getPort(14), false, status)){printf("Failed to allocate DIO 14\n"); return;}
+		if(!allocateDIO(getPort(15), false, status)) {printf("Failed to allocate DIO 15\n"); return;}
+		if(!allocateDIO(getPort(16), true, status)) {printf("Failed to allocate DIO 16\n"); return;}
+		if(!allocateDIO(getPort(17), false, status)) {printf("Failed to allocate DIO 17\n"); return;}
+		digitalSystem->writeEnableMXPSpecialFunction(digitalSystem->readEnableMXPSpecialFunction(status)|0x00F0, status);
+		spiSetHandle(4, spilib_open("/dev/spidev1.0"));
+		break;
+	default:
+		break;
+	}
+	return;
 }
-void cleanSPI(void* spi_pointer, int32_t *status) {}
-void setSPIBitsPerWord(void* spi_pointer, uint32_t bits, int32_t *status) {}
-uint32_t getSPIBitsPerWord(void* spi_pointer, int32_t *status) {
-  return 0;
+
+/**
+ * Generic transaction.
+ *
+ * This is a lower-level interface to the spi hardware giving you more control over each transaction.
+ *
+ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
+ * @param dataToSend Buffer of data to send as part of the transaction.
+ * @param dataReceived Buffer to read data into.
+ * @param size Number of bytes to transfer. [0..7]
+ * @return Number of bytes transferred, -1 for error
+ */
+int32_t spiTransaction(uint8_t port, uint8_t *dataToSend, uint8_t *dataReceived, uint8_t size)
+{
+	Synchronized sync(spiGetSemaphore(port));
+	return spilib_writeread(spiGetHandle(port), (const char*) dataToSend, (char*) dataReceived, (int32_t) size);
 }
-void setSPIClockRate(void* spi_pointer, double hz, int32_t *status) {}
-void setSPIMSBFirst(void* spi_pointer, int32_t *status) {}
-void setSPILSBFirst(void* spi_pointer, int32_t *status) {}
-void setSPISampleDataOnFalling(void* spi_pointer, int32_t *status) {}
-void setSPISampleDataOnRising(void* spi_pointer, int32_t *status) {}
-void setSPISlaveSelect(void* spi_pointer, uint8_t ss_routing_module, uint32_t ss_routing_pin,
-					   int32_t *status) {}
-void setSPILatchMode(void* spi_pointer, tFrameMode mode, int32_t *status) {}
-tFrameMode getSPILatchMode(void* spi_pointer, int32_t *status) {
-  return (tFrameMode) 0;
+
+/**
+ * Execute a write transaction with the device.
+ *
+ * Write to a device and wait until the transaction is complete.
+ *
+ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
+ * @param datToSend The data to write to the register on the device.
+ * @param sendSize The number of bytes to be written
+ * @return The number of bytes written. -1 for an error
+ */
+int32_t spiWrite(uint8_t port, uint8_t* dataToSend, uint8_t sendSize)
+{
+	Synchronized sync(spiGetSemaphore(port));
+	return spilib_write(spiGetHandle(port), (const char*) dataToSend, (int32_t) sendSize);
 }
-void setSPIFramePolarity(void* spi_pointer, bool activeLow, int32_t *status) {}
-bool getSPIFramePolarity(void* spi_pointer, int32_t *status) {
-  return false;
+
+/**
+ * Execute a read from the device.
+ *
+ *   This methdod does not write any data out to the device
+ *   Most spi devices will require a register address to be written before
+ *   they begin returning data
+ *
+ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
+ * @param buffer A pointer to the array of bytes to store the data read from the device.
+ * @param count The number of bytes to read in the transaction. [1..7]
+ * @return Number of bytes read. -1 for error.
+ */
+int32_t spiRead(uint8_t port, uint8_t *buffer, uint8_t count)
+{
+	Synchronized sync(spiGetSemaphore(port));
+	return spilib_read(spiGetHandle(port), (char*) buffer, (int32_t) count);
 }
-void setSPIClockActiveLow(void* spi_pointer, int32_t *status) {}
-void setSPIClockActiveHigh(void* spi_pointer, int32_t *status) {}
-void applySPIConfig(void* spi_pointer, int32_t *status) {}
-uint16_t getSPIOutputFIFOAvailable(void* spi_pointer, int32_t *status) {
-  return 0;
+
+/**
+ * Close the SPI port
+ *
+ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
+ */
+void spiClose(uint8_t port) {
+	Synchronized sync(spiGetSemaphore(port));
+	spilib_close(spiGetHandle(port));
+	spiSetHandle(port, 0);
+	return;
 }
-uint16_t getSPINumReceived(void* spi_pointer, int32_t *status) {
-  return 0;
+
+/**
+ * Set the clock speed for the SPI bus.
+ *
+ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
+ * @param speed The speed in Hz (0-1MHz)
+ */
+void spiSetSpeed(uint8_t port, uint32_t speed) {
+	Synchronized sync(spiGetSemaphore(port));
+	int retVal = spilib_setspeed(spiGetHandle(port), speed);
 }
-bool isSPIDone(void* spi_pointer, int32_t *status) {
-  return false;
+
+/**
+ * Set the SPI options
+ *
+ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
+ * @param msb_first True to write the MSB first, False for LSB first
+ * @param sample_on_trailing True to sample on the trailing edge, False to sample on the leading edge
+ * @param clk_idle_high True to set the clock to active low, False to set the clock active high
+ */
+void spiSetOpts(uint8_t port, int msb_first, int sample_on_trailing, int clk_idle_high) {
+	Synchronized sync(spiGetSemaphore(port));
+	int retVal = spilib_setopts(spiGetHandle(port), msb_first, sample_on_trailing, clk_idle_high);
 }
-bool hadSPIReceiveOverflow(void* spi_pointer, int32_t *status) {
-  return false;
+
+/**
+ * Set the CS Active high for a SPI port
+ *
+ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
+ */
+void spiSetChipSelectActiveHigh(uint8_t port, int32_t *status){
+	Synchronized sync(spiGetSemaphore(port));
+	if(port < 4)
+	{
+		spiSystem->writeChipSelectActiveHigh_Hdr(spiSystem->readChipSelectActiveHigh_Hdr(status) | (1<<port), status);
+	}
+	else
+	{
+		spiSystem->writeChipSelectActiveHigh_MXP(1, status);
+	}
 }
-void writeSPI(void* spi_pointer, uint32_t data, int32_t *status) {}
-uint32_t readSPI(void* spi_pointer, bool initiate, int32_t *status) {return 0;}
-void resetSPI(void* spi_pointer, int32_t *status) {}
-void clearSPIReceivedData(void* spi_pointer, int32_t *status) {}
+
+/**
+ * Set the CS Active low for a SPI port
+ *
+ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
+ */
+void spiSetChipSelectActiveLow(uint8_t port, int32_t *status){
+	Synchronized sync(spiGetSemaphore(port));
+	if(port < 4)
+	{
+		spiSystem->writeChipSelectActiveHigh_Hdr(spiSystem->readChipSelectActiveHigh_Hdr(status) & ~(1<<port), status);
+	}
+	else
+	{
+		spiSystem->writeChipSelectActiveHigh_MXP(0, status);
+	}
+}
+
+/**
+ * Get the stored handle for a SPI port
+ *
+ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
+ * @return The stored handle for the SPI port. 0 represents no stored handle.
+ */
+int32_t spiGetHandle(uint8_t port){
+	Synchronized sync(spiGetSemaphore(port));
+	switch(port){
+	case 0:
+		return m_spiCS0Handle;
+		break;
+	case 1:
+		return m_spiCS1Handle;
+		break;
+	case 2:
+		return m_spiCS2Handle;
+		break;
+	case 3:
+		return m_spiCS3Handle;
+		break;
+	case 4:
+		return m_spiMXPHandle;
+		break;
+	default:
+		return 0;
+		break;
+	}
+}
+
+/**
+ * Set the stored handle for a SPI port
+ *
+ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP.
+ * @param handle The value of the handle for the port.
+ */
+void spiSetHandle(uint8_t port, int32_t handle){
+	Synchronized sync(spiGetSemaphore(port));
+	switch(port){
+	case 0:
+		m_spiCS0Handle = handle;
+		break;
+	case 1:
+		m_spiCS1Handle = handle;
+		break;
+	case 2:
+		m_spiCS2Handle = handle;
+		break;
+	case 3:
+		m_spiCS3Handle = handle;
+		break;
+	case 4:
+		m_spiMXPHandle = handle;
+		break;
+	default:
+		break;
+	}
+}
+
+/**
+ * Get the semaphore for a SPI port
+ *
+ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
+ * @return The semaphore for the SPI port. NULL represents no stored semaphore.
+ */
+MUTEX_ID spiGetSemaphore(uint8_t port){
+	if(port < 4)
+		return spiOnboardSemaphore;
+	else
+		return spiMXPSemaphore;
+}
+
+/**
+ * Set the semaphore for a SPI port
+ *
+ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
+ * @param semaphore The semaphore for the SPI port.
+ */
+void spiSetSemaphore(uint8_t port, MUTEX_ID semaphore){
+	if (port < 4)
+		spiOnboardSemaphore = semaphore;
+	else
+		spiMXPSemaphore = semaphore;
+}
 
 /*
  * Initialize the I2C port. Opens the port if necessary and saves the handle.
@@ -1611,7 +1471,7 @@ void i2CInitialize(uint8_t port, int32_t *status) {
  * @param receiveSize Number of bytes to read from the device. [0..7]
  * @return Transfer Aborted... false for success, true for aborted.
  */
-int i2CTransaction(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived, uint8_t receiveSize)
+int32_t i2CTransaction(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived, uint8_t receiveSize)
 {
 	if(port > 1) {
 		//Set port out of range error here
@@ -1646,7 +1506,7 @@ int i2CTransaction(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend, uin
  * @param data The byte to write to the register on the device.
  * @return Transfer Aborted... false for success, true for aborted.
  */
-int i2CWrite(uint8_t port, uint8_t deviceAddress, uint8_t* dataToSend, uint8_t sendSize)
+int32_t i2CWrite(uint8_t port, uint8_t deviceAddress, uint8_t* dataToSend, uint8_t sendSize)
 {
 	if(port > 1) {
 		//Set port out of range error here
@@ -1678,7 +1538,7 @@ int i2CWrite(uint8_t port, uint8_t deviceAddress, uint8_t* dataToSend, uint8_t s
  * @param buffer A pointer to the array of bytes to store the data read from the device.
  * @return Transfer Aborted... false for success, true for aborted.
  */
-int i2CRead(uint8_t port, uint8_t deviceAddress, uint8_t *buffer, uint8_t count)
+int32_t i2CRead(uint8_t port, uint8_t deviceAddress, uint8_t *buffer, uint8_t count)
 {
 	if(port > 1) {
 		//Set port out of range error here
