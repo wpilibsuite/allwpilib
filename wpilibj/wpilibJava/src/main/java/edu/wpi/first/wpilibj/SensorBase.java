@@ -28,7 +28,7 @@ public abstract class SensorBase { // TODO: Refactor
     /**
      * Number of digital channels per digital sidecar
      */
-    public static final int kDigitalChannels = 20;
+    public static final int kDigitalChannels = 26;
     /**
      * Number of digital modules
      * XXX: This number is incorrect.  We need to find the correct number.

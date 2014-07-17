@@ -35,7 +35,7 @@ public:
 	static bool CheckSolenoidChannel(uint32_t channel);
 	static bool CheckPDPChannel(uint32_t channel);
 
-	static const uint32_t kDigitalChannels = 20;
+	static const uint32_t kDigitalChannels = 26;
 	static const uint32_t kAnalogInputs = 8;
 	static const uint32_t kAnalogOutputs = 2;
 	static const uint32_t kSolenoidChannels = 8;

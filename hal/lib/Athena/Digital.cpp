@@ -1453,6 +1453,8 @@ void i2CInitialize(uint8_t port, int32_t *status) {
 		} else if(port == 1) {
 			i2CMXPObjCount++;
 			if (i2CMXPHandle > 0) return;
+			if(!allocateDIO(getPort(24), false, status)) return;
+			if(!allocateDIO(getPort(25), false, status)) return;
 			digitalSystem->writeEnableMXPSpecialFunction(digitalSystem->readEnableMXPSpecialFunction(status)|0xC000, status);
 			i2CMXPHandle = i2clib_open("/dev/i2c-1");
 		}
