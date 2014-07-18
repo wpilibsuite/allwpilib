@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.can.CANMessageNotFoundException;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
+import edu.wpi.first.wpilibj.util.AllocationException;
+import edu.wpi.first.wpilibj.util.CheckedAllocationException;
 
 /**
  * Texas Instruments Jaguar Speed Controller as a CAN device.
@@ -30,6 +32,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	public static final double kApproxBusVoltage = 12.0;
 
 	private MotorSafetyHelper m_safetyHelper;
+	private static final Resource allocated = new Resource(63);
 
 	private static final int kFullMessageIDMask = CANJNI.CAN_MSGID_API_M | CANJNI.CAN_MSGID_MFR_M | CANJNI.CAN_MSGID_DTYPE_M;
 	private static final int kSendMessagePeriod = 20;
@@ -155,6 +158,13 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	 * @see CANJaguar#setVoltageMode(QuadEncoderTag, int)
 	 */
 	public CANJaguar(int deviceNumber) {
+		try {
+			allocated.allocate(deviceNumber-1);
+		} catch (CheckedAllocationException e1) {
+			throw new AllocationException(
+	                "CANJaguar device " + e1.getMessage() + "(increment index by one)");
+		}
+		
 		m_deviceNumber = (byte)deviceNumber;
 		m_controlMode = ControlMode.PercentVbus;
 
@@ -212,6 +222,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	* No other methods should be called after this is called.
 	*/
 	public void free() {
+		allocated.free(m_deviceNumber-1);
 		m_safetyHelper = null;
 
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
