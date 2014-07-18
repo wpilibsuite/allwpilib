@@ -7,6 +7,7 @@
 
 #include "ErrorBase.h"
 #include "MotorSafety.h"
+#include "Resource.h"
 #include "MotorSafetyHelper.h"
 #include "PIDOutput.h"
 #include "SpeedController.h"

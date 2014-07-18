@@ -32,6 +32,8 @@ static const uint32_t kFullMessageIDMask = (CAN_MSGID_API_M | CAN_MSGID_MFR_M | 
 
 static const int32_t kReceiveStatusAttempts = 50;
 
+static Resource *allocated = NULL;
+
 static int32_t sendMessageHelper(uint32_t messageID, const uint8_t *data, uint8_t dataSize, int32_t period)
 {
 	static const uint32_t kTrustedMessages[] = {
@@ -236,6 +238,16 @@ CANJaguar::CANJaguar(uint8_t deviceNumber)
 	, m_maxOutputVoltage (kApproxBusVoltage)
 	, m_safetyHelper (NULL)
 {
+	char buf[64];
+	snprintf(buf, 64, "CANJaguar device number %d", m_deviceNumber);
+	Resource::CreateResourceObject(&allocated, 63);
+
+	if (allocated->Allocate(m_deviceNumber-1, buf) == ~0ul)
+	{
+		CloneError(allocated);
+		return;
+	}
+
 	SetPercentMode();
 	InitCANJaguar();
 	ConfigMaxOutputVoltage(kApproxBusVoltage);
@@ -243,6 +255,8 @@ CANJaguar::CANJaguar(uint8_t deviceNumber)
 
 CANJaguar::~CANJaguar()
 {
+	allocated->Free(m_deviceNumber-1);
+
 	int32_t status;
 
 	// Disable periodic setpoints

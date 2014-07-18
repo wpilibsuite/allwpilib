@@ -68,6 +68,39 @@ protected:
 };
 
 /**
+ * Tests that allocating the same CANJaguar port as an already allocated port throws a resource already allocated error code.
+ */
+TEST_F(CANJaguarTest, DuplicateAllocationCausesError) {
+	std::cout<<"The following error is an expected part of the test system"<<std::endl;
+	CANJaguar *m_jaguar = new CANJaguar(TestBench::kCANJaguarID);
+	EXPECT_EQ(wpi_error_value_ResourceAlreadyAllocated, m_jaguar->GetError().GetCode()) << "An error should have been returned";
+	//See WPIErrors.h for error code comparison
+	delete m_jaguar;
+}
+
+/**
+ * Tests that allocating a CANJaguar device beyond the range of devices throws a module index out of range error code.
+ */
+TEST_F(CANJaguarTest, OutOfRangeAllocationCausesError) {
+	std::cout<<"The following error is an expected part of the test system"<<std::endl;
+	CANJaguar *m_jaguar = new CANJaguar(64);
+	EXPECT_EQ( wpi_error_value_ModuleIndexOutOfRange, m_jaguar->GetError().GetCode()) << "An error should have been returned";
+	//See WPIErrors.h for error code comparison
+	delete m_jaguar; //This will also return an error
+}
+
+/**
+ * Tests that allocating a negative CANJaguar device throws a module index out of range error code.
+ */
+TEST_F(CANJaguarTest, OutOfRangeNegativeAllocationCausesError) {
+	std::cout<<"The following error is an expected part of the test system"<<std::endl;
+	CANJaguar *m_jaguar = new CANJaguar(0);
+	EXPECT_EQ(wpi_error_value_ModuleIndexOutOfRange, m_jaguar->GetError().GetCode()) << "An error should have been returned";
+	//See WPIErrors.h for error code comparison
+	delete m_jaguar; //This will also return an error
+}
+
+/**
  * Checks the default status data for reasonable values to confirm that we're
  * really getting status data from the Jaguar.
  */
