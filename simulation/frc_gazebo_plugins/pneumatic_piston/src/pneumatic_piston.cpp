@@ -22,7 +22,7 @@ void PneumaticPiston::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   }
 
   forward_force = sdf->Get<double>("forward-force");
-  reverse_force = -sdf->Get<double>("reverse-force");
+  reverse_force = sdf->Get<double>("reverse-force");
 
   if (sdf->HasElement("direction") && sdf->Get<std::string>("direction") == "reversed") {
     forward_force = -forward_force;
