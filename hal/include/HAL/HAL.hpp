@@ -12,6 +12,7 @@
 #endif
 #include <cmath>
 
+#include "Accelerometer.hpp"
 #include "Analog.hpp"
 #include "CAN.hpp"
 #include "Compressor.hpp"
