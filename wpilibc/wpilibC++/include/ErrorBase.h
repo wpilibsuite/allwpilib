@@ -19,7 +19,7 @@
 #define wpi_setStaticError(object, code)   (wpi_setStaticErrorWithContext(object, code, ""))
 #define wpi_setGlobalErrorWithContext(code, context)   (ErrorBase::SetGlobalError((code), (context), __FILE__, __FUNCTION__, __LINE__))
 #define wpi_setGlobalError(code)   (wpi_setGlobalErrorWithContext(code, ""))
-#define wpi_setWPIErrorWithContext(error, context)   (this->SetWPIError((wpi_error_s_##error), (context), __FILE__, __FUNCTION__, __LINE__))
+#define wpi_setWPIErrorWithContext(error, context)   (this->SetWPIError((wpi_error_s_##error), (wpi_error_value_##error), (context), __FILE__, __FUNCTION__, __LINE__))
 #define wpi_setWPIError(error)   (wpi_setWPIErrorWithContext(error, ""))
 #define wpi_setStaticWPIErrorWithContext(object, error, context)   (object->SetWPIError((wpi_error_s_##error), (context), __FILE__, __FUNCTION__, __LINE__))
 #define wpi_setStaticWPIError(object, error)   (wpi_setStaticWPIErrorWithContext(object, error, ""))
@@ -44,7 +44,7 @@ public:
 			const char* function, uint32_t lineNumber) const;
 	virtual void SetError(Error::Code code, const char *contextMessage, const char* filename,
 			const char* function, uint32_t lineNumber) const;
-	virtual void SetWPIError(const char *errorMessage, const char *contextMessage,
+	virtual void SetWPIError(const char *errorMessage, Error::Code code, const char *contextMessage,
 			const char* filename, const char* function, uint32_t lineNumber) const;
 	virtual void CloneError(ErrorBase *rhs) const;
 	virtual void ClearError() const;
