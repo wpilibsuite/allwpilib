@@ -145,14 +145,14 @@ void ErrorBase::SetError(Error::Code code, const char *contextMessage,
  * @param function Function of the error source
  * @param lineNumber Line number of the error source
  */
-void ErrorBase::SetWPIError(const char *errorMessage, const char *contextMessage,
+void ErrorBase::SetWPIError(const char *errorMessage, Error::Code code , const char *contextMessage,
 		const char* filename, const char* function, uint32_t lineNumber) const
 {
 	char err[256];
 	sprintf(err, "%s: %s", errorMessage, contextMessage);
 
 	//  Set the current error information for this object.
-	m_error.Set(-1, err, filename, function, lineNumber, this);
+	m_error.Set(code, err, filename, function, lineNumber, this);
 
 	// Update the global error if there is not one already set.
 	Synchronized mutex(_globalErrorMutex);
