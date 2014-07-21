@@ -12,20 +12,13 @@
  * @param range The range the accelerometer will measure
  */
 BuiltInAccelerometer::BuiltInAccelerometer(Range range)
+	: m_table(0)
 {
 	setAccelerometerActive(false);
 	setAccelerometerRange((AccelerometerRange)range);
 	setAccelerometerActive(true);
 
 	HALReport(HALUsageReporting::kResourceType_Accelerometer, 0, 0, "Built-in accelerometer");
-}
-
-/**
- * Destructor.
- */
-BuiltInAccelerometer::~BuiltInAccelerometer()
-{
-	setAccelerometerActive(false);
 }
 
 /**
@@ -50,4 +43,25 @@ double BuiltInAccelerometer::GetY() const
 double BuiltInAccelerometer::GetZ() const
 {
 	return getAccelerometerZ();
+}
+
+std::string BuiltInAccelerometer::GetSmartDashboardType() {
+	return "Accelerometer";
+}
+
+void BuiltInAccelerometer::InitTable(ITable *subtable) {
+	m_table = subtable;
+	UpdateTable();
+}
+
+void BuiltInAccelerometer::UpdateTable() {
+	if (m_table != NULL) {
+		m_table->PutNumber("X", GetX());
+		m_table->PutNumber("Y", GetY());
+		m_table->PutNumber("Z", GetZ());
+	}
+}
+
+ITable* BuiltInAccelerometer::GetTable() {
+	return m_table;
 }

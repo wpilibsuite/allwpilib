@@ -19,6 +19,7 @@
 #include "AnalogModule.h"
 #include "AnalogTrigger.h"
 #include "AnalogTriggerOutput.h"
+#include "BuiltInAccelerometer.h"
 #include "Buttons/AnalogIOButton.h"
 #include "Buttons/DigitalIOButton.h"
 #include "Buttons/InternalButton.h"

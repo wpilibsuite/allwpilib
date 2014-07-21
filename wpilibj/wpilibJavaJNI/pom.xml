@@ -20,10 +20,10 @@
 		</dependency>
 	</dependencies>
 	<repositories>
-    
+
   </repositories>
 	<pluginRepositories>
-    
+
   </pluginRepositories>
 	<properties>
 		<embeddedJDKHome>${user.home}${file.separator}jdk-linux-arm-vfp-sflt${file.separator}jdk1.7.0_45</embeddedJDKHome>
@@ -83,7 +83,7 @@
 										<file>${embeddedJDKIncludePath}</file>
 									</files>
 									<message>A copy of the 'Linux ARM v6/v7 Soft Float ABI' JDK must be extracted to '${embeddedJDKHome}' and
-the folder '${embeddedJDKIncludePath}' must exist to build this module. You must use Java 7 u45. This JDK may be downloaded from 
+the folder '${embeddedJDKIncludePath}' must exist to build this module. You must use Java 7 u45. This JDK may be downloaded from
 http://www.oracle.com/technetwork/java/javase/downloads/java-archive-downloads-javase7-521261.html#jdk-7u45-oth-JPR. To override
 this default location, specify a value for the 'embeddedJDKHome' property at the command line, like 'mvn -DembeddedJDKHome=path/to/jdk'</message>
 								</requireFilesExist>
@@ -113,6 +113,7 @@ this default location, specify a value for the 'embeddedJDKHome' property at the
 								<javahClassName>edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary</javahClassName>
 								<javahClassName>edu.wpi.first.wpilibj.hal.HALUtil</javahClassName>
 								<javahClassName>edu.wpi.first.wpilibj.hal.JNIWrapper</javahClassName>
+								<javahClassName>edu.wpi.first.wpilibj.hal.AccelerometerJNI</javahClassName>
 								<javahClassName>edu.wpi.first.wpilibj.hal.AnalogJNI</javahClassName>
 								<javahClassName>edu.wpi.first.wpilibj.hal.CounterJNI</javahClassName>
 								<javahClassName>edu.wpi.first.wpilibj.hal.DIOJNI</javahClassName>
@@ -128,7 +129,7 @@ this default location, specify a value for the 'embeddedJDKHome' property at the
 							</javahClassNames>
 							<!-- enable additional javah interface in dependencies list -->
 							<!-- javahSearchJNIFromDependencies>true</javahSearchJNIFromDependencies -->
-							<!-- 
+							<!--
             			| Add jdk include directories to system include path
             			| Override ${jkdIncludePath} If your jdk does not conform to Sun JDK layout
             			-->
@@ -242,7 +243,7 @@ this default location, specify a value for the 'embeddedJDKHome' property at the
 									</then>
 									<else>
 										<copy todir="${project.build.directory}" >
-									        <fileset dir="${mvn.cpp-root.zip.path}" />  
+									        <fileset dir="${mvn.cpp-root.zip.path}" />
 									 	</copy>
 									</else>
 								</if>
