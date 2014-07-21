@@ -7,11 +7,11 @@ if (PKG_CONFIG_FOUND)
 endif()
 
 find_package(gazebo REQUIRED)
+find_library(GZ_MSGS libgz_msgs.so ../msgs/build)
 
 file(GLOB_RECURSE SRC_FILES src/*.cpp)
-file(GLOB_RECURSE MSG_FILES ../msgs/src/*.cc)
 include_directories(src ${Boost_INCLUDE_DIR} ${GAZEBO_INCLUDE_DIRS} ../msgs/src)
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${MSG_FILES})
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 
-link_directories(${GAZEBO_LIBRARY_DIRS} ../msgs/build)
-target_link_libraries(${PROJECT_NAME} ${GAZEBO_LIBRARIES})
+link_directories(${GAZEBO_LIBRARY_DIRS} ../msgs/build/)
+target_link_libraries(${PROJECT_NAME} ${GZ_MSGS} ${GAZEBO_LIBRARIES})

@@ -20,6 +20,7 @@ build:
 
 copy-plugins:
 	mkdir -p plugins
+	cp msgs/build/libgz_msgs.so plugins
 	cp dc_motor/build/libgz_dc_motor.so plugins
 	cp pneumatic_piston/build/libgz_pneumatic_piston.so plugins
 	cp potentiometer/build/libgz_potentiometer.so plugins
@@ -40,6 +41,10 @@ clean: clean-docs
 	cd limit_switch && make clean
 	cd clock && make clean
 	-rm -r plugins
+
+install: all
+	mkdir -p $(DESTDIR)$(plugin.dir)
+	install plugins/* $(DESTDIR)$(plugin.dir)
 
 docs:
 	doxygen frc_gazebo_plugins.doxy
