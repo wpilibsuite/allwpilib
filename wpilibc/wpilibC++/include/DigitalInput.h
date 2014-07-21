@@ -5,8 +5,6 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-class DigitalModule;
-
 #include "DigitalSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
 
@@ -45,7 +43,6 @@ public:
 private:
 	void InitDigitalInput(uint32_t channel);
 	uint32_t m_channel;
-	DigitalModule *m_module;
 	bool m_lastValue;
 
 	ITable *m_table;

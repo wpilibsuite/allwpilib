@@ -6,7 +6,6 @@
 
 #include "PWM.h"
 
-#include "DigitalModule.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
 #include "Utility.h"
@@ -44,9 +43,13 @@ void PWM::InitPWM(uint32_t channel)
 		CloneError(allocated);
 		return;
 	}
+
 	m_channel = channel;
-	m_module = DigitalModule::GetInstance(1);
-	m_module->SetPWM(m_channel, kPwmDisabled);
+
+	int32_t status = 0;
+	setPWM(m_pwm_ports[m_channel], kPwmDisabled, &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+
 	m_eliminateDeadband = false;
 
 	HALReport(HALUsageReporting::kResourceType_PWM, channel);
@@ -58,7 +61,6 @@ void PWM::InitPWM(uint32_t channel)
  * @param channel The PWM channel.
  */
 PWM::PWM(uint32_t channel)
-	: m_module(NULL)
 {
 	InitPWM(channel);
 }
@@ -70,11 +72,11 @@ PWM::PWM(uint32_t channel)
  */
 PWM::~PWM()
 {
-	if (m_module)
-	{
-		m_module->SetPWM(m_channel, kPwmDisabled);
-		allocated->Free(m_channel);
-	}
+	int32_t status = 0;
+	setPWM(m_pwm_ports[m_channel], kPwmDisabled, &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+
+	allocated->Free(m_channel);
 }
 
 /**
@@ -123,15 +125,17 @@ void PWM::SetBounds(int32_t max, int32_t deadbandMax, int32_t center, int32_t de
 void PWM::SetBounds(double max, double deadbandMax, double center, double deadbandMin, double min)
 {
 	// calculate the loop time in milliseconds
-	double loopTime = m_module->GetLoopTiming()/(kSystemClockTicksPerMicrosecond*1e3);
+	int32_t status = 0;
+	double loopTime = getLoopTiming(&status)/(kSystemClockTicksPerMicrosecond*1e3);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+
 	if (StatusIsFatal()) return;
 
-    m_maxPwm = (int32_t)((max-kDefaultPwmCenter)/loopTime+kDefaultPwmStepsDown-1);
-    m_deadbandMaxPwm = (int32_t)((deadbandMax-kDefaultPwmCenter)/loopTime+kDefaultPwmStepsDown-1);
-    m_centerPwm = (int32_t)((center-kDefaultPwmCenter)/loopTime+kDefaultPwmStepsDown-1);
-    m_deadbandMinPwm = (int32_t)((deadbandMin-kDefaultPwmCenter)/loopTime+kDefaultPwmStepsDown-1);
-    m_minPwm = (int32_t)((min-kDefaultPwmCenter)/loopTime+kDefaultPwmStepsDown-1);
-//    printf("Calculated m_minPwm: %d min: %lf  loopTime: %lf  defaultStepsDown: %d\n", m_minPwm, min, loopTime, kDefaultPwmStepsDown);
+	m_maxPwm = (int32_t)((max-kDefaultPwmCenter)/loopTime+kDefaultPwmStepsDown-1);
+	m_deadbandMaxPwm = (int32_t)((deadbandMax-kDefaultPwmCenter)/loopTime+kDefaultPwmStepsDown-1);
+	m_centerPwm = (int32_t)((center-kDefaultPwmCenter)/loopTime+kDefaultPwmStepsDown-1);
+	m_deadbandMinPwm = (int32_t)((deadbandMin-kDefaultPwmCenter)/loopTime+kDefaultPwmStepsDown-1);
+	m_minPwm = (int32_t)((min-kDefaultPwmCenter)/loopTime+kDefaultPwmStepsDown-1);
 }
 
 /**
@@ -298,7 +302,10 @@ float PWM::GetSpeed()
 void PWM::SetRaw(unsigned short value)
 {
 	if (StatusIsFatal()) return;
-	m_module->SetPWM(m_channel, value);
+
+	int32_t status = 0;
+	setPWM(m_pwm_ports[m_channel], value, &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
@@ -311,7 +318,12 @@ void PWM::SetRaw(unsigned short value)
 unsigned short PWM::GetRaw()
 {
 	if (StatusIsFatal()) return 0;
-	return m_module->GetPWM(m_channel);
+
+	int32_t status = 0;
+	unsigned short value = getPWM(m_pwm_ports[m_channel], &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+
+	return value;
 }
 
 /**
@@ -322,20 +334,25 @@ unsigned short PWM::GetRaw()
 void PWM::SetPeriodMultiplier(PeriodMultiplier mult)
 {
 	if (StatusIsFatal()) return;
+
+	int32_t status = 0;
+
 	switch(mult)
 	{
 	case kPeriodMultiplier_4X:
-		m_module->SetPWMPeriodScale(m_channel, 3); // Squelch 3 out of 4 outputs
+		setPWMPeriodScale(m_pwm_ports[m_channel], 3, &status); // Squelch 3 out of 4 outputs
 		break;
 	case kPeriodMultiplier_2X:
-		m_module->SetPWMPeriodScale(m_channel, 1); // Squelch 1 out of 2 outputs
+		setPWMPeriodScale(m_pwm_ports[m_channel], 1, &status); // Squelch 1 out of 2 outputs
 		break;
 	case kPeriodMultiplier_1X:
-		m_module->SetPWMPeriodScale(m_channel, 0); // Don't squelch any outputs
+		setPWMPeriodScale(m_pwm_ports[m_channel], 0, &status); // Don't squelch any outputs
 		break;
 	default:
 		wpi_assert(false);
 	}
+
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 

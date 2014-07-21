@@ -5,7 +5,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "ADXL345_I2C.h"
-#include "DigitalModule.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "I2C.h"
 

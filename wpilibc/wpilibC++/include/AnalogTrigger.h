@@ -10,7 +10,6 @@
 #include "SensorBase.h"
 
 class AnalogInput;
-class AnalogModule;
 
 class AnalogTrigger : public SensorBase
 {

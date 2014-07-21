@@ -7,14 +7,12 @@
 
 #include "SensorBase.h"
 
-class DigitalModule;
-
 /**
  * I2C bus interface class.
- * 
+ *
  * This class is intended to be used by sensor (and other I2C device) drivers.
  * It probably should not be used directly.
- * 
+ *
  */
 class I2C : SensorBase
 {

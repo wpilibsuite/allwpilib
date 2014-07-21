@@ -9,7 +9,6 @@
 #include "SensorBase.h"
 #include "PIDSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
-#include "AnalogModule.h"
 
 /**
  * Analog input class.
@@ -30,8 +29,6 @@ public:
 
 	explicit AnalogInput(uint32_t channel);
 	virtual ~AnalogInput();
-
-    AnalogModule *GetModule() { return AnalogModule::GetInstance(1); }
 
 	int16_t GetValue();
 	int32_t GetAverageValue();
@@ -58,6 +55,9 @@ public:
 	int64_t GetAccumulatorValue();
 	uint32_t GetAccumulatorCount();
 	void GetAccumulatorOutput(int64_t *value, uint32_t *count);
+
+	static void SetSampleRate(float samplesPerSecond);
+	static float GetSampleRate();
 
 	double PIDGet();
 

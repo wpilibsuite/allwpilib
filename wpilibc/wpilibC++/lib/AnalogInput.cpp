@@ -368,6 +368,29 @@ void AnalogInput::GetAccumulatorOutput(int64_t *value, uint32_t *count)
 }
 
 /**
+ * Set the sample rate for all analog channels.
+ *
+ * @param samplesPerSecond The number of samples per second.
+ */
+void AnalogInput::SetSampleRate(float samplesPerSecond)
+{
+	int32_t status = 0;
+	setAnalogSampleRate(samplesPerSecond, &status);
+}
+
+/**
+ * Get the current sample rate for all channels
+ *
+ * @return Sample rate.
+ */
+float AnalogInput::GetSampleRate()
+{
+	int32_t status = 0;
+	float sampleRate = getAnalogSampleRate(&status);
+	return sampleRate;
+}
+
+/**
  * Get the Average value for the PID Source base object.
  *
  * @return The average voltage.

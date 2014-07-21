@@ -19,11 +19,41 @@ const uint32_t SensorBase::kPDPChannels;
 const uint32_t SensorBase::kChassisSlots;
 SensorBase *SensorBase::m_singletonList = NULL;
 
+static bool portsInitialized = false;
+void* SensorBase::m_digital_ports[kDigitalChannels];
+void* SensorBase::m_relay_ports[kRelayChannels];
+void* SensorBase::m_pwm_ports[kPwmChannels];
+
 /**
  * Creates an instance of the sensor base and gets an FPGA handle
  */
 SensorBase::SensorBase()
 {
+	if(!portsInitialized) {
+		for (uint32_t i = 0; i < kDigitalChannels; i++)
+		{
+			void* port = getPort(i);
+			int32_t status = 0;
+			m_digital_ports[i] = initializeDigitalPort(port, &status);
+			wpi_setErrorWithContext(status, getHALErrorMessage(status));
+		}
+
+		for (uint32_t i = 0; i < kRelayChannels; i++)
+		{
+			void* port = getPort(i);
+			int32_t status = 0;
+			m_relay_ports[i] = initializeDigitalPort(port, &status);
+			wpi_setErrorWithContext(status, getHALErrorMessage(status));
+		}
+
+		for (uint32_t i = 0; i < kPwmChannels; i++)
+		{
+			void* port = getPort(i);
+			int32_t status = 0;
+			m_pwm_ports[i] = initializeDigitalPort(port, &status);
+			wpi_setErrorWithContext(status, getHALErrorMessage(status));
+		}
+	}
 }
 
 /**
@@ -141,9 +171,9 @@ bool SensorBase::CheckAnalogInput(uint32_t channel)
  */
 bool SensorBase::CheckAnalogOutput(uint32_t channel)
 {
-    if (channel < kAnalogOutputs)
-        return true;
-    return false;
+	if (channel < kAnalogOutputs)
+		return true;
+	return false;
 }
 
 /**

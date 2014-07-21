@@ -5,7 +5,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "DigitalInput.h"
-#include "DigitalModule.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
 #include "WPIErrors.h"
@@ -31,8 +30,10 @@ void DigitalInput::InitDigitalInput(uint32_t channel)
 		return;
 	}
 	m_channel = channel;
-	m_module = DigitalModule::GetInstance(1);
-	m_module->AllocateDIO(channel, true);
+
+	int32_t status = 0;
+	bool allocated = allocateDIO(m_digital_ports[channel], true, &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
 	HALReport(HALUsageReporting::kResourceType_DigitalInput, channel);
 }
@@ -62,7 +63,10 @@ DigitalInput::~DigitalInput()
 		m_interrupt = NULL;
 		interruptsResource->Free(m_interruptIndex);
 	}
-	m_module->FreeDIO(m_channel);
+
+	int32_t status = 0;
+	freeDIO(m_digital_ports[m_channel], &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /*
@@ -71,8 +75,10 @@ DigitalInput::~DigitalInput()
  */
 uint32_t DigitalInput::Get()
 {
-	if (StatusIsFatal()) return 0;
-	return m_module->GetDIO(m_channel);
+	int32_t status = 0;
+	bool value = getDIO(m_digital_ports[m_channel], &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	return value;
 }
 
 /**
@@ -96,8 +102,7 @@ uint32_t DigitalInput::GetChannelForRouting()
  */
 uint32_t DigitalInput::GetModuleForRouting()
 {
-	if (StatusIsFatal()) return 0;
-	return m_module->GetNumber() - 1;
+	return 0;
 }
 
 /**

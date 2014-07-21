@@ -21,7 +21,7 @@ public:
 	virtual ~SensorBase();
 	static void DeleteSingletons();
 
-    static uint32_t GetDefaultSolenoidModule()
+	static uint32_t GetDefaultSolenoidModule()
 	{
 		return 0;
 	}
@@ -44,8 +44,13 @@ public:
 	static const uint32_t kRelayChannels = 8;
 	static const uint32_t kPDPChannels = 16;
 	static const uint32_t kChassisSlots = 8;
+
 protected:
 	void AddToSingletonList();
+
+	static void* m_digital_ports[kDigitalChannels];
+	static void* m_relay_ports[kRelayChannels];
+	static void* m_pwm_ports[kPwmChannels];
 
 private:
 	DISALLOW_COPY_AND_ASSIGN(SensorBase);

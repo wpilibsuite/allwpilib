@@ -9,8 +9,6 @@
 #include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITableListener.h"
 
-class DigitalModule;
-
 /**
  * Class implements the PWM generation in the FPGA.
  *
@@ -29,7 +27,6 @@ class DigitalModule;
  */
 class PWM : public SensorBase, public ITableListener, public LiveWindowSendable
 {
-	friend class DigitalModule;
 public:
 	enum PeriodMultiplier
 	{
@@ -105,7 +102,6 @@ protected:
 private:
 	void InitPWM(uint32_t channel);
 	uint32_t m_channel;
-	DigitalModule *m_module;
 	int32_t GetMaxPositivePwm()
 	{
 		return m_maxPwm;

@@ -9,8 +9,6 @@
 #include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITableListener.h"
 
-class DigitalModule;
-
 /**
  * Class to write to digital outputs.
  * Write values to the digital output channels. Other devices implemented elsewhere will allocate
@@ -51,8 +49,7 @@ private:
 	void InitDigitalOutput(uint32_t channel);
 
 	uint32_t m_channel;
-	uint32_t m_pwmGenerator;
-	DigitalModule *m_module;
+	void *m_pwmGenerator;
 
 	ITable *m_table;
 };
