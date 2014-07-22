@@ -6,7 +6,7 @@
 ExampleSubsystem* CommandBase::examplesubsystem = NULL;
 OI* CommandBase::oi = NULL;
 
-CommandBase::CommandBase(std::string name) :
+CommandBase::CommandBase(char const *name) :
 		Command(name)
 {
 }
