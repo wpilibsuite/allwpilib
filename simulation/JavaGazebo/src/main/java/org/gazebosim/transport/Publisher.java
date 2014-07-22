@@ -79,6 +79,27 @@ public class Publisher<T extends Message> implements PublisherRecord {
 			}
 		}
 		listeners.add(conn);
+		this.notifyAll();
+	}
+
+	public synchronized void waitForConnection() throws InterruptedException {
+		while (this.listeners.isEmpty()) {
+			this.wait();
+		}
+	}
+
+	public synchronized boolean waitForConnection(long timeout_millis) throws InterruptedException {
+		long start = System.currentTimeMillis();
+
+		while (this.listeners.isEmpty()) {
+			long remain = timeout_millis - (System.currentTimeMillis() - start);
+			if (remain <= 0) {
+				break;
+			}
+			this.wait(remain);
+		}
+
+		return !this.listeners.isEmpty();
 	}
 
 	public void setLatchMode(boolean b) {

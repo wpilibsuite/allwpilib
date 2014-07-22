@@ -13,7 +13,6 @@ public class SimEncoder {
 	
 	public SimEncoder(String topic) {
 		command_pub = MainNode.advertise(topic+"/control", Msgs.String());
-		command_pub.setLatchMode(true);
 
 		MainNode.subscribe(topic+"/position", Msgs.Float64(),
 			new SubscriberCallback<Float64>() {
@@ -21,15 +20,26 @@ public class SimEncoder {
 					position = msg.getData();
 				}
 			}
-    	);
-    	
-    	MainNode.subscribe(topic+"/velocity", Msgs.Float64(),
+		);
+
+		MainNode.subscribe(topic+"/velocity", Msgs.Float64(),
 			new SubscriberCallback<Float64>() {
 				@Override public void callback(Float64 msg) {
 					velocity = msg.getData();
 				}
 			}
 		);
+
+		try {
+			if (command_pub.waitForConnection(5000)) { // Wait up to five seconds.
+				System.out.println("Initialized " + topic);
+			} else {
+				System.err.println("Failed to initialize " + topic + ": does the encoder exist?");
+			}
+		} catch (InterruptedException ex) {
+			ex.printStackTrace(); // TODO: Better way to handle this?
+			Thread.currentThread().interrupt();
+		}
 	}
 	
 	public void reset() {
