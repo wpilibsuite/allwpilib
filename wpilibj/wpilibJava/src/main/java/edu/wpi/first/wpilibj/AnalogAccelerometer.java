@@ -16,12 +16,12 @@ import edu.wpi.first.wpilibj.tables.ITable;
 
 
 /**
- * Handle operation of the accelerometer.
+ * Handle operation of an analog accelerometer.
  * The accelerometer reads acceleration directly through the sensor. Many sensors have
  * multiple axis and can be treated as multiple devices. Each is calibrated by finding
  * the center value over a period of time.
  */
-public class Accelerometer extends SensorBase implements PIDSource, ISensor, LiveWindowSendable {
+public class AnalogAccelerometer extends SensorBase implements PIDSource, ISensor, LiveWindowSendable {
 
     private AnalogInput m_analogChannel;
     private double m_voltsPerG = 1.0;
@@ -42,7 +42,7 @@ public class Accelerometer extends SensorBase implements PIDSource, ISensor, Liv
      * The constructor allocates desired analog channel.
      * @param channel the port that the accelerometer is on
      */
-    public Accelerometer(final int channel) {
+    public AnalogAccelerometer(final int channel) {
         m_allocatedChannel = true;
         m_analogChannel = new AnalogInput(channel);
         initAccelerometer();
@@ -55,7 +55,7 @@ public class Accelerometer extends SensorBase implements PIDSource, ISensor, Liv
      * the Accelerometer class.
      * @param channel an already initialized analog channel
      */
-    public Accelerometer(AnalogInput channel) {
+    public AnalogAccelerometer(AnalogInput channel) {
         m_allocatedChannel = false;
         if (channel == null)
             throw new NullPointerException("Analog Channel given was null");

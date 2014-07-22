@@ -5,6 +5,7 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
+#include "interfaces/Accelerometer.h"
 #include "SensorBase.h"
 #include "SPI.h"
 
@@ -17,7 +18,7 @@ class DigitalOutput;
  * This class allows access to an Analog Devices ADXL345 3-axis accelerometer via SPI.
  * This class assumes the sensor is wired in 4-wire SPI mode.
  */
-class ADXL345_SPI : public SensorBase
+class ADXL345_SPI : public Accelerometer, public SensorBase
 {
 protected:
 	static const uint8_t kPowerCtlRegister = 0x2D;
@@ -30,7 +31,6 @@ protected:
 		kDataFormat_FullRes=0x08, kDataFormat_Justify=0x04};
 
 public:
-	enum DataFormat_Range {kRange_2G=0x00, kRange_4G=0x01, kRange_8G=0x02, kRange_16G=0x03};
 	enum Axes {kAxis_X=0x00, kAxis_Y=0x02, kAxis_Z=0x04};
 	struct AllAxes
 	{
@@ -40,13 +40,20 @@ public:
 	};
 
 public:
-	ADXL345_SPI(SPI::Port port, DataFormat_Range range=kRange_2G);
+	ADXL345_SPI(SPI::Port port, Range range=kRange_2G);
 	virtual ~ADXL345_SPI();
+
+	// Accelerometer interface
+	virtual void SetRange(Range range);
+	virtual double GetX();
+	virtual double GetY();
+	virtual double GetZ();
+
 	virtual double GetAcceleration(Axes axis);
 	virtual AllAxes GetAccelerations();
 
 protected:
-	void Init(DataFormat_Range range);
+	void Init(Range range);
 
 	SPI* m_spi;
 	SPI::Port m_port;

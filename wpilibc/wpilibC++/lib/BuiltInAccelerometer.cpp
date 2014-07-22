@@ -6,6 +6,7 @@
 
 #include "BuiltInAccelerometer.h"
 #include "HAL/HAL.hpp"
+#include "WPIErrors.h"
 
 /**
  * Constructor.
@@ -14,17 +15,28 @@
 BuiltInAccelerometer::BuiltInAccelerometer(Range range)
 	: m_table(0)
 {
+	SetRange(range);
+
+	HALReport(HALUsageReporting::kResourceType_Accelerometer, 0, 0, "Built-in accelerometer");
+}
+
+/** {@inheritdoc} */
+void BuiltInAccelerometer::SetRange(Range range)
+{
+	if(range == kRange_16G)
+	{
+		wpi_setWPIErrorWithContext(ParameterOutOfRange, "16G range not supported (use k2G, k4G, or k8G)");
+	}
+
 	setAccelerometerActive(false);
 	setAccelerometerRange((AccelerometerRange)range);
 	setAccelerometerActive(true);
-
-	HALReport(HALUsageReporting::kResourceType_Accelerometer, 0, 0, "Built-in accelerometer");
 }
 
 /**
  * @return The acceleration of the RoboRIO along the X axis in g-forces
  */
-double BuiltInAccelerometer::GetX() const
+double BuiltInAccelerometer::GetX()
 {
 	return getAccelerometerX();
 }
@@ -32,7 +44,7 @@ double BuiltInAccelerometer::GetX() const
 /**
  * @return The acceleration of the RoboRIO along the Y axis in g-forces
  */
-double BuiltInAccelerometer::GetY() const
+double BuiltInAccelerometer::GetY()
 {
 	return getAccelerometerY();
 }
@@ -40,7 +52,7 @@ double BuiltInAccelerometer::GetY() const
 /**
  * @return The acceleration of the RoboRIO along the Z axis in g-forces
  */
-double BuiltInAccelerometer::GetZ() const
+double BuiltInAccelerometer::GetZ()
 {
 	return getAccelerometerZ();
 }

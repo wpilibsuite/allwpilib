@@ -14,7 +14,7 @@ const uint8_t ADXL345_SPI::kDataFormatRegister;
 const uint8_t ADXL345_SPI::kDataRegister;
 constexpr double ADXL345_SPI::kGsPerLSB;
 
-ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::DataFormat_Range range)
+ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::Range range)
 {
 	m_port = port;
 	Init(range);
@@ -23,7 +23,7 @@ ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::DataFormat_Range range)
 /**
  * Internal common init function.
  */
-void ADXL345_SPI::Init(DataFormat_Range range)
+void ADXL345_SPI::Init(Range range)
 {
 		m_spi = new SPI(m_port);
 		m_spi->SetClockRate(500000);
@@ -37,10 +37,8 @@ void ADXL345_SPI::Init(DataFormat_Range range)
 		commands[0] = kPowerCtlRegister;
 		commands[1] = kPowerCtl_Measure;
 		m_spi->Transaction(commands, commands, 2);
-		// Specify the data format to read
-		commands[0] = kDataFormatRegister;
-		commands[1] = kDataFormat_FullRes| (uint8_t)(range & 0x03);
-		m_spi->Transaction(commands, commands, 2);
+
+		SetRange(range);
 
 		HALReport(HALUsageReporting::kResourceType_ADXL345, HALUsageReporting::kADXL345_SPI);
 }
@@ -52,6 +50,35 @@ ADXL345_SPI::~ADXL345_SPI()
 {
 	delete m_spi;
 	m_spi = NULL;
+}
+
+/** {@inheritdoc} */
+void ADXL345_SPI::SetRange(Range range)
+{
+	uint8_t commands[2];
+	
+	// Specify the data format to read
+	commands[0] = kDataFormatRegister;
+	commands[1] = kDataFormat_FullRes| (uint8_t)(range & 0x03);
+	m_spi->Transaction(commands, commands, 2);
+}
+
+/** {@inheritdoc} */
+double ADXL345_SPI::GetX()
+{
+	return GetAcceleration(kAxis_X);
+}
+
+/** {@inheritdoc} */
+double ADXL345_SPI::GetY()
+{
+	return GetAcceleration(kAxis_Y);
+}
+
+/** {@inheritdoc} */
+double ADXL345_SPI::GetZ()
+{
+	return GetAcceleration(kAxis_Z);
 }
 
 /**

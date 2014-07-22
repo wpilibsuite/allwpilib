@@ -5,6 +5,7 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
+#include "interfaces/Accelerometer.h"
 #include "I2C.h"
 
 /**
@@ -13,7 +14,7 @@
  * This class allows access to a Analog Devices ADXL345 3-axis accelerometer on an I2C bus.
  * This class assumes the default (not alternate) sensor address of 0x1D (7-bit address).
  */
-class ADXL345_I2C : public I2C
+class ADXL345_I2C : public Accelerometer, public I2C
 {
 protected:
 	static const uint8_t kAddress = 0x1D;
@@ -26,7 +27,6 @@ protected:
 		kDataFormat_FullRes=0x08, kDataFormat_Justify=0x04};
 
 public:
-	enum DataFormat_Range {kRange_2G=0x00, kRange_4G=0x01, kRange_8G=0x02, kRange_16G=0x03};
 	enum Axes {kAxis_X=0x00, kAxis_Y=0x02, kAxis_Z=0x04};
 	struct AllAxes
 	{
@@ -36,8 +36,15 @@ public:
 	};
 
 public:
-	ADXL345_I2C(Port port, DataFormat_Range range=kRange_2G);
+	ADXL345_I2C(Port port, Range range = kRange_2G);
 	virtual ~ADXL345_I2C();
+
+	// Accelerometer interface
+	virtual void SetRange(Range range);
+	virtual double GetX();
+	virtual double GetY();
+	virtual double GetZ();
+
 	virtual double GetAcceleration(Axes axis);
 	virtual AllAxes GetAccelerations();
 
