@@ -6,7 +6,6 @@
 
 #include "Gyro.h"
 #include "AnalogInput.h"
-#include "AnalogModule.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "Timer.h"
 #include "WPIErrors.h"
@@ -46,7 +45,7 @@ void Gyro::InitGyro()
 	m_analog->SetOversampleBits(kOversampleBits);
 	float sampleRate = kSamplesPerSecond *
 		(1 << (kAverageBits + kOversampleBits));
-	m_analog->GetModule()->SetSampleRate(sampleRate);
+	m_analog->SetSampleRate(sampleRate);
 	Wait(1.0);
 
 	m_analog->InitAccumulator();
@@ -148,7 +147,7 @@ float Gyro::GetAngle( void )
 	int64_t value = rawValue - (int64_t)((float)count * m_offset);
 
 	double scaledValue = value * 1e-9 * (double)m_analog->GetLSBWeight() * (double)(1 << m_analog->GetAverageBits()) /
-		(m_analog->GetModule()->GetSampleRate() * m_voltsPerDegreePerSecond);
+		(m_analog->GetSampleRate() * m_voltsPerDegreePerSecond);
 
 	return (float)scaledValue;
 }

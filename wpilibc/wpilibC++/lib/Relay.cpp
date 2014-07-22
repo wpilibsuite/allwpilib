@@ -1,12 +1,11 @@
 /*----------------------------------------------------------------------------*/
 /* Copyright (c) FIRST 2008. All Rights Reserved.							  */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* Open Source Software - may be modified and shared by FRC teams. The code	*/
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
 #include "Relay.h"
 
-#include "DigitalModule.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
 #include "WPIErrors.h"
@@ -54,9 +53,12 @@ void Relay::InitRelay()
 
 		HALReport(HALUsageReporting::kResourceType_Relay, m_channel + 128);
 	}
-	m_module = DigitalModule::GetInstance(1);
-	m_module->SetRelayForward(m_channel, false);
-	m_module->SetRelayReverse(m_channel, false);
+
+	int32_t status = 0;
+	setRelayForward(m_relay_ports[m_channel], false, &status);
+	setRelayReverse(m_relay_ports[m_channel], false, &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+
 	LiveWindow::GetInstance()->AddActuator("Relay", 1, m_channel, this);
 }
 
@@ -78,8 +80,11 @@ Relay::Relay(uint32_t channel, Relay::Direction direction)
  */
 Relay::~Relay()
 {
-	m_module->SetRelayForward(m_channel, false);
-	m_module->SetRelayReverse(m_channel, false);
+
+	int32_t status = 0;
+	setRelayForward(m_relay_ports[m_channel], false, &status);
+	setRelayReverse(m_relay_ports[m_channel], false, &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
 	if (m_direction == kBothDirections || m_direction == kForwardOnly)
 	{
@@ -97,37 +102,40 @@ Relay::~Relay()
  * Valid values depend on which directions of the relay are controlled by the object.
  *
  * When set to kBothDirections, the relay can be any of the four states:
- *    0v-0v, 0v-12v, 12v-0v, 12v-12v
+ *	 0v-0v, 0v-12v, 12v-0v, 12v-12v
  *
  * When set to kForwardOnly or kReverseOnly, you can specify the constant for the
- *    direction or you can simply specify kOff and kOn.  Using only kOff and kOn is
- *    recommended.
+ *	 direction or you can simply specify kOff and kOn.  Using only kOff and kOn is
+ *	 recommended.
  *
  * @param value The state to set the relay.
  */
 void Relay::Set(Relay::Value value)
 {
 	if (StatusIsFatal()) return;
+
+	int32_t status = 0;
+
 	switch (value)
 	{
 	case kOff:
 		if (m_direction == kBothDirections || m_direction == kForwardOnly)
 		{
-			m_module->SetRelayForward(m_channel, false);
+			setRelayForward(m_relay_ports[m_channel], false, &status);
 		}
 		if (m_direction == kBothDirections || m_direction == kReverseOnly)
 		{
-			m_module->SetRelayReverse(m_channel, false);
+			setRelayReverse(m_relay_ports[m_channel], false, &status);
 		}
 		break;
 	case kOn:
 		if (m_direction == kBothDirections || m_direction == kForwardOnly)
 		{
-			m_module->SetRelayForward(m_channel, true);
+			setRelayForward(m_relay_ports[m_channel], true, &status);
 		}
 		if (m_direction == kBothDirections || m_direction == kReverseOnly)
 		{
-			m_module->SetRelayReverse(m_channel, true);
+			setRelayReverse(m_relay_ports[m_channel], true, &status);
 		}
 		break;
 	case kForward:
@@ -138,11 +146,11 @@ void Relay::Set(Relay::Value value)
 		}
 		if (m_direction == kBothDirections || m_direction == kForwardOnly)
 		{
-			m_module->SetRelayForward(m_channel, true);
+			setRelayForward(m_relay_ports[m_channel], true, &status);
 		}
 		if (m_direction == kBothDirections)
 		{
-			m_module->SetRelayReverse(m_channel, false);
+			setRelayReverse(m_relay_ports[m_channel], false, &status);
 		}
 		break;
 	case kReverse:
@@ -153,14 +161,16 @@ void Relay::Set(Relay::Value value)
 		}
 		if (m_direction == kBothDirections)
 		{
-			m_module->SetRelayForward(m_channel, false);
+			setRelayForward(m_relay_ports[m_channel], false, &status);
 		}
 		if (m_direction == kBothDirections || m_direction == kReverseOnly)
 		{
-			m_module->SetRelayReverse(m_channel, true);
+			setRelayReverse(m_relay_ports[m_channel], true, &status);
 		}
 		break;
 	}
+
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
@@ -174,27 +184,31 @@ void Relay::Set(Relay::Value value)
  * @return The current state of the relay as a Relay::Value
  */
 Relay::Value Relay::Get() {
-   if(m_module->GetRelayForward(m_channel)) {
-	   if(m_module->GetRelayReverse(m_channel)) {
-		   return kOn;
-	   } else {
-		   if(m_direction == kForwardOnly) {
-			   return kOn;
-		   } else {
-		   return kForward;
-		   }
-	   }
-   } else {
-	   if(m_module->GetRelayReverse(m_channel)) {
-		   if(m_direction == kReverseOnly) {
-			   return kOn;
-		   } else {
-		   return kReverse;
-		   }
-	   } else {
-		   return kOff;
-	   }
-   }
+	int32_t status;
+
+	if(getRelayForward(m_relay_ports[m_channel], &status)) {
+		if(getRelayReverse(m_relay_ports[m_channel], &status)) {
+			return kOn;
+		} else {
+			if(m_direction == kForwardOnly) {
+				return kOn;
+			} else {
+			return kForward;
+			}
+		}
+	} else {
+		if(getRelayReverse(m_relay_ports[m_channel], &status)) {
+			if(m_direction == kReverseOnly) {
+				return kOn;
+			} else {
+			return kReverse;
+			}
+		} else {
+			return kOff;
+		}
+	}
+
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 void Relay::ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) {

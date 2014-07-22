@@ -10,8 +10,6 @@
 #include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITable.h"
 
-class DigitalModule;
-
 /**
  * Class for Spike style relay outputs.
  * Relays are intended to be connected to spikes or similar relays. The relay channels controls
@@ -59,5 +57,4 @@ private:
 
 	uint32_t m_channel;
 	Direction m_direction;
-	DigitalModule *m_module;
 };

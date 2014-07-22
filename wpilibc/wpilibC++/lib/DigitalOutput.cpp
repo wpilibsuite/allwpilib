@@ -5,7 +5,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "DigitalOutput.h"
-#include "DigitalModule.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
 #include "WPIErrors.h"
@@ -29,9 +28,11 @@ void DigitalOutput::InitDigitalOutput(uint32_t channel)
 		return;
 	}
 	m_channel = channel;
-	m_pwmGenerator = ~0ul;
-	m_module = DigitalModule::GetInstance(1);
-	m_module->AllocateDIO(m_channel, false);
+	m_pwmGenerator = (void *)~0ul;
+
+	int32_t status = 0;
+	allocateDIO(m_digital_ports[channel], false, &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
 	HALReport(HALUsageReporting::kResourceType_DigitalOutput, channel);
 }
@@ -55,7 +56,10 @@ DigitalOutput::~DigitalOutput()
 	if (StatusIsFatal()) return;
 	// Disable the PWM in case it was running.
 	DisablePWM();
-	m_module->FreeDIO(m_channel);
+
+	int32_t status = 0;
+	freeDIO(m_digital_ports[m_channel], &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
@@ -65,7 +69,10 @@ DigitalOutput::~DigitalOutput()
 void DigitalOutput::Set(uint32_t value)
 {
 	if (StatusIsFatal()) return;
-	m_module->SetDIO(m_channel, value);
+
+	int32_t status = 0;
+	setDIO(m_digital_ports[m_channel], value, &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
@@ -85,7 +92,10 @@ uint32_t DigitalOutput::GetChannel()
 void DigitalOutput::Pulse(float length)
 {
 	if (StatusIsFatal()) return;
-	m_module->Pulse(m_channel, length);
+
+	int32_t status = 0;
+	pulse(m_digital_ports[m_channel], length, &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
@@ -95,7 +105,11 @@ void DigitalOutput::Pulse(float length)
 bool DigitalOutput::IsPulsing()
 {
 	if (StatusIsFatal()) return false;
-	return m_module->IsPulsing(m_channel);
+
+	int32_t status = 0;
+	bool value = isPulsing(m_digital_ports[m_channel], &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	return value;
 }
 
 /**
@@ -103,14 +117,17 @@ bool DigitalOutput::IsPulsing()
  *
  * The valid range is from 0.6 Hz to 19 kHz.  The frequency resolution is logarithmic.
  *
- * There is only one PWM frequency per digital module.
+ * There is only one PWM frequency for all digital channels.
  *
- * @param rate The frequency to output all digital output PWM signals on this module.
+ * @param rate The frequency to output all digital output PWM signals.
  */
 void DigitalOutput::SetPWMRate(float rate)
 {
 	if (StatusIsFatal()) return;
-	m_module->SetDO_PWMRate(rate);
+
+	int32_t status = 0;
+	setPWMRate(rate, &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
@@ -127,11 +144,21 @@ void DigitalOutput::SetPWMRate(float rate)
  */
 void DigitalOutput::EnablePWM(float initialDutyCycle)
 {
-	if (StatusIsFatal()) return;
-	if (m_pwmGenerator != ~0ul) return;
-	m_pwmGenerator = m_module->AllocateDO_PWM();
-	m_module->SetDO_PWMDutyCycle(m_pwmGenerator, initialDutyCycle);
-	m_module->SetDO_PWMOutputChannel(m_pwmGenerator, m_channel);
+	if(m_pwmGenerator != (void *)~0ul) return;
+
+	int32_t status = 0;
+
+	if(StatusIsFatal()) return;
+	m_pwmGenerator = allocatePWM(&status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+
+	if(StatusIsFatal()) return;
+	setPWMDutyCycle(m_pwmGenerator, initialDutyCycle, &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+
+	if(StatusIsFatal()) return;
+	setPWMOutputChannel(m_pwmGenerator, m_channel, &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
@@ -142,10 +169,18 @@ void DigitalOutput::EnablePWM(float initialDutyCycle)
 void DigitalOutput::DisablePWM()
 {
 	if (StatusIsFatal()) return;
+	if(m_pwmGenerator == (void *)~0ul) return;
+
+	int32_t status = 0;
+
 	// Disable the output by routing to a dead bit.
-	m_module->SetDO_PWMOutputChannel(m_pwmGenerator, kDigitalChannels);
-	m_module->FreeDO_PWM(m_pwmGenerator);
-	m_pwmGenerator = ~0ul;
+	setPWMOutputChannel(m_pwmGenerator, kDigitalChannels, &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+
+	freePWM(m_pwmGenerator, &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+
+	m_pwmGenerator = (void *)~0ul;
 }
 
 /**
@@ -159,7 +194,10 @@ void DigitalOutput::DisablePWM()
 void DigitalOutput::UpdateDutyCycle(float dutyCycle)
 {
 	if (StatusIsFatal()) return;
-	m_module->SetDO_PWMDutyCycle(m_pwmGenerator, dutyCycle);
+
+	int32_t status = 0;
+	setPWMDutyCycle(m_pwmGenerator, dutyCycle, &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
@@ -167,7 +205,7 @@ void DigitalOutput::UpdateDutyCycle(float dutyCycle)
  */
 uint32_t DigitalOutput::GetChannelForRouting()
 {
-	return DigitalModule::RemapDigitalChannel(GetChannel() - 1);
+	return GetChannel();
 }
 
 /**
@@ -175,8 +213,7 @@ uint32_t DigitalOutput::GetChannelForRouting()
  */
 uint32_t DigitalOutput::GetModuleForRouting()
 {
-    if (StatusIsFatal()) return 0;
-    return m_module->GetNumber() - 1;
+	return 0;
 }
 
 /**

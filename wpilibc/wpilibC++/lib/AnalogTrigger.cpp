@@ -7,7 +7,6 @@
 #include "AnalogTrigger.h"
 
 #include "AnalogInput.h"
-#include "AnalogModule.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
 #include "WPIErrors.h"
