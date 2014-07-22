@@ -6,6 +6,7 @@ gazebo-plugins-version = 0.2
 gazebo-plugins-package-version = $(gazebo-plugins-version)-$(package-version)
 gazebo-models-version = 0.2
 gazebo-models-package-version = $(gazebo-models-version)-$(package-version)
+gazebo-models-orig-url = https://usfirst.collab.net/sf/frs/do/downloadFile/projects.wpilib/frs.simulation.frcsim_gazebo_models/frs1052?dl=1
 eclipse-plugins-version = 0.1
 eclipse-plugins-package-version = $(eclipse-plugins-version)-$(package-version)
 eclipse-toolchain-version = 0.1
@@ -107,6 +108,11 @@ pull-eclipse-plugins:
 pull-libwpilibsim-cpp:
 	cp -rf -t frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/ $(allwpilib)/wpilibc/wpilibC++Sim/*
 	echo Increment version?
+
+download-models:
+	cd frcsim-gazebo-models && \
+	    wget $(gazebo-models-orig-url) -O frcsim-gazebo-models_${gazebo-models-version}.orig.tar.gz && \
+	    tar xvf frcsim-gazebo-models_${gazebo-models-version}.orig.tar.gz
 
 deploy:
 	rsync -r -v -C -p repository/ adhenning@ccc.wpi.edu:public_html/frcsim/
