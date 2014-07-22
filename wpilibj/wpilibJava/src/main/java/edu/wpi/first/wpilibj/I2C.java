@@ -28,11 +28,11 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
 public class I2C extends SensorBase {
 	public enum Port {kOnboard(0), kMXP(1);
 		private int value;
-		
+
 		private Port(int value){
 			this.value = value;
 		}
-		
+
 		public int getValue(){
 			return this.value;
 		}
@@ -44,21 +44,19 @@ public class I2C extends SensorBase {
     /**
      * Constructor.
      *
-     * @param module
-     *            The Digital Module to which the device is connected.
      * @param deviceAddress
      *            The address of the device on the I2C bus.
      */
     public I2C(Port port, int deviceAddress) {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
-	
+
         m_port = port;
         m_deviceAddress = deviceAddress;
-		
+
 		I2CJNI.i2CInitialize((byte)m_port.getValue(), status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
-		
+
         UsageReporting.report(tResourceType.kResourceType_I2C, deviceAddress);
     }
 
@@ -93,7 +91,7 @@ public class I2C extends SensorBase {
 		ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(receiveSize);
 
 		aborted = I2CJNI
-				.i2CTransaction((byte) m_port.getValue(), (byte) m_deviceAddress, 
+				.i2CTransaction((byte) m_port.getValue(), (byte) m_deviceAddress,
 					dataToSendBuffer, (byte) sendSize,
 					dataReceivedBuffer, (byte) receiveSize) != 0;
 		/*if (status.get() == HALUtil.PARAMETER_OUT_OF_RANGE) {
@@ -140,13 +138,13 @@ public class I2C extends SensorBase {
 		byte[] buffer = new byte[2];
 		buffer[0] = (byte) registerAddress;
 		buffer[1] = (byte) data;
-		
+
 		ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(2);
 		dataToSendBuffer.put(buffer);
-		
+
 		return I2CJNI.i2CWrite((byte)m_port.getValue(), (byte) m_deviceAddress, dataToSendBuffer, (byte)buffer.length) < 0;
 	}
-	
+
 	/**
 	 * Execute a write transaction with the device.
 	 *
@@ -156,10 +154,10 @@ public class I2C extends SensorBase {
 	 * @param data
 	 *            The data to write to the device.
 	 */
-	public synchronized boolean writeBulk(byte[] data) {		
+	public synchronized boolean writeBulk(byte[] data) {
 		ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(data.length);
 		dataToSendBuffer.put(data);
-		
+
 		return I2CJNI.i2CWrite((byte)m_port.getValue(), (byte) m_deviceAddress, dataToSendBuffer, (byte)data.length) < 0;
 	}
 
@@ -190,7 +188,7 @@ public class I2C extends SensorBase {
 		return transaction(registerAddressArray, registerAddressArray.length,
 				buffer, count);
 	}
-	
+
 	/**
 	 * Execute a read only transaction with the device.
 	 *
@@ -209,9 +207,9 @@ public class I2C extends SensorBase {
 		if (buffer == null) {
 			throw new NullPointerException("Null return buffer was given");
 		}
-		
+
 		ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(count);
-		
+
 		int retVal = I2CJNI.i2CRead((byte)m_port.getValue(), (byte) m_deviceAddress, dataReceivedBuffer, (byte)count);
 		dataReceivedBuffer.get(buffer);
 		return retVal < 0;

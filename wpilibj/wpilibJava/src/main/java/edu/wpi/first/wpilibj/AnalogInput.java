@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
+/* Copyright (c) FIRST 2008-2012. All Rights Reserved.						*/
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
+/* the project.															   */
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
@@ -53,7 +53,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 	 * Construct an analog channel.
 	 *
 	 * @param channel
-	 *            The channel number to represent.
+	 *			The channel number to represent.
 	 */
 	public AnalogInput(final int channel) {
 		m_channel = channel;
@@ -69,7 +69,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 					 + " is already allocated");
 		}
 
-		ByteBuffer port_pointer = AnalogJNI.getPortWithModule((byte) 1, (byte) channel);
+		ByteBuffer port_pointer = AnalogJNI.getPort((byte) channel);
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
@@ -91,21 +91,12 @@ public class AnalogInput extends SensorBase implements PIDSource,
 	}
 
 	/**
-	 * Get the analog module.
+	 * Get a sample straight from this channel. The sample is a 12-bit value
+	 * representing the 0V to 10V range of the A/D converter. The units are in
+	 * A/D converter codes. Use GetVoltage() to get the analog value in
+	 * calibrated units.
 	 *
-	 * @return The AnalogModule.
-	 */
-	public AnalogModule getModule() {
-		return AnalogModule.getInstance(1);
-	}
-
-	/**
-	 * Get a sample straight from this channel on the module. The sample is a
-	 * 12-bit value representing the -10V to 10V range of the A/D converter in
-	 * the module. The units are in A/D converter codes. Use GetVoltage() to get
-	 * the analog value in calibrated units.
-	 *
-	 * @return A sample straight from this channel on the module.
+	 * @return A sample straight from this channel.
 	 */
 	public int getValue() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -122,8 +113,8 @@ public class AnalogInput extends SensorBase implements PIDSource,
 	 * SetOversampleBits(). The value configured in setAverageBits() will cause
 	 * this value to be averaged 2**bits number of samples. This is not a
 	 * sliding window. The sample will not change until 2**(OversamplBits +
-	 * AverageBits) samples have been acquired from the module on this channel.
-	 * Use getAverageVoltage() to get the analog value in calibrated units.
+	 * AverageBits) samples have been acquired from this channel. Use
+	 * getAverageVoltage() to get the analog value in calibrated units.
 	 *
 	 * @return A sample from the oversample and average engine for this channel.
 	 */
@@ -137,11 +128,11 @@ public class AnalogInput extends SensorBase implements PIDSource,
 	}
 
 	/**
-	 * Get a scaled sample straight from this channel on the module. The value
-	 * is scaled to units of Volts using the calibrated scaling data from
-	 * getLSBWeight() and getOffset().
+	 * Get a scaled sample straight from this channel. The value is scaled to
+	 * units of Volts using the calibrated scaling data from getLSBWeight() and
+	 * getOffset().
 	 *
-	 * @return A scaled sample straight from this channel on the module.
+	 * @return A scaled sample straight from this channel.
 	 */
 	public double getVoltage() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -161,7 +152,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 	 * stable, but it will update more slowly.
 	 *
 	 * @return A scaled sample from the output of the oversample and average
-	 *         engine for this channel.
+	 *		 engine for this channel.
 	 */
 	public double getAverageVoltage() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -175,7 +166,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 	/**
 	 * Get the factory scaling least significant bit weight constant. The least
 	 * significant bit weight constant for the channel that was calibrated in
-	 * manufacturing and stored in an eeprom in the module.
+	 * manufacturing and stored in an eeprom.
 	 *
 	 * Volts = ((LSB_Weight * 1e-9) * raw) - (Offset * 1e-9)
 	 *
@@ -192,8 +183,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 
 	/**
 	 * Get the factory scaling offset constant. The offset constant for the
-	 * channel that was calibrated in manufacturing and stored in an eeprom in
-	 * the module.
+	 * channel that was calibrated in manufacturing and stored in an eeprom.
 	 *
 	 * Volts = ((LSB_Weight * 1e-9) * raw) - (Offset * 1e-9)
 	 *
@@ -223,7 +213,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 	 * automatically in the FPGA.
 	 *
 	 * @param bits
-	 *            The number of averaging bits.
+	 *			The number of averaging bits.
 	 */
 	public void setAverageBits(final int bits) {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -255,7 +245,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 	 * oversampling is done automatically in the FPGA.
 	 *
 	 * @param bits
-	 *            The number of oversample bits.
+	 *			The number of oversample bits.
 	 */
 	public void setOversampleBits(final int bits) {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -306,7 +296,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 	 * This will be added to all values returned to the user.
 	 *
 	 * @param initialValue
-	 *            The value that the accumulator should start from when reset.
+	 *			The value that the accumulator should start from when reset.
 	 */
 	public void setAccumulatorInitialValue(long initialValue) {
 		m_accumulatorOffset = initialValue;
@@ -396,7 +386,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 	 * can be used for averaging.
 	 *
 	 * @param result
-	 *            AccumulatorResult object to store the results in.
+	 *			AccumulatorResult object to store the results in.
 	 */
 	public void getAccumulatorOutput(AccumulatorResult result) {
 		if (result == null) {
@@ -435,14 +425,39 @@ public class AnalogInput extends SensorBase implements PIDSource,
 		return false;
 	}
 
-	public void setSampleRate(final double samplesPerSecond) {
-		// TODO: This will change when variable size scan lists are implemented.
-		// TODO: Need float comparison with epsilon.
+	/**
+	 * Set the sample rate.
+	 *
+	 * This is a global setting for all channels.
+	 *
+	 * @param samplesPerSecond The number of samples per second.
+	 */
+	public static void setGlobalSampleRate(final double samplesPerSecond) {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
-		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
-		AnalogJNI.setAnalogSampleRate((float) samplesPerSecond, status.asIntBuffer());
+
+		AnalogJNI.setAnalogSampleRate((float)samplesPerSecond, status.asIntBuffer());
+
 		HALUtil.checkStatus(status.asIntBuffer());
+	}
+
+	/**
+	 * Get the current sample rate.
+	 *
+	 * This assumes one entry in the scan list. This is a global setting for
+	 * all channels.
+	 *
+	 * @return Sample rate.
+	 */
+	public static double getGlobalSampleRate() {
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+
+		double value = AnalogJNI.getAnalogSampleRate(status.asIntBuffer());
+
+		HALUtil.checkStatus(status.asIntBuffer());
+
+		return value;
 	}
 
 	/**

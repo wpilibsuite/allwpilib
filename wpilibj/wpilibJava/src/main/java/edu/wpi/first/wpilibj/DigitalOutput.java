@@ -138,25 +138,22 @@ public class DigitalOutput extends DigitalSource implements IInputOutput,
 	 * The valid range is from 0.6 Hz to 19 kHz. The frequency resolution is
 	 * logarithmic.
 	 *
-	 * There is only one PWM frequency per digital module.
+	 * There is only one PWM frequency for all channnels.
 	 *
-	 * @param rate
-	 *            The frequency to output all digital output PWM signals on this
-	 *            module.
+	 * @param rate The frequency to output all digital output PWM signals.
 	 */
 	public void setPWMRate(double rate) {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
-		PWMJNI.setPWMRateWithModule((byte) 1, rate,
-				status.asIntBuffer());
+		PWMJNI.setPWMRate(rate, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/**
 	 * Enable a PWM Output on this line.
 	 *
-	 * Allocate one of the 4 DO PWM generator resources from this module.
+	 * Allocate one of the 4 DO PWM generator resources.
 	 *
 	 * Supply the initial duty-cycle to output so as to avoid a glitch when
 	 * first starting.
@@ -173,12 +170,12 @@ public class DigitalOutput extends DigitalSource implements IInputOutput,
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
-		m_pwmGenerator = PWMJNI.allocatePWMWithModule((byte) 1, status.asIntBuffer());
+		m_pwmGenerator = PWMJNI.allocatePWM(status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
 		PWMJNI.setPWMDutyCycle(m_pwmGenerator, initialDutyCycle,
 			status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
-		PWMJNI.setPWMOutputChannelWithModule((byte) 1, m_pwmGenerator, m_channel, status.asIntBuffer());
+		PWMJNI.setPWMOutputChannel(m_pwmGenerator, m_channel, status.asIntBuffer());
 	}
 
 	/**
@@ -193,7 +190,7 @@ public class DigitalOutput extends DigitalSource implements IInputOutput,
 		status.order(ByteOrder.LITTLE_ENDIAN);
 		PWMJNI.setPWMOutputChannel(m_pwmGenerator, kDigitalChannels, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
-		PWMJNI.freePWMWithModule((byte) 1, m_pwmGenerator, status.asIntBuffer());
+		PWMJNI.freePWM(m_pwmGenerator, status.asIntBuffer());
 		m_pwmGenerator = null;
 	}
 
@@ -210,7 +207,7 @@ public class DigitalOutput extends DigitalSource implements IInputOutput,
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
-		PWMJNI.setPWMDutyCycleWithModule((byte) 1, m_pwmGenerator, dutyCycle, status.asIntBuffer());
+		PWMJNI.setPWMDutyCycle(m_pwmGenerator, dutyCycle, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
 	}
 

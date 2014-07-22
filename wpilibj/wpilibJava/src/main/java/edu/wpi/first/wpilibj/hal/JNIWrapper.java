@@ -23,33 +23,33 @@ public class JNIWrapper
 				jniLibrary = File.createTempFile("libwpilibJavaJNI", ".so");
 				// flag for delete on exit
 				jniLibrary.deleteOnExit();
-				
+
 				byte [] buffer = new byte[1024];
-				
+
 				int readBytes;
-				
+
 				InputStream is = JNIWrapper.class.getResourceAsStream("/linux-arm/libwpilibJavaJNI.so");
-				
+
 				OutputStream os = new FileOutputStream(jniLibrary);
-				
+
 				try
 				{
 					while((readBytes = is.read(buffer)) != -1 )
 					{
 						os.write(buffer, 0, readBytes);
 					}
-					
+
 				}
 				finally
 				{
 					os.close();
 					is.close();
 				}
-				
-				
+
+
 				libraryLoaded = true;
 			}
-			
+
 			System.load(jniLibrary.getAbsolutePath());
 		}
 		catch( Exception ex )
@@ -59,4 +59,5 @@ public class JNIWrapper
 		}
 	}
 	public static native ByteBuffer getPortWithModule(byte module, byte pin);
+	public static native ByteBuffer getPort(byte pin);
 }

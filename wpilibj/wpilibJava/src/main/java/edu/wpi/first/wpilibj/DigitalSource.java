@@ -44,7 +44,7 @@ public abstract class DigitalSource extends InterruptableSensorBase {
 					+ " is already allocated");
 		}
 
-		ByteBuffer port_pointer = DIOJNI.getPortWithModule((byte) 1, (byte) channel);
+		ByteBuffer port_pointer = DIOJNI.getPort((byte) channel);
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);

@@ -57,7 +57,7 @@ public class Gyro extends SensorBase implements PIDSource, ISensor,
 		m_analog.setOversampleBits(kOversampleBits);
 		double sampleRate = kSamplesPerSecond
 				* (1 << (kAverageBits + kOversampleBits));
-		m_analog.setSampleRate(sampleRate);
+		AnalogInput.setGlobalSampleRate(sampleRate);
 
 		Timer.delay(1.0);
 		m_analog.initAccumulator();
@@ -160,7 +160,7 @@ public class Gyro extends SensorBase implements PIDSource, ISensor,
 					* 1e-9
 					* m_analog.getLSBWeight()
 					* (1 << m_analog.getAverageBits())
-					/ (m_analog.getModule().getSampleRate() * m_voltsPerDegreePerSecond);
+					/ (AnalogInput.getGlobalSampleRate() * m_voltsPerDegreePerSecond);
 
 			return scaledValue;
 		}

@@ -56,7 +56,7 @@ public class AnalogTrigger implements IInputOutput {
 	 *            the port to use for the analog trigger
 	 */
 	protected void initTrigger(final int channel) {
-		ByteBuffer port_pointer = AnalogJNI.getPortWithModule((byte) 1, (byte) channel);
+		ByteBuffer port_pointer = AnalogJNI.getPort((byte) channel);
 		IntBuffer status = IntBuffer.allocate(1);
 		IntBuffer index = IntBuffer.allocate(1);
 		// XXX: Uncomment when analog has been fixed

@@ -162,8 +162,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, ISensor,
 	/**
 	 * Create an instance of the Ultrasonic Sensor.
 	 * This is designed to supchannel the Daventech SRF04 and Vex ultrasonic
-	 * sensors. This constructor assumes that both digital I/O channels are in
-	 * the default digital module. Default unit is inches.
+	 * sensors. Default unit is inches.
 	 *
 	 * @param pingChannel
 	 *            The digital output channel that sends the pulse to initiate

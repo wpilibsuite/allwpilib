@@ -22,14 +22,14 @@ import edu.wpi.first.wpilibj.util.AllocationException;
 import edu.wpi.first.wpilibj.util.CheckedAllocationException;
 
 /**
- * Solenoid class for running high voltage Digital Output (9472 module).
+ * Solenoid class for running high voltage Digital Output.
  *
  * The Solenoid class is typically used for pneumatics solenoids, but could be used
- * for any device within the current spec of the 9472 module.
+ * for any device within the current spec of the PCM.
  */
 public class Solenoid extends SolenoidBase implements LiveWindowSendable {
 
-    private int m_channel; ///< The channel on the module to control.
+    private int m_channel; ///< The channel to control.
     private ByteBuffer m_solenoid_port;
 
     /**
@@ -39,16 +39,9 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
         checkSolenoidModule(m_moduleNumber);
         checkSolenoidChannel(m_channel);
 
-//        try {
-//            m_allocated.allocate((m_moduleNumber - 1) * kSolenoidChannels + m_channel - 1);
-//        } catch (CheckedAllocationException e) {
-//            throw new AllocationException(
-//                "Solenoid channel " + m_channel + " on module " + m_moduleNumber + " is already allocated");
-//        }
-        
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
-		
+
         ByteBuffer port = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
         m_solenoid_port = SolenoidJNI.initializeSolenoidPort(port, status.asIntBuffer());
         HALUtil.checkStatus(status.asIntBuffer());

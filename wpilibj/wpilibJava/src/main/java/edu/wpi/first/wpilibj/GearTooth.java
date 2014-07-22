@@ -52,9 +52,9 @@ public class GearTooth extends Counter implements ISensor {
         super(channel);
         enableDirectionSensing(directionSensitive);
         if(directionSensitive) {
-            UsageReporting.report(tResourceType.kResourceType_GearTooth, channel, DigitalModule.getDefaultDigitalModule()-1, "D");
+            UsageReporting.report(tResourceType.kResourceType_GearTooth, channel, 0, "D");
         } else {
-            UsageReporting.report(tResourceType.kResourceType_GearTooth, channel, DigitalModule.getDefaultDigitalModule()-1);
+            UsageReporting.report(tResourceType.kResourceType_GearTooth, channel, 0);
         }
         LiveWindow.addSensor("GearTooth", channel, this);
     }
