@@ -11,10 +11,10 @@
 
 /**
  * Create an object that represents one of the four outputs from an analog trigger.
- * 
+ *
  * Because this class derives from DigitalSource, it can be passed into routing functions
  * for Counter, Encoder, etc.
- * 
+ *
  * @param trigger A pointer to the trigger for which this is an output.
  * @param outputType An enum that specifies the output on the trigger to represent.
  */
@@ -80,4 +80,3 @@ void AnalogTriggerOutput::RequestInterrupts(InterruptHandlerFunction handler, vo
 void AnalogTriggerOutput::RequestInterrupts()
 {
 }
-
