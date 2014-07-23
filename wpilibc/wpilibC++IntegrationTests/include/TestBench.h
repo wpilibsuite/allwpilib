@@ -50,6 +50,7 @@ public:
 
 	/* Relay channels */
 	static const uint32_t kRelayChannel = 0;
+	static const uint32_t kCANJaguarRelayChannel = 1;
 
 	/* CAN IDs */
 	static const uint32_t kCANJaguarID = 2;

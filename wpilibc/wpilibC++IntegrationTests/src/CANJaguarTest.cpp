@@ -9,6 +9,8 @@
 #include "gtest/gtest.h"
 #include "TestBench.h"
 
+static constexpr double kSpikeTime = 0.5;
+
 static constexpr double kExpectedBusVoltage = 14.0;
 static constexpr double kExpectedTemperature = 25.0;
 
@@ -30,8 +32,13 @@ protected:
 	CANJaguar *m_jaguar;
 	DigitalOutput *m_fakeForwardLimit, *m_fakeReverseLimit;
 	AnalogOutput *m_fakePotentiometer;
+	Relay *m_spike;
 
 	virtual void SetUp() {
+		m_spike = new Relay(TestBench::kCANJaguarRelayChannel, Relay::kForwardOnly);
+		m_spike->Set(Relay::kOn);
+		Wait(kSpikeTime);
+
 		m_jaguar = new CANJaguar(TestBench::kCANJaguarID);
 
 		m_fakeForwardLimit = new DigitalOutput(TestBench::kFakeJaguarForwardLimit);
@@ -52,6 +59,7 @@ protected:
 		delete m_fakeForwardLimit;
 		delete m_fakeReverseLimit;
 		delete m_fakePotentiometer;
+		delete m_spike;
 	}
 
 	/**
@@ -68,36 +76,39 @@ protected:
 };
 
 /**
- * Tests that allocating the same CANJaguar port as an already allocated port throws a resource already allocated error code.
+ * Tests that allocating the same CANJaguar port as an already allocated port
+ * causes a ResourceAlreadyAllocated error.
  */
-TEST_F(CANJaguarTest, DuplicateAllocationCausesError) {
-	std::cout<<"The following error is an expected part of the test system"<<std::endl;
-	CANJaguar *m_jaguar = new CANJaguar(TestBench::kCANJaguarID);
-	EXPECT_EQ(wpi_error_value_ResourceAlreadyAllocated, m_jaguar->GetError().GetCode()) << "An error should have been returned";
-	//See WPIErrors.h for error code comparison
-	delete m_jaguar;
+TEST_F(CANJaguarTest, AlreadyAllocatedError) {
+	std::cout << "The following errors are expected.";
+
+	CANJaguar jaguar(TestBench::kCANJaguarID);
+	EXPECT_EQ(wpi_error_value_ResourceAlreadyAllocated, jaguar.GetError().GetCode())
+		<< "An error should have been returned";
 }
 
 /**
- * Tests that allocating a CANJaguar device beyond the range of devices throws a module index out of range error code.
+ * Test that allocating a CANJaguar with device number 64 causes an
+ * out-of-range error.
  */
-TEST_F(CANJaguarTest, OutOfRangeAllocationCausesError) {
-	std::cout<<"The following error is an expected part of the test system"<<std::endl;
-	CANJaguar *m_jaguar = new CANJaguar(64);
-	EXPECT_EQ( wpi_error_value_ModuleIndexOutOfRange, m_jaguar->GetError().GetCode()) << "An error should have been returned";
-	//See WPIErrors.h for error code comparison
-	delete m_jaguar; //This will also return an error
+TEST_F(CANJaguarTest, 64OutOfRangeError) {
+	std::cout << "The following errors are expected.";
+
+	CANJaguar jaguar(64);
+	EXPECT_EQ(wpi_error_value_ChannelIndexOutOfRange, jaguar.GetError().GetCode())
+		<< "An error should have been returned";
 }
 
 /**
- * Tests that allocating a negative CANJaguar device throws a module index out of range error code.
+ * Test that allocating a CANJaguar with device number 0 causes an out-of-range
+ * error.
  */
-TEST_F(CANJaguarTest, OutOfRangeNegativeAllocationCausesError) {
-	std::cout<<"The following error is an expected part of the test system"<<std::endl;
-	CANJaguar *m_jaguar = new CANJaguar(0);
-	EXPECT_EQ(wpi_error_value_ModuleIndexOutOfRange, m_jaguar->GetError().GetCode()) << "An error should have been returned";
-	//See WPIErrors.h for error code comparison
-	delete m_jaguar; //This will also return an error
+TEST_F(CANJaguarTest, 0OutOfRangeError) {
+	std::cout << "The following errors are expected.";
+
+	CANJaguar jaguar(0);
+	EXPECT_EQ(wpi_error_value_ChannelIndexOutOfRange, jaguar.GetError().GetCode())
+		<< "An error should have been returned";
 }
 
 /**
@@ -121,6 +132,39 @@ TEST_F(CANJaguarTest, InitialStatus) {
 
 	EXPECT_EQ(m_jaguar->GetFaults(), 0)
 		<< "Jaguar has one or more fault set.";
+}
+
+/**
+ * Make sure the Jaguar keeps its state after a power cycle by setting a
+ * control mode, turning the spike on and off, then checking if the Jaguar
+ * behaves like it should in that control mode.
+ */
+TEST_F(CANJaguarTest, BrownOut) {
+	double setpoint = 10.0;
+
+	/* Set the jaguar to quad encoder position mode */
+	m_jaguar->SetPositionMode(CANJaguar::QuadEncoder, 360, 10.0f, 0.1f, 0.0f);
+	m_jaguar->EnableControl();
+	SetJaguar(kMotorTime, 0.0);
+
+	/* Turn the spike off and on again */
+	m_spike->Set(Relay::kOff);
+	Wait(kSpikeTime);
+	m_spike->Set(Relay::kOn);
+	Wait(kSpikeTime);
+
+	/* The jaguar should automatically get set to quad encoder position mode,
+		so it should be able to reach a setpoint in a couple seconds. */
+	for(int i = 0; i < 10; i++) {
+		SetJaguar(1.0f, setpoint);
+
+		if(std::abs(m_jaguar->GetPosition() - setpoint) <= kEncoderPositionTolerance) {
+			return;
+		}
+	}
+
+	EXPECT_NEAR(setpoint, m_jaguar->GetPosition(), kEncoderPositionTolerance)
+		<< "CAN Jaguar should have resumed PID control after power cycle";
 }
 
 /**
@@ -288,7 +332,8 @@ TEST_F(CANJaguarTest, FakePotentiometerPosition) {
 
 		SetJaguar(kPotentiometerSettlingTime);
 
-		EXPECT_NEAR(m_fakePotentiometer->GetVoltage() / 3.0f, m_jaguar->GetPosition(), kPotentiometerPositionTolerance)
+		EXPECT_NEAR(m_fakePotentiometer->GetVoltage() / 3.0f, m_jaguar->GetPosition(),
+				kPotentiometerPositionTolerance)
 			<< "CAN Jaguar should have returned the potentiometer position set by the analog output";
 	}
 }
