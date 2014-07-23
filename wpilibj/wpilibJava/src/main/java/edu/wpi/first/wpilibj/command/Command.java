@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.NamedSendable;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
@@ -201,7 +201,7 @@ public abstract class Command implements NamedSendable {
      * @return whether or not the command should stay within the {@link Scheduler}.
      */
     synchronized boolean run() {
-        if (!m_runWhenDisabled && m_parent == null && DriverStation.getInstance().isDisabled()) {
+        if (!m_runWhenDisabled && m_parent == null && RobotState.isDisabled()) {
             cancel();
         }
         if (isCanceled()) {

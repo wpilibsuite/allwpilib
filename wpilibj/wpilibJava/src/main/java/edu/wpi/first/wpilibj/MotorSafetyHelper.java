@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.wpilibj.Timer;
+
 /**
  * The MotorSafetyHelper object is constructed for every object that wants to implement the Motor
  * Safety protocol. The helper object has the code to actually do the timing and call the
@@ -82,8 +84,7 @@ public class MotorSafetyHelper {
      * updated again.
      */
     public void check() {
-        DriverStation ds = DriverStation.getInstance();
-        if (!m_enabled || ds.isDisabled() || ds.isTest())
+        if (!m_enabled || RobotState.isDisabled() || RobotState.isTest())
             return;
         if (m_stopTime < Timer.getFPGATimestamp()) {
             System.err.println(m_safeObject.getDescription() + "... Output not updated often enough.");

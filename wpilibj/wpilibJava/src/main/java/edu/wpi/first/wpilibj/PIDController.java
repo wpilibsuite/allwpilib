@@ -6,10 +6,7 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
-import java.util.TimerTask;
-
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.parsing.IUtility;
 import edu.wpi.first.wpilibj.tables.ITable;
@@ -46,7 +43,6 @@ public class PIDController implements IUtility, LiveWindowSendable, Controller {
     private double m_period = kDefaultPeriod;
     PIDSource m_pidInput;
     PIDOutput m_pidOutput;
-    java.util.Timer m_controlLoop;
     private boolean m_freed = false;
     private boolean m_usingPercentTolerance;
 
@@ -91,8 +87,7 @@ public class PIDController implements IUtility, LiveWindowSendable, Controller {
         }
     }
 
-    private class PIDTask extends TimerTask {
-
+    private class PIDTask implements Runnable {
         private PIDController m_controller;
 
         public PIDTask(PIDController controller) {
@@ -103,10 +98,9 @@ public class PIDController implements IUtility, LiveWindowSendable, Controller {
         }
 
         public void run() {
-        	if(!m_freed){
+        	while (!m_controller.m_freed) {
         		m_controller.calculate();
-        	} else {
-        		cancel();
+        		Timer.delay(m_controller.m_period);
         	}
         }
     }
@@ -133,9 +127,6 @@ public class PIDController implements IUtility, LiveWindowSendable, Controller {
             throw new NullPointerException("Null PIDOutput was given");
         }
 
-        m_controlLoop = new java.util.Timer();
-
-
         m_P = Kp;
         m_I = Ki;
         m_D = Kd;
@@ -145,10 +136,10 @@ public class PIDController implements IUtility, LiveWindowSendable, Controller {
         m_pidOutput = output;
         m_period = period;
 
-        m_controlLoop.schedule(new PIDTask(this), 0L, (long) (m_period * 1000));
+        new Thread(new PIDTask(this)).start();
 
         instances++;
-        UsageReporting.report(tResourceType.kResourceType_PIDController, instances);
+        HLUsageReporting.reportPIDController(instances);
         m_tolerance = new NullTolerance();
     }
 
@@ -199,10 +190,8 @@ public class PIDController implements IUtility, LiveWindowSendable, Controller {
     public void free() {
     	m_freed = true;
     	if(this.table!=null) table.removeTableListener(listener);
-        m_controlLoop.cancel();
         m_pidInput = null;
     	m_pidOutput = null;
-        m_controlLoop = null;
     }
 
     /**

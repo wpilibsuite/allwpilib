@@ -3,7 +3,7 @@
 	     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>edu.wpi.first.wpilibj</groupId>
-  <artifactId>wpilibJava</artifactId>
+  <artifactId>wpilibJavaDevices</artifactId>
   <packaging>jar</packaging>
   <version>0.1.0-SNAPSHOT</version>
   
@@ -34,8 +34,13 @@
       </build>
     </profile>
   </profiles>
-
+  
   <dependencies>
+    <dependency>
+      <groupId>edu.wpi.first.wpilibj</groupId>
+      <artifactId>wpilibJava</artifactId>
+      <version>0.1.0-SNAPSHOT</version>
+    </dependency>
     <dependency>
       <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
       <artifactId>NetworkTables</artifactId>
@@ -57,11 +62,29 @@
         <configuration>
           <source>1.7</source>
           <target>1.7</target>
+	      <excludes>
+	        <exclude>edu/wpi/first/wpilibj/image/</exclude>
+	        <exclude>edu/wpi/first/wpilibj/camera/</exclude>
+	        <exclude>edu/wpi/first/wpilibj/visa/</exclude>
+	        <exclude>edu/wpi/first/wpilibj/SerialPort.java</exclude>
+	      </excludes>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
+      </plugin>
+      <plugin>
+      	<groupId>org.apache.maven.plugins</groupId>
+      	<artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+      	  <sourceFileExcludes>
+      	    <exclude>edu/wpi/first/wpilibj/image/</exclude>
+      	    <exclude>edu/wpi/first/wpilibj/camera/</exclude>
+      	    <exclude>edu/wpi/first/wpilibj/visa/</exclude>
+      	    <exclude>edu/wpi/first/wpilibj/SerialPort.java</exclude>
+      	  </sourceFileExcludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

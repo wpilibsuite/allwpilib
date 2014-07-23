@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 
 /**
  * WaitUntilCommand - waits until an absolute game time.
@@ -34,7 +34,7 @@ public class WaitUntilCommand extends Command {
      * Check if we've reached the actual finish time.
      */
     public boolean isFinished() {
-        return DriverStation.getInstance().getMatchTime() >= m_time;
+        return Timer.getMatchTime() >= m_time;
     }
 
     public void end() {

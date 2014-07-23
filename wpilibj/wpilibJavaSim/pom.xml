@@ -29,6 +29,11 @@
   </profiles>
   
   <dependencies>
+    <dependency>
+      <groupId>edu.wpi.first.wpilibj</groupId>
+      <artifactId>wpilibJava</artifactId>
+      <version>0.1.0-SNAPSHOT</version>
+    </dependency>
 	<dependency>
 	  <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
 	  <artifactId>NetworkTables</artifactId>

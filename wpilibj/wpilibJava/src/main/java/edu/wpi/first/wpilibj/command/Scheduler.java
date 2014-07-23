@@ -10,11 +10,9 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import edu.wpi.first.wpilibj.HLUsageReporting;
 import edu.wpi.first.wpilibj.NamedSendable;
 import edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler;
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.networktables2.type.NumberArray;
 import edu.wpi.first.wpilibj.networktables2.type.StringArray;
 import edu.wpi.first.wpilibj.tables.ITable;
@@ -91,7 +89,7 @@ public class Scheduler implements NamedSendable {
      * Instantiates a {@link Scheduler}.
      */
     private Scheduler() {
-        UsageReporting.report(tResourceType.kResourceType_Command, tInstances.kCommand_Scheduler);
+    	HLUsageReporting.reportScheduler();
     }
 
     /**

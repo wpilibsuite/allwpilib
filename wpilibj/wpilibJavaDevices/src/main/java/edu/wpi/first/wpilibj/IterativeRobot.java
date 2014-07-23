@@ -6,6 +6,10 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
@@ -61,6 +65,8 @@ public class IterativeRobot extends RobotBase {
      *
      */
     public void startCompetition() {
+        UsageReporting.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Iterative);
+
         robotInit();
 
         // tracing support:
@@ -89,7 +95,7 @@ public class IterativeRobot extends RobotBase {
                     m_testInitialized = false;
                 }
                 if (nextPeriodReady()) {
-                	// TODO: FRC_NetworkCommunicationsLibrary.FRC_NetworkCommunication_observeUserProgramDisabled();
+                	FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramDisabled();
                     disabledPeriodic();
                     didDisabledPeriodic = true;
                 }
@@ -105,7 +111,7 @@ public class IterativeRobot extends RobotBase {
                     m_disabledInitialized = false;
                 }
                 if (nextPeriodReady()) {
-                	// TODO: FRC_NetworkCommunicationsLibrary.FRC_NetworkCommunication_observeUserProgramTest();
+                	FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramTest();
                     testPeriodic();
                     didTestPeriodic = true;
                 }
@@ -124,7 +130,7 @@ public class IterativeRobot extends RobotBase {
                     m_disabledInitialized = false;
                 }
                 if (nextPeriodReady()) {
-                    // TODO: FRC_NetworkCommunicationsLibrary.FRC_NetworkCommunication_observeUserProgramAutonomous();
+                    FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramAutonomous();
                     autonomousPeriodic();
                     didAutonomousPeriodic = true;
                 }
@@ -140,12 +146,11 @@ public class IterativeRobot extends RobotBase {
                     m_disabledInitialized = false;
                 }
                 if (nextPeriodReady()) {
-                    // TODO: FRC_NetworkCommunicationsLibrary.FRC_NetworkCommunication_observeUserProgramTeleop();
+                    FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramTeleop();
                     teleopPeriodic();
                     didTeleopPeriodic = true;
                 }
             }
-        	m_ds.waitForData();
         }
     }
 
@@ -154,7 +159,7 @@ public class IterativeRobot extends RobotBase {
      * Call the periodic functions whenever a packet is received from the Driver Station, or about every 20ms.
      */
     private boolean nextPeriodReady() {
-    	return m_ds.isNewControlData();
+        return m_ds.isNewControlData();
     }
 
     /* ----------- Overridable initialization code -----------------*/

@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.parsing.IInputOutput;
 /**
  * Provide access to the network communication data to / from the Driver Station.
  */
-public class DriverStation implements IInputOutput {
+public class DriverStation implements IInputOutput, RobotState.Interface {
     /**
      * Slot for the analog module to read the battery
      */

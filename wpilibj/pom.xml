@@ -9,6 +9,7 @@
   
   <modules>
     <module>wpilibJava</module>
+    <module>wpilibJavaDevices</module>
     <module>wpilibJavaSim</module>
     <module>wpilibJavaJNI</module>
     <module>wpilibJavaFinal</module>

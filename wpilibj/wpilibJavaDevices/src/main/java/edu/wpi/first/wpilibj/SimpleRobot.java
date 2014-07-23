@@ -7,6 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
@@ -109,6 +112,8 @@ public class SimpleRobot extends RobotBase {
      * to be enabled again.
      */
     public void startCompetition() {
+        UsageReporting.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Simple);
+
         robotMain();
         if (!m_robotMainOverridden) {
             // first and one-time initialization
