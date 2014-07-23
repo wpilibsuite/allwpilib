@@ -10,6 +10,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import edu.wpi.first.wpilibj.test.AbstractTestSuite;
+
 /**
  * @author jonathanleitschuh
  *
@@ -24,6 +26,6 @@ import org.junit.runners.Suite.SuiteClasses;
 				CommandTimeoutTest.class,
 				DefaultCommandTest.class
 			})
-public class CommandTestSuite {
+public class CommandTestSuite extends AbstractTestSuite{
 
 }

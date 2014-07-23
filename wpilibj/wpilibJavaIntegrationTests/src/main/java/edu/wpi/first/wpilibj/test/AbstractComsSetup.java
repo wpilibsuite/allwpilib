@@ -46,15 +46,18 @@ public abstract class AbstractComsSetup {
 			System.out.println("Started coms");
 
 			// Wait until the robot is enabled before starting the tests
+			int i = 0;
 			while (!DriverStation.getInstance().isEnabled()) {
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				System.out.println("Waiting for enable");
+				//Prints the message on one line overwriting itself each time
+				System.out.print("\rWaiting for enable: " + i++);
 			}
-
+			System.out.println();
+			
 			// Ready to go!
 			initialized = true;
 			System.out.println("Running!");

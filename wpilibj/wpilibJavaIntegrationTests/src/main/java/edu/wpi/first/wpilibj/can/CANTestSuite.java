@@ -10,6 +10,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import edu.wpi.first.wpilibj.test.AbstractTestSuite;
+
 /**
  * @author jonathanleitschuh
  *
@@ -21,6 +23,6 @@ import org.junit.runners.Suite.SuiteClasses;
 				SpeedQuadEncoderModeTest.class,
 				VoltageQuadEncoderModeTest.class
 			})
-public class CANTestSuite {
+public class CANTestSuite extends AbstractTestSuite {
 
 }

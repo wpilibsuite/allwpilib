@@ -10,9 +10,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import edu.wpi.first.wpilibj.test.AbstractTestSuite;
 
 /**
  * @author jonathanleitschuh
@@ -22,5 +20,5 @@ import junit.framework.TestSuite;
 @SuiteClasses({	
 				SmartDashboardTest.class
 })
-public class SmartDashboardTestSuite {
+public class SmartDashboardTestSuite extends AbstractTestSuite{
 }

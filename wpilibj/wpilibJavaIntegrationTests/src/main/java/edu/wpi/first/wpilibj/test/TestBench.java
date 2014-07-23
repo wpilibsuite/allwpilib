@@ -6,10 +6,10 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj.test;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -21,10 +21,8 @@ import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Victor;
-import edu.wpi.first.wpilibj.can.CANMessageNotFoundException;
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture;
 import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
@@ -353,5 +351,23 @@ public final class TestBench {
 			instance = new TestBench();
 		}
 		return instance;
+	}
+	
+	/**
+	 * Provides access to the output stream for the test system. This should be used instead of System.out
+	 * This is gives us a way to implement changes to where the output text of this test system is sent.
+	 * @return The test bench global print stream.
+	 */
+	public static PrintStream out(){
+		return System.out;
+	}
+	
+	/**
+	 * Provides access to the error stream for the test system. This should be used instead of System.err
+	 * This is gives us a way to implement changes to where the output text of this test system is sent.
+	 * @return The test bench global print stream.
+	 */
+	public static PrintStream err(){
+		return System.err;
 	}
 }

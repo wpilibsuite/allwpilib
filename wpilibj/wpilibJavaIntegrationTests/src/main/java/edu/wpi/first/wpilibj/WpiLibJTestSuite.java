@@ -10,6 +10,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import edu.wpi.first.wpilibj.test.AbstractTestSuite;
+
 /**
  * @author jonathanleitschuh
  * Holds all of the tests in the roor wpilibj directory
@@ -33,6 +35,5 @@ import org.junit.runners.Suite.SuiteClasses;
 				TiltPanCameraTest.class,
 				TimerTest.class
 				})
-public class WpiLibJTestSuite {
-
+public class WpiLibJTestSuite extends AbstractTestSuite {
 }
