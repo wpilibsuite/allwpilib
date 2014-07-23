@@ -4,7 +4,7 @@
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
-#include "Accelerometer.h"
+#include "AnalogAccelerometer.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
@@ -12,7 +12,7 @@
 /**
  * Common function for initializing the accelerometer.
  */
-void Accelerometer::InitAccelerometer()
+void AnalogAccelerometer::InitAccelerometer()
 {
 	m_table = NULL;
 	m_voltsPerG = 1.0;
@@ -26,7 +26,7 @@ void Accelerometer::InitAccelerometer()
  *
  * The constructor allocates desired analog input.
  */
-Accelerometer::Accelerometer(uint32_t channel)
+AnalogAccelerometer::AnalogAccelerometer(uint32_t channel)
 {
 	m_AnalogInput = new AnalogInput(channel);
 	m_allocatedChannel = true;
@@ -39,7 +39,7 @@ Accelerometer::Accelerometer(uint32_t channel)
  * useful if the port is going to be read as an analog channel as well as through
  * the Accelerometer class.
  */
-Accelerometer::Accelerometer(AnalogInput *channel)
+AnalogAccelerometer::AnalogAccelerometer(AnalogInput *channel)
 {
 	if (channel == NULL)
 	{
@@ -56,7 +56,7 @@ Accelerometer::Accelerometer(AnalogInput *channel)
 /**
  * Delete the analog components used for the accelerometer.
  */
-Accelerometer::~Accelerometer()
+AnalogAccelerometer::~AnalogAccelerometer()
 {
 	if (m_allocatedChannel)
 	{
@@ -71,7 +71,7 @@ Accelerometer::~Accelerometer()
  *
  * @return The current acceleration of the sensor in Gs.
  */
-float Accelerometer::GetAcceleration()
+float AnalogAccelerometer::GetAcceleration()
 {
 	return (m_AnalogInput->GetAverageVoltage() - m_zeroGVoltage) / m_voltsPerG;
 }
@@ -84,7 +84,7 @@ float Accelerometer::GetAcceleration()
  *
  * @param sensitivity The sensitivity of accelerometer in Volts per G.
  */
-void Accelerometer::SetSensitivity(float sensitivity)
+void AnalogAccelerometer::SetSensitivity(float sensitivity)
 {
 	m_voltsPerG = sensitivity;
 }
@@ -96,7 +96,7 @@ void Accelerometer::SetSensitivity(float sensitivity)
  *
  * @param zero The zero G voltage.
  */
-void Accelerometer::SetZero(float zero)
+void AnalogAccelerometer::SetZero(float zero)
 {
 	m_zeroGVoltage = zero;
 }
@@ -106,32 +106,32 @@ void Accelerometer::SetZero(float zero)
  *
  * @return The current acceleration in Gs.
  */
-double Accelerometer::PIDGet()
+double AnalogAccelerometer::PIDGet()
 {
 	return GetAcceleration();
 }
 
-void Accelerometer::UpdateTable() {
+void AnalogAccelerometer::UpdateTable() {
 	if (m_table != NULL) {
 		m_table->PutNumber("Value", GetAcceleration());
 	}
 }
 
-void Accelerometer::StartLiveWindowMode() {
+void AnalogAccelerometer::StartLiveWindowMode() {
 }
 
-void Accelerometer::StopLiveWindowMode() {
+void AnalogAccelerometer::StopLiveWindowMode() {
 }
 
-std::string Accelerometer::GetSmartDashboardType() {
+std::string AnalogAccelerometer::GetSmartDashboardType() {
 	return "Accelerometer";
 }
 
-void Accelerometer::InitTable(ITable *subTable) {
+void AnalogAccelerometer::InitTable(ITable *subTable) {
 	m_table = subTable;
 	UpdateTable();
 }
 
-ITable * Accelerometer::GetTable() {
+ITable * AnalogAccelerometer::GetTable() {
 	return m_table;
 }

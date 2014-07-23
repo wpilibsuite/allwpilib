@@ -11,16 +11,16 @@
 #include "LiveWindow/LiveWindowSendable.h"
 
 /**
- * Handle operation of the accelerometer.
+ * Handle operation of an analog accelerometer.
  * The accelerometer reads acceleration directly through the sensor. Many sensors have
  * multiple axis and can be treated as multiple devices. Each is calibrated by finding
  * the center value over a period of time.
  */
-class Accelerometer : public SensorBase, public PIDSource, public LiveWindowSendable {
+class AnalogAccelerometer : public SensorBase, public PIDSource, public LiveWindowSendable {
 public:
-	explicit Accelerometer(uint32_t channel);
-	explicit Accelerometer(AnalogInput *channel);
-	virtual ~Accelerometer();
+	explicit AnalogAccelerometer(uint32_t channel);
+	explicit AnalogAccelerometer(AnalogInput *channel);
+	virtual ~AnalogAccelerometer();
 
 	float GetAcceleration();
 	void SetSensitivity(float sensitivity);

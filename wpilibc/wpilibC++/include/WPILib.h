@@ -10,9 +10,9 @@
 #include "string.h"
 #include <iostream>
 
-#include "Accelerometer.h"
 #include "ADXL345_I2C.h"
 #include "ADXL345_SPI.h"
+#include "AnalogAccelerometer.h"
 #include "AnalogInput.h"
 #include "AnalogOutput.h"
 #include "AnalogPotentiometer.h"
@@ -51,6 +51,7 @@
 #include "GearTooth.h"
 #include "GenericHID.h"
 #include "Gyro.h"
+#include "interfaces/Accelerometer.h"
 #include "interfaces/Potentiometer.h"
 #include "I2C.h"
 #include "IterativeRobot.h"

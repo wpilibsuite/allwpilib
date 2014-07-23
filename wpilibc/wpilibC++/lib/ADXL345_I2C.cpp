@@ -19,7 +19,7 @@ constexpr double ADXL345_I2C::kGsPerLSB;
  *
  * @param range The range (+ or -) that the accelerometer will measure.
  */
-ADXL345_I2C::ADXL345_I2C(Port port, ADXL345_I2C::DataFormat_Range range):
+ADXL345_I2C::ADXL345_I2C(Port port, Range range):
 		I2C(port, kAddress)
 {
 		//m_i2c = new I2C((I2C::Port)port, kAddress);
@@ -27,7 +27,7 @@ ADXL345_I2C::ADXL345_I2C(Port port, ADXL345_I2C::DataFormat_Range range):
 		// Turn on the measurements
 		Write(kPowerCtlRegister, kPowerCtl_Measure);
 		// Specify the data format to read
-		Write(kDataFormatRegister, kDataFormat_FullRes | (uint8_t)range);
+		SetRange(range);
 
 		HALReport(HALUsageReporting::kResourceType_ADXL345, HALUsageReporting::kADXL345_I2C, 0);
 }
@@ -39,6 +39,30 @@ ADXL345_I2C::~ADXL345_I2C()
 {
 	//delete m_i2c;
 	//m_i2c = NULL;
+}
+
+/** {@inheritdoc} */
+void ADXL345_I2C::SetRange(Range range)
+{
+	Write(kDataFormatRegister, kDataFormat_FullRes | (uint8_t)range);
+}
+
+/** {@inheritdoc} */
+double ADXL345_I2C::GetX()
+{
+	return GetAcceleration(kAxis_X);
+}
+
+/** {@inheritdoc} */
+double ADXL345_I2C::GetY()
+{
+	return GetAcceleration(kAxis_Y);
+}
+
+/** {@inheritdoc} */
+double ADXL345_I2C::GetZ()
+{
+	return GetAcceleration(kAxis_Z);
 }
 
 /**
