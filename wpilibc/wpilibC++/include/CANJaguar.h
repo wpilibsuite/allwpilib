@@ -227,6 +227,8 @@ protected:
 	bool m_receivedStatusMessage1;
 	bool m_receivedStatusMessage2;
 
+	bool m_controlEnabled;
+
 	void verify();
 
 	MotorSafetyHelper *m_safetyHelper;

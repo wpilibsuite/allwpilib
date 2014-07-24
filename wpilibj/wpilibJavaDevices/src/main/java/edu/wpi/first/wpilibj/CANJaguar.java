@@ -301,44 +301,46 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 		byte[] data = new byte[8];
 		byte dataSize;
 
-		switch(m_controlMode) {
-		case PercentVbus:
-			messageID = CANJNI.LM_API_VOLT_T_SET;
-			dataSize = packPercentage(data, outputValue);
-			break;
+		if(m_controlEnabled) {
+			switch(m_controlMode) {
+			case PercentVbus:
+				messageID = CANJNI.LM_API_VOLT_T_SET;
+				dataSize = packPercentage(data, outputValue);
+				break;
 
-		case Speed:
-			messageID = CANJNI.LM_API_SPD_T_SET;
-			dataSize = packFXP16_16(data, outputValue);
-			break;
+			case Speed:
+				messageID = CANJNI.LM_API_SPD_T_SET;
+				dataSize = packFXP16_16(data, outputValue);
+				break;
 
-		case Position:
-			messageID = CANJNI.LM_API_POS_T_SET;
-			dataSize = packFXP16_16(data, outputValue);
-			break;
+			case Position:
+				messageID = CANJNI.LM_API_POS_T_SET;
+				dataSize = packFXP16_16(data, outputValue);
+				break;
 
-		case Current:
-			messageID = CANJNI.LM_API_ICTRL_T_SET;
-			dataSize = packFXP8_8(data, outputValue);
-			break;
+			case Current:
+				messageID = CANJNI.LM_API_ICTRL_T_SET;
+				dataSize = packFXP8_8(data, outputValue);
+				break;
 
 
-		case Voltage:
-			messageID = CANJNI.LM_API_VCOMP_T_SET;
-			dataSize = packFXP8_8(data, outputValue);
-			break;
+			case Voltage:
+				messageID = CANJNI.LM_API_VCOMP_T_SET;
+				dataSize = packFXP8_8(data, outputValue);
+				break;
 
-		default:
-			return;
+			default:
+				return;
+			}
+
+			if(syncGroup != 0) {
+				data[dataSize++] = syncGroup;
+			}
+
+			sendMessage(messageID, data, dataSize, kSendMessagePeriod);
+
+			if(m_safetyHelper != null) m_safetyHelper.feed();
 		}
-
-		if(syncGroup != 0) {
-			data[dataSize++] = syncGroup;
-		}
-
-		sendMessage(messageID, data, dataSize, kSendMessagePeriod);
-
-		if(m_safetyHelper != null) m_safetyHelper.feed();
 
 		m_value = outputValue;
 
@@ -429,15 +431,13 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 						getMessage(message, CANJNI.CAN_MSGID_FULL_M, data);
 					} catch (CANMessageNotFoundException e) {}
 				}
-
-				enableControl();
 			}
 		} catch(CANMessageNotFoundException e) {
 			requestMessage(CANJNI.LM_API_STATUS_POWER);
 		}
 
 		// Verify that any recently set parameters are correct
-		if(!m_controlModeVerified) {
+		if(!m_controlModeVerified && m_controlEnabled) {
 			try {
 				getMessage(CANJNI.LM_API_STATUS_CMODE, CANJNI.CAN_MSGID_FULL_M, data);
 
@@ -1012,6 +1012,8 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 			sendMessage(CANJNI.LM_API_VCOMP_T_EN, new byte[0], 0);
 			break;
 		}
+
+		m_controlEnabled = true;
 	}
 
 	/**
@@ -1052,6 +1054,8 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 			sendMessage(CANJNI.LM_API_VCOMP_DIS, new byte[0], 0);
 			break;
 		}
+
+		m_controlEnabled = false;
 	}
 
 	/**
@@ -1730,6 +1734,8 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	boolean m_receivedStatusMessage2 = false;
 
 	static final int kReceiveStatusAttempts = 50;
+
+	boolean m_controlEnabled = true;
 
 	static void sendMessageHelper(int messageID, byte[] data, int dataSize, int period) throws CANMessageNotFoundException {
 		final int[] kTrustedMessages = {

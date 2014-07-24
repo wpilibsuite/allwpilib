@@ -135,6 +135,25 @@ TEST_F(CANJaguarTest, InitialStatus) {
 }
 
 /**
+ * Ensure that the jaguar doesn't move when it's disabled
+ */
+TEST_F(CANJaguarTest, Disable) {
+	m_jaguar->SetPercentMode(CANJaguar::QuadEncoder, 360);
+	m_jaguar->EnableControl();
+	m_jaguar->DisableControl();
+
+	double initialPosition = m_jaguar->GetPosition();
+	
+	SetJaguar(kMotorTime, 1.0f);
+	m_jaguar->Set(0.0f);
+
+	double finalPosition = m_jaguar->GetPosition();
+
+	EXPECT_NEAR(initialPosition, finalPosition, kEncoderPositionTolerance)
+		<< "Jaguar moved while disabled";
+}
+
+/**
  * Make sure the Jaguar keeps its state after a power cycle by setting a
  * control mode, turning the spike on and off, then checking if the Jaguar
  * behaves like it should in that control mode.

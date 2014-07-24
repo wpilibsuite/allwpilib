@@ -294,57 +294,60 @@ void CANJaguar::Set(float outputValue, uint8_t syncGroup)
 	uint8_t dataBuffer[8];
 	uint8_t dataSize;
 
-	if (m_safetyHelper && !m_safetyHelper->IsAlive())
+	if(m_safetyHelper && !m_safetyHelper->IsAlive() && m_controlEnabled)
 	{
 		EnableControl();
 	}
 
-	switch(m_controlMode)
+	if(m_controlEnabled)
 	{
-	case kPercentVbus:
+		switch(m_controlMode)
 		{
-			messageID = LM_API_VOLT_T_SET;
-			if (outputValue > 1.0) outputValue = 1.0;
-			if (outputValue < -1.0) outputValue = -1.0;
-			dataSize = packPercentage(dataBuffer, outputValue);
+		case kPercentVbus:
+			{
+				messageID = LM_API_VOLT_T_SET;
+				if (outputValue > 1.0) outputValue = 1.0;
+				if (outputValue < -1.0) outputValue = -1.0;
+				dataSize = packPercentage(dataBuffer, outputValue);
+			}
+			break;
+		case kSpeed:
+			{
+				messageID = LM_API_SPD_T_SET;
+				dataSize = packFXP16_16(dataBuffer, outputValue);
+			}
+			break;
+		case kPosition:
+			{
+				messageID = LM_API_POS_T_SET;
+				dataSize = packFXP16_16(dataBuffer, outputValue);
+			}
+			break;
+		case kCurrent:
+			{
+				messageID = LM_API_ICTRL_T_SET;
+				dataSize = packFXP8_8(dataBuffer, outputValue);
+			}
+			break;
+		case kVoltage:
+			{
+				messageID = LM_API_VCOMP_T_SET;
+				dataSize = packFXP8_8(dataBuffer, outputValue);
+			}
+			break;
+		default:
+			return;
 		}
-		break;
-	case kSpeed:
+		if (syncGroup != 0)
 		{
-			messageID = LM_API_SPD_T_SET;
-			dataSize = packFXP16_16(dataBuffer, outputValue);
+			dataBuffer[dataSize] = syncGroup;
+			dataSize++;
 		}
-		break;
-	case kPosition:
-		{
-			messageID = LM_API_POS_T_SET;
-			dataSize = packFXP16_16(dataBuffer, outputValue);
-		}
-		break;
-	case kCurrent:
-		{
-			messageID = LM_API_ICTRL_T_SET;
-			dataSize = packFXP8_8(dataBuffer, outputValue);
-		}
-		break;
-	case kVoltage:
-		{
-			messageID = LM_API_VCOMP_T_SET;
-			dataSize = packFXP8_8(dataBuffer, outputValue);
-		}
-		break;
-	default:
-		return;
-	}
-	if (syncGroup != 0)
-	{
-		dataBuffer[dataSize] = syncGroup;
-		dataSize++;
-	}
 
-	sendMessage(messageID, dataBuffer, dataSize, kSendMessagePeriod);
+		sendMessage(messageID, dataBuffer, dataSize, kSendMessagePeriod);
 
-	if (m_safetyHelper) m_safetyHelper->Feed();
+		if (m_safetyHelper) m_safetyHelper->Feed();
+	}
 
 	m_value = outputValue;
 
@@ -682,7 +685,7 @@ void CANJaguar::verify()
 	}
 
 	// Verify that any recently set parameters are correct
-	if(!m_controlModeVerified)
+	if(!m_controlModeVerified && m_controlEnabled)
 	{
 		if(getMessage(LM_API_STATUS_CMODE, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
 		{
@@ -1305,6 +1308,7 @@ void CANJaguar::EnableControl(double encoderInitialPosition)
 		break;
 	}
 
+	m_controlEnabled = true;
 	m_controlModeVerified = false;
 }
 
@@ -1332,10 +1336,12 @@ void CANJaguar::DisableControl()
 	case kCurrent:
 		sendMessage(LM_API_ICTRL_DIS, dataBuffer, dataSize);
 		break;
-case kVoltage:
+	case kVoltage:
 		sendMessage(LM_API_VCOMP_DIS, dataBuffer, dataSize);
 		break;
 	}
+
+	m_controlEnabled = false;
 }
 
 /**
