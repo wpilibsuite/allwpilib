@@ -7,15 +7,14 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteOrder;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.DIOJNI;
-import edu.wpi.first.wpilibj.hal.RelayJNI;
-import edu.wpi.first.wpilibj.hal.HALLibrary;
 import edu.wpi.first.wpilibj.hal.HALUtil;
+import edu.wpi.first.wpilibj.hal.RelayJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.parsing.IDeviceController;
@@ -36,6 +35,7 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
  */
 public class Relay extends SensorBase implements IDeviceController,
 		LiveWindowSendable {
+	
 	/**
 	 * This class represents errors in trying to set relay values contradictory
 	 * to the direction to which the relay is set.
@@ -56,33 +56,29 @@ public class Relay extends SensorBase implements IDeviceController,
 	/**
 	 * The state to drive a Relay to.
 	 */
-	public static class Value {
-
+	public static enum Value {
+		/**
+		 * value: off
+		 */
+		kOff(0),
+		/**
+		 * value: on for relays with defined direction
+		 */
+		kOn(1),
+		/**
+		 * value: forward
+		 */
+		kForward(2),
+		/**
+		 * value: reverse
+		 */
+		kReverse(3);
+		
 		/**
 		 * The integer value representing this enumeration
 		 */
 		public final int value;
-		static final int kOff_val = 0;
-		static final int kOn_val = 1;
-		static final int kForward_val = 2;
-		static final int kReverse_val = 3;
-		/**
-		 * value: off
-		 */
-		public static final Value kOff = new Value(kOff_val);
-		/**
-		 * value: on for relays with defined direction
-		 */
-		public static final Value kOn = new Value(kOn_val);
-		/**
-		 * value: forward
-		 */
-		public static final Value kForward = new Value(kForward_val);
-		/**
-		 * value: reverse
-		 */
-		public static final Value kReverse = new Value(kReverse_val);
-
+		
 		private Value(int value) {
 			this.value = value;
 		}
@@ -91,35 +87,35 @@ public class Relay extends SensorBase implements IDeviceController,
 	/**
 	 * The Direction(s) that a relay is configured to operate in.
 	 */
-	public static class Direction {
+	public static enum Direction {
+		/**
+		 * direction: both directions are valid
+		 */
+
+		kBoth(0),
+		/**
+		 * direction: Only forward is valid
+		 */
+		kForward(1),
+		/**
+		 * direction: only reverse is valid
+		 */
+		kReverse(2);
 
 		/**
 		 * The integer value representing this enumeration
 		 */
 		public final int value;
-		static final int kBoth_val = 0;
-		static final int kForward_val = 1;
-		static final int kReverse_val = 2;
-		/**
-		 * direction: both directions are valid
-		 */
-		public static final Direction kBoth = new Direction(kBoth_val);
-		/**
-		 * direction: Only forward is valid
-		 */
-		public static final Direction kForward = new Direction(kForward_val);
-		/**
-		 * direction: only reverse is valid
-		 */
-		public static final Direction kReverse = new Direction(kReverse_val);
-
+		
 		private Direction(int value) {
 			this.value = value;
 		}
+		
 	}
 
-	private int m_channel;
+	private final int m_channel;
 	private ByteBuffer m_port;
+
 	private Direction m_direction;
 	private static Resource relayChannels = new Resource(kRelayChannels * 2);
 
@@ -168,6 +164,7 @@ public class Relay extends SensorBase implements IDeviceController,
 		m_channel = channel;
 		m_direction = direction;
 		initRelay();
+		set(Value.kOff);
 	}
 
 	/**
@@ -177,25 +174,24 @@ public class Relay extends SensorBase implements IDeviceController,
 	 *            The channel number for this relay.
 	 */
 	public Relay(final int channel) {
-		m_channel = channel;
-		m_direction = Direction.kBoth;
-		initRelay();
+		this(channel, Direction.kBoth);
 	}
 
+	@Override
 	public void free() {
+		if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
+			relayChannels.free(m_channel*2);
+		}
+		if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
+			relayChannels.free(m_channel*2 + 1);
+		}
+		
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
 
 		RelayJNI.setRelayForward(m_port, (byte) 0, status.asIntBuffer());
 		RelayJNI.setRelayForward(m_port, (byte) 0, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
-
-		if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
-			relayChannels.free(m_channel);
-		}
-		if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
-			relayChannels.free(m_channel + 1);
-		}
 
 		DIOJNI.freeDIO(m_port, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
@@ -221,8 +217,8 @@ public class Relay extends SensorBase implements IDeviceController,
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
 
-		switch (value.value) {
-		case Value.kOff_val:
+		switch (value) {
+		case kOff:
 			if (m_direction == Direction.kBoth
 					|| m_direction == Direction.kForward) {
 				RelayJNI.setRelayForward(m_port, (byte) 0, status.asIntBuffer());
@@ -232,7 +228,7 @@ public class Relay extends SensorBase implements IDeviceController,
 				RelayJNI.setRelayReverse(m_port, (byte) 0, status.asIntBuffer());
 			}
 			break;
-		case Value.kOn_val:
+		case kOn:
 			if (m_direction == Direction.kBoth
 					|| m_direction == Direction.kForward) {
 				RelayJNI.setRelayForward(m_port, (byte) 1, status.asIntBuffer());
@@ -242,7 +238,7 @@ public class Relay extends SensorBase implements IDeviceController,
 				RelayJNI.setRelayReverse(m_port, (byte) 1, status.asIntBuffer());
 			}
 			break;
-		case Value.kForward_val:
+		case kForward:
 			if (m_direction == Direction.kReverse)
 				throw new InvalidValueException(
 						"A relay configured for reverse cannot be set to forward");
@@ -254,7 +250,7 @@ public class Relay extends SensorBase implements IDeviceController,
 				RelayJNI.setRelayReverse(m_port, (byte) 0, status.asIntBuffer());
 			}
 			break;
-		case Value.kReverse_val:
+		case kReverse:
 			if (m_direction == Direction.kForward)
 				throw new InvalidValueException(
 						"A relay configured for forward cannot be set to reverse");
@@ -338,6 +334,7 @@ public class Relay extends SensorBase implements IDeviceController,
 	/*
 	 * Live Window code, only does anything if live window is activated.
 	 */
+	@Override
 	public String getSmartDashboardType() {
 		return "Relay";
 	}
@@ -348,6 +345,7 @@ public class Relay extends SensorBase implements IDeviceController,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void initTable(ITable subtable) {
 		m_table = subtable;
 		updateTable();
@@ -356,6 +354,7 @@ public class Relay extends SensorBase implements IDeviceController,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public ITable getTable() {
 		return m_table;
 	}
@@ -363,6 +362,7 @@ public class Relay extends SensorBase implements IDeviceController,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void updateTable() {
 		if (m_table != null) {
 			if (get() == Value.kOn) {
@@ -380,8 +380,10 @@ public class Relay extends SensorBase implements IDeviceController,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void startLiveWindowMode() {
 		m_table_listener = new ITableListener() {
+			@Override
 			public void valueChanged(ITable itable, String key, Object value,
 					boolean bln) {
 				String val = ((String) value);
@@ -400,6 +402,7 @@ public class Relay extends SensorBase implements IDeviceController,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void stopLiveWindowMode() {
 		// TODO: Broken, should only remove the listener from "Value" only.
 		m_table.removeTableListener(m_table_listener);
