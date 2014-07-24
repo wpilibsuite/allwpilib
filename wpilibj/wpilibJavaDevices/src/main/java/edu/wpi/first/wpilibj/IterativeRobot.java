@@ -151,6 +151,7 @@ public class IterativeRobot extends RobotBase {
                     didTeleopPeriodic = true;
                 }
             }
+            m_ds.waitForData();
         }
     }
 
