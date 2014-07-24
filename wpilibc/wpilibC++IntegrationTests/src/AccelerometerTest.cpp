@@ -8,8 +8,7 @@
 #include "WPILib.h"
 #include "gtest/gtest.h"
 
-static constexpr double accelerationTolerance = 0.1;
-
+static constexpr double kAccelerationTolerance = 0.1;
 /**
  * There's not much we can automatically test with the on-board accelerometer,
  * but checking for gravity is probably good enough to tell that it's working.
@@ -17,7 +16,11 @@ static constexpr double accelerationTolerance = 0.1;
 TEST(AccelerometerTest, Accelerometer) {
 	BuiltInAccelerometer accelerometer;
 
-	ASSERT_NEAR(0.0, accelerometer.GetX(), accelerationTolerance);
-	ASSERT_NEAR(0.0, accelerometer.GetY(), accelerationTolerance);
-	ASSERT_NEAR(1.0, accelerometer.GetZ(), accelerationTolerance);
+	/* The testbench sometimes shakes a little from a previous test.  Give it
+		some time. */
+	Wait(1.0);
+
+	ASSERT_NEAR(0.0, accelerometer.GetX(), kAccelerationTolerance);
+	ASSERT_NEAR(0.0, accelerometer.GetY(), kAccelerationTolerance);
+	ASSERT_NEAR(1.0, accelerometer.GetZ(), kAccelerationTolerance);
 }
