@@ -13,7 +13,6 @@ import java.nio.ByteOrder;
 import edu.wpi.first.wpilibj.can.CANExceptionFactory;
 import edu.wpi.first.wpilibj.can.CANJNI;
 import edu.wpi.first.wpilibj.can.CANMessageNotFoundException;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
@@ -206,6 +205,8 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 		!m_receivedStatusMessage1 ||
 		!m_receivedStatusMessage2 ||
 		!receivedFirmwareVersion) {
+			/* Free the resource */
+			free();
 			throw new CANMessageNotFoundException();
 		}
 
