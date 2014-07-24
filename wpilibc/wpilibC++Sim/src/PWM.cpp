@@ -34,7 +34,7 @@ void PWM::InitPWM(uint32_t channel)
 		return;
 	}
 
-	sprintf(buf, "pwm/1/%d", channel);
+	sprintf(buf, "pwm/%d", channel);
 	impl = new SimContinuousOutput(buf);
 	m_channel = channel;
 	m_eliminateDeadband = false;
