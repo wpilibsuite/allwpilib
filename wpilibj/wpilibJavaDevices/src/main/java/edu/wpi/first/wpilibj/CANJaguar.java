@@ -1350,6 +1350,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 
 		// Update the local mode
 		m_controlMode = controlMode;
+		m_controlModeVerified = false;
 	}
 
 	/**

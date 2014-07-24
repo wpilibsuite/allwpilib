@@ -1617,6 +1617,7 @@ void CANJaguar::ChangeControlMode(ControlMode controlMode)
 
 	// Update the local mode
 	m_controlMode = controlMode;
+	m_controlModeVerified = false;
 
 	HALReport(HALUsageReporting::kResourceType_CANJaguar, m_deviceNumber, m_controlMode);
 }
