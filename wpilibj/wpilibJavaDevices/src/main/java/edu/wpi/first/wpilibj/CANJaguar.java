@@ -1695,7 +1695,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	LimitMode m_limitMode = LimitMode.SwitchInputsOnly;
 	double m_forwardLimit = 0.0;
 	double m_reverseLimit = 0.0;
-	double m_maxOutputVoltage = 30.0;
+	double m_maxOutputVoltage = kApproxBusVoltage;
 	double m_voltageRampRate = 0.0;
 	float m_faultTime = 0.0f;
 
