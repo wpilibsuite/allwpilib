@@ -398,7 +398,7 @@ float AnalogInput::GetSampleRate()
 double AnalogInput::PIDGet()
 {
 	if (StatusIsFatal()) return 0.0;
-	return GetAverageValue();
+	return GetAverageVoltage();
 }
 
 void AnalogInput::UpdateTable() {
