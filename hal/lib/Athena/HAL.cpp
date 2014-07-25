@@ -172,6 +172,7 @@ int HALInitialize(int mode)
 	nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
 			nLoadOut::kTargetClass_RoboRIO;
 
+	int32_t status;
 	global = tGlobal::create(&status);
 
 	// Kill any previous robot programs
