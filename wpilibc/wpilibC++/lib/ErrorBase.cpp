@@ -12,6 +12,7 @@
 #include "WPIErrors.h"
 
 #include <errno.h>
+#include <cstring>
 #include <cstdio>
 
 MUTEX_ID ErrorBase::_globalErrorMutex = initializeMutexNormal();
@@ -49,7 +50,7 @@ void ErrorBase::ClearError() const
 
 /**
  * @brief Set error information associated with a C library call that set an error to the "errno" global variable.
- * 
+ *
  * @param contextMessage A custom message from the code that set the error.
  * @param filename Filename of the error source
  * @param function Function of the error source
@@ -66,12 +67,7 @@ void ErrorBase::SetErrnoError(const char *contextMessage,
 	}
 	else
 	{
-		char *statName = new char[256 + 1]; // TODO: MAX_SYS_SYM_LEN or linux equivalent.
-		if (getErrnoToName(errNo, statName))
-			snprintf(err, 256, "%s (0x%08X): %s", statName, errNo, contextMessage);
-		else
-			snprintf(err, 256, "Unknown errno 0x%08X: %s", errNo, contextMessage);
-		delete [] statName;
+		snprintf(err, 256, "%s (0x%08X): %s", strerror(errNo), errNo, contextMessage);
 	}
 
 	//  Set the current error information for this object.
@@ -86,7 +82,7 @@ void ErrorBase::SetErrnoError(const char *contextMessage,
 
 /**
  * @brief Set the current error information associated from the nivision Imaq API.
- * 
+ *
  * @param success The return from the function
  * @param contextMessage A custom message from the code that set the error.
  * @param filename Filename of the error source
@@ -113,7 +109,7 @@ void ErrorBase::SetImaqError(int success, const char *contextMessage, const char
 
 /**
  * @brief Set the current error information associated with this sensor.
- * 
+ *
  * @param code The error code
  * @param contextMessage A custom message from the code that set the error.
  * @param filename Filename of the error source
@@ -138,7 +134,7 @@ void ErrorBase::SetError(Error::Code code, const char *contextMessage,
 
 /**
  * @brief Set the current error information associated with this sensor.
- * 
+ *
  * @param errorMessage The error message from WPIErrors.h
  * @param contextMessage A custom message from the code that set the error.
  * @param filename Filename of the error source
@@ -168,7 +164,7 @@ void ErrorBase::CloneError(ErrorBase *rhs) const
 
 /**
 @brief Check if the current error code represents a fatal error.
-  
+
 @return true if the current error is fatal.
 */
 bool ErrorBase::StatusIsFatal() const
@@ -202,11 +198,10 @@ void ErrorBase::SetGlobalWPIError(const char *errorMessage, const char *contextM
 }
 
 /**
-  * Retrieve the current global error.    
+  * Retrieve the current global error.
 */
 Error& ErrorBase::GetGlobalError()
 {
 	Synchronized mutex(_globalErrorMutex);
 	return _globalError;
 }
-
