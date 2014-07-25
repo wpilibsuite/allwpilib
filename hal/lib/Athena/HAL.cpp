@@ -16,6 +16,8 @@ const uint32_t dio_kNumSystems = tDIO::kNumSystems;
 const uint32_t interrupt_kNumSystems = tInterrupt::kNumSystems;
 const uint32_t kSystemClockTicksPerMicrosecond = 40;
 
+static tGlobal *global;
+
 void* getPort(uint8_t pin)
 {
 	Port* port = new Port();
@@ -74,10 +76,7 @@ const char* getHALErrorMessage(int32_t code)
  */
 uint16_t getFPGAVersion(int32_t *status)
 {
-	tGlobal *global = tGlobal::create(status);
-	uint16_t version = global->readVersion(status);
-	delete global;
-	return version;
+	return global->readVersion(status);
 }
 
 /**
@@ -90,23 +89,17 @@ uint16_t getFPGAVersion(int32_t *status)
  */
 uint32_t getFPGARevision(int32_t *status)
 {
-	tGlobal *global = tGlobal::create(status);
-	uint32_t revision = global->readRevision(status);
-	delete global;
-	return revision;
+	return global->readRevision(status);
 }
 
 /**
  * Read the microsecond-resolution timer on the FPGA.
- * 
+ *
  * @return The current time in microseconds according to the FPGA (since FPGA reset).
  */
 uint32_t getFPGATime(int32_t *status)
 {
-	tGlobal *global = tGlobal::create(status);
-	uint32_t time = global->readLocalTime(status);
-	delete global;
-	return time;
+	return global->readLocalTime(status);
 }
 
 /**
@@ -115,9 +108,7 @@ uint32_t getFPGATime(int32_t *status)
 void setFPGALED(uint32_t state, int32_t *status)
 {
 	// XXX: Not supported?
-	// tGlobal *global = tGlobal::create(status);
 	// global->writeFPGA_LED(state, status);
-	// delete global;
 }
 
 /**
@@ -127,9 +118,7 @@ void setFPGALED(uint32_t state, int32_t *status)
 int32_t getFPGALED(int32_t *status)
 {
 	// XXX: Not supported?
-	// tGlobal *global = tGlobal::create(status);
 	// bool ledValue = global->readFPGA_LED(status);
-	// delete global;
 	// return ledValue;
 	return 0; // XXX: Dummy value
 }
@@ -183,9 +172,12 @@ int HALInitialize(int mode)
 	nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
 			nLoadOut::kTargetClass_RoboRIO;
 
+	global = tGlobal::create(&status);
+
 	// Kill any previous robot programs
 	std::fstream fs;
-	fs.open("/var/lock/frc.pid", std::fstream::in | std::fstream::out); // By making this both in/out, it won't give us an error if it doesnt exist
+	// By making this both in/out, it won't give us an error if it doesnt exist
+	fs.open("/var/lock/frc.pid", std::fstream::in | std::fstream::out);
 	if (fs.bad())
 		return 0;
 
