@@ -28,7 +28,7 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
  * Analog channel class.
  *
  * Each analog channel is read from hardware as a 12-bit number representing
- * -10V to 10V.
+ * 0V to 5V.
  *
  * Connected to each analog channel is an averaging and oversampling engine.
  * This engine accumulates the specified ( by setAverageBits() and
@@ -91,7 +91,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 
 	/**
 	 * Get a sample straight from this channel. The sample is a 12-bit value
-	 * representing the 0V to 10V range of the A/D converter. The units are in
+	 * representing the 0V to 5V range of the A/D converter. The units are in
 	 * A/D converter codes. Use GetVoltage() to get the analog value in
 	 * calibrated units.
 	 *

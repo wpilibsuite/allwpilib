@@ -283,7 +283,7 @@ uint32_t getAnalogOversampleBits(void* analog_port_pointer, int32_t *status) {
 /**
  * Get a sample straight from the channel on this module.
  *
- * The sample is a 12-bit value representing the -10V to 10V range of the A/D converter in the module.
+ * The sample is a 12-bit value representing the 0V to 5V range of the A/D converter in the module.
  * The units are in A/D converter codes.  Use GetVoltage() to get the analog value in calibrated units.
  *
  * @param analog_port_pointer Pointer to the analog port to use.
