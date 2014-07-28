@@ -36,7 +36,7 @@ public:
 	};
 
 public:
-	ADXL345_I2C(Port port, Range range = kRange_2G);
+	explicit ADXL345_I2C(Port port, Range range = kRange_2G);
 	virtual ~ADXL345_I2C();
 
 	// Accelerometer interface
