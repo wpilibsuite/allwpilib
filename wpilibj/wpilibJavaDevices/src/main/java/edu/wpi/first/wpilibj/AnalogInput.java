@@ -460,12 +460,12 @@ public class AnalogInput extends SensorBase implements PIDSource,
 	}
 
 	/**
-	 * Get the average value for use with PIDController
+	 * Get the average voltage for use with PIDController
 	 *
-	 * @return the average value
+	 * @return the average voltage
 	 */
 	public double pidGet() {
-		return getAverageValue();
+		return getAverageVoltage();
 	}
 
 	/**
