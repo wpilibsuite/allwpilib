@@ -58,6 +58,7 @@
 								</option>
 								<option id="gnu.cpp.link.option.flags.1747959472" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-Wl,-rpath-link,$cpp-location/lib" valueType="string"/>
 								<option id="gnu.cpp.link.option.other.1891020896" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other" valueType="stringList">
+									<listOptionValue builtIn="false" value="-export-dynamic"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1757265359" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

@@ -80,7 +80,7 @@ protected:
  * causes a ResourceAlreadyAllocated error.
  */
 TEST_F(CANJaguarTest, AlreadyAllocatedError) {
-	std::cout << "The following errors are expected.";
+	std::cout << "The following errors are expected." << std::endl << std::endl;
 
 	CANJaguar jaguar(TestBench::kCANJaguarID);
 	EXPECT_EQ(wpi_error_value_ResourceAlreadyAllocated, jaguar.GetError().GetCode())
@@ -92,7 +92,7 @@ TEST_F(CANJaguarTest, AlreadyAllocatedError) {
  * out-of-range error.
  */
 TEST_F(CANJaguarTest, 64OutOfRangeError) {
-	std::cout << "The following errors are expected.";
+	std::cout << "The following errors are expected." << std::endl << std::endl;
 
 	CANJaguar jaguar(64);
 	EXPECT_EQ(wpi_error_value_ChannelIndexOutOfRange, jaguar.GetError().GetCode())
@@ -104,7 +104,7 @@ TEST_F(CANJaguarTest, 64OutOfRangeError) {
  * error.
  */
 TEST_F(CANJaguarTest, 0OutOfRangeError) {
-	std::cout << "The following errors are expected.";
+	std::cout << "The following errors are expected." << std::endl << std::endl;
 
 	CANJaguar jaguar(0);
 	EXPECT_EQ(wpi_error_value_ChannelIndexOutOfRange, jaguar.GetError().GetCode())
@@ -143,7 +143,7 @@ TEST_F(CANJaguarTest, Disable) {
 	m_jaguar->DisableControl();
 
 	double initialPosition = m_jaguar->GetPosition();
-	
+
 	SetJaguar(kMotorTime, 1.0f);
 	m_jaguar->Set(0.0f);
 
