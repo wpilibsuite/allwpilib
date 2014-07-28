@@ -20,6 +20,10 @@ BuiltInAccelerometer::BuiltInAccelerometer(Range range)
 	HALReport(HALUsageReporting::kResourceType_Accelerometer, 0, 0, "Built-in accelerometer");
 }
 
+BuiltInAccelerometer::~BuiltInAccelerometer()
+{
+}
+
 /** {@inheritdoc} */
 void BuiltInAccelerometer::SetRange(Range range)
 {

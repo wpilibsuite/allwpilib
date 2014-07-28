@@ -18,6 +18,7 @@ class BuiltInAccelerometer : public Accelerometer, public SensorBase, public Liv
 {
 public:
 	BuiltInAccelerometer(Range range = kRange_8G);
+        virtual ~BuiltInAccelerometer();
 
 	// Accelerometer interface
 	virtual void SetRange(Range range);
