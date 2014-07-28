@@ -9,5 +9,4 @@
 extern "C"
 {
 	void printCurrentStackTrace();
-	bool getErrnoToName(int32_t errNo, char* name);
 }
