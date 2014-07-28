@@ -18,7 +18,7 @@ static const char *kTableName = "Preferences";
 /** The value of the save field */
 static const char *kSaveField = "~S A V E~";
 /** The file to save to */
-static const char *kFileName = "/c/wpilib-preferences.ini";
+static const char *kFileName = "wpilib-preferences.ini";
 /** The characters to put between a field and value */
 static const char *kValuePrefix = "=\"";
 /** The characters to put after the value */
@@ -33,9 +33,9 @@ Preferences::Preferences() :
 	m_readTask("PreferencesReadTask", (FUNCPTR)Preferences::InitReadTask),
 	m_writeTask("PreferencesWriteTask", (FUNCPTR)Preferences::InitWriteTask)
 {
-	m_fileLock = initializeMutexNormal();
+	m_fileLock = initializeMutexRecursive();
 	m_fileOpStarted = initializeSemaphore (SEMAPHORE_EMPTY);
-	m_tableLock = initializeMutexNormal();
+	m_tableLock = initializeMutexRecursive();
 
 	Synchronized sync(m_fileLock);
 	m_readTask.Start((uint32_t)this);
@@ -424,7 +424,7 @@ void Preferences::ReadTaskRun()
 			{
 				value = fgetc(file);
 			} while (value == ' ' || value == '\t');
-			
+
 			if (value == '\n' || value == ';')
 			{
 				if (value == '\n')
@@ -511,7 +511,7 @@ void Preferences::ReadTaskRun()
 	}
 	else
 	{
-		wpi_setWPIErrorWithContext(NoAvailableResources, "Failed to open preferences file.");
+		wpi_setErrnoErrorWithContext("Opening preferences file");
 	}
 
 	if (file != NULL)
@@ -519,7 +519,7 @@ void Preferences::ReadTaskRun()
 
 	if (!comment.empty())
 		m_endComment = comment;
-	
+
 	NetworkTable::GetTable(kTableName)->PutBoolean(kSaveField, false);
 	NetworkTable::GetTable(kTableName)->AddTableListener(this);
 }
