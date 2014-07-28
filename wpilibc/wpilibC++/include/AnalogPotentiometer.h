@@ -27,11 +27,11 @@ public:
      * @param scale The scaling to multiply the voltage by to get a meaningful unit.
      * @param offset The offset to add to the scaled value for controlling the zero value
      */
-    AnalogPotentiometer(int channel, double scale = 1.0, double offset = 0.0);
+    explicit AnalogPotentiometer(int channel, double scale = 1.0, double offset = 0.0);
 
-    AnalogPotentiometer(AnalogInput *input, double scale = 1.0, double offset = 0.0);
+    explicit AnalogPotentiometer(AnalogInput *input, double scale = 1.0, double offset = 0.0);
 
-    AnalogPotentiometer(AnalogInput &input, double scale = 1.0, double offset = 0.0);
+    explicit AnalogPotentiometer(AnalogInput &input, double scale = 1.0, double offset = 0.0);
 
     virtual ~AnalogPotentiometer();
 
