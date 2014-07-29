@@ -6,14 +6,15 @@
 
 #include "Error.h"
 
-#include "HAL/cpp/StackTrace.hpp"
+#include <iostream>
+#include <sstream>
 #include <cstdio>
 #include <cstring>
+#include <cstdlib>
 
 //#include "NetworkCommunication/FRCComm.h"
 #include "Timer.h"
 #include "Utility.h"
-bool Error::m_stackTraceEnabled = false;
 bool Error::m_suspendOnErrorEnabled = false;
 
 Error::Error()
@@ -75,39 +76,18 @@ void Error::Set(Code code, const char* contextMessage, const char* filename, con
 
 void Error::Report()
 {
-	// Error string buffers
-	char *error = new char[256];
-	char *error_with_code = new char[256];
+	std::stringstream errorStream;
 
-	// Build error strings
-	if (m_code != -1)
-	{
-		snprintf(error, 256, "%s: status = %d (0x%08X) %s ...in %s() in %s at line %d\n",
-				m_code < 0 ? "ERROR" : "WARNING", (int32_t)m_code, (uint32_t)m_code, m_message.c_str(),
-				m_function.c_str(), m_filename.c_str(), m_lineNumber);
-		sprintf(error_with_code,"<Code>%d %s", (int32_t)m_code, error);
-	} else {
-		snprintf(error, 256, "ERROR: %s ...in %s() in %s at line %d\n", m_message.c_str(),
-				m_function.c_str(), m_filename.c_str(), m_lineNumber);
-		strcpy(error_with_code, error);
-	}
-	// TODO: Add logging to disk
+	errorStream << "Error on line " << m_lineNumber << " ";
+	errorStream << "of "<< basename(m_filename.c_str()) << ": ";
+	errorStream << m_message << std::endl;
+	errorStream << GetStackTrace(4);
 
-	// Send to the DriverStation
-	HALSetErrorData(error_with_code, strlen(error_with_code), 100);
+	std::string error = errorStream.str();
 
-	delete [] error_with_code;
-
-	// Print to console
-	printf("\n\n>>>>%s", error);
-
-	delete [] error;
-
-	if (m_stackTraceEnabled)
-	{
-		printf("-----------<Stack Trace>----------------\n");
-		printCurrentStackTrace();
-	}
+	// Print the error and send it to the DriverStation
+	std::cout << error << std::endl;
+	HALSetErrorData(error.c_str(), error.size(), 100);
 }
 
 void Error::Clear()
@@ -120,4 +100,3 @@ void Error::Clear()
 	m_originatingObject = NULL;
 	m_timestamp = 0.0;
 }
-

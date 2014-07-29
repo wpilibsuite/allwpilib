@@ -6,7 +6,6 @@
 
 #include "ErrorBase.h"
 #include "HAL/cpp/Synchronized.hpp"
-#include "HAL/cpp/StackTrace.hpp"
 #include "nivision.h"
 #define WPI_ERRORS_DEFINE_STRINGS
 #include "WPIErrors.h"

@@ -33,10 +33,6 @@ public:
 	void Clear();
 	void Set(Code code, const char* contextMessage, const char* filename, const char *function,
 			uint32_t lineNumber, const ErrorBase* originatingObject);
-	static void EnableStackTrace(bool enable)
-	{
-		m_stackTraceEnabled = enable;
-	}
 	static void EnableSuspendOnError(bool enable)
 	{
 		m_suspendOnErrorEnabled = enable;
@@ -53,6 +49,5 @@ private:
 	const ErrorBase* m_originatingObject;
 	double m_timestamp;
 
-	static bool m_stackTraceEnabled;
 	static bool m_suspendOnErrorEnabled;DISALLOW_COPY_AND_ASSIGN(Error);
 };
