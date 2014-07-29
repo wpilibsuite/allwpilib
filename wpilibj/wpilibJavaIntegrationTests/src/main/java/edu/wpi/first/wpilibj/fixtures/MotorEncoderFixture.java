@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj.fixtures;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.Counter;
@@ -40,6 +41,8 @@ public abstract class MotorEncoderFixture <T extends SpeedController> implements
 	 */
 	public MotorEncoderFixture(){
 	}
+	
+	abstract public int getPDPChannel();
 
 	/**
 	 * Where the implementer of this class should pass the speed controller
@@ -209,6 +212,17 @@ public abstract class MotorEncoderFixture <T extends SpeedController> implements
 		}
 
 		return true;
+	}
+	
+	@Override
+	public String toString(){
+		StringBuilder string = new StringBuilder("MotorEncoderFixture<");
+		//Get the generic type as a class
+		@SuppressWarnings("unchecked")
+		Class<T> class1 = (Class<T>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+		string.append(class1.getSimpleName());
+		string.append(">");
+		return string.toString();
 	}
 
 }

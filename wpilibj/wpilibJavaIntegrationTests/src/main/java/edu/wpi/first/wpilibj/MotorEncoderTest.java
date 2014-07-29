@@ -33,36 +33,27 @@ public class MotorEncoderTest extends AbstractComsSetup {
 	private static final double MOTOR_RUNTIME = .25;
 	
 	//private static final List<MotorEncoderFixture> pairs = new ArrayList<MotorEncoderFixture>();
-	private static MotorEncoderFixture me = null;
+	private static MotorEncoderFixture<?> me = null;
 	
+	@Override
 	protected Logger getClassLogger(){
 		return logger;
 	}
 	
-	public MotorEncoderTest(MotorEncoderFixture mef){
+	public MotorEncoderTest(MotorEncoderFixture<?> mef){
 		logger.fine("Constructor with: " + mef.getType());
 		if(me != null && !me.equals(mef)) me.teardown();
 		me = mef;
 	}
 	
-	@Parameters
-	public static Collection<MotorEncoderFixture[]> generateData(){
+	@Parameters(name= "{index}: {0}")
+	public static Collection<MotorEncoderFixture<?>[]> generateData(){
 		//logger.fine("Loading the MotorList");
-		return Arrays.asList(new MotorEncoderFixture[][]{
+		return Arrays.asList(new MotorEncoderFixture<?>[][]{
 				 {TestBench.getInstance().getTalonPair()},
 				 {TestBench.getInstance().getVictorPair()},
 				 {TestBench.getInstance().getJaguarPair()}
-			//	 TestBench.getInstance().getCanJaguarPair()
 		});
-	}
-	
-	/**
-	 * Checks to see if this MotorEncoderFixture is fully configured for encoder testing
-	 * @param me The motor encoder under test
-	 * @return true if this motor encoder has an encoder attached to it
-	 */
-	boolean shouldRunTest(MotorEncoderFixture me){
-		return true;//me.getType().equals(Victor.class.getSimpleName()) || me.getType().equals(Talon.class.getSimpleName());
 	}
 
 	@Before
@@ -110,12 +101,9 @@ public class MotorEncoderTest extends AbstractComsSetup {
 		me.getMotor().set(.75);
 		Timer.delay(MOTOR_RUNTIME);
 		int currentValue = me.getEncoder().get();
-		if (shouldRunTest(me)) { // TODO REMOVE THIS WHEN ALL ENCODERS ARE
-									// PROPERLY ATTACHED
-			assertTrue(me.getType() + " Encoder not incremented: start: "
-					+ startValue + "; current: " + currentValue,
-					startValue < currentValue);
-		}
+		assertTrue(me.getType() + " Encoder not incremented: start: "
+				+ startValue + "; current: " + currentValue,
+				startValue < currentValue);
 		me.reset();
 		encodersResetCheck(me);
 	}
@@ -130,12 +118,9 @@ public class MotorEncoderTest extends AbstractComsSetup {
 		me.getMotor().set(-.75);
 		Timer.delay(MOTOR_RUNTIME);
 		int currentValue = me.getEncoder().get();
-		if (shouldRunTest(me)) { // TODO REMOVE THIS WHEN ALL ENCODERS ARE
-									// PROPERLY ATTACHED
-			assertTrue(me.getType() + " Encoder not decremented: start: "
-					+ startValue + "; current: " + currentValue,
-					startValue > currentValue);
-		}
+		assertTrue(me.getType() + " Encoder not decremented: start: "
+				+ startValue + "; current: " + currentValue,
+				startValue > currentValue);
 		me.reset();
 		encodersResetCheck(me);
 	}
@@ -144,7 +129,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
 	 * This method test if the counters count when the motors rotate
 	 */
 	@Test
-	public void testCouter(){
+	public void testCounter(){
 		int counter1Start = me.getCounters()[0].get();
 		int counter2Start = me.getCounters()[1].get();
 
@@ -152,15 +137,12 @@ public class MotorEncoderTest extends AbstractComsSetup {
 		Timer.delay(MOTOR_RUNTIME);
 		int counter1End = me.getCounters()[0].get();
 		int counter2End = me.getCounters()[1].get();
-		if (shouldRunTest(me)) { // TODO REMOVE THIS WHEN ALL ENCODERS ARE
-									// PROPERLY ATTACHED
-			assertTrue(me.getType() + " Counter not incremented: start: "
-					+ counter1Start + "; current: " + counter1End,
-					counter1Start < counter1End);
-			assertTrue(me.getType() + " Counter not incremented: start: "
-					+ counter1Start + "; current: " + counter2End,
-					counter2Start < counter2End);
-		}
+		assertTrue(me.getType() + " Counter not incremented: start: "
+				+ counter1Start + "; current: " + counter1End,
+				counter1Start < counter1End);
+		assertTrue(me.getType() + " Counter not incremented: start: "
+				+ counter1Start + "; current: " + counter2End,
+				counter2Start < counter2End);
 		me.reset();
 		encodersResetCheck(me);
 	}
@@ -206,14 +188,13 @@ public class MotorEncoderTest extends AbstractComsSetup {
 		pid.free();
 		me.reset();
 	}
-	 
 	
 	
 	/**
 	 * Checks to see if the encoders and counters are appropriately reset to zero when reset
 	 * @param me The MotorEncoderFixture under test
 	 */
-	private void encodersResetCheck(MotorEncoderFixture me){
+	private void encodersResetCheck(MotorEncoderFixture<?> me){
 		int encoderVal =  me.getEncoder().get();
 		int counterVal[] = new int[2];
 		for(int i = 0; i < 2; i++){
