@@ -118,6 +118,23 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGATime
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_HALUtil
+ * Method:    getFPGAButton
+ * Signature: (Ljava/nio/IntBuffer;)I
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAButton
+  (JNIEnv * env, jclass, jobject status)
+{
+	//HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGATime";
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	jboolean returnValue = getFPGAButton( statusPtr );
+	//HALUTIL_LOG(logDEBUG) << "Status = " << *statusPtr;
+	//HALUTIL_LOG(logDEBUG) << "FPGATime = " << returnValue;
+	return returnValue;
+
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_HALUtil
  * Method:    getHALErrorMessage
  * Signature: (I)Ljava/lang/String;
  */

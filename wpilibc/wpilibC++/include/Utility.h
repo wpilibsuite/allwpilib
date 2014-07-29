@@ -26,7 +26,7 @@ void wpi_suspendOnAssertEnabled(bool enabled);
 uint16_t GetFPGAVersion();
 uint32_t GetFPGARevision();
 uint32_t GetFPGATime();
-int32_t GetRIOUserSwitch();
+bool GetUserButton();
 void SetRIOUserLED(uint32_t state);
 int32_t GetRIOUserLED();
 int32_t ToggleRIOUserLED();

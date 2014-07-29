@@ -25,7 +25,8 @@ public class HALUtil extends JNIWrapper {
 	public static native short getFPGAVersion(IntBuffer status);
 	public static native int getFPGARevision(IntBuffer status);
 	public static native long getFPGATime(IntBuffer status);
-	
+	public static native boolean getFPGAButton(IntBuffer status);
+
 	public static native String getHALErrorMessage(int code);
 
 	public static void checkStatus(IntBuffer status)

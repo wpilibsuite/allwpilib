@@ -283,6 +283,8 @@ extern "C"
 	void setFPGALED(uint32_t state, int32_t *status);
 	int32_t getFPGALED(int32_t *status);
 
+	bool getFPGAButton(int32_t *status);
+
 	int HALSetErrorData(const char *errors, int errorsLength, int wait_ms);
 	int HALSetUserDsLcdData(const char *userDsLcdData, int userDsLcdDataLength, int wait_ms);
 	int HALOverrideIOConfig(const char *ioConfig, int wait_ms);
@@ -313,4 +315,3 @@ extern "C"
 	void EDVR_CreateReference();
 	void Occur();
 }
-

@@ -25,7 +25,7 @@ public class Utility implements IUtility {
 
 	/**
 	 * Return the FPGA Version number. For now, expect this to be 2009.
-	 * 
+	 *
 	 * @return FPGA Version number.
 	 */
 	int getFPGAVersion() {
@@ -41,7 +41,7 @@ public class Utility implements IUtility {
 	 * Return the FPGA Revision number. The format of the revision is 3 numbers.
 	 * The 12 most significant bits are the Major Revision. the next 8 bits are
 	 * the Minor Revision. The 12 least significant bits are the Build Number.
-	 * 
+	 *
 	 * @return FPGA Revision number.
 	 */
 	long getFPGARevision() {
@@ -55,15 +55,29 @@ public class Utility implements IUtility {
 
 	/**
 	 * Read the microsecond timer from the FPGA.
-	 * 
+	 *
 	 * @return The current time in microseconds according to the FPGA.
 	 */
 	public static long getFPGATime() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
-		
+
 		long value = HALUtil.getFPGATime(status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		return value;
+	}
+
+	/**
+	 * Get the state of the "USER" button on the RoboRIO
+	 * @return true if the button is currently pressed down
+	 */
+	public static boolean getUserButton() {
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+
+		boolean value = HALUtil.getFPGAButton(status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
 		return value;
 	}
@@ -71,7 +85,7 @@ public class Utility implements IUtility {
 	/**
 	 * Control whether to send System.err output to the driver station's error
 	 * pane.
-	 * 
+	 *
 	 * @param enabled
 	 *            if true, send error stream to driver station, otherwise
 	 *            disable sending error stream

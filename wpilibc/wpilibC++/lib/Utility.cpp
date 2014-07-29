@@ -211,13 +211,17 @@ extern "C"
 }
 
 /**
- * Read the value of the USER1 DIP switch on the cRIO.
+ * Get the state of the "USER" button on the RoboRIO
+ * @return true if the button is currently pressed down
  */
-int32_t GetRIOUserSwitch()
+bool GetUserButton()
 {
-	int32_t switchValue = UserSwitchInput(0);
-	wpi_assert(switchValue >= 0);
-	return switchValue > 0;
+	int32_t status = 0;
+
+	bool value = getFPGAButton(&status);
+	wpi_setGlobalError(status);
+
+	return value;
 }
 
 /**

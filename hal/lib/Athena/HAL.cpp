@@ -123,6 +123,15 @@ int32_t getFPGALED(int32_t *status)
 	return 0; // XXX: Dummy value
 }
 
+/**
+ * Get the state of the "USER" button on the RoboRIO
+ * @return true if the button is currently pressed down
+ */
+bool getFPGAButton(int32_t *status)
+{
+	return global->readUserButton(status);
+}
+
 int HALSetErrorData(const char *errors, int errorsLength, int wait_ms)
 {
 	return setErrorData(errors, errorsLength, wait_ms);
