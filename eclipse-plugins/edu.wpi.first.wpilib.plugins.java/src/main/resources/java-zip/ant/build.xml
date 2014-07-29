@@ -19,10 +19,8 @@
   <!-- Targets -->
 
   <target name="get-target-ip">
-    <math result="ip.upper" operand1="${team-number}" operation="/" operand2="100" datatype="int"/>
-    <math result="ip.lower" operand1="${team-number}" operation="%" operand2="100" datatype="int"/>
-    <property name="target" value="10.${ip.upper}.${ip.lower}.2" />
-     <echo>Target IP: ${target}</echo>
+    <property name="target" value="roboRIO-${team-number}.local" />
+     <echo>Target: ${target}</echo>
   </target>
 
   <target name="compile" description="Compile the source code.">
@@ -78,13 +76,13 @@
        username="${username}"
        password="${password}"
        trust="true"
-       command=". /etc/profile.d/natinst-path.sh; chmod a+x run*program; ${deploy.kill.command};"/>
+       command=". /etc/profile.d/natinst-path.sh; ${deploy.kill.command};"/>
 
     <sshexec host="${target}"
        username="${username}"
        password="${password}"
        trust="true"
-       command="tail -f -s 0 -n 1 ${deploy.log.file}"/>
+       command="tail -F -s 0 -n 0 ${deploy.log.file}"/>
   </target>
 
   <target name="debug-deploy" depends="get-target-ip,jar" description="Deploy the jar and start the program running.">
