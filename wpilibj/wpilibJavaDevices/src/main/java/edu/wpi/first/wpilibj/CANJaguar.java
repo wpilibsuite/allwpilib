@@ -1033,27 +1033,19 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	* Stop driving the output based on the feedback.
 	*/
 	public void disableControl() {
-		switch(m_controlMode) {
-		case PercentVbus:
-			sendMessage(CANJNI.LM_API_VOLT_DIS, new byte[0], 0);
-			break;
+		// Disable all control modes.
+		sendMessage(CANJNI.LM_API_VOLT_DIS, new byte[0], 0);
+		sendMessage(CANJNI.LM_API_SPD_DIS, new byte[0], 0);
+		sendMessage(CANJNI.LM_API_POS_DIS, new byte[0], 0);
+		sendMessage(CANJNI.LM_API_ICTRL_DIS, new byte[0], 0);
+		sendMessage(CANJNI.LM_API_VCOMP_DIS, new byte[0], 0);
 
-		case Speed:
-			sendMessage(CANJNI.LM_API_SPD_DIS, new byte[0], 0);
-			break;
-
-		case Position:
-			sendMessage(CANJNI.LM_API_POS_DIS, new byte[0], 0);
-			break;
-
-		case Current:
-			sendMessage(CANJNI.LM_API_ICTRL_DIS, new byte[0], 0);
-			break;
-
-		case Voltage:
-			sendMessage(CANJNI.LM_API_VCOMP_DIS, new byte[0], 0);
-			break;
-		}
+		// Stop all periodic setpoints
+		sendMessage(CANJNI.LM_API_VOLT_T_SET, new byte[0], 0, CANJNI.CAN_SEND_PERIOD_STOP_REPEATING);
+		sendMessage(CANJNI.LM_API_SPD_T_SET, new byte[0], 0, CANJNI.CAN_SEND_PERIOD_STOP_REPEATING);
+		sendMessage(CANJNI.LM_API_POS_T_SET, new byte[0], 0, CANJNI.CAN_SEND_PERIOD_STOP_REPEATING);
+		sendMessage(CANJNI.LM_API_ICTRL_T_SET, new byte[0], 0, CANJNI.CAN_SEND_PERIOD_STOP_REPEATING);
+		sendMessage(CANJNI.LM_API_VCOMP_T_SET, new byte[0], 0, CANJNI.CAN_SEND_PERIOD_STOP_REPEATING);
 
 		m_controlEnabled = false;
 	}
