@@ -539,7 +539,7 @@ void CANJaguar::setupPeriodicStatus() {
 	// temperature.
 	static const uint8_t kMessage0Data[] = {
 		LM_PSTAT_VOLTBUS_B0, LM_PSTAT_VOLTBUS_B1,
-		LM_PSTAT_VOUT_B0, LM_PSTAT_VOUT_B1,
+		LM_PSTAT_VOLTOUT_B0, LM_PSTAT_VOLTOUT_B1,
 		LM_PSTAT_CURRENT_B0, LM_PSTAT_CURRENT_B1,
 		LM_PSTAT_TEMP_B0, LM_PSTAT_TEMP_B1
 	};
@@ -579,7 +579,7 @@ void CANJaguar::updatePeriodicStatus() {
 	// has arrived and unpack the values into the cached member variables
 	if(getMessage(LM_API_PSTAT_DATA_S0, CAN_MSGID_FULL_M, data, &dataSize)) {
 		m_busVoltage    = unpackFXP8_8(data);
-		m_outputVoltage = unpackFXP8_8(data + 2);
+		m_outputVoltage = unpackPercentage(data + 2) * m_busVoltage;
 		m_outputCurrent = unpackFXP8_8(data + 4);
 		m_temperature   = unpackFXP8_8(data + 6);
 
