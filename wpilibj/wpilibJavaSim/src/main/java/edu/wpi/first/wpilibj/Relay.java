@@ -10,7 +10,6 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.simulation.SimSpeedController;
-import edu.wpi.first.wpilibj.parsing.IDeviceController;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 
@@ -24,8 +23,7 @@ import edu.wpi.first.wpilibj.tables.ITableListener;
  * allows the two channels (forward and reverse) to be used independently for
  * something that does not care about voltage polarity (like a solenoid).
  */
-public class Relay extends SensorBase implements IDeviceController,
-		LiveWindowSendable {
+public class Relay extends SensorBase implements LiveWindowSendable {
 	/**
 	 * This class represents errors in trying to set relay values contradictory
 	 * to the direction to which the relay is set.
@@ -200,7 +198,7 @@ public class Relay extends SensorBase implements IDeviceController,
 						"A relay configured for reverse cannot be set to forward");
 			if (m_direction == Direction.kBoth
 					|| m_direction == Direction.kForward) {
-				
+
 				go_pos = true;
 			}
 			if (m_direction == Direction.kBoth) {

@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.parsing.ISensor;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
@@ -24,8 +23,7 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
  * determine the default offset. This is subtracted from each sample to
  * determine the heading.
  */
-public class Gyro extends SensorBase implements PIDSource, ISensor,
-		LiveWindowSendable {
+public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 
 	static final int kOversampleBits = 10;
 	static final int kAverageBits = 0;

@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tReso
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
 import edu.wpi.first.wpilibj.hal.HALUtil;
-import edu.wpi.first.wpilibj.parsing.IInputOutput;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
 /**
@@ -24,7 +23,7 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
  *
  * @author dtjones
  */
-public class AnalogTrigger implements IInputOutput {
+public class AnalogTrigger {
 
 	/**
 	 * Exceptions dealing with improper operation of the Analog trigger

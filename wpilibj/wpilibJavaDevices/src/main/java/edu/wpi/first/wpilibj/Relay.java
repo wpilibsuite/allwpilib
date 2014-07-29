@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.hal.RelayJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.parsing.IDeviceController;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 import edu.wpi.first.wpilibj.util.AllocationException;
@@ -33,9 +32,8 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
  * allows the two channels (forward and reverse) to be used independently for
  * something that does not care about voltage polarity (like a solenoid).
  */
-public class Relay extends SensorBase implements IDeviceController,
-		LiveWindowSendable {
-	
+public class Relay extends SensorBase implements LiveWindowSendable {
+
 	/**
 	 * This class represents errors in trying to set relay values contradictory
 	 * to the direction to which the relay is set.
@@ -73,12 +71,12 @@ public class Relay extends SensorBase implements IDeviceController,
 		 * value: reverse
 		 */
 		kReverse(3);
-		
+
 		/**
 		 * The integer value representing this enumeration
 		 */
 		public final int value;
-		
+
 		private Value(int value) {
 			this.value = value;
 		}
@@ -106,11 +104,11 @@ public class Relay extends SensorBase implements IDeviceController,
 		 * The integer value representing this enumeration
 		 */
 		public final int value;
-		
+
 		private Direction(int value) {
 			this.value = value;
 		}
-		
+
 	}
 
 	private final int m_channel;
@@ -185,7 +183,7 @@ public class Relay extends SensorBase implements IDeviceController,
 		if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
 			relayChannels.free(m_channel*2 + 1);
 		}
-		
+
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
 

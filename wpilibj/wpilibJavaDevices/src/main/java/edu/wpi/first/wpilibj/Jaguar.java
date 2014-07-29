@@ -10,12 +10,11 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.parsing.IDeviceController;
 
 /**
  * Texas Instruments Jaguar Speed Controller as a PWM device.
  */
-public class Jaguar extends SafePWM implements SpeedController, IDeviceController {
+public class Jaguar extends SafePWM implements SpeedController {
 
     /**
      * Common initialization code called by all constructors.

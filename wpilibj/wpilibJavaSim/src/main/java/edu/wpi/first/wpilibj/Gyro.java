@@ -9,7 +9,6 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.simulation.SimGyro;
-import edu.wpi.first.wpilibj.parsing.ISensor;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
@@ -22,8 +21,7 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
  * determine the default offset. This is subtracted from each sample to
  * determine the heading.
  */
-public class Gyro extends SensorBase implements PIDSource, ISensor,
-		LiveWindowSendable {
+public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 
 	private PIDSourceParameter m_pidSource;
 	private SimGyro impl;
@@ -59,7 +57,7 @@ public class Gyro extends SensorBase implements PIDSource, ISensor,
 	 * Gyro constructor with a precreated analog channel object. Use this
 	 * constructor when the analog channel needs to be shared. There is no
 	 * reference counting when an AnalogChannel is passed to the gyro.
-	 * 
+	 *
 	 * @param channel
 	 *            The AnalogChannel object that the gyro is connected to.
 	 */

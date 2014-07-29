@@ -11,13 +11,12 @@ import java.nio.IntBuffer;
 import java.nio.ByteBuffer;
 
 import edu.wpi.first.wpilibj.hal.HALUtil;
-import edu.wpi.first.wpilibj.parsing.IDeviceController;
 
 /**
  * SolenoidBase class is the common base class for the Solenoid and
  * DoubleSolenoid classes.
  */
-public abstract class SolenoidBase extends SensorBase implements IDeviceController {
+public abstract class SolenoidBase extends SensorBase {
 
     private ByteBuffer[] m_ports;
     protected int m_moduleNumber; ///< The number of the solenoid module being used.

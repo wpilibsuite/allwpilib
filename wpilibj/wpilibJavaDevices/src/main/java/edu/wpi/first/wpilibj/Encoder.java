@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.hal.EncoderJNI;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.parsing.ISensor;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
@@ -30,8 +29,7 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
  * encoders have two digital outputs, an A Channel and a B Channel that are out
  * of phase with each other to allow the FPGA to do direction sensing.
  */
-public class Encoder extends SensorBase implements CounterBase, PIDSource,
-		ISensor, LiveWindowSendable {
+public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveWindowSendable {
 
 	/**
 	 * The a source
@@ -59,7 +57,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	/**
 	 * Common initialization code for Encoders. This code allocates resources
 	 * for Encoders and is common to all constructors.
-	 * 
+	 *
 	 * @param reverseDirection
 	 *            If true, counts down instead of up (this is all relative)
 	 * @param encodingType
@@ -108,7 +106,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 
 	/**
 	 * Encoder constructor. Construct a Encoder given a and b channels.
-	 * 
+	 *
 	 * @param aChannel
 	 *            The a channel digital input channel.
 	 * @param bChannel
@@ -130,7 +128,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 
 	/**
 	 * Encoder constructor. Construct a Encoder given a and b channels.
-	 * 
+	 *
 	 * @param aChannel
 	 *            The a channel digital input channel.
 	 * @param bChannel
@@ -142,7 +140,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 
 	/**
 	 * Encoder constructor. Construct a Encoder given a and b channels.
-	 * 
+	 *
 	 * @param aChannel
 	 *            The a channel digital input channel.
 	 * @param bChannel
@@ -176,7 +174,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	/**
 	 * Encoder constructor. Construct a Encoder given a and b channels.
 	 * Using an index pulse forces 4x encoding
-	 * 
+	 *
 	 * @param aChannel
 	 *            The a channel digital input channel.
 	 * @param bChannel
@@ -202,7 +200,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	/**
 	 * Encoder constructor. Construct a Encoder given a and b channels.
 	 * Using an index pulse forces 4x encoding
-	 * 
+	 *
 	 * @param aChannel
 	 *            The a channel digital input channel.
 	 * @param bChannel
@@ -220,7 +218,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	 * digital inputs. This is used in the case where the digital inputs are
 	 * shared. The Encoder class will not allocate the digital inputs and assume
 	 * that they already are counted.
-	 * 
+	 *
 	 * @param aSource
 	 *            The source that should be used for the a channel.
 	 * @param bSource
@@ -249,7 +247,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	 * digital inputs. This is used in the case where the digital inputs are
 	 * shared. The Encoder class will not allocate the digital inputs and assume
 	 * that they already are counted.
-	 * 
+	 *
 	 * @param aSource
 	 *            The source that should be used for the a channel.
 	 * @param bSource
@@ -264,7 +262,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	 * digital inputs. This is used in the case where the digital inputs are
 	 * shared. The Encoder class will not allocate the digital inputs and assume
 	 * that they already are counted.
-	 * 
+	 *
 	 * @param aSource
 	 *            The source that should be used for the a channel.
 	 * @param bSource
@@ -305,7 +303,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	 * digital inputs. This is used in the case where the digital inputs are
 	 * shared. The Encoder class will not allocate the digital inputs and assume
 	 * that they already are counted.
-	 * 
+	 *
 	 * @param aSource
 	 *            The source that should be used for the a channel.
 	 * @param bSource
@@ -338,7 +336,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	 * digital inputs. This is used in the case where the digital inputs are
 	 * shared. The Encoder class will not allocate the digital inputs and assume
 	 * that they already are counted.
-	 * 
+	 *
 	 * @param aSource
 	 *            The source that should be used for the a channel.
 	 * @param bSource
@@ -413,7 +411,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	/**
 	 * Gets the raw value from the encoder. The raw value is the actual count
 	 * unscaled by the 1x, 2x, or 4x scale factor.
-	 * 
+	 *
 	 * @return Current raw count from the encoder
 	 */
 	public int getRaw() {
@@ -433,7 +431,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	/**
 	 * Gets the current count. Returns the current count on the Encoder. This
 	 * method compensates for the decoding type.
-	 * 
+	 *
 	 * @return Current count from the Encoder adjusted for the 1x, 2x, or 4x
 	 *         scale factor.
 	 */
@@ -461,11 +459,11 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	 * Returns the period of the most recent pulse. Returns the period of the
 	 * most recent Encoder pulse in seconds. This method compensates for the
 	 * decoding type.
-	 * 
+	 *
 	 * @deprecated Use getRate() in favor of this method. This returns unscaled
 	 *             periods and getRate() scales using value from
 	 *             setDistancePerPulse().
-	 * 
+	 *
 	 * @return Period in seconds of the most recent pulse.
 	 */
 	public double getPeriod() {
@@ -488,8 +486,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	 * the attached device is stopped. This timeout allows users to determine if
 	 * the wheels or other shaft has stopped rotating. This method compensates
 	 * for the decoding type.
-	 * 
-	 * 
+	 *
+	 *
 	 * @param maxPeriod
 	 *            The maximum time between rising and falling edges before the
 	 *            FPGA will report the device stopped. This is expressed in
@@ -512,7 +510,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	 * is returned that is true if the encoder is considered stopped and false
 	 * if it is still moving. A stopped encoder is one where the most recent
 	 * pulse width exceeds the MaxPeriod.
-	 * 
+	 *
 	 * @return True if the encoder is considered stopped.
 	 */
 	public boolean getStopped() {
@@ -530,7 +528,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 
 	/**
 	 * The last direction the encoder value changed.
-	 * 
+	 *
 	 * @return The last direction the encoder value changed.
 	 */
 	public boolean getDirection() {
@@ -566,7 +564,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 
 	/**
 	 * Get the distance the robot has driven since the last reset.
-	 * 
+	 *
 	 * @return The distance driven since the last reset as scaled by the value
 	 *         from setDistancePerPulse().
 	 */
@@ -577,7 +575,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	/**
 	 * Get the current rate of the encoder. Units are distance per second as
 	 * scaled by the value from setDistancePerPulse().
-	 * 
+	 *
 	 * @return The current rate of the encoder.
 	 */
 	public double getRate() {
@@ -587,7 +585,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	/**
 	 * Set the minimum rate of the device before the hardware reports it
 	 * stopped.
-	 * 
+	 *
 	 * @param minRate
 	 *            The minimum rate. The units are in distance per second as
 	 *            scaled by the value from setDistancePerPulse().
@@ -604,7 +602,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	 * encoder's rated Pulses per Revolution and factor in gearing reductions
 	 * following the encoder shaft. This distance can be in any units you like,
 	 * linear or angular.
-	 * 
+	 *
 	 * @param distancePerPulse
 	 *            The scale factor that will be used to convert pulses to useful
 	 *            units.
@@ -617,7 +615,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	 * Set the direction sensing for this encoder. This sets the direction
 	 * sensing on the encoder so that it could count in the correct software
 	 * direction regardless of the mounting.
-	 * 
+	 *
 	 * @param reverseDirection
 	 *            true if the encoder direction should be reversed
 	 */
@@ -634,10 +632,10 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	 * timer to average when calculating the period. Perform averaging to
 	 * account for mechanical imperfections or as oversampling to increase
 	 * resolution.
-	 * 
+	 *
 	 * TODO: Should this throw a checked exception, so that the user has to deal
 	 * with giving an incorrect value?
-	 * 
+	 *
 	 * @param samplesToAverage
 	 *            The number of samples to average from 1 to 127.
 	 */
@@ -666,7 +664,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	 * timer to average when calculating the period. Perform averaging to
 	 * account for mechanical imperfections or as oversampling to increase
 	 * resolution.
-	 * 
+	 *
 	 * @return SamplesToAverage The number of samples being averaged (from 1 to
 	 *         127)
 	 */
@@ -689,7 +687,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	/**
 	 * Set which parameter of the encoder you are using as a process control
 	 * variable. The encoder class supports the rate and distance parameters.
-	 * 
+	 *
 	 * @param pidSource
 	 *            An enum to select the parameter.
 	 */
@@ -700,7 +698,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 
 	/**
 	 * Implement the PIDSource interface.
-	 * 
+	 *
 	 * @return The current value of the selected source parameter.
 	 */
 	public double pidGet() {

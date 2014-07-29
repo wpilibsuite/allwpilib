@@ -13,12 +13,11 @@ import java.nio.IntBuffer;
 
 import edu.wpi.first.wpilibj.hal.HALLibrary;
 import edu.wpi.first.wpilibj.hal.HALUtil;
-import edu.wpi.first.wpilibj.parsing.IUtility;
 
 /**
  * Contains global utility functions
  */
-public class Utility implements IUtility {
+public class Utility {
 
 	private Utility() {
 	}

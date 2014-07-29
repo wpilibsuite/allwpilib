@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tReso
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.parsing.ISensor;
 import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
@@ -18,7 +17,7 @@ import edu.wpi.first.wpilibj.tables.ITable;
  *
  * This class allows access to the RoboRIO's internal accelerometer.
  */
-public class BuiltInAccelerometer implements Accelerometer, ISensor, LiveWindowSendable
+public class BuiltInAccelerometer implements Accelerometer, LiveWindowSendable
 {
 	/**
 	 * Constructor.

@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.parsing.ISensor;
 import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
@@ -25,8 +24,7 @@ import edu.wpi.first.wpilibj.tables.ITable;
  * and goes low when the echo is received. The time that the line is high
  * determines the round trip distance (time of flight).
  */
-public class Ultrasonic extends SensorBase implements PIDSource, ISensor,
-		LiveWindowSendable {
+public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSendable {
 
 	/**
 	 * The units to return when PIDGet is called

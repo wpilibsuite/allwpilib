@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.hal.DIOJNI;
 import edu.wpi.first.wpilibj.hal.InterruptJNI.InterruptHandlerFunction;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.parsing.IInputOutput;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.util.AllocationException;
 import edu.wpi.first.wpilibj.util.CheckedAllocationException;
@@ -29,8 +28,7 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
  * digital inputs and outputs as required. This class is only for devices like
  * switches etc. that aren't implemented anywhere else.
  */
-public class DigitalInput extends DigitalSource implements IInputOutput,
-		LiveWindowSendable {
+public class DigitalInput extends DigitalSource implements LiveWindowSendable {
 
 	/**
 	 * Create an instance of a Digital Input class. Creates a digital input

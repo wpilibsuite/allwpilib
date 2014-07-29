@@ -7,7 +7,6 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.parsing.IUtility;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 import edu.wpi.first.wpilibj.util.BoundaryException;
@@ -19,7 +18,7 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
  * care of the integral calculations, as well as writing the given
  * PIDOutput
  */
-public class PIDController implements IUtility, LiveWindowSendable, Controller {
+public class PIDController implements LiveWindowSendable, Controller {
 
     public static final double kDefaultPeriod = .05;
     private static int instances = 0;
@@ -264,7 +263,7 @@ public class PIDController implements IUtility, LiveWindowSendable, Controller {
                 pidOutput = m_pidOutput;
                 result = m_result;
             }
-            
+
             pidOutput.pidWrite(result);
         }
     }

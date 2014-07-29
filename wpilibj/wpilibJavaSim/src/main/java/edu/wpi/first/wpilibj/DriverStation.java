@@ -12,12 +12,11 @@ import gazebo.msgs.GzDriverStation.DriverStation.State;
 import gazebo.msgs.GzJoystick.Joystick;
 
 import org.gazebosim.transport.SubscriberCallback;
-import edu.wpi.first.wpilibj.parsing.IInputOutput;
 
 /**
  * Provide access to the network communication data to / from the Driver Station.
  */
-public class DriverStation implements IInputOutput, RobotState.Interface {
+public class DriverStation implements RobotState.Interface {
     /**
      * Slot for the analog module to read the battery
      */
@@ -104,7 +103,7 @@ public class DriverStation implements IInputOutput, RobotState.Interface {
 				}
 			}
         );
-        
+
         for (int i = 1; i <= 4; i++) {
         	final int j = i;
         	MainNode.subscribe("ds/joysticks/"+i, Joystick.getDefaultInstance(),

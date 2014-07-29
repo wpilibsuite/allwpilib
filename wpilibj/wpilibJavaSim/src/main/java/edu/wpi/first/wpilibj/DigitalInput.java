@@ -8,7 +8,6 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.simulation.SimDigitalInput;
-import edu.wpi.first.wpilibj.parsing.IInputOutput;
 import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
@@ -18,8 +17,7 @@ import edu.wpi.first.wpilibj.tables.ITable;
  * digital inputs and outputs as required. This class is only for devices like
  * switches etc. that aren't implemented anywhere else.
  */
-public class DigitalInput implements IInputOutput,
-		LiveWindowSendable {
+public class DigitalInput implements LiveWindowSendable {
 	private SimDigitalInput impl;
 	private int m_channel;
 
