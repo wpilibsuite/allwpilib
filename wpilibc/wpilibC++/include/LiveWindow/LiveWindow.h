@@ -14,7 +14,7 @@ struct LiveWindowComponent
 	bool isSensor;
 
 	LiveWindowComponent()
-	{}//WTF?
+	{}
 	LiveWindowComponent(std::string subsystem, std::string name, bool isSensor)
 	{
 		this->subsystem = subsystem;
@@ -54,7 +54,6 @@ private:
 	std::vector<LiveWindowSendable *> m_sensors;
 	std::map<LiveWindowSendable *, LiveWindowComponent> m_components;
 
-	static LiveWindow *m_instance;
 	ITable *m_liveWindowTable;
 	ITable *m_statusTable;
 

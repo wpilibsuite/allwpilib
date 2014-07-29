@@ -3,8 +3,6 @@
 #include <algorithm>
 #include <sstream>
 
-LiveWindow* LiveWindow::m_instance = NULL;
-
 /**
  * Get an instance of the LiveWindow main class
  * This is a singleton to guarantee that there is only a single instance regardless of
@@ -12,11 +10,9 @@ LiveWindow* LiveWindow::m_instance = NULL;
  */
 LiveWindow * LiveWindow::GetInstance()
 {
-	if (m_instance == NULL)
-	{
-		m_instance = new LiveWindow();
-	}
-	return m_instance;
+	static LiveWindow* instance = new LiveWindow();
+
+	return instance;
 }
 
 /**
