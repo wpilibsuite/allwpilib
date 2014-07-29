@@ -19,9 +19,9 @@ public class SocketTest {
 	}};
 
 
-	@Test(timeout=1000)
+	@Test(timeout=1500)
 	public void testSingleSocketConnection() throws Throwable {
-		doSocketTest(1, 500, 1000, SocketStreams.newStreamProvider(10111), SocketStreams.newStreamFactory("localhost", 10111));
+		doSocketTest(1, 500, 1500, SocketStreams.newStreamProvider(10111), SocketStreams.newStreamFactory("localhost", 10111));
 	}
 	@Test(timeout=2500)
 	public void testManySocketConnection() throws Throwable {

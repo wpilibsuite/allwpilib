@@ -10,7 +10,7 @@ import org.junit.*;
 
 public class DefaultThreadManagerTest {
 	volatile Throwable exception = null;
-	@Test(timeout=300)
+	@Test(timeout=400)
 	public void testConcurrentThreads() throws Throwable {
 		final int numCounts = 10;
 		final int numThreads = 10;
