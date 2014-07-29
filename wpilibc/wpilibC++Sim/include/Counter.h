@@ -14,6 +14,9 @@
  * This is a general purpose class for counting repetitive events. It can return the number
  * of counts, the period of the most recent cycle, and detect when the signal being counted
  * has stopped by supplying a maximum cycle time.
+ *
+ * All counters will immediately start counting - Reset() them if you need them
+ * to be zeroed before use.
  */
 class Counter : public SensorBase, public CounterBase, public LiveWindowSendable
 {
@@ -52,10 +55,8 @@ public:
 	void SetReverseDirection(bool reverseDirection);
 
 	// CounterBase interface
-	void Start();
 	int32_t Get();
 	void Reset();
-	void Stop();
 	double GetPeriod();
 	void SetMaxPeriod(double maxPeriod);
 	void SetUpdateWhenEmpty(bool enabled);

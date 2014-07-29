@@ -14,6 +14,9 @@
 /**
  * Common initialization code for Encoders.
  * This code allocates resources for Encoders and is common to all constructors.
+ *
+ * The counter will start counting immediately.
+ *
  * @param reverseDirection If true, counts down instead of up (this is all relative)
  * @param encodingType either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is
  * selected, then an encoder FPGA object is used and the returned counts will be 4x the encoder
@@ -64,11 +67,21 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType)
 
 	HALReport(HALUsageReporting::kResourceType_Encoder, index, encodingType);
 	LiveWindow::GetInstance()->AddSensor("Encoder", m_aSource->GetChannelForRouting(), this);
+
+	if (StatusIsFatal()) return;
+	if (!m_counter) {
+		int32_t status = 0;
+		startEncoder(m_encoder, &status);
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
 }
 
 /**
  * Encoder constructor.
  * Construct a Encoder given a and b channels.
+ *
+ * The counter will start counting immediately.
+ *
  * @param aChannel The a channel digital input channel.
  * @param bChannel The b channel digital input channel.
  * @param reverseDirection represents the orientation of the encoder and inverts the output values
@@ -95,6 +108,9 @@ Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection, En
  * Construct a Encoder given a and b channels as digital inputs. This is used in the case
  * where the digital inputs are shared. The Encoder class will not allocate the digital inputs
  * and assume that they already are counted.
+ *
+ * The counter will start counting immediately.
+ *
  * @param aSource The source that should be used for the a channel.
  * @param bSource the source that should be used for the b channel.
  * @param reverseDirection represents the orientation of the encoder and inverts the output values
@@ -124,6 +140,9 @@ Encoder::Encoder(DigitalSource *aSource, DigitalSource *bSource, bool reverseDir
  * Construct a Encoder given a and b channels as digital inputs. This is used in the case
  * where the digital inputs are shared. The Encoder class will not allocate the digital inputs
  * and assume that they already are counted.
+ *
+ * The counter will start counting immediately.
+ *
  * @param aSource The source that should be used for the a channel.
  * @param bSource the source that should be used for the b channel.
  * @param reverseDirection represents the orientation of the encoder and inverts the output values
@@ -161,39 +180,6 @@ Encoder::~Encoder()
 	{
 	  	int32_t status = 0;
 		freeEncoder(m_encoder, &status);
-		wpi_setErrorWithContext(status, getHALErrorMessage(status));
-	}
-}
-
-/**
- * Start the Encoder.
- * Starts counting pulses on the Encoder device.
- */
-void Encoder::Start()
-{
-	if (StatusIsFatal()) return;
-	if (m_counter)
-		m_counter->Start();
-	else
-	{
-		int32_t status = 0;
-		startEncoder(m_encoder, &status);
-		wpi_setErrorWithContext(status, getHALErrorMessage(status));
-	}
-}
-
-/**
- * Stops counting pulses on the Encoder device. The value is not changed.
- */
-void Encoder::Stop()
-{
-	if (StatusIsFatal()) return;
-	if (m_counter)
-		m_counter->Stop();
-	else
-	{
-		int32_t status = 0;
-		stopEncoder(m_encoder, &status);
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
 }

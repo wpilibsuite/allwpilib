@@ -14,6 +14,8 @@
 /**
  * Create an instance of a counter object.
  * This creates a ChipObject counter and initializes status variables appropriately
+ *
+ * The counter will start counting immediately.
  */
 void Counter::InitCounter(Mode mode)
 {
@@ -30,12 +32,19 @@ void Counter::InitCounter(Mode mode)
 	m_allocatedDownSource = false;
 
 	HALReport(HALUsageReporting::kResourceType_Counter, index, mode);
+
+	if (StatusIsFatal()) return;
+	status = 0;
+	startCounter(m_counter, &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
  * Create an instance of a counter where no sources are selected.
  * Then they all must be selected by calling functions to specify the upsource and the downsource
  * independently.
+ *
+ * The counter will start counting immediately.
  */
 Counter::Counter() :
 	m_upSource(NULL),
@@ -49,6 +58,8 @@ Counter::Counter() :
  * Create an instance of a counter from a Digital Input.
  * This is used if an existing digital input is to be shared by multiple other objects such
  * as encoders.
+ *
+ * The counter will start counting immediately.
  */
 Counter::Counter(DigitalSource *source) :
 	m_upSource(NULL),
@@ -73,6 +84,8 @@ Counter::Counter(DigitalSource &source) :
 /**
  * Create an instance of a Counter object.
  * Create an up-Counter instance given a channel.
+ *
+ * The counter will start counting immediately.
  */
 Counter::Counter(uint32_t channel) :
 	m_upSource(NULL),
@@ -88,6 +101,8 @@ Counter::Counter(uint32_t channel) :
  * Create an instance of a Counter object.
  * Create an instance of a simple up-Counter given an analog trigger.
  * Use the trigger state output from the analog trigger.
+ *
+ * The counter will start counting immediately.
  */
 Counter::Counter(AnalogTrigger *trigger) :
 	m_upSource(NULL),
@@ -448,19 +463,6 @@ void Counter::SetSamplesToAverage (int samplesToAverage) {
 }
 
 /**
- * Start the Counter counting.
- * This enables the counter and it starts accumulating counts from the associated
- * input channel. The counter value is not reset on starting, and still has the previous value.
- */
-void Counter::Start()
-{
-	if (StatusIsFatal()) return;
-	int32_t status = 0;
-	startCounter(m_counter, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
-}
-
-/**
  * Read the current counter value.
  * Read the value at this instant. It may still be running, so it reflects the current value. Next
  * time it is read, it might have a different value.
@@ -484,18 +486,6 @@ void Counter::Reset()
 	if (StatusIsFatal()) return;
 	int32_t status = 0;
 	resetCounter(m_counter, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
-}
-
-/**
- * Stop the Counter.
- * Stops the counting but doesn't effect the current value.
- */
-void Counter::Stop()
-{
-	if (StatusIsFatal()) return;
-	int32_t status = 0;
-	stopCounter(m_counter, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 

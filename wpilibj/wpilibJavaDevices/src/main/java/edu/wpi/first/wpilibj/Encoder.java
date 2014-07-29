@@ -28,6 +28,9 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
  * mounted such that forward movement generates negative values. Quadrature
  * encoders have two digital outputs, an A Channel and a B Channel that are out
  * of phase with each other to allow the FPGA to do direction sensing.
+ *
+ * All encoders will immediately start counting - reset() them if you need them
+ * to be zeroed before use.
  */
 public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveWindowSendable {
 
@@ -57,6 +60,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 	/**
 	 * Common initialization code for Encoders. This code allocates resources
 	 * for Encoders and is common to all constructors.
+	 *
+	 * The encoder will start counting immediately.
 	 *
 	 * @param reverseDirection
 	 *            If true, counts down instead of up (this is all relative)
@@ -102,10 +107,20 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 		UsageReporting.report(tResourceType.kResourceType_Encoder,
 				m_index, m_encodingType.value);
 		LiveWindow.addSensor("Encoder", m_aSource.getChannelForRouting(), this);
+
+		if (m_counter == null) {
+			ByteBuffer status = ByteBuffer.allocateDirect(4);
+			// set the byte order
+			status.order(ByteOrder.LITTLE_ENDIAN);
+			EncoderJNI.startEncoder(m_encoder, status.asIntBuffer());
+			HALUtil.checkStatus(status.asIntBuffer());
+		}
 	}
 
 	/**
 	 * Encoder constructor. Construct a Encoder given a and b channels.
+	 *
+	 * The encoder will start counting immediately.
 	 *
 	 * @param aChannel
 	 *            The a channel digital input channel.
@@ -129,6 +144,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 	/**
 	 * Encoder constructor. Construct a Encoder given a and b channels.
 	 *
+	 * The encoder will start counting immediately.
+	 *
 	 * @param aChannel
 	 *            The a channel digital input channel.
 	 * @param bChannel
@@ -140,6 +157,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 
 	/**
 	 * Encoder constructor. Construct a Encoder given a and b channels.
+	 *
+	 * The encoder will start counting immediately.
 	 *
 	 * @param aChannel
 	 *            The a channel digital input channel.
@@ -174,6 +193,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 	/**
 	 * Encoder constructor. Construct a Encoder given a and b channels.
 	 * Using an index pulse forces 4x encoding
+	 *
+	 * The encoder will start counting immediately.
 	 *
 	 * @param aChannel
 	 *            The a channel digital input channel.
@@ -201,6 +222,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 	 * Encoder constructor. Construct a Encoder given a and b channels.
 	 * Using an index pulse forces 4x encoding
 	 *
+	 * The encoder will start counting immediately.
+	 *
 	 * @param aChannel
 	 *            The a channel digital input channel.
 	 * @param bChannel
@@ -218,6 +241,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 	 * digital inputs. This is used in the case where the digital inputs are
 	 * shared. The Encoder class will not allocate the digital inputs and assume
 	 * that they already are counted.
+	 *
+	 * The encoder will start counting immediately.
 	 *
 	 * @param aSource
 	 *            The source that should be used for the a channel.
@@ -248,6 +273,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 	 * shared. The Encoder class will not allocate the digital inputs and assume
 	 * that they already are counted.
 	 *
+	 * The encoder will start counting immediately.
+	 *
 	 * @param aSource
 	 *            The source that should be used for the a channel.
 	 * @param bSource
@@ -262,6 +289,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 	 * digital inputs. This is used in the case where the digital inputs are
 	 * shared. The Encoder class will not allocate the digital inputs and assume
 	 * that they already are counted.
+	 *
+	 * The encoder will start counting immediately.
 	 *
 	 * @param aSource
 	 *            The source that should be used for the a channel.
@@ -303,6 +332,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 	 * digital inputs. This is used in the case where the digital inputs are
 	 * shared. The Encoder class will not allocate the digital inputs and assume
 	 * that they already are counted.
+	 *
+	 * The encoder will start counting immediately.
 	 *
 	 * @param aSource
 	 *            The source that should be used for the a channel.
@@ -336,6 +367,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 	 * digital inputs. This is used in the case where the digital inputs are
 	 * shared. The Encoder class will not allocate the digital inputs and assume
 	 * that they already are counted.
+	 *
+	 * The encoder will start counting immediately.
 	 *
 	 * @param aSource
 	 *            The source that should be used for the a channel.
@@ -374,36 +407,6 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 			// set the byte order
 			status.order(ByteOrder.LITTLE_ENDIAN);
 			EncoderJNI.freeEncoder(m_encoder, status.asIntBuffer());
-			HALUtil.checkStatus(status.asIntBuffer());
-		}
-	}
-
-	/**
-	 * Start the Encoder. Starts counting pulses on the Encoder device.
-	 */
-	public void start() {
-		if (m_counter != null) {
-			m_counter.start();
-		} else {
-			ByteBuffer status = ByteBuffer.allocateDirect(4);
-			// set the byte order
-			status.order(ByteOrder.LITTLE_ENDIAN);
-			EncoderJNI.startEncoder(m_encoder, status.asIntBuffer());
-			HALUtil.checkStatus(status.asIntBuffer());
-		}
-	}
-
-	/**
-	 * Stops counting pulses on the Encoder device. The value is not changed.
-	 */
-	public void stop() {
-		if (m_counter != null) {
-			m_counter.stop();
-		} else {
-			ByteBuffer status = ByteBuffer.allocateDirect(4);
-			// set the byte order
-			status.order(ByteOrder.LITTLE_ENDIAN);
-			EncoderJNI.stopEncoder(m_encoder, status.asIntBuffer());
 			HALUtil.checkStatus(status.asIntBuffer());
 		}
 	}

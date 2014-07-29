@@ -81,7 +81,6 @@ public class FakeEncoderFixture implements ITestFixture {
 	 */
 	@Override
 	public boolean setup() {
-		m_encoder.start();
 		return true;
 	}
 

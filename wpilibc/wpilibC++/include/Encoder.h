@@ -22,6 +22,9 @@ class DigitalSource;
  * sense of the output to make code more readable if the encoder is mounted such that forward movement
  * generates negative values. Quadrature encoders have two digital outputs, an A Channel and a B Channel
  * that are out of phase with each other to allow the FPGA to do direction sensing.
+ *
+ * All encoders will immediately start counting - Reset() them if you need them
+ * to be zeroed before use.
  */
 class Encoder : public SensorBase, public CounterBase, public PIDSource, public LiveWindowSendable
 {
@@ -36,11 +39,9 @@ public:
 	virtual ~Encoder();
 
 	// CounterBase interface
-	void Start();
 	int32_t Get();
 	int32_t GetRaw();
 	void Reset();
-	void Stop();
 	double GetPeriod();
 	void SetMaxPeriod(double maxPeriod);
 	bool GetStopped();

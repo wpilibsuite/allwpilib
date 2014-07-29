@@ -29,23 +29,23 @@ import edu.wpi.first.wpilibj.test.TestBench;
 @RunWith(Parameterized.class)
 public class MotorEncoderTest extends AbstractComsSetup {
 	private static final Logger logger = Logger.getLogger(MotorEncoderTest.class.getName());
-	
+
 	private static final double MOTOR_RUNTIME = .25;
-	
+
 	//private static final List<MotorEncoderFixture> pairs = new ArrayList<MotorEncoderFixture>();
 	private static MotorEncoderFixture<?> me = null;
-	
+
 	@Override
 	protected Logger getClassLogger(){
 		return logger;
 	}
-	
+
 	public MotorEncoderTest(MotorEncoderFixture<?> mef){
 		logger.fine("Constructor with: " + mef.getType());
 		if(me != null && !me.equals(mef)) me.teardown();
 		me = mef;
 	}
-	
+
 	@Parameters(name= "{index}: {0}")
 	public static Collection<MotorEncoderFixture<?>[]> generateData(){
 		//logger.fine("Loading the MotorList");
@@ -65,7 +65,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
 		me.setup();
 
 	}
-	
+
 	@After
 	public void tearDown() throws Exception {
 		me.reset();
@@ -76,7 +76,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
 		// Clean up the fixture after the test
 		me.teardown();
 	}
-	
+
 	/**
 	 * Test to ensure that the isMotorWithinRange method is functioning properly.
 	 * Really only needs to run on one MotorEncoderFixture to ensure that it is working correctly.
@@ -124,7 +124,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
 		me.reset();
 		encodersResetCheck(me);
 	}
-	
+
 	/**
 	 * This method test if the counters count when the motors rotate
 	 */
@@ -146,7 +146,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
 		me.reset();
 		encodersResetCheck(me);
 	}
-	
+
 	/**
 	 * Tests to see if you set the speed to something not <= 1.0 if the code appropriately throttles the value
 	 */
@@ -157,7 +157,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
 				+ me.getMotor().get(), me.isMotorSpeedWithinRange(1.0, 0.001));
 		me.reset();
 	}
-	
+
 	/**
 	 * Tests to see if you set the speed to something not >= -1.0 if the code appropriately throttles the value
 	 */
@@ -168,8 +168,8 @@ public class MotorEncoderTest extends AbstractComsSetup {
 				+ me.getMotor().get(), me.isMotorSpeedWithinRange(-1.0, 0.001));
 		me.reset();
 	}
-	
-	
+
+
 	@Test
 	public void testPIDController() {
 		PIDController pid = new PIDController(0.003, 0.001, 0, me.getEncoder(),
@@ -188,8 +188,8 @@ public class MotorEncoderTest extends AbstractComsSetup {
 		pid.free();
 		me.reset();
 	}
-	
-	
+
+
 	/**
 	 * Checks to see if the encoders and counters are appropriately reset to zero when reset
 	 * @param me The MotorEncoderFixture under test
@@ -205,7 +205,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
 		assertTrue(me.getType() + " Motor value: " + motorVal + " when it should be 0", motorVal == 0);
 		assertTrue(me.getType() + " Counter value " + counterVal[0] + " when is should be 0", counterVal[0] == 0);
 		assertTrue(me.getType() + " Counter value " + counterVal[1] + " when is should be 0", counterVal[1] == 0);
-		Timer.delay(.1);
+		Timer.delay(.2);
 		assertTrue(me.getType() + " Encoder.getStopped() returned false", me.getEncoder().getStopped());
 	}
 

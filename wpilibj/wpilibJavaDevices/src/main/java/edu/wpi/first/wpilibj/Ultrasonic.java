@@ -125,7 +125,6 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
 		m_counter.setMaxPeriod(1.0);
 		m_counter.setSemiPeriodMode(true);
 		m_counter.reset();
-		m_counter.start();
 		m_enabled = true; // make it available for round robin scheduling
 		setAutomaticMode(originalMode);
 

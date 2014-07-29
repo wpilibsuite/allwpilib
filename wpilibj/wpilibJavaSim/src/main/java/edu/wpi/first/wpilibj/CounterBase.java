@@ -11,6 +11,9 @@ package edu.wpi.first.wpilibj;
  * Interface for counting the number of ticks on a digital input channel.
  * Encoders, Gear tooth sensors, and counters should all subclass this so it can be used to
  * build more advanced classes for control and driving.
+ *
+ * All counters will immediately start counting - reset() them if you need them
+ * to be zeroed before use.
  */
 public interface CounterBase {
 
@@ -45,11 +48,6 @@ public interface CounterBase {
     }
 
     /**
-     * Start the counter
-     */
-    public void start();
-
-    /**
      * Get the count
      * @return the count
      */
@@ -59,11 +57,6 @@ public interface CounterBase {
      * Reset the count to zero
      */
     void reset();
-
-    /**
-     * Stop counting
-     */
-    void stop();
 
     /**
      * Get the time between the last two edges counted

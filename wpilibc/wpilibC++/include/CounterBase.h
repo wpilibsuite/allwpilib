@@ -7,8 +7,11 @@
 
 /**
  * Interface for counting the number of ticks on a digital input channel.
- * Encoders, Gear tooth sensors, and counters should all subclass this so it can be used to
- * build more advanced classes for control and driving.
+ * Encoders, Gear tooth sensors, and counters should all subclass this so it can
+ * be used to build more advanced classes for control and driving.
+ *
+ * All counters will immediately start counting - Reset() them if you need them
+ * to be zeroed before use.
  */
 class CounterBase
 {
@@ -21,10 +24,8 @@ public:
 	};
 
 	virtual ~CounterBase() {}
-	virtual void Start() = 0;
 	virtual int32_t Get() = 0;
 	virtual void Reset() = 0;
-	virtual void Stop() = 0;
 	virtual double GetPeriod() = 0;
 	virtual void SetMaxPeriod(double maxPeriod) = 0;
 	virtual bool GetStopped() = 0;
