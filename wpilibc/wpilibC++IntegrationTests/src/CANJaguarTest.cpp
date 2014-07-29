@@ -205,7 +205,7 @@ TEST_F(CANJaguarTest, SetGet) {
 /**
  * Test if we can drive the motor in percentage mode and get a position back
  */
-TEST_F(CANJaguarTest, PercentForwards) {
+TEST_F(CANJaguarTest, PercentModeForwardWorks) {
 	m_jaguar->SetPercentMode(CANJaguar::QuadEncoder, 360);
 	m_jaguar->EnableControl();
 
@@ -227,7 +227,7 @@ TEST_F(CANJaguarTest, PercentForwards) {
  * Test if we can drive the motor backwards in percentage mode and get a
  * position back
  */
-TEST_F(CANJaguarTest, PercentReverse) {
+TEST_F(CANJaguarTest, PercentModeReverseWorks) {
 	m_jaguar->SetPercentMode(CANJaguar::QuadEncoder, 360);
 	m_jaguar->EnableControl();
 
@@ -250,24 +250,25 @@ TEST_F(CANJaguarTest, PercentReverse) {
  * Test if we can set an absolute voltage and receive a matching output voltage
  * status.
  */
-TEST_F(CANJaguarTest, Voltage) {
+TEST_F(CANJaguarTest, VoltageModeWorks) {
 	m_jaguar->SetVoltageMode();
 	m_jaguar->EnableControl();
 
-	SetJaguar(kMotorTime, M_PI);
-	m_jaguar->Set(0.0f);
-	EXPECT_NEAR(M_PI, m_jaguar->GetOutputVoltage(), kVoltageTolerance);
+	float setpoints[] = { M_PI, 8.0f, -10.0f };
 
-	SetJaguar(kMotorTime, 8.0f);
-	m_jaguar->Set(0.0f);
-	EXPECT_NEAR(8.0f, m_jaguar->GetOutputVoltage(), kVoltageTolerance);
+	for(int i = 0; i < sizeof(setpoints)/sizeof(setpoints[0]); i++) {
+		float setpoint = setpoints[i];
+
+		SetJaguar(kMotorTime, setpoint);
+		EXPECT_NEAR(setpoint, m_jaguar->GetOutputVoltage(), kVoltageTolerance);
+	}
 }
 
 /**
  * Test if we can set a speed in speed control mode and receive a matching
  * speed status.
  */
-TEST_F(CANJaguarTest, SpeedPID) {
+TEST_F(CANJaguarTest, SpeedModeWorks) {
 	m_jaguar->SetSpeedMode(CANJaguar::QuadEncoder, 360, 0.1f, 0.003f, 0.01f);
 	m_jaguar->EnableControl();
 
@@ -281,7 +282,7 @@ TEST_F(CANJaguarTest, SpeedPID) {
  * Test if we can set a position and reach that position with PID control on
  * the Jaguar.
  */
-TEST_F(CANJaguarTest, EncoderPositionPID) {
+TEST_F(CANJaguarTest, PositionModeWorks) {
 	m_jaguar->SetPositionMode(CANJaguar::QuadEncoder, 360, 10.0f, 0.1f, 0.0f);
 
 	double setpoint = m_jaguar->GetPosition() + 10.0f;
@@ -305,35 +306,27 @@ TEST_F(CANJaguarTest, EncoderPositionPID) {
  * Test if we can set a current setpoint with PID control on the Jaguar and get
  * a corresponding output current
  */
-TEST_F(CANJaguarTest, CurrentPID) {
+TEST_F(CANJaguarTest, CurrentModeWorks) {
 	m_jaguar->SetCurrentMode(10.0, 4.0, 1.0);
 	m_jaguar->EnableControl();
 
-	float setpoint =  1.6f;
+	float setpoints[] = { 1.6f, 2.0f, -1.6f };
 
-	/* It should get to the setpoint within 10 seconds */
-	for(int i = 0; i < 10; i++) {
-		SetJaguar(1.0, setpoint);
+	for(int i = 0; i < sizeof(setpoints)/sizeof(setpoints[0]); i++) {
+		float setpoint = setpoints[i];
+		float expectedCurrent = std::abs(setpoints[i]);
 
-		if(std::abs(m_jaguar->GetOutputCurrent() - setpoint) <= kCurrentTolerance) {
-			break;
+		/* It should get to each setpoint within 10 seconds */
+		for(int j = 0; j < 10; j++) {
+			SetJaguar(1.0, setpoints[i]);
+
+			if(std::abs(m_jaguar->GetOutputCurrent() - expectedCurrent) <= kCurrentTolerance) {
+				break;
+			}
 		}
+
+		EXPECT_NEAR(expectedCurrent, m_jaguar->GetOutputCurrent(), kCurrentTolerance);
 	}
-
-	EXPECT_NEAR(setpoint, m_jaguar->GetOutputCurrent(), kCurrentTolerance);
-
-	setpoint =  2.0f;
-
-	/* It should get to the setpoint within 10 seconds */
-	for(int i = 0; i < 10; i++) {
-		SetJaguar(1.0, setpoint);
-
-		if(std::abs(m_jaguar->GetOutputCurrent() - setpoint) <= kCurrentTolerance) {
-			break;
-		}
-	}
-
-	EXPECT_NEAR(setpoint, m_jaguar->GetOutputCurrent(), kCurrentTolerance);
 }
 
 /**
