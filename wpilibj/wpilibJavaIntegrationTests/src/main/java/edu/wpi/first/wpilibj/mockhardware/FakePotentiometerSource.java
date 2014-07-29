@@ -16,6 +16,7 @@ public class FakePotentiometerSource {
 	private AnalogOutput output;
 	private boolean m_init_output;
 	private double potMaxAngle;
+	private double potMaxVoltage = 5.0;
 	private final double defaultPotMaxAngle;
 	public FakePotentiometerSource(AnalogOutput output, double defaultPotMaxAngle){
 		this.defaultPotMaxAngle = defaultPotMaxAngle;
@@ -29,6 +30,14 @@ public class FakePotentiometerSource {
 		m_init_output = true;
 	}
 	
+	/**
+	 * Sets the maximum voltage output. If not the default is 5.0V
+	 * @param voltage The voltage that indicates that the pot is at the max value.
+	 */
+	public void setMaxVoltage(double voltage){
+		potMaxVoltage = voltage;
+	}
+	
 	public void setRange(double range){
 		potMaxAngle = range;
 	}
@@ -39,7 +48,7 @@ public class FakePotentiometerSource {
 	}
 	
 	public void setAngle(double angle){
-		output.setVoltage((5.0/potMaxAngle)*angle);
+		output.setVoltage((potMaxVoltage/potMaxAngle)*angle);
 	}
 	
 	public void setVoltage(double voltage){
@@ -50,9 +59,22 @@ public class FakePotentiometerSource {
 		return output.getVoltage();
 	}
 	
+	/**
+	 * Returns the currently set angle
+	 * @return
+	 */
+	public double getAngle(){
+		double voltage = output.getVoltage();
+		if(voltage == 0){ //Removes divide by zero error
+			return 0;
+		}
+		return voltage * (potMaxAngle/potMaxVoltage);
+	}
+	
 	public void free(){
 		if(m_init_output){
 			output.free();
+			output = null;
 			m_init_output = false;
 		}
 	}

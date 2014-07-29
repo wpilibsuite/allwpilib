@@ -6,6 +6,8 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj.fixtures;
 
+import java.util.logging.Logger;
+
 import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
@@ -24,11 +26,12 @@ import edu.wpi.first.wpilibj.test.TestBench;
  *
  */
 public abstract class MotorEncoderFixture <T extends SpeedController> implements ITestFixture {
+	private static final Logger logger = Logger.getLogger(MotorEncoderFixture.class.getName());
 	private boolean initialized = false;
 	private boolean tornDown = false;
 	protected T motor;
 	private Encoder encoder;
-	private Counter counters[] = new Counter[2];
+	private final Counter counters[] = new Counter[2];
 	protected DigitalInput aSource; //Stored so it can be freed at tear down
 	protected DigitalInput bSource;
 
@@ -61,7 +64,7 @@ public abstract class MotorEncoderFixture <T extends SpeedController> implements
 	final private void initialize(){
 		synchronized(this){
 			if(!initialized){
-				motor = giveSpeedController();
+				initialized = true; //This ensures it is only initialized once
 				
 				aSource = giveDigitalInputA();
 				bSource = giveDigitalInputB();
@@ -73,7 +76,12 @@ public abstract class MotorEncoderFixture <T extends SpeedController> implements
 				for(Counter c: counters){
 					c.start();
 				}
-				initialized = true;
+				logger.fine("Creating the speed controller!");
+				motor = giveSpeedController(); //CANJaguar throws an exception if it doesn't get the message
+				
+					
+				
+				
 			}
 		}
 	}
@@ -158,11 +166,14 @@ public abstract class MotorEncoderFixture <T extends SpeedController> implements
 	 */
 	@Override
 	public boolean teardown() {
-		String type = getType();
+		String type;
+		if(motor != null){
+			type = getType();
+		} else {
+			type = "null";
+		}
 		if(!tornDown){
 			boolean wasNull = false;
-			initialize();
-			reset();
 			if(motor instanceof PWM && motor != null){
 				((PWM) motor).free();
 				motor = null;

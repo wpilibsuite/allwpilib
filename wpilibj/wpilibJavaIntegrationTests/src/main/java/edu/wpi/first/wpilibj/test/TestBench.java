@@ -59,6 +59,7 @@ public final class TestBench {
 	public static final int kTalonPDPChannel = 11;
 	
 	/* CAN ASSOICATED CHANNELS */
+	public static final int kCANRelayPowerCycler = 1;
 	public static final int kFakeJaguarPotentiometer = 1;
 	public static final int kFakeJaguarForwardLimit = 16;
 	public static final int kFakeJaguarReverseLimit = 17;
@@ -182,6 +183,13 @@ public final class TestBench {
 		@Override
 		protected DigitalOutput giveFakeReverseLimit() {
 			return new DigitalOutput(kFakeJaguarReverseLimit);
+		}
+		/* (non-Javadoc)
+		 * @see edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture#givePoweCycleRelay()
+		 */
+		@Override
+		protected Relay givePoweCycleRelay() {
+			return new Relay(kCANRelayPowerCycler);
 		}
 	}
 

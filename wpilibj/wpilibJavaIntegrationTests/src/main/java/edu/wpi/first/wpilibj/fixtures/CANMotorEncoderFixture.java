@@ -6,10 +6,14 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj.fixtures;
 
+import java.util.logging.Logger;
+
 import edu.wpi.first.wpilibj.CANJaguar;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
-import edu.wpi.first.wpilibj.mockhardware.FakeEncoderSource;
+import edu.wpi.first.wpilibj.Relay;
+import edu.wpi.first.wpilibj.Relay.Direction;
+import edu.wpi.first.wpilibj.Relay.Value;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.mockhardware.FakePotentiometerSource;
 
 /**
@@ -17,24 +21,37 @@ import edu.wpi.first.wpilibj.mockhardware.FakePotentiometerSource;
  *
  */
 public abstract class CANMotorEncoderFixture extends MotorEncoderFixture<CANJaguar> implements ITestFixture {
+	private static final Logger logger = Logger.getLogger(CANMotorEncoderFixture.class.getName());
+	public static final double RELAY_POWER_UP_TIME = .75;
 	private FakePotentiometerSource potSource;
 	private DigitalOutput forwardLimit;
 	private DigitalOutput reverseLimit;
+	private Relay powerCycler;
 	private boolean initialized = false;
 	
 	protected abstract FakePotentiometerSource giveFakePotentiometerSource();
 	protected abstract DigitalOutput giveFakeForwardLimit();
 	protected abstract DigitalOutput giveFakeReverseLimit();
+	protected abstract Relay givePoweCycleRelay();
 	
-	public CANMotorEncoderFixture(){}
+	public CANMotorEncoderFixture(){
+	}
 	
-	public void initialize(){
+	private void initialize(){
 		synchronized(this){
 			if(!initialized){
-				potSource = giveFakePotentiometerSource();
+				initialized = true;//This ensures it is only initialized once
+				
+				powerCycler = givePoweCycleRelay();
+				powerCycler.setDirection(Direction.kForward);
+				logger.fine("Turning on the power!");
+				powerCycler.set(Value.kForward);
 				forwardLimit = giveFakeForwardLimit();
 				reverseLimit = giveFakeReverseLimit();
-				initialized = true;
+				forwardLimit.set(false);
+				reverseLimit.set(false);
+				potSource = giveFakePotentiometerSource();
+				Timer.delay(RELAY_POWER_UP_TIME); //Delay so the relay has time to boot up
 			}
 		}
 	}
@@ -42,7 +59,7 @@ public abstract class CANMotorEncoderFixture extends MotorEncoderFixture<CANJagu
 
 	@Override
 	public boolean setup() {
-		initialize();
+		initialize(); //This initializes the Relay first
 		return super.setup();
 	}
 
@@ -58,11 +75,41 @@ public abstract class CANMotorEncoderFixture extends MotorEncoderFixture<CANJagu
 	
 	@Override
 	public boolean teardown() {
-		potSource.free();
-		forwardLimit.free();
-		reverseLimit.free();
-		boolean superTornDown = super.teardown();
-		getMotor().free();
+		boolean wasNull = false;
+		if(potSource != null){
+			potSource.free();
+			potSource = null;
+		} else wasNull = true;
+		if(forwardLimit != null){
+			forwardLimit.set(false);
+			forwardLimit.free();
+			forwardLimit = null;
+		} else wasNull = true;
+		if(reverseLimit != null){
+			reverseLimit.set(false);
+			reverseLimit.free();
+			reverseLimit = null;
+		} else wasNull = true;
+		boolean superTornDown = false;
+		try{
+			superTornDown = super.teardown();
+		} finally {
+			try{
+				if(getMotor() != null){
+					getMotor().disableControl();
+					getMotor().free();
+				} else wasNull = true;
+			} finally {
+				if(powerCycler != null){
+					powerCycler.free();
+					powerCycler = null;
+				} else wasNull = true;
+			}
+		}
+		if(wasNull){
+			throw new RuntimeException("CANMotorEncoderFixture had a null value at teardown");
+		}
+		
 		return superTornDown;
 	}
 	
@@ -79,6 +126,48 @@ public abstract class CANMotorEncoderFixture extends MotorEncoderFixture<CANJagu
 	public DigitalOutput getReverseLimit(){
 		initialize();
 		return reverseLimit;
+	}
+	
+	public String printStatus(){
+		StringBuilder status = new StringBuilder("CAN Motor Encoder Status: ");
+		if(getMotor() != null){
+			status.append("\t" + getMotor().getDescription() + "\n");
+			status.append("\tFault = " + getMotor().getFaults() + "\n");
+			status.append("\tValue = " + getMotor().get() + "\n");
+			status.append("\tOutputVoltage = " + getMotor().getOutputVoltage() +"\n");
+			status.append("\tPosition = " + getMotor().getPosition() + "\n");
+			status.append("\tForward Limit Ok = " + getMotor().getForwardLimitOK() + "\n");
+			status.append("\tReverse Limit Ok = " + getMotor().getReverseLimitOK() + "\n");
+		} else { 
+			status.append("\t" + "CANJaguar Motor = null" + "\n");
+		}
+		if(forwardLimit != null){
+			status.append("\tForward Limit Output = " + forwardLimit + "\n");
+		} else {
+			status.append("\tForward Limit Output = null" +"\n");
+		}
+		if(reverseLimit != null){
+			status.append("\tReverse Limit Output = " + reverseLimit + "\n");
+		} else {
+			status.append("\tReverse Limit Output = null" +"\n");
+		}
+		
+		return status.toString();
+	}
+	
+	public void brownOut(double seconds){
+		initialize();
+		powerOff();
+		Timer.delay(seconds);
+		powerOn();
+	}
+	public void powerOff(){
+		initialize();
+		powerCycler.set(Value.kOff);
+	}
+	public void powerOn(){
+		initialize();
+		powerCycler.set(Value.kForward);
 	}
 
 }
