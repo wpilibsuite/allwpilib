@@ -1885,7 +1885,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 		// temperature.
 		final byte[] kMessage0Data = new byte[] {
 			CANJNI.LM_PSTAT_VOLTBUS_B0, CANJNI.LM_PSTAT_VOLTBUS_B1,
-			CANJNI.LM_PSTAT_VOUT_B0, CANJNI.LM_PSTAT_VOUT_B1,
+			CANJNI.LM_PSTAT_VOLTOUT_B0, CANJNI.LM_PSTAT_VOLTOUT_B1,
 			CANJNI.LM_PSTAT_CURRENT_B0, CANJNI.LM_PSTAT_CURRENT_B1,
 			CANJNI.LM_PSTAT_TEMP_B0, CANJNI.LM_PSTAT_TEMP_B1
 		};
@@ -1932,7 +1932,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 			getMessage(CANJNI.LM_API_PSTAT_DATA_S0, CANJNI.CAN_MSGID_FULL_M, data);
 
 			m_busVoltage    = unpackFXP8_8(new byte[] { data[0], data[1] });
-			m_outputVoltage = unpackFXP8_8(new byte[] { data[2], data[3] });
+			m_outputVoltage = unpackPercentage(new byte[] { data[2], data[3] }) * m_busVoltage;
 			m_outputCurrent = unpackFXP8_8(new byte[] { data[4], data[5] });
 			m_temperature   = unpackFXP8_8(new byte[] { data[6], data[7] });
 
