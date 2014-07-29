@@ -16,7 +16,6 @@
 #include "LiveWindow/LiveWindow.h"
 
 /* we are on ARM-LE now, not Freescale so no need to swap */
-//TODO: is this defined in a PN way? or is this Jag-specific?
 #define swap16(x)	(x)
 #define swap32(x)	(x)
 
@@ -1322,24 +1321,19 @@ void CANJaguar::DisableControl()
 	uint8_t dataBuffer[8];
 	uint8_t dataSize = 0;
 
-	switch(m_controlMode)
-	{
-	case kPercentVbus:
-		sendMessage(LM_API_VOLT_DIS, dataBuffer, dataSize);
-		break;
-	case kSpeed:
-		sendMessage(LM_API_SPD_DIS, dataBuffer, dataSize);
-		break;
-	case kPosition:
-		sendMessage(LM_API_POS_DIS, dataBuffer, dataSize);
-		break;
-	case kCurrent:
-		sendMessage(LM_API_ICTRL_DIS, dataBuffer, dataSize);
-		break;
-	case kVoltage:
-		sendMessage(LM_API_VCOMP_DIS, dataBuffer, dataSize);
-		break;
-	}
+	// Disable all control
+	sendMessage(LM_API_VOLT_DIS, dataBuffer, dataSize);
+	sendMessage(LM_API_SPD_DIS, dataBuffer, dataSize);
+	sendMessage(LM_API_POS_DIS, dataBuffer, dataSize);
+	sendMessage(LM_API_ICTRL_DIS, dataBuffer, dataSize);
+	sendMessage(LM_API_VCOMP_DIS, dataBuffer, dataSize);
+
+	// Stop all periodic setpoints
+	sendMessage(LM_API_VOLT_T_SET, dataBuffer, dataSize, CAN_SEND_PERIOD_STOP_REPEATING);
+	sendMessage(LM_API_SPD_T_SET, dataBuffer, dataSize, CAN_SEND_PERIOD_STOP_REPEATING);
+	sendMessage(LM_API_POS_T_SET, dataBuffer, dataSize, CAN_SEND_PERIOD_STOP_REPEATING);
+	sendMessage(LM_API_ICTRL_T_SET, dataBuffer, dataSize, CAN_SEND_PERIOD_STOP_REPEATING);
+	sendMessage(LM_API_VCOMP_T_SET, dataBuffer, dataSize, CAN_SEND_PERIOD_STOP_REPEATING);
 
 	m_controlEnabled = false;
 }
