@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.image.ColorImage;
 import edu.wpi.first.wpilibj.image.HSLImage;
 import edu.wpi.first.wpilibj.image.NIVisionException;
-import edu.wpi.first.wpilibj.parsing.ISensor;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
 //TODO figure out where to use finally to free resources
@@ -30,7 +29,7 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
  * This class is a singleton used to configure and get images from the axis camera.
  * @author dtjones
  */
-public class AxisCamera implements ISensor {
+public class AxisCamera {
 
     private static AxisCamera m_instance = null;
 

@@ -7,10 +7,9 @@ import edu.wpi.first.wpilibj.SensorBase;
 import edu.wpi.first.wpilibj.hal.CompressorJNI;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.parsing.IDevice;
 import edu.wpi.first.wpilibj.tables.ITable;
 
-public class Compressor extends SensorBase implements IDevice, LiveWindowSendable {
+public class Compressor extends SensorBase implements LiveWindowSendable {
 	private ByteBuffer m_pcm;
 
 	public Compressor(int pcmId) {

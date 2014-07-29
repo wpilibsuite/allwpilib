@@ -9,7 +9,6 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.simulation.SimEncoder;
-import edu.wpi.first.wpilibj.parsing.ISensor;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
@@ -23,8 +22,7 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
  * encoders have two digital outputs, an A Channel and a B Channel that are out
  * of phase with each other to allow the FPGA to do direction sensing.
  */
-public class Encoder extends SensorBase implements CounterBase, PIDSource,
-		ISensor, LiveWindowSendable {
+public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveWindowSendable {
 	private int m_index;
 	private double m_distancePerPulse; // distance of travel for each encoder tick
 	private EncodingType m_encodingType = EncodingType.k4X;
@@ -38,7 +36,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	/**
 	 * Common initialization code for Encoders. This code allocates resources
 	 * for Encoders and is common to all constructors.
-	 * 
+	 *
 	 * @param reverseDirection
 	 *            If true, counts down instead of up (this is all relative)
 	 * @param encodingType
@@ -55,7 +53,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 		m_pidSource = PIDSourceParameter.kDistance;
 
 		LiveWindow.addSensor("Encoder", aChannel, this);
-		
+
 		if (bChannel < aChannel) { // Swap ports
 			int channel = bChannel;
 			bChannel = aChannel;
@@ -71,7 +69,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 
 	/**
 	 * Encoder constructor. Construct a Encoder given a and b channels.
-	 * 
+	 *
 	 * @param aChannel
 	 *            The a channel digital input channel.
 	 * @param bChannel
@@ -91,7 +89,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 
 	/**
 	 * Encoder constructor. Construct a Encoder given a and b channels.
-	 * 
+	 *
 	 * @param aChannel
 	 *            The a channel digital input channel.
 	 * @param bChannel
@@ -103,7 +101,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 
 	/**
 	 * Encoder constructor. Construct a Encoder given a and b channels.
-	 * 
+	 *
 	 * @param aChannel
 	 *            The a channel digital input channel.
 	 * @param bChannel
@@ -198,7 +196,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 
 	/**
 	 * Sets the maximum period for stopped detection.
-	 * Sets the value that represents the maximum period of the Encoder before 
+	 * Sets the value that represents the maximum period of the Encoder before
 	 * that the attached device is stopped. This timeout allows users to determ
 	 * other shaft has stopped rotating.
 	 * This method compensates for the decoding type.
@@ -215,7 +213,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	/**
 	 * Determine if the encoder is stopped.
 	 * Using the MaxPeriod value, a boolean is returned that is true if the enc
-	 * stopped and false if it is still moving. A stopped encoder is one where 
+	 * stopped and false if it is still moving. A stopped encoder is one where
 	 * width exceeds the MaxPeriod.
 	 * @return True if the encoder is considered stopped.
 	 */
@@ -257,7 +255,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 	/**
 	 * Set which parameter of the encoder you are using as a process control
 	 * variable. The encoder class supports the rate and distance parameters.
-	 * 
+	 *
 	 * @param pidSource
 	 *            An enum to select the parameter.
 	 */
@@ -268,7 +266,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
 
 	/**
 	 * Implement the PIDSource interface.
-	 * 
+	 *
 	 * @return The current value of the selected source parameter.
 	 */
 	public double pidGet() {

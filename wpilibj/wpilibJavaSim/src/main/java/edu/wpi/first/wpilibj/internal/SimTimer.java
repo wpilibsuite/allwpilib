@@ -11,7 +11,6 @@ import org.gazebosim.transport.Msgs;
 import org.gazebosim.transport.SubscriberCallback;
 
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.parsing.IUtility;
 import edu.wpi.first.wpilibj.simulation.MainNode;
 import gazebo.msgs.GzFloat64.Float64;
 
@@ -22,7 +21,7 @@ import gazebo.msgs.GzFloat64.Float64;
  * value. The implementation simply records the time when started and subtracts the current time
  * whenever the value is requested.
  */
-public class SimTimer implements IUtility, Timer.StaticInterface {
+public class SimTimer implements Timer.StaticInterface {
 
     private long m_startTime;
     private double m_accumulatedTime;
@@ -52,7 +51,7 @@ public class SimTimer implements IUtility, Timer.StaticInterface {
      */
     public void delay(final double seconds) {
     	final double start = simTime;
-    	
+
     	while ((simTime - start) < seconds) {
     		synchronized(time_notifier) {
     			try {
@@ -104,7 +103,7 @@ public class SimTimer implements IUtility, Timer.StaticInterface {
 	    private long getMsClock() {
 	        return (long) (simTime * 1e3);
 	    }
-	
+
 	    /**
 	     * Get the current time from the timer. If the clock is running it is derived from
 	     * the current system clock the start time stored in the timer class. If the clock
@@ -119,7 +118,7 @@ public class SimTimer implements IUtility, Timer.StaticInterface {
 	            return m_accumulatedTime;
 	        }
 	    }
-	
+
 	    /**
 	     * Reset the timer by setting the time to 0.
 	     * Make the timer startTime the current time so new requests will be relative now
@@ -128,7 +127,7 @@ public class SimTimer implements IUtility, Timer.StaticInterface {
 	        m_accumulatedTime = 0;
 	        m_startTime = getMsClock();
 	    }
-	
+
 	    /**
 	     * Start the timer running.
 	     * Just set the running flag to true indicating that all time requests should be
@@ -138,7 +137,7 @@ public class SimTimer implements IUtility, Timer.StaticInterface {
 	        m_startTime = getMsClock();
 	        m_running = true;
 	    }
-	
+
 	    /**
 	     * Stop the timer.
 	     * This computes the time as of now and clears the running flag, causing all

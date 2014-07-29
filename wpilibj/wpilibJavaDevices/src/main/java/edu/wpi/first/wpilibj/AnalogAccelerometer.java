@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tReso
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.parsing.ISensor;
 import edu.wpi.first.wpilibj.tables.ITable;
 
 
@@ -21,7 +20,7 @@ import edu.wpi.first.wpilibj.tables.ITable;
  * multiple axis and can be treated as multiple devices. Each is calibrated by finding
  * the center value over a period of time.
  */
-public class AnalogAccelerometer extends SensorBase implements PIDSource, ISensor, LiveWindowSendable {
+public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWindowSendable {
 
     private AnalogInput m_analogChannel;
     private double m_voltsPerG = 1.0;

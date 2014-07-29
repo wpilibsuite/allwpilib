@@ -14,12 +14,11 @@ import edu.wpi.first.wpilibj.communication.FRCCommonControlData;
 import edu.wpi.first.wpilibj.communication.FRCCommonControlMasks;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.parsing.IInputOutput;
 
 /**
  * Provide access to the network communication data to / from the Driver Station.
  */
-public class DriverStation implements IInputOutput, RobotState.Interface {
+public class DriverStation implements RobotState.Interface {
 
     /**
      * The size of the user status data
@@ -135,10 +134,10 @@ public class DriverStation implements IInputOutput, RobotState.Interface {
         //m_batteryChannel = new AnalogChannel(kBatterySlot, kBatteryChannel);
 
         m_packetDataAvailableSem = HALUtil.initializeMutexNormal();
-        
+
         // set the byte order
         m_packetDataAvailableSem.order(ByteOrder.LITTLE_ENDIAN);
-        
+
         FRCNetworkCommunicationsLibrary.setNewDataSem(m_packetDataAvailableSem);
 
         m_thread = new Thread(new DriverStationTask(this), "FRCDriverStation");

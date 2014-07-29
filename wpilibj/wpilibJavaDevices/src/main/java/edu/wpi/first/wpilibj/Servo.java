@@ -10,7 +10,6 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.parsing.IDevice;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 
@@ -20,7 +19,7 @@ import edu.wpi.first.wpilibj.tables.ITableListener;
  * The range parameters default to the appropriate values for the Hitec HS-322HD servo provided
  * in the FIRST Kit of Parts in 2008.
  */
-public class Servo extends PWM implements IDevice {
+public class Servo extends PWM {
 
     private static final double kMaxServoAngle = 180.0;
     private static final double kMinServoAngle = 0.0;

@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.hal.DIOJNI;
 import edu.wpi.first.wpilibj.hal.PWMJNI;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.parsing.IInputOutput;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 
@@ -29,8 +28,7 @@ import edu.wpi.first.wpilibj.tables.ITableListener;
  * devices that are implemented elsewhere will automatically allocate digital
  * inputs and outputs as required.
  */
-public class DigitalOutput extends DigitalSource implements IInputOutput,
-		LiveWindowSendable {
+public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
 
 	private ByteBuffer m_pwmGenerator;
 

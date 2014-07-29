@@ -13,7 +13,6 @@ import java.nio.IntBuffer;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
-import edu.wpi.first.wpilibj.parsing.IInputOutput;
 
 /**
  * Provide access to "LCD" on the Driver Station.
@@ -22,7 +21,7 @@ import edu.wpi.first.wpilibj.parsing.IInputOutput;
  * Buffer the printed data locally and then send it
  * when UpdateLCD is called.
  */
-public class DriverStationLCD extends SensorBase implements IInputOutput {
+public class DriverStationLCD extends SensorBase {
 
     private static DriverStationLCD m_instance;
     /**

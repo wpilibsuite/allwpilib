@@ -10,7 +10,6 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.parsing.ISensor;
 
 /**
  * Alias for counter class.
@@ -18,7 +17,7 @@ import edu.wpi.first.wpilibj.parsing.ISensor;
  * the gear tooth sensor, but in future versions we might implement the necessary timing in the
  * FPGA to sense direction.
  */
-public class GearTooth extends Counter implements ISensor {
+public class GearTooth extends Counter {
 
     private static final double kGearToothThreshold = 55e-6;
 

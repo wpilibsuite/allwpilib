@@ -10,13 +10,12 @@ import java.util.Stack;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
-import edu.wpi.first.wpilibj.parsing.IInputOutput;
 
 /**
  * Pack data into the "user data" field that gets sent to the dashboard laptop
  * via the driver station.
  */
-public class Dashboard  implements IDashboard, IInputOutput {
+public class Dashboard  implements IDashboard {
 
     protected class MemAccess {
 

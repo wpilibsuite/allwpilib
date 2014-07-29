@@ -10,7 +10,6 @@ package edu.wpi.first.wpilibj.internal;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Utility;
-import edu.wpi.first.wpilibj.parsing.IUtility;
 
 /**
  * Timer objects measure accumulated time in milliseconds.
@@ -19,7 +18,7 @@ import edu.wpi.first.wpilibj.parsing.IUtility;
  * value. The implementation simply records the time when started and subtracts the current time
  * whenever the value is requested.
  */
-public class HardwareTimer implements IUtility, Timer.StaticInterface {
+public class HardwareTimer implements Timer.StaticInterface {
     /**
      * Pause the thread for a specified time. Pause the execution of the
      * thread for a specified period of time given in seconds. Motors will
@@ -62,7 +61,7 @@ public class HardwareTimer implements IUtility, Timer.StaticInterface {
         private long m_startTime;
         private double m_accumulatedTime;
         private boolean m_running;
-        
+
 	    /**
 	     * Create a new timer object.
 	     * Create a new timer object and reset the time to zero. The timer is initially not running and
@@ -71,11 +70,11 @@ public class HardwareTimer implements IUtility, Timer.StaticInterface {
 	    public TimerImpl() {
 	        reset();
 	    }
-	    
+
 	    private long getMsClock() {
 	    	return Utility.getFPGATime() / 1000;
 	    }
-	
+
 	    /**
 	     * Get the current time from the timer. If the clock is running it is derived from
 	     * the current system clock the start time stored in the timer class. If the clock
@@ -90,7 +89,7 @@ public class HardwareTimer implements IUtility, Timer.StaticInterface {
 	            return m_accumulatedTime;
 	        }
 	    }
-	
+
 	    /**
 	     * Reset the timer by setting the time to 0.
 	     * Make the timer startTime the current time so new requests will be relative now
@@ -99,7 +98,7 @@ public class HardwareTimer implements IUtility, Timer.StaticInterface {
 	        m_accumulatedTime = 0;
 	        m_startTime = getMsClock();
 	    }
-	
+
 	    /**
 	     * Start the timer running.
 	     * Just set the running flag to true indicating that all time requests should be
@@ -109,7 +108,7 @@ public class HardwareTimer implements IUtility, Timer.StaticInterface {
 	        m_startTime = getMsClock();
 	        m_running = true;
 	    }
-	
+
 	    /**
 	     * Stop the timer.
 	     * This computes the time as of now and clears the running flag, causing all

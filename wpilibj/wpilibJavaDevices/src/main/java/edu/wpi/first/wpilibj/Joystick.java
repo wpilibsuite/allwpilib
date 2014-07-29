@@ -8,7 +8,6 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
-import edu.wpi.first.wpilibj.parsing.IInputOutput;
 
 /**
  * Handle input from standard Joysticks connected to the Driver Station.
@@ -16,7 +15,7 @@ import edu.wpi.first.wpilibj.parsing.IInputOutput;
  * the most recent value is returned. There is a single class instance for each joystick and the mapping
  * of ports to hardware buttons depends on the code in the driver station.
  */
-public class Joystick extends GenericHID implements IInputOutput {
+public class Joystick extends GenericHID {
 
     static final byte kDefaultXAxis = 1;
     static final byte kDefaultYAxis = 2;
