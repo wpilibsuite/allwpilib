@@ -161,14 +161,14 @@ public abstract class RobotBase {
      */
     public static void main(String args[]) {
         boolean errorOnExit = false;
-        
+
+        FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationReserve();
+        FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
+
         // Set some implementations so that the static methods work properly
         Timer.SetImplementation(new HardwareTimer());
         HLUsageReporting.SetImplementation(new HardwareHLUsageReporting());
         RobotState.SetImplementation(DriverStation.getInstance());
-
-        FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationReserve();
-        FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
 
         UsageReporting.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
 
