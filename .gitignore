@@ -11,6 +11,7 @@ bin/
 .cproject
 .settings/
 .classpath
+**/dependency-reduced-pom.xml
 
 #Java File extentions
 *.class
