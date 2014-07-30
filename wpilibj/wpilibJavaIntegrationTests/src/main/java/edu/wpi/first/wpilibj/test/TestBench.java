@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture;
@@ -55,8 +56,9 @@ public final class TestBench {
 
 	/* PowerDistributionPanel channels */
 	public static final int kJaguarPDPChannel = 6;
-	public static final int kVictorPDPChannel = 10;
+	public static final int kVictorPDPChannel = 8;
 	public static final int kTalonPDPChannel = 11;
+	public static final int kCANJaguarPDPChannel = 5;
 	
 	/* CAN ASSOICATED CHANNELS */
 	public static final int kCANRelayPowerCycler = 1;
@@ -102,6 +104,10 @@ public final class TestBench {
 			protected DigitalInput giveDigitalInputB() {
 				return new DigitalInput(1);
 			}
+			@Override
+			public int getPDPChannel() {
+				return kTalonPDPChannel;
+			}
 		};
 		return talonPair;
 	}
@@ -129,6 +135,10 @@ public final class TestBench {
 			protected DigitalInput giveDigitalInputB() {
 				return new DigitalInput(3);
 			}
+			@Override
+			public int getPDPChannel() {
+				return kVictorPDPChannel;
+			}
 		};
 		return vicPair;
 	}
@@ -154,6 +164,10 @@ public final class TestBench {
 			@Override
 			protected DigitalInput giveDigitalInputB() {
 				return new DigitalInput(5);
+			}
+			@Override
+			public int getPDPChannel() {
+				return kJaguarPDPChannel;
 			}
 		};
 		return jagPair;
@@ -191,6 +205,11 @@ public final class TestBench {
 		protected Relay givePoweCycleRelay() {
 			return new Relay(kCANRelayPowerCycler);
 		}
+		
+		@Override
+		public int getPDPChannel() {
+			return kCANJaguarPDPChannel;
+		}
 	}
 
 	/**
@@ -215,6 +234,7 @@ public final class TestBench {
 		Gyro gyro = new Gyro(0);
 		gyro.setSensitivity(.007); // If a different gyroscope is used this
 									// value will be different
+		Timer.delay(1);
 
 		Servo tilt = new Servo(9);
 		Servo pan = new Servo(8);
