@@ -56,7 +56,6 @@ protected:
  */
 TEST_F(CounterTest, CountTalon) {
   Reset();
-  m_talonCounter->Start();
   /* Run the motor forward and determine if the counter is counting. */
   m_talon->Set(1.0f);
   Wait(0.5);
@@ -72,7 +71,6 @@ TEST_F(CounterTest, CountTalon) {
 
 TEST_F(CounterTest, CountVictor) {
   Reset();
-  m_victorCounter->Start();
   /* Run the motor forward and determine if the counter is counting. */
   m_victor->Set(1.0f);
   Wait(0.5);
@@ -88,7 +86,6 @@ TEST_F(CounterTest, CountVictor) {
 
 TEST_F(CounterTest, CountJaguar) {
   Reset();
-  m_jaguarCounter->Start();
   /* Run the motor forward and determine if the counter is counting. */
   m_jaguar->Set(1.0f);
   Wait(0.5);
@@ -108,7 +105,6 @@ TEST_F(CounterTest, CountJaguar) {
  */
 TEST_F(CounterTest, TalonGetStopped) {
   Reset();
-  m_talonCounter->Start();
   /* Set the Max Period of the counter and run the motor */
   m_talonCounter->SetMaxPeriod(kMaxPeriod);
   m_talon->Set(1.0f);
@@ -124,7 +120,6 @@ TEST_F(CounterTest, TalonGetStopped) {
 
 TEST_F(CounterTest, VictorGetStopped) {
   Reset();
-  m_victorCounter->Start();
   /* Set the Max Period of the counter and run the motor */
   m_victorCounter->SetMaxPeriod(kMaxPeriod);
   m_victor->Set(1.0f);
@@ -140,7 +135,6 @@ TEST_F(CounterTest, VictorGetStopped) {
 
 TEST_F(CounterTest, JaguarGetStopped) {
   Reset();
-  m_jaguarCounter->Start();
   /* Set the Max Period of the counter and run the motor */
   m_jaguarCounter->SetMaxPeriod(kMaxPeriod);
   m_jaguar->Set(1.0f);

@@ -64,7 +64,6 @@ protected:
 	void Reset() {
 		m_speedController->Set(0.0f);
 		m_encoder->Reset();
-		m_encoder->Start();
 	}
 };
 

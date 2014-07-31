@@ -70,7 +70,6 @@ public class FakeCounterFixture implements ITestFixture {
 	 */
 	@Override
 	public boolean setup() {
-		counter.start();
 		return true;
 		
 	}

@@ -71,7 +71,6 @@ void Ultrasonic::Initialize()
 	m_counter->SetMaxPeriod(1.0);
 	m_counter->SetSemiPeriodMode(true);
 	m_counter->Reset();
-	m_counter->Start();
 	m_enabled = true; // make it available for round robin scheduling
 	SetAutomaticMode(originalMode);
 

@@ -12,6 +12,9 @@
 /**
  * Common initialization code for Encoders.
  * This code allocates resources for Encoders and is common to all constructors.
+ *
+ * The counter will start counting immediately.
+ *
  * @param reverseDirection If true, counts down instead of up (this is all relative)
  * @param encodingType either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is
  * selected, then an encoder FPGA object is used and the returned counts will be 4x the encoder
@@ -22,8 +25,8 @@
 void Encoder::InitEncoder(int channelA, int channelB, bool reverseDirection, EncodingType encodingType)
 {
 	m_table = NULL;
-    this->channelA = channelA;
-    this->channelB = channelB;
+	this->channelA = channelA;
+	this->channelB = channelB;
 	m_encodingType = encodingType;
 
 	int32_t index = 0;
@@ -32,22 +35,26 @@ void Encoder::InitEncoder(int channelA, int channelB, bool reverseDirection, Enc
 
 	LiveWindow::GetInstance()->AddSensor("Encoder", channelA, this);
 
-    if (channelB < channelA) { // Swap ports
-        int channel = channelB;
-        channelB = channelA;
-        channelA = channel;
-        m_reverseDirection = !reverseDirection;
-    } else {
-        m_reverseDirection = reverseDirection;
-    }
-    char buffer[50];
-    int n = sprintf(buffer, "dio/%d/%d", channelA, channelB);
-    impl = new SimEncoder(buffer);
+	if (channelB < channelA) { // Swap ports
+		int channel = channelB;
+		channelB = channelA;
+		channelA = channel;
+		m_reverseDirection = !reverseDirection;
+	} else {
+		m_reverseDirection = reverseDirection;
+	}
+	char buffer[50];
+	int n = sprintf(buffer, "dio/%d/%d", channelA, channelB);
+	impl = new SimEncoder(buffer);
+	impl->Start();
 }
 
 /**
  * Encoder constructor.
  * Construct a Encoder given a and b channels.
+ *
+ * The counter will start counting immediately.
+ *
  * @param aChannel The a channel digital input channel.
  * @param bChannel The b channel digital input channel.
  * @param reverseDirection represents the orientation of the encoder and inverts the output values
@@ -68,6 +75,9 @@ Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection, En
  * Construct a Encoder given a and b channels as digital inputs. This is used in the case
  * where the digital inputs are shared. The Encoder class will not allocate the digital inputs
  * and assume that they already are counted.
+ *
+ * The counter will start counting immediately.
+ *
  * @param aSource The source that should be used for the a channel.
  * @param bSource the source that should be used for the b channel.
  * @param reverseDirection represents the orientation of the encoder and inverts the output values
@@ -97,6 +107,9 @@ Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection, En
  * Construct a Encoder given a and b channels as digital inputs. This is used in the case
  * where the digital inputs are shared. The Encoder class will not allocate the digital inputs
  * and assume that they already are counted.
+ *
+ * The counter will start counting immediately.
+ *
  * @param aSource The source that should be used for the a channel.
  * @param bSource the source that should be used for the b channel.
  * @param reverseDirection represents the orientation of the encoder and inverts the output values
@@ -125,23 +138,6 @@ Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection, En
 Encoder::~Encoder()
 {
 
-}
-
-/**
- * Start the Encoder.
- * Starts counting pulses on the Encoder device.
- */
-void Encoder::Start()
-{
-    impl->Start();
-}
-
-/**
- * Stops counting pulses on the Encoder device. The value is not changed.
- */
-void Encoder::Stop()
-{
-    impl->Stop();
 }
 
 /**

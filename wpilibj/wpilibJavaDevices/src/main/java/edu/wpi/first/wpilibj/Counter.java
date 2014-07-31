@@ -24,6 +24,9 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
  * general purpose class for counting repetitive events. It can return the
  * number of counts, the period of the most recent cycle, and detect when the
  * signal being counted has stopped by supplying a maximum cycle time.
+ *
+ * All counters will immediately start counting - reset() them if you need them
+ * to be zeroed before use.
  */
 public class Counter extends SensorBase implements CounterBase,
 		LiveWindowSendable, PIDSource {
@@ -91,12 +94,19 @@ public class Counter extends SensorBase implements CounterBase,
 
 		UsageReporting.report(tResourceType.kResourceType_Counter, m_index,
 				mode.value);
+
+		status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		CounterJNI.startCounter(m_counter, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/**
 	 * Create an instance of a counter where no sources are selected. Then they
 	 * all must be selected by calling functions to specify the upsource and the
 	 * downsource independently.
+	 *
+	 * The counter will start counting immediately.
 	 */
 	public Counter() {
 		initCounter(Mode.kTwoPulse);
@@ -106,6 +116,8 @@ public class Counter extends SensorBase implements CounterBase,
 	 * Create an instance of a counter from a Digital Input. This is used if an
 	 * existing digital input is to be shared by multiple other objects such as
 	 * encoders.
+	 *
+	 * The counter will start counting immediately.
 	 *
 	 * @param source
 	 *            the digital source to count
@@ -121,6 +133,8 @@ public class Counter extends SensorBase implements CounterBase,
 	 * Create an instance of a Counter object. Create an up-Counter instance
 	 * given a channel.
 	 *
+	 * The counter will start counting immediately.
+	 *
 	 * @param channel
 	 *            the digital input channel to count
 	 */
@@ -133,6 +147,8 @@ public class Counter extends SensorBase implements CounterBase,
 	 * Create an instance of a Counter object. Create an instance of a simple
 	 * up-Counter given an analog trigger. Use the trigger state output from the
 	 * analog trigger.
+	 *
+	 * The counter will start counting immediately.
 	 *
 	 * @param encodingType
 	 *            which edges to count
@@ -174,6 +190,8 @@ public class Counter extends SensorBase implements CounterBase,
 	 * Create an instance of a Counter object. Create an instance of a simple
 	 * up-Counter given an analog trigger. Use the trigger state output from the
 	 * analog trigger.
+	 *
+	 * The counter will start counting immediately.
 	 *
 	 * @param trigger
 	 *            the analog trigger to count
@@ -423,18 +441,6 @@ public class Counter extends SensorBase implements CounterBase,
 	}
 
 	/**
-	 * Start the Counter counting. This enables the counter and it starts
-	 * accumulating counts from the associated input channel. The counter value
-	 * is not reset on starting, and still has the previous value.
-	 */
-	public void start() {
-		ByteBuffer status = ByteBuffer.allocateDirect(4);
-		status.order(ByteOrder.LITTLE_ENDIAN);
-		CounterJNI.startCounter(m_counter, status.asIntBuffer());
-		HALUtil.checkStatus(status.asIntBuffer());
-	}
-
-	/**
 	 * Read the current counter value. Read the value at this instant. It may
 	 * still be running, so it reflects the current value. Next time it is read,
 	 * it might have a different value.
@@ -466,17 +472,6 @@ public class Counter extends SensorBase implements CounterBase,
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
 		CounterJNI.resetCounter(m_counter, status.asIntBuffer());
-		HALUtil.checkStatus(status.asIntBuffer());
-	}
-
-	/**
-	 * Stop the Counter. Stops the counting but doesn't effect the current
-	 * value.
-	 */
-	public void stop() {
-		ByteBuffer status = ByteBuffer.allocateDirect(4);
-		status.order(ByteOrder.LITTLE_ENDIAN);
-		CounterJNI.stopCounter(m_counter, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
 	}
 

@@ -61,7 +61,6 @@ TEST_F(DIOLoopTest, FakeCounter) {
 	Reset();
 
 	Counter counter(m_input);
-	counter.Start();
 
 	EXPECT_EQ(0, counter.Get()) << "Counter did not initialize to 0.";
 

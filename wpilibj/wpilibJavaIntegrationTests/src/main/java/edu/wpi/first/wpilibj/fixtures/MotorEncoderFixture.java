@@ -76,15 +76,8 @@ public abstract class MotorEncoderFixture <T extends SpeedController> implements
 				encoder = new Encoder(aSource, bSource);
 				counters[0] = new Counter(aSource);
 				counters[1] = new Counter(bSource);
-				for(Counter c: counters){
-					c.start();
-				}
 				logger.fine("Creating the speed controller!");
 				motor = giveSpeedController(); //CANJaguar throws an exception if it doesn't get the message
-				
-					
-				
-				
 			}
 		}
 	}
@@ -92,7 +85,6 @@ public abstract class MotorEncoderFixture <T extends SpeedController> implements
 	@Override
 	public boolean setup() {
 		initialize();
-		encoder.start();
 		return true;
 	}
 
