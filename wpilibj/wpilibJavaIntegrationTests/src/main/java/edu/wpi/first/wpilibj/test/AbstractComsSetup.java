@@ -16,12 +16,8 @@ import org.junit.runner.Description;
 import org.junit.runners.model.MultipleFailureException;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.HLUsageReporting;
-import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
-import edu.wpi.first.wpilibj.internal.HardwareHLUsageReporting;
-import edu.wpi.first.wpilibj.internal.HardwareTimer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
@@ -47,15 +43,8 @@ public abstract class AbstractComsSetup {
 	static{
 		if (!initialized) {
 			// Set some implementations so that the static methods work properly
-			Timer.SetImplementation(new HardwareTimer());
-			HLUsageReporting.SetImplementation(new HardwareHLUsageReporting());
-			RobotState.SetImplementation(DriverStation.getInstance());
-
+			RobotBase.initializeHardwareConfiguration();
 			
-			// Start up the network communications
-			FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationReserve();
-			FRCNetworkCommunicationsLibrary
-					.FRCNetworkCommunicationObserveUserProgramStarting();
 			LiveWindow.setEnabled(false);
 			TestBench.out().println("Started coms");
 
@@ -71,14 +60,14 @@ public abstract class AbstractComsSetup {
 				TestBench.out().print("\rWaiting for enable: " + i++);
 			}
 			TestBench.out().println();
-			
+
 			// Ready to go!
 			initialized = true;
 			TestBench.out().println("Running!");
 		}
 	}
-	
-	
+
+
 	protected abstract Logger getClassLogger();
 	
 	/** This causes a stack trace to be printed as the test is running as well as at the end */
