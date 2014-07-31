@@ -6,56 +6,43 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.logging.Logger;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
 
-public class TiltPanCameraTest extends AbstractComsSetup {
+public class GyroTest extends AbstractComsSetup {
 	
-	private static final Logger logger = Logger.getLogger(TiltPanCameraTest.class.getName());
+	private static final Logger logger = Logger.getLogger(GyroTest.class.getName());
 	
-	public static final double TEST_ANGLE = 185.0;
+	public static final double TEST_ANGLE = 180.0;
 	
-	private static TiltPanCameraFixture tpcam;
+	private TiltPanCameraFixture tpcam;
 
 	
+	@Override
 	protected Logger getClassLogger(){
 		return logger;
 	}
 	
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		logger.fine("Setup: TiltPan camera");
-		tpcam = TestBench.getInstance().getTiltPanCam();
-		
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-		tpcam.teardown();
-	}
-
 	@Before
 	public void setUp() throws Exception {
-		boolean setupSucsess = tpcam.setup();
-		assertTrue(tpcam.getSetupError(), setupSucsess);
-		double resetTime = tpcam.getLastResetTimeGyro();
-		assertEquals("The Gyroscoe reset time was " + resetTime + " seconds", 0, resetTime, .03);
+		logger.fine("Setup: TiltPan camera");
+		tpcam = TestBench.getInstance().getTiltPanCam();
+		tpcam.setup();
 	}
 
 	@After
 	public void tearDown() throws Exception {
 		tpcam.reset();
+		tpcam.teardown();
 	}
 	
 	@Test
@@ -69,11 +56,11 @@ public class TiltPanCameraTest extends AbstractComsSetup {
 	 */
 	@Test
 	public void testGyroAngle() {
-		for(double i = 0; i < 1.0; i+=.01){
+		for(double i = 0; i < 1.0; i+=.005){
 			//System.out.println("i: " + i);
 			//System.out.println("Angle " + tpcam.getGyro().getAngle());
 			tpcam.getPan().set(i);
-			Timer.delay(.05);
+			Timer.delay(.025);
 		}
 		//Timer.delay(TiltPanCameraFixture.RESET_TIME);
 		double angle = tpcam.getGyro().getAngle();
@@ -81,7 +68,6 @@ public class TiltPanCameraTest extends AbstractComsSetup {
 		double difference = TEST_ANGLE - angle;
 		
 		double diff = Math.abs(difference);
-		
 		
 		assertEquals(errorMessage(diff, TEST_ANGLE), TEST_ANGLE, angle, 8);
 	}
@@ -92,7 +78,7 @@ public class TiltPanCameraTest extends AbstractComsSetup {
 		assertEquals(errorMessage(angle, 0), 0, angle, .5);
 		Timer.delay(5);
 		angle = tpcam.getGyro().getAngle();
-		assertEquals(errorMessage(angle, 0), 0, angle, .5);
+		assertEquals("After 5 seconds " + errorMessage(angle, 0), 0, angle, 1);
 	}
 	
 	private String errorMessage(double difference, double target){

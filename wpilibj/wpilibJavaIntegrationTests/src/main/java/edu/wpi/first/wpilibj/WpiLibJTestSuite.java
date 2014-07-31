@@ -32,7 +32,7 @@ import edu.wpi.first.wpilibj.test.AbstractTestSuite;
 				PrefrencesTest.class,
 				RelayCrossConnectTest.class,
 				SampleTest.class,
-				TiltPanCameraTest.class,
+				GyroTest.class,
 				TimerTest.class
 				})
 public class WpiLibJTestSuite extends AbstractTestSuite {

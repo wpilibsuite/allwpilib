@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Talon;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture;
@@ -52,6 +51,12 @@ public final class TestBench {
 	public static final int kTalonChannel = 10;
 	public static final int kVictorChannel = 1;
 	public static final int kJaguarChannel = 2;
+	
+	/*TiltPanCamera Channels */
+	public static final int kGyroChannel = 0;
+	public static final double kGyroSensitivity = 0.0134897058674;
+	public static final int kTiltServoChannel = 9;
+	public static final int kPanServoChannel = 8;
 	
 
 	/* PowerDistributionPanel channels */
@@ -231,15 +236,24 @@ public final class TestBench {
 	 * @return a freshly allocated Servo's and a freshly allocated Gyroscope
 	 */
 	public TiltPanCameraFixture getTiltPanCam() {
-		Gyro gyro = new Gyro(0);
-		gyro.setSensitivity(.007); // If a different gyroscope is used this
-									// value will be different
-		Timer.delay(1);
+		TiltPanCameraFixture tpcam = new TiltPanCameraFixture(){
+			@Override
+			protected Gyro giveGyro() {
+				Gyro gyro = new Gyro(kGyroChannel);
+				gyro.setSensitivity(kGyroSensitivity);
+				return gyro;
+			}
 
-		Servo tilt = new Servo(9);
-		Servo pan = new Servo(8);
+			@Override
+			protected Servo giveTilt() {
+				return new Servo(kTiltServoChannel);
+			}
 
-		TiltPanCameraFixture tpcam = new TiltPanCameraFixture(tilt, pan, gyro);
+			@Override
+			protected Servo givePan() {
+				return new Servo(kPanServoChannel);
+			}
+		};
 
 		return tpcam;
 	}
