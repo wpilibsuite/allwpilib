@@ -24,12 +24,12 @@ import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
 @RunWith(Parameterized.class)
-public class AccelerometerTest extends AbstractComsSetup {
+public class BuiltInAccelerometerTest extends AbstractComsSetup {
 	private static final Logger logger = Logger.getLogger(PIDTest.class.getName());
 	private static final double kAccelerationTolerance = 0.1;
 	private BuiltInAccelerometer m_accelerometer;
 
-	public AccelerometerTest(Accelerometer.Range range) {
+	public BuiltInAccelerometerTest(Accelerometer.Range range) {
 		m_accelerometer = new BuiltInAccelerometer(range);
 	}
 

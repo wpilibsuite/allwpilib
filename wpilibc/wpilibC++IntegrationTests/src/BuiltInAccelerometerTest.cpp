@@ -13,7 +13,7 @@ static constexpr double kAccelerationTolerance = 0.1;
  * There's not much we can automatically test with the on-board accelerometer,
  * but checking for gravity is probably good enough to tell that it's working.
  */
-TEST(AccelerometerTest, Accelerometer) {
+TEST(BuiltInAccelerometerTest, Accelerometer) {
 	BuiltInAccelerometer accelerometer;
 
 	/* The testbench sometimes shakes a little from a previous test.  Give it
