@@ -7,6 +7,7 @@
 #include "AnalogInput.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
+#include "Timer.h"
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 
@@ -284,6 +285,16 @@ void AnalogInput::ResetAccumulator()
 	int32_t status = 0;
 	resetAccumulator(m_port, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+
+	if(!StatusIsFatal())
+	{
+		// Wait until the next sample, so the next call to GetAccumulator*()
+		// won't have old values.
+		const float sampleTime = 1.0f / GetSampleRate();
+		const float overSamples = 1 << GetOversampleBits();
+		const float averageSamples = 1 << GetAverageBits();
+		Wait(sampleTime * overSamples * averageSamples);
+	}
 }
 
 /**

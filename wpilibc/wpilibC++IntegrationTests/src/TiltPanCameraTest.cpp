@@ -9,7 +9,7 @@
 #include "gtest/gtest.h"
 #include "TestBench.h"
 
-static constexpr double kServoResetTime = 1.0;
+static constexpr double kServoResetTime = 2.0;
 
 static constexpr double kTestAngle = 180.0;
 
@@ -44,6 +44,13 @@ protected:
 		m_tilt = new Servo(TestBench::kCameraTiltChannel);
 		m_pan = new Servo(TestBench::kCameraPanChannel);
 		m_spiAccel = new ADXL345_SPI(SPI::kOnboardCS0);
+
+		m_tilt->SetAngle(90.0f);
+		m_pan->SetAngle(0.0f);
+
+		Wait(kServoResetTime);
+
+		m_gyro->Reset();
 	}
 
 	virtual void TearDown() {
@@ -56,14 +63,16 @@ protected:
 Gyro *TiltPanCameraTest::m_gyro = 0;
 
 /**
+ * Test if the gyro angle defaults to 0 immediately after being reset.
+ */
+TEST_F(TiltPanCameraTest, DefaultGyroAngle) {
+	EXPECT_NEAR(0.0f, m_gyro->GetAngle(), 0.01f);
+}
+
+/**
  * Test if the servo turns 180 degrees and the gyroscope measures this angle
  */
 TEST_F(TiltPanCameraTest, GyroAngle) {
-	m_pan->Set(0.0f);
-	Wait(kServoResetTime);
-
-	m_gyro->Reset();
-
 	for(int i = 0; i < 180; i++) {
 		m_pan->SetAngle(i);
 

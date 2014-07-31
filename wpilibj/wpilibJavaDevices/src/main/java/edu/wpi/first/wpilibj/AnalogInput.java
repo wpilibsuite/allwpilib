@@ -310,6 +310,14 @@ public class AnalogInput extends SensorBase implements PIDSource,
 		status.order(ByteOrder.LITTLE_ENDIAN);
 		AnalogJNI.resetAccumulator(m_port, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
+
+		// Wait until the next sample, so the next call to getAccumulator*()
+		// won't have old values.
+		final double sampleTime = 1.0 / getGlobalSampleRate();
+		final double overSamples = 1 << getOversampleBits();
+		final double averageSamples = 1 << getAverageBits();
+		Timer.delay(sampleTime * overSamples * averageSamples);
+
 	}
 
 	/**
