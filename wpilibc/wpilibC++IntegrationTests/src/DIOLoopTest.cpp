@@ -43,12 +43,12 @@ TEST_F(DIOLoopTest, Loop) {
 	Reset();
 
 	m_output->Set(false);
-  Wait(kDelayTime);
+	Wait(kDelayTime);
 	EXPECT_FALSE(m_input->Get()) << "The digital output was turned off, but "
 		<< "the digital input is on.";
 
 	m_output->Set(true);
-  Wait(kDelayTime);
+	Wait(kDelayTime);
 	EXPECT_TRUE(m_input->Get()) << "The digital output was turned on, but "
 		<< "the digital input is off.";
 }
@@ -69,8 +69,29 @@ TEST_F(DIOLoopTest, FakeCounter) {
 		m_output->Set(true);
 		m_output->Set(false);
 	}
-  
-  Wait(kDelayTime);
+
+	Wait(kDelayTime);
 
 	EXPECT_EQ(100, counter.Get()) << "Counter did not count up to 100.";
+}
+
+void InterruptHandler(uint32_t interruptAssertedMask, void *param) {
+	*(int *)param = 12345;
+}
+
+TEST_F(DIOLoopTest, AsynchronusInterruptWorks) {
+	int param = 0;
+
+	// Given an interrupt handler that sets an int to 12345
+	m_input->RequestInterrupts(InterruptHandler, &param);
+	m_input->EnableInterrupts();
+
+	// If the voltage rises
+	m_output->Set(false);
+	m_output->Set(true);
+	m_input->CancelInterrupts();
+
+	// Then the int should be 12345
+	Wait(kDelayTime);
+	EXPECT_EQ(12345, param) << "The interrupt did not run.";
 }
