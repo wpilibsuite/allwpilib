@@ -26,11 +26,11 @@ import edu.wpi.first.wpilibj.test.TestBench;
  */
 public class AnalogCrossConnectTest extends AbstractComsSetup {
 	private static final Logger logger = Logger.getLogger(AnalogCrossConnectTest.class.getName());
-	
+
 	private static AnalogCrossConnectFixture analogIO;
-	
-	static final double kDelayTime = 0.05;
-	
+
+	static final double kDelayTime = 0.01;
+
 	@Override
 	protected Logger getClassLogger() {
 		return logger;
@@ -72,11 +72,82 @@ public class AnalogCrossConnectTest extends AbstractComsSetup {
 	public void testAnalogOuput() {
 		for(int i = 0; i < 50; i++) {
 			analogIO.getOutput().setVoltage(i / 10.0f);
-	        Timer.delay(kDelayTime);
-	        assertEquals(analogIO.getOutput().getVoltage(), analogIO.getInput().getVoltage(), 0.01);
+			Timer.delay(kDelayTime);
+			assertEquals(analogIO.getOutput().getVoltage(), analogIO.getInput().getVoltage(), 0.01);
 		}
 	}
-	
+
+	@Test
+	public void testAnalogTriggerBelowWindow() {
+		// Given
+		AnalogTrigger trigger = new AnalogTrigger(analogIO.getInput());
+		trigger.setLimitsVoltage(2.0f, 3.0f);
+
+		// When the output voltage is than less the lower limit
+		analogIO.getOutput().setVoltage(1.0f);
+		Timer.delay(kDelayTime);
+
+		// Then the analog trigger is not in the window and the trigger state is off
+		assertFalse("Analog trigger is in the window (2V, 3V)", trigger.getInWindow());
+		assertFalse("Analog trigger is on", trigger.getTriggerState());
+
+		trigger.free();
+	}
+
+	@Test
+	public void testAnalogTriggerInWindow() {
+		// Given
+		AnalogTrigger trigger = new AnalogTrigger(analogIO.getInput());
+		trigger.setLimitsVoltage(2.0f, 3.0f);
+
+		// When the output voltage is within the lower and upper limits
+		analogIO.getOutput().setVoltage(2.5f);
+		Timer.delay(kDelayTime);
+
+		// Then the analog trigger is in the window and the trigger state is off
+		assertTrue("Analog trigger is not in the window (2V, 3V)", trigger.getInWindow());
+		assertFalse("Analog trigger is on", trigger.getTriggerState());
+
+		trigger.free();
+	}
+
+	@Test
+	public void testAnalogTriggerAboveWindow() {
+		// Given
+		AnalogTrigger trigger = new AnalogTrigger(analogIO.getInput());
+		trigger.setLimitsVoltage(2.0f, 3.0f);
+
+		// When the output voltage is greater than the upper limit
+		analogIO.getOutput().setVoltage(4.0f);
+		Timer.delay(kDelayTime);
+
+		// Then the analog trigger is not in the window and the trigger state is on
+		assertFalse("Analog trigger is in the window (2V, 3V)", trigger.getInWindow());
+		assertTrue("Analog trigger is not on", trigger.getTriggerState());
+
+		trigger.free();
+	}
+
+	@Test
+	public void testAnalogTriggerCounter() {
+		// Given
+		AnalogTrigger trigger = new AnalogTrigger(analogIO.getInput());
+		trigger.setLimitsVoltage(2.0f, 3.0f);
+
+		Counter counter = new Counter(trigger);
+
+		// When the analog output is turned low and high 50 times
+		for(int i = 0; i < 50; i++) {
+			analogIO.getOutput().setVoltage(1.0);
+			Timer.delay(kDelayTime);
+			analogIO.getOutput().setVoltage(4.0);
+			Timer.delay(kDelayTime);
+		}
+
+		// Then the counter should be at 50
+		assertEquals("Analog trigger counter did not count 50 ticks", 50, counter.get());
+	}
+
 	@Test(expected=RuntimeException.class)
 	public void testRuntimeExceptionOnInvalidAccumulatorPort(){
 		analogIO.getInput().getAccumulatorCount();

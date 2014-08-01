@@ -91,5 +91,5 @@ TEST_F(AnalogLoopTest, AnalogTriggerCounterWorks) {
 	}
 
 	// The counter should be 50
-	EXPECT_EQ(50, counter.Get()) << "Analog trigger counter did not count 100 ticks";
+	EXPECT_EQ(50, counter.Get()) << "Analog trigger counter did not count 50 ticks";
 }

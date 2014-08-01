@@ -50,19 +50,18 @@ public class AnalogTrigger {
 
 	/**
 	 * Initialize an analog trigger from a channel.
-     *
+	 *
 	 * @param channel
 	 *            the port to use for the analog trigger
 	 */
 	protected void initTrigger(final int channel) {
 		ByteBuffer port_pointer = AnalogJNI.getPort((byte) channel);
-		IntBuffer status = IntBuffer.allocate(1);
-		IntBuffer index = IntBuffer.allocate(1);
-		// XXX: Uncomment when analog has been fixed
-		//		m_port = HALLibrary
-		//		.initializeAnalogTrigger(port_pointer, index, status);
-		//HALUtil.checkStatus(status);
-		//m_index = index.get(0);
+		IntBuffer index = ByteBuffer.allocateDirect(4).asIntBuffer();
+		IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
+
+		m_port = AnalogJNI.initializeAnalogTrigger(port_pointer, index, status);
+		HALUtil.checkStatus(status);
+		m_index = index.get(0);
 
 		UsageReporting.report(tResourceType.kResourceType_AnalogTrigger, channel);
 	}
@@ -93,7 +92,7 @@ public class AnalogTrigger {
 	 * Release the resources used by this object
 	 */
 	public void free() {
-		IntBuffer status = IntBuffer.allocate(1);
+		IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
 		AnalogJNI.cleanAnalogTrigger(m_port, status);
 		HALUtil.checkStatus(status);
 		m_port = null;
@@ -113,7 +112,7 @@ public class AnalogTrigger {
 		if (lower > upper) {
 			throw new BoundaryException("Lower bound is greater than upper");
 		}
-		IntBuffer status = IntBuffer.allocate(1);
+		IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
 		AnalogJNI.setAnalogTriggerLimitsRaw(m_port, lower, upper, status);
 		HALUtil.checkStatus(status);
 	}
@@ -132,9 +131,7 @@ public class AnalogTrigger {
 			throw new BoundaryException(
 					"Lower bound is greater than upper bound");
 		}
-		// TODO: This depends on the averaged setting. Only raw values will work
-		// as is.
-		IntBuffer status = IntBuffer.allocate(1);
+		IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
 		AnalogJNI.setAnalogTriggerLimitsVoltage(m_port, (float) lower,
 				(float) upper, status);
 		HALUtil.checkStatus(status);
@@ -149,7 +146,7 @@ public class AnalogTrigger {
 	 *            true to use an averaged value, false otherwise
 	 */
 	public void setAveraged(boolean useAveragedValue) {
-		IntBuffer status = IntBuffer.allocate(1);
+		IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
 		AnalogJNI.setAnalogTriggerAveraged(m_port,
 				(byte) (useAveragedValue ? 1 : 0), status);
 		HALUtil.checkStatus(status);
@@ -165,7 +162,7 @@ public class AnalogTrigger {
 	 *            true to use a filterd value, false otherwise
 	 */
 	public void setFiltered(boolean useFilteredValue) {
-		IntBuffer status = IntBuffer.allocate(1);
+		IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
 		AnalogJNI.setAnalogTriggerFiltered(m_port,
 				(byte) (useFilteredValue ? 1 : 0), status);
 		HALUtil.checkStatus(status);
@@ -188,7 +185,7 @@ public class AnalogTrigger {
 	 * @return The InWindow output of the analog trigger.
 	 */
 	public boolean getInWindow() {
-		IntBuffer status = IntBuffer.allocate(1);
+		IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
 		byte value = AnalogJNI.getAnalogTriggerInWindow(m_port, status);
 		HALUtil.checkStatus(status);
 		return value != 0;
@@ -202,7 +199,7 @@ public class AnalogTrigger {
 	 * @return The TriggerState output of the analog trigger.
 	 */
 	public boolean getTriggerState() {
-		IntBuffer status = IntBuffer.allocate(1);
+		IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
 		byte value = AnalogJNI.getAnalogTriggerTriggerState(m_port, status);
 		HALUtil.checkStatus(status);
 		return value != 0;
