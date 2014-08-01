@@ -13,7 +13,6 @@ import java.nio.ByteOrder;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
-import edu.wpi.first.wpilibj.hal.AnalogJNI;
 import edu.wpi.first.wpilibj.hal.CounterJNI;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
@@ -35,34 +34,28 @@ public class Counter extends SensorBase implements CounterBase,
 	/**
 	 * Mode determines how and what the counter counts
 	 */
-	public static class Mode {
+	public static enum Mode {
+		/**
+		 * mode: two pulse
+		 */
+		kTwoPulse(0),
+		/**
+		 * mode: semi period
+		 */
+		kSemiperiod(1),
+		/**
+		 * mode: pulse length
+		 */
+		kPulseLength(2),
+		/**
+		 * mode: external direction
+		 */
+		kExternalDirection(3);
 
 		/**
 		 * The integer value representing this enumeration
 		 */
 		public final int value;
-		static final int kTwoPulse_val = 0;
-		static final int kSemiperiod_val = 1;
-		static final int kPulseLength_val = 2;
-		static final int kExternalDirection_val = 3;
-		/**
-		 * mode: two pulse
-		 */
-		public static final Mode kTwoPulse = new Mode(kTwoPulse_val);
-		/**
-		 * mode: semi period
-		 */
-		public static final Mode kSemiperiod = new Mode(kSemiperiod_val);
-		/**
-		 * mode: pulse length
-		 */
-		public static final Mode kPulseLength = new Mode(kPulseLength_val);
-		/**
-		 * mode: external direction
-		 */
-		public static final Mode kExternalDirection = new Mode(
-				kExternalDirection_val);
-
 		private Mode(int value) {
 			this.value = value;
 		}
@@ -125,7 +118,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 */
 	public Counter(DigitalSource source) {
 		if (source == null)
-			throw new NullPointerException("Source given was null");
+			throw new NullPointerException("Digital Source given was null");
 		initCounter(Mode.kTwoPulse);
 		setUpSource(source);
 	}
@@ -198,10 +191,14 @@ public class Counter extends SensorBase implements CounterBase,
 	 *            the analog trigger to count
 	 */
 	public Counter(AnalogTrigger trigger) {
+		if( trigger == null){
+			throw new NullPointerException("The Analog Trigger given was null");
+		}
 		initCounter(Mode.kTwoPulse);
 		setUpSource(trigger.createOutput(AnalogTriggerType.STATE));
 	}
 
+	@Override
 	public void free() {
 		setUpdateWhenEmpty(true);
 
@@ -260,6 +257,12 @@ public class Counter extends SensorBase implements CounterBase,
 	 *            The analog trigger output that will trigger the counter.
 	 */
 	public void setUpSource(AnalogTrigger analogTrigger, AnalogTriggerType triggerType) {
+		if (analogTrigger == null){
+			throw new NullPointerException("Analog Trigger given was null");
+		}
+		if (triggerType == null){
+			throw new NullPointerException("Analog Trigger Type given was null");
+		}
 		analogTrigger.createOutput(triggerType);
 		m_allocatedUpSource = true;
 	}
@@ -320,6 +323,10 @@ public class Counter extends SensorBase implements CounterBase,
 	 *            the digital source to count
 	 */
 	public void setDownSource(DigitalSource source) {
+		if(source == null){
+			throw new NullPointerException("The Digital Source given was null");
+		}
+		
 		if (m_downSource != null && m_allocatedDownSource) {
 			m_downSource.free();
 			m_allocatedDownSource = false;
@@ -347,6 +354,13 @@ public class Counter extends SensorBase implements CounterBase,
 	 *            The analog trigger output that will trigger the counter.
 	 */
 	public void setDownSource(AnalogTrigger analogTrigger, AnalogTriggerType triggerType) {
+		if (analogTrigger == null){
+			throw new NullPointerException("Analog Trigger given was null");
+		}
+		if (triggerType == null){
+			throw new NullPointerException("Analog Trigger Type given was null");
+		}
+		
 		setDownSource(analogTrigger.createOutput(triggerType));
 		m_allocatedDownSource = true;
 	}
@@ -446,6 +460,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * still be running, so it reflects the current value. Next time it is read,
 	 * it might have a different value.
 	 */
+	@Override
 	public int get() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
@@ -469,6 +484,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * effect the running state of the counter, just sets the current value to
 	 * zero.
 	 */
+	@Override
 	public void reset() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
@@ -486,6 +502,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 *            The maximum period where the counted device is considered
 	 *            moving in seconds.
 	 */
+	@Override
 	public void setMaxPeriod(double maxPeriod) {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
@@ -527,6 +544,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * @return Returns true if the most recent counter period exceeds the
 	 *         MaxPeriod value set by SetMaxPeriod.
 	 */
+	@Override
 	public boolean getStopped() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
@@ -540,6 +558,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 *
 	 * @return The last direction the counter value changed.
 	 */
+	@Override
 	public boolean getDirection() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
@@ -571,6 +590,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 *
 	 * @returns The period of the last two pulses in units of seconds.
 	 */
+	@Override
 	public double getPeriod() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
@@ -651,10 +671,14 @@ public class Counter extends SensorBase implements CounterBase,
 	 *            An enum to select the parameter.
 	 */
 	public void setPIDSourceParameter(PIDSourceParameter pidSource) {
+		if(pidSource == null){
+			throw new NullPointerException("PID Source Parameter given was null");
+		}
 		BoundaryException.assertWithinBounds(pidSource.value, 0, 1);
 		m_pidSource = pidSource;
 	}
 
+	@Override
 	public double pidGet() {
 		switch (m_pidSource.value) {
 		case PIDSourceParameter.kDistance_val:
@@ -669,6 +693,7 @@ public class Counter extends SensorBase implements CounterBase,
 	/**
 	 * Live Window code, only does anything if live window is activated.
 	 */
+	@Override
 	public String getSmartDashboardType() {
 		return "Counter";
 	}
@@ -678,6 +703,7 @@ public class Counter extends SensorBase implements CounterBase,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void initTable(ITable subtable) {
 		m_table = subtable;
 		updateTable();
@@ -686,6 +712,7 @@ public class Counter extends SensorBase implements CounterBase,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public ITable getTable() {
 		return m_table;
 	}
@@ -693,6 +720,7 @@ public class Counter extends SensorBase implements CounterBase,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void updateTable() {
 		if (m_table != null) {
 			m_table.putNumber("Value", get());
@@ -702,12 +730,14 @@ public class Counter extends SensorBase implements CounterBase,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void startLiveWindowMode() {
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void stopLiveWindowMode() {
 	}
 }

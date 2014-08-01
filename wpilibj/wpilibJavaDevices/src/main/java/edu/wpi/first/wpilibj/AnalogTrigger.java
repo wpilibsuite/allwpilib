@@ -7,18 +7,16 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.IntBuffer;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
-//import com.sun.jna.Pointer;
-
-
-import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.util.BoundaryException;
+//import com.sun.jna.Pointer;
+import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 
 /**
  * Class for creating and configuring Analog Triggers
@@ -87,6 +85,9 @@ public class AnalogTrigger {
 	 *            the AnalogInput to use for the analog trigger
 	 */
 	public AnalogTrigger(AnalogInput channel) {
+		if(channel == null){
+			throw new NullPointerException("The Analog Input given was null");
+		}
 		initTrigger(channel.getChannel());
 	}
 

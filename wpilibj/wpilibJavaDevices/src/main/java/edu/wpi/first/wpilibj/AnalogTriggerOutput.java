@@ -8,7 +8,6 @@
 package edu.wpi.first.wpilibj;
 
 import java.nio.IntBuffer;
-import java.nio.ByteBuffer;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
@@ -64,8 +63,8 @@ public class AnalogTriggerOutput extends DigitalSource {
 
 	}
 
-	private AnalogTrigger m_trigger;
-	private AnalogTriggerType m_outputType;
+	private final AnalogTrigger m_trigger;
+	private final AnalogTriggerType m_outputType;
 
 	/**
 	 * Create an object that represents one of the four outputs from an analog
@@ -82,6 +81,8 @@ public class AnalogTriggerOutput extends DigitalSource {
 	public AnalogTriggerOutput(AnalogTrigger trigger, final AnalogTriggerType outputType) {
 		if (trigger == null)
 			throw new NullPointerException("Analog Trigger given was null");
+		if (outputType == null)
+			throw new NullPointerException("Analog Trigger Type given was null");
 		m_trigger = trigger;
 		m_outputType = outputType;
 
@@ -89,6 +90,7 @@ public class AnalogTriggerOutput extends DigitalSource {
 				trigger.getIndex(), outputType.value);
 	}
 
+	@Override
 	public void free() {
 	}
 
@@ -105,14 +107,17 @@ public class AnalogTriggerOutput extends DigitalSource {
 		return value != 0;
 	}
 
+	@Override
 	public int getChannelForRouting() {
 		return (m_trigger.m_index << 2) + m_outputType.value;
 	}
 
+	@Override
 	public int getModuleForRouting() {
 		return m_trigger.m_index >> 2;
 	}
 
+	@Override
 	public boolean getAnalogTriggerForRouting() {
 		return true;
 	}
