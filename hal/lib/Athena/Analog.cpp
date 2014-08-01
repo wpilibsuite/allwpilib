@@ -186,40 +186,6 @@ float getAnalogSampleRate(int32_t *status) {
 }
 
 /**
- * Set the sample rate on the module.
- *
- * This is a global setting for the module and effects all channels.
- *
- * @param module The module to use
- * @param samplesPerSecond The number of samples per channel per second.
- */
-void setAnalogSampleRateWithModule(uint8_t module, double samplesPerSecond, int32_t *status) {
-  if (checkAnalogModule(module)) {
-	setAnalogSampleRate(samplesPerSecond, status);
-  } else {
-	// XXX: Set error status
-  }
-}
-
-/**
- * Get the current sample rate on the module.
- *
- * This assumes one entry in the scan list.
- * This is a global setting for the module and effects all channels.
- *
- * @param module The module to use
- * @return Sample rate.
- */
-float getAnalogSampleRateWithModule(uint8_t module, int32_t *status) {
-  if (checkAnalogModule(module)) {
-	return getAnalogSampleRate(status);
-  } else {
-	return -1; // XXX: Set error status
-  }
-}
-
-
-/**
  * Set the number of averaging bits.
  *
  * This sets the number of averaging bits. The actual number of averaged samples is 2**bits.
@@ -736,10 +702,6 @@ int getAnalogSampleRateIntHack(int32_t *status) {
   return floatToInt(getAnalogSampleRate(status));
 }
 
-int getAnalogSampleRateWithModuleIntHack(uint8_t module, int32_t *status) {
-  return floatToInt(getAnalogSampleRateWithModuleIntHack(module, status));
-}
-
 int getAnalogVoltageIntHack(void* analog_port_pointer, int32_t *status) {
   return floatToInt(getAnalogVoltage(analog_port_pointer, status));
 }
@@ -752,10 +714,6 @@ int getAnalogAverageVoltageIntHack(void* analog_port_pointer, int32_t *status) {
 // Doubles
 void setAnalogSampleRateIntHack(int samplesPerSecond, int32_t *status) {
   setAnalogSampleRate(intToFloat(samplesPerSecond), status);
-}
-
-void setAnalogSampleRateWithModuleIntHack(uint8_t module, int samplesPerSecond, int32_t *status) {
-  setAnalogSampleRateWithModule(module, intToFloat(samplesPerSecond), status);
 }
 
 int32_t getAnalogVoltsToValueIntHack(void* analog_port_pointer, int voltage, int32_t *status) {

@@ -121,21 +121,6 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_getDIODirection
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
- * Method:    checkDigitalModule
- * Signature: (B)B
- */
-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_checkDigitalModule
-  (JNIEnv *, jclass, jbyte value)
-{
-	DIOJNI_LOG(logDEBUG) << "Calling DIOJNI checkDigitalModule";
-	DIOJNI_LOG(logDEBUG) << "Module = " << (jint)value;
-	jbyte returnValue = checkDigitalModule( value );
-	DIOJNI_LOG(logDEBUG) << "checkDigitalModuleResult = " << (jint)returnValue;
-	return returnValue;
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
  * Method:    pulse
  * Signature: (Ljava/nio/ByteBuffer;DLjava/nio/IntBuffer;)V
  */
@@ -172,18 +157,6 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_isAnyPulsing
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
- * Method:    isAnyPulsingWithModule
- * Signature: (BLjava/nio/IntBuffer;)B
- */
-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_isAnyPulsingWithModule
-  (JNIEnv *, jclass, jbyte, jobject)
-{
-	assert(false);
-
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
  * Method:    getLoopTiming
  * Signature: (Ljava/nio/IntBuffer;)S
  */
@@ -196,17 +169,5 @@ JNIEXPORT jshort JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_getLoopTiming
 	DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	DIOJNI_LOG(logDEBUG) << "LoopTiming = " << returnValue;
 	return returnValue;
-
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
- * Method:    getLoopTimingWithModule
- * Signature: (BLjava/nio/IntBuffer;)S
- */
-JNIEXPORT jshort JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_getLoopTimingWithModule
-  (JNIEnv *, jclass, jbyte, jobject)
-{
-	assert(false);
 
 }

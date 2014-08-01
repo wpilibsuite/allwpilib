@@ -26,11 +26,9 @@ extern "C"
 	void* initializeAnalogInputPort(void* port_pointer, int32_t *status);
 	bool checkAnalogModule(uint8_t module);
 	bool checkAnalogInputChannel(uint32_t pin);
-	
+
 	void setAnalogSampleRate(double samplesPerSecond, int32_t *status);
 	float getAnalogSampleRate(int32_t *status);
-	void setAnalogSampleRateWithModule(uint8_t module, double samplesPerSecond, int32_t *status);
-	float getAnalogSampleRateWithModule(uint8_t module, int32_t *status);
 	void setAnalogAverageBits(void* analog_port_pointer, uint32_t bits, int32_t *status);
 	uint32_t getAnalogAverageBits(void* analog_port_pointer, int32_t *status);
 	void setAnalogOversampleBits(void* analog_port_pointer, uint32_t bits, int32_t *status);
@@ -71,14 +69,11 @@ extern "C"
 	//// Float JNA Hack
 	// Float
 	int getAnalogSampleRateIntHack(int32_t *status);
-	int getAnalogSampleRateWithModuleIntHack(uint8_t module, int32_t *status);
 	int getAnalogVoltageIntHack(void* analog_port_pointer, int32_t *status);
 	int getAnalogAverageVoltageIntHack(void* analog_port_pointer, int32_t *status);
 
 	// Doubles
 	void setAnalogSampleRateIntHack(int samplesPerSecond, int32_t *status);
-	void setAnalogSampleRateWithModuleIntHack(uint8_t module, int samplesPerSecond,
-			int32_t *status);
 	int32_t getAnalogVoltsToValueIntHack(void* analog_port_pointer, int voltage, int32_t *status);
 	void setAnalogTriggerLimitsVoltageIntHack(void* analog_trigger_pointer, int lower, int upper,
 			int32_t *status);

@@ -150,37 +150,6 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogSamp
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
- * Method:    setAnalogSampleRateWithModule
- * Signature: (BDLjava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogSampleRateWithModule
-  (JNIEnv * env, jclass, jbyte module, jdouble value, jobject status)
-{
-	ANALOGJNI_LOG(logDEBUG) << "Module = " << (jint)module;
-	ANALOGJNI_LOG(logDEBUG) << "SampleRate = " << value;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	setAnalogSampleRateWithModule( module, value, statusPtr );
-	ANALOGJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
- * Method:    getAnalogSampleRateWithModule
- * Signature: (BLjava/nio/IntBuffer;)D
- */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogSampleRateWithModule
-  (JNIEnv * env, jclass, jbyte module, jobject status)
-{
-	ANALOGJNI_LOG(logDEBUG) << "Module = " << (jint)module;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	double returnValue = getAnalogSampleRateWithModule( module, statusPtr );
-	ANALOGJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
-	ANALOGJNI_LOG(logDEBUG) << "SampleRate = " << returnValue;
-	return returnValue;
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
  * Method:    setAnalogAverageBits
  * Signature: (Ljava/nio/ByteBuffer;ILjava/nio/IntBuffer;)V
  */

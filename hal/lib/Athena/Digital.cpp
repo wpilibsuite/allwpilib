@@ -80,7 +80,7 @@ MUTEX_ID spiMXPSemaphore = NULL;
 tSPI *spiSystem;
 
 /**
- * Initialize the digital modules.
+ * Initialize the digital system.
  */
 void initializeDigital(int32_t *status) {
   if (digitalSystemsInitialized) return;
@@ -96,21 +96,21 @@ void initializeDigital(int32_t *status) {
 
   digitalI2COnBoardSemaphore = initializeMutexRecursive();
   digitalI2CMXPSemaphore = initializeMutexRecursive();
-  
+
   Resource::CreateResourceObject(&DIOChannels, tDIO::kNumSystems * kDigitalPins);
   Resource::CreateResourceObject(&DO_PWMGenerators, tDIO::kNumPWMDutyCycleAElements + tDIO::kNumPWMDutyCycleBElements);
   digitalSystem = tDIO::create(status);
 
   // Relay Setup
   relaySystem = tRelay::create(status);
-    
+
   // Turn off all relay outputs.
   relaySystem->writeValue_Forward(0, status);
   relaySystem->writeValue_Reverse(0, status);
 
   // PWM Setup
   pwmSystem = tPWM::create(status);
-      
+
   // Make sure that the 9403 IONode has had a chance to initialize before continuing.
   while(pwmSystem->readLoopTiming(status) == 0) delayTicks(1);
 
@@ -122,7 +122,7 @@ void initializeDigital(int32_t *status) {
 
   //Calculate the length, in ms, of one DIO loop
   double loopTime = pwmSystem->readLoopTiming(status)/(kSystemClockTicksPerMicrosecond*1e3);
-    
+
   pwmSystem->writeConfig_Period((uint16_t) (kDefaultPwmPeriod/loopTime + .5), status);
   uint16_t minHigh = (uint16_t) ((kDefaultPwmCenter-kDefaultPwmStepsDown*loopTime)/loopTime + .5);
   pwmSystem->writeConfig_MinHigh(minHigh, status);
@@ -132,23 +132,16 @@ void initializeDigital(int32_t *status) {
     // Initialize port structure
     DigitalPort* digital_port = new DigitalPort();
     digital_port->port.pin = pwm_index;
-    
+
     setPWM(digital_port, kPwmDisabled, status);
     setPWMPeriodScale(digital_port, 3, status); // Set all to 4x by default.
   }
-  
+
   digitalSystemsInitialized = true;
 }
 
 /**
- * Create a new instance of an digital module.
- * Create an instance of the digital module object. Initialize all the parameters
- * to reasonable values on start.
- * Setting a global value on an digital module can be done only once unless subsequent
- * values are set the previously set value.
- * Digital modules are a singleton, so the constructor is never called outside of this class.
- *
- * @param moduleNumber The digital module to create (1 or 2).
+ * Create a new instance of a digital port.
  */
 void* initializeDigitalPort(void* port_pointer, int32_t *status) {
   initializeDigital(status);
@@ -159,10 +152,6 @@ void* initializeDigitalPort(void* port_pointer, int32_t *status) {
   digital_port->port = *port;
 
   return digital_port;
-}
-
-bool checkDigitalModule(uint8_t module) {
-  return nLoadOut::getModulePresence(nLoadOut::kModuleType_Digital, module - 1);
 }
 
 bool checkPWMChannel(void* digital_port_pointer) {
@@ -190,19 +179,19 @@ uint32_t remapMXPChannel(uint32_t pin) {
 /**
  * Set a PWM channel to the desired value. The values range from 0 to 255 and the period is controlled
  * by the PWM Period and MinHigh registers.
- * 
+ *
  * @param channel The PWM channel to set.
  * @param value The PWM value to set.
- */  
+ */
 void setPWM(void* digital_port_pointer, unsigned short value, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   checkPWMChannel(port);
-  
+
   if(port->port.pin < tPWM::kNumHdrRegisters) {
     pwmSystem->writeHdr(port->port.pin, value, status);
   } else {
     pwmSystem->writeMXP(port->port.pin - tPWM::kNumHdrRegisters, value, status);
-    
+
     // Enable special functions on this pin
     uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
     short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
@@ -212,14 +201,14 @@ void setPWM(void* digital_port_pointer, unsigned short value, int32_t *status) {
 
 /**
  * Get a value from a PWM channel. The values range from 0 to 255.
- * 
+ *
  * @param channel The PWM channel to read from.
  * @return The raw PWM value.
  */
 unsigned short getPWM(void* digital_port_pointer, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   checkPWMChannel(port);
-  
+
   if(port->port.pin < tPWM::kNumHdrRegisters) {
     return pwmSystem->readHdr(port->port.pin, status);
   } else {
@@ -229,14 +218,14 @@ unsigned short getPWM(void* digital_port_pointer, int32_t *status) {
 
 /**
  * Set how how often the PWM signal is squelched, thus scaling the period.
- * 
+ *
  * @param channel The PWM channel to configure.
  * @param squelchMask The 2-bit mask of outputs to squelch.
  */
 void setPWMPeriodScale(void* digital_port_pointer, uint32_t squelchMask, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   checkPWMChannel(port);
-  
+
   if(port->port.pin < tPWM::kNumPeriodScaleHdrElements) {
     pwmSystem->writePeriodScaleHdr(port->port.pin, squelchMask, status);
   } else {
@@ -247,42 +236,19 @@ void setPWMPeriodScale(void* digital_port_pointer, uint32_t squelchMask, int32_t
 /**
  * Allocate a DO PWM Generator.
  * Allocate PWM generators so that they are not accidently reused.
- * 
+ *
  * @return PWM Generator refnum
  */
 void* allocatePWM(int32_t *status) {
-  return allocatePWMWithModule(0, status);
-}
-
-/**
- * Allocate a DO PWM Generator.
- * Allocate PWM generators so that they are not accidently reused.
- * 
- * @return PWM Generator refnum
- */
-void* allocatePWMWithModule(uint8_t module, int32_t *status) {
-  char buf[64];
-  snprintf(buf, 64, "DO_PWM (Module: %d)", module);
-  uint32_t* val = NULL;
-  *val = DO_PWMGenerators->Allocate(buf);
-  return val;
+  return (void*)DO_PWMGenerators->Allocate("DO_PWM");
 }
 
 /**
  * Free the resource associated with a DO PWM generator.
- * 
+ *
  * @param pwmGenerator The pwmGen to free that was allocated with AllocateDO_PWM()
  */
 void freePWM(void* pwmGenerator, int32_t *status) {
-  freePWMWithModule(0, pwmGenerator, status);
-}
-
-/**
- * Free the resource associated with a DO PWM generator.
- * 
- * @param pwmGenerator The pwmGen to free that was allocated with AllocateDO_PWM()
- */
-void freePWMWithModule(uint8_t module, void* pwmGenerator, int32_t *status) {
   uint32_t id = *((uint32_t*) pwmGenerator);
   if (id == ~0ul) return;
   DO_PWMGenerators->Free(id);
@@ -290,46 +256,26 @@ void freePWMWithModule(uint8_t module, void* pwmGenerator, int32_t *status) {
 
 /**
  * Change the frequency of the DO PWM generator.
- * 
+ *
  * The valid range is from 0.6 Hz to 19 kHz.  The frequency resolution is logarithmic.
- * 
- * @param rate The frequency to output all digital output PWM signals on this module.
+ *
+ * @param rate The frequency to output all digital output PWM signals.
  */
 void setPWMRate(double rate, int32_t *status) {
-  setPWMRateWithModule(0, rate, status);
-}
-
-/**
- * Change the frequency of the DO PWM generator.
- * 
- * The valid range is from 0.6 Hz to 19 kHz.  The frequency resolution is logarithmic.
- * 
- * @param rate The frequency to output all digital output PWM signals on this module.
- */
-void setPWMRateWithModule(uint8_t module, double rate, int32_t *status) {
   // Currently rounding in the log rate domain... heavy weight toward picking a higher freq.
   // TODO: Round in the linear rate domain.
   uint8_t pwmPeriodPower = (uint8_t)(log(1.0 / (pwmSystem->readLoopTiming(status) * 0.25E-6 * rate))/log(2.0) + 0.5);
   digitalSystem->writePWMPeriodPower(pwmPeriodPower, status);
 }
 
+
 /**
  * Configure the duty-cycle of the PWM generator
- * 
+ *
  * @param pwmGenerator The generator index reserved by AllocateDO_PWM()
  * @param dutyCycle The percent duty cycle to output [0..1].
  */
 void setPWMDutyCycle(void* pwmGenerator, double dutyCycle, int32_t *status) {
-  setPWMDutyCycleWithModule(0, pwmGenerator, dutyCycle, status);
-}
-
-/**
- * Configure the duty-cycle of the PWM generator
- * 
- * @param pwmGenerator The generator index reserved by AllocateDO_PWM()
- * @param dutyCycle The percent duty cycle to output [0..1].
- */
-void setPWMDutyCycleWithModule(uint8_t module, void* pwmGenerator, double dutyCycle, int32_t *status) {
   uint32_t id = *((uint32_t*) pwmGenerator);
   if (id == ~0ul) return;
   if (dutyCycle > 1.0) dutyCycle = 1.0;
@@ -350,21 +296,11 @@ void setPWMDutyCycleWithModule(uint8_t module, void* pwmGenerator, double dutyCy
 
 /**
  * Configure which DO channel the PWM siganl is output on
- * 
+ *
  * @param pwmGenerator The generator index reserved by AllocateDO_PWM()
  * @param channel The Digital Output channel to output on
  */
 void setPWMOutputChannel(void* pwmGenerator, uint32_t pin, int32_t *status) {
-  setPWMOutputChannelWithModule(0, pwmGenerator, pin, status);
-}
-
-/**
- * Configure which DO channel the PWM siganl is output on
- * 
- * @param pwmGenerator The generator index reserved by AllocateDO_PWM()
- * @param channel The Digital Output channel to output on
- */
-void setPWMOutputChannelWithModule(uint8_t module, void* pwmGenerator, uint32_t pin, int32_t *status) {
   uint32_t id = *((uint32_t*) pwmGenerator);
   if (id == ~0ul) return;
   switch(id) {
@@ -449,7 +385,7 @@ bool getRelayReverse(void* digital_port_pointer, int32_t *status) {
  * Allocate Digital I/O channels.
  * Allocate channels so that they are not accidently reused. Also the direction is set at the
  * time of the allocation.
- * 
+ *
  * @param channel The Digital I/O channel
  * @param input If true open as input; if false open as output
  * @return Was successfully allocated
@@ -457,13 +393,13 @@ bool getRelayReverse(void* digital_port_pointer, int32_t *status) {
 bool allocateDIO(void* digital_port_pointer, bool input, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   char buf[64];
-  snprintf(buf, 64, "DIO %d (Module %d)", port->port.pin, port->port.module);
-  if (DIOChannels->Allocate(kDigitalPins * (port->port.module - 1) + port->port.pin, buf) == ~0ul) return false;
+  snprintf(buf, 64, "DIO %d", port->port.pin);
+  if (DIOChannels->Allocate(port->port.pin, buf) == ~0ul) return false;
   {
     Synchronized sync(digitalDIOSemaphore);
-    
+
     tDIO::tOutputEnable outputEnable = digitalSystem->readOutputEnable(status);
-    
+
     if(port->port.pin < kNumHeaders) {
       uint32_t bitToSet = 1 << port->port.pin;
       if (input) {
@@ -473,18 +409,18 @@ bool allocateDIO(void* digital_port_pointer, bool input, int32_t *status) {
       }
     } else {
       uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
-      
+
       // Disable special functions on this pin
       short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
       digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet, status);
-      
+
       if (input) {
         outputEnable.MXP = outputEnable.MXP & (~bitToSet); // clear the bit for read
       } else {
         outputEnable.MXP = outputEnable.MXP | bitToSet; // set the bit for write
       }
     }
-    
+
     digitalSystem->writeOutputEnable(outputEnable, status);
   }
   return true;
@@ -492,18 +428,18 @@ bool allocateDIO(void* digital_port_pointer, bool input, int32_t *status) {
 
 /**
  * Free the resource associated with a digital I/O channel.
- * 
+ *
  * @param channel The Digital I/O channel to free
  */
 void freeDIO(void* digital_port_pointer, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
-  DIOChannels->Free(kDigitalPins * (port->port.module - 1) + port->port.pin);
+  DIOChannels->Free(port->port.pin);
 }
 
 /**
  * Write a digital I/O bit to the FPGA.
  * Set a single value on a digital I/O channel.
- * 
+ *
  * @param channel The Digital I/O channel
  * @param value The state to set the digital channel (if it is configured as an output)
  */
@@ -516,7 +452,7 @@ void setDIO(void* digital_port_pointer, short value, int32_t *status) {
   {
     Synchronized sync(digitalDIOSemaphore);
     tDIO::tDO currentDIO = digitalSystem->readDO(status);
-    
+
     if(port->port.pin < kNumHeaders) {
       if(value == 0) {
         currentDIO.Headers = currentDIO.Headers & ~(1 << port->port.pin);
@@ -529,11 +465,11 @@ void setDIO(void* digital_port_pointer, short value, int32_t *status) {
       } else if (value == 1) {
         currentDIO.MXP = currentDIO.MXP | (1 << remapMXPChannel(port->port.pin));
       }
-      
+
       uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
       short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
       digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet, status);
-    } 
+    }
     digitalSystem->writeDO(currentDIO, status);
   }
 }
@@ -541,7 +477,7 @@ void setDIO(void* digital_port_pointer, short value, int32_t *status) {
 /**
  * Read a digital I/O bit from the FPGA.
  * Get a single value from a digital I/O channel.
- * 
+ *
  * @param channel The digital I/O channel
  * @return The state of the specified channel
  */
@@ -560,7 +496,7 @@ bool getDIO(void* digital_port_pointer, int32_t *status) {
     uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
     short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
     digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet, status);
-    
+
     return ((currentDIO.MXP >> remapMXPChannel(port->port.pin)) & 1) != 0;
   }
 }
@@ -568,7 +504,7 @@ bool getDIO(void* digital_port_pointer, int32_t *status) {
 /**
  * Read the direction of a the Digital I/O lines
  * A 1 bit means output and a 0 bit means input.
- * 
+ *
  * @param channel The digital I/O channel
  * @return The direction of the specified channel
  */
@@ -579,7 +515,7 @@ bool getDIODirection(void* digital_port_pointer, int32_t *status) {
   //AND it against the currentOutputEnable
   //if it == 0, then return false
   //else return true
-  
+
   if(port->port.pin < kNumHeaders) {
     return ((currentOutputEnable.Headers >> port->port.pin) & 1) != 0;
   } else {
@@ -590,33 +526,33 @@ bool getDIODirection(void* digital_port_pointer, int32_t *status) {
 /**
  * Generate a single pulse.
  * Write a pulse to the specified digital output channel. There can only be a single pulse going at any time.
- * 
+ *
  * @param channel The Digital Output channel that the pulse should be output on
  * @param pulseLength The active length of the pulse (in seconds)
  */
 void pulse(void* digital_port_pointer, double pulseLength, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   tDIO::tPulse pulse;
-  
+
   if(port->port.pin < kNumHeaders) {
     pulse.Headers = 1 << port->port.pin;
   } else {
     pulse.MXP = 1 << remapMXPChannel(port->port.pin);
   }
-  
+
   digitalSystem->writePulseLength((uint8_t)(1.0e9 * pulseLength / (pwmSystem->readLoopTiming(status) * 25)), status);
   digitalSystem->writePulse(pulse, status);
 }
 
 /**
  * Check a DIO line to see if it is currently generating a pulse.
- * 
+ *
  * @return A pulse is in progress
  */
 bool isPulsing(void* digital_port_pointer, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   tDIO::tPulse pulseRegister = digitalSystem->readPulse(status);
-  
+
   if(port->port.pin < kNumHeaders) {
     return (pulseRegister.Headers & (1 << port->port.pin)) != 0;
   } else {
@@ -626,24 +562,13 @@ bool isPulsing(void* digital_port_pointer, int32_t *status) {
 
 /**
  * Check if any DIO line is currently generating a pulse.
- * 
+ *
  * @return A pulse on some line is in progress
  */
 bool isAnyPulsing(int32_t *status) {
-  return isAnyPulsingWithModule(1, status) || isAnyPulsingWithModule(2, status);
-}
-
-/**
- * Check if any DIO line is currently generating a pulse.
- * 
- * @return A pulse on some line is in progress
- */
-bool isAnyPulsingWithModule(uint8_t module, int32_t *status) {
   tDIO::tPulse pulseRegister = digitalSystem->readPulse(status);
   return pulseRegister.Headers != 0 && pulseRegister.MXP != 0;
 }
-
-
 
 struct counter_t {
   tCounter* counter;
@@ -687,19 +612,22 @@ void setCounterAverageSize(void* counter_pointer, int32_t size, int32_t *status)
  * Set the source object that causes the counter to count up.
  * Set the up counting DigitalSource.
  */
-void setCounterUpSourceWithModule(void* counter_pointer, uint8_t module, uint32_t pin,
-								  bool analogTrigger, int32_t *status) {
+void setCounterUpSource(void* counter_pointer, uint32_t pin, bool analogTrigger, int32_t *status) {
   Counter* counter = (Counter*) counter_pointer;
-  
+
+  uint8_t module;
+
   if(pin >= kNumHeaders) {
     pin = remapMXPChannel(pin);
     module = 1;
+  } else {
+    module = 0;
   }
-  
+
   counter->counter->writeConfig_UpSource_Module(module, status);
   counter->counter->writeConfig_UpSource_Channel(pin, status);
   counter->counter->writeConfig_UpSource_AnalogTrigger(analogTrigger, status);
-	
+
   if(counter->counter->readConfig_Mode(status) == kTwoPulse ||
 	 counter->counter->readConfig_Mode(status) == kExternalDirection) {
 	setCounterUpSourceEdge(counter_pointer, true, false, status);
@@ -736,8 +664,7 @@ void clearCounterUpSource(void* counter_pointer, int32_t *status) {
  * Set the source object that causes the counter to count down.
  * Set the down counting DigitalSource.
  */
-void setCounterDownSourceWithModule(void* counter_pointer, uint8_t module, uint32_t pin,
-									bool analogTrigger, int32_t *status) {
+void setCounterDownSource(void* counter_pointer, uint32_t pin, bool analogTrigger, int32_t *status) {
   Counter* counter = (Counter*) counter_pointer;
   unsigned char mode = counter->counter->readConfig_Mode(status);
   if (mode != kTwoPulse && mode != kExternalDirection) {
@@ -745,16 +672,20 @@ void setCounterDownSourceWithModule(void* counter_pointer, uint8_t module, uint3
 	*status = PARAMETER_OUT_OF_RANGE;
 	return;
   }
-  
+
+  uint8_t module;
+
   if(pin >= kNumHeaders) {
     pin = remapMXPChannel(pin);
     module = 1;
+  } else {
+    module = 0;
   }
-  
+
   counter->counter->writeConfig_DownSource_Module(module, status);
   counter->counter->writeConfig_DownSource_Channel(pin, status);
   counter->counter->writeConfig_DownSource_AnalogTrigger(analogTrigger, status);
-	
+
   setCounterDownSourceEdge(counter_pointer, true, false, status);
   counter->counter->strobeReset(status);
 }
@@ -805,7 +736,7 @@ void setCounterExternalDirectionMode(void* counter_pointer, int32_t *status) {
 
 /**
  * Set Semi-period mode on this counter.
- * Counts up on both rising and falling edges. 
+ * Counts up on both rising and falling edges.
  */
 void setCounterSemiPeriodMode(void* counter_pointer, bool highSemiPeriod, int32_t *status) {
   Counter* counter = (Counter*) counter_pointer;
@@ -826,8 +757,8 @@ void setCounterPulseLengthMode(void* counter_pointer, double threshold, int32_t 
 }
 
 /**
- * Get the Samples to Average which specifies the number of samples of the timer to 
- * average when calculating the period. Perform averaging to account for 
+ * Get the Samples to Average which specifies the number of samples of the timer to
+ * average when calculating the period. Perform averaging to account for
  * mechanical imperfections or as oversampling to increase resolution.
  * @return SamplesToAverage The number of samples being averaged (from 1 to 127)
  */
@@ -837,8 +768,8 @@ int32_t getCounterSamplesToAverage(void* counter_pointer, int32_t *status) {
 }
 
 /**
- * Set the Samples to Average which specifies the number of samples of the timer to 
- * average when calculating the period. Perform averaging to account for 
+ * Set the Samples to Average which specifies the number of samples of the timer to
+ * average when calculating the period. Perform averaging to account for
  * mechanical imperfections or as oversampling to increase resolution.
  * @param samplesToAverage The number of samples to average from 1 to 127.
  */
@@ -994,7 +925,7 @@ void* initializeEncoder(uint8_t port_a_module, uint32_t port_a_pin, bool port_a_
 
   // Initialize encoder structure
   Encoder* encoder = new Encoder();
-  
+
   if(port_a_pin >= kNumHeaders) {
     port_a_pin = remapMXPChannel(port_a_pin);
     port_a_module = 1;
@@ -1004,7 +935,7 @@ void* initializeEncoder(uint8_t port_a_module, uint32_t port_a_pin, bool port_a_
     port_b_pin = remapMXPChannel(port_b_pin);
     port_b_module = 1;
   }
-  
+
   Resource::CreateResourceObject(&quadEncoders, tEncoder::kNumSystems);
   encoder->index = quadEncoders->Allocate("4X Encoder");
   *index = encoder->index;
@@ -1070,7 +1001,7 @@ int32_t getEncoder(void* encoder_pointer, int32_t *status) {
  * Returns the period of the most recent pulse.
  * Returns the period of the most recent Encoder pulse in seconds.
  * This method compenstates for the decoding type.
- * 
+ *
  * @deprecated Use GetRate() in favor of this method.  This returns unscaled periods and GetRate() scales using value from SetDistancePerPulse().
  *
  * @return Period in seconds of the most recent pulse.
@@ -1097,9 +1028,9 @@ double getEncoderPeriod(void* encoder_pointer, int32_t *status) {
  * that the attached device is stopped. This timeout allows users to determine if the wheels or
  * other shaft has stopped rotating.
  * This method compensates for the decoding type.
- * 
+ *
  * @deprecated Use SetMinRate() in favor of this method.  This takes unscaled periods and SetMinRate() scales using value from SetDistancePerPulse().
- * 
+ *
  * @param maxPeriod The maximum time between rising and falling edges before the FPGA will
  * report the device stopped. This is expressed in seconds.
  */
@@ -1141,8 +1072,8 @@ void setEncoderReverseDirection(void* encoder_pointer, bool reverseDirection, in
 }
 
 /**
- * Set the Samples to Average which specifies the number of samples of the timer to 
- * average when calculating the period. Perform averaging to account for 
+ * Set the Samples to Average which specifies the number of samples of the timer to
+ * average when calculating the period. Perform averaging to account for
  * mechanical imperfections or as oversampling to increase resolution.
  * @param samplesToAverage The number of samples to average from 1 to 127.
  */
@@ -1155,8 +1086,8 @@ void setEncoderSamplesToAverage(void* encoder_pointer, uint32_t samplesToAverage
 }
 
 /**
- * Get the Samples to Average which specifies the number of samples of the timer to 
- * average when calculating the period. Perform averaging to account for 
+ * Get the Samples to Average which specifies the number of samples of the timer to
+ * average when calculating the period. Perform averaging to account for
  * mechanical imperfections or as oversampling to increase resolution.
  * @return SamplesToAverage The number of samples being averaged (from 1 to 127)
  */
@@ -1166,23 +1097,13 @@ uint32_t getEncoderSamplesToAverage(void* encoder_pointer, int32_t *status) {
 }
 
 /**
- * Get the loop timing of the Digital Module
- * 
+ * Get the loop timing of the PWM system
+ *
  * @return The loop time
- */  
+ */
 uint16_t getLoopTiming(int32_t *status) {
-  return getLoopTimingWithModule(1, status);
-}
-
-/**
- * Get the loop timing of the Digital Module
- * 
- * @return The loop time
- */  
-uint16_t getLoopTimingWithModule(uint8_t module, int32_t *status) {
   return pwmSystem->readLoopTiming(status);
 }
-
 
 /*
  * Initialize the spi port. Opens the port if necessary and saves the handle.

@@ -84,25 +84,6 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_allocatePWM
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
- * Method:    allocatePWMWithModule
- * Signature: (BLjava/nio/IntBuffer;)Ljava/nio/ByteBuffer;
- */
-JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_allocatePWMWithModule
-  (JNIEnv * env, jclass, jbyte module, jobject status)
-{
-	PWMJNI_LOG(logDEBUG) << "Calling PWMJNI allocatePWMWithModule";
-	PWMJNI_LOG(logDEBUG) << "Module = " << (jint)module;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	void** pwmPtr = (void**)new unsigned char[4];
-	*pwmPtr =  allocatePWMWithModule(module, statusPtr);
-	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
-	PWMJNI_LOG(logDEBUG) << "PWM Ptr = " << *pwmPtr;
-	return env->NewDirectByteBuffer( pwmPtr, 4);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
  * Method:    freePWM
  * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
  */
@@ -120,24 +101,6 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_freePWM
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
- * Method:    freePWMWithModule
- * Signature: (BLjava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_freePWMWithModule
-  (JNIEnv * env, jclass, jbyte module, jobject id, jobject status)
-{
-	PWMJNI_LOG(logDEBUG) << "Calling PWMJNI freePWMWithModule";
-	PWMJNI_LOG(logDEBUG) << "Module = " << (jint)module;
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	PWMJNI_LOG(logDEBUG) << "PWM Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	freePWMWithModule(module, *javaId, statusPtr);
-	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
  * Method:    setPWMRate
  * Signature: (DLjava/nio/IntBuffer;)V
  */
@@ -149,23 +112,6 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMRate
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
 	setPWMRate(value, statusPtr);
-	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
- * Method:    setPWMRateWithModule
- * Signature: (BDLjava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMRateWithModule
-  (JNIEnv * env, jclass, jbyte module, jdouble value, jobject status)
-{
-	PWMJNI_LOG(logDEBUG) << "Calling PWMJNI setPWMRateWithModule";
-	PWMJNI_LOG(logDEBUG) << "Module = " << (jint)module;
-	PWMJNI_LOG(logDEBUG) << "Rate= " << value;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	setPWMRateWithModule(module, value, statusPtr);
 	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
 
@@ -189,25 +135,6 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMDutyCycle
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
- * Method:    setPWMDutyCycleWithModule
- * Signature: (BLjava/nio/ByteBuffer;DLjava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMDutyCycleWithModule
-  (JNIEnv * env, jclass, jbyte module, jobject id, jdouble value, jobject status)
-{
-	PWMJNI_LOG(logDEBUG) << "Calling PWMJNI setPWMDutyCycleWithModule";
-	PWMJNI_LOG(logDEBUG) << "Module = " << (jint)module;
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	PWMJNI_LOG(logDEBUG) << "PWM Ptr = " << *javaId;
-	PWMJNI_LOG(logDEBUG) << "DutyCycle= " << value;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	setPWMDutyCycleWithModule( module, *javaId, value, statusPtr);
-	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
  * Method:    setPWMOutputChannel
  * Signature: (Ljava/nio/ByteBuffer;ILjava/nio/IntBuffer;)V
  */
@@ -221,24 +148,5 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMOutputChannel
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
 	setPWMOutputChannel(*javaId, (uint32_t) value, statusPtr);
-	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
- * Method:    setPWMOutputChannelWithModule
- * Signature: (BLjava/nio/ByteBuffer;ILjava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMOutputChannelWithModule
-  (JNIEnv * env, jclass, jbyte module, jobject id, jint value, jobject status)
-{
-	PWMJNI_LOG(logDEBUG) << "Calling PWMJNI setPWMOutputChannelWithModule";
-	PWMJNI_LOG(logDEBUG) << "Module = " << (jint)module;
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	PWMJNI_LOG(logDEBUG) << "PWM Ptr = " << *javaId;
-	PWMJNI_LOG(logDEBUG) << "Pin= " << value;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	setPWMOutputChannelWithModule( module, *javaId, (uint32_t) value, statusPtr);
 	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }

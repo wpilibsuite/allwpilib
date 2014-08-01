@@ -72,21 +72,20 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterAvera
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
- * Method:    setCounterUpSourceWithModule
+ * Method:    setCounterUpSource
  * Signature: (Ljava/nio/ByteBuffer;BIBLjava/nio/IntBuffer;)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpSourceWithModule
-  (JNIEnv * env, jclass, jobject id, jbyte module, jint pin, jbyte analogTrigger, jobject status)
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpSource
+  (JNIEnv * env, jclass, jobject id, jint pin, jbyte analogTrigger, jobject status)
 {
-	COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI setCounterUpSourceWithModule";
+	COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI setCounterUpSource";
 	void ** javaId = (void**)env->GetDirectBufferAddress(id);
 	COUNTERJNI_LOG(logDEBUG) << "Counter Ptr = " << *javaId;
-	COUNTERJNI_LOG(logDEBUG) << "Module = " << (jint)module;
 	COUNTERJNI_LOG(logDEBUG) << "Pin = " << pin;
 	COUNTERJNI_LOG(logDEBUG) << "AnalogTrigger = " << (jint)analogTrigger;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	setCounterUpSourceWithModule(*javaId, module, pin, analogTrigger, statusPtr);
+	setCounterUpSource(*javaId, pin, analogTrigger, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
 
@@ -128,21 +127,20 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_clearCounterUpS
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
- * Method:    setCounterDownSourceWithModule
+ * Method:    setCounterDownSource
  * Signature: (Ljava/nio/ByteBuffer;BIBLjava/nio/IntBuffer;)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterDownSourceWithModule
-  (JNIEnv * env, jclass, jobject id, jbyte module, jint pin, jbyte analogTrigger, jobject status)
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterDownSource
+  (JNIEnv * env, jclass, jobject id, jint pin, jbyte analogTrigger, jobject status)
 {
-	COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI setCounterDownSourceWithModule";
+	COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI setCounterDownSource";
 	void ** javaId = (void**)env->GetDirectBufferAddress(id);
 	COUNTERJNI_LOG(logDEBUG) << "Counter Ptr = " << *javaId;
-	COUNTERJNI_LOG(logDEBUG) << "Module = " << (jint)module;
 	COUNTERJNI_LOG(logDEBUG) << "Pin = " << pin;
 	COUNTERJNI_LOG(logDEBUG) << "AnalogTrigger = " << (jint)analogTrigger;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	setCounterDownSourceWithModule(*javaId, module, pin, analogTrigger, statusPtr);
+	setCounterDownSource(*javaId, pin, analogTrigger, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
 

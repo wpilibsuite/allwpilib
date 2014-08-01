@@ -232,8 +232,8 @@ void Counter::SetUpSource(DigitalSource *source)
 	else
 	{
 		int32_t status = 0;
-		setCounterUpSourceWithModule(m_counter, source->GetModuleForRouting(), source->GetChannelForRouting(),
-									 source->GetAnalogTriggerForRouting(), &status);
+		setCounterUpSource(m_counter, source->GetChannelForRouting(),
+		                   source->GetAnalogTriggerForRouting(), &status);
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
 }
@@ -333,8 +333,8 @@ void Counter::SetDownSource(DigitalSource *source)
 	else
 	{
 		int32_t status = 0;
-		setCounterDownSourceWithModule(m_counter, source->GetModuleForRouting(),source->GetChannelForRouting(),
-									   source->GetAnalogTriggerForRouting(), &status);
+		setCounterDownSource(m_counter, source->GetChannelForRouting(),
+		                     source->GetAnalogTriggerForRouting(), &status);
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
 }

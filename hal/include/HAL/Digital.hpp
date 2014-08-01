@@ -17,7 +17,6 @@ enum Mode
 extern "C"
 {
 	void* initializeDigitalPort(void* port_pointer, int32_t *status);
-	bool checkDigitalModule(uint8_t module);
 	bool checkPWMChannel(void* digital_port_pointer);
 	bool checkRelayChannel(void* digital_port_pointer);
 
@@ -25,17 +24,10 @@ extern "C"
 	unsigned short getPWM(void* digital_port_pointer, int32_t *status);
 	void setPWMPeriodScale(void* digital_port_pointer, uint32_t squelchMask, int32_t *status);
 	void* allocatePWM(int32_t *status);
-	void* allocatePWMWithModule(uint8_t module, int32_t *status);
 	void freePWM(void* pwmGenerator, int32_t *status);
-	void freePWMWithModule(uint8_t module, void* pwmGenerator, int32_t *status);
 	void setPWMRate(double rate, int32_t *status);
-	void setPWMRateWithModule(uint8_t module, double rate, int32_t *status);
 	void setPWMDutyCycle(void* pwmGenerator, double dutyCycle, int32_t *status);
-	void setPWMDutyCycleWithModule(uint8_t module, void* pwmGenerator, double dutyCycle,
-			int32_t *status);
 	void setPWMOutputChannel(void* pwmGenerator, uint32_t pin, int32_t *status);
-	void setPWMOutputChannelWithModule(uint8_t module, void* pwmGenerator, uint32_t pin,
-			int32_t *status);
 
 	void setRelayForward(void* digital_port_pointer, bool on, int32_t *status);
 	void setRelayReverse(void* digital_port_pointer, bool on, int32_t *status);
@@ -50,18 +42,15 @@ extern "C"
 	void pulse(void* digital_port_pointer, double pulseLength, int32_t *status);
 	bool isPulsing(void* digital_port_pointer, int32_t *status);
 	bool isAnyPulsing(int32_t *status);
-	bool isAnyPulsingWithModule(uint8_t module, int32_t *status);
 
 	void* initializeCounter(Mode mode, uint32_t *index, int32_t *status);
 	void freeCounter(void* counter_pointer, int32_t *status);
 	void setCounterAverageSize(void* counter_pointer, int32_t size, int32_t *status);
-	void setCounterUpSourceWithModule(void* counter_pointer, uint8_t module, uint32_t pin,
-			bool analogTrigger, int32_t *status); // TODO: Without Module
+	void setCounterUpSource(void* counter_pointer, uint32_t pin, bool analogTrigger, int32_t *status);
 	void setCounterUpSourceEdge(void* counter_pointer, bool risingEdge, bool fallingEdge,
 			int32_t *status);
 	void clearCounterUpSource(void* counter_pointer, int32_t *status);
-	void setCounterDownSourceWithModule(void* counter_pointer, uint8_t module, uint32_t pin,
-			bool analogTrigger, int32_t *status); // TODO: Without Module
+	void setCounterDownSource(void* counter_pointer, uint32_t pin, bool analogTrigger, int32_t *status);
 	void setCounterDownSourceEdge(void* counter_pointer, bool risingEdge, bool fallingEdge,
 			int32_t *status);
 	void clearCounterDownSource(void* counter_pointer, int32_t *status);
@@ -100,7 +89,6 @@ extern "C"
 	uint32_t getEncoderSamplesToAverage(void* encoder_pointer, int32_t *status);
 
 	uint16_t getLoopTiming(int32_t *status);
-	uint16_t getLoopTimingWithModule(uint8_t module, int32_t *status);
 
 	void spiInitialize(uint8_t port, int32_t *status);
 	int32_t spiTransaction(uint8_t port, uint8_t *dataToSend, uint8_t *dataReceived, uint8_t size);
@@ -126,8 +114,5 @@ extern "C"
 	//// Float JNA Hack
 	// double
 	void setPWMRateIntHack(int rate, int32_t *status);
-	void setPWMRateWithModuleIntHack(uint8_t module, int32_t rate, int32_t *status);
 	void setPWMDutyCycleIntHack(void* pwmGenerator, int32_t dutyCycle, int32_t *status);
-	void setPWMDutyCycleWithModuleIntHack(uint8_t module, void* pwmGenerator, int32_t dutyCycle,
-			int32_t *status);
 }

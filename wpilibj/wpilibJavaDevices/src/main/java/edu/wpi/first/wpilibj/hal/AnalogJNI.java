@@ -29,8 +29,6 @@ public class AnalogJNI extends JNIWrapper {
 	public static native double getAnalogOutput(ByteBuffer port_pointer, IntBuffer status);
 	public static native void setAnalogSampleRate(double samplesPerSecond, IntBuffer status);
 	public static native double getAnalogSampleRate(IntBuffer status);
-	public static native void setAnalogSampleRateWithModule(byte module, double samplesPerSecond, IntBuffer status);
-	public static native double getAnalogSampleRateWithModule(byte module, IntBuffer status);
 	public static native void setAnalogAverageBits(ByteBuffer analog_port_pointer, int bits, IntBuffer status);
 	public static native int getAnalogAverageBits(ByteBuffer analog_port_pointer, IntBuffer status);
 	public static native void setAnalogOversampleBits(ByteBuffer analog_port_pointer, int bits, IntBuffer status);

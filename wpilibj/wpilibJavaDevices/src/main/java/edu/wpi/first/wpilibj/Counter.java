@@ -241,8 +241,7 @@ public class Counter extends SensorBase implements CounterBase,
 		m_upSource = source;
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
-		CounterJNI.setCounterUpSourceWithModule(m_counter,
-				(byte) source.getModuleForRouting(),
+		CounterJNI.setCounterUpSource(m_counter,
 				source.getChannelForRouting(),
 				(byte) (source.getAnalogTriggerForRouting() ? 1 : 0), status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
@@ -333,8 +332,7 @@ public class Counter extends SensorBase implements CounterBase,
 		}
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
-		CounterJNI.setCounterDownSourceWithModule(m_counter,
-				(byte) source.getModuleForRouting(),
+		CounterJNI.setCounterDownSource(m_counter,
 				source.getChannelForRouting(),
 				(byte) (source.getAnalogTriggerForRouting() ? 1 : 0), status.asIntBuffer());
 		if (status.asIntBuffer().get(0) == HALUtil.PARAMETER_OUT_OF_RANGE) {
