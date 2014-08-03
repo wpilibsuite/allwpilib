@@ -67,12 +67,21 @@
             type="new"
             wizardId="edu.wpi.first.wpilib.plugins.cpp.wizards.file_template.CommandWizard">
          <enablement>
-   			  <with
-                    variable="activeWorkbenchWindow.activePerspective">
-                 <equals
-                       value="org.eclipse.cdt.ui.CPerspective">
-                 </equals>
-              </with>
+               <with
+                     variable="selection">
+                  <iterate>
+                     <and>
+                        <test
+                            value="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
+                            property="org.eclipse.core.resources.projectNature">
+                        </test>
+                        <test
+                            value="org.eclipse.cdt.core.cnature"
+                            property="org.eclipse.core.resources.projectNature">
+                        </test>
+                     </and>
+                  </iterate>
+               </with>
          </enablement>
       </commonWizard>
       <commonWizard
@@ -80,12 +89,21 @@
             type="new"
             wizardId="edu.wpi.first.wpilib.plugins.cpp.wizards.file_template.CommandGroupWizard">
          <enablement>
-			  <with
-	                variable="activeWorkbenchWindow.activePerspective">
-	             <equals
-	                   value="org.eclipse.cdt.ui.CPerspective">
-	             </equals>
-	          </with>
+               <with
+                     variable="selection">
+                  <iterate>
+                     <and>
+                        <test
+                            value="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
+                            property="org.eclipse.core.resources.projectNature">
+                        </test>
+                        <test
+                            value="org.eclipse.cdt.core.cnature"
+                            property="org.eclipse.core.resources.projectNature">
+                        </test>
+                     </and>
+                  </iterate>
+               </with>
          </enablement>
       </commonWizard>
       <commonWizard
@@ -93,12 +111,21 @@
             type="new"
             wizardId="edu.wpi.first.wpilib.plugins.cpp.wizards.file_template.SubsystemWizard">
          <enablement>
-			  <with
-	                variable="activeWorkbenchWindow.activePerspective">
-	             <equals
-	                   value="org.eclipse.cdt.ui.CPerspective">
-	             </equals>
-	          </with>
+               <with
+                     variable="selection">
+                  <iterate>
+                     <and>
+                        <test
+                            value="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
+                            property="org.eclipse.core.resources.projectNature">
+                        </test>
+                        <test
+                            value="org.eclipse.cdt.core.cnature"
+                            property="org.eclipse.core.resources.projectNature">
+                        </test>
+                     </and>
+                  </iterate>
+               </with>
          </enablement>
       </commonWizard>
       <commonWizard
@@ -106,12 +133,21 @@
             type="new"
             wizardId="edu.wpi.first.wpilib.plugins.cpp.wizards.file_template.PIDSubsystemWizard">
          <enablement>
-			  <with
-	                variable="activeWorkbenchWindow.activePerspective">
-	             <equals
-	                   value="org.eclipse.cdt.ui.CPerspective">
-	             </equals>
-	          </with>
+               <with
+                     variable="selection">
+                  <iterate>
+                     <and>
+                        <test
+                            value="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
+                            property="org.eclipse.core.resources.projectNature">
+                        </test>
+                        <test
+                            value="org.eclipse.cdt.core.cnature"
+                            property="org.eclipse.core.resources.projectNature">
+                        </test>
+                     </and>
+                  </iterate>
+               </with>
          </enablement>
       </commonWizard>
       <commonWizard
@@ -119,12 +155,21 @@
             type="new"
             wizardId="edu.wpi.first.wpilib.plugins.cpp.wizards.file_template.TriggerWizard">
          <enablement>
-			  <with
-	                variable="activeWorkbenchWindow.activePerspective">
-	             <equals
-	                   value="org.eclipse.cdt.ui.CPerspective">
-	             </equals>
-	          </with>
+               <with
+                     variable="selection">
+                  <iterate>
+                     <and>
+                        <test
+                            value="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
+                            property="org.eclipse.core.resources.projectNature">
+                        </test>
+                        <test
+                            value="org.eclipse.cdt.core.cnature"
+                            property="org.eclipse.core.resources.projectNature">
+                        </test>
+                     </and>
+                  </iterate>
+               </with>
          </enablement>
       </commonWizard>
    </extension>
@@ -147,10 +192,10 @@
          point="org.eclipse.debug.ui.launchShortcuts">
       <shortcut
             class="edu.wpi.first.wpilib.plugins.cpp.launching.DeployLaunchShortcut"
-            description="Deploy the WPILib project to the athena board."
+            description="Deploy the WPILib project to the roboRIO"
             icon="resources/icons/wpi.ico"
             id="edu.wpi.first.wpilib.plugins.cpp.launching.deploy"
-            label="WPILib Deploy Configure Builder"
+            label="WPILib C++ Deploy"
             modes="run,debug">
             <contextualLaunch>
             <enablement>
@@ -172,11 +217,11 @@
             </enablement>
          </contextualLaunch>
          <description
-               description="Deploy the WPILib project to the athena board."
+               description="Deploy the WPILib project to the roboRIO"
                mode="run">
          </description>
          <description
-               description="Deploy the WPILib project to the athena board and debug it."
+               description="Deploy the WPILib project to the roboRIO"
                mode="debug">
          </description>
       </shortcut>
@@ -185,7 +230,7 @@
             description="Test the WPILib project using the Gazebo simulator."
             icon="resources/icons/wpi.ico"
             id="edu.wpi.first.wpilib.plugins.cpp.launching.simulate"
-            label="WPILib Simulate"
+            label="WPILib C++ Simulation"
             modes="run,debug">
             <contextualLaunch>
             <enablement>

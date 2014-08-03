@@ -67,10 +67,16 @@
             wizardId="edu.wpi.first.wpilib.plugins.java.wizards.file_template.CommandWizard">
          <enablement>
       	   <with variable="selection"><iterate>
-               <test
-                    args="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
-                    property="org.eclipse.jdt.launching.hasProjectNature">
-                </test>
+               <and>
+                    <test
+                        args="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
+                        property="org.eclipse.jdt.launching.hasProjectNature">
+                    </test>
+                    <test
+						args="org.eclipse.jdt.core.javanature"
+                        property="org.eclipse.jdt.launching.hasProjectNature">
+                    </test>
+                </and>
            </iterate></with>
          </enablement>
       </commonWizard>
@@ -80,10 +86,16 @@
             wizardId="edu.wpi.first.wpilib.plugins.java.wizards.file_template.CommandGroupWizard">
          <enablement>
       	   <with variable="selection"><iterate>
-               <test
-                    args="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
-                    property="org.eclipse.jdt.launching.hasProjectNature">
-                </test>
+               <and>
+                    <test
+                        args="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
+                        property="org.eclipse.jdt.launching.hasProjectNature">
+                    </test>
+                    <test
+						args="org.eclipse.jdt.core.javanature"
+                        property="org.eclipse.jdt.launching.hasProjectNature">
+                    </test>
+                </and>
            </iterate></with>
          </enablement>
       </commonWizard>
@@ -93,10 +105,16 @@
             wizardId="edu.wpi.first.wpilib.plugins.java.wizards.file_template.SubsystemWizard">
          <enablement>
       	   <with variable="selection"><iterate>
-               <test
-                    args="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
-                    property="org.eclipse.jdt.launching.hasProjectNature">
-                </test>
+               <and>
+                    <test
+                        args="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
+                        property="org.eclipse.jdt.launching.hasProjectNature">
+                    </test>
+                    <test
+						args="org.eclipse.jdt.core.javanature"
+                        property="org.eclipse.jdt.launching.hasProjectNature">
+                    </test>
+                </and>
            </iterate></with>
          </enablement>
       </commonWizard>
@@ -106,10 +124,16 @@
             wizardId="edu.wpi.first.wpilib.plugins.java.wizards.file_template.PIDSubsystemWizard">
          <enablement>
       	   <with variable="selection"><iterate>
-               <test
-                    args="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
-                    property="org.eclipse.jdt.launching.hasProjectNature">
-                </test>
+               <and>
+                    <test
+                        args="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
+                        property="org.eclipse.jdt.launching.hasProjectNature">
+                    </test>
+                    <test
+						args="org.eclipse.jdt.core.javanature"
+                        property="org.eclipse.jdt.launching.hasProjectNature">
+                    </test>
+                </and>
            </iterate></with>
          </enablement>
       </commonWizard>
@@ -119,10 +143,16 @@
             wizardId="edu.wpi.first.wpilib.plugins.java.wizards.file_template.TriggerWizard">
          <enablement>
       	   <with variable="selection"><iterate>
-               <test
-                    args="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
-                    property="org.eclipse.jdt.launching.hasProjectNature">
-                </test>
+               <and>
+                    <test
+                        args="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
+                        property="org.eclipse.jdt.launching.hasProjectNature">
+                    </test>
+                    <test
+						args="org.eclipse.jdt.core.javanature"
+                        property="org.eclipse.jdt.launching.hasProjectNature">
+                    </test>
+                </and>
            </iterate></with>
          </enablement>
       </commonWizard>
@@ -146,10 +176,10 @@
          point="org.eclipse.debug.ui.launchShortcuts">
       <shortcut
             class="edu.wpi.first.wpilib.plugins.java.launching.DeployLaunchShortcut"
-            description="Deploy the WPILib project to the athena board."
+            description="Deploy the WPILib project to the roboRIO"
             icon="resources/icons/wpi.ico"
             id="edu.wpi.first.wpilib.plugins.java.launching.deploy"
-            label="WPILib Deploy"
+            label="WPILib Java Deploy"
             modes="run,debug">
             <contextualLaunch>
             <enablement>
@@ -171,11 +201,11 @@
             </enablement>
          </contextualLaunch>
          <description
-               description="Deploy the WPILib project to the athena board."
+               description="Deploy the WPILib project to the roboRIO board."
                mode="run">
          </description>
          <description
-               description="Deploy the WPILib project to the athena board and debug it."
+               description="Deploy the WPILib project to the roboRIO board and debug it."
                mode="debug">
          </description>
       </shortcut>
@@ -184,7 +214,7 @@
             description="Test your WPILib program with the Gazebo simulator."
             icon="resources/icons/Gazebo.png"
             id="edu.wpi.first.wpilib.plugins.java.launching.simulate"
-            label="WPILib Simulation"
+            label="WPILib Java Simulation"
             modes="run,debug">
             <contextualLaunch>
             <enablement>
