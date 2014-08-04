@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project name="athena-project-build" default="deploy">
-  
+
   <!-- Load Tasks -->
   <taskdef resource="net/sf/antcontrib/antlib.xml">
     <classpath>
@@ -19,12 +19,10 @@
   <!-- Targets -->
 
   <target name="get-target-ip">
-    <math result="ip.upper" operand1="${team-number}" operation="/" operand2="100" datatype="int"/>
-    <math result="ip.lower" operand1="${team-number}" operation="%" operand2="100" datatype="int"/>
-    <property name="target" value="10.${ip.upper}.${ip.lower}.2" />
-     <echo>Target IP: ${target}</echo>
+    <property name="target" value="roboRIO-${team-number}.local" />
+    <echo>Target: ${target}</echo>
   </target>
-  
+
   <target name="deploy" depends="get-target-ip" description="Deploy the progam and start it running.">
     <sshexec host="${target}"
          username="${username}"
@@ -32,11 +30,11 @@
          trust="true"
          failonerror="no"
          command="rm ${deploy.dir}/FRCUserProgram" />
-    
+
     <echo>[athena-deploy] Copying code over.</echo>
     <scp file="${out.exe}" sftp="true" todir="${username}@${target}:${deploy.dir}" password="${password}" trust="true"/>
     <scp file="${wpilib.ant.dir}/robotCommand" todir="${username}@${target}:/home/lvuser/" password="${password}" trust="true"/>
-    
+
     <echo>[athena-deploy] Starting program.</echo>
     <sshexec host="${target}"
        username="${username}"
@@ -48,7 +46,7 @@
        username="${username}"
        password="${password}"
        trust="true"
-       command="tail -f -s 0 -n 1 ${deploy.log.file}"/>
+       command="tail -F -s 0 -n 0 ${deploy.log.file}"/>
   </target>
 
   <target name="debug-deploy" depends="get-target-ip" description="Deploy the jar and start the program running in debug mode.">
