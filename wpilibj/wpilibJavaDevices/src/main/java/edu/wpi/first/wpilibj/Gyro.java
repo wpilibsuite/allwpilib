@@ -27,7 +27,8 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 	static final int kOversampleBits = 10;
 	static final int kAverageBits = 0;
 	static final double kSamplesPerSecond = 50.0;
-	static final double kCalibrationSampleTime = 5.0;
+	static final double kCalibrationSampleTime = 0.01;
+	static final int kNumCalibrationSamples = 500;
 	static final double kDefaultVoltsPerDegreePerSecond = 0.007;
 	private AnalogInput m_analog;
 	double m_voltsPerDegreePerSecond;
@@ -61,7 +62,21 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 		m_analog.initAccumulator();
 		m_analog.resetAccumulator();
 
-		Timer.delay(kCalibrationSampleTime);
+		// Get the lowest and highest value that occur within a large number of
+		// calibration samples.  These are used to determine an appropriate
+		// default deadband.
+		int lowestSample = Integer.MAX_VALUE, highestSample = Integer.MIN_VALUE;
+		for(int i = 0; i < kNumCalibrationSamples; i++) {
+			int sample = m_analog.getAverageValue();
+
+			if(sample < lowestSample) {
+				lowestSample = sample;
+			} else if(sample > highestSample) {
+				highestSample = sample;
+			}
+
+			Timer.delay(kCalibrationSampleTime);
+		}
 
 		m_analog.getAccumulatorOutput(result);
 
@@ -70,10 +85,10 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 		m_offset = ((double) result.value / (double) result.count)
 				- m_center;
 
-		m_analog.setAccumulatorCenter(m_center);
+		int deadband = Math.max(highestSample - m_center, m_center - lowestSample);
 
-		m_analog.setAccumulatorDeadband(0); // /< TODO: compute / parameterize
-											// this
+		m_analog.setAccumulatorCenter(m_center);
+		m_analog.setAccumulatorDeadband(deadband);
 		m_analog.resetAccumulator();
 
 		setPIDSourceParameter(PIDSourceParameter.kAngle);
@@ -190,6 +205,18 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 	 */
 	public void setSensitivity(double voltsPerDegreePerSecond) {
 		m_voltsPerDegreePerSecond = voltsPerDegreePerSecond;
+	}
+
+	/**
+	 * Set the size of the neutral zone.  Any voltage from the gyro less than
+	 * this amount from the center is considered stationary.  This is set by
+	 * default after calibration.
+	 *
+	 * @param volts The size of the deadband in volts
+	 */
+	void setDeadband(double volts) {
+		int deadband = (int)(volts * 1e9 / m_analog.getLSBWeight() * (1 << m_analog.getOversampleBits()));
+		m_analog.setAccumulatorDeadband(deadband);
 	}
 
 	/**

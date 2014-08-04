@@ -10,11 +10,12 @@
 #include "Timer.h"
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
-
+#include <climits>
 const uint32_t Gyro::kOversampleBits;
 const uint32_t Gyro::kAverageBits;
 constexpr float Gyro::kSamplesPerSecond;
 constexpr float Gyro::kCalibrationSampleTime;
+constexpr int Gyro::kNumCalibrationSamples;
 constexpr float Gyro::kDefaultVoltsPerDegreePerSecond;
 
 /**
@@ -49,7 +50,26 @@ void Gyro::InitGyro()
 	Wait(1.0);
 
 	m_analog->InitAccumulator();
-	Wait(kCalibrationSampleTime);
+
+	// Get the lowest and highest value that occur within a large number of
+	// calibration samples.  These are used to determine an appropriate default
+	// deadband.
+	int32_t lowestSample = INT_MAX, highestSample = INT_MIN;
+	for(int i = 0; i < kNumCalibrationSamples; i++)
+	{
+		int32_t sample = m_analog->GetAverageValue();
+
+		if(sample < lowestSample)
+		{
+			lowestSample = sample;
+		}
+		else if(sample > highestSample)
+		{
+			highestSample = sample;
+		}
+
+		Wait(kCalibrationSampleTime);
+	}
 
 	int64_t value;
 	uint32_t count;
@@ -59,8 +79,10 @@ void Gyro::InitGyro()
 
 	m_offset = ((float)value / (float)count) - (float)m_center;
 
+	int32_t deadband = std::max(highestSample - m_center, m_center - lowestSample);
+
 	m_analog->SetAccumulatorCenter(m_center);
-	m_analog->SetAccumulatorDeadband(0); ///< TODO: compute / parameterize this
+	m_analog->SetAccumulatorDeadband(deadband);
 	m_analog->ResetAccumulator();
 
 	SetPIDSourceParameter(kAngle);
@@ -177,6 +199,18 @@ double Gyro::GetRate( void )
 void Gyro::SetSensitivity( float voltsPerDegreePerSecond )
 {
 	m_voltsPerDegreePerSecond = voltsPerDegreePerSecond;
+}
+
+/**
+ * Set the size of the neutral zone.  Any voltage from the gyro less than this
+ * amount from the center is considered stationary.  This is set by default
+ * after calibration.
+ *
+ * @param volts The size of the deadband in volts
+ */
+void Gyro::SetDeadband( float volts ) {
+	int32_t deadband = volts * 1e9 / m_analog->GetLSBWeight() * (1 << m_analog->GetOversampleBits());
+	m_analog->SetAccumulatorDeadband(deadband);
 }
 
 void Gyro::SetPIDSourceParameter(PIDSourceParameter pidSource)
