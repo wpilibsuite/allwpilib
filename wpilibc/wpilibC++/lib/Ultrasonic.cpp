@@ -230,9 +230,7 @@ void Ultrasonic::SetAutomaticMode(bool enabling)
  */
 void Ultrasonic::Ping()
 {
-	// TODO: Either assert or disable, not both.
 	wpi_assert(!m_automaticEnabled);
-	SetAutomaticMode(false); // turn off automatic round robin if pinging single sensor
 	m_counter->Reset(); // reset the counter to zero (invalid data now)
 	m_pingChannel->Pulse(kPingTime); // do the ping to start getting a single range
 }
