@@ -11,14 +11,18 @@
 #include "HAL/HAL.hpp"
 #include "HAL/cpp/Synchronized.hpp"
 #include "Utility.h"
+#include <iostream>
+
+// The time, in seconds, at which the 32-bit FPGA timestamp rolls over to 0
+static const double kRolloverTime = (1ll << 32) / 1e6;
 
 /**
  * Pause the task for a specified time.
- * 
+ *
  * Pause the execution of the program for a specified period of time given in seconds.
  * Motors will continue to run at their last assigned values, and sensors will continue to
  * update. Only the task containing the wait will pause until the wait time is expired.
- * 
+ *
  * @param seconds Length of time to pause, in seconds.
  */
 void Wait(double seconds)
@@ -41,19 +45,19 @@ double GetClock()
  * @brief Gives real-time clock system time with nanosecond resolution
  * @return The time, just in case you want the robot to start autonomous at 8pm on Saturday.
 */
-double GetTime()  
+double GetTime()
 {
 	struct timespec tp;
-	
+
 	clock_gettime(CLOCK_REALTIME,&tp);
 	double realTime = (double)tp.tv_sec + (double)((double)tp.tv_nsec*1e-9);
-	
+
 	return (realTime);
 }
 
 /**
  * Create a new timer object.
- * 
+ *
  * Create a new timer object and reset the time to zero. The timer is initially not running and
  * must be started.
  */
@@ -78,7 +82,7 @@ Timer::~Timer()
  * Get the current time from the timer. If the clock is running it is derived from
  * the current system clock the start time stored in the timer class. If the clock
  * is not running, then return the time when it was last stopped.
- * 
+ *
  * @return unsigned Current time value for this timer in seconds
  */
 double Timer::Get()
@@ -89,8 +93,13 @@ double Timer::Get()
 	Synchronized sync(m_semaphore);
 	if(m_running)
 	{
-		// This math won't work if the timer rolled over (71 minutes after boot).
-		// TODO: Check for it and compensate.
+		// If the current time is before the start time, then the FPGA clock
+		// rolled over.  Compensate by adding the ~71 minutes that it takes
+		// to roll over to the current time.
+		if(currentTime < m_startTime) {
+			currentTime += kRolloverTime;
+		}
+
 		result = (currentTime - m_startTime) + m_accumulatedTime;
 	}
 	else
@@ -103,7 +112,7 @@ double Timer::Get()
 
 /**
  * Reset the timer by setting the time to 0.
- * 
+ *
  * Make the timer startTime the current time so new requests will be relative to now
  */
 void Timer::Reset()
@@ -141,7 +150,7 @@ void Timer::Stop()
 	Synchronized sync(m_semaphore);
 	if (m_running)
 	{
-		m_accumulatedTime = temp;	
+		m_accumulatedTime = temp;
 		m_running = false;
 	}
 }
@@ -169,7 +178,7 @@ bool Timer::HasPeriodPassed(double period)
 
 /*
  * Return the FPGA system clock time in seconds.
- * 
+ *
  * Return the time from the FPGA hardware clock in seconds since the FPGA
  * started.
  * Rolls over after 71 minutes.
