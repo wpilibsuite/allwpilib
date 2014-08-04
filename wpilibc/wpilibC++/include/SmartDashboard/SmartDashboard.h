@@ -19,21 +19,21 @@ class SmartDashboard : public SensorBase
 {
 public:
 	static void init();
-	
+
 	static void PutData(std::string key, Sendable *data);
 	static void PutData(NamedSendable *value);
-	//static Sendable* GetData(std::string keyName);
-	
+	static Sendable* GetData(std::string keyName);
+
 	static void PutBoolean(std::string keyName, bool value);
 	static bool GetBoolean(std::string keyName);
-	
+
 	static void PutNumber(std::string keyName, double value);
 	static double GetNumber(std::string keyName);
-	
+
 	static void PutString(std::string keyName, std::string value);
 	static int GetString(std::string keyName, char *value, unsigned int valueLen);
 	static std::string GetString(std::string keyName);
-	
+
 	static void PutValue(std::string keyName, ComplexData& value);
 	static void RetrieveValue(std::string keyName, ComplexData& value);
 private:
@@ -43,8 +43,8 @@ private:
 
 	/** The {@link NetworkTable} used by {@link SmartDashboard} */
 	static ITable* m_table;
-	
-	/** 
+
+	/**
 	 * A map linking tables in the SmartDashboard to the {@link SmartDashboardData} objects
 	 * they came from.
 	 */
@@ -52,4 +52,3 @@ private:
 };
 
 #endif
-

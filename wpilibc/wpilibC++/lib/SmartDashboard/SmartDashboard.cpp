@@ -16,9 +16,9 @@ std::map<ITable *, Sendable *> SmartDashboard::m_tablesToData;
 
 void SmartDashboard::init(){
 	m_table = NetworkTable::GetTable("SmartDashboard");
-}
 
-//TODO usage reporting
+	HALReport(HALUsageReporting::kResourceType_SmartDashboard, 0);
+}
 
 /**
  * Maps the specified key to the specified value in this table.
@@ -31,13 +31,13 @@ void SmartDashboard::PutData(std::string key, Sendable *data)
 {
 	if (data == NULL)
 	{
-		//TODO wpi_setWPIErrorWithContext(NullParameter, "value");
+		wpi_setGlobalWPIErrorWithContext(NullParameter, "value");
 		return;
 	}
-    ITable* dataTable = m_table->GetSubTable(key);
-    dataTable->PutString("~TYPE~", data->GetSmartDashboardType());
-    data->InitTable(dataTable);
-    m_tablesToData[dataTable] = data;
+	ITable* dataTable = m_table->GetSubTable(key);
+	dataTable->PutString("~TYPE~", data->GetSmartDashboardType());
+	data->InitTable(dataTable);
+	m_tablesToData[dataTable] = data;
 }
 
 /**
@@ -50,7 +50,7 @@ void SmartDashboard::PutData(NamedSendable *value)
 {
 	if (value == NULL)
 	{
-		//TODO wpi_setWPIErrorWithContext(NullParameter, "value");
+		wpi_setGlobalWPIErrorWithContext(NullParameter, "value");
 		return;
 	}
 	PutData(value->GetName(), value);
@@ -61,17 +61,17 @@ void SmartDashboard::PutData(NamedSendable *value)
  * @param keyName the key
  * @return the value
  */
-//TODO Sendable *SmartDashboard::GetData(std::string key)
-/*{
-	ITable* subtable = m_table->GetSubTable(keyName);
+Sendable *SmartDashboard::GetData(std::string key)
+{
+	ITable* subtable = m_table->GetSubTable(key);
 	Sendable *data = m_tablesToData[subtable];
 	if (data == NULL)
 	{
-		wpi_setWPIErrorWithContext(SmartDashboardMissingKey, keyName);
+		wpi_setGlobalWPIErrorWithContext(SmartDashboardMissingKey, key.c_str());
 		return NULL;
 	}
-    return data;
-}*/
+	return data;
+}
 
 /**
  * Maps the specified key to the specified complex value (such as an array) in this table.

@@ -15,4 +15,9 @@ public class HardwareHLUsageReporting implements HLUsageReporting.Interface {
 	public void reportPIDController(int num) {
 		UsageReporting.report(tResourceType.kResourceType_PIDController, num);
 	}
+
+	@Override
+	public void reportSmartDashboard() {
+		UsageReporting.report(tResourceType.kResourceType_SmartDashboard, 0);
+	}
 }

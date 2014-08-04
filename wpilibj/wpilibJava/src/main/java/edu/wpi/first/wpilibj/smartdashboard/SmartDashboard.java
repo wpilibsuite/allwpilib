@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.networktables.NetworkTableKeyNotDefined;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.TableKeyNotDefinedException;
+import edu.wpi.first.wpilibj.HLUsageReporting;
 import java.util.Hashtable;
 import java.util.NoSuchElementException;
 
@@ -26,7 +27,6 @@ import java.util.NoSuchElementException;
  * @author Joe Grinstead
  */
 public class SmartDashboard {
-    //TODO usage reporting
     /** The {@link NetworkTable} used by {@link SmartDashboard} */
     private static final NetworkTable table = NetworkTable.getTable("SmartDashboard");
     /**
@@ -34,6 +34,10 @@ public class SmartDashboard {
      * they came from.
      */
     private static final Hashtable tablesToData = new Hashtable();
+
+    static {
+        HLUsageReporting.reportSmartDashboard();
+    }
 
     /**
      * Maps the specified key to the specified value in this table.
@@ -71,15 +75,15 @@ public class SmartDashboard {
      * @throws IllegalArgumentException if the value mapped to by the key is not a {@link SmartDashboardData}
      * @throws IllegalArgumentException if the key is null
      */
-//TODO    public static SmartDashboardData getData(String key) {
-//        NetworkTable subtable = table.getSubTable(key);
-//        Object data = tablesToData.get(subtable);
-//        if (data == null) {
-//            throw new IllegalArgumentException("Value at \"" + key + "\" is not a boolean");
-//        } else {
-//            return (SmartDashboardData) data;
-//        }
-//    }
+    public static Sendable getData(String key) {
+        ITable subtable = table.getSubTable(key);
+        Object data = tablesToData.get(subtable);
+        if (data == null) {
+            throw new IllegalArgumentException("SmartDashboard data does not exist: " + key);
+        } else {
+            return (Sendable) data;
+        }
+    }
 
     /**
      * Maps the specified key to the specified value in this table.
