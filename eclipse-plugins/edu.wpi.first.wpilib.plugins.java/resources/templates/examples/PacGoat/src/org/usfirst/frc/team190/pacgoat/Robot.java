@@ -33,7 +33,7 @@ public class Robot extends IterativeRobot {
 	public static Collector collector;
 	public static Shooter shooter;
 	public static Pneumatics pneumatics;
-	public static Pivot pivot;;
+	public static Pivot pivot;
 
 	public SendableChooser autoChooser;
 	public SendableChooser autonomousDirectionChooser;
