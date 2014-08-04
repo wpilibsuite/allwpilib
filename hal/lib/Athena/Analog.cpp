@@ -288,7 +288,7 @@ int16_t getAnalogValue(void* analog_port_pointer, int32_t *status) {
  */
 int32_t getAnalogAverageValue(void* analog_port_pointer, int32_t *status) {
   AnalogPort* port = (AnalogPort*) analog_port_pointer;
-  int16_t value;
+  int32_t value;
   checkAnalogInputChannel(port->port.pin);
 
   tAI::tReadSelect readSelect;
@@ -299,7 +299,7 @@ int32_t getAnalogAverageValue(void* analog_port_pointer, int32_t *status) {
     Synchronized sync(analogRegisterWindowSemaphore);
     analogInputSystem->writeReadSelect(readSelect, status);
     analogInputSystem->strobeLatchOutput(status);
-    value = (int16_t) analogInputSystem->readOutput(status);
+    value = (int32_t) analogInputSystem->readOutput(status);
   }
 
   return value;
