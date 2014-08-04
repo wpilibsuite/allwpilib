@@ -9,8 +9,6 @@
 #include "Resource.h"
 #include "WPIErrors.h"
 
-extern Resource *interruptsResource;
-
 /**
  * Create an instance of a DigitalOutput.
  * Creates a digital output given a channel. Common creation routine for all
@@ -235,10 +233,10 @@ bool DigitalOutput::GetAnalogTriggerForRouting()
 void DigitalOutput::RequestInterrupts(InterruptHandlerFunction handler, void *param)
 {
 	if (StatusIsFatal()) return;
-	uint32_t index = interruptsResource->Allocate("Sync Interrupt");
+	uint32_t index = m_interrupts->Allocate("Sync Interrupt");
 	if (index == ~0ul)
 	{
-		CloneError(interruptsResource);
+		CloneError(m_interrupts);
 		return;
 	}
 	m_interruptIndex = index;
@@ -263,10 +261,10 @@ void DigitalOutput::RequestInterrupts(InterruptHandlerFunction handler, void *pa
 void DigitalOutput::RequestInterrupts()
 {
 	if (StatusIsFatal()) return;
-	uint32_t index = interruptsResource->Allocate("Sync Interrupt");
+	uint32_t index = m_interrupts->Allocate("Sync Interrupt");
 	if (index == ~0ul)
 	{
-		CloneError(interruptsResource);
+		CloneError(m_interrupts);
 		return;
 	}
 	m_interruptIndex = index;

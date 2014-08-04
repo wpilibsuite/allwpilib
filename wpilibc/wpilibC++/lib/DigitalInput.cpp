@@ -9,9 +9,6 @@
 #include "Resource.h"
 #include "WPIErrors.h"
 
-// TODO: This is not a good place for this...
-Resource *interruptsResource = NULL;
-
 /**
  * Create an instance of a DigitalInput.
  * Creates a digital input given a channel. Common creation routine for all
@@ -21,7 +18,6 @@ void DigitalInput::InitDigitalInput(uint32_t channel)
 {
 	m_table = NULL;
 	char buf[64];
-	Resource::CreateResourceObject(&interruptsResource, interrupt_kNumSystems);
 
 	if (!CheckDigitalChannel(channel))
 	{
@@ -61,7 +57,7 @@ DigitalInput::~DigitalInput()
 		cleanInterrupts(m_interrupt, &status);
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
 		m_interrupt = NULL;
-		interruptsResource->Free(m_interruptIndex);
+		m_interrupts->Free(m_interruptIndex);
 	}
 
 	int32_t status = 0;
@@ -117,17 +113,17 @@ bool DigitalInput::GetAnalogTriggerForRouting()
  * Request interrupts asynchronously on this digital input.
  * @param handler The address of the interrupt handler function of type tInterruptHandler that
  * will be called whenever there is an interrupt on the digitial input port.
- * Request interrupts in synchronus mode where the user program interrupt handler will be
+ * Request interrupts in asynchronus mode where the user program interrupt handler will be
  * called when an interrupt occurs.
  * The default is interrupt on rising edges only.
  */
 void DigitalInput::RequestInterrupts(InterruptHandlerFunction handler, void *param)
 {
 	if (StatusIsFatal()) return;
-	uint32_t index = interruptsResource->Allocate("Async Interrupt");
+	uint32_t index = m_interrupts->Allocate("Async Interrupt");
 	if (index == ~0ul)
 	{
-		CloneError(interruptsResource);
+		CloneError(m_interrupts);
 		return;
 	}
 	m_interruptIndex = index;
@@ -152,10 +148,10 @@ void DigitalInput::RequestInterrupts(InterruptHandlerFunction handler, void *par
 void DigitalInput::RequestInterrupts()
 {
 	if (StatusIsFatal()) return;
-	uint32_t index = interruptsResource->Allocate("Sync Interrupt");
+	uint32_t index = m_interrupts->Allocate("Sync Interrupt");
 	if (index == ~0ul)
 	{
-		CloneError(interruptsResource);
+		CloneError(m_interrupts);
 		return;
 	}
 	m_interruptIndex = index;

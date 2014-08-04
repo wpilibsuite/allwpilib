@@ -75,7 +75,7 @@ TEST_F(DIOLoopTest, FakeCounter) {
 	EXPECT_EQ(100, counter.Get()) << "Counter did not count up to 100.";
 }
 
-void InterruptHandler(uint32_t interruptAssertedMask, void *param) {
+static void InterruptHandler(uint32_t interruptAssertedMask, void *param) {
 	*(int *)param = 12345;
 }
 

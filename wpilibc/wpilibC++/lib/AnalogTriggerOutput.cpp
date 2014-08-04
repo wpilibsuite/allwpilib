@@ -27,6 +27,14 @@ AnalogTriggerOutput::AnalogTriggerOutput(AnalogTrigger *trigger, AnalogTriggerTy
 
 AnalogTriggerOutput::~AnalogTriggerOutput()
 {
+	if (m_interrupt != NULL)
+	{
+		int32_t status = 0;
+		cleanInterrupts(m_interrupt, &status);
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+		m_interrupt = NULL;
+		m_interrupts->Free(m_interruptIndex);
+	}
 }
 
 /**
@@ -54,7 +62,7 @@ uint32_t AnalogTriggerOutput::GetChannelForRouting()
  */
 uint32_t AnalogTriggerOutput::GetModuleForRouting()
 {
-	return m_trigger->m_index >> 2;
+	return 0;
 }
 
 /**
@@ -67,16 +75,51 @@ bool AnalogTriggerOutput::GetAnalogTriggerForRouting()
 
 /**
  * Request interrupts asynchronously on this analog trigger output.
- * TODO: Hardware supports interrupts on Analog Trigger outputs... WPILib should too
+ * @param handler The address of the interrupt handler function of type tInterruptHandler that
+ * will be called whenever there is an interrupt on the digitial input port.
+ * Request interrupts in synchronus mode where the user program interrupt handler will be
+ * called when an interrupt occurs.
  */
 void AnalogTriggerOutput::RequestInterrupts(InterruptHandlerFunction handler, void *param)
 {
+	if (StatusIsFatal()) return;
+	uint32_t index = m_interrupts->Allocate("Async Interrupt");
+	if (index == ~0ul)
+	{
+		CloneError(m_interrupts);
+		return;
+	}
+	m_interruptIndex = index;
+
+	AllocateInterrupts(false);
+
+	int32_t status = 0;
+	requestInterrupts(m_interrupt, GetModuleForRouting(), GetChannelForRouting(),
+	                  GetAnalogTriggerForRouting(), &status);
+	attachInterruptHandler(m_interrupt, handler, param, &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
  * Request interrupts synchronously on this analog trigger output.
- * TODO: Hardware supports interrupts on Analog Trigger outputs... WPILib should too
+ * Request interrupts in asynchronus mode where the user program will have to
+ * explicitly wait for the interrupt to occur.
  */
 void AnalogTriggerOutput::RequestInterrupts()
 {
+	if (StatusIsFatal()) return;
+	uint32_t index = m_interrupts->Allocate("Sync Interrupt");
+	if (index == ~0ul)
+	{
+		CloneError(m_interrupts);
+		return;
+	}
+	m_interruptIndex = index;
+
+	AllocateInterrupts(true);
+
+	int32_t status = 0;
+	requestInterrupts(m_interrupt, GetModuleForRouting(), GetChannelForRouting(),
+					  GetAnalogTriggerForRouting(), &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }

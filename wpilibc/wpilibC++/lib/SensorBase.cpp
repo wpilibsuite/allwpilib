@@ -17,6 +17,7 @@ const uint32_t SensorBase::kPwmChannels;
 const uint32_t SensorBase::kRelayChannels;
 const uint32_t SensorBase::kPDPChannels;
 const uint32_t SensorBase::kChassisSlots;
+Resource *SensorBase::m_interrupts = NULL;
 SensorBase *SensorBase::m_singletonList = NULL;
 
 static bool portsInitialized = false;
@@ -54,6 +55,8 @@ SensorBase::SensorBase()
 			wpi_setErrorWithContext(status, getHALErrorMessage(status));
 		}
 	}
+
+	Resource::CreateResourceObject(&m_interrupts, interrupt_kNumSystems);
 }
 
 /**

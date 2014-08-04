@@ -93,3 +93,30 @@ TEST_F(AnalogLoopTest, AnalogTriggerCounterWorks) {
 	// The counter should be 50
 	EXPECT_EQ(50, counter.Get()) << "Analog trigger counter did not count 50 ticks";
 }
+
+static void InterruptHandler(uint32_t interruptAssertedMask, void *param) {
+	*(int *)param = 12345;
+}
+
+TEST_F(AnalogLoopTest, AsynchronusInterruptWorks) {
+	int param = 0;
+	AnalogTrigger trigger(m_input);
+	trigger.SetLimitsVoltage(2.0f, 3.0f);
+
+	// Given an interrupt handler that sets an int to 12345
+	AnalogTriggerOutput *triggerOutput = trigger.CreateOutput(kState);
+	triggerOutput->RequestInterrupts(InterruptHandler, &param);
+	triggerOutput->EnableInterrupts();
+
+	// If the analog output moves from below to above the window
+	m_output->SetVoltage(0.0);
+	Wait(kDelayTime);
+	m_output->SetVoltage(5.0);
+	triggerOutput->CancelInterrupts();
+
+	// Then the int should be 12345
+	Wait(kDelayTime);
+	EXPECT_EQ(12345, param) << "The interrupt did not run.";
+
+	delete triggerOutput;
+}
