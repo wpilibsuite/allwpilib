@@ -6,7 +6,9 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.logging.Logger;
 
@@ -16,15 +18,15 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
 
 /**
  * @author jonathanleitschuh
  *
  */
-public class AnalogCrossConnectTest extends AbstractComsSetup {
+public class AnalogCrossConnectTest extends AbstractInterruptTest {
 	private static final Logger logger = Logger.getLogger(AnalogCrossConnectTest.class.getName());
 
 	private static AnalogCrossConnectFixture analogIO;
@@ -133,7 +135,6 @@ public class AnalogCrossConnectTest extends AbstractComsSetup {
 		// Given
 		AnalogTrigger trigger = new AnalogTrigger(analogIO.getInput());
 		trigger.setLimitsVoltage(2.0f, 3.0f);
-
 		Counter counter = new Counter(trigger);
 
 		// When the analog output is turned low and high 50 times
@@ -151,5 +152,49 @@ public class AnalogCrossConnectTest extends AbstractComsSetup {
 	@Test(expected=RuntimeException.class)
 	public void testRuntimeExceptionOnInvalidAccumulatorPort(){
 		analogIO.getInput().getAccumulatorCount();
+	}
+
+	private AnalogTrigger interruptTrigger;
+	private AnalogTriggerOutput interruptTriggerOutput;
+	
+	/* (non-Javadoc)
+	 * @see edu.wpi.first.wpilibj.AbstractInterruptTest#giveInterruptableSensorBase()
+	 */
+	@Override
+	InterruptableSensorBase giveInterruptableSensorBase() {
+		interruptTrigger = new AnalogTrigger(analogIO.getInput());
+		interruptTrigger.setLimitsVoltage(2.0f, 3.0f);
+		interruptTriggerOutput = new AnalogTriggerOutput(interruptTrigger, AnalogTriggerType.STATE);
+		return interruptTriggerOutput;
+	}
+
+
+	/* (non-Javadoc)
+	 * @see edu.wpi.first.wpilibj.AbstractInterruptTest#freeInterruptableSensorBase()
+	 */
+	@Override
+	void freeInterruptableSensorBase() {
+		interruptTriggerOutput.cancelInterrupts();
+		interruptTriggerOutput.free();
+		interruptTriggerOutput = null;
+		interruptTrigger.free();
+		interruptTrigger = null;
+	}
+
+
+	/* (non-Javadoc)
+	 * @see edu.wpi.first.wpilibj.AbstractInterruptTest#setInterruptHigh()
+	 */
+	@Override
+	void setInterruptHigh() {
+		analogIO.getOutput().setVoltage(4.0);
+	}
+
+	/* (non-Javadoc)
+	 * @see edu.wpi.first.wpilibj.AbstractInterruptTest#setInterruptLow()
+	 */
+	@Override
+	void setInterruptLow() {
+		analogIO.getOutput().setVoltage(1.0);
 	}
 }

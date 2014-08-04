@@ -52,6 +52,11 @@ public class DIOCrossConnectFixture implements ITestFixture {
 
 	@Override
 	public boolean reset() {
+		try{
+			input.cancelInterrupts();
+		} catch(IllegalStateException e) {
+			//This will happen if the interrupt has not been allocated for this test.
+		}
 		output.set(false);
 		return true;
 	}

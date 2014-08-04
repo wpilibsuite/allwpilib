@@ -7,26 +7,40 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.IntBuffer;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
-import edu.wpi.first.wpilibj.hal.InterruptJNI;
-import edu.wpi.first.wpilibj.hal.InterruptJNI.InterruptHandlerFunction;
 import edu.wpi.first.wpilibj.hal.HALUtil;
+import edu.wpi.first.wpilibj.hal.InterruptJNI;
+import edu.wpi.first.wpilibj.util.AllocationException;
+import edu.wpi.first.wpilibj.util.CheckedAllocationException;
 
 /**
  * Base for sensors to be used with interrupts
  */
 public abstract class InterruptableSensorBase extends SensorBase {
+	/** 
+	 * This is done to store the JVM variable in the InterruptJNI
+	 * This is done because the HAL must have access to the JVM variable
+	 * in order to attach the newly spawned thread when an interrupt is fired.
+	 */
+	static{
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		InterruptJNI.initializeInterruptJVM(status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+	}
 
 	/**
 	 * The interrupt resource
 	 */
-	protected ByteBuffer m_interrupt;
+	protected ByteBuffer m_interrupt = null;
+	
 	/**
-	 * The interrupt manager resource
+	 * Flags if the interrupt being allocated is synchronous
 	 */
-	protected InterruptHandlerFunction m_manager;
+	protected boolean m_isSynchronousInterrupt = false;
+	
 	/**
 	 * The index of the interrupt
 	 */
@@ -40,25 +54,102 @@ public abstract class InterruptableSensorBase extends SensorBase {
 	 * Create a new InterrupatableSensorBase
 	 */
 	public InterruptableSensorBase() {
-		m_manager = null;
 		m_interrupt = null;
+	}
+	
+	/**
+	 * @return
+	 */
+	abstract boolean getAnalogTriggerForRouting();
+
+	/**
+	 * @return
+	 */
+	abstract int getChannelForRouting();
+
+	/**
+	 * @return
+	 */
+	abstract byte getModuleForRouting();
+	
+	/**
+	 * Request interrupts asynchronously on this digital input.
+	 *
+	 * @param handler
+	 *            The {@link #InterruptHandlerFunction} that contains the method
+	 *            {@link InterruptHandlerFunction#interruptFired(int, Object)} that
+	 *            will be called whenever there is an interrupt on this device.
+	 *            Request interrupts in synchronus mode where the user program
+	 *            interrupt handler will be called when an interrupt occurs. The 
+	 *            default is interrupt on rising edges only.
+	 */
+	public void requestInterrupts(InterruptHandlerFunction<?> handler) {
+		if(m_interrupt != null){
+			throw new AllocationException("The interrupt has already been allocated");
+		}
+		
+		allocateInterrupts(false);
+		
+		assert (m_interrupt != null);
+
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		InterruptJNI.requestInterrupts(m_interrupt, getModuleForRouting(),
+				getChannelForRouting(),
+				(byte) (getAnalogTriggerForRouting() ? 1 : 0), status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		setUpSourceEdge(true, false);
+		InterruptJNI.attachInterruptHandler(m_interrupt, handler.function, handler.overridableParamater(), status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+	}
+
+	/**
+	 * Request interrupts synchronously on this digital input. Request
+	 * interrupts in synchronous mode where the user program will have to
+	 * explicitly wait for the interrupt to occur. The default is interrupt on
+	 * rising edges only.
+	 */
+	public void requestInterrupts() {
+		if(m_interrupt != null){
+			throw new AllocationException("The interrupt has already been allocated");
+		}
+		
+		allocateInterrupts(true);
+
+		assert (m_interrupt != null);
+
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		// set the byte order
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		InterruptJNI.requestInterrupts(m_interrupt, getModuleForRouting(),
+				getChannelForRouting(),
+				(byte) (getAnalogTriggerForRouting() ? 1 : 0), status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		setUpSourceEdge(true, false);
+
 	}
 
 	/**
 	 * Allocate the interrupt
 	 * 
-	 * @param watcher
+	 * @param watcher true if the interrupt should be in synchronous mode where the user
+	 * program will have to explicitly wait for the interrupt to occur.
 	 */
-	public void allocateInterrupts(boolean watcher) {
-		if (!watcher) {
-			throw new IllegalArgumentException(
-					"Interrupt callbacks not yet supported");
+	protected void allocateInterrupts(boolean watcher) {
+		try {
+			m_interruptIndex = interrupts.allocate();
+		} catch (CheckedAllocationException e) {
+			throw new AllocationException(
+					"No interrupts are left to be allocated");
 		}
-		// Expects the calling leaf class to allocate an interrupt index.
-		IntBuffer status = IntBuffer.allocate(1);
+		m_isSynchronousInterrupt = watcher;
+
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
 		m_interrupt = InterruptJNI.initializeInterrupts(m_interruptIndex,
-				(byte) (watcher ? 1 : 0), status);
-		HALUtil.checkStatus(status);
+				(byte) (watcher ? 1 : 0), status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/**
@@ -66,13 +157,15 @@ public abstract class InterruptableSensorBase extends SensorBase {
 	 * structures and disables any interrupts.
 	 */
 	public void cancelInterrupts() {
-		if (m_interrupt == null || m_manager == null) {
-			throw new IllegalStateException();
+		if (m_interrupt == null) {
+			throw new IllegalStateException("The interrupt is not allocated.");
 		}
-		IntBuffer status = IntBuffer.allocate(1);
-		InterruptJNI.cleanInterrupts(m_interrupt, status);
-		HALUtil.checkStatus(status);
-		
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		InterruptJNI.cleanInterrupts(m_interrupt, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		m_interrupt = null;
+		interrupts.free(m_interruptIndex);
 	}
 
 	/**
@@ -82,12 +175,13 @@ public abstract class InterruptableSensorBase extends SensorBase {
 	 *            Timeout in seconds
 	 */
 	public void waitForInterrupt(double timeout) {
-		if (m_interrupt == null || m_manager == null) {
-			throw new IllegalStateException();
+		if (m_interrupt == null) {
+			throw new IllegalStateException("The interrupt is not allocated.");
 		}
-		IntBuffer status = IntBuffer.allocate(1);
-		InterruptJNI.waitForInterrupt(m_interrupt, (float) timeout, status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		InterruptJNI.waitForInterrupt(m_interrupt, (float) timeout, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/**
@@ -96,24 +190,32 @@ public abstract class InterruptableSensorBase extends SensorBase {
 	 * other options before starting to field interrupts.
 	 */
 	public void enableInterrupts() {
-		if (m_interrupt == null || m_manager == null) {
-			throw new IllegalStateException();
+		if (m_interrupt == null) {
+			throw new IllegalStateException("The interrupt is not allocated.");
 		}
-		IntBuffer status = IntBuffer.allocate(1);
-		InterruptJNI.enableInterrupts(m_interrupt, status);
-		HALUtil.checkStatus(status);
+		if(m_isSynchronousInterrupt){
+			throw new IllegalStateException("You do not need to enable synchronous interrupts");
+		}
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		InterruptJNI.enableInterrupts(m_interrupt, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/**
 	 * Disable Interrupts without without deallocating structures.
 	 */
 	public void disableInterrupts() {
-		if (m_interrupt == null || m_manager == null) {
-			throw new IllegalStateException();
+		if (m_interrupt == null) {
+			throw new IllegalStateException("The interrupt is not allocated.");
 		}
-		IntBuffer status = IntBuffer.allocate(1);
-		InterruptJNI.disableInterrupts(m_interrupt, status);
-		HALUtil.checkStatus(status);
+		if(m_isSynchronousInterrupt){
+			throw new IllegalStateException("You can not disable synchronous interrupts");
+		}
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		InterruptJNI.disableInterrupts(m_interrupt, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/**
@@ -123,12 +225,36 @@ public abstract class InterruptableSensorBase extends SensorBase {
 	 * @return Timestamp in seconds since boot.
 	 */
 	public double readInterruptTimestamp() {
-		if (m_interrupt == null || m_manager == null) {
-			throw new IllegalStateException();
+		if (m_interrupt == null) {
+			throw new IllegalStateException("The interrupt is not allocated.");
 		}
-		IntBuffer status = IntBuffer.allocate(1);
-		double timestamp = InterruptJNI.readInterruptTimestamp(m_interrupt, status);
-		HALUtil.checkStatus(status);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		double timestamp = InterruptJNI.readInterruptTimestamp(m_interrupt, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 		return timestamp;
+	}
+	
+	/**
+	 * Set which edge to trigger interrupts on
+	 *
+	 * @param risingEdge
+	 *            true to interrupt on rising edge
+	 * @param fallingEdge
+	 *            true to interrupt on falling edge
+	 */
+	public void setUpSourceEdge(boolean risingEdge, boolean fallingEdge) {
+		if (m_interrupt != null) {
+			ByteBuffer status = ByteBuffer.allocateDirect(4);
+			// set the byte order
+			status.order(ByteOrder.LITTLE_ENDIAN);
+			InterruptJNI.setInterruptUpSourceEdge(m_interrupt,
+					(byte) (risingEdge ? 1 : 0), (byte) (fallingEdge ? 1 : 0),
+					status.asIntBuffer());
+			HALUtil.checkStatus(status.asIntBuffer());
+		} else {
+			throw new IllegalArgumentException(
+					"You must call RequestInterrupts before setUpSourceEdge");
+		}
 	}
 }

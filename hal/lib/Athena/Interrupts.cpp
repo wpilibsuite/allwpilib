@@ -52,8 +52,10 @@ void enableInterrupts(void* interrupt_pointer, int32_t *status)
  */
 void disableInterrupts(void* interrupt_pointer, int32_t *status)
 {
+
 	Interrupt* anInterrupt = (Interrupt*)interrupt_pointer;
 	anInterrupt->manager->disable(status);
+
 }
 
 /**

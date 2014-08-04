@@ -6,14 +6,12 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.logging.Logger;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
@@ -68,8 +66,8 @@ public class AnalogPotentiometerTest extends AbstractComsSetup {
 	public void testRangeValues(){
 		for(double i = 0.0; i < 360.0; i = i+1.0){
 			potSource.setAngle(i);
-			assertEquals(i, pot.get(), DOUBLE_COMPARISON_DELTA);
 			Timer.delay(.02);
+			assertEquals(i, pot.get(), DOUBLE_COMPARISON_DELTA);
 		}
 	}
 

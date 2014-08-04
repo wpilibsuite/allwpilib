@@ -14,16 +14,12 @@ import java.util.logging.Logger;
 
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
 
 /**
@@ -31,11 +27,12 @@ import edu.wpi.first.wpilibj.test.TestBench;
  * @author jonathanleitschuh
  */
 @RunWith(Parameterized.class)
-public class DIOCrossConnectTest extends AbstractComsSetup {
+public class DIOCrossConnectTest extends AbstractInterruptTest {
 	private static final Logger logger = Logger.getLogger(DIOCrossConnectTest.class.getName());
 
 	private static DIOCrossConnectFixture dio = null;
 	
+	@Override
 	protected Logger getClassLogger(){
 		return logger;
 	}
@@ -65,7 +62,7 @@ public class DIOCrossConnectTest extends AbstractComsSetup {
 	 * Array in the Collection, each array element corresponds to a parameter
 	 * in the constructor.
 	 */
-	@Parameters
+	@Parameters(name= "{index}: Input Port: {0} Output Port: {1}")
 	public static Collection<Integer[]> generateData() {
 		// In this example, the parameter generator returns a List of
 		// arrays. Each array has two elements: { Digital input port, Digital output port}.
@@ -74,24 +71,14 @@ public class DIOCrossConnectTest extends AbstractComsSetup {
 		return TestBench.getInstance().getDIOCrossConnectCollection();
 	}
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-
-	}
-
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 		dio.teardown();
 	}
 
-	@Before
-	public void setUp() throws Exception {
-		dio.reset();
-
-	}
-
 	@After
 	public void tearDown() throws Exception {
+		dio.reset();
 	}
 
 	/**
@@ -115,4 +102,38 @@ public class DIOCrossConnectTest extends AbstractComsSetup {
 		Timer.delay(.02);
 		assertFalse("DIO Not Low after .05s delay", dio.getInput().get());
 	}
+
+	/* (non-Javadoc)
+	 * @see edu.wpi.first.wpilibj.AbstractInterruptTest#giveInterruptableSensorBase()
+	 */
+	@Override
+	InterruptableSensorBase giveInterruptableSensorBase() {
+		return dio.getInput();
+	}
+
+	/* (non-Javadoc)
+	 * @see edu.wpi.first.wpilibj.AbstractInterruptTest#freeInterruptableSensorBase()
+	 */
+	@Override
+	void freeInterruptableSensorBase() {
+		// Handled in the fixture
+	}
+
+	/* (non-Javadoc)
+	 * @see edu.wpi.first.wpilibj.AbstractInterruptTest#setInterruptHigh()
+	 */
+	@Override
+	void setInterruptHigh() {
+		dio.getOutput().set(true);
+	}
+
+	/* (non-Javadoc)
+	 * @see edu.wpi.first.wpilibj.AbstractInterruptTest#setInterruptLow()
+	 */
+	@Override
+	void setInterruptLow() {
+		dio.getOutput().set(false);
+		
+	}
+	
 }

@@ -3,6 +3,8 @@
 #include "Log.hpp"
 #include "edu_wpi_first_wpilibj_hal_HALUtil.h"
 #include "HAL/HAL.hpp"
+#include "errno.h"
+#include <string.h>
 
 // set the logging level
 TLogLevel halUtilLogLevel = logWARNING;
@@ -144,4 +146,28 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrorMess
 	const char * msg = getHALErrorMessage(paramId);
 	HALUTIL_LOG(logDEBUG) << "Calling HALUtil getHALErrorMessage id=" << paramId << " msg=" << msg;
 	return paramEnv->NewStringUTF(msg);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_HALUtil
+ * Method:    getHALErrno
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrno
+  (JNIEnv *, jclass)
+{
+	return errno;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_HALUtil
+ * Method:    getHALstrerror
+ * Signature: (I)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALstrerror
+  (JNIEnv * env, jclass, jint errorCode)
+{
+	const char * msg = strerror(errno);
+	HALUTIL_LOG(logDEBUG) << "Calling HALUtil getHALstrerror errorCode=" << errorCode << " msg=" << msg;
+	return env->NewStringUTF(msg);
 }

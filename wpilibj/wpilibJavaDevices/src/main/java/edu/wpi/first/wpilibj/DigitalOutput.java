@@ -7,24 +7,21 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
-//import com.sun.jna.Pointer;
-
-
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.DIOJNI;
-import edu.wpi.first.wpilibj.hal.PWMJNI;
 import edu.wpi.first.wpilibj.hal.HALUtil;
+import edu.wpi.first.wpilibj.hal.PWMJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
+//import com.sun.jna.Pointer;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 
 /**
- * Class to write digital outputs. This class will wrtie digital outputs. Other
+ * Class to write digital outputs. This class will write digital outputs. Other
  * devices that are implemented elsewhere will automatically allocate digital
  * inputs and outputs as required.
  */
@@ -48,6 +45,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
 	/**
 	 * Free the resources associated with a digital output.
 	 */
+	@Override
 	public void free() {
 		// disable the pwm only if we have allocated it
 		if (m_pwmGenerator != null) {
@@ -104,6 +102,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
 	 * @param pulseLength
 	 *            The length of the pulse.
 	 */
+	@Deprecated
 	public void pulse(final int channel, final int pulseLength) {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
@@ -212,6 +211,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
 	/*
 	 * Live Window code, only does anything if live window is activated.
 	 */
+	@Override
 	public String getSmartDashboardType() {
 		return "Digital Output";
 	}
@@ -222,6 +222,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void initTable(ITable subtable) {
 		m_table = subtable;
 		updateTable();
@@ -230,6 +231,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public ITable getTable() {
 		return m_table;
 	}
@@ -237,6 +239,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void updateTable() {
 		// TODO: Put current value.
 	}
@@ -244,8 +247,10 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void startLiveWindowMode() {
 		m_table_listener = new ITableListener() {
+			@Override
 			public void valueChanged(ITable itable, String key, Object value,
 					boolean bln) {
 				set(((Boolean) value).booleanValue());
@@ -257,6 +262,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void stopLiveWindowMode() {
 		// TODO: Broken, should only remove the listener from "Value" only.
 		m_table.removeTableListener(m_table_listener);

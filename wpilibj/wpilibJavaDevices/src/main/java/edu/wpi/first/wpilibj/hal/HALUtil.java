@@ -1,7 +1,7 @@
 package edu.wpi.first.wpilibj.hal;
 
-import java.nio.IntBuffer;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 public class HALUtil extends JNIWrapper {
 	public static final int NULL_PARAMETER = -5;
@@ -28,6 +28,12 @@ public class HALUtil extends JNIWrapper {
 	public static native boolean getFPGAButton(IntBuffer status);
 
 	public static native String getHALErrorMessage(int code);
+	
+	public static native int getHALErrno();
+	public static native String getHALstrerror(int errno);
+	public static String getHALstrerror(){
+		return getHALstrerror(getHALErrno());
+	}
 
 	public static void checkStatus(IntBuffer status)
 	{
