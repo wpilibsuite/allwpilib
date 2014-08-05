@@ -50,6 +50,8 @@
 #include <sstream>
 #include <vector>
 
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+
 #if GTEST_OS_LINUX
 
 // TODO(kenton@google.com): Use autoconf to detect availability of

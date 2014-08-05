@@ -65,7 +65,7 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
 	m_I = Ki;
 	m_D = Kd;
 	m_F = Kf;
-	
+
 	m_maximumOutput = 1.0;
 	m_minimumOutput = -1.0;
 
@@ -86,17 +86,17 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
 	m_pidInput = source;
 	m_pidOutput = output;
 	m_period = period;
-	
+
 	pthread_mutexattr_t mutexattr;
 	pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE);
 	pthread_mutex_init(&m_mutex, &mutexattr);
-	
-	pthread_create(&m_controlLoop, NULL, PIDController::CallCalculate, this);	
+
+	pthread_create(&m_controlLoop, NULL, PIDController::CallCalculate, this);
 
 	static int32_t instances = 0;
 	instances++;
 	HALReport(HALUsageReporting::kResourceType_PIDController, instances);
-	
+
 	m_toleranceType = kNoTolerance;
 }
 
@@ -110,7 +110,7 @@ PIDController::~PIDController()
 	pthread_mutex_lock(&m_mutex);
 	m_destruct = true;
 	pthread_mutex_unlock(&m_mutex);
-	
+
 	pthread_join(m_controlLoop, NULL);
 }
 
@@ -125,41 +125,43 @@ void *PIDController::CallCalculate(void *data)
 {
 	PIDController *controller = (PIDController*) data;
 	int destruct = 0;
-	
+
 	while(!destruct) {
 		controller->Calculate();
-		
+
 		/* End the calculation loop when the PIDController gets destructed */
 		pthread_mutex_lock(&controller->m_mutex);
 		destruct = controller->m_destruct;
 		pthread_mutex_unlock(&controller->m_mutex);
-		
+
 		Wait(controller->m_period);
 	}
+
+	return NULL;
 }
 
  /**
   * Read the input, calculate the output accordingly, and write to the output.
   * This should only be called by the Notifier indirectly through CallCalculate
   * and is created during initialization.
-  */	
+  */
 void PIDController::Calculate()
 {
 	bool enabled;
 	PIDSource *pidInput;
-	
+
 	if(m_pidInput == 0) return;
 	if(m_pidOutput == 0) return;
-	
+
 	pthread_mutex_lock(&m_mutex);
 	enabled = m_enabled;
 	pidInput = m_pidInput;
 	pthread_mutex_unlock(&m_mutex);
-	
+
 	if(enabled)
 	{
 		pthread_mutex_lock(&m_mutex);
-		
+
 		float input = pidInput->PIDGet();
 
 		float result;
@@ -180,7 +182,7 @@ void PIDController::Calculate()
 				}
 			}
 		}
-		
+
 		if(m_I != 0)
 		{
 			double potentialIGain = (m_totalError + m_error) * m_I;
@@ -205,9 +207,9 @@ void PIDController::Calculate()
 
 		pidOutput = m_pidOutput;
 		result = m_result;
-		
+
 		pidOutput->PIDWrite(result);
-		
+
 		pthread_mutex_unlock(&m_mutex);
 	}
 }
@@ -266,11 +268,11 @@ void PIDController::SetPID(float p, float i, float d, float f)
 float PIDController::GetP()
 {
 	float temp;
-	
+
 	pthread_mutex_lock(&m_mutex);
-	temp = m_P; 
+	temp = m_P;
 	pthread_mutex_unlock(&m_mutex);
-	
+
 	return temp;
 }
 
@@ -281,11 +283,11 @@ float PIDController::GetP()
 float PIDController::GetI()
 {
 	float temp;
-	
+
 	pthread_mutex_lock(&m_mutex);
-	temp = m_I; 
+	temp = m_I;
 	pthread_mutex_unlock(&m_mutex);
-	
+
 	return temp;
 }
 
@@ -296,11 +298,11 @@ float PIDController::GetI()
 float PIDController::GetD()
 {
 	float temp;
-	
+
 	pthread_mutex_lock(&m_mutex);
-	temp = m_D; 
+	temp = m_D;
 	pthread_mutex_unlock(&m_mutex);
-	
+
 	return temp;
 }
 
@@ -311,11 +313,11 @@ float PIDController::GetD()
 float PIDController::GetF()
 {
 	float temp;
-	
+
 	pthread_mutex_lock(&m_mutex);
-	temp = m_F; 
+	temp = m_F;
 	pthread_mutex_unlock(&m_mutex);
-	
+
 	return temp;
 }
 
@@ -327,11 +329,11 @@ float PIDController::GetF()
 float PIDController::Get()
 {
 	float temp;
-	
+
 	pthread_mutex_lock(&m_mutex);
-	temp = m_result; 
+	temp = m_result;
 	pthread_mutex_unlock(&m_mutex);
-	
+
 	return temp;
 }
 
@@ -351,7 +353,7 @@ void PIDController::SetContinuous(bool continuous)
 
 /**
  * Sets the maximum and minimum values expected from the input.
- * 
+ *
  * @param minimumInput the minimum value expected from the input
  * @param maximumInput the maximum value expected from the output
  */
@@ -359,7 +361,7 @@ void PIDController::SetInputRange(float minimumInput, float maximumInput)
 {
 	pthread_mutex_lock(&m_mutex);
 	m_minimumInput = minimumInput;
-	m_maximumInput = maximumInput;	
+	m_maximumInput = maximumInput;
 	pthread_mutex_unlock(&m_mutex);
 
 	SetSetpoint(m_setpoint);
@@ -367,7 +369,7 @@ void PIDController::SetInputRange(float minimumInput, float maximumInput)
 
 /**
  * Sets the minimum and maximum values to write.
- * 
+ *
  * @param minimumOutput the minimum value to write to the output
  * @param maximumOutput the maximum value to write to the output
  */
@@ -400,7 +402,7 @@ void PIDController::SetSetpoint(float setpoint)
 		m_setpoint = setpoint;
 	}
 	pthread_mutex_unlock(&m_mutex);
-	
+
 	if (m_table != NULL) {
 		m_table->PutNumber("setpoint", m_setpoint);
 	}
@@ -413,11 +415,11 @@ void PIDController::SetSetpoint(float setpoint)
 float PIDController::GetSetpoint()
 {
 	float temp;
-	
+
 	pthread_mutex_lock(&m_mutex);
-	temp = m_setpoint; 
+	temp = m_setpoint;
 	pthread_mutex_unlock(&m_mutex);
-	
+
 	return temp;
 }
 
@@ -428,11 +430,11 @@ float PIDController::GetSetpoint()
 float PIDController::GetError()
 {
 	float error;
-	
+
 	pthread_mutex_lock(&m_mutex);
 	error = m_setpoint - m_pidInput->PIDGet();
 	pthread_mutex_unlock(&m_mutex);
-	
+
 	return error;
 }
 
@@ -485,7 +487,7 @@ void PIDController::SetAbsoluteTolerance(float absTolerance)
 bool PIDController::OnTarget()
 {
 	bool temp;
-	
+
 	pthread_mutex_lock(&m_mutex);
 	switch (m_toleranceType) {
 	case kPercentTolerance:
@@ -499,7 +501,7 @@ bool PIDController::OnTarget()
 		temp = false;
 	}
 	pthread_mutex_unlock(&m_mutex);
-	
+
 	return temp;
 }
 
@@ -508,10 +510,10 @@ bool PIDController::OnTarget()
  */
 void PIDController::Enable()
 {
-	pthread_mutex_lock(&m_mutex);		
+	pthread_mutex_lock(&m_mutex);
 	m_enabled = true;
 	pthread_mutex_unlock(&m_mutex);
-	
+
 	if (m_table != NULL) {
 		m_table->PutBoolean("enabled", true);
 	}
@@ -526,7 +528,7 @@ void PIDController::Disable()
 	m_pidOutput->PIDWrite(0);
 	m_enabled = false;
 	pthread_mutex_unlock(&m_mutex);
-	
+
 	if (m_table != NULL) {
 		m_table->PutBoolean("enabled", false);
 	}
@@ -538,11 +540,11 @@ void PIDController::Disable()
 bool PIDController::IsEnabled()
 {
 	bool temp;
-	
+
 	pthread_mutex_lock(&m_mutex);
-	temp = m_enabled; 
+	temp = m_enabled;
 	pthread_mutex_unlock(&m_mutex);
-	
+
 	return temp;
 }
 
@@ -600,7 +602,7 @@ void PIDController::ValueChanged(ITable* source, const std::string& key, EntryVa
 }
 
 void PIDController::UpdateTable() {
-	
+
 }
 
 void PIDController::StartLiveWindowMode() {
@@ -608,5 +610,5 @@ void PIDController::StartLiveWindowMode() {
 }
 
 void PIDController::StopLiveWindowMode() {
-	
+
 }

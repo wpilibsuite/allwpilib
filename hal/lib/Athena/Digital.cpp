@@ -1215,7 +1215,7 @@ void spiClose(uint8_t port) {
  */
 void spiSetSpeed(uint8_t port, uint32_t speed) {
 	Synchronized sync(spiGetSemaphore(port));
-	int retVal = spilib_setspeed(spiGetHandle(port), speed);
+	spilib_setspeed(spiGetHandle(port), speed);
 }
 
 /**
@@ -1228,7 +1228,7 @@ void spiSetSpeed(uint8_t port, uint32_t speed) {
  */
 void spiSetOpts(uint8_t port, int msb_first, int sample_on_trailing, int clk_idle_high) {
 	Synchronized sync(spiGetSemaphore(port));
-	int retVal = spilib_setopts(spiGetHandle(port), msb_first, sample_on_trailing, clk_idle_high);
+	spilib_setopts(spiGetHandle(port), msb_first, sample_on_trailing, clk_idle_high);
 }
 
 /**
@@ -1276,22 +1276,16 @@ int32_t spiGetHandle(uint8_t port){
 	switch(port){
 	case 0:
 		return m_spiCS0Handle;
-		break;
 	case 1:
 		return m_spiCS1Handle;
-		break;
 	case 2:
 		return m_spiCS2Handle;
-		break;
 	case 3:
 		return m_spiCS3Handle;
-		break;
 	case 4:
 		return m_spiMXPHandle;
-		break;
 	default:
 		return 0;
-		break;
 	}
 }
 
