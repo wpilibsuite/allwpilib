@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+/* Copyright (c) FIRST 2008. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
@@ -50,8 +50,8 @@ void DoubleSolenoid::InitSolenoid()
 		return;
 	}
 
-	m_forwardMask = 1 << (m_forwardChannel - 1);
-	m_reverseMask = 1 << (m_reverseChannel - 1);
+	m_forwardMask = 1 << m_forwardChannel;
+	m_reverseMask = 1 << m_reverseChannel;
 
 	HALReport(HALUsageReporting::kResourceType_Solenoid, m_forwardChannel, m_moduleNumber);
 	HALReport(HALUsageReporting::kResourceType_Solenoid, m_reverseChannel, m_moduleNumber);

@@ -28,7 +28,7 @@ void Solenoid::InitSolenoid()
 		wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
 		return;
 	}
-	Resource::CreateResourceObject(&m_allocated, solenoid_kNumDO7_0Elements * kSolenoidChannels);
+	Resource::CreateResourceObject(&m_allocated, kSolenoidChannels * 63);
 
 	snprintf(buf, 64, "Solenoid %d (Module: %d)", m_channel, m_moduleNumber);
 	if (m_allocated->Allocate(m_moduleNumber * kSolenoidChannels + m_channel, buf) == ~0ul)
