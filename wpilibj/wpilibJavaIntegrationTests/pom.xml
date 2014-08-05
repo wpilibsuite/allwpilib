@@ -35,7 +35,7 @@
 		    <version>1.8</version>
 		</dependency-->
 	</dependencies>
-	
+
 	<profiles>
 		<profile>
 			<id>docline-java8-disable</id>
@@ -57,7 +57,7 @@
 		</profile>
 	</profiles>
 
-	<build>  
+	<build>
 		<resources>
 			<!-- Package the logging.properties file with the jar-->
 	        <resource>
@@ -143,6 +143,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.5</version>
 				<configuration>
 					<archive>
 						<manifest>
