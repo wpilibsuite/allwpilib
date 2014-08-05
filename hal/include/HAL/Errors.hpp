@@ -3,7 +3,7 @@
 #define SAMPLE_RATE_TOO_HIGH 1
 #define SAMPLE_RATE_TOO_HIGH_MESSAGE "Analog module sample rate is too high"
 #define VOLTAGE_OUT_OF_RANGE 2
-#define VOLTAGE_OUT_OF_RANGE_MESSAGE "Voltage to convert to raw value is out of range [-10; 10]"
+#define VOLTAGE_OUT_OF_RANGE_MESSAGE "Voltage to convert to raw value is out of range [0; 5]"
 #define LOOP_TIMING_ERROR 4
 #define LOOP_TIMING_ERROR_MESSAGE "Digital module loop timing is not the expected value"
 #define SPI_WRITE_NO_MOSI 12

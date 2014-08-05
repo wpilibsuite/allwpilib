@@ -353,12 +353,12 @@ float getAnalogAverageVoltage(void* analog_port_pointer, int32_t *status) {
  * @return The raw value for the channel.
  */
 int32_t getAnalogVoltsToValue(void* analog_port_pointer, double voltage, int32_t *status) {
-  if (voltage > 10.0) {
-    voltage = 10.0;
+  if (voltage > 5.0) {
+    voltage = 5.0;
     *status = VOLTAGE_OUT_OF_RANGE;
   }
-  if (voltage < -10.0) {
-    voltage = -10.0;
+  if (voltage < 0.0) {
+    voltage = 0.0;
     *status = VOLTAGE_OUT_OF_RANGE;
   }
   uint32_t LSBWeight = getAnalogLSBWeight(analog_port_pointer, status);
