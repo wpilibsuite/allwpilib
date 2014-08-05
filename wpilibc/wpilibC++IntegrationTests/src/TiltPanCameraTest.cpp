@@ -33,7 +33,7 @@ protected:
 		// The gyro object blocks for 5 seconds in the constructor, so only
 		// construct it once for the whole test case
 		m_gyro = new Gyro(TestBench::kCameraGyroChannel);
-		m_gyro->SetSensitivity(0.0134897058674);
+		m_gyro->SetSensitivity(0.013);
 	}
 
 	static void TearDownTestCase() {
@@ -66,22 +66,22 @@ Gyro *TiltPanCameraTest::m_gyro = 0;
  * Test if the gyro angle defaults to 0 immediately after being reset.
  */
 TEST_F(TiltPanCameraTest, DefaultGyroAngle) {
-	EXPECT_NEAR(0.0f, m_gyro->GetAngle(), 0.01f);
+	EXPECT_NEAR(0.0f, m_gyro->GetAngle(), 1.0f);
 }
 
 /**
  * Test if the servo turns 180 degrees and the gyroscope measures this angle
  */
 TEST_F(TiltPanCameraTest, GyroAngle) {
-	for(int i = 0; i < 180; i++) {
-		m_pan->SetAngle(i);
+	for(int i = 0; i < 1800; i++) {
+		m_pan->SetAngle(i / 10.0);
 
-		Wait(0.05);
+		Wait(0.001);
 	}
 
 	double gyroAngle = m_gyro->GetAngle();
 
-	EXPECT_NEAR(gyroAngle, kTestAngle, 20.0) << "Gyro measured " << gyroAngle
+	EXPECT_NEAR(gyroAngle, kTestAngle, 10.0) << "Gyro measured " << gyroAngle
 		<< " degrees, servo should have turned " << kTestAngle <<  " degrees";
 }
 

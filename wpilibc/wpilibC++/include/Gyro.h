@@ -27,8 +27,7 @@ public:
 	static const uint32_t kOversampleBits = 10;
 	static const uint32_t kAverageBits = 0;
 	static constexpr float kSamplesPerSecond = 50.0;
-	static constexpr float kCalibrationSampleTime = 0.01;
-	static constexpr int kNumCalibrationSamples = 500;
+	static constexpr float kCalibrationSampleTime = 5.0;
 	static constexpr float kDefaultVoltsPerDegreePerSecond = 0.007;
 
 	explicit Gyro(uint32_t channel);

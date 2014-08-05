@@ -19,19 +19,19 @@ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
 
 public class GyroTest extends AbstractComsSetup {
-	
+
 	private static final Logger logger = Logger.getLogger(GyroTest.class.getName());
-	
+
 	public static final double TEST_ANGLE = 180.0;
-	
+
 	private TiltPanCameraFixture tpcam;
 
-	
+
 	@Override
 	protected Logger getClassLogger(){
 		return logger;
 	}
-	
+
 	@Before
 	public void setUp() throws Exception {
 		logger.fine("Setup: TiltPan camera");
@@ -44,7 +44,7 @@ public class GyroTest extends AbstractComsSetup {
 		tpcam.reset();
 		tpcam.teardown();
 	}
-	
+
 	@Test
 	public void testInitial(){
 		double angle = tpcam.getGyro().getAngle();
@@ -56,22 +56,21 @@ public class GyroTest extends AbstractComsSetup {
 	 */
 	@Test
 	public void testGyroAngle() {
-		for(double i = 0; i < 1.0; i+=.005){
-			//System.out.println("i: " + i);
-			//System.out.println("Angle " + tpcam.getGyro().getAngle());
-			tpcam.getPan().set(i);
-			Timer.delay(.025);
+		for(int i = 0; i < 1800; i++) {
+			tpcam.getPan().setAngle(i / 10.0);
+
+			Timer.delay(0.001);
 		}
-		//Timer.delay(TiltPanCameraFixture.RESET_TIME);
+
 		double angle = tpcam.getGyro().getAngle();
-		
+
 		double difference = TEST_ANGLE - angle;
-		
+
 		double diff = Math.abs(difference);
-		
+
 		assertEquals(errorMessage(diff, TEST_ANGLE), TEST_ANGLE, angle, 8);
 	}
-	
+
 	@Test
 	public void testDeviationOverTime(){
 		double angle = tpcam.getGyro().getAngle();
@@ -80,7 +79,7 @@ public class GyroTest extends AbstractComsSetup {
 		angle = tpcam.getGyro().getAngle();
 		assertEquals("After 5 seconds " + errorMessage(angle, 0), 0, angle, 1);
 	}
-	
+
 	private String errorMessage(double difference, double target){
 		return "Gryo angle skewed " + difference + " deg away from target " + target;
 	}

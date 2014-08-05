@@ -15,7 +15,6 @@ const uint32_t Gyro::kOversampleBits;
 const uint32_t Gyro::kAverageBits;
 constexpr float Gyro::kSamplesPerSecond;
 constexpr float Gyro::kCalibrationSampleTime;
-constexpr int Gyro::kNumCalibrationSamples;
 constexpr float Gyro::kDefaultVoltsPerDegreePerSecond;
 
 /**
@@ -51,25 +50,7 @@ void Gyro::InitGyro()
 
 	m_analog->InitAccumulator();
 
-	// Get the lowest and highest value that occur within a large number of
-	// calibration samples.  These are used to determine an appropriate default
-	// deadband.
-	int32_t lowestSample = INT_MAX, highestSample = INT_MIN;
-	for(int i = 0; i < kNumCalibrationSamples; i++)
-	{
-		int32_t sample = m_analog->GetAverageValue();
-
-		if(sample < lowestSample)
-		{
-			lowestSample = sample;
-		}
-		else if(sample > highestSample)
-		{
-			highestSample = sample;
-		}
-
-		Wait(kCalibrationSampleTime);
-	}
+	Wait(kCalibrationSampleTime);
 
 	int64_t value;
 	uint32_t count;
@@ -78,12 +59,10 @@ void Gyro::InitGyro()
 	m_center = (uint32_t)((float)value / (float)count + .5);
 
 	m_offset = ((float)value / (float)count) - (float)m_center;
-
-	int32_t deadband = std::max(highestSample - m_center, m_center - lowestSample);
-
 	m_analog->SetAccumulatorCenter(m_center);
-	m_analog->SetAccumulatorDeadband(deadband);
 	m_analog->ResetAccumulator();
+
+	SetDeadband(0.0f);
 
 	SetPIDSourceParameter(kAngle);
 
@@ -203,8 +182,9 @@ void Gyro::SetSensitivity( float voltsPerDegreePerSecond )
 
 /**
  * Set the size of the neutral zone.  Any voltage from the gyro less than this
- * amount from the center is considered stationary.  This is set by default
- * after calibration.
+ * amount from the center is considered stationary.  Setting a deadband will
+ * decrease the amount of drift when the gyro isn't rotating, but will make it
+ * less accurate.
  *
  * @param volts The size of the deadband in volts
  */
