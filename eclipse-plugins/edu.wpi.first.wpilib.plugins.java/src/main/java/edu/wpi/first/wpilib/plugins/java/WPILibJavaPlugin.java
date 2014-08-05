@@ -100,11 +100,15 @@ public class WPILibJavaPlugin extends AbstractUIPlugin implements IStartup {
 	    IProject[] projects = root.getProjects();
 	    // Loop over all projects
 	    for (IProject project : projects) {
-	      try {
-	    	  updateVariables(project);
-	      } catch (CoreException e) {
-            WPILibJavaPlugin.logError("Error updating projects.", e);
-	      }
+			  try {
+				  if(project.hasNature("edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature")){
+					WPILibJavaPlugin.logInfo("Updating project");
+					updateVariables(project);
+				  } else {
+				  }
+			  } catch (CoreException e) {
+				WPILibJavaPlugin.logError("Error updating projects.", e);
+			  }
 	    }
 	}
 	
