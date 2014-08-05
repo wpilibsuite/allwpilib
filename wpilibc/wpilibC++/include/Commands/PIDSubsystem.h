@@ -14,7 +14,7 @@
 
 /**
  * This class is designed to handle the case where there is a {@link Subsystem}
- * which uses a single {@link PIDController} almost constantly (for instance, 
+ * which uses a single {@link PIDController} almost constantly (for instance,
  * an elevator which attempts to stay at a constant height).
  *
  * <p>It provides some convenience methods to run an internal {@link PIDController}.
@@ -32,7 +32,7 @@ public:
 	PIDSubsystem(double p, double i, double d, double f);
 	PIDSubsystem(double p, double i, double d, double f, double period);
 	virtual ~PIDSubsystem();
-	
+
 	void Enable();
 	void Disable();
 
@@ -44,13 +44,14 @@ public:
 	void SetSetpoint(double setpoint);
 	void SetSetpointRelative(double deltaSetpoint);
 	void SetInputRange(float minimumInput, float maximumInput);
+	void SetOutputRange(float minimumOutput, float maximumOutput);
 	double GetSetpoint();
 	double GetPosition();
 
 	virtual void SetAbsoluteTolerance(float absValue);
 	virtual void SetPercentTolerance(float percent);
 	virtual bool OnTarget();
-	
+
 protected:
 	PIDController *GetPIDController();
 
@@ -67,4 +68,3 @@ public:
 };
 
 #endif
-

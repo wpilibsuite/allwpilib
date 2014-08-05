@@ -16,7 +16,7 @@ class Notifier;
 
 /**
  * Class implements a PID Control Loop.
- * 
+ *
  * Creates a separate thread which reads the given PIDSource and takes
  * care of the integral calculations, as well as writing the given
  * PIDOutput
@@ -32,7 +32,7 @@ public:
 	virtual float Get();
 	virtual void SetContinuous(bool continuous = true);
 	virtual void SetInputRange(float minimumInput, float maximumInput);
-	virtual void SetOutputRange(float mimimumOutput, float maximumOutput);
+	virtual void SetOutputRange(float minimumOutput, float maximumOutput);
 	virtual void SetPID(float p, float i, float d);
 	virtual void SetPID(float p, float i, float d, float f);
 	virtual float GetP();
@@ -86,7 +86,7 @@ private:
 
 	PIDSource *m_pidInput;
 	PIDOutput *m_pidOutput;
-	
+
 	pthread_t m_controlLoop;
 	pthread_mutex_t m_mutex;
 

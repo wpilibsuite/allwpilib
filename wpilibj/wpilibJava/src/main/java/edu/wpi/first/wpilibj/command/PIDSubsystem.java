@@ -185,6 +185,16 @@ public abstract class PIDSubsystem extends Subsystem implements Sendable {
     }
 
     /**
+     * Sets the maximum and minimum values to write.
+     *
+     * @param minimumOutput the minimum value to write to the output
+     * @param maximumOutput the maximum value to write to the output
+     */
+    public void setOutputRange(double minimumOutput, double maximumOutput) {
+        controller.setOutputRange(minimumOutput, maximumOutput);
+    }
+
+    /**
     * Set the absolute error which is considered tolerable for use with
     * OnTarget. The value is in the same range as the PIDInput values.
     * @param t A PIDController.Tolerance object instance that is for example

@@ -8,8 +8,6 @@
 #include "PIDController.h"
 #include "float.h"
 
-// XXX max and min are not used?
-
 /**
  * Instantiates a {@link PIDSubsystem} that will use the given p, i and d values.
  * @param name the name
@@ -111,7 +109,7 @@ void PIDSubsystem::Enable()
 	m_controller->Enable();
 }
 
-/** 
+/**
   * Disables the internal {@link PIDController}
   */
 void PIDSubsystem::Disable()
@@ -165,13 +163,24 @@ double PIDSubsystem::GetSetpoint()
 
 /**
  * Sets the maximum and minimum values expected from the input.
- * 
+ *
  * @param minimumInput the minimum value expected from the input
  * @param maximumInput the maximum value expected from the output
  */
 void PIDSubsystem::SetInputRange(float minimumInput, float maximumInput)
 {
 	m_controller->SetInputRange(minimumInput, maximumInput);
+}
+
+/**
+ * Sets the maximum and minimum values to write.
+ *
+ * @param minimumOutput the minimum value to write to the output
+ * @param maximumOutput the maximum value to write to the output
+ */
+void PIDSubsystem::SetOutputRange(float minimumOutput, float maximumOutput)
+{
+	m_controller->SetOutputRange(minimumOutput, maximumOutput);
 }
 
 /*
@@ -197,10 +206,10 @@ void PIDSubsystem::SetPercentTolerance(float percent) {
  * determined by SetTolerance. This asssumes that the maximum and minimum input
  * were set using SetInput. Use OnTarget() in the IsFinished() method of commands
  * that use this subsystem.
- * 
+ *
  * Currently this just reports on target as the actual value passes through the setpoint.
  * Ideally it should be based on being within the tolerance for some period of time.
- * 
+ *
  * @return true if the error is within the percentage tolerance of the input range
  */
 bool PIDSubsystem::OnTarget()
