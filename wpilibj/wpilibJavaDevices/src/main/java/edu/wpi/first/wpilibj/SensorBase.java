@@ -76,7 +76,6 @@ public abstract class SensorBase { // TODO: Refactor
 
     /**
      * Verify that the solenoid module is correct.
-     * Module numbers are 1 or 2 (they are no longer real cRIO slots).
      *
      * @param moduleNumber The solenoid module module number to check.
      */
