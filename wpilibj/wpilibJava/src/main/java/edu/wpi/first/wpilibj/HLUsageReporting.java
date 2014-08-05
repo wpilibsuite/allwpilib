@@ -1,5 +1,7 @@
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.wpilibj.util.BaseSystemNotInitializedException;
+
 /**
  * Support for high level usage reporting.
  *
@@ -15,18 +17,24 @@ public class HLUsageReporting {
 	public static void reportScheduler() {
 		if (impl != null) {
 			impl.reportScheduler();
+		} else {
+			throw new BaseSystemNotInitializedException(Interface.class, HLUsageReporting.class);
 		}
 	}
 
 	public static void reportPIDController(int num) {
 		if (impl != null) {
 			impl.reportPIDController(num);
+		} else {
+			throw new BaseSystemNotInitializedException(Interface.class, HLUsageReporting.class);
 		}
 	}
 
 	public static void reportSmartDashboard() {
 		if(impl != null) {
 			impl.reportSmartDashboard();
+		} else {
+			throw new BaseSystemNotInitializedException(Interface.class, HLUsageReporting.class);
 		}
 	}
 

@@ -1,5 +1,7 @@
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.wpilibj.util.BaseSystemNotInitializedException;
+
 public class RobotState {
 	private static Interface impl;
 
@@ -11,7 +13,7 @@ public class RobotState {
 		if (impl != null) {
 			return impl.isDisabled();
 		} else {
-			return true;
+			throw new BaseSystemNotInitializedException(Interface.class, RobotState.class);
 		}
 	}
 
@@ -19,7 +21,7 @@ public class RobotState {
 		if (impl != null) {
 			return impl.isEnabled();
 		} else {
-			return false;
+			throw new BaseSystemNotInitializedException(Interface.class, RobotState.class);
 		}
 	}
 
@@ -27,7 +29,7 @@ public class RobotState {
 		if (impl != null) {
 			return impl.isOperatorControl();
 		} else {
-			return true;
+			throw new BaseSystemNotInitializedException(Interface.class, RobotState.class);
 		}
 	}
 
@@ -35,7 +37,7 @@ public class RobotState {
 		if (impl != null) {
 			return impl.isAutonomous();
 		} else {
-			return false;
+			throw new BaseSystemNotInitializedException(Interface.class, RobotState.class);
 		}
 	}
 
@@ -43,10 +45,10 @@ public class RobotState {
 		if (impl != null) {
 			return impl.isTest();
 		} else {
-			return false;
+			throw new BaseSystemNotInitializedException(Interface.class, RobotState.class);
 		}
 	}
-	
+
 	interface Interface {
 		boolean isDisabled();
 		boolean isEnabled();
