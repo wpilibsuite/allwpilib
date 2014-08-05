@@ -47,24 +47,24 @@ public final class TestBench {
 	 * completely stopped
 	 */
 	public static final double MOTOR_STOP_TIME = 0.20;
-	
+
 	public static final int kTalonChannel = 10;
 	public static final int kVictorChannel = 1;
 	public static final int kJaguarChannel = 2;
-	
+
 	/*TiltPanCamera Channels */
 	public static final int kGyroChannel = 0;
-	public static final double kGyroSensitivity = 0.0134897058674;
+	public static final double kGyroSensitivity = 0.013;
 	public static final int kTiltServoChannel = 9;
 	public static final int kPanServoChannel = 8;
-	
+
 
 	/* PowerDistributionPanel channels */
 	public static final int kJaguarPDPChannel = 6;
 	public static final int kVictorPDPChannel = 8;
 	public static final int kTalonPDPChannel = 11;
 	public static final int kCANJaguarPDPChannel = 5;
-	
+
 	/* CAN ASSOICATED CHANNELS */
 	public static final int kCANRelayPowerCycler = 1;
 	public static final int kFakeJaguarPotentiometer = 1;
@@ -177,7 +177,7 @@ public final class TestBench {
 		};
 		return jagPair;
 	}
-	
+
 	public class BaseCANMotorEncoderFixture extends CANMotorEncoderFixture{
 		@Override
 		protected CANJaguar giveSpeedController() {
@@ -210,7 +210,7 @@ public final class TestBench {
 		protected Relay givePoweCycleRelay() {
 			return new Relay(kCANRelayPowerCycler);
 		}
-		
+
 		@Override
 		public int getPDPChannel() {
 			return kCANJaguarPDPChannel;
@@ -394,7 +394,7 @@ public final class TestBench {
 		}
 		return instance;
 	}
-	
+
 	/**
 	 * Provides access to the output stream for the test system. This should be used instead of System.out
 	 * This is gives us a way to implement changes to where the output text of this test system is sent.
@@ -403,7 +403,7 @@ public final class TestBench {
 	public static PrintStream out(){
 		return System.out;
 	}
-	
+
 	/**
 	 * Provides access to the error stream for the test system. This should be used instead of System.err
 	 * This is gives us a way to implement changes to where the output text of this test system is sent.
