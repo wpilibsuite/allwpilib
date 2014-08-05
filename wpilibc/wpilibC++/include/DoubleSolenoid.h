@@ -12,7 +12,7 @@
 /**
  * DoubleSolenoid class for running 2 channels of high voltage Digital Output
  * (9472 module).
- * 
+ *
  * The DoubleSolenoid class is typically used for pneumatics solenoids that
  * have two positions controlled by two separate channels.
  */
@@ -47,6 +47,6 @@ private:
 	uint32_t m_reverseChannel; ///< The reverse channel on the module to control.
 	uint8_t m_forwardMask; ///< The mask for the forward channel.
 	uint8_t m_reverseMask; ///< The mask for the reverse channel.
-	
+
 	ITable *m_table;
 };

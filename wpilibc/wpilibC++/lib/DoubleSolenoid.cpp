@@ -7,7 +7,6 @@
 #include "DoubleSolenoid.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "WPIErrors.h"
-#include <string.h>
 #include "LiveWindow/LiveWindow.h"
 
 /**
@@ -37,24 +36,26 @@ void DoubleSolenoid::InitSolenoid()
 	}
 	Resource::CreateResourceObject(&m_allocated, solenoid_kNumDO7_0Elements * kSolenoidChannels);
 
-	snprintf(buf, 64, "Solenoid %d (Module %d)", m_forwardChannel, m_moduleNumber);
-	if (m_allocated->Allocate((m_moduleNumber - 1) * kSolenoidChannels + m_forwardChannel - 1, buf) == ~0ul)
+	snprintf(buf, 64, "Solenoid %d (Module: %d)", m_forwardChannel, m_moduleNumber);
+	if (m_allocated->Allocate(m_moduleNumber * kSolenoidChannels + m_forwardChannel, buf) == ~0ul)
 	{
 		CloneError(m_allocated);
 		return;
 	}
-	snprintf(buf, 64, "Solenoid %d (Module %d)", m_reverseChannel, m_moduleNumber);
-	if (m_allocated->Allocate((m_moduleNumber - 1) * kSolenoidChannels + m_reverseChannel - 1, buf) == ~0ul)
+
+	snprintf(buf, 64, "Solenoid %d (Module: %d)", m_reverseChannel, m_moduleNumber);
+	if (m_allocated->Allocate(m_moduleNumber * kSolenoidChannels + m_reverseChannel, buf) == ~0ul)
 	{
 		CloneError(m_allocated);
 		return;
 	}
+
 	m_forwardMask = 1 << (m_forwardChannel - 1);
 	m_reverseMask = 1 << (m_reverseChannel - 1);
 
-	HALReport(HALUsageReporting::kResourceType_Solenoid, m_forwardChannel, m_moduleNumber - 1);
-	HALReport(HALUsageReporting::kResourceType_Solenoid, m_reverseChannel, m_moduleNumber - 1);
-	LiveWindow::GetInstance()->AddActuator("DoubleSolenoid", m_forwardChannel, this);
+	HALReport(HALUsageReporting::kResourceType_Solenoid, m_forwardChannel, m_moduleNumber);
+	HALReport(HALUsageReporting::kResourceType_Solenoid, m_reverseChannel, m_moduleNumber);
+	LiveWindow::GetInstance()->AddActuator("DoubleSolenoid", m_moduleNumber, m_forwardChannel, this);
 }
 
 /**
@@ -74,7 +75,7 @@ DoubleSolenoid::DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel)
 /**
  * Constructor.
  *
- * @param moduleNumber The solenoid module (1 or 2).
+ * @param moduleNumber The CAN ID of the PCM.
  * @param forwardChannel The forward channel on the module to control.
  * @param reverseChannel The reverse channel on the module to control.
  */
@@ -93,8 +94,8 @@ DoubleSolenoid::~DoubleSolenoid()
 {
 	if (CheckSolenoidModule(m_moduleNumber))
 	{
-		m_allocated->Free((m_moduleNumber - 1) * kSolenoidChannels + m_forwardChannel - 1);
-		m_allocated->Free((m_moduleNumber - 1) * kSolenoidChannels + m_reverseChannel - 1);
+		m_allocated->Free(m_moduleNumber * kSolenoidChannels + m_forwardChannel);
+		m_allocated->Free(m_moduleNumber * kSolenoidChannels + m_reverseChannel);
 	}
 }
 
