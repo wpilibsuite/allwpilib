@@ -37,8 +37,6 @@ import edu.wpi.first.wpilibj.hal.HALUtil;
  *   0 = disabled (i.e. PWM output is held low)
  */
 public class PWM extends SensorBase implements LiveWindowSendable {
-	private static Resource allocated = new Resource( kPwmChannels);
-
 	/**
 	 * Represents the amount to multiply the minimum servo-pulse pwm period by.
 	 */
@@ -113,18 +111,19 @@ public class PWM extends SensorBase implements LiveWindowSendable {
 	 */
 	private void initPWM(final int channel) {
 		checkPWMChannel(channel);
-		try {
-			allocated.allocate(channel);
-		} catch (CheckedAllocationException e) {
-			throw new AllocationException(
-				"PWM channel " + channel  + " is already allocated");
-		}
 		m_channel = channel;
 
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
 
 		m_port = DIOJNI.initializeDigitalPort(DIOJNI.getPort((byte) m_channel), status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+
+		if (!PWMJNI.allocatePWMChannel(m_port, status.asIntBuffer()))
+		{
+			throw new AllocationException(
+				"PWM channel " + channel  + " is already allocated");
+		}
 		HALUtil.checkStatus(status.asIntBuffer());
 
 		PWMJNI.setPWM(m_port, (short) 0, status.asIntBuffer());
@@ -156,10 +155,11 @@ public class PWM extends SensorBase implements LiveWindowSendable {
 		PWMJNI.setPWM(m_port, (short) 0, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
 
-		PWMJNI.freeDIO(m_port, status.asIntBuffer());
+		PWMJNI.freePWMChannel(m_port, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
 
-		allocated.free(m_channel);
+		PWMJNI.freeDIO(m_port, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/**

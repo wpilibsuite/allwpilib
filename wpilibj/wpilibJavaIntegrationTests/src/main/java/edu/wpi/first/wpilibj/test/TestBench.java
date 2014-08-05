@@ -68,8 +68,8 @@ public final class TestBench {
 	/* CAN ASSOICATED CHANNELS */
 	public static final int kCANRelayPowerCycler = 1;
 	public static final int kFakeJaguarPotentiometer = 1;
-	public static final int kFakeJaguarForwardLimit = 16;
-	public static final int kFakeJaguarReverseLimit = 17;
+	public static final int kFakeJaguarForwardLimit = 20;
+	public static final int kFakeJaguarReverseLimit = 21;
 	public static final int kCANJaguarID = 2;
 
 	//THESE MUST BE IN INCREMENTING ORDER
@@ -310,12 +310,12 @@ public final class TestBench {
 
 			@Override
 			protected DigitalInput giveInputTwo() {
-				return new DigitalInput(14);
+				return new DigitalInput(18);
 			}
 
 			@Override
 			protected DigitalInput giveInputOne() {
-				return new DigitalInput(15);
+				return new DigitalInput(19);
 			}
 		};
 		return relay;
