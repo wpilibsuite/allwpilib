@@ -14,8 +14,8 @@
 
 /**
  * Create an instance of a Serial Port class.
- * 
- * @param baudRate The baud rate to configure the serial port.  The cRIO-9074 supports up to 230400 Baud.
+ *
+ * @param baudRate The baud rate to configure the serial port.
  * @param dataBits The number of data bits per transfer.  Valid values are between 5 and 8 bits.
  * @param parity Select the type of parity checking to use.
  * @param stopBits The number of stop bits to use as defined by the enum StopBits.
@@ -75,7 +75,7 @@ SerialPort::~SerialPort()
 
 /**
  * Set the type of flow control to enable on this port.
- * 
+ *
  * By default, flow control is disabled.
  */
 void SerialPort::SetFlowControl(SerialPort::FlowControl flowControl)
@@ -89,18 +89,18 @@ void SerialPort::SetFlowControl(SerialPort::FlowControl flowControl)
 
 /**
  * Enable termination and specify the termination character.
- * 
+ *
  * Termination is currently only implemented for receive.
  * When the the terminator is recieved, the Read() or Scanf() will return
  *   fewer bytes than requested, stopping after the terminator.
- * 
+ *
  * @param terminator The character to use for termination.
  */
 void SerialPort::EnableTermination(char terminator)
 {
 	if (!m_consoleModeEnabled)
 	{
-		viSetAttribute(m_portHandle, VI_ATTR_TERMCHAR_EN, VI_TRUE); 
+		viSetAttribute(m_portHandle, VI_ATTR_TERMCHAR_EN, VI_TRUE);
 		viSetAttribute(m_portHandle, VI_ATTR_TERMCHAR, terminator);
 		viSetAttribute(m_portHandle, VI_ATTR_ASRL_END_IN, VI_ASRL_END_TERMCHAR);
 	}
@@ -113,14 +113,14 @@ void SerialPort::DisableTermination()
 {
 	if (!m_consoleModeEnabled)
 	{
-		viSetAttribute(m_portHandle, VI_ATTR_TERMCHAR_EN, VI_FALSE); 
+		viSetAttribute(m_portHandle, VI_ATTR_TERMCHAR_EN, VI_FALSE);
 		viSetAttribute(m_portHandle, VI_ATTR_ASRL_END_IN, VI_ASRL_END_NONE);
 	}
 }
 
 /**
  * Get the number of bytes currently available to read from the serial port.
- * 
+ *
  * @return The number of bytes available to read.
  */
 int32_t SerialPort::GetBytesReceived()
@@ -136,9 +136,9 @@ int32_t SerialPort::GetBytesReceived()
 
 /**
  * Output formatted text to the serial port.
- * 
+ *
  * @bug All pointer-based parameters seem to return an error.
- * 
+ *
  * @param writeFmt A string that defines the format of the output.
  */
 void SerialPort::Printf(const char *writeFmt, ...)
@@ -155,9 +155,9 @@ void SerialPort::Printf(const char *writeFmt, ...)
 
 /**
  * Input formatted text from the serial port.
- * 
+ *
  * @bug All pointer-based parameters seem to return an error.
- * 
+ *
  * @param readFmt A string that defines the format of the input.
  */
 void SerialPort::Scanf(const char *readFmt, ...)
@@ -174,11 +174,11 @@ void SerialPort::Scanf(const char *readFmt, ...)
 
 /**
  * Read raw bytes out of the buffer.
- * 
+ *
  * @param buffer Pointer to the buffer to store the bytes in.
  * @param count The maximum number of bytes to read.
  * @return The number of bytes actually read into the buffer.
- */ 
+ */
 uint32_t SerialPort::Read(char *buffer, int32_t count)
 {
 	uint32_t retCount = 0;
@@ -200,11 +200,11 @@ uint32_t SerialPort::Read(char *buffer, int32_t count)
 
 /**
  * Write raw bytes to the buffer.
- * 
+ *
  * @param buffer Pointer to the buffer to read the bytes from.
  * @param count The maximum number of bytes to write.
  * @return The number of bytes actually written into the port.
- */ 
+ */
 uint32_t SerialPort::Write(const char *buffer, int32_t count)
 {
 	uint32_t retCount = 0;
@@ -218,10 +218,10 @@ uint32_t SerialPort::Write(const char *buffer, int32_t count)
 
 /**
  * Configure the timeout of the serial port.
- * 
+ *
  * This defines the timeout for transactions with the hardware.
  * It will affect reads and very large writes.
- * 
+ *
  * @param timeout The number of seconds to to wait for I/O.
  */
 void SerialPort::SetTimeout(float timeout)
@@ -235,14 +235,14 @@ void SerialPort::SetTimeout(float timeout)
 
 /**
  * Specify the size of the input buffer.
- * 
+ *
  * Specify the amount of data that can be stored before data
  * from the device is returned to Read or Scanf.  If you want
  * data that is recieved to be returned immediately, set this to 1.
- * 
+ *
  * It the buffer is not filled before the read timeout expires, all
  * data that has been received so far will be returned.
- * 
+ *
  * @param size The read buffer size.
  */
 void SerialPort::SetReadBufferSize(uint32_t size)
@@ -256,10 +256,10 @@ void SerialPort::SetReadBufferSize(uint32_t size)
 
 /**
  * Specify the size of the output buffer.
- * 
+ *
  * Specify the amount of data that can be stored before being
  * transmitted to the device.
- * 
+ *
  * @param size The write buffer size.
  */
 void SerialPort::SetWriteBufferSize(uint32_t size)
@@ -273,13 +273,13 @@ void SerialPort::SetWriteBufferSize(uint32_t size)
 
 /**
  * Specify the flushing behavior of the output buffer.
- * 
+ *
  * When set to kFlushOnAccess, data is synchronously written to the serial port
  *   after each call to either Printf() or Write().
- * 
+ *
  * When set to kFlushWhenFull, data will only be written to the serial port when
  *   the buffer is full or when Flush() is called.
- * 
+ *
  * @param mode The write buffer mode.
  */
 void SerialPort::SetWriteBufferMode(SerialPort::WriteBufferMode mode)
@@ -293,7 +293,7 @@ void SerialPort::SetWriteBufferMode(SerialPort::WriteBufferMode mode)
 
 /**
  * Force the output buffer to be written to the port.
- * 
+ *
  * This is used when SetWriteBufferMode() is set to kFlushWhenFull to force a
  * flush before the buffer is full.
  */
@@ -308,7 +308,7 @@ void SerialPort::Flush()
 
 /**
  * Reset the serial port driver to a known state.
- * 
+ *
  * Empty the transmit and receive buffers in the device and formatted I/O.
  */
 void SerialPort::Reset()
@@ -329,4 +329,3 @@ void SerialPort::Reset()
 //	((SerialPort*) userHandle)->_internalHandler(vi, eventType, event);
 //	return VI_SUCCESS;
 //}
-

@@ -1153,7 +1153,7 @@ public class NIVision {
     }
 
     /**
-     * Set true to be able to create files on cRio
+     * Set true to be able to create files on RoboRIO
      * @param val true allows files to be created
      */
     public static void setWriteFileAllowed(boolean val) {

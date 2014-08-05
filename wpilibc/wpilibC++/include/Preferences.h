@@ -16,10 +16,10 @@
 
 /**
  * The preferences class provides a relatively simple way to save important values to
- * the cRIO to access the next time the cRIO is booted.
+ * the RoboRIO to access the next time the RoboRIO is booted.
  *
  * <p>This class loads and saves from a file
- * inside the cRIO.  The user can not access the file directly, but may modify values at specific
+ * inside the RoboRIO.  The user can not access the file directly, but may modify values at specific
  * fields which will then be saved to the file when {@link Preferences#Save() Save()} is called.</p>
  *
  * <p>This class is thread safe.</p>

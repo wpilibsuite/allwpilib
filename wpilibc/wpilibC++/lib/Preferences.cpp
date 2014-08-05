@@ -308,10 +308,10 @@ void Preferences::PutLong(const char *key, int64_t value)
 }
 
 /**
- * Saves the preferences to a file on the cRIO.
+ * Saves the preferences to a file on the RoboRIO.
  *
  * <p>This should <b>NOT</b> be called often.
- * Too many writes can damage the cRIO's flash memory.
+ * Too many writes can damage the RoboRIO's flash memory.
  * While it is ok to save once or twice a match, this should never
  * be called every run of {@link IterativeRobot#TeleopPeriodic()}, etc.</p>
  *

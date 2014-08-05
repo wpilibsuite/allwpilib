@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.visa.Visa;
 import edu.wpi.first.wpilibj.visa.VisaException;
 
 /**
- * Driver for the RS-232 serial port on the cRIO.
+ * Driver for the RS-232 serial port on the RoboRIO.
  *
  * The current implementation uses the VISA formatted I/O mode.  This means that
  *   all traffic goes through the formatted buffers.  This allows the intermingled
@@ -161,7 +161,7 @@ public class SerialPort {
     /**
      * Create an instance of a Serial Port class.
      *
-     * @param baudRate The baud rate to configure the serial port.  The cRIO-9074 supports up to 230400 Baud.
+     * @param baudRate The baud rate to configure the serial port.
      * @param dataBits The number of data bits per transfer.  Valid values are between 5 and 8 bits.
      * @param parity Select the type of parity checking to use.
      * @param stopBits The number of stop bits to use as defined by the enum StopBits.
@@ -203,7 +203,7 @@ public class SerialPort {
     /**
      * Create an instance of a Serial Port class. Defaults to one stop bit.
      *
-     * @param baudRate The baud rate to configure the serial port.  The cRIO-9074 supports up to 230400 Baud.
+     * @param baudRate The baud rate to configure the serial port.
      * @param dataBits The number of data bits per transfer.  Valid values are between 5 and 8 bits.
      * @param parity Select the type of parity checking to use.
      */
@@ -215,7 +215,7 @@ public class SerialPort {
      * Create an instance of a Serial Port class. Defaults to no parity and one
      * stop bit.
      *
-     * @param baudRate The baud rate to configure the serial port.  The cRIO-9074 supports up to 230400 Baud.
+     * @param baudRate The baud rate to configure the serial port.
      * @param dataBits The number of data bits per transfer.  Valid values are between 5 and 8 bits.
      */
     public SerialPort(final int baudRate, final int dataBits) throws VisaException {
@@ -226,7 +226,7 @@ public class SerialPort {
      * Create an instance of a Serial Port class. Defaults to 8 databits,
      * no parity, and one stop bit.
      *
-     * @param baudRate The baud rate to configure the serial port.  The cRIO-9074 supports up to 230400 Baud.
+     * @param baudRate The baud rate to configure the serial port.
      */
     public SerialPort(final int baudRate) throws VisaException {
         this(baudRate, 8, Parity.kNone, StopBits.kOne);
