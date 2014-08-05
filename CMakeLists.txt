@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(All-WPILib)
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wformat=2 -Wextra -Wno-unused-parameter -fPIC")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wformat=2 -Wall -Wextra -Wno-unused-parameter -fPIC")
 SET(CMAKE_SKIP_BUILD_RPATH TRUE)
 
 file(GLOB_RECURSE NI_LIBS ni-libraries/*.so*)

@@ -167,6 +167,7 @@ static double unpackAxis(int16_t raw) {
 	case kRange_2G: return raw / 1024.0;
 	case kRange_4G: return raw / 512.0;
 	case kRange_8G: return raw / 256.0;
+	default: return 0.0;
 	}
 }
 

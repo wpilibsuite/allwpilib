@@ -45,7 +45,6 @@ SPI::~SPI()
  */
 void SPI::SetClockRate(double hz)
 {
-	int32_t retVal = 0;
 	spiSetSpeed(m_port, hz);
 }
 
@@ -55,7 +54,6 @@ void SPI::SetClockRate(double hz)
  */
 void SPI::SetMSBFirst()
 {
-	int32_t retVal = 0;
 	m_msbFirst = true;
 	spiSetOpts(m_port, (int) m_msbFirst, (int) m_sampleOnTrailing, (int) m_clk_idle_high);
 }
@@ -66,7 +64,6 @@ void SPI::SetMSBFirst()
  */
 void SPI::SetLSBFirst()
 {
-	int32_t retVal = 0;
 	m_msbFirst = false;
 	spiSetOpts(m_port, (int) m_msbFirst, (int) m_sampleOnTrailing, (int) m_clk_idle_high);
 }
@@ -77,7 +74,6 @@ void SPI::SetLSBFirst()
  */
 void SPI::SetSampleDataOnFalling()
 {
-	int32_t retVal = 0;
 	m_sampleOnTrailing = true;
 	spiSetOpts(m_port, (int) m_msbFirst, (int) m_sampleOnTrailing, (int) m_clk_idle_high);
 }
@@ -88,7 +84,6 @@ void SPI::SetSampleDataOnFalling()
  */
 void SPI::SetSampleDataOnRising()
 {
-	int32_t retVal = 0;
 	m_sampleOnTrailing = false;
 	spiSetOpts(m_port, (int) m_msbFirst, (int) m_sampleOnTrailing, (int) m_clk_idle_high);
 }
@@ -99,7 +94,6 @@ void SPI::SetSampleDataOnRising()
  */
 void SPI::SetClockActiveLow()
 {
-	int32_t retVal = 0;
 	m_clk_idle_high = true;
 	spiSetOpts(m_port, (int) m_msbFirst, (int) m_sampleOnTrailing, (int) m_clk_idle_high);
 }
@@ -110,7 +104,6 @@ void SPI::SetClockActiveLow()
  */
 void SPI::SetClockActiveHigh()
 {
-	int32_t retVal = 0;
 	m_clk_idle_high = false;
 	spiSetOpts(m_port, (int) m_msbFirst, (int) m_sampleOnTrailing, (int) m_clk_idle_high);
 }
@@ -188,4 +181,3 @@ int32_t SPI::Transaction(uint8_t* dataToSend, uint8_t* dataReceived, uint8_t siz
 	retVal = spiTransaction(m_port, dataToSend, dataReceived, size);
 	return retVal;
 }
-

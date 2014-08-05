@@ -102,7 +102,7 @@ bool checkAnalogModule(uint8_t module) {
  * @return Analog channel is valid
  */
 bool checkAnalogInputChannel(uint32_t pin) {
-  if (pin >= 0 && pin < kAnalogInputPins)
+  if (pin < kAnalogInputPins)
     return true;
   return false;
 }
@@ -115,7 +115,7 @@ bool checkAnalogInputChannel(uint32_t pin) {
  * @return Analog channel is valid
  */
 bool checkAnalogOutputChannel(uint32_t pin) {
-  if (pin >= 0 && pin < kAnalogOutputPins)
+  if (pin < kAnalogOutputPins)
     return true;
   return false;
 }

@@ -28,7 +28,7 @@ void DigitalInput::InitDigitalInput(uint32_t channel)
 	m_channel = channel;
 
 	int32_t status = 0;
-	bool allocated = allocateDIO(m_digital_ports[channel], true, &status);
+	allocateDIO(m_digital_ports[channel], true, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
 	HALReport(HALUsageReporting::kResourceType_DigitalInput, channel);
