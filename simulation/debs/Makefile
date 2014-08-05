@@ -18,6 +18,8 @@ frcsim-package-version = $(frcsim-version)-$(package-version)
 
 all: debs update-repository
 
+jenkins: download-models pull-eclipse-toolchain pull all
+
 allwpilib:
 	cd $(allwpilib) && mvn -T 8 clean package -Dwith-eclipse-plugins -DskipTests -DskipIT
 
@@ -103,6 +105,15 @@ pull-eclipse-plugins:
 	cp $(allwpilib)/eclipse-plugins/edu.wpi.first.wpilib.plugins.updatesite/target/site/features/edu.wpi.first.wpilib.plugins.java.feature_* frcsim-eclipse-plugins/frcsim-eclipse-plugins/features
 	cp $(allwpilib)/eclipse-plugins/edu.wpi.first.wpilib.plugins.updatesite/target/site/features/edu.wpi.first.wpilib.plugins.cpp.feature_* frcsim-eclipse-plugins/frcsim-eclipse-plugins/features
 	cp $(allwpilib)/eclipse-plugins/edu.wpi.first.wpilib.plugins.updatesite/target/site/features/edu.wpi.first.wpilib.plugins.core.feature_* frcsim-eclipse-plugins/frcsim-eclipse-plugins/features
+	echo Increment version?
+
+pull-eclipse-toolchain:
+	rm -rf frcsim-eclipse-plugins/frcsim-eclipse-toolchain-plugins/plugins
+	rm -rf frcsim-eclipse-plugins/frcsim-eclipse-toolchain-plugins/features
+	mkdir -p frcsim-eclipse-plugins/frcsim-eclipse-toolchain-plugins/plugins
+	mkdir -p frcsim-eclipse-plugins/frcsim-eclipse-toolchain-plugins/features
+	cp $(allwpilib)/eclipse-plugins/edu.wpi.first.wpilib.plugins.updatesite/target/site/plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux_* frcsim-eclipse-plugins/frcsim-eclipse-toolchain-plugins/plugins
+	cp $(allwpilib)/eclipse-plugins/edu.wpi.first.wpilib.plugins.updatesite/target/site/features/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux.feature_* frcsim-eclipse-plugins/frcsim-eclipse-toolchain-plugins/features
 	echo Increment version?
 
 pull-libwpilibsim-cpp:
