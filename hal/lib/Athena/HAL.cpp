@@ -103,27 +103,6 @@ uint32_t getFPGATime(int32_t *status)
 }
 
 /**
- * Set the state of the FPGA status LED on the cRIO.
- */
-void setFPGALED(uint32_t state, int32_t *status)
-{
-	// XXX: Not supported?
-	// global->writeFPGA_LED(state, status);
-}
-
-/**
- * Get the current state of the FPGA status LED on the cRIO.
- * @return The curent state of the FPGA LED.
- */
-int32_t getFPGALED(int32_t *status)
-{
-	// XXX: Not supported?
-	// bool ledValue = global->readFPGA_LED(status);
-	// return ledValue;
-	return 0; // XXX: Dummy value
-}
-
-/**
  * Get the state of the "USER" button on the RoboRIO
  * @return true if the button is currently pressed down
  */
