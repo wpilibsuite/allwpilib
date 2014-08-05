@@ -202,14 +202,6 @@ uint32_t GetFPGATime()
 	return time;
 }
 
-// RT hardware access functions exported from ni_emb.out
-extern "C"
-{
-	int32_t UserSwitchInput(int32_t nSwitch);
-	int32_t LedInput(int32_t led);
-	int32_t LedOutput(int32_t led, int32_t value);
-}
-
 /**
  * Get the state of the "USER" button on the RoboRIO
  * @return true if the button is currently pressed down
@@ -222,67 +214,6 @@ bool GetUserButton()
 	wpi_setGlobalError(status);
 
 	return value;
-}
-
-/**
- * Set the state of the USER1 status LED on the cRIO.
- */
-void SetRIOUserLED(uint32_t state)
-{
-	LedOutput(0, state > 0);
-}
-
-/**
- * Get the current state of the USER1 status LED on the cRIO.
- * @return The curent state of the USER1 LED.
- */
-int32_t GetRIOUserLED()
-{
-	return LedInput(0);
-}
-
-/**
- * Toggle the state of the USER1 status LED on the cRIO.
- * @return The new state of the USER1 LED.
- */
-int32_t ToggleRIOUserLED()
-{
-	int32_t ledState = !GetRIOUserLED();
-	SetRIOUserLED(ledState);
-	return ledState;
-}
-
-/**
- * Set the state of the FPGA status LED on the cRIO.
- */
-void SetRIO_FPGA_LED(uint32_t state)
-{
-	int32_t status = 0;
-	setFPGALED(state, &status);
-	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
-}
-
-/**
- * Get the current state of the FPGA status LED on the cRIO.
- * @return The curent state of the FPGA LED.
- */
-int32_t GetRIO_FPGA_LED()
-{
-	int32_t status = 0;
-	int32_t state = getFPGALED(&status);
-	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
-	return state;
-}
-
-/**
- * Toggle the state of the FPGA status LED on the cRIO.
- * @return The new state of the FPGA LED.
- */
-int32_t ToggleRIO_FPGA_LED()
-{
-	int32_t ledState = !GetRIO_FPGA_LED();
-	SetRIO_FPGA_LED(ledState);
-	return ledState;
 }
 
 /**

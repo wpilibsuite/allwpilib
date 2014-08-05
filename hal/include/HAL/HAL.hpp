@@ -280,9 +280,6 @@ extern "C"
 	uint32_t getFPGARevision(int32_t *status);
 	uint32_t getFPGATime(int32_t *status);
 
-	void setFPGALED(uint32_t state, int32_t *status);
-	int32_t getFPGALED(int32_t *status);
-
 	bool getFPGAButton(int32_t *status);
 
 	int HALSetErrorData(const char *errors, int errorsLength, int wait_ms);
