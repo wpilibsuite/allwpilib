@@ -11,6 +11,9 @@
 
 static const double kDelayTime = 0.1;
 
+static const double kSynchronousInterruptTime = 2.0;
+static const double kSynchronousInterruptTimeTolerance = 0.01;
+
 /**
  * A fixture with a digital input and a digital output physically wired
  * together.
@@ -79,7 +82,7 @@ static void InterruptHandler(uint32_t interruptAssertedMask, void *param) {
 	*(int *)param = 12345;
 }
 
-TEST_F(DIOLoopTest, AsynchronusInterruptWorks) {
+TEST_F(DIOLoopTest, AsynchronousInterruptWorks) {
 	int param = 0;
 
 	// Given an interrupt handler that sets an int to 12345
@@ -94,4 +97,27 @@ TEST_F(DIOLoopTest, AsynchronusInterruptWorks) {
 	// Then the int should be 12345
 	Wait(kDelayTime);
 	EXPECT_EQ(12345, param) << "The interrupt did not run.";
+}
+
+static void *InterruptTriggerer(void *data) {
+	DigitalOutput *output = static_cast<DigitalOutput *>(data);
+	output->Set(false);
+	Wait(kSynchronousInterruptTime);
+	output->Set(true);
+	return NULL;
+}
+
+TEST_F(DIOLoopTest, SynchronousInterruptWorks) {
+	// Given a synchronous interrupt
+	m_input->RequestInterrupts();
+
+	// If we have another thread trigger the interrupt in a few seconds
+	pthread_t interruptTriggererLoop;
+	pthread_create(&interruptTriggererLoop, NULL, InterruptTriggerer, m_output);
+
+	// Then this thread should pause and resume after that number of seconds
+	Timer timer;
+	timer.Start();
+	m_input->WaitForInterrupt(kSynchronousInterruptTime + 1.0);
+	EXPECT_NEAR(kSynchronousInterruptTime, timer.Get(), kSynchronousInterruptTimeTolerance);
 }

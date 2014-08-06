@@ -7,9 +7,12 @@
 #include "InterruptableSensorBase.h"
 #include "Utility.h"
 
+Resource *InterruptableSensorBase::m_interrupts = NULL;
+
 InterruptableSensorBase::InterruptableSensorBase()
 {
 	m_interrupt = NULL;
+	Resource::CreateResourceObject(&m_interrupts, interrupt_kNumSystems);
 }
 
 InterruptableSensorBase::~InterruptableSensorBase()
@@ -37,6 +40,7 @@ void InterruptableSensorBase::CancelInterrupts()
 	cleanInterrupts(m_interrupt, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	m_interrupt = NULL;
+	m_interrupts->Free(m_interruptIndex);
 }
 
 /**
