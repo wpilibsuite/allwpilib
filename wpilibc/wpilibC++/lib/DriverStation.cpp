@@ -8,8 +8,6 @@
 #include "AnalogInput.h"
 #include "HAL/cpp/Synchronized.hpp"
 #include "Timer.h"
-//#include "NetworkCommunication/FRCComm.h"
-//#include "NetworkCommunication/UsageReporting.h"
 #include "MotorSafetyHelper.h"
 #include "Utility.h"
 #include "WPIErrors.h"
@@ -20,13 +18,11 @@
 TLogLevel dsLogLevel = logDEBUG;
 
 #define DS_LOG(level) \
-    if (level > dsLogLevel) ; \
-    else Log().Get(level)
+	if (level > dsLogLevel) ; \
+	else Log().Get(level)
 
-const uint32_t DriverStation::kBatteryChannel;
 const uint32_t DriverStation::kJoystickPorts;
 const uint32_t DriverStation::kJoystickAxes;
-constexpr float DriverStation::kUpdatePeriod;
 DriverStation* DriverStation::m_instance = NULL;
 uint8_t DriverStation::m_updateNumber = 0;
 
@@ -36,9 +32,7 @@ uint8_t DriverStation::m_updateNumber = 0;
  * This is only called once the first time GetInstance() is called
  */
 DriverStation::DriverStation()
-	: m_controlData (NULL)
-	, m_digitalOut (0)
-	, m_batteryChannel (NULL)
+	: m_digitalOut (0)
 	, m_statusDataSemaphore (initializeMutexNormal())
 	, m_task ("DriverStation", (FUNCPTR)DriverStation::InitTask)
 	, m_dashboardHigh(m_statusDataSemaphore)
@@ -47,7 +41,6 @@ DriverStation::DriverStation()
 	, m_dashboardInUseLow(&m_dashboardLow)
 	, m_newControlData(0)
 	, m_packetDataAvailableSem (0)
-	, m_enhancedIO()
 	, m_waitForDataSem(0)
 	, m_approxMatchTimeOffset(-1.0)
 	, m_userInDisabled(false)
@@ -65,35 +58,6 @@ DriverStation::DriverStation()
 
 	m_waitForDataSem = initializeMultiWait();
 
-	m_controlData = new HALCommonControlData;
-
-	// initialize packet number and control words to zero;
-	m_controlData->packetIndex = 0;
-	m_controlData->control = 0;
-
-	// set all joystick axis values to neutral; buttons to OFF
-	m_controlData->stick0Axis1 = m_controlData->stick0Axis2 = m_controlData->stick0Axis3 = 0;
-	m_controlData->stick1Axis1 = m_controlData->stick1Axis2 = m_controlData->stick1Axis3 = 0;
-	m_controlData->stick2Axis1 = m_controlData->stick2Axis2 = m_controlData->stick2Axis3 = 0;
-	m_controlData->stick3Axis1 = m_controlData->stick3Axis2 = m_controlData->stick3Axis3 = 0;
-	m_controlData->stick0Axis4 = m_controlData->stick0Axis5 = m_controlData->stick0Axis6 = 0;
-	m_controlData->stick1Axis4 = m_controlData->stick1Axis5 = m_controlData->stick1Axis6 = 0;
-	m_controlData->stick2Axis4 = m_controlData->stick2Axis5 = m_controlData->stick2Axis6 = 0;
-	m_controlData->stick3Axis4 = m_controlData->stick3Axis5 = m_controlData->stick3Axis6 = 0;
-	m_controlData->stick0Buttons = 0;
-	m_controlData->stick1Buttons = 0;
-	m_controlData->stick2Buttons = 0;
-	m_controlData->stick3Buttons = 0;
-
-	// initialize the analog and digital data.
-	m_controlData->analog1 = 0;
-	m_controlData->analog2 = 0;
-	m_controlData->analog3 = 0;
-	m_controlData->analog4 = 0;
-	m_controlData->dsDigitalIn = 0;
-
-	m_batteryChannel = new AnalogInput(kBatteryChannel);
-
 	AddToSingletonList();
 
 	if (!m_task.Start((int32_t)this))
@@ -106,8 +70,6 @@ DriverStation::~DriverStation()
 {
 	m_task.Stop();
 	deleteMutex(m_statusDataSemaphore);
-	delete m_batteryChannel;
-	delete m_controlData;
 	m_instance = NULL;
 	deleteMultiWait(m_waitForDataSem);
 	// Unregister our semaphore.
@@ -127,7 +89,6 @@ void DriverStation::Run()
 	{
 		takeMutex(m_packetDataAvailableSem);
 		SetData();
-		m_enhancedIO.UpdateData();
 		GetData();
 		giveMultiWait(m_waitForDataSem);
 		if (++period >= 4)
@@ -139,10 +100,10 @@ void DriverStation::Run()
 			HALNetworkCommunicationObserveUserProgramDisabled();
 		if (m_userInAutonomous)
 			HALNetworkCommunicationObserveUserProgramAutonomous();
-        if (m_userInTeleop)
-            HALNetworkCommunicationObserveUserProgramTeleop();
-        if (m_userInTest)
-            HALNetworkCommunicationObserveUserProgramTest();
+		if (m_userInTeleop)
+			HALNetworkCommunicationObserveUserProgramTeleop();
+		if (m_userInTest)
+			HALNetworkCommunicationObserveUserProgramTest();
 	}
 }
 
@@ -158,6 +119,8 @@ DriverStation* DriverStation::GetInstance()
 	return m_instance;
 }
 
+#include <iostream>
+
 /**
  * Copy data from the DS task for the user.
  * If no new data exists, it will just be returned, otherwise
@@ -167,7 +130,19 @@ void DriverStation::GetData()
 {
 	static bool lastEnabled = false;
 
-	HALGetCommonControlData(m_controlData, HAL_WAIT_FOREVER);
+	// Get the status data
+	HALGetControlWord(&m_controlWord);
+
+	// Get the location/alliance data
+	HALGetAllianceStation(&m_allianceStationID);
+
+	// Get the status of all of the joysticks
+	for(uint8_t stick = 0; stick < kJoystickPorts; stick++) {
+		uint8_t count;
+
+		HALGetJoystickAxes(stick, &m_joystickAxes[stick], kJoystickAxes);
+		HALGetJoystickButtons(stick, &m_joystickButtons[stick], &count);
+	}
 
 	if (!lastEnabled && IsEnabled())
 	{
@@ -199,30 +174,23 @@ void DriverStation::SetData()
 
 	m_dashboardInUseHigh->GetStatusBuffer(&userStatusDataHigh, &userStatusDataHighSize);
 	m_dashboardInUseLow->GetStatusBuffer(&userStatusDataLow, &userStatusDataLowSize);
-	HALSetStatusData(GetBatteryVoltage(), m_digitalOut, m_updateNumber,
-		userStatusDataHigh, userStatusDataHighSize, userStatusDataLow, userStatusDataLowSize, HAL_WAIT_FOREVER);
+
+	//TODO ???
+	//HALSetStatusData(GetBatteryVoltage(), m_digitalOut, m_updateNumber,
+	//	userStatusDataHigh, userStatusDataHighSize, userStatusDataLow, userStatusDataLowSize, HAL_WAIT_FOREVER);
 
 	m_dashboardInUseHigh->Flush();
 	m_dashboardInUseLow->Flush();
 }
 
 /**
- * Read the battery voltage from the specified AnalogInput.
- *
- * This accessor assumes that the battery voltage is being measured
- * through the voltage divider on an analog breakout.
+ * Read the battery voltage.
  *
  * @return The battery voltage.
  */
 float DriverStation::GetBatteryVoltage()
 {
-	if (m_batteryChannel == NULL)
-		wpi_setWPIError(NullParameter);
-
-	// The Analog bumper has a voltage divider on the battery source.
-	// Vbatt *--/\/\/\--* Vsample *--/\/\/\--* Gnd
-	//         680 Ohms            1000 Ohms
-	return m_batteryChannel->GetAverageVoltage() * (1680.0 / 1000.0);
+	return 0.0f; // TODO
 }
 
 /**
@@ -235,43 +203,28 @@ float DriverStation::GetBatteryVoltage()
  */
 float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
 {
+	if (stick < 1 || stick > kJoystickPorts)
+	{
+		wpi_setWPIError(BadJoystickIndex);
+		return 0;
+	}
+
 	if (axis < 1 || axis > kJoystickAxes)
 	{
 		wpi_setWPIError(BadJoystickAxis);
-		return 0.0;
+		return 0.0f;
 	}
 
-	int8_t value;
-	switch (stick)
+	int8_t value = m_joystickAxes[stick - 1].axes[axis - 1];
+
+	if(value < 0)
 	{
-		case 1:
-			value = m_controlData->stick0Axes[axis-1];
-			break;
-		case 2:
-			value = m_controlData->stick1Axes[axis-1];
-			break;
-		case 3:
-			value = m_controlData->stick2Axes[axis-1];
-			break;
-		case 4:
-			value = m_controlData->stick3Axes[axis-1];
-			break;
-		default:
-			wpi_setWPIError(BadJoystickIndex);
-			return 0.0;
+		return value / 128.0f;
 	}
-
-	float result;
-	if (value < 0)
-		result = ((float) value) / 128.0;
 	else
-		result = ((float) value) / 127.0;
-	wpi_assert(result <= 1.0 && result >= -1.0);
-	if (result > 1.0)
-		result = 1.0;
-	else if (result < -1.0)
-		result = -1.0;
-	return result;
+	{
+		return value / 127.0f;
+	}
 }
 
 /**
@@ -283,143 +236,38 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
  */
 short DriverStation::GetStickButtons(uint32_t stick)
 {
-	if (stick < 1 || stick > 4)
-		wpi_setWPIErrorWithContext(ParameterOutOfRange, "stick must be between 1 and 4");
-
-	switch (stick)
+	if (stick < 1 || stick > kJoystickPorts)
 	{
-	case 1:
-		return m_controlData->stick0Buttons;
-	case 2:
-		return m_controlData->stick1Buttons;
-	case 3:
-		return m_controlData->stick2Buttons;
-	case 4:
-		return m_controlData->stick3Buttons;
-	}
-	return 0;
-}
-
-// 5V divided by 10 bits
-#define kDSAnalogInScaling ((float)(5.0 / 1023.0))
-
-/**
- * Get an analog voltage from the Driver Station.
- * The analog values are returned as voltage values for the Driver Station analog inputs.
- * These inputs are typically used for advanced operator interfaces consisting of potentiometers
- * or resistor networks representing values on a rotary switch.
- *
- * @param channel The analog input channel on the driver station to read from. Valid range is 1 - 4.
- * @return The analog voltage on the input.
- */
-float DriverStation::GetAnalogIn(uint32_t channel)
-{
-	if (channel < 1 || channel > 4)
-		wpi_setWPIErrorWithContext(ParameterOutOfRange, "channel must be between 1 and 4");
-
-	static uint8_t reported_mask = 0;
-	if (!(reported_mask & (1 >> channel)))
-	{
-		HALReport(HALUsageReporting::kResourceType_DriverStationCIO, channel, HALUsageReporting::kDriverStationCIO_Analog);
-		reported_mask |= (1 >> channel);
+		wpi_setWPIError(BadJoystickIndex);
+		return 0;
 	}
 
-	switch (channel)
-	{
-	case 1:
-		return kDSAnalogInScaling * m_controlData->analog1;
-	case 2:
-		return kDSAnalogInScaling * m_controlData->analog2;
-	case 3:
-		return kDSAnalogInScaling * m_controlData->analog3;
-	case 4:
-		return kDSAnalogInScaling * m_controlData->analog4;
-	}
-	return 0.0;
-}
-
-/**
- * Get values from the digital inputs on the Driver Station.
- * Return digital values from the Drivers Station. These values are typically used for buttons
- * and switches on advanced operator interfaces.
- * @param channel The digital input to get. Valid range is 1 - 8.
- */
-bool DriverStation::GetDigitalIn(uint32_t channel)
-{
-	if (channel < 1 || channel > 8)
-		wpi_setWPIErrorWithContext(ParameterOutOfRange, "channel must be between 1 and 8");
-
-	static uint8_t reported_mask = 0;
-	if (!(reported_mask & (1 >> channel)))
-	{
-		HALReport(HALUsageReporting::kResourceType_DriverStationCIO, channel, HALUsageReporting::kDriverStationCIO_DigitalIn);
-		reported_mask |= (1 >> channel);
-	}
-
-	return ((m_controlData->dsDigitalIn >> (channel-1)) & 0x1) ? true : false;
-}
-
-/**
- * Set a value for the digital outputs on the Driver Station.
- *
- * Control digital outputs on the Drivers Station. These values are typically used for
- * giving feedback on a custom operator station such as LEDs.
- *
- * @param channel The digital output to set. Valid range is 1 - 8.
- * @param value The state to set the digital output.
- */
-void DriverStation::SetDigitalOut(uint32_t channel, bool value)
-{
-	if (channel < 1 || channel > 8)
-		wpi_setWPIErrorWithContext(ParameterOutOfRange, "channel must be between 1 and 8");
-
-	static uint8_t reported_mask = 0;
-	if (!(reported_mask & (1 >> channel)))
-	{
-		HALReport(HALUsageReporting::kResourceType_DriverStationCIO, channel,HALUsageReporting::kDriverStationCIO_DigitalOut);
-		reported_mask |= (1 >> channel);
-	}
-
-	m_digitalOut &= ~(0x1 << (channel-1));
-	m_digitalOut |= ((uint8_t)value << (channel-1));
-}
-
-/**
- * Get a value that was set for the digital outputs on the Driver Station.
- * @param channel The digital ouput to monitor. Valid range is 1 through 8.
- * @return A digital value being output on the Drivers Station.
- */
-bool DriverStation::GetDigitalOut(uint32_t channel)
-{
-	if (channel < 1 || channel > 8)
-		wpi_setWPIErrorWithContext(ParameterOutOfRange, "channel must be between 1 and 8");
-
-	return ((m_digitalOut >> (channel-1)) & 0x1) ? true : false;
+	return m_joystickButtons[stick - 1];
 }
 
 bool DriverStation::IsEnabled()
 {
-	return m_controlData->enabled;
+	return m_controlWord.enabled;
 }
 
 bool DriverStation::IsDisabled()
 {
-	return !m_controlData->enabled;
+	return !m_controlWord.enabled;
 }
 
 bool DriverStation::IsAutonomous()
 {
-	return m_controlData->autonomous;
+	return m_controlWord.autonomous;
 }
 
 bool DriverStation::IsOperatorControl()
 {
-	return !(m_controlData->autonomous || m_controlData->test);
+	return !(m_controlWord.autonomous || m_controlWord.test);
 }
 
 bool DriverStation::IsTest()
 {
-	return m_controlData->test;
+	return m_controlWord.test;
 }
 
 /**
@@ -440,18 +288,7 @@ bool DriverStation::IsNewControlData()
  */
 bool DriverStation::IsFMSAttached()
 {
-	return m_controlData->fmsAttached;
-}
-
-/**
- * Return the DS packet number.
- * The packet number is the index of this set of data returned by the driver station.
- * Each time new data is received, the packet number (included with the sent data) is returned.
- * @return The driver station packet number
- */
-uint32_t DriverStation::GetPacketNumber()
-{
-	return m_controlData->packetIndex;
+	return m_controlWord.fmsAttached;
 }
 
 /**
@@ -461,10 +298,19 @@ uint32_t DriverStation::GetPacketNumber()
  */
 DriverStation::Alliance DriverStation::GetAlliance()
 {
-	if (m_controlData->dsID_Alliance == 'R') return kRed;
-	if (m_controlData->dsID_Alliance == 'B') return kBlue;
-	wpi_assert(false);
-	return kInvalid;
+	switch(m_allianceStationID)
+	{
+	case kHALAllianceStationID_red1:
+	case kHALAllianceStationID_red2:
+	case kHALAllianceStationID_red3:
+		return kRed;
+	case kHALAllianceStationID_blue1:
+	case kHALAllianceStationID_blue2:
+	case kHALAllianceStationID_blue3:
+		return kBlue;
+	default:
+		return kInvalid;
+	}
 }
 
 /**
@@ -474,8 +320,20 @@ DriverStation::Alliance DriverStation::GetAlliance()
  */
 uint32_t DriverStation::GetLocation()
 {
-	wpi_assert ((m_controlData->dsID_Position >= '1') && (m_controlData->dsID_Position <= '3'));
-	return m_controlData->dsID_Position - '0';
+	switch(m_allianceStationID)
+	{
+	case kHALAllianceStationID_red1:
+	case kHALAllianceStationID_blue1:
+		return 1;
+	case kHALAllianceStationID_red2:
+	case kHALAllianceStationID_blue2:
+		return 2;
+	case kHALAllianceStationID_red3:
+	case kHALAllianceStationID_blue3:
+		return 3;
+	default:
+		return 0;
+	}
 }
 
 /**
@@ -503,13 +361,4 @@ double DriverStation::GetMatchTime()
 	if (m_approxMatchTimeOffset < 0.0)
 		return 0.0;
 	return Timer::GetFPGATimestamp() - m_approxMatchTimeOffset;
-}
-
-/**
- * Return the team number that the Driver Station is configured for
- * @return The team number
- */
-uint16_t DriverStation::GetTeamNumber()
-{
-	return m_controlData->teamID;
 }

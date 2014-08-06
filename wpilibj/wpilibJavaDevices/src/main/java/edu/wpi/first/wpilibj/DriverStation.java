@@ -10,8 +10,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
-import edu.wpi.first.wpilibj.communication.FRCCommonControlData;
-import edu.wpi.first.wpilibj.communication.FRCCommonControlMasks;
+import edu.wpi.first.wpilibj.communication.HALControlWord;
+import edu.wpi.first.wpilibj.communication.HALAllianceStationID;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -24,14 +24,6 @@ public class DriverStation implements RobotState.Interface {
      * The size of the user status data
      */
     public static final int USER_STATUS_DATA_SIZE = FRCNetworkCommunicationsLibrary.USER_STATUS_DATA_SIZE;
-    /**
-     * Slot for the analog module to read the battery
-     */
-    public static final int kBatterySlot = 1;
-    /**
-     * Analog channel to read the battery
-     */
-    public static final int kBatteryChannel = 7;
     /**
      * Number of Joystick Ports
      */
@@ -48,28 +40,7 @@ public class DriverStation implements RobotState.Interface {
     /**
      * The robot alliance that the robot is a part of
      */
-    public static class Alliance {
-
-        /** The integer value representing this enumeration. */
-        public final int value;
-        /** The Alliance name. */
-        public final String name;
-        public static final int kRed_val = 0;
-        public static final int kBlue_val = 1;
-        public static final int kInvalid_val = 2;
-        /** alliance: Red */
-        public static final Alliance kRed = new Alliance(kRed_val, "Red");
-        /** alliance: Blue */
-        public static final Alliance kBlue = new Alliance(kBlue_val, "Blue");
-        /** alliance: Invalid */
-        public static final Alliance kInvalid = new Alliance(kInvalid_val, "invalid");
-
-        private Alliance(int value, String name) {
-            this.value = value;
-            this.name = name;
-        }
-    } /* Alliance */
-
+    public enum Alliance { Red, Blue, Invalid }
 
     private static class DriverStationTask implements Runnable {
 
@@ -85,8 +56,12 @@ public class DriverStation implements RobotState.Interface {
     } /* DriverStationTask */
 
     private static DriverStation instance = new DriverStation();
-    private FRCCommonControlData m_controlData;
-    private AnalogInput m_batteryChannel;
+
+    private HALControlWord m_controlWord;
+    private HALAllianceStationID m_allianceStationID;
+    private short[][] m_joystickAxes = new short[kJoystickAxes][kJoystickPorts];
+    private int[] m_joystickButtons = new int[kJoystickPorts];
+
     private Thread m_thread;
     private final Object m_semaphore;
     private final Object m_dataSem;
@@ -121,17 +96,11 @@ public class DriverStation implements RobotState.Interface {
      * instance static member variable.
      */
     protected DriverStation() {
-        m_controlData = new FRCCommonControlData();
         m_semaphore = new Object();
         m_dataSem = new Object();
 
         m_dashboardInUseHigh = m_dashboardDefaultHigh = new Dashboard(m_semaphore);
         m_dashboardInUseLow = m_dashboardDefaultLow = new Dashboard(m_semaphore);
-
-        // m_controlData is initialized in constructor FRCCommonControlData.
-
-	// XXX: Uncomment when analogChannel is fixed
-        //m_batteryChannel = new AnalogChannel(kBatterySlot, kBatteryChannel);
 
         m_packetDataAvailableSem = HALUtil.initializeMutexNormal();
 
@@ -216,7 +185,17 @@ public class DriverStation implements RobotState.Interface {
      * the data will be copied from the DS polling loop.
      */
     protected synchronized void getData() {
-    	FRCNetworkCommunicationsLibrary.getCommonControlData(m_controlData);
+        // Get the status data
+        m_controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
+
+        // Get the location/alliance data
+        m_allianceStationID = FRCNetworkCommunicationsLibrary.HALGetAllianceStation();
+
+        // Get the status of all of the joysticks
+        for(byte stick = 0; stick < kJoystickPorts; stick++) {
+            m_joystickButtons[stick] = FRCNetworkCommunicationsLibrary.HALGetJoystickButtons(stick);
+            m_joystickAxes[stick] = FRCNetworkCommunicationsLibrary.HALGetJoystickAxes(stick);
+        }
 
         if (!lastEnabled && isEnabled()) {
             // If starting teleop, assume that autonomous just took up 15 seconds
@@ -239,7 +218,8 @@ public class DriverStation implements RobotState.Interface {
      */
     protected void setData() {
         synchronized (m_semaphore) {
-            FRCNetworkCommunicationsLibrary.setStatusData((float) getBatteryVoltage(),
+            // TODO ???
+            /*FRCNetworkCommunicationsLibrary.setStatusData((float) getBatteryVoltage(),
             						 (byte) m_digitalOut,
                                      (byte) m_updateNumber,
                                      new String(m_dashboardInUseHigh.getBytes()),
@@ -247,25 +227,17 @@ public class DriverStation implements RobotState.Interface {
                                      new String(m_dashboardInUseLow.getBytes()),
                                      m_dashboardInUseLow.getBytesLength());
             m_dashboardInUseHigh.flush();
-            m_dashboardInUseLow.flush();
+            m_dashboardInUseLow.flush();*/
         }
     }
 
     /**
-     * Read the battery voltage from the specified AnalogChannel.
-     *
-     * This accessor assumes that the battery voltage is being measured
-     * through the voltage divider on an analog breakout.
+     * Read the battery voltage.
      *
      * @return The battery voltage.
      */
     public double getBatteryVoltage() {
-        // The Analog bumper has a voltage divider on the battery source.
-        // Vbatt *--/\/\/\--* Vsample *--/\/\/\--* Gnd
-        //         680 Ohms            1000 Ohms
-	// XXX: Uncomment this when analog channel is fixed
-        //return m_batteryChannel.getAverageVoltage() * (1680.0 / 1000.0);
-	return 12.0;
+        return 0.0; // TODO
     }
 
     /**
@@ -277,42 +249,21 @@ public class DriverStation implements RobotState.Interface {
      * @return The value of the axis on the joystick.
      */
     public double getStickAxis(int stick, int axis) {
+        if(stick < 1 || stick > kJoystickPorts) {
+            throw new RuntimeException("Joystick index is out of range, should be 1-4");
+        }
+
         if (axis < 1 || axis > kJoystickAxes) {
-            return 0.0;
+            throw new RuntimeException("Joystick axis is out of range");
         }
 
-        int value;
-        switch (stick) {
-        case 1:
-            value = m_controlData.stick0Axes[axis - 1];
-            break;
-        case 2:
-            value = m_controlData.stick1Axes[axis - 1];
-            break;
-        case 3:
-            value = m_controlData.stick2Axes[axis - 1];
-            break;
-        case 4:
-            value = m_controlData.stick3Axes[axis - 1];
-            break;
-        default:
-            return 0.0;
-        }
+        byte value = (byte)m_joystickAxes[stick - 1][axis - 1];
 
-        double result;
-        if (value < 0) {
-            result = ((double) value) / 128.0;
+        if(value < 0) {
+            return value / 128.0;
         } else {
-            result = ((double) value) / 127.0;
+            return value / 127.0;
         }
-
-        // wpi_assert(result <= 1.0 && result >= -1.0);
-        if (result > 1.0) {
-            result = 1.0;
-        } else if (result < -1.0) {
-            result = -1.0;
-        }
-        return result;
     }
 
     /**
@@ -323,76 +274,11 @@ public class DriverStation implements RobotState.Interface {
      * @return The state of the buttons on the joystick.
      */
     public int getStickButtons(final int stick) {
-        switch (stick) {
-        case 1:
-            return m_controlData.stick0Buttons;
-        case 2:
-            return m_controlData.stick1Buttons;
-        case 3:
-            return m_controlData.stick2Buttons;
-        case 4:
-            return m_controlData.stick3Buttons;
-        default:
-            return 0;
+        if(stick < 1 || stick > kJoystickPorts) {
+            throw new RuntimeException("Joystick index is out of range, should be 1-4");
         }
-    }
 
-    /**
-     * Get an analog voltage from the Driver Station.
-     * The analog values are returned as voltage values for the Driver Station analog inputs.
-     * These inputs are typically used for advanced operator interfaces consisting of potentiometers
-     * or resistor networks representing values on a rotary switch.
-     *
-     * @param channel The analog input channel on the driver station to read from. Valid range is 1 - 4.
-     * @return The analog voltage on the input.
-     */
-    public double getAnalogIn(final int channel) {
-        switch (channel) {
-        case 1:
-            return kDSAnalogInScaling * m_controlData.analog1;
-        case 2:
-            return kDSAnalogInScaling * m_controlData.analog2;
-        case 3:
-            return kDSAnalogInScaling * m_controlData.analog3;
-        case 4:
-            return kDSAnalogInScaling * m_controlData.analog4;
-        default:
-            return 0.0;
-        }
-    }
-
-    /**
-     * Get values from the digital inputs on the Driver Station.
-     * Return digital values from the Drivers Station. These values are typically used for buttons
-     * and switches on advanced operator interfaces.
-     * @param channel The digital input to get. Valid range is 1 - 8.
-     * @return The value of the digital input
-     */
-    public boolean getDigitalIn(final int channel) {
-        return ((m_controlData.dsDigitalIn >> (channel - 1)) & 0x1) == 0x1;
-    }
-
-    /**
-     * Set a value for the digital outputs on the Driver Station.
-     *
-     * Control digital outputs on the Drivers Station. These values are typically used for
-     * giving feedback on a custom operator station such as LEDs.
-     *
-     * @param channel The digital output to set. Valid range is 1 - 8.
-     * @param value The state to set the digital output.
-     */
-    public void setDigitalOut(final int channel, final boolean value) {
-        m_digitalOut &= ~(0x1 << (channel - 1));
-        m_digitalOut |= ((value ? 1 : 0) << (channel - 1));
-    }
-
-    /**
-     * Get a value that was set for the digital outputs on the Driver Station.
-     * @param channel The digital ouput to monitor. Valid range is 1 through 8.
-     * @return A digital value being output on the Drivers Station.
-     */
-    public boolean getDigitalOut(final int channel) {
-        return ((m_digitalOut >> (channel - 1)) & 0x1) == 0x1;
+        return (int)m_joystickButtons[stick - 1];
     }
 
     /**
@@ -402,7 +288,7 @@ public class DriverStation implements RobotState.Interface {
      * @return True if the robot is enabled, false otherwise.
      */
     public boolean isEnabled() {
-        return (m_controlData.control & FRCCommonControlMasks.ENABLED) != 0;
+        return m_controlWord.getEnabled();
     }
 
     /**
@@ -422,7 +308,7 @@ public class DriverStation implements RobotState.Interface {
      * @return True if autonomous mode should be enabled, false otherwise.
      */
     public boolean isAutonomous() {
-        return (m_controlData.control & FRCCommonControlMasks.AUTONOMOUS) != 0;
+        return m_controlWord.getAutonomous();
     }
 
     /**
@@ -431,7 +317,7 @@ public class DriverStation implements RobotState.Interface {
      * @return True if test mode should be enabled, false otherwise.
      */
     public boolean isTest() {
-        return (m_controlData.control & FRCCommonControlMasks.TEST) != 0;
+        return m_controlWord.getTest();
     }
 
     /**
@@ -455,28 +341,23 @@ public class DriverStation implements RobotState.Interface {
     }
 
     /**
-     * Return the DS packet number.
-     * The packet number is the index of this set of data returned by the driver station.
-     * Each time new data is received, the packet number (included with the sent data) is returned.
-     *
-     * @return The DS packet number.
-     */
-    public int getPacketNumber() {
-        return m_controlData.packetIndex;
-    }
-
-    /**
      * Get the current alliance from the FMS
      * @return the current alliance
      */
     public Alliance getAlliance() {
-        switch (m_controlData.dsID_Alliance) {
-        case 'R':
-            return Alliance.kRed;
-        case 'B':
-            return Alliance.kBlue;
-        default:
-            return Alliance.kInvalid;
+        switch (m_allianceStationID) {
+            case Red1:
+            case Red2:
+            case Red3:
+                return Alliance.Red;
+
+            case Blue1:
+            case Blue2:
+            case Blue3:
+                return Alliance.Blue;
+
+            default:
+                return Alliance.Invalid;
         }
     }
 
@@ -486,15 +367,22 @@ public class DriverStation implements RobotState.Interface {
      * @return the location of the team's driver station controls: 1, 2, or 3
      */
     public int getLocation() {
-        return m_controlData.dsID_Position - '0';
-    }
+        switch (m_allianceStationID) {
+            case Red1:
+            case Blue1:
+                return 1;
 
-    /**
-     * Return the team number that the Driver Station is configured for
-     * @return The team number
-     */
-    public int getTeamNumber() {
-        return m_controlData.teamID;
+            case Red2:
+            case Blue2:
+                return 2;
+
+            case Blue3:
+            case Red3:
+                return 3;
+
+            default:
+                return 0;
+        }
     }
 
     /**
@@ -590,7 +478,7 @@ public class DriverStation implements RobotState.Interface {
      * @return True if the robot is competing on a field being controlled by a Field Management System
      */
     public boolean isFMSAttached() {
-        return (m_controlData.control & FRCCommonControlMasks.FMS_ATTATCHED) > 0;
+        return m_controlWord.getFMSAttached();
     }
 
     /**

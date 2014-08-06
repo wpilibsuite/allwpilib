@@ -50,6 +50,23 @@ public:
 	 * @return This should return 0 if a message was populated, non-0 if no message was not populated.
 	 */
 	virtual int32_t receiveMessage(uint32_t &messageID, uint8_t *data, uint8_t &dataSize) = 0;
+
+	/**
+	 * This entry-point of the CANInterfacePlugin returns status of the CAN bus.
+	 * 
+	 * This function may be called from multiple contexts and must therefore be reentrant.
+	 * 
+	 * This function will return detailed hardware status if available for diagnostics of the CAN interface.
+	 * 
+	 * @param busOffCount The number of times that sendMessage failed with a busOff error indicating that messages
+	 *  are not successfully transmitted on the bus.
+	 * @param txFullCount The number of times that sendMessage failed with a txFifoFull error indicating that messages
+	 *  are not successfully received by any CAN device.
+	 * @param receiveErrorCount The count of receive errors as reported by the CAN driver.
+	 * @param transmitErrorCount The count of transmit errors as reported by the CAN driver.
+	 * @return This should return 0 if all status was retrieved successfully or an error code if not.
+	 */
+	virtual int32_t getStatus(uint32_t &busOffCount, uint32_t &txFullCount, uint32_t &receiveErrorCount, uint32_t &transmitErrorCount) {return 0;}
 };
 
 /**

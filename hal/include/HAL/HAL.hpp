@@ -30,7 +30,6 @@
 #define HAL_IO_CONFIG_DATA_SIZE 32
 #define HAL_SYS_STATUS_DATA_SIZE 44
 #define HAL_USER_STATUS_DATA_SIZE (984 - HAL_IO_CONFIG_DATA_SIZE - HAL_SYS_STATUS_DATA_SIZE)
-#define HAL_USER_DS_LCD_DATA_SIZE 128
 
 #define HALFRC_NetworkCommunication_DynamicType_DSEnhancedIO_Input 17
 #define HALFRC_NetworkCommunication_DynamicType_DSEnhancedIO_Output 18
@@ -142,118 +141,31 @@ namespace HALUsageReporting
 	};
 }
 
-struct HALCommonControlData
-{
-	uint16_t packetIndex;
-	union
-	{
-		uint8_t control;
-#ifndef __vxworks
-		struct
-		{
-			uint8_t checkVersions :1;
-			uint8_t test :1;
-			uint8_t resync :1;
-			uint8_t fmsAttached :1;
-			uint8_t autonomous :1;
-			uint8_t enabled :1;
-			uint8_t notEStop :1;
-			uint8_t reset :1;
-		};
-#else
-		struct
-		{
-			uint8_t reset : 1;
-			uint8_t notEStop : 1;
-			uint8_t enabled : 1;
-			uint8_t autonomous : 1;
-			uint8_t fmsAttached:1;
-			uint8_t resync : 1;
-			uint8_t test :1;
-			uint8_t checkVersions :1;
-		};
-#endif
-	};
-	uint8_t dsDigitalIn;
-	uint16_t teamID;
-
-	char dsID_Alliance;
-	char dsID_Position;
-
-	union
-	{
-		int8_t stick0Axes[6];
-		struct
-		{ // TODO: ???
-			int8_t stick0Axis1;
-			int8_t stick0Axis2;
-			int8_t stick0Axis3;
-			int8_t stick0Axis4;
-			int8_t stick0Axis5;
-			int8_t stick0Axis6;
-		};
-	};
-	uint16_t stick0Buttons;		// Left-most 4 bits are unused
-
-	union
-	{
-		int8_t stick1Axes[6];
-		struct
-		{ // TODO: ???
-			int8_t stick1Axis1;
-			int8_t stick1Axis2;
-			int8_t stick1Axis3;
-			int8_t stick1Axis4;
-			int8_t stick1Axis5;
-			int8_t stick1Axis6;
-		};
-	};
-	uint16_t stick1Buttons;		// Left-most 4 bits are unused
-
-	union
-	{
-		int8_t stick2Axes[6];
-		struct
-		{ // TODO: ???
-			int8_t stick2Axis1;
-			int8_t stick2Axis2;
-			int8_t stick2Axis3;
-			int8_t stick2Axis4;
-			int8_t stick2Axis5;
-			int8_t stick2Axis6;
-		};
-	};
-	uint16_t stick2Buttons;		// Left-most 4 bits are unused
-
-	union
-	{
-		int8_t stick3Axes[6];
-		struct
-		{ // TODO: ???
-			int8_t stick3Axis1;
-			int8_t stick3Axis2;
-			int8_t stick3Axis3;
-			int8_t stick3Axis4;
-			int8_t stick3Axis5;
-			int8_t stick3Axis6;
-		};
-	};
-	uint16_t stick3Buttons;		// Left-most 4 bits are unused
-
-	//Analog inputs are 10 bit right-justified
-	uint16_t analog1;
-	uint16_t analog2;
-	uint16_t analog3;
-	uint16_t analog4;
-
-	uint64_t cRIOChecksum;
-	uint32_t FPGAChecksum0;
-	uint32_t FPGAChecksum1;
-	uint32_t FPGAChecksum2;
-	uint32_t FPGAChecksum3;
-
-	char versionData[8];
+struct HALControlWord {
+	uint32_t enabled : 1;
+	uint32_t autonomous : 1;
+	uint32_t test :1;
+	uint32_t eStop : 1;
+	uint32_t fmsAttached:1;
+	uint32_t dsAttached:1;
+	uint32_t control_reserved : 26;
 };
+
+enum HALAllianceStationID {
+	kHALAllianceStationID_red1,
+	kHALAllianceStationID_red2,
+	kHALAllianceStationID_red3,
+	kHALAllianceStationID_blue1,
+	kHALAllianceStationID_blue2,
+	kHALAllianceStationID_blue3,
+};
+
+struct HALJoystickAxes {
+	uint16_t count;
+	int16_t axes[6];
+};
+
+typedef uint32_t HALJoystickButtons;
 
 inline float intToFloat(int value)
 {
@@ -283,10 +195,12 @@ extern "C"
 	bool getFPGAButton(int32_t *status);
 
 	int HALSetErrorData(const char *errors, int errorsLength, int wait_ms);
-	int HALSetUserDsLcdData(const char *userDsLcdData, int userDsLcdDataLength, int wait_ms);
-	int HALOverrideIOConfig(const char *ioConfig, int wait_ms);
-	int HALGetDynamicControlData(uint8_t type, char *dynamicData, int32_t maxLength, int wait_ms);
-	int HALGetCommonControlData(HALCommonControlData *data, int wait_ms);
+
+	int HALGetControlWord(HALControlWord *data);
+	int HALGetAllianceStation(enum HALAllianceStationID *allianceStation);
+	int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes *axes, uint8_t maxAxes);
+	int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons, uint8_t *count);
+
 	void HALSetNewDataSem(pthread_mutex_t *);
 	int HALSetStatusData(float battery, uint8_t dsDigitalOut, uint8_t updateNumber,
 			const char *userDataHigh, int userDataHighLength, const char *userDataLow,

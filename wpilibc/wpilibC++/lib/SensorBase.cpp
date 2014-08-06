@@ -101,7 +101,7 @@ void SensorBase::DeleteSingletons()
  */
 bool SensorBase::CheckSolenoidModule(uint8_t moduleNumber)
 {
-	if (nLoadOut::getModulePresence(nLoadOut::kModuleType_Solenoid, moduleNumber - 1))
+	if (moduleNumber < 64)
 		return true;
 	return false;
 }

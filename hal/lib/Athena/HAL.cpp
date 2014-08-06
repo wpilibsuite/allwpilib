@@ -6,7 +6,6 @@
 #include "NetworkCommunication/FRCComm.h"
 #include "NetworkCommunication/UsageReporting.h"
 #include "NetworkCommunication/LoadOut.h"
-#include "ChipObject/nInterfaceGlobals.h"
 #include <fstream>
 #include <iostream>
 #include <unistd.h>
@@ -116,26 +115,24 @@ int HALSetErrorData(const char *errors, int errorsLength, int wait_ms)
 	return setErrorData(errors, errorsLength, wait_ms);
 }
 
-int HALSetUserDsLcdData(const char *userDsLcdData, int userDsLcdDataLength,
-		int wait_ms)
+int HALGetControlWord(HALControlWord *data)
 {
-	return setUserDsLcdData(userDsLcdData, userDsLcdDataLength, wait_ms);
+	return FRC_NetworkCommunication_getControlWord((ControlWord_t*) data);
 }
 
-int HALOverrideIOConfig(const char *ioConfig, int wait_ms)
+int HALGetAllianceStation(enum HALAllianceStationID *allianceStation)
 {
-	return overrideIOConfig(ioConfig, wait_ms);
+	return FRC_NetworkCommunication_getAllianceStation((AllianceStationID_t*) allianceStation);
 }
 
-int HALGetDynamicControlData(uint8_t type, char *dynamicData, int32_t maxLength,
-		int wait_ms)
+int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes *axes, uint8_t maxAxes)
 {
-	return getDynamicControlData(type, dynamicData, maxLength, wait_ms);
+	return FRC_NetworkCommunication_getJoystickAxes(joystickNum, (JoystickAxes_t*) axes, maxAxes);
 }
 
-int HALGetCommonControlData(HALCommonControlData *data, int wait_ms)
+int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons, uint8_t *count)
 {
-	return getRecentCommonControlData((FRCCommonControlData*) data, wait_ms);
+	return FRC_NetworkCommunication_getJoystickButtons(joystickNum, buttons, count);
 }
 
 void HALSetNewDataSem(pthread_mutex_t * param)
@@ -240,8 +237,12 @@ void HALNetworkCommunicationObserveUserProgramTest(void)
 uint32_t HALReport(uint8_t resource, uint8_t instanceNumber, uint8_t context,
 		const char *feature)
 {
-	//return FRC_NetworkCommunication_nUsageReporting_report( resource, instanceNumber, context, feature);
-	return 0;
+	if(feature == NULL)
+	{
+		feature = "";
+	}
+
+	return FRC_NetworkCommunication_nUsageReporting_report(resource, instanceNumber, context, feature);
 }
 
 // TODO: HACKS
@@ -266,13 +267,4 @@ void imaqGetLastError()
 }
 void niTimestamp64()
 {
-}
-
-#include "NetworkCommunication/LoadOut.h"
-namespace nLoadOut
-{
-bool getModulePresence(tModuleType moduleType, uint8_t moduleNumber)
-{
-	return true;
-}
 }

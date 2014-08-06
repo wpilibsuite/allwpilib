@@ -263,7 +263,7 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 	 * <i>native declaration : src\main\include\NetworkCommunication\AICalibration.h:7</i><br>
 	 * @deprecated use the safer methods {@link #FRC_NetworkCommunication_nAICalibration_getLSBWeight(int, int, java.nio.IntBuffer)} and {@link #FRC_NetworkCommunication_nAICalibration_getLSBWeight(int, int, com.sun.jna.ptr.IntByReference)} instead
 	 */
-	//@Deprecated 
+	//@Deprecated
 	//public static native int FRC_NetworkCommunication_nAICalibration_getLSBWeight(int aiSystemIndex, int channel, Integer status);
 	/**
 	 * Original signature : <code>uint32_t FRC_NetworkCommunication_nAICalibration_getLSBWeight(const uint32_t, const uint32_t, int32_t*)</code><br>
@@ -275,18 +275,13 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 	 * <i>native declaration : src\main\include\NetworkCommunication\AICalibration.h:8</i><br>
 	 * @deprecated use the safer methods {@link #FRC_NetworkCommunication_nAICalibration_getOffset(int, int, java.nio.IntBuffer)} and {@link #FRC_NetworkCommunication_nAICalibration_getOffset(int, int, com.sun.jna.ptr.IntByReference)} instead
 	 */
-	//@Deprecated 
+	//@Deprecated
 	//public static native int FRC_NetworkCommunication_nAICalibration_getOffset(int aiSystemIndex, int channel, Integer status);
 	/**
 	 * Original signature : <code>int32_t FRC_NetworkCommunication_nAICalibration_getOffset(const uint32_t, const uint32_t, int32_t*)</code><br>
 	 * <i>native declaration : src\main\include\NetworkCommunication\AICalibration.h:8</i>
 	 */
 	public static native int FRCNetworkCommunicationAICalibrationGetOffset(int aiSystemIndex, int channel, Integer status);
-	/**
-	 * Original signature : <code>bool getModulePresence(tModuleType, uint8_t)</code><br>
-	 * <i>native declaration : src\main\include\NetworkCommunication\LoadOut.h:14</i>
-	 */
-	public static native byte getModulePresence(int moduleType, byte moduleNumber);
 	/**
 	 * Original signature : <code>tTargetClass getTargetClass()</code><br>
 	 * <i>native declaration : src\main\include\NetworkCommunication\LoadOut.h:25</i>
@@ -309,7 +304,7 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 	 * <i>native declaration : src\main\include\NetworkCommunication\symModuleLink.h:6</i><br>
 	 * @deprecated use the safer methods {@link #moduleNameFindBySymbolName(java.lang.String, java.nio.ByteBuffer)} and {@link #moduleNameFindBySymbolName(com.sun.jna.Pointer, com.sun.jna.Pointer)} instead
 	 */
-	//@Deprecated 
+	//@Deprecated
 	//public static native FRC_NetworkCommunicationsLibrary.STATUS moduleNameFindBySymbolName(Pointer symbol, Pointer module);
 	/**
 	 * Original signature : <code>STATUS moduleNameFindBySymbolName(const char*, char*)</code><br>
@@ -320,7 +315,7 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 	//public static native FRC_NetworkCommunicationsLibrary.STATUS moduleNameFindBySymbolName(String symbol, ByteBuffer module);
 	/**
 	 * Report the usage of a resource of interest.<br>
-	 * <br>
+	 *<br>
 	 * @param resource one of the values in the tResourceType above (max value 51).<br>
 	 * @param instanceNumber an index that identifies the resource instance.<br>
 	 * @param context an optional additional context number for some cases (such as module number).  Set to 0 to omit.<br>
@@ -329,11 +324,11 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 	 * <i>native declaration : src\main\include\NetworkCommunication\UsageReporting.h:113</i><br>
 	 * @deprecated use the safer methods {@link #report(int, byte, byte, java.lang.String)} and {@link #report(int, byte, byte, com.sun.jna.Pointer)} instead
 	 */
-	//@Deprecated 
+	//@Deprecated
 	//public static native int report(int resource, byte instanceNumber, byte context, Pointer feature);
 	/**
 	 * Report the usage of a resource of interest.<br>
-	 * <br>
+	 *<br>
 	 * @param resource one of the values in the tResourceType above (max value 51).<br>
 	 * @param instanceNumber an index that identifies the resource instance.<br>
 	 * @param context an optional additional context number for some cases (such as module number).  Set to 0 to omit.<br>
@@ -347,7 +342,7 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 	 * <i>native declaration : src\main\include\NetworkCommunication\UsageReporting.h:120</i><br>
 	 * @deprecated use the safer methods {@link #FRC_NetworkCommunication_nUsageReporting_report(byte, byte, byte, java.lang.String)} and {@link #FRC_NetworkCommunication_nUsageReporting_report(byte, byte, byte, com.sun.jna.Pointer)} instead
 	 */
-	//@Deprecated 
+	//@Deprecated
 	//public static native int FRC_NetworkCommunication_nUsageReporting_report(byte resource, byte instanceNumber, byte context, Pointer feature);
 	/**
 	 * Original signature : <code>uint32_t FRC_NetworkCommunication_nUsageReporting_report(uint8_t, uint8_t, uint8_t, const char*)</code><br>
@@ -359,7 +354,7 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 	 * <i>native declaration : src\main\include\NetworkCommunication\FRCComm.h:124</i><br>
 	 * @deprecated use the safer methods {@link #getFPGAHardwareVersion(java.nio.ShortBuffer, java.nio.IntBuffer)} and {@link #getFPGAHardwareVersion(com.sun.jna.ptr.ShortByReference, com.sun.jna.ptr.IntByReference)} instead
 	 */
-	//@Deprecated 
+	//@Deprecated
 	//public static native void getFPGAHardwareVersion(ShortByReference fpgaVersion, IntByReference fpgaRevision);
 	/**
 	 * Original signature : <code>void getFPGAHardwareVersion(uint16_t*, uint32_t*)</code><br>
@@ -367,21 +362,11 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 	 */
 	public static native void getFPGAHardwareVersion(ShortBuffer fpgaVersion, IntBuffer fpgaRevision);
 	/**
-	 * Original signature : <code>int getCommonControlData(FRCCommonControlData*, int)</code><br>
-	 * <i>native declaration : src\main\include\NetworkCommunication\FRCComm.h:126</i>
-	 */
-	public static native int getCommonControlData(FRCCommonControlData data);
-	/**
-	 * Original signature : <code>int getRecentCommonControlData(FRCCommonControlData*, int)</code><br>
-	 * <i>native declaration : src\main\include\NetworkCommunication\FRCComm.h:127</i>
-	 */
-	public static native int getRecentCommonControlData(FRCCommonControlData commonData, int wait_ms);
-	/**
 	 * Original signature : <code>int getRecentStatusData(uint8_t*, uint8_t*, uint8_t*, int)</code><br>
 	 * <i>native declaration : src\main\include\NetworkCommunication\FRCComm.h:128</i><br>
 	 * @deprecated use the safer methods {@link #getRecentStatusData(java.nio.ByteBuffer, java.nio.ByteBuffer, java.nio.ByteBuffer, int)} and {@link #getRecentStatusData(com.sun.jna.Pointer, com.sun.jna.Pointer, com.sun.jna.Pointer, int)} instead
 	 */
-	//@Deprecated 
+	//@Deprecated
 	//public static native int getRecentStatusData(Pointer batteryInt, Pointer batteryDec, Pointer dsDigitalOut, int wait_ms);
 	/**
 	 * Original signature : <code>int getRecentStatusData(uint8_t*, uint8_t*, uint8_t*, int)</code><br>
@@ -389,23 +374,11 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 	 */
 	public static native int getRecentStatusData(ByteBuffer batteryInt, ByteBuffer batteryDec, ByteBuffer dsDigitalOut, int wait_ms);
 	/**
-	 * Original signature : <code>int getDynamicControlData(uint8_t, char*, int32_t, int)</code><br>
-	 * <i>native declaration : src\main\include\NetworkCommunication\FRCComm.h:129</i><br>
-	 * @deprecated use the safer methods {@link #getDynamicControlData(byte, java.nio.ByteBuffer, int, int)} and {@link #getDynamicControlData(byte, com.sun.jna.Pointer, int, int)} instead
-	 */
-	//@Deprecated 
-	//public static native int getDynamicControlData(byte type, Pointer dynamicData, int maxLength, int wait_ms);
-	/**
-	 * Original signature : <code>int getDynamicControlData(uint8_t, char*, int32_t, int)</code><br>
-	 * <i>native declaration : src\main\include\NetworkCommunication\FRCComm.h:129</i>
-	 */
-	public static native int getDynamicControlData(byte type, ByteBuffer dynamicData, int maxLength, int wait_ms);
-	/**
 	 * Original signature : <code>int setStatusData(float, uint8_t, uint8_t, const char*, int, const char*, int, int)</code><br>
 	 * <i>native declaration : src\main\include\NetworkCommunication\FRCComm.h:130</i><br>
 	 * @deprecated use the safer methods {@link #setStatusData(float, byte, byte, java.lang.String, int, java.lang.String, int, int)} and {@link #setStatusData(float, byte, byte, com.sun.jna.Pointer, int, com.sun.jna.Pointer, int, int)} instead
 	 */
-	//@Deprecated 
+	//@Deprecated
 	//public static native int setStatusData(float battery, byte dsDigitalOut, byte updateNumber, Pointer userDataHigh, int userDataHighLength, Pointer userDataLow, int userDataLowLength, int wait_ms);
 	/**
 	 * Original signature : <code>int setStatusData(float, uint8_t, uint8_t, const char*, int, const char*, int, int)</code><br>
@@ -413,23 +386,11 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 	 */
 	public static native int setStatusData(float battery, byte dsDigitalOut, byte updateNumber, String userDataHigh, int userDataHighLength, String userDataLow, int userDataLowLength);
 	/**
-	 * Original signature : <code>int setStatusDataFloatAsInt(int, uint8_t, uint8_t, const char*, int, const char*, int, int)</code><br>
-	 * <i>native declaration : src\main\include\NetworkCommunication\FRCComm.h:133</i><br>
-	 * @deprecated use the safer methods {@link #setStatusDataFloatAsInt(int, byte, byte, java.lang.String, int, java.lang.String, int, int)} and {@link #setStatusDataFloatAsInt(int, byte, byte, com.sun.jna.Pointer, int, com.sun.jna.Pointer, int, int)} instead
-	 */
-	//@Deprecated 
-	//public static native int setStatusDataFloatAsInt(int battery, byte dsDigitalOut, byte updateNumber, Pointer userDataHigh, int userDataHighLength, Pointer userDataLow, int userDataLowLength, int wait_ms);
-	/**
-	 * Original signature : <code>int setStatusDataFloatAsInt(int, uint8_t, uint8_t, const char*, int, const char*, int, int)</code><br>
-	 * <i>native declaration : src\main\include\NetworkCommunication\FRCComm.h:133</i>
-	 */
-	public static native int setStatusDataFloatAsInt(int battery, byte dsDigitalOut, byte updateNumber, String userDataHigh, int userDataHighLength, String userDataLow, int userDataLowLength, int wait_ms);
-	/**
 	 * Original signature : <code>int setErrorData(const char*, int, int)</code><br>
 	 * <i>native declaration : src\main\include\NetworkCommunication\FRCComm.h:136</i><br>
 	 * @deprecated use the safer methods {@link #setErrorData(java.lang.String, int, int)} and {@link #setErrorData(com.sun.jna.Pointer, int, int)} instead
 	 */
-	//@Deprecated 
+	//@Deprecated
 	//public static native int setErrorData(Pointer errors, int errorsLength, int wait_ms);
 	/**
 	 * Original signature : <code>int setErrorData(const char*, int, int)</code><br>
@@ -437,23 +398,11 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 	 */
 	public static native int setErrorData(String errors, int errorsLength, int wait_ms);
 	/**
-	 * Original signature : <code>int setUserDsLcdData(const char*, int, int)</code><br>
-	 * <i>native declaration : src\main\include\NetworkCommunication\FRCComm.h:137</i><br>
-	 * @deprecated use the safer methods {@link #setUserDsLcdData(java.lang.String, int, int)} and {@link #setUserDsLcdData(com.sun.jna.Pointer, int, int)} instead
-	 */
-	//@Deprecated 
-	//public static native int setUserDsLcdData(Pointer userDsLcdData, int userDsLcdDataLength, int wait_ms);
-	/**
-	 * Original signature : <code>int setUserDsLcdData(const char*, int, int)</code><br>
-	 * <i>native declaration : src\main\include\NetworkCommunication\FRCComm.h:137</i>
-	 */
-	public static native int setUserDsLcdData(String userDsLcdData, int userDsLcdDataLength, int wait_ms);
-	/**
 	 * Original signature : <code>int overrideIOConfig(const char*, int)</code><br>
 	 * <i>native declaration : src\main\include\NetworkCommunication\FRCComm.h:138</i><br>
 	 * @deprecated use the safer methods {@link #overrideIOConfig(java.lang.String, int)} and {@link #overrideIOConfig(com.sun.jna.Pointer, int)} instead
 	 */
-	//@Deprecated 
+	//@Deprecated
 	//public static native int overrideIOConfig(String ioConfig, int wait_ms);
 	/**
 	 * Original signature : <code>int overrideIOConfig(const char*, int)</code><br>
@@ -491,7 +440,7 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 	 * <i>native declaration : src\main\include\NetworkCommunication\FRCComm.h:159</i><br>
 	 * @deprecated use the safer methods {@link #FRC_NetworkCommunication_getVersionString(java.nio.ByteBuffer)} and {@link #FRC_NetworkCommunication_getVersionString(com.sun.jna.Pointer)} instead
 	 */
-	//@Deprecated 
+	//@Deprecated
 	//public static native void FRC_NetworkCommunication_getVersionString(Pointer version);
 	/**
 	 * Original signature : <code>void FRC_NetworkCommunication_getVersionString(char*)</code><br>
@@ -504,7 +453,43 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 	public static native void FRCNetworkCommunicationObserveUserProgramTeleop();
 	public static native void FRCNetworkCommunicationObserveUserProgramTest();
 	public static native void FRCNetworkCommunicationReserve();
-	
+
+	private static native int NativeHALGetControlWord();
+	public static HALControlWord HALGetControlWord() {
+		int word = NativeHALGetControlWord();
+		return new HALControlWord(
+			(word & 1) != 0,
+			((word >> 2) & 1) != 0,
+			((word >> 3) & 1) != 0,
+			((word >> 4) & 1) != 0,
+			((word >> 5) & 1) != 0,
+			((word >> 6) & 1) != 0
+		);
+	}
+
+	private static native int NativeHALGetAllianceStation();
+	public static HALAllianceStationID HALGetAllianceStation() {
+		switch(NativeHALGetAllianceStation()) {
+		case 0:
+			return HALAllianceStationID.Red1;
+		case 1:
+			return HALAllianceStationID.Red2;
+		case 2:
+			return HALAllianceStationID.Red3;
+		case 3:
+			return HALAllianceStationID.Blue1;
+		case 4:
+			return HALAllianceStationID.Blue2;
+		case 5:
+			return HALAllianceStationID.Blue3;
+		default:
+			return null;
+		}
+	}
+
+	public static native short[] HALGetJoystickAxes(byte joystickNum);
+	public static native int HALGetJoystickButtons(byte joystickNum);
+
 	/*
 	public static class pthread_mutex_t extends PointerType {
 		public pthread_mutex_t(Pointer address) {
@@ -522,7 +507,7 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 			super();
 		}
 	};*/
-	
+
 	//
 	// JNI Testing
 	//
@@ -535,11 +520,11 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 	public static native long JNIValueReturnLongTest(long longValue);
 	public static native float JNIValueReturnFloatTest(float floatValue);
 	public static native double JNIValueReturnDoubleTest(double doubleValue);
-	
+
 	public static native String JNIObjectReturnStringTest( String stringObject);
-	
+
 	public static native ByteBuffer JNIObjectReturnByteBufferTest( ByteBuffer byteBuffer );
-	
+
 	public static native ByteBuffer JNIObjectAndParamReturnIntBufferTest( IntBuffer intBuffer);
-	
+
 }

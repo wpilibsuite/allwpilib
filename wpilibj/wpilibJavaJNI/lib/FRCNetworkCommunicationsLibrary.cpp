@@ -40,17 +40,6 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
 }
 /*
  * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
- * Method:    getModulePresence
- * Signature: (IB)B
- */
-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_getModulePresence
-  (JNIEnv *, jclass, jint, jbyte)
-{
-	assert(false);
-	return 0;
-}
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
  * Method:    getTargetClass
  * Signature: ()I
  */
@@ -145,192 +134,6 @@ jfieldID FPGAChecksum1FieldID;
 jfieldID FPGAChecksum2FieldID;
 jfieldID FPGAChecksum3FieldID;
 jfieldID versionDataFieldID;
-
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
- * Method:    getCommonControlData
- * Signature: (Ledu/wpi/first/wpilibj/communication/FRCCommonControlData;I)I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_getCommonControlData
-  (JNIEnv * env, jclass, jobject controlData)
-{
-	HALCommonControlData controlDataNative;
-
-	controlDataNative.packetIndex = 0xFF;
-	controlDataNative.control = 0xFF;
-
-	int returnValue = HALGetCommonControlData(&controlDataNative, HAL_WAIT_FOREVER);
-
-	//NETCOMM_LOG(logDEBUG) << "PacketIndex: " << (void*)controlDataNative.packetIndex << " Control: " << (void*)controlDataNative.control << " ReturnValue: " << (void*)returnValue;
-
-	if(!initializeComplete)
-	{
-		// control data class
-		dataClass = (jclass)env->NewGlobalRef(env->GetObjectClass(controlData));
-		//dataClass = env->GetObjectClass(controlData);
-		// public short packetIndex;
-		packetIndexFieldID = env->GetFieldID(dataClass, "packetIndex", "S" );
-		//	public byte control;
-		controlFieldID = env->GetFieldID(dataClass, "control", "B" );
-		//	public byte dsDigitalIn;
-		dsDigitalInFieldID = env->GetFieldID(dataClass, "dsDigitalIn", "B" );
-		//	public short teamID;
-		teamIDFieldID = env->GetFieldID(dataClass, "teamID", "S" );
-		//	public byte dsID_Alliance;
-		dsID_AllianceFieldID = env->GetFieldID(dataClass, "dsID_Alliance", "B" );
-		//	public byte dsID_Position;
-		dsID_PositionFieldID = env->GetFieldID(dataClass, "dsID_Position", "B" );
-		//	public byte[] stick0Axes;
-		stick0AxesFieldID = env->GetFieldID(dataClass, "stick0Axes", "[B" );
-		//	public short stick0Buttons;
-		stick0ButtonsFieldID = env->GetFieldID(dataClass, "stick0Buttons", "S" );
-		//	public byte[] stick1Axes;
-		stick1AxesFieldID = env->GetFieldID(dataClass, "stick1Axes", "[B" );
-		//	public short stick1Buttons;
-		stick1ButtonsFieldID = env->GetFieldID(dataClass, "stick1Buttons", "S" );
-		//	public byte[] stick2Axes;
-		stick2AxesFieldID = env->GetFieldID(dataClass, "stick2Axes", "[B" );
-		//	public short stick2Buttons;
-		stick2ButtonsFieldID = env->GetFieldID(dataClass, "stick2Buttons", "S" );
-		//	public byte[] stick3Axes;
-		stick3AxesFieldID = env->GetFieldID(dataClass, "stick3Axes", "[B" );
-		//	public short stick3Buttons;
-		stick3ButtonsFieldID = env->GetFieldID(dataClass, "stick3Buttons", "S" );
-		//	public short analog1;
-		analog1FieldID = env->GetFieldID(dataClass, "analog1", "S" );
-		//	public short analog2;
-		analog2FieldID = env->GetFieldID(dataClass, "analog2", "S" );
-		//	public short analog3;
-		analog3FieldID = env->GetFieldID(dataClass, "analog3", "S" );
-		//	public short analog4;
-		analog4FieldID = env->GetFieldID(dataClass, "analog4", "S" );
-		//	public long cRIOChecksum;
-		cRIOChecksumFieldID = env->GetFieldID(dataClass, "cRIOChecksum", "J" );
-		//	public int FPGAChecksum0;
-		FPGAChecksum0FieldID = env->GetFieldID(dataClass, "FPGAChecksum0", "I" );
-		//	public int FPGAChecksum1;
-		FPGAChecksum1FieldID = env->GetFieldID(dataClass, "FPGAChecksum1", "I" );
-		//	public int FPGAChecksum2;
-		FPGAChecksum2FieldID = env->GetFieldID(dataClass, "FPGAChecksum2", "I" );
-		//	public int FPGAChecksum3;
-		FPGAChecksum3FieldID = env->GetFieldID(dataClass, "FPGAChecksum3", "I" );
-		//	public byte[] versionData;
-		versionDataFieldID = env->GetFieldID(dataClass, "versionData", "[B" );
-
-		initializeComplete = true;
-	}
-
-	//NETCOMM_LOG(logDEBUG) << "PacketIndex  : " << (short)controlDataNative.packetIndex;
-	env->SetShortField(controlData,packetIndexFieldID, controlDataNative.packetIndex);
-	//NETCOMM_LOG(logDEBUG) << "Control  : " << (short)controlDataNative.control;
-	env->SetByteField(controlData,controlFieldID, controlDataNative.control);
-	env->SetByteField(controlData,dsDigitalInFieldID, controlDataNative.dsDigitalIn);
-	env->SetShortField(controlData,teamIDFieldID, controlDataNative.teamID);
-	env->SetByteField(controlData,dsID_AllianceFieldID, controlDataNative.dsID_Alliance);
-	env->SetByteField(controlData,dsID_PositionFieldID, controlDataNative.dsID_Position);
-
-	// process the axes for joystick 0
-	jobject stick0Axes = env->GetObjectField(controlData, stick0AxesFieldID);
-	jbyteArray * stick0AxesPtr = reinterpret_cast<jbyteArray*>(&stick0Axes);
-	jbyte * stick0AxesBytePtr = env->GetByteArrayElements(*stick0AxesPtr,NULL);
-
-	for( short axisCount = 0; axisCount < 6; axisCount++)
-	{
-		stick0AxesBytePtr[axisCount]=controlDataNative.stick0Axes[axisCount];
-	}
-
-	env->ReleaseByteArrayElements(*stick0AxesPtr,stick0AxesBytePtr,0);
-
-	//	/** C type : field2_union */
-	//	public field2_union field2;
-	//	/** Left-most 4 bits are unused */
-	env->SetShortField(controlData,stick0ButtonsFieldID, controlDataNative.stick0Buttons);
-
-	// process the axes for joystick 1
-	jobject stick1Axes = env->GetObjectField(controlData, stick1AxesFieldID);
-	jbyteArray * stick1AxesPtr = reinterpret_cast<jbyteArray*>(&stick1Axes);
-	jbyte * stick1AxesBytePtr = env->GetByteArrayElements(*stick1AxesPtr,NULL);
-
-	for( short axisCount = 0; axisCount < 6; axisCount++)
-	{
-		stick1AxesBytePtr[axisCount]=controlDataNative.stick1Axes[axisCount];
-	}
-
-	env->ReleaseByteArrayElements(*stick1AxesPtr,stick1AxesBytePtr,0);
-
-	//	/** C type : field3_union */
-	//	public field3_union field3;
-	//	/** Left-most 4 bits are unused */
-	env->SetShortField(controlData,stick1ButtonsFieldID, controlDataNative.stick1Buttons);
-
-	// process the axes for joystick 2
-	jobject stick2Axes = env->GetObjectField(controlData, stick2AxesFieldID);
-	jbyteArray * stick2AxesPtr = reinterpret_cast<jbyteArray*>(&stick2Axes);
-	jbyte * stick2AxesBytePtr = env->GetByteArrayElements(*stick2AxesPtr,NULL);
-
-	for( short axisCount = 0; axisCount < 6; axisCount++)
-	{
-		stick2AxesBytePtr[axisCount]=controlDataNative.stick2Axes[axisCount];
-	}
-
-	env->ReleaseByteArrayElements(*stick2AxesPtr,stick2AxesBytePtr,0);
-
-	//	/** C type : field4_union */
-	//	public field4_union field4;
-	//	/** Left-most 4 bits are unused */
-	env->SetShortField(controlData,stick2ButtonsFieldID, controlDataNative.stick2Buttons);
-
-	// process the axes for joystick 3
-	jobject stick3Axes = env->GetObjectField(controlData, stick3AxesFieldID);
-	jbyteArray * stick3AxesPtr = reinterpret_cast<jbyteArray*>(&stick3Axes);
-	jbyte * stick3AxesBytePtr = env->GetByteArrayElements(*stick3AxesPtr,NULL);
-
-	for( short axisCount = 0; axisCount < 6; axisCount++)
-	{
-		stick3AxesBytePtr[axisCount]=controlDataNative.stick3Axes[axisCount];
-	}
-
-	env->ReleaseByteArrayElements(*stick3AxesPtr,stick3AxesBytePtr,0);
-
-	//	/** C type : field5_union */
-	//	public field5_union field5;
-	//	/** Left-most 4 bits are unused */
-	env->SetShortField(controlData,stick3ButtonsFieldID, controlDataNative.stick3Buttons);
-	//	/** Analog inputs are 10 bit right-justified */
-	env->SetShortField(controlData,analog1FieldID, controlDataNative.analog1);
-	env->SetShortField(controlData,analog2FieldID, controlDataNative.analog2);
-	env->SetShortField(controlData,analog3FieldID, controlDataNative.analog3);
-	env->SetShortField(controlData,analog4FieldID, controlDataNative.analog4);
-	env->SetLongField(controlData,cRIOChecksumFieldID, controlDataNative.cRIOChecksum);
-	env->SetIntField(controlData,FPGAChecksum0FieldID, controlDataNative.FPGAChecksum0);
-	env->SetIntField(controlData,FPGAChecksum1FieldID, controlDataNative.FPGAChecksum1);
-	env->SetIntField(controlData,FPGAChecksum2FieldID, controlDataNative.FPGAChecksum2);
-	env->SetIntField(controlData,FPGAChecksum3FieldID, controlDataNative.FPGAChecksum3);
-	//	/** C type : char[8] */
-	//	public byte[] versionData;
-	jobject versionData = env->GetObjectField(controlData, versionDataFieldID);
-	jbyteArray * versionDataPtr = reinterpret_cast<jbyteArray*>(&versionData);
-	jbyte * versionDataBytePtr = env->GetByteArrayElements(*versionDataPtr,NULL);
-
-	for( short byteCount = 0; byteCount < 8; byteCount++)
-	{
-		versionDataBytePtr[byteCount]=controlDataNative.versionData[byteCount];
-	}
-
-	env->ReleaseByteArrayElements(*versionDataPtr,versionDataBytePtr,0);
-
-	return returnValue;
-}
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
- * Method:    getRecentCommonControlData
- * Signature: (Ledu/wpi/first/wpilibj/communication/FRCCommonControlData;I)I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_getRecentCommonControlData
-  (JNIEnv *, jclass, jobject, jint)
-{
-	assert(false);
-}
 /*
  * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
  * Method:    getRecentStatusData
@@ -341,17 +144,6 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
 {
 	assert(false);
 }
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
- * Method:    getDynamicControlData
- * Signature: (BLjava/nio/ByteBuffer;II)I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_getDynamicControlData
-  (JNIEnv *, jclass, jbyte, jobject, jint, jint)
-{
-	assert(false);
-}
-
 /*
  * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
  * Method:    setStatusData
@@ -370,30 +162,10 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
 }
 /*
  * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
- * Method:    setStatusDataFloatAsInt
- * Signature: (IBBLjava/lang/String;ILjava/lang/String;II)I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_setStatusDataFloatAsInt
-  (JNIEnv *, jclass, jint, jbyte, jbyte, jstring, jint, jstring, jint, jint)
-{
-	assert(false);
-}
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
  * Method:    setErrorData
  * Signature: (Ljava/lang/String;II)I
  */
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_setErrorData
-  (JNIEnv *, jclass, jstring, jint, jint)
-{
-	assert(false);
-}
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
- * Method:    setUserDsLcdData
- * Signature: (Ljava/lang/String;II)I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_setUserDsLcdData
   (JNIEnv *, jclass, jstring, jint, jint)
 {
 	assert(false);
@@ -510,6 +282,65 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
   (JNIEnv *, jclass)
 {
 	assert(1 == HALInitialize(0));
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
+ * Method:    NativeHALGetControlWord
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_NativeHALGetControlWord
+  (JNIEnv *, jclass)
+{
+    jint controlWord;
+    HALGetControlWord((HALControlWord*)&controlWord);
+    return controlWord;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
+ * Method:    NativeHALGetAllianceStation
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_NativeHALGetAllianceStation
+  (JNIEnv *, jclass)
+{
+    jint allianceStation;
+    HALGetAllianceStation((HALAllianceStationID*)&allianceStation);
+    return allianceStation;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
+ * Method:    HALGetJoystickAxes
+ * Signature: (B)[S
+ */
+JNIEXPORT jshortArray JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickAxes
+  (JNIEnv * env, jclass, jbyte joystickNum)
+{
+    HALJoystickAxes axes;
+    HALGetJoystickAxes(joystickNum, &axes, 6);
+
+    jshortArray axesArray = env->NewShortArray(axes.count);
+    env->SetShortArrayRegion(axesArray, 0, axes.count, axes.axes);
+
+    return axesArray;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
+ * Method:    HALGetJoystickButtons
+ * Signature: (B)S
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickButtons
+  (JNIEnv *, jclass, jbyte joystickNum)
+{
+    HALJoystickButtons buttons;
+    uint8_t count;
+
+    HALGetJoystickButtons(joystickNum, &buttons, &count);
+
+    return buttons;
 }
 
 /*

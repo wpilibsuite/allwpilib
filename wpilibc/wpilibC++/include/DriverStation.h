@@ -1,16 +1,15 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+/* Copyright (c) FIRST 2008. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 #pragma once
 
 #include "Dashboard.h"
-#include "DriverStationEnhancedIO.h"
 #include "SensorBase.h"
 #include "Task.h"
 
-struct HALCommonControlData;
+struct HALControlWord;
 class AnalogInput;
 
 /**
@@ -29,17 +28,11 @@ public:
 	virtual ~DriverStation();
 	static DriverStation *GetInstance();
 
-	static const uint32_t kBatteryChannel = 7;
 	static const uint32_t kJoystickPorts = 4;
 	static const uint32_t kJoystickAxes = 6;
 
 	float GetStickAxis(uint32_t stick, uint32_t axis);
 	short GetStickButtons(uint32_t stick);
-
-	float GetAnalogIn(uint32_t channel);
-	bool GetDigitalIn(uint32_t channel);
-	void SetDigitalOut(uint32_t channel, bool value);
-	bool GetDigitalOut(uint32_t channel);
 
 	bool IsEnabled();
 	bool IsDisabled();
@@ -49,13 +42,11 @@ public:
 	bool IsNewControlData();
 	bool IsFMSAttached();
 
-	uint32_t GetPacketNumber();
 	Alliance GetAlliance();
 	uint32_t GetLocation();
 	void WaitForData();
 	double GetMatchTime();
 	float GetBatteryVoltage();
-	uint16_t GetTeamNumber();
 
 	// Get the default dashboard packers. These instances stay around even after
 	// a call to SetHigh|LowPriorityDashboardPackerToUse() changes which packer
@@ -90,11 +81,6 @@ public:
 	void SetLowPriorityDashboardPackerToUse(DashboardBase* db)
 	{
 		m_dashboardInUseLow = db;
-	}
-
-	DriverStationEnhancedIO& GetEnhancedIO()
-	{
-		return m_enhancedIO;
 	}
 
 	void IncrementUpdateNumber()
@@ -145,14 +131,15 @@ private:
 	static void InitTask(DriverStation *ds);
 	static DriverStation *m_instance;
 	static uint8_t m_updateNumber;
-	///< TODO: Get rid of this and use the semaphore signaling
-	static constexpr float kUpdatePeriod = 0.02;
 
 	void Run();
 
-	struct HALCommonControlData *m_controlData;
+	HALControlWord m_controlWord;
+	HALAllianceStationID m_allianceStationID;
+	HALJoystickAxes m_joystickAxes[kJoystickPorts];
+	HALJoystickButtons m_joystickButtons[kJoystickPorts];
+
 	uint8_t m_digitalOut;
-	AnalogInput *m_batteryChannel;
 	MUTEX_ID m_statusDataSemaphore;
 	Task m_task;
 	Dashboard m_dashboardHigh;  // the default dashboard packers
@@ -161,7 +148,6 @@ private:
 	DashboardBase* m_dashboardInUseLow;
 	SEMAPHORE_ID m_newControlData;
 	MUTEX_ID m_packetDataAvailableSem;
-	DriverStationEnhancedIO m_enhancedIO;
 	MULTIWAIT_ID m_waitForDataSem;
 	double m_approxMatchTimeOffset;
 	bool m_userInDisabled;
