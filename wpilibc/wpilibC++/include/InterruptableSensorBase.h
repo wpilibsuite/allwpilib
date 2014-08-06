@@ -7,6 +7,7 @@
 
 #include "HAL/HAL.hpp"
 #include "SensorBase.h"
+#include "Resource.h"
 
 class InterruptableSensorBase : public SensorBase
 {
@@ -24,4 +25,6 @@ protected:
 	void* m_interrupt;
 	uint32_t m_interruptIndex;
 	void AllocateInterrupts(bool watcher);
+
+	static Resource *m_interrupts;
 };

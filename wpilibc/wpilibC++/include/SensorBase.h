@@ -8,7 +8,6 @@
 #include "ErrorBase.h"
 #include <stdio.h>
 #include "Base.h"
-#include "Resource.h"
 
 /**
  * Base class for all sensors.
@@ -52,7 +51,6 @@ protected:
 	static void* m_digital_ports[kDigitalChannels];
 	static void* m_relay_ports[kRelayChannels];
 	static void* m_pwm_ports[kPwmChannels];
-	static Resource *m_interrupts;
 
 private:
 	DISALLOW_COPY_AND_ASSIGN(SensorBase);
