@@ -62,6 +62,7 @@ tRelay* relaySystem = NULL;
 tPWM* pwmSystem = NULL;
 Resource *DIOChannels = NULL;
 Resource *DO_PWMGenerators = NULL;
+Resource *PWMChannels = NULL;
 
 bool digitalSystemsInitialized = false;
 
@@ -99,6 +100,7 @@ void initializeDigital(int32_t *status) {
 
   Resource::CreateResourceObject(&DIOChannels, tDIO::kNumSystems * kDigitalPins);
   Resource::CreateResourceObject(&DO_PWMGenerators, tDIO::kNumPWMDutyCycleAElements + tDIO::kNumPWMDutyCycleBElements);
+  Resource::CreateResourceObject(&PWMChannels, tPWM::kNumSystems * kPwmPins);
   digitalSystem = tDIO::create(status);
 
   // Relay Setup
@@ -165,15 +167,19 @@ bool checkRelayChannel(void* digital_port_pointer) {
 }
 
 /**
- * Map DIO pin numbers from their physical number (10 to 19) to their position
+ * Map DIO pin numbers from their physical number (10 to 26) to their position
  * in the bit field.
  */
 uint32_t remapMXPChannel(uint32_t pin) {
-  if(pin < 14) {
-    return pin - 10; // First four digital headers
-  } else {
-    return pin - 6; // Last 8 digital headers, not counting the SPI pins
-  }
+    return pin - 10;
+}
+
+uint32_t remapMXPPWMChannel(uint32_t pin) {
+	if(pin < 14) {
+		return pin - 10;	//first block of 4 pwms (MXP 0-3)
+	} else {
+		return pin - 6;	//block of PWMs after SPI
+	}
 }
 
 /**
@@ -191,11 +197,6 @@ void setPWM(void* digital_port_pointer, unsigned short value, int32_t *status) {
     pwmSystem->writeHdr(port->port.pin, value, status);
   } else {
     pwmSystem->writeMXP(port->port.pin - tPWM::kNumHdrRegisters, value, status);
-
-    // Enable special functions on this pin
-    uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
-    short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
-    digitalSystem->writeEnableMXPSpecialFunction(specialFunctions | bitToSet, status);
   }
 }
 
@@ -424,6 +425,32 @@ bool allocateDIO(void* digital_port_pointer, bool input, int32_t *status) {
     digitalSystem->writeOutputEnable(outputEnable, status);
   }
   return true;
+}
+
+bool allocatePWMChannel(void* digital_port_pointer, int32_t *status) {
+		DigitalPort* port = (DigitalPort*) digital_port_pointer;
+		char buf[64];
+		snprintf(buf, 64, "PWM %d", port->port.pin);
+		if (PWMChannels->Allocate(port->port.pin, buf) == ~0ul) return false;
+		if (port->port.pin > tPWM::kNumHdrRegisters-1) {
+			snprintf(buf, 64, "PWM %d and DIO %d", port->port.pin, remapMXPPWMChannel(port->port.pin) + 10);
+			if (DIOChannels->Allocate(remapMXPPWMChannel(port->port.pin) + 10, buf) == ~0ul) return false;
+		    uint32_t bitToSet = 1 << remapMXPPWMChannel(port->port.pin);
+		    short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
+		    digitalSystem->writeEnableMXPSpecialFunction(specialFunctions | bitToSet, status);
+		}
+		return true;
+}
+
+void freePWMChannel(void* digital_port_pointer, int32_t *status) {
+    DigitalPort* port = (DigitalPort*) digital_port_pointer;
+    PWMChannels->Free(port->port.pin);
+    if(port->port.pin > tPWM::kNumHdrRegisters-1) {
+        DIOChannels->Free(remapMXPPWMChannel(port->port.pin) + 10);
+        uint32_t bitToUnset = 1 << remapMXPPWMChannel(port->port.pin);
+        short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
+        digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToUnset, status);
+    }
 }
 
 /**

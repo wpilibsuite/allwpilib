@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.SensorBase;
 
 
 public class PWMJNI extends DIOJNI {
+	public static native boolean allocatePWMChannel(ByteBuffer digital_port_pointer, IntBuffer status);
+	public static native void freePWMChannel(ByteBuffer digital_port_pointer, IntBuffer status);
 	public static native void setPWM(ByteBuffer digital_port_pointer, short value, IntBuffer status);
 	public static native short getPWM(ByteBuffer digital_port_pointer, IntBuffer status);
 	public static native void setPWMPeriodScale(ByteBuffer digital_port_pointer, int squelchMask, IntBuffer status);

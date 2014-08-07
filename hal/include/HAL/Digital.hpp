@@ -21,6 +21,8 @@ extern "C"
 	bool checkRelayChannel(void* digital_port_pointer);
 
 	void setPWM(void* digital_port_pointer, unsigned short value, int32_t *status);
+	bool allocatePWMChannel(void* digital_port_pointer, int32_t *status);
+	void freePWMChannel(void* digital_port_pointer, int32_t *status);
 	unsigned short getPWM(void* digital_port_pointer, int32_t *status);
 	void setPWMPeriodScale(void* digital_port_pointer, uint32_t squelchMask, int32_t *status);
 	void* allocatePWM(int32_t *status);

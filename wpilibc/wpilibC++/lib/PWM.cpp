@@ -15,7 +15,6 @@ constexpr float PWM::kDefaultPwmPeriod;
 constexpr float PWM::kDefaultPwmCenter;
 const int32_t PWM::kDefaultPwmStepsDown;
 const int32_t PWM::kPwmDisabled;
-static Resource *allocated = NULL;
 
 /**
  * Initialize PWMs given a channel.
@@ -28,7 +27,6 @@ void PWM::InitPWM(uint32_t channel)
 {
 	m_table = NULL;
 	char buf[64];
-	Resource::CreateResourceObject(&allocated, kPwmChannels);
 
 	if (!CheckPWMChannel(channel))
 	{
@@ -37,16 +35,12 @@ void PWM::InitPWM(uint32_t channel)
 		return;
 	}
 
-	snprintf(buf, 64, "PWM %d", channel);
-	if (allocated->Allocate(channel, buf) == ~0ul)
-	{
-		CloneError(allocated);
-		return;
-	}
+	int32_t status = 0;
+	allocatePWMChannel(m_pwm_ports[channel], &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
 	m_channel = channel;
 
-	int32_t status = 0;
 	setPWM(m_pwm_ports[m_channel], kPwmDisabled, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
@@ -73,10 +67,12 @@ PWM::PWM(uint32_t channel)
 PWM::~PWM()
 {
 	int32_t status = 0;
+
 	setPWM(m_pwm_ports[m_channel], kPwmDisabled, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
-	allocated->Free(m_channel);
+	freePWMChannel(m_pwm_ports[m_channel], &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**

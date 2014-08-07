@@ -43,10 +43,10 @@ public:
 	static const uint32_t kFakePressureSwitchChannel = 11;
 	static const uint32_t kFakeSolenoid1Channel = 12;
 	static const uint32_t kFakeSolenoid2Channel = 13;
-	static const uint32_t kFakeRelayForward = 14;
-	static const uint32_t kFakeRelayReverse = 15;
-	static const uint32_t kFakeJaguarForwardLimit = 16;
-	static const uint32_t kFakeJaguarReverseLimit = 17;
+	static const uint32_t kFakeRelayForward = 18;
+	static const uint32_t kFakeRelayReverse = 19;
+	static const uint32_t kFakeJaguarForwardLimit = 20;
+	static const uint32_t kFakeJaguarReverseLimit = 21;
 
 	/* Relay channels */
 	static const uint32_t kRelayChannel = 0;

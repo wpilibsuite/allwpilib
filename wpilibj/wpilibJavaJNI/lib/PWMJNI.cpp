@@ -16,6 +16,43 @@ TLogLevel pwmJNILogLevel = logWARNING;
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Method:    allocatePWMChannel
+ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_allocatePWMChannel
+  (JNIEnv * env, jclass, jobject id, jobject status)
+{
+	PWMJNI_LOG(logDEBUG) << "Calling DIOJNI allocatePWMChannel";
+	void ** javaId = (void**)env->GetDirectBufferAddress(id);
+	PWMJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+    jbyte returnValue = allocatePWMChannel(*javaId, statusPtr);
+	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	PWMJNI_LOG(logDEBUG) << "allocatePWMChannelResult = " << (jint)returnValue;
+    return returnValue;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Method:    freePWMChannel
+ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_freePWMChannel
+  (JNIEnv * env, jclass, jobject id, jobject status)
+{
+	PWMJNI_LOG(logDEBUG) << "Calling DIOJNI freePWMChannel";
+	void ** javaId = (void**)env->GetDirectBufferAddress(id);
+	PWMJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	freePWMChannel(*javaId, statusPtr);
+	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
  * Method:    setPWM
  * Signature: (Ljava/nio/ByteBuffer;SLjava/nio/IntBuffer;)V
  */
