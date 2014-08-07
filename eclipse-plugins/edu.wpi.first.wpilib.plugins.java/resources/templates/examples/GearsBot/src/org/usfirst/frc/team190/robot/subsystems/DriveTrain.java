@@ -51,9 +51,6 @@ public class DriveTrain extends Subsystem {
 			left_encoder.setDistancePerPulse((4.0/12.0*Math.PI) / 360.0);
 			right_encoder.setDistancePerPulse((4.0/12.0*Math.PI) / 360.0);
 		}
-		
-		left_encoder.start();
-		right_encoder.start();
 
 		rangefinder = new AnalogInput(6);
 		gyro = new Gyro(1);
