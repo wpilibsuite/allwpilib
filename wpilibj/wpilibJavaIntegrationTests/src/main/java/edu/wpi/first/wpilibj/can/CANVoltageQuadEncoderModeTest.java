@@ -12,11 +12,14 @@ import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-import java.util.logging.Level;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.googlecode.junittoolbox.PollingWait;
+import com.googlecode.junittoolbox.RunnableAssert;
 
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.Timer;
@@ -33,6 +36,8 @@ public class CANVoltageQuadEncoderModeTest extends AbstractCANTest {
 	private static final double kRunningValue = 14;
 	
 	private static final double kVoltageTolerance = .25;
+	
+	private static final PollingWait kWait = new PollingWait().timeoutAfter((long)kMotorTimeSettling, TimeUnit.SECONDS).pollEvery(1, TimeUnit.MILLISECONDS);
 	
 	/* (non-Javadoc)
 	 * @see edu.wpi.first.wpilibj.can.AbstractCANTest#stopMotor()
@@ -83,70 +88,67 @@ public class CANVoltageQuadEncoderModeTest extends AbstractCANTest {
 	}
 	
 	
+	/**
+	 * Sets up the test to have the CANJaguar running at the target voltage
+	 * @param targetValue the target voltage
+	 * @param wait the PollingWait to to use to wait for the setup to complete with
+	 */
+	private void setupMotorVoltageForTest(final double targetValue, PollingWait wait){
+		getME().getMotor().enableControl();
+		setCANJaguar(1, targetValue);
+		wait.until(new RunnableAssert("[SETUP] Waiting for the output voltage to match the set output value") {
+			@Override
+			public void run() throws Exception {
+				getME().getMotor().set(targetValue);
+				assertEquals("[TEST SETUP] The output voltage should have matched the set value", targetValue, getME().getMotor().getOutputVoltage(), 0.5);
+				assertEquals("[TEST SETUP] The set value did not match the get value", targetValue, getME().getMotor().get(), 0.5);
+			}
+		});
+	}
+	
+	
 	@Test
 	public void testMaxOutputVoltagePositive(){
 		//given
 		double maxVoltage = 5;
-		getME().getMotor().enableControl();
-		runMotorForward(); //Sets the output to be #kRunningValue
-		runMotorForward();
-		setCANJaguar(1, kRunningValue);
-		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "Voltage settling to max", new BooleanCheck(){
-			@Override
-			public boolean getAsBoolean(){
-				runMotorForward();
-				return Math.abs((Math.abs(getME().getMotor().getOutputVoltage()) - kRunningValue)) < 1;
-			}
-		});
-		assertEquals(kRunningValue, getME().getMotor().get(), 0.00000001);
+		
+		setupMotorVoltageForTest(kRunningValue, kWait);
+		
 		final double fastSpeed = getME().getMotor().getSpeed();
 		
 		//when
 		getME().getMotor().configMaxOutputVoltage(maxVoltage);
 		
 		setCANJaguar(1, kRunningValue);
-		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "SpeedReducing settling to max", new BooleanCheck(){
+		//Then
+		kWait.until(new RunnableAssert("Waiting for the speed to reduce using max output voltage") {
 			@Override
-			public boolean getAsBoolean(){
+			public void run() throws Exception {
 				runMotorForward();
-				return fastSpeed > getME().getMotor().getSpeed();
+				assertThat("Speed did not reduce when the max output voltage was set", fastSpeed, is(greaterThan(getME().getMotor().getSpeed())));
 			}
 		});
-		//then
-		assertThat("Speed did not reduce when the max output voltage was set", fastSpeed, is(greaterThan(getME().getMotor().getSpeed())));
+		
 	}
 	
 	@Test
 	public void testMaxOutputVoltagePositiveSetToZeroStopsMotor(){
 		//given
-		double maxVoltage = 0;
-		getME().getMotor().enableControl();
-		runMotorForward(); //Sets the output to be #kRunningValue
-		runMotorForward();
-		setCANJaguar(1, kRunningValue);
-		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "Voltage settling to max", new BooleanCheck(){
-			@Override
-			public boolean getAsBoolean(){
-				runMotorForward();
-				return Math.abs((Math.abs(getME().getMotor().getOutputVoltage()) - kRunningValue)) < 1;
-			}
-		});
-		assertEquals(kRunningValue, getME().getMotor().get(), 0.00000001);
-		final double fastSpeed = getME().getMotor().getSpeed();
+		final double maxVoltage = 0;
 		
+		setupMotorVoltageForTest(kRunningValue, kWait);
 		//when
 		getME().getMotor().configMaxOutputVoltage(maxVoltage);
 		
 		setCANJaguar(1, kRunningValue);
-		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "SpeedReducing settling to max", new BooleanCheck(){
+		//then
+		kWait.until(new RunnableAssert("Waiting for the speed to reduce to zero using max output voltage") {
 			@Override
-			public boolean getAsBoolean(){
+			public void run() throws Exception {
 				runMotorForward();
-				return getME().getMotor().getSpeed() == 0;
+				assertEquals("Speed did not go to zero when the max output voltage was set to " + maxVoltage, 0, getME().getMotor().getSpeed(), kEncoderSpeedTolerance);
 			}
 		});
-		//then
-		assertEquals("Speed did not go to zero when the max output voltage was set to " + maxVoltage, 0, getME().getMotor().getSpeed(), kEncoderSpeedTolerance);
 	}
 	
 	
@@ -154,67 +156,43 @@ public class CANVoltageQuadEncoderModeTest extends AbstractCANTest {
 	public void testMaxOutputVoltageNegative(){
 		//given
 		double maxVoltage = 5;
-		getME().getMotor().enableControl();
-		runMotorReverse(); //Sets the output to be #kRunningValue
 		
-		setCANJaguar(1, -kRunningValue);
-		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "Voltage settling to max", new BooleanCheck(){
-			@Override
-			public boolean getAsBoolean(){
-				runMotorReverse();
-				return Math.abs((Math.abs(getME().getMotor().getOutputVoltage()) - kRunningValue)) < 1;
-			}
-		});
-		assertEquals(-kRunningValue, getME().getMotor().get(), 0.00000001);
+		setupMotorVoltageForTest(-kRunningValue, kWait);
 		final double fastSpeed = getME().getMotor().getSpeed();
 		
 		//when
 		getME().getMotor().configMaxOutputVoltage(maxVoltage);
-		
-		
 		setCANJaguar(1, -kRunningValue);
-		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "SpeedReducing settling to max", new BooleanCheck(){
+		
+		//then
+		kWait.until(new RunnableAssert("Waiting for the speed to reduce using max output voltage") {
+			
 			@Override
-			public boolean getAsBoolean(){
+			public void run() throws Exception {
 				runMotorReverse();
-				return fastSpeed < getME().getMotor().getSpeed();
+				assertThat("Speed did not reduce when the max output voltage was set", fastSpeed, is(lessThan(getME().getMotor().getSpeed())));
 			}
 		});
-		//then
-		assertThat("Speed did not reduce when the max output voltage was set", fastSpeed, is(lessThan(getME().getMotor().getSpeed())));
 	}
 	
 	@Test
 	public void testMaxOutputVoltageNegativeSetToZeroStopsMotor(){
 		//given
-		double maxVoltage = 0;
-		getME().getMotor().enableControl();
-		runMotorForward(); //Sets the output to be #kRunningValue
-		runMotorForward();
-		setCANJaguar(1, kRunningValue);
-		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "Voltage settling to max", new BooleanCheck(){
-			@Override
-			public boolean getAsBoolean(){
-				runMotorForward();
-				return Math.abs((Math.abs(getME().getMotor().getOutputVoltage()) - kRunningValue)) < 1;
-			}
-		});
-		assertEquals(kRunningValue, getME().getMotor().get(), 0.00000001);
-		final double fastSpeed = getME().getMotor().getSpeed();
+		final double maxVoltage = 0;
+		setupMotorVoltageForTest(-kRunningValue, kWait);
 		
 		//when
 		getME().getMotor().configMaxOutputVoltage(maxVoltage);
+		setCANJaguar(1, -kRunningValue);
 		
-		setCANJaguar(1, kRunningValue);
-		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "SpeedReducing settling to max", new BooleanCheck(){
+		//Then
+		kWait.until(new RunnableAssert("Waiting for the speed to reduce to zero using max output voltage") {
 			@Override
-			public boolean getAsBoolean(){
-				runMotorForward();
-				return getME().getMotor().getSpeed() == 0;
+			public void run() throws Exception {
+				runMotorReverse();
+				assertEquals("Speed did not go to zero when the max output voltage was set to " + maxVoltage, 0, getME().getMotor().getSpeed(), kEncoderSpeedTolerance);
 			}
 		});
-		//then
-		assertEquals("Speed did not go to zero when the max output voltage was set to " + maxVoltage, 0, getME().getMotor().getSpeed(), kEncoderSpeedTolerance);
 	}
 
 }

@@ -74,7 +74,7 @@ public class CANCurrentQuadEncoderModeTest extends AbstractCANTest {
 			}
 		}
 
-		assertEquals(setpoint, getME().getMotor().getOutputCurrent(), kCurrentTolerance);
+		assertEquals("The desired output current was not reached",setpoint, getME().getMotor().getOutputCurrent(), kCurrentTolerance);
 	}
 	
 	@Test
@@ -90,7 +90,7 @@ public class CANCurrentQuadEncoderModeTest extends AbstractCANTest {
 			}
 		}
 
-		assertEquals(Math.abs(setpoint), getME().getMotor().getOutputCurrent(), kCurrentTolerance);
+		assertEquals("The desired output current was not reached", Math.abs(setpoint), getME().getMotor().getOutputCurrent(), kCurrentTolerance);
 	}
 
 }

@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
+/* Copyright (c) FIRST 2008-2014. All Rights Reserved.						*/
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
+/* the project.															   */
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj.can;
 
@@ -10,14 +10,20 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import com.googlecode.junittoolbox.PollingWait;
+import com.googlecode.junittoolbox.RunnableAssert;
 
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.Timer;
@@ -82,39 +88,45 @@ public class CANPercentQuadEncoderModeTest extends AbstractCANTest{
 	
 	@Test
 	public void testRotateForward() {
+		//Given
 		getME().getMotor().enableControl();
 		final double initialPosition = getME().getMotor().getPosition();
-	    /* Drive the speed controller briefly to move the encoder */
+		//When
+		/* Drive the speed controller briefly to move the encoder */
 		runMotorForward();
-		BooleanCheck correctState = new BooleanCheck(){@Override
-			public boolean getAsBoolean(){
-				runMotorForward();//Calls set every time before we check the value
-				return initialPosition < getME().getMotor().getPosition();
-			}
-		};
-		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "Position incrementing", correctState);
-	    stopMotor();
 
-	    /* The position should have increased */
-	    assertThat("CAN Jaguar position should have increased after the motor moved", getME().getMotor().getPosition(), is(greaterThan(initialPosition)));
+		//Then
+		PollingWait wait = new PollingWait().timeoutAfter((long)kMotorTimeSettling, TimeUnit.SECONDS).pollEvery(1, TimeUnit.MILLISECONDS);
+		wait.until(new RunnableAssert("CANJaguar position incrementing") {
+			@Override
+			public void run() throws Exception {
+				runMotorForward();
+				assertThat("CANJaguar position should have increased after the motor moved", getME().getMotor().getPosition(), is(greaterThan(initialPosition)));
+			}
+		});
+		
+		stopMotor();
 	}
 	
 	@Test
 	public void testRotateReverse() {
+		//Given
 		getME().getMotor().enableControl();
 		final double initialPosition = getME().getMotor().getPosition();
-	    /* Drive the speed controller briefly to move the encoder */
-	    runMotorReverse();
-	    delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "Position decrementing", new BooleanCheck(){@Override
-	    	public boolean getAsBoolean(){
-	    			runMotorReverse();//Calls set every time before we check the value
-	    			return initialPosition > getME().getMotor().getPosition();
-	    		}
-	    });
-	    stopMotor();
-
-	    /* The position should have decreased */
-	    assertThat( "CAN Jaguar position should have decreased after the motor moved", getME().getMotor().getPosition(), is(lessThan(initialPosition)));
+		//When
+		/* Drive the speed controller briefly to move the encoder */
+		runMotorReverse();
+		
+		//Then
+		PollingWait wait = new PollingWait().timeoutAfter((long)kMotorTimeSettling, TimeUnit.SECONDS).pollEvery(1, TimeUnit.MILLISECONDS);
+		wait.until(new RunnableAssert("CANJaguar position decrementing") {
+			@Override
+			public void run() throws Exception {
+				runMotorReverse();
+				assertThat("CANJaguar position should have decreased after the motor moved", getME().getMotor().getPosition(), is(lessThan(initialPosition)));
+			}
+		});
+		stopMotor();
 	}
 	
 	/**
@@ -131,12 +143,16 @@ public class CANPercentQuadEncoderModeTest extends AbstractCANTest{
 		stopMotor();
 		Timer.delay(kEncoderSettlingTime);
 		
-		delayTillInCorrectStateWithMessage(Level.FINE, kLimitSettlingTime, "Concurrent Limit settling", new BooleanCheck(){@Override
-			public boolean getAsBoolean(){return !getME().getMotor().getForwardLimitOK() && getME().getMotor().getReverseLimitOK();}});
-		
-		/* Make sure we limits are recognized by the Jaguar. */
-		//assertFalse("The forward limit switch did not settle after " + kLimitSettlingTime + " seconds",getME().getMotor().getForwardLimitOK());
-		//assertTrue("The reverse limit switch did not settle after " + kLimitSettlingTime + " seconds", getME().getMotor().getReverseLimitOK());
+		PollingWait wait = new PollingWait().timeoutAfter((long)kLimitSettlingTime, TimeUnit.SECONDS).pollEvery(1, TimeUnit.MILLISECONDS);
+		/* Wait until the limits are recognized by the CANJaguar. */
+		wait.until(new RunnableAssert("Waiting for the forward and reverse limit switches to be in the correct state") {
+			@Override
+			public void run() throws Exception {
+				stopMotor();
+				assertFalse("[TEST SETUP] The forward limit switch is not in the correct state",getME().getMotor().getForwardLimitOK());
+				assertTrue("[TEST SETUP]The reverse limit switch is not in the correct state", getME().getMotor().getReverseLimitOK());
+			}
+		});
 
 		final double initialPosition = getME().getMotor().getPosition();
 		
@@ -170,18 +186,18 @@ public class CANPercentQuadEncoderModeTest extends AbstractCANTest{
 
 		stopMotor();
 		Timer.delay(kEncoderSettlingTime);
-		
-		delayTillInCorrectStateWithMessage(Level.FINE, kLimitSettlingTime, "Concurrent Limit settling", new BooleanCheck(){@Override
-		public boolean getAsBoolean(){
+
+		PollingWait limitWait = new PollingWait().timeoutAfter((long)kLimitSettlingTime, TimeUnit.SECONDS).pollEvery(1, TimeUnit.MILLISECONDS);
+		/* Wait until the limits are recognized by the CANJaguar. */
+		limitWait.until(new RunnableAssert("Waiting for the forward and reverse limit switches to be in the correct state") {
+			@Override
+			public void run() throws Exception {
 				stopMotor();
-				return !getME().getMotor().getForwardLimitOK() && getME().getMotor().getReverseLimitOK();
+				assertFalse("[TEST SETUP] The forward limit switch is not in the correct state",getME().getMotor().getForwardLimitOK());
+				assertTrue("[TEST SETUP] The reverse limit switch is not in the correct state", getME().getMotor().getReverseLimitOK());
 			}
 		});
-		
-		/* Make sure we limits are still recognized by the Jaguar. */
-		//assertFalse("The forward limit switch did not settle after " + kLimitSettlingTime + " seconds",getME().getMotor().getForwardLimitOK());
-		//assertTrue("The reverse limit switch did not settle after " + kLimitSettlingTime + " seconds", getME().getMotor().getReverseLimitOK());
-		
+
 		final double initialPosition = getME().getMotor().getPosition();
 		
 		//When
@@ -190,19 +206,20 @@ public class CANPercentQuadEncoderModeTest extends AbstractCANTest{
 		 * move, since only the forward switch is activated.
 		 */
 		setCANJaguar(kMotorTime, -1);
-		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "Encoder drive reverse settling", new BooleanCheck(){@Override
-			public boolean getAsBoolean(){
+		//Then
+		PollingWait wait = new PollingWait().timeoutAfter((long)kMotorTimeSettling, TimeUnit.SECONDS).pollEvery(1, TimeUnit.MILLISECONDS);
+		wait.until(new RunnableAssert("Waiting for the encoder to update") {
+			@Override
+			public void run() throws Exception {
 				runMotorReverse();
-				return getME().getMotor().getPosition() != initialPosition;
+				assertThat(
+						"CAN Jaguar should have moved in reverse while the forward limit was on",
+						getME().getMotor().getPosition(), is(lessThan(initialPosition)));
 			}
+			
 		});
 		stopMotor();
 
-		//Then
-		/* The position should have decreased */
-		assertThat(
-				"CAN Jaguar should have moved in reverse while the forward limit was on",
-				getME().getMotor().getPosition(), is(lessThan(initialPosition)));
 	}
 
 	/**
@@ -220,16 +237,16 @@ public class CANPercentQuadEncoderModeTest extends AbstractCANTest{
 		stopMotor();
 		Timer.delay(kEncoderSettlingTime);
 		
-		delayTillInCorrectStateWithMessage(Level.FINE, kLimitSettlingTime, "Concurrent Limit settling", new BooleanCheck(){@Override
-			public boolean getAsBoolean(){
+		PollingWait wait = new PollingWait().timeoutAfter((long)kLimitSettlingTime, TimeUnit.SECONDS).pollEvery(1, TimeUnit.MILLISECONDS);
+		/* Wait until the limits are recognized by the CANJaguar. */
+		wait.until(new RunnableAssert("Waiting for the forward and reverse limit switches to be in the correct state") {
+			@Override
+			public void run() throws Exception {
 				stopMotor();
-				return getME().getMotor().getForwardLimitOK() && !getME().getMotor().getReverseLimitOK();
+				assertTrue("[TEST SETUP] The forward limit switch is not in the correct state",getME().getMotor().getForwardLimitOK());
+				assertFalse("[TEST SETUP] The reverse limit switch is not in the correct state", getME().getMotor().getReverseLimitOK());
 			}
 		});
-		
-		/* Make sure we limits are recognized by the Jaguar. */
-		//assertTrue("The forward limit switch did not settle after " + kLimitSettlingTime + " seconds", getME().getMotor().getForwardLimitOK());
-		//assertFalse("The reverse limit switch did not settle after " + kLimitSettlingTime + " seconds",getME().getMotor().getReverseLimitOK());
 
 		final double initialPosition = getME().getMotor().getPosition();
 		
@@ -253,6 +270,9 @@ public class CANPercentQuadEncoderModeTest extends AbstractCANTest{
 	 * Test if we can limit the Jaguar to only moving forwards with a fake limit
 	 * switch.
 	 */
+	/**
+	 * 
+	 */
 	@Test
 	public void shouldRotateForward_WhenFakeLimitSwitchReversesIsTripped() {
 		//Given
@@ -261,17 +281,18 @@ public class CANPercentQuadEncoderModeTest extends AbstractCANTest{
 		getME().getReverseLimit().set(true);
 		getME().getMotor().enableControl();
 		
-		delayTillInCorrectStateWithMessage(Level.FINE, kLimitSettlingTime, "Concurrent Limit settling", new BooleanCheck(){@Override
-		public boolean getAsBoolean(){
-			stopMotor();
-			return getME().getMotor().getForwardLimitOK() && !getME().getMotor().getReverseLimitOK();
+		PollingWait limitWait = new PollingWait().timeoutAfter((long)kLimitSettlingTime, TimeUnit.SECONDS).pollEvery(1, TimeUnit.MILLISECONDS);
+		/* Wait until the limits are recognized by the CANJaguar. */
+		limitWait.until(new RunnableAssert("Waiting for the forward and reverse limit switches to be in the correct state") {
+			@Override
+			public void run() throws Exception {
+				stopMotor();
+				assertTrue("[TEST SETUP] The forward limit switch is not in the correct state",getME().getMotor().getForwardLimitOK());
+				assertFalse("[TEST SETUP] The reverse limit switch is not in the correct state", getME().getMotor().getReverseLimitOK());
 			}
 		});
+
 		final double initialPosition = getME().getMotor().getPosition();
-		
-		/* Make sure we limits are still recognized by the Jaguar. */
-		//assertTrue("The forward limit switch did not settle after " + kLimitSettlingTime + " seconds", getME().getMotor().getForwardLimitOK());
-		//assertFalse("The reverse limit switch did not settle after " + kLimitSettlingTime + " seconds",getME().getMotor().getReverseLimitOK());
 
 		//When
 		/*
@@ -279,20 +300,20 @@ public class CANPercentQuadEncoderModeTest extends AbstractCANTest{
 		 * move, since only the reverse switch is activated.
 		 */
 		setCANJaguar(kMotorTime, 1);
-		Timer.delay(kMotorTime);
-		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "Encoder drive forward settling", new BooleanCheck(){@Override
-			public boolean getAsBoolean(){
-				runMotorForward();
-				return getME().getMotor().getPosition() != initialPosition;
-			}
-		});
-		stopMotor();
-		
 		//Then
 		/* The position should have increased */
-		assertThat(
-				"CAN Jaguar should have moved forwards while the reverse limit was on",
-				getME().getMotor().getPosition(), is(greaterThan(initialPosition)));
+		PollingWait wait = new PollingWait().timeoutAfter((long)kMotorTimeSettling, TimeUnit.SECONDS).pollEvery(1, TimeUnit.MILLISECONDS);
+		wait.until(new RunnableAssert("Waiting for the encoder to update") {
+			@Override
+			public void run() throws Exception {
+				runMotorForward();
+				assertThat(
+						"CAN Jaguar should have moved forwards while the reverse limit was on",
+						getME().getMotor().getPosition(), is(greaterThan(initialPosition)));
+			}
+			
+		});
+		stopMotor();
 	}
 	
 	@Ignore("Encoder is not yet wired to the FPGA")
