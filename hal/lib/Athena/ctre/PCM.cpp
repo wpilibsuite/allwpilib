@@ -123,9 +123,9 @@ CTR_Code PCM::SetSolenoid(unsigned char idx, bool en)
 	CtreCanNode::txTask<PcmControl_t> toFill = GetTx<PcmControl_t>(CONTROL_1 | GetDeviceNumber());
 	if(toFill.IsEmpty())return CTR_UnexpectedArbId;
 	if (en)
-		toFill->solenoidBits |= (1ul << (7-idx));
+		toFill->solenoidBits |= (1ul << (idx));
 	else
-		toFill->solenoidBits &= ~(1ul << (7-idx));
+		toFill->solenoidBits &= ~(1ul << (idx));
 	FlushTx(toFill);
 	return CTR_OKAY;
 }
@@ -161,20 +161,20 @@ CTR_Code PCM::SetClosedLoopControl(bool en)
 }
 
 /* Get solenoid state
- * 
+ *
  * @Return	-	True/False	-	True if solenoid enabled, false otherwise
- * 
+ *
  * @Param 	-	idx		- 	ID of solenoid (0-7) to return status of
  */
 CTR_Code PCM::GetSolenoid(UINT8 idx, bool &status)
 {
 	GET_PCM_STATUS();
-	status = (rx->SolenoidBits & (1ul<<(7-idx)) ) ? 1 : 0;
+	status = (rx->SolenoidBits & (1ul<<(idx)) ) ? 1 : 0;
 	return rx.err;
 }
 
 /* Get pressure switch state
- * 
+ *
  * @Return	-	True/False	-	True if pressure adequate, false if low
  */
 CTR_Code PCM::GetPressure(bool &status)
@@ -185,7 +185,7 @@ CTR_Code PCM::GetPressure(bool &status)
 }
 
 /* Get compressor state
- * 
+ *
  * @Return	-	True/False	-	True if enabled, false if otherwise
  */
 CTR_Code PCM::GetCompressor(bool &status)
@@ -196,7 +196,7 @@ CTR_Code PCM::GetCompressor(bool &status)
 }
 
 /* Get closed loop control state
- * 
+ *
  * @Return	-	True/False	-	True if closed loop enabled, false if otherwise
  */
 CTR_Code PCM::GetClosedLoopControl(bool &status)
@@ -207,8 +207,8 @@ CTR_Code PCM::GetClosedLoopControl(bool &status)
 }
 
 /* Get compressor current draw
- * 
- * @Return	-	Amperes	-	Compressor current 
+ *
+ * @Return	-	Amperes	-	Compressor current
  */
 CTR_Code PCM::GetCompressorCurrent(float &status)
 {
@@ -221,7 +221,7 @@ CTR_Code PCM::GetCompressorCurrent(float &status)
 }
 
 /* Get voltage across solenoid rail
- * 
+ *
  * @Return	-	Volts	-	Voltage across solenoid rail
  */
 CTR_Code PCM::GetSolenoidVoltage(float &status)
@@ -235,7 +235,7 @@ CTR_Code PCM::GetSolenoidVoltage(float &status)
 }
 
 /* Get hardware fault value
- * 
+ *
  * @Return	-	True/False	-	True if hardware failure detected, false if otherwise
  */
 CTR_Code PCM::GetHardwareFault(bool &status)
@@ -246,7 +246,7 @@ CTR_Code PCM::GetHardwareFault(bool &status)
 }
 
 /* Get compressor fault value
- * 
+ *
  * @Return	-	True/False	-	True if shorted compressor detected, false if otherwise
  */
 CTR_Code PCM::GetCompressorFault(bool &status)
@@ -257,7 +257,7 @@ CTR_Code PCM::GetCompressorFault(bool &status)
 }
 
 /* Get solenoid fault value
- * 
+ *
  * @Return	-	True/False	-	True if shorted solenoid detected, false if otherwise
  */
 CTR_Code PCM::GetSolenoidFault(bool &status)
@@ -268,7 +268,7 @@ CTR_Code PCM::GetSolenoidFault(bool &status)
 }
 
 /* Get compressor sticky fault value
- * 
+ *
  * @Return	-	True/False	-	True if solenoid had previously been shorted
  * 								(and sticky fault was not cleared), false if otherwise
  */
@@ -280,7 +280,7 @@ CTR_Code PCM::GetCompressorStickyFault(bool &status)
 }
 
 /* Get solenoid sticky fault value
- * 
+ *
  * @Return	-	True/False	-	True if compressor had previously been shorted
  * 								(and sticky fault was not cleared), false if otherwise
  */
@@ -291,7 +291,7 @@ CTR_Code PCM::GetSolenoidStickyFault(bool &status)
 	return rx.err;
 }
 /* Get battery voltage
- * 
+ *
  * @Return	-	Volts	-	Voltage across PCM power ports
  */
 CTR_Code PCM::GetBatteryVoltage(float &status)
@@ -311,9 +311,9 @@ CTR_Code PCM::isModuleEnabled(bool &status)
 	return rx.err;
 }
 /* Get number of total failed PCM Control Frame
- * 
+ *
  * @Return	-	Failed Control Frames	-	Number of failed control frames (tokenization fails)
- * 
+ *
  * @WARNING	-	Return only valid if [SeekDebugFrames] is enabled
  * 				See function SeekDebugFrames
  * 				See function EnableSeekDebugFrames
@@ -327,10 +327,10 @@ CTR_Code PCM::GetNumberOfFailedControlFrames(UINT16 &status)
 	return rx.err;
 }
 /* Get raw Solenoid Blacklist
- * 
+ *
  * @Return	-	BINARY	-	Raw binary breakdown of Solenoid Blacklist
  * 							BIT7 = Solenoid 1, BIT6 = Solenoid 2, etc.
- * 
+ *
  * @WARNING	-	Return only valid if [SeekStatusFaultFrames] is enabled
  * 				See function SeekStatusFaultFrames
  * 				See function EnableSeekStatusFaultFrames
@@ -343,11 +343,11 @@ CTR_Code PCM::GetSolenoidBlackList(UINT8 &status)
 }
 /* Get solenoid Blacklist status
  * - Blacklisted solenoids cannot be enabled until PCM is power cycled
- * 
+ *
  * @Return	-	True/False	-	True if Solenoid is blacklisted, false if otherwise
- * 
+ *
  * @Param	-	idx			-	ID of solenoid [0,7]
- * 
+ *
  * @WARNING	-	Return only valid if [SeekStatusFaultFrames] is enabled
  * 				See function SeekStatusFaultFrames
  * 				See function EnableSeekStatusFaultFrames
@@ -355,7 +355,7 @@ CTR_Code PCM::GetSolenoidBlackList(UINT8 &status)
 CTR_Code PCM::IsSolenoidBlacklisted(UINT8 idx, bool &status)
 {
 	GET_PCM_SOL_FAULTS();
-	status = (rx->SolenoidBlacklist & (1ul<<(7-idx)) )? 1 : 0;
+	status = (rx->SolenoidBlacklist & (1ul<<(idx)) )? 1 : 0;
 	return rx.err;
 }
 //------------------ C interface --------------------------------------------//

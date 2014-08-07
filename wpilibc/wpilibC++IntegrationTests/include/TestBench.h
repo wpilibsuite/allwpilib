@@ -61,6 +61,6 @@ public:
 	static const uint32_t kTalonPDPChannel = 11;
 
 	/* PCM channels */
-	static const int32_t kSolenoidChannel1 = 7;
-	static const int32_t kSolenoidChannel2 = 6;
+	static const int32_t kSolenoidChannel1 = 0;
+	static const int32_t kSolenoidChannel2 = 1;
 };
