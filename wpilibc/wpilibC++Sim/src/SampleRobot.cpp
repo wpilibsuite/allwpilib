@@ -4,16 +4,16 @@
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
-#include "SimpleRobot.h"
+#include "SampleRobot.h"
 
-#include "DriverStation.h"
-//#include "NetworkCommunication/UsageReporting.h"
+#include <stdio.h>
+#include <unistd.h>
 #include "Timer.h"
 #include "SmartDashboard/SmartDashboard.h"
 #include "LiveWindow/LiveWindow.h"
 #include "networktables/NetworkTable.h"
 
-SimpleRobot::SimpleRobot()
+SampleRobot::SampleRobot()
 	: m_robotMainOverridden (true)
 {
 }
@@ -24,7 +24,7 @@ SimpleRobot::SimpleRobot()
  * Programmers should override this method for default Robot-wide initialization which will
  * be called each time the robot enters the disabled state.
  */
-void SimpleRobot::RobotInit()
+void SampleRobot::RobotInit()
 {
 	printf("Default %s() method... Override me!\n", __FUNCTION__);
 }
@@ -34,7 +34,7 @@ void SimpleRobot::RobotInit()
  * Programmers should override this method to run code that should run while the field is
  * disabled.
  */
-void SimpleRobot::Disabled()
+void SampleRobot::Disabled()
 {
 	printf("Default %s() method... Override me!\n", __FUNCTION__);
 }
@@ -45,7 +45,7 @@ void SimpleRobot::Disabled()
  * in the autonomous period. This will be called once each time the robot enters the
  * autonomous state.
  */
-void SimpleRobot::Autonomous()
+void SampleRobot::Autonomous()
 {
 	printf("Default %s() method... Override me!\n", __FUNCTION__);
 }
@@ -56,7 +56,7 @@ void SimpleRobot::Autonomous()
  * in the Operator Control (tele-operated) period. This is called once each time the robot
  * enters the teleop state.
  */
-void SimpleRobot::OperatorControl()
+void SampleRobot::OperatorControl()
 {
 	printf("Default %s() method... Override me!\n", __FUNCTION__);
 }
@@ -66,7 +66,7 @@ void SimpleRobot::OperatorControl()
  * Programmers should override this method to run code that executes while the robot is
  * in test mode. This will be called once whenever the robot enters test mode
  */
-void SimpleRobot::Test()
+void SampleRobot::Test()
 {
 	printf("Default %s() method... Override me!\n", __FUNCTION__);
 }
@@ -82,7 +82,7 @@ void SimpleRobot::Test()
  * overridden by a user subclass (i.e. the default version runs), then the Autonomous() and
  * OperatorControl() methods will be called.
  */
-void SimpleRobot::RobotMain()
+void SampleRobot::RobotMain()
 {
 	m_robotMainOverridden = false;
 }
@@ -95,11 +95,9 @@ void SimpleRobot::RobotMain()
  * change, either the other mode starts or the robot is disabled. Then go back and wait for the
  * robot to be enabled again.
  */
-void SimpleRobot::StartCompetition()
+void SampleRobot::StartCompetition()
 {
 	LiveWindow *lw = LiveWindow::GetInstance();
-
-	HALReport(HALUsageReporting::kResourceType_Framework, HALUsageReporting::kFramework_Simple);
 
 	SmartDashboard::init();
 	NetworkTable::GetTable("LiveWindow")->GetSubTable("~STATUS~")->PutBoolean("LW Enabled", false);
@@ -119,22 +117,22 @@ void SimpleRobot::StartCompetition()
 				m_ds->InDisabled(true);
 				Disabled();
 				m_ds->InDisabled(false);
-				while (IsDisabled()) m_ds->WaitForData();
+				while (IsDisabled()) sleep(1); //m_ds->WaitForData();
 			}
 			else if (IsAutonomous())
 			{
 				m_ds->InAutonomous(true);
 				Autonomous();
 				m_ds->InAutonomous(false);
-				while (IsAutonomous() && IsEnabled()) m_ds->WaitForData();
+				while (IsAutonomous() && IsEnabled()) sleep(1); //m_ds->WaitForData();
 			}
             else if (IsTest())
             {
             	lw->SetEnabled(true);
-                m_ds->InTest(true);
+            	m_ds->InTest(true);
                 Test();
                 m_ds->InTest(false);
-                while (IsTest() && IsEnabled()) m_ds->WaitForData();
+                while (IsTest() && IsEnabled()) sleep(1); //m_ds->WaitForData();
                 lw->SetEnabled(false);
             }
 			else
@@ -142,7 +140,7 @@ void SimpleRobot::StartCompetition()
 				m_ds->InOperatorControl(true);
 				OperatorControl();
 				m_ds->InOperatorControl(false);
-				while (IsOperatorControl() && IsEnabled()) m_ds->WaitForData();
+				while (IsOperatorControl() && IsEnabled()) sleep(1); //m_ds->WaitForData();
 			}
 		}
 	}

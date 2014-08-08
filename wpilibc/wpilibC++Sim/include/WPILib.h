@@ -33,7 +33,7 @@
 #include "SmartDashboard/SmartDashboard.h"
 
 #include "RobotBase.h"
-#include "SimpleRobot.h"
+#include "SampleRobot.h"
 #include "IterativeRobot.h"
 #include "SpeedController.h"
 #include "Talon.h"
