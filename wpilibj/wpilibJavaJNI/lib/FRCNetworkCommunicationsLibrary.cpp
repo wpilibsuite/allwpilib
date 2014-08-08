@@ -136,32 +136,6 @@ jfieldID FPGAChecksum3FieldID;
 jfieldID versionDataFieldID;
 /*
  * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
- * Method:    getRecentStatusData
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/ByteBuffer;Ljava/nio/ByteBuffer;I)I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_getRecentStatusData
-  (JNIEnv *, jclass, jobject, jobject, jobject, jint)
-{
-	assert(false);
-}
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
- * Method:    setStatusData
- * Signature: (FBBLjava/lang/String;ILjava/lang/String;II)I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_setStatusData
-  (JNIEnv * env, jclass, jfloat paramBattery, jbyte param1, jbyte param2, jstring paramUserDataHigh, jint param4, jstring paramUserDataLow, jint param6)
-{
-	//NETCOMM_LOG(logDEBUG) << "Voltage - " << paramBattery;
-	const char * userDataHighStr = env->GetStringUTFChars(paramUserDataHigh, NULL);
-	const char * userDataLowStr = env->GetStringUTFChars(paramUserDataLow, NULL);
-	jint returnValue = HALSetStatusData(paramBattery, param1, param2, userDataHighStr, param4, userDataLowStr, param6, HAL_WAIT_FOREVER );
-	env->ReleaseStringUTFChars(paramUserDataHigh,userDataHighStr);
-	env->ReleaseStringUTFChars(paramUserDataLow,userDataLowStr);
-	return returnValue;
-}
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
  * Method:    setErrorData
  * Signature: (Ljava/lang/String;II)I
  */

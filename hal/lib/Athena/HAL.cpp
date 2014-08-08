@@ -140,14 +140,6 @@ void HALSetNewDataSem(pthread_mutex_t * param)
 	setNewDataSem(param);
 }
 
-int HALSetStatusData(float battery, uint8_t dsDigitalOut, uint8_t updateNumber,
-		const char *userDataHigh, int userDataHighLength,
-		const char *userDataLow, int userDataLowLength, int wait_ms)
-{
-	return setStatusData(battery, dsDigitalOut, updateNumber, userDataHigh,
-			userDataHighLength, userDataLow, userDataLowLength, wait_ms);
-}
-
 /**
  * Call this to start up HAL. This is required for robot programs.
  */

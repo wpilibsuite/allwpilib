@@ -67,10 +67,6 @@ public class DriverStation implements RobotState.Interface {
     private final Object m_dataSem;
     private int m_digitalOut;
     private volatile boolean m_thread_keepalive = true;
-    private final Dashboard m_dashboardDefaultHigh;
-    private final Dashboard m_dashboardDefaultLow;
-    private IDashboard m_dashboardInUseHigh;
-    private IDashboard m_dashboardInUseLow;
     private int m_updateNumber = 0;
     private double m_approxMatchTimeOffset = -1.0;
     private boolean m_userInDisabled = false;
@@ -99,11 +95,7 @@ public class DriverStation implements RobotState.Interface {
         m_semaphore = new Object();
         m_dataSem = new Object();
 
-        m_dashboardInUseHigh = m_dashboardDefaultHigh = new Dashboard(m_semaphore);
-        m_dashboardInUseLow = m_dashboardDefaultLow = new Dashboard(m_semaphore);
-
-        m_packetDataAvailableSem = HALUtil.initializeMutexNormal();
-
+        m_packetDataAvailableSem = ByteBuffer.allocateDirect(4);
         // set the byte order
         m_packetDataAvailableSem.order(ByteOrder.LITTLE_ENDIAN);
 
@@ -131,7 +123,6 @@ public class DriverStation implements RobotState.Interface {
         	HALUtil.takeMutex(m_packetDataAvailableSem);
         	synchronized (this) {
                 getData();
-                setData();
             }
             synchronized (m_dataSem) {
                 m_dataSem.notifyAll();
@@ -210,25 +201,6 @@ public class DriverStation implements RobotState.Interface {
         lastEnabled = isEnabled();
 
         m_newControlData = true;
-    }
-
-    /**
-     * Copy status data from the DS task for the user.
-     * This is used primarily to set digital outputs on the DS.
-     */
-    protected void setData() {
-        synchronized (m_semaphore) {
-            // TODO ???
-            /*FRCNetworkCommunicationsLibrary.setStatusData((float) getBatteryVoltage(),
-            						 (byte) m_digitalOut,
-                                     (byte) m_updateNumber,
-                                     new String(m_dashboardInUseHigh.getBytes()),
-                                     m_dashboardInUseHigh.getBytesLength(),
-                                     new String(m_dashboardInUseLow.getBytes()),
-                                     m_dashboardInUseLow.getBytesLength());
-            m_dashboardInUseHigh.flush();
-            m_dashboardInUseLow.flush();*/
-        }
     }
 
     /**
@@ -382,93 +354,6 @@ public class DriverStation implements RobotState.Interface {
 
             default:
                 return 0;
-        }
-    }
-
-    /**
-     * Sets the dashboard packer to use for sending high priority user data to a
-     * dashboard receiver. This can idle or restore the default packer.
-     * (Initializing SmartDashboard sets the high priority packer in use, so
-     * beware that the default packer will then be idle. You can restore the
-     * default high priority packer by calling
-     * {@code setDashboardPackerToUseHigh(getDashboardPackerHigh())}.)
-     *
-     * @param dashboard any kind of IDashboard object
-     */
-    public void setDashboardPackerToUseHigh(IDashboard dashboard) {
-        m_dashboardInUseHigh = dashboard;
-    }
-
-    /**
-     * Gets the default dashboard packer for sending high priority user data to
-     * a dashboard receiver. This instance stays around even after a call to
-     * {@link #setDashboardPackerToUseHigh} changes which packer is in use.
-     *
-     * @return the default Dashboard object; it may be idle
-     */
-    public Dashboard getDashboardPackerHigh() {
-        return m_dashboardDefaultHigh;
-    }
-
-    /**
-     * Gets the dashboard packer that's currently in use for sending high
-     * priority user data to a dashboard receiver. This can be any kind of
-     * IDashboard.
-     *
-     * @return the current IDashboard object
-     */
-    public IDashboard getDashboardPackerInUseHigh() {
-        return m_dashboardInUseHigh;
-    }
-
-    /**
-     * Sets the dashboard packer to use for sending low priority user data to a
-     * dashboard receiver. This can idle or restore the default packer.
-     *
-     * @param dashboard any kind of IDashboard object
-     */
-    public void setDashboardPackerToUseLow(IDashboard dashboard) {
-        m_dashboardInUseLow = dashboard;
-    }
-
-    /**
-     * Gets the default dashboard packer for sending low priority user data to
-     * a dashboard receiver. This instance stays around even after a call to
-     * {@link #setDashboardPackerToUseLow} changes which packer is in use.
-     *
-     * @return the default Dashboard object; it may be idle
-     */
-    public Dashboard getDashboardPackerLow() {
-        return m_dashboardDefaultLow;
-    }
-
-    /**
-     * Gets the dashboard packer that's currently in use for sending low
-     * priority user data to a dashboard receiver. This can be any kind of
-     * IDashboard.
-     *
-     * @return the current IDashboard object
-     */
-    public IDashboard getDashboardPackerInUseLow() {
-        return m_dashboardInUseLow;
-    }
-
-    /**
-     * Gets the status data monitor
-     * @return The status data monitor for use with IDashboard objects which must
-     * send data across the network.
-     */
-    public Object getStatusDataMonitor() {
-        return m_semaphore;
-    }
-
-    /**
-     * Increments the internal update number sent across the network along with
-     * status data.
-     */
-    void incrementUpdateNumber() {
-        synchronized (m_semaphore) {
-            m_updateNumber++;
         }
     }
 

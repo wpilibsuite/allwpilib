@@ -202,9 +202,6 @@ extern "C"
 	int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons, uint8_t *count);
 
 	void HALSetNewDataSem(pthread_mutex_t *);
-	int HALSetStatusData(float battery, uint8_t dsDigitalOut, uint8_t updateNumber,
-			const char *userDataHigh, int userDataHighLength, const char *userDataLow,
-			int userDataLowLength, int wait_ms);
 
 	int HALInitialize(int mode = 0);
 	void HALNetworkCommunicationObserveUserProgramStarting();

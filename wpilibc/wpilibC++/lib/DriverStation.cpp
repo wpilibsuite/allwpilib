@@ -24,7 +24,6 @@ TLogLevel dsLogLevel = logDEBUG;
 const uint32_t DriverStation::kJoystickPorts;
 const uint32_t DriverStation::kJoystickAxes;
 DriverStation* DriverStation::m_instance = NULL;
-uint8_t DriverStation::m_updateNumber = 0;
 
 /**
  * DriverStation contructor.
@@ -35,10 +34,6 @@ DriverStation::DriverStation()
 	: m_digitalOut (0)
 	, m_statusDataSemaphore (initializeMutexNormal())
 	, m_task ("DriverStation", (FUNCPTR)DriverStation::InitTask)
-	, m_dashboardHigh(m_statusDataSemaphore)
-	, m_dashboardLow(m_statusDataSemaphore)
-	, m_dashboardInUseHigh(&m_dashboardHigh)
-	, m_dashboardInUseLow(&m_dashboardLow)
 	, m_newControlData(0)
 	, m_packetDataAvailableSem (0)
 	, m_waitForDataSem(0)
@@ -88,7 +83,6 @@ void DriverStation::Run()
 	while (true)
 	{
 		takeMutex(m_packetDataAvailableSem);
-		SetData();
 		GetData();
 		giveMultiWait(m_waitForDataSem);
 		if (++period >= 4)
@@ -118,8 +112,6 @@ DriverStation* DriverStation::GetInstance()
 	}
 	return m_instance;
 }
-
-#include <iostream>
 
 /**
  * Copy data from the DS task for the user.
@@ -158,29 +150,6 @@ void DriverStation::GetData()
 	}
 	lastEnabled = IsEnabled();
 	giveSemaphore(m_newControlData);
-}
-
-/**
- * Copy status data from the DS task for the user.
- */
-void DriverStation::SetData()
-{
-	char *userStatusDataHigh;
-	int32_t userStatusDataHighSize;
-	char *userStatusDataLow;
-	int32_t userStatusDataLowSize;
-
-	Synchronized sync(m_statusDataSemaphore);
-
-	m_dashboardInUseHigh->GetStatusBuffer(&userStatusDataHigh, &userStatusDataHighSize);
-	m_dashboardInUseLow->GetStatusBuffer(&userStatusDataLow, &userStatusDataLowSize);
-
-	//TODO ???
-	//HALSetStatusData(GetBatteryVoltage(), m_digitalOut, m_updateNumber,
-	//	userStatusDataHigh, userStatusDataHighSize, userStatusDataLow, userStatusDataLowSize, HAL_WAIT_FOREVER);
-
-	m_dashboardInUseHigh->Flush();
-	m_dashboardInUseLow->Flush();
 }
 
 /**

@@ -5,7 +5,6 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-#include "Dashboard.h"
 #include "SensorBase.h"
 #include "Task.h"
 
@@ -48,45 +47,6 @@ public:
 	double GetMatchTime();
 	float GetBatteryVoltage();
 
-	// Get the default dashboard packers. These instances stay around even after
-	// a call to SetHigh|LowPriorityDashboardPackerToUse() changes which packer
-	// is in use. You can restore the default high priority packer by calling
-	// SetHighPriorityDashboardPackerToUse(&GetHighPriorityDashboardPacker()).
-	Dashboard& GetHighPriorityDashboardPacker()
-	{
-		return m_dashboardHigh;
-	}
-	Dashboard& GetLowPriorityDashboardPacker()
-	{
-		return m_dashboardLow;
-	}
-
-	// Get/set the dashboard packers to use. This can sideline or restore the
-	// default packers. Initializing SmartDashboard changes the high priority
-	// packer in use so beware that the default packer will then be idle. These
-	// methods support any kind of DashboardBase, e.g. a Dashboard or a
-	// SmartDashboard.
-	DashboardBase* GetHighPriorityDashboardPackerInUse()
-	{
-		return m_dashboardInUseHigh;
-	}
-	DashboardBase* GetLowPriorityDashboardPackerInUse()
-	{
-		return m_dashboardInUseLow;
-	}
-	void SetHighPriorityDashboardPackerToUse(DashboardBase* db)
-	{
-		m_dashboardInUseHigh = db;
-	}
-	void SetLowPriorityDashboardPackerToUse(DashboardBase* db)
-	{
-		m_dashboardInUseLow = db;
-	}
-
-	void IncrementUpdateNumber()
-	{
-		m_updateNumber++;
-	}
 	MUTEX_ID GetUserStatusDataSem()
 	{
 		return m_statusDataSemaphore;
@@ -142,10 +102,6 @@ private:
 	uint8_t m_digitalOut;
 	MUTEX_ID m_statusDataSemaphore;
 	Task m_task;
-	Dashboard m_dashboardHigh;  // the default dashboard packers
-	Dashboard m_dashboardLow;
-	DashboardBase* m_dashboardInUseHigh;  // the current dashboard packers in use
-	DashboardBase* m_dashboardInUseLow;
 	SEMAPHORE_ID m_newControlData;
 	MUTEX_ID m_packetDataAvailableSem;
 	MULTIWAIT_ID m_waitForDataSem;

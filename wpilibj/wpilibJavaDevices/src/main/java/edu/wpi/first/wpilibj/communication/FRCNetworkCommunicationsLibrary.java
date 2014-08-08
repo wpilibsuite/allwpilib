@@ -362,30 +362,6 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 	 */
 	public static native void getFPGAHardwareVersion(ShortBuffer fpgaVersion, IntBuffer fpgaRevision);
 	/**
-	 * Original signature : <code>int getRecentStatusData(uint8_t*, uint8_t*, uint8_t*, int)</code><br>
-	 * <i>native declaration : src\main\include\NetworkCommunication\FRCComm.h:128</i><br>
-	 * @deprecated use the safer methods {@link #getRecentStatusData(java.nio.ByteBuffer, java.nio.ByteBuffer, java.nio.ByteBuffer, int)} and {@link #getRecentStatusData(com.sun.jna.Pointer, com.sun.jna.Pointer, com.sun.jna.Pointer, int)} instead
-	 */
-	//@Deprecated
-	//public static native int getRecentStatusData(Pointer batteryInt, Pointer batteryDec, Pointer dsDigitalOut, int wait_ms);
-	/**
-	 * Original signature : <code>int getRecentStatusData(uint8_t*, uint8_t*, uint8_t*, int)</code><br>
-	 * <i>native declaration : src\main\include\NetworkCommunication\FRCComm.h:128</i>
-	 */
-	public static native int getRecentStatusData(ByteBuffer batteryInt, ByteBuffer batteryDec, ByteBuffer dsDigitalOut, int wait_ms);
-	/**
-	 * Original signature : <code>int setStatusData(float, uint8_t, uint8_t, const char*, int, const char*, int, int)</code><br>
-	 * <i>native declaration : src\main\include\NetworkCommunication\FRCComm.h:130</i><br>
-	 * @deprecated use the safer methods {@link #setStatusData(float, byte, byte, java.lang.String, int, java.lang.String, int, int)} and {@link #setStatusData(float, byte, byte, com.sun.jna.Pointer, int, com.sun.jna.Pointer, int, int)} instead
-	 */
-	//@Deprecated
-	//public static native int setStatusData(float battery, byte dsDigitalOut, byte updateNumber, Pointer userDataHigh, int userDataHighLength, Pointer userDataLow, int userDataLowLength, int wait_ms);
-	/**
-	 * Original signature : <code>int setStatusData(float, uint8_t, uint8_t, const char*, int, const char*, int, int)</code><br>
-	 * <i>native declaration : src\main\include\NetworkCommunication\FRCComm.h:130</i>
-	 */
-	public static native int setStatusData(float battery, byte dsDigitalOut, byte updateNumber, String userDataHigh, int userDataHighLength, String userDataLow, int userDataLowLength);
-	/**
 	 * Original signature : <code>int setErrorData(const char*, int, int)</code><br>
 	 * <i>native declaration : src\main\include\NetworkCommunication\FRCComm.h:136</i><br>
 	 * @deprecated use the safer methods {@link #setErrorData(java.lang.String, int, int)} and {@link #setErrorData(com.sun.jna.Pointer, int, int)} instead
