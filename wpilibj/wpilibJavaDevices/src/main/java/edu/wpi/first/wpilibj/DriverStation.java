@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
+import java.nio.IntBuffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -13,6 +14,7 @@ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
 import edu.wpi.first.wpilibj.communication.HALControlWord;
 import edu.wpi.first.wpilibj.communication.HALAllianceStationID;
 import edu.wpi.first.wpilibj.hal.HALUtil;
+import edu.wpi.first.wpilibj.hal.PowerJNI;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
@@ -95,10 +97,7 @@ public class DriverStation implements RobotState.Interface {
         m_semaphore = new Object();
         m_dataSem = new Object();
 
-        m_packetDataAvailableSem = ByteBuffer.allocateDirect(4);
-        // set the byte order
-        m_packetDataAvailableSem.order(ByteOrder.LITTLE_ENDIAN);
-
+        m_packetDataAvailableSem = HALUtil.initializeMutexNormal();
         FRCNetworkCommunicationsLibrary.setNewDataSem(m_packetDataAvailableSem);
 
         m_thread = new Thread(new DriverStationTask(this), "FRCDriverStation");
@@ -209,7 +208,11 @@ public class DriverStation implements RobotState.Interface {
      * @return The battery voltage.
      */
     public double getBatteryVoltage() {
-        return 0.0; // TODO
+        IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
+        float voltage = PowerJNI.getVinVoltage(status);
+        HALUtil.checkStatus(status);
+
+        return voltage;
     }
 
     /**

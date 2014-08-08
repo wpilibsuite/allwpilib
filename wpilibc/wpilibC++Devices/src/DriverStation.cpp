@@ -162,7 +162,11 @@ void DriverStation::GetData()
  */
 float DriverStation::GetBatteryVoltage()
 {
-	return 0.0f; // TODO
+	int32_t status = 0;
+	float voltage = getVinVoltage(&status);
+	wpi_setErrorWithContext(status, "getVinVoltage");
+
+	return voltage;
 }
 
 /**
