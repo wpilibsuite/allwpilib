@@ -7,7 +7,7 @@
 
 #include "ErrorBase.h"
 #include "HAL/cpp/Synchronized.hpp"
-#include "HAL/HAL.hpp"
+#include <stdint.h>
 
 /**
  * The Resource class is a convenient way to track allocated resources.

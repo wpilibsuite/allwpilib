@@ -5,7 +5,10 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-#include "HAL/HAL.hpp"
+#include <stdint.h>
+#include <cmath>
+#include <pthread.h>
+#include <semaphore.h>
 
 /**
  * Interface for Controllers

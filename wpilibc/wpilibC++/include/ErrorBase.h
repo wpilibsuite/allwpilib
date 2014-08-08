@@ -8,7 +8,6 @@
 #include "Base.h"
 #include "Error.h"
 #include "HAL/Semaphore.hpp"
-#include "HAL/HAL.hpp"
 
 #define wpi_setErrnoErrorWithContext(context)   (this->SetErrnoError((context), __FILE__, __FUNCTION__, __LINE__))
 #define wpi_setErrnoError()   (wpi_setErrnoErrorWithContext(""))

@@ -5,7 +5,7 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-#include "HAL/HAL.hpp"
+#include <stdint.h>
 
 /** GenericHID Interface
  */

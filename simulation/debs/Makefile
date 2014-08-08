@@ -108,12 +108,12 @@ pull-eclipse-plugins:
 	echo Increment version?
 
 pull-eclipse-toolchain:
-	rm -rf frcsim-eclipse-plugins/frcsim-eclipse-toolchain-plugins/plugins
-	rm -rf frcsim-eclipse-plugins/frcsim-eclipse-toolchain-plugins/features
-	mkdir -p frcsim-eclipse-plugins/frcsim-eclipse-toolchain-plugins/plugins
-	mkdir -p frcsim-eclipse-plugins/frcsim-eclipse-toolchain-plugins/features
-	cp $(allwpilib)/eclipse-plugins/edu.wpi.first.wpilib.plugins.updatesite/target/site/plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux_* frcsim-eclipse-plugins/frcsim-eclipse-toolchain-plugins/plugins
-	cp $(allwpilib)/eclipse-plugins/edu.wpi.first.wpilib.plugins.updatesite/target/site/features/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux.feature_* frcsim-eclipse-plugins/frcsim-eclipse-toolchain-plugins/features
+	rm -rf frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/plugins
+	rm -rf frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/features
+	mkdir -p frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/plugins
+	mkdir -p frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/features
+	cp $(allwpilib)/eclipse-plugins/edu.wpi.first.wpilib.plugins.updatesite/target/site/plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux_* frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/plugins/
+	cp $(allwpilib)/eclipse-plugins/edu.wpi.first.wpilib.plugins.updatesite/target/site/features/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux.feature_* frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/features/
 	echo Increment version?
 
 pull-libwpilibsim-cpp:
@@ -124,6 +124,14 @@ download-models:
 	cd frcsim-gazebo-models && \
 	    wget $(gazebo-models-orig-url) -O frcsim-gazebo-models_${gazebo-models-version}.orig.tar.gz && \
 	    tar xvf frcsim-gazebo-models_${gazebo-models-version}.orig.tar.gz
+
+install:
+	sudo dpkg -i frcsim-gazebo-plugins/frcsim-gazebo-plugins_0.2-1_amd64.deb \
+                 frcsim-gazebo-models/frcsim-gazebo-models_0.2-1_all.deb \
+                 frcsim-eclipse-plugins/frcsim-eclipse-plugins_0.1-1_all.deb \
+                 frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin_0.1-1_all.deb \
+                 frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_0.1-1_amd64.deb \
+                 frcsim/frcsim_0.1-1_all.deb
 
 deploy:
 	rsync -r -v -C -p repository/ adhenning@ccc.wpi.edu:public_html/frcsim/

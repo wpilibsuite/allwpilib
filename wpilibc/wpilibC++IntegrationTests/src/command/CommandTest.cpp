@@ -8,10 +8,13 @@
 #include "WPILib.h"
 #include "command/MockCommand.h"
 #include "gtest/gtest.h"
+#include "RobotState.h"
+#include "DriverStation.h"
 
 class CommandTest : public testing::Test {
 protected:
 	virtual void SetUp() {
+        RobotState::SetImplementation(DriverStation::GetInstance());
 		Scheduler::GetInstance()->SetEnabled(true);
 	}
 

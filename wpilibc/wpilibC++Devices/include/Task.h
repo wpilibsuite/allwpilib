@@ -6,7 +6,7 @@
 #pragma once
 
 #include "ErrorBase.h"
-#include "HAL/Task.hpp"
+#include "HAL/HAL.hpp"
 
 /**
  * WPI task is a wrapper for the native Task object.

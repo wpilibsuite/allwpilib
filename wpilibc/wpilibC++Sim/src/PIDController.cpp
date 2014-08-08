@@ -61,10 +61,6 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
 								float period)
 {
 	m_table = NULL;
-	
-	m_semaphore = initializeMutexRecursive();
-
-	m_controlLoop = new Notifier(PIDController::CallCalculate, this);
 
 	m_P = Kp;
 	m_I = Ki;
@@ -91,6 +87,9 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
 	m_pidOutput = output;
 	m_period = period;
 
+	
+	m_semaphore = initializeMutexRecursive();
+	m_controlLoop = new Notifier(PIDController::CallCalculate, this);
 	m_controlLoop->StartPeriodic(m_period);
 
 	static int32_t instances = 0;

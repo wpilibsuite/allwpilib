@@ -5,10 +5,24 @@
 /*----------------------------------------------------------------------------*/
 
 #include "RobotBase.h"
-#include "RobotState.h"
-#include "Utility.h"
 
+#include "DriverStation.h"
+//#include "NetworkCommunication/FRCComm.h"
+//#include "NetworkCommunication/symModuleLink.h"
+//#include "NetworkCommunication/UsageReporting.h"
+#include "RobotState.h"
+#include "HLUsageReporting.h"
+#include "Internal/HardwareHLReporting.h"
+#include "Utility.h"
 #include <cstring>
+#include "HAL/HAL.hpp"
+
+#ifdef __vxworks
+// VXWorks needs som special unloading code
+#include <moduleLib.h>
+#include <unldLib.h>
+#include <taskLib.h>
+#endif
 
 RobotBase* RobotBase::m_instance = NULL;
 
@@ -32,9 +46,10 @@ RobotBase &RobotBase::getInstance()
  * nice to put this code into it's own task that loads on boot so ensure that it runs.
  */
 RobotBase::RobotBase()
+	: m_task (NULL)
+	, m_ds (NULL)
 {
 	m_ds = DriverStation::GetInstance();
-    RobotState::SetImplementation(DriverStation::GetInstance());
 }
 
 /**
@@ -44,6 +59,10 @@ RobotBase::RobotBase()
  */
 RobotBase::~RobotBase()
 {
+	SensorBase::DeleteSingletons();
+	delete m_task;
+	m_task = NULL;
+	m_instance = NULL;
 }
 
 /**
@@ -95,10 +114,81 @@ bool RobotBase::IsTest()
  * Indicates if new data is available from the driver station.
  * @return Has new data arrived over the network since the last time this function was called?
  */
-// bool RobotBase::IsNewDataAvailable()
-// {
-// 	return m_ds->IsNewControlData();
-// }
+bool RobotBase::IsNewDataAvailable()
+{
+	return m_ds->IsNewControlData();
+}
+
+/**
+ * Static interface that will start the competition in the new task.
+ */
+void RobotBase::robotTask(FUNCPTR factory, Task *task)
+{
+	RobotBase::setInstance((RobotBase*)factory());
+	RobotBase::getInstance().m_task = task;
+	RobotBase::getInstance().StartCompetition();
+}
+
+/**
+ * 
+ * Start the robot code.
+ * This function starts the robot code running by spawning a task. Currently tasks seemed to be
+ * started by LVRT without setting the VX_FP_TASK flag so floating point context is not saved on
+ * interrupts. Therefore the program experiences hard to debug and unpredictable results. So the
+ * LVRT code starts this function, and it, in turn, starts the actual user program.
+ */
+void RobotBase::startRobotTask(FUNCPTR factory)
+{
+#ifdef SVN_REV
+	if (strlen(SVN_REV))
+	{
+		printf("WPILib was compiled from SVN revision %s\n", SVN_REV);
+	}
+	else
+	{
+		printf("WPILib was compiled from a location that is not source controlled.\n");
+	}
+#else
+	printf("WPILib was compiled without -D'SVN_REV=nnnn'\n");
+#endif
+
+    RobotState::SetImplementation(DriverStation::GetInstance());
+    HLUsageReporting::SetImplementation(new HardwareHLReporting());
+
+#ifdef __vxworks
+	// Check for startup code already running
+	int32_t oldId = taskNameToId(const_cast<char*>("FRC_RobotTask"));
+	if (oldId != ERROR)
+	{
+		// Find the startup code module.
+		char moduleName[256];
+		moduleNameFindBySymbolName("FRC_UserProgram_StartupLibraryInit", moduleName);
+		MODULE_ID startupModId = moduleFindByName(moduleName);
+		if (startupModId != NULL)
+		{
+			// Remove the startup code.
+			unldByModuleId(startupModId, 0);
+			printf("!!!   Error: Default code was still running... It was unloaded for you... Please try again.\n");
+			return;
+		}
+		// This case should no longer get hit.
+		printf("!!!   Error: Other robot code is still running... Unload it and then try again.\n");
+		return;
+	}
+#endif
+
+	// Let the framework know that we are starting a new user program so the Driver Station can disable.
+	HALNetworkCommunicationObserveUserProgramStarting();
+
+	// Let the Usage Reporting framework know that there is a C++ program running
+	HALReport(HALUsageReporting::kResourceType_Language, HALUsageReporting::kLanguage_CPlusPlus);
+
+	// Start robot task
+	// This is done to ensure that the C++ robot task is spawned with the floating point
+	// context save parameter.
+	Task *task = new Task("RobotTask", (FUNCPTR)RobotBase::robotTask, Task::kDefaultPriority, 64000);
+	task->Start((int32_t)factory, (int32_t)task);
+}
 
 /**
  * This class exists for the sole purpose of getting its destructor called when the module unloads.

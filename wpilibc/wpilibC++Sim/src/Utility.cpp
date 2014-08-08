@@ -6,7 +6,6 @@
 
 #include "Utility.h"
 
-#include "HAL/cpp/StackTrace.hpp"
 #include "Task.h"
 #include "Timer.h"
 #include <stdio.h>
@@ -36,11 +35,11 @@ void wpi_suspendOnAssertEnabled(bool enabled)
 
 static void wpi_handleTracing()
 {
-	if (stackTraceEnabled)
-	{
-		printf("\n-----------<Stack Trace>----------------\n");
-		printCurrentStackTrace();
-	}
+	// if (stackTraceEnabled)
+	// {
+	// 	printf("\n-----------<Stack Trace>----------------\n");
+	// 	printCurrentStackTrace();
+	// }
 	printf("\n");
 }
 

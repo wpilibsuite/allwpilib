@@ -16,7 +16,7 @@ class Notifier;
 
 /**
  * Class implements a PID Control Loop.
- *
+ * 
  * Creates a separate thread which reads the given PIDSource and takes
  * care of the integral calculations, as well as writing the given
  * PIDOutput
@@ -32,7 +32,7 @@ public:
 	virtual float Get();
 	virtual void SetContinuous(bool continuous = true);
 	virtual void SetInputRange(float minimumInput, float maximumInput);
-	virtual void SetOutputRange(float minimumOutput, float maximumOutput);
+	virtual void SetOutputRange(float mimimumOutput, float maximumOutput);
 	virtual void SetPID(float p, float i, float d);
 	virtual void SetPID(float p, float i, float d, float f);
 	virtual float GetP();
@@ -69,6 +69,7 @@ private:
 	float m_minimumInput;		// minimum input - limit setpoint to this
 	bool m_continuous;	// do the endpoints wrap around? eg. Absolute encoder
 	bool m_enabled; 			//is the pid controller enabled
+	bool m_destruct; // should the calculate thread stop running
 	float m_prevError;	// the prior sensor input (used to compute velocity)
 	double m_totalError; //the sum of the errors for use in the integral calc
 	enum
@@ -82,18 +83,16 @@ private:
 	float m_error;
 	float m_result;
 	float m_period;
-	
-	MUTEX_ID m_semaphore;
-	
+
 	PIDSource *m_pidInput;
 	PIDOutput *m_pidOutput;
-
+	
 	pthread_t m_controlLoop;
 	pthread_mutex_t m_mutex;
 
 	void Initialize(float p, float i, float d, float f, PIDSource *source, PIDOutput *output,
 			float period = 0.05);
-	static void CallCalculate(void *controller);
+	static void *CallCalculate(void *controller);
 
 	virtual ITable* GetTable();
 	virtual std::string GetSmartDashboardType();

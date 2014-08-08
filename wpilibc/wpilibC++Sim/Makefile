@@ -5,6 +5,7 @@ allwpilib = ../..
 
 all:
 	mkdir -p $(build.dir)
+	cp -r $(allwpilib)/wpilibc/wpilibC++ build
 	cd ${build.dir} && ALLWPILIB=$(allwpilib) cmake .. && make
 
 clean:

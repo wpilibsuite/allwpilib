@@ -34,7 +34,6 @@ public:
 
 	static double GetFPGATimestamp();
 	static double GetPPCTimestamp();
-    static double GetMatchTime();
 
 private:
 	double m_startTime;

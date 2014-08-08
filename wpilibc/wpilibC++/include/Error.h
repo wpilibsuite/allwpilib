@@ -7,7 +7,7 @@
 
 #include "Base.h"
 #include <string>
-#include "HAL/HAL.hpp"
+#include <stdint.h>
 
 //  Forward declarations
 class ErrorBase;
@@ -49,5 +49,6 @@ private:
 	const ErrorBase* m_originatingObject;
 	double m_timestamp;
 
-	static bool m_suspendOnErrorEnabled;DISALLOW_COPY_AND_ASSIGN(Error);
+	static bool m_suspendOnErrorEnabled;
+    DISALLOW_COPY_AND_ASSIGN(Error);
 };

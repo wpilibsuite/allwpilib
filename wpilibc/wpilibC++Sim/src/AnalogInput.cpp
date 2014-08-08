@@ -13,7 +13,7 @@
  */
 void AnalogInput::InitAnalogInput(uint32_t channel)
 {
-	m_table = NULL;
+    m_table = NULL;
 
 	m_channel = channel;
 	char buffer[50];

@@ -5,8 +5,8 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
+#include "HAL/HAL.hpp"
 #include "ErrorBase.h"
-#include "Task.h"
 #include "HAL/cpp/Synchronized.hpp"
 
 typedef void (*TimerEventHandler)(void *param);
@@ -22,6 +22,7 @@ public:
 private:
 	static Notifier *timerQueueHead;
 	static ReentrantSemaphore queueSemaphore;
+	static void* m_notifier;
 	static int refcount;
 
 	static void ProcessQueue(uint32_t mask, void *params); // process the timer queue on a timer event
@@ -38,7 +39,4 @@ private:
 	SEMAPHORE_ID m_handlerSemaphore;		// held by interrupt manager task while handler call is in progress
 
 	DISALLOW_COPY_AND_ASSIGN(Notifier);
-
-	static Task *task;
-	static void Run();
 };

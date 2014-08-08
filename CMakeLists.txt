@@ -5,6 +5,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wformat=2 -Wall -Wextra -Wno-unused-par
 SET(CMAKE_SKIP_BUILD_RPATH TRUE)
 
 file(GLOB_RECURSE NI_LIBS ni-libraries/*.so*)
+get_filename_component(WPILIB_INCLUDES wpilibc/wpilibC++/include REALPATH)
 get_filename_component(HAL_API_INCLUDES hal/include REALPATH)
 get_filename_component(NWT_API_INCLUDES networktables/cpp/include REALPATH)
 add_subdirectory(hal)

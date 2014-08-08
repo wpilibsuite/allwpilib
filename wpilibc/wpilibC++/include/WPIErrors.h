@@ -54,6 +54,7 @@ S(NetworkTablesWrongType, -42, "The wrong type was read from the NetworkTables e
 S(NetworkTablesCorrupt, -43, "NetworkTables data stream is corrupt");
 S(SmartDashboardMissingKey, -43, "SmartDashboard data does not exist");
 S(CommandIllegalUse, -50, "Illegal use of Command");
+S(UnsupportedInSimulation, -80, "Unsupported in simulation");
 
 /*
  * Warnings

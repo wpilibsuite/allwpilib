@@ -5,7 +5,7 @@
 /*---------------------------------------------------------------------------*/
 #pragma once
 
-#include "HAL/HAL.hpp"
+#include <stdint.h>
 #include <string>
 
 #define wpi_assert(condition) wpi_assert_impl(condition, #condition, NULL, __FILE__, __LINE__, __FUNCTION__)
