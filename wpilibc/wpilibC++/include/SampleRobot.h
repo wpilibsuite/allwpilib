@@ -7,14 +7,11 @@
 
 #include "RobotBase.h"
 
-/**
- * @todo If this is going to last until release, it needs a better name.
- */
-class SimpleRobot : public RobotBase
+class SampleRobot : public RobotBase
 {
 public:
-	SimpleRobot();
-	virtual ~SimpleRobot() {}
+	SampleRobot();
+	virtual ~SampleRobot() {}
 	virtual void RobotInit();
 	virtual void Disabled();
 	virtual void Autonomous();

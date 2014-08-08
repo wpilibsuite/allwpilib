@@ -67,7 +67,7 @@
 #include "SensorBase.h"
 #include "SerialPort.h"
 #include "Servo.h"
-#include "SimpleRobot.h"
+#include "SampleRobot.h"
 #include "SmartDashboard/SendableChooser.h"
 #include "SmartDashboard/SmartDashboard.h"
 #include "Solenoid.h"

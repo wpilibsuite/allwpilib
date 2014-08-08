@@ -1,7 +1,7 @@
 Specific Issues
 ===============
 
-- SimpleRobot.java (support for telling the DriverStation the current mode)
+- SampleRobot.java (support for telling the DriverStation the current mode)
 - Iterative.java (support for telling the DriverStation the current mode and nextPeriodReady())
 - command/WaitUntilCommand.java (Needs DriverStation)
 - command/Command.java (XXX Issue with DriverStation)
