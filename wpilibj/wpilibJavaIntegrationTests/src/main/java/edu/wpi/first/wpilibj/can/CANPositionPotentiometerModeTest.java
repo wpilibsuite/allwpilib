@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
+/* Copyright (c) FIRST 2008-2014. All Rights Reserved.						*/
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
+/* the project.															   */
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj.can;
 
@@ -11,12 +11,15 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-import java.util.logging.Level;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import com.googlecode.junittoolbox.PollingWait;
+import com.googlecode.junittoolbox.RunnableAssert;
 
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.Timer;
@@ -30,9 +33,7 @@ public class CANPositionPotentiometerModeTest extends AbstractCANTest {
 	private static final Logger logger = Logger.getLogger(CANPositionPotentiometerModeTest.class.getName());
 	
 	private static final double kStoppedValue = 0;
-	private static final double kRunningValue = 1;
 	
-	private static final int rotationRange = 360;
 	private static final int defaultPotAngle = 180;
 	private static final double maxPotVoltage = 3.0;
 	
@@ -82,13 +83,13 @@ public class CANPositionPotentiometerModeTest extends AbstractCANTest {
 	@Test
 	public void testRotateForward() {
 		int initialPosition = getME().getEncoder().get();
-	    /* Drive the speed controller briefly to move the encoder */
+		/* Drive the speed controller briefly to move the encoder */
 		getME().getMotor().set(kStoppedValue);
-	    Timer.delay(kMotorTimeSettling);
-	    getME().getMotor().set(defaultPotAngle);
+		Timer.delay(kMotorTimeSettling);
+		getME().getMotor().set(defaultPotAngle);
 
-	    /* The position should have increased */
-	    assertThat("CAN Jaguar position should have increased after the motor moved", getME().getEncoder().get(), is(greaterThan(initialPosition)));
+		/* The position should have increased */
+		assertThat("CAN Jaguar position should have increased after the motor moved", getME().getEncoder().get(), is(greaterThan(initialPosition)));
 		
 	}
 	
@@ -99,13 +100,13 @@ public class CANPositionPotentiometerModeTest extends AbstractCANTest {
 	@Test
 	public void testRotateReverse() {
 		int initialPosition = getME().getEncoder().get();
-	    /* Drive the speed controller briefly to move the encoder */
+		/* Drive the speed controller briefly to move the encoder */
 		getME().getMotor().set(kStoppedValue);
-	    Timer.delay(kMotorTimeSettling);
-	    getME().getMotor().set(defaultPotAngle);
+		Timer.delay(kMotorTimeSettling);
+		getME().getMotor().set(defaultPotAngle);
 
-	    /* The position should have increased */
-	    assertThat("CAN Jaguar position should have increased after the motor moved", getME().getEncoder().get(), is(greaterThan(initialPosition)));
+		/* The position should have increased */
+		assertThat("CAN Jaguar position should have increased after the motor moved", getME().getEncoder().get(), is(greaterThan(initialPosition)));
 		
 	}
 	
@@ -115,29 +116,38 @@ public class CANPositionPotentiometerModeTest extends AbstractCANTest {
 	 */
 	@Test
 	public void testFakePotentiometerPosition() {
-		//When have we reached the correct state for this test?
-		BooleanCheck correctState = new BooleanCheck(){@Override
-		public boolean getAsBoolean(){
-			getME().getMotor().set(0);
-			return Math.abs(getME().getFakePot().getVoltage() - getME().getMotor().getPosition()*3) < kPotentiometerPositionTolerance*3;
+		//TODO When https://github.com/Pragmatists/JUnitParams/issues/5 is resolved make this test parameterized
+		
+		//Given
+		PollingWait wait = new PollingWait().timeoutAfter((long)kPotentiometerSettlingTime, TimeUnit.SECONDS).pollEvery(1, TimeUnit.MILLISECONDS);
+		RunnableAssert assertion = new RunnableAssert("Waiting for potentiometer position to be correct"){
+			@Override
+			public void run() throws Exception {
+				getME().getMotor().set(0);
+				assertEquals("CAN Jaguar should have returned the potentiometer position set by the analog output",
+				             getME().getFakePot().getVoltage() , getME().getMotor().getPosition()*3 , kPotentiometerPositionTolerance*3);
 			}
 		};
-
-	    getME().getFakePot().setVoltage(0.0f);
-	    delayTillInCorrectStateWithMessage(Level.FINE, kPotentiometerSettlingTime, "Potentiometer position settling", correctState);
-	    assertEquals("CAN Jaguar should have returned the potentiometer position set by the analog output", getME().getFakePot().getVoltage() , getME().getMotor().getPosition()*3 , kPotentiometerPositionTolerance*3);
-
-	    getME().getFakePot().setVoltage(1.0f);
-	    delayTillInCorrectStateWithMessage(Level.FINE, kPotentiometerSettlingTime, "Potentiometer position settling", correctState);
-	    assertEquals("CAN Jaguar should have returned the potentiometer position set by the analog output", getME().getFakePot().getVoltage() , getME().getMotor().getPosition()*3 , kPotentiometerPositionTolerance*3);
-
-	    getME().getFakePot().setVoltage(2.0f);
-	    delayTillInCorrectStateWithMessage(Level.FINE, kPotentiometerSettlingTime, "Potentiometer position settling", correctState);
-	    assertEquals("CAN Jaguar should have returned the potentiometer position set by the analog output", getME().getFakePot().getVoltage() , getME().getMotor().getPosition()*3 , kPotentiometerPositionTolerance*3);
-
-	    getME().getFakePot().setVoltage(3.0f);
-	    delayTillInCorrectStateWithMessage(Level.FINE, kPotentiometerSettlingTime, "Potentiometer position settling", correctState);
-	    assertEquals("CAN Jaguar should have returned the potentiometer position set by the analog output", getME().getFakePot().getVoltage() , getME().getMotor().getPosition()*3 , kPotentiometerPositionTolerance*3);
+		
+		//When
+		getME().getFakePot().setVoltage(0.0);
+		//Then
+		wait.until(assertion);
+		
+		//When
+		getME().getFakePot().setVoltage(1.0);
+		//Then
+		wait.until(assertion);
+		
+		//When
+		getME().getFakePot().setVoltage(2.0);
+		//Then
+		wait.until(assertion);
+		
+		//When
+		getME().getFakePot().setVoltage(3.0);
+		//Then
+		wait.until(assertion);
 	}
 	
 }

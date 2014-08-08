@@ -28,7 +28,7 @@ public abstract class AbstractCANTest extends AbstractComsSetup{
 	public static final double kMotorTimeSettling = 10;
 	public static final double kPotentiometerSettlingTime = 10.0;
 	public static final double kEncoderSettlingTime = 0.50;
-	public static final double kEncoderSpeedTolerance = 30.0;
+	public static final double kEncoderSpeedTolerance = 20.0;
 	public static final double kLimitSettlingTime = 20.0; //timeout in seconds
 	public static final double kStartupTime = 0.50;
 	public static final double kEncoderPositionTolerance = .75;

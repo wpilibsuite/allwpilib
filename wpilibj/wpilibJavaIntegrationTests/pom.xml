@@ -29,11 +29,11 @@
 			<artifactId>hamcrest-all</artifactId>
 			<version>1.3</version>
 		</dependency>
-		<!--dependency>
-		    <groupId>com.googlecode.junit-toolbox</groupId>
-		    <artifactId>junit-toolbox</artifactId>
-		    <version>1.8</version>
-		</dependency-->
+		<dependency>
+			<groupId>com.googlecode.junit-toolbox</groupId>
+			<artifactId>junit-toolbox</artifactId>
+			<version>2.0</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>
@@ -114,12 +114,12 @@
 									<version>1.3</version>
 									<type>jar</type>
 								</artifactItem>
-								<!--artifactItem>
-								    <groupId>com.googlecode.junit-toolbox</groupId>
-								    <artifactId>junit-toolbox</artifactId>
-								    <version>1.8</version>
-								    <type>jar</type>
-								</artifactItem-->
+								<artifactItem>
+									<groupId>com.googlecode.junit-toolbox</groupId>
+									<artifactId>junit-toolbox</artifactId>
+									<version>2.0</version>
+									<type>jar</type>
+								</artifactItem>
 							</artifactItems>
 							<outputDirectory>${project.build.directory}/classes</outputDirectory>
 						</configuration>
