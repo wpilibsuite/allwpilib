@@ -166,6 +166,7 @@ public abstract class RobotBase {
         // Set some implementations so that the static methods work properly
         Timer.SetImplementation(new SimTimer());
         RobotState.SetImplementation(DriverStation.getInstance());
+		HLUsageReporting.SetImplementation(new HLUsageReporting.Null()); // No reporting
 
 		String robotName = "";
 		Enumeration<URL> resources = null;

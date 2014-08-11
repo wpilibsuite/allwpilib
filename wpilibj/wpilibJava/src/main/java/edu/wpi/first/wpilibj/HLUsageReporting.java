@@ -43,4 +43,10 @@ public class HLUsageReporting {
 		void reportPIDController(int num);
 		void reportSmartDashboard();
 	}
+
+    public static class Null implements Interface {
+        public void reportScheduler() {}
+		public void reportPIDController(int num) {}
+		public void reportSmartDashboard() {}
+	}
 }
