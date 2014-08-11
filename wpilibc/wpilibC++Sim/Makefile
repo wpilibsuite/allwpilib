@@ -14,3 +14,4 @@ clean:
 install: all
 	mkdir -p $(DESTDIR)$(lib.dir)
 	install $(build.dir)/libWPILibSim.so $(DESTDIR)$(lib.dir)
+	install $(build.dir)/build/wpilibC++/libWPILib.a $(DESTDIR)$(lib.dir)

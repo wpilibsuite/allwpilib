@@ -10,9 +10,11 @@ SimGyro::SimGyro(std::string topic) {
     velSub = MainNode::Subscribe("~/simulator/"+topic+"/velocity",
                                  &SimGyro::velocityCallback, this);
 
-    commandPub->WaitForConnection();
-    
-    std::cout << "Initialized ~/simulator/"+topic << std::endl;
+    if (commandPub->WaitForConnection(gazebo::common::Time(5.0))) { // Wait up to five seconds.
+		std::cout << "Initialized ~/simulator/" + topic << std::endl;
+	} else {
+		std::cerr << "Failed to initialize ~/simulator/" + topic + ": does the gyro exist?" << std::endl;
+	}
 }
 
 void SimGyro::Reset() {

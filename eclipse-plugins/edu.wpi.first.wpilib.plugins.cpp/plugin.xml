@@ -228,7 +228,7 @@
       <shortcut
             class="edu.wpi.first.wpilib.plugins.cpp.launching.SimulateLaunchShortcut"
             description="Test the WPILib project using the Gazebo simulator."
-            icon="resources/icons/wpi.ico"
+            icon="resources/icons/Gazebo.png"
             id="edu.wpi.first.wpilib.plugins.cpp.launching.simulate"
             label="WPILib C++ Simulation"
             modes="run,debug">

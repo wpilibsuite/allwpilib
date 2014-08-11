@@ -28,6 +28,7 @@
 								<option id="gnu.cpp.compiler.option.optimization.level.549514425" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.debugging.level.1682909384" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 							        <option id="gnu.cpp.compiler.option.include.paths.1597382905" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}/src&quot;"/>
 								  <listOptionValue builtIn="false" value="$cpp-location/include"/>
 							        </option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.963785380" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -38,7 +39,9 @@
 									<listOptionValue builtIn="false" value="$cpp-location/lib"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.1072058280" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" value="WPILib"/>
 									<listOptionValue builtIn="false" value="WPILibAthena"/>
+									<listOptionValue builtIn="false" value="WPILib"/>
 									<listOptionValue builtIn="false" value="HALAthena"/>
 									<listOptionValue builtIn="false" value="NetworkTables"/>
 									<listOptionValue builtIn="false" value="FRC_NetworkCommunication"/>
@@ -167,7 +170,9 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.66697269" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
 							<tool command="g++" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cpp.linker.base.2094820582" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
 								<option id="gnu.cpp.link.option.libs.1563598353" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" value="WPILib"/>
 									<listOptionValue builtIn="false" value="WPILibSim"/>
+									<listOptionValue builtIn="false" value="WPILib"/>
 									<listOptionValue builtIn="false" value="gazebo"/>
 									<listOptionValue builtIn="false" value="gazebo_transport"/>
 									<listOptionValue builtIn="false" value="gazebo_msgs"/>

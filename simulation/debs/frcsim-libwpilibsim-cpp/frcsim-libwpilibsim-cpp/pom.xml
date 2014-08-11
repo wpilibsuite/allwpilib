@@ -24,6 +24,7 @@
                 <mkdir dir="${project.build.directory}/sim-includes/sim/include"/>
                 <copy todir="${project.build.directory}/sim-includes/sim/include">
                   <fileset dir="include"/>
+                  <fileset dir="../wpilibC++/include"/>
                   <fileset dir="../../networktables/cpp/include"/>
                   <fileset dir="../../hal/include"/>
                 </copy>

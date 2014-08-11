@@ -1,3 +1,9 @@
+frcsim-gazebo-models (0.3-1) trusty; urgency=medium
+
+  * Fixed GearsBot gyro
+
+ -- Alex Henning <alex@thoriumrobotics.com>  Tue, 12 Aug 2014 09:32:27 -0400
+
 frcsim-gazebo-models (0.2-1) trusty; urgency=medium
 
   * New models using the smaller plugins

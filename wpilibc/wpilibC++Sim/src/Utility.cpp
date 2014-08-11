@@ -11,6 +11,14 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <iostream>
+#include <sstream>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <execinfo.h>
+#include <cxxabi.h>
+
 static bool stackTraceEnabled = false;
 static bool suspendOnAssertEnabled = false;
 
@@ -160,5 +168,59 @@ bool wpi_assertNotEqual_impl(int valueA,
 uint32_t GetFPGATime()
 {
 	return wpilib::internal::simTime * 1e6;
+}
+
+
+/**
+ * Demangle a C++ symbol, used for printing stack traces.
+ */
+static std::string demangle(char const *mangledSymbol)
+{
+	char buffer[256];
+	size_t length;
+	int status;
+
+	if(sscanf(mangledSymbol, "%*[^(]%*[^_]%255[^)+]", buffer))
+	{
+		char *symbol = abi::__cxa_demangle(buffer, NULL, &length, &status);
+
+		if(status == 0)
+		{
+			return symbol;
+		}
+		else
+		{
+			// If the symbol couldn't be demangled, it's probably a C function,
+			// so just return it as-is.
+			return buffer;
+		}
+	}
+
+	// If everything else failed, just return the mangled symbol
+	return mangledSymbol;
+}
+
+/**
+ * Get a stack trace, ignoring the first "offset" symbols.
+ */
+std::string GetStackTrace(uint32_t offset)
+{
+	void *stackTrace[128];
+	int stackSize = backtrace(stackTrace, 128);
+	char **mangledSymbols = backtrace_symbols(stackTrace, stackSize);
+	std::stringstream trace;
+
+	for(int i = offset; i < stackSize; i++)
+	{
+		// Only print recursive functions once in a row.
+		if(i == 0 ||stackTrace[i] != stackTrace[i - 1])
+		{
+			trace << "\tat " << demangle(mangledSymbols[i]) << std::endl;
+		}
+	}
+
+	free(mangledSymbols);
+
+	return trace.str();
 }
 

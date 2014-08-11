@@ -4,9 +4,9 @@ allwpilib=../..
 package-version = 1
 gazebo-plugins-version = 0.2
 gazebo-plugins-package-version = $(gazebo-plugins-version)-$(package-version)
-gazebo-models-version = 0.2
+gazebo-models-version = 0.3
 gazebo-models-package-version = $(gazebo-models-version)-$(package-version)
-gazebo-models-orig-url = https://usfirst.collab.net/sf/frs/do/downloadFile/projects.wpilib/frs.simulation.frcsim_gazebo_models/frs1052?dl=1
+gazebo-models-orig-url = https://usfirst.collab.net/sf/frs/do/downloadFile/projects.wpilib/frs.simulation.frcsim_gazebo_models/frs1070?dl=1
 eclipse-plugins-version = 0.1
 eclipse-plugins-package-version = $(eclipse-plugins-version)-$(package-version)
 eclipse-toolchain-version = 0.1
