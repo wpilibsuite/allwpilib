@@ -22,6 +22,7 @@
 #include "Interrupts.hpp"
 #include "Errors.hpp"
 #include "PDP.hpp"
+#include "Power.hpp"
 
 #include "Utilities.hpp"
 #include "Semaphore.hpp"
