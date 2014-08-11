@@ -134,6 +134,12 @@
                 </artifactItem>
                 <artifactItem>
 				  <groupId>edu.wpi.first.wpilibj</groupId>
+				  <artifactId>wpilibJava</artifactId>
+				  <version>0.1.0-SNAPSHOT</version>
+				  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+				  <groupId>edu.wpi.first.wpilibj</groupId>
 				  <artifactId>wpilibJavaSim</artifactId>
 				  <version>0.1.0-SNAPSHOT</version>
 				  <type>jar</type>
