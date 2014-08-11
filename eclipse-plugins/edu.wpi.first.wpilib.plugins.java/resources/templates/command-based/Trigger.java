@@ -1,6 +1,6 @@
 package $package;
 
-import edu.wpi.first.wpilibj.command.Trigger;
+import edu.wpi.first.wpilibj.buttons.Trigger;
 
 /**
  *
