@@ -41,7 +41,6 @@
 									<listOptionValue builtIn="false" value="WPILibAthena"/>
 									<listOptionValue builtIn="false" value="HALAthena"/>
 									<listOptionValue builtIn="false" value="NetworkTables"/>
-									<listOptionValue builtIn="false" value="FRC_FPGA_ChipObject"/>
 									<listOptionValue builtIn="false" value="FRC_NetworkCommunication"/>
 									<listOptionValue builtIn="false" value="i2c"/>
 									<listOptionValue builtIn="false" value="ni_emb"/>
