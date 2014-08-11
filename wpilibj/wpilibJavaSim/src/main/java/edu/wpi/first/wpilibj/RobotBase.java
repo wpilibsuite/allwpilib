@@ -153,10 +153,6 @@ public abstract class RobotBase {
      */
     public static void main(String args[]) { // TODO: expose main to teams?
         boolean errorOnExit = false;
-        
-        // Set some implementations so that the static methods work properly
-        Timer.SetImplementation(new SimTimer());
-        RobotState.SetImplementation(DriverStation.getInstance());
 
         try {
             MainNode.openGazeboConnection();
@@ -166,6 +162,10 @@ public abstract class RobotBase {
             System.exit(1);
             return;
         }
+        
+        // Set some implementations so that the static methods work properly
+        Timer.SetImplementation(new SimTimer());
+        RobotState.SetImplementation(DriverStation.getInstance());
 
 		String robotName = "";
 		Enumeration<URL> resources = null;
