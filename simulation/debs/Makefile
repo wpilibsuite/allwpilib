@@ -122,7 +122,7 @@ pull-libwpilibsim-cpp:
 
 download-models:
 	cd frcsim-gazebo-models && \
-	    wget $(gazebo-models-orig-url) -O frcsim-gazebo-models_${gazebo-models-version}.orig.tar.gz && \
+	    wget --no-check-certificate $(gazebo-models-orig-url) -O frcsim-gazebo-models_${gazebo-models-version}.orig.tar.gz && \
 	    tar xvf frcsim-gazebo-models_${gazebo-models-version}.orig.tar.gz
 
 install:
