@@ -8,13 +8,6 @@ import edu.wpi.first.wpilib.plugins.core.wizards.ProjectType;
 import edu.wpi.first.wpilib.plugins.cpp.WPILibCPPPlugin;
 
 public class CPPProjectType implements ProjectType {
-	static ProjectType SIMPLE = new CPPProjectType() {
-		@Override public Map<String, String> getFiles(String packageName) {
-			Map<String, String> files = super.getFiles(packageName);
-			files.put("src/Robot.cpp", "simple/Robot.cpp");
-			return files;
-		}
-	};
 	static ProjectType ITERATIVE = new CPPProjectType() {
 		@Override public Map<String, String> getFiles(String packageName) {
 			Map<String, String> files = super.getFiles(packageName);
@@ -47,7 +40,6 @@ public class CPPProjectType implements ProjectType {
 	};
 	@SuppressWarnings("serial")
 	static Map<String, ProjectType> TYPES = new HashMap<String, ProjectType>() {{
-		put(ProjectType.SIMPLE, SIMPLE);
 		put(ProjectType.ITERATIVE, ITERATIVE);
 		put(ProjectType.COMMAND_BASED, COMMAND_BASED);
 	}};
