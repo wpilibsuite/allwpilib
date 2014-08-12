@@ -92,7 +92,7 @@
                 </artifactItem>
                 <artifactItem>
 				  <groupId>edu.wpi.first.wpilibj</groupId>
-				  <artifactId>wpilibJavaDevices</artifactId>
+				  <artifactId>wpilibJavaFinal</artifactId>
 				  <version>0.1.0-SNAPSHOT</version>
 				  <classifier>sources</classifier>
 				  <outputDirectory>${java-zip}/lib</outputDirectory>
@@ -103,6 +103,13 @@
                 <artifactItem>
 				  <groupId>edu.wpi.first.wpilibj</groupId>
 				  <artifactId>wpilibJavaDevices</artifactId>
+				  <version>0.1.0-SNAPSHOT</version>
+				  <type>javadoc</type>
+				  <outputDirectory>${java-zip}/javadoc-jar</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+				  <groupId>edu.wpi.first.wpilibj</groupId>
+				  <artifactId>wpilibJava</artifactId>
 				  <version>0.1.0-SNAPSHOT</version>
 				  <type>javadoc</type>
 				  <outputDirectory>${java-zip}/javadoc-jar</outputDirectory>
@@ -329,6 +336,12 @@
 			  <version>0.1.0-SNAPSHOT</version>
 			  <type>jar</type>
 	</dependency>
+	<dependency>
+			  <groupId>edu.wpi.first.wpilibj</groupId>
+			  <artifactId>wpilibJavaFinal</artifactId>
+			  <version>0.1.0-SNAPSHOT</version>
+			  <classifier>sources</classifier>
+	</dependency>
 	<!-- dependency>
 			  <groupId>net.java.dev.jna</groupId>
 			  <artifactId>jna</artifactId>
@@ -361,6 +374,12 @@
 	</dependency>
 
 	<!-- Javadoc -->
+	<dependency>
+			  <groupId>edu.wpi.first.wpilibj</groupId>
+			  <artifactId>wpilibJava</artifactId>
+			  <version>0.1.0-SNAPSHOT</version>
+			  <type>javadoc</type>
+	</dependency>
 	<dependency>
 			  <groupId>edu.wpi.first.wpilibj</groupId>
 			  <artifactId>wpilibJavaDevices</artifactId>
