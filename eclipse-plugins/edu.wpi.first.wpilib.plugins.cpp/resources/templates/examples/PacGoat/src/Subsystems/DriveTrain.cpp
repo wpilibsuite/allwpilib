@@ -43,8 +43,6 @@ DriveTrain::DriveTrain() :
 		leftEncoder->SetDistancePerPulse((4.0/*in*/*M_PI)/(360.0*12.0/*in/ft*/));
 	#endif
 
-	rightEncoder->Start();
-	leftEncoder->Start();
 	LiveWindow::GetInstance()->AddSensor("DriveTrain", "Right Encoder", rightEncoder);
 	LiveWindow::GetInstance()->AddSensor("DriveTrain", "Left Encoder", leftEncoder);
 

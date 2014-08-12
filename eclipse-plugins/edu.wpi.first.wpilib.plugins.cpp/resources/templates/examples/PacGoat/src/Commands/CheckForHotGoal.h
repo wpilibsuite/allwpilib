@@ -9,7 +9,7 @@
  * points than get none. When called sequentially, this command will block until
  * the hot goal is detected or until it is timed out.
  */
-class CheckForHotGoal : Command {
+class CheckForHotGoal : public Command {
 public:
 	CheckForHotGoal(double time);
 	void Initialize();
