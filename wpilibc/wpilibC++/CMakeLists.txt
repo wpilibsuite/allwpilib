@@ -6,7 +6,7 @@ include_directories(include/ ${NWT_API_INCLUDES} ${HAL_API_INCLUDES})
 add_library(WPILib STATIC ${SRC_FILES})
 set(CMAKE_CXX_FLAGS "-fPIC")
 target_link_libraries(WPILib)
-INSTALL(TARGETS WPILib ARCHIVE DESTINATION src COMPONENT src)
+INSTALL(TARGETS WPILib ARCHIVE DESTINATION lib COMPONENT lib)
 INSTALL(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT headers)
 # lib/ c m gcc_s ld-linux
 # usr/lib stdc++
