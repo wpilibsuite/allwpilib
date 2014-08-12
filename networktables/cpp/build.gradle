@@ -1,0 +1,19 @@
+apply plugin: 'cpp'
+
+libraries {
+  main {}
+}
+
+sources {
+  main {
+    cpp {
+      source {
+        srcDirs = ["lib/share", "lib/Athena"]
+        // includes = "**/*.cpp"
+      }
+      exportedHeaders {
+        srcDirs = ["include"]
+      }
+    }
+  }
+}
