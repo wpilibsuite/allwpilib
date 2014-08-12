@@ -1,4 +1,5 @@
 allwpilib=../..
+version=DEVELOPMENT
 
 all: java cpp site
 
@@ -8,7 +9,7 @@ java:
 	cp -r $(allwpilib)/wpilibj/wpilibJava/src/main/java/* build/java/
 	cp -r $(allwpilib)/wpilibj/wpilibJavaDevices/src/main/java/* build/java/
 	# cp -r $(allwpilib)/networktables/java/src/main/java/* build/java/
-	doxygen java.doxy
+	( cat java.doxy ; echo "PROJECT_NUMBER=${version}" ) | doxygen -
 
 cpp:
 	mkdir -p build/cpp/
@@ -19,7 +20,7 @@ cpp:
 	cp -r $(allwpilib)/wpilibc/wpilibC++Devices/include build/cpp/
 	# cp -r $(allwpilib)/networktables/cpp/lib build/cpp/
 	# cp -r $(allwpilib)/networktables/cpp/include build/cpp/
-	doxygen cpp.doxy
+	( cat cpp.doxy ; echo "PROJECT_NUMBER=${version}" ) | doxygen -
 
 # TODO: HAL
 
