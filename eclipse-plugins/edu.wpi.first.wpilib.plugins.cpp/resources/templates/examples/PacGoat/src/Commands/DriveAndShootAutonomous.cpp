@@ -6,6 +6,7 @@
 #include "Commands/SetPivotSetpoint.h"
 #include "Commands/DriveForward.h"
 #include "Commands/Shoot.h"
+#include "Commands/CheckForHotGoal.h"
 
 DriveAndShootAutonomous::DriveAndShootAutonomous() {
     AddSequential(new CloseClaw());

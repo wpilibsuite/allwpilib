@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <examples>
+  <!-- TODO add back in when there are enough samples to justify tags
   <tagDescription>
     <name>Simple Robot</name>
     <description>Examples for simple robot programs.</description>
@@ -11,46 +12,13 @@
     dashboards and co-processors.</description>
   </tagDescription>
   <tagDescription>
+    <name>Simulation</name>
+    <description>Examples that can be run in simulation.</description>
+  </tagDescription>-->
+  <tagDescription>
     <name>CommandBased Robot</name>
     <description>Examples for CommandBased robot programs.</description>
   </tagDescription>
-  <tagDescription>
-    <name>Simulation</name>
-    <description>Examples that can be run in simulation.</description>
-  </tagDescription>
-  
-  <example>
-    <name>Simple Robot Example</name>
-    <description>The simplest possible program that compiles. This
-    shows the structure of a simple program that does nothing at
-    all.</description>
-    <tags>
-      <tag>Simple Robot</tag>
-    </tags>
-    <packages>
-      <package>src</package>
-    </packages>
-    <files>
-      <file source="examples/Simple Robot Example/Robot.java" destination="src/Robot.cpp" />
-    </files>
-  </example>
-  
-  <example>
-    <name>Network Table Counter</name>
-    <description>A simple program that increments a network table
-    variable once every second. This shows the structure of a simple
-    program that only uses network tables.</description>
-    <tags>
-      <tag>Simple Robot</tag>
-      <tag>Network Tables</tag>
-    </tags>
-    <packages>
-      <package>src</package>
-    </packages>
-    <files>
-      <file source="examples/Network Table Counter/Robot.cpp" destination="src/Robot.cpp" />
-    </files>
-  </example>
 
   <example>
     <name>GearsBot</name>
@@ -59,7 +27,6 @@
     supports simulation.</description>
     <tags>
       <tag>CommandBased Robot</tag>
-      <tag>Simulation</tag>
     </tags>
     <packages>
       <package>src</package>
@@ -137,14 +104,12 @@
             destination="src/Subsystems/Wrist.h"></file>
     </files>
   </example>
-  
+
   <example>
     <name>PacGoat</name>
     <description>A fully functional example CommandBased program for FRC Team 190&#39;s 2014 robot. This code can run on your computer if it supports simulation.</description>
     <tags>
       <tag>CommandBased Robot</tag>
-      <tag>Simulation</tag>
-      <tag>2014 Season</tag>
     </tags>
     <packages>
       <package>src</package>

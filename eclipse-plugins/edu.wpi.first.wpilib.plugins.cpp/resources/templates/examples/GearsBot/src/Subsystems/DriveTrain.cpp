@@ -26,9 +26,6 @@ DriveTrain::DriveTrain() : Subsystem("DriveTrain") {
 		right_encoder->SetDistancePerPulse((double) (4.0/12.0*M_PI) / 360.0);
 	#endif
 
-	left_encoder->Start();
-	right_encoder->Start();
-
 	rangefinder = new AnalogInput(6);
 	gyro = new Gyro(1);
 
