@@ -5,6 +5,7 @@
 #include "Commands/Command.h"
 #include "Subsystems/ExampleSubsystem.h"
 #include "OI.h"
+#include "WPILib.h"
 
 /**
  * The base for all commands. All atomic commands should subclass CommandBase.

@@ -2,6 +2,7 @@
 #define $classname_H
 
 #include "../CommandBase.h"
+#include "WPILib.h"
 
 class $classname: public CommandBase
 {
