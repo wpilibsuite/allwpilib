@@ -40,6 +40,7 @@
 								</option>
 								<option id="gnu.cpp.link.option.libs.1072058280" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="WPILibAthena"/>
+									<listOptionValue builtIn="false" value="WPILib"/>
 									<listOptionValue builtIn="false" value="HALAthena"/>
 									<listOptionValue builtIn="false" value="NetworkTables"/>
 									<listOptionValue builtIn="false" value="FRC_NetworkCommunication"/>
