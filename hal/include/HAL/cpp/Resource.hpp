@@ -6,12 +6,8 @@
 #pragma once
 
 #include "../Errors.hpp"
-#ifdef __vxworks
-#include <vxWorks.h>
-#else
-#include <stdint.h>
-#endif
 #include "HAL/cpp/priority_mutex.h"
+#include <stdint.h>
 
 /**
  * The Resource class is a convenient way to track allocated resources.

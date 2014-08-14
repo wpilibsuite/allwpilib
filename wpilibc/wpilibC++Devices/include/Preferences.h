@@ -73,15 +73,6 @@ class Preferences : public ErrorBase, public ITableListener {
   void ReadTaskRun();
   void WriteTaskRun();
 
-  static int InitReadTask(Preferences *obj) {
-    obj->ReadTaskRun();
-    return 0;
-  }
-  static int InitWriteTask(Preferences *obj) {
-    obj->WriteTaskRun();
-    return 0;
-  }
-
   /** The semaphore for accessing the file */
   priority_recursive_mutex m_fileLock;
   /** The semaphore for beginning reads and writes to the file */

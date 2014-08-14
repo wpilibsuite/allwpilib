@@ -10,11 +10,8 @@
 #define NT_CRITICAL_REGION(s) { NTSynchronized _sync(s);
 #define NT_END_REGION }
 
-#if (defined __vxworks || defined WIN32)
+#if defined WIN32
 
-#ifdef __vxworks
-#include <vxWorks.h>
-#endif
 #include <semLib.h>
 
 class NTReentrantSemaphore
@@ -62,7 +59,7 @@ private:
 	pthread_mutexattr_t mta;
 	pthread_mutex_t m_semaphore;
 };
-#endif // __vxworks
+#endif // WIN32
 
 /**
  * Provide easy support for critical regions.
@@ -79,12 +76,12 @@ class NTSynchronized
 public:
 	explicit NTSynchronized(NTReentrantSemaphore&);
 	//TODO remove vxworks SEM_ID support
-#if (defined __vxworks || defined WIN32)
+#if defined WIN32
 	explicit NTSynchronized(SEM_ID);
 #endif
 	virtual ~NTSynchronized();
 private:
-#if (defined __vxworks || defined WIN32)
+#if defined WIN32
 	bool usingSem;
 	NTReentrantSemaphore* m_sem;
 	SEM_ID m_semaphore;

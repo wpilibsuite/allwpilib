@@ -13,6 +13,7 @@
 #include "HAL/cpp/priority_mutex.h"
 #include "HAL/cpp/priority_condition_variable.h"
 #include <condition_variable>
+#include <atomic>
 
 struct HALControlWord;
 class AnalogInput;
@@ -92,7 +93,6 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   void GetData();
 
  private:
-  static void InitTask(DriverStation *ds);
   static DriverStation *m_instance;
   void ReportJoystickUnpluggedError(std::string message);
   void Run();
@@ -102,7 +102,8 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   HALJoystickButtons m_joystickButtons[kJoystickPorts];
   HALJoystickDescriptor m_joystickDescriptor[kJoystickPorts];
 #ifndef FRC_SIMULATOR
-  Task m_task{"DriverStation", (FUNCPTR)DriverStation::InitTask};
+  Task m_task;
+  std::atomic<bool> m_isRunning{false};
 #endif
   mutable Semaphore m_newControlData{Semaphore::kEmpty};
   mutable priority_condition_variable m_packetDataAvailableCond;

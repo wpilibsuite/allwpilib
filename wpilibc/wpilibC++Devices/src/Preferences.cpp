@@ -24,11 +24,9 @@ static const char *kValuePrefix = "=\"";
 /** The characters to put after the value */
 static const char *kValueSuffix = "\"\n";
 
-Preferences::Preferences()
-    : m_readTask("PreferencesReadTask", (FUNCPTR)Preferences::InitReadTask),
-      m_writeTask("PreferencesWriteTask", (FUNCPTR)Preferences::InitWriteTask) {
+Preferences::Preferences() {
   std::unique_lock<priority_recursive_mutex> sync(m_fileLock);
-  m_readTask.Start((uint32_t) this);
+  m_readTask = Task("PreferencesReadTask", &Preferences::ReadTaskRun, this);
 
   /* The main thread initially blocks on the semaphore. The read task signals
    * the main thread to continue after it has locked the table mutex (so the
@@ -293,7 +291,7 @@ void Preferences::PutLong(const char *key, int64_t value) {
  */
 void Preferences::Save() {
   std::unique_lock<priority_recursive_mutex> sync(m_fileLock);
-  m_writeTask.Start((uint32_t) this);
+  m_writeTask = Task("PreferencesWriteTask", &Preferences::WriteTaskRun, this);
   m_fileOpStarted.take();
 }
 

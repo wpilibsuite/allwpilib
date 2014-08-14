@@ -10,6 +10,7 @@
 #include "Task.h"
 #include "PIDSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
+#include <atomic>
 
 #include "HAL/cpp/priority_mutex.h"
 
@@ -74,14 +75,14 @@ class Ultrasonic : public SensorBase,
   static constexpr double kPingTime =
       10 * 1e-6;  ///< Time (sec) for the ping trigger pulse.
   static const uint32_t kPriority =
-      90;  ///< Priority that the ultrasonic round robin task runs.
+      64;  ///< Priority that the ultrasonic round robin task runs.
   static constexpr double kMaxUltrasonicTime =
       0.1;  ///< Max time (ms) between readings.
   static constexpr double kSpeedOfSoundInchesPerSec = 1130.0 * 12.0;
 
   static Task m_task;  // task doing the round-robin automatic sensing
   static Ultrasonic *m_firstSensor;  // head of the ultrasonic sensor list
-  static bool m_automaticEnabled;    // automatic round robin mode
+  static std::atomic<bool> m_automaticEnabled; // automatic round robin mode
   static priority_mutex m_mutex;  // synchronize access to the list of sensors
 
   DigitalInput *m_echoChannel;

@@ -33,9 +33,6 @@ class Error {
   void Set(Code code, const char* contextMessage, const char* filename,
            const char* function, uint32_t lineNumber,
            const ErrorBase* originatingObject);
-  static void EnableSuspendOnError(bool enable) {
-    m_suspendOnErrorEnabled = enable;
-  }
 
  private:
   void Report();
@@ -48,6 +45,5 @@ class Error {
   const ErrorBase* m_originatingObject = nullptr;
   double m_timestamp = 0.0;
 
-  static bool m_suspendOnErrorEnabled;
   DISALLOW_COPY_AND_ASSIGN(Error);
 };

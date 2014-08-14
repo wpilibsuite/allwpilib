@@ -8,6 +8,9 @@
 
 #include "ErrorBase.h"
 #include "HAL/Task.hpp"
+#include <iostream>
+#include <string>
+#include <thread>
 
 /**
  * WPI task is a wrapper for the native Task object.
@@ -15,38 +18,40 @@
  **/
 class Task : public ErrorBase {
  public:
-  static const uint32_t kDefaultPriority = 101;
+  static const uint32_t kDefaultPriority = 60;
 
-  Task(const char* name, FUNCPTR function, int32_t priority = kDefaultPriority,
-       uint32_t stackSize = 20000);
+  Task() = default;
+  Task(const Task&) = delete;
+  Task& operator=(const Task&) = delete;
+  Task& operator=(Task&& task);
+
+  template <class Function, class... Args>
+  Task(const char* name, Function&& function, Args&&... args);
+
   virtual ~Task();
 
-  bool Start(uint32_t arg0 = 0, uint32_t arg1 = 0, uint32_t arg2 = 0,
-             uint32_t arg3 = 0, uint32_t arg4 = 0, uint32_t arg5 = 0,
-             uint32_t arg6 = 0, uint32_t arg7 = 0, uint32_t arg8 = 0,
-             uint32_t arg9 = 0);
-  bool Restart();
-  bool Stop();
+  bool joinable() const noexcept;
+  void join();
+  void detach();
+  std::thread::id get_id() const noexcept;
+  std::thread::native_handle_type native_handle();
 
-  bool IsReady() const;
-  bool IsSuspended() const;
-
-  bool Suspend();
-  bool Resume();
-
-  bool Verify() const;
+  bool Verify();
 
   int32_t GetPriority();
+
+  /**
+   * @param priority The priority at which the internal thread should run.
+   *                 Must be within range 1 to 99 inclusive for pthreads.
+   */
   bool SetPriority(int32_t priority);
-  const char* GetName() const;
-  TASK GetID() const;
+
+  std::string GetName() const;
 
  private:
-  FUNCPTR m_function;
-  char* m_taskName;
-  TASK m_taskID = NULL_TASK;
-  uint32_t m_stackSize;
-  int m_priority;
+  std::thread m_thread;
+  std::string m_taskName;
   bool HandleError(STATUS results);
-  DISALLOW_COPY_AND_ASSIGN(Task);
 };
+
+#include "Task.inc"

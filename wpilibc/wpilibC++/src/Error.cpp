@@ -16,7 +16,6 @@
 #include "DriverStation.h"
 #include "Timer.h"
 #include "Utility.h"
-bool Error::m_suspendOnErrorEnabled = false;
 
 Error::Error() {}
 

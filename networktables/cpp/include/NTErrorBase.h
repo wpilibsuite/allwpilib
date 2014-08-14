@@ -7,11 +7,8 @@
 #ifndef _ERROR_BASE_H
 #define _ERROR_BASE_H
 
-#if (defined __vxworks || defined WIN32)
+#if defined WIN32
 #include <semLib.h>
-#ifdef __vxworks
-#include <vxWorks.h>
-#endif
 
 #define DISALLOW_COPY_AND_ASSIGN(ErrorBase) 
 
@@ -44,4 +41,4 @@ public:
 };
 
 #endif
-#endif // __vxworks
+#endif // WIN32

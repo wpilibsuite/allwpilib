@@ -1,22 +1,12 @@
 #pragma once
 
-#ifdef __vxworks
-#include <vxWorks.h>
-#else
 #include <stdint.h>
 #include <pthread.h>
 #include <semaphore.h>
-#endif
 
-#ifdef __vxworks
-typedef SEM_ID MUTEX_ID;
-typedef SEM_ID SEMAPHORE_ID;
-typedef SEM_ID MULTIWAIT_ID;
-#else
 typedef pthread_mutex_t* MUTEX_ID;
 typedef sem_t* SEMAPHORE_ID;
 typedef pthread_cond_t* MULTIWAIT_ID;
-#endif
 
 extern "C"
 {

@@ -19,13 +19,6 @@
 #include "HAL/HAL.hpp"
 #include <cstdio>
 
-#ifdef __vxworks
-// VXWorks needs som special unloading code
-#include <moduleLib.h>
-#include <unldLib.h>
-#include <taskLib.h>
-#endif
-
 RobotBase *RobotBase::m_instance = nullptr;
 
 void RobotBase::setInstance(RobotBase *robot) {

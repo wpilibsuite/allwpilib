@@ -22,14 +22,9 @@
 #define EXPORT_FUNC __declspec(dllexport) __cdecl
 #endif
 #else
-#if defined(__vxworks)
-#include <vxWorks.h>
-#define EXPORT_FUNC
-#else
 #include <stdint.h>
 #include <pthread.h>
 #define EXPORT_FUNC
-#endif
 #endif
 
 #define ERR_FRCSystem_NetCommNotResponding -44049
@@ -52,7 +47,6 @@ enum MatchType_t {
 };
 
 struct ControlWord_t {
-#ifndef __vxworks
 	uint32_t enabled : 1;
 	uint32_t autonomous : 1;
 	uint32_t test :1;
@@ -60,15 +54,6 @@ struct ControlWord_t {
 	uint32_t fmsAttached:1;
 	uint32_t dsAttached:1;
 	uint32_t control_reserved : 26;
-#else
-	uint32_t control_reserved : 26;
-	uint32_t dsAttached:1;
-	uint32_t fmsAttached:1;
-	uint32_t eStop : 1;
-	uint32_t test :1;
-	uint32_t autonomous : 1;
-	uint32_t enabled : 1;
-#endif
 };
 
 struct JoystickAxes_t {
@@ -96,11 +81,7 @@ extern "C" {
 #ifdef SIMULATION
 	void EXPORT_FUNC setNewDataSem(HANDLE);
 #else
-# if defined (__vxworks)
-	void EXPORT_FUNC setNewDataSem(SEM_ID);
-# else
 	void EXPORT_FUNC setNewDataSem(pthread_cond_t *);
-# endif
 #endif
 
 	// this uint32_t is really a LVRefNum

@@ -3,11 +3,7 @@
  * Methods for interacting with a compressor with the CAN PCM device
  */
 
-#ifdef __vxworks
-#include <vxWorks.h>
-#else
 #include <stdint.h>
-#endif
 
 #ifndef __HAL_COMPRESSOR_H__
 #define __HAL_COMPRESSOR_H__

@@ -50,28 +50,21 @@ DriverStation::DriverStation() {
 
   AddToSingletonList();
 
-  // They need to be identical or it could lead to runtime stack corruption if
-  // the caller and callee push and pop different amounts of data on the stack.
-  static_assert(sizeof(this) == sizeof(uint32_t),
-                "We are passing a pointer through a uint32_t");
-  if (!m_task.Start((uint32_t) this)) {
-    wpi_setWPIError(DriverStationTaskError);
-  }
+  m_task = Task("DriverStation", &DriverStation::Run, this);
 }
 
 DriverStation::~DriverStation() {
-  m_task.Stop();
+  m_isRunning = false;
+  m_task.join();
+
   // Unregister our semaphore.
   HALSetNewDataSem(nullptr);
 }
 
-// XXX: This assumes that the calling convention treats pointers and uint32_ts
-// identical, which is not necessarily true.
-void DriverStation::InitTask(DriverStation* ds) { ds->Run(); }
-
 void DriverStation::Run() {
+  m_isRunning = true;
   int period = 0;
-  while (true) {
+  while (m_isRunning) {
     {
       std::unique_lock<priority_mutex> lock(m_packetDataAvailableMutex);
       m_packetDataAvailableCond.wait(lock);

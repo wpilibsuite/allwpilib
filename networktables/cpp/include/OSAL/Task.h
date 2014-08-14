@@ -7,12 +7,9 @@
 #ifndef __NTTASK_H__
 #define __NTTASK_H__
 
-#if (defined __vxworks || defined WIN32)
+#if defined WIN32
 
 #include "NTErrorBase.h"
-#ifdef __vxworks
-#include <vxWorks.h>
-#endif
 
 /**
  * WPI task is a wrapper for the native Task object.
@@ -72,5 +69,5 @@ private:
 	DISALLOW_COPY_AND_ASSIGN(NTTask);
 };
 
-#endif // __vxworks
+#endif // WIN32
 #endif // __TASK_H__

@@ -8,11 +8,7 @@
 #ifndef __CANSessionMux_h__
 #define __CANSessionMux_h__
 
-#if defined(__vxworks)
-#include <vxWorks.h>
-#else
 #include <stdint.h>
-#endif
 
 #define CAN_SEND_PERIOD_NO_REPEAT 0
 #define CAN_SEND_PERIOD_STOP_REPEATING -1

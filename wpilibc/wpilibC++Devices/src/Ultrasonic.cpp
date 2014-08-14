@@ -23,13 +23,10 @@ const uint32_t Ultrasonic::kPriority;  ///< Priority that the ultrasonic round
 constexpr double
     Ultrasonic::kMaxUltrasonicTime;  ///< Max time (ms) between readings.
 constexpr double Ultrasonic::kSpeedOfSoundInchesPerSec;
-Task Ultrasonic::m_task(
-    "UltrasonicChecker",
-    (FUNCPTR)
-        UltrasonicChecker);  // task doing the round-robin automatic sensing
 Ultrasonic *Ultrasonic::m_firstSensor =
     nullptr;  // head of the ultrasonic sensor list
-bool Ultrasonic::m_automaticEnabled = false;  // automatic round robin mode
+Task Ultrasonic::m_task;
+std::atomic<bool> Ultrasonic::m_automaticEnabled{false}; // automatic round robin mode
 priority_mutex Ultrasonic::m_mutex;
 
 /**
@@ -214,7 +211,12 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
     // Start round robin task
     wpi_assert(m_task.Verify() ==
                false);  // should be false since was previously disabled
-    m_task.Start();
+    m_task = Task("UltrasonicChecker", &Ultrasonic::UltrasonicChecker);
+
+    // TODO: Currently, lvuser does not have permissions to set task priorities.
+    // Until that is the case, uncommenting this will break user code that calls
+    // Ultrasonic::SetAutomicMode().
+    //m_task.SetPriority(kPriority);
   } else {
     // disabling automatic mode. Wait for background task to stop running.
     while (m_task.Verify())
@@ -225,7 +227,8 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
     for (Ultrasonic *u = m_firstSensor; u != nullptr; u = u->m_nextSensor) {
       u->m_counter->Reset();
     }
-    m_task.Stop();
+    m_automaticEnabled = false;
+    m_task.join();
   }
 }
 

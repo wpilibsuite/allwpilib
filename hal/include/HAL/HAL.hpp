@@ -5,11 +5,7 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-#ifdef __vxworks
-#include <vxWorks.h>
-#else
 #include <stdint.h>
-#endif
 #include <cmath>
 
 #include "Accelerometer.hpp"

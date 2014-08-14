@@ -19,19 +19,6 @@
 #include <cxxabi.h>
 #include "nivision.h"
 
-static bool suspendOnAssertEnabled = false;
-
-/**
- * Enable suspend on assert.
- * If enabled, the user task will be suspended whenever an assert fails. This
- * will allow the user to attach to the task with the debugger and examine
- * variables
- * around the failure.
- */
-void wpi_suspendOnAssertEnabled(bool enabled) {
-  suspendOnAssertEnabled = enabled;
-}
-
 /**
  * Assert implementation.
  * This allows breakpoints to be set on an assert.
@@ -61,8 +48,6 @@ bool wpi_assert_impl(bool conditionValue, const char *conditionText,
     // Print the error and send it to the DriverStation
     std::cout << error << std::endl;
     HALSetErrorData(error.c_str(), error.size(), 100);
-
-    if (suspendOnAssertEnabled) suspendTask(nullptr);
   }
 
   return conditionValue;
@@ -98,8 +83,6 @@ void wpi_assertEqual_common_impl(const char *valueA, const char *valueB,
   // Print the error and send it to the DriverStation
   std::cout << error << std::endl;
   HALSetErrorData(error.c_str(), error.size(), 100);
-
-  if (suspendOnAssertEnabled) suspendTask(nullptr);
 }
 
 /**

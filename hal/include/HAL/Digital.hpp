@@ -1,9 +1,5 @@
 #pragma once
-#ifdef __vxworks
-#include <vxWorks.h>
-#else
 #include <stdint.h>
-#endif
 
 #include "HAL/cpp/priority_mutex.h"
 
