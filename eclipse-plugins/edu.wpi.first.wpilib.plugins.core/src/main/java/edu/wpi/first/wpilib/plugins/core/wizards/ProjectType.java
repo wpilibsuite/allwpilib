@@ -4,7 +4,7 @@ import java.net.URL;
 import java.util.Map;
 
 public interface ProjectType {
-	String SIMPLE = "SIMPLE";
+	String SAMPLE = "SAMPLE";
 	String ITERATIVE = "ITERATIVE";
 	String COMMAND_BASED = "COMMAND_BASED";
 	

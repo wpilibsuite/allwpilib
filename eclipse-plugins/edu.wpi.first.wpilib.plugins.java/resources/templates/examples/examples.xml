@@ -16,6 +16,25 @@
     <description>Examples that can be run in simulation.</description>
   </tagDescription>-->
   <tagDescription>
+	<name>Getting Started with Java</name>
+	<description>Examples for getting started with FRC Java</description>
+  </tagDescription>
+  <example>
+	<name>Getting Started</name>
+	<description>An example program which demonstrates the simplest autonomous and
+	teleoperated routines.</description>
+	<tags>
+	  <tag>Getting Started with Java</tag>
+	</tags>
+	<packages>
+	  <package>src/$package-dir</package>
+	</packages>
+	<files>
+	  <file source="examples/GettingStarted/src/org/usfirst/frc/team190/robot/Robot.java"
+			destination="src/$package-dir/Robot.java"></file>
+	</files>
+  </example>
+  <tagDescription>
     <name>CommandBased Robot</name>
     <description>Examples for CommandBased robot programs.</description>
   </tagDescription>

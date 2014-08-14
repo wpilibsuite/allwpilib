@@ -3,6 +3,9 @@ package $package;
 
 
 import edu.wpi.first.wpilibj.SampleRobot;
+import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Timer;
 
 /**
  * This is a demo program showing the use of the RobotDrive class.

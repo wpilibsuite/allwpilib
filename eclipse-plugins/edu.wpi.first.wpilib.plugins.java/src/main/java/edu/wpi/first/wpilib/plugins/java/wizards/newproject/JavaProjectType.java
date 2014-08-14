@@ -8,10 +8,10 @@ import edu.wpi.first.wpilib.plugins.core.wizards.ProjectType;
 import edu.wpi.first.wpilib.plugins.java.WPILibJavaPlugin;
 
 public class JavaProjectType implements ProjectType {
-	static ProjectType SIMPLE = new JavaProjectType() {
+	static ProjectType SAMPLE = new JavaProjectType() {
 		@Override public Map<String, String> getFiles(String packageName) {
 			Map<String, String> files = super.getFiles(packageName);
-			files.put("src/"+packageName.replace(".", "/")+"/Robot.java", "simple/Robot.java");
+			files.put("src/"+packageName.replace(".", "/")+"/Robot.java", "sample/Robot.java");
 			return files;
 		}
 	};
@@ -40,7 +40,7 @@ public class JavaProjectType implements ProjectType {
 	};
 	@SuppressWarnings("serial")
 	static Map<String, ProjectType> TYPES = new HashMap<String, ProjectType>() {{
-		put(ProjectType.SIMPLE, SIMPLE);
+		put(ProjectType.SAMPLE, SAMPLE);
 		put(ProjectType.ITERATIVE, ITERATIVE);
 		put(ProjectType.COMMAND_BASED, COMMAND_BASED);
 	}};

@@ -16,6 +16,26 @@
     <description>Examples that can be run in simulation.</description>
   </tagDescription>-->
   <tagDescription>
+	<name>Getting Started with C++</name>
+	<description>Examples for getting started with FRC C++</description>
+  </tagDescription>
+  <example>
+	<name>Getting Started</name>
+	<description>An example program which demonstrates the simplest autonomous and
+	teleoperated routines.</description>
+	<tags>
+	  <tag>Getting Started with C++</tag>
+	</tags>
+	<packages>
+	  <package>src</package>
+	</packages>
+	<files>
+	  <file source="examples/GettingStarted/src/Robot.cpp"
+			destination="src/Robot.cpp"></file>
+	</files>
+  </example>
+	
+  <tagDescription>
     <name>CommandBased Robot</name>
     <description>Examples for CommandBased robot programs.</description>
   </tagDescription>
