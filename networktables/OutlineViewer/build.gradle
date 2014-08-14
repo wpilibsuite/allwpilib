@@ -1,0 +1,24 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+group = "edu.wpi.frc.wpilib"
+version = "2.0"
+
+sourceCompatibility = 1.7
+
+sourceSets {
+	main {
+	     java {
+	     	  srcDirs = ["src"]
+	     }
+	}
+}
+
+repositories {
+       mavenCentral()
+       mavenLocal()
+}
+
+dependencies {
+	     compile project(":java")
+}
