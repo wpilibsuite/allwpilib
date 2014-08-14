@@ -104,15 +104,15 @@ function install-frcsim {
     fi
 
     # Add FRCSim Repository and Key
-    if ! echo "deb http://users.wpi.edu/~adhenning/frcsim `lsb_release -cs` main" > /etc/apt/sources.list.d/frcsim-latest.list
+    if ! echo "deb http://first.wpi.edu/FRC/roborio/release/linux `lsb_release -cs` main" > /etc/apt/sources.list.d/frcsim-latest.list
     then
         echo "*** Cannot add FRCSim repository!" 1>&2
         install-fail
     fi
-    if ! (wget users.wpi.edu/~adhenning/frcsim.key -O - | apt-key add -)
+    if ! (wget first.wpi.edu/FRC/roborio/wpilib.gpg.key -O - | apt-key add -)
     then
         echo "*** Cannot add FRCSim repository key!" 1>&2
-        if ! ping users.wpi.edu -c 1 >/dev/null; then
+        if ! ping first.wpi.edu -c 1 >/dev/null; then
             echo "*** The package host for FRCSim appears to be down. Try again later." 1>&2
         fi
         install-fail
