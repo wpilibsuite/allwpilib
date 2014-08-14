@@ -166,6 +166,7 @@
     <tags>
       <tag>CommandBased Robot</tag>
     </tags>
+    <world>/usr/share/frcsim/worlds/GearsBotDemo.world</world>
     <packages>
       <package>src/$package-dir</package>
       <package>src/$package-dir/commands</package>
@@ -198,6 +199,7 @@
     <tags>
       <tag>CommandBased Robot</tag>
     </tags>
+    <world>/usr/share/frcsim/worlds/PacGoat2014.world</world>
     <packages>
       <package>src/$package-dir</package>
       <package>src/$package-dir/commands</package>

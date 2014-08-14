@@ -14,4 +14,10 @@ public interface IExampleProject extends ProjectType {
 			this.destination = destination;
 		}
 	}
+
+	/**
+	 * @return The world file to use for simulation, if empty
+	 *         the default is used.
+	 */
+	String getWorld();
 }

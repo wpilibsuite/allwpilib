@@ -15,6 +15,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
 
 import edu.wpi.first.wpilib.plugins.core.WPILibCore;
+import edu.wpi.first.wpilib.plugins.core.wizards.INewProjectInfo;
 import edu.wpi.first.wpilib.plugins.core.wizards.NewProjectMainPage;
 import edu.wpi.first.wpilib.plugins.core.wizards.ProjectCreationUtils;
 import edu.wpi.first.wpilib.plugins.core.wizards.ProjectType;
@@ -56,7 +57,7 @@ public class NewJavaWizard extends Wizard implements INewWizard {
 			teamNumberPage = new TeamNumberPage(selection);
 			addPage(teamNumberPage);
 		}
-		page = new NewProjectMainPage(selection, teamNumberPage);
+		page = new NewProjectMainPage(selection, teamNumberPage, INewProjectInfo.Null);
 		page.setProjectTypes(JavaProjectType.TYPES);
 		page.setTitle("Create New Robot Java Project");
 		page.setDescription("This wizard creates a new Robot Java Project configured to use WPILib for programming FRC robots.");

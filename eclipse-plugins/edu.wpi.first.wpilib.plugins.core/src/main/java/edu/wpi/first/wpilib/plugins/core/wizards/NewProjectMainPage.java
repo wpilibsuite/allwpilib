@@ -39,6 +39,7 @@ public class NewProjectMainPage extends WizardPage {
 	private boolean showPackage;
 	private boolean showProjectTypes;
 	private TeamNumberPage teamNumberPage;
+	private INewProjectInfo info;
 
 	/**
 	 * Constructor for SampleNewWizardPage.
@@ -46,17 +47,20 @@ public class NewProjectMainPage extends WizardPage {
 	 *
 	 * @param pageName
 	 */
-	public NewProjectMainPage(ISelection selection, TeamNumberPage teamNumberPage) {
+	public NewProjectMainPage(ISelection selection, TeamNumberPage teamNumberPage, INewProjectInfo info) {
 		super("wizardPage");
 		this.teamNumberPage = teamNumberPage;
 		showPackage = true;
 		showProjectTypes = false;
+		this.info = info;
 	}
 
 	/**
 	 * @see IDialogPage#createControl(Composite)
 	 */
 	public void createControl(Composite parent) {
+		System.out.println(info.getName() +" -- "+ info.getWorld());
+		
 		Composite container = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout();
 		container.setLayout(layout);
@@ -130,7 +134,7 @@ public class NewProjectMainPage extends WizardPage {
 		comp.setLayout(groupLayout);
 		worldText = new Text(comp, SWT.BORDER | SWT.SINGLE);
 		worldText.setLayoutData(gd);
- 		worldText.setText("/usr/share/frcsim/worlds/GearsBotDemo.world");
+		worldText.setText("/usr/share/frcsim/worlds/GearsBotDemo.world");
 		worldText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				dialogChanged();
@@ -161,11 +165,18 @@ public class NewProjectMainPage extends WizardPage {
 					@Override public void stateChanged(ChangeEvent e) {
 						String teamNumber = TeamNumberPage.getTeamNumberFromPage(teamNumberPage);
 						packageText.setText("org.usfirst.frc.team"+teamNumber+".robot");
-
 					}
 				});
 			}
 		}
+		info.registerChangeListener(new ChangeListener() {
+			@Override public void stateChanged(ChangeEvent e) {
+				projectNameText.setText(info.getName());
+				if (!"".equals(info.getWorld())) {
+					worldText.setText(info.getWorld());
+				}
+			}
+		});
 	}
 
 	/**

@@ -7,16 +7,17 @@ import edu.wpi.first.wpilib.plugins.core.wizards.IExampleProject;
 import edu.wpi.first.wpilib.plugins.java.wizards.newproject.JavaProjectType;
 
 public class ExampleJavaProject extends JavaProjectType implements IExampleProject {
-	private String name, description;
+	private String name, description, world;
 	private List<String> tags;
 	private List<String> packages;
 	private List<ExportFile> files;
 	
 	public ExampleJavaProject(String name, String description, List<String> tags, 
-			List<String> packages, List<ExportFile> files) {
+			String world, List<String> packages, List<ExportFile> files) {
 		this.name = name;
 		this.description = description;
 		this.tags = tags;
+		this.world = world;
 		this.packages = packages;
 		this.files = files;
 	}
@@ -31,6 +32,10 @@ public class ExampleJavaProject extends JavaProjectType implements IExampleProje
 
 	public List<String> getTags() {
 		return tags;
+	}
+	
+	public String getWorld() {
+		return world;
 	}
 
 	@Override
