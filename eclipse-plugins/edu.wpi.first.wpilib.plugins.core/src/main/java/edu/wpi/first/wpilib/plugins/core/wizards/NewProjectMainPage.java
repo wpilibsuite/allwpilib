@@ -35,7 +35,7 @@ public class NewProjectMainPage extends WizardPage {
 	private Text worldText;
 	private Button worldButton;
 
-	Button iterativeRobot, commandRobot;
+	Button iterativeRobot, commandRobot, sampleRobot;
 	private boolean showPackage;
 	private boolean showProjectTypes;
 	private TeamNumberPage teamNumberPage;
@@ -109,6 +109,12 @@ public class NewProjectMainPage extends WizardPage {
 			gd = new GridData(GridData.FILL_HORIZONTAL);
 			gd.widthHint = 300;
 			commandRobot.setLayoutData(gd);
+			
+			sampleRobot = new Button(projectTypeGroup, SWT.RADIO | SWT.WRAP);
+			sampleRobot.setText("Sample Robot: A robot project used for small sample programs or for highly advanced programs with more complete control over program flow");
+			gd = new GridData(GridData.FILL_HORIZONTAL);
+			gd.widthHint = 300;
+			sampleRobot.setLayoutData(gd);
 		}
 
 		label = new Label(container, SWT.NULL);
@@ -214,6 +220,7 @@ public class NewProjectMainPage extends WizardPage {
 	public ProjectType getProjectType() {
 		if (!showProjectTypes) return null;
 		else if (iterativeRobot.getSelection()) return types.get(ProjectType.ITERATIVE);
+		else if (sampleRobot.getSelection()) return types.get(ProjectType.SAMPLE);
 		else return types.get(ProjectType.COMMAND_BASED);
 	}
 

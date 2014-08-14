@@ -38,10 +38,18 @@ public class CPPProjectType implements ProjectType {
 			return files;
 		}
 	};
+	static ProjectType SAMPLE = new CPPProjectType() {
+		@Override public Map<String, String> getFiles(String packageName) {
+			Map<String, String> files = super.getFiles(packageName);
+			files.put("src/Robot.cpp", "sample/Robot.cpp");
+			return files;
+		}
+	};
 	@SuppressWarnings("serial")
 	static Map<String, ProjectType> TYPES = new HashMap<String, ProjectType>() {{
 		put(ProjectType.ITERATIVE, ITERATIVE);
 		put(ProjectType.COMMAND_BASED, COMMAND_BASED);
+		put(ProjectType.SAMPLE, SAMPLE);
 	}};
 
 	@Override
