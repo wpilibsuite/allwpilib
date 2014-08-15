@@ -9,7 +9,7 @@
 #include "gtest/gtest.h"
 #include "TestBench.h"
 
-static const double kDelayTime = 0.001;
+static const double kDelayTime = 0.01;
 
 class FakeEncoderTest : public testing::Test {
 protected:
@@ -42,6 +42,10 @@ TEST_F(FakeEncoderTest, TestDefaultState) {
  * Test the encoder by setting the digital outputs and reading the value.
  */
 TEST_F(FakeEncoderTest, TestCountUp) {
+	m_outputA->Set(false);
+	m_outputB->Set(false);
+	m_encoder->Reset();
+
 	//Sets the outputs such that the encoder moves in the positive direction
 	for(int i = 0; i < 100; i++) {
 		m_outputA->Set(true);

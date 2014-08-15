@@ -142,6 +142,8 @@ TEST_F(CANJaguarTest, Disable) {
 	m_jaguar->EnableControl();
 	m_jaguar->DisableControl();
 
+	Wait(kEncoderSettlingTime);
+
 	double initialPosition = m_jaguar->GetPosition();
 
 	SetJaguar(kMotorTime, 1.0f);

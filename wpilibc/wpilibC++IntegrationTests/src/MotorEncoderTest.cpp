@@ -17,7 +17,7 @@ std::ostream &operator<<(std::ostream &os, MotorEncoderTestType const &type) {
 	case TEST_JAGUAR: os << "Jaguar"; break;
 	case TEST_TALON: os << "Talon"; break;
 	}
-	
+
 	return os;
 }
 
@@ -32,7 +32,7 @@ class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
 protected:
 	SpeedController *m_speedController;
 	Encoder *m_encoder;
-	
+
 	virtual void SetUp() {
 		switch(GetParam()) {
 		case TEST_VICTOR:
@@ -40,27 +40,27 @@ protected:
 			m_encoder = new Encoder(TestBench::kVictorEncoderChannelA,
 				TestBench::kVictorEncoderChannelB);
 			break;
-		
+
 		case TEST_JAGUAR:
 			m_speedController = new Jaguar(TestBench::kJaguarChannel);
 			m_encoder = new Encoder(TestBench::kJaguarEncoderChannelA,
 				TestBench::kJaguarEncoderChannelB);
 			break;
-		
+
 		case TEST_TALON:
 			m_speedController = new Talon(TestBench::kTalonChannel);
 			m_encoder = new Encoder(TestBench::kTalonEncoderChannelA,
 				TestBench::kTalonEncoderChannelB);
 			break;
 		}
-		
+
 	}
-	
+
 	virtual void TearDown() {
 		delete m_speedController;
 		delete m_encoder;
 	}
-	
+
 	void Reset() {
 		m_speedController->Set(0.0f);
 		m_encoder->Reset();
@@ -73,12 +73,12 @@ protected:
  */
 TEST_P(MotorEncoderTest, Increment) {
 	Reset();
-	
+
 	/* Drive the speed controller briefly to move the encoder */
 	m_speedController->Set(1.0);
 	Wait(kMotorTime);
 	m_speedController->Set(0.0);
-	
+
 	/* The encoder should be positive now */
 	EXPECT_GT(m_encoder->Get(), 0)
 		<< "Encoder should have incremented after the motor moved";
@@ -90,12 +90,12 @@ TEST_P(MotorEncoderTest, Increment) {
  */
 TEST_P(MotorEncoderTest, Decrement) {
 	Reset();
-	
+
 	/* Drive the speed controller briefly to move the encoder */
 	m_speedController->Set(-1.0f);
 	Wait(kMotorTime);
 	m_speedController->Set(0.0f);
-	
+
 	/* The encoder should be positive now */
 	EXPECT_LT(m_encoder->Get(), 0.0f)
 		<< "Encoder should have decremented after the motor moved";
@@ -106,15 +106,15 @@ TEST_P(MotorEncoderTest, Decrement) {
  */
 TEST_P(MotorEncoderTest, ClampSpeed) {
 	Reset();
-	
+
 	m_speedController->Set(2.0f);
 	Wait(kMotorTime);
-	
+
 	EXPECT_FLOAT_EQ(1.0f, m_speedController->Get());
-	
+
 	m_speedController->Set(-2.0f);
 	Wait(kMotorTime);
-	
+
 	EXPECT_FLOAT_EQ(-1.0f, m_speedController->Get());
 }
 
@@ -123,19 +123,19 @@ TEST_P(MotorEncoderTest, ClampSpeed) {
  */
 TEST_P(MotorEncoderTest, PIDController) {
 	Reset();
-	
+
 	PIDController pid(0.003f, 0.001f, 0.0f, m_encoder, m_speedController);
 	pid.SetAbsoluteTolerance(20.0f);
 	pid.SetOutputRange(-0.2f, 0.2f);
 	pid.SetSetpoint(2500);
-	
-	/* 5 seconds should be plenty time to get to the setpoint */
+
+	/* 10 seconds should be plenty time to get to the setpoint */
 	pid.Enable();
-	Wait(5.0);
+	Wait(10.0);
 	pid.Disable();
-	
+
 	RecordProperty("PID Error", pid.GetError());
-	
+
 	EXPECT_TRUE(pid.OnTarget()) << "PID loop did not converge within 5 seconds.";
 }
 
@@ -144,10 +144,9 @@ TEST_P(MotorEncoderTest, PIDController) {
  */
 TEST_P(MotorEncoderTest, Reset) {
 	Reset();
-	
+
 	EXPECT_EQ(0, m_encoder->Get()) << "Encoder did not reset to 0";
 }
 
 INSTANTIATE_TEST_CASE_P(Test, MotorEncoderTest,
 	testing::Values(TEST_VICTOR, TEST_JAGUAR, TEST_TALON));
-
