@@ -13,7 +13,16 @@ bin/
 .classpath
 **/dependency-reduced-pom.xml
 
-#Java File extentions
+# Vagrant generated file
+.vagrant/
+
+# Mac generated file
+*.DS_Store
+
+# Added by the users of vagrant
+jdk-7u45-linux-arm-vfp-sflt.gz
+
+# Java File extentions
 *.class
 
 # Package Files #
