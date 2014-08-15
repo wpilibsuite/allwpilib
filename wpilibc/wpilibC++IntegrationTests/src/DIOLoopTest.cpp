@@ -9,6 +9,8 @@
 #include "gtest/gtest.h"
 #include "TestBench.h"
 
+static const double kCounterTime = 0.001;
+
 static const double kDelayTime = 0.1;
 
 static const double kSynchronousInterruptTime = 2.0;
@@ -70,10 +72,10 @@ TEST_F(DIOLoopTest, FakeCounter) {
 	/* Count 100 ticks.  The counter value should be 100 after this loop. */
 	for(int i = 0; i < 100; i++) {
 		m_output->Set(true);
+		Wait(kCounterTime);
 		m_output->Set(false);
+		Wait(kCounterTime);
 	}
-
-	Wait(kDelayTime);
 
 	EXPECT_EQ(100, counter.Get()) << "Counter did not count up to 100.";
 }

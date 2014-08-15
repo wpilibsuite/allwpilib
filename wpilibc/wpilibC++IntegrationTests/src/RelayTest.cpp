@@ -10,6 +10,8 @@
 #include "TestBench.h"
 #include "Relay.h"
 
+static const double kDelayTime = 0.01;
+
 class RelayTest : public testing::Test {
 protected:
 	Relay *m_relay;
@@ -41,6 +43,7 @@ protected:
 
 		//set the relay to forward
 		m_relay->Set(Relay::kForward);
+		Wait(kDelayTime);
 		EXPECT_TRUE(m_forward->Get())
 		<<"Relay did not set forward";
 		EXPECT_FALSE(m_reverse->Get())
@@ -49,6 +52,7 @@ protected:
 
 		//set the relay to reverse
 		m_relay->Set(Relay::kReverse);
+		Wait(kDelayTime);
 		EXPECT_TRUE(m_reverse->Get())
 		<<"Relay did not set reverse";
 		EXPECT_FALSE(m_forward->Get())
@@ -56,6 +60,7 @@ protected:
 
 		//set the relay to off
 		m_relay->Set(Relay::kOff);
+		Wait(kDelayTime);
 		EXPECT_FALSE(m_forward->Get())
 		<<"Relay did not set off";
 		EXPECT_FALSE(m_reverse->Get())
@@ -64,6 +69,7 @@ protected:
 
 		//set the relay to on
 		m_relay->Set(Relay::kOn);
+		Wait(kDelayTime);
 		EXPECT_TRUE(m_forward->Get())
 		<<"Relay did not set on";
 		EXPECT_TRUE(m_reverse->Get())
