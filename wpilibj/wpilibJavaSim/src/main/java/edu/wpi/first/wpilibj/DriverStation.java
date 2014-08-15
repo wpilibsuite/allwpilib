@@ -161,12 +161,12 @@ public class DriverStation implements RobotState.Interface {
      * @return The value of the axis on the joystick.
      */
     public double getStickAxis(int stick, int axis) {
-        if (axis < 1 || axis > kJoystickAxes) {
-            return 0.0;
-        }
         if (stick < 0 || stick >= joysticks.length || joysticks[stick] == null) {
             return 0.0;
     	}
+        if (axis < 1 || axis > kJoystickAxes || axis > joysticks[stick].getAxesCount()) {
+            return 0.0;
+        }
     	return joysticks[stick].getAxes(axis - 1);
     }
 
@@ -180,6 +180,9 @@ public class DriverStation implements RobotState.Interface {
     public boolean getStickButton(int stick, int button) {
     	if (stick < 0 || stick >= joysticks.length || joysticks[stick] == null) {
             return false;
+    	}
+    	if (button < 1 || button > joysticks[stick].getButtonsCount()) {
+    		return false;
     	}
     	return joysticks[stick].getButtons(button - 1);
     }
