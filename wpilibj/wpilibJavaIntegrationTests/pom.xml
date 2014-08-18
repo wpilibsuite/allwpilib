@@ -34,6 +34,11 @@
 			<artifactId>junit-toolbox</artifactId>
 			<version>2.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>6.8.8</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>
@@ -120,6 +125,12 @@
 									<version>2.0</version>
 									<type>jar</type>
 								</artifactItem>
+								<artifactItem>
+									<groupId>org.testng</groupId>
+									<artifactId>testng</artifactId>
+									<version>6.8.8</version>
+									<type>jar</type>
+								</artifactItem>
 							</artifactItems>
 							<outputDirectory>${project.build.directory}/classes</outputDirectory>
 						</configuration>
@@ -148,7 +159,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>edu.wpi.first.wpilibj.test.TestSuite</mainClass>
+							<mainClass>org.testng.TestNG</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
