@@ -39,6 +39,11 @@
 			<artifactId>testng</artifactId>
 			<version>6.8.8</version>
 		</dependency>
+		<dependency>
+			<groupId>com.beust</groupId>
+			<artifactId>jcommander</artifactId>
+			<version>1.35</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>
@@ -129,6 +134,12 @@
 									<groupId>org.testng</groupId>
 									<artifactId>testng</artifactId>
 									<version>6.8.8</version>
+									<type>jar</type>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.beust</groupId>
+									<artifactId>jcommander</artifactId>
+									<version>1.35</version>
 									<type>jar</type>
 								</artifactItem>
 							</artifactItems>
