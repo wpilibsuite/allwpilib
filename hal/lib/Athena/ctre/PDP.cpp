@@ -110,7 +110,7 @@ CTR_Code PDP::GetChannelCurrent(UINT8 idx, double &current)
 		}
 	}
 	/* convert to amps */
-	current = 0.06724511900000001*raw + 1.527114967;
+	current = (double)raw * 0.125;  /* 7.3 fixed pt value in Amps */
 	/* signal caller with success */
 	return retval;
 }
@@ -118,14 +118,14 @@ CTR_Code PDP::GetVoltage(double &voltage)
 {
 	GET_STATUS3();
 	uint32_t raw = rx->busVoltage;
-	voltage = 0.0554413328606877 * raw;
+	voltage = (double)raw * 0.05 + 4.0; /* 50mV per unit plus 4V. */;
 	return rx.err;
 }
 CTR_Code PDP::GetTemperature(double &tempC)
 {
 	GET_STATUS3();
 	uint32_t raw = rx->temp;
-	tempC =	((double)raw-67.8564500484966)*1.03250836957542;
+	tempC =	(double)raw * 1.03250836957542 - 67.8564500484966;
 	return rx.err;
 }
 //------------------ C interface --------------------------------------------//

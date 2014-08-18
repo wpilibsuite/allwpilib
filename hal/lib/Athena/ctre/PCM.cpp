@@ -216,7 +216,7 @@ CTR_Code PCM::GetCompressorCurrent(float &status)
 	uint32_t temp =(rx->compressorCurrentTop6);
 	temp <<= 4;
 	temp |=  rx->compressorCurrentBtm4;
-	status = 20.1612903225806 * temp;
+	status = temp * 0.03125; /* 5.5 fixed pt value in Amps */
 	return rx.err;
 }
 
@@ -230,7 +230,7 @@ CTR_Code PCM::GetSolenoidVoltage(float &status)
 	uint32_t raw =(rx->solenoidVoltageTop8);
 	raw <<= 2;
 	raw |=  rx->solenoidVoltageBtm2;
-	status = (double) raw * 24.7800586510264 / 1000;
+	status = (double) raw * 0.03125; /* 5.5 fixed pt value in Volts */
 	return rx.err;
 }
 
@@ -297,7 +297,7 @@ CTR_Code PCM::GetSolenoidStickyFault(bool &status)
 CTR_Code PCM::GetBatteryVoltage(float &status)
 {
 	GET_PCM_STATUS();
-	status = (float)rx->battVoltage * ((59.0420332355816) / 1000.0);;
+	status = (float)rx->battVoltage * 0.05 + 4.0; /* 50mV per unit plus 4V. */
 	return rx.err;
 }
 /* Return status of module enable/disable
