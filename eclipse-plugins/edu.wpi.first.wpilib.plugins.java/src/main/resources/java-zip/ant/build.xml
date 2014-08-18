@@ -32,9 +32,9 @@
      includeAntRuntime="no"
      includeJavaRuntime="no"
      classpath="${classpath}"
-     target="1.7"
-     source="1.7"
-     compiler="javac1.7"
+     target="${ant.java.version}"
+     source="${ant.java.version}"
+     compiler="javac${ant.java.version}"
      debug="true">
     </javac>
   </target>
