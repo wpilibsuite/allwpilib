@@ -134,7 +134,7 @@ TEST_P(MotorEncoderTest, PIDController) {
 	Wait(10.0);
 	pid.Disable();
 
-	RecordProperty("PID Error", pid.GetError());
+	RecordProperty("PIDError", pid.GetError());
 
 	EXPECT_TRUE(pid.OnTarget()) << "PID loop did not converge within 5 seconds.";
 }
