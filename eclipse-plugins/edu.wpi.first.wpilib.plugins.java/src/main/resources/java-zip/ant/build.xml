@@ -76,25 +76,35 @@
        username="${username}"
        password="${password}"
        trust="true"
-       command=". /etc/profile.d/natinst-path.sh; ${deploy.kill.command};"/>
+       command="${deploy.kill.command};"/>
 
     <sshexec host="${target}"
        username="${username}"
        password="${password}"
        trust="true"
-       command="tail -F -s 0 -n 0 ${deploy.log.file}"/>
+       command="${deploy.log.command}"/>
   </target>
 
   <target name="debug-deploy" depends="get-target-ip,jar" description="Deploy the jar and start the program running.">
     <echo>[athena-deploy] Copying code over.</echo>
     <scp file="${dist.jar}" todir="${username}@${target}:${deploy.dir}" password="${password}" trust="true"/>
+  	<!-- The remoteDebugCommand file is used by /usr/local/frc/bin/frcRunRobot.sh on the roboRIO  -->
+    <scp file="${wpilib.ant.dir}/robotDebugCommand" todir="${username}@${target}:${command.dir}" password="${password}" trust="true"/>
+  	<!-- The frcdebug file is used as a flag for /usr/local/frc/bin/frcRunRobot.sh to run the robot program in debug mode -->
+  	<scp file="${wpilib.ant.dir}/frcdebug" todir="${username}@${target}:${debug.flag.dir}" password="${password}" trust="true"/>
 
-    <echo>[athena-deploy] Starting program.</echo>
+    <echo>[athena-deploy] Starting Debug program.</echo>
     <sshexec host="${target}"
-       username="${username}"
-       password="${password}"
-       trust="true"
-       command=". /etc/profile.d/natinst-path.sh; ${deploy.debug.command}"/>
+        username="${username}"
+        password="${password}"
+        trust="true"
+        command="${deploy.kill.command}"/>
+
+    <sshexec host="${target}"
+        username="${username}"
+        password="${password}"
+        trust="true"
+        command="${deploy.log.command}"/>
   </target>
 
   <!-- Simulate -->
