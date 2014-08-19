@@ -139,21 +139,37 @@ public class DeployLaunchShortcut implements ILaunchShortcut
 		String remote_connection = RSEUtils.getTarget(teamNumber).getName();
 		
 		ILaunchConfigurationWorkingCopy config = type.newInstance(null, activeProj.getName());
+		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_COREFILE_PATH, "");
+		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_ENABLE_REGISTER_BOOKKEEPING, false);
+		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_ENABLE_VARIABLE_BOOKKEEPING, false);
+		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_ID, "org.eclipse.rse.remotecdt.RemoteGDBDebugger");
+		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_REGISTER_GROUPS, "");
+		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_START_MODE, "run");
+		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_STOP_AT_MAIN, true);
+		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_STOP_AT_MAIN_SYMBOL, "main");
+		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_USE_TERMINAL, true);
 		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, activeProj.getName());
 		Collection<Executable> exes = ExecutablesManager.getExecutablesManager().getExecutablesForProject(activeProj);
 		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME,
 				exes.size() > 0 ? exes.toArray(new Executable[0])[0].getPath().makeRelativeTo(activeProj.getLocation()).toString():
 			 "Debug/FRCUserProgram");
+			 
+			 
 		config.setAttribute(IRemoteConnectionConfigurationConstants.ATTR_REMOTE_PATH, "/home/admin/FRCUserProgram");
-		config.setAttribute(IMILaunchConfigurationConstants.ATTR_DEBUG_NAME, WPILibCPPPlugin.getDefault().getToolchain() + "/bin/arm-none-linux-gnueabi-gdb");
 		config.setAttribute(IRemoteConnectionConfigurationConstants.ATTR_REMOTE_CONNECTION, remote_connection);
-		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_ID, "gdbserver");
+		config.setAttribute(IRemoteConnectionConfigurationConstants.ATTR_SKIP_DOWNLOAD_TO_TARGET, false);
+		config.setAttribute(IRemoteConnectionConfigurationConstants.ATTR_GDBSERVER_PORT, "2345");
+		config.setAttribute(IRemoteConnectionConfigurationConstants.ATTR_GDBSERVER_COMMAND, "gdbserver");
+		
+		config.setAttribute(IMILaunchConfigurationConstants.ATTR_DEBUG_NAME, WPILibCPPPlugin.getDefault().getToolchain() + "/bin/arm-none-linux-gnueabi-gdb");
 		List<String> solibs = new ArrayList<>();
 		solibs.add(WPILibCPPPlugin.getDefault().getToolchain() + "/arm-non-linux-gnueabi/libc/lib");
 		solibs.add(WPILibCPPPlugin.getDefault().getToolchain() + "/arm-non-linux-gnueabi/libc/usr/lib");
 		solibs.add(WPILibCPPPlugin.getDefault().getCPPDir() + "/lib");
 		config.setAttribute(IMILaunchConfigurationConstants.ATTR_DEBUGGER_SOLIB_PATH, solibs);
-		
+		config.setAttribute(IMILaunchConfigurationConstants.ATTR_DEBUGGER_AUTO_SOLIB, true);
+		config.setAttribute(IMILaunchConfigurationConstants.ATTR_DEBUGGER_STOP_ON_SOLIB_EVENTS, false);
+		config.doSave();
 		return config;
 	}
 }
