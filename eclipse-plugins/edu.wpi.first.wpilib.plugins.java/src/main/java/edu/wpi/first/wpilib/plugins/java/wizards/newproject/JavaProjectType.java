@@ -33,6 +33,8 @@ public class JavaProjectType implements ProjectType {
 		@Override public Map<String, String> getFiles(String packageName) {
 			Map<String, String> files = super.getFiles(packageName);
 			files.put("src/"+packageName.replace(".", "/")+"/Robot.java", "command-based/Robot.java");
+			files.put("src/"+packageName.replace(".", "/")+"/RobotMap.java", "command-based/RobotMap.java");
+			files.put("src/"+packageName.replace(".", "/")+"/OI.java", "command-based/OI.java");
 			files.put("src/"+packageName.replace(".", "/")+"/commands/ExampleCommand.java", "command-based/ExampleCommand.java");
 			files.put("src/"+packageName.replace(".", "/")+"/subsystems/ExampleSubsystem.java", "command-based/ExampleSubsystem.java");
 			return files;
