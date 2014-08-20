@@ -7,9 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import edu.wpi.first.wpilibj.hal.DIOJNI;
 import edu.wpi.first.wpilibj.hal.HALUtil;
@@ -54,6 +53,7 @@ public abstract class DigitalSource extends InterruptableSensorBase {
 		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
+	@Override
 	public void free() {
 		channels.free(m_channel);
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -69,6 +69,7 @@ public abstract class DigitalSource extends InterruptableSensorBase {
 	 *
 	 * @return channel routing number
 	 */
+	@Override
 	public int getChannelForRouting() {
 		return m_channel;
 	}
@@ -78,15 +79,16 @@ public abstract class DigitalSource extends InterruptableSensorBase {
 	 *
 	 * @return 0
 	 */
-	public int getModuleForRouting() {
+	@Override
+	public byte getModuleForRouting() {
 		return 0;
 	}
 
 	/**
 	 * Is this an analog trigger
-	 *
 	 * @return true if this is an analog trigger
 	 */
+	@Override
 	public boolean getAnalogTriggerForRouting() {
 		return false;
 	}

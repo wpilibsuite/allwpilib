@@ -6,6 +6,9 @@
 #include <stdint.h>
 #endif
 
+#include <iostream>
+#include "errno.h"
+
 extern "C"
 {
 	typedef void (*InterruptHandlerFunction)(uint32_t interruptAssertedMask, void *param);

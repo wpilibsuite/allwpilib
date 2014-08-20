@@ -12,14 +12,10 @@ import java.nio.ByteOrder;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
-import edu.wpi.first.wpilibj.hal.InterruptJNI;
 import edu.wpi.first.wpilibj.hal.DIOJNI;
-import edu.wpi.first.wpilibj.hal.InterruptJNI.InterruptHandlerFunction;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.util.AllocationException;
-import edu.wpi.first.wpilibj.util.CheckedAllocationException;
 
 /**
  * Class to read a digital input. This class will read digital inputs and return
@@ -67,97 +63,15 @@ public class DigitalInput extends DigitalSource implements LiveWindowSendable {
 		return m_channel;
 	}
 
+	@Override
 	public boolean getAnalogTriggerForRouting() {
 		return false;
-	}
-
-	/**
-	 * Request interrupts asynchronously on this digital input.
-	 *
-	 * @param handler
-	 *            The address of the interrupt handler function of type
-	 *            tInterruptHandler that will be called whenever there is an
-	 *            interrupt on the digitial input port. Request interrupts in
-	 *            synchronus mode where the user program interrupt handler will
-	 *            be called when an interrupt occurs. The default is interrupt
-	 *            on rising edges only.
-	 */
-	public void requestInterrupts(InterruptHandlerFunction handler) {
-		// TODO: add interrupt support
-
-		try {
-			m_interruptIndex = interrupts.allocate();
-		} catch (CheckedAllocationException e) {
-			throw new AllocationException(
-					"No interrupts are left to be allocated");
-		}
-
-		allocateInterrupts(false);
-
-		ByteBuffer status = ByteBuffer.allocateDirect(4);
-		// set the byte order
-		status.order(ByteOrder.LITTLE_ENDIAN);
-		InterruptJNI.requestInterrupts(m_interrupt, (byte) getModuleForRouting(),
-				getChannelForRouting(),
-				(byte) (getAnalogTriggerForRouting() ? 1 : 0), status.asIntBuffer());
-		setUpSourceEdge(true, false);
-		InterruptJNI.attachInterruptHandler(m_interrupt, handler, null, status.asIntBuffer());
-		HALUtil.checkStatus(status.asIntBuffer());
-	}
-
-	/**
-	 * Request interrupts synchronously on this digital input. Request
-	 * interrupts in synchronus mode where the user program will have to
-	 * explicitly wait for the interrupt to occur. The default is interrupt on
-	 * rising edges only.
-	 */
-	public void requestInterrupts() {
-		try {
-			m_interruptIndex = interrupts.allocate();
-		} catch (CheckedAllocationException e) {
-			throw new AllocationException(
-					"No interrupts are left to be allocated");
-		}
-
-		allocateInterrupts(true);
-
-		ByteBuffer status = ByteBuffer.allocateDirect(4);
-		// set the byte order
-		status.order(ByteOrder.LITTLE_ENDIAN);
-		InterruptJNI.requestInterrupts(m_interrupt, (byte) getModuleForRouting(),
-				getChannelForRouting(),
-				(byte) (getAnalogTriggerForRouting() ? 1 : 0), status.asIntBuffer());
-		HALUtil.checkStatus(status.asIntBuffer());
-		setUpSourceEdge(true, false);
-
-	}
-
-	/**
-	 * Set which edge to trigger interrupts on
-	 *
-	 * @param risingEdge
-	 *            true to interrupt on rising edge
-	 * @param fallingEdge
-	 *            true to interrupt on falling edge
-	 */
-	public void setUpSourceEdge(boolean risingEdge, boolean fallingEdge) {
-		if (m_interrupt != null) {
-			ByteBuffer status = ByteBuffer.allocateDirect(4);
-			// set the byte order
-			status.order(ByteOrder.LITTLE_ENDIAN);
-			InterruptJNI.setInterruptUpSourceEdge(m_interrupt,
-					(byte) (risingEdge ? 1 : 0), (byte) (fallingEdge ? 1 : 0),
-					status.asIntBuffer());
-			HALUtil.checkStatus(status.asIntBuffer());
-		} else {
-			throw new IllegalArgumentException(
-					"You must call RequestInterrupts before setUpSourceEdge");
-		}
 	}
 
 	/*
 	 * Live Window code, only does anything if live window is activated.
 	 */
+	@Override
 	public String getSmartDashboardType() {
 		return "Digital Input";
 	}
@@ -167,6 +81,7 @@ public class DigitalInput extends DigitalSource implements LiveWindowSendable {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void initTable(ITable subtable) {
 		m_table = subtable;
 		updateTable();
@@ -175,6 +90,7 @@ public class DigitalInput extends DigitalSource implements LiveWindowSendable {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void updateTable() {
 		if (m_table != null) {
 			m_table.putBoolean("Value", get());
@@ -184,6 +100,7 @@ public class DigitalInput extends DigitalSource implements LiveWindowSendable {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public ITable getTable() {
 		return m_table;
 	}
@@ -191,12 +108,14 @@ public class DigitalInput extends DigitalSource implements LiveWindowSendable {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void startLiveWindowMode() {
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void stopLiveWindowMode() {
 	}
 }

@@ -92,6 +92,7 @@ public class AnalogTriggerOutput extends DigitalSource {
 
 	@Override
 	public void free() {
+		
 	}
 
 	/**
@@ -113,8 +114,8 @@ public class AnalogTriggerOutput extends DigitalSource {
 	}
 
 	@Override
-	public int getModuleForRouting() {
-		return m_trigger.m_index >> 2;
+	public byte getModuleForRouting() {
+		return (byte) (m_trigger.m_index >> 2);
 	}
 
 	@Override
@@ -122,27 +123,6 @@ public class AnalogTriggerOutput extends DigitalSource {
 		return true;
 	}
 
-	/**
-	 * Request interrupts asynchronously on this digital input.
-	 *
-	 * @param handler
-	 *            the interrupt service routine
-	 * @param param
-	 *            a parameter for the ISR
-	 */
-	// public void requestInterrupts(/*tInterruptHandler*/Object handler, Object
-	// param) {
-	// TODO: add interrupt support
-	// TODO: throw exception
-	// }
-
-	/**
-	 * Request interrupts synchronously on this digital input.
-	 */
-	// public void requestInterrupts() {
-	// TODO: throw exception
-	// }
-	
 	/**
 	 * Defines the state in which the AnalogTrigger triggers
 	 * @author jonathanleitschuh
