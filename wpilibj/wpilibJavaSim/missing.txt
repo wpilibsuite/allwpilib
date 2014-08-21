@@ -30,7 +30,6 @@ General Items
 - DriverStation
 - Joystick
 
-- Preferences
 - Relay
 - Ultrasonic
 - Watchdog
