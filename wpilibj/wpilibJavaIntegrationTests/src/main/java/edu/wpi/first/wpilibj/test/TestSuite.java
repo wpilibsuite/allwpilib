@@ -16,6 +16,7 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import junit.framework.JUnit4TestAdapter;
 import junit.runner.Version;
 
 import org.junit.runner.JUnitCore;
@@ -73,6 +74,20 @@ public class TestSuite extends AbstractTestSuite {
 	private static final String METHOD_REPEAT_FILTER = "--repeat=";
 	private static final String CLASS_NAME_FILTER = "--filter=";
 	
+	private static TestSuite instance = null;
+	
+	public static TestSuite getInstance(){
+		if(instance == null){
+			instance = new TestSuite();
+		}
+		return instance;
+	}
+
+	/**
+	 * This has to be public so that the JUnit4
+	 */
+	public TestSuite(){}
+
 	/**
 	 * Displays a help message for the user when they use the --help flag at runtime.
 	 */
@@ -309,9 +324,16 @@ public class TestSuite extends AbstractTestSuite {
 		}
 		TestBench.out().println();
 	}
-	
-	
 
+	/**
+	 * This is used by ant to get the Junit tests. This is required because the tests try to load using a
+	 * JUnit 3 framework. JUnit4 uses annotations to load tests. This method allows JUnit3 to load JUnit4 tests.
+	 */
+	public static junit.framework.Test suite(){
+		return new JUnit4TestAdapter(TestSuite.class);
+	}
+	
+	
 	/**
 	 * The method called at runtime
 	 * @param args The test suites to run

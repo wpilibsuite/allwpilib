@@ -35,14 +35,14 @@
 			<version>2.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
-			<version>6.8.8</version>
+			<groupId>org.apache.ant</groupId>
+			<artifactId>ant</artifactId>
+			<version>1.9.4</version>
 		</dependency>
 		<dependency>
-			<groupId>com.beust</groupId>
-			<artifactId>jcommander</artifactId>
-			<version>1.35</version>
+			<groupId>org.apache.ant</groupId>
+			<artifactId>ant-junit</artifactId>
+			<version>1.9.4</version>
 		</dependency>
 	</dependencies>
 
@@ -131,15 +131,15 @@
 									<type>jar</type>
 								</artifactItem>
 								<artifactItem>
-									<groupId>org.testng</groupId>
-									<artifactId>testng</artifactId>
-									<version>6.8.8</version>
+									<groupId>org.apache.ant</groupId>
+									<artifactId>ant</artifactId>
+									<version>1.9.4</version>
 									<type>jar</type>
 								</artifactItem>
 								<artifactItem>
-									<groupId>com.beust</groupId>
-									<artifactId>jcommander</artifactId>
-									<version>1.35</version>
+									<groupId>org.apache.ant</groupId>
+									<artifactId>ant-junit</artifactId>
+									<version>1.9.4</version>
 									<type>jar</type>
 								</artifactItem>
 							</artifactItems>
@@ -170,7 +170,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>org.testng.TestNG</mainClass>
+							<mainClass>edu.wpi.first.wpilibj.test.AntJunitLanucher</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

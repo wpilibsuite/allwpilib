@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
+/* Copyright (c) FIRST 2008-2014. All Rights Reserved.						*/
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
+/* the project.															   */
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj.test;
 
@@ -27,7 +27,6 @@ import org.junit.runners.model.InitializationError;
 public abstract class AbstractTestSuite {
 	private static final Logger logger = Logger.getLogger(AbstractTestSuite.class.getName());
 	
-	
 	/**
 	 * Gets all of the classes listed within the SuiteClasses annotation. To use it, annotate a class
 	 * with <code>@RunWith(Suite.class)</code> and <code>@SuiteClasses({TestClass1.class, ...})</code>.
@@ -38,13 +37,13 @@ public abstract class AbstractTestSuite {
 	protected List<Class<?>> getAnnotatedTestClasses(){
 		SuiteClasses annotation = getClass().getAnnotation(SuiteClasses.class);
 		List<Class<?>> classes = new Vector<Class<?>>();
-        if (annotation == null) {
-            throw new RuntimeException(String.format("class '%s' must have a SuiteClasses annotation",  getClass().getName()));
-        }
-        for(Class<?> c : annotation.value()){
-        	classes.add(c);
-        }
-        return classes;
+		if (annotation == null) {
+			throw new RuntimeException(String.format("class '%s' must have a SuiteClasses annotation",  getClass().getName()));
+		}
+		for(Class<?> c : annotation.value()){
+			classes.add(c);
+		}
+		return classes;
 	}
 	
 	/**
@@ -135,7 +134,7 @@ public abstract class AbstractTestSuite {
 	 * Gets all of the test classes listed in this suite. Does not include any of the test suites. All of these classes contain tests.
 	 * @return The list of base test classes.
 	 */
-	protected List<Class<?>> getAllContainedBaseTests(){
+	public List<Class<?>> getAllContainedBaseTests(){
 		List<Class<?>> runningBaseTests = new Vector <Class<?>>();
 		return getAllContainedBaseTests(runningBaseTests);
 	}
@@ -161,7 +160,7 @@ public abstract class AbstractTestSuite {
 	 * @param regex the text pattern to retrieve.
 	 * @return The list of classes matching the regex pattern
 	 */
-	protected List<Class<?>> getAllClassMatching(final String regex){
+	public List<Class<?>> getAllClassMatching(final String regex){
 		final List<Class<?>> matchingClasses = new Vector<Class<?>>();
 		return getAllClassMatching(regex, matchingClasses);
 	}
