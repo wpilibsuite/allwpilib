@@ -48,6 +48,14 @@
        trust="true"
        command="tail -F -s 0 -n 0 ${deploy.log.file}"/>
   </target>
+  
+  <target name="kill-program" depends="get-target-ip" description="Kill the currently running FRC program">
+	  <sshexec host="${target}"
+		   username="${username}"
+		   password="${password}"
+		   trust="true"
+		   command="/usr/local/frc/bin/frcKillRobot.sh"/>
+  </target>
 
   <target name="debug-deploy" depends="get-target-ip" description="Deploy the jar and start the program running in debug mode.">
     <echo>[athena-deploy] Killing running program</echo>

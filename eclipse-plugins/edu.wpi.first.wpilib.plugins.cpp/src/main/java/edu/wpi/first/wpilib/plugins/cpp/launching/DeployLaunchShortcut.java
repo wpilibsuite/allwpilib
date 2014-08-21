@@ -111,6 +111,11 @@ public class DeployLaunchShortcut implements ILaunchShortcut
 			// Debug deploys are done with the Eclipse Remote System Explorer,
 			// which lets it work with Eclipse's C++ debugger.
 			
+			// Kill running program before using RSE as RSE can't
+			WPILibCPPPlugin.logInfo("Running ant file: " + activeProj.getLocation().toOSString() + File.separator + "build.xml");
+			WPILibCPPPlugin.logInfo("Targets: kill-program, Mode: " + mode);
+			AntLauncher.runAntFile(new File (activeProj.getLocation().toOSString() + File.separator + "build.xml"), "kill-program", null, mode);
+			
 			// TODO: figure out UI issues. that's why this is undocumented
 			ILaunchConfigurationWorkingCopy config;
 			try {
