@@ -17,7 +17,7 @@ class Robot: public SampleRobot
 
 public:
 	Robot() :
-			myRobot(1, 2),	// these must be initialized in the same order
+			myRobot(0, 1),	// these must be initialized in the same order
 			stick(1)		// as they are declared above.
 	{
 		myRobot.SetExpiration(0.1);
