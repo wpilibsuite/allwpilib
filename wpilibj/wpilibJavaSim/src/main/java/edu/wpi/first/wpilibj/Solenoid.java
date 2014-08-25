@@ -14,10 +14,10 @@ import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 
 /**
- * Solenoid class for running high voltage Digital Output (9472 module).
+ * Solenoid class for running high voltage Digital Output.
  *
  * The Solenoid class is typically used for pneumatics solenoids, but could be used
- * for any device within the current spec of the 9472 module.
+ * for any device within the current spec of the PCM.
  */
 public class Solenoid implements LiveWindowSendable {
 

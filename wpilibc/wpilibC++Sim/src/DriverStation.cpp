@@ -88,10 +88,7 @@ DriverStation* DriverStation::GetInstance()
 }
 
 /**
- * Read the battery voltage from the specified AnalogInput.
- *
- * This accessor assumes that the battery voltage is being measured
- * through the voltage divider on an analog breakout.
+ * Read the battery voltage. Hardcoded to 12 volts for Simulation.
  *
  * @return The battery voltage.
  */

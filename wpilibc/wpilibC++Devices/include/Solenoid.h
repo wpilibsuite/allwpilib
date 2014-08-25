@@ -10,10 +10,10 @@
 #include "tables/ITableListener.h"
 
 /**
- * Solenoid class for running high voltage Digital Output (9472 module).
+ * Solenoid class for running high voltage Digital Output (PCM).
  * 
  * The Solenoid class is typically used for pneumatics solenoids, but could be used
- * for any device within the current spec of the 9472 module.
+ * for any device within the current spec of the PCM.
  */
 class Solenoid : public SolenoidBase, public LiveWindowSendable, public ITableListener
 {

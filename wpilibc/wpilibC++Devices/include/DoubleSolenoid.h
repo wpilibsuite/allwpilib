@@ -11,7 +11,7 @@
 
 /**
  * DoubleSolenoid class for running 2 channels of high voltage Digital Output
- * (9472 module).
+ * (PCM).
  *
  * The DoubleSolenoid class is typically used for pneumatics solenoids that
  * have two positions controlled by two separate channels.

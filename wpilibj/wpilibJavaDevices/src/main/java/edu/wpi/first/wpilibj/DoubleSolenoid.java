@@ -16,8 +16,7 @@ import edu.wpi.first.wpilibj.util.AllocationException;
 import edu.wpi.first.wpilibj.util.CheckedAllocationException;
 
 /**
- * DoubleSolenoid class for running 2 channels of high voltage Digital Output
- * (9472 module).
+ * DoubleSolenoid class for running 2 channels of high voltage Digital Output.
  *
  * The DoubleSolenoid class is typically used for pneumatics solenoids that
  * have two positions controlled by two separate channels.

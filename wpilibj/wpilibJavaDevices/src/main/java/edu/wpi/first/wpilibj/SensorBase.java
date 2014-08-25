@@ -24,7 +24,7 @@ public abstract class SensorBase { // TODO: Refactor
      */
     public static final int kSystemClockTicksPerMicrosecond = 40;
     /**
-     * Number of digital channels per digital sidecar
+     * Number of digital channels per roboRIO
      */
     public static final int kDigitalChannels = 26;
     /**
@@ -44,11 +44,11 @@ public abstract class SensorBase { // TODO: Refactor
      */
     public static final int kSolenoidModules = 2;
     /**
-     * Number of PWM channels per sidecar
+     * Number of PWM channels per roboRIO
      */
     public static final int kPwmChannels = 20;
     /**
-     * Number of relay channels per sidecar
+     * Number of relay channels per roboRIO
      */
     public static final int kRelayChannels = 4;
     /**
@@ -179,7 +179,7 @@ public abstract class SensorBase { // TODO: Refactor
     /**
      * Get the number of the default solenoid module.
      *
-     * @return The number of the default analog module.
+     * @return The number of the default solenoid module.
      */
     public static int getDefaultSolenoidModule() {
         return SensorBase.m_defaultSolenoidModule;
