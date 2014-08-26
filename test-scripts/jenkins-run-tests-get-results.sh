@@ -28,7 +28,7 @@ fi
 printf "Running cpp test\n"
 
 # Run the C++ Tests
-./deploy-and-run-test-on-robot.sh cpp "--gtest_output=xml:${DEFAULT_DESTINATION_CPP_TEST_RESULTS}"
+./deploy-and-run-test-on-robot.sh cpp -A "--gtest_output=xml:${DEFAULT_DESTINATION_CPP_TEST_RESULTS}"
 
 # Retrive the C++ Test Results
 SCP_GET_CPP_TEST_RESULT="scp ${ROBOT_ADDRESS}:${DEFAULT_DESTINATION_CPP_TEST_RESULTS} ${DEFAULT_LOCAL_CPP_TEST_RESULT}"

@@ -39,5 +39,3 @@ function startDS {
 startDS&
 
 sleep 1
-
-exit
