@@ -49,6 +49,10 @@ mkdir -p /home/vagrant/jdk-linux-arm-vfp-sflt/
 # Unzip the jdk into this new directory
 tar -xzf /vagrant/jdk-7u45-linux-arm-vfp-sflt.gz -C /home/vagrant/jdk-linux-arm-vfp-sflt/
 
+
+# Install sshpass for the test system
+apt-get --yes --force-yes install sshpass
+
 # Keep this at the end of this file
 printf "\n\n"
 printf "Your virtual enviroment is now nearly set-up.\n"

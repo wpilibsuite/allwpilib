@@ -18,7 +18,7 @@ fi
 mkdir ${DEFAULT_LOCAL_TEST_RESULTS_DIR} 2>/dev/null
 
 # Remove the preivous test results from the the robot
-SSH_REMOVE_OLD_TEST_RESULTS="ssh -t ${ROBOT_ADDRESS} 'rm -R ${DEFAULT_DESTINATION_TEST_RESULTS_DIR}; mkdir ${DEFAULT_DESTINATION_TEST_RESULTS_DIR}'"
+SSH_REMOVE_OLD_TEST_RESULTS="ssh -t ${ROBOT_ADDRESS} rm -R ${DEFAULT_DESTINATION_TEST_RESULTS_DIR}; mkdir ${DEFAULT_DESTINATION_TEST_RESULTS_DIR}"
 if [ $(which sshpass) ]; then
 	sshpass -p "" ${SSH_REMOVE_OLD_TEST_RESULTS}
 else
@@ -28,7 +28,7 @@ fi
 printf "Running cpp test\n"
 
 # Run the C++ Tests
-deploy-and-run-test-on-robot.sh cpp "--gtest_output=xml:${DEFAULT_DESTINATION_CPP_TEST_RESULTS}"
+./deploy-and-run-test-on-robot.sh cpp "--gtest_output=xml:${DEFAULT_DESTINATION_CPP_TEST_RESULTS}"
 
 # Retrive the C++ Test Results
 SCP_GET_CPP_TEST_RESULT="scp ${ROBOT_ADDRESS}:${DEFAULT_DESTINATION_CPP_TEST_RESULTS} ${DEFAULT_LOCAL_CPP_TEST_RESULT}"
@@ -39,7 +39,7 @@ else
 fi
 
 # Run the Java Tests
-deploy-and-run-test-on-robot.sh java
+./deploy-and-run-test-on-robot.sh java
 
 # Retrive the Java Test Results
 SCP_GET_JAVA_TEST_RESULT="scp ${ROBOT_ADDRESS}:${DEFAULT_DESTINATION_JAVA_TEST_RESULTS} ${DEFAULT_LOCAL_JAVA_TEST_RESULT}"
