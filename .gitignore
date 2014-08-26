@@ -11,6 +11,8 @@ bin/
 .classpath
 **/dependency-reduced-pom.xml
 
+# Created by the jenkins test script
+test-reports
 
 # Added by the users of vagrant
 jdk-7u45-linux-arm-vfp-sflt.gz

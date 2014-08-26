@@ -24,20 +24,6 @@ import org.apache.tools.ant.taskdefs.optional.junit.JUnitTest;
  */
 public class AntJunitLanucher {
 
-	/**
-	 * Deletes the given file recursively
-	 * 
-	 * @param f
-	 *            the file to delete
-	 */
-	static void deleteFile(File f) {
-		if (f.isDirectory()) {
-			for (File c : f.listFiles())
-				deleteFile(c);
-		}
-		f.delete();
-	}
-
 	public static void main(String... args) {
 		if (args.length == 0) {
 			String path = String.format("%s/%s",
@@ -46,9 +32,6 @@ public class AntJunitLanucher {
 			Project project = new Project();
 
 			try {
-				// Delete the the old test directory if it exists
-				deleteFile(new File(pathToReports));
-
 				// Create the file to store the test output
 				new File(pathToReports).mkdirs();
 				JUnitTask task = new JUnitTask();
