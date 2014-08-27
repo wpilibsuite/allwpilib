@@ -435,11 +435,11 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 		int word = NativeHALGetControlWord();
 		return new HALControlWord(
 			(word & 1) != 0,
+			((word >> 1) & 1) != 0,
 			((word >> 2) & 1) != 0,
 			((word >> 3) & 1) != 0,
 			((word >> 4) & 1) != 0,
-			((word >> 5) & 1) != 0,
-			((word >> 6) & 1) != 0
+			((word >> 5) & 1) != 0
 		);
 	}
 
