@@ -50,6 +50,8 @@ RobotBase::RobotBase()
 	, m_ds (NULL)
 {
 	m_ds = DriverStation::GetInstance();
+	RobotState::SetImplementation(DriverStation::GetInstance()); \
+	HLUsageReporting::SetImplementation(new HardwareHLReporting()); \
 }
 
 /**
@@ -151,9 +153,6 @@ void RobotBase::startRobotTask(FUNCPTR factory)
 #else
 	printf("WPILib was compiled without -D'SVN_REV=nnnn'\n");
 #endif
-
-    RobotState::SetImplementation(DriverStation::GetInstance());
-    HLUsageReporting::SetImplementation(new HardwareHLReporting());
 
 #ifdef __vxworks
 	// Check for startup code already running
