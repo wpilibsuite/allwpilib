@@ -3,7 +3,9 @@
 	dh $@
 
 override_dh_auto_build:
-	$(MAKE) allwpilib=../../../..
+	$(MAKE) allwpilib=allwpilib
 
 override_dh_auto_install:
-	$(MAKE) DESTDIR=$$(pwd)/debian/frcsim-libwpilibsim-cpp allwpilib=../../../.. install
+	$(MAKE) DESTDIR=$$(pwd)/debian/frcsim-libwpilibsim-cpp allwpilib=allwpilib install
+
+override_dh_strip:
