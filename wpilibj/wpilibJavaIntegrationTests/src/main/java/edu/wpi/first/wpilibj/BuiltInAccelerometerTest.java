@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Logger;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,14 +19,13 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
-import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
 @RunWith(Parameterized.class)
 public class BuiltInAccelerometerTest extends AbstractComsSetup {
-	private static final Logger logger = Logger.getLogger(PIDTest.class.getName());
+	private static final Logger logger = Logger.getLogger(BuiltInAccelerometerTest.class.getName());
 	private static final double kAccelerationTolerance = 0.1;
-	private BuiltInAccelerometer m_accelerometer;
+	private final BuiltInAccelerometer m_accelerometer;
 
 	public BuiltInAccelerometerTest(Accelerometer.Range range) {
 		m_accelerometer = new BuiltInAccelerometer(range);
