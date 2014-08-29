@@ -86,10 +86,10 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
      * @param on Turn the solenoid output off or on.
      */
     public void set(boolean on) {
-    	ByteBuffer status = ByteBuffer.allocateDirect(4);
-		status.order(ByteOrder.LITTLE_ENDIAN);
-    	SolenoidJNI.setSolenoid(m_solenoid_port, (byte) (on ? 1 : 0), status.asIntBuffer());
-    	HALUtil.checkStatus(status.asIntBuffer());
+        byte value = (byte) (on ? 0xFF : 0x00);
+        byte mask = (byte) (1 << m_channel);
+
+    	set(value, mask);
     }
 
     /**
@@ -98,11 +98,8 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
      * @return The current value of the solenoid.
      */
     public boolean get() {
-    	ByteBuffer status = ByteBuffer.allocateDirect(4);
-    	status.order(ByteOrder.LITTLE_ENDIAN);
-    	boolean value = SolenoidJNI.getSolenoid(m_solenoid_port, status.asIntBuffer()) != 0;
-    	HALUtil.checkStatus(status.asIntBuffer());
-    	return value;
+        int value = getAll() & ( 1 << m_channel);
+        return (value != 0);
     }
 
     /*

@@ -32,7 +32,7 @@ public class PCMTest extends AbstractComsSetup {
 	protected static final double kCompressorDelayTime = 2.0;
 
 	/* Solenoids should change much more quickly */
-	protected static final double kSolenoidDelayTime = 0.1;
+	protected static final double kSolenoidDelayTime = 1.0;
 
 	/* The voltage divider on the test bench should bring the compressor output
 	to around these values. */
@@ -44,7 +44,6 @@ public class PCMTest extends AbstractComsSetup {
 	private static  DigitalOutput fakePressureSwitch;
 	private static AnalogInput fakeCompressor;
 
-	private static  Solenoid solenoid1, solenoid2;
 	private static  DigitalInput fakeSolenoid1, fakeSolenoid2;
 
 	@BeforeClass
@@ -53,9 +52,6 @@ public class PCMTest extends AbstractComsSetup {
 
 	    fakePressureSwitch = new DigitalOutput(11);
 	    fakeCompressor = new AnalogInput(1);
-
-	    solenoid1 = new Solenoid(7);
-	    solenoid2 = new Solenoid(6);
 
 	    fakeSolenoid1 = new DigitalInput(12);
 	    fakeSolenoid2 = new DigitalInput(13);
@@ -67,9 +63,6 @@ public class PCMTest extends AbstractComsSetup {
 
 		fakePressureSwitch.free();
 		fakeCompressor.free();
-
-		solenoid1.free();
-		solenoid2.free();
 
 		fakeSolenoid1.free();
 		fakeSolenoid2.free();
@@ -83,8 +76,6 @@ public class PCMTest extends AbstractComsSetup {
 	public void reset() throws Exception {
 		compressor.stop();
 	    fakePressureSwitch.set(false);
-	    solenoid1.set(false);
-	    solenoid2.set(false);
 	}
 
 	@After
@@ -120,6 +111,9 @@ public class PCMTest extends AbstractComsSetup {
 	public void testSolenoid() throws Exception {
 		reset();
 
+		Solenoid solenoid1 = new Solenoid(0);
+		Solenoid solenoid2 = new Solenoid(1);
+
 		solenoid1.set(false);
 		solenoid2.set(false);
 		Timer.delay(kSolenoidDelayTime);
@@ -146,6 +140,35 @@ public class PCMTest extends AbstractComsSetup {
 		Timer.delay(kSolenoidDelayTime);
 		assertFalse("Solenoid #1 did not turn on",fakeSolenoid1.get());
 		assertFalse("Solenoid #2 did not turn on",fakeSolenoid2.get());
+
+		solenoid1.free();
+		solenoid2.free();
+	}
+
+	/**
+	* Test if the correct solenoids turn on and off when they should when used
+	* with the DoubleSolenoid class.
+	*/
+	@Test
+	public void doubleSolenoid() {
+		DoubleSolenoid solenoid = new DoubleSolenoid(0, 1);
+
+		solenoid.set(DoubleSolenoid.Value.kOff);
+		Timer.delay(kSolenoidDelayTime);
+		assertTrue("Solenoid #1 did not turn off", fakeSolenoid1.get());
+		assertTrue("Solenoid #2 did not turn off", fakeSolenoid2.get());
+
+		solenoid.set(DoubleSolenoid.Value.kForward);
+		Timer.delay(kSolenoidDelayTime);
+		assertFalse("Solenoid #1 did not turn on", fakeSolenoid1.get());
+		assertTrue("Solenoid #2 did not turn off", fakeSolenoid2.get());
+
+		solenoid.set(DoubleSolenoid.Value.kReverse);
+		Timer.delay(kSolenoidDelayTime);
+		assertTrue("Solenoid #1 did not turn off", fakeSolenoid1.get());
+		assertFalse("Solenoid #2 did not turn on", fakeSolenoid2.get());
+
+		solenoid.free();
 	}
 
 	protected Logger getClassLogger(){

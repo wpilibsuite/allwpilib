@@ -11,6 +11,7 @@ import java.nio.IntBuffer;
 import java.nio.ByteBuffer;
 
 import edu.wpi.first.wpilibj.hal.HALUtil;
+import edu.wpi.first.wpilibj.hal.SolenoidJNI;
 
 /**
  * SolenoidBase class is the common base class for the Solenoid and
@@ -20,8 +21,7 @@ public abstract class SolenoidBase extends SensorBase {
 
     private ByteBuffer[] m_ports;
     protected int m_moduleNumber; ///< The number of the solenoid module being used.
-    // XXX: Move this to be both HAL calls
-    //protected Resource m_allocated = new Resource(SolenoidJNI.getModuleCount() * SensorBase.kSolenoidChannels);
+    protected Resource m_allocated = new Resource(63* SensorBase.kSolenoidChannels);
 
     /**
      * Constructor.
@@ -30,13 +30,13 @@ public abstract class SolenoidBase extends SensorBase {
      */
     public SolenoidBase(final int moduleNumber) {
         m_moduleNumber = moduleNumber;
-//        m_ports = new ByteBuffer[SensorBase.kSolenoidChannels];
-//        for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
-//            ByteBuffer port = SolenoidJNI.getPortWithModule((byte) moduleNumber, (byte) (i+1));
-//            IntBuffer status = IntBuffer.allocate(1);
-//            m_ports[i] = SolenoidJNI.initializeSolenoidPort(port, status);
-//            HALUtil.checkStatus(status);
-//        }
+        m_ports = new ByteBuffer[SensorBase.kSolenoidChannels];
+        for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
+            ByteBuffer port = SolenoidJNI.getPortWithModule((byte) moduleNumber, (byte) i);
+            IntBuffer status = IntBuffer.allocate(1);
+            m_ports[i] = SolenoidJNI.initializeSolenoidPort(port, status);
+            HALUtil.checkStatus(status);
+        }
     }
 
     /**
@@ -46,13 +46,13 @@ public abstract class SolenoidBase extends SensorBase {
      * @param mask The channels you want to be affected.
      */
     protected synchronized void set(int value, int mask) {
-//        IntBuffer status = IntBuffer.allocate(1);
-//        for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
-//            int local_mask = 1 << i;
-//            if ((mask & local_mask) != 0)
-//                SolenoidJNI.setSolenoid(m_ports[i], (byte) (value & local_mask), status);
-//        }
-//        HALUtil.checkStatus(status);
+        IntBuffer status = IntBuffer.allocate(1);
+        for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
+            int local_mask = 1 << i;
+            if ((mask & local_mask) != 0)
+                SolenoidJNI.setSolenoid(m_ports[i], (byte) (value & local_mask), status);
+        }
+        HALUtil.checkStatus(status);
     }
 
     /**
@@ -62,32 +62,11 @@ public abstract class SolenoidBase extends SensorBase {
      */
     public byte getAll() {
         byte value = 0;
-//        IntBuffer status = IntBuffer.allocate(1);
-//        for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
-//            value |= SolenoidJNI.getSolenoid(m_ports[i], status) << i;
-//        }
-//        HALUtil.checkStatus(status);
+        IntBuffer status = IntBuffer.allocate(1);
+        for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
+            value |= SolenoidJNI.getSolenoid(m_ports[i], status) << i;
+        }
+        HALUtil.checkStatus(status);
         return value;
-    }
-
-    /**
-     * Read all 8 solenoids in the default solenoid module as a single byte
-     *
-     * @return The current value of all 8 solenoids on the default module.
-     */
-    public static byte getAllFromDefaultModule() {
-        return getAllFromModule(getDefaultSolenoidModule());
-    }
-
-    /**
-     * Read all 8 solenoids in the specified solenoid module as a single byte
-     *
-     * @return The current value of all 8 solenoids on the specified module.
-     */
-    public static byte getAllFromModule(int moduleNumber) {
-    	byte value = 0;
-//        checkSolenoidModule(moduleNumber);
-//        throw new RuntimeException("Not supported right now.");
-    	return value;
     }
 }
