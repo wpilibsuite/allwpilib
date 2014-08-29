@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -69,6 +70,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
 	@After
 	public void tearDown() throws Exception {
 		me.reset();
+		encodersResetCheck(me);
 	}
 
 	@AfterClass
@@ -105,8 +107,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
 		assertTrue(me.getType() + " Encoder not incremented: start: "
 				+ startValue + "; current: " + currentValue,
 				startValue < currentValue);
-		me.reset();
-		encodersResetCheck(me);
+		
 	}
 
 	/**
@@ -122,8 +123,6 @@ public class MotorEncoderTest extends AbstractComsSetup {
 		assertTrue(me.getType() + " Encoder not decremented: start: "
 				+ startValue + "; current: " + currentValue,
 				startValue > currentValue);
-		me.reset();
-		encodersResetCheck(me);
 	}
 
 	/**
@@ -156,7 +155,6 @@ public class MotorEncoderTest extends AbstractComsSetup {
 		me.getMotor().set(15);
 		assertTrue(me.getType() + " Motor speed was not close to 1.0, was: "
 				+ me.getMotor().get(), me.isMotorSpeedWithinRange(1.0, 0.001));
-		me.reset();
 	}
 
 	/**
@@ -167,7 +165,6 @@ public class MotorEncoderTest extends AbstractComsSetup {
 		me.getMotor().set(-15);
 		assertTrue(me.getType() + " Motor speed was not close to 1.0, was: "
 				+ me.getMotor().get(), me.isMotorSpeedWithinRange(-1.0, 0.001));
-		me.reset();
 	}
 
 
@@ -187,7 +184,6 @@ public class MotorEncoderTest extends AbstractComsSetup {
 				pid.onTarget());
 
 		pid.free();
-		me.reset();
 	}
 
 
@@ -196,18 +192,11 @@ public class MotorEncoderTest extends AbstractComsSetup {
 	 * @param me The MotorEncoderFixture under test
 	 */
 	private void encodersResetCheck(MotorEncoderFixture<?> me){
-		int encoderVal =  me.getEncoder().get();
-		int counterVal[] = new int[2];
-		for(int i = 0; i < 2; i++){
-			counterVal[i] = me.getCounters()[i].get();
-		}
-		double motorVal = me.getMotor().get();
-		assertTrue(me.getType() + " Encoder value: " + encoderVal + " when it should be 0", encoderVal == 0);
-		assertTrue(me.getType() + " Motor value: " + motorVal + " when it should be 0", motorVal == 0);
-		assertTrue(me.getType() + " Counter value " + counterVal[0] + " when is should be 0", counterVal[0] == 0);
-		assertTrue(me.getType() + " Counter value " + counterVal[1] + " when is should be 0", counterVal[1] == 0);
-		Timer.delay(.2);
-		assertTrue(me.getType() + " Encoder.getStopped() returned false", me.getEncoder().getStopped());
+		assertEquals(me.getType() + " Encoder value was incorrect after reset.", me.getEncoder().get(), 0);
+		assertEquals(me.getType() + " Motor value was incorrect after reset.", me.getMotor().get(), 0, 0);
+		assertEquals(me.getType() + " Counter1 value was incorrect after reset.", me.getCounters()[0].get(),  0);
+		assertEquals(me.getType() + " Counter2 value was incorrect after reset.", me.getCounters()[1].get(),  0);
+		assertTrue(me.getType() + " Encoder.getStopped() returned false after the motor was reset.", me.getEncoder().getStopped());
 	}
 
 }
