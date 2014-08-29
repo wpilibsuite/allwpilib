@@ -9,7 +9,7 @@
 #include "CANJaguar.h"
 #include "GenericHID.h"
 #include "Joystick.h"
-#include "Jaguar.h"
+#include "Talon.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "Utility.h"
 #include "WPIErrors.h"
@@ -46,15 +46,15 @@ void RobotDrive::InitRobotDrive() {
 /** Constructor for RobotDrive with 2 motors specified with channel numbers.
  * Set up parameters for a two wheel drive system where the
  * left and right motor pwm channels are specified in the call.
- * This call assumes Jaguars for controlling the motors.
+ * This call assumes Talons for controlling the motors.
  * @param leftMotorChannel The PWM channel number that drives the left motor.
  * @param rightMotorChannel The PWM channel number that drives the right motor.
  */
 RobotDrive::RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel)
 {
 	InitRobotDrive();
-	m_rearLeftMotor = new Jaguar(leftMotorChannel);
-	m_rearRightMotor = new Jaguar(rightMotorChannel);
+	m_rearLeftMotor = new Talon(leftMotorChannel);
+	m_rearRightMotor = new Talon(rightMotorChannel);
 	for (int32_t i=0; i < kMaxNumberOfMotors; i++)
 	{
 		m_invertedMotors[i] = 1;
@@ -67,7 +67,7 @@ RobotDrive::RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel)
  * Constructor for RobotDrive with 4 motors specified with channel numbers.
  * Set up parameters for a four wheel drive system where all four motor
  * pwm channels are specified in the call.
- * This call assumes Jaguars for controlling the motors.
+ * This call assumes Talons for controlling the motors.
  * @param frontLeftMotor Front left motor channel number
  * @param rearLeftMotor Rear Left motor channel number
  * @param frontRightMotor Front right motor channel number
@@ -77,10 +77,10 @@ RobotDrive::RobotDrive(uint32_t frontLeftMotor, uint32_t rearLeftMotor,
 		uint32_t frontRightMotor, uint32_t rearRightMotor)
 {
 	InitRobotDrive();
-	m_rearLeftMotor = new Jaguar(rearLeftMotor);
-	m_rearRightMotor = new Jaguar(rearRightMotor);
-	m_frontLeftMotor = new Jaguar(frontLeftMotor);
-	m_frontRightMotor = new Jaguar(frontRightMotor);
+	m_rearLeftMotor = new Talon(rearLeftMotor);
+	m_rearRightMotor = new Talon(rearRightMotor);
+	m_frontLeftMotor = new Talon(frontLeftMotor);
+	m_frontRightMotor = new Talon(frontRightMotor);
 	for (int32_t i=0; i < kMaxNumberOfMotors; i++)
 	{
 		m_invertedMotors[i] = 1;
