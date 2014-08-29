@@ -11,7 +11,8 @@ import edu.wpi.first.wpilib.plugins.cpp.preferences.PreferenceConstants;
 public class ToolchainInstaller extends AbstractInstaller {
 
 	public ToolchainInstaller(String version) {
-		super(version);
+		super(version, 
+				WPILibCPPPlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.TOOLCHAIN_INSTALLED), WPILibCPPPlugin.getDefault().getToolchain());
 	}
 
 	@Override
@@ -21,11 +22,8 @@ public class ToolchainInstaller extends AbstractInstaller {
 
 	@Override
 	protected void updateInstalledVersion(String version) {
-		IPreferenceStore prefs = WPILibCPPPlugin.getDefault().getPreferenceStore();
-		if (prefs.getBoolean(PreferenceConstants.UPDATE_TOOLCHAIN_VERSION)) {
-			System.out.println("Forcing library version to "+version);
-			prefs.setValue(PreferenceConstants.TOOLCHAIN_VERSION, version);
-		}
+		WPILibCPPPlugin.getDefault().getPreferenceStore().setValue(PreferenceConstants.TOOLCHAIN_INSTALLED,
+				WPILibCPPPlugin.getDefault().getCurrentVersion());
 	}
 
 	@Override

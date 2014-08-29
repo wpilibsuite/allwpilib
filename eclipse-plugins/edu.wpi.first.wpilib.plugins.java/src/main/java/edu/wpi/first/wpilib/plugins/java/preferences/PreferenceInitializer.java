@@ -18,9 +18,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	 */
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = WPILibJavaPlugin.getDefault().getPreferenceStore();
-		store.setDefault(PreferenceConstants.LIBRARY_VERSION,
-				WPILibCore.getDefault().getProjectProperties(null)
-				.getProperty("version", WPILibJavaPlugin.getDefault().getCurrentVersion()));
-		store.setDefault(PreferenceConstants.UPDATE_LIBRARY_VERSION, true);
+		if (!store.contains(PreferenceConstants.LIBRARY_INSTALLED))
+			store.setValue(PreferenceConstants.LIBRARY_INSTALLED, "none");
 	}
 }

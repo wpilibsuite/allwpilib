@@ -1,11 +1,8 @@
 package edu.wpi.first.wpilib.plugins.java.installer;
 
 import java.io.InputStream;
-import java.util.Properties;
-
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import edu.wpi.first.wpilib.plugins.core.WPILibCore;
 import edu.wpi.first.wpilib.plugins.core.installer.AbstractInstaller;
 import edu.wpi.first.wpilib.plugins.java.WPILibJavaPlugin;
 import edu.wpi.first.wpilib.plugins.java.preferences.PreferenceConstants;
@@ -19,7 +16,9 @@ import edu.wpi.first.wpilib.plugins.java.preferences.PreferenceConstants;
 public class JavaInstaller extends AbstractInstaller {
 
 	public JavaInstaller(String version) {
-		super(version);
+		super(version, 
+				WPILibJavaPlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.LIBRARY_INSTALLED),
+				WPILibJavaPlugin.getDefault().getJavaPath());
 	}
 
 	@Override
@@ -30,14 +29,7 @@ public class JavaInstaller extends AbstractInstaller {
 	@Override
 	protected void updateInstalledVersion(String version) {
 		IPreferenceStore prefs = WPILibJavaPlugin.getDefault().getPreferenceStore();
-		if (prefs.getBoolean(PreferenceConstants.UPDATE_LIBRARY_VERSION)) {
-			WPILibJavaPlugin.logInfo("Forcing library version to "+version);
-	    	Properties props = WPILibCore.getDefault().getProjectProperties(null);
-	    	props.setProperty("version", version);
-	    	WPILibCore.getDefault().saveGlobalProperties(props);
-			prefs.setValue(PreferenceConstants.LIBRARY_VERSION, version);
-		}
-    	WPILibJavaPlugin.getDefault().updateProjects();
+			prefs.setValue(PreferenceConstants.LIBRARY_INSTALLED, version);
 	}
 
 	@Override

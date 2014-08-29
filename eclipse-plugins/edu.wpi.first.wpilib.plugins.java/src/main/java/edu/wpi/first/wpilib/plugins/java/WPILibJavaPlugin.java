@@ -78,12 +78,16 @@ public class WPILibJavaPlugin extends AbstractUIPlugin implements IStartup {
 			return "DEVELOPMENT";
 		}
 	}
+	public String getJavaPath() {
+		return WPILibCore.getDefault().getWPILibBaseDir()
+				+ File.separator + "java" + File.separator + "current";
+	}
 
 	public Properties getProjectProperties(IProject project) {
 		Properties defaults = WPILibCore.getDefault().getProjectProperties(project);
 		Properties props;
 		try {
-			File file = new File(WPILibCore.getDefault().getWPILibBaseDir()+"/java/"+getCurrentVersion()+"/ant/build.properties");
+			File file = new File(WPILibCore.getDefault().getWPILibBaseDir()+"/java/current/ant/build.properties");
 			props = new AntPropertiesParser(new FileInputStream(file)).getProperties(defaults);
 		} catch (Exception e) {
             WPILibJavaPlugin.logError("Error getting properties.", e);

@@ -33,7 +33,7 @@ public class Activator extends AbstractUIPlugin implements IStartup {
 	}
 
 	private String getCurrentVersion() {
-		return WPILibCPPPlugin.getDefault().getDefaultToolchainVersion();
+		return "4.4.1-csery-gcc";
 	}
 
 	/*

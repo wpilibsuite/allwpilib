@@ -158,15 +158,6 @@
       </commonWizard>
    </extension>
    <extension
-       point="org.eclipse.ui.preferencePages">
-      <page
-            category="edu.wpi.first.wpilib.plugins.core.preferences.WPILibPreferencePage"
-            class="edu.wpi.first.wpilib.plugins.java.preferences.JavaPreferencePage"
-            id="edu.wpi.first.wpilib.plugins.java.preferences.JavaPreferencePage"
-            name="Java Preferences">
-      </page>
-   </extension>
-   <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
             class="edu.wpi.first.wpilib.plugins.java.preferences.PreferenceInitializer">

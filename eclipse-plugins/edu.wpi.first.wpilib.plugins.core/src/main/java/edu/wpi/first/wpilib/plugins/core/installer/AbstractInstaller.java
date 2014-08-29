@@ -22,12 +22,12 @@ import edu.wpi.first.wpilib.plugins.core.WPILibCore;
 
 public abstract class AbstractInstaller {
 	protected File installLocation;
-	protected String version;
+	protected String version, installedVersion;
 
-	public AbstractInstaller(String version) {
-		this.installLocation = new File(WPILibCore.getDefault().getWPILibBaseDir()
-				+ File.separator + getFeatureName() + File.separator + version);
+	public AbstractInstaller(String version, String installedVersion, String path) {
+		this.installLocation = new File(path);
 		this.version = version;
+		this.installedVersion = installedVersion;
 	}
 
 	/**
@@ -55,7 +55,7 @@ public abstract class AbstractInstaller {
 				WPILibCore.logInfo("Installing "+getFeatureName()+" if necessary");
 
 				if (!isInstalled()) {
-					WPILibCore.logInfo("Install necessary");
+					WPILibCore.logInfo("Install necessary for " + getFeatureName());
 					try {
 						install();
 					} catch (InstallException e) {
@@ -64,9 +64,9 @@ public abstract class AbstractInstaller {
 								getErrorMessage(e));
 					}
 				}
-
+				
 				updateInstalledVersion(version);
-				WPILibCore.logInfo("Installed");
+				WPILibCore.logInfo("Installed" + getFeatureName());
 
 				return Status.OK_STATUS;
 			}
@@ -105,7 +105,7 @@ public abstract class AbstractInstaller {
 	 * @return True for is there and newer, false otherwise.
 	 */
 	protected boolean isInstalled() {
-		return installLocation.exists(); 
+		return installLocation.exists() && !version.contains("DEVELOPMENT") && version.equals(installedVersion);
 	}
 
 	/**
@@ -138,7 +138,7 @@ public abstract class AbstractInstaller {
 					}
 
 					// Call 'unzip'
-					final String[] cmd = {"unzip", tmpFile.getAbsolutePath(), "-d", installLocation.getAbsolutePath()};
+					final String[] cmd = {"unzip" , "-o", tmpFile.getAbsolutePath(), "-d", installLocation.getAbsolutePath()};
 					WPILibCore.logInfo("unzip "+tmpFile.getAbsolutePath()+" -d "+installLocation.getAbsolutePath());
 					final Process unzipProcess = DebugPlugin.exec(cmd, installLocation);
 					try (final InputStream is = unzipProcess.getInputStream()) {
