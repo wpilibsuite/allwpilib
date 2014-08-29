@@ -79,7 +79,7 @@ public class RobotDrive implements MotorSafety {
     /** Constructor for RobotDrive with 2 motors specified with channel numbers.
      * Set up parameters for a two wheel drive system where the
      * left and right motor pwm channels are specified in the call.
-     * This call assumes Jaguars for controlling the motors.
+     * This call assumes Talons for controlling the motors.
      * @param leftMotorChannel The PWM channel number that drives the left motor.
      * @param rightMotorChannel The PWM channel number that drives the right motor.
      */
@@ -87,9 +87,9 @@ public class RobotDrive implements MotorSafety {
         m_sensitivity = kDefaultSensitivity;
         m_maxOutput = kDefaultMaxOutput;
         m_frontLeftMotor = null;
-        m_rearLeftMotor = new Jaguar(leftMotorChannel);
+        m_rearLeftMotor = new Talon(leftMotorChannel);
         m_frontRightMotor = null;
-        m_rearRightMotor = new Jaguar(rightMotorChannel);
+        m_rearRightMotor = new Talon(rightMotorChannel);
         for (int i = 0; i < kMaxNumberOfMotors; i++) {
             m_invertedMotors[i] = 1;
         }
@@ -102,7 +102,7 @@ public class RobotDrive implements MotorSafety {
      * Constructor for RobotDrive with 4 motors specified with channel numbers.
      * Set up parameters for a four wheel drive system where all four motor
      * pwm channels are specified in the call.
-     * This call assumes Jaguars for controlling the motors.
+     * This call assumes Talons for controlling the motors.
      * @param frontLeftMotor Front left motor channel number
      * @param rearLeftMotor Rear Left motor channel number
      * @param frontRightMotor Front right motor channel number
@@ -112,10 +112,10 @@ public class RobotDrive implements MotorSafety {
                       final int frontRightMotor, final int rearRightMotor) {
         m_sensitivity = kDefaultSensitivity;
         m_maxOutput = kDefaultMaxOutput;
-        m_rearLeftMotor = new Jaguar(rearLeftMotor);
-        m_rearRightMotor = new Jaguar(rearRightMotor);
-        m_frontLeftMotor = new Jaguar(frontLeftMotor);
-        m_frontRightMotor = new Jaguar(frontRightMotor);
+        m_rearLeftMotor = new Talon(rearLeftMotor);
+        m_rearRightMotor = new Talon(rearRightMotor);
+        m_frontLeftMotor = new Talon(frontLeftMotor);
+        m_frontRightMotor = new Talon(frontRightMotor);
         for (int i = 0; i < kMaxNumberOfMotors; i++) {
             m_invertedMotors[i] = 1;
         }
