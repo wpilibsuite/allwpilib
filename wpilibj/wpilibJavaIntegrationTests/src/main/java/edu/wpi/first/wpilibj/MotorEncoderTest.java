@@ -75,6 +75,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
 	public static void tearDownAfterClass() {
 		// Clean up the fixture after the test
 		me.teardown();
+		me=null;
 	}
 
 	/**

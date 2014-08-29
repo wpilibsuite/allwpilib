@@ -37,6 +37,7 @@ public class CounterTest extends AbstractComsSetup {
 	Integer input;
 	Integer output;
 	
+	@Override
 	protected Logger getClassLogger(){
 		return logger;
 	}
@@ -87,6 +88,7 @@ public class CounterTest extends AbstractComsSetup {
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 		counter.teardown();
+		counter=null;
 	}
 
 	/**

@@ -28,6 +28,7 @@ public class PDPTest extends AbstractComsSetup {
 
 	private static PowerDistributionPanel pdp;
 	private static MotorEncoderFixture<?> me;
+	private final double expectedStoppedCurrentDraw; 
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -37,24 +38,28 @@ public class PDPTest extends AbstractComsSetup {
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 		pdp.free();
+		pdp=null;
 		me.teardown();
+		me=null;
 	}
 
 
-	public PDPTest(MotorEncoderFixture<?> mef){
+	public PDPTest(MotorEncoderFixture<?> mef, Double expectedCurrentDraw){
 		logger.fine("Constructor with: " + mef.getType());
 		if(me != null && !me.equals(mef)) me.teardown();
 		me = mef;
 		me.setup();
+		
+		this.expectedStoppedCurrentDraw = expectedCurrentDraw;
 	}
 
-	@Parameters(name= "{index}: {0}")
-	public static Collection<MotorEncoderFixture<?>[]> generateData(){
+	@Parameters(name= "{index}: {0}, Expected Stopped Current Draw: {1}")
+	public static Collection<Object[]> generateData(){
 		//logger.fine("Loading the MotorList");
-		return Arrays.asList(new MotorEncoderFixture<?>[][]{
-				 {TestBench.getInstance().getTalonPair()},
-				 {TestBench.getInstance().getVictorPair()},
-				 {TestBench.getInstance().getJaguarPair()}
+		return Arrays.asList(new Object[][]{
+				 {TestBench.getInstance().getTalonPair(), new Double(0.0)},
+				 {TestBench.getInstance().getVictorPair(), new Double(0.0)},
+				 {TestBench.getInstance().getJaguarPair(), new Double(0.0)}
 		});
 	}
 
@@ -74,7 +79,7 @@ public class PDPTest extends AbstractComsSetup {
 
 		/* The Current should be 0 */
 		assertEquals("The low current was not within the expected range.",
-				0.0, pdp.getCurrent(me.getPDPChannel()), 0.001);
+				expectedStoppedCurrentDraw, pdp.getCurrent(me.getPDPChannel()), 0.001);
 	}
 
 	/**
@@ -89,7 +94,7 @@ public class PDPTest extends AbstractComsSetup {
 
 		/* The current should now be greater than the low current */
 		assertThat("The driven current is not greater than the resting current.",
-				pdp.getCurrent(me.getPDPChannel()), is(greaterThan(0.0)));
+				pdp.getCurrent(me.getPDPChannel()), is(greaterThan(expectedStoppedCurrentDraw)));
 	}
 
 	@Override

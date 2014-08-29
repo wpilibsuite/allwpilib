@@ -195,50 +195,50 @@ public class TestSuite extends AbstractTestSuite {
 			return JUnitCore.runClasses(QUICK_TEST);
 		}
 		
+		/**
+		 * Stores the data from multiple {@link Result}s in one class that can be returned to display the results.
+		 */
+		class MultipleResult extends Result{
+			private static final long serialVersionUID = 1L;
+			private final List<Failure> failures = new Vector<Failure>();
+			private int runCount = 0;
+			private int ignoreCount = 0;
+			private long runTime = 0;
+			
+		    @Override
+			public int getRunCount() {
+		        return runCount;
+		    }
+		    @Override
+			public int getFailureCount() {
+		        return failures.size();
+		    }
+		    @Override
+			public long getRunTime() {
+		        return runTime;
+		    }
+		    @Override
+			public List<Failure> getFailures() {
+		        return failures;
+		    }
+		    @Override
+			public int getIgnoreCount() {
+		        return ignoreCount;
+		    }
+			/**
+			 * Adds the given result's data to this result
+			 * @param r the result to add to this result
+			 */
+			void addResult(Result r){
+				failures.addAll(r.getFailures());
+				runCount += r.getRunCount();
+				ignoreCount += r.getIgnoreCount();
+				runTime += r.getRunTime();	
+			}
+		}
+		
 		//If a specific method has been requested
 		if(methodFilter){
-			/**
-			 * Stores the data from multiple {@link Result}s in one class that can be returned to display the results.
-			 */
-			class MultipleResult extends Result{
-				private static final long serialVersionUID = 1L;
-				private final List<Failure> failures = new Vector<Failure>();
-				private int runCount = 0;
-				private int ignoreCount = 0;
-				private long runTime = 0;
-				
-			    @Override
-				public int getRunCount() {
-			        return runCount;
-			    }
-			    @Override
-				public int getFailureCount() {
-			        return failures.size();
-			    }
-			    @Override
-				public long getRunTime() {
-			        return runTime;
-			    }
-			    @Override
-				public List<Failure> getFailures() {
-			        return failures;
-			    }
-			    @Override
-				public int getIgnoreCount() {
-			        return ignoreCount;
-			    }
-				/**
-				 * Adds the given result's data to this result
-				 * @param r the result to add to this result
-				 */
-				void addResult(Result r){
-					failures.addAll(r.getFailures());
-					runCount += r.getRunCount();
-					ignoreCount += r.getIgnoreCount();
-					runTime += r.getRunTime();	
-				}
-			}
-			
 			List<ClassMethodPair> pairs  = (new TestSuite()).getMethodMatching(methodRegex);
 			if(pairs.size() == 0){
 				displayInvalidUsage("None of the arguments passed to the method name filter matched.", args);
@@ -280,10 +280,17 @@ public class TestSuite extends AbstractTestSuite {
 				return null;
 			}
 			printLoadedTests(testClasses.toArray(new Class[0]));
-			return JUnitCore.runClasses(testClasses.toArray(new Class[0]));	
+			MultipleResult results = new MultipleResult();
+			//Runs tests multiple times if the repeat rule is used
+			for(int i = 0; i < repeatCount; i++){
+				Result result = (new JUnitCore()).run(testClasses.toArray(new Class[0]));
+				//Store the given results in one cohesive result
+				results.addResult(result);
+			}
+			return results;
 		}
-		
 		displayInvalidUsage("None of the parameters that you passed matched any of the accepted flags.", args);
+		
 		return null;
 	}
 	

@@ -53,6 +53,7 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 		analogIO.teardown();
+		analogIO=null;
 	}
 
 	/**
