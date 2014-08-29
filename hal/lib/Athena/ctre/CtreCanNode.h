@@ -88,6 +88,11 @@ private:
 			uint32_t arbId;
 			uint8_t toSend[8];
 			uint32_t periodMs;
+			txJob_t() : arbId(0),periodMs(0)
+			{
+				for(int i=0;i<sizeof(toSend);++i)
+					toSend[i] = 0;
+			}
 	};
 
 	class rxEvent_t{

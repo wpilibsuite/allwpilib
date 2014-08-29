@@ -101,8 +101,7 @@ PCM::PCM(UINT8 deviceNumber): CtreCanNode(deviceNumber)
 	RegisterRx(STATUS_DEBUG | deviceNumber );
 	RegisterTx(CONTROL_1 | deviceNumber, kCANPeriod);
 	/* enable close loop */
-	CtreCanNode::txTask<PcmControl_t> toFill = GetTx<PcmControl_t>(CONTROL_1 | GetDeviceNumber());
-	toFill->closedLoopEnable = 1;
+	SetClosedLoopControl(1);
 }
 /* PCM D'tor
  */
