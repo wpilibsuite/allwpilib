@@ -6,7 +6,9 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,43 +16,28 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.logging.Logger;
 
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import edu.wpi.first.wpilibj.command.AbstractCommandTest;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
 /**
  * @author jonathanleitschuh
  *
  */
-public class PrefrencesTest extends AbstractCommandTest {
+public class PrefrencesTest extends AbstractComsSetup {
 	private static final Logger logger = Logger.getLogger(PrefrencesTest.class.getName());
 	
 	private NetworkTable prefTable;
 	private Preferences pref;
 	private long check;
 
+	@Override
 	protected Logger getClassLogger(){
 		return logger;
 	}
-	
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
 
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
 
 	/**
 	 * @throws java.lang.Exception
@@ -77,13 +64,7 @@ public class PrefrencesTest extends AbstractCommandTest {
 		check = System.currentTimeMillis();
 	}
 
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@After
-	public void tearDown() throws Exception {
-	}
-	
+
 	public void remove() {
 		pref.remove("checkedValueLong");
 		pref.remove("checkedValueDouble");
@@ -101,7 +82,7 @@ public class PrefrencesTest extends AbstractCommandTest {
 		pref.putFloat("checkedValueFloat", 1);
 		pref.putBoolean("checkedValueBoolean", true);
 	}
-	
+
 	@Test
 	public void testAddRemoveSave() {
 		assertEquals(pref.getLong("checkedValueLong", 0), 172L);
