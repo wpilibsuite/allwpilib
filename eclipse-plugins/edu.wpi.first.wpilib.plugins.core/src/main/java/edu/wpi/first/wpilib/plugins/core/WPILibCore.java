@@ -133,7 +133,7 @@ public class WPILibCore extends AbstractUIPlugin {
 	}
 
 	public String getDefaultVersion() {
-		return "2013-test-0.4";
+		return "0.2";
 	}
 
 	public String getCurrentVersion() {

@@ -58,13 +58,9 @@ public class WPILibCPPPlugin extends AbstractUIPlugin implements IStartup {
 		return plugin;
 	}
 
-	public String getDefaultToolchainVersion() {
-		return "arm-none-linux-gnueabi-4.4.1";
-	}
-
 	public String getToolchain() {
 		return WPILibCore.getDefault().getWPILibBaseDir()
-				+ File.separator + "toolchains" + File.separator + getPreferenceStore().getString(PreferenceConstants.TOOLCHAIN_VERSION);
+				+ File.separator + "toolchains" + File.separator + "current";
 	}
 	
 	public String getCurrentVersion() {
@@ -82,7 +78,7 @@ public class WPILibCPPPlugin extends AbstractUIPlugin implements IStartup {
 
 	public String getCPPDir() {
 		return WPILibCore.getDefault().getWPILibBaseDir()
-				+ File.separator + "cpp" + File.separator + getPreferenceStore().getString(PreferenceConstants.LIBRARY_VERSION);
+				+ File.separator + "cpp" + File.separator + "current";
 	}
 
 	@Override
