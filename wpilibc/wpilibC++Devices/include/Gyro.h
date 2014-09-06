@@ -40,6 +40,7 @@ public:
 	void SetDeadband(float volts);
 	void SetPIDSourceParameter(PIDSourceParameter pidSource);
 	virtual void Reset();
+	void InitGyro();
 
 	// PIDSource interface
 	double PIDGet();
@@ -51,10 +52,10 @@ public:
 	void InitTable(ITable *subTable);
 	ITable * GetTable();
 
-private:
-	void InitGyro();
-
+protected:
 	AnalogInput *m_analog;
+
+private:
 	float m_voltsPerDegreePerSecond;
 	float m_offset;
 	bool m_channelAllocated;

@@ -29,7 +29,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 	static final double kSamplesPerSecond = 50.0;
 	static final double kCalibrationSampleTime = 5.0;
 	static final double kDefaultVoltsPerDegreePerSecond = 0.007;
-	private AnalogInput m_analog;
+	protected AnalogInput m_analog;
 	double m_voltsPerDegreePerSecond;
 	double m_offset;
 	int m_center;
@@ -45,7 +45,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 	 * calculations are in progress, this is typically done when the robot is
 	 * first turned on while it's sitting at rest before the competition starts.
 	 */
-	private void initGyro() {
+	public void initGyro() {
 		result = new AccumulatorResult();
 		if (m_analog == null) {
 			System.out.println("Null m_analog");
