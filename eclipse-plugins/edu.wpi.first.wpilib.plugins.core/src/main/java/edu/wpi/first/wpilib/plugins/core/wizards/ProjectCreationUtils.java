@@ -21,6 +21,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 
 import edu.wpi.first.wpilib.plugins.core.WPILibCore;
 
@@ -79,8 +81,14 @@ public class ProjectCreationUtils {
 			} catch (CoreException e) {
                 WPILibCore.logError("Can't create new project.", e);
 			}
+		}else {
+			Display.getDefault().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "Error", "Error! A project of the same name already exists in the Workspace");
+				}
+			});
 		}
-		
 		return newProject;
 	}
 
