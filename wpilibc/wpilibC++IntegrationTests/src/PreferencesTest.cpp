@@ -10,7 +10,7 @@
 #include <cstdio>
 #include <fstream>
 
-static const char *kFileName = "wpilib-preferences.ini";
+static const char *kFileName = "/home/lvuser/wpilib-preferences.ini";
 static const double kSaveTime = 0.2;
 
 /**

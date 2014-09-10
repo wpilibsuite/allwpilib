@@ -28,7 +28,7 @@ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
  */
 public class PrefrencesTest extends AbstractComsSetup {
 	private static final Logger logger = Logger.getLogger(PrefrencesTest.class.getName());
-	
+
 	private NetworkTable prefTable;
 	private Preferences pref;
 	private long check;
@@ -45,7 +45,7 @@ public class PrefrencesTest extends AbstractComsSetup {
 	@Before
 	public void setUp() throws Exception {
 		try {
-			File file = new File("wpilib-preferences.ini");
+			File file = new File("/home/lvuser/wpilib-preferences.ini");
 			file.mkdirs();
 			if (file.exists()) {
 				file.delete();
@@ -109,7 +109,7 @@ public class PrefrencesTest extends AbstractComsSetup {
 		assertEquals(pref.getFloat("checkedValueFloat", 0), 1, 0);
 		assertTrue(pref.getBoolean("checkedValueBoolean", false));
 	}
-	
+
 	@Test
 	public void testPreferencesToNetworkTables(){
 		String networkedNumber = "networkCheckedValue";

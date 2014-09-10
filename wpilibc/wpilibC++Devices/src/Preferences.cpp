@@ -18,7 +18,7 @@ static const char *kTableName = "Preferences";
 /** The value of the save field */
 static const char *kSaveField = "~S A V E~";
 /** The file to save to */
-static const char *kFileName = "wpilib-preferences.ini";
+static const char *kFileName = "/home/lvuser/wpilib-preferences.ini";
 /** The characters to put between a field and value */
 static const char *kValuePrefix = "=\"";
 /** The characters to put after the value */
