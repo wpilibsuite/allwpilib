@@ -46,7 +46,7 @@ public abstract class SolenoidBase extends SensorBase {
      * @param mask The channels you want to be affected.
      */
     protected synchronized void set(int value, int mask) {
-        IntBuffer status = IntBuffer.allocate(1);
+        IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
         for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
             int local_mask = 1 << i;
             if ((mask & local_mask) != 0)
@@ -62,7 +62,7 @@ public abstract class SolenoidBase extends SensorBase {
      */
     public byte getAll() {
         byte value = 0;
-        IntBuffer status = IntBuffer.allocate(1);
+        IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
         for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
             value |= SolenoidJNI.getSolenoid(m_ports[i], status) << i;
         }
