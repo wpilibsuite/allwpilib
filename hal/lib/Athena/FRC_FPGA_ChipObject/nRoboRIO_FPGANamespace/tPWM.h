@@ -1,14 +1,14 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2015_1_0_7_PWM_h__
-#define __nFRC_2015_1_0_7_PWM_h__
+#ifndef __nFRC_2015_1_0_8_PWM_h__
+#define __nFRC_2015_1_0_8_PWM_h__
 
 #include "tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2015_1_0_7
+namespace nFRC_2015_1_0_8
 {
 
 class tPWM
@@ -80,6 +80,15 @@ public:
    virtual unsigned char readPeriodScaleHdr(unsigned char bitfield_index, tRioStatusCode *status) = 0;
 
 
+   typedef enum
+   {
+      kNumZeroLatchElements = 20,
+   } tZeroLatch_IfaceConstants;
+
+   virtual void writeZeroLatch(unsigned char bitfield_index, bool value, tRioStatusCode *status) = 0;
+   virtual bool readZeroLatch(unsigned char bitfield_index, tRioStatusCode *status) = 0;
+
+
 
 
    typedef enum
@@ -108,4 +117,4 @@ private:
 }
 }
 
-#endif // __nFRC_2015_1_0_7_PWM_h__
+#endif // __nFRC_2015_1_0_8_PWM_h__
