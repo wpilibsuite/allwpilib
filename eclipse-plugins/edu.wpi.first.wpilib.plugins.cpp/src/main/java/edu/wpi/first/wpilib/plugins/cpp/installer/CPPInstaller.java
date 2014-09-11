@@ -20,7 +20,7 @@ public class CPPInstaller extends AbstractInstaller {
 	@Override
 	protected void updateInstalledVersion(String version) {
 		WPILibCPPPlugin.getDefault().getPreferenceStore().setValue(PreferenceConstants.LIBRARY_INSTALLED,
-				WPILibCPPPlugin.getDefault().getCurrentVersion());
+				version);
 	}
 	
 	@Override

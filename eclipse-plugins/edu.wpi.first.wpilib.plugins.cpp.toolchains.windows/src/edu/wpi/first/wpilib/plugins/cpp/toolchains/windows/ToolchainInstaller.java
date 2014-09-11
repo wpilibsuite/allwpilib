@@ -23,7 +23,7 @@ public class ToolchainInstaller extends AbstractInstaller {
 	@Override
 	protected void updateInstalledVersion(String version) {
 		WPILibCPPPlugin.getDefault().getPreferenceStore().setValue(PreferenceConstants.TOOLCHAIN_INSTALLED,
-				WPILibCPPPlugin.getDefault().getCurrentVersion());
+				version);
 	}
 
 	@Override
