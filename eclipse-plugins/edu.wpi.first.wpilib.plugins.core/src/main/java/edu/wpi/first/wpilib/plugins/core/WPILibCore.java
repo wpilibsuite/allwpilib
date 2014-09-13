@@ -105,6 +105,7 @@ public class WPILibCore extends AbstractUIPlugin {
 
 	public void saveGlobalProperties(Properties props) {
 		try {
+			props.setProperty("version", "current");
 			props.store(new FileOutputStream(new File(WPILibCore.getDefault()
 					.getWPILibBaseDir() + "/wpilib.properties")),
 					"Don't add new properties, they will be deleted by the eclipse plugin.");
