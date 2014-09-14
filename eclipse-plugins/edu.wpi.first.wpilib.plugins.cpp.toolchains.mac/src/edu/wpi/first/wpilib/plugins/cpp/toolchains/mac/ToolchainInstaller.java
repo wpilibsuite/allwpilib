@@ -12,7 +12,8 @@ public class ToolchainInstaller extends AbstractInstaller {
 
 	public ToolchainInstaller(String version) {
 		super(version, 
-				WPILibCPPPlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.TOOLCHAIN_INSTALLED), WPILibCPPPlugin.getDefault().getToolchain());
+				WPILibCPPPlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.TOOLCHAIN_INSTALLED), 
+				WPILibCPPPlugin.getDefault().getToolchain());
 	}
 
 	@Override
@@ -22,7 +23,7 @@ public class ToolchainInstaller extends AbstractInstaller {
 
 	@Override
 	protected void updateInstalledVersion(String version) {
-		WPILibCPPPlugin.getDefault().getPreferenceStore().setDefault(PreferenceConstants.TOOLCHAIN_INSTALLED,
+		WPILibCPPPlugin.getDefault().getPreferenceStore().setValue(PreferenceConstants.TOOLCHAIN_INSTALLED,
 				version);
 	}
 
@@ -30,5 +31,4 @@ public class ToolchainInstaller extends AbstractInstaller {
 	protected InputStream getInstallResourceStream() {
 		return ToolchainInstaller.class.getResourceAsStream("/resources/toolchain.zip");
 	}
-
 }
