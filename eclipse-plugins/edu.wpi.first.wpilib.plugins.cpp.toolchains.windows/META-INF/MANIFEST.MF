@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Windows
 Bundle-SymbolicName: edu.wpi.first.wpilib.plugins.cpp.toolchains.windows;singleton:=true
-Bundle-Version: 0.2.0
+Bundle-Version: 0.3.0
 Bundle-Activator: edu.wpi.first.wpilib.plugins.cpp.toolchains.windows.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,

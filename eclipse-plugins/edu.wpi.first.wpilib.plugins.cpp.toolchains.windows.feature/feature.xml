@@ -2,7 +2,7 @@
 <feature
       id="edu.wpi.first.wpilib.plugins.cpp.toolchains.windows.feature"
       label="Windows Toolchain for Robot C++ Development"
-      version="0.2.0"
+      version="0.3.0"
       provider-name="Worcester Polytechnic Institute"
       os="win32">
 

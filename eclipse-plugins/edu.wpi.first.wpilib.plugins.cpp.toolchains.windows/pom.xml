@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>edu.wpi.first.wpilib.plugins.cpp.toolchains.windows</artifactId>
-  <version>0.2.0</version>
+  <version>0.3.0</version>
   <packaging>eclipse-plugin</packaging>
 
   <parent>
