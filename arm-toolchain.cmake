@@ -1,12 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 INCLUDE(CMakeForceCompiler)
-set(ARM_PREFIX arm-none-linux-gnueabi)
-#set(ARM_PREFIX arm-frc-linux-gnueabi)
+set(ARM_PREFIX arm-frc-linux-gnueabi)
 set(CMAKE_SYSTEM_NAME Linux)
 CMAKE_FORCE_CXX_COMPILER(${ARM_PREFIX}-g++ GNU)
 CMAKE_FORCE_C_COMPILER(${ARM_PREFIX}-gcc GNU)
 set(CMAKE_CXX_FLAGS "-march=armv7-a -mcpu=cortex-a9 -mfloat-abi=softfp -Wall -Wno-psabi" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g3" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -g" CACHE STRING "" FORCE) # still want debugging for release?
-#SET(CMAKE_FIND_ROOT_PATH /usr/arm-frc-linux-gnueabi)
-SET(CMAKE_FIND_ROOT_PATH $ENV{USER_HOME}/wpilib/toolchains/arm-none-linux-gnueabi-4.4.1/arm-none-linux-gnueabi/libc)
