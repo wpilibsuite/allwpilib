@@ -58,11 +58,6 @@ public class WPILibCPPPlugin extends AbstractUIPlugin implements IStartup {
 		return plugin;
 	}
 
-	public String getToolchain() {
-		return WPILibCore.getDefault().getWPILibBaseDir()
-				+ File.separator + "toolchains" + File.separator + "current";
-	}
-	
 	public String getCurrentVersion() {
 		try {
 			Properties props = new AntPropertiesParser(WPILibCPPPlugin.class.getResourceAsStream("/resources/configuration.properties")).getProperties();

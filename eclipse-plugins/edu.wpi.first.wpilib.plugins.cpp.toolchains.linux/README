@@ -1,8 +1,0 @@
-Making This Plugin Work
-=======================
-
-This plugin needs a very big zip that contains the toolchain. This is
-currently hosted by Jenkins in the "Windows Toolchain Provider"
-project. This can also be created from the download from mentor
-embedded. The file should be resources/toolchain.zip and contains the
-5 main directories.
