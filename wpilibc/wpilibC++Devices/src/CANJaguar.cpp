@@ -1837,10 +1837,9 @@ void CANJaguar::ConfigNeutralMode(NeutralMode mode)
 void CANJaguar::ConfigEncoderCodesPerRev(uint16_t codesPerRev)
 {
 	uint8_t dataBuffer[8];
-	uint8_t dataSize;
 
 	// Set the codes per revolution mode
-	dataSize = packint16_t(dataBuffer, codesPerRev);
+	packint16_t(dataBuffer, codesPerRev);
 	sendMessage(LM_API_CFG_ENC_LINES, dataBuffer, sizeof(uint16_t));
 
 	m_encoderCodesPerRev = codesPerRev;

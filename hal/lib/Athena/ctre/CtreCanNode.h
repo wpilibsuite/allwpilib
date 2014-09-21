@@ -90,7 +90,7 @@ private:
 			uint32_t periodMs;
 			txJob_t() : arbId(0),periodMs(0)
 			{
-				for(int i=0;i<sizeof(toSend);++i)
+				for(unsigned i=0;i<sizeof(toSend);++i)
 					toSend[i] = 0;
 			}
 	};
