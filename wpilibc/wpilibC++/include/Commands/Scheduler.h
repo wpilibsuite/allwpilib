@@ -34,6 +34,7 @@ public:
 	void Run();	
 	void Remove(Command *command);
 	void RemoveAll();
+	void ResetAll();
 	void SetEnabled(bool enabled);
 	
 	void UpdateTable();

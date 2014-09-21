@@ -26,7 +26,7 @@ protected:
 	 * scope of the test.
 	 */
 	void TeardownScheduler(){
-		Scheduler::GetInstance()->RemoveAll();
+		Scheduler::GetInstance()->ResetAll();
 	}
 
 	void AssertCommandState(MockCommand &command, int initialize, int execute, int isFinished, int end, int interrupted){
@@ -224,11 +224,11 @@ TEST_F(CommandTest, ThreeCommandOnSubSystem){
 
 //CommandSequentialGroupTest ported from CommandSequentialGroupTest.java
 TEST_F(CommandTest, OneCommandSupersedingAnotherBecauseOfDependencies){
-	ASubsystem subsystem("Command Superseding Test Subsystem");
+	ASubsystem* subsystem = new ASubsystem("Command Superseding Test Subsystem");
 	MockCommand command1;
-	command1.Requires(&subsystem);
+	command1.Requires(subsystem);
 	MockCommand command2;
-	command2.Requires(&subsystem);
+	command2.Requires(subsystem);
 
 
 	AssertCommandState(command1, 0, 0, 0, 0, 0);

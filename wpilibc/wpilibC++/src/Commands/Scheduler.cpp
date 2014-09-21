@@ -26,6 +26,10 @@ Scheduler::Scheduler() :
 
 	m_table = NULL;
 	m_enabled = true;
+	m_runningCommandsChanged = false;
+	toCancel = NULL;
+	commands = NULL;
+	ids = NULL;
 }
 
 Scheduler::~Scheduler() {
@@ -213,6 +217,19 @@ void Scheduler::RemoveAll() {
 	while (m_commands.size() > 0) {
 		Remove(*m_commands.begin());
 	}
+}
+
+/**
+ * Completely resets the scheduler. Undefined behavior if running.
+ */
+void Scheduler::ResetAll()
+{
+	RemoveAll();
+	m_subsystems.clear();
+	m_buttons.clear();
+	m_additions.clear();
+	m_commands.clear();
+	m_table = NULL;
 }
 
 /**
