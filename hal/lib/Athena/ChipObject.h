@@ -4,6 +4,8 @@
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 #pragma once
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
 #pragma GCC diagnostic ignored "-Wignored-qualifiers"
 
 #include <stdint.h>
@@ -37,3 +39,4 @@
 // FIXME: these should not be here!
 using namespace nFPGA;
 using namespace nRoboRIO_FPGANamespace;
+#pragma GCC diagnostic pop

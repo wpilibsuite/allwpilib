@@ -10,6 +10,7 @@
 #include "RobotState.h"
 #include "Timer.h"
 #include "WPIErrors.h"
+#include <typeinfo>
 
 static const char *kName = "name";
 static const char *kRunning = "running";
@@ -29,17 +30,7 @@ void Command::InitCommand(const char *name, double timeout)
 	m_canceled = false;
 	m_runWhenDisabled = false;
 	m_parent = NULL;
-	if (name == NULL)
-	{
-		// Don't have a way to find the subclass name like java, so use the address
-		char buf[32];
-		snprintf(buf, 32, "Command_%p", this);
-		m_name = buf;
-	}
-	else
-	{
-		m_name = name;
-	}
+	m_name = name == NULL? std::string() : name;
 	m_table = NULL;	
 }
 
@@ -437,6 +428,10 @@ bool Command::WillRunWhenDisabled()
 
 std::string Command::GetName()
 {
+	if (m_name.length() == 0)
+	{
+		m_name = std::string("Command_") + std::string(typeid(*this).name());
+	}
 	return m_name;
 }
 
