@@ -159,7 +159,8 @@ public class DeployLaunchShortcut implements ILaunchShortcut
 				exes.size() > 0 ? exes.toArray(new Executable[0])[0].getPath().makeRelativeTo(activeProj.getLocation()).toString():
 			 "Debug/FRCUserProgram");
 			 
-			 
+		// This value is being overwritten somewhere
+		config.setAttribute("org.eclipse.cdt.dsf.gdb.DEBUG_NAME", "arm-frc-linux-gnueabi-gdb");
 		config.setAttribute(IRemoteConnectionConfigurationConstants.ATTR_REMOTE_PATH, "/home/admin/FRCUserProgram");
 		config.setAttribute(IRemoteConnectionConfigurationConstants.ATTR_REMOTE_CONNECTION, remote_connection);
 		config.setAttribute(IRemoteConnectionConfigurationConstants.ATTR_SKIP_DOWNLOAD_TO_TARGET, false);
