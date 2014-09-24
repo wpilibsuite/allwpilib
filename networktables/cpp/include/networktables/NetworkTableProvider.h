@@ -10,22 +10,20 @@ class NetworkTableProvider;
 #include "networktables2/NetworkTableNode.h"
 #include "networktables/NetworkTable.h"
 
-using namespace std;
-
 class NetworkTableProvider : public ITableProvider
 {
 private:
 	NetworkTableNode& node;
-	map<std::string, NetworkTable*> tables;
+	std::map<std::string, NetworkTable*> tables;
 
 	/**
 	 * Create a new NetworkTableProvider for a given NetworkTableNode
-	 * @param node the node that handles the actual network table 
+	 * @param node the node that handles the actual network table
 	 */
 public:
 	NetworkTableProvider(NetworkTableNode& node);
 	virtual ~NetworkTableProvider();
-	
+
 	ITable* GetRootTable();
 
 	ITable* GetTable(std::string key);

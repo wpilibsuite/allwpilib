@@ -18,19 +18,17 @@ class NetworkTableSubListenerAdapter;
 #include "networktables/NetworkTable.h"
 
 
-using namespace std;
-
 class NetworkTableSubListenerAdapter : public ITableListener{
 private:
 	std::string& prefix;
 	NetworkTable* targetSource;
 	ITableListener* targetListener;
-	set<std::string> notifiedTables;
+	std::set<std::string> notifiedTables;
 
 public:
 	NetworkTableSubListenerAdapter(std::string& prefix, NetworkTable* targetSource, ITableListener* targetListener);
 	virtual ~NetworkTableSubListenerAdapter();
-    void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
+	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
 };
 
 

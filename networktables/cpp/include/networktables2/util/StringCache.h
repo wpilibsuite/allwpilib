@@ -4,19 +4,17 @@
 #include <map>
 #include <string>
 
-using namespace std;
-
 /**
  * A simple cache that allows for caching the mapping of one string to another calculated one
- * 
+ *
  * @author Mitchell
  *
  */
 class StringCache {
 private:
-	map<std::string, std::string> cache;
+	std::map<std::string, std::string> cache;
 
-	
+
 	/**
 	 * @param input
 	 * @return the value for a given input
@@ -24,10 +22,10 @@ private:
 public:
 	StringCache();
 	virtual ~StringCache();
-	
-	
+
+
 	std::string& Get(const std::string& input);
-	
+
 	/**
 	 * Will only be called if a value has not already been calculated
 	 * @param input

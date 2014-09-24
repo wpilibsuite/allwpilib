@@ -16,6 +16,7 @@
 #include "networktables/NetworkTableListenerAdapter.h"
 #include "networktables/NetworkTableSubListenerAdapter.h"
 
+using namespace std;
 
 const char NetworkTable::PATH_SEPARATOR_CHAR = '/';
 const std::string NetworkTable::PATH_SEPARATOR("/");
@@ -53,7 +54,7 @@ void NetworkTable::Initialize() {
 	printf("[NT] ...NetworkTable::Initialize().\n");
 }
 
-void NetworkTable::Shutdown() 
+void NetworkTable::Shutdown()
 {
 	if (staticProvider!=NULL)
 	{
@@ -188,7 +189,7 @@ void NetworkTable::RemoveTableListener(ITableListener* listener) {
 }
 
 NetworkTableEntry* NetworkTable::GetEntry(std::string key){
-	{ 
+	{
 		NTSynchronized sync(LOCK);
 		return entryCache.Get(key);
 	}
@@ -196,7 +197,7 @@ NetworkTableEntry* NetworkTable::GetEntry(std::string key){
 
 
 NetworkTable* NetworkTable::GetSubTable(std::string key) {
-	{ 
+	{
 		NTSynchronized sync(LOCK);
 		return (NetworkTable*)provider.GetTable(absoluteKeyCache.Get(key));
 	}
@@ -206,7 +207,7 @@ NetworkTable* NetworkTable::GetSubTable(std::string key) {
 bool NetworkTable::ContainsKey(std::string key) {
 	return node.ContainsKey(absoluteKeyCache.Get(key));
 }
-	
+
 bool NetworkTable::ContainsSubTable(std::string key){
         std::string subtablePrefix(absoluteKeyCache.Get(key));
         subtablePrefix+=PATH_SEPARATOR;
@@ -337,4 +338,3 @@ EntryCache::~EntryCache(){}
 NetworkTableEntry* EntryCache::Get(std::string& key){
 	return cache[key];
 }
-
