@@ -15,28 +15,28 @@ bool RobotState::IsDisabled() {
 
 bool RobotState::IsEnabled() {
     if (impl != 0) {
-        impl->IsEnabled();
+        return impl->IsEnabled();
     }
     return false;
 }
 
 bool RobotState::IsOperatorControl() {
     if (impl != 0) {
-        impl->IsOperatorControl();
+        return impl->IsOperatorControl();
     }
     return true;
 }
 
 bool RobotState::IsAutonomous() {
     if (impl != 0) {
-        impl->IsAutonomous();
+        return impl->IsAutonomous();
     }
     return false;
 }
 
 bool RobotState::IsTest() {
     if (impl != 0) {
-        impl->IsTest();
+        return impl->IsTest();
     }
     return false;
 }
