@@ -12,12 +12,6 @@
     <module>edu.wpi.first.wpilib.plugins.core.feature</module>
     <module>edu.wpi.first.wpilib.plugins.cpp</module>
     <module>edu.wpi.first.wpilib.plugins.cpp.feature</module>
-    <module>edu.wpi.first.wpilib.plugins.cpp.toolchains.linux</module>
-    <module>edu.wpi.first.wpilib.plugins.cpp.toolchains.linux.feature</module>
-    <module>edu.wpi.first.wpilib.plugins.cpp.toolchains.mac</module>
-    <module>edu.wpi.first.wpilib.plugins.cpp.toolchains.mac.feature</module>
-    <module>edu.wpi.first.wpilib.plugins.cpp.toolchains.windows</module>
-    <module>edu.wpi.first.wpilib.plugins.cpp.toolchains.windows.feature</module>
     <module>edu.wpi.first.wpilib.plugins.java</module>
     <module>edu.wpi.first.wpilib.plugins.java.feature</module>
     <module>edu.wpi.first.wpilib.plugins.updatesite</module>

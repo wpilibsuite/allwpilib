@@ -44,7 +44,6 @@ public class WPIRobotCPPProjectCreator implements IProjectCreator {
 	public Map<String, String> getValues() {
 		Map<String, String> vals = new HashMap<String, String>();
 		vals.put("$project", projectName);
-		vals.put("$toolchain", WPILibCPPPlugin.getDefault().getToolchain());
 		vals.put("$cpp-location", WPILibCPPPlugin.getDefault().getCPPDir());
 		vals.put("$world", worldName);
 		return vals;
@@ -74,9 +73,6 @@ public class WPIRobotCPPProjectCreator implements IProjectCreator {
 		} catch (CoreException e) {
             WPILibCPPPlugin.logError("Error intializing FRC C++ project.", e);
 		}
-		
-		//config.getToolChain().getOptionById("cdt.managedbuild.option.gnu.cross.prefix").setValue(prefix);
-		//config.getToolChain().getOptionById("cdt.managedbuild.option.gnu.cross.path").setValue(path);
 	}
 
 	@Override

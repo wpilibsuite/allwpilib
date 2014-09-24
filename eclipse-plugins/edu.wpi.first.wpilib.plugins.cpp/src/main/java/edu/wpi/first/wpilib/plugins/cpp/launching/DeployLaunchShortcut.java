@@ -166,10 +166,7 @@ public class DeployLaunchShortcut implements ILaunchShortcut
 		config.setAttribute(IRemoteConnectionConfigurationConstants.ATTR_GDBSERVER_PORT, "2345");
 		config.setAttribute(IRemoteConnectionConfigurationConstants.ATTR_GDBSERVER_COMMAND, "gdbserver");
 		
-		config.setAttribute(IMILaunchConfigurationConstants.ATTR_DEBUG_NAME, WPILibCPPPlugin.getDefault().getToolchain() + "/bin/arm-none-linux-gnueabi-gdb");
 		List<String> solibs = new ArrayList<>();
-		solibs.add(WPILibCPPPlugin.getDefault().getToolchain() + "/arm-non-linux-gnueabi/libc/lib");
-		solibs.add(WPILibCPPPlugin.getDefault().getToolchain() + "/arm-non-linux-gnueabi/libc/usr/lib");
 		solibs.add(WPILibCPPPlugin.getDefault().getCPPDir() + "/lib");
 		config.setAttribute(IMILaunchConfigurationConstants.ATTR_DEBUGGER_SOLIB_PATH, solibs);
 		config.setAttribute(IMILaunchConfigurationConstants.ATTR_DEBUGGER_AUTO_SOLIB, true);
