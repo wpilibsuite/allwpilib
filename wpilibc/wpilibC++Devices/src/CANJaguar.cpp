@@ -275,6 +275,14 @@ CANJaguar::~CANJaguar()
 }
 
 /**
+ * @return The CAN ID passed in the constructor
+ */
+uint8_t CANJaguar::getDeviceNumber() const
+{
+	return m_deviceNumber;
+}
+
+/**
  * Sets the output set-point value.
  *
  * The scale and the units depend on the mode the Jaguar is in.<br>

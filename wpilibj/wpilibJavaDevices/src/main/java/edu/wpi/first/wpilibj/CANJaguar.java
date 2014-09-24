@@ -266,6 +266,14 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	}
 
 	/**
+	* @return The CAN ID passed in the constructor
+	*/
+	int getDeviceNumber()
+	{
+		return m_deviceNumber;
+	}
+
+	/**
 	 * Get the recently set outputValue set point.
 	 *
 	 * The scale and the units depend on the mode the Jaguar is in.<br>
