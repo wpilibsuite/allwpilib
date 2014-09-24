@@ -68,6 +68,8 @@ public:
 	explicit CANJaguar(uint8_t deviceNumber);
 	virtual ~CANJaguar();
 
+	uint8_t getDeviceNumber() const;
+
 	// SpeedController interface
 	virtual float Get();
 	virtual void Set(float value, uint8_t syncGroup=0);
