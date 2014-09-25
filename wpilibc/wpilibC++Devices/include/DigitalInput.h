@@ -20,7 +20,7 @@ class DigitalInput : public DigitalSource, public LiveWindowSendable
 public:
 	explicit DigitalInput(uint32_t channel);
 	virtual ~DigitalInput();
-	uint32_t Get();
+	bool Get();
 	uint32_t GetChannel();
 
 	// Digital Source Interface

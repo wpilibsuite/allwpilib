@@ -69,7 +69,7 @@ DigitalInput::~DigitalInput()
  * Get the value from a digital input channel.
  * Retrieve the value of a single digital input channel from the FPGA.
  */
-uint32_t DigitalInput::Get()
+bool DigitalInput::Get()
 {
 	int32_t status = 0;
 	bool value = getDIO(m_digital_ports[m_channel], &status);
