@@ -27,17 +27,17 @@ allwpilib:
 	cd $(allwpilib) && mvn -T 8 clean package -Dwith-eclipse-plugins -DskipTests -DskipIT
 
 orig: orig-frcsim-gazebo-plugins orig-frcsim-gazebo-models orig-frcsim-eclipse-plugins \
-	  orig-frcsim-eclipse-toolchain-plugin orig-frcsim-libwpilibsim-cpp orig-frcsim
+	  orig-frcsim-libwpilibsim-cpp orig-frcsim
 
 debs: debs-frcsim-gazebo-plugins debs-frcsim-gazebo-models debs-frcsim-eclipse-plugins \
-	  debs-frcsim-eclipse-toolchain-plugin debs-frcsim-libwpilibsim-cpp debs-frcsim
+	  debs-frcsim-libwpilibsim-cpp debs-frcsim
 
 update-repository: debs clean-repository 
 	cd repository && reprepro includedeb $(codename) ../frcsim-gazebo-plugins/frcsim-gazebo-plugins_$(gazebo-plugins-package-version)_amd64.deb
 	cd repository && reprepro includedeb $(codename) ../frcsim-gazebo-plugins/frcsim-gazebo-plugins_$(gazebo-plugins-package-version)_i386.deb
 	cd repository && reprepro includedeb $(codename) ../frcsim-gazebo-models/frcsim-gazebo-models_$(gazebo-models-package-version)_all.deb
 	cd repository && reprepro includedeb $(codename) ../frcsim-eclipse-plugins/frcsim-eclipse-plugins_$(eclipse-plugins-package-version)_all.deb
-	cd repository && reprepro includedeb $(codename) ../frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin_$(eclipse-toolchain-package-version)_all.deb
+	# cd repository && reprepro includedeb $(codename) ../frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin_$(eclipse-toolchain-package-version)_all.deb
 	cd repository && reprepro includedeb $(codename) ../frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_amd64.deb
 	cd repository && reprepro includedeb $(codename) ../frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_i386.deb
 	cd repository && reprepro includedeb $(codename) ../frcsim/frcsim_$(frcsim-package-version)_all.deb
@@ -47,7 +47,7 @@ clean-repository:
 	cd repository && reprepro remove $(codename) frcsim-gazebo-plugins
 	cd repository && reprepro remove $(codename) frcsim-gazebo-models
 	cd repository && reprepro remove $(codename) frcsim-eclipse-plugins
-	cd repository && reprepro remove $(codename) frcsim-eclipse-toolchain-plugin
+	# cd repository && reprepro remove $(codename) frcsim-eclipse-toolchain-plugin
 	cd repository && reprepro remove $(codename) frcsim-libwpilibsim-cpp
 	cd repository && reprepro remove $(codename) frcsim
 
@@ -72,7 +72,7 @@ install:
 	sudo dpkg -i frcsim-gazebo-plugins/frcsim-gazebo-plugins_$(gazebo-plugins-package-version)_amd64.deb \
 	frcsim-gazebo-models/frcsim-gazebo-models_$(gazebo-models-package-version)_all.deb \
 	frcsim-eclipse-plugins/frcsim-eclipse-plugins_$(eclipse-plugins-package-version)_all.deb \
-	frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin_$(eclipse-toolchain-package-version)_all.deb \
+	# frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin_$(eclipse-toolchain-package-version)_all.deb \
 	frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_amd64.deb \
 	frcsim/frcsim_$(frcsim-package-version)_all.deb
 
