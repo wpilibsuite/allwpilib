@@ -1,0 +1,3 @@
+/* GNU ld script */
+OUTPUT_FORMAT(elf32-littlearm)
+INPUT ( -lwpi_2015 )
