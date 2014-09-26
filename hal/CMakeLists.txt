@@ -6,7 +6,7 @@ include_directories(lib/Athena lib/Athena/FRC_FPGA_ChipObject include)
 add_library(HALAthena STATIC ${SRC_FILES})
 target_link_libraries(HALAthena ${NI_LIBS})
 INSTALL(TARGETS HALAthena ARCHIVE DESTINATION lib COMPONENT lib)
-INSTALL(FILES ${NI_LIBS} DESTINATION lib COMPONENT ni_lib)
+INSTALL(FILES ${NI_LIBS} ${WPI_LD_LIBS} DESTINATION lib COMPONENT ni_lib)
 INSTALL(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT headers)
 # lib/ c m gcc_s ld-linux
 # usr/lib 
