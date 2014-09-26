@@ -9,6 +9,7 @@
 //#include "NetworkCommunication/UsageReporting.h"
 #include "HAL/cpp/Synchronized.hpp"
 #include "WPIErrors.h"
+#include "HAL/HAL.hpp"
 
 #include <stdio.h>
 #include <algorithm>

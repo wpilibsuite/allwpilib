@@ -9,6 +9,7 @@
 #include <time.h>
 
 #include "HAL/cpp/Synchronized.hpp"
+#include "simulation/simTime.h"
 #include "Utility.h"
 
 /**

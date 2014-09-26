@@ -12,6 +12,7 @@
 #include <math.h>
 #include "HAL/cpp/Synchronized.hpp"
 #include "Timer.h"
+#include "HAL/HAL.hpp"
 
 static const char *kP = "p";
 static const char *kI = "i";

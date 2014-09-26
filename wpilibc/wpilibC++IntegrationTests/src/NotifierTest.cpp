@@ -12,9 +12,10 @@
 
 unsigned notifierCounter;
 
-void notifierHandler(void *)
+void *notifierHandler(void *)
 {
 	notifierCounter++;
+	return nullptr;
 }
 
 /**

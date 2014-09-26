@@ -7,6 +7,7 @@
 #include "Solenoid.h"
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
+#include "simulation/simTime.h"
 
 /**
  * Common function to implement constructor behavior.

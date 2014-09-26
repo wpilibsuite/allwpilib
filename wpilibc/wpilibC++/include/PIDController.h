@@ -69,6 +69,7 @@ private:
 	float m_minimumInput;		// minimum input - limit setpoint to this
 	bool m_continuous;	// do the endpoints wrap around? eg. Absolute encoder
 	bool m_enabled; 			//is the pid controller enabled
+	bool m_destruct; // should the calculate thread stop running
 	float m_prevError;	// the prior sensor input (used to compute velocity)
 	double m_totalError; //the sum of the errors for use in the integral calc
 	enum
@@ -88,12 +89,16 @@ private:
 	PIDSource *m_pidInput;
 	PIDOutput *m_pidOutput;
 
+#ifndef FRC_SIMULATOR
 	pthread_t m_controlLoop;
+#else
+	Notifier* m_controlLoop;
+#endif
 	pthread_mutex_t m_mutex;
 
 	void Initialize(float p, float i, float d, float f, PIDSource *source, PIDOutput *output,
 			float period = 0.05);
-	static void CallCalculate(void *controller);
+	static void *CallCalculate(void *controller);
 
 	virtual ITable* GetTable();
 	virtual std::string GetSmartDashboardType();
