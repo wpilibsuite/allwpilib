@@ -184,7 +184,6 @@ frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin_$(eclipse-toolch
 
 debs-frcsim-libwpilibsim-cpp: frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_amd64.deb frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_i386.deb
 frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_i386.deb: frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-version).orig.tar.gz frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_amd64.deb
-	cd frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp && make clean
 	cd frcsim-libwpilibsim-cpp && sbuild --arch=i386 -A -d trusty-i386 frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version).dsc
 frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_amd64.deb: frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-version).orig.tar.gz
 	cd frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp && debuild --no-lintian -us -uc -aamd64
