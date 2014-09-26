@@ -352,6 +352,16 @@ void PWM::SetPeriodMultiplier(PeriodMultiplier mult)
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
+void PWM::SetZeroLatch()
+{
+	if (StatusIsFatal()) return;
+	
+	int32_t status = 0;
+	
+	latchPWMZero(m_pwm_ports[m_channel], &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+}
+
 
 void PWM::ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) {
 	SetSpeed(value.f);

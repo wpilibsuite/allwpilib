@@ -86,6 +86,21 @@ JNIEXPORT jshort JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWM
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Method:    latchPWMZero
+ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_latchPWMZero
+  (JNIEnv * env, jclass, jobject id, jobject status)
+{
+  	void ** javaId = (void**)env->GetDirectBufferAddress(id);
+	PWMJNI_LOG(logDEBUG) << "PWM Ptr = " << *javaId;
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	latchPWMZero( *javaId, statusPtr );
+	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
  * Method:    setPWMPeriodScale
  * Signature: (Ljava/nio/ByteBuffer;ILjava/nio/IntBuffer;)V
  */

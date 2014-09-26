@@ -24,6 +24,7 @@ extern "C"
 	bool allocatePWMChannel(void* digital_port_pointer, int32_t *status);
 	void freePWMChannel(void* digital_port_pointer, int32_t *status);
 	unsigned short getPWM(void* digital_port_pointer, int32_t *status);
+	void latchPWMZero(void* digital_port_pointer, int32_t *status);
 	void setPWMPeriodScale(void* digital_port_pointer, uint32_t squelchMask, int32_t *status);
 	void* allocatePWM(int32_t *status);
 	void freePWM(void* pwmGenerator, int32_t *status);

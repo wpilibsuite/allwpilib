@@ -27,6 +27,7 @@ void Talon::InitTalon() {
 	SetBounds(2.037, 1.539, 1.513, 1.487, .989);
 	SetPeriodMultiplier(kPeriodMultiplier_2X);
 	SetRaw(m_centerPwm);
+	SetZeroLatch();
 
 	HALReport(HALUsageReporting::kResourceType_Talon, GetChannel());
 	LiveWindow::GetInstance()->AddActuator("Talon", GetChannel(), this);
