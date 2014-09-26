@@ -1,11 +1,13 @@
 #!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+export DH_OPTIONS
+
+export DESTDIR=$$(pwd)/debian/frcsim-libwpilibsim-cpp
+
 %:
 	dh $@
-
-override_dh_auto_build:
-	$(MAKE) allwpilib=allwpilib
-
-override_dh_auto_install:
-	$(MAKE) DESTDIR=$$(pwd)/debian/frcsim-libwpilibsim-cpp allwpilib=allwpilib install
 
 override_dh_strip:

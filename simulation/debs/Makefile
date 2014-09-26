@@ -133,13 +133,18 @@ frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin_$(eclipse-toolch
 
 orig-frcsim-libwpilibsim-cpp: frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-version).orig.tar.gz
 pull-libwpilibsim-cpp:
-	cp -rf -t frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/ $(allwpilib)/wpilibc/wpilibC++Sim/*
 	mkdir -p frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib
 	cp -rf $(allwpilib)/hal frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib
 	mkdir -p frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib/networktables
 	cp -rf $(allwpilib)/networktables/cpp frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib/networktables
 	mkdir -p frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib/wpilibc
-	cp -r $(allwpilib)/wpilibc/wpilibC++ frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib/wpilibC++ 
+	cp -r $(allwpilib)/wpilibc/wpilibC++ frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib/wpilibc/wpilibC++
+	cp -r $(allwpilib)/wpilibc/wpilibC++Sim frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib/wpilibc/wpilibC++Sim
+	echo 'cmake_minimum_required(VERSION 2.8)' > frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/CMakeLists.txt
+	echo 'project(WPILibSim)' >> frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/CMakeLists.txt
+	echo 'add_subdirectory(allwpilib/wpilibc/wpilibC++Sim)' >> frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/CMakeLists.txt
+
+	
 	echo Increment version?
 frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-version).orig.tar.gz: pull-libwpilibsim-cpp
 	cd frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp && debuild clean
