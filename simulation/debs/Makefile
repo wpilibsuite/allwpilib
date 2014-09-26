@@ -139,7 +139,7 @@ pull-libwpilibsim-cpp:
 	mkdir -p frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib/networktables
 	cp -rf $(allwpilib)/networktables/cpp frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib/networktables
 	mkdir -p frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib/wpilibc
-	cp -r $(allwpilib)/wpilibc/wpilibC++ frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib/wpilibc 
+	cp -r $(allwpilib)/wpilibc/wpilibC++ frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib/wpilibC++ 
 	echo Increment version?
 frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-version).orig.tar.gz: pull-libwpilibsim-cpp
 	cd frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp && debuild clean
