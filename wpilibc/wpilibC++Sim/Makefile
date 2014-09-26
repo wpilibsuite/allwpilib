@@ -1,12 +1,10 @@
 prefix = /usr
 lib.dir = $(prefix)/lib
 build.dir = build
-allwpilib = ../..
 
 all:
 	mkdir -p $(build.dir)
-	cp -r $(allwpilib)/wpilibc/wpilibC++ build
-	cd ${build.dir} && ALLWPILIB=$(allwpilib) cmake .. && make
+	cd ${build.dir} && cmake .. && make
 
 clean:
 	rm -rf $(build.dir)

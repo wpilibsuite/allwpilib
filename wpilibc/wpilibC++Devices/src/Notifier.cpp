@@ -8,6 +8,7 @@
 #include "Timer.h"
 #include "Utility.h"
 #include "WPIErrors.h"
+#include "HAL/HAL.hpp"
 
 Notifier *Notifier::timerQueueHead = NULL;
 ReentrantSemaphore Notifier::queueSemaphore;

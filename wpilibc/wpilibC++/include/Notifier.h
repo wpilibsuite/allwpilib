@@ -9,7 +9,7 @@
 #include "Task.h"
 #include "HAL/cpp/Synchronized.hpp"
 
-typedef void (*TimerEventHandler)(void *param);
+typedef void *(*TimerEventHandler)(void *param);
 
 class Notifier : public ErrorBase
 {
@@ -22,6 +22,7 @@ public:
 private:
 	static Notifier *timerQueueHead;
 	static ReentrantSemaphore queueSemaphore;
+	static void* m_notifier;
 	static int refcount;
 
 	static void ProcessQueue(uint32_t mask, void *params); // process the timer queue on a timer event

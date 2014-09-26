@@ -8,6 +8,7 @@
 #include "SensorBase.h"
 #include "RobotState.h"
 #include "Task.h"
+#include "HAL/HAL.hpp"
 
 struct HALControlWord;
 class AnalogInput;

@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
+#include "HAL/HAL.hpp"
 
 const uint32_t Task::kDefaultPriority;
 
