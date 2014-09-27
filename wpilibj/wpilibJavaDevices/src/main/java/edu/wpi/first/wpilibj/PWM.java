@@ -393,36 +393,36 @@ public class PWM extends SensorBase implements LiveWindowSendable {
 
 		HALUtil.checkStatus(status.asIntBuffer());
 	}
+	
+	protected void setZeroLatch()
+	{
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		
+		PWMJNI.latchPWMZero(m_port, status.asIntBuffer());
+		
+		HALUtil.checkStatus(status.asIntBuffer());
+	}
 
 	private int getMaxPositivePwm() {
 		return m_maxPwm;
 	}
 
-	;
-
 	private int getMinPositivePwm() {
 		return m_eliminateDeadband ? m_deadbandMaxPwm : m_centerPwm + 1;
 	}
-
-	;
 
 	private int getCenterPwm() {
 		return m_centerPwm;
 	}
 
-	;
-
 	private int getMaxNegativePwm() {
 		return m_eliminateDeadband ? m_deadbandMinPwm : m_centerPwm - 1;
 	}
 
-	;
-
 	private int getMinNegativePwm() {
 		return m_minPwm;
 	}
-
-	;
 
 	private int getPositiveScaleFactor() {
 		return getMaxPositivePwm() - getMinPositivePwm();

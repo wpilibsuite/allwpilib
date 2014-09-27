@@ -34,6 +34,7 @@ public class Talon extends SafePWM implements SpeedController {
         setBounds(2.037, 1.539, 1.513, 1.487, .989);
         setPeriodMultiplier(PeriodMultiplier.k2X);
         setRaw(m_centerPwm);
+		setZeroLatch();
 
         LiveWindow.addActuator("Talon", getChannel(), this);
         UsageReporting.report(tResourceType.kResourceType_Talon, getChannel());

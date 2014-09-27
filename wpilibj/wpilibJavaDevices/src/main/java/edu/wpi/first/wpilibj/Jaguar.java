@@ -32,6 +32,7 @@ public class Jaguar extends SafePWM implements SpeedController {
         setBounds(2.31, 1.55, 1.507, 1.454, .697);
         setPeriodMultiplier(PeriodMultiplier.k1X);
         setRaw(m_centerPwm);
+		setZeroLatch();
 
         UsageReporting.report(tResourceType.kResourceType_Jaguar, getChannel());
         LiveWindow.addActuator("Jaguar", getChannel(), this);

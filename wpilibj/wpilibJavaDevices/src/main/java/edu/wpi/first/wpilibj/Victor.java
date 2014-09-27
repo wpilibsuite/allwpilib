@@ -36,6 +36,7 @@ public class Victor extends SafePWM implements SpeedController {
         setBounds(2.027, 1.525, 1.507, 1.49, 1.026);
         setPeriodMultiplier(PeriodMultiplier.k2X);
         setRaw(m_centerPwm);
+		setZeroLatch();
 
         LiveWindow.addActuator("Victor", getChannel(), this);
         UsageReporting.report(tResourceType.kResourceType_Victor, getChannel());

@@ -40,6 +40,7 @@ public:
 	virtual void SetRaw(unsigned short value);
 	virtual unsigned short GetRaw();
 	void SetPeriodMultiplier(PeriodMultiplier mult);
+	void SetZeroLatch();
 	void EnableDeadbandElimination(bool eliminateDeadband);
 	void SetBounds(int32_t max, int32_t deadbandMax, int32_t center, int32_t deadbandMin,
 			int32_t min);

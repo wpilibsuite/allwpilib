@@ -29,6 +29,7 @@ void Victor::InitVictor() {
 
 	SetPeriodMultiplier(kPeriodMultiplier_2X);
 	SetRaw(m_centerPwm);
+	SetZeroLatch();
 
 	LiveWindow::GetInstance()->AddActuator("Victor", GetChannel(), this);
 	HALReport(HALUsageReporting::kResourceType_Victor, GetChannel());

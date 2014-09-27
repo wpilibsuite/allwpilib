@@ -26,6 +26,7 @@ void Jaguar::InitJaguar()
 	SetBounds(2.31, 1.55, 1.507, 1.454, .697);
 	SetPeriodMultiplier(kPeriodMultiplier_1X);
 	SetRaw(m_centerPwm);
+	SetZeroLatch();
 
 	HALReport(HALUsageReporting::kResourceType_Jaguar, GetChannel());
 	LiveWindow::GetInstance()->AddActuator("Jaguar", GetChannel(), this);
