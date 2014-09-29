@@ -92,6 +92,11 @@
     <scp file="${wpilib.ant.dir}/robotDebugCommand" todir="${username}@${target}:${command.dir}" password="${password}" trust="true"/>
   	<!-- The frcdebug file is used as a flag for /usr/local/frc/bin/frcRunRobot.sh to run the robot program in debug mode -->
   	<scp file="${wpilib.ant.dir}/frcdebug" todir="${username}@${target}:${debug.flag.dir}" password="${password}" trust="true"/>
+	<sshexec host="${target}"
+        username="${username}"
+        password="${password}"
+        trust="true"
+        command="${debug.flag.command}"/>
 
     <echo>[athena-deploy] Starting Debug program.</echo>
     <sshexec host="${target}"
