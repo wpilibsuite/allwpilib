@@ -27,8 +27,8 @@ public class Robot extends SampleRobot {
     public Robot() {
         myRobot = new RobotDrive(0, 1);
         myRobot.setExpiration(0.1);
-        leftStick = new Joystick(1);
-        rightStick = new Joystick(2);
+        leftStick = new Joystick(0);
+        rightStick = new Joystick(1);
     }
 
     
