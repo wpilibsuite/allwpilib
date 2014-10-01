@@ -23,7 +23,7 @@ public class Robot extends IterativeRobot {
      */
     public void robotInit() {
     	myRobot = new RobotDrive(0,1);
-    	stick = new Joystick(1);
+    	stick = new Joystick(0);
     }
     
     /**

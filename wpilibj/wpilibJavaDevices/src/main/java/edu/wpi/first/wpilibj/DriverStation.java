@@ -224,15 +224,15 @@ public class DriverStation implements RobotState.Interface {
      * @return The value of the axis on the joystick.
      */
     public double getStickAxis(int stick, int axis) {
-        if(stick < 1 || stick > kJoystickPorts) {
-            throw new RuntimeException("Joystick index is out of range, should be 1-4");
+        if(stick < 0 || stick >= kJoystickPorts) {
+            throw new RuntimeException("Joystick index is out of range, should be 0-3");
         }
 
         if (axis < 1 || axis > kJoystickAxes) {
             throw new RuntimeException("Joystick axis is out of range");
         }
 
-        byte value = (byte)m_joystickAxes[stick - 1][axis - 1];
+        byte value = (byte)m_joystickAxes[stick][axis - 1];
 
         if(value < 0) {
             return value / 128.0;
@@ -249,11 +249,11 @@ public class DriverStation implements RobotState.Interface {
      * @return The state of the buttons on the joystick.
      */
     public int getStickButtons(final int stick) {
-        if(stick < 1 || stick > kJoystickPorts) {
-            throw new RuntimeException("Joystick index is out of range, should be 1-4");
+        if(stick < 0 || stick >= kJoystickPorts) {
+            throw new RuntimeException("Joystick index is out of range, should be 0-3");
         }
 
-        return (int)m_joystickButtons[stick - 1];
+        return (int)m_joystickButtons[stick];
     }
 
     /**

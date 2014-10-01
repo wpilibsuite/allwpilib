@@ -23,7 +23,7 @@ public class OI {
 	public Joystick joystick;
 
 	public OI() {
-		joystick = new Joystick(1);
+		joystick = new Joystick(0);
 		
 		new JoystickButton(joystick, 12).whenPressed(new LowGoal());
 		new JoystickButton(joystick, 10).whenPressed(new Collect());

@@ -10,7 +10,7 @@
 #include "Commands/SetCollectionSpeed.h"
 
 OI::OI() {
-	joystick = new Joystick(1);
+	joystick = new Joystick(0);
 
 	R1 = new JoystickButton(joystick, 12);
 	R1->WhenPressed(new LowGoal());

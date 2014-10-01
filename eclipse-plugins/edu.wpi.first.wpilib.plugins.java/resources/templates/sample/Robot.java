@@ -30,7 +30,7 @@ public class Robot extends SampleRobot {
     public Robot() {
         myRobot = new RobotDrive(0, 1);
         myRobot.setExpiration(0.1);
-        stick = new Joystick(1);
+        stick = new Joystick(0);
     }
 
     /**

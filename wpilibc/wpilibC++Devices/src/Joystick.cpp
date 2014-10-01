@@ -73,8 +73,12 @@ void Joystick::InitJoystick(uint32_t numAxisTypes, uint32_t numButtonTypes)
 			joysticks[i] = NULL;
 		joySticksInitialized = true;
 	}
-	joysticks[m_port - 1] = this;
-	
+	if (m_port >= DriverStation::kJoystickPorts) {
+		wpi_setWPIError(BadJoystickIndex);
+	} else {
+		joysticks[m_port] = this;
+	}
+
 	m_ds = DriverStation::GetInstance();
 	m_axes = new uint32_t[numAxisTypes];
 	m_buttons = new uint32_t[numButtonTypes];
@@ -82,11 +86,11 @@ void Joystick::InitJoystick(uint32_t numAxisTypes, uint32_t numButtonTypes)
 
 Joystick * Joystick::GetStickForPort(uint32_t port)
 {
-	Joystick *stick = joysticks[port - 1];
+	Joystick *stick = joysticks[port];
 	if (stick == NULL)
 	{
 		stick = new Joystick(port);
-		joysticks[port - 1] = stick;
+		joysticks[port] = stick;
 	}
 	return stick;
 }

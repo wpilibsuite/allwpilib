@@ -11,7 +11,7 @@ class Robot: public IterativeRobot
 public:
 	Robot() :
 		myRobot(0, 1),	// these must be initialized in the same order
-		stick(1),		// as they are declared above.
+		stick(0),		// as they are declared above.
 		lw(NULL),
 		autoLoopCounter(0)
 	{

@@ -179,7 +179,7 @@ float DriverStation::GetBatteryVoltage()
  */
 float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
 {
-	if (stick < 1 || stick > kJoystickPorts)
+	if (stick >= kJoystickPorts)
 	{
 		wpi_setWPIError(BadJoystickIndex);
 		return 0;
@@ -191,7 +191,7 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
 		return 0.0f;
 	}
 
-	int8_t value = m_joystickAxes[stick - 1].axes[axis - 1];
+	int8_t value = m_joystickAxes[stick].axes[axis - 1];
 
 	if(value < 0)
 	{
@@ -212,13 +212,13 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
  */
 short DriverStation::GetStickButtons(uint32_t stick)
 {
-	if (stick < 1 || stick > kJoystickPorts)
+	if (stick >= kJoystickPorts)
 	{
 		wpi_setWPIError(BadJoystickIndex);
 		return 0;
 	}
 
-	return m_joystickButtons[stick - 1];
+	return m_joystickButtons[stick];
 }
 
 bool DriverStation::IsEnabled()

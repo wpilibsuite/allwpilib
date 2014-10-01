@@ -19,7 +19,7 @@ OI::OI() {
 	SmartDashboard::PutData("Open Claw", new OpenClaw());
 	SmartDashboard::PutData("Close Claw", new CloseClaw());
 
-	joy= new Joystick(1);
+	joy= new Joystick(0);
 
 
     // Create some buttons
