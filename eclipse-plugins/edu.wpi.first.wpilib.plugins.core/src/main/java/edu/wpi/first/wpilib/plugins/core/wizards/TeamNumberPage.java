@@ -77,8 +77,8 @@ public class TeamNumberPage extends WizardPage {
 	private void dialogChanged() {
 		String teamNumber = getTeamNumber();
 		if (listener != null) listener.stateChanged(null); 
-		if (!teamNumber.matches("^([0-9]+)$")) {
-			updateStatus("Team number must be a valid integer.");
+		if (!teamNumber.matches("^([1-9][0-9]*)$")) {
+			updateStatus("Team number must be a valid integer without leading zeroes.");
 			return;
 		}
 		updateStatus(null);
