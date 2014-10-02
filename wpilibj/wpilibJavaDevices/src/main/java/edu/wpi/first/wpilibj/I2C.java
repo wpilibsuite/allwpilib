@@ -107,7 +107,10 @@ public class I2C extends SensorBase {
 			}
 		}
 		HALUtil.checkStatus(status);*/
-		dataReceivedBuffer.get(dataReceived);
+		if(receiveSize > 0 && dataReceived != null)
+		{
+			dataReceivedBuffer.get(dataReceived);
+		}
 		return aborted;
 	}
 
