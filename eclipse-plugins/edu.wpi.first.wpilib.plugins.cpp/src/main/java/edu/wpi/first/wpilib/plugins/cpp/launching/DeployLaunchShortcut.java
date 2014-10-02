@@ -144,7 +144,7 @@ public class DeployLaunchShortcut implements ILaunchShortcut
 		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_ENABLE_VARIABLE_BOOKKEEPING, false);
 		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_ID, "org.eclipse.rse.remotecdt.RemoteGDBDebugger");
 		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_REGISTER_GROUPS, "");
-		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_START_MODE, "run");
+		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_START_MODE, "remote");
 		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_STOP_AT_MAIN, false);
 		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_USE_TERMINAL, true);
 		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, activeProj.getName());
