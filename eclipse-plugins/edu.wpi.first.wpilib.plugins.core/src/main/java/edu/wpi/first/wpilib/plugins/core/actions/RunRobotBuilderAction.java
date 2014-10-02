@@ -34,14 +34,13 @@ public class RunRobotBuilderAction implements IWorkbenchWindowActionDelegate {
 	 * @see IWorkbenchWindowActionDelegate#run
 	 */
 	public void run(IAction action) {
-		File dir = new File(WPILibCore.getDefault().getWPILibBaseDir()+File.separator+"tools"+File.separator
-				+WPILibCore.getDefault().getCurrentVersion());
+		File dir = new File(WPILibCore.getDefault().getWPILibBaseDir()+File.separator+"tools");
 		File[] files = dir.listFiles(new FilenameFilter() {
 			@Override public boolean accept(File dir, String name) {
 				return name.startsWith("RobotBuilder") && name.endsWith(".jar");
 			}
 		});
-		if (files.length < 1) return;
+		if (files == null || files.length < 1) return;
 		String[] cmd = {"java", "-jar", files[0].getAbsolutePath()};
 		try {
 			DebugPlugin.exec(cmd, new File(System.getProperty("user.home")));

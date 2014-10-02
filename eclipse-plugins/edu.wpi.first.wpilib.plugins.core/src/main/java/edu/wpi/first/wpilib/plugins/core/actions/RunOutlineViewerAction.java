@@ -1,6 +1,7 @@
 package edu.wpi.first.wpilib.plugins.core.actions;
 
 import java.io.File;
+import java.io.FilenameFilter;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
@@ -33,13 +34,18 @@ public class RunOutlineViewerAction implements IWorkbenchWindowActionDelegate {
 	 * @see IWorkbenchWindowActionDelegate#run
 	 */
 	public void run(IAction action) {
-		String jarFile = WPILibCore.getDefault().getWPILibBaseDir()+File.separator+"tools"+File.separator
-				+WPILibCore.getDefault().getCurrentVersion()+File.separator+"OutlineViewer-with-dependencies.jar";
-		String[] cmd = {"java", "-jar", jarFile};
+		File dir = new File(WPILibCore.getDefault().getWPILibBaseDir()+File.separator+"tools");
+		File[] files = dir.listFiles(new FilenameFilter() {
+			@Override public boolean accept(File dir, String name) {
+				return name.startsWith("OutlineViewer") && name.endsWith(".jar");
+			}
+		});
+		if (files == null || files.length < 1) return;
+		String[] cmd = {"java", "-jar", files[0].getAbsolutePath()};
 		try {
 			DebugPlugin.exec(cmd, new File(System.getProperty("user.home")));
 		} catch (CoreException e) {
-            WPILibCore.logError("Error running outline viewer.", e);
+            WPILibCore.logError("Error running OutlineViewer.", e);
 		}
 	}
 
