@@ -116,6 +116,26 @@
   </files>
   </example>
 
+
+ <example>
+  <name>Motor Controller</name>
+  <description>Demonstrate controlling a single motor with a joystick</description>
+  <tags>
+    <tag>Actuators</tag>
+    <tag>Complete List</tag>
+    <tag>Joystick</tag>
+    <tag>Robot and Motor</tag>
+  </tags>
+  <packages>
+    <package>src/$package-dir</package>
+  </packages>
+  <files>
+    <file source="examples/MotorControl/src/org/usfirst/frc/team190/robot/Robot.java"
+      destination="src/$package-dir/Robot.java"></file>
+  </files>
+  </example>
+
+
   <tagDescription>
     <name>CommandBased Robot</name>
     <description>Examples for CommandBased robot programs.</description>
