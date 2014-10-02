@@ -15,31 +15,113 @@
     <name>Simulation</name>
     <description>Examples that can be run in simulation.</description>
   </tagDescription>-->
+
   <tagDescription>
 	<name>Getting Started with C++</name>
 	<description>Examples for getting started with FRC C++</description>
   </tagDescription>
-  <example>
-	<name>Getting Started</name>
-	<description>An example program which demonstrates the simplest autonomous and
-	teleoperated routines.</description>
-	<tags>
-	  <tag>Getting Started with C++</tag>
-	</tags>
-	<packages>
-	  <package>src</package>
-	</packages>
-	<files>
-	  <file source="examples/GettingStarted/src/Robot.cpp"
-			destination="src/Robot.cpp"></file>
-	</files>
-  </example>
-	
+
   <tagDescription>
     <name>CommandBased Robot</name>
     <description>Examples for CommandBased robot programs.</description>
   </tagDescription>
 
+  <tagDescription>
+    <name>Actuators</name>
+    <description>Example programs that demonstrate the use of various actuators</description>
+  </tagDescription>
+
+  <tagDescription>
+    <name>Analog</name>
+    <description>Examples programs that show different uses of analog inputs, 
+      outputs and various analog sensors</description>
+  </tagDescription>
+
+  <tagDescription>
+    <name>CAN</name>
+    <description>Example programs that demonstrate the use of the CAN components in the control system</description>
+  </tagDescription>
+
+  <tagDescription>
+    <name>Complete List</name>
+    <description>Complete list of all sample programs across all categories</description>
+  </tagDescription>
+
+  <tagDescription>
+    <name>Digital</name>
+    <description>Example programs that demonstrate the sensors that use the digital I/O ports</description>
+  </tagDescription>
+
+  <tagDescription>
+    <name>I2C</name>
+    <description>Example programs that demonstrate the use of I2C and various sensors that use it</description>
+  </tagDescription>
+
+  <tagDescription>
+    <name>Joystick</name>
+    <description>Example programs that demonstate different uses of joysticks for robot driving</description>
+  </tagDescription>
+
+  <tagDescription>
+    <name>Pneumatics</name>
+    <description>Example programs that demonstrate the use of the compressor and solenoids</description>
+  </tagDescription>
+
+  <tagDescription>
+    <name>Robot and Motor</name>
+    <description>Example programs that demonstrate driving a robot and motors including safety, servos, etc.</description>
+  </tagDescription>
+
+  <tagDescription>
+    <name>SPI</name>
+    <description>Example programs that demonstrate the use of the SPI bus and sensors that connect to it</description>
+  </tagDescription>
+
+  <tagDescription>
+    <name>Safety</name>
+    <description>Example programs that demonstate the motor safety classes and how to use them with your programs</description>
+  </tagDescription>
+
+  <tagDescription>
+    <name>Sensors</name>
+    <description>Example programs that demonstrate the use of the various commonly used sensors on FRC robots</description>
+  </tagDescription>
+
+<example>
+  <name>Arcade Drive</name>
+  <description>An example program which the use of Arcade Drive with the RobotDrive class</description>
+  <tags>
+    <tag>Getting Started with C++</tag>
+    <tag>Robot and Motor</tag>
+    <tag>Joystick</tag>
+    <tag>Complete List</tag>
+  </tags>
+  <packages>
+    <package>src</package>
+  </packages>
+  <files>
+    <file source="examples/ArcadeDrive/src/Robot.cpp" destination="src/Robot.cpp"></file>
+  </files>
+  </example>
+
+
+  <example>
+  <name>Getting Started</name>
+  <description>An example program which demonstrates the simplest autonomous and
+  teleoperated routines.</description>
+  <tags>
+    <tag>Getting Started with C++</tag>
+    <tag>Complete List</tag>
+  </tags>
+  <packages>
+    <package>src</package>
+  </packages>
+  <files>
+    <file source="examples/GettingStarted/src/Robot.cpp"
+      destination="src/Robot.cpp"></file>
+  </files>
+  </example>
+  
   <example>
     <name>GearsBot</name>
     <description>A fully functional example CommandBased program for
@@ -47,6 +129,7 @@
     supports simulation.</description>
     <tags>
       <tag>CommandBased Robot</tag>
+      <tag>Complete List</tag>
     </tags>
     <packages>
       <package>src</package>
@@ -130,7 +213,8 @@
     <description>A fully functional example CommandBased program for FRC Team 190&#39;s 2014 robot. This code can run on your computer if it supports simulation.</description>
     <tags>
       <tag>CommandBased Robot</tag>
-    </tags>
+      <tag>Complete List</tag>
+   </tags>
     <packages>
       <package>src</package>
       <package>src/Commands</package>
