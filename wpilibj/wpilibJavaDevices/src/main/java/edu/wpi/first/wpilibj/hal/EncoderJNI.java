@@ -6,8 +6,6 @@ import java.nio.ByteBuffer;
 public class EncoderJNI extends JNIWrapper {
 	public static native ByteBuffer initializeEncoder(byte port_a_module, int port_a_pin, byte port_a_analog_trigger, byte port_b_module, int port_b_pin, byte port_b_analog_trigger, byte reverseDirection, IntBuffer index, IntBuffer status);
 	public static native void freeEncoder(ByteBuffer encoder_pointer, IntBuffer status);
-	public static native void startEncoder(ByteBuffer encoder_pointer, IntBuffer status);
-	public static native void stopEncoder(ByteBuffer encoder_pointer, IntBuffer status);
 	public static native void resetEncoder(ByteBuffer encoder_pointer, IntBuffer status);
 	public static native int getEncoder(ByteBuffer encoder_pointer, IntBuffer status);
 	public static native double getEncoderPeriod(ByteBuffer encoder_pointer, IntBuffer status);

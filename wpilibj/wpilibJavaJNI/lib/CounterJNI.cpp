@@ -289,40 +289,6 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterSampl
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
- * Method:    startCounter
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_startCounter
-  (JNIEnv * env, jclass, jobject id, jobject status)
-{
-	COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI startCounter";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	COUNTERJNI_LOG(logDEBUG) << "Counter Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	startCounter(*javaId, statusPtr);
-	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
- * Method:    stopCounter
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_stopCounter
-  (JNIEnv * env, jclass, jobject id, jobject status)
-{
-	COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI stopCounter";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	COUNTERJNI_LOG(logDEBUG) << "Counter Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	stopCounter(*javaId, statusPtr);
-	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
  * Method:    resetCounter
  * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
  */

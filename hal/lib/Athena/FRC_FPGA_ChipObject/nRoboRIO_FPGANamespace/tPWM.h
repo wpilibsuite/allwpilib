@@ -1,14 +1,14 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2015_1_0_8_PWM_h__
-#define __nFRC_2015_1_0_8_PWM_h__
+#ifndef __nFRC_2015_1_0_9_PWM_h__
+#define __nFRC_2015_1_0_9_PWM_h__
 
 #include "tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2015_1_0_8
+namespace nFRC_2015_1_0_9
 {
 
 class tPWM
@@ -117,4 +117,4 @@ private:
 }
 }
 
-#endif // __nFRC_2015_1_0_8_PWM_h__
+#endif // __nFRC_2015_1_0_9_PWM_h__

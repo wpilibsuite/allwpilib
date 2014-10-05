@@ -63,40 +63,6 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_freeEncoder
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_EncoderJNI
- * Method:    startEncoder
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_startEncoder
-  (JNIEnv * env, jclass, jobject id, jobject status)
-{
-	ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI startEncoder";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	startEncoder(*javaId, statusPtr);
-	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_EncoderJNI
- * Method:    stopEncoder
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_stopEncoder
-  (JNIEnv * env, jclass, jobject id, jobject status)
-{
-	ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI stopEncoder";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	stopEncoder(*javaId, statusPtr);
-	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_EncoderJNI
  * Method:    resetEncoder
  * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
  */

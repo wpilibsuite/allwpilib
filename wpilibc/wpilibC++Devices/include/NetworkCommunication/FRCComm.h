@@ -32,6 +32,8 @@
 #endif
 #endif
 
+#define ERR_FRCSystem_NetCommNotResponding -44049
+
 enum AllianceStationID_t {
 	kAllianceStationID_red1,
 	kAllianceStationID_red2,
@@ -68,7 +70,7 @@ struct JoystickAxes_t {
 
 struct JoystickPOV_t {
 	uint16_t count;
-	uint16_t povs[1];
+	int16_t povs[1];
 };
 
 #ifdef __cplusplus
@@ -79,9 +81,6 @@ extern "C" {
 	void EXPORT_FUNC getFPGAHardwareVersion(uint16_t *fpgaVersion, uint32_t *fpgaRevision);
 #endif
 	int EXPORT_FUNC setStatusData(float battery, uint8_t dsDigitalOut, uint8_t updateNumber,
-			const char *userDataHigh, int userDataHighLength,
-			const char *userDataLow, int userDataLowLength, int wait_ms);
-	int EXPORT_FUNC setStatusDataFloatAsInt(int battery, uint8_t dsDigitalOut, uint8_t updateNumber,
 			const char *userDataHigh, int userDataHighLength,
 			const char *userDataLow, int userDataLowLength, int wait_ms);
 	int EXPORT_FUNC setErrorData(const char *errors, int errorsLength, int wait_ms);
@@ -101,9 +100,13 @@ extern "C" {
 
 	int EXPORT_FUNC FRC_NetworkCommunication_getControlWord(struct ControlWord_t *controlWord);
 	int EXPORT_FUNC FRC_NetworkCommunication_getAllianceStation(enum AllianceStationID_t *allianceStation);
+	int EXPORT_FUNC FRC_NetworkCommunication_getMatchTime(float *matchTime);
 	int EXPORT_FUNC FRC_NetworkCommunication_getJoystickAxes(uint8_t joystickNum, struct JoystickAxes_t *axes, uint8_t maxAxes);
 	int EXPORT_FUNC FRC_NetworkCommunication_getJoystickButtons(uint8_t joystickNum, uint32_t *buttons, uint8_t *count);
 	int EXPORT_FUNC FRC_NetworkCommunication_getJoystickPOVs(uint8_t joystickNum, struct JoystickPOV_t *povs, uint8_t maxPOVs);
+	int EXPORT_FUNC FRC_NetworkCommunication_setJoystickOutputs(uint8_t joystickNum, uint32_t hidOutputs, uint16_t leftRumble, uint16_t rightRumble);
+	int EXPORT_FUNC FRC_NetworkCommunication_getJoystickDesc(uint8_t joystickNum, uint8_t *isXBox, uint8_t *type, char *name,
+		uint8_t *axisCount, uint8_t *axisTypes, uint8_t *buttonCount, uint8_t *povCount);
 
 	void EXPORT_FUNC FRC_NetworkCommunication_getVersionString(char *version);
 	int EXPORT_FUNC FRC_NetworkCommunication_observeUserProgramStarting(void);

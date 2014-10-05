@@ -12,15 +12,23 @@
 class InterruptableSensorBase : public SensorBase
 {
 public:
+	enum WaitResult {
+		kTimeout = 0x0,
+		kRisingEdge = 0x1,
+		kFallingEdge = 0x100,
+		kBoth = 0x101,
+	};
+
 	InterruptableSensorBase();
 	virtual ~InterruptableSensorBase();
 	virtual void RequestInterrupts(InterruptHandlerFunction handler, void *param) = 0; ///< Asynchronus handler version.
 	virtual void RequestInterrupts() = 0;		///< Synchronus Wait version.
 	virtual void CancelInterrupts();			///< Free up the underlying chipobject functions.
-	virtual void WaitForInterrupt(float timeout); ///< Synchronus version.
+	virtual WaitResult WaitForInterrupt(float timeout, bool ignorePrevious = true); ///< Synchronus version.
 	virtual void EnableInterrupts();			///< Enable interrupts - after finishing setup.
 	virtual void DisableInterrupts();		///< Disable, but don't deallocate.
-	virtual double ReadInterruptTimestamp();///< Return the timestamp for the interrupt that occurred.
+	virtual double ReadRisingTimestamp();///< Return the timestamp for the rising interrupt that occurred.
+	virtual double ReadFallingTimestamp();///< Return the timestamp for the falling interrupt that occurred.
 protected:
 	void* m_interrupt;
 	uint32_t m_interruptIndex;

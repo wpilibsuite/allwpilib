@@ -683,14 +683,11 @@ void setCounterUpSourceEdge(void* counter_pointer, bool risingEdge, bool falling
  */
 void clearCounterUpSource(void* counter_pointer, int32_t *status) {
   Counter* counter = (Counter*) counter_pointer;
-  bool state = counter->counter->readConfig_Enable(status);
-  counter->counter->writeConfig_Enable(false, status);
   counter->counter->writeConfig_UpFallingEdge(false, status);
   counter->counter->writeConfig_UpRisingEdge(false, status);
   // Index 0 of digital is always 0.
   counter->counter->writeConfig_UpSource_Channel(0, status);
   counter->counter->writeConfig_UpSource_AnalogTrigger(false, status);
-  counter->counter->writeConfig_Enable(state, status);
 }
 
 /**
@@ -738,14 +735,11 @@ void setCounterDownSourceEdge(void* counter_pointer, bool risingEdge, bool falli
  */
 void clearCounterDownSource(void* counter_pointer, int32_t *status) {
   Counter* counter = (Counter*) counter_pointer;
-  bool state = counter->counter->readConfig_Enable(status);
-  counter->counter->writeConfig_Enable(false, status);
   counter->counter->writeConfig_DownFallingEdge(false, status);
   counter->counter->writeConfig_DownRisingEdge(false, status);
   // Index 0 of digital is always 0.
   counter->counter->writeConfig_DownSource_Channel(0, status);
   counter->counter->writeConfig_DownSource_AnalogTrigger(false, status);
-  counter->counter->writeConfig_Enable(state, status);
 }
 
 /**
@@ -812,25 +806,6 @@ void setCounterSamplesToAverage(void* counter_pointer, int samplesToAverage, int
 	*status = PARAMETER_OUT_OF_RANGE;
   }
   counter->counter->writeTimerConfig_AverageSize(samplesToAverage, status);
-}
-
-/**
- * Start the Counter counting.
- * This enables the counter and it starts accumulating counts from the associated
- * input channel. The counter value is not reset on starting, and still has the previous value.
- */
-void startCounter(void* counter_pointer, int32_t *status) {
-  Counter* counter = (Counter*) counter_pointer;
-  counter->counter->writeConfig_Enable(1, status);
-}
-
-/**
- * Stop the Counter.
- * Stops the counting but doesn't effect the current value.
- */
-void stopCounter(void* counter_pointer, int32_t *status) {
-  Counter* counter = (Counter*) counter_pointer;
-  counter->counter->writeConfig_Enable(0, status);
 }
 
 /**
@@ -991,23 +966,6 @@ void freeEncoder(void* encoder_pointer, int32_t *status) {
   Encoder* encoder = (Encoder*) encoder_pointer;
   quadEncoders->Free(encoder->index);
   delete encoder->encoder;
-}
-
-/**
- * Start the Encoder.
- * Starts counting pulses on the Encoder device.
- */
-void startEncoder(void* encoder_pointer, int32_t *status) {
-  Encoder* encoder = (Encoder*) encoder_pointer;
-  encoder->encoder->writeConfig_Enable(1, status);
-}
-
-/**
- * Stops counting pulses on the Encoder device. The value is not changed.
- */
-void stopEncoder(void* encoder_pointer, int32_t *status) {
-  Encoder* encoder = (Encoder*) encoder_pointer;
-  encoder->encoder->writeConfig_Enable(0, status);
 }
 
 /**

@@ -1,7 +1,7 @@
 /*
- * FPGA Interface C API 2.0 header file.
+ * FPGA Interface C API 14.0 header file.
  *
- * Copyright (c) 2011,
+ * Copyright (c) 2014,
  * National Instruments Corporation.
  * All rights reserved.
  */
@@ -14,13 +14,18 @@
  */
 #if defined(_M_IX86) \
  || defined(_M_X64) \
+ || defined(_M_AMD64) \
  || defined(i386) \
+ || defined(__i386) \
  || defined(__i386__) \
+ || defined(__i486__) \
+ || defined(__i586__) \
+ || defined(__i686__) \
  || defined(__amd64__) \
  || defined(__amd64) \
  || defined(__x86_64__) \
  || defined(__x86_64) \
- || defined(__i386) \
+ || defined(__IA32__) \
  || defined(_X86_) \
  || defined(__THW_INTEL__) \
  || defined(__I86__) \
@@ -31,8 +36,7 @@
  || defined(M_I386) \
  || defined(M_I86) \
  || defined(_M_I386) \
- || defined(_M_I86) \
- || defined(__arm__)
+ || defined(_M_I86)
    #if defined(_WIN32) \
     || defined(_WIN64) \
     || defined(__WIN32__) \
@@ -43,11 +47,13 @@
     || defined(__CYGWIN__)
       /* Either Windows or Phar Lap ETS. */
       #define NiFpga_Windows 1
-   #elif defined(__linux) \
-      || defined(__linux__) \
-      || defined(__gnu_linux__) \
-      || defined(linux)
+   #elif defined(__linux__) \
+      || defined(__linux) \
+      || defined(linux) \
+      || defined(__gnu_linux__)
       #define NiFpga_Linux 1
+   #elif defined(__APPLE__) && defined(__MACH__)
+      #define NiFpga_MacOsX 1
    #else
       #error Unsupported OS.
    #endif
@@ -63,6 +69,21 @@
    #if defined(__vxworks)
       #define NiFpga_VxWorks 1
    #else
+      #error Unsupported OS.
+   #endif
+#elif defined(__arm__) \
+   || defined(__thumb__) \
+   || defined(__TARGET_ARCH_ARM) \
+   || defined(__TARGET_ARCH_THUMB) \
+   || defined(_ARM) \
+   || defined(_M_ARM) \
+   || defined(_M_ARMT)
+#if defined(__linux__) \
+ || defined(__linux) \
+ || defined(linux) \
+ || defined(__gnu_linux__)
+   #define NiFpga_Linux 1
+#else
       #error Unsupported OS.
    #endif
 #else
@@ -91,6 +112,9 @@
    #define NiFpga_Cpp 1
    #if __cplusplus >= 199707L
       #define NiFpga_Cpp98 1
+      #if __cplusplus >= 201103L
+         #define NiFpga_Cpp11 1
+      #endif
    #endif
 #endif
 #if defined(__STDC__)
@@ -101,6 +125,9 @@
          #define NiFpga_C94 1
          #if __STDC_VERSION__ >= 199901L
             #define NiFpga_C99 1
+            #if __STDC_VERSION__ >= 201112L
+               #define NiFpga_C11 1
+            #endif
          #endif
       #endif
    #endif
@@ -111,7 +138,7 @@
  */
 #if NiFpga_Cpp || NiFpga_C99
    /* The inline keyword exists in C++ and C99. */
-   #define NiFpga_Inline inline
+#define NiFpga_Inline inline
 #elif NiFpga_Msvc
    /* Visual C++ (at least since 6.0) also supports an alternate keyword. */
    #define NiFpga_Inline __inline
@@ -142,12 +169,12 @@
  || defined(_SYS_INTTYPES_H) \
  || defined(_SYS_INTTYPES_H_) \
  || defined(_STDINT_H_INCLUDED) \
- || defined(BOOST_CSTDINT_HPP) \
  || defined(_MSC_STDINT_H_) \
  || defined(_PSTDINT_H_INCLUDED)
    /* Assume that exact-width integer types have already been defined. */
 #elif NiFpga_VxWorks
-   #include <vxWorks.h>
+   /* VxWorks (at least 6.3 and earlier) did not have stdint.h. */
+   #include <types/vxTypes.h>
 #elif NiFpga_C99 \
    || NiFpga_Gcc /* GCC (at least since 3.0) has a stdint.h. */ \
    || defined(HAVE_STDINT_H)
@@ -178,7 +205,8 @@
 #include <stddef.h>
 
 #if NiFpga_Cpp
-extern "C" {
+extern "C"
+{
 #endif
 
 /**
@@ -213,6 +241,12 @@ static const NiFpga_Status NiFpga_Status_Success = 0;
 static const NiFpga_Status NiFpga_Status_FifoTimeout = -50400;
 
 /**
+ * No transfer is in progress because the transfer was aborted by the client.
+ * The operation could not be completed as specified.
+ */
+static const NiFpga_Status NiFpga_Status_TransferAborted = -50405;
+
+/**
  * A memory allocation failed. Try again after rebooting.
  */
 static const NiFpga_Status NiFpga_Status_MemoryFull = -52000;
@@ -229,9 +263,8 @@ static const NiFpga_Status NiFpga_Status_SoftwareFault = -52003;
 static const NiFpga_Status NiFpga_Status_InvalidParameter = -52005;
 
 /**
- * A required resource was not found. The NiFpga.* library, the RIO resource,
- * or some other resource may be missing, or the NiFpga.* library may not be
- * the required minimum version.
+ * A required resource was not found. The NiFpga.* library, the RIO resource, or
+ * some other resource may be missing.
  */
 static const NiFpga_Status NiFpga_Status_ResourceNotFound = -52006;
 
@@ -243,9 +276,22 @@ static const NiFpga_Status NiFpga_Status_ResourceNotFound = -52006;
 static const NiFpga_Status NiFpga_Status_ResourceNotInitialized = -52010;
 
 /**
+ * A hardware failure has occurred. The operation could not be completed as
+ * specified.
+ */
+static const NiFpga_Status NiFpga_Status_HardwareFault = -52018;
+
+/**
  * The FPGA is already running.
  */
 static const NiFpga_Status NiFpga_Status_FpgaAlreadyRunning = -61003;
+
+/**
+ * An error occurred downloading the VI to the FPGA device. Verify that
+ * the target is connected and powered and that the resource of the target
+ * is properly configured.
+ */
+static const NiFpga_Status NiFpga_Status_DownloadError = -61018;
 
 /**
  * The bitfile was not compiled for the specified resource's device type.
@@ -269,16 +315,15 @@ static const NiFpga_Status NiFpga_Status_IrqTimeout = -61060;
 static const NiFpga_Status NiFpga_Status_CorruptBitfile = -61070;
 
 /**
- * The FIFO depth is invalid. It was either 0, greater than the amount of
- * available memory in the host computer, or greater than the maximum size
- * allowed by the hardware.
+ * The requested FIFO depth is invalid. It is either 0 or an amount not
+ * supported by the hardware.
  */
 static const NiFpga_Status NiFpga_Status_BadDepth = -61072;
 
 /**
- * The number of FIFO elements is invalid. Either the number is greater than
- * the depth of the host memory DMA FIFO, or more elements were requested for
- * release than had been acquired. 
+ * The number of FIFO elements is invalid. Either the number is greater than the
+ * depth of the host memory DMA FIFO, or more elements were requested for
+ * release than had been acquired.
  */
 static const NiFpga_Status NiFpga_Status_BadReadWriteCount = -61073;
 
@@ -296,45 +341,95 @@ static const NiFpga_Status NiFpga_Status_BadReadWriteCount = -61073;
 static const NiFpga_Status NiFpga_Status_ClockLostLock = -61083;
 
 /**
- * Operation could not be performed because the FPGA is busy. Stop all the
- * activities on the FPGA before requesting this operation.
+ * The operation could not be performed because the FPGA is busy. Stop all
+ * activities on the FPGA before requesting this operation. If the target is in
+ * Scan Interface programming mode, put it in FPGA Interface programming mode.
  */
 static const NiFpga_Status NiFpga_Status_FpgaBusy = -61141;
 
 /**
- * Operation could not be performed because the FPGA is busy operating in FPGA
- * Interface C API mode. Stop all the activities on the FPGA before requesting
+ * The operation could not be performed because the FPGA is busy operating in
+ * FPGA Interface C API mode. Stop all activities on the FPGA before requesting
  * this operation.
  */
 static const NiFpga_Status NiFpga_Status_FpgaBusyFpgaInterfaceCApi = -61200;
 
 /**
  * The chassis is in Scan Interface programming mode. In order to run FPGA VIs,
- * you must go to the chassis properties page, select FPGA programming mode,
- * and deploy settings.
+ * you must go to the chassis properties page, select FPGA programming mode, and
+ * deploy settings.
  */
 static const NiFpga_Status NiFpga_Status_FpgaBusyScanInterface = -61201;
 
 /**
- * Operation could not be performed because the FPGA is busy operating in FPGA
- * Interface mode. Stop all the activities on the FPGA before requesting this
+ * The operation could not be performed because the FPGA is busy operating in
+ * FPGA Interface mode. Stop all activities on the FPGA before requesting this
  * operation.
  */
 static const NiFpga_Status NiFpga_Status_FpgaBusyFpgaInterface = -61202;
 
 /**
- * Operation could not be performed because the FPGA is busy operating in
- * Interactive mode. Stop all the activities on the FPGA before requesting this
+ * The operation could not be performed because the FPGA is busy operating in
+ * Interactive mode. Stop all activities on the FPGA before requesting this
  * operation.
  */
 static const NiFpga_Status NiFpga_Status_FpgaBusyInteractive = -61203;
 
 /**
- * Operation could not be performed because the FPGA is busy operating in
- * Emulation mode. Stop all the activities on the FPGA before requesting this
+ * The operation could not be performed because the FPGA is busy operating in
+ * Emulation mode. Stop all activities on the FPGA before requesting this
  * operation.
  */
 static const NiFpga_Status NiFpga_Status_FpgaBusyEmulation = -61204;
+
+/**
+ * LabVIEW FPGA does not support the Reset method for bitfiles that allow
+ * removal of implicit enable signals in single-cycle Timed Loops.
+ */
+static const NiFpga_Status NiFpga_Status_ResetCalledWithImplicitEnableRemoval = -61211;
+
+/**
+ * LabVIEW FPGA does not support the Abort method for bitfiles that allow
+ * removal of implicit enable signals in single-cycle Timed Loops.
+ */
+static const NiFpga_Status NiFpga_Status_AbortCalledWithImplicitEnableRemoval = -61212;
+
+/**
+ * LabVIEW FPGA does not support Close and Reset if Last Reference for bitfiles
+ * that allow removal of implicit enable signals in single-cycle Timed Loops.
+ * Pass the NiFpga_CloseAttribute_NoResetIfLastSession attribute to NiFpga_Close
+ * instead of 0.
+ */
+static const NiFpga_Status NiFpga_Status_CloseAndResetCalledWithImplicitEnableRemoval = -61213;
+
+/**
+ * For bitfiles that allow removal of implicit enable signals in single-cycle
+ * Timed Loops, LabVIEW FPGA does not support this method prior to running the
+ * bitfile.
+ */
+static const NiFpga_Status NiFpga_Status_ImplicitEnableRemovalButNotYetRun = -61214;
+
+/**
+ * Bitfiles that allow removal of implicit enable signals in single-cycle Timed
+ * Loops can run only once. Download the bitfile again before re-running the VI.
+ */
+static const NiFpga_Status NiFpga_Status_RunAfterStoppedCalledWithImplicitEnableRemoval = -61215;
+
+/**
+ * A gated clock has violated the handshaking protocol. If you are using
+ * external gated clocks, ensure that they follow the required clock gating
+ * protocol. If you are generating your clocks internally, please contact
+ * National Instruments Technical Support.
+ */
+static const NiFpga_Status NiFpga_Status_GatedClockHandshakingViolation = -61216;
+
+/**
+ * The number of elements requested must be less than or equal to the number of
+ * unacquired elements left in the host memory DMA FIFO. There are currently
+ * fewer unacquired elements left in the FIFO than are being requested. Release
+ * some acquired elements before acquiring more elements.
+ */
+static const NiFpga_Status NiFpga_Status_ElementsNotPermissibleToBeAcquired = -61219;
 
 /**
  * An unexpected internal error occurred.
@@ -342,10 +437,26 @@ static const NiFpga_Status NiFpga_Status_FpgaBusyEmulation = -61204;
 static const NiFpga_Status NiFpga_Status_InternalError = -61499;
 
 /**
+ * The NI-RIO driver was unable to allocate memory for a FIFO. This can happen
+ * when the combined depth of all DMA FIFOs exceeds the maximum depth for the
+ * controller, or when the controller runs out of system memory. You may be able
+ * to reconfigure the controller with a greater maximum FIFO depth. For more
+ * information, refer to the NI KnowledgeBase article 65OF2ERQ.
+ */
+static const NiFpga_Status NiFpga_Status_TotalDmaFifoDepthExceeded = -63003;
+
+/**
  * Access to the remote system was denied. Use MAX to check the Remote Device
  * Access settings under Software>>NI-RIO>>NI-RIO Settings on the remote system.
  */
 static const NiFpga_Status NiFpga_Status_AccessDenied = -63033;
+
+/**
+ * The NI-RIO software on the host is not compatible with the software on the
+ * target. Upgrade the NI-RIO software on the host in order to connect to this
+ * target.
+ */
+static const NiFpga_Status NiFpga_Status_HostVersionMismatch = -63038;
 
 /**
  * A connection could not be established to the specified remote device. Ensure
@@ -361,14 +472,37 @@ static const NiFpga_Status NiFpga_Status_RpcConnectionError = -63040;
 static const NiFpga_Status NiFpga_Status_RpcSessionError = -63043;
 
 /**
- * A Read FIFO or Write FIFO function was called while the host had acquired
- * elements of the FIFO. Release all acquired elements before reading or
- * writing.
+ * The operation could not complete because another session is accessing the
+ * FIFO. Close the other session and retry.
+ */
+static const NiFpga_Status NiFpga_Status_FifoReserved = -63082;
+
+/**
+ * A Configure FIFO, Stop FIFO, Read FIFO, or Write FIFO function was called
+ * while the host had acquired elements of the FIFO. Release all acquired
+ * elements before configuring, stopping, reading, or writing.
  */
 static const NiFpga_Status NiFpga_Status_FifoElementsCurrentlyAcquired = -63083;
 
 /**
- * The bitfile could not be read.
+ * A function was called using a misaligned address. The address must be a
+ * multiple of the size of the datatype.
+ */
+static const NiFpga_Status NiFpga_Status_MisalignedAccess = -63084;
+
+/**
+ * The FPGA Read/Write Control Function is accessing a control or indicator
+ * with data that exceeds the maximum size supported on the current target.
+ * Refer to the hardware documentation for the limitations on data types for
+ * this target.
+ */
+static const NiFpga_Status NiFpga_Status_ControlOrIndicatorTooLarge = -63085;
+
+/**
+ * A valid .lvbitx bitfile is required. If you are using a valid .lvbitx
+ * bitfile, the bitfile may not be compatible with the software you are using.
+ * Determine which version of LabVIEW was used to make the bitfile, update your
+ * software to that version or later, and try again.
  */
 static const NiFpga_Status NiFpga_Status_BitfileReadError = -63101;
 
@@ -378,6 +512,14 @@ static const NiFpga_Status NiFpga_Status_BitfileReadError = -63101;
  * application.
  */
 static const NiFpga_Status NiFpga_Status_SignatureMismatch = -63106;
+
+/**
+ * The bitfile you are trying to use is not compatible with the version of
+ * NI-RIO installed on the target and/or the host. Determine which versions of
+ * NI-RIO and LabVIEW were used to make the bitfile, update the software on the
+ * target and host to that version or later, and try again.
+ */
+static const NiFpga_Status NiFpga_Status_IncompatibleBitfile = -63107;
 
 /**
  * Either the supplied resource name is invalid as a RIO resource name, or the
@@ -392,8 +534,8 @@ static const NiFpga_Status NiFpga_Status_InvalidResourceName = -63192;
 static const NiFpga_Status NiFpga_Status_FeatureNotSupported = -63193;
 
 /**
- * The NI-RIO software on the remote system is not compatible with the local
- * NI-RIO software. Upgrade the NI-RIO software on the remote system.
+ * The NI-RIO software on the target system is not compatible with this
+ * software. Upgrade the NI-RIO software on the target system.
  */
 static const NiFpga_Status NiFpga_Status_VersionMismatch = -63194;
 
@@ -442,18 +584,14 @@ static NiFpga_Inline NiFpga_Bool NiFpga_IsNotError(const NiFpga_Status status)
  * @return the resulting status
  */
 static NiFpga_Inline NiFpga_Status NiFpga_MergeStatus(
-                                                NiFpga_Status* const status,
-                                                const NiFpga_Status  newStatus)
+                                               NiFpga_Status* const status,
+                                               const NiFpga_Status  newStatus)
 {
    if (!status)
-   {
       return NiFpga_Status_InvalidParameter;
-   }
    if (NiFpga_IsNotError(*status)
    &&  (*status == NiFpga_Status_Success || NiFpga_IsError(newStatus)))
-   {
       *status = newStatus;
-   }
    return *status;
 }
 
@@ -477,9 +615,7 @@ static NiFpga_Inline NiFpga_Status NiFpga_MergeStatus(
  */
 #define NiFpga_IfIsNotError(status, expression) \
    if (NiFpga_IsNotError(status)) \
-   { \
       NiFpga_MergeStatus(&status, (expression)); \
-   }
 
 /**
  * You must call this function before all other function calls. This function
@@ -577,7 +713,7 @@ typedef enum
 
 /**
  * Runs the FPGA VI on the target. If you use NiFpga_RunAttribute_WaitUntilDone,
- * NiFpga_Run blocks the thread until the FPGA finishes running (if ever).
+ * NiFpga_Run blocks the thread until the FPGA finishes running.
  *
  * @param session handle to a currently open session
  * @param attribute bitwise OR of any NiFpga_RunAttributes, or 0
@@ -1203,9 +1339,10 @@ static const uint32_t NiFpga_InfiniteTimeout = 0xFFFFFFFF;
 typedef void* NiFpga_IrqContext;
 
 /**
- * IRQ contexts are single-threaded; only one thread can wait with a particular
- * context at any given time. Clients must reserve as many contexts as the
- * application requires.
+ * IRQ contexts are single-threaded; only one thread can wait with a
+ * particular context at any given time. To minimize jitter when first
+ * waiting on IRQs, reserve as many contexts as the application
+ * requires.
  *
  * If a context is successfully reserved (the returned status is not an error),
  * it must be unreserved later. Otherwise a memory leak will occur.
@@ -1228,11 +1365,11 @@ NiFpga_Status NiFpga_UnreserveIrqContext(NiFpga_Session    session,
                                          NiFpga_IrqContext context);
 
 /**
- * This is a blocking function that stops the calling thread until the FPGA
- * asserts any IRQ in the irqs parameter, or until the function call times out.
- * Before calling this function, you must use NiFpga_ReserveIrqContext to
- * reserve an IRQ context. No other threads can use the same context when this
- * function is called.
+ * This is a blocking function that stops the calling thread until the
+ * FPGA asserts any IRQ in the irqs parameter, or until the function
+ * call times out.  Before calling this function, use
+ * NiFpga_ReserveIrqContext to reserve an IRQ context. No other
+ * threads can use the same context when this function is called.
  *
  * You can use the irqsAsserted parameter to determine which IRQs were asserted
  * for each function call.
@@ -1295,6 +1432,7 @@ NiFpga_Status NiFpga_ConfigureFifo2(NiFpga_Session session,
                                     uint32_t       fifo,
                                     size_t         requestedDepth,
                                     size_t*        actualDepth);
+
 /**
  * Starts a FIFO. This method is optional.
  *
@@ -1682,7 +1820,7 @@ NiFpga_Status NiFpga_WriteFifoU64(NiFpga_Session  session,
  * @param session handle to a currently open session
  * @param fifo target-to-host FIFO from which to read
  * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested reqested number of elements
+ * @param elementsRequested requested number of elements
  * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
  * @param elementsAcquired actual number of elements acquired, which may be
  *                         less than the requested number
@@ -1716,7 +1854,7 @@ NiFpga_Status NiFpga_AcquireFifoReadElementsBool(
  * @param session handle to a currently open session
  * @param fifo target-to-host FIFO from which to read
  * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested reqested number of elements
+ * @param elementsRequested requested number of elements
  * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
  * @param elementsAcquired actual number of elements acquired, which may be
  *                         less than the requested number
@@ -1750,7 +1888,7 @@ NiFpga_Status NiFpga_AcquireFifoReadElementsI8(
  * @param session handle to a currently open session
  * @param fifo target-to-host FIFO from which to read
  * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested reqested number of elements
+ * @param elementsRequested requested number of elements
  * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
  * @param elementsAcquired actual number of elements acquired, which may be
  *                         less than the requested number
@@ -1784,7 +1922,7 @@ NiFpga_Status NiFpga_AcquireFifoReadElementsU8(
  * @param session handle to a currently open session
  * @param fifo target-to-host FIFO from which to read
  * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested reqested number of elements
+ * @param elementsRequested requested number of elements
  * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
  * @param elementsAcquired actual number of elements acquired, which may be
  *                         less than the requested number
@@ -1818,7 +1956,7 @@ NiFpga_Status NiFpga_AcquireFifoReadElementsI16(
  * @param session handle to a currently open session
  * @param fifo target-to-host FIFO from which to read
  * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested reqested number of elements
+ * @param elementsRequested requested number of elements
  * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
  * @param elementsAcquired actual number of elements acquired, which may be
  *                         less than the requested number
@@ -1852,7 +1990,7 @@ NiFpga_Status NiFpga_AcquireFifoReadElementsU16(
  * @param session handle to a currently open session
  * @param fifo target-to-host FIFO from which to read
  * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested reqested number of elements
+ * @param elementsRequested requested number of elements
  * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
  * @param elementsAcquired actual number of elements acquired, which may be
  *                         less than the requested number
@@ -1886,7 +2024,7 @@ NiFpga_Status NiFpga_AcquireFifoReadElementsI32(
  * @param session handle to a currently open session
  * @param fifo target-to-host FIFO from which to read
  * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested reqested number of elements
+ * @param elementsRequested requested number of elements
  * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
  * @param elementsAcquired actual number of elements acquired, which may be
  *                         less than the requested number
@@ -1920,7 +2058,7 @@ NiFpga_Status NiFpga_AcquireFifoReadElementsU32(
  * @param session handle to a currently open session
  * @param fifo target-to-host FIFO from which to read
  * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested reqested number of elements
+ * @param elementsRequested requested number of elements
  * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
  * @param elementsAcquired actual number of elements acquired, which may be
  *                         less than the requested number
@@ -1954,7 +2092,7 @@ NiFpga_Status NiFpga_AcquireFifoReadElementsI64(
  * @param session handle to a currently open session
  * @param fifo target-to-host FIFO from which to read
  * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested reqested number of elements
+ * @param elementsRequested requested number of elements
  * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
  * @param elementsAcquired actual number of elements acquired, which may be
  *                         less than the requested number
@@ -1987,7 +2125,7 @@ NiFpga_Status NiFpga_AcquireFifoReadElementsU64(
  * @param session handle to a currently open session
  * @param fifo host-to-target FIFO to which to write
  * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested reqested number of elements
+ * @param elementsRequested requested number of elements
  * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
  * @param elementsAcquired actual number of elements acquired, which may be
  *                         less than the requested number
@@ -2021,7 +2159,7 @@ NiFpga_Status NiFpga_AcquireFifoWriteElementsBool(
  * @param session handle to a currently open session
  * @param fifo host-to-target FIFO to which to write
  * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested reqested number of elements
+ * @param elementsRequested requested number of elements
  * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
  * @param elementsAcquired actual number of elements acquired, which may be
  *                         less than the requested number
@@ -2055,7 +2193,7 @@ NiFpga_Status NiFpga_AcquireFifoWriteElementsI8(
  * @param session handle to a currently open session
  * @param fifo host-to-target FIFO to which to write
  * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested reqested number of elements
+ * @param elementsRequested requested number of elements
  * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
  * @param elementsAcquired actual number of elements acquired, which may be
  *                         less than the requested number
@@ -2089,7 +2227,7 @@ NiFpga_Status NiFpga_AcquireFifoWriteElementsU8(
  * @param session handle to a currently open session
  * @param fifo host-to-target FIFO to which to write
  * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested reqested number of elements
+ * @param elementsRequested requested number of elements
  * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
  * @param elementsAcquired actual number of elements acquired, which may be
  *                         less than the requested number
@@ -2123,7 +2261,7 @@ NiFpga_Status NiFpga_AcquireFifoWriteElementsI16(
  * @param session handle to a currently open session
  * @param fifo host-to-target FIFO to which to write
  * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested reqested number of elements
+ * @param elementsRequested requested number of elements
  * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
  * @param elementsAcquired actual number of elements acquired, which may be
  *                         less than the requested number
@@ -2157,7 +2295,7 @@ NiFpga_Status NiFpga_AcquireFifoWriteElementsU16(
  * @param session handle to a currently open session
  * @param fifo host-to-target FIFO to which to write
  * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested reqested number of elements
+ * @param elementsRequested requested number of elements
  * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
  * @param elementsAcquired actual number of elements acquired, which may be
  *                         less than the requested number
@@ -2191,7 +2329,7 @@ NiFpga_Status NiFpga_AcquireFifoWriteElementsI32(
  * @param session handle to a currently open session
  * @param fifo host-to-target FIFO to which to write
  * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested reqested number of elements
+ * @param elementsRequested requested number of elements
  * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
  * @param elementsAcquired actual number of elements acquired, which may be
  *                         less than the requested number
@@ -2225,7 +2363,7 @@ NiFpga_Status NiFpga_AcquireFifoWriteElementsU32(
  * @param session handle to a currently open session
  * @param fifo host-to-target FIFO to which to write
  * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested reqested number of elements
+ * @param elementsRequested requested number of elements
  * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
  * @param elementsAcquired actual number of elements acquired, which may be
  *                         less than the requested number
@@ -2259,7 +2397,7 @@ NiFpga_Status NiFpga_AcquireFifoWriteElementsI64(
  * @param session handle to a currently open session
  * @param fifo host-to-target FIFO to which to write
  * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested reqested number of elements
+ * @param elementsRequested requested number of elements
  * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
  * @param elementsAcquired actual number of elements acquired, which may be
  *                         less than the requested number

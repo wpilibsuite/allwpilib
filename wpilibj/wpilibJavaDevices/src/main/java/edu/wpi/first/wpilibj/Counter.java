@@ -88,11 +88,6 @@ public class Counter extends SensorBase implements CounterBase,
 
 		UsageReporting.report(tResourceType.kResourceType_Counter, m_index,
 				mode.value);
-
-		status = ByteBuffer.allocateDirect(4);
-		status.order(ByteOrder.LITTLE_ENDIAN);
-		CounterJNI.startCounter(m_counter, status.asIntBuffer());
-		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
 	/**
@@ -325,7 +320,7 @@ public class Counter extends SensorBase implements CounterBase,
 		if(source == null){
 			throw new NullPointerException("The Digital Source given was null");
 		}
-		
+
 		if (m_downSource != null && m_allocatedDownSource) {
 			m_downSource.free();
 			m_allocatedDownSource = false;
@@ -358,7 +353,7 @@ public class Counter extends SensorBase implements CounterBase,
 		if (triggerType == null){
 			throw new NullPointerException("Analog Trigger Type given was null");
 		}
-		
+
 		setDownSource(analogTrigger.createOutput(triggerType));
 		m_allocatedDownSource = true;
 	}

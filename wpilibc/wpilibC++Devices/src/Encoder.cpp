@@ -67,13 +67,6 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType)
 
 	HALReport(HALUsageReporting::kResourceType_Encoder, index, encodingType);
 	LiveWindow::GetInstance()->AddSensor("Encoder", m_aSource->GetChannelForRouting(), this);
-
-	if (StatusIsFatal()) return;
-	if (!m_counter) {
-		int32_t status = 0;
-		startEncoder(m_encoder, &status);
-		wpi_setErrorWithContext(status, getHALErrorMessage(status));
-	}
 }
 
 /**

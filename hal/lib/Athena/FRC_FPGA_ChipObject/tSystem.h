@@ -20,6 +20,7 @@ public:
    tSystem(tRioStatusCode *status);
    ~tSystem();
    void getFpgaGuid(uint32_t *guid_ptr, tRioStatusCode *status);
+   void reset(tRioStatusCode *status);
 
 protected:
    static NiFpga_Session _DeviceHandle;

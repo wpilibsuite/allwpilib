@@ -32,11 +32,6 @@ void Counter::InitCounter(Mode mode)
 	m_allocatedDownSource = false;
 
 	HALReport(HALUsageReporting::kResourceType_Counter, index, mode);
-
-	if (StatusIsFatal()) return;
-	status = 0;
-	startCounter(m_counter, &status);
-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**

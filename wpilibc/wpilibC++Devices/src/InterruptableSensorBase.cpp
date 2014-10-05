@@ -46,13 +46,20 @@ void InterruptableSensorBase::CancelInterrupts()
 /**
  * In synchronous mode, wait for the defined interrupt to occur.
  * @param timeout Timeout in seconds
+ * @param ignorePrevious If true, ignore interrupts that happened before
+ * WaitForInterrupt was called.
+ * @return What interrupts fired
  */
-void InterruptableSensorBase::WaitForInterrupt(float timeout)
+InterruptableSensorBase::WaitResult InterruptableSensorBase::WaitForInterrupt(float timeout, bool ignorePrevious)
 {
 	wpi_assert(m_interrupt != NULL);
 	int32_t status = 0;
-	waitForInterrupt(m_interrupt, timeout, &status);
+	uint32_t result;
+
+	result = waitForInterrupt(m_interrupt, timeout, ignorePrevious, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+
+	return static_cast<WaitResult>(result);
 }
 
 /**
@@ -80,15 +87,33 @@ void InterruptableSensorBase::DisableInterrupts()
 }
 
 /**
- * Return the timestamp for the interrupt that occurred most recently.
+ * Return the timestamp for the rising interrupt that occurred most recently.
  * This is in the same time domain as GetClock().
+ * The rising-edge interrupt should be enabled with
+ * {@link #DigitalInput.SetUpSourceEdge}
  * @return Timestamp in seconds since boot.
  */
-double InterruptableSensorBase::ReadInterruptTimestamp()
+double InterruptableSensorBase::ReadRisingTimestamp()
 {
 	wpi_assert(m_interrupt != NULL);
 	int32_t status = 0;
-	double timestamp = readInterruptTimestamp(m_interrupt, &status);
+	double timestamp = readRisingTimestamp(m_interrupt, &status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	return timestamp;
+}
+
+/**
+ * Return the timestamp for the falling interrupt that occurred most recently.
+ * This is in the same time domain as GetClock().
+ * The falling-edge interrupt should be enabled with
+ * {@link #DigitalInput.SetUpSourceEdge}
+ * @return Timestamp in seconds since boot.
+*/
+double InterruptableSensorBase::ReadFallingTimestamp()
+{
+	wpi_assert(m_interrupt != NULL);
+	int32_t status = 0;
+	double timestamp = readFallingTimestamp(m_interrupt, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	return timestamp;
 }

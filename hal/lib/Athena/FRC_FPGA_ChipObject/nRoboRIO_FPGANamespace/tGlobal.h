@@ -1,14 +1,14 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2015_1_0_8_Global_h__
-#define __nFRC_2015_1_0_8_Global_h__
+#ifndef __nFRC_2015_1_0_9_Global_h__
+#define __nFRC_2015_1_0_9_Global_h__
 
 #include "tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2015_1_0_8
+namespace nFRC_2015_1_0_9
 {
 
 class tGlobal
@@ -101,4 +101,4 @@ private:
 }
 }
 
-#endif // __nFRC_2015_1_0_8_Global_h__
+#endif // __nFRC_2015_1_0_9_Global_h__
