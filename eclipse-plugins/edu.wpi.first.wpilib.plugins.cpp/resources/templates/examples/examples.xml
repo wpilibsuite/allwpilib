@@ -105,6 +105,24 @@
   </example>
 
 
+<example>
+  <name>Mecanum Drive</name>
+  <description>An example program which the use of Mecanum Drive with the RobotDrive class</description>
+  <tags>
+    <tag>Getting Started with C++</tag>
+    <tag>Robot and Motor</tag>
+    <tag>Joystick</tag>
+    <tag>Complete List</tag>
+  </tags>
+  <packages>
+    <package>src</package>
+  </packages>
+  <files>
+    <file source="examples/MecanumDrive/src/Robot.cpp" destination="src/Robot.cpp"></file>
+  </files>
+  </example>
+
+
   <example>
   <name>Getting Started</name>
   <description>An example program which demonstrates the simplest autonomous and
