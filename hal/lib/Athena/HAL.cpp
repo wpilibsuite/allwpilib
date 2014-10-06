@@ -145,6 +145,7 @@ void HALSetNewDataSem(pthread_mutex_t * param)
  */
 int HALInitialize(int mode)
 {
+	FRC_NetworkCommunication_Reserve(nullptr);
 	// image 4; Fixes errors caused by multiple processes. Talk to NI about this
 	nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
 			nLoadOut::kTargetClass_RoboRIO;
