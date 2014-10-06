@@ -162,7 +162,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
 	 *            The duty-cycle to start generating. [0..1]
 	 */
 	public void enablePWM(double initialDutyCycle) {
-		if (m_pwmGenerator == null)
+		if (m_pwmGenerator != null)
 			return;
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
@@ -181,6 +181,8 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
 	 * Free up one of the 4 DO PWM generator resources that were in use.
 	 */
 	public void disablePWM() {
+		if (m_pwmGenerator == null)
+			return;
 		// Disable the output by routing to a dead bit.
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
@@ -201,6 +203,8 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
 	 *            The duty-cycle to change to. [0..1]
 	 */
 	public void updateDutyCycle(double dutyCycle) {
+		if (m_pwmGenerator == null)
+			return;
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		// set the byte order
 		status.order(ByteOrder.LITTLE_ENDIAN);
