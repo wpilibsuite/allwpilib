@@ -219,8 +219,8 @@ unsigned short getPWM(void* digital_port_pointer, int32_t *status) {
 
 void latchPWMZero(void* digital_port_pointer, int32_t *status) {
 	DigitalPort* port = (DigitalPort*) digital_port_pointer;
-	pwmSystem->writeZeroLatch(1 << port->port.pin, true, status);
-	pwmSystem->writeZeroLatch(1 << port->port.pin, false, status);
+	pwmSystem->writeZeroLatch(port->port.pin, true, status);
+	pwmSystem->writeZeroLatch(port->port.pin, false, status);
 }
 
 /**
