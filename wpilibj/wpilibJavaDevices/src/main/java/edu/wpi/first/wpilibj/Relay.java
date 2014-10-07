@@ -188,7 +188,8 @@ public class Relay extends SensorBase implements LiveWindowSendable {
 		status.order(ByteOrder.LITTLE_ENDIAN);
 
 		RelayJNI.setRelayForward(m_port, (byte) 0, status.asIntBuffer());
-		RelayJNI.setRelayForward(m_port, (byte) 0, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		RelayJNI.setRelayReverse(m_port, (byte) 0, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
 
 		DIOJNI.freeDIO(m_port, status.asIntBuffer());
