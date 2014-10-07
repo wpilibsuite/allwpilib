@@ -9,7 +9,7 @@
 #include "Task.h"
 #include "HAL/cpp/Synchronized.hpp"
 
-typedef void *(*TimerEventHandler)(void *param);
+typedef void (*TimerEventHandler)(void *param);
 
 class Notifier : public ErrorBase
 {

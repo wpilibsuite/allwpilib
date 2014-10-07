@@ -115,11 +115,10 @@ PIDController::~PIDController()
  * This method is static and called by the Notifier class.
  * @param controller the address of the PID controller object to use in the background loop
  */
-void *PIDController::CallCalculate(void *controller)
+void PIDController::CallCalculate(void *controller)
 {
 	PIDController *control = (PIDController*) controller;
 	control->Calculate();
-	return nullptr;
 }
 
  /**
