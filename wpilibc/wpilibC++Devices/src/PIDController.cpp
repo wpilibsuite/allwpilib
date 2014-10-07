@@ -5,7 +5,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "PIDController.h"
-//#include "NetworkCommunication/UsageReporting.h"
 #include "Notifier.h"
 #include "PIDSource.h"
 #include "PIDOutput.h"
@@ -56,6 +55,20 @@ PIDController::PIDController(float Kp, float Ki, float Kd, float Kf,
 	Initialize(Kp, Ki, Kd, Kf, source, output, period);
 }
 
+struct CallerInfo
+{
+	TimerEventHandler fn;
+	void* data;
+};
+
+static void* forwardCallCalculate(CallerInfo* rdata)
+{
+	CallerInfo data = *rdata;
+	delete rdata;
+	data.fn(data.data);
+	return nullptr;
+}
+
 void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
 								PIDSource *source, PIDOutput *output,
 								float period)
@@ -92,7 +105,11 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
 	pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE);
 	pthread_mutex_init(&m_mutex, &mutexattr);
 
-	pthread_create(&m_controlLoop, NULL, PIDController::CallCalculate, this);
+	CallerInfo *ci = new CallerInfo();
+	ci->fn = &CallCalculate;
+	ci->data = this;
+	pthread_create(&m_controlLoop, NULL, (void*(*)(void*))&forwardCallCalculate, ci);
+	//forwardCallCalculate will delete the obj, no need to delete it ourselves
 
 	static int32_t instances = 0;
 	instances++;
@@ -122,7 +139,7 @@ PIDController::~PIDController()
  * This method is static and called by pthreads.
  * @param controller the address of the PID controller object to use in the background loop
  */
-void *PIDController::CallCalculate(void *data)
+void PIDController::CallCalculate(void *data)
 {
 	PIDController *controller = (PIDController*) data;
 	int destruct = 0;
@@ -137,8 +154,6 @@ void *PIDController::CallCalculate(void *data)
 
 		Wait(controller->m_period);
 	}
-
-	return NULL;
 }
 
  /**
