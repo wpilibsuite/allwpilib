@@ -18,8 +18,10 @@ public:
    virtual void getHardwareFpgaSignature(uint32_t *guid_ptr, tRioStatusCode *status)=0;
    virtual uint32_t getLVHandle(tRioStatusCode *status)=0;
    virtual uint32_t getHandle()=0;
+   virtual void reset(tRioStatusCode *status)=0;
 };
 
 }
 
 #endif // __tSystemInterface_h__
+

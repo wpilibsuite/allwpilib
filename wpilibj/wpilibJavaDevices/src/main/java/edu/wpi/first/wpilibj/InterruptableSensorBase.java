@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
  * Base for sensors to be used with interrupts
  */
 public abstract class InterruptableSensorBase extends SensorBase {
-	/** 
+	/**
 	 * This is done to store the JVM variable in the InterruptJNI
 	 * This is done because the HAL must have access to the JVM variable
 	 * in order to attach the newly spawned thread when an interrupt is fired.
@@ -35,12 +35,12 @@ public abstract class InterruptableSensorBase extends SensorBase {
 	 * The interrupt resource
 	 */
 	protected ByteBuffer m_interrupt = null;
-	
+
 	/**
 	 * Flags if the interrupt being allocated is synchronous
 	 */
 	protected boolean m_isSynchronousInterrupt = false;
-	
+
 	/**
 	 * The index of the interrupt
 	 */
@@ -56,7 +56,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
 	public InterruptableSensorBase() {
 		m_interrupt = null;
 	}
-	
+
 	/**
 	 * @return
 	 */
@@ -71,7 +71,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
 	 * @return
 	 */
 	abstract byte getModuleForRouting();
-	
+
 	/**
 	 * Request interrupts asynchronously on this digital input.
 	 *
@@ -80,16 +80,16 @@ public abstract class InterruptableSensorBase extends SensorBase {
 	 *            {@link InterruptHandlerFunction#interruptFired(int, Object)} that
 	 *            will be called whenever there is an interrupt on this device.
 	 *            Request interrupts in synchronus mode where the user program
-	 *            interrupt handler will be called when an interrupt occurs. The 
+	 *            interrupt handler will be called when an interrupt occurs. The
 	 *            default is interrupt on rising edges only.
 	 */
 	public void requestInterrupts(InterruptHandlerFunction<?> handler) {
 		if(m_interrupt != null){
 			throw new AllocationException("The interrupt has already been allocated");
 		}
-		
+
 		allocateInterrupts(false);
-		
+
 		assert (m_interrupt != null);
 
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -114,7 +114,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
 		if(m_interrupt != null){
 			throw new AllocationException("The interrupt has already been allocated");
 		}
-		
+
 		allocateInterrupts(true);
 
 		assert (m_interrupt != null);
@@ -132,7 +132,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
 
 	/**
 	 * Allocate the interrupt
-	 * 
+	 *
 	 * @param watcher true if the interrupt should be in synchronous mode where the user
 	 * program will have to explicitly wait for the interrupt to occur.
 	 */
@@ -170,18 +170,31 @@ public abstract class InterruptableSensorBase extends SensorBase {
 
 	/**
 	 * In synchronous mode, wait for the defined interrupt to occur.
-	 * 
+	 *
 	 * @param timeout
 	 *            Timeout in seconds
+	 * @param ignorePrevious
+	 *            If true, ignore interrupts that happened before
+	 *            waitForInterrupt was called.
 	 */
-	public void waitForInterrupt(double timeout) {
+	public void waitForInterrupt(double timeout, boolean ignorePrevious) {
 		if (m_interrupt == null) {
 			throw new IllegalStateException("The interrupt is not allocated.");
 		}
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
-		InterruptJNI.waitForInterrupt(m_interrupt, (float) timeout, status.asIntBuffer());
+		InterruptJNI.waitForInterrupt(m_interrupt, (float) timeout, ignorePrevious, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
+	}
+
+	/**
+	 * In synchronous mode, wait for the defined interrupt to occur.
+	 *
+	 * @param timeout
+	 *            Timeout in seconds
+	 */
+	public void waitForInterrupt(double timeout) {
+		waitForInterrupt(timeout, true);
 	}
 
 	/**
@@ -219,22 +232,41 @@ public abstract class InterruptableSensorBase extends SensorBase {
 	}
 
 	/**
-	 * Return the timestamp for the interrupt that occurred most recently. This
-	 * is in the same time domain as getClock().
-	 * 
+	 * Return the timestamp for the rising interrupt that occurred most
+	 * recently. This is in the same time domain as getClock().
+	 * The rising-edge interrupt should be enabled with
+	 * {@link #setUpSourceEdge}
 	 * @return Timestamp in seconds since boot.
 	 */
-	public double readInterruptTimestamp() {
+	public double readRisingTimestamp() {
 		if (m_interrupt == null) {
 			throw new IllegalStateException("The interrupt is not allocated.");
 		}
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
-		double timestamp = InterruptJNI.readInterruptTimestamp(m_interrupt, status.asIntBuffer());
+		double timestamp = InterruptJNI.readRisingTimestamp(m_interrupt, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
 		return timestamp;
 	}
-	
+
+	/**
+	* Return the timestamp for the falling interrupt that occurred most
+	* recently. This is in the same time domain as getClock().
+	* The falling-edge interrupt should be enabled with
+	* {@link #setUpSourceEdge}
+	* @return Timestamp in seconds since boot.
+	*/
+	public double readFallingTimestamp() {
+		if (m_interrupt == null) {
+			throw new IllegalStateException("The interrupt is not allocated.");
+		}
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		double timestamp = InterruptJNI.readFallingTimestamp(m_interrupt, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		return timestamp;
+	}
+
 	/**
 	 * Set which edge to trigger interrupts on
 	 *

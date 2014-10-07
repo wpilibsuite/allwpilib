@@ -11,6 +11,7 @@
 #include <stdint.h>
 
 #include "FRC_FPGA_ChipObject/RoboRIO_FRC_ChipObject_Aliases.h"
+#include "FRC_FPGA_ChipObject/tDMAChannelDescriptor.h"
 #include "FRC_FPGA_ChipObject/tDMAManager.h"
 #include "FRC_FPGA_ChipObject/tInterruptManager.h"
 #include "FRC_FPGA_ChipObject/tSystem.h"

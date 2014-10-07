@@ -63,8 +63,6 @@ extern "C"
 	void setCounterPulseLengthMode(void* counter_pointer, double threshold, int32_t *status);
 	int32_t getCounterSamplesToAverage(void* counter_pointer, int32_t *status);
 	void setCounterSamplesToAverage(void* counter_pointer, int samplesToAverage, int32_t *status);
-	void startCounter(void* counter_pointer, int32_t *status);
-	void stopCounter(void* counter_pointer, int32_t *status);
 	void resetCounter(void* counter_pointer, int32_t *status);
 	int32_t getCounter(void* counter_pointer, int32_t *status);
 	double getCounterPeriod(void* counter_pointer, int32_t *status);
@@ -78,8 +76,6 @@ extern "C"
 			uint8_t port_b_module, uint32_t port_b_pin, bool port_b_analog_trigger,
 			bool reverseDirection, int32_t *index, int32_t *status); // TODO: fix routing
 	void freeEncoder(void* encoder_pointer, int32_t *status);
-	void startEncoder(void* encoder_pointer, int32_t *status);
-	void stopEncoder(void* encoder_pointer, int32_t *status);
 	void resetEncoder(void* encoder_pointer, int32_t *status);
 	int32_t getEncoder(void* encoder_pointer, int32_t *status); // Raw value
 	double getEncoderPeriod(void* encoder_pointer, int32_t *status);

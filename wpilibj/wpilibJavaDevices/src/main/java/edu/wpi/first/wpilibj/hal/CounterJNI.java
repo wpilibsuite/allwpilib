@@ -19,8 +19,6 @@ public class CounterJNI extends JNIWrapper {
 	public static native void setCounterPulseLengthMode(ByteBuffer counter_pointer, double threshold, IntBuffer status);
 	public static native int getCounterSamplesToAverage(ByteBuffer counter_pointer, IntBuffer status);
 	public static native void setCounterSamplesToAverage(ByteBuffer counter_pointer, int samplesToAverage, IntBuffer status);
-	public static native void startCounter(ByteBuffer counter_pointer, IntBuffer status);
-	public static native void stopCounter(ByteBuffer counter_pointer, IntBuffer status);
 	public static native void resetCounter(ByteBuffer counter_pointer, IntBuffer status);
 	public static native int getCounter(ByteBuffer counter_pointer, IntBuffer status);
 	public static native double getCounterPeriod(ByteBuffer counter_pointer, IntBuffer status);

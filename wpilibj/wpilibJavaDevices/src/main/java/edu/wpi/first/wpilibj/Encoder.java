@@ -107,14 +107,6 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 		UsageReporting.report(tResourceType.kResourceType_Encoder,
 				m_index, m_encodingType.value);
 		LiveWindow.addSensor("Encoder", m_aSource.getChannelForRouting(), this);
-
-		if (m_counter == null) {
-			ByteBuffer status = ByteBuffer.allocateDirect(4);
-			// set the byte order
-			status.order(ByteOrder.LITTLE_ENDIAN);
-			EncoderJNI.startEncoder(m_encoder, status.asIntBuffer());
-			HALUtil.checkStatus(status.asIntBuffer());
-		}
 	}
 
 	/**

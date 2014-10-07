@@ -28,11 +28,11 @@ public:
    tInterruptManager(uint32_t interruptMask, bool watcher, tRioStatusCode *status);
    ~tInterruptManager();
    void registerHandler(tInterruptHandler handler, void *param, tRioStatusCode *status);
-   uint32_t watch(int32_t timeoutInMs, tRioStatusCode *status);
+   uint32_t watch(int32_t timeoutInMs, bool ignorePrevious, tRioStatusCode *status);
    void enable(tRioStatusCode *status);
    void disable(tRioStatusCode *status);
    bool isEnabled(tRioStatusCode *status);
-private:
+public:
    class tInterruptThread;
    friend class tInterruptThread;
    void handler();
@@ -58,4 +58,3 @@ private:
 
 
 #endif // __tInterruptManager_h__
-

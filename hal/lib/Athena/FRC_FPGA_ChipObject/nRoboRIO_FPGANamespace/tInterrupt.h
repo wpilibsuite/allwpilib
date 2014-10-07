@@ -1,14 +1,14 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2015_1_0_8_Interrupt_h__
-#define __nFRC_2015_1_0_8_Interrupt_h__
+#ifndef __nFRC_2015_1_0_9_Interrupt_h__
+#define __nFRC_2015_1_0_9_Interrupt_h__
 
 #include "tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2015_1_0_8
+namespace nFRC_2015_1_0_9
 {
 
 class tInterrupt
@@ -54,9 +54,9 @@ public:
 
    typedef enum
    {
-   } tTimeStamp_IfaceConstants;
+   } tFallingTimeStamp_IfaceConstants;
 
-   virtual unsigned int readTimeStamp(tRioStatusCode *status) = 0;
+   virtual unsigned int readFallingTimeStamp(tRioStatusCode *status) = 0;
 
 
    typedef enum
@@ -79,6 +79,13 @@ public:
    virtual bool readConfig_WaitForAck(tRioStatusCode *status) = 0;
 
 
+   typedef enum
+   {
+   } tRisingTimeStamp_IfaceConstants;
+
+   virtual unsigned int readRisingTimeStamp(tRioStatusCode *status) = 0;
+
+
 
 
 
@@ -90,4 +97,4 @@ private:
 }
 }
 
-#endif // __nFRC_2015_1_0_8_Interrupt_h__
+#endif // __nFRC_2015_1_0_9_Interrupt_h__
