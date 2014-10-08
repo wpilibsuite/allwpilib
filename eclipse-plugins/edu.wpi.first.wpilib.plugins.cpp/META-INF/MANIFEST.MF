@@ -25,7 +25,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.cdt.debug.ui;bundle-version="7.2.0",
  org.eclipse.cdt.launch;bundle-version="7.1.0",
  org.eclipse.cdt.launch.remote;bundle-version="2.4.0",
- org.eclipse.cdt.debug.mi.core;bundle-version="7.2.0"
+ org.eclipse.cdt.debug.mi.core;bundle-version="7.2.0",
+ org.eclipse.core.variables
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: edu.wpi.first.wpilib.plugins.cpp,

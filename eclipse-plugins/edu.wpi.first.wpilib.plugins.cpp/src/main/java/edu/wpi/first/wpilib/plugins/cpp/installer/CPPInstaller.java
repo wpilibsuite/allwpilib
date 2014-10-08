@@ -1,6 +1,12 @@
 package edu.wpi.first.wpilib.plugins.cpp.installer;
 
 import java.io.InputStream;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.variables.IStringVariableManager;
+import org.eclipse.core.variables.IValueVariable;
+import org.eclipse.core.variables.VariablesPlugin;
+
 import edu.wpi.first.wpilib.plugins.core.installer.AbstractInstaller;
 import edu.wpi.first.wpilib.plugins.cpp.WPILibCPPPlugin;
 import edu.wpi.first.wpilib.plugins.cpp.preferences.PreferenceConstants;
@@ -21,6 +27,26 @@ public class CPPInstaller extends AbstractInstaller {
 	protected void updateInstalledVersion(String version) {
 		WPILibCPPPlugin.getDefault().getPreferenceStore().setValue(PreferenceConstants.LIBRARY_INSTALLED,
 				version);
+		
+		IStringVariableManager vm = VariablesPlugin.getDefault().getStringVariableManager();
+		try
+		{
+			if (System.getProperty("os.name").startsWith("Windows"))
+			{
+				IValueVariable vv = vm.getValueVariable("HOME");
+				if (vv == null)
+					vm.addVariables(new IValueVariable[]{vm.newValueVariable("HOME", "user.home directory", false,System.getProperty("user.home"))});
+				else
+				{
+					if (!System.getProperty("user.home").equals(vm.performStringSubstitution("${HOME}")))
+						vv.setValue(System.getProperty("user.home"));
+				}
+			}
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 	}
 	
 	@Override
