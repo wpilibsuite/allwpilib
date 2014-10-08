@@ -21,14 +21,18 @@ public:
 
 	InterruptableSensorBase();
 	virtual ~InterruptableSensorBase();
-	virtual void RequestInterrupts(InterruptHandlerFunction handler, void *param) = 0; ///< Asynchronus handler version.
-	virtual void RequestInterrupts() = 0;		///< Synchronus Wait version.
+	virtual uint32_t GetChannelForRouting() = 0;
+	virtual uint32_t GetModuleForRouting() = 0;
+	virtual bool GetAnalogTriggerForRouting() = 0;
+	virtual void RequestInterrupts(InterruptHandlerFunction handler, void *param); ///< Asynchronus handler version.
+	virtual void RequestInterrupts();		///< Synchronus Wait version.
 	virtual void CancelInterrupts();			///< Free up the underlying chipobject functions.
 	virtual WaitResult WaitForInterrupt(float timeout, bool ignorePrevious = true); ///< Synchronus version.
 	virtual void EnableInterrupts();			///< Enable interrupts - after finishing setup.
 	virtual void DisableInterrupts();		///< Disable, but don't deallocate.
 	virtual double ReadRisingTimestamp();///< Return the timestamp for the rising interrupt that occurred.
 	virtual double ReadFallingTimestamp();///< Return the timestamp for the falling interrupt that occurred.
+	virtual void SetUpSourceEdge(bool risingEdge, bool fallingEdge);
 protected:
 	void* m_interrupt;
 	uint32_t m_interruptIndex;

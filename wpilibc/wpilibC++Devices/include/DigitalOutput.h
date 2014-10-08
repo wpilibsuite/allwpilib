@@ -32,10 +32,6 @@ public:
 	virtual uint32_t GetChannelForRouting();
 	virtual uint32_t GetModuleForRouting();
 	virtual bool GetAnalogTriggerForRouting();
-	virtual void RequestInterrupts(InterruptHandlerFunction handler, void *param);
-	virtual void RequestInterrupts();
-
-	void SetUpSourceEdge(bool risingEdge, bool fallingEdge);
 
 	virtual void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
 	void UpdateTable();
