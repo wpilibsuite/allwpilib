@@ -308,7 +308,7 @@ TEST_F(CANJaguarTest, PositionModeWorks) {
  * Test if we can set a current setpoint with PID control on the Jaguar and get
  * a corresponding output current
  */
-TEST_F(CANJaguarTest, CurrentModeWorks) {
+TEST_F(CANJaguarTest, DISABLED_CurrentModeWorks) {
 	m_jaguar->SetCurrentMode(10.0, 4.0, 1.0);
 	m_jaguar->EnableControl();
 
