@@ -83,5 +83,14 @@
             content="WPILib Intro/sample.xml">
       </configExtension>
    </extension>
+   <extension
+         point="org.eclipse.core.variables.valueVariables">
+          <variable
+    name="WPILIB"
+    initialValue="${HOME}/wpilib"
+    description="WPILib Path"
+    >
+   </variable>
+   </extension>
 
 </plugin>
