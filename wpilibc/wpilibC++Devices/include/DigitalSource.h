@@ -21,6 +21,4 @@ public:
 	virtual uint32_t GetChannelForRouting() = 0;
 	virtual uint32_t GetModuleForRouting() = 0;
 	virtual bool GetAnalogTriggerForRouting() = 0;
-	virtual void RequestInterrupts(InterruptHandlerFunction handler, void *param) = 0;
-	virtual void RequestInterrupts() = 0;
 };
