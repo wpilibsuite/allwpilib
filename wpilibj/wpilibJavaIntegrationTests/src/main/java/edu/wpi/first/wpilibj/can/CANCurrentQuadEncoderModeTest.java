@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Ignore;
 
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.Timer;
@@ -24,7 +25,7 @@ public class CANCurrentQuadEncoderModeTest extends AbstractCANTest {
 	private static Logger logger = Logger.getLogger(CANCurrentQuadEncoderModeTest.class.getName());
 	private static final double kStoppedValue = 0;
 	private static final double kRunningValue = 3.0;
-	
+
 	/* (non-Javadoc)
 	 * @see edu.wpi.first.wpilibj.can.AbstractCANTest#stopMotor()
 	 */
@@ -45,12 +46,12 @@ public class CANCurrentQuadEncoderModeTest extends AbstractCANTest {
 	protected void runMotorReverse() {
 		getME().getMotor().set(-kRunningValue);
 	}
-	
+
 	@Override
 	protected Logger getClassLogger() {
 		return logger;
 	}
-	
+
 	@Before
 	public void setUp() throws Exception {
 		getME().getMotor().setCurrentMode(CANJaguar.kQuadEncoder, 360, 10.0, 4.0, 1.0);
@@ -60,7 +61,8 @@ public class CANCurrentQuadEncoderModeTest extends AbstractCANTest {
 		Timer.delay(kStartupTime);
 	}
 
-	
+
+	@Ignore
 	@Test
 	public void testDriveToCurrentPositive() {
 		double setpoint =  1.6f;
@@ -76,7 +78,8 @@ public class CANCurrentQuadEncoderModeTest extends AbstractCANTest {
 
 		assertEquals("The desired output current was not reached",setpoint, getME().getMotor().getOutputCurrent(), kCurrentTolerance);
 	}
-	
+
+	@Ignore
 	@Test
 	public void testDriveToCurrentNegative() {
 		double setpoint =  -1.6f;
