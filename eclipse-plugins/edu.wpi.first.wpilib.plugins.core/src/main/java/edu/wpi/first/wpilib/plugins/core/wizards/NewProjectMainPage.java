@@ -98,18 +98,19 @@ public class NewProjectMainPage extends WizardPage {
 			groupLayout.numColumns = 1;
 			projectTypeGroup.setLayout(groupLayout);
 
+			commandRobot = new Button(projectTypeGroup, SWT.RADIO | SWT.WRAP);
+			commandRobot.setText("Command-Based Robot: A robot project that allows robots to be implemented using the command based model to allow complex functionality to be developed from simpler functionality.");
+			gd = new GridData(GridData.FILL_HORIZONTAL);
+			gd.widthHint = 300;
+			commandRobot.setLayoutData(gd);
+			commandRobot.setSelection(true);
+
 			iterativeRobot = new Button(projectTypeGroup, SWT.RADIO | SWT.WRAP);
 			iterativeRobot.setText("Iterative Robot: A robot project that allows robots to be implemented in an iterative manner.");
 			gd = new GridData(GridData.FILL_HORIZONTAL);
 			gd.widthHint = 300;
 			iterativeRobot.setLayoutData(gd);
 
-			commandRobot = new Button(projectTypeGroup, SWT.RADIO | SWT.WRAP);
-			commandRobot.setText("Command-Based Robot: A robot project that allows robots to be implemented using the command based model to allow complex functionality to be developed from simpler functionality.");
-			gd = new GridData(GridData.FILL_HORIZONTAL);
-			gd.widthHint = 300;
-			commandRobot.setLayoutData(gd);
-			
 			sampleRobot = new Button(projectTypeGroup, SWT.RADIO | SWT.WRAP);
 			sampleRobot.setText("Sample Robot: A robot project used for small sample programs or for highly advanced programs with more complete control over program flow");
 			gd = new GridData(GridData.FILL_HORIZONTAL);
