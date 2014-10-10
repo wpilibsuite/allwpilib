@@ -257,7 +257,7 @@ public class Counter extends SensorBase implements CounterBase,
 		if (triggerType == null){
 			throw new NullPointerException("Analog Trigger Type given was null");
 		}
-		analogTrigger.createOutput(triggerType);
+		setUpSource(analogTrigger.createOutput(triggerType));
 		m_allocatedUpSource = true;
 	}
 
