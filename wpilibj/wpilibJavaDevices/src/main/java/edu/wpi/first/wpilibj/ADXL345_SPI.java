@@ -5,6 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
+
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 
 /**
@@ -96,6 +100,8 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer {
 		m_spi.write(commands, 2);
 
         setRange(range);
+
+		UsageReporting.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_SPI);
 	}
 
 	/** {inheritdoc} */
