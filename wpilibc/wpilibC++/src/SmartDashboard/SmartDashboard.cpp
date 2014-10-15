@@ -110,13 +110,23 @@ void SmartDashboard::PutBoolean(std::string keyName, bool value)
 }
 
 /**
- * Returns the value at the specified key.
+ * Returns the value at the specified key. Throws an exception if the key is not found in the table
  * @param keyName the key
  * @return the value
  */
 bool SmartDashboard::GetBoolean(std::string keyName)
 {
 	return m_table->GetBoolean(keyName);
+}
+
+/**
+ * Returns the value at the specified key. If the key is not found, returns the default value.
+ * @param keyName the key
+ * @return the value
+ */
+bool SmartDashboard::GetBoolean(std::string keyName, bool defaultValue)
+{
+	return m_table->GetBoolean(keyName, defaultValue);
 }
 
 /**
@@ -131,13 +141,23 @@ void SmartDashboard::PutNumber(std::string keyName, double value){
 }
 
 /**
- * Returns the value at the specified key.
+ * Returns the value at the specified key. Throws an exception if the key is not found in the table.
  * @param keyName the key
  * @return the value
  */
 double SmartDashboard::GetNumber(std::string keyName)
 {
 	return m_table->GetNumber(keyName);
+}
+
+/**
+ * Returns the value at the specified key. If the key is not found, returns the default value.
+ * @param keyName the key
+ * @return the value
+ */
+double SmartDashboard::GetNumber(std::string keyName, double defaultValue)
+{
+	return m_table->GetNumber(keyName, defaultValue);
 }
 
 /**
@@ -170,11 +190,21 @@ int SmartDashboard::GetString(std::string keyName, char *outBuffer, unsigned int
 
 
 /**
- * Returns the value at the specified key.
+ * Returns the value at the specified key. Throws an exception if the key is not found in the table
  * @param keyName the key
  * @return the value
  */
 std::string SmartDashboard::GetString(std::string keyName)
 {
 	return m_table->GetString(keyName);
+}
+
+/**
+ * Returns the value at the specified key. If the key is not found, returns the default value.
+ * @param keyName the key
+ * @return the value
+ */
+std::string SmartDashboard::GetString(std::string keyName, std::string defaultValue)
+{
+	return m_table->GetString(keyName, defaultValue);
 }
