@@ -2103,6 +2103,10 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	public String getDescription() {
 		return "CANJaguar ID "+m_deviceNumber;
 	}
+	
+	public int getDeviceID() {
+		return (int)m_deviceNumber;
+	}
 
 	/**
 	* Common interface for stopping a motor.

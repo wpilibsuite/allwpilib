@@ -143,6 +143,7 @@ public:
 	bool IsSafetyEnabled();
 	void SetSafetyEnabled(bool enabled);
 	void GetDescription(char *desc);
+	uint8_t GetDeviceID();
 
 protected:
 	// Control mode helpers

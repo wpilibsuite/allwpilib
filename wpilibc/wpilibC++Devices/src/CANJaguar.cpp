@@ -2036,6 +2036,11 @@ void CANJaguar::GetDescription(char *desc)
 	sprintf(desc, "CANJaguar ID %d", m_deviceNumber);
 }
 
+uint8_t CANJaguar::GetDeviceID()
+{
+	return m_deviceNumber;
+}
+
 /**
  * Common interface for stopping the motor
  * Part of the MotorSafety interface
