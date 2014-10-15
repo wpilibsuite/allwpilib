@@ -15,6 +15,11 @@ private:
 		autonomousCommand = new ExampleCommand();
 		lw = LiveWindow::GetInstance();
 	}
+	
+	void DisabledPeriodic()
+	{
+		Scheduler::GetInstance()->Run();
+	}
 
 	void AutonomousInit()
 	{
