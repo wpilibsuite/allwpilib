@@ -102,14 +102,7 @@
 				<!-- Javadoc -->
                 <artifactItem>
 				  <groupId>edu.wpi.first.wpilibj</groupId>
-				  <artifactId>wpilibJavaDevices</artifactId>
-				  <version>0.1.0-SNAPSHOT</version>
-				  <type>javadoc</type>
-				  <outputDirectory>${java-zip}/javadoc-jar</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-				  <groupId>edu.wpi.first.wpilibj</groupId>
-				  <artifactId>wpilibJava</artifactId>
+				  <artifactId>wpilibJavaFinal</artifactId>
 				  <version>0.1.0-SNAPSHOT</version>
 				  <type>javadoc</type>
 				  <outputDirectory>${java-zip}/javadoc-jar</outputDirectory>

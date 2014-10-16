@@ -14,6 +14,27 @@
     <relativePath>../../maven-utilities/athena/library-jar/pom.xml</relativePath>
   </parent>
   
+  <profiles>
+    <profile>
+      <id>docline-java8-disable</id>
+      <activation>
+	    <jdk>[1.8,</jdk>
+      </activation>
+
+      <build>
+	    <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <additionalparam>-Xdoclint:none</additionalparam>
+            </configuration>
+          </plugin>
+	    </plugins>
+      </build>
+    </profile>
+  </profiles>
+  
   <dependencies>
 	<dependency>
 	  <groupId>edu.wpi.first.wpilibj</groupId>
@@ -150,6 +171,19 @@
             </exclusions>
           </dependency>
         </dependencies>
+      </plugin>
+	   <plugin>
+      	<groupId>org.apache.maven.plugins</groupId>
+      	<artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+      	  <sourceFileExcludes>
+      	    <exclude>edu/wpi/first/wpilibj/image/</exclude>
+      	    <exclude>edu/wpi/first/wpilibj/camera/</exclude>
+      	    <exclude>edu/wpi/first/wpilibj/visa/</exclude>
+      	    <exclude>edu/wpi/first/wpilibj/SerialPort.java</exclude>
+      	  </sourceFileExcludes>
+		   <includeDependencySources>true</includeDependencySources>
+        </configuration>
       </plugin>
 
 
