@@ -152,4 +152,10 @@ public abstract class GenericHID {
      * @return true if the button is pressed
      */
     public abstract boolean getRawButton(int button);
+
+    public abstract int getPOV(int pov);
+
+    public int getPOV() {
+        return getPOV(1);
+    }
 }

@@ -31,10 +31,6 @@ public class DriverStation implements RobotState.Interface {
      */
     public static final int kJoystickPorts = 4;
     /**
-     * Number of Joystick Axes
-     */
-    public static final int kJoystickAxes = 6;
-    /**
      * Convert from raw values to volts
      */
     public static final double kDSAnalogInScaling = 5.0 / 1023.0;
@@ -61,7 +57,8 @@ public class DriverStation implements RobotState.Interface {
 
     private HALControlWord m_controlWord;
     private HALAllianceStationID m_allianceStationID;
-    private short[][] m_joystickAxes = new short[kJoystickAxes][kJoystickPorts];
+    private short[][] m_joystickAxes = new short[FRCNetworkCommunicationsLibrary.kMaxJoystickAxes][kJoystickPorts];
+    private short[][] m_joystickPOVs = new short[FRCNetworkCommunicationsLibrary.kMaxJoystickPOVs][kJoystickPorts];
     private int[] m_joystickButtons = new int[kJoystickPorts];
 
     private Thread m_thread;
@@ -185,6 +182,7 @@ public class DriverStation implements RobotState.Interface {
         for(byte stick = 0; stick < kJoystickPorts; stick++) {
             m_joystickButtons[stick] = FRCNetworkCommunicationsLibrary.HALGetJoystickButtons(stick);
             m_joystickAxes[stick] = FRCNetworkCommunicationsLibrary.HALGetJoystickAxes(stick);
+            m_joystickPOVs[stick] = FRCNetworkCommunicationsLibrary.HALGetJoystickPOVs(stick);
         }
 
         if (!lastEnabled && isEnabled()) {
@@ -228,7 +226,7 @@ public class DriverStation implements RobotState.Interface {
             throw new RuntimeException("Joystick index is out of range, should be 0-3");
         }
 
-        if (axis < 1 || axis > kJoystickAxes) {
+        if (axis < 1 || axis > m_joystickAxes[stick].length) {
             throw new RuntimeException("Joystick axis is out of range");
         }
 
@@ -239,6 +237,23 @@ public class DriverStation implements RobotState.Interface {
         } else {
             return value / 127.0;
         }
+    }
+
+    /**
+     * Get the state of a POV on the joystick.
+     *
+     * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
+     */
+    public int getStickPOV(int stick, int pov) {
+        if(stick < 0 || stick >= kJoystickPorts) {
+            throw new RuntimeException("Joystick index is out of range, should be 0-3");
+        }
+
+        if (pov < 1 || pov > m_joystickPOVs[stick].length) {
+            throw new RuntimeException("Joystick POV is out of range");
+        }
+
+        return m_joystickPOVs[stick][pov - 1];
     }
 
     /**

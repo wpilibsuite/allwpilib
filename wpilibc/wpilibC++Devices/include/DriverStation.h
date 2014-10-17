@@ -30,9 +30,9 @@ public:
 	static DriverStation *GetInstance();
 
 	static const uint32_t kJoystickPorts = 4;
-	static const uint32_t kJoystickAxes = 6;
 
 	float GetStickAxis(uint32_t stick, uint32_t axis);
+	int GetStickPOV(uint32_t stick, uint32_t pov);
 	short GetStickButtons(uint32_t stick);
 
 	bool IsEnabled();
@@ -98,6 +98,7 @@ private:
 	HALControlWord m_controlWord;
 	HALAllianceStationID m_allianceStationID;
 	HALJoystickAxes m_joystickAxes[kJoystickPorts];
+	HALJoystickPOVs m_joystickPOVs[kJoystickPorts];
 	HALJoystickButtons m_joystickButtons[kJoystickPorts];
 
 	MUTEX_ID m_statusDataSemaphore;

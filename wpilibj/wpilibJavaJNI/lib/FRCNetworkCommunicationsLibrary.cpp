@@ -293,12 +293,29 @@ JNIEXPORT jshortArray JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetwor
   (JNIEnv * env, jclass, jbyte joystickNum)
 {
     HALJoystickAxes axes;
-    HALGetJoystickAxes(joystickNum, &axes, 6);
+    HALGetJoystickAxes(joystickNum, &axes);
 
     jshortArray axesArray = env->NewShortArray(axes.count);
     env->SetShortArrayRegion(axesArray, 0, axes.count, axes.axes);
 
     return axesArray;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
+ * Method:    HALGetJoystickPOVs
+ * Signature: (B)[S
+ */
+JNIEXPORT jshortArray JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickPOVs
+  (JNIEnv * env, jclass, jbyte joystickNum)
+{
+    HALJoystickPOVs povs;
+    HALGetJoystickPOVs(joystickNum, &povs);
+
+    jshortArray povsArray = env->NewShortArray(povs.count);
+    env->SetShortArrayRegion(povsArray, 0, povs.count, povs.povs);
+
+    return povsArray;
 }
 
 /*

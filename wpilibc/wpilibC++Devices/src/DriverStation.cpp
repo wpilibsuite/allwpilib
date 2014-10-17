@@ -24,7 +24,6 @@ TLogLevel dsLogLevel = logDEBUG;
 	else Log().Get(level)
 
 const uint32_t DriverStation::kJoystickPorts;
-const uint32_t DriverStation::kJoystickAxes;
 DriverStation* DriverStation::m_instance = NULL;
 
 /**
@@ -45,6 +44,13 @@ DriverStation::DriverStation()
 	, m_userInTest(false)
 {
 	memset(&m_controlWord, 0, sizeof(m_controlWord));
+
+	// All joysticks should default to having zero axes and povs, so
+	// uninitialized memory doesn't get sent to speed controllers.
+	for(unsigned int i = 0; i < kJoystickPorts; i++) {
+		m_joystickAxes[i].count = 0;
+		m_joystickPOVs[i].count = 0;
+	}
 
 	// Create a new semaphore
 	m_packetDataAvailableSem = initializeMutexNormal();
@@ -135,7 +141,8 @@ void DriverStation::GetData()
 	for(uint8_t stick = 0; stick < kJoystickPorts; stick++) {
 		uint8_t count;
 
-		HALGetJoystickAxes(stick, &m_joystickAxes[stick], kJoystickAxes);
+		HALGetJoystickAxes(stick, &m_joystickAxes[stick]);
+		HALGetJoystickPOVs(stick, &m_joystickPOVs[stick]);
 		HALGetJoystickButtons(stick, &m_joystickButtons[stick], &count);
 	}
 
@@ -185,7 +192,7 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
 		return 0;
 	}
 
-	if (axis < 1 || axis > kJoystickAxes)
+	if (axis < 1 || axis > m_joystickAxes[stick].count)
 	{
 		wpi_setWPIError(BadJoystickAxis);
 		return 0.0f;
@@ -201,6 +208,27 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
 	{
 		return value / 127.0f;
 	}
+}
+
+/**
+ * Get the state of a POV on the joystick.
+ *
+ * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
+ */
+int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
+	if (stick >= kJoystickPorts)
+	{
+		wpi_setWPIError(BadJoystickIndex);
+		return 0;
+	}
+
+	if (pov < 1 || pov > m_joystickPOVs[stick].count)
+	{
+		wpi_setWPIError(BadJoystickAxis);
+		return 0;
+	}
+
+	return m_joystickPOVs[stick].povs[pov - 1];
 }
 
 /**
