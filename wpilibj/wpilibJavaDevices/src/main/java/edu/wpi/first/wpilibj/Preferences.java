@@ -503,6 +503,8 @@ public class Preferences {
                 file.createNewFile();
 
                 output = new FileOutputStream(file);
+				
+				output.write("[Preferences]\n".getBytes());
 
                 for (int i = 0; i < keys.size(); i++) {
                     String key = (String) keys.elementAt(i);
@@ -616,7 +618,11 @@ public class Preferences {
                                 buffer.append('\n');
                                 comment.addBytes(buffer.toString().getBytes());
                             }
-                        } else {
+                        } else if (value == '[') {
+							// Find the end of the section and the new line after it and throw it away
+							while (reader.read() !=']');
+							while (reader.read() != '\n');
+						} else {
                             buffer = new StringBuffer(30);
                             for (; value != '='; value = reader.readWithoutWhitespace()) {
                                 buffer.append(value);
