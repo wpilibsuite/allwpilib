@@ -161,9 +161,20 @@ enum HALAllianceStationID {
 	kHALAllianceStationID_blue3,
 };
 
+/* The maximum number of axes that will be stored in a single HALJoystickAxes
+	struct. This is used for allocating buffers, not bounds checking, since
+	there are usually less axes in practice. */
+static constexpr size_t kMaxJoystickAxes = 12;
+static constexpr size_t kMaxJoystickPOVs = 12;
+
 struct HALJoystickAxes {
 	uint16_t count;
-	int16_t axes[6];
+	int16_t axes[kMaxJoystickAxes];
+};
+
+struct HALJoystickPOVs {
+	uint16_t count;
+	int16_t povs[kMaxJoystickPOVs];
 };
 
 typedef uint32_t HALJoystickButtons;
@@ -199,7 +210,8 @@ extern "C"
 
 	int HALGetControlWord(HALControlWord *data);
 	int HALGetAllianceStation(enum HALAllianceStationID *allianceStation);
-	int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes *axes, uint8_t maxAxes);
+	int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes *axes);
+	int HALGetJoystickPOVs(uint8_t joystickNum, HALJoystickPOVs *povs);
 	int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons, uint8_t *count);
 
 	void HALSetNewDataSem(pthread_mutex_t *);

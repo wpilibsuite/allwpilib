@@ -125,9 +125,14 @@ int HALGetAllianceStation(enum HALAllianceStationID *allianceStation)
 	return FRC_NetworkCommunication_getAllianceStation((AllianceStationID_t*) allianceStation);
 }
 
-int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes *axes, uint8_t maxAxes)
+int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes *axes)
 {
-	return FRC_NetworkCommunication_getJoystickAxes(joystickNum, (JoystickAxes_t*) axes, maxAxes);
+	return FRC_NetworkCommunication_getJoystickAxes(joystickNum, (JoystickAxes_t*) axes, kMaxJoystickAxes);
+}
+
+int HALGetJoystickPOVs(uint8_t joystickNum, HALJoystickPOVs *povs)
+{
+	return FRC_NetworkCommunication_getJoystickPOVs(joystickNum, (JoystickPOV_t*) povs, kMaxJoystickPOVs);
 }
 
 int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons, uint8_t *count)

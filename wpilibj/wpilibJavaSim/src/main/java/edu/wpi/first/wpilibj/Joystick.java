@@ -277,6 +277,15 @@ public class Joystick extends GenericHID {
     }
 
     /**
+     * Get the state of a POV on the joystick.
+     *
+     * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
+     */
+    public int getPOV(int pov) {
+        return 0; // TODO
+    }
+
+    /**
      * Get buttons based on an enumerated type.
      *
      * The button type will be looked up in the list of buttons and then read.
