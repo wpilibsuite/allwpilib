@@ -31,6 +31,10 @@ public class Robot extends IterativeRobot {
         // instantiate the command used for the autonomous period
         autonomousCommand = new ExampleCommand();
     }
+	
+	public void disabledPeriodic() {
+		Scheduler.getInstance().run();
+	}
 
     public void autonomousInit() {
         // schedule the autonomous command (example)
