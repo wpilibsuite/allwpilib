@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
   <artifactId>NetworkTables</artifactId>
@@ -38,11 +38,19 @@
     <profile>
       <id>docline-java8-disable</id>
       <activation>
-	<jdk>[1.8,</jdk>
+	    <jdk>[1.8,</jdk>
       </activation>
 
+      <distributionManagement>
+        <repository>
+          <id>filesystem.repo</id>
+          <name>Temporary Staging Repository</name>
+          <url>file://${user.home}/releases/maven</url>
+        </repository>
+      </distributionManagement>
+
       <build>
-	<plugins>
+	    <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
@@ -50,7 +58,7 @@
               <additionalparam>-Xdoclint:none</additionalparam>
             </configuration>
           </plugin>
-	</plugins>
+	    </plugins>
       </build>
     </profile>
   </profiles>
@@ -63,9 +71,9 @@
         <configuration>
           <source>1.6</source>
           <target>1.6</target>
-	  <testExcludes>
-	    <exclude>edu/wpi/first/wpilibj/networktables2/system/SystemTest.java</exclude>
-	  </testExcludes>
+	      <testExcludes>
+	        <exclude>edu/wpi/first/wpilibj/networktables2/system/SystemTest.java</exclude>
+	      </testExcludes>
         </configuration>
       </plugin>
       <plugin>
@@ -92,8 +100,8 @@
         <artifactId>maven-source-plugin</artifactId>
       </plugin>
       <plugin>
-	<groupId>org.apache.maven.plugins</groupId>
-	<artifactId>maven-javadoc-plugin</artifactId>
+	    <groupId>org.apache.maven.plugins</groupId>
+	    <artifactId>maven-javadoc-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
