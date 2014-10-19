@@ -33,6 +33,15 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+
+  <distributionManagement>
+    <repository>
+      <id>filesystem.repo</id>
+      <name>Temporary Staging Repository</name>
+      <url>file://${user.home}/releases/maven</url>
+    </repository>
+  </distributionManagement>
   
   <profiles>
     <profile>
