@@ -126,10 +126,6 @@ public abstract class PIDSubsystem extends Subsystem implements Sendable {
      * Returns the {@link PIDController} used by this {@link PIDSubsystem}.
      * Use this if you would like to fine tune the pid loop.
      *
-     * <p>Notice that calling {@link PIDController#setSetpoint(double) setSetpoint(...)} on the controller
-     * will not result in the setpoint being trimmed to be in
-     * the range defined by {@link PIDSubsystem#setSetpointRange(double, double) setSetpointRange(...)}.</p>
-     *
      * @return the {@link PIDController} used by this {@link PIDSubsystem}
      */
     public PIDController getPIDController() {
@@ -139,7 +135,7 @@ public abstract class PIDSubsystem extends Subsystem implements Sendable {
 
     /**
      * Adds the given value to the setpoint.
-     * If {@link PIDCommand#setRange(double, double) setRange(...)} was used,
+     * If {@link PIDSubsystem#setInputRange(double, double) setInputRange(...)} was used,
      * then the bounds will still be honored by this method.
      * @param deltaSetpoint the change in the setpoint
      */
@@ -148,7 +144,7 @@ public abstract class PIDSubsystem extends Subsystem implements Sendable {
     }
 
     /**
-     * Sets the setpoint to the given value.  If {@link PIDCommand#setRange(double, double) setRange(...)}
+     * Sets the setpoint to the given value.  If {@link PIDSubsystem#setInputRange(double, double) setInputRange(...)}
      * was called,
      * then the given setpoint
      * will be trimmed to fit within the range.
@@ -197,8 +193,7 @@ public abstract class PIDSubsystem extends Subsystem implements Sendable {
     /**
     * Set the absolute error which is considered tolerable for use with
     * OnTarget. The value is in the same range as the PIDInput values.
-    * @param t A PIDController.Tolerance object instance that is for example
-    * AbsoluteTolerance or PercentageTolerance. E.g. setTolerance(new PIDController.AbsoluteTolerance(0.1))
+    * @param t the absolute tolerance
     */
     public void setAbsoluteTolerance(double t) {
         controller.setAbsoluteTolerance(t);
@@ -207,8 +202,7 @@ public abstract class PIDSubsystem extends Subsystem implements Sendable {
     /**
     * Set the percentage error which is considered tolerable for use with
     * OnTarget. (Value of 15.0 == 15 percent)
-    * @param t A PIDController.Tolerance object instance that is for example
-    * AbsoluteTolerance or PercentageTolerance. E.g. setTolerance(new PIDController.AbsoluteTolerance(0.1))
+    * @param p the percent tolerance
     */
     public void setPercentTolerance(double p) {
         controller.setPercentTolerance(p);

@@ -372,10 +372,10 @@ public class PIDController implements LiveWindowSendable, Controller {
     }
 
     /**
-     * Sets the maximum and minimum values expected from the input.
+     * Sets the maximum and minimum values expected from the input and setpoint.
      *
-     * @param minimumInput the minimum percentage expected from the input
-     * @param maximumInput the maximum percentage expected from the output
+     * @param minimumInput the minimum value expected from the input
+     * @param maximumInput the maximum value expected from the input
      */
     public synchronized void setInputRange(double minimumInput, double maximumInput) {
         if (minimumInput > maximumInput) {
@@ -442,7 +442,7 @@ public class PIDController implements LiveWindowSendable, Controller {
      * Set the percentage error which is considered tolerable for use with
      * OnTarget. (Input of 15.0 = 15 percent)
      * @param percent error which is tolerable
-     * @deprecated Use {@link #setPercentTolerance(double) or {@link #setAbsoluteTolerance(double)} instead.
+     * @deprecated Use {@link #setPercentTolerance(double)} or {@link #setAbsoluteTolerance(double)} instead.
      */
     @Deprecated
 	public synchronized void setTolerance(double percent) {

@@ -16,7 +16,7 @@ package edu.wpi.first.wpilibj.util;
 public class BaseSystemNotInitializedException extends RuntimeException {
 	 /**
      * Create a new BaseSystemNotInitializedException
-     * @param msg the message to attach to the exception
+     * @param message the message to attach to the exception
      */
 	public BaseSystemNotInitializedException(String message) {
 		super(message);

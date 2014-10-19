@@ -91,19 +91,19 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer {
 		m_i2c.write(kDataFormatRegister, kDataFormat_FullRes | value);
 	}
 
-	/** {@inheritdoc} */
+	/** {@inheritDoc} */
 	@Override
 	public double getX() {
 		return getAcceleration(Axes.kX);
 	}
 
-	/** {@inheritdoc} */
+	/** {@inheritDoc} */
 	@Override
 	public double getY() {
 		return getAcceleration(Axes.kY);
 	}
 
-	/** {@inheritdoc} */
+	/** {@inheritDoc} */
 	@Override
 	public double getZ() {
 		return getAcceleration(Axes.kZ);

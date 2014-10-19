@@ -57,7 +57,7 @@ public class SmartDashboard {
 
     //TODO should we reimplement NamedSendable?
     /**
-     * Maps the specified key (where the key is the name of the {@link SmartDashboardNamedData}
+     * Maps the specified key (where the key is the name of the {@link NamedSendable} SmartDashboardNamedData
      * to the specified value in this table.
      * The value can be retrieved by calling the get method with a key that is equal to the original key.
      * @param value the value
@@ -72,7 +72,6 @@ public class SmartDashboard {
      * @param key the key
      * @return the value
      * @throws NetworkTableKeyNotDefined if there is no value mapped to by the key
-     * @throws IllegalArgumentException if the value mapped to by the key is not a {@link SmartDashboardData}
      * @throws IllegalArgumentException if the key is null
      */
     public static Sendable getData(String key) {

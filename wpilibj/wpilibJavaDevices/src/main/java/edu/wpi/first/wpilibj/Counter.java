@@ -466,7 +466,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * Read the current scaled counter value. Read the value at this instant,
 	 * scaled by the distance per pulse (defaults to 1).
 	 *
-	 * @return
+	 * @return The distance since the last reset
 	 */
 	public double getDistance() {
 		return get() * m_distancePerPulse;
@@ -581,7 +581,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * most recent count. This can be used for velocity calculations to
 	 * determine shaft speed.
 	 *
-	 * @returns The period of the last two pulses in units of seconds.
+	 * @return The period of the last two pulses in units of seconds.
 	 */
 	@Override
 	public double getPeriod() {

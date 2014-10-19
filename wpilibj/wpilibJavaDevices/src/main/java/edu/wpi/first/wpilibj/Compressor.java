@@ -26,7 +26,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
 
 	/**
 	 * Create an instance of the Compressor
-	 * @param pcmID
+	 * @param pcmId
 	 * 		The PCM CAN device ID. Most robots that use PCM will have a single module. Use this
 	 * 		for supporting a second module other than the default.
 	 */
@@ -71,7 +71,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
 
 	/**
 	 * Get the enabled status of the compressor
-	 * @returns true if the compressor is on
+	 * @return true if the compressor is on
 	 */
 	public boolean enabled() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);

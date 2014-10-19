@@ -95,11 +95,7 @@ public abstract class PIDCommand extends Command implements Sendable {
     /**
      * Returns the {@link PIDController} used by this {@link PIDCommand}.
      * Use this if you would like to fine tune the pid loop.
-     *
-     * <p>Notice that calling {@link PIDController#setSetpoint(double) setSetpoint(...)} on the controller
-     * will not result in the setpoint being trimmed to be in
-     * the range defined by {@link PIDCommand#setSetpointRange(double, double) setSetpointRange(...)}.</p>
-     *
+	 *
      * @return the {@link PIDController} used by this {@link PIDCommand}
      */
     protected PIDController getPIDController() {
@@ -120,7 +116,7 @@ public abstract class PIDCommand extends Command implements Sendable {
 
     /**
      * Adds the given value to the setpoint.
-     * If {@link PIDCommand#setRange(double, double) setRange(...)} was used,
+     * If {@link PIDCommand#setInputRange(double, double) setInputRange(...)} was used,
      * then the bounds will still be honored by this method.
      * @param deltaSetpoint the change in the setpoint
      */
@@ -129,7 +125,7 @@ public abstract class PIDCommand extends Command implements Sendable {
     }
 
     /**
-     * Sets the setpoint to the given value.  If {@link PIDCommand#setRange(double, double) setRange(...)}
+     * Sets the setpoint to the given value.  If {@link PIDCommand#setInputRange(double, double) setInputRange(...)}
      * was called,
      * then the given setpoint
      * will be trimmed to fit within the range.
@@ -154,6 +150,16 @@ public abstract class PIDCommand extends Command implements Sendable {
     protected double getPosition() {
         return returnPIDInput();
     }
+	
+	 /**
+     * Sets the maximum and minimum values expected from the input and setpoint.
+     *
+     * @param minimumInput the minimum value expected from the input and setpoint
+     * @param maximumInput the maximum value expected from the input and setpoint
+     */
+	protected void setInputRange(double minimumInput, double maximumInput) {
+		controller.setInputRange(minimumInput, maximumInput);
+	}
 
     /**
      * Returns the input for the pid loop.

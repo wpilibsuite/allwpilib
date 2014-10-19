@@ -46,7 +46,7 @@ public class SPI extends SensorBase {
 	/**
 	 * Constructor
 	 *
-	 * @param SPIport the physical SPI port
+	 * @param port the physical SPI port
 	 */
     public SPI(Port port) {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);

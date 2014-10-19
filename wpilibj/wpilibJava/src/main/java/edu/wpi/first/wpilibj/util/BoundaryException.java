@@ -53,7 +53,7 @@ public class BoundaryException extends RuntimeException {
 	 *            The lower limit
 	 * @param upper
 	 *            The upper limit
-	 * @return
+	 * @return the message for a boundary exception
 	 */
 	public static String getMessage(double value, double lower, double upper) {
 		return "Value must be between " + lower + " and " + upper + ", "

@@ -64,12 +64,9 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer {
 	private SPI m_spi;
 
 	/**
-	 * Constructor. Use this when the device is the first/only device on the bus
+	 * Constructor.
 	 *
-	 * @param clk The clock channel
-	 * @param mosi The mosi (output) channel
-	 * @param miso The miso (input) channel
-	 * @param cs The chip select channel
+	 * @param port the Port that the accelerometer is connected to
 	 * @param range The range (+ or -) that the accelerometer will measure.
 	 */
 	public ADXL345_SPI(SPI.Port port, Range range) {
@@ -132,19 +129,19 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer {
 		m_spi.write(commands, commands.length);
 	}
 
-	/** {@inheritdoc} */
+	/** {@inheritDoc} */
 	@Override
 	public double getX() {
 		return getAcceleration(Axes.kX);
 	}
 
-	/** {@inheritdoc} */
+	/** {@inheritDoc} */
 	@Override
 	public double getY() {
 		return getAcceleration(Axes.kY);
 	}
 
-	/** {@inheritdoc} */
+	/** {@inheritDoc} */
 	@Override
 	public double getZ() {
 		return getAcceleration(Axes.kZ);

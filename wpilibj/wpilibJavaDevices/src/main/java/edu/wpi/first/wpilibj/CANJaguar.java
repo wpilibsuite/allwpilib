@@ -1157,7 +1157,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	 * position sensing from a quadrature encoder.<br>
 	 * After calling this you must call {@link CANJaguar#enableControl()} or {@link CANJaguar#enableControl(double)} to enable the device.
 	 *
-	 * @param endoer The constant {@link CANJaguar#kQuadEncoder}
+	 * @param tag The constant {@link CANJaguar#kQuadEncoder}
 	 * @param p The proportional gain of the Jaguar's PID controller.
 	 * @param i The integral gain of the Jaguar's PID controller.
 	 * @param d The differential gain of the Jaguar's PID controller.
@@ -1800,7 +1800,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	* 	is added internally)
 	* @param data The up to 8 bytes of data to be sent with the message
 	* @param dataSize Specify how much of the data in "data" to send
-	* @param periodic If positive, tell Network Communications to send the
+	* @param period If positive, tell Network Communications to send the
 	* 	message every "period" milliseconds.
 	*/
 	protected void sendMessage(int messageID, byte[] data, int dataSize, int period) {
@@ -1808,7 +1808,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	}
 
 	/**
-	* Send a message to the Jaguar, non-periodly
+	* Send a message to the Jaguar, non-periodically
 	*
 	* @param messageID The messageID to be used on the CAN bus (device number
 	* 	is added internally)
@@ -1823,7 +1823,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	* Request a message from the Jaguar, but don't wait for it to arrive.
 	*
 	* @param messageID The message to request
-	* @param periodic If positive, tell Network Communications to request the
+	* @param period If positive, tell Network Communications to request the
 	* 	message every "period" milliseconds.
 	*/
 	protected void requestMessage(int messageID, int period) {
@@ -1847,7 +1847,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	* @param messageID The messageID to read from the CAN bus (device number is added internally)
 	* @param data The up to 8 bytes of data that was received with the message
 	*
-	* @throw CANMessageNotFoundException if there's not new message available
+	* @throws CANMessageNotFoundException if there's not new message available
 	*/
 	protected void getMessage(int messageID, int messageMask, byte[] data) throws CANMessageNotFoundException {
 		messageID |= m_deviceNumber;

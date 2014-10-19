@@ -58,17 +58,17 @@ public abstract class InterruptableSensorBase extends SensorBase {
 	}
 
 	/**
-	 * @return
+	 * @return true if this is an analog trigger
 	 */
 	abstract boolean getAnalogTriggerForRouting();
 
 	/**
-	 * @return
+	 * @return channel routing number
 	 */
 	abstract int getChannelForRouting();
 
 	/**
-	 * @return
+	 * @return module routing number
 	 */
 	abstract byte getModuleForRouting();
 
@@ -76,7 +76,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
 	 * Request interrupts asynchronously on this digital input.
 	 *
 	 * @param handler
-	 *            The {@link #InterruptHandlerFunction} that contains the method
+	 *            The {@link InterruptHandlerFunction} that contains the method
 	 *            {@link InterruptHandlerFunction#interruptFired(int, Object)} that
 	 *            will be called whenever there is an interrupt on this device.
 	 *            Request interrupts in synchronus mode where the user program
