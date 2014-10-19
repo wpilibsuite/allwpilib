@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2011. All Rights Reserved.							  */
+/* Copyright (c) FIRST 2011. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
@@ -564,18 +564,20 @@ void Preferences::WriteTaskRun()
 }
 
 static bool isKeyAcceptable(const std::string& value) {
-    for (unsigned int i = 0; i < value.length(); i++) {
-        char letter = value.at(i);
-        switch (letter) {
-            case '=':
-            case '\n':
-            case '\r':
-            case ' ':
-            case '\t':
-            	return false;
-        }
-    }
-    return true;
+	for (unsigned int i = 0; i < value.length(); i++) {
+		char letter = value.at(i);
+		switch (letter) {
+		case '=':
+		case '\n':
+		case '\r':
+		case ' ':
+		case '\t':
+		case '[':
+		case ']':
+			return false;
+		}
+	}
+	return true;
 }
 void Preferences::ValueChanged(ITable* table, const std::string& key, EntryValue value, bool isNew)
 {

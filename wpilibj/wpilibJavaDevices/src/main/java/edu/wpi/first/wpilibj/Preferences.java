@@ -503,7 +503,7 @@ public class Preferences {
                 file.createNewFile();
 
                 output = new FileOutputStream(file);
-				
+
 				output.write("[Preferences]\n".getBytes());
 
                 for (int i = 0; i < keys.size(); i++) {
@@ -803,6 +803,8 @@ public class Preferences {
                 case '\r':
                 case ' ':
                 case '\t':
+                case '[':
+                case ']':
                     throw new ImproperPreferenceKeyException(value, letter);
                 }
             }
@@ -813,7 +815,7 @@ public class Preferences {
          * preference table.
          *
          * @param value
-         * @return
+         * @return true if the given string is ok to use in the preference table
          */
         public static boolean isAcceptable(String value) {
             for (int i = 0; i < value.length(); i++) {
@@ -824,6 +826,8 @@ public class Preferences {
                 case '\r':
                 case ' ':
                 case '\t':
+                case '[':
+                case ']':
                     return false;
                 }
             }
