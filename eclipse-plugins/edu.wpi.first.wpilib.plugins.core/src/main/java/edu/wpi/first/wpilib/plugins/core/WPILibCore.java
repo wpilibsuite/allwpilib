@@ -134,7 +134,17 @@ public class WPILibCore extends AbstractUIPlugin {
 	}
 
 	public String getDefaultVersion() {
-		return "0.2";
+		try {
+			Properties props = new AntPropertiesParser(WPILibCore.class.getResourceAsStream("/resources/configuration.properties")).getProperties();
+			if (props.getProperty("version").startsWith("$")) {
+				return "DEVELOPMENT";
+			} else {
+				return props.getProperty("version");
+			}
+		} catch (CoreException e) {
+            WPILibCore.logError("Error getting properties.", e);
+			return "DEVELOPMENT";
+		}
 	}
 
 	public String getCurrentVersion() {
