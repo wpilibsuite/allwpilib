@@ -7,6 +7,7 @@
 #ifndef JOYSTICK_H_
 #define JOYSTICK_H_
 
+#include <cstdint>
 #include "GenericHID.h"
 #include "ErrorBase.h"
 
