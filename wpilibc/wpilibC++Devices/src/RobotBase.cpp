@@ -41,7 +41,7 @@ RobotBase &RobotBase::getInstance()
  * Constructor for a generic robot program.
  * User code should be placed in the constuctor that runs before the Autonomous or Operator
  * Control period starts. The constructor will run to completion before Autonomous is entered.
- * 
+ *
  * This must be used to ensure that the communications code starts. In the future it would be
  * nice to put this code into it's own task that loads on boot so ensure that it runs.
  */
@@ -52,6 +52,8 @@ RobotBase::RobotBase()
 	m_ds = DriverStation::GetInstance();
 	RobotState::SetImplementation(DriverStation::GetInstance()); \
 	HLUsageReporting::SetImplementation(new HardwareHLReporting()); \
+
+	RobotBase::setInstance(this);
 }
 
 /**
@@ -119,74 +121,6 @@ bool RobotBase::IsTest()
 bool RobotBase::IsNewDataAvailable()
 {
 	return m_ds->IsNewControlData();
-}
-
-/**
- * Static interface that will start the competition in the new task.
- */
-void RobotBase::robotTask(FUNCPTR factory, Task *task)
-{
-	RobotBase::setInstance((RobotBase*)factory());
-	RobotBase::getInstance().m_task = task;
-	RobotBase::getInstance().StartCompetition();
-}
-
-/**
- * 
- * Start the robot code.
- * This function starts the robot code running by spawning a task. Currently tasks seemed to be
- * started by LVRT without setting the VX_FP_TASK flag so floating point context is not saved on
- * interrupts. Therefore the program experiences hard to debug and unpredictable results. So the
- * LVRT code starts this function, and it, in turn, starts the actual user program.
- */
-void RobotBase::startRobotTask(FUNCPTR factory)
-{
-#ifdef SVN_REV
-	if (strlen(SVN_REV))
-	{
-		printf("WPILib was compiled from SVN revision %s\n", SVN_REV);
-	}
-	else
-	{
-		printf("WPILib was compiled from a location that is not source controlled.\n");
-	}
-#else
-	printf("WPILib was compiled without -D'SVN_REV=nnnn'\n");
-#endif
-
-#ifdef __vxworks
-	// Check for startup code already running
-	int32_t oldId = taskNameToId(const_cast<char*>("FRC_RobotTask"));
-	if (oldId != ERROR)
-	{
-		// Find the startup code module.
-		char moduleName[256];
-		moduleNameFindBySymbolName("FRC_UserProgram_StartupLibraryInit", moduleName);
-		MODULE_ID startupModId = moduleFindByName(moduleName);
-		if (startupModId != NULL)
-		{
-			// Remove the startup code.
-			unldByModuleId(startupModId, 0);
-			printf("!!!   Error: Default code was still running... It was unloaded for you... Please try again.\n");
-			return;
-		}
-		// This case should no longer get hit.
-		printf("!!!   Error: Other robot code is still running... Unload it and then try again.\n");
-		return;
-	}
-#endif
-
-	// Let the framework know that we are starting a new user program so the Driver Station can disable.
-	HALNetworkCommunicationObserveUserProgramStarting();
-
-	// Let the Usage Reporting framework know that there is a C++ program running
-	HALReport(HALUsageReporting::kResourceType_Language, HALUsageReporting::kLanguage_CPlusPlus);
-
-	// Start robot task
-	// This is done to ensure that the C++ robot task is spawned with the floating point
-	// context save parameter.
-	Task *task = new Task("RobotTask", (FUNCPTR)RobotBase::robotTask, Task::kDefaultPriority, 64000);
-	task->Start((int32_t)factory, (int32_t)task);
 }
 
 /**

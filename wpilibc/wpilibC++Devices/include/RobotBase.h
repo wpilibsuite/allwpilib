@@ -10,23 +10,6 @@
 
 class DriverStation;
 
-#ifdef __vxworks
-#define START_ROBOT_CLASS(_ClassName_) \
-	RobotBase *FRC_userClassFactory() \
-	{ \
-	    cout << "Instantiating " #_ClassName_ "...\n";\
-		RobotBase* rb= new _ClassName_();\
-	    cout << "...Instantiated " #_ClassName_ "\n";\
-		return rb;\
-	} \
-	extern "C" { \
-		int32_t FRC_UserProgram_StartupLibraryInit() \
-		{ \
-			RobotBase::startRobotTask((FUNCPTR)FRC_userClassFactory); \
-			return 0; \
-		} \
-	}
-#else
 #define START_ROBOT_CLASS(_ClassName_) \
 	int main() \
 	{ \
@@ -36,7 +19,6 @@ class DriverStation;
 		(new _ClassName_())->StartCompetition(); \
 		return 0; \
 	}
-#endif
 
 /**
  * Implement a Robot Program framework.
