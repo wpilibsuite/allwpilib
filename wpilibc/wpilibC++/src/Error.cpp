@@ -8,13 +8,12 @@
 
 #include <iostream>
 #include <sstream>
-#include <cstdio>
 #include <cstring>
 #include <cstdlib>
 #include <stdint.h>
 #include "HAL/Task.hpp"
 
-//#include "NetworkCommunication/FRCComm.h"
+#include "DriverStation.h"
 #include "Timer.h"
 #include "Utility.h"
 bool Error::m_suspendOnErrorEnabled = false;
@@ -58,20 +57,30 @@ uint32_t Error::GetLineNumber() const
 const ErrorBase* Error::GetOriginatingObject() const
 {	return m_originatingObject;  }
 
-double Error::GetTime() const
+double Error::GetTimestamp() const
 {	return m_timestamp;  }
 
 void Error::Set(Code code, const char* contextMessage, const char* filename, const char* function, uint32_t lineNumber, const ErrorBase* originatingObject)
 {
+	bool report = true;
+
+	if(code == m_code && GetTime() - m_timestamp < 1)
+	{
+		report = false;
+	}
+
 	m_code = code;
 	m_message = contextMessage;
 	m_filename = filename;
 	m_function = function;
 	m_lineNumber = lineNumber;
 	m_originatingObject = originatingObject;
-	m_timestamp = GetTime();
 
-	Report();
+	if(report)
+	{
+		m_timestamp = GetTime();
+		Report();
+	}
 
     if (m_suspendOnErrorEnabled) suspendTask(0);
 }
@@ -87,9 +96,7 @@ void Error::Report()
 
 	std::string error = errorStream.str();
 
-	// Print the error and send it to the DriverStation
-	std::cout << error << std::endl;
-    // TODO: Better logging HALSetErrorData(error.c_str(), error.size(), 100);
+	DriverStation::ReportError(error);
 }
 
 void Error::Clear()

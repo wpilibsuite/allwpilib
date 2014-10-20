@@ -400,6 +400,26 @@ public class DriverStation implements RobotState.Interface {
         }
         return Timer.getFPGATimestamp() - m_approxMatchTimeOffset;
     }
+	
+	/**
+	 * Report error to Driver Station.
+	 * Also prints error to System.err
+	 * Optionally appends Stack trace to error message
+	 * @param printTrace If true, append stack trace to error string
+	 */
+	public static void reportError(String error, boolean printTrace) {
+		String errorString = error;
+		if(printTrace) {
+			errorString += " at ";
+			StackTraceElement[] traces = Thread.currentThread().getStackTrace();
+			for (int i=2; i<traces.length; i++)
+			{
+				errorString += traces[i].toString() + "\n";
+			}
+		}
+		System.err.println(errorString);
+		FRCNetworkCommunicationsLibrary.HALSetErrorData(errorString);
+	}
 
     /** Only to be used to tell the Driver Station what code you claim to be executing
      *   for diagnostic purposes only

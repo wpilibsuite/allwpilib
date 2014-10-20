@@ -29,7 +29,7 @@ public:
 	const char *GetFunction() const;
 	uint32_t GetLineNumber() const;
 	const ErrorBase* GetOriginatingObject() const;
-	double GetTime() const;
+	double GetTimestamp() const;
 	void Clear();
 	void Set(Code code, const char* contextMessage, const char* filename, const char *function,
 			uint32_t lineNumber, const ErrorBase* originatingObject);

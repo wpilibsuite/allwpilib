@@ -60,7 +60,7 @@ DriverStation::DriverStation()
 		                           &DriverStation::joystickCallback2, this);
 	joysticks[2] = msgs::JoystickPtr(new msgs::Joystick());
 	joysticksSub[2] =  MainNode::Subscribe("~/ds/joysticks/3",
-		                           &DriverStation::joystickCallback3, this);
+	&DriverStation::joystickCallback3, this);
 	joysticks[3] = msgs::JoystickPtr(new msgs::Joystick());
 	joysticksSub[3] =  MainNode::Subscribe("~/ds/joysticks/4",
 	                                   &DriverStation::joystickCallback4, this);
@@ -323,6 +323,15 @@ double DriverStation::GetMatchTime()
 	if (m_approxMatchTimeOffset < 0.0)
 		return 0.0;
 	return Timer::GetFPGATimestamp() - m_approxMatchTimeOffset;
+}
+
+/**
+ * Report an error to the DriverStation messages window.
+ * The error is also printed to the program console.
+ */
+void DriverStation::ReportError(std::string error)
+{
+	std::cout << error << std::endl;
 }
 
 /**

@@ -28,6 +28,7 @@ public:
 
 	virtual ~DriverStation();
 	static DriverStation *GetInstance();
+	static void ReportError(std::string error);
 
 	static const uint32_t kJoystickPorts = 4;
 

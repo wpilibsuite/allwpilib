@@ -10,9 +10,11 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+import java.lang.StackTraceElement;
 
 import edu.wpi.first.wpilibj.hal.HALLibrary;
 import edu.wpi.first.wpilibj.hal.HALUtil;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
 
 /**
  * Contains global utility functions

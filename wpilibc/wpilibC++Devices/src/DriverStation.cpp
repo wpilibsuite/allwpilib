@@ -366,3 +366,13 @@ double DriverStation::GetMatchTime()
 		return 0.0;
 	return Timer::GetFPGATimestamp() - m_approxMatchTimeOffset;
 }
+
+/**
+ * Report an error to the DriverStation messages window.
+ * The error is also printed to the program console.
+ */
+void DriverStation::ReportError(std::string error)
+{
+	std::cout << error << std::endl;
+    HALSetErrorData(error.c_str(), error.size(), 0);
+}

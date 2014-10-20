@@ -468,42 +468,6 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 	public static native short[] HALGetJoystickAxes(byte joystickNum);
 	public static native short[] HALGetJoystickPOVs(byte joystickNum);
 	public static native int HALGetJoystickButtons(byte joystickNum);
-
-	/*
-	public static class pthread_mutex_t extends PointerType {
-		public pthread_mutex_t(Pointer address) {
-			super(address);
-		}
-		public pthread_mutex_t() {
-			super();
-		}
-	};
-	public static class STATUS extends PointerType {
-		public STATUS(Pointer address) {
-			super(address);
-		}
-		public STATUS() {
-			super();
-		}
-	};*/
-
-	//
-	// JNI Testing
-	//
-	public static native void JNIValueParameterTest(boolean booleanValue, byte byteValue, char charValue, short shortValue, int intValue, long longValue, float floatValue, double doubleValue );
-	public static native boolean JNIValueReturnBooleanTest(boolean booleanValue);
-	public static native byte JNIValueReturnByteTest(byte byteValue);
-	public static native char JNIValueReturnCharTest(char charValue);
-	public static native short JNIValueReturnShortTest(short shortValue);
-	public static native int JNIValueReturnIntTest(int intValue);
-	public static native long JNIValueReturnLongTest(long longValue);
-	public static native float JNIValueReturnFloatTest(float floatValue);
-	public static native double JNIValueReturnDoubleTest(double doubleValue);
-
-	public static native String JNIObjectReturnStringTest( String stringObject);
-
-	public static native ByteBuffer JNIObjectReturnByteBufferTest( ByteBuffer byteBuffer );
-
-	public static native ByteBuffer JNIObjectAndParamReturnIntBufferTest( IntBuffer intBuffer);
-
+	
+	public static native int HALSetErrorData(String error);
 }

@@ -2,6 +2,7 @@
 
 #include "Port.h"
 #include "HAL/Errors.hpp"
+#include "ctre/ctre.h"
 #include "ChipObject.h"
 #include "NetworkCommunication/FRCComm.h"
 #include "NetworkCommunication/UsageReporting.h"
@@ -38,34 +39,72 @@ void* getPortWithModule(uint8_t module, uint8_t pin)
 
 const char* getHALErrorMessage(int32_t code)
 {
-	if (code == 0)
-		return "";
-	else if (code == SAMPLE_RATE_TOO_HIGH)
-		return SAMPLE_RATE_TOO_HIGH_MESSAGE;
-	else if (code == VOLTAGE_OUT_OF_RANGE)
-		return VOLTAGE_OUT_OF_RANGE_MESSAGE;
-	else if (code == LOOP_TIMING_ERROR)
-		return LOOP_TIMING_ERROR_MESSAGE;
-	else if (code == SPI_WRITE_NO_MOSI)
-		return SPI_WRITE_NO_MOSI_MESSAGE;
-	else if (code == SPI_READ_NO_MISO)
-		return SPI_READ_NO_MISO_MESSAGE;
-	else if (code == SPI_READ_NO_DATA)
-		return SPI_READ_NO_DATA_MESSAGE;
-	else if (code == INCOMPATIBLE_STATE)
-		return INCOMPATIBLE_STATE_MESSAGE;
-	else if (code == NO_AVAILABLE_RESOURCES)
-		return NO_AVAILABLE_RESOURCES_MESSAGE;
-	else if (code == NULL_PARAMETER)
-		return NULL_PARAMETER_MESSAGE;
-	else if (code == ANALOG_TRIGGER_LIMIT_ORDER_ERROR)
-		return ANALOG_TRIGGER_LIMIT_ORDER_ERROR_MESSAGE;
-	else if (code == ANALOG_TRIGGER_PULSE_OUTPUT_ERROR)
-		return ANALOG_TRIGGER_PULSE_OUTPUT_ERROR_MESSAGE;
-	else if (code == PARAMETER_OUT_OF_RANGE)
-		return PARAMETER_OUT_OF_RANGE_MESSAGE;
-	else
-		return "";
+	switch(code) {
+		case 0:
+			return "";
+		case CTR_RxTimeout:
+			return CTR_RxTimeout_MESSAGE;
+		case CTR_TxTimeout:
+			return CTR_TxTimeout_MESSAGE;
+		case CTR_InvalidParamValue:
+			return CTR_InvalidParamValue_MESSAGE;
+		case CTR_UnexpectedArbId:
+			return CTR_UnexpectedArbId_MESSAGE;
+		case NiFpga_Status_FifoTimeout:
+			return NiFpga_Status_FifoTimeout_MESSAGE;
+		case NiFpga_Status_TransferAborted:
+			return NiFpga_Status_TransferAborted_MESSAGE;
+		case NiFpga_Status_MemoryFull: 
+			return NiFpga_Status_MemoryFull_MESSAGE;
+		case NiFpga_Status_SoftwareFault:
+			return NiFpga_Status_SoftwareFault_MESSAGE;
+		case NiFpga_Status_InvalidParameter:
+			return NiFpga_Status_InvalidParameter_MESSAGE;
+		case NiFpga_Status_ResourceNotFound:
+			return NiFpga_Status_ResourceNotFound_MESSAGE; 
+		case NiFpga_Status_ResourceNotInitialized:
+			return NiFpga_Status_ResourceNotInitialized_MESSAGE; 
+		case NiFpga_Status_HardwareFault:
+			return NiFpga_Status_HardwareFault_MESSAGE;
+		case NiFpga_Status_IrqTimeout:
+			return NiFpga_Status_IrqTimeout_MESSAGE;
+		case SAMPLE_RATE_TOO_HIGH:
+			return SAMPLE_RATE_TOO_HIGH_MESSAGE;
+		case VOLTAGE_OUT_OF_RANGE:
+			return VOLTAGE_OUT_OF_RANGE_MESSAGE;
+		case LOOP_TIMING_ERROR:
+			return LOOP_TIMING_ERROR_MESSAGE;
+		case SPI_WRITE_NO_MOSI:
+			return SPI_WRITE_NO_MOSI_MESSAGE;
+		case SPI_READ_NO_MISO:
+			return SPI_READ_NO_MISO_MESSAGE;
+		case SPI_READ_NO_DATA:
+			return SPI_READ_NO_DATA_MESSAGE;
+		case INCOMPATIBLE_STATE:
+			return INCOMPATIBLE_STATE_MESSAGE;
+		case NO_AVAILABLE_RESOURCES:
+			return NO_AVAILABLE_RESOURCES_MESSAGE;
+		case NULL_PARAMETER:
+			return NULL_PARAMETER_MESSAGE;
+		case ANALOG_TRIGGER_LIMIT_ORDER_ERROR:
+			return ANALOG_TRIGGER_LIMIT_ORDER_ERROR_MESSAGE;
+		case ANALOG_TRIGGER_PULSE_OUTPUT_ERROR:
+			return ANALOG_TRIGGER_PULSE_OUTPUT_ERROR_MESSAGE;
+		case PARAMETER_OUT_OF_RANGE:
+			return PARAMETER_OUT_OF_RANGE_MESSAGE;
+		case ERR_CANSessionMux_InvalidBuffer:
+			return ERR_CANSessionMux_InvalidBuffer_MESSAGE;
+		case ERR_CANSessionMux_MessageNotFound:
+			return ERR_CANSessionMux_MessageNotFound_MESSAGE;
+		case WARN_CANSessionMux_NoToken:
+			return WARN_CANSessionMux_NoToken_MESSAGE;
+		case ERR_CANSessionMux_NotAllowed:
+			return ERR_CANSessionMux_NotAllowed_MESSAGE;
+		case ERR_CANSessionMux_NotInitialized:
+			return ERR_CANSessionMux_NotInitialized_MESSAGE; 	
+		default:
+			return "Unknown error status";
+	}
 }
 
 /**

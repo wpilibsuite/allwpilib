@@ -31,6 +31,7 @@ public:
 
 	virtual ~DriverStation();
 	static DriverStation *GetInstance();
+	static void ReportError(std::string error);
 
 	static const uint32_t kBatteryChannel = 7;
 	static const uint32_t kJoystickPorts = 4;
@@ -59,6 +60,8 @@ public:
 	double GetMatchTime();
 	float GetBatteryVoltage();
 	uint16_t GetTeamNumber();
+	
+
 
 	void IncrementUpdateNumber()
 	{

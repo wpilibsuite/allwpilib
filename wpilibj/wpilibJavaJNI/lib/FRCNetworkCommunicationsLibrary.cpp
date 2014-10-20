@@ -88,8 +88,8 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetworkCommunicationUsageReportingReport
   (JNIEnv * paramEnv, jclass, jbyte paramResource, jbyte paramInstanceNumber, jbyte paramContext, jstring paramFeature)
 {
-	NETCOMM_LOG(logDEBUG) << "Calling FRCNetworkCommunicationsLibrary report " << "res:"<< (unsigned int)paramResource << " instance:" << (unsigned int)paramInstanceNumber << " context:" << (unsigned int)paramContext << " feature:" << paramFeature;
 	const char * featureStr = paramEnv->GetStringUTFChars(paramFeature, NULL);
+	NETCOMM_LOG(logDEBUG) << "Calling FRCNetworkCommunicationsLibrary report " << "res:"<< (unsigned int)paramResource << " instance:" << (unsigned int)paramInstanceNumber << " context:" << (unsigned int)paramContext << " feature:" << featureStr;
 	jint returnValue = HALReport(paramResource, paramInstanceNumber, paramContext, featureStr);
 	paramEnv->ReleaseStringUTFChars(paramFeature,featureStr);
 	return returnValue;
@@ -534,3 +534,22 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCom
 
 	return env->NewDirectByteBuffer(returnByteArray, 4);
 }
+
+/*
+ * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
+ * Method:    HALSetErrorData
+ * Signature: (Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALSetErrorData
+  (JNIEnv * env, jclass, jstring error)
+{
+  const char * errorStr = env->GetStringUTFChars(error, NULL);
+  jsize length = env->GetStringUTFLength(error);
+  
+  NETCOMM_LOG(logDEBUG) << "Set Error: " << errorStr;
+  NETCOMM_LOG(logDEBUG) << "Length: " << length;
+  jint returnValue = HALSetErrorData(errorStr, (jint) length, 0);
+  env->ReleaseStringUTFChars(error,errorStr);
+  return returnValue;
+}
+  

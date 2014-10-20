@@ -387,6 +387,7 @@ void AnalogInput::SetSampleRate(float samplesPerSecond)
 {
 	int32_t status = 0;
 	setAnalogSampleRate(samplesPerSecond, &status);
+	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
@@ -398,6 +399,7 @@ float AnalogInput::GetSampleRate()
 {
 	int32_t status = 0;
 	float sampleRate = getAnalogSampleRate(&status);
+	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
 	return sampleRate;
 }
 
