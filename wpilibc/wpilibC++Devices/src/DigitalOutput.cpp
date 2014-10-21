@@ -83,7 +83,7 @@ uint32_t DigitalOutput::GetChannel()
 
 /**
  * Output a single pulse on the digital output line.
- * Send a single pulse on the digital output line where the pulse diration is specified in seconds.
+ * Send a single pulse on the digital output line where the pulse duration is specified in seconds.
  * Maximum pulse length is 0.0016 seconds.
  * @param length The pulselength in seconds
  */
@@ -131,7 +131,7 @@ void DigitalOutput::SetPWMRate(float rate)
 /**
  * Enable a PWM Output on this line.
  *
- * Allocate one of the 4 DO PWM generator resources from this module.
+ * Allocate one of the 6 DO PWM generator resources from this module.
  *
  * Supply the initial duty-cycle to output so as to avoid a glitch when first starting.
  *
@@ -162,7 +162,7 @@ void DigitalOutput::EnablePWM(float initialDutyCycle)
 /**
  * Change this line from a PWM output back to a static Digital Output line.
  *
- * Free up one of the 4 DO PWM generator resources that were in use.
+ * Free up one of the 6 DO PWM generator resources that were in use.
  */
 void DigitalOutput::DisablePWM()
 {
