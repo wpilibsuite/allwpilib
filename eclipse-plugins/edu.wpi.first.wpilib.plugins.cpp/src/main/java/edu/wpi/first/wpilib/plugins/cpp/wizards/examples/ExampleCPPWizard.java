@@ -41,7 +41,7 @@ public class ExampleCPPWizard extends ExampleWizard {
 	protected IWizardPage getDetailsPage() {
 		if (detailsPage != null) return detailsPage;
 		detailsPage = new NewProjectMainPage(selection, getTeamNumberPage());
-		detailsPage.setTitle("Create Example Robot Java Project");
+		detailsPage.setTitle("Create Example Robot C++ Project");
 		detailsPage.setDescription("This wizard creates a new example project based on your selection.");
 		detailsPage.setShowPackage(false);
 		return detailsPage;
