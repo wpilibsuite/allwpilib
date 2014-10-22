@@ -105,6 +105,39 @@
 </example>
 
 <example>
+  <name>Relay</name>
+  <description>Demonstrate controlling a Relay from Joystick buttons.</description>
+  <tags>
+    <tag>Actuators</tag>
+    <tag>Joystick</tag>
+    <tag>Complete List</tag>
+  </tags>
+  <packages>
+    <package>src</package>
+  </packages>
+  <files>
+    <file source="examples/Relay/src/Robot.cpp" destination="src/Robot.cpp"></file>
+  </files>
+</example>
+
+<example>
+  <name>Solenoids</name>
+  <description>Demonstrate controlling a single and double solenoid from Joystick buttons.</description>
+  <tags>
+    <tag>Actuators</tag>
+    <tag>Joystick</tag>
+    <tag>Pneumatics</tag>
+    <tag>Complete List</tag>
+  </tags>
+  <packages>
+    <package>src</package>
+  </packages>
+  <files>
+    <file source="examples/Solenoid/src/Robot.cpp" destination="src/Robot.cpp"></file>
+  </files>
+</example>
+
+<example>
   <name>Arcade Drive</name>
   <description>An example program which the use of Arcade Drive with the RobotDrive class</description>
   <tags>
