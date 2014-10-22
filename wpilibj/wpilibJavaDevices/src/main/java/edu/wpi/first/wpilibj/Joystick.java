@@ -17,11 +17,11 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
  */
 public class Joystick extends GenericHID {
 
-    static final byte kDefaultXAxis = 1;
-    static final byte kDefaultYAxis = 2;
-    static final byte kDefaultZAxis = 3;
-    static final byte kDefaultTwistAxis = 3;
-    static final byte kDefaultThrottleAxis = 4;
+    static final byte kDefaultXAxis = 0;
+    static final byte kDefaultYAxis = 1;
+    static final byte kDefaultZAxis = 2;
+    static final byte kDefaultTwistAxis = 2;
+    static final byte kDefaultThrottleAxis = 3;
     static final int kDefaultTriggerButton = 1;
     static final int kDefaultTopButton = 2;
 
@@ -198,7 +198,7 @@ public class Joystick extends GenericHID {
     /**
      * Get the value of the axis.
      *
-     * @param axis The axis to read [1-6].
+     * @param axis The axis to read, starting at 0.
      * @return The value of the axis.
      */
     public double getRawAxis(final int axis) {

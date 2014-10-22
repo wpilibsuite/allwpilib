@@ -192,13 +192,13 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
 		return 0;
 	}
 
-	if (axis < 1 || axis > m_joystickAxes[stick].count)
+	if (axis >= m_joystickAxes[stick].count)
 	{
 		wpi_setWPIError(BadJoystickAxis);
 		return 0.0f;
 	}
 
-	int8_t value = m_joystickAxes[stick].axes[axis - 1];
+	int8_t value = m_joystickAxes[stick].axes[axis];
 
 	if(value < 0)
 	{
@@ -222,13 +222,13 @@ int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
 		return 0;
 	}
 
-	if (pov < 1 || pov > m_joystickPOVs[stick].count)
+	if (pov >= m_joystickPOVs[stick].count)
 	{
 		wpi_setWPIError(BadJoystickAxis);
 		return 0;
 	}
 
-	return m_joystickPOVs[stick].povs[pov - 1];
+	return m_joystickPOVs[stick].povs[pov];
 }
 
 /**

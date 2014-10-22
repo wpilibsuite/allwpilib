@@ -149,7 +149,7 @@ float Joystick::GetThrottle()
 /**
  * Get the value of the axis.
  *
- * @param axis The axis to read [1-6].
+ * @param axis The axis to read, starting at 0.
  * @return The value of the axis.
  */
 float Joystick::GetRawAxis(uint32_t axis)

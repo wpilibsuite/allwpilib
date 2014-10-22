@@ -57,8 +57,8 @@ public class DriverStation implements RobotState.Interface {
 
     private HALControlWord m_controlWord;
     private HALAllianceStationID m_allianceStationID;
-    private short[][] m_joystickAxes = new short[FRCNetworkCommunicationsLibrary.kMaxJoystickAxes][kJoystickPorts];
-    private short[][] m_joystickPOVs = new short[FRCNetworkCommunicationsLibrary.kMaxJoystickPOVs][kJoystickPorts];
+    private short[][] m_joystickAxes = new short[kJoystickPorts][FRCNetworkCommunicationsLibrary.kMaxJoystickAxes];
+    private short[][] m_joystickPOVs = new short[kJoystickPorts][FRCNetworkCommunicationsLibrary.kMaxJoystickPOVs];
     private int[] m_joystickButtons = new int[kJoystickPorts];
 
     private Thread m_thread;
@@ -226,11 +226,11 @@ public class DriverStation implements RobotState.Interface {
             throw new RuntimeException("Joystick index is out of range, should be 0-3");
         }
 
-        if (axis < 1 || axis > m_joystickAxes[stick].length) {
+        if (axis < 0 || axis >= m_joystickAxes[stick].length) {
             throw new RuntimeException("Joystick axis is out of range");
         }
 
-        byte value = (byte)m_joystickAxes[stick][axis - 1];
+        byte value = (byte)m_joystickAxes[stick][axis];
 
         if(value < 0) {
             return value / 128.0;
@@ -249,11 +249,11 @@ public class DriverStation implements RobotState.Interface {
             throw new RuntimeException("Joystick index is out of range, should be 0-3");
         }
 
-        if (pov < 1 || pov > m_joystickPOVs[stick].length) {
+        if (pov < 0 || pov >= m_joystickPOVs[stick].length) {
             throw new RuntimeException("Joystick POV is out of range");
         }
 
-        return m_joystickPOVs[stick][pov - 1];
+        return m_joystickPOVs[stick][pov];
     }
 
     /**
