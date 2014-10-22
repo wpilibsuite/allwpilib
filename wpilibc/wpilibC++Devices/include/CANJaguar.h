@@ -41,6 +41,7 @@ public:
 	/** Sets a potentiometer as the position reference only. <br> Passed as the "tag" when setting the control mode. */
 	static const struct PotentiometerStruct {} Potentiometer;
 
+	typedef enum {kPercentVbus, kCurrent, kSpeed, kPosition, kVoltage} ControlMode;
 	typedef enum {kCurrentFault = 1, kTemperatureFault = 2, kBusVoltageFault = 4, kGateDriverFault = 8} Faults;
 	typedef enum {kForwardLimit = 1, kReverseLimit = 2} Limits;
 	typedef enum {
@@ -133,6 +134,7 @@ public:
 	void ConfigReverseLimit(double reverseLimitPosition);
 	void ConfigMaxOutputVoltage(double voltage);
 	void ConfigFaultTime(float faultTime);
+	ControlMode GetControlMode();
 
 	static void UpdateSyncGroup(uint8_t syncGroup);
 
@@ -147,10 +149,8 @@ public:
 
 protected:
 	// Control mode helpers
-	typedef enum {kPercentVbus, kCurrent, kSpeed, kPosition, kVoltage} ControlMode;
 
 	void ChangeControlMode(ControlMode controlMode);
-	ControlMode GetControlMode();
 
 	void SetSpeedReference(uint8_t reference);
 	uint8_t GetSpeedReference();

@@ -54,7 +54,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	/**
 	* Mode determines how the Jaguar is controlled, used internally.
 	*/
-	private enum ControlMode {
+	public enum ControlMode {
 		PercentVbus, Current, Speed, Position, Voltage;
 	}
 
@@ -1377,7 +1377,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	*
 	* @return ControlMode that the Jag is in.
 	*/
-	private ControlMode getControlMode() {
+	public ControlMode getControlMode() {
 		return m_controlMode;
 	}
 
