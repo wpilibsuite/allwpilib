@@ -133,7 +133,7 @@
 									<format property="timestamp" pattern="yyyy/MM/dd HH:mm:ss z"/>
 								</tstamp>
 								<tstamp>
-									<format property="version-info" pattern="yyyy.MM"/>
+									<format property="version-info" pattern="yyyy.MM.dd.HH.mm.ss"/>
 								</tstamp>
 								<property name="version" value="${version-info}.${build-number}"/>
 							</target>
