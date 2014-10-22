@@ -446,6 +446,6 @@ public class DriverStation implements RobotState.Interface {
      *   for diagnostic purposes only
      * @param entering If true, starting test code; if false, leaving test code */
     public void InTest(boolean entering) {
-        m_userInTeleop = entering;
+        m_userInTest = entering;
     }
 }
