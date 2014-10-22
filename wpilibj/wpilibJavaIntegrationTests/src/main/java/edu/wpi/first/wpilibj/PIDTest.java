@@ -44,9 +44,8 @@ public class PIDTest extends AbstractComsSetup {
 	private static final Logger logger = Logger.getLogger(PIDTest.class.getName());
 	private NetworkTable table;
 	
-	private static final double absoluteTollerance = 20;
-	private static final double outputRange = 0.19;
-	
+	private static final double absoluteTollerance = 30;
+	private static final double outputRange = 0.2;	
 	
 	private PIDController controller = null;
 	private static MotorEncoderFixture me = null;
@@ -173,7 +172,7 @@ public class PIDTest extends AbstractComsSetup {
 		controller.disable();
 		controller.setSetpoint(setpoint);
 		controller.enable();
-		assertEquals(setpoint, new Double(controller.getSetpoint()));
+		assertEquals("Did not correctly set set-point",setpoint, new Double(controller.getSetpoint()));
 	}
 
 	@Test (timeout = 6000)
@@ -187,7 +186,7 @@ public class PIDTest extends AbstractComsSetup {
 		controller.enable();
 		Timer.delay(5);
 		controller.disable();
-		assertTrue(pidData() + "Controller Error: " + controller.getError(), controller.onTarget());
+		assertTrue(pidData() + "Was not on Target. Controller Error: " + controller.getError(), controller.onTarget());
 	}
 	
 	private String pidData(){
