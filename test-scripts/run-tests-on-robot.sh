@@ -17,7 +17,7 @@ source config.sh
 DEFAULT_TEST_DIR=${DEFAULT_DESTINATION_DIR}
 DEFAULT_PATH_TO_JRE=/usr/local/frc/JRE/bin/java
 
-usage="$(basename "$0") [-h] (java|cpp) name [-d test_dir] [-A] [arg] [arg]...
+usage="$(basename "$0") [-h] (java|cpp) name [-d test_dir] [-m] [-A] [arg] [arg]...
 A script designed to run the integration tests.
 This script should only be run on the roborio.
 Where:
@@ -29,14 +29,19 @@ Where:
           This scrip will automatically move the test into the ${DEFAULT_TEST_DIR}
           directory when the driver station mutex is released.
           Default: Assumes the test is in the same directory as this scrip.
+    -m    The driver station mutex will be handled manually.
     -A    Do not use the default arguments for the given language.
     arg   The arguments to be passed to test."
 
 mutexTaken=false
+driverStationEnabled=false
 # This function should run even if the script exits abnormally
 function finish {
-	if [ "$mutexTaken" == true ]; then
+	if [ "$driverStationEnabled" == true ]; then
 		/usr/local/frc/bin/teststand ds --name="${NAME}" disable
+		driverStationEnabled=false
+	fi
+	if [ "$mutexTaken" == true ]; then
 		/usr/local/frc/bin/teststand give --name="${NAME}"
 		mutexTaken=false
 	fi
@@ -46,6 +51,8 @@ trap finish EXIT SIGINT
 # This function should be run asynchronysly to enable the tests 10
 # seconds after they have been run.
 function enableIn10Seconds {
+	/usr/local/frc/bin/teststand ds --name="${NAME}" disable
+	driverStationEnabled=true
 	sleep 10
 	/usr/local/frc/bin/teststand ds --name="${NAME}" enable
 }
@@ -68,6 +75,7 @@ PARAM_ARGS=${@:3}
 TEST_RUN_ARGS=${@:3}
 RUN_WITH_DEFAULT_ARGS=true
 DEFAULT_ARGS=""
+MUTEX_OVERRIDE=false
 
 # Determine the language that we are attempting to run
 if [[ "$1" = java ]]; then
@@ -92,7 +100,7 @@ PARAM_COUNTER=2
 printf "Param Args ${PARAM_ARGS}\n"
 
 # Check for optional paramaters
-while  getopts ':hd:A' option $PARAM_ARGS ; do
+while  getopts ':hmd:A' option $PARAM_ARGS ; do
 	case "$option" in
 	h)
 		# Print the help message
@@ -103,6 +111,10 @@ while  getopts ':hd:A' option $PARAM_ARGS ; do
 	A)
 		# Remove the default arguments
 		RUN_WITH_DEFAULT_ARGS=false
+		PARAM_COUNTER=$[$PARAM_COUNTER +1]
+		;;
+	m)
+		MUTEX_OVERRIDE=true
 		PARAM_COUNTER=$[$PARAM_COUNTER +1]
 		;;
 	d)
@@ -130,9 +142,14 @@ if [[ $# -lt $PARAM_COUNTER ]]; then
 	exit 1
 fi
 
-# Attempt to take the mutex for the driver station
-mutexTaken=true
-/usr/local/frc/bin/teststand take --name="${NAME}"
+# If the mutex has been retrived a higher level in the tree
+if [ "$MUTEX_OVERRIDE" == false ]; then
+	# Attempt to take the mutex for the driver station
+	mutexTaken=true
+	/usr/local/frc/bin/teststand take --name="${NAME}"
+else
+	printf "Override driver station control enabled.\n"
+fi
 
 # Kill all running robot programs
 killall java FRCUserProgram

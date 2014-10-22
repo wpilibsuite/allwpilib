@@ -9,6 +9,34 @@
 # Configurable variables
 source config.sh
 
+# Setup the mutex release before we grab it
+mutexTaken=false
+# This function should run even if the script exits abnormally
+function finish {
+	if [ "$mutexTaken" == true ]; then
+		SSH_GIVE_MUTEX="ssh -t ${ROBOT_ADDRESS} /usr/local/frc/bin/teststand give --name=$(whoami)"
+		if [ $(which sshpass) ]; then
+			sshpass -p "" ${SSH_GIVE_MUTEX}
+		else
+			printf "WARNING!!! THIS IS HOW THE MUTEX IS RELEASED!\nIF YOU CHOOSE TO 'ctr+c' NOW YOU WILL HAVE TO HAND BACK THE MUTEX MANUALLY ON THE ROBOT.\n"
+			eval ${SSH_GIVE_MUTEX}
+		fi
+		mutexTaken=false
+	fi
+}
+trap finish EXIT SIGINT
+
+
+
+# Take the mutex from the driver station
+mutexTaken=true
+SSH_TAKE_MUTEX="ssh -t ${ROBOT_ADDRESS} /usr/local/frc/bin/teststand take --name=$(whoami)"
+if [ $(which sshpass) ]; then
+	sshpass -p "" ${SSH_TAKE_MUTEX}
+else
+	eval ${SSH_TAKE_MUTEX}
+fi
+
 # If there are already test results in the repository then remove them
 if [[ -e ${DEFAULT_LOCAL_TEST_RESULTS_DIR} ]]; then
 	rm -R ${DEFAULT_LOCAL_TEST_RESULTS_DIR}
@@ -28,7 +56,7 @@ fi
 printf "Running cpp test\n"
 
 # Run the C++ Tests
-./deploy-and-run-test-on-robot.sh cpp -A "--gtest_output=xml:${DEFAULT_DESTINATION_CPP_TEST_RESULTS}"
+./deploy-and-run-test-on-robot.sh cpp -m -A "--gtest_output=xml:${DEFAULT_DESTINATION_CPP_TEST_RESULTS}"
 
 # Retrive the C++ Test Results
 SCP_GET_CPP_TEST_RESULT="scp ${ROBOT_ADDRESS}:${DEFAULT_DESTINATION_CPP_TEST_RESULTS} ${DEFAULT_LOCAL_CPP_TEST_RESULT}"
@@ -39,7 +67,7 @@ else
 fi
 
 # Run the Java Tests
-./deploy-and-run-test-on-robot.sh java
+./deploy-and-run-test-on-robot.sh java -m
 
 # Retrive the Java Test Results
 SCP_GET_JAVA_TEST_RESULT="scp ${ROBOT_ADDRESS}:${DEFAULT_DESTINATION_JAVA_TEST_RESULTS} ${DEFAULT_LOCAL_JAVA_TEST_RESULT}"
@@ -48,3 +76,5 @@ if [ $(which sshpass) ]; then
 else
 	eval ${SCP_GET_JAVA_TEST_RESULT}
 fi
+
+# The mutex is released when this program exits
