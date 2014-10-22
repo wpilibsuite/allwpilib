@@ -215,6 +215,7 @@ Relay::Value Relay::Get() {
 void Relay::ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) {
 	std::string *val = (std::string *) value.ptr;
 	if (*val == "Off") Set(kOff);
+        else if (*val == "On") Set(kOn);
 	else if (*val == "Forward") Set(kForward);
 	else if (*val == "Reverse") Set(kReverse);
 }

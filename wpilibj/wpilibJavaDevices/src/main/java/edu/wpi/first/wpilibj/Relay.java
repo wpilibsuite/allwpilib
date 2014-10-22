@@ -388,6 +388,8 @@ public class Relay extends SensorBase implements LiveWindowSendable {
 				String val = ((String) value);
 				if (val.equals("Off")) {
 					set(Value.kOff);
+				} else if (val.equals("On")) {
+					set(Value.kOn);
 				} else if (val.equals("Forward")) {
 					set(Value.kForward);
 				} else if (val.equals("Reverse")) {
