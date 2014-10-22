@@ -32,7 +32,7 @@ public:
    void enable(tRioStatusCode *status);
    void disable(tRioStatusCode *status);
    bool isEnabled(tRioStatusCode *status);
-public:
+private:
    class tInterruptThread;
    friend class tInterruptThread;
    void handler();
@@ -58,3 +58,4 @@ public:
 
 
 #endif // __tInterruptManager_h__
+
