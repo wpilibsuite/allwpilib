@@ -22,10 +22,10 @@ class DriverStation;
 class Joystick : public GenericHID, public ErrorBase
 {
 public:
-	static const uint32_t kDefaultXAxis = 1;
-	static const uint32_t kDefaultYAxis = 2;
-	static const uint32_t kDefaultZAxis = 3;
-	static const uint32_t kDefaultTwistAxis = 4;
+	static const uint32_t kDefaultXAxis = 0;
+	static const uint32_t kDefaultYAxis = 1;
+	static const uint32_t kDefaultZAxis = 2;
+	static const uint32_t kDefaultTwistAxis = 2;
 	static const uint32_t kDefaultThrottleAxis = 3;
 	typedef enum
 	{
@@ -57,7 +57,7 @@ public:
 	virtual bool GetTop(JoystickHand hand = kRightHand);
 	virtual bool GetBumper(JoystickHand hand = kRightHand);
 	virtual bool GetRawButton(uint32_t button);
-	virtual int GetPOV(uint32_t pov = 1);
+	virtual int GetPOV(uint32_t pov = 0);
 	bool GetButton(ButtonType button);
 	static Joystick* GetStickForPort(uint32_t port);
 

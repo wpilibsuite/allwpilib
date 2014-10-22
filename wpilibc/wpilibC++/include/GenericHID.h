@@ -34,5 +34,5 @@ public:
 	virtual bool GetBumper(JoystickHand hand = kRightHand) = 0;
 	virtual bool GetRawButton(uint32_t button) = 0;
 
-	virtual int GetPOV(uint32_t pov = 1) = 0;
+	virtual int GetPOV(uint32_t pov = 0) = 0;
 };
