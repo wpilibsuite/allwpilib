@@ -13,9 +13,6 @@
 #include "Utility.h"
 #include <iostream>
 
-// The time, in seconds, at which the 32-bit FPGA timestamp rolls over to 0
-static const double kRolloverTime = (1ll << 32) / 1e6;
-
 /**
  * Pause the task for a specified time.
  *

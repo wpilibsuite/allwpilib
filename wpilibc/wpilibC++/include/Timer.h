@@ -35,6 +35,9 @@ public:
 	static double GetFPGATimestamp();
 	static double GetPPCTimestamp();
     static double GetMatchTime();
+	
+	// The time, in seconds, at which the 32-bit FPGA timestamp rolls over to 0
+	static constexpr double kRolloverTime = (1ll << 32) / 1e6;
 
 private:
 	double m_startTime;

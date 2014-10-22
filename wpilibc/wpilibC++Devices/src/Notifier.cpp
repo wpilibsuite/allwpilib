@@ -138,7 +138,7 @@ void Notifier::ProcessQueue(uint32_t mask, void *params)
  * Insert this Notifier into the timer queue in right place.
  * WARNING: this method does not do synchronization! It must be called from somewhere
  * that is taking care of synchronizing access to the queue.
- * @param reschedule If false, the scheduled alarm is based on the curent time and UpdateAlarm
+ * @param reschedule If false, the scheduled alarm is based on the current time and UpdateAlarm
  * method is called which will enable the alarm if necessary.
  * If true, update the time by adding the period (no drift) when rescheduled periodic from ProcessQueue.
  * This ensures that the public methods only update the queue after finishing inserting.
@@ -152,6 +152,10 @@ void Notifier::InsertInQueue(bool reschedule)
 	else
 	{
 		m_expirationTime = GetClock() + m_period;
+	}
+	if (m_expirationTime > Timer::kRolloverTime)
+	{
+		m_expirationTime -= Timer::kRolloverTime;
 	}
 	if (timerQueueHead == NULL || timerQueueHead->m_expirationTime >= this->m_expirationTime)
 	{
