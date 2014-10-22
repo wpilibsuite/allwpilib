@@ -22,7 +22,7 @@ public class GyroTest extends AbstractComsSetup {
 
 	private static final Logger logger = Logger.getLogger(GyroTest.class.getName());
 
-	public static final double TEST_ANGLE = 180.0;
+	public static final double TEST_ANGLE = 90.0;
 
 	private TiltPanCameraFixture tpcam;
 
@@ -56,11 +56,26 @@ public class GyroTest extends AbstractComsSetup {
 	 */
 	@Test
 	public void testGyroAngle() {
-		for(int i = 0; i < 1800; i++) {
-			tpcam.getPan().setAngle(i / 10.0);
-
-			Timer.delay(0.001);
+		//Set angle
+		for(int i = 0; i < 5; i++) {
+			tpcam.getPan().setAngle(45);
+			Timer.delay(.1);
 		}
+		//Reset for setup
+		tpcam.getGyro().reset();
+		
+		//Prevent drift
+		for(int i = 0; i < 10; i++) {
+			tpcam.getPan().setAngle(45);
+			Timer.delay(.1);
+		}
+		
+		//Perform test
+		for(int i = 450; i < 1350; i++) {
+			tpcam.getPan().setAngle(i / 10.0);
+			Timer.delay(0.005);
+		}
+		Timer.delay(.2);
 
 		double angle = tpcam.getGyro().getAngle();
 
@@ -68,7 +83,7 @@ public class GyroTest extends AbstractComsSetup {
 
 		double diff = Math.abs(difference);
 
-		assertEquals(errorMessage(diff, TEST_ANGLE), TEST_ANGLE, angle, 8);
+		assertEquals(errorMessage(diff, TEST_ANGLE), TEST_ANGLE, angle, 4);
 	}
 
 	@Test
