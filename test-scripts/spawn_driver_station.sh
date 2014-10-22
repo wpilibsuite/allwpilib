@@ -8,7 +8,7 @@
 
 source config.sh
 
-TESTSTAND_SERVE_COMMAND=".scratch/teststand serve"
+TESTSTAND_SERVE_COMMAND="/usr/local/frc/bin/teststand serve"
 
 #Checks to see if the mutex driver station is running. If it isn't then start it.
 
