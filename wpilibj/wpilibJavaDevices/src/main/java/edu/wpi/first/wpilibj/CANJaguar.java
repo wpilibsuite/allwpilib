@@ -795,6 +795,18 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 				requestMessage(CANJNI.LM_API_CFG_FAULT_TIME);
 			}
 		}
+
+		if(!m_receivedStatusMessage0 ||
+				!m_receivedStatusMessage1 ||
+				!m_receivedStatusMessage2) {
+			// If the periodic status messages haven't been verified as received,
+			// request periodic status messages again and attempt to unpack any
+			// available ones.
+			setupPeriodicStatus();
+			getTemperature();
+			getPosition();
+			getFaults();
+		}
 	}
 
 	/**
@@ -2103,7 +2115,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 	public String getDescription() {
 		return "CANJaguar ID "+m_deviceNumber;
 	}
-	
+
 	public int getDeviceID() {
 		return (int)m_deviceNumber;
 	}
