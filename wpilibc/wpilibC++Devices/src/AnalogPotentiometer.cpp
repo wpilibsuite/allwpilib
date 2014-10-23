@@ -1,28 +1,29 @@
 
 #include "AnalogPotentiometer.h"
+#include "ControllerPower.h"
 
 /**
  * Common initialization code called by all constructors.
  */
-void AnalogPotentiometer::initPot(AnalogInput *input, double scale, double offset) {
-    m_scale = scale;
+void AnalogPotentiometer::initPot(AnalogInput *input, double fullRange, double offset) {
+    m_fullRange = fullRange;
     m_offset = offset;
     m_analog_input = input;
 }
 
-AnalogPotentiometer::AnalogPotentiometer(int channel, double scale, double offset) {
+AnalogPotentiometer::AnalogPotentiometer(int channel, double fullRange, double offset) {
     m_init_analog_input = true;
-    initPot(new AnalogInput(channel), scale, offset);
+    initPot(new AnalogInput(channel), fullRange, offset);
 }
 
-AnalogPotentiometer::AnalogPotentiometer(AnalogInput *input, double scale, double offset) {
+AnalogPotentiometer::AnalogPotentiometer(AnalogInput *input, double fullRange, double offset) {
     m_init_analog_input = false;
-    initPot(input, scale, offset);
+    initPot(input, fullRange, offset);
 }
 
-AnalogPotentiometer::AnalogPotentiometer(AnalogInput &input, double scale, double offset) {
+AnalogPotentiometer::AnalogPotentiometer(AnalogInput &input, double fullRange, double offset) {
     m_init_analog_input = false;
-    initPot(&input, scale, offset);
+    initPot(&input, fullRange, offset);
 }
 
 AnalogPotentiometer::~AnalogPotentiometer() {
@@ -33,12 +34,12 @@ AnalogPotentiometer::~AnalogPotentiometer() {
 }
 
 /**
- * Get the current reading of the potentiomere.
+ * Get the current reading of the potentiometer.
  *
  * @return The current position of the potentiometer.
  */
 double AnalogPotentiometer::Get() {
-    return m_analog_input->GetVoltage() * m_scale + m_offset;
+    return (m_analog_input->GetVoltage() / ControllerPower::GetVoltage5V()) * m_fullRange + m_offset;
 }
 
 /**
