@@ -105,6 +105,25 @@
 </example>
 
 <example>
+  <name>Motor Control With Encoder</name>
+  <description>Demonstrate controlling a single motor with a Joystick and displaying the net movement of the motor using an encoder.</description>
+  <tags>
+    <tag>Robot and Motor</tag>
+    <tag>Digital</tag>
+    <tag>Sensors</tag>
+    <tag>Actuators</tag>
+    <tag>Joystick</tag>
+    <tag>Complete List</tag>
+  </tags>
+  <packages>
+    <package>src</package>
+  </packages>
+  <files>
+    <file source="examples/MotorControl/src/Robot.cpp" destination="src/Robot.cpp"></file>
+  </files>
+</example>
+
+<example>
   <name>Relay</name>
   <description>Demonstrate controlling a Relay from Joystick buttons.</description>
   <tags>
@@ -150,6 +169,22 @@
   </packages>
   <files>
     <file source="examples/Solenoid/src/Robot.cpp" destination="src/Robot.cpp"></file>
+  </files>
+</example>
+
+<example>
+  <name>Encoder</name>
+  <description>Demonstrate displaying the value of a quadrature encoder on the SmartDashboard.</description>
+  <tags>
+    <tag>Complete List</tag>
+    <tag>Digital</tag>
+    <tag>Sensors</tag>
+  </tags>
+  <packages>
+    <package>src</package>
+  </packages>
+  <files>
+    <file source="examples/Encoder/src/Robot.cpp" destination="src/Robot.cpp"></file>
   </files>
 </example>
 
