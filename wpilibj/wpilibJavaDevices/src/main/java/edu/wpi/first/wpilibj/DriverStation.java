@@ -29,7 +29,7 @@ public class DriverStation implements RobotState.Interface {
     /**
      * Number of Joystick Ports
      */
-    public static final int kJoystickPorts = 4;
+    public static final int kJoystickPorts = 6;
     /**
      * Convert from raw values to volts
      */

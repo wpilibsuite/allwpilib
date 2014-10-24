@@ -30,7 +30,7 @@ public:
 	static DriverStation *GetInstance();
 	static void ReportError(std::string error);
 
-	static const uint32_t kJoystickPorts = 4;
+	static const uint32_t kJoystickPorts = 6;
 
 	float GetStickAxis(uint32_t stick, uint32_t axis);
 	int GetStickPOV(uint32_t stick, uint32_t pov);
