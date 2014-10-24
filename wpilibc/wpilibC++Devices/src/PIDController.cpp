@@ -9,8 +9,8 @@
 #include "PIDSource.h"
 #include "PIDOutput.h"
 #include <math.h>
+#include <vector>
 #include "HAL/cpp/Synchronized.hpp"
-#include "Timer.h"
 #include "HAL/HAL.hpp"
 
 static const char *kP = "p";
@@ -33,7 +33,8 @@ static const char *kEnabled = "enabled";
  */
 PIDController::PIDController(float Kp, float Ki, float Kd,
 								PIDSource *source, PIDOutput *output,
-								float period)
+								float period) :
+	m_semaphore (0)
 {
 	Initialize(Kp, Ki, Kd, 0.0f, source, output, period);
 }
@@ -50,30 +51,22 @@ PIDController::PIDController(float Kp, float Ki, float Kd,
  */
 PIDController::PIDController(float Kp, float Ki, float Kd, float Kf,
 								PIDSource *source, PIDOutput *output,
-								float period)
+								float period) :
+	m_semaphore (0)
 {
 	Initialize(Kp, Ki, Kd, Kf, source, output, period);
 }
 
-struct CallerInfo
-{
-	TimerEventHandler fn;
-	void* data;
-};
-
-static void* forwardCallCalculate(CallerInfo* rdata)
-{
-	CallerInfo data = *rdata;
-	delete rdata;
-	data.fn(data.data);
-	return nullptr;
-}
 
 void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
 								PIDSource *source, PIDOutput *output,
 								float period)
 {
 	m_table = NULL;
+	
+	m_semaphore = initializeMutexNormal();
+
+	m_controlLoop = new Notifier(PIDController::CallCalculate, this);
 
 	m_P = Kp;
 	m_I = Ki;
@@ -88,7 +81,6 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
 
 	m_continuous = false;
 	m_enabled = false;
-	m_destruct = false;
 	m_setpoint = 0;
 
 	m_prevError = 0;
@@ -101,15 +93,7 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
 	m_pidOutput = output;
 	m_period = period;
 
-	pthread_mutexattr_t mutexattr;
-	pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE);
-	pthread_mutex_init(&m_mutex, &mutexattr);
-
-	CallerInfo *ci = new CallerInfo();
-	ci->fn = &CallCalculate;
-	ci->data = this;
-	pthread_create(&m_controlLoop, NULL, (void*(*)(void*))&forwardCallCalculate, ci);
-	//forwardCallCalculate will delete the obj, no need to delete it ourselves
+	m_controlLoop->StartPeriodic(m_period);
 
 	static int32_t instances = 0;
 	instances++;
@@ -123,37 +107,22 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
  */
 PIDController::~PIDController()
 {
-	/* Let the calculation loop end before the std::thread object gets
-		destructed */
-	pthread_mutex_lock(&m_mutex);
-	m_destruct = true;
-	pthread_mutex_unlock(&m_mutex);
-
-	pthread_join(m_controlLoop, NULL);
+	takeMutex(m_semaphore);
+	deleteMutex(m_semaphore);
+	delete m_controlLoop;
 }
 
 /**
  * Call the Calculate method as a non-static method. This avoids having to prepend
  * all local variables in that method with the class pointer. This way the "this"
  * pointer will be set up and class variables can be called more easily.
- * This method is static and called by pthreads.
+ * This method is static and called by the Notifier class.
  * @param controller the address of the PID controller object to use in the background loop
  */
-void PIDController::CallCalculate(void *data)
+void PIDController::CallCalculate(void *controller)
 {
-	PIDController *controller = (PIDController*) data;
-	int destruct = 0;
-
-	while(!destruct) {
-		controller->Calculate();
-
-		/* End the calculation loop when the PIDController gets destructed */
-		pthread_mutex_lock(&controller->m_mutex);
-		destruct = controller->m_destruct;
-		pthread_mutex_unlock(&controller->m_mutex);
-
-		Wait(controller->m_period);
-	}
+	PIDController *control = (PIDController*) controller;
+	control->Calculate();
 }
 
  /**
@@ -165,68 +134,71 @@ void PIDController::Calculate()
 {
 	bool enabled;
 	PIDSource *pidInput;
+	PIDOutput *pidOutput;
 
-	if(m_pidInput == 0) return;
-	if(m_pidOutput == 0) return;
-
-	pthread_mutex_lock(&m_mutex);
-	enabled = m_enabled;
-	pidInput = m_pidInput;
-	pthread_mutex_unlock(&m_mutex);
-
-	if(enabled)
+	CRITICAL_REGION(m_semaphore)
 	{
-		pthread_mutex_lock(&m_mutex);
-
-		float input = pidInput->PIDGet();
-
-		float result;
-		PIDOutput *pidOutput;
-
-		m_error = m_setpoint - input;
-		if (m_continuous)
-		{
-			if (fabs(m_error) > (m_maximumInput - m_minimumInput) / 2)
-			{
-				if (m_error > 0)
-				{
-					m_error = m_error - m_maximumInput + m_minimumInput;
-				}
-				else
-				{
-					m_error = m_error + m_maximumInput - m_minimumInput;
-				}
-			}
-		}
-
-		if(m_I != 0)
-		{
-			double potentialIGain = (m_totalError + m_error) * m_I;
-			if (potentialIGain < m_maximumOutput)
-			{
-				if (potentialIGain > m_minimumOutput)
-					m_totalError += m_error;
-				else
-					m_totalError = m_minimumOutput / m_I;
-			}
-			else
-			{
-				m_totalError = m_maximumOutput / m_I;
-			}
-		}
-
-		m_result = m_P * m_error + m_I * m_totalError + m_D * (m_error - m_prevError) + m_setpoint * m_F;
-		m_prevError = m_error;
-
-		if (m_result > m_maximumOutput) m_result = m_maximumOutput;
-		else if (m_result < m_minimumOutput) m_result = m_minimumOutput;
-
+		pidInput = m_pidInput;
 		pidOutput = m_pidOutput;
-		result = m_result;
+		enabled = m_enabled;
+		pidInput = m_pidInput;
+	}
+	END_REGION;
 
-		pidOutput->PIDWrite(result);
+	if (pidInput == NULL) return;
+	if (pidOutput == NULL) return;
 
-		pthread_mutex_unlock(&m_mutex);
+	if (enabled)
+	{
+		{
+			Synchronized sync(m_semaphore);
+      float input = pidInput->PIDGet();
+      float result;
+      PIDOutput *pidOutput;
+
+			m_error = m_setpoint - input;
+			if (m_continuous)
+			{
+				if (fabs(m_error) > (m_maximumInput - m_minimumInput) / 2)
+				{
+					if (m_error > 0)
+					{
+						m_error = m_error - m_maximumInput + m_minimumInput;
+					}
+					else
+					{
+						m_error = m_error + m_maximumInput - m_minimumInput;
+					}
+				}
+			}
+
+			if(m_I != 0)
+			{
+				double potentialIGain = (m_totalError + m_error) * m_I;
+				if (potentialIGain < m_maximumOutput)
+				{
+					if (potentialIGain > m_minimumOutput)
+						m_totalError += m_error;
+					else
+						m_totalError = m_minimumOutput / m_I;
+				}
+				else
+				{
+					m_totalError = m_maximumOutput / m_I;
+				}
+			}
+
+			m_result = m_P * m_error + m_I * m_totalError + m_D * (m_error - m_prevError) + m_setpoint * m_F;
+			m_prevError = m_error;
+
+			if (m_result > m_maximumOutput) m_result = m_maximumOutput;
+			else if (m_result < m_minimumOutput) m_result = m_minimumOutput;
+
+			pidOutput = m_pidOutput;
+			result = m_result;
+
+      pidOutput->PIDWrite(result);
+		}
 	}
 }
 
@@ -239,11 +211,13 @@ void PIDController::Calculate()
  */
 void PIDController::SetPID(float p, float i, float d)
 {
-	pthread_mutex_lock(&m_mutex);
-	m_P = p;
-	m_I = i;
-	m_D = d;
-	pthread_mutex_unlock(&m_mutex);
+	CRITICAL_REGION(m_semaphore)
+	{
+		m_P = p;
+		m_I = i;
+		m_D = d;
+	}
+	END_REGION;
 
 	if (m_table != NULL) {
 		m_table->PutNumber("p", m_P);
@@ -262,12 +236,14 @@ void PIDController::SetPID(float p, float i, float d)
  */
 void PIDController::SetPID(float p, float i, float d, float f)
 {
-	pthread_mutex_lock(&m_mutex);
-	m_P = p;
-	m_I = i;
-	m_D = d;
-	m_F = f;
-	pthread_mutex_unlock(&m_mutex);
+	CRITICAL_REGION(m_semaphore)
+	{
+		m_P = p;
+		m_I = i;
+		m_D = d;
+		m_F = f;
+	}
+	END_REGION;
 
 	if (m_table != NULL) {
 		m_table->PutNumber("p", m_P);
@@ -283,13 +259,11 @@ void PIDController::SetPID(float p, float i, float d, float f)
  */
 float PIDController::GetP()
 {
-	float temp;
-
-	pthread_mutex_lock(&m_mutex);
-	temp = m_P;
-	pthread_mutex_unlock(&m_mutex);
-
-	return temp;
+	CRITICAL_REGION(m_semaphore)
+	{
+		return m_P;
+	}
+	END_REGION;
 }
 
 /**
@@ -298,13 +272,11 @@ float PIDController::GetP()
  */
 float PIDController::GetI()
 {
-	float temp;
-
-	pthread_mutex_lock(&m_mutex);
-	temp = m_I;
-	pthread_mutex_unlock(&m_mutex);
-
-	return temp;
+	CRITICAL_REGION(m_semaphore)
+	{
+		return m_I;
+	}
+	END_REGION;
 }
 
 /**
@@ -313,13 +285,11 @@ float PIDController::GetI()
  */
 float PIDController::GetD()
 {
-	float temp;
-
-	pthread_mutex_lock(&m_mutex);
-	temp = m_D;
-	pthread_mutex_unlock(&m_mutex);
-
-	return temp;
+	CRITICAL_REGION(m_semaphore)
+	{
+		return m_D;
+	}
+	END_REGION;
 }
 
 /**
@@ -328,13 +298,11 @@ float PIDController::GetD()
  */
 float PIDController::GetF()
 {
-	float temp;
-
-	pthread_mutex_lock(&m_mutex);
-	temp = m_F;
-	pthread_mutex_unlock(&m_mutex);
-
-	return temp;
+	CRITICAL_REGION(m_semaphore)
+	{
+		return m_F;
+	}
+	END_REGION;
 }
 
 /**
@@ -344,13 +312,13 @@ float PIDController::GetF()
  */
 float PIDController::Get()
 {
-	float temp;
-
-	pthread_mutex_lock(&m_mutex);
-	temp = m_result;
-	pthread_mutex_unlock(&m_mutex);
-
-	return temp;
+	float result;
+	CRITICAL_REGION(m_semaphore)
+	{
+		result = m_result;
+	}
+	END_REGION;
+	return result;
 }
 
 /**
@@ -362,9 +330,11 @@ float PIDController::Get()
  */
 void PIDController::SetContinuous(bool continuous)
 {
-	pthread_mutex_lock(&m_mutex);
-	m_continuous = continuous;
-	pthread_mutex_unlock(&m_mutex);
+	CRITICAL_REGION(m_semaphore)
+	{
+		m_continuous = continuous;
+	}
+	END_REGION;
 }
 
 /**
@@ -375,10 +345,12 @@ void PIDController::SetContinuous(bool continuous)
  */
 void PIDController::SetInputRange(float minimumInput, float maximumInput)
 {
-	pthread_mutex_lock(&m_mutex);
-	m_minimumInput = minimumInput;
-	m_maximumInput = maximumInput;
-	pthread_mutex_unlock(&m_mutex);
+	CRITICAL_REGION(m_semaphore)
+	{
+		m_minimumInput = minimumInput;
+		m_maximumInput = maximumInput;	
+	}
+	END_REGION;
 
 	SetSetpoint(m_setpoint);
 }
@@ -391,10 +363,12 @@ void PIDController::SetInputRange(float minimumInput, float maximumInput)
  */
 void PIDController::SetOutputRange(float minimumOutput, float maximumOutput)
 {
-	pthread_mutex_lock(&m_mutex);
-	m_minimumOutput = minimumOutput;
-	m_maximumOutput = maximumOutput;
-	pthread_mutex_unlock(&m_mutex);
+	CRITICAL_REGION(m_semaphore)
+	{
+		m_minimumOutput = minimumOutput;
+		m_maximumOutput = maximumOutput;
+	}
+	END_REGION;
 }
 
 /**
@@ -403,22 +377,24 @@ void PIDController::SetOutputRange(float minimumOutput, float maximumOutput)
  */
 void PIDController::SetSetpoint(float setpoint)
 {
-	pthread_mutex_lock(&m_mutex);
-	if (m_maximumInput > m_minimumInput)
+	CRITICAL_REGION(m_semaphore)
 	{
-		if (setpoint > m_maximumInput)
-			m_setpoint = m_maximumInput;
-		else if (setpoint < m_minimumInput)
-			m_setpoint = m_minimumInput;
+		if (m_maximumInput > m_minimumInput)
+		{
+			if (setpoint > m_maximumInput)
+				m_setpoint = m_maximumInput;
+			else if (setpoint < m_minimumInput)
+				m_setpoint = m_minimumInput;
+			else
+				m_setpoint = setpoint;
+		}
 		else
+		{
 			m_setpoint = setpoint;
+		}
 	}
-	else
-	{
-		m_setpoint = setpoint;
-	}
-	pthread_mutex_unlock(&m_mutex);
-
+	END_REGION;	
+	
 	if (m_table != NULL) {
 		m_table->PutNumber("setpoint", m_setpoint);
 	}
@@ -430,13 +406,13 @@ void PIDController::SetSetpoint(float setpoint)
  */
 float PIDController::GetSetpoint()
 {
-	float temp;
-
-	pthread_mutex_lock(&m_mutex);
-	temp = m_setpoint;
-	pthread_mutex_unlock(&m_mutex);
-
-	return temp;
+	float setpoint;
+	CRITICAL_REGION(m_semaphore)
+	{
+		setpoint = m_setpoint;
+	}
+	END_REGION;
+	return setpoint;
 }
 
 /**
@@ -446,11 +422,13 @@ float PIDController::GetSetpoint()
 float PIDController::GetError()
 {
 	float error;
-
-	pthread_mutex_lock(&m_mutex);
-	error = m_setpoint - m_pidInput->PIDGet();
-	pthread_mutex_unlock(&m_mutex);
-
+  double pidInput;
+	CRITICAL_REGION(m_semaphore)
+	{
+    pidInput = m_pidInput->PIDGet();
+	}
+	END_REGION;
+  error = GetSetpoint() - pidInput;
 	return error;
 }
 
@@ -461,10 +439,12 @@ float PIDController::GetError()
  */
 void PIDController::SetTolerance(float percent)
 {
-	pthread_mutex_lock(&m_mutex);
-	m_toleranceType = kPercentTolerance;
-	m_tolerance = percent;
-	pthread_mutex_unlock(&m_mutex);
+	CRITICAL_REGION(m_semaphore)
+	{
+		m_toleranceType = kPercentTolerance;
+		m_tolerance = percent;
+	}
+	END_REGION;
 }
 
 /*
@@ -474,10 +454,12 @@ void PIDController::SetTolerance(float percent)
  */
 void PIDController::SetPercentTolerance(float percent)
 {
-	pthread_mutex_lock(&m_mutex);
-	m_toleranceType = kPercentTolerance;
-	m_tolerance = percent;
-	pthread_mutex_unlock(&m_mutex);
+	CRITICAL_REGION(m_semaphore)
+	{
+		m_toleranceType = kPercentTolerance;
+		m_tolerance = percent;
+	}
+	END_REGION;
 }
 
 /*
@@ -487,10 +469,12 @@ void PIDController::SetPercentTolerance(float percent)
  */
 void PIDController::SetAbsoluteTolerance(float absTolerance)
 {
-	pthread_mutex_lock(&m_mutex);
-	m_toleranceType = kAbsoluteTolerance;
-	m_tolerance = absTolerance;
-	pthread_mutex_unlock(&m_mutex);
+	CRITICAL_REGION(m_semaphore)
+	{
+		m_toleranceType = kAbsoluteTolerance;
+		m_tolerance = absTolerance;
+	}
+	END_REGION;
 }
 
 /*
@@ -503,21 +487,22 @@ void PIDController::SetAbsoluteTolerance(float absTolerance)
 bool PIDController::OnTarget()
 {
 	bool temp;
-
-	pthread_mutex_lock(&m_mutex);
-	switch (m_toleranceType) {
-	case kPercentTolerance:
-		temp = fabs(GetError()) < (m_tolerance / 100 * (m_maximumInput - m_minimumInput));
-		break;
-	case kAbsoluteTolerance:
-		temp = fabs(GetError()) < m_tolerance;
-		break;
-	//TODO: this case needs an error
-	case kNoTolerance:
-		temp = false;
+  double error = GetError();
+	CRITICAL_REGION(m_semaphore)
+	{
+		switch (m_toleranceType) {
+		case kPercentTolerance:
+			temp = fabs(error) < (m_tolerance / 100 * (m_maximumInput - m_minimumInput));
+			break;
+		case kAbsoluteTolerance:
+			temp = fabs(error) < m_tolerance;
+			break;
+		//TODO: this case needs an error
+		case kNoTolerance:
+			temp = false;
+		}
 	}
-	pthread_mutex_unlock(&m_mutex);
-
+	END_REGION;
 	return temp;
 }
 
@@ -526,10 +511,12 @@ bool PIDController::OnTarget()
  */
 void PIDController::Enable()
 {
-	pthread_mutex_lock(&m_mutex);
-	m_enabled = true;
-	pthread_mutex_unlock(&m_mutex);
-
+	CRITICAL_REGION(m_semaphore)
+	{			
+		m_enabled = true;
+	}
+	END_REGION;	
+	
 	if (m_table != NULL) {
 		m_table->PutBoolean("enabled", true);
 	}
@@ -540,11 +527,13 @@ void PIDController::Enable()
  */
 void PIDController::Disable()
 {
-	pthread_mutex_lock(&m_mutex);
-	m_pidOutput->PIDWrite(0);
-	m_enabled = false;
-	pthread_mutex_unlock(&m_mutex);
-
+	CRITICAL_REGION(m_semaphore)
+	{
+		m_pidOutput->PIDWrite(0);
+		m_enabled = false;
+	}
+	END_REGION;
+	
 	if (m_table != NULL) {
 		m_table->PutBoolean("enabled", false);
 	}
@@ -555,13 +544,13 @@ void PIDController::Disable()
  */
 bool PIDController::IsEnabled()
 {
-	bool temp;
-
-	pthread_mutex_lock(&m_mutex);
-	temp = m_enabled;
-	pthread_mutex_unlock(&m_mutex);
-
-	return temp;
+	bool enabled;
+	CRITICAL_REGION(m_semaphore)
+	{
+		enabled = m_enabled;
+	}
+	END_REGION;
+	return enabled;
 }
 
 /**
@@ -571,11 +560,13 @@ void PIDController::Reset()
 {
 	Disable();
 
-	pthread_mutex_lock(&m_mutex);
-	m_prevError = 0;
-	m_totalError = 0;
-	m_result = 0;
-	pthread_mutex_unlock(&m_mutex);
+	CRITICAL_REGION(m_semaphore)
+	{
+		m_prevError = 0;
+		m_totalError = 0;
+		m_result = 0;
+	}
+	END_REGION;
 }
 
 std::string PIDController::GetSmartDashboardType(){
