@@ -296,8 +296,10 @@ void setPWMDutyCycle(void* pwmGenerator, double dutyCycle, int32_t *status) {
 	  // The resolution of the duty cycle drops close to the highest frequencies.
 	  rawDutyCycle = rawDutyCycle / pow(2.0, 4 - pwmPeriodPower);
 	}
-    digitalSystem->writePWMDutyCycleA(id, (uint8_t)rawDutyCycle, status);
-    digitalSystem->writePWMDutyCycleB(id, (uint8_t)rawDutyCycle, status);
+	if(id < 4)
+		digitalSystem->writePWMDutyCycleA(id, (uint8_t)rawDutyCycle, status);
+	else 
+		digitalSystem->writePWMDutyCycleB(id - 3, (uint8_t)rawDutyCycle, status);
   }
 }
 
