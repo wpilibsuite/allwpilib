@@ -175,7 +175,7 @@ public class PIDTest extends AbstractComsSetup {
 		assertEquals("Did not correctly set set-point",setpoint, new Double(controller.getSetpoint()));
 	}
 
-	@Test (timeout = 6000)
+	@Test (timeout = 15000)
 	public void testRotateToTarget() {
 		setupAbsoluteTollerance();
 		setupOutputRange();
@@ -184,7 +184,7 @@ public class PIDTest extends AbstractComsSetup {
 		controller.setSetpoint(setpoint);
 		assertEquals(pidData() +"did not have an error of " + setpoint, setpoint, controller.getError(), 0);
 		controller.enable();
-		Timer.delay(5);
+		Timer.delay(10);
 		controller.disable();
 		assertTrue(pidData() + "Was not on Target. Controller Error: " + controller.getError(), controller.onTarget());
 	}
