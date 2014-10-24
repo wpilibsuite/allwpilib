@@ -134,7 +134,7 @@ public abstract class AbstractComsSetup {
 				//Prints the message on one line overwriting itself each time
 				TestBench.out().print("\rWaiting for enable: " + i++);
 			}
-			getClassLogger().logp(Level.INFO, description.getClassName(), description.getMethodName(), description.getDisplayName());
+			getClassLogger().logp(Level.INFO, description.getClassName(), description.getMethodName(), "Starting");
 	        super.starting(description);
 	    }
 
