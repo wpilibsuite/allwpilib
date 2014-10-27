@@ -39,7 +39,7 @@ public class Robot extends SampleRobot {
      */
     public void operatorControl() {
         robotDrive.setSafetyEnabled(true);
-        while (isOperatorControl()) {
+        while (isOperatorControl() && isEnabled()) {
         	
         	// Use the joystick X axis for lateral movement, Y axis for forward movement, and Z axis for rotation.
         	// This sample does not use field-oriented drive, so the gyro input is set to zero.

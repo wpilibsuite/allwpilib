@@ -66,7 +66,7 @@ public:
 	 */
 	void OperatorControl()
 	{
-		while (IsOperatorControl())
+		while (IsOperatorControl() && IsEnabled())
 		{
 			// Retrieve the net displacement of the Encoder since the lsat Reset.
 			SmartDashboard::PutNumber("Encoder Distance", m_encoder.GetDistance());

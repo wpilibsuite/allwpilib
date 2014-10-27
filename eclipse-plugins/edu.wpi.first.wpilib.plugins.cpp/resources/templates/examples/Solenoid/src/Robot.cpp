@@ -51,7 +51,7 @@ public:
 	 */
 	void OperatorControl()
 	{
-		while (IsOperatorControl())
+		while (IsOperatorControl() && IsEnabled())
 		{
 			// The output of GetRawButton is true/false depending on whether
 			//   the button is pressed; Set takes a boolean for for whether to

@@ -32,7 +32,7 @@ public class Robot extends SampleRobot {
      * Runs the motor from a joystick.
      */
     public void operatorControl() {
-        while (isOperatorControl()) {
+        while (isOperatorControl() && isEnabled()) {
         	// Set the motor's output.
         	// This takes a number from -1 (100% speed in reverse) to +1 (100% speed going forward)
         	motor.set(stick.getY());

@@ -39,7 +39,7 @@ public:
 	 * Simultaneously displays encoder values on the SmartDashboard.
 	 */
 	void OperatorControl() {
-		while (IsOperatorControl()) {
+		while (IsOperatorControl() && IsEnabled()) {
 			// Set the motor controller's output.
 			// This takes a number from -1 (100% speed in reverse) to +1 (100% speed forwards).
 			m_motor.Set(m_stick.GetY());
