@@ -182,6 +182,14 @@ double Timer::GetFPGATimestamp()
 	return wpilib::internal::simTime;
 }
 
+/*
+ * Not in a match.
+ */
+double Timer::GetMatchTime()
+{
+	return Timer::GetFPGATimestamp();
+}
+
 // Internal function that reads the PPC timestamp counter.
 extern "C"
 {

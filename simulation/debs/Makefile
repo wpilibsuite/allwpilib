@@ -72,7 +72,6 @@ install:
 	sudo dpkg -i frcsim-gazebo-plugins/frcsim-gazebo-plugins_$(gazebo-plugins-package-version)_amd64.deb \
 	frcsim-gazebo-models/frcsim-gazebo-models_$(gazebo-models-package-version)_all.deb \
 	frcsim-eclipse-plugins/frcsim-eclipse-plugins_$(eclipse-plugins-package-version)_all.deb \
-	# frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin_$(eclipse-toolchain-package-version)_all.deb \
 	frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_amd64.deb \
 	frcsim/frcsim_$(frcsim-package-version)_all.deb
 
@@ -143,8 +142,6 @@ pull-libwpilibsim-cpp:
 	echo 'cmake_minimum_required(VERSION 2.8)' > frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/CMakeLists.txt
 	echo 'project(WPILibSim)' >> frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/CMakeLists.txt
 	echo 'add_subdirectory(allwpilib/wpilibc/wpilibC++Sim)' >> frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/CMakeLists.txt
-
-	
 	echo Increment version?
 frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-version).orig.tar.gz: pull-libwpilibsim-cpp
 	cd frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp && debuild clean

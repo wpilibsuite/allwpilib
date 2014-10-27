@@ -47,7 +47,6 @@ frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/frcsim-ec
 frcsim/frcsim/debian/frcsim/
 frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/debian/frcsim-libwpilibsim-cpp/
 
-frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/Makefile
 frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/CMakeLists.txt
 
 # Generated Repository

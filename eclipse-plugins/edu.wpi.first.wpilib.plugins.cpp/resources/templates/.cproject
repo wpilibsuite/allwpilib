@@ -143,9 +143,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.66697269" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.2094820582" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
 								<option id="gnu.cpp.link.option.libs.1563598353" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="WPILib"/>
 									<listOptionValue builtIn="false" value="WPILibSim"/>
-									<listOptionValue builtIn="false" value="WPILib"/>
 									<listOptionValue builtIn="false" value="gazebo"/>
 									<listOptionValue builtIn="false" value="gazebo_transport"/>
 									<listOptionValue builtIn="false" value="gazebo_msgs"/>
