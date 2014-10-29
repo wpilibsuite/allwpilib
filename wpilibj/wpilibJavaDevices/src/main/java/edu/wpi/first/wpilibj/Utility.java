@@ -82,19 +82,4 @@ public class Utility {
 		HALUtil.checkStatus(status.asIntBuffer());
 		return value;
 	}
-
-	/**
-	 * Control whether to send System.err output to the driver station's error
-	 * pane.
-	 *
-	 * @param enabled
-	 *            if true, send error stream to driver station, otherwise
-	 *            disable sending error stream
-	 */
-	public static void sendErrorStreamToDriverStation(boolean enabled) {
-		final String url = "dserror:edu.wpi.first.wpilibj.Utility"; // the path
-																	// is just a
-																	// comment.
-	}
-
 }
