@@ -65,8 +65,6 @@
 	      <excludes>
 	        <exclude>edu/wpi/first/wpilibj/image/</exclude>
 	        <exclude>edu/wpi/first/wpilibj/camera/</exclude>
-	        <exclude>edu/wpi/first/wpilibj/visa/</exclude>
-	        <exclude>edu/wpi/first/wpilibj/SerialPort.java</exclude>
 	      </excludes>
         </configuration>
       </plugin>
@@ -81,8 +79,6 @@
       	  <sourceFileExcludes>
       	    <exclude>edu/wpi/first/wpilibj/image/</exclude>
       	    <exclude>edu/wpi/first/wpilibj/camera/</exclude>
-      	    <exclude>edu/wpi/first/wpilibj/visa/</exclude>
-      	    <exclude>edu/wpi/first/wpilibj/SerialPort.java</exclude>
       	  </sourceFileExcludes>
         </configuration>
       </plugin>

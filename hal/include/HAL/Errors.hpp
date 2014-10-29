@@ -45,3 +45,16 @@
 #define ANALOG_TRIGGER_PULSE_OUTPUT_ERROR_MESSAGE "HAL: Attempted to read AnalogTrigger pulse output."
 #define PARAMETER_OUT_OF_RANGE -1028
 #define PARAMETER_OUT_OF_RANGE_MESSAGE "HAL: A parameter is out of range."
+
+#define VI_ERROR_SYSTEM_ERROR_MESSAGE "HAL - VISA: System Error";
+#define VI_ERROR_INV_OBJECT_MESSAGE "HAL - VISA: Invalid Object"
+#define VI_ERROR_RSRC_LOCKED_MESSAGE "HAL - VISA: Resource Locked"
+#define VI_ERROR_RSRC_NFOUND_MESSAGE "HAL - VISA: Resource Not Found"
+#define VI_ERROR_INV_RSRC_NAME_MESSAGE "HAL - VISA: Invalid Resource Name"  
+#define VI_ERROR_QUEUE_OVERFLOW_MESSAGE "HAL - VISA: Queue Overflow" 
+#define VI_ERROR_IO_MESSAGE "HAL - VISA: General IO Error"
+#define VI_ERROR_ASRL_PARITY_MESSAGE "HAL - VISA: Parity Error"
+#define VI_ERROR_ASRL_FRAMING_MESSAGE "HAL - VISA: Framing Error"
+#define VI_ERROR_ASRL_OVERRUN_MESSAGE "HAL - VISA: Buffer Overrun Error" 
+#define VI_ERROR_RSRC_BUSY_MESSAGE "HAL - VISA: Resource Busy"
+#define VI_ERROR_INV_PARAMETER_MESSAGE "HAL - VISA: Invalid Parameter" 
