@@ -80,6 +80,12 @@ public class ProjectCreationUtils {
 				}
 			} catch (CoreException e) {
                 WPILibCore.logError("Can't create new project.", e);
+				Display.getDefault().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "Error", "Error creating project! This may occur if a project of the same name with different case exists in the Workspace");
+				}
+			});
 			}
 		}else {
 			Display.getDefault().syncExec(new Runnable() {
