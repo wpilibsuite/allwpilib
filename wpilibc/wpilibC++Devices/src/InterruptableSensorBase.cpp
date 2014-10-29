@@ -21,6 +21,13 @@ InterruptableSensorBase::~InterruptableSensorBase()
 
 }
 
+/**
+* Request one of the 8 interrupts asynchronously on this digital input.
+* Request interrupts in asynchronous mode where the user's interrupt handler will be
+* called when the interrupt fires. Users that want control over the thread priority
+* should use the synchronous method with their own spawned thread.
+* The default is interrupt on rising edges only.
+*/
 void InterruptableSensorBase::RequestInterrupts(InterruptHandlerFunction handler, void *param)
 {
 	if (StatusIsFatal()) return;
@@ -44,9 +51,9 @@ void InterruptableSensorBase::RequestInterrupts(InterruptHandlerFunction handler
 }
 
 /**
-* Request interrupts synchronously on this digital input.
-* Request interrupts in synchronus mode where the user program will have to explicitly
-* wait for the interrupt to occur.
+* Request one of the 8 interrupts synchronously on this digital input.
+* Request interrupts in synchronous mode where the user program will have to explicitly
+* wait for the interrupt to occur using WaitForInterrupt.
 * The default is interrupt on rising edges only.
 */
 void InterruptableSensorBase::RequestInterrupts()
