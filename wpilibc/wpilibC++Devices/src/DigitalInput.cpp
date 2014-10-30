@@ -8,6 +8,7 @@
 //#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
 #include "WPIErrors.h"
+#include "LiveWindow/LiveWindow.h"
 
 /**
  * Create an instance of a DigitalInput.
@@ -31,6 +32,7 @@ void DigitalInput::InitDigitalInput(uint32_t channel)
 	allocateDIO(m_digital_ports[channel], true, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
+	LiveWindow::GetInstance()->AddSensor("DigitalInput", channel, this);
 	HALReport(HALUsageReporting::kResourceType_DigitalInput, channel);
 }
 
