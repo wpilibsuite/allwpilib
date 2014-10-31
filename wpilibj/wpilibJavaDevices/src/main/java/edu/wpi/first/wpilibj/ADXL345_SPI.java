@@ -6,6 +6,9 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
+import java.nio.ByteOrder;
+import java.nio.ByteBuffer;
+
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
@@ -157,9 +160,11 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer {
 		byte[] transferBuffer = new byte[3];
 		transferBuffer[0] = (byte)((kAddress_Read | kAddress_MultiByte | kDataRegister) + axis.value);
 		m_spi.transaction(transferBuffer, transferBuffer, 3);
-		//Sensor is little endian... swap bytes
-		int rawAccel = transferBuffer[2] << 8 | transferBuffer[1];
-		return rawAccel * kGsPerLSB;
+		ByteBuffer rawAccel = ByteBuffer.wrap(transferBuffer, 1, 2);
+		//Sensor is little endian
+		rawAccel.order(ByteOrder.LITTLE_ENDIAN);
+		
+		return rawAccel.getShort() * kGsPerLSB;
 	}
 
 	/**
@@ -170,22 +175,18 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer {
 	public ADXL345_SPI.AllAxes getAccelerations() {
 		ADXL345_SPI.AllAxes data = new ADXL345_SPI.AllAxes();
 		byte dataBuffer[] = new byte[7];
-		int[] rawData = new int[3];
 		if (m_spi != null)
 		{
 			// Select the data address.
 			dataBuffer[0] = (byte)(kAddress_Read | kAddress_MultiByte | kDataRegister);
 			m_spi.transaction(dataBuffer, dataBuffer, 7);
-
-			for (int i=0; i<3; i++)
-			{
-				//Sensor is little endian... swap bytes
-				rawData[i] = dataBuffer[i*2+2] << 8 | dataBuffer[i*2+1];
-			}
-
-			data.XAxis = rawData[0] * kGsPerLSB;
-			data.YAxis = rawData[1] * kGsPerLSB;
-			data.ZAxis = rawData[2] * kGsPerLSB;
+			ByteBuffer rawData = ByteBuffer.wrap(dataBuffer, 1, 6);
+			//Sensor is little endian... swap bytes
+			rawData.order(ByteOrder.LITTLE_ENDIAN);
+		
+			data.XAxis = rawData.getShort() * kGsPerLSB;
+			data.YAxis = rawData.getShort() * kGsPerLSB;
+			data.ZAxis = rawData.getShort() * kGsPerLSB;
 		}
 		return data;
 	}
