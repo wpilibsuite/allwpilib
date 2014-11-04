@@ -17,8 +17,9 @@ test-reports
 # Added by the users of vagrant
 jdk-7u45-linux-arm-vfp-sflt.gz
 
-
-
+# IntelliJ
+*.iml
+.idea/
 
 # Created by http://www.gitignore.io
 
