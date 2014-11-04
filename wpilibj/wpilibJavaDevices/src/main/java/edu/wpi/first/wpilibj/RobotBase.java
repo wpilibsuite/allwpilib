@@ -182,9 +182,11 @@ public abstract class RobotBase {
 		RobotBase robot;
 		try {
 			robot = (RobotBase) Class.forName(robotName).newInstance();
-		} catch (InstantiationException|IllegalAccessException|ClassNotFoundException e) {
+		} catch (Throwable t) {
+			DriverStation.reportError("ERROR Unhandled exception instantiating robot " + robotName + " " + t.toString() + " at " + Arrays.toString(t.getStackTrace()), false);
 			System.err.println("WARNING: Robots don't quit!");
 			System.err.println("ERROR: Could not instantiate robot "+robotName+"!");
+			System.exit(1);
 			return;
 		}
 
@@ -202,5 +204,6 @@ public abstract class RobotBase {
 				System.err.println("---> Unexpected return from startCompetition() method.");
 			}
 		}
+		System.exit(1);
 	}
 }
