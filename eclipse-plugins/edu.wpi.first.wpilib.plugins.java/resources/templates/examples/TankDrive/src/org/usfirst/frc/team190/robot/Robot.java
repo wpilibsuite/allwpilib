@@ -37,7 +37,7 @@ public class Robot extends SampleRobot {
      */
     public void operatorControl() {
         myRobot.setSafetyEnabled(true);
-        while (isOperatorControl()) {
+        while (isOperatorControl() && isEnabled()) {
         	myRobot.tankDrive(leftStick, rightStick);
             Timer.delay(0.005);		// wait for a motor update time
         }

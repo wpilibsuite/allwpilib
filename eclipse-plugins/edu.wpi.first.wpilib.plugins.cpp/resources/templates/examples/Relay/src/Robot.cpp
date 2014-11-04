@@ -39,7 +39,7 @@ public:
 	 */
 	void OperatorControl()
 	{
-		while (IsOperatorControl())
+		while (IsOperatorControl() && IsEnabled())
 		{
 			// Retrieve the button values. GetRawButton will return
 			//   true if the button is pressed and false if not.

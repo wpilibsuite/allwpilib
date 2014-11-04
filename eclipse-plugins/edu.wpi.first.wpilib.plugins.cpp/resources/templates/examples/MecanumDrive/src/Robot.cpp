@@ -34,7 +34,7 @@ public:
 	void OperatorControl()
 	{
 		robotDrive.SetSafetyEnabled(false);
-		while (IsOperatorControl())
+		while (IsOperatorControl() && IsEnabled())
 		{
         	// Use the joystick X axis for lateral movement, Y axis for forward movement, and Z axis for rotation.
         	// This sample does not use field-oriented drive, so the gyro input is set to zero.

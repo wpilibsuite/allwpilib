@@ -27,7 +27,7 @@ public:
 	 */
 	void OperatorControl()
 	{
-		while (IsOperatorControl())
+		while (IsOperatorControl() && IsEnabled())
 		{
 			// Get the current going through channel 7, in Amperes.
 			// The PDP returns the current in increments of 0.125A.
