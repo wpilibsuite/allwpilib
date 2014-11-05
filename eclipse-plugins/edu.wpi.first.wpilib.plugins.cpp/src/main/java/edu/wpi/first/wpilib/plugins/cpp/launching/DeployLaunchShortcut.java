@@ -154,7 +154,7 @@ public class DeployLaunchShortcut implements ILaunchShortcut
 			 "Debug/FRCUserProgram");
 		
 		config.setAttribute("org.eclipse.cdt.dsf.gdb.DEBUG_NAME", "arm-frc-linux-gnueabi-gdb");
-		config.setAttribute(IRemoteConnectionConfigurationConstants.ATTR_REMOTE_PATH, "/home/admin/FRCUserProgram");
+		config.setAttribute(IRemoteConnectionConfigurationConstants.ATTR_REMOTE_PATH, "/home/lvuser/FRCUserProgram");
 		config.setAttribute(IRemoteConnectionConfigurationConstants.ATTR_REMOTE_CONNECTION, remote_connection);
 		config.setAttribute(IRemoteConnectionConfigurationConstants.ATTR_SKIP_DOWNLOAD_TO_TARGET, false);
 		config.setAttribute(IRemoteConnectionConfigurationConstants.ATTR_GDBSERVER_PORT, "2345");
