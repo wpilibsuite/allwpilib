@@ -32,7 +32,7 @@ public class Talon extends SafePWM implements SpeedController {
      */
     private void initTalon() {
         setBounds(2.037, 1.539, 1.513, 1.487, .989);
-        setPeriodMultiplier(PeriodMultiplier.k2X);
+        setPeriodMultiplier(PeriodMultiplier.k1X);
         setRaw(m_centerPwm);
 		setZeroLatch();
 
