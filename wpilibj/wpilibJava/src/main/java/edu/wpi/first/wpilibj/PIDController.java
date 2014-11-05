@@ -6,6 +6,8 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
+import java.util.TimerTask;
+
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
@@ -22,25 +24,26 @@ public class PIDController implements LiveWindowSendable, Controller {
 
     public static final double kDefaultPeriod = .05;
     private static int instances = 0;
-    private double m_P;			// factor for "proportional" control
-    private double m_I;			// factor for "integral" control
-    private double m_D;			// factor for "derivative" control
+    private double m_P;     // factor for "proportional" control
+    private double m_I;     // factor for "integral" control
+    private double m_D;     // factor for "derivative" control
     private double m_F;                 // factor for feedforward term
-    private double m_maximumOutput = 1.0;	// |maximum output|
-    private double m_minimumOutput = -1.0;	// |minimum output|
-    private double m_maximumInput = 0.0;		// maximum input - limit setpoint to this
-    private double m_minimumInput = 0.0;		// minimum input - limit setpoint to this
-    private boolean m_continuous = false;	// do the endpoints wrap around? eg. Absolute encoder
-    private boolean m_enabled = false; 			//is the pid controller enabled
-    private double m_prevError = 0.0;	// the prior sensor input (used to compute velocity)
+    private double m_maximumOutput = 1.0; // |maximum output|
+    private double m_minimumOutput = -1.0;  // |minimum output|
+    private double m_maximumInput = 0.0;    // maximum input - limit setpoint to this
+    private double m_minimumInput = 0.0;    // minimum input - limit setpoint to this
+    private boolean m_continuous = false; // do the endpoints wrap around? eg. Absolute encoder
+    private boolean m_enabled = false;    //is the pid controller enabled
+    private double m_prevError = 0.0; // the prior sensor input (used to compute velocity)
     private double m_totalError = 0.0; //the sum of the errors for use in the integral calc
-    private Tolerance m_tolerance;	//the tolerance object used to check if on target
+    private Tolerance m_tolerance;  //the tolerance object used to check if on target
     private double m_setpoint = 0.0;
     private double m_error = 0.0;
     private double m_result = 0.0;
     private double m_period = kDefaultPeriod;
     PIDSource m_pidInput;
     PIDOutput m_pidOutput;
+    java.util.Timer m_controlLoop;
     private boolean m_freed = false;
     private boolean m_usingPercentTolerance;
 
@@ -61,7 +64,7 @@ public class PIDController implements LiveWindowSendable, Controller {
         }
 
         @Override
-		public boolean onTarget() {
+    public boolean onTarget() {
             return (Math.abs(getError()) < percentage / 100
                     * (m_maximumInput - m_minimumInput));
         }
@@ -75,7 +78,7 @@ public class PIDController implements LiveWindowSendable, Controller {
         }
 
         @Override
-		public boolean onTarget() {
+    public boolean onTarget() {
             return Math.abs(getError()) < value;
         }
     }
@@ -83,13 +86,14 @@ public class PIDController implements LiveWindowSendable, Controller {
     public class NullTolerance implements Tolerance {
 
         @Override
-		public boolean onTarget() {
+    public boolean onTarget() {
             throw new RuntimeException("No tolerance value set when using PIDController.onTarget()");
         }
     }
 
-    private class PIDTask implements Runnable {
-        private final PIDController m_controller;
+    private class PIDTask extends TimerTask {
+
+        private PIDController m_controller;
 
         public PIDTask(PIDController controller) {
             if (controller == null) {
@@ -99,11 +103,8 @@ public class PIDController implements LiveWindowSendable, Controller {
         }
 
         @Override
-		public void run() {
-        	while (!m_controller.m_freed) {
-        		m_controller.calculate();
-        		Timer.delay(m_controller.m_period);
-        	}
+    public void run() {
+            m_controller.calculate();
         }
     }
 
@@ -129,6 +130,9 @@ public class PIDController implements LiveWindowSendable, Controller {
             throw new NullPointerException("Null PIDOutput was given");
         }
 
+        m_controlLoop = new java.util.Timer();
+
+
         m_P = Kp;
         m_I = Ki;
         m_D = Kd;
@@ -138,7 +142,7 @@ public class PIDController implements LiveWindowSendable, Controller {
         m_pidOutput = output;
         m_period = period;
 
-        new Thread(new PIDTask(this)).start();
+        m_controlLoop.schedule(new PIDTask(this), 0L, (long) (m_period * 1000));
 
         instances++;
         HLUsageReporting.reportPIDController(instances);
@@ -192,10 +196,14 @@ public class PIDController implements LiveWindowSendable, Controller {
      * Free the PID object
      */
     public void free() {
-    	m_freed = true;
-    	if(this.table!=null) table.removeTableListener(listener);
+      m_controlLoop.cancel();
+      synchronized (this) {
+        m_freed = true;
+        m_pidOutput = null;
         m_pidInput = null;
-    	m_pidOutput = null;
+        m_controlLoop = null;
+      }
+      if(this.table!=null) table.removeTableListener(listener);
     }
 
     /**
@@ -219,11 +227,11 @@ public class PIDController implements LiveWindowSendable, Controller {
         }
 
         if (enabled) {
-        	double input;
+          double input;
             double result;
             PIDOutput pidOutput = null;
             synchronized (this){
-            	input = pidInput.pidGet();
+              input = pidInput.pidGet();
             }
             synchronized (this) {
                 m_error = m_setpoint - input;
@@ -313,7 +321,7 @@ public class PIDController implements LiveWindowSendable, Controller {
      * Get the Proportional coefficient
      * @return proportional coefficient
      */
-    public double getP() {
+    public synchronized double getP() {
         return m_P;
     }
 
@@ -321,7 +329,7 @@ public class PIDController implements LiveWindowSendable, Controller {
      * Get the Integral coefficient
      * @return integral coefficient
      */
-    public double getI() {
+    public synchronized double getI() {
         return m_I;
     }
 
@@ -445,8 +453,19 @@ public class PIDController implements LiveWindowSendable, Controller {
      * @deprecated Use {@link #setPercentTolerance(double)} or {@link #setAbsoluteTolerance(double)} instead.
      */
     @Deprecated
-	public synchronized void setTolerance(double percent) {
+  public synchronized void setTolerance(double percent) {
         m_tolerance = new PercentageTolerance(percent);
+    }
+
+    /** Set the PID tolerance using a Tolerance object.
+     * Tolerance can be specified as a percentage of the range or as an absolute
+     * value. The Tolerance object encapsulates those options in an object. Use it by
+     * creating the type of tolerance that you want to use: setTolerance(new PIDController.AbsoluteTolerance(0.1))
+     * @param tolerance a tolerance object of the right type, e.g. PercentTolerance
+     * or AbsoluteTolerance
+     */
+    private synchronized void setTolerance(Tolerance tolerance) {
+        m_tolerance = tolerance;
     }
 
     /**
@@ -481,7 +500,7 @@ public class PIDController implements LiveWindowSendable, Controller {
      * Begin running the PIDController
      */
     @Override
-	public synchronized void enable() {
+  public synchronized void enable() {
         m_enabled = true;
 
         if (table != null) {
@@ -493,7 +512,7 @@ public class PIDController implements LiveWindowSendable, Controller {
      * Stop running the PIDController, this sets the output to zero before stopping.
      */
     @Override
-	public synchronized void disable() {
+    public synchronized void disable() {
         m_pidOutput.pidWrite(0);
         m_enabled = false;
 
@@ -520,22 +539,22 @@ public class PIDController implements LiveWindowSendable, Controller {
     }
 
     @Override
-	public String getSmartDashboardType() {
+  public String getSmartDashboardType() {
         return "PIDController";
     }
 
     private final ITableListener listener = new ITableListener() {
         @Override
-		public void valueChanged(ITable table, String key, Object value, boolean isNew) {
+    public void valueChanged(ITable table, String key, Object value, boolean isNew) {
             if (key.equals("p") || key.equals("i") || key.equals("d") || key.equals("f")) {
-                if (m_P != table.getNumber("p", 0.0) || m_I != table.getNumber("i", 0.0) ||
-                        m_D != table.getNumber("d", 0.0) || m_F != table.getNumber("f", 0.0))
+                if (getP() != table.getNumber("p", 0.0) || getI() != table.getNumber("i", 0.0) ||
+                        getD() != table.getNumber("d", 0.0) || getF() != table.getNumber("f", 0.0))
                     setPID(table.getNumber("p", 0.0), table.getNumber("i", 0.0), table.getNumber("d", 0.0), table.getNumber("f", 0.0));
             } else if (key.equals("setpoint")) {
-                if (m_setpoint != ((Double) value).doubleValue())
+                if (getSetpoint() != ((Double) value).doubleValue())
                     setSetpoint(((Double) value).doubleValue());
             } else if (key.equals("enabled")) {
-                if (m_enabled != ((Boolean) value).booleanValue()) {
+                if (isEnable() != ((Boolean) value).booleanValue()) {
                     if (((Boolean) value).booleanValue()) {
                         enable();
                     } else {
@@ -547,7 +566,7 @@ public class PIDController implements LiveWindowSendable, Controller {
     };
     private ITable table;
     @Override
-	public void initTable(ITable table) {
+  public void initTable(ITable table) {
         if(this.table!=null)
             this.table.removeTableListener(listener);
         this.table = table;
@@ -566,7 +585,7 @@ public class PIDController implements LiveWindowSendable, Controller {
      * {@inheritDoc}
      */
     @Override
-	public ITable getTable() {
+  public ITable getTable() {
         return table;
     }
 
@@ -574,14 +593,14 @@ public class PIDController implements LiveWindowSendable, Controller {
      * {@inheritDoc}
      */
     @Override
-	public void updateTable() {
+  public void updateTable() {
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-	public void startLiveWindowMode() {
+  public void startLiveWindowMode() {
         disable();
     }
 
@@ -589,6 +608,6 @@ public class PIDController implements LiveWindowSendable, Controller {
      * {@inheritDoc}
      */
     @Override
-	public void stopLiveWindowMode() {
+  public void stopLiveWindowMode() {
     }
 }
