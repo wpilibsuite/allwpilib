@@ -194,7 +194,10 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
 
 	if (axis >= m_joystickAxes[stick].count)
 	{
-		wpi_setWPIError(BadJoystickAxis);
+		if (axis >= kMaxJoystickAxes)
+			wpi_setWPIError(BadJoystickAxis);
+		else
+			ReportError("WARNING: Joystick Axis missing, check if all controllers are plugged in\n");
 		return 0.0f;
 	}
 
@@ -224,7 +227,10 @@ int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
 
 	if (pov >= m_joystickPOVs[stick].count)
 	{
-		wpi_setWPIError(BadJoystickAxis);
+		if (pov >= kMaxJoystickPOVs)
+			wpi_setWPIError(BadJoystickAxis);
+		else
+			ReportError("WARNING: Joystick POV missing, check if all controllers are plugged in\n");
 		return 0;
 	}
 

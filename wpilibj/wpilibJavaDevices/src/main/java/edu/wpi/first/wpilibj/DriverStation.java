@@ -223,11 +223,16 @@ public class DriverStation implements RobotState.Interface {
      */
     public double getStickAxis(int stick, int axis) {
         if(stick < 0 || stick >= kJoystickPorts) {
-            throw new RuntimeException("Joystick index is out of range, should be 0-3");
+            throw new RuntimeException("Joystick index is out of range, should be 0-5");
         }
 
-        if (axis < 0 || axis >= m_joystickAxes[stick].length) {
+        if (axis < 0 || axis >= FRCNetworkCommunicationsLibrary.kMaxJoystickAxes) {
             throw new RuntimeException("Joystick axis is out of range");
+        }
+
+        if (axis >= m_joystickAxes[stick].length) {
+			reportError("WARNING: Joystick axis " + axis + " on port " + stick + " not available, check if controller is plugged in\n", false);
+            return 0.0;
         }
 
         byte value = (byte)m_joystickAxes[stick][axis];
@@ -246,11 +251,16 @@ public class DriverStation implements RobotState.Interface {
      */
     public int getStickPOV(int stick, int pov) {
         if(stick < 0 || stick >= kJoystickPorts) {
-            throw new RuntimeException("Joystick index is out of range, should be 0-3");
+            throw new RuntimeException("Joystick index is out of range, should be 0-5");
         }
 
-        if (pov < 0 || pov >= m_joystickPOVs[stick].length) {
+        if (pov < 0 || pov >= FRCNetworkCommunicationsLibrary.kMaxJoystickPOVs) {
             throw new RuntimeException("Joystick POV is out of range");
+        }
+
+        if (pov >= m_joystickPOVs[stick].length) {
+			reportError("WARNING: Joystick POV " + pov + " on port " + stick + " not available, check if controller is plugged in\n", false);
+            return 0;
         }
 
         return m_joystickPOVs[stick][pov];
