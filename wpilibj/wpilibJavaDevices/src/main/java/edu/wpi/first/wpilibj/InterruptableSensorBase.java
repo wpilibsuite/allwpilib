@@ -73,13 +73,13 @@ public abstract class InterruptableSensorBase extends SensorBase {
 	abstract byte getModuleForRouting();
 
 	/**
-	 * Request interrupts asynchronously on this digital input.
+	 * Request one of the 8 interrupts asynchronously on this digital input.
 	 *
 	 * @param handler
 	 *            The {@link InterruptHandlerFunction} that contains the method
 	 *            {@link InterruptHandlerFunction#interruptFired(int, Object)} that
 	 *            will be called whenever there is an interrupt on this device.
-	 *            Request interrupts in synchronus mode where the user program
+	 *            Request interrupts in synchronous mode where the user program
 	 *            interrupt handler will be called when an interrupt occurs. The
 	 *            default is interrupt on rising edges only.
 	 */
@@ -105,10 +105,10 @@ public abstract class InterruptableSensorBase extends SensorBase {
 	}
 
 	/**
-	 * Request interrupts synchronously on this digital input. Request
+	 * Request one of the 8 interrupts synchronously on this digital input. Request
 	 * interrupts in synchronous mode where the user program will have to
-	 * explicitly wait for the interrupt to occur. The default is interrupt on
-	 * rising edges only.
+	 * explicitly wait for the interrupt to occur using {@link waitForInterrupt}. 
+	 * The default is interrupt on rising edges only.
 	 */
 	public void requestInterrupts() {
 		if(m_interrupt != null){
