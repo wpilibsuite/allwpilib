@@ -36,11 +36,6 @@ public abstract class RobotBase {
 	 */
 	public static final int ROBOT_TASK_PRIORITY = 101;
 
-	/**
-	 * Boolean System property. If true (default), send System.err messages to the driver station.
-	 */
-	public final static String ERRORS_TO_DRIVERSTATION_PROP = "first.driverstation.senderrors";
-
 	protected final DriverStation m_ds;
 
 	/**
@@ -56,9 +51,6 @@ public abstract class RobotBase {
 		// TODO: See if the next line is necessary
 		// Resource.RestartProgram();
 
-//		if (getBooleanProperty(ERRORS_TO_DRIVERSTATION_PROP, true)) {
-//			Utility.sendErrorStreamToDriverStation(true);
-//		}
 		NetworkTable.setServerMode();//must be before b
 		m_ds = DriverStation.getInstance();
 		NetworkTable.getTable("");  // forces network tables to initialize
