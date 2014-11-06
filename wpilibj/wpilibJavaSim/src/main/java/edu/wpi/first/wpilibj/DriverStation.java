@@ -28,7 +28,7 @@ public class DriverStation implements RobotState.Interface {
     /**
      * Number of Joystick Ports
      */
-    public static final int kJoystickPorts = 4;
+    public static final int kJoystickPorts = 6;
     /**
      * Number of Joystick Axes
      */
@@ -72,7 +72,7 @@ public class DriverStation implements RobotState.Interface {
     private boolean m_userInTest = false;
     private boolean m_newControlData;
     private GzDriverStation.DriverStation state;
-    private Joystick joysticks[] = new Joystick[4];
+    private Joystick joysticks[] = new Joystick[6];
 
     /**
      * Gets an instance of the DriverStation
@@ -104,7 +104,7 @@ public class DriverStation implements RobotState.Interface {
 			}
         );
 
-        for (int i = 1; i <= 4; i++) {
+        for (int i = 0; i < 6; i++) {
         	final int j = i;
         	MainNode.subscribe("ds/joysticks/"+i, Joystick.getDefaultInstance(),
         		new SubscriberCallback<Joystick>() {
@@ -161,10 +161,10 @@ public class DriverStation implements RobotState.Interface {
         if (stick < 0 || stick >= joysticks.length || joysticks[stick] == null) {
             return 0.0;
     	}
-        if (axis < 1 || axis > kJoystickAxes || axis > joysticks[stick].getAxesCount()) {
+        if (axis < 0 || axis >= kJoystickAxes || axis >= joysticks[stick].getAxesCount()) {
             return 0.0;
         }
-    	return joysticks[stick].getAxes(axis - 1);
+    	return joysticks[stick].getAxes(axis);
     }
 
     /**

@@ -105,7 +105,7 @@ public class DS {
 	public void scanForJoysticks() {
 		joysticks.removeAll();
 		List<ISimJoystick> sticks = joystickProvider.scanForJoysticks();
-		while (sticks.size() < 4) {
+		while (sticks.size() < 6) {
 			sticks.add(new FakeJoystick());
 		}
 		joysticks.setListData(sticks);
