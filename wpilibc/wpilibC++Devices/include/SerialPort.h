@@ -27,16 +27,15 @@ public:
 	enum StopBits {kStopBits_One=10, kStopBits_OnePointFive=15, kStopBits_Two=20};
 	enum FlowControl {kFlowControl_None=0, kFlowControl_XonXoff=1, kFlowControl_RtsCts=2, kFlowControl_DtrDsr=4};
 	enum WriteBufferMode {kFlushOnAccess=1, kFlushWhenFull=2};
+	enum Port {kOnboard=0, kMXP=1};
 
-	SerialPort(uint32_t baudRate, uint8_t dataBits = 8, Parity parity = kParity_None,
+	SerialPort(uint32_t baudRate, Port port = kOnboard, uint8_t dataBits = 8, Parity parity = kParity_None,
 			StopBits stopBits = kStopBits_One);
 	~SerialPort();
 	void SetFlowControl(FlowControl flowControl);
 	void EnableTermination(char terminator = '\n');
 	void DisableTermination();
 	int32_t GetBytesReceived();
-	void Printf(const char *writeFmt, ...);
-	void Scanf(const char *readFmt, ...);
 	uint32_t Read(char *buffer, int32_t count);
 	uint32_t Write(const char *buffer, int32_t count);
 	void SetTimeout(float timeout);
@@ -50,6 +49,7 @@ private:
 	uint32_t m_resourceManagerHandle;
 	uint32_t m_portHandle;
 	bool m_consoleModeEnabled;
+	uint8_t m_port;
 
 	DISALLOW_COPY_AND_ASSIGN(SerialPort);
 };

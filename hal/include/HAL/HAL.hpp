@@ -23,6 +23,7 @@
 #include "Errors.hpp"
 #include "PDP.hpp"
 #include "Power.hpp"
+#include "SerialPort.hpp"
 
 #include "Utilities.hpp"
 #include "Semaphore.hpp"

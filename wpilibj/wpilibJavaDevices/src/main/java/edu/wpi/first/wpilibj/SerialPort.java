@@ -8,8 +8,15 @@ package edu.wpi.first.wpilibj;
 
 import java.io.UnsupportedEncodingException;
 
-import edu.wpi.first.wpilibj.visa.Visa;
-import edu.wpi.first.wpilibj.visa.VisaException;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
+import java.nio.ByteBuffer;
+
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.HALLibrary;
+import edu.wpi.first.wpilibj.hal.HALUtil;
+import edu.wpi.first.wpilibj.hal.SerialPortJNI;
 
 /**
  * Driver for the RS-232 serial port on the RoboRIO.
@@ -25,8 +32,22 @@ import edu.wpi.first.wpilibj.visa.VisaException;
  */
 public class SerialPort {
 
-    private int m_resourceManagerHandle;
-    private int m_portHandle;
+    private byte m_port;
+	
+	public enum Port {
+		kOnboard(0), 
+		kMXP(1);
+		
+		private int value;
+		
+		private Port(int value){
+			this.value = value;
+		}
+		
+		public int getValue(){
+			return this.value;
+		}
+	};
 
     /**
      * Represents the parity to use for serial communications
@@ -166,22 +187,22 @@ public class SerialPort {
      * @param parity Select the type of parity checking to use.
      * @param stopBits The number of stop bits to use as defined by the enum StopBits.
      */
-    public SerialPort(final int baudRate, final int dataBits, Parity parity, StopBits stopBits) throws VisaException {
-        m_resourceManagerHandle = 0;
-        m_portHandle = 0;
-
-        m_resourceManagerHandle = Visa.viOpenDefaultRM();
-
-        m_portHandle = Visa.viOpen(m_resourceManagerHandle, "ASRL1::INSTR", 0, 0);
-
-        Visa.viSetAttribute(m_portHandle, Visa.VI_ATTR_ASRL_BAUD, baudRate);
-
-        Visa.viSetAttribute(m_portHandle, Visa.VI_ATTR_ASRL_DATA_BITS, dataBits);
-
-        Visa.viSetAttribute(m_portHandle, Visa.VI_ATTR_ASRL_PARITY, parity.value);
-
-        Visa.viSetAttribute(m_portHandle, Visa.VI_ATTR_ASRL_STOP_BITS, stopBits.value);
-
+    public SerialPort(final int baudRate, Port port, final int dataBits, Parity parity, StopBits stopBits) {
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        m_port = (byte) port.getValue();
+		
+		SerialPortJNI.serialInitializePort(m_port, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		SerialPortJNI.serialSetBaudRate(m_port, baudRate, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		SerialPortJNI.serialSetDataBits(m_port, (byte) dataBits, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		SerialPortJNI.serialSetParity(m_port, (byte) parity.value, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		SerialPortJNI.serialSetStopBits(m_port, (byte) stopBits.value, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		
         // Set the default read buffer size to 1 to return bytes immediately
         setReadBufferSize(1);
 
@@ -193,11 +214,7 @@ public class SerialPort {
 
         disableTermination();
 
-        //viInstallHandler(m_portHandle, VI_EVENT_IO_COMPLETION, ioCompleteHandler, this);
-        //viEnableEvent(m_portHandle, VI_EVENT_IO_COMPLETION, VI_HNDLR, VI_NULL);
-
-		// XXX: Resource Reporting Fixes
-//        UsageReporting.report(UsageReporting.kResourceType_SerialPort,0);
+        UsageReporting.report(tResourceType.kResourceType_SerialPort,0);
     }
 
     /**
@@ -207,8 +224,8 @@ public class SerialPort {
      * @param dataBits The number of data bits per transfer.  Valid values are between 5 and 8 bits.
      * @param parity Select the type of parity checking to use.
      */
-    public SerialPort(final int baudRate, final int dataBits, Parity parity) throws VisaException {
-        this(baudRate, dataBits, parity, StopBits.kOne);
+    public SerialPort(final int baudRate, Port port, final int dataBits, Parity parity) {
+        this(baudRate, port, dataBits, parity, StopBits.kOne);
     }
 
     /**
@@ -218,8 +235,8 @@ public class SerialPort {
      * @param baudRate The baud rate to configure the serial port.
      * @param dataBits The number of data bits per transfer.  Valid values are between 5 and 8 bits.
      */
-    public SerialPort(final int baudRate, final int dataBits) throws VisaException {
-        this(baudRate, dataBits, Parity.kNone, StopBits.kOne);
+    public SerialPort(final int baudRate, Port port, final int dataBits) {
+        this(baudRate, port, dataBits, Parity.kNone, StopBits.kOne);
     }
 
     /**
@@ -228,17 +245,18 @@ public class SerialPort {
      *
      * @param baudRate The baud rate to configure the serial port.
      */
-    public SerialPort(final int baudRate) throws VisaException {
-        this(baudRate, 8, Parity.kNone, StopBits.kOne);
+    public SerialPort(final int baudRate, Port port) {
+        this(baudRate, port, 8, Parity.kNone, StopBits.kOne);
     }
 
     /**
      * Destructor.
      */
     public void free() {
-        //viUninstallHandler(m_portHandle, VI_EVENT_IO_COMPLETION, ioCompleteHandler, this);
-        Visa.viClose(m_portHandle);
-        Visa.viClose(m_resourceManagerHandle);
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        SerialPortJNI.serialClose(m_port, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
     }
 
     /**
@@ -247,8 +265,11 @@ public class SerialPort {
      * By default, flow control is disabled.
      * @param flowControl
      */
-    public void setFlowControl(FlowControl flowControl) throws VisaException {
-        Visa.viSetAttribute(m_portHandle, Visa.VI_ATTR_ASRL_FLOW_CNTRL, flowControl.value);
+    public void setFlowControl(FlowControl flowControl) {
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+        SerialPortJNI.serialSetFlowControl(m_port, (byte) flowControl.value, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());		
     }
 
     /**
@@ -260,14 +281,15 @@ public class SerialPort {
      *
      * @param terminator The character to use for termination.
      */
-    public void enableTermination(char terminator) throws VisaException {
-        Visa.viSetAttribute(m_portHandle, Visa.VI_ATTR_TERMCHAR_EN, true);
-        Visa.viSetAttribute(m_portHandle, Visa.VI_ATTR_TERMCHAR, terminator);
-        Visa.viSetAttribute(m_portHandle, Visa.VI_ATTR_ASRL_END_IN, Visa.VI_ASRL_END_TERMCHAR);
+    public void enableTermination(char terminator) {
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		SerialPortJNI.serialEnableTermination(m_port, terminator, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());	
     }
 
     /**
-     * Enable termination and specify the termination character.
+     * Enable termination with the default terminator '\n'
      *
      * Termination is currently only implemented for receive.
      * When the the terminator is received, the read() or readString() will return
@@ -275,16 +297,18 @@ public class SerialPort {
      *
      * The default terminator is '\n'
      */
-    public void enableTermination() throws VisaException {
+    public void enableTermination() {
         this.enableTermination('\n');
     }
 
     /**
      * Disable termination behavior.
      */
-    public void disableTermination() throws VisaException {
-        Visa.viSetAttribute(m_portHandle, Visa.VI_ATTR_TERMCHAR_EN, false);
-        Visa.viSetAttribute(m_portHandle, Visa.VI_ATTR_ASRL_END_IN, Visa.VI_ASRL_END_NONE);
+    public void disableTermination() {
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		SerialPortJNI.serialDisableTermination(m_port, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
     }
 
     /**
@@ -292,20 +316,13 @@ public class SerialPort {
      *
      * @return The number of bytes available to read.
      */
-    public int getBytesReceived() throws VisaException {
-        return Visa.viGetAttribute(m_portHandle, Visa.VI_ATTR_ASRL_AVAIL_NUM);
-    }
-
-    /**
-     * Output formatted text to the serial port.
-     *
-     * @deprecated use write(string.getBytes()) instead
-     * @bug All pointer-based parameters seem to return an error.
-     *
-     * @param write A string to write
-     */
-    public void print(String write) throws VisaException {
-        Visa.viVPrintf(m_portHandle, write);
+    public int getBytesReceived() {
+		int retVal = 0;
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		retVal = SerialPortJNI.serialGetBytesRecieved(m_port, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		return retVal;
     }
 
     /**
@@ -313,7 +330,7 @@ public class SerialPort {
      *
      * @return The read string
      */
-    public String readString() throws VisaException {
+    public String readString() {
         return readString(getBytesReceived());
     }
 
@@ -323,8 +340,8 @@ public class SerialPort {
      * @param count the number of characters to read into the string
      * @return The read string
      */
-    public String readString(int count) throws VisaException {
-        byte[] out = Visa.viBufRead(m_portHandle, count);
+    public String readString(int count) {
+        byte[] out = read(count);
         try {
             return new String(out, 0, count, "US-ASCII");
         } catch (UnsupportedEncodingException ex) {
@@ -339,20 +356,43 @@ public class SerialPort {
      * @param count The maximum number of bytes to read.
      * @return An array of the read bytes
      */
-    public byte[] read(final int count) throws VisaException {
-        return Visa.viBufRead(m_portHandle, count);
+    public byte[] read(final int count) {
+	    ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(count);
+        SerialPortJNI.serialRead(m_port, dataReceivedBuffer, count, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		byte[] retVal = new byte[count];
+		dataReceivedBuffer.get(retVal);
+		return retVal;
     }
 
     /**
-     * Write raw bytes to the buffer.
+     * Write raw bytes to the serial port.
      *
-     * @param buffer the buffer to read the bytes from.
+     * @param buffer The buffer of bytes to write.
      * @param count The maximum number of bytes to write.
      * @return The number of bytes actually written into the port.
      */
-    public int write(byte[] buffer, int count) throws VisaException {
-        return Visa.viBufWrite(m_portHandle, buffer, count);
+    public int write(byte[] buffer, int count) {
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(count);
+		dataToSendBuffer.put(buffer);
+        int retVal = SerialPortJNI.serialWrite(m_port, dataToSendBuffer, count, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		return retVal;
     }
+	
+	/**
+     * Write a string to the serial port
+     *
+     * @param data The string to write to the serial port.
+     * @return The number of bytes actually written into the port.
+     */
+	public int writeString(String data) {
+		return write(data.getBytes(), data.length());
+	}
 
     /**
      * Configure the timeout of the serial port.
@@ -363,8 +403,11 @@ public class SerialPort {
      *
      * @param timeout The number of seconds to to wait for I/O.
      */
-    public void setTimeout(double timeout) throws VisaException {
-        Visa.viSetAttribute(m_portHandle, Visa.VI_ATTR_TMO_VALUE, (int) (timeout * 1e3));
+    public void setTimeout(double timeout) {
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		SerialPortJNI.serialSetTimeout(m_port, (float)timeout, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());		
     }
 
     /**
@@ -379,8 +422,11 @@ public class SerialPort {
      *
      * @param size The read buffer size.
      */
-    void setReadBufferSize(int size) throws VisaException {
-        Visa.viSetBuf(m_portHandle, Visa.VI_READ_BUF, size);
+    public void setReadBufferSize(int size) {
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		SerialPortJNI.serialSetReadBufferSize(m_port, size, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());		
     }
 
     /**
@@ -391,8 +437,11 @@ public class SerialPort {
     *
     * @param size The write buffer size.
     */
-    void setWriteBufferSize(int size) throws VisaException {
-        Visa.viSetBuf(m_portHandle, Visa.VI_WRITE_BUF, size);
+    public void setWriteBufferSize(int size) {
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		SerialPortJNI.serialSetWriteBufferSize(m_port, size, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());		
     }
 
     /**
@@ -406,8 +455,11 @@ public class SerialPort {
      *
      * @param mode The write buffer mode.
      */
-    public void setWriteBufferMode(WriteBufferMode mode) throws VisaException {
-        Visa.viSetAttribute(m_portHandle, Visa.VI_ATTR_WR_BUF_OPER_MODE, mode.value);
+    public void setWriteBufferMode(WriteBufferMode mode) {
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		SerialPortJNI.serialSetWriteMode(m_port, (byte)mode.value, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());		
     }
 
     /**
@@ -416,8 +468,11 @@ public class SerialPort {
      * This is used when setWriteBufferMode() is set to kFlushWhenFull to force a
      * flush before the buffer is full.
      */
-    public void flush() throws VisaException {
-        Visa.viFlush(m_portHandle, Visa.VI_WRITE_BUF);
+    public void flush() {
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		SerialPortJNI.serialFlush(m_port, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());		
     }
 
     /**
@@ -425,7 +480,10 @@ public class SerialPort {
      *
      * Empty the transmit and receive buffers in the device and formatted I/O.
      */
-    public void reset() throws VisaException {
-        Visa.viClear(m_portHandle);
+    public void reset() {
+        ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		SerialPortJNI.serialClear(m_port, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());		
     }
 }

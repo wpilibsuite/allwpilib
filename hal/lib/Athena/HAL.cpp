@@ -3,6 +3,7 @@
 #include "Port.h"
 #include "HAL/Errors.hpp"
 #include "ctre/ctre.h"
+#include "visa/visa.h"
 #include "ChipObject.h"
 #include "NetworkCommunication/FRCComm.h"
 #include "NetworkCommunication/UsageReporting.h"
@@ -101,7 +102,31 @@ const char* getHALErrorMessage(int32_t code)
 		case ERR_CANSessionMux_NotAllowed:
 			return ERR_CANSessionMux_NotAllowed_MESSAGE;
 		case ERR_CANSessionMux_NotInitialized:
-			return ERR_CANSessionMux_NotInitialized_MESSAGE; 	
+			return ERR_CANSessionMux_NotInitialized_MESSAGE;
+		case VI_ERROR_SYSTEM_ERROR:
+			return VI_ERROR_SYSTEM_ERROR_MESSAGE;
+		case VI_ERROR_INV_OBJECT:
+			return VI_ERROR_INV_OBJECT_MESSAGE;
+		case VI_ERROR_RSRC_LOCKED:
+			return VI_ERROR_RSRC_LOCKED_MESSAGE;
+		case VI_ERROR_RSRC_NFOUND:
+			return VI_ERROR_RSRC_NFOUND_MESSAGE;
+		case VI_ERROR_INV_RSRC_NAME:
+			return VI_ERROR_INV_RSRC_NAME_MESSAGE;
+		case VI_ERROR_QUEUE_OVERFLOW:
+			return VI_ERROR_QUEUE_OVERFLOW_MESSAGE;
+		case VI_ERROR_IO:
+			return VI_ERROR_IO_MESSAGE;
+		case VI_ERROR_ASRL_PARITY:
+			return VI_ERROR_ASRL_PARITY_MESSAGE;
+		case VI_ERROR_ASRL_FRAMING:
+			return VI_ERROR_ASRL_FRAMING_MESSAGE;
+		case VI_ERROR_ASRL_OVERRUN:
+			return VI_ERROR_ASRL_OVERRUN_MESSAGE;
+		case VI_ERROR_RSRC_BUSY:
+			return VI_ERROR_RSRC_BUSY_MESSAGE;
+		case VI_ERROR_INV_PARAMETER:
+			return VI_ERROR_INV_PARAMETER_MESSAGE;
 		default:
 			return "Unknown error status";
 	}
