@@ -66,6 +66,7 @@ clean:
 	-rm frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin_$(eclipse-toolchain-package-version)_all.deb
 	-rm frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_amd64.deb
 	-rm frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_i386.deb
+	-rm -r frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib
 	-rm frcsim/frcsim_$(frcsim-package-version)_all.deb
 
 install:

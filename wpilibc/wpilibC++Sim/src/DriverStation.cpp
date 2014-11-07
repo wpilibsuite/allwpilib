@@ -53,17 +53,23 @@ DriverStation::DriverStation()
 		                   &DriverStation::stateCallback, this);
 	// TODO: for loop + boost bind
 	joysticks[0] = msgs::JoystickPtr(new msgs::Joystick());
-	joysticksSub[0] =  MainNode::Subscribe("~/ds/joysticks/1",
-		                           &DriverStation::joystickCallback1, this);
+	joysticksSub[0] =  MainNode::Subscribe("~/ds/joysticks/0",
+		                           &DriverStation::joystickCallback0, this);
 	joysticks[1] = msgs::JoystickPtr(new msgs::Joystick());
-	joysticksSub[1] =  MainNode::Subscribe("~/ds/joysticks/2",
-		                           &DriverStation::joystickCallback2, this);
+	joysticksSub[1] =  MainNode::Subscribe("~/ds/joysticks/1",
+		                           &DriverStation::joystickCallback1, this);
 	joysticks[2] = msgs::JoystickPtr(new msgs::Joystick());
-	joysticksSub[2] =  MainNode::Subscribe("~/ds/joysticks/3",
-	&DriverStation::joystickCallback3, this);
+	joysticksSub[2] =  MainNode::Subscribe("~/ds/joysticks/2",
+		                           &DriverStation::joystickCallback2, this);
 	joysticks[3] = msgs::JoystickPtr(new msgs::Joystick());
-	joysticksSub[3] =  MainNode::Subscribe("~/ds/joysticks/4",
+	joysticksSub[3] =  MainNode::Subscribe("~/ds/joysticks/5",
+	                                   &DriverStation::joystickCallback3, this);
+	joysticks[4] = msgs::JoystickPtr(new msgs::Joystick());
+	joysticksSub[4] =  MainNode::Subscribe("~/ds/joysticks/4",
 	                                   &DriverStation::joystickCallback4, this);
+	joysticks[5] = msgs::JoystickPtr(new msgs::Joystick());
+	joysticksSub[5] =  MainNode::Subscribe("~/ds/joysticks/5",
+	                                   &DriverStation::joystickCallback5, this);
 
 	AddToSingletonList();
 }
@@ -107,22 +113,22 @@ float DriverStation::GetBatteryVoltage()
  */
 float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
 {
-	if (axis < 1 || axis > kJoystickAxes)
+	if (axis < 0 || axis > (kJoystickAxes - 1))
 	{
 		wpi_setWPIError(BadJoystickAxis);
 		return 0.0;
 	}
-	if (stick < 1 || stick > 4)
+	if (stick < 0 || stick > 5)
 	{
 		wpi_setWPIError(BadJoystickIndex);
 		return 0.0;
 	}
 	CRITICAL_REGION(m_joystickSemaphore)
-	if (joysticks[stick-1] == NULL || axis >= joysticks[stick-1]->axes().size())
+	if (joysticks[stick] == NULL || axis >= joysticks[stick]->axes().size())
 	{
 		return 0.0;
 	}
-	return joysticks[stick-1]->axes(axis-1);
+	return joysticks[stick]->axes(axis);
 	END_REGION
 }
 
@@ -136,17 +142,17 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
  */
 bool DriverStation::GetStickButton(uint32_t stick, uint32_t button)
 {
-	if (stick < 1 || stick > 4)
+    if (stick < 0 || stick >= 6)
 	{
-		wpi_setWPIErrorWithContext(ParameterOutOfRange, "stick must be between 1 and 4");
+		wpi_setWPIErrorWithContext(ParameterOutOfRange, "stick must be between 0 and 5");
 		return false;
 	}
 	CRITICAL_REGION(m_joystickSemaphore)
-	if (joysticks[stick-1] == NULL || button >= joysticks[stick-1]->buttons().size())
+	if (joysticks[stick] == NULL || button >= joysticks[stick]->buttons().size())
 	{
 	        return false;
 	}
-	return joysticks[stick-1]->buttons(button-1);
+	return joysticks[stick]->buttons(button-1);
 	END_REGION
 }
 
@@ -159,17 +165,17 @@ bool DriverStation::GetStickButton(uint32_t stick, uint32_t button)
  */
 short DriverStation::GetStickButtons(uint32_t stick)
 {
-	if (stick < 1 || stick > 4)
+    if (stick < 0 || stick >= 6)
 	{
-		wpi_setWPIErrorWithContext(ParameterOutOfRange, "stick must be between 1 and 4");
+		wpi_setWPIErrorWithContext(ParameterOutOfRange, "stick must be between 0 and 5");
 		return false;
 	}
 	short btns = 0, btnid;
 	CRITICAL_REGION(m_joystickSemaphore)
-	msgs::JoystickPtr joy = joysticks[stick-1];
+	msgs::JoystickPtr joy = joysticks[stick];
 	for (btnid = 0; btnid < joy->buttons().size() && btnid < 12; btnid++)
 	{
-		if (joysticks[stick-1]->buttons(btnid))
+		if (joysticks[stick]->buttons(btnid))
 		{
 			btns |= (1 << btnid);
 		}
@@ -359,22 +365,32 @@ void DriverStation::joystickCallback(const msgs::ConstJoystickPtr &msg,
 	END_REGION;
 }
 
-void DriverStation::joystickCallback1(const msgs::ConstJoystickPtr &msg)
+void DriverStation::joystickCallback0(const msgs::ConstJoystickPtr &msg)
 {
     joystickCallback(msg, 0);
 }
 
-void DriverStation::joystickCallback2(const msgs::ConstJoystickPtr &msg)
+void DriverStation::joystickCallback1(const msgs::ConstJoystickPtr &msg)
 {
     joystickCallback(msg, 1);
 }
 
-void DriverStation::joystickCallback3(const msgs::ConstJoystickPtr &msg)
+void DriverStation::joystickCallback2(const msgs::ConstJoystickPtr &msg)
 {
     joystickCallback(msg, 2);
 }
 
-void DriverStation::joystickCallback4(const msgs::ConstJoystickPtr &msg)
+void DriverStation::joystickCallback3(const msgs::ConstJoystickPtr &msg)
 {
     joystickCallback(msg, 3);
+}
+
+void DriverStation::joystickCallback4(const msgs::ConstJoystickPtr &msg)
+{
+    joystickCallback(msg, 4);
+}
+
+void DriverStation::joystickCallback5(const msgs::ConstJoystickPtr &msg)
+{
+    joystickCallback(msg, 5);
 }

@@ -42,7 +42,7 @@ public class Main {
 	    	final double start = simTime;
 			for (int i = 0; i < provider.getJoysticks().size(); i++) {
 				ISimJoystick joystick = provider.getJoysticks().get(i);
-				joystick.advertise(node, i+1);
+				joystick.advertise(node, i);
 				joystick.publish();
 			}
 			ds.publish();
