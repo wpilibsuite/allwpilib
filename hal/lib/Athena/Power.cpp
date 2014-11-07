@@ -46,7 +46,7 @@ float getUserCurrent6V(int32_t *status) {
  */
 float getUserVoltage5V(int32_t *status) {
 	initializePower(status);
-	return power->readUserVoltage5V(status) / 4.096f * 0.004962f - 0.013f;
+	return power->readUserVoltage5V(status) / 4.096f * 0.005962f - 0.013f;
 }
 
 /**
