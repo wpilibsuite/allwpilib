@@ -44,8 +44,8 @@ public class PIDTest extends AbstractComsSetup {
 	private static final Logger logger = Logger.getLogger(PIDTest.class.getName());
 	private NetworkTable table;
 	
-	private static final double absoluteTollerance = 30;
-	private static final double outputRange = 0.2;	
+	private static final double absoluteTollerance = 20;
+	private static final double outputRange = 0.3;	
 	
 	private PIDController controller = null;
 	private static MotorEncoderFixture me = null;
@@ -72,8 +72,8 @@ public class PIDTest extends AbstractComsSetup {
 	public static Collection<Object[]> generateData(){
 		//logger.fine("Loading the MotorList");
 		Collection<Object[]> data = new ArrayList<Object[]>();
-		double kp = 0.003;
-		double ki = 0.0015;
+		double kp = 0.001;
+		double ki = 0.0005;
 		double kd = 0.0;
 		for(int i = 0; i < 1; i++){
 			data.addAll(Arrays.asList(new Object[][]{

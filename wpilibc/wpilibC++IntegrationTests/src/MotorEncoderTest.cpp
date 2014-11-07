@@ -124,9 +124,9 @@ TEST_P(MotorEncoderTest, ClampSpeed) {
 TEST_P(MotorEncoderTest, PIDController) {
 	Reset();
 
-	PIDController pid(0.003f, 0.001f, 0.0f, m_encoder, m_speedController);
+	PIDController pid(0.001f, 0.0005f, 0.0f, m_encoder, m_speedController);
 	pid.SetAbsoluteTolerance(20.0f);
-	pid.SetOutputRange(-0.2f, 0.2f);
+	pid.SetOutputRange(-0.3f, 0.3f);
 	pid.SetSetpoint(2500);
 
 	/* 10 seconds should be plenty time to get to the setpoint */
@@ -136,7 +136,7 @@ TEST_P(MotorEncoderTest, PIDController) {
 
 	RecordProperty("PIDError", pid.GetError());
 
-	EXPECT_TRUE(pid.OnTarget()) << "PID loop did not converge within 5 seconds.";
+	EXPECT_TRUE(pid.OnTarget()) << "PID loop did not converge within 10 seconds.";
 }
 
 /**
