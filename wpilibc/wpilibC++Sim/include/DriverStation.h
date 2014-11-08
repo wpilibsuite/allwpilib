@@ -118,8 +118,9 @@ private:
 
 	uint8_t m_digitalOut;
 	MULTIWAIT_ID m_waitForDataSem;
-    MUTEX_ID m_stateSemaphore;
-    MUTEX_ID m_joystickSemaphore;
+	MUTEX_ID m_waitForDataMutex;
+	MUTEX_ID m_stateSemaphore;
+	MUTEX_ID m_joystickSemaphore;
 	double m_approxMatchTimeOffset;
 	bool m_userInDisabled;
 	bool m_userInAutonomous;

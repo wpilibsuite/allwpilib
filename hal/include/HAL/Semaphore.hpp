@@ -46,7 +46,7 @@ extern "C"
 
 	MULTIWAIT_ID initializeMultiWait();
 	void deleteMultiWait(MULTIWAIT_ID sem);
-	int8_t takeMultiWait(MULTIWAIT_ID sem, int32_t timeout);
+	int8_t takeMultiWait(MULTIWAIT_ID sem, MUTEX_ID m, int32_t timeout);
 	int8_t giveMultiWait(MULTIWAIT_ID sem);
 }
 
