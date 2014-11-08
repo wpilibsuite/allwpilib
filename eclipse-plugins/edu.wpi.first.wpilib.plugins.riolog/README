@@ -1,0 +1,13 @@
+
+                       Riolog
+
+This is an Eclipse plugin that receives and displays text from UDP port 6666. It
+defines a new view that displays the received text.
+
+To compile, open project in an Eclipse  instance with the appropriate plugin
+development tools, and Export as a deployable plugin/fragment.
+
+To install, copy the resulting jar file into $eclipse/dropins/, and start
+Eclipse (-clean may be necessary).
+
+To enable, go to Window>Show View>Other... and choose General>Riolog.

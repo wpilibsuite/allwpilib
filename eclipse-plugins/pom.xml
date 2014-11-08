@@ -14,12 +14,13 @@
     <module>edu.wpi.first.wpilib.plugins.cpp.feature</module>
     <module>edu.wpi.first.wpilib.plugins.java</module>
     <module>edu.wpi.first.wpilib.plugins.java.feature</module>
+    <module>edu.wpi.first.wpilib.plugins.riolog</module>
     <module>edu.wpi.first.wpilib.plugins.updatesite</module>
   </modules>
   
   <properties>
     <!-- local-repository>C:/Users/wpilibj-buildmaster/maven-repository</local-repository-->
-    <tycho-version>0.18.1</tycho-version>
+    <tycho-version>0.21.0</tycho-version>
   </properties>
 
   <repositories>
