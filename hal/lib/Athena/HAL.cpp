@@ -8,6 +8,7 @@
 #include "NetworkCommunication/FRCComm.h"
 #include "NetworkCommunication/UsageReporting.h"
 #include "NetworkCommunication/LoadOut.h"
+#include "NetworkCommunication/CANSessionMux.h"
 #include <fstream>
 #include <iostream>
 #include <unistd.h>
