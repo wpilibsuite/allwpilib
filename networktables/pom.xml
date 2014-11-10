@@ -9,5 +9,6 @@
 
   <modules>
 	<module>java</module>
+	<module>OutlineViewer</module>
   </modules>
 </project>

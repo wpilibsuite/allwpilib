@@ -28,7 +28,7 @@ public class TableEntryData {
      *  STRING
      * </pre> Use {@link #getEntryType(String name) getEntryType} to grab one
      * that isn't pre-baked. This is typically used to show custom metadata
-     * information from a {@code é‰TYPEé‰} entry in a
+     * information from a {@code ~TYPE~} entry in a
      * {@link BranchNode BranchNode's} {@code Type} cell.
      */
     public static final class EntryType {
@@ -127,12 +127,12 @@ public class TableEntryData {
 
     /**
      * Sees if the data within this structure is metadata (i.e. has a key
-     * bookended by tildes ("é‰") and is in all caps). Used to show/hide metadata
+     * bookended by tildes ("~") and is in all caps). Used to show/hide metadata
      * leaves in branches.
      */
     public boolean isMetadata() {
-        return key.startsWith("é‰")
-               && key.endsWith("é‰")
+        return key.startsWith("~")
+               && key.endsWith("~")
                && key.toUpperCase().equals(key);
     }
 }
