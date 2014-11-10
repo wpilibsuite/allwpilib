@@ -52,6 +52,30 @@ JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrent6
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PowerJNI
+ * Method:    getUserActive6V
+ * Signature: (Ljava/nio/IntBuffer;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserActive6V
+  (JNIEnv * env, jclass, jobject status)
+{
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	return getUserActive6V(statusPtr);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_PowerJNI
+ * Method:    getUserCurrentFaults6V
+ * Signature: (Ljava/nio/IntBuffer;)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrentFaults6V
+  (JNIEnv * env, jclass, jobject status)
+{
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	return getUserCurrentFaults6V(statusPtr);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_PowerJNI
  * Method:    getUserVoltage5V
  * Signature: (Ljava/nio/IntBuffer;)F
  */
@@ -72,6 +96,30 @@ JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrent5
 {
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	return getUserCurrent5V(statusPtr);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_PowerJNI
+ * Method:    getUserActive5V
+ * Signature: (Ljava/nio/IntBuffer;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserActive5V
+  (JNIEnv * env, jclass, jobject status)
+{
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	return getUserActive5V(statusPtr);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_PowerJNI
+ * Method:    getUserCurrentFaults5V
+ * Signature: (Ljava/nio/IntBuffer;)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrentFaults5V
+  (JNIEnv * env, jclass, jobject status)
+{
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	return getUserCurrentFaults3V3(statusPtr);
 }
 
 /*
@@ -97,3 +145,28 @@ JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrent3
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	return getUserCurrent3V3(statusPtr);
 }
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_PowerJNI
+ * Method:    getUserActive3V3
+ * Signature: (Ljava/nio/IntBuffer;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserActive3V3
+  (JNIEnv * env, jclass, jobject status)
+{
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	return getUserActive3V3(statusPtr);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_PowerJNI
+ * Method:    getUserCurrentFaults3V3
+ * Signature: (Ljava/nio/IntBuffer;)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrentFaults3V3
+  (JNIEnv * env, jclass, jobject status)
+{
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	return getUserCurrentFaults3V3(statusPtr);
+}
+

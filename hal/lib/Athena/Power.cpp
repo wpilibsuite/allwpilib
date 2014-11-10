@@ -42,6 +42,22 @@ float getUserCurrent6V(int32_t *status) {
 }
 
 /**
+ * Get the active state of the 6V rail
+ */
+bool getUserActive6V(int32_t *status) {
+	initializePower(status);
+	return power->readStatus_User6V(status) == 4;
+}
+
+/**
+ * Get the fault count for the 6V rail
+ */
+int getUserCurrentFaults6V(int32_t *status) {
+	initializePower(status);
+	return (int)power->readOverCurrentFaultCounts_OverCurrentFaultCount6V(status);
+}
+
+/**
  * Get the 5V rail voltage
  */
 float getUserVoltage5V(int32_t *status) {
@@ -58,6 +74,27 @@ float getUserCurrent5V(int32_t *status) {
 }
 
 /**
+ * Get the active state of the 5V rail
+ */
+bool getUserActive5V(int32_t *status) {
+	initializePower(status);
+	return power->readStatus_User5V(status) == 4;
+}
+
+/**
+ * Get the fault count for the 5V rail
+ */
+int getUserCurrentFaults5V(int32_t *status) {
+	initializePower(status);
+	return (int)power->readOverCurrentFaultCounts_OverCurrentFaultCount5V(status);
+}
+
+unsigned char getUserStatus5V(int32_t *status) {
+	initializePower(status);
+	return power->readStatus_User5V(status);
+}
+
+/**
  * Get the 3.3V rail voltage
  */
 float getUserVoltage3V3(int32_t *status) {
@@ -71,4 +108,20 @@ float getUserVoltage3V3(int32_t *status) {
 float getUserCurrent3V3(int32_t *status) {
 	initializePower(status);
 	return power->readUserCurrent3V3(status) / 4.096f * 0.002486f - 0.003f;
+}
+
+/**
+ * Get the active state of the 3.3V rail
+ */
+bool getUserActive3V3(int32_t *status) {
+	initializePower(status);
+	return power->readStatus_User3V3(status) == 4;
+}
+
+/**
+ * Get the fault count for the 3.3V rail
+ */
+int getUserCurrentFaults3V3(int32_t *status) {
+	initializePower(status);
+	return (int)power->readOverCurrentFaultCounts_OverCurrentFaultCount3V3(status);
 }
