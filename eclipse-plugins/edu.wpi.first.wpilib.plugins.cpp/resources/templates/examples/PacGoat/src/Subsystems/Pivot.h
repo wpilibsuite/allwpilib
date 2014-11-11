@@ -12,10 +12,10 @@ class Pivot: public PIDSubsystem
 {
 public:
 	// Constants for some useful angles
-	static const double COLLECT = 105;
-	static const double LOW_GOAL = 90;
-	static const double SHOOT = 45;
-	static const double SHOOT_NEAR = 30;
+	static constexpr double COLLECT = 105;
+	static constexpr double LOW_GOAL = 90;
+	static constexpr double SHOOT = 45;
+	static constexpr double SHOOT_NEAR = 30;
 
 private:
 	// Subsystem devices

@@ -13,9 +13,9 @@ class Collector: public Subsystem
 {
 public:
 	// Constants for some useful speeds
-	static const double FORWARD = 1;
-	static const double STOP = 0;
-	static const double REVERSE = -1;
+	static constexpr double FORWARD = 1;
+	static constexpr double STOP = 0;
+	static constexpr double REVERSE = -1;
 
 private:
 	// Subsystem devices
