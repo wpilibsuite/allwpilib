@@ -12,8 +12,8 @@ private:
 	double driveForwardSpeed;
 	double distance;
 	double error;
-	static const double TOLERANCE = .1;
-	static const double KP = -1.0 / 5.0;
+	static constexpr double TOLERANCE = .1;
+	static constexpr double KP = -1.0 / 5.0;
 	void init(double dist, double maxSpeed);
 public:
 	DriveForward();

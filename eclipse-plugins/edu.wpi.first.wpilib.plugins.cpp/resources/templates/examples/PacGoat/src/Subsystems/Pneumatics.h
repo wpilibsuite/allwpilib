@@ -17,7 +17,7 @@ private:
 		Compressor* compressor;
 	#endif
 
-	static const double MAX_PRESSURE = 2.55;
+	static constexpr double MAX_PRESSURE = 2.55;
 
 public:
 	Pneumatics();
