@@ -59,21 +59,13 @@ public:
 	virtual void TeleopPeriodic();
 	virtual void TestPeriodic();
 
-	void SetPeriod(double period);
-	double GetPeriod();
-	double GetLoopsPerSec();
-
 protected:
 	virtual ~IterativeRobot();
 	IterativeRobot();
 
 private:
-	bool NextPeriodReady();
-
 	bool m_disabledInitialized;
 	bool m_autonomousInitialized;
 	bool m_teleopInitialized;
 	bool m_testInitialized;
-	double m_period;
-	Timer m_mainLoopTimer;
 };
