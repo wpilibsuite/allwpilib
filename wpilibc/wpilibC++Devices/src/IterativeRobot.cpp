@@ -26,7 +26,6 @@ IterativeRobot::IterativeRobot()
 	, m_autonomousInitialized (false)
 	, m_teleopInitialized (false)
 	, m_testInitialized (false)
-	, m_period (kDefaultPeriod)
 {
 }
 
@@ -35,50 +34,6 @@ IterativeRobot::IterativeRobot()
  */
 IterativeRobot::~IterativeRobot()
 {
-}
-
-/**
- * Set the period for the periodic functions.
- * 
- * @param period The period of the periodic function calls.  0.0 means sync to driver station control data.
- */
-void IterativeRobot::SetPeriod(double period)
-{
-	if (period > 0.0)
-	{
-		// Not syncing with the DS, so start the timer for the main loop
-		m_mainLoopTimer.Reset();
-		m_mainLoopTimer.Start();
-	}
-	else
-	{
-		// Syncing with the DS, don't need the timer
-		m_mainLoopTimer.Stop();
-	}
-	m_period = period;
-}
-
-/**
- * Get the period for the periodic functions.
- * Returns 0.0 if configured to syncronize with DS control data packets.
- * @return Period of the periodic function calls
- */
-double IterativeRobot::GetPeriod()
-{
-	return m_period;
-}
-
-/**
- * Get the number of loops per second for the IterativeRobot
- * @return Frequency of the periodic function calls
- */
-double IterativeRobot::GetLoopsPerSec()
-{
-	// If syncing to the driver station, we don't know the rate,
-	//   so guess something close.
-	if (m_period <= 0.0)
-		return 50.0;
-	return 1.0 / m_period;
 }
 
 /**
@@ -118,11 +73,8 @@ void IterativeRobot::StartCompetition()
                 m_teleopInitialized = false;
                 m_testInitialized = false;
 			}
-			if (NextPeriodReady())
-			{
-				HALNetworkCommunicationObserveUserProgramDisabled();
-				DisabledPeriodic();
-			}
+			HALNetworkCommunicationObserveUserProgramDisabled();
+			DisabledPeriodic();
 		}
 		else if (IsAutonomous())
 		{
@@ -138,11 +90,8 @@ void IterativeRobot::StartCompetition()
                 m_teleopInitialized = false;
                 m_testInitialized = false;
 			}
-			if (NextPeriodReady())
-			{
-				HALNetworkCommunicationObserveUserProgramAutonomous();
-				AutonomousPeriodic();
-			}
+			HALNetworkCommunicationObserveUserProgramAutonomous();
+			AutonomousPeriodic();
 		}
         else if (IsTest())
         {
@@ -158,11 +107,8 @@ void IterativeRobot::StartCompetition()
                 m_autonomousInitialized = false;
                 m_teleopInitialized = false;
             }
-            if (NextPeriodReady())
-            {
-                HALNetworkCommunicationObserveUserProgramTest();
-                TestPeriodic();
-            }
+            HALNetworkCommunicationObserveUserProgramTest();
+            TestPeriodic();
         }
 		else
 		{
@@ -179,37 +125,12 @@ void IterativeRobot::StartCompetition()
                 m_testInitialized = false;
                 Scheduler::GetInstance()->SetEnabled(true);
 			}
-			if (NextPeriodReady())
-			{
-				HALNetworkCommunicationObserveUserProgramTeleop();
-				TeleopPeriodic();
-			}
+			HALNetworkCommunicationObserveUserProgramTeleop();
+			TeleopPeriodic();
 		}
 		// wait for driver station data so the loop doesn't hog the CPU
 		m_ds->WaitForData();
 	}	
-}
-
-/**
- * Determine if the periodic functions should be called.
- *
- * If m_period > 0.0, call the periodic function every m_period as compared
- * to Timer.Get().  If m_period == 0.0, call the periodic functions whenever
- * a packet is received from the Driver Station, or about every 20ms.
- *
- * @todo Decide what this should do if it slips more than one cycle.
- */
-
-bool IterativeRobot::NextPeriodReady()
-{
-	if (m_period > 0.0)
-	{
-		return m_mainLoopTimer.HasPeriodPassed(m_period);
-	}
-	else
-	{
-		return m_ds->IsNewControlData();
-	}
 }
 
 /**
