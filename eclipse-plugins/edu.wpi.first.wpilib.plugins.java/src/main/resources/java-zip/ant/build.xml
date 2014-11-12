@@ -66,7 +66,11 @@
     </jar>
   </target>
 
-  <target name="deploy" depends="get-target-ip,jar" description="Deploy the jar and start the program running.">
+    <!-- We're running a clean here to get around a known ant issue where it does not detected changed constant variables.
+     To get around this, we're recompiling the entire project, which is not an issue for most teams. If this is an issue
+     for you, you can remove the clean here, just be sure to do a full rebuild after you've changed any constants.
+     Reference: http://stackoverflow.com/questions/6430001/ant-doesnt-recompile-constants -->
+  <target name="deploy" depends="get-target-ip,clean,jar" description="Deploy the jar and start the program running.">
     <echo>[athena-deploy] Copying code over.</echo>
     <scp file="${dist.jar}" todir="${username}@${target}:${deploy.dir}" password="${password}" trust="true"/>
     <scp file="${wpilib.ant.dir}/robotCommand" todir="${username}@${target}:${command.dir}" password="${password}" trust="true"/>
