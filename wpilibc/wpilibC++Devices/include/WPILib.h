@@ -35,6 +35,7 @@
 #include "Commands/WaitForChildren.h"
 #include "Commands/WaitUntilCommand.h"
 #include "Compressor.h"
+#include "ControllerPower.h"
 #include "Counter.h"
 #include "DigitalInput.h"
 #include "DigitalOutput.h"
