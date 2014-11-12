@@ -36,10 +36,10 @@ public abstract class ExampleWizard extends Wizard implements INewWizard {
 	 */
 	protected abstract void doFinish(IExampleProject ex, String teamNumber) throws CoreException;
 
-	protected abstract IWizardPage getDetailsPage();
+	protected abstract IWizardPage getDetailsPage(INewProjectInfo info);
 	
 	public abstract IExampleProject makeExampleProject(String name, String description,
-			List<String> tags, List<String> folders, List<IExampleProject.ExportFile> files);
+			List<String> tags, String world, List<String> folders, List<IExampleProject.ExportFile> files);
 	
 	public abstract URL getResourceURL();
 	
@@ -60,7 +60,7 @@ public abstract class ExampleWizard extends Wizard implements INewWizard {
 		}
 		page1 = new ExampleWizardChoicePage(this, selection);
 		addPage(page1);
-		page2 = getDetailsPage();
+		page2 = getDetailsPage(page1);
 		addPage(page2);
 	}
 

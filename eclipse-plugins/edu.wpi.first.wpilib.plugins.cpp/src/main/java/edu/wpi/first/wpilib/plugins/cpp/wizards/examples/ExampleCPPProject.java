@@ -7,16 +7,17 @@ import edu.wpi.first.wpilib.plugins.core.wizards.IExampleProject;
 import edu.wpi.first.wpilib.plugins.cpp.wizards.newproject.CPPProjectType;
 
 public class ExampleCPPProject extends CPPProjectType implements IExampleProject {
-	private String name, description;
+	private String name, description, world;
 	private List<String> tags;
 	private List<String> directories;
 	private List<ExportFile> files;
 	
 	public ExampleCPPProject(String name, String description, List<String> tags, 
-			List<String> directories, List<ExportFile> files) {
+			String world, List<String> directories, List<ExportFile> files) {
 		this.name = name;
 		this.description = description;
 		this.tags = tags;
+		this.world = world;
 		this.directories = directories;
 		this.files = files;
 	}
@@ -31,6 +32,10 @@ public class ExampleCPPProject extends CPPProjectType implements IExampleProject
 
 	public List<String> getTags() {
 		return tags;
+	}
+	
+	public String getWorld() {
+		return world;
 	}
 
 	@Override

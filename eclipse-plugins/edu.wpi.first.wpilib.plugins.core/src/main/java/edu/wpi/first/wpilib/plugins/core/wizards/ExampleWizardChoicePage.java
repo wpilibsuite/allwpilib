@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.event.ChangeListener;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -36,11 +37,12 @@ import edu.wpi.first.wpilib.plugins.core.WPILibCore;
  * OR with the extension that matches the expected one (mpe).
  */
 
-public class ExampleWizardChoicePage extends WizardPage {
+public class ExampleWizardChoicePage extends WizardPage implements INewProjectInfo {
 	private Tree exampleTree;
 	private Browser descriptionText;
 	private IExampleProject selectedExample;
 	private ExampleWizard parent;
+	private ChangeListener listener;
 
 	/**
 	 * Constructor for SampleNewWizardPage.
@@ -88,6 +90,20 @@ public class ExampleWizardChoicePage extends WizardPage {
 		initialize();
 		dialogChanged();
 		setControl(container);
+	}
+	
+	public String getName() {
+		if (selectedExample != null) {
+			return selectedExample.getName();
+		}
+		return "";
+	}
+	
+	public String getWorld() {
+		if (selectedExample != null) {
+			return selectedExample.getWorld();
+		}
+		return "";
 	}
 
 	/**
@@ -137,7 +153,6 @@ public class ExampleWizardChoicePage extends WizardPage {
 	/**
 	 * Ensures that both text fields are set.
 	 */
-
 	private void dialogChanged() {
 		if (exampleTree.getSelection().length > 0) {
 			Object selectedData = exampleTree.getSelection()[0].getData();
@@ -157,6 +172,7 @@ public class ExampleWizardChoicePage extends WizardPage {
 			return;
 		}
 		
+		listener.stateChanged(null);
 		updateStatus(null);
 	}
 
@@ -211,6 +227,11 @@ public class ExampleWizardChoicePage extends WizardPage {
 				tags.add(tagElementList.item(i).getTextContent());
 			}
 		}
+		String world = "";
+		if (element.getElementsByTagName("world") != null &&
+			element.getElementsByTagName("world").item(0) != null) {
+			world = element.getElementsByTagName("world").item(0).getTextContent();
+		}
 		List<String> packages = new ArrayList<String>();
 		tagsElement = element.getElementsByTagName("packages").item(0);
 		if (tagsElement.getNodeType() == Node.ELEMENT_NODE) {
@@ -231,10 +252,15 @@ public class ExampleWizardChoicePage extends WizardPage {
 				}
 			}
 		}
-		return parent.makeExampleProject(name, description, tags, packages, files);
+		return parent.makeExampleProject(name, description, tags, world, packages, files);
 	}
 
 	public IExampleProject getExampleProject() {
 		return selectedExample;
+	}
+
+	@Override
+	public void registerChangeListener(ChangeListener listener) {
+		this.listener = listener;
 	}
 }

@@ -250,6 +250,7 @@
       <tag>CommandBased Robot</tag>
       <tag>Complete List</tag>
     </tags>
+    <world>/usr/share/frcsim/worlds/GearsBotDemo.world</world>
     <packages>
       <package>src</package>
       <package>src/Commands</package>
@@ -333,7 +334,8 @@
     <tags>
       <tag>CommandBased Robot</tag>
       <tag>Complete List</tag>
-   </tags>
+    </tags>
+    <world>/usr/share/frcsim/worlds/PacGoat2014.world</world>
     <packages>
       <package>src</package>
       <package>src/Commands</package>

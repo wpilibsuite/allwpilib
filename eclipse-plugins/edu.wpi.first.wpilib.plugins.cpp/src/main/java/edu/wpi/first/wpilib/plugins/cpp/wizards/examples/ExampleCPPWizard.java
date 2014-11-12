@@ -11,6 +11,7 @@ import edu.wpi.first.wpilib.plugins.core.WPILibCore;
 import edu.wpi.first.wpilib.plugins.core.wizards.ExampleWizard;
 import edu.wpi.first.wpilib.plugins.core.wizards.IExampleProject;
 import edu.wpi.first.wpilib.plugins.core.wizards.IExampleProject.ExportFile;
+import edu.wpi.first.wpilib.plugins.core.wizards.INewProjectInfo;
 import edu.wpi.first.wpilib.plugins.core.wizards.NewProjectMainPage;
 import edu.wpi.first.wpilib.plugins.core.wizards.ProjectCreationUtils;
 import edu.wpi.first.wpilib.plugins.cpp.WPILibCPPPlugin;
@@ -38,9 +39,9 @@ public class ExampleCPPWizard extends ExampleWizard {
 	}
 
 	@Override
-	protected IWizardPage getDetailsPage() {
+	protected IWizardPage getDetailsPage(INewProjectInfo info) {
 		if (detailsPage != null) return detailsPage;
-		detailsPage = new NewProjectMainPage(selection, getTeamNumberPage());
+		detailsPage = new NewProjectMainPage(selection, getTeamNumberPage(), info);
 		detailsPage.setTitle("Create Example Robot C++ Project");
 		detailsPage.setDescription("This wizard creates a new example project based on your selection.");
 		detailsPage.setShowPackage(false);
@@ -49,8 +50,8 @@ public class ExampleCPPWizard extends ExampleWizard {
 
 	@Override
 	public IExampleProject makeExampleProject(String name, String description,
-			List<String> tags, List<String> folders, List<ExportFile> files) {
-		return new ExampleCPPProject(name, description, tags, folders, files);
+			List<String> tags, String world, List<String> folders, List<ExportFile> files) {
+		return new ExampleCPPProject(name, description, tags, world, folders, files);
 	}
 
 	@Override
