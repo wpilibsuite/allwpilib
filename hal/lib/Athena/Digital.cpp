@@ -242,7 +242,7 @@ void setPWMPeriodScale(void* digital_port_pointer, uint32_t squelchMask, int32_t
 
 /**
  * Allocate a DO PWM Generator.
- * Allocate PWM generators so that they are not accidently reused.
+ * Allocate PWM generators so that they are not accidentally reused.
  *
  * @return PWM Generator refnum
  */
@@ -299,12 +299,12 @@ void setPWMDutyCycle(void* pwmGenerator, double dutyCycle, int32_t *status) {
 	if(id < 4)
 		digitalSystem->writePWMDutyCycleA(id, (uint8_t)rawDutyCycle, status);
 	else 
-		digitalSystem->writePWMDutyCycleB(id - 3, (uint8_t)rawDutyCycle, status);
+		digitalSystem->writePWMDutyCycleB(id - 4, (uint8_t)rawDutyCycle, status);
   }
 }
 
 /**
- * Configure which DO channel the PWM siganl is output on
+ * Configure which DO channel the PWM signal is output on
  *
  * @param pwmGenerator The generator index reserved by AllocateDO_PWM()
  * @param channel The Digital Output channel to output on
