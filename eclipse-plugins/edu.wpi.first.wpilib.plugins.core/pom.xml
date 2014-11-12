@@ -85,6 +85,13 @@
 				  <outputDirectory>${tools-zip}</outputDirectory>
 				  <destFileName>SmartDashboard.jar</destFileName>
 	            </artifactItem>
+	            <artifactItem>
+	              <groupId>edu.wpi.first.wpilib.networktables</groupId>
+	              <artifactId>OutlineViewer</artifactId>
+	              <version>1.0.0-SNAPSHOT</version>
+				  <outputDirectory>${tools-zip}</outputDirectory>
+				  <destFileName>OutlineViewer.jar</destFileName>
+	            </artifactItem>
               </artifactItems>
                 
               <overWriteReleases>false</overWriteReleases>
@@ -192,6 +199,11 @@
     <dependency>
 	  <groupId>edu.wpi.first.wpilib</groupId>
 	  <artifactId>SmartDashboard</artifactId>
+	  <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+	  <groupId>edu.wpi.first.wpilib.networktables</groupId>
+	  <artifactId>OutlineViewer</artifactId>
 	  <version>1.0.0-SNAPSHOT</version>
     </dependency>
   </dependencies>

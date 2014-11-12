@@ -252,7 +252,7 @@ public class AddArrayDialog extends AbstractAddDialog {
                     } catch (NumberFormatException e) {
                         JOptionPane.showMessageDialog(
                                 this,
-                                "Invalid double value Žã"" + data + "Žã" in row " + (i + 1),
+                                "Invalid double value \"" + data + "\" in row " + (i + 1),
                                 "Invalid number",
                                 JOptionPane.ERROR_MESSAGE);
                         return null;
