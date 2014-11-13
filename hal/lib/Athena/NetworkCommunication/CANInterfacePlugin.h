@@ -51,6 +51,7 @@ public:
 	 */
 	virtual int32_t receiveMessage(uint32_t &messageID, uint8_t *data, uint8_t &dataSize) = 0;
 
+#if defined(__linux)
 	/**
 	 * This entry-point of the CANInterfacePlugin returns status of the CAN bus.
 	 * 
@@ -67,6 +68,7 @@ public:
 	 * @return This should return 0 if all status was retrieved successfully or an error code if not.
 	 */
 	virtual int32_t getStatus(uint32_t &busOffCount, uint32_t &txFullCount, uint32_t &receiveErrorCount, uint32_t &transmitErrorCount) {return 0;}
+#endif
 };
 
 /**
