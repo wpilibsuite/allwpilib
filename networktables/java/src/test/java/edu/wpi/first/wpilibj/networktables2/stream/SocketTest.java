@@ -19,13 +19,13 @@ public class SocketTest {
 	}};
 
 
-	@Test(timeout=1500)
+	@Test(timeout=2500)
 	public void testSingleSocketConnection() throws Throwable {
-		doSocketTest(1, 500, 1500, SocketStreams.newStreamProvider(10111), SocketStreams.newStreamFactory("localhost", 10111));
+		doSocketTest(1, 500, 2500, SocketStreams.newStreamProvider(10111), SocketStreams.newStreamFactory("localhost", 10111));
 	}
 	@Test(timeout=2500)
 	public void testManySocketConnection() throws Throwable {
-		doSocketTest(10, 500, 2000, SocketStreams.newStreamProvider(10112), SocketStreams.newStreamFactory("localhost", 10112));
+		doSocketTest(10, 500, 2500, SocketStreams.newStreamProvider(10112), SocketStreams.newStreamFactory("localhost", 10112));
 	}
 
 	private void doSocketTest(final int count, long threadTimeout, long testTimeout, final IOStreamProvider streamProvider, final IOStreamFactory factory) throws Throwable {
