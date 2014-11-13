@@ -61,6 +61,7 @@ DriverStation::DriverStation()
 	HALSetNewDataSem(m_packetDataAvailableSem);
 
 	m_waitForDataSem = initializeMultiWait();
+	m_waitForDataMutex = initializeMutexNormal();
 
 	AddToSingletonList();
 
@@ -79,6 +80,7 @@ DriverStation::~DriverStation()
 	// Unregister our semaphore.
 	HALSetNewDataSem(0);
 	deleteMutex(m_packetDataAvailableSem);
+	deleteMutex(m_waitForDataMutex);
 }
 
 void DriverStation::InitTask(DriverStation *ds)
@@ -353,7 +355,7 @@ uint32_t DriverStation::GetLocation()
  */
 void DriverStation::WaitForData()
 {
-	takeMultiWait(m_waitForDataSem, SEMAPHORE_WAIT_FOREVER);
+	takeMultiWait(m_waitForDataSem, m_waitForDataMutex, SEMAPHORE_WAIT_FOREVER);
 }
 
 /**

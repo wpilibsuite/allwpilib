@@ -1,4 +1,3 @@
-
 #include "HAL/Semaphore.hpp"
 
 #include "Log.hpp"
@@ -122,11 +121,10 @@ void deleteMultiWait(MULTIWAIT_ID sem) {
   delete sem;
 }
 
-int8_t takeMultiWait(MULTIWAIT_ID sem, int32_t timeout) {
-  MUTEX_ID m = initializeMutexNormal();
+int8_t takeMultiWait(MULTIWAIT_ID sem, MUTEX_ID m, int32_t timeout) {
   takeMutex(m);
   int8_t val = pthread_cond_wait(sem, m);
-  deleteMutex(m);
+  giveMutex(m);
   return val;
 }
 

@@ -28,7 +28,8 @@ void Wait(double seconds)
     double start = wpilib::internal::simTime;
     	
     while ((wpilib::internal::simTime - start) < seconds) {
-        takeMultiWait(wpilib::internal::time_wait, 0);
+      takeMultiWait(wpilib::internal::time_wait,
+                    wpilib::internal::time_wait_mutex, 0);
     }
 }
 
@@ -203,6 +204,7 @@ extern "C"
 namespace wpilib { namespace internal {
     double simTime = 0;
     MULTIWAIT_ID time_wait = initializeMultiWait();
+    MUTEX_ID time_wait_mutex = initializeMutexNormal();
 
     void time_callback(const msgs::ConstFloat64Ptr &msg) {
         simTime = msg->data();

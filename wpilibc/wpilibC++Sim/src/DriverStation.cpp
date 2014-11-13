@@ -45,6 +45,7 @@ DriverStation::DriverStation()
 {
 	// Create a new semaphore
 	m_waitForDataSem = initializeMultiWait();
+	m_waitForDataMutex = initializeMutexNormal();
 	m_stateSemaphore = initializeMutexRecursive();
 	m_joystickSemaphore = initializeMutexRecursive();
 
@@ -78,6 +79,7 @@ DriverStation::~DriverStation()
 {
 	m_instance = NULL;
 	deleteMultiWait(m_waitForDataSem);
+	deleteMutex(m_waitForDataMutex);
 	// TODO: Release m_stateSemaphore and m_joystickSemaphore?
 }
 
@@ -311,7 +313,7 @@ uint32_t DriverStation::GetLocation()
  */
 void DriverStation::WaitForData()
 {
-	takeMultiWait(m_waitForDataSem, SEMAPHORE_WAIT_FOREVER);
+	takeMultiWait(m_waitForDataSem, m_waitForDataMutex, SEMAPHORE_WAIT_FOREVER);
 }
 
 /**
