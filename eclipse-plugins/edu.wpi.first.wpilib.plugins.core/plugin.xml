@@ -34,6 +34,14 @@
                tooltip="Launch the SmartDashboard to get feedback from the robot.">
          </action>
          <action
+               class="edu.wpi.first.wpilib.plugins.core.actions.RunSimulationSmartDashboardAction"
+               icon="icons/smartdashboard16x16.png"
+               id="edu.wpi.first.wpilib.plugins.core.actions.RunSimulationSmartDashboardAction"
+               label="Run S&amp;imulation SmartDashboard"
+               menubarPath="edu.wpi.first.wpilib.plugins.core.menu/edu.wpi.first.wpilib.plugins.core.actions"
+               tooltip="Launch the SmartDashboard to get feedback from a simulated robot.">
+         </action>
+         <action
                class="edu.wpi.first.wpilib.plugins.core.actions.RunRobotBuilderAction"
                icon="icons/robotbuilder16x16.png"
                id="edu.wpi.first.wpilib.plugins.core.actions.RunRobotBuilderAction"
