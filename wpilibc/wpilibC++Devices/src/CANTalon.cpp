@@ -9,6 +9,12 @@
 #include "ctre/CanTalonSRX.h"
 
 /**
+ * The CANTalon object is currently incomplete. As of Nov 14 2014, we only know
+ * for sure that sending a throttle and checking basic values (eg current,
+ * temperature) work.
+ */
+
+/**
  * Constructor for the CANTalon device.
  * @param deviceNumber The CAN ID of the Talon SRX
  */
@@ -16,6 +22,8 @@ CANTalon::CANTalon(uint8_t deviceNumber)
 	: m_deviceNumber(deviceNumber)
 	, m_impl(new CanTalonSRX(deviceNumber))
 	, m_safetyHelper(new MotorSafetyHelper(this))
+  , m_controlEnabled(false)
+  , m_controlMode(kPercentVbus)
 {
 }
 
@@ -48,16 +56,43 @@ void CANTalon::PIDWrite(float output)
  */
 float CANTalon::Get()
 {
-	// TODO
-	return 0.0f;
+  return 0.0f;
 }
 
 /**
- * TODO documentation (see CANJaguar.cpp)
+ * Sets the output set-point value.
  */
 void CANTalon::Set(float value, uint8_t syncGroup)
 {
-	// TODO
+  if(m_controlEnabled) {
+    CTR_Code status;
+    switch(GetControlMode()) {
+      case kPercentVbus:
+        {
+          m_impl->Set(value);
+          status = CTR_OKAY;
+        }
+        break;
+      case kFollower:
+        {
+          status = m_impl->SetDemand24((int)value);
+        }
+        break;
+      case kVoltage:
+        {
+          // Voltage is an 8.8 fixed point number.
+          int volts = int(value * 256);
+          status = m_impl->SetDemand24(volts);
+        }
+      default:
+        // TODO: Add support for other modes. Need to figure out what format
+        // SetDemand24 needs.
+        break;
+    }
+    if (status != CTR_OKAY) {
+      wpi_setErrorWithContext(status, getHALErrorMessage(status));
+    }
+  }
 }
 
 /**
@@ -65,7 +100,18 @@ void CANTalon::Set(float value, uint8_t syncGroup)
  */
 void CANTalon::Disable()
 {
-	// TODO
+  // Until Modes other than throttle work, just disable by setting throttle to 0.0.
+  m_impl->Set(0.0); // TODO when firmware is updated, remove this.
+  //m_impl->SetModeSelect(kDisabled); // TODO when firmware is updated, uncomment this.
+  m_controlEnabled = false;
+}
+
+/**
+ * TODO documentation (see CANJaguar.cpp)
+ */
+void CANTalon::EnableControl() {
+  SetControlMode(m_controlMode);
+  m_controlEnabled = true;
 }
 
 /**
@@ -130,12 +176,18 @@ double CANTalon::GetD()
 }
 
 /**
- * TODO documentation (see CANJaguar.cpp)
+ * Returns the voltage coming in from the battery.
+ *
+ * @return The input voltage in vols.
  */
 float CANTalon::GetBusVoltage()
 {
-	// TODO
-	return 0.0f;
+  double voltage;
+  CTR_Code status = m_impl->GetBatteryV(voltage);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
+  return voltage;
 }
 
 /**
@@ -143,17 +195,29 @@ float CANTalon::GetBusVoltage()
  */
 float CANTalon::GetOutputVoltage()
 {
-	// TODO
-	return 0.0f;
+  int throttle11;
+  CTR_Code status = m_impl->GetAppliedThrottle11(throttle11);
+  float voltage = GetBusVoltage() * float(throttle11) / 1023.0;
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
+	return voltage;
 }
+
 
 /**
  * TODO documentation (see CANJaguar.cpp)
  */
 float CANTalon::GetOutputCurrent()
 {
-	// TODO
-	return 0.0f;
+  double current;
+
+  CTR_Code status = m_impl->GetCurrent(current);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
+
+	return current;
 }
 
 /**
@@ -161,26 +225,47 @@ float CANTalon::GetOutputCurrent()
  */
 float CANTalon::GetTemperature()
 {
-	// TODO
-	return 0.0f;
+  double temp;
+
+  CTR_Code status = m_impl->GetTemp(temp);
+	if(temp != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
+	return temp;
 }
 
 /**
  * TODO documentation (see CANJaguar.cpp)
+ *
+ * @return The position of the sensor currently providing feedback.
  */
 double CANTalon::GetPosition()
 {
-	// TODO
-	return 0.0;
+  int postition;
+  // TODO convert from int to appropriate units (or at least document it).
+
+  CTR_Code status = m_impl->GetSensorPosition(postition);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
+	return (double)postition;
 }
 
 /**
  * TODO documentation (see CANJaguar.cpp)
+ *
+ * @returns The speed of the sensor currently providing feedback.
  */
 double CANTalon::GetSpeed()
 {
-	// TODO
-	return 0.0;
+  int speed;
+  // TODO convert from int to appropriate units (or at least document it).
+
+  CTR_Code status = m_impl->GetSensorVelocity(speed);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
+	return (double)speed;
 }
 
 /**
@@ -299,6 +384,7 @@ void CANTalon::ConfigReverseLimit(double reverseLimitPosition)
 
 /**
  * TODO documentation (see CANJaguar.cpp)
+ * Does this exist on the Talon?
  */
 void CANTalon::ConfigMaxOutputVoltage(double voltage)
 {
@@ -307,6 +393,7 @@ void CANTalon::ConfigMaxOutputVoltage(double voltage)
 
 /**
  * TODO documentation (see CANJaguar.cpp)
+ * Does this exist on the Talon?
  */
 void CANTalon::ConfigFaultTime(float faultTime)
 {
@@ -318,7 +405,11 @@ void CANTalon::ConfigFaultTime(float faultTime)
  */
 void CANTalon::SetControlMode(CANSpeedController::ControlMode mode)
 {
-	// TODO
+  m_controlMode = mode;
+  CTR_Code status = m_impl->SetModeSelect((int)mode);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
 }
 
 /**
@@ -326,8 +417,7 @@ void CANTalon::SetControlMode(CANSpeedController::ControlMode mode)
  */
 CANSpeedController::ControlMode CANTalon::GetControlMode()
 {
-	// TODO
-	return CANSpeedController::ControlMode::kPercentVbus;
+  return m_controlMode;
 }
 
 void CANTalon::SetExpiration(float timeout)
@@ -361,10 +451,12 @@ void CANTalon::GetDescription(char *desc)
 }
 
 /**
-* Common interface for stopping the motor
-* Part of the MotorSafety interface
+ * Common interface for stopping the motor
+ * Part of the MotorSafety interface
+ *
+ * @deprecated Call Disable instead.
 */
 void CANTalon::StopMotor()
 {
-	// TODO
+  Disable();
 }

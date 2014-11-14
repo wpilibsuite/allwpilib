@@ -16,11 +16,14 @@ class CANSpeedController : public SpeedController
 {
 public:
 	enum ControlMode {
-		kPercentVbus,
-		kCurrent,
-		kSpeed,
-		kPosition,
-		kVoltage
+		kPercentVbus=0,
+    // TODO(james): Handle kFollower in CANJaguar.
+    kFollower=1, // Only supported on Talon SRX.
+		kVoltage=2,
+		kPosition=3,
+		kSpeed=4,
+		kCurrent=5,
+    kDisabled=15
 	};
 
 	enum Faults {

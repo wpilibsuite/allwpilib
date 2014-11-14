@@ -343,6 +343,7 @@ void CANJaguar::Set(float outputValue, uint8_t syncGroup)
 			}
 			break;
 		default:
+		  wpi_setWPIErrorWithContext(IncompatibleMode, "The Jaguar only supports Current, Voltage, Position, Speed, and Percent (throttle) modes.");
 			return;
 		}
 		if (syncGroup != 0)
@@ -1158,6 +1159,9 @@ void CANJaguar::SetP(double p)
 		dataSize = packFXP16_16(dataBuffer, p);
 		sendMessage(LM_API_ICTRL_PC, dataBuffer, dataSize);
 		break;
+  default:
+		wpi_setWPIErrorWithContext(IncompatibleMode, "PID constants only apply in Speed, Position, and Current mode");
+    break;
 	}
 
 	m_p = p;
@@ -1192,6 +1196,9 @@ void CANJaguar::SetI(double i)
 		dataSize = packFXP16_16(dataBuffer, i);
 		sendMessage(LM_API_ICTRL_IC, dataBuffer, dataSize);
 		break;
+  default:
+		wpi_setWPIErrorWithContext(IncompatibleMode, "PID constants only apply in Speed, Position, and Current mode");
+    break;
 	}
 
 	m_i = i;
@@ -1226,6 +1233,9 @@ void CANJaguar::SetD(double d)
 		dataSize = packFXP16_16(dataBuffer, d);
 		sendMessage(LM_API_ICTRL_DC, dataBuffer, dataSize);
 		break;
+  default:
+		wpi_setWPIErrorWithContext(IncompatibleMode, "PID constants only apply in Speed, Position, and Current mode");
+    return;
 	}
 
 	m_d = d;
@@ -1313,6 +1323,9 @@ void CANJaguar::EnableControl(double encoderInitialPosition)
 	case kVoltage:
 		sendMessage(LM_API_VCOMP_T_EN, dataBuffer, dataSize);
 		break;
+  default:
+		wpi_setWPIErrorWithContext(IncompatibleMode, "The Jaguar only supports Current, Voltage, Position, Speed, and Percent (throttle) modes.");
+    break;
 	}
 
 	m_controlEnabled = true;

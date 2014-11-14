@@ -39,6 +39,7 @@ public:
 	virtual float Get() override;
 	virtual void Set(float value, uint8_t syncGroup=0) override;
 	virtual void Disable() override;
+  virtual void EnableControl();
 	virtual void SetP(double p) override;
 	virtual void SetI(double i) override;
 	virtual void SetD(double d) override;
@@ -74,4 +75,7 @@ private:
 	uint8_t m_deviceNumber;
 	CanTalonSRX *m_impl;
 	MotorSafetyHelper *m_safetyHelper;
+
+  bool m_controlEnabled;
+  ControlMode m_controlMode;
 };

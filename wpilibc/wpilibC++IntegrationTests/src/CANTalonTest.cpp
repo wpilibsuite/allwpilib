@@ -9,10 +9,13 @@
 #include "TestBench.h"
 
 TEST(CANTalonTest, QuickTest) {
-	CANTalon talon(10);
+	CANTalon talon(0);
+  talon.SetControlMode(CANTalon::kPercentVbus);
+  talon.EnableControl();
+  talon.Set(1.0);
+  Wait(0.25);
+  EXPECT_GT(talon.GetOutputCurrent(), 4.0);
 
-	for(;;) {
-		std::cout << "Firmware version: " << talon.GetFirmwareVersion() << std::endl;
-		Wait(0.25);
-	}
+  talon.Set(0.0);
+  talon.Disable();
 }
