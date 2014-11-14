@@ -23,7 +23,6 @@
 #include "Buttons/JoystickButton.h"
 #include "Buttons/NetworkButton.h"
 #include "CANJaguar.h"
-#include "CANTalon.h"
 #include "Commands/Command.h"
 #include "Commands/CommandGroup.h"
 #include "Commands/PIDCommand.h"

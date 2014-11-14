@@ -1,5 +1,3 @@
-#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
-
 #include "CtreCanNode.h"
 #include "NetworkCommunication/CANSessionMux.h"
 #include <string.h> // memset
@@ -22,7 +20,7 @@ void CtreCanNode::RegisterTx(uint32_t arbId, uint32_t periodMs)
 {
 	int32_t status = 0;
 
-	txJob_t job = {0};
+	txJob_t job;
 	job.arbId = arbId;
 	job.periodMs = periodMs;
 	_txJobs[arbId] = job;
@@ -98,4 +96,3 @@ void CtreCanNode::FlushTx(uint32_t arbId)
 															iter->second.periodMs,
 															&status);
 }
-

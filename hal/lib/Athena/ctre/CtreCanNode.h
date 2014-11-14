@@ -1,7 +1,7 @@
 #ifndef CtreCanNode_H_
 #define CtreCanNode_H_
 #include "ctre.h"				//BIT Defines + Typedefs
-#include <NetworkCommunication/CANSessionMux.h>	//CAN Comm
+#include "NetworkCommunication/CANSessionMux.h" 	//CAN Comm
 #include <pthread.h>
 #include <map>
 #include <string.h> // memcpy
@@ -61,7 +61,7 @@ protected:
 
 	template<typename T> txTask<T> GetTx(uint32_t arbId)
 	{
-		txTask<T> retval = {0, nullptr};
+		txTask<T> retval = {0};
 		txJobs_t::iterator i = _txJobs.find(arbId);
 		if(i != _txJobs.end()){
 			retval.arbId = i->second.arbId;
@@ -88,6 +88,11 @@ private:
 			uint32_t arbId;
 			uint8_t toSend[8];
 			uint32_t periodMs;
+			txJob_t() : arbId(0),periodMs(0)
+			{
+				for(unsigned i=0;i<sizeof(toSend);++i)
+					toSend[i] = 0;
+			}
 	};
 
 	class rxEvent_t{
