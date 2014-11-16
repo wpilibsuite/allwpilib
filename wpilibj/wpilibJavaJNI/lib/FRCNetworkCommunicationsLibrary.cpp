@@ -342,7 +342,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_setNewDataSem
   (JNIEnv * env, jclass, jobject id )
 {
-	MUTEX_ID* javaId = (MUTEX_ID*)env->GetDirectBufferAddress(id);
+	MULTIWAIT_ID* javaId = (MULTIWAIT_ID*)env->GetDirectBufferAddress(id);
 	NETCOMM_LOG(logDEBUG) << "Mutex Ptr = " << *javaId;
 	HALSetNewDataSem(*javaId);
 }

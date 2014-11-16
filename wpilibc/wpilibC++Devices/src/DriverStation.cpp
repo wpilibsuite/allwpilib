@@ -35,7 +35,7 @@ DriverStation::DriverStation()
 	: m_statusDataSemaphore (initializeMutexNormal())
 	, m_task ("DriverStation", (FUNCPTR)DriverStation::InitTask)
 	, m_newControlData(0)
-	, m_packetDataAvailableSem (0)
+	, m_packetDataAvailableMultiWait(0)
 	, m_waitForDataSem(0)
 	, m_approxMatchTimeOffset(-1.0)
 	, m_userInDisabled(false)
@@ -53,15 +53,18 @@ DriverStation::DriverStation()
 	}
 
 	// Create a new semaphore
-	m_packetDataAvailableSem = initializeMutexNormal();
+	m_packetDataAvailableMultiWait = initializeMultiWait();
 	m_newControlData = initializeSemaphore(SEMAPHORE_EMPTY);
-
-	// Register that semaphore with the network communications task.
-	// It will signal when new packet data is available.
-	HALSetNewDataSem(m_packetDataAvailableSem);
 
 	m_waitForDataSem = initializeMultiWait();
 	m_waitForDataMutex = initializeMutexNormal();
+
+	m_packetDataAvailableMultiWait = initializeMultiWait();
+	m_packetDataAvailableMutex = initializeMutexNormal();
+
+	// Register that semaphore with the network communications task.
+	// It will signal when new packet data is available.
+	HALSetNewDataSem(m_packetDataAvailableMultiWait);
 
 	AddToSingletonList();
 
@@ -79,7 +82,8 @@ DriverStation::~DriverStation()
 	deleteMultiWait(m_waitForDataSem);
 	// Unregister our semaphore.
 	HALSetNewDataSem(0);
-	deleteMutex(m_packetDataAvailableSem);
+	deleteMultiWait(m_packetDataAvailableMultiWait);
+	deleteMutex(m_packetDataAvailableMutex);
 	deleteMutex(m_waitForDataMutex);
 }
 
@@ -93,7 +97,7 @@ void DriverStation::Run()
 	int period = 0;
 	while (true)
 	{
-		takeMutex(m_packetDataAvailableSem);
+		takeMultiWait(m_packetDataAvailableMultiWait, m_packetDataAvailableMutex, 0);  
 		GetData();
 		giveMultiWait(m_waitForDataSem);
 		if (++period >= 4)

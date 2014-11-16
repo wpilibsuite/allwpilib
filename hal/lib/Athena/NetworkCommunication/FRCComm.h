@@ -91,7 +91,7 @@ extern "C" {
 # if defined (__vxworks)
 	void EXPORT_FUNC setNewDataSem(SEM_ID);
 # else
-	void EXPORT_FUNC setNewDataSem(pthread_mutex_t *);
+	void EXPORT_FUNC setNewDataSem(pthread_cond_t *);
 # endif
 #endif
 

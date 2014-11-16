@@ -205,7 +205,7 @@ int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons, uint
 	return FRC_NetworkCommunication_getJoystickButtons(joystickNum, buttons, count);
 }
 
-void HALSetNewDataSem(pthread_mutex_t * param)
+void HALSetNewDataSem(pthread_cond_t * param)
 {
 	setNewDataSem(param);
 }

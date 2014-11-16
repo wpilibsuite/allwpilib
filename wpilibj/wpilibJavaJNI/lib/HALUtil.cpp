@@ -71,6 +71,49 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_takeMutex
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_HALUtil
+ * Method:    initializeMultiWait
+ * Signature: ()Ljava/nio/ByteBuffer;
+ */
+JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_initializeMultiWait
+(JNIEnv * env, jclass)
+{
+	HALUTIL_LOG(logDEBUG) << "Calling HALUtil initializeMultiWait";
+	MULTIWAIT_ID* multiWaitPtr = (MULTIWAIT_ID*)new unsigned char[4];
+	*multiWaitPtr = initializeMultiWait();
+	HALUTIL_LOG(logDEBUG) << "MultiWait Ptr = " << *multiWaitPtr;
+	return env->NewDirectByteBuffer( multiWaitPtr, 4);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_HALUtil
+ * Method:    deleteMultiWait
+ * Signature: (Ljava/nio/ByteBuffer;)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_deleteMultiWait
+(JNIEnv * env, jclass, jobject id)
+{
+	HALUTIL_LOG(logDEBUG) << "Calling HALUtil deleteMultiWait";
+	MULTIWAIT_ID* javaId = (MULTIWAIT_ID*)env->GetDirectBufferAddress(id);
+	HALUTIL_LOG(logDEBUG) << "MultiWait Ptr = " << *javaId;
+	deleteMultiWait( *javaId );
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_HALUtil
+ * Method:    takeMultiWait
+ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/ByteBuffer;I)B
+ */
+JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_takeMultiWait
+  (JNIEnv * env, jclass, jobject multiWaitId, jobject mutexId, jint timeout)
+{
+ 	MULTIWAIT_ID* javaMultiWaitId = (MULTIWAIT_ID*)env->GetDirectBufferAddress(multiWaitId);
+	MUTEX_ID* javaMutexId = (MUTEX_ID*)env->GetDirectBufferAddress(mutexId);
+	jbyte returnValue = takeMultiWait(*javaMultiWaitId, *javaMutexId, (int32_t) timeout);
+	return returnValue;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_HALUtil
  * Method:    getFPGAVersion
  * Signature: (Ljava/nio/IntBuffer;)S
  */

@@ -105,7 +105,8 @@ private:
 	MUTEX_ID m_statusDataSemaphore;
 	Task m_task;
 	SEMAPHORE_ID m_newControlData;
-	MUTEX_ID m_packetDataAvailableSem;
+	MULTIWAIT_ID m_packetDataAvailableMultiWait;
+	MUTEX_ID m_packetDataAvailableMutex;
 	MULTIWAIT_ID m_waitForDataSem;
 	MUTEX_ID m_waitForDataMutex;
 	double m_approxMatchTimeOffset;
