@@ -3,6 +3,11 @@ lib.dir = $(prefix)/lib
 plugin.dir = $(lib.dir)/frcsim/plugins
 build.dir = build
 
+ext = .so
+ifeq ($(shell uname), Darwin)
+	ext = .dylib
+endif
+
 .PHONY : all build copy-plugins clean docs clean-docs
 
 all: build copy-plugins
@@ -20,15 +25,15 @@ build:
 
 copy-plugins:
 	mkdir -p plugins
-	cp msgs/build/libgz_msgs.so plugins
-	cp dc_motor/build/libgz_dc_motor.so plugins
-	cp pneumatic_piston/build/libgz_pneumatic_piston.so plugins
-	cp potentiometer/build/libgz_potentiometer.so plugins
-	cp rangefinder/build/libgz_rangefinder.so plugins
-	cp encoder/build/libgz_encoder.so plugins
-	cp gyro/build/libgz_gyro.so plugins
-	cp limit_switch/build/libgz_limit_switch.so plugins
-	cp clock/build/libgz_clock.so plugins
+	cp msgs/build/libgz_msgs$(ext) plugins
+	cp dc_motor/build/libgz_dc_motor$(ext) plugins
+	cp pneumatic_piston/build/libgz_pneumatic_piston$(ext) plugins
+	cp potentiometer/build/libgz_potentiometer$(ext) plugins
+	cp rangefinder/build/libgz_rangefinder$(ext) plugins
+	cp encoder/build/libgz_encoder$(ext) plugins
+	cp gyro/build/libgz_gyro$(ext) plugins
+	cp limit_switch/build/libgz_limit_switch$(ext) plugins
+	cp clock/build/libgz_clock$(ext) plugins
 
 clean: clean-docs
 	cd msgs && make clean
