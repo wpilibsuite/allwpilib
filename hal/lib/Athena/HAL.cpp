@@ -11,6 +11,7 @@
 #include <fstream>
 #include <iostream>
 #include <unistd.h>
+#include <sys/prctl.h>
 #include <signal.h> // linux for kill
 const uint32_t solenoid_kNumDO7_0Elements = 8;
 const uint32_t dio_kNumSystems = tDIO::kNumSystems;
@@ -214,6 +215,11 @@ void HALSetNewDataSem(pthread_mutex_t * param)
  */
 int HALInitialize(int mode)
 {
+    setlinebuf(stdin);
+    setlinebuf(stdout);
+
+    prctl(PR_SET_PDEATHSIG, SIGTERM);
+
 	FRC_NetworkCommunication_Reserve(nullptr);
 	// image 4; Fixes errors caused by multiple processes. Talk to NI about this
 	nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
