@@ -378,7 +378,7 @@ public class SerialPort {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
 		ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(count);
-		dataToSendBuffer.put(buffer);
+		dataToSendBuffer.put(buffer, 0, count);
         int retVal = SerialPortJNI.serialWrite(m_port, dataToSendBuffer, count, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
 		return retVal;
