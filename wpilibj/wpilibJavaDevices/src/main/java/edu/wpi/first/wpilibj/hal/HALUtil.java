@@ -23,6 +23,9 @@ public class HALUtil extends JNIWrapper {
 	//public static native ByteBuffer initializeSemaphore(int initialValue);
 	//public static native void deleteSemaphore(ByteBuffer sem);
 	//public static native byte takeSemaphore(ByteBuffer sem, int timeout);
+	public static native ByteBuffer initializeMultiWait();
+	public static native void deleteMultiWait(ByteBuffer sem);
+	public static native byte takeMultiWait(ByteBuffer sem, ByteBuffer m, int timeOut);
 	public static native short getFPGAVersion(IntBuffer status);
 	public static native int getFPGARevision(IntBuffer status);
 	public static native long getFPGATime(IntBuffer status);

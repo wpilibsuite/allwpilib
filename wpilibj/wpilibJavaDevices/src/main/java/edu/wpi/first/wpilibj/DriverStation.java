@@ -8,14 +8,12 @@ package edu.wpi.first.wpilibj;
 
 import java.nio.IntBuffer;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
 import edu.wpi.first.wpilibj.communication.HALControlWord;
 import edu.wpi.first.wpilibj.communication.HALAllianceStationID;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.hal.PowerJNI;
-import edu.wpi.first.wpilibj.Timer;
 
 /**
  * Provide access to the network communication data to / from the Driver Station.
@@ -73,6 +71,7 @@ public class DriverStation implements RobotState.Interface {
     private boolean m_userInTeleop = false;
     private boolean m_userInTest = false;
     private boolean m_newControlData;
+    private final ByteBuffer m_packetDataAvailableMutex;
     private final ByteBuffer m_packetDataAvailableSem;
 
     /**
@@ -94,7 +93,8 @@ public class DriverStation implements RobotState.Interface {
         m_semaphore = new Object();
         m_dataSem = new Object();
 
-        m_packetDataAvailableSem = HALUtil.initializeMutexNormal();
+        m_packetDataAvailableMutex = HALUtil.initializeMutexNormal();
+        m_packetDataAvailableSem = HALUtil.initializeMultiWait();
         FRCNetworkCommunicationsLibrary.setNewDataSem(m_packetDataAvailableSem);
 
         m_thread = new Thread(new DriverStationTask(this), "FRCDriverStation");
@@ -116,7 +116,7 @@ public class DriverStation implements RobotState.Interface {
     private void task() {
         int safetyCounter = 0;
         while (m_thread_keepalive) {
-        	HALUtil.takeMutex(m_packetDataAvailableSem);
+        	HALUtil.takeMultiWait(m_packetDataAvailableSem, m_packetDataAvailableMutex, 0);
         	synchronized (this) {
                 getData();
             }
