@@ -342,8 +342,9 @@ void CANJaguar::Set(float outputValue, uint8_t syncGroup)
 				dataSize = packFXP8_8(dataBuffer, outputValue);
 			}
 			break;
-		default:
-			return;
+    default:
+      wpi_setWPIErrorWithContext(IncompatibleMode, "The Jaguar only supports Current, Voltage, Position, Speed, and Percent (Throttle) modes.");
+      return;
 		}
 		if (syncGroup != 0)
 		{
@@ -1144,6 +1145,7 @@ void CANJaguar::SetP(double p)
 	{
 	case kPercentVbus:
 	case kVoltage:
+  case kFollower:
 		wpi_setWPIErrorWithContext(IncompatibleMode, "PID constants only apply in Speed, Position, and Current mode");
 		break;
 	case kSpeed:
@@ -1178,6 +1180,7 @@ void CANJaguar::SetI(double i)
 	{
 	case kPercentVbus:
 	case kVoltage:
+  case kFollower:
 		wpi_setWPIErrorWithContext(IncompatibleMode, "PID constants only apply in Speed, Position, and Current mode");
 		break;
 	case kSpeed:
@@ -1212,6 +1215,7 @@ void CANJaguar::SetD(double d)
 	{
 	case kPercentVbus:
 	case kVoltage:
+  case kFollower:
 		wpi_setWPIErrorWithContext(IncompatibleMode, "PID constants only apply in Speed, Position, and Current mode");
 		break;
 	case kSpeed:
@@ -1313,6 +1317,9 @@ void CANJaguar::EnableControl(double encoderInitialPosition)
 	case kVoltage:
 		sendMessage(LM_API_VCOMP_T_EN, dataBuffer, dataSize);
 		break;
+  default:
+    wpi_setWPIErrorWithContext(IncompatibleMode, "The Jaguar only supports Current, Voltage, Position, Speed, and Percent (Throttle) modes.");
+    return;
 	}
 
 	m_controlEnabled = true;
@@ -1353,7 +1360,7 @@ void CANJaguar::DisableControl()
  */
 void CANJaguar::SetPercentMode()
 {
-	ChangeControlMode(kPercentVbus);
+	SetControlMode(kPercentVbus);
 	SetPositionReference(LM_REF_NONE);
 	SetSpeedReference(LM_REF_NONE);
 }
@@ -1368,7 +1375,7 @@ void CANJaguar::SetPercentMode()
  */
 void CANJaguar::SetPercentMode(CANJaguar::EncoderStruct, uint16_t codesPerRev)
 {
-	ChangeControlMode(kPercentVbus);
+	SetControlMode(kPercentVbus);
 	SetPositionReference(LM_REF_NONE);
 	SetSpeedReference(LM_REF_ENCODER);
 	ConfigEncoderCodesPerRev(codesPerRev);
@@ -1384,7 +1391,7 @@ void CANJaguar::SetPercentMode(CANJaguar::EncoderStruct, uint16_t codesPerRev)
  */
 void CANJaguar::SetPercentMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev)
 {
-	ChangeControlMode(kPercentVbus);
+	SetControlMode(kPercentVbus);
 	SetPositionReference(LM_REF_ENCODER);
 	SetSpeedReference(LM_REF_QUAD_ENCODER);
 	ConfigEncoderCodesPerRev(codesPerRev);
@@ -1399,7 +1406,7 @@ void CANJaguar::SetPercentMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRe
 */
 void CANJaguar::SetPercentMode(CANJaguar::PotentiometerStruct)
 {
-	ChangeControlMode(kPercentVbus);
+	SetControlMode(kPercentVbus);
 	SetPositionReference(LM_REF_POT);
 	SetSpeedReference(LM_REF_NONE);
 	ConfigPotentiometerTurns(1);
@@ -1415,7 +1422,7 @@ void CANJaguar::SetPercentMode(CANJaguar::PotentiometerStruct)
  */
 void CANJaguar::SetCurrentMode(double p, double i, double d)
 {
-	ChangeControlMode(kCurrent);
+	SetControlMode(kCurrent);
 	SetPositionReference(LM_REF_NONE);
 	SetSpeedReference(LM_REF_NONE);
 	SetPID(p, i, d);
@@ -1433,7 +1440,7 @@ void CANJaguar::SetCurrentMode(double p, double i, double d)
 */
 void CANJaguar::SetCurrentMode(CANJaguar::EncoderStruct, uint16_t codesPerRev, double p, double i, double d)
 {
-	ChangeControlMode(kCurrent);
+	SetControlMode(kCurrent);
 	SetPositionReference(LM_REF_NONE);
 	SetSpeedReference(LM_REF_NONE);
 	ConfigEncoderCodesPerRev(codesPerRev);
@@ -1452,7 +1459,7 @@ void CANJaguar::SetCurrentMode(CANJaguar::EncoderStruct, uint16_t codesPerRev, d
 */
 void CANJaguar::SetCurrentMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev, double p, double i, double d)
 {
-	ChangeControlMode(kCurrent);
+	SetControlMode(kCurrent);
 	SetPositionReference(LM_REF_ENCODER);
 	SetSpeedReference(LM_REF_QUAD_ENCODER);
 	ConfigEncoderCodesPerRev(codesPerRev);
@@ -1471,7 +1478,7 @@ void CANJaguar::SetCurrentMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRe
 */
 void CANJaguar::SetCurrentMode(CANJaguar::PotentiometerStruct, double p, double i, double d)
 {
-	ChangeControlMode(kCurrent);
+	SetControlMode(kCurrent);
 	SetPositionReference(LM_REF_POT);
 	SetSpeedReference(LM_REF_NONE);
 	ConfigPotentiometerTurns(1);
@@ -1491,7 +1498,7 @@ void CANJaguar::SetCurrentMode(CANJaguar::PotentiometerStruct, double p, double 
  */
 void CANJaguar::SetSpeedMode(CANJaguar::EncoderStruct, uint16_t codesPerRev, double p, double i, double d)
 {
-	ChangeControlMode(kSpeed);
+	SetControlMode(kSpeed);
 	SetPositionReference(LM_REF_NONE);
 	SetSpeedReference(LM_REF_ENCODER);
 	ConfigEncoderCodesPerRev(codesPerRev);
@@ -1510,7 +1517,7 @@ void CANJaguar::SetSpeedMode(CANJaguar::EncoderStruct, uint16_t codesPerRev, dou
 */
 void CANJaguar::SetSpeedMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev, double p, double i, double d)
 {
-	ChangeControlMode(kSpeed);
+	SetControlMode(kSpeed);
 	SetPositionReference(LM_REF_ENCODER);
 	SetSpeedReference(LM_REF_QUAD_ENCODER);
 	ConfigEncoderCodesPerRev(codesPerRev);
@@ -1530,7 +1537,7 @@ void CANJaguar::SetSpeedMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev,
  */
 void CANJaguar::SetPositionMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev, double p, double i, double d)
 {
-	ChangeControlMode(kPosition);
+	SetControlMode(kPosition);
 	SetPositionReference(LM_REF_ENCODER);
 	ConfigEncoderCodesPerRev(codesPerRev);
 	SetPID(p, i, d);
@@ -1545,7 +1552,7 @@ void CANJaguar::SetPositionMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerR
 */
 void CANJaguar::SetPositionMode(CANJaguar::PotentiometerStruct, double p, double i, double d)
 {
-	ChangeControlMode(kPosition);
+	SetControlMode(kPosition);
 	SetPositionReference(LM_REF_POT);
 	ConfigPotentiometerTurns(1);
 	SetPID(p, i, d);
@@ -1557,7 +1564,7 @@ void CANJaguar::SetPositionMode(CANJaguar::PotentiometerStruct, double p, double
 */
 void CANJaguar::SetVoltageMode()
 {
-	ChangeControlMode(kVoltage);
+	SetControlMode(kVoltage);
 	SetPositionReference(LM_REF_NONE);
 	SetSpeedReference(LM_REF_NONE);
 }
@@ -1572,7 +1579,7 @@ void CANJaguar::SetVoltageMode()
 */
 void CANJaguar::SetVoltageMode(CANJaguar::EncoderStruct, uint16_t codesPerRev)
 {
-	ChangeControlMode(kVoltage);
+	SetControlMode(kVoltage);
 	SetPositionReference(LM_REF_NONE);
 	SetSpeedReference(LM_REF_ENCODER);
 	ConfigEncoderCodesPerRev(codesPerRev);
@@ -1588,7 +1595,7 @@ void CANJaguar::SetVoltageMode(CANJaguar::EncoderStruct, uint16_t codesPerRev)
 */
 void CANJaguar::SetVoltageMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev)
 {
-	ChangeControlMode(kVoltage);
+	SetControlMode(kVoltage);
 	SetPositionReference(LM_REF_ENCODER);
 	SetSpeedReference(LM_REF_QUAD_ENCODER);
 	ConfigEncoderCodesPerRev(codesPerRev);
@@ -1603,7 +1610,7 @@ void CANJaguar::SetVoltageMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRe
 */
 void CANJaguar::SetVoltageMode(CANJaguar::PotentiometerStruct)
 {
-	ChangeControlMode(kVoltage);
+	SetControlMode(kVoltage);
 	SetPositionReference(LM_REF_POT);
 	SetSpeedReference(LM_REF_NONE);
 	ConfigPotentiometerTurns(1);
@@ -1618,10 +1625,13 @@ void CANJaguar::SetVoltageMode(CANJaguar::PotentiometerStruct)
  *
  * @param controlMode The new mode.
  */
-void CANJaguar::ChangeControlMode(ControlMode controlMode)
+void CANJaguar::SetControlMode(ControlMode controlMode)
 {
 	// Disable the previous mode
 	DisableControl();
+
+  if (controlMode == kFollower)
+    wpi_setWPIErrorWithContext(IncompatibleMode, "The Jaguar only supports Current, Voltage, Position, Speed, and Percent (Throttle) modes.");
 
 	// Update the local mode
 	m_controlMode = controlMode;

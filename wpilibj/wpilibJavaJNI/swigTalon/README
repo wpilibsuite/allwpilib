@@ -1,0 +1,5 @@
+The generateJNI.sh script explains how to use it to generate the JNI bindings
+for the CAN Talon stuff using swig. This whole directory is a temporary measure
+until I (James Kuszmaul--11/18/2014) or someone else figures out how to
+integrate the swig stuff into the build system. For now, all the generated JNI
+bindings are checked into git, so that it should work until someone goes and updates ctre/CanTalonSRX.*

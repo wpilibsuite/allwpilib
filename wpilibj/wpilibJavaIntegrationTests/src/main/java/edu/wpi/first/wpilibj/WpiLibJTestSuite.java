@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.test.AbstractTestSuite;
 				AnalogCrossConnectTest.class,
 				AnalogPotentiometerTest.class,
 				BuiltInAccelerometerTest.class,
+				CANTalonTest.class,
 				CounterTest.class,
 				DIOCrossConnectTest.class,
 				EncoderTest.class,

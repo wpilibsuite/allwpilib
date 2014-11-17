@@ -61,7 +61,7 @@ protected:
 
 	template<typename T> txTask<T> GetTx(uint32_t arbId)
 	{
-		txTask<T> retval = {0, nullptr};
+		txTask<T> retval = {0};
 		txJobs_t::iterator i = _txJobs.find(arbId);
 		if(i != _txJobs.end()){
 			retval.arbId = i->second.arbId;

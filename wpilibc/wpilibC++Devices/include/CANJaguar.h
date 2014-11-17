@@ -10,7 +10,7 @@
 #include "Resource.h"
 #include "MotorSafetyHelper.h"
 #include "PIDOutput.h"
-#include "SpeedController.h"
+#include "CANSpeedController.h"
 #include "HAL/Semaphore.hpp"
 #include "HAL/HAL.hpp"
 #include "LiveWindow/LiveWindowSendable.h"
@@ -23,7 +23,7 @@
  * Luminary Micro Jaguar Speed Control
  */
 class CANJaguar : public MotorSafety,
-					public SpeedController,
+					public CANSpeedController,
 					public ErrorBase,
 					public LiveWindowSendable,
 					public ITableListener
@@ -41,40 +41,11 @@ public:
 	/** Sets a potentiometer as the position reference only. <br> Passed as the "tag" when setting the control mode. */
 	static const struct PotentiometerStruct {} Potentiometer;
 
-	typedef enum {kPercentVbus, kCurrent, kSpeed, kPosition, kVoltage} ControlMode;
-	typedef enum {kCurrentFault = 1, kTemperatureFault = 2, kBusVoltageFault = 4, kGateDriverFault = 8} Faults;
-	typedef enum {kForwardLimit = 1, kReverseLimit = 2} Limits;
-	typedef enum {
-					kNeutralMode_Jumper = 0, /** Use the NeutralMode that is set by the jumper wire on the CAN device */
-					kNeutralMode_Brake = 1,  /** Stop the motor's rotation by applying a force. */
-					kNeutralMode_Coast = 2   /** Do not attempt to stop the motor. Instead allow it to coast to a stop without applying resistance. */
-				} NeutralMode;
-	typedef enum {
-				/**
-				 * Disables the soft position limits and only uses the limit switches to limit rotation.
-				 * @see CANJaguar#GetForwardLimitOK()
-				 * @see CANJaguar#GetReverseLimitOK()
-				 *
-				 */
-					kLimitMode_SwitchInputsOnly = 0,
-				/**
-				 * Enables the soft position limits on the Jaguar.
-				 * These will be used in addition to the limit switches. This does not disable the behavior
-				 * of the limit switch input.
-				 * @see CANJaguar#ConfigSoftPositionLimits(double, double)
-				 */
-					kLimitMode_SoftPositionLimits = 1
-				} LimitMode;
-
 	explicit CANJaguar(uint8_t deviceNumber);
 	virtual ~CANJaguar();
 
 	uint8_t getDeviceNumber() const;
-
-	// SpeedController interface
-	virtual float Get();
-	virtual void Set(float value, uint8_t syncGroup=0);
-	virtual void Disable();
+	uint8_t GetHardwareVersion();
 
 	// PIDOutput interface
 	virtual void PIDWrite(float output);
@@ -104,39 +75,42 @@ public:
 	void SetVoltageMode(QuadEncoderStruct, uint16_t codesPerRev);
 	void SetVoltageMode(PotentiometerStruct);
 
-	// Other Accessors
-	void SetP(double p);
-	void SetI(double i);
-	void SetD(double d);
-	void SetPID(double p, double i, double d);
-	double GetP();
-	double GetI();
-	double GetD();
-	float GetBusVoltage();
-	float GetOutputVoltage();
-	float GetOutputCurrent();
-	float GetTemperature();
-	double GetPosition();
-	double GetSpeed();
-	bool GetForwardLimitOK();
-	bool GetReverseLimitOK();
-	uint16_t GetFaults();
-	void SetVoltageRampRate(double rampRate);
-	virtual uint32_t GetFirmwareVersion();
-	uint8_t GetHardwareVersion();
-	void ConfigNeutralMode(NeutralMode mode);
-	void ConfigEncoderCodesPerRev(uint16_t codesPerRev);
-	void ConfigPotentiometerTurns(uint16_t turns);
-	void ConfigSoftPositionLimits(double forwardLimitPosition, double reverseLimitPosition);
-	void DisableSoftPositionLimits();
-	void ConfigLimitMode(LimitMode mode);
-	void ConfigForwardLimit(double forwardLimitPosition);
-	void ConfigReverseLimit(double reverseLimitPosition);
-	void ConfigMaxOutputVoltage(double voltage);
-	void ConfigFaultTime(float faultTime);
-	ControlMode GetControlMode();
+	// CANSpeedController interface
+	virtual float Get() override;
+	virtual void Set(float value, uint8_t syncGroup=0) override;
+	virtual void Disable() override;
+	virtual void SetP(double p) override;
+	virtual void SetI(double i) override;
+	virtual void SetD(double d) override;
+	virtual void SetPID(double p, double i, double d) override;
+	virtual double GetP() override;
+	virtual double GetI() override;
+	virtual double GetD() override;
+	virtual float GetBusVoltage() override;
+	virtual float GetOutputVoltage() override;
+	virtual float GetOutputCurrent() override;
+	virtual float GetTemperature() override;
+	virtual double GetPosition() override;
+	virtual double GetSpeed() override;
+	virtual bool GetForwardLimitOK() override;
+	virtual bool GetReverseLimitOK() override;
+	virtual uint16_t GetFaults() override;
+	virtual void SetVoltageRampRate(double rampRate) override;
+	virtual uint32_t GetFirmwareVersion() override;
+	virtual void ConfigNeutralMode(NeutralMode mode) override;
+	virtual void ConfigEncoderCodesPerRev(uint16_t codesPerRev) override;
+	virtual void ConfigPotentiometerTurns(uint16_t turns) override;
+	virtual void ConfigSoftPositionLimits(double forwardLimitPosition, double reverseLimitPosition) override;
+	virtual void DisableSoftPositionLimits() override;
+	virtual void ConfigLimitMode(LimitMode mode) override;
+	virtual void ConfigForwardLimit(double forwardLimitPosition) override;
+	virtual void ConfigReverseLimit(double reverseLimitPosition) override;
+	virtual void ConfigMaxOutputVoltage(double voltage) override;
+	virtual void ConfigFaultTime(float faultTime) override;
+	virtual void SetControlMode(ControlMode mode);
+	virtual ControlMode GetControlMode();
 
-	static void UpdateSyncGroup(uint8_t syncGroup);
+ 	static void UpdateSyncGroup(uint8_t syncGroup);
 
 	void SetExpiration(float timeout);
 	float GetExpiration();
@@ -149,9 +123,6 @@ public:
 
 protected:
 	// Control mode helpers
-
-	void ChangeControlMode(ControlMode controlMode);
-
 	void SetSpeedReference(uint8_t reference);
 	uint8_t GetSpeedReference();
 

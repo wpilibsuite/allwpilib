@@ -14,7 +14,6 @@
 
 #include "Accelerometer.hpp"
 #include "Analog.hpp"
-#include "CAN.hpp"
 #include "Compressor.hpp"
 #include "Digital.hpp"
 #include "Solenoid.hpp"
