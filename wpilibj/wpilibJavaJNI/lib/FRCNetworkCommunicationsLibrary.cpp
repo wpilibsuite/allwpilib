@@ -537,6 +537,30 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCom
 
 /*
  * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
+ * Method:    HALGetSystemActive
+ * Signature: (Ljava/nio/IntBuffer;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetSystemActive
+  (JNIEnv * env, jclass, jobject status)
+{
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	return HALGetSystemActive((int32_t*)statusPtr);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
+ * Method:    HALGetBrownedOut
+ * Signature: (Ljava/nio/IntBuffer;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetBrownedOut
+  (JNIEnv * env, jclass, jobject status)
+{
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	return HALGetBrownedOut((int32_t*)statusPtr);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
  * Method:    HALSetErrorData
  * Signature: (Ljava/lang/String;)I
  */

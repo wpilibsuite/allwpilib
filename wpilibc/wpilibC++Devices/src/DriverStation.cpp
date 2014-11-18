@@ -286,6 +286,29 @@ bool DriverStation::IsTest()
 	return m_controlWord.test;
 }
 
+bool DriverStation::IsDSAttached()
+{
+	HALControlWord controlWord;
+	HALGetControlWord(&controlWord);
+	return controlWord.dsAttached;
+}
+
+bool DriverStation::IsSysActive()
+{
+	int32_t status = 0;
+	bool retVal = HALGetSystemActive(&status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	return retVal;
+}
+
+bool DriverStation::IsSysBrownedOut()
+{
+	int32_t status = 0;
+	bool retVal = HALGetBrownedOut(&status);
+	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	return retVal;
+}
+
 /**
  * Has a new control packet from the driver station arrived since the last time this function was called?
  * Warning: If you call this function from more than one place at the same time,

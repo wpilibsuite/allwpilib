@@ -8,6 +8,7 @@ package edu.wpi.first.wpilibj;
 
 import java.nio.IntBuffer;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
 import edu.wpi.first.wpilibj.communication.HALControlWord;
@@ -329,6 +330,22 @@ public class DriverStation implements RobotState.Interface {
     public boolean isOperatorControl() {
         return !(isAutonomous() || isTest());
     }
+	
+	public boolean isSysActive() {
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		boolean retVal = FRCNetworkCommunicationsLibrary.HALGetSystemActive(status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		return retVal;
+	}
+	
+	public boolean isBrownedOut() {
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		boolean retVal = FRCNetworkCommunicationsLibrary.HALGetBrownedOut(status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+		return retVal;
+	}
 
     /**
      * Has a new control packet from the driver station arrived since the last time this function was called?
@@ -393,6 +410,11 @@ public class DriverStation implements RobotState.Interface {
     public boolean isFMSAttached() {
         return m_controlWord.getFMSAttached();
     }
+	
+	public boolean isDSAttached() {
+		HALControlWord controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
+		return controlWord.getDSAttached();
+	}
 
     /**
      * Return the approximate match time

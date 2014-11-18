@@ -41,8 +41,11 @@ public:
 	bool IsAutonomous();
 	bool IsOperatorControl();
 	bool IsTest();
+	bool IsDSAttached();
 	bool IsNewControlData();
 	bool IsFMSAttached();
+	bool IsSysActive();
+	bool IsSysBrownedOut();
 
 	Alliance GetAlliance();
 	uint32_t GetLocation();
