@@ -20,10 +20,25 @@
 
   <target name="get-target-ip">
     <property name="target" value="roboRIO-${team-number}.local" />
-    <echo>Target: ${target}</echo>
+	<echo>Trying Target: ${target}</echo>
+	 <if>
+		<isreachable host="${target}"/>
+	  <then>
+		<echo>roboRIO found via mDNS</echo>
+	  </then>
+	  <else>
+		<math result="ip.upper" operand1="${team-number}" operation="/" operand2="100" datatype="int"/>
+		<math result="ip.lower" operand1="${team-number}" operation="%" operand2="100" datatype="int"/>
+		<property name="target" value="10.${ip-upper}.${ip.lower}.2"/>
+		<echo>roboRIO not found via mDNS, falling back to static address of ${target}</echo>
+		<assert name="roboRIOFound" message="roboRIO not found, please check that the roboRIO is connected, imaged and that the team number is set properly in Eclipse">
+			<isreachable host="${target}"/>
+		</assert>
+	  </else>
+	 </if>
   </target>
 
-  <target name="deploy" depends="get-target-ip" description="Deploy the progam and start it running.">
+  <target name="deploy" depends="get-target-ip, dependencies" description="Deploy the progam and start it running.">
     <sshexec host="${target}"
          username="${username}"
          password="${password}"
@@ -57,28 +72,6 @@
 		   command="/usr/local/frc/bin/frcKillRobot.sh"/>
   </target>
 
-  <target name="debug-deploy" depends="get-target-ip" description="Deploy the jar and start the program running in debug mode.">
-    <echo>[athena-deploy] Killing running program</echo>
-    <sshexec host="${target}"
-             username="${username}"
-             password="${password}"
-             trust="true"
-             command="killall FRCUserProgram; sleep 1"/>
-    <echo>[athena-debug-deploy] Copying code over.</echo>
-    <scp file="${dist.jar}" todir="${username}@${target}:${deploy.dir}"
-	 password="${password}" trust="true"/>
-    <scp file="${wpilib.ant.dir}/debugcppprogram" todir="${username}@${target}:${deploy.dir}"
-	 password="${password}" trust="true"/>
-    <scp file="${wpilib.ant.dir}/debugjavaprogram" todir="${username}@${target}:${deploy.dir}"
-	 password="${password}" trust="true"/>
-    <echo>[athena-debug-deploy] Starting program.</echo>
-    <sshexec host="${target}"
-	     username="${username}"
-	     password="${password}"
-	     trust="true"
-	     command="chmod a+x debug*program; ${deploy.debug.command}"/>
-  </target>
-
   <!-- Simulation support -->
   <target name="simulate">
     <parallel>
@@ -101,5 +94,21 @@
 	    <exec executable="${sim.exe}"></exec>
       </sequential>
     </parallel>
+  </target>
+  
+  <target name="dependencies" depends="get-target-ip">
+    <property name="ant.enable.asserts" value="true"/>
+	<post to="http://${target}/nisysapi/server" logfile="sysProps.xml" verbose="false" encoding="UTF-16LE">
+		<prop name="Function" value="GetPropertiesOfItem"/>
+		<prop name="Plugins" value="nisyscfg"/>
+		<prop name="Items" value="system"/>
+	</post>
+	<loadfile srcFile="sysProps.xml" encoding="UTF-16LE" property="roboRIOSysValues"/>
+	<propertyregex property="roboRIOImage" input="${roboRIOSysValues}" regexp="FRC_roboRIO_2015_v([0-9]+)" select="\1" defaultValue="ImageRegExFail"/>
+	<assert message="roboRIO Image does not match plugin, allowed image version: ${roboRIOAllowedImages}">
+		<bool>
+			<contains string="${roboRIOAllowedImages}" substring="${roboRIOImage}"/>
+		</bool>
+	</assert>
   </target>
 </project>

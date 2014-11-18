@@ -21,6 +21,7 @@
   
   <property file="${user.home}/wpilib/wpilib.properties"/>
   <property file="build.properties"/>
+  <property file="${user.home}/wpilib/cpp/${version}/ant/build.properties"/>
   
   <import file="${wpilib.ant.dir}/build.xml"/>
 
