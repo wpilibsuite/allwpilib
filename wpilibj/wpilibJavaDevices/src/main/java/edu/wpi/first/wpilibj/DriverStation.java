@@ -54,7 +54,7 @@ public class DriverStation implements RobotState.Interface {
 
     private static DriverStation instance = new DriverStation();
 
-    private HALControlWord m_controlWord;
+    private HALControlWord m_controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
     private HALAllianceStationID m_allianceStationID;
     private short[][] m_joystickAxes = new short[kJoystickPorts][FRCNetworkCommunicationsLibrary.kMaxJoystickAxes];
     private short[][] m_joystickPOVs = new short[kJoystickPorts][FRCNetworkCommunicationsLibrary.kMaxJoystickPOVs];
@@ -289,7 +289,7 @@ public class DriverStation implements RobotState.Interface {
      * @return True if the robot is enabled, false otherwise.
      */
     public boolean isEnabled() {
-        return m_controlWord.getEnabled();
+        return m_controlWord.getEnabled() && isDSAttached();
     }
 
     /**
@@ -362,6 +362,9 @@ public class DriverStation implements RobotState.Interface {
      * @return the current alliance
      */
     public Alliance getAlliance() {
+		if(m_allianceStationID == null) {
+			return Alliance.Invalid;
+		}
         switch (m_allianceStationID) {
             case Red1:
             case Red2:
@@ -384,6 +387,9 @@ public class DriverStation implements RobotState.Interface {
      * @return the location of the team's driver station controls: 1, 2, or 3
      */
     public int getLocation() {
+		if(m_allianceStationID == null) {
+			return 0;
+		}
         switch (m_allianceStationID) {
             case Red1:
             case Blue1:
@@ -450,7 +456,10 @@ public class DriverStation implements RobotState.Interface {
 			}
 		}
 		System.err.println(errorString);
-		FRCNetworkCommunicationsLibrary.HALSetErrorData(errorString);
+		HALControlWord controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
+		if(controlWord.getDSAttached()) {
+			FRCNetworkCommunicationsLibrary.HALSetErrorData(errorString);
+		}
 	}
 
     /** Only to be used to tell the Driver Station what code you claim to be executing
