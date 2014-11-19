@@ -216,6 +216,9 @@ extern "C"
 	int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons, uint8_t *count);
 
 	void HALSetNewDataSem(pthread_cond_t *);
+	
+	bool HALGetSystemActive(int32_t *status);
+	bool HALGetBrownedOut(int32_t *status);
 
 	int HALInitialize(int mode = 0);
 	void HALNetworkCommunicationObserveUserProgramStarting();

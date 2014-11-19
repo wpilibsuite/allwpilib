@@ -19,6 +19,7 @@ const uint32_t interrupt_kNumSystems = tInterrupt::kNumSystems;
 const uint32_t kSystemClockTicksPerMicrosecond = 40;
 
 static tGlobal *global;
+static tSysWatchdog *watchdog;
 
 void* getPort(uint8_t pin)
 {
@@ -210,6 +211,16 @@ void HALSetNewDataSem(pthread_cond_t * param)
 	setNewDataSem(param);
 }
 
+bool HALGetSystemActive(int32_t *status)
+{
+	return watchdog->readStatus_SystemActive(status);
+}
+	
+bool HALGetBrownedOut(int32_t *status)
+{
+	return !(watchdog->readStatus_PowerAlive(status));
+}
+
 /**
  * Call this to start up HAL. This is required for robot programs.
  */
@@ -227,6 +238,7 @@ int HALInitialize(int mode)
 
 	int32_t status;
 	global = tGlobal::create(&status);
+	watchdog = tSysWatchdog::create(&status);
 
 	// Kill any previous robot programs
 	std::fstream fs;

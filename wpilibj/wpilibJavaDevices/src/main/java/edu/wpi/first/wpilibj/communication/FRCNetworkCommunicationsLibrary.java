@@ -468,6 +468,8 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 	public static native short[] HALGetJoystickAxes(byte joystickNum);
 	public static native short[] HALGetJoystickPOVs(byte joystickNum);
 	public static native int HALGetJoystickButtons(byte joystickNum);
+	public static native boolean HALGetSystemActive(IntBuffer status);
+	public static native boolean HALGetBrownedOut(IntBuffer status);
 	
 	public static native int HALSetErrorData(String error);
 }
