@@ -97,11 +97,6 @@
        trust="true"
        command="${deploy.kill.command};"/>
 
-    <sshexec host="${target}"
-       username="${username}"
-       password="${password}"
-       trust="true"
-       command="${deploy.log.command}"/>
   </target>
 
   <target name="debug-deploy" depends="jar,get-target-ip,dependencies" description="Deploy the jar and start the program running.">
@@ -124,11 +119,6 @@
         trust="true"
         command="${deploy.kill.command}"/>
 
-    <sshexec host="${target}"
-        username="${username}"
-        password="${password}"
-        trust="true"
-        command="${deploy.log.command}"/>
   </target>
 
   <!-- Simulate -->
