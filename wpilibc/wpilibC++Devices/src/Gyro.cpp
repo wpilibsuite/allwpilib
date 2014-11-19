@@ -75,7 +75,7 @@ void Gyro::InitGyro()
  *
  * @param channel The analog channel the gyro is connected to.
  */
-Gyro::Gyro(uint32_t channel)
+Gyro::Gyro(int32_t channel)
 {
 	m_analog = new AnalogInput(channel);
 	m_channelAllocated = true;

@@ -25,7 +25,7 @@ class Counter : public SensorBase, public CounterBase, public LiveWindowSendable
 public:
 
 	Counter();
-	explicit Counter(uint32_t channel);
+	explicit Counter(int32_t channel);
 	explicit Counter(DigitalSource *source);
 	explicit Counter(DigitalSource &source);
 	explicit Counter(AnalogTrigger *trigger);
@@ -34,7 +34,7 @@ public:
 			bool inverted);
 	virtual ~Counter();
 
-	void SetUpSource(uint32_t channel);
+	void SetUpSource(int32_t channel);
 	void SetUpSource(AnalogTrigger *analogTrigger, AnalogTriggerType triggerType);
 	void SetUpSource(AnalogTrigger &analogTrigger, AnalogTriggerType triggerType);
 	void SetUpSource(DigitalSource *source);
@@ -42,7 +42,7 @@ public:
 	void SetUpSourceEdge(bool risingEdge, bool fallingEdge);
 	void ClearUpSource();
 
-	void SetDownSource(uint32_t channel);
+	void SetDownSource(int32_t channel);
 	void SetDownSource(AnalogTrigger *analogTrigger, AnalogTriggerType triggerType);
 	void SetDownSource(AnalogTrigger &analogTrigger, AnalogTriggerType triggerType);
 	void SetDownSource(DigitalSource *source);

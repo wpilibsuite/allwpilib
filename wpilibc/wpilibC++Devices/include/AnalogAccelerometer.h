@@ -18,7 +18,7 @@
  */
 class AnalogAccelerometer : public SensorBase, public PIDSource, public LiveWindowSendable {
 public:
-	explicit AnalogAccelerometer(uint32_t channel);
+	explicit AnalogAccelerometer(int32_t channel);
 	explicit AnalogAccelerometer(AnalogInput *channel);
 	virtual ~AnalogAccelerometer();
 

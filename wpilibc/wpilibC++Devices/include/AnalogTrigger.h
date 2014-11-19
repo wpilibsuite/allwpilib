@@ -15,7 +15,7 @@ class AnalogTrigger : public SensorBase
 {
 	friend class AnalogTriggerOutput;
 public:
-	explicit AnalogTrigger(uint32_t channel);
+	explicit AnalogTrigger(int32_t channel);
 	explicit AnalogTrigger(AnalogInput *channel);
 	virtual ~AnalogTrigger();
 
