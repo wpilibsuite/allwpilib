@@ -26,7 +26,7 @@ void AnalogAccelerometer::InitAccelerometer()
  *
  * The constructor allocates desired analog input.
  */
-AnalogAccelerometer::AnalogAccelerometer(uint32_t channel)
+AnalogAccelerometer::AnalogAccelerometer(int32_t channel)
 {
 	m_AnalogInput = new AnalogInput(channel);
 	m_allocatedChannel = true;

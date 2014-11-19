@@ -30,7 +30,7 @@ public:
 	static constexpr float kCalibrationSampleTime = 5.0;
 	static constexpr float kDefaultVoltsPerDegreePerSecond = 0.007;
 
-	explicit Gyro(uint32_t channel);
+	explicit Gyro(int32_t channel);
 	explicit Gyro(AnalogInput *channel);
 	explicit Gyro(AnalogInput &channel);
 	virtual ~Gyro();

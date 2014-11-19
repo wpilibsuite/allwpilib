@@ -82,7 +82,7 @@ Counter::Counter(DigitalSource &source) :
  *
  * The counter will start counting immediately.
  */
-Counter::Counter(uint32_t channel) :
+Counter::Counter(int32_t channel) :
 	m_upSource(NULL),
 	m_downSource(NULL),
 	m_counter(NULL)
@@ -177,7 +177,7 @@ Counter::~Counter()
 /**
  * Set the upsource for the counter as a digital input channel.
  */
-void Counter::SetUpSource(uint32_t channel)
+void Counter::SetUpSource(int32_t channel)
 {
     if (StatusIsFatal()) return;
     SetUpSource(new DigitalInput(channel));
@@ -278,7 +278,7 @@ void Counter::ClearUpSource()
 /**
  * Set the down counting source to be a digital input channel.
  */
-void Counter::SetDownSource(uint32_t channel)
+void Counter::SetDownSource(int32_t channel)
 {
 	if (StatusIsFatal()) return;
 	SetDownSource(new DigitalInput(channel));

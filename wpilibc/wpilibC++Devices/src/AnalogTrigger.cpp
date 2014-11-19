@@ -31,7 +31,7 @@ void AnalogTrigger::InitTrigger(uint32_t channel)
  *
  * @param channel The analog channel (0..7).
  */
-AnalogTrigger::AnalogTrigger(uint32_t channel)
+AnalogTrigger::AnalogTrigger(int32_t channel)
 {
 	InitTrigger(channel);
 }
