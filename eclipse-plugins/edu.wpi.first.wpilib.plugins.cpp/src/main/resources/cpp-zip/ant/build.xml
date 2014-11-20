@@ -57,11 +57,6 @@
        trust="true"
        command=". /etc/profile.d/natinst-path.sh; chmod a+x ${deploy.dir}/${out}; ${deploy.kill.command};"/>
 
-    <sshexec host="${target}"
-       username="${username}"
-       password="${password}"
-       trust="true"
-       command="tail -F -n 0 ${deploy.log.file}"/>
   </target>
   
   <target name="kill-program" depends="get-target-ip" description="Kill the currently running FRC program">
