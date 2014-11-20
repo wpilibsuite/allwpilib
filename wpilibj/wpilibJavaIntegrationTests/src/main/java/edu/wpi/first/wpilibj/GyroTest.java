@@ -61,14 +61,11 @@ public class GyroTest extends AbstractComsSetup {
 			tpcam.getPan().setAngle(45);
 			Timer.delay(.1);
 		}
+
+    Timer.delay(0.5);
 		//Reset for setup
 		tpcam.getGyro().reset();
-		
-		//Prevent drift
-		for(int i = 0; i < 10; i++) {
-			tpcam.getPan().setAngle(45);
-			Timer.delay(.1);
-		}
+    Timer.delay(0.5);
 		
 		//Perform test
 		for(int i = 450; i < 1350; i++) {
@@ -88,6 +85,10 @@ public class GyroTest extends AbstractComsSetup {
 
 	@Test
 	public void testDeviationOverTime(){
+    // Make sure that the test isn't influenced by any previous motions.
+    Timer.delay(0.25);
+    tpcam.getGyro().reset();
+    Timer.delay(0.25);
 		double angle = tpcam.getGyro().getAngle();
 		assertEquals(errorMessage(angle, 0), 0, angle, .5);
 		Timer.delay(5);
