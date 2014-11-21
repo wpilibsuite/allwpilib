@@ -433,10 +433,7 @@ public class DriverStation implements RobotState.Interface {
      * @return Match time in seconds since the beginning of autonomous
      */
     public double getMatchTime() {
-        if (m_approxMatchTimeOffset < 0.0) {
-            return 0.0;
-        }
-        return Timer.getFPGATimestamp() - m_approxMatchTimeOffset;
+        return FRCNetworkCommunicationsLibrary.HALGetMatchTime();
     }
 	
 	/**

@@ -214,6 +214,7 @@ extern "C"
 	int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes *axes);
 	int HALGetJoystickPOVs(uint8_t joystickNum, HALJoystickPOVs *povs);
 	int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons, uint8_t *count);
+	int HALGetMatchTime(float *matchTime);
 
 	void HALSetNewDataSem(pthread_cond_t *);
 	

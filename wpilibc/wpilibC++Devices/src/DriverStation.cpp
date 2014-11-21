@@ -397,9 +397,9 @@ void DriverStation::WaitForData()
  */
 double DriverStation::GetMatchTime()
 {
-	if (m_approxMatchTimeOffset < 0.0)
-		return 0.0;
-	return Timer::GetFPGATimestamp() - m_approxMatchTimeOffset;
+	float matchTime;
+	HALGetMatchTime(&matchTime);
+	return (double)matchTime;
 }
 
 /**

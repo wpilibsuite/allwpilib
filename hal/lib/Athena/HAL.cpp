@@ -206,6 +206,11 @@ int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons, uint
 	return FRC_NetworkCommunication_getJoystickButtons(joystickNum, buttons, count);
 }
 
+int HALGetMatchTime(float *matchTime)
+{
+	return FRC_NetworkCommunication_getMatchTime(matchTime);
+}
+
 void HALSetNewDataSem(pthread_cond_t * param)
 {
 	setNewDataSem(param);

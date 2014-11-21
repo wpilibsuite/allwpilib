@@ -537,6 +537,20 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCom
 
 /*
  * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
+
+ * Method:    HALGetMatchTime
+ * Signature: ()F
+ */
+JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetMatchTime
+  (JNIEnv * env, jclass)
+{
+	jfloat matchTime;
+	HALGetMatchTime((float*)&matchTime);
+	return matchTime;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
  * Method:    HALGetSystemActive
  * Signature: (Ljava/nio/IntBuffer;)Z
  */
