@@ -6,10 +6,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import javax.swing.JOptionPane;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.jface.dialogs.MessageDialog;
 
 import edu.wpi.first.wpilib.plugins.core.WPILibCore;
 
@@ -21,8 +20,8 @@ public class SimulationNotification {
 	
 	public static void showUnsupported() {
 		String title = "Simulation Unsupported";
-		String message = SIMULATION_UNSUPPORTED_MSG; 
-		JOptionPane.showMessageDialog(null, message, title, JOptionPane.OK_OPTION);
+		String message = SIMULATION_UNSUPPORTED_MSG;
+		MessageDialog.openError(null, title, message);
 		try {
 			Desktop.getDesktop().browse(new URI(URL));
 		} catch (IOException e) {
