@@ -22,17 +22,9 @@ import edu.wpi.first.wpilibj.hal.PowerJNI;
 public class DriverStation implements RobotState.Interface {
 
     /**
-     * The size of the user status data
-     */
-    public static final int USER_STATUS_DATA_SIZE = FRCNetworkCommunicationsLibrary.USER_STATUS_DATA_SIZE;
-    /**
      * Number of Joystick Ports
      */
     public static final int kJoystickPorts = 6;
-    /**
-     * Convert from raw values to volts
-     */
-    public static final double kDSAnalogInScaling = 5.0 / 1023.0;
 
     /**
      * The robot alliance that the robot is a part of
@@ -54,19 +46,10 @@ public class DriverStation implements RobotState.Interface {
 
     private static DriverStation instance = new DriverStation();
 
-    private HALControlWord m_controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
-    private HALAllianceStationID m_allianceStationID;
-    private short[][] m_joystickAxes = new short[kJoystickPorts][FRCNetworkCommunicationsLibrary.kMaxJoystickAxes];
-    private short[][] m_joystickPOVs = new short[kJoystickPorts][FRCNetworkCommunicationsLibrary.kMaxJoystickPOVs];
-    private int[] m_joystickButtons = new int[kJoystickPorts];
 
     private Thread m_thread;
-    private final Object m_semaphore;
     private final Object m_dataSem;
-    private int m_digitalOut;
     private volatile boolean m_thread_keepalive = true;
-    private int m_updateNumber = 0;
-    private double m_approxMatchTimeOffset = -1.0;
     private boolean m_userInDisabled = false;
     private boolean m_userInAutonomous = false;
     private boolean m_userInTeleop = false;
@@ -91,7 +74,6 @@ public class DriverStation implements RobotState.Interface {
      * instance static member variable.
      */
     protected DriverStation() {
-        m_semaphore = new Object();
         m_dataSem = new Object();
 
         m_packetDataAvailableMutex = HALUtil.initializeMutexNormal();
@@ -118,14 +100,11 @@ public class DriverStation implements RobotState.Interface {
         int safetyCounter = 0;
         while (m_thread_keepalive) {
         	HALUtil.takeMultiWait(m_packetDataAvailableSem, m_packetDataAvailableMutex, 0);
-        	synchronized (this) {
-                getData();
-            }
             synchronized (m_dataSem) {
                 m_dataSem.notifyAll();
             }
+            m_newControlData = true;
             if (++safetyCounter >= 5) {
-                //               System.out.println("Checking safety");
                 MotorSafetyHelper.checkMotors();
                 safetyCounter = 0;
             }
@@ -165,40 +144,6 @@ public class DriverStation implements RobotState.Interface {
             }
         }
     }
-    private static boolean lastEnabled = false;
-
-    /**
-     * Copy data from the DS task for the user.
-     * If no new data exists, it will just be returned, otherwise
-     * the data will be copied from the DS polling loop.
-     */
-    protected synchronized void getData() {
-        // Get the status data
-        m_controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
-
-        // Get the location/alliance data
-        m_allianceStationID = FRCNetworkCommunicationsLibrary.HALGetAllianceStation();
-
-        // Get the status of all of the joysticks
-        for(byte stick = 0; stick < kJoystickPorts; stick++) {
-            m_joystickAxes[stick] = FRCNetworkCommunicationsLibrary.HALGetJoystickAxes(stick);
-            m_joystickPOVs[stick] = FRCNetworkCommunicationsLibrary.HALGetJoystickPOVs(stick);
-        }
-
-        if (!lastEnabled && isEnabled()) {
-            // If starting teleop, assume that autonomous just took up 15 seconds
-            if (isAutonomous()) {
-                m_approxMatchTimeOffset = Timer.getFPGATimestamp();
-            } else {
-                m_approxMatchTimeOffset = Timer.getFPGATimestamp() - 15.0;
-            }
-        } else if (lastEnabled && !isEnabled()) {
-            m_approxMatchTimeOffset = -1.0;
-        }
-        lastEnabled = isEnabled();
-
-        m_newControlData = true;
-    }
 
     /**
      * Read the battery voltage.
@@ -229,13 +174,15 @@ public class DriverStation implements RobotState.Interface {
         if (axis < 0 || axis >= FRCNetworkCommunicationsLibrary.kMaxJoystickAxes) {
             throw new RuntimeException("Joystick axis is out of range");
         }
+		
+		short[] joystickAxes = FRCNetworkCommunicationsLibrary.HALGetJoystickAxes((byte)stick);
 
-        if (axis >= m_joystickAxes[stick].length) {
+        if (axis >= joystickAxes.length) {
 			reportError("WARNING: Joystick axis " + axis + " on port " + stick + " not available, check if controller is plugged in\n", false);
             return 0.0;
         }
 
-        byte value = (byte)m_joystickAxes[stick][axis];
+        byte value = (byte)joystickAxes[axis];
 
         if(value < 0) {
             return value / 128.0;
@@ -257,13 +204,15 @@ public class DriverStation implements RobotState.Interface {
         if (pov < 0 || pov >= FRCNetworkCommunicationsLibrary.kMaxJoystickPOVs) {
             throw new RuntimeException("Joystick POV is out of range");
         }
+		
+		short[] joystickPOVs = FRCNetworkCommunicationsLibrary.HALGetJoystickPOVs((byte)stick);
 
-        if (pov >= m_joystickPOVs[stick].length) {
+        if (pov >= joystickPOVs.length) {
 			reportError("WARNING: Joystick POV " + pov + " on port " + stick + " not available, check if controller is plugged in\n", false);
             return 0;
         }
 
-        return m_joystickPOVs[stick][pov];
+        return joystickPOVs[pov];
     }
 
     /**
@@ -296,7 +245,8 @@ public class DriverStation implements RobotState.Interface {
      * @return True if the robot is enabled, false otherwise.
      */
     public boolean isEnabled() {
-        return m_controlWord.getEnabled() && isDSAttached();
+		HALControlWord controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
+        return controlWord.getEnabled() && controlWord.getDSAttached();
     }
 
     /**
@@ -316,7 +266,8 @@ public class DriverStation implements RobotState.Interface {
      * @return True if autonomous mode should be enabled, false otherwise.
      */
     public boolean isAutonomous() {
-        return m_controlWord.getAutonomous();
+		HALControlWord controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
+        return controlWord.getAutonomous();
     }
 
     /**
@@ -325,7 +276,8 @@ public class DriverStation implements RobotState.Interface {
      * @return True if test mode should be enabled, false otherwise.
      */
     public boolean isTest() {
-        return m_controlWord.getTest();
+		HALControlWord controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
+        return controlWord.getTest();
     }
 
     /**
@@ -369,10 +321,12 @@ public class DriverStation implements RobotState.Interface {
      * @return the current alliance
      */
     public Alliance getAlliance() {
-		if(m_allianceStationID == null) {
+		HALAllianceStationID allianceStationID = FRCNetworkCommunicationsLibrary.HALGetAllianceStation();
+		if(allianceStationID == null) {
 			return Alliance.Invalid;
 		}
-        switch (m_allianceStationID) {
+		
+        switch (allianceStationID) {
             case Red1:
             case Red2:
             case Red3:
@@ -394,10 +348,11 @@ public class DriverStation implements RobotState.Interface {
      * @return the location of the team's driver station controls: 1, 2, or 3
      */
     public int getLocation() {
-		if(m_allianceStationID == null) {
+		HALAllianceStationID allianceStationID = FRCNetworkCommunicationsLibrary.HALGetAllianceStation();
+		if(allianceStationID == null) {
 			return 0;
 		}
-        switch (m_allianceStationID) {
+        switch (allianceStationID) {
             case Red1:
             case Blue1:
                 return 1;
@@ -421,7 +376,8 @@ public class DriverStation implements RobotState.Interface {
      * @return True if the robot is competing on a field being controlled by a Field Management System
      */
     public boolean isFMSAttached() {
-        return m_controlWord.getFMSAttached();
+		HALControlWord controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
+        return controlWord.getFMSAttached();
     }
 	
 	public boolean isDSAttached() {

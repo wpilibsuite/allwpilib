@@ -266,6 +266,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_NativeHALGetControlWord
   (JNIEnv *, jclass)
 {
+	NETCOMM_LOG(logDEBUG) << "Calling HAL Control Word";
     jint controlWord;
     HALGetControlWord((HALControlWord*)&controlWord);
     return controlWord;
@@ -279,6 +280,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_NativeHALGetAllianceStation
   (JNIEnv *, jclass)
 {
+	NETCOMM_LOG(logDEBUG) << "Calling HAL Alliance Station";
     jint allianceStation;
     HALGetAllianceStation((HALAllianceStationID*)&allianceStation);
     return allianceStation;
@@ -292,6 +294,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
 JNIEXPORT jshortArray JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickAxes
   (JNIEnv * env, jclass, jbyte joystickNum)
 {
+	NETCOMM_LOG(logDEBUG) << "Calling HALJoystickAxes";
     HALJoystickAxes axes;
     HALGetJoystickAxes(joystickNum, &axes);
 
@@ -309,6 +312,7 @@ JNIEXPORT jshortArray JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetwor
 JNIEXPORT jshortArray JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickPOVs
   (JNIEnv * env, jclass, jbyte joystickNum)
 {
+	NETCOMM_LOG(logDEBUG) << "Calling HALJoystickPOVs";
     HALJoystickPOVs povs;
     HALGetJoystickPOVs(joystickNum, &povs);
 

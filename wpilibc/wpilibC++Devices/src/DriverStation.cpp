@@ -32,26 +32,15 @@ DriverStation* DriverStation::m_instance = NULL;
  * This is only called once the first time GetInstance() is called
  */
 DriverStation::DriverStation()
-	: m_statusDataSemaphore (initializeMutexNormal())
-	, m_task ("DriverStation", (FUNCPTR)DriverStation::InitTask)
+	: m_task ("DriverStation", (FUNCPTR)DriverStation::InitTask)
 	, m_newControlData(0)
 	, m_packetDataAvailableMultiWait(0)
 	, m_waitForDataSem(0)
-	, m_approxMatchTimeOffset(-1.0)
 	, m_userInDisabled(false)
 	, m_userInAutonomous(false)
 	, m_userInTeleop(false)
 	, m_userInTest(false)
 {
-	memset(&m_controlWord, 0, sizeof(m_controlWord));
-
-	// All joysticks should default to having zero axes and povs, so
-	// uninitialized memory doesn't get sent to speed controllers.
-	for(unsigned int i = 0; i < kJoystickPorts; i++) {
-		m_joystickAxes[i].count = 0;
-		m_joystickPOVs[i].count = 0;
-	}
-
 	// Create a new semaphore
 	m_packetDataAvailableMultiWait = initializeMultiWait();
 	m_newControlData = initializeSemaphore(SEMAPHORE_EMPTY);
@@ -77,7 +66,6 @@ DriverStation::DriverStation()
 DriverStation::~DriverStation()
 {
 	m_task.Stop();
-	deleteMutex(m_statusDataSemaphore);
 	m_instance = NULL;
 	deleteMultiWait(m_waitForDataSem);
 	// Unregister our semaphore.
@@ -98,8 +86,8 @@ void DriverStation::Run()
 	while (true)
 	{
 		takeMultiWait(m_packetDataAvailableMultiWait, m_packetDataAvailableMutex, 0);  
-		GetData();
 		giveMultiWait(m_waitForDataSem);
+		giveSemaphore(m_newControlData);
 		if (++period >= 4)
 		{
 			MotorSafetyHelper::CheckMotors();
@@ -126,43 +114,6 @@ DriverStation* DriverStation::GetInstance()
 		m_instance = new DriverStation();
 	}
 	return m_instance;
-}
-
-/**
- * Copy data from the DS task for the user.
- * If no new data exists, it will just be returned, otherwise
- * the data will be copied from the DS polling loop.
- */
-void DriverStation::GetData()
-{
-	static bool lastEnabled = false;
-
-	// Get the status data
-	HALGetControlWord(&m_controlWord);
-
-	// Get the location/alliance data
-	HALGetAllianceStation(&m_allianceStationID);
-
-	// Get the status of all of the joysticks
-	for(uint8_t stick = 0; stick < kJoystickPorts; stick++) {
-		HALGetJoystickAxes(stick, &m_joystickAxes[stick]);
-		HALGetJoystickPOVs(stick, &m_joystickPOVs[stick]);
-	}
-
-	if (!lastEnabled && IsEnabled())
-	{
-		// If starting teleop, assume that autonomous just took up 15 seconds
-		if (IsAutonomous())
-			m_approxMatchTimeOffset = Timer::GetFPGATimestamp();
-		else
-			m_approxMatchTimeOffset = Timer::GetFPGATimestamp() - 15.0;
-	}
-	else if (lastEnabled && !IsEnabled())
-	{
-		m_approxMatchTimeOffset = -1.0;
-	}
-	lastEnabled = IsEnabled();
-	giveSemaphore(m_newControlData);
 }
 
 /**
@@ -195,7 +146,9 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
 		return 0;
 	}
 
-	if (axis >= m_joystickAxes[stick].count)
+	HALJoystickAxes joystickAxes;
+	HALGetJoystickAxes(stick, &joystickAxes);
+	if (axis >= joystickAxes.count)
 	{
 		if (axis >= kMaxJoystickAxes)
 			wpi_setWPIError(BadJoystickAxis);
@@ -204,7 +157,7 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
 		return 0.0f;
 	}
 
-	int8_t value = m_joystickAxes[stick].axes[axis];
+	int8_t value = joystickAxes.axes[axis];
 
 	if(value < 0)
 	{
@@ -227,8 +180,10 @@ int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
 		wpi_setWPIError(BadJoystickIndex);
 		return 0;
 	}
-
-	if (pov >= m_joystickPOVs[stick].count)
+	
+	HALJoystickPOVs joystickPOVs;
+	HALGetJoystickPOVs(stick, &joystickPOVs);
+	if (pov >= joystickPOVs.count)
 	{
 		if (pov >= kMaxJoystickPOVs)
 			wpi_setWPIError(BadJoystickAxis);
@@ -237,7 +192,7 @@ int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
 		return 0;
 	}
 
-	return m_joystickPOVs[stick].povs[pov];
+	return joystickPOVs.povs[pov];
 }
 
 /**
@@ -265,27 +220,37 @@ bool DriverStation::GetStickButton(uint32_t stick, uint8_t button)
 
 bool DriverStation::IsEnabled()
 {
-	return m_controlWord.enabled;
+	HALControlWord controlWord;
+	HALGetControlWord(&controlWord);
+	return controlWord.enabled && controlWord.dsAttached;
 }
 
 bool DriverStation::IsDisabled()
 {
-	return !m_controlWord.enabled;
+	HALControlWord controlWord;
+	HALGetControlWord(&controlWord);
+	return !(controlWord.enabled && controlWord.dsAttached);
 }
 
 bool DriverStation::IsAutonomous()
 {
-	return m_controlWord.autonomous;
+	HALControlWord controlWord;
+	HALGetControlWord(&controlWord);
+	return controlWord.autonomous;
 }
 
 bool DriverStation::IsOperatorControl()
 {
-	return !(m_controlWord.autonomous || m_controlWord.test);
+	HALControlWord controlWord;
+	HALGetControlWord(&controlWord);
+	return !(controlWord.autonomous || controlWord.test);
 }
 
 bool DriverStation::IsTest()
 {
-	return m_controlWord.test;
+	HALControlWord controlWord;
+	HALGetControlWord(&controlWord);
+	return controlWord.test;
 }
 
 bool DriverStation::IsDSAttached()
@@ -329,7 +294,9 @@ bool DriverStation::IsNewControlData()
  */
 bool DriverStation::IsFMSAttached()
 {
-	return m_controlWord.fmsAttached;
+	HALControlWord controlWord;
+	HALGetControlWord(&controlWord);
+	return controlWord.fmsAttached;
 }
 
 /**
@@ -339,7 +306,9 @@ bool DriverStation::IsFMSAttached()
  */
 DriverStation::Alliance DriverStation::GetAlliance()
 {
-	switch(m_allianceStationID)
+	HALAllianceStationID allianceStationID;
+	HALGetAllianceStation(&allianceStationID);
+	switch(allianceStationID)
 	{
 	case kHALAllianceStationID_red1:
 	case kHALAllianceStationID_red2:
@@ -361,7 +330,9 @@ DriverStation::Alliance DriverStation::GetAlliance()
  */
 uint32_t DriverStation::GetLocation()
 {
-	switch(m_allianceStationID)
+	HALAllianceStationID allianceStationID;
+	HALGetAllianceStation(&allianceStationID);
+	switch(allianceStationID)
 	{
 	case kHALAllianceStationID_red1:
 	case kHALAllianceStationID_blue1:

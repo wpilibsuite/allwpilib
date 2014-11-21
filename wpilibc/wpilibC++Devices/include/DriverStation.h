@@ -53,11 +53,6 @@ public:
 	double GetMatchTime();
 	float GetBatteryVoltage();
 
-	MUTEX_ID GetUserStatusDataSem()
-	{
-		return m_statusDataSemaphore;
-	}
-
 	/** Only to be used to tell the Driver Station what code you claim to be executing
 	 *   for diagnostic purposes only
 	 * @param entering If true, starting disabled code; if false, leaving disabled code */
@@ -90,29 +85,18 @@ public:
 protected:
 	DriverStation();
 
-	void GetData();
-	void SetData();
-
 private:
 	static void InitTask(DriverStation *ds);
 	static DriverStation *m_instance;
 
 	void Run();
 
-	HALControlWord m_controlWord;
-	HALAllianceStationID m_allianceStationID;
-	HALJoystickAxes m_joystickAxes[kJoystickPorts];
-	HALJoystickPOVs m_joystickPOVs[kJoystickPorts];
-	HALJoystickButtons m_joystickButtons[kJoystickPorts];
-
-	MUTEX_ID m_statusDataSemaphore;
 	Task m_task;
 	SEMAPHORE_ID m_newControlData;
 	MULTIWAIT_ID m_packetDataAvailableMultiWait;
 	MUTEX_ID m_packetDataAvailableMutex;
 	MULTIWAIT_ID m_waitForDataSem;
 	MUTEX_ID m_waitForDataMutex;
-	double m_approxMatchTimeOffset;
 	bool m_userInDisabled;
 	bool m_userInAutonomous;
 	bool m_userInTeleop;
