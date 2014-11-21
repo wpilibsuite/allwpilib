@@ -178,7 +178,10 @@ struct HALJoystickPOVs {
 	int16_t povs[kMaxJoystickPOVs];
 };
 
-typedef uint32_t HALJoystickButtons;
+struct HALJoystickButtons {
+	uint32_t buttons;
+	uint8_t count;
+};
 
 inline float intToFloat(int value)
 {
@@ -213,7 +216,7 @@ extern "C"
 	int HALGetAllianceStation(enum HALAllianceStationID *allianceStation);
 	int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes *axes);
 	int HALGetJoystickPOVs(uint8_t joystickNum, HALJoystickPOVs *povs);
-	int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons, uint8_t *count);
+	int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons);
 	int HALGetMatchTime(float *matchTime);
 
 	void HALSetNewDataSem(pthread_cond_t *);

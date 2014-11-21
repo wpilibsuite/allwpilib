@@ -34,7 +34,7 @@ public:
 
 	float GetStickAxis(uint32_t stick, uint32_t axis);
 	int GetStickPOV(uint32_t stick, uint32_t pov);
-	short GetStickButtons(uint32_t stick);
+	bool GetStickButton(uint32_t stick, uint8_t button);
 
 	bool IsEnabled();
 	bool IsDisabled();

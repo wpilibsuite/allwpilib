@@ -228,7 +228,7 @@ bool Joystick::GetBumper(JoystickHand hand)
  **/
 bool Joystick::GetRawButton(uint32_t button)
 {
-	return ((0x1 << (button-1)) & m_ds->GetStickButtons(m_port)) != 0;
+	return m_ds->GetStickButton(m_port, button);
 }
 
 /**

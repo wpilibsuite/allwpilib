@@ -201,9 +201,9 @@ int HALGetJoystickPOVs(uint8_t joystickNum, HALJoystickPOVs *povs)
 	return FRC_NetworkCommunication_getJoystickPOVs(joystickNum, (JoystickPOV_t*) povs, kMaxJoystickPOVs);
 }
 
-int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons, uint8_t *count)
+int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons)
 {
-	return FRC_NetworkCommunication_getJoystickButtons(joystickNum, buttons, count);
+	return FRC_NetworkCommunication_getJoystickButtons(joystickNum, &buttons->buttons, &buttons->count);
 }
 
 int HALGetMatchTime(float *matchTime)

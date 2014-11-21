@@ -145,11 +145,8 @@ void DriverStation::GetData()
 
 	// Get the status of all of the joysticks
 	for(uint8_t stick = 0; stick < kJoystickPorts; stick++) {
-		uint8_t count;
-
 		HALGetJoystickAxes(stick, &m_joystickAxes[stick]);
 		HALGetJoystickPOVs(stick, &m_joystickPOVs[stick]);
-		HALGetJoystickButtons(stick, &m_joystickButtons[stick], &count);
 	}
 
 	if (!lastEnabled && IsEnabled())
@@ -245,20 +242,25 @@ int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
 
 /**
  * The state of the buttons on the joystick.
- * 12 buttons (4 msb are unused) from the joystick.
  *
  * @param stick The joystick to read.
  * @return The state of the buttons on the joystick.
  */
-short DriverStation::GetStickButtons(uint32_t stick)
+bool DriverStation::GetStickButton(uint32_t stick, uint8_t button)
 {
 	if (stick >= kJoystickPorts)
 	{
 		wpi_setWPIError(BadJoystickIndex);
 		return 0;
 	}
-
-	return m_joystickButtons[stick];
+	HALJoystickButtons joystickButtons;
+	HALGetJoystickButtons(stick, &joystickButtons);
+	if(button >= joystickButtons.count)
+	{
+		ReportError("WARNING: Joystick Button missing, check if all controllers are plugged in\n");
+		return false;
+	}
+	return ((0x1 << (button-1)) & joystickButtons.buttons) !=0;
 }
 
 bool DriverStation::IsEnabled()

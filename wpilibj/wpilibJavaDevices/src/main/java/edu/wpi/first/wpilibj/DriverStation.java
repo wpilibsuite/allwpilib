@@ -181,7 +181,6 @@ public class DriverStation implements RobotState.Interface {
 
         // Get the status of all of the joysticks
         for(byte stick = 0; stick < kJoystickPorts; stick++) {
-            m_joystickButtons[stick] = FRCNetworkCommunicationsLibrary.HALGetJoystickButtons(stick);
             m_joystickAxes[stick] = FRCNetworkCommunicationsLibrary.HALGetJoystickAxes(stick);
             m_joystickPOVs[stick] = FRCNetworkCommunicationsLibrary.HALGetJoystickPOVs(stick);
         }
@@ -274,12 +273,20 @@ public class DriverStation implements RobotState.Interface {
      * @param stick The joystick to read.
      * @return The state of the buttons on the joystick.
      */
-    public int getStickButtons(final int stick) {
+    public boolean getStickButton(final int stick, byte button) {
         if(stick < 0 || stick >= kJoystickPorts) {
             throw new RuntimeException("Joystick index is out of range, should be 0-3");
         }
-
-        return (int)m_joystickButtons[stick];
+		
+		ByteBuffer countBuffer = ByteBuffer.allocateDirect(1);
+		int buttons = FRCNetworkCommunicationsLibrary.HALGetJoystickButtons((byte)stick, countBuffer);
+		byte count = 0;
+		count = countBuffer.get();
+		if(button >= count) {
+			reportError("WARNING: Joystick Button " + button + " on port " + stick + " not available, check if controller is plugged in\n", false);
+            return false;
+		}
+		return ((0x1 << (button - 1)) & buttons) != 0;
     }
 
     /**

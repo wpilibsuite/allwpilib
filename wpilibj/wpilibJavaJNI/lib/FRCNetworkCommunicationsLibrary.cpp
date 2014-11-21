@@ -324,14 +324,17 @@ JNIEXPORT jshortArray JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetwor
  * Signature: (B)S
  */
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickButtons
-  (JNIEnv *, jclass, jbyte joystickNum)
+  (JNIEnv * env, jclass, jbyte joystickNum, jobject count)
 {
-    HALJoystickButtons buttons;
-    uint8_t count;
-
-    HALGetJoystickButtons(joystickNum, &buttons, &count);
-
-    return buttons;
+	NETCOMM_LOG(logDEBUG) << "Calling HALJoystickButtons";
+    HALJoystickButtons joystickButtons;
+    HALGetJoystickButtons(joystickNum, &joystickButtons);
+	jbyte *countPtr = (jbyte*)env->GetDirectBufferAddress(count);
+	NETCOMM_LOG(logDEBUG) << "Buttons = " << joystickButtons.buttons;
+	NETCOMM_LOG(logDEBUG) << "Count = " << (jint)joystickButtons.count;
+	*countPtr = joystickButtons.count;
+	NETCOMM_LOG(logDEBUG) << "CountBuffer = " << (jint)*countPtr;
+    return joystickButtons.buttons;
 }
 
 /*

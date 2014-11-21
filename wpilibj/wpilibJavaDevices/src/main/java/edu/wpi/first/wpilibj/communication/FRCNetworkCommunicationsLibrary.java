@@ -467,7 +467,7 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 	public static int kMaxJoystickPOVs = 12;
 	public static native short[] HALGetJoystickAxes(byte joystickNum);
 	public static native short[] HALGetJoystickPOVs(byte joystickNum);
-	public static native int HALGetJoystickButtons(byte joystickNum);
+	public static native int HALGetJoystickButtons(byte joystickNum, ByteBuffer count);
 	public static native float HALGetMatchTime();
 	public static native boolean HALGetSystemActive(IntBuffer status);
 	public static native boolean HALGetBrownedOut(IntBuffer status);
