@@ -8,8 +8,6 @@ import java.io.OutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.swing.JOptionPane;
-
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -17,6 +15,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.jface.dialogs.MessageDialog;
 
 import edu.wpi.first.wpilib.plugins.core.WPILibCore;
 
@@ -117,7 +116,7 @@ public abstract class AbstractInstaller {
 	protected void install() throws InstallException {
 		if(installLocation.exists()) {
 			if(!removeFileHandler(installLocation, true)) {
-				JOptionPane.showMessageDialog(null,
+				MessageDialog.openError(null, "Error",
 					String.format("Could not update the old wpilib folder.%n"
 							+ "Please close any WPILib tools and restart Eclipse."));
 			}
