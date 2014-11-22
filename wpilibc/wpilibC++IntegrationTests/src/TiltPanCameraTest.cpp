@@ -13,9 +13,9 @@ static constexpr double kServoResetTime = 2.0;
 
 static constexpr double kTestAngle = 180.0;
 
-static constexpr double kTiltSetpoint0 = 0.16;
-static constexpr double kTiltSetpoint45 = 0.385;
-static constexpr double kTiltSetpoint90 = 0.61;
+static constexpr double kTiltSetpoint0 = 0.22;
+static constexpr double kTiltSetpoint45 = 0.45;
+static constexpr double kTiltSetpoint90 = 0.68;
 static constexpr double kTiltTime = 1.0;
 static constexpr double kAccelerometerTolerance = 0.2;
 
@@ -73,9 +73,13 @@ TEST_F(TiltPanCameraTest, DefaultGyroAngle) {
  * Test if the servo turns 180 degrees and the gyroscope measures this angle
  */
 TEST_F(TiltPanCameraTest, GyroAngle) {
+  // Make sure that the gyro doesn't get jerked when the servo goes to zero.
+  m_pan->SetAngle(0.0);
+  Wait(0.25);
+  m_gyro->Reset();
+
 	for(int i = 0; i < 1800; i++) {
 		m_pan->SetAngle(i / 10.0);
-
 		Wait(0.001);
 	}
 
