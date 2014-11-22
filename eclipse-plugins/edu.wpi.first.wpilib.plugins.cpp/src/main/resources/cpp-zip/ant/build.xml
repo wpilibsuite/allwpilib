@@ -93,7 +93,7 @@
   
   <target name="dependencies" depends="get-target-ip">
     <property name="ant.enable.asserts" value="true"/>
-	<post to="http://${target}/nisysapi/server" logfile="sysProps.xml" verbose="false" encoding="UTF-16LE">
+	<post to="http://${target}/nisysapi/server" logfile="sysProps.xml" verbose="false" encoding="UTF-16LE" append="false">
 		<prop name="Function" value="GetPropertiesOfItem"/>
 		<prop name="Plugins" value="nisyscfg"/>
 		<prop name="Items" value="system"/>
