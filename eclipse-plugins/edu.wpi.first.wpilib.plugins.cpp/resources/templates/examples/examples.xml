@@ -281,7 +281,7 @@
     </example>
 
     <example>
-        <name>Getting Started</name>
+        <name>Intermediate vision</name>
         <description>An example program that acquires images from an attached USB camera and adds some
             annotation to the image as you might do for showing operators the result of some image
             recognition, and sends it to the dashboard for display.
