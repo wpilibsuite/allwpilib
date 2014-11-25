@@ -6,11 +6,15 @@
 #define STATUS_1  		0x8041400
 #define STATUS_2  		0x8041440
 #define STATUS_3  		0x8041480
+#define STATUS_ENERGY	0x8041740
+
+#define CONTROL_1		0x08041C00	/* PDP_Control_ClearStats */
 
 #define EXPECTED_RESPONSE_TIMEOUT_MS	(50)
 #define GET_STATUS1()		CtreCanNode::recMsg<PdpStatus1_t> rx = GetRx<PdpStatus1_t>(STATUS_1,EXPECTED_RESPONSE_TIMEOUT_MS)
 #define GET_STATUS2()		CtreCanNode::recMsg<PdpStatus2_t> rx = GetRx<PdpStatus2_t>(STATUS_2,EXPECTED_RESPONSE_TIMEOUT_MS)
 #define GET_STATUS3()		CtreCanNode::recMsg<PdpStatus3_t> rx = GetRx<PdpStatus3_t>(STATUS_3,EXPECTED_RESPONSE_TIMEOUT_MS)
+#define GET_STATUS_ENERGY()	CtreCanNode::recMsg<PDP_Status_Energy_t> rx = GetRx<PDP_Status_Energy_t>(STATUS_ENERGY,EXPECTED_RESPONSE_TIMEOUT_MS)
 
 /* encoder/decoders */
 typedef struct _PdpStatus1_t{
@@ -56,6 +60,18 @@ typedef struct _PdpStatus3_t{
 	unsigned busVoltage:8;
 	unsigned temp:8;
 }PdpStatus3_t;
+typedef struct _PDP_Status_Energy_t {
+	unsigned TmeasMs_likelywillbe20ms_:8;
+	unsigned TotalCurrent_125mAperunit_h8:8;
+	unsigned Power_125mWperunit_h4:4;
+	unsigned TotalCurrent_125mAperunit_l4:4;
+	unsigned Power_125mWperunit_m8:8;
+	unsigned Energy_125mWPerUnitXTmeas_h4:4;
+	unsigned Power_125mWperunit_l4:4;
+	unsigned Energy_125mWPerUnitXTmeas_mh8:8;
+	unsigned Energy_125mWPerUnitXTmeas_ml8:8;
+	unsigned Energy_125mWPerUnitXTmeas_l8:8;
+} PDP_Status_Energy_t ;
 
 PDP::PDP(UINT8 deviceNumber): CtreCanNode(deviceNumber)
 {
@@ -127,6 +143,68 @@ CTR_Code PDP::GetTemperature(double &tempC)
 	uint32_t raw = rx->temp;
 	tempC =	(double)raw * 1.03250836957542 - 67.8564500484966;
 	return rx.err;
+}
+CTR_Code PDP::GetTotalCurrent(double &currentAmps)
+{
+	GET_STATUS_ENERGY();
+	uint32_t raw;
+	raw = rx->TotalCurrent_125mAperunit_h8;
+	raw <<= 4;
+	raw |=  rx->TotalCurrent_125mAperunit_l4;
+	currentAmps = 0.125 * raw;
+	return rx.err;
+}
+CTR_Code PDP::GetTotalPower(double &powerWatts)
+{
+	GET_STATUS_ENERGY();
+	uint32_t raw;
+	raw = rx->Power_125mWperunit_h4;
+	raw <<= 8;
+	raw |=  rx->Power_125mWperunit_m8;
+	raw <<= 4;
+	raw |=  rx->Power_125mWperunit_l4;
+	powerWatts = 0.125 * raw;
+	return rx.err;
+}
+CTR_Code PDP::GetTotalEnergy(double &energyJoules)
+{
+	GET_STATUS_ENERGY();
+	uint32_t raw;
+	raw = rx->Energy_125mWPerUnitXTmeas_h4;
+	raw <<= 8;
+	raw |=  rx->Energy_125mWPerUnitXTmeas_mh8;
+	raw <<= 8;
+	raw |=  rx->Energy_125mWPerUnitXTmeas_ml8;
+	raw <<= 8;
+	raw |=  rx->Energy_125mWPerUnitXTmeas_l8;
+	energyJoules = 0.125 * raw; 						/* mW integrated every TmeasMs */
+	energyJoules *= rx->TmeasMs_likelywillbe20ms_;	/* multiplied by TmeasMs = joules */
+	return rx.err;
+}
+/* Clear sticky faults.
+ * @Return	-	CTR_Code	-	Error code (if any)
+ */
+CTR_Code PDP::ClearStickyFaults()
+{
+	int32_t status = 0;
+	uint8_t pdpControl[] = { 0x80 }; /* only bit set is ClearStickyFaults */
+	FRC_NetworkCommunication_CANSessionMux_sendMessage(CONTROL_1  | GetDeviceNumber(), pdpControl, sizeof(pdpControl), 0, &status);
+	if(status)
+		return CTR_TxFailed;
+	return CTR_OKAY;
+}
+
+/* Reset Energy Signals
+ * @Return	-	CTR_Code	-	Error code (if any)
+ */
+CTR_Code PDP::ResetEnergy()
+{
+	int32_t status = 0;
+	uint8_t pdpControl[] = { 0x40 }; /* only bit set is ResetEnergy */
+	FRC_NetworkCommunication_CANSessionMux_sendMessage(CONTROL_1  | GetDeviceNumber(), pdpControl, sizeof(pdpControl), 0, &status);
+	if(status)
+		return CTR_TxFailed;
+	return CTR_OKAY;
 }
 //------------------ C interface --------------------------------------------//
 extern "C" {

@@ -26,3 +26,36 @@ double getPDPChannelCurrent(uint8_t channel, int32_t *status) {
 	return current;
 }
 
+double getPDPTotalCurrent(int32_t *status) {
+	double current;
+	
+	*status = pdp.GetTotalCurrent(current);
+	
+	return current;
+}
+
+double getPDPTotalPower(int32_t *status) {
+	double power;
+	
+	*status = pdp.GetTotalPower(power);
+	
+	return power;
+}
+
+double getPDPTotalEnergy(int32_t *status) {
+	double energy;
+	
+	*status = pdp.GetTotalEnergy(energy);
+	
+	return energy;
+}
+
+void resetPDPTotalEnergy(int32_t *status) {
+	*status = pdp.ResetEnergy();
+}
+
+void clearPDPStickyFaults(int32_t *status) {
+	*status = pdp.ClearStickyFaults();
+}
+
+

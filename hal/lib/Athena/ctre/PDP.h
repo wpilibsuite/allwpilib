@@ -38,6 +38,19 @@ public:
      * @Param	-	status		-	Temperature of PDP in Centigrade / Celcius (C)
      */
     CTR_Code GetTemperature(double &status);
+
+	CTR_Code GetTotalCurrent(double &currentAmps);
+	CTR_Code GetTotalPower(double &powerWatts);
+	CTR_Code GetTotalEnergy(double &energyJoules);
+    /* Clear sticky faults.
+     * @Return	-	CTR_Code	-	Error code (if any)
+     */
+	CTR_Code ClearStickyFaults();
+
+	/* Reset Energy Signals
+	 * @Return	-	CTR_Code	-	Error code (if any)
+	 */
+	CTR_Code ResetEnergy();
 private:
     uint64_t ReadCurrents(uint8_t api);
 };

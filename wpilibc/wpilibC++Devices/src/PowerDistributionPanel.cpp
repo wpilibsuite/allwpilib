@@ -69,3 +69,80 @@ PowerDistributionPanel::GetCurrent(uint8_t channel) {
 	return current;
 }
 
+/**
+ * @return The the total current drawn from the PDP channels in Amperes
+ */
+double
+PowerDistributionPanel::GetTotalCurrent() {
+	int32_t status = 0;
+	
+	double current = getPDPTotalCurrent(&status);
+	
+	if(status) {
+		wpi_setWPIErrorWithContext(Timeout, "");
+	}
+	
+	return current;
+}
+
+/**
+ * @return The the total power drawn from the PDP channels in Joules
+ */
+double
+PowerDistributionPanel::GetTotalPower() {
+	int32_t status = 0;
+	
+	double power = getPDPTotalPower(&status);
+	
+	if(status) {
+		wpi_setWPIErrorWithContext(Timeout, "");
+	}
+	
+	return power;
+}
+
+/**
+ * @return The the total energy drawn from the PDP channels in Watts
+ */
+double
+PowerDistributionPanel::GetTotalEnergy() {
+	int32_t status = 0;
+	
+	double energy = getPDPTotalEnergy(&status);
+	
+	if(status) {
+		wpi_setWPIErrorWithContext(Timeout, "");
+	}
+	
+	return energy;
+}
+
+/**
+ * Reset the total energy drawn from the PDP
+ * @see PowerDistributionPanel#GetTotalEnergy
+ */
+void
+PowerDistributionPanel::ResetTotalEnergy() { 
+	int32_t status = 0;
+	
+	resetPDPTotalEnergy(&status);
+	
+	if(status) {
+		wpi_setWPIErrorWithContext(Timeout, "");
+	}
+}
+
+/**
+ * Remove all of the fault flags on the PDP
+ */
+void
+PowerDistributionPanel::ClearStickyFaults() {
+	int32_t status = 0;
+	
+	clearPDPStickyFaults(&status);
+	
+	if(status) {
+		wpi_setWPIErrorWithContext(Timeout, "");
+	}
+}
+

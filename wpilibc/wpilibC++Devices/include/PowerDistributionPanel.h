@@ -21,6 +21,11 @@ class PowerDistributionPanel : public SensorBase {
 		double GetVoltage();
 		double GetTemperature();
 		double GetCurrent(uint8_t channel);
+		double GetTotalCurrent();
+		double GetTotalPower();
+		double GetTotalEnergy();
+		void ResetTotalEnergy();
+		void ClearStickyFaults();
 };
 
 #endif /* __WPILIB_POWER_DISTRIBUTION_PANEL_H__ */
