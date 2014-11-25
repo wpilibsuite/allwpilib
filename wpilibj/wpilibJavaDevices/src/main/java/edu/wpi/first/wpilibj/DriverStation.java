@@ -103,6 +103,8 @@ public class DriverStation implements RobotState.Interface {
             synchronized (m_dataSem) {
                 m_dataSem.notifyAll();
             }
+            // need to get the controlWord to keep the motors enabled
+            HALControlWord controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
             m_newControlData = true;
             if (++safetyCounter >= 5) {
                 MotorSafetyHelper.checkMotors();

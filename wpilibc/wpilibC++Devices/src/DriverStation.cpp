@@ -82,12 +82,16 @@ void DriverStation::InitTask(DriverStation *ds)
 
 void DriverStation::Run()
 {
+   	HALControlWord controlWord;
 	int period = 0;
 	while (true)
 	{
-		takeMultiWait(m_packetDataAvailableMultiWait, m_packetDataAvailableMutex, 0);  
+        // need to get the controlWord to keep the motors enabled
+	    HALGetControlWord(&controlWord);
+		takeMultiWait(m_packetDataAvailableMultiWait, m_packetDataAvailableMutex, 0);
 		giveMultiWait(m_waitForDataSem);
 		giveSemaphore(m_newControlData);
+
 		if (++period >= 4)
 		{
 			MotorSafetyHelper::CheckMotors();
@@ -221,6 +225,7 @@ bool DriverStation::GetStickButton(uint32_t stick, uint8_t button)
 bool DriverStation::IsEnabled()
 {
 	HALControlWord controlWord;
+    memset(&controlWord, 0, sizeof(controlWord));
 	HALGetControlWord(&controlWord);
 	return controlWord.enabled && controlWord.dsAttached;
 }
@@ -228,6 +233,7 @@ bool DriverStation::IsEnabled()
 bool DriverStation::IsDisabled()
 {
 	HALControlWord controlWord;
+    memset(&controlWord, 0, sizeof(controlWord));
 	HALGetControlWord(&controlWord);
 	return !(controlWord.enabled && controlWord.dsAttached);
 }
@@ -235,6 +241,7 @@ bool DriverStation::IsDisabled()
 bool DriverStation::IsAutonomous()
 {
 	HALControlWord controlWord;
+    memset(&controlWord, 0, sizeof(controlWord));
 	HALGetControlWord(&controlWord);
 	return controlWord.autonomous;
 }
@@ -242,6 +249,7 @@ bool DriverStation::IsAutonomous()
 bool DriverStation::IsOperatorControl()
 {
 	HALControlWord controlWord;
+    memset(&controlWord, 0, sizeof(controlWord));
 	HALGetControlWord(&controlWord);
 	return !(controlWord.autonomous || controlWord.test);
 }
@@ -256,6 +264,7 @@ bool DriverStation::IsTest()
 bool DriverStation::IsDSAttached()
 {
 	HALControlWord controlWord;
+    memset(&controlWord, 0, sizeof(controlWord));
 	HALGetControlWord(&controlWord);
 	return controlWord.dsAttached;
 }
