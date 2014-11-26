@@ -65,6 +65,13 @@ public class CANTalonTest extends AbstractComsSetup {
     // Turn Talon off.
     talon.Set(0.0);
 		assertTrue(true);
+
+    Timer.delay(2);
+    CANTalon tal = new CANTalon(0);
+    tal.enableControl();
+    tal.set(0.5);
+    Timer.delay(1.0);
+    tal.disable();
 	}
 
 }
