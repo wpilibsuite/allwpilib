@@ -38,23 +38,13 @@ typedef	unsigned int	UINT;
 typedef unsigned long	ULONG;
 
 typedef enum {
-		CTR_OKAY,				//No Error - Function executed as expected
-		CTR_RxTimeout,			/*
-								 *	Receive Timeout
-								 *
-								 *		No module-specific CAN frames have been received in
-								 *	the last 50ms. Function returns the latest received data
-								 *	but may be STALE DATA.
-								 */
-		CTR_TxTimeout,			/*
-								 *	Transmission Timeout
-								 *
-								 *		No module-specific CAN frames were transmitted in
-								 *	the last 50ms. Parameters passed in by the user are loaded
-								 *	for next transmission but have not sent.
-								 */
-		CTR_InvalidParamValue,
-		CTR_UnexpectedArbId,
+		CTR_OKAY,				//!< No Error - Function executed as expected
+		CTR_RxTimeout,			//!< CAN frame has not been received within specified period of time.
+		CTR_TxTimeout,			//!< Not used.
+		CTR_InvalidParamValue, 	//!< Caller passed an invalid param
+		CTR_UnexpectedArbId,	//!< Specified CAN Id is invalid.
+		CTR_TxFailed,			//!< Could not transmit the CAN frame.
+		CTR_SigNotUpdated,		//!< Have not received an value response for signal.
 }CTR_Code;
 
 #endif

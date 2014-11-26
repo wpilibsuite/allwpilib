@@ -3,3 +3,7 @@ for the CAN Talon stuff using swig. This whole directory is a temporary measure
 until I (James Kuszmaul--11/18/2014) or someone else figures out how to
 integrate the swig stuff into the build system. For now, all the generated JNI
 bindings are checked into git, so that it should work until someone goes and updates ctre/CanTalonSRX.*
+
+In order for this to work, I had to change the CanTalonSRX constructor to take a int deviceNumber instead of a uint8_t.
+
+Also, in all the SWIGTYPE* files, you must change protected methods to public functions.

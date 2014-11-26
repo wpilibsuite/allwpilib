@@ -24,11 +24,9 @@ CANTalon::CANTalon(int deviceNumber)
 	, m_safetyHelper(new MotorSafetyHelper(this))
   , m_controlEnabled(false)
 {
-  // The control mode may already have been set.
-  CTR_Code status = m_impl->SetModeSelect((int)m_controlMode);
-	if(status != CTR_OKAY) {
-		wpi_setErrorWithContext(status, getHALErrorMessage(status));
-	}
+  // The control mode may already have been set; GetControlMode will reset
+  // m_controlMode to match the Talon.
+  GetControlMode();
 }
 
 CANTalon::~CANTalon() {
@@ -60,6 +58,24 @@ void CANTalon::PIDWrite(float output)
  */
 float CANTalon::Get()
 {
+  int value;
+  switch(m_controlMode) {
+    case kPercentVbus:
+      m_impl->GetAppliedThrottle(value);
+      return 1.0 - (float)value / 1023.0;
+    case kVoltage:
+      return GetOutputVoltage();
+    case kCurrent:
+      return GetOutputCurrent();
+    case kSpeed:
+      m_impl->GetSensorVelocity(value);
+      return value;
+    case kPosition:
+      m_impl->GetSensorPosition(value);
+      return value;
+    default:
+      break;
+  }
   return 0.0f;
 }
 
@@ -79,18 +95,18 @@ void CANTalon::Set(float value, uint8_t syncGroup)
         break;
       case kFollowerMode:
         {
-          status = m_impl->SetDemand24((int)value);
+          status = m_impl->SetDemand((int)value);
         }
         break;
       case kVoltageMode:
         {
           // Voltage is an 8.8 fixed point number.
           int volts = int(value * 256);
-          status = m_impl->SetDemand24(volts);
+          status = m_impl->SetDemand(volts);
         }
       default:
         // TODO: Add support for other modes. Need to figure out what format
-        // SetDemand24 needs.
+        // SetDemand needs.
         break;
     }
     if (status != CTR_OKAY) {
@@ -105,8 +121,8 @@ void CANTalon::Set(float value, uint8_t syncGroup)
 void CANTalon::Disable()
 {
   // Until Modes other than throttle work, just disable by setting throttle to 0.0.
-  m_impl->Set(0.0); // TODO when firmware is updated, remove this.
-  //m_impl->SetModeSelect(kDisabled); // TODO when firmware is updated, uncomment this.
+  //m_impl->Set(0.0); // TODO when firmware is updated, remove this.
+  m_impl->SetModeSelect(kDisabled); // TODO when firmware is updated, uncomment this.
   m_controlEnabled = false;
 }
 
@@ -119,11 +135,14 @@ void CANTalon::EnableControl() {
 }
 
 /**
- * TODO documentation (see CANJaguar.cpp)
+ * @param 
  */
 void CANTalon::SetP(double p)
 {
-	// TODO
+  CTR_Code status = m_impl->SetPgain(m_profile, p);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
 }
 
 /**
@@ -131,7 +150,10 @@ void CANTalon::SetP(double p)
  */
 void CANTalon::SetI(double i)
 {
-	// TODO
+  CTR_Code status = m_impl->SetIgain(m_profile, i);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
 }
 
 /**
@@ -139,7 +161,10 @@ void CANTalon::SetI(double i)
  */
 void CANTalon::SetD(double d)
 {
-	// TODO
+  CTR_Code status = m_impl->SetDgain(m_profile, d);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
 }
 
 /**
@@ -157,8 +182,12 @@ void CANTalon::SetPID(double p, double i, double d)
  */
 double CANTalon::GetP()
 {
-	// TODO
-	return 0.0;
+  double p;
+  CTR_Code status = m_impl->GetPgain(m_profile, p);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
+	return p;
 }
 
 /**
@@ -166,8 +195,12 @@ double CANTalon::GetP()
  */
 double CANTalon::GetI()
 {
-	// TODO
-	return 0.0;
+  double i;
+  CTR_Code status = m_impl->GetIgain(m_profile, i);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
+	return i;
 }
 
 /**
@@ -175,8 +208,12 @@ double CANTalon::GetI()
  */
 double CANTalon::GetD()
 {
-	// TODO
-	return 0.0;
+  double d;
+  CTR_Code status = m_impl->GetDgain(m_profile, d);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
+	return d;
 }
 
 /**
@@ -200,8 +237,8 @@ float CANTalon::GetBusVoltage()
 float CANTalon::GetOutputVoltage()
 {
   int throttle11;
-  CTR_Code status = m_impl->GetAppliedThrottle11(throttle11);
-  float voltage = GetBusVoltage() * float(throttle11) / 1023.0;
+  CTR_Code status = m_impl->GetAppliedThrottle(throttle11);
+  float voltage = GetBusVoltage() * (float(throttle11) / 1023.0 - 1.0);
 	if(status != CTR_OKAY) {
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}

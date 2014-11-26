@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj.fixtures.SampleFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
 import edu.wpi.first.wpilibj.hal.CanTalonSRX;
+import edu.wpi.first.wpilibj.hal.CanTalonJNI;
+import edu.wpi.first.wpilibj.hal.SWIGTYPE_p_double;
 
 /**
  * Basic test (borrowed straight from SampleTest) for running the CAN TalonSRX.
@@ -61,10 +63,21 @@ public class CANTalonTest extends AbstractComsSetup {
     talon.SetModeSelect(0);
     // Set Talon to 50% forwards throttle.
     talon.Set(0.5);
+    long currentp = CanTalonJNI.new_doublep();//new SWIGTYPE_p_double(, true);
+    talon.GetTemp(new SWIGTYPE_p_double(currentp, true));
+    System.out.println(CanTalonJNI.doublep_value(currentp));
     Timer.delay(1.5);
     // Turn Talon off.
     talon.Set(0.0);
 		assertTrue(true);
+
+    Timer.delay(2);
+    CANTalon tal = new CANTalon(0);
+    tal.enableControl();
+    tal.set(0.5);
+    System.out.println(tal.getTemp());
+    Timer.delay(1.0);
+    tal.disable();
 	}
 
 }

@@ -15,11 +15,11 @@ public class SWIGTYPE_p_UINT8 {
     swigCPtr = cPtr;
   }
 
-  protected SWIGTYPE_p_UINT8() {
+  public SWIGTYPE_p_UINT8() {
     swigCPtr = 0;
   }
 
-  protected static long getCPtr(SWIGTYPE_p_UINT8 obj) {
+  public static long getCPtr(SWIGTYPE_p_UINT8 obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }
