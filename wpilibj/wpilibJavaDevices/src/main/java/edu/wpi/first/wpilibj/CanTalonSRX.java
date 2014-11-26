@@ -47,6 +47,114 @@ public class CanTalonSRX extends CtreCanNode {
     CanTalonJNI.CanTalonSRX_Set(swigCPtr, this, value);
   }
 
+  public SWIGTYPE_p_CTR_Code SetParam(CanTalonSRX.param_t paramEnum, double value) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetParam(swigCPtr, this, paramEnum.swigValue(), value), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code RequestParam(CanTalonSRX.param_t paramEnum) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_RequestParam(swigCPtr, this, paramEnum.swigValue()), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code GetParamResponse(CanTalonSRX.param_t paramEnum, SWIGTYPE_p_double value) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetParamResponse(swigCPtr, this, paramEnum.swigValue(), SWIGTYPE_p_double.getCPtr(value)), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code GetParamResponseInt32(CanTalonSRX.param_t paramEnum, SWIGTYPE_p_int32_t value) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetParamResponseInt32(swigCPtr, this, paramEnum.swigValue(), SWIGTYPE_p_int32_t.getCPtr(value)), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code SetPgain(SWIGTYPE_p_uint32_t slotIdx, double gain) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetPgain(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), gain), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code SetIgain(SWIGTYPE_p_uint32_t slotIdx, double gain) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetIgain(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), gain), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code SetDgain(SWIGTYPE_p_uint32_t slotIdx, double gain) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetDgain(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), gain), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code SetFgain(SWIGTYPE_p_uint32_t slotIdx, double gain) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetFgain(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), gain), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code SetIzone(SWIGTYPE_p_uint32_t slotIdx, SWIGTYPE_p_int32_t zone) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetIzone(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), SWIGTYPE_p_int32_t.getCPtr(zone)), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code SetCloseLoopRampRate(SWIGTYPE_p_uint32_t slotIdx, SWIGTYPE_p_int32_t closeLoopRampRate) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetCloseLoopRampRate(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), SWIGTYPE_p_int32_t.getCPtr(closeLoopRampRate)), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code SetSensorPosition(SWIGTYPE_p_int32_t pos) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetSensorPosition(swigCPtr, this, SWIGTYPE_p_int32_t.getCPtr(pos)), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code SetForwardSoftLimit(SWIGTYPE_p_int32_t forwardLimit) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetForwardSoftLimit(swigCPtr, this, SWIGTYPE_p_int32_t.getCPtr(forwardLimit)), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code SetReverseSoftLimit(SWIGTYPE_p_int32_t reverseLimit) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetReverseSoftLimit(swigCPtr, this, SWIGTYPE_p_int32_t.getCPtr(reverseLimit)), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code SetForwardSoftEnable(SWIGTYPE_p_int32_t enable) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetForwardSoftEnable(swigCPtr, this, SWIGTYPE_p_int32_t.getCPtr(enable)), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code SetReverseSoftEnable(SWIGTYPE_p_int32_t enable) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetReverseSoftEnable(swigCPtr, this, SWIGTYPE_p_int32_t.getCPtr(enable)), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code GetPgain(SWIGTYPE_p_uint32_t slotIdx, SWIGTYPE_p_double gain) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetPgain(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), SWIGTYPE_p_double.getCPtr(gain)), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code GetIgain(SWIGTYPE_p_uint32_t slotIdx, SWIGTYPE_p_double gain) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetIgain(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), SWIGTYPE_p_double.getCPtr(gain)), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code GetDgain(SWIGTYPE_p_uint32_t slotIdx, SWIGTYPE_p_double gain) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetDgain(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), SWIGTYPE_p_double.getCPtr(gain)), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code GetFgain(SWIGTYPE_p_uint32_t slotIdx, SWIGTYPE_p_double gain) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetFgain(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), SWIGTYPE_p_double.getCPtr(gain)), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code GetIzone(SWIGTYPE_p_uint32_t slotIdx, SWIGTYPE_p_int32_t zone) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetIzone(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), SWIGTYPE_p_int32_t.getCPtr(zone)), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code GetCloseLoopRampRate(SWIGTYPE_p_uint32_t slotIdx, SWIGTYPE_p_int32_t closeLoopRampRate) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetCloseLoopRampRate(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), SWIGTYPE_p_int32_t.getCPtr(closeLoopRampRate)), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code GetForwardSoftLimit(SWIGTYPE_p_int32_t forwardLimit) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetForwardSoftLimit(swigCPtr, this, SWIGTYPE_p_int32_t.getCPtr(forwardLimit)), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code GetReverseSoftLimit(SWIGTYPE_p_int32_t reverseLimit) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetReverseSoftLimit(swigCPtr, this, SWIGTYPE_p_int32_t.getCPtr(reverseLimit)), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code GetForwardSoftEnable(SWIGTYPE_p_int32_t enable) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetForwardSoftEnable(swigCPtr, this, SWIGTYPE_p_int32_t.getCPtr(enable)), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code GetReverseSoftEnable(SWIGTYPE_p_int32_t enable) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetReverseSoftEnable(swigCPtr, this, SWIGTYPE_p_int32_t.getCPtr(enable)), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code SetStatusFrameRate(SWIGTYPE_p_uint32_t frameEnum, SWIGTYPE_p_uint8_t periodMs) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetStatusFrameRate(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(frameEnum), SWIGTYPE_p_uint8_t.getCPtr(periodMs)), true);
+  }
+
+  public SWIGTYPE_p_CTR_Code ClearStickyFaults() {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_ClearStickyFaults(swigCPtr, this), true);
+  }
+
   public SWIGTYPE_p_CTR_Code GetFault_OverTemp(SWIGTYPE_p_int param) {
     return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetFault_OverTemp(swigCPtr, this, SWIGTYPE_p_int.getCPtr(param)), true);
   }
@@ -99,16 +207,16 @@ public class CanTalonSRX extends CtreCanNode {
     return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetStckyFault_RevSoftLim(swigCPtr, this, SWIGTYPE_p_int.getCPtr(param)), true);
   }
 
-  public SWIGTYPE_p_CTR_Code GetAppliedThrottle11(SWIGTYPE_p_int param) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetAppliedThrottle11(swigCPtr, this, SWIGTYPE_p_int.getCPtr(param)), true);
+  public SWIGTYPE_p_CTR_Code GetAppliedThrottle(SWIGTYPE_p_int param) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetAppliedThrottle(swigCPtr, this, SWIGTYPE_p_int.getCPtr(param)), true);
   }
 
   public SWIGTYPE_p_CTR_Code GetCloseLoopErr(SWIGTYPE_p_int param) {
     return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetCloseLoopErr(swigCPtr, this, SWIGTYPE_p_int.getCPtr(param)), true);
   }
 
-  public SWIGTYPE_p_CTR_Code GetSelectlFeedbackDevice(SWIGTYPE_p_int param) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetSelectlFeedbackDevice(swigCPtr, this, SWIGTYPE_p_int.getCPtr(param)), true);
+  public SWIGTYPE_p_CTR_Code GetFeedbackDeviceSelect(SWIGTYPE_p_int param) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetFeedbackDeviceSelect(swigCPtr, this, SWIGTYPE_p_int.getCPtr(param)), true);
   }
 
   public SWIGTYPE_p_CTR_Code GetModeSelect(SWIGTYPE_p_int param) {
@@ -125,10 +233,6 @@ public class CanTalonSRX extends CtreCanNode {
 
   public SWIGTYPE_p_CTR_Code GetLimitSwitchClosedRev(SWIGTYPE_p_int param) {
     return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetLimitSwitchClosedRev(swigCPtr, this, SWIGTYPE_p_int.getCPtr(param)), true);
-  }
-
-  public SWIGTYPE_p_CTR_Code GetCloseLoopCellSelect(SWIGTYPE_p_int param) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetCloseLoopCellSelect(swigCPtr, this, SWIGTYPE_p_int.getCPtr(param)), true);
   }
 
   public SWIGTYPE_p_CTR_Code GetSensorPosition(SWIGTYPE_p_int param) {
@@ -199,40 +303,172 @@ public class CanTalonSRX extends CtreCanNode {
     return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetFirmVers(swigCPtr, this, SWIGTYPE_p_int.getCPtr(param)), true);
   }
 
-  public SWIGTYPE_p_CTR_Code SetDemand24(int param) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetDemand24(swigCPtr, this, param), true);
+  public SWIGTYPE_p_CTR_Code SetDemand(int param) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetDemand(swigCPtr, this, param), true);
   }
 
-  public SWIGTYPE_p_CTR_Code SetLimitSwitchEn(int param) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetLimitSwitchEn(swigCPtr, this, param), true);
+  public SWIGTYPE_p_CTR_Code SetOverrideLimitSwitchEn(int param) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetOverrideLimitSwitchEn(swigCPtr, this, param), true);
   }
 
-  public SWIGTYPE_p_CTR_Code SetSelectlFeedbackDevice(int param) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetSelectlFeedbackDevice(swigCPtr, this, param), true);
+  public SWIGTYPE_p_CTR_Code SetFeedbackDeviceSelect(int param) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetFeedbackDeviceSelect(swigCPtr, this, param), true);
   }
 
   public SWIGTYPE_p_CTR_Code SetRevMotDuringCloseLoopEn(int param) {
     return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetRevMotDuringCloseLoopEn(swigCPtr, this, param), true);
   }
 
-  public SWIGTYPE_p_CTR_Code SetBrakeType(int param) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetBrakeType(swigCPtr, this, param), true);
+  public SWIGTYPE_p_CTR_Code SetOverrideBrakeType(int param) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetOverrideBrakeType(swigCPtr, this, param), true);
   }
 
   public SWIGTYPE_p_CTR_Code SetModeSelect(int param) {
     return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetModeSelect(swigCPtr, this, param), true);
   }
 
-  public SWIGTYPE_p_CTR_Code SetCloseLoopCellSelect(int param) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetCloseLoopCellSelect(swigCPtr, this, param), true);
+  public SWIGTYPE_p_CTR_Code SetProfileSlotSelect(int param) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetProfileSlotSelect(swigCPtr, this, param), true);
   }
 
   public SWIGTYPE_p_CTR_Code SetRampThrottle(int param) {
     return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetRampThrottle(swigCPtr, this, param), true);
   }
 
-  public SWIGTYPE_p_CTR_Code SetRevEncoderPosAndVel(int param) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetRevEncoderPosAndVel(swigCPtr, this, param), true);
+  public SWIGTYPE_p_CTR_Code SetRevFeedbackSensor(int param) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetRevFeedbackSensor(swigCPtr, this, param), true);
+  }
+
+  public final static int kMode_DutyCycle = CanTalonJNI.CanTalonSRX_kMode_DutyCycle_get();
+  public final static int kMode_PositionCloseLoop = CanTalonJNI.CanTalonSRX_kMode_PositionCloseLoop_get();
+  public final static int kMode_VelocityCloseLoop = CanTalonJNI.CanTalonSRX_kMode_VelocityCloseLoop_get();
+  public final static int kMode_CurrentCloseLoop = CanTalonJNI.CanTalonSRX_kMode_CurrentCloseLoop_get();
+  public final static int kMode_VoltCompen = CanTalonJNI.CanTalonSRX_kMode_VoltCompen_get();
+  public final static int kMode_SlaveFollower = CanTalonJNI.CanTalonSRX_kMode_SlaveFollower_get();
+  public final static int kMode_NoDrive = CanTalonJNI.CanTalonSRX_kMode_NoDrive_get();
+  public final static int kLimitSwitchOverride_UseDefaultsFromFlash = CanTalonJNI.CanTalonSRX_kLimitSwitchOverride_UseDefaultsFromFlash_get();
+  public final static int kLimitSwitchOverride_DisableFwd_DisableRev = CanTalonJNI.CanTalonSRX_kLimitSwitchOverride_DisableFwd_DisableRev_get();
+  public final static int kLimitSwitchOverride_DisableFwd_EnableRev = CanTalonJNI.CanTalonSRX_kLimitSwitchOverride_DisableFwd_EnableRev_get();
+  public final static int kLimitSwitchOverride_EnableFwd_DisableRev = CanTalonJNI.CanTalonSRX_kLimitSwitchOverride_EnableFwd_DisableRev_get();
+  public final static int kLimitSwitchOverride_EnableFwd_EnableRev = CanTalonJNI.CanTalonSRX_kLimitSwitchOverride_EnableFwd_EnableRev_get();
+  public final static int kBrakeOverride_UseDefaultsFromFlash = CanTalonJNI.CanTalonSRX_kBrakeOverride_UseDefaultsFromFlash_get();
+  public final static int kBrakeOverride_OverrideCoast = CanTalonJNI.CanTalonSRX_kBrakeOverride_OverrideCoast_get();
+  public final static int kBrakeOverride_OverrideBrake = CanTalonJNI.CanTalonSRX_kBrakeOverride_OverrideBrake_get();
+  public final static int kFeedbackDev_DigitalQuadEnc = CanTalonJNI.CanTalonSRX_kFeedbackDev_DigitalQuadEnc_get();
+  public final static int kFeedbackDev_AnalogPot = CanTalonJNI.CanTalonSRX_kFeedbackDev_AnalogPot_get();
+  public final static int kFeedbackDev_AnalogEncoder = CanTalonJNI.CanTalonSRX_kFeedbackDev_AnalogEncoder_get();
+  public final static int kFeedbackDev_CountEveryRisingEdge = CanTalonJNI.CanTalonSRX_kFeedbackDev_CountEveryRisingEdge_get();
+  public final static int kFeedbackDev_CountEveryFallingEdge = CanTalonJNI.CanTalonSRX_kFeedbackDev_CountEveryFallingEdge_get();
+  public final static int kFeedbackDev_PosIsPulseWidth = CanTalonJNI.CanTalonSRX_kFeedbackDev_PosIsPulseWidth_get();
+  public final static int kProfileSlotSelect_Slot0 = CanTalonJNI.CanTalonSRX_kProfileSlotSelect_Slot0_get();
+  public final static int kProfileSlotSelect_Slot1 = CanTalonJNI.CanTalonSRX_kProfileSlotSelect_Slot1_get();
+  public final static int kStatusFrame_General = CanTalonJNI.CanTalonSRX_kStatusFrame_General_get();
+  public final static int kStatusFrame_Feedback = CanTalonJNI.CanTalonSRX_kStatusFrame_Feedback_get();
+  public final static int kStatusFrame_Encoder = CanTalonJNI.CanTalonSRX_kStatusFrame_Encoder_get();
+  public final static int kStatusFrame_AnalogTempVbat = CanTalonJNI.CanTalonSRX_kStatusFrame_AnalogTempVbat_get();
+  public final static class param_t {
+    public final static CanTalonSRX.param_t eProfileParamSlot0_P = new CanTalonSRX.param_t("eProfileParamSlot0_P", CanTalonJNI.CanTalonSRX_eProfileParamSlot0_P_get());
+    public final static CanTalonSRX.param_t eProfileParamSlot0_I = new CanTalonSRX.param_t("eProfileParamSlot0_I", CanTalonJNI.CanTalonSRX_eProfileParamSlot0_I_get());
+    public final static CanTalonSRX.param_t eProfileParamSlot0_D = new CanTalonSRX.param_t("eProfileParamSlot0_D", CanTalonJNI.CanTalonSRX_eProfileParamSlot0_D_get());
+    public final static CanTalonSRX.param_t eProfileParamSlot0_F = new CanTalonSRX.param_t("eProfileParamSlot0_F", CanTalonJNI.CanTalonSRX_eProfileParamSlot0_F_get());
+    public final static CanTalonSRX.param_t eProfileParamSlot0_IZone = new CanTalonSRX.param_t("eProfileParamSlot0_IZone", CanTalonJNI.CanTalonSRX_eProfileParamSlot0_IZone_get());
+    public final static CanTalonSRX.param_t eProfileParamSlot0_CloseLoopRampRate = new CanTalonSRX.param_t("eProfileParamSlot0_CloseLoopRampRate", CanTalonJNI.CanTalonSRX_eProfileParamSlot0_CloseLoopRampRate_get());
+    public final static CanTalonSRX.param_t eProfileParamSlot1_P = new CanTalonSRX.param_t("eProfileParamSlot1_P", CanTalonJNI.CanTalonSRX_eProfileParamSlot1_P_get());
+    public final static CanTalonSRX.param_t eProfileParamSlot1_I = new CanTalonSRX.param_t("eProfileParamSlot1_I", CanTalonJNI.CanTalonSRX_eProfileParamSlot1_I_get());
+    public final static CanTalonSRX.param_t eProfileParamSlot1_D = new CanTalonSRX.param_t("eProfileParamSlot1_D", CanTalonJNI.CanTalonSRX_eProfileParamSlot1_D_get());
+    public final static CanTalonSRX.param_t eProfileParamSlot1_F = new CanTalonSRX.param_t("eProfileParamSlot1_F", CanTalonJNI.CanTalonSRX_eProfileParamSlot1_F_get());
+    public final static CanTalonSRX.param_t eProfileParamSlot1_IZone = new CanTalonSRX.param_t("eProfileParamSlot1_IZone", CanTalonJNI.CanTalonSRX_eProfileParamSlot1_IZone_get());
+    public final static CanTalonSRX.param_t eProfileParamSlot1_CloseLoopRampRate = new CanTalonSRX.param_t("eProfileParamSlot1_CloseLoopRampRate", CanTalonJNI.CanTalonSRX_eProfileParamSlot1_CloseLoopRampRate_get());
+    public final static CanTalonSRX.param_t eProfileParamSoftLimitForThreshold = new CanTalonSRX.param_t("eProfileParamSoftLimitForThreshold", CanTalonJNI.CanTalonSRX_eProfileParamSoftLimitForThreshold_get());
+    public final static CanTalonSRX.param_t eProfileParamSoftLimitRevThreshold = new CanTalonSRX.param_t("eProfileParamSoftLimitRevThreshold", CanTalonJNI.CanTalonSRX_eProfileParamSoftLimitRevThreshold_get());
+    public final static CanTalonSRX.param_t eProfileParamSoftLimitForEnable = new CanTalonSRX.param_t("eProfileParamSoftLimitForEnable", CanTalonJNI.CanTalonSRX_eProfileParamSoftLimitForEnable_get());
+    public final static CanTalonSRX.param_t eProfileParamSoftLimitRevEnable = new CanTalonSRX.param_t("eProfileParamSoftLimitRevEnable", CanTalonJNI.CanTalonSRX_eProfileParamSoftLimitRevEnable_get());
+    public final static CanTalonSRX.param_t eOnBoot_BrakeMode = new CanTalonSRX.param_t("eOnBoot_BrakeMode", CanTalonJNI.CanTalonSRX_eOnBoot_BrakeMode_get());
+    public final static CanTalonSRX.param_t eOnBoot_LimitSwitch_Forward_NormallyClosed = new CanTalonSRX.param_t("eOnBoot_LimitSwitch_Forward_NormallyClosed", CanTalonJNI.CanTalonSRX_eOnBoot_LimitSwitch_Forward_NormallyClosed_get());
+    public final static CanTalonSRX.param_t eOnBoot_LimitSwitch_Reverse_NormallyClosed = new CanTalonSRX.param_t("eOnBoot_LimitSwitch_Reverse_NormallyClosed", CanTalonJNI.CanTalonSRX_eOnBoot_LimitSwitch_Reverse_NormallyClosed_get());
+    public final static CanTalonSRX.param_t eOnBoot_LimitSwitch_Forward_Disable = new CanTalonSRX.param_t("eOnBoot_LimitSwitch_Forward_Disable", CanTalonJNI.CanTalonSRX_eOnBoot_LimitSwitch_Forward_Disable_get());
+    public final static CanTalonSRX.param_t eOnBoot_LimitSwitch_Reverse_Disable = new CanTalonSRX.param_t("eOnBoot_LimitSwitch_Reverse_Disable", CanTalonJNI.CanTalonSRX_eOnBoot_LimitSwitch_Reverse_Disable_get());
+    public final static CanTalonSRX.param_t eFault_OverTemp = new CanTalonSRX.param_t("eFault_OverTemp", CanTalonJNI.CanTalonSRX_eFault_OverTemp_get());
+    public final static CanTalonSRX.param_t eFault_UnderVoltage = new CanTalonSRX.param_t("eFault_UnderVoltage", CanTalonJNI.CanTalonSRX_eFault_UnderVoltage_get());
+    public final static CanTalonSRX.param_t eFault_ForLim = new CanTalonSRX.param_t("eFault_ForLim", CanTalonJNI.CanTalonSRX_eFault_ForLim_get());
+    public final static CanTalonSRX.param_t eFault_RevLim = new CanTalonSRX.param_t("eFault_RevLim", CanTalonJNI.CanTalonSRX_eFault_RevLim_get());
+    public final static CanTalonSRX.param_t eFault_HardwareFailure = new CanTalonSRX.param_t("eFault_HardwareFailure", CanTalonJNI.CanTalonSRX_eFault_HardwareFailure_get());
+    public final static CanTalonSRX.param_t eFault_ForSoftLim = new CanTalonSRX.param_t("eFault_ForSoftLim", CanTalonJNI.CanTalonSRX_eFault_ForSoftLim_get());
+    public final static CanTalonSRX.param_t eFault_RevSoftLim = new CanTalonSRX.param_t("eFault_RevSoftLim", CanTalonJNI.CanTalonSRX_eFault_RevSoftLim_get());
+    public final static CanTalonSRX.param_t eStckyFault_OverTemp = new CanTalonSRX.param_t("eStckyFault_OverTemp", CanTalonJNI.CanTalonSRX_eStckyFault_OverTemp_get());
+    public final static CanTalonSRX.param_t eStckyFault_UnderVoltage = new CanTalonSRX.param_t("eStckyFault_UnderVoltage", CanTalonJNI.CanTalonSRX_eStckyFault_UnderVoltage_get());
+    public final static CanTalonSRX.param_t eStckyFault_ForLim = new CanTalonSRX.param_t("eStckyFault_ForLim", CanTalonJNI.CanTalonSRX_eStckyFault_ForLim_get());
+    public final static CanTalonSRX.param_t eStckyFault_RevLim = new CanTalonSRX.param_t("eStckyFault_RevLim", CanTalonJNI.CanTalonSRX_eStckyFault_RevLim_get());
+    public final static CanTalonSRX.param_t eStckyFault_ForSoftLim = new CanTalonSRX.param_t("eStckyFault_ForSoftLim", CanTalonJNI.CanTalonSRX_eStckyFault_ForSoftLim_get());
+    public final static CanTalonSRX.param_t eStckyFault_RevSoftLim = new CanTalonSRX.param_t("eStckyFault_RevSoftLim", CanTalonJNI.CanTalonSRX_eStckyFault_RevSoftLim_get());
+    public final static CanTalonSRX.param_t eAppliedThrottle = new CanTalonSRX.param_t("eAppliedThrottle", CanTalonJNI.CanTalonSRX_eAppliedThrottle_get());
+    public final static CanTalonSRX.param_t eCloseLoopErr = new CanTalonSRX.param_t("eCloseLoopErr", CanTalonJNI.CanTalonSRX_eCloseLoopErr_get());
+    public final static CanTalonSRX.param_t eFeedbackDeviceSelect = new CanTalonSRX.param_t("eFeedbackDeviceSelect", CanTalonJNI.CanTalonSRX_eFeedbackDeviceSelect_get());
+    public final static CanTalonSRX.param_t eRevMotDuringCloseLoopEn = new CanTalonSRX.param_t("eRevMotDuringCloseLoopEn", CanTalonJNI.CanTalonSRX_eRevMotDuringCloseLoopEn_get());
+    public final static CanTalonSRX.param_t eModeSelect = new CanTalonSRX.param_t("eModeSelect", CanTalonJNI.CanTalonSRX_eModeSelect_get());
+    public final static CanTalonSRX.param_t eProfileSlotSelect = new CanTalonSRX.param_t("eProfileSlotSelect", CanTalonJNI.CanTalonSRX_eProfileSlotSelect_get());
+    public final static CanTalonSRX.param_t eRampThrottle = new CanTalonSRX.param_t("eRampThrottle", CanTalonJNI.CanTalonSRX_eRampThrottle_get());
+    public final static CanTalonSRX.param_t eRevFeedbackSensor = new CanTalonSRX.param_t("eRevFeedbackSensor", CanTalonJNI.CanTalonSRX_eRevFeedbackSensor_get());
+    public final static CanTalonSRX.param_t eLimitSwitchEn = new CanTalonSRX.param_t("eLimitSwitchEn", CanTalonJNI.CanTalonSRX_eLimitSwitchEn_get());
+    public final static CanTalonSRX.param_t eLimitSwitchClosedFor = new CanTalonSRX.param_t("eLimitSwitchClosedFor", CanTalonJNI.CanTalonSRX_eLimitSwitchClosedFor_get());
+    public final static CanTalonSRX.param_t eLimitSwitchClosedRev = new CanTalonSRX.param_t("eLimitSwitchClosedRev", CanTalonJNI.CanTalonSRX_eLimitSwitchClosedRev_get());
+    public final static CanTalonSRX.param_t eSensorPosition = new CanTalonSRX.param_t("eSensorPosition", CanTalonJNI.CanTalonSRX_eSensorPosition_get());
+    public final static CanTalonSRX.param_t eSensorVelocity = new CanTalonSRX.param_t("eSensorVelocity", CanTalonJNI.CanTalonSRX_eSensorVelocity_get());
+    public final static CanTalonSRX.param_t eCurrent = new CanTalonSRX.param_t("eCurrent", CanTalonJNI.CanTalonSRX_eCurrent_get());
+    public final static CanTalonSRX.param_t eBrakeIsEnabled = new CanTalonSRX.param_t("eBrakeIsEnabled", CanTalonJNI.CanTalonSRX_eBrakeIsEnabled_get());
+    public final static CanTalonSRX.param_t eEncPosition = new CanTalonSRX.param_t("eEncPosition", CanTalonJNI.CanTalonSRX_eEncPosition_get());
+    public final static CanTalonSRX.param_t eEncVel = new CanTalonSRX.param_t("eEncVel", CanTalonJNI.CanTalonSRX_eEncVel_get());
+    public final static CanTalonSRX.param_t eEncIndexRiseEvents = new CanTalonSRX.param_t("eEncIndexRiseEvents", CanTalonJNI.CanTalonSRX_eEncIndexRiseEvents_get());
+    public final static CanTalonSRX.param_t eQuadApin = new CanTalonSRX.param_t("eQuadApin", CanTalonJNI.CanTalonSRX_eQuadApin_get());
+    public final static CanTalonSRX.param_t eQuadBpin = new CanTalonSRX.param_t("eQuadBpin", CanTalonJNI.CanTalonSRX_eQuadBpin_get());
+    public final static CanTalonSRX.param_t eQuadIdxpin = new CanTalonSRX.param_t("eQuadIdxpin", CanTalonJNI.CanTalonSRX_eQuadIdxpin_get());
+    public final static CanTalonSRX.param_t eAnalogInWithOv = new CanTalonSRX.param_t("eAnalogInWithOv", CanTalonJNI.CanTalonSRX_eAnalogInWithOv_get());
+    public final static CanTalonSRX.param_t eAnalogInVel = new CanTalonSRX.param_t("eAnalogInVel", CanTalonJNI.CanTalonSRX_eAnalogInVel_get());
+    public final static CanTalonSRX.param_t eTemp = new CanTalonSRX.param_t("eTemp", CanTalonJNI.CanTalonSRX_eTemp_get());
+    public final static CanTalonSRX.param_t eBatteryV = new CanTalonSRX.param_t("eBatteryV", CanTalonJNI.CanTalonSRX_eBatteryV_get());
+    public final static CanTalonSRX.param_t eResetCount = new CanTalonSRX.param_t("eResetCount", CanTalonJNI.CanTalonSRX_eResetCount_get());
+    public final static CanTalonSRX.param_t eResetFlags = new CanTalonSRX.param_t("eResetFlags", CanTalonJNI.CanTalonSRX_eResetFlags_get());
+    public final static CanTalonSRX.param_t eFirmVers = new CanTalonSRX.param_t("eFirmVers", CanTalonJNI.CanTalonSRX_eFirmVers_get());
+    public final static CanTalonSRX.param_t eSettingsChanged = new CanTalonSRX.param_t("eSettingsChanged", CanTalonJNI.CanTalonSRX_eSettingsChanged_get());
+
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public String toString() {
+      return swigName;
+    }
+
+    public static param_t swigToEnum(int swigValue) {
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (int i = 0; i < swigValues.length; i++)
+        if (swigValues[i].swigValue == swigValue)
+          return swigValues[i];
+      throw new IllegalArgumentException("No enum " + param_t.class + " with value " + swigValue);
+    }
+
+    private param_t(String swigName) {
+      this.swigName = swigName;
+      this.swigValue = swigNext++;
+    }
+
+    private param_t(String swigName, int swigValue) {
+      this.swigName = swigName;
+      this.swigValue = swigValue;
+      swigNext = swigValue+1;
+    }
+
+    private param_t(String swigName, param_t swigEnum) {
+      this.swigName = swigName;
+      this.swigValue = swigEnum.swigValue;
+      swigNext = this.swigValue+1;
+    }
+
+    private static param_t[] swigValues = { eProfileParamSlot0_P, eProfileParamSlot0_I, eProfileParamSlot0_D, eProfileParamSlot0_F, eProfileParamSlot0_IZone, eProfileParamSlot0_CloseLoopRampRate, eProfileParamSlot1_P, eProfileParamSlot1_I, eProfileParamSlot1_D, eProfileParamSlot1_F, eProfileParamSlot1_IZone, eProfileParamSlot1_CloseLoopRampRate, eProfileParamSoftLimitForThreshold, eProfileParamSoftLimitRevThreshold, eProfileParamSoftLimitForEnable, eProfileParamSoftLimitRevEnable, eOnBoot_BrakeMode, eOnBoot_LimitSwitch_Forward_NormallyClosed, eOnBoot_LimitSwitch_Reverse_NormallyClosed, eOnBoot_LimitSwitch_Forward_Disable, eOnBoot_LimitSwitch_Reverse_Disable, eFault_OverTemp, eFault_UnderVoltage, eFault_ForLim, eFault_RevLim, eFault_HardwareFailure, eFault_ForSoftLim, eFault_RevSoftLim, eStckyFault_OverTemp, eStckyFault_UnderVoltage, eStckyFault_ForLim, eStckyFault_RevLim, eStckyFault_ForSoftLim, eStckyFault_RevSoftLim, eAppliedThrottle, eCloseLoopErr, eFeedbackDeviceSelect, eRevMotDuringCloseLoopEn, eModeSelect, eProfileSlotSelect, eRampThrottle, eRevFeedbackSensor, eLimitSwitchEn, eLimitSwitchClosedFor, eLimitSwitchClosedRev, eSensorPosition, eSensorVelocity, eCurrent, eBrakeIsEnabled, eEncPosition, eEncVel, eEncIndexRiseEvents, eQuadApin, eQuadBpin, eQuadIdxpin, eAnalogInWithOv, eAnalogInVel, eTemp, eBatteryV, eResetCount, eResetFlags, eFirmVers, eSettingsChanged };
+    private static int swigNext = 0;
+    private final int swigValue;
+    private final String swigName;
   }
 
 }

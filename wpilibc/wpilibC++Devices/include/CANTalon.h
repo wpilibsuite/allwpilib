@@ -86,6 +86,7 @@ private:
 	int m_deviceNumber;
 	CanTalonSRX *m_impl;
 	MotorSafetyHelper *m_safetyHelper;
+  int m_profile; // Profile from CANTalon to use. Set to zero until we can actually test this.
 
   bool m_controlEnabled;
   ControlMode m_controlMode;

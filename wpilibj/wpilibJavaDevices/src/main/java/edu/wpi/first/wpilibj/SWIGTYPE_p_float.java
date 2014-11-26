@@ -8,18 +8,18 @@
 
 package edu.wpi.first.wpilibj.hal;
 
-public class SWIGTYPE_p_double {
+public class SWIGTYPE_p_float {
   private long swigCPtr;
 
-  public SWIGTYPE_p_double(long cPtr, boolean futureUse) {
+  public SWIGTYPE_p_float(long cPtr, boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  public SWIGTYPE_p_double() {
+  public SWIGTYPE_p_float() {
     swigCPtr = 0;
   }
 
-  public static long getCPtr(SWIGTYPE_p_double obj) {
+  public static long getCPtr(SWIGTYPE_p_float obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

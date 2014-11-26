@@ -11,15 +11,15 @@ package edu.wpi.first.wpilibj.hal;
 public class SWIGTYPE_p_CTR_Code {
   private long swigCPtr;
 
-  protected SWIGTYPE_p_CTR_Code(long cPtr, boolean futureUse) {
+  public SWIGTYPE_p_CTR_Code(long cPtr, boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  protected SWIGTYPE_p_CTR_Code() {
+  public SWIGTYPE_p_CTR_Code() {
     swigCPtr = 0;
   }
 
-  protected static long getCPtr(SWIGTYPE_p_CTR_Code obj) {
+  public static long getCPtr(SWIGTYPE_p_CTR_Code obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

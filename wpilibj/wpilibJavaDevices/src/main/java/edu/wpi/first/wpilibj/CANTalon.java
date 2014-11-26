@@ -9,6 +9,8 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.hal.CanTalonSRX;
+import edu.wpi.first.wpilibj.hal.CanTalonJNI;
+import edu.wpi.first.wpilibj.hal.SWIGTYPE_p_double;
 
 public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
 	private MotorSafetyHelper m_safetyHelper;
@@ -61,6 +63,13 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
   public double get() {
     // TODO
     return 0.0f;
+  }
+
+  // Returns temperature of Talon, in degrees Celsius.
+  public double getTemp() {
+    long tempp = CanTalonJNI.new_doublep(); // Create a new swig pointer.
+    m_impl.GetTemp(new SWIGTYPE_p_double(tempp, true));
+    return CanTalonJNI.doublep_value(tempp);
   }
 
   // Only supports kPercentVbus mode for now.

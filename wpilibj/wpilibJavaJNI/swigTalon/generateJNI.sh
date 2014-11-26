@@ -14,4 +14,5 @@ swig -c++ -package edu.wpi.first.wpilibj.hal -java CanTalonSRX.i
 # Stick generated files into appropriate places.
 cp CanTalonSRX_wrap.cxx ../lib/CanTalonSRXJNI.cpp
 mv CanTalonJNI.java ../../wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/
+rm CanTalon.java # useless file.
 cp *.java ../../wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/

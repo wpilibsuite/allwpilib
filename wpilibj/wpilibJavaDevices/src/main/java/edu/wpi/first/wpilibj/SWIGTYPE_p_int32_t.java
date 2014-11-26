@@ -8,5 +8,19 @@
 
 package edu.wpi.first.wpilibj.hal;
 
-public class CanTalon {
+public class SWIGTYPE_p_int32_t {
+  private long swigCPtr;
+
+  public SWIGTYPE_p_int32_t(long cPtr, boolean futureUse) {
+    swigCPtr = cPtr;
+  }
+
+  public SWIGTYPE_p_int32_t() {
+    swigCPtr = 0;
+  }
+
+  public static long getCPtr(SWIGTYPE_p_int32_t obj) {
+    return (obj == null) ? 0 : obj.swigCPtr;
+  }
 }
+
