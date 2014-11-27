@@ -87,23 +87,30 @@ void CANTalon::Set(float value, uint8_t syncGroup)
   if(m_controlEnabled) {
     CTR_Code status;
     switch(GetControlMode()) {
-      case kThrottle:
+      case CANSpeedController::kPercentVbus:
         {
           m_impl->Set(value);
           status = CTR_OKAY;
         }
         break;
-      case kFollowerMode:
+      case CANSpeedController::kFollower:
         {
           status = m_impl->SetDemand((int)value);
         }
         break;
-      case kVoltageMode:
+      case CANSpeedController::kVoltage:
         {
           // Voltage is an 8.8 fixed point number.
           int volts = int(value * 256);
           status = m_impl->SetDemand(volts);
         }
+        break;
+      case CANSpeedController::kSpeed:
+        status = m_impl->SetDemand(value);
+        break;
+      case CANSpeedController::kPosition:
+        status = m_impl->SetDemand(value);
+        break;
       default:
         // TODO: Add support for other modes. Need to figure out what format
         // SetDemand needs.
