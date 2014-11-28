@@ -739,6 +739,7 @@ public class RobotDrive implements MotorSafety {
         if (m_rearRightMotor != null) {
             m_rearRightMotor.set(0.0);
         }
+        if (m_safetyHelper != null) m_safetyHelper.feed();
     }
 
     private void setupMotorSafety() {

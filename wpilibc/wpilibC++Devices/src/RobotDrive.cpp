@@ -735,4 +735,5 @@ void RobotDrive::StopMotor()
 	if (m_frontRightMotor != NULL) m_frontRightMotor->Disable();
 	if (m_rearLeftMotor != NULL) m_rearLeftMotor->Disable();
 	if (m_rearRightMotor != NULL) m_rearRightMotor->Disable();
+	m_safetyHelper->Feed();
 }
