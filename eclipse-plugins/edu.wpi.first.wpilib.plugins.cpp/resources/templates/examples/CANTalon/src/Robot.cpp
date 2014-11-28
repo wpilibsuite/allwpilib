@@ -22,7 +22,7 @@ public:
 	 * Runs the motor from the output of a Joystick.
 	 */
 	void OperatorControl() {
-    talon.EnableControl();
+    m_motor.EnableControl();
 		while (IsOperatorControl() && IsEnabled()) {
       // Takes a number from -1.0 (full reverse) to +1.0 (full forwards).
 			m_motor.Set(0.5);
