@@ -34,7 +34,7 @@
  * Velocity is in position ticks / 100ms.
  *
  * All output units are in respect to duty cycle (throttle) which is -1023(full reverse) to +1023 (full forward).
- *  This includes demand (which specifies duty cycle when in duty cycle mode) and rampRamp, which is in throttle units per 1ms (if nonzero).
+ *  This includes demand (which specifies duty cycle when in duty cycle mode) and rampRamp, which is in throttle units per 10ms (if nonzero).
  *
  * Pos and velocity close loops are calc'd as
  * 		err = target - posOrVel.
@@ -106,7 +106,8 @@ private:
 	 */
 	CTR_Code GetParamResponseRaw(uint32_t paramEnum, int32_t & rawBits);
 public:
-    CanTalonSRX(int deviceNumber=0);
+	static const int kDefaultControlPeriodMs = 10; //!< default control update rate is 10ms.
+	CanTalonSRX(UINT8 deviceNumber = 0,UINT8 controlPeriodMs = kDefaultControlPeriodMs);
     ~CanTalonSRX();
     void Set(double value);
 	/* mode select enumerations */

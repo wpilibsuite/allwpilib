@@ -34,7 +34,7 @@
  * Velocity is in position ticks / 100ms.
  *
  * All output units are in respect to duty cycle (throttle) which is -1023(full reverse) to +1023 (full forward).
- *  This includes demand (which specifies duty cycle when in duty cycle mode) and rampRamp, which is in throttle units per 1ms (if nonzero).
+ *  This includes demand (which specifies duty cycle when in duty cycle mode) and rampRamp, which is in throttle units per 10ms (if nonzero).
  *
  * Pos and velocity close loops are calc'd as
  * 		err = target - posOrVel.
@@ -241,7 +241,7 @@ typedef struct _TALON_Param_Response_t {
 } TALON_Param_Response_t ;
 
 
-CanTalonSRX::CanTalonSRX(int deviceNumber): CtreCanNode((UINT8)deviceNumber), _can_h(0), _can_stat(0)
+CanTalonSRX::CanTalonSRX(UINT8 deviceNumber,UINT8 controlPeriodMs): CtreCanNode(deviceNumber), _can_h(0), _can_stat(0)
 {
 	RegisterRx(STATUS_1 | (UINT8)deviceNumber );
 	RegisterRx(STATUS_2 | (UINT8)deviceNumber );
@@ -250,7 +250,7 @@ CanTalonSRX::CanTalonSRX(int deviceNumber): CtreCanNode((UINT8)deviceNumber), _c
 	RegisterRx(STATUS_5 | (UINT8)deviceNumber );
 	RegisterRx(STATUS_6 | (UINT8)deviceNumber );
 	RegisterRx(STATUS_7 | (UINT8)deviceNumber );
-	RegisterTx(CONTROL_1 | (UINT8)deviceNumber, 10);
+	RegisterTx(CONTROL_1 | (UINT8)deviceNumber, controlPeriodMs);
 	/* default our frame rate table to what firmware defaults to. */
 	_statusRateMs[0] = 10;	/* 	TALON_Status_1_General_10ms_t 		*/
 	_statusRateMs[1] = 20;	/* 	TALON_Status_2_Feedback_20ms_t 		*/
@@ -392,17 +392,23 @@ CTR_Code CanTalonSRX::SetParam(param_t paramEnum, double value)
 {
 	int32_t rawbits = 0;
 	switch(paramEnum){
-		case eProfileParamSlot0_P:/* 10.22 fixed pt value */
+		case eProfileParamSlot0_P:/* unsigned 10.22 fixed pt value */
 		case eProfileParamSlot0_I:
 		case eProfileParamSlot0_D:
-		case eProfileParamSlot0_F:
 		case eProfileParamSlot1_P:
 		case eProfileParamSlot1_I:
 		case eProfileParamSlot1_D:
-		case eProfileParamSlot1_F:
-		case eCurrent:
-		case eTemp:
-		case eBatteryV:
+		{
+			uint32_t urawbits;
+			value = std::min(value,1023.0); /* bounds check doubles that are outside u10.22 */
+			value = std::max(value,0.0);
+			urawbits = value * FLOAT_TO_FXP; /* perform unsign arithmetic */
+			rawbits = urawbits; /* copy bits over.  SetParamRaw just stuffs into CAN frame with no sense of signedness */
+		}	break;
+		case eProfileParamSlot1_F:	/* signed 10.22 fixed pt value */
+		case eProfileParamSlot0_F:
+			value = std::min(value, 512.0); /* bounds check doubles that are outside s10.22 */
+			value = std::max(value,-512.0);
 			rawbits = value * FLOAT_TO_FXP;
 			break;
 		default: /* everything else is integral */
@@ -686,22 +692,26 @@ CTR_Code CanTalonSRX::GetStckyFault_RevSoftLim(int &param)
 CTR_Code CanTalonSRX::GetAppliedThrottle(int &param)
 {
 	GET_STATUS1();
-	uint32_t raw = 0;
+	int32_t raw = 0;
 	raw |= rx->AppliedThrottle_h3;
 	raw <<= 8;
 	raw |= rx->AppliedThrottle_l8;
+	raw <<= (32-11); /* sign extend */
+	raw >>= (32-11); /* sign extend */
 	param = (int)raw;
 	return rx.err;
 }
 CTR_Code CanTalonSRX::GetCloseLoopErr(int &param)
 {
 	GET_STATUS1();
-	uint32_t raw = 0;
+	int32_t raw = 0;
 	raw |= rx->CloseLoopErrH;
-	raw <<= 16;
+	raw <<= 8;
 	raw |= rx->CloseLoopErrM;
 	raw <<= 8;
 	raw |= rx->CloseLoopErrL;
+	raw <<= (32-24); /* sign extend */
+	raw >>= (32-24); /* sign extend */
 	param = (int)raw;
 	return rx.err;
 }
@@ -742,22 +752,26 @@ CTR_Code CanTalonSRX::GetLimitSwitchClosedRev(int &param)
 CTR_Code CanTalonSRX::GetSensorPosition(int &param)
 {
 	GET_STATUS2();
-	uint32_t raw = 0;
+	int32_t raw = 0;
 	raw |= rx->SensorPositionH;
-	raw <<= 16;
+	raw <<= 8;
 	raw |= rx->SensorPositionM;
 	raw <<= 8;
 	raw |= rx->SensorPositionL;
+	raw <<= (32-24); /* sign extend */
+	raw >>= (32-24); /* sign extend */
 	param = (int)raw;
 	return rx.err;
 }
 CTR_Code CanTalonSRX::GetSensorVelocity(int &param)
 {
 	GET_STATUS2();
-	uint32_t raw = 0;
+	int32_t raw = 0;
 	raw |= rx->SensorVelocityH;
 	raw <<= 8;
 	raw |= rx->SensorVelocityL;
+	raw <<= (32-16); /* sign extend */
+	raw >>= (32-16); /* sign extend */
 	param = (int)raw;
 	return rx.err;
 }
@@ -780,22 +794,26 @@ CTR_Code CanTalonSRX::GetBrakeIsEnabled(int &param)
 CTR_Code CanTalonSRX::GetEncPosition(int &param)
 {
 	GET_STATUS3();
-	uint32_t raw = 0;
+	int32_t raw = 0;
 	raw |= rx->EncPositionH;
-	raw <<= 16;
+	raw <<= 8;
 	raw |= rx->EncPositionM;
 	raw <<= 8;
 	raw |= rx->EncPositionL;
+	raw <<= (32-24); /* sign extend */
+	raw >>= (32-24); /* sign extend */
 	param = (int)raw;
 	return rx.err;
 }
 CTR_Code CanTalonSRX::GetEncVel(int &param)
 {
 	GET_STATUS3();
-	uint32_t raw = 0;
+	int32_t raw = 0;
 	raw |= rx->EncVelH;
 	raw <<= 8;
 	raw |= rx->EncVelL;
+	raw <<= (32-16); /* sign extend */
+	raw >>= (32-16); /* sign extend */
 	param = (int)raw;
 	return rx.err;
 }
@@ -830,23 +848,27 @@ CTR_Code CanTalonSRX::GetQuadIdxpin(int &param)
 CTR_Code CanTalonSRX::GetAnalogInWithOv(int &param)
 {
 	GET_STATUS4();
-	uint32_t raw = 0;
+	int32_t raw = 0;
 	raw |= rx->AnalogInWithOvH;
-	raw <<= 16;
+	raw <<= 8;
 	raw |= rx->AnalogInWithOvM;
 	raw <<= 8;
 	raw |= rx->AnalogInWithOvL;
+	raw <<= (32-24); /* sign extend */
+	raw >>= (32-24); /* sign extend */
 	param = (int)raw;
 	return rx.err;
 }
 CTR_Code CanTalonSRX::GetAnalogInVel(int &param)
 {
 	GET_STATUS4();
-	uint32_t raw = 0;
+	int32_t raw = 0;
 	raw |= rx->AnalogInVelH;
 	raw <<= 8;
 	raw |= rx->AnalogInVelL;
 	param = (int)raw;
+	raw <<= (32-16); /* sign extend */
+	raw >>= (32-16); /* sign extend */
 	return rx.err;
 }
 CTR_Code CanTalonSRX::GetTemp(double &param)
