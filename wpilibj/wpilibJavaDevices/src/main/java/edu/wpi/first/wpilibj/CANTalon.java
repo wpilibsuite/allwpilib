@@ -11,11 +11,14 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.wpilibj.hal.CanTalonSRX;
 import edu.wpi.first.wpilibj.hal.CanTalonJNI;
 import edu.wpi.first.wpilibj.hal.SWIGTYPE_p_double;
+import edu.wpi.first.wpilibj.hal.SWIGTYPE_p_int;
+import edu.wpi.first.wpilibj.hal.SWIGTYPE_p_uint32_t;
+import edu.wpi.first.wpilibj.hal.SWIGTYPE_p_CTR_Code;
 
 public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
 	private MotorSafetyHelper m_safetyHelper;
 	public enum ControlMode {
-		PercentVbus(0), Follower(1), Voltage(2), Position(3), Speed(4), Current(5), Disabled(15);
+		PercentVbus(0), Follower(5), Voltage(4), Position(1), Speed(2), Current(3), Disabled(15);
 
     public int value;
 
@@ -34,35 +37,225 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     }
 	}
 
+  public enum FeedbackDevice {
+		QuadEncoder(0), AnalogPot(2), AnalogEncoder(3), EncRising(4), EncFalling(5);
+
+    public int value;
+
+    public static FeedbackDevice valueOf(int value) {
+			for(FeedbackDevice mode : values()) {
+				if(mode.value == value) {
+					return mode;
+				}
+			}
+
+			return null;
+    }
+
+    private FeedbackDevice(int value) {
+      this.value = value;
+    }
+	}
+
   private CanTalonSRX m_impl;
+  ControlMode m_controlMode;
 
   int m_deviceNumber;
   boolean m_controlEnabled;
+  int m_profile;
 
   public CANTalon(int deviceNumber) {
     m_deviceNumber = deviceNumber;
     m_impl = new CanTalonSRX(deviceNumber);
     m_safetyHelper = new MotorSafetyHelper(this);
-    m_controlEnabled = false;
+    m_controlEnabled = true;
+    m_profile = 0;
+    setProfile(m_profile);
+    changeControlMode(ControlMode.PercentVbus);
   }
 
   @Override
   public void pidWrite(double output) {
-    set(output);
+    if (getControlMode() == ControlMode.PercentVbus) {
+      set(output);
+    }
+    else {
+			throw new IllegalStateException("PID only supported in PercentVbus mode");
+    }
   }
 
+  public void delete() {
+    m_impl.delete();
+  }
+
+  /**
+   * Sets the appropriate output on the talon, depending on the mode.
+   *
+   * In PercentVbus, the output is between -1.0 and 1.0, with 0.0 as stopped.
+   * In Follower mode, the output is the integer device ID of the talon to duplicate.
+   * In Voltage mode, outputValue is in volts.
+   * In Current mode, outputValue is in amperes.
+   * In Speed mode, outputValue is in position change / 10ms.
+   * In Position mode, outputValue is in encoder ticks or an analog value,
+   *   depending on the sensor.
+   *
+   * @param outputValue The setpoint value, as described above.
+   */
   public void set(double outputValue) {
-    m_impl.Set(outputValue);
+    System.out.println("Enabled: " + m_controlEnabled + " Mode: " + m_controlMode);
+    m_controlMode = ControlMode.PercentVbus;
+    if (m_controlEnabled) {
+      switch (getControlMode()) {
+        case PercentVbus:
+          m_impl.Set(outputValue);
+          break;
+        case Follower:
+          m_impl.SetDemand((int)outputValue);
+          break;
+        case Voltage:
+          // Voltage is an 8.8 fixed point number.
+          int volts = (int)(outputValue * 256);
+          m_impl.SetDemand(volts);
+          break;
+        case Speed:
+          m_impl.SetDemand((int)outputValue);
+          break;
+        case Position:
+          m_impl.SetDemand((int)outputValue);
+          break;
+        default:
+          break;
+      }
+    }
+    System.out.println("Enabled: " + m_controlEnabled + " Mode: " + m_controlMode);
   }
 
+  /**
+   * Sets the output of the Talon.
+   *
+   * @param outputValue See set().
+   * @param thisValueDoesNotDoAnything corresponds to syncGroup from Jaguar; not relevant here.
+   */
   @Override
   public void set(double outputValue, byte thisValueDoesNotDoAnything) {
     set(outputValue);
   }
 
+  /**
+   * Flips the sign (multiplies by negative one) the sensor values going into
+   *the talon.
+   *
+   * This only affects position and velocity closed loop control. Allows for
+   *   situations where you may have a sensor flipped and going in the wrong
+   *   direction.
+   *
+   * @param flip True if sensor input should be flipped; False if not.
+   */
+  public void reverseSensor(boolean flip) {
+    m_impl.SetRevFeedbackSensor(flip ? 1 : 0);
+  }
+
+   /**
+    * Flips the sign (multiplies by negative one) the throttle values going into
+    *  the motor on the talon in closed loop modes.
+    *
+    * @param flip True if motor output should be flipped; False if not.
+    */
+  public void reverseOutput(boolean flip) {
+    m_impl.SetRevMotDuringCloseLoopEn(flip ? 1 : 0);
+  }
+
+  /**
+   * Gets the current status of the Talon (usually a sensor value).
+   *
+   * In Current mode: returns output current.
+   * In Speed mode: returns current speed.
+   * In Position omde: returns current sensor position.
+   * In Throttle and Follower modes: returns current applied throttle.
+   *
+   * @return The current sensor value of the Talon.
+   */
   public double get() {
-    // TODO
-    return 0.0f;
+    long valuep = CanTalonJNI.new_intp();
+    SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
+    switch (m_controlMode) {
+      case Voltage:
+        return getOutputVoltage();
+      case Current:
+        return getOutputCurrent();
+      case Speed:
+        m_impl.GetSensorVelocity(swigp);
+        return (double)CanTalonJNI.intp_value(valuep);
+      case Position:
+        m_impl.GetSensorPosition(swigp);
+        return (double)CanTalonJNI.intp_value(valuep);
+      case PercentVbus:
+      default:
+        m_impl.GetAppliedThrottle(swigp);
+        return (double)CanTalonJNI.intp_value(valuep) / 1023.0;
+    }
+  }
+
+  /**
+   * Get the current encoder position, regardless of whether it is the current feedback device.
+   *
+   * @return The current position of the encoder.
+   */
+  public int getEncPosition() {
+    long valuep = CanTalonJNI.new_intp();
+    SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
+    m_impl.GetEncPosition(swigp);
+    return CanTalonJNI.intp_value(valuep);
+  }
+
+  /**
+   * Get the current encoder velocity, regardless of whether it is the current feedback device.
+   *
+   * @return The current speed of the encoder.
+   */
+  public int getEncVelocity() {
+    long valuep = CanTalonJNI.new_intp();
+    SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
+    m_impl.GetEncVel(swigp);
+    return CanTalonJNI.intp_value(valuep);
+  }
+
+  /**
+   * Get the current analog in position, regardless of whether it is the current
+   * feedback device.
+   *
+   * @return The current value from the analog in (0 - 1023).
+   */
+  public int getAnalogInPosition() {
+    long valuep = CanTalonJNI.new_intp();
+    SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
+    m_impl.GetAnalogInWithOv(swigp);
+    return CanTalonJNI.intp_value(valuep);
+  }
+
+  /**
+   * Get the current encoder velocity, regardless of whether it is the current
+   * feedback device.
+   *
+   * @return The current speed of the analog in device.
+   */
+  public int getAnalogInVelocity() {
+    long valuep = CanTalonJNI.new_intp();
+    SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
+    m_impl.GetAnalogInVel(swigp);
+    return CanTalonJNI.intp_value(valuep);
+  }
+
+  /**
+   * Get the current difference between the setpoint and the sensor value.
+   *
+   * @return The error, in whatever units are appropriate.
+   */
+  public int getClosedLoopError() {
+    long valuep = CanTalonJNI.new_intp();
+    SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
+    m_impl.GetCloseLoopErr(swigp);
+    return CanTalonJNI.intp_value(valuep);
   }
 
   // Returns temperature of Talon, in degrees Celsius.
@@ -72,9 +265,75 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     return CanTalonJNI.doublep_value(tempp);
   }
 
-  // Only supports kPercentVbus mode for now.
+  // Returns the current going through the Talon, in Amperes.
+  public double getOutputCurrent() {
+    long curp = CanTalonJNI.new_doublep(); // Create a new swig pointer.
+    m_impl.GetCurrent(new SWIGTYPE_p_double(curp, true));
+    return CanTalonJNI.doublep_value(curp);
+  }
+
+  /**
+   * @return The voltage being output by the Talon, in Volts.
+   */
+  public double getOutputVoltage() {
+    long throttlep = CanTalonJNI.new_intp();
+    m_impl.GetAppliedThrottle(new SWIGTYPE_p_int(throttlep, true));
+    double voltage = getBusVoltage() * (double)CanTalonJNI.intp_value(throttlep) / 1023.0;
+    return voltage;
+  }
+
+  /**
+   * @return The voltage at the battery terminals of the Talon, in Volts.
+   */
+  public double getBusVoltage() {
+    long voltagep = CanTalonJNI.new_doublep();
+    SWIGTYPE_p_CTR_Code status = m_impl.GetBatteryV(new SWIGTYPE_p_double(voltagep, true));
+    /* Note: This section needs the JNI bindings regenerated with
+     pointer_functions for CTR_Code included in order to be able to catch notice
+     and throw errors.
+     if (CanTalonJNI.CTR_Codep_value(status) != 0) {
+       // TODO throw an error.
+     }*/
+
+    return CanTalonJNI.doublep_value(voltagep);
+  }
+
+  public double getPosition() {
+    long positionp = CanTalonJNI.new_intp();
+    m_impl.GetSensorPosition(new SWIGTYPE_p_int(positionp, true));
+    return CanTalonJNI.intp_value(positionp);
+  }
+
+  public double getSpeed() {
+    long speedp = CanTalonJNI.new_intp();
+    m_impl.GetSensorVelocity(new SWIGTYPE_p_int(speedp, true));
+    return CanTalonJNI.intp_value(speedp);
+  }
+
+  public ControlMode getControlMode() {
+    long tempp = CanTalonJNI.new_intp();
+    m_impl.GetModeSelect(new SWIGTYPE_p_int(tempp, true));
+    ControlMode mode = ControlMode.valueOf(CanTalonJNI.intp_value(tempp));
+    if (mode == ControlMode.Disabled) {
+      m_controlEnabled = false;
+    }
+    else {
+      m_controlMode = mode;
+    }
+    return mode;
+  }
+
+  public void changeControlMode(ControlMode controlMode) {
+    m_controlMode = controlMode;
+    m_impl.SetModeSelect(controlMode.value);
+  }
+
+  public void setFeedbackDevice(FeedbackDevice device) {
+    m_impl.SetFeedbackDeviceSelect(device.value);
+  }
+
   public void enableControl() {
-    m_impl.SetModeSelect(ControlMode.PercentVbus.value);
+    changeControlMode(m_controlMode);
 		m_controlEnabled = true;
   }
 
@@ -83,7 +342,171 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
 		m_controlEnabled = false;
   }
 
-	/**
+  public double getP() {
+		if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
+			throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
+		}
+
+    // Update the information that we have.
+    if (m_profile == 0)
+      m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot0_P);
+    else
+      m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_P);
+
+    long pp = CanTalonJNI.new_doublep();
+    m_impl.GetPgain(m_profile, new SWIGTYPE_p_double(pp, true));
+    return CanTalonJNI.doublep_value(pp);
+  }
+
+  public double getI() {
+		if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
+			throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
+		}
+
+    // Update the information that we have.
+    if (m_profile == 0)
+      m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot0_I);
+    else
+      m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_I);
+
+    long ip = CanTalonJNI.new_doublep();
+    m_impl.GetIgain(m_profile, new SWIGTYPE_p_double(ip, true));
+    return CanTalonJNI.doublep_value(ip);
+  }
+
+  public double getD() {
+		if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
+			throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
+		}
+
+    // Update the information that we have.
+    if (m_profile == 0)
+      m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot0_D);
+    else
+      m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_D);
+
+    long dp = CanTalonJNI.new_doublep();
+    m_impl.GetDgain(m_profile, new SWIGTYPE_p_double(dp, true));
+    return CanTalonJNI.doublep_value(dp);
+  }
+
+  public double getF() {
+		if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
+			throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
+		}
+
+    // Update the information that we have.
+    if (m_profile == 0)
+      m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot0_F);
+    else
+      m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_F);
+
+    long fp = CanTalonJNI.new_doublep();
+    m_impl.GetFgain(m_profile, new SWIGTYPE_p_double(fp, true));
+    return CanTalonJNI.doublep_value(fp);
+  }
+
+  public double getIZone() {
+		if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
+			throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
+		}
+
+    // Update the information that we have.
+    if (m_profile == 0)
+      m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot0_IZone);
+    else
+      m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_IZone);
+
+    long fp = CanTalonJNI.new_intp();
+    m_impl.GetIzone(m_profile, new SWIGTYPE_p_int(fp, true));
+    return CanTalonJNI.intp_value(fp);
+  }
+
+  public double getRampRate() {
+		if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
+			throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
+		}
+
+    // Update the information that we have.
+    if (m_profile == 0)
+      m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot0_CloseLoopRampRate);
+    else
+      m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_CloseLoopRampRate);
+
+    long fp = CanTalonJNI.new_intp();
+    m_impl.GetCloseLoopRampRate(m_profile, new SWIGTYPE_p_int(fp, true));
+    return CanTalonJNI.intp_value(fp);
+  }
+
+
+  public void setP(double p) {
+    m_impl.SetPgain(m_profile, p);
+  }
+
+  public void setI(double i) {
+    m_impl.SetIgain(m_profile, i);
+  }
+
+  public void setD(double d) {
+    m_impl.SetDgain(m_profile, d);
+  }
+
+  public void setF(double f) {
+    m_impl.SetFgain(m_profile, f);
+  }
+
+  public void setIZone(int izone) {
+    m_impl.SetIzone(m_profile, izone);
+  }
+
+  public void setRampRate(int rampRate) {
+    m_impl.SetCloseLoopRampRate(m_profile, rampRate);
+  }
+
+  /**
+   * Sets control values for closed loop control.
+   *
+   * @param p Proportional constant.
+   * @param i Integration constant.
+   * @param d Differential constant.
+   * @param f Feedforward constant.
+   * @param izone Integration zone -- prevents accumulation of integration error
+   *   with large errors. Setting this to zero will ignore any izone stuff.
+   * @param ramprate Closed loop ramp rate. Represents maximum change in
+   *   throttle every 10ms.
+   * @param profile which profile to set the pid constants for. You can have two
+   *   profiles, with values of 0 or 1, allowing you to keep a second set of values
+   *   on hand in the talon. In order to switch profiles without recalling setPID,
+   *   you must call setProfile().
+   */
+  public void setPID(double p, double i, double d, double f, int izone, int ramprate, int profile) {
+    if (profile != 0 && profile != 1)
+      throw new IllegalArgumentException("Talon PID profile must be 0 or 1.");
+    m_profile = profile;
+    setProfile(profile);
+    setP(p);
+    setI(i);
+    setD(d);
+    setF(f);
+    setIZone(izone);
+    setRampRate(ramprate);
+  }
+  public void setPID(double p, double i, double d) {
+    setPID(p, i, d, 0, 0, 0, m_profile);
+  }
+
+  /**
+   * Select which closed loop profile to use, and uses whatever PIDF gains and
+   * the such that are already there.
+   */
+  public void setProfile(int profile) {
+    if (profile != 0 && profile != 1)
+      throw new IllegalArgumentException("Talon PID profile must be 0 or 1.");
+    m_profile = profile;
+    m_impl.SetProfileSlotSelect(m_profile);
+  }
+
+        /**
 	* Common interface for stopping a motor.
 	*
 	* @deprecated Use disableControl instead.
@@ -102,6 +525,115 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
 	public int getDeviceID() {
 		return m_deviceNumber;
 	}
+
+  // TODO: Documentation for all these accessors/setters for misc. stuff.
+  public void setForwardSoftLimit(int forwardLimit) {
+    m_impl.SetForwardSoftLimit(forwardLimit);
+  }
+  
+  public void enableForwardSoftLimit(boolean enable) {
+    m_impl.SetForwardSoftEnable(enable ? 1 : 0);
+  }
+
+  public void setReverseSoftLimit(int forwardLimit) {
+    m_impl.SetReverseSoftLimit(forwardLimit);
+  }
+  
+  public void enableReverseSoftLimit(boolean enable) {
+    m_impl.SetReverseSoftEnable(enable ? 1 : 0);
+  }
+
+  public void clearStickyFaults() {
+    m_impl.ClearStickyFaults();
+  }
+
+  public void enableLimitSwitch(boolean forward, boolean reverse) {
+    int mask = 4 + (forward ? 1 : 0) * 2 + (reverse ? 1 : 0);
+    m_impl.SetOverrideLimitSwitchEn(mask);
+  }
+
+  public void enableBrakeMode(boolean brake) {
+    m_impl.SetOverrideBrakeType(brake ? 2 : 1);
+  }
+
+  public int getFaultOverTemp() {
+    long valuep = CanTalonJNI.new_intp();
+    m_impl.GetFault_OverTemp(new SWIGTYPE_p_int(valuep, true));
+    return CanTalonJNI.intp_value(valuep);
+  }
+
+  public int getFaultUnderVoltage() {
+    long valuep = CanTalonJNI.new_intp();
+    m_impl.GetFault_UnderVoltage(new SWIGTYPE_p_int(valuep, true));
+    return CanTalonJNI.intp_value(valuep);
+  }
+
+  public int getFaultForLim() {
+    long valuep = CanTalonJNI.new_intp();
+    m_impl.GetFault_ForLim(new SWIGTYPE_p_int(valuep, true));
+    return CanTalonJNI.intp_value(valuep);
+  }
+
+  public int getFaultRevLim() {
+    long valuep = CanTalonJNI.new_intp();
+    m_impl.GetFault_RevLim(new SWIGTYPE_p_int(valuep, true));
+    return CanTalonJNI.intp_value(valuep);
+  }
+
+  public int getFaultHardwareFailure() {
+    long valuep = CanTalonJNI.new_intp();
+    m_impl.GetFault_HardwareFailure(new SWIGTYPE_p_int(valuep, true));
+    return CanTalonJNI.intp_value(valuep);
+  }
+
+  public int getFaultForSoftLim() {
+    long valuep = CanTalonJNI.new_intp();
+    m_impl.GetFault_ForSoftLim(new SWIGTYPE_p_int(valuep, true));
+    return CanTalonJNI.intp_value(valuep);
+  }
+
+  public int getFaultRevSoftLim() {
+    long valuep = CanTalonJNI.new_intp();
+    m_impl.GetFault_RevSoftLim(new SWIGTYPE_p_int(valuep, true));
+    return CanTalonJNI.intp_value(valuep);
+  }
+
+  public int getStickyFaultOverTemp() {
+    long valuep = CanTalonJNI.new_intp();
+    m_impl.GetStckyFault_OverTemp(new SWIGTYPE_p_int(valuep, true));
+    return CanTalonJNI.intp_value(valuep);
+  }
+
+  public int getStickyFaultUnderVoltage() {
+    long valuep = CanTalonJNI.new_intp();
+    m_impl.GetStckyFault_UnderVoltage(new SWIGTYPE_p_int(valuep, true));
+    return CanTalonJNI.intp_value(valuep);
+  }
+
+  public int getStickyFaultForLim() {
+    long valuep = CanTalonJNI.new_intp();
+    m_impl.GetStckyFault_ForLim(new SWIGTYPE_p_int(valuep, true));
+    return CanTalonJNI.intp_value(valuep);
+  }
+
+  public int getStickyFaultRevLim() {
+    long valuep = CanTalonJNI.new_intp();
+    m_impl.GetStckyFault_RevLim(new SWIGTYPE_p_int(valuep, true));
+    return CanTalonJNI.intp_value(valuep);
+  }
+
+  public int getStickyFaultForSoftLim() {
+    long valuep = CanTalonJNI.new_intp();
+    m_impl.GetStckyFault_ForSoftLim(new SWIGTYPE_p_int(valuep, true));
+    return CanTalonJNI.intp_value(valuep);
+  }
+
+  public int getStickyFaultRevSoftLim() {
+    long valuep = CanTalonJNI.new_intp();
+    m_impl.GetStckyFault_RevSoftLim(new SWIGTYPE_p_int(valuep, true));
+    return CanTalonJNI.intp_value(valuep);
+  }
+
 
 	@Override
 	public void setExpiration(double timeout) {

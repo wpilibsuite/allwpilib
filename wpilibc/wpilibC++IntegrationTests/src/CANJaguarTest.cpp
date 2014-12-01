@@ -161,12 +161,12 @@ TEST_F(CANJaguarTest, Disable) {
  * behaves like it should in that control mode.
  */
 TEST_F(CANJaguarTest, BrownOut) {
-	double setpoint = 10.0;
 
 	/* Set the jaguar to quad encoder position mode */
-	m_jaguar->SetPositionMode(CANJaguar::QuadEncoder, 360, 10.0f, 0.1f, 0.0f);
+	m_jaguar->SetPositionMode(CANJaguar::QuadEncoder, 360, 20.0f, 0.01f, 0.0f);
 	m_jaguar->EnableControl();
 	SetJaguar(kMotorTime, 0.0);
+	double setpoint = m_jaguar->GetPosition() + 1.0f;
 
 	/* Turn the spike off and on again */
 	m_spike->Set(Relay::kOff);
@@ -274,7 +274,7 @@ TEST_F(CANJaguarTest, SpeedModeWorks) {
 	m_jaguar->SetSpeedMode(CANJaguar::QuadEncoder, 360, 0.1f, 0.003f, 0.01f);
 	m_jaguar->EnableControl();
 
-	constexpr float speed = 200.0f;
+	constexpr float speed = 100.0f;
 
 	SetJaguar(kMotorTime, speed);
 	EXPECT_NEAR(speed, m_jaguar->GetSpeed(), kEncoderSpeedTolerance);
@@ -285,9 +285,9 @@ TEST_F(CANJaguarTest, SpeedModeWorks) {
  * the Jaguar.
  */
 TEST_F(CANJaguarTest, PositionModeWorks) {
-	m_jaguar->SetPositionMode(CANJaguar::QuadEncoder, 360, 10.0f, 0.1f, 0.0f);
+	m_jaguar->SetPositionMode(CANJaguar::QuadEncoder, 360, 15.0f, 0.02f, 0.0f);
 
-	double setpoint = m_jaguar->GetPosition() + 10.0f;
+	double setpoint = m_jaguar->GetPosition() + 1.0f;
 
 	m_jaguar->EnableControl();
 

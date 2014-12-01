@@ -7,21 +7,25 @@
 #include "WPILib.h"
 #include "gtest/gtest.h"
 #include "TestBench.h"
+#include "ctre/CanTalonSRX.h"
 
 const int deviceId = 0;
 
 TEST(CANTalonTest, QuickTest) {
+  double throttle = 0.1;
 	CANTalon talon(deviceId);
   talon.SetControlMode(CANSpeedController::kPercentVbus);
   talon.EnableControl();
-  talon.Set(0.5);
+  talon.Set(throttle);
   Wait(0.25);
-  EXPECT_NEAR(talon.Get(), 0.5, 5e-3);
-  talon.Set(-0.5);
+  EXPECT_NEAR(talon.Get(), throttle, 5e-3);
+  talon.Set(-throttle);
   Wait(0.25);
-  EXPECT_NEAR(talon.Get(), -0.5, 5e-3);
+  EXPECT_NEAR(talon.Get(), -throttle, 5e-3);
 
   talon.Disable();
+  Wait(0.1);
+  EXPECT_FLOAT_EQ(talon.Get(), 0.0);
 }
 
 TEST(CANTalonTest, SetGetPID) {
@@ -29,7 +33,7 @@ TEST(CANTalonTest, SetGetPID) {
   CANTalon talon(deviceId);
   double p = 0.05, i = 0.098, d = 1.23;
   talon.SetPID(p, i , d);
-  Wait(0.1);
+  // Wait(0.03);
   EXPECT_NEAR(p, talon.GetP(), 1e-5);
   EXPECT_NEAR(i, talon.GetI(), 1e-5);
   EXPECT_NEAR(d, talon.GetD(), 1e-5);
@@ -38,7 +42,7 @@ TEST(CANTalonTest, SetGetPID) {
   i = 0.198;
   d = 1.03;
   talon.SetPID(p, i , d);
-  Wait(0.1);
+  // Wait(0.03);
   EXPECT_NEAR(p, talon.GetP(), 1e-5);
   EXPECT_NEAR(i, talon.GetI(), 1e-5);
   EXPECT_NEAR(d, talon.GetD(), 1e-5);
@@ -46,14 +50,19 @@ TEST(CANTalonTest, SetGetPID) {
 
 TEST(CANTalonTest, DISABLED_PositionModeWorks) {
   CANTalon talon(deviceId);
-  double p = 1;
-  double i = 0.05;
-  double d = 0.01;
-  talon.SetPID(p, i, d);
+  talon.SetFeedbackDevice(CANTalon::AnalogPot);
   talon.SetControlMode(CANSpeedController::kPosition);
-  talon.Set(1000);
-  talon.EnableControl();
-  Wait(10.0);
+  Wait(0.1);
+  double p = 2;
+  double i = 0.00;
+  double d = 0.00;
+  Wait(0.2);
+  talon.SetControlMode(CANSpeedController::kPosition);
+  talon.SetFeedbackDevice(CANTalon::AnalogPot);
+  talon.SetPID(p, i, d);
+  Wait(0.2);
+  talon.Set(100);
+  Wait(100);
   talon.Disable();
-  EXPECT_NEAR(talon.Get(), 1000, 100);
+  EXPECT_NEAR(talon.Get(), 500, 1000);
 }

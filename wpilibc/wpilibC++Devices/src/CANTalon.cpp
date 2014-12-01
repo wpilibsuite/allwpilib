@@ -22,11 +22,14 @@ CANTalon::CANTalon(int deviceNumber)
 	: m_deviceNumber(deviceNumber)
 	, m_impl(new CanTalonSRX(deviceNumber))
 	, m_safetyHelper(new MotorSafetyHelper(this))
-  , m_controlEnabled(false)
+  , m_profile(0)
+  , m_controlEnabled(true)
+  , m_controlMode(kPercentVbus)
 {
   // The control mode may already have been set; GetControlMode will reset
   // m_controlMode to match the Talon.
   GetControlMode();
+  m_impl->SetProfileSlotSelect(m_profile);
 }
 
 CANTalon::~CANTalon() {
@@ -60,9 +63,6 @@ float CANTalon::Get()
 {
   int value;
   switch(m_controlMode) {
-    case kPercentVbus:
-      m_impl->GetAppliedThrottle(value);
-      return 1.0 - (float)value / 1023.0;
     case kVoltage:
       return GetOutputVoltage();
     case kCurrent:
@@ -73,14 +73,24 @@ float CANTalon::Get()
     case kPosition:
       m_impl->GetSensorPosition(value);
       return value;
+    case kPercentVbus:
     default:
-      break;
+      m_impl->GetAppliedThrottle(value);
+      return (float)value / 1023.0;
   }
-  return 0.0f;
 }
 
 /**
- * Sets the output set-point value.
+ * Sets the appropriate output on the talon, depending on the mode.
+ *
+ * In PercentVbus, the output is between -1.0 and 1.0, with 0.0 as stopped.
+ * In Voltage mode, outputValue is in volts.
+ * In Current mode, outputValue is in amperes.
+ * In Speed mode, outputValue is in position change / 10ms.
+ * In Position mode, outputValue is in encoder ticks or an analog value,
+ *   depending on the sensor.
+ *
+ * @param outputValue The setpoint value, as described above.
  */
 void CANTalon::Set(float value, uint8_t syncGroup)
 {
@@ -112,8 +122,6 @@ void CANTalon::Set(float value, uint8_t syncGroup)
         status = m_impl->SetDemand(value);
         break;
       default:
-        // TODO: Add support for other modes. Need to figure out what format
-        // SetDemand needs.
         break;
     }
     if (status != CTR_OKAY) {
@@ -128,8 +136,7 @@ void CANTalon::Set(float value, uint8_t syncGroup)
 void CANTalon::Disable()
 {
   // Until Modes other than throttle work, just disable by setting throttle to 0.0.
-  //m_impl->Set(0.0); // TODO when firmware is updated, remove this.
-  m_impl->SetModeSelect(kDisabled); // TODO when firmware is updated, uncomment this.
+  m_impl->SetModeSelect((int)CANTalon::kDisabled);
   m_controlEnabled = false;
 }
 
@@ -142,7 +149,7 @@ void CANTalon::EnableControl() {
 }
 
 /**
- * @param 
+ * @param p Proportional constant to use in PID loop.
  */
 void CANTalon::SetP(double p)
 {
@@ -185,12 +192,30 @@ void CANTalon::SetPID(double p, double i, double d)
 }
 
 /**
+ * Select the feedback device to use in closed-loop
+ */
+void CANTalon::SetFeedbackDevice(FeedbackDevice device)
+{
+  CTR_Code status = m_impl->SetFeedbackDeviceSelect((int)device);
+
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  }
+}
+
+/**
  * TODO documentation (see CANJaguar.cpp)
  */
 double CANTalon::GetP()
 {
+  // Update the info in m_impl.
+  CTR_Code status = m_impl->RequestParam(CanTalonSRX::eProfileParamSlot0_P);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  }
+
   double p;
-  CTR_Code status = m_impl->GetPgain(m_profile, p);
+  status = m_impl->GetPgain(m_profile, p);
 	if(status != CTR_OKAY) {
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
@@ -202,8 +227,14 @@ double CANTalon::GetP()
  */
 double CANTalon::GetI()
 {
+  // Update the info in m_impl.
+  CTR_Code status = m_impl->RequestParam(CanTalonSRX::eProfileParamSlot0_I);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  }
+
   double i;
-  CTR_Code status = m_impl->GetIgain(m_profile, i);
+  status = m_impl->GetIgain(m_profile, i);
 	if(status != CTR_OKAY) {
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
@@ -215,8 +246,14 @@ double CANTalon::GetI()
  */
 double CANTalon::GetD()
 {
+  // Update the info in m_impl.
+  CTR_Code status = m_impl->RequestParam(CanTalonSRX::eProfileParamSlot0_D);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  }
+
   double d;
-  CTR_Code status = m_impl->GetDgain(m_profile, d);
+  status = m_impl->GetDgain(m_profile, d);
 	if(status != CTR_OKAY) {
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
@@ -245,7 +282,7 @@ float CANTalon::GetOutputVoltage()
 {
   int throttle11;
   CTR_Code status = m_impl->GetAppliedThrottle(throttle11);
-  float voltage = GetBusVoltage() * (float(throttle11) / 1023.0 - 1.0);
+  float voltage = GetBusVoltage() * (float(throttle11) / 1023.0);
 	if(status != CTR_OKAY) {
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
@@ -300,6 +337,20 @@ double CANTalon::GetPosition()
 }
 
 /**
+ * Returns the current error in the controller.
+ *
+ * @return the difference between the setpoint and the sensor value.
+ */
+int CANTalon::GetClosedLoopError() {
+  int error;
+  CTR_Code status = m_impl->GetCloseLoopErr(error);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
+  return error;
+}
+
+/**
  * TODO documentation (see CANJaguar.cpp)
  *
  * @returns The speed of the sensor currently providing feedback.
@@ -314,6 +365,70 @@ double CANTalon::GetSpeed()
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
 	return (double)speed;
+}
+
+/**
+ * Get the position of whatever is in the analog pin of the Talon, regardless of
+ * whether it is actually being used for feedback.
+ *
+ * @returns The value (0 - 1023) on the analog pin of the Talon.
+ */
+int CANTalon::GetAnalogIn()
+{
+  int position;
+  CTR_Code status = m_impl->GetAnalogInWithOv(position);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
+  return position;
+}
+
+/**
+ * Get the position of whatever is in the analog pin of the Talon, regardless of
+ * whether it is actually being used for feedback.
+ *
+ * @returns The value (0 - 1023) on the analog pin of the Talon.
+ */
+int CANTalon::GetAnalogInVel()
+{
+  int vel;
+  CTR_Code status = m_impl->GetAnalogInVel(vel);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
+  return vel;
+}
+
+/**
+ * Get the position of whatever is in the analog pin of the Talon, regardless of
+ * whether it is actually being used for feedback.
+ *
+ * @returns The value (0 - 1023) on the analog pin of the Talon.
+ */
+int CANTalon::GetEncPosition()
+{
+  int position;
+  CTR_Code status = m_impl->GetEncPosition(position);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
+  return position;
+}
+
+/**
+ * Get the position of whatever is in the analog pin of the Talon, regardless of
+ * whether it is actually being used for feedback.
+ *
+ * @returns The value (0 - 1023) on the analog pin of the Talon.
+ */
+int CANTalon::GetEncVel()
+{
+  int vel;
+  CTR_Code status = m_impl->GetEncVel(vel);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
+  return vel;
 }
 
 /**

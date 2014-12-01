@@ -20,6 +20,13 @@ class CANTalon : public MotorSafety,
                  public ErrorBase
 {
 public:
+  enum FeedbackDevice {
+    QuadEncoder=0,
+    AnalogPot=2,
+    AnalogEncoder=3,
+    EncRising=4,
+    EncFalling=5
+  };
 	explicit CANTalon(int deviceNumber);
 	virtual ~CANTalon();
 
@@ -53,6 +60,11 @@ public:
 	virtual float GetTemperature() override;
 	virtual double GetPosition() override;
 	virtual double GetSpeed() override;
+  virtual int GetClosedLoopError();
+  virtual int GetAnalogIn();
+  virtual int GetAnalogInVel();
+  virtual int GetEncPosition();
+  virtual int GetEncVel();
 	virtual bool GetForwardLimitOK() override;
 	virtual bool GetReverseLimitOK() override;
 	virtual uint16_t GetFaults() override;
@@ -69,17 +81,18 @@ public:
 	virtual void ConfigMaxOutputVoltage(double voltage) override;
 	virtual void ConfigFaultTime(float faultTime) override;
 	virtual void SetControlMode(ControlMode mode);
+  void SetFeedbackDevice(FeedbackDevice device);
 	virtual ControlMode GetControlMode();
 
 private:
   // Values for various modes as is sent in the CAN packets for the Talon.
   enum TalonControlMode {
 		kThrottle=0,
-    kFollowerMode=1,
-		kVoltageMode=2,
-		kPositionMode=3,
-		kSpeedMode=4,
-		kCurrentMode=5,
+    kFollowerMode=5,
+		kVoltageMode=4,
+		kPositionMode=1,
+		kSpeedMode=2,
+		kCurrentMode=3,
     kDisabled=15
   };
 

@@ -256,6 +256,90 @@ static int intp_value(int *obj) {
 }
 
 
+static uint32_t *new_uint32_tp() { 
+  return new uint32_t(); 
+}
+
+static uint32_t *copy_uint32_tp(uint32_t value) { 
+  return new uint32_t(value); 
+}
+
+static void delete_uint32_tp(uint32_t *obj) { 
+  if (obj) delete obj; 
+}
+
+static void uint32_tp_assign(uint32_t *obj, uint32_t value) {
+  *obj = value;
+}
+
+static uint32_t uint32_tp_value(uint32_t *obj) {
+  return *obj;
+}
+
+
+static int32_t *new_int32_tp() { 
+  return new int32_t(); 
+}
+
+static int32_t *copy_int32_tp(int32_t value) { 
+  return new int32_t(value); 
+}
+
+static void delete_int32_tp(int32_t *obj) { 
+  if (obj) delete obj; 
+}
+
+static void int32_tp_assign(int32_t *obj, int32_t value) {
+  *obj = value;
+}
+
+static int32_t int32_tp_value(int32_t *obj) {
+  return *obj;
+}
+
+
+static uint8_t *new_uint8_tp() { 
+  return new uint8_t(); 
+}
+
+static uint8_t *copy_uint8_tp(uint8_t value) { 
+  return new uint8_t(value); 
+}
+
+static void delete_uint8_tp(uint8_t *obj) { 
+  if (obj) delete obj; 
+}
+
+static void uint8_tp_assign(uint8_t *obj, uint8_t value) {
+  *obj = value;
+}
+
+static uint8_t uint8_tp_value(uint8_t *obj) {
+  return *obj;
+}
+
+
+static CTR_Code *new_CTR_Codep() { 
+  return new CTR_Code(); 
+}
+
+static CTR_Code *copy_CTR_Codep(CTR_Code value) { 
+  return new CTR_Code(value); 
+}
+
+static void delete_CTR_Codep(CTR_Code *obj) { 
+  if (obj) delete obj; 
+}
+
+static void CTR_Codep_assign(CTR_Code *obj, CTR_Code value) {
+  *obj = value;
+}
+
+static CTR_Code CTR_Codep_value(CTR_Code *obj) {
+  return *obj;
+}
+
+
 static float *new_floatp() { 
   return new float(); 
 }
@@ -405,6 +489,302 @@ SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_intp_1value(J
 }
 
 
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_new_1uint32_1tp(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  uint32_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (uint32_t *)new_uint32_tp();
+  *(uint32_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_copy_1uint32_1tp(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  uint32_t arg1 ;
+  uint32_t *argp1 ;
+  uint32_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  argp1 = *(uint32_t **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
+    return 0;
+  }
+  arg1 = *argp1; 
+  result = (uint32_t *)copy_uint32_tp(arg1);
+  *(uint32_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_delete_1uint32_1tp(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  uint32_t *arg1 = (uint32_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(uint32_t **)&jarg1; 
+  delete_uint32_tp(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_uint32_1tp_1assign(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  uint32_t *arg1 = (uint32_t *) 0 ;
+  uint32_t arg2 ;
+  uint32_t *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(uint32_t **)&jarg1; 
+  argp2 = *(uint32_t **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
+    return ;
+  }
+  arg2 = *argp2; 
+  uint32_tp_assign(arg1,arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_uint32_1tp_1value(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  uint32_t *arg1 = (uint32_t *) 0 ;
+  uint32_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(uint32_t **)&jarg1; 
+  result = uint32_tp_value(arg1);
+  *(uint32_t **)&jresult = new uint32_t((const uint32_t &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_new_1int32_1tp(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  int32_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (int32_t *)new_int32_tp();
+  *(int32_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_copy_1int32_1tp(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  int32_t arg1 ;
+  int32_t *argp1 ;
+  int32_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  argp1 = *(int32_t **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null int32_t");
+    return 0;
+  }
+  arg1 = *argp1; 
+  result = (int32_t *)copy_int32_tp(arg1);
+  *(int32_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_delete_1int32_1tp(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  int32_t *arg1 = (int32_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(int32_t **)&jarg1; 
+  delete_int32_tp(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_int32_1tp_1assign(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  int32_t *arg1 = (int32_t *) 0 ;
+  int32_t arg2 ;
+  int32_t *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(int32_t **)&jarg1; 
+  argp2 = *(int32_t **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null int32_t");
+    return ;
+  }
+  arg2 = *argp2; 
+  int32_tp_assign(arg1,arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_int32_1tp_1value(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  int32_t *arg1 = (int32_t *) 0 ;
+  int32_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(int32_t **)&jarg1; 
+  result = int32_tp_value(arg1);
+  *(int32_t **)&jresult = new int32_t((const int32_t &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_new_1uint8_1tp(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  uint8_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (uint8_t *)new_uint8_tp();
+  *(uint8_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_copy_1uint8_1tp(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  uint8_t arg1 ;
+  uint8_t *argp1 ;
+  uint8_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  argp1 = *(uint8_t **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint8_t");
+    return 0;
+  }
+  arg1 = *argp1; 
+  result = (uint8_t *)copy_uint8_tp(arg1);
+  *(uint8_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_delete_1uint8_1tp(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  uint8_t *arg1 = (uint8_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(uint8_t **)&jarg1; 
+  delete_uint8_tp(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_uint8_1tp_1assign(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  uint8_t *arg1 = (uint8_t *) 0 ;
+  uint8_t arg2 ;
+  uint8_t *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(uint8_t **)&jarg1; 
+  argp2 = *(uint8_t **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint8_t");
+    return ;
+  }
+  arg2 = *argp2; 
+  uint8_tp_assign(arg1,arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_uint8_1tp_1value(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  uint8_t *arg1 = (uint8_t *) 0 ;
+  uint8_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(uint8_t **)&jarg1; 
+  result = uint8_tp_value(arg1);
+  *(uint8_t **)&jresult = new uint8_t((const uint8_t &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_new_1CTR_1Codep(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  CTR_Code *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (CTR_Code *)new_CTR_Codep();
+  *(CTR_Code **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_copy_1CTR_1Codep(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  CTR_Code arg1 ;
+  CTR_Code *argp1 ;
+  CTR_Code *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  argp1 = *(CTR_Code **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null CTR_Code");
+    return 0;
+  }
+  arg1 = *argp1; 
+  result = (CTR_Code *)copy_CTR_Codep(arg1);
+  *(CTR_Code **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_delete_1CTR_1Codep(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  CTR_Code *arg1 = (CTR_Code *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(CTR_Code **)&jarg1; 
+  delete_CTR_Codep(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CTR_1Codep_1assign(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  CTR_Code *arg1 = (CTR_Code *) 0 ;
+  CTR_Code arg2 ;
+  CTR_Code *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(CTR_Code **)&jarg1; 
+  argp2 = *(CTR_Code **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null CTR_Code");
+    return ;
+  }
+  arg2 = *argp2; 
+  CTR_Codep_assign(arg1,arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CTR_1Codep_1value(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  CTR_Code *arg1 = (CTR_Code *) 0 ;
+  CTR_Code result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(CTR_Code **)&jarg1; 
+  result = CTR_Codep_value(arg1);
+  *(CTR_Code **)&jresult = new CTR_Code((const CTR_Code &)result); 
+  return jresult;
+}
+
+
 SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_new_1floatp(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   float *result = 0 ;
@@ -512,7 +892,35 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CtreCanNode_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_new_1CanTalonSRX_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1kDefaultControlPeriodMs_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (int)CanTalonSRX::kDefaultControlPeriodMs;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_new_1CanTalonSRX_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2) {
+  jlong jresult = 0 ;
+  int arg1 ;
+  int arg2 ;
+  CanTalonSRX *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = (int)jarg2; 
+  result = (CanTalonSRX *)new CanTalonSRX(arg1,arg2);
+  *(CanTalonSRX **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_new_1CanTalonSRX_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jlong jresult = 0 ;
   int arg1 ;
   CanTalonSRX *result = 0 ;
@@ -526,7 +934,7 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_new_1CanTalo
 }
 
 
-SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_new_1CanTalonSRX_1_1SWIG_11(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_new_1CanTalonSRX_1_1SWIG_12(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   CanTalonSRX *result = 0 ;
   
@@ -1704,7 +2112,7 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
   CanTalonSRX::param_t arg2 ;
-  int32_t *arg3 = 0 ;
+  int *arg3 = 0 ;
   CTR_Code result;
   
   (void)jenv;
@@ -1712,9 +2120,9 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
   arg2 = (CanTalonSRX::param_t)jarg2; 
-  arg3 = *(int32_t **)&jarg3;
+  arg3 = *(int **)&jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int32_t & reference is null");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
     return 0;
   } 
   result = (arg1)->GetParamResponseInt32(arg2,*arg3);
@@ -1726,21 +2134,15 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_
 SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetPgain(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jdouble jarg3) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  uint32_t arg2 ;
+  unsigned int arg2 ;
   double arg3 ;
-  uint32_t *argp2 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  argp2 = *(uint32_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (unsigned int)jarg2; 
   arg3 = (double)jarg3; 
   result = (arg1)->SetPgain(arg2,arg3);
   *(CTR_Code **)&jresult = new CTR_Code((const CTR_Code &)result); 
@@ -1751,21 +2153,15 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_
 SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetIgain(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jdouble jarg3) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  uint32_t arg2 ;
+  unsigned int arg2 ;
   double arg3 ;
-  uint32_t *argp2 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  argp2 = *(uint32_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (unsigned int)jarg2; 
   arg3 = (double)jarg3; 
   result = (arg1)->SetIgain(arg2,arg3);
   *(CTR_Code **)&jresult = new CTR_Code((const CTR_Code &)result); 
@@ -1776,21 +2172,15 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_
 SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetDgain(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jdouble jarg3) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  uint32_t arg2 ;
+  unsigned int arg2 ;
   double arg3 ;
-  uint32_t *argp2 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  argp2 = *(uint32_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (unsigned int)jarg2; 
   arg3 = (double)jarg3; 
   result = (arg1)->SetDgain(arg2,arg3);
   *(CTR_Code **)&jresult = new CTR_Code((const CTR_Code &)result); 
@@ -1801,21 +2191,15 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_
 SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetFgain(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jdouble jarg3) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  uint32_t arg2 ;
+  unsigned int arg2 ;
   double arg3 ;
-  uint32_t *argp2 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  argp2 = *(uint32_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (unsigned int)jarg2; 
   arg3 = (double)jarg3; 
   result = (arg1)->SetFgain(arg2,arg3);
   *(CTR_Code **)&jresult = new CTR_Code((const CTR_Code &)result); 
@@ -1823,177 +2207,123 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetIzone(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetIzone(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jint jarg3) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  uint32_t arg2 ;
-  int32_t arg3 ;
-  uint32_t *argp2 ;
-  int32_t *argp3 ;
+  unsigned int arg2 ;
+  int arg3 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  argp2 = *(uint32_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
-    return 0;
-  }
-  arg2 = *argp2; 
-  argp3 = *(int32_t **)&jarg3; 
-  if (!argp3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null int32_t");
-    return 0;
-  }
-  arg3 = *argp3; 
+  arg2 = (unsigned int)jarg2; 
+  arg3 = (int)jarg3; 
   result = (arg1)->SetIzone(arg2,arg3);
   *(CTR_Code **)&jresult = new CTR_Code((const CTR_Code &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetCloseLoopRampRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetCloseLoopRampRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jint jarg3) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  uint32_t arg2 ;
-  int32_t arg3 ;
-  uint32_t *argp2 ;
-  int32_t *argp3 ;
+  unsigned int arg2 ;
+  int arg3 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  argp2 = *(uint32_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
-    return 0;
-  }
-  arg2 = *argp2; 
-  argp3 = *(int32_t **)&jarg3; 
-  if (!argp3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null int32_t");
-    return 0;
-  }
-  arg3 = *argp3; 
+  arg2 = (unsigned int)jarg2; 
+  arg3 = (int)jarg3; 
   result = (arg1)->SetCloseLoopRampRate(arg2,arg3);
   *(CTR_Code **)&jresult = new CTR_Code((const CTR_Code &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetSensorPosition(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetSensorPosition(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  int32_t arg2 ;
-  int32_t *argp2 ;
+  int arg2 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  argp2 = *(int32_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null int32_t");
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   result = (arg1)->SetSensorPosition(arg2);
   *(CTR_Code **)&jresult = new CTR_Code((const CTR_Code &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetForwardSoftLimit(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetForwardSoftLimit(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  int32_t arg2 ;
-  int32_t *argp2 ;
+  int arg2 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  argp2 = *(int32_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null int32_t");
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   result = (arg1)->SetForwardSoftLimit(arg2);
   *(CTR_Code **)&jresult = new CTR_Code((const CTR_Code &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetReverseSoftLimit(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetReverseSoftLimit(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  int32_t arg2 ;
-  int32_t *argp2 ;
+  int arg2 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  argp2 = *(int32_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null int32_t");
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   result = (arg1)->SetReverseSoftLimit(arg2);
   *(CTR_Code **)&jresult = new CTR_Code((const CTR_Code &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetForwardSoftEnable(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetForwardSoftEnable(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  int32_t arg2 ;
-  int32_t *argp2 ;
+  int arg2 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  argp2 = *(int32_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null int32_t");
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   result = (arg1)->SetForwardSoftEnable(arg2);
   *(CTR_Code **)&jresult = new CTR_Code((const CTR_Code &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetReverseSoftEnable(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetReverseSoftEnable(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  int32_t arg2 ;
-  int32_t *argp2 ;
+  int arg2 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  argp2 = *(int32_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null int32_t");
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   result = (arg1)->SetReverseSoftEnable(arg2);
   *(CTR_Code **)&jresult = new CTR_Code((const CTR_Code &)result); 
   return jresult;
@@ -2003,21 +2333,15 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_
 SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1GetPgain(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  uint32_t arg2 ;
+  unsigned int arg2 ;
   double *arg3 = 0 ;
-  uint32_t *argp2 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  argp2 = *(uint32_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (unsigned int)jarg2; 
   arg3 = *(double **)&jarg3;
   if (!arg3) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "double & reference is null");
@@ -2032,21 +2356,15 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_
 SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1GetIgain(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  uint32_t arg2 ;
+  unsigned int arg2 ;
   double *arg3 = 0 ;
-  uint32_t *argp2 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  argp2 = *(uint32_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (unsigned int)jarg2; 
   arg3 = *(double **)&jarg3;
   if (!arg3) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "double & reference is null");
@@ -2061,21 +2379,15 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_
 SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1GetDgain(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  uint32_t arg2 ;
+  unsigned int arg2 ;
   double *arg3 = 0 ;
-  uint32_t *argp2 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  argp2 = *(uint32_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (unsigned int)jarg2; 
   arg3 = *(double **)&jarg3;
   if (!arg3) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "double & reference is null");
@@ -2090,21 +2402,15 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_
 SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1GetFgain(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  uint32_t arg2 ;
+  unsigned int arg2 ;
   double *arg3 = 0 ;
-  uint32_t *argp2 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  argp2 = *(uint32_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (unsigned int)jarg2; 
   arg3 = *(double **)&jarg3;
   if (!arg3) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "double & reference is null");
@@ -2119,24 +2425,18 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_
 SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1GetIzone(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  uint32_t arg2 ;
-  int32_t *arg3 = 0 ;
-  uint32_t *argp2 ;
+  unsigned int arg2 ;
+  int *arg3 = 0 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  argp2 = *(uint32_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
-    return 0;
-  }
-  arg2 = *argp2; 
-  arg3 = *(int32_t **)&jarg3;
+  arg2 = (unsigned int)jarg2; 
+  arg3 = *(int **)&jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int32_t & reference is null");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
     return 0;
   } 
   result = (arg1)->GetIzone(arg2,*arg3);
@@ -2148,24 +2448,18 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_
 SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1GetCloseLoopRampRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  uint32_t arg2 ;
-  int32_t *arg3 = 0 ;
-  uint32_t *argp2 ;
+  unsigned int arg2 ;
+  int *arg3 = 0 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  argp2 = *(uint32_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
-    return 0;
-  }
-  arg2 = *argp2; 
-  arg3 = *(int32_t **)&jarg3;
+  arg2 = (unsigned int)jarg2; 
+  arg3 = *(int **)&jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int32_t & reference is null");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
     return 0;
   } 
   result = (arg1)->GetCloseLoopRampRate(arg2,*arg3);
@@ -2177,16 +2471,16 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_
 SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1GetForwardSoftLimit(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  int32_t *arg2 = 0 ;
+  int *arg2 = 0 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  arg2 = *(int32_t **)&jarg2;
+  arg2 = *(int **)&jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int32_t & reference is null");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
     return 0;
   } 
   result = (arg1)->GetForwardSoftLimit(*arg2);
@@ -2198,16 +2492,16 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_
 SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1GetReverseSoftLimit(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  int32_t *arg2 = 0 ;
+  int *arg2 = 0 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  arg2 = *(int32_t **)&jarg2;
+  arg2 = *(int **)&jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int32_t & reference is null");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
     return 0;
   } 
   result = (arg1)->GetReverseSoftLimit(*arg2);
@@ -2219,16 +2513,16 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_
 SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1GetForwardSoftEnable(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  int32_t *arg2 = 0 ;
+  int *arg2 = 0 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  arg2 = *(int32_t **)&jarg2;
+  arg2 = *(int **)&jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int32_t & reference is null");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
     return 0;
   } 
   result = (arg1)->GetForwardSoftEnable(*arg2);
@@ -2240,16 +2534,16 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_
 SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1GetReverseSoftEnable(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  int32_t *arg2 = 0 ;
+  int *arg2 = 0 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  arg2 = *(int32_t **)&jarg2;
+  arg2 = *(int **)&jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int32_t & reference is null");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
     return 0;
   } 
   result = (arg1)->GetReverseSoftEnable(*arg2);
@@ -2261,28 +2555,16 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_
 SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetStatusFrameRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
-  uint32_t arg2 ;
-  uint8_t arg3 ;
-  uint32_t *argp2 ;
-  uint8_t *argp3 ;
+  unsigned int arg2 ;
+  unsigned int arg3 ;
   CTR_Code result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(CanTalonSRX **)&jarg1; 
-  argp2 = *(uint32_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
-    return 0;
-  }
-  arg2 = *argp2; 
-  argp3 = *(uint8_t **)&jarg3; 
-  if (!argp3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint8_t");
-    return 0;
-  }
-  arg3 = *argp3; 
+  arg2 = (unsigned int)jarg2; 
+  arg3 = (unsigned int)jarg3; 
   result = (arg1)->SetStatusFrameRate(arg2,arg3);
   *(CTR_Code **)&jresult = new CTR_Code((const CTR_Code &)result); 
   return jresult;

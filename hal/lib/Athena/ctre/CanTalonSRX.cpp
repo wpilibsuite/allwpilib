@@ -241,7 +241,7 @@ typedef struct _TALON_Param_Response_t {
 } TALON_Param_Response_t ;
 
 
-CanTalonSRX::CanTalonSRX(UINT8 deviceNumber,UINT8 controlPeriodMs): CtreCanNode(deviceNumber), _can_h(0), _can_stat(0)
+CanTalonSRX::CanTalonSRX(int deviceNumber,int controlPeriodMs): CtreCanNode(deviceNumber), _can_h(0), _can_stat(0)
 {
 	RegisterRx(STATUS_1 | (UINT8)deviceNumber );
 	RegisterRx(STATUS_2 | (UINT8)deviceNumber );
@@ -250,7 +250,7 @@ CanTalonSRX::CanTalonSRX(UINT8 deviceNumber,UINT8 controlPeriodMs): CtreCanNode(
 	RegisterRx(STATUS_5 | (UINT8)deviceNumber );
 	RegisterRx(STATUS_6 | (UINT8)deviceNumber );
 	RegisterRx(STATUS_7 | (UINT8)deviceNumber );
-	RegisterTx(CONTROL_1 | (UINT8)deviceNumber, controlPeriodMs);
+	RegisterTx(CONTROL_1 | (UINT8)deviceNumber, (UINT8)controlPeriodMs);
 	/* default our frame rate table to what firmware defaults to. */
 	_statusRateMs[0] = 10;	/* 	TALON_Status_1_General_10ms_t 		*/
 	_statusRateMs[1] = 20;	/* 	TALON_Status_2_Feedback_20ms_t 		*/
@@ -334,7 +334,7 @@ void CanTalonSRX::Set(double value)
  * -Default brake and limit switch signals... eOnBoot_XXXs.  Avoid doing this, use the override signals in the control frame.
  * Talon will automatically send a PARAM_RESPONSE after the set, so GetParamResponse will catch the latest value after a couple ms.
  */
-CTR_Code CanTalonSRX::SetParamRaw(uint32_t paramEnum, int32_t rawBits)
+CTR_Code CanTalonSRX::SetParamRaw(unsigned paramEnum, int rawBits)
 {
 	/* caller is using param API.  Open session if it hasn'T been done. */
 	if(0 == _can_h)
@@ -355,7 +355,7 @@ CTR_Code CanTalonSRX::SetParamRaw(uint32_t paramEnum, int32_t rawBits)
 /**
  * Checks cached CAN frames and updating solicited signals.
  */
-CTR_Code CanTalonSRX::GetParamResponseRaw(uint32_t paramEnum, int32_t & rawBits)
+CTR_Code CanTalonSRX::GetParamResponseRaw(unsigned paramEnum, int & rawBits)
 {
 	CTR_Code retval = CTR_OKAY;
 	/* process received param events. We don't expect many since this API is not used often. */
@@ -441,7 +441,7 @@ CTR_Code CanTalonSRX::GetParamResponse(param_t paramEnum, double & value)
 	}
 	return retval;
 }
-CTR_Code CanTalonSRX::GetParamResponseInt32(param_t paramEnum, int32_t & value)
+CTR_Code CanTalonSRX::GetParamResponseInt32(param_t paramEnum, int & value)
 {
 	double dvalue = 0;
 	CTR_Code retval = GetParamResponse(paramEnum, dvalue);
@@ -452,134 +452,135 @@ CTR_Code CanTalonSRX::GetParamResponseInt32(param_t paramEnum, int32_t & value)
 /*----- If your application requires changing these values consider using both slots and switch between slot0 <=> slot1. ------------------*/
 /*----- If your application requires changing these signals frequently then it makes sense to leverage this API. --------------------------*/
 /*----- Getters don't block, so it may require several calls to get the latest value. --------------------------*/
-CTR_Code CanTalonSRX::SetPgain(uint32_t slotIdx,double gain)
+CTR_Code CanTalonSRX::SetPgain(unsigned slotIdx,double gain)
 {
 	if(slotIdx == 0)
 		return SetParam(eProfileParamSlot0_P, gain);
 	return SetParam(eProfileParamSlot1_P, gain);
 }
-CTR_Code CanTalonSRX::SetIgain(uint32_t slotIdx,double gain)
+CTR_Code CanTalonSRX::SetIgain(unsigned slotIdx,double gain)
 {
 	if(slotIdx == 0)
 		return SetParam(eProfileParamSlot0_I, gain);
 	return SetParam(eProfileParamSlot1_I, gain);
 }
-CTR_Code CanTalonSRX::SetDgain(uint32_t slotIdx,double gain)
+CTR_Code CanTalonSRX::SetDgain(unsigned slotIdx,double gain)
 {
 	if(slotIdx == 0)
 		return SetParam(eProfileParamSlot0_D, gain);
 	return SetParam(eProfileParamSlot1_D, gain);
 }
-CTR_Code CanTalonSRX::SetFgain(uint32_t slotIdx,double gain)
+CTR_Code CanTalonSRX::SetFgain(unsigned slotIdx,double gain)
 {
 	if(slotIdx == 0)
 		return SetParam(eProfileParamSlot0_F, gain);
 	return SetParam(eProfileParamSlot1_F, gain);
 }
-CTR_Code CanTalonSRX::SetIzone(uint32_t slotIdx,int32_t zone)
+CTR_Code CanTalonSRX::SetIzone(unsigned slotIdx,int zone)
 {
 	if(slotIdx == 0)
 		return SetParam(eProfileParamSlot0_IZone, zone);
 	return SetParam(eProfileParamSlot1_IZone, zone);
 }
-CTR_Code CanTalonSRX::SetCloseLoopRampRate(uint32_t slotIdx,int32_t closeLoopRampRate)
+CTR_Code CanTalonSRX::SetCloseLoopRampRate(unsigned slotIdx,int closeLoopRampRate)
 {
 	if(slotIdx == 0)
 		return SetParam(eProfileParamSlot0_CloseLoopRampRate, closeLoopRampRate);
 	return SetParam(eProfileParamSlot1_CloseLoopRampRate, closeLoopRampRate);
 }
-CTR_Code CanTalonSRX::GetPgain(uint32_t slotIdx,double & gain)
+CTR_Code CanTalonSRX::GetPgain(unsigned slotIdx,double & gain)
 {
 	if(slotIdx == 0)
 		return GetParamResponse(eProfileParamSlot0_P, gain);
 	return GetParamResponse(eProfileParamSlot1_P, gain);
 }
-CTR_Code CanTalonSRX::GetIgain(uint32_t slotIdx,double & gain)
+CTR_Code CanTalonSRX::GetIgain(unsigned slotIdx,double & gain)
 {
 	if(slotIdx == 0)
 		return GetParamResponse(eProfileParamSlot0_I, gain);
 	return GetParamResponse(eProfileParamSlot1_I, gain);
 }
-CTR_Code CanTalonSRX::GetDgain(uint32_t slotIdx,double & gain)
+CTR_Code CanTalonSRX::GetDgain(unsigned slotIdx,double & gain)
 {
 	if(slotIdx == 0)
 		return GetParamResponse(eProfileParamSlot0_D, gain);
 	return GetParamResponse(eProfileParamSlot1_D, gain);
 }
-CTR_Code CanTalonSRX::GetFgain(uint32_t slotIdx,double & gain)
+CTR_Code CanTalonSRX::GetFgain(unsigned slotIdx,double & gain)
 {
 	if(slotIdx == 0)
 		return GetParamResponse(eProfileParamSlot0_F, gain);
 	return GetParamResponse(eProfileParamSlot1_F, gain);
 }
-CTR_Code CanTalonSRX::GetIzone(uint32_t slotIdx,int32_t & zone)
+CTR_Code CanTalonSRX::GetIzone(unsigned slotIdx,int & zone)
 {
 	if(slotIdx == 0)
 		return GetParamResponseInt32(eProfileParamSlot0_IZone, zone);
 	return GetParamResponseInt32(eProfileParamSlot1_IZone, zone);
 }
-CTR_Code CanTalonSRX::GetCloseLoopRampRate(uint32_t slotIdx,int32_t & closeLoopRampRate)
+CTR_Code CanTalonSRX::GetCloseLoopRampRate(unsigned slotIdx,int & closeLoopRampRate)
 {
 	if(slotIdx == 0)
 		return GetParamResponseInt32(eProfileParamSlot0_CloseLoopRampRate, closeLoopRampRate);
 	return GetParamResponseInt32(eProfileParamSlot1_CloseLoopRampRate, closeLoopRampRate);
 }
 
-CTR_Code CanTalonSRX::SetSensorPosition(int32_t pos)
+CTR_Code CanTalonSRX::SetSensorPosition(int pos)
 {
 	return SetParam(eSensorPosition, pos);
 }
-CTR_Code CanTalonSRX::SetForwardSoftLimit(int32_t forwardLimit)
+CTR_Code CanTalonSRX::SetForwardSoftLimit(int forwardLimit)
 {
 	return SetParam(eProfileParamSoftLimitForThreshold, forwardLimit);
 }
-CTR_Code CanTalonSRX::SetReverseSoftLimit(int32_t reverseLimit)
+CTR_Code CanTalonSRX::SetReverseSoftLimit(int reverseLimit)
 {
 	return SetParam(eProfileParamSoftLimitRevThreshold, reverseLimit);
 }
-CTR_Code CanTalonSRX::SetForwardSoftEnable(int32_t enable)
+CTR_Code CanTalonSRX::SetForwardSoftEnable(int enable)
 {
 	return SetParam(eProfileParamSoftLimitForEnable, enable);
 }
-CTR_Code CanTalonSRX::SetReverseSoftEnable(int32_t enable)
+CTR_Code CanTalonSRX::SetReverseSoftEnable(int enable)
 {
 	return SetParam(eProfileParamSoftLimitRevEnable, enable);
 }
-CTR_Code CanTalonSRX::GetForwardSoftLimit(int32_t & forwardLimit)
+CTR_Code CanTalonSRX::GetForwardSoftLimit(int & forwardLimit)
 {
 	return GetParamResponseInt32(eProfileParamSoftLimitForThreshold, forwardLimit);
 }
-CTR_Code CanTalonSRX::GetReverseSoftLimit(int32_t & reverseLimit)
+CTR_Code CanTalonSRX::GetReverseSoftLimit(int & reverseLimit)
 {
 	return GetParamResponseInt32(eProfileParamSoftLimitRevThreshold, reverseLimit);
 }
-CTR_Code CanTalonSRX::GetForwardSoftEnable(int32_t & enable)
+CTR_Code CanTalonSRX::GetForwardSoftEnable(int & enable)
 {
 	return GetParamResponseInt32(eProfileParamSoftLimitForEnable, enable);
 }
-CTR_Code CanTalonSRX::GetReverseSoftEnable(int32_t & enable)
+CTR_Code CanTalonSRX::GetReverseSoftEnable(int & enable)
 {
 	return GetParamResponseInt32(eProfileParamSoftLimitRevEnable, enable);
 }
 /**
  * Change the periodMs of a TALON's status frame.  See kStatusFrame_* enums for what's available.
  */
-CTR_Code CanTalonSRX::SetStatusFrameRate(uint32_t frameEnum, uint8_t periodMs)
+CTR_Code CanTalonSRX::SetStatusFrameRate(unsigned frameEnum, unsigned periodMs)
 {
 	int32_t status = 0;
+  uint8_t period = (uint8_t)periodMs;
 	/* tweak just the status messsage rate the caller cares about */
 	switch(frameEnum){
 		case kStatusFrame_General:
-			_statusRateMs[0] = periodMs;
+			_statusRateMs[0] = period;
 			break;
 		case kStatusFrame_Feedback:
-			_statusRateMs[1] = periodMs;
+			_statusRateMs[1] = period;
 			break;
 		case kStatusFrame_Encoder:
-			_statusRateMs[2] = periodMs;
+			_statusRateMs[2] = period;
 			break;
 		case kStatusFrame_AnalogTempVbat:
-			_statusRateMs[3] = periodMs;
+			_statusRateMs[3] = period;
 			break;
 	}
 	/* build our request frame */

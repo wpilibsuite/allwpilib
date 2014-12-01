@@ -52,32 +52,82 @@ public class CANTalonTest extends AbstractComsSetup {
 		fixture.teardown();
 	}
 
+  private String errorMessage(double actual, double expected) {
+    String start = "Actual value was: ";
+    start += actual;
+    start += " Expected: ";
+    start += expected;
+    return start;
+  }
+
 	/**
    * Briefly run a CAN Talon and assert true.
 	 */
 	@Test
-	public void test() {
-    // The constructor takes a device ID (settable in roboRIO web interface).
-    CanTalonSRX talon = new CanTalonSRX(0);
-    // Make sure that the Talon is in the basic throttle mode.
-    talon.SetModeSelect(0);
-    // Set Talon to 50% forwards throttle.
-    talon.Set(0.5);
-    long currentp = CanTalonJNI.new_doublep();//new SWIGTYPE_p_double(, true);
-    talon.GetTemp(new SWIGTYPE_p_double(currentp, true));
-    System.out.println(CanTalonJNI.doublep_value(currentp));
-    Timer.delay(1.5);
-    // Turn Talon off.
-    talon.Set(0.0);
-		assertTrue(true);
-
-    Timer.delay(2);
+	public void throttle() {
+    double throttle = 0.1;
     CANTalon tal = new CANTalon(0);
-    tal.enableControl();
-    tal.set(0.5);
-    System.out.println(tal.getTemp());
-    Timer.delay(1.0);
+    tal.set(throttle);
+    Timer.delay(5.0);
+    assertTrue(errorMessage(tal.get(), throttle), Math.abs(throttle - tal.get()) < 1e-2);
+
+    tal.set(-throttle);
+    Timer.delay(1.25);
+    assertTrue(errorMessage(tal.get(), -throttle), Math.abs(throttle + tal.get()) < 1e-2);
+    tal.reverseOutput(true);
+    tal.set(-throttle);
+    Timer.delay(1.25);
+    assertTrue(errorMessage(tal.get(), -throttle), Math.abs(throttle + tal.get()) < 1e-2);
+
     tal.disable();
+    Timer.delay(0.2);
+    assertTrue(errorMessage(tal.get(), 0.0), Math.abs(tal.get()) < 1e-10);
 	}
+
+  @Test
+  public void SetGetPID() {
+    CANTalon talon = new CANTalon(0);
+    talon.changeControlMode(CANTalon.ControlMode.Position);
+    double p = 0.05, i = 0.098, d = 1.23;
+    talon.setPID(p, i , d);
+    assertTrue(errorMessage(talon.getP(), p), Math.abs(p - talon.getP()) < 1e-5);
+    assertTrue(errorMessage(talon.getI(), i), Math.abs(i - talon.getI()) < 1e-5);
+    assertTrue(errorMessage(talon.getD(), d), Math.abs(d - talon.getD()) < 1e-5);
+    // Test with new values in case the talon was already set to the previous ones.
+    p = 0.15;
+    i = 0.198;
+    d = 1.03;
+    talon.setPID(p, i , d);
+    assertTrue(errorMessage(talon.getP(), p), Math.abs(p - talon.getP()) < 1e-5);
+    assertTrue(errorMessage(talon.getI(), i), Math.abs(i - talon.getI()) < 1e-5);
+    assertTrue(errorMessage(talon.getD(), d), Math.abs(d - talon.getD()) < 1e-5);
+  }
+
+  @Test
+  public void positionModeWorks() {
+    CANTalon talon = new CANTalon(0);
+    talon.changeControlMode(CANTalon.ControlMode.Position);
+    talon.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot);
+    Timer.delay(0.2);
+    double p = 1.0, i = 0.0, d = 0.00;
+    talon.setPID(p, i , d);
+    talon.set(100);
+    Timer.delay(5.0);
+    talon.reverseOutput(true);
+    Timer.delay(5.0);
+    //assertTrue(errorMessage(talon.get(), 100), Math.abs(100 - talon.get()) < 10);
+    assertTrue(true);
+  }
+
+  @Test
+  public void testBrake() {
+    CANTalon talon = new CANTalon(0);
+    for (int i = 0; i < 5; i++) {
+      talon.enableBrakeMode(true);
+      Timer.delay(0.5);
+      talon.enableBrakeMode(false);
+      Timer.delay(0.5);
+    }
+  }
 
 }

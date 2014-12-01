@@ -107,9 +107,9 @@ private:
 	CTR_Code GetParamResponseRaw(uint32_t paramEnum, int32_t & rawBits);
 public:
 	static const int kDefaultControlPeriodMs = 10; //!< default control update rate is 10ms.
-	CanTalonSRX(UINT8 deviceNumber = 0,UINT8 controlPeriodMs = kDefaultControlPeriodMs);
-    ~CanTalonSRX();
-    void Set(double value);
+	CanTalonSRX(int deviceNumber = 0,int controlPeriodMs = kDefaultControlPeriodMs);
+	~CanTalonSRX();
+	void Set(double value);
 	/* mode select enumerations */
 	static const int kMode_DutyCycle = 0; //!< Demand is 11bit signed duty cycle [-1023,1023].
 	static const int kMode_PositionCloseLoop = 1; //!< Position PIDF.
@@ -229,36 +229,36 @@ public:
 	 */
 	CTR_Code RequestParam(param_t paramEnum);
 	CTR_Code GetParamResponse(param_t paramEnum, double & value);
-	CTR_Code GetParamResponseInt32(param_t paramEnum, int32_t & value);
+	CTR_Code GetParamResponseInt32(param_t paramEnum, int & value);
     /*----- getters and setters that use param request/response. These signals are backed up in flash and will survive a power cycle. ---------*/
 	/*----- If your application requires changing these values consider using both slots and switch between slot0 <=> slot1. ------------------*/
 	/*----- If your application requires changing these signals frequently then it makes sense to leverage this API. --------------------------*/
 	/*----- Getters don't block, so it may require several calls to get the latest value. --------------------------*/
-	CTR_Code SetPgain(uint32_t slotIdx,double gain);
-	CTR_Code SetIgain(uint32_t slotIdx,double gain);
-	CTR_Code SetDgain(uint32_t slotIdx,double gain);
-	CTR_Code SetFgain(uint32_t slotIdx,double gain);
-	CTR_Code SetIzone(uint32_t slotIdx,int32_t zone);
-	CTR_Code SetCloseLoopRampRate(uint32_t slotIdx,int32_t closeLoopRampRate);
-	CTR_Code SetSensorPosition(int32_t pos);
-	CTR_Code SetForwardSoftLimit(int32_t forwardLimit);
-	CTR_Code SetReverseSoftLimit(int32_t reverseLimit);
-	CTR_Code SetForwardSoftEnable(int32_t enable);
-	CTR_Code SetReverseSoftEnable(int32_t enable);
-	CTR_Code GetPgain(uint32_t slotIdx,double & gain);
-	CTR_Code GetIgain(uint32_t slotIdx,double & gain);
-	CTR_Code GetDgain(uint32_t slotIdx,double & gain);
-	CTR_Code GetFgain(uint32_t slotIdx,double & gain);
-	CTR_Code GetIzone(uint32_t slotIdx,int32_t & zone);
-	CTR_Code GetCloseLoopRampRate(uint32_t slotIdx,int32_t & closeLoopRampRate);
-	CTR_Code GetForwardSoftLimit(int32_t & forwardLimit);
-	CTR_Code GetReverseSoftLimit(int32_t & reverseLimit);
-	CTR_Code GetForwardSoftEnable(int32_t & enable);
-	CTR_Code GetReverseSoftEnable(int32_t & enable);
+	CTR_Code SetPgain(unsigned slotIdx,double gain);
+	CTR_Code SetIgain(unsigned slotIdx,double gain);
+	CTR_Code SetDgain(unsigned slotIdx,double gain);
+	CTR_Code SetFgain(unsigned slotIdx,double gain);
+	CTR_Code SetIzone(unsigned slotIdx,int zone);
+	CTR_Code SetCloseLoopRampRate(unsigned slotIdx,int closeLoopRampRate);
+	CTR_Code SetSensorPosition(int pos);
+	CTR_Code SetForwardSoftLimit(int forwardLimit);
+	CTR_Code SetReverseSoftLimit(int reverseLimit);
+	CTR_Code SetForwardSoftEnable(int enable);
+	CTR_Code SetReverseSoftEnable(int enable);
+	CTR_Code GetPgain(unsigned slotIdx,double & gain);
+	CTR_Code GetIgain(unsigned slotIdx,double & gain);
+	CTR_Code GetDgain(unsigned slotIdx,double & gain);
+	CTR_Code GetFgain(unsigned slotIdx,double & gain);
+	CTR_Code GetIzone(unsigned slotIdx,int & zone);
+	CTR_Code GetCloseLoopRampRate(unsigned slotIdx,int & closeLoopRampRate);
+	CTR_Code GetForwardSoftLimit(int & forwardLimit);
+	CTR_Code GetReverseSoftLimit(int & reverseLimit);
+	CTR_Code GetForwardSoftEnable(int & enable);
+	CTR_Code GetReverseSoftEnable(int & enable);
 	/**
 	 * Change the periodMs of a TALON's status frame.  See kStatusFrame_* enums for what's available.
 	 */
-	CTR_Code SetStatusFrameRate(uint32_t frameEnum, uint8_t periodMs);
+	CTR_Code SetStatusFrameRate(unsigned frameEnum, unsigned periodMs);
 	/**
 	 * Clear all sticky faults in TALON.
 	 */

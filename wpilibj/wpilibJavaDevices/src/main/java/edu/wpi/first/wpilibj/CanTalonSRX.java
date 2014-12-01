@@ -35,12 +35,16 @@ public class CanTalonSRX extends CtreCanNode {
     super.delete();
   }
 
+  public CanTalonSRX(int deviceNumber, int controlPeriodMs) {
+    this(CanTalonJNI.new_CanTalonSRX__SWIG_0(deviceNumber, controlPeriodMs), true);
+  }
+
   public CanTalonSRX(int deviceNumber) {
-    this(CanTalonJNI.new_CanTalonSRX__SWIG_0(deviceNumber), true);
+    this(CanTalonJNI.new_CanTalonSRX__SWIG_1(deviceNumber), true);
   }
 
   public CanTalonSRX() {
-    this(CanTalonJNI.new_CanTalonSRX__SWIG_1(), true);
+    this(CanTalonJNI.new_CanTalonSRX__SWIG_2(), true);
   }
 
   public void Set(double value) {
@@ -59,96 +63,96 @@ public class CanTalonSRX extends CtreCanNode {
     return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetParamResponse(swigCPtr, this, paramEnum.swigValue(), SWIGTYPE_p_double.getCPtr(value)), true);
   }
 
-  public SWIGTYPE_p_CTR_Code GetParamResponseInt32(CanTalonSRX.param_t paramEnum, SWIGTYPE_p_int32_t value) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetParamResponseInt32(swigCPtr, this, paramEnum.swigValue(), SWIGTYPE_p_int32_t.getCPtr(value)), true);
+  public SWIGTYPE_p_CTR_Code GetParamResponseInt32(CanTalonSRX.param_t paramEnum, SWIGTYPE_p_int value) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetParamResponseInt32(swigCPtr, this, paramEnum.swigValue(), SWIGTYPE_p_int.getCPtr(value)), true);
   }
 
-  public SWIGTYPE_p_CTR_Code SetPgain(SWIGTYPE_p_uint32_t slotIdx, double gain) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetPgain(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), gain), true);
+  public SWIGTYPE_p_CTR_Code SetPgain(long slotIdx, double gain) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetPgain(swigCPtr, this, slotIdx, gain), true);
   }
 
-  public SWIGTYPE_p_CTR_Code SetIgain(SWIGTYPE_p_uint32_t slotIdx, double gain) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetIgain(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), gain), true);
+  public SWIGTYPE_p_CTR_Code SetIgain(long slotIdx, double gain) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetIgain(swigCPtr, this, slotIdx, gain), true);
   }
 
-  public SWIGTYPE_p_CTR_Code SetDgain(SWIGTYPE_p_uint32_t slotIdx, double gain) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetDgain(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), gain), true);
+  public SWIGTYPE_p_CTR_Code SetDgain(long slotIdx, double gain) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetDgain(swigCPtr, this, slotIdx, gain), true);
   }
 
-  public SWIGTYPE_p_CTR_Code SetFgain(SWIGTYPE_p_uint32_t slotIdx, double gain) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetFgain(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), gain), true);
+  public SWIGTYPE_p_CTR_Code SetFgain(long slotIdx, double gain) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetFgain(swigCPtr, this, slotIdx, gain), true);
   }
 
-  public SWIGTYPE_p_CTR_Code SetIzone(SWIGTYPE_p_uint32_t slotIdx, SWIGTYPE_p_int32_t zone) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetIzone(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), SWIGTYPE_p_int32_t.getCPtr(zone)), true);
+  public SWIGTYPE_p_CTR_Code SetIzone(long slotIdx, int zone) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetIzone(swigCPtr, this, slotIdx, zone), true);
   }
 
-  public SWIGTYPE_p_CTR_Code SetCloseLoopRampRate(SWIGTYPE_p_uint32_t slotIdx, SWIGTYPE_p_int32_t closeLoopRampRate) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetCloseLoopRampRate(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), SWIGTYPE_p_int32_t.getCPtr(closeLoopRampRate)), true);
+  public SWIGTYPE_p_CTR_Code SetCloseLoopRampRate(long slotIdx, int closeLoopRampRate) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetCloseLoopRampRate(swigCPtr, this, slotIdx, closeLoopRampRate), true);
   }
 
-  public SWIGTYPE_p_CTR_Code SetSensorPosition(SWIGTYPE_p_int32_t pos) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetSensorPosition(swigCPtr, this, SWIGTYPE_p_int32_t.getCPtr(pos)), true);
+  public SWIGTYPE_p_CTR_Code SetSensorPosition(int pos) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetSensorPosition(swigCPtr, this, pos), true);
   }
 
-  public SWIGTYPE_p_CTR_Code SetForwardSoftLimit(SWIGTYPE_p_int32_t forwardLimit) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetForwardSoftLimit(swigCPtr, this, SWIGTYPE_p_int32_t.getCPtr(forwardLimit)), true);
+  public SWIGTYPE_p_CTR_Code SetForwardSoftLimit(int forwardLimit) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetForwardSoftLimit(swigCPtr, this, forwardLimit), true);
   }
 
-  public SWIGTYPE_p_CTR_Code SetReverseSoftLimit(SWIGTYPE_p_int32_t reverseLimit) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetReverseSoftLimit(swigCPtr, this, SWIGTYPE_p_int32_t.getCPtr(reverseLimit)), true);
+  public SWIGTYPE_p_CTR_Code SetReverseSoftLimit(int reverseLimit) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetReverseSoftLimit(swigCPtr, this, reverseLimit), true);
   }
 
-  public SWIGTYPE_p_CTR_Code SetForwardSoftEnable(SWIGTYPE_p_int32_t enable) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetForwardSoftEnable(swigCPtr, this, SWIGTYPE_p_int32_t.getCPtr(enable)), true);
+  public SWIGTYPE_p_CTR_Code SetForwardSoftEnable(int enable) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetForwardSoftEnable(swigCPtr, this, enable), true);
   }
 
-  public SWIGTYPE_p_CTR_Code SetReverseSoftEnable(SWIGTYPE_p_int32_t enable) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetReverseSoftEnable(swigCPtr, this, SWIGTYPE_p_int32_t.getCPtr(enable)), true);
+  public SWIGTYPE_p_CTR_Code SetReverseSoftEnable(int enable) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetReverseSoftEnable(swigCPtr, this, enable), true);
   }
 
-  public SWIGTYPE_p_CTR_Code GetPgain(SWIGTYPE_p_uint32_t slotIdx, SWIGTYPE_p_double gain) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetPgain(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), SWIGTYPE_p_double.getCPtr(gain)), true);
+  public SWIGTYPE_p_CTR_Code GetPgain(long slotIdx, SWIGTYPE_p_double gain) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetPgain(swigCPtr, this, slotIdx, SWIGTYPE_p_double.getCPtr(gain)), true);
   }
 
-  public SWIGTYPE_p_CTR_Code GetIgain(SWIGTYPE_p_uint32_t slotIdx, SWIGTYPE_p_double gain) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetIgain(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), SWIGTYPE_p_double.getCPtr(gain)), true);
+  public SWIGTYPE_p_CTR_Code GetIgain(long slotIdx, SWIGTYPE_p_double gain) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetIgain(swigCPtr, this, slotIdx, SWIGTYPE_p_double.getCPtr(gain)), true);
   }
 
-  public SWIGTYPE_p_CTR_Code GetDgain(SWIGTYPE_p_uint32_t slotIdx, SWIGTYPE_p_double gain) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetDgain(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), SWIGTYPE_p_double.getCPtr(gain)), true);
+  public SWIGTYPE_p_CTR_Code GetDgain(long slotIdx, SWIGTYPE_p_double gain) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetDgain(swigCPtr, this, slotIdx, SWIGTYPE_p_double.getCPtr(gain)), true);
   }
 
-  public SWIGTYPE_p_CTR_Code GetFgain(SWIGTYPE_p_uint32_t slotIdx, SWIGTYPE_p_double gain) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetFgain(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), SWIGTYPE_p_double.getCPtr(gain)), true);
+  public SWIGTYPE_p_CTR_Code GetFgain(long slotIdx, SWIGTYPE_p_double gain) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetFgain(swigCPtr, this, slotIdx, SWIGTYPE_p_double.getCPtr(gain)), true);
   }
 
-  public SWIGTYPE_p_CTR_Code GetIzone(SWIGTYPE_p_uint32_t slotIdx, SWIGTYPE_p_int32_t zone) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetIzone(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), SWIGTYPE_p_int32_t.getCPtr(zone)), true);
+  public SWIGTYPE_p_CTR_Code GetIzone(long slotIdx, SWIGTYPE_p_int zone) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetIzone(swigCPtr, this, slotIdx, SWIGTYPE_p_int.getCPtr(zone)), true);
   }
 
-  public SWIGTYPE_p_CTR_Code GetCloseLoopRampRate(SWIGTYPE_p_uint32_t slotIdx, SWIGTYPE_p_int32_t closeLoopRampRate) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetCloseLoopRampRate(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(slotIdx), SWIGTYPE_p_int32_t.getCPtr(closeLoopRampRate)), true);
+  public SWIGTYPE_p_CTR_Code GetCloseLoopRampRate(long slotIdx, SWIGTYPE_p_int closeLoopRampRate) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetCloseLoopRampRate(swigCPtr, this, slotIdx, SWIGTYPE_p_int.getCPtr(closeLoopRampRate)), true);
   }
 
-  public SWIGTYPE_p_CTR_Code GetForwardSoftLimit(SWIGTYPE_p_int32_t forwardLimit) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetForwardSoftLimit(swigCPtr, this, SWIGTYPE_p_int32_t.getCPtr(forwardLimit)), true);
+  public SWIGTYPE_p_CTR_Code GetForwardSoftLimit(SWIGTYPE_p_int forwardLimit) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetForwardSoftLimit(swigCPtr, this, SWIGTYPE_p_int.getCPtr(forwardLimit)), true);
   }
 
-  public SWIGTYPE_p_CTR_Code GetReverseSoftLimit(SWIGTYPE_p_int32_t reverseLimit) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetReverseSoftLimit(swigCPtr, this, SWIGTYPE_p_int32_t.getCPtr(reverseLimit)), true);
+  public SWIGTYPE_p_CTR_Code GetReverseSoftLimit(SWIGTYPE_p_int reverseLimit) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetReverseSoftLimit(swigCPtr, this, SWIGTYPE_p_int.getCPtr(reverseLimit)), true);
   }
 
-  public SWIGTYPE_p_CTR_Code GetForwardSoftEnable(SWIGTYPE_p_int32_t enable) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetForwardSoftEnable(swigCPtr, this, SWIGTYPE_p_int32_t.getCPtr(enable)), true);
+  public SWIGTYPE_p_CTR_Code GetForwardSoftEnable(SWIGTYPE_p_int enable) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetForwardSoftEnable(swigCPtr, this, SWIGTYPE_p_int.getCPtr(enable)), true);
   }
 
-  public SWIGTYPE_p_CTR_Code GetReverseSoftEnable(SWIGTYPE_p_int32_t enable) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetReverseSoftEnable(swigCPtr, this, SWIGTYPE_p_int32_t.getCPtr(enable)), true);
+  public SWIGTYPE_p_CTR_Code GetReverseSoftEnable(SWIGTYPE_p_int enable) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetReverseSoftEnable(swigCPtr, this, SWIGTYPE_p_int.getCPtr(enable)), true);
   }
 
-  public SWIGTYPE_p_CTR_Code SetStatusFrameRate(SWIGTYPE_p_uint32_t frameEnum, SWIGTYPE_p_uint8_t periodMs) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetStatusFrameRate(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(frameEnum), SWIGTYPE_p_uint8_t.getCPtr(periodMs)), true);
+  public SWIGTYPE_p_CTR_Code SetStatusFrameRate(long frameEnum, long periodMs) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetStatusFrameRate(swigCPtr, this, frameEnum, periodMs), true);
   }
 
   public SWIGTYPE_p_CTR_Code ClearStickyFaults() {
@@ -339,6 +343,7 @@ public class CanTalonSRX extends CtreCanNode {
     return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetRevFeedbackSensor(swigCPtr, this, param), true);
   }
 
+  public final static int kDefaultControlPeriodMs = CanTalonJNI.CanTalonSRX_kDefaultControlPeriodMs_get();
   public final static int kMode_DutyCycle = CanTalonJNI.CanTalonSRX_kMode_DutyCycle_get();
   public final static int kMode_PositionCloseLoop = CanTalonJNI.CanTalonSRX_kMode_PositionCloseLoop_get();
   public final static int kMode_VelocityCloseLoop = CanTalonJNI.CanTalonSRX_kMode_VelocityCloseLoop_get();
