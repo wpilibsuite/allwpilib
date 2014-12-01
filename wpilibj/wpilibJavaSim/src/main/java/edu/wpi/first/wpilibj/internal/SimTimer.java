@@ -149,5 +149,23 @@ public class SimTimer implements Timer.StaticInterface {
 	        m_accumulatedTime = temp;
 	        m_running = false;
 	    }
+
+        /**
+         * Check if the period specified has passed and if it has, advance the start
+         * time by that period. This is useful to decide if it's time to do periodic
+         * work without drifting later by the time it took to get around to checking.
+         *
+         * @param period The period to check for (in seconds).
+         * @return If the period has passed.
+         */
+        public synchronized boolean hasPeriodPassed(double period) {
+            if (get() > period) {
+                // Advance the start time by the period.
+                // Don't set it to the current time... we want to avoid drift.
+                m_startTime += period;
+                return true;
+            }
+            return false;
+        }
     }
 }
