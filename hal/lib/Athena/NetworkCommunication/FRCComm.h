@@ -33,6 +33,7 @@
 #endif
 
 #define ERR_FRCSystem_NetCommNotResponding -44049
+#define ERR_FRCSystem_NoDSConnection -44018
 
 enum AllianceStationID_t {
 	kAllianceStationID_red1,
@@ -41,6 +42,13 @@ enum AllianceStationID_t {
 	kAllianceStationID_blue1,
 	kAllianceStationID_blue2,
 	kAllianceStationID_blue3,
+};
+
+enum MatchType_t {
+	kMatchType_none,
+	kMatchType_practice,
+	kMatchType_qualification,
+	kMatchType_elimination,
 };
 
 struct ControlWord_t {

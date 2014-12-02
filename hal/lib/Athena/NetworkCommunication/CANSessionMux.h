@@ -26,6 +26,7 @@
 #define WARN_CANSessionMux_NoToken         44087
 #define ERR_CANSessionMux_NotAllowed      -44088
 #define ERR_CANSessionMux_NotInitialized  -44089
+#define ERR_CANSessionMux_SessionOverrun   44050
 
 struct tCANStreamMessage{
 	uint32_t messageID;
