@@ -31,6 +31,9 @@ public class DriverStation implements RobotState.Interface {
      */
     public enum Alliance { Red, Blue, Invalid }
 
+    private static final double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
+    private double m_nextMessageTime = 0.0;
+
     private static class DriverStationTask implements Runnable {
 
         private DriverStation m_ds;
@@ -160,6 +163,14 @@ public class DriverStation implements RobotState.Interface {
         return voltage;
     }
 
+    private void reportJoystickUnpluggedError(String message) {
+        double currentTime = Timer.getFPGATimestamp();
+        if (currentTime > m_nextMessageTime) {
+            reportError(message, false);
+            m_nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;
+        }
+    }
+
     /**
      * Get the value of the axis on a joystick.
      * This depends on the mapping of the joystick connected to the specified port.
@@ -180,7 +191,7 @@ public class DriverStation implements RobotState.Interface {
 		short[] joystickAxes = FRCNetworkCommunicationsLibrary.HALGetJoystickAxes((byte)stick);
 
         if (axis >= joystickAxes.length) {
-			reportError("WARNING: Joystick axis " + axis + " on port " + stick + " not available, check if controller is plugged in\n", false);
+			reportJoystickUnpluggedError("WARNING: Joystick axis " + axis + " on port " + stick + " not available, check if controller is plugged in\n");
             return 0.0;
         }
 
@@ -210,7 +221,7 @@ public class DriverStation implements RobotState.Interface {
 		short[] joystickPOVs = FRCNetworkCommunicationsLibrary.HALGetJoystickPOVs((byte)stick);
 
         if (pov >= joystickPOVs.length) {
-			reportError("WARNING: Joystick POV " + pov + " on port " + stick + " not available, check if controller is plugged in\n", false);
+			reportJoystickUnpluggedError("WARNING: Joystick POV " + pov + " on port " + stick + " not available, check if controller is plugged in\n");
             return 0;
         }
 
@@ -234,7 +245,7 @@ public class DriverStation implements RobotState.Interface {
 		byte count = 0;
 		count = countBuffer.get();
 		if(button >= count) {
-			reportError("WARNING: Joystick Button " + button + " on port " + stick + " not available, check if controller is plugged in\n", false);
+			reportJoystickUnpluggedError("WARNING: Joystick Button " + button + " on port " + stick + " not available, check if controller is plugged in\n");
             return false;
 		}
 		return ((0x1 << (button - 1)) & buttons) != 0;

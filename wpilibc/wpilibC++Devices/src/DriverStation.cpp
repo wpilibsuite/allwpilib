@@ -18,7 +18,7 @@
 
 // set the logging level
 TLogLevel dsLogLevel = logDEBUG;
-const double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0e06;
+const double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
 
 #define DS_LOG(level) \
 	if (level > dsLogLevel) ; \
