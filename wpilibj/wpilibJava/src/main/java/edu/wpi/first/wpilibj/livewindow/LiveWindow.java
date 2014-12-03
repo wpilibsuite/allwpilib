@@ -53,8 +53,8 @@ public class LiveWindow {
     private static Vector sensors = new Vector();
 //    private static Vector actuators = new Vector();
     private static Hashtable components = new Hashtable();
-    private static ITable livewindowTable = NetworkTable.getTable("LiveWindow");
-    private static ITable statusTable = livewindowTable.getSubTable("~STATUS~");
+    private static ITable livewindowTable;
+    private static ITable statusTable;
     private static boolean liveWindowEnabled = false;
     private static boolean firstTime = true;
 
@@ -67,6 +67,8 @@ public class LiveWindow {
      */
     private static void initializeLiveWindowComponents() {
         System.out.println("Initializing the components first time");
+        livewindowTable = NetworkTable.getTable("LiveWindow");
+        statusTable = livewindowTable.getSubTable("~STATUS~");
         for (Enumeration e = components.keys(); e.hasMoreElements();) {
             LiveWindowSendable component = (LiveWindowSendable) e.nextElement();
             LiveWindowComponent c = (LiveWindowComponent) components.get(component);
