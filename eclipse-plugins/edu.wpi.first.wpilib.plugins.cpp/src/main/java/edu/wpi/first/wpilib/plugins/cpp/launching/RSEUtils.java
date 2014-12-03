@@ -43,8 +43,8 @@ public class RSEUtils {
             			RSECorePlugin.getTheCoreRegistry().getSystemTypeById("org.eclipse.rse.systemtype.ssh");
             	host = registry.createHost(profile.getName(), systemType, connectionName, hostName,
             			"The remote target for debugging the robot for team "+teamNumber+".");
-            	host.setDefaultUserId("admin");
-            	SystemSignonInformation info = new SystemSignonInformation(hostName, "admin",
+            	host.setDefaultUserId("lvuser");
+            	SystemSignonInformation info = new SystemSignonInformation(hostName, "lvuser",
             			"", systemType);
     			PasswordPersistenceManager.getInstance().add(info, true, false);
             } catch (Exception e) {
