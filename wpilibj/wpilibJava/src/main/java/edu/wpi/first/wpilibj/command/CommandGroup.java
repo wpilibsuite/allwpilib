@@ -34,11 +34,11 @@ import java.util.Vector;
 public class CommandGroup extends Command {
 
     /** The commands in this group (stored in entries) */
-    private Vector m_commands = new Vector();
+    Vector m_commands = new Vector();
     /** The active children in this group (stored in entries) */
     Vector m_children = new Vector();
     /** The current command, -1 signifies that none have been run */
-    private int m_currentCommandIndex = -1;
+    int m_currentCommandIndex = -1;
 
     /**
      * Creates a new {@link CommandGroup CommandGroup}.
