@@ -113,6 +113,19 @@ public class Timer {
 		timer.stop();
 	}
 
+	/**
+	 * Check if the period specified has passed and if it has, advance the start
+	 * time by that period. This is useful to decide if it's time to do periodic
+	 * work without drifting later by the time it took to get around to checking.
+	 *
+	 * @param period The period to check for (in seconds).
+	 * @return If the period has passed.
+	 */
+	public boolean hasPeriodPassed(double period)
+	{
+		return timer.hasPeriodPassed(period);
+	}
+
 	public interface Interface {
 		/**
 		 * Get the current time from the timer. If the clock is running it is derived from
@@ -143,5 +156,16 @@ public class Timer {
 		 * looking at the system clock.
 		 */
 		public void stop();
+
+
+		/**
+		 * Check if the period specified has passed and if it has, advance the start
+		 * time by that period. This is useful to decide if it's time to do periodic
+		 * work without drifting later by the time it took to get around to checking.
+		 *
+		 * @param period The period to check for (in seconds).
+		 * @return If the period has passed.
+		 */
+		public boolean hasPeriodPassed(double period);
 	}
 }
