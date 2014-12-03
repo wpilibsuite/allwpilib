@@ -88,7 +88,7 @@ protected:
 private:
 	static void InitTask(DriverStation *ds);
 	static DriverStation *m_instance;
-
+	void ReportJoystickUnpluggedError(std::string message);
 	void Run();
 
 	Task m_task;
@@ -101,4 +101,5 @@ private:
 	bool m_userInAutonomous;
 	bool m_userInTeleop;
 	bool m_userInTest;
+	double m_nextMessageTime;
 };

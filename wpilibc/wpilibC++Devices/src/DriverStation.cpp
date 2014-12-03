@@ -18,6 +18,7 @@
 
 // set the logging level
 TLogLevel dsLogLevel = logDEBUG;
+const double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0e06;
 
 #define DS_LOG(level) \
 	if (level > dsLogLevel) ; \
@@ -40,6 +41,7 @@ DriverStation::DriverStation()
 	, m_userInAutonomous(false)
 	, m_userInTeleop(false)
 	, m_userInTest(false)
+	, m_nextMessageTime(0)
 {
 	// Create a new semaphore
 	m_packetDataAvailableMultiWait = initializeMultiWait();
@@ -134,6 +136,14 @@ float DriverStation::GetBatteryVoltage()
 	return voltage;
 }
 
+void DriverStation::ReportJoystickUnpluggedError(std::string message) {
+	double currentTime = Timer::GetFPGATimestamp();
+	if (currentTime > m_nextMessageTime) {
+		ReportError(message);
+		m_nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;
+	}
+}
+
 /**
  * Get the value of the axis on a joystick.
  * This depends on the mapping of the joystick connected to the specified port.
@@ -157,7 +167,7 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
 		if (axis >= kMaxJoystickAxes)
 			wpi_setWPIError(BadJoystickAxis);
 		else
-			ReportError("WARNING: Joystick Axis missing, check if all controllers are plugged in\n");
+			ReportJoystickUnpluggedError("WARNING: Joystick Axis missing, check if all controllers are plugged in\n");
 		return 0.0f;
 	}
 
@@ -192,7 +202,7 @@ int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
 		if (pov >= kMaxJoystickPOVs)
 			wpi_setWPIError(BadJoystickAxis);
 		else
-			ReportError("WARNING: Joystick POV missing, check if all controllers are plugged in\n");
+			ReportJoystickUnpluggedError("WARNING: Joystick POV missing, check if all controllers are plugged in\n");
 		return 0;
 	}
 
@@ -216,7 +226,7 @@ bool DriverStation::GetStickButton(uint32_t stick, uint8_t button)
 	HALGetJoystickButtons(stick, &joystickButtons);
 	if(button >= joystickButtons.count)
 	{
-		ReportError("WARNING: Joystick Button missing, check if all controllers are plugged in\n");
+		ReportJoystickUnpluggedError("WARNING: Joystick Button missing, check if all controllers are plugged in\n");
 		return false;
 	}
 	return ((0x1 << (button-1)) & joystickButtons.buttons) !=0;
