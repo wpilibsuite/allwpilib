@@ -217,6 +217,20 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 			// Not all Jaguar firmware reports a hardware version.
 			m_hardwareVersion = 0;
 		}
+		
+		// 3330 was the first shipping RDK firmware version for the Jaguar
+		if (m_firmwareVersion >= 3330 || m_firmwareVersion < 108)
+		{
+			if (m_firmwareVersion < 3330)
+			{
+				DriverStation.reportError("Jag " + m_deviceNumber + " firmware " + m_firmwareVersion + " is too old (must be at least version 108 of the FIRST approved firmware)", false);
+			}
+			else
+			{
+				DriverStation.reportError("Jag" + m_deviceNumber + " firmware " + m_firmwareVersion +  " is not FIRST approved (must be at least version 108 of the FIRST approved firmware)", false);
+			}
+			return;
+		}
 	}
 
 	/**

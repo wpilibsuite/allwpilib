@@ -179,16 +179,16 @@ void CANJaguar::InitCANJaguar()
 		return;
 
 	// 3330 was the first shipping RDK firmware version for the Jaguar
-	if (m_firmwareVersion >= 3330 || m_firmwareVersion < 101)
+	if (m_firmwareVersion >= 3330 || m_firmwareVersion < 108)
 	{
 		char buf[256];
 		if (m_firmwareVersion < 3330)
 		{
-			snprintf(buf, 256, "Jag #%d firmware (%d) is too old (must be at least version 101 of the FIRST approved firmware)", m_deviceNumber, m_firmwareVersion);
+			snprintf(buf, 256, "Jag #%d firmware (%d) is too old (must be at least version 108 of the FIRST approved firmware)", m_deviceNumber, m_firmwareVersion);
 		}
 		else
 		{
-			snprintf(buf, 256, "Jag #%d firmware (%d) is not FIRST approved (must be at least version 101 of the FIRST approved firmware)", m_deviceNumber, m_firmwareVersion);
+			snprintf(buf, 256, "Jag #%d firmware (%d) is not FIRST approved (must be at least version 108 of the FIRST approved firmware)", m_deviceNumber, m_firmwareVersion);
 		}
 		wpi_setWPIErrorWithContext(JaguarVersionError, buf);
 		return;
