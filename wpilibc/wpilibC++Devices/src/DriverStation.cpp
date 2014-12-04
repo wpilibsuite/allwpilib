@@ -224,7 +224,7 @@ bool DriverStation::GetStickButton(uint32_t stick, uint8_t button)
 	}
 	HALJoystickButtons joystickButtons;
 	HALGetJoystickButtons(stick, &joystickButtons);
-	if(button >= joystickButtons.count)
+	if(button > joystickButtons.count)
 	{
 		ReportJoystickUnpluggedError("WARNING: Joystick Button missing, check if all controllers are plugged in\n");
 		return false;

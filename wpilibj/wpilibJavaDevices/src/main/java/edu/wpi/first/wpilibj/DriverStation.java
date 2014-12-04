@@ -244,7 +244,7 @@ public class DriverStation implements RobotState.Interface {
 		int buttons = FRCNetworkCommunicationsLibrary.HALGetJoystickButtons((byte)stick, countBuffer);
 		byte count = 0;
 		count = countBuffer.get();
-		if(button >= count) {
+		if(button > count) {
 			reportJoystickUnpluggedError("WARNING: Joystick Button " + button + " on port " + stick + " not available, check if controller is plugged in\n");
             return false;
 		}
