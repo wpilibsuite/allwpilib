@@ -566,7 +566,7 @@ void CANJaguar::setupPeriodicStatus() {
 		LM_PSTAT_END
 	};
 
-	dataSize = packint16_t(data, kSendMessagePeriod / 10);
+	dataSize = packint16_t(data, kSendMessagePeriod);
 	sendMessage(LM_API_PSTAT_PER_EN_S0, data, dataSize);
 	sendMessage(LM_API_PSTAT_PER_EN_S1, data, dataSize);
 	sendMessage(LM_API_PSTAT_PER_EN_S2, data, dataSize);

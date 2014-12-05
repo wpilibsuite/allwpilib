@@ -1928,7 +1928,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 			(byte)0,
 		};
 
-		dataSize = packINT16(data, (short)(kSendMessagePeriod / 10));
+		dataSize = packINT16(data, (short)(kSendMessagePeriod));
 		sendMessage(CANJNI.LM_API_PSTAT_PER_EN_S0, data, dataSize);
 		sendMessage(CANJNI.LM_API_PSTAT_PER_EN_S1, data, dataSize);
 		sendMessage(CANJNI.LM_API_PSTAT_PER_EN_S2, data, dataSize);
