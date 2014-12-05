@@ -305,6 +305,10 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     return CanTalonJNI.intp_value(positionp);
   }
 
+  public void setPosition(double pos) {
+    m_impl.SetSensorPosition((int)pos);
+  }
+
   public double getSpeed() {
     long speedp = CanTalonJNI.new_intp();
     m_impl.GetSensorVelocity(new SWIGTYPE_p_int(speedp, true));
