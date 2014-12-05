@@ -10,7 +10,7 @@
 #include "PIDOutput.h"
 
 /**
- * CTRE Talon Speed Controller
+ * Cross the Road Electronics (CTRE) Talon and Talon SR Speed Controller
  */
 class Talon : public SafePWM, public SpeedController
 {

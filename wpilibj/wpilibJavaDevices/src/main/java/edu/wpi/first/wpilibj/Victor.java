@@ -12,7 +12,10 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
- * VEX Robotics Victor Speed Controller
+ * VEX Robotics Victor 888 Speed Controller
+ * 
+ * The Vex Robotics Victor 884 Speed Controller can also be used with this
+ * class but may need to be calibrated per the Victor 884 user manual.
  */
 public class Victor extends SafePWM implements SpeedController {
 

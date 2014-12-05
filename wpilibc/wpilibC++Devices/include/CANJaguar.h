@@ -20,7 +20,7 @@
 #include <utility>
 
 /**
- * Luminary Micro Jaguar Speed Control
+ * Luminary Micro / Vex Robotics Jaguar Speed Control
  */
 class CANJaguar : public MotorSafety,
 					public CANSpeedController,

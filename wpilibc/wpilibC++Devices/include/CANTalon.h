@@ -13,7 +13,7 @@
 class CanTalonSRX;
 
 /**
- * CTRE Talon SRX Speed Controller
+ * CTRE Talon SRX Speed Controller with CAN Control
  */
 class CANTalon : public MotorSafety,
                  public CANSpeedController,

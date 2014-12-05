@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
- * CTRE Talon Speed Controller
+ * Cross the Road Electronics (CTRE) Talon and Talon SR Speed Controller
  */
 public class Talon extends SafePWM implements SpeedController {
 

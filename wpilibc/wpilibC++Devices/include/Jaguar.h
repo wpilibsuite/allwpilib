@@ -10,7 +10,7 @@
 #include "PIDOutput.h"
 
 /**
- * Luminary Micro Jaguar Speed Control
+ * Luminary Micro / Vex Robotics Jaguar Speed Controller with PWM control
  */
 class Jaguar : public SafePWM, public SpeedController
 {
