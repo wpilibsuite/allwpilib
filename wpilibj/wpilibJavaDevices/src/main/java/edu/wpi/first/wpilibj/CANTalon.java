@@ -75,7 +75,8 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
   }
 
   @Override
-  public void pidWrite(double output) {
+  public void pidWrite(double output)
+     {
     if (getControlMode() == ControlMode.PercentVbus) {
       set(output);
     }
@@ -342,6 +343,12 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
 		m_controlEnabled = false;
   }
 
+  /**
+   * Get the current proportional constant.
+   *
+   * @returns double proportional constant for current profile.
+   * @throws IllegalStateException if not in Position of Speed mode.
+   */
   public double getP() {
 		if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
 			throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
@@ -352,6 +359,9 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
       m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot0_P);
     else
       m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_P);
+
+    // Briefly wait for new values from the Talon.
+    Timer.delay(1);
 
     long pp = CanTalonJNI.new_doublep();
     m_impl.GetPgain(m_profile, new SWIGTYPE_p_double(pp, true));
@@ -369,6 +379,9 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     else
       m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_I);
 
+    // Briefly wait for new values from the Talon.
+    Timer.delay(1);
+
     long ip = CanTalonJNI.new_doublep();
     m_impl.GetIgain(m_profile, new SWIGTYPE_p_double(ip, true));
     return CanTalonJNI.doublep_value(ip);
@@ -384,6 +397,9 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
       m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot0_D);
     else
       m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_D);
+
+    // Briefly wait for new values from the Talon.
+    Timer.delay(1);
 
     long dp = CanTalonJNI.new_doublep();
     m_impl.GetDgain(m_profile, new SWIGTYPE_p_double(dp, true));
@@ -401,6 +417,9 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     else
       m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_F);
 
+    // Briefly wait for new values from the Talon.
+    Timer.delay(1);
+
     long fp = CanTalonJNI.new_doublep();
     m_impl.GetFgain(m_profile, new SWIGTYPE_p_double(fp, true));
     return CanTalonJNI.doublep_value(fp);
@@ -416,6 +435,9 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
       m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot0_IZone);
     else
       m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_IZone);
+
+    // Briefly wait for new values from the Talon.
+    Timer.delay(1);
 
     long fp = CanTalonJNI.new_intp();
     m_impl.GetIzone(m_profile, new SWIGTYPE_p_int(fp, true));
@@ -433,34 +455,97 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     else
       m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_CloseLoopRampRate);
 
+    // Briefly wait for new values from the Talon.
+    Timer.delay(1);
+
     long fp = CanTalonJNI.new_intp();
     m_impl.GetCloseLoopRampRate(m_profile, new SWIGTYPE_p_int(fp, true));
     return CanTalonJNI.intp_value(fp);
   }
 
 
+  /**
+   * Set the proportional value of the currently selected profile.
+   *
+   * @param p Proportional constant for the currently selected PID profile.
+   * @see setProfile For selecting a certain profile.
+   */
   public void setP(double p) {
     m_impl.SetPgain(m_profile, p);
   }
 
+  /**
+   * Set the integration constant of the currently selected profile.
+   *
+   * @param i Integration constant for the currently selected PID profile.
+   * @see setProfile For selecting a certain profile.
+   */
   public void setI(double i) {
     m_impl.SetIgain(m_profile, i);
   }
 
+  /**
+   * Set the derivative constant of the currently selected profile.
+   *
+   * @param d Derivative constant for the currently selected PID profile.
+   * @see setProfile For selecting a certain profile.
+   */
   public void setD(double d) {
     m_impl.SetDgain(m_profile, d);
   }
 
+  /**
+   * Set the feedforward value of the currently selected profile.
+   *
+   * @param f Feedforward constant for the currently selected PID profile.
+   * @see setProfile For selecting a certain profile.
+   */
   public void setF(double f) {
     m_impl.SetFgain(m_profile, f);
   }
 
+   /**
+    * Set the integration zone of the current Closed Loop profile.
+    *
+    * Whenever the error is larger than the izone value, the accumulated
+    *  integration error is cleared so that high errors aren't racked up when at
+    *  high errors.
+    * An izone value of 0 means no difference from a standard PIDF loop.
+    *
+    * @param izone Width of the integration zone.
+    * @see setProfile For selecting a certain profile.
+    */
   public void setIZone(int izone) {
     m_impl.SetIzone(m_profile, izone);
   }
 
-  public void setRampRate(int rampRate) {
-    m_impl.SetCloseLoopRampRate(m_profile, rampRate);
+  /**
+   * Set the closed loop ramp rate for the current profile.
+   *
+   * Limits the rate at which the throttle will change.
+   * Only affects position and speed closed loop modes.
+   *
+   * @param rampRate Maximum change in voltage, in volts / sec.
+   * @see setProfile For selecting a certain profile.
+   */
+  public void setCloseLoopRampRate(double rampRate) {
+    // CanTalonSRX takes units of Throttle (0 - 1023) / 10ms.
+    int rate = (int) (rampRate * 1023.0 / 12.0 * 100.0);
+    m_impl.SetCloseLoopRampRate(m_profile, rate);
+  }
+
+  /**
+   * Set the voltage ramp rate for the current profile.
+   *
+   * Limits the rate at which the throttle will change.
+   * Affects all modes.
+   *
+   * @param rampRate Maximum change in voltage, in volts / sec.
+   */
+  public void setVoltageRampRate(double rampRate) {
+    // CanTalonSRX takes units of Throttle (0 - 1023) / 10ms.
+    int rate = (int) (rampRate * 1023.0 / 12.0 * 100.0);
+    m_impl.SetRampThrottle(rate);
   }
 
   /**
@@ -479,7 +564,8 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
    *   on hand in the talon. In order to switch profiles without recalling setPID,
    *   you must call setProfile().
    */
-  public void setPID(double p, double i, double d, double f, int izone, int ramprate, int profile) {
+  public void setPID(double p, double i, double d, double f, int izone, int ramprate, int profile)
+    {
     if (profile != 0 && profile != 1)
       throw new IllegalArgumentException("Talon PID profile must be 0 or 1.");
     m_profile = profile;
@@ -489,7 +575,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     setD(d);
     setF(f);
     setIZone(izone);
-    setRampRate(ramprate);
+    setCloseLoopRampRate(ramprate);
   }
   public void setPID(double p, double i, double d) {
     setPID(p, i, d, 0, 0, 0, m_profile);
@@ -499,7 +585,8 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
    * Select which closed loop profile to use, and uses whatever PIDF gains and
    * the such that are already there.
    */
-  public void setProfile(int profile) {
+  public void setProfile(int profile)
+     {
     if (profile != 0 && profile != 1)
       throw new IllegalArgumentException("Talon PID profile must be 0 or 1.");
     m_profile = profile;

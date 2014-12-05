@@ -171,6 +171,23 @@
   </files>
   </example>
 
+ <example>
+  <name>CAN Talon SRX PID</name>
+  <description>Demonstrate running a Talon SRX with PID Closed Loop control.</description>
+  <tags>
+    <tag>Actuators</tag>
+    <tag>Complete List</tag>
+    <tag>Robot and Motor</tag>
+  </tags>
+  <packages>
+    <package>src/$package-dir</package>
+  </packages>
+  <files>
+    <file source="examples/CANTalonPID/src/org/usfirst/frc/team190/robot/Robot.java"
+      destination="src/$package-dir/Robot.java"></file>
+  </files>
+  </example>
+
 
   <tagDescription>
     <name>CommandBased Robot</name>
