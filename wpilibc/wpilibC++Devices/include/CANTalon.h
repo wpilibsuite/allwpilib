@@ -50,14 +50,18 @@ public:
 	virtual void SetP(double p) override;
 	virtual void SetI(double i) override;
 	virtual void SetD(double d) override;
+	void SetF(double f);
 	virtual void SetPID(double p, double i, double d) override;
+	void SetPID(double p, double i, double d, double f);
 	virtual double GetP() override;
 	virtual double GetI() override;
 	virtual double GetD() override;
+	double GetF();
 	virtual float GetBusVoltage() override;
 	virtual float GetOutputVoltage() override;
 	virtual float GetOutputCurrent() override;
 	virtual float GetTemperature() override;
+	void SetPosition(double pos);
 	virtual double GetPosition() override;
 	virtual double GetSpeed() override;
   virtual int GetClosedLoopError();
@@ -65,9 +69,18 @@ public:
   virtual int GetAnalogInVel();
   virtual int GetEncPosition();
   virtual int GetEncVel();
+	int GetPinStateQuadA();
+	int GetPinStateQuadB();
+	int GetPinStateQuadIdx();
+	int IsFwdLimitSwitchClosed();
+	int IsRevLimitSwitchClosed();
+	int GetNumberOfQuadIdxRises();
+	void SetNumberOfQuadIdxRises(int rises);
 	virtual bool GetForwardLimitOK() override;
 	virtual bool GetReverseLimitOK() override;
 	virtual uint16_t GetFaults() override;
+	uint16_t GetStickyFaults();
+	void ClearStickyFaults();
 	virtual void SetVoltageRampRate(double rampRate) override;
 	virtual uint32_t GetFirmwareVersion() override;
 	virtual void ConfigNeutralMode(NeutralMode mode) override;
@@ -83,7 +96,10 @@ public:
 	virtual void SetControlMode(ControlMode mode);
   void SetFeedbackDevice(FeedbackDevice device);
 	virtual ControlMode GetControlMode();
-
+	void SetSensorDirection(bool reverseSensor);
+	void SetCloseLoopRampRate(double rampRate);
+	void SelectProfileSlot(int slotIdx);
+	double GetIzone();
 private:
   // Values for various modes as is sent in the CAN packets for the Talon.
   enum TalonControlMode {
