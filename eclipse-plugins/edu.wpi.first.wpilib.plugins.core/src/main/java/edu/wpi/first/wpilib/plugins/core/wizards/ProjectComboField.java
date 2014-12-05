@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -48,4 +49,8 @@ public class ProjectComboField {
 		combo.addModifyListener(modifyListener);
 	}
 	
+	public void addSelectionListener(SelectionListener selectionListener) {
+		combo.addSelectionListener(selectionListener);
+	}
+
 }
