@@ -205,6 +205,20 @@ public class DriverStation implements RobotState.Interface {
     }
 
     /**
+    *   Returns the number of axis on a given joystick port
+    *
+    * @param stick The joystick port number
+    */
+    public int getStickAxisCount(int stick){
+
+        if(stick < 0 || stick >= kJoystickPorts) {
+            throw new RuntimeException("Joystick index is out of range, should be 0-5");
+        }
+        
+        return FRCNetworkCommunicationsLibrary.HALGetJoystickAxes((byte)stick).length;
+    }
+
+    /**
      * Get the state of a POV on the joystick.
      *
      * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
@@ -229,6 +243,20 @@ public class DriverStation implements RobotState.Interface {
     }
 
     /**
+    * Returns the number of POVs on a given joystick port
+    *
+    * @param stick The joystick port number
+    */
+    public int getStickPOVCount(int stick){
+
+        if(stick < 0 || stick >= kJoystickPorts) {
+            throw new RuntimeException("Joystick index is out of range, should be 0-5");
+        }
+
+        return FRCNetworkCommunicationsLibrary.HALGetJoystickPOVs((byte)stick).length;
+    }
+
+    /**
      * The state of the buttons on the joystick.
      * 12 buttons (4 msb are unused) from the joystick.
      *
@@ -249,6 +277,24 @@ public class DriverStation implements RobotState.Interface {
             return false;
 		}
 		return ((0x1 << (button - 1)) & buttons) != 0;
+    }
+
+    /**
+    *   Gets the number of buttons on a joystick
+    *
+    *   @param  stick the joystick port number
+    */
+    public int getStickButtonCount(int stick){
+
+        if(stick < 0 || stick >= kJoystickPorts) {
+            throw new RuntimeException("Joystick index is out of range, should be 0-3");
+        }
+        
+        ByteBuffer countBuffer = ByteBuffer.allocateDirect(1);
+
+        int buttons = FRCNetworkCommunicationsLibrary.HALGetJoystickButtons((byte)stick, countBuffer);
+        byte count = countBuffer.get();
+        return count;
     }
 
     /**

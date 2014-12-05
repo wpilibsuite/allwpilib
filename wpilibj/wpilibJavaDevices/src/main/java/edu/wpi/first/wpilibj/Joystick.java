@@ -263,6 +263,13 @@ public class Joystick extends GenericHID {
     }
 
     /**
+    * For the current joystick, return the number of axis
+    */
+    public int getAxisCount(){
+        return m_ds.getStickAxisCount(m_port);
+    }
+
+    /**
      * Read the state of the trigger on the joystick.
      *
      * Look up which button has been assigned to the trigger and read its state.
@@ -311,12 +318,26 @@ public class Joystick extends GenericHID {
     }
 
     /**
+    * For the current joystick, return the number of buttons
+    */
+    public int getButtonCount(){
+        return m_ds.getStickButtonCount(m_port);
+    }
+
+    /**
      * Get the state of a POV on the joystick.
      *
      * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
      */
     public int getPOV(int pov) {
         return m_ds.getStickPOV(m_port, pov);
+    }
+
+    /**
+    * For the current joystick, return the number of POVs
+    */
+    public int getPOVCount(){
+        return m_ds.getStickPOVCount(m_port);
     }
 
     /**
