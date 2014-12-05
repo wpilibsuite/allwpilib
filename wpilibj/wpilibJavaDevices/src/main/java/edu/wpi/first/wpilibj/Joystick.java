@@ -7,6 +7,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 
 /**
@@ -99,10 +100,40 @@ public class Joystick extends GenericHID {
             this.value = value;
         }
     }
+    
+    
+    /**
+     * Represents a rumble output on the JoyStick
+     */
+    public static class RumbleType {
+
+        /**
+         * The integer value representing this enumeration
+         */
+        public final int value;
+        static final int kLeftRumble_val = 0;
+        static final int kRightRumble_val = 1;
+        /**
+         * Left Rumble
+         */
+        public static final RumbleType kLeftRumble = new RumbleType((kLeftRumble_val));
+        /**
+         * Right Rumble
+         */
+        public static final RumbleType kRightRumble = new RumbleType(kRightRumble_val);
+
+        private RumbleType(int value) {
+            this.value = value;
+        }
+    }
+    
     private DriverStation m_ds;
     private final int m_port;
     private final byte[] m_axes;
     private final byte[] m_buttons;
+    private int m_outputs;
+    private short m_leftRumble;
+    private short m_rightRumble;
 
     /**
      * Construct an instance of a joystick.
@@ -358,5 +389,39 @@ public class Joystick extends GenericHID {
      */
     public void setAxisChannel(AxisType axis, int channel) {
         m_axes[axis.value] = (byte) channel;
+    }
+    
+    /**
+     * Set the rumble output for the joystick. The DS currently supports 2 rumble values,
+     * left rumble and right rumble
+     * @param type Which rumble value to set
+     * @param value The normalized value (0 to 1) to set the rumble to
+     */
+    public void setRumble(RumbleType type, float value) {
+        if (type.value == RumbleType.kLeftRumble_val)
+            m_leftRumble = (short)(value*65535);
+        else
+            m_rightRumble = (short)(value*65535);
+        FRCNetworkCommunicationsLibrary.HALSetJoystickOutputs((byte)m_port, m_outputs, m_leftRumble, m_rightRumble);
+    }
+
+    /**
+     * Set a single HID output value for the joystick.
+     * @param outputNumber The index of the output to set (1-32)
+     * @param value The value to set the output to
+     */
+        
+    public void setOutput(int outputNumber, boolean value) {
+        m_outputs = (m_outputs & ~(1 << (outputNumber-1))) | ((value?1:0) << (outputNumber-1));
+        FRCNetworkCommunicationsLibrary.HALSetJoystickOutputs((byte)m_port, m_outputs, m_leftRumble, m_rightRumble);
+    }
+
+    /**
+     * Set all HID output values for the joystick.
+     * @param value The 32 bit output value (1 bit for each output)
+     */
+    public void setOutputs(int value) {
+        m_outputs = value;
+        FRCNetworkCommunicationsLibrary.HALSetJoystickOutputs((byte)m_port, m_outputs, m_leftRumble, m_rightRumble);
     }
 }

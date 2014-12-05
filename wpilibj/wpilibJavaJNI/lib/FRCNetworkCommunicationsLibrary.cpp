@@ -343,6 +343,20 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
 
 /*
  * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
+ * Method:    HALSetJoystickOutputs
+ * Signature: (BISS)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALSetJoystickOutputs
+  (JNIEnv *, jclass, jbyte port, jint outputs, jshort leftRumble, jshort rightRumble)
+{
+	NETCOMM_LOG(logDEBUG) << "Calling HALSetJoystickOutputs on port " << port;
+	NETCOMM_LOG(logDEBUG) << "Outputs: " << outputs;
+	NETCOMM_LOG(logDEBUG) << "Left Rumble: " << leftRumble << " Right Rumble: " << rightRumble;
+	return HALSetJoystickOutputs(port, outputs, leftRumble, rightRumble);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
  * Method:    setNewDataSem
  * Signature: ([B)V
  */

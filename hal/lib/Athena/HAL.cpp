@@ -207,6 +207,17 @@ int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons)
 	return FRC_NetworkCommunication_getJoystickButtons(joystickNum, &buttons->buttons, &buttons->count);
 }
 
+int HALGetJoystickDescriptor(uint8_t joystickNum, HALJoystickDescriptor *desc)
+{
+	return FRC_NetworkCommunication_getJoystickDesc(joystickNum, &desc->isXbox, &desc->type, (char *)(&desc->name), 
+		&desc->axisCount, &desc->axisTypes, &desc->buttonCount, &desc->povCount);
+}
+
+int HALSetJoystickOutputs(uint8_t joystickNum, uint32_t outputs, uint16_t leftRumble, uint16_t rightRumble)
+{
+	return FRC_NetworkCommunication_setJoystickOutputs(joystickNum, outputs, leftRumble, rightRumble);
+}
+
 int HALGetMatchTime(float *matchTime)
 {
 	return FRC_NetworkCommunication_getMatchTime(matchTime);

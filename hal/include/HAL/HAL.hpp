@@ -182,6 +182,16 @@ struct HALJoystickButtons {
 	uint8_t count;
 };
 
+struct HALJoystickDescriptor {
+	uint8_t isXbox;
+	uint8_t type;
+	char name[256];
+	uint8_t axisCount;
+	uint8_t axisTypes;
+	uint8_t buttonCount;
+	uint8_t povCount;
+};
+
 inline float intToFloat(int value)
 {
 	return (float)value;
@@ -216,6 +226,8 @@ extern "C"
 	int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes *axes);
 	int HALGetJoystickPOVs(uint8_t joystickNum, HALJoystickPOVs *povs);
 	int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons);
+	int HALGetJoystickDescriptor(uint8_t joystickNum, HALJoystickDescriptor *desc);
+	int HALSetJoystickOutputs(uint8_t joystickNum, uint32_t outputs, uint16_t leftRumble, uint16_t rightRumble);
 	int HALGetMatchTime(float *matchTime);
 
 	void HALSetNewDataSem(pthread_cond_t *);
