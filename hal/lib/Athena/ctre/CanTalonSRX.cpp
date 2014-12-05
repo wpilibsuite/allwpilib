@@ -986,7 +986,7 @@ CTR_Code CanTalonSRX::SetRevFeedbackSensor(int param)
 {
 	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(CONTROL_1 | GetDeviceNumber());
 	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
-	toFill->RevFeedbackSensor = param;
+	toFill->RevFeedbackSensor = param ? 1 : 0;
 	FlushTx(toFill);
 	return CTR_OKAY;
 }

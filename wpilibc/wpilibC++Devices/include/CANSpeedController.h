@@ -28,7 +28,12 @@ public:
 		kCurrentFault = 1,
 		kTemperatureFault = 2,
 		kBusVoltageFault = 4,
-		kGateDriverFault = 8
+		kGateDriverFault = 8,
+		/* SRX extensions */
+		kFwdLimitSwitch = 0x10,
+		kRevLimitSwitch = 0x20,
+		kFwdSoftLimit = 0x40,
+		kRevSoftLimit = 0x80,
 	};
 
 	enum Limits {
