@@ -37,6 +37,10 @@ public:
 	{
 		kTriggerButton, kTopButton, kNumButtonTypes
 	} ButtonType;
+	typedef enum
+	{
+		kLeftRumble, kRightRumble
+	} RumbleType;
 
 	explicit Joystick(uint32_t port);
 	Joystick(uint32_t port, uint32_t numAxisTypes, uint32_t numButtonTypes);
@@ -64,6 +68,10 @@ public:
 	virtual float GetMagnitude();
 	virtual float GetDirectionRadians();
 	virtual float GetDirectionDegrees();
+	
+	void SetRumble(RumbleType type, float value);
+	void SetOutput(uint8_t outputNumber, bool value);
+	void SetOutputs(uint32_t value);
 
 private:
 	DISALLOW_COPY_AND_ASSIGN(Joystick);
@@ -73,6 +81,9 @@ private:
 	uint32_t m_port;
 	uint32_t *m_axes;
 	uint32_t *m_buttons;
+	uint32_t m_outputs;
+	uint16_t m_leftRumble;
+	uint16_t m_rightRumble;
 };
 
 #endif

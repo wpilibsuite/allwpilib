@@ -31,6 +31,9 @@ Joystick::Joystick(uint32_t port)
 	, m_port (port)
 	, m_axes (NULL)
 	, m_buttons (NULL)
+	, m_outputs (0)
+	, m_leftRumble (0)
+	, m_rightRumble (0)
 {
 	InitJoystick(kNumAxisTypes, kNumButtonTypes);
 
@@ -305,11 +308,46 @@ float Joystick::GetDirectionRadians(){
  * Get the direction of the vector formed by the joystick and its origin
  * in degrees
  *
- * uses acos(-1) to represent Pi due to absence of readily accessable Pi
+ * uses acos(-1) to represent Pi due to absence of readily accessible Pi
  * constant in C++
  *
  * @return The direction of the vector in degrees
  */
 float Joystick::GetDirectionDegrees(){
 	return (180/acos(-1))*GetDirectionRadians();
+}
+
+/**
+ * Set the rumble output for the joystick. The DS currently supports 2 rumble values,
+ * left rumble and right rumble
+ * @param type Which rumble value to set
+ * @param value The normalized value (0 to 1) to set the rumble to
+ */
+void Joystick::SetRumble(RumbleType type, float value) {
+	if (type == kLeftRumble)
+		m_leftRumble = value*65535;
+	else
+		m_rightRumble = value*65535;
+	HALSetJoystickOutputs(m_port, m_outputs, m_leftRumble, m_rightRumble);
+}
+
+/**
+ * Set a single HID output value for the joystick.
+ * @param outputNumber The index of the output to set (1-32)
+ * @param value The value to set the output to
+ */
+	
+void Joystick::SetOutput(uint8_t outputNumber, bool value) {
+	m_outputs = (m_outputs & ~(1 << (outputNumber-1))) | (value << (outputNumber-1));
+
+	HALSetJoystickOutputs(m_port, m_outputs, m_leftRumble, m_rightRumble);
+}
+
+/**
+ * Set all HID output values for the joystick.
+ * @param value The 32 bit output value (1 bit for each output)
+ */
+void Joystick::SetOutputs(uint32_t value) {
+	m_outputs = value;
+	HALSetJoystickOutputs(m_port, m_outputs, m_leftRumble, m_rightRumble);
 }
