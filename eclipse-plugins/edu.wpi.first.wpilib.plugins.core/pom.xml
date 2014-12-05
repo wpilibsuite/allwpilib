@@ -92,6 +92,13 @@
 				  <outputDirectory>${tools-zip}</outputDirectory>
 				  <destFileName>OutlineViewer.jar</destFileName>
 	            </artifactItem>
+		    <artifactItem>
+		      <groupId>edu.wpi.first.wpilib</groupId>
+		      <artifactId>java-installer</artifactId>
+		      <version>1.0-SNAPSHOT</version>
+		      <outputDirectory>${tools-zip}</outputDirectory>
+		      <destFileName>java-installer.jar</destFileName>
+		    </artifactItem>
               </artifactItems>
                 
               <overWriteReleases>false</overWriteReleases>
