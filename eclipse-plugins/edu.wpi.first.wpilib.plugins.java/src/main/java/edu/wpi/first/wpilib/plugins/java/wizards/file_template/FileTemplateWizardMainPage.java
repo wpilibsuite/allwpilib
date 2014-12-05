@@ -11,7 +11,9 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -76,6 +78,15 @@ public class FileTemplateWizardMainPage extends WizardPage {
 				});
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		projectsCombo.setLayoutData(gd);
+		projectsCombo.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent e){
+				if (project == null){
+					project = projectsCombo.getProject();
+				}
+				packageText.setText(getDefaultPackage());
+			}
+			public void widgetDefaultSelected(SelectionEvent e){}
+		});
 		projectsCombo.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				dialogChanged();
@@ -116,6 +127,7 @@ public class FileTemplateWizardMainPage extends WizardPage {
 	 */
 
 	private void initialize() {
+		WPILibJavaPlugin.logInfo("initialize");
 		projectsCombo.setProject(project);
 		packageText.setText(getDefaultPackage());
 	}
@@ -130,7 +142,7 @@ public class FileTemplateWizardMainPage extends WizardPage {
 
 		// Update the default package if necessary
 		if (project == null || !project.equals(projectsCombo.getProject())) {
-			String oldDefault = getDefaultPackage();
+			String oldDefault = getDefaultPackage();	
 			project = projectsCombo.getProject();
 			if (packageString.equals(oldDefault)) {
 				packageText.setText(getDefaultPackage());
