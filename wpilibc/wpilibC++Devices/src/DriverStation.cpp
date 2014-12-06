@@ -144,6 +144,57 @@ void DriverStation::ReportJoystickUnpluggedError(std::string message) {
 	}
 }
 
+/**	Returns the number of axis on a given joystick port
+ *
+ * @param stick The joystick port number
+ * @return the number of axis on the indicated joystick
+ */
+int DriverStation::GetStickAxisCount(uint32_t stick)
+{
+    if (stick >= kJoystickPorts)
+    {
+        wpi_setWPIError(BadJoystickIndex);
+        return 0;
+    }
+   	HALJoystickAxes joystickAxes;
+   	HALGetJoystickAxes(stick, &joystickAxes);
+   	return joystickAxes.count;
+}
+
+/**	Returns the number of POVs on a given joystick port
+ *
+ * @param stick The joystick port number
+ * @return thenumber of POVs on the indicated joystick
+ */
+int DriverStation::GetStickPOVCount(uint32_t stick)
+{
+    if (stick >= kJoystickPorts)
+    {
+        wpi_setWPIError(BadJoystickIndex);
+        return 0;
+    }
+	HALJoystickPOVs joystickPOVs;
+	HALGetJoystickPOVs(stick, &joystickPOVs);
+   	return joystickPOVs.count;
+}
+
+/**	Returns the number of buttons on a given joystick port
+ *
+ * @param stick The joystick port number
+ * @return The number of buttons on the indicated joystick
+ */
+int DriverStation::GetStickButtonCount(uint32_t stick)
+{
+    if (stick >= kJoystickPorts)
+    {
+        wpi_setWPIError(BadJoystickIndex);
+        return 0;
+    }
+	HALJoystickButtons joystickButtons;
+	HALGetJoystickButtons(stick, &joystickButtons);
+   	return joystickButtons.count;
+}
+
 /**
  * Get the value of the axis on a joystick.
  * This depends on the mapping of the joystick connected to the specified port.

@@ -36,6 +36,10 @@ public:
 	int GetStickPOV(uint32_t stick, uint32_t pov);
 	bool GetStickButton(uint32_t stick, uint8_t button);
 
+	int GetStickAxisCount(uint32_t stick);
+	int GetStickPOVCount(uint32_t stick);
+	int GetStickButtonCount(uint32_t stick);
+
 	bool IsEnabled();
 	bool IsDisabled();
 	bool IsAutonomous();
