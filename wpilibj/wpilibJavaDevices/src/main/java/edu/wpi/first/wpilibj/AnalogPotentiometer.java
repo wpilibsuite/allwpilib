@@ -5,31 +5,37 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+
+import edu.wpi.first.wpilibj.hal.HALUtil;
+import edu.wpi.first.wpilibj.hal.PowerJNI;
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
  * Class for reading analog potentiometers. Analog potentiometers read
- * in an analog voltage that corresponds to a position. Usually the
- * position is either degrees or meters. However, if no conversion is
- * given it remains volts.
+ * in an analog voltage that corresponds to a position. The position is
+ * in whichever units you choose, by way of the scaling and offset
+ * constants passed to the constructor. 
  *
  * @author Alex Henning
+ * @author Colby Skeggs (rail voltage)
  */
 public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
-    private double m_scale, m_offset;
+    private double m_fullRange, m_offset;
     private AnalogInput m_analog_input;
     private boolean m_init_analog_input;
 
     /**
      * Common initialization code called by all constructors.
      * @param input The {@link AnalogInput} this potentiometer is plugged into.
-     * @param scale The scaling to multiply the voltage by to get a meaningful unit.
+     * @param fullRange The scaling to multiply the voltage by to get a meaningful unit.
      * @param offset The offset to add to the scaled value for controlling the zero value
      */
-    private void initPot(final AnalogInput input, double scale, double offset) {
-        this.m_scale = scale;
+    private void initPot(final AnalogInput input, double fullRange, double offset) {
+        this.m_fullRange = fullRange;
         this.m_offset = offset;
         m_analog_input = input;
     }
@@ -37,51 +43,54 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
     /**
      * AnalogPotentiometer constructor.
      *
-     * Use the scaling and offset values so that the output produces
+     * Use the fullRange and offset values so that the output produces
      * meaningful values. I.E: you have a 270 degree potentiometer and
      * you want the output to be degrees with the halfway point as 0
-     * degrees. The scale value is 270.0(degrees)/5.0(volts) and the
-     * offset is -135.0 since the halfway point after scaling is 135
-     * degrees.
+     * degrees. The fullRange value is 270.0(degrees) and the offset is
+     * -135.0 since the halfway point after scaling is 135 degrees.
+     * 
+     * This will calculate the result from the fullRange times the
+     * fraction of the supply voltage, plus the offset.
      *
      * @param channel The analog channel this potentiometer is plugged into.
-     * @param scale The scaling to multiply the voltage by to get a meaningful unit.
+     * @param fullRange The scaling to multiply the fraction by to get a meaningful unit.
      * @param offset The offset to add to the scaled value for controlling the zero value
      */
-    public AnalogPotentiometer(final int channel, double scale, double offset) {
+    public AnalogPotentiometer(final int channel, double fullRange, double offset) {
     	AnalogInput input = new AnalogInput(channel);
     	m_init_analog_input = true;
-        initPot(input, scale, offset);
+        initPot(input, fullRange, offset);
     }
-    
+
     /**
      * AnalogPotentiometer constructor.
      *
-     * Use the scaling and offset values so that the output produces
+     * Use the fullRange and offset values so that the output produces
      * meaningful values. I.E: you have a 270 degree potentiometer and
      * you want the output to be degrees with the halfway point as 0
-     * degrees. The scale value is 270.0(degrees)/5.0(volts) and the
-     * offset is -135.0 since the halfway point after scaling is 135
-     * degrees.
+     * degrees. The fullRange value is 270.0(degrees) and the offset is
+     * -135.0 since the halfway point after scaling is 135 degrees.
+     * 
+     * This will calculate the result from the fullRange times the
+     * fraction of the supply voltage, plus the offset.
      *
      * @param input The {@link AnalogInput} this potentiometer is plugged into.
-     * @param scale The scaling to multiply the voltage by to get a meaningful unit.
+     * @param fullRange The scaling to multiply the fraction by to get a meaningful unit.
      * @param offset The offset to add to the scaled value for controlling the zero value
      */
-    public AnalogPotentiometer(final AnalogInput input, double scale, double offset) {
+    public AnalogPotentiometer(final AnalogInput input, double fullRange, double offset) {
     	m_init_analog_input = false;
-    	initPot(input, scale, offset);
+    	initPot(input, fullRange, offset);
     }
-    
+
     /**
      * AnalogPotentiometer constructor.
      *
-     * Use the scaling and offset values so that the output produces
+     * Use the fullRange and offset values so that the output produces
      * meaningful values. I.E: you have a 270 degree potentiometer and
      * you want the output to be degrees with the halfway point as 0
-     * degrees. The scale value is 270.0(degrees)/5.0(volts) and the
-     * offset is -135.0 since the halfway point after scaling is 135
-     * degrees.
+     * degrees. The fullRange value is 270.0(degrees) and the offset is
+     * -135.0 since the halfway point after scaling is 135 degrees.
      *
      * @param channel The analog channel this potentiometer is plugged into.
      * @param scale The scaling to multiply the voltage by to get a meaningful unit.
@@ -93,12 +102,11 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
     /**
      * AnalogPotentiometer constructor.
      *
-     * Use the scaling and offset values so that the output produces
+     * Use the fullRange and offset values so that the output produces
      * meaningful values. I.E: you have a 270 degree potentiometer and
      * you want the output to be degrees with the halfway point as 0
-     * degrees. The scale value is 270.0(degrees)/5.0(volts) and the
-     * offset is -135.0 since the halfway point after scaling is 135
-     * degrees.
+     * degrees. The fullRange value is 270.0(degrees) and the offset is
+     * -135.0 since the halfway point after scaling is 135 degrees.
      *
      * @param input The {@link AnalogInput} this potentiometer is plugged into.
      * @param scale The scaling to multiply the voltage by to get a meaningful unit.
@@ -115,7 +123,7 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
     public AnalogPotentiometer(final int channel) {
     	this(channel, 1, 0);
     }
-    
+
     /**
      * AnalogPotentiometer constructor.
      *
@@ -126,12 +134,12 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
     }
 
     /**
-     * Get the current reading of the potentiomere.
+     * Get the current reading of the potentiometer.
      *
      * @return The current position of the potentiometer.
      */
     public double get() {
-        return m_analog_input.getVoltage() * m_scale + m_offset;
+        return (m_analog_input.getVoltage() / ControllerPower.getVoltage5V()) * m_fullRange + m_offset;
     }
 
     /**

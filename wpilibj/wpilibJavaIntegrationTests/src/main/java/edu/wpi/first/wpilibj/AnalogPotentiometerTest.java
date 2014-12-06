@@ -29,7 +29,7 @@ public class AnalogPotentiometerTest extends AbstractComsSetup {
 	private FakePotentiometerSource potSource;
 	private AnalogPotentiometer pot;
 	
-	private static final double DOUBLE_COMPARISON_DELTA = 1.0;
+	private static final double DOUBLE_COMPARISON_DELTA = 2.0;
 
 	/**
 	 * @throws java.lang.Exception
@@ -38,7 +38,7 @@ public class AnalogPotentiometerTest extends AbstractComsSetup {
 	public void setUp() throws Exception {
 		analogIO = TestBench.getAnalogCrossConnectFixture();
 		potSource = new FakePotentiometerSource(analogIO.getOutput(), 360);
-		pot = new AnalogPotentiometer(analogIO.getInput(), 360.0/5.0, 0);
+		pot = new AnalogPotentiometer(analogIO.getInput(), 360.0, 0);
 		
 	}
 
@@ -66,6 +66,7 @@ public class AnalogPotentiometerTest extends AbstractComsSetup {
 	public void testRangeValues(){
 		for(double i = 0.0; i < 360.0; i = i+1.0){
 			potSource.setAngle(i);
+			potSource.setMaxVoltage(ControllerPower.getVoltage5V());
 			Timer.delay(.02);
 			assertEquals(i, pot.get(), DOUBLE_COMPARISON_DELTA);
 		}
