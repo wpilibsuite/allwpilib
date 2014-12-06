@@ -103,7 +103,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
    * @param outputValue The setpoint value, as described above.
    */
   public void set(double outputValue) {
-    System.out.println("Enabled: " + m_controlEnabled + " Mode: " + m_controlMode);
+    //System.out.println("Enabled: " + m_controlEnabled + " Mode: " + m_controlMode);
     m_controlMode = ControlMode.PercentVbus;
     if (m_controlEnabled) {
       switch (getControlMode()) {
@@ -128,7 +128,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
           break;
       }
     }
-    System.out.println("Enabled: " + m_controlEnabled + " Mode: " + m_controlMode);
+    //System.out.println("Enabled: " + m_controlEnabled + " Mode: " + m_controlMode);
   }
 
   /**
