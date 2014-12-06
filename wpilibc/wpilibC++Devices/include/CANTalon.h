@@ -119,4 +119,5 @@ private:
 
   bool m_controlEnabled;
   ControlMode m_controlMode;
+  TalonControlMode m_sendMode;
 };

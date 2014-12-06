@@ -20,9 +20,7 @@ CANTalon::CANTalon(int deviceNumber)
   , m_controlEnabled(true)
   , m_controlMode(kPercentVbus)
 {
-  // The control mode may already have been set; GetControlMode will reset
-  // m_controlMode to match the Talon.
-  GetControlMode();
+  SetControlMode(m_controlMode);
   m_impl->SetProfileSlotSelect(m_profile);
 }
 
@@ -91,7 +89,7 @@ void CANTalon::Set(float value, uint8_t syncGroup)
 {
   if(m_controlEnabled) {
     CTR_Code status;
-    switch(GetControlMode()) {
+    switch(m_controlMode) {
       case CANSpeedController::kPercentVbus:
         {
           m_impl->Set(value);
@@ -122,6 +120,13 @@ void CANTalon::Set(float value, uint8_t syncGroup)
     if (status != CTR_OKAY) {
       wpi_setErrorWithContext(status, getHALErrorMessage(status));
     }
+
+    status = m_impl->SetModeSelect(m_sendMode);
+
+    if (status != CTR_OKAY) {
+      wpi_setErrorWithContext(status, getHALErrorMessage(status));
+    }
+
   }
 }
 
@@ -975,28 +980,28 @@ void CANTalon::ConfigFaultTime(float faultTime)
 void CANTalon::SetControlMode(CANSpeedController::ControlMode mode)
 {
   m_controlMode = mode;
-  TalonControlMode sendMode;
   switch (mode) {
     case kPercentVbus:
-      sendMode = kThrottle;
+      m_sendMode = kThrottle;
       break;
     case kCurrent:
-      sendMode = kCurrentMode;
+      m_sendMode = kCurrentMode;
       break;
     case kSpeed:
-      sendMode = kSpeedMode;
+      m_sendMode = kSpeedMode;
       break;
     case kPosition:
-      sendMode = kPositionMode;
+      m_sendMode = kPositionMode;
       break;
     case kVoltage:
-      sendMode = kVoltageMode;
+      m_sendMode = kVoltageMode;
       break;
     case kFollower:
-      sendMode = kFollowerMode;
+      m_sendMode = kFollowerMode;
       break;
   }
-  CTR_Code status = m_impl->SetModeSelect((int)sendMode);
+  // Keep the talon disabled until Set() is called.
+  CTR_Code status = m_impl->SetModeSelect((int)kDisabled);
 	if(status != CTR_OKAY) {
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
@@ -1007,35 +1012,6 @@ void CANTalon::SetControlMode(CANSpeedController::ControlMode mode)
  */
 CANSpeedController::ControlMode CANTalon::GetControlMode()
 {
-  // Take the opportunity to check that the control mode is what we think it is.
-  int temp;
-  CTR_Code status = m_impl->GetModeSelect(temp);
-	if(status != CTR_OKAY) {
-		wpi_setErrorWithContext(status, getHALErrorMessage(status));
-	}
-  switch ((TalonControlMode)temp) {
-    case kThrottle:
-      m_controlMode = kPercentVbus;
-      break;
-    case kCurrentMode:
-      m_controlMode = kCurrent;
-      break;
-    case kSpeedMode:
-      m_controlMode = kSpeed;
-      break;
-    case kPositionMode:
-      m_controlMode = kPosition;
-      break;
-    case kVoltageMode:
-      m_controlMode = kVoltage;
-      break;
-    case kFollowerMode:
-      m_controlMode = kFollower;
-      break;
-    case kDisabled:
-      m_controlEnabled = false;
-      break;
-  }
   return m_controlMode;
 }
 
