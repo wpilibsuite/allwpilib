@@ -263,6 +263,37 @@ bool Joystick::GetButton(ButtonType button)
 }
 
 /**
+ * Get the number of axis for a joystick
+ *
+ * @return the number of axis for the current joystick
+ */
+int Joystick::GetAxisCount()
+{
+    return m_ds->GetStickAxisCount(m_port);
+}
+
+/**
+  * Get the number of axis for a joystick
+  *
+* @return the number of buttons on the current joystick
+ */
+int Joystick::GetButtonCount()
+{
+    return m_ds->GetStickButtonCount(m_port);
+}
+
+/**
+ * Get the number of axis for a joystick
+ *
+ * @return then umber of POVs for the current joystick
+ */
+int Joystick::GetPOVCount()
+{
+    return m_ds->GetStickPOVCount(m_port);
+}
+
+
+/**
  * Get the channel currently associated with the specified axis.
  *
  * @param axis The axis to look up the channel for.

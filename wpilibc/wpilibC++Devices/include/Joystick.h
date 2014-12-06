@@ -68,6 +68,10 @@ public:
 	virtual float GetMagnitude();
 	virtual float GetDirectionRadians();
 	virtual float GetDirectionDegrees();
+
+	int GetAxisCount();
+	int GetButtonCount();
+	int GetPOVCount();
 	
 	void SetRumble(RumbleType type, float value);
 	void SetOutput(uint8_t outputNumber, bool value);
