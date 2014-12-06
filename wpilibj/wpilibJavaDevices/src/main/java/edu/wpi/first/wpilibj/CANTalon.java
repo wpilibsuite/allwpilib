@@ -365,7 +365,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
       m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_P);
 
     // Briefly wait for new values from the Talon.
-    Timer.delay(1);
+    Timer.delay(0.001);
 
     long pp = CanTalonJNI.new_doublep();
     m_impl.GetPgain(m_profile, new SWIGTYPE_p_double(pp, true));
@@ -384,7 +384,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
       m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_I);
 
     // Briefly wait for new values from the Talon.
-    Timer.delay(1);
+    Timer.delay(0.001);
 
     long ip = CanTalonJNI.new_doublep();
     m_impl.GetIgain(m_profile, new SWIGTYPE_p_double(ip, true));
@@ -403,7 +403,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
       m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_D);
 
     // Briefly wait for new values from the Talon.
-    Timer.delay(1);
+    Timer.delay(0.001);
 
     long dp = CanTalonJNI.new_doublep();
     m_impl.GetDgain(m_profile, new SWIGTYPE_p_double(dp, true));
@@ -422,7 +422,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
       m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_F);
 
     // Briefly wait for new values from the Talon.
-    Timer.delay(1);
+    Timer.delay(0.001);
 
     long fp = CanTalonJNI.new_doublep();
     m_impl.GetFgain(m_profile, new SWIGTYPE_p_double(fp, true));
@@ -441,7 +441,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
       m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_IZone);
 
     // Briefly wait for new values from the Talon.
-    Timer.delay(1);
+    Timer.delay(0.001);
 
     long fp = CanTalonJNI.new_intp();
     m_impl.GetIzone(m_profile, new SWIGTYPE_p_int(fp, true));
@@ -460,7 +460,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
       m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_CloseLoopRampRate);
 
     // Briefly wait for new values from the Talon.
-    Timer.delay(1);
+    Timer.delay(0.001);
 
     long fp = CanTalonJNI.new_intp();
     m_impl.GetCloseLoopRampRate(m_profile, new SWIGTYPE_p_int(fp, true));
