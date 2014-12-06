@@ -63,9 +63,8 @@
  * 			ClearIaccum()
  * 		...this is very useful in preventing integral windup and is highly recommended if using full PID to keep stability low.
  *
- * CloseLoopRampRate ramps the target of the close loop.  The units are in position per 1ms.  Set to zero to disable ramping.
- * 		So a value of 10 means allow the target input of the close loop to approach the user's demand by 10 units (ADC or encoder edges)
- * 		per 1ms.
+ * CloseLoopRampRate is in throttle units per 1ms.  Set to zero to disable ramping.
+ * 		Works the same as RampThrottle but only is in effect when a close loop mode and profile slot is selected.
  *
  * auto generated using spreadsheet and WpiClassGen.csproj
  * @link https://docs.google.com/spreadsheets/d/1OU_ZV7fZLGYUQ-Uhc8sVAmUmWTlT8XBFYK8lfjg_tac/edit#gid=1766046967
@@ -963,6 +962,23 @@ CTR_Code CanTalonSRX::SetModeSelect(int param)
 	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(CONTROL_1 | GetDeviceNumber());
 	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
 	toFill->ModeSelect = param;
+	FlushTx(toFill);
+	return CTR_OKAY;
+}
+/**
+ * @param modeSelect selects which mode.
+ * @param demand setpt or throttle or masterId to follow.
+ * @return error code, 0 iff successful.
+ * This function has the advantage of atomically setting mode and demand.
+ */
+CTR_Code CanTalonSRX::SetModeSelect(int modeSelect,int demand)
+{
+	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(CONTROL_1 | GetDeviceNumber());
+	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
+	toFill->ModeSelect = modeSelect;
+	toFill->DemandH = demand>>16;
+	toFill->DemandM = demand>>8;
+	toFill->DemandL = demand>>0;
 	FlushTx(toFill);
 	return CTR_OKAY;
 }

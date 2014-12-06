@@ -63,9 +63,8 @@
  * 			ClearIaccum()
  * 		...this is very useful in preventing integral windup and is highly recommended if using full PID to keep stability low.
  *
- * CloseLoopRampRate ramps the target of the close loop.  The units are in position per 1ms.  Set to zero to disable ramping.
- * 		So a value of 10 means allow the target input of the close loop to approach the user's demand by 10 units (ADC or encoder edges)
- * 		per 1ms.
+ * CloseLoopRampRate is in throttle units per 1ms.  Set to zero to disable ramping.
+ * 		Works the same as RampThrottle but only is in effect when a close loop mode and profile slot is selected.
  *
  * auto generated using spreadsheet and WpiClassGen.csproj
  * @link https://docs.google.com/spreadsheets/d/1OU_ZV7fZLGYUQ-Uhc8sVAmUmWTlT8XBFYK8lfjg_tac/edit#gid=1766046967
@@ -308,6 +307,7 @@ public:
 	CTR_Code SetRevMotDuringCloseLoopEn(int param);
 	CTR_Code SetOverrideBrakeType(int param);
 	CTR_Code SetModeSelect(int param);
+	CTR_Code SetModeSelect(int modeSelect,int demand);
 	CTR_Code SetProfileSlotSelect(int param);
 	CTR_Code SetRampThrottle(int param);
 	CTR_Code SetRevFeedbackSensor(int param);
