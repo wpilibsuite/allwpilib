@@ -212,6 +212,8 @@ public:
 		eResetFlags=88,
 		eFirmVers=89,
 		eSettingsChanged=90,
+		eQuadFilterEn=91,	
+		ePidIaccum=93,
 	}param_t;
     /*---------------------setters and getters that use the solicated param request/response-------------*//**
      * Send a one shot frame to set an arbitrary signal.

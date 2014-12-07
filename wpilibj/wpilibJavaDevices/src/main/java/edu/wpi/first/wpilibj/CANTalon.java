@@ -438,7 +438,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     return CanTalonJNI.intp_value(fp);
   }
 
-  public double getRampRate() {
+  public double getCloseLoopRampRate() {
 	//	if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
 	//		throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
 	//	}
@@ -456,8 +456,41 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     m_impl.GetCloseLoopRampRate(m_profile, new SWIGTYPE_p_int(fp, true));
     return CanTalonJNI.intp_value(fp);
   }
+  /**
+  * @return The version of the firmware running on the Talon
+  */
+  public long GetFirmwareVersion() {
 
+    // Update the information that we have.
+    m_impl.RequestParam(CanTalonSRX.param_t.eFirmVers);
 
+    // Briefly wait for new values from the Talon.
+    Timer.delay(0.001);
+
+    long fp = CanTalonJNI.new_intp();
+    m_impl.GetParamResponseInt32(CanTalonSRX.param_t.eFirmVers, new SWIGTYPE_p_int(fp, true));
+    return CanTalonJNI.intp_value(fp);
+  }
+  public long GetIaccum() {
+
+    // Update the information that we have.
+    m_impl.RequestParam(CanTalonSRX.param_t.ePidIaccum);
+
+    // Briefly wait for new values from the Talon.
+    Timer.delay(0.001);
+
+    long fp = CanTalonJNI.new_intp();
+    m_impl.GetParamResponseInt32(CanTalonSRX.param_t.ePidIaccum, new SWIGTYPE_p_int(fp, true));
+    return CanTalonJNI.intp_value(fp);
+  }
+  
+	/**
+	 * Clear the accumulator for I gain.
+	 */
+	public void ClearIaccum()
+	{
+		SWIGTYPE_p_CTR_Code status = m_impl.SetParam(CanTalonSRX.param_t.ePidIaccum, 0);
+	}
   /**
    * Set the proportional value of the currently selected profile.
    *

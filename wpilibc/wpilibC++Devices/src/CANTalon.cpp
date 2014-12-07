@@ -815,9 +815,12 @@ void CANTalon::SetCloseLoopRampRate(double rampRate)
 uint32_t CANTalon::GetFirmwareVersion()
 {
 	int firmwareVersion;
-	m_impl->RequestParam(CanTalonSRX::eFirmVers);
+	CTR_Code status = m_impl->RequestParam(CanTalonSRX::eFirmVers);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
 	usleep(1000);
-	CTR_Code status = m_impl->GetParamResponseInt32(CanTalonSRX::eFirmVers,firmwareVersion);
+	status = m_impl->GetParamResponseInt32(CanTalonSRX::eFirmVers,firmwareVersion);
 	if(status != CTR_OKAY) {
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
@@ -829,6 +832,33 @@ uint32_t CANTalon::GetFirmwareVersion()
 	//}
 
 	return firmwareVersion;
+}
+/**
+ * @return The accumulator for I gain.
+ */
+int CANTalon::GetIaccum()
+{
+	CTR_Code status = m_impl->RequestParam(CanTalonSRX::ePidIaccum);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
+	usleep(1000); /* small yield for getting response */
+	int iaccum;
+	status = m_impl->GetParamResponseInt32(CanTalonSRX::ePidIaccum,iaccum);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
+	return iaccum;
+}
+/**
+ * Clear the accumulator for I gain.
+ */
+void CANTalon::ClearIaccum()
+{
+	CTR_Code status = m_impl->SetParam(CanTalonSRX::ePidIaccum, 0);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
 }
 
 /**

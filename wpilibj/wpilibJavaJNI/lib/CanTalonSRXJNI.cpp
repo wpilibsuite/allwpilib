@@ -2049,6 +2049,30 @@ SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1
 }
 
 
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1eQuadFilterEn_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::eQuadFilterEn;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1ePidIaccum_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::ePidIaccum;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetParam(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jdouble jarg3) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;

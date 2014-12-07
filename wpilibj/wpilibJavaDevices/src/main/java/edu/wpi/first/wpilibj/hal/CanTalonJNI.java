@@ -143,6 +143,8 @@ public class CanTalonJNI {
   public final static native int CanTalonSRX_eResetFlags_get();
   public final static native int CanTalonSRX_eFirmVers_get();
   public final static native int CanTalonSRX_eSettingsChanged_get();
+  public final static native int CanTalonSRX_eQuadFilterEn_get();
+  public final static native int CanTalonSRX_ePidIaccum_get();
   public final static native long CanTalonSRX_SetParam(long jarg1, CanTalonSRX jarg1_, int jarg2, double jarg3);
   public final static native long CanTalonSRX_RequestParam(long jarg1, CanTalonSRX jarg1_, int jarg2);
   public final static native long CanTalonSRX_GetParamResponse(long jarg1, CanTalonSRX jarg1_, int jarg2, long jarg3);

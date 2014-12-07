@@ -7,3 +7,4 @@ bindings are checked into git, so that it should work until someone goes and upd
 In order for this to work, I had to change the CanTalonSRX constructor to take a int deviceNumber instead of a uint8_t.
 
 Also, in all the SWIGTYPE* files, you must change protected methods to public functions.
+Because the SWIGTYPE* files don't generally change, you can jsut do a git checkout -- SWIGTYPE* in wpilibJavaDevices/....../wpilibj/
