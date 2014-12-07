@@ -103,10 +103,8 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
    * @param outputValue The setpoint value, as described above.
    */
   public void set(double outputValue) {
-    //System.out.println("Enabled: " + m_controlEnabled + " Mode: " + m_controlMode);
-    m_controlMode = ControlMode.PercentVbus;
     if (m_controlEnabled) {
-      switch (getControlMode()) {
+      switch (m_controlMode) {
         case PercentVbus:
           m_impl.Set(outputValue);
           break;
@@ -127,8 +125,8 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
         default:
           break;
       }
+      m_impl.SetModeSelect(m_controlMode.value);
     }
-    //System.out.println("Enabled: " + m_controlEnabled + " Mode: " + m_controlMode);
   }
 
   /**
@@ -316,21 +314,13 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
   }
 
   public ControlMode getControlMode() {
-    long tempp = CanTalonJNI.new_intp();
-    m_impl.GetModeSelect(new SWIGTYPE_p_int(tempp, true));
-    ControlMode mode = ControlMode.valueOf(CanTalonJNI.intp_value(tempp));
-    if (mode == ControlMode.Disabled) {
-      m_controlEnabled = false;
-    }
-    else {
-      m_controlMode = mode;
-    }
-    return mode;
+    return m_controlMode;
   }
 
   public void changeControlMode(ControlMode controlMode) {
     m_controlMode = controlMode;
-    m_impl.SetModeSelect(controlMode.value);
+    // Disable until set() is called.
+    m_impl.SetModeSelect(ControlMode.Disabled.value);
   }
 
   public void setFeedbackDevice(FeedbackDevice device) {
