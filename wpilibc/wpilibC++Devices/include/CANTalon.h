@@ -102,6 +102,9 @@ public:
 	double GetIzone();
 	int GetIaccum();
 	void ClearIaccum();
+
+  bool IsControlEnabled();
+  double GetSetpoint();
 private:
   // Values for various modes as is sent in the CAN packets for the Talon.
   enum TalonControlMode {
@@ -122,4 +125,6 @@ private:
   bool m_controlEnabled;
   ControlMode m_controlMode;
   TalonControlMode m_sendMode;
+
+  double m_setPoint;
 };
