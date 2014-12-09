@@ -36,6 +36,11 @@ IterativeRobot::~IterativeRobot()
 {
 }
 
+void IterativeRobot::Prestart() {
+	// Don't immediately say that the robot's ready to be enabled.
+	// See below.
+}
+
 /**
  * Provide an alternate "main loop" via StartCompetition().
  * 
@@ -53,6 +58,12 @@ void IterativeRobot::StartCompetition()
 	SmartDashboard::init();
 	NetworkTable::GetTable("LiveWindow")->GetSubTable("~STATUS~")->PutBoolean("LW Enabled", false);
 	RobotInit();
+
+    // We call this now (not in Prestart like default) so that the robot
+    // won't enable until the initialization has finished. This is useful
+    // because otherwise it's sometimes possible to enable the robot
+    // before the code is ready.
+	HALNetworkCommunicationObserveUserProgramStarting();
 
 	// loop forever, calling the appropriate mode-dependent function
 	lw->SetEnabled(false);

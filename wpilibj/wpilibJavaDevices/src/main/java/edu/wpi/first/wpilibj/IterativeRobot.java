@@ -59,6 +59,12 @@ public class IterativeRobot extends RobotBase {
         m_teleopInitialized = false;
         m_testInitialized = false;
     }
+    
+    @Override
+    protected void prestart() {
+    	// Don't immediately say that the robot's ready to be enabled.
+    	// See below.
+    }
 
     /**
      * Provide an alternate "main loop" via startCompetition().
@@ -68,15 +74,12 @@ public class IterativeRobot extends RobotBase {
         UsageReporting.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Iterative);
 
         robotInit();
-
-        // tracing support:
-        final int TRACE_LOOP_MAX = 100;
-        int loopCount = TRACE_LOOP_MAX;
-        Object marker = null;
-        boolean didDisabledPeriodic = false;
-        boolean didAutonomousPeriodic = false;
-        boolean didTeleopPeriodic = false;
-        boolean didTestPeriodic = false;
+        
+        // We call this now (not in prestart like default) so that the robot
+        // won't enable until the initialization has finished. This is useful
+        // because otherwise it's sometimes possible to enable the robot
+        // before the code is ready. 
+        FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
 
         // loop forever, calling the appropriate mode-dependent function
         LiveWindow.setEnabled(false);
@@ -97,7 +100,6 @@ public class IterativeRobot extends RobotBase {
                 if (nextPeriodReady()) {
                 	FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramDisabled();
                     disabledPeriodic();
-                    didDisabledPeriodic = true;
                 }
             } else if (isTest()) {
                 // call TestInit() if we are now just entering test mode from either
@@ -113,7 +115,6 @@ public class IterativeRobot extends RobotBase {
                 if (nextPeriodReady()) {
                 	FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramTest();
                     testPeriodic();
-                    didTestPeriodic = true;
                 }
             } else if (isAutonomous()) {
                 // call Autonomous_Init() if this is the first time
@@ -132,7 +133,6 @@ public class IterativeRobot extends RobotBase {
                 if (nextPeriodReady()) {
                     FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramAutonomous();
                     autonomousPeriodic();
-                    didAutonomousPeriodic = true;
                 }
             } else {
                 // call Teleop_Init() if this is the first time
@@ -148,7 +148,6 @@ public class IterativeRobot extends RobotBase {
                 if (nextPeriodReady()) {
                     FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramTeleop();
                     teleopPeriodic();
-                    didTeleopPeriodic = true;
                 }
             }
             m_ds.waitForData();
