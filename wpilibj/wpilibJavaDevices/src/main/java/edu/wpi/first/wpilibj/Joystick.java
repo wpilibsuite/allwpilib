@@ -419,6 +419,10 @@ public class Joystick extends GenericHID {
      * @param value The normalized value (0 to 1) to set the rumble to
      */
     public void setRumble(RumbleType type, float value) {
+        if (value < 0)
+            value = 0;
+        else if (value > 1)
+            value = 1;
         if (type.value == RumbleType.kLeftRumble_val)
             m_leftRumble = (short)(value*65535);
         else
