@@ -10,6 +10,8 @@ bin/
 .project
 .classpath
 **/dependency-reduced-pom.xml
+wpilibj/wpilibJavaJNI/nivision/*.c
+wpilibj/wpilibJavaJNI/nivision/*.java
 
 # Created by the jenkins test script
 test-reports
@@ -154,6 +156,10 @@ tmp/
 local.properties
 .settings/
 .loadpath
+
+### Python ###
+*.pyc
+__pycache__
 
 # External tool builders
 .externalToolBuilders/
