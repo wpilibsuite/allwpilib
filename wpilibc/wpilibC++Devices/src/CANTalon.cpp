@@ -19,6 +19,7 @@ CANTalon::CANTalon(int deviceNumber)
   , m_profile(0)
   , m_controlEnabled(true)
   , m_controlMode(kPercentVbus)
+  , m_setPoint(0)
 {
   SetControlMode(m_controlMode);
   m_impl->SetProfileSlotSelect(m_profile);
@@ -88,6 +89,7 @@ float CANTalon::Get()
 void CANTalon::Set(float value, uint8_t syncGroup)
 {
   if(m_controlEnabled) {
+    m_setPoint = value;
     CTR_Code status;
     switch(m_controlMode) {
       case CANSpeedController::kPercentVbus:
@@ -146,6 +148,13 @@ void CANTalon::Disable()
 void CANTalon::EnableControl() {
   SetControlMode(m_controlMode);
   m_controlEnabled = true;
+}
+
+/**
+ * @return Whether the Talon is currently enabled.
+ */
+bool CANTalon::IsControlEnabled() {
+  return m_controlEnabled;
 }
 
 /**
@@ -339,6 +348,13 @@ double CANTalon::GetIzone()
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
 	return (double)iz;
+}
+
+/**
+ * @return the current setpoint; ie, whatever was last passed to Set().
+ */
+double CANTalon::GetSetpoint() {
+  return m_setPoint;
 }
 
 /**

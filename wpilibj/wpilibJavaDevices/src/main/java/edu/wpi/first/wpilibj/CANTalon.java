@@ -64,12 +64,15 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
   boolean m_controlEnabled;
   int m_profile;
 
+  double m_setPoint;
+
   public CANTalon(int deviceNumber) {
     m_deviceNumber = deviceNumber;
     m_impl = new CanTalonSRX(deviceNumber);
     m_safetyHelper = new MotorSafetyHelper(this);
     m_controlEnabled = true;
     m_profile = 0;
+    m_setPoint = 0;
     setProfile(m_profile);
     changeControlMode(ControlMode.PercentVbus);
   }
@@ -104,6 +107,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
    */
   public void set(double outputValue) {
     if (m_controlEnabled) {
+      m_setPoint = outputValue;
       switch (m_controlMode) {
         case PercentVbus:
           m_impl.Set(outputValue);
@@ -319,6 +323,8 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
 
   public void changeControlMode(ControlMode controlMode) {
     m_controlMode = controlMode;
+    if (controlMode == ControlMode.Disabled)
+      m_controlEnabled = false;
     // Disable until set() is called.
     m_impl.SetModeSelect(ControlMode.Disabled.value);
   }
@@ -335,6 +341,10 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
   public void disableControl() {
     m_impl.SetModeSelect(ControlMode.Disabled.value);
 		m_controlEnabled = false;
+  }
+
+  public boolean isControlEnabled() {
+    return m_controlEnabled;
   }
 
   /**
@@ -604,8 +614,16 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     setIZone(izone);
     setCloseLoopRampRate(ramprate);
   }
+
   public void setPID(double p, double i, double d) {
     setPID(p, i, d, 0, 0, 0, m_profile);
+  }
+
+  /**
+   * @return The latest value set using set().
+   */
+  public double getSetpoint() {
+    return m_setPoint;
   }
 
   /**
