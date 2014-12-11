@@ -63,9 +63,8 @@
  * 			ClearIaccum()
  * 		...this is very useful in preventing integral windup and is highly recommended if using full PID to keep stability low.
  *
- * CloseLoopRampRate ramps the target of the close loop.  The units are in position per 1ms.  Set to zero to disable ramping.
- * 		So a value of 10 means allow the target input of the close loop to approach the user's demand by 10 units (ADC or encoder edges)
- * 		per 1ms.
+ * CloseLoopRampRate is in throttle units per 1ms.  Set to zero to disable ramping.
+ * 		Works the same as RampThrottle but only is in effect when a close loop mode and profile slot is selected.
  *
  * auto generated using spreadsheet and WpiClassGen.csproj
  * @link https://docs.google.com/spreadsheets/d/1OU_ZV7fZLGYUQ-Uhc8sVAmUmWTlT8XBFYK8lfjg_tac/edit#gid=1766046967
@@ -310,9 +309,66 @@ public:
 	CTR_Code SetRevMotDuringCloseLoopEn(int param);
 	CTR_Code SetOverrideBrakeType(int param);
 	CTR_Code SetModeSelect(int param);
+	CTR_Code SetModeSelect(int modeSelect,int demand);
 	CTR_Code SetProfileSlotSelect(int param);
 	CTR_Code SetRampThrottle(int param);
 	CTR_Code SetRevFeedbackSensor(int param);
 };
+extern "C" {
+	void *c_TalonSRX_Create(int deviceNumber, int controlPeriodMs);
+	void c_TalonSRX_Destroy(void *handle);
+	CTR_Code c_TalonSRX_SetParam(void *handle, int paramEnum, double value);
+	CTR_Code c_TalonSRX_RequestParam(void *handle, int paramEnum);
+	CTR_Code c_TalonSRX_GetParamResponse(void *handle, int paramEnum, double *value);
+	CTR_Code c_TalonSRX_GetParamResponseInt32(void *handle, int paramEnum, int *value);
+	CTR_Code c_TalonSRX_SetStatusFrameRate(void *handle, unsigned frameEnum, unsigned periodMs);
+	CTR_Code c_TalonSRX_ClearStickyFaults(void *handle);
+	CTR_Code c_TalonSRX_GetFault_OverTemp(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetFault_UnderVoltage(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetFault_ForLim(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetFault_RevLim(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetFault_HardwareFailure(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetFault_ForSoftLim(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetFault_RevSoftLim(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetStckyFault_OverTemp(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetStckyFault_UnderVoltage(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetStckyFault_ForLim(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetStckyFault_RevLim(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetStckyFault_ForSoftLim(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetStckyFault_RevSoftLim(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetAppliedThrottle(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetCloseLoopErr(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetFeedbackDeviceSelect(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetModeSelect(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetLimitSwitchEn(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetLimitSwitchClosedFor(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetLimitSwitchClosedRev(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetSensorPosition(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetSensorVelocity(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetCurrent(void *handle, double *param);
+	CTR_Code c_TalonSRX_GetBrakeIsEnabled(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetEncPosition(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetEncVel(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetEncIndexRiseEvents(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetQuadApin(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetQuadBpin(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetQuadIdxpin(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetAnalogInWithOv(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetAnalogInVel(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetTemp(void *handle, double *param);
+	CTR_Code c_TalonSRX_GetBatteryV(void *handle, double *param);
+	CTR_Code c_TalonSRX_GetResetCount(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetResetFlags(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetFirmVers(void *handle, int *param);
+	CTR_Code c_TalonSRX_SetDemand(void *handle, int param);
+	CTR_Code c_TalonSRX_SetOverrideLimitSwitchEn(void *handle, int param);
+	CTR_Code c_TalonSRX_SetFeedbackDeviceSelect(void *handle, int param);
+	CTR_Code c_TalonSRX_SetRevMotDuringCloseLoopEn(void *handle, int param);
+	CTR_Code c_TalonSRX_SetOverrideBrakeType(void *handle, int param);
+	CTR_Code c_TalonSRX_SetModeSelect(void *handle, int param);
+	CTR_Code c_TalonSRX_SetProfileSlotSelect(void *handle, int param);
+	CTR_Code c_TalonSRX_SetRampThrottle(void *handle, int param);
+	CTR_Code c_TalonSRX_SetRevFeedbackSensor(void *handle, int param);
+}
 #endif
 
