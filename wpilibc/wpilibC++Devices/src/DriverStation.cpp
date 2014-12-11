@@ -28,7 +28,7 @@ const uint32_t DriverStation::kJoystickPorts;
 DriverStation* DriverStation::m_instance = NULL;
 
 /**
- * DriverStation contructor.
+ * DriverStation constructor.
  *
  * This is only called once the first time GetInstance() is called
  */
@@ -43,6 +43,13 @@ DriverStation::DriverStation()
 	, m_userInTest(false)
 	, m_nextMessageTime(0)
 {
+	// All joysticks should default to having zero axes, povs and buttons, so
+	// uninitialized memory doesn't get sent to speed controllers.
+	for(unsigned int i = 0; i < kJoystickPorts; i++) {
+		m_joystickAxes[i].count = 0;
+		m_joystickPOVs[i].count = 0;
+		m_joystickButtons[i].count = 0;
+	}
 	// Create a new semaphore
 	m_packetDataAvailableMultiWait = initializeMultiWait();
 	m_newControlData = initializeSemaphore(SEMAPHORE_EMPTY);
@@ -84,15 +91,12 @@ void DriverStation::InitTask(DriverStation *ds)
 
 void DriverStation::Run()
 {
-   	HALControlWord controlWord;
 	int period = 0;
 	while (true)
 	{
-        // need to get the controlWord to keep the motors enabled
-	    HALGetControlWord(&controlWord);
 		takeMultiWait(m_packetDataAvailableMultiWait, m_packetDataAvailableMutex, 0);
+		GetData();
 		giveMultiWait(m_waitForDataSem);
-		giveSemaphore(m_newControlData);
 
 		if (++period >= 4)
 		{
@@ -120,6 +124,23 @@ DriverStation* DriverStation::GetInstance()
 		m_instance = new DriverStation();
 	}
 	return m_instance;
+}
+
+/**
+ * Copy data from the DS task for the user.
+ * If no new data exists, it will just be returned, otherwise
+ * the data will be copied from the DS polling loop.
+ */
+void DriverStation::GetData()
+{
+
+	// Get the status of all of the joysticks
+	for(uint8_t stick = 0; stick < kJoystickPorts; stick++) {
+		HALGetJoystickAxes(stick, &m_joystickAxes[stick]);
+		HALGetJoystickPOVs(stick, &m_joystickPOVs[stick]);
+		HALGetJoystickButtons(stick, &m_joystickButtons[stick]);
+	}
+	giveSemaphore(m_newControlData);
 }
 
 /**
@@ -211,9 +232,7 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
 		return 0;
 	}
 
-	HALJoystickAxes joystickAxes;
-	HALGetJoystickAxes(stick, &joystickAxes);
-	if (axis >= joystickAxes.count)
+	if (axis >= m_joystickAxes[stick].count)
 	{
 		if (axis >= kMaxJoystickAxes)
 			wpi_setWPIError(BadJoystickAxis);
@@ -222,7 +241,7 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
 		return 0.0f;
 	}
 
-	int8_t value = joystickAxes.axes[axis];
+	int8_t value = m_joystickAxes[stick].axes[axis];
 
 	if(value < 0)
 	{
@@ -245,10 +264,8 @@ int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
 		wpi_setWPIError(BadJoystickIndex);
 		return 0;
 	}
-	
-	HALJoystickPOVs joystickPOVs;
-	HALGetJoystickPOVs(stick, &joystickPOVs);
-	if (pov >= joystickPOVs.count)
+
+	if (pov >= m_joystickPOVs[stick].count)
 	{
 		if (pov >= kMaxJoystickPOVs)
 			wpi_setWPIError(BadJoystickAxis);
@@ -257,7 +274,7 @@ int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
 		return 0;
 	}
 
-	return joystickPOVs.povs[pov];
+	return m_joystickPOVs[stick].povs[pov];
 }
 
 /**
@@ -271,16 +288,20 @@ bool DriverStation::GetStickButton(uint32_t stick, uint8_t button)
 	if (stick >= kJoystickPorts)
 	{
 		wpi_setWPIError(BadJoystickIndex);
-		return 0;
+		return false;
 	}
-	HALJoystickButtons joystickButtons;
-	HALGetJoystickButtons(stick, &joystickButtons);
-	if(button > joystickButtons.count)
+	
+	if(button > m_joystickButtons[stick].count)
 	{
 		ReportJoystickUnpluggedError("WARNING: Joystick Button missing, check if all controllers are plugged in\n");
 		return false;
 	}
-	return ((0x1 << (button-1)) & joystickButtons.buttons) !=0;
+	if(button == 0)
+	{
+		ReportJoystickUnpluggedError("ERROR: Button indexes begin at 1 in WPILib for C++ and Java");
+		return false;
+	}
+	return ((0x1 << (button-1)) & m_joystickButtons[stick].buttons) !=0;
 }
 
 bool DriverStation::IsEnabled()

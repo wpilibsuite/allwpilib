@@ -89,12 +89,16 @@ public:
 protected:
 	DriverStation();
 
+	void GetData();
 private:
 	static void InitTask(DriverStation *ds);
 	static DriverStation *m_instance;
 	void ReportJoystickUnpluggedError(std::string message);
 	void Run();
 
+	HALJoystickAxes m_joystickAxes[kJoystickPorts];
+	HALJoystickPOVs m_joystickPOVs[kJoystickPorts];
+	HALJoystickButtons m_joystickButtons[kJoystickPorts];
 	Task m_task;
 	SEMAPHORE_ID m_newControlData;
 	MULTIWAIT_ID m_packetDataAvailableMultiWait;
