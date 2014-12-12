@@ -54,6 +54,10 @@ const char* getHALErrorMessage(int32_t code)
 			return CTR_InvalidParamValue_MESSAGE;
 		case CTR_UnexpectedArbId:
 			return CTR_UnexpectedArbId_MESSAGE;
+                case CTR_TxFailed:
+			return CTR_TxFailed_MESSAGE;
+                case CTR_SigNotUpdated:
+			return CTR_SigNotUpdated_MESSAGE;
 		case NiFpga_Status_FifoTimeout:
 			return NiFpga_Status_FifoTimeout_MESSAGE;
 		case NiFpga_Status_TransferAborted:
