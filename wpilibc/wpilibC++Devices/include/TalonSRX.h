@@ -5,14 +5,25 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-#include "Talon.h"
+#include "SafePWM.h"
+#include "SpeedController.h"
+#include "PIDOutput.h"
 
 /**
  * Cross the Road Electronics (CTRE) Talon SRX Speed Controller with PWM control
  * @see CANTalon for CAN control
  */
-class TalonSRX: public Talon {
+class TalonSRX : public SafePWM, public SpeedController
+{
 public:
 	explicit TalonSRX(uint32_t channel);
 	virtual ~TalonSRX();
+	virtual void Set(float value, uint8_t syncGroup = 0);
+	virtual float Get();
+	virtual void Disable();
+
+	virtual void PIDWrite(float output);
+
+private:
+	void InitTalonSRX();
 };

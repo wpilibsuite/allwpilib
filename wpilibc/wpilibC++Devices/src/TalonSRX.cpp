@@ -6,10 +6,78 @@
 
 #include "TalonSRX.h"
 
-TalonSRX::TalonSRX(uint32_t channel) : Talon(channel) {
+//#include "NetworkCommunication/UsageReporting.h"
+#include "LiveWindow/LiveWindow.h"
 
+/**
+ * Common initialization code called by all constructors.
+ *
+ * Note that the TalonSRX uses the following bounds for PWM values. These values should work reasonably well for
+ * most controllers, but if users experience issues such as asymmetric behavior around
+ * the deadband or inability to saturate the controller in either direction, calibration is recommended.
+ * The calibration procedure can be found in the TalonSRX User Manual available from Cross The Road Electronics.
+ *
+ */
+void TalonSRX::InitTalonSRX() {
+	SetBounds(2.001, 1.52, 1.50, 1.48, .999);
+	SetPeriodMultiplier(kPeriodMultiplier_1X);
+	SetRaw(m_centerPwm);
+	SetZeroLatch();
+
+	HALReport(HALUsageReporting::kResourceType_Talon, GetChannel());
+	LiveWindow::GetInstance()->AddActuator("TalonSRX", GetChannel(), this);
 }
 
-TalonSRX::~TalonSRX() {
+/**
+ * @param channel The PWM channel that the TalonSRX is attached to.
+ */
+TalonSRX::TalonSRX(uint32_t channel) : SafePWM(channel)
+{
+	InitTalonSRX();
 }
 
+TalonSRX::~TalonSRX()
+{
+}
+
+/**
+ * Set the PWM value.
+ *
+ * The PWM value is set using a range of -1.0 to 1.0, appropriately
+ * scaling the value for the FPGA.
+ *
+ * @param speed The speed value between -1.0 and 1.0 to set.
+ * @param syncGroup Unused interface.
+ */
+void TalonSRX::Set(float speed, uint8_t syncGroup)
+{
+	SetSpeed(speed);
+}
+
+/**
+ * Get the recently set value of the PWM.
+ *
+ * @return The most recently set value for the PWM between -1.0 and 1.0.
+ */
+float TalonSRX::Get()
+{
+	return GetSpeed();
+}
+
+/**
+ * Common interface for disabling a motor.
+ */
+void TalonSRX::Disable()
+{
+	SetRaw(kPwmDisabled);
+}
+
+/**
+ * Write out the PID value as seen in the PIDOutput base object.
+ *
+ * @param output Write out the PWM value as was found in the PIDController
+ */
+void TalonSRX::PIDWrite(float output)
+{
+	Set(output);
+}

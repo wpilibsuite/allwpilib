@@ -5,13 +5,24 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-#include "Talon.h"
+#include "SafePWM.h"
+#include "SpeedController.h"
+#include "PIDOutput.h"
 
 /**
  * Vex Robotics Victor SP Speed Controller
  */
-class VictorSP: public Talon {
+class VictorSP : public SafePWM, public SpeedController
+{
 public:
 	explicit VictorSP(uint32_t channel);
 	virtual ~VictorSP();
+	virtual void Set(float value, uint8_t syncGroup = 0);
+	virtual float Get();
+	virtual void Disable();
+
+	virtual void PIDWrite(float output);
+
+private:
+	void InitVictorSP();
 };
