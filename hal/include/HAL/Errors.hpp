@@ -4,6 +4,8 @@
 #define CTR_TxTimeout_MESSAGE "CTRE CAN Transmit Timeout"
 #define CTR_InvalidParamValue_MESSAGE "CTRE CAN Invalid Parameter"
 #define CTR_UnexpectedArbId_MESSAGE "CTRE Unexpected Arbitration ID (CAN Node ID)"
+#define CTR_TxFailed_MESSAGE "CTRE CAN Transmit Error"
+#define CTR_SigNotUpdated_MESSAGE "CTRE CAN Signal Not Updated"
 
 #define NiFpga_Status_FifoTimeout_MESSAGE "NIFPGA: FIFO timeout error"
 #define NiFpga_Status_TransferAborted_MESSAGE "NIFPGA: Transfer aborted error"
