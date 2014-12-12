@@ -890,6 +890,18 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqInterlaceSeparate(JNIEn
  * Image Information functions
  */
 
+/* J: EnumerateCustomKeysResult imaqEnumerateCustomKeys(Image image)
+ * JN: long imaqEnumerateCustomKeys(long image, long size)
+ * C: char** imaqEnumerateCustomKeys(const Image* image, unsigned int* size)
+ */
+
+JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqEnumerateCustomKeys(JNIEnv* env, jclass , jlong image, jlong size)
+{
+    char** rv = imaqEnumerateCustomKeys((const Image*)image, (unsigned int*)size);
+    if (!rv) throwJavaException(env);
+    return (jlong)rv;
+}
+
 /* J: int imaqGetBitDepth(Image image)
  * JN: int imaqGetBitDepth(long image, long bitDepth)
  * C: int imaqGetBitDepth(const Image* image, unsigned int* bitDepth)
@@ -985,6 +997,18 @@ JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqIsImageEmpty(JNIEnv* en
     return (jint)rv;
 }
 
+/* J: RawData imaqReadCustomData(Image image, String key)
+ * JN: long imaqReadCustomData(long image, long key, long size)
+ * C: void* imaqReadCustomData(const Image* image, const char* key, unsigned int* size)
+ */
+
+JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqReadCustomData(JNIEnv* env, jclass , jlong image, jlong key, jlong size)
+{
+    void* rv = imaqReadCustomData((const Image*)image, (const char*)key, (unsigned int*)size);
+    if (!rv) throwJavaException(env);
+    return (jlong)rv;
+}
+
 /* J: void imaqRemoveCustomData(Image image, String key)
  * JN: void imaqRemoveCustomData(long image, long key)
  * C: int imaqRemoveCustomData(Image* image, const char* key)
@@ -1037,6 +1061,17 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqSetImageSize(JNIEnv* en
 JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqSetMaskOffset(JNIEnv* env, jclass , jlong image, jlong offset)
 {
     int rv = imaqSetMaskOffset((Image*)image, *((Point*)offset));
+    if (rv == 0) throwJavaException(env);
+}
+
+/* J: void imaqWriteCustomData(Image image, String key, RawData data, int size)
+ * JN: void imaqWriteCustomData(long image, long key, long data, int size)
+ * C: int imaqWriteCustomData(Image* image, const char* key, const void* data, unsigned int size)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqWriteCustomData(JNIEnv* env, jclass , jlong image, jlong key, jlong data, jint size)
+{
+    int rv = imaqWriteCustomData((Image*)image, (const char*)key, (const void*)data, (unsigned int)size);
     if (rv == 0) throwJavaException(env);
 }
 
@@ -1149,6 +1184,18 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqDuplicate(JNIEnv* env, 
     if (rv == 0) throwJavaException(env);
 }
 
+/* J: RawData imaqFlatten(Image image, FlattenType type, CompressionType compression, int quality)
+ * JN: long imaqFlatten(long image, int type, int compression, int quality, long size)
+ * C: void* imaqFlatten(const Image* image, FlattenType type, CompressionType compression, int quality, unsigned int* size)
+ */
+
+JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqFlatten(JNIEnv* env, jclass , jlong image, jint type, jint compression, jint quality, jlong size)
+{
+    void* rv = imaqFlatten((const Image*)image, (FlattenType)type, (CompressionType)compression, (int)quality, (unsigned int*)size);
+    if (!rv) throwJavaException(env);
+    return (jlong)rv;
+}
+
 /* J: void imaqFlip(Image dest, Image source, FlipAxis axis)
  * JN: void imaqFlip(long dest, long source, int axis)
  * C: int imaqFlip(Image* dest, const Image* source, FlipAxis axis)
@@ -1201,6 +1248,17 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqScale(JNIEnv* env, jcla
 JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqTranspose(JNIEnv* env, jclass , jlong dest, jlong source)
 {
     int rv = imaqTranspose((Image*)dest, (const Image*)source);
+    if (rv == 0) throwJavaException(env);
+}
+
+/* J: void imaqUnflatten(Image image, RawData data, int size)
+ * JN: void imaqUnflatten(long image, long data, int size)
+ * C: int imaqUnflatten(Image* image, const void* data, unsigned int size)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqUnflatten(JNIEnv* env, jclass , jlong image, jlong data, jint size)
+{
+    int rv = imaqUnflatten((Image*)image, (const void*)data, (unsigned int)size);
     if (rv == 0) throwJavaException(env);
 }
 
@@ -1288,6 +1346,18 @@ JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqGetFilterNames(JNIEnv*
     return (jlong)rv;
 }
 
+/* J: LoadImagePopupResult imaqLoadImagePopup(String defaultDirectory, String defaultFileSpec, String fileTypeList, String title, int allowMultiplePaths, ButtonLabel buttonLabel, int restrictDirectory, int restrictExtension, int allowCancel, int allowMakeDirectory)
+ * JN: long imaqLoadImagePopup(long defaultDirectory, long defaultFileSpec, long fileTypeList, long title, int allowMultiplePaths, int buttonLabel, int restrictDirectory, int restrictExtension, int allowCancel, int allowMakeDirectory, long cancelled, long numPaths)
+ * C: char** imaqLoadImagePopup(const char* defaultDirectory, const char* defaultFileSpec, const char* fileTypeList, const char* title, int allowMultiplePaths, ButtonLabel buttonLabel, int restrictDirectory, int restrictExtension, int allowCancel, int allowMakeDirectory, int* cancelled, int* numPaths)
+ */
+
+JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqLoadImagePopup(JNIEnv* env, jclass , jlong defaultDirectory, jlong defaultFileSpec, jlong fileTypeList, jlong title, jint allowMultiplePaths, jint buttonLabel, jint restrictDirectory, jint restrictExtension, jint allowCancel, jint allowMakeDirectory, jlong cancelled, jlong numPaths)
+{
+    char** rv = imaqLoadImagePopup((const char*)defaultDirectory, (const char*)defaultFileSpec, (const char*)fileTypeList, (const char*)title, (int)allowMultiplePaths, (ButtonLabel)buttonLabel, (int)restrictDirectory, (int)restrictExtension, (int)allowCancel, (int)allowMakeDirectory, (int*)cancelled, (int*)numPaths);
+    if (!rv) throwJavaException(env);
+    return (jlong)rv;
+}
+
 /* J: int imaqOpenAVI(String fileName)
  * JN: int imaqOpenAVI(long fileName)
  * C: AVISession imaqOpenAVI(const char* fileName)
@@ -1322,6 +1392,17 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqReadVisionFile(JNIEnv* 
     if (rv == 0) throwJavaException(env);
 }
 
+/* J: void imaqWriteAVIFrame(Image image, int session, RawData data, int dataLength)
+ * JN: void imaqWriteAVIFrame(long image, int session, long data, int dataLength)
+ * C: int imaqWriteAVIFrame(Image* image, AVISession session, const void* data, unsigned int dataLength)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqWriteAVIFrame(JNIEnv* env, jclass , jlong image, jint session, jlong data, jint dataLength)
+{
+    int rv = imaqWriteAVIFrame((Image*)image, (AVISession)session, (const void*)data, (unsigned int)dataLength);
+    if (rv == 0) throwJavaException(env);
+}
+
 /* J: void imaqWriteBMPFile(Image image, String fileName, int compress, RGBValue colorTable)
  * JN: void imaqWriteBMPFile(long image, long fileName, int compress, long colorTable)
  * C: int imaqWriteBMPFile(const Image* image, const char* fileName, int compress, const RGBValue* colorTable)
@@ -1341,6 +1422,17 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqWriteBMPFile(JNIEnv* en
 JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqWriteFile(JNIEnv* env, jclass , jlong image, jlong fileName, jlong colorTable)
 {
     int rv = imaqWriteFile((const Image*)image, (const char*)fileName, (const RGBValue*)colorTable);
+    if (rv == 0) throwJavaException(env);
+}
+
+/* J: void imaqWriteJPEGFile(Image image, String fileName, int quality, RawData colorTable)
+ * JN: void imaqWriteJPEGFile(long image, long fileName, int quality, long colorTable)
+ * C: int imaqWriteJPEGFile(const Image* image, const char* fileName, unsigned int quality, void* colorTable)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqWriteJPEGFile(JNIEnv* env, jclass , jlong image, jlong fileName, jint quality, jlong colorTable)
+{
+    int rv = imaqWriteJPEGFile((const Image*)image, (const char*)fileName, (unsigned int)quality, (void*)colorTable);
     if (rv == 0) throwJavaException(env);
 }
 
@@ -1545,6 +1637,18 @@ JNIEXPORT jfloat JNICALL Java_com_ni_vision_NIVision__1imaqGetPolygonArea(JNIEnv
     return (jfloat)rv;
 }
 
+/* J: InterpolatePointsResult imaqInterpolatePoints(Image image, Point[] points, InterpolationMethod method, int subpixel)
+ * JN: long imaqInterpolatePoints(long image, long points, int numPoints, int method, int subpixel, long interpCount)
+ * C: float* imaqInterpolatePoints(const Image* image, const Point* points, int numPoints, InterpolationMethod method, int subpixel, int* interpCount)
+ */
+
+JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqInterpolatePoints(JNIEnv* env, jclass , jlong image, jlong points, jint numPoints, jint method, jint subpixel, jlong interpCount)
+{
+    float* rv = imaqInterpolatePoints((const Image*)image, (const Point*)points, (int)numPoints, (InterpolationMethod)method, (int)subpixel, (int*)interpCount);
+    if (!rv) throwJavaException(env);
+    return (jlong)rv;
+}
+
 /*
  * Clipboard functions
  */
@@ -1613,6 +1717,17 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqSetBorderSize(JNIEnv* e
 /*
  * Image Management functions
  */
+
+/* J: void imaqArrayToImage(Image image, RawData array, int numCols, int numRows)
+ * JN: void imaqArrayToImage(long image, long array, int numCols, int numRows)
+ * C: int imaqArrayToImage(Image* image, const void* array, int numCols, int numRows)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqArrayToImage(JNIEnv* env, jclass , jlong image, jlong array, jint numCols, jint numRows)
+{
+    int rv = imaqArrayToImage((Image*)image, (const void*)array, (int)numCols, (int)numRows);
+    if (rv == 0) throwJavaException(env);
+}
 
 /* J: Image imaqCreateImage(ImageType type, int borderSize)
  * JN: long imaqCreateImage(int type, int borderSize)
@@ -2465,6 +2580,18 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqReplaceComplexPlane(JNI
 JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqLearnColor(JNIEnv* env, jclass , jlong image, jlong roi, jint sensitivity, jint saturation)
 {
     ColorInformation* rv = imaqLearnColor((const Image*)image, (const ROI*)roi, (ColorSensitivity)sensitivity, (int)saturation);
+    if (!rv) throwJavaException(env);
+    return (jlong)rv;
+}
+
+/* J: MatchColorResult imaqMatchColor(Image image, ColorInformation info, ROI roi)
+ * JN: long imaqMatchColor(long image, long info, long roi, long numScores)
+ * C: int* imaqMatchColor(const Image* image, const ColorInformation* info, const ROI* roi, int* numScores)
+ */
+
+JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqMatchColor(JNIEnv* env, jclass , jlong image, jlong info, jlong roi, jlong numScores)
+{
+    int* rv = imaqMatchColor((const Image*)image, (const ColorInformation*)info, (const ROI*)roi, (int*)numScores);
     if (!rv) throwJavaException(env);
     return (jlong)rv;
 }
@@ -3384,6 +3511,17 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqOverlayLine(JNIEnv* env
     if (rv == 0) throwJavaException(env);
 }
 
+/* J: void imaqOverlayMetafile(Image image, RawData metafile, Rect rect, String group)
+ * JN: void imaqOverlayMetafile(long image, long metafile, long rect, long group)
+ * C: int imaqOverlayMetafile(Image* image, const void* metafile, Rect rect, const char* group)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqOverlayMetafile(JNIEnv* env, jclass , jlong image, jlong metafile, jlong rect, jlong group)
+{
+    int rv = imaqOverlayMetafile((Image*)image, (const void*)metafile, *((Rect*)rect), (const char*)group);
+    if (rv == 0) throwJavaException(env);
+}
+
 /* J: void imaqOverlayOpenContour(Image image, Point[] points, RGBValue color, String group)
  * JN: void imaqOverlayOpenContour(long image, long points, int numPoints, long color, long group)
  * C: int imaqOverlayOpenContour(Image* image, const Point* points, int numPoints, const RGBValue* color, const char* group)
@@ -3567,6 +3705,18 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqTrainChars(JNIEnv* env,
 {
     int rv = imaqTrainChars((const Image*)image, (CharSet*)set, (int)index, (const char*)charValue, (const ROI*)roi, (const OCRProcessingOptions*)processingOptions, (const OCRSpacingOptions*)spacingOptions);
     if (rv == 0) throwJavaException(env);
+}
+
+/* J: VerifyTextResult imaqVerifyText(Image image, CharSet set, String expectedString, ROI roi)
+ * JN: long imaqVerifyText(long image, long set, long expectedString, long roi, long numScores)
+ * C: int* imaqVerifyText(const Image* image, const CharSet* set, const char* expectedString, const ROI* roi, int* numScores)
+ */
+
+JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqVerifyText(JNIEnv* env, jclass , jlong image, jlong set, jlong expectedString, jlong roi, jlong numScores)
+{
+    int* rv = imaqVerifyText((const Image*)image, (const CharSet*)set, (const char*)expectedString, (const ROI*)roi, (int*)numScores);
+    if (!rv) throwJavaException(env);
+    return (jlong)rv;
 }
 
 /* J: void imaqWriteOCRFile(String fileName, CharSet set, String setDescription, ReadTextOptions readOptions, OCRProcessingOptions processingOptions, OCRSpacingOptions spacingOptions)
@@ -4384,6 +4534,18 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqSetWindowOverlay(JNIEnv
 JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqCreateOverlayFromROI(JNIEnv* env, jclass , jlong roi)
 {
     Overlay* rv = imaqCreateOverlayFromROI((const ROI*)roi);
+    if (!rv) throwJavaException(env);
+    return (jlong)rv;
+}
+
+/* J: Overlay imaqCreateOverlayFromMetafile(RawData metafile)
+ * JN: long imaqCreateOverlayFromMetafile(long metafile)
+ * C: Overlay* imaqCreateOverlayFromMetafile(const void* metafile)
+ */
+
+JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqCreateOverlayFromMetafile(JNIEnv* env, jclass , jlong metafile)
+{
+    Overlay* rv = imaqCreateOverlayFromMetafile((const void*)metafile);
     if (!rv) throwJavaException(env);
     return (jlong)rv;
 }

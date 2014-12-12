@@ -116,11 +116,11 @@ public class NIVision {
     private static abstract class OpaqueStruct {
         private long nativeObj;
         private boolean owned;
-        private OpaqueStruct() {
-            this.nativeObj = 0;
-            this.owned = false;
+        protected OpaqueStruct() {
+            nativeObj = 0;
+            owned = false;
         }
-        private OpaqueStruct(long nativeObj, boolean owned) {
+        protected OpaqueStruct(long nativeObj, boolean owned) {
             this.nativeObj = nativeObj;
             this.owned = owned;
         }
@@ -139,6 +139,48 @@ public class NIVision {
         }
         public long getAddress() {
             return nativeObj;
+        }
+    }
+
+    public static class RawData {
+        private ByteBuffer buf;
+        private boolean owned;
+        public RawData() {
+            owned = false;
+        }
+        public RawData(ByteBuffer buf) {
+            this.buf = buf;
+            owned = false;
+        }
+        private RawData(long nativeObj, boolean owned, int size) {
+            buf = newDirectByteBuffer(nativeObj, size);
+            this.owned = owned;
+        }
+        public void free() {
+            if (owned) {
+                imaqDispose(getByteBufferAddress(buf));
+                owned = false;
+                buf = null;
+            }
+        }
+        @Override
+        protected void finalize() throws Throwable {
+            if (owned)
+                imaqDispose(getByteBufferAddress(buf));
+            super.finalize();
+        }
+        public long getAddress() {
+            if (buf == null)
+                return 0;
+            return getByteBufferAddress(buf);
+        }
+        public ByteBuffer getBuffer() {
+            return buf;
+        }
+        public void setBuffer(ByteBuffer buf) {
+            if (owned)
+                free();
+            this.buf = buf;
         }
     }
 
@@ -20120,6 +20162,52 @@ public class NIVision {
      * Image Information functions
      */
 
+    public static class EnumerateCustomKeysResult {
+        public String[] array;
+        private long array_addr;
+        private EnumerateCustomKeysResult(ByteBuffer rv_buf, long jn_rv) {
+            array_addr = jn_rv;
+            int array_size;
+            array_size = rv_buf.getInt(0);
+            array = new String[array_size];
+            if (array_size > 0 && array_addr != 0) {
+                ByteBuffer bb = newDirectByteBuffer(array_addr, array_size*4);
+                for (int i=0, off=0; i<array_size; i++, off += 4) {
+                    long addr = getPointer(bb, off);
+                    if (addr == 0)
+                        array[i] = null;
+                    else {
+                        ByteBuffer bb2 = newDirectByteBuffer(addr, 1000); // FIXME
+                        while (bb2.get() != 0) {}
+                        byte[] bytes = new byte[bb2.position()-1];
+                        bb2.rewind();
+                        getBytes(bb2, bytes, 0, bytes.length);
+                        try {
+                            array[i] = new String(bytes, "UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            array[i] = "";
+                        }
+                    }
+                }
+            }
+        }
+
+        @Override
+        protected void finalize() throws Throwable {
+            imaqDispose(array_addr);
+            super.finalize();
+        }
+    }
+
+    public static EnumerateCustomKeysResult imaqEnumerateCustomKeys(Image image) {
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        long rv_addr = getByteBufferAddress(rv_buf);
+        long jn_rv = _imaqEnumerateCustomKeys(image.getAddress(), rv_addr+0);
+        EnumerateCustomKeysResult rv = new EnumerateCustomKeysResult(rv_buf, jn_rv);
+        return rv;
+    }
+    private static native long _imaqEnumerateCustomKeys(long image, long size);
+
     public static int imaqGetBitDepth(Image image) {
         ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
         long rv_addr = getByteBufferAddress(rv_buf);
@@ -20210,6 +20298,29 @@ public class NIVision {
     }
     private static native int _imaqIsImageEmpty(long image, long empty);
 
+    public static RawData imaqReadCustomData(Image image, String key) {
+        ByteBuffer key_buf = null;
+        if (key != null) {
+            byte[] key_bytes;
+            try {
+                key_bytes = key.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                key_bytes = new byte[0];
+            }
+            key_buf = ByteBuffer.allocateDirect(key_bytes.length+1);
+            putBytes(key_buf, key_bytes, 0, key_bytes.length).put(key_bytes.length, (byte)0);
+        }
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        long rv_addr = getByteBufferAddress(rv_buf);
+        long jn_rv = _imaqReadCustomData(image.getAddress(), key == null ? 0 : getByteBufferAddress(key_buf), rv_addr+0);
+        int size;
+        RawData val;
+        size = rv_buf.getInt(0);
+        val = new RawData(jn_rv, false, size);
+        return val;
+    }
+    private static native long _imaqReadCustomData(long image, long key, long size);
+
     public static void imaqRemoveCustomData(Image image, String key) {
         ByteBuffer key_buf = null;
         if (key != null) {
@@ -20254,6 +20365,23 @@ public class NIVision {
         
     }
     private static native void _imaqSetMaskOffset(long image, long offset);
+
+    public static void imaqWriteCustomData(Image image, String key, RawData data, int size) {
+        ByteBuffer key_buf = null;
+        if (key != null) {
+            byte[] key_bytes;
+            try {
+                key_bytes = key.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                key_bytes = new byte[0];
+            }
+            key_buf = ByteBuffer.allocateDirect(key_bytes.length+1);
+            putBytes(key_buf, key_bytes, 0, key_bytes.length).put(key_bytes.length, (byte)0);
+        }
+        _imaqWriteCustomData(image.getAddress(), key == null ? 0 : getByteBufferAddress(key_buf), data.getAddress(), size);
+        
+    }
+    private static native void _imaqWriteCustomData(long image, long key, long data, int size);
 
     /**
      * Display functions
@@ -20346,6 +20474,18 @@ public class NIVision {
     }
     private static native void _imaqDuplicate(long dest, long source);
 
+    public static RawData imaqFlatten(Image image, FlattenType type, CompressionType compression, int quality) {
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        long rv_addr = getByteBufferAddress(rv_buf);
+        long jn_rv = _imaqFlatten(image.getAddress(), type.getValue(), compression.getValue(), quality, rv_addr+0);
+        int size;
+        RawData val;
+        size = rv_buf.getInt(0);
+        val = new RawData(jn_rv, true, size);
+        return val;
+    }
+    private static native long _imaqFlatten(long image, int type, int compression, int quality, long size);
+
     public static void imaqFlip(Image dest, Image source, FlipAxis axis) {
         
         _imaqFlip(dest.getAddress(), source.getAddress(), axis.getValue());
@@ -20380,6 +20520,13 @@ public class NIVision {
         
     }
     private static native void _imaqTranspose(long dest, long source);
+
+    public static void imaqUnflatten(Image image, RawData data, int size) {
+        
+        _imaqUnflatten(image.getAddress(), data.getAddress(), size);
+        
+    }
+    private static native void _imaqUnflatten(long image, long data, int size);
 
     public static void imaqUnwrapImage(Image dest, Image source, Annulus annulus, RectOrientation orientation, InterpolationMethod method) {
         
@@ -20529,6 +20676,98 @@ public class NIVision {
     }
     private static native long _imaqGetFilterNames(long numFilters);
 
+    public static class LoadImagePopupResult {
+        public int cancelled;
+        public String[] array;
+        private long array_addr;
+        private LoadImagePopupResult(ByteBuffer rv_buf, long jn_rv) {
+            array_addr = jn_rv;
+            cancelled = rv_buf.getInt(0);
+            int array_numPaths;
+            array_numPaths = rv_buf.getInt(8);
+            array = new String[array_numPaths];
+            if (array_numPaths > 0 && array_addr != 0) {
+                ByteBuffer bb = newDirectByteBuffer(array_addr, array_numPaths*4);
+                for (int i=0, off=0; i<array_numPaths; i++, off += 4) {
+                    long addr = getPointer(bb, off);
+                    if (addr == 0)
+                        array[i] = null;
+                    else {
+                        ByteBuffer bb2 = newDirectByteBuffer(addr, 1000); // FIXME
+                        while (bb2.get() != 0) {}
+                        byte[] bytes = new byte[bb2.position()-1];
+                        bb2.rewind();
+                        getBytes(bb2, bytes, 0, bytes.length);
+                        try {
+                            array[i] = new String(bytes, "UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            array[i] = "";
+                        }
+                    }
+                }
+            }
+        }
+
+        @Override
+        protected void finalize() throws Throwable {
+            imaqDispose(array_addr);
+            super.finalize();
+        }
+    }
+
+    public static LoadImagePopupResult imaqLoadImagePopup(String defaultDirectory, String defaultFileSpec, String fileTypeList, String title, int allowMultiplePaths, ButtonLabel buttonLabel, int restrictDirectory, int restrictExtension, int allowCancel, int allowMakeDirectory) {
+        ByteBuffer defaultDirectory_buf = null;
+        if (defaultDirectory != null) {
+            byte[] defaultDirectory_bytes;
+            try {
+                defaultDirectory_bytes = defaultDirectory.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                defaultDirectory_bytes = new byte[0];
+            }
+            defaultDirectory_buf = ByteBuffer.allocateDirect(defaultDirectory_bytes.length+1);
+            putBytes(defaultDirectory_buf, defaultDirectory_bytes, 0, defaultDirectory_bytes.length).put(defaultDirectory_bytes.length, (byte)0);
+        }
+        ByteBuffer defaultFileSpec_buf = null;
+        if (defaultFileSpec != null) {
+            byte[] defaultFileSpec_bytes;
+            try {
+                defaultFileSpec_bytes = defaultFileSpec.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                defaultFileSpec_bytes = new byte[0];
+            }
+            defaultFileSpec_buf = ByteBuffer.allocateDirect(defaultFileSpec_bytes.length+1);
+            putBytes(defaultFileSpec_buf, defaultFileSpec_bytes, 0, defaultFileSpec_bytes.length).put(defaultFileSpec_bytes.length, (byte)0);
+        }
+        ByteBuffer fileTypeList_buf = null;
+        if (fileTypeList != null) {
+            byte[] fileTypeList_bytes;
+            try {
+                fileTypeList_bytes = fileTypeList.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                fileTypeList_bytes = new byte[0];
+            }
+            fileTypeList_buf = ByteBuffer.allocateDirect(fileTypeList_bytes.length+1);
+            putBytes(fileTypeList_buf, fileTypeList_bytes, 0, fileTypeList_bytes.length).put(fileTypeList_bytes.length, (byte)0);
+        }
+        ByteBuffer title_buf = null;
+        if (title != null) {
+            byte[] title_bytes;
+            try {
+                title_bytes = title.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                title_bytes = new byte[0];
+            }
+            title_buf = ByteBuffer.allocateDirect(title_bytes.length+1);
+            putBytes(title_buf, title_bytes, 0, title_bytes.length).put(title_bytes.length, (byte)0);
+        }
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24);
+        long rv_addr = getByteBufferAddress(rv_buf);
+        long jn_rv = _imaqLoadImagePopup(defaultDirectory == null ? 0 : getByteBufferAddress(defaultDirectory_buf), defaultFileSpec == null ? 0 : getByteBufferAddress(defaultFileSpec_buf), fileTypeList == null ? 0 : getByteBufferAddress(fileTypeList_buf), title == null ? 0 : getByteBufferAddress(title_buf), allowMultiplePaths, buttonLabel.getValue(), restrictDirectory, restrictExtension, allowCancel, allowMakeDirectory, rv_addr+0, rv_addr+8);
+        LoadImagePopupResult rv = new LoadImagePopupResult(rv_buf, jn_rv);
+        return rv;
+    }
+    private static native long _imaqLoadImagePopup(long defaultDirectory, long defaultFileSpec, long fileTypeList, long title, int allowMultiplePaths, int buttonLabel, int restrictDirectory, int restrictExtension, int allowCancel, int allowMakeDirectory, long cancelled, long numPaths);
+
     public static int imaqOpenAVI(String fileName) {
         ByteBuffer fileName_buf = null;
         if (fileName != null) {
@@ -20607,6 +20846,13 @@ public class NIVision {
     }
     private static native void _imaqReadVisionFile(long image, long fileName, long colorTable, long numColors);
 
+    public static void imaqWriteAVIFrame(Image image, int session, RawData data, int dataLength) {
+        
+        _imaqWriteAVIFrame(image.getAddress(), session, data.getAddress(), dataLength);
+        
+    }
+    private static native void _imaqWriteAVIFrame(long image, int session, long data, int dataLength);
+
     public static void imaqWriteBMPFile(Image image, String fileName, int compress, RGBValue colorTable) {
         ByteBuffer fileName_buf = null;
         if (fileName != null) {
@@ -20640,6 +20886,23 @@ public class NIVision {
         
     }
     private static native void _imaqWriteFile(long image, long fileName, long colorTable);
+
+    public static void imaqWriteJPEGFile(Image image, String fileName, int quality, RawData colorTable) {
+        ByteBuffer fileName_buf = null;
+        if (fileName != null) {
+            byte[] fileName_bytes;
+            try {
+                fileName_bytes = fileName.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                fileName_bytes = new byte[0];
+            }
+            fileName_buf = ByteBuffer.allocateDirect(fileName_bytes.length+1);
+            putBytes(fileName_buf, fileName_bytes, 0, fileName_bytes.length).put(fileName_bytes.length, (byte)0);
+        }
+        _imaqWriteJPEGFile(image.getAddress(), fileName == null ? 0 : getByteBufferAddress(fileName_buf), quality, colorTable == null ? 0 : colorTable.getAddress());
+        
+    }
+    private static native void _imaqWriteJPEGFile(long image, long fileName, int quality, long colorTable);
 
     public static void imaqWriteJPEG2000File(Image image, String fileName, int lossless, float compressionRatio, JPEG2000FileAdvancedOptions advancedOptions, RGBValue colorTable) {
         ByteBuffer fileName_buf = null;
@@ -20935,6 +21198,42 @@ public class NIVision {
     }
     private static native float _imaqGetPolygonArea(long points, int numPoints, long area);
 
+    public static class InterpolatePointsResult {
+        public float[] array;
+        private long array_addr;
+        private InterpolatePointsResult(ByteBuffer rv_buf, long jn_rv) {
+            array_addr = jn_rv;
+            int array_interpCount;
+            array_interpCount = rv_buf.getInt(0);
+            array = new float[array_interpCount];
+            if (array_interpCount > 0 && array_addr != 0) {
+                newDirectByteBuffer(array_addr, array_interpCount*4).asFloatBuffer().get(array);
+            }
+        }
+
+        @Override
+        protected void finalize() throws Throwable {
+            imaqDispose(array_addr);
+            super.finalize();
+        }
+    }
+
+    public static InterpolatePointsResult imaqInterpolatePoints(Image image, Point[] points, InterpolationMethod method, int subpixel) {
+        int numPoints = points.length;
+        ByteBuffer points_buf = null;
+        points_buf = ByteBuffer.allocateDirect(points.length*8);
+        for (int i=0, off=0; i<points.length; i++, off += 8) {
+            points[i].setBuffer(points_buf, off);
+            points[i].write();
+        }
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        long rv_addr = getByteBufferAddress(rv_buf);
+        long jn_rv = _imaqInterpolatePoints(image.getAddress(), getByteBufferAddress(points_buf), numPoints, method.getValue(), subpixel, rv_addr+0);
+        InterpolatePointsResult rv = new InterpolatePointsResult(rv_buf, jn_rv);
+        return rv;
+    }
+    private static native long _imaqInterpolatePoints(long image, long points, int numPoints, int method, int subpixel, long interpCount);
+
     /**
      * Clipboard functions
      */
@@ -20988,6 +21287,13 @@ public class NIVision {
     /**
      * Image Management functions
      */
+
+    public static void imaqArrayToImage(Image image, RawData array, int numCols, int numRows) {
+        
+        _imaqArrayToImage(image.getAddress(), array.getAddress(), numCols, numRows);
+        
+    }
+    private static native void _imaqArrayToImage(long image, long array, int numCols, int numRows);
 
     public static Image imaqCreateImage(ImageType type, int borderSize) {
         
@@ -21707,6 +22013,35 @@ public class NIVision {
         return new ColorInformation(jn_rv, true);
     }
     private static native long _imaqLearnColor(long image, long roi, int sensitivity, int saturation);
+
+    public static class MatchColorResult {
+        public int[] array;
+        private long array_addr;
+        private MatchColorResult(ByteBuffer rv_buf, long jn_rv) {
+            array_addr = jn_rv;
+            int array_numScores;
+            array_numScores = rv_buf.getInt(0);
+            array = new int[array_numScores];
+            if (array_numScores > 0 && array_addr != 0) {
+                newDirectByteBuffer(array_addr, array_numScores*4).asIntBuffer().get(array);
+            }
+        }
+
+        @Override
+        protected void finalize() throws Throwable {
+            imaqDispose(array_addr);
+            super.finalize();
+        }
+    }
+
+    public static MatchColorResult imaqMatchColor(Image image, ColorInformation info, ROI roi) {
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        long rv_addr = getByteBufferAddress(rv_buf);
+        long jn_rv = _imaqMatchColor(image.getAddress(), info.getAddress(), roi == null ? 0 : roi.getAddress(), rv_addr+0);
+        MatchColorResult rv = new MatchColorResult(rv_buf, jn_rv);
+        return rv;
+    }
+    private static native long _imaqMatchColor(long image, long info, long roi, long numScores);
 
     /**
      * Frequency Domain Analysis functions
@@ -22914,6 +23249,23 @@ public class NIVision {
     }
     private static native void _imaqOverlayLine(long image, long start, long end, long color, long group);
 
+    public static void imaqOverlayMetafile(Image image, RawData metafile, Rect rect, String group) {
+        ByteBuffer group_buf = null;
+        if (group != null) {
+            byte[] group_bytes;
+            try {
+                group_bytes = group.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                group_bytes = new byte[0];
+            }
+            group_buf = ByteBuffer.allocateDirect(group_bytes.length+1);
+            putBytes(group_buf, group_bytes, 0, group_bytes.length).put(group_bytes.length, (byte)0);
+        }
+        _imaqOverlayMetafile(image.getAddress(), metafile.getAddress(), rect.getAddress(), group == null ? 0 : getByteBufferAddress(group_buf));
+        
+    }
+    private static native void _imaqOverlayMetafile(long image, long metafile, long rect, long group);
+
     public static void imaqOverlayOpenContour(Image image, Point[] points, RGBValue color, String group) {
         int numPoints = points.length;
         ByteBuffer points_buf = null;
@@ -23191,6 +23543,46 @@ public class NIVision {
         
     }
     private static native void _imaqTrainChars(long image, long set, int index, long charValue, long roi, long processingOptions, long spacingOptions);
+
+    public static class VerifyTextResult {
+        public int[] array;
+        private long array_addr;
+        private VerifyTextResult(ByteBuffer rv_buf, long jn_rv) {
+            array_addr = jn_rv;
+            int array_numScores;
+            array_numScores = rv_buf.getInt(0);
+            array = new int[array_numScores];
+            if (array_numScores > 0 && array_addr != 0) {
+                newDirectByteBuffer(array_addr, array_numScores*4).asIntBuffer().get(array);
+            }
+        }
+
+        @Override
+        protected void finalize() throws Throwable {
+            imaqDispose(array_addr);
+            super.finalize();
+        }
+    }
+
+    public static VerifyTextResult imaqVerifyText(Image image, CharSet set, String expectedString, ROI roi) {
+        ByteBuffer expectedString_buf = null;
+        if (expectedString != null) {
+            byte[] expectedString_bytes;
+            try {
+                expectedString_bytes = expectedString.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                expectedString_bytes = new byte[0];
+            }
+            expectedString_buf = ByteBuffer.allocateDirect(expectedString_bytes.length+1);
+            putBytes(expectedString_buf, expectedString_bytes, 0, expectedString_bytes.length).put(expectedString_bytes.length, (byte)0);
+        }
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        long rv_addr = getByteBufferAddress(rv_buf);
+        long jn_rv = _imaqVerifyText(image.getAddress(), set.getAddress(), expectedString == null ? 0 : getByteBufferAddress(expectedString_buf), roi.getAddress(), rv_addr+0);
+        VerifyTextResult rv = new VerifyTextResult(rv_buf, jn_rv);
+        return rv;
+    }
+    private static native long _imaqVerifyText(long image, long set, long expectedString, long roi, long numScores);
 
     public static void imaqWriteOCRFile(String fileName, CharSet set, String setDescription, ReadTextOptions readOptions, OCRProcessingOptions processingOptions, OCRSpacingOptions spacingOptions) {
         ByteBuffer fileName_buf = null;
@@ -24184,6 +24576,14 @@ public class NIVision {
         return new Overlay(jn_rv, true);
     }
     private static native long _imaqCreateOverlayFromROI(long roi);
+
+    public static Overlay imaqCreateOverlayFromMetafile(RawData metafile) {
+        
+        long jn_rv = _imaqCreateOverlayFromMetafile(metafile.getAddress());
+        
+        return new Overlay(jn_rv, true);
+    }
+    private static native long _imaqCreateOverlayFromMetafile(long metafile);
 
     public static void imaqSetCalibrationInfo(Image image, CalibrationUnit unit, float xDistance, float yDistance) {
         

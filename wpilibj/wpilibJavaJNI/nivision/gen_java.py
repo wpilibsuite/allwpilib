@@ -78,7 +78,7 @@ java_types_map = {
         ("long double", None): JavaType("double", "double", "jdouble", "D"),
         ("unsigned char*", None): JavaType("String", "String", "jstring", "Ljava/lang/String;"),
         ("char*", None): JavaType("String", "String", "jstring", "Ljava/lang/String;"),
-        #("void*", None): JavaType("c_void_p", "long", "jlong", "J"),
+        ("void*", None): JavaType("RawData", "long", "jlong", "J", is_opaque=True),
         #("size_t", None): JavaType("long", "long", "jlong", "J"),
         ("String255", None): JavaType("String", "String", "jstring", "Ljava/lang/String;", string_array=True, array_size="256"),
         ("String255", ""): JavaType("String[]", "String[]", "jstringArray", "[Ljava/lang/String;", string_array=True, array_size="256"),
@@ -981,11 +981,11 @@ public class {classname} {{
     private static abstract class OpaqueStruct {{
         private long nativeObj;
         private boolean owned;
-        private OpaqueStruct() {{
-            this.nativeObj = 0;
-            this.owned = false;
+        protected OpaqueStruct() {{
+            nativeObj = 0;
+            owned = false;
         }}
-        private OpaqueStruct(long nativeObj, boolean owned) {{
+        protected OpaqueStruct(long nativeObj, boolean owned) {{
             this.nativeObj = nativeObj;
             this.owned = owned;
         }}
@@ -1005,11 +1005,52 @@ public class {classname} {{
         public long getAddress() {{
             return nativeObj;
         }}
+    }}
+
+    public static class RawData {{
+        private ByteBuffer buf;
+        private boolean owned;
+        public RawData() {{
+            owned = false;
+        }}
+        public RawData(ByteBuffer buf) {{
+            this.buf = buf;
+            owned = false;
+        }}
+        private RawData(long nativeObj, boolean owned, int size) {{
+            buf = newDirectByteBuffer(nativeObj, size);
+            this.owned = owned;
+        }}
+        public void free() {{
+            if (owned) {{
+                imaqDispose(getByteBufferAddress(buf));
+                owned = false;
+                buf = null;
+            }}
+        }}
+        @Override
+        protected void finalize() throws Throwable {{
+            if (owned)
+                imaqDispose(getByteBufferAddress(buf));
+            super.finalize();
+        }}
+        public long getAddress() {{
+            if (buf == null)
+                return 0;
+            return getByteBufferAddress(buf);
+        }}
+        public ByteBuffer getBuffer() {{
+            return buf;
+        }}
+        public void setBuffer(ByteBuffer buf) {{
+            if (owned)
+                free();
+            this.buf = buf;
+        }}
     }}""".format(package=self.package, classname=self.classname), file=self.out)
 
         if int(self.config_struct.get("_platform_", "pointer")) == 4:
             # 32-bit addressing
-            java_types_map[("void*", None)] = JavaType("c_void_p", "int", "jint", "I")
             java_types_map[("size_t", None)] = JavaType("int", "int", "jint", "I")
             print("""
     private static long getPointer(ByteBuffer bb, int offset) {
@@ -1038,7 +1079,6 @@ public class {classname} {{
     }""", file=self.out)
         else:
             # 64-bit addressing
-            java_types_map[("void*", None)] = JavaType("c_void_p", "long", "jlong", "J")
             java_types_map[("size_t", None)] = JavaType("long", "long", "jlong", "J")
             print("""
     private static long getPointer(ByteBuffer bb, int offset) {
@@ -1346,6 +1386,12 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqDispose(JNIEnv* , jclass
             if retarraysize not in outparams:
                 outparams.append(retarraysize)
 
+        retsize = self.config_get(name, "retsize", "").strip()
+        if retsize:
+            size_params.add(retsize)
+            if retsize not in outparams:
+                outparams.append(retsize)
+
         retowned = not self.config_getboolean(name, "retunowned", False)
 
         # Input and output parameter code is generated with the help of
@@ -1384,9 +1430,6 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqDispose(JNIEnv* , jclass
             arr = field["arr"]
             is_pointer = field["is_pointer"]
             to_arg = field["to_arg"]
-
-            if jtype.j_type == "c_void_p":
-                raise NotImplementedError("void pointer not implemented")
 
             # input parameter generation
             if fname not in size_params:
@@ -1434,14 +1477,11 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqDispose(JNIEnv* , jclass
             else:
                 raise ValueError("unrecognized jni signature '%s'" % jtype.jni_sig)
 
-        if rettype.j_type == "c_void_p":
-            raise NotImplementedError("%s: void pointer not implemented")
-
         jrettype = rettype.j_type
 
         outstruct_name = None
-        #print(name, outparams, retarraysize)
-        if outparams or retarraysize:
+        #print(name, jrettype, outparams, retarraysize, retsize)
+        if outparams or retarraysize or retsize:
             # create a return buffer (TODO: optimize size)
             jinit.append("ByteBuffer rv_buf = ByteBuffer.allocateDirect(%d);" % ((len(outparams)+1)*8))
             jinit.append("long rv_addr = getByteBufferAddress(rv_buf);")
@@ -1473,8 +1513,6 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqDispose(JNIEnv* , jclass
             off = 0
             for fname, ftype, arr, comment in helper.fields:
                 field = helper.get_field_java_code(fname, ftype, arr, off, jfielddefs_private, backing="rv_buf")
-                if field["type"].j_type == "c_void_p":
-                    raise NotImplementedError("void pointer not implemented")
                 if fname == retarraysize:
                     jconstruct.append(field["fielddef"].replace("public ", "").replace(fname, "array_%s" % fname))
                     jconstruct.extend(x.replace(fname, "array_%s" % fname) for x in field["backing_read"])
@@ -1503,10 +1541,17 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqDispose(JNIEnv* , jclass
                 jretc = "return %s;" % outparams[0]
                 jrettype = paramtypes[outparams[0]][2].j_type
                 rettype = paramtypes[outparams[0]][2]
+            elif len(outparams) == 1 and retsize:
+                jfini.extend(x.replace("public ", "") for x in jfielddefs)
+                jfini.extend(jconstruct)
+                jfini.append("val = new {type}(jn_rv, {owned}, {size});".format(type=rettype.j_type, owned="true" if retowned else "false", size=retsize))
+                jretc = "return val;"
             else:
                 defined.add(outstruct_name)
                 jfini.append("{struct_name} rv = new {struct_name}({args});".format(struct_name=outstruct_name, args=", ".join(x[0] for x in jconstruct_args)))
-                if not retarraysize and functype != "STDFUNC":
+                if retsize:
+                    jfini.append("rv.val = new {type}(jn_rv, {owned}, rv.{size});".format(type=rettype.j_type, owned="true" if retowned else "false", size=retsize))
+                elif not retarraysize and functype != "STDFUNC":
                     jfini.append("rv.val = new {type}(jn_rv, {owned});".format(type=rettype.j_type, owned="true" if retowned else "false"))
 
                 jrettype = outstruct_name
