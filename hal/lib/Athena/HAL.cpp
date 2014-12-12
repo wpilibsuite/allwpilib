@@ -227,9 +227,9 @@ int HALGetMatchTime(float *matchTime)
 	return FRC_NetworkCommunication_getMatchTime(matchTime);
 }
 
-void HALSetNewDataSem(pthread_cond_t * param)
+void HALSetNewDataSem(MULTIWAIT_ID sem)
 {
-	setNewDataSem(param);
+	setNewDataSem(sem);
 }
 
 bool HALGetSystemActive(int32_t *status)
