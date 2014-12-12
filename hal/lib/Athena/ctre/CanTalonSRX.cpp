@@ -1006,3 +1006,222 @@ CTR_Code CanTalonSRX::SetRevFeedbackSensor(int param)
 	FlushTx(toFill);
 	return CTR_OKAY;
 }
+//------------------ C interface --------------------------------------------//
+extern "C" {
+void *c_TalonSRX_Create(int deviceNumber, int controlPeriodMs)
+{
+	return new CanTalonSRX(deviceNumber, controlPeriodMs);
+}
+void c_TalonSRX_Destroy(void *handle)
+{
+	delete (CanTalonSRX*)handle;
+}
+CTR_Code c_TalonSRX_SetParam(void *handle, int paramEnum, double value)
+{
+	return ((CanTalonSRX*)handle)->SetParam((CanTalonSRX::param_t)paramEnum, value);
+}
+CTR_Code c_TalonSRX_RequestParam(void *handle, int paramEnum)
+{
+	return ((CanTalonSRX*)handle)->RequestParam((CanTalonSRX::param_t)paramEnum);
+}
+CTR_Code c_TalonSRX_GetParamResponse(void *handle, int paramEnum, double *value)
+{
+	return ((CanTalonSRX*)handle)->GetParamResponse((CanTalonSRX::param_t)paramEnum, *value);
+}
+CTR_Code c_TalonSRX_GetParamResponseInt32(void *handle, int paramEnum, int *value)
+{
+	return ((CanTalonSRX*)handle)->GetParamResponseInt32((CanTalonSRX::param_t)paramEnum, *value);
+}
+CTR_Code c_TalonSRX_SetStatusFrameRate(void *handle, unsigned frameEnum, unsigned periodMs)
+{
+	return ((CanTalonSRX*)handle)->SetStatusFrameRate(frameEnum, periodMs);
+}
+CTR_Code c_TalonSRX_ClearStickyFaults(void *handle)
+{
+	return ((CanTalonSRX*)handle)->ClearStickyFaults();
+}
+CTR_Code c_TalonSRX_GetFault_OverTemp(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetFault_OverTemp(*param);
+}
+CTR_Code c_TalonSRX_GetFault_UnderVoltage(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetFault_UnderVoltage(*param);
+}
+CTR_Code c_TalonSRX_GetFault_ForLim(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetFault_ForLim(*param);
+}
+CTR_Code c_TalonSRX_GetFault_RevLim(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetFault_RevLim(*param);
+}
+CTR_Code c_TalonSRX_GetFault_HardwareFailure(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetFault_HardwareFailure(*param);
+}
+CTR_Code c_TalonSRX_GetFault_ForSoftLim(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetFault_ForSoftLim(*param);
+}
+CTR_Code c_TalonSRX_GetFault_RevSoftLim(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetFault_RevSoftLim(*param);
+}
+CTR_Code c_TalonSRX_GetStckyFault_OverTemp(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetStckyFault_OverTemp(*param);
+}
+CTR_Code c_TalonSRX_GetStckyFault_UnderVoltage(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetStckyFault_UnderVoltage(*param);
+}
+CTR_Code c_TalonSRX_GetStckyFault_ForLim(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetStckyFault_ForLim(*param);
+}
+CTR_Code c_TalonSRX_GetStckyFault_RevLim(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetStckyFault_RevLim(*param);
+}
+CTR_Code c_TalonSRX_GetStckyFault_ForSoftLim(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetStckyFault_ForSoftLim(*param);
+}
+CTR_Code c_TalonSRX_GetStckyFault_RevSoftLim(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetStckyFault_RevSoftLim(*param);
+}
+CTR_Code c_TalonSRX_GetAppliedThrottle(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetAppliedThrottle(*param);
+}
+CTR_Code c_TalonSRX_GetCloseLoopErr(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetCloseLoopErr(*param);
+}
+CTR_Code c_TalonSRX_GetFeedbackDeviceSelect(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetFeedbackDeviceSelect(*param);
+}
+CTR_Code c_TalonSRX_GetModeSelect(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetModeSelect(*param);
+}
+CTR_Code c_TalonSRX_GetLimitSwitchEn(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetLimitSwitchEn(*param);
+}
+CTR_Code c_TalonSRX_GetLimitSwitchClosedFor(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetLimitSwitchClosedFor(*param);
+}
+CTR_Code c_TalonSRX_GetLimitSwitchClosedRev(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetLimitSwitchClosedRev(*param);
+}
+CTR_Code c_TalonSRX_GetSensorPosition(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetSensorPosition(*param);
+}
+CTR_Code c_TalonSRX_GetSensorVelocity(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetSensorVelocity(*param);
+}
+CTR_Code c_TalonSRX_GetCurrent(void *handle, double *param)
+{
+	return ((CanTalonSRX*)handle)->GetCurrent(*param);
+}
+CTR_Code c_TalonSRX_GetBrakeIsEnabled(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetBrakeIsEnabled(*param);
+}
+CTR_Code c_TalonSRX_GetEncPosition(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetEncPosition(*param);
+}
+CTR_Code c_TalonSRX_GetEncVel(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetEncVel(*param);
+}
+CTR_Code c_TalonSRX_GetEncIndexRiseEvents(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetEncIndexRiseEvents(*param);
+}
+CTR_Code c_TalonSRX_GetQuadApin(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetQuadApin(*param);
+}
+CTR_Code c_TalonSRX_GetQuadBpin(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetQuadBpin(*param);
+}
+CTR_Code c_TalonSRX_GetQuadIdxpin(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetQuadIdxpin(*param);
+}
+CTR_Code c_TalonSRX_GetAnalogInWithOv(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetAnalogInWithOv(*param);
+}
+CTR_Code c_TalonSRX_GetAnalogInVel(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetAnalogInVel(*param);
+}
+CTR_Code c_TalonSRX_GetTemp(void *handle, double *param)
+{
+	return ((CanTalonSRX*)handle)->GetTemp(*param);
+}
+CTR_Code c_TalonSRX_GetBatteryV(void *handle, double *param)
+{
+	return ((CanTalonSRX*)handle)->GetBatteryV(*param);
+}
+CTR_Code c_TalonSRX_GetResetCount(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetResetCount(*param);
+}
+CTR_Code c_TalonSRX_GetResetFlags(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetResetFlags(*param);
+}
+CTR_Code c_TalonSRX_GetFirmVers(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetFirmVers(*param);
+}
+CTR_Code c_TalonSRX_SetDemand(void *handle, int param)
+{
+	return ((CanTalonSRX*)handle)->SetDemand(param);
+}
+CTR_Code c_TalonSRX_SetOverrideLimitSwitchEn(void *handle, int param)
+{
+	return ((CanTalonSRX*)handle)->SetOverrideLimitSwitchEn(param);
+}
+CTR_Code c_TalonSRX_SetFeedbackDeviceSelect(void *handle, int param)
+{
+	return ((CanTalonSRX*)handle)->SetFeedbackDeviceSelect(param);
+}
+CTR_Code c_TalonSRX_SetRevMotDuringCloseLoopEn(void *handle, int param)
+{
+	return ((CanTalonSRX*)handle)->SetRevMotDuringCloseLoopEn(param);
+}
+CTR_Code c_TalonSRX_SetOverrideBrakeType(void *handle, int param)
+{
+	return ((CanTalonSRX*)handle)->SetOverrideBrakeType(param);
+}
+CTR_Code c_TalonSRX_SetModeSelect(void *handle, int param)
+{
+	return ((CanTalonSRX*)handle)->SetModeSelect(param);
+}
+CTR_Code c_TalonSRX_SetProfileSlotSelect(void *handle, int param)
+{
+	return ((CanTalonSRX*)handle)->SetProfileSlotSelect(param);
+}
+CTR_Code c_TalonSRX_SetRampThrottle(void *handle, int param)
+{
+	return ((CanTalonSRX*)handle)->SetRampThrottle(param);
+}
+CTR_Code c_TalonSRX_SetRevFeedbackSensor(void *handle, int param)
+{
+	return ((CanTalonSRX*)handle)->SetRevFeedbackSensor(param);
+}
+}
