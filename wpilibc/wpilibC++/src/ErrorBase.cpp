@@ -91,11 +91,11 @@ void ErrorBase::SetImaqError(int success, const char *contextMessage, const char
 {
 	//  If there was an error
 	if (success <= 0) {
-		//TODO: ??? char err[256];
-		// XXX: sprintf(err, "%s: %s", contextMessage, imaqGetErrorText(imaqGetLastError()));
+		char err[256];
+		sprintf(err, "%i: %s", success, contextMessage);
 
 		//  Set the current error information for this object.
-		// XXX: m_error.Set(imaqGetLastError(), err, filename, function, lineNumber, this);
+		m_error.Set(success, err, filename, function, lineNumber, this);
 
 		// Update the global error if there is not one already set.
 		Synchronized mutex(_globalErrorMutex);
