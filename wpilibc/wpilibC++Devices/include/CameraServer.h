@@ -25,7 +25,7 @@ class CameraServer : public ErrorBase {
 	static constexpr uint32_t kSize320x240 = 1;
 	static constexpr uint32_t kSize160x120 = 2;
 	static constexpr int32_t kHardwareCompression = -1;
-	static constexpr char const *kDefaultCameraName = "cam1";
+	static constexpr char const *kDefaultCameraName = "cam0";
 
 public:
 	static CameraServer *GetInstance();
