@@ -13,8 +13,10 @@ void serialInitializePort(uint8_t port, int32_t *status) {
 	
 	if(port == 0)
 		portName = "ASRL1::INSTR";
-	else
+	else if (port == 1)
 		portName = "ASRL2::INSTR";
+	else
+		portName = "ASRL3::INSTR";
 
 	*status = viOpen(m_resourceManagerHandle, const_cast<char*>(portName), VI_NULL, VI_NULL, (ViSession*)&m_portHandle[port]);
 	if(*status > 0)

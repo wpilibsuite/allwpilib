@@ -36,7 +36,8 @@ public class SerialPort {
 	
 	public enum Port {
 		kOnboard(0), 
-		kMXP(1);
+		kMXP(1),
+		kUSB(2);
 		
 		private int value;
 		
