@@ -31,7 +31,7 @@ public class VictorSP extends SafePWM implements SpeedController {
      *   - .989ms = full "reverse"
      */
     protected void initVictorSP() {
-        setBounds(2.001, 1.52, 1.50, 1.48, 0.999);
+        setBounds(2.004, 1.52, 1.50, 1.48, .997);
         setPeriodMultiplier(PeriodMultiplier.k1X);
         setRaw(m_centerPwm);
 		setZeroLatch();

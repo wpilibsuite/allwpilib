@@ -19,7 +19,7 @@
  *
  */
 void TalonSRX::InitTalonSRX() {
-	SetBounds(2.001, 1.52, 1.50, 1.48, .999);
+	SetBounds(2.004, 1.52, 1.50, 1.48, .997);
 	SetPeriodMultiplier(kPeriodMultiplier_1X);
 	SetRaw(m_centerPwm);
 	SetZeroLatch();
