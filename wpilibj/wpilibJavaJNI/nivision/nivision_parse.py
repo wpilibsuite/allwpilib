@@ -7,14 +7,14 @@ __all__ = ["define_after_struct", "defined", "forward_structs", "opaque_structs"
 # parser regular expressions
 number_re = re.compile(r'-?[0-9]+')
 constant_re = re.compile(r'[A-Z0-9_]+')
-define_re = re.compile(r'^#define\s+(?P<name>(IMAQ|ERR)_[A-Z0-9_]+)\s+(?P<value>.*)')
+define_re = re.compile(r'^#define\s+(?P<name>(IMAQ|ERR)[A-Z0-9_]+)\s+(?P<value>.*)')
 enum_re = re.compile(r'^typedef\s+enum\s+(?P<name>[A-Za-z0-9]+)_enum\s*{')
-enum_value_re = re.compile(r'^\s*(?P<name>[A-Z0-9_]+)\s*=\s*(?P<value>-?[0-9A-Fx]+)\s*,?')
+enum_value_re = re.compile(r'^\s*(?P<name>[A-Za-z0-9_]+)\s*(=\s*(?P<value>-?[0-9A-Fx]+))?\s*,?')
 struct_re = re.compile(r'^typedef\s+struct\s+(?P<name>[A-Za-z0-9]+)_struct\s*{')
 union_re = re.compile(r'^typedef\s+union\s+(?P<name>[A-Za-z0-9]+)_union\s*{')
-func_pointer_re = re.compile(r'(?P<restype>[A-Za-z0-9_*]+)\s*\(\s*[A-Za-z0-9_]*[*]\s*(?P<name>[A-Za-z0-9_]+)\s*\)\s*\((?P<params>[^)]*)\)')
+func_pointer_re = re.compile(r'\s*(?P<restype>[A-Za-z0-9_*]+)\s*\(\s*[A-Za-z0-9_]*\s*[*]\s*(?P<name>[A-Za-z0-9_]+)\s*\)\s*\((?P<params>[^)]*)\)')
 static_const_re = re.compile(r'^static\s+const\s+(?P<type>[A-Za-z0-9_]+)\s+(?P<name>[A-Za-z0-9_]+)\s*=\s*(?P<value>[^;]+);')
-function_re = re.compile(r'^(IMAQ_FUNC\s+)?(?P<restype>(const\s+)?[A-Za-z0-9_*]+)\s+(IMAQ_STDCALL\s+)?(?P<name>[A-Za-z0-9_]+)\s*\((?P<params>[^)]*)\);')
+function_re = re.compile(r'^((IMAQ|NI)_FUNC\s+)?(?P<restype>(const\s+)?[A-Za-z0-9_*]+)\s+((IMAQ_STDCALL|NI_FUNC[C]?)\s+)?(?P<name>[A-Za-z0-9_]+)\s*\((?P<params>[^)]*)\);')
 
 # defines deferred until after structures
 define_after_struct = []
@@ -214,6 +214,12 @@ def parse_file(emit, f, block_comment_exclude):
             continue
 
         if not code or code[0] == '#':
+            continue
+
+        if not code or code[0] == '#':
+            continue
+
+        if code == 'extern "C" {' or code == "}":
             continue
 
         print("%d: Unrecognized: %s" % (lineno+1, code))

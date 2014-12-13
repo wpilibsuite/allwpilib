@@ -11,6 +11,9 @@ bin/
 .classpath
 **/dependency-reduced-pom.xml
 wpilibj/wpilibJavaJNI/nivision/*.c
+wpilibj/wpilibJavaJNI/nivision/*.cpp
+wpilibj/wpilibJavaJNI/nivision/*.s
+wpilibj/wpilibJavaJNI/nivision/*_arm.ini
 wpilibj/wpilibJavaJNI/nivision/*.java
 
 # Created by the jenkins test script

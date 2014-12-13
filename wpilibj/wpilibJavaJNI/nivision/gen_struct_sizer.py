@@ -10,16 +10,18 @@ except ImportError:
 from nivision_parse import *
 
 class StructSizerEmitter:
-    def __init__(self, out, config):
+    def __init__(self, out, config, hname):
         self.out = out
         self.config = config
         print("""#include <stdio.h>
-#include <nivision.h>
+#include <stddef.h>
+#include <{hname}>
 
 int main()
-{
-    printf("[_platform_]\\npointer=%d\\n", (int)sizeof(void*));
-""", file=self.out)
+{{
+    asm("#STRUCT_SIZER [_platform_]\\n");
+    asm("#STRUCT_SIZER pointer=%0\\n" : : "n"((int)sizeof(void*)));
+""".format(hname=hname), file=self.out)
 
     def finish(self):
         print("}", file=self.out)
@@ -67,12 +69,13 @@ int main()
         if name in opaque_structs:
             return
 
-        print('printf("[{name}]\\n_SIZE_=%d\\n", (int)sizeof({name}));'.format(name=name), file=self.out)
+        print('asm("#STRUCT_SIZER [{name}]\\n");'.format(name=name), file=self.out)
+        print('asm("#STRUCT_SIZER _SIZE_=%0\\n" : : "n"((int)sizeof({name})));'.format(name=name), file=self.out)
 
         for fname, ftype, arr, comment in fields:
             if ':' in fname:
                 continue # can't handle bitfields
-            print('printf("{field}=%d\\n", (int)offsetof({name}, {field}));'.format(name=name, field=fname), file=self.out)
+            print('asm("#STRUCT_SIZER {field}=%0\\n" : : "n"((int)offsetof({name}, {field})));'.format(name=name, field=fname), file=self.out)
 
     def struct(self, name, fields):
         self.structunion("Structure", name, fields)
@@ -80,7 +83,7 @@ int main()
     def union(self, name, fields):
         self.structunion("Union", name, fields)
 
-def generate(srcdir, configpath=None, nivisionhpath=None):
+def generate(srcdir, configpath=None, hpath=None):
     # read config file
     config = configparser.ConfigParser()
     config.read(configpath)
@@ -88,7 +91,7 @@ def generate(srcdir, configpath=None, nivisionhpath=None):
             config.get("Block Comment", "exclude").splitlines())
 
     # open input file
-    inf = open(nivisionhpath)
+    inf = open(hpath)
 
     # prescan for undefined structures
     prescan_file(inf)
@@ -96,18 +99,16 @@ def generate(srcdir, configpath=None, nivisionhpath=None):
 
     # generate
     with open("struct_sizer.c", "wt") as out:
-        emit = StructSizerEmitter(out, config)
+        emit = StructSizerEmitter(out, config, os.path.basename(hpath))
         parse_file(emit, inf, block_comment_exclude)
         emit.finish()
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: gen_struct_sizer.py <nivision.h> [config.ini]")
+    if len(sys.argv) != 3:
+        print("Usage: gen_struct_sizer.py <header.h> <config.ini>")
         exit(0)
 
     fname = sys.argv[1]
-    configname = "nivision_2011.ini"
-    if len(sys.argv) >= 3:
-        configname = sys.argv[2]
+    configname = sys.argv[2]
 
     generate("", configname, fname)
