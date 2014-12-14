@@ -28,6 +28,7 @@ public:
     EncFalling=5
   };
 	explicit CANTalon(int deviceNumber);
+	explicit CANTalon(int deviceNumber,int controlPeriodMs);
 	virtual ~CANTalon();
 
 	// PIDController interface

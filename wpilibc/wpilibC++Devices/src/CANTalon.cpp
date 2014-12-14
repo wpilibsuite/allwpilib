@@ -24,7 +24,24 @@ CANTalon::CANTalon(int deviceNumber)
   SetControlMode(m_controlMode);
   m_impl->SetProfileSlotSelect(m_profile);
 }
-
+/**
+ * Constructor for the CANTalon device.
+ * @param deviceNumber The CAN ID of the Talon SRX
+ * @param controlPeriodMs The period in ms to send the CAN control frame.
+ *							Period is bounded to [1ms, 95ms].
+ */
+CANTalon::CANTalon(int deviceNumber,int controlPeriodMs)
+	: m_deviceNumber(deviceNumber)
+	, m_impl(new CanTalonSRX(deviceNumber,controlPeriodMs)) /* bounded underneath to be within [1 ms,95 ms] */
+	, m_safetyHelper(new MotorSafetyHelper(this))
+  , m_profile(0)
+  , m_controlEnabled(true)
+  , m_controlMode(kPercentVbus)
+  , m_setPoint(0)
+{
+  SetControlMode(m_controlMode);
+  m_impl->SetProfileSlotSelect(m_profile);
+}
 CANTalon::~CANTalon() {
 	delete m_impl;
 	delete m_safetyHelper;

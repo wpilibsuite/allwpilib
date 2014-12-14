@@ -242,6 +242,11 @@ typedef struct _TALON_Param_Response_t {
 
 CanTalonSRX::CanTalonSRX(int deviceNumber,int controlPeriodMs): CtreCanNode(deviceNumber), _can_h(0), _can_stat(0)
 {
+	/* bound period to be within [1 ms,95 ms] */
+	if(controlPeriodMs < 1)
+		controlPeriodMs = 1;
+	else if(controlPeriodMs > 95)
+		controlPeriodMs = 95;
 	RegisterRx(STATUS_1 | (UINT8)deviceNumber );
 	RegisterRx(STATUS_2 | (UINT8)deviceNumber );
 	RegisterRx(STATUS_3 | (UINT8)deviceNumber );
