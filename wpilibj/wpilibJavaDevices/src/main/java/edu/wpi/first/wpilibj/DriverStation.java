@@ -299,9 +299,9 @@ public class DriverStation implements RobotState.Interface {
 			reportJoystickUnpluggedError("WARNING: Joystick Button " + button + " on port " + stick + " not available, check if controller is plugged in\n");
             return false;
 		}
-		if(button == 0)
+		if(button <= 0)
 		{
-			reportJoystickUnpluggedError("ERROR: Button indexes begin at 1 in WPILib for C++ and Java");
+			reportJoystickUnpluggedError("ERROR: Button indexes begin at 1 in WPILib for C++ and Java\n");
 			return false;
 		}
 		return ((0x1 << (button - 1)) & m_joystickButtons[stick].buttons) != 0;
