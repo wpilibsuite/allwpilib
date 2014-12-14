@@ -129,4 +129,5 @@ private:
   TalonControlMode m_sendMode;
 
   double m_setPoint;
+  static const unsigned int kDelayForSolicitedSignalsUs = 4000;
 };

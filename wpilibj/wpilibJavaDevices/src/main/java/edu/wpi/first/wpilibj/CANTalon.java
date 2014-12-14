@@ -21,7 +21,6 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
 		PercentVbus(0), Follower(5), Voltage(4), Position(1), Speed(2), Current(3), Disabled(15);
 
     public int value;
-
     public static ControlMode valueOf(int value) {
 			for(ControlMode mode : values()) {
 				if(mode.value == value) {
@@ -59,6 +58,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
 
   private CanTalonSRX m_impl;
   ControlMode m_controlMode;
+  private static double kDelayForSolicitedSignals = 0.004;
 
   int m_deviceNumber;
   boolean m_controlEnabled;
@@ -69,6 +69,16 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
   public CANTalon(int deviceNumber) {
     m_deviceNumber = deviceNumber;
     m_impl = new CanTalonSRX(deviceNumber);
+    m_safetyHelper = new MotorSafetyHelper(this);
+    m_controlEnabled = true;
+    m_profile = 0;
+    m_setPoint = 0;
+    setProfile(m_profile);
+    changeControlMode(ControlMode.PercentVbus);
+  }
+  public CANTalon(int deviceNumber,int controlPeriodMs) {
+    m_deviceNumber = deviceNumber;
+    m_impl = new CanTalonSRX(deviceNumber,controlPeriodMs); /* bound period to be within [1 ms,95 ms] */
     m_safetyHelper = new MotorSafetyHelper(this);
     m_controlEnabled = true;
     m_profile = 0;
@@ -375,7 +385,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
       m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_P);
 
     // Briefly wait for new values from the Talon.
-    Timer.delay(0.001);
+    Timer.delay(kDelayForSolicitedSignals);
 
     long pp = CanTalonJNI.new_doublep();
     m_impl.GetPgain(m_profile, new SWIGTYPE_p_double(pp, true));
@@ -394,7 +404,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
       m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_I);
 
     // Briefly wait for new values from the Talon.
-    Timer.delay(0.001);
+    Timer.delay(kDelayForSolicitedSignals);
 
     long ip = CanTalonJNI.new_doublep();
     m_impl.GetIgain(m_profile, new SWIGTYPE_p_double(ip, true));
@@ -413,7 +423,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
       m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_D);
 
     // Briefly wait for new values from the Talon.
-    Timer.delay(0.001);
+    Timer.delay(kDelayForSolicitedSignals);
 
     long dp = CanTalonJNI.new_doublep();
     m_impl.GetDgain(m_profile, new SWIGTYPE_p_double(dp, true));
@@ -432,7 +442,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
       m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_F);
 
     // Briefly wait for new values from the Talon.
-    Timer.delay(0.001);
+    Timer.delay(kDelayForSolicitedSignals);
 
     long fp = CanTalonJNI.new_doublep();
     m_impl.GetFgain(m_profile, new SWIGTYPE_p_double(fp, true));
@@ -451,7 +461,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
       m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_IZone);
 
     // Briefly wait for new values from the Talon.
-    Timer.delay(0.001);
+    Timer.delay(kDelayForSolicitedSignals);
 
     long fp = CanTalonJNI.new_intp();
     m_impl.GetIzone(m_profile, new SWIGTYPE_p_int(fp, true));
@@ -478,7 +488,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
       m_impl.RequestParam(CanTalonSRX.param_t.eProfileParamSlot1_CloseLoopRampRate);
 
     // Briefly wait for new values from the Talon.
-    Timer.delay(0.001);
+    Timer.delay(kDelayForSolicitedSignals);
 
     long fp = CanTalonJNI.new_intp();
     m_impl.GetCloseLoopRampRate(m_profile, new SWIGTYPE_p_int(fp, true));
@@ -494,7 +504,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     m_impl.RequestParam(CanTalonSRX.param_t.eFirmVers);
 
     // Briefly wait for new values from the Talon.
-    Timer.delay(0.001);
+    Timer.delay(kDelayForSolicitedSignals);
 
     long fp = CanTalonJNI.new_intp();
     m_impl.GetParamResponseInt32(CanTalonSRX.param_t.eFirmVers, new SWIGTYPE_p_int(fp, true));
@@ -506,7 +516,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     m_impl.RequestParam(CanTalonSRX.param_t.ePidIaccum);
 
     // Briefly wait for new values from the Talon.
-    Timer.delay(0.001);
+    Timer.delay(kDelayForSolicitedSignals);
 
     long fp = CanTalonJNI.new_intp();
     m_impl.GetParamResponseInt32(CanTalonSRX.param_t.ePidIaccum, new SWIGTYPE_p_int(fp, true));

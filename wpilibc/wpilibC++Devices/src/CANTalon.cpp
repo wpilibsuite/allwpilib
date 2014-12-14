@@ -286,7 +286,7 @@ double CANTalon::GetP()
 	if(status != CTR_OKAY) {
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
   }
-  usleep(1000); /* small yield for getting response */
+  usleep(kDelayForSolicitedSignalsUs); /* small yield for getting response */
   double p;
   status = m_impl->GetPgain(m_profile, p);
 	if(status != CTR_OKAY) {
@@ -307,7 +307,7 @@ double CANTalon::GetI()
 	if(status != CTR_OKAY) {
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
   }
-	usleep(1000); /* small yield for getting response */
+	usleep(kDelayForSolicitedSignalsUs); /* small yield for getting response */
 
   double i;
   status = m_impl->GetIgain(m_profile, i);
@@ -329,7 +329,7 @@ double CANTalon::GetD()
 	if(status != CTR_OKAY) {
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
   }
-	usleep(1000); /* small yield for getting response */
+	usleep(kDelayForSolicitedSignalsUs); /* small yield for getting response */
 
   double d;
   status = m_impl->GetDgain(m_profile, d);
@@ -351,7 +351,7 @@ double CANTalon::GetF()
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
   }
 
-	usleep(1000);  /* small yield for getting response */
+	usleep(kDelayForSolicitedSignalsUs);  /* small yield for getting response */
   double f;
   status = m_impl->GetFgain(m_profile, f);
 	if(status != CTR_OKAY) {
@@ -370,7 +370,7 @@ int CANTalon::GetIzone()
 	if(status != CTR_OKAY) {
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
  }
-	usleep(1000);
+	usleep(kDelayForSolicitedSignalsUs);
 
  int iz;
  status = m_impl->GetIzone(m_profile, iz);
@@ -865,7 +865,7 @@ uint32_t CANTalon::GetFirmwareVersion()
 	if(status != CTR_OKAY) {
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
-	usleep(1000);
+	usleep(kDelayForSolicitedSignalsUs);
 	status = m_impl->GetParamResponseInt32(CanTalonSRX::eFirmVers,firmwareVersion);
 	if(status != CTR_OKAY) {
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -888,7 +888,7 @@ int CANTalon::GetIaccum()
 	if(status != CTR_OKAY) {
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
-	usleep(1000); /* small yield for getting response */
+	usleep(kDelayForSolicitedSignalsUs); /* small yield for getting response */
 	int iaccum;
 	status = m_impl->GetParamResponseInt32(CanTalonSRX::ePidIaccum,iaccum);
 	if(status != CTR_OKAY) {
