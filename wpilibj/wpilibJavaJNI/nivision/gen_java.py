@@ -17,6 +17,7 @@ java_accessor_map = {
         "J": "Long",
         "F": "Float",
         "D": "Double",
+        "Z": "Boolean",
         }
 
 java_size_map = {
@@ -27,6 +28,7 @@ java_size_map = {
         "J": 8,
         "F": 4,
         "D": 8,
+        "Z": 1,
         }
 
 class JavaType:
@@ -66,6 +68,9 @@ java_types_map = {
         ("unsigned short", None): JavaType("int", "int", "jint", "I"),
         ("unsigned", None): JavaType("int", "int", "jint", "I"),
         ("unsigned int", None): JavaType("int", "int", "jint", "I"),
+        ("uInt32", None): JavaType("int", "int", "jint", "I"),
+        ("IMAQdxSession", None): JavaType("int", "int", "jint", "I"),
+        ("bool32", None): JavaType("boolean", "boolean", "jboolean", "Z"),
         ("long", None): JavaType("long", "long", "jlong", "J"),
         ("unsigned long", None): JavaType("long", "long", "jlong", "J"),
         ("__int64", None): JavaType("long", "long", "jlong", "J"),
@@ -88,6 +93,7 @@ java_types_map = {
         ("short", ""): JavaType("short[]", "short[]", "jshortArray", "[S"),
         ("int", ""): JavaType("int[]", "int[]", "jintArray", "[I"),
         ("unsigned int", ""): JavaType("int[]", "int[]", "jintArray", "[I"),
+        ("uInt32", ""): JavaType("int[]", "int[]", "jintArray", "[I"),
         ("long", ""): JavaType("long[]", "long[]", "jlongArray", "[J"),
         ("float", ""): JavaType("float[]", "float[]", "jfloatArray", "[F"),
         ("double", ""): JavaType("double[]", "double[]", "jdoubleArray", "[D"),
@@ -1117,6 +1123,7 @@ public class {classname} {{
 #include <assert.h>
 #include <jni.h>
 #include <nivision.h>
+#include <NIIMAQdx.h>
 
 // throw java exception
 static void throwJavaException(JNIEnv *env) {{
@@ -1126,6 +1133,18 @@ static void throwJavaException(JNIEnv *env) {{
     char* full_err_msg = (char*)malloc(30+strlen(err_text));
     sprintf(full_err_msg, "imaqError: %d: %s", err, err_text);
     imaqDispose(err_text);
+    env->ThrowNew(je, full_err_msg);
+    free(full_err_msg);
+}}
+
+// throw IMAQdx java exception
+static void dxthrowJavaException(JNIEnv *env, IMAQdxError err) {{
+    jclass je = env->FindClass("{packagepath}/VisionException");
+    char* err_text = (char*)malloc(200);
+    IMAQdxGetErrorString(err, err_text, 200);
+    char* full_err_msg = (char*)malloc(250);
+    sprintf(full_err_msg, "IMAQdxError: %d: %s", err, err_text);
+    free(err_text);
     env->ThrowNew(je, full_err_msg);
     free(full_err_msg);
 }}
@@ -1260,8 +1279,13 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqDispose(JNIEnv* , jclass
                 continue
             if vname.startswith("IMAQ_"):
                 vname = vname[5:]
+            if vname.startswith("IMAQdx"):
+                vname = vname[6:]
             if vname[0] in "0123456789":
                 vname = "C" + vname
+            if value is None:
+                # auto-increment
+                value = "%d" % (prev_value + 1)
             valuestrs.append("%s(%s),%s" % (vname, value, " // %s" % comment if comment else ""))
             defined.add(vname)
             value_i = int(value, 0)
@@ -1344,6 +1368,10 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqDispose(JNIEnv* , jclass
             functype = "STDFUNC"
             rettype = c_to_jtype("void", None)
             exceptioncheck = "if (rv == 0) throwJavaException(env);"
+        elif restype == "IMAQdxError":
+            functype = "STDFUNC"
+            rettype = c_to_jtype("void", None)
+            exceptioncheck = "if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);"
         else:
             if restype[-1] == "*":
                 functype = "STDPTRFUNC"
@@ -1680,36 +1708,45 @@ JNIEXPORT {rettype} JNICALL Java_{package}_{classname}__1{name}({args})
     def union(self, name, fields):
         self.unions[name] = fields
 
-def generate(srcdir, outdir, config_struct_path, configpath, nivisionhpath):
-    # read config files
-    config_struct = configparser.ConfigParser()
-    config_struct.read(config_struct_path)
-    config = configparser.ConfigParser()
-    config.read(configpath)
-    block_comment_exclude = set(x.strip() for x in
-            config.get("Block Comment", "exclude").splitlines())
+def generate(srcdir, outdir, inputs):
+    emit = None
 
-    # open input file
-    inf = open(nivisionhpath)
+    for fname, config_struct_path, configpath in inputs:
+        # read config files
+        config_struct = configparser.ConfigParser()
+        config_struct.read(config_struct_path)
+        config = configparser.ConfigParser()
+        config.read(configpath)
+        block_comment_exclude = set(x.strip() for x in
+                config.get("Block Comment", "exclude").splitlines())
 
-    # prescan for undefined structures
-    prescan_file(inf)
-    inf.seek(0)
+        # open input file
+        with open(fname) as inf:
+            # prescan for undefined structures
+            prescan_file(inf)
+            inf.seek(0)
 
-    # generate
-    emit = JavaEmitter(outdir, config, config_struct)
-    parse_file(emit, inf, block_comment_exclude)
+            if emit is None:
+                emit = JavaEmitter(outdir, config, config_struct)
+            else:
+                emit.config = config
+                emit.config_struct = config_struct
+
+            # generate
+            parse_file(emit, inf, block_comment_exclude)
+
     emit.finish()
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("Usage: gen_wrap.py <nivision.h> config_struct.ini [config.ini]")
+    if len(sys.argv) < 4 or ((len(sys.argv)-1) % 3) != 0:
+        print("Usage: gen_wrap.py <header.h config_struct.ini config.ini>...")
         exit(0)
 
-    fname = sys.argv[1]
-    config_struct_name = sys.argv[2]
-    configname = "nivision_2011.ini"
-    if len(sys.argv) >= 4:
-        configname = sys.argv[3]
+    inputs = []
+    for i in range(1, len(sys.argv), 3):
+        fname = sys.argv[i]
+        config_struct_name = sys.argv[i+1]
+        configname = sys.argv[i+2]
+        inputs.append((fname, config_struct_name, configname))
 
-    generate("", "", config_struct_name, configname, fname)
+    generate("", "", inputs)

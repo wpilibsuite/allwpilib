@@ -2133,17 +2133,61 @@ public class NIVision {
 
     public static enum QRDimensions {
         QR_DIMENSIONS_AUTO_DETECT(0), // The function will automatically determine the dimensions of the QR code.
+        QR_DIMENSIONS_11x11(11), // Specifies the dimensions of the QR code as 11 x 11.
+        QR_DIMENSIONS_13x13(13), // Specifies the dimensions of the QR code as 13 x 13.
+        QR_DIMENSIONS_15x15(15), // Specifies the dimensions of the QR code as 15 x 15.
+        QR_DIMENSIONS_17x17(17), // Specifies the dimensions of the QR code as 17 x 17.
+        QR_DIMENSIONS_21x21(21), // Specifies the dimensions of the QR code as 21 x 21.
+        QR_DIMENSIONS_25x25(25), // Specifies the dimensions of the QR code as 25 x 25.
+        QR_DIMENSIONS_29x29(29), // Specifies the dimensions of the QR code as 29 x 29.
+        QR_DIMENSIONS_33x33(33), // Specifies the dimensions of the QR code as 33 x 33.
+        QR_DIMENSIONS_37x37(37), // Specifies the dimensions of the QR code as 37 x 37.
+        QR_DIMENSIONS_41x41(41), // Specifies the dimensions of the QR code as 41 x 41.
+        QR_DIMENSIONS_45x45(45), // Specifies the dimensions of the QR code as 45 x 45.
+        QR_DIMENSIONS_49x49(49), // Specifies the dimensions of the QR code as 49 x 49.
+        QR_DIMENSIONS_53x53(53), // Specifies the dimensions of the QR code as 53 x 53.
+        QR_DIMENSIONS_57x57(57), // Specifies the dimensions of the QR code as 57 x 57.
+        QR_DIMENSIONS_61x61(61), // Specifies the dimensions of the QR code as 61 x 61.
+        QR_DIMENSIONS_65x65(65), // Specifies the dimensions of the QR code as 65 x 65.
+        QR_DIMENSIONS_69x69(69), // Specifies the dimensions of the QR code as 69 x 69.
+        QR_DIMENSIONS_73x73(73), // Specifies the dimensions of the QR code as 73 x 73.
+        QR_DIMENSIONS_77x77(77), // Specifies the dimensions of the QR code as 77 x 77.
+        QR_DIMENSIONS_81x81(81), // Specifies the dimensions of the QR code as 81 x 81.
+        QR_DIMENSIONS_85x85(85), // Specifies the dimensions of the QR code as 85 x 85.
+        QR_DIMENSIONS_89x89(89), // Specifies the dimensions of the QR code as 89 x 89.
+        QR_DIMENSIONS_93x93(93), // Specifies the dimensions of the QR code as 93 x 93.
+        QR_DIMENSIONS_97x97(97), // Specifies the dimensions of the QR code as 97 x 97.
+        QR_DIMENSIONS_101x101(101), // Specifies the dimensions of the QR code as 101 x 101.
+        QR_DIMENSIONS_105x105(105), // Specifies the dimensions of the QR code as 105 x 105.
+        QR_DIMENSIONS_109x109(109), // Specifies the dimensions of the QR code as 109 x 109.
+        QR_DIMENSIONS_113x113(113), // Specifies the dimensions of the QR code as 113 x 113.
+        QR_DIMENSIONS_117x117(117), // Specifies the dimensions of the QR code as 117 x 117.
+        QR_DIMENSIONS_121x121(121), // Specifies the dimensions of the QR code as 121 x 121.
+        QR_DIMENSIONS_125x125(125), // Specifies the dimensions of the QR code as 125 x 125.
+        QR_DIMENSIONS_129x129(129), // Specifies the dimensions of the QR code as 129 x 129.
+        QR_DIMENSIONS_133x133(133), // Specifies the dimensions of the QR code as 133 x 133.
+        QR_DIMENSIONS_137x137(137), // Specifies the dimensions of the QR code as 137 x 137.
+        QR_DIMENSIONS_141x141(141), // Specifies the dimensions of the QR code as 141 x 141.
+        QR_DIMENSIONS_145x145(145), // Specifies the dimensions of the QR code as 145 x 145.
+        QR_DIMENSIONS_149x149(149), // Specifies the dimensions of the QR code as 149 x 149.
+        QR_DIMENSIONS_153x153(153), // Specifies the dimensions of the QR code as 153 x 153.
+        QR_DIMENSIONS_157x157(157), // Specifies the dimensions of the QR code as 157 x 1537.
+        QR_DIMENSIONS_161x161(161), // Specifies the dimensions of the QR code as 161 x 161.
+        QR_DIMENSIONS_165x165(165), // Specifies the dimensions of the QR code as 165 x 165.
+        QR_DIMENSIONS_169x169(169), // Specifies the dimensions of the QR code as 169 x 169.
+        QR_DIMENSIONS_173x173(173), // Specifies the dimensions of the QR code as 173 x 173.
+        QR_DIMENSIONS_177x177(177), // Specifies the dimensions of the QR code as 177 x 177.
         ;
         private final int value;
         private QRDimensions(int value) {
             this.value = value;
         }
         public static QRDimensions fromValue(int val) {
-            try {
-                return values()[val];
-            } catch (ArrayIndexOutOfBoundsException e) {
-                return null;
+            for (QRDimensions v : values()) {
+                if (v.value == val)
+                    return v;
             }
+            return null;
         }
         public int getValue() {
             return value;
@@ -3633,6 +3677,13 @@ public class NIVision {
 
     public static enum DataMatrixCellSampleSize {
         AUTO_DETECT_CELL_SAMPLE_SIZE(-2), // The function will try each sample size and use the one which decodes the Data Matrix barcode within the fewest iterations and utilizing the least amount of error correction.
+        C1x1(1), // The function will use a 1x1 sized sample from each cell.
+        C2x2(2), // The function will use a 2x2 sized sample from each cell.
+        C3x3(3), // The function will use a 3x3 sized sample from each cell.
+        C4x4(4), // The function will use a 4x4 sized sample from each cell.
+        C5x5(5), // The function will use a 5x5 sized sample from each cell.
+        C6x6(6), // The function will use a 6x6 sized sample from each cell.
+        C7x7(7), // The function will use a 7x7 sized sample from each cell.
         ;
         private final int value;
         private DataMatrixCellSampleSize(int value) {
@@ -24952,4 +25003,1207 @@ public class NIVision {
         return new RakeReport(jn_rv, true);
     }
     private static native long _imaqRake(long image, long roi, int direction, int process, long options);
+
+    /**
+     * Purpose	  : Include file for NI-IMAQdx library support.
+     */
+    public static final int IMAQDX_MAX_API_STRING_LENGTH = 512;
+
+    /**
+     * Bus Type Enumeration
+     */
+
+    public static enum IMAQdxBusType {
+        BusTypeFireWire(0x31333934),
+        BusTypeEthernet(0x69707634),
+        BusTypeSimulator(0x2073696D),
+        BusTypeDirectShow(0x64736877),
+        BusTypeIP(0x4950636D),
+        BusTypeSmartCam2(0x53436132),
+        BusTypeUSB3Vision(0x55534233),
+        BusTypeUVC(0x55564320),
+        BusTypeGuard(0xFFFFFFFF),
+        ;
+        private final int value;
+        private IMAQdxBusType(int value) {
+            this.value = value;
+        }
+        public static IMAQdxBusType fromValue(int val) {
+            for (IMAQdxBusType v : values()) {
+                if (v.value == val)
+                    return v;
+            }
+            return null;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * Camera Control Mode Enumeration
+     */
+
+    public static enum IMAQdxCameraControlMode {
+        CameraControlModeController(0),
+        CameraControlModeListener(1),
+        CameraControlModeGuard(0xFFFFFFFF),
+        ;
+        private final int value;
+        private IMAQdxCameraControlMode(int value) {
+            this.value = value;
+        }
+        public static IMAQdxCameraControlMode fromValue(int val) {
+            for (IMAQdxCameraControlMode v : values()) {
+                if (v.value == val)
+                    return v;
+            }
+            return null;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * Buffer Number Mode Enumeration
+     */
+
+    public static enum IMAQdxBufferNumberMode {
+        BufferNumberModeNext(0),
+        BufferNumberModeLast(1),
+        BufferNumberModeBufferNumber(2),
+        BufferNumberModeGuard(0xFFFFFFFF),
+        ;
+        private final int value;
+        private IMAQdxBufferNumberMode(int value) {
+            this.value = value;
+        }
+        public static IMAQdxBufferNumberMode fromValue(int val) {
+            for (IMAQdxBufferNumberMode v : values()) {
+                if (v.value == val)
+                    return v;
+            }
+            return null;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * Plug n Play Event Enumeration
+     */
+
+    public static enum IMAQdxPnpEvent {
+        PnpEventCameraAttached(0),
+        PnpEventCameraDetached(1),
+        PnpEventBusReset(2),
+        PnpEventGuard(0xFFFFFFFF),
+        ;
+        private final int value;
+        private IMAQdxPnpEvent(int value) {
+            this.value = value;
+        }
+        public static IMAQdxPnpEvent fromValue(int val) {
+            for (IMAQdxPnpEvent v : values()) {
+                if (v.value == val)
+                    return v;
+            }
+            return null;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * Bayer Pattern Enumeration
+     */
+
+    public static enum IMAQdxBayerPattern {
+        BayerPatternNone(0),
+        BayerPatternGB(1),
+        BayerPatternGR(2),
+        BayerPatternBG(3),
+        BayerPatternRG(4),
+        BayerPatternHardware(5),
+        BayerPatternGuard(0xFFFFFFFF),
+        ;
+        private final int value;
+        private IMAQdxBayerPattern(int value) {
+            this.value = value;
+        }
+        public static IMAQdxBayerPattern fromValue(int val) {
+            for (IMAQdxBayerPattern v : values()) {
+                if (v.value == val)
+                    return v;
+            }
+            return null;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * Bayer Decode Algorithm Enumeration
+     */
+
+    public static enum IMAQdxBayerAlgorithm {
+        BayerAlgorithmBilinear(0),
+        BayerAlgorithmVNG(1),
+        BayerAlgorithmGuard(0xFFFFFFFF),
+        ;
+        private final int value;
+        private IMAQdxBayerAlgorithm(int value) {
+            this.value = value;
+        }
+        public static IMAQdxBayerAlgorithm fromValue(int val) {
+            for (IMAQdxBayerAlgorithm v : values()) {
+                if (v.value == val)
+                    return v;
+            }
+            return null;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * Output Image Types -- Values match Vision Development Module image types
+     */
+
+    public static enum IMAQdxOutputImageType {
+        OutputImageTypeU8(0),
+        OutputImageTypeI16(1),
+        OutputImageTypeU16(7),
+        OutputImageTypeRGB32(4),
+        OutputImageTypeRGB64(6),
+        OutputImageTypeAuto(0x7FFFFFFF),
+        OutputImageTypeGuard(0xFFFFFFFF),
+        ;
+        private final int value;
+        private IMAQdxOutputImageType(int value) {
+            this.value = value;
+        }
+        public static IMAQdxOutputImageType fromValue(int val) {
+            for (IMAQdxOutputImageType v : values()) {
+                if (v.value == val)
+                    return v;
+            }
+            return null;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * Controller Destination Mode Enumeration
+     */
+
+    public static enum IMAQdxDestinationMode {
+        DestinationModeUnicast(0),
+        DestinationModeBroadcast(1),
+        DestinationModeMulticast(2),
+        DestinationModeGuard(0xFFFFFFFF),
+        ;
+        private final int value;
+        private IMAQdxDestinationMode(int value) {
+            this.value = value;
+        }
+        public static IMAQdxDestinationMode fromValue(int val) {
+            for (IMAQdxDestinationMode v : values()) {
+                if (v.value == val)
+                    return v;
+            }
+            return null;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * Attribute Type Enumeration
+     */
+
+    public static enum IMAQdxAttributeType {
+        AttributeTypeU32(0),
+        AttributeTypeI64(1),
+        AttributeTypeF64(2),
+        AttributeTypeString(3),
+        AttributeTypeEnum(4),
+        AttributeTypeBool(5),
+        AttributeTypeCommand(6),
+        AttributeTypeBlob(7),
+        AttributeTypeGuard(0xFFFFFFFF),
+        ;
+        private final int value;
+        private IMAQdxAttributeType(int value) {
+            this.value = value;
+        }
+        public static IMAQdxAttributeType fromValue(int val) {
+            for (IMAQdxAttributeType v : values()) {
+                if (v.value == val)
+                    return v;
+            }
+            return null;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * Value Type Enumeration
+     */
+
+    public static enum IMAQdxValueType {
+        ValueTypeU32(0),
+        ValueTypeI64(1),
+        ValueTypeF64(2),
+        ValueTypeString(3),
+        ValueTypeEnumItem(4),
+        ValueTypeBool(5),
+        ValueTypeDisposableString(6),
+        ValueTypeGuard(0xFFFFFFFF),
+        ;
+        private final int value;
+        private IMAQdxValueType(int value) {
+            this.value = value;
+        }
+        public static IMAQdxValueType fromValue(int val) {
+            for (IMAQdxValueType v : values()) {
+                if (v.value == val)
+                    return v;
+            }
+            return null;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * Interface File Flags Enumeration
+     */
+
+    public static enum IMAQdxInterfaceFileFlags {
+        InterfaceFileFlagsConnected(0x1),
+        InterfaceFileFlagsDirty(0x2),
+        InterfaceFileFlagsGuard(0xFFFFFFFF),
+        ;
+        private final int value;
+        private IMAQdxInterfaceFileFlags(int value) {
+            this.value = value;
+        }
+        public static IMAQdxInterfaceFileFlags fromValue(int val) {
+            for (IMAQdxInterfaceFileFlags v : values()) {
+                if (v.value == val)
+                    return v;
+            }
+            return null;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * Overwrite Mode Enumeration
+     */
+
+    public static enum IMAQdxOverwriteMode {
+        OverwriteModeGetOldest(0x0),
+        OverwriteModeFail(0x2),
+        OverwriteModeGetNewest(0x3),
+        OverwriteModeGuard(0xFFFFFFFF),
+        ;
+        private final int value;
+        private IMAQdxOverwriteMode(int value) {
+            this.value = value;
+        }
+        public static IMAQdxOverwriteMode fromValue(int val) {
+            for (IMAQdxOverwriteMode v : values()) {
+                if (v.value == val)
+                    return v;
+            }
+            return null;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * Incomplete Buffer Mode Enumeration
+     */
+
+    public static enum IMAQdxIncompleteBufferMode {
+        IncompleteBufferModeIgnore(0),
+        IncompleteBufferModeFail(1),
+        IncompleteBufferModeGuard(0xFFFFFFFF),
+        ;
+        private final int value;
+        private IMAQdxIncompleteBufferMode(int value) {
+            this.value = value;
+        }
+        public static IMAQdxIncompleteBufferMode fromValue(int val) {
+            for (IMAQdxIncompleteBufferMode v : values()) {
+                if (v.value == val)
+                    return v;
+            }
+            return null;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * Lost Packet Mode Enumeration
+     */
+
+    public static enum IMAQdxLostPacketMode {
+        LostPacketModeIgnore(0),
+        LostPacketModeFail(1),
+        LostPacketModeGuard(0xFFFFFFFF),
+        ;
+        private final int value;
+        private IMAQdxLostPacketMode(int value) {
+            this.value = value;
+        }
+        public static IMAQdxLostPacketMode fromValue(int val) {
+            for (IMAQdxLostPacketMode v : values()) {
+                if (v.value == val)
+                    return v;
+            }
+            return null;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * Attribute Visibility Enumeration
+     */
+
+    public static enum IMAQdxAttributeVisibility {
+        AttributeVisibilitySimple(0x00001000),
+        AttributeVisibilityIntermediate(0x00002000),
+        AttributeVisibilityAdvanced(0x00004000),
+        AttributeVisibilityGuard(0xFFFFFFFF),
+        ;
+        private final int value;
+        private IMAQdxAttributeVisibility(int value) {
+            this.value = value;
+        }
+        public static IMAQdxAttributeVisibility fromValue(int val) {
+            for (IMAQdxAttributeVisibility v : values()) {
+                if (v.value == val)
+                    return v;
+            }
+            return null;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * Stream Channel Mode Enumeration
+     */
+
+    public static enum IMAQdxStreamChannelMode {
+        StreamChannelModeAutomatic(0),
+        StreamChannelModeManual(1),
+        StreamChannelModeGuard(0xFFFFFFFF),
+        ;
+        private final int value;
+        private IMAQdxStreamChannelMode(int value) {
+            this.value = value;
+        }
+        public static IMAQdxStreamChannelMode fromValue(int val) {
+            for (IMAQdxStreamChannelMode v : values()) {
+                if (v.value == val)
+                    return v;
+            }
+            return null;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * Pixel Signedness Enumeration
+     */
+
+    public static enum IMAQdxPixelSignedness {
+        PixelSignednessUnsigned(0),
+        PixelSignednessSigned(1),
+        PixelSignednessHardware(2),
+        PixelSignednessGuard(0xFFFFFFFF),
+        ;
+        private final int value;
+        private IMAQdxPixelSignedness(int value) {
+            this.value = value;
+        }
+        public static IMAQdxPixelSignedness fromValue(int val) {
+            for (IMAQdxPixelSignedness v : values()) {
+                if (v.value == val)
+                    return v;
+            }
+            return null;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * USB Connection Speed Enumeration
+     */
+
+    public static enum IMAQdxUSBConnectionSpeed {
+        USBConnectionSpeedLow(1),
+        USBConnectionSpeedFull(2),
+        USBConnectionSpeedHigh(4),
+        USBConnectionSpeedSuper(8),
+        USBConnectionSpeedGuard(0xFFFFFFFF),
+        ;
+        private final int value;
+        private IMAQdxUSBConnectionSpeed(int value) {
+            this.value = value;
+        }
+        public static IMAQdxUSBConnectionSpeed fromValue(int val) {
+            for (IMAQdxUSBConnectionSpeed v : values()) {
+                if (v.value == val)
+                    return v;
+            }
+            return null;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * CVI Structures
+     */
+
+    /**
+     * Camera Information Structure
+     */
+
+    public static class IMAQdxCameraInformation extends DisposedStruct {
+        public long Type;
+        public long Version;
+        public long Flags;
+        public long SerialNumberHi;
+        public long SerialNumberLo;
+        public IMAQdxBusType BusType;
+        public String InterfaceName;
+        public String VendorName;
+        public String ModelName;
+        public String CameraFileName;
+        public String CameraAttributeURL;
+
+        private void init() {
+            
+        }
+        public IMAQdxCameraInformation() {
+            super(2584);
+            init();
+        }
+        public IMAQdxCameraInformation(long Type, long Version, long Flags, long SerialNumberHi, long SerialNumberLo, IMAQdxBusType BusType, String InterfaceName, String VendorName, String ModelName, String CameraFileName, String CameraAttributeURL) {
+            super(2584);
+            this.Type = Type;
+            this.Version = Version;
+            this.Flags = Flags;
+            this.SerialNumberHi = SerialNumberHi;
+            this.SerialNumberLo = SerialNumberLo;
+            this.BusType = BusType;
+            this.InterfaceName = InterfaceName;
+            this.VendorName = VendorName;
+            this.ModelName = ModelName;
+            this.CameraFileName = CameraFileName;
+            this.CameraAttributeURL = CameraAttributeURL;
+        }
+        protected IMAQdxCameraInformation(ByteBuffer backing, int offset) {
+            super(backing, offset, 2584);
+            init();
+        }
+        protected IMAQdxCameraInformation(long nativeObj, boolean owned) {
+            super(nativeObj, owned, 2584);
+            init();
+        }
+        protected void setBuffer(ByteBuffer backing, int offset) {
+            super.setBuffer(backing, offset, 2584);
+        }
+        public void read() {
+            Type = backing.getLong(0);
+            Version = backing.getLong(4);
+            Flags = backing.getLong(8);
+            SerialNumberHi = backing.getLong(12);
+            SerialNumberLo = backing.getLong(16);
+            BusType = IMAQdxBusType.fromValue(backing.getInt(20));
+            {
+                byte[] bytes = new byte[IMAQDX_MAX_API_STRING_LENGTH];
+                getBytes(backing, bytes, 24, IMAQDX_MAX_API_STRING_LENGTH);
+                int len;
+                for (len=0; len<bytes.length && bytes[len] != 0; len++) {}
+                try {
+                    InterfaceName = new String(bytes, 0, len, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    InterfaceName = "";
+                }
+            }
+            {
+                byte[] bytes = new byte[IMAQDX_MAX_API_STRING_LENGTH];
+                getBytes(backing, bytes, 536, IMAQDX_MAX_API_STRING_LENGTH);
+                int len;
+                for (len=0; len<bytes.length && bytes[len] != 0; len++) {}
+                try {
+                    VendorName = new String(bytes, 0, len, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    VendorName = "";
+                }
+            }
+            {
+                byte[] bytes = new byte[IMAQDX_MAX_API_STRING_LENGTH];
+                getBytes(backing, bytes, 1048, IMAQDX_MAX_API_STRING_LENGTH);
+                int len;
+                for (len=0; len<bytes.length && bytes[len] != 0; len++) {}
+                try {
+                    ModelName = new String(bytes, 0, len, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    ModelName = "";
+                }
+            }
+            {
+                byte[] bytes = new byte[IMAQDX_MAX_API_STRING_LENGTH];
+                getBytes(backing, bytes, 1560, IMAQDX_MAX_API_STRING_LENGTH);
+                int len;
+                for (len=0; len<bytes.length && bytes[len] != 0; len++) {}
+                try {
+                    CameraFileName = new String(bytes, 0, len, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    CameraFileName = "";
+                }
+            }
+            {
+                byte[] bytes = new byte[IMAQDX_MAX_API_STRING_LENGTH];
+                getBytes(backing, bytes, 2072, IMAQDX_MAX_API_STRING_LENGTH);
+                int len;
+                for (len=0; len<bytes.length && bytes[len] != 0; len++) {}
+                try {
+                    CameraAttributeURL = new String(bytes, 0, len, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    CameraAttributeURL = "";
+                }
+            }
+        }
+        public void write() {
+            backing.putLong(0, Type);
+            backing.putLong(4, Version);
+            backing.putLong(8, Flags);
+            backing.putLong(12, SerialNumberHi);
+            backing.putLong(16, SerialNumberLo);
+            if (BusType != null)
+                backing.putInt(20, BusType.getValue());
+            if (InterfaceName != null) {
+                byte[] bytes;
+                try {
+                    bytes = InterfaceName.getBytes("UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    bytes = new byte[0];
+                }
+                putBytes(backing, bytes, 24, bytes.length);
+                for (int i=bytes.length; i<IMAQDX_MAX_API_STRING_LENGTH; i++)
+                    backing.put(i, (byte)0); // fill with zero
+            }
+            if (VendorName != null) {
+                byte[] bytes;
+                try {
+                    bytes = VendorName.getBytes("UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    bytes = new byte[0];
+                }
+                putBytes(backing, bytes, 536, bytes.length);
+                for (int i=bytes.length; i<IMAQDX_MAX_API_STRING_LENGTH; i++)
+                    backing.put(i, (byte)0); // fill with zero
+            }
+            if (ModelName != null) {
+                byte[] bytes;
+                try {
+                    bytes = ModelName.getBytes("UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    bytes = new byte[0];
+                }
+                putBytes(backing, bytes, 1048, bytes.length);
+                for (int i=bytes.length; i<IMAQDX_MAX_API_STRING_LENGTH; i++)
+                    backing.put(i, (byte)0); // fill with zero
+            }
+            if (CameraFileName != null) {
+                byte[] bytes;
+                try {
+                    bytes = CameraFileName.getBytes("UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    bytes = new byte[0];
+                }
+                putBytes(backing, bytes, 1560, bytes.length);
+                for (int i=bytes.length; i<IMAQDX_MAX_API_STRING_LENGTH; i++)
+                    backing.put(i, (byte)0); // fill with zero
+            }
+            if (CameraAttributeURL != null) {
+                byte[] bytes;
+                try {
+                    bytes = CameraAttributeURL.getBytes("UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    bytes = new byte[0];
+                }
+                putBytes(backing, bytes, 2072, bytes.length);
+                for (int i=bytes.length; i<IMAQDX_MAX_API_STRING_LENGTH; i++)
+                    backing.put(i, (byte)0); // fill with zero
+            }
+        }
+        public int size() {
+            return 2584;
+        }
+    }
+
+    /**
+     * Camera File Structure
+     */
+
+    public static class IMAQdxCameraFile extends DisposedStruct {
+        public long Type;
+        public long Version;
+        public String FileName;
+
+        private void init() {
+            
+        }
+        public IMAQdxCameraFile() {
+            super(520);
+            init();
+        }
+        public IMAQdxCameraFile(long Type, long Version, String FileName) {
+            super(520);
+            this.Type = Type;
+            this.Version = Version;
+            this.FileName = FileName;
+        }
+        protected IMAQdxCameraFile(ByteBuffer backing, int offset) {
+            super(backing, offset, 520);
+            init();
+        }
+        protected IMAQdxCameraFile(long nativeObj, boolean owned) {
+            super(nativeObj, owned, 520);
+            init();
+        }
+        protected void setBuffer(ByteBuffer backing, int offset) {
+            super.setBuffer(backing, offset, 520);
+        }
+        public void read() {
+            Type = backing.getLong(0);
+            Version = backing.getLong(4);
+            {
+                byte[] bytes = new byte[IMAQDX_MAX_API_STRING_LENGTH];
+                getBytes(backing, bytes, 8, IMAQDX_MAX_API_STRING_LENGTH);
+                int len;
+                for (len=0; len<bytes.length && bytes[len] != 0; len++) {}
+                try {
+                    FileName = new String(bytes, 0, len, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    FileName = "";
+                }
+            }
+        }
+        public void write() {
+            backing.putLong(0, Type);
+            backing.putLong(4, Version);
+            if (FileName != null) {
+                byte[] bytes;
+                try {
+                    bytes = FileName.getBytes("UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    bytes = new byte[0];
+                }
+                putBytes(backing, bytes, 8, bytes.length);
+                for (int i=bytes.length; i<IMAQDX_MAX_API_STRING_LENGTH; i++)
+                    backing.put(i, (byte)0); // fill with zero
+            }
+        }
+        public int size() {
+            return 520;
+        }
+    }
+
+    /**
+     * Attribute Information Structure
+     */
+
+    public static class IMAQdxAttributeInformation extends DisposedStruct {
+        public IMAQdxAttributeType Type;
+        public long Readable;
+        public long Writable;
+        public String Name;
+
+        private void init() {
+            
+        }
+        public IMAQdxAttributeInformation() {
+            super(524);
+            init();
+        }
+        public IMAQdxAttributeInformation(IMAQdxAttributeType Type, long Readable, long Writable, String Name) {
+            super(524);
+            this.Type = Type;
+            this.Readable = Readable;
+            this.Writable = Writable;
+            this.Name = Name;
+        }
+        protected IMAQdxAttributeInformation(ByteBuffer backing, int offset) {
+            super(backing, offset, 524);
+            init();
+        }
+        protected IMAQdxAttributeInformation(long nativeObj, boolean owned) {
+            super(nativeObj, owned, 524);
+            init();
+        }
+        protected void setBuffer(ByteBuffer backing, int offset) {
+            super.setBuffer(backing, offset, 524);
+        }
+        public void read() {
+            Type = IMAQdxAttributeType.fromValue(backing.getInt(0));
+            Readable = backing.getLong(4);
+            Writable = backing.getLong(8);
+            {
+                byte[] bytes = new byte[IMAQDX_MAX_API_STRING_LENGTH];
+                getBytes(backing, bytes, 12, IMAQDX_MAX_API_STRING_LENGTH);
+                int len;
+                for (len=0; len<bytes.length && bytes[len] != 0; len++) {}
+                try {
+                    Name = new String(bytes, 0, len, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    Name = "";
+                }
+            }
+        }
+        public void write() {
+            if (Type != null)
+                backing.putInt(0, Type.getValue());
+            backing.putLong(4, Readable);
+            backing.putLong(8, Writable);
+            if (Name != null) {
+                byte[] bytes;
+                try {
+                    bytes = Name.getBytes("UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    bytes = new byte[0];
+                }
+                putBytes(backing, bytes, 12, bytes.length);
+                for (int i=bytes.length; i<IMAQDX_MAX_API_STRING_LENGTH; i++)
+                    backing.put(i, (byte)0); // fill with zero
+            }
+        }
+        public int size() {
+            return 524;
+        }
+    }
+
+    /**
+     * Enumeration Item Structure
+     */
+
+    public static class IMAQdxEnumItem extends DisposedStruct {
+        public long Value;
+        public long Reserved;
+        public String Name;
+
+        private void init() {
+            
+        }
+        public IMAQdxEnumItem() {
+            super(520);
+            init();
+        }
+        public IMAQdxEnumItem(long Value, long Reserved, String Name) {
+            super(520);
+            this.Value = Value;
+            this.Reserved = Reserved;
+            this.Name = Name;
+        }
+        protected IMAQdxEnumItem(ByteBuffer backing, int offset) {
+            super(backing, offset, 520);
+            init();
+        }
+        protected IMAQdxEnumItem(long nativeObj, boolean owned) {
+            super(nativeObj, owned, 520);
+            init();
+        }
+        protected void setBuffer(ByteBuffer backing, int offset) {
+            super.setBuffer(backing, offset, 520);
+        }
+        public void read() {
+            Value = backing.getLong(0);
+            Reserved = backing.getLong(4);
+            {
+                byte[] bytes = new byte[IMAQDX_MAX_API_STRING_LENGTH];
+                getBytes(backing, bytes, 8, IMAQDX_MAX_API_STRING_LENGTH);
+                int len;
+                for (len=0; len<bytes.length && bytes[len] != 0; len++) {}
+                try {
+                    Name = new String(bytes, 0, len, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    Name = "";
+                }
+            }
+        }
+        public void write() {
+            backing.putLong(0, Value);
+            backing.putLong(4, Reserved);
+            if (Name != null) {
+                byte[] bytes;
+                try {
+                    bytes = Name.getBytes("UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    bytes = new byte[0];
+                }
+                putBytes(backing, bytes, 8, bytes.length);
+                for (int i=bytes.length; i<IMAQDX_MAX_API_STRING_LENGTH; i++)
+                    backing.put(i, (byte)0); // fill with zero
+            }
+        }
+        public int size() {
+            return 520;
+        }
+    }
+
+    /**
+     * Camera Information Structure
+     */
+
+    /**
+     * Attributes
+     */
+
+    /**
+     * Functions
+     */
+
+    public static void IMAQdxSnap(long id, Image image) {
+        
+        _IMAQdxSnap(id, image.getAddress());
+        
+    }
+    private static native void _IMAQdxSnap(long id, long image);
+
+    public static void IMAQdxConfigureGrab(long id) {
+        
+        _IMAQdxConfigureGrab(id);
+        
+    }
+    private static native void _IMAQdxConfigureGrab(long id);
+
+    public static long IMAQdxGrab(long id, Image image, long waitForNextBuffer) {
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        long rv_addr = getByteBufferAddress(rv_buf);
+        long jn_rv = _IMAQdxGrab(id, image.getAddress(), waitForNextBuffer, rv_addr+0);
+        long actualBufferNumber;
+        actualBufferNumber = rv_buf.getLong(0);
+        return actualBufferNumber;
+    }
+    private static native long _IMAQdxGrab(long id, long image, long waitForNextBuffer, long actualBufferNumber);
+
+    public static void IMAQdxDiscoverEthernetCameras(String address, long timeout) {
+        ByteBuffer address_buf = null;
+        if (address != null) {
+            byte[] address_bytes;
+            try {
+                address_bytes = address.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                address_bytes = new byte[0];
+            }
+            address_buf = ByteBuffer.allocateDirect(address_bytes.length+1);
+            putBytes(address_buf, address_bytes, 0, address_bytes.length).put(address_bytes.length, (byte)0);
+        }
+        _IMAQdxDiscoverEthernetCameras(address == null ? 0 : getByteBufferAddress(address_buf), timeout);
+        
+    }
+    private static native void _IMAQdxDiscoverEthernetCameras(long address, long timeout);
+
+    public static void IMAQdxResetCamera(String name, long resetAll) {
+        ByteBuffer name_buf = null;
+        if (name != null) {
+            byte[] name_bytes;
+            try {
+                name_bytes = name.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                name_bytes = new byte[0];
+            }
+            name_buf = ByteBuffer.allocateDirect(name_bytes.length+1);
+            putBytes(name_buf, name_bytes, 0, name_bytes.length).put(name_bytes.length, (byte)0);
+        }
+        _IMAQdxResetCamera(name == null ? 0 : getByteBufferAddress(name_buf), resetAll);
+        
+    }
+    private static native void _IMAQdxResetCamera(long name, long resetAll);
+
+    public static long IMAQdxOpenCamera(String name, IMAQdxCameraControlMode mode) {
+        ByteBuffer name_buf = null;
+        if (name != null) {
+            byte[] name_bytes;
+            try {
+                name_bytes = name.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                name_bytes = new byte[0];
+            }
+            name_buf = ByteBuffer.allocateDirect(name_bytes.length+1);
+            putBytes(name_buf, name_bytes, 0, name_bytes.length).put(name_bytes.length, (byte)0);
+        }
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        long rv_addr = getByteBufferAddress(rv_buf);
+        long jn_rv = _IMAQdxOpenCamera(name == null ? 0 : getByteBufferAddress(name_buf), mode.getValue(), rv_addr+0);
+        long id;
+        id = rv_buf.getLong(0);
+        return id;
+    }
+    private static native long _IMAQdxOpenCamera(long name, int mode, long id);
+
+    public static void IMAQdxCloseCamera(long id) {
+        
+        _IMAQdxCloseCamera(id);
+        
+    }
+    private static native void _IMAQdxCloseCamera(long id);
+
+    public static void IMAQdxConfigureAcquisition(long id, long continuous, long bufferCount) {
+        
+        _IMAQdxConfigureAcquisition(id, continuous, bufferCount);
+        
+    }
+    private static native void _IMAQdxConfigureAcquisition(long id, long continuous, long bufferCount);
+
+    public static void IMAQdxStartAcquisition(long id) {
+        
+        _IMAQdxStartAcquisition(id);
+        
+    }
+    private static native void _IMAQdxStartAcquisition(long id);
+
+    public static long IMAQdxGetImage(long id, Image image, IMAQdxBufferNumberMode mode, long desiredBufferNumber) {
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        long rv_addr = getByteBufferAddress(rv_buf);
+        long jn_rv = _IMAQdxGetImage(id, image.getAddress(), mode.getValue(), desiredBufferNumber, rv_addr+0);
+        long actualBufferNumber;
+        actualBufferNumber = rv_buf.getLong(0);
+        return actualBufferNumber;
+    }
+    private static native long _IMAQdxGetImage(long id, long image, int mode, long desiredBufferNumber, long actualBufferNumber);
+
+    public static void IMAQdxStopAcquisition(long id) {
+        
+        _IMAQdxStopAcquisition(id);
+        
+    }
+    private static native void _IMAQdxStopAcquisition(long id);
+
+    public static void IMAQdxUnconfigureAcquisition(long id) {
+        
+        _IMAQdxUnconfigureAcquisition(id);
+        
+    }
+    private static native void _IMAQdxUnconfigureAcquisition(long id);
+
+    public static IMAQdxAttributeType IMAQdxGetAttributeType(long id, String name) {
+        ByteBuffer name_buf = null;
+        if (name != null) {
+            byte[] name_bytes;
+            try {
+                name_bytes = name.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                name_bytes = new byte[0];
+            }
+            name_buf = ByteBuffer.allocateDirect(name_bytes.length+1);
+            putBytes(name_buf, name_bytes, 0, name_bytes.length).put(name_bytes.length, (byte)0);
+        }
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        long rv_addr = getByteBufferAddress(rv_buf);
+        int jn_rv = _IMAQdxGetAttributeType(id, name == null ? 0 : getByteBufferAddress(name_buf), rv_addr+0);
+        IMAQdxAttributeType type;
+        type = IMAQdxAttributeType.fromValue(rv_buf.getInt(0));
+        return type;
+    }
+    private static native int _IMAQdxGetAttributeType(long id, long name, long type);
+
+    public static long IMAQdxIsAttributeReadable(long id, String name) {
+        ByteBuffer name_buf = null;
+        if (name != null) {
+            byte[] name_bytes;
+            try {
+                name_bytes = name.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                name_bytes = new byte[0];
+            }
+            name_buf = ByteBuffer.allocateDirect(name_bytes.length+1);
+            putBytes(name_buf, name_bytes, 0, name_bytes.length).put(name_bytes.length, (byte)0);
+        }
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        long rv_addr = getByteBufferAddress(rv_buf);
+        long jn_rv = _IMAQdxIsAttributeReadable(id, name == null ? 0 : getByteBufferAddress(name_buf), rv_addr+0);
+        long readable;
+        readable = rv_buf.getLong(0);
+        return readable;
+    }
+    private static native long _IMAQdxIsAttributeReadable(long id, long name, long readable);
+
+    public static long IMAQdxIsAttributeWritable(long id, String name) {
+        ByteBuffer name_buf = null;
+        if (name != null) {
+            byte[] name_bytes;
+            try {
+                name_bytes = name.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                name_bytes = new byte[0];
+            }
+            name_buf = ByteBuffer.allocateDirect(name_bytes.length+1);
+            putBytes(name_buf, name_bytes, 0, name_bytes.length).put(name_bytes.length, (byte)0);
+        }
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        long rv_addr = getByteBufferAddress(rv_buf);
+        long jn_rv = _IMAQdxIsAttributeWritable(id, name == null ? 0 : getByteBufferAddress(name_buf), rv_addr+0);
+        long writable;
+        writable = rv_buf.getLong(0);
+        return writable;
+    }
+    private static native long _IMAQdxIsAttributeWritable(long id, long name, long writable);
+
+    public static void IMAQdxWriteRegister(long id, long offset, long value) {
+        
+        _IMAQdxWriteRegister(id, offset, value);
+        
+    }
+    private static native void _IMAQdxWriteRegister(long id, long offset, long value);
+
+    public static long IMAQdxReadRegister(long id, long offset) {
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        long rv_addr = getByteBufferAddress(rv_buf);
+        long jn_rv = _IMAQdxReadRegister(id, offset, rv_addr+0);
+        long value;
+        value = rv_buf.getLong(0);
+        return value;
+    }
+    private static native long _IMAQdxReadRegister(long id, long offset, long value);
+
+    public static void IMAQdxWriteAttributes(long id, String filename) {
+        ByteBuffer filename_buf = null;
+        if (filename != null) {
+            byte[] filename_bytes;
+            try {
+                filename_bytes = filename.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                filename_bytes = new byte[0];
+            }
+            filename_buf = ByteBuffer.allocateDirect(filename_bytes.length+1);
+            putBytes(filename_buf, filename_bytes, 0, filename_bytes.length).put(filename_bytes.length, (byte)0);
+        }
+        _IMAQdxWriteAttributes(id, filename == null ? 0 : getByteBufferAddress(filename_buf));
+        
+    }
+    private static native void _IMAQdxWriteAttributes(long id, long filename);
+
+    public static void IMAQdxReadAttributes(long id, String filename) {
+        ByteBuffer filename_buf = null;
+        if (filename != null) {
+            byte[] filename_bytes;
+            try {
+                filename_bytes = filename.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                filename_bytes = new byte[0];
+            }
+            filename_buf = ByteBuffer.allocateDirect(filename_bytes.length+1);
+            putBytes(filename_buf, filename_bytes, 0, filename_bytes.length).put(filename_bytes.length, (byte)0);
+        }
+        _IMAQdxReadAttributes(id, filename == null ? 0 : getByteBufferAddress(filename_buf));
+        
+    }
+    private static native void _IMAQdxReadAttributes(long id, long filename);
+
+    public static void IMAQdxResetEthernetCameraAddress(String name, String address, String subnet, String gateway, long timeout) {
+        ByteBuffer name_buf = null;
+        if (name != null) {
+            byte[] name_bytes;
+            try {
+                name_bytes = name.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                name_bytes = new byte[0];
+            }
+            name_buf = ByteBuffer.allocateDirect(name_bytes.length+1);
+            putBytes(name_buf, name_bytes, 0, name_bytes.length).put(name_bytes.length, (byte)0);
+        }
+        ByteBuffer address_buf = null;
+        if (address != null) {
+            byte[] address_bytes;
+            try {
+                address_bytes = address.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                address_bytes = new byte[0];
+            }
+            address_buf = ByteBuffer.allocateDirect(address_bytes.length+1);
+            putBytes(address_buf, address_bytes, 0, address_bytes.length).put(address_bytes.length, (byte)0);
+        }
+        ByteBuffer subnet_buf = null;
+        if (subnet != null) {
+            byte[] subnet_bytes;
+            try {
+                subnet_bytes = subnet.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                subnet_bytes = new byte[0];
+            }
+            subnet_buf = ByteBuffer.allocateDirect(subnet_bytes.length+1);
+            putBytes(subnet_buf, subnet_bytes, 0, subnet_bytes.length).put(subnet_bytes.length, (byte)0);
+        }
+        ByteBuffer gateway_buf = null;
+        if (gateway != null) {
+            byte[] gateway_bytes;
+            try {
+                gateway_bytes = gateway.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                gateway_bytes = new byte[0];
+            }
+            gateway_buf = ByteBuffer.allocateDirect(gateway_bytes.length+1);
+            putBytes(gateway_buf, gateway_bytes, 0, gateway_bytes.length).put(gateway_bytes.length, (byte)0);
+        }
+        _IMAQdxResetEthernetCameraAddress(name == null ? 0 : getByteBufferAddress(name_buf), address == null ? 0 : getByteBufferAddress(address_buf), subnet == null ? 0 : getByteBufferAddress(subnet_buf), gateway == null ? 0 : getByteBufferAddress(gateway_buf), timeout);
+        
+    }
+    private static native void _IMAQdxResetEthernetCameraAddress(long name, long address, long subnet, long gateway, long timeout);
+
+    public static IMAQdxAttributeVisibility IMAQdxGetAttributeVisibility(long id, String name) {
+        ByteBuffer name_buf = null;
+        if (name != null) {
+            byte[] name_bytes;
+            try {
+                name_bytes = name.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                name_bytes = new byte[0];
+            }
+            name_buf = ByteBuffer.allocateDirect(name_bytes.length+1);
+            putBytes(name_buf, name_bytes, 0, name_bytes.length).put(name_bytes.length, (byte)0);
+        }
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        long rv_addr = getByteBufferAddress(rv_buf);
+        int jn_rv = _IMAQdxGetAttributeVisibility(id, name == null ? 0 : getByteBufferAddress(name_buf), rv_addr+0);
+        IMAQdxAttributeVisibility visibility;
+        visibility = IMAQdxAttributeVisibility.fromValue(rv_buf.getInt(0));
+        return visibility;
+    }
+    private static native int _IMAQdxGetAttributeVisibility(long id, long name, long visibility);
 }
