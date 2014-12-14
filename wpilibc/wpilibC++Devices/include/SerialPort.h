@@ -27,7 +27,7 @@ public:
 	enum StopBits {kStopBits_One=10, kStopBits_OnePointFive=15, kStopBits_Two=20};
 	enum FlowControl {kFlowControl_None=0, kFlowControl_XonXoff=1, kFlowControl_RtsCts=2, kFlowControl_DtrDsr=4};
 	enum WriteBufferMode {kFlushOnAccess=1, kFlushWhenFull=2};
-	enum Port {kOnboard=0, kMXP=1};
+	enum Port {kOnboard=0, kMXP=1, kUSB=2};
 
 	SerialPort(uint32_t baudRate, Port port = kOnboard, uint8_t dataBits = 8, Parity parity = kParity_None,
 			StopBits stopBits = kStopBits_One);
