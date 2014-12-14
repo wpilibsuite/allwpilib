@@ -59,4 +59,53 @@ public class PowerDistributionPanel extends SensorBase {
 
 		return current;
 	}
+
+	/**
+	*	@return The current of all the channels
+	*/
+	public double getTotalCurrent(){
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+
+		double current = PDPJNI.getPDPTotalCurrent(status.asIntBuffer());
+
+		return current;
+	}
+
+	/**
+	*	@return the total power
+	*/
+	public double getTotalPower(){
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+
+		double power = PDPJNI.getPDPTotalPower(status.asIntBuffer());
+
+		return power;
+
+	}
+
+	public double getTotalEnergy(){
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+
+		double energy = PDPJNI.getPDPTotalEnergy(status.asIntBuffer());
+
+		return energy;
+	}
+
+	public void resetTotalEnergy(){
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+
+		PDPJNI.resetPDPTotalEnergy(status.asIntBuffer());
+	}
+
+	public void clearStickyFaults(){
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+		
+		PDPJNI.clearPDPStickyFaults(status.asIntBuffer());
+	}
+
 }
