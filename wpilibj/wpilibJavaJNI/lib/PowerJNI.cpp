@@ -119,7 +119,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrentFau
   (JNIEnv * env, jclass, jobject status)
 {
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	return getUserCurrentFaults3V3(statusPtr);
+	return getUserCurrentFaults5V(statusPtr);
 }
 
 /*
