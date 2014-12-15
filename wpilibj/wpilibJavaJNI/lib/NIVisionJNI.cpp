@@ -36,7 +36,7 @@ static void dxthrowJavaException(JNIEnv *env, IMAQdxError err) {
 
 extern "C" {
 
-JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqDispose(JNIEnv* , jclass , jlong addr)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision_imaqDispose(JNIEnv* , jclass , jlong addr)
 {
     imaqDispose((void*)addr);
 }
@@ -4998,239 +4998,239 @@ JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqRake(JNIEnv* env, jcla
  * Functions
  */
 
-/* J: void IMAQdxSnap(long id, Image image)
- * JN: void IMAQdxSnap(long id, long image)
+/* J: void IMAQdxSnap(int id, Image image)
+ * JN: void IMAQdxSnap(int id, long image)
  * C: IMAQdxError IMAQdxSnap(IMAQdxSession id, Image* image)
  */
 
-JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxSnap(JNIEnv* env, jclass , jlong id, jlong image)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxSnap(JNIEnv* env, jclass , jint id, jlong image)
 {
     IMAQdxError rv = IMAQdxSnap((IMAQdxSession)id, (Image*)image);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
 }
 
-/* J: void IMAQdxConfigureGrab(long id)
- * JN: void IMAQdxConfigureGrab(long id)
+/* J: void IMAQdxConfigureGrab(int id)
+ * JN: void IMAQdxConfigureGrab(int id)
  * C: IMAQdxError IMAQdxConfigureGrab(IMAQdxSession id)
  */
 
-JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxConfigureGrab(JNIEnv* env, jclass , jlong id)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxConfigureGrab(JNIEnv* env, jclass , jint id)
 {
     IMAQdxError rv = IMAQdxConfigureGrab((IMAQdxSession)id);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
 }
 
-/* J: long IMAQdxGrab(long id, Image image, long waitForNextBuffer)
- * JN: long IMAQdxGrab(long id, long image, long waitForNextBuffer, long actualBufferNumber)
+/* J: int IMAQdxGrab(int id, Image image, int waitForNextBuffer)
+ * JN: int IMAQdxGrab(int id, long image, int waitForNextBuffer, long actualBufferNumber)
  * C: IMAQdxError IMAQdxGrab(IMAQdxSession id, Image* image, bool32 waitForNextBuffer, uInt32* actualBufferNumber)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1IMAQdxGrab(JNIEnv* env, jclass , jlong id, jlong image, jlong waitForNextBuffer, jlong actualBufferNumber)
+JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1IMAQdxGrab(JNIEnv* env, jclass , jint id, jlong image, jint waitForNextBuffer, jlong actualBufferNumber)
 {
     IMAQdxError rv = IMAQdxGrab((IMAQdxSession)id, (Image*)image, (bool32)waitForNextBuffer, (uInt32*)actualBufferNumber);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
-    return (jlong)rv;
+    return (jint)rv;
 }
 
-/* J: void IMAQdxDiscoverEthernetCameras(String address, long timeout)
- * JN: void IMAQdxDiscoverEthernetCameras(long address, long timeout)
+/* J: void IMAQdxDiscoverEthernetCameras(String address, int timeout)
+ * JN: void IMAQdxDiscoverEthernetCameras(long address, int timeout)
  * C: IMAQdxError IMAQdxDiscoverEthernetCameras(const char* address, uInt32 timeout)
  */
 
-JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxDiscoverEthernetCameras(JNIEnv* env, jclass , jlong address, jlong timeout)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxDiscoverEthernetCameras(JNIEnv* env, jclass , jlong address, jint timeout)
 {
     IMAQdxError rv = IMAQdxDiscoverEthernetCameras((const char*)address, (uInt32)timeout);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
 }
 
-/* J: void IMAQdxResetCamera(String name, long resetAll)
- * JN: void IMAQdxResetCamera(long name, long resetAll)
+/* J: void IMAQdxResetCamera(String name, int resetAll)
+ * JN: void IMAQdxResetCamera(long name, int resetAll)
  * C: IMAQdxError IMAQdxResetCamera(const char* name, bool32 resetAll)
  */
 
-JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxResetCamera(JNIEnv* env, jclass , jlong name, jlong resetAll)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxResetCamera(JNIEnv* env, jclass , jlong name, jint resetAll)
 {
     IMAQdxError rv = IMAQdxResetCamera((const char*)name, (bool32)resetAll);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
 }
 
-/* J: long IMAQdxOpenCamera(String name, IMAQdxCameraControlMode mode)
- * JN: long IMAQdxOpenCamera(long name, int mode, long id)
+/* J: int IMAQdxOpenCamera(String name, IMAQdxCameraControlMode mode)
+ * JN: int IMAQdxOpenCamera(long name, int mode, long id)
  * C: IMAQdxError IMAQdxOpenCamera(const char* name, IMAQdxCameraControlMode mode, IMAQdxSession* id)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1IMAQdxOpenCamera(JNIEnv* env, jclass , jlong name, jint mode, jlong id)
+JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1IMAQdxOpenCamera(JNIEnv* env, jclass , jlong name, jint mode, jlong id)
 {
     IMAQdxError rv = IMAQdxOpenCamera((const char*)name, (IMAQdxCameraControlMode)mode, (IMAQdxSession*)id);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
-    return (jlong)rv;
+    return (jint)rv;
 }
 
-/* J: void IMAQdxCloseCamera(long id)
- * JN: void IMAQdxCloseCamera(long id)
+/* J: void IMAQdxCloseCamera(int id)
+ * JN: void IMAQdxCloseCamera(int id)
  * C: IMAQdxError IMAQdxCloseCamera(IMAQdxSession id)
  */
 
-JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxCloseCamera(JNIEnv* env, jclass , jlong id)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxCloseCamera(JNIEnv* env, jclass , jint id)
 {
     IMAQdxError rv = IMAQdxCloseCamera((IMAQdxSession)id);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
 }
 
-/* J: void IMAQdxConfigureAcquisition(long id, long continuous, long bufferCount)
- * JN: void IMAQdxConfigureAcquisition(long id, long continuous, long bufferCount)
+/* J: void IMAQdxConfigureAcquisition(int id, int continuous, int bufferCount)
+ * JN: void IMAQdxConfigureAcquisition(int id, int continuous, int bufferCount)
  * C: IMAQdxError IMAQdxConfigureAcquisition(IMAQdxSession id, bool32 continuous, uInt32 bufferCount)
  */
 
-JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxConfigureAcquisition(JNIEnv* env, jclass , jlong id, jlong continuous, jlong bufferCount)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxConfigureAcquisition(JNIEnv* env, jclass , jint id, jint continuous, jint bufferCount)
 {
     IMAQdxError rv = IMAQdxConfigureAcquisition((IMAQdxSession)id, (bool32)continuous, (uInt32)bufferCount);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
 }
 
-/* J: void IMAQdxStartAcquisition(long id)
- * JN: void IMAQdxStartAcquisition(long id)
+/* J: void IMAQdxStartAcquisition(int id)
+ * JN: void IMAQdxStartAcquisition(int id)
  * C: IMAQdxError IMAQdxStartAcquisition(IMAQdxSession id)
  */
 
-JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxStartAcquisition(JNIEnv* env, jclass , jlong id)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxStartAcquisition(JNIEnv* env, jclass , jint id)
 {
     IMAQdxError rv = IMAQdxStartAcquisition((IMAQdxSession)id);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
 }
 
-/* J: long IMAQdxGetImage(long id, Image image, IMAQdxBufferNumberMode mode, long desiredBufferNumber)
- * JN: long IMAQdxGetImage(long id, long image, int mode, long desiredBufferNumber, long actualBufferNumber)
+/* J: int IMAQdxGetImage(int id, Image image, IMAQdxBufferNumberMode mode, int desiredBufferNumber)
+ * JN: int IMAQdxGetImage(int id, long image, int mode, int desiredBufferNumber, long actualBufferNumber)
  * C: IMAQdxError IMAQdxGetImage(IMAQdxSession id, Image* image, IMAQdxBufferNumberMode mode, uInt32 desiredBufferNumber, uInt32* actualBufferNumber)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetImage(JNIEnv* env, jclass , jlong id, jlong image, jint mode, jlong desiredBufferNumber, jlong actualBufferNumber)
+JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetImage(JNIEnv* env, jclass , jint id, jlong image, jint mode, jint desiredBufferNumber, jlong actualBufferNumber)
 {
     IMAQdxError rv = IMAQdxGetImage((IMAQdxSession)id, (Image*)image, (IMAQdxBufferNumberMode)mode, (uInt32)desiredBufferNumber, (uInt32*)actualBufferNumber);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
-    return (jlong)rv;
+    return (jint)rv;
 }
 
-/* J: void IMAQdxStopAcquisition(long id)
- * JN: void IMAQdxStopAcquisition(long id)
+/* J: void IMAQdxStopAcquisition(int id)
+ * JN: void IMAQdxStopAcquisition(int id)
  * C: IMAQdxError IMAQdxStopAcquisition(IMAQdxSession id)
  */
 
-JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxStopAcquisition(JNIEnv* env, jclass , jlong id)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxStopAcquisition(JNIEnv* env, jclass , jint id)
 {
     IMAQdxError rv = IMAQdxStopAcquisition((IMAQdxSession)id);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
 }
 
-/* J: void IMAQdxUnconfigureAcquisition(long id)
- * JN: void IMAQdxUnconfigureAcquisition(long id)
+/* J: void IMAQdxUnconfigureAcquisition(int id)
+ * JN: void IMAQdxUnconfigureAcquisition(int id)
  * C: IMAQdxError IMAQdxUnconfigureAcquisition(IMAQdxSession id)
  */
 
-JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxUnconfigureAcquisition(JNIEnv* env, jclass , jlong id)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxUnconfigureAcquisition(JNIEnv* env, jclass , jint id)
 {
     IMAQdxError rv = IMAQdxUnconfigureAcquisition((IMAQdxSession)id);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
 }
 
-/* J: IMAQdxAttributeType IMAQdxGetAttributeType(long id, String name)
- * JN: int IMAQdxGetAttributeType(long id, long name, long type)
+/* J: IMAQdxAttributeType IMAQdxGetAttributeType(int id, String name)
+ * JN: int IMAQdxGetAttributeType(int id, long name, long type)
  * C: IMAQdxError IMAQdxGetAttributeType(IMAQdxSession id, const char* name, IMAQdxAttributeType* type)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeType(JNIEnv* env, jclass , jlong id, jlong name, jlong type)
+JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeType(JNIEnv* env, jclass , jint id, jlong name, jlong type)
 {
     IMAQdxError rv = IMAQdxGetAttributeType((IMAQdxSession)id, (const char*)name, (IMAQdxAttributeType*)type);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
     return (jint)rv;
 }
 
-/* J: long IMAQdxIsAttributeReadable(long id, String name)
- * JN: long IMAQdxIsAttributeReadable(long id, long name, long readable)
+/* J: int IMAQdxIsAttributeReadable(int id, String name)
+ * JN: int IMAQdxIsAttributeReadable(int id, long name, long readable)
  * C: IMAQdxError IMAQdxIsAttributeReadable(IMAQdxSession id, const char* name, bool32* readable)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1IMAQdxIsAttributeReadable(JNIEnv* env, jclass , jlong id, jlong name, jlong readable)
+JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1IMAQdxIsAttributeReadable(JNIEnv* env, jclass , jint id, jlong name, jlong readable)
 {
     IMAQdxError rv = IMAQdxIsAttributeReadable((IMAQdxSession)id, (const char*)name, (bool32*)readable);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
-    return (jlong)rv;
+    return (jint)rv;
 }
 
-/* J: long IMAQdxIsAttributeWritable(long id, String name)
- * JN: long IMAQdxIsAttributeWritable(long id, long name, long writable)
+/* J: int IMAQdxIsAttributeWritable(int id, String name)
+ * JN: int IMAQdxIsAttributeWritable(int id, long name, long writable)
  * C: IMAQdxError IMAQdxIsAttributeWritable(IMAQdxSession id, const char* name, bool32* writable)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1IMAQdxIsAttributeWritable(JNIEnv* env, jclass , jlong id, jlong name, jlong writable)
+JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1IMAQdxIsAttributeWritable(JNIEnv* env, jclass , jint id, jlong name, jlong writable)
 {
     IMAQdxError rv = IMAQdxIsAttributeWritable((IMAQdxSession)id, (const char*)name, (bool32*)writable);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
-    return (jlong)rv;
+    return (jint)rv;
 }
 
-/* J: void IMAQdxWriteRegister(long id, long offset, long value)
- * JN: void IMAQdxWriteRegister(long id, long offset, long value)
+/* J: void IMAQdxWriteRegister(int id, int offset, int value)
+ * JN: void IMAQdxWriteRegister(int id, int offset, int value)
  * C: IMAQdxError IMAQdxWriteRegister(IMAQdxSession id, uInt32 offset, uInt32 value)
  */
 
-JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxWriteRegister(JNIEnv* env, jclass , jlong id, jlong offset, jlong value)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxWriteRegister(JNIEnv* env, jclass , jint id, jint offset, jint value)
 {
     IMAQdxError rv = IMAQdxWriteRegister((IMAQdxSession)id, (uInt32)offset, (uInt32)value);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
 }
 
-/* J: long IMAQdxReadRegister(long id, long offset)
- * JN: long IMAQdxReadRegister(long id, long offset, long value)
+/* J: int IMAQdxReadRegister(int id, int offset)
+ * JN: int IMAQdxReadRegister(int id, int offset, long value)
  * C: IMAQdxError IMAQdxReadRegister(IMAQdxSession id, uInt32 offset, uInt32* value)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1IMAQdxReadRegister(JNIEnv* env, jclass , jlong id, jlong offset, jlong value)
+JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1IMAQdxReadRegister(JNIEnv* env, jclass , jint id, jint offset, jlong value)
 {
     IMAQdxError rv = IMAQdxReadRegister((IMAQdxSession)id, (uInt32)offset, (uInt32*)value);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
-    return (jlong)rv;
+    return (jint)rv;
 }
 
-/* J: void IMAQdxWriteAttributes(long id, String filename)
- * JN: void IMAQdxWriteAttributes(long id, long filename)
+/* J: void IMAQdxWriteAttributes(int id, String filename)
+ * JN: void IMAQdxWriteAttributes(int id, long filename)
  * C: IMAQdxError IMAQdxWriteAttributes(IMAQdxSession id, const char* filename)
  */
 
-JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxWriteAttributes(JNIEnv* env, jclass , jlong id, jlong filename)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxWriteAttributes(JNIEnv* env, jclass , jint id, jlong filename)
 {
     IMAQdxError rv = IMAQdxWriteAttributes((IMAQdxSession)id, (const char*)filename);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
 }
 
-/* J: void IMAQdxReadAttributes(long id, String filename)
- * JN: void IMAQdxReadAttributes(long id, long filename)
+/* J: void IMAQdxReadAttributes(int id, String filename)
+ * JN: void IMAQdxReadAttributes(int id, long filename)
  * C: IMAQdxError IMAQdxReadAttributes(IMAQdxSession id, const char* filename)
  */
 
-JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxReadAttributes(JNIEnv* env, jclass , jlong id, jlong filename)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxReadAttributes(JNIEnv* env, jclass , jint id, jlong filename)
 {
     IMAQdxError rv = IMAQdxReadAttributes((IMAQdxSession)id, (const char*)filename);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
 }
 
-/* J: void IMAQdxResetEthernetCameraAddress(String name, String address, String subnet, String gateway, long timeout)
- * JN: void IMAQdxResetEthernetCameraAddress(long name, long address, long subnet, long gateway, long timeout)
+/* J: void IMAQdxResetEthernetCameraAddress(String name, String address, String subnet, String gateway, int timeout)
+ * JN: void IMAQdxResetEthernetCameraAddress(long name, long address, long subnet, long gateway, int timeout)
  * C: IMAQdxError IMAQdxResetEthernetCameraAddress(const char* name, const char* address, const char* subnet, const char* gateway, uInt32 timeout)
  */
 
-JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxResetEthernetCameraAddress(JNIEnv* env, jclass , jlong name, jlong address, jlong subnet, jlong gateway, jlong timeout)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxResetEthernetCameraAddress(JNIEnv* env, jclass , jlong name, jlong address, jlong subnet, jlong gateway, jint timeout)
 {
     IMAQdxError rv = IMAQdxResetEthernetCameraAddress((const char*)name, (const char*)address, (const char*)subnet, (const char*)gateway, (uInt32)timeout);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
 }
 
-/* J: IMAQdxAttributeVisibility IMAQdxGetAttributeVisibility(long id, String name)
- * JN: int IMAQdxGetAttributeVisibility(long id, long name, long visibility)
+/* J: IMAQdxAttributeVisibility IMAQdxGetAttributeVisibility(int id, String name)
+ * JN: int IMAQdxGetAttributeVisibility(int id, long name, long visibility)
  * C: IMAQdxError IMAQdxGetAttributeVisibility(IMAQdxSession id, const char* name, IMAQdxAttributeVisibility* visibility)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeVisibility(JNIEnv* env, jclass , jlong id, jlong name, jlong visibility)
+JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeVisibility(JNIEnv* env, jclass , jint id, jlong name, jlong visibility)
 {
     IMAQdxError rv = IMAQdxGetAttributeVisibility((IMAQdxSession)id, (const char*)name, (IMAQdxAttributeVisibility*)visibility);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
