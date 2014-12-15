@@ -27,6 +27,12 @@ public:
     EncRising=4,
     EncFalling=5
   };
+  enum StatusFrameRate {
+    StatusFrameRateGeneral=0,
+    StatusFrameRateFeedback=1,
+    StatusFrameRateQuadEncoder=2,
+    StatusFrameRateAnalogTempVbat=3,
+  };
 	explicit CANTalon(int deviceNumber);
 	explicit CANTalon(int deviceNumber,int controlPeriodMs);
 	virtual ~CANTalon();
@@ -68,6 +74,7 @@ public:
 	virtual double GetSpeed() override;
   virtual int GetClosedLoopError();
   virtual int GetAnalogIn();
+  virtual int GetAnalogInRaw();
   virtual int GetAnalogInVel();
   virtual int GetEncPosition();
   virtual int GetEncVel();
@@ -97,6 +104,7 @@ public:
 	virtual void ConfigFaultTime(float faultTime) override;
 	virtual void SetControlMode(ControlMode mode);
   void SetFeedbackDevice(FeedbackDevice device);
+	void SetStatusFrameRateMs(StatusFrameRate stateFrame, int periodMs);
 	virtual ControlMode GetControlMode();
 	void SetSensorDirection(bool reverseSensor);
 	void SetCloseLoopRampRate(double rampRate);
@@ -104,6 +112,7 @@ public:
 	int GetIzone();
 	int GetIaccum();
 	void ClearIaccum();
+	int GetBrakeEnableDuringNeutral();
 
   bool IsControlEnabled();
   double GetSetpoint();

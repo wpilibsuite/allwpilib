@@ -571,6 +571,11 @@ CTR_Code CanTalonSRX::GetReverseSoftEnable(int & enable)
 CTR_Code CanTalonSRX::SetStatusFrameRate(unsigned frameEnum, unsigned periodMs)
 {
 	int32_t status = 0;
+	/* bounds check the period */
+	if(periodMs < 1)
+		periodMs = 1;
+	else if (periodMs > 255)
+		periodMs = 255;
   uint8_t period = (uint8_t)periodMs;
 	/* tweak just the status messsage rate the caller cares about */
 	switch(frameEnum){

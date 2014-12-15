@@ -55,6 +55,23 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
       this.value = value;
     }
 	}
+  /** enumerated types for frame rate ms */
+  public enum StatusFrameRate {
+		General(0), Feedback(1), QuadEncoder(2), AnalogTempVbat(3);
+    public int value;
+    public static StatusFrameRate valueOf(int value) {
+			for(StatusFrameRate mode : values()) {
+				if(mode.value == value) {
+					return mode;
+				}
+			}
+			return null;
+    }
+    private StatusFrameRate(int value) {
+      this.value = value;
+    }
+  }
+
 
   private CanTalonSRX m_impl;
   ControlMode m_controlMode;
@@ -244,10 +261,51 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
   }
 
   /**
+   * Get the number of of rising edges seen on the index pin.
+   *
+   * @return number of rising edges on idx pin.
+   */
+  public int getNumberOfQuadIdxRises() {
+    long valuep = CanTalonJNI.new_intp();
+    SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
+    m_impl.GetEncIndexRiseEvents(swigp);
+    return CanTalonJNI.intp_value(valuep);
+  }
+  /**
+   * @return IO level of QUADA pin.
+   */
+  public int getPinStateQuadA(){
+    long valuep = CanTalonJNI.new_intp();
+    SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
+    m_impl.GetQuadApin(swigp);
+    return CanTalonJNI.intp_value(valuep);
+  }
+  /**
+   * @return IO level of QUADB pin.
+   */
+  public int getPinStateQuadB() {
+    long valuep = CanTalonJNI.new_intp();
+    SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
+    m_impl.GetQuadBpin(swigp);
+    return CanTalonJNI.intp_value(valuep);
+  }
+  /**
+   * @return IO level of QUAD Index pin.
+   */
+  public int getPinStateQuadIdx(){
+    long valuep = CanTalonJNI.new_intp();
+    SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
+    m_impl.GetQuadIdxpin(swigp);
+    return CanTalonJNI.intp_value(valuep);
+  }
+
+  /**
    * Get the current analog in position, regardless of whether it is the current
    * feedback device.
    *
-   * @return The current value from the analog in (0 - 1023).
+   * @return The 24bit analog position.  The bottom ten bits is the ADC (0 - 1023) on
+   *								the analog pin of the Talon. The upper 14 bits
+   *								tracks the overflows and underflows (continuous sensor).
    */
   public int getAnalogInPosition() {
     long valuep = CanTalonJNI.new_intp();
@@ -255,7 +313,14 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     m_impl.GetAnalogInWithOv(swigp);
     return CanTalonJNI.intp_value(valuep);
   }
-
+  /**
+   * Get the current analog in position, regardless of whether it is the current
+   * feedback device.
+   * @return The ADC (0 - 1023) on analog pin of the Talon.
+   */
+  public int getAnalogInRaw() {
+    return getAnalogInPosition() & 0x3FF;
+  }
   /**
    * Get the current encoder velocity, regardless of whether it is the current
    * feedback device.
@@ -280,7 +345,27 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     m_impl.GetCloseLoopErr(swigp);
     return CanTalonJNI.intp_value(valuep);
   }
-
+  // Returns true if limit switch is closed. false if open.
+  public boolean isFwdLimitSwitchClosed() {
+    long valuep = CanTalonJNI.new_intp();
+    SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
+    m_impl.GetLimitSwitchClosedFor(swigp);
+    return (CanTalonJNI.intp_value(valuep)==0) ? true : false;
+  }
+  // Returns true if limit switch is closed. false if open.
+  public boolean isRevLimitSwitchClosed() {
+    long valuep = CanTalonJNI.new_intp();
+    SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
+    m_impl.GetLimitSwitchClosedRev(swigp);
+    return (CanTalonJNI.intp_value(valuep)==0) ? true : false;
+  }
+  // Returns true if break is enabled during neutral. false if coast.
+  public boolean getBrakeEnableDuringNeutral() {
+    long valuep = CanTalonJNI.new_intp();
+    SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
+    m_impl.GetBrakeIsEnabled(swigp);
+    return (CanTalonJNI.intp_value(valuep)==0) ? false : true;
+  }
   // Returns temperature of Talon, in degrees Celsius.
   public double getTemp() {
     long tempp = CanTalonJNI.new_doublep(); // Create a new swig pointer.
@@ -352,7 +437,9 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
   public void setFeedbackDevice(FeedbackDevice device) {
     m_impl.SetFeedbackDeviceSelect(device.value);
   }
-
+  public void setStatusFrameRateMs(StatusFrameRate stateFrame, int periodMs){
+    m_impl.SetStatusFrameRate(stateFrame.value,periodMs);
+  }
   public void enableControl() {
     changeControlMode(m_controlMode);
 		m_controlEnabled = true;
@@ -522,7 +609,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     m_impl.GetParamResponseInt32(CanTalonSRX.param_t.ePidIaccum, new SWIGTYPE_p_int(fp, true));
     return CanTalonJNI.intp_value(fp);
   }
-  
+
 	/**
 	 * Clear the accumulator for I gain.
 	 */
@@ -690,7 +777,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
   public void setForwardSoftLimit(int forwardLimit) {
     m_impl.SetForwardSoftLimit(forwardLimit);
   }
-  
+
   public void enableForwardSoftLimit(boolean enable) {
     m_impl.SetForwardSoftEnable(enable ? 1 : 0);
   }
@@ -698,7 +785,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
   public void setReverseSoftLimit(int reverseLimit) {
     m_impl.SetReverseSoftLimit(reverseLimit);
   }
-  
+
   public void enableReverseSoftLimit(boolean enable) {
     m_impl.SetReverseSoftEnable(enable ? 1 : 0);
   }

@@ -273,6 +273,16 @@ void CANTalon::SetFeedbackDevice(FeedbackDevice device)
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
 }
+/**
+ * Select the feedback device to use in closed-loop
+ */
+void CANTalon::SetStatusFrameRateMs(StatusFrameRate stateFrame, int periodMs)
+{
+	CTR_Code status = m_impl->SetStatusFrameRate((int)stateFrame,periodMs);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
+}
 
 /**
  * TODO documentation (see CANJaguar.cpp)
@@ -529,7 +539,9 @@ double CANTalon::GetSpeed()
  * Get the position of whatever is in the analog pin of the Talon, regardless of
  * whether it is actually being used for feedback.
  *
- * @returns The value (0 - 1023) on the analog pin of the Talon.
+ * @returns The 24bit analog value.  The bottom ten bits is the ADC (0 - 1023) on 
+ *								the analog pin of the Talon. The upper 14 bits
+ *								tracks the overflows and underflows (continuous sensor).
  */
 int CANTalon::GetAnalogIn()
 {
@@ -540,7 +552,16 @@ int CANTalon::GetAnalogIn()
 	}
   return position;
 }
-
+/**
+ * Get the position of whatever is in the analog pin of the Talon, regardless of
+ * whether it is actually being used for feedback.
+ *
+ * @returns The ADC (0 - 1023) on analog pin of the Talon.
+ */
+int CANTalon::GetAnalogInRaw()
+{
+    return GetAnalogIn() & 0x3FF;
+}
 /**
  * Get the position of whatever is in the analog pin of the Talon, regardless of
  * whether it is actually being used for feedback.
@@ -929,7 +950,18 @@ void CANTalon::ConfigNeutralMode(NeutralMode mode)
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
 }
-
+/**
+ * @return nonzero if brake is enabled during neutral.  Zero if coast is enabled during neutral.
+ */
+int CANTalon::GetBrakeEnableDuringNeutral()
+{
+  int brakeEn = 0;
+  CTR_Code status = m_impl->GetBrakeIsEnabled(brakeEn);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
+	return brakeEn;
+}
 /**
  * TODO documentation (see CANJaguar.cpp)
  */
@@ -1001,6 +1033,23 @@ void CANTalon::ConfigLimitMode(LimitMode mode)
 			}
 			/* override enable the limit switches, this circumvents the webdash */
 			status = m_impl->SetOverrideLimitSwitchEn(CanTalonSRX::kLimitSwitchOverride_EnableFwd_EnableRev);
+			if(status != CTR_OKAY) {
+				wpi_setErrorWithContext(status, getHALErrorMessage(status));
+			}
+			break;
+			
+		case kLimitMode_SrxDisableSwitchInputs: /** disable both limit switches and soft limits */
+			/* turn on both limits. SRX has individual enables and polarity for each limit switch.*/
+			status = m_impl->SetForwardSoftEnable(false);
+			if(status != CTR_OKAY) {
+				wpi_setErrorWithContext(status, getHALErrorMessage(status));
+			}
+			status = m_impl->SetReverseSoftEnable(false);
+			if(status != CTR_OKAY) {
+				wpi_setErrorWithContext(status, getHALErrorMessage(status));
+			}
+			/* override enable the limit switches, this circumvents the webdash */
+			status = m_impl->SetOverrideLimitSwitchEn(CanTalonSRX::kLimitSwitchOverride_DisableFwd_DisableRev);
 			if(status != CTR_OKAY) {
 				wpi_setErrorWithContext(status, getHALErrorMessage(status));
 			}

@@ -54,7 +54,10 @@ public:
 		/** Only use switches for limits */
 		kLimitMode_SwitchInputsOnly = 0,
 		/** Use both switches and soft limits */
-		kLimitMode_SoftPositionLimits = 1
+		kLimitMode_SoftPositionLimits = 1,
+		/* SRX extensions */
+		/** Disable switches and disable soft limits */
+		kLimitMode_SrxDisableSwitchInputs = 2,
 	};
 
 	virtual float Get() = 0;
