@@ -60,6 +60,8 @@ public:
 	virtual void TestPeriodic();
 
 protected:
+	virtual void Prestart();
+
 	virtual ~IterativeRobot();
 	IterativeRobot();
 

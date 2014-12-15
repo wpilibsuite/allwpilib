@@ -39,7 +39,7 @@ RobotBase &RobotBase::getInstance()
 
 /**
  * Constructor for a generic robot program.
- * User code should be placed in the constuctor that runs before the Autonomous or Operator
+ * User code should be placed in the constructor that runs before the Autonomous or Operator
  * Control period starts. The constructor will run to completion before Autonomous is entered.
  *
  * This must be used to ensure that the communications code starts. In the future it would be
@@ -88,7 +88,7 @@ bool RobotBase::IsDisabled()
 }
 
 /**
- * Determine if the robot is currently in Autnomous mode.
+ * Determine if the robot is currently in Autonomous mode.
  * @return True if the robot is currently operating Autonomously as determined by the field controls.
  */
 bool RobotBase::IsAutonomous()
@@ -112,6 +112,15 @@ bool RobotBase::IsOperatorControl()
 bool RobotBase::IsTest()
 {
     return m_ds->IsTest();
+}
+
+/**
+ * This hook is called right before startCompetition(). By default, tell the DS that the robot is now ready to
+ * be enabled. If you don't want for the robot to be enabled yet, you can override this method to do nothing.
+ */
+void RobotBase::Prestart()
+{
+	HALNetworkCommunicationObserveUserProgramStarting();
 }
 
 /**

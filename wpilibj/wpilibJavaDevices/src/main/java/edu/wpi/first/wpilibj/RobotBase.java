@@ -130,6 +130,15 @@ public abstract class RobotBase {
 	 */
 	public abstract void startCompetition();
 
+	/**
+	 * This hook is called right before startCompetition(). By default, tell the
+	 * DS that the robot is now ready to be enabled. If you don't want for the
+	 * robot to be enabled yet, you can override this method to do nothing.
+	 */
+	protected void prestart() {
+		FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
+	}
+
 	public static boolean getBooleanProperty(String name, boolean defaultValue) {
 		String propVal = System.getProperty(name);
 		if (propVal == null) {
@@ -149,7 +158,6 @@ public abstract class RobotBase {
 	 */
 	public static void initializeHardwareConfiguration(){
 		FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationReserve();
-		FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
 
 		// Set some implementations so that the static methods work properly
 		Timer.SetImplementation(new HardwareTimer());
@@ -161,8 +169,6 @@ public abstract class RobotBase {
 	 * Starting point for the applications.
 	 */
 	public static void main(String args[]) {
-		boolean errorOnExit = false;
-
 		initializeHardwareConfiguration();
 
 		UsageReporting.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
@@ -182,14 +188,16 @@ public abstract class RobotBase {
 		RobotBase robot;
 		try {
 			robot = (RobotBase) Class.forName(robotName).newInstance();
+			robot.prestart();
 		} catch (Throwable t) {
 			DriverStation.reportError("ERROR Unhandled exception instantiating robot " + robotName + " " + t.toString() + " at " + Arrays.toString(t.getStackTrace()), false);
 			System.err.println("WARNING: Robots don't quit!");
-			System.err.println("ERROR: Could not instantiate robot "+robotName+"!");
+			System.err.println("ERROR: Could not instantiate robot " + robotName + "!");
 			System.exit(1);
 			return;
 		}
 
+		boolean errorOnExit = false;
 		try {
 			robot.startCompetition();
 		} catch (Throwable t) {

@@ -18,6 +18,7 @@ import org.junit.runners.model.MultipleFailureException;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
@@ -44,6 +45,7 @@ public abstract class AbstractComsSetup {
 		if (!initialized) {
 			// Set some implementations so that the static methods work properly
 			RobotBase.initializeHardwareConfiguration();
+			FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
 			
 			LiveWindow.setEnabled(false);
 			TestBench.out().println("Started coms");
