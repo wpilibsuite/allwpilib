@@ -54,7 +54,7 @@ public abstract class Button extends Trigger {
 
     /**
      * Toggles the command whenever the button is pressed (on then off then on)
-     * @param command
+     * @param command the command to start
      */
     public void toggleWhenPressed(final Command command) {
         toggleWhenActive(command);
@@ -62,7 +62,7 @@ public abstract class Button extends Trigger {
 
     /**
      * Cancel the command when the button is pressed
-     * @param command
+     * @param command the command to start
      */
     public void cancelWhenPressed(final Command command) {
         cancelWhenActive(command);

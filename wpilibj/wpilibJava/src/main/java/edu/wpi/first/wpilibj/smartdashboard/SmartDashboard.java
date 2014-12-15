@@ -149,7 +149,7 @@ public class SmartDashboard {
      * @param key the key
      * @param defaultValue the value returned if the key is undefined
      * @return the value
-     * @throws NoSuchEleNetworkTableKeyNotDefinedmentException if there is no value mapped to by the key
+     * @throws NetworkTableKeyNotDefined if there is no value mapped to by the key
      * @throws IllegalArgumentException if the value mapped to by the key is not a double
      * @throws IllegalArgumentException if the key is null
      */
@@ -241,7 +241,7 @@ public class SmartDashboard {
      * @param key the key
      * @param defaultValue the value returned if the key is undefined
      * @return the value
-     * @throws NetworkTableKeyNotDefined if there is no value mapped to by the key
+     * @throws TableKeyNotDefinedException if there is no value mapped to by the key
      * @throws IllegalArgumentException if the value mapped to by the key is not an int
      * @throws IllegalArgumentException if the key is null
      */
@@ -274,7 +274,7 @@ public class SmartDashboard {
      * @deprecated Use {@link #getNumber(java.lang.String) getNumber} instead
      * @param key the key
      * @return the value
-     * @throws NoSuchEleNetworkTableKeyNotDefinedmentException if there is no value mapped to by the key
+     * @throws TableKeyNotDefinedException if there is no value mapped to by the key
      * @throws IllegalArgumentException if the value mapped to by the key is not a double
      * @throws IllegalArgumentException if the key is null
      */
@@ -289,7 +289,7 @@ public class SmartDashboard {
      * @param key the key
      * @param defaultValue the value returned if the key is undefined
      * @return the value
-     * @throws NoSuchEleNetworkTableKeyNotDefinedmentException if there is no value mapped to by the key
+     * @throws TableKeyNotDefinedException if there is no value mapped to by the key
      * @throws IllegalArgumentException if the value mapped to by the key is not a double
      * @throws IllegalArgumentException if the key is null
      */

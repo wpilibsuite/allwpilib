@@ -264,7 +264,7 @@ public class SerialPort {
      * Set the type of flow control to enable on this port.
      *
      * By default, flow control is disabled.
-     * @param flowControl
+     * @param flowControl the FlowControl value to use
      */
     public void setFlowControl(FlowControl flowControl) {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);

@@ -1,74 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>edu.wpi.first.wpilibj</groupId>
   <artifactId>wpilibJavaFinal</artifactId>
   <packaging>jar</packaging>
   <version>0.1.0-SNAPSHOT</version>
-  
+
   <parent>
     <groupId>edu.wpi.first.wpilib.templates.athena</groupId>
     <artifactId>library-jar</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <relativePath>../../maven-utilities/athena/library-jar/pom.xml</relativePath>
   </parent>
-  
+
   <profiles>
     <profile>
       <id>docline-java8-disable</id>
       <activation>
-	    <jdk>[1.8,</jdk>
+        <jdk>[1.8,</jdk>
       </activation>
 
       <build>
-	    <plugins>
+        <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
             <configuration>
               <additionalparam>-Xdoclint:none</additionalparam>
+              <tags>
+                <tag>
+                  <name>pre</name>
+                  <placement>a</placement>
+                  <head>Precondition:</head>
+                </tag>
+              </tags>
             </configuration>
           </plugin>
-	    </plugins>
+        </plugins>
       </build>
     </profile>
   </profiles>
-  
+
   <dependencies>
-	<dependency>
-	  <groupId>edu.wpi.first.wpilibj</groupId>
-	  <artifactId>wpilibJava</artifactId>
-	  <version>0.1.0-SNAPSHOT</version>
-	</dependency>
-	<dependency>
-	  <groupId>edu.wpi.first.wpilibj</groupId>
-	  <artifactId>wpilibJavaDevices</artifactId>
-	  <version>0.1.0-SNAPSHOT</version>
-	</dependency>
-	<dependency>
-	  <groupId>edu.wpi.first.wpilibj</groupId>
-	  <artifactId>wpilibJavaJNI</artifactId>
-	  <version>0.1.0-SNAPSHOT</version>
-	  <type>so</type>
-	</dependency>
-    
-	<dependency>
-	  <groupId>edu.wpi.first.wpilibj</groupId>
-	  <artifactId>wpilibJava</artifactId>
-	  <version>0.1.0-SNAPSHOT</version>
-	  <classifier>sources</classifier>
-	</dependency>
-	<dependency>
-	  <groupId>edu.wpi.first.wpilibj</groupId>
-	  <artifactId>wpilibJavaDevices</artifactId>
-	  <version>0.1.0-SNAPSHOT</version>
-	  <classifier>sources</classifier>
-	</dependency>
+    <dependency>
+      <groupId>edu.wpi.first.wpilibj</groupId>
+      <artifactId>wpilibJava</artifactId>
+      <version>0.1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>edu.wpi.first.wpilibj</groupId>
+      <artifactId>wpilibJavaDevices</artifactId>
+      <version>0.1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>edu.wpi.first.wpilibj</groupId>
+      <artifactId>wpilibJavaJNI</artifactId>
+      <version>0.1.0-SNAPSHOT</version>
+      <type>so</type>
+    </dependency>
+
+    <dependency>
+      <groupId>edu.wpi.first.wpilibj</groupId>
+      <artifactId>wpilibJava</artifactId>
+      <version>0.1.0-SNAPSHOT</version>
+      <classifier>sources</classifier>
+    </dependency>
+    <dependency>
+      <groupId>edu.wpi.first.wpilibj</groupId>
+      <artifactId>wpilibJavaDevices</artifactId>
+      <version>0.1.0-SNAPSHOT</version>
+      <classifier>sources</classifier>
+    </dependency>
   </dependencies>
 
   <build>
-	<plugins>
+    <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
@@ -96,7 +103,7 @@
                   </then>
                   <else>
                     <copy todir="${project.build.directory}/classes" >
-                      <fileset dir="${mvn.wpilibJava.jar.path}" />  
+                      <fileset dir="${mvn.wpilibJava.jar.path}" />
                     </copy>
                   </else>
                 </if>
@@ -112,7 +119,7 @@
                   </then>
                   <else>
                     <copy todir="${project.build.directory}/classes" >
-                      <fileset dir="${mvn.wpilibJavaDevices.jar.path}" />  
+                      <fileset dir="${mvn.wpilibJavaDevices.jar.path}" />
                     </copy>
                   </else>
                 </if>
@@ -128,12 +135,12 @@
             <phase>generate-sources</phase>
             <configuration>
               <target>
-                <copy todir="${project.build.directory}/classes/linux-arm" 
-                      file="${edu.wpi.first.wpilibj:wpilibJavaJNI:so}" />  
+                <copy todir="${project.build.directory}/classes/linux-arm"
+                      file="${edu.wpi.first.wpilibj:wpilibJavaJNI:so}" />
               </target>
             </configuration>
           </execution>
-          
+
           <execution>
             <id>generate-sources</id>
             <goals>
@@ -172,17 +179,16 @@
           </dependency>
         </dependencies>
       </plugin>
-	   <plugin>
-      	<groupId>org.apache.maven.plugins</groupId>
-      	<artifactId>maven-javadoc-plugin</artifactId>
+       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
-      	  <sourceFileExcludes>
-      	    <exclude>edu/wpi/first/wpilibj/image/</exclude>
-      	    <exclude>edu/wpi/first/wpilibj/camera/</exclude>
-      	    <exclude>edu/wpi/first/wpilibj/visa/</exclude>
-      	    <exclude>edu/wpi/first/wpilibj/SerialPort.java</exclude>
-      	  </sourceFileExcludes>
-		   <includeDependencySources>true</includeDependencySources>
+          <sourceFileExcludes>
+            <exclude>edu/wpi/first/wpilibj/image/</exclude>
+            <exclude>edu/wpi/first/wpilibj/camera/</exclude>
+            <exclude>edu/wpi/first/wpilibj/visa/</exclude>
+          </sourceFileExcludes>
+           <includeDependencySources>true</includeDependencySources>
         </configuration>
       </plugin>
 
@@ -201,52 +207,52 @@
           </execution>
         </executions>
       </plugin>
-	</plugins>
-	<pluginManagement>
-	  <plugins>
-		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-		<plugin>
-		  <groupId>org.eclipse.m2e</groupId>
-		  <artifactId>lifecycle-mapping</artifactId>
-		  <version>1.0.0</version>
-		  <configuration>
-			<lifecycleMappingMetadata>
-			  <pluginExecutions>
-				<pluginExecution>
-				  <pluginExecutionFilter>
-					<groupId>
-					  org.apache.maven.plugins
-					</groupId>
-					<artifactId>
-					  maven-dependency-plugin
-					</artifactId>
-					<versionRange>[2.8,)</versionRange>
-					<goals>
-					  <goal>copy</goal>
-					</goals>
-				  </pluginExecutionFilter>
-				  <action>
-					<execute />
-				  </action>
-				</pluginExecution>
-				<pluginExecution>
-				  <pluginExecutionFilter>
-					<groupId>org.apache.maven.plugins</groupId>
-        			<artifactId>maven-dependency-plugin</artifactId>
-					<versionRange>[2.8,)</versionRange>
-					<goals>
-					  <goal>unpack</goal>
-					</goals>
-				  </pluginExecutionFilter>
-				  <action>
-					<ignore />
-				  </action>
-				</pluginExecution>
-			  </pluginExecutions>
-			</lifecycleMappingMetadata>
-		  </configuration>
-		</plugin>
-	  </plugins>
-	</pluginManagement>
+    </plugins>
+    <pluginManagement>
+      <plugins>
+        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>
+                      org.apache.maven.plugins
+                    </groupId>
+                    <artifactId>
+                      maven-dependency-plugin
+                    </artifactId>
+                    <versionRange>[2.8,)</versionRange>
+                    <goals>
+                      <goal>copy</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute />
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <versionRange>[2.8,)</versionRange>
+                    <goals>
+                      <goal>unpack</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 </project>

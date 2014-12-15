@@ -360,7 +360,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
   /**
    * Get the current proportional constant.
    *
-   * @returns double proportional constant for current profile.
+   * @return double proportional constant for current profile.
    * @throws IllegalStateException if not in Position of Speed mode.
    */
   public double getP() {
@@ -515,7 +515,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
    * Set the proportional value of the currently selected profile.
    *
    * @param p Proportional constant for the currently selected PID profile.
-   * @see setProfile For selecting a certain profile.
+   * @see #setProfile For selecting a certain profile.
    */
   public void setP(double p) {
     m_impl.SetPgain(m_profile, p);
@@ -525,7 +525,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
    * Set the integration constant of the currently selected profile.
    *
    * @param i Integration constant for the currently selected PID profile.
-   * @see setProfile For selecting a certain profile.
+   * @see #setProfile For selecting a certain profile.
    */
   public void setI(double i) {
     m_impl.SetIgain(m_profile, i);
@@ -535,7 +535,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
    * Set the derivative constant of the currently selected profile.
    *
    * @param d Derivative constant for the currently selected PID profile.
-   * @see setProfile For selecting a certain profile.
+   * @see #setProfile For selecting a certain profile.
    */
   public void setD(double d) {
     m_impl.SetDgain(m_profile, d);
@@ -545,7 +545,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
    * Set the feedforward value of the currently selected profile.
    *
    * @param f Feedforward constant for the currently selected PID profile.
-   * @see setProfile For selecting a certain profile.
+   * @see #setProfile For selecting a certain profile.
    */
   public void setF(double f) {
     m_impl.SetFgain(m_profile, f);
@@ -560,7 +560,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     * An izone value of 0 means no difference from a standard PIDF loop.
     *
     * @param izone Width of the integration zone.
-    * @see setProfile For selecting a certain profile.
+    * @see #setProfile For selecting a certain profile.
     */
   public void setIZone(int izone) {
     m_impl.SetIzone(m_profile, izone);
@@ -573,7 +573,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
    * Only affects position and speed closed loop modes.
    *
    * @param rampRate Maximum change in voltage, in volts / sec.
-   * @see setProfile For selecting a certain profile.
+   * @see #setProfile For selecting a certain profile.
    */
   public void setCloseLoopRampRate(double rampRate) {
     // CanTalonSRX takes units of Throttle (0 - 1023) / 10ms.

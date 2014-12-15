@@ -107,7 +107,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
 	/**
 	 * Request one of the 8 interrupts synchronously on this digital input. Request
 	 * interrupts in synchronous mode where the user program will have to
-	 * explicitly wait for the interrupt to occur using {@link waitForInterrupt}. 
+	 * explicitly wait for the interrupt to occur using {@link #waitForInterrupt}. 
 	 * The default is interrupt on rising edges only.
 	 */
 	public void requestInterrupts() {

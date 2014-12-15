@@ -814,7 +814,7 @@ public class Preferences {
          * Returns whether or not the given string is ok to use in the
          * preference table.
          *
-         * @param value
+         * @param value the string to check
          * @return true if the given string is ok to use in the preference table
          */
         public static boolean isAcceptable(String value) {
