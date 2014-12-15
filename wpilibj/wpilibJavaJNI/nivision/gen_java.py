@@ -70,7 +70,7 @@ java_types_map = {
         ("unsigned int", None): JavaType("int", "int", "jint", "I"),
         ("uInt32", None): JavaType("int", "int", "jint", "I"),
         ("IMAQdxSession", None): JavaType("int", "int", "jint", "I"),
-        ("bool32", None): JavaType("boolean", "boolean", "jboolean", "Z"),
+        ("bool32", None): JavaType("int", "int", "jint", "I"),
         ("long", None): JavaType("long", "long", "jlong", "J"),
         ("unsigned long", None): JavaType("long", "long", "jlong", "J"),
         ("__int64", None): JavaType("long", "long", "jlong", "J"),
@@ -209,7 +209,7 @@ if ({size_fname} > 0 && {fname}_addr != 0) {{
 strzArrayEmitSized.addWriteBuf("{buftype} {fname}_buf")
 strzArrayEmitSized.addWriteBuf("{buftype}[] {fname}_bufs")
 strzArrayEmitSized.addWrite("""
-{fname}_buf = ByteBuffer.allocateDirect({fname}.length*{pointer_sz});
+{fname}_buf = ByteBuffer.allocateDirect({fname}.length*{pointer_sz}).order(ByteOrder.nativeOrder());
 for (int i=0, off=0; i<{fname}.length; i++, off += {pointer_sz}) {{
     if ({fname}[i] == null)
         putPointer({fname}_buf, off, 0);
@@ -263,7 +263,7 @@ strzArrayEmitUnsized.addRead("""
 strzArrayEmitUnsized.addWriteBuf("{buftype} {fname}_buf")
 strzArrayEmitUnsized.addWriteBuf("{buftype}[] {fname}_bufs")
 strzArrayEmitUnsized.addWrite("""
-{fname}_buf = ByteBuffer.allocateDirect(({fname}.length+1)*{pointer_sz});
+{fname}_buf = ByteBuffer.allocateDirect(({fname}.length+1)*{pointer_sz}).order(ByteOrder.nativeOrder());
 for (int i=0, off=0; i<{fname}.length; i++, off += {pointer_sz}) {{
     if ({fname}[i] == null)
         putPointer({fname}_buf, off, 0);
@@ -295,7 +295,7 @@ if ({size_fname} > 0 && {fname}_addr != 0) {{
 }}""" % (4, 4))
 enumArrayEmit.addWriteBuf("{buftype} {fname}_buf")
 enumArrayEmit.addWrite("""
-{fname}_buf = ByteBuffer.allocateDirect({fname}.length*%d);
+{fname}_buf = ByteBuffer.allocateDirect({fname}.length*%d).order(ByteOrder.nativeOrder());
 for (int i=0, off=0; i<{fname}.length; i++, off += %d) {{
     if ({fname} != null)
         {fname}_buf.putInt(off, {fname}[i].getValue());
@@ -316,7 +316,7 @@ if ({size_fname} > 0 && {fname}_addr != 0) {{
 }}""")
 opaqueArrayEmit.addWriteBuf("{buftype} {fname}_buf")
 opaqueArrayEmit.addWrite("""
-{fname}_buf = ByteBuffer.allocateDirect({fname}.length*{pointer_sz});
+{fname}_buf = ByteBuffer.allocateDirect({fname}.length*{pointer_sz}).order(ByteOrder.nativeOrder());
 for (int i=0, off=0; i<{fname}.length; i++, off += {pointer_sz}) {{
     putPointer({fname}_buf, off, {fname}[i]);
 }}""")
@@ -368,7 +368,7 @@ if ({size_fname} > 0 && {fname}_addr != 0) {{
 structArrayEmit.addWriteBuf("{buftype} {fname}_buf")
 # FIXME: This can be optimized for the read->write case.
 structArrayEmit.addWrite("""
-{fname}_buf = ByteBuffer.allocateDirect({fname}.length*{struct_sz});
+{fname}_buf = ByteBuffer.allocateDirect({fname}.length*{struct_sz}).order(ByteOrder.nativeOrder());
 for (int i=0, off=0; i<{fname}.length; i++, off += {struct_sz}) {{
     {fname}[i].setBuffer({fname}_buf, off);
     {fname}[i].write();
@@ -400,7 +400,7 @@ if ({size_fname} > 0 && {fname}_addr != 0) {{
 }}""")
 jtypeArrayEmit.addWriteBuf("ByteBuffer {fname}_buf")
 jtypeArrayEmit.addWrite("""
-{fname}_buf = ByteBuffer.allocateDirect({fname}.length*{struct_sz});
+{fname}_buf = ByteBuffer.allocateDirect({fname}.length*{struct_sz}).order(ByteOrder.nativeOrder());
 {fname}_buf.as{buftype}().put({fname}).rewind();""")
 jtypeArrayEmit.addBackingWrite("putPointer({backing}, {foffset}, {fname}_buf);")
 jtypeArrayEmit.toArg = "getByteBufferAddress({fname}_buf)"
@@ -1151,7 +1151,7 @@ static void dxthrowJavaException(JNIEnv *env, IMAQdxError err) {{
 
 extern "C" {{
 
-JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqDispose(JNIEnv* , jclass , jlong addr)
+JNIEXPORT void JNICALL Java_{package}_{classname}_imaqDispose(JNIEnv* , jclass , jlong addr)
 {{
     imaqDispose((void*)addr);
 }}""".format(packagepath=self.package.replace(".", "/"),
@@ -1332,7 +1332,7 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqDispose(JNIEnv* , jclass
             return
         elif typedef.startswith("union"):
             return
-        else:
+        elif (name, arr) not in java_types_map:
             java_types_map[(name, arr)] = c_to_jtype(typedef, arr).copy()
             if arr is None:
                 java_types_map[(name, "")] = c_to_jtype(typedef, "").copy()
@@ -1495,7 +1495,7 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqDispose(JNIEnv* , jclass
                 jn_passedargs[fname] = fname
             elif jtype.jni_sig == "Ljava/lang/String;":
                 if jtype.string_array:
-                    jinit.append("ByteBuffer {fname}_buf = ByteBuffer.allocateDirect({array_size});".format(fname=fname, array_size=256))
+                    jinit.append("ByteBuffer {fname}_buf = ByteBuffer.allocateDirect({array_size}).order(ByteOrder.nativeOrder());".format(fname=fname, array_size=256))
                     jinit.extend(field["backing_write"])
                     jn_passedargs[fname] = "{fname} == null ? 0 : getByteBufferAddress({fname}_buf)".format(fname=fname)
                 else:
@@ -1511,7 +1511,7 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqDispose(JNIEnv* , jclass
         #print(name, jrettype, outparams, retarraysize, retsize)
         if outparams or retarraysize or retsize:
             # create a return buffer (TODO: optimize size)
-            jinit.append("ByteBuffer rv_buf = ByteBuffer.allocateDirect(%d);" % ((len(outparams)+1)*8))
+            jinit.append("ByteBuffer rv_buf = ByteBuffer.allocateDirect(%d).order(ByteOrder.nativeOrder());" % ((len(outparams)+1)*8))
             jinit.append("long rv_addr = getByteBufferAddress(rv_buf);")
 
             # create a return structure

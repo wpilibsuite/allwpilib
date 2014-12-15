@@ -3826,7 +3826,7 @@ public class NIVision {
             p2 = backing.getFloat(12);
         }
         public void write() {
-            kCoeffs_buf = ByteBuffer.allocateDirect(kCoeffs.length*4);
+            kCoeffs_buf = ByteBuffer.allocateDirect(kCoeffs.length*4).order(ByteOrder.nativeOrder());
             kCoeffs_buf.asFloatBuffer().put(kCoeffs).rewind();
             backing.putInt(4, kCoeffs.length);
             putPointer(backing, 0, kCoeffs_buf);
@@ -4109,14 +4109,14 @@ public class NIVision {
             imageSize.read();
         }
         public void write() {
-            pixelCoords_buf = ByteBuffer.allocateDirect(pixelCoords.length*16);
+            pixelCoords_buf = ByteBuffer.allocateDirect(pixelCoords.length*16).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<pixelCoords.length; i++, off += 16) {
                 pixelCoords[i].setBuffer(pixelCoords_buf, off);
                 pixelCoords[i].write();
             }
             backing.putInt(4, pixelCoords.length);
             putPointer(backing, 0, pixelCoords_buf);
-            realCoords_buf = ByteBuffer.allocateDirect(realCoords.length*16);
+            realCoords_buf = ByteBuffer.allocateDirect(realCoords.length*16).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<realCoords.length; i++, off += 16) {
                 realCoords[i].setBuffer(realCoords_buf, off);
                 realCoords[i].write();
@@ -4930,7 +4930,7 @@ public class NIVision {
             }
         }
         public void write() {
-            points_buf = ByteBuffer.allocateDirect(points.length*16);
+            points_buf = ByteBuffer.allocateDirect(points.length*16).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<points.length; i++, off += 16) {
                 points[i].setBuffer(points_buf, off);
                 points[i].write();
@@ -5118,14 +5118,14 @@ public class NIVision {
             }
         }
         public void write() {
-            bestFit_buf = ByteBuffer.allocateDirect(bestFit.length*16);
+            bestFit_buf = ByteBuffer.allocateDirect(bestFit.length*16).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<bestFit.length; i++, off += 16) {
                 bestFit[i].setBuffer(bestFit_buf, off);
                 bestFit[i].write();
             }
             backing.putInt(4, bestFit.length);
             putPointer(backing, 0, bestFit_buf);
-            polynomialCoefficients_buf = ByteBuffer.allocateDirect(polynomialCoefficients.length*8);
+            polynomialCoefficients_buf = ByteBuffer.allocateDirect(polynomialCoefficients.length*8).order(ByteOrder.nativeOrder());
             polynomialCoefficients_buf.asDoubleBuffer().put(polynomialCoefficients).rewind();
             backing.putInt(12, polynomialCoefficients.length);
             putPointer(backing, 8, polynomialCoefficients_buf);
@@ -5452,25 +5452,25 @@ public class NIVision {
             hasEquation = backing.getInt(48);
         }
         public void write() {
-            pointsPixel_buf = ByteBuffer.allocateDirect(pointsPixel.length*16);
+            pointsPixel_buf = ByteBuffer.allocateDirect(pointsPixel.length*16).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<pointsPixel.length; i++, off += 16) {
                 pointsPixel[i].setBuffer(pointsPixel_buf, off);
                 pointsPixel[i].write();
             }
             backing.putInt(4, pointsPixel.length);
             putPointer(backing, 0, pointsPixel_buf);
-            pointsReal_buf = ByteBuffer.allocateDirect(pointsReal.length*16);
+            pointsReal_buf = ByteBuffer.allocateDirect(pointsReal.length*16).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<pointsReal.length; i++, off += 16) {
                 pointsReal[i].setBuffer(pointsReal_buf, off);
                 pointsReal[i].write();
             }
             backing.putInt(12, pointsReal.length);
             putPointer(backing, 8, pointsReal_buf);
-            curvaturePixel_buf = ByteBuffer.allocateDirect(curvaturePixel.length*8);
+            curvaturePixel_buf = ByteBuffer.allocateDirect(curvaturePixel.length*8).order(ByteOrder.nativeOrder());
             curvaturePixel_buf.asDoubleBuffer().put(curvaturePixel).rewind();
             backing.putInt(20, curvaturePixel.length);
             putPointer(backing, 16, curvaturePixel_buf);
-            curvatureReal_buf = ByteBuffer.allocateDirect(curvatureReal.length*8);
+            curvatureReal_buf = ByteBuffer.allocateDirect(curvatureReal.length*8).order(ByteOrder.nativeOrder());
             curvatureReal_buf.asDoubleBuffer().put(curvatureReal).rewind();
             backing.putInt(28, curvatureReal.length);
             putPointer(backing, 24, curvatureReal_buf);
@@ -5587,7 +5587,7 @@ public class NIVision {
             }
         }
         public void write() {
-            labelOut_buf = ByteBuffer.allocateDirect(labelOut.length*8);
+            labelOut_buf = ByteBuffer.allocateDirect(labelOut.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<labelOut.length; i++, off += 8) {
                 labelOut[i].setBuffer(labelOut_buf, off);
                 labelOut[i].write();
@@ -5658,17 +5658,17 @@ public class NIVision {
             }
         }
         public void write() {
-            roiArray_buf = ByteBuffer.allocateDirect(roiArray.length*4);
+            roiArray_buf = ByteBuffer.allocateDirect(roiArray.length*4).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<roiArray.length; i++, off += 4) {
                 putPointer(roiArray_buf, off, roiArray[i]);
             }
             backing.putInt(4, roiArray.length);
             putPointer(backing, 0, roiArray_buf);
-            labelsOutArray_buf = ByteBuffer.allocateDirect(labelsOutArray.length*4);
+            labelsOutArray_buf = ByteBuffer.allocateDirect(labelsOutArray.length*4).order(ByteOrder.nativeOrder());
             labelsOutArray_buf.asIntBuffer().put(labelsOutArray).rewind();
             backing.putInt(12, labelsOutArray.length);
             putPointer(backing, 8, labelsOutArray_buf);
-            isTooManyVectorsArray_buf = ByteBuffer.allocateDirect(isTooManyVectorsArray.length*4);
+            isTooManyVectorsArray_buf = ByteBuffer.allocateDirect(isTooManyVectorsArray.length*4).order(ByteOrder.nativeOrder());
             isTooManyVectorsArray_buf.asIntBuffer().put(isTooManyVectorsArray).rewind();
             backing.putInt(20, isTooManyVectorsArray.length);
             putPointer(backing, 16, isTooManyVectorsArray_buf);
@@ -5793,7 +5793,7 @@ public class NIVision {
             backing.putDouble(16, maxCurvature);
             backing.putDouble(24, maxCurvatureReal);
             backing.putInt(32, label);
-            curvePoints_buf = ByteBuffer.allocateDirect(curvePoints.length*16);
+            curvePoints_buf = ByteBuffer.allocateDirect(curvePoints.length*16).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<curvePoints.length; i++, off += 16) {
                 curvePoints[i].setBuffer(curvePoints_buf, off);
                 curvePoints[i].write();
@@ -5925,7 +5925,7 @@ public class NIVision {
             }
         }
         public void write() {
-            curves_buf = ByteBuffer.allocateDirect(curves.length*48);
+            curves_buf = ByteBuffer.allocateDirect(curves.length*48).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<curves.length; i++, off += 48) {
                 curves[i].setBuffer(curves_buf, off);
                 curves[i].write();
@@ -6036,14 +6036,14 @@ public class NIVision {
             }
         }
         public void write() {
-            distances_buf = ByteBuffer.allocateDirect(distances.length*40);
+            distances_buf = ByteBuffer.allocateDirect(distances.length*40).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<distances.length; i++, off += 40) {
                 distances[i].setBuffer(distances_buf, off);
                 distances[i].write();
             }
             backing.putInt(4, distances.length);
             putPointer(backing, 0, distances_buf);
-            distancesReal_buf = ByteBuffer.allocateDirect(distancesReal.length*40);
+            distancesReal_buf = ByteBuffer.allocateDirect(distancesReal.length*40).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<distancesReal.length; i++, off += 40) {
                 distancesReal[i].setBuffer(distancesReal_buf, off);
                 distancesReal[i].write();
@@ -6173,14 +6173,14 @@ public class NIVision {
             backing.putDouble(16, maxDistance);
             backing.putDouble(24, maxDistanceReal);
             backing.putInt(32, label);
-            templateSubsection_buf = ByteBuffer.allocateDirect(templateSubsection.length*16);
+            templateSubsection_buf = ByteBuffer.allocateDirect(templateSubsection.length*16).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<templateSubsection.length; i++, off += 16) {
                 templateSubsection[i].setBuffer(templateSubsection_buf, off);
                 templateSubsection[i].write();
             }
             backing.putInt(40, templateSubsection.length);
             putPointer(backing, 36, templateSubsection_buf);
-            targetSubsection_buf = ByteBuffer.allocateDirect(targetSubsection.length*16);
+            targetSubsection_buf = ByteBuffer.allocateDirect(targetSubsection.length*16).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<targetSubsection.length; i++, off += 16) {
                 targetSubsection[i].setBuffer(targetSubsection_buf, off);
                 targetSubsection[i].write();
@@ -6232,7 +6232,7 @@ public class NIVision {
             }
         }
         public void write() {
-            classifiedDistances_buf = ByteBuffer.allocateDirect(classifiedDistances.length*56);
+            classifiedDistances_buf = ByteBuffer.allocateDirect(classifiedDistances.length*56).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<classifiedDistances.length; i++, off += 56) {
                 classifiedDistances[i].setBuffer(classifiedDistances_buf, off);
                 classifiedDistances[i].write();
@@ -6290,11 +6290,11 @@ public class NIVision {
             }
         }
         public void write() {
-            curvaturePixel_buf = ByteBuffer.allocateDirect(curvaturePixel.length*8);
+            curvaturePixel_buf = ByteBuffer.allocateDirect(curvaturePixel.length*8).order(ByteOrder.nativeOrder());
             curvaturePixel_buf.asDoubleBuffer().put(curvaturePixel).rewind();
             backing.putInt(4, curvaturePixel.length);
             putPointer(backing, 0, curvaturePixel_buf);
-            curvatureReal_buf = ByteBuffer.allocateDirect(curvatureReal.length*8);
+            curvatureReal_buf = ByteBuffer.allocateDirect(curvatureReal.length*8).order(ByteOrder.nativeOrder());
             curvatureReal_buf.asDoubleBuffer().put(curvatureReal).rewind();
             backing.putInt(12, curvatureReal.length);
             putPointer(backing, 8, curvatureReal_buf);
@@ -6467,14 +6467,14 @@ public class NIVision {
             }
         }
         public void write() {
-            contourPoints_buf = ByteBuffer.allocateDirect(contourPoints.length*16);
+            contourPoints_buf = ByteBuffer.allocateDirect(contourPoints.length*16).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<contourPoints.length; i++, off += 16) {
                 contourPoints[i].setBuffer(contourPoints_buf, off);
                 contourPoints[i].write();
             }
             backing.putInt(4, contourPoints.length);
             putPointer(backing, 0, contourPoints_buf);
-            sourcePoints_buf = ByteBuffer.allocateDirect(sourcePoints.length*16);
+            sourcePoints_buf = ByteBuffer.allocateDirect(sourcePoints.length*16).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<sourcePoints.length; i++, off += 16) {
                 sourcePoints[i].setBuffer(sourcePoints_buf, off);
                 sourcePoints[i].write();
@@ -6569,7 +6569,7 @@ public class NIVision {
             textureFeaturesCols = backing.getInt(16);
         }
         public void write() {
-            waveletBands_buf = ByteBuffer.allocateDirect(waveletBands.length*4);
+            waveletBands_buf = ByteBuffer.allocateDirect(waveletBands.length*4).order(ByteOrder.nativeOrder());
             waveletBands_buf.asIntBuffer().put(waveletBands).rewind();
             backing.putInt(4, waveletBands.length);
             putPointer(backing, 0, waveletBands_buf);
@@ -7930,14 +7930,14 @@ public class NIVision {
             putPointer(backing, 0, bestClassName == null ? 0 : getByteBufferAddress(bestClassName_buf));
             backing.putFloat(4, classificationScore);
             backing.putFloat(8, identificationScore);
-            allScores_buf = ByteBuffer.allocateDirect(allScores.length*8);
+            allScores_buf = ByteBuffer.allocateDirect(allScores.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<allScores.length; i++, off += 8) {
                 allScores[i].setBuffer(allScores_buf, off);
                 allScores[i].write();
             }
             backing.putInt(16, allScores.length);
             putPointer(backing, 12, allScores_buf);
-            sampleScores_buf = ByteBuffer.allocateDirect(sampleScores.length*12);
+            sampleScores_buf = ByteBuffer.allocateDirect(sampleScores.length*12).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<sampleScores.length; i++, off += 12) {
                 sampleScores[i].setBuffer(sampleScores_buf, off);
                 sampleScores[i].write();
@@ -8195,7 +8195,7 @@ public class NIVision {
             }
         }
         public void write() {
-            straightEdges_buf = ByteBuffer.allocateDirect(straightEdges.length*88);
+            straightEdges_buf = ByteBuffer.allocateDirect(straightEdges.length*88).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<straightEdges.length; i++, off += 88) {
                 straightEdges[i].setBuffer(straightEdges_buf, off);
                 straightEdges[i].write();
@@ -8500,7 +8500,7 @@ public class NIVision {
                 putBytes(readString_buf, readString_bytes, 0, readString_bytes.length).put(readString_bytes.length, (byte)0);
             }
             putPointer(backing, 0, readString == null ? 0 : getByteBufferAddress(readString_buf));
-            characterReport_buf = ByteBuffer.allocateDirect(characterReport.length*44);
+            characterReport_buf = ByteBuffer.allocateDirect(characterReport.length*44).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<characterReport.length; i++, off += 44) {
                 characterReport[i].setBuffer(characterReport_buf, off);
                 characterReport[i].write();
@@ -8751,14 +8751,14 @@ public class NIVision {
             calibrationValid = backing.getInt(16);
         }
         public void write() {
-            edges_buf = ByteBuffer.allocateDirect(edges.length*56);
+            edges_buf = ByteBuffer.allocateDirect(edges.length*56).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<edges.length; i++, off += 56) {
                 edges[i].setBuffer(edges_buf, off);
                 edges[i].write();
             }
             backing.putInt(4, edges.length);
             putPointer(backing, 0, edges_buf);
-            gradientInfo_buf = ByteBuffer.allocateDirect(gradientInfo.length*8);
+            gradientInfo_buf = ByteBuffer.allocateDirect(gradientInfo.length*8).order(ByteOrder.nativeOrder());
             gradientInfo_buf.asDoubleBuffer().put(gradientInfo).rewind();
             backing.putInt(12, gradientInfo.length);
             putPointer(backing, 8, gradientInfo_buf);
@@ -8877,21 +8877,21 @@ public class NIVision {
             }
         }
         public void write() {
-            firstEdges_buf = ByteBuffer.allocateDirect(firstEdges.length*56);
+            firstEdges_buf = ByteBuffer.allocateDirect(firstEdges.length*56).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<firstEdges.length; i++, off += 56) {
                 firstEdges[i].setBuffer(firstEdges_buf, off);
                 firstEdges[i].write();
             }
             backing.putInt(4, firstEdges.length);
             putPointer(backing, 0, firstEdges_buf);
-            lastEdges_buf = ByteBuffer.allocateDirect(lastEdges.length*56);
+            lastEdges_buf = ByteBuffer.allocateDirect(lastEdges.length*56).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<lastEdges.length; i++, off += 56) {
                 lastEdges[i].setBuffer(lastEdges_buf, off);
                 lastEdges[i].write();
             }
             backing.putInt(12, lastEdges.length);
             putPointer(backing, 8, lastEdges_buf);
-            searchArcs_buf = ByteBuffer.allocateDirect(searchArcs.length*56);
+            searchArcs_buf = ByteBuffer.allocateDirect(searchArcs.length*56).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<searchArcs.length; i++, off += 56) {
                 searchArcs[i].setBuffer(searchArcs_buf, off);
                 searchArcs[i].write();
@@ -8971,21 +8971,21 @@ public class NIVision {
             }
         }
         public void write() {
-            firstEdges_buf = ByteBuffer.allocateDirect(firstEdges.length*56);
+            firstEdges_buf = ByteBuffer.allocateDirect(firstEdges.length*56).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<firstEdges.length; i++, off += 56) {
                 firstEdges[i].setBuffer(firstEdges_buf, off);
                 firstEdges[i].write();
             }
             backing.putInt(4, firstEdges.length);
             putPointer(backing, 0, firstEdges_buf);
-            lastEdges_buf = ByteBuffer.allocateDirect(lastEdges.length*56);
+            lastEdges_buf = ByteBuffer.allocateDirect(lastEdges.length*56).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<lastEdges.length; i++, off += 56) {
                 lastEdges[i].setBuffer(lastEdges_buf, off);
                 lastEdges[i].write();
             }
             backing.putInt(12, lastEdges.length);
             putPointer(backing, 8, lastEdges_buf);
-            searchLines_buf = ByteBuffer.allocateDirect(searchLines.length*36);
+            searchLines_buf = ByteBuffer.allocateDirect(searchLines.length*36).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<searchLines.length; i++, off += 36) {
                 searchLines[i].setBuffer(searchLines_buf, off);
                 searchLines[i].write();
@@ -9167,21 +9167,21 @@ public class NIVision {
             }
         }
         public void write() {
-            firstEdges_buf = ByteBuffer.allocateDirect(firstEdges.length*56);
+            firstEdges_buf = ByteBuffer.allocateDirect(firstEdges.length*56).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<firstEdges.length; i++, off += 56) {
                 firstEdges[i].setBuffer(firstEdges_buf, off);
                 firstEdges[i].write();
             }
             backing.putInt(4, firstEdges.length);
             putPointer(backing, 0, firstEdges_buf);
-            lastEdges_buf = ByteBuffer.allocateDirect(lastEdges.length*56);
+            lastEdges_buf = ByteBuffer.allocateDirect(lastEdges.length*56).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<lastEdges.length; i++, off += 56) {
                 lastEdges[i].setBuffer(lastEdges_buf, off);
                 lastEdges[i].write();
             }
             backing.putInt(12, lastEdges.length);
             putPointer(backing, 8, lastEdges_buf);
-            searchLines_buf = ByteBuffer.allocateDirect(searchLines.length*36);
+            searchLines_buf = ByteBuffer.allocateDirect(searchLines.length*36).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<searchLines.length; i++, off += 36) {
                 searchLines[i].setBuffer(searchLines_buf, off);
                 searchLines[i].write();
@@ -9397,14 +9397,14 @@ public class NIVision {
             }
         }
         public void write() {
-            straightEdges_buf = ByteBuffer.allocateDirect(straightEdges.length*88);
+            straightEdges_buf = ByteBuffer.allocateDirect(straightEdges.length*88).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<straightEdges.length; i++, off += 88) {
                 straightEdges[i].setBuffer(straightEdges_buf, off);
                 straightEdges[i].write();
             }
             backing.putInt(4, straightEdges.length);
             putPointer(backing, 0, straightEdges_buf);
-            searchLines_buf = ByteBuffer.allocateDirect(searchLines.length*36);
+            searchLines_buf = ByteBuffer.allocateDirect(searchLines.length*36).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<searchLines.length; i++, off += 36) {
                 searchLines[i].setBuffer(searchLines_buf, off);
                 searchLines[i].write();
@@ -9567,7 +9567,7 @@ public class NIVision {
             backing.putDouble(56, straightness);
             backing.putDouble(64, averageSignalToNoiseRatio);
             backing.putInt(72, calibrationValid);
-            usedEdges_buf = ByteBuffer.allocateDirect(usedEdges.length*56);
+            usedEdges_buf = ByteBuffer.allocateDirect(usedEdges.length*56).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<usedEdges.length; i++, off += 56) {
                 usedEdges[i].setBuffer(usedEdges_buf, off);
                 usedEdges[i].write();
@@ -9853,7 +9853,7 @@ public class NIVision {
             for (PointFloat it : boundingBox) {
                 it.write();
             }
-            tokenizedData_buf = ByteBuffer.allocateDirect(tokenizedData.length*16);
+            tokenizedData_buf = ByteBuffer.allocateDirect(tokenizedData.length*16).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<tokenizedData.length; i++, off += 16) {
                 tokenizedData[i].setBuffer(tokenizedData_buf, off);
                 tokenizedData[i].write();
@@ -10765,7 +10765,7 @@ public class NIVision {
                 putBytes(readString_buf, readString_bytes, 0, readString_bytes.length).put(readString_bytes.length, (byte)0);
             }
             putPointer(backing, 0, readString == null ? 0 : getByteBufferAddress(readString_buf));
-            characterReport_buf = ByteBuffer.allocateDirect(characterReport.length*56);
+            characterReport_buf = ByteBuffer.allocateDirect(characterReport.length*56).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<characterReport.length; i++, off += 56) {
                 characterReport[i].setBuffer(characterReport_buf, off);
                 characterReport[i].write();
@@ -11363,7 +11363,7 @@ public class NIVision {
         public void write() {
             if (type != null)
                 backing.putInt(0, type.getValue());
-            contourPoints_buf = ByteBuffer.allocateDirect(contourPoints.length*8);
+            contourPoints_buf = ByteBuffer.allocateDirect(contourPoints.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<contourPoints.length; i++, off += 8) {
                 contourPoints[i].setBuffer(contourPoints_buf, off);
                 contourPoints[i].write();
@@ -11534,7 +11534,7 @@ public class NIVision {
                 for (int i=bytes.length; i<256; i++)
                     backing.put(i, (byte)0); // fill with zero
             }
-            featureData_buf = ByteBuffer.allocateDirect(featureData.length*16);
+            featureData_buf = ByteBuffer.allocateDirect(featureData.length*16).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<featureData.length; i++, off += 16) {
                 featureData[i].setBuffer(featureData_buf, off);
                 featureData[i].write();
@@ -12026,7 +12026,7 @@ public class NIVision {
         }
         public void write() {
             backing.putInt(0, mode);
-            angleRanges_buf = ByteBuffer.allocateDirect(angleRanges.length*8);
+            angleRanges_buf = ByteBuffer.allocateDirect(angleRanges.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<angleRanges.length; i++, off += 8) {
                 angleRanges[i].setBuffer(angleRanges_buf, off);
                 angleRanges[i].write();
@@ -12095,7 +12095,7 @@ public class NIVision {
             averageEdgeStrength = backing.getDouble(40);
         }
         public void write() {
-            points_buf = ByteBuffer.allocateDirect(points.length*8);
+            points_buf = ByteBuffer.allocateDirect(points.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<points.length; i++, off += 8) {
                 points[i].setBuffer(points_buf, off);
                 points[i].write();
@@ -12399,7 +12399,7 @@ public class NIVision {
         }
         public void write() {
             backing.putFloat(4, accuracy);
-            classNames_buf = ByteBuffer.allocateDirect(classNames.length*4);
+            classNames_buf = ByteBuffer.allocateDirect(classNames.length*4).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<classNames.length; i++, off += 4) {
                 if (classNames[i] == null)
                     putPointer(classNames_buf, off, 0);
@@ -12417,11 +12417,11 @@ public class NIVision {
             }
             backing.putInt(0, classNames.length);
             putPointer(backing, 8, classNames_buf);
-            classAccuracy_buf = ByteBuffer.allocateDirect(classAccuracy.length*8);
+            classAccuracy_buf = ByteBuffer.allocateDirect(classAccuracy.length*8).order(ByteOrder.nativeOrder());
             classAccuracy_buf.asDoubleBuffer().put(classAccuracy).rewind();
             backing.putInt(0, classAccuracy.length);
             putPointer(backing, 12, classAccuracy_buf);
-            classPredictiveValue_buf = ByteBuffer.allocateDirect(classPredictiveValue.length*8);
+            classPredictiveValue_buf = ByteBuffer.allocateDirect(classPredictiveValue.length*8).order(ByteOrder.nativeOrder());
             classPredictiveValue_buf.asDoubleBuffer().put(classPredictiveValue).rewind();
             backing.putInt(0, classPredictiveValue.length);
             putPointer(backing, 16, classPredictiveValue_buf);
@@ -12539,7 +12539,7 @@ public class NIVision {
             }
         }
         public void write() {
-            allScores_buf = ByteBuffer.allocateDirect(allScores.length*12);
+            allScores_buf = ByteBuffer.allocateDirect(allScores.length*12).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<allScores.length; i++, off += 12) {
                 allScores[i].setBuffer(allScores_buf, off);
                 allScores[i].write();
@@ -12686,7 +12686,7 @@ public class NIVision {
                 putBytes(className_buf, className_bytes, 0, className_bytes.length).put(className_bytes.length, (byte)0);
             }
             putPointer(backing, 0, className == null ? 0 : getByteBufferAddress(className_buf));
-            featureVector_buf = ByteBuffer.allocateDirect(featureVector.length*8);
+            featureVector_buf = ByteBuffer.allocateDirect(featureVector.length*8).order(ByteOrder.nativeOrder());
             featureVector_buf.asDoubleBuffer().put(featureVector).rewind();
             backing.putInt(8, featureVector.length);
             putPointer(backing, 4, featureVector_buf);
@@ -12838,7 +12838,7 @@ public class NIVision {
             putPointer(backing, 0, bestClassName == null ? 0 : getByteBufferAddress(bestClassName_buf));
             backing.putFloat(4, classificationScore);
             backing.putFloat(8, identificationScore);
-            allScores_buf = ByteBuffer.allocateDirect(allScores.length*8);
+            allScores_buf = ByteBuffer.allocateDirect(allScores.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<allScores.length; i++, off += 8) {
                 allScores[i].setBuffer(allScores_buf, off);
                 allScores[i].write();
@@ -13206,7 +13206,7 @@ public class NIVision {
         public void write() {
             backing.putInt(0, mode);
             backing.putInt(4, subpixelAccuracy);
-            angleRanges_buf = ByteBuffer.allocateDirect(angleRanges.length*8);
+            angleRanges_buf = ByteBuffer.allocateDirect(angleRanges.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<angleRanges.length; i++, off += 8) {
                 angleRanges[i].setBuffer(angleRanges_buf, off);
                 angleRanges[i].write();
@@ -13459,7 +13459,7 @@ public class NIVision {
             putPointer(backing, 4, windowTitle == null ? 0 : getByteBufferAddress(windowTitle_buf));
             if (type != null)
                 backing.putInt(8, type.getValue());
-            palette_buf = ByteBuffer.allocateDirect(palette.length*4);
+            palette_buf = ByteBuffer.allocateDirect(palette.length*4).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<palette.length; i++, off += 4) {
                 palette[i].setBuffer(palette_buf, off);
                 palette[i].write();
@@ -13789,7 +13789,7 @@ public class NIVision {
             backing.putDouble(48, perimeter);
             backing.putDouble(56, error);
             backing.putInt(64, valid);
-            pointsUsed_buf = ByteBuffer.allocateDirect(pointsUsed.length*4);
+            pointsUsed_buf = ByteBuffer.allocateDirect(pointsUsed.length*4).order(ByteOrder.nativeOrder());
             pointsUsed_buf.asIntBuffer().put(pointsUsed).rewind();
             backing.putInt(72, pointsUsed.length);
             putPointer(backing, 68, pointsUsed_buf);
@@ -14244,7 +14244,7 @@ public class NIVision {
             backing.putDouble(24, perimeter);
             backing.putDouble(32, error);
             backing.putInt(40, valid);
-            pointsUsed_buf = ByteBuffer.allocateDirect(pointsUsed.length*4);
+            pointsUsed_buf = ByteBuffer.allocateDirect(pointsUsed.length*4).order(ByteOrder.nativeOrder());
             pointsUsed_buf.asIntBuffer().put(pointsUsed).rewind();
             backing.putInt(48, pointsUsed.length);
             putPointer(backing, 44, pointsUsed_buf);
@@ -14463,7 +14463,7 @@ public class NIVision {
             readResolution = ReadResolution.fromValue(backing.getInt(65300));
         }
         public void write() {
-            validChars_buf = ByteBuffer.allocateDirect(validChars.length*4);
+            validChars_buf = ByteBuffer.allocateDirect(validChars.length*4).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<validChars.length; i++, off += 4) {
                 if (validChars[i] == null)
                     putPointer(validChars_buf, off, 0);
@@ -14771,7 +14771,7 @@ public class NIVision {
                 putBytes(readString_buf, readString_bytes, 0, readString_bytes.length).put(readString_bytes.length, (byte)0);
             }
             putPointer(backing, 0, readString == null ? 0 : getByteBufferAddress(readString_buf));
-            characterReport_buf = ByteBuffer.allocateDirect(characterReport.length*48);
+            characterReport_buf = ByteBuffer.allocateDirect(characterReport.length*48).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<characterReport.length; i++, off += 48) {
                 characterReport[i].setBuffer(characterReport_buf, off);
                 characterReport[i].write();
@@ -14915,7 +14915,7 @@ public class NIVision {
             }
         }
         public void write() {
-            edges_buf = ByteBuffer.allocateDirect(edges.length*8);
+            edges_buf = ByteBuffer.allocateDirect(edges.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<edges.length; i++, off += 8) {
                 edges[i].setBuffer(edges_buf, off);
                 edges[i].write();
@@ -15401,7 +15401,7 @@ public class NIVision {
                 putBytes(text_buf, text_bytes, 0, text_bytes.length).put(text_bytes.length, (byte)0);
             }
             putPointer(backing, 0, text == null ? 0 : getByteBufferAddress(text_buf));
-            segmentInfo_buf = ByteBuffer.allocateDirect(segmentInfo.length*4);
+            segmentInfo_buf = ByteBuffer.allocateDirect(segmentInfo.length*4).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<segmentInfo.length; i++, off += 4) {
                 segmentInfo[i].setBuffer(segmentInfo_buf, off);
                 segmentInfo[i].write();
@@ -15559,7 +15559,7 @@ public class NIVision {
             backing.putInt(8, threshold);
             if (ignoreMode != null)
                 backing.putInt(12, ignoreMode.getValue());
-            colorsToIgnore_buf = ByteBuffer.allocateDirect(colorsToIgnore.length*12);
+            colorsToIgnore_buf = ByteBuffer.allocateDirect(colorsToIgnore.length*12).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<colorsToIgnore.length; i++, off += 12) {
                 colorsToIgnore[i].setBuffer(colorsToIgnore_buf, off);
                 colorsToIgnore[i].write();
@@ -15678,19 +15678,19 @@ public class NIVision {
             }
         }
         public void write() {
-            columnAverages_buf = ByteBuffer.allocateDirect(columnAverages.length*4);
+            columnAverages_buf = ByteBuffer.allocateDirect(columnAverages.length*4).order(ByteOrder.nativeOrder());
             columnAverages_buf.asFloatBuffer().put(columnAverages).rewind();
             backing.putInt(4, columnAverages.length);
             putPointer(backing, 0, columnAverages_buf);
-            rowAverages_buf = ByteBuffer.allocateDirect(rowAverages.length*4);
+            rowAverages_buf = ByteBuffer.allocateDirect(rowAverages.length*4).order(ByteOrder.nativeOrder());
             rowAverages_buf.asFloatBuffer().put(rowAverages).rewind();
             backing.putInt(12, rowAverages.length);
             putPointer(backing, 8, rowAverages_buf);
-            risingDiagAverages_buf = ByteBuffer.allocateDirect(risingDiagAverages.length*4);
+            risingDiagAverages_buf = ByteBuffer.allocateDirect(risingDiagAverages.length*4).order(ByteOrder.nativeOrder());
             risingDiagAverages_buf.asFloatBuffer().put(risingDiagAverages).rewind();
             backing.putInt(20, risingDiagAverages.length);
             putPointer(backing, 16, risingDiagAverages_buf);
-            fallingDiagAverages_buf = ByteBuffer.allocateDirect(fallingDiagAverages.length*4);
+            fallingDiagAverages_buf = ByteBuffer.allocateDirect(fallingDiagAverages.length*4).order(ByteOrder.nativeOrder());
             fallingDiagAverages_buf.asFloatBuffer().put(fallingDiagAverages).rewind();
             backing.putInt(28, fallingDiagAverages.length);
             putPointer(backing, 24, fallingDiagAverages_buf);
@@ -15751,7 +15751,7 @@ public class NIVision {
             stdDev = backing.getFloat(32);
         }
         public void write() {
-            profileData_buf = ByteBuffer.allocateDirect(profileData.length*4);
+            profileData_buf = ByteBuffer.allocateDirect(profileData.length*4).order(ByteOrder.nativeOrder());
             profileData_buf.asFloatBuffer().put(profileData).rewind();
             backing.putInt(36, profileData.length);
             putPointer(backing, 0, profileData_buf);
@@ -15838,7 +15838,7 @@ public class NIVision {
                 backing.putInt(4, featureMode.getValue());
             backing.putInt(8, minContrast);
             backing.putInt(12, subpixelAccuracy);
-            angleRanges_buf = ByteBuffer.allocateDirect(angleRanges.length*8);
+            angleRanges_buf = ByteBuffer.allocateDirect(angleRanges.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<angleRanges.length; i++, off += 8) {
                 angleRanges[i].setBuffer(angleRanges_buf, off);
                 angleRanges[i].write();
@@ -15914,7 +15914,7 @@ public class NIVision {
             numPixels = backing.getInt(32);
         }
         public void write() {
-            histogram_buf = ByteBuffer.allocateDirect(histogram.length*4);
+            histogram_buf = ByteBuffer.allocateDirect(histogram.length*4).order(ByteOrder.nativeOrder());
             histogram_buf.asIntBuffer().put(histogram).rewind();
             backing.putInt(4, histogram.length);
             putPointer(backing, 0, histogram_buf);
@@ -16321,7 +16321,7 @@ public class NIVision {
             equation.write();
             backing.putInt(40, valid);
             backing.putDouble(48, error);
-            pointsUsed_buf = ByteBuffer.allocateDirect(pointsUsed.length*4);
+            pointsUsed_buf = ByteBuffer.allocateDirect(pointsUsed.length*4).order(ByteOrder.nativeOrder());
             pointsUsed_buf.asIntBuffer().put(pointsUsed).rewind();
             backing.putInt(60, pointsUsed.length);
             putPointer(backing, 56, pointsUsed_buf);
@@ -16574,14 +16574,14 @@ public class NIVision {
             }
         }
         public void write() {
-            pixelCoordinates_buf = ByteBuffer.allocateDirect(pixelCoordinates.length*8);
+            pixelCoordinates_buf = ByteBuffer.allocateDirect(pixelCoordinates.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<pixelCoordinates.length; i++, off += 8) {
                 pixelCoordinates[i].setBuffer(pixelCoordinates_buf, off);
                 pixelCoordinates[i].write();
             }
             backing.putInt(8, pixelCoordinates.length);
             putPointer(backing, 0, pixelCoordinates_buf);
-            realWorldCoordinates_buf = ByteBuffer.allocateDirect(realWorldCoordinates.length*8);
+            realWorldCoordinates_buf = ByteBuffer.allocateDirect(realWorldCoordinates.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<realWorldCoordinates.length; i++, off += 8) {
                 realWorldCoordinates[i].setBuffer(realWorldCoordinates_buf, off);
                 realWorldCoordinates[i].write();
@@ -16861,7 +16861,7 @@ public class NIVision {
             }
         }
         public void write() {
-            points_buf = ByteBuffer.allocateDirect(points.length*8);
+            points_buf = ByteBuffer.allocateDirect(points.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<points.length; i++, off += 8) {
                 points[i].setBuffer(points_buf, off);
                 points[i].write();
@@ -16959,7 +16959,7 @@ public class NIVision {
         }
         public void write() {
             backing.putInt(4, saturation);
-            info_buf = ByteBuffer.allocateDirect(info.length*8);
+            info_buf = ByteBuffer.allocateDirect(info.length*8).order(ByteOrder.nativeOrder());
             info_buf.asDoubleBuffer().put(info).rewind();
             backing.putInt(0, info.length);
             putPointer(backing, 8, info_buf);
@@ -17100,35 +17100,35 @@ public class NIVision {
             }
         }
         public void write() {
-            rakeArcs_buf = ByteBuffer.allocateDirect(rakeArcs.length*32);
+            rakeArcs_buf = ByteBuffer.allocateDirect(rakeArcs.length*32).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<rakeArcs.length; i++, off += 32) {
                 rakeArcs[i].setBuffer(rakeArcs_buf, off);
                 rakeArcs[i].write();
             }
             backing.putInt(4, rakeArcs.length);
             putPointer(backing, 0, rakeArcs_buf);
-            firstEdges_buf = ByteBuffer.allocateDirect(firstEdges.length*8);
+            firstEdges_buf = ByteBuffer.allocateDirect(firstEdges.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<firstEdges.length; i++, off += 8) {
                 firstEdges[i].setBuffer(firstEdges_buf, off);
                 firstEdges[i].write();
             }
             backing.putInt(12, firstEdges.length);
             putPointer(backing, 8, firstEdges_buf);
-            lastEdges_buf = ByteBuffer.allocateDirect(lastEdges.length*8);
+            lastEdges_buf = ByteBuffer.allocateDirect(lastEdges.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<lastEdges.length; i++, off += 8) {
                 lastEdges[i].setBuffer(lastEdges_buf, off);
                 lastEdges[i].write();
             }
             backing.putInt(20, lastEdges.length);
             putPointer(backing, 16, lastEdges_buf);
-            allEdges_buf = ByteBuffer.allocateDirect(allEdges.length*8);
+            allEdges_buf = ByteBuffer.allocateDirect(allEdges.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<allEdges.length; i++, off += 8) {
                 allEdges[i].setBuffer(allEdges_buf, off);
                 allEdges[i].write();
             }
             backing.putInt(32, allEdges.length);
             putPointer(backing, 24, allEdges_buf);
-            linesWithEdges_buf = ByteBuffer.allocateDirect(linesWithEdges.length*4);
+            linesWithEdges_buf = ByteBuffer.allocateDirect(linesWithEdges.length*4).order(ByteOrder.nativeOrder());
             linesWithEdges_buf.asIntBuffer().put(linesWithEdges).rewind();
             backing.putInt(32, linesWithEdges.length);
             putPointer(backing, 28, linesWithEdges_buf);
@@ -17215,7 +17215,7 @@ public class NIVision {
             putPointer(backing, 4, windowTitle == null ? 0 : getByteBufferAddress(windowTitle_buf));
             if (type != null)
                 backing.putInt(8, type.getValue());
-            palette_buf = ByteBuffer.allocateDirect(palette.length*4);
+            palette_buf = ByteBuffer.allocateDirect(palette.length*4).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<palette.length; i++, off += 4) {
                 palette[i].setBuffer(palette_buf, off);
                 palette[i].write();
@@ -17276,7 +17276,7 @@ public class NIVision {
         public void write() {
             if (type != null)
                 backing.putInt(0, type.getValue());
-            points_buf = ByteBuffer.allocateDirect(points.length*8);
+            points_buf = ByteBuffer.allocateDirect(points.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<points.length; i++, off += 8) {
                 points[i].setBuffer(points_buf, off);
                 points[i].write();
@@ -17816,7 +17816,7 @@ public class NIVision {
                 backing.putInt(0, mode.getValue());
             backing.putInt(4, minContrast);
             backing.putInt(8, subpixelAccuracy);
-            angleRanges_buf = ByteBuffer.allocateDirect(angleRanges.length*8);
+            angleRanges_buf = ByteBuffer.allocateDirect(angleRanges.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<angleRanges.length; i++, off += 8) {
                 angleRanges[i].setBuffer(angleRanges_buf, off);
                 angleRanges[i].write();
@@ -17917,7 +17917,7 @@ public class NIVision {
             }
         }
         public void write() {
-            points_buf = ByteBuffer.allocateDirect(points.length*8);
+            points_buf = ByteBuffer.allocateDirect(points.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<points.length; i++, off += 8) {
                 points[i].setBuffer(points_buf, off);
                 points[i].write();
@@ -18343,7 +18343,7 @@ public class NIVision {
         }
         public void write() {
             global.write();
-            regions_buf = ByteBuffer.allocateDirect(regions.length*28);
+            regions_buf = ByteBuffer.allocateDirect(regions.length*28).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<regions.length; i++, off += 28) {
                 regions[i].setBuffer(regions_buf, off);
                 regions[i].write();
@@ -18504,35 +18504,35 @@ public class NIVision {
             }
         }
         public void write() {
-            rakeLines_buf = ByteBuffer.allocateDirect(rakeLines.length*16);
+            rakeLines_buf = ByteBuffer.allocateDirect(rakeLines.length*16).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<rakeLines.length; i++, off += 16) {
                 rakeLines[i].setBuffer(rakeLines_buf, off);
                 rakeLines[i].write();
             }
             backing.putInt(4, rakeLines.length);
             putPointer(backing, 0, rakeLines_buf);
-            firstEdges_buf = ByteBuffer.allocateDirect(firstEdges.length*8);
+            firstEdges_buf = ByteBuffer.allocateDirect(firstEdges.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<firstEdges.length; i++, off += 8) {
                 firstEdges[i].setBuffer(firstEdges_buf, off);
                 firstEdges[i].write();
             }
             backing.putInt(12, firstEdges.length);
             putPointer(backing, 8, firstEdges_buf);
-            lastEdges_buf = ByteBuffer.allocateDirect(lastEdges.length*8);
+            lastEdges_buf = ByteBuffer.allocateDirect(lastEdges.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<lastEdges.length; i++, off += 8) {
                 lastEdges[i].setBuffer(lastEdges_buf, off);
                 lastEdges[i].write();
             }
             backing.putInt(20, lastEdges.length);
             putPointer(backing, 16, lastEdges_buf);
-            allEdges_buf = ByteBuffer.allocateDirect(allEdges.length*8);
+            allEdges_buf = ByteBuffer.allocateDirect(allEdges.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<allEdges.length; i++, off += 8) {
                 allEdges[i].setBuffer(allEdges_buf, off);
                 allEdges[i].write();
             }
             backing.putInt(32, allEdges.length);
             putPointer(backing, 24, allEdges_buf);
-            linesWithEdges_buf = ByteBuffer.allocateDirect(linesWithEdges.length*4);
+            linesWithEdges_buf = ByteBuffer.allocateDirect(linesWithEdges.length*4).order(ByteOrder.nativeOrder());
             linesWithEdges_buf.asIntBuffer().put(linesWithEdges).rewind();
             backing.putInt(32, linesWithEdges.length);
             putPointer(backing, 28, linesWithEdges_buf);
@@ -18591,14 +18591,14 @@ public class NIVision {
             }
         }
         public void write() {
-            points_buf = ByteBuffer.allocateDirect(points.length*8);
+            points_buf = ByteBuffer.allocateDirect(points.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<points.length; i++, off += 8) {
                 points[i].setBuffer(points_buf, off);
                 points[i].write();
             }
             backing.putInt(8, points.length);
             putPointer(backing, 0, points_buf);
-            validPoints_buf = ByteBuffer.allocateDirect(validPoints.length*4);
+            validPoints_buf = ByteBuffer.allocateDirect(validPoints.length*4).order(ByteOrder.nativeOrder());
             validPoints_buf.asIntBuffer().put(validPoints).rewind();
             backing.putInt(8, validPoints.length);
             putPointer(backing, 4, validPoints_buf);
@@ -18704,7 +18704,7 @@ public class NIVision {
         }
         public void write() {
             needleBase.write();
-            arcCoordPoints_buf = ByteBuffer.allocateDirect(arcCoordPoints.length*8);
+            arcCoordPoints_buf = ByteBuffer.allocateDirect(arcCoordPoints.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<arcCoordPoints.length; i++, off += 8) {
                 arcCoordPoints[i].setBuffer(arcCoordPoints_buf, off);
                 arcCoordPoints[i].write();
@@ -18901,35 +18901,35 @@ public class NIVision {
             }
         }
         public void write() {
-            spokeLines_buf = ByteBuffer.allocateDirect(spokeLines.length*16);
+            spokeLines_buf = ByteBuffer.allocateDirect(spokeLines.length*16).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<spokeLines.length; i++, off += 16) {
                 spokeLines[i].setBuffer(spokeLines_buf, off);
                 spokeLines[i].write();
             }
             backing.putInt(4, spokeLines.length);
             putPointer(backing, 0, spokeLines_buf);
-            firstEdges_buf = ByteBuffer.allocateDirect(firstEdges.length*8);
+            firstEdges_buf = ByteBuffer.allocateDirect(firstEdges.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<firstEdges.length; i++, off += 8) {
                 firstEdges[i].setBuffer(firstEdges_buf, off);
                 firstEdges[i].write();
             }
             backing.putInt(12, firstEdges.length);
             putPointer(backing, 8, firstEdges_buf);
-            lastEdges_buf = ByteBuffer.allocateDirect(lastEdges.length*8);
+            lastEdges_buf = ByteBuffer.allocateDirect(lastEdges.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<lastEdges.length; i++, off += 8) {
                 lastEdges[i].setBuffer(lastEdges_buf, off);
                 lastEdges[i].write();
             }
             backing.putInt(20, lastEdges.length);
             putPointer(backing, 16, lastEdges_buf);
-            allEdges_buf = ByteBuffer.allocateDirect(allEdges.length*8);
+            allEdges_buf = ByteBuffer.allocateDirect(allEdges.length*8).order(ByteOrder.nativeOrder());
             for (int i=0, off=0; i<allEdges.length; i++, off += 8) {
                 allEdges[i].setBuffer(allEdges_buf, off);
                 allEdges[i].write();
             }
             backing.putInt(32, allEdges.length);
             putPointer(backing, 24, allEdges_buf);
-            linesWithEdges_buf = ByteBuffer.allocateDirect(linesWithEdges.length*4);
+            linesWithEdges_buf = ByteBuffer.allocateDirect(linesWithEdges.length*4).order(ByteOrder.nativeOrder());
             linesWithEdges_buf.asIntBuffer().put(linesWithEdges).rewind();
             backing.putInt(32, linesWithEdges.length);
             putPointer(backing, 28, linesWithEdges_buf);
@@ -19452,7 +19452,7 @@ public class NIVision {
      */
 
     public static int imaqCountParticles(Image image, int connectivity8) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqCountParticles(image.getAddress(), connectivity8, rv_addr+0);
         int numParticles;
@@ -19462,7 +19462,7 @@ public class NIVision {
     private static native int _imaqCountParticles(long image, int connectivity8, long numParticles);
 
     public static double imaqMeasureParticle(Image image, int particleNumber, int calibrated, MeasurementType measurement) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         double jn_rv = _imaqMeasureParticle(image.getAddress(), particleNumber, calibrated, measurement.getValue(), rv_addr+0);
         double value;
@@ -19474,7 +19474,7 @@ public class NIVision {
     public static MeasureParticlesReport imaqMeasureParticles(Image image, MeasureParticlesCalibrationMode calibrationMode, MeasurementType[] measurements) {
         int numMeasurements = measurements.length;
         ByteBuffer measurements_buf = null;
-        measurements_buf = ByteBuffer.allocateDirect(measurements.length*4);
+        measurements_buf = ByteBuffer.allocateDirect(measurements.length*4).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<measurements.length; i++, off += 4) {
             if (measurements != null)
                 measurements_buf.putInt(off, measurements[i].getValue());
@@ -19488,12 +19488,12 @@ public class NIVision {
     public static int imaqParticleFilter4(Image dest, Image source, ParticleFilterCriteria2[] criteria, ParticleFilterOptions2 options, ROI roi) {
         int criteriaCount = criteria.length;
         ByteBuffer criteria_buf = null;
-        criteria_buf = ByteBuffer.allocateDirect(criteria.length*20);
+        criteria_buf = ByteBuffer.allocateDirect(criteria.length*20).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<criteria.length; i++, off += 20) {
             criteria[i].setBuffer(criteria_buf, off);
             criteria[i].write();
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqParticleFilter4(dest.getAddress(), source.getAddress(), getByteBufferAddress(criteria_buf), criteriaCount, options.getAddress(), roi.getAddress(), rv_addr+0);
         int numParticles;
@@ -19552,7 +19552,7 @@ public class NIVision {
     }
 
     public static FindCirclesResult imaqFindCircles(Image dest, Image source, float minRadius, float maxRadius) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqFindCircles(dest.getAddress(), source.getAddress(), minRadius, maxRadius, rv_addr+0);
         FindCirclesResult rv = new FindCirclesResult(rv_buf, jn_rv);
@@ -19561,7 +19561,7 @@ public class NIVision {
     private static native long _imaqFindCircles(long dest, long source, float minRadius, float maxRadius, long numCircles);
 
     public static int imaqLabel2(Image dest, Image source, int connectivity8) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqLabel2(dest.getAddress(), source.getAddress(), connectivity8, rv_addr+0);
         int particleCount;
@@ -19632,7 +19632,7 @@ public class NIVision {
     }
 
     public static CopyFromRingResult imaqCopyFromRing(long sessionID, Image image, int imageToCopy, Rect rect) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqCopyFromRing(sessionID, image == null ? 0 : image.getAddress(), imageToCopy, rv_addr+0, rect.getAddress());
         CopyFromRingResult rv = new CopyFromRingResult(rv_buf);
@@ -19668,7 +19668,7 @@ public class NIVision {
     }
 
     public static ExtractFromRingResult imaqExtractFromRing(long sessionID, int imageToExtract) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqExtractFromRing(sessionID, imageToExtract, rv_addr+0);
         ExtractFromRingResult rv = new ExtractFromRingResult(rv_buf);
@@ -19702,7 +19702,7 @@ public class NIVision {
     public static void imaqSetupRing(long sessionID, Image[] images, int skipCount, Rect rect) {
         int numImages = images.length;
         ByteBuffer images_buf = null;
-        images_buf = ByteBuffer.allocateDirect(images.length*4);
+        images_buf = ByteBuffer.allocateDirect(images.length*4).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<images.length; i++, off += 4) {
             putPointer(images_buf, off, images[i]);
         }
@@ -19714,7 +19714,7 @@ public class NIVision {
     public static void imaqSetupSequence(long sessionID, Image[] images, int skipCount, Rect rect) {
         int numImages = images.length;
         ByteBuffer images_buf = null;
-        images_buf = ByteBuffer.allocateDirect(images.length*4);
+        images_buf = ByteBuffer.allocateDirect(images.length*4).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<images.length; i++, off += 4) {
             putPointer(images_buf, off, images[i]);
         }
@@ -19850,12 +19850,12 @@ public class NIVision {
     public static CaliperToolResult imaqCaliperTool(Image image, Point[] points, EdgeOptions edgeOptions, CaliperOptions caliperOptions) {
         int numPoints = points.length;
         ByteBuffer points_buf = null;
-        points_buf = ByteBuffer.allocateDirect(points.length*8);
+        points_buf = ByteBuffer.allocateDirect(points.length*8).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<points.length; i++, off += 8) {
             points[i].setBuffer(points_buf, off);
             points[i].write();
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqCaliperTool(image.getAddress(), getByteBufferAddress(points_buf), numPoints, edgeOptions.getAddress(), caliperOptions.getAddress(), rv_addr+0);
         CaliperToolResult rv = new CaliperToolResult(rv_buf, jn_rv);
@@ -19873,7 +19873,7 @@ public class NIVision {
     }
 
     public static ConcentricRake2Result imaqConcentricRake2(Image image, ROI roi, ConcentricRakeDirection direction, EdgeProcess process, int stepSize) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqConcentricRake2(image.getAddress(), roi.getAddress(), direction.getValue(), process.getValue(), stepSize, rv_addr+0);
         ConcentricRake2Result rv = new ConcentricRake2Result(rv_buf);
@@ -19909,9 +19909,9 @@ public class NIVision {
     public static DetectExtremesResult imaqDetectExtremes(double[] pixels, DetectionMode mode, DetectExtremesOptions options) {
         int numPixels = pixels.length;
         ByteBuffer pixels_buf = null;
-        pixels_buf = ByteBuffer.allocateDirect(pixels.length*8);
+        pixels_buf = ByteBuffer.allocateDirect(pixels.length*8).order(ByteOrder.nativeOrder());
         pixels_buf.asDoubleBuffer().put(pixels).rewind();
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqDetectExtremes(getByteBufferAddress(pixels_buf), numPixels, mode.getValue(), options.getAddress(), rv_addr+0);
         DetectExtremesResult rv = new DetectExtremesResult(rv_buf, jn_rv);
@@ -19920,7 +19920,7 @@ public class NIVision {
     private static native long _imaqDetectExtremes(long pixels, int numPixels, int mode, long options, long numExtremes);
 
     public static double imaqDetectRotation(Image referenceImage, Image testImage, PointFloat referenceCenter, PointFloat testCenter, int radius, float precision) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         double jn_rv = _imaqDetectRotation(referenceImage.getAddress(), testImage.getAddress(), referenceCenter.getAddress(), testCenter.getAddress(), radius, precision, rv_addr+0);
         double angle;
@@ -19939,7 +19939,7 @@ public class NIVision {
     }
 
     public static EdgeTool4Result imaqEdgeTool4(Image image, ROI roi, EdgeProcess processType, int reverseDirection) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqEdgeTool4(image.getAddress(), roi.getAddress(), processType.getValue(), rv_addr+0, reverseDirection);
         EdgeTool4Result rv = new EdgeTool4Result(rv_buf);
@@ -19971,7 +19971,7 @@ public class NIVision {
     }
 
     public static FindTransformRect2Result imaqFindTransformRect2(Image image, ROI roi, FindTransformMode mode, FindTransformRectOptions2 findTransformOptions, StraightEdgeOptions straightEdgeOptions) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(32);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(32).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqFindTransformRect2(image.getAddress(), roi.getAddress(), mode.getValue(), rv_addr+0, rv_addr+8, findTransformOptions.getAddress(), straightEdgeOptions.getAddress(), rv_addr+16);
         FindTransformRect2Result rv = new FindTransformRect2Result(rv_buf);
@@ -19994,7 +19994,7 @@ public class NIVision {
     }
 
     public static FindTransformRects2Result imaqFindTransformRects2(Image image, ROI primaryROI, ROI secondaryROI, FindTransformMode mode, FindTransformRectsOptions2 findTransformOptions, StraightEdgeOptions primaryStraightEdgeOptions, StraightEdgeOptions secondaryStraightEdgeOptions) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(32);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(32).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqFindTransformRects2(image.getAddress(), primaryROI.getAddress(), secondaryROI.getAddress(), mode.getValue(), rv_addr+0, rv_addr+8, findTransformOptions.getAddress(), primaryStraightEdgeOptions.getAddress(), secondaryStraightEdgeOptions.getAddress(), rv_addr+16);
         FindTransformRects2Result rv = new FindTransformRects2Result(rv_buf);
@@ -20003,7 +20003,7 @@ public class NIVision {
     private static native void _imaqFindTransformRects2(long image, long primaryROI, long secondaryROI, int mode, long baseSystem, long newSystem, long findTransformOptions, long primaryStraightEdgeOptions, long secondaryStraightEdgeOptions, long axisReport);
 
     public static float imaqLineGaugeTool2(Image image, Point start, Point end, LineGaugeMethod method, EdgeOptions edgeOptions, CoordinateTransform2 transform) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         float jn_rv = _imaqLineGaugeTool2(image.getAddress(), start.getAddress(), end.getAddress(), method.getValue(), edgeOptions.getAddress(), transform.getAddress(), rv_addr+0);
         float distance;
@@ -20022,7 +20022,7 @@ public class NIVision {
     }
 
     public static Rake2Result imaqRake2(Image image, ROI roi, RakeDirection direction, EdgeProcess process, int stepSize) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqRake2(image.getAddress(), roi.getAddress(), direction.getValue(), process.getValue(), stepSize, rv_addr+0);
         Rake2Result rv = new Rake2Result(rv_buf);
@@ -20058,12 +20058,12 @@ public class NIVision {
     public static SimpleEdgeResult imaqSimpleEdge(Image image, Point[] points, SimpleEdgeOptions options) {
         int numPoints = points.length;
         ByteBuffer points_buf = null;
-        points_buf = ByteBuffer.allocateDirect(points.length*8);
+        points_buf = ByteBuffer.allocateDirect(points.length*8).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<points.length; i++, off += 8) {
             points[i].setBuffer(points_buf, off);
             points[i].write();
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqSimpleEdge(image.getAddress(), getByteBufferAddress(points_buf), numPoints, options.getAddress(), rv_addr+0);
         SimpleEdgeResult rv = new SimpleEdgeResult(rv_buf, jn_rv);
@@ -20081,7 +20081,7 @@ public class NIVision {
     }
 
     public static Spoke2Result imaqSpoke2(Image image, ROI roi, SpokeDirection direction, EdgeProcess process, int stepSize) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqSpoke2(image.getAddress(), roi.getAddress(), direction.getValue(), process.getValue(), stepSize, rv_addr+0);
         Spoke2Result rv = new Spoke2Result(rv_buf);
@@ -20182,7 +20182,7 @@ public class NIVision {
             text_buf = ByteBuffer.allocateDirect(text_bytes.length+1);
             putBytes(text_buf, text_bytes, 0, text_bytes.length).put(text_bytes.length, (byte)0);
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqDrawTextOnImage(dest.getAddress(), source.getAddress(), coord.getAddress(), text == null ? 0 : getByteBufferAddress(text_buf), options == null ? 0 : options.getAddress(), rv_addr+0);
         int fontNameUsed;
@@ -20251,7 +20251,7 @@ public class NIVision {
     }
 
     public static EnumerateCustomKeysResult imaqEnumerateCustomKeys(Image image) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqEnumerateCustomKeys(image.getAddress(), rv_addr+0);
         EnumerateCustomKeysResult rv = new EnumerateCustomKeysResult(rv_buf, jn_rv);
@@ -20260,7 +20260,7 @@ public class NIVision {
     private static native long _imaqEnumerateCustomKeys(long image, long size);
 
     public static int imaqGetBitDepth(Image image) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqGetBitDepth(image.getAddress(), rv_addr+0);
         int bitDepth;
@@ -20270,7 +20270,7 @@ public class NIVision {
     private static native int _imaqGetBitDepth(long image, long bitDepth);
 
     public static int imaqGetBytesPerPixel(Image image) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqGetBytesPerPixel(image.getAddress(), rv_addr+0);
         int byteCount;
@@ -20280,7 +20280,7 @@ public class NIVision {
     private static native int _imaqGetBytesPerPixel(long image, long byteCount);
 
     public static ImageInfo imaqGetImageInfo(Image image) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGetImageInfo(image.getAddress(), rv_addr+0);
         ImageInfo info;
@@ -20300,7 +20300,7 @@ public class NIVision {
     }
 
     public static GetImageSizeResult imaqGetImageSize(Image image) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqGetImageSize(image.getAddress(), rv_addr+0, rv_addr+8);
         GetImageSizeResult rv = new GetImageSizeResult(rv_buf);
@@ -20309,7 +20309,7 @@ public class NIVision {
     private static native void _imaqGetImageSize(long image, long width, long height);
 
     public static ImageType imaqGetImageType(Image image) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqGetImageType(image.getAddress(), rv_addr+0);
         ImageType type;
@@ -20319,7 +20319,7 @@ public class NIVision {
     private static native int _imaqGetImageType(long image, long type);
 
     public static Point imaqGetMaskOffset(Image image) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGetMaskOffset(image.getAddress(), rv_addr+0);
         Point offset;
@@ -20330,7 +20330,7 @@ public class NIVision {
     private static native long _imaqGetMaskOffset(long image, long offset);
 
     public static int imaqGetVisionInfoTypes(Image image) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqGetVisionInfoTypes(image.getAddress(), rv_addr+0);
         int present;
@@ -20340,7 +20340,7 @@ public class NIVision {
     private static native int _imaqGetVisionInfoTypes(long image, long present);
 
     public static int imaqIsImageEmpty(Image image) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqIsImageEmpty(image.getAddress(), rv_addr+0);
         int empty;
@@ -20361,7 +20361,7 @@ public class NIVision {
             key_buf = ByteBuffer.allocateDirect(key_bytes.length+1);
             putBytes(key_buf, key_bytes, 0, key_bytes.length).put(key_bytes.length, (byte)0);
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqReadCustomData(image.getAddress(), key == null ? 0 : getByteBufferAddress(key_buf), rv_addr+0);
         int size;
@@ -20439,7 +20439,7 @@ public class NIVision {
      */
 
     public static int imaqAreToolsContextSensitive() {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqAreToolsContextSensitive(rv_addr+0);
         int sensitive;
@@ -20474,7 +20474,7 @@ public class NIVision {
     }
 
     public static GetLastKeyResult imaqGetLastKey() {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(32);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(32).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqGetLastKey(rv_addr+0, rv_addr+8, rv_addr+16);
         GetLastKeyResult rv = new GetLastKeyResult(rv_buf);
@@ -20483,7 +20483,7 @@ public class NIVision {
     private static native void _imaqGetLastKey(long keyPressed, long windowNumber, long modifiers);
 
     public static Point imaqGetWindowCenterPos(int windowNumber) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGetWindowCenterPos(windowNumber, rv_addr+0);
         Point centerPosition;
@@ -20526,7 +20526,7 @@ public class NIVision {
     private static native void _imaqDuplicate(long dest, long source);
 
     public static RawData imaqFlatten(Image image, FlattenType type, CompressionType compression, int quality) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqFlatten(image.getAddress(), type.getValue(), compression.getValue(), quality, rv_addr+0);
         int size;
@@ -20634,7 +20634,7 @@ public class NIVision {
     private static native int _imaqCreateAVI(long fileName, long compressionFilter, int quality, int framesPerSecond, int maxDataSize);
 
     public static AVIInfo imaqGetAVIInfo(int session) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGetAVIInfo(session, rv_addr+0);
         AVIInfo info;
@@ -20673,7 +20673,7 @@ public class NIVision {
             fileName_buf = ByteBuffer.allocateDirect(fileName_bytes.length+1);
             putBytes(fileName_buf, fileName_bytes, 0, fileName_bytes.length).put(fileName_bytes.length, (byte)0);
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(56);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(56).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqGetFileInfo(fileName == null ? 0 : getByteBufferAddress(fileName_buf), rv_addr+0, rv_addr+8, rv_addr+16, rv_addr+24, rv_addr+32, rv_addr+40);
         GetFileInfoResult rv = new GetFileInfoResult(rv_buf);
@@ -20719,7 +20719,7 @@ public class NIVision {
     }
 
     public static GetFilterNamesResult imaqGetFilterNames() {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGetFilterNames(rv_addr+0);
         GetFilterNamesResult rv = new GetFilterNamesResult(rv_buf, jn_rv);
@@ -20811,7 +20811,7 @@ public class NIVision {
             title_buf = ByteBuffer.allocateDirect(title_bytes.length+1);
             putBytes(title_buf, title_bytes, 0, title_bytes.length).put(title_bytes.length, (byte)0);
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqLoadImagePopup(defaultDirectory == null ? 0 : getByteBufferAddress(defaultDirectory_buf), defaultFileSpec == null ? 0 : getByteBufferAddress(defaultFileSpec_buf), fileTypeList == null ? 0 : getByteBufferAddress(fileTypeList_buf), title == null ? 0 : getByteBufferAddress(title_buf), allowMultiplePaths, buttonLabel.getValue(), restrictDirectory, restrictExtension, allowCancel, allowMakeDirectory, rv_addr+0, rv_addr+8);
         LoadImagePopupResult rv = new LoadImagePopupResult(rv_buf, jn_rv);
@@ -20859,7 +20859,7 @@ public class NIVision {
             fileName_buf = ByteBuffer.allocateDirect(fileName_bytes.length+1);
             putBytes(fileName_buf, fileName_bytes, 0, fileName_bytes.length).put(fileName_bytes.length, (byte)0);
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqReadFile(image.getAddress(), fileName == null ? 0 : getByteBufferAddress(fileName_buf), rv_addr+0, rv_addr+8);
         ReadFileResult rv = new ReadFileResult(rv_buf);
@@ -20889,7 +20889,7 @@ public class NIVision {
             fileName_buf = ByteBuffer.allocateDirect(fileName_bytes.length+1);
             putBytes(fileName_buf, fileName_bytes, 0, fileName_bytes.length).put(fileName_bytes.length, (byte)0);
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqReadVisionFile(image.getAddress(), fileName == null ? 0 : getByteBufferAddress(fileName_buf), rv_addr+0, rv_addr+8);
         ReadVisionFileResult rv = new ReadVisionFileResult(rv_buf);
@@ -21028,7 +21028,7 @@ public class NIVision {
      */
 
     public static CoordinateSystem imaqBuildCoordinateSystem(Point points, ReferenceMode mode, AxisOrientation orientation) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqBuildCoordinateSystem(points.getAddress(), mode.getValue(), orientation.getValue(), rv_addr+0);
         CoordinateSystem system;
@@ -21041,7 +21041,7 @@ public class NIVision {
     public static BestCircle2 imaqFitCircle2(PointFloat[] points, FitCircleOptions options) {
         int numPoints = points.length;
         ByteBuffer points_buf = null;
-        points_buf = ByteBuffer.allocateDirect(points.length*8);
+        points_buf = ByteBuffer.allocateDirect(points.length*8).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<points.length; i++, off += 8) {
             points[i].setBuffer(points_buf, off);
             points[i].write();
@@ -21055,7 +21055,7 @@ public class NIVision {
     public static BestEllipse2 imaqFitEllipse2(PointFloat[] points, FitEllipseOptions options) {
         int numPoints = points.length;
         ByteBuffer points_buf = null;
-        points_buf = ByteBuffer.allocateDirect(points.length*8);
+        points_buf = ByteBuffer.allocateDirect(points.length*8).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<points.length; i++, off += 8) {
             points[i].setBuffer(points_buf, off);
             points[i].write();
@@ -21069,7 +21069,7 @@ public class NIVision {
     public static BestLine imaqFitLine(PointFloat[] points, FitLineOptions options) {
         int numPoints = points.length;
         ByteBuffer points_buf = null;
-        points_buf = ByteBuffer.allocateDirect(points.length*8);
+        points_buf = ByteBuffer.allocateDirect(points.length*8).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<points.length; i++, off += 8) {
             points[i].setBuffer(points_buf, off);
             points[i].write();
@@ -21081,7 +21081,7 @@ public class NIVision {
     private static native long _imaqFitLine(long points, int numPoints, long options);
 
     public static float imaqGetAngle(PointFloat start1, PointFloat end1, PointFloat start2, PointFloat end2) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         float jn_rv = _imaqGetAngle(start1.getAddress(), end1.getAddress(), start2.getAddress(), end2.getAddress(), rv_addr+0);
         float angle;
@@ -21102,7 +21102,7 @@ public class NIVision {
     }
 
     public static GetBisectingLineResult imaqGetBisectingLine(PointFloat start1, PointFloat end1, PointFloat start2, PointFloat end2) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqGetBisectingLine(start1.getAddress(), end1.getAddress(), start2.getAddress(), end2.getAddress(), rv_addr+0, rv_addr+8);
         GetBisectingLineResult rv = new GetBisectingLineResult(rv_buf);
@@ -21111,7 +21111,7 @@ public class NIVision {
     private static native void _imaqGetBisectingLine(long start1, long end1, long start2, long end2, long bisectStart, long bisectEnd);
 
     public static float imaqGetDistance(PointFloat point1, PointFloat point2) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         float jn_rv = _imaqGetDistance(point1.getAddress(), point2.getAddress(), rv_addr+0);
         float distance;
@@ -21121,7 +21121,7 @@ public class NIVision {
     private static native float _imaqGetDistance(long point1, long point2, long distance);
 
     public static PointFloat imaqGetIntersection(PointFloat start1, PointFloat end1, PointFloat start2, PointFloat end2) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGetIntersection(start1.getAddress(), end1.getAddress(), start2.getAddress(), end2.getAddress(), rv_addr+0);
         PointFloat intersection;
@@ -21143,7 +21143,7 @@ public class NIVision {
     }
 
     public static GetMidLineResult imaqGetMidLine(PointFloat refLineStart, PointFloat refLineEnd, PointFloat point) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqGetMidLine(refLineStart.getAddress(), refLineEnd.getAddress(), point.getAddress(), rv_addr+0, rv_addr+8);
         GetMidLineResult rv = new GetMidLineResult(rv_buf);
@@ -21165,7 +21165,7 @@ public class NIVision {
     }
 
     public static GetPerpendicularLineResult imaqGetPerpendicularLine(PointFloat refLineStart, PointFloat refLineEnd, PointFloat point) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(32);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(32).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqGetPerpendicularLine(refLineStart.getAddress(), refLineEnd.getAddress(), point.getAddress(), rv_addr+0, rv_addr+8, rv_addr+16);
         GetPerpendicularLineResult rv = new GetPerpendicularLineResult(rv_buf);
@@ -21198,7 +21198,7 @@ public class NIVision {
     }
 
     public static GetPointsOnContourResult imaqGetPointsOnContour(Image image) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGetPointsOnContour(image.getAddress(), rv_addr+0);
         GetPointsOnContourResult rv = new GetPointsOnContourResult(rv_buf, jn_rv);
@@ -21231,7 +21231,7 @@ public class NIVision {
     }
 
     public static GetPointsOnLineResult imaqGetPointsOnLine(Point start, Point end) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGetPointsOnLine(start.getAddress(), end.getAddress(), rv_addr+0);
         GetPointsOnLineResult rv = new GetPointsOnLineResult(rv_buf, jn_rv);
@@ -21240,7 +21240,7 @@ public class NIVision {
     private static native long _imaqGetPointsOnLine(long start, long end, long numPoints);
 
     public static float imaqGetPolygonArea(PointFloat points, int numPoints) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         float jn_rv = _imaqGetPolygonArea(points.getAddress(), numPoints, rv_addr+0);
         float area;
@@ -21272,12 +21272,12 @@ public class NIVision {
     public static InterpolatePointsResult imaqInterpolatePoints(Image image, Point[] points, InterpolationMethod method, int subpixel) {
         int numPoints = points.length;
         ByteBuffer points_buf = null;
-        points_buf = ByteBuffer.allocateDirect(points.length*8);
+        points_buf = ByteBuffer.allocateDirect(points.length*8).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<points.length; i++, off += 8) {
             points[i].setBuffer(points_buf, off);
             points[i].write();
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqInterpolatePoints(image.getAddress(), getByteBufferAddress(points_buf), numPoints, method.getValue(), subpixel, rv_addr+0);
         InterpolatePointsResult rv = new InterpolatePointsResult(rv_buf, jn_rv);
@@ -21290,7 +21290,7 @@ public class NIVision {
      */
 
     public static RGBValue imaqClipboardToImage(Image dest) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqClipboardToImage(dest.getAddress(), rv_addr+0);
         RGBValue palette;
@@ -21319,7 +21319,7 @@ public class NIVision {
     private static native void _imaqFillBorder(long image, int method);
 
     public static int imaqGetBorderSize(Image image) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqGetBorderSize(image.getAddress(), rv_addr+0);
         int borderSize;
@@ -21396,7 +21396,7 @@ public class NIVision {
     private static native long _imaqSupervisedColorSegmentation(long session, long labelImage, long srcImage, long roi, long labelIn, int numLabelIn, int maxDistance, int minIdentificationScore, long segmentOptions);
 
     public static int imaqGetColorSegmentationMaxDistance(ClassifierSession session, ColorSegmenationOptions segmentOptions, SegmentationDistanceLevel distLevel) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqGetColorSegmentationMaxDistance(session.getAddress(), segmentOptions.getAddress(), distLevel.getValue(), rv_addr+0);
         int maxDistance;
@@ -21438,7 +21438,7 @@ public class NIVision {
     private static native void _imaqMathTransform(long dest, long source, int method, float rangeMin, float rangeMax, float power, long mask);
 
     public static int imaqWatershedTransform(Image dest, Image source, int connectivity8) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqWatershedTransform(dest.getAddress(), source.getAddress(), connectivity8, rv_addr+0);
         int zoneCount;
@@ -21452,7 +21452,7 @@ public class NIVision {
      */
 
     public static int imaqAreScrollbarsVisible(int windowNumber) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqAreScrollbarsVisible(windowNumber, rv_addr+0);
         int visible;
@@ -21479,7 +21479,7 @@ public class NIVision {
     }
 
     public static GetMousePosResult imaqGetMousePos() {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqGetMousePos(rv_addr+0, rv_addr+8);
         GetMousePosResult rv = new GetMousePosResult(rv_buf);
@@ -21503,7 +21503,7 @@ public class NIVision {
     }
 
     public static GetWindowBackgroundResult imaqGetWindowBackground(int windowNumber) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(40);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(40).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqGetWindowBackground(windowNumber, rv_addr+0, rv_addr+8, rv_addr+16, rv_addr+24);
         GetWindowBackgroundResult rv = new GetWindowBackgroundResult(rv_buf);
@@ -21512,7 +21512,7 @@ public class NIVision {
     private static native void _imaqGetWindowBackground(int windowNumber, long fillStyle, long hatchStyle, long fillColor, long backgroundColor);
 
     public static DisplayMapping imaqGetWindowDisplayMapping(int windowNum) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGetWindowDisplayMapping(windowNum, rv_addr+0);
         DisplayMapping mapping;
@@ -21532,7 +21532,7 @@ public class NIVision {
     }
 
     public static GetWindowGridResult imaqGetWindowGrid(int windowNumber) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqGetWindowGrid(windowNumber, rv_addr+0, rv_addr+8);
         GetWindowGridResult rv = new GetWindowGridResult(rv_buf);
@@ -21541,7 +21541,7 @@ public class NIVision {
     private static native void _imaqGetWindowGrid(int windowNumber, long xResolution, long yResolution);
 
     public static int imaqGetWindowHandle() {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqGetWindowHandle(rv_addr+0);
         int handle;
@@ -21551,7 +21551,7 @@ public class NIVision {
     private static native int _imaqGetWindowHandle(long handle);
 
     public static Point imaqGetWindowPos(int windowNumber) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGetWindowPos(windowNumber, rv_addr+0);
         Point position;
@@ -21571,7 +21571,7 @@ public class NIVision {
     }
 
     public static GetWindowSizeResult imaqGetWindowSize(int windowNumber) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqGetWindowSize(windowNumber, rv_addr+0, rv_addr+8);
         GetWindowSizeResult rv = new GetWindowSizeResult(rv_buf);
@@ -21597,7 +21597,7 @@ public class NIVision {
     }
 
     public static GetWindowZoom2Result imaqGetWindowZoom2(int windowNumber) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqGetWindowZoom2(windowNumber, rv_addr+0, rv_addr+8);
         GetWindowZoom2Result rv = new GetWindowZoom2Result(rv_buf);
@@ -21606,7 +21606,7 @@ public class NIVision {
     private static native void _imaqGetWindowZoom2(int windowNumber, long xZoom, long yZoom);
 
     public static int imaqIsWindowNonTearing(int windowNumber) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqIsWindowNonTearing(windowNumber, rv_addr+0);
         int nonTearing;
@@ -21616,7 +21616,7 @@ public class NIVision {
     private static native int _imaqIsWindowNonTearing(int windowNumber, long nonTearing);
 
     public static int imaqIsWindowVisible(int windowNumber) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqIsWindowVisible(windowNumber, rv_addr+0);
         int visible;
@@ -21677,7 +21677,7 @@ public class NIVision {
     public static void imaqSetWindowPalette(int windowNumber, PaletteType type, RGBValue[] palette) {
         int numColors = palette.length;
         ByteBuffer palette_buf = null;
-        palette_buf = ByteBuffer.allocateDirect(palette.length*4);
+        palette_buf = ByteBuffer.allocateDirect(palette.length*4).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<palette.length; i++, off += 4) {
             palette[i].setBuffer(palette_buf, off);
             palette[i].write();
@@ -21744,7 +21744,7 @@ public class NIVision {
      */
 
     public static int imaqMulticoreOptions(MulticoreOperation operation) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqMulticoreOptions(operation.getValue(), rv_addr+0);
         int customNumCores;
@@ -21765,7 +21765,7 @@ public class NIVision {
     private static native void _imaqCloseToolWindow();
 
     public static Tool imaqGetCurrentTool() {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqGetCurrentTool(rv_addr+0);
         Tool currentTool;
@@ -21789,7 +21789,7 @@ public class NIVision {
     }
 
     public static GetLastEventResult imaqGetLastEvent() {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(40);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(40).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqGetLastEvent(rv_addr+0, rv_addr+8, rv_addr+16, rv_addr+24);
         GetLastEventResult rv = new GetLastEventResult(rv_buf);
@@ -21798,7 +21798,7 @@ public class NIVision {
     private static native void _imaqGetLastEvent(long type, long windowNumber, long tool, long rect);
 
     public static Point imaqGetToolWindowPos() {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGetToolWindowPos(rv_addr+0);
         Point position;
@@ -21809,7 +21809,7 @@ public class NIVision {
     private static native long _imaqGetToolWindowPos(long position);
 
     public static int imaqIsToolWindowVisible() {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqIsToolWindowVisible(rv_addr+0);
         int visible;
@@ -21876,7 +21876,7 @@ public class NIVision {
     }
 
     public static ReadMeterResult imaqReadMeter(Image image, MeterArc arcInfo) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqReadMeter(image.getAddress(), arcInfo.getAddress(), rv_addr+0, rv_addr+8);
         ReadMeterResult rv = new ReadMeterResult(rv_buf);
@@ -21912,7 +21912,7 @@ public class NIVision {
     private static native long _imaqGetCalibrationInfo3(long image, int isGetErrorMap);
 
     public static float imaqLearnCalibrationGrid(Image image, ROI roi, LearnCalibrationOptions options, GridDescriptor grid, CoordinateSystem system, RangeFloat range) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         float jn_rv = _imaqLearnCalibrationGrid(image.getAddress(), roi.getAddress(), options.getAddress(), grid.getAddress(), system.getAddress(), range.getAddress(), rv_addr+0);
         float quality;
@@ -21922,7 +21922,7 @@ public class NIVision {
     private static native float _imaqLearnCalibrationGrid(long image, long roi, long options, long grid, long system, long range, long quality);
 
     public static float imaqLearnCalibrationPoints(Image image, CalibrationPoints points, ROI roi, LearnCalibrationOptions options, GridDescriptor grid, CoordinateSystem system) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         float jn_rv = _imaqLearnCalibrationPoints(image.getAddress(), points.getAddress(), roi.getAddress(), options.getAddress(), grid.getAddress(), system.getAddress(), rv_addr+0);
         float quality;
@@ -21948,7 +21948,7 @@ public class NIVision {
     public static TransformReport imaqTransformPixelToRealWorld(Image image, PointFloat[] pixelCoordinates) {
         int numCoordinates = pixelCoordinates.length;
         ByteBuffer pixelCoordinates_buf = null;
-        pixelCoordinates_buf = ByteBuffer.allocateDirect(pixelCoordinates.length*8);
+        pixelCoordinates_buf = ByteBuffer.allocateDirect(pixelCoordinates.length*8).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<pixelCoordinates.length; i++, off += 8) {
             pixelCoordinates[i].setBuffer(pixelCoordinates_buf, off);
             pixelCoordinates[i].write();
@@ -21962,7 +21962,7 @@ public class NIVision {
     public static TransformReport imaqTransformRealWorldToPixel(Image image, PointFloat[] realWorldCoordinates) {
         int numCoordinates = realWorldCoordinates.length;
         ByteBuffer realWorldCoordinates_buf = null;
-        realWorldCoordinates_buf = ByteBuffer.allocateDirect(realWorldCoordinates.length*8);
+        realWorldCoordinates_buf = ByteBuffer.allocateDirect(realWorldCoordinates.length*8).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<realWorldCoordinates.length; i++, off += 8) {
             realWorldCoordinates[i].setBuffer(realWorldCoordinates_buf, off);
             realWorldCoordinates[i].write();
@@ -21981,7 +21981,7 @@ public class NIVision {
     private static native void _imaqSetSimpleCalibration2(long image, long gridDescriptor);
 
     public static CoordinateSystem imaqCalibrationSetAxisInfo(Image image) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqCalibrationSetAxisInfo(image.getAddress(), rv_addr+0);
         CoordinateSystem axisInfo;
@@ -22086,7 +22086,7 @@ public class NIVision {
     }
 
     public static MatchColorResult imaqMatchColor(Image image, ColorInformation info, ROI roi) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqMatchColor(image.getAddress(), info.getAddress(), roi == null ? 0 : roi.getAddress(), rv_addr+0);
         MatchColorResult rv = new MatchColorResult(rv_buf, jn_rv);
@@ -22145,7 +22145,7 @@ public class NIVision {
      */
 
     public static AIMGradeReport imaqGradeDataMatrixBarcodeAIM(Image image) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGradeDataMatrixBarcodeAIM(image.getAddress(), rv_addr+0);
         AIMGradeReport report;
@@ -22196,7 +22196,7 @@ public class NIVision {
     }
 
     public static ReadPDF417BarcodeResult imaqReadPDF417Barcode(Image image, ROI roi, Barcode2DSearchMode searchMode) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqReadPDF417Barcode(image.getAddress(), roi.getAddress(), searchMode.getValue(), rv_addr+0);
         ReadPDF417BarcodeResult rv = new ReadPDF417BarcodeResult(rv_buf, jn_rv);
@@ -22260,7 +22260,7 @@ public class NIVision {
     }
 
     public static MatchShapeResult imaqMatchShape(Image dest, Image source, Image templateImage, int scaleInvariant, int connectivity8, double tolerance) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqMatchShape(dest.getAddress(), source.getAddress(), templateImage.getAddress(), scaleInvariant, connectivity8, tolerance, rv_addr+0);
         MatchShapeResult rv = new MatchShapeResult(rv_buf, jn_rv);
@@ -22283,7 +22283,7 @@ public class NIVision {
     public static int imaqAddClosedContour(ROI roi, Point[] points) {
         int numPoints = points.length;
         ByteBuffer points_buf = null;
-        points_buf = ByteBuffer.allocateDirect(points.length*8);
+        points_buf = ByteBuffer.allocateDirect(points.length*8).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<points.length; i++, off += 8) {
             points[i].setBuffer(points_buf, off);
             points[i].write();
@@ -22305,7 +22305,7 @@ public class NIVision {
     public static int imaqAddOpenContour(ROI roi, Point[] points) {
         int numPoints = points.length;
         ByteBuffer points_buf = null;
-        points_buf = ByteBuffer.allocateDirect(points.length*8);
+        points_buf = ByteBuffer.allocateDirect(points.length*8).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<points.length; i++, off += 8) {
             points[i].setBuffer(points_buf, off);
             points[i].write();
@@ -22365,7 +22365,7 @@ public class NIVision {
     private static native int _imaqGetContour(long roi, int index);
 
     public static RGBValue imaqGetContourColor(ROI roi, int id) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGetContourColor(roi.getAddress(), id, rv_addr+0);
         RGBValue contourColor;
@@ -22416,7 +22416,7 @@ public class NIVision {
      */
 
     public static int imaqConstructROI2(Image image, ROI roi, Tool initialTool, ToolWindowOptions tools, ConstructROIOptions2 options) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqConstructROI2(image.getAddress(), roi.getAddress(), initialTool.getValue(), tools.getAddress(), options.getAddress(), rv_addr+0);
         int okay;
@@ -22434,7 +22434,7 @@ public class NIVision {
     private static native long _imaqCreateROI();
 
     public static Rect imaqGetROIBoundingBox(ROI roi) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGetROIBoundingBox(roi.getAddress(), rv_addr+0);
         Rect boundingBox;
@@ -22445,7 +22445,7 @@ public class NIVision {
     private static native long _imaqGetROIBoundingBox(long roi, long boundingBox);
 
     public static RGBValue imaqGetROIColor(ROI roi) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGetROIColor(roi.getAddress(), rv_addr+0);
         RGBValue roiColor;
@@ -22482,7 +22482,7 @@ public class NIVision {
      */
 
     public static PointFloat imaqCentroid(Image image, Image mask) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqCentroid(image.getAddress(), rv_addr+0, mask.getAddress());
         PointFloat centroid;
@@ -22517,7 +22517,7 @@ public class NIVision {
     }
 
     public static ExtractCurvesResult imaqExtractCurves(Image image, ROI roi, CurveOptions curveOptions) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqExtractCurves(image.getAddress(), roi.getAddress(), curveOptions.getAddress(), rv_addr+0);
         ExtractCurvesResult rv = new ExtractCurvesResult(rv_buf, jn_rv);
@@ -22586,7 +22586,7 @@ public class NIVision {
     public static void imaqMultithreshold(Image dest, Image source, ThresholdData[] ranges) {
         int numRanges = ranges.length;
         ByteBuffer ranges_buf = null;
-        ranges_buf = ByteBuffer.allocateDirect(ranges.length*16);
+        ranges_buf = ByteBuffer.allocateDirect(ranges.length*16).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<ranges.length; i++, off += 16) {
             ranges[i].setBuffer(ranges_buf, off);
             ranges[i].write();
@@ -22636,7 +22636,7 @@ public class NIVision {
     }
 
     public static DetectCirclesResult imaqDetectCircles(Image image, CircleDescriptor circleDescriptor, CurveOptions curveOptions, ShapeDetectionOptions shapeDetectionOptions, ROI roi) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqDetectCircles(image.getAddress(), circleDescriptor.getAddress(), curveOptions.getAddress(), shapeDetectionOptions.getAddress(), roi.getAddress(), rv_addr+0);
         DetectCirclesResult rv = new DetectCirclesResult(rv_buf, jn_rv);
@@ -22669,7 +22669,7 @@ public class NIVision {
     }
 
     public static DetectEllipsesResult imaqDetectEllipses(Image image, EllipseDescriptor ellipseDescriptor, CurveOptions curveOptions, ShapeDetectionOptions shapeDetectionOptions, ROI roi) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqDetectEllipses(image.getAddress(), ellipseDescriptor.getAddress(), curveOptions.getAddress(), shapeDetectionOptions.getAddress(), roi.getAddress(), rv_addr+0);
         DetectEllipsesResult rv = new DetectEllipsesResult(rv_buf, jn_rv);
@@ -22702,7 +22702,7 @@ public class NIVision {
     }
 
     public static DetectLinesResult imaqDetectLines(Image image, LineDescriptor lineDescriptor, CurveOptions curveOptions, ShapeDetectionOptions shapeDetectionOptions, ROI roi) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqDetectLines(image.getAddress(), lineDescriptor.getAddress(), curveOptions.getAddress(), shapeDetectionOptions.getAddress(), roi.getAddress(), rv_addr+0);
         DetectLinesResult rv = new DetectLinesResult(rv_buf, jn_rv);
@@ -22735,7 +22735,7 @@ public class NIVision {
     }
 
     public static DetectRectanglesResult imaqDetectRectangles(Image image, RectangleDescriptor rectangleDescriptor, CurveOptions curveOptions, ShapeDetectionOptions shapeDetectionOptions, ROI roi) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqDetectRectangles(image.getAddress(), rectangleDescriptor.getAddress(), curveOptions.getAddress(), shapeDetectionOptions.getAddress(), roi.getAddress(), rv_addr+0);
         DetectRectanglesResult rv = new DetectRectanglesResult(rv_buf, jn_rv);
@@ -22770,19 +22770,19 @@ public class NIVision {
     public static GetGeometricFeaturesFromCurvesResult imaqGetGeometricFeaturesFromCurves(Curve[] curves, FeatureType[] featureTypes) {
         int numCurves = curves.length;
         ByteBuffer curves_buf = null;
-        curves_buf = ByteBuffer.allocateDirect(curves.length*48);
+        curves_buf = ByteBuffer.allocateDirect(curves.length*48).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<curves.length; i++, off += 48) {
             curves[i].setBuffer(curves_buf, off);
             curves[i].write();
         }
         int numFeatureTypes = featureTypes.length;
         ByteBuffer featureTypes_buf = null;
-        featureTypes_buf = ByteBuffer.allocateDirect(featureTypes.length*4);
+        featureTypes_buf = ByteBuffer.allocateDirect(featureTypes.length*4).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<featureTypes.length; i++, off += 4) {
             if (featureTypes != null)
                 featureTypes_buf.putInt(off, featureTypes[i].getValue());
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGetGeometricFeaturesFromCurves(getByteBufferAddress(curves_buf), numCurves, getByteBufferAddress(featureTypes_buf), numFeatureTypes, rv_addr+0);
         GetGeometricFeaturesFromCurvesResult rv = new GetGeometricFeaturesFromCurvesResult(rv_buf, jn_rv);
@@ -22815,7 +22815,7 @@ public class NIVision {
     }
 
     public static GetGeometricTemplateFeatureInfoResult imaqGetGeometricTemplateFeatureInfo(Image pattern) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGetGeometricTemplateFeatureInfo(pattern.getAddress(), rv_addr+0);
         GetGeometricTemplateFeatureInfoResult rv = new GetGeometricTemplateFeatureInfoResult(rv_buf, jn_rv);
@@ -22838,7 +22838,7 @@ public class NIVision {
     private static native void _imaqLearnGeometricPattern(long image, long originOffset, long curveOptions, long advancedLearnOptions, long mask);
 
     public static LearnPatternAdvancedOptions imaqLearnPattern3(Image image, LearningMode learningMode, Image mask) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqLearnPattern3(image.getAddress(), learningMode.getValue(), rv_addr+0, mask.getAddress());
         LearnPatternAdvancedOptions advancedOptions;
@@ -22873,7 +22873,7 @@ public class NIVision {
     }
 
     public static MatchColorPatternResult imaqMatchColorPattern(Image image, Image pattern, MatchColorPatternOptions options, Rect searchRect) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqMatchColorPattern(image.getAddress(), pattern.getAddress(), options.getAddress(), searchRect.getAddress(), rv_addr+0);
         MatchColorPatternResult rv = new MatchColorPatternResult(rv_buf, jn_rv);
@@ -22906,7 +22906,7 @@ public class NIVision {
     }
 
     public static MatchGeometricPattern2Result imaqMatchGeometricPattern2(Image image, Image pattern, CurveOptions curveOptions, MatchGeometricPatternOptions matchOptions, MatchGeometricPatternAdvancedOptions2 advancedMatchOptions, ROI roi) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqMatchGeometricPattern2(image.getAddress(), pattern.getAddress(), curveOptions.getAddress(), matchOptions.getAddress(), advancedMatchOptions.getAddress(), roi.getAddress(), rv_addr+0);
         MatchGeometricPattern2Result rv = new MatchGeometricPattern2Result(rv_buf, jn_rv);
@@ -22939,7 +22939,7 @@ public class NIVision {
     }
 
     public static MatchMultipleGeometricPatternsResult imaqMatchMultipleGeometricPatterns(Image image, MultipleGeometricPattern multiplePattern, ROI roi) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqMatchMultipleGeometricPatterns(image.getAddress(), multiplePattern.getAddress(), roi.getAddress(), rv_addr+0);
         MatchMultipleGeometricPatternsResult rv = new MatchMultipleGeometricPatternsResult(rv_buf, jn_rv);
@@ -22959,7 +22959,7 @@ public class NIVision {
             fileName_buf = ByteBuffer.allocateDirect(fileName_bytes.length+1);
             putBytes(fileName_buf, fileName_bytes, 0, fileName_bytes.length).put(fileName_bytes.length, (byte)0);
         }
-        ByteBuffer description_buf = ByteBuffer.allocateDirect(256);
+        ByteBuffer description_buf = ByteBuffer.allocateDirect(256).order(ByteOrder.nativeOrder());
         if (description != null) {
             byte[] bytes;
             try {
@@ -23010,12 +23010,12 @@ public class NIVision {
     public static RefineMatchesResult imaqRefineMatches(Image image, Image pattern, PatternMatch[] candidatesIn) {
         int numCandidatesIn = candidatesIn.length;
         ByteBuffer candidatesIn_buf = null;
-        candidatesIn_buf = ByteBuffer.allocateDirect(candidatesIn.length*52);
+        candidatesIn_buf = ByteBuffer.allocateDirect(candidatesIn.length*52).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<candidatesIn.length; i++, off += 52) {
             candidatesIn[i].setBuffer(candidatesIn_buf, off);
             candidatesIn[i].write();
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(32);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(32).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqRefineMatches(image.getAddress(), pattern.getAddress(), getByteBufferAddress(candidatesIn_buf), numCandidatesIn, rv_addr+0, rv_addr+8, rv_addr+16);
         RefineMatchesResult rv = new RefineMatchesResult(rv_buf, jn_rv);
@@ -23093,7 +23093,7 @@ public class NIVision {
     }
 
     public static MatchGeometricPattern3Result imaqMatchGeometricPattern3(Image image, Image pattern, CurveOptions curveOptions, MatchGeometricPatternOptions matchOptions, MatchGeometricPatternAdvancedOptions3 advancedMatchOptions, ROI roi) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqMatchGeometricPattern3(image.getAddress(), pattern.getAddress(), curveOptions.getAddress(), matchOptions.getAddress(), advancedMatchOptions.getAddress(), roi.getAddress(), rv_addr+0);
         MatchGeometricPattern3Result rv = new MatchGeometricPattern3Result(rv_buf, jn_rv);
@@ -23133,7 +23133,7 @@ public class NIVision {
     }
 
     public static MatchPattern3Result imaqMatchPattern3(Image image, Image pattern, MatchPatternOptions options, MatchPatternAdvancedOptions advancedOptions, ROI roi) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqMatchPattern3(image.getAddress(), pattern.getAddress(), options == null ? 0 : options.getAddress(), advancedOptions.getAddress(), roi.getAddress(), rv_addr+0);
         MatchPattern3Result rv = new MatchPattern3Result(rv_buf, jn_rv);
@@ -23191,7 +23191,7 @@ public class NIVision {
             group_buf = ByteBuffer.allocateDirect(group_bytes.length+1);
             putBytes(group_buf, group_bytes, 0, group_bytes.length).put(group_bytes.length, (byte)0);
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGetOverlayProperties(image.getAddress(), group == null ? 0 : getByteBufferAddress(group_buf), rv_addr+0);
         TransformBehaviors transformBehaviors;
@@ -23204,7 +23204,7 @@ public class NIVision {
     public static void imaqMergeOverlay(Image dest, Image source, RGBValue[] palette, String group) {
         int numColors = palette.length;
         ByteBuffer palette_buf = null;
-        palette_buf = ByteBuffer.allocateDirect(palette.length*4);
+        palette_buf = ByteBuffer.allocateDirect(palette.length*4).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<palette.length; i++, off += 4) {
             palette[i].setBuffer(palette_buf, off);
             palette[i].write();
@@ -23262,7 +23262,7 @@ public class NIVision {
     public static void imaqOverlayClosedContour(Image image, Point[] points, RGBValue color, DrawMode drawMode, String group) {
         int numPoints = points.length;
         ByteBuffer points_buf = null;
-        points_buf = ByteBuffer.allocateDirect(points.length*8);
+        points_buf = ByteBuffer.allocateDirect(points.length*8).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<points.length; i++, off += 8) {
             points[i].setBuffer(points_buf, off);
             points[i].write();
@@ -23320,7 +23320,7 @@ public class NIVision {
     public static void imaqOverlayOpenContour(Image image, Point[] points, RGBValue color, String group) {
         int numPoints = points.length;
         ByteBuffer points_buf = null;
-        points_buf = ByteBuffer.allocateDirect(points.length*8);
+        points_buf = ByteBuffer.allocateDirect(points.length*8).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<points.length; i++, off += 8) {
             points[i].setBuffer(points_buf, off);
             points[i].write();
@@ -23342,7 +23342,7 @@ public class NIVision {
     private static native void _imaqOverlayOpenContour(long image, long points, int numPoints, long color, long group);
 
     public static byte imaqOverlayOval(Image image, Rect boundingBox, RGBValue color, DrawMode drawMode) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         byte jn_rv = _imaqOverlayOval(image.getAddress(), boundingBox.getAddress(), color.getAddress(), drawMode.getValue(), rv_addr+0);
         byte group;
@@ -23354,14 +23354,14 @@ public class NIVision {
     public static void imaqOverlayPoints(Image image, Point[] points, RGBValue[] colors, PointSymbol symbol, UserPointSymbol userSymbol, String group) {
         int numPoints = points.length;
         ByteBuffer points_buf = null;
-        points_buf = ByteBuffer.allocateDirect(points.length*8);
+        points_buf = ByteBuffer.allocateDirect(points.length*8).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<points.length; i++, off += 8) {
             points[i].setBuffer(points_buf, off);
             points[i].write();
         }
         int numColors = colors.length;
         ByteBuffer colors_buf = null;
-        colors_buf = ByteBuffer.allocateDirect(colors.length*4);
+        colors_buf = ByteBuffer.allocateDirect(colors.length*4).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<colors.length; i++, off += 4) {
             colors[i].setBuffer(colors_buf, off);
             colors[i].write();
@@ -23456,7 +23456,7 @@ public class NIVision {
             group_buf = ByteBuffer.allocateDirect(group_bytes.length+1);
             putBytes(group_buf, group_bytes, 0, group_bytes.length).put(group_bytes.length, (byte)0);
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqSetOverlayProperties(image.getAddress(), group == null ? 0 : getByteBufferAddress(group_buf), rv_addr+0);
         TransformBehaviors transformBehaviors;
@@ -23526,7 +23526,7 @@ public class NIVision {
             fileName_buf = ByteBuffer.allocateDirect(fileName_bytes.length+1);
             putBytes(fileName_buf, fileName_bytes, 0, fileName_bytes.length).put(fileName_bytes.length, (byte)0);
         }
-        ByteBuffer setDescription_buf = ByteBuffer.allocateDirect(256);
+        ByteBuffer setDescription_buf = ByteBuffer.allocateDirect(256).order(ByteOrder.nativeOrder());
         if (setDescription != null) {
             byte[] bytes;
             try {
@@ -23538,7 +23538,7 @@ public class NIVision {
             for (int i=bytes.length; i<256; i++)
                 setDescription_buf.put(i, (byte)0); // fill with zero
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(32);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(32).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqReadOCRFile(fileName == null ? 0 : getByteBufferAddress(fileName_buf), set.getAddress(), setDescription == null ? 0 : getByteBufferAddress(setDescription_buf), rv_addr+0, rv_addr+8, rv_addr+16);
         ReadOCRFileResult rv = new ReadOCRFileResult(rv_buf);
@@ -23627,7 +23627,7 @@ public class NIVision {
             expectedString_buf = ByteBuffer.allocateDirect(expectedString_bytes.length+1);
             putBytes(expectedString_buf, expectedString_bytes, 0, expectedString_bytes.length).put(expectedString_bytes.length, (byte)0);
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqVerifyText(image.getAddress(), set.getAddress(), expectedString == null ? 0 : getByteBufferAddress(expectedString_buf), roi.getAddress(), rv_addr+0);
         VerifyTextResult rv = new VerifyTextResult(rv_buf, jn_rv);
@@ -23677,7 +23677,7 @@ public class NIVision {
     }
 
     public static ExtractContourResult imaqExtractContour(Image image, ROI roi, ExtractContourDirection direction, ConnectionConstraint connectionConstraintParams, int numOfConstraints, ExtractContourSelection selection, Image contourImage) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqExtractContour(image.getAddress(), roi.getAddress(), direction.getValue(), rv_addr+0, connectionConstraintParams.getAddress(), numOfConstraints, selection.getValue(), contourImage.getAddress());
         ExtractContourResult rv = new ExtractContourResult(rv_buf);
@@ -23714,7 +23714,7 @@ public class NIVision {
     public static CurvatureAnalysisReport imaqContourClassifyCurvature(Image contourImage, int kernel, RangeLabel[] curvatureClasses) {
         int numCurvatureClasses = curvatureClasses.length;
         ByteBuffer curvatureClasses_buf = null;
-        curvatureClasses_buf = ByteBuffer.allocateDirect(curvatureClasses.length*24);
+        curvatureClasses_buf = ByteBuffer.allocateDirect(curvatureClasses.length*24).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<curvatureClasses.length; i++, off += 24) {
             curvatureClasses[i].setBuffer(curvatureClasses_buf, off);
             curvatureClasses[i].write();
@@ -23736,7 +23736,7 @@ public class NIVision {
     public static ClassifyDistancesReport imaqContourClassifyDistances(Image targetImage, Image templateImage, SetupMatchPatternData matchSetupData, int smoothingKernel, RangeLabel[] distanceRanges) {
         int numDistanceRanges = distanceRanges.length;
         ByteBuffer distanceRanges_buf = null;
-        distanceRanges_buf = ByteBuffer.allocateDirect(distanceRanges.length*24);
+        distanceRanges_buf = ByteBuffer.allocateDirect(distanceRanges.length*24).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<distanceRanges.length; i++, off += 24) {
             distanceRanges[i].setBuffer(distanceRanges_buf, off);
             distanceRanges[i].write();
@@ -23770,12 +23770,12 @@ public class NIVision {
     public static ContourSetupMatchPatternResult imaqContourSetupMatchPattern(int enableSubPixelAccuracy, int useLearnCurveParameters, RangeSettingDouble[] rangeSettings) {
         int numRangeSettings = rangeSettings.length;
         ByteBuffer rangeSettings_buf = null;
-        rangeSettings_buf = ByteBuffer.allocateDirect(rangeSettings.length*24);
+        rangeSettings_buf = ByteBuffer.allocateDirect(rangeSettings.length*24).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<rangeSettings.length; i++, off += 24) {
             rangeSettings[i].setBuffer(rangeSettings_buf, off);
             rangeSettings[i].write();
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqContourSetupMatchPattern(rv_addr+0, enableSubPixelAccuracy, rv_addr+8, useLearnCurveParameters, getByteBufferAddress(rangeSettings_buf), numRangeSettings);
         ContourSetupMatchPatternResult rv = new ContourSetupMatchPatternResult(rv_buf);
@@ -23787,12 +23787,12 @@ public class NIVision {
     public static SetupMatchPatternData imaqContourAdvancedSetupMatchPattern(GeometricAdvancedSetupDataOption[] geometricOptions) {
         int numGeometricOptions = geometricOptions.length;
         ByteBuffer geometricOptions_buf = null;
-        geometricOptions_buf = ByteBuffer.allocateDirect(geometricOptions.length*16);
+        geometricOptions_buf = ByteBuffer.allocateDirect(geometricOptions.length*16).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<geometricOptions.length; i++, off += 16) {
             geometricOptions[i].setBuffer(geometricOptions_buf, off);
             geometricOptions[i].write();
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqContourAdvancedSetupMatchPattern(rv_addr+0, getByteBufferAddress(geometricOptions_buf), numGeometricOptions);
         SetupMatchPatternData matchSetupData;
@@ -23869,7 +23869,7 @@ public class NIVision {
     public static void imaqGrayMorphologyReconstruct(Image dstImage, Image srcImage, Image markerImage, PointFloat[] points, MorphologyReconstructOperation operation, StructuringElement structuringElement, ROI roi) {
         int numOfPoints = points.length;
         ByteBuffer points_buf = null;
-        points_buf = ByteBuffer.allocateDirect(points.length*8);
+        points_buf = ByteBuffer.allocateDirect(points.length*8).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<points.length; i++, off += 8) {
             points[i].setBuffer(points_buf, off);
             points[i].write();
@@ -23882,7 +23882,7 @@ public class NIVision {
     public static void imaqMorphologyReconstruct(Image dstImage, Image srcImage, Image markerImage, PointFloat[] points, MorphologyReconstructOperation operation, Connectivity connectivity, ROI roi) {
         int numOfPoints = points.length;
         ByteBuffer points_buf = null;
-        points_buf = ByteBuffer.allocateDirect(points.length*8);
+        points_buf = ByteBuffer.allocateDirect(points.length*8).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<points.length; i++, off += 8) {
             points[i].setBuffer(points_buf, off);
             points[i].write();
@@ -23916,7 +23916,7 @@ public class NIVision {
     }
 
     public static MaskToROIResult imaqMaskToROI(Image mask) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqMaskToROI(mask.getAddress(), rv_addr+0);
         MaskToROIResult rv = new MaskToROIResult(rv_buf);
@@ -23934,7 +23934,7 @@ public class NIVision {
     private static native long _imaqROIProfile(long image, long roi);
 
     public static int imaqROIToMask(Image mask, ROI roi, int fillValue, Image imageModel) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqROIToMask(mask.getAddress(), roi.getAddress(), fillValue, imageModel == null ? 0 : imageModel.getAddress(), rv_addr+0);
         int inSpace;
@@ -23953,7 +23953,7 @@ public class NIVision {
     public static LabelToROIReport imaqLabelToROI(Image image, int[] labelsIn, int maxNumVectors, int isExternelEdges) {
         int numLabelsIn = labelsIn.length;
         ByteBuffer labelsIn_buf = null;
-        labelsIn_buf = ByteBuffer.allocateDirect(labelsIn.length*4);
+        labelsIn_buf = ByteBuffer.allocateDirect(labelsIn.length*4).order(ByteOrder.nativeOrder());
         labelsIn_buf.asIntBuffer().put(labelsIn).rewind();
         long jn_rv = _imaqLabelToROI(image.getAddress(), getByteBufferAddress(labelsIn_buf), numLabelsIn, maxNumVectors, isExternelEdges);
         
@@ -23990,7 +23990,7 @@ public class NIVision {
         }
         int vectorSize = featureVector.length;
         ByteBuffer featureVector_buf = null;
-        featureVector_buf = ByteBuffer.allocateDirect(featureVector.length*8);
+        featureVector_buf = ByteBuffer.allocateDirect(featureVector.length*8).order(ByteOrder.nativeOrder());
         featureVector_buf.asDoubleBuffer().put(featureVector).rewind();
         _imaqAddClassifierSample(image.getAddress(), session.getAddress(), roi.getAddress(), sampleClass == null ? 0 : getByteBufferAddress(sampleClass_buf), getByteBufferAddress(featureVector_buf), vectorSize);
         
@@ -24000,7 +24000,7 @@ public class NIVision {
     public static ClassifierReportAdvanced imaqAdvanceClassify(Image image, ClassifierSession session, ROI roi, double[] featureVector) {
         int vectorSize = featureVector.length;
         ByteBuffer featureVector_buf = null;
-        featureVector_buf = ByteBuffer.allocateDirect(featureVector.length*8);
+        featureVector_buf = ByteBuffer.allocateDirect(featureVector.length*8).order(ByteOrder.nativeOrder());
         featureVector_buf.asDoubleBuffer().put(featureVector).rewind();
         long jn_rv = _imaqAdvanceClassify(image.getAddress(), session.getAddress(), roi.getAddress(), getByteBufferAddress(featureVector_buf), vectorSize);
         
@@ -24011,7 +24011,7 @@ public class NIVision {
     public static ClassifierReport imaqClassify(Image image, ClassifierSession session, ROI roi, double[] featureVector) {
         int vectorSize = featureVector.length;
         ByteBuffer featureVector_buf = null;
-        featureVector_buf = ByteBuffer.allocateDirect(featureVector.length*8);
+        featureVector_buf = ByteBuffer.allocateDirect(featureVector.length*8).order(ByteOrder.nativeOrder());
         featureVector_buf.asDoubleBuffer().put(featureVector).rewind();
         long jn_rv = _imaqClassify(image.getAddress(), session.getAddress(), roi.getAddress(), getByteBufferAddress(featureVector_buf), vectorSize);
         
@@ -24051,7 +24051,7 @@ public class NIVision {
     }
 
     public static GetClassifierSampleInfoResult imaqGetClassifierSampleInfo(ClassifierSession session, int index) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGetClassifierSampleInfo(session.getAddress(), index, rv_addr+0);
         GetClassifierSampleInfoResult rv = new GetClassifierSampleInfoResult(rv_buf);
@@ -24061,7 +24061,7 @@ public class NIVision {
     private static native long _imaqGetClassifierSampleInfo(long session, int index, long numSamples);
 
     public static ColorOptions imaqGetColorClassifierOptions(ClassifierSession session) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGetColorClassifierOptions(session.getAddress(), rv_addr+0);
         ColorOptions options;
@@ -24072,7 +24072,7 @@ public class NIVision {
     private static native long _imaqGetColorClassifierOptions(long session, long options);
 
     public static NearestNeighborOptions imaqGetNearestNeighborOptions(ClassifierSession session) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGetNearestNeighborOptions(session.getAddress(), rv_addr+0);
         NearestNeighborOptions options;
@@ -24094,7 +24094,7 @@ public class NIVision {
     }
 
     public static GetParticleClassifierOptions2Result imaqGetParticleClassifierOptions2(ClassifierSession session) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqGetParticleClassifierOptions2(session.getAddress(), rv_addr+0, rv_addr+8);
         GetParticleClassifierOptions2Result rv = new GetParticleClassifierOptions2Result(rv_buf);
@@ -24124,7 +24124,7 @@ public class NIVision {
             fileName_buf = ByteBuffer.allocateDirect(fileName_bytes.length+1);
             putBytes(fileName_buf, fileName_bytes, 0, fileName_bytes.length).put(fileName_bytes.length, (byte)0);
         }
-        ByteBuffer description_buf = ByteBuffer.allocateDirect(256);
+        ByteBuffer description_buf = ByteBuffer.allocateDirect(256).order(ByteOrder.nativeOrder());
         if (description != null) {
             byte[] bytes;
             try {
@@ -24136,7 +24136,7 @@ public class NIVision {
             for (int i=bytes.length; i<256; i++)
                 description_buf.put(i, (byte)0); // fill with zero
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqReadClassifierFile(session.getAddress(), fileName == null ? 0 : getByteBufferAddress(fileName_buf), mode.getValue(), rv_addr+0, rv_addr+8, description == null ? 0 : getByteBufferAddress(description_buf));
         ReadClassifierFileResult rv = new ReadClassifierFileResult(rv_buf);
@@ -24196,7 +24196,7 @@ public class NIVision {
             fileName_buf = ByteBuffer.allocateDirect(fileName_bytes.length+1);
             putBytes(fileName_buf, fileName_bytes, 0, fileName_bytes.length).put(fileName_bytes.length, (byte)0);
         }
-        ByteBuffer description_buf = ByteBuffer.allocateDirect(256);
+        ByteBuffer description_buf = ByteBuffer.allocateDirect(256).order(ByteOrder.nativeOrder());
         if (description != null) {
             byte[] bytes;
             try {
@@ -24289,7 +24289,7 @@ public class NIVision {
     }
 
     public static SelectParticlesResult imaqSelectParticles(Image image, ParticleReport reports, int reportCount, int rejectBorder, SelectParticleCriteria criteria, int criteriaCount) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqSelectParticles(image.getAddress(), reports.getAddress(), reportCount, rejectBorder, criteria.getAddress(), criteriaCount, rv_addr+0);
         SelectParticlesResult rv = new SelectParticlesResult(rv_buf, jn_rv);
@@ -24329,7 +24329,7 @@ public class NIVision {
     }
 
     public static GetParticleInfoResult imaqGetParticleInfo(Image image, int connectivity8, ParticleInfoMode mode) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqGetParticleInfo(image.getAddress(), connectivity8, mode.getValue(), rv_addr+0);
         GetParticleInfoResult rv = new GetParticleInfoResult(rv_buf, jn_rv);
@@ -24338,7 +24338,7 @@ public class NIVision {
     private static native long _imaqGetParticleInfo(long image, int connectivity8, int mode, long reportCount);
 
     public static float imaqCalcCoeff(Image image, ParticleReport report, MeasurementValue parameter) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         float jn_rv = _imaqCalcCoeff(image.getAddress(), report.getAddress(), parameter.getValue(), rv_addr+0);
         float coefficient;
@@ -24372,7 +24372,7 @@ public class NIVision {
     }
 
     public static EdgeToolResult imaqEdgeTool(Image image, Point points, int numPoints, EdgeOptions options) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqEdgeTool(image.getAddress(), points.getAddress(), numPoints, options.getAddress(), rv_addr+0);
         EdgeToolResult rv = new EdgeToolResult(rv_buf, jn_rv);
@@ -24405,7 +24405,7 @@ public class NIVision {
     }
 
     public static CirclesResult imaqCircles(Image dest, Image source, float minRadius, float maxRadius) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqCircles(dest.getAddress(), source.getAddress(), minRadius, maxRadius, rv_addr+0);
         CirclesResult rv = new CirclesResult(rv_buf, jn_rv);
@@ -24414,7 +24414,7 @@ public class NIVision {
     private static native long _imaqCircles(long dest, long source, float minRadius, float maxRadius, long numCircles);
 
     public static int imaqLabel(Image dest, Image source, int connectivity8) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqLabel(dest.getAddress(), source.getAddress(), connectivity8, rv_addr+0);
         int particleCount;
@@ -24426,12 +24426,12 @@ public class NIVision {
     public static BestEllipse imaqFitEllipse(PointFloat[] points) {
         int numPoints = points.length;
         ByteBuffer points_buf = null;
-        points_buf = ByteBuffer.allocateDirect(points.length*8);
+        points_buf = ByteBuffer.allocateDirect(points.length*8).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<points.length; i++, off += 8) {
             points[i].setBuffer(points_buf, off);
             points[i].write();
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqFitEllipse(getByteBufferAddress(points_buf), numPoints, rv_addr+0);
         BestEllipse ellipse;
@@ -24444,12 +24444,12 @@ public class NIVision {
     public static BestCircle imaqFitCircle(PointFloat[] points) {
         int numPoints = points.length;
         ByteBuffer points_buf = null;
-        points_buf = ByteBuffer.allocateDirect(points.length*8);
+        points_buf = ByteBuffer.allocateDirect(points.length*8).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<points.length; i++, off += 8) {
             points[i].setBuffer(points_buf, off);
             points[i].write();
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqFitCircle(getByteBufferAddress(points_buf), numPoints, rv_addr+0);
         BestCircle circle;
@@ -24484,7 +24484,7 @@ public class NIVision {
     }
 
     public static MatchPatternResult imaqMatchPattern(Image image, Image pattern, MatchPatternOptions options, Rect searchRect) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqMatchPattern(image.getAddress(), pattern.getAddress(), options == null ? 0 : options.getAddress(), searchRect.getAddress(), rv_addr+0);
         MatchPatternResult rv = new MatchPatternResult(rv_buf, jn_rv);
@@ -24500,7 +24500,7 @@ public class NIVision {
     private static native void _imaqConvex(long dest, long source);
 
     public static int imaqIsVisionInfoPresent(Image image, VisionInfoType type) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqIsVisionInfoPresent(image.getAddress(), type.getValue(), rv_addr+0);
         int present;
@@ -24510,7 +24510,7 @@ public class NIVision {
     private static native int _imaqIsVisionInfoPresent(long image, int type, long present);
 
     public static float imaqLineGaugeTool(Image image, Point start, Point end, LineGaugeMethod method, EdgeOptions edgeOptions, CoordinateTransform reference) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         float jn_rv = _imaqLineGaugeTool(image.getAddress(), start.getAddress(), end.getAddress(), method.getValue(), edgeOptions.getAddress(), reference == null ? 0 : reference.getAddress(), rv_addr+0);
         float distance;
@@ -24532,12 +24532,12 @@ public class NIVision {
     public static BestCircleResult imaqBestCircle(PointFloat[] points) {
         int numPoints = points.length;
         ByteBuffer points_buf = null;
-        points_buf = ByteBuffer.allocateDirect(points.length*8);
+        points_buf = ByteBuffer.allocateDirect(points.length*8).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<points.length; i++, off += 8) {
             points[i].setBuffer(points_buf, off);
             points[i].write();
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqBestCircle(getByteBufferAddress(points_buf), numPoints, rv_addr+0, rv_addr+8);
         BestCircleResult rv = new BestCircleResult(rv_buf);
@@ -24597,7 +24597,7 @@ public class NIVision {
     }
 
     public static CoordinateReferenceResult imaqCoordinateReference(Point points, ReferenceMode mode) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqCoordinateReference(points.getAddress(), mode.getValue(), rv_addr+0, rv_addr+8);
         CoordinateReferenceResult rv = new CoordinateReferenceResult(rv_buf);
@@ -24655,7 +24655,7 @@ public class NIVision {
     }
 
     public static GetCalibrationInfoResult imaqGetCalibrationInfo(Image image) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(32);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(32).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqGetCalibrationInfo(image.getAddress(), rv_addr+0, rv_addr+8, rv_addr+16);
         GetCalibrationInfoResult rv = new GetCalibrationInfoResult(rv_buf);
@@ -24664,7 +24664,7 @@ public class NIVision {
     private static native void _imaqGetCalibrationInfo(long image, long unit, long xDistance, long yDistance);
 
     public static int imaqConstructROI(Image image, ROI roi, Tool initialTool, ToolWindowOptions tools, ConstructROIOptions options) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqConstructROI(image.getAddress(), roi.getAddress(), initialTool.getValue(), tools.getAddress(), options.getAddress(), rv_addr+0);
         int okay;
@@ -24685,7 +24685,7 @@ public class NIVision {
     }
 
     public static GetParticleClassifierOptionsResult imaqGetParticleClassifierOptions(ClassifierSession session) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqGetParticleClassifierOptions(session.getAddress(), rv_addr+0, rv_addr+8);
         GetParticleClassifierOptionsResult rv = new GetParticleClassifierOptionsResult(rv_buf);
@@ -24710,7 +24710,7 @@ public class NIVision {
     }
 
     public static GetWindowZoomResult imaqGetWindowZoom(int windowNumber) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(24).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         _imaqGetWindowZoom(windowNumber, rv_addr+0, rv_addr+8);
         GetWindowZoomResult rv = new GetWindowZoomResult(rv_buf);
@@ -24719,7 +24719,7 @@ public class NIVision {
     private static native void _imaqGetWindowZoom(int windowNumber, long xZoom, long yZoom);
 
     public static int imaqParticleFilter3(Image dest, Image source, ParticleFilterCriteria2 criteria, int criteriaCount, ParticleFilterOptions options, ROI roi) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqParticleFilter3(dest.getAddress(), source.getAddress(), criteria.getAddress(), criteriaCount, options.getAddress(), roi.getAddress(), rv_addr+0);
         int numParticles;
@@ -24737,7 +24737,7 @@ public class NIVision {
     private static native long _imaqReadText2(long image, long set, long roi, long readOptions, long processingOptions, long spacingOptions);
 
     public static LearnPatternAdvancedOptions imaqLearnPattern2(Image image, LearningMode learningMode) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqLearnPattern2(image.getAddress(), learningMode.getValue(), rv_addr+0);
         LearnPatternAdvancedOptions advancedOptions;
@@ -24810,7 +24810,7 @@ public class NIVision {
     }
 
     public static MatchPattern2Result imaqMatchPattern2(Image image, Image pattern, MatchPatternOptions options, MatchPatternAdvancedOptions advancedOptions, Rect searchRect) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqMatchPattern2(image.getAddress(), pattern.getAddress(), options == null ? 0 : options.getAddress(), advancedOptions.getAddress(), searchRect.getAddress(), rv_addr+0);
         MatchPattern2Result rv = new MatchPattern2Result(rv_buf, jn_rv);
@@ -24835,12 +24835,12 @@ public class NIVision {
     public static int imaqParticleFilter2(Image dest, Image source, ParticleFilterCriteria2[] criteria, int rejectMatches, int connectivity8) {
         int criteriaCount = criteria.length;
         ByteBuffer criteria_buf = null;
-        criteria_buf = ByteBuffer.allocateDirect(criteria.length*20);
+        criteria_buf = ByteBuffer.allocateDirect(criteria.length*20).order(ByteOrder.nativeOrder());
         for (int i=0, off=0; i<criteria.length; i++, off += 20) {
             criteria[i].setBuffer(criteria_buf, off);
             criteria[i].write();
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _imaqParticleFilter2(dest.getAddress(), source.getAddress(), getByteBufferAddress(criteria_buf), criteriaCount, rejectMatches, connectivity8, rv_addr+0);
         int numParticles;
@@ -24874,7 +24874,7 @@ public class NIVision {
     }
 
     public static EdgeTool2Result imaqEdgeTool2(Image image, Point points, int numPoints, EdgeProcess process, EdgeOptions options) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqEdgeTool2(image.getAddress(), points.getAddress(), numPoints, process.getValue(), options.getAddress(), rv_addr+0);
         EdgeTool2Result rv = new EdgeTool2Result(rv_buf, jn_rv);
@@ -24915,7 +24915,7 @@ public class NIVision {
     }
 
     public static ReadDataMatrixBarcodeResult imaqReadDataMatrixBarcode(Image image, ROI roi, DataMatrixOptions options) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqReadDataMatrixBarcode(image.getAddress(), roi.getAddress(), options.getAddress(), rv_addr+0);
         ReadDataMatrixBarcodeResult rv = new ReadDataMatrixBarcodeResult(rv_buf, jn_rv);
@@ -24956,7 +24956,7 @@ public class NIVision {
     }
 
     public static MatchGeometricPatternResult imaqMatchGeometricPattern(Image image, Image pattern, CurveOptions curveOptions, MatchGeometricPatternOptions matchOptions, MatchGeometricPatternAdvancedOptions advancedMatchOptions, ROI roi) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         long jn_rv = _imaqMatchGeometricPattern(image.getAddress(), pattern.getAddress(), curveOptions.getAddress(), matchOptions.getAddress(), advancedMatchOptions.getAddress(), roi.getAddress(), rv_addr+0);
         MatchGeometricPatternResult rv = new MatchGeometricPatternResult(rv_buf, jn_rv);
@@ -25501,11 +25501,11 @@ public class NIVision {
      */
 
     public static class IMAQdxCameraInformation extends DisposedStruct {
-        public long Type;
-        public long Version;
-        public long Flags;
-        public long SerialNumberHi;
-        public long SerialNumberLo;
+        public int Type;
+        public int Version;
+        public int Flags;
+        public int SerialNumberHi;
+        public int SerialNumberLo;
         public IMAQdxBusType BusType;
         public String InterfaceName;
         public String VendorName;
@@ -25520,7 +25520,7 @@ public class NIVision {
             super(2584);
             init();
         }
-        public IMAQdxCameraInformation(long Type, long Version, long Flags, long SerialNumberHi, long SerialNumberLo, IMAQdxBusType BusType, String InterfaceName, String VendorName, String ModelName, String CameraFileName, String CameraAttributeURL) {
+        public IMAQdxCameraInformation(int Type, int Version, int Flags, int SerialNumberHi, int SerialNumberLo, IMAQdxBusType BusType, String InterfaceName, String VendorName, String ModelName, String CameraFileName, String CameraAttributeURL) {
             super(2584);
             this.Type = Type;
             this.Version = Version;
@@ -25546,11 +25546,11 @@ public class NIVision {
             super.setBuffer(backing, offset, 2584);
         }
         public void read() {
-            Type = backing.getLong(0);
-            Version = backing.getLong(4);
-            Flags = backing.getLong(8);
-            SerialNumberHi = backing.getLong(12);
-            SerialNumberLo = backing.getLong(16);
+            Type = backing.getInt(0);
+            Version = backing.getInt(4);
+            Flags = backing.getInt(8);
+            SerialNumberHi = backing.getInt(12);
+            SerialNumberLo = backing.getInt(16);
             BusType = IMAQdxBusType.fromValue(backing.getInt(20));
             {
                 byte[] bytes = new byte[IMAQDX_MAX_API_STRING_LENGTH];
@@ -25609,11 +25609,11 @@ public class NIVision {
             }
         }
         public void write() {
-            backing.putLong(0, Type);
-            backing.putLong(4, Version);
-            backing.putLong(8, Flags);
-            backing.putLong(12, SerialNumberHi);
-            backing.putLong(16, SerialNumberLo);
+            backing.putInt(0, Type);
+            backing.putInt(4, Version);
+            backing.putInt(8, Flags);
+            backing.putInt(12, SerialNumberHi);
+            backing.putInt(16, SerialNumberLo);
             if (BusType != null)
                 backing.putInt(20, BusType.getValue());
             if (InterfaceName != null) {
@@ -25682,8 +25682,8 @@ public class NIVision {
      */
 
     public static class IMAQdxCameraFile extends DisposedStruct {
-        public long Type;
-        public long Version;
+        public int Type;
+        public int Version;
         public String FileName;
 
         private void init() {
@@ -25693,7 +25693,7 @@ public class NIVision {
             super(520);
             init();
         }
-        public IMAQdxCameraFile(long Type, long Version, String FileName) {
+        public IMAQdxCameraFile(int Type, int Version, String FileName) {
             super(520);
             this.Type = Type;
             this.Version = Version;
@@ -25711,8 +25711,8 @@ public class NIVision {
             super.setBuffer(backing, offset, 520);
         }
         public void read() {
-            Type = backing.getLong(0);
-            Version = backing.getLong(4);
+            Type = backing.getInt(0);
+            Version = backing.getInt(4);
             {
                 byte[] bytes = new byte[IMAQDX_MAX_API_STRING_LENGTH];
                 getBytes(backing, bytes, 8, IMAQDX_MAX_API_STRING_LENGTH);
@@ -25726,8 +25726,8 @@ public class NIVision {
             }
         }
         public void write() {
-            backing.putLong(0, Type);
-            backing.putLong(4, Version);
+            backing.putInt(0, Type);
+            backing.putInt(4, Version);
             if (FileName != null) {
                 byte[] bytes;
                 try {
@@ -25751,8 +25751,8 @@ public class NIVision {
 
     public static class IMAQdxAttributeInformation extends DisposedStruct {
         public IMAQdxAttributeType Type;
-        public long Readable;
-        public long Writable;
+        public int Readable;
+        public int Writable;
         public String Name;
 
         private void init() {
@@ -25762,7 +25762,7 @@ public class NIVision {
             super(524);
             init();
         }
-        public IMAQdxAttributeInformation(IMAQdxAttributeType Type, long Readable, long Writable, String Name) {
+        public IMAQdxAttributeInformation(IMAQdxAttributeType Type, int Readable, int Writable, String Name) {
             super(524);
             this.Type = Type;
             this.Readable = Readable;
@@ -25782,8 +25782,8 @@ public class NIVision {
         }
         public void read() {
             Type = IMAQdxAttributeType.fromValue(backing.getInt(0));
-            Readable = backing.getLong(4);
-            Writable = backing.getLong(8);
+            Readable = backing.getInt(4);
+            Writable = backing.getInt(8);
             {
                 byte[] bytes = new byte[IMAQDX_MAX_API_STRING_LENGTH];
                 getBytes(backing, bytes, 12, IMAQDX_MAX_API_STRING_LENGTH);
@@ -25799,8 +25799,8 @@ public class NIVision {
         public void write() {
             if (Type != null)
                 backing.putInt(0, Type.getValue());
-            backing.putLong(4, Readable);
-            backing.putLong(8, Writable);
+            backing.putInt(4, Readable);
+            backing.putInt(8, Writable);
             if (Name != null) {
                 byte[] bytes;
                 try {
@@ -25823,8 +25823,8 @@ public class NIVision {
      */
 
     public static class IMAQdxEnumItem extends DisposedStruct {
-        public long Value;
-        public long Reserved;
+        public int Value;
+        public int Reserved;
         public String Name;
 
         private void init() {
@@ -25834,7 +25834,7 @@ public class NIVision {
             super(520);
             init();
         }
-        public IMAQdxEnumItem(long Value, long Reserved, String Name) {
+        public IMAQdxEnumItem(int Value, int Reserved, String Name) {
             super(520);
             this.Value = Value;
             this.Reserved = Reserved;
@@ -25852,8 +25852,8 @@ public class NIVision {
             super.setBuffer(backing, offset, 520);
         }
         public void read() {
-            Value = backing.getLong(0);
-            Reserved = backing.getLong(4);
+            Value = backing.getInt(0);
+            Reserved = backing.getInt(4);
             {
                 byte[] bytes = new byte[IMAQDX_MAX_API_STRING_LENGTH];
                 getBytes(backing, bytes, 8, IMAQDX_MAX_API_STRING_LENGTH);
@@ -25867,8 +25867,8 @@ public class NIVision {
             }
         }
         public void write() {
-            backing.putLong(0, Value);
-            backing.putLong(4, Reserved);
+            backing.putInt(0, Value);
+            backing.putInt(4, Reserved);
             if (Name != null) {
                 byte[] bytes;
                 try {
@@ -25898,31 +25898,31 @@ public class NIVision {
      * Functions
      */
 
-    public static void IMAQdxSnap(long id, Image image) {
+    public static void IMAQdxSnap(int id, Image image) {
         
         _IMAQdxSnap(id, image.getAddress());
         
     }
-    private static native void _IMAQdxSnap(long id, long image);
+    private static native void _IMAQdxSnap(int id, long image);
 
-    public static void IMAQdxConfigureGrab(long id) {
+    public static void IMAQdxConfigureGrab(int id) {
         
         _IMAQdxConfigureGrab(id);
         
     }
-    private static native void _IMAQdxConfigureGrab(long id);
+    private static native void _IMAQdxConfigureGrab(int id);
 
-    public static long IMAQdxGrab(long id, Image image, long waitForNextBuffer) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+    public static int IMAQdxGrab(int id, Image image, int waitForNextBuffer) {
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
-        long jn_rv = _IMAQdxGrab(id, image.getAddress(), waitForNextBuffer, rv_addr+0);
-        long actualBufferNumber;
-        actualBufferNumber = rv_buf.getLong(0);
+        int jn_rv = _IMAQdxGrab(id, image.getAddress(), waitForNextBuffer, rv_addr+0);
+        int actualBufferNumber;
+        actualBufferNumber = rv_buf.getInt(0);
         return actualBufferNumber;
     }
-    private static native long _IMAQdxGrab(long id, long image, long waitForNextBuffer, long actualBufferNumber);
+    private static native int _IMAQdxGrab(int id, long image, int waitForNextBuffer, long actualBufferNumber);
 
-    public static void IMAQdxDiscoverEthernetCameras(String address, long timeout) {
+    public static void IMAQdxDiscoverEthernetCameras(String address, int timeout) {
         ByteBuffer address_buf = null;
         if (address != null) {
             byte[] address_bytes;
@@ -25937,9 +25937,9 @@ public class NIVision {
         _IMAQdxDiscoverEthernetCameras(address == null ? 0 : getByteBufferAddress(address_buf), timeout);
         
     }
-    private static native void _IMAQdxDiscoverEthernetCameras(long address, long timeout);
+    private static native void _IMAQdxDiscoverEthernetCameras(long address, int timeout);
 
-    public static void IMAQdxResetCamera(String name, long resetAll) {
+    public static void IMAQdxResetCamera(String name, int resetAll) {
         ByteBuffer name_buf = null;
         if (name != null) {
             byte[] name_bytes;
@@ -25954,9 +25954,9 @@ public class NIVision {
         _IMAQdxResetCamera(name == null ? 0 : getByteBufferAddress(name_buf), resetAll);
         
     }
-    private static native void _IMAQdxResetCamera(long name, long resetAll);
+    private static native void _IMAQdxResetCamera(long name, int resetAll);
 
-    public static long IMAQdxOpenCamera(String name, IMAQdxCameraControlMode mode) {
+    public static int IMAQdxOpenCamera(String name, IMAQdxCameraControlMode mode) {
         ByteBuffer name_buf = null;
         if (name != null) {
             byte[] name_bytes;
@@ -25968,61 +25968,61 @@ public class NIVision {
             name_buf = ByteBuffer.allocateDirect(name_bytes.length+1);
             putBytes(name_buf, name_bytes, 0, name_bytes.length).put(name_bytes.length, (byte)0);
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
-        long jn_rv = _IMAQdxOpenCamera(name == null ? 0 : getByteBufferAddress(name_buf), mode.getValue(), rv_addr+0);
-        long id;
-        id = rv_buf.getLong(0);
+        int jn_rv = _IMAQdxOpenCamera(name == null ? 0 : getByteBufferAddress(name_buf), mode.getValue(), rv_addr+0);
+        int id;
+        id = rv_buf.getInt(0);
         return id;
     }
-    private static native long _IMAQdxOpenCamera(long name, int mode, long id);
+    private static native int _IMAQdxOpenCamera(long name, int mode, long id);
 
-    public static void IMAQdxCloseCamera(long id) {
+    public static void IMAQdxCloseCamera(int id) {
         
         _IMAQdxCloseCamera(id);
         
     }
-    private static native void _IMAQdxCloseCamera(long id);
+    private static native void _IMAQdxCloseCamera(int id);
 
-    public static void IMAQdxConfigureAcquisition(long id, long continuous, long bufferCount) {
+    public static void IMAQdxConfigureAcquisition(int id, int continuous, int bufferCount) {
         
         _IMAQdxConfigureAcquisition(id, continuous, bufferCount);
         
     }
-    private static native void _IMAQdxConfigureAcquisition(long id, long continuous, long bufferCount);
+    private static native void _IMAQdxConfigureAcquisition(int id, int continuous, int bufferCount);
 
-    public static void IMAQdxStartAcquisition(long id) {
+    public static void IMAQdxStartAcquisition(int id) {
         
         _IMAQdxStartAcquisition(id);
         
     }
-    private static native void _IMAQdxStartAcquisition(long id);
+    private static native void _IMAQdxStartAcquisition(int id);
 
-    public static long IMAQdxGetImage(long id, Image image, IMAQdxBufferNumberMode mode, long desiredBufferNumber) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+    public static int IMAQdxGetImage(int id, Image image, IMAQdxBufferNumberMode mode, int desiredBufferNumber) {
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
-        long jn_rv = _IMAQdxGetImage(id, image.getAddress(), mode.getValue(), desiredBufferNumber, rv_addr+0);
-        long actualBufferNumber;
-        actualBufferNumber = rv_buf.getLong(0);
+        int jn_rv = _IMAQdxGetImage(id, image.getAddress(), mode.getValue(), desiredBufferNumber, rv_addr+0);
+        int actualBufferNumber;
+        actualBufferNumber = rv_buf.getInt(0);
         return actualBufferNumber;
     }
-    private static native long _IMAQdxGetImage(long id, long image, int mode, long desiredBufferNumber, long actualBufferNumber);
+    private static native int _IMAQdxGetImage(int id, long image, int mode, int desiredBufferNumber, long actualBufferNumber);
 
-    public static void IMAQdxStopAcquisition(long id) {
+    public static void IMAQdxStopAcquisition(int id) {
         
         _IMAQdxStopAcquisition(id);
         
     }
-    private static native void _IMAQdxStopAcquisition(long id);
+    private static native void _IMAQdxStopAcquisition(int id);
 
-    public static void IMAQdxUnconfigureAcquisition(long id) {
+    public static void IMAQdxUnconfigureAcquisition(int id) {
         
         _IMAQdxUnconfigureAcquisition(id);
         
     }
-    private static native void _IMAQdxUnconfigureAcquisition(long id);
+    private static native void _IMAQdxUnconfigureAcquisition(int id);
 
-    public static IMAQdxAttributeType IMAQdxGetAttributeType(long id, String name) {
+    public static IMAQdxAttributeType IMAQdxGetAttributeType(int id, String name) {
         ByteBuffer name_buf = null;
         if (name != null) {
             byte[] name_bytes;
@@ -26034,16 +26034,16 @@ public class NIVision {
             name_buf = ByteBuffer.allocateDirect(name_bytes.length+1);
             putBytes(name_buf, name_bytes, 0, name_bytes.length).put(name_bytes.length, (byte)0);
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _IMAQdxGetAttributeType(id, name == null ? 0 : getByteBufferAddress(name_buf), rv_addr+0);
         IMAQdxAttributeType type;
         type = IMAQdxAttributeType.fromValue(rv_buf.getInt(0));
         return type;
     }
-    private static native int _IMAQdxGetAttributeType(long id, long name, long type);
+    private static native int _IMAQdxGetAttributeType(int id, long name, long type);
 
-    public static long IMAQdxIsAttributeReadable(long id, String name) {
+    public static int IMAQdxIsAttributeReadable(int id, String name) {
         ByteBuffer name_buf = null;
         if (name != null) {
             byte[] name_bytes;
@@ -26055,16 +26055,16 @@ public class NIVision {
             name_buf = ByteBuffer.allocateDirect(name_bytes.length+1);
             putBytes(name_buf, name_bytes, 0, name_bytes.length).put(name_bytes.length, (byte)0);
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
-        long jn_rv = _IMAQdxIsAttributeReadable(id, name == null ? 0 : getByteBufferAddress(name_buf), rv_addr+0);
-        long readable;
-        readable = rv_buf.getLong(0);
+        int jn_rv = _IMAQdxIsAttributeReadable(id, name == null ? 0 : getByteBufferAddress(name_buf), rv_addr+0);
+        int readable;
+        readable = rv_buf.getInt(0);
         return readable;
     }
-    private static native long _IMAQdxIsAttributeReadable(long id, long name, long readable);
+    private static native int _IMAQdxIsAttributeReadable(int id, long name, long readable);
 
-    public static long IMAQdxIsAttributeWritable(long id, String name) {
+    public static int IMAQdxIsAttributeWritable(int id, String name) {
         ByteBuffer name_buf = null;
         if (name != null) {
             byte[] name_bytes;
@@ -26076,33 +26076,33 @@ public class NIVision {
             name_buf = ByteBuffer.allocateDirect(name_bytes.length+1);
             putBytes(name_buf, name_bytes, 0, name_bytes.length).put(name_bytes.length, (byte)0);
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
-        long jn_rv = _IMAQdxIsAttributeWritable(id, name == null ? 0 : getByteBufferAddress(name_buf), rv_addr+0);
-        long writable;
-        writable = rv_buf.getLong(0);
+        int jn_rv = _IMAQdxIsAttributeWritable(id, name == null ? 0 : getByteBufferAddress(name_buf), rv_addr+0);
+        int writable;
+        writable = rv_buf.getInt(0);
         return writable;
     }
-    private static native long _IMAQdxIsAttributeWritable(long id, long name, long writable);
+    private static native int _IMAQdxIsAttributeWritable(int id, long name, long writable);
 
-    public static void IMAQdxWriteRegister(long id, long offset, long value) {
+    public static void IMAQdxWriteRegister(int id, int offset, int value) {
         
         _IMAQdxWriteRegister(id, offset, value);
         
     }
-    private static native void _IMAQdxWriteRegister(long id, long offset, long value);
+    private static native void _IMAQdxWriteRegister(int id, int offset, int value);
 
-    public static long IMAQdxReadRegister(long id, long offset) {
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+    public static int IMAQdxReadRegister(int id, int offset) {
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
-        long jn_rv = _IMAQdxReadRegister(id, offset, rv_addr+0);
-        long value;
-        value = rv_buf.getLong(0);
+        int jn_rv = _IMAQdxReadRegister(id, offset, rv_addr+0);
+        int value;
+        value = rv_buf.getInt(0);
         return value;
     }
-    private static native long _IMAQdxReadRegister(long id, long offset, long value);
+    private static native int _IMAQdxReadRegister(int id, int offset, long value);
 
-    public static void IMAQdxWriteAttributes(long id, String filename) {
+    public static void IMAQdxWriteAttributes(int id, String filename) {
         ByteBuffer filename_buf = null;
         if (filename != null) {
             byte[] filename_bytes;
@@ -26117,9 +26117,9 @@ public class NIVision {
         _IMAQdxWriteAttributes(id, filename == null ? 0 : getByteBufferAddress(filename_buf));
         
     }
-    private static native void _IMAQdxWriteAttributes(long id, long filename);
+    private static native void _IMAQdxWriteAttributes(int id, long filename);
 
-    public static void IMAQdxReadAttributes(long id, String filename) {
+    public static void IMAQdxReadAttributes(int id, String filename) {
         ByteBuffer filename_buf = null;
         if (filename != null) {
             byte[] filename_bytes;
@@ -26134,9 +26134,9 @@ public class NIVision {
         _IMAQdxReadAttributes(id, filename == null ? 0 : getByteBufferAddress(filename_buf));
         
     }
-    private static native void _IMAQdxReadAttributes(long id, long filename);
+    private static native void _IMAQdxReadAttributes(int id, long filename);
 
-    public static void IMAQdxResetEthernetCameraAddress(String name, String address, String subnet, String gateway, long timeout) {
+    public static void IMAQdxResetEthernetCameraAddress(String name, String address, String subnet, String gateway, int timeout) {
         ByteBuffer name_buf = null;
         if (name != null) {
             byte[] name_bytes;
@@ -26184,9 +26184,9 @@ public class NIVision {
         _IMAQdxResetEthernetCameraAddress(name == null ? 0 : getByteBufferAddress(name_buf), address == null ? 0 : getByteBufferAddress(address_buf), subnet == null ? 0 : getByteBufferAddress(subnet_buf), gateway == null ? 0 : getByteBufferAddress(gateway_buf), timeout);
         
     }
-    private static native void _IMAQdxResetEthernetCameraAddress(long name, long address, long subnet, long gateway, long timeout);
+    private static native void _IMAQdxResetEthernetCameraAddress(long name, long address, long subnet, long gateway, int timeout);
 
-    public static IMAQdxAttributeVisibility IMAQdxGetAttributeVisibility(long id, String name) {
+    public static IMAQdxAttributeVisibility IMAQdxGetAttributeVisibility(int id, String name) {
         ByteBuffer name_buf = null;
         if (name != null) {
             byte[] name_bytes;
@@ -26198,12 +26198,12 @@ public class NIVision {
             name_buf = ByteBuffer.allocateDirect(name_bytes.length+1);
             putBytes(name_buf, name_bytes, 0, name_bytes.length).put(name_bytes.length, (byte)0);
         }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16);
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
         int jn_rv = _IMAQdxGetAttributeVisibility(id, name == null ? 0 : getByteBufferAddress(name_buf), rv_addr+0);
         IMAQdxAttributeVisibility visibility;
         visibility = IMAQdxAttributeVisibility.fromValue(rv_buf.getInt(0));
         return visibility;
     }
-    private static native int _IMAQdxGetAttributeVisibility(long id, long name, long visibility);
+    private static native int _IMAQdxGetAttributeVisibility(int id, long name, long visibility);
 }
