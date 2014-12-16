@@ -1,7 +1,7 @@
 package edu.wpi.first.wpilibj;
 
+import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -43,6 +43,7 @@ public class CameraServer {
 	private boolean m_autoCaptureStarted;
 
 	private CameraServer() {
+		ready = new AtomicBoolean(false);
 		m_imageData = new ArrayList<Byte>();
 		m_quality = 50;
 		serverThread = new Thread(new Runnable() {
@@ -74,25 +75,28 @@ public class CameraServer {
 		// handle multi-threadedness
 
 		/* Flatten the IMAQ image to a JPEG */
+
 		RawData data = NIVision.imaqFlatten(image,
 				NIVision.FlattenType.FLATTEN_IMAGE,
 				NIVision.CompressionType.COMPRESSION_JPEG, 10 * m_quality);
 		ByteBuffer buffer = data.getBuffer();
+		m_imageData.clear();
 
 		/* Find the start of the JPEG data */
-		boolean startOfImage = false;
-		for (int i = 0; i < buffer.limit() - 1; i++) {
-			if (buffer.get(i) == 0xFF && buffer.get(i + 1) == 0xD8) {
-				startOfImage = true;
-			}
-			if (startOfImage) {
-				m_imageData.add(buffer.get(i));
-			}
+		int index = 0;
+		while (index < buffer.limit() - 1) {
+			if ((buffer.get(index) & 0xff) == 0xFF
+					&& (buffer.get(index + 1) & 0xff) == 0xD8)
+				break;
+			index++;
+		}
+		while (index < buffer.limit()) {
+			m_imageData.add(buffer.get(index++));
 		}
 
-		if (m_imageData.size() < 2) {
+		if (m_imageData.size() <= 2) {
 			throw new VisionException(
-					"data size of flattened image is less than 2. Try another camera!");
+					"data size of flattened image is less than 2. Try another camera! ");
 		}
 
 		data.free();
@@ -135,18 +139,20 @@ public class CameraServer {
 
 		@Override
 		public void run() {
-			Image frame = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
-			int id = NIVision.IMAQdxOpenCamera(name, NIVision.IMAQdxCameraControlMode.CameraControlModeController);
+			Image frame = NIVision.imaqCreateImage(
+					NIVision.ImageType.IMAGE_RGB, 0);
+			int id = NIVision.IMAQdxOpenCamera(name,
+				NIVision.IMAQdxCameraControlMode.CameraControlModeController);
 			NIVision.IMAQdxConfigureGrab(id);
 			NIVision.IMAQdxStartAcquisition(id);
-			
-			while (true){
+
+			while (true) {
 				NIVision.IMAQdxGrab(id, frame, 1);
 				setImage(frame);
 			}
-			
-//			NIVision.IMAQdxStopAcquisition(id);
-//			NIVision.IMAQdxCloseCamera(id);
+
+			// NIVision.IMAQdxStopAcquisition(id);
+			// NIVision.IMAQdxCloseCamera(id);
 
 		}
 
@@ -198,20 +204,13 @@ public class CameraServer {
 		while (true) {
 			try {
 				Socket s = socket.accept();
-				InputStream is = s.getInputStream();
+
+				DataInputStream is = new DataInputStream(s.getInputStream());
 				OutputStream os = s.getOutputStream();
 
-				byte[] fpsData = new byte[4];
-				byte[] compressionData = new byte[4];
-				byte[] sizeData = new byte[4];
-
-				is.read(fpsData);
-				is.read(compressionData);
-				is.read(sizeData);
-
-				int fps = byteArrayToInt(fpsData);
-				int compression = byteArrayToInt(compressionData);
-				int size = byteArrayToInt(sizeData);
+				int fps = is.readInt();
+				int compression = is.readInt();
+				int size = is.readInt();
 
 				if (compression != kHardwareCompression) {
 					// print to driverstation -->
@@ -221,7 +220,6 @@ public class CameraServer {
 				}
 
 				long period = (long) (1000 / (1.0 * fps));
-
 				while (true) {
 
 					long t0 = System.currentTimeMillis();
@@ -232,13 +230,16 @@ public class CameraServer {
 
 					// write numbers
 					try {
+
 						os.write(kMagicNumber);
 
 						// write size of image
+
 						synchronized (this) {
 							os.write(intTobyteArray(m_imageData.size()));
 
 							byte[] imageData = new byte[m_imageData.size()];
+
 							for (int i = 0; i < m_imageData.size(); i++) {
 								imageData[i] = m_imageData.get(i).byteValue();
 							}
@@ -246,9 +247,13 @@ public class CameraServer {
 							os.write(imageData);
 						}
 						long dt = System.currentTimeMillis() - t0;
-						Thread.sleep(period - dt);
+
+						if (dt < period) {
+							Thread.sleep(period - dt);
+						}
 
 					} catch (IOException ex) {
+						// print error to driverstation
 						break;
 					}
 				}
@@ -263,39 +268,11 @@ public class CameraServer {
 	public byte[] intTobyteArray(int n) {
 		byte[] arr = new byte[4];
 
-		ByteOrder order = ByteOrder.nativeOrder();
-
-		if (order == ByteOrder.LITTLE_ENDIAN) {
-			for (int i = 0; i < arr.length; i++) {
-				arr[i] = (byte) ((n >> i * 8) & 0xFF);
-			}
-		} else {
-			for (int i = arr.length - 1; i >= 0; i--) {
-				arr[i] = (byte) ((n >> i * 8) & 0xFF);
-			}
-		}
+		arr[0] = (byte) ((n >> 24) & 0xFF);
+		arr[1] = (byte) ((n >> 16) & 0xFF);
+		arr[2] = (byte) ((n >> 8) & 0xFF);
+		arr[3] = (byte) (n & 0xFF);
 
 		return arr;
 	}
-
-	public int byteArrayToInt(byte[] a) {
-		int value = 0;
-
-		ByteOrder order = ByteOrder.nativeOrder();
-
-		if (order == ByteOrder.LITTLE_ENDIAN) {
-			for (int i = 0; i < a.length; i++) {
-				int b = (int) a[i];
-				value += b << (i * 8);
-			}
-		} else {
-			for (int i = a.length - 1; i >= 0; i--) {
-				int b = (int) a[i];
-				value += b << (i * 8);
-			}
-		}
-
-		return value;
-	}
 }
-
