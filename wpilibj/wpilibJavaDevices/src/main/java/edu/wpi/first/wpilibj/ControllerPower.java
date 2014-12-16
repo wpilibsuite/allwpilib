@@ -16,6 +16,10 @@ import edu.wpi.first.wpilibj.hal.PowerJNI;
 
 public class ControllerPower
 {
+	/**
+	* Get the input voltage to the robot controller
+	* @return The controller input voltage value
+	*/
 	public static double getInputVoltage()
 	{
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -24,7 +28,11 @@ public class ControllerPower
 		HALUtil.checkStatus(status.asIntBuffer());
 		return retVal;
 	}
-	
+
+	/**
+	* Get the input current to the robot controller
+	* @return The controller input current value
+	*/
 	public static double getInputCurrent()
 	{
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -34,6 +42,10 @@ public class ControllerPower
 		return retVal;
 	}
 	
+	/**
+	* Get the voltage of the 3.3V rail
+	* @return The controller 3.3V rail voltage value
+	*/
 	public static double getVoltage3V3()
 	{
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -43,6 +55,10 @@ public class ControllerPower
 		return retVal;
 	}
 	
+	/**
+	* Get the current output of the 3.3V rail
+	* @return The controller 3.3V rail output current value
+	*/
 	public static double getCurrent3V3()
 	{
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -52,6 +68,11 @@ public class ControllerPower
 		return retVal;
 	}
 	
+	/**
+	* Get the enabled state of the 3.3V rail. The rail may be disabled due to a controller
+	* brownout, a short circuit on the rail, or controller over-voltage
+	* @return The controller 3.3V rail enabled value
+	*/
 	public static boolean getEnabled3V3()
 	{
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -61,6 +82,10 @@ public class ControllerPower
 		return retVal;
 	}
 	
+	/**
+	* Get the count of the total current faults on the 3.3V rail since the controller has booted
+	* @return The number of faults
+	*/
 	public static int getFaultCount3V3()
 	{
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -70,6 +95,10 @@ public class ControllerPower
 		return retVal;
 	}
 	
+	/**
+	* Get the voltage of the 5V rail
+	* @return The controller 5V rail voltage value
+	*/
 	public static double getVoltage5V()
 	{
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -79,6 +108,10 @@ public class ControllerPower
 		return retVal;
 	}
 	
+	/**
+	* Get the current output of the 5V rail
+	* @return The controller 5V rail output current value
+	*/
 	public static double getCurrent5V()
 	{
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -88,6 +121,11 @@ public class ControllerPower
 		return retVal;
 	}
 	
+	/**
+	* Get the enabled state of the 5V rail. The rail may be disabled due to a controller
+	* brownout, a short circuit on the rail, or controller over-voltage
+	* @return The controller 5V rail enabled value
+	*/
 	public static boolean getEnabled5V()
 	{
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -97,6 +135,10 @@ public class ControllerPower
 		return retVal;
 	}	
 	
+	/**
+	* Get the count of the total current faults on the 5V rail since the controller has booted
+	* @return The number of faults
+	*/
 	public static int getFaultCount5V()
 	{
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -106,6 +148,10 @@ public class ControllerPower
 		return retVal;
 	}
 	
+	/**
+	* Get the voltage of the 6V rail
+	* @return The controller 6V rail voltage value
+	*/
 	public static double getVoltage6V()
 	{
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -115,6 +161,10 @@ public class ControllerPower
 		return retVal;
 	}
 	
+	/**
+	* Get the current output of the 6V rail
+	* @return The controller 6V rail output current value
+	*/
 	public static double getCurrent6V()
 	{
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -124,6 +174,11 @@ public class ControllerPower
 		return retVal;
 	}
 	
+	/**
+	* Get the enabled state of the 6V rail. The rail may be disabled due to a controller
+	* brownout, a short circuit on the rail, or controller over-voltage
+	* @return The controller 6V rail enabled value
+	*/	
 	public static boolean getEnabled6V()
 	{
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -132,7 +187,11 @@ public class ControllerPower
 		HALUtil.checkStatus(status.asIntBuffer());
 		return retVal;
 	}
-	
+
+	/**
+	* Get the count of the total current faults on the 6V rail since the controller has booted
+	* @return The number of faults
+	*/
 	public static int getFaultCount6V()
 	{
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
