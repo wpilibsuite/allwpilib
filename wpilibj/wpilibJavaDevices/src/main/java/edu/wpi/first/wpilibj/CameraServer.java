@@ -66,7 +66,7 @@ public class CameraServer {
 	 * 640x480 video, this method could take between 40 and 50 milliseconds to
 	 * complete.
 	 *
-	 * This shouldn't be called if {@link #StartAutomaticCapture} is called.
+	 * This shouldn't be called if {@link #startAutomaticCapture} is called.
 	 *
 	 * @param image
 	 *            The IMAQ image to show on the dashboard
@@ -108,7 +108,7 @@ public class CameraServer {
 	 * Start automatically capturing images to send to the dashboard.
 	 *
 	 * You should call this method to just see a camera feed on the dashboard
-	 * without doing any vision processing on the roboRIO. {@link #SetImage}
+	 * without doing any vision processing on the roboRIO. {@link #setImage}
 	 * shouldn't be called after this is called.
 	 *
 	 * @param cameraName
@@ -191,8 +191,8 @@ public class CameraServer {
 	 * This function listens for a connection from the dashboard in a background
 	 * thread, then sends back the M-JPEG stream.
 	 * 
-	 * @throws IOException
-	 * @throws InterruptedException
+	 * @throws IOException if the Socket connection fails
+	 * @throws InterruptedException if the sleep is interrupted
 	 */
 	protected void serve() throws IOException, InterruptedException {
 
