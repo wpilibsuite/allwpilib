@@ -47,6 +47,8 @@
 #define ANALOG_TRIGGER_PULSE_OUTPUT_ERROR_MESSAGE "HAL: Attempted to read AnalogTrigger pulse output."
 #define PARAMETER_OUT_OF_RANGE -1028
 #define PARAMETER_OUT_OF_RANGE_MESSAGE "HAL: A parameter is out of range."
+#define RESOURCE_IS_ALLOCATED -1029
+#define RESOURCE_IS_ALLOCATED_MESSAGE "HAL: Resource already allocated"
 
 #define VI_ERROR_SYSTEM_ERROR_MESSAGE "HAL - VISA: System Error";
 #define VI_ERROR_INV_OBJECT_MESSAGE "HAL - VISA: Invalid Object"

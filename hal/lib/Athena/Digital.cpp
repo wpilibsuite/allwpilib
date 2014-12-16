@@ -384,7 +384,11 @@ bool allocateDIO(void* digital_port_pointer, bool input, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   char buf[64];
   snprintf(buf, 64, "DIO %d", port->port.pin);
-  if (DIOChannels->Allocate(port->port.pin, buf) == ~0ul) return false;
+  if (DIOChannels->Allocate(port->port.pin, buf) == ~0ul) {
+    *status = RESOURCE_IS_ALLOCATED;
+    return false;
+  }
+
   {
     Synchronized sync(digitalDIOSemaphore);
 
@@ -420,7 +424,11 @@ bool allocatePWMChannel(void* digital_port_pointer, int32_t *status) {
 		DigitalPort* port = (DigitalPort*) digital_port_pointer;
 		char buf[64];
 		snprintf(buf, 64, "PWM %d", port->port.pin);
-		if (PWMChannels->Allocate(port->port.pin, buf) == ~0ul) return false;
+		if (PWMChannels->Allocate(port->port.pin, buf) == ~0ul) {
+      *status = RESOURCE_IS_ALLOCATED;
+      return false;
+    }
+
 		if (port->port.pin > tPWM::kNumHdrRegisters-1) {
 			snprintf(buf, 64, "PWM %d and DIO %d", port->port.pin, remapMXPPWMChannel(port->port.pin) + 10);
 			if (DIOChannels->Allocate(remapMXPPWMChannel(port->port.pin) + 10, buf) == ~0ul) return false;
