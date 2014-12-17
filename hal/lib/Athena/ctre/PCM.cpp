@@ -17,7 +17,9 @@ static const INT32 kCANPeriod = 20;
 #define GET_PCM_SOL_FAULTS()		CtreCanNode::recMsg<PcmStatusFault_t> 	rx = GetRx<PcmStatusFault_t>	(STATUS_SOL_FAULTS,EXPECTED_RESPONSE_TIMEOUT_MS)
 #define GET_PCM_DEBUG()				CtreCanNode::recMsg<PcmDebug_t> 		rx = GetRx<PcmDebug_t>			(STATUS_DEBUG,EXPECTED_RESPONSE_TIMEOUT_MS)
 
-#define CONTROL_1 			0x09041C00
+#define CONTROL_1 			0x09041C00	/* PCM_Control */
+#define CONTROL_2 			0x09041C40	/* PCM_SupplemControl */
+#define CONTROL_3 			0x09041C80	/* PcmControlSetOneShotDur_t */
 
 /* encoder/decoders */
 typedef struct _PcmStatus_t{
@@ -27,8 +29,8 @@ typedef struct _PcmStatus_t{
 	unsigned compressorOn:1;
 	unsigned stickyFaultFuseTripped:1;
 	unsigned stickyFaultCompCurrentTooHigh:1;
-	unsigned faultCompCurrentTooHigh:1;
 	unsigned faultFuseTripped:1;
+	unsigned faultCompCurrentTooHigh:1;
 	unsigned faultHardwareFailure:1;
 	unsigned isCloseloopEnabled:1;
 	unsigned pressureSwitchEn:1;
@@ -40,7 +42,8 @@ typedef struct _PcmStatus_t{
 	unsigned compressorCurrentTop6:6;
 	unsigned solenoidVoltageBtm2:2;
 	/* Byte 5 */
-	unsigned reserved:2;
+	unsigned StickyFault_dItooHigh :1;
+	unsigned Fault_dItooHigh :1;
 	unsigned moduleEnabled:1;
 	unsigned closedLoopOutput:1;
 	unsigned compressorCurrentBtm4:4;
@@ -63,19 +66,28 @@ typedef struct _PcmControl_t{
 	unsigned compressorOn:1;
 	unsigned closedLoopEnable:1;
 	unsigned clearStickyFaults:1;
+	/* Byte 4 */
+	unsigned OneShotField_h8:8;
+	/* Byte 5 */
+	unsigned OneShotField_l8:8;
 }PcmControl_t;
+
+typedef struct _PcmControlSetOneShotDur_t{
+	uint8_t sol10MsPerUnit[8];
+}PcmControlSetOneShotDur_t;
 
 typedef struct _PcmStatusFault_t{
 	/* Byte 0 */
 	unsigned SolenoidBlacklist:8;
 	/* Byte 1 */
-	unsigned reserved1:8;
-	unsigned reserved2:8;
-	unsigned reserved3:8;
-	unsigned reserved4:8;
-	unsigned reserved5:8;
-	unsigned reserved6:8;
-	unsigned reserved7:8;
+	unsigned reserved_bit0 :1;
+	unsigned reserved_bit1 :1;
+	unsigned reserved_bit2 :1;
+	unsigned reserved_bit3 :1;
+	unsigned StickyFault_CompNoCurrent :1;
+	unsigned Fault_CompNoCurrent :1;
+	unsigned StickyFault_SolenoidJumper :1;
+	unsigned Fault_SolenoidJumper :1;
 }PcmStatusFault_t;
 
 typedef struct _PcmDebug_t{
@@ -135,12 +147,13 @@ CTR_Code PCM::SetSolenoid(unsigned char idx, bool en)
  *
  * @Param 	-	clr		- 	Clear / do not clear faults
  */
-CTR_Code PCM::ClearStickyFaults(bool clr)
+CTR_Code PCM::ClearStickyFaults()
 {
-	CtreCanNode::txTask<PcmControl_t> toFill = GetTx<PcmControl_t>(CONTROL_1 | GetDeviceNumber());
-	if(toFill.IsEmpty())return CTR_UnexpectedArbId;
-	toFill->clearStickyFaults = clr;
-	FlushTx(toFill);
+	int32_t status = 0;
+	uint8_t pcmSupplemControl[] = { 0, 0, 0, 0x80 }; /* only bit set is ClearStickyFaults */
+	FRC_NetworkCommunication_CANSessionMux_sendMessage(CONTROL_2  | GetDeviceNumber(), pcmSupplemControl, sizeof(pcmSupplemControl), 0, &status);
+	if(status)
+		return CTR_TxFailed;
 	return CTR_OKAY;
 }
 
@@ -155,6 +168,59 @@ CTR_Code PCM::SetClosedLoopControl(bool en)
 	CtreCanNode::txTask<PcmControl_t> toFill = GetTx<PcmControl_t>(CONTROL_1 | GetDeviceNumber());
 	if(toFill.IsEmpty())return CTR_UnexpectedArbId;
 	toFill->closedLoopEnable = en;
+	FlushTx(toFill);
+	return CTR_OKAY;
+}
+/* Get solenoid Blacklist status
+ * @Return	-	CTR_Code	-	Error code (if any)
+ * @Param	-	idx			-	ID of solenoid [0,7] to fire one shot pulse.
+ */
+CTR_Code PCM::FireOneShotSolenoid(UINT8 idx)
+{
+	CtreCanNode::txTask<PcmControl_t> toFill = GetTx<PcmControl_t>(CONTROL_1 | GetDeviceNumber());
+	if(toFill.IsEmpty())return CTR_UnexpectedArbId;
+	/* grab field as it is now */
+	uint16_t oneShotField;
+	oneShotField = toFill->OneShotField_h8;
+	oneShotField <<= 8;
+	oneShotField |= toFill->OneShotField_l8;
+	/* get the caller's channel */
+	uint16_t shift = 2*idx;
+	uint16_t mask = 3; /* two bits wide */
+	uint8_t chBits = (oneShotField >> shift) & mask;
+	/* flip it */
+	chBits = (chBits)%3 + 1;
+	/* clear out 2bits for this channel*/
+	oneShotField &= ~(mask << shift);
+	/* put new field in */
+	oneShotField |= chBits << shift;
+	/* apply field as it is now */
+	toFill->OneShotField_h8 = oneShotField >> 8;
+	toFill->OneShotField_l8 = oneShotField;
+	FlushTx(toFill);
+	return CTR_OKAY;
+}
+/* Configure the pulse width of a solenoid channel for one-shot pulse.
+ * Preprogrammed pulsewidth is 10ms resolute and can be between 20ms and 5.1s.
+ * @Return	-	CTR_Code	-	Error code (if any)
+ * @Param	-	idx			-	ID of solenoid [0,7] to configure.
+ * @Param	-	durMs		-	pulse width in ms.
+ */
+CTR_Code PCM::SetOneShotDurationMs(UINT8 idx,uint32_t durMs)
+{
+	/* sanity check caller's param */
+	if(idx > 8)
+		return CTR_InvalidParamValue;
+	/* get latest tx frame */
+	CtreCanNode::txTask<PcmControlSetOneShotDur_t> toFill = GetTx<PcmControlSetOneShotDur_t>(CONTROL_3 | GetDeviceNumber());
+	if(toFill.IsEmpty()){
+		/* only send this out if caller wants to do one-shots */
+		RegisterTx(CONTROL_3 | _deviceNumber, kCANPeriod);
+		/* grab it */
+		toFill = GetTx<PcmControlSetOneShotDur_t>(CONTROL_3 | GetDeviceNumber());
+	}
+	toFill->sol10MsPerUnit[idx] = std::min(durMs/10,(uint32_t)0xFF);
+	/* apply the new data bytes */
 	FlushTx(toFill);
 	return CTR_OKAY;
 }
@@ -248,10 +314,34 @@ CTR_Code PCM::GetHardwareFault(bool &status)
  *
  * @Return	-	True/False	-	True if shorted compressor detected, false if otherwise
  */
-CTR_Code PCM::GetCompressorFault(bool &status)
+CTR_Code PCM::GetCompressorCurrentTooHighFault(bool &status)
 {
 	GET_PCM_STATUS();
 	status = rx->faultCompCurrentTooHigh;
+	return rx.err;
+}
+CTR_Code PCM::GetCompressorShortedStickyFault(bool &status)
+{
+	GET_PCM_STATUS();
+	status = rx->StickyFault_dItooHigh;
+	return rx.err;
+}
+CTR_Code PCM::GetCompressorShortedFault(bool &status)
+{
+	GET_PCM_STATUS();
+	status = rx->Fault_dItooHigh;
+	return rx.err;
+}
+CTR_Code PCM::GetCompressorNotConnectedStickyFault(bool &status)
+{
+	GET_PCM_SOL_FAULTS();
+	status = rx->StickyFault_CompNoCurrent;
+	return rx.err;
+}
+CTR_Code PCM::GetCompressorNotConnectedFault(bool &status)
+{
+	GET_PCM_SOL_FAULTS();
+	status = rx->Fault_CompNoCurrent;
 	return rx.err;
 }
 
@@ -271,7 +361,7 @@ CTR_Code PCM::GetSolenoidFault(bool &status)
  * @Return	-	True/False	-	True if solenoid had previously been shorted
  * 								(and sticky fault was not cleared), false if otherwise
  */
-CTR_Code PCM::GetCompressorStickyFault(bool &status)
+CTR_Code PCM::GetCompressorCurrentTooHighStickyFault(bool &status)
 {
 	GET_PCM_STATUS();
 	status = rx->stickyFaultCompCurrentTooHigh;
@@ -369,7 +459,7 @@ extern "C" {
 		return ((PCM*) handle)->SetClosedLoopControl(param);
 	}
 	CTR_Code c_ClearStickyFaults(void * handle, INT8 param) {
-		return ((PCM*) handle)->ClearStickyFaults(param);
+		return ((PCM*) handle)->ClearStickyFaults();
 	}
 	CTR_Code c_GetSolenoid(void * handle, UINT8 idx, INT8 * status) {
 		bool bstatus;
@@ -410,7 +500,7 @@ extern "C" {
 	}
 	CTR_Code c_GetCompressorFault(void * handle, INT8*status) {
 		bool bstatus;
-		CTR_Code retval = ((PCM*) handle)->GetCompressorFault(bstatus);
+		CTR_Code retval = ((PCM*) handle)->GetCompressorCurrentTooHighFault(bstatus);
 		*status = bstatus;
 		return retval;
 	}
@@ -422,7 +512,7 @@ extern "C" {
 	}
 	CTR_Code c_GetCompressorStickyFault(void * handle, INT8*status) {
 		bool bstatus;
-		CTR_Code retval = ((PCM*) handle)->GetCompressorStickyFault(bstatus);
+		CTR_Code retval = ((PCM*) handle)->GetCompressorCurrentTooHighStickyFault(bstatus);
 		*status = bstatus;
 		return retval;
 	}
