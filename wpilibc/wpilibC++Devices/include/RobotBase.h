@@ -16,8 +16,7 @@ class DriverStation;
 		if (!HALInitialize()){std::cerr<<"FATAL ERROR: HAL could not be initialized"<<std::endl;return -1;}	\
 		HALReport(HALUsageReporting::kResourceType_Language, HALUsageReporting::kLanguage_CPlusPlus); \
 		_ClassName_ *robot = new _ClassName_(); \
-		robot->Prestart();\
-		robot->StartCompetition(); \
+		RobotBase::robotSetup(robot); \
 		return 0; \
 	}
 
@@ -45,6 +44,8 @@ public:
 	static void startRobotTask(FUNCPTR factory);
 	static void robotTask(FUNCPTR factory, Task *task);
 	virtual void StartCompetition() = 0;
+	
+	static void robotSetup(RobotBase *robot);
 
 protected:
 	virtual ~RobotBase();
