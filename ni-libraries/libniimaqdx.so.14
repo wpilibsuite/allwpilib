@@ -1,0 +1,2 @@
+OUTPUT_FORMAT(elf32-littlearm)
+GROUP ( libniimaqdx.so.14.0 )
