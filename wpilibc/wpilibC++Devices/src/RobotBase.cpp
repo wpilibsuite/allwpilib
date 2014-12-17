@@ -37,6 +37,12 @@ RobotBase &RobotBase::getInstance()
 	return *m_instance;
 }
 
+void RobotBase::robotSetup(RobotBase *robot)
+{
+	robot->Prestart();
+	robot->StartCompetition();
+}
+
 /**
  * Constructor for a generic robot program.
  * User code should be placed in the constructor that runs before the Autonomous or Operator
