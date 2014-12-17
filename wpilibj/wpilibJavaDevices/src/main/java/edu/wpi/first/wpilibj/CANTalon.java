@@ -457,7 +457,15 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     m_impl.GetIzone(m_profile, new SWIGTYPE_p_int(fp, true));
     return CanTalonJNI.intp_value(fp);
   }
-
+  /**
+   * Get the closed loop ramp rate for the current profile.
+   *
+   * Limits the rate at which the throttle will change.
+   * Only affects position and speed closed loop modes.
+   *
+   * @return rampRate Maximum change in voltage, in volts / sec.
+   * @see #setProfile For selecting a certain profile.
+   */
   public double getCloseLoopRampRate() {
 	//	if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
 	//		throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
@@ -474,7 +482,8 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
 
     long fp = CanTalonJNI.new_intp();
     m_impl.GetCloseLoopRampRate(m_profile, new SWIGTYPE_p_int(fp, true));
-    return CanTalonJNI.intp_value(fp);
+    double throttlePerMs = CanTalonJNI.intp_value(fp);
+	return throttlePerMs / 1023.0 * 12.0 * 1000.0;
   }
   /**
   * @return The version of the firmware running on the Talon
@@ -576,8 +585,8 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
    * @see #setProfile For selecting a certain profile.
    */
   public void setCloseLoopRampRate(double rampRate) {
-    // CanTalonSRX takes units of Throttle (0 - 1023) / 10ms.
-    int rate = (int) (rampRate * 1023.0 / 12.0 * 100.0);
+    // CanTalonSRX takes units of Throttle (0 - 1023) / 1ms.
+    int rate = (int) (rampRate * 1023.0 / 12.0 / 1000.0);
     m_impl.SetCloseLoopRampRate(m_profile, rate);
   }
 
@@ -591,7 +600,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
    */
   public void setVoltageRampRate(double rampRate) {
     // CanTalonSRX takes units of Throttle (0 - 1023) / 10ms.
-    int rate = (int) (rampRate * 1023.0 / 12.0 * 100.0);
+    int rate = (int) (rampRate * 1023.0 / 12.0 /100.0);
     m_impl.SetRampThrottle(rate);
   }
 
@@ -604,14 +613,13 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
    * @param f Feedforward constant.
    * @param izone Integration zone -- prevents accumulation of integration error
    *   with large errors. Setting this to zero will ignore any izone stuff.
-   * @param ramprate Closed loop ramp rate. Represents maximum change in
-   *   throttle every 10ms.
+   * @param closeLoopRampRate Closed loop ramp rate. Maximum change in voltage, in volts / sec.
    * @param profile which profile to set the pid constants for. You can have two
    *   profiles, with values of 0 or 1, allowing you to keep a second set of values
    *   on hand in the talon. In order to switch profiles without recalling setPID,
    *   you must call setProfile().
    */
-  public void setPID(double p, double i, double d, double f, int izone, int ramprate, int profile)
+  public void setPID(double p, double i, double d, double f, int izone, double closeLoopRampRate, int profile)
     {
     if (profile != 0 && profile != 1)
       throw new IllegalArgumentException("Talon PID profile must be 0 or 1.");
@@ -622,7 +630,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     setD(d);
     setF(f);
     setIZone(izone);
-    setCloseLoopRampRate(ramprate);
+    setCloseLoopRampRate(closeLoopRampRate);
   }
 
   public void setPID(double p, double i, double d) {
