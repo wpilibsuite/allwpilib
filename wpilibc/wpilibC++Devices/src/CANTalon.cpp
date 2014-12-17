@@ -21,7 +21,7 @@ CANTalon::CANTalon(int deviceNumber)
   , m_controlMode(kPercentVbus)
   , m_setPoint(0)
 {
-  SetControlMode(m_controlMode);
+  ApplyControlMode(m_controlMode);
   m_impl->SetProfileSlotSelect(m_profile);
 }
 /**
@@ -39,7 +39,7 @@ CANTalon::CANTalon(int deviceNumber,int controlPeriodMs)
   , m_controlMode(kPercentVbus)
   , m_setPoint(0)
 {
-  SetControlMode(m_controlMode);
+  ApplyControlMode(m_controlMode);
   m_impl->SetProfileSlotSelect(m_profile);
 }
 CANTalon::~CANTalon() {
@@ -1100,9 +1100,12 @@ void CANTalon::ConfigFaultTime(float faultTime)
 }
 
 /**
- * TODO documentation (see CANJaguar.cpp)
+ * Fixup the sendMode so Set() serializes the correct demand value.
+ * Also fills the modeSelecet in the control frame to disabled.
+ * @param mode Control mode to ultimately enter once user calls Set().
+ * @see Set()
  */
-void CANTalon::SetControlMode(CANSpeedController::ControlMode mode)
+void CANTalon::ApplyControlMode(CANSpeedController::ControlMode mode)
 {
   m_controlMode = mode;
   switch (mode) {
@@ -1130,6 +1133,17 @@ void CANTalon::SetControlMode(CANSpeedController::ControlMode mode)
 	if(status != CTR_OKAY) {
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
+}
+/**
+ * TODO documentation (see CANJaguar.cpp)
+ */
+void CANTalon::SetControlMode(CANSpeedController::ControlMode mode)
+{
+  if(m_controlMode == mode){
+    /* we already are in this mode, don't perform disable workaround */
+  }else{
+    ApplyControlMode(mode);
+  }
 }
 
 /**

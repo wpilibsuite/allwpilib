@@ -139,4 +139,11 @@ private:
 
   double m_setPoint;
   static const unsigned int kDelayForSolicitedSignalsUs = 4000;
+  /**
+   * Fixup the sendMode so Set() serializes the correct demand value.
+   * Also fills the modeSelecet in the control frame to disabled.
+   * @param mode Control mode to ultimately enter once user calls Set().
+   * @see Set()
+   */
+  void ApplyControlMode(CANSpeedController::ControlMode mode);
 };

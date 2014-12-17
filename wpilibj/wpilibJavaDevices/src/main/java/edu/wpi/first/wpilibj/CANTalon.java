@@ -91,7 +91,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     m_profile = 0;
     m_setPoint = 0;
     setProfile(m_profile);
-    changeControlMode(ControlMode.PercentVbus);
+    applyControlMode(ControlMode.PercentVbus);
   }
   public CANTalon(int deviceNumber,int controlPeriodMs) {
     m_deviceNumber = deviceNumber;
@@ -101,7 +101,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     m_profile = 0;
     m_setPoint = 0;
     setProfile(m_profile);
-    changeControlMode(ControlMode.PercentVbus);
+    applyControlMode(ControlMode.PercentVbus);
   }
   public CANTalon(int deviceNumber,int controlPeriodMs) {
     m_deviceNumber = deviceNumber;
@@ -425,13 +425,25 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
   public ControlMode getControlMode() {
     return m_controlMode;
   }
-
-  public void changeControlMode(ControlMode controlMode) {
+  /**
+   * Fixup the m_controlMode so set() serializes the correct demand value.
+   * Also fills the modeSelecet in the control frame to disabled.
+   * @param controlMode Control mode to ultimately enter once user calls set().
+   * @see #set
+   */  
+  public void applyControlMode(ControlMode controlMode) {
     m_controlMode = controlMode;
     if (controlMode == ControlMode.Disabled)
       m_controlEnabled = false;
     // Disable until set() is called.
     m_impl.SetModeSelect(ControlMode.Disabled.value);
+  }
+  public void changeControlMode(ControlMode controlMode) {
+    if(m_controlMode == controlMode){
+      /* we already are in this mode, don't perform disable workaround */
+    }else{
+      applyControlMode(controlMode);
+    }
   }
 
   public void setFeedbackDevice(FeedbackDevice device) {
