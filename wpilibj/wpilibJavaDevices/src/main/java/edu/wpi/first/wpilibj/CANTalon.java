@@ -677,8 +677,8 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     m_impl.SetForwardSoftEnable(enable ? 1 : 0);
   }
 
-  public void setReverseSoftLimit(int forwardLimit) {
-    m_impl.SetReverseSoftLimit(forwardLimit);
+  public void setReverseSoftLimit(int reverseLimit) {
+    m_impl.SetReverseSoftLimit(reverseLimit);
   }
   
   public void enableReverseSoftLimit(boolean enable) {
