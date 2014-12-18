@@ -52,6 +52,7 @@ public:
 	virtual void SetI(double i) override;
 	virtual void SetD(double d) override;
 	void SetF(double f);
+	void SetIzone(unsigned iz);
 	virtual void SetPID(double p, double i, double d) override;
 	void SetPID(double p, double i, double d, double f);
 	virtual double GetP() override;
@@ -100,7 +101,7 @@ public:
 	void SetSensorDirection(bool reverseSensor);
 	void SetCloseLoopRampRate(double rampRate);
 	void SelectProfileSlot(int slotIdx);
-	double GetIzone();
+	int GetIzone();
 	int GetIaccum();
 	void ClearIaccum();
 

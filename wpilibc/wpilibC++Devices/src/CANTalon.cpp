@@ -221,6 +221,19 @@ void CANTalon::SetF(double f)
 	}
 }
 /**
+ * Set the Izone to a nonzero value to auto clear the integral accumulator
+ *		when the absolute value of CloseLoopError exceeds Izone.
+ *
+ * @see SelectProfileSlot to choose between the two sets of gains.
+ */
+void CANTalon::SetIzone(unsigned iz)
+{
+  CTR_Code status = m_impl->SetIzone(m_profile, iz);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
+}
+/**
  * SRX has two available slots for PID.
  * @param slotIdx one or zero depending on which slot caller wants.
  */
@@ -349,7 +362,7 @@ double CANTalon::GetF()
 /**
  * @see SelectProfileSlot to choose between the two sets of gains.
  */
-double CANTalon::GetIzone()
+int CANTalon::GetIzone()
 {
   CanTalonSRX::param_t param = m_profile ? CanTalonSRX::eProfileParamSlot1_IZone: CanTalonSRX::eProfileParamSlot0_IZone;
  // Update the info in m_impl.
@@ -364,7 +377,7 @@ double CANTalon::GetIzone()
 	if(status != CTR_OKAY) {
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
-	return (double)iz;
+	return iz;
 }
 
 /**
