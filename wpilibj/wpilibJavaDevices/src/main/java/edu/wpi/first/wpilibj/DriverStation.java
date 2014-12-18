@@ -289,6 +289,21 @@ public class DriverStation implements RobotState.Interface {
      * @param stick The joystick to read.
      * @return The state of the buttons on the joystick.
      */
+    public synchronized int getStickButtons(final int stick) {
+        if(stick < 0 || stick >= kJoystickPorts) {
+            throw new RuntimeException("Joystick index is out of range, should be 0-3");
+        }
+
+        return m_joystickButtons[stick].buttons;
+    }
+
+    /**
+     * The state of one joystick button. Button indexes begin at 1.
+     *
+     * @param stick The joystick to read.
+     * @param button The button index, beginning at 1.
+     * @return The state of the joystick button.
+     */
     public synchronized boolean getStickButton(final int stick, byte button) {
         if(stick < 0 || stick >= kJoystickPorts) {
             throw new RuntimeException("Joystick index is out of range, should be 0-3");
