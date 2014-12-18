@@ -86,6 +86,14 @@
 				  <destFileName>SmartDashboard.jar</destFileName>
 	            </artifactItem>
 	            <artifactItem>
+	              <groupId>edu.wpi.first.wpilib</groupId>
+	              <artifactId>sfx</artifactId>
+	              <type>zip</type>
+	              <classifier>zip</classifier>
+				  <outputDirectory>${tools-zip}/../</outputDirectory>
+				  <destFileName>sfx.zip</destFileName>
+	            </artifactItem>
+	            <artifactItem>
 	              <groupId>edu.wpi.first.wpilib.networktables</groupId>
 	              <artifactId>OutlineViewer</artifactId>
 	              <version>1.0.0-SNAPSHOT</version>
@@ -143,6 +151,7 @@
             </goals>
 		    <configuration>
 			  <target>
+				<unzip src="${tools-zip}/../sfx.zip" dest="${tools-zip}"/>
 			    <zip destfile="${project.build.directory}/classes/resources/tools.zip"
 				     basedir="${tools-zip}"
 				     update="true" />
@@ -207,6 +216,12 @@
 	  <groupId>edu.wpi.first.wpilib</groupId>
 	  <artifactId>SmartDashboard</artifactId>
 	  <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+	  <groupId>edu.wpi.first.wpilib</groupId>
+	  <artifactId>sfx</artifactId>
+	              <type>zip</type>
+	  <version>LATEST</version>
     </dependency>
     <dependency>
 	  <groupId>edu.wpi.first.wpilib.networktables</groupId>
