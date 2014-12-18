@@ -431,7 +431,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
    * @param controlMode Control mode to ultimately enter once user calls set().
    * @see #set
    */  
-  public void applyControlMode(ControlMode controlMode) {
+  private void applyControlMode(ControlMode controlMode) {
     m_controlMode = controlMode;
     if (controlMode == ControlMode.Disabled)
       m_controlEnabled = false;
