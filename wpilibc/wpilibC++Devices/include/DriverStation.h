@@ -34,6 +34,7 @@ public:
 
 	float GetStickAxis(uint32_t stick, uint32_t axis);
 	int GetStickPOV(uint32_t stick, uint32_t pov);
+	uint32_t GetStickButtons(uint32_t stick);
 	bool GetStickButton(uint32_t stick, uint8_t button);
 
 	int GetStickAxisCount(uint32_t stick);

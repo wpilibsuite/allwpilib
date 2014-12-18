@@ -283,6 +283,24 @@ int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
  * @param stick The joystick to read.
  * @return The state of the buttons on the joystick.
  */
+uint32_t DriverStation::GetStickButtons(uint32_t stick)
+{
+	if (stick >= kJoystickPorts)
+	{
+		wpi_setWPIError(BadJoystickIndex);
+		return 0;
+	}
+
+	return m_joystickButtons[stick].buttons;
+}
+
+/**
+ * The state of one joystick button. Button indexes begin at 1.
+ *
+ * @param stick The joystick to read.
+ * @param button The button index, beginning at 1.
+ * @return The state of the joystick button.
+ */
 bool DriverStation::GetStickButton(uint32_t stick, uint8_t button)
 {
 	if (stick >= kJoystickPorts)
