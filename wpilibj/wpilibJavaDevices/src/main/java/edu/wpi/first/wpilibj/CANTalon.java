@@ -810,6 +810,34 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     int mask = 4 + (forward ? 1 : 0) * 2 + (reverse ? 1 : 0);
     m_impl.SetOverrideLimitSwitchEn(mask);
   }
+  /**
+   * Configure the fwd limit switch to be normally open or normally closed.
+   * Talon will disable momentarilly if the Talon's current setting
+   * is dissimilar to the caller's requested setting.
+   *
+   * Since Talon saves setting to flash this should only affect
+   * a given Talon initially during robot install.
+   *
+   * @param normallyOpen true for normally open.  false for normally closed.
+   */
+  public void ConfigFwdLimitSwitchNormallyOpen(boolean normallyOpen)
+  {
+	SWIGTYPE_p_CTR_Code status = m_impl.SetParam(CanTalonSRX.param_t.eOnBoot_LimitSwitch_Forward_NormallyClosed,normallyOpen ? 0 : 1);
+  }
+  /**
+   * Configure the rev limit switch to be normally open or normally closed.
+   * Talon will disable momentarilly if the Talon's current setting
+   * is dissimilar to the caller's requested setting.
+   *
+   * Since Talon saves setting to flash this should only affect
+   * a given Talon initially during robot install.
+   *
+   * @param normallyOpen true for normally open.  false for normally closed.
+   */
+  public void ConfigRevLimitSwitchNormallyOpen(boolean normallyOpen)
+  {
+	SWIGTYPE_p_CTR_Code status = m_impl.SetParam(CanTalonSRX.param_t.eOnBoot_LimitSwitch_Reverse_NormallyClosed,normallyOpen ? 0 : 1);
+  }
 
   public void enableBrakeMode(boolean brake) {
     m_impl.SetOverrideBrakeType(brake ? 2 : 1);

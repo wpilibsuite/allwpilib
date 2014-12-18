@@ -1068,7 +1068,40 @@ void CANTalon::ConfigForwardLimit(double forwardLimitPosition)
 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
 }
-
+/**
+ * Change the fwd limit switch setting to normally open or closed.
+ * Talon will disable momentarilly if the Talon's current setting
+ * is dissimilar to the caller's requested setting.
+ *
+ * Since Talon saves setting to flash this should only affect
+ * a given Talon initially during robot install.
+ *
+ * @param normallyOpen true for normally open.  false for normally closed.
+ */
+void CANTalon::ConfigFwdLimitSwitchNormallyOpen(bool normallyOpen)
+{
+	CTR_Code status = m_impl->SetParam(CanTalonSRX::eOnBoot_LimitSwitch_Forward_NormallyClosed, normallyOpen ? 0 : 1);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
+}
+/**
+ * Change the rev limit switch setting to normally open or closed.
+ * Talon will disable momentarilly if the Talon's current setting
+ * is dissimilar to the caller's requested setting.
+ *
+ * Since Talon saves setting to flash this should only affect
+ * a given Talon initially during robot install.
+ *
+ * @param normallyOpen true for normally open.  false for normally closed.
+ */
+void CANTalon::ConfigRevLimitSwitchNormallyOpen(bool normallyOpen)
+{
+	CTR_Code status = m_impl->SetParam(CanTalonSRX::eOnBoot_LimitSwitch_Reverse_NormallyClosed, normallyOpen ? 0 : 1);
+	if(status != CTR_OKAY) {
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+	}
+}
 /**
  * TODO documentation (see CANJaguar.cpp)
  */

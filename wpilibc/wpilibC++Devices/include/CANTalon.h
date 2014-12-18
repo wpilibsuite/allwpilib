@@ -100,6 +100,28 @@ public:
 	virtual void ConfigLimitMode(LimitMode mode) override;
 	virtual void ConfigForwardLimit(double forwardLimitPosition) override;
 	virtual void ConfigReverseLimit(double reverseLimitPosition) override;
+	/**
+	 * Change the fwd limit switch setting to normally open or closed.
+	 * Talon will disable momentarilly if the Talon's current setting
+	 * is dissimilar to the caller's requested setting.
+	 *
+	 * Since Talon saves setting to flash this should only affect
+	 * a given Talon initially during robot install.
+	 *
+	 * @param normallyOpen true for normally open.  false for normally closed.
+	 */
+	void ConfigFwdLimitSwitchNormallyOpen(bool normallyOpen);
+	/**
+	 * Change the rev limit switch setting to normally open or closed.
+	 * Talon will disable momentarilly if the Talon's current setting
+	 * is dissimilar to the caller's requested setting.
+	 *
+	 * Since Talon saves setting to flash this should only affect
+	 * a given Talon initially during robot install.
+	 *
+	 * @param normallyOpen true for normally open.  false for normally closed.
+	 */
+	void ConfigRevLimitSwitchNormallyOpen(bool normallyOpen);
 	virtual void ConfigMaxOutputVoltage(double voltage) override;
 	virtual void ConfigFaultTime(float faultTime) override;
 	virtual void SetControlMode(ControlMode mode);
