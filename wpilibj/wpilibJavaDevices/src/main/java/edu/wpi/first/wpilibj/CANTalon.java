@@ -103,16 +103,6 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     setProfile(m_profile);
     applyControlMode(ControlMode.PercentVbus);
   }
-  public CANTalon(int deviceNumber,int controlPeriodMs) {
-    m_deviceNumber = deviceNumber;
-    m_impl = new CanTalonSRX(deviceNumber,controlPeriodMs); /* bound period to be within [1 ms,95 ms] */
-    m_safetyHelper = new MotorSafetyHelper(this);
-    m_controlEnabled = true;
-    m_profile = 0;
-    m_setPoint = 0;
-    setProfile(m_profile);
-    changeControlMode(ControlMode.PercentVbus);
-  }
 
   @Override
   public void pidWrite(double output)
