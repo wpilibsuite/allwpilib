@@ -876,9 +876,9 @@ CTR_Code CanTalonSRX::GetAnalogInVel(int &param)
 	raw |= rx->AnalogInVelH;
 	raw <<= 8;
 	raw |= rx->AnalogInVelL;
-	param = (int)raw;
 	raw <<= (32-16); /* sign extend */
 	raw >>= (32-16); /* sign extend */
+	param = (int)raw;
 	return rx.err;
 }
 CTR_Code CanTalonSRX::GetTemp(double &param)
