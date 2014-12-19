@@ -33,7 +33,7 @@ public class CANVoltageQuadEncoderModeTest extends AbstractCANTest {
 	/** The stopped value in volts */
 	private static final double kStoppedValue = 0;
 	/** The running value in volts */
-	private static final double kRunningValue = 14;
+	private static final double kRunningValue = 12;
 	
 	private static final double kVoltageTolerance = .25;
 	
