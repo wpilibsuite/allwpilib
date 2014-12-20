@@ -366,6 +366,7 @@ extern "C" {
 	CTR_Code c_TalonSRX_SetRevMotDuringCloseLoopEn(void *handle, int param);
 	CTR_Code c_TalonSRX_SetOverrideBrakeType(void *handle, int param);
 	CTR_Code c_TalonSRX_SetModeSelect(void *handle, int param);
+	CTR_Code c_TalonSRX_SetModeSelect2(void *handle, int modeSelect, int demand);
 	CTR_Code c_TalonSRX_SetProfileSlotSelect(void *handle, int param);
 	CTR_Code c_TalonSRX_SetRampThrottle(void *handle, int param);
 	CTR_Code c_TalonSRX_SetRevFeedbackSensor(void *handle, int param);

@@ -1222,6 +1222,10 @@ CTR_Code c_TalonSRX_SetModeSelect(void *handle, int param)
 {
 	return ((CanTalonSRX*)handle)->SetModeSelect(param);
 }
+CTR_Code c_TalonSRX_SetModeSelect2(void *handle, int modeSelect, int demand)
+{
+	return ((CanTalonSRX*)handle)->SetModeSelect(modeSelect, demand);
+}
 CTR_Code c_TalonSRX_SetProfileSlotSelect(void *handle, int param)
 {
 	return ((CanTalonSRX*)handle)->SetProfileSlotSelect(param);
