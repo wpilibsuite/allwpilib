@@ -105,6 +105,8 @@ float CANTalon::Get()
  */
 void CANTalon::Set(float value, uint8_t syncGroup)
 {
+  /* feed safety helper since caller just updated our output */
+  m_safetyHelper->Feed();
   if(m_controlEnabled) {
     m_setPoint = value;
     CTR_Code status;

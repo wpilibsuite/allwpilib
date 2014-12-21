@@ -133,6 +133,8 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
    * @param outputValue The setpoint value, as described above.
    */
   public void set(double outputValue) {
+    /* feed safety helper since caller just updated our output */
+    m_safetyHelper.feed();
     if (m_controlEnabled) {
       m_setPoint = outputValue;
       switch (m_controlMode) {
