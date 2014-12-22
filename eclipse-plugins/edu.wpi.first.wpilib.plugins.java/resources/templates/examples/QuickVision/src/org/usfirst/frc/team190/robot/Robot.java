@@ -1,13 +1,11 @@
 package $package;
 
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.SampleRobot;
-import edu.wpi.first.wpilibj.RobotDrive;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Timer;
 
 /**
  * This is a demo program showing the use of the CameraServer class.
- * With start automatic capture, there is no opertunity to process the image.
+ * With start automatic capture, there is no opportunity to process the image.
  * Look at the AdvancedVision sample for how to process the image before sending it to the FRC PC Dashboard.
  */
 public class Robot extends SampleRobot {
