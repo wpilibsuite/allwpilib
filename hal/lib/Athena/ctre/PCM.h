@@ -26,9 +26,8 @@ public:
 
     /* Clears PCM sticky faults (indicators of past faults
      * @Return	-	CTR_Code	-	Error code (if any) for setting solenoid
-     * @Param 	-	clr		- 	Clear / do not clear faults
      */
-    CTR_Code 	ClearStickyFaults(bool clr);
+    CTR_Code 	ClearStickyFaults();
     
     /* Get solenoid state
      *
@@ -76,9 +75,9 @@ public:
 
     /* Get compressor fault value
      * @Return	-	CTR_Code	-	Error code (if any)
-     * @Param	-	status		-	True if shorted compressor detected, false if otherwise
+     * @Param	-	status		-	True if abnormally high compressor current detected, false if otherwise
      */
-    CTR_Code 	GetCompressorFault(bool &status);
+    CTR_Code 	GetCompressorCurrentTooHighFault(bool &status);
 
     /* Get solenoid fault value
      * @Return	-	CTR_Code	-	Error code (if any)
@@ -91,7 +90,29 @@ public:
      * @Param	-	status		-	True if solenoid had previously been shorted
      * 								(and sticky fault was not cleared), false if otherwise
      */
-    CTR_Code 	GetCompressorStickyFault(bool &status);
+    CTR_Code 	GetCompressorCurrentTooHighStickyFault(bool &status);
+    /* Get compressor shorted sticky fault value
+     * @Return	-	CTR_Code	-	Error code (if any)
+     * @Param	-	status		-	True if compressor output is shorted, false if otherwise
+     */
+    CTR_Code 	GetCompressorShortedStickyFault(bool &status);
+    /* Get compressor shorted fault value
+     * @Return	-	CTR_Code	-	Error code (if any)
+     * @Param	-	status		-	True if compressor output is shorted, false if otherwise
+     */
+    CTR_Code 	GetCompressorShortedFault(bool &status);
+    /* Get compressor is not connected sticky fault value
+     * @Return	-	CTR_Code	-	Error code (if any)
+     * @Param	-	status		-	True if compressor current is too low, 
+     * 					indicating compressor is not connected, false if otherwise
+     */
+    CTR_Code 	GetCompressorNotConnectedStickyFault(bool &status);
+    /* Get compressor is not connected fault value
+     * @Return	-	CTR_Code	-	Error code (if any)
+     * @Param	-	status		-	True if compressor current is too low, 
+     * 					indicating compressor is not connected, false if otherwise
+     */
+    CTR_Code 	GetCompressorNotConnectedFault(bool &status);
 
     /* Get solenoid sticky fault value
      * @Return	-	CTR_Code	-	Error code (if any)
@@ -146,6 +167,21 @@ public:
      * @Param	-	status		-	Returns TRUE if PCM is enabled, FALSE if disabled
      */
     CTR_Code	isModuleEnabled(bool &status);
+
+    /* Get solenoid Blacklist status
+     * @Return	-	CTR_Code	-	Error code (if any)
+     * @Param	-	idx			-	ID of solenoid [0,7] to fire one shot pulse.
+     */
+    CTR_Code FireOneShotSolenoid(UINT8 idx);
+
+    /* Configure the pulse width of a solenoid channel for one-shot pulse.
+	 * Preprogrammed pulsewidth is 10ms resolute and can be between 20ms and 5.1s.
+     * @Return	-	CTR_Code	-	Error code (if any)
+     * @Param	-	idx			-	ID of solenoid [0,7] to configure.
+     * @Param	-	durMs		-	pulse width in ms.
+     */
+    CTR_Code SetOneShotDurationMs(UINT8 idx,uint32_t durMs);
+
 };
 //------------------ C interface --------------------------------------------//
 extern "C" {
