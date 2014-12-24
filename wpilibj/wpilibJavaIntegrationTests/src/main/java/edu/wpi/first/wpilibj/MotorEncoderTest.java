@@ -196,6 +196,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
 		assertEquals(me.getType() + " Motor value was incorrect after reset.", me.getMotor().get(), 0, 0);
 		assertEquals(me.getType() + " Counter1 value was incorrect after reset.", me.getCounters()[0].get(),  0);
 		assertEquals(me.getType() + " Counter2 value was incorrect after reset.", me.getCounters()[1].get(),  0);
+		Timer.delay(0.5);  // so this doesn't fail with the 0.5 second default timeout on the encoders
 		assertTrue(me.getType() + " Encoder.getStopped() returned false after the motor was reset.", me.getEncoder().getStopped());
 	}
 

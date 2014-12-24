@@ -31,6 +31,8 @@ void Counter::InitCounter(Mode mode)
 	m_allocatedUpSource = false;
 	m_allocatedDownSource = false;
 
+	SetMaxPeriod(.5);
+
 	HALReport(HALUsageReporting::kResourceType_Counter, index, mode);
 }
 

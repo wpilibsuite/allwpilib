@@ -52,6 +52,7 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType)
 										   reverseDirection, &index, &status);
 			  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 			m_counter = NULL;
+			SetMaxPeriod(.5);
 			break;
 		}
 		case k1X:

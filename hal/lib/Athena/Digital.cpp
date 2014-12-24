@@ -838,7 +838,7 @@ double getCounterPeriod(void* counter_pointer, int32_t *status) {
 	// output.Period is a fixed point number that counts by 2 (24 bits, 25 integer bits)
 	period = (double)(output.Period << 1) / (double)output.Count;
   }
-  return period * 1.0e-6;
+  return period * 2.5e-8;  // result * timebase (currently 40ns)
 }
 
 /**
@@ -850,7 +850,7 @@ double getCounterPeriod(void* counter_pointer, int32_t *status) {
  */
 void setCounterMaxPeriod(void* counter_pointer, double maxPeriod, int32_t *status) {
   Counter* counter = (Counter*) counter_pointer;
-  counter->counter->writeTimerConfig_StallPeriod((uint32_t)(maxPeriod * 1.0e6), status);
+  counter->counter->writeTimerConfig_StallPeriod((uint32_t)(maxPeriod * 4.0e8), status);
 }
 
 /**
@@ -1000,7 +1000,7 @@ double getEncoderPeriod(void* encoder_pointer, int32_t *status) {
 	// output.Period is a fixed point number that counts by 2 (24 bits, 25 integer bits)
 	value = (double)(output.Period << 1) / (double)output.Count;
   }
-  double measuredPeriod = value * 1.0e-6;
+  double measuredPeriod = value * 2.5e-8;
   return measuredPeriod / DECODING_SCALING_FACTOR;
 }
 
@@ -1018,7 +1018,7 @@ double getEncoderPeriod(void* encoder_pointer, int32_t *status) {
  */
 void setEncoderMaxPeriod(void* encoder_pointer, double maxPeriod, int32_t *status) {
   Encoder* encoder = (Encoder*) encoder_pointer;
-  encoder->encoder->writeTimerConfig_StallPeriod((uint32_t)(maxPeriod * 1.0e6 * DECODING_SCALING_FACTOR), status);
+  encoder->encoder->writeTimerConfig_StallPeriod((uint32_t)(maxPeriod * 4.0e8 * DECODING_SCALING_FACTOR), status);
 }
 
 /**

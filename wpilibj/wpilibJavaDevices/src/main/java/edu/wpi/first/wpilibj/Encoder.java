@@ -94,6 +94,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 			HALUtil.checkStatus(status.asIntBuffer());
 			m_index = index.asIntBuffer().get(0);
 			m_counter = null;
+			setMaxPeriod(.5);
 			break;
 		case EncodingType.k2X_val:
 		case EncodingType.k1X_val:
@@ -464,7 +465,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 	public double getPeriod() {
 		double measuredPeriod;
 		if (m_counter != null) {
-			measuredPeriod = m_counter.getPeriod();
+			measuredPeriod = m_counter.getPeriod() / decodingScaleFactor();
 		} else {
 			ByteBuffer status = ByteBuffer.allocateDirect(4);
 			// set the byte order
@@ -472,7 +473,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 			measuredPeriod = EncoderJNI.getEncoderPeriod(m_encoder, status.asIntBuffer());
 			HALUtil.checkStatus(status.asIntBuffer());
 		}
-		return measuredPeriod / decodingScaleFactor();
+		return measuredPeriod;
 	}
 
 	/**

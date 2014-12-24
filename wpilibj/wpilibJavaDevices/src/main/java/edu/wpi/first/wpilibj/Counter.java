@@ -86,6 +86,8 @@ public class Counter extends SensorBase implements CounterBase,
 		m_upSource = null;
 		m_downSource = null;
 
+		setMaxPeriod(.5);
+
 		UsageReporting.report(tResourceType.kResourceType_Counter, m_index,
 				mode.value);
 	}
@@ -166,12 +168,16 @@ public class Counter extends SensorBase implements CounterBase,
 		if (encodingType == null)
 			throw new NullPointerException("Encoding type given was null");
 
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		if (encodingType == EncodingType.k1X) {
 			setUpSourceEdge(true, false);
+			CounterJNI.setCounterAverageSize(m_counter, 1, status.asIntBuffer());
 		} else {
 			setUpSourceEdge(true, true);
+			CounterJNI.setCounterAverageSize(m_counter, 2, status.asIntBuffer());
 		}
 
+		HALUtil.checkStatus(status.asIntBuffer());
 		setDownSourceEdge(inverted, true);
 	}
 
@@ -374,7 +380,7 @@ public class Counter extends SensorBase implements CounterBase,
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
 		CounterJNI.setCounterDownSourceEdge(m_counter, (byte) (risingEdge ? 1
-				: 0), (byte) (fallingEdge ? 0 : 1), status.asIntBuffer());
+				: 0), (byte) (fallingEdge ? 1 : 0), status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
