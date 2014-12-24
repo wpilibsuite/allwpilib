@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj.image;
 
+import com.ni.vision.NIVision;
+
 /**
  * A color image represented in RGB color space at 3 bytes per pixel.
  * @author dtjones
@@ -17,7 +19,7 @@ public class RGBImage extends ColorImage {
      * Create a new 0x0 image.
      */
     public RGBImage() throws NIVisionException {
-        super(NIVision.ImageType.imaqImageRGB);
+        super(NIVision.ImageType.IMAGE_RGB);
     }
 
     RGBImage(RGBImage sourceImage) {
@@ -29,7 +31,7 @@ public class RGBImage extends ColorImage {
      * @param fileName The path of the file to load.
      */
     public RGBImage(String fileName) throws NIVisionException {
-        super(NIVision.ImageType.imaqImageRGB);
-        NIVision.readFile(image, fileName);
+        super(NIVision.ImageType.IMAGE_RGB);
+        NIVision.imaqReadFile(image, fileName);
     }
 }

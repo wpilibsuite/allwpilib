@@ -6,6 +6,8 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj.image;
 
+import com.ni.vision.NIVision;
+
 /**
  * Class to store commonly used information about a particle.
  * @author dtjones
@@ -52,21 +54,21 @@ public class ParticleAnalysisReport {
     ParticleAnalysisReport(BinaryImage image, int index) throws NIVisionException {
         imageHeight = image.getHeight();
         imageWidth = image.getWidth();
-        center_mass_x = (int) NIVision.MeasureParticle(image.image, index, false, NIVision.MeasurementType.IMAQ_MT_CENTER_OF_MASS_X);
-        center_mass_y = (int) NIVision.MeasureParticle(image.image, index, false, NIVision.MeasurementType.IMAQ_MT_CENTER_OF_MASS_Y);
+        center_mass_x = (int) NIVision.imaqMeasureParticle(image.image, index, 0, NIVision.MeasurementType.MT_CENTER_OF_MASS_X);
+        center_mass_y = (int) NIVision.imaqMeasureParticle(image.image, index, 0, NIVision.MeasurementType.MT_CENTER_OF_MASS_Y);
         center_mass_x_normalized = (2.0 * center_mass_x / imageWidth) - 1.0;
         center_mass_y_normalized = (2.0 * center_mass_y / imageHeight) - 1.0;
-        particleArea = NIVision.MeasureParticle(image.image, index, false, NIVision.MeasurementType.IMAQ_MT_AREA);
-        boundingRectLeft = (int) NIVision.MeasureParticle(image.image, index, false, NIVision.MeasurementType.IMAQ_MT_BOUNDING_RECT_LEFT);
-        boundingRectTop = (int) NIVision.MeasureParticle(image.image, index, false, NIVision.MeasurementType.IMAQ_MT_BOUNDING_RECT_TOP);
-        boundingRectWidth = (int) NIVision.MeasureParticle(image.image, index, false, NIVision.MeasurementType.IMAQ_MT_BOUNDING_RECT_WIDTH);
-        boundingRectHeight = (int) NIVision.MeasureParticle(image.image, index, false, NIVision.MeasurementType.IMAQ_MT_BOUNDING_RECT_HEIGHT);
-        particleToImagePercent = NIVision.MeasureParticle(image.image, index, false, NIVision.MeasurementType.IMAQ_MT_AREA_BY_IMAGE_AREA);
-        particleQuality = NIVision.MeasureParticle(image.image, index, false, NIVision.MeasurementType.IMAQ_MT_AREA_BY_PARTICLE_AND_HOLES_AREA);
+        particleArea = NIVision.imaqMeasureParticle(image.image, index, 0, NIVision.MeasurementType.MT_AREA);
+        boundingRectLeft = (int) NIVision.imaqMeasureParticle(image.image, index, 0, NIVision.MeasurementType.MT_BOUNDING_RECT_LEFT);
+        boundingRectTop = (int) NIVision.imaqMeasureParticle(image.image, index, 0, NIVision.MeasurementType.MT_BOUNDING_RECT_TOP);
+        boundingRectWidth = (int) NIVision.imaqMeasureParticle(image.image, index, 0, NIVision.MeasurementType.MT_BOUNDING_RECT_WIDTH);
+        boundingRectHeight = (int) NIVision.imaqMeasureParticle(image.image, index, 0, NIVision.MeasurementType.MT_BOUNDING_RECT_HEIGHT);
+        particleToImagePercent = NIVision.imaqMeasureParticle(image.image, index, 0, NIVision.MeasurementType.MT_AREA_BY_IMAGE_AREA);
+        particleQuality = NIVision.imaqMeasureParticle(image.image, index, 0, NIVision.MeasurementType.MT_AREA_BY_PARTICLE_AND_HOLES_AREA);
     }
 
     static double getParticleToImagePercent(BinaryImage image, int index) throws NIVisionException {
-        return NIVision.MeasureParticle(image.image, index, false, NIVision.MeasurementType.IMAQ_MT_AREA_BY_IMAGE_AREA);
+        return NIVision.imaqMeasureParticle(image.image, index, 0, NIVision.MeasurementType.MT_AREA_BY_IMAGE_AREA);
     }
 
     /**

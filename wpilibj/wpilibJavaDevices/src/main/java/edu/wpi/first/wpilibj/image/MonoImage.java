@@ -6,31 +6,38 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj.image;
 
+import com.ni.vision.NIVision;
+import com.ni.vision.NIVision.EllipseDescriptor;
+import com.ni.vision.NIVision.CurveOptions;
+import com.ni.vision.NIVision.ShapeDetectionOptions;
+import com.ni.vision.NIVision.ROI;
+import com.ni.vision.NIVision.DetectEllipsesResult;
+
 /**
  * A grey scale image represented at a byte per pixel.
  * @author dtjones
  */
-public class MonoImage extends Image {
+public class MonoImage extends ImageBase {
 
     /**
      * Create a new 0x0 image.
      */
     public MonoImage() throws NIVisionException {
-        super(NIVision.ImageType.imaqImageU8);
+        super(NIVision.ImageType.IMAGE_U8);
     }
 
     MonoImage(MonoImage sourceImage) {
         super(sourceImage);
     }
 
-    public EllipseMatch[] detectEllipses(EllipseDescriptor ellipseDescriptor,
+    public DetectEllipsesResult detectEllipses(EllipseDescriptor ellipseDescriptor,
                                          CurveOptions curveOptions, ShapeDetectionOptions shapeDetectionOptions,
-                                         RegionOfInterest roi) throws NIVisionException {
-        return NIVision.detectEllipses(this, ellipseDescriptor, curveOptions, shapeDetectionOptions, roi);
+                                         ROI roi) throws NIVisionException {
+        return NIVision.imaqDetectEllipses(image, ellipseDescriptor, curveOptions, shapeDetectionOptions, roi);
     }
 
-    public EllipseMatch[] detectEllipses(EllipseDescriptor ellipseDescriptor)
+    public DetectEllipsesResult detectEllipses(EllipseDescriptor ellipseDescriptor)
     throws NIVisionException {
-        return NIVision.detectEllipses(this, ellipseDescriptor, null, null, null);
+        return NIVision.imaqDetectEllipses(image, ellipseDescriptor, null, null, null);
     }
 }

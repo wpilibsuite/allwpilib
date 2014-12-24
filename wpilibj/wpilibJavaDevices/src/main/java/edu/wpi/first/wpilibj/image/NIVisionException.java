@@ -422,7 +422,7 @@ public class NIVisionException extends Exception {
         case -1074395879:
             return "Invalid measure number.";
         case -1074395878:
-            return "The Image Display control does not support writing this property node.";
+            return "The ImageBase Display control does not support writing this property node.";
         case -1074395877:
             return "The specified color mode requires the use of imaqChangeColorSpace2.";
         case -1074395876:

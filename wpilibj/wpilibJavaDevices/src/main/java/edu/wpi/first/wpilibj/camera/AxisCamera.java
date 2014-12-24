@@ -139,19 +139,19 @@ public class AxisCamera {
         public final int height;
         static final ResolutionT[] allValues = new ResolutionT[4];
         /**
-         * Image is 640 pixels wide by 480 tall
+         * ImageBase is 640 pixels wide by 480 tall
          */
         public static final ResolutionT k640x480 = new ResolutionT(0, 640, 480);
         /**
-         * Image is 640 pixels wide by 360 tall
+         * ImageBase is 640 pixels wide by 360 tall
          */
         public static final ResolutionT k640x360 = new ResolutionT(1, 640, 360);
         /**
-         * Image is 320 pixels wide by 240 tall
+         * ImageBase is 320 pixels wide by 240 tall
          */
         public static final ResolutionT k320x240 = new ResolutionT(2, 320, 240);
         /**
-         * Image is 160 pixels wide by 120 tall
+         * ImageBase is 160 pixels wide by 120 tall
          */
         public static final ResolutionT k160x120 = new ResolutionT(3, 160, 120);
 

@@ -63,7 +63,6 @@
           <source>1.7</source>
           <target>1.7</target>
 	      <excludes>
-	        <exclude>edu/wpi/first/wpilibj/image/</exclude>
 	        <exclude>edu/wpi/first/wpilibj/camera/</exclude>
 	      </excludes>
         </configuration>
@@ -77,7 +76,6 @@
       	<artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
       	  <sourceFileExcludes>
-      	    <exclude>edu/wpi/first/wpilibj/image/</exclude>
       	    <exclude>edu/wpi/first/wpilibj/camera/</exclude>
       	  </sourceFileExcludes>
         </configuration>

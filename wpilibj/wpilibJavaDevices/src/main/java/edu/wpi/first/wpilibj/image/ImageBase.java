@@ -6,21 +6,22 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj.image;
 
-import com.sun.jna.Pointer;
+import com.ni.vision.NIVision;
+import com.ni.vision.NIVision.Image;
 
 /**
  * Class representing a generic image.
  * @author dtjones
  */
-public abstract class Image {
+public abstract class ImageBase {
 
     /**
      * Pointer to the image memory
      */
-    public final Pointer image;
+    public final Image image;
     static final int DEFAULT_BORDER_SIZE = 3;
 
-    Image(NIVision.ImageType type) throws NIVisionException {
+    ImageBase(NIVision.ImageType type) throws NIVisionException {
         image = NIVision.imaqCreateImage(type, DEFAULT_BORDER_SIZE);
     }
 
@@ -30,7 +31,7 @@ public abstract class Image {
      * one will free both.
      * @param sourceImage The image to reference
      */
-    Image(Image sourceImage) {
+    ImageBase(ImageBase sourceImage) {
         image = sourceImage.image;
     }
 
@@ -48,14 +49,16 @@ public abstract class Image {
      * @param fileName The path to write the image to.
      */
     public void write(String fileName) throws NIVisionException {
-        NIVision.writeFile(image, fileName);
+        NIVision.RGBValue value = new NIVision.RGBValue();
+        NIVision.imaqWriteFile(image, fileName, value);
+        value.free();
     }
 
     /**
      * Release the memory associated with an image.
      */
     public void free() throws NIVisionException {
-        NIVision.dispose(image);
+        image.free();
     }
 
     /**
@@ -63,7 +66,7 @@ public abstract class Image {
      * @return The height of the image.
      */
     public int getHeight() throws NIVisionException {
-        return NIVision.getHeight(image);
+        return NIVision.imaqGetImageSize(image).height;
     }
 
     /**
@@ -71,6 +74,6 @@ public abstract class Image {
      * @return The width of the image.
      */
     public int getWidth() throws NIVisionException {
-        return NIVision.getWidth(image);
+        return NIVision.imaqGetImageSize(image).width;
     }
 }

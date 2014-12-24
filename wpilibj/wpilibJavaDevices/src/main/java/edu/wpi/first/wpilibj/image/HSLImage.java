@@ -6,6 +6,8 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj.image;
 
+import com.ni.vision.NIVision;
+
 /**
  * A color image represented in HSL color space at 3 bytes per pixel.
  * @author dtjones
@@ -16,7 +18,7 @@ public class HSLImage extends ColorImage {
      * Create a new 0x0 image.
      */
     public HSLImage() throws NIVisionException {
-        super(NIVision.ImageType.imaqImageHSL);
+        super(NIVision.ImageType.IMAGE_HSL);
     }
 
     HSLImage(HSLImage sourceImage) {
@@ -28,7 +30,7 @@ public class HSLImage extends ColorImage {
      * @param fileName The path of the file to load.
      */
     public HSLImage(String fileName) throws NIVisionException {
-        super(NIVision.ImageType.imaqImageHSL);
-        NIVision.readFile(image, fileName);
+        super(NIVision.ImageType.IMAGE_HSL);
+        NIVision.imaqReadFile(image, fileName);
     }
 }
