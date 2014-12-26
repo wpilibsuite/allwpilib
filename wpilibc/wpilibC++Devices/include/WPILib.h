@@ -85,6 +85,7 @@
 #include "Utility.h"
 #include "Victor.h"
 #include "VictorSP.h"
+#include "Vision/AxisCamera.h"
 #include "Vision/BinaryImage.h"
 #include "Vision/ColorImage.h"
 #include "Vision/HSLImage.h"
