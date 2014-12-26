@@ -101,7 +101,9 @@ void InterruptableSensorBase::CancelInterrupts()
 }
 
 /**
- * In synchronous mode, wait for the defined interrupt to occur.
+ * In synchronous mode, wait for the defined interrupt to occur. You should <b>NOT</b> attempt to read the
+ * sensor from another thread while waiting for an interrupt. This is not threadsafe, and can cause 
+ * memory corruption
  * @param timeout Timeout in seconds
  * @param ignorePrevious If true, ignore interrupts that happened before
  * WaitForInterrupt was called.
