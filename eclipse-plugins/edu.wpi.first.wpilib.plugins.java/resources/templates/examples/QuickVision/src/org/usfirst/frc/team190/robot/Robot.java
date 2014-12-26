@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.SampleRobot;
 /**
  * This is a demo program showing the use of the CameraServer class.
  * With start automatic capture, there is no opportunity to process the image.
- * Look at the AdvancedVision sample for how to process the image before sending it to the FRC PC Dashboard.
+ * Look at the IntermediateVision sample for how to process the image before sending it to the FRC PC Dashboard.
  */
 public class Robot extends SampleRobot {
 
