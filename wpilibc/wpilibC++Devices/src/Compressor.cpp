@@ -129,6 +129,123 @@ bool Compressor::GetClosedLoopControl() {
 	return value;
 }
 
+/**
+ * @return true if PCM is in fault state : Compressor Drive is 
+ *			disabled due to compressor current being too high.
+ */
+bool Compressor::GetCompressorCurrentTooHighFault() {
+	int32_t status = 0;
+	bool value;
+
+	value = getCompressorCurrentTooHighFault(m_pcm_pointer, &status);
+
+	if(status) {
+		wpi_setWPIError(Timeout);
+	}
+
+	return value;
+}
+/**
+ * @return true if PCM sticky fault is set : Compressor Drive is 
+ *			disabled due to compressor current being too high.
+ */
+bool Compressor::GetCompressorCurrentTooHighStickyFault() {
+	int32_t status = 0;
+	bool value;
+
+	value = getCompressorCurrentTooHighStickyFault(m_pcm_pointer, &status);
+
+	if(status) {
+		wpi_setWPIError(Timeout);
+	}
+
+	return value;
+}
+/**
+ * @return true if PCM sticky fault is set : Compressor output 
+ *			appears to be shorted.
+ */
+bool Compressor::GetCompressorShortedStickyFault() {
+	int32_t status = 0;
+	bool value;
+
+	value = getCompressorShortedStickyFault(m_pcm_pointer, &status);
+
+	if(status) {
+		wpi_setWPIError(Timeout);
+	}
+
+	return value;
+}
+/**
+ * @return true if PCM is in fault state : Compressor output 
+ *			appears to be shorted.
+ */
+bool Compressor::GetCompressorShortedFault() {
+	int32_t status = 0;
+	bool value;
+
+	value = getCompressorShortedFault(m_pcm_pointer, &status);
+
+	if(status) {
+		wpi_setWPIError(Timeout);
+	}
+
+	return value;
+}
+/**
+ * @return true if PCM sticky fault is set : Compressor does not 
+ *			appear to be wired, i.e. compressor is
+ * 			not drawing enough current.
+ */
+bool Compressor::GetCompressorNotConnectedStickyFault() {
+	int32_t status = 0;
+	bool value;
+
+	value = getCompressorNotConnectedStickyFault(m_pcm_pointer, &status);
+
+	if(status) {
+		wpi_setWPIError(Timeout);
+	}
+
+	return value;
+}
+/**
+ * @return true if PCM is in fault state : Compressor does not 
+ *			appear to be wired, i.e. compressor is
+ * 			not drawing enough current.
+ */
+bool Compressor::GetCompressorNotConnectedFault() {
+	int32_t status = 0;
+	bool value;
+
+	value = getCompressorNotConnectedFault(m_pcm_pointer, &status);
+
+	if(status) {
+		wpi_setWPIError(Timeout);
+	}
+
+	return value;
+}
+/**
+ * Clear ALL sticky faults inside PCM that Compressor is wired to.
+ *
+ * If a sticky fault is set, then it will be persistently cleared.  Compressor drive
+ *		maybe momentarily disable while flags are being cleared. Care should be 
+ *		taken to not call this too frequently, otherwise normal compressor 
+ *		functionality may be prevented.
+ *
+ * If no sticky faults are set then this call will have no effect.
+ */
+void Compressor::ClearAllPCMStickyFaults() {
+	int32_t status = 0;
+
+	clearAllPCMStickyFaults(m_pcm_pointer, &status);
+
+	if(status) {
+		wpi_setWPIError(Timeout);
+	}
+}
 void Compressor::UpdateTable() {
 	if(m_table) {
 		m_table->PutBoolean("Enabled", Enabled());

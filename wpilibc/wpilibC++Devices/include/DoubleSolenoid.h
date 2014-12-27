@@ -31,6 +31,8 @@ public:
 	virtual ~DoubleSolenoid();
 	virtual void Set(Value value);
 	virtual Value Get();
+	bool IsFwdSolenoidBlackListed();
+	bool IsRevSolenoidBlackListed();
 
 	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
 	void UpdateTable();

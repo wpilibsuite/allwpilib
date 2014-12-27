@@ -23,6 +23,14 @@ extern "C" {
 	
 	bool getPressureSwitch(void *pcm_pointer, int32_t *status);
 	float getCompressorCurrent(void *pcm_pointer, int32_t *status);
+
+	bool getCompressorCurrentTooHighFault(void *pcm_pointer, int32_t *status);
+	bool getCompressorCurrentTooHighStickyFault(void *pcm_pointer, int32_t *status);
+	bool getCompressorShortedStickyFault(void *pcm_pointer, int32_t *status);
+	bool getCompressorShortedFault(void *pcm_pointer, int32_t *status);
+	bool getCompressorNotConnectedStickyFault(void *pcm_pointer, int32_t *status);
+	bool getCompressorNotConnectedFault(void *pcm_pointer, int32_t *status);
+	void clearAllPCMStickyFaults(void *pcm_pointer, int32_t *status);
 }
 
 #endif

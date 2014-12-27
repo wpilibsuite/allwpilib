@@ -100,3 +100,99 @@ JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompres
 	return getCompressorCurrent(*pcm_pointer, status_pointer);
 }
 
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI
+ * Method:    getCompressorCurrentTooHighFault
+ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorCurrentTooHighFault
+  (JNIEnv *env, jclass, jobject pcm_pointer_object, jobject status)
+{
+	VoidPointer *pcm_pointer = (VoidPointer *)env->GetDirectBufferAddress(pcm_pointer_object);
+	jint *status_pointer = (jint *)env->GetDirectBufferAddress(status);
+	
+	return getCompressorCurrentTooHighFault(*pcm_pointer, status_pointer);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI
+ * Method:    getCompressorCurrentTooHighStickyFault
+ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorCurrentTooHighStickyFault
+  (JNIEnv *env, jclass, jobject pcm_pointer_object, jobject status)
+{
+	VoidPointer *pcm_pointer = (VoidPointer *)env->GetDirectBufferAddress(pcm_pointer_object);
+	jint *status_pointer = (jint *)env->GetDirectBufferAddress(status);
+	
+	return getCompressorCurrentTooHighStickyFault(*pcm_pointer, status_pointer);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI
+ * Method:    getCompressorShortedStickyFault
+ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorShortedStickyFault
+  (JNIEnv *env, jclass, jobject pcm_pointer_object, jobject status)
+{
+	VoidPointer *pcm_pointer = (VoidPointer *)env->GetDirectBufferAddress(pcm_pointer_object);
+	jint *status_pointer = (jint *)env->GetDirectBufferAddress(status);
+	
+	return getCompressorShortedStickyFault(*pcm_pointer, status_pointer);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI
+ * Method:    getCompressorShortedFault
+ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorShortedFault
+  (JNIEnv *env, jclass, jobject pcm_pointer_object, jobject status)
+{
+	VoidPointer *pcm_pointer = (VoidPointer *)env->GetDirectBufferAddress(pcm_pointer_object);
+	jint *status_pointer = (jint *)env->GetDirectBufferAddress(status);
+	
+	return getCompressorShortedFault(*pcm_pointer, status_pointer);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI
+ * Method:    getCompressorNotConnectedStickyFault
+ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorNotConnectedStickyFault
+  (JNIEnv *env, jclass, jobject pcm_pointer_object, jobject status)
+{
+	VoidPointer *pcm_pointer = (VoidPointer *)env->GetDirectBufferAddress(pcm_pointer_object);
+	jint *status_pointer = (jint *)env->GetDirectBufferAddress(status);
+	
+	return getCompressorNotConnectedStickyFault(*pcm_pointer, status_pointer);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI
+ * Method:    getCompressorNotConnectedFault
+ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorNotConnectedFault
+  (JNIEnv *env, jclass, jobject pcm_pointer_object, jobject status)
+{
+	VoidPointer *pcm_pointer = (VoidPointer *)env->GetDirectBufferAddress(pcm_pointer_object);
+	jint *status_pointer = (jint *)env->GetDirectBufferAddress(status);
+	
+	return getCompressorNotConnectedFault(*pcm_pointer, status_pointer);
+}
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI
+ * Method:    clearAllPCMStickyFaults
+ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CompressorJNI_clearAllPCMStickyFaults
+  (JNIEnv *env, jclass, jobject pcm_pointer_object, jobject status)
+{
+	VoidPointer *pcm_pointer = (VoidPointer *)env->GetDirectBufferAddress(pcm_pointer_object);
+	jint *status_pointer = (jint *)env->GetDirectBufferAddress(status);
+	
+	clearAllPCMStickyFaults(*pcm_pointer, status_pointer);
+}

@@ -7,4 +7,9 @@ public class SolenoidJNI extends JNIWrapper {
 	public static native ByteBuffer getPortWithModule(byte module, byte channel);
 	public static native void setSolenoid(ByteBuffer port, byte on, IntBuffer status);
 	public static native byte getSolenoid(ByteBuffer port, IntBuffer status);
+
+	public static native byte getPCMSolenoidBlackList(ByteBuffer pcm_pointer, IntBuffer status);
+	public static native boolean getPCMSolenoidVoltageStickyFault(ByteBuffer pcm_pointer, IntBuffer status);
+	public static native boolean getPCMSolenoidVoltageFault(ByteBuffer pcm_pointer, IntBuffer status);
+	public static native void clearAllPCMStickyFaults(ByteBuffer pcm_pointer, IntBuffer status);
 }
