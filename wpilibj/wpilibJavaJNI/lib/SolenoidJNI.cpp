@@ -89,3 +89,57 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getSolenoid
 	
 	return getSolenoid(*solenoid_port_pointer, status_pointer);
 }
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Method:    getPCMSolenoidBlackList
+ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)B
+ */
+JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidBlackList
+  (JNIEnv *env, jclass, jobject solenoid_port, jobject status)
+{
+	
+	VoidPointer *solenoid_port_pointer = (VoidPointer *)env->GetDirectBufferAddress(solenoid_port);
+	jint *status_pointer = (jint*)env->GetDirectBufferAddress(status);
+	
+	return getPCMSolenoidBlackList(*solenoid_port_pointer, status_pointer);
+}
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Method:    getPCMSolenoidVoltageStickyFault
+ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidVoltageStickyFault
+  (JNIEnv *env, jclass, jobject solenoid_port, jobject status)
+{
+	VoidPointer *solenoid_port_pointer = (VoidPointer *)env->GetDirectBufferAddress(solenoid_port);
+	jint *status_pointer = (jint *)env->GetDirectBufferAddress(status);
+	
+	return getPCMSolenoidVoltageStickyFault(*solenoid_port_pointer, status_pointer);
+}
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Method:    getPCMSolenoidVoltageFault
+ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidVoltageFault
+  (JNIEnv *env, jclass, jobject solenoid_port, jobject status)
+{
+	VoidPointer *solenoid_port_pointer = (VoidPointer *)env->GetDirectBufferAddress(solenoid_port);
+	jint *status_pointer = (jint *)env->GetDirectBufferAddress(status);
+	
+	return getPCMSolenoidVoltageFault(*solenoid_port_pointer, status_pointer);
+}
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Method:    clearAllPCMStickyFaults
+ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_clearAllPCMStickyFaults
+  (JNIEnv *env, jclass, jobject solenoid_port, jobject status)
+{
+	VoidPointer *solenoid_port_pointer = (VoidPointer *)env->GetDirectBufferAddress(solenoid_port);
+	jint *status_pointer = (jint *)env->GetDirectBufferAddress(status);
+	
+	clearAllPCMStickyFaults_sol(*solenoid_port_pointer, status_pointer);
+}

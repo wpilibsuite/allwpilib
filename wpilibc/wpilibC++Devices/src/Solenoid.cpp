@@ -102,7 +102,19 @@ bool Solenoid::Get()
 	uint8_t value = GetAll() & ( 1 << m_channel);
 	return (value != 0);
 }
-
+/**
+ * Check if solenoid is blacklisted.
+ *		If a solenoid is shorted, it is added to the blacklist and
+ *		disabled until power cycle, or until faults are cleared.
+ *		@see ClearAllPCMStickyFaults()
+ *
+ * @return If solenoid is disabled due to short.
+ */
+bool Solenoid::IsBlackListed()
+{
+	int value = GetPCMSolenoidBlackList() & ( 1 << m_channel);
+	return (value != 0);
+}
 
 void Solenoid::ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) {
 	Set(value.b);

@@ -32,6 +32,14 @@ public:
 	void SetClosedLoopControl(bool on);
 	bool GetClosedLoopControl();
 
+	bool GetCompressorCurrentTooHighFault();
+	bool GetCompressorCurrentTooHighStickyFault();
+	bool GetCompressorShortedStickyFault();
+	bool GetCompressorShortedFault();
+	bool GetCompressorNotConnectedStickyFault();
+	bool GetCompressorNotConnectedFault();
+	void ClearAllPCMStickyFaults();
+
 	void UpdateTable();
 	void StartLiveWindowMode();
 	void StopLiveWindowMode();

@@ -52,3 +52,33 @@ void setSolenoid(void* solenoid_port_pointer, bool value, int32_t *status) {
 
 	port->module->SetSolenoid(port->pin, value);
 }
+
+int getPCMSolenoidBlackList(void* solenoid_port_pointer, int32_t *status){
+	solenoid_port_t* port = (solenoid_port_t*) solenoid_port_pointer;
+	UINT8 value;
+	
+	*status = port->module->GetSolenoidBlackList(value);
+
+	return value;
+}
+bool getPCMSolenoidVoltageStickyFault(void* solenoid_port_pointer, int32_t *status){
+	solenoid_port_t* port = (solenoid_port_t*) solenoid_port_pointer;
+	bool value;
+
+	*status = port->module->GetSolenoidStickyFault(value);
+
+	return value;
+}
+bool getPCMSolenoidVoltageFault(void* solenoid_port_pointer, int32_t *status){
+	solenoid_port_t* port = (solenoid_port_t*) solenoid_port_pointer;
+	bool value;
+
+	*status = port->module->GetSolenoidFault(value);
+
+	return value;
+}
+void clearAllPCMStickyFaults_sol(void *solenoid_port_pointer, int32_t *status){
+	solenoid_port_t* port = (solenoid_port_t*) solenoid_port_pointer;
+	
+	*status = port->module->ClearStickyFaults();
+}

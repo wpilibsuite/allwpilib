@@ -138,6 +138,32 @@ DoubleSolenoid::Value DoubleSolenoid::Get()
 	if (value & m_reverseMask) return kReverse;
 	return kOff;
 }
+/**
+ * Check if the forward solenoid is blacklisted.
+ *		If a solenoid is shorted, it is added to the blacklist and
+ *		disabled until power cycle, or until faults are cleared.
+ *		@see ClearAllPCMStickyFaults()
+ *
+ * @return If solenoid is disabled due to short.
+ */
+bool DoubleSolenoid::IsFwdSolenoidBlackListed()
+{
+	int blackList = GetPCMSolenoidBlackList();
+	return (blackList & m_forwardMask) ? 1 : 0;
+}
+/**
+ * Check if the reverse solenoid is blacklisted.
+ *		If a solenoid is shorted, it is added to the blacklist and
+ *		disabled until power cycle, or until faults are cleared.
+ *		@see ClearAllPCMStickyFaults()
+ *
+ * @return If solenoid is disabled due to short.
+ */
+bool DoubleSolenoid::IsRevSolenoidBlackListed()
+{
+	int blackList = GetPCMSolenoidBlackList();
+	return (blackList & m_reverseMask) ? 1 : 0;
+}
 
 void DoubleSolenoid::ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) {
 	Value lvalue = kOff;

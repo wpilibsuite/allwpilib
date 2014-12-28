@@ -61,4 +61,56 @@ float getCompressorCurrent(void *pcm_pointer, int32_t *status) {
 	
 	return value;
 }
-
+bool getCompressorCurrentTooHighFault(void *pcm_pointer, int32_t *status) {
+	PCM *module = (PCM *)pcm_pointer;
+	bool value;
+	
+	*status = module->GetCompressorCurrentTooHighFault(value);
+	
+	return value;
+}
+bool getCompressorCurrentTooHighStickyFault(void *pcm_pointer, int32_t *status) {
+	PCM *module = (PCM *)pcm_pointer;
+	bool value;
+	
+	*status = module->GetCompressorCurrentTooHighStickyFault(value);
+	
+	return value;
+}
+bool getCompressorShortedStickyFault(void *pcm_pointer, int32_t *status) {
+	PCM *module = (PCM *)pcm_pointer;
+	bool value;
+	
+	*status = module->GetCompressorShortedStickyFault(value);
+	
+	return value;
+}
+bool getCompressorShortedFault(void *pcm_pointer, int32_t *status) {
+	PCM *module = (PCM *)pcm_pointer;
+	bool value;
+	
+	*status = module->GetCompressorShortedFault(value);
+	
+	return value;
+}
+bool getCompressorNotConnectedStickyFault(void *pcm_pointer, int32_t *status) {
+	PCM *module = (PCM *)pcm_pointer;
+	bool value;
+	
+	*status = module->GetCompressorNotConnectedStickyFault(value);
+	
+	return value;
+}
+bool getCompressorNotConnectedFault(void *pcm_pointer, int32_t *status) {
+	PCM *module = (PCM *)pcm_pointer;
+	bool value;
+	
+	*status = module->GetCompressorNotConnectedFault(value);
+	
+	return value;
+}
+void clearAllPCMStickyFaults(void *pcm_pointer, int32_t *status) {
+	PCM *module = (PCM *)pcm_pointer;
+	
+	*status = module->ClearStickyFaults();
+}

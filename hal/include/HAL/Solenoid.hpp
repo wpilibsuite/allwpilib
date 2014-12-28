@@ -13,4 +13,9 @@ extern "C"
 
 	bool getSolenoid(void* solenoid_port_pointer, int32_t *status);
 	void setSolenoid(void* solenoid_port_pointer, bool value, int32_t *status);
+
+	int getPCMSolenoidBlackList(void* solenoid_port_pointer, int32_t *status);
+	bool getPCMSolenoidVoltageStickyFault(void* solenoid_port_pointer, int32_t *status);
+	bool getPCMSolenoidVoltageFault(void* solenoid_port_pointer, int32_t *status);
+	void clearAllPCMStickyFaults_sol(void *solenoid_port_pointer, int32_t *status);
 }

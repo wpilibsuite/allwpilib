@@ -101,7 +101,18 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
         int value = getAll() & ( 1 << m_channel);
         return (value != 0);
     }
-
+	/**
+	 * Check if solenoid is blacklisted.
+	 *		If a solenoid is shorted, it is added to the blacklist and
+	 *		disabled until power cycle, or until faults are cleared.
+	 *		@see clearAllPCMStickyFaults()
+	 *
+	 * @return If solenoid is disabled due to short.
+	 */
+	public boolean isBlackListed() {
+		int value = getPCMSolenoidBlackList() & ( 1 << m_channel);
+		return (value != 0);
+	}
     /*
      * Live Window code, only does anything if live window is activated.
      */

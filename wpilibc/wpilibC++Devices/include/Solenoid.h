@@ -23,6 +23,7 @@ public:
 	virtual ~Solenoid();
 	virtual void Set(bool on);
 	virtual bool Get();
+	bool IsBlackListed();
 
 	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
 	void UpdateTable();

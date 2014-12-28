@@ -20,6 +20,10 @@ public:
 	virtual ~SolenoidBase();
 	uint8_t GetAll();
 
+	uint8_t GetPCMSolenoidBlackList();
+	bool GetPCMSolenoidVoltageStickyFault();
+	bool GetPCMSolenoidVoltageFault();
+	void ClearAllPCMStickyFaults();
 protected:
 	explicit SolenoidBase(uint8_t pcmID);
 	void Set(uint8_t value, uint8_t mask);

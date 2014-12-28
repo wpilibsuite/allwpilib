@@ -139,6 +139,103 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
 		return on;
 	}
 
+	/**
+	 * @return true if PCM is in fault state : Compressor Drive is 
+	 *			disabled due to compressor current being too high.
+	 */
+	public boolean getCompressorCurrentTooHighFault() {
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+
+		boolean retval = CompressorJNI.getCompressorCurrentTooHighFault(m_pcm, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+
+		return retval;
+	}
+	/**
+	 * @return true if PCM sticky fault is set : Compressor Drive is 
+	 *			disabled due to compressor current being too high.
+	 */
+	public boolean getCompressorCurrentTooHighStickyFault() {
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+
+		boolean retval = CompressorJNI.getCompressorCurrentTooHighStickyFault(m_pcm, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+
+		return retval;
+	}
+	/**
+	 * @return true if PCM sticky fault is set : Compressor output 
+	 *			appears to be shorted.
+	 */
+	public boolean getCompressorShortedStickyFault() {
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+
+		boolean retval = CompressorJNI.getCompressorShortedStickyFault(m_pcm, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+
+		return retval;
+	}
+	/**
+	 * @return true if PCM is in fault state : Compressor output 
+	 *			appears to be shorted.
+	 */
+	public boolean getCompressorShortedFault() {
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+
+		boolean retval = CompressorJNI.getCompressorShortedFault(m_pcm, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+
+		return retval;
+	}
+	/**
+	 * @return true if PCM sticky fault is set : Compressor does not 
+	 *			appear to be wired, i.e. compressor is
+	 * 			not drawing enough current.
+	 */
+	public boolean getCompressorNotConnectedStickyFault() {
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+
+		boolean retval = CompressorJNI.getCompressorNotConnectedStickyFault(m_pcm, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+
+		return retval;
+	}
+	/**
+	 * @return true if PCM is in fault state : Compressor does not 
+	 *			appear to be wired, i.e. compressor is
+	 * 			not drawing enough current.
+	 */
+	public boolean getCompressorNotConnectedFault() {
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+
+		boolean retval = CompressorJNI.getCompressorNotConnectedFault(m_pcm, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+
+		return retval;
+	}
+	/**
+	 * Clear ALL sticky faults inside PCM that Compressor is wired to.
+	 *
+	 * If a sticky fault is set, then it will be persistently cleared.  Compressor drive
+	 *		maybe momentarily disable while flags are being cleared. Care should be 
+	 *		taken to not call this too frequently, otherwise normal compressor 
+	 *		functionality may be prevented.
+	 *
+	 * If no sticky faults are set then this call will have no effect.
+	 */
+	public void clearAllPCMStickyFaults() {
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+
+		CompressorJNI.clearAllPCMStickyFaults(m_pcm, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+	}
 	@Override
 	public void startLiveWindowMode() {
 	}
