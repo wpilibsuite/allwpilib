@@ -53,7 +53,8 @@ AxisCamera::AxisCamera(std::string const& cameraHost)
 		, m_exposurePriority(50)
 		, m_maxFPS(0)
 		, m_resolution(kResolution_640x480)
-		, m_compression(50), m_rotation(kRotation_0)
+		, m_compression(50)
+		, m_rotation(kRotation_0)
 		, m_parametersDirty(true)
 		, m_streamDirty(true)
 		, m_done(false)
@@ -331,7 +332,7 @@ int AxisCamera::GetMaxFPS()
 
 /**
  * Write resolution value to camera.
- * @param resolution The camera resolution value to write to the camera.  Use the Resolution_t enum.
+ * @param resolution The camera resolution value to write to the camera.
  */
 void AxisCamera::WriteResolution(AxisCamera::Resolution resolution)
 {
@@ -353,6 +354,24 @@ AxisCamera::Resolution AxisCamera::GetResolution()
 {
 	std::lock_guard<std::mutex> lock(m_parametersMutex);
 	return m_resolution;
+}
+
+/**
+ * Write the rotation value to the camera.
+ * If you mount your camera upside down, use this to adjust the image for you.
+ * @param rotation The angle to rotate the camera (<code>AxisCamera::Rotation::k0</code>
+ * or <code>AxisCamera::Rotation::k180</code>)
+ */
+void AxisCamera::WriteRotation(AxisCamera::Rotation rotation)
+{
+	std::lock_guard<std::mutex> lock(m_parametersMutex);
+
+	if (m_rotation != rotation)
+	{
+		m_rotation = rotation;
+		m_parametersDirty = true;
+		m_streamDirty = true;
+	}
 }
 
 /**
@@ -388,26 +407,16 @@ void AxisCamera::WriteCompression(int compression)
 }
 
 /**
- * Write the rotation value to the camera.
- * If you mount your camera upside down, use this to adjust the image for you.
- * @param rotation The image from the Rotation_t enum in AxisCameraParams (kRotation_0 or kRotation_180)
+ * @return The configured compression level of the camera
  */
-void AxisCamera::WriteRotation(AxisCamera::Rotation rotation)
+int AxisCamera::GetCompression()
 {
 	std::lock_guard<std::mutex> lock(m_parametersMutex);
-
-	if (m_rotation != rotation)
-	{
-		m_rotation = rotation;
-		m_parametersDirty = true;
-		m_streamDirty = true;
-	}
+	return m_compression;
 }
 
 /**
- * Thread spawned by AxisCamera constructor to receive images from cam
- * If setNewImageSem has been called, this function does a semGive on each new image
- * Images can be accessed by calling getImage()
+ * Method called in the capture thread to receive images from the camera
  */
 void AxisCamera::Capture()
 {
@@ -594,7 +603,7 @@ bool AxisCamera::WriteParameters()
 
 /**
  * Create a socket connected to camera
- * Used to create a connection to the camera by both AxisCameraParams and AxisCamera.
+ * Used to create a connection to the camera for both capturing images and setting parameters.
  * @param requestString The initial request string to send upon successful connection.
  * @param setError If true, rais an error if there's a problem creating the connection.
  * This is only enabled after several unsucessful connections, so a single one doesn't
@@ -637,3 +646,4 @@ int AxisCamera::CreateCameraSocket(std::string const& requestString, bool setErr
 
 	return camSocket;
 }
+
