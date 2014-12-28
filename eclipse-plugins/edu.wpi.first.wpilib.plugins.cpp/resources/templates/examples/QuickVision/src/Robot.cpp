@@ -10,11 +10,18 @@ class QuickVisionRobot : public SampleRobot
 {
 public:
 	void RobotInit() override {
-		CameraServer::GetInstance()->SetQuality(75);
-		CameraServer::GetInstance()->StartAutomaticCapture();
+		CameraServer::GetInstance()->SetQuality(50);
+		//the camera name (ex "cam0") can be found through the roborio web interface
+		CameraServer::GetInstance()->StartAutomaticCapture("cam0");
 	}
 
-	void OperatorControl() override {
+	void OperatorControl()
+	{
+		while (IsOperatorControl() && IsEnabled())
+		{
+			/** robot code here! **/
+			Wait(0.005);				// wait for a motor update time
+		}
 	}
 };
 

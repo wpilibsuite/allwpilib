@@ -14,7 +14,7 @@ public:
 	void RobotInit() override {
 	    // create an image
 		frame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
-		// open the camera
+		//the camera name (ex "cam0") can be found through the roborio web interface
 		imaqError = IMAQdxOpenCamera("cam0", IMAQdxCameraControlModeController, &session);
 		if(imaqError != IMAQdxErrorSuccess) {
 			DriverStation::ReportError("IMAQdxOpenCamera error: " + std::to_string((long)imaqError) + "\n");
@@ -39,6 +39,7 @@ public:
 				imaqDrawShapeOnImage(frame, frame, { 10, 10, 100, 100 }, DrawMode::IMAQ_DRAW_VALUE, ShapeMode::IMAQ_SHAPE_OVAL, 0.0f);
 				CameraServer::GetInstance()->SetImage(frame);
 			}
+			Wait(0.005);				// wait for a motor update time
 		}
         // stop image acquisition
 		IMAQdxStopAcquisition(session);

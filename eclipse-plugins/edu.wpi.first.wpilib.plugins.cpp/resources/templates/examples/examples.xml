@@ -281,7 +281,7 @@
   </example>
 
     <example>
-        <name>Simple vision program</name>
+        <name>Simple Vision</name>
         <description>The minimal program to acquire images from an attached USB camera on the robot
         and send them to the dashboard.</description>
         <tags>
@@ -298,7 +298,7 @@
     </example>
 
     <example>
-        <name>Intermediate vision</name>
+        <name>Intermediate Vision</name>
         <description>An example program that acquires images from an attached USB camera and adds some
             annotation to the image as you might do for showing operators the result of some image
             recognition, and sends it to the dashboard for display.

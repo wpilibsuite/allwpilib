@@ -294,7 +294,7 @@
   </example>
 
   <example>
-    <name>Quick Vision</name>
+    <name>Simple Vision</name>
     <description>Demonstrate the use of the CameraServer class to stream from a USB Webcam without processing the images.</description>
     <tags>
       <tag>Vision</tag>
