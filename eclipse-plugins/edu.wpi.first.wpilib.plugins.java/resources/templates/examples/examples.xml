@@ -309,7 +309,7 @@
   </example>
 
   <example>
-    <name>Advanced Vision</name>
+    <name>Intermediate Vision</name>
     <description>Demonstrate the use of the NIVision class to capture image from a Webcam, process them, and then send them to the dashboard.</description>
     <tags>
       <tag>Vision</tag>
@@ -318,7 +318,7 @@
       <package>src/$package-dir</package>
     </packages>
     <files>
-      <file source="examples/AdvancedVision/src/org/usfirst/frc/team190/robot/Robot.java"
+      <file source="examples/IntermediateVision/src/org/usfirst/frc/team190/robot/Robot.java"
         destination="src/$package-dir/Robot.java"></file>
     </files>
   </example>
