@@ -39,7 +39,7 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
      * Create a new instance of an accelerometer.
      *
      * The constructor allocates desired analog channel.
-     * @param channel the port that the accelerometer is on
+     * @param channel The channel number for the analog input the accelerometer is connected to
      */
     public AnalogAccelerometer(final int channel) {
         m_allocatedChannel = true;
@@ -52,7 +52,7 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
      * Make a new instance of accelerometer given an AnalogChannel. This is particularly
      * useful if the port is going to be read as an analog channel as well as through
      * the Accelerometer class.
-     * @param channel an already initialized analog channel
+     * @param channel The existing AnalogInput object for the analog input the accelerometer is connected to
      */
     public AnalogAccelerometer(AnalogInput channel) {
         m_allocatedChannel = false;
@@ -87,7 +87,7 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
      * Set the accelerometer sensitivity.
      *
      * This sets the sensitivity of the accelerometer used for calculating the acceleration.
-     * The sensitivity varys by accelerometer model. There are constants defined for various models.
+     * The sensitivity varies by accelerometer model. There are constants defined for various models.
      *
      * @param sensitivity The sensitivity of accelerometer in Volts per G.
      */
@@ -98,7 +98,7 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
     /**
      * Set the voltage that corresponds to 0 G.
      *
-     * The zero G voltage varys by accelerometer model. There are constants defined for various models.
+     * The zero G voltage varies by accelerometer model. There are constants defined for various models.
      *
      * @param zero The zero G voltage.
      */

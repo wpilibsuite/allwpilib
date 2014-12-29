@@ -48,7 +48,7 @@ public class Servo extends PWM {
      * By default {@value #kDefaultMaxServoPWM} ms is used as the maxPWM value<br>
      * By default {@value #kDefaultMinServoPWM} ms is used as the minPWM value<br>
      *
-     * @param channel The PWM channel to which the servo is attached.
+     * @param channel The PWM channel to which the servo is attached. 0-9 are on-board, 10-19 are on the MXP port
      */
     public Servo(final int channel) {
         super(channel);

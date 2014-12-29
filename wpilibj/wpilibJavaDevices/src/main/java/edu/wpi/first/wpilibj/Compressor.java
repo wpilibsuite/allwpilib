@@ -36,8 +36,8 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
 
 	/**
 	 * Create an instance of the Compressor
-	 * Makes a new instance of the compressor using the default address. Additional modules can be
-	 * supported by making a new instancce and specifying the CAN ID
+	 * Makes a new instance of the compressor using the default PCM ID (0). Additional modules can be
+	 * supported by making a new instance and specifying the CAN ID
 	 */
 	public Compressor() {
 		initCompressor(getDefaultSolenoidModule());

@@ -116,9 +116,9 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 	 * The encoder will start counting immediately.
 	 *
 	 * @param aChannel
-	 *            The a channel digital input channel.
+	 *            The a channel DIO channel. 0-9 are on-board, 10-25 are on the MXP port
 	 * @param bChannel
-	 *            The b channel digital input channel.
+	 *            The b channel DIO channel. 0-9 are on-board, 10-25 are on the MXP port
 	 * @param reverseDirection
 	 *            represents the orientation of the encoder and inverts the
 	 *            output values if necessary so forward represents positive

@@ -27,7 +27,7 @@ public class SafePWM extends PWM implements MotorSafety {
 
     /**
      * Constructor for a SafePWM object taking a channel number
-     * @param channel The channel number to be used for the underlying PWM object
+     * @param channel The channel number to be used for the underlying PWM object. 0-9 are on-board, 10-19 are on the MXP port.
      */
     public SafePWM(final int channel) {
         super(channel);

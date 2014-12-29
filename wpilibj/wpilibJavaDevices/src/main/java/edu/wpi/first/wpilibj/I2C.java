@@ -44,6 +44,7 @@ public class I2C extends SensorBase {
     /**
      * Constructor.
      *
+	 * @param port The I2C port the device is connected to.
      * @param deviceAddress
      *            The address of the device on the I2C bus.
      */

@@ -39,7 +39,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 
 	/**
 	 * Initialize the gyro. Calibrate the gyro by running for a number of
-	 * samples and computing the center value for this part. Then use the center
+	 * samples and computing the center value. Then use the center
 	 * value as the Accumulator center value for subsequent measurements. It's
 	 * important to make sure that the robot is not moving while the centering
 	 * calculations are in progress, this is typically done when the robot is
@@ -82,10 +82,10 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 	}
 
 	/**
-	 * Gyro constructor with only a channel.
+	 * Gyro constructor using the channel number
 	 *
 	 * @param channel
-	 *            The analog channel the gyro is connected to.
+	 *            The analog channel the gyro is connected to. 0-3 are on-board 4-7 are on the MXP port.
 	 */
 	public Gyro(int channel) {
 		this(new AnalogInput(channel));
@@ -97,7 +97,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 	 * constructor when the analog channel needs to be shared.
 	 *
 	 * @param channel
-	 *            The AnalogChannel object that the gyro is connected to.
+	 *            The AnalogInput object that the gyro is connected to.
 	 */
 	public Gyro(AnalogInput channel) {
 		m_analog = channel;
@@ -135,9 +135,9 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 	 *
 	 * The angle is based on the current accumulator value corrected by the
 	 * oversampling rate, the gyro type and the A/D calibration values. The
-	 * angle is continuous, that is can go beyond 360 degrees. This make
+	 * angle is continuous, that is it will continue from 360 to 361 degrees. This allows
 	 * algorithms that wouldn't want to see a discontinuity in the gyro output
-	 * as it sweeps past 0 on the second time around.
+	 * as it sweeps past from 360 to 0 on the second time around.
 	 *
 	 * @return the current heading of the robot in degrees. This heading is
 	 *         based on integration of the returned rate from the gyro.
@@ -179,13 +179,13 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 	}
 
 	/**
-	 * Set the gyro type based on the sensitivity. This takes the number of
+	 * Set the gyro sensitivity. This takes the number of
 	 * volts/degree/second sensitivity of the gyro and uses it in subsequent
-	 * calculations to allow the code to work with multiple gyros.
+	 * calculations to allow the code to work with multiple gyros. This value
+	 * is typically found in the gyro datasheet.
 	 *
 	 * @param voltsPerDegreePerSecond
-	 *            The type of gyro specified as the voltage that represents one
-	 *            degree/second.
+	 *            The sensitivity in Volts/degree/second.
 	 */
 	public void setSensitivity(double voltsPerDegreePerSecond) {
 		m_voltsPerDegreePerSecond = voltsPerDegreePerSecond;
@@ -205,7 +205,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 	}
 
 	/**
-	 * Set which parameter of the encoder you are using as a process control
+	 * Set which parameter of the gyro you are using as a process control
 	 * variable. The Gyro class supports the rate and angle parameters
 	 *
 	 * @param pidSource
@@ -217,9 +217,10 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 	}
 
 	/**
-	 * Get the angle of the gyro for use with PIDControllers
+	 * Get the output of the gyro for use with PIDControllers.
+	 * May be the angle or rate depending on the set PIDSourceParameter
 	 *
-	 * @return the current angle according to the gyro
+	 * @return the output according to the gyro
 	 */
 	@Override
 	public double pidGet() {

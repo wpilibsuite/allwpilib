@@ -24,11 +24,11 @@ public class VictorSP extends SafePWM implements SpeedController {
      * the deadband or inability to saturate the controller in either direction, calibration is recommended.
      * The calibration procedure can be found in the VictorSP User Manual available from CTRE.
      *
-     *   - 2.037ms = full "forward"
-     *   - 1.539ms = the "high end" of the deadband range
-     *   - 1.513ms = center of the deadband range (off)
-     *   - 1.487ms = the "low end" of the deadband range
-     *   - .989ms = full "reverse"
+     *   - 2.004ms = full "forward"
+     *   - 1.52ms = the "high end" of the deadband range
+     *   - 1.50ms = center of the deadband range (off)
+     *   - 1.48ms = the "low end" of the deadband range
+     *   - .997ms = full "reverse"
      */
     protected void initVictorSP() {
         setBounds(2.004, 1.52, 1.50, 1.48, .997);
@@ -43,7 +43,7 @@ public class VictorSP extends SafePWM implements SpeedController {
     /**
      * Constructor.
      *
-     * @param channel The PWM channel that the VictorSP is attached to.
+     * @param channel The PWM channel that the VictorSP is attached to. 0-9 are on-board, 10-19 are on the MXP port
      */
     public VictorSP(final int channel) {
         super(channel);

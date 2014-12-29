@@ -183,7 +183,7 @@ public class DriverStation implements RobotState.Interface {
     /**
      * Read the battery voltage.
      *
-     * @return The battery voltage.
+     * @return The battery voltage in Volts.
      */
     public double getBatteryVoltage() {
         IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
@@ -193,6 +193,11 @@ public class DriverStation implements RobotState.Interface {
         return voltage;
     }
 
+	/**
+	 * Reports errors telated to unplugged joysticks
+	 * Throttles the errors so that they don't overwhelm the DS
+	 */
+	
     private void reportJoystickUnpluggedError(String message) {
         double currentTime = Timer.getFPGATimestamp();
         if (currentTime > m_nextMessageTime) {
@@ -233,9 +238,10 @@ public class DriverStation implements RobotState.Interface {
     }
 
     /**
-    *   Returns the number of axis on a given joystick port
+    * Returns the number of axes on a given joystick port
     *
     * @param stick The joystick port number
+	* @return The number of axes on the indicated joystick
     */
     public synchronized int getStickAxisCount(int stick){
 
@@ -272,6 +278,7 @@ public class DriverStation implements RobotState.Interface {
     * Returns the number of POVs on a given joystick port
     *
     * @param stick The joystick port number
+	* @return The number of POVs on the indicated joystick
     */
     public synchronized int getStickPOVCount(int stick){
 
@@ -284,7 +291,6 @@ public class DriverStation implements RobotState.Interface {
 
     /**
      * The state of the buttons on the joystick.
-     * 12 buttons (4 msb are unused) from the joystick.
      *
      * @param stick The joystick to read.
      * @return The state of the buttons on the joystick.
@@ -323,14 +329,15 @@ public class DriverStation implements RobotState.Interface {
     }
 
     /**
-    *   Gets the number of buttons on a joystick
+    * Gets the number of buttons on a joystick
     *
-    *   @param  stick the joystick port number
+    * @param  stick The joystick port number
+	* @return The number of buttons on the indicated joystick
     */
     public synchronized int getStickButtonCount(int stick){
 
         if(stick < 0 || stick >= kJoystickPorts) {
-            throw new RuntimeException("Joystick index is out of range, should be 0-3");
+            throw new RuntimeException("Joystick index is out of range, should be 0-5");
         }
         
         
@@ -389,6 +396,12 @@ public class DriverStation implements RobotState.Interface {
         return !(isAutonomous() || isTest());
     }
 	
+	/**
+     * Gets a value indicating whether the FPGA outputs are enabled. The outputs may be disabled
+	 * if the robot is disabled or e-stopped, the watdhog has expired, or if the roboRIO browns out.
+     *
+     * @return True if the FPGA outputs are enabled.
+     */
 	public boolean isSysActive() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
@@ -397,6 +410,11 @@ public class DriverStation implements RobotState.Interface {
 		return retVal;
 	}
 	
+	/**
+     * Check if the system is browned out.
+	 * 
+     * @return True if the system is browned out
+     */
 	public boolean isBrownedOut() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
@@ -484,16 +502,15 @@ public class DriverStation implements RobotState.Interface {
 		return controlWord.getDSAttached();
 	}
 
-    /**
-     * Return the approximate match time
-     * The FMS does not currently send the official match time to the robots
-     * This returns the time since the enable signal sent from the Driver Station
-     * At the beginning of autonomous, the time is reset to 0.0 seconds
-     * At the beginning of teleop, the time is reset to +15.0 seconds
-     * If the robot is disabled, this returns 0.0 seconds
-     * Warning: This is not an official time (so it cannot be used to argue with referees)
-     * @return Match time in seconds since the beginning of autonomous
-     */
+	/**
+	 * Return the approximate match time
+	 * The FMS does not send an official match time to the robots, but does send an approximate match time.
+	 * The value will count down the time remaining in the current period (auto or teleop).
+	 * Warning: This is not an official time (so it cannot be used to dispute ref calls or guarantee that a function
+	 * will trigger before the match ends)
+	 * The Practice Match function of the DS approximates the behaviour seen on the field.
+	 * @return Time remaining in current match period (auto or teleop) in seconds 
+	 */
     public double getMatchTime() {
         return FRCNetworkCommunicationsLibrary.HALGetMatchTime();
     }

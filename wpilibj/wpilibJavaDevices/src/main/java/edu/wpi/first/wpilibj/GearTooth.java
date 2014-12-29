@@ -44,8 +44,8 @@ public class GearTooth extends Counter {
     /**
      * Construct a GearTooth sensor given a channel.
      *
-     * @param channel The GPIO channel that the sensor is connected to.
-     * @param directionSensitive Enable the pulse length decoding in hardware to specify count direction.
+     * @param channel The DIO channel that the sensor is connected to. 0-9 are on-board, 10-25 are on the MXP port
+     * @param directionSensitive True to enable the pulse length decoding in hardware to specify count direction.
      */
     public GearTooth(final int channel, boolean directionSensitive) {
         super(channel);
@@ -60,10 +60,10 @@ public class GearTooth extends Counter {
 
     /**
      * Construct a GearTooth sensor given a digital input.
-     * This should be used when sharing digial inputs.
+     * This should be used when sharing digital inputs.
      *
-     * @param source An object that fully descibes the input that the sensor is connected to.
-     * @param directionSensitive Enable the pulse length decoding in hardware to specify count direction.
+     * @param source An existing DigitalSource object (such as a DigitalInput)
+     * @param directionSensitive True to enable the pulse length decoding in hardware to specify count direction.
      */
     public GearTooth(DigitalSource source, boolean directionSensitive) {
         super(source);

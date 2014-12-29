@@ -34,7 +34,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
 	 * output given a channel.
      *
 	 * @param channel
-	 *            the port to use for the digital output
+	 *            the DIO channel to use for the digital output. 0-9 are on-board, 10-25 are on the MXP
 	 */
 	public DigitalOutput(int channel) {
 		initDigitalPort(channel, false);
