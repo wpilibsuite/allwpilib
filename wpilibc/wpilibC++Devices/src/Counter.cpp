@@ -16,6 +16,7 @@
  * This creates a ChipObject counter and initializes status variables appropriately
  *
  * The counter will start counting immediately.
+ * @param mode The counter mode
  */
 void Counter::InitCounter(Mode mode)
 {
@@ -38,7 +39,7 @@ void Counter::InitCounter(Mode mode)
 
 /**
  * Create an instance of a counter where no sources are selected.
- * Then they all must be selected by calling functions to specify the upsource and the downsource
+ * They all must be selected by calling functions to specify the upsource and the downsource
  * independently.
  *
  * The counter will start counting immediately.
@@ -52,11 +53,12 @@ Counter::Counter() :
 }
 
 /**
- * Create an instance of a counter from a Digital Input.
+ * Create an instance of a counter from a Digital Source (such as a Digital Input).
  * This is used if an existing digital input is to be shared by multiple other objects such
- * as encoders.
+ * as encoders or if the Digital Source is not a Digital Input channel (such as an Analog Trigger).
  *
  * The counter will start counting immediately.
+ * @param source A pointer to the existing DigitalSource object. It will be set as the Up Source.
  */
 Counter::Counter(DigitalSource *source) :
 	m_upSource(NULL),
@@ -68,6 +70,14 @@ Counter::Counter(DigitalSource *source) :
 	ClearDownSource();
 }
 
+/**
+ * Create an instance of a counter from a Digital Source (such as a Digital Input).
+ * This is used if an existing digital input is to be shared by multiple other objects such
+ * as encoders or if the Digital Source is not a Digital Input channel (such as an Analog Trigger).
+ *
+ * The counter will start counting immediately.
+ * @param source A reference to the existing DigitalSource object. It will be set as the Up Source.
+ */
 Counter::Counter(DigitalSource &source) :
 	m_upSource(NULL),
 	m_downSource(NULL),
@@ -83,6 +93,7 @@ Counter::Counter(DigitalSource &source) :
  * Create an up-Counter instance given a channel.
  *
  * The counter will start counting immediately.
+ * @param channel The DIO channel to use as the up source. 0-9 are on-board, 10-25 are on the MXP 
  */
 Counter::Counter(int32_t channel) :
 	m_upSource(NULL),
@@ -100,6 +111,7 @@ Counter::Counter(int32_t channel) :
  * Use the trigger state output from the analog trigger.
  *
  * The counter will start counting immediately.
+ * @param trigger The pointer to the existing AnalogTrigger object.
  */
 Counter::Counter(AnalogTrigger *trigger) :
 	m_upSource(NULL),
@@ -112,6 +124,14 @@ Counter::Counter(AnalogTrigger *trigger) :
 	m_allocatedUpSource = true;
 }
 
+/**
+ * Create an instance of a Counter object.
+ * Create an instance of a simple up-Counter given an analog trigger.
+ * Use the trigger state output from the analog trigger.
+ *
+ * The counter will start counting immediately.
+ * @param trigger The reference to the existing AnalogTrigger object.
+ */
 Counter::Counter(AnalogTrigger &trigger) :
 	m_upSource(NULL),
 	m_downSource(NULL),
@@ -123,6 +143,15 @@ Counter::Counter(AnalogTrigger &trigger) :
 	m_allocatedUpSource = true;
 }
 
+/**
+ * Create an instance of a Counter object.
+ * Creates a full up-down counter given two Digital Sources
+ * @param encodingType The quadrature decoding mode (1x or 2x)
+ * @param upSource The pointer to the DigitalSource to set as the up source
+ * @param downSource The pointer to the DigitalSource to set as the down source
+ * @param inverted True to invert the output (reverse the direction)
+ */
+	
 Counter::Counter(EncodingType encodingType, DigitalSource *upSource, DigitalSource *downSource, bool inverted) :
 	m_upSource(NULL),
 	m_downSource(NULL),
@@ -178,6 +207,7 @@ Counter::~Counter()
 
 /**
  * Set the upsource for the counter as a digital input channel.
+ * @param channel The DIO channel to use as the up source. 0-9 are on-board, 10-25 are on the MXP 
  */
 void Counter::SetUpSource(int32_t channel)
 {
@@ -211,6 +241,7 @@ void Counter::SetUpSource(AnalogTrigger &analogTrigger, AnalogTriggerType trigge
 /**
  * Set the source object that causes the counter to count up.
  * Set the up counting DigitalSource.
+ * @param source Pointer to the DigitalSource object to set as the up source
  */
 void Counter::SetUpSource(DigitalSource *source)
 {
@@ -238,6 +269,7 @@ void Counter::SetUpSource(DigitalSource *source)
 /**
  * Set the source object that causes the counter to count up.
  * Set the up counting DigitalSource.
+ * @param source Reference to the DigitalSource object to set as the up source
  */
 void Counter::SetUpSource(DigitalSource &source)
 {
@@ -246,7 +278,9 @@ void Counter::SetUpSource(DigitalSource &source)
 
 /**
  * Set the edge sensitivity on an up counting source.
- * Set the up source to either detect rising edges or falling edges.
+ * Set the up source to either detect rising edges or falling edges or both.
+ * @param risingEdge True to trigger on rising edges
+ * @param fallingEdge True to trigger on falling edges
  */
 void Counter::SetUpSourceEdge(bool risingEdge, bool fallingEdge)
 {
@@ -279,6 +313,7 @@ void Counter::ClearUpSource()
 
 /**
  * Set the down counting source to be a digital input channel.
+ * @param channel The DIO channel to use as the up source. 0-9 are on-board, 10-25 are on the MXP 
  */
 void Counter::SetDownSource(int32_t channel)
 {
@@ -312,6 +347,7 @@ void Counter::SetDownSource(AnalogTrigger &analogTrigger, AnalogTriggerType trig
 /**
  * Set the source object that causes the counter to count down.
  * Set the down counting DigitalSource.
+ * @param source Pointer to the DigitalSource object to set as the down source
  */
 void Counter::SetDownSource(DigitalSource *source)
 {
@@ -339,6 +375,7 @@ void Counter::SetDownSource(DigitalSource *source)
 /**
  * Set the source object that causes the counter to count down.
  * Set the down counting DigitalSource.
+ * @param source Reference to the DigitalSource object to set as the down source
  */
 void Counter::SetDownSource(DigitalSource &source)
 {
@@ -348,6 +385,8 @@ void Counter::SetDownSource(DigitalSource &source)
 /**
  * Set the edge sensitivity on a down counting source.
  * Set the down source to either detect rising edges or falling edges.
+ * @param risingEdge True to trigger on rising edges
+ * @param fallingEdge True to trigger on falling edges
  */
 void Counter::SetDownSourceEdge(bool risingEdge, bool fallingEdge)
 {
@@ -486,11 +525,11 @@ void Counter::Reset()
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
-/*
+/**
  * Get the Period of the most recent count.
  * Returns the time interval of the most recent count. This can be used for velocity calculations
  * to determine shaft speed.
- * @returns The period of the last two pulses in units of seconds.
+ * @returns The period between the last two pulses in units of seconds.
  */
 double Counter::GetPeriod()
 {
@@ -527,6 +566,7 @@ void Counter::SetMaxPeriod(double maxPeriod)
  * output (except when there have been no events since an FPGA reset) and you will likely not
  * see the stopped bit become true (since it is updated at the end of an average and there are
  * no samples to average).
+ * @param enabled True to enable update when empty
  */
 void Counter::SetUpdateWhenEmpty(bool enabled)
 {

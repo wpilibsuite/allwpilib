@@ -116,6 +116,7 @@ void DriverStation::Run()
 
 /**
  * Return a pointer to the singleton DriverStation.
+ * @return Pointer to the DS instance
  */
 DriverStation* DriverStation::GetInstance()
 {
@@ -146,7 +147,7 @@ void DriverStation::GetData()
 /**
  * Read the battery voltage.
  *
- * @return The battery voltage.
+ * @return The battery voltage in Volts.
  */
 float DriverStation::GetBatteryVoltage()
 {
@@ -157,6 +158,10 @@ float DriverStation::GetBatteryVoltage()
 	return voltage;
 }
 
+/**
+ * Reports errors related to unplugged joysticks
+ * Throttles the errors so that they don't overwhelm the DS
+ */
 void DriverStation::ReportJoystickUnpluggedError(std::string message) {
 	double currentTime = Timer::GetFPGATimestamp();
 	if (currentTime > m_nextMessageTime) {
@@ -165,10 +170,11 @@ void DriverStation::ReportJoystickUnpluggedError(std::string message) {
 	}
 }
 
-/**	Returns the number of axis on a given joystick port
+/**	
+ * Returns the number of axes on a given joystick port
  *
  * @param stick The joystick port number
- * @return the number of axis on the indicated joystick
+ * @return The number of axes on the indicated joystick
  */
 int DriverStation::GetStickAxisCount(uint32_t stick)
 {
@@ -182,10 +188,11 @@ int DriverStation::GetStickAxisCount(uint32_t stick)
    	return joystickAxes.count;
 }
 
-/**	Returns the number of POVs on a given joystick port
+/**	
+ * Returns the number of POVs on a given joystick port
  *
  * @param stick The joystick port number
- * @return thenumber of POVs on the indicated joystick
+ * @return The number of POVs on the indicated joystick
  */
 int DriverStation::GetStickPOVCount(uint32_t stick)
 {
@@ -199,7 +206,8 @@ int DriverStation::GetStickPOVCount(uint32_t stick)
    	return joystickPOVs.count;
 }
 
-/**	Returns the number of buttons on a given joystick port
+/**	
+ * Returns the number of buttons on a given joystick port
  *
  * @param stick The joystick port number
  * @return The number of buttons on the indicated joystick
@@ -322,6 +330,10 @@ bool DriverStation::GetStickButton(uint32_t stick, uint8_t button)
 	return ((0x1 << (button-1)) & m_joystickButtons[stick].buttons) !=0;
 }
 
+/**
+ * Check if the DS has enabled the robot
+ * @return True if the robot is enabled and the DS is connected
+ */
 bool DriverStation::IsEnabled()
 {
 	HALControlWord controlWord;
@@ -330,6 +342,10 @@ bool DriverStation::IsEnabled()
 	return controlWord.enabled && controlWord.dsAttached;
 }
 
+/**
+ * Check if the robot is disabled
+ * @return True if the robot is explicitly disabled or the DS is not connected
+ */
 bool DriverStation::IsDisabled()
 {
 	HALControlWord controlWord;
@@ -338,6 +354,10 @@ bool DriverStation::IsDisabled()
 	return !(controlWord.enabled && controlWord.dsAttached);
 }
 
+/**
+ * Check if the DS is commanding autonomous mode
+ * @return True if the robot is being commanded to be in autonomous mode
+ */
 bool DriverStation::IsAutonomous()
 {
 	HALControlWord controlWord;
@@ -346,6 +366,10 @@ bool DriverStation::IsAutonomous()
 	return controlWord.autonomous;
 }
 
+/**
+ * Check if the DS is commanding teleop mode
+ * @return True if the robot is being commanded to be in teleop mode
+ */
 bool DriverStation::IsOperatorControl()
 {
 	HALControlWord controlWord;
@@ -354,6 +378,10 @@ bool DriverStation::IsOperatorControl()
 	return !(controlWord.autonomous || controlWord.test);
 }
 
+/**
+ * Check if the DS is commanding test mode
+ * @return True if the robot is being commanded to be in test mode
+ */
 bool DriverStation::IsTest()
 {
 	HALControlWord controlWord;
@@ -361,6 +389,10 @@ bool DriverStation::IsTest()
 	return controlWord.test;
 }
 
+/**
+ * Check if the DS is attached
+ * @return True if the DS is connected to the robot
+ */
 bool DriverStation::IsDSAttached()
 {
 	HALControlWord controlWord;
@@ -369,6 +401,11 @@ bool DriverStation::IsDSAttached()
 	return controlWord.dsAttached;
 }
 
+/**
+ * Check if the FPGA outputs are enabled. The outputs may be disabled if the robot is disabled
+ * or e-stopped, the watchdog has expired, or if the roboRIO browns out.
+ * @return True if the FPGA outputs are enabled.
+ */
 bool DriverStation::IsSysActive()
 {
 	int32_t status = 0;
@@ -377,6 +414,10 @@ bool DriverStation::IsSysActive()
 	return retVal;
 }
 
+/**
+ * Check if the system is browned out.
+ * @return True if the system is browned out
+ */
 bool DriverStation::IsSysBrownedOut()
 {
 	int32_t status = 0;
@@ -388,7 +429,7 @@ bool DriverStation::IsSysBrownedOut()
 /**
  * Has a new control packet from the driver station arrived since the last time this function was called?
  * Warning: If you call this function from more than one place at the same time,
- * you will not get the get the intended behavior
+ * you will not get the get the intended behaviour.
  * @return True if the control data has been updated since the last call.
  */
 bool DriverStation::IsNewControlData()
@@ -398,7 +439,6 @@ bool DriverStation::IsNewControlData()
 
 /**
  * Is the driver station attached to a Field Management System?
- * Note: This does not work with the Blue DS.
  * @return True if the robot is competing on a field being controlled by a Field Management System
  */
 bool DriverStation::IsFMSAttached()
@@ -411,7 +451,7 @@ bool DriverStation::IsFMSAttached()
 /**
  * Return the alliance that the driver station says it is on.
  * This could return kRed or kBlue
- * @return The Alliance enum
+ * @return The Alliance enum (kRed, kBlue or kInvalid)
  */
 DriverStation::Alliance DriverStation::GetAlliance()
 {
@@ -435,7 +475,7 @@ DriverStation::Alliance DriverStation::GetAlliance()
 /**
  * Return the driver station location on the field
  * This could return 1, 2, or 3
- * @return The location of the driver station
+ * @return The location of the driver station (1-3, 0 for invalid)
  */
 uint32_t DriverStation::GetLocation()
 {
@@ -469,13 +509,12 @@ void DriverStation::WaitForData()
 
 /**
  * Return the approximate match time
- * The FMS does not currently send the official match time to the robots
- * This returns the time since the enable signal sent from the Driver Station
- * At the beginning of autonomous, the time is reset to 0.0 seconds
- * At the beginning of teleop, the time is reset to +15.0 seconds
- * If the robot is disabled, this returns 0.0 seconds
- * Warning: This is not an official time (so it cannot be used to argue with referees)
- * @return Match time in seconds since the beginning of autonomous
+ * The FMS does not send an official match time to the robots, but does send an approximate match time.
+ * The value will count down the time remaining in the current period (auto or teleop).
+ * Warning: This is not an official time (so it cannot be used to dispute ref calls or guarantee that a function
+ * will trigger before the match ends)
+ * The Practice Match function of the DS approximates the behaviour seen on the field.
+ * @return Time remaining in current match period (auto or teleop)
  */
 double DriverStation::GetMatchTime()
 {

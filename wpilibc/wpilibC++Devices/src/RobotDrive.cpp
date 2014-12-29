@@ -43,12 +43,13 @@ void RobotDrive::InitRobotDrive() {
 	m_safetyHelper->SetSafetyEnabled(true);
 }
 
-/** Constructor for RobotDrive with 2 motors specified with channel numbers.
+/** 
+ * Constructor for RobotDrive with 2 motors specified with channel numbers.
  * Set up parameters for a two wheel drive system where the
  * left and right motor pwm channels are specified in the call.
  * This call assumes Talons for controlling the motors.
- * @param leftMotorChannel The PWM channel number that drives the left motor.
- * @param rightMotorChannel The PWM channel number that drives the right motor.
+ * @param leftMotorChannel The PWM channel number that drives the left motor. 0-9 are on-board, 10-19 are on the MXP port
+ * @param rightMotorChannel The PWM channel number that drives the right motor. 0-9 are on-board, 10-19 are on the MXP port
  */
 RobotDrive::RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel)
 {
@@ -68,10 +69,10 @@ RobotDrive::RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel)
  * Set up parameters for a four wheel drive system where all four motor
  * pwm channels are specified in the call.
  * This call assumes Talons for controlling the motors.
- * @param frontLeftMotor Front left motor channel number
- * @param rearLeftMotor Rear Left motor channel number
- * @param frontRightMotor Front right motor channel number
- * @param rearRightMotor Rear Right motor channel number
+ * @param frontLeftMotor Front left motor channel number. 0-9 are on-board, 10-19 are on the MXP port
+ * @param rearLeftMotor Rear Left motor channel number. 0-9 are on-board, 10-19 are on the MXP port
+ * @param frontRightMotor Front right motor channel number. 0-9 are on-board, 10-19 are on the MXP port
+ * @param rearRightMotor Rear Right motor channel number. 0-9 are on-board, 10-19 are on the MXP port
  */
 RobotDrive::RobotDrive(uint32_t frontLeftMotor, uint32_t rearLeftMotor,
 		uint32_t frontRightMotor, uint32_t rearRightMotor)
@@ -94,7 +95,7 @@ RobotDrive::RobotDrive(uint32_t frontLeftMotor, uint32_t rearLeftMotor,
  * The SpeedController version of the constructor enables programs to use the RobotDrive classes with
  * subclasses of the SpeedController objects, for example, versions with ramping or reshaping of
  * the curve to suit motor bias or deadband elimination.
- * @param leftMotor The left SpeedController object used to drive the robot.
+ * @param leftMotor The left SpeedController object used to drive the robot. 
  * @param rightMotor the right SpeedController object used to drive the robot.
  */
 RobotDrive::RobotDrive(SpeedController *leftMotor, SpeedController *rightMotor)

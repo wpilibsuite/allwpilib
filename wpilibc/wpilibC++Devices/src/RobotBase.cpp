@@ -123,6 +123,8 @@ bool RobotBase::IsTest()
 /**
  * This hook is called right before startCompetition(). By default, tell the DS that the robot is now ready to
  * be enabled. If you don't want for the robot to be enabled yet, you can override this method to do nothing.
+ * If you do so, you will need to call HALNetworkCommunicationObserveUserProgramStarting() from your code when
+ * you are ready for the robot to be enabled.
  */
 void RobotBase::Prestart()
 {

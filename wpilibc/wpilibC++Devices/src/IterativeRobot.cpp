@@ -44,10 +44,7 @@ void IterativeRobot::Prestart() {
 /**
  * Provide an alternate "main loop" via StartCompetition().
  * 
- * This specific StartCompetition() implements "main loop" behavior like that of the FRC
- * control system in 2008 and earlier, with a primary (slow) loop that is
- * called periodically, and a "fast loop" (a.k.a. "spin loop") that is 
- * called as fast as possible with no delay between calls. 
+ * This specific StartCompetition() implements "main loop" behaviour synced with the DS packets
  */
 void IterativeRobot::StartCompetition()
 {

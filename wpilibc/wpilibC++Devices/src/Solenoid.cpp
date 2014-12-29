@@ -42,9 +42,9 @@ void Solenoid::InitSolenoid()
 }
 
 /**
- * Constructor.
+ * Constructor using the default PCM ID (0).
  *
- * @param channel The channel on the solenoid module to control (1..8).
+ * @param channel The channel on the PCM to control (0..7).
  */
 Solenoid::Solenoid(uint32_t channel)
 	: SolenoidBase (GetDefaultSolenoidModule())
@@ -56,8 +56,8 @@ Solenoid::Solenoid(uint32_t channel)
 /**
  * Constructor.
  *
- * @param moduleNumber The solenoid module (1 or 2).
- * @param channel The channel on the solenoid module to control (1..8).
+ * @param moduleNumber The CAN ID of the PCM the solenoid is attached to
+ * @param channel The channel on the PCM to control (0..7).
  */
 Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel)
 	: SolenoidBase (moduleNumber)

@@ -28,10 +28,10 @@ void Wait(double seconds)
 	delaySeconds(seconds);
 }
 
-/*
+/**
  * Return the FPGA system clock time in seconds.
  * This is deprecated and just forwards to Timer::GetFPGATimestamp().
- * @returns Robot running time in seconds.
+ * @return Robot running time in seconds.
  */
 double GetClock()
 {
@@ -80,7 +80,7 @@ Timer::~Timer()
  * the current system clock the start time stored in the timer class. If the clock
  * is not running, then return the time when it was last stopped.
  *
- * @return unsigned Current time value for this timer in seconds
+ * @return Current time value for this timer in seconds
  */
 double Timer::Get()
 {
@@ -158,7 +158,7 @@ void Timer::Stop()
  * work without drifting later by the time it took to get around to checking.
  *
  * @param period The period to check for (in seconds).
- * @return If the period has passed.
+ * @return True if the period has passed.
  */
 bool Timer::HasPeriodPassed(double period)
 {
@@ -166,14 +166,14 @@ bool Timer::HasPeriodPassed(double period)
 	{
 		Synchronized sync(m_semaphore);
 		// Advance the start time by the period.
-		// Don't set it to the current time... we want to avoid drift.
 		m_startTime += period;
+		// Don't set it to the current time... we want to avoid drift.
 		return true;
 	}
 	return false;
 }
 
-/*
+/**
  * Return the FPGA system clock time in seconds.
  *
  * Return the time from the FPGA hardware clock in seconds since the FPGA

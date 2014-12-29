@@ -23,8 +23,8 @@ void AnalogAccelerometer::InitAccelerometer()
 
 /**
  * Create a new instance of an accelerometer.
- *
  * The constructor allocates desired analog input.
+ * @param channel The channel number for the analog input the accelerometer is connected to
  */
 AnalogAccelerometer::AnalogAccelerometer(int32_t channel)
 {
@@ -38,6 +38,7 @@ AnalogAccelerometer::AnalogAccelerometer(int32_t channel)
  * Make a new instance of accelerometer given an AnalogInput. This is particularly
  * useful if the port is going to be read as an analog channel as well as through
  * the Accelerometer class.
+ * @param channel The existing AnalogInput object for the analog input the accelerometer is connected to
  */
 AnalogAccelerometer::AnalogAccelerometer(AnalogInput *channel)
 {
@@ -80,7 +81,7 @@ float AnalogAccelerometer::GetAcceleration()
  * Set the accelerometer sensitivity.
  *
  * This sets the sensitivity of the accelerometer used for calculating the acceleration.
- * The sensitivity varys by accelerometer model. There are constants defined for various models.
+ * The sensitivity varies by accelerometer model. There are constants defined for various models.
  *
  * @param sensitivity The sensitivity of accelerometer in Volts per G.
  */
@@ -92,7 +93,7 @@ void AnalogAccelerometer::SetSensitivity(float sensitivity)
 /**
  * Set the voltage that corresponds to 0 G.
  *
- * The zero G voltage varys by accelerometer model. There are constants defined for various models.
+ * The zero G voltage varies by accelerometer model. There are constants defined for various models.
  *
  * @param zero The zero G voltage.
  */

@@ -40,7 +40,7 @@ void DigitalInput::InitDigitalInput(uint32_t channel)
  * Create an instance of a Digital Input class.
  * Creates a digital input given a channel.
  *
- * @param channel The digital channel (0..19).
+ * @param channel The DIO channel 0-9 are on-board, 10-25 are on the MXP port
  */
 DigitalInput::DigitalInput(uint32_t channel)
 {
@@ -67,7 +67,7 @@ DigitalInput::~DigitalInput()
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
-/*
+/**
  * Get the value from a digital input channel.
  * Retrieve the value of a single digital input channel from the FPGA.
  */

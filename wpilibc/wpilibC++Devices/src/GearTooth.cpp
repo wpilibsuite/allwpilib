@@ -23,8 +23,8 @@ void GearTooth::EnableDirectionSensing(bool directionSensitive)
 /**
  * Construct a GearTooth sensor given a channel.
  *
- * @param channel The GPIO channel that the sensor is connected to.
- * @param directionSensitive Enable the pulse length decoding in hardware to specify count direction.
+ * @param channel The DIO channel that the sensor is connected to. 0-9 are on-board, 10-25 are on the MXP.
+ * @param directionSensitive True to enable the pulse length decoding in hardware to specify count direction.
  */
 GearTooth::GearTooth(uint32_t channel, bool directionSensitive)
 	: Counter(channel)
@@ -35,10 +35,10 @@ GearTooth::GearTooth(uint32_t channel, bool directionSensitive)
 
 /**
  * Construct a GearTooth sensor given a digital input.
- * This should be used when sharing digial inputs.
+ * This should be used when sharing digital inputs.
  *
- * @param source An object that fully descibes the input that the sensor is connected to.
- * @param directionSensitive Enable the pulse length decoding in hardware to specify count direction.
+ * @param source A pointer to the existing DigitalSource object (such as a DigitalInput)
+ * @param directionSensitive True to enable the pulse length decoding in hardware to specify count direction.
  */
 GearTooth::GearTooth(DigitalSource *source, bool directionSensitive)
 	: Counter(source)
@@ -46,6 +46,13 @@ GearTooth::GearTooth(DigitalSource *source, bool directionSensitive)
 	EnableDirectionSensing(directionSensitive);
 }
 
+/**
+ * Construct a GearTooth sensor given a digital input.
+ * This should be used when sharing digital inputs.
+ *
+ * @param source A reference to the existing DigitalSource object (such as a DigitalInput)
+ * @param directionSensitive True to enable the pulse length decoding in hardware to specify count direction.
+ */
 GearTooth::GearTooth(DigitalSource &source, bool directionSensitive): Counter(source)
 {
 	EnableDirectionSensing(directionSensitive);

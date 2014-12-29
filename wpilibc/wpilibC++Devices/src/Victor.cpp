@@ -14,15 +14,15 @@
  *
  * Note that the Victor uses the following bounds for PWM values.  These values were determined
  * empirically and optimized for the Victor 888. These values should work reasonably well for
- * Victor 884 controllers as well but if users experience issues such as asymmetric behavior around
+ * Victor 884 controllers as well but if users experience issues such as asymmetric behaviour around
  * the deadband or inability to saturate the controller in either direction, calibration is recommended.
  * The calibration procedure can be found in the Victor 884 User Manual available from IFI.
  *
- *   - 206 = full "forward"
- *   - 131 = the "high end" of the deadband range
- *   - 128 = center of the deadband range (off)
- *   - 125 = the "low end" of the deadband range
- *   - 56 = full "reverse"
+ *   2.027ms = full "forward"
+ *   1.525ms = the "high end" of the deadband range
+ *   1.507ms = center of the deadband range (off)
+ *   1.49ms = the "low end" of the deadband range
+ *   1.026ms = full "reverse"
  */
 void Victor::InitVictor() {
 	SetBounds(2.027, 1.525, 1.507, 1.49, 1.026);
@@ -36,7 +36,8 @@ void Victor::InitVictor() {
 }
 
 /**
- * @param channel The PWM channel that the Victor is attached to.
+ * Constructor for a Victor
+ * @param channel The PWM channel number that the Victor is attached to. 0-9 are on-board, 10-19 are on the MXP port
  */
 Victor::Victor(uint32_t channel) : SafePWM(channel)
 {

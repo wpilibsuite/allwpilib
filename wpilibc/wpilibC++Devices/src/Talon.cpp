@@ -17,11 +17,11 @@
  * the deadband or inability to saturate the controller in either direction, calibration is recommended.
  * The calibration procedure can be found in the Talon User Manual available from CTRE.
  *
- *   - 211 = full "forward"
- *   - 133 = the "high end" of the deadband range
- *   - 129 = center of the deadband range (off)
- *   - 125 = the "low end" of the deadband range
- *   - 49 = full "reverse"
+ *   2.037ms = full "forward"
+ *   1.539ms = the "high end" of the deadband range
+ *   1.513ms = center of the deadband range (off)
+ *   1.487ms = the "low end" of the deadband range
+ *   0.989ms = full "reverse"
  */
 void Talon::InitTalon() {
 	SetBounds(2.037, 1.539, 1.513, 1.487, .989);
@@ -34,7 +34,8 @@ void Talon::InitTalon() {
 }
 
 /**
- * @param channel The PWM channel that the Talon is attached to.
+ * Constructor for a Talon (original or Talon SR)
+ * @param channel The PWM channel number that the Talon is attached to. 0-9 are on-board, 10-19 are on the MXP port
  */
 Talon::Talon(uint32_t channel) : SafePWM(channel)
 {

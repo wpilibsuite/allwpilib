@@ -56,7 +56,7 @@ MotorSafetyHelper::~MotorSafetyHelper()
 	}
 }
 
-/*
+/**
  * Feed the motor safety object.
  * Resets the timer on this object that is used to do the timeouts.
  */
@@ -66,7 +66,7 @@ void MotorSafetyHelper::Feed()
 	m_stopTime = Timer::GetFPGATimestamp() + m_expiration;
 }
 
-/*
+/**
  * Set the expiration time for the corresponding motor safety object.
  * @param expirationTime The timeout value in seconds.
  */
@@ -78,7 +78,7 @@ void MotorSafetyHelper::SetExpiration(float expirationTime)
 
 /**
  * Retrieve the timeout value for the corresponding motor safety object.
- * @returns the timeout value in seconds.
+ * @return the timeout value in seconds.
  */
 float MotorSafetyHelper::GetExpiration()
 {
@@ -88,7 +88,7 @@ float MotorSafetyHelper::GetExpiration()
 
 /**
  * Determine if the motor is still operating or has timed out.
- * @returns a true value if the motor is still operating normally and hasn't timed out.
+ * @return a true value if the motor is still operating normally and hasn't timed out.
  */
 bool MotorSafetyHelper::IsAlive()
 {
@@ -133,7 +133,7 @@ void MotorSafetyHelper::SetSafetyEnabled(bool enabled)
 /**
  * Return the state of the motor safety enabled flag
  * Return if the motor safety is currently enabled for this devicce.
- * @returns True if motor safety is enforced for this device
+ * @return True if motor safety is enforced for this device
  */
 bool MotorSafetyHelper::IsSafetyEnabled()
 {

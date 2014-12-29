@@ -13,10 +13,14 @@
  * Common initialization code called by all constructors.
  *
  * Note that the TalonSRX uses the following bounds for PWM values. These values should work reasonably well for
- * most controllers, but if users experience issues such as asymmetric behavior around
+ * most controllers, but if users experience issues such as asymmetric behaviour around
  * the deadband or inability to saturate the controller in either direction, calibration is recommended.
  * The calibration procedure can be found in the TalonSRX User Manual available from Cross The Road Electronics.
- *
+ *   2.004ms = full "forward"
+ *   1.52ms = the "high end" of the deadband range
+ *   1.50ms = center of the deadband range (off)
+ *   1.48ms = the "low end" of the deadband range
+ *   0.997ms = full "reverse"
  */
 void TalonSRX::InitTalonSRX() {
 	SetBounds(2.004, 1.52, 1.50, 1.48, .997);
@@ -29,7 +33,8 @@ void TalonSRX::InitTalonSRX() {
 }
 
 /**
- * @param channel The PWM channel that the TalonSRX is attached to.
+ * Construct a TalonSRX connected via PWM
+ * @param channel The PWM channel that the TalonSRX is attached to. 0-9 are on-board, 10-19 are on the MXP port
  */
 TalonSRX::TalonSRX(uint32_t channel) : SafePWM(channel)
 {

@@ -10,7 +10,7 @@
 #include "LiveWindow/LiveWindow.h"
 
 /**
- * Common function to implement constructor behavior.
+ * Common function to implement constructor behaviour.
  */
 void DoubleSolenoid::InitSolenoid()
 {
@@ -59,9 +59,9 @@ void DoubleSolenoid::InitSolenoid()
 
 /**
  * Constructor.
- *
- * @param forwardChannel The forward channel on the module to control.
- * @param reverseChannel The reverse channel on the module to control.
+ * Uses the default PCM ID of 0
+ * @param forwardChannel The forward channel number on the PCM.
+ * @param reverseChannel The reverse channel number on the PCM.
  */
 DoubleSolenoid::DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel)
 	: SolenoidBase (GetDefaultSolenoidModule())
@@ -101,7 +101,7 @@ DoubleSolenoid::~DoubleSolenoid()
 /**
  * Set the value of a solenoid.
  *
- * @param value Move the solenoid to forward, reverse, or don't move it.
+ * @param value The value to set (Off, Forward or Reverse)
  */
 void DoubleSolenoid::Set(Value value)
 {

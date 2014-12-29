@@ -32,7 +32,7 @@ void Servo::InitServo()
 }
 
 /**
- * @param channel The PWM channel to which the servo is attached.
+ * @param channel The PWM channel to which the servo is attached. 0-9 are on-board, 10-19 are on the MXP port
  */
 Servo::Servo(uint32_t channel) : SafePWM(channel)
 {

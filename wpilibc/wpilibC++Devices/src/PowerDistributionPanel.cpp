@@ -15,6 +15,7 @@ PowerDistributionPanel::PowerDistributionPanel() {
 }
 
 /**
+ * Query the input voltage of the PDP
  * @return The voltage of the PDP
  */
 double
@@ -31,6 +32,7 @@ PowerDistributionPanel::GetVoltage() {
 }
 
 /**
+ * Query the temperature of the PDP
  * @return The temperature of the PDP in degrees Celsius
  */
 double
@@ -47,6 +49,7 @@ PowerDistributionPanel::GetTemperature() {
 }
 
 /**
+ * Query the current of a single channel of the PDP
  * @return The current of one of the PDP channels (channels 0-15) in Amperes
  */
 double
@@ -70,6 +73,7 @@ PowerDistributionPanel::GetCurrent(uint8_t channel) {
 }
 
 /**
+ * Query the total current of all monitored PDP channels (0-15)
  * @return The the total current drawn from the PDP channels in Amperes
  */
 double
@@ -86,6 +90,7 @@ PowerDistributionPanel::GetTotalCurrent() {
 }
 
 /**
+ * Query the total power drawn from the monitored PDP channels
  * @return The the total power drawn from the PDP channels in Joules
  */
 double
@@ -102,6 +107,7 @@ PowerDistributionPanel::GetTotalPower() {
 }
 
 /**
+ * Query the total energy drawn from the monitored PDP channels
  * @return The the total energy drawn from the PDP channels in Watts
  */
 double

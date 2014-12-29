@@ -19,8 +19,8 @@ constexpr float Gyro::kDefaultVoltsPerDegreePerSecond;
 
 /**
  * Initialize the gyro.
- * Calibrate the gyro by running for a number of samples and computing the center value for this
- * part. Then use the center value as the Accumulator center value for subsequent measurements.
+ * Calibrate the gyro by running for a number of samples and computing the center value. 
+ * Then use the center value as the Accumulator center value for subsequent measurements.
  * It's important to make sure that the robot is not moving while the centering calculations are
  * in progress, this is typically done when the robot is first turned on while it's sitting at
  * rest before the competition starts.
@@ -71,9 +71,9 @@ void Gyro::InitGyro()
 }
 
 /**
- * Gyro constructor with only a channel..
+ * Gyro constructor using the channel number.
  *
- * @param channel The analog channel the gyro is connected to.
+ * @param channel The analog channel the gyro is connected to. 0-3 are on-board, 4-7 are on the MXP.
  */
 Gyro::Gyro(int32_t channel)
 {
@@ -83,10 +83,10 @@ Gyro::Gyro(int32_t channel)
 }
 
 /**
- * Gyro constructor with a precreated analog channel object.
- * Use this constructor when the analog channel needs to be shared. There
- * is no reference counting when an AnalogInput is passed to the gyro.
- * @param channel The AnalogInput object that the gyro is connected to.
+ * Gyro constructor with a precreated AnalogInput object.
+ * Use this constructor when the analog channel needs to be shared.
+ * This object will not clean up the AnalogInput object when using this constructor
+ * @param channel A pointer to the AnalogInput object that the gyro is connected to.
  */
 Gyro::Gyro(AnalogInput *channel)
 {
@@ -102,6 +102,12 @@ Gyro::Gyro(AnalogInput *channel)
 	}
 }
 
+/**
+ * Gyro constructor with a precreated AnalogInput object.
+ * Use this constructor when the analog channel needs to be shared.
+ * This object will not clean up the AnalogInput object when using this constructor
+ * @param channel A reference to the AnalogInput object that the gyro is connected to.
+ */
 Gyro::Gyro(AnalogInput &channel)
 {
 	m_analog = &channel;
@@ -133,8 +139,8 @@ Gyro::~Gyro()
  *
  * The angle is based on the current accumulator value corrected by the oversampling rate, the
  * gyro type and the A/D calibration values.
- * The angle is continuous, that is can go beyond 360 degrees. This make algorithms that wouldn't
- * want to see a discontinuity in the gyro output as it sweeps past 0 on the second time around.
+ * The angle is continuous, that is it will continue from 360->361 degrees. This allows algorithms that wouldn't
+ * want to see a discontinuity in the gyro output as it sweeps from 360 to 0 on the second time around.
  *
  * @return the current heading of the robot in degrees. This heading is based on integration
  * of the returned rate from the gyro.
@@ -169,11 +175,12 @@ double Gyro::GetRate( void )
 
 
 /**
- * Set the gyro type based on the sensitivity.
+ * Set the gyro sensitivity.
  * This takes the number of volts/degree/second sensitivity of the gyro and uses it in subsequent
- * calculations to allow the code to work with multiple gyros.
+ * calculations to allow the code to work with multiple gyros. This value is typically found in 
+ * the gyro datasheet.
  *
- * @param voltsPerDegreePerSecond The type of gyro specified as the voltage that represents one degree/second.
+ * @param voltsPerDegreePerSecond The sensitivity in Volts/degree/second
  */
 void Gyro::SetSensitivity( float voltsPerDegreePerSecond )
 {
@@ -193,6 +200,11 @@ void Gyro::SetDeadband( float volts ) {
 	m_analog->SetAccumulatorDeadband(deadband);
 }
 
+
+/**
+ * Sets the type of output to use with the WPILib PID class
+ * The gyro supports using either rate or angle for PID calculations
+ */
 void Gyro::SetPIDSourceParameter(PIDSourceParameter pidSource)
 {
 	if(pidSource == 0 || pidSource > 2)
@@ -201,9 +213,10 @@ void Gyro::SetPIDSourceParameter(PIDSourceParameter pidSource)
 }
 
 /**
- * Get the angle in degrees for the PIDSource base object.
+ * Get the PIDOutput for the PIDSource base object. Can be set to return
+ * angle or rate using SetPIDSourceParameter(). Defaults to angle.
  *
- * @return The angle in degrees.
+ * @return The PIDOutput (angle or rate, defaults to angle)
  */
 double Gyro::PIDGet()
 {
