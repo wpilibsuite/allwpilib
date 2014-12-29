@@ -85,7 +85,8 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 	 * Gyro constructor using the channel number
 	 *
 	 * @param channel
-	 *            The analog channel the gyro is connected to. 0-3 are on-board 4-7 are on the MXP port.
+	 *            The analog channel the gyro is connected to. Gyros can only 
+                  be used on on-board channels 0-1.
 	 */
 	public Gyro(int channel) {
 		this(new AnalogInput(channel));
@@ -97,7 +98,8 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 	 * constructor when the analog channel needs to be shared.
 	 *
 	 * @param channel
-	 *            The AnalogInput object that the gyro is connected to.
+	 *            The AnalogInput object that the gyro is connected to. Gyros 
+	              can only be used on on-board channels 0-1.
 	 */
 	public Gyro(AnalogInput channel) {
 		m_analog = channel;

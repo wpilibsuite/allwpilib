@@ -71,9 +71,10 @@ void Gyro::InitGyro()
 }
 
 /**
- * Gyro constructor using the channel number.
+ * Gyro constructor using the Analog Input channel number.
  *
- * @param channel The analog channel the gyro is connected to. 0-3 are on-board, 4-7 are on the MXP.
+ * @param channel The analog channel the gyro is connected to. Gyros 
+	              can only be used on on-board Analog Inputs 0-1.
  */
 Gyro::Gyro(int32_t channel)
 {
@@ -85,7 +86,8 @@ Gyro::Gyro(int32_t channel)
 /**
  * Gyro constructor with a precreated AnalogInput object.
  * Use this constructor when the analog channel needs to be shared.
- * This object will not clean up the AnalogInput object when using this constructor
+ * This object will not clean up the AnalogInput object when using this constructor. 
+ * Gyros can only be used on on-board channels 0-1.
  * @param channel A pointer to the AnalogInput object that the gyro is connected to.
  */
 Gyro::Gyro(AnalogInput *channel)

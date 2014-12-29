@@ -194,10 +194,9 @@ public class DriverStation implements RobotState.Interface {
     }
 
 	/**
-	 * Reports errors telated to unplugged joysticks
+	 * Reports errors related to unplugged joysticks
 	 * Throttles the errors so that they don't overwhelm the DS
 	 */
-	
     private void reportJoystickUnpluggedError(String message) {
         double currentTime = Timer.getFPGATimestamp();
         if (currentTime > m_nextMessageTime) {

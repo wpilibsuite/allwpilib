@@ -29,7 +29,7 @@ import edu.wpi.first.wpilibj.hal.HALUtil;
  * Changes are immediately sent to the FPGA, and the update occurs at the next
  * FPGA cycle. There is no delay.
  *
- * As of revision 0.1.10 of the FPGA, the FPGA interprets the 0-255 values as follows:
+ * As of revision 0.1.10 of the FPGA, the FPGA interprets the 0-2000 values as follows:
  *   - 2000 = maximum pulse width
  *   - 1999 to 1001 = linear scaling from "full forward" to "center"
  *   - 1000 = center value
