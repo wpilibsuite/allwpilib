@@ -70,7 +70,7 @@ public class AnalogTrigger {
 	 * Constructor for an analog trigger given a channel number.
 	 *
 	 * @param channel
-	 *            the port to use for the analog trigger
+	 *            the port to use for the analog trigger 0-3 are on-board, 4-7 are on the MXP port
 	 */
 	public AnalogTrigger(final int channel) {
 		initTrigger(channel);

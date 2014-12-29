@@ -53,7 +53,7 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer {
 
 	/**
 	 * Constructor.
-	 *
+	 * @param port The I2C port the accelerometer is attached to
 	 * @param range The range (+ or -) that the accelerometer will measure.
 	 */
 	public ADXL345_I2C(I2C.Port port, Range range) {
@@ -132,7 +132,7 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer {
 	/**
 	 * Get the acceleration of all axes in Gs.
 	 *
-	 * @return Acceleration measured on all axes of the ADXL345 in Gs.
+	 * @return An object containing the acceleration measured on each axis of the ADXL345 in Gs.
 	 */
 	public AllAxes getAccelerations() {
 		AllAxes data = new AllAxes();

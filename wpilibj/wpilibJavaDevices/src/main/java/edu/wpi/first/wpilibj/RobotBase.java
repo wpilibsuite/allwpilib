@@ -7,6 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -134,6 +138,9 @@ public abstract class RobotBase {
 	 * This hook is called right before startCompetition(). By default, tell the
 	 * DS that the robot is now ready to be enabled. If you don't want for the
 	 * robot to be enabled yet, you can override this method to do nothing.
+	 * If you do so, you will need to call 
+	 * FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationOvserveUserProgramStarting() from
+	 * your code when you are ready for the robot to be enabled.
 	 */
 	protected void prestart() {
 		FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
@@ -196,6 +203,31 @@ public abstract class RobotBase {
 			System.exit(1);
 			return;
 		}
+		
+		File file = null;
+            FileOutputStream output = null;
+            try {
+                file = new File("/tmp/frc_versions/FRC_Lib_Version.ini");
+
+                if (file.exists())
+                	file.delete();
+
+                file.createNewFile();
+
+                output = new FileOutputStream(file);
+
+				output.write("2015 Java 1.0.0".getBytes());
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            } finally {
+                if (output != null) {
+                    try {
+                        output.close();
+                    } catch (IOException ex) {
+                    }
+                }
+            }
 
 		boolean errorOnExit = false;
 		try {

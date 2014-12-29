@@ -70,7 +70,8 @@ public class SPI extends SensorBase {
 	
 	/**
 	 * Configure the rate of the generated clock signal.
-	 * The default and maximum value is 500,000 Hz.
+	 * The default value is 500,000 Hz.
+	 * The maximum value is 4,000,000 Hz.
 	 *
 	 * @param hz	The clock rate in Hertz.
 	 */

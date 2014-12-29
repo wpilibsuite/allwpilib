@@ -26,7 +26,7 @@ public abstract class SolenoidBase extends SensorBase {
     /**
      * Constructor.
      *
-     * @param moduleNumber The number of the solenoid module to use.
+     * @param moduleNumber The PCM CAN ID
      */
     public SolenoidBase(final int moduleNumber) {
         m_moduleNumber = moduleNumber;
@@ -74,7 +74,7 @@ public abstract class SolenoidBase extends SensorBase {
 	 * 
 	 *		If a solenoid is shorted, it is added to the blacklist and
 	 *		disabled until power cycle, or until faults are cleared.
-	 *		@see clearAllPCMStickyFaults()
+	 *		@see #clearAllPCMStickyFaults()
 	 * 
 	 * @return The solenoid blacklist of all 8 solenoids on the module.
 	 */

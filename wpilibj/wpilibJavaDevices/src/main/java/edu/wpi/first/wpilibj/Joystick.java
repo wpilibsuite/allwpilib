@@ -305,12 +305,11 @@ public class Joystick extends GenericHID {
     }
 
     /**
-     * Get the button value for buttons 1 through 12.
+     * Get the button value (starting at button 1)
      *
-     * The buttons are returned in a single 16 bit value with one bit representing the state
-     * of each button. The appropriate button is returned as a boolean value.
+     * The appropriate button is returned as a boolean value.
      *
-     * @param button The button number to be read.
+     * @param button The button number to be read (starting at 1).
      * @return The state of the button.
      */
     public boolean getRawButton(final int button) {
@@ -327,6 +326,7 @@ public class Joystick extends GenericHID {
     /**
      * Get the state of a POV on the joystick.
      *
+	 * @param pov The index of the POV to read (starting at 0)
      * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
      */
     public int getPOV(int pov) {

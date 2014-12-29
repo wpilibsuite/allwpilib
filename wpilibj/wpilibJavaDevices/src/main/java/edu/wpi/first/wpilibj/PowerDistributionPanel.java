@@ -23,6 +23,7 @@ public class PowerDistributionPanel extends SensorBase {
 	}
 
 	/**
+	 * Query the input voltage of the PDP
 	 * @return The voltage of the PDP
 	 */
 	public double getVoltage() {
@@ -35,6 +36,7 @@ public class PowerDistributionPanel extends SensorBase {
 	}
 
 	/**
+	 * Query the temperature of the PDP
 	 * @return The temperature of the PDP in degrees Celsius
 	 */
 	public double getTemperature() {
@@ -47,6 +49,7 @@ public class PowerDistributionPanel extends SensorBase {
 	}
 
 	/**
+	 * Query the current of a single channel of the PDP
 	 * @return The current of one of the PDP channels (channels 0-15) in Amperes
 	 */
 	public double getCurrent(int channel) {
@@ -61,7 +64,8 @@ public class PowerDistributionPanel extends SensorBase {
 	}
 
 	/**
-	*	@return The current of all the channels
+	* Query the current of all monitored PDP channels (0-15)
+	* @return The current of all the channels
 	*/
 	public double getTotalCurrent(){
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -73,7 +77,8 @@ public class PowerDistributionPanel extends SensorBase {
 	}
 
 	/**
-	*	@return the total power
+	* Query the total power drawn from the monitored PDP channels
+	* @return the total power
 	*/
 	public double getTotalPower(){
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -85,6 +90,10 @@ public class PowerDistributionPanel extends SensorBase {
 
 	}
 
+	/**
+	* Query the total energy drawn from the monitored PDP channels
+	* @return the total power
+	*/
 	public double getTotalEnergy(){
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
@@ -94,6 +103,9 @@ public class PowerDistributionPanel extends SensorBase {
 		return energy;
 	}
 
+	/**
+	* Reset the total energy to 0
+	*/
 	public void resetTotalEnergy(){
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
@@ -101,6 +113,9 @@ public class PowerDistributionPanel extends SensorBase {
 		PDPJNI.resetPDPTotalEnergy(status.asIntBuffer());
 	}
 
+	/**
+	* Clear all PDP sticky faults
+	*/
 	public void clearStickyFaults(){
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);

@@ -106,7 +106,7 @@ public class Counter extends SensorBase implements CounterBase,
 	/**
 	 * Create an instance of a counter from a Digital Input. This is used if an
 	 * existing digital input is to be shared by multiple other objects such as
-	 * encoders.
+	 * encoders or if the Digital Source is not a DIO channel (such as an Analog Trigger)
 	 *
 	 * The counter will start counting immediately.
 	 *
@@ -127,7 +127,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * The counter will start counting immediately.
 	 *
 	 * @param channel
-	 *            the digital input channel to count
+	 *            the DIO channel to use as the up source. 0-9 are on-board, 10-25 are on the MXP
 	 */
 	public Counter(int channel) {
 		initCounter(Mode.kTwoPulse);
@@ -220,7 +220,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * Set the upsource for the counter as a digital input channel.
 	 *
 	 * @param channel
-	 *            the digital port to count
+	 *            the DIO channel to count 0-9 are on-board, 10-25 are on the MXP
 	 */
 	public void setUpSource(int channel) {
 		setUpSource(new DigitalInput(channel));
@@ -308,7 +308,7 @@ public class Counter extends SensorBase implements CounterBase,
 	 * Set the down counting source to be a digital input channel.
 	 *
 	 * @param channel
-	 *            the digital port to count
+	 *            the DIO channel to count 0-9 are on-board, 10-25 are on the MXP
 	 */
 	public void setDownSource(int channel) {
 		setDownSource(new DigitalInput(channel));

@@ -52,8 +52,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 	/**
 	 * Construct an analog channel.
 	 *
-	 * @param channel
-	 *			The channel number to represent.
+	 * @param channel The channel number to represent. 0-3 are on-board 4-7 are on the MXP port.
 	 */
 	public AnalogInput(final int channel) {
 		m_channel = channel;
@@ -108,10 +107,10 @@ public class AnalogInput extends SensorBase implements PIDSource,
 
 	/**
 	 * Get a sample from the output of the oversample and average engine for
-	 * this channel. The sample is 12-bit + the value configured in
+	 * this channel. The sample is 12-bit + the bits configured in
 	 * SetOversampleBits(). The value configured in setAverageBits() will cause
-	 * this value to be averaged 2**bits number of samples. This is not a
-	 * sliding window. The sample will not change until 2**(OversamplBits +
+	 * this value to be averaged 2^bits number of samples. This is not a
+	 * sliding window. The sample will not change until 2^(OversampleBits +
 	 * AverageBits) samples have been acquired from this channel. Use
 	 * getAverageVoltage() to get the analog value in calibrated units.
 	 *
@@ -208,7 +207,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 
 	/**
 	 * Set the number of averaging bits. This sets the number of averaging bits.
-	 * The actual number of averaged samples is 2**bits. The averaging is done
+	 * The actual number of averaged samples is 2^bits. The averaging is done
 	 * automatically in the FPGA.
 	 *
 	 * @param bits
@@ -224,7 +223,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 
 	/**
 	 * Get the number of averaging bits. This gets the number of averaging bits
-	 * from the FPGA. The actual number of averaged samples is 2**bits. The
+	 * from the FPGA. The actual number of averaged samples is 2^bits. The
 	 * averaging is done automatically in the FPGA.
 	 *
 	 * @return The number of averaging bits.
@@ -240,7 +239,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 
 	/**
 	 * Set the number of oversample bits. This sets the number of oversample
-	 * bits. The actual number of oversampled values is 2**bits. The
+	 * bits. The actual number of oversampled values is 2^bits. The
 	 * oversampling is done automatically in the FPGA.
 	 *
 	 * @param bits
@@ -256,7 +255,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 
 	/**
 	 * Get the number of oversample bits. This gets the number of oversample
-	 * bits from the FPGA. The actual number of oversampled values is 2**bits.
+	 * bits from the FPGA. The actual number of oversampled values is 2^bits.
 	 * The oversampling is done automatically in the FPGA.
 	 *
 	 * @return The number of oversample bits.
@@ -290,7 +289,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 	}
 
 	/**
-	 * Set an inital value for the accumulator.
+	 * Set an initial value for the accumulator.
 	 *
 	 * This will be added to all values returned to the user.
 	 *
@@ -325,11 +324,11 @@ public class AnalogInput extends SensorBase implements PIDSource,
 	 *
 	 * The center value is subtracted from each A/D value before it is added to
 	 * the accumulator. This is used for the center value of devices like gyros
-	 * and accelerometers to make integration work and to take the device offset
+	 * and accelerometers to take the device offset
 	 * into account when integrating.
 	 *
 	 * This center value is based on the output of the oversampled and averaged
-	 * source from channel 1. Because of this, any non-zero oversample bits will
+	 * source the accumulator channel. Because of this, any non-zero oversample bits will
 	 * affect the size of the value for this field.
 	 */
 	public void setAccumulatorCenter(int center) {
@@ -342,6 +341,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 
 	/**
 	 * Set the accumulator's deadband.
+	 * @param deadband The deadband size in ADC codes (12-bit value)
 	 */
 	public void setAccumulatorDeadband(int deadband) {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -354,7 +354,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 	/**
 	 * Read the accumulated value.
 	 *
-	 * Read the value that has been accumulating on channel 1. The accumulator
+	 * Read the value that has been accumulating. The accumulator
 	 * is attached after the oversample and average engine.
 	 *
 	 * @return The 64-bit value accumulated since the last Reset().
@@ -433,10 +433,11 @@ public class AnalogInput extends SensorBase implements PIDSource,
 	}
 
 	/**
-	 * Set the sample rate.
+	 * Set the sample rate per channel.
 	 *
 	 * This is a global setting for all channels.
-	 *
+	 * The maximum rate is 500kS/s divided by the number of channels in use.
+	 * This is 62500 samples/s per channel if all 8 channels are used.
 	 * @param samplesPerSecond The number of samples per second.
 	 */
 	public static void setGlobalSampleRate(final double samplesPerSecond) {

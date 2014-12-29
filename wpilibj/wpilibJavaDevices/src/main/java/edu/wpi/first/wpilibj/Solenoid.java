@@ -51,9 +51,9 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
     }
 
     /**
-     * Constructor.
+     * Constructor using the default PCM ID (0)
      *
-     * @param channel The channel on the module to control.
+     * @param channel The channel on the PCM to control.
      */
     public Solenoid(final int channel) {
         super(getDefaultSolenoidModule());
@@ -64,8 +64,8 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
     /**
      * Constructor.
      *
-     * @param moduleNumber The module number of the solenoid module to use.
-     * @param channel The channel on the module to control.
+     * @param moduleNumber The CAN ID of the PCM the solenoid is attached to.
+     * @param channel The channel on the PCM to control (0..7).
      */
     public Solenoid(final int moduleNumber, final int channel) {
         super(moduleNumber);

@@ -32,7 +32,7 @@ public class DigitalInput extends DigitalSource implements LiveWindowSendable {
 	 * given a channel.
 	 *
 	 * @param channel
-	 *            the port for the digital input
+	 *            the DIO channel for the digital input 0-9 are on-board, 10-25 are on the MXP
 	 */
 	public DigitalInput(int channel) {
         initDigitalPort(channel, true);
@@ -45,7 +45,7 @@ public class DigitalInput extends DigitalSource implements LiveWindowSendable {
 	 * Get the value from a digital input channel. Retrieve the value of a
 	 * single digital input channel from the FPGA.
 	 *
-	 * @return the stats of the digital input
+	 * @return the status of the digital input
 	 */
 	public boolean get() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);

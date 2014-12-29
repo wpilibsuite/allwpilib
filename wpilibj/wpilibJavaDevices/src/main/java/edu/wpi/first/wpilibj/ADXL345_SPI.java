@@ -69,7 +69,7 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer {
 	/**
 	 * Constructor.
 	 *
-	 * @param port the Port that the accelerometer is connected to
+	 * @param port The SPI port that the accelerometer is connected to
 	 * @param range The range (+ or -) that the accelerometer will measure.
 	 */
 	public ADXL345_SPI(SPI.Port port, Range range) {
@@ -170,7 +170,7 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer {
 	/**
 	 * Get the acceleration of all axes in Gs.
 	 *
-	 * @return Acceleration measured on all axes of the ADXL345 in Gs.
+	 * @return An object containing the acceleration measured on each axis of the ADXL345 in Gs.
 	 */
 	public ADXL345_SPI.AllAxes getAccelerations() {
 		ADXL345_SPI.AllAxes data = new ADXL345_SPI.AllAxes();

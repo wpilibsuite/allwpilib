@@ -42,7 +42,7 @@ public class Jaguar extends SafePWM implements SpeedController {
     /**
      * Constructor.
      *
-     * @param channel The PWM channel that the Jaguar is attached to.
+     * @param channel The PWM channel that the Jaguar is attached to. 0-9 are on-board, 10-19 are on the MXP port
      */
     public Jaguar(final int channel) {
         super(channel);

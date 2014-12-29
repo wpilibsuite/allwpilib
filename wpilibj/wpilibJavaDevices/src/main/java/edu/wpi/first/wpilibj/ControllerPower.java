@@ -18,7 +18,7 @@ public class ControllerPower
 {
 	/**
 	* Get the input voltage to the robot controller
-	* @return The controller input voltage value
+	* @return The controller input voltage value in Volts
 	*/
 	public static double getInputVoltage()
 	{
@@ -31,7 +31,7 @@ public class ControllerPower
 
 	/**
 	* Get the input current to the robot controller
-	* @return The controller input current value
+	* @return The controller input current value in Amps
 	*/
 	public static double getInputCurrent()
 	{
@@ -44,7 +44,7 @@ public class ControllerPower
 	
 	/**
 	* Get the voltage of the 3.3V rail
-	* @return The controller 3.3V rail voltage value
+	* @return The controller 3.3V rail voltage value in Volts
 	*/
 	public static double getVoltage3V3()
 	{
@@ -57,7 +57,7 @@ public class ControllerPower
 	
 	/**
 	* Get the current output of the 3.3V rail
-	* @return The controller 3.3V rail output current value
+	* @return The controller 3.3V rail output current value in Volts
 	*/
 	public static double getCurrent3V3()
 	{
@@ -97,7 +97,7 @@ public class ControllerPower
 	
 	/**
 	* Get the voltage of the 5V rail
-	* @return The controller 5V rail voltage value
+	* @return The controller 5V rail voltage value in Volts
 	*/
 	public static double getVoltage5V()
 	{
@@ -110,7 +110,7 @@ public class ControllerPower
 	
 	/**
 	* Get the current output of the 5V rail
-	* @return The controller 5V rail output current value
+	* @return The controller 5V rail output current value in Amps
 	*/
 	public static double getCurrent5V()
 	{
@@ -150,7 +150,7 @@ public class ControllerPower
 	
 	/**
 	* Get the voltage of the 6V rail
-	* @return The controller 6V rail voltage value
+	* @return The controller 6V rail voltage value in Volts
 	*/
 	public static double getVoltage6V()
 	{
@@ -163,7 +163,7 @@ public class ControllerPower
 	
 	/**
 	* Get the current output of the 6V rail
-	* @return The controller 6V rail output current value
+	* @return The controller 6V rail output current value in Amps
 	*/
 	public static double getCurrent6V()
 	{
