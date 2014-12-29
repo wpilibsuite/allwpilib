@@ -221,7 +221,7 @@
 		</bool>
 	</assert>
 	<echo>roboRIO image version validated</echo>
-	<echo>Checking for JRE. If this fails install the JRE using these instructions: http://wpilib.screenstepslive.com/s/4485/m/13809/l/243933-installing-java-8-on-the-roborio-java-only</echo>
+	<echo>Checking for JRE. If this fails install the JRE using these instructions: https://wpilib.screenstepslive.com/s/4485/m/13503/l/288822-installing-java-8-on-the-roborio-using-the-frc-roborio-java-installer-java-only</echo>
 	<sshexec host="${target}"
         username="${username}"
         password="${password}"
