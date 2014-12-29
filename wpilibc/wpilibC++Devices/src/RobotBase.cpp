@@ -16,6 +16,7 @@
 #include "Utility.h"
 #include <cstring>
 #include "HAL/HAL.hpp"
+#include <cstdio>
 
 #ifdef __vxworks
 // VXWorks needs som special unloading code
@@ -60,6 +61,13 @@ RobotBase::RobotBase()
 	HLUsageReporting::SetImplementation(new HardwareHLReporting()); \
 
 	RobotBase::setInstance(this);
+	
+	FILE *file = NULL;
+	file = fopen("/tmp/frc_versions/FRC_Lib_Version.ini", "w");
+
+	fputs("2015 C++ 1.0.0", file);
+	if (file != NULL)
+	fclose(file);
 }
 
 /**
