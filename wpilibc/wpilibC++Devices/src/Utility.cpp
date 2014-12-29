@@ -21,7 +21,7 @@
 static bool suspendOnAssertEnabled = false;
 
 /**
- * Enable suspend on asssert.
+ * Enable suspend on assert.
  * If enabled, the user task will be suspended whenever an assert fails. This
  * will allow the user to attach to the task with the debugger and examine variables
  * around the failure.
@@ -204,7 +204,7 @@ uint32_t GetFPGATime()
 
 /**
  * Get the state of the "USER" button on the RoboRIO
- * @return true if the button is currently pressed down
+ * @return True if the button is currently pressed down
  */
 bool GetUserButton()
 {
@@ -247,6 +247,7 @@ static std::string demangle(char const *mangledSymbol)
 
 /**
  * Get a stack trace, ignoring the first "offset" symbols.
+ * @param offset The number of symbols at the top of the stack to ignore
  */
 std::string GetStackTrace(uint32_t offset)
 {

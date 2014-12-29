@@ -44,12 +44,17 @@ void AnalogOutput::InitAnalogOutput(uint32_t channel) {
 }
 
 /**
- * Construct an anlog output on the given channel
+ * Construct an analog output on the given channel.
+ * All analog outputs are located on the MXP port.
+ * @param The channel number on the roboRIO to represent.
  */
 AnalogOutput::AnalogOutput(uint32_t channel) {
     InitAnalogOutput(channel);
 }
 
+/**
+ * Destructor. Frees analog output resource
+ */
 AnalogOutput::~AnalogOutput() {
     outputs->Free(m_channel);
 }

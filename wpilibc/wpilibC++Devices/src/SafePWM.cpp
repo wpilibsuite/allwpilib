@@ -19,7 +19,7 @@ void SafePWM::InitSafePWM()
 
 /**
  * Constructor for a SafePWM object taking a channel number.
- * @param channel The PWM channel number (0..19).
+ * @param channel The PWM channel number 0-9 are on-board, 10-19 are on the MXP port
  */
 SafePWM::SafePWM(uint32_t channel): PWM(channel)
 {
@@ -31,7 +31,7 @@ SafePWM::~SafePWM()
 	delete m_safetyHelper;
 }
 
-/*
+/**
  * Set the expiration time for the PWM object
  * @param timeout The timeout (in seconds) for this motor object
  */

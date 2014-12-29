@@ -54,7 +54,7 @@ void AnalogInput::InitAnalogInput(uint32_t channel)
 /**
  * Construct an analog input.
  *
- * @param channel The channel number to represent.
+ * @param channel The channel number on the roboRIO to represent. 0-3 are on-board 4-7 are on the MXP port.
  */
 AnalogInput::AnalogInput(uint32_t channel)
 {
@@ -86,9 +86,9 @@ int16_t AnalogInput::GetValue()
 
 /**
  * Get a sample from the output of the oversample and average engine for this channel.
- * The sample is 12-bit + the value configured in SetOversampleBits().
+ * The sample is 12-bit + the bits configured in SetOversampleBits().
  * The value configured in SetAverageBits() will cause this value to be averaged 2**bits number of samples.
- * This is not a sliding window.  The sample will not change until 2**(OversamplBits + AverageBits) samples
+ * This is not a sliding window.  The sample will not change until 2**(OversampleBits + AverageBits) samples
  * have been acquired from the module on this channel.
  * Use GetAverageVoltage() to get the analog value in calibrated units.
  * @return A sample from the oversample and average engine for this channel.
@@ -176,7 +176,7 @@ uint32_t AnalogInput::GetChannel()
 
 /**
  * Set the number of averaging bits.
- * This sets the number of averaging bits. The actual number of averaged samples is 2**bits.
+ * This sets the number of averaging bits. The actual number of averaged samples is 2^bits.
  * Use averaging to improve the stability of your measurement at the expense of sampling rate.
  * The averaging is done automatically in the FPGA.
  *
@@ -192,7 +192,7 @@ void AnalogInput::SetAverageBits(uint32_t bits)
 
 /**
  * Get the number of averaging bits previously configured.
- * This gets the number of averaging bits from the FPGA. The actual number of averaged samples is 2**bits.
+ * This gets the number of averaging bits from the FPGA. The actual number of averaged samples is 2^bits.
  * The averaging is done automatically in the FPGA.
  *
  * @return Number of bits of averaging previously configured.
@@ -207,7 +207,7 @@ uint32_t AnalogInput::GetAverageBits()
 
 /**
  * Set the number of oversample bits.
- * This sets the number of oversample bits. The actual number of oversampled values is 2**bits.
+ * This sets the number of oversample bits. The actual number of oversampled values is 2^bits.
  * Use oversampling to improve the resolution of your measurements at the expense of sampling rate.
  * The oversampling is done automatically in the FPGA.
  *
@@ -224,7 +224,7 @@ void AnalogInput::SetOversampleBits(uint32_t bits)
 /**
  * Get the number of oversample bits previously configured.
  * This gets the number of oversample bits from the FPGA. The actual number of oversampled values is
- * 2**bits. The oversampling is done automatically in the FPGA.
+ * 2^bits. The oversampling is done automatically in the FPGA.
  *
  * @return Number of bits of oversampling previously configured.
  */
@@ -265,7 +265,7 @@ void AnalogInput::InitAccumulator()
 
 
 /**
- * Set an inital value for the accumulator.
+ * Set an initial value for the accumulator.
  *
  * This will be added to all values returned to the user.
  * @param initialValue The value that the accumulator should start from when reset.
@@ -301,11 +301,11 @@ void AnalogInput::ResetAccumulator()
  * Set the center value of the accumulator.
  *
  * The center value is subtracted from each A/D value before it is added to the accumulator. This
- * is used for the center value of devices like gyros and accelerometers to make integration work
- * and to take the device offset into account when integrating.
+ * is used for the center value of devices like gyros and accelerometers to 
+ * take the device offset into account when integrating.
  *
- * This center value is based on the output of the oversampled and averaged source from channel 1.
- * Because of this, any non-zero oversample bits will affect the size of the value for this field.
+ * This center value is based on the output of the oversampled and averaged source from the accumulator
+ * channel. Because of this, any non-zero oversample bits will affect the size of the value for this field.
  */
 void AnalogInput::SetAccumulatorCenter(int32_t center)
 {
@@ -317,6 +317,7 @@ void AnalogInput::SetAccumulatorCenter(int32_t center)
 
 /**
  * Set the accumulator's deadband.
+ * @param 
  */
 void AnalogInput::SetAccumulatorDeadband(int32_t deadband)
 {
@@ -329,7 +330,7 @@ void AnalogInput::SetAccumulatorDeadband(int32_t deadband)
 /**
  * Read the accumulated value.
  *
- * Read the value that has been accumulating on channel 1.
+ * Read the value that has been accumulating.
  * The accumulator is attached after the oversample and average engine.
  *
  * @return The 64-bit value accumulated since the last Reset().
@@ -379,8 +380,9 @@ void AnalogInput::GetAccumulatorOutput(int64_t *value, uint32_t *count)
 }
 
 /**
- * Set the sample rate for all analog channels.
- *
+ * Set the sample rate per channel for all analog channels.
+ * The maximum rate is 500kS/s divided by the number of channels in use.
+ * This is 62500 samples/s per channel.
  * @param samplesPerSecond The number of samples per second.
  */
 void AnalogInput::SetSampleRate(float samplesPerSecond)

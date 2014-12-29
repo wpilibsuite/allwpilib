@@ -12,7 +12,7 @@ Resource *SolenoidBase::m_allocated = NULL;
 /**
  * Constructor
  * 
- * @param moduleNumber The solenoid module (1 or 2).
+ * @param moduleNumber The CAN PCM ID.
  */
 SolenoidBase::SolenoidBase(uint8_t moduleNumber)
 	: m_moduleNumber (moduleNumber)

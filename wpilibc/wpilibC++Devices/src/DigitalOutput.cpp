@@ -39,7 +39,7 @@ void DigitalOutput::InitDigitalOutput(uint32_t channel)
  * Create an instance of a digital output.
  * Create a digital output given a channel.
  *
- * @param channel The digital channel (0..19)
+ * @param channel The digital channel 0-9 are on-board, 10-25 are on the MXP port
  */
 DigitalOutput::DigitalOutput(uint32_t channel)
 {
@@ -63,6 +63,7 @@ DigitalOutput::~DigitalOutput()
 /**
  * Set the value of a digital output.
  * Set the value of a digital output to either one (true) or zero (false).
+ * @param value 1 (true) for high, 0 (false) for disabled
  */
 void DigitalOutput::Set(uint32_t value)
 {

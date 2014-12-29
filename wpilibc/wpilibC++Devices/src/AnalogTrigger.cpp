@@ -29,7 +29,7 @@ void AnalogTrigger::InitTrigger(uint32_t channel)
 /**
  * Constructor for an analog trigger given a channel number.
  *
- * @param channel The analog channel (0..7).
+ * @param channel The channel number on the roboRIO to represent. 0-3 are on-board 4-7 are on the MXP port.
  */
 AnalogTrigger::AnalogTrigger(int32_t channel)
 {
@@ -40,6 +40,7 @@ AnalogTrigger::AnalogTrigger(int32_t channel)
  * Construct an analog trigger given an analog input.
  * This should be used in the case of sharing an analog channel between the
  * trigger and an analog input object.
+ * @param channel The pointer to the existing AnalogInput object
  */
 AnalogTrigger::AnalogTrigger(AnalogInput *input)
 {
@@ -57,6 +58,8 @@ AnalogTrigger::~AnalogTrigger()
  * Set the upper and lower limits of the analog trigger.
  * The limits are given in ADC codes.  If oversampling is used, the units must be scaled
  * appropriately.
+ * @param lower The lower limit of the trigger in ADC codes (12-bit values).
+ * @param upper The upper limit of the trigger in ADC codes (12-bit values).
  */
 void AnalogTrigger::SetLimitsRaw(int32_t lower, int32_t upper)
 {
@@ -69,6 +72,8 @@ void AnalogTrigger::SetLimitsRaw(int32_t lower, int32_t upper)
 /**
  * Set the upper and lower limits of the analog trigger.
  * The limits are given as floating point voltage values.
+ * @param lower The lower limit of the trigger in Volts.
+ * @param upper The upper limit of the trigger in Volts.
  */
 void AnalogTrigger::SetLimitsVoltage(float lower, float upper)
 {
@@ -82,6 +87,7 @@ void AnalogTrigger::SetLimitsVoltage(float lower, float upper)
  * Configure the analog trigger to use the averaged vs. raw values.
  * If the value is true, then the averaged value is selected for the analog trigger, otherwise
  * the immediate value is used.
+ * @param useAveragedValue If true, use the Averaged value, otherwise use the instantaneous reading
  */
 void AnalogTrigger::SetAveraged(bool useAveragedValue)
 {
@@ -95,6 +101,7 @@ void AnalogTrigger::SetAveraged(bool useAveragedValue)
  * Configure the analog trigger to use a filtered value.
  * The analog trigger will operate with a 3 point average rejection filter. This is designed to
  * help with 360 degree pot applications for the period where the pot crosses through zero.
+ * @param useFilteredValue If true, use the 3 point rejection filter, otherwise use the unfiltered value
  */
 void AnalogTrigger::SetFiltered(bool useFilteredValue)
 {
@@ -118,7 +125,7 @@ uint32_t AnalogTrigger::GetIndex()
 /**
  * Return the InWindow output of the analog trigger.
  * True if the analog input is between the upper and lower limits.
- * @return The InWindow output of the analog trigger.
+ * @return True if the analog input is between the upper and lower limits.
  */
 bool AnalogTrigger::GetInWindow()
 {
@@ -134,7 +141,7 @@ bool AnalogTrigger::GetInWindow()
  * True if above upper limit.
  * False if below lower limit.
  * If in Hysteresis, maintain previous state.
- * @return The TriggerState output of the analog trigger.
+ * @return True if above upper limit. False if below lower limit. If in Hysteresis, maintain previous state.
  */
 bool AnalogTrigger::GetTriggerState()
 {

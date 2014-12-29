@@ -12,7 +12,7 @@
 /**
  * Constructor.
  *
- * @param Port The I2C port to which the device is connected.
+ * @param port The I2C port to which the device is connected.
  * @param deviceAddress The address of the device on the I2C bus.
  */
 I2C::I2C(Port port, uint8_t deviceAddress) :

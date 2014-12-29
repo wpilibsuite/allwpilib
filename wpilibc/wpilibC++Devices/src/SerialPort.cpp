@@ -16,6 +16,7 @@
  * Create an instance of a Serial Port class.
  *
  * @param baudRate The baud rate to configure the serial port.
+ * @param port The physical port to use
  * @param dataBits The number of data bits per transfer.  Valid values are between 5 and 8 bits.
  * @param parity Select the type of parity checking to use.
  * @param stopBits The number of stop bits to use as defined by the enum StopBits.
@@ -236,13 +237,3 @@ void SerialPort::Reset()
 	serialClear(m_port, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
-
-//void SerialPort::_internalHandler(uint32_t port, uint32_t eventType, uint32_t event)
-//{
-//}
-
-//ViStatus _VI_FUNCH ioCompleteHandler (ViSession vi, ViEventType eventType, ViEvent event, ViAddr userHandle)
-//{
-//	((SerialPort*) userHandle)->_internalHandler(vi, eventType, event);
-//	return VI_SUCCESS;
-//}
