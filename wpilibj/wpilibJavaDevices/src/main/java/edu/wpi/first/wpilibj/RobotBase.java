@@ -7,6 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -199,6 +203,31 @@ public abstract class RobotBase {
 			System.exit(1);
 			return;
 		}
+		
+		File file = null;
+            FileOutputStream output = null;
+            try {
+                file = new File("/tmp/frc_versions/FRC_Lib_Version.ini");
+
+                if (file.exists())
+                	file.delete();
+
+                file.createNewFile();
+
+                output = new FileOutputStream(file);
+
+				output.write("2015 Java 1.0.0".getBytes());
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            } finally {
+                if (output != null) {
+                    try {
+                        output.close();
+                    } catch (IOException ex) {
+                    }
+                }
+            }
 
 		boolean errorOnExit = false;
 		try {
