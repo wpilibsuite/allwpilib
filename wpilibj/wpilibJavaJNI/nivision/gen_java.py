@@ -1686,7 +1686,7 @@ JNIEXPORT {rettype} JNICALL Java_{package}_{classname}__1{name}({args})
 }}""".format(rettype=rettype.jni_type,
              package=self.package.replace(".", "_"),
              classname=self.classname,
-             name=name,
+             name=name.replace("_", "_1"),
              args=", ".join("%s %s" % (x[1].jni_type, x[0]) for x in jni_funcargs),
              callfunc=callcfunc,
              exceptioncheck=exceptioncheck,
