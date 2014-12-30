@@ -25004,6 +25004,16 @@ public class NIVision {
     }
     private static native long _imaqRake(long image, long roi, int direction, int process, long options);
 
+    public static void Priv_ReadJPEGString_C(Image image, byte[] string) {
+        int stringLength = string.length;
+        ByteBuffer string_buf = null;
+        string_buf = ByteBuffer.allocateDirect(string.length);
+        putBytes(string_buf, string, 0, string.length);
+        _Priv_ReadJPEGString_C(image.getAddress(), getByteBufferAddress(string_buf), stringLength);
+        
+    }
+    private static native void _Priv_ReadJPEGString_C(long image, long string, int stringLength);
+
     /**
      * Purpose	  : Include file for NI-IMAQdx library support.
      */

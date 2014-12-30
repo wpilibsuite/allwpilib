@@ -4890,6 +4890,17 @@ JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqRake(JNIEnv* env, jcla
     return (jlong)rv;
 }
 
+/* J: void Priv_ReadJPEGString_C(Image image, byte[] string)
+ * JN: void Priv_ReadJPEGString_C(long image, long string, int stringLength)
+ * C: int Priv_ReadJPEGString_C(Image* image, const unsigned char* string, unsigned int stringLength)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1Priv_1ReadJPEGString_1C(JNIEnv* env, jclass , jlong image, jlong string, jint stringLength)
+{
+    int rv = Priv_ReadJPEGString_C((Image*)image, (const unsigned char*)string, (unsigned int)stringLength);
+    if (rv == 0) throwJavaException(env);
+}
+
 /*
  * Purpose	  : Include file for NI-IMAQdx library support.
  */

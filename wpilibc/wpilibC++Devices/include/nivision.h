@@ -5339,5 +5339,7 @@ IMAQ_FUNC ReadTextReport*        IMAQ_STDCALL imaqReadText(const Image* image, c
 IMAQ_FUNC ThresholdData*         IMAQ_STDCALL imaqAutoThreshold(Image* dest, Image* source, int numClasses, ThresholdMethod method);
 IMAQ_FUNC ColorHistogramReport*  IMAQ_STDCALL imaqColorHistogram(Image* image, int numClasses, ColorMode mode, const Image* mask);
 IMAQ_FUNC RakeReport*            IMAQ_STDCALL imaqRake(const Image* image, const ROI* roi, RakeDirection direction, EdgeProcess process, const RakeOptions* options);
+
+IMAQ_FUNC int                    IMAQ_STDCALL Priv_ReadJPEGString_C(Image* image, const unsigned char* string, unsigned int stringLength);
 #endif
 

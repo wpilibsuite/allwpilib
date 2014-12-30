@@ -18,10 +18,6 @@
 #include <iostream>
 #include <sstream>
 
-/** Private NI function to decode JPEG */
-IMAQ_FUNC int Priv_ReadJPEGString_C(Image* _image, const unsigned char* _string,
-		uint32_t _stringLength);
-
 static const unsigned int kMaxPacketSize = 1536;
 static const unsigned int kImageBufferAllocationIncrement = 1000;
 
