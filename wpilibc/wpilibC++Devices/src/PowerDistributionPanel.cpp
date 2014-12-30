@@ -7,11 +7,13 @@
 #include "PowerDistributionPanel.h"
 #include "WPIErrors.h"
 #include "HAL/PDP.hpp"
+#include "LiveWindow/LiveWindow.h"
 
 /**
  * Initialize the PDP.
  */
 PowerDistributionPanel::PowerDistributionPanel() {
+	m_table=NULL;
 }
 
 /**
@@ -152,3 +154,44 @@ PowerDistributionPanel::ClearStickyFaults() {
 	}
 }
 
+void PowerDistributionPanel::UpdateTable() {
+    if (m_table != NULL) {
+        m_table->PutNumber("Chan0", GetCurrent(0));
+        m_table->PutNumber("Chan1", GetCurrent(1));
+        m_table->PutNumber("Chan2", GetCurrent(2));
+        m_table->PutNumber("Chan3", GetCurrent(3));
+        m_table->PutNumber("Chan4", GetCurrent(4));
+        m_table->PutNumber("Chan5", GetCurrent(5));
+        m_table->PutNumber("Chan6", GetCurrent(6));
+        m_table->PutNumber("Chan7", GetCurrent(7));
+        m_table->PutNumber("Chan8", GetCurrent(8));
+        m_table->PutNumber("Chan9", GetCurrent(9));
+        m_table->PutNumber("Chan10", GetCurrent(10));
+        m_table->PutNumber("Chan11", GetCurrent(11));
+        m_table->PutNumber("Chan12", GetCurrent(12));
+        m_table->PutNumber("Chan13", GetCurrent(13));
+        m_table->PutNumber("Chan14", GetCurrent(14));
+        m_table->PutNumber("Chan15", GetCurrent(15));
+        m_table->PutNumber("Voltage", GetVoltage());
+        m_table->PutNumber("TotalCurrent", GetTotalCurrent());
+    }
+}
+
+void PowerDistributionPanel::StartLiveWindowMode() {
+}
+
+void PowerDistributionPanel::StopLiveWindowMode() {
+}
+
+std::string PowerDistributionPanel::GetSmartDashboardType() {
+	return "PowerDistributionPanel";
+}
+
+void PowerDistributionPanel::InitTable(ITable *subTable) {
+	m_table = subTable;
+	UpdateTable();
+}
+
+ITable * PowerDistributionPanel::GetTable() {
+	return m_table;
+}
