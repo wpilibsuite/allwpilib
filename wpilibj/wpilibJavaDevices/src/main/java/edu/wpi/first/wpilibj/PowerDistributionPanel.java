@@ -12,13 +12,15 @@ import java.nio.ByteOrder;
 
 import edu.wpi.first.wpilibj.hal.PDPJNI;
 import edu.wpi.first.wpilibj.hal.HALUtil;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
  * Class for getting voltage, current, and temperature from the CAN PDP
  * @author Thomas Clark
  */
-public class PowerDistributionPanel extends SensorBase {
+public class PowerDistributionPanel extends SensorBase implements LiveWindowSendable {
 	public PowerDistributionPanel() {
 	}
 
@@ -122,5 +124,66 @@ public class PowerDistributionPanel extends SensorBase {
 		
 		PDPJNI.clearPDPStickyFaults(status.asIntBuffer());
 	}
+	
+    public String getSmartDashboardType() {
+        return "PowerDistributionPanel";
+    }
+    /*
+     * Live Window code, only does anything if live window is activated.
+     */
+    private ITable m_table;
+
+    /**
+     * {@inheritDoc}
+     */
+    public void initTable(ITable subtable) {
+        m_table = subtable;
+        updateTable();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public ITable getTable() {
+        return m_table;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void updateTable() {
+        if (m_table != null) {
+            m_table.putNumber("Chan0", getCurrent(0));
+            m_table.putNumber("Chan1", getCurrent(1));
+            m_table.putNumber("Chan2", getCurrent(2));
+            m_table.putNumber("Chan3", getCurrent(3));
+            m_table.putNumber("Chan4", getCurrent(4));
+            m_table.putNumber("Chan5", getCurrent(5));
+            m_table.putNumber("Chan6", getCurrent(6));
+            m_table.putNumber("Chan7", getCurrent(7));
+            m_table.putNumber("Chan8", getCurrent(8));
+            m_table.putNumber("Chan9", getCurrent(9));
+            m_table.putNumber("Chan10", getCurrent(10));
+            m_table.putNumber("Chan11", getCurrent(11));
+            m_table.putNumber("Chan12", getCurrent(12));
+            m_table.putNumber("Chan13", getCurrent(13));
+            m_table.putNumber("Chan14", getCurrent(14));
+            m_table.putNumber("Chan15", getCurrent(15));
+            m_table.putNumber("Voltage", getVoltage());
+            m_table.putNumber("TotalCurrent", getTotalCurrent());
+        }
+    }
+
+    /**
+     * PDP doesn't have to do anything special when entering the LiveWindow.
+     * {@inheritDoc}
+     */
+    public void startLiveWindowMode() {}
+
+    /**
+     * PDP doesn't have to do anything special when exiting the LiveWindow.
+     * {@inheritDoc}
+     */
+    public void stopLiveWindowMode() {}
 
 }
