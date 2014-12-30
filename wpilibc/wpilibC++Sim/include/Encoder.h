@@ -37,6 +37,7 @@ public:
 	// CounterBase interface
 	int32_t Get();
 	int32_t GetRaw();
+	int32_t GetEncodingScale();
 	void Reset();
 	double GetPeriod();
 	void SetMaxPeriod(double maxPeriod);
@@ -59,6 +60,11 @@ public:
 	void InitTable(ITable *subTable);
 	ITable * GetTable();
 
+	int32_t FPGAEncoderIndex()
+	{
+		return 0;
+	}
+
 private:
 	void InitEncoder(int channelA, int channelB, bool _reverseDirection, EncodingType encodingType);
 	double DecodingScaleFactor();
@@ -70,6 +76,7 @@ private:
 	int channelA, channelB;
 	double m_distancePerPulse;		// distance of travel for each encoder tick
 	EncodingType m_encodingType;	// Encoding type
+	int32_t m_encodingScale;		// 1x, 2x, or 4x, per the encodingType
 	PIDSourceParameter m_pidSource;	// Encoder parameter that sources a PID controller
 	bool m_reverseDirection;
 	SimEncoder* impl;

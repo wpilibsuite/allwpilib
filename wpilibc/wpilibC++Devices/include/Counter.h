@@ -67,7 +67,7 @@ public:
 	bool GetDirection();
 	void SetSamplesToAverage(int samplesToAverage);
 	int GetSamplesToAverage();
-	uint32_t GetIndex()
+	uint32_t GetFPGAIndex()
 	{
 		return m_index;
 	}

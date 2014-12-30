@@ -23,8 +23,8 @@ void Counter::InitCounter(Mode mode)
 	m_table = NULL;
 
 	int32_t status = 0;
-	uint32_t index = 0;
-	m_counter = initializeCounter(mode, &index, &status);
+	m_index = 0;
+	m_counter = initializeCounter(mode, &m_index, &status);
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
 	m_upSource = NULL;
@@ -34,7 +34,7 @@ void Counter::InitCounter(Mode mode)
 
 	SetMaxPeriod(.5);
 
-	HALReport(HALUsageReporting::kResourceType_Counter, index, mode);
+	HALReport(HALUsageReporting::kResourceType_Counter, m_index, mode);
 }
 
 /**

@@ -28,6 +28,9 @@ void Encoder::InitEncoder(int channelA, int channelB, bool reverseDirection, Enc
 	this->channelA = channelA;
 	this->channelB = channelB;
 	m_encodingType = encodingType;
+	m_encodingScale = encodingType == k4X ? 4
+		: encodingType == k2X ? 2
+		: 1;
 
 	int32_t index = 0;
 	m_distancePerPulse = 1.0;
@@ -187,6 +190,12 @@ double Encoder::DecodingScaleFactor()
 		return 0.0;
 	}
 }
+
+/**
+ * The encoding scale factor 1x, 2x, or 4x, per the requested encodingType.
+ * Used to divide raw edge counts down to spec'd counts.
+ */
+int32_t Encoder::GetEncodingScale() { return m_encodingScale; }
 
 /**
  * Gets the raw value from the encoder.

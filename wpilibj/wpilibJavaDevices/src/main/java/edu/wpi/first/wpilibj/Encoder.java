@@ -52,6 +52,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 										// tick
 	private Counter m_counter; // Counter object for 1x and 2x encoding
 	private EncodingType m_encodingType = EncodingType.k4X;
+	private int m_encodingScale; // 1x, 2x, or 4x, per the encodingType
 	private boolean m_allocatedA;
 	private boolean m_allocatedB;
 	private boolean m_allocatedI;
@@ -77,6 +78,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 	private void initEncoder(boolean reverseDirection) {
 		switch (m_encodingType.value) {
 		case EncodingType.k4X_val:
+			m_encodingScale = 4;
 			ByteBuffer status = ByteBuffer.allocateDirect(4);
 			// set the byte order
 			status.order(ByteOrder.LITTLE_ENDIAN);
@@ -98,8 +100,10 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 			break;
 		case EncodingType.k2X_val:
 		case EncodingType.k1X_val:
+			m_encodingScale = m_encodingType == EncodingType.k1X ? 1 : 2;
 			m_counter = new Counter(m_encodingType, m_aSource, m_bSource,
 					reverseDirection);
+			m_index = m_counter.getFPGAIndex();
 			break;
 		}
 		m_distancePerPulse = 1.0;
@@ -373,6 +377,21 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 	public Encoder(DigitalSource aSource, DigitalSource bSource,
 			DigitalSource indexSource) {
 		this(aSource, bSource, indexSource, false);
+	}
+
+	/**
+	 * @return the Encoder's FPGA index
+	 */
+	public int getFPGAIndex() {
+		return m_index;
+	}
+
+	/**
+	 * @return the encoding scale factor 1x, 2x, or 4x, per the requested
+	 *   encodingType. Used to divide raw edge counts down to spec'd counts.
+	 */
+	public int getEncodingScale() {
+		return m_encodingScale;
 	}
 
 	public void free() {

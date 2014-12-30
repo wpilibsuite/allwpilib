@@ -217,6 +217,13 @@ public class Counter extends SensorBase implements CounterBase,
 	}
 
 	/**
+	 * @return the Counter's FPGA index
+	 */
+	public int getFPGAIndex() {
+		return m_index;
+	}
+
+	/**
 	 * Set the upsource for the counter as a digital input channel.
 	 *
 	 * @param channel

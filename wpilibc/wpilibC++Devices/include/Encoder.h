@@ -41,6 +41,7 @@ public:
 	// CounterBase interface
 	int32_t Get();
 	int32_t GetRaw();
+	int32_t GetEncodingScale();
 	void Reset();
 	double GetPeriod();
 	void SetMaxPeriod(double maxPeriod);
@@ -63,6 +64,11 @@ public:
 	void InitTable(ITable *subTable);
 	ITable * GetTable();
 
+	int32_t GetFPGAIndex()
+	{
+		return m_index;
+	}
+
 private:
 	void InitEncoder(bool _reverseDirection, EncodingType encodingType);
 	double DecodingScaleFactor();
@@ -72,9 +78,11 @@ private:
 	bool m_allocatedASource;		// was the A source allocated locally?
 	bool m_allocatedBSource;		// was the B source allocated locally?
 	void* m_encoder;
+	int32_t m_index;				// The encoder's FPGA index.
 	double m_distancePerPulse;		// distance of travel for each encoder tick
 	Counter *m_counter;				// Counter object for 1x and 2x encoding
 	EncodingType m_encodingType;	// Encoding type
+	int32_t m_encodingScale;		// 1x, 2x, or 4x, per the encodingType
 	PIDSourceParameter m_pidSource;	// Encoder parameter that sources a PID controller
 
 	ITable *m_table;

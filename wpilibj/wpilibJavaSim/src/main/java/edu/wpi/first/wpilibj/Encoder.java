@@ -29,6 +29,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 	private int m_index;
 	private double m_distancePerPulse; // distance of travel for each encoder tick
 	private EncodingType m_encodingType = EncodingType.k4X;
+	private int m_encodingScale; // 1x, 2x, or 4x, per the encodingType
 	private boolean m_allocatedA;
 	private boolean m_allocatedB;
 	private boolean m_allocatedI;
@@ -56,6 +57,9 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 	private void initEncoder(int aChannel, int bChannel, boolean reverseDirection) {
 		m_distancePerPulse = 1.0;
 		m_pidSource = PIDSourceParameter.kDistance;
+		m_encodingScale = m_encodingType == EncodingType.k4X ? 4
+			: m_encodingType == EncodingType.k2X ? 2
+			: 1;
 
 		LiveWindow.addSensor("Encoder", aChannel, this);
 
@@ -140,6 +144,21 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 			throw new NullPointerException("Given encoding type was null");
 		m_encodingType = encodingType;
 		initEncoder(aChannel, bChannel, reverseDirection);
+	}
+
+	/**
+	 * @return the Encoder's FPGA index
+	 */
+	public int getFPGAEncoderIndex() {
+		return m_index;
+	}
+
+	/**
+	 * @return the encoding scale factor 1x, 2x, or 4x, per the requested
+	 *   encodingType. Used to divide raw edge counts down to spec'd counts.
+	 */
+	public int getEncodingScale() {
+		return m_encodingScale;
 	}
 
 	public void free() {}

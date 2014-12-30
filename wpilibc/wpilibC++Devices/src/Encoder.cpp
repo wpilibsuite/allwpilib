@@ -28,11 +28,12 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType)
 {
 	m_table = NULL;
 	m_encodingType = encodingType;
-	int32_t index = 0;
+	m_index = 0;
 	switch (encodingType)
 	{
 		case k4X:
 		{
+			m_encodingScale = 4;
 			if (m_aSource->StatusIsFatal())
 			{
 				CloneError(m_aSource);
@@ -44,12 +45,11 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType)
 				return;
 			}
 			int32_t status = 0;
-			int32_t index = 0;
 			m_encoder =  initializeEncoder(m_aSource->GetModuleForRouting(), m_aSource->GetChannelForRouting(),
 										   m_aSource->GetAnalogTriggerForRouting(),
 										   m_bSource->GetModuleForRouting(), m_bSource->GetChannelForRouting(),
 										   m_bSource->GetAnalogTriggerForRouting(),
-										   reverseDirection, &index, &status);
+										   reverseDirection, &m_index, &status);
 			  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 			m_counter = NULL;
 			SetMaxPeriod(.5);
@@ -58,15 +58,19 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType)
 		case k1X:
 		case k2X:
 		{
+			m_encodingScale = encodingType == k1X ? 1 : 2;
 			m_counter = new Counter(m_encodingType, m_aSource, m_bSource, reverseDirection);
-			index = m_counter->GetIndex();
+			m_index = m_counter->GetFPGAIndex();
 			break;
 		}
+		default:
+			wpi_setErrorWithContext(-1, "Invalid encodingType argument");
+			break;
 	}
 	m_distancePerPulse = 1.0;
 	m_pidSource = kDistance;
 
-	HALReport(HALUsageReporting::kResourceType_Encoder, index, encodingType);
+	HALReport(HALUsageReporting::kResourceType_Encoder, m_index, encodingType);
 	LiveWindow::GetInstance()->AddSensor("Encoder", m_aSource->GetChannelForRouting(), this);
 }
 
@@ -179,6 +183,12 @@ Encoder::~Encoder()
 }
 
 /**
+ * The encoding scale factor 1x, 2x, or 4x, per the requested encodingType.
+ * Used to divide raw edge counts down to spec'd counts.
+ */
+int32_t Encoder::GetEncodingScale() { return m_encodingScale; }
+
+/**
  * Gets the raw value from the encoder.
  * The raw value is the actual count unscaled by the 1x, 2x, or 4x scale
  * factor.
@@ -232,7 +242,7 @@ void Encoder::Reset()
 /**
  * Returns the period of the most recent pulse.
  * Returns the period of the most recent Encoder pulse in seconds.
- * This method compenstates for the decoding type.
+ * This method compensates for the decoding type.
  *
  * @deprecated Use GetRate() in favor of this method.  This returns unscaled periods and GetRate() scales using value from SetDistancePerPulse().
  *
