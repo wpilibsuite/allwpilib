@@ -10,12 +10,15 @@ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInst
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
  *
  * @author dtjones
  */
-public class ADXL345_I2C extends SensorBase implements Accelerometer {
+public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindowSendable {
 
 	private static final byte kAddress = 0x1D;
 	private static final byte kPowerCtlRegister = 0x2D;
@@ -65,6 +68,7 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer {
 		setRange(range);
 
 		UsageReporting.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_I2C);
+		LiveWindow.addSensor("ADXL345_I2C", port.getValue(), this);
 	}
 
 	/** {inheritdoc} */
@@ -146,5 +150,32 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer {
 		return data;
 	}
 
-	// TODO: Support LiveWindow
+	public String getSmartDashboardType(){
+		return "3AxisAccelerometer";
+	}
+
+	private ITable m_table;
+
+	/** {@inheritDoc} */
+	public void initTable(ITable subtable) {
+		m_table = subtable;
+		updateTable();
+	}
+
+	/** {@inheritDoc} */
+	public void updateTable() {
+		if (m_table != null) {
+			m_table.putNumber("X", getX());
+			m_table.putNumber("Y", getY());
+			m_table.putNumber("Z", getZ());
+		}
+	}
+
+	/** {@inheritDoc} */
+	public ITable getTable(){
+		return m_table;
+	}
+
+	public void startLiveWindowMode() {}
+	public void stopLiveWindowMode() {}
 }
