@@ -7,6 +7,7 @@
 #include "ADXL345_I2C.h"
 #include "I2C.h"
 #include "HAL/HAL.hpp"
+#include "LiveWindow/LiveWindow.h"
 
 const uint8_t ADXL345_I2C::kAddress;
 const uint8_t ADXL345_I2C::kPowerCtlRegister;
@@ -31,6 +32,7 @@ ADXL345_I2C::ADXL345_I2C(Port port, Range range):
 		SetRange(range);
 
 		HALReport(HALUsageReporting::kResourceType_ADXL345, HALUsageReporting::kADXL345_I2C, 0);
+		LiveWindow::GetInstance()->AddSensor("ADXL345_I2C", port, this);
 }
 
 /**
@@ -100,4 +102,25 @@ ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations()
 		data.ZAxis = rawData[2] * kGsPerLSB;
 	//}
 	return data;
+}
+
+std::string ADXL345_I2C::GetSmartDashboardType() {
+	return "3AxisAccelerometer";
+}
+
+void ADXL345_I2C::InitTable(ITable *subtable) {
+	m_table = subtable;
+	UpdateTable();
+}
+
+void ADXL345_I2C::UpdateTable() {
+	if (m_table != NULL) {
+		m_table->PutNumber("X", GetX());
+		m_table->PutNumber("Y", GetY());
+		m_table->PutNumber("Z", GetZ());
+	}
+}
+
+ITable* ADXL345_I2C::GetTable() {
+	return m_table;
 }

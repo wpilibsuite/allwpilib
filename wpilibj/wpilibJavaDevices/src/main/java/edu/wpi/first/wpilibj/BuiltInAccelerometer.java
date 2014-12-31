@@ -26,6 +26,7 @@ public class BuiltInAccelerometer implements Accelerometer, LiveWindowSendable
 	public BuiltInAccelerometer(Range range) {
 		setRange(range);
 		UsageReporting.report(tResourceType.kResourceType_Accelerometer, 0, 0, "Built-in accelerometer");
+		LiveWindow.addSensor("BuiltInAccel", 0, this);
 	}
 
 	/**
@@ -83,7 +84,7 @@ public class BuiltInAccelerometer implements Accelerometer, LiveWindowSendable
 	}
 
 	public String getSmartDashboardType(){
-		return "Accelerometer";
+		return "3AxisAccelerometer";
 	}
 
 	private ITable m_table;

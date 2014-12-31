@@ -7,6 +7,7 @@
 
 #include "interfaces/Accelerometer.h"
 #include "I2C.h"
+#include "LiveWindow/LiveWindowSendable.h"
 
 /**
  * ADXL345 Accelerometer on I2C.
@@ -14,7 +15,7 @@
  * This class allows access to a Analog Devices ADXL345 3-axis accelerometer on an I2C bus.
  * This class assumes the default (not alternate) sensor address of 0x1D (7-bit address).
  */
-class ADXL345_I2C : public Accelerometer, public I2C
+class ADXL345_I2C : public Accelerometer, public I2C, public LiveWindowSendable
 {
 protected:
 	static const uint8_t kAddress = 0x1D;
@@ -48,6 +49,15 @@ public:
 	virtual double GetAcceleration(Axes axis);
 	virtual AllAxes GetAccelerations();
 
+	virtual std::string GetSmartDashboardType();
+	virtual void InitTable(ITable *subtable);
+	virtual void UpdateTable();
+	virtual ITable* GetTable();
+	virtual void StartLiveWindowMode() {}
+	virtual void StopLiveWindowMode() {}
+
 protected:
 	//I2C* m_i2c;
+private:
+	ITable *m_table;
 };
