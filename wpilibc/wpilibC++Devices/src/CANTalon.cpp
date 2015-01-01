@@ -66,9 +66,16 @@ void CANTalon::PIDWrite(float output)
 	}
 }
 
-/**
- * TODO documentation (see CANJaguar.cpp)
- */
+  /**
+   * Gets the current status of the Talon (usually a sensor value).
+   *
+   * In Current mode: returns output current.
+   * In Speed mode: returns current speed.
+   * In Position mode: returns current sensor position.
+   * In PercentVbus and Follower modes: returns current applied throttle.
+   *
+   * @return The current sensor value of the Talon.
+   */
 float CANTalon::Get()
 {
   int value;
@@ -94,11 +101,12 @@ float CANTalon::Get()
  * Sets the appropriate output on the talon, depending on the mode.
  *
  * In PercentVbus, the output is between -1.0 and 1.0, with 0.0 as stopped.
- * In Voltage mode, outputValue is in volts.
- * In Current mode, outputValue is in amperes.
- * In Speed mode, outputValue is in position change / 10ms.
- * In Position mode, outputValue is in encoder ticks or an analog value,
+ * In Voltage mode, output value is in volts.
+ * In Current mode, output value is in amperes.
+ * In Speed mode, output value is in position change / 10ms.
+ * In Position mode, output value is in encoder ticks or an analog value,
  *   depending on the sensor.
+ * In Follower mode, the output value is the integer device ID of the talon to duplicate.
  *
  * @param outputValue The setpoint value, as described above.
  * @see SelectProfileSlot to choose between the two sets of gains.
@@ -188,10 +196,12 @@ void CANTalon::SetP(double p)
 	}
 }
 
-/**
- * TODO documentation (see CANJaguar.cpp)
- * @see SelectProfileSlot to choose between the two sets of gains.
- */
+ /**
+  * Set the integration constant of the currently selected profile.
+  *
+  * @param i Integration constant for the currently selected PID profile.
+  * @see SelectProfileSlot to choose between the two sets of gains.
+  */
 void CANTalon::SetI(double i)
 {
   CTR_Code status = m_impl->SetIgain(m_profile, i);
@@ -201,7 +211,9 @@ void CANTalon::SetI(double i)
 }
 
 /**
- * TODO documentation (see CANJaguar.cpp)
+ * Set the derivative constant of the currently selected profile.
+ *
+ * @param d Derivative constant for the currently selected PID profile.
  * @see SelectProfileSlot to choose between the two sets of gains.
  */
 void CANTalon::SetD(double d)
@@ -212,7 +224,9 @@ void CANTalon::SetD(double d)
 	}
 }
 /**
+ * Set the feedforward value of the currently selected profile.
  *
+ * @param f Feedforward constant for the currently selected PID profile.
  * @see SelectProfileSlot to choose between the two sets of gains.
  */
 void CANTalon::SetF(double f)
@@ -248,7 +262,11 @@ void CANTalon::SelectProfileSlot(int slotIdx)
 	}
 }
 /**
- * TODO documentation (see CANJaguar.cpp)
+ * Sets control values for closed loop control.
+ *
+ * @param p Proportional constant.
+ * @param i Integration constant.
+ * @param d Differential constant.
  * This function does not modify F-gain.  Considerable passing a zero for f using
  * the four-parameter function.
  */
@@ -258,6 +276,14 @@ void CANTalon::SetPID(double p, double i, double d)
 	SetI(i);
 	SetD(d);
 }
+/**
+ * Sets control values for closed loop control.
+ *
+ * @param p Proportional constant.
+ * @param i Integration constant.
+ * @param d Differential constant.
+ * @param f Feedforward constant.
+ */
 void CANTalon::SetPID(double p, double i, double d, double f)
 {
 	SetP(p);
@@ -287,7 +313,9 @@ void CANTalon::SetStatusFrameRateMs(StatusFrameRate stateFrame, int periodMs)
 }
 
 /**
- * TODO documentation (see CANJaguar.cpp)
+ * Get the current proportional constant.
+ *
+ * @return double proportional constant for current profile.
  * @see SelectProfileSlot to choose between the two sets of gains.
  */
 double CANTalon::GetP()
@@ -402,7 +430,7 @@ double CANTalon::GetSetpoint() {
 /**
  * Returns the voltage coming in from the battery.
  *
- * @return The input voltage in vols.
+ * @return The input voltage in volts.
  */
 float CANTalon::GetBusVoltage()
 {
@@ -415,7 +443,7 @@ float CANTalon::GetBusVoltage()
 }
 
 /**
- * TODO documentation (see CANJaguar.cpp)
+ * @return The voltage being output by the Talon, in Volts.
  */
 float CANTalon::GetOutputVoltage()
 {
@@ -430,7 +458,7 @@ float CANTalon::GetOutputVoltage()
 
 
 /**
- * TODO documentation (see CANJaguar.cpp)
+ *  Returns the current going through the Talon, in Amperes.
  */
 float CANTalon::GetOutputCurrent()
 {
@@ -444,9 +472,9 @@ float CANTalon::GetOutputCurrent()
 	return current;
 }
 
-/**
- * TODO documentation (see CANJaguar.cpp)
- */
+  /**
+   *  Returns temperature of Talon, in degrees Celsius.
+   */
 float CANTalon::GetTemperature()
 {
   double temp;
@@ -965,7 +993,7 @@ int CANTalon::GetBrakeEnableDuringNeutral()
 	return brakeEn;
 }
 /**
- * TODO documentation (see CANJaguar.cpp)
+ * @deprecated not implemented
  */
 void CANTalon::ConfigEncoderCodesPerRev(uint16_t codesPerRev)
 {
@@ -973,7 +1001,7 @@ void CANTalon::ConfigEncoderCodesPerRev(uint16_t codesPerRev)
 }
 
 /**
- * TODO documentation (see CANJaguar.cpp)
+ * @deprecated not implemented
  */
 void CANTalon::ConfigPotentiometerTurns(uint16_t turns)
 {
@@ -981,7 +1009,7 @@ void CANTalon::ConfigPotentiometerTurns(uint16_t turns)
 }
 
 /**
- * TODO documentation (see CANJaguar.cpp)
+ * @deprecated not implemented
  */
 void CANTalon::ConfigSoftPositionLimits(double forwardLimitPosition, double reverseLimitPosition)
 {
