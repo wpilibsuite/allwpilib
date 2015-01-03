@@ -41,6 +41,96 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision_imaqDispose(JNIEnv* , jclass 
     imaqDispose((void*)addr);
 }
 
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeU32(IMAQdxSession id, const char* name, uInt32* value)
+{
+    return IMAQdxGetAttribute(id, name, IMAQdxValueTypeU32, (void*)value);
+}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeI64(IMAQdxSession id, const char* name, Int64* value)
+{
+    return IMAQdxGetAttribute(id, name, IMAQdxValueTypeI64, (void*)value);
+}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeF64(IMAQdxSession id, const char* name, float64* value)
+{
+    return IMAQdxGetAttribute(id, name, IMAQdxValueTypeF64, (void*)value);
+}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeString(IMAQdxSession id, const char* name, char value[IMAQDX_MAX_API_STRING_LENGTH])
+{
+    return IMAQdxGetAttribute(id, name, IMAQdxValueTypeString, (void*)value);
+}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeEnum(IMAQdxSession id, const char* name, IMAQdxEnumItem* value)
+{
+    return IMAQdxGetAttribute(id, name, IMAQdxValueTypeEnumItem, (void*)value);
+}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeBool(IMAQdxSession id, const char* name, bool32* value)
+{
+    return IMAQdxGetAttribute(id, name, IMAQdxValueTypeBool, (void*)value);
+}
+
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeMinimumU32(IMAQdxSession id, const char* name, uInt32* value)
+{
+    return IMAQdxGetAttributeMinimum(id, name, IMAQdxValueTypeU32, (void*)value);
+}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeMinimumI64(IMAQdxSession id, const char* name, Int64* value)
+{
+    return IMAQdxGetAttributeMinimum(id, name, IMAQdxValueTypeI64, (void*)value);
+}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeMinimumF64(IMAQdxSession id, const char* name, float64* value)
+{
+    return IMAQdxGetAttributeMinimum(id, name, IMAQdxValueTypeF64, (void*)value);
+}
+
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeMaximumU32(IMAQdxSession id, const char* name, uInt32* value)
+{
+    return IMAQdxGetAttributeMaximum(id, name, IMAQdxValueTypeU32, (void*)value);
+}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeMaximumI64(IMAQdxSession id, const char* name, Int64* value)
+{
+    return IMAQdxGetAttributeMaximum(id, name, IMAQdxValueTypeI64, (void*)value);
+}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeMaximumF64(IMAQdxSession id, const char* name, float64* value)
+{
+    return IMAQdxGetAttributeMaximum(id, name, IMAQdxValueTypeF64, (void*)value);
+}
+
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeIncrementU32(IMAQdxSession id, const char* name, uInt32* value)
+{
+    return IMAQdxGetAttributeIncrement(id, name, IMAQdxValueTypeU32, (void*)value);
+}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeIncrementI64(IMAQdxSession id, const char* name, Int64* value)
+{
+    return IMAQdxGetAttributeIncrement(id, name, IMAQdxValueTypeI64, (void*)value);
+}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeIncrementF64(IMAQdxSession id, const char* name, float64* value)
+{
+    return IMAQdxGetAttributeIncrement(id, name, IMAQdxValueTypeF64, (void*)value);
+}
+
+static inline IMAQdxError NI_FUNC IMAQdxSetAttributeU32(IMAQdxSession id, const char* name, uInt32 value)
+{
+    return IMAQdxSetAttribute(id, name, IMAQdxValueTypeU32, value);
+}
+static inline IMAQdxError NI_FUNC IMAQdxSetAttributeI64(IMAQdxSession id, const char* name, Int64 value)
+{
+    return IMAQdxSetAttribute(id, name, IMAQdxValueTypeI64, value);
+}
+static inline IMAQdxError NI_FUNC IMAQdxSetAttributeF64(IMAQdxSession id, const char* name, float64 value)
+{
+    return IMAQdxSetAttribute(id, name, IMAQdxValueTypeF64, value);
+}
+static inline IMAQdxError NI_FUNC IMAQdxSetAttributeString(IMAQdxSession id, const char* name, const char* value)
+{
+    return IMAQdxSetAttribute(id, name, IMAQdxValueTypeString, value);
+}
+static inline IMAQdxError NI_FUNC IMAQdxSetAttributeEnum(IMAQdxSession id, const char* name, const IMAQdxEnumItem* value)
+{
+    return IMAQdxSetAttribute(id, name, IMAQdxValueTypeU32, value->Value);
+}
+static inline IMAQdxError NI_FUNC IMAQdxSetAttributeBool(IMAQdxSession id, const char* name, bool32 value)
+{
+    return IMAQdxSetAttribute(id, name, IMAQdxValueTypeBool, value);
+}
+
+
 /*
  * Opaque Structures
  */
@@ -165,28 +255,26 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqXor(JNIEnv* env, jclass
  * Particle Analysis functions
  */
 
-/* J: int imaqCountParticles(Image image, int connectivity8)
- * JN: int imaqCountParticles(long image, int connectivity8, long numParticles)
+/* J: void imaqCountParticles(Image image, int connectivity8)
+ * JN: void imaqCountParticles(long image, int connectivity8, long numParticles)
  * C: int imaqCountParticles(Image* image, int connectivity8, int* numParticles)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqCountParticles(JNIEnv* env, jclass , jlong image, jint connectivity8, jlong numParticles)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqCountParticles(JNIEnv* env, jclass , jlong image, jint connectivity8, jlong numParticles)
 {
     int rv = imaqCountParticles((Image*)image, (int)connectivity8, (int*)numParticles);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
-/* J: double imaqMeasureParticle(Image image, int particleNumber, int calibrated, MeasurementType measurement)
- * JN: double imaqMeasureParticle(long image, int particleNumber, int calibrated, int measurement, long value)
+/* J: void imaqMeasureParticle(Image image, int particleNumber, int calibrated, MeasurementType measurement)
+ * JN: void imaqMeasureParticle(long image, int particleNumber, int calibrated, int measurement, long value)
  * C: int imaqMeasureParticle(Image* image, int particleNumber, int calibrated, MeasurementType measurement, double* value)
  */
 
-JNIEXPORT jdouble JNICALL Java_com_ni_vision_NIVision__1imaqMeasureParticle(JNIEnv* env, jclass , jlong image, jint particleNumber, jint calibrated, jint measurement, jlong value)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqMeasureParticle(JNIEnv* env, jclass , jlong image, jint particleNumber, jint calibrated, jint measurement, jlong value)
 {
     int rv = imaqMeasureParticle((Image*)image, (int)particleNumber, (int)calibrated, (MeasurementType)measurement, (double*)value);
     if (rv == 0) throwJavaException(env);
-    return (jdouble)rv;
 }
 
 /* J: MeasureParticlesReport imaqMeasureParticles(Image image, MeasureParticlesCalibrationMode calibrationMode, MeasurementType[] measurements)
@@ -201,16 +289,15 @@ JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqMeasureParticles(JNIEn
     return (jlong)rv;
 }
 
-/* J: int imaqParticleFilter4(Image dest, Image source, ParticleFilterCriteria2[] criteria, ParticleFilterOptions2 options, ROI roi)
- * JN: int imaqParticleFilter4(long dest, long source, long criteria, int criteriaCount, long options, long roi, long numParticles)
+/* J: void imaqParticleFilter4(Image dest, Image source, ParticleFilterCriteria2[] criteria, ParticleFilterOptions2 options, ROI roi)
+ * JN: void imaqParticleFilter4(long dest, long source, long criteria, int criteriaCount, long options, long roi, long numParticles)
  * C: int imaqParticleFilter4(Image* dest, Image* source, const ParticleFilterCriteria2* criteria, int criteriaCount, const ParticleFilterOptions2* options, const ROI* roi, int* numParticles)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqParticleFilter4(JNIEnv* env, jclass , jlong dest, jlong source, jlong criteria, jint criteriaCount, jlong options, jlong roi, jlong numParticles)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqParticleFilter4(JNIEnv* env, jclass , jlong dest, jlong source, jlong criteria, jint criteriaCount, jlong options, jlong roi, jlong numParticles)
 {
     int rv = imaqParticleFilter4((Image*)dest, (Image*)source, (const ParticleFilterCriteria2*)criteria, (int)criteriaCount, (const ParticleFilterOptions2*)options, (const ROI*)roi, (int*)numParticles);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
 /*
@@ -262,16 +349,15 @@ JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqFindCircles(JNIEnv* en
     return (jlong)rv;
 }
 
-/* J: int imaqLabel2(Image dest, Image source, int connectivity8)
- * JN: int imaqLabel2(long dest, long source, int connectivity8, long particleCount)
+/* J: void imaqLabel2(Image dest, Image source, int connectivity8)
+ * JN: void imaqLabel2(long dest, long source, int connectivity8, long particleCount)
  * C: int imaqLabel2(Image* dest, Image* source, int connectivity8, int* particleCount)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqLabel2(JNIEnv* env, jclass , jlong dest, jlong source, jint connectivity8, jlong particleCount)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqLabel2(JNIEnv* env, jclass , jlong dest, jlong source, jint connectivity8, jlong particleCount)
 {
     int rv = imaqLabel2((Image*)dest, (Image*)source, (int)connectivity8, (int*)particleCount);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
 /* J: void imaqMorphology(Image dest, Image source, MorphologyMethod method, StructuringElement structuringElement)
@@ -635,16 +721,15 @@ JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqDetectExtremes(JNIEnv*
     return (jlong)rv;
 }
 
-/* J: double imaqDetectRotation(Image referenceImage, Image testImage, PointFloat referenceCenter, PointFloat testCenter, int radius, float precision)
- * JN: double imaqDetectRotation(long referenceImage, long testImage, long referenceCenter, long testCenter, int radius, float precision, long angle)
+/* J: void imaqDetectRotation(Image referenceImage, Image testImage, PointFloat referenceCenter, PointFloat testCenter, int radius, float precision)
+ * JN: void imaqDetectRotation(long referenceImage, long testImage, long referenceCenter, long testCenter, int radius, float precision, long angle)
  * C: int imaqDetectRotation(const Image* referenceImage, const Image* testImage, PointFloat referenceCenter, PointFloat testCenter, int radius, float precision, double* angle)
  */
 
-JNIEXPORT jdouble JNICALL Java_com_ni_vision_NIVision__1imaqDetectRotation(JNIEnv* env, jclass , jlong referenceImage, jlong testImage, jlong referenceCenter, jlong testCenter, jint radius, jfloat precision, jlong angle)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqDetectRotation(JNIEnv* env, jclass , jlong referenceImage, jlong testImage, jlong referenceCenter, jlong testCenter, jint radius, jfloat precision, jlong angle)
 {
     int rv = imaqDetectRotation((const Image*)referenceImage, (const Image*)testImage, *((PointFloat*)referenceCenter), *((PointFloat*)testCenter), (int)radius, (float)precision, (double*)angle);
     if (rv == 0) throwJavaException(env);
-    return (jdouble)rv;
 }
 
 /* J: EdgeReport2 imaqEdgeTool4(Image image, ROI roi, EdgeProcess processType, int reverseDirection)
@@ -693,16 +778,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqFindTransformRects2(JNI
     if (rv == 0) throwJavaException(env);
 }
 
-/* J: float imaqLineGaugeTool2(Image image, Point start, Point end, LineGaugeMethod method, EdgeOptions edgeOptions, CoordinateTransform2 transform)
- * JN: float imaqLineGaugeTool2(long image, long start, long end, int method, long edgeOptions, long transform, long distance)
+/* J: void imaqLineGaugeTool2(Image image, Point start, Point end, LineGaugeMethod method, EdgeOptions edgeOptions, CoordinateTransform2 transform)
+ * JN: void imaqLineGaugeTool2(long image, long start, long end, int method, long edgeOptions, long transform, long distance)
  * C: int imaqLineGaugeTool2(const Image* image, Point start, Point end, LineGaugeMethod method, const EdgeOptions* edgeOptions, const CoordinateTransform2* transform, float* distance)
  */
 
-JNIEXPORT jfloat JNICALL Java_com_ni_vision_NIVision__1imaqLineGaugeTool2(JNIEnv* env, jclass , jlong image, jlong start, jlong end, jint method, jlong edgeOptions, jlong transform, jlong distance)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqLineGaugeTool2(JNIEnv* env, jclass , jlong image, jlong start, jlong end, jint method, jlong edgeOptions, jlong transform, jlong distance)
 {
     int rv = imaqLineGaugeTool2((const Image*)image, *((Point*)start), *((Point*)end), (LineGaugeMethod)method, (const EdgeOptions*)edgeOptions, (const CoordinateTransform2*)transform, (float*)distance);
     if (rv == 0) throwJavaException(env);
-    return (jfloat)rv;
 }
 
 /* J: RakeReport2 imaqRake2(Image image, ROI roi, RakeDirection direction, EdgeProcess process, int stepSize)
@@ -861,16 +945,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqDrawShapeOnImage(JNIEnv
     if (rv == 0) throwJavaException(env);
 }
 
-/* J: int imaqDrawTextOnImage(Image dest, Image source, Point coord, String text, DrawTextOptions options)
- * JN: int imaqDrawTextOnImage(long dest, long source, long coord, long text, long options, long fontNameUsed)
+/* J: void imaqDrawTextOnImage(Image dest, Image source, Point coord, String text, DrawTextOptions options)
+ * JN: void imaqDrawTextOnImage(long dest, long source, long coord, long text, long options, long fontNameUsed)
  * C: int imaqDrawTextOnImage(Image* dest, const Image* source, Point coord, const char* text, const DrawTextOptions* options, int* fontNameUsed)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqDrawTextOnImage(JNIEnv* env, jclass , jlong dest, jlong source, jlong coord, jlong text, jlong options, jlong fontNameUsed)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqDrawTextOnImage(JNIEnv* env, jclass , jlong dest, jlong source, jlong coord, jlong text, jlong options, jlong fontNameUsed)
 {
     int rv = imaqDrawTextOnImage((Image*)dest, (const Image*)source, *((Point*)coord), (const char*)text, (const DrawTextOptions*)options, (int*)fontNameUsed);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
 /*
@@ -915,40 +998,37 @@ JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqEnumerateCustomKeys(JN
     return (jlong)rv;
 }
 
-/* J: int imaqGetBitDepth(Image image)
- * JN: int imaqGetBitDepth(long image, long bitDepth)
+/* J: void imaqGetBitDepth(Image image)
+ * JN: void imaqGetBitDepth(long image, long bitDepth)
  * C: int imaqGetBitDepth(const Image* image, unsigned int* bitDepth)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqGetBitDepth(JNIEnv* env, jclass , jlong image, jlong bitDepth)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetBitDepth(JNIEnv* env, jclass , jlong image, jlong bitDepth)
 {
     int rv = imaqGetBitDepth((const Image*)image, (unsigned int*)bitDepth);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
-/* J: int imaqGetBytesPerPixel(Image image)
- * JN: int imaqGetBytesPerPixel(long image, long byteCount)
+/* J: void imaqGetBytesPerPixel(Image image)
+ * JN: void imaqGetBytesPerPixel(long image, long byteCount)
  * C: int imaqGetBytesPerPixel(const Image* image, int* byteCount)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqGetBytesPerPixel(JNIEnv* env, jclass , jlong image, jlong byteCount)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetBytesPerPixel(JNIEnv* env, jclass , jlong image, jlong byteCount)
 {
     int rv = imaqGetBytesPerPixel((const Image*)image, (int*)byteCount);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
-/* J: ImageInfo imaqGetImageInfo(Image image)
- * JN: long imaqGetImageInfo(long image, long info)
+/* J: void imaqGetImageInfo(Image image)
+ * JN: void imaqGetImageInfo(long image, long info)
  * C: int imaqGetImageInfo(const Image* image, ImageInfo* info)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqGetImageInfo(JNIEnv* env, jclass , jlong image, jlong info)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetImageInfo(JNIEnv* env, jclass , jlong image, jlong info)
 {
     int rv = imaqGetImageInfo((const Image*)image, (ImageInfo*)info);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
 /* J: void imaqGetImageSize(Image image)
@@ -962,52 +1042,48 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetImageSize(JNIEnv* en
     if (rv == 0) throwJavaException(env);
 }
 
-/* J: ImageType imaqGetImageType(Image image)
- * JN: int imaqGetImageType(long image, long type)
+/* J: void imaqGetImageType(Image image)
+ * JN: void imaqGetImageType(long image, long type)
  * C: int imaqGetImageType(const Image* image, ImageType* type)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqGetImageType(JNIEnv* env, jclass , jlong image, jlong type)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetImageType(JNIEnv* env, jclass , jlong image, jlong type)
 {
     int rv = imaqGetImageType((const Image*)image, (ImageType*)type);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
-/* J: Point imaqGetMaskOffset(Image image)
- * JN: long imaqGetMaskOffset(long image, long offset)
+/* J: void imaqGetMaskOffset(Image image)
+ * JN: void imaqGetMaskOffset(long image, long offset)
  * C: int imaqGetMaskOffset(const Image* image, Point* offset)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqGetMaskOffset(JNIEnv* env, jclass , jlong image, jlong offset)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetMaskOffset(JNIEnv* env, jclass , jlong image, jlong offset)
 {
     int rv = imaqGetMaskOffset((const Image*)image, (Point*)offset);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
-/* J: int imaqGetVisionInfoTypes(Image image)
- * JN: int imaqGetVisionInfoTypes(long image, long present)
+/* J: void imaqGetVisionInfoTypes(Image image)
+ * JN: void imaqGetVisionInfoTypes(long image, long present)
  * C: int imaqGetVisionInfoTypes(const Image* image, unsigned int* present)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqGetVisionInfoTypes(JNIEnv* env, jclass , jlong image, jlong present)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetVisionInfoTypes(JNIEnv* env, jclass , jlong image, jlong present)
 {
     int rv = imaqGetVisionInfoTypes((const Image*)image, (unsigned int*)present);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
-/* J: int imaqIsImageEmpty(Image image)
- * JN: int imaqIsImageEmpty(long image, long empty)
+/* J: void imaqIsImageEmpty(Image image)
+ * JN: void imaqIsImageEmpty(long image, long empty)
  * C: int imaqIsImageEmpty(const Image* image, int* empty)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqIsImageEmpty(JNIEnv* env, jclass , jlong image, jlong empty)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqIsImageEmpty(JNIEnv* env, jclass , jlong image, jlong empty)
 {
     int rv = imaqIsImageEmpty((const Image*)image, (int*)empty);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
 /* J: RawData imaqReadCustomData(Image image, String key)
@@ -1092,16 +1168,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqWriteCustomData(JNIEnv*
  * Display functions
  */
 
-/* J: int imaqAreToolsContextSensitive()
- * JN: int imaqAreToolsContextSensitive(long sensitive)
+/* J: void imaqAreToolsContextSensitive()
+ * JN: void imaqAreToolsContextSensitive(long sensitive)
  * C: int imaqAreToolsContextSensitive(int* sensitive)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqAreToolsContextSensitive(JNIEnv* env, jclass , jlong sensitive)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqAreToolsContextSensitive(JNIEnv* env, jclass , jlong sensitive)
 {
     int rv = imaqAreToolsContextSensitive((int*)sensitive);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
 /* J: void imaqCloseWindow(int windowNumber)
@@ -1137,16 +1212,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetLastKey(JNIEnv* env,
     if (rv == 0) throwJavaException(env);
 }
 
-/* J: Point imaqGetWindowCenterPos(int windowNumber)
- * JN: long imaqGetWindowCenterPos(int windowNumber, long centerPosition)
+/* J: void imaqGetWindowCenterPos(int windowNumber)
+ * JN: void imaqGetWindowCenterPos(int windowNumber, long centerPosition)
  * C: int imaqGetWindowCenterPos(int windowNumber, Point* centerPosition)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqGetWindowCenterPos(JNIEnv* env, jclass , jint windowNumber, jlong centerPosition)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetWindowCenterPos(JNIEnv* env, jclass , jint windowNumber, jlong centerPosition)
 {
     int rv = imaqGetWindowCenterPos((int)windowNumber, (Point*)centerPosition);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
 /* J: void imaqSetToolContextSensitivity(int sensitive)
@@ -1324,16 +1398,15 @@ JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqCreateAVI(JNIEnv* env, 
     return (jint)rv;
 }
 
-/* J: AVIInfo imaqGetAVIInfo(int session)
- * JN: long imaqGetAVIInfo(int session, long info)
+/* J: void imaqGetAVIInfo(int session)
+ * JN: void imaqGetAVIInfo(int session, long info)
  * C: int imaqGetAVIInfo(AVISession session, AVIInfo* info)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqGetAVIInfo(JNIEnv* env, jclass , jint session, jlong info)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetAVIInfo(JNIEnv* env, jclass , jint session, jlong info)
 {
     int rv = imaqGetAVIInfo((AVISession)session, (AVIInfo*)info);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
 /* J: void imaqGetFileInfo(String fileName)
@@ -1497,16 +1570,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqWriteVisionFile(JNIEnv*
  * Analytic Geometry functions
  */
 
-/* J: CoordinateSystem imaqBuildCoordinateSystem(Point points, ReferenceMode mode, AxisOrientation orientation)
- * JN: long imaqBuildCoordinateSystem(long points, int mode, int orientation, long system)
+/* J: void imaqBuildCoordinateSystem(Point points, ReferenceMode mode, AxisOrientation orientation)
+ * JN: void imaqBuildCoordinateSystem(long points, int mode, int orientation, long system)
  * C: int imaqBuildCoordinateSystem(const Point* points, ReferenceMode mode, AxisOrientation orientation, CoordinateSystem* system)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqBuildCoordinateSystem(JNIEnv* env, jclass , jlong points, jint mode, jint orientation, jlong system)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqBuildCoordinateSystem(JNIEnv* env, jclass , jlong points, jint mode, jint orientation, jlong system)
 {
     int rv = imaqBuildCoordinateSystem((const Point*)points, (ReferenceMode)mode, (AxisOrientation)orientation, (CoordinateSystem*)system);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
 /* J: BestCircle2 imaqFitCircle2(PointFloat[] points, FitCircleOptions options)
@@ -1545,16 +1617,15 @@ JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqFitLine(JNIEnv* env, j
     return (jlong)rv;
 }
 
-/* J: float imaqGetAngle(PointFloat start1, PointFloat end1, PointFloat start2, PointFloat end2)
- * JN: float imaqGetAngle(long start1, long end1, long start2, long end2, long angle)
+/* J: void imaqGetAngle(PointFloat start1, PointFloat end1, PointFloat start2, PointFloat end2)
+ * JN: void imaqGetAngle(long start1, long end1, long start2, long end2, long angle)
  * C: int imaqGetAngle(PointFloat start1, PointFloat end1, PointFloat start2, PointFloat end2, float* angle)
  */
 
-JNIEXPORT jfloat JNICALL Java_com_ni_vision_NIVision__1imaqGetAngle(JNIEnv* env, jclass , jlong start1, jlong end1, jlong start2, jlong end2, jlong angle)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetAngle(JNIEnv* env, jclass , jlong start1, jlong end1, jlong start2, jlong end2, jlong angle)
 {
     int rv = imaqGetAngle(*((PointFloat*)start1), *((PointFloat*)end1), *((PointFloat*)start2), *((PointFloat*)end2), (float*)angle);
     if (rv == 0) throwJavaException(env);
-    return (jfloat)rv;
 }
 
 /* J: void imaqGetBisectingLine(PointFloat start1, PointFloat end1, PointFloat start2, PointFloat end2)
@@ -1568,28 +1639,26 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetBisectingLine(JNIEnv
     if (rv == 0) throwJavaException(env);
 }
 
-/* J: float imaqGetDistance(PointFloat point1, PointFloat point2)
- * JN: float imaqGetDistance(long point1, long point2, long distance)
+/* J: void imaqGetDistance(PointFloat point1, PointFloat point2)
+ * JN: void imaqGetDistance(long point1, long point2, long distance)
  * C: int imaqGetDistance(PointFloat point1, PointFloat point2, float* distance)
  */
 
-JNIEXPORT jfloat JNICALL Java_com_ni_vision_NIVision__1imaqGetDistance(JNIEnv* env, jclass , jlong point1, jlong point2, jlong distance)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetDistance(JNIEnv* env, jclass , jlong point1, jlong point2, jlong distance)
 {
     int rv = imaqGetDistance(*((PointFloat*)point1), *((PointFloat*)point2), (float*)distance);
     if (rv == 0) throwJavaException(env);
-    return (jfloat)rv;
 }
 
-/* J: PointFloat imaqGetIntersection(PointFloat start1, PointFloat end1, PointFloat start2, PointFloat end2)
- * JN: long imaqGetIntersection(long start1, long end1, long start2, long end2, long intersection)
+/* J: void imaqGetIntersection(PointFloat start1, PointFloat end1, PointFloat start2, PointFloat end2)
+ * JN: void imaqGetIntersection(long start1, long end1, long start2, long end2, long intersection)
  * C: int imaqGetIntersection(PointFloat start1, PointFloat end1, PointFloat start2, PointFloat end2, PointFloat* intersection)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqGetIntersection(JNIEnv* env, jclass , jlong start1, jlong end1, jlong start2, jlong end2, jlong intersection)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetIntersection(JNIEnv* env, jclass , jlong start1, jlong end1, jlong start2, jlong end2, jlong intersection)
 {
     int rv = imaqGetIntersection(*((PointFloat*)start1), *((PointFloat*)end1), *((PointFloat*)start2), *((PointFloat*)end2), (PointFloat*)intersection);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
 /* J: void imaqGetMidLine(PointFloat refLineStart, PointFloat refLineEnd, PointFloat point)
@@ -1638,16 +1707,15 @@ JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqGetPointsOnLine(JNIEnv
     return (jlong)rv;
 }
 
-/* J: float imaqGetPolygonArea(PointFloat points, int numPoints)
- * JN: float imaqGetPolygonArea(long points, int numPoints, long area)
+/* J: void imaqGetPolygonArea(PointFloat points, int numPoints)
+ * JN: void imaqGetPolygonArea(long points, int numPoints, long area)
  * C: int imaqGetPolygonArea(const PointFloat* points, int numPoints, float* area)
  */
 
-JNIEXPORT jfloat JNICALL Java_com_ni_vision_NIVision__1imaqGetPolygonArea(JNIEnv* env, jclass , jlong points, jint numPoints, jlong area)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetPolygonArea(JNIEnv* env, jclass , jlong points, jint numPoints, jlong area)
 {
     int rv = imaqGetPolygonArea((const PointFloat*)points, (int)numPoints, (float*)area);
     if (rv == 0) throwJavaException(env);
-    return (jfloat)rv;
 }
 
 /* J: InterpolatePointsResult imaqInterpolatePoints(Image image, Point[] points, InterpolationMethod method, int subpixel)
@@ -1666,16 +1734,15 @@ JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqInterpolatePoints(JNIE
  * Clipboard functions
  */
 
-/* J: RGBValue imaqClipboardToImage(Image dest)
- * JN: long imaqClipboardToImage(long dest, long palette)
+/* J: void imaqClipboardToImage(Image dest)
+ * JN: void imaqClipboardToImage(long dest, long palette)
  * C: int imaqClipboardToImage(Image* dest, RGBValue* palette)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqClipboardToImage(JNIEnv* env, jclass , jlong dest, jlong palette)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqClipboardToImage(JNIEnv* env, jclass , jlong dest, jlong palette)
 {
     int rv = imaqClipboardToImage((Image*)dest, (RGBValue*)palette);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
 /* J: void imaqImageToClipboard(Image image, RGBValue palette)
@@ -1704,16 +1771,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqFillBorder(JNIEnv* env,
     if (rv == 0) throwJavaException(env);
 }
 
-/* J: int imaqGetBorderSize(Image image)
- * JN: int imaqGetBorderSize(long image, long borderSize)
+/* J: void imaqGetBorderSize(Image image)
+ * JN: void imaqGetBorderSize(long image, long borderSize)
  * C: int imaqGetBorderSize(const Image* image, int* borderSize)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqGetBorderSize(JNIEnv* env, jclass , jlong image, jlong borderSize)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetBorderSize(JNIEnv* env, jclass , jlong image, jlong borderSize)
 {
     int rv = imaqGetBorderSize((const Image*)image, (int*)borderSize);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
 /* J: void imaqSetBorderSize(Image image, int size)
@@ -1815,16 +1881,15 @@ JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqSupervisedColorSegment
     return (jlong)rv;
 }
 
-/* J: int imaqGetColorSegmentationMaxDistance(ClassifierSession session, ColorSegmenationOptions segmentOptions, SegmentationDistanceLevel distLevel)
- * JN: int imaqGetColorSegmentationMaxDistance(long session, long segmentOptions, int distLevel, long maxDistance)
+/* J: void imaqGetColorSegmentationMaxDistance(ClassifierSession session, ColorSegmenationOptions segmentOptions, SegmentationDistanceLevel distLevel)
+ * JN: void imaqGetColorSegmentationMaxDistance(long session, long segmentOptions, int distLevel, long maxDistance)
  * C: int imaqGetColorSegmentationMaxDistance(ClassifierSession* session, const ColorSegmenationOptions* segmentOptions, SegmentationDistanceLevel distLevel, int* maxDistance)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqGetColorSegmentationMaxDistance(JNIEnv* env, jclass , jlong session, jlong segmentOptions, jint distLevel, jlong maxDistance)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetColorSegmentationMaxDistance(JNIEnv* env, jclass , jlong session, jlong segmentOptions, jint distLevel, jlong maxDistance)
 {
     int rv = imaqGetColorSegmentationMaxDistance((ClassifierSession*)session, (const ColorSegmenationOptions*)segmentOptions, (SegmentationDistanceLevel)distLevel, (int*)maxDistance);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
 /*
@@ -1875,32 +1940,30 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqMathTransform(JNIEnv* e
     if (rv == 0) throwJavaException(env);
 }
 
-/* J: int imaqWatershedTransform(Image dest, Image source, int connectivity8)
- * JN: int imaqWatershedTransform(long dest, long source, int connectivity8, long zoneCount)
+/* J: void imaqWatershedTransform(Image dest, Image source, int connectivity8)
+ * JN: void imaqWatershedTransform(long dest, long source, int connectivity8, long zoneCount)
  * C: int imaqWatershedTransform(Image* dest, const Image* source, int connectivity8, int* zoneCount)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqWatershedTransform(JNIEnv* env, jclass , jlong dest, jlong source, jint connectivity8, jlong zoneCount)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqWatershedTransform(JNIEnv* env, jclass , jlong dest, jlong source, jint connectivity8, jlong zoneCount)
 {
     int rv = imaqWatershedTransform((Image*)dest, (const Image*)source, (int)connectivity8, (int*)zoneCount);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
 /*
  * Window Management functions
  */
 
-/* J: int imaqAreScrollbarsVisible(int windowNumber)
- * JN: int imaqAreScrollbarsVisible(int windowNumber, long visible)
+/* J: void imaqAreScrollbarsVisible(int windowNumber)
+ * JN: void imaqAreScrollbarsVisible(int windowNumber, long visible)
  * C: int imaqAreScrollbarsVisible(int windowNumber, int* visible)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqAreScrollbarsVisible(JNIEnv* env, jclass , jint windowNumber, jlong visible)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqAreScrollbarsVisible(JNIEnv* env, jclass , jint windowNumber, jlong visible)
 {
     int rv = imaqAreScrollbarsVisible((int)windowNumber, (int*)visible);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
 /* J: void imaqBringWindowToTop(int windowNumber)
@@ -1936,16 +1999,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetWindowBackground(JNI
     if (rv == 0) throwJavaException(env);
 }
 
-/* J: DisplayMapping imaqGetWindowDisplayMapping(int windowNum)
- * JN: long imaqGetWindowDisplayMapping(int windowNum, long mapping)
+/* J: void imaqGetWindowDisplayMapping(int windowNum)
+ * JN: void imaqGetWindowDisplayMapping(int windowNum, long mapping)
  * C: int imaqGetWindowDisplayMapping(int windowNum, DisplayMapping* mapping)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqGetWindowDisplayMapping(JNIEnv* env, jclass , jint windowNum, jlong mapping)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetWindowDisplayMapping(JNIEnv* env, jclass , jint windowNum, jlong mapping)
 {
     int rv = imaqGetWindowDisplayMapping((int)windowNum, (DisplayMapping*)mapping);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
 /* J: void imaqGetWindowGrid(int windowNumber)
@@ -1959,28 +2021,26 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetWindowGrid(JNIEnv* e
     if (rv == 0) throwJavaException(env);
 }
 
-/* J: int imaqGetWindowHandle()
- * JN: int imaqGetWindowHandle(long handle)
+/* J: void imaqGetWindowHandle()
+ * JN: void imaqGetWindowHandle(long handle)
  * C: int imaqGetWindowHandle(int* handle)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqGetWindowHandle(JNIEnv* env, jclass , jlong handle)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetWindowHandle(JNIEnv* env, jclass , jlong handle)
 {
     int rv = imaqGetWindowHandle((int*)handle);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
-/* J: Point imaqGetWindowPos(int windowNumber)
- * JN: long imaqGetWindowPos(int windowNumber, long position)
+/* J: void imaqGetWindowPos(int windowNumber)
+ * JN: void imaqGetWindowPos(int windowNumber, long position)
  * C: int imaqGetWindowPos(int windowNumber, Point* position)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqGetWindowPos(JNIEnv* env, jclass , jint windowNumber, jlong position)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetWindowPos(JNIEnv* env, jclass , jint windowNumber, jlong position)
 {
     int rv = imaqGetWindowPos((int)windowNumber, (Point*)position);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
 /* J: void imaqGetWindowSize(int windowNumber)
@@ -2017,28 +2077,26 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetWindowZoom2(JNIEnv* 
     if (rv == 0) throwJavaException(env);
 }
 
-/* J: int imaqIsWindowNonTearing(int windowNumber)
- * JN: int imaqIsWindowNonTearing(int windowNumber, long nonTearing)
+/* J: void imaqIsWindowNonTearing(int windowNumber)
+ * JN: void imaqIsWindowNonTearing(int windowNumber, long nonTearing)
  * C: int imaqIsWindowNonTearing(int windowNumber, int* nonTearing)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqIsWindowNonTearing(JNIEnv* env, jclass , jint windowNumber, jlong nonTearing)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqIsWindowNonTearing(JNIEnv* env, jclass , jint windowNumber, jlong nonTearing)
 {
     int rv = imaqIsWindowNonTearing((int)windowNumber, (int*)nonTearing);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
-/* J: int imaqIsWindowVisible(int windowNumber)
- * JN: int imaqIsWindowVisible(int windowNumber, long visible)
+/* J: void imaqIsWindowVisible(int windowNumber)
+ * JN: void imaqIsWindowVisible(int windowNumber, long visible)
  * C: int imaqIsWindowVisible(int windowNumber, int* visible)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqIsWindowVisible(JNIEnv* env, jclass , jint windowNumber, jlong visible)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqIsWindowVisible(JNIEnv* env, jclass , jint windowNumber, jlong visible)
 {
     int rv = imaqIsWindowVisible((int)windowNumber, (int*)visible);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
 /* J: void imaqMoveWindow(int windowNumber, Point position)
@@ -2199,16 +2257,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqZoomWindow2(JNIEnv* env
  * Utilities functions
  */
 
-/* J: int imaqMulticoreOptions(MulticoreOperation operation)
- * JN: int imaqMulticoreOptions(int operation, long customNumCores)
+/* J: void imaqMulticoreOptions(MulticoreOperation operation)
+ * JN: void imaqMulticoreOptions(int operation, long customNumCores)
  * C: int imaqMulticoreOptions(MulticoreOperation operation, unsigned int* customNumCores)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqMulticoreOptions(JNIEnv* env, jclass , jint operation, jlong customNumCores)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqMulticoreOptions(JNIEnv* env, jclass , jint operation, jlong customNumCores)
 {
     int rv = imaqMulticoreOptions((MulticoreOperation)operation, (unsigned int*)customNumCores);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
 /*
@@ -2226,16 +2283,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqCloseToolWindow(JNIEnv*
     if (rv == 0) throwJavaException(env);
 }
 
-/* J: Tool imaqGetCurrentTool()
- * JN: int imaqGetCurrentTool(long currentTool)
+/* J: void imaqGetCurrentTool()
+ * JN: void imaqGetCurrentTool(long currentTool)
  * C: int imaqGetCurrentTool(Tool* currentTool)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqGetCurrentTool(JNIEnv* env, jclass , jlong currentTool)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetCurrentTool(JNIEnv* env, jclass , jlong currentTool)
 {
     int rv = imaqGetCurrentTool((Tool*)currentTool);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
 /* J: void imaqGetLastEvent()
@@ -2249,28 +2305,26 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetLastEvent(JNIEnv* en
     if (rv == 0) throwJavaException(env);
 }
 
-/* J: Point imaqGetToolWindowPos()
- * JN: long imaqGetToolWindowPos(long position)
+/* J: void imaqGetToolWindowPos()
+ * JN: void imaqGetToolWindowPos(long position)
  * C: int imaqGetToolWindowPos(Point* position)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqGetToolWindowPos(JNIEnv* env, jclass , jlong position)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetToolWindowPos(JNIEnv* env, jclass , jlong position)
 {
     int rv = imaqGetToolWindowPos((Point*)position);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
-/* J: int imaqIsToolWindowVisible()
- * JN: int imaqIsToolWindowVisible(long visible)
+/* J: void imaqIsToolWindowVisible()
+ * JN: void imaqIsToolWindowVisible(long visible)
  * C: int imaqIsToolWindowVisible(int* visible)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqIsToolWindowVisible(JNIEnv* env, jclass , jlong visible)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqIsToolWindowVisible(JNIEnv* env, jclass , jlong visible)
 {
     int rv = imaqIsToolWindowVisible((int*)visible);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
 /* J: void imaqMoveToolWindow(Point position)
@@ -2394,28 +2448,26 @@ JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqGetCalibrationInfo3(JN
     return (jlong)rv;
 }
 
-/* J: float imaqLearnCalibrationGrid(Image image, ROI roi, LearnCalibrationOptions options, GridDescriptor grid, CoordinateSystem system, RangeFloat range)
- * JN: float imaqLearnCalibrationGrid(long image, long roi, long options, long grid, long system, long range, long quality)
+/* J: void imaqLearnCalibrationGrid(Image image, ROI roi, LearnCalibrationOptions options, GridDescriptor grid, CoordinateSystem system, RangeFloat range)
+ * JN: void imaqLearnCalibrationGrid(long image, long roi, long options, long grid, long system, long range, long quality)
  * C: int imaqLearnCalibrationGrid(Image* image, const ROI* roi, const LearnCalibrationOptions* options, const GridDescriptor* grid, const CoordinateSystem* system, const RangeFloat* range, float* quality)
  */
 
-JNIEXPORT jfloat JNICALL Java_com_ni_vision_NIVision__1imaqLearnCalibrationGrid(JNIEnv* env, jclass , jlong image, jlong roi, jlong options, jlong grid, jlong system, jlong range, jlong quality)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqLearnCalibrationGrid(JNIEnv* env, jclass , jlong image, jlong roi, jlong options, jlong grid, jlong system, jlong range, jlong quality)
 {
     int rv = imaqLearnCalibrationGrid((Image*)image, (const ROI*)roi, (const LearnCalibrationOptions*)options, (const GridDescriptor*)grid, (const CoordinateSystem*)system, (const RangeFloat*)range, (float*)quality);
     if (rv == 0) throwJavaException(env);
-    return (jfloat)rv;
 }
 
-/* J: float imaqLearnCalibrationPoints(Image image, CalibrationPoints points, ROI roi, LearnCalibrationOptions options, GridDescriptor grid, CoordinateSystem system)
- * JN: float imaqLearnCalibrationPoints(long image, long points, long roi, long options, long grid, long system, long quality)
+/* J: void imaqLearnCalibrationPoints(Image image, CalibrationPoints points, ROI roi, LearnCalibrationOptions options, GridDescriptor grid, CoordinateSystem system)
+ * JN: void imaqLearnCalibrationPoints(long image, long points, long roi, long options, long grid, long system, long quality)
  * C: int imaqLearnCalibrationPoints(Image* image, const CalibrationPoints* points, const ROI* roi, const LearnCalibrationOptions* options, const GridDescriptor* grid, const CoordinateSystem* system, float* quality)
  */
 
-JNIEXPORT jfloat JNICALL Java_com_ni_vision_NIVision__1imaqLearnCalibrationPoints(JNIEnv* env, jclass , jlong image, jlong points, jlong roi, jlong options, jlong grid, jlong system, jlong quality)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqLearnCalibrationPoints(JNIEnv* env, jclass , jlong image, jlong points, jlong roi, jlong options, jlong grid, jlong system, jlong quality)
 {
     int rv = imaqLearnCalibrationPoints((Image*)image, (const CalibrationPoints*)points, (const ROI*)roi, (const LearnCalibrationOptions*)options, (const GridDescriptor*)grid, (const CoordinateSystem*)system, (float*)quality);
     if (rv == 0) throwJavaException(env);
-    return (jfloat)rv;
 }
 
 /* J: void imaqSetCoordinateSystem(Image image, CoordinateSystem system)
@@ -2475,16 +2527,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqSetSimpleCalibration2(J
     if (rv == 0) throwJavaException(env);
 }
 
-/* J: CoordinateSystem imaqCalibrationSetAxisInfo(Image image)
- * JN: long imaqCalibrationSetAxisInfo(long image, long axisInfo)
+/* J: void imaqCalibrationSetAxisInfo(Image image)
+ * JN: void imaqCalibrationSetAxisInfo(long image, long axisInfo)
  * C: int imaqCalibrationSetAxisInfo(Image* image, CoordinateSystem* axisInfo)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqCalibrationSetAxisInfo(JNIEnv* env, jclass , jlong image, jlong axisInfo)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqCalibrationSetAxisInfo(JNIEnv* env, jclass , jlong image, jlong axisInfo)
 {
     int rv = imaqCalibrationSetAxisInfo((Image*)image, (CoordinateSystem*)axisInfo);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
 /* J: void imaqCalibrationGetThumbnailImage(Image templateImage, Image image, CalibrationThumbnailType type, int index)
@@ -2683,16 +2734,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqTruncate(JNIEnv* env, j
  * Barcode I/O functions
  */
 
-/* J: AIMGradeReport imaqGradeDataMatrixBarcodeAIM(Image image)
- * JN: long imaqGradeDataMatrixBarcodeAIM(long image, long report)
+/* J: void imaqGradeDataMatrixBarcodeAIM(Image image)
+ * JN: void imaqGradeDataMatrixBarcodeAIM(long image, long report)
  * C: int imaqGradeDataMatrixBarcodeAIM(const Image* image, AIMGradeReport* report)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqGradeDataMatrixBarcodeAIM(JNIEnv* env, jclass , jlong image, jlong report)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGradeDataMatrixBarcodeAIM(JNIEnv* env, jclass , jlong image, jlong report)
 {
     int rv = imaqGradeDataMatrixBarcodeAIM((const Image*)image, (AIMGradeReport*)report);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
 /* J: BarcodeInfo imaqReadBarcode(Image image, BarcodeType type, ROI roi, int validate)
@@ -2910,16 +2960,15 @@ JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqGetContour(JNIEnv* env,
     return (jint)rv;
 }
 
-/* J: RGBValue imaqGetContourColor(ROI roi, int id)
- * JN: long imaqGetContourColor(long roi, int id, long contourColor)
+/* J: void imaqGetContourColor(ROI roi, int id)
+ * JN: void imaqGetContourColor(long roi, int id, long contourColor)
  * C: int imaqGetContourColor(const ROI* roi, ContourID id, RGBValue* contourColor)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqGetContourColor(JNIEnv* env, jclass , jlong roi, jint id, jlong contourColor)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetContourColor(JNIEnv* env, jclass , jlong roi, jint id, jlong contourColor)
 {
     int rv = imaqGetContourColor((const ROI*)roi, (ContourID)id, (RGBValue*)contourColor);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
 /* J: void imaqGetContourCount(ROI roi)
@@ -2982,16 +3031,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqSetContourColor(JNIEnv*
  * Regions of Interest functions
  */
 
-/* J: int imaqConstructROI2(Image image, ROI roi, Tool initialTool, ToolWindowOptions tools, ConstructROIOptions2 options)
- * JN: int imaqConstructROI2(long image, long roi, int initialTool, long tools, long options, long okay)
+/* J: void imaqConstructROI2(Image image, ROI roi, Tool initialTool, ToolWindowOptions tools, ConstructROIOptions2 options)
+ * JN: void imaqConstructROI2(long image, long roi, int initialTool, long tools, long options, long okay)
  * C: int imaqConstructROI2(const Image* image, ROI* roi, Tool initialTool, const ToolWindowOptions* tools, const ConstructROIOptions2* options, int* okay)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqConstructROI2(JNIEnv* env, jclass , jlong image, jlong roi, jint initialTool, jlong tools, jlong options, jlong okay)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqConstructROI2(JNIEnv* env, jclass , jlong image, jlong roi, jint initialTool, jlong tools, jlong options, jlong okay)
 {
     int rv = imaqConstructROI2((const Image*)image, (ROI*)roi, (Tool)initialTool, (const ToolWindowOptions*)tools, (const ConstructROIOptions2*)options, (int*)okay);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
 /* J: ROI imaqCreateROI()
@@ -3006,28 +3054,26 @@ JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqCreateROI(JNIEnv* env,
     return (jlong)rv;
 }
 
-/* J: Rect imaqGetROIBoundingBox(ROI roi)
- * JN: long imaqGetROIBoundingBox(long roi, long boundingBox)
+/* J: void imaqGetROIBoundingBox(ROI roi)
+ * JN: void imaqGetROIBoundingBox(long roi, long boundingBox)
  * C: int imaqGetROIBoundingBox(const ROI* roi, Rect* boundingBox)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqGetROIBoundingBox(JNIEnv* env, jclass , jlong roi, jlong boundingBox)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetROIBoundingBox(JNIEnv* env, jclass , jlong roi, jlong boundingBox)
 {
     int rv = imaqGetROIBoundingBox((const ROI*)roi, (Rect*)boundingBox);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
-/* J: RGBValue imaqGetROIColor(ROI roi)
- * JN: long imaqGetROIColor(long roi, long roiColor)
+/* J: void imaqGetROIColor(ROI roi)
+ * JN: void imaqGetROIColor(long roi, long roiColor)
  * C: int imaqGetROIColor(const ROI* roi, RGBValue* roiColor)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqGetROIColor(JNIEnv* env, jclass , jlong roi, jlong roiColor)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetROIColor(JNIEnv* env, jclass , jlong roi, jlong roiColor)
 {
     int rv = imaqGetROIColor((const ROI*)roi, (RGBValue*)roiColor);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
 /* J: ROI imaqGetWindowROI(int windowNumber)
@@ -3068,16 +3114,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqSetWindowROI(JNIEnv* en
  * Image Analysis functions
  */
 
-/* J: PointFloat imaqCentroid(Image image, Image mask)
- * JN: long imaqCentroid(long image, long centroid, long mask)
+/* J: void imaqCentroid(Image image, Image mask)
+ * JN: void imaqCentroid(long image, long centroid, long mask)
  * C: int imaqCentroid(const Image* image, PointFloat* centroid, const Image* mask)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqCentroid(JNIEnv* env, jclass , jlong image, jlong centroid, jlong mask)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqCentroid(JNIEnv* env, jclass , jlong image, jlong centroid, jlong mask)
 {
     int rv = imaqCentroid((const Image*)image, (PointFloat*)centroid, (const Image*)mask);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
 /* J: ExtractCurvesResult imaqExtractCurves(Image image, ROI roi, CurveOptions curveOptions)
@@ -3302,16 +3347,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqLearnGeometricPattern(J
     if (rv == 0) throwJavaException(env);
 }
 
-/* J: LearnPatternAdvancedOptions imaqLearnPattern3(Image image, LearningMode learningMode, Image mask)
- * JN: long imaqLearnPattern3(long image, int learningMode, long advancedOptions, long mask)
+/* J: void imaqLearnPattern3(Image image, LearningMode learningMode, Image mask)
+ * JN: void imaqLearnPattern3(long image, int learningMode, long advancedOptions, long mask)
  * C: int imaqLearnPattern3(Image* image, LearningMode learningMode, LearnPatternAdvancedOptions* advancedOptions, const Image* mask)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqLearnPattern3(JNIEnv* env, jclass , jlong image, jint learningMode, jlong advancedOptions, jlong mask)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqLearnPattern3(JNIEnv* env, jclass , jlong image, jint learningMode, jlong advancedOptions, jlong mask)
 {
     int rv = imaqLearnPattern3((Image*)image, (LearningMode)learningMode, (LearnPatternAdvancedOptions*)advancedOptions, (const Image*)mask);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
 /* J: MatchColorPatternResult imaqMatchColorPattern(Image image, Image pattern, MatchColorPatternOptions options, Rect searchRect)
@@ -3457,16 +3501,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqCopyOverlay(JNIEnv* env
     if (rv == 0) throwJavaException(env);
 }
 
-/* J: TransformBehaviors imaqGetOverlayProperties(Image image, String group)
- * JN: long imaqGetOverlayProperties(long image, long group, long transformBehaviors)
+/* J: void imaqGetOverlayProperties(Image image, String group)
+ * JN: void imaqGetOverlayProperties(long image, long group, long transformBehaviors)
  * C: int imaqGetOverlayProperties(const Image* image, const char* group, TransformBehaviors* transformBehaviors)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqGetOverlayProperties(JNIEnv* env, jclass , jlong image, jlong group, jlong transformBehaviors)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetOverlayProperties(JNIEnv* env, jclass , jlong image, jlong group, jlong transformBehaviors)
 {
     int rv = imaqGetOverlayProperties((const Image*)image, (const char*)group, (TransformBehaviors*)transformBehaviors);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
 /* J: void imaqMergeOverlay(Image dest, Image source, RGBValue[] palette, String group)
@@ -3546,16 +3589,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqOverlayOpenContour(JNIE
     if (rv == 0) throwJavaException(env);
 }
 
-/* J: byte imaqOverlayOval(Image image, Rect boundingBox, RGBValue color, DrawMode drawMode)
- * JN: byte imaqOverlayOval(long image, long boundingBox, long color, int drawMode, long group)
+/* J: void imaqOverlayOval(Image image, Rect boundingBox, RGBValue color, DrawMode drawMode)
+ * JN: void imaqOverlayOval(long image, long boundingBox, long color, int drawMode, long group)
  * C: int imaqOverlayOval(Image* image, Rect boundingBox, const RGBValue* color, DrawMode drawMode, char* group)
  */
 
-JNIEXPORT jbyte JNICALL Java_com_ni_vision_NIVision__1imaqOverlayOval(JNIEnv* env, jclass , jlong image, jlong boundingBox, jlong color, jint drawMode, jlong group)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqOverlayOval(JNIEnv* env, jclass , jlong image, jlong boundingBox, jlong color, jint drawMode, jlong group)
 {
     int rv = imaqOverlayOval((Image*)image, *((Rect*)boundingBox), (const RGBValue*)color, (DrawMode)drawMode, (char*)group);
     if (rv == 0) throwJavaException(env);
-    return (jbyte)rv;
 }
 
 /* J: void imaqOverlayPoints(Image image, Point[] points, RGBValue[] colors, PointSymbol symbol, UserPointSymbol userSymbol, String group)
@@ -3602,16 +3644,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqOverlayText(JNIEnv* env
     if (rv == 0) throwJavaException(env);
 }
 
-/* J: TransformBehaviors imaqSetOverlayProperties(Image image, String group)
- * JN: long imaqSetOverlayProperties(long image, long group, long transformBehaviors)
+/* J: void imaqSetOverlayProperties(Image image, String group)
+ * JN: void imaqSetOverlayProperties(long image, long group, long transformBehaviors)
  * C: int imaqSetOverlayProperties(Image* image, const char* group, TransformBehaviors* transformBehaviors)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqSetOverlayProperties(JNIEnv* env, jclass , jlong image, jlong group, jlong transformBehaviors)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqSetOverlayProperties(JNIEnv* env, jclass , jlong image, jlong group, jlong transformBehaviors)
 {
     int rv = imaqSetOverlayProperties((Image*)image, (const char*)group, (TransformBehaviors*)transformBehaviors);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
 /*
@@ -3842,16 +3883,15 @@ JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqContourSetupMatchPatte
     return (jlong)rv;
 }
 
-/* J: SetupMatchPatternData imaqContourAdvancedSetupMatchPattern(GeometricAdvancedSetupDataOption[] geometricOptions)
- * JN: long imaqContourAdvancedSetupMatchPattern(long matchSetupData, long geometricOptions, int numGeometricOptions)
+/* J: void imaqContourAdvancedSetupMatchPattern(GeometricAdvancedSetupDataOption[] geometricOptions)
+ * JN: void imaqContourAdvancedSetupMatchPattern(long matchSetupData, long geometricOptions, int numGeometricOptions)
  * C: int imaqContourAdvancedSetupMatchPattern(SetupMatchPatternData* matchSetupData, GeometricAdvancedSetupDataOption* geometricOptions, unsigned int numGeometricOptions)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqContourAdvancedSetupMatchPattern(JNIEnv* env, jclass , jlong matchSetupData, jlong geometricOptions, jint numGeometricOptions)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqContourAdvancedSetupMatchPattern(JNIEnv* env, jclass , jlong matchSetupData, jlong geometricOptions, jint numGeometricOptions)
 {
     int rv = imaqContourAdvancedSetupMatchPattern((SetupMatchPatternData*)matchSetupData, (GeometricAdvancedSetupDataOption*)geometricOptions, (unsigned int)numGeometricOptions);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
 /* J: ContourFitLineReport imaqContourFitLine(Image image, double pixelRadius)
@@ -4011,16 +4051,15 @@ JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqROIProfile(JNIEnv* env
     return (jlong)rv;
 }
 
-/* J: int imaqROIToMask(Image mask, ROI roi, int fillValue, Image imageModel)
- * JN: int imaqROIToMask(long mask, long roi, int fillValue, long imageModel, long inSpace)
+/* J: void imaqROIToMask(Image mask, ROI roi, int fillValue, Image imageModel)
+ * JN: void imaqROIToMask(long mask, long roi, int fillValue, long imageModel, long inSpace)
  * C: int imaqROIToMask(Image* mask, const ROI* roi, int fillValue, const Image* imageModel, int* inSpace)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqROIToMask(JNIEnv* env, jclass , jlong mask, jlong roi, jint fillValue, jlong imageModel, jlong inSpace)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqROIToMask(JNIEnv* env, jclass , jlong mask, jlong roi, jint fillValue, jlong imageModel, jlong inSpace)
 {
     int rv = imaqROIToMask((Image*)mask, (const ROI*)roi, (int)fillValue, (const Image*)imageModel, (int*)inSpace);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
 /* J: void imaqTransformROI2(ROI roi, CoordinateSystem baseSystem, CoordinateSystem newSystem)
@@ -4147,28 +4186,26 @@ JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqGetClassifierSampleInf
     return (jlong)rv;
 }
 
-/* J: ColorOptions imaqGetColorClassifierOptions(ClassifierSession session)
- * JN: long imaqGetColorClassifierOptions(long session, long options)
+/* J: void imaqGetColorClassifierOptions(ClassifierSession session)
+ * JN: void imaqGetColorClassifierOptions(long session, long options)
  * C: int imaqGetColorClassifierOptions(const ClassifierSession* session, ColorOptions* options)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqGetColorClassifierOptions(JNIEnv* env, jclass , jlong session, jlong options)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetColorClassifierOptions(JNIEnv* env, jclass , jlong session, jlong options)
 {
     int rv = imaqGetColorClassifierOptions((const ClassifierSession*)session, (ColorOptions*)options);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
-/* J: NearestNeighborOptions imaqGetNearestNeighborOptions(ClassifierSession session)
- * JN: long imaqGetNearestNeighborOptions(long session, long options)
+/* J: void imaqGetNearestNeighborOptions(ClassifierSession session)
+ * JN: void imaqGetNearestNeighborOptions(long session, long options)
  * C: int imaqGetNearestNeighborOptions(const ClassifierSession* session, NearestNeighborOptions* options)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqGetNearestNeighborOptions(JNIEnv* env, jclass , jlong session, jlong options)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetNearestNeighborOptions(JNIEnv* env, jclass , jlong session, jlong options)
 {
     int rv = imaqGetNearestNeighborOptions((const ClassifierSession*)session, (NearestNeighborOptions*)options);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
 /* J: void imaqGetParticleClassifierOptions2(ClassifierSession session)
@@ -4342,16 +4379,15 @@ JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqGetParticleInfo(JNIEnv
     return (jlong)rv;
 }
 
-/* J: float imaqCalcCoeff(Image image, ParticleReport report, MeasurementValue parameter)
- * JN: float imaqCalcCoeff(long image, long report, int parameter, long coefficient)
+/* J: void imaqCalcCoeff(Image image, ParticleReport report, MeasurementValue parameter)
+ * JN: void imaqCalcCoeff(long image, long report, int parameter, long coefficient)
  * C: int imaqCalcCoeff(const Image* image, const ParticleReport* report, MeasurementValue parameter, float* coefficient)
  */
 
-JNIEXPORT jfloat JNICALL Java_com_ni_vision_NIVision__1imaqCalcCoeff(JNIEnv* env, jclass , jlong image, jlong report, jint parameter, jlong coefficient)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqCalcCoeff(JNIEnv* env, jclass , jlong image, jlong report, jint parameter, jlong coefficient)
 {
     int rv = imaqCalcCoeff((const Image*)image, (const ParticleReport*)report, (MeasurementValue)parameter, (float*)coefficient);
     if (rv == 0) throwJavaException(env);
-    return (jfloat)rv;
 }
 
 /* J: EdgeToolResult imaqEdgeTool(Image image, Point points, int numPoints, EdgeOptions options)
@@ -4378,40 +4414,37 @@ JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqCircles(JNIEnv* env, j
     return (jlong)rv;
 }
 
-/* J: int imaqLabel(Image dest, Image source, int connectivity8)
- * JN: int imaqLabel(long dest, long source, int connectivity8, long particleCount)
+/* J: void imaqLabel(Image dest, Image source, int connectivity8)
+ * JN: void imaqLabel(long dest, long source, int connectivity8, long particleCount)
  * C: int imaqLabel(Image* dest, Image* source, int connectivity8, int* particleCount)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqLabel(JNIEnv* env, jclass , jlong dest, jlong source, jint connectivity8, jlong particleCount)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqLabel(JNIEnv* env, jclass , jlong dest, jlong source, jint connectivity8, jlong particleCount)
 {
     int rv = imaqLabel((Image*)dest, (Image*)source, (int)connectivity8, (int*)particleCount);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
-/* J: BestEllipse imaqFitEllipse(PointFloat[] points)
- * JN: long imaqFitEllipse(long points, int numPoints, long ellipse)
+/* J: void imaqFitEllipse(PointFloat[] points)
+ * JN: void imaqFitEllipse(long points, int numPoints, long ellipse)
  * C: int imaqFitEllipse(const PointFloat* points, int numPoints, BestEllipse* ellipse)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqFitEllipse(JNIEnv* env, jclass , jlong points, jint numPoints, jlong ellipse)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqFitEllipse(JNIEnv* env, jclass , jlong points, jint numPoints, jlong ellipse)
 {
     int rv = imaqFitEllipse((const PointFloat*)points, (int)numPoints, (BestEllipse*)ellipse);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
-/* J: BestCircle imaqFitCircle(PointFloat[] points)
- * JN: long imaqFitCircle(long points, int numPoints, long circle)
+/* J: void imaqFitCircle(PointFloat[] points)
+ * JN: void imaqFitCircle(long points, int numPoints, long circle)
  * C: int imaqFitCircle(const PointFloat* points, int numPoints, BestCircle* circle)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqFitCircle(JNIEnv* env, jclass , jlong points, jint numPoints, jlong circle)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqFitCircle(JNIEnv* env, jclass , jlong points, jint numPoints, jlong circle)
 {
     int rv = imaqFitCircle((const PointFloat*)points, (int)numPoints, (BestCircle*)circle);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
 /* J: MatchPatternResult imaqMatchPattern(Image image, Image pattern, MatchPatternOptions options, Rect searchRect)
@@ -4437,28 +4470,26 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqConvex(JNIEnv* env, jcl
     if (rv == 0) throwJavaException(env);
 }
 
-/* J: int imaqIsVisionInfoPresent(Image image, VisionInfoType type)
- * JN: int imaqIsVisionInfoPresent(long image, int type, long present)
+/* J: void imaqIsVisionInfoPresent(Image image, VisionInfoType type)
+ * JN: void imaqIsVisionInfoPresent(long image, int type, long present)
  * C: int imaqIsVisionInfoPresent(const Image* image, VisionInfoType type, int* present)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqIsVisionInfoPresent(JNIEnv* env, jclass , jlong image, jint type, jlong present)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqIsVisionInfoPresent(JNIEnv* env, jclass , jlong image, jint type, jlong present)
 {
     int rv = imaqIsVisionInfoPresent((const Image*)image, (VisionInfoType)type, (int*)present);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
-/* J: float imaqLineGaugeTool(Image image, Point start, Point end, LineGaugeMethod method, EdgeOptions edgeOptions, CoordinateTransform reference)
- * JN: float imaqLineGaugeTool(long image, long start, long end, int method, long edgeOptions, long reference, long distance)
+/* J: void imaqLineGaugeTool(Image image, Point start, Point end, LineGaugeMethod method, EdgeOptions edgeOptions, CoordinateTransform reference)
+ * JN: void imaqLineGaugeTool(long image, long start, long end, int method, long edgeOptions, long reference, long distance)
  * C: int imaqLineGaugeTool(const Image* image, Point start, Point end, LineGaugeMethod method, const EdgeOptions* edgeOptions, const CoordinateTransform* reference, float* distance)
  */
 
-JNIEXPORT jfloat JNICALL Java_com_ni_vision_NIVision__1imaqLineGaugeTool(JNIEnv* env, jclass , jlong image, jlong start, jlong end, jint method, jlong edgeOptions, jlong reference, jlong distance)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqLineGaugeTool(JNIEnv* env, jclass , jlong image, jlong start, jlong end, jint method, jlong edgeOptions, jlong reference, jlong distance)
 {
     int rv = imaqLineGaugeTool((const Image*)image, *((Point*)start), *((Point*)end), (LineGaugeMethod)method, (const EdgeOptions*)edgeOptions, (const CoordinateTransform*)reference, (float*)distance);
     if (rv == 0) throwJavaException(env);
-    return (jfloat)rv;
 }
 
 /* J: void imaqBestCircle(PointFloat[] points)
@@ -4585,16 +4616,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetCalibrationInfo(JNIE
     if (rv == 0) throwJavaException(env);
 }
 
-/* J: int imaqConstructROI(Image image, ROI roi, Tool initialTool, ToolWindowOptions tools, ConstructROIOptions options)
- * JN: int imaqConstructROI(long image, long roi, int initialTool, long tools, long options, long okay)
+/* J: void imaqConstructROI(Image image, ROI roi, Tool initialTool, ToolWindowOptions tools, ConstructROIOptions options)
+ * JN: void imaqConstructROI(long image, long roi, int initialTool, long tools, long options, long okay)
  * C: int imaqConstructROI(const Image* image, ROI* roi, Tool initialTool, const ToolWindowOptions* tools, const ConstructROIOptions* options, int* okay)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqConstructROI(JNIEnv* env, jclass , jlong image, jlong roi, jint initialTool, jlong tools, jlong options, jlong okay)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqConstructROI(JNIEnv* env, jclass , jlong image, jlong roi, jint initialTool, jlong tools, jlong options, jlong okay)
 {
     int rv = imaqConstructROI((const Image*)image, (ROI*)roi, (Tool)initialTool, (const ToolWindowOptions*)tools, (const ConstructROIOptions*)options, (int*)okay);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
 /* J: void imaqGetParticleClassifierOptions(ClassifierSession session)
@@ -4630,16 +4660,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqGetWindowZoom(JNIEnv* e
     if (rv == 0) throwJavaException(env);
 }
 
-/* J: int imaqParticleFilter3(Image dest, Image source, ParticleFilterCriteria2 criteria, int criteriaCount, ParticleFilterOptions options, ROI roi)
- * JN: int imaqParticleFilter3(long dest, long source, long criteria, int criteriaCount, long options, long roi, long numParticles)
+/* J: void imaqParticleFilter3(Image dest, Image source, ParticleFilterCriteria2 criteria, int criteriaCount, ParticleFilterOptions options, ROI roi)
+ * JN: void imaqParticleFilter3(long dest, long source, long criteria, int criteriaCount, long options, long roi, long numParticles)
  * C: int imaqParticleFilter3(Image* dest, Image* source, const ParticleFilterCriteria2* criteria, int criteriaCount, const ParticleFilterOptions* options, const ROI* roi, int* numParticles)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqParticleFilter3(JNIEnv* env, jclass , jlong dest, jlong source, jlong criteria, jint criteriaCount, jlong options, jlong roi, jlong numParticles)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqParticleFilter3(JNIEnv* env, jclass , jlong dest, jlong source, jlong criteria, jint criteriaCount, jlong options, jlong roi, jlong numParticles)
 {
     int rv = imaqParticleFilter3((Image*)dest, (Image*)source, (const ParticleFilterCriteria2*)criteria, (int)criteriaCount, (const ParticleFilterOptions*)options, (const ROI*)roi, (int*)numParticles);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
 /* J: ReadTextReport2 imaqReadText2(Image image, CharSet set, ROI roi, ReadTextOptions readOptions, OCRProcessingOptions processingOptions, OCRSpacingOptions spacingOptions)
@@ -4654,16 +4683,15 @@ JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqReadText2(JNIEnv* env,
     return (jlong)rv;
 }
 
-/* J: LearnPatternAdvancedOptions imaqLearnPattern2(Image image, LearningMode learningMode)
- * JN: long imaqLearnPattern2(long image, int learningMode, long advancedOptions)
+/* J: void imaqLearnPattern2(Image image, LearningMode learningMode)
+ * JN: void imaqLearnPattern2(long image, int learningMode, long advancedOptions)
  * C: int imaqLearnPattern2(Image* image, LearningMode learningMode, LearnPatternAdvancedOptions* advancedOptions)
  */
 
-JNIEXPORT jlong JNICALL Java_com_ni_vision_NIVision__1imaqLearnPattern2(JNIEnv* env, jclass , jlong image, jint learningMode, jlong advancedOptions)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqLearnPattern2(JNIEnv* env, jclass , jlong image, jint learningMode, jlong advancedOptions)
 {
     int rv = imaqLearnPattern2((Image*)image, (LearningMode)learningMode, (LearnPatternAdvancedOptions*)advancedOptions);
     if (rv == 0) throwJavaException(env);
-    return (jlong)rv;
 }
 
 /* J: void imaqDivide(Image dest, Image sourceA, Image sourceB)
@@ -4758,16 +4786,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqCopyCalibrationInfo(JNI
     if (rv == 0) throwJavaException(env);
 }
 
-/* J: int imaqParticleFilter2(Image dest, Image source, ParticleFilterCriteria2[] criteria, int rejectMatches, int connectivity8)
- * JN: int imaqParticleFilter2(long dest, long source, long criteria, int criteriaCount, int rejectMatches, int connectivity8, long numParticles)
+/* J: void imaqParticleFilter2(Image dest, Image source, ParticleFilterCriteria2[] criteria, int rejectMatches, int connectivity8)
+ * JN: void imaqParticleFilter2(long dest, long source, long criteria, int criteriaCount, int rejectMatches, int connectivity8, long numParticles)
  * C: int imaqParticleFilter2(Image* dest, Image* source, const ParticleFilterCriteria2* criteria, int criteriaCount, int rejectMatches, int connectivity8, int* numParticles)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqParticleFilter2(JNIEnv* env, jclass , jlong dest, jlong source, jlong criteria, jint criteriaCount, jint rejectMatches, jint connectivity8, jlong numParticles)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqParticleFilter2(JNIEnv* env, jclass , jlong dest, jlong source, jlong criteria, jint criteriaCount, jint rejectMatches, jint connectivity8, jlong numParticles)
 {
     int rv = imaqParticleFilter2((Image*)dest, (Image*)source, (const ParticleFilterCriteria2*)criteria, (int)criteriaCount, (int)rejectMatches, (int)connectivity8, (int*)numParticles);
     if (rv == 0) throwJavaException(env);
-    return (jint)rv;
 }
 
 /* J: EdgeTool2Result imaqEdgeTool2(Image image, Point points, int numPoints, EdgeProcess process, EdgeOptions options)
@@ -5031,16 +5058,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxConfigureGrab(JNIEnv*
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
 }
 
-/* J: int IMAQdxGrab(int id, Image image, int waitForNextBuffer)
- * JN: int IMAQdxGrab(int id, long image, int waitForNextBuffer, long actualBufferNumber)
+/* J: void IMAQdxGrab(int id, Image image, int waitForNextBuffer)
+ * JN: void IMAQdxGrab(int id, long image, int waitForNextBuffer, long actualBufferNumber)
  * C: IMAQdxError IMAQdxGrab(IMAQdxSession id, Image* image, bool32 waitForNextBuffer, uInt32* actualBufferNumber)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1IMAQdxGrab(JNIEnv* env, jclass , jint id, jlong image, jint waitForNextBuffer, jlong actualBufferNumber)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxGrab(JNIEnv* env, jclass , jint id, jlong image, jint waitForNextBuffer, jlong actualBufferNumber)
 {
     IMAQdxError rv = IMAQdxGrab((IMAQdxSession)id, (Image*)image, (bool32)waitForNextBuffer, (uInt32*)actualBufferNumber);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
-    return (jint)rv;
 }
 
 /* J: void IMAQdxDiscoverEthernetCameras(String address, int timeout)
@@ -5065,16 +5091,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxResetCamera(JNIEnv* e
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
 }
 
-/* J: int IMAQdxOpenCamera(String name, IMAQdxCameraControlMode mode)
- * JN: int IMAQdxOpenCamera(long name, int mode, long id)
+/* J: void IMAQdxOpenCamera(String name, IMAQdxCameraControlMode mode)
+ * JN: void IMAQdxOpenCamera(long name, int mode, long id)
  * C: IMAQdxError IMAQdxOpenCamera(const char* name, IMAQdxCameraControlMode mode, IMAQdxSession* id)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1IMAQdxOpenCamera(JNIEnv* env, jclass , jlong name, jint mode, jlong id)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxOpenCamera(JNIEnv* env, jclass , jlong name, jint mode, jlong id)
 {
     IMAQdxError rv = IMAQdxOpenCamera((const char*)name, (IMAQdxCameraControlMode)mode, (IMAQdxSession*)id);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
-    return (jint)rv;
 }
 
 /* J: void IMAQdxCloseCamera(int id)
@@ -5110,16 +5135,23 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxStartAcquisition(JNIE
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
 }
 
-/* J: int IMAQdxGetImage(int id, Image image, IMAQdxBufferNumberMode mode, int desiredBufferNumber)
- * JN: int IMAQdxGetImage(int id, long image, int mode, int desiredBufferNumber, long actualBufferNumber)
+/* J: void IMAQdxGetImage(int id, Image image, IMAQdxBufferNumberMode mode, int desiredBufferNumber)
+ * JN: void IMAQdxGetImage(int id, long image, int mode, int desiredBufferNumber, long actualBufferNumber)
  * C: IMAQdxError IMAQdxGetImage(IMAQdxSession id, Image* image, IMAQdxBufferNumberMode mode, uInt32 desiredBufferNumber, uInt32* actualBufferNumber)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetImage(JNIEnv* env, jclass , jint id, jlong image, jint mode, jint desiredBufferNumber, jlong actualBufferNumber)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetImage(JNIEnv* env, jclass , jint id, jlong image, jint mode, jint desiredBufferNumber, jlong actualBufferNumber)
 {
     IMAQdxError rv = IMAQdxGetImage((IMAQdxSession)id, (Image*)image, (IMAQdxBufferNumberMode)mode, (uInt32)desiredBufferNumber, (uInt32*)actualBufferNumber);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
-    return (jint)rv;
+}
+
+JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetImageData(JNIEnv* env, jclass , jint id, jlong buffer, jint bufferSize, jint mode, jint desiredBufferNumber)
+{
+    uInt32 actualBufferNumber;
+    IMAQdxError rv = IMAQdxGetImageData((IMAQdxSession)id, (void*)buffer, (uInt32)bufferSize, (IMAQdxBufferNumberMode)mode, (uInt32)desiredBufferNumber, &actualBufferNumber);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+    return (jint)actualBufferNumber;
 }
 
 /* J: void IMAQdxStopAcquisition(int id)
@@ -5144,40 +5176,43 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxUnconfigureAcquisitio
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
 }
 
-/* J: IMAQdxAttributeType IMAQdxGetAttributeType(int id, String name)
- * JN: int IMAQdxGetAttributeType(int id, long name, long type)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxEnumerateVideoModes(JNIEnv* env, jclass , jint id, jlong videoModeArray, jlong count, jlong currentMode)
+{
+    IMAQdxError rv = IMAQdxEnumerateVideoModes((IMAQdxSession)id, (IMAQdxVideoMode*)videoModeArray, (uInt32*)count, (uInt32*)currentMode);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}
+
+/* J: void IMAQdxGetAttributeType(int id, String name)
+ * JN: void IMAQdxGetAttributeType(int id, long name, long type)
  * C: IMAQdxError IMAQdxGetAttributeType(IMAQdxSession id, const char* name, IMAQdxAttributeType* type)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeType(JNIEnv* env, jclass , jint id, jlong name, jlong type)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeType(JNIEnv* env, jclass , jint id, jlong name, jlong type)
 {
     IMAQdxError rv = IMAQdxGetAttributeType((IMAQdxSession)id, (const char*)name, (IMAQdxAttributeType*)type);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
-    return (jint)rv;
 }
 
-/* J: int IMAQdxIsAttributeReadable(int id, String name)
- * JN: int IMAQdxIsAttributeReadable(int id, long name, long readable)
+/* J: void IMAQdxIsAttributeReadable(int id, String name)
+ * JN: void IMAQdxIsAttributeReadable(int id, long name, long readable)
  * C: IMAQdxError IMAQdxIsAttributeReadable(IMAQdxSession id, const char* name, bool32* readable)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1IMAQdxIsAttributeReadable(JNIEnv* env, jclass , jint id, jlong name, jlong readable)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxIsAttributeReadable(JNIEnv* env, jclass , jint id, jlong name, jlong readable)
 {
     IMAQdxError rv = IMAQdxIsAttributeReadable((IMAQdxSession)id, (const char*)name, (bool32*)readable);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
-    return (jint)rv;
 }
 
-/* J: int IMAQdxIsAttributeWritable(int id, String name)
- * JN: int IMAQdxIsAttributeWritable(int id, long name, long writable)
+/* J: void IMAQdxIsAttributeWritable(int id, String name)
+ * JN: void IMAQdxIsAttributeWritable(int id, long name, long writable)
  * C: IMAQdxError IMAQdxIsAttributeWritable(IMAQdxSession id, const char* name, bool32* writable)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1IMAQdxIsAttributeWritable(JNIEnv* env, jclass , jint id, jlong name, jlong writable)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxIsAttributeWritable(JNIEnv* env, jclass , jint id, jlong name, jlong writable)
 {
     IMAQdxError rv = IMAQdxIsAttributeWritable((IMAQdxSession)id, (const char*)name, (bool32*)writable);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
-    return (jint)rv;
 }
 
 /* J: void IMAQdxWriteRegister(int id, int offset, int value)
@@ -5191,16 +5226,15 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxWriteRegister(JNIEnv*
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
 }
 
-/* J: int IMAQdxReadRegister(int id, int offset)
- * JN: int IMAQdxReadRegister(int id, int offset, long value)
+/* J: void IMAQdxReadRegister(int id, int offset)
+ * JN: void IMAQdxReadRegister(int id, int offset, long value)
  * C: IMAQdxError IMAQdxReadRegister(IMAQdxSession id, uInt32 offset, uInt32* value)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1IMAQdxReadRegister(JNIEnv* env, jclass , jint id, jint offset, jlong value)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxReadRegister(JNIEnv* env, jclass , jint id, jint offset, jlong value)
 {
     IMAQdxError rv = IMAQdxReadRegister((IMAQdxSession)id, (uInt32)offset, (uInt32*)value);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
-    return (jint)rv;
 }
 
 /* J: void IMAQdxWriteAttributes(int id, String filename)
@@ -5236,15 +5270,245 @@ JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxResetEthernetCameraAd
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
 }
 
-/* J: IMAQdxAttributeVisibility IMAQdxGetAttributeVisibility(int id, String name)
- * JN: int IMAQdxGetAttributeVisibility(int id, long name, long visibility)
+/* J: void IMAQdxGetAttributeVisibility(int id, String name)
+ * JN: void IMAQdxGetAttributeVisibility(int id, long name, long visibility)
  * C: IMAQdxError IMAQdxGetAttributeVisibility(IMAQdxSession id, const char* name, IMAQdxAttributeVisibility* visibility)
  */
 
-JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeVisibility(JNIEnv* env, jclass , jint id, jlong name, jlong visibility)
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeVisibility(JNIEnv* env, jclass , jint id, jlong name, jlong visibility)
 {
     IMAQdxError rv = IMAQdxGetAttributeVisibility((IMAQdxSession)id, (const char*)name, (IMAQdxAttributeVisibility*)visibility);
     if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
-    return (jint)rv;
+}
+
+/* J: void IMAQdxGetAttributeU32(int id, String name)
+ * JN: void IMAQdxGetAttributeU32(int id, long name, long value)
+ * C: IMAQdxError IMAQdxGetAttributeU32(IMAQdxSession id, const char* name, uInt32* value)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeU32(JNIEnv* env, jclass , jint id, jlong name, jlong value)
+{
+    IMAQdxError rv = IMAQdxGetAttributeU32((IMAQdxSession)id, (const char*)name, (uInt32*)value);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}
+
+/* J: void IMAQdxGetAttributeI64(int id, String name)
+ * JN: void IMAQdxGetAttributeI64(int id, long name, long value)
+ * C: IMAQdxError IMAQdxGetAttributeI64(IMAQdxSession id, const char* name, Int64* value)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeI64(JNIEnv* env, jclass , jint id, jlong name, jlong value)
+{
+    IMAQdxError rv = IMAQdxGetAttributeI64((IMAQdxSession)id, (const char*)name, (Int64*)value);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}
+
+/* J: void IMAQdxGetAttributeF64(int id, String name)
+ * JN: void IMAQdxGetAttributeF64(int id, long name, long value)
+ * C: IMAQdxError IMAQdxGetAttributeF64(IMAQdxSession id, const char* name, float64* value)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeF64(JNIEnv* env, jclass , jint id, jlong name, jlong value)
+{
+    IMAQdxError rv = IMAQdxGetAttributeF64((IMAQdxSession)id, (const char*)name, (float64*)value);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}
+
+/* J: void IMAQdxGetAttributeString(int id, String name)
+ * JN: void IMAQdxGetAttributeString(int id, long name, long value)
+ * C: IMAQdxError IMAQdxGetAttributeString(IMAQdxSession id, const char* name, char value)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeString(JNIEnv* env, jclass , jint id, jlong name, jlong value)
+{
+    IMAQdxError rv = IMAQdxGetAttributeString((IMAQdxSession)id, (const char*)name, (char*)value);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}
+
+/* J: void IMAQdxGetAttributeEnum(int id, String name)
+ * JN: void IMAQdxGetAttributeEnum(int id, long name, long value)
+ * C: IMAQdxError IMAQdxGetAttributeEnum(IMAQdxSession id, const char* name, IMAQdxEnumItem* value)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeEnum(JNIEnv* env, jclass , jint id, jlong name, jlong value)
+{
+    IMAQdxError rv = IMAQdxGetAttributeEnum((IMAQdxSession)id, (const char*)name, (IMAQdxEnumItem*)value);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}
+
+/* J: void IMAQdxGetAttributeBool(int id, String name)
+ * JN: void IMAQdxGetAttributeBool(int id, long name, long value)
+ * C: IMAQdxError IMAQdxGetAttributeBool(IMAQdxSession id, const char* name, bool32* value)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeBool(JNIEnv* env, jclass , jint id, jlong name, jlong value)
+{
+    IMAQdxError rv = IMAQdxGetAttributeBool((IMAQdxSession)id, (const char*)name, (bool32*)value);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}
+
+/* J: void IMAQdxGetAttributeMinimumU32(int id, String name)
+ * JN: void IMAQdxGetAttributeMinimumU32(int id, long name, long value)
+ * C: IMAQdxError IMAQdxGetAttributeMinimumU32(IMAQdxSession id, const char* name, uInt32* value)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeMinimumU32(JNIEnv* env, jclass , jint id, jlong name, jlong value)
+{
+    IMAQdxError rv = IMAQdxGetAttributeMinimumU32((IMAQdxSession)id, (const char*)name, (uInt32*)value);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}
+
+/* J: void IMAQdxGetAttributeMinimumI64(int id, String name)
+ * JN: void IMAQdxGetAttributeMinimumI64(int id, long name, long value)
+ * C: IMAQdxError IMAQdxGetAttributeMinimumI64(IMAQdxSession id, const char* name, Int64* value)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeMinimumI64(JNIEnv* env, jclass , jint id, jlong name, jlong value)
+{
+    IMAQdxError rv = IMAQdxGetAttributeMinimumI64((IMAQdxSession)id, (const char*)name, (Int64*)value);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}
+
+/* J: void IMAQdxGetAttributeMinimumF64(int id, String name)
+ * JN: void IMAQdxGetAttributeMinimumF64(int id, long name, long value)
+ * C: IMAQdxError IMAQdxGetAttributeMinimumF64(IMAQdxSession id, const char* name, float64* value)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeMinimumF64(JNIEnv* env, jclass , jint id, jlong name, jlong value)
+{
+    IMAQdxError rv = IMAQdxGetAttributeMinimumF64((IMAQdxSession)id, (const char*)name, (float64*)value);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}
+
+/* J: void IMAQdxGetAttributeMaximumU32(int id, String name)
+ * JN: void IMAQdxGetAttributeMaximumU32(int id, long name, long value)
+ * C: IMAQdxError IMAQdxGetAttributeMaximumU32(IMAQdxSession id, const char* name, uInt32* value)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeMaximumU32(JNIEnv* env, jclass , jint id, jlong name, jlong value)
+{
+    IMAQdxError rv = IMAQdxGetAttributeMaximumU32((IMAQdxSession)id, (const char*)name, (uInt32*)value);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}
+
+/* J: void IMAQdxGetAttributeMaximumI64(int id, String name)
+ * JN: void IMAQdxGetAttributeMaximumI64(int id, long name, long value)
+ * C: IMAQdxError IMAQdxGetAttributeMaximumI64(IMAQdxSession id, const char* name, Int64* value)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeMaximumI64(JNIEnv* env, jclass , jint id, jlong name, jlong value)
+{
+    IMAQdxError rv = IMAQdxGetAttributeMaximumI64((IMAQdxSession)id, (const char*)name, (Int64*)value);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}
+
+/* J: void IMAQdxGetAttributeMaximumF64(int id, String name)
+ * JN: void IMAQdxGetAttributeMaximumF64(int id, long name, long value)
+ * C: IMAQdxError IMAQdxGetAttributeMaximumF64(IMAQdxSession id, const char* name, float64* value)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeMaximumF64(JNIEnv* env, jclass , jint id, jlong name, jlong value)
+{
+    IMAQdxError rv = IMAQdxGetAttributeMaximumF64((IMAQdxSession)id, (const char*)name, (float64*)value);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}
+
+/* J: void IMAQdxGetAttributeIncrementU32(int id, String name)
+ * JN: void IMAQdxGetAttributeIncrementU32(int id, long name, long value)
+ * C: IMAQdxError IMAQdxGetAttributeIncrementU32(IMAQdxSession id, const char* name, uInt32* value)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeIncrementU32(JNIEnv* env, jclass , jint id, jlong name, jlong value)
+{
+    IMAQdxError rv = IMAQdxGetAttributeIncrementU32((IMAQdxSession)id, (const char*)name, (uInt32*)value);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}
+
+/* J: void IMAQdxGetAttributeIncrementI64(int id, String name)
+ * JN: void IMAQdxGetAttributeIncrementI64(int id, long name, long value)
+ * C: IMAQdxError IMAQdxGetAttributeIncrementI64(IMAQdxSession id, const char* name, Int64* value)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeIncrementI64(JNIEnv* env, jclass , jint id, jlong name, jlong value)
+{
+    IMAQdxError rv = IMAQdxGetAttributeIncrementI64((IMAQdxSession)id, (const char*)name, (Int64*)value);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}
+
+/* J: void IMAQdxGetAttributeIncrementF64(int id, String name)
+ * JN: void IMAQdxGetAttributeIncrementF64(int id, long name, long value)
+ * C: IMAQdxError IMAQdxGetAttributeIncrementF64(IMAQdxSession id, const char* name, float64* value)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxGetAttributeIncrementF64(JNIEnv* env, jclass , jint id, jlong name, jlong value)
+{
+    IMAQdxError rv = IMAQdxGetAttributeIncrementF64((IMAQdxSession)id, (const char*)name, (float64*)value);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}
+
+/* J: void IMAQdxSetAttributeU32(int id, String name, int value)
+ * JN: void IMAQdxSetAttributeU32(int id, long name, int value)
+ * C: IMAQdxError IMAQdxSetAttributeU32(IMAQdxSession id, const char* name, uInt32 value)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxSetAttributeU32(JNIEnv* env, jclass , jint id, jlong name, jint value)
+{
+    IMAQdxError rv = IMAQdxSetAttributeU32((IMAQdxSession)id, (const char*)name, (uInt32)value);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}
+
+/* J: void IMAQdxSetAttributeI64(int id, String name, long value)
+ * JN: void IMAQdxSetAttributeI64(int id, long name, long value)
+ * C: IMAQdxError IMAQdxSetAttributeI64(IMAQdxSession id, const char* name, Int64 value)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxSetAttributeI64(JNIEnv* env, jclass , jint id, jlong name, jlong value)
+{
+    IMAQdxError rv = IMAQdxSetAttributeI64((IMAQdxSession)id, (const char*)name, (Int64)value);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}
+
+/* J: void IMAQdxSetAttributeF64(int id, String name, double value)
+ * JN: void IMAQdxSetAttributeF64(int id, long name, double value)
+ * C: IMAQdxError IMAQdxSetAttributeF64(IMAQdxSession id, const char* name, float64 value)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxSetAttributeF64(JNIEnv* env, jclass , jint id, jlong name, jdouble value)
+{
+    IMAQdxError rv = IMAQdxSetAttributeF64((IMAQdxSession)id, (const char*)name, (float64)value);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}
+
+/* J: void IMAQdxSetAttributeString(int id, String name, String value)
+ * JN: void IMAQdxSetAttributeString(int id, long name, long value)
+ * C: IMAQdxError IMAQdxSetAttributeString(IMAQdxSession id, const char* name, const char* value)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxSetAttributeString(JNIEnv* env, jclass , jint id, jlong name, jlong value)
+{
+    IMAQdxError rv = IMAQdxSetAttributeString((IMAQdxSession)id, (const char*)name, (const char*)value);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}
+
+/* J: void IMAQdxSetAttributeEnum(int id, String name, IMAQdxEnumItem value)
+ * JN: void IMAQdxSetAttributeEnum(int id, long name, long value)
+ * C: IMAQdxError IMAQdxSetAttributeEnum(IMAQdxSession id, const char* name, const IMAQdxEnumItem* value)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxSetAttributeEnum(JNIEnv* env, jclass , jint id, jlong name, jlong value)
+{
+    IMAQdxError rv = IMAQdxSetAttributeEnum((IMAQdxSession)id, (const char*)name, (const IMAQdxEnumItem*)value);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}
+
+/* J: void IMAQdxSetAttributeBool(int id, String name, int value)
+ * JN: void IMAQdxSetAttributeBool(int id, long name, int value)
+ * C: IMAQdxError IMAQdxSetAttributeBool(IMAQdxSession id, const char* name, bool32 value)
+ */
+
+JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1IMAQdxSetAttributeBool(JNIEnv* env, jclass , jint id, jlong name, jint value)
+{
+    IMAQdxError rv = IMAQdxSetAttributeBool((IMAQdxSession)id, (const char*)name, (bool32)value);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
 }
 }

@@ -1154,7 +1154,97 @@ extern "C" {{
 JNIEXPORT void JNICALL Java_{package}_{classname}_imaqDispose(JNIEnv* , jclass , jlong addr)
 {{
     imaqDispose((void*)addr);
-}}""".format(packagepath=self.package.replace(".", "/"),
+}}
+
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeU32(IMAQdxSession id, const char* name, uInt32* value)
+{{
+    return IMAQdxGetAttribute(id, name, IMAQdxValueTypeU32, (void*)value);
+}}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeI64(IMAQdxSession id, const char* name, Int64* value)
+{{
+    return IMAQdxGetAttribute(id, name, IMAQdxValueTypeI64, (void*)value);
+}}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeF64(IMAQdxSession id, const char* name, float64* value)
+{{
+    return IMAQdxGetAttribute(id, name, IMAQdxValueTypeF64, (void*)value);
+}}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeString(IMAQdxSession id, const char* name, char value[IMAQDX_MAX_API_STRING_LENGTH])
+{{
+    return IMAQdxGetAttribute(id, name, IMAQdxValueTypeString, (void*)value);
+}}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeEnum(IMAQdxSession id, const char* name, IMAQdxEnumItem* value)
+{{
+    return IMAQdxGetAttribute(id, name, IMAQdxValueTypeEnumItem, (void*)value);
+}}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeBool(IMAQdxSession id, const char* name, bool32* value)
+{{
+    return IMAQdxGetAttribute(id, name, IMAQdxValueTypeBool, (void*)value);
+}}
+
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeMinimumU32(IMAQdxSession id, const char* name, uInt32* value)
+{{
+    return IMAQdxGetAttributeMinimum(id, name, IMAQdxValueTypeU32, (void*)value);
+}}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeMinimumI64(IMAQdxSession id, const char* name, Int64* value)
+{{
+    return IMAQdxGetAttributeMinimum(id, name, IMAQdxValueTypeI64, (void*)value);
+}}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeMinimumF64(IMAQdxSession id, const char* name, float64* value)
+{{
+    return IMAQdxGetAttributeMinimum(id, name, IMAQdxValueTypeF64, (void*)value);
+}}
+
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeMaximumU32(IMAQdxSession id, const char* name, uInt32* value)
+{{
+    return IMAQdxGetAttributeMaximum(id, name, IMAQdxValueTypeU32, (void*)value);
+}}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeMaximumI64(IMAQdxSession id, const char* name, Int64* value)
+{{
+    return IMAQdxGetAttributeMaximum(id, name, IMAQdxValueTypeI64, (void*)value);
+}}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeMaximumF64(IMAQdxSession id, const char* name, float64* value)
+{{
+    return IMAQdxGetAttributeMaximum(id, name, IMAQdxValueTypeF64, (void*)value);
+}}
+
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeIncrementU32(IMAQdxSession id, const char* name, uInt32* value)
+{{
+    return IMAQdxGetAttributeIncrement(id, name, IMAQdxValueTypeU32, (void*)value);
+}}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeIncrementI64(IMAQdxSession id, const char* name, Int64* value)
+{{
+    return IMAQdxGetAttributeIncrement(id, name, IMAQdxValueTypeI64, (void*)value);
+}}
+static inline IMAQdxError NI_FUNC IMAQdxGetAttributeIncrementF64(IMAQdxSession id, const char* name, float64* value)
+{{
+    return IMAQdxGetAttributeIncrement(id, name, IMAQdxValueTypeF64, (void*)value);
+}}
+
+static inline IMAQdxError NI_FUNC IMAQdxSetAttributeU32(IMAQdxSession id, const char* name, uInt32 value)
+{{
+    return IMAQdxSetAttribute(id, name, IMAQdxValueTypeU32, value);
+}}
+static inline IMAQdxError NI_FUNC IMAQdxSetAttributeI64(IMAQdxSession id, const char* name, Int64 value)
+{{
+    return IMAQdxSetAttribute(id, name, IMAQdxValueTypeI64, value);
+}}
+static inline IMAQdxError NI_FUNC IMAQdxSetAttributeF64(IMAQdxSession id, const char* name, float64 value)
+{{
+    return IMAQdxSetAttribute(id, name, IMAQdxValueTypeF64, value);
+}}
+static inline IMAQdxError NI_FUNC IMAQdxSetAttributeString(IMAQdxSession id, const char* name, const char* value)
+{{
+    return IMAQdxSetAttribute(id, name, IMAQdxValueTypeString, value);
+}}
+static inline IMAQdxError NI_FUNC IMAQdxSetAttributeEnum(IMAQdxSession id, const char* name, const IMAQdxEnumItem* value)
+{{
+    return IMAQdxSetAttribute(id, name, IMAQdxValueTypeU32, value->Value);
+}}
+static inline IMAQdxError NI_FUNC IMAQdxSetAttributeBool(IMAQdxSession id, const char* name, bool32 value)
+{{
+    return IMAQdxSetAttribute(id, name, IMAQdxValueTypeBool, value);
+}}
+""".format(packagepath=self.package.replace(".", "/"),
            package=self.package.replace(".", "_"),
            classname=self.classname), file=self.outc)
 
@@ -1346,6 +1436,61 @@ JNIEXPORT void JNICALL Java_{package}_{classname}_imaqDispose(JNIEnv* , jclass ,
         raise NotImplementedError("typedef function not implemented")
 
     def function(self, name, restype, params):
+        if name == "IMAQdxEnumerateVideoModes":
+            # full custom code
+            print("""
+    public static class dxEnumerateVideoModesResult {{
+        public IMAQdxEnumItem[] videoModeArray;
+        public int currentMode;
+        private ByteBuffer videoModeArray_buf;
+        private dxEnumerateVideoModesResult(ByteBuffer rv_buf, ByteBuffer videoModeArray_buf) {{
+            this.videoModeArray_buf = videoModeArray_buf;
+            int count = rv_buf.getInt(0);
+            videoModeArray = new IMAQdxEnumItem[count];
+            for (int i=0, off=0; i<count; i++, off += {struct_sz}) {{
+                videoModeArray[i] = new IMAQdxEnumItem(videoModeArray_buf, off);
+                videoModeArray[i].read();
+            }}
+            currentMode = rv_buf.getInt(8);
+        }}
+    }}
+
+    public static dxEnumerateVideoModesResult IMAQdxEnumerateVideoModes(int id) {{
+        ByteBuffer rv_buf = ByteBuffer.allocateDirect(8+8).order(ByteOrder.nativeOrder());
+        long rv_addr = getByteBufferAddress(rv_buf);
+        _IMAQdxEnumerateVideoModes(id, 0, rv_addr+0, rv_addr+8);
+        int count = rv_buf.getInt(0);
+        ByteBuffer videoModeArray_buf = ByteBuffer.allocateDirect(count*{struct_sz}).order(ByteOrder.nativeOrder());
+        _IMAQdxEnumerateVideoModes(id, getByteBufferAddress(videoModeArray_buf), rv_addr+0, rv_addr+8);
+        dxEnumerateVideoModesResult rv = new dxEnumerateVideoModesResult(rv_buf, videoModeArray_buf);
+        return rv;
+    }}
+    private static native void _IMAQdxEnumerateVideoModes(int id, long videoModeArray, long count, long currentMode);""".format(struct_sz=self.config_struct.get("IMAQdxEnumItem", "_SIZE_")), file=self.out)
+            print("""
+JNIEXPORT void JNICALL Java_{package}_{classname}__1IMAQdxEnumerateVideoModes(JNIEnv* env, jclass , jint id, jlong videoModeArray, jlong count, jlong currentMode)
+{{
+    IMAQdxError rv = IMAQdxEnumerateVideoModes((IMAQdxSession)id, (IMAQdxVideoMode*)videoModeArray, (uInt32*)count, (uInt32*)currentMode);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+}}""".format(package=self.package.replace(".", "_"),
+             classname=self.classname), file=self.outc)
+            return
+        elif name == "IMAQdxGetImageData":
+            print("""
+    public static int IMAQdxGetImageData(int id, ByteBuffer buffer, IMAQdxBufferNumberMode mode, int desiredBufferNumber) {{
+        long buffer_addr = getByteBufferAddress(buffer);
+        int buffer_size = buffer.capacity();
+        return _IMAQdxGetImageData(id, buffer_addr, buffer_size, mode.getValue(), desiredBufferNumber);
+    }}
+    private static native int _IMAQdxGetImageData(int id, long buffer, int bufferSize, int mode, int desiredBufferNumber);""".format(), file=self.out)
+            print("""
+JNIEXPORT jint JNICALL Java_{package}_{classname}__1IMAQdxGetImageData(JNIEnv* env, jclass , jint id, jlong buffer, jint bufferSize, jint mode, jint desiredBufferNumber)
+{{
+    uInt32 actualBufferNumber;
+    IMAQdxError rv = IMAQdxGetImageData((IMAQdxSession)id, (void*)buffer, (uInt32)bufferSize, (IMAQdxBufferNumberMode)mode, (uInt32)desiredBufferNumber, &actualBufferNumber);
+    if (rv != IMAQdxErrorSuccess) dxthrowJavaException(env, rv);
+    return (jint)actualBufferNumber;
+}}""".format(package=self.package.replace(".", "_"),
+             classname=self.classname), file=self.outc)
         if self.config_getboolean(name, "exclude", fallback=False):
             return
 
@@ -1443,8 +1588,10 @@ JNIEXPORT void JNICALL Java_{package}_{classname}_imaqDispose(JNIEnv* , jclass ,
             is_nullok = (fname in nullokparams) and not is_outparam
 
             if is_outparam:
-                assert ftype[-1] == '*'
-                ftype = ftype[:-1]
+                if ftype[-1] == '*':
+                    ftype = ftype[:-1]
+                elif arr is None:
+                    raise ValueError("outparam %s is not a pointer or array", fname)
             field = helper.get_field_java_code(fname, ftype, arr, 0, jfielddefs_private, backing="%s_buf" % fname)
             paramtypes[fname] = (ftype, arr, field["type"])
             if is_outparam:
@@ -1510,16 +1657,28 @@ JNIEXPORT void JNICALL Java_{package}_{classname}_imaqDispose(JNIEnv* , jclass ,
         outstruct_name = None
         #print(name, jrettype, outparams, retarraysize, retsize)
         if outparams or retarraysize or retsize:
-            # create a return buffer (TODO: optimize size)
-            jinit.append("ByteBuffer rv_buf = ByteBuffer.allocateDirect(%d).order(ByteOrder.nativeOrder());" % ((len(outparams)+1)*8))
-            jinit.append("long rv_addr = getByteBufferAddress(rv_buf);")
-
             # create a return structure
-            outstruct_fields = [(pname, ptype[:-1], arr, "")
-                                for (pname, ptype, arr) in params
-                                if pname in outparams]
+            outstruct_fields = []
+            outstruct_size = []
+            for (pname, ptype, arr) in params:
+                if pname not in outparams:
+                    continue
+                if ptype[-1] == '*':
+                    ptype = ptype[:-1]
+                outstruct_fields.append((pname, ptype, arr, ""))
+                if arr:
+                    if ptype == "char":
+                        outstruct_size.append(arr)
+                    else:
+                        raise NotImplementedError("non-char array")
+                else:
+                    outstruct_size.append("8")
             outstruct_sized_members = {}
             outstruct_name = name[4:] + "Result"
+
+            # create a return buffer (TODO: optimize size)
+            jinit.append("ByteBuffer rv_buf = ByteBuffer.allocateDirect(%s).order(ByteOrder.nativeOrder());" % "+".join(outstruct_size))
+            jinit.append("long rv_addr = getByteBufferAddress(rv_buf);")
 
             jconstruct_args = [("rv_buf", "ByteBuffer")]
             jconstruct = []
@@ -1568,7 +1727,7 @@ JNIEXPORT void JNICALL Java_{package}_{classname}_imaqDispose(JNIEnv* , jclass ,
                 jfini.extend(jconstruct)
                 jretc = "return %s;" % outparams[0]
                 jrettype = paramtypes[outparams[0]][2].j_type
-                rettype = paramtypes[outparams[0]][2]
+                #rettype = paramtypes[outparams[0]][2]
             elif len(outparams) == 1 and retsize:
                 jfini.extend(x.replace("public ", "") for x in jfielddefs)
                 jfini.extend(jconstruct)
@@ -1671,6 +1830,8 @@ JNIEXPORT void JNICALL Java_{package}_{classname}_imaqDispose(JNIEnv* , jclass ,
                 cargs.append("*((%s*)%s)" % (ptype, pname))
             elif ptype.endswith("String255"):
                 cargs.append("(char *)%s" % pname)
+            elif arr:
+                cargs.append("(%s*)%s" % (ptype, pname))
             else:
                 cargs.append("(%s)%s" % (ptype, pname))
 

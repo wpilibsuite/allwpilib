@@ -21,7 +21,10 @@ python gen_java.py \
     \
     ../../../wpilibc/wpilibC++Devices/include/NIIMAQdx.h \
     imaqdx_arm.ini \
-    imaqdx.ini
+    imaqdx.ini \
+    dxattr.h \
+    imaqdx_arm.ini \
+    dxattr.ini
 
 # Stick generated files into appropriate places.
 cp NIVision.cpp ../lib/NIVisionJNI.cpp
