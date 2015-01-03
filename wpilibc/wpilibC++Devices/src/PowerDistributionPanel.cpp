@@ -18,7 +18,7 @@ PowerDistributionPanel::PowerDistributionPanel() {
 
 /**
  * Query the input voltage of the PDP
- * @return The voltage of the PDP
+ * @return The voltage of the PDP in volts
  */
 double
 PowerDistributionPanel::GetVoltage() {
@@ -93,7 +93,7 @@ PowerDistributionPanel::GetTotalCurrent() {
 
 /**
  * Query the total power drawn from the monitored PDP channels
- * @return The the total power drawn from the PDP channels in Joules
+ * @return The the total power drawn from the PDP channels in Watts
  */
 double
 PowerDistributionPanel::GetTotalPower() {
@@ -110,7 +110,7 @@ PowerDistributionPanel::GetTotalPower() {
 
 /**
  * Query the total energy drawn from the monitored PDP channels
- * @return The the total energy drawn from the PDP channels in Watts
+ * @return The the total energy drawn from the PDP channels in Joules
  */
 double
 PowerDistributionPanel::GetTotalEnergy() {
