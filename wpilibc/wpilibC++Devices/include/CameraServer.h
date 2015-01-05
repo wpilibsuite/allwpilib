@@ -6,54 +6,76 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
+#include "USBCamera.h"
 #include "ErrorBase.h"
 #include "nivision.h"
 #include "NIIMAQdx.h"
 
-#include <vector>
-#include <thread>
 #include <mutex>
+#include <thread>
+#include <memory>
 #include <condition_variable>
+#include <tuple>
+#include <vector>
 
-/**
- * Class that runs a TCP server that serves an M-JPEG stream to the dashboard.
- */
 class CameraServer : public ErrorBase {
-	static constexpr uint16_t kPort = 1180;
-	static constexpr uint8_t kMagicNumber[] = { 0x01, 0x00, 0x00, 0x00 };
-	static constexpr uint32_t kSize640x480 = 0;
-	static constexpr uint32_t kSize320x240 = 1;
-	static constexpr uint32_t kSize160x120 = 2;
-	static constexpr int32_t kHardwareCompression = -1;
-	static constexpr char const *kDefaultCameraName = "cam0";
+ private:
+  static constexpr uint16_t kPort = 1180;
+  static constexpr uint8_t kMagicNumber[] = { 0x01, 0x00, 0x00, 0x00 };
+  static constexpr uint32_t kSize640x480 = 0;
+  static constexpr uint32_t kSize320x240 = 1;
+  static constexpr uint32_t kSize160x120 = 2;
+  static constexpr int32_t kHardwareCompression = -1;
+  static constexpr uint32_t kMaxImageSize = 200000;
 
-public:
-	static CameraServer *GetInstance();
+ protected:
+  CameraServer();
+ 
+  std::shared_ptr<USBCamera> m_camera;
+  std::thread m_serverThread;
+  std::thread m_captureThread;
+  std::recursive_mutex m_imageMutex;
+  std::condition_variable_any m_newImageVariable;
+  std::vector<uint8_t*> m_dataPool;
+  unsigned int m_quality;
+  bool m_autoCaptureStarted;
+  bool m_hwClient;
+  std::tuple<uint8_t*, unsigned int, unsigned int, bool> m_imageData;
 
-	void SetImage(Image const *image);
+  void Serve();
+  void AutoCapture();
+  void SetImageData(uint8_t* data, unsigned int size, unsigned int start = 0, bool imaqData = false);
+  void FreeImageData(std::tuple<uint8_t*, unsigned int, unsigned int, bool> imageData);
 
-	void StartAutomaticCapture(char const *cameraName = kDefaultCameraName);
+  struct Request {
+    uint32_t fps;
+    int32_t compression;
+    uint32_t size;
+  };
 
-	void SetQuality(unsigned int quality);
-	unsigned int GetQuality() const;
+  static CameraServer* s_instance;
+  
+ public:
+  static CameraServer* GetInstance();
+  void SetImage(Image const *image);
 
-protected:
-	CameraServer();
-	void serve();
+  void StartAutomaticCapture(char const *cameraName = USBCamera::kDefaultCameraName);
 
-	std::thread m_serverThread;
-	std::recursive_mutex m_imageMutex;
-	std::condition_variable_any m_newImageReady;
-	std::vector<uint8_t> m_imageData;
-	unsigned int m_quality;
-	bool m_autoCaptureStarted;
+  /**
+   * Start automatically capturing images to send to the dashboard.
+   *
+   * You should call this method to just see a camera feed on the
+   * dashboard without doing any vision processing on the roboRIO.
+   * {@link #SetImage} should not be called after this is called.
+   *
+   * @param camera The camera interface (eg. USBCamera)
+   */
+  void StartAutomaticCapture(std::shared_ptr<USBCamera> camera);
 
-	struct Request {
-		uint32_t fps;
-		int32_t compression;
-		uint32_t size;
-	};
+  bool IsAutoCaptureStarted();
 
-	static CameraServer *s_instance;
+  void SetQuality(unsigned int quality);
+  unsigned int GetQuality();
+
+  void SetSize(unsigned int size);
 };
-
