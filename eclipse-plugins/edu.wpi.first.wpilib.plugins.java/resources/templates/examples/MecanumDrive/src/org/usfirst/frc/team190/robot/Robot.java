@@ -25,10 +25,10 @@ public class Robot extends SampleRobot {
     final int joystickChannel	= 0;
 
     public Robot() {
-    	robotDrive.setExpiration(0.1);
         robotDrive = new RobotDrive(frontLeftChannel, rearLeftChannel, frontRightChannel, rearRightChannel);
     	robotDrive.setInvertedMotor(MotorType.kFrontLeft, true);	// invert the left side motors
     	robotDrive.setInvertedMotor(MotorType.kRearLeft, true);		// you may need to change or remove this to match your robot
+        robotDrive.setExpiration(0.1);
 
         stick = new Joystick(joystickChannel);
     }
