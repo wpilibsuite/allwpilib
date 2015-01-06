@@ -1079,6 +1079,20 @@ uint32_t getEncoderSamplesToAverage(void* encoder_pointer, int32_t *status) {
 }
 
 /**
+ * Set an index source for an encoder, which is an input that resets the
+ * encoder's count.
+ */
+void setEncoderIndexSource(void *encoder_pointer, uint32_t pin, bool analogTrigger, bool activeHigh,
+    bool edgeSensitive, int32_t *status) {
+  Encoder* encoder = (Encoder*) encoder_pointer;
+  encoder->encoder->writeConfig_IndexSource_Channel((unsigned char)pin, status);
+  encoder->encoder->writeConfig_IndexSource_Module((unsigned char)0, status);
+  encoder->encoder->writeConfig_IndexSource_AnalogTrigger(analogTrigger, status);
+  encoder->encoder->writeConfig_IndexActiveHigh(activeHigh, status);
+  encoder->encoder->writeConfig_IndexEdgeSensitive(edgeSensitive, status);
+}
+
+/**
  * Get the loop timing of the PWM system
  *
  * @return The loop time

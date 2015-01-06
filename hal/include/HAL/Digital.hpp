@@ -86,6 +86,8 @@ extern "C"
 	void setEncoderSamplesToAverage(void* encoder_pointer, uint32_t samplesToAverage,
 			int32_t *status);
 	uint32_t getEncoderSamplesToAverage(void* encoder_pointer, int32_t *status);
+	void setEncoderIndexSource(void *encoder_pointer, uint32_t pin, bool analogTrigger, bool activeHigh,
+			bool edgeSensitive, int32_t *status);
 
 	uint16_t getLoopTiming(int32_t *status);
 
