@@ -34,7 +34,7 @@ public class RunSFXDashboardAction implements IWorkbenchWindowActionDelegate {
 	 * @see IWorkbenchWindowActionDelegate#run
 	 */
 	public void run(IAction action) {
-		File dir = new File(WPILibCore.getDefault().getWPILibBaseDir()+File.separator+"tools");
+		File dir = new File(WPILibCore.getDefault().getWPILibBaseDir()+File.separator+"tools"+File.separator+"sfx-2014.11.01");
 		File[] files = dir.listFiles(new FilenameFilter() {
 			@Override public boolean accept(File dir, String name) {
 				return name.startsWith("sfx") && name.endsWith(".jar");
