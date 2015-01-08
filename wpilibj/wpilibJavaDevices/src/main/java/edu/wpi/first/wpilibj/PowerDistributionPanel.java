@@ -17,7 +17,8 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
- * Class for getting voltage, current, and temperature from the CAN PDP
+ * Class for getting voltage, current, temperature, power and energy from the CAN PDP.
+ * The PDP must be at CAN Address 0.
  * @author Thomas Clark
  */
 public class PowerDistributionPanel extends SensorBase implements LiveWindowSendable {
@@ -26,7 +27,7 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
 
 	/**
 	 * Query the input voltage of the PDP
-	 * @return The voltage of the PDP
+	 * @return The voltage of the PDP in volts
 	 */
 	public double getVoltage() {
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -67,7 +68,7 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
 
 	/**
 	* Query the current of all monitored PDP channels (0-15)
-	* @return The current of all the channels
+	* @return The current of all the channels in Amperes
 	*/
 	public double getTotalCurrent(){
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -80,7 +81,7 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
 
 	/**
 	* Query the total power drawn from the monitored PDP channels
-	* @return the total power
+	* @return the total power in Watts
 	*/
 	public double getTotalPower(){
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
@@ -94,7 +95,7 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
 
 	/**
 	* Query the total energy drawn from the monitored PDP channels
-	* @return the total power
+	* @return the total energy in Joules
 	*/
 	public double getTotalEnergy(){
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
