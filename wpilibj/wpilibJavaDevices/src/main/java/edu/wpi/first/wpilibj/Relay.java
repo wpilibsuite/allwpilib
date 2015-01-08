@@ -152,7 +152,7 @@ public class Relay extends SensorBase implements LiveWindowSendable {
 	 * Relay constructor given a channel.
 	 *
 	 * @param channel
-	 *            The channel number for this relay.
+	 *            The channel number for this relay (0 - 3).
 	 * @param direction
 	 *            The direction that the Relay object will control.
 	 */
@@ -169,7 +169,7 @@ public class Relay extends SensorBase implements LiveWindowSendable {
 	 * Relay constructor given a channel, allowing both directions.
 	 *
 	 * @param channel
-	 *            The channel number for this relay.
+	 *            The channel number for this relay (0 - 3).
 	 */
 	public Relay(final int channel) {
 		this(channel, Direction.kBoth);

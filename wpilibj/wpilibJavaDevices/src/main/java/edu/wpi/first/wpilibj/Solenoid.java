@@ -53,7 +53,7 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
     /**
      * Constructor using the default PCM ID (0)
      *
-     * @param channel The channel on the PCM to control.
+     * @param channel The channel on the PCM to control (0..7).
      */
     public Solenoid(final int channel) {
         super(getDefaultSolenoidModule());
