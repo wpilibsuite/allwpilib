@@ -7,16 +7,17 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-
+import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.util.BoundaryException;
+
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+
 //import com.sun.jna.Pointer;
-import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 
 /**
  * Class for creating and configuring Analog Triggers
@@ -217,7 +218,7 @@ public class AnalogTrigger {
 	 *            An enum of the type of output object to create.
 	 * @return A pointer to a new AnalogTriggerOutput object.
 	 */
-	AnalogTriggerOutput createOutput(AnalogTriggerType type) {
+	public AnalogTriggerOutput createOutput(AnalogTriggerType type) {
 		return new AnalogTriggerOutput(this, type);
 	}
 }

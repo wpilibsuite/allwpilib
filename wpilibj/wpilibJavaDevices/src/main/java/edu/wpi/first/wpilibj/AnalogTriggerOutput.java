@@ -7,12 +7,12 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.IntBuffer;
-
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
 import edu.wpi.first.wpilibj.hal.HALUtil;
+
+import java.nio.IntBuffer;
 
 /**
  * Class to represent a specific output from an analog trigger. This class is
@@ -128,10 +128,10 @@ public class AnalogTriggerOutput extends DigitalSource {
 	 * @author jonathanleitschuh
 	 */
 	public enum AnalogTriggerType{
-		IN_WINDOW(AnalogJNI.AnalogTriggerType.kInWindow),
-		STATE(AnalogJNI.AnalogTriggerType.kState),
-		RISING_PULSE(AnalogJNI.AnalogTriggerType.kRisingPulse),
-		FALLING_PULSE(AnalogJNI.AnalogTriggerType.kFallingPulse);
+		kInWindow(AnalogJNI.AnalogTriggerType.kInWindow),
+		kState(AnalogJNI.AnalogTriggerType.kState),
+		kRisingPulse(AnalogJNI.AnalogTriggerType.kRisingPulse),
+		kFallingPulse(AnalogJNI.AnalogTriggerType.kFallingPulse);
 		
 		private final int value;
 		

@@ -196,7 +196,7 @@ public class Counter extends SensorBase implements CounterBase,
 			throw new NullPointerException("The Analog Trigger given was null");
 		}
 		initCounter(Mode.kTwoPulse);
-		setUpSource(trigger.createOutput(AnalogTriggerType.STATE));
+		setUpSource(trigger.createOutput(AnalogTriggerType.kState));
 	}
 
 	@Override

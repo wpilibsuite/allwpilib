@@ -165,7 +165,7 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
 	InterruptableSensorBase giveInterruptableSensorBase() {
 		interruptTrigger = new AnalogTrigger(analogIO.getInput());
 		interruptTrigger.setLimitsVoltage(2.0f, 3.0f);
-		interruptTriggerOutput = new AnalogTriggerOutput(interruptTrigger, AnalogTriggerType.STATE);
+		interruptTriggerOutput = new AnalogTriggerOutput(interruptTrigger, AnalogTriggerType.kState);
 		return interruptTriggerOutput;
 	}
 
