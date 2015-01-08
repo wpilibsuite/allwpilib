@@ -60,8 +60,8 @@ void DoubleSolenoid::InitSolenoid()
 /**
  * Constructor.
  * Uses the default PCM ID of 0
- * @param forwardChannel The forward channel number on the PCM.
- * @param reverseChannel The reverse channel number on the PCM.
+ * @param forwardChannel The forward channel number on the PCM (0..7).
+ * @param reverseChannel The reverse channel number on the PCM (0..7).
  */
 DoubleSolenoid::DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel)
 	: SolenoidBase (GetDefaultSolenoidModule())
@@ -75,8 +75,8 @@ DoubleSolenoid::DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel)
  * Constructor.
  *
  * @param moduleNumber The CAN ID of the PCM.
- * @param forwardChannel The forward channel on the module to control.
- * @param reverseChannel The reverse channel on the module to control.
+ * @param forwardChannel The forward channel on the PCM to control (0..7).
+ * @param reverseChannel The reverse channel on the PCM to control (0..7).
  */
 DoubleSolenoid::DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel, uint32_t reverseChannel)
 	: SolenoidBase (moduleNumber)

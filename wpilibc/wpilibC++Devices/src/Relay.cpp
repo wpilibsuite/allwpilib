@@ -65,7 +65,7 @@ void Relay::InitRelay()
 
 /**
  * Relay constructor given a channel.
- * @param channel The channel number.
+ * @param channel The channel number (0-3).
  * @param direction The direction that the Relay object will control.
  */
 Relay::Relay(uint32_t channel, Relay::Direction direction)

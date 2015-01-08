@@ -76,8 +76,8 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
     /**
      * Constructor.
      * Uses the default PCM ID of 0
-     * @param forwardChannel The forward channel number on the PCM.
-     * @param reverseChannel The reverse channel number on the PCM.
+     * @param forwardChannel The forward channel number on the PCM (0..7).
+     * @param reverseChannel The reverse channel number on the PCM (0..7).
      */
     public DoubleSolenoid(final int forwardChannel, final int reverseChannel) {
         super(getDefaultSolenoidModule());
@@ -90,8 +90,8 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
      * Constructor.
      *
      * @param moduleNumber The module number of the solenoid module to use.
-     * @param forwardChannel The forward channel on the module to control.
-     * @param reverseChannel The reverse channel on the module to control.
+     * @param forwardChannel The forward channel on the module to control (0..7).
+     * @param reverseChannel The reverse channel on the module to control (0..7).
      */
     public DoubleSolenoid(final int moduleNumber, final int forwardChannel, final int reverseChannel) {
         super(moduleNumber);
