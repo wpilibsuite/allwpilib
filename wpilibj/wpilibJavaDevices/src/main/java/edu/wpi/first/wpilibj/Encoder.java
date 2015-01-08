@@ -33,6 +33,9 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
  * to be zeroed before use.
  */
 public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveWindowSendable {
+	public enum IndexingType {
+		kResetWhileHigh, kResetWhileLow, kResetOnFallingEdge, kResetOnRisingEdge
+	}
 
 	/**
 	 * The a source
@@ -725,6 +728,59 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 		default:
 			return 0.0;
 		}
+	}
+
+	/**
+	 * Set the index source for the encoder.  When this source rises, the encoder count automatically resets.
+	 *
+	 * @param channel A DIO channel to set as the encoder index
+	 * @param type The state that will cause the encoder to reset
+	 */
+	public void setIndexSource(int channel, IndexingType type) {
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+			
+		boolean activeHigh = (type == IndexingType.kResetWhileHigh) || (type == IndexingType.kResetOnRisingEdge);
+		boolean edgeSensitive = (type == IndexingType.kResetOnFallingEdge) || (type == IndexingType.kResetOnRisingEdge);
+
+		EncoderJNI.setEncoderIndexSource(m_encoder, channel, false, activeHigh, edgeSensitive, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+	}
+
+	/**
+	 * Set the index source for the encoder.  When this source is activated, the encoder count automatically resets.
+	 *
+	 * @param channel A DIO channel to set as the encoder index
+	 */
+	public void setIndexSource(int channel) {
+		this.setIndexSource(channel, IndexingType.kResetOnRisingEdge);
+	}
+
+	/**
+	 * Set the index source for the encoder.  When this source rises, the encoder count automatically resets.
+	 *
+	 * @param source A digital source to set as the encoder index
+	 * @param type The state that will cause the encoder to reset
+	 */
+	public void setIndexSource(DigitalSource source, IndexingType type) {
+		ByteBuffer status = ByteBuffer.allocateDirect(4);
+		status.order(ByteOrder.LITTLE_ENDIAN);
+			
+		boolean activeHigh = (type == IndexingType.kResetWhileHigh) || (type == IndexingType.kResetOnRisingEdge);
+		boolean edgeSensitive = (type == IndexingType.kResetOnFallingEdge) || (type == IndexingType.kResetOnRisingEdge);
+
+		EncoderJNI.setEncoderIndexSource(m_encoder, source.getChannelForRouting(), source.getAnalogTriggerForRouting(),
+				activeHigh, edgeSensitive, status.asIntBuffer());
+		HALUtil.checkStatus(status.asIntBuffer());
+	}
+
+	/**
+	 * Set the index source for the encoder.  When this source is activated, the encoder count automatically resets.
+	 *
+	 * @param source A digital source to set as the encoder index
+	 */
+	public void setIndexSource(DigitalSource source) {
+		this.setIndexSource(source, IndexingType.kResetOnRisingEdge);
 	}
 
 	/*
