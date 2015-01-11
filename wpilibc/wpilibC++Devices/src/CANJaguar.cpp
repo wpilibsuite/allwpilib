@@ -760,6 +760,10 @@ void CANJaguar::verify()
 			message = LM_API_POS_PC;
 		else if(m_controlMode == kCurrent)
 			message = LM_API_ICTRL_PC;
+		else {
+			wpi_setWPIErrorWithContext(IncompatibleMode, "PID constants only apply in Speed, Position, and Current mode");
+			return;
+		}
 
 		if(getMessage(message, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
 		{
@@ -788,6 +792,10 @@ void CANJaguar::verify()
 			message = LM_API_POS_IC;
 		else if(m_controlMode == kCurrent)
 			message = LM_API_ICTRL_IC;
+		else {
+			wpi_setWPIErrorWithContext(IncompatibleMode, "PID constants only apply in Speed, Position, and Current mode");
+			return;
+		}
 
 		if(getMessage(message, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
 		{
@@ -816,6 +824,10 @@ void CANJaguar::verify()
 			message = LM_API_POS_DC;
 		else if(m_controlMode == kCurrent)
 			message = LM_API_ICTRL_DC;
+    else {
+		  wpi_setWPIErrorWithContext(IncompatibleMode, "PID constants only apply in Speed, Position, and Current mode");
+      return;
+    }
 
 		if(getMessage(message, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
 		{
