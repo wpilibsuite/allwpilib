@@ -202,8 +202,8 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
    *
    * In Current mode: returns output current.
    * In Speed mode: returns current speed.
-   * In Position omde: returns current sensor position.
-   * In Throttle and Follower modes: returns current applied throttle.
+   * In Position mode: returns current sensor position.
+   * In PercentVbus and Follower modes: returns current applied throttle.
    *
    * @return The current sensor value of the Talon.
    */
@@ -358,14 +358,18 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     m_impl.GetBrakeIsEnabled(swigp);
     return (CanTalonJNI.intp_value(valuep)==0) ? false : true;
   }
-  // Returns temperature of Talon, in degrees Celsius.
+  /**
+   *  Returns temperature of Talon, in degrees Celsius.
+   */
   public double getTemp() {
     long tempp = CanTalonJNI.new_doublep(); // Create a new swig pointer.
     m_impl.GetTemp(new SWIGTYPE_p_double(tempp, true));
     return CanTalonJNI.doublep_value(tempp);
   }
 
-  // Returns the current going through the Talon, in Amperes.
+  /**
+   *  Returns the current going through the Talon, in Amperes.
+   */
   public double getOutputCurrent() {
     long curp = CanTalonJNI.new_doublep(); // Create a new swig pointer.
     m_impl.GetCurrent(new SWIGTYPE_p_double(curp, true));
@@ -398,6 +402,14 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     return CanTalonJNI.doublep_value(voltagep);
   }
 
+  /**
+ * TODO documentation (see CANJaguar.java)
+ *
+ * @return The position of the sensor currently providing feedback.
+ * 			When using analog sensors, 0 units corresponds to 0V, 1023 units corresponds to 3.3V
+ * 			When using an analog encoder (wrapping around 1023 to 0 is possible) the units are still 3.3V per 1023 units.
+ * 			When using quadrature, each unit is a quadrature edge (4X) mode.
+ */
   public double getPosition() {
     long positionp = CanTalonJNI.new_intp();
     m_impl.GetSensorPosition(new SWIGTYPE_p_int(positionp, true));
@@ -408,6 +420,21 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     m_impl.SetSensorPosition((int)pos);
   }
 
+/**
+ * TODO documentation (see CANJaguar.java)
+ *
+ * @return The speed of the sensor currently providing feedback.
+ *
+ * The speed units will be in the sensor's native ticks per 100ms.
+ *
+ * For analog sensors, 3.3V corresponds to 1023 units.
+ * 		So a speed of 200 equates to ~0.645 dV per 100ms or 6.451 dV per second.
+ * 		If this is an analog encoder, that likely means 1.9548 rotations per sec.
+ * For quadrature encoders, each unit corresponds a quadrature edge (4X).
+ * 		So a 250 count encoder will produce 1000 edge events per rotation.
+ * 		An example speed of 200 would then equate to 20% of a rotation per 100ms,
+ * 		or 10 rotations per second.
+ */
   public double getSpeed() {
     long speedp = CanTalonJNI.new_intp();
     m_impl.GetSensorVelocity(new SWIGTYPE_p_int(speedp, true));
@@ -462,7 +489,6 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
    * Get the current proportional constant.
    *
    * @return double proportional constant for current profile.
-   * @throws IllegalStateException if not in Position of Speed mode.
    */
   public double getP() {
 		//if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
