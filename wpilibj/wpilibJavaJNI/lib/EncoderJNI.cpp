@@ -7,7 +7,7 @@
 #include "HAL/Digital.hpp"
 
 // set the logging level
-TLogLevel encoderJNILogLevel = logWARNING;
+TLogLevel encoderJNILogLevel = logDEBUG;
 
 #define ENCODERJNI_LOG(level) \
     if (level > encoderJNILogLevel) ; \
@@ -222,4 +222,25 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderSampl
 	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	ENCODERJNI_LOG(logDEBUG) << "getEncoderSamplesToAverageResult = " <<  returnValue;
 	return returnValue;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_EncoderJNI
+ * Method:    setEncoderIndexSource
+ * Signature: (Ljava/nio/ByteBuffer;IZZZLjava/nio/IntBuffer;)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_setEncoderIndexSource
+  (JNIEnv * env, jclass, jobject id, jint pin, jboolean analogTrigger, jboolean activeHigh, jboolean edgeSensitive, jobject status)
+{
+	ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI setEncoderIndexSource";
+	void ** javaId = (void**)env->GetDirectBufferAddress(id);
+	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	ENCODERJNI_LOG(logDEBUG) << "Pin = " << pin;
+	ENCODERJNI_LOG(logDEBUG) << "Analog Trigger = " << (analogTrigger?"true":"false");
+	ENCODERJNI_LOG(logDEBUG) << "Active High = " << (activeHigh?"true":"false");
+	ENCODERJNI_LOG(logDEBUG) << "Edge Sensitive = " << (edgeSensitive?"true":"false");
+	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	setEncoderIndexSource(*javaId, pin, analogTrigger, activeHigh, edgeSensitive, statusPtr);
+	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
