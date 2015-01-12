@@ -507,6 +507,47 @@ double Encoder::PIDGet()
 	}
 }
 
+/**
+ * Set the index source for the encoder.  When this source is activated, the encoder count automatically resets.
+ *
+ * @param channel A DIO channel to set as the encoder index
+ * @param type The state that will cause the encoder to reset
+ */
+void Encoder::SetIndexSource(uint32_t channel, Encoder::IndexingType type) {
+	int32_t status = 0;
+	bool activeHigh = (type == kResetWhileHigh) || (type == kResetOnRisingEdge);
+	bool edgeSensitive = (type == kResetOnFallingEdge) || (type == kResetOnRisingEdge);
+
+  setEncoderIndexSource(m_encoder, channel, false, activeHigh, edgeSensitive, &status);
+  wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
+}
+
+/**
+ * Set the index source for the encoder.  When this source is activated, the encoder count automatically resets.
+ *
+ * @param channel A digital source to set as the encoder index
+ * @param type The state that will cause the encoder to reset
+ */
+void Encoder::SetIndexSource(DigitalSource *source, Encoder::IndexingType type) {
+	int32_t status = 0;
+	bool activeHigh = (type == kResetWhileHigh) || (type == kResetOnRisingEdge);
+	bool edgeSensitive = (type == kResetOnFallingEdge) || (type == kResetOnRisingEdge);
+
+  setEncoderIndexSource(m_encoder, source->GetChannelForRouting(), source->GetAnalogTriggerForRouting(), activeHigh,
+  		edgeSensitive, &status);
+  wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
+}
+
+/**
+ * Set the index source for the encoder.  When this source is activated, the encoder count automatically resets.
+ *
+ * @param channel A digital source to set as the encoder index
+ * @param type The state that will cause the encoder to reset
+ */
+void Encoder::SetIndexSource(DigitalSource &source, Encoder::IndexingType type) {
+	SetIndexSource(&source, type);
+}
+
 void Encoder::UpdateTable() {
 	if (m_table != NULL) {
         m_table->PutNumber("Speed", GetRate());

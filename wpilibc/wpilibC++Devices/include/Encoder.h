@@ -29,6 +29,7 @@ class DigitalSource;
 class Encoder : public SensorBase, public CounterBase, public PIDSource, public LiveWindowSendable
 {
 public:
+	enum IndexingType { kResetWhileHigh, kResetWhileLow, kResetOnFallingEdge, kResetOnRisingEdge };
 
 	Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection = false,
 			EncodingType encodingType = k4X);
@@ -56,6 +57,10 @@ public:
 	int GetSamplesToAverage();
 	void SetPIDSourceParameter(PIDSourceParameter pidSource);
 	double PIDGet();
+
+	void SetIndexSource(uint32_t channel, IndexingType type = kResetOnRisingEdge);
+	void SetIndexSource(DigitalSource *source, IndexingType type = kResetOnRisingEdge);
+	void SetIndexSource(DigitalSource &source, IndexingType type = kResetOnRisingEdge);
 
 	void UpdateTable();
 	void StartLiveWindowMode();
