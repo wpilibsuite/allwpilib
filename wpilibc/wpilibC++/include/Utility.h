@@ -5,6 +5,10 @@
 /*---------------------------------------------------------------------------*/
 #pragma once
 
+/** @file
+ * Contains global utility functions
+ */
+
 #include <stdint.h>
 #include <string>
 
