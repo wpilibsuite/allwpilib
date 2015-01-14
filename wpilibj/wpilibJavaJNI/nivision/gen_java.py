@@ -9,15 +9,18 @@ except ImportError:
 
 from nivision_parse import *
 
+# base, cast-out-pre, cast-out-post, cast-in-pre, cast-in-post
 java_accessor_map = {
-        "B": "",
-        "C": "Char",
-        "S": "Short",
-        "I": "Int",
-        "J": "Long",
-        "F": "Float",
-        "D": "Double",
-        "Z": "Boolean",
+        "B": ("", "", "", "", ""),
+        "C": ("Char", "", "", "", ""),
+        "S": ("Short", "", "", "", ""),
+        "I": ("Int", "", "", "", ""),
+        "J": ("Long", "", "", "", ""),
+        "F": ("Float", "", "", "", ""),
+        "D": ("Double", "", "", "", ""),
+        "Z": ("Boolean", "", "", "", ""),
+        "X": ("", "(short)(", " & 0xff)", "(byte)(", " & 0xff)"),
+        "Y": ("Short", "(int)(", " & 0xffff)", "(short)(", " & 0xffff)"),
         }
 
 java_size_map = {
@@ -63,9 +66,9 @@ java_types_map = {
         ("int", None): JavaType("int", "int", "jint", "I"),
         ("char", None): JavaType("byte", "byte", "jbyte", "B"),
         ("wchar_t", None): JavaType("char", "char", "jchar", "C"),
-        ("unsigned char", None): JavaType("short", "short", "jshort", "S"),
+        ("unsigned char", None): JavaType("short", "short", "jshort", "X"),
         ("short", None): JavaType("short", "short", "jshort", "S"),
-        ("unsigned short", None): JavaType("int", "int", "jint", "I"),
+        ("unsigned short", None): JavaType("int", "int", "jint", "Y"),
         ("unsigned", None): JavaType("int", "int", "jint", "I"),
         ("unsigned int", None): JavaType("int", "int", "jint", "I"),
         ("uInt32", None): JavaType("int", "int", "jint", "I"),
@@ -431,8 +434,8 @@ structEmit.toArg = "{fname}.getAddress()"
 
 # java type
 jtypeEmit = JavaEmitData()
-jtypeEmit.addBackingRead("{fname} = {backing}.get{jaccessor}({foffset});")
-jtypeEmit.addBackingWrite("{backing}.put{jaccessor}({foffset}, {fname});")
+jtypeEmit.addBackingRead("{fname} = {jaccessor_cast_out_pre}{backing}.get{jaccessor}({foffset}){jaccessor_cast_out_post};")
+jtypeEmit.addBackingWrite("{backing}.put{jaccessor}({foffset}, {jaccessor_cast_in_pre}{fname}{jaccessor_cast_in_post});")
 
 # string - array of characters
 strSizedEmit = JavaEmitData()
@@ -561,7 +564,7 @@ class JavaStructEmitHelper:
         struct_sz = None
         buftype = "ByteBuffer"
         array_size = jtype.array_size or ""
-        jaccessor = None
+        jaccessor = (None, None, None, None, None)
 
         writeBufs = []
         backingRead = []
@@ -612,7 +615,7 @@ for (int i=0, off={foffset}; i<%s; i++, off += {struct_sz})
                 elif jtype.jni_sig[1] == 'B':
                     typeemit = byteArrayEmit
                 elif jtype.jni_sig[1] in java_accessor_map:
-                    buftype = "%sBuffer" % java_accessor_map[jtype.jni_sig[1]]
+                    buftype = "%sBuffer" % java_accessor_map[jtype.jni_sig[1]][0]
                     struct_sz = java_size_map[jtype.jni_sig[1]]
                     typeemit = jtypeArrayEmit
                 else:
@@ -660,7 +663,11 @@ for (int i=0, off={foffset}; i<%s; i++, off += {struct_sz})
                      struct_sz=struct_sz,
                      array_size=array_size,
                      buftype=buftype,
-                     jaccessor=jaccessor,
+                     jaccessor=jaccessor[0],
+                     jaccessor_cast_out_pre=jaccessor[1],
+                     jaccessor_cast_out_post=jaccessor[2],
+                     jaccessor_cast_in_pre=jaccessor[3],
+                     jaccessor_cast_in_post=jaccessor[4],
                      backing=backing)
         jconstruct = [x.format(**fargs) for x in construct]
         jwritebufs = [x.format(**fargs) for x in writeBufs]
@@ -922,7 +929,7 @@ public class {classname} {{
     }}
 
     public static ByteBuffer sliceByteBuffer(ByteBuffer bb, int offset, int size) {{
-        ByteBuffer new_bb = bb.duplicate();
+        ByteBuffer new_bb = bb.duplicate().order(ByteOrder.nativeOrder());
         new_bb.position(offset);
         new_bb.limit(size);
         return new_bb;
@@ -1129,10 +1136,12 @@ public class {classname} {{
 static void throwJavaException(JNIEnv *env) {{
     jclass je = env->FindClass("{packagepath}/VisionException");
     int err = imaqGetLastError();
-    char* err_text = imaqGetErrorText(err);
-    char* full_err_msg = (char*)malloc(30+strlen(err_text));
-    sprintf(full_err_msg, "imaqError: %d: %s", err, err_text);
-    imaqDispose(err_text);
+    //char* err_text = imaqGetErrorText(err);
+    //char* full_err_msg = (char*)malloc(30+strlen(err_text));
+    //sprintf(full_err_msg, "imaqError: %d: %s", err, err_text);
+    //imaqDispose(err_text);
+    char* full_err_msg = (char*)malloc(30);
+    sprintf(full_err_msg, "imaqError: %d", err);
     env->ThrowNew(je, full_err_msg);
     free(full_err_msg);
 }}
@@ -1491,6 +1500,29 @@ JNIEXPORT jint JNICALL Java_{package}_{classname}__1IMAQdxGetImageData(JNIEnv* e
     return (jint)actualBufferNumber;
 }}""".format(package=self.package.replace(".", "_"),
              classname=self.classname), file=self.outc)
+        elif name == "imaqReadFile":
+            print("""
+    public static void imaqReadFile(Image image, String fileName) {{
+        ByteBuffer fileName_buf;
+        byte[] fileName_bytes;
+        try {{
+            fileName_bytes = fileName.getBytes("UTF-8");
+        }} catch (UnsupportedEncodingException e) {{
+            fileName_bytes = new byte[0];
+        }}
+        fileName_buf = ByteBuffer.allocateDirect(fileName_bytes.length+1);
+        putBytes(fileName_buf, fileName_bytes, 0, fileName_bytes.length).put(fileName_bytes.length, (byte)0);
+        _imaqReadFile(image.getAddress(), getByteBufferAddress(fileName_buf), 0, 0);
+    }}
+    private static native void _imaqReadFile(long image, long fileName, long colorTable, long numColors);""".format(), file=self.out)
+            print("""
+JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqReadFile(JNIEnv* env, jclass , jlong image, jlong fileName, jlong colorTable, jlong numColors)
+{{
+    int rv = imaqReadFile((Image*)image, (const char*)fileName, (RGBValue*)colorTable, (int*)numColors);
+    if (rv == 0) throwJavaException(env);
+}}""".format(package=self.package.replace(".", "_"),
+             classname=self.classname), file=self.outc)
+            return
         if self.config_getboolean(name, "exclude", fallback=False):
             return
 

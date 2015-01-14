@@ -51,7 +51,7 @@ public class NIVision {
     }
 
     public static ByteBuffer sliceByteBuffer(ByteBuffer bb, int offset, int size) {
-        ByteBuffer new_bb = bb.duplicate();
+        ByteBuffer new_bb = bb.duplicate().order(ByteOrder.nativeOrder());
         new_bb.position(offset);
         new_bb.limit(size);
         return new_bb;
@@ -4734,16 +4734,16 @@ public class NIVision {
             super.setBuffer(backing, offset, 4);
         }
         public void read() {
-            B = backing.getShort(0);
-            G = backing.getShort(1);
-            R = backing.getShort(2);
-            alpha = backing.getShort(3);
+            B = (short)(backing.get(0) & 0xff);
+            G = (short)(backing.get(1) & 0xff);
+            R = (short)(backing.get(2) & 0xff);
+            alpha = (short)(backing.get(3) & 0xff);
         }
         public void write() {
-            backing.putShort(0, B);
-            backing.putShort(1, G);
-            backing.putShort(2, R);
-            backing.putShort(3, alpha);
+            backing.put(0, (byte)(B & 0xff));
+            backing.put(1, (byte)(G & 0xff));
+            backing.put(2, (byte)(R & 0xff));
+            backing.put(3, (byte)(alpha & 0xff));
         }
         public int size() {
             return 4;
@@ -12969,16 +12969,16 @@ public class NIVision {
             super.setBuffer(backing, offset, 8);
         }
         public void read() {
-            B = backing.getInt(0);
-            G = backing.getInt(2);
-            R = backing.getInt(4);
-            alpha = backing.getInt(6);
+            B = (int)(backing.getShort(0) & 0xffff);
+            G = (int)(backing.getShort(2) & 0xffff);
+            R = (int)(backing.getShort(4) & 0xffff);
+            alpha = (int)(backing.getShort(6) & 0xffff);
         }
         public void write() {
-            backing.putInt(0, B);
-            backing.putInt(2, G);
-            backing.putInt(4, R);
-            backing.putInt(6, alpha);
+            backing.putShort(0, (short)(B & 0xffff));
+            backing.putShort(2, (short)(G & 0xffff));
+            backing.putShort(4, (short)(R & 0xffff));
+            backing.putShort(6, (short)(alpha & 0xffff));
         }
         public int size() {
             return 8;
@@ -13505,16 +13505,16 @@ public class NIVision {
             super.setBuffer(backing, offset, 4);
         }
         public void read() {
-            L = backing.getShort(0);
-            S = backing.getShort(1);
-            H = backing.getShort(2);
-            alpha = backing.getShort(3);
+            L = (short)(backing.get(0) & 0xff);
+            S = (short)(backing.get(1) & 0xff);
+            H = (short)(backing.get(2) & 0xff);
+            alpha = (short)(backing.get(3) & 0xff);
         }
         public void write() {
-            backing.putShort(0, L);
-            backing.putShort(1, S);
-            backing.putShort(2, H);
-            backing.putShort(3, alpha);
+            backing.put(0, (byte)(L & 0xff));
+            backing.put(1, (byte)(S & 0xff));
+            backing.put(2, (byte)(H & 0xff));
+            backing.put(3, (byte)(alpha & 0xff));
         }
         public int size() {
             return 4;
@@ -13553,16 +13553,16 @@ public class NIVision {
             super.setBuffer(backing, offset, 4);
         }
         public void read() {
-            V = backing.getShort(0);
-            S = backing.getShort(1);
-            H = backing.getShort(2);
-            alpha = backing.getShort(3);
+            V = (short)(backing.get(0) & 0xff);
+            S = (short)(backing.get(1) & 0xff);
+            H = (short)(backing.get(2) & 0xff);
+            alpha = (short)(backing.get(3) & 0xff);
         }
         public void write() {
-            backing.putShort(0, V);
-            backing.putShort(1, S);
-            backing.putShort(2, H);
-            backing.putShort(3, alpha);
+            backing.put(0, (byte)(V & 0xff));
+            backing.put(1, (byte)(S & 0xff));
+            backing.put(2, (byte)(H & 0xff));
+            backing.put(3, (byte)(alpha & 0xff));
         }
         public int size() {
             return 4;
@@ -13601,16 +13601,16 @@ public class NIVision {
             super.setBuffer(backing, offset, 4);
         }
         public void read() {
-            I = backing.getShort(0);
-            S = backing.getShort(1);
-            H = backing.getShort(2);
-            alpha = backing.getShort(3);
+            I = (short)(backing.get(0) & 0xff);
+            S = (short)(backing.get(1) & 0xff);
+            H = (short)(backing.get(2) & 0xff);
+            alpha = (short)(backing.get(3) & 0xff);
         }
         public void write() {
-            backing.putShort(0, I);
-            backing.putShort(1, S);
-            backing.putShort(2, H);
-            backing.putShort(3, alpha);
+            backing.put(0, (byte)(I & 0xff));
+            backing.put(1, (byte)(S & 0xff));
+            backing.put(2, (byte)(H & 0xff));
+            backing.put(3, (byte)(alpha & 0xff));
         }
         public int size() {
             return 4;
@@ -13652,13 +13652,13 @@ public class NIVision {
             b = backing.getDouble(0);
             a = backing.getDouble(8);
             L = backing.getDouble(16);
-            alpha = backing.getShort(24);
+            alpha = (short)(backing.get(24) & 0xff);
         }
         public void write() {
             backing.putDouble(0, b);
             backing.putDouble(8, a);
             backing.putDouble(16, L);
-            backing.putShort(24, alpha);
+            backing.put(24, (byte)(alpha & 0xff));
         }
         public int size() {
             return 32;
@@ -13700,13 +13700,13 @@ public class NIVision {
             Z = backing.getDouble(0);
             Y = backing.getDouble(8);
             X = backing.getDouble(16);
-            alpha = backing.getShort(24);
+            alpha = (short)(backing.get(24) & 0xff);
         }
         public void write() {
             backing.putDouble(0, Z);
             backing.putDouble(8, Y);
             backing.putDouble(16, X);
-            backing.putShort(24, alpha);
+            backing.put(24, (byte)(alpha & 0xff));
         }
         public int size() {
             return 32;
@@ -19495,7 +19495,7 @@ public class NIVision {
         }
         ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
         long rv_addr = getByteBufferAddress(rv_buf);
-        _imaqParticleFilter4(dest.getAddress(), source.getAddress(), getByteBufferAddress(criteria_buf), criteriaCount, options.getAddress(), roi.getAddress(), rv_addr+0);
+        _imaqParticleFilter4(dest.getAddress(), source.getAddress(), getByteBufferAddress(criteria_buf), criteriaCount, options.getAddress(), roi == null ? 0 : roi.getAddress(), rv_addr+0);
         int numParticles;
         numParticles = rv_buf.getInt(0);
         return numParticles;
@@ -20837,33 +20837,17 @@ public class NIVision {
     }
     private static native int _imaqOpenAVI(long fileName);
 
-    public static class ReadFileResult {
-        public RGBValue colorTable;
-        public int numColors;
-        private ReadFileResult(ByteBuffer rv_buf) {
-            colorTable = new RGBValue(rv_buf, 0);
-            colorTable.read();
-            numColors = rv_buf.getInt(8);
+    public static void imaqReadFile(Image image, String fileName) {
+        ByteBuffer fileName_buf;
+        byte[] fileName_bytes;
+        try {
+            fileName_bytes = fileName.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            fileName_bytes = new byte[0];
         }
-    }
-
-    public static ReadFileResult imaqReadFile(Image image, String fileName) {
-        ByteBuffer fileName_buf = null;
-        if (fileName != null) {
-            byte[] fileName_bytes;
-            try {
-                fileName_bytes = fileName.getBytes("UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                fileName_bytes = new byte[0];
-            }
-            fileName_buf = ByteBuffer.allocateDirect(fileName_bytes.length+1);
-            putBytes(fileName_buf, fileName_bytes, 0, fileName_bytes.length).put(fileName_bytes.length, (byte)0);
-        }
-        ByteBuffer rv_buf = ByteBuffer.allocateDirect(8+8).order(ByteOrder.nativeOrder());
-        long rv_addr = getByteBufferAddress(rv_buf);
-        _imaqReadFile(image.getAddress(), fileName == null ? 0 : getByteBufferAddress(fileName_buf), rv_addr+0, rv_addr+8);
-        ReadFileResult rv = new ReadFileResult(rv_buf);
-        return rv;
+        fileName_buf = ByteBuffer.allocateDirect(fileName_bytes.length+1);
+        putBytes(fileName_buf, fileName_bytes, 0, fileName_bytes.length).put(fileName_bytes.length, (byte)0);
+        _imaqReadFile(image.getAddress(), getByteBufferAddress(fileName_buf), 0, 0);
     }
     private static native void _imaqReadFile(long image, long fileName, long colorTable, long numColors);
 

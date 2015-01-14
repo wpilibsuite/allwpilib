@@ -14,10 +14,12 @@
 static void throwJavaException(JNIEnv *env) {
     jclass je = env->FindClass("com/ni/vision/VisionException");
     int err = imaqGetLastError();
-    char* err_text = imaqGetErrorText(err);
-    char* full_err_msg = (char*)malloc(30+strlen(err_text));
-    sprintf(full_err_msg, "imaqError: %d: %s", err, err_text);
-    imaqDispose(err_text);
+    //char* err_text = imaqGetErrorText(err);
+    //char* full_err_msg = (char*)malloc(30+strlen(err_text));
+    //sprintf(full_err_msg, "imaqError: %d: %s", err, err_text);
+    //imaqDispose(err_text);
+    char* full_err_msg = (char*)malloc(30);
+    sprintf(full_err_msg, "imaqError: %d", err);
     env->ThrowNew(je, full_err_msg);
     free(full_err_msg);
 }
@@ -1455,11 +1457,6 @@ JNIEXPORT jint JNICALL Java_com_ni_vision_NIVision__1imaqOpenAVI(JNIEnv* env, jc
     
     return (jint)rv;
 }
-
-/* J: void imaqReadFile(Image image, String fileName)
- * JN: void imaqReadFile(long image, long fileName, long colorTable, long numColors)
- * C: int imaqReadFile(Image* image, const char* fileName, RGBValue* colorTable, int* numColors)
- */
 
 JNIEXPORT void JNICALL Java_com_ni_vision_NIVision__1imaqReadFile(JNIEnv* env, jclass , jlong image, jlong fileName, jlong colorTable, jlong numColors)
 {
