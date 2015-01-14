@@ -81,7 +81,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}/src&quot;"/>
 									<listOptionValue builtIn="false" value="${WPILIB}/cpp/current/sim/include"/>
 									<listOptionValue builtIn="false" value="/usr/include"/>
-									<listOptionValue builtIn="false" value="/usr/include/gazebo-3.1"/>
+									<listOptionValue builtIn="false" value="/usr/include/gazebo-3.2"/>
 									<listOptionValue builtIn="false" value="/usr/include/sdformat-2.2"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.optimization.level.1648211502" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
