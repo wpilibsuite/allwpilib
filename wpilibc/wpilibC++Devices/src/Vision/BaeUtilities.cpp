@@ -16,7 +16,7 @@
 #include "Servo.h"
 #include "Timer.h"
 
-/**
+/** @file
  *   Utility functions 
  */
 

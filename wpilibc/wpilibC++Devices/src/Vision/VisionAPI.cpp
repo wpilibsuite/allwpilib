@@ -14,7 +14,9 @@
 int VisionAPI_debugFlag = 1;
 #define DPRINTF if(VisionAPI_debugFlag)dprintf
 
-/*   Image Management functions    */
+/** @file
+ *    Image Management functions
+ */
 
 /**
 * @brief Create an image object
