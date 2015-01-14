@@ -852,6 +852,7 @@ class JavaEmitter:
         self.classpath = self.package.replace(".", "/") + "/" + self.classname
 
         self.unions = {}
+        self.errors = {}
 
         with open(os.path.join(outdir, "VisionException.java"), "wt") as f:
             print("""//
@@ -1132,16 +1133,15 @@ public class {classname} {{
 #include <nivision.h>
 #include <NIIMAQdx.h>
 
+static const char* getErrorText(int err);
+
 // throw java exception
 static void throwJavaException(JNIEnv *env) {{
     jclass je = env->FindClass("{packagepath}/VisionException");
     int err = imaqGetLastError();
-    //char* err_text = imaqGetErrorText(err);
-    //char* full_err_msg = (char*)malloc(30+strlen(err_text));
-    //sprintf(full_err_msg, "imaqError: %d: %s", err, err_text);
-    //imaqDispose(err_text);
-    char* full_err_msg = (char*)malloc(30);
-    sprintf(full_err_msg, "imaqError: %d", err);
+    const char* err_text = getErrorText(err);
+    char* full_err_msg = (char*)malloc(30+strlen(err_text));
+    sprintf(full_err_msg, "imaqError: %d: %s", err, err_text);
     env->ThrowNew(je, full_err_msg);
     free(full_err_msg);
 }}
@@ -1149,11 +1149,9 @@ static void throwJavaException(JNIEnv *env) {{
 // throw IMAQdx java exception
 static void dxthrowJavaException(JNIEnv *env, IMAQdxError err) {{
     jclass je = env->FindClass("{packagepath}/VisionException");
-    char* err_text = (char*)malloc(200);
-    IMAQdxGetErrorString(err, err_text, 200);
-    char* full_err_msg = (char*)malloc(250);
+    const char* err_text = getErrorText(err);
+    char* full_err_msg = (char*)malloc(30+strlen(err_text));
     sprintf(full_err_msg, "IMAQdxError: %d: %s", err, err_text);
-    free(err_text);
     env->ThrowNew(je, full_err_msg);
     free(full_err_msg);
 }}
@@ -1263,7 +1261,14 @@ static inline IMAQdxError NI_FUNC IMAQdxSetAttributeBool(IMAQdxSession id, const
 
     def finish(self):
         print("}", file=self.out)
-        print("}", file=self.outc)
+        print("""}}
+
+static const char* getErrorText(int err) {{
+    switch (err) {{
+        {errs}
+        default: return "Unknown error";
+    }}
+}}""".format(errs="\n        ".join('case %s: return "%s";' % (x, self.errors[x]) for x in sorted(self.errors))), file=self.outc)
 
     def config_get(self, section, option, fallback):
         try:
@@ -1301,8 +1306,6 @@ static inline IMAQdxError NI_FUNC IMAQdxSetAttributeBool(IMAQdxSession id, const
             return
         if name in opaque_structs:
             return
-        if name.startswith("ERR_"):
-            return
         clean = None
         type = None
         after_struct = False
@@ -1333,6 +1336,10 @@ static inline IMAQdxError NI_FUNC IMAQdxSetAttributeBool(IMAQdxSession id, const
 
         if clean is None:
             print("Invalid #define: %s" % name)
+            return
+
+        if name.startswith("ERR_"):
+            self.errors[name] = comment
             return
 
         # strip IMAQ_ prefix
@@ -1376,22 +1383,32 @@ static inline IMAQdxError NI_FUNC IMAQdxSetAttributeBool(IMAQdxSession id, const
         for vname, value, comment in values:
             if vname.endswith("SIZE_GUARD"):
                 continue
+            if value is None:
+                # auto-increment
+                value = "%d" % (prev_value + 1)
+            value_i = int(value, 0)
+            if value_i < 0 or value_i != (prev_value + 1):
+                # need to do search instead of index for fromValue()
+                need_search = True
+            prev_value = value_i
+
+            if vname == "IMAQdxErrorSuccess":
+                continue
+            if vname.startswith("IMAQdxError"):
+                self.errors[vname] = comment
+                continue
+
             if vname.startswith("IMAQ_"):
                 vname = vname[5:]
             if vname.startswith("IMAQdx"):
                 vname = vname[6:]
             if vname[0] in "0123456789":
                 vname = "C" + vname
-            if value is None:
-                # auto-increment
-                value = "%d" % (prev_value + 1)
             valuestrs.append("%s(%s),%s" % (vname, value, " // %s" % comment if comment else ""))
             defined.add(vname)
-            value_i = int(value, 0)
-            if value_i < 0 or value_i != (prev_value + 1):
-                # need to do search instead of index for fromValue()
-                need_search = True
-            prev_value = value_i
+
+        if not valuestrs:
+            return
 
         print("""
     public static enum {name} {{
