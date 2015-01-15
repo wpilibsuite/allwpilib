@@ -15,6 +15,8 @@ wpilibj/wpilibJavaJNI/nivision/*.cpp
 wpilibj/wpilibJavaJNI/nivision/*.s
 wpilibj/wpilibJavaJNI/nivision/*_arm.ini
 wpilibj/wpilibJavaJNI/nivision/*.java
+wpilibj/wpilibJavaJNI/nivision/nivision_funcs.txt
+wpilibj/wpilibJavaJNI/nivision/imaqdx_funcs.txt
 
 # Created by the jenkins test script
 test-reports
