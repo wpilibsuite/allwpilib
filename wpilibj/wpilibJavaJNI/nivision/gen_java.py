@@ -1,4 +1,5 @@
 from __future__ import print_function
+import codecs
 import sys
 import os
 import re
@@ -1947,7 +1948,7 @@ def generate(srcdir, outdir, inputs):
                 library_funcs.add(line.strip())
 
         # open input file
-        with open(fname) as inf:
+        with codecs.open(fname, encoding="utf-8", errors="ignore") as inf:
             # prescan for undefined structures
             prescan_file(inf)
             inf.seek(0)
