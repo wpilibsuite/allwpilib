@@ -9,6 +9,8 @@
  * To use a USB camera instead, see the IntermediateVision example for details
  * on using the USB camera. To use an Axis Camera, see the AxisCamera example for details on
  * using an Axis Camera.
+ *
+ * Sample images can be found here: http://wp.wpi.edu/wpilib/2015/01/16/sample-images-for-vision-projects/ 
  */
 class VisionColor2015Sample : public SampleRobot
 {
@@ -69,7 +71,7 @@ public:
 	void Autonomous() override {
 		while (IsAutonomous() && IsEnabled())
 		{
-			//read file in from disk. For this example to run you need to copy image20.jpg from the SampleImages folder in this project to the
+			//read file in from disk. For this example to run you need to copy image20.jpg from the SampleImages folder to the
 			//directory shown below using FTP or SFTP: http://wpilib.screenstepslive.com/s/4485/m/24166/l/282299-roborio-ftp
 			imaqError = imaqReadFile(frame, "//home//lvuser//SampleImages//image20.jpg", NULL, NULL);
 
@@ -115,9 +117,9 @@ public:
 					imaqMeasureParticle(binaryFrame, particleIndex, 0, IMAQ_MT_BOUNDING_RECT_LEFT, &(par.BoundingRectLeft));
 					imaqMeasureParticle(binaryFrame, particleIndex, 0, IMAQ_MT_BOUNDING_RECT_BOTTOM, &(par.BoundingRectBottom));
 					imaqMeasureParticle(binaryFrame, particleIndex, 0, IMAQ_MT_BOUNDING_RECT_RIGHT, &(par.BoundingRectRight));
-					particles.push_back(*par);
+					particles.push_back(par);
 				}
-				sort(particles->begin(), particles->end(), CompareParticleSizes);
+				sort(particles.begin(), particles.end(), CompareParticleSizes);
 
 				//This example only scores the largest particle. Extending to score all particles and choosing the desired one is left as an exercise
 				//for the reader. Note that the long and short side scores expect a single tote and will not work for a stack of 2 or more totes.
@@ -157,7 +159,7 @@ public:
 		if(error < ERR_SUCCESS) {
 			DriverStation::ReportError("Send To Dashboard error: " + std::to_string((long)imaqError) + "\n");
 		} else {
-			CameraServer::GetInstance()->SetImage(binaryFrame);
+			CameraServer::GetInstance()->SetImage(image);
 		}
 	}
 

@@ -339,53 +339,10 @@
         </tags>
         <packages>
             <package>src/$package-dir</package>
-			<package>SampleImages</package>
         </packages>
         <files>
             <file source="examples/2015Vision/Color_src/Robot.java"
                   destination="src/$package-dir/Robot.java"></file>
-			<file source="examples/2015Vision/SampleImages/image.jpg"
-				  destination="SampleImages/image.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image2.jpg"
-				  destination="SampleImages/image2.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image3.jpg"
-				  destination="SampleImages/image3.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image4.jpg"
-				  destination="SampleImages/image4.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image5.jpg"
-				  destination="SampleImages/image5.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image6.jpg"
-				  destination="SampleImages/image6.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image7.jpg"
-				  destination="SampleImages/image7.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image8.jpg"
-				  destination="SampleImages/image8.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image9.jpg"
-				  destination="SampleImages/image9.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image10.jpg"
-				  destination="SampleImages/image10.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image11.jpg"
-				  destination="SampleImages/image11.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image12.jpg"
-				  destination="SampleImages/image12.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image13.jpg"
-				  destination="SampleImages/image13.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image14.jpg"
-				  destination="SampleImages/image14.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image15.jpg"
-				  destination="SampleImages/image15.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image16.jpg"
-				  destination="SampleImages/image16.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image17.jpg"
-				  destination="SampleImages/image17.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image18.jpg"
-				  destination="SampleImages/image18.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image19.jpg"
-				  destination="SampleImages/image19.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image20.jpg"
-				  destination="SampleImages/image20.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/IMG_1800.png"
-				  destination="SampleImages/IMG_1800.png"></file>
 		</files>
     </example>
 
@@ -402,53 +359,10 @@
         </tags>
         <packages>
             <package>src/$package-dir</package>
-			<package>SampleImages</package>
         </packages>
         <files>
             <file source="examples/2015Vision/Retro_src/Robot.java"
                   destination="src/$package-dir/Robot.java"></file>
-			<file source="examples/2015Vision/SampleImages/image.jpg"
-				  destination="SampleImages/image.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image2.jpg"
-				  destination="SampleImages/image2.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image3.jpg"
-				  destination="SampleImages/image3.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image4.jpg"
-				  destination="SampleImages/image4.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image5.jpg"
-				  destination="SampleImages/image5.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image6.jpg"
-				  destination="SampleImages/image6.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image7.jpg"
-				  destination="SampleImages/image7.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image8.jpg"
-				  destination="SampleImages/image8.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image9.jpg"
-				  destination="SampleImages/image9.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image10.jpg"
-				  destination="SampleImages/image10.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image11.jpg"
-				  destination="SampleImages/image11.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image12.jpg"
-				  destination="SampleImages/image12.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image13.jpg"
-				  destination="SampleImages/image13.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image14.jpg"
-				  destination="SampleImages/image14.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image15.jpg"
-				  destination="SampleImages/image15.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image16.jpg"
-				  destination="SampleImages/image16.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image17.jpg"
-				  destination="SampleImages/image17.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image18.jpg"
-				  destination="SampleImages/image18.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image19.jpg"
-				  destination="SampleImages/image19.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/image20.jpg"
-				  destination="SampleImages/image20.jpg"></file>
-			<file source="examples/2015Vision/SampleImages/IMG_1800.png"
-				  destination="SampleImages/IMG_1800.png"></file>
 		</files>
     </example>
 

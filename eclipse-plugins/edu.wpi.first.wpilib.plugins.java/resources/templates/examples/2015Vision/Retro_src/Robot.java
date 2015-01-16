@@ -20,6 +20,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * To use a USB camera instead, see the SimpelVision and AdvancedVision examples for details
  * on using the USB camera. To use an Axis Camera, see the AxisCamera example for details on
  * using an Axis Camera.
+ *
+ * Sample images can found here: http://wp.wpi.edu/wpilib/2015/01/16/sample-images-for-vision-projects/ 
  */
 public class Robot extends SampleRobot {
 		//A structure to hold measurements of a particle
@@ -85,7 +87,7 @@ public class Robot extends SampleRobot {
 		public void autonomous() {
 			while (isAutonomous() && isEnabled())
 			{
-				//read file in from disk. For this example to run you need to copy image.jpg from the SampleImages folder in this project to the
+				//read file in from disk. For this example to run you need to copy image.jpg from the SampleImages folder to the
 				//directory shown below using FTP or SFTP: http://wpilib.screenstepslive.com/s/4485/m/24166/l/282299-roborio-ftp
 				NIVision.imaqReadFile(frame, "/home/lvuser/SampleImages/image.jpg");
 
