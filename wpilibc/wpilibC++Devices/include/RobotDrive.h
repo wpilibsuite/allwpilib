@@ -67,6 +67,7 @@ public:
 	void SetInvertedMotor(MotorType motor, bool isInverted);
 	void SetSensitivity(float sensitivity);
 	void SetMaxOutput(double maxOutput);
+	void SetCANJaguarSyncGroup(uint8_t syncGroup);
 
 	void SetExpiration(float timeout);
 	float GetExpiration();
@@ -93,6 +94,7 @@ protected:
 	SpeedController *m_rearLeftMotor;
 	SpeedController *m_rearRightMotor;
 	MotorSafetyHelper *m_safetyHelper;
+	uint8_t m_syncGroup;
 
 private:
 	int32_t GetNumMotors()
