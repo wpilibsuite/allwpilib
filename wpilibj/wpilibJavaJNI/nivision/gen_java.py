@@ -843,10 +843,11 @@ for (int i=0, off={foffset}; i<%s; i++, off += {struct_sz})
 
 
 class JavaEmitter:
-    def __init__(self, outdir, config, config_struct):
+    def __init__(self, outdir, config, config_struct, library_funcs):
         self.outdir = outdir
         self.config = config
         self.config_struct = config_struct
+        self.library_funcs = library_funcs
         self.package = "com.ni.vision"
         self.classname = "NIVision"
         self.classpath = self.package.replace(".", "/") + "/" + self.classname
@@ -930,21 +931,29 @@ public class {classname} {{
     }}
 
     public static ByteBuffer sliceByteBuffer(ByteBuffer bb, int offset, int size) {{
-        ByteBuffer new_bb = bb.duplicate().order(ByteOrder.nativeOrder());
-        new_bb.position(offset);
-        new_bb.limit(size);
+        int pos = bb.position();
+        int lim = bb.limit();
+        bb.position(offset);
+        bb.limit(offset+size);
+        ByteBuffer new_bb = bb.slice().order(ByteOrder.nativeOrder());
+        bb.position(pos);
+        bb.limit(lim);
         return new_bb;
     }}
 
     public static ByteBuffer getBytes(ByteBuffer bb, byte[] dst, int offset, int size) {{
-        for (int i=offset; i<offset+size; i++)
-            dst[i] = bb.get(i);
+        int pos = bb.position();
+        bb.position(offset);
+        bb.get(dst, 0, size);
+        bb.position(pos);
         return bb;
     }}
 
     public static ByteBuffer putBytes(ByteBuffer bb, byte[] src, int offset, int size) {{
-        for (int i=offset; i<offset+size; i++)
-            bb.put(i, src[i]);
+        int pos = bb.position();
+        bb.position(offset);
+        bb.put(src, 0, size);
+        bb.position(pos);
         return bb;
     }}
 
@@ -1462,6 +1471,8 @@ static const char* getErrorText(int err) {{
         raise NotImplementedError("typedef function not implemented")
 
     def function(self, name, restype, params):
+        if name not in self.library_funcs:
+            return
         if name == "IMAQdxEnumerateVideoModes":
             # full custom code
             print("""
@@ -1921,7 +1932,7 @@ JNIEXPORT {rettype} JNICALL Java_{package}_{classname}__1{name}({args})
 def generate(srcdir, outdir, inputs):
     emit = None
 
-    for fname, config_struct_path, configpath in inputs:
+    for fname, config_struct_path, configpath, funcs_path in inputs:
         # read config files
         config_struct = configparser.ConfigParser()
         config_struct.read(config_struct_path)
@@ -1930,6 +1941,11 @@ def generate(srcdir, outdir, inputs):
         block_comment_exclude = set(x.strip() for x in
                 config.get("Block Comment", "exclude").splitlines())
 
+        library_funcs = set()
+        with open(funcs_path) as ff:
+            for line in ff:
+                library_funcs.add(line.strip())
+
         # open input file
         with open(fname) as inf:
             # prescan for undefined structures
@@ -1937,10 +1953,11 @@ def generate(srcdir, outdir, inputs):
             inf.seek(0)
 
             if emit is None:
-                emit = JavaEmitter(outdir, config, config_struct)
+                emit = JavaEmitter(outdir, config, config_struct, library_funcs)
             else:
                 emit.config = config
                 emit.config_struct = config_struct
+                emit.library_funcs = library_funcs
 
             # generate
             parse_file(emit, inf, block_comment_exclude)
@@ -1948,15 +1965,16 @@ def generate(srcdir, outdir, inputs):
     emit.finish()
 
 if __name__ == "__main__":
-    if len(sys.argv) < 4 or ((len(sys.argv)-1) % 3) != 0:
-        print("Usage: gen_wrap.py <header.h config_struct.ini config.ini>...")
+    if len(sys.argv) < 5 or ((len(sys.argv)-1) % 4) != 0:
+        print("Usage: gen_wrap.py <header.h config_struct.ini config.ini funcs.txt>...")
         exit(0)
 
     inputs = []
-    for i in range(1, len(sys.argv), 3):
+    for i in range(1, len(sys.argv), 4):
         fname = sys.argv[i]
         config_struct_name = sys.argv[i+1]
         configname = sys.argv[i+2]
-        inputs.append((fname, config_struct_name, configname))
+        funcs_name = sys.argv[i+3]
+        inputs.append((fname, config_struct_name, configname, funcs_name))
 
     generate("", "", inputs)
