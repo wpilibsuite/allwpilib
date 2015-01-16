@@ -55,6 +55,7 @@ public class USBCamera {
 	}
 
 	public synchronized void openCamera() {
+		if (m_id != -1) return; // Camera is already open
 		for (int i=0; i<3; i++) {
 			try {
 				m_id = NIVision.IMAQdxOpenCamera(m_name,
@@ -119,7 +120,7 @@ public class USBCamera {
 			if (fps > foundFps)
 				continue;
 			String format = m.group("format");
-			boolean isJpeg = format == "jpeg" || format == "JPEG";
+			boolean isJpeg = format.equals("jpeg") || format.equals("JPEG");
 			if ((m_useJpeg && !isJpeg) || (!m_useJpeg && isJpeg))
 				continue;
 			foundMode = mode;
@@ -261,33 +262,38 @@ public class USBCamera {
 		}
 
 		NIVision.IMAQdxGetImageData(m_id, data, NIVision.IMAQdxBufferNumberMode.BufferNumberModeLast, 0);
+                data.limit(data.capacity() - 1);
 		data.limit(getJpegSize(data));
 	}
 
 	private static int getJpegSize(ByteBuffer data) {
-		if (data.get(0) != 0xff || data.get(1) != 0xd8)
+		if (data.get(0) != (byte) 0xff || data.get(1) != (byte) 0xd8)
 			throw new VisionException("invalid image");
 		int pos = 2;
 		while (true) {
-			byte b = data.get(pos);
-			if (b != 0xff)
-				throw new VisionException("invalid image at pos " + pos + " (" + data.get(pos) + ")");
-			b = data.get(pos+1);
-			if (b == 0x01 || (b >= 0xd0 && b <= 0xd7)) // various
-				pos += 2;
-			else if (b == 0xd9) // EOI
-				return pos + 2;
-			else if (b == 0xd8) // SOI
-				throw new VisionException("invalid image");
-			else if (b == 0xda) { // SOS
-				int len = ((data.get(pos+2) & 0xff) << 8) | (data.get(pos+3) & 0xff);
-				pos += len + 2;
-				// Find next marker.  Skip over escaped and RST markers.
-				while (data.get(pos) != 0xff || data.get(pos+1) == 0x00 || (data.get(pos+1) >= 0xd0 && data.get(pos+1) <= 0xd7))
-					pos += 1;
-			} else { // various
-				int len = ((data.get(pos+2) & 0xff) << 8) | (data.get(pos+3) & 0xff);
-				pos += len + 2;
+			try {
+				byte b = data.get(pos);
+				if (b != (byte) 0xff)
+					throw new VisionException("invalid image at pos " + pos + " (" + data.get(pos) + ")");
+				b = data.get(pos+1);
+				if (b == (byte) 0x01 || (b >= (byte) 0xd0 && b <= (byte) 0xd7)) // various
+					pos += 2;
+				else if (b == (byte) 0xd9) // EOI
+					return pos + 2;
+				else if (b == (byte) 0xd8) // SOI
+					throw new VisionException("invalid image");
+				else if (b == (byte) 0xda) { // SOS
+					int len = ((data.get(pos+2) & 0xff) << 8) | (data.get(pos+3) & 0xff);
+					pos += len + 2;
+					// Find next marker.  Skip over escaped and RST markers.
+					while (data.get(pos) != (byte) 0xff || data.get(pos+1) == (byte) 0x00 || (data.get(pos+1) >= (byte) 0xd0 && data.get(pos+1) <= (byte) 0xd7))
+						pos += 1;
+				} else { // various
+					int len = ((data.get(pos+2) & 0xff) << 8) | (data.get(pos+3) & 0xff);
+					pos += len + 2;
+				}
+			} catch (IndexOutOfBoundsException ex) {
+				throw new VisionException("invalid image: could not find jpeg end " + ex.getMessage());
 			}
 		}
 	}
