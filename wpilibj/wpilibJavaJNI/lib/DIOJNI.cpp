@@ -113,10 +113,17 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_getDIO
  * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)B
  */
 JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_getDIODirection
-  (JNIEnv *, jclass, jobject, jobject)
+  (JNIEnv *env, jclass, jobject id, jobject status)
 {
-	assert(false);
-
+	DIOJNI_LOG(logDEBUG) << "Calling DIOJNI getDIODirection (RR upd)";
+	void ** javaId = (void**)env->GetDirectBufferAddress(id);
+	//DIOJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	//DIOJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	jbyte returnValue = getDIODirection(*javaId, statusPtr);
+	//DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	DIOJNI_LOG(logDEBUG) << "getDIODirectionResult = " << (jbyte)returnValue;
+	return returnValue;
 }
 
 /*
@@ -125,10 +132,16 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_getDIODirection
  * Signature: (Ljava/nio/ByteBuffer;DLjava/nio/IntBuffer;)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_pulse
-  (JNIEnv *, jclass, jobject, jdouble, jobject)
+  (JNIEnv *env, jclass, jobject id, jdouble value, jobject status)
 {
-	assert(false);
-
+	DIOJNI_LOG(logDEBUG) << "Calling DIOJNI pulse (RR upd)";
+	void ** javaId = (void**)env->GetDirectBufferAddress(id);
+	//DIOJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
+	//DIOJNI_LOG(logDEBUG) << "Value = " << value;
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	//DIOJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	pulse(*javaId, value, statusPtr);
+	DIOJNI_LOG(logDEBUG) << "Did it work? Status = " << *statusPtr;
 }
 
 /*
@@ -137,9 +150,18 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_pulse
  * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)B
  */
 JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_isPulsing
-  (JNIEnv *, jclass, jobject, jobject)
+  (JNIEnv *env, jclass, jobject id, jobject status)
 {
-	assert(false);
+	DIOJNI_LOG(logDEBUG) << "Calling DIOJNI isPulsing (RR upd)";
+	void ** javaId = (void**)env->GetDirectBufferAddress(id);
+	//DIOJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	//DIOJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	jbyte returnValue = isPulsing(*javaId, statusPtr);
+	//DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	DIOJNI_LOG(logDEBUG) << "isPulsingResult = " << (jbyte)returnValue;
+	return returnValue;
+
 
 }
 
@@ -149,10 +171,14 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_isPulsing
  * Signature: (Ljava/nio/IntBuffer;)B
  */
 JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_isAnyPulsing
-  (JNIEnv *, jclass, jobject)
+  (JNIEnv *env, jclass, jobject status)
 {
-	assert(false);
-
+	DIOJNI_LOG(logDEBUG) << "Calling DIOJNI isAnyPulsing (RR upd)";
+	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	jbyte returnValue = isAnyPulsing( statusPtr );
+	//DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	DIOJNI_LOG(logDEBUG) << "isAnyPulsingResult = " << (jbyte)returnValue;
+	return returnValue;
 }
 
 /*
