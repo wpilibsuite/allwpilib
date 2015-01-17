@@ -64,6 +64,15 @@
 
     <echo>[athena-deploy] Copying code over.</echo>
     <scp file="${out.exe}" sftp="true" todir="${username}@${target}:${deploy.dir}" password="${password}" trust="true"/>
+
+    <sshexec host="${target}"
+               username="admin"
+               password="${password}"
+               trust="true"
+               failonerror="false"
+               command="killall netconsole-host"/>
+    <scp file="${wpilib.ant.dir}/netconsole-host" todir="admin@${target}:/usr/local/frc/bin" password="${password}" trust="true"/>
+
     <scp file="${wpilib.ant.dir}/robotCommand" todir="${username}@${target}:/home/lvuser/" password="${password}" trust="true"/>
 
     <echo>[athena-deploy] Starting program.</echo>

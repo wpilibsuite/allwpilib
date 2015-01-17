@@ -104,7 +104,16 @@
   <target name="deploy" depends="clean,jar,get-target-ip,dependencies" description="Deploy the jar and start the program running.">
     <echo>[athena-deploy] Copying code over.</echo>
     <scp file="${dist.jar}" todir="${username}@${target}:${deploy.dir}" password="${password}" trust="true"/>
-    <scp file="${wpilib.ant.dir}/robotCommand" todir="${username}@${target}:${command.dir}" password="${password}" trust="true"/>
+
+      <sshexec host="${target}"
+               username="admin"
+               password="${password}"
+               trust="true"
+               failonerror="false"
+               command="killall netconsole-host"/>
+      <scp file="${wpilib.ant.dir}/netconsole-host" todir="admin@${target}:/usr/local/frc/bin" password="${password}" trust="true"/>
+
+      <scp file="${wpilib.ant.dir}/robotCommand" todir="${username}@${target}:${command.dir}" password="${password}" trust="true"/>
 
     <echo>[athena-deploy] Starting program.</echo>
     <sshexec host="${target}"
