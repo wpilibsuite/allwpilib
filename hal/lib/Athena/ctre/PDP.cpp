@@ -178,7 +178,8 @@ CTR_Code PDP::GetTotalEnergy(double &energyJoules)
 	raw <<= 8;
 	raw |=  rx->Energy_125mWPerUnitXTmeas_l8;
 	energyJoules = 0.125 * raw; 						/* mW integrated every TmeasMs */
-	energyJoules *= rx->TmeasMs_likelywillbe20ms_;	/* multiplied by TmeasMs = joules */
+	energyJoules *= 0.001;								/* convert from mW to W */
+	energyJoules *= rx->TmeasMs_likelywillbe20ms_;		/* multiplied by TmeasMs = joules */
 	return rx.err;
 }
 /* Clear sticky faults.
