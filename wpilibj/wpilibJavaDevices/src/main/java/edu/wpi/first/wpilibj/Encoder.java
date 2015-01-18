@@ -216,6 +216,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 		m_bSource = new DigitalInput(bChannel);
 		m_indexSource = new DigitalInput(indexChannel);
 		initEncoder(reverseDirection);
+		setIndexSource(indexChannel);
 	}
 
 	/**
@@ -328,7 +329,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 	}
 
 	/**
-	 * Encoder constructor. Construct a Encoder given a and b channels as
+	 * Encoder constructor. Construct a Encoder given a, b and index channels as
 	 * digital inputs. This is used in the case where the digital inputs are
 	 * shared. The Encoder class will not allocate the digital inputs and assume
 	 * that they already are counted.
@@ -360,10 +361,11 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 		m_bSource = bSource;
 		m_indexSource = indexSource;
 		initEncoder(reverseDirection);
+		setIndexSource(indexSource);
 	}
 
 	/**
-	 * Encoder constructor. Construct a Encoder given a and b channels as
+	 * Encoder constructor. Construct a Encoder given a, b and index channels as
 	 * digital inputs. This is used in the case where the digital inputs are
 	 * shared. The Encoder class will not allocate the digital inputs and assume
 	 * that they already are counted.
