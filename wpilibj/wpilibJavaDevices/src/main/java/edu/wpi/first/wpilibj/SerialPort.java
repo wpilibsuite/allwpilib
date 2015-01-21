@@ -362,9 +362,9 @@ public class SerialPort {
 	    ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
 		ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(count);
-        SerialPortJNI.serialRead(m_port, dataReceivedBuffer, count, status.asIntBuffer());
+        int gotten = SerialPortJNI.serialRead(m_port, dataReceivedBuffer, count, status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
-		byte[] retVal = new byte[count];
+		byte[] retVal = new byte[gotten];
 		dataReceivedBuffer.get(retVal);
 		return retVal;
     }
