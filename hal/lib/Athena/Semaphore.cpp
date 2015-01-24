@@ -121,6 +121,9 @@ void deleteMultiWait(MULTIWAIT_ID sem) {
   delete sem;
 }
 
+/**
+ * @param timeout Not implemented.
+ */
 int8_t takeMultiWait(MULTIWAIT_ID sem, MUTEX_ID m, int32_t timeout) {
   takeMutex(m);
   int8_t val = pthread_cond_wait(sem, m);

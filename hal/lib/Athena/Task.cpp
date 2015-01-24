@@ -24,6 +24,11 @@ void* startRoutine(void* data) {
 	return ret;
 }
 
+/**
+ * @param priority Not implemented.
+ * @param options Not implemented.
+ * @param stackSize Not implemented.
+ */
 TASK spawnTask(char * name, int priority, int options, int stackSize,
 		       FUNCPTR entryPt, uint32_t arg0, uint32_t arg1, uint32_t arg2,
 		       uint32_t arg3, uint32_t arg4, uint32_t arg5, uint32_t arg6,

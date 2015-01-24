@@ -91,6 +91,7 @@ float CANTalon::Get()
       m_impl->GetSensorPosition(value);
       return value;
     case kPercentVbus:
+    case kFollower:
     default:
       m_impl->GetAppliedThrottle(value);
       return (float)value / 1023.0;
@@ -143,7 +144,11 @@ void CANTalon::Set(float value, uint8_t syncGroup)
       case CANSpeedController::kPosition:
         status = m_impl->SetDemand(value);
         break;
+      case CANSpeedController::kCurrent:
       default:
+        wpi_setWPIErrorWithContext(
+            IncompatibleMode,
+            "The CAN Talon does not support Current Mode at this time.");
         break;
     }
     if (status != CTR_OKAY) {
@@ -511,7 +516,7 @@ double CANTalon::GetPosition()
 	return (double)postition;
 }
 /**
- * If sensor and motor are out of phase, sensor can be inverted 
+ * If sensor and motor are out of phase, sensor can be inverted
  * (position and velocity multiplied by -1).
  * @see GetPosition and @see GetSpeed.
  */
@@ -568,7 +573,7 @@ double CANTalon::GetSpeed()
  * Get the position of whatever is in the analog pin of the Talon, regardless of
  * whether it is actually being used for feedback.
  *
- * @returns The 24bit analog value.  The bottom ten bits is the ADC (0 - 1023) on 
+ * @returns The 24bit analog value.  The bottom ten bits is the ADC (0 - 1023) on
  *								the analog pin of the Talon. The upper 14 bits
  *								tracks the overflows and underflows (continuous sensor).
  */
@@ -1066,7 +1071,7 @@ void CANTalon::ConfigLimitMode(LimitMode mode)
 				wpi_setErrorWithContext(status, getHALErrorMessage(status));
 			}
 			break;
-			
+
 		case kLimitMode_SrxDisableSwitchInputs: /** disable both limit switches and soft limits */
 			/* turn on both limits. SRX has individual enables and polarity for each limit switch.*/
 			status = m_impl->SetForwardSoftEnable(false);

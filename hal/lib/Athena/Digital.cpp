@@ -12,6 +12,8 @@
 #include "i2clib/i2c-lib.h"
 #include "spilib/spi-lib.h"
 
+static_assert(sizeof(uint32_t) <= sizeof(void *), "This file shoves uint32_ts into pointers.");
+
 static const uint32_t kExpectedLoopTiming = 40;
 static const uint32_t kDigitalPins = 26;
 static const uint32_t kPwmPins = 20;
