@@ -161,6 +161,44 @@ bool checkRelayChannel(void* digital_port_pointer) {
 }
 
 /**
+ * Check a port to make sure that it is not NULL and is a valid PWM port.
+ *
+ * Sets the status to contain the appropriate error.
+ *
+ * @return true if the port passed validation.
+ */
+static bool verifyPWMChannel(DigitalPort *port, int32_t *status) {
+  if (port == NULL) {
+    *status = NULL_PARAMETER;
+    return false;
+  } else if (!checkPWMChannel(port)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return false;
+  } else {
+    return true;
+  }
+}
+
+/**
+ * Check a port to make sure that it is not NULL and is a valid Relay port.
+ *
+ * Sets the status to contain the appropriate error.
+ *
+ * @return true if the port passed validation.
+ */
+static bool verifyRelayChannel(DigitalPort *port, int32_t *status) {
+  if (port == NULL) {
+    *status = NULL_PARAMETER;
+    return false;
+  } else if (!checkRelayChannel(port)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return false;
+  } else {
+    return true;
+  }
+}
+
+/**
  * Map DIO pin numbers from their physical number (10 to 26) to their position
  * in the bit field.
  */
@@ -185,7 +223,7 @@ uint32_t remapMXPPWMChannel(uint32_t pin) {
  */
 void setPWM(void* digital_port_pointer, unsigned short value, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
-  checkPWMChannel(port);
+  if (!verifyPWMChannel(port, status)) { return; }
 
   if(port->port.pin < tPWM::kNumHdrRegisters) {
     pwmSystem->writeHdr(port->port.pin, value, status);
@@ -202,7 +240,7 @@ void setPWM(void* digital_port_pointer, unsigned short value, int32_t *status) {
  */
 unsigned short getPWM(void* digital_port_pointer, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
-  checkPWMChannel(port);
+  if (!verifyPWMChannel(port, status)) { return 0; }
 
   if(port->port.pin < tPWM::kNumHdrRegisters) {
     return pwmSystem->readHdr(port->port.pin, status);
@@ -213,6 +251,8 @@ unsigned short getPWM(void* digital_port_pointer, int32_t *status) {
 
 void latchPWMZero(void* digital_port_pointer, int32_t *status) {
 	DigitalPort* port = (DigitalPort*) digital_port_pointer;
+	if (!verifyPWMChannel(port, status)) { return; }
+
 	pwmSystem->writeZeroLatch(port->port.pin, true, status);
 	pwmSystem->writeZeroLatch(port->port.pin, false, status);
 }
@@ -225,7 +265,7 @@ void latchPWMZero(void* digital_port_pointer, int32_t *status) {
  */
 void setPWMPeriodScale(void* digital_port_pointer, uint32_t squelchMask, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
-  checkPWMChannel(port);
+  if (!verifyPWMChannel(port, status)) { return; }
 
   if(port->port.pin < tPWM::kNumPeriodScaleHdrElements) {
     pwmSystem->writePeriodScaleHdr(port->port.pin, squelchMask, status);
@@ -316,7 +356,10 @@ void setPWMOutputChannel(void* pwmGenerator, uint32_t pin, int32_t *status) {
  */
 void setRelayForward(void* digital_port_pointer, bool on, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
-  checkRelayChannel(port);
+  if (!verifyRelayChannel(port, status)) {
+    return;
+  }
+
   {
     std::lock_guard<priority_recursive_mutex> sync(digitalRelayMutex);
     uint8_t forwardRelays = relaySystem->readValue_Forward(status);
@@ -335,7 +378,10 @@ void setRelayForward(void* digital_port_pointer, bool on, int32_t *status) {
  */
 void setRelayReverse(void* digital_port_pointer, bool on, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
-  checkRelayChannel(port);
+  if (!verifyRelayChannel(port, status)) {
+    return;
+  }
+
   {
     std::lock_guard<priority_recursive_mutex> sync(digitalRelayMutex);
     uint8_t reverseRelays = relaySystem->readValue_Reverse(status);
@@ -352,6 +398,8 @@ void setRelayReverse(void* digital_port_pointer, bool on, int32_t *status) {
  */
 bool getRelayForward(void* digital_port_pointer, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
+  if (!verifyRelayChannel(port, status)) { return false; }
+
   uint8_t forwardRelays = relaySystem->readValue_Forward(status);
   return (forwardRelays & (1 << port->port.pin)) != 0;
 }
@@ -361,6 +409,8 @@ bool getRelayForward(void* digital_port_pointer, int32_t *status) {
  */
 bool getRelayReverse(void* digital_port_pointer, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
+  if (!verifyRelayChannel(port, status)) { return false; }
+
   uint8_t reverseRelays = relaySystem->readValue_Reverse(status);
   return (reverseRelays & (1 << port->port.pin)) != 0;
 }
@@ -415,26 +465,30 @@ bool allocateDIO(void* digital_port_pointer, bool input, int32_t *status) {
 }
 
 bool allocatePWMChannel(void* digital_port_pointer, int32_t *status) {
-		DigitalPort* port = (DigitalPort*) digital_port_pointer;
-		char buf[64];
-		snprintf(buf, 64, "PWM %d", port->port.pin);
-		if (PWMChannels->Allocate(port->port.pin, buf) == ~0ul) {
-      *status = RESOURCE_IS_ALLOCATED;
-      return false;
+	DigitalPort* port = (DigitalPort*) digital_port_pointer;
+	if (!verifyPWMChannel(port, status)) { return false; }
+
+	char buf[64];
+	snprintf(buf, 64, "PWM %d", port->port.pin);
+	if (PWMChannels->Allocate(port->port.pin, buf) == ~0ul) {
+		*status = RESOURCE_IS_ALLOCATED;
+		return false;
     }
 
-		if (port->port.pin > tPWM::kNumHdrRegisters-1) {
-			snprintf(buf, 64, "PWM %d and DIO %d", port->port.pin, remapMXPPWMChannel(port->port.pin) + 10);
-			if (DIOChannels->Allocate(remapMXPPWMChannel(port->port.pin) + 10, buf) == ~0ul) return false;
-		    uint32_t bitToSet = 1 << remapMXPPWMChannel(port->port.pin);
-		    short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
-		    digitalSystem->writeEnableMXPSpecialFunction(specialFunctions | bitToSet, status);
-		}
-		return true;
+	if (port->port.pin > tPWM::kNumHdrRegisters-1) {
+		snprintf(buf, 64, "PWM %d and DIO %d", port->port.pin, remapMXPPWMChannel(port->port.pin) + 10);
+		if (DIOChannels->Allocate(remapMXPPWMChannel(port->port.pin) + 10, buf) == ~0ul) return false;
+		uint32_t bitToSet = 1 << remapMXPPWMChannel(port->port.pin);
+		short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
+		digitalSystem->writeEnableMXPSpecialFunction(specialFunctions | bitToSet, status);
+	}
+	return true;
 }
 
 void freePWMChannel(void* digital_port_pointer, int32_t *status) {
     DigitalPort* port = (DigitalPort*) digital_port_pointer;
+    if (!verifyPWMChannel(port, status)) { return; }
+
     PWMChannels->Free(port->port.pin);
     if(port->port.pin > tPWM::kNumHdrRegisters-1) {
         DIOChannels->Free(remapMXPPWMChannel(port->port.pin) + 10);
@@ -529,7 +583,7 @@ bool getDIO(void* digital_port_pointer, int32_t *status) {
 bool getDIODirection(void* digital_port_pointer, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   tDIO::tOutputEnable currentOutputEnable = digitalSystem->readOutputEnable(status);
-	//Shift 00000001 over port->port.pin-1 places.
+  //Shift 00000001 over port->port.pin-1 places.
   //AND it against the currentOutputEnable
   //if it == 0, then return false
   //else return true

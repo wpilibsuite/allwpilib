@@ -49,7 +49,7 @@ bool getSolenoid(void* solenoid_port_pointer, int32_t *status) {
 void setSolenoid(void* solenoid_port_pointer, bool value, int32_t *status) {
 	solenoid_port_t* port = (solenoid_port_t*) solenoid_port_pointer;
 
-	port->module->SetSolenoid(port->pin, value);
+	*status = port->module->SetSolenoid(port->pin, value);
 }
 
 int getPCMSolenoidBlackList(void* solenoid_port_pointer, int32_t *status){
