@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "OSAL/Task.h"
 
+#include "NetworkCommunication/UsageReporting.h"
+#include "WPIErrors.h"
 #include <string.h>
 #include <Windows.h>
 
@@ -55,7 +57,7 @@ DWORD thread_proc( void *p_ptr )
 //This sets the name of the thread, which can help to identify threads in win32
 #define MS_VC_EXCEPTION 0x406D1388
 static void set_thread_name( const char *p_thread_name, DWORD ID )
-{	
+{
 #pragma pack(push,8)
 	typedef struct tagTHREADNAME_INFO
 	{	DWORD dwType;		// Must be 0x1000.
@@ -162,7 +164,7 @@ bool NTTask::Stop()
 		::TerminateThread( m_Handle, 0 );
 
 		// Free the memory
-		::VirtualFree( Info_.AllocationBase, 0, MEM_RELEASE ); 		
+		::VirtualFree( Info_.AllocationBase, 0, MEM_RELEASE );
 	}
 
 	//if (Verify())
@@ -289,19 +291,19 @@ bool NTTask::HandleError(STATUS results)
 	//case S_objLib_OBJ_ID_ERROR:
 	//	wpi_setWPIErrorWithContext(TaskIDError, m_taskName);
 	//	break;
-	//	
+	//
 	//case S_objLib_OBJ_DELETED:
 	//	wpi_setWPIErrorWithContext(TaskDeletedError, m_taskName);
 	//	break;
-	//	
+	//
 	//case S_taskLib_ILLEGAL_OPTIONS:
 	//	wpi_setWPIErrorWithContext(TaskOptionsError, m_taskName);
 	//	break;
-	//	
+	//
 	//case S_memLib_NOT_ENOUGH_MEMORY:
 	//	wpi_setWPIErrorWithContext(TaskMemoryError, m_taskName);
 	//	break;
-	//	
+	//
 	//case S_taskLib_ILLEGAL_PRIORITY:
 	//	wpi_setWPIErrorWithContext(TaskPriorityError, m_taskName);
 	//	break;
@@ -312,4 +314,3 @@ bool NTTask::HandleError(STATUS results)
 	//}
 	return false;
 }
-

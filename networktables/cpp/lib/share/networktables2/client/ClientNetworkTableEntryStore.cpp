@@ -17,7 +17,7 @@ ClientNetworkTableEntryStore::~ClientNetworkTableEntryStore(){}
 
 bool ClientNetworkTableEntryStore::addEntry(NetworkTableEntry* newEntry){
 	{
-		NTSynchronized sync(LOCK);
+		NTSynchronized sync(block_namedEntries);
 		NetworkTableEntry* entry = (NetworkTableEntry*)namedEntries[newEntry->name];
 
 		if(entry!=NULL){
@@ -28,7 +28,7 @@ bool ClientNetworkTableEntryStore::addEntry(NetworkTableEntry* newEntry){
 					idEntries[newEntry->GetId()] = entry;
 				}
 			}
-			
+
 			entry->ForcePut(newEntry->GetSequenceNumber(), newEntry->GetType(), newEntry->GetValue());
 		}
 		else{
@@ -41,7 +41,7 @@ bool ClientNetworkTableEntryStore::addEntry(NetworkTableEntry* newEntry){
 }
 
 bool ClientNetworkTableEntryStore::updateEntry(NetworkTableEntry* entry, SequenceNumber sequenceNumber, EntryValue value) {
-	{ 
+	{
 		NTSynchronized sync(LOCK);
 		entry->ForcePut(sequenceNumber, value);
 		if(entry->GetId()==NetworkTableEntry::UNKNOWN_ID){
@@ -57,7 +57,7 @@ bool ClientNetworkTableEntryStore::updateEntry(NetworkTableEntry* entry, Sequenc
  * @throws IOException
  */
 void ClientNetworkTableEntryStore::sendUnknownEntries(NetworkTableConnection& connection) {
-	{ 
+	{
 		NTSynchronized sync(LOCK);
 		std::map<std::string, NetworkTableEntry*>::iterator itr;
 		for(itr = namedEntries.begin(); itr != namedEntries.end(); itr++)

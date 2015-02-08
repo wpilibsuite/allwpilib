@@ -1,6 +1,6 @@
 /**
  * An abstraction for the NetworkTable protocol
- * 
+ *
  * @author mwills
  *
  */
@@ -19,6 +19,7 @@ NetworkTableConnection::~NetworkTableConnection(){
 
 void NetworkTableConnection::SetIOStream(IOStream* stream)
 {
+	isValid=(stream!=NULL);
 	ioStream->SetIOStream(stream);  //just passing through
 }
 
@@ -102,7 +103,7 @@ void NetworkTableConnection::sendEntryUpdate(NetworkTableEntry& entry) {
 }
 
 void NetworkTableConnection::read(ConnectionAdapter& adapter) {
-	int messageType = ioStream->readByte();
+	int messageType = (isValid)?ioStream->readByte():(int)KEEP_ALIVE;
 	switch (messageType) {
 	case KEEP_ALIVE:
 		adapter.keepAlive();

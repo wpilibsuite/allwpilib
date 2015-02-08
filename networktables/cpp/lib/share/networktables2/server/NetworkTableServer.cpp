@@ -17,10 +17,10 @@ NetworkTableServer::NetworkTableServer(IOStreamProvider& _streamProvider, Networ
 		connectionList(&incomingStreamMonitor),
 		writeManager(connectionList, threadManager, GetEntryStore(), ULONG_MAX),
                 continuingReceiver(writeManager){
-	
+
 	GetEntryStore().SetIncomingReceiver(&continuingReceiver);
 	GetEntryStore().SetOutgoingReceiver(&continuingReceiver);
-	
+
 	incomingStreamMonitor.start();
 	writeManager.start();
 }
@@ -35,6 +35,9 @@ NetworkTableServer::~NetworkTableServer(){
 
 void NetworkTableServer::Close(){
 	try{
+		//Note: streamProvider must come before the incomingStreamMonitor so the that task can complete first for the thread to close
+		//  [9/1/2013 Terminator]
+		streamProvider.close();
 		incomingStreamMonitor.stop();
 		writeManager.stop();
 		connectionList.closeAll();
