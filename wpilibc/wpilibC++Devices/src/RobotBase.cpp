@@ -65,7 +65,7 @@ RobotBase::RobotBase()
 	FILE *file = NULL;
 	file = fopen("/tmp/frc_versions/FRC_Lib_Version.ini", "w");
 
-	fputs("2015 C++ 1.0.0", file);
+	fputs("2015 C++ 1.1.0", file);
 	if (file != NULL)
 	fclose(file);
 }
