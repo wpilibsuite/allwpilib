@@ -1,6 +1,8 @@
 #include "HAL/Interrupts.hpp"
 #include "ChipObject.h"
 
+extern void remapDigitalSource(bool analogTrigger, uint32_t &pin, uint8_t &module);
+
 struct Interrupt // FIXME: why is this internal?
 {
 	tInterrupt *anInterrupt;
@@ -99,6 +101,7 @@ void requestInterrupts(void* interrupt_pointer, uint8_t routing_module, uint32_t
 {
 	Interrupt* anInterrupt = (Interrupt*)interrupt_pointer;
 	anInterrupt->anInterrupt->writeConfig_WaitForAck(false, status);
+	remapDigitalSource(routing_analog_trigger, routing_pin, routing_module);
 	anInterrupt->anInterrupt->writeConfig_Source_AnalogTrigger(routing_analog_trigger, status);
 	anInterrupt->anInterrupt->writeConfig_Source_Channel(routing_pin, status);
 	anInterrupt->anInterrupt->writeConfig_Source_Module(routing_module, status);

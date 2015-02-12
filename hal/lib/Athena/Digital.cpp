@@ -633,6 +633,25 @@ void setCounterAverageSize(void* counter_pointer, int32_t size, int32_t *status)
 }
 
 /**
+ * remap the digital source pin and set the module.
+ * If it's an analog trigger, determine the module from the high order routing channel
+ * else do normal digital input remapping based on pin number (MXP)
+ */
+void remapDigitalSource(bool analogTrigger, uint32_t &pin, uint8_t &module) {
+  if (analogTrigger) {
+    module = pin >> 4;
+  } else {
+    if(pin >= kNumHeaders) {
+      pin = remapMXPChannel(pin);
+      module = 1;
+    } else {
+      module = 0;
+    }
+  }
+}
+
+
+/**
  * Set the source object that causes the counter to count up.
  * Set the up counting DigitalSource.
  */
@@ -641,12 +660,7 @@ void setCounterUpSource(void* counter_pointer, uint32_t pin, bool analogTrigger,
 
   uint8_t module;
 
-  if(pin >= kNumHeaders) {
-    pin = remapMXPChannel(pin);
-    module = 1;
-  } else {
-    module = 0;
-  }
+  remapDigitalSource(analogTrigger, pin, module);
 
   counter->counter->writeConfig_UpSource_Module(module, status);
   counter->counter->writeConfig_UpSource_Channel(pin, status);
@@ -696,12 +710,7 @@ void setCounterDownSource(void* counter_pointer, uint32_t pin, bool analogTrigge
 
   uint8_t module;
 
-  if(pin >= kNumHeaders) {
-    pin = remapMXPChannel(pin);
-    module = 1;
-  } else {
-    module = 0;
-  }
+  remapDigitalSource(analogTrigger, pin, module);
 
   counter->counter->writeConfig_DownSource_Module(module, status);
   counter->counter->writeConfig_DownSource_Channel(pin, status);
@@ -925,15 +934,8 @@ void* initializeEncoder(uint8_t port_a_module, uint32_t port_a_pin, bool port_a_
   // Initialize encoder structure
   Encoder* encoder = new Encoder();
 
-  if(port_a_pin >= kNumHeaders) {
-    port_a_pin = remapMXPChannel(port_a_pin);
-    port_a_module = 1;
-  }
-
-  if(port_b_pin >= kNumHeaders) {
-    port_b_pin = remapMXPChannel(port_b_pin);
-    port_b_module = 1;
-  }
+  remapDigitalSource(port_a_analog_trigger, port_a_pin, port_a_module);
+  remapDigitalSource(port_b_analog_trigger, port_b_pin, port_b_module);
 
   Resource::CreateResourceObject(&quadEncoders, tEncoder::kNumSystems);
   encoder->index = quadEncoders->Allocate("4X Encoder");
