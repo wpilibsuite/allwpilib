@@ -13,9 +13,9 @@ static const INT32 kCANPeriod = 20;
 #define STATUS_DEBUG  		0x9041480
 
 #define EXPECTED_RESPONSE_TIMEOUT_MS	(50)
-#define GET_PCM_STATUS()			CtreCanNode::recMsg<PcmStatus_t> 		rx = GetRx<PcmStatus_t>			(STATUS_1,EXPECTED_RESPONSE_TIMEOUT_MS)
-#define GET_PCM_SOL_FAULTS()		CtreCanNode::recMsg<PcmStatusFault_t> 	rx = GetRx<PcmStatusFault_t>	(STATUS_SOL_FAULTS,EXPECTED_RESPONSE_TIMEOUT_MS)
-#define GET_PCM_DEBUG()				CtreCanNode::recMsg<PcmDebug_t> 		rx = GetRx<PcmDebug_t>			(STATUS_DEBUG,EXPECTED_RESPONSE_TIMEOUT_MS)
+#define GET_PCM_STATUS()			CtreCanNode::recMsg<PcmStatus_t> 		rx = GetRx<PcmStatus_t>			(STATUS_1|GetDeviceNumber(),EXPECTED_RESPONSE_TIMEOUT_MS)
+#define GET_PCM_SOL_FAULTS()		CtreCanNode::recMsg<PcmStatusFault_t> 	rx = GetRx<PcmStatusFault_t>	(STATUS_SOL_FAULTS|GetDeviceNumber(),EXPECTED_RESPONSE_TIMEOUT_MS)
+#define GET_PCM_DEBUG()				CtreCanNode::recMsg<PcmDebug_t> 		rx = GetRx<PcmDebug_t>			(STATUS_DEBUG|GetDeviceNumber(),EXPECTED_RESPONSE_TIMEOUT_MS)
 
 #define CONTROL_1 			0x09041C00	/* PCM_Control */
 #define CONTROL_2 			0x09041C40	/* PCM_SupplemControl */
