@@ -530,5 +530,11 @@ double DriverStation::GetMatchTime()
 void DriverStation::ReportError(std::string error)
 {
 	std::cout << error << std::endl;
-    HALSetErrorData(error.c_str(), error.size(), 0);
+	
+	HALControlWord controlWord;
+	HALGetControlWord(&controlWord);
+	if(controlWord.dsAttached)
+	{
+		HALSetErrorData(error.c_str(), error.size(), 0);
+	}
 }
