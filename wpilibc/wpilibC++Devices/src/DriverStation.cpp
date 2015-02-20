@@ -270,7 +270,7 @@ int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
 	if (stick >= kJoystickPorts)
 	{
 		wpi_setWPIError(BadJoystickIndex);
-		return 0;
+		return -1;
 	}
 
 	if (pov >= m_joystickPOVs[stick].count)
@@ -279,7 +279,7 @@ int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
 			wpi_setWPIError(BadJoystickAxis);
 		else
 			ReportJoystickUnpluggedError("WARNING: Joystick POV missing, check if all controllers are plugged in\n");
-		return 0;
+		return -1;
 	}
 
 	return m_joystickPOVs[stick].povs[pov];

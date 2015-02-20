@@ -267,7 +267,7 @@ public class DriverStation implements RobotState.Interface {
 
         if (pov >= m_joystickPOVs[stick].length) {
 			reportJoystickUnpluggedError("WARNING: Joystick POV " + pov + " on port " + stick + " not available, check if controller is plugged in\n");
-            return 0;
+            return -1;
         }
 
         return m_joystickPOVs[stick][pov];

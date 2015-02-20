@@ -216,7 +216,7 @@ public abstract class RobotBase {
 
                 output = new FileOutputStream(file);
 
-				output.write("2015 Java 1.1.0".getBytes());
+				output.write("2015 Java 1.2.0".getBytes());
 
             } catch (IOException ex) {
                 ex.printStackTrace();
