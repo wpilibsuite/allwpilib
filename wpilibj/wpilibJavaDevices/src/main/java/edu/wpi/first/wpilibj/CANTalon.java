@@ -812,16 +812,40 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
     m_impl.SetForwardSoftLimit(forwardLimit);
   }
 
+  public int getForwardSoftLimit() {
+    long valuep = CanTalonJNI.new_intp();
+    m_impl.GetForwardSoftLimit(new SWIGTYPE_p_int(valuep, true));
+    return CanTalonJNI.intp_value(valuep);
+  }
+
   public void enableForwardSoftLimit(boolean enable) {
     m_impl.SetForwardSoftEnable(enable ? 1 : 0);
+  }
+
+  public boolean isForwardSoftLimitEnabled() {
+    long valuep = CanTalonJNI.new_intp();
+    m_impl.GetForwardSoftEnable(new SWIGTYPE_p_int(valuep, true));
+    return (CanTalonJNI.intp_value(valuep)==0) ? false : true;
   }
 
   public void setReverseSoftLimit(int reverseLimit) {
     m_impl.SetReverseSoftLimit(reverseLimit);
   }
 
+  public int getReverseSoftLimit() {
+    long valuep = CanTalonJNI.new_intp();
+    m_impl.GetReverseSoftLimit(new SWIGTYPE_p_int(valuep, true));
+    return CanTalonJNI.intp_value(valuep);
+  }
+
   public void enableReverseSoftLimit(boolean enable) {
     m_impl.SetReverseSoftEnable(enable ? 1 : 0);
+  }
+
+  public boolean isReverseSoftLimitEnabled() {
+    long valuep = CanTalonJNI.new_intp();
+    m_impl.GetReverseSoftEnable(new SWIGTYPE_p_int(valuep, true));
+    return (CanTalonJNI.intp_value(valuep)==0) ? false : true;
   }
 
   public void clearStickyFaults() {
