@@ -164,9 +164,14 @@ public class CameraServer {
      *            The name of the camera interface (e.g. "cam1")
      */
     public void startAutomaticCapture(String cameraName) {
-        USBCamera camera = new USBCamera(cameraName);
-        camera.openCamera();
-        startAutomaticCapture(camera);
+        try {
+            USBCamera camera = new USBCamera(cameraName);
+            camera.openCamera();
+            startAutomaticCapture(camera);
+         }
+        catch (VisionException ex) {
+            DriverStation.reportError("Error when starting the camera: " + cameraName + " " + ex.getMessage(), true);
+        }
     }
 
     public synchronized void startAutomaticCapture(USBCamera camera) {
