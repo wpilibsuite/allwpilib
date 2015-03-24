@@ -124,7 +124,7 @@ public abstract class MotorEncoderFixture <T extends SpeedController> implements
 	 * Checks to see if the speed of the motor is within some range of a given value.
 	 * This is used instead of equals() because doubles can have inaccuracies.
 	 * @param value The value to compare against
-	 * @param acuracy The accuracy range to check against to see if the
+	 * @param accuracy The accuracy range to check against to see if the
 	 * @return true if the range of values between motors speed accuracy contains the 'value'.
 	 */
 	public boolean isMotorSpeedWithinRange(double value, double accuracy){
@@ -136,7 +136,7 @@ public abstract class MotorEncoderFixture <T extends SpeedController> implements
 	public boolean reset(){
 		initialize();
 		boolean wasReset = true;
-
+                motor.setInverted(false);
 		motor.set(0);
 		Timer.delay(TestBench.MOTOR_STOP_TIME); //DEFINED IN THE TestBench
 		encoder.reset();

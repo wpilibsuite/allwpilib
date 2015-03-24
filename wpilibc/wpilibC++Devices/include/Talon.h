@@ -22,7 +22,8 @@ public:
 	virtual void Disable();
 
 	virtual void PIDWrite(float output) override;
-
+  virtual void SetInverted(bool isInverted) override;
 private:
 	void InitTalon();
+	bool m_isInverted;
 };

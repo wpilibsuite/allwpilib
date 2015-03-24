@@ -27,6 +27,11 @@ static constexpr double kCurrentTolerance = 0.1;
 
 static constexpr double kVoltageTolerance = 0.1;
 
+static constexpr double kMotorVoltage = 5.0;
+
+static constexpr double kMotorPercent = 0.5;
+
+static constexpr double kMotorSpeed = 100;
 class CANJaguarTest : public testing::Test {
 protected:
 	CANJaguar *m_jaguar;
@@ -73,6 +78,39 @@ protected:
 			Wait(totalTime / 50.0);
 		}
 	}
+	/**
+	* returns the sign of the given number
+	*/
+	int SignNum(double value){
+	return -(value<0) + (value>0);
+	}
+	void InversionTest(float motorValue, float delayTime = kMotorTime){
+	m_jaguar->EnableControl();
+    m_jaguar->SetInverted(false);
+    SetJaguar(delayTime,motorValue);
+    double initialSpeed = m_jaguar->GetSpeed();
+    m_jaguar->Set(0.0);
+    m_jaguar->SetInverted(true);
+    SetJaguar(delayTime,motorValue);
+    double finalSpeed = m_jaguar->GetSpeed();
+    //checks that the motor has changed direction
+    EXPECT_FALSE(SignNum(initialSpeed) == SignNum(finalSpeed))
+        << "CAN Jaguar did not invert direction positive. Initial speed was: "
+        << initialSpeed << " Final displacement was: " << finalSpeed
+        << " Sign of initial displacement was: " << SignNum(initialSpeed)
+        << " Sign of final displacement was: " << SignNum(finalSpeed);
+    SetJaguar(delayTime,-motorValue);
+    initialSpeed = m_jaguar->GetSpeed();
+    m_jaguar->Set(0.0);
+    m_jaguar->SetInverted(false);
+    SetJaguar(delayTime,-motorValue);
+    finalSpeed = m_jaguar->GetSpeed();
+    EXPECT_FALSE(SignNum(initialSpeed) == SignNum(finalSpeed))
+        << "CAN Jaguar did not invert direction negative. Initial displacement "
+           "was: " << initialSpeed << " Final displacement was: " << finalSpeed
+        << " Sign of initial displacement was: " << SignNum(initialSpeed)
+        << " Sign of final displacement was: " << SignNum(finalSpeed);
+        }
 };
 
 /**
@@ -422,4 +460,29 @@ TEST_F(CANJaguarTest, FakeLimitSwitchReverse) {
 	/* The position should have increased */
 	EXPECT_GT(m_jaguar->GetPosition(), initialPosition)
 		<< "CAN Jaguar should have moved forwards while the reverse limit was on";
+}
+/**
+*Tests that inversion works in voltage mode
+*/
+TEST_F(CANJaguarTest, InvertingVoltageMode){
+m_jaguar->SetVoltageMode(CANJaguar::QuadEncoder, 360);
+m_jaguar->EnableControl();
+InversionTest(kMotorVoltage);
+}
+
+/**
+*Tests that inversion works in percentMode
+*/
+TEST_F(CANJaguarTest, InvertingPercentMode){
+m_jaguar->SetPercentMode(CANJaguar::QuadEncoder, 360);
+m_jaguar->EnableControl();
+InversionTest(kMotorPercent);
+}
+/**
+* Tests that inversion works in SpeedMode
+*/
+TEST_F(CANJaguarTest, InvertingSpeedMode){
+m_jaguar->SetSpeedMode(CANJaguar::QuadEncoder, 360, 0.1f, 0.005f, 0.00f);
+m_jaguar->EnableControl();
+InversionTest(kMotorSpeed, kMotorTime);
 }

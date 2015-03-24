@@ -33,6 +33,7 @@ void Victor::InitVictor() {
 
 	LiveWindow::GetInstance()->AddActuator("Victor", GetChannel(), this);
 	HALReport(HALUsageReporting::kResourceType_Victor, GetChannel());
+	m_isInverted = false;
 }
 
 /**
@@ -59,7 +60,7 @@ Victor::~Victor()
  */
 void Victor::Set(float speed, uint8_t syncGroup)
 {
-	SetSpeed(speed);
+	SetSpeed(m_isInverted ? -speed: speed);
 }
 
 /**
@@ -79,7 +80,13 @@ void Victor::Disable()
 {
 	SetRaw(kPwmDisabled);
 }
-
+/**
+* common interface for inverting direction of a speed controller
+* @param isInverted The state of inversion true is inverted
+*/
+void Victor::SetInverted(bool isInverted){
+m_isInverted = isInverted;
+}
 /**
  * Write out the PID value as seen in the PIDOutput base object.
  *

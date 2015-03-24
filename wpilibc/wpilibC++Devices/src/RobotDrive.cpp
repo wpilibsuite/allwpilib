@@ -57,10 +57,6 @@ RobotDrive::RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel)
 	InitRobotDrive();
 	m_rearLeftMotor = new Talon(leftMotorChannel);
 	m_rearRightMotor = new Talon(rightMotorChannel);
-	for (int32_t i=0; i < kMaxNumberOfMotors; i++)
-	{
-		m_invertedMotors[i] = 1;
-	}
 	SetLeftRightMotorOutputs(0.0, 0.0);
 	m_deleteSpeedControllers = true;
 }
@@ -83,10 +79,6 @@ RobotDrive::RobotDrive(uint32_t frontLeftMotor, uint32_t rearLeftMotor,
 	m_rearRightMotor = new Talon(rearRightMotor);
 	m_frontLeftMotor = new Talon(frontLeftMotor);
 	m_frontRightMotor = new Talon(frontRightMotor);
-	for (int32_t i=0; i < kMaxNumberOfMotors; i++)
-	{
-		m_invertedMotors[i] = 1;
-	}
 	SetLeftRightMotorOutputs(0.0, 0.0);
 	m_deleteSpeedControllers = true;
 }
@@ -110,10 +102,6 @@ RobotDrive::RobotDrive(SpeedController *leftMotor, SpeedController *rightMotor)
 	}
 	m_rearLeftMotor = leftMotor;
 	m_rearRightMotor = rightMotor;
-	for (int32_t i=0; i < kMaxNumberOfMotors; i++)
-	{
-		m_invertedMotors[i] = 1;
-	}
 	m_deleteSpeedControllers = false;
 }
 
@@ -122,10 +110,6 @@ RobotDrive::RobotDrive(SpeedController &leftMotor, SpeedController &rightMotor)
 	InitRobotDrive();
 	m_rearLeftMotor = &leftMotor;
 	m_rearRightMotor = &rightMotor;
-	for (int32_t i=0; i < kMaxNumberOfMotors; i++)
-	{
-		m_invertedMotors[i] = 1;
-	}
 	m_deleteSpeedControllers = false;
 }
 
@@ -150,10 +134,6 @@ RobotDrive::RobotDrive(SpeedController *frontLeftMotor, SpeedController *rearLef
 	m_rearLeftMotor = rearLeftMotor;
 	m_frontRightMotor = frontRightMotor;
 	m_rearRightMotor = rearRightMotor;
-	for (int32_t i=0; i < kMaxNumberOfMotors; i++)
-	{
-		m_invertedMotors[i] = 1;
-	}
 	m_deleteSpeedControllers = false;
 }
 
@@ -165,10 +145,6 @@ RobotDrive::RobotDrive(SpeedController &frontLeftMotor, SpeedController &rearLef
 	m_rearLeftMotor = &rearLeftMotor;
 	m_frontRightMotor = &frontRightMotor;
 	m_rearRightMotor = &rearRightMotor;
-	for (int32_t i=0; i < kMaxNumberOfMotors; i++)
-	{
-		m_invertedMotors[i] = 1;
-	}
 	m_deleteSpeedControllers = false;
 }
 
@@ -508,10 +484,10 @@ void RobotDrive::MecanumDrive_Cartesian(float x, float y, float rotation, float 
 
 	Normalize(wheelSpeeds);
 
-	m_frontLeftMotor->Set(wheelSpeeds[kFrontLeftMotor] * m_invertedMotors[kFrontLeftMotor] * m_maxOutput, m_syncGroup);
-	m_frontRightMotor->Set(wheelSpeeds[kFrontRightMotor] * m_invertedMotors[kFrontRightMotor] * m_maxOutput, m_syncGroup);
-	m_rearLeftMotor->Set(wheelSpeeds[kRearLeftMotor] * m_invertedMotors[kRearLeftMotor] * m_maxOutput, m_syncGroup);
-	m_rearRightMotor->Set(wheelSpeeds[kRearRightMotor] * m_invertedMotors[kRearRightMotor] * m_maxOutput, m_syncGroup);
+	m_frontLeftMotor->Set(wheelSpeeds[kFrontLeftMotor] * m_maxOutput, m_syncGroup);
+	m_frontRightMotor->Set(wheelSpeeds[kFrontRightMotor] * m_maxOutput, m_syncGroup);
+	m_rearLeftMotor->Set(wheelSpeeds[kRearLeftMotor] * m_maxOutput, m_syncGroup);
+	m_rearRightMotor->Set(wheelSpeeds[kRearRightMotor] * m_maxOutput, m_syncGroup);
 
 	if (m_syncGroup != 0)
 	{
@@ -558,10 +534,10 @@ void RobotDrive::MecanumDrive_Polar(float magnitude, float direction, float rota
 
 	Normalize(wheelSpeeds);
 
-	m_frontLeftMotor->Set(wheelSpeeds[kFrontLeftMotor] * m_invertedMotors[kFrontLeftMotor] * m_maxOutput, m_syncGroup);
-	m_frontRightMotor->Set(wheelSpeeds[kFrontRightMotor] * m_invertedMotors[kFrontRightMotor] * m_maxOutput, m_syncGroup);
-	m_rearLeftMotor->Set(wheelSpeeds[kRearLeftMotor] * m_invertedMotors[kRearLeftMotor] * m_maxOutput, m_syncGroup);
-	m_rearRightMotor->Set(wheelSpeeds[kRearRightMotor] * m_invertedMotors[kRearRightMotor] * m_maxOutput, m_syncGroup);
+	m_frontLeftMotor->Set(wheelSpeeds[kFrontLeftMotor] * m_maxOutput, m_syncGroup);
+	m_frontRightMotor->Set(wheelSpeeds[kFrontRightMotor] * m_maxOutput, m_syncGroup);
+	m_rearLeftMotor->Set(wheelSpeeds[kRearLeftMotor] * m_maxOutput, m_syncGroup);
+	m_rearRightMotor->Set(wheelSpeeds[kRearRightMotor] * m_maxOutput, m_syncGroup);
 
 	if (m_syncGroup != 0)
 	{
@@ -599,12 +575,12 @@ void RobotDrive::SetLeftRightMotorOutputs(float leftOutput, float rightOutput)
 	wpi_assert(m_rearLeftMotor != NULL && m_rearRightMotor != NULL);
 
 	if (m_frontLeftMotor != NULL)
-		m_frontLeftMotor->Set(Limit(leftOutput) * m_invertedMotors[kFrontLeftMotor] * m_maxOutput, m_syncGroup);
-	m_rearLeftMotor->Set(Limit(leftOutput) * m_invertedMotors[kRearLeftMotor] * m_maxOutput, m_syncGroup);
+		m_frontLeftMotor->Set(Limit(leftOutput) * m_maxOutput, m_syncGroup);
+	m_rearLeftMotor->Set(Limit(leftOutput) * m_maxOutput, m_syncGroup);
 
 	if (m_frontRightMotor != NULL)
-		m_frontRightMotor->Set(-Limit(rightOutput) * m_invertedMotors[kFrontRightMotor] * m_maxOutput, m_syncGroup);
-	m_rearRightMotor->Set(-Limit(rightOutput) * m_invertedMotors[kRearRightMotor] * m_maxOutput, m_syncGroup);
+		m_frontRightMotor->Set(-Limit(rightOutput) * m_maxOutput, m_syncGroup);
+	m_rearRightMotor->Set(-Limit(rightOutput) * m_maxOutput, m_syncGroup);
 
 	if (m_syncGroup != 0)
 	{
@@ -679,7 +655,12 @@ void RobotDrive::SetInvertedMotor(MotorType motor, bool isInverted)
 		wpi_setWPIError(InvalidMotorIndex);
 		return;
 	}
-	m_invertedMotors[motor] = isInverted ? -1 : 1;
+	switch(motor){
+	case kFrontLeftMotor: m_frontLeftMotor -> SetInverted(isInverted); break;
+	case kFrontRightMotor: m_frontRightMotor -> SetInverted(isInverted); break;
+	case kRearLeftMotor: m_rearLeftMotor -> SetInverted(isInverted); break;
+	case kRearRightMotor: m_rearRightMotor -> SetInverted(isInverted); break;
+	}
 }
 
 /**

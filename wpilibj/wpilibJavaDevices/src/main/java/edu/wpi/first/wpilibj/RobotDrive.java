@@ -60,7 +60,6 @@ public class RobotDrive implements MotorSafety {
     public static final double kDefaultSensitivity = 0.5;
     public static final double kDefaultMaxOutput = 1.0;
     protected static final int kMaxNumberOfMotors = 4;
-    protected final int m_invertedMotors[] = new int[4];
     protected double m_sensitivity;
     protected double m_maxOutput;
     protected SpeedController m_frontLeftMotor;
@@ -89,9 +88,6 @@ public class RobotDrive implements MotorSafety {
         m_rearLeftMotor = new Talon(leftMotorChannel);
         m_frontRightMotor = null;
         m_rearRightMotor = new Talon(rightMotorChannel);
-        for (int i = 0; i < kMaxNumberOfMotors; i++) {
-            m_invertedMotors[i] = 1;
-        }
         m_allocatedSpeedControllers = true;
         setupMotorSafety();
         drive(0, 0);
@@ -115,9 +111,6 @@ public class RobotDrive implements MotorSafety {
         m_rearRightMotor = new Talon(rearRightMotor);
         m_frontLeftMotor = new Talon(frontLeftMotor);
         m_frontRightMotor = new Talon(frontRightMotor);
-        for (int i = 0; i < kMaxNumberOfMotors; i++) {
-            m_invertedMotors[i] = 1;
-        }
         m_allocatedSpeedControllers = true;
         setupMotorSafety();
         drive(0, 0);
@@ -142,9 +135,6 @@ public class RobotDrive implements MotorSafety {
         m_rearRightMotor = rightMotor;
         m_sensitivity = kDefaultSensitivity;
         m_maxOutput = kDefaultMaxOutput;
-        for (int i = 0; i < kMaxNumberOfMotors; i++) {
-            m_invertedMotors[i] = 1;
-        }
         m_allocatedSpeedControllers = false;
         setupMotorSafety();
         drive(0, 0);
@@ -169,10 +159,6 @@ public class RobotDrive implements MotorSafety {
         m_frontRightMotor = frontRightMotor;
         m_rearRightMotor = rearRightMotor;
         m_sensitivity = kDefaultSensitivity;
-        m_maxOutput = kDefaultMaxOutput;
-        for (int i = 0; i < kMaxNumberOfMotors; i++) {
-            m_invertedMotors[i] = 1;
-        }
         m_allocatedSpeedControllers = false;
         setupMotorSafety();
         drive(0, 0);
@@ -487,10 +473,10 @@ public class RobotDrive implements MotorSafety {
         wheelSpeeds[MotorType.kRearRight_val] = xIn + yIn - rotation;
 
         normalize(wheelSpeeds);
-        m_frontLeftMotor.set(wheelSpeeds[MotorType.kFrontLeft_val] * m_invertedMotors[MotorType.kFrontLeft_val] * m_maxOutput, m_syncGroup);
-        m_frontRightMotor.set(wheelSpeeds[MotorType.kFrontRight_val] * m_invertedMotors[MotorType.kFrontRight_val] * m_maxOutput, m_syncGroup);
-        m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft_val] * m_invertedMotors[MotorType.kRearLeft_val] * m_maxOutput, m_syncGroup);
-        m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight_val] * m_invertedMotors[MotorType.kRearRight_val] * m_maxOutput, m_syncGroup);
+        m_frontLeftMotor.set(wheelSpeeds[MotorType.kFrontLeft_val] * m_maxOutput, m_syncGroup);
+        m_frontRightMotor.set(wheelSpeeds[MotorType.kFrontRight_val] * m_maxOutput, m_syncGroup);
+        m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft_val] * m_maxOutput, m_syncGroup);
+        m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight_val] * m_maxOutput, m_syncGroup);
 
         if (m_syncGroup != 0) {
             CANJaguar.updateSyncGroup(m_syncGroup);
@@ -533,10 +519,10 @@ public class RobotDrive implements MotorSafety {
 
         normalize(wheelSpeeds);
 
-        m_frontLeftMotor.set(wheelSpeeds[MotorType.kFrontLeft_val] * m_invertedMotors[MotorType.kFrontLeft_val] * m_maxOutput, m_syncGroup);
-        m_frontRightMotor.set(wheelSpeeds[MotorType.kFrontRight_val] * m_invertedMotors[MotorType.kFrontRight_val] * m_maxOutput, m_syncGroup);
-        m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft_val] * m_invertedMotors[MotorType.kRearLeft_val] * m_maxOutput, m_syncGroup);
-        m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight_val] * m_invertedMotors[MotorType.kRearRight_val] * m_maxOutput, m_syncGroup);
+        m_frontLeftMotor.set(wheelSpeeds[MotorType.kFrontLeft_val] * m_maxOutput, m_syncGroup);
+        m_frontRightMotor.set(wheelSpeeds[MotorType.kFrontRight_val] * m_maxOutput, m_syncGroup);
+        m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft_val] * m_maxOutput, m_syncGroup);
+        m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight_val] * m_maxOutput, m_syncGroup);
 
         if (this.m_syncGroup != 0) {
             CANJaguar.updateSyncGroup(m_syncGroup);
@@ -573,14 +559,14 @@ public class RobotDrive implements MotorSafety {
         }
 
         if (m_frontLeftMotor != null) {
-            m_frontLeftMotor.set(limit(leftOutput) * m_invertedMotors[MotorType.kFrontLeft_val] * m_maxOutput, m_syncGroup);
+            m_frontLeftMotor.set(limit(leftOutput) * m_maxOutput, m_syncGroup);
         }
-        m_rearLeftMotor.set(limit(leftOutput) * m_invertedMotors[MotorType.kRearLeft_val] * m_maxOutput, m_syncGroup);
+        m_rearLeftMotor.set(limit(leftOutput) * m_maxOutput, m_syncGroup);
 
         if (m_frontRightMotor != null) {
-            m_frontRightMotor.set(-limit(rightOutput) * m_invertedMotors[MotorType.kFrontRight_val] * m_maxOutput, m_syncGroup);
+            m_frontRightMotor.set(-limit(rightOutput) * m_maxOutput, m_syncGroup);
         }
-        m_rearRightMotor.set(-limit(rightOutput) * m_invertedMotors[MotorType.kRearRight_val] * m_maxOutput, m_syncGroup);
+        m_rearRightMotor.set(-limit(rightOutput) * m_maxOutput, m_syncGroup);
 
         if (this.m_syncGroup != 0) {
             CANJaguar.updateSyncGroup(m_syncGroup);
@@ -640,9 +626,13 @@ public class RobotDrive implements MotorSafety {
      * @param isInverted True if the motor should be inverted when operated.
      */
     public void setInvertedMotor(MotorType motor, boolean isInverted) {
-        m_invertedMotors[motor.value] = isInverted ? -1 : 1;
+        switch (motor.value){
+            case MotorType.kFrontLeft_val:  m_frontLeftMotor.setInverted(isInverted); break;
+            case MotorType.kFrontRight_val: m_frontRightMotor.setInverted(isInverted); break;
+            case MotorType.kRearLeft_val: m_rearLeftMotor.setInverted(isInverted); break;
+            case MotorType.kRearRight_val: m_rearRightMotor.setInverted(isInverted); break;
+        }
     }
-
     /**
      * Set the turning sensitivity.
      *

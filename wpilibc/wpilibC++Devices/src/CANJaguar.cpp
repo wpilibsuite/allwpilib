@@ -204,7 +204,7 @@ void CANJaguar::InitCANJaguar()
 	default:
 		break;
 	}
-
+    m_isInverted = false;
 	HALReport(HALUsageReporting::kResourceType_CANJaguar, m_deviceNumber, m_controlMode);
 	LiveWindow::GetInstance()->AddActuator("CANJaguar", m_deviceNumber, this);
 }
@@ -315,13 +315,13 @@ void CANJaguar::Set(float outputValue, uint8_t syncGroup)
 				messageID = LM_API_VOLT_T_SET;
 				if (outputValue > 1.0) outputValue = 1.0;
 				if (outputValue < -1.0) outputValue = -1.0;
-				dataSize = packPercentage(dataBuffer, outputValue);
+				dataSize = packPercentage(dataBuffer, (m_isInverted ? -outputValue : outputValue));
 			}
 			break;
 		case kSpeed:
 			{
 				messageID = LM_API_SPD_T_SET;
-				dataSize = packFXP16_16(dataBuffer, outputValue);
+				dataSize = packFXP16_16(dataBuffer, (m_isInverted ? -outputValue : outputValue));
 			}
 			break;
 		case kPosition:
@@ -339,7 +339,7 @@ void CANJaguar::Set(float outputValue, uint8_t syncGroup)
 		case kVoltage:
 			{
 				messageID = LM_API_VCOMP_T_SET;
-				dataSize = packFXP8_8(dataBuffer, outputValue);
+				dataSize = packFXP8_8(dataBuffer, (m_isInverted ? -outputValue : outputValue));
 			}
 			break;
     default:
@@ -2116,6 +2116,15 @@ void CANJaguar::StopLiveWindowMode()
 	{
 		m_table->RemoveTableListener(this);
 	}
+}
+
+/**
+* common interface for inverting direction of a speed controller
+* Only works in PercentVbus, speed, and Voltage modes
+* @param isInverted The state of inversion true is inverted
+*/
+void CANJaguar::SetInverted(bool isInverted){
+m_isInverted = isInverted;
 }
 
 std::string CANJaguar::GetSmartDashboardType() const

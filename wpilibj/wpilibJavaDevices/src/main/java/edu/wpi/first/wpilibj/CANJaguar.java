@@ -50,7 +50,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
 	/** Sets a potentiometer as the position reference only. <br> Passed as the "tag" when setting the control mode. */
 	public final static PotentiometerTag kPotentiometer = new PotentiometerTag();
 
-
+    private boolean isInverted = false;
 	/**
 	* Mode determines how the Jaguar is controlled, used internally.
 	*/
@@ -348,12 +348,12 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
 			switch(m_controlMode) {
 			case PercentVbus:
 				messageID = CANJNI.LM_API_VOLT_T_SET;
-				dataSize = packPercentage(data, outputValue);
+				dataSize = packPercentage(data, isInverted ? -outputValue: outputValue);
 				break;
 
 			case Speed:
 				messageID = CANJNI.LM_API_SPD_T_SET;
-				dataSize = packFXP16_16(data, outputValue);
+				dataSize = packFXP16_16(data, isInverted ? -outputValue: outputValue);
 				break;
 
 			case Position:
@@ -369,7 +369,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
 
 			case Voltage:
 				messageID = CANJNI.LM_API_VCOMP_T_SET;
-				dataSize = packFXP8_8(data, outputValue);
+				dataSize = packFXP8_8(data, isInverted ? -outputValue: outputValue);
 				break;
 
 			default:
@@ -422,7 +422,17 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
     disableControl();
   }
 
-	/**
+    /**
+     * Inverts the direction of rotation of the motor
+     * Only works in percentVbus, Speed, and Voltage mode
+     * @param isInverted The state of inversion true is inverted
+     */
+    @Override
+    public void setInverted(boolean isInverted) {
+        this.isInverted = isInverted;
+    }
+
+    /**
 	* Check all unverified params and make sure they're equal to their local
 	* cached versions. If a value isn't available, it gets requested.  If a value
 	* doesn't match up, it gets set again.

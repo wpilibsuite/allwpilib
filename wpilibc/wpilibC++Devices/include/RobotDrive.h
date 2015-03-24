@@ -84,8 +84,6 @@ protected:
 	void RotateVector(double &x, double &y, double angle);
 
 	static const int32_t kMaxNumberOfMotors = 4;
-
-	int32_t m_invertedMotors[kMaxNumberOfMotors];
 	float m_sensitivity;
 	double m_maxOutput;
 	bool m_deleteSpeedControllers;

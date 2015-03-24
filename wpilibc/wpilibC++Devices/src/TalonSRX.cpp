@@ -30,6 +30,7 @@ void TalonSRX::InitTalonSRX() {
 
 	HALReport(HALUsageReporting::kResourceType_TalonSRX, GetChannel());
 	LiveWindow::GetInstance()->AddActuator("TalonSRX", GetChannel(), this);
+	m_isInverted = false;
 }
 
 /**
@@ -76,7 +77,13 @@ void TalonSRX::Disable()
 {
 	SetRaw(kPwmDisabled);
 }
-
+/**
+* common interface for inverting direction of a speed controller
+* @param isInverted The state of inversion true is inverted
+*/
+void TalonSRX::SetInverted(bool isInverted){
+m_isInverted = isInverted;
+}
 /**
  * Write out the PID value as seen in the PIDOutput base object.
  *

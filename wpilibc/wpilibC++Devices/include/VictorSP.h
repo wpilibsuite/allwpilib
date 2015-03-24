@@ -23,6 +23,8 @@ public:
 
 	virtual void PIDWrite(float output) override;
 
+    virtual void SetInverted(bool isInverted);
 private:
 	void InitVictorSP();
+	bool m_isInverted;
 };

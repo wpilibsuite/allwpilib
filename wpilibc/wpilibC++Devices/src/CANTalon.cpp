@@ -23,6 +23,7 @@ CANTalon::CANTalon(int deviceNumber)
 {
   ApplyControlMode(m_controlMode);
   m_impl->SetProfileSlotSelect(m_profile);
+    m_isInverted = false;
 }
 /**
  * Constructor for the CANTalon device.
@@ -131,7 +132,7 @@ void CANTalon::Set(float value, uint8_t syncGroup)
     switch(m_controlMode) {
       case CANSpeedController::kPercentVbus:
         {
-          m_impl->Set(value);
+          m_impl->Set(m_isInverted ? -value : value);
           status = CTR_OKAY;
         }
         break;
@@ -143,12 +144,12 @@ void CANTalon::Set(float value, uint8_t syncGroup)
       case CANSpeedController::kVoltage:
         {
           // Voltage is an 8.8 fixed point number.
-          int volts = int(value * 256);
+          int volts = int((m_isInverted ? value: -value) * 256);
           status = m_impl->SetDemand(volts);
         }
         break;
       case CANSpeedController::kSpeed:
-        status = m_impl->SetDemand(value);
+        status = m_impl->SetDemand(m_isInverted ? -value : value);
         break;
       case CANSpeedController::kPosition:
         status = m_impl->SetDemand(value);
@@ -1291,7 +1292,14 @@ void CANTalon::GetDescription(char *desc) const
 {
 	sprintf(desc, "CANTalon ID %d", m_deviceNumber);
 }
-
+/**
+* common interface for inverting direction of a speed controller
+* Only works in PercentVbus, speed, and Voltage modes
+* @param isInverted The state of inversion true is inverted
+*/
+void CANTalon::SetInverted(bool isInverted){
+m_isInverted = isInverted;
+}
 /**
  * Common interface for stopping the motor
  * Part of the MotorSafety interface

@@ -163,6 +163,7 @@ public:
 	void InitTable(ITable *subTable) override;
 	ITable * GetTable() const override;
 
+  virtual void SetInverted(bool isInverted) override;
 private:
   // Values for various modes as is sent in the CAN packets for the Talon.
   enum TalonControlMode {
@@ -196,4 +197,5 @@ private:
 
   // LiveWindow stuff.
 	ITable *m_table;
+  bool m_isInverted;
 };

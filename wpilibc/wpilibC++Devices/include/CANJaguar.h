@@ -123,6 +123,8 @@ public:
 	void GetDescription(char *desc) const override;
 	uint8_t GetDeviceID() const;
 
+  //SpeedController overrides
+  virtual void SetInverted(bool isInverted) override;
 protected:
 	// Control mode helpers
 	void SetSpeedReference(uint8_t reference);
@@ -223,4 +225,5 @@ protected:
 
 private:
 	void InitCANJaguar();
+	bool m_isInverted;
 };

@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.tables.ITableListener;
 
 public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface, CANSpeedController, LiveWindowSendable {
 	private MotorSafetyHelper m_safetyHelper;
+  private boolean isInverted = false;
 	public enum TalonControlMode {
 		PercentVbus(0), Follower(5), Voltage(4), Position(1), Speed(2), Current(3), Disabled(15);
 
@@ -144,18 +145,18 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
       m_setPoint = outputValue;
       switch (m_controlMode) {
         case PercentVbus:
-          m_impl.Set(outputValue);
+          m_impl.Set(isInverted ? -outputValue: outputValue);
           break;
         case Follower:
           m_impl.SetDemand((int)outputValue);
           break;
         case Voltage:
           // Voltage is an 8.8 fixed point number.
-          int volts = (int)(outputValue * 256);
+          int volts = (int)((isInverted ? -outputValue: outputValue) * 256);
           m_impl.SetDemand(volts);
           break;
         case Speed:
-          m_impl.SetDemand((int)outputValue);
+          m_impl.SetDemand((int)(isInverted ? -outputValue: outputValue));
           break;
         case Position:
           m_impl.SetDemand((int)outputValue);
@@ -167,7 +168,18 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
     }
   }
 
-  /**
+    /**
+     * Inverts the direction of the motor's rotation
+     * Only works in PercentVbus mode
+     *
+     * @param isInverted The state of inversion true is inverted
+     */
+    @Override
+    public void setInverted(boolean isInverted) {
+        this.isInverted = isInverted;
+    }
+
+    /**
    * Sets the output of the Talon.
    *
    * @param outputValue See set().

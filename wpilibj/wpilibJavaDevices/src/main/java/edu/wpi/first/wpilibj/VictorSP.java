@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
  * VEX Robotics Victor SP Speed Controller
  */
 public class VictorSP extends SafePWM implements SpeedController {
-
+private boolean isInverted = false;
     /**
      * Common initialization code called by all constructors.
      *
@@ -62,7 +62,7 @@ public class VictorSP extends SafePWM implements SpeedController {
      * @param syncGroup The update group to add this Set() to, pending UpdateSyncGroup().  If 0, update immediately.
      */
     public void set(double speed, byte syncGroup) {
-        setSpeed(speed);
+        setSpeed(isInverted ? -speed: speed);
         Feed();
     }
 
@@ -75,8 +75,18 @@ public class VictorSP extends SafePWM implements SpeedController {
      * @param speed The speed value between -1.0 and 1.0 to set.
      */
     public void set(double speed) {
-        setSpeed(speed);
+        setSpeed(isInverted ? -speed: speed);
         Feed();
+    }
+
+    /**
+     * Common interface for inverting direction of a speed controller
+     *
+     * @param isInverted The state of inversion true is inverted
+     */
+    @Override
+    public void setInverted(boolean isInverted) {
+        this.isInverted = isInverted;
     }
 
     /**

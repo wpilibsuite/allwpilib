@@ -23,7 +23,9 @@ public:
 	virtual void Disable() override;
 
 	virtual void PIDWrite(float output) override;
+  virtual void SetInverted(bool isInverted) override;
 
 private:
 	void InitTalonSRX();
+	bool m_isInverted;
 };

@@ -177,10 +177,10 @@ public class MotorEncoderTest extends AbstractComsSetup {
 		pid.setSetpoint(2500);
 
 		pid.enable();
-		Timer.delay(5.0);
+		Timer.delay(10.0);
 		pid.disable();
 
-		assertTrue("PID loop did not reach setpoint within 5 seconds. The error was: " + pid.getError(),
+		assertTrue("PID loop did not reach setpoint within 10 seconds. The error was: " + pid.getError(),
 				pid.onTarget());
 
 		pid.free();

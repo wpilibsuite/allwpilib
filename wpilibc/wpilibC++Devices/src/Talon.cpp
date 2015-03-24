@@ -31,6 +31,7 @@ void Talon::InitTalon() {
 
 	HALReport(HALUsageReporting::kResourceType_Talon, GetChannel());
 	LiveWindow::GetInstance()->AddActuator("Talon", GetChannel(), this);
+	m_isInverted = false;
 }
 
 /**
@@ -57,7 +58,7 @@ Talon::~Talon()
  */
 void Talon::Set(float speed, uint8_t syncGroup)
 {
-	SetSpeed(speed);
+	SetSpeed(m_isInverted ? -speed : speed);
 }
 
 /**
@@ -77,7 +78,13 @@ void Talon::Disable()
 {
 	SetRaw(kPwmDisabled);
 }
-
+/**
+* common interface for inverting direction of a speed controller
+* @param isInverted The state of inversion true is inverted
+*/
+void Talon::SetInverted(bool isInverted){
+m_isInverted = isInverted;
+}
 /**
  * Write out the PID value as seen in the PIDOutput base object.
  *

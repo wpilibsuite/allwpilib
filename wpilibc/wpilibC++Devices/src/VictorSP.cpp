@@ -31,6 +31,7 @@ void VictorSP::InitVictorSP() {
 
 	HALReport(HALUsageReporting::kResourceType_VictorSP, GetChannel());
 	LiveWindow::GetInstance()->AddActuator("VictorSP", GetChannel(), this);
+	m_isInverted = false;
 }
 
 /**
@@ -57,7 +58,7 @@ VictorSP::~VictorSP()
  */
 void VictorSP::Set(float speed, uint8_t syncGroup)
 {
-	SetSpeed(speed);
+	SetSpeed(m_isInverted ? -speed: speed);
 }
 
 /**
@@ -69,7 +70,13 @@ float VictorSP::Get() const
 {
 	return GetSpeed();
 }
-
+/**
+* common interface for inverting direction of a speed controller
+* @param isInverted The state of inversion true is inverted
+*/
+void VictorSP::SetInverted(bool isInverted){
+m_isInverted = isInverted;
+}
 /**
  * Common interface for disabling a motor.
  */
