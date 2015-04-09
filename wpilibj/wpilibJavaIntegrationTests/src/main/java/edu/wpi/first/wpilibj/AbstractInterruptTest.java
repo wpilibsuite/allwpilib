@@ -91,7 +91,7 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
 		}
 
 		@Override
-		void interruptFired(int interruptAssertedMask, InterruptCounter param) {
+		public void interruptFired(int interruptAssertedMask, InterruptCounter param) {
 			interruptFireTime.set(Utility.getFPGATime());
 			counter.increment();
 			try{
@@ -106,7 +106,7 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
 		};
 
 		@Override
-		public InterruptCounter overridableParamater(){
+		public InterruptCounter overridableParameter(){
 			return counter;
 		}
 	};

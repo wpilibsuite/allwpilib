@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.hal.InterruptJNI.InterruptJNIHandlerFunction;
  * @param <T> The type of the parameter that should be returned to the the
  *  method {@link #interruptFired(int, Object)}
  */
-public abstract class InterruptHandlerFunction<T>{
+public abstract class InterruptHandlerFunction<T> {
 	/**
 	 * The entry point for the interrupt. When the interrupt fires the
 	 * {@link #apply(int, Object)} method is called.
@@ -26,7 +26,7 @@ public abstract class InterruptHandlerFunction<T>{
 	 * pass a generic object to the interrupt fired method.
 	 * @author Jonathan Leitschuh
 	 */
-	private class Function implements InterruptJNIHandlerFunction{
+	private class Function implements InterruptJNIHandlerFunction {
 		@SuppressWarnings("unchecked")
 		@Override
 		public void apply(int interruptAssertedMask, Object param) {
@@ -38,10 +38,10 @@ public abstract class InterruptHandlerFunction<T>{
 	/**
 	 * This method is run every time an interrupt is fired.
 	 * @param interruptAssertedMask
-	 * @param param The parameter provided by overriding the {@link #overridableParamater()}
+	 * @param param The parameter provided by overriding the {@link #overridableParameter()}
 	 * method. 
 	 */
-	abstract void interruptFired(int interruptAssertedMask, T param);
+	public abstract void interruptFired(int interruptAssertedMask, T param);
 	
 	
 	/**
@@ -51,7 +51,7 @@ public abstract class InterruptHandlerFunction<T>{
 	 * is run.
 	 * @return The object that should be passed to the interrupt when it runs
 	 */
-	public T overridableParamater(){
+	public T overridableParameter() {
 		return null;
 	}
 }

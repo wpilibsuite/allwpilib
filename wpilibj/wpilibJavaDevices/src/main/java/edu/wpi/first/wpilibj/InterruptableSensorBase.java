@@ -100,7 +100,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
 				(byte) (getAnalogTriggerForRouting() ? 1 : 0), status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
 		setUpSourceEdge(true, false);
-		InterruptJNI.attachInterruptHandler(m_interrupt, handler.function, handler.overridableParamater(), status.asIntBuffer());
+		InterruptJNI.attachInterruptHandler(m_interrupt, handler.function, handler.overridableParameter(), status.asIntBuffer());
 		HALUtil.checkStatus(status.asIntBuffer());
 	}
 
