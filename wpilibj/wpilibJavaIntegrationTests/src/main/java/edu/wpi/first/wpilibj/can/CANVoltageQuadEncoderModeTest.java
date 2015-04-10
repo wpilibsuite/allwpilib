@@ -33,7 +33,7 @@ public class CANVoltageQuadEncoderModeTest extends AbstractCANTest {
 	/** The stopped value in volts */
 	private static final double kStoppedValue = 0;
 	/** The running value in volts */
-	private static final double kRunningValue = 12;
+	private static final double kRunningValue = 4;
 	
 	private static final double kVoltageTolerance = .25;
 	
@@ -110,7 +110,7 @@ public class CANVoltageQuadEncoderModeTest extends AbstractCANTest {
 	@Test
 	public void testMaxOutputVoltagePositive(){
 		//given
-		double maxVoltage = 5;
+		double maxVoltage = 3;
 		
 		setupMotorVoltageForTest(kRunningValue, kWait);
 		
@@ -155,7 +155,7 @@ public class CANVoltageQuadEncoderModeTest extends AbstractCANTest {
 	@Test
 	public void testMaxOutputVoltageNegative(){
 		//given
-		double maxVoltage = 5;
+		double maxVoltage = 3;
 		
 		setupMotorVoltageForTest(-kRunningValue, kWait);
 		final double fastSpeed = getME().getMotor().getSpeed();

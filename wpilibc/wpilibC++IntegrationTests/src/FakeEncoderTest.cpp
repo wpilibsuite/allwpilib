@@ -25,7 +25,8 @@ protected:
 		m_outputA = new DigitalOutput(TestBench::kLoop2OutputChannel);
 		m_outputB = new DigitalOutput(TestBench::kLoop1OutputChannel);
 		m_indexOutput = new AnalogOutput(TestBench::kAnalogOutputChannel);
-
+                m_outputA->Set(false);
+                m_outputB->Set(false);
 		m_encoder = new Encoder(TestBench::kLoop1InputChannel, TestBench::kLoop2InputChannel);
 		m_indexAnalogTrigger = new AnalogTrigger(TestBench::kFakeAnalogOutputChannel);
 		m_indexAnalogTrigger->SetLimitsVoltage(2.0, 3.0);
@@ -80,6 +81,7 @@ TEST_F(FakeEncoderTest, TestDefaultState) {
  * Test the encoder by setting the digital outputs and reading the value.
  */
 TEST_F(FakeEncoderTest, TestCountUp) {
+    m_encoder->Reset();
 	Simulate100QuadratureTicks();
 
 	EXPECT_FLOAT_EQ(100.0f, m_encoder->Get())

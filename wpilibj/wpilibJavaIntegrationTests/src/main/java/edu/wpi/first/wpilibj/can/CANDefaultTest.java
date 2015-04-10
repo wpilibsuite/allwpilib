@@ -181,7 +181,7 @@ public class CANDefaultTest extends AbstractCANTest{
 	
 	@Test
 	public void testPositionModeVerifiesOnBrownOut() {
-		final double setpoint = 10.0;
+		final double setpoint = 1.0;
 
 		//Given
 		getME().getMotor().setPositionMode(CANJaguar.kQuadEncoder, 360, 10.0, 0.1, 0.0);

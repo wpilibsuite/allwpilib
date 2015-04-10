@@ -57,9 +57,9 @@ public class CANSpeedQuadEncoderModeTest extends AbstractCANTest {
 	 */
 	@Test
 	public void testRotateForwardSpeed() {
-		double speed = 60.0f;
+		double speed = 50.0f;
 		double initialPosition = getME().getMotor().getPosition();
-		setCANJaguar(kMotorTime, speed);
+                setCANJaguar(2*kMotorTime, speed);
 		assertEquals("The motor did not reach the required speed in speed mode", speed, getME().getMotor().getSpeed(), kEncoderSpeedTolerance);
 		assertThat("The motor did not move forward in speed mode", getME().getMotor().getPosition(), is(greaterThan(initialPosition)));
 	}
@@ -70,9 +70,9 @@ public class CANSpeedQuadEncoderModeTest extends AbstractCANTest {
 	 */
 	@Test
 	public void testRotateReverseSpeed() {
-		double speed = -60.0f;
+		double speed = -50.0f;
 		double initialPosition = getME().getMotor().getPosition();
-		setCANJaguar(kMotorTime, speed);
+                setCANJaguar(2*kMotorTime, speed);
 		assertEquals("The motor did not reach the required speed in speed mode", speed, getME().getMotor().getSpeed(), kEncoderSpeedTolerance);
 		assertThat("The motor did not move in reverse in speed mode", getME().getMotor().getPosition(), is(lessThan(initialPosition)));
 	}

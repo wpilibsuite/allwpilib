@@ -70,7 +70,10 @@ TEST_F(TiltPanCameraTest, DefaultGyroAngle) {
 }
 
 /**
- * Test if the servo turns 180 degrees and the gyroscope measures this angle
+ * Test if the servo turns 90 degrees and the gyroscope measures this angle
+ * Note servo on TestBench is not the same type of servo that servo class
+ * was designed for so setAngle is significantly off. This has been calibrated
+ * for the servo on the rig.
  */
 TEST_F(TiltPanCameraTest, GyroAngle) {
   // Make sure that the gyro doesn't get jerked when the servo goes to zero.
