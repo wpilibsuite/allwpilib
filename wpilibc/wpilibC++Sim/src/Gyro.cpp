@@ -9,11 +9,11 @@
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 
-const uint32_t Gyro::kOversampleBits;
-const uint32_t Gyro::kAverageBits;
-constexpr float Gyro::kSamplesPerSecond;
-constexpr float Gyro::kCalibrationSampleTime;
-constexpr float Gyro::kDefaultVoltsPerDegreePerSecond;
+const uint32_t Gyro::kOversampleBits = 10;
+const uint32_t Gyro::kAverageBits = 0;
+const float Gyro::kSamplesPerSecond = 50.0;
+const float Gyro::kCalibrationSampleTime = 5.0;
+const float Gyro::kDefaultVoltsPerDegreePerSecond = 0.007;
 
 /**
  * Initialize the gyro.
@@ -30,7 +30,7 @@ void Gyro::InitGyro(int channel)
 	char buffer[50];
 	int n = sprintf(buffer, "analog/%d", channel);
 	impl = new SimGyro(buffer);
-    
+
 	LiveWindow::GetInstance().AddSensor("Gyro", channel, this);
 }
 
@@ -56,12 +56,12 @@ void Gyro::Reset()
 
 /**
  * Return the actual angle in degrees that the robot is currently facing.
- * 
+ *
  * The angle is based on the current accumulator value corrected by the oversampling rate, the
  * gyro type and the A/D calibration values.
  * The angle is continuous, that is can go beyond 360 degrees. This make algorithms that wouldn't
  * want to see a discontinuity in the gyro output as it sweeps past 0 on the second time around.
- * 
+ *
  * @return the current heading of the robot in degrees. This heading is based on integration
  * of the returned rate from the gyro.
  */

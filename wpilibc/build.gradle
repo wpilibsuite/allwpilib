@@ -189,6 +189,7 @@ task wpilibcSimZip(type: Zip) {
     into 'sim/include'
     from "${sim}/include"
     from "${shared}/include"
+    from "../build/simulation/gz_msgs/generated"
     from '../networktables/cpp/include'
     from '../hal/include'
 }

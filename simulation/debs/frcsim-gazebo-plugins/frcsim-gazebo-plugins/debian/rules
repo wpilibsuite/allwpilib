@@ -1,6 +1,0 @@
-#!/usr/bin/make -f
-%:
-	dh $@
-
-override_dh_strip:
-	strip --remove-section=.comment --remove-section=.note --strip-unneeded debian/frcsim-gazebo-plugins/usr/lib/frcsim/plugins/libgz_potentiometer.so

@@ -1,8 +1,11 @@
 #pragma once
 
+#include "simulation/gz_msgs/msgs.h"
+
+#include <gazebo/physics/physics.hh>
+#include <gazebo/transport/transport.hh>
 #include <gazebo/gazebo.hh>
 
-#include "msgs/msgs.h"
 
 using namespace gazebo;
 
@@ -33,13 +36,13 @@ using namespace gazebo;
  * - `units`: Optional. Defaults to radians.
  */
 class Encoder: public ModelPlugin {
-public: 
+public:
   Encoder();
   ~Encoder();
-  
+
   /// \brief Load the encoder and configures it according to the sdf.
   void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
-  
+
   /// \brief Sends out the encoder reading each timestep.
   void Update(const common::UpdateInfo &info);
 
@@ -49,13 +52,13 @@ private:
 
   /// \brief Whether or not this encoder measures radians or degrees.
   bool radians;
-  
+
   /// \brief Whether or not the encoder has been stopped.
   bool stopped;
-  
+
   /// \brief The zero value of the encoder.
   double zero;
-  
+
   /// \brief The value the encoder stopped counting at
   double stop_value;
 
@@ -68,12 +71,12 @@ private:
   /// \brief Gets the current angle, taking into account whether to
   ///        return radians or degrees.
   double GetAngle();
-  
+
   /// \brief Gets the current velocity, taking into account whether to
   ///        return radians/second or degrees/second.
   double GetVelocity();
 
-  physics::ModelPtr model;                  ///< \brief The model that this is attached to. 
+  physics::ModelPtr model;                  ///< \brief The model that this is attached to.
   event::ConnectionPtr updateConn;          ///< \brief Pointer to the world update function.
   transport::NodePtr node;                  ///< \brief The node we're advertising on.
   transport::SubscriberPtr command_sub;     ///< \brief Subscriber handle.

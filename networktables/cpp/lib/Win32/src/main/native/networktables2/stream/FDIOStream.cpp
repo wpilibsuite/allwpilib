@@ -1,22 +1,24 @@
-#include "stdafx.h"
 /*
  * FDIOStream.cpp
  *
  *  Created on: Sep 27, 2012
  */
+ //make sure this comes before windows.h
+#include <winsock2.h>
 
 #include "networktables2/stream/FDIOStream.h"
 #include "networktables2/util/IOException.h"
 #include "networktables2/util/EOFException.h"
 
+#include <iostream>
 #include <errno.h>
 #include <stdlib.h>
+#include <assert.h>
 #include <stdio.h>
 #include <windows.h>
-#include <winsock2.h>
 #include <wininet.h>
 #include <ws2tcpip.h>
-
+#include <io.h>
 
 FDIOStream::FDIOStream(int _fd){
   fd = _fd;
@@ -24,7 +26,7 @@ FDIOStream::FDIOStream(int _fd){
   u_long on = 1;
   if (ioctlsocket(fd, FIONBIO, &on))
   {
-    ::close(fd);
+    ::_close(fd);
     throw IOException("Could not set socket to non-blocking mode");
   }
 }
@@ -38,7 +40,7 @@ int FDIOStream::read(void* ptr, int numbytes){
 		return 0;
 	char* bufferPointer = (char*)ptr;
 	int totalRead = 0;
-	while (totalRead < numbytes) 
+	while (totalRead < numbytes)
 	{
 		int numRead=recv(fd, bufferPointer, numbytes-totalRead, 0);
 		if(numRead == 0){
@@ -77,7 +79,7 @@ int Send( int sockfd,char* Data, size_t sizeData )
 	if (!Result_)
 	{
 		char Buffer[128];
-		sprintf(Buffer,"Send() failed: WSA error=%d\n",WSAGetLastError());
+		sprintf_s(Buffer,"Send() failed: WSA error=%d\n",WSAGetLastError());
 		OutputDebugStringA(Buffer);
 	}
 
@@ -86,7 +88,7 @@ int Send( int sockfd,char* Data, size_t sizeData )
 
 int FDIOStream::write(const void* ptr, int numbytes)
 {
-	int numWrote = ::write(fd, (char*)ptr, numbytes);
+	int numWrote = ::_write(fd, (char*)ptr, numbytes);
 	if(numWrote==numbytes)
 		return numWrote;
 
@@ -106,12 +108,12 @@ int FDIOStream::write(const void* ptr, int numbytes)
 			throw IOException("Select returned an error on write");
 
 		if (FD_ISSET(fd, &fdSet)) {
-			numWrote = ::write(fd, (char*)ptr, numbytes);
+			numWrote = ::_write(fd, (char*)ptr, numbytes);
 			if(numWrote==numbytes)
 				return numWrote;
 		}
 	}
- 	
+
 	perror("write error: ");
 	fflush(stderr);
 	throw IOException("Could not write all bytes to fd stream");
@@ -126,7 +128,7 @@ void FDIOStream::close()
 	if (fd != INVALID_SOCKET)
 	{
 		char Buffer[128];
-		sprintf(Buffer,"closesocket %d\n",fd);
+		sprintf_s(Buffer,"closesocket %d\n",fd);
 		OutputDebugStringA(Buffer);
 
 		shutdown( fd, SD_BOTH );

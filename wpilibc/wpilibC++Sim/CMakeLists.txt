@@ -1,31 +1,70 @@
 cmake_minimum_required(VERSION 2.8)
 project(WPILibSim)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wformat=2 -Wall -Wextra -Wno-unused-parameter -fPIC -std=c++1y -DFRC_SIMULATOR")
+if (WIN32)
+  #temporary until we build dlls
+  add_definitions(-DBUILDING_STATIC_LIBS)
+
+  # XXX: should be set via CMake variables in configure.bat
+  set(PTHREAD_INCLUDE_DIR "C:/Users/peter/gz-ws/pthread-w32/include")
+  set(PTHREAD_LIBRARY "C:/Users/peter/gz-ws/pthread-w32/libs/x64/pthreadVC2.lib")
+endif()
 
 get_filename_component(HAL_API_INCLUDES ../../hal/include REALPATH)
 get_filename_component(NWT_API_INCLUDES ../../networktables/cpp/include REALPATH)
-add_subdirectory(../wpilibC++ wpilibC++)
 
-include (FindPkgConfig)
-if (PKG_CONFIG_FOUND)
-  pkg_check_modules(GAZEBO gazebo)
+
+# also on windows use sprintf_s instead of snprintf
+# TODO: find a more permenenant solution
+if (WIN32)
+  add_definitions(-Dsnprintf=sprintf_s)
 endif()
 
-find_package(gazebo REQUIRED)
-
-file(GLOB_RECURSE SRC_FILES src/*.cpp ../../networktables/cpp/lib/share/*.cpp
-                                      ../../networktables/cpp/lib/Athena/*.cpp)
+if (WIN32)
+  file(GLOB_RECURSE SRC_FILES src/*.cpp
+    ../../networktables/cpp/lib/share/*.cpp
+    ../../networktables/cpp/lib/WIN32/*.cpp)
+else()
+  file(GLOB_RECURSE SRC_FILES src/*.cpp
+    ../../networktables/cpp/lib/share/*.cpp
+    ../../networktables/cpp/lib/Athena/*.cpp)
+endif()
 
 file(GLOB_RECURSE COM_SRC_FILES ../wpilibC++/src/*.cpp)
 
-include_directories(include/ ../../wpilibc/wpilibC++/include
-                    ../../networktables/cpp/include
-                    ../../hal/include
-                    ${Boost_INCLUDE_DIR} ${GAZEBO_INCLUDE_DIRS}) # ${NWT_API_INCLUDES}
-add_library(WPILibSim SHARED ${SRC_FILES} ${COM_SRC_FILES})
-target_link_libraries(WPILibSim ${GAZEBO_LIBRARIES}  -fPIC) # NetworkTables
-INSTALL(TARGETS WPILibSim LIBRARY DESTINATION src COMPONENT src)
-INSTALL(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT headers)
-# ni_emb
-# HAL NWT
+
+set (INCLUDE_FOLDERS include
+  ../wpilibC++/include
+  ../../networktables/cpp/include
+  ../../hal/include
+  ${GZ_MSGS_INCLUDE_DIR}
+  ${Boost_INCLUDE_DIR}
+  ${GAZEBO_INCLUDE_DIRS})
+
+if (WIN32)
+  #these paths will be fixed when a more permenant windows development solution is found
+  set(INCLUDE_FOLDERS ${INCLUDE_FOLDERS}
+    C:/Users/peter/gz-ws/protobuf-2.6.0-win64-vc12/src
+    C:/Users/peter/gz-ws/sdformat/src/win/tinyxml
+    C:/Users/peter/gz-ws/FreeImage-vc12-x64-release-debug/Source
+    C:/Users/peter/gz-ws/tbb43_20141023oss/include
+    ${PTHREAD_INCLUDE_DIR})
+endif()
+
+include_directories(${INCLUDE_FOLDERS})
+
+link_directories(${GAZEBO_LIBRARY_DIRS})
+
+if (WIN32)
+  add_library(WPILibSim ${SRC_FILES} ${COM_SRC_FILES})
+else()
+  add_library(WPILibSim SHARED ${SRC_FILES} ${COM_SRC_FILES})
+endif()
+
+target_link_libraries(WPILibSim gz_msgs ${PTHREAD_LIBRARY} ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}  -fPIC) # NetworkTables
+
+if (WIN32)
+  set_target_properties(${project}  PROPERTIES LINK_FLAGS "/DEBUG")
+endif()
+
+#copy to eclipse plugin

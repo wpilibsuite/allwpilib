@@ -32,24 +32,35 @@ class LiveWindow {
  public:
   static LiveWindow &GetInstance();
   void Run();
+#if !defined(_MSC_VER)
   [[deprecated(
       "Raw pointers are deprecated; pass the component using shared_ptr "
       "instead.")]]
+#else
+  __declspec(deprecated("**Raw pointers are deprecated; pass the component using shared_ptr instead**"))
+#endif
   void AddSensor(const std::string &subsystem, const std::string &name,
                  LiveWindowSendable *component);
   void AddSensor(const std::string &subsystem, const std::string &name,
                  LiveWindowSendable &component);
   void AddSensor(const std::string &subsystem, const std::string &name,
                  std::shared_ptr<LiveWindowSendable> component);
+#if !defined(_MSC_VER)
   [[deprecated(
       "Raw pointers are deprecated; pass the component using shared_ptr "
       "instead.")]]
+#else
+  __declspec(deprecated("**Raw pointers are deprecated; pass the component using shared_ptr instead**"))
+#endif
   void AddActuator(const std::string &subsystem, const std::string &name,
                    LiveWindowSendable *component);
   void AddActuator(const std::string &subsystem, const std::string &name,
                    LiveWindowSendable &component);
   void AddActuator(const std::string &subsystem, const std::string &name,
                    std::shared_ptr<LiveWindowSendable> component);
+#if !defined(_MSC_VER)
+[[deprecated]]
+#endif
   void AddSensor(std::string type, int channel, LiveWindowSendable *component);
   void AddActuator(std::string type, int channel,
                    LiveWindowSendable *component);

@@ -44,7 +44,7 @@ class Timer {
   static double GetMatchTime();
 
   // The time, in seconds, at which the 32-bit FPGA timestamp rolls over to 0
-  static constexpr double kRolloverTime = (1ll << 32) / 1e6;
+  static const double kRolloverTime;
 
  private:
   double m_startTime = 0.0;

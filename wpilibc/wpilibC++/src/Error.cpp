@@ -69,9 +69,17 @@ void Error::Report() {
   std::stringstream errorStream;
 
   errorStream << "Error on line " << m_lineNumber << " ";
-  errorStream << "of " << basename(m_filename.c_str()) << ": ";
-  errorStream << m_message << std::endl;
-  errorStream << GetStackTrace(4);
+#if defined(_UNIX)
+	errorStream << "of " << basename(m_filename.c_str()) << ": ";
+#elif defined(_WIN32)
+	const int MAX_DIR = 100;
+	char basename[MAX_DIR];
+	_splitpath_s(m_filename.c_str(), NULL, 0, basename, MAX_DIR, NULL, 0, NULL, 0);
+	errorStream << "of " << basename << ": ";
+#endif
+
+	errorStream << m_message << std::endl;
+	errorStream << GetStackTrace(4);
 
   std::string error = errorStream.str();
 

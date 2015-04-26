@@ -81,9 +81,6 @@ void LiveWindow::AddSensor(const std::string &subsystem,
  * @brief Use a raw pointer to the LiveWindow.
  * @deprecated Prefer smart pointers or references.
  */
-[[deprecated(
-    "Raw pointers are deprecated; pass the component using shared_ptr "
-    "instead.")]]
 void LiveWindow::AddSensor(const std::string &subsystem,
                            const std::string &name,
                            LiveWindowSendable *component) {
@@ -135,7 +132,6 @@ void LiveWindow::AddActuator(const std::string &subsystem, const std::string &na
 /**
  * Meant for internal use in other WPILib classes.
  */
-[[deprecated]]
 void LiveWindow::AddSensor(std::string type, int channel,
                            LiveWindowSendable *component) {
   std::ostringstream oss;

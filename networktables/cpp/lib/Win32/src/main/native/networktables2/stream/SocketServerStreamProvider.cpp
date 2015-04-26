@@ -4,7 +4,6 @@
  *  Created on: Sep 27, 2012
  *      Author: Mitchell Wills
  */
-#include "stdafx.h"
 
 #include "networktables2/stream/SocketServerStreamProvider.h"
 #include "networktables2/stream/FDIOStream.h"
@@ -12,6 +11,7 @@
 
 #include <cstring>
 #include <errno.h>
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>

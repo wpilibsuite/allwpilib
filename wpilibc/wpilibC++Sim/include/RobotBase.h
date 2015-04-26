@@ -7,6 +7,8 @@
 
 #include "Base.h"
 #include "DriverStation.h"
+#include "simulation/simTime.h"
+#include "simulation/MainNode.h"
 
 #define START_ROBOT_CLASS(_ClassName_) \
 	int main() \

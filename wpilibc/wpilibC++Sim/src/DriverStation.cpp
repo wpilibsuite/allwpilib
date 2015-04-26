@@ -24,7 +24,7 @@ TLogLevel dsLogLevel = logDEBUG;
 const uint32_t DriverStation::kBatteryChannel;
 const uint32_t DriverStation::kJoystickPorts;
 const uint32_t DriverStation::kJoystickAxes;
-constexpr float DriverStation::kUpdatePeriod;
+const float DriverStation::kUpdatePeriod = 0.02;
 uint8_t DriverStation::m_updateNumber = 0;
 
 /**
@@ -37,22 +37,22 @@ DriverStation::DriverStation() {
 	stateSub = MainNode::Subscribe("~/ds/state",
 		                   &DriverStation::stateCallback, this);
 	// TODO: for loop + boost bind
-	joysticks[0] = msgs::JoystickPtr(new msgs::Joystick());
+	joysticks[0] = msgs::FRCJoystickPtr(new msgs::FRCJoystick());
 	joysticksSub[0] =  MainNode::Subscribe("~/ds/joysticks/0",
 		                           &DriverStation::joystickCallback0, this);
-	joysticks[1] = msgs::JoystickPtr(new msgs::Joystick());
+	joysticks[1] = msgs::FRCJoystickPtr(new msgs::FRCJoystick());
 	joysticksSub[1] =  MainNode::Subscribe("~/ds/joysticks/1",
 		                           &DriverStation::joystickCallback1, this);
-	joysticks[2] = msgs::JoystickPtr(new msgs::Joystick());
+	joysticks[2] = msgs::FRCJoystickPtr(new msgs::FRCJoystick());
 	joysticksSub[2] =  MainNode::Subscribe("~/ds/joysticks/2",
 		                           &DriverStation::joystickCallback2, this);
-	joysticks[3] = msgs::JoystickPtr(new msgs::Joystick());
+	joysticks[3] = msgs::FRCJoystickPtr(new msgs::FRCJoystick());
 	joysticksSub[3] =  MainNode::Subscribe("~/ds/joysticks/5",
 	                                   &DriverStation::joystickCallback3, this);
-	joysticks[4] = msgs::JoystickPtr(new msgs::Joystick());
+	joysticks[4] = msgs::FRCJoystickPtr(new msgs::FRCJoystick());
 	joysticksSub[4] =  MainNode::Subscribe("~/ds/joysticks/4",
 	                                   &DriverStation::joystickCallback4, this);
-	joysticks[5] = msgs::JoystickPtr(new msgs::Joystick());
+	joysticks[5] = msgs::FRCJoystickPtr(new msgs::FRCJoystick());
 	joysticksSub[5] =  MainNode::Subscribe("~/ds/joysticks/5",
 	                                   &DriverStation::joystickCallback5, this);
 
@@ -148,7 +148,7 @@ short DriverStation::GetStickButtons(uint32_t stick)
 	short btns = 0, btnid;
 
 	std::unique_lock<std::recursive_mutex> lock(m_joystickMutex);
-	msgs::JoystickPtr joy = joysticks[stick];
+	msgs::FRCJoystickPtr joy = joysticks[stick];
 	for (btnid = 0; btnid < joy->buttons().size() && btnid < 12; btnid++)
 	{
 		if (joysticks[stick]->buttons(btnid))
@@ -210,7 +210,8 @@ void DriverStation::SetDigitalOut(uint32_t channel, bool value)
  */
 bool DriverStation::GetDigitalOut(uint32_t channel)
 {
-    wpi_setWPIErrorWithContext(UnsupportedInSimulation, "GetDigitalOut");
+	wpi_setWPIErrorWithContext(UnsupportedInSimulation, "GetDigitalOut");
+	return false;
 }
 
 bool DriverStation::IsEnabled() const
@@ -331,39 +332,39 @@ void DriverStation::stateCallback(const msgs::ConstDriverStationPtr &msg)
     m_waitForDataCond.notify_all();
 }
 
-void DriverStation::joystickCallback(const msgs::ConstJoystickPtr &msg,
+void DriverStation::joystickCallback(const msgs::ConstFRCJoystickPtr &msg,
                                      int i)
 {
 	std::unique_lock<std::recursive_mutex> lock(m_joystickMutex);
     *(joysticks[i]) = *msg;
 }
 
-void DriverStation::joystickCallback0(const msgs::ConstJoystickPtr &msg)
+void DriverStation::joystickCallback0(const msgs::ConstFRCJoystickPtr &msg)
 {
     joystickCallback(msg, 0);
 }
 
-void DriverStation::joystickCallback1(const msgs::ConstJoystickPtr &msg)
+void DriverStation::joystickCallback1(const msgs::ConstFRCJoystickPtr &msg)
 {
     joystickCallback(msg, 1);
 }
 
-void DriverStation::joystickCallback2(const msgs::ConstJoystickPtr &msg)
+void DriverStation::joystickCallback2(const msgs::ConstFRCJoystickPtr &msg)
 {
     joystickCallback(msg, 2);
 }
 
-void DriverStation::joystickCallback3(const msgs::ConstJoystickPtr &msg)
+void DriverStation::joystickCallback3(const msgs::ConstFRCJoystickPtr &msg)
 {
     joystickCallback(msg, 3);
 }
 
-void DriverStation::joystickCallback4(const msgs::ConstJoystickPtr &msg)
+void DriverStation::joystickCallback4(const msgs::ConstFRCJoystickPtr &msg)
 {
     joystickCallback(msg, 4);
 }
 
-void DriverStation::joystickCallback5(const msgs::ConstJoystickPtr &msg)
+void DriverStation::joystickCallback5(const msgs::ConstFRCJoystickPtr &msg)
 {
     joystickCallback(msg, 5);
 }

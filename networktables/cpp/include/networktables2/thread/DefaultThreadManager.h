@@ -17,11 +17,7 @@ class PeriodicNTThread;
 #include "networktables2/thread/NTThreadManager.h"
 #include "networktables2/thread/NTThread.h"
 
-#if defined WIN32
-#include "OSAL/Task.h"
-#else
 #include <pthread.h>
-#endif
 
 class DefaultThreadManager : public NTThreadManager{
 public:
@@ -30,21 +26,11 @@ public:
 
 class PeriodicNTThread : public NTThread {
 private:
-#if defined WIN32
-	const char* name;
-	NTTask* thread;
-#else
 	pthread_t thread;
-#endif
 	PeriodicRunnable* r;
 	bool run;
-#if defined WIN32
-	int _taskMain();
-	static int taskMain(PeriodicNTThread* o);
-#else//TODO make return int for pthread as well
 	void _taskMain();
 	static void* taskMain(PeriodicNTThread* o);
-#endif
 public:
 	PeriodicNTThread(PeriodicRunnable* r, const char* name);
 	virtual ~PeriodicNTThread();

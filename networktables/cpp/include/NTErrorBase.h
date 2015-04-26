@@ -8,23 +8,22 @@
 #define _ERROR_BASE_H
 
 #if defined WIN32
-#include <semLib.h>
 
-#define wpi_setErrnoErrorWithContext(context) 
-#define wpi_setErrnoError() 
-#define wpi_setImaqErrorWithContext(code, context)  
-#define wpi_setErrorWithContext(code, context)   
-#define wpi_setError(code)   
-#define wpi_setStaticErrorWithContext(object, code, context)  
+#define wpi_setErrnoErrorWithContext(context)
+#define wpi_setErrnoError()
+#define wpi_setImaqErrorWithContext(code, context)
+#define wpi_setErrorWithContext(code, context)
+#define wpi_setError(code)
+#define wpi_setStaticErrorWithContext(object, code, context)
 #define wpi_setStaticError(object, code)
-#define wpi_setGlobalErrorWithContext(code, context)  
-#define wpi_setGlobalError(code) 
+#define wpi_setGlobalErrorWithContext(code, context)
+#define wpi_setGlobalError(code)
 #define wpi_setWPIErrorWithContext(error, context)
-#define wpi_setWPIError(error)   
-#define wpi_setStaticWPIErrorWithContext(object, error, context)  
-#define wpi_setStaticWPIError(object, error)   
-#define wpi_setGlobalWPIErrorWithContext(error, context)  
-#define wpi_setGlobalWPIError(error) 
+#define wpi_setWPIError(error)
+#define wpi_setStaticWPIErrorWithContext(object, error, context)
+#define wpi_setStaticWPIError(object, error)
+#define wpi_setGlobalWPIErrorWithContext(error, context)
+#define wpi_setGlobalWPIError(error)
 
 /**
  * Base class for most objects.
@@ -35,7 +34,7 @@ class ErrorBase
 {
 //TODO: Consider initializing instance variables and cleanup in destructor
 public:
-	
+
 };
 
 #endif

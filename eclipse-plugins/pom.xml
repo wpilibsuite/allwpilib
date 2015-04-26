@@ -11,6 +11,8 @@
     <modules>
         <module>edu.wpi.first.wpilib.plugins.core</module>
         <module>edu.wpi.first.wpilib.plugins.core.feature</module>
+        <module>edu.wpi.first.wpilib.plugins.simulation</module>
+        <module>edu.wpi.first.wpilib.plugins.simulation.feature</module>
         <module>edu.wpi.first.wpilib.plugins.cpp</module>
         <module>edu.wpi.first.wpilib.plugins.cpp.feature</module>
         <module>edu.wpi.first.wpilib.plugins.java</module>

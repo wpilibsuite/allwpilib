@@ -1,11 +1,4 @@
 #include "limit_switch.h"
-#include "internal_limit_switch.h"
-#include "external_limit_switch.h"
-
-#include <gazebo/physics/physics.hh>
-#include <gazebo/transport/transport.hh>
-
-#include "msgs/msgs.h"
 
 GZ_REGISTER_MODEL_PLUGIN(LimitSwitch)
 

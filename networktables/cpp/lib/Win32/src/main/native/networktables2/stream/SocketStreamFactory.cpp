@@ -4,10 +4,9 @@
 *  Created on: Nov 3, 2012
 *      Author: Mitchell Wills
 */
-#include "stdafx.h"
-
 #include <cstring>
 #include <stdlib.h>
+#include <assert.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <winsock2.h>
@@ -53,7 +52,7 @@ IOStream *SocketStreamFactory::createStream(){
 
 		server = gethostbyname(host);
 
-		if (server == NULL) 
+		if (server == NULL)
 			throw 1;
 
 		memset(&serv_addr, 0, sizeof(serv_addr));
@@ -75,7 +74,7 @@ IOStream *SocketStreamFactory::createStream(){
 		//  [9/10/2013 JamesK]
 		{
 			char Buffer[128];
-			sprintf(Buffer,"connecting %d\n",sockfd);
+			sprintf_s(Buffer,"connecting %d\n",sockfd);
 			OutputDebugStringA(Buffer);
 		}
 		if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) == 0)
@@ -117,7 +116,7 @@ IOStream *SocketStreamFactory::createStream(){
 		if (ErrorMsg)
 		{
 			char Buffer[1024];
-			sprintf(Buffer,"ErrorMsg=%s WSA error=%d\n",ErrorMsg,WSAGetLastError());
+			sprintf_s(Buffer,"ErrorMsg=%s WSA error=%d\n",ErrorMsg,WSAGetLastError());
 			OutputDebugStringA(Buffer);
 			printf("ErrorMsg=%s WSA error=%d\n",ErrorMsg,WSAGetLastError());
 

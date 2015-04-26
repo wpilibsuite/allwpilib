@@ -1,8 +1,5 @@
 #include "encoder.h"
 
-#include <gazebo/physics/physics.hh>
-#include <gazebo/transport/transport.hh>
-
 GZ_REGISTER_MODEL_PLUGIN(Encoder)
 
 Encoder::Encoder() {}
@@ -19,7 +16,7 @@ void Encoder::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   } else {
     topic = "~/"+sdf->GetAttribute("name")->GetAsString();
   }
-  
+
   if (sdf->HasElement("units")) {
     radians = sdf->Get<std::string>("units") != "degrees";
   } else {
@@ -28,7 +25,7 @@ void Encoder::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   zero = GetAngle();
   stopped = true;
   stop_value = 0;
-  
+
   gzmsg << "Initializing encoder: " << topic << " joint=" << joint->GetName()
         << " radians=" << radians << std::endl;
 

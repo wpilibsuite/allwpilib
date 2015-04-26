@@ -4,7 +4,11 @@
 #include <iomanip>
 #include <string>
 #include <stdio.h>
-#include <sys/time.h>
+#ifdef _WIN32
+    #include <Windows.h>
+#else
+    #include <sys/time.h>
+#endif
 
 inline std::string NowTime();
 
@@ -88,6 +92,17 @@ typedef Log FILELog;
     if (level > FILELog::ReportingLevel()) ; \
     else Log().Get(level)
 
+
+#ifdef _WIN32
+inline std::string NowTime()
+{
+    SYSTEMTIME st;
+    GetLocalTime(&st);
+    char result[100] = {0};
+    sprintf(result, "%d:%d:%d.%d", st.wHour , st.wMinute , st.wSecond , st.wMilliseconds);
+    return result;
+}
+#else
 inline std::string NowTime()
 {
     char buffer[11];
@@ -101,3 +116,4 @@ inline std::string NowTime()
     sprintf(result, "%s.%03ld", buffer, (long)tv.tv_usec / 1000);
     return result;
 }
+#endif

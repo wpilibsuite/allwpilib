@@ -1,6 +1,8 @@
 package edu.wpi.first.wpilib.plugins.core.installer;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +47,38 @@ public abstract class AbstractInstaller {
 	 */
 	protected abstract InputStream getInstallResourceStream();
 
-	public void installIfNecessary() {
+	/**
+	 *
+	 * @param sourcePath the file location of the zip file EX "/resources/simuation.zip"
+	 * @param destinationPath the file location to unzip into EX "/home/peter/wpilib/simulation/plugins"
+	 */
+  public void installIfNecessary(String sourcePath, String destinationPath){
+		//we're installing from this directory
+		InputStream sourceStream;
+		try {
+			sourceStream = new FileInputStream(sourcePath);
+			File destFile = new File(destinationPath);
+			installIfNecessary(sourceStream, destFile);
+		} catch (FileNotFoundException e) {
+			WPILibCore.logInfo("source zip file was not found: "+sourcePath);
+		}
+	}
+
+	/**
+	 * This function will delete an old wpilib subfolder if necessary and then copy
+	 * the resource stream to the intended directory.
+	 *
+	 * @throws InstallException if bad things happen ...
+	 */
+	public void installIfNecessary(){
+		installIfNecessary(getInstallResourceStream(), installLocation);
+	}
+
+	/**
+	 * I'm thinking maybe instead of final things,
+	 * create a UnzipJob class to extend Job and have these as parameters to the constructor*
+	 */
+	public void installIfNecessary(final InputStream sourceStream,final File destination) {
 		final Job installJob = new Job("Install " + getFeatureName()) {
 
 			@Override
@@ -56,14 +89,14 @@ public abstract class AbstractInstaller {
 				if (!isInstalled()) {
 					WPILibCore.logInfo("Install necessary for " + getFeatureName());
 					try {
-						install();
+						install(sourceStream,destination);
 					} catch (InstallException e) {
                         WPILibCore.logError("Error installing "+getFeatureName(), e);
 						return new Status(IStatus.ERROR, WPILibCore.PLUGIN_ID,
 								getErrorMessage(e));
 					}
 				}
-				
+
 				updateInstalledVersion(version);
 				WPILibCore.logInfo("Installed" + getFeatureName());
 
@@ -98,6 +131,7 @@ public abstract class AbstractInstaller {
 	}
 
 	/**
+	 *
 	 * This function has been updated to guarantee that the wpilib folder date
 	 * is older than the jar file being run, which ensures up to date tools.
 	 *
@@ -108,38 +142,41 @@ public abstract class AbstractInstaller {
 	}
 
 	/**
-	 * This function will delete an old wpilib subfolder if necessary and then copy
-	 * the resource stream to the intended directory.
 	 *
-	 * @throws InstallException if bad things happen ...
+	 * @TODO this function is very long and complicated. If all it does is unzip, it shouldn't be so hard.
+	 *
+	 * @param sourceStream input stream of zip file
+	 * @param destination desired location for output of unzipping
+	 * @throws InstallException
 	 */
-	protected void install() throws InstallException {
-		if(installLocation.exists()) {
-			if(!removeFileHandler(installLocation, true)) {
+	protected void install(InputStream sourceStream, File destination) throws InstallException {
+		if(destination.exists()) {
+			if(!removeFileHandler(destination, true)) {
 				MessageDialog.openError(null, "Error",
 					String.format("Could not update the old wpilib folder.%n"
 							+ "Please close any WPILib tools and restart Eclipse."));
 			}
-			
+
 				//removeFileHandler(installLocation, false);
 		}
 
-		installLocation.mkdirs();
+		destination.mkdirs();
 		final String osName = System.getProperty("os.name");
 		try {
-			if (osName.startsWith("Mac OS X") || osName.startsWith("Linux")) { // Unix-like OSes must preserve the executable bit; call unzip
+			// Unix-like OSes must preserve the executable bit; call unzip
+			if (osName.startsWith("Mac OS X") || osName.startsWith("Linux")) {
 				final File tmpFile = File.createTempFile(getFeatureName()+"-", ".zip");
 				try {
 					// Copy to temporary file
-					try (final InputStream zip = getInstallResourceStream();
+					try (final InputStream zip = sourceStream;
 							final FileOutputStream fout = new FileOutputStream(tmpFile)) {
 						copyStreams(zip, fout);
 					}
 
 					// Call 'unzip'
-					final String[] cmd = {"unzip" , "-o", tmpFile.getAbsolutePath(), "-d", installLocation.getAbsolutePath()};
-					WPILibCore.logInfo("unzip "+tmpFile.getAbsolutePath()+" -d "+installLocation.getAbsolutePath());
-					final Process unzipProcess = DebugPlugin.exec(cmd, installLocation);
+					final String[] cmd = {"unzip", "-q", "-o", tmpFile.getAbsolutePath(), "-d", destination.getAbsolutePath()};
+					WPILibCore.logInfo("unzip "+tmpFile.getAbsolutePath()+" -d "+destination.getAbsolutePath());
+					final Process unzipProcess = DebugPlugin.exec(cmd, destination);
 					try (final InputStream is = unzipProcess.getInputStream()) {
 						copyStreams(is, System.out); // Copy output to console
 					}
@@ -153,11 +190,11 @@ public abstract class AbstractInstaller {
 					tmpFile.delete();
 				}
 			} else {
-				ZipInputStream zip = new ZipInputStream(getInstallResourceStream());
+				ZipInputStream zip = new ZipInputStream(sourceStream);
 				ZipEntry entry = zip.getNextEntry();
 				while (entry != null) {
 					WPILibCore.logInfo("\tZipEntry " + entry + ": " + entry.getSize());
-					File f = new File(installLocation, entry.getName());
+					File f = new File(destination, entry.getName());
 					if (entry.isDirectory()) {
 						f.mkdirs();
 					} else {
@@ -175,6 +212,7 @@ public abstract class AbstractInstaller {
 			throw new InstallException("Install encountered a problem", ex);
 		}
 	}
+
 
 	private static void copyStreams(InputStream source, OutputStream destination) throws IOException {
 		byte[] buffer = new byte[1024];

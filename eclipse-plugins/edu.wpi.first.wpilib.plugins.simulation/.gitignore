@@ -1,0 +1,2 @@
+#ignore libraries. They will be copied from frc_gazebo_plugins/build/plugins
+*.so

@@ -51,6 +51,8 @@ double GetTime() {
   return (realTime);
 }
 
+//for compatibility with msvc12--see C2864
+const double Timer::kRolloverTime = (1ll << 32) / 1e6;
 /**
  * Create a new timer object.
  *

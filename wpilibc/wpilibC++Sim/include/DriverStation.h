@@ -5,7 +5,14 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-#include "simulation/msgs/msgs.h"
+#include "simulation/gz_msgs/msgs.h"
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <gazebo/transport/transport.hh>
 #include "SensorBase.h"
 #include "RobotState.h"
@@ -106,16 +113,16 @@ private:
 	static DriverStation *m_instance;
 	static uint8_t m_updateNumber;
 	///< TODO: Get rid of this and use the semaphore signaling
-	static constexpr float kUpdatePeriod = 0.02;
+	static const float kUpdatePeriod;
 
     void stateCallback(const msgs::ConstDriverStationPtr &msg);
-    void joystickCallback(const msgs::ConstJoystickPtr &msg, int i);
-    void joystickCallback0(const msgs::ConstJoystickPtr &msg);
-    void joystickCallback1(const msgs::ConstJoystickPtr &msg);
-    void joystickCallback2(const msgs::ConstJoystickPtr &msg);
-    void joystickCallback3(const msgs::ConstJoystickPtr &msg);
-    void joystickCallback4(const msgs::ConstJoystickPtr &msg);
-    void joystickCallback5(const msgs::ConstJoystickPtr &msg);
+    void joystickCallback(const msgs::ConstFRCJoystickPtr &msg, int i);
+    void joystickCallback0(const msgs::ConstFRCJoystickPtr &msg);
+    void joystickCallback1(const msgs::ConstFRCJoystickPtr &msg);
+    void joystickCallback2(const msgs::ConstFRCJoystickPtr &msg);
+    void joystickCallback3(const msgs::ConstFRCJoystickPtr &msg);
+    void joystickCallback4(const msgs::ConstFRCJoystickPtr &msg);
+    void joystickCallback5(const msgs::ConstFRCJoystickPtr &msg);
 
 	uint8_t m_digitalOut = 0;
 	std::condition_variable m_waitForDataCond;
@@ -131,5 +138,5 @@ private:
     transport::SubscriberPtr stateSub;
     transport::SubscriberPtr joysticksSub[6];
     msgs::DriverStationPtr state;
-    msgs::JoystickPtr joysticks[6];
+    msgs::FRCJoystickPtr joysticks[6];
 };

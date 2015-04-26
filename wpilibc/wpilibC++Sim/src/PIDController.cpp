@@ -392,6 +392,37 @@ float PIDController::GetError() const
 	return GetSetpoint() - pidInput;
 }
 
+/**
+ * Sets what type of input the PID controller will use
+ */
+void PIDController::SetPIDSourceType(PIDSourceType pidSource) {
+  m_pidInput->SetPIDSourceType(pidSource);
+}
+
+/**
+ * Returns the type of input the PID controller is using
+ * @return the PID controller input type
+ */
+PIDSourceType PIDController::GetPIDSourceType() const {
+  return m_pidInput->GetPIDSourceType();
+}
+
+/**
+ * Returns the current average of the error over the past few iterations.
+ * You can specify the number of iterations to average with SetToleranceBuffer()
+ * (defaults to 1). This is the same value that is used for OnTarget().
+ * @return the average error
+ */
+float PIDController::GetAvgError() const {
+  float avgError = 0;
+  {
+    std::unique_lock<priority_mutex> sync(m_mutex);
+    // Don't divide by zero.
+    if (m_buf.size()) avgError = m_bufTotal / m_buf.size();
+  }
+  return avgError;
+}
+
 /*
  * Set the percentage error which is considered tolerable for use with
  * OnTarget.
@@ -426,6 +457,25 @@ void PIDController::SetAbsoluteTolerance(float absTolerance)
 	std::unique_lock<priority_mutex> lock(m_mutex);
 	m_toleranceType = kAbsoluteTolerance;
 	m_tolerance = absTolerance;
+}
+
+/*
+ * Set the number of previous error samples to average for tolerancing. When
+ * determining whether a mechanism is on target, the user may want to use a
+ * rolling average of previous measurements instead of a precise position or
+ * velocity. This is useful for noisy sensors which return a few erroneous
+ * measurements when the mechanism is on target. However, the mechanism will
+ * not register as on target for at least the specified bufLength cycles.
+ * @param bufLength Number of previous cycles to average. Defaults to 1.
+ */
+void PIDController::SetToleranceBuffer(unsigned bufLength) {
+  m_bufLength = bufLength;
+
+  // Cut the buffer down to size if needed.
+  while (m_buf.size() > bufLength) {
+    m_bufTotal -= m_buf.front();
+    m_buf.pop();
+  }
 }
 
 /*

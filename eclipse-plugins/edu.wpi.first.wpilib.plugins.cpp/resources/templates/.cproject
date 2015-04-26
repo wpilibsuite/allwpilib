@@ -3,7 +3,13 @@
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
 		<cconfiguration id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751" moduleId="org.eclipse.cdt.core.settings" name="Debug">
-				<externalSettings/>
+				<externalSettings>
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/GearsBotCPPWin"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/GearsBotCPPWin/Debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="GearsBotCPPWin" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
@@ -12,7 +18,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="FRCUserProgram" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751" name="Debug" parent="cdt.managedbuild.config.gnu.cross.exe.debug">
+				<configuration artifactName="FRCUserProgram" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="Debug" id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751" name="Debug" parent="cdt.managedbuild.config.gnu.cross.exe.debug">
 					<folderInfo id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.exe.debug.379433867" name="Cross GCC" nonInternalBuilderId="cdt.managedbuild.builder.gnu.cross" superClass="cdt.managedbuild.toolchain.gnu.cross.exe.debug">
 							<option id="cdt.managedbuild.option.gnu.cross.prefix.541714056" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" value="arm-frc-linux-gnueabi-" valueType="string"/>
@@ -58,10 +64,11 @@
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 		</cconfiguration>
 		<cconfiguration id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751.2017904325">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751.2017904325" moduleId="org.eclipse.cdt.core.settings" name="Simulate">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751.2017904325" moduleId="org.eclipse.cdt.core.settings" name="Linux Simulate">
 				<externalSettings/>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
@@ -70,27 +77,31 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="FRCUserProgram" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751.2017904325" name="Simulate" parent="cdt.managedbuild.config.gnu.cross.exe.debug">
+				<configuration artifactName="FRCUserProgram" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="Linux Simulate" id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751.2017904325" name="Linux Simulate" parent="cdt.managedbuild.config.gnu.cross.exe.debug">
 					<folderInfo id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751.2017904325." name="/" resourcePath="">
 						<toolChain errorParsers="" id="cdt.managedbuild.toolchain.gnu.base.1184188597" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
-							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.1621111203" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.PE" id="cdt.managedbuild.target.gnu.platform.base.1621111203" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
 							<builder buildPath="${workspace_loc:/${ProjName}}/Simulate" errorParsers="org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.CWDLocator" id="cdt.managedbuild.target.gnu.builder.base.840272037" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.base.158466008" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.2105416021" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
+							<tool commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" id="cdt.managedbuild.tool.gnu.cpp.compiler.base.2105416021" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
 								<option id="gnu.cpp.compiler.option.include.paths.1645322059" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}/src&quot;"/>
 									<listOptionValue builtIn="false" value="${WPILIB}/cpp/current/sim/include"/>
 									<listOptionValue builtIn="false" value="/usr/include"/>
-									<listOptionValue builtIn="false" value="/usr/include/gazebo-3.2"/>
-									<listOptionValue builtIn="false" value="/usr/include/sdformat-2.2"/>
+									<listOptionValue builtIn="false" value="/usr/include/gazebo-5.0"/>
+									<listOptionValue builtIn="false" value="/usr/include/sdformat-2.3"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.optimization.level.1648211502" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.debugging.level.937474733" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1023092361" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols"/>
+								<option id="gnu.cpp.compiler.option.dialect.std.1098415592" superClass="gnu.cpp.compiler.option.dialect.std" value="gnu.cpp.compiler.dialect.default" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.dialect.flags.389754588" superClass="gnu.cpp.compiler.option.dialect.flags" value="-std=c++11" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1758810658" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.2039239712" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.2100353684" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.1900634657" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.dialect.std.1352883605" superClass="gnu.c.compiler.option.dialect.std" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1197133064" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.66697269" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
@@ -108,7 +119,7 @@
 								</option>
 								<option id="gnu.cpp.link.option.paths.1677933356" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="/usr/lib/x86_64-linux-gnu"/>
-									<listOptionValue builtIn="false" value="/usr/lib/x86_64-linux-gnu/gazebo-2.2/plugins"/>
+									<listOptionValue builtIn="false" value="/usr/lib/x86_64-linux-gnu/gazebo-5.0/plugins"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.152327207" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -124,26 +135,149 @@
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128" moduleId="org.eclipse.cdt.core.settings" name="Windows Simulate">
+				<externalSettings>
+					<externalSetting>
+						<entry flags="RESOLVED" kind="includePath" name="C:\Users\peter\wpilib\cpp\current\include"/>
+						<entry flags="RESOLVED" kind="includePath" name="C:\Users\peter\gz-ws\gazebo_sketchy\build\install\Debug\include"/>
+						<entry flags="RESOLVED" kind="includePath" name="C:\Users\peter\gz-ws\sdformat\build\install\Debug\include"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="includePath" name="/GearsBotCPPWin/src"/>
+					</externalSetting>
+				</externalSettings>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="exe" artifactName="FRCUserProgram" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="Windows Simulate" errorParsers="org.eclipse.cdt.core.VCErrorParser" id="cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128" name="Windows Simulate" parent="cdt.managedbuild.config.gnu.mingw.exe.debug" postannouncebuildStep="" postbuildStep="" preannouncebuildStep="setup environment variables" prebuildStep="">
+					<folderInfo id="cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128." name="/" resourcePath="">
+						<toolChain errorParsers="" id="cdt.managedbuild.toolchain.gnu.cross.base.592056279" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.base">
+							<option id="cdt.managedbuild.option.gnu.cross.prefix.773876502" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix"/>
+							<option id="cdt.managedbuild.option.gnu.cross.path.1970286339" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.1773189260" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
+							<builder buildPath="${workspace_loc:/GearsBotCPPWIN}/Windows Simulate" errorParsers="" id="org.eclipse.cdt.build.core.internal.builder.132963544" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="org.eclipse.cdt.build.core.internal.builder"/>
+							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="" id="cdt.managedbuild.tool.gnu.cross.c.compiler.1872033968" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
+								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.172352140" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.debugging.level.273333971" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.default" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.misc.other.1387357347" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c" valueType="string"/>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1953150292" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool command="&quot;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\amd64\cl&quot;" commandLinePattern="${COMMAND} ${FLAGS} /Fo${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} /wd4068 /EHsc" errorParsers="" id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.809153465" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler">
+								<option id="gnu.cpp.compiler.option.include.paths.599803694" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Users\peter\wpilib\cpp\current\sim\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Users\peter\allwpilib\wpilibc\wpilibC++Sim\msgs\build&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Program Files (x86)\Windows Kits\8.1\Include\um&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Program Files (x86)\Windows Kits\8.1\Include\winrt&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Program Files (x86)\Windows Kits\8.1\Include\shared&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Users\peter\gz-ws\gazebo\build\install\Debug\include\gazebo-6.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Users\peter\gz-ws\sdformat\build\install\Debug\include\sdformat-3.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Users\peter\gz-ws\ign-math\build\install\Debug\include\ignition\math2&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Users\peter\gz-ws\FreeImage-vc12-x64-release-debug\Source&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Users\peter\gz-ws\protobuf-2.6.0-win64-vc12\src&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Users\peter\gz-ws\dlfcn-win32-vc12-x64-release-debug\build\install\Debug\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Users\peter\gz-ws\tbb43_20141023oss\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Users\peter\gz-ws\sdformat\src\win\tinyxml&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Users\peter\gz-ws\pthread-w32\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Users\peter\gz-ws\boost_1_56_0&quot;"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.optimization.level.1265709272" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.debugging.level.1058836115" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.dialect.std.2006680120" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.default" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.warnings.allwarn.2144515316" name="All warnings (-Wall)" superClass="gnu.cpp.compiler.option.warnings.allwarn" useByScannerDiscovery="false" value="false" valueType="boolean"/>
+								<option id="gnu.cpp.compiler.option.other.other.1677876881" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="/c /MDd" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.other.pic.594318292" name="Position Independent Code (-fPIC)" superClass="gnu.cpp.compiler.option.other.pic" useByScannerDiscovery="false" value="false" valueType="boolean"/>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1865235685" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="_USE_MATH_DEFINES"/>
+									<listOptionValue builtIn="false" value="WIN32_LEAN_AND_MEAN"/>
+									<listOptionValue builtIn="false" value="NOMINMAX"/>
+									<listOptionValue builtIn="false" value="FRC_SIMULATOR"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.debugging.other.183827657" name="Other debugging flags" superClass="gnu.cpp.compiler.option.debugging.other" useByScannerDiscovery="false" value="/Z7" valueType="string"/>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1150869869" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1090661906" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
+							<tool command="&quot;C:\Program Files (x86)\Microsoft Visual Studio 12.0\vc\bin\link&quot;" commandLinePattern="${COMMAND} /ignore:4099 /LIBPATH:&quot;C:\Users\peter\gz-ws\FreeImage-vc12-x64-release-debug\x64\Debug\DLL&quot; /LIBPATH:&quot;C:\Program Files (x86)\Windows Kits\8.1\Lib\winv6.3\um\x64&quot; /LIBPATH:&quot;C:\Users\peter\gz-ws\boost_1_56_0\lib64-msvc-12.0&quot;  /LIBPATH:&quot;${WPILIB}\cpp\current\sim\lib&quot; /LIBPATH:&quot;C:\Users\peter\gz-ws\dlfcn-win32-vc12-x64-release-debug\build\install\Debug\lib&quot; /LIBPATH:&quot;C:\Users\peter\gz-ws\pthread-w32\lib\x64&quot; /LIBPATH:&quot;C:\Users\peter\gz-ws\ign-math\build\install\Debug\lib&quot; /LIBPATH:&quot;C:\Users\peter\gz-ws\libcurl-vc12-x64-release-debug-static-ipv6-sspi-winssl\Debug\lib&quot; /LIBPATH:&quot;C:\Users\peter\gz-ws\sdformat\build\install\Debug\lib&quot; /LIBPATH:&quot;C:\Users\peter\gz-ws\protobuf-2.6.0-win64-vc12\vsprojects\Debug&quot; /LIBPATH:&quot;C:\Users\peter\gz-ws\gazebo\build\install\Debug\lib&quot;  /LIBPATH:&quot;C:\Users\peter\allwpilib\wpilibc\wpilibC++Sim\build&quot; /LIBPATH:&quot;C:\Users\peter\gz-ws\tbb43_20141023oss\lib\intel64\vc12&quot;   /LIBPATH:&quot;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\amd64&quot; /LIBPATH:&quot;C:\Program Files (x86)\Windows Kits\8.1\Lib\winv6.3\um\x64&quot; ${FLAGS} /OUT:${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} /DEBUG WPILibSim.lib gazebo.lib gazebo_transport.lib gazebo_msgs.lib  gazebo_common.lib gazebo_util.lib gazebo_client.lib gazebo_math.lib libprotobuf.lib sdformat.lib dl.lib libcurl_a_debug.lib ignition-math2.lib pthreadVC2.lib gz_msgs.lib IPHlpApi.lib /NODEFAULTLIB:libboost_system-vc120-mt-gd-1_56.lib /NODEFAULTLIB:libboost_thread-vc120-mt-gd-1_56.lib FreeImaged.lib" errorParsers="" id="cdt.managedbuild.tool.gnu.cross.cpp.linker.680547965" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker">
+								<option id="gnu.cpp.link.option.libs.231732731" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs"/>
+								<option id="gnu.cpp.link.option.paths.122555745" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths"/>
+								<option id="gnu.cpp.link.option.shared.1816604740" name="Shared (-shared)" superClass="gnu.cpp.link.option.shared" value="false" valueType="boolean"/>
+								<option id="gnu.cpp.link.option.flags.761367792" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="" valueType="string"/>
+								<option id="gnu.cpp.link.option.other.715702568" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other"/>
+								<option id="gnu.cpp.link.option.userobjs.984105280" name="Other objects" superClass="gnu.cpp.link.option.userobjs"/>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1789925387" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+								<outputType id="cdt.managedbuild.tool.gnu.cpp.linker.output.so.1893130812" outputPrefix="" superClass="cdt.managedbuild.tool.gnu.cpp.linker.output.so"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cross.archiver.976699519" name="Cross GCC Archiver" superClass="cdt.managedbuild.tool.gnu.cross.archiver"/>
+							<tool command="as" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="" id="cdt.managedbuild.tool.gnu.cross.assembler.10555843" name="Cross GCC Assembler" superClass="cdt.managedbuild.tool.gnu.cross.assembler">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.219135409" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-		<project id="$project.cdt.managedbuild.target.gnu.cross.exe.13534228" name="Executable" projectType="cdt.managedbuild.target.gnu.cross.exe"/>
+		<project id="GearsBotCPP.cdt.managedbuild.target.gnu.cross.exe.13534228" name="Executable" projectType="cdt.managedbuild.target.gnu.cross.exe"/>
 	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Windows Simulate"/>
+		<configuration configurationName="Simulate">
+			<resource resourceType="PROJECT" workspacePath="/GearsBotCPP"/>
+		</configuration>
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/GearsBotCPP"/>
+		</configuration>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751;cdt.managedbuild.config.gnu.cross.exe.debug.1104744751.;cdt.managedbuild.tool.gnu.cross.c.compiler.1261239456;cdt.managedbuild.tool.gnu.c.compiler.input.1793678673">
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128;cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128.;cdt.managedbuild.tool.gnu.cross.cpp.compiler.809153465;cdt.managedbuild.tool.gnu.cpp.compiler.input.1150869869">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128;cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128.;org.eclipse.cdt.msvc.cl.dll.debug.544581750;org.eclipse.cdt.msvc.cl.inputType.1806965547">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.msw.build.clScannerInfo"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128;cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128.;org.eclipse.cdt.msvc.cl.c.dll.debug.748290057;org.eclipse.cdt.msvc.cl.inputType.c.690275938">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.msw.build.clScannerInfo"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128;cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128.;cdt.managedbuild.tool.gnu.cross.c.compiler.1872033968;cdt.managedbuild.tool.gnu.c.compiler.input.1953150292">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128;cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128.;org.eclipse.cdt.msvc.cl.dll.debug.880390044;org.eclipse.cdt.msvc.cl.inputType.393977355">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.msw.build.clScannerInfo"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128;cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1297766759;cdt.managedbuild.tool.gnu.cpp.compiler.input.498113544">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128;cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128.;cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.785693711;cdt.managedbuild.tool.gnu.c.compiler.input.778242069">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128;cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.exe.debug.1647706237;cdt.managedbuild.tool.gnu.cpp.compiler.input.1338339147">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751;cdt.managedbuild.config.gnu.cross.exe.debug.1104744751.;cdt.managedbuild.tool.gnu.cross.cpp.compiler.1505235107;cdt.managedbuild.tool.gnu.cpp.compiler.input.1033680971">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-	</storageModule>
-	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
-	<storageModule moduleId="refreshScope" versionNumber="2">
-		<configuration configurationName="Debug">
-			<resource resourceType="PROJECT" workspacePath="/$project"/>
-		</configuration>
-		<configuration configurationName="Simulate">
-			<resource resourceType="PROJECT" workspacePath="/$project"/>
-		</configuration>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751;cdt.managedbuild.config.gnu.cross.exe.debug.1104744751.;cdt.managedbuild.tool.gnu.cross.c.compiler.1261239456;cdt.managedbuild.tool.gnu.c.compiler.input.1793678673">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128;cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128.;org.eclipse.cdt.msvc.cl.c.dll.debug.1658947706;org.eclipse.cdt.msvc.cl.inputType.c.2076377067">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.msw.build.clScannerInfo"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128;cdt.managedbuild.config.gnu.mingw.exe.debug.912379410.387599128.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.510224028;cdt.managedbuild.tool.gnu.c.compiler.input.323654435">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
 	</storageModule>
 </cproject>

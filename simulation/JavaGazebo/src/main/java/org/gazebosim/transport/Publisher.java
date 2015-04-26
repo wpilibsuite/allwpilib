@@ -65,6 +65,10 @@ public class Publisher<T extends Message> implements PublisherRecord {
 	}
 
 	@Override
+	/**
+	 * This function is called when another topic requests a subscription to a topic I am publishing
+	 * Called in Node.java in the handle() function
+	 */
 	public synchronized void connect(Connection conn) {
 		LOG.fine("Handling subscriber connection for topic: "+topic);
 		if (latching && lastMsg != null) {

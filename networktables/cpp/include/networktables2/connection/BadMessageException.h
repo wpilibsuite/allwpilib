@@ -8,6 +8,7 @@
 #ifndef BADMESSAGEEXCEPTION_H_
 #define BADMESSAGEEXCEPTION_H_
 
+#include "NTBase.h"
 #include <exception>
 #include <string>
 

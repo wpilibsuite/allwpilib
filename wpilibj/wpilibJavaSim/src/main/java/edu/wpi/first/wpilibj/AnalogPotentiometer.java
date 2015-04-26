@@ -54,7 +54,7 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
     	m_init_analog_input = true;
         initPot(input, scale, offset);
     }
-    
+
     /**
      * AnalogPotentiometer constructor.
      *
@@ -73,7 +73,7 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
     	m_init_analog_input = false;
     	initPot(input, scale, offset);
     }
-    
+
     /**
      * AnalogPotentiometer constructor.
      *
@@ -90,7 +90,7 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
     public AnalogPotentiometer(final int channel, double scale) {
         this(channel, scale, 0);
     }
-    
+
     /**
      * AnalogPotentiometer constructor.
      *
@@ -116,7 +116,7 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
     public AnalogPotentiometer(final int channel) {
     	this(channel, 1, 0);
     }
-    
+
     /**
      * AnalogPotentiometer constructor.
      *
@@ -190,7 +190,7 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
     public ITable getTable(){
         return m_table;
     }
-    
+
     public void free(){
     	if(m_init_analog_input){
     		m_analog_input.free();

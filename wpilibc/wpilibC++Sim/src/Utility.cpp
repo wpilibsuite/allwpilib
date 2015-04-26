@@ -1,4 +1,4 @@
-/*----------------------------------------------------------------------------*/
+
 /* Copyright (c) FIRST 2008. All Rights Reserved.							  */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
@@ -16,8 +16,10 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <execinfo.h>
-#include <cxxabi.h>
+#if defined(UNIX)
+	#include <execinfo.h>
+	#include <cxxabi.h>
+#endif
 
 static bool stackTraceEnabled = false;
 static bool suspendOnAssertEnabled = false;
@@ -75,7 +77,7 @@ bool wpi_assert_impl(bool conditionValue, const std::string &conditionText,
     }
 
     // Print to console and send to remote dashboard
-    std::cout << "\n\n>>>>" << error;
+    std::cout << "\n\n>>>>" << error.str();
 
     wpi_handleTracing();
   }
@@ -109,7 +111,7 @@ void wpi_assertEqual_common_impl(int valueA, int valueB,
   }
 
   // Print to console and send to remote dashboard
-  std::cout << "\n\n>>>>" << error;
+  std::cout << "\n\n>>>>" << error.str();
 
   wpi_handleTracing();
 }
@@ -164,6 +166,8 @@ uint32_t GetFPGATime()
 	return wpilib::internal::simTime * 1e6;
 }
 
+//TODO: implement symbol demangling and backtrace on windows
+#if defined(UNIX)
 
 /**
  * Demangle a C++ symbol, used for printing stack traces.
@@ -189,6 +193,7 @@ static std::string demangle(char const *mangledSymbol)
 			return buffer;
 		}
 	}
+
 
 	// If everything else failed, just return the mangled symbol
 	return mangledSymbol;
@@ -218,3 +223,13 @@ std::string GetStackTrace(uint32_t offset)
 	return trace.str();
 }
 
+#else
+static std::string demangle(char const *mangledSymbol)
+{
+	return "no demangling on windows";
+}
+std::string GetStackTrace(uint32_t offset)
+{
+	return "no stack trace on windows";
+}
+#endif

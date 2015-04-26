@@ -6,6 +6,9 @@
    <feature url="features/edu.wpi.first.wpilib.plugins.java.feature_0.1.0.qualifier.jar" id="edu.wpi.first.wpilib.plugins.java.feature" version="0.1.0.qualifier">
       <category name="edu.wpi.first.wpilib.plugins"/>
    </feature>
+   <feature url="features/edu.wpi.first.wpilib.plugins.simulation.feature_0.1.0.qualifier.jar" id="edu.wpi.first.wpilib.plugins.simulation.feature" version="0.1.0.qualifier">
+      <category name="edu.wpi.first.wpilib.plugins"/>
+   </feature>
    <category-def name="edu.wpi.first.wpilib.plugins" label="WPILib Robot Development">
       <description>
          Core WPILib Robot Development Tools.

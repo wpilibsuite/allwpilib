@@ -5,6 +5,7 @@ import gazebo.msgs.GzTime.Time;
 
 import java.io.IOException;
 import java.net.ConnectException;
+import java.net.InetAddress;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
@@ -64,8 +65,16 @@ public class Connection {
 
 	public void serve(final ServerCallback cb) throws IOException {
 		ssocket = new ServerSocket(0);
-		host = ssocket.getInetAddress().getHostAddress(); // TODO: get globally addressable name.
+		host = ssocket.getInetAddress().getHostAddress();
 		port = ssocket.getLocalPort();
+
+		//enable user to change master uri via environment variable GAZEBO_MASTER_URI
+		//TODO : allow for automatic guesing of IP. Look at Connection.cc in gazebo for C++ example
+		String user_defined_ip = System.getenv("GAZEBO_IP");
+        if (user_defined_ip != null) {
+          host = InetAddress.getByName(user_defined_ip).getHostAddress();;
+          LOG.warning("Using custom host: "+host);
+        }
 
 		new Thread("Gazebo Server Thread") {
 			@Override

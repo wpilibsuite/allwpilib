@@ -174,17 +174,15 @@
   <target name="simulate" depends="jar-for-simulation">
     <parallel>
       <sequential>
-	    <echo>[simulate] Running Gazebo.</echo>
-	    <exec executable="frcsim">
-	      <arg value="${simulation.world.file}"/>
-	    </exec>
+  	    <condition property="frcsim.executable" value="frcsim.bat" else="frcsim">
+          <os family="windows" />
+        </condition>
+        <!-- TODO: launch gazebo once? -->
+        <echo>[simulate] You may now run Gazebo</echo>
       </sequential>
       <sequential>
         <sleep seconds="5"/>
-	    <echo>[simulate] Running DriverStation.</echo>
-	    <java jar="${wpilib.sim.tools}/SimDS.jar" fork="true">
-          <jvmarg value="-Djava.library.path=${wpilib.sim.lib}" />
-        </java>
+	    <echo>[debug-simulate] You may now run your DriverStation.</echo>
       </sequential>
       <sequential>
         <sleep seconds="5"/>
@@ -206,10 +204,7 @@
       </sequential>
       <sequential>
         <sleep seconds="5"/>
-	    <echo>[debug-simulate] Running DriverStation.</echo>
-	    <java jar="${wpilib.sim.tools}/SimDS.jar" fork="true">
-          <jvmarg value="-Djava.library.path=${wpilib.sim.lib}" />
-        </java>
+	    <echo>[debug-simulate] you may now run your DriverStation.</echo>
       </sequential>
       <sequential>
         <sleep seconds="5"/>

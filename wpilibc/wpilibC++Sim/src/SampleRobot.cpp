@@ -7,11 +7,21 @@
 #include "SampleRobot.h"
 
 #include <stdio.h>
-#include <unistd.h>
 #include "Timer.h"
 #include "SmartDashboard/SmartDashboard.h"
 #include "LiveWindow/LiveWindow.h"
 #include "networktables/NetworkTable.h"
+
+#if defined(_UNIX)
+	#include <unistd.h>
+#elif defined(_WIN32)
+  #include <windows.h>
+  void sleep(unsigned milliseconds)
+	    {
+	        Sleep(milliseconds);
+	    }
+#endif
+
 
 SampleRobot::SampleRobot()
 	: m_robotMainOverridden (true)

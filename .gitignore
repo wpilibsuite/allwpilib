@@ -179,8 +179,11 @@ __pycache__
 # PDT-specific
 .buildpath
 
-# sbteclipse plugin 
+# sbteclipse plugin
 .target
 
 # TeXlipse plugin
 .texlipse
+
+#catkin stuff
+package.xml

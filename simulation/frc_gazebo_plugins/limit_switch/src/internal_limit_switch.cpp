@@ -1,12 +1,10 @@
 #include "internal_limit_switch.h"
 
-#include <gazebo/physics/physics.hh>
-
 InternalLimitSwitch::InternalLimitSwitch(physics::ModelPtr model, sdf::ElementPtr sdf) {
   joint = model->GetJoint(sdf->Get<std::string>("joint"));
   min = sdf->Get<double>("min");
   max = sdf->Get<double>("max");
-  
+
   if (sdf->HasElement("units")) {
     radians = sdf->Get<std::string>("units") != "degrees";
   } else {
@@ -18,7 +16,7 @@ InternalLimitSwitch::InternalLimitSwitch(physics::ModelPtr model, sdf::ElementPt
 }
 
 InternalLimitSwitch::~InternalLimitSwitch() {}
-  
+
 bool InternalLimitSwitch::Get() {
   double value;
   joint->GetAngle(0).Normalize();

@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: WPILib_Robot_Simulation
+Bundle-SymbolicName: edu.wpi.first.wpilib.plugins.simulation;singleton:=true
+Bundle-Version: 0.1.0.qualifier
+Bundle-Activator: edu.wpi.first.wpilib.plugins.simulation.WPILibSimulationPlugin
+Require-Bundle: org.eclipse.core.runtime,
+ edu.wpi.first.wpilib.plugins.core;bundle-version="0.1.0",
+ org.eclipse.jface;bundle-version="3.10.2",
+ org.eclipse.ui;bundle-version="3.106.1"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: Worcester Polytechnic Institute

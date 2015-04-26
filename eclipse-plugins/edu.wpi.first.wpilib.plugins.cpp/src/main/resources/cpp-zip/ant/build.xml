@@ -104,17 +104,15 @@
   <target name="simulate">
     <parallel>
       <sequential>
-	    <echo>[simulate] Running Gazebo.</echo>
-	    <exec executable="frcsim">
-	      <arg value="${simulation.world.file}"/>
-	    </exec>
+        <!-- windows uses a batch file to run frcsim, linux uses a shell script -->
+	      <condition property="frcsim.executable" value="frcsim.bat" else="frcsim">
+          <os family="windows" />
+        </condition>
+        <!-- TODO: launch gazebo once? -->
+        <echo>[simulate] You may now run Gazebo</echo>
       </sequential>
       <sequential>
-        <sleep seconds="5"/>
-	    <echo>[simulate] Running DriverStation.</echo>
-	    <java jar="${sim.tools}/SimDS.jar" fork="true">
-          <jvmarg value="-Djava.library.path=${sim.lib}" />
-        </java>
+	      <echo>[simulate] You can now run your DriverStation!</echo>
       </sequential>
       <sequential>
         <sleep seconds="5"/>

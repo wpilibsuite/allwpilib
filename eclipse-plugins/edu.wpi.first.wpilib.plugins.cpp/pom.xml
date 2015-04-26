@@ -25,6 +25,7 @@
             </resource>
         </resources>
         <plugins>
+            <!--copy the ant resources from src/main/resrouces/cpp-zip to target/resources/cpp-zip to cpp-zip -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.6</version>

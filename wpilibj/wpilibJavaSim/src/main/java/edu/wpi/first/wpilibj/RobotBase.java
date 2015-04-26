@@ -162,7 +162,7 @@ public abstract class RobotBase {
             System.exit(1);
             return;
         }
-        
+
         // Set some implementations so that the static methods work properly
         Timer.SetImplementation(new SimTimer());
         RobotState.SetImplementation(DriverStation.getInstance());
@@ -173,10 +173,15 @@ public abstract class RobotBase {
 		try {
 			resources = RobotBase.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
 		} catch (IOException e) {e.printStackTrace();}
+
+        System.out.println("resources = |"+ resources +"|");
+
 		while (resources != null && resources.hasMoreElements()) {
 		    try {
 		    	Manifest manifest = new Manifest(resources.nextElement().openStream());
-		    	robotName = manifest.getMainAttributes().getValue("Robot-Class");
+          if (manifest.getMainAttributes().getValue("Robot-Class") != null){
+            robotName = manifest.getMainAttributes().getValue("Robot-Class");
+          }
 		    } catch (IOException e) {e.printStackTrace();}
 		}
 

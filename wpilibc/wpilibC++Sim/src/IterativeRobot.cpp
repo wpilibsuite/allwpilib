@@ -3,16 +3,19 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
-
 #include "IterativeRobot.h"
 
 #include "DriverStation.h"
 #include "SmartDashboard/SmartDashboard.h"
 #include "LiveWindow/LiveWindow.h"
 #include "networktables/NetworkTable.h"
-#include <unistd.h>
 
-constexpr double IterativeRobot::kDefaultPeriod;
+//not sure what this is used for yet.
+#ifdef _UNIX
+	#include <unistd.h>
+#endif
+
+const double IterativeRobot::kDefaultPeriod = 0;
 
 /**
  * Set the period for the periodic functions.

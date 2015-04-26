@@ -11,6 +11,21 @@
 #include "simulation/simTime.h"
 #include "Utility.h"
 
+
+// Internal stuff
+#include "simulation/SimFloatInput.h"
+#include "simulation/MainNode.h"
+namespace wpilib { namespace internal {
+    double simTime = 0;
+    std::condition_variable time_wait;
+    std::mutex time_wait_mutex;
+
+    void time_callback(const msgs::ConstFloat64Ptr &msg) {
+        simTime = msg->data();
+        time_wait.notify_all();
+    }
+}}
+
 /**
  * Pause the task for a specified time.
  *
@@ -26,8 +41,8 @@ void Wait(double seconds)
 
     double start = wpilib::internal::simTime;
 
+	std::unique_lock<std::mutex> lock(wpilib::internal::time_wait_mutex);
     while ((wpilib::internal::simTime - start) < seconds) {
-      std::unique_lock<std::mutex> lock(wpilib::internal::time_wait_mutex);
       wpilib::internal::time_wait.wait(lock);
     }
 }
@@ -51,6 +66,8 @@ double GetTime()
     return Timer::GetFPGATimestamp(); // The epoch starts when Gazebo starts
 }
 
+//for compatibility with msvc12--see C2864
+const double Timer::kRolloverTime = (1ll << 32) / 1e6;
 /**
  * Create a new timer object.
  *
@@ -189,17 +206,3 @@ extern "C"
 	uint32_t niTimestamp32(void);
 	uint64_t niTimestamp64(void);
 }
-
-// Internal stuff
-#include "simulation/SimFloatInput.h"
-#include "simulation/MainNode.h"
-namespace wpilib { namespace internal {
-    double simTime = 0;
-
-    void time_callback(const msgs::ConstFloat64Ptr &msg) {
-        simTime = msg->data();
-        time_wait.notify_all();
-    }
-
-    transport::SubscriberPtr time_pub = MainNode::Subscribe("~/time", &time_callback);
-}}

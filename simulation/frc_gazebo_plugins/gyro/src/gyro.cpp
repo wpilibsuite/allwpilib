@@ -1,7 +1,5 @@
 #include "gyro.h"
 
-#include <gazebo/physics/physics.hh>
-#include <gazebo/transport/transport.hh>
 
 GZ_REGISTER_MODEL_PLUGIN(Gyro)
 
@@ -24,14 +22,14 @@ void Gyro::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   if (axisString == "roll") axis = Roll;
   if (axisString == "pitch") axis = Pitch;
   if (axisString == "yaw") axis = Yaw;
-  
+
   if (sdf->HasElement("units")) {
     radians = sdf->Get<std::string>("units") != "degrees";
   } else {
     radians = true;
   }
   zero = GetAngle();
-  
+
   gzmsg << "Initializing gyro: " << topic << " link=" << link->GetName()
         << " axis=" << axis << " radians=" << radians << std::endl;
 

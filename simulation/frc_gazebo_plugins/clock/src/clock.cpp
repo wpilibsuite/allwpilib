@@ -1,10 +1,5 @@
 #include "clock.h"
 
-#include <gazebo/physics/physics.hh>
-#include <gazebo/transport/transport.hh>
-
-#include "msgs/msgs.h"
-
 GZ_REGISTER_MODEL_PLUGIN(Clock)
 
 Clock::Clock() {}

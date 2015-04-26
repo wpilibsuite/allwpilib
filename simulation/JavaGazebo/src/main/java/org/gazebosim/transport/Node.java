@@ -52,10 +52,30 @@ public class Node implements Runnable, ServerCallback {
 	}
 
 	public void waitForConnection() throws IOException, InterruptedException {
+		//enable user to change master uri via environment variable GAZEBO_MASTER_URI
+		String user_defined_uri = System.getenv("GAZEBO_MASTER_URI");
+		String gazebo_master_uri = "localhost";
+		int port = 11345;
+		if (user_defined_uri != null) {
+			String[] parts = user_defined_uri.split(":");
+			if (parts.length != 2){
+				LOG.severe("invalid GAZEBO_MASTER_URI " + user_defined_uri+ ". URI must be of the form HOSTNAME:PORT");
+				LOG.warning("using default GAZEBO_MASTER_URI=localhost:11345");
+			}
+			else {
+				gazebo_master_uri = parts[0];
+				port = Integer.parseInt(parts[1]);
+			}
+		}
+
 		server.serve(this);
-		master.connectAndWait("localhost", 11345);
+
+		LOG.info("GAZEBO_MASTER_URI is host=" + gazebo_master_uri + " port="+port);
+
+		master.connectAndWait(gazebo_master_uri, port);
+
 		initializeConnection();
-		
+
 		new Thread(this).start();
 		LOG.info("Serving on: "+server.host+":"+server.port);
 	}
@@ -66,9 +86,9 @@ public class Node implements Runnable, ServerCallback {
 		String type = defaultMessage.getDescriptorForType().getFullName();
 		Publisher<T> pub = new Publisher<T>(topic, type, server.host, server.port);
 		publishers.put(topic, pub);
-		
+
 		Publish req = Publish.newBuilder().setTopic(topic).setMsgType(type)
-					  	.setHost(server.host).setPort(server.port).build();
+						.setHost(server.host).setPort(server.port).build();
 		try {
 			master.writePacket("advertise", req);
 		} catch (IOException e) {
@@ -76,7 +96,7 @@ public class Node implements Runnable, ServerCallback {
 		}
 		return pub;
 	}
-	
+
 	public synchronized <T extends Message> Subscriber<T>
 			subscribe(String topic, T defaultMessage, SubscriberCallback<T> cb) {
 		topic = fixTopic(topic);
@@ -84,7 +104,7 @@ public class Node implements Runnable, ServerCallback {
 		if (subscriptions.containsKey(topic)) {
 			throw new RuntimeException("Multiple subscribers for: "+topic);
 		}
-		
+
 		String type = defaultMessage.getDescriptorForType().getFullName();
 		Subscribe req = Subscribe.newBuilder().setTopic(topic).setMsgType(type)
 							.setHost(server.host).setPort(server.port).setLatching(false).build();
@@ -93,7 +113,7 @@ public class Node implements Runnable, ServerCallback {
 		} catch (IOException e) {
 			e.printStackTrace(); // FIXME: Shouldn't happen, should probably complain louder
 		}
-		
+
 		Subscriber<T> s = new Subscriber<>(topic, type, cb, defaultMessage,
 				server.host, server.port);
 		subscriptions.put(topic, s);
@@ -122,7 +142,7 @@ public class Node implements Runnable, ServerCallback {
 			e.printStackTrace(); // FIXME: Log
 		}
 	}
-	
+
 	private synchronized void initializeConnection() throws IOException {
 		Packet initData = master.read();
 		if (!initData.getType().equals("version_init")) {
@@ -135,12 +155,12 @@ public class Node implements Runnable, ServerCallback {
 		String_V ns = String_V.parseFrom(namespaceData.getSerializedData());
 		namespaces.addAll(ns.getDataList());
 		LOG.info(namespaces.toString());
-		
-		Packet publisherData = master.read(); 
+
+		Packet publisherData = master.read();
 		if (publisherData.getType().equals("publishers_init")) {
 			Publishers pubs = Publishers.parseFrom(publisherData.getSerializedData());
 			for (Publish pub : pubs.getPublisherList()) {
- 				PublisherRecord record = new RemotePublisherRecord(pub);
+				PublisherRecord record = new RemotePublisherRecord(pub);
 				publishers.put(record.getTopic(), record);
 			}
 			LOG.info(publishers.toString());
@@ -148,7 +168,7 @@ public class Node implements Runnable, ServerCallback {
 			LOG.severe("No publisher data received.");
 		}
 	}
-	
+
 	public synchronized void processPacket(Packet packet) throws InvalidProtocolBufferException {
 		if (packet.getType().equals("publisher_add")) {
 			PublisherRecord pub = new RemotePublisherRecord(Publish.parseFrom(packet.getSerializedData()));
@@ -157,7 +177,7 @@ public class Node implements Runnable, ServerCallback {
 				LOG.info("ACK "+pub.getTopic());
 				return; // This is us
 			}
-			
+
 			LOG.info("New Publisher: "+pub.getTopic());
 			LOG.fine("Publisher: "+Publish.parseFrom(packet.getSerializedData()));
 			publishers.put(pub.getTopic(), pub);
@@ -169,7 +189,7 @@ public class Node implements Runnable, ServerCallback {
 				LOG.info("Ignoring subscription request on (local) "+pub.getTopic());
 				return; // This is us
 			}
-			
+
 			LOG.info("PUBSUB found for "+pub.getTopic());
 			LOG.fine("Publisher: "+Publish.parseFrom(packet.getSerializedData()));
 			subscriptions.get(pub.getTopic()).connect(pub);
@@ -185,6 +205,9 @@ public class Node implements Runnable, ServerCallback {
 	}
 
 	@Override
+	/**
+	 * This is called when another node requests subscription to a topic we are publishing
+	 */
 	public void handle(Connection conn) throws IOException {
 		LOG.fine("Handling new connection");
 		Packet msg = conn.read();
@@ -192,7 +215,7 @@ public class Node implements Runnable, ServerCallback {
 			LOG.warning("Read null message.");
 			return;
 		}
-			
+
 		if (msg.getType().equals("sub")) {
 			Subscribe sub = Subscribe.parseFrom(msg.getSerializedData());
 			if (!publishers.containsKey(sub.getTopic())) {
@@ -205,11 +228,12 @@ public class Node implements Runnable, ServerCallback {
 			PublisherRecord pub = publishers.get(sub.getTopic());
 			if (!pub.getMsgType().equals(sub.getMsgType())) {
 				LOG.severe(String.format("Message type mismatch requested=%d publishing=%s\n",
-						   				 pub.getMsgType(), sub.getMsgType()));
+										 pub.getMsgType(), sub.getMsgType()));
 				return;
 			}
 
 			LOG.info("CONN " + sub.getTopic());
+			//Tell the publisher that it has recieved a connection from a subscriver
 			pub.connect(conn);
 		} else {
 			LOG.warning("Unknown message type: " + msg.getType());

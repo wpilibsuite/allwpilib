@@ -1,3 +1,9 @@
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "pneumatic_piston.h"
 
 #include <gazebo/physics/physics.hh>
@@ -28,7 +34,7 @@ void PneumaticPiston::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
     forward_force = -forward_force;
     reverse_force = -reverse_force;
   }
-  
+
   gzmsg << "Initializing piston: " << topic << " joint=" << joint->GetName()
         << " forward_force=" << forward_force
         << " reverse_force=" << reverse_force<< std::endl;

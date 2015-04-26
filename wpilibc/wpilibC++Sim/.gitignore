@@ -1,0 +1,3 @@
+#don't track the generate protobuf files
+include/simulation/msgs/
+src/simulation/msgs

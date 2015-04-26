@@ -1,10 +1,15 @@
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "potentiometer.h"
 
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/transport.hh>
 #include <boost/algorithm/string.hpp>
 
-#include "msgs/msgs.h"
 
 GZ_REGISTER_MODEL_PLUGIN(Potentiometer)
 
@@ -22,7 +27,7 @@ void Potentiometer::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   } else {
     topic = "~/"+sdf->GetAttribute("name")->GetAsString();
   }
-  
+
   if (sdf->HasElement("units")) {
     radians = sdf->Get<std::string>("units") != "degrees";
   } else {

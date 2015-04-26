@@ -8,10 +8,9 @@
 #ifndef ITABLELISTENER_H_
 #define ITABLELISTENER_H_
 
-
 class ITableListener;
 
-
+#include "NTBase.h"
 #include "tables/ITable.h"
 
 #include <memory>
@@ -42,7 +41,11 @@ class ITableListener {
 
  private:
   template <class T>
-  struct[[deprecated]] NullDeleter {
+  struct
+#if !defined(_MSC_VER)
+  [[deprecated]]
+#endif
+  NullDeleter {
     void operator()(T*) const noexcept {};
   };
 };

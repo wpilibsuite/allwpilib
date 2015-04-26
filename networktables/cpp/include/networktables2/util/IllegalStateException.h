@@ -8,6 +8,7 @@
 #ifndef ILLEGALSTATEEXCEPTION_H_
 #define ILLEGALSTATEEXCEPTION_H_
 
+#include "NTBase.h"
 #include <exception>
 #include <string>
 

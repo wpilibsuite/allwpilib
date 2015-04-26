@@ -1,8 +1,5 @@
 #include "dc_motor.h"
 
-#include <gazebo/physics/physics.hh>
-#include <gazebo/transport/transport.hh>
-
 GZ_REGISTER_MODEL_PLUGIN(DCMotor)
 
 DCMotor::DCMotor() {}
@@ -20,13 +17,13 @@ void DCMotor::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   } else {
     topic = "~/"+sdf->GetAttribute("name")->GetAsString();
   }
-  
+
   if (sdf->HasElement("multiplier")) {
     multiplier = sdf->Get<double>("multiplier");
   } else {
     multiplier = 1;
   }
-  
+
   gzmsg << "Initializing motor: " << topic << " joint=" << joint->GetName()
         << " multiplier=" << multiplier << std::endl;
 
