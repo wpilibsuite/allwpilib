@@ -28,7 +28,7 @@ void TalonSRX::InitTalonSRX() {
 	SetRaw(m_centerPwm);
 	SetZeroLatch();
 
-	HALReport(HALUsageReporting::kResourceType_Talon, GetChannel());
+	HALReport(HALUsageReporting::kResourceType_TalonSRX, GetChannel());
 	LiveWindow::GetInstance()->AddActuator("TalonSRX", GetChannel(), this);
 }
 

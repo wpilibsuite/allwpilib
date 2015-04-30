@@ -157,6 +157,14 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 		public static final int kResourceType_HiTechnicCompass = 47;
 		/** <i>native declaration : src\main\include\NetworkCommunication\UsageReporting.h:58</i> */
 		public static final int kResourceType_SRF08 = 48;
+		/** <i>native declaration : src\main\include\NetworkCommunication\UsageReporting.h:59</i> */
+		public static final int kResourceType_AnalogOutput = 49;
+		/** <i>native declaration : src\main\include\NetworkCommunication\UsageReporting.h:60</i> */
+		public static final int kResourceType_VictorSP = 50;
+		/** <i>native declaration : src\main\include\NetworkCommunication\UsageReporting.h:61</i> */
+		public static final int kResourceType_TalonSRX = 51;
+		/** <i>native declaration : src\main\include\NetworkCommunication\UsageReporting.h:62</i> */
+		public static final int kResourceType_CANTalonSRX = 52;
 	};
 	/**
 	 * <i>native declaration : src\main\include\NetworkCommunication\UsageReporting.h</i><br>

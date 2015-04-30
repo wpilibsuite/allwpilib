@@ -95,6 +95,10 @@ namespace HALUsageReporting
 		kResourceType_HiTechnicAccel,
 		kResourceType_HiTechnicCompass,
 		kResourceType_SRF08,
+		kResourceType_AnalogOutput,
+        kResourceType_VictorSP,
+        kResourceType_TalonSRX,
+        kResourceType_CANTalonSRX,
 	};
 
 	enum tInstances

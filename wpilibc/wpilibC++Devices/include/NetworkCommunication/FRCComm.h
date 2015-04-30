@@ -33,6 +33,7 @@
 #endif
 
 #define ERR_FRCSystem_NetCommNotResponding -44049
+#define ERR_FRCSystem_NoDSConnection -44018
 
 enum AllianceStationID_t {
 	kAllianceStationID_red1,
@@ -41,6 +42,13 @@ enum AllianceStationID_t {
 	kAllianceStationID_blue1,
 	kAllianceStationID_blue2,
 	kAllianceStationID_blue3,
+};
+
+enum MatchType_t {
+	kMatchType_none,
+	kMatchType_practice,
+	kMatchType_qualification,
+	kMatchType_elimination,
 };
 
 struct ControlWord_t {
@@ -91,7 +99,7 @@ extern "C" {
 # if defined (__vxworks)
 	void EXPORT_FUNC setNewDataSem(SEM_ID);
 # else
-	void EXPORT_FUNC setNewDataSem(pthread_mutex_t *);
+	void EXPORT_FUNC setNewDataSem(pthread_cond_t *);
 # endif
 #endif
 
