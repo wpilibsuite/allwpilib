@@ -10,7 +10,6 @@
 # so that test results are not commited to the repo
 DEFAULT_LOCAL_TEST_RESULTS_DIR=../test-reports
 
-
 ROBOT_ADDRESS=admin@roboRIO-190.local
 DEFAULT_LOCAL_RUN_TEST_SCRIPT="run-tests-on-robot.sh"
 
@@ -21,7 +20,12 @@ DEFAULT_DESTINATION_TEST_RESULTS_DIR=${DEFAULT_DESTINATION_DIR}/testResults
 # C++ test variables
 DEFAULT_CPP_TEST_NAME=FRCUserProgram
 DEFAULT_CPP_TEST_ARGS="--gtest_color=yes"
-DEFAULT_LOCAL_CPP_TEST_FILE=../cmake/target/cmake/wpilibc/wpilibC++IntegrationTests/FRCUserProgram
+if [ "$GRADLE" ]; then
+    DEFAULT_LOCAL_CPP_TEST_FILE=../wpilibc/build/binaries/fRCUserProgramExecutable/FRCUserProgram
+else
+    DEFAULT_LOCAL_CPP_TEST_FILE=../cmake/target/cmake/wpilibc/wpilibC++IntegrationTests/FRCUserProgram
+fi
+
 CPP_REPORT=cppreport.xml
 DEFAULT_LOCAL_CPP_TEST_RESULT=${DEFAULT_LOCAL_TEST_RESULTS_DIR}/${CPP_REPORT}
 DEFAULT_DESTINATION_CPP_TEST_RESULTS=${DEFAULT_DESTINATION_TEST_RESULTS_DIR}/${CPP_REPORT}
@@ -29,7 +33,13 @@ DEFAULT_DESTINATION_CPP_TEST_RESULTS=${DEFAULT_DESTINATION_TEST_RESULTS_DIR}/${C
 # Java test variables
 DEFAULT_JAVA_TEST_NAME=FRCUserProgram.jar
 DEFAULT_JAVA_TEST_ARGS=""
-DEFAULT_LOCAL_JAVA_TEST_FILE=../wpilibj/wpilibJavaIntegrationTests/target/wpilibJavaIntegrationTests-0.1.0-SNAPSHOT.jar
+
+if [ "$GRADLE" ]; then
+    DEFAULT_LOCAL_JAVA_TEST_FILE=../wpilibj/build/libs/wpilibJavaIntegrationTests-0.1.0-SNAPSHOT.jar
+else
+    DEFAULT_LOCAL_JAVA_TEST_FILE=../wpilibj/wpilibJavaIntegrationTests/target/wpilibJavaIntegrationTests-0.1.0-SNAPSHOT.jar
+fi
+
 JAVA_REPORT=javareport.xml
 DEFAULT_LOCAL_JAVA_TEST_RESULT=${DEFAULT_LOCAL_TEST_RESULTS_DIR}/${JAVA_REPORT}
 DEFAULT_DESTINATION_JAVA_TEST_RESULTS=${DEFAULT_DESTINATION_TEST_RESULTS_DIR}/AntReports/TEST-edu.wpi.first.wpilibj.test.TestSuite.xml

@@ -2,20 +2,22 @@ apply plugin: 'cpp'
 
 model {
     components {
-        NetworkTables(NativeLibrarySpec) {
+        HALAthena(NativeLibrarySpec) {
             targetPlatform 'arm'
+            tasks.withType(CppCompile) {
+                dependsOn addNiLibraryLinks
+            }
             sources {
                 cpp {
                     source {
-                        srcDirs = ["lib/share", "lib/Athena"]
+                        srcDirs = ["lib/Athena", "lib/Athena/FRC_FPGA_ChipObject"]
                         includes = ["**/*.cpp"]
                     }
                     exportedHeaders {
-                        srcDirs = ["include"]
+                        srcDirs = ["include", "lib/Athena", "lib/Athena/FRC_FPGA_ChipObject"]
                     }
                 }
             }
         }
     }
 }
-

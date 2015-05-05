@@ -1,210 +1,212 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>edu.wpi.first.wpilib.plugins.cpp</artifactId>
-	<packaging>eclipse-plugin</packaging>
-	<parent>
-		<groupId>edu.wpi.first.wpilib.plugins</groupId>
-		<artifactId>edu.wpi.first.wpilib.plugins</artifactId>
-		<version>0.1.0.qualifier</version>
-		<relativePath>..</relativePath>
-	</parent>
-	<properties>
-		<build-number>DEVELOPMENT</build-number>
-		<cpp-zip>${project.build.directory}/cpp-zip</cpp-zip>
-	</properties>
-	<build>
-		<resources>
-			<resource>
-				<directory>.</directory>
-				<includes>
-					<include>resources/configuration.properties</include>
-				</includes>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
-		<plugins>
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.6</version>
-				<executions>
-					<execution>
-						<id>copy-ant-resources-to-cpp-zip</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${cpp-zip}</outputDirectory>
-							<resources>
-								<resource>
-									<directory>src/main/resources/cpp-zip</directory>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.8</version>
-				<executions>
-					<!-- Fetch the dependencies needed to build the cpp.zip file. -->
-					<execution>
-						<id>fetch-cpp-zip-dependencies</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>edu.wpi.first.wpilib.cmake</groupId>
-									<artifactId>cpp-root</artifactId>
-									<version>1.0.0</version>
-								    <type>zip</type>
-									<destFileName>cpp-root.jar</destFileName>
-								</artifactItem>
-								<artifactItem>
-  			                        <groupId>edu.wpi.first.wpilibc.simulation</groupId>
- 			                        <artifactId>WPILibCSim</artifactId>
-			                        <version>0.1.0</version>
-			                        <type>zip</type>
-									<destFileName>sim-include.zip</destFileName>
-								</artifactItem>
-							</artifactItems>
-							<outputDirectory>${project.build.directory}</outputDirectory>
-							<overWriteReleases>false</overWriteReleases>
-							<overWriteSnapshots>true</overWriteSnapshots>
-							<prependGroupId>true</prependGroupId>
-						</configuration>
-					</execution>
-                    
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>edu.wpi.first.wpilib.plugins.cpp</artifactId>
+    <packaging>eclipse-plugin</packaging>
+    <parent>
+        <groupId>edu.wpi.first.wpilib.plugins</groupId>
+        <artifactId>edu.wpi.first.wpilib.plugins</artifactId>
+        <version>0.1.0.qualifier</version>
+        <relativePath>..</relativePath>
+    </parent>
+    <properties>
+        <build-number>DEVELOPMENT</build-number>
+        <cpp-zip>${project.build.directory}/cpp-zip</cpp-zip>
+    </properties>
+    <build>
+        <resources>
+            <resource>
+                <directory>.</directory>
+                <includes>
+                    <include>resources/configuration.properties</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>copy-ant-resources-to-cpp-zip</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${cpp-zip}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources/cpp-zip</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.8</version>
+                <executions>
+                    <!-- Fetch the dependencies needed to build the cpp.zip file. -->
+                    <execution>
+                        <id>fetch-cpp-zip-dependencies</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>edu.wpi.first.wpilib.cmake</groupId>
+                                    <artifactId>cpp-root</artifactId>
+                                    <version>1.0.0</version>
+                                    <type>zip</type>
+                                    <destFileName>cpp-root.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>edu.wpi.first.wpilibc.simulation</groupId>
+                                    <artifactId>WPILibCSim</artifactId>
+                                    <version>0.1.0</version>
+                                    <type>zip</type>
+                                    <destFileName>sim-include.zip</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <prependGroupId>true</prependGroupId>
+                        </configuration>
+                    </execution>
+
                     <!-- Simulation -->
                     <execution>
-                      <id>fetch-sim-jar-zip-dependencies</id>
-                      <phase>compile</phase>
-                      <goals>
-                        <goal>copy</goal>
-                      </goals>
-                      <configuration>
-			            <outputDirectory>${cpp-zip}/sim/lib</outputDirectory>
-                        <overWriteReleases>false</overWriteReleases>
-                        <overWriteSnapshots>true</overWriteSnapshots>
-                        
-                        <artifactItems>
-                          <artifactItem>
-                            <groupId>net.java.jinput</groupId>
-                            <artifactId>jinput-platform</artifactId>
-                            <version>2.0.5</version>
-                            <classifier>natives-linux</classifier>
-                            <type>jar</type>
-                          </artifactItem>
+                        <id>fetch-sim-jar-zip-dependencies</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${cpp-zip}/sim/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
 
-                          <artifactItem>
-                            <groupId>edu.wpi.first.wpilibj.simulation</groupId>
-                            <artifactId>SimDS</artifactId>
-                            <version>0.1.0-SNAPSHOT</version>
-				            <destFileName>SimDS.jar</destFileName>
-                            <outputDirectory>${cpp-zip}/sim/tools</outputDirectory>
-                          </artifactItem>
-                        </artifactItems>
-                      </configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>net.java.jinput</groupId>
+                                    <artifactId>jinput-platform</artifactId>
+                                    <version>2.0.5</version>
+                                    <classifier>natives-linux</classifier>
+                                    <type>jar</type>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>edu.wpi.first.wpilibj.simulation</groupId>
+                                    <artifactId>SimDS</artifactId>
+                                    <version>0.1.0-SNAPSHOT</version>
+                                    <destFileName>SimDS.jar</destFileName>
+                                    <outputDirectory>${cpp-zip}/sim/tools</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
                     </execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-                  
-					<!-- Set time stamp and version properties. -->
-					<execution>
-						<id>set-version-info</id>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<phase>process-sources</phase>
-						<configuration>
-							<target>
-								<tstamp>
-									<format property="timestamp" pattern="yyyy/MM/dd HH:mm:ss z"/>
-								</tstamp>
-								<tstamp>
-									<format property="version-info" pattern="yyyy.MM.dd.HH.mm.ss"/>
-								</tstamp>
-								<property name="version" value="${version-info}.${build-number}"/>
-							</target>
-							<exportAntProperties>true</exportAntProperties>
-						</configuration>
-					</execution>
-                    
-					<!-- Unzip the include files for cpp.zip. -->
-					<execution>
-						<id>unzip-cpp-includes</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<target>
-								<unzip dest="${cpp-zip}">
-									<fileset dir="${project.build.directory}">
-										<include name="cpp-root.jar"/>
-										<include name="sim-include.zip"/>
-									</fileset>
-								</unzip>
-							</target>
-						</configuration>
-					</execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+
+                    <!-- Set time stamp and version properties. -->
+                    <execution>
+                        <id>set-version-info</id>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                        <configuration>
+                            <target>
+                                <tstamp>
+                                    <format property="timestamp" pattern="yyyy/MM/dd HH:mm:ss z"/>
+                                </tstamp>
+                                <tstamp>
+                                    <format property="version-info" pattern="yyyy.MM.dd.HH.mm.ss"/>
+                                </tstamp>
+                                <property name="version" value="${version-info}.${build-number}"/>
+                            </target>
+                            <exportAntProperties>true</exportAntProperties>
+                        </configuration>
+                    </execution>
+
+                    <!-- Unzip the include files for cpp.zip. -->
+                    <execution>
+                        <id>unzip-cpp-includes</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <unzip dest="${cpp-zip}">
+                                    <fileset dir="${project.build.directory}">
+                                        <include name="cpp-root.jar"/>
+                                        <include name="sim-include.zip"/>
+                                    </fileset>
+                                </unzip>
+                            </target>
+                        </configuration>
+                    </execution>
 
                     <!-- Unzip jinput *.so's -->
-		            <execution>
-			          <id>unzip-jinput-libs</id>
-                      <phase>compile</phase>
-                      <goals>
-                        <goal>run</goal>
-                      </goals>
-			          <configuration>
-			            <target>
-				          <unzip src="${cpp-zip}/sim/lib/jinput-platform-2.0.5-natives-linux.jar"
-					             dest="${cpp-zip}/sim/lib"
-					             overwrite="true" />
-			            </target>
-			          </configuration>
-		            </execution>
-          
-					<!-- Generate zip file to unzip for the user. -->
-					<execution>
-						<id>generate-cpp-zip</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<target>
-								<zip destfile="${project.build.directory}/classes/resources/cpp.zip" basedir="${cpp-zip}" update="true"/>
-							</target>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-	<dependencies>
-		<dependency>
-			<groupId>edu.wpi.first.wpilib.cmake</groupId>
-			<artifactId>cpp-root</artifactId>
-			<version>1.0.0</version>
-			<type>zip</type>
-		</dependency>
-		<dependency>
-			<groupId>edu.wpi.first.wpilibc.simulation</groupId>
-			<artifactId>WPILibCSim</artifactId>
-			<version>0.1.0</version>
-			<type>zip</type>
-		</dependency>
-	</dependencies>
+                    <execution>
+                        <id>unzip-jinput-libs</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <unzip src="${cpp-zip}/sim/lib/jinput-platform-2.0.5-natives-linux.jar"
+                                       dest="${cpp-zip}/sim/lib"
+                                       overwrite="true"/>
+                            </target>
+                        </configuration>
+                    </execution>
+
+                    <!-- Generate zip file to unzip for the user. -->
+                    <execution>
+                        <id>generate-cpp-zip</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <zip destfile="${project.build.directory}/classes/resources/cpp.zip"
+                                     basedir="${cpp-zip}" update="true"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>edu.wpi.first.wpilib.cmake</groupId>
+            <artifactId>cpp-root</artifactId>
+            <version>1.0.0</version>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>edu.wpi.first.wpilibc.simulation</groupId>
+            <artifactId>WPILibCSim</artifactId>
+            <version>0.1.0</version>
+            <type>zip</type>
+        </dependency>
+    </dependencies>
 </project>

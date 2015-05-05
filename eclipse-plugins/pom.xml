@@ -1,98 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>edu.wpi.first.wpilib.plugins</groupId>
-  <artifactId>edu.wpi.first.wpilib.plugins</artifactId>
-  <version>0.1.0.qualifier</version>
-  <packaging>pom</packaging>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>edu.wpi.first.wpilib.plugins</groupId>
+    <artifactId>edu.wpi.first.wpilib.plugins</artifactId>
+    <version>0.1.0.qualifier</version>
+    <packaging>pom</packaging>
 
-  <modules>
-    <module>edu.wpi.first.wpilib.plugins.core</module>
-    <module>edu.wpi.first.wpilib.plugins.core.feature</module>
-    <module>edu.wpi.first.wpilib.plugins.cpp</module>
-    <module>edu.wpi.first.wpilib.plugins.cpp.feature</module>
-    <module>edu.wpi.first.wpilib.plugins.java</module>
-    <module>edu.wpi.first.wpilib.plugins.java.feature</module>
-    <module>edu.wpi.first.wpilib.plugins.riolog</module>
-    <module>edu.wpi.first.wpilib.plugins.updatesite</module>
-  </modules>
-  
-  <properties>
-    <!-- local-repository>C:/Users/wpilibj-buildmaster/maven-repository</local-repository-->
-    <tycho-version>0.21.0</tycho-version>
-  </properties>
+    <modules>
+        <module>edu.wpi.first.wpilib.plugins.core</module>
+        <module>edu.wpi.first.wpilib.plugins.core.feature</module>
+        <module>edu.wpi.first.wpilib.plugins.cpp</module>
+        <module>edu.wpi.first.wpilib.plugins.cpp.feature</module>
+        <module>edu.wpi.first.wpilib.plugins.java</module>
+        <module>edu.wpi.first.wpilib.plugins.java.feature</module>
+        <module>edu.wpi.first.wpilib.plugins.riolog</module>
+        <module>edu.wpi.first.wpilib.plugins.updatesite</module>
+    </modules>
 
-  <repositories>
-    <repository>
-      <id>juno</id>
-      <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/luna</url>
-    </repository>
-    <repository>
-      <id>FRC Binaries</id>
-      <url>http://first.wpi.edu/FRC/c/maven/</url>
-    </repository>
-  </repositories>
-  
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-maven-plugin</artifactId>
-        <version>${tycho-version}</version>
-        <extensions>true</extensions>
-      </plugin>
-    </plugins>
-  </build>
+    <properties>
+        <!-- local-repository>C:/Users/wpilibj-buildmaster/maven-repository</local-repository-->
+        <tycho-version>0.21.0</tycho-version>
+    </properties>
 
-  <profiles>
-    <!-- TODO: Sign the jars for verification. -->
-    <!-- Currently disabled since eclipse runs out of memory verifying the -->
-    <!-- signatures of the toolchains. -->
-    <!--   <profile> -->
-    <!--     <id>sign</id> -->
-    <!--     <activation> -->
-    <!--         <property> -->
-    <!--             <name>jarsigner.alias</name> -->
-    <!--         </property> -->
-    <!--     </activation> -->
-    <!--     <build> -->
-    <!--         <plugins> -->
-    <!--             <plugin> -->
-    <!--                 <groupId>org.apache.maven.plugins</groupId> -->
-    <!--                 <artifactId>maven-jarsigner-plugin</artifactId> -->
-    <!--                 <version>1.2</version> -->
-    <!--                 <executions> -->
-    <!--                     <execution> -->
-    <!--                         <id>sign</id> -->
-    <!--                         <goals> -->
-    <!--                             <goal>sign</goal> -->
-    <!--                         </goals> -->
-    <!--                     </execution> -->
-    <!--                 </executions> -->
-    <!--             </plugin> -->
-    <!--         </plugins> -->
-    <!--     </build> -->
-    <!-- </profile> -->
-    <profile>
-      <id>docline-java8-disable</id>
-      <activation>
-	<jdk>[1.8,</jdk>
-      </activation>
+    <repositories>
+        <repository>
+            <id>juno</id>
+            <layout>p2</layout>
+            <url>http://download.eclipse.org/releases/luna</url>
+        </repository>
+        <repository>
+            <id>FRC Binaries</id>
+            <url>http://first.wpi.edu/FRC/c/maven/</url>
+        </repository>
+    </repositories>
 
-      <build>
-	<plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <configuration>
-              <additionalparam>-Xdoclint:none</additionalparam>
-            </configuration>
-          </plugin>
-	</plugins>
-      </build>
-    </profile>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.eclipse.tycho</groupId>
+                <artifactId>tycho-maven-plugin</artifactId>
+                <version>${tycho-version}</version>
+                <extensions>true</extensions>
+            </plugin>
+        </plugins>
+    </build>
 
-  </profiles>
+    <profiles>
+        <!-- TODO: Sign the jars for verification. -->
+        <!-- Currently disabled since eclipse runs out of memory verifying the -->
+        <!-- signatures of the toolchains. -->
+        <!--   <profile> -->
+        <!--     <id>sign</id> -->
+        <!--     <activation> -->
+        <!--         <property> -->
+        <!--             <name>jarsigner.alias</name> -->
+        <!--         </property> -->
+        <!--     </activation> -->
+        <!--     <build> -->
+        <!--         <plugins> -->
+        <!--             <plugin> -->
+        <!--                 <groupId>org.apache.maven.plugins</groupId> -->
+        <!--                 <artifactId>maven-jarsigner-plugin</artifactId> -->
+        <!--                 <version>1.2</version> -->
+        <!--                 <executions> -->
+        <!--                     <execution> -->
+        <!--                         <id>sign</id> -->
+        <!--                         <goals> -->
+        <!--                             <goal>sign</goal> -->
+        <!--                         </goals> -->
+        <!--                     </execution> -->
+        <!--                 </executions> -->
+        <!--             </plugin> -->
+        <!--         </plugins> -->
+        <!--     </build> -->
+        <!-- </profile> -->
+        <profile>
+            <id>docline-java8-disable</id>
+            <activation>
+                <jdk>[1.8,</jdk>
+            </activation>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <additionalparam>-Xdoclint:none</additionalparam>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+    </profiles>
 </project>

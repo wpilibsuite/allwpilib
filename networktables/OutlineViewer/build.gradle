@@ -1,24 +1,39 @@
 apply plugin: 'java'
-apply plugin: 'maven'
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'maven-publish'
 
-group = "edu.wpi.frc.wpilib"
-version = "2.0"
-
-sourceCompatibility = 1.7
-
-sourceSets {
-	main {
-	     java {
-	     	  srcDirs = ["src"]
-	     }
-	}
+buildscript {
+    repositories { jcenter() }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.1'
+    }
 }
 
-repositories {
-       mavenCentral()
-       mavenLocal()
+mainClassName = 'edu.wpi.first.tableviewer.TableViewer'
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifact(shadowJar) {
+                classifier null
+            }
+            groupId 'edu.wpi.first.wpilib.networktables'
+            artifactId 'OutlineViewer'
+            version '1.0.0-SNAPSHOT'
+        }
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ["src"]
+        }
+    }
 }
 
 dependencies {
-	     compile project(":java")
+    compile project(":networktables:java")
+    compile 'uk.gov.nationalarchives.thirdparty.netbeans:org-netbeans-swing-outline:7.2'
 }

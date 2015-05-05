@@ -1,0 +1,17 @@
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifact jar
+            groupId 'org.gazebosim'
+            artifactId 'JavaGazebo'
+            version '0.1.0-SNAPSHOT'
+        }
+    }
+}
+
+dependencies {
+    compile 'com.google.protobuf:protobuf-java:2.5.0'
+}

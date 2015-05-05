@@ -1,232 +1,233 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>edu.wpi.first.wpilib.plugins.core</artifactId>
-  <packaging>eclipse-plugin</packaging>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>edu.wpi.first.wpilib.plugins.core</artifactId>
+    <packaging>eclipse-plugin</packaging>
 
-  <parent>
-    <groupId>edu.wpi.first.wpilib.plugins</groupId>
-    <artifactId>edu.wpi.first.wpilib.plugins</artifactId>
-    <version>0.1.0.qualifier</version>
-    <relativePath>..</relativePath>
-  </parent>
-  
-  <properties>
-	<build-number>DEVELOPMENT</build-number>
-	<tools-zip>${project.build.directory}/tools-zip</tools-zip>
-  </properties>
+    <parent>
+        <groupId>edu.wpi.first.wpilib.plugins</groupId>
+        <artifactId>edu.wpi.first.wpilib.plugins</artifactId>
+        <version>0.1.0.qualifier</version>
+        <relativePath>..</relativePath>
+    </parent>
 
-  <repositories>
-    <repository>
-      <id>WPILib Maven Repository</id>
-      <url>http://first.wpi.edu/FRC/roborio/maven/</url>
-    </repository>
-  </repositories>
+    <properties>
+        <build-number>DEVELOPMENT</build-number>
+        <tools-zip>${project.build.directory}/tools-zip</tools-zip>
+    </properties>
 
-  <build>
-	<resources>
-	  <resource>
-		<directory>.</directory>
-        <includes>
-          <include>resources/configuration.properties</include>
-        </includes>
-		<filtering>true</filtering>
-      </resource>
-	</resources>
-	<plugins>
-	  <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>2.6</version>
-        <executions>
-          <execution>
-            <id>copy-ant-resources-to-tools-zip</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${tools-zip}</outputDirectory>
-              <resources>          
-                <resource>
-                  <directory>src/main/resources/tools-zip</directory>
-                </resource>
-              </resources>              
-            </configuration>            
-          </execution>
-        </executions>
-      </plugin>
-	  <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.8</version>
-        <executions>
-		  
-		  <!-- Fetch the dependencies needed to build the jar.zip file. -->
-          <execution>
-            <id>fetch-jar-zip-dependencies</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-	            <artifactItem>
-	              <groupId>edu.wpi.first.wpilib</groupId>
-	              <artifactId>RobotBuilder</artifactId>
-	              <version>2.0.0-SNAPSHOT</version>
-				  <outputDirectory>${tools-zip}</outputDirectory>
-				  <destFileName>RobotBuilder.jar</destFileName>
-	            </artifactItem>
-	            <artifactItem>
-	              <groupId>edu.wpi.first.wpilib</groupId>
-	              <artifactId>SmartDashboard</artifactId>
-	              <version>1.0.0-SNAPSHOT</version>
-				  <outputDirectory>${tools-zip}</outputDirectory>
-				  <destFileName>SmartDashboard.jar</destFileName>
-	            </artifactItem>
-	            <artifactItem>
-	              <groupId>edu.wpi.first.wpilib</groupId>
-	              <artifactId>sfx</artifactId>
-	              <type>zip</type>
-	              <classifier>zip</classifier>
-				  <outputDirectory>${tools-zip}/../</outputDirectory>
-				  <destFileName>sfx.zip</destFileName>
-	            </artifactItem>
-	            <artifactItem>
-	              <groupId>edu.wpi.first.wpilib.networktables</groupId>
-	              <artifactId>OutlineViewer</artifactId>
-	              <version>1.0.0-SNAPSHOT</version>
-				  <outputDirectory>${tools-zip}</outputDirectory>
-				  <destFileName>OutlineViewer.jar</destFileName>
-	            </artifactItem>
-		    <artifactItem>
-		      <groupId>edu.wpi.first.wpilib</groupId>
-		      <artifactId>java-installer</artifactId>
-		      <version>1.0-SNAPSHOT</version>
-		      <outputDirectory>${tools-zip}</outputDirectory>
-		      <destFileName>java-installer.jar</destFileName>
-		    </artifactItem>
-              </artifactItems>
-                
-              <overWriteReleases>false</overWriteReleases>
-              <overWriteSnapshots>true</overWriteSnapshots>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-	  <plugin>
-	    <groupId>org.apache.maven.plugins</groupId>
-	    <artifactId>maven-antrun-plugin</artifactId>
-	    <version>1.7</version>
-	    <executions>
-		  
-		  <!-- Set time stamp and version properties. -->
-		  <execution>
-		    <id>set-version-info</id>
-		    <goals>
-			  <goal>run</goal>
-		    </goals>
-		    <phase>process-sources</phase>
-		    <configuration>
-			  <target>
-			    <tstamp>
-				  <format property="timestamp" pattern="yyyy/MM/dd HH:mm:ss z"/>
-			    </tstamp>
-			    <tstamp>
-				  <format property="version-info" pattern="yyyy.MM.dd.HH.mm.ss"/>
-			    </tstamp>
-			    <property name="version" value="${version-info}.${build-number}"/>
-			  </target>
-			  <exportAntProperties>true</exportAntProperties>
-		    </configuration>
-		  </execution>
+    <repositories>
+        <repository>
+            <id>WPILib Maven Repository</id>
+            <url>http://first.wpi.edu/FRC/roborio/maven/</url>
+        </repository>
+    </repositories>
 
-		  <!-- Generate zip file to unzip for the user. -->
-		  <execution>
-		    <id>generate-jar-zip</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-		    <configuration>
-			  <target>
-				<unzip src="${tools-zip}/../sfx.zip" dest="${tools-zip}"/>
-			    <zip destfile="${project.build.directory}/classes/resources/tools.zip"
-				     basedir="${tools-zip}"
-				     update="true" />
-			  </target>
-		    </configuration>
-		  </execution>
-	    </executions>
-	  </plugin>
-    </plugins>
-    <pluginManagement>
-	  <plugins>
-	    <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-	    <plugin>
-		  <groupId>org.eclipse.m2e</groupId>
-		  <artifactId>lifecycle-mapping</artifactId>
-		  <version>1.0.0</version>
-		  <configuration>
-		    <lifecycleMappingMetadata>
-			  <pluginExecutions>
-			    <pluginExecution>
-				  <pluginExecutionFilter>
-				    <groupId>
-					  org.apache.maven.plugins
-				    </groupId>
-				    <artifactId>
-					  maven-dependency-plugin
-				    </artifactId>
-				    <versionRange>[2.8,)</versionRange>
-				    <goals>
-					  <goal>copy</goal>
-				    </goals>
-				  </pluginExecutionFilter>
-				  <action>
-				    <ignore/>
-				  </action>
-			    </pluginExecution>
-			  </pluginExecutions>
-		    </lifecycleMappingMetadata>
-		  </configuration>
-	    </plugin>
-	  </plugins>
-    </pluginManagement>
-  </build>
+    <build>
+        <resources>
+            <resource>
+                <directory>.</directory>
+                <includes>
+                    <include>resources/configuration.properties</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>copy-ant-resources-to-tools-zip</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${tools-zip}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources/tools-zip</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.8</version>
+                <executions>
 
-  <dependencies>
-    <!-- Add fake dependencies to inform Maven of the correct
-         order it should build projects in during a multi-module build.
-         
-         This list should match the list in the invocation of
-         maven-dependency-plugin:copy above.
-         
-         It may be possible to avoid this duplication by using the 
-         maven-assembly-plugin instead.-->
-    
-    <!-- Library sources for debugging WPILib on the Athena -->
-    <dependency>
-	  <groupId>edu.wpi.first.wpilib</groupId>
-	  <artifactId>RobotBuilder</artifactId>
-	  <version>2.0.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-	  <groupId>edu.wpi.first.wpilib</groupId>
-	  <artifactId>SmartDashboard</artifactId>
-	  <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-	  <groupId>edu.wpi.first.wpilib</groupId>
-	  <artifactId>sfx</artifactId>
-	              <type>zip</type>
-	  <version>LATEST</version>
-    </dependency>
-    <dependency>
-	  <groupId>edu.wpi.first.wpilib.networktables</groupId>
-	  <artifactId>OutlineViewer</artifactId>
-	  <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
+                    <!-- Fetch the dependencies needed to build the jar.zip file. -->
+                    <execution>
+                        <id>fetch-jar-zip-dependencies</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>edu.wpi.first.wpilib</groupId>
+                                    <artifactId>RobotBuilder</artifactId>
+                                    <version>2.0.0-SNAPSHOT</version>
+                                    <outputDirectory>${tools-zip}</outputDirectory>
+                                    <destFileName>RobotBuilder.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>edu.wpi.first.wpilib</groupId>
+                                    <artifactId>SmartDashboard</artifactId>
+                                    <version>1.0.0-SNAPSHOT</version>
+                                    <outputDirectory>${tools-zip}</outputDirectory>
+                                    <destFileName>SmartDashboard.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>edu.wpi.first.wpilib</groupId>
+                                    <artifactId>sfx</artifactId>
+                                    <type>zip</type>
+                                    <classifier>zip</classifier>
+                                    <outputDirectory>${tools-zip}/../</outputDirectory>
+                                    <destFileName>sfx.zip</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>edu.wpi.first.wpilib.networktables</groupId>
+                                    <artifactId>OutlineViewer</artifactId>
+                                    <version>1.0.0-SNAPSHOT</version>
+                                    <outputDirectory>${tools-zip}</outputDirectory>
+                                    <destFileName>OutlineViewer.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>edu.wpi.first.wpilib</groupId>
+                                    <artifactId>java-installer</artifactId>
+                                    <version>1.0-SNAPSHOT</version>
+                                    <outputDirectory>${tools-zip}</outputDirectory>
+                                    <destFileName>java-installer.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+
+                    <!-- Set time stamp and version properties. -->
+                    <execution>
+                        <id>set-version-info</id>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                        <configuration>
+                            <target>
+                                <tstamp>
+                                    <format property="timestamp" pattern="yyyy/MM/dd HH:mm:ss z"/>
+                                </tstamp>
+                                <tstamp>
+                                    <format property="version-info" pattern="yyyy.MM.dd.HH.mm.ss"/>
+                                </tstamp>
+                                <property name="version" value="${version-info}.${build-number}"/>
+                            </target>
+                            <exportAntProperties>true</exportAntProperties>
+                        </configuration>
+                    </execution>
+
+                    <!-- Generate zip file to unzip for the user. -->
+                    <execution>
+                        <id>generate-jar-zip</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <unzip src="${tools-zip}/../sfx.zip" dest="${tools-zip}"/>
+                                <zip destfile="${project.build.directory}/classes/resources/tools.zip"
+                                     basedir="${tools-zip}"
+                                     update="true"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>
+                                            org.apache.maven.plugins
+                                        </groupId>
+                                        <artifactId>
+                                            maven-dependency-plugin
+                                        </artifactId>
+                                        <versionRange>[2.8,)</versionRange>
+                                        <goals>
+                                            <goal>copy</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore/>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <dependencies>
+        <!-- Add fake dependencies to inform Maven of the correct
+             order it should build projects in during a multi-module build.
+
+             This list should match the list in the invocation of
+             maven-dependency-plugin:copy above.
+
+             It may be possible to avoid this duplication by using the
+             maven-assembly-plugin instead.-->
+
+        <!-- Library sources for debugging WPILib on the Athena -->
+        <dependency>
+            <groupId>edu.wpi.first.wpilib</groupId>
+            <artifactId>RobotBuilder</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.wpi.first.wpilib</groupId>
+            <artifactId>SmartDashboard</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.wpi.first.wpilib</groupId>
+            <artifactId>sfx</artifactId>
+            <type>zip</type>
+            <version>LATEST</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.wpi.first.wpilib.networktables</groupId>
+            <artifactId>OutlineViewer</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 </project>

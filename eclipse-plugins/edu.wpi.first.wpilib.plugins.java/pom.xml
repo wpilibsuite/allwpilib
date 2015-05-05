@@ -1,383 +1,378 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>edu.wpi.first.wpilib.plugins.java</artifactId>
-  <packaging>eclipse-plugin</packaging>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>edu.wpi.first.wpilib.plugins.java</artifactId>
+    <packaging>eclipse-plugin</packaging>
 
-  <parent>
-    <groupId>edu.wpi.first.wpilib.plugins</groupId>
-    <artifactId>edu.wpi.first.wpilib.plugins</artifactId>
-    <version>0.1.0.qualifier</version>
-    <relativePath>..</relativePath>
-  </parent>
+    <parent>
+        <groupId>edu.wpi.first.wpilib.plugins</groupId>
+        <artifactId>edu.wpi.first.wpilib.plugins</artifactId>
+        <version>0.1.0.qualifier</version>
+        <relativePath>..</relativePath>
+    </parent>
 
-  <properties>
-	<build-number>DEVELOPMENT</build-number>
-	<java-zip>${project.build.directory}/java-zip</java-zip>
-  </properties>
+    <properties>
+        <build-number>DEVELOPMENT</build-number>
+        <java-zip>${project.build.directory}/java-zip</java-zip>
+    </properties>
 
-  <build>
-	<resources>
-	  <resource>
-		<directory>.</directory>
-        <includes>
-          <include>resources/configuration.properties</include>
-        </includes>
-		<filtering>true</filtering>
-      </resource>
-	</resources>
-	<plugins>
-	  <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>2.6</version>
-        <executions>
-          <execution>
-            <id>copy-ant-resources-to-java-zip</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${java-zip}</outputDirectory>
-              <resources>          
-                <resource>
-                  <directory>src/main/resources/java-zip</directory>
-                </resource>
-              </resources>              
-            </configuration>            
-          </execution>
-        </executions>
-      </plugin>
-	  <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.8</version>
-        <executions>
-		  
-		  <!-- Fetch the dependencies needed to build the jar.zip file. -->
-          <execution>
-            <id>fetch-jar-zip-dependencies</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-				<!-- Libraries needed to link against for WPILib on the Athena -->
-                <artifactItem>
-				  <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
-				  <artifactId>NetworkTables</artifactId>
-				  <version>0.1.0-SNAPSHOT</version>
-				  <type>jar</type>
-				  <destFileName>NetworkTables.jar</destFileName>
-				  <outputDirectory>${java-zip}/lib</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-				  <groupId>edu.wpi.first.wpilibj</groupId>
-				  <artifactId>wpilibJavaFinal</artifactId>
-				  <version>0.1.0-SNAPSHOT</version>
-				  <type>jar</type>
-				  <destFileName>WPILib.jar</destFileName>
-				  <outputDirectory>${java-zip}/lib</outputDirectory>
-                </artifactItem>
-				<!-- Library sources for debugging WPILib on the Athena -->
-                <artifactItem>
-				  <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
-				  <artifactId>NetworkTables</artifactId>
-				  <version>0.1.0-SNAPSHOT</version>
-				  <classifier>sources</classifier>
-				  <outputDirectory>${java-zip}/lib</outputDirectory>
-				  <destFileName>NetworkTables-sources.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-				  <groupId>edu.wpi.first.wpilibj</groupId>
-				  <artifactId>wpilibJavaFinal</artifactId>
-				  <version>0.1.0-SNAPSHOT</version>
-				  <classifier>sources</classifier>
-				  <outputDirectory>${java-zip}/lib</outputDirectory>
-				  <destFileName>WPILib-sources.jar</destFileName>
-                </artifactItem>
+    <build>
+        <resources>
+            <resource>
+                <directory>.</directory>
+                <includes>
+                    <include>resources/configuration.properties</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>copy-ant-resources-to-java-zip</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${java-zip}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources/java-zip</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.8</version>
+                <executions>
 
-				<!-- Javadoc -->
-                <artifactItem>
-				  <groupId>edu.wpi.first.wpilibj</groupId>
-				  <artifactId>wpilibJavaFinal</artifactId>
-				  <version>0.1.0-SNAPSHOT</version>
-				  <type>javadoc</type>
-				  <outputDirectory>${java-zip}/javadoc-jar</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-              
-              <overWriteReleases>false</overWriteReleases>
-              <overWriteSnapshots>true</overWriteSnapshots>
-            </configuration>
-          </execution>
+                    <!-- Fetch the dependencies needed to build the jar.zip file. -->
+                    <execution>
+                        <id>fetch-jar-zip-dependencies</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <!-- Libraries needed to link against for WPILib on the Athena -->
+                                <artifactItem>
+                                    <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
+                                    <artifactId>NetworkTables</artifactId>
+                                    <version>0.1.0-SNAPSHOT</version>
+                                    <type>jar</type>
+                                    <destFileName>NetworkTables.jar</destFileName>
+                                    <outputDirectory>${java-zip}/lib</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>edu.wpi.first.wpilibj</groupId>
+                                    <artifactId>wpilibJavaFinal</artifactId>
+                                    <version>0.1.0-SNAPSHOT</version>
+                                    <type>jar</type>
+                                    <destFileName>WPILib.jar</destFileName>
+                                    <outputDirectory>${java-zip}/lib</outputDirectory>
+                                </artifactItem>
+                                <!-- Library sources for debugging WPILib on the Athena -->
+                                <artifactItem>
+                                    <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
+                                    <artifactId>NetworkTables</artifactId>
+                                    <version>0.1.0-SNAPSHOT</version>
+                                    <classifier>sources</classifier>
+                                    <outputDirectory>${java-zip}/lib</outputDirectory>
+                                    <destFileName>NetworkTables-sources.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>edu.wpi.first.wpilibj</groupId>
+                                    <artifactId>wpilibJavaFinal</artifactId>
+                                    <version>0.1.0-SNAPSHOT</version>
+                                    <classifier>sources</classifier>
+                                    <outputDirectory>${java-zip}/lib</outputDirectory>
+                                    <destFileName>WPILib-sources.jar</destFileName>
+                                </artifactItem>
 
-          <!-- Simulation -->
-          <execution>
-            <id>fetch-sim-jar-zip-dependencies</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-			  <outputDirectory>${java-zip}/sim/lib</outputDirectory>
-              <overWriteReleases>false</overWriteReleases>
-              <overWriteSnapshots>true</overWriteSnapshots>
-              
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.gazebosim</groupId>
-                  <artifactId>JavaGazebo</artifactId>
-                  <version>0.1.0-SNAPSHOT</version>
-                </artifactItem>
-                <artifactItem>
-				  <groupId>edu.wpi.first.wpilibj</groupId>
-				  <artifactId>wpilibJava</artifactId>
-				  <version>0.1.0-SNAPSHOT</version>
-				  <type>jar</type>
-                </artifactItem>
-                <artifactItem>
-				  <groupId>edu.wpi.first.wpilibj</groupId>
-				  <artifactId>wpilibJavaSim</artifactId>
-				  <version>0.1.0-SNAPSHOT</version>
-				  <type>jar</type>
-                </artifactItem>
-                <artifactItem>
-	              <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
-	              <artifactId>NetworkTables</artifactId>
-	              <version>0.1.0-SNAPSHOT</version>
-                </artifactItem>
-                
-                <artifactItem>
-                  <groupId>net.java.jinput</groupId>
-                  <artifactId>jinput</artifactId>
-                  <version>2.0.5</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.java.jinput</groupId>
-                  <artifactId>jinput-platform</artifactId>
-                  <version>2.0.5</version>
-                  <classifier>natives-linux</classifier>
+                                <!-- Javadoc -->
+                                <artifactItem>
+                                    <groupId>edu.wpi.first.wpilibj</groupId>
+                                    <artifactId>wpilibJavaFinal</artifactId>
+                                    <version>0.1.0-SNAPSHOT</version>
+                                    <type>javadoc</type>
+                                    <outputDirectory>${java-zip}/javadoc-jar</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+
+                    <!-- Simulation -->
+                    <execution>
+                        <id>fetch-sim-jar-zip-dependencies</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${java-zip}/sim/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.gazebosim</groupId>
+                                    <artifactId>JavaGazebo</artifactId>
+                                    <version>0.1.0-SNAPSHOT</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>edu.wpi.first.wpilibj</groupId>
+                                    <artifactId>wpilibJavaSim</artifactId>
+                                    <version>0.1.0-SNAPSHOT</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
+                                    <artifactId>NetworkTables</artifactId>
+                                    <version>0.1.0-SNAPSHOT</version>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>net.java.jinput</groupId>
+                                    <artifactId>jinput</artifactId>
+                                    <version>2.0.5</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>net.java.jinput</groupId>
+                                    <artifactId>jinput-platform</artifactId>
+                                    <version>2.0.5</version>
+                                    <classifier>natives-linux</classifier>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>net.java.jutils</groupId>
+                                    <artifactId>jutils</artifactId>
+                                    <version>1.0.0</version>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>com.google.protobuf</groupId>
+                                    <artifactId>protobuf-java</artifactId>
+                                    <version>2.5.0</version>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>edu.wpi.first.wpilibj.simulation</groupId>
+                                    <artifactId>SimDS</artifactId>
+                                    <version>0.1.0-SNAPSHOT</version>
+                                    <destFileName>SimDS.jar</destFileName>
+                                    <outputDirectory>${java-zip}/sim/tools</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+
+                    <!-- Set time stamp and version properties. -->
+                    <execution>
+                        <id>set-version-info</id>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                        <configuration>
+                            <target>
+                                <tstamp>
+                                    <format property="timestamp" pattern="yyyy/MM/dd HH:mm:ss z"/>
+                                </tstamp>
+                                <tstamp>
+                                    <format property="version-info" pattern="yyyy.MM.dd.HH.mm.ss"/>
+                                </tstamp>
+                                <property name="version" value="${version-info}.${build-number}"/>
+                            </target>
+                            <exportAntProperties>true</exportAntProperties>
+                        </configuration>
+                    </execution>
+
+                    <!-- Unzip the javadocs files for java.zip. -->
+                    <execution>
+                        <id>unzip-javadocs</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <unzip dest="${java-zip}/javadoc">
+                                    <fileset dir="${java-zip}/javadoc-jar">
+                                        <include name="*.jar"/>
+                                    </fileset>
+                                </unzip>
+                                <delete dir="${java-zip}/javadoc-jar"/>
+                            </target>
+                        </configuration>
+                    </execution>
+
+                    <!-- Unzip jinput *.so's -->
+                    <execution>
+                        <id>unzip-jinput-libs</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <unzip src="${java-zip}/sim/lib/jinput-platform-2.0.5-natives-linux.jar"
+                                       dest="${java-zip}/sim/lib"
+                                       overwrite="true"/>
+                            </target>
+                        </configuration>
+                    </execution>
+
+                    <!-- Generate zip file to unzip for the user. -->
+                    <execution>
+                        <id>generate-jar-zip</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <zip destfile="${project.build.directory}/classes/resources/java.zip"
+                                     basedir="${java-zip}"
+                                     update="true"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>
+                                            org.apache.maven.plugins
+                                        </groupId>
+                                        <artifactId>
+                                            maven-dependency-plugin
+                                        </artifactId>
+                                        <versionRange>[2.8,)</versionRange>
+                                        <goals>
+                                            <goal>copy</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore/>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <dependencies>
+        <!-- Add fake dependencies to inform Maven of the correct
+        order it should build projects in during a multi-module build.
+
+        This list should match the list in the invocation of
+        maven-dependency-plugin:copy above.
+
+        It may be possible to avoid this duplication by using the
+        maven-assembly-plugin instead.-->
+        <!-- Libraries needed to link against for WPILib on the Athena -->
+        <dependency>
+            <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
+            <artifactId>NetworkTables</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>edu.wpi.first.wpilibj</groupId>
+            <artifactId>wpilibJavaFinal</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>edu.wpi.first.wpilibj</groupId>
+            <artifactId>wpilibJavaSim</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>edu.wpi.first.wpilibj</groupId>
+            <artifactId>wpilibJavaFinal</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+            <classifier>sources</classifier>
+        </dependency>
+        <!-- dependency>
+                  <groupId>net.java.dev.jna</groupId>
+                  <artifactId>jna</artifactId>
+                  <version>4.0.0</version>
                   <type>jar</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.java.jutils</groupId>
-                  <artifactId>jutils</artifactId>
-                  <version>1.0.0</version>
-                </artifactItem>
+        </dependency-->
+        <!-- dependency>
+                  <groupId>com.nativelibs4java</groupId>
+                  <artifactId>jnaerator-runtime</artifactId>
+                  <version>0.12-SNAPSHOT</version>
+                  <type>jar</type>
+        </dependency-->
 
-                <artifactItem>
-    	          <groupId>com.google.protobuf</groupId>
-    	          <artifactId>protobuf-java</artifactId>
-    	          <version>2.5.0</version>
-                </artifactItem>
+        <!-- Library sources for debugging WPILib on the Athena -->
+        <dependency>
+            <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
+            <artifactId>NetworkTables</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+            <classifier>sources</classifier>
+        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>edu.wpi.first.wpilibj</groupId>-->
+            <!--<artifactId>wpilibJava</artifactId>-->
+            <!--<version>0.1.0-SNAPSHOT</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>edu.wpi.first.wpilibj</groupId>-->
+            <!--<artifactId>wpilibJavaDevices</artifactId>-->
+            <!--<version>0.1.0-SNAPSHOT</version>-->
+        <!--</dependency>-->
 
-                <artifactItem>
-                  <groupId>edu.wpi.first.wpilibj.simulation</groupId>
-                  <artifactId>SimDS</artifactId>
-                  <version>0.1.0-SNAPSHOT</version>
-				  <destFileName>SimDS.jar</destFileName>
-                  <outputDirectory>${java-zip}/sim/tools</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-	  <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-antrun-plugin</artifactId>
-		<version>1.7</version>
-		<executions>
-		  
-		  <!-- Set time stamp and version properties. -->
-		  <execution>
-			<id>set-version-info</id>
-			<goals>
-			  <goal>run</goal>
-			</goals>
-			<phase>process-sources</phase>
-			<configuration>
-			  <target>
-				<tstamp>
-				  <format property="timestamp" pattern="yyyy/MM/dd HH:mm:ss z"/>
-				</tstamp>
-				<tstamp>
-				  <format property="version-info" pattern="yyyy.MM.dd.HH.mm.ss"/>
-				</tstamp>
-				<property name="version" value="${version-info}.${build-number}"/>
-			  </target>
-			  <exportAntProperties>true</exportAntProperties>
-			</configuration>
-		  </execution>
-
-		  <!-- Unzip the javadocs files for java.zip. -->
-		  <execution>
-			<id>unzip-javadocs</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-			<configuration>
-			  <target>
-				<unzip dest="${java-zip}/javadoc">
-				  <fileset dir="${java-zip}/javadoc-jar">
-					<include name="*.jar"/>
-				  </fileset>
-				</unzip>
-				<delete dir="${java-zip}/javadoc-jar"/>
-			  </target>
-			</configuration>
-		  </execution>
-
-		  <!-- Unzip jinput *.so's -->
-		  <execution>
-			<id>unzip-jinput-libs</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-			<configuration>
-			  <target>
-				<unzip src="${java-zip}/sim/lib/jinput-platform-2.0.5-natives-linux.jar"
-					   dest="${java-zip}/sim/lib"
-					   overwrite="true" />
-			  </target>
-			</configuration>
-		  </execution>
-          
-		  <!-- Generate zip file to unzip for the user. -->
-		  <execution>
-			<id>generate-jar-zip</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-			<configuration>
-			  <target>
-				<zip destfile="${project.build.directory}/classes/resources/java.zip"
-					 basedir="${java-zip}"
-					 update="true" />
-			  </target>
-			</configuration>
-		  </execution>
-		</executions>
-	  </plugin>
-    </plugins>
-	<pluginManagement>
-		<plugins>
-			<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-			<plugin>
-				<groupId>org.eclipse.m2e</groupId>
-				<artifactId>lifecycle-mapping</artifactId>
-				<version>1.0.0</version>
-				<configuration>
-					<lifecycleMappingMetadata>
-						<pluginExecutions>
-							<pluginExecution>
-								<pluginExecutionFilter>
-									<groupId>
-										org.apache.maven.plugins
-									</groupId>
-									<artifactId>
-										maven-dependency-plugin
-									</artifactId>
-									<versionRange>[2.8,)</versionRange>
-									<goals>
-										<goal>copy</goal>
-									</goals>
-								</pluginExecutionFilter>
-								<action>
-									<ignore/>
-								</action>
-							</pluginExecution>
-						</pluginExecutions>
-					</lifecycleMappingMetadata>
-				</configuration>
-			</plugin>
-		</plugins>
-	</pluginManagement>
-  </build>
-  
-  <dependencies>
-      <!-- Add fake dependencies to inform Maven of the correct
-      order it should build projects in during a multi-module build.
-      
-      This list should match the list in the invocation of
-      maven-dependency-plugin:copy above.
-      
-      It may be possible to avoid this duplication by using the 
-      maven-assembly-plugin instead.-->
-	<!-- Libraries needed to link against for WPILib on the Athena -->
-	<dependency>
-			  <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
-			  <artifactId>NetworkTables</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <type>jar</type>
-	</dependency>
-	<dependency>
-			  <groupId>edu.wpi.first.wpilibj</groupId>
-			  <artifactId>wpilibJavaFinal</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <type>jar</type>
-	</dependency>
-	<dependency>
-			  <groupId>edu.wpi.first.wpilibj</groupId>
-			  <artifactId>wpilibJavaSim</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <type>jar</type>
-	</dependency>
-	<dependency>
-			  <groupId>edu.wpi.first.wpilibj</groupId>
-			  <artifactId>wpilibJavaFinal</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <classifier>sources</classifier>
-	</dependency>
-	<!-- dependency>
-			  <groupId>net.java.dev.jna</groupId>
-			  <artifactId>jna</artifactId>
-			  <version>4.0.0</version>
-			  <type>jar</type>
-	</dependency-->
-	<!-- dependency>
-			  <groupId>com.nativelibs4java</groupId>
-			  <artifactId>jnaerator-runtime</artifactId>
-			  <version>0.12-SNAPSHOT</version>
-			  <type>jar</type>
-	</dependency-->
-	
-	<!-- Library sources for debugging WPILib on the Athena -->
-	<dependency>
-			  <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
-			  <artifactId>NetworkTables</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <classifier>sources</classifier>
-	</dependency>
-	<dependency>
-			  <groupId>edu.wpi.first.wpilibj</groupId>
-			  <artifactId>wpilibJava</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-	</dependency>
-	<dependency>
-			  <groupId>edu.wpi.first.wpilibj</groupId>
-			  <artifactId>wpilibJavaDevices</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-	</dependency>
-
-	<!-- Javadoc -->
-	<dependency>
-			  <groupId>edu.wpi.first.wpilibj</groupId>
-			  <artifactId>wpilibJava</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <type>javadoc</type>
-	</dependency>
-	<dependency>
-			  <groupId>edu.wpi.first.wpilibj</groupId>
-			  <artifactId>wpilibJavaDevices</artifactId>
-			  <version>0.1.0-SNAPSHOT</version>
-			  <type>javadoc</type>
-	</dependency>
-  </dependencies>
+        <!-- Javadoc -->
+        <!--<dependency>-->
+            <!--<groupId>edu.wpi.first.wpilibj</groupId>-->
+            <!--<artifactId>wpilibJava</artifactId>-->
+            <!--<version>0.1.0-SNAPSHOT</version>-->
+            <!--<type>javadoc</type>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>edu.wpi.first.wpilibj</groupId>-->
+            <!--<artifactId>wpilibJavaDevices</artifactId>-->
+            <!--<version>0.1.0-SNAPSHOT</version>-->
+            <!--<type>javadoc</type>-->
+        <!--</dependency>-->
+    </dependencies>
 </project>

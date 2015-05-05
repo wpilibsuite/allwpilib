@@ -17,6 +17,7 @@ wpilibj/wpilibJavaJNI/nivision/*_arm.ini
 wpilibj/wpilibJavaJNI/nivision/*.java
 wpilibj/wpilibJavaJNI/nivision/nivision_funcs.txt
 wpilibj/wpilibJavaJNI/nivision/imaqdx_funcs.txt
+doxygen.log
 
 # Created by the jenkins test script
 test-reports

@@ -1,0 +1,279 @@
+apply plugin: 'java'
+apply plugin: 'cpp'
+apply plugin: 'maven-publish'
+
+// We need this so we can get the networktables javadoc for the javadoc task
+evaluationDependsOn(':networktables:java')
+
+def jdkDownloadSite = 'http://www.oracle.com/technetwork/java/javase/downloads/jdk8-arm-downloads-2187472.html'
+def jdkFolder = 'jdk-linux-arm-vfp-sflt'
+def jdkVersion = 'jdk1.8.0_33'
+def jdkLocation = System.getProperty("user.home") + File.separator + jdkFolder + File.separator + jdkVersion
+def generatedJNIHeaderLoc = 'wpilibJavaJNI/build/include'
+
+// Maven publishing configuration
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifact wpilibjJar
+            artifact(wpilibjSources) {
+                classifier 'sources'
+            }
+            artifact(wpilibjJavadoc) {
+                classifier 'javadoc'
+            }
+
+            groupId 'edu.wpi.first.wpilibj'
+            artifactId 'wpilibJavaFinal'
+            version '0.1.0-SNAPSHOT'
+        }
+        mavenSim(MavenPublication) {
+            artifact wpilibjSimJar
+            artifact(wpilibjSimSources) {
+                classifier 'sources'
+            }
+            artifact(wpilibjSimJavadoc) {
+                classifier 'javadoc'
+            }
+
+            groupId 'edu.wpi.first.wpilibj'
+            artifactId 'wpilibJavaSim'
+            version '0.1.0-SNAPSHOT'
+        }
+    }
+}
+
+// Configuration for the HAL bindings
+model {
+    components {
+        wpilibJavaJNI(NativeLibrarySpec) {
+            targetPlatform 'arm'
+            binaries.all {
+                tasks.withType(CppCompile) {
+                    dependsOn verifyJre
+                    dependsOn jniHeaders
+                    dependsOn addNiLibraryLinks
+                }
+            }
+            sources {
+                cpp {
+                    source {
+                        srcDirs = ['wpilibJavaJNI/lib']
+                        includes = ['**/*.cpp']
+                    }
+                    exportedHeaders {
+                        // JDK is included for jni.h. We also need the arm-linux specific headers. This does not need to change
+                        // when compiling on Windows
+                        // The JNI headers are put into the build/include directory by the jniHeaders task on wpilibJavaDevices
+                        def includeLocation = jdkLocation + File.separator + 'include'
+                        srcDirs = ["wpilibJavaJNI/include", includeLocation, includeLocation + File.separator + "linux"]
+                        jniHeaders.outputs.files.each { file ->
+                            srcDirs file.getPath()
+                        }
+                    }
+                    lib project: ':hal', library: 'HALAthena', linkage: 'static'
+                }
+            }
+        }
+    }
+}
+
+// Configuration for the Java project, which pulls sources from the wpilibJava and wpilibJavaDevices folders
+sourceSets {
+    // This is the sourceset for RoboRIO-specific code
+    main {
+        java {
+            srcDirs 'wpilibJavaDevices/src/main/java'
+        }
+    }
+    // Unit tests. These run on any platform
+    test {
+        java {
+            srcDirs 'wpilibJava/src/test/java', 'wpilibJavaDevices/src/test/java'
+        }
+    }
+    // This is the shared code between the RoboRIO and simulation
+    shared {
+        java {
+            srcDirs 'wpilibJava/src/main/java'
+        }
+    }
+    // Integration tests run on the WPI test stand
+    integrationTest {
+        java {
+            srcDirs 'wpilibJavaIntegrationTests/src/main/java', 'wpilibJavaIntegrationTests/src/test/java'
+        }
+        resources {
+            srcDir 'wpilibJavaIntegrationTests/src/main/resources'
+        }
+    }
+    // The simulation specific code
+    simulation {
+        java {
+            srcDirs 'wpilibJavaSim/src/main/java'
+        }
+    }
+}
+
+dependencies {
+    compile sourceSets.shared.output
+    compile project(':networktables:java')
+    testCompile 'junit:junit:4.11'
+    sharedCompile project(':networktables:java')
+    integrationTestCompile project(':networktables:java')
+    integrationTestCompile 'junit:junit:4.11'
+    integrationTestCompile sourceSets.main.output
+    integrationTestCompile sourceSets.shared.output
+    integrationTestCompile 'com.googlecode.junit-toolbox:junit-toolbox:2.0'
+    integrationTestCompile 'org.apache.ant:ant:1.9.4'
+    integrationTestCompile 'org.apache.ant:ant-junit:1.9.4'
+    simulationCompile sourceSets.main.output
+    simulationCompile sourceSets.shared.output
+    simulationCompile project(':simulation:JavaGazebo')
+    simulationCompile project(':networktables:java')
+}
+
+task wpilibjJar(type: Jar) {
+    description = 'Creates the WPILib Java jar, with the JNI shared library in the correct place'
+    group = 'WPILib'
+    dependsOn { wpilibJavaJNISharedLibrary }
+    dependsOn { classes }
+    from files(sourceSets.main.output.classesDir)
+    from files(sourceSets.shared.output.classesDir)
+    binaries.withType(SharedLibraryBinarySpec) {
+        from(file(it.sharedLibraryFile)) {
+            into 'linux-arm'
+        }
+    }
+}
+
+task wpilibjSources(type: Jar, dependsOn: classes) {
+    description = 'Creates the sources jar for the maven publishing routine'
+    group = 'WPILib'
+    classifier = 'sources'
+    from sourceSets.main.allJava
+    from sourceSets.shared.allJava
+}
+
+task javadoc(type: Javadoc, overwrite: true) {
+    def netTables = project(':networktables:java')
+    source sourceSets.main.allJava, sourceSets.shared.allJava, netTables.sourceSets.main.allJava
+    classpath = files([sourceSets.main.compileClasspath, sourceSets.shared.compileClasspath, netTables.sourceSets.main.compileClasspath])
+}
+
+task wpilibjJavadoc(type: Jar, dependsOn: javadoc) {
+    description = 'Creates the javadoc jar for the maven publishing routine'
+    group = 'WPILib'
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task wpilibjSimJar(type: Jar, dependsOn: simulationClasses) {
+    description = 'Creates the WPILibJSimulation Jar'
+    group = 'WPILib'
+    from sourceSets.simulation.output.classesDir
+    from sourceSets.shared.output.classesDir
+    baseName 'wpilibjSimulation'
+}
+
+task wpilibjSimSources(type: Jar, dependsOn: simulationClasses) {
+    description = 'Creates the wpilibjSimulation sources jar for the maven publishing routine'
+    group = 'WPILib'
+    classifier = 'sources'
+    from sourceSets.simulation.allJava
+    from sourceSets.shared.allJava
+}
+
+task simulationJavadoc(type: Javadoc) {
+    description = 'Generates javadoc for the simulation components'
+    group = 'WPILib'
+    source sourceSets.simulation.allJava, sourceSets.shared.allJava
+    classpath = files([sourceSets.simulation.compileClasspath, sourceSets.shared.compileClasspath])
+}
+
+task wpilibjSimJavadoc(type: Jar, dependsOn: simulationJavadoc) {
+    description = 'Creates the wpilibjSimulation javadoc jar for the maven publishing routine'
+    group = 'WPILib'
+    classifier = 'javadoc'
+    from simulationJavadoc.destinationDir
+}
+
+task wpilibjIntegrationTestJar(type: Jar) {
+    description = 'Creates the wpilib integration tests jar'
+    group = 'WPILib'
+    dependsOn { wpilibJavaJNISharedLibrary }
+    dependsOn { wpilibjJar }
+    dependsOn { integrationTestClasses }
+    from sourceSets.integrationTest.output.classesDir
+    // Get all dependencies needed for running the jar
+    configurations.integrationTestCompile.filter { it.getPath().endsWith('.jar') }.each {
+        if (!it.isDirectory()) {
+            from zipTree(it)
+        }
+    }
+    wpilibjJar.outputs.files.each { from zipTree(it) }
+    manifest {
+        attributes 'Main-Class': 'edu.wpi.first.wpilibj.test.AntJunitLanucher'
+    }
+    baseName = 'wpilibJavaIntegrationTests'
+    version = '0.1.0-SNAPSHOT'
+}
+
+/**
+ * Generates the JNI headers from the HAL package
+ */
+task jniHeaders {
+    description = 'Generates JNI headers from edu.wpi.first.wpilibj.hal.*'
+    group = 'WPILib'
+    def outputFolder = file(generatedJNIHeaderLoc)
+    inputs.files sourceSets.main.output
+    outputs.file outputFolder
+    doLast {
+        outputFolder.mkdirs()
+        exec {
+            executable org.gradle.internal.jvm.Jvm.current().getExecutable('javah')
+            args '-d', outputFolder
+            args '-classpath', sourceSets.main.output.classesDir
+            args 'edu.wpi.first.wpilibj.can.CANJNI'
+            args 'edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary'
+            args 'edu.wpi.first.wpilibj.hal.HALUtil'
+            args 'edu.wpi.first.wpilibj.hal.JNIWrapper'
+            args 'edu.wpi.first.wpilibj.hal.AccelerometerJNI'
+            args 'edu.wpi.first.wpilibj.hal.AnalogJNI'
+            args 'edu.wpi.first.wpilibj.hal.CounterJNI'
+            args 'edu.wpi.first.wpilibj.hal.DIOJNI'
+            args 'edu.wpi.first.wpilibj.hal.EncoderJNI'
+            args 'edu.wpi.first.wpilibj.hal.I2CJNI'
+            args 'edu.wpi.first.wpilibj.hal.InterruptJNI'
+            args 'edu.wpi.first.wpilibj.hal.PWMJNI'
+            args 'edu.wpi.first.wpilibj.hal.RelayJNI'
+            args 'edu.wpi.first.wpilibj.hal.SPIJNI'
+            args 'edu.wpi.first.wpilibj.hal.SolenoidJNI'
+            args 'edu.wpi.first.wpilibj.hal.CompressorJNI'
+            args 'edu.wpi.first.wpilibj.hal.PDPJNI'
+            args 'edu.wpi.first.wpilibj.hal.PowerJNI'
+            args 'edu.wpi.first.wpilibj.hal.SerialPortJNI'
+        }
+    }
+}
+
+clean {
+    delete generatedJNIHeaderLoc
+}
+
+// Ensures that the JNI headers have been downloaded and are in the correct location for generating the JNI build
+task verifyJre {
+    description = 'Verifies that the ARM JDK is downloaded in the user directory'
+    group = 'WPILib'
+    def outputFolder = new File(jdkLocation)
+    outputs.file outputFolder
+    doLast {
+        if (!outputFolder.exists() && !outputFolder.isDirectory()) {
+            def errorMessage = 'The ARM JDK was not found. Please install the JDK in the following location:' +
+                    System.lineSeparator() + jdkLocation +
+                    System.lineSeparator() + 'You can download the JDK here:' +
+                    System.lineSeparator() + jdkDownloadSite
+            throw new GradleException(errorMessage)
+        }
+    }
+}

@@ -1,0 +1,53 @@
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'maven-publish'
+
+// Adds the dependency for the shadow plugin, which creates an uberjar with all dependencies
+buildscript {
+    repositories { jcenter() }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.1'
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifact(shadowJar) {
+                // The shadow plugin has the 'all' classifier. We don't want this, so use null instead
+                classifier null
+            }
+            artifact(simDsSources) {
+                classifier 'sources'
+            }
+            artifact(simDsJavadoc) {
+                classifier 'javadoc'
+            }
+            groupId 'edu.wpi.first.wpilibj.simulation'
+            artifactId 'SimDS'
+            version '0.1.0-SNAPSHOT'
+        }
+    }
+}
+
+mainClassName = 'edu.wpi.first.wpilibj.simulation.ds.Main'
+
+dependencies {
+    compile 'net.java.jinput:jinput:2.0.5'
+    compile project(':simulation:JavaGazebo')
+}
+
+task simDsSources(type: Jar, dependsOn: classes) {
+    description = 'Creates the sources jar for the SimDS'
+    group = 'WPILib'
+    classifier = 'sources'
+    from sourceSets.main.allJava
+}
+
+task simDsJavadoc(type: Jar, dependsOn: javadoc) {
+    description = 'Creates the javadoc jar for the SimDS'
+    group = 'WPILib'
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}

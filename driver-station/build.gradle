@@ -1,0 +1,4 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'edu.wpi.first.driverstation.DriverStation'

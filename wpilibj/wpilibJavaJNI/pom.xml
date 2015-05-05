@@ -26,7 +26,7 @@
 
   </pluginRepositories>
 	<properties>
-		<embeddedJDKHome>${user.home}${file.separator}jdk-linux-arm-vfp-sflt${file.separator}jdk1.7.0_45</embeddedJDKHome>
+		<embeddedJDKHome>${user.home}${file.separator}jdk-linux-arm-vfp-sflt${file.separator}jdk1.8.0_33</embeddedJDKHome>
 		<embeddedJDKIncludePath>${embeddedJDKHome}${file.separator}include</embeddedJDKIncludePath>
 	</properties>
 	<profiles>

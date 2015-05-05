@@ -1,0 +1,233 @@
+apply plugin: 'cpp'
+apply plugin: 'maven-publish'
+apply plugin : 'org.ysb33r.doxygen'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.ysb33r.gradle:doxygen:0.2'
+    }
+}
+
+def shared = 'wpilibC++'
+def devices = 'wpilibC++Devices'
+def sim = 'wpilibC++Sim'
+
+// Ensure that both hal and networktables are evaluated, so that they have the binaries property. We need this to
+// properly copy their archives into the final zip
+evaluationDependsOn(':hal')
+evaluationDependsOn(':networktables:cpp')
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifact wpilibcZip
+            groupId 'edu.wpi.first.wpilib.cmake'
+            artifactId 'cpp-root'
+            version '1.0.0'
+        }
+        mavenSim(MavenPublication) {
+            artifact wpilibcSimZip
+            groupId 'edu.wpi.first.wpilibc.simulation'
+            artifactId 'WPILibCSim'
+            version '0.1.0'
+        }
+    }
+}
+
+model {
+    components {
+        wpilib_nonshared(NativeLibrarySpec) {
+            targetPlatform 'arm'
+            binaries.all {
+                tasks.withType(CppCompile) {
+                    dependsOn addNiLibraryLinks
+                }
+            }
+            sources {
+                cpp {
+                    source {
+                        srcDirs = ["${shared}/src", "${devices}/src"]
+                        includes = ['**/*.cpp']
+                    }
+                    exportedHeaders {
+                        srcDirs = ["${shared}/include", "${devices}/include"]
+                        includes = ['**/*.h']
+                    }
+                    lib project: ':hal', library: 'HALAthena', linkage: 'static'
+                    lib project: ':networktables:cpp', library: 'NetworkTables', linkage: 'static'
+                }
+            }
+        }
+        FRCUserProgram(NativeExecutableSpec) {
+            targetPlatform 'arm'
+            binaries.all {
+                tasks.withType(CppCompile) {
+                    dependsOn addNiLibraryLinks
+                }
+
+                cppCompiler.args '-pthread'
+                linker.args '-pthread'
+                cppCompiler.args '-Wno-unused-variable'
+                linker.args '-Wno-unused-variable'
+                linker.args '-Wl,-rpath,/opt/GenICam_v2_3/bin/Linux_armv7-a'
+            }
+            sources {
+                cpp {
+                    def dir = 'wpilibC++IntegrationTests'
+                    source {
+                        srcDir "${dir}/src"
+                        include '*.cpp'
+                    }
+                    source {
+                        srcDir "${dir}/src/gtest/src"
+                        include 'gtest-all.cc', 'gtest_main.cc'
+                    }
+                    exportedHeaders {
+                        srcDirs = ["${dir}/include", "${dir}/src/gtest", "${dir}/src/gtest/include", "${devices}/include", "${shared}/include", '../hal/include/HAL', '../networktables/cpp/include']
+                        include '**/*.h'
+                    }
+
+                    lib library: 'wpilib_nonshared', linkage: 'static'
+                    lib project: ':networktables:cpp', library: 'NetworkTables', linkage: 'static'
+                    lib project: ':hal', library: 'HALAthena', linkage: 'static'
+                }
+            }
+        }
+    }
+}
+
+doxygen {
+    source file("${shared}/src")
+    source file("${shared}/include")
+    source file("${devices}/src")
+    source file("${devices}/include")
+    def netTablesLoc = '../networktables/cpp'
+    source file("${netTablesLoc}/include")
+    source file("${netTablesLoc}/lib/Athena")
+    source file("${netTablesLoc}/lib/share")
+    template file('cpp.doxy')
+    exclude 'pcre.h'
+    exclude 'nivision.h'
+}
+
+task wpilibcZip(type: Zip) {
+    description = 'Zips all of the libraries for wpilibc'
+    group = 'WPILib'
+    baseName = 'wpilibc'
+    destinationDir = project.buildDir
+
+    // If doxygen is available on this computer, then include the output zip
+    if (checkDoxygen()) {
+        from(doxygen.outputDir) {
+            into 'docs'
+        }
+    }
+
+    // Include the static library file and header files from this project
+    binaries.withType(StaticLibraryBinarySpec) { spec ->
+        spec.headerDirs.each {
+            from(it) {
+                into 'include'
+            }
+        }
+        from(spec.staticLibraryFile) {
+            into 'libs'
+        }
+    }
+
+    // Include the static library file and header files from the networktables project
+    def netTables = project(':networktables:cpp')
+    netTables.binaries.withType(StaticLibraryBinarySpec) { spec ->
+        spec.headerDirs.each {
+            from(it) {
+                into 'include'
+            }
+        }
+        from(spec.staticLibraryFile) {
+            into 'libs'
+        }
+    }
+
+    // Include the static library file and shared library object from hal project
+    def hal = project(':hal')
+    hal.binaries.withType(StaticLibraryBinarySpec) { spec ->
+        spec.headerDirs.each {
+            from(it) {
+                into 'include'
+                // We don't want to include any of the .cpp files that are in some of the header directories
+                exclude '**/*.cpp'
+            }
+        }
+        from(spec.staticLibraryFile) {
+            into 'libs'
+        }
+    }
+    hal.binaries.withType(SharedLibraryBinarySpec) { spec ->
+        from(spec.sharedLibraryFile) {
+            into 'libs'
+        }
+    }
+
+    // We rename the libHALAthena.so object to libHALAthena_shared.so
+    rename('(libHALAthena)(.so)', '$1_shared$2')
+
+    // Finally, include all of the shared library objects from the ni directory
+    from(project.file('../ni-libraries')) {
+        into 'libs'
+        exclude 'genlinks'
+    }
+}
+
+task wpilibcSimZip(type: Zip) {
+    description 'Creates the include zip file for wpilibc'
+    group 'wpilib'
+    baseName 'WPILibCSim'
+    destinationDir = project.buildDir
+    into 'sim/include'
+    from "${sim}/include"
+    from "${shared}/include"
+    from '../networktables/cpp/include'
+    from '../hal/include'
+}
+
+// Add the dependency on the wpilib_nonsharedStaticLibrary task to the wpilibc task. Because of the gradle lifecycle,
+// this cannot be done purely with dependsOn in the task, as the static library task doesn't exist yet. Same goes for
+// the networkTablesStaticLibrary task and the two HAL tasks below
+tasks.whenTaskAdded { task ->
+    if (task.name == 'wpilib_nonsharedStaticLibrary') {
+        wpilibcZip.dependsOn task
+    }
+}
+
+// Add the networktables static library as a dependency
+project(':networktables:cpp').tasks.whenTaskAdded { task ->
+    if (task.name == 'networkTablesStaticLibrary') {
+        wpilibcZip.dependsOn task
+    }
+}
+
+// Add the hal static and shared libraries as a dependency
+project(':hal').tasks.whenTaskAdded { task ->
+    if (task.name == 'hALAthenaStaticLibrary' || task.name == 'hALAthenaSharedLibrary') {
+        wpilibcZip.dependsOn task
+    }
+}
+
+// If doxygen exists on the command line, then add the doxygen task as dependency of the wpilibcZip task
+if (checkDoxygen()) {
+    wpilibcZip.dependsOn doxygen
+}
+
+// Attempts to execute the doxygen command. If there is no exception, doxygen exists, so return true. If there's
+// an IOException, it doesn't exist, so return false
+boolean checkDoxygen() {
+    try {
+        'doxygen'.execute()
+        true
+    } catch (IOException e) {
+        false
+    }
+}

@@ -1,0 +1,10 @@
+include 'networktables:java',
+        'networktables:cpp',
+        'networktables:OutlineViewer',
+        'hal',
+        'wpilibj',
+        'wpilibc',
+        'simulation:JavaGazebo',
+        'simulation:SimDS',
+        'jenkins',
+        'driver-station'

@@ -1,0 +1,31 @@
+evaluationDependsOn(':wpilibj')
+evaluationDependsOn(':wpilibc')
+
+task publishJavadoc(type: Copy) {
+    description = 'Publishes the generated javadoc to the docs/site/java folder'
+    group = 'WPILib'
+    def javadoc = project(':wpilibj').javadoc
+    dependsOn javadoc
+    from javadoc.destinationDir
+    destinationDir file('docs/site/java')
+}
+
+task publishDoxygen(type: Copy) {
+    description = 'Publishes the generated doxygen to the docs/site/cpp folder'
+    group = 'WPILib'
+    def doxygen = project(':wpilibc').doxygen
+    dependsOn doxygen
+    from doxygen.outputDir
+    destinationDir file('docs/site/cpp')
+}
+
+task publishDocs() {
+    description = 'Publishes the generated javadoc and doxygen to the docs/site/<language> folder'
+    group = 'WPILib'
+    dependsOn publishJavadoc
+    dependsOn publishDoxygen
+}
+
+task clean(type: Delete) {
+    delete 'docs/site'
+}

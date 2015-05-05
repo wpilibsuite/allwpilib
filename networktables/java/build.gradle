@@ -1,39 +1,68 @@
 apply plugin: 'java'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
 group = "edu.wpi.frc.wpilib"
 version = "2.0"
+archivesBaseName = 'NetworkTables'
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            artifact (networktablesSource) {
+                classifier = 'sources'
+            }
+            artifact (networktablesJavadoc) {
+                classifier = 'javadoc'
+            }
+
+            groupId 'edu.wpi.first.wpilib.networktables.java'
+            artifactId 'NetworkTables'
+            version '0.1.0-SNAPSHOT'
+        }
+    }
+    repositories {
+        maven {
+            url "file://${System.properties['user.home']}/releases/maven"
+        }
+    }
+}
 
 sourceSets {
-	main {
-	     java {
-	     	  srcDirs = ["src/main/java", "Athena/src/main/java"]
-	     }
-	}
-	test {
-	     java {
-		  srcDirs = ["Athena/src/test/java"]
-		  excludes = ["edu/wpi/first/wpilibj/networktables2/system/SystemTest.java"]
-	     }
-	}
+    main {
+        java {
+            srcDirs = ["src/main/java", "Athena/src/main/java"]
+        }
+    }
+    test {
+        java {
+            srcDirs = ["src/test/java"]
+            excludes = ["edu/wpi/first/wpilibj/networktables2/system/SystemTest.java"]
+        }
+    }
+}
+
+task networktablesSource(type: Jar, dependsOn: classes) {
+    description = 'Generates the source jar for NetworktTables java'
+    group = 'WPILib'
+    classifier = 'classes'
+    from sourceSets.main.allJava
+}
+
+task networktablesJavadoc(type: Jar, dependsOn: javadoc) {
+    description = 'Generates the javadoc jar for NetworkTables java'
+    group = 'WPILib'
+    classifier = 'javadoc'
+    from javadoc.destinationDir
 }
 
 repositories {
-       mavenCentral()
-       mavenLocal()
+    mavenCentral()
 }
 
 dependencies {
-       testCompile group: 'junit', name: 'junit', version: '4.+'
-       testCompile group: 'org.jmock', name: 'jmock-junit4', version: '2.6.0'
-       testCompile group: 'org.jmock', name: 'jmock-legacy', version: '2.6.0'
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+    testCompile group: 'org.jmock', name: 'jmock-junit4', version: '2.6.0'
+    testCompile group: 'org.jmock', name: 'jmock-legacy', version: '2.6.0'
 }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: "file://localhost/tmp/myRepo/")
-            pom.artifactId = 'networktables'
-	}
-    }
-}

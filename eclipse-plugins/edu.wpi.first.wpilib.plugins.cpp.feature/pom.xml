@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>edu.wpi.first.wpilib.plugins.cpp.feature</artifactId>
-  <packaging>eclipse-feature</packaging>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>edu.wpi.first.wpilib.plugins.cpp.feature</artifactId>
+    <packaging>eclipse-feature</packaging>
 
-  <parent>
-    <groupId>edu.wpi.first.wpilib.plugins</groupId>
-    <artifactId>edu.wpi.first.wpilib.plugins</artifactId>
-    <version>0.1.0.qualifier</version>
-    <relativePath>..</relativePath>
-  </parent>
+    <parent>
+        <groupId>edu.wpi.first.wpilib.plugins</groupId>
+        <artifactId>edu.wpi.first.wpilib.plugins</artifactId>
+        <version>0.1.0.qualifier</version>
+        <relativePath>..</relativePath>
+    </parent>
 
 </project>

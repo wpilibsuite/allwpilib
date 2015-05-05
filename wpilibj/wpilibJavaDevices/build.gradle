@@ -1,0 +1,61 @@
+apply plugin: 'java'
+
+if (JavaVersion.current().isJava8Compatible()) {
+    tasks.withType(Javadoc) {
+        // disable the crazy super-strict doclint tool in Java 8
+        //noinspection SpellCheckingInspection
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
+}
+
+task jniHeaders {
+    def outputFolder = new File('../wpilibJavaJNI/build/include')
+    inputs.files sourceSets.main.output
+    outputs.file outputFolder
+    doLast {
+        outputFolder.mkdirs()
+        exec {
+            executable org.gradle.internal.jvm.Jvm.current().getExecutable('javah')
+            args '-d', outputFolder
+            args '-classpath', sourceSets.main.output.classesDir
+            args 'edu.wpi.first.wpilibj.can.CANJNI'
+            args 'edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary'
+            args 'edu.wpi.first.wpilibj.hal.HALUtil'
+            args 'edu.wpi.first.wpilibj.hal.JNIWrapper'
+            args 'edu.wpi.first.wpilibj.hal.AccelerometerJNI'
+            args 'edu.wpi.first.wpilibj.hal.AnalogJNI'
+            args 'edu.wpi.first.wpilibj.hal.CounterJNI'
+            args 'edu.wpi.first.wpilibj.hal.DIOJNI'
+            args 'edu.wpi.first.wpilibj.hal.EncoderJNI'
+            args 'edu.wpi.first.wpilibj.hal.I2CJNI'
+            args 'edu.wpi.first.wpilibj.hal.InterruptJNI'
+            args 'edu.wpi.first.wpilibj.hal.PWMJNI'
+            args 'edu.wpi.first.wpilibj.hal.RelayJNI'
+            args 'edu.wpi.first.wpilibj.hal.SPIJNI'
+            args 'edu.wpi.first.wpilibj.hal.SolenoidJNI'
+            args 'edu.wpi.first.wpilibj.hal.CompressorJNI'
+            args 'edu.wpi.first.wpilibj.hal.PDPJNI'
+            args 'edu.wpi.first.wpilibj.hal.PowerJNI'
+            args 'edu.wpi.first.wpilibj.hal.SerialPortJNI'
+        }
+    }
+}
+
+jniHeaders.dependsOn classes
+
+sourceSets {
+    main {
+        java {
+            excludes = ['edu/wpi/first/wpilibj/camera/']
+        }
+        javadoc {
+            excludes = ['edu/wpi/first/wpilibj/camera/']
+        }
+    }
+}
+
+dependencies {
+    compile 'junit:junit:4.11'
+    compile project(':networktables:java')
+    compile project(':wpilibj:wpilibJava')
+}
