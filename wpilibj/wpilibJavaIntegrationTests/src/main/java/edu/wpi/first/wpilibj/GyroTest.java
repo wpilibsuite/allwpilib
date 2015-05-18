@@ -66,9 +66,9 @@ public class GyroTest extends AbstractComsSetup {
 		//Reset for setup
 		tpcam.getGyro().reset();
     Timer.delay(0.5);
-		
+
 		//Perform test
-		for(int i = 450; i < 1350; i++) {
+		for(int i = 450; i < 1420; i++) {
 			tpcam.getPan().setAngle(i / 10.0);
 			Timer.delay(0.005);
 		}
