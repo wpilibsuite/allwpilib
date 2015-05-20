@@ -112,6 +112,7 @@ subprojects {
                             args << '-rdynamic'
                             args.remove('-m32')
                         }
+                        staticLibArchiver.executable = compilerPrefix + staticLibArchiver.executable
                     }
                 }
             }
