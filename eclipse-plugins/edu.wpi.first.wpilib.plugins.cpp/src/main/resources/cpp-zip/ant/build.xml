@@ -60,17 +60,19 @@
          password="${password}"
          trust="true"
          failonerror="no"
-         command="rm ${deploy.dir}/FRCUserProgram" />
+         command="rm -f ${deploy.dir}/FRCUserProgram" />
 
     <echo>[athena-deploy] Copying code over.</echo>
     <scp file="${out.exe}" sftp="true" todir="${username}@${target}:${deploy.dir}" password="${password}" trust="true"/>
 
+     <!-- Suppress the exit status so that if no netconsole was running then
+          it doesn't show up red on the output. -->
     <sshexec host="${target}"
                username="admin"
                password="${password}"
                trust="true"
                failonerror="false"
-               command="killall netconsole-host"/>
+               command="killall -q netconsole-host || :"/>
     <scp file="${wpilib.ant.dir}/netconsole-host" todir="admin@${target}:/usr/local/frc/bin" password="${password}" trust="true"/>
 
     <scp file="${wpilib.ant.dir}/robotCommand" todir="${username}@${target}:/home/lvuser/" password="${password}" trust="true"/>
@@ -82,8 +84,14 @@
        trust="true"
        command=". /etc/profile.d/natinst-path.sh; chmod a+x ${deploy.dir}/${out}; ${deploy.kill.command};"/>
 
+    <sshexec host="${target}"
+         username="${username}"
+         password="${password}"
+         trust="true"
+         command="sync" />
+
   </target>
-  
+
   <target name="kill-program" depends="get-target-ip" description="Kill the currently running FRC program">
 	  <sshexec host="${target}"
 		   username="${username}"
@@ -115,7 +123,7 @@
       </sequential>
     </parallel>
   </target>
-  
+
   <target name="dependencies" depends="get-target-ip">
     <property name="ant.enable.asserts" value="true"/>
 	<post to="http://${target}/nisysapi/server" logfile="sysProps.xml" verbose="false" encoding="UTF-16LE" append="false">

@@ -100,17 +100,19 @@
     <!-- We're running a clean here to get around a known ant issue where it does not detected changed constant variables.
      To get around this, we're recompiling the entire project, which is not an issue for most teams. If this is an issue
      for you, you can remove the clean here, just be sure to do a full rebuild after you've changed any constants.
-     Reference: http://stackoverflow.com/questions/6430001/ant-doesnt-recompile-constants -->	
+     Reference: http://stackoverflow.com/questions/6430001/ant-doesnt-recompile-constants -->
   <target name="deploy" depends="clean,jar,get-target-ip,dependencies" description="Deploy the jar and start the program running.">
     <echo>[athena-deploy] Copying code over.</echo>
     <scp file="${dist.jar}" todir="${username}@${target}:${deploy.dir}" password="${password}" trust="true"/>
 
+     <!-- Suppress the exit status so that if no netconsole was running then
+          it doesn't show up red on the output. -->
       <sshexec host="${target}"
                username="admin"
                password="${password}"
                trust="true"
                failonerror="false"
-               command="killall netconsole-host"/>
+               command="killall -q netconsole-host || :"/>
       <scp file="${wpilib.ant.dir}/netconsole-host" todir="admin@${target}:/usr/local/frc/bin" password="${password}" trust="true"/>
 
       <scp file="${wpilib.ant.dir}/robotCommand" todir="${username}@${target}:${command.dir}" password="${password}" trust="true"/>
@@ -121,6 +123,12 @@
        password="${password}"
        trust="true"
        command="${deploy.kill.command};"/>
+
+    <sshexec host="${target}"
+         username="${username}"
+         password="${password}"
+         trust="true"
+         command="sync" />
 
   </target>
 
@@ -214,7 +222,7 @@
       </sequential>
     </parallel>
   </target>
-  
+
   <target name="dependencies" depends="get-target-ip">
     <property name="ant.enable.asserts" value="true"/>
 	<post to="http://${target}/nisysapi/server" logfile="sysProps.xml" verbose="false" encoding="UTF-16LE" append="false">
