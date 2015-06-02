@@ -37,14 +37,16 @@ typedef int32_t TASK;
 typedef pthread_t* TASK;
 #endif
 
-extern "C"
-{
-	extern const uint32_t VXWORKS_FP_TASK;
-	extern const int32_t HAL_objLib_OBJ_ID_ERROR;
-	extern const int32_t HAL_objLib_OBJ_DELETED;
-	extern const int32_t HAL_taskLib_ILLEGAL_OPTIONS;
-	extern const int32_t HAL_memLib_NOT_ENOUGH_MEMORY;
-	extern const int32_t HAL_taskLib_ILLEGAL_PRIORITY;
+extern "C" {
+  // Note: These constants used to be declared extern and were defined in
+  // Task.cpp. This caused issues with the JNI bindings for java, and so the
+  // instantiations were moved here.
+  const uint32_t VXWORKS_FP_TASK = 0x01000000;
+  const int32_t HAL_objLib_OBJ_ID_ERROR = -1; // TODO: update to relevant TaskIDError
+  const int32_t HAL_objLib_OBJ_DELETED = -1; // TODO: update to relevant TaskDeletedError
+  const int32_t HAL_taskLib_ILLEGAL_OPTIONS = -1; // TODO: update to relevant TaskOptionsError
+  const int32_t HAL_memLib_NOT_ENOUGH_MEMORY = -1; // TODO: update to relevant TaskMemoryError
+  const int32_t HAL_taskLib_ILLEGAL_PRIORITY = -1; // TODO: update to relevant TaskPriorityError
 
 	TASK spawnTask(char * name, int priority, int options, int stackSize, FUNCPTR entryPt,
 			uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4,
@@ -58,5 +60,5 @@ extern "C"
 	STATUS verifyTaskID(TASK task);
 	STATUS setTaskPriority(TASK task, int priority);
 	STATUS getTaskPriority(TASK task, int* priority);
-}
 
+}
