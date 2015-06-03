@@ -214,3 +214,8 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALstrerror
 	HALUTIL_LOG(logDEBUG) << "Calling HALUtil getHALstrerror errorCode=" << errorCode << " msg=" << msg;
 	return env->NewStringUTF(msg);
 }
+
+JNIEXPORT jint JNICALL
+    Java_edu_wpi_first_wpilibj_hal_HALUtil_pointerSize(JNIEnv*, jclass) {
+  return sizeof(void*);
+}

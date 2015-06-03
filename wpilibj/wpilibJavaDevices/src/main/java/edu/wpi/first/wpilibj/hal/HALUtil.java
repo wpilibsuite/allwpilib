@@ -32,7 +32,7 @@ public class HALUtil extends JNIWrapper {
 	public static native boolean getFPGAButton(IntBuffer status);
 
 	public static native String getHALErrorMessage(int code);
-	
+
 	public static native int getHALErrno();
 	public static native String getHALstrerror(int errno);
 	public static String getHALstrerror(){
@@ -52,4 +52,5 @@ public class HALUtil extends JNIWrapper {
 		}
 	}
 
+  public static native int pointerSize();
 }

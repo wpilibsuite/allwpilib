@@ -4,12 +4,6 @@
 #include <stdio.h>
 #include <signal.h>
 
-const uint32_t VXWORKS_FP_TASK = 0x01000000;
-const int32_t HAL_objLib_OBJ_ID_ERROR = -1; // TODO: update to relevant TaskIDError
-const int32_t HAL_objLib_OBJ_DELETED = -1; // TODO: update to relevant TaskDeletedError
-const int32_t HAL_taskLib_ILLEGAL_OPTIONS = -1; // TODO: update to relevant TaskOptionsError
-const int32_t HAL_memLib_NOT_ENOUGH_MEMORY = -1; // TODO: update to relevant TaskMemoryError
-const int32_t HAL_taskLib_ILLEGAL_PRIORITY = -1; // TODO: update to relevant TaskPriorityError
 
 struct TaskArgs {
 	FUNCPTR fun;
@@ -30,7 +24,7 @@ void* startRoutine(void* data) {
 	return ret;
 }
 
-TASK spawnTask(char * name, int priority, int options, int stackSize, 
+TASK spawnTask(char * name, int priority, int options, int stackSize,
 		       FUNCPTR entryPt, uint32_t arg0, uint32_t arg1, uint32_t arg2,
 		       uint32_t arg3, uint32_t arg4, uint32_t arg5, uint32_t arg6,
 		       uint32_t arg7, uint32_t arg8, uint32_t arg9) {

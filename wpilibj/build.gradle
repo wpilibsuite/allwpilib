@@ -245,6 +245,7 @@ task jniHeaders {
             args 'edu.wpi.first.wpilibj.hal.EncoderJNI'
             args 'edu.wpi.first.wpilibj.hal.I2CJNI'
             args 'edu.wpi.first.wpilibj.hal.InterruptJNI'
+            args 'edu.wpi.first.wpilibj.hal.NotifierJNI'
             args 'edu.wpi.first.wpilibj.hal.PWMJNI'
             args 'edu.wpi.first.wpilibj.hal.RelayJNI'
             args 'edu.wpi.first.wpilibj.hal.SPIJNI'
