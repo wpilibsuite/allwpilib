@@ -164,7 +164,6 @@ void CANTalon::Set(float value, uint8_t syncGroup)
  */
 void CANTalon::Disable()
 {
-  // Until Modes other than throttle work, just disable by setting throttle to 0.0.
   m_impl->SetModeSelect((int)CANTalon::kDisabled);
   m_controlEnabled = false;
 }
@@ -1171,6 +1170,7 @@ void CANTalon::ConfigFaultTime(float faultTime)
 void CANTalon::ApplyControlMode(CANSpeedController::ControlMode mode)
 {
   m_controlMode = mode;
+  HALReport(HALUsageReporting::kResourceType_CANTalonSRX, m_deviceNumber+1, mode);
   switch (mode) {
     case kPercentVbus:
       m_sendMode = kThrottle;

@@ -29,7 +29,7 @@ void VictorSP::InitVictorSP() {
 	SetRaw(m_centerPwm);
 	SetZeroLatch();
 
-	HALReport(HALUsageReporting::kResourceType_Talon, GetChannel());
+	HALReport(HALUsageReporting::kResourceType_VictorSP, GetChannel());
 	LiveWindow::GetInstance()->AddActuator("VictorSP", GetChannel(), this);
 }
 

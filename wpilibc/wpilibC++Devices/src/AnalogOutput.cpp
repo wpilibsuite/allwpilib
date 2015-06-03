@@ -40,7 +40,7 @@ void AnalogOutput::InitAnalogOutput(uint32_t channel) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
     LiveWindow::GetInstance()->AddActuator("AnalogOutput", m_channel, this);
-    HALReport(HALUsageReporting::kResourceType_AnalogChannel, m_channel, 0);
+    HALReport(HALUsageReporting::kResourceType_AnalogOutput, m_channel);
 }
 
 /**

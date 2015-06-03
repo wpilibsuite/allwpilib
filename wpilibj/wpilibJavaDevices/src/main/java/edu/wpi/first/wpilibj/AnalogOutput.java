@@ -60,7 +60,7 @@ public class AnalogOutput extends SensorBase implements LiveWindowSendable {
 		HALUtil.checkStatus(status.asIntBuffer());
 
 		LiveWindow.addSensor("AnalogOutput", channel, this);
-		UsageReporting.report(tResourceType.kResourceType_AnalogChannel, channel, 1);
+		UsageReporting.report(tResourceType.kResourceType_AnalogOutput, channel);
 	}
 
 	/**

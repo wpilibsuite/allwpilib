@@ -37,7 +37,7 @@ public class VictorSP extends SafePWM implements SpeedController {
 		setZeroLatch();
 
         LiveWindow.addActuator("VictorSP", getChannel(), this);
-        UsageReporting.report(tResourceType.kResourceType_Talon, getChannel());
+        UsageReporting.report(tResourceType.kResourceType_VictorSP, getChannel());
     }
 
     /**

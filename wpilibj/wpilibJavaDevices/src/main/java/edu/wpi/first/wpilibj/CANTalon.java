@@ -10,6 +10,8 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.hal.CanTalonSRX;
 import edu.wpi.first.wpilibj.hal.CanTalonJNI;
+import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.hal.SWIGTYPE_p_double;
 import edu.wpi.first.wpilibj.hal.SWIGTYPE_p_int;
 import edu.wpi.first.wpilibj.hal.SWIGTYPE_p_uint32_t;
@@ -456,6 +458,8 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
       m_controlEnabled = false;
     // Disable until set() is called.
     m_impl.SetModeSelect(ControlMode.Disabled.value);
+	
+	UsageReporting.report(tResourceType.kResourceType_CANTalonSRX, m_deviceNumber + 1, controlMode.value);
   }
   public void changeControlMode(ControlMode controlMode) {
     if(m_controlMode == controlMode){
