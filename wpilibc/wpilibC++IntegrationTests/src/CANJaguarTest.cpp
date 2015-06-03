@@ -274,7 +274,7 @@ TEST_F(CANJaguarTest, SpeedModeWorks) {
 	m_jaguar->SetSpeedMode(CANJaguar::QuadEncoder, 360, 0.1f, 0.003f, 0.01f);
 	m_jaguar->EnableControl();
 
-	constexpr float speed = 100.0f;
+	constexpr float speed = 60.0f;
 
 	SetJaguar(kMotorTime, speed);
 	EXPECT_NEAR(speed, m_jaguar->GetSpeed(), kEncoderSpeedTolerance);

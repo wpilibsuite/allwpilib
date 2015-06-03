@@ -11,7 +11,7 @@
 
 static constexpr double kServoResetTime = 2.0;
 
-static constexpr double kTestAngle = 180.0;
+static constexpr double kTestAngle = 90.0;
 
 static constexpr double kTiltSetpoint0 = 0.22;
 static constexpr double kTiltSetpoint45 = 0.45;
@@ -45,7 +45,7 @@ protected:
 		m_pan = new Servo(TestBench::kCameraPanChannel);
 		m_spiAccel = new ADXL345_SPI(SPI::kOnboardCS0);
 
-		m_tilt->SetAngle(90.0f);
+		m_tilt->Set(kTiltSetpoint45);
 		m_pan->SetAngle(0.0f);
 
 		Wait(kServoResetTime);
@@ -78,8 +78,8 @@ TEST_F(TiltPanCameraTest, GyroAngle) {
   Wait(0.25);
   m_gyro->Reset();
 
-	for(int i = 0; i < 1800; i++) {
-		m_pan->SetAngle(i / 10.0);
+	for(int i = 0; i < 600; i++) {
+		m_pan->Set(i / 1000.0);
 		Wait(0.001);
 	}
 
