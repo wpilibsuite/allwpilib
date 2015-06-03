@@ -10,10 +10,12 @@ C++ requires cmake if not run from maven, and is much faster.
 Make a new directory and then run:
 ```
 mkdir build && cd build
-cmake .. -DCMAKE_TOOLCHAIN_FILE=../arm-toolchain.cmake
+cmake .. -DCMAKE_TOOLCHAIN_FILE=../arm-toolchain.cmake -G "MSYS Makefiles"
 make # multicore add -j(num of cpu cores + 1), so -j3 on dual core for faster compile
 make install DESTDIR=/some/dir/you/want/to/put/all/headers/and/libs #optional
 ``
+
+Note that you will receive a warning about libstdc++, but the build should complete successfully
 
 Alternatively, if you like IDEs, you can import it directly into QtDeveloper, or a number of other IDEs such as Code::Blocks or Eclipse. See CMake documentation for details.
 Eclipse demo:
