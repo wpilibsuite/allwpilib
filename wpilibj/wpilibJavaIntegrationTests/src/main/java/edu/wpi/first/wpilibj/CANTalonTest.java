@@ -87,7 +87,7 @@ public class CANTalonTest extends AbstractComsSetup {
   @Test
   public void SetGetPID() {
     CANTalon talon = new CANTalon(0);
-    talon.changeControlMode(CANTalon.ControlMode.Position);
+    talon.changeControlMode(CANTalon.TalonControlMode.Position);
     double p = 0.05, i = 0.098, d = 1.23;
     talon.setPID(p, i , d);
     assertTrue(errorMessage(talon.getP(), p), Math.abs(p - talon.getP()) < 1e-5);
@@ -106,7 +106,7 @@ public class CANTalonTest extends AbstractComsSetup {
   @Test
   public void positionModeWorks() {
     CANTalon talon = new CANTalon(0);
-    talon.changeControlMode(CANTalon.ControlMode.Position);
+    talon.changeControlMode(CANTalon.TalonControlMode.Position);
     talon.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot);
     Timer.delay(0.2);
     double p = 1.0, i = 0.0, d = 0.00;

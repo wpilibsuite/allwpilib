@@ -20,14 +20,14 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 
-public class CANTalon implements MotorSafety, PIDOutput, SpeedController, LiveWindowSendable {
+public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedController, LiveWindowSendable {
 	private MotorSafetyHelper m_safetyHelper;
-	public enum ControlMode {
+	public enum TalonControlMode {
 		PercentVbus(0), Follower(5), Voltage(4), Position(1), Speed(2), Current(3), Disabled(15);
 
     public int value;
-    public static ControlMode valueOf(int value) {
-			for(ControlMode mode : values()) {
+    public static TalonControlMode valueOf(int value) {
+			for(TalonControlMode mode : values()) {
 				if(mode.value == value) {
 					return mode;
 				}
@@ -36,7 +36,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController, LiveWi
 			return null;
     }
 
-    private ControlMode(int value) {
+    private TalonControlMode(int value) {
       this.value = value;
     }
 	}
@@ -79,7 +79,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController, LiveWi
 
 
   private CanTalonSRX m_impl;
-  ControlMode m_controlMode;
+  TalonControlMode m_controlMode;
   private static double kDelayForSolicitedSignals = 0.004;
 
   int m_deviceNumber;
@@ -96,7 +96,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController, LiveWi
     m_profile = 0;
     m_setPoint = 0;
     setProfile(m_profile);
-    applyControlMode(ControlMode.PercentVbus);
+    applyControlMode(TalonControlMode.PercentVbus);
   }
   public CANTalon(int deviceNumber,int controlPeriodMs) {
     m_deviceNumber = deviceNumber;
@@ -106,18 +106,23 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController, LiveWi
     m_profile = 0;
     m_setPoint = 0;
     setProfile(m_profile);
-    applyControlMode(ControlMode.PercentVbus);
+    applyControlMode(TalonControlMode.PercentVbus);
   }
 
   @Override
   public void pidWrite(double output)
      {
-    if (getControlMode() == ControlMode.PercentVbus) {
+    if (getControlMode() == TalonControlMode.PercentVbus) {
       set(output);
     }
     else {
 			throw new IllegalStateException("PID only supported in PercentVbus mode");
     }
+  }
+
+  @Override
+  public double pidGet() {
+    return getPosition();
   }
 
   public void delete() {
@@ -366,7 +371,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController, LiveWi
   /**
    *  Returns temperature of Talon, in degrees Celsius.
    */
-  public double getTemp() {
+  public double getTemperature() {
     long tempp = CanTalonJNI.new_doublep(); // Create a new swig pointer.
     m_impl.GetTemp(new SWIGTYPE_p_double(tempp, true));
     return CanTalonJNI.doublep_value(tempp);
@@ -446,7 +451,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController, LiveWi
     return CanTalonJNI.intp_value(speedp);
   }
 
-  public ControlMode getControlMode() {
+  public TalonControlMode getControlMode() {
     return m_controlMode;
   }
   /**
@@ -455,16 +460,16 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController, LiveWi
    * @param controlMode Control mode to ultimately enter once user calls set().
    * @see #set
    */
-  private void applyControlMode(ControlMode controlMode) {
+  private void applyControlMode(TalonControlMode controlMode) {
     m_controlMode = controlMode;
-    if (controlMode == ControlMode.Disabled)
+    if (controlMode == TalonControlMode.Disabled)
       m_controlEnabled = false;
     // Disable until set() is called.
-    m_impl.SetModeSelect(ControlMode.Disabled.value);
+    m_impl.SetModeSelect(TalonControlMode.Disabled.value);
 
 	UsageReporting.report(tResourceType.kResourceType_CANTalonSRX, m_deviceNumber + 1, controlMode.value);
   }
-  public void changeControlMode(ControlMode controlMode) {
+  public void changeControlMode(TalonControlMode controlMode) {
     if(m_controlMode == controlMode){
       /* we already are in this mode, don't perform disable workaround */
     }else{
@@ -484,7 +489,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController, LiveWi
   }
 
   public void disableControl() {
-    m_impl.SetModeSelect(ControlMode.Disabled.value);
+    m_impl.SetModeSelect(TalonControlMode.Disabled.value);
 		m_controlEnabled = false;
   }
 

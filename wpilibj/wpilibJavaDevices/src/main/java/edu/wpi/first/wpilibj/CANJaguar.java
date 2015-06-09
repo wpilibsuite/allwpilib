@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
  * Texas Instruments Jaguar Speed Controller as a CAN device.
  * @author Thomas Clark
  */
-public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveWindowSendable {
+public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController, LiveWindowSendable {
 
 	public static final int kMaxMessageDataSize = 8;
 
@@ -217,7 +217,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
 			// Not all Jaguar firmware reports a hardware version.
 			m_hardwareVersion = 0;
 		}
-		
+
 		// 3330 was the first shipping RDK firmware version for the Jaguar
 		if (m_firmwareVersion >= 3330 || m_firmwareVersion < 108)
 		{
