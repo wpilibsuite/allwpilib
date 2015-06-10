@@ -134,7 +134,7 @@ task wpilibcZip(type: Zip) {
             }
         }
         from(spec.staticLibraryFile) {
-            into 'libs'
+            into 'lib'
         }
     }
 
@@ -147,7 +147,7 @@ task wpilibcZip(type: Zip) {
             }
         }
         from(spec.staticLibraryFile) {
-            into 'libs'
+            into 'lib'
         }
     }
 
@@ -162,12 +162,12 @@ task wpilibcZip(type: Zip) {
             }
         }
         from(spec.staticLibraryFile) {
-            into 'libs'
+            into 'lib'
         }
     }
     hal.binaries.withType(SharedLibraryBinarySpec) { spec ->
         from(spec.sharedLibraryFile) {
-            into 'libs'
+            into 'lib'
         }
     }
 
@@ -176,7 +176,7 @@ task wpilibcZip(type: Zip) {
 
     // Finally, include all of the shared library objects from the ni directory
     from(project.file('../ni-libraries')) {
-        into 'libs'
+        into 'lib'
         exclude 'genlinks'
     }
 }
