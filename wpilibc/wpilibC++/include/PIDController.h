@@ -103,7 +103,7 @@ private:
 	virtual void StopLiveWindowMode();
 protected:
 	ITable* m_table;
-	void Calculate();
+	virtual void Calculate();
 
 	DISALLOW_COPY_AND_ASSIGN(PIDController);
 };

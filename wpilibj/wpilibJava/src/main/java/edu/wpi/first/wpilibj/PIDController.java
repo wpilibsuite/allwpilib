@@ -211,7 +211,7 @@ public class PIDController implements LiveWindowSendable, Controller {
      * This should only be called by the PIDTask
      * and is created during initialization.
      */
-    private void calculate() {
+    protected void calculate() {
         boolean enabled;
         PIDSource pidInput;
 
