@@ -115,6 +115,28 @@ subprojects {
                         staticLibArchiver.executable = compilerPrefix + staticLibArchiver.executable
                     }
                 }
+                macGcc(Clang) {
+                    target('arm') {
+                        // We use a custom-built cross compiler with the prefix arm-frc-linux-gnueabi-<util name>
+                        // If this ever changes, the prefix will need to be changed here
+                        def compilerPrefix = 'arm-frc-linux-gnueabi-'
+                        cppCompiler.executable = compilerPrefix + 'g++'
+                        linker.executable = compilerPrefix + 'g++'
+                        assembler.executable = compilerPrefix + 'gcc'
+                        // Gradle auto-adds the -m32 argument to the linker and compiler. Our compiler only supports
+                        // arm, and doesn't understand this flag, so it is removed from both
+                        cppCompiler.withArguments { args ->
+                            args << '-std=c++1y' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
+                            args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-O0' << '-g3' << '-rdynamic'
+                            args.remove('-m32')
+                        }
+                        linker.withArguments { args ->
+                            args << '-rdynamic'
+                            args.remove('-m32')
+                        }
+                        staticLibArchiver.executable = compilerPrefix + staticLibArchiver.executable
+                    }
+                }
             }
 
             // The only platform is arm linux
