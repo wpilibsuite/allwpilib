@@ -66,7 +66,11 @@ DriverStation::DriverStation()
 
 	AddToSingletonList();
 
-	if (!m_task.Start((int32_t)this))
+  // They need to be identical or it could lead to runtime stack corruption if
+  // the caller and callee push and pop different amounts of data on the stack.
+  static_assert(sizeof(this) == sizeof(uint32_t),
+                "We are passing a pointer through a uint32_t");
+	if (!m_task.Start((uint32_t)this))
 	{
 		wpi_setWPIError(DriverStationTaskError);
 	}
@@ -84,6 +88,8 @@ DriverStation::~DriverStation()
 	deleteMutex(m_waitForDataMutex);
 }
 
+// XXX: This assumes that the calling convention treats pointers and uint32_ts
+// identical, which is not necessarily true.
 void DriverStation::InitTask(DriverStation *ds)
 {
 	ds->Run();
@@ -170,7 +176,7 @@ void DriverStation::ReportJoystickUnpluggedError(std::string message) {
 	}
 }
 
-/**	
+/**
  * Returns the number of axes on a given joystick port
  *
  * @param stick The joystick port number
@@ -188,7 +194,7 @@ int DriverStation::GetStickAxisCount(uint32_t stick)
    	return joystickAxes.count;
 }
 
-/**	
+/**
  * Returns the number of POVs on a given joystick port
  *
  * @param stick The joystick port number
@@ -206,7 +212,7 @@ int DriverStation::GetStickPOVCount(uint32_t stick)
    	return joystickPOVs.count;
 }
 
-/**	
+/**
  * Returns the number of buttons on a given joystick port
  *
  * @param stick The joystick port number
@@ -316,7 +322,7 @@ bool DriverStation::GetStickButton(uint32_t stick, uint8_t button)
 		wpi_setWPIError(BadJoystickIndex);
 		return false;
 	}
-	
+
 	if(button > m_joystickButtons[stick].count)
 	{
 		ReportJoystickUnpluggedError("WARNING: Joystick Button missing, check if all controllers are plugged in\n");
