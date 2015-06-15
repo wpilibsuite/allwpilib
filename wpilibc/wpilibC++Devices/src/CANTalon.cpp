@@ -66,16 +66,25 @@ void CANTalon::PIDWrite(float output)
 	}
 }
 
-  /**
-   * Gets the current status of the Talon (usually a sensor value).
-   *
-   * In Current mode: returns output current.
-   * In Speed mode: returns current speed.
-   * In Position mode: returns current sensor position.
-   * In PercentVbus and Follower modes: returns current applied throttle.
-   *
-   * @return The current sensor value of the Talon.
-   */
+/**
+ * Retrieve the current sensor value. Equivalent to Get().
+ *
+ * @return The current sensor value of the Talon.
+ */
+double CANTalon::PIDGet() const {
+  return Get();
+}
+
+/**
+ * Gets the current status of the Talon (usually a sensor value).
+ *
+ * In Current mode: returns output current.
+ * In Speed mode: returns current speed.
+ * In Position mode: returns current sensor position.
+ * In PercentVbus and Follower modes: returns current applied throttle.
+ *
+ * @return The current sensor value of the Talon.
+ */
 float CANTalon::Get() const
 {
   int value;
@@ -165,7 +174,24 @@ void CANTalon::Set(float value, uint8_t syncGroup)
 }
 
 /**
- * TODO documentation (see CANJaguar.cpp)
+ * Sets the setpoint to value. Equivalent to Set().
+ */
+void CANTalon::SetSetpoint(float value) {
+  Set(value);
+}
+
+/**
+ * Resets the integral term and disables the controller.
+ */
+void CANTalon::Reset() {
+  ClearIaccum();
+  Disable();
+}
+
+/**
+ * Disables control of the talon, causing the motor to brake or coast
+ * depending on its mode (see the Talon SRX Software Reference manual
+ * for more information).
  */
 void CANTalon::Disable()
 {
@@ -174,7 +200,7 @@ void CANTalon::Disable()
 }
 
 /**
- * TODO documentation (see CANJaguar.cpp)
+ * Enables control of the Talon, allowing the motor to move.
  */
 void CANTalon::EnableControl() {
   SetControlMode(m_controlMode);
@@ -182,10 +208,24 @@ void CANTalon::EnableControl() {
 }
 
 /**
+ * Enables control of the Talon, allowing the motor to move.
+ */
+void CANTalon::Enable() {
+  EnableControl();
+}
+
+/**
  * @return Whether the Talon is currently enabled.
  */
 bool CANTalon::IsControlEnabled() const {
   return m_controlEnabled;
+}
+
+/**
+ * @return Whether the Talon is currently enabled.
+ */
+bool CANTalon::IsEnabled() const {
+  return IsControlEnabled();
 }
 
 /**

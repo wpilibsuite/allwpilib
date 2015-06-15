@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
  * Texas Instruments Jaguar Speed Controller as a CAN device.
  * @author Thomas Clark
  */
-public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController, LiveWindowSendable {
+public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeedController, LiveWindowSendable {
 
 	public static final int kMaxMessageDataSize = 8;
 
@@ -304,6 +304,27 @@ public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController, Li
 		return m_value;
 	}
 
+  /**
+   * Equivalent to {@link #get()}.
+   */
+  @Override
+  public double getSetpoint() {
+    return get();
+  }
+
+  /**
+   * Get the difference between the setpoint and goal in closed loop modes.
+   *
+   * Outside of position and velocity modes the return value of getError()
+   * has relatively little meaning.
+   *
+   * @return The difference between the setpoint and the current position.
+   */
+  @Override
+  public double getError() {
+    return get() - getPosition();
+  }
+
 	/**
 	 * Sets the output set-point value.
 	 *
@@ -386,6 +407,20 @@ public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController, Li
 	public void set(double value) {
 		set(value, (byte)0);
 	}
+
+  /**
+   * Equivalent to {@link #set(double)}. Implements PIDInterface.
+   */
+  @Override
+  public void setSetpoint(double value) {
+    set(value);
+  }
+
+  @Override
+  public void reset() {
+    set(m_value);
+    disableControl();
+  }
 
 	/**
 	* Check all unverified params and make sure they're equal to their local
@@ -834,6 +869,11 @@ public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController, Li
 		disableControl();
 	}
 
+  // PIDInterface interface
+  public void enable() {
+    enableControl();
+  }
+
 	// PIDOutput interface
 	@Override
 	public void pidWrite(double output) {
@@ -1060,6 +1100,15 @@ public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController, Li
 	public void enableControl() {
 		enableControl(0.0);
 	}
+
+  /**
+   * Return whether the controller is enabled.
+   *
+   * @returns true if enabled.
+   */
+  public boolean isEnabled() {
+    return m_controlEnabled;
+  }
 
 	/**
 	* Disable the closed loop controller.

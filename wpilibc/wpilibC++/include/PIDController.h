@@ -9,6 +9,7 @@
 #include "Controller.h"
 #include "LiveWindow/LiveWindow.h"
 #include "HAL/Semaphore.hpp"
+#include "PIDInterface.h"
 
 class PIDOutput;
 class PIDSource;
@@ -21,8 +22,9 @@ class Notifier;
  * care of the integral calculations, as well as writing the given
  * PIDOutput
  */
-class PIDController : public LiveWindowSendable, public Controller, public ITableListener
-{
+class PIDController : public LiveWindowSendable,
+                      public PIDInterface,
+                      public ITableListener {
 public:
 	PIDController(float p, float i, float d, PIDSource *source, PIDOutput *output, float period =
 			0.05);
@@ -33,15 +35,15 @@ public:
 	virtual void SetContinuous(bool continuous = true);
 	virtual void SetInputRange(float minimumInput, float maximumInput);
 	virtual void SetOutputRange(float minimumOutput, float maximumOutput);
-	virtual void SetPID(float p, float i, float d);
-	virtual void SetPID(float p, float i, float d, float f);
-	virtual float GetP() const;
-	virtual float GetI() const;
-	virtual float GetD() const;
-	virtual float GetF() const;
+	virtual void SetPID(double p, double i, double d) override;
+	virtual void SetPID(double p, double i, double d, double f);
+	virtual double GetP() const override;
+	virtual double GetI() const override;
+	virtual double GetD() const override;
+	virtual double GetF() const;
 
-	virtual void SetSetpoint(float setpoint);
-	virtual float GetSetpoint() const;
+	virtual void SetSetpoint(float setpoint) override;
+	virtual double GetSetpoint() const override;
 
 	virtual float GetError() const;
 
@@ -52,9 +54,9 @@ public:
 
 	virtual void Enable() override;
 	virtual void Disable() override;
-	virtual bool IsEnabled() const;
+	virtual bool IsEnabled() const override;
 
-	virtual void Reset();
+	virtual void Reset() override;
 
 	virtual void InitTable(ITable* table);
 

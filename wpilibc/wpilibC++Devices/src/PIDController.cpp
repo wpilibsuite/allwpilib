@@ -63,7 +63,7 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
 								float period)
 {
 	m_table = NULL;
-	
+
 	m_semaphore = initializeMutexNormal();
 
 	m_controlLoop = new Notifier(PIDController::CallCalculate, this);
@@ -209,7 +209,7 @@ void PIDController::Calculate()
  * @param i Integral coefficient
  * @param d Differential coefficient
  */
-void PIDController::SetPID(float p, float i, float d)
+void PIDController::SetPID(double p, double i, double d)
 {
 	CRITICAL_REGION(m_semaphore)
 	{
@@ -234,7 +234,7 @@ void PIDController::SetPID(float p, float i, float d)
  * @param d Differential coefficient
  * @param f Feed forward coefficient
  */
-void PIDController::SetPID(float p, float i, float d, float f)
+void PIDController::SetPID(double p, double i, double d, double f)
 {
 	CRITICAL_REGION(m_semaphore)
 	{
@@ -257,7 +257,7 @@ void PIDController::SetPID(float p, float i, float d, float f)
  * Get the Proportional coefficient
  * @return proportional coefficient
  */
-float PIDController::GetP() const
+double PIDController::GetP() const
 {
 	CRITICAL_REGION(m_semaphore)
 	{
@@ -270,7 +270,7 @@ float PIDController::GetP() const
  * Get the Integral coefficient
  * @return integral coefficient
  */
-float PIDController::GetI() const
+double PIDController::GetI() const
 {
 	CRITICAL_REGION(m_semaphore)
 	{
@@ -283,7 +283,7 @@ float PIDController::GetI() const
  * Get the Differential coefficient
  * @return differential coefficient
  */
-float PIDController::GetD() const
+double PIDController::GetD() const
 {
 	CRITICAL_REGION(m_semaphore)
 	{
@@ -296,7 +296,7 @@ float PIDController::GetD() const
  * Get the Feed forward coefficient
  * @return Feed forward coefficient
  */
-float PIDController::GetF() const
+double PIDController::GetF() const
 {
 	CRITICAL_REGION(m_semaphore)
 	{
@@ -348,7 +348,7 @@ void PIDController::SetInputRange(float minimumInput, float maximumInput)
 	CRITICAL_REGION(m_semaphore)
 	{
 		m_minimumInput = minimumInput;
-		m_maximumInput = maximumInput;	
+		m_maximumInput = maximumInput;
 	}
 	END_REGION;
 
@@ -393,8 +393,8 @@ void PIDController::SetSetpoint(float setpoint)
 			m_setpoint = setpoint;
 		}
 	}
-	END_REGION;	
-	
+	END_REGION;
+
 	if (m_table != NULL) {
 		m_table->PutNumber("setpoint", m_setpoint);
 	}
@@ -404,7 +404,7 @@ void PIDController::SetSetpoint(float setpoint)
  * Returns the current setpoint of the PIDController
  * @return the current setpoint
  */
-float PIDController::GetSetpoint() const
+double PIDController::GetSetpoint() const
 {
 	float setpoint;
 	CRITICAL_REGION(m_semaphore)
@@ -512,11 +512,11 @@ bool PIDController::OnTarget() const
 void PIDController::Enable()
 {
 	CRITICAL_REGION(m_semaphore)
-	{			
+	{
 		m_enabled = true;
 	}
-	END_REGION;	
-	
+	END_REGION;
+
 	if (m_table != NULL) {
 		m_table->PutBoolean("enabled", true);
 	}
@@ -533,7 +533,7 @@ void PIDController::Disable()
 		m_enabled = false;
 	}
 	END_REGION;
-	
+
 	if (m_table != NULL) {
 		m_table->PutBoolean("enabled", false);
 	}

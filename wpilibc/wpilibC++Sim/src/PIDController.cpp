@@ -66,7 +66,7 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
 	m_I = Ki;
 	m_D = Kd;
 	m_F = Kf;
-	
+
 	m_maximumOutput = 1.0;
 	m_minimumOutput = -1.0;
 
@@ -87,14 +87,14 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
 	m_pidOutput = output;
 	m_period = period;
 
-	
+
 	m_semaphore = initializeMutexRecursive();
 	m_controlLoop = new Notifier(PIDController::CallCalculate, this);
 	m_controlLoop->StartPeriodic(m_period);
 
 	static int32_t instances = 0;
 	instances++;
-	
+
 	m_toleranceType = kNoTolerance;
 }
 
@@ -125,7 +125,7 @@ void PIDController::CallCalculate(void *controller)
   * Read the input, calculate the output accordingly, and write to the output.
   * This should only be called by the Notifier indirectly through CallCalculate
   * and is created during initialization.
-  */	
+  */
 void PIDController::Calculate()
 {
 	bool enabled;
@@ -163,7 +163,7 @@ void PIDController::Calculate()
 					}
 				}
 			}
-			
+
 			if(m_I != 0)
 			{
 				double potentialIGain = (m_totalError + m_error) * m_I;
@@ -201,7 +201,7 @@ void PIDController::Calculate()
  * @param i Integral coefficient
  * @param d Differential coefficient
  */
-void PIDController::SetPID(float p, float i, float d)
+void PIDController::SetPID(double p, double i, double d)
 {
 	CRITICAL_REGION(m_semaphore)
 	{
@@ -226,7 +226,7 @@ void PIDController::SetPID(float p, float i, float d)
  * @param d Differential coefficient
  * @param f Feed forward coefficient
  */
-void PIDController::SetPID(float p, float i, float d, float f)
+void PIDController::SetPID(double p, double i, double d, double f)
 {
 	CRITICAL_REGION(m_semaphore)
 	{
@@ -249,7 +249,7 @@ void PIDController::SetPID(float p, float i, float d, float f)
  * Get the Proportional coefficient
  * @return proportional coefficient
  */
-float PIDController::GetP() const
+double PIDController::GetP() const
 {
 	CRITICAL_REGION(m_semaphore)
 	{
@@ -262,7 +262,7 @@ float PIDController::GetP() const
  * Get the Integral coefficient
  * @return integral coefficient
  */
-float PIDController::GetI() const
+double PIDController::GetI() const
 {
 	CRITICAL_REGION(m_semaphore)
 	{
@@ -275,7 +275,7 @@ float PIDController::GetI() const
  * Get the Differential coefficient
  * @return differential coefficient
  */
-float PIDController::GetD() const
+double PIDController::GetD() const
 {
 	CRITICAL_REGION(m_semaphore)
 	{
@@ -288,7 +288,7 @@ float PIDController::GetD() const
  * Get the Feed forward coefficient
  * @return Feed forward coefficient
  */
-float PIDController::GetF() const
+double PIDController::GetF() const
 {
 	CRITICAL_REGION(m_semaphore)
 	{
@@ -332,7 +332,7 @@ void PIDController::SetContinuous(bool continuous)
 
 /**
  * Sets the maximum and minimum values expected from the input.
- * 
+ *
  * @param minimumInput the minimum value expected from the input
  * @param maximumInput the maximum value expected from the output
  */
@@ -341,7 +341,7 @@ void PIDController::SetInputRange(float minimumInput, float maximumInput)
 	CRITICAL_REGION(m_semaphore)
 	{
 		m_minimumInput = minimumInput;
-		m_maximumInput = maximumInput;	
+		m_maximumInput = maximumInput;
 	}
 	END_REGION;
 
@@ -350,7 +350,7 @@ void PIDController::SetInputRange(float minimumInput, float maximumInput)
 
 /**
  * Sets the minimum and maximum values to write.
- * 
+ *
  * @param minimumOutput the minimum value to write to the output
  * @param maximumOutput the maximum value to write to the output
  */
@@ -386,8 +386,8 @@ void PIDController::SetSetpoint(float setpoint)
 			m_setpoint = setpoint;
 		}
 	}
-	END_REGION;	
-	
+	END_REGION;
+
 	if (m_table != NULL) {
 		m_table->PutNumber("setpoint", m_setpoint);
 	}
@@ -397,7 +397,7 @@ void PIDController::SetSetpoint(float setpoint)
  * Returns the current setpoint of the PIDController
  * @return the current setpoint
  */
-float PIDController::GetSetpoint() const
+double PIDController::GetSetpoint() const
 {
 	float setpoint;
 	CRITICAL_REGION(m_semaphore)
@@ -501,11 +501,11 @@ bool PIDController::OnTarget() const
 void PIDController::Enable()
 {
 	CRITICAL_REGION(m_semaphore)
-	{			
+	{
 		m_enabled = true;
 	}
-	END_REGION;	
-	
+	END_REGION;
+
 	if (m_table != NULL) {
 		m_table->PutBoolean("enabled", true);
 	}
@@ -522,7 +522,7 @@ void PIDController::Disable()
 		m_enabled = false;
 	}
 	END_REGION;
-	
+
 	if (m_table != NULL) {
 		m_table->PutBoolean("enabled", false);
 	}
@@ -598,7 +598,7 @@ void PIDController::ValueChanged(ITable* source, const std::string& key, EntryVa
 }
 
 void PIDController::UpdateTable() {
-	
+
 }
 
 void PIDController::StartLiveWindowMode() {
@@ -606,5 +606,5 @@ void PIDController::StartLiveWindowMode() {
 }
 
 void PIDController::StopLiveWindowMode() {
-	
+
 }

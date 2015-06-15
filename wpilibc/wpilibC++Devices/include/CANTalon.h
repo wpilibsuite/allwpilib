@@ -8,6 +8,8 @@
 #include "SafePWM.h"
 #include "CANSpeedController.h"
 #include "PIDOutput.h"
+#include "PIDSource.h"
+#include "PIDInterface.h"
 #include "MotorSafetyHelper.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITable.h"
@@ -21,7 +23,9 @@ class CANTalon : public MotorSafety,
                  public CANSpeedController,
                  public ErrorBase,
                  public LiveWindowSendable,
-                 public ITableListener
+                 public ITableListener,
+                 public PIDSource,
+                 public PIDInterface
 {
 public:
   enum FeedbackDevice {
@@ -41,8 +45,11 @@ public:
 	explicit CANTalon(int deviceNumber,int controlPeriodMs);
 	virtual ~CANTalon();
 
-	// PIDController interface
+	// PIDOutput interface
 	virtual void PIDWrite(float output) override;
+
+  // PIDSource interface
+  virtual double PIDGet() const override;
 
 	// MotorSafety interface
 	virtual void SetExpiration(float timeout) override;
@@ -56,19 +63,22 @@ public:
 	// CANSpeedController interface
 	virtual float Get() const override;
 	virtual void Set(float value, uint8_t syncGroup=0) override;
+  virtual void Reset() override;
+  virtual void SetSetpoint(float value) override;
 	virtual void Disable() override;
   virtual void EnableControl();
+  virtual void Enable();
 	virtual void SetP(double p) override;
 	virtual void SetI(double i) override;
 	virtual void SetD(double d) override;
 	void SetF(double f);
 	void SetIzone(unsigned iz);
 	virtual void SetPID(double p, double i, double d) override;
-	void SetPID(double p, double i, double d, double f);
+	virtual void SetPID(double p, double i, double d, double f);
 	virtual double GetP() const override;
 	virtual double GetI() const override;
 	virtual double GetD() const override;
-	double GetF() const;
+	virtual double GetF() const;
 	virtual float GetBusVoltage() const override;
 	virtual float GetOutputVoltage() const override;
 	virtual float GetOutputCurrent() const override;
@@ -141,7 +151,8 @@ public:
 	int GetBrakeEnableDuringNeutral() const;
 
   bool IsControlEnabled() const;
-  double GetSetpoint() const;
+  bool IsEnabled() const override;
+  double GetSetpoint() const override;
 
   // LiveWindow stuff.
 	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) override;
@@ -151,6 +162,7 @@ public:
 	std::string GetSmartDashboardType() const override;
 	void InitTable(ITable *subTable) override;
 	ITable * GetTable() const override;
+
 private:
   // Values for various modes as is sent in the CAN packets for the Talon.
   enum TalonControlMode {

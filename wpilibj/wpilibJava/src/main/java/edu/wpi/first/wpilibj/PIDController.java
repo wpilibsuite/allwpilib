@@ -1,4 +1,3 @@
-/*----------------------------------------------------------------------------*/
 /* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
@@ -20,7 +19,7 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
  * care of the integral calculations, as well as writing the given
  * PIDOutput
  */
-public class PIDController implements LiveWindowSendable, Controller {
+public class PIDController implements PIDInterface, LiveWindowSendable, Controller {
 
     public static final double kDefaultPeriod = .05;
     private static int instances = 0;
@@ -47,13 +46,25 @@ public class PIDController implements LiveWindowSendable, Controller {
     private boolean m_freed = false;
     private boolean m_usingPercentTolerance;
 
-    /**
-     * Tolerance is the type of tolerance used to specify if the PID controller is on target.
-     * The various implementations of this class such as PercentageTolerance and AbsoluteTolerance
-     * specify types of tolerance specifications to use.
-     */
+   /**
+    * Tolerance is the type of tolerance used to specify if the PID controller
+    * is on target.
+    *
+    * The various implementations of this class such as PercentageTolerance and
+    * AbsoluteTolerance specify types of tolerance specifications to use.
+    */
     public interface Tolerance {
         public boolean onTarget();
+    }
+
+    /**
+     * Used internally for when Tolerance hasn't been set.
+     */
+    public class NullTolerance implements Tolerance {
+        @Override
+        public boolean onTarget() {
+          throw new RuntimeException("No tolerance value set when calling onTarget().");
+        }
     }
 
     public class PercentageTolerance implements Tolerance {
@@ -64,7 +75,7 @@ public class PIDController implements LiveWindowSendable, Controller {
         }
 
         @Override
-    public boolean onTarget() {
+        public boolean onTarget() {
             return (Math.abs(getError()) < percentage / 100
                     * (m_maximumInput - m_minimumInput));
         }
@@ -78,16 +89,8 @@ public class PIDController implements LiveWindowSendable, Controller {
         }
 
         @Override
-    public boolean onTarget() {
+        public boolean onTarget() {
             return Math.abs(getError()) < value;
-        }
-    }
-
-    public class NullTolerance implements Tolerance {
-
-        @Override
-    public boolean onTarget() {
-            throw new RuntimeException("No tolerance value set when using PIDController.onTarget()");
         }
     }
 
@@ -464,7 +467,7 @@ public class PIDController implements LiveWindowSendable, Controller {
      * @param tolerance a tolerance object of the right type, e.g. PercentTolerance
      * or AbsoluteTolerance
      */
-    private synchronized void setTolerance(Tolerance tolerance) {
+    public void setTolerance(Tolerance tolerance) {
         m_tolerance = tolerance;
     }
 
@@ -523,9 +526,19 @@ public class PIDController implements LiveWindowSendable, Controller {
 
     /**
      * Return true if PIDController is enabled.
+     *
+     * @deprecated Call {@link #isEnabled()} instead.
      */
+    @Deprecated
     public synchronized boolean isEnable() {
-        return m_enabled;
+        return isEnabled();
+    }
+
+    /**
+     * Return true if PIDController is enabled.
+     */
+    public boolean isEnabled() {
+      return m_enabled;
     }
 
     /**
