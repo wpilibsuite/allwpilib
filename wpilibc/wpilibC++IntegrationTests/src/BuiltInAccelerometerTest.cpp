@@ -21,6 +21,6 @@ TEST(BuiltInAccelerometerTest, Accelerometer) {
 	Wait(1.0);
 
 	ASSERT_NEAR(0.0, accelerometer.GetX(), kAccelerationTolerance);
-	ASSERT_NEAR(0.0, accelerometer.GetY(), kAccelerationTolerance);
-	ASSERT_NEAR(1.0, accelerometer.GetZ(), kAccelerationTolerance);
+	ASSERT_NEAR(1.0, accelerometer.GetY(), kAccelerationTolerance);
+	ASSERT_NEAR(0.0, accelerometer.GetZ(), kAccelerationTolerance);
 }
