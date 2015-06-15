@@ -82,13 +82,24 @@ private boolean isInverted = false;
     }
 
     /**
-     * Common interface for inverting direction of a speed controller
+     * Common interface for inverting direction of a speed controller.
      *
-     * @param isInverted The state of inversion true is inverted
+     * @param isInverted The state of inversion, true is inverted.
      */
     @Override
     public void setInverted(boolean isInverted) {
         this.isInverted = isInverted;
+    }
+
+    /**
+     * Common interface for the inverting direction of a speed controller.
+     *
+     * @return isInverted The state of inversion, true is inverted.
+     *
+     */
+    @Override
+    public boolean getInverted() {
+        return this.isInverted;
     }
 
     /**

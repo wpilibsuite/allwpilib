@@ -125,6 +125,7 @@ public:
 
   //SpeedController overrides
   virtual void SetInverted(bool isInverted) override;
+	virtual bool GetInverted() const override;
 protected:
 	// Control mode helpers
 	void SetSpeedReference(uint8_t reference);

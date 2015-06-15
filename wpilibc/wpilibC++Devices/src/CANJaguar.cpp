@@ -2119,12 +2119,22 @@ void CANJaguar::StopLiveWindowMode()
 }
 
 /**
-* common interface for inverting direction of a speed controller
-* Only works in PercentVbus, speed, and Voltage modes
-* @param isInverted The state of inversion true is inverted
+* Common interface for inverting direction of a speed controller.
+* Only works in PercentVbus, speed, and Voltage modes.
+* @param isInverted The state of inversion, true is inverted
 */
 void CANJaguar::SetInverted(bool isInverted){
 m_isInverted = isInverted;
+}
+
+/**
+ * Common interface for the inverting direction of a speed controller.
+ *
+ * @return isInverted The state of inversion, true is inverted.
+ *
+ */
+bool CANJaguar::GetInverted() const {
+	return m_isInverted;
 }
 
 std::string CANJaguar::GetSmartDashboardType() const

@@ -95,6 +95,17 @@ private boolean isInverted = false;
     }
 
     /**
+     * Common interface for the inverting direction of a speed controller.
+     *
+     * @return isInverted The state of inversion, true is inverted.
+     *
+     */
+    @Override
+    public boolean getInverted() {
+        return this.isInverted;
+    }
+
+    /**
      * Get the recently set value of the PWM.
      *
      * @return The most recently set value for the PWM between -1.0 and 1.0.

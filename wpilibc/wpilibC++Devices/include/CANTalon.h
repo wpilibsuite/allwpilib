@@ -163,7 +163,9 @@ public:
 	void InitTable(ITable *subTable) override;
 	ITable * GetTable() const override;
 
+	//SpeedController overrides
   virtual void SetInverted(bool isInverted) override;
+	virtual bool GetInverted() const override;
 private:
   // Values for various modes as is sent in the CAN packets for the Talon.
   enum TalonControlMode {

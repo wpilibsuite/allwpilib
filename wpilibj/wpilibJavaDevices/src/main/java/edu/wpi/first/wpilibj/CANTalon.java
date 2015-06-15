@@ -169,14 +169,25 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   }
 
     /**
-     * Inverts the direction of the motor's rotation
-     * Only works in PercentVbus mode
+     * Inverts the direction of the motor's rotation.
+     * Only works in PercentVbus mode.
      *
-     * @param isInverted The state of inversion true is inverted
+     * @param isInverted The state of inversion, true is inverted.
      */
     @Override
     public void setInverted(boolean isInverted) {
         this.isInverted = isInverted;
+    }
+     
+    /**
+     * Common interface for the inverting direction of a speed controller.
+     *
+     * @return isInverted The state of inversion, true is inverted.
+     *
+     */
+    @Override
+    public boolean getInverted() {
+        return this.isInverted;
     }
 
     /**

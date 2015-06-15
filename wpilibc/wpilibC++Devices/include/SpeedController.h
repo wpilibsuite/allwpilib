@@ -22,19 +22,28 @@ public:
 	 * @param syncGroup The update group to add this Set() to, pending UpdateSyncGroup().  If 0, update immediately.
 	 */
 	virtual void Set(float speed, uint8_t syncGroup = 0) = 0;
+
 	/**
 	 * Common interface for getting the current set speed of a speed controller.
 	 *
 	 * @return The current set speed.  Value is between -1.0 and 1.0.
 	 */
 	virtual float Get() const = 0;
+
 	/**
-	* common interface for inverting direction of a speed controller
-	* @param isInverted The state of inversion true is inverted
+	* Common interface for inverting direction of a speed controller.
+	* @param isInverted The state of inversion, true is inverted.
 	*/
 	virtual void SetInverted(bool isInverted) = 0;
 	/**
+
 	 * Common interface for disabling a motor.
 	 */
 	virtual void Disable() = 0;
+
+	/**
+	 * Common interface for returning the inversion state of a speed controller.
+	 * @return isInverted The state of inversion, true is inverted.
+	 */
+	 virtual bool GetInverted() const = 0;
 };

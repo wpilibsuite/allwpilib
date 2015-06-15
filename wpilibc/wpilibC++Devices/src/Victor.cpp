@@ -81,12 +81,23 @@ void Victor::Disable()
 	SetRaw(kPwmDisabled);
 }
 /**
-* common interface for inverting direction of a speed controller
-* @param isInverted The state of inversion true is inverted
+* Common interface for inverting direction of a speed controller.
+* @param isInverted The state of inversion, true is inverted.
 */
 void Victor::SetInverted(bool isInverted){
 m_isInverted = isInverted;
 }
+
+/**
+ * Common interface for the inverting direction of a speed controller.
+ *
+ * @return isInverted The state of inversion, true is inverted.
+ *
+ */
+bool Victor::GetInverted() const {
+	return m_isInverted;
+}
+
 /**
  * Write out the PID value as seen in the PIDOutput base object.
  *

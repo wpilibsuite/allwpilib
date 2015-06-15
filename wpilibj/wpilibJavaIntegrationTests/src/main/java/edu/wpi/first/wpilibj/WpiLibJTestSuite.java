@@ -28,7 +28,7 @@ import edu.wpi.first.wpilibj.test.AbstractTestSuite;
 				EncoderTest.class,
 				GyroTest.class,
 				MotorEncoderTest.class,
-                MotorInvertingTest.class,
+				MotorInvertingTest.class,
 				PCMTest.class,
 				PDPTest.class,
 				PIDTest.class,

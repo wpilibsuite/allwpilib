@@ -78,6 +78,7 @@ void Talon::Disable()
 {
 	SetRaw(kPwmDisabled);
 }
+
 /**
 * common interface for inverting direction of a speed controller
 * @param isInverted The state of inversion true is inverted
@@ -85,6 +86,17 @@ void Talon::Disable()
 void Talon::SetInverted(bool isInverted){
 m_isInverted = isInverted;
 }
+
+/**
+ * Common interface for the inverting direction of a speed controller.
+ *
+ * @return isInverted The state of inversion, true is inverted.
+ *
+ */
+bool Talon::GetInverted() const {
+	return m_isInverted;
+}
+
 /**
  * Write out the PID value as seen in the PIDOutput base object.
  *

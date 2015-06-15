@@ -35,11 +35,23 @@ public interface SpeedController extends PIDOutput {
     void set(double speed);
 
     /**
-     * Common interface for inverting direction of a speed controller
+     * Common interface for inverting direction of a speed controller.
      *
-     * @param isInverted The state of inversion true is inverted
+     * @param isInverted The state of inversion true is inverted.
      */
     void setInverted(boolean isInverted);
+
+    /**
+    *  Common interface for returning if a speed controller 
+    *  is in the inverted state or not.
+    * 
+    *  @return isInverted The state of the inversion true is inverted.
+    *
+    */
+    boolean getInverted();
+
+
+
     /**
      * Disable the speed controller
      */

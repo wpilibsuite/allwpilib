@@ -433,6 +433,17 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
     }
 
     /**
+     * Common interface for the inverting direction of a speed controller.
+     *
+     * @return isInverted The state of inversion, true is inverted.
+     *
+     */
+    @Override
+    public boolean getInverted() {
+        return this.isInverted;
+    }
+    
+    /**
 	* Check all unverified params and make sure they're equal to their local
 	* cached versions. If a value isn't available, it gets requested.  If a value
 	* doesn't match up, it gets set again.

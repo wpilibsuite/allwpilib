@@ -24,7 +24,7 @@ public:
 
 	virtual void PIDWrite(float output) override;
   virtual void SetInverted(bool isInverted) override;
-
+	virtual bool GetInverted() const override;
 private:
 	void InitTalonSRX();
 	bool m_isInverted;

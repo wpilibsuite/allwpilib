@@ -33,6 +33,7 @@ public class MotorInvertingTest extends AbstractComsSetup {
          fixture = afixture;
          fixture.setup();
     }
+    
     @Parameterized.Parameters(name= "{index}: {0}")
     public static Collection<MotorEncoderFixture<?>[]> generateData(){
         //logger.fine("Loading the MotorList");
@@ -42,11 +43,14 @@ public class MotorInvertingTest extends AbstractComsSetup {
                 {TestBench.getInstance().getJaguarPair()}
         });
     }
+
     private static final Logger logger = Logger.getLogger(MotorInvertingTest.class.getName());
+    
     @Override
     protected Logger getClassLogger(){
         return logger;
     }
+
     @Before
     public void setUp() {
         // Reset the fixture elements before every test
@@ -59,8 +63,9 @@ public class MotorInvertingTest extends AbstractComsSetup {
         // Clean up the fixture after the test
         fixture.teardown();
     }
+
     @Test
-         public void testInvertingPositive(){
+    public void testInvertingPositive(){
         fixture.getMotor().setInverted(false);
         fixture.getMotor().set(motorspeed);
         Timer.delay(delaytime);
@@ -71,6 +76,7 @@ public class MotorInvertingTest extends AbstractComsSetup {
         assertFalse("Inverting with Positive value does not change direction",fixture.getEncoder().getDirection()==initDirection);
         fixture.getMotor().set(0);
     }
+
     @Test
     public void testInvertingNegative(){
         fixture.getMotor().setInverted(false);
@@ -83,6 +89,7 @@ public class MotorInvertingTest extends AbstractComsSetup {
         assertFalse("Inverting with Negative value does not change direction",fixture.getEncoder().getDirection()==initDirection);
         fixture.getMotor().set(0);
     }
+
     @Test
          public void testInvertingSwitchingPosToNeg(){
         fixture.getMotor().setInverted(false);
@@ -95,6 +102,7 @@ public class MotorInvertingTest extends AbstractComsSetup {
         assertTrue("Inverting with Switching value does change direction", fixture.getEncoder().getDirection() == initDirection);
         fixture.getMotor().set(0);
     }
+
     @Test
     public void testInvertingSwitchingNegToPos(){
         fixture.getMotor().setInverted(false);

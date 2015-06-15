@@ -1292,14 +1292,26 @@ void CANTalon::GetDescription(char *desc) const
 {
 	sprintf(desc, "CANTalon ID %d", m_deviceNumber);
 }
+
 /**
-* common interface for inverting direction of a speed controller
-* Only works in PercentVbus, speed, and Voltage modes
-* @param isInverted The state of inversion true is inverted
+* Common interface for inverting direction of a speed controller.
+* Only works in PercentVbus, speed, and Voltage modes.
+* @param isInverted The state of inversion, true is inverted.
 */
 void CANTalon::SetInverted(bool isInverted){
 m_isInverted = isInverted;
 }
+
+/**
+ * Common interface for the inverting direction of a speed controller.
+ *
+ * @return isInverted The state of inversion, true is inverted.
+ *
+ */
+bool CANTalon::GetInverted() const {
+  return m_isInverted;
+}
+
 /**
  * Common interface for stopping the motor
  * Part of the MotorSafety interface
