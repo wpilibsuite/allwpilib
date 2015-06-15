@@ -57,6 +57,10 @@ public class DriverStation implements RobotState.Interface {
     private short[][] m_joystickAxes = new short[kJoystickPorts][FRCNetworkCommunicationsLibrary.kMaxJoystickAxes];
     private short[][] m_joystickPOVs = new short[kJoystickPorts][FRCNetworkCommunicationsLibrary.kMaxJoystickPOVs];
     private HALJoystickButtons[] m_joystickButtons = new HALJoystickButtons[kJoystickPorts];
+	private int[] m_joystickIsXbox = new int[kJoystickPorts];
+	private int[] m_joystickType = new int[kJoystickPorts];
+	private String[] m_joystickName = new String[kJoystickPorts];
+	private int[][] m_joystickAxisType = new int[kJoystickPorts][FRCNetworkCommunicationsLibrary.kMaxJoystickAxes];
 
     private Thread m_thread;
     private final Object m_dataSem;
@@ -273,7 +277,7 @@ public class DriverStation implements RobotState.Interface {
         return m_joystickPOVs[stick][pov];
     }
 
-    /**
+/**
     * Returns the number of POVs on a given joystick port
     *
     * @param stick The joystick port number
@@ -342,6 +346,68 @@ public class DriverStation implements RobotState.Interface {
         
         return m_joystickButtons[stick].count;
     }
+
+	/**
+    * Gets the value of isXbox on a joystick
+    *
+    * @param  stick The joystick port number
+	* @return A boolean that returns the value of isXbox
+    */
+    public synchronized boolean getJoystickIsXbox(int stick){
+
+        if(stick < 0 || stick >= kJoystickPorts) {
+            throw new RuntimeException("Joystick index is out of range, should be 0-5");
+        }
+		//TODO: Remove this when calling for descriptor on empty stick no longer crashes
+		if(1 > m_joystickButtons[stick].count && 1 > m_joystickAxes[stick].length) {
+			reportJoystickUnpluggedError("WARNING: Joystick on port " + stick + " not available, check if controller is plugged in\n");
+            return false;
+		}
+		boolean retVal = false;
+		if(FRCNetworkCommunicationsLibrary.HALGetJoystickIsXbox((byte)stick)==1)
+		{
+			retVal = true;
+		} 
+		return retVal;
+    }
+
+	/**
+    * Gets the value of type on a joystick
+    *
+    * @param  stick The joystick port number
+	* @return The value of type
+    */
+    public synchronized int getJoystickType(int stick){
+
+        if(stick < 0 || stick >= kJoystickPorts) {
+            throw new RuntimeException("Joystick index is out of range, should be 0-5");
+        }
+			//TODO: Remove this when calling for descriptor on empty stick no longer crashes
+			if(1 > m_joystickButtons[stick].count && 1 > m_joystickAxes[stick].length) {
+			reportJoystickUnpluggedError("WARNING: Joystick on port " + stick + " not available, check if controller is plugged in\n");
+            return -1;
+		}
+        return FRCNetworkCommunicationsLibrary.HALGetJoystickType((byte) stick);
+    }
+	
+	/**
+    * Gets the name of the joystick at a port
+    *
+    * @param  stick The joystick port number
+	* @return The value of name
+    */
+    public synchronized String getJoystickName(int stick){
+
+        if(stick < 0 || stick >= kJoystickPorts) {
+            throw new RuntimeException("Joystick index is out of range, should be 0-5");
+        }
+			//TODO: Remove this when calling for descriptor on empty stick no longer crashes
+			if(1 > m_joystickButtons[stick].count && 1 > m_joystickAxes[stick].length) {
+			reportJoystickUnpluggedError("WARNING: Joystick on port " + stick + " not available, check if controller is plugged in\n");
+            return "";
+		}
+        return FRCNetworkCommunicationsLibrary.HALGetJoystickName((byte)stick);
+    }	
 
     /**
      * Gets a value indicating whether the Driver Station requires the

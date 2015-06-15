@@ -412,6 +412,33 @@ public class Joystick extends GenericHID {
         m_axes[axis.value] = (byte) channel;
     }
     
+	/**
+     * Get the value of isXbox for the current joystick.
+     * 
+     * @param value A boolean that is true if the controller is an xbox controller.
+     */
+	public boolean getIsXbox() {
+		return m_ds.getJoystickIsXbox(m_port);
+	}
+	
+	/**
+     * Get the HID type of the current joystick.
+     * 
+     * @param value The HID type value of the current joystick.
+     */
+	public int getType() {
+		return m_ds.getJoystickType(m_port);
+	}
+	
+	/**
+     * Get the name of the current joystick.
+     * 
+     * @param value The name of the current joystick.
+     */
+	public String getName() {
+		return m_ds.getJoystickName(m_port);
+	}
+	
     /**
      * Set the rumble output for the joystick. The DS currently supports 2 rumble values,
      * left rumble and right rumble

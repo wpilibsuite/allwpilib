@@ -357,6 +357,42 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
 
 /*
  * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
+ * Method:    HALGetJoystickIsXbox
+ * Signature: (B)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickIsXbox
+  (JNIEnv *, jclass, jbyte port)
+  {
+	NETCOMM_LOG(logDEBUG) << "Calling HALGetJoystickIsXbox";
+	return HALGetJoystickIsXbox(port);
+  }
+
+/*
+ * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
+ * Method:    HALGetJoystickType
+ * Signature: (B)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickType
+  (JNIEnv *, jclass, jbyte port)
+  {
+	NETCOMM_LOG(logDEBUG) << "Calling HALGetJoystickType";
+	return HALGetJoystickType(port);
+  }
+
+/*
+ * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
+ * Method:    HALGetJoystickName
+ * Signature: (B)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickName
+  (JNIEnv * env, jclass, jbyte port)
+  {
+	NETCOMM_LOG(logDEBUG) << "Calling HALGetJoystickName";
+	return env->NewStringUTF(HALGetJoystickName(port));
+  }
+
+/*
+ * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
  * Method:    setNewDataSem
  * Signature: ([B)V
  */

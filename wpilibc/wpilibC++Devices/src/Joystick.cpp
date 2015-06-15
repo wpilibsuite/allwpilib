@@ -9,6 +9,7 @@
 //#include "NetworkCommunication/UsageReporting.h"
 #include "WPIErrors.h"
 #include <math.h>
+#include <string.h>
 
 const uint32_t Joystick::kDefaultXAxis;
 const uint32_t Joystick::kDefaultYAxis;
@@ -276,6 +277,42 @@ int Joystick::GetAxisCount()
 }
 
 /**
+ * Get the value of isXbox for the joystick.
+ *
+ * @return A boolean that is true if the joystick is an xbox controller.
+ */
+bool Joystick::GetIsXbox()
+{
+	return m_ds->GetJoystickIsXbox(m_port);
+}
+
+/**
+ * Get the HID type of the controller.
+ *
+ * @return the HID type of the controller.
+ */
+Joystick::HIDType Joystick::GetType()
+{
+	return static_cast<HIDType>(m_ds->GetJoystickType(m_port));
+}
+
+/**
+ * Get the name of the joystick.
+ *
+ * @return the name of the controller.
+ */
+std::string Joystick::GetName()
+{
+	return m_ds->GetJoystickName(m_port);
+}
+
+//int Joystick::GetAxisType(uint8_t axis)
+//{
+//	return m_ds->GetJoystickAxisType(m_port, axis);
+//}
+
+
+/**
   * Get the number of axis for a joystick
   *
 * @return the number of buttons on the current joystick
@@ -389,3 +426,5 @@ void Joystick::SetOutputs(uint32_t value) {
 	m_outputs = value;
 	HALSetJoystickOutputs(m_port, m_outputs, m_leftRumble, m_rightRumble);
 }
+
+

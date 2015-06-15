@@ -41,7 +41,11 @@ public:
 	{
 		kLeftRumble, kRightRumble
 	} RumbleType;
-
+	typedef enum
+	{
+		kUnknown = -1, kXInputUnknown = 0, kXInputGamepad = 1, kXInputWheel = 2, kXInputArcadeStick = 3, kXInputFlightStick = 4, kXInputDancePad = 5, kXInputGuitar = 6, kXInputGuitar2 = 7,
+		kXInputDrumKit = 8, kXInputGuitar3 = 11, kXInputArcadePad = 19, kHIDJoystick = 20, kHIDGamepad = 21, kHIDDriving = 22, kHIDFlight = 23, kHID1stPerson = 24
+	} HIDType;
 	explicit Joystick(uint32_t port);
 	Joystick(uint32_t port, uint32_t numAxisTypes, uint32_t numButtonTypes);
 	virtual ~Joystick();
@@ -69,6 +73,11 @@ public:
 	virtual float GetDirectionRadians();
 	virtual float GetDirectionDegrees();
 
+	bool GetIsXbox();
+	Joystick::HIDType GetType();
+	std::string GetName();
+	int GetAxisType(uint8_t axis);
+	
 	int GetAxisCount();
 	int GetButtonCount();
 	int GetPOVCount();
