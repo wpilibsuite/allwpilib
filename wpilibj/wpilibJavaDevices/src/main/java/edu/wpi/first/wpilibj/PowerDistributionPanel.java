@@ -22,9 +22,20 @@ import edu.wpi.first.wpilibj.tables.ITable;
  * @author Thomas Clark
  */
 public class PowerDistributionPanel extends SensorBase implements LiveWindowSendable {
-	public PowerDistributionPanel() {
+	
+	int m_module;
+	
+	public PowerDistributionPanel(int module) {
+		m_module = module;
+		checkPDPModule(m_module);
+		PDPJNI.initializePDP(m_module);
 	}
 
+	public PowerDistributionPanel() {
+		this(0);
+	}
+
+	
 	/**
 	 * Query the input voltage of the PDP
 	 * @return The voltage of the PDP in volts
@@ -33,7 +44,7 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
 
-		double voltage = PDPJNI.getPDPVoltage(status.asIntBuffer());
+		double voltage = PDPJNI.getPDPVoltage(status.asIntBuffer(), m_module);
 
 		return voltage;
 	}
@@ -46,7 +57,7 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
 
-		double temperature = PDPJNI.getPDPTemperature(status.asIntBuffer());
+		double temperature = PDPJNI.getPDPTemperature(status.asIntBuffer(), m_module);
 
 		return temperature;
 	}
@@ -59,7 +70,7 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
 
-		double current = PDPJNI.getPDPChannelCurrent((byte)channel, status.asIntBuffer());
+		double current = PDPJNI.getPDPChannelCurrent((byte)channel, status.asIntBuffer(), m_module);
 
 		checkPDPChannel(channel);
 
@@ -74,7 +85,7 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
 
-		double current = PDPJNI.getPDPTotalCurrent(status.asIntBuffer());
+		double current = PDPJNI.getPDPTotalCurrent(status.asIntBuffer(), m_module);
 
 		return current;
 	}
@@ -87,7 +98,7 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
 
-		double power = PDPJNI.getPDPTotalPower(status.asIntBuffer());
+		double power = PDPJNI.getPDPTotalPower(status.asIntBuffer(), m_module);
 
 		return power;
 
@@ -101,7 +112,7 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
 
-		double energy = PDPJNI.getPDPTotalEnergy(status.asIntBuffer());
+		double energy = PDPJNI.getPDPTotalEnergy(status.asIntBuffer(), m_module);
 
 		return energy;
 	}
@@ -113,7 +124,7 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
 
-		PDPJNI.resetPDPTotalEnergy(status.asIntBuffer());
+		PDPJNI.resetPDPTotalEnergy(status.asIntBuffer(), m_module);
 	}
 
 	/**
@@ -123,7 +134,7 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
 		ByteBuffer status = ByteBuffer.allocateDirect(4);
 		status.order(ByteOrder.LITTLE_ENDIAN);
 		
-		PDPJNI.clearPDPStickyFaults(status.asIntBuffer());
+		PDPJNI.clearPDPStickyFaults(status.asIntBuffer(), m_module);
 	}
 	
     public String getSmartDashboardType() {

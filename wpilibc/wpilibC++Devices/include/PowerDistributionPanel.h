@@ -19,6 +19,7 @@
 class PowerDistributionPanel : public SensorBase, public LiveWindowSendable {
 	public:
 		PowerDistributionPanel();
+		PowerDistributionPanel(uint8_t module);
 		
 		double GetVoltage();
 		double GetTemperature();
@@ -38,6 +39,7 @@ class PowerDistributionPanel : public SensorBase, public LiveWindowSendable {
 
 	private:
 		ITable *m_table;
+		uint8_t m_module;
 };
 
 #endif /* __WPILIB_POWER_DISTRIBUTION_PANEL_H__ */

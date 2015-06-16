@@ -55,7 +55,11 @@ public abstract class SensorBase { // TODO: Refactor
      * Number of power distribution channels
      */
     public static final int kPDPChannels = 16;
-
+	/**
+	 * Number of power distribution modules
+	 */
+	public static final int kPDPModules = 63;
+	
     private static int m_defaultSolenoidModule = 0;
 
     /**
@@ -174,6 +178,18 @@ public abstract class SensorBase { // TODO: Refactor
         }
     }
 
+	/**
+	 * Verify that the PDP module number is within limits.
+	 * module numbers are 0-based.
+	 * 
+	 * @param channel The module number to check.
+	 */
+	     protected static void checkPDPModule(final int module) {
+        if (module < 0 || module > kPDPModules) {
+            throw new IndexOutOfBoundsException("Requested PDP module number is out of range.");
+        }
+    }
+	
     /**
      * Get the number of the default solenoid module.
      *

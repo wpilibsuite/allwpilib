@@ -6,12 +6,23 @@
  * Method:    getPDPTemperature
  * Signature: (Ljava/nio/IntBuffer;)D
  */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_initializePDP
+  (JNIEnv *, jclass, jint module)
+{
+	initializePDP(module);
+}
+  
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_PDPJNI
+ * Method:    getPDPTemperature
+ * Signature: (Ljava/nio/IntBuffer;)D
+ */
 JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTemperature
-  (JNIEnv *env, jclass, jobject status)
+  (JNIEnv *env, jclass, jobject status, jint module)
 {
 	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
 	
-	return getPDPTemperature(status_ptr);
+	return getPDPTemperature(status_ptr, module);
 }
 
 /*
@@ -20,11 +31,11 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTemperatur
  * Signature: (Ljava/nio/IntBuffer;)D
  */
 JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPVoltage
-  (JNIEnv *env, jclass, jobject status)
+  (JNIEnv *env, jclass, jobject status, jint module)
 {
 	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
 	
-	return getPDPVoltage(status_ptr);
+	return getPDPVoltage(status_ptr, module);
 }
 
 /*
@@ -33,11 +44,11 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPVoltage
  * Signature: (BLjava/nio/IntBuffer;)D
  */
 JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPChannelCurrent
-  (JNIEnv *env, jclass, jbyte channel, jobject status)
+  (JNIEnv *env, jclass, jbyte channel, jobject status, jint module)
 {
 	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
 	
-	return getPDPChannelCurrent(channel, status_ptr);
+	return getPDPChannelCurrent(channel, status_ptr, module);
 }
 
 /*
@@ -46,11 +57,11 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPChannelCur
  * Signature: (BLjava/nio/IntBuffer;)D
  */
 JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalCurrent
-  (JNIEnv *env, jclass, jobject status)
+  (JNIEnv *env, jclass, jobject status, jint module)
 {
 	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
 	
-	return getPDPTotalCurrent(status_ptr);
+	return getPDPTotalCurrent(status_ptr, module);
 }
 
 /*
@@ -59,11 +70,11 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalCurre
  * Signature: (BLjava/nio/IntBuffer;)D
  */
 JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalPower
-  (JNIEnv *env, jclass, jobject status)
+  (JNIEnv *env, jclass, jobject status, jint module)
 {
 	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
 	
-	return getPDPTotalPower(status_ptr);
+	return getPDPTotalPower(status_ptr, module);
 }
 
 /*
@@ -72,11 +83,11 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalPower
  * Signature: (BLjava/nio/IntBuffer;)D
  */
 JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalEnergy
-  (JNIEnv *env, jclass, jobject status)
+  (JNIEnv *env, jclass, jobject status, jint module)
 {
 	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
 	
-	return getPDPTotalEnergy(status_ptr);
+	return getPDPTotalEnergy(status_ptr, module);
 }
 
 
@@ -86,11 +97,11 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalEnerg
  * Signature: (BLjava/nio/IntBuffer;)D
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_resetPDPTotalEnergy
-  (JNIEnv *env, jclass, jobject status)
+  (JNIEnv *env, jclass, jobject status, jint module)
 {
 	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
 	
-	resetPDPTotalEnergy(status_ptr);
+	resetPDPTotalEnergy(status_ptr, module);
 }
 
 /*
@@ -99,9 +110,9 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_resetPDPTotalEnergy
  * Signature: (BLjava/nio/IntBuffer;)D
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_clearPDPStickyFaults
-  (JNIEnv *env, jclass, jobject status)
+  (JNIEnv *env, jclass, jobject status, jint module)
 {
 	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
 	
-	clearPDPStickyFaults(status_ptr);
+	clearPDPStickyFaults(status_ptr, module);
 }

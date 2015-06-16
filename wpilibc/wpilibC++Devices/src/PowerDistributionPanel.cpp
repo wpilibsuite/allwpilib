@@ -9,11 +9,17 @@
 #include "HAL/PDP.hpp"
 #include "LiveWindow/LiveWindow.h"
 
+PowerDistributionPanel::PowerDistributionPanel() {
+	PowerDistributionPanel(0);
+}
+
 /**
  * Initialize the PDP.
  */
-PowerDistributionPanel::PowerDistributionPanel() {
+PowerDistributionPanel::PowerDistributionPanel(uint8_t module) {
 	m_table=NULL;
+	m_module = module;
+	initializePDP(m_module);
 }
 
 /**
@@ -24,7 +30,7 @@ double
 PowerDistributionPanel::GetVoltage() {
 	int32_t status = 0;
 	
-	double voltage = getPDPVoltage(&status);
+	double voltage = getPDPVoltage(&status, m_module);
 	
 	if(status) {
 		wpi_setWPIErrorWithContext(Timeout, "");
@@ -41,7 +47,7 @@ double
 PowerDistributionPanel::GetTemperature() {
 	int32_t status = 0;
 	
-	double temperature = getPDPTemperature(&status);
+	double temperature = getPDPTemperature(&status, m_module);
 	
 	if(status) {
 		wpi_setWPIErrorWithContext(Timeout, "");
@@ -65,7 +71,7 @@ PowerDistributionPanel::GetCurrent(uint8_t channel) {
 		wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
 	}
 	
-	double current = getPDPChannelCurrent(channel, &status);
+	double current = getPDPChannelCurrent(channel, &status, m_module);
 	
 	if(status) {
 		wpi_setWPIErrorWithContext(Timeout, "");
@@ -82,7 +88,7 @@ double
 PowerDistributionPanel::GetTotalCurrent() {
 	int32_t status = 0;
 	
-	double current = getPDPTotalCurrent(&status);
+	double current = getPDPTotalCurrent(&status, m_module);
 	
 	if(status) {
 		wpi_setWPIErrorWithContext(Timeout, "");
@@ -99,7 +105,7 @@ double
 PowerDistributionPanel::GetTotalPower() {
 	int32_t status = 0;
 	
-	double power = getPDPTotalPower(&status);
+	double power = getPDPTotalPower(&status, m_module);
 	
 	if(status) {
 		wpi_setWPIErrorWithContext(Timeout, "");
@@ -116,7 +122,7 @@ double
 PowerDistributionPanel::GetTotalEnergy() {
 	int32_t status = 0;
 	
-	double energy = getPDPTotalEnergy(&status);
+	double energy = getPDPTotalEnergy(&status, m_module);
 	
 	if(status) {
 		wpi_setWPIErrorWithContext(Timeout, "");
@@ -133,7 +139,7 @@ void
 PowerDistributionPanel::ResetTotalEnergy() { 
 	int32_t status = 0;
 	
-	resetPDPTotalEnergy(&status);
+	resetPDPTotalEnergy(&status, m_module);
 	
 	if(status) {
 		wpi_setWPIErrorWithContext(Timeout, "");
@@ -147,7 +153,7 @@ void
 PowerDistributionPanel::ClearStickyFaults() {
 	int32_t status = 0;
 	
-	clearPDPStickyFaults(&status);
+	clearPDPStickyFaults(&status, m_module);
 	
 	if(status) {
 		wpi_setWPIErrorWithContext(Timeout, "");
