@@ -9,6 +9,7 @@
 #include "SensorBase.h"
 #include "HAL/HAL.hpp"
 #include "HAL/cpp/Synchronized.hpp"
+#include "Port.h"
 
 /**
  * SolenoidBase class is the common base class for the Solenoid and
@@ -18,20 +19,19 @@ class SolenoidBase : public SensorBase
 {
 public:
 	virtual ~SolenoidBase();
-	uint8_t GetAll();
-
-	uint8_t GetPCMSolenoidBlackList();
-	bool GetPCMSolenoidVoltageStickyFault();
-	bool GetPCMSolenoidVoltageFault();
-	void ClearAllPCMStickyFaults();
+	uint8_t GetAll(int module = 0);
+	
+	uint8_t GetPCMSolenoidBlackList(int module);
+	bool GetPCMSolenoidVoltageStickyFault(int module);
+	bool GetPCMSolenoidVoltageFault(int module);
+	void ClearAllPCMStickyFaults(int module);
 protected:
 	explicit SolenoidBase(uint8_t pcmID);
-	void Set(uint8_t value, uint8_t mask);
+	void Set(uint8_t value, uint8_t mask, int module);
 	virtual void InitSolenoid() = 0;
-
+	const static int m_maxModules = 63;
+	const static int m_maxPorts = 8;
+	static void* m_ports[m_maxModules][m_maxPorts];
 	uint32_t m_moduleNumber; ///< Slot number where the module is plugged into the chassis.
 	static Resource *m_allocated;
-
-private:
-	void* m_ports[kSolenoidChannels];
 };

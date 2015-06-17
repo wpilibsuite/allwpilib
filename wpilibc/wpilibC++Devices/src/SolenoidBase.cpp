@@ -9,6 +9,7 @@
 // Needs to be global since the protected resource spans all Solenoid objects.
 Resource *SolenoidBase::m_allocated = NULL;
 
+void* SolenoidBase::m_ports[m_maxModules][m_maxPorts];
 /**
  * Constructor
  * 
@@ -17,12 +18,12 @@ Resource *SolenoidBase::m_allocated = NULL;
 SolenoidBase::SolenoidBase(uint8_t moduleNumber)
 	: m_moduleNumber (moduleNumber)
 {
-  	for (uint32_t i = 0; i < kSolenoidChannels; i++)
+	for (uint32_t i = 0; i < kSolenoidChannels; i++)
 	{
-	  void* port = getPortWithModule(moduleNumber, i);
-	  int32_t status = 0;
-	  m_ports[i] = initializeSolenoidPort(port, &status);
-	  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+		void* port = getPortWithModule(moduleNumber, i);
+		int32_t status = 0;
+		SolenoidBase::m_ports[moduleNumber][i] = initializeSolenoidPort(port, &status);
+		wpi_setErrorWithContext(status, getHALErrorMessage(status));
 	}
 }
 
@@ -39,13 +40,13 @@ SolenoidBase::~SolenoidBase()
  * @param value The value you want to set on the module.
  * @param mask The channels you want to be affected.
  */
-void SolenoidBase::Set(uint8_t value, uint8_t mask)
+void SolenoidBase::Set(uint8_t value, uint8_t mask, int module)
 {
   	int32_t status = 0;
-	for (int i = 0; i < 8; i++) { // XXX: Unhardcode
+	for (int i = 0; i < m_maxPorts; i++) { 
 	  uint8_t local_mask = 1 << i;
 	  if (mask & local_mask)
-		setSolenoid(m_ports[i], value & local_mask, &status);
+		setSolenoid(m_ports[module][i], value & local_mask, &status);
 	}
 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
@@ -55,12 +56,12 @@ void SolenoidBase::Set(uint8_t value, uint8_t mask)
  * 
  * @return The current value of all 8 solenoids on the module.
  */
-uint8_t SolenoidBase::GetAll()
+uint8_t SolenoidBase::GetAll(int module)
 {
   	uint8_t value = 0;
   	int32_t status = 0;
-	for (int i = 0; i < 8; i++) { // XXX: Unhardcode
-	  value |= getSolenoid(m_ports[i], &status) << i;
+	for (int i = 0; i < m_maxPorts; i++) {
+		value |= getSolenoid(m_ports[module][i], &status) << i;
 	}
 	return value;
 }
@@ -73,30 +74,30 @@ uint8_t SolenoidBase::GetAll()
  * 
  * @return The solenoid blacklist of all 8 solenoids on the module.
  */
-uint8_t SolenoidBase::GetPCMSolenoidBlackList()
+uint8_t SolenoidBase::GetPCMSolenoidBlackList(int module)
 {
 	int32_t status = 0;
-	return getPCMSolenoidBlackList(m_ports[0], &status);
+	return getPCMSolenoidBlackList(m_ports[module][0], &status);
 }
 /**
  * @return true if PCM sticky fault is set : The common 
  *			highside solenoid voltage rail is too low,
  *	 		most likely a solenoid channel is shorted.
  */
-bool SolenoidBase::GetPCMSolenoidVoltageStickyFault()
+bool SolenoidBase::GetPCMSolenoidVoltageStickyFault(int module)
 {
 	int32_t status = 0;
-	return getPCMSolenoidVoltageStickyFault(m_ports[0], &status);
+	return getPCMSolenoidVoltageStickyFault(m_ports[module][0], &status);
 }
 /**
  * @return true if PCM is in fault state : The common 
  *			highside solenoid voltage rail is too low,
  *	 		most likely a solenoid channel is shorted.
  */
-bool SolenoidBase::GetPCMSolenoidVoltageFault()
+bool SolenoidBase::GetPCMSolenoidVoltageFault(int module)
 {
 	int32_t status = 0;
-	return getPCMSolenoidVoltageFault(m_ports[0], &status);
+	return getPCMSolenoidVoltageFault(m_ports[module][0], &status);
 }
 /**
  * Clear ALL sticky faults inside PCM that Compressor is wired to.
@@ -108,8 +109,8 @@ bool SolenoidBase::GetPCMSolenoidVoltageFault()
  *
  * If no sticky faults are set then this call will have no effect.
  */
-void SolenoidBase::ClearAllPCMStickyFaults()
+void SolenoidBase::ClearAllPCMStickyFaults(int module)
 {
 	int32_t status = 0;
-	return clearAllPCMStickyFaults_sol(m_ports[0], &status);
+	return clearAllPCMStickyFaults_sol(m_ports[module][0], &status);
 }

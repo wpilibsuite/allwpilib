@@ -121,7 +121,7 @@ void DoubleSolenoid::Set(Value value)
 		break;
 	}
 
-	SolenoidBase::Set(rawValue, m_forwardMask | m_reverseMask);
+	SolenoidBase::Set(rawValue, m_forwardMask | m_reverseMask, m_moduleNumber);
 }
 
 /**
@@ -132,7 +132,7 @@ void DoubleSolenoid::Set(Value value)
 DoubleSolenoid::Value DoubleSolenoid::Get()
 {
 	if (StatusIsFatal()) return kOff;
-	uint8_t value = GetAll();
+	uint8_t value = GetAll(m_moduleNumber);
 
 	if (value & m_forwardMask) return kForward;
 	if (value & m_reverseMask) return kReverse;
@@ -148,7 +148,7 @@ DoubleSolenoid::Value DoubleSolenoid::Get()
  */
 bool DoubleSolenoid::IsFwdSolenoidBlackListed()
 {
-	int blackList = GetPCMSolenoidBlackList();
+	int blackList = GetPCMSolenoidBlackList(m_moduleNumber);
 	return (blackList & m_forwardMask) ? 1 : 0;
 }
 /**
@@ -161,7 +161,7 @@ bool DoubleSolenoid::IsFwdSolenoidBlackListed()
  */
 bool DoubleSolenoid::IsRevSolenoidBlackListed()
 {
-	int blackList = GetPCMSolenoidBlackList();
+	int blackList = GetPCMSolenoidBlackList(m_moduleNumber);
 	return (blackList & m_reverseMask) ? 1 : 0;
 }
 

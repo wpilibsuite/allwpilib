@@ -88,7 +88,7 @@ void Solenoid::Set(bool on)
 	uint8_t value = on ? 0xFF : 0x00;
 	uint8_t mask = 1 << m_channel;
 
-	SolenoidBase::Set(value, mask);
+	SolenoidBase::Set(value, mask, m_moduleNumber);
 }
 
 /**
@@ -99,7 +99,7 @@ void Solenoid::Set(bool on)
 bool Solenoid::Get()
 {
 	if (StatusIsFatal()) return false;
-	uint8_t value = GetAll() & ( 1 << m_channel);
+	uint8_t value = GetAll(m_moduleNumber) & ( 1 << m_channel);
 	return (value != 0);
 }
 /**
@@ -112,7 +112,7 @@ bool Solenoid::Get()
  */
 bool Solenoid::IsBlackListed()
 {
-	int value = GetPCMSolenoidBlackList() & ( 1 << m_channel);
+	int value = GetPCMSolenoidBlackList(m_moduleNumber) & ( 1 << m_channel);
 	return (value != 0);
 }
 
