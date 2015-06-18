@@ -5,6 +5,8 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
+#include "stdint.h"
+
 #ifdef WPI_ERRORS_DEFINE_STRINGS
 #define S(label, offset, message) const char *wpi_error_s_##label = message ; \
 	const int32_t wpi_error_value_##label = offset
