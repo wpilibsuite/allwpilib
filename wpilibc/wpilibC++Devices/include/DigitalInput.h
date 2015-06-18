@@ -40,7 +40,6 @@ class DigitalInput : public DigitalSource, public LiveWindowSendable {
 
  private:
   uint32_t m_channel;
-  bool m_lastValue;
 
   ITable *m_table = nullptr;
 };

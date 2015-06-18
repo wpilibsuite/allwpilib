@@ -336,9 +336,9 @@ std::string Preferences::Get(const char *key) {
   Synchronized sync(m_tableLock);
   if (key == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "key");
-    return std::string("");
+    return "";
   }
-  return m_values[std::string(key)];
+  return m_values[key];
 }
 
 /**

@@ -663,7 +663,7 @@ void CANJaguar::verify() {
   }
 
   if (!m_pVerified) {
-    uint32_t message;
+    uint32_t message = 0;
 
     if (m_controlMode == kSpeed)
       message = LM_API_SPD_PC;
@@ -693,7 +693,7 @@ void CANJaguar::verify() {
   }
 
   if (!m_iVerified) {
-    uint32_t message;
+    uint32_t message = 0;
 
     if (m_controlMode == kSpeed)
       message = LM_API_SPD_IC;
@@ -723,7 +723,7 @@ void CANJaguar::verify() {
   }
 
   if (!m_dVerified) {
-    uint32_t message;
+    uint32_t message = 0;
 
     if (m_controlMode == kSpeed)
       message = LM_API_SPD_DC;
