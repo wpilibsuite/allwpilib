@@ -36,7 +36,7 @@ public:
 	 * 
 	 * @return The message associated with this exception.
 	 */
-	const char* what();
+	const char* what() const noexcept;
 	
 	/**
 	 * Determines whether this exception indicates that an EOF

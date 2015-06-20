@@ -30,7 +30,7 @@ protected:
 	DoubleSolenoid *m_doubleSolenoid;
 	DigitalInput *m_fakeSolenoid1, *m_fakeSolenoid2;
 
-	virtual void SetUp() {
+	virtual void SetUp() override {
 		m_compressor = new Compressor();
 
 		m_fakePressureSwitch = new DigitalOutput(TestBench::kFakePressureSwitchChannel);
@@ -39,7 +39,7 @@ protected:
 		m_fakeSolenoid2 = new DigitalInput(TestBench::kFakeSolenoid2Channel);
 	}
 
-	virtual void TearDown() {
+	virtual void TearDown() override {
 		delete m_compressor;
 		delete m_fakePressureSwitch;
 		delete m_fakeCompressor;

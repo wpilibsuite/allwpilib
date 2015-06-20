@@ -46,15 +46,15 @@ public:
 
 	// MotorSafety interface
 	virtual void SetExpiration(float timeout) override;
-	virtual float GetExpiration() override;
-	virtual bool IsAlive() override;
+	virtual float GetExpiration() const override;
+	virtual bool IsAlive() const override;
 	virtual void StopMotor() override;
 	virtual void SetSafetyEnabled(bool enabled) override;
-	virtual bool IsSafetyEnabled() override;
-	virtual void GetDescription(char *desc) override;
+	virtual bool IsSafetyEnabled() const override;
+	virtual void GetDescription(char *desc) const override;
 
 	// CANSpeedController interface
-	virtual float Get() override;
+	virtual float Get() const override;
 	virtual void Set(float value, uint8_t syncGroup=0) override;
 	virtual void Disable() override;
   virtual void EnableControl();
@@ -65,37 +65,37 @@ public:
 	void SetIzone(unsigned iz);
 	virtual void SetPID(double p, double i, double d) override;
 	void SetPID(double p, double i, double d, double f);
-	virtual double GetP() override;
-	virtual double GetI() override;
-	virtual double GetD() override;
-	double GetF();
-	virtual float GetBusVoltage() override;
-	virtual float GetOutputVoltage() override;
-	virtual float GetOutputCurrent() override;
-	virtual float GetTemperature() override;
+	virtual double GetP() const override;
+	virtual double GetI() const override;
+	virtual double GetD() const override;
+	double GetF() const;
+	virtual float GetBusVoltage() const override;
+	virtual float GetOutputVoltage() const override;
+	virtual float GetOutputCurrent() const override;
+	virtual float GetTemperature() const override;
 	void SetPosition(double pos);
-	virtual double GetPosition() override;
-	virtual double GetSpeed() override;
-  virtual int GetClosedLoopError();
-  virtual int GetAnalogIn();
-  virtual int GetAnalogInRaw();
-  virtual int GetAnalogInVel();
-  virtual int GetEncPosition();
-  virtual int GetEncVel();
-	int GetPinStateQuadA();
-	int GetPinStateQuadB();
-	int GetPinStateQuadIdx();
-	int IsFwdLimitSwitchClosed();
-	int IsRevLimitSwitchClosed();
-	int GetNumberOfQuadIdxRises();
+	virtual double GetPosition() const override;
+	virtual double GetSpeed() const override;
+  virtual int GetClosedLoopError() const;
+  virtual int GetAnalogIn() const;
+  virtual int GetAnalogInRaw() const;
+  virtual int GetAnalogInVel() const;
+  virtual int GetEncPosition() const;
+  virtual int GetEncVel() const;
+	int GetPinStateQuadA() const;
+	int GetPinStateQuadB() const;
+	int GetPinStateQuadIdx() const;
+	int IsFwdLimitSwitchClosed() const;
+	int IsRevLimitSwitchClosed() const;
+	int GetNumberOfQuadIdxRises() const;
 	void SetNumberOfQuadIdxRises(int rises);
-	virtual bool GetForwardLimitOK() override;
-	virtual bool GetReverseLimitOK() override;
-	virtual uint16_t GetFaults() override;
-	uint16_t GetStickyFaults();
+	virtual bool GetForwardLimitOK() const override;
+	virtual bool GetReverseLimitOK() const override;
+	virtual uint16_t GetFaults() const override;
+	uint16_t GetStickyFaults() const;
 	void ClearStickyFaults();
 	virtual void SetVoltageRampRate(double rampRate) override;
-	virtual uint32_t GetFirmwareVersion() override;
+	virtual uint32_t GetFirmwareVersion() const override;
 	virtual void ConfigNeutralMode(NeutralMode mode) override;
 	virtual void ConfigEncoderCodesPerRev(uint16_t codesPerRev) override;
 	virtual void ConfigPotentiometerTurns(uint16_t turns) override;
@@ -131,26 +131,26 @@ public:
 	virtual void SetControlMode(ControlMode mode);
   void SetFeedbackDevice(FeedbackDevice device);
 	void SetStatusFrameRateMs(StatusFrameRate stateFrame, int periodMs);
-	virtual ControlMode GetControlMode();
+	virtual ControlMode GetControlMode() const;
 	void SetSensorDirection(bool reverseSensor);
 	void SetCloseLoopRampRate(double rampRate);
 	void SelectProfileSlot(int slotIdx);
-	int GetIzone();
-	int GetIaccum();
+	int GetIzone() const;
+	int GetIaccum() const;
 	void ClearIaccum();
-	int GetBrakeEnableDuringNeutral();
+	int GetBrakeEnableDuringNeutral() const;
 
-  bool IsControlEnabled();
-  double GetSetpoint();
+  bool IsControlEnabled() const;
+  double GetSetpoint() const;
 
   // LiveWindow stuff.
-	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
-	void UpdateTable();
-	void StartLiveWindowMode();
-	void StopLiveWindowMode();
-	std::string GetSmartDashboardType();
-	void InitTable(ITable *subTable);
-	ITable * GetTable();
+	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) override;
+	void UpdateTable() override;
+	void StartLiveWindowMode() override;
+	void StopLiveWindowMode() override;
+	std::string GetSmartDashboardType() const override;
+	void InitTable(ITable *subTable) override;
+	ITable * GetTable() const override;
 private:
   // Values for various modes as is sent in the CAN packets for the Talon.
   enum TalonControlMode {

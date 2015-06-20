@@ -329,7 +329,7 @@ bool CommandGroup::IsFinished()
 	return (unsigned)m_currentCommandIndex >= m_commands.size() && m_children.empty();
 }
 
-bool CommandGroup::IsInterruptible()
+bool CommandGroup::IsInterruptible() const
 {
 	if (!Command::IsInterruptible())
 		return false;
@@ -341,8 +341,8 @@ bool CommandGroup::IsInterruptible()
 			return false;
 	}
 
-	CommandList::iterator iter = m_children.begin();
-	for (; iter != m_children.end(); iter++)
+	CommandList::const_iterator iter = m_children.cbegin();
+	for (; iter != m_children.cend(); iter++)
 	{
 		if (!iter->m_command->IsInterruptible())
 			return false;
@@ -377,7 +377,7 @@ void CommandGroup::CancelConflicts(Command *command)
 	}
 }
 
-int CommandGroup::GetSize()
+int CommandGroup::GetSize() const
 {
 	return m_children.size();
 }

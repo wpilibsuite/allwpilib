@@ -20,20 +20,20 @@ class DigitalInput : public DigitalSource, public LiveWindowSendable
 public:
 	explicit DigitalInput(uint32_t channel);
 	virtual ~DigitalInput();
-	bool Get();
-	uint32_t GetChannel();
+	bool Get() const;
+	uint32_t GetChannel() const;
 
 	// Digital Source Interface
-	virtual uint32_t GetChannelForRouting();
-	virtual uint32_t GetModuleForRouting();
-	virtual bool GetAnalogTriggerForRouting();
+	virtual uint32_t GetChannelForRouting() const;
+	virtual uint32_t GetModuleForRouting() const;
+	virtual bool GetAnalogTriggerForRouting() const;
 
 	void UpdateTable();
 	void StartLiveWindowMode();
 	void StopLiveWindowMode();
-	std::string GetSmartDashboardType();
+	std::string GetSmartDashboardType() const;
 	void InitTable(ITable *subTable);
-	ITable * GetTable();
+	ITable * GetTable() const;
 
 private:
 	void InitDigitalInput(uint32_t channel);

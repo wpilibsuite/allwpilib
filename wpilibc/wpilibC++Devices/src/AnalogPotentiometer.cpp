@@ -59,7 +59,7 @@ AnalogPotentiometer::~AnalogPotentiometer() {
  *
  * @return The current position of the potentiometer (in the units used for fullRaneg and offset).
  */
-double AnalogPotentiometer::Get() {
+double AnalogPotentiometer::Get() const {
     return (m_analog_input->GetVoltage() / ControllerPower::GetVoltage5V()) * m_fullRange + m_offset;
 }
 
@@ -68,7 +68,7 @@ double AnalogPotentiometer::Get() {
  *
  * @return The current reading.
  */
-double AnalogPotentiometer::PIDGet() {
+double AnalogPotentiometer::PIDGet() const {
     return Get();
 }
 
@@ -76,7 +76,7 @@ double AnalogPotentiometer::PIDGet() {
 /**
  * @return the Smart Dashboard Type
  */
-std::string AnalogPotentiometer::GetSmartDashboardType() {
+std::string AnalogPotentiometer::GetSmartDashboardType() const {
     return "Analog Input";
 }
 
@@ -94,6 +94,6 @@ void AnalogPotentiometer::UpdateTable() {
     }
 }
 
-ITable* AnalogPotentiometer::GetTable() {
+ITable* AnalogPotentiometer::GetTable() const {
     return m_table;
 }

@@ -80,7 +80,7 @@ void MotorSafetyHelper::SetExpiration(float expirationTime)
  * Retrieve the timeout value for the corresponding motor safety object.
  * @return the timeout value in seconds.
  */
-float MotorSafetyHelper::GetExpiration()
+float MotorSafetyHelper::GetExpiration() const
 {
 	Synchronized sync(m_syncMutex);
 	return m_expiration;
@@ -90,7 +90,7 @@ float MotorSafetyHelper::GetExpiration()
  * Determine if the motor is still operating or has timed out.
  * @return a true value if the motor is still operating normally and hasn't timed out.
  */
-bool MotorSafetyHelper::IsAlive()
+bool MotorSafetyHelper::IsAlive() const
 {
 	Synchronized sync(m_syncMutex);
 	return !m_enabled || m_stopTime > Timer::GetFPGATimestamp();
@@ -135,7 +135,7 @@ void MotorSafetyHelper::SetSafetyEnabled(bool enabled)
  * Return if the motor safety is currently enabled for this devicce.
  * @return True if motor safety is enforced for this device
  */
-bool MotorSafetyHelper::IsSafetyEnabled()
+bool MotorSafetyHelper::IsSafetyEnabled() const
 {
 	Synchronized sync(m_syncMutex);
 	return m_enabled;

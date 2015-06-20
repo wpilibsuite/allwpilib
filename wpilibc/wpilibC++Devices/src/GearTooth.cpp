@@ -66,6 +66,6 @@ GearTooth::~GearTooth()
 }
 
 
-std::string GearTooth::GetSmartDashboardType() {
+std::string GearTooth::GetSmartDashboardType() const {
 	return "GearTooth";
 }

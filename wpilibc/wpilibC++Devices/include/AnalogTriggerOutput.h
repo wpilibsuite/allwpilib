@@ -42,12 +42,12 @@ class AnalogTriggerOutput : public DigitalSource
 public:
 
 	virtual ~AnalogTriggerOutput();
-	bool Get();
+	bool Get() const;
 
 	// DigitalSource interface
-	virtual uint32_t GetChannelForRouting();
-	virtual uint32_t GetModuleForRouting();
-	virtual bool GetAnalogTriggerForRouting();
+	virtual uint32_t GetChannelForRouting() const override;
+	virtual uint32_t GetModuleForRouting() const override;
+	virtual bool GetAnalogTriggerForRouting() const override;
 protected:
 	AnalogTriggerOutput(AnalogTrigger *trigger, AnalogTriggerType outputType);
 

@@ -76,7 +76,7 @@ void AnalogOutput::SetVoltage(float voltage) {
  *
  * @return The value in Volts, from 0.0 to +5.0
  */
-float AnalogOutput::GetVoltage() {
+float AnalogOutput::GetVoltage() const {
     int32_t status = 0;
     float voltage = getAnalogOutput(m_port, &status);
 
@@ -97,7 +97,7 @@ void AnalogOutput::StartLiveWindowMode() {
 void AnalogOutput::StopLiveWindowMode() {
 }
 
-std::string AnalogOutput::GetSmartDashboardType() {
+std::string AnalogOutput::GetSmartDashboardType() const {
     return "Analog Output";
 }
 
@@ -106,6 +106,6 @@ void AnalogOutput::InitTable(ITable *subTable) {
     UpdateTable();
 }
 
-ITable *AnalogOutput::GetTable() {
+ITable *AnalogOutput::GetTable() const {
     return m_table;
 }

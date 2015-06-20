@@ -24,7 +24,7 @@ public:
 	void SetDefaultCommand(Command *command);
 	Command *GetDefaultCommand();
 	void SetCurrentCommand(Command *command);
-	Command *GetCurrentCommand();
+	Command *GetCurrentCommand() const;
 	virtual void InitDefaultCommand();
 	
 private:
@@ -39,8 +39,8 @@ private:
 public:
 	virtual std::string GetName();
 	virtual void InitTable(ITable* table);
-	virtual ITable* GetTable();
-	virtual std::string GetSmartDashboardType();
+	virtual ITable* GetTable() const;
+	virtual std::string GetSmartDashboardType() const;
 protected:
 	ITable* m_table;
 };

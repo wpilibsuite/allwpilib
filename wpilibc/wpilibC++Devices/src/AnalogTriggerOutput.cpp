@@ -41,7 +41,7 @@ AnalogTriggerOutput::~AnalogTriggerOutput()
  * Get the state of the analog trigger output.
  * @return The state of the analog trigger output.
  */
-bool AnalogTriggerOutput::Get()
+bool AnalogTriggerOutput::Get() const
 {
   int32_t status = 0;
   bool result = getAnalogTriggerOutput(m_trigger->m_trigger, m_outputType, &status);
@@ -52,7 +52,7 @@ bool AnalogTriggerOutput::Get()
 /**
  * @return The value to be written to the channel field of a routing mux.
  */
-uint32_t AnalogTriggerOutput::GetChannelForRouting()
+uint32_t AnalogTriggerOutput::GetChannelForRouting() const
 {
 	return (m_trigger->m_index << 2) + m_outputType;
 }
@@ -60,7 +60,7 @@ uint32_t AnalogTriggerOutput::GetChannelForRouting()
 /**
  * @return The value to be written to the module field of a routing mux.
  */
-uint32_t AnalogTriggerOutput::GetModuleForRouting()
+uint32_t AnalogTriggerOutput::GetModuleForRouting() const
 {
 	return 0;
 }
@@ -68,7 +68,7 @@ uint32_t AnalogTriggerOutput::GetModuleForRouting()
 /**
  * @return The value to be written to the module field of a routing mux.
  */
-bool AnalogTriggerOutput::GetAnalogTriggerForRouting()
+bool AnalogTriggerOutput::GetAnalogTriggerForRouting() const
 {
 	return true;
 }

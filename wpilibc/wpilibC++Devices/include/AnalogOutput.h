@@ -21,14 +21,14 @@ public:
     virtual ~AnalogOutput();
 
     void SetVoltage(float voltage);
-    float GetVoltage();
+    float GetVoltage() const;
 
-    void UpdateTable();
-    void StartLiveWindowMode();
-    void StopLiveWindowMode();
-    std::string GetSmartDashboardType();
-    void InitTable(ITable *subTable);
-    ITable *GetTable();
+    void UpdateTable() override;
+    void StartLiveWindowMode() override;
+    void StopLiveWindowMode() override;
+    std::string GetSmartDashboardType() const override;
+    void InitTable(ITable *subTable) override;
+    ITable *GetTable() const override;
 
 protected:
     void InitAnalogOutput(uint32_t channel);

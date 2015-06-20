@@ -82,7 +82,7 @@ Timer::~Timer()
  * 
  * @return unsigned Current time value for this timer in seconds
  */
-double Timer::Get()
+double Timer::Get() const
 {
 	double result;
 	double currentTime = GetFPGATimestamp();

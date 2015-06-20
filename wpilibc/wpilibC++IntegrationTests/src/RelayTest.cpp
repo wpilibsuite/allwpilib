@@ -19,13 +19,13 @@ protected:
 	DigitalInput *m_reverse;
 
 
-	virtual void SetUp() {
+	virtual void SetUp() override {
 		m_relay = new Relay(TestBench::kRelayChannel);
 		m_forward = new DigitalInput(TestBench::kFakeRelayForward);
 		m_reverse = new DigitalInput(TestBench::kFakeRelayReverse);
 	}
 
-	virtual void TearDown() {
+	virtual void TearDown() override {
 		delete m_relay;
 		delete m_forward;
 		delete m_reverse;

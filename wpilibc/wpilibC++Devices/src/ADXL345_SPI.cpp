@@ -141,7 +141,7 @@ ADXL345_SPI::AllAxes ADXL345_SPI::GetAccelerations()
 	return data;
 }
 
-std::string ADXL345_SPI::GetSmartDashboardType() {
+std::string ADXL345_SPI::GetSmartDashboardType() const {
 	return "3AxisAccelerometer";
 }
 
@@ -158,6 +158,6 @@ void ADXL345_SPI::UpdateTable() {
 	}
 }
 
-ITable* ADXL345_SPI::GetTable() {
+ITable* ADXL345_SPI::GetTable() const {
 	return m_table;
 }

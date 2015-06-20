@@ -17,7 +17,7 @@ public:
 	CommandGroupEntry();
 	CommandGroupEntry(Command *command, Sequence state);
 	CommandGroupEntry(Command *command, Sequence state, double timeout);
-	bool IsTimedOut();
+	bool IsTimedOut() const;
 
 	double m_timeout;
 	Command *m_command;

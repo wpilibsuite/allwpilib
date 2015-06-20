@@ -26,7 +26,7 @@ public:
 	 * 
 	 * @return The current set speed.  Value is between -1.0 and 1.0.
 	 */
-	virtual float Get() = 0;
+	virtual float Get() const = 0;
 	/**
 	 * Common interface for disabling a motor.
 	 */

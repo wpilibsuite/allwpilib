@@ -75,7 +75,7 @@ AnalogInput::~AnalogInput()
  * The units are in A/D converter codes.  Use GetVoltage() to get the analog value in calibrated units.
  * @return A sample straight from this channel.
  */
-int16_t AnalogInput::GetValue()
+int16_t AnalogInput::GetValue() const
 {
 	if (StatusIsFatal()) return 0;
 	int32_t status = 0;
@@ -93,7 +93,7 @@ int16_t AnalogInput::GetValue()
  * Use GetAverageVoltage() to get the analog value in calibrated units.
  * @return A sample from the oversample and average engine for this channel.
  */
-int32_t AnalogInput::GetAverageValue()
+int32_t AnalogInput::GetAverageValue() const
 {
 	if (StatusIsFatal()) return 0;
 	int32_t status = 0;
@@ -107,7 +107,7 @@ int32_t AnalogInput::GetAverageValue()
  * The value is scaled to units of Volts using the calibrated scaling data from GetLSBWeight() and GetOffset().
  * @return A scaled sample straight from this channel.
  */
-float AnalogInput::GetVoltage()
+float AnalogInput::GetVoltage() const
 {
 	if (StatusIsFatal()) return 0.0f;
 	int32_t status = 0;
@@ -123,7 +123,7 @@ float AnalogInput::GetVoltage()
  * Using averaging will cause this value to be more stable, but it will update more slowly.
  * @return A scaled sample from the output of the oversample and average engine for this channel.
  */
-float AnalogInput::GetAverageVoltage()
+float AnalogInput::GetAverageVoltage() const
 {
 	if (StatusIsFatal()) return 0.0f;
 	int32_t status = 0;
@@ -139,7 +139,7 @@ float AnalogInput::GetAverageVoltage()
  *
  * @return Least significant bit weight.
  */
-uint32_t AnalogInput::GetLSBWeight()
+uint32_t AnalogInput::GetLSBWeight() const
 {
 	if (StatusIsFatal()) return 0;
 	int32_t status = 0;
@@ -155,7 +155,7 @@ uint32_t AnalogInput::GetLSBWeight()
  *
  * @return Offset constant.
  */
-int32_t AnalogInput::GetOffset()
+int32_t AnalogInput::GetOffset() const
 {
 	if (StatusIsFatal()) return 0;
 	int32_t status = 0;
@@ -168,7 +168,7 @@ int32_t AnalogInput::GetOffset()
  * Get the channel number.
  * @return The channel number.
  */
-uint32_t AnalogInput::GetChannel()
+uint32_t AnalogInput::GetChannel() const
 {
 	if (StatusIsFatal()) return 0;
 	return m_channel;
@@ -197,7 +197,7 @@ void AnalogInput::SetAverageBits(uint32_t bits)
  *
  * @return Number of bits of averaging previously configured.
  */
-uint32_t AnalogInput::GetAverageBits()
+uint32_t AnalogInput::GetAverageBits() const
 {
 	int32_t status = 0;
 	int32_t averageBits = getAnalogAverageBits(m_port, &status);
@@ -228,7 +228,7 @@ void AnalogInput::SetOversampleBits(uint32_t bits)
  *
  * @return Number of bits of oversampling previously configured.
  */
-uint32_t AnalogInput::GetOversampleBits()
+uint32_t AnalogInput::GetOversampleBits() const
 {
 	if (StatusIsFatal()) return 0;
 	int32_t status = 0;
@@ -242,7 +242,7 @@ uint32_t AnalogInput::GetOversampleBits()
  *
  * @return The analog input is attached to an accumulator.
  */
-bool AnalogInput::IsAccumulatorChannel()
+bool AnalogInput::IsAccumulatorChannel() const
 {
 	if (StatusIsFatal()) return false;
 	int32_t status = 0;
@@ -335,7 +335,7 @@ void AnalogInput::SetAccumulatorDeadband(int32_t deadband)
  *
  * @return The 64-bit value accumulated since the last Reset().
  */
-int64_t AnalogInput::GetAccumulatorValue()
+int64_t AnalogInput::GetAccumulatorValue() const
 {
 	if (StatusIsFatal()) return 0;
 	int32_t status = 0;
@@ -351,7 +351,7 @@ int64_t AnalogInput::GetAccumulatorValue()
  *
  * @return The number of times samples from the channel were accumulated.
  */
-uint32_t AnalogInput::GetAccumulatorCount()
+uint32_t AnalogInput::GetAccumulatorCount() const
 {
 	if (StatusIsFatal()) return 0;
 	int32_t status = 0;
@@ -370,7 +370,7 @@ uint32_t AnalogInput::GetAccumulatorCount()
  * @param value Pointer to the 64-bit accumulated output.
  * @param count Pointer to the number of accumulation cycles.
  */
-void AnalogInput::GetAccumulatorOutput(int64_t *value, uint32_t *count)
+void AnalogInput::GetAccumulatorOutput(int64_t *value, uint32_t *count) const
 {
 	if (StatusIsFatal()) return;
 	int32_t status = 0;
@@ -410,7 +410,7 @@ float AnalogInput::GetSampleRate()
  *
  * @return The average voltage.
  */
-double AnalogInput::PIDGet()
+double AnalogInput::PIDGet() const
 {
 	if (StatusIsFatal()) return 0.0;
 	return GetAverageVoltage();
@@ -430,7 +430,7 @@ void AnalogInput::StopLiveWindowMode() {
 
 }
 
-std::string AnalogInput::GetSmartDashboardType() {
+std::string AnalogInput::GetSmartDashboardType() const {
 	return "Analog Input";
 }
 
@@ -439,6 +439,6 @@ void AnalogInput::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable * AnalogInput::GetTable() {
+ITable * AnalogInput::GetTable() const {
 	return m_table;
 }

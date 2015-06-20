@@ -58,26 +58,27 @@ public:
 	void SetReverseDirection(bool reverseDirection);
 
 	// CounterBase interface
-	int32_t Get();
-	void Reset();
-	double GetPeriod();
-	void SetMaxPeriod(double maxPeriod);
+	int32_t Get() const override;
+	void Reset() override;
+	double GetPeriod() const override;
+	void SetMaxPeriod(double maxPeriod) override;
 	void SetUpdateWhenEmpty(bool enabled);
-	bool GetStopped();
-	bool GetDirection();
+	bool GetStopped() const override;
+	bool GetDirection() const override;
+
 	void SetSamplesToAverage(int samplesToAverage);
-	int GetSamplesToAverage();
-	uint32_t GetFPGAIndex()
+	int GetSamplesToAverage() const;
+	uint32_t GetFPGAIndex() const
 	{
 		return m_index;
 	}
 
-	void UpdateTable();
-	void StartLiveWindowMode();
-	void StopLiveWindowMode();
-	virtual std::string GetSmartDashboardType();
-	void InitTable(ITable *subTable);
-	ITable * GetTable();
+	void UpdateTable() override;
+	void StartLiveWindowMode() override;
+	void StopLiveWindowMode() override;
+	virtual std::string GetSmartDashboardType() const override;
+	void InitTable(ITable *subTable) override;
+	ITable * GetTable() const override;
 protected:
 	DigitalSource *m_upSource;		///< What makes the counter count up.
 	DigitalSource *m_downSource;	///< What makes the counter count down.

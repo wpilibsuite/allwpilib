@@ -45,20 +45,20 @@ public:
 	virtual ~ADXL345_SPI();
 
 	// Accelerometer interface
-	virtual void SetRange(Range range);
-	virtual double GetX();
-	virtual double GetY();
-	virtual double GetZ();
+	virtual void SetRange(Range range) override;
+	virtual double GetX() override;
+	virtual double GetY() override;
+	virtual double GetZ() override;
 
 	virtual double GetAcceleration(Axes axis);
 	virtual AllAxes GetAccelerations();
 
-	virtual std::string GetSmartDashboardType();
-	virtual void InitTable(ITable *subtable);
-	virtual void UpdateTable();
-	virtual ITable* GetTable();
-	virtual void StartLiveWindowMode() {}
-	virtual void StopLiveWindowMode() {}
+	virtual std::string GetSmartDashboardType() const override;
+	virtual void InitTable(ITable *subtable) override;
+	virtual void UpdateTable() override;
+	virtual ITable* GetTable() const override;
+	virtual void StartLiveWindowMode() override {}
+	virtual void StopLiveWindowMode() override {}
 
 protected:
 	void Init(Range range);

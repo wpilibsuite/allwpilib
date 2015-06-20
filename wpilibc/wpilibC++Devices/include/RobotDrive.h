@@ -69,13 +69,13 @@ public:
 	void SetMaxOutput(double maxOutput);
 	void SetCANJaguarSyncGroup(uint8_t syncGroup);
 
-	void SetExpiration(float timeout);
-	float GetExpiration();
-	bool IsAlive();
-	void StopMotor();
-	bool IsSafetyEnabled();
-	void SetSafetyEnabled(bool enabled);
-	void GetDescription(char *desc);
+	void SetExpiration(float timeout) override;
+	float GetExpiration() const override;
+	bool IsAlive() const override;
+	void StopMotor() override;
+	bool IsSafetyEnabled() const override;
+	void SetSafetyEnabled(bool enabled) override;
+	void GetDescription(char *desc) const override;
 
 protected:
 	void InitRobotDrive();

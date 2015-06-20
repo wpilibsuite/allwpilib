@@ -184,7 +184,7 @@ void Relay::Set(Relay::Value value)
  *
  * @return The current state of the relay as a Relay::Value
  */
-Relay::Value Relay::Get() {
+Relay::Value Relay::Get() const {
 	int32_t status;
 
 	if(getRelayForward(m_relay_ports[m_channel], &status)) {
@@ -249,7 +249,7 @@ void Relay::StopLiveWindowMode() {
 	}
 }
 
-std::string Relay::GetSmartDashboardType() {
+std::string Relay::GetSmartDashboardType() const {
 	return "Relay";
 }
 
@@ -258,6 +258,6 @@ void Relay::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable * Relay::GetTable() {
+ITable * Relay::GetTable() const {
 	return m_table;
 }

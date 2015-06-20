@@ -40,43 +40,44 @@ public:
 	virtual ~Encoder();
 
 	// CounterBase interface
-	int32_t Get();
-	int32_t GetRaw();
-	int32_t GetEncodingScale();
-	void Reset();
-	double GetPeriod();
-	void SetMaxPeriod(double maxPeriod);
-	bool GetStopped();
-	bool GetDirection();
-	double GetDistance();
-	double GetRate();
+	int32_t Get() const override;
+	int32_t GetRaw() const;
+	int32_t GetEncodingScale() const;
+	void Reset() override;
+	double GetPeriod() const override;
+	void SetMaxPeriod(double maxPeriod) override;
+	bool GetStopped() const override;
+	bool GetDirection() const override;
+
+	double GetDistance() const;
+	double GetRate() const;
 	void SetMinRate(double minRate);
 	void SetDistancePerPulse(double distancePerPulse);
 	void SetReverseDirection(bool reverseDirection);
 	void SetSamplesToAverage(int samplesToAverage);
-	int GetSamplesToAverage();
+	int GetSamplesToAverage() const;
 	void SetPIDSourceParameter(PIDSourceParameter pidSource);
-	double PIDGet();
+	double PIDGet() const override;
 
 	void SetIndexSource(uint32_t channel, IndexingType type = kResetOnRisingEdge);
 	void SetIndexSource(DigitalSource *source, IndexingType type = kResetOnRisingEdge);
 	void SetIndexSource(DigitalSource &source, IndexingType type = kResetOnRisingEdge);
 
-	void UpdateTable();
-	void StartLiveWindowMode();
-	void StopLiveWindowMode();
-	std::string GetSmartDashboardType();
-	void InitTable(ITable *subTable);
-	ITable * GetTable();
+	void UpdateTable() override;
+	void StartLiveWindowMode() override;
+	void StopLiveWindowMode() override;
+	std::string GetSmartDashboardType() const override;
+	void InitTable(ITable *subTable) override;
+	ITable * GetTable() const override;
 
-	int32_t GetFPGAIndex()
+	int32_t GetFPGAIndex() const
 	{
 		return m_index;
 	}
 
 private:
 	void InitEncoder(bool _reverseDirection, EncodingType encodingType);
-	double DecodingScaleFactor();
+	double DecodingScaleFactor() const;
 
 	DigitalSource *m_aSource;		// the A phase of the quad encoder
 	DigitalSource *m_bSource;		// the B phase of the quad encoder

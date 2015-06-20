@@ -26,10 +26,10 @@ public:
 	};
 
 	virtual ~CounterBase() {}
-	virtual int32_t Get() = 0;
+	virtual int32_t Get() const = 0;
 	virtual void Reset() = 0;
-	virtual double GetPeriod() = 0;
+	virtual double GetPeriod() const = 0;
 	virtual void SetMaxPeriod(double maxPeriod) = 0;
-	virtual bool GetStopped() = 0;
-	virtual bool GetDirection() = 0;
+	virtual bool GetStopped() const = 0;
+	virtual bool GetDirection() const = 0;
 };

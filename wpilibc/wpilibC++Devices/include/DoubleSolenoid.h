@@ -30,17 +30,17 @@ public:
 	DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel, uint32_t reverseChannel);
 	virtual ~DoubleSolenoid();
 	virtual void Set(Value value);
-	virtual Value Get();
-	bool IsFwdSolenoidBlackListed();
-	bool IsRevSolenoidBlackListed();
+	virtual Value Get() const;
+	bool IsFwdSolenoidBlackListed() const;
+	bool IsRevSolenoidBlackListed() const;
 
 	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
 	void UpdateTable();
 	void StartLiveWindowMode();
 	void StopLiveWindowMode();
-	std::string GetSmartDashboardType();
+	std::string GetSmartDashboardType() const;
 	void InitTable(ITable *subTable);
-	ITable * GetTable();
+	ITable * GetTable() const;
 
 private:
 	virtual void InitSolenoid();

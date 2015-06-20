@@ -39,7 +39,7 @@ public:
 	void AddActuator(std::string type, int channel, LiveWindowSendable *component);
 	void AddActuator(std::string type, int module, int channel, LiveWindowSendable *component);
 
-	bool IsEnabled() { return m_enabled; }
+	bool IsEnabled() const { return m_enabled; }
 	void SetEnabled(bool enabled);
 
 protected:

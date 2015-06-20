@@ -104,7 +104,7 @@ ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations()
 	return data;
 }
 
-std::string ADXL345_I2C::GetSmartDashboardType() {
+std::string ADXL345_I2C::GetSmartDashboardType() const {
 	return "3AxisAccelerometer";
 }
 
@@ -121,6 +121,6 @@ void ADXL345_I2C::UpdateTable() {
 	}
 }
 
-ITable* ADXL345_I2C::GetTable() {
+ITable* ADXL345_I2C::GetTable() const {
 	return m_table;
 }

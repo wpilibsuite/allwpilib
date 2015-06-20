@@ -93,7 +93,7 @@ Command::~Command()
  * The ID is a unique sequence number that is incremented for each command.
  * @return the ID of this command
  */
-int Command::GetID() {
+int Command::GetID() const {
 	return m_commandID;
 }
 
@@ -115,7 +115,7 @@ void Command::SetTimeout(double timeout)
  * This function will work even if there is no specified timeout.
  * @return the time since this command was initialized (in seconds).
  */
-double Command::TimeSinceInitialized()
+double Command::TimeSinceInitialized() const
 {
 	if (m_startTime < 0.0)
 		return 0.0;
@@ -239,7 +239,7 @@ void Command::StartTiming()
  * If there is no timeout, this will always return false.
  * @return whether the time has expired
  */
-bool Command::IsTimedOut()
+bool Command::IsTimedOut() const
 {
 	return m_timeout != -1 && TimeSinceInitialized() >= m_timeout;
 }
@@ -248,7 +248,7 @@ bool Command::IsTimedOut()
  * Returns the requirements (as an std::set of {@link Subsystem Subsystems} pointers) of this command
  * @return the requirements (as an std::set of {@link Subsystem Subsystems} pointers) of this command
  */
-Command::SubsystemSet Command::GetRequirements()
+Command::SubsystemSet Command::GetRequirements() const
 {
 	return m_requirements;
 }
@@ -328,7 +328,7 @@ void Command::StartRunning()
  * not have yet called {@link Command#interrupted()}.
  * @return whether or not the command is running
  */
-bool Command::IsRunning()
+bool Command::IsRunning() const
 {
 	return m_running;
 }
@@ -363,7 +363,7 @@ void Command::_Cancel()
  * Returns whether or not this has been canceled.
  * @return whether or not this has been canceled
  */
-bool Command::IsCanceled()
+bool Command::IsCanceled() const
 {
 	return m_canceled;
 }
@@ -372,7 +372,7 @@ bool Command::IsCanceled()
  * Returns whether or not this command can be interrupted.
  * @return whether or not this command can be interrupted
  */
-bool Command::IsInterruptible()
+bool Command::IsInterruptible() const
 {
 	return m_interruptible;
 }
@@ -391,7 +391,7 @@ void Command::SetInterruptible(bool interruptible)
  * @param system the system
  * @return whether or not the subsystem is required (false if given NULL)
  */
-bool Command::DoesRequire(Subsystem *system)
+bool Command::DoesRequire(Subsystem *system) const
 {
 	return m_requirements.count(system) > 0;
 }
@@ -401,7 +401,7 @@ bool Command::DoesRequire(Subsystem *system)
  * Will return null if this {@link Command} is not in a group.
  * @return the {@link CommandGroup} that this command is a part of (or null if not in group)
  */
-CommandGroup *Command::GetGroup()
+CommandGroup *Command::GetGroup() const
 {
 	return m_parent;
 }
@@ -421,7 +421,7 @@ void Command::SetRunWhenDisabled(bool run)
  * Returns whether or not this {@link Command} will run when the robot is disabled, or if it will cancel itself.
  * @return whether or not this {@link Command} will run when the robot is disabled, or if it will cancel itself
  */
-bool Command::WillRunWhenDisabled()
+bool Command::WillRunWhenDisabled() const
 {
 	return m_runWhenDisabled;
 }
@@ -435,7 +435,7 @@ std::string Command::GetName()
 	return m_name;
 }
 
-std::string Command::GetSmartDashboardType()
+std::string Command::GetSmartDashboardType() const
 {
 	return "Command";
 }
@@ -453,7 +453,7 @@ void Command::InitTable(ITable* table)
     }
 }
 
-ITable* Command::GetTable(){
+ITable* Command::GetTable() const {
 	return m_table;
 }
 

@@ -34,34 +34,34 @@ public:
 
 	float GetStickAxis(uint32_t stick, uint32_t axis);
 	int GetStickPOV(uint32_t stick, uint32_t pov);
-	uint32_t GetStickButtons(uint32_t stick);
+	uint32_t GetStickButtons(uint32_t stick) const;
 	bool GetStickButton(uint32_t stick, uint8_t button);
 
-	int GetStickAxisCount(uint32_t stick);
-	int GetStickPOVCount(uint32_t stick);
-	int GetStickButtonCount(uint32_t stick);
-	
-	bool GetJoystickIsXbox(uint32_t stick);
-	int GetJoystickType(uint32_t stick);
-	std::string GetJoystickName(uint32_t stick);
-	int GetJoystickAxisType(uint32_t stick, uint8_t axis);
-	
-	bool IsEnabled();
-	bool IsDisabled();
-	bool IsAutonomous();
-	bool IsOperatorControl();
-	bool IsTest();
-	bool IsDSAttached();
-	bool IsNewControlData();
-	bool IsFMSAttached();
-	bool IsSysActive();
-	bool IsSysBrownedOut();
+	int GetStickAxisCount(uint32_t stick) const;
+	int GetStickPOVCount(uint32_t stick) const;
+	int GetStickButtonCount(uint32_t stick) const;
 
-	Alliance GetAlliance();
-	uint32_t GetLocation();
+	bool GetJoystickIsXbox(uint32_t stick) const;
+	int GetJoystickType(uint32_t stick) const;
+	std::string GetJoystickName(uint32_t stick) const;
+	int GetJoystickAxisType(uint32_t stick, uint8_t axis) const;
+
+	bool IsEnabled() const override;
+	bool IsDisabled() const override;
+	bool IsAutonomous() const override;
+	bool IsOperatorControl() const override;
+	bool IsTest() const override;
+	bool IsDSAttached() const;
+	bool IsNewControlData() const;
+	bool IsFMSAttached() const;
+	bool IsSysActive() const;
+	bool IsSysBrownedOut() const;
+	
+	Alliance GetAlliance() const;
+	uint32_t GetLocation() const;
 	void WaitForData();
-	double GetMatchTime();
-	float GetBatteryVoltage();
+	double GetMatchTime() const;
+	float GetBatteryVoltage() const;
 
 	/** Only to be used to tell the Driver Station what code you claim to be executing
 	 *   for diagnostic purposes only

@@ -72,7 +72,7 @@ AnalogAccelerometer::~AnalogAccelerometer()
  *
  * @return The current acceleration of the sensor in Gs.
  */
-float AnalogAccelerometer::GetAcceleration()
+float AnalogAccelerometer::GetAcceleration() const
 {
 	return (m_AnalogInput->GetAverageVoltage() - m_zeroGVoltage) / m_voltsPerG;
 }
@@ -107,7 +107,7 @@ void AnalogAccelerometer::SetZero(float zero)
  *
  * @return The current acceleration in Gs.
  */
-double AnalogAccelerometer::PIDGet()
+double AnalogAccelerometer::PIDGet() const
 {
 	return GetAcceleration();
 }
@@ -124,7 +124,7 @@ void AnalogAccelerometer::StartLiveWindowMode() {
 void AnalogAccelerometer::StopLiveWindowMode() {
 }
 
-std::string AnalogAccelerometer::GetSmartDashboardType() {
+std::string AnalogAccelerometer::GetSmartDashboardType() const {
 	return "Accelerometer";
 }
 
@@ -133,6 +133,6 @@ void AnalogAccelerometer::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable * AnalogAccelerometer::GetTable() {
+ITable * AnalogAccelerometer::GetTable() const {
 	return m_table;
 }

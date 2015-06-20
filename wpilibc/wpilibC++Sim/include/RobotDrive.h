@@ -7,6 +7,8 @@
 
 #include "ErrorBase.h"
 #include <stdlib.h>
+#include "MotorSafety.h"
+#include "MotorSafetyHelper.h"
 
 class SpeedController;
 class GenericHID;
@@ -19,7 +21,7 @@ class GenericHID;
  * used for either the Drive function (intended for hand created drive code, such as autonomous)
  * or with the Tank/Arcade functions intended to be used for Operator Control driving.
  */
-class RobotDrive : public ErrorBase
+class RobotDrive : public MotorSafety, public ErrorBase
 {
 public:
 	enum MotorType
@@ -64,13 +66,13 @@ public:
 	void SetSensitivity(float sensitivity);
 	void SetMaxOutput(double maxOutput);
 
-	void SetExpiration(float timeout);
-	float GetExpiration();
-	bool IsAlive();
-	void StopMotor();
-	bool IsSafetyEnabled();
-	void SetSafetyEnabled(bool enabled);
-	void GetDescription(char *desc);
+	void SetExpiration(float timeout) override;
+	float GetExpiration() const override;
+	bool IsAlive() const override;
+	void StopMotor() override;
+	bool IsSafetyEnabled() const override;
+	void SetSafetyEnabled(bool enabled) override;
+	void GetDescription(char *desc) const override;
 
 protected:
 	void InitRobotDrive();

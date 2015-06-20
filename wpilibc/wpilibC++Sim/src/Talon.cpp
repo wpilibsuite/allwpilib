@@ -62,7 +62,7 @@ void Talon::Set(float speed, uint8_t syncGroup)
  *
  * @return The most recently set value for the PWM between -1.0 and 1.0.
  */
-float Talon::Get()
+float Talon::Get() const
 {
 	return GetSpeed();
 }

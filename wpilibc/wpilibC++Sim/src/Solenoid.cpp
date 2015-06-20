@@ -65,7 +65,7 @@ void Solenoid::Set(bool on)
  *
  * @return The current value of the solenoid.
  */
-bool Solenoid::Get()
+bool Solenoid::Get() const
 {
     return m_on;
 }
@@ -95,7 +95,7 @@ void Solenoid::StopLiveWindowMode() {
 	}
 }
 
-std::string Solenoid::GetSmartDashboardType() {
+std::string Solenoid::GetSmartDashboardType() const {
 	return "Solenoid";
 }
 
@@ -104,6 +104,6 @@ void Solenoid::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable * Solenoid::GetTable() {
+ITable * Solenoid::GetTable() const {
 	return m_table;
 }

@@ -65,7 +65,7 @@ void VictorSP::Set(float speed, uint8_t syncGroup)
  *
  * @return The most recently set value for the PWM between -1.0 and 1.0.
  */
-float VictorSP::Get()
+float VictorSP::Get() const
 {
 	return GetSpeed();
 }

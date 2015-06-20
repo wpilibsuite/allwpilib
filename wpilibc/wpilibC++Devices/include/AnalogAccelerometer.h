@@ -22,17 +22,17 @@ public:
 	explicit AnalogAccelerometer(AnalogInput *channel);
 	virtual ~AnalogAccelerometer();
 
-	float GetAcceleration();
+	float GetAcceleration() const;
 	void SetSensitivity(float sensitivity);
 	void SetZero(float zero);
-	double PIDGet();
+	double PIDGet() const override;
 
-	void UpdateTable();
-	void StartLiveWindowMode();
-	void StopLiveWindowMode();
-	std::string GetSmartDashboardType();
-	void InitTable(ITable *subTable);
-	ITable * GetTable();
+	void UpdateTable() override;
+	void StartLiveWindowMode() override;
+	void StopLiveWindowMode() override;
+	std::string GetSmartDashboardType() const override;
+	void InitTable(ITable *subTable) override;
+	ITable * GetTable() const override;
 
 private:
 	void InitAccelerometer();

@@ -135,7 +135,7 @@ void Relay::Set(Relay::Value value)
  *
  * @return The current state of the relay as a Relay::Value
  */
-Relay::Value Relay::Get() {
+Relay::Value Relay::Get() const {
 	// TODO: Don't assume that the go_pos and go_neg fields are correct?
 	if ((go_pos || m_direction == kReverseOnly) && (go_neg || m_direction == kForwardOnly)) {
 		return kOn;
@@ -184,7 +184,7 @@ void Relay::StopLiveWindowMode() {
 	}
 }
 
-std::string Relay::GetSmartDashboardType() {
+std::string Relay::GetSmartDashboardType() const {
 	return "Relay";
 }
 
@@ -193,6 +193,6 @@ void Relay::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable * Relay::GetTable() {
+ITable * Relay::GetTable() const {
 	return m_table;
 }

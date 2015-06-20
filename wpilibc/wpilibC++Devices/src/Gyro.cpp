@@ -147,7 +147,7 @@ Gyro::~Gyro()
  * @return the current heading of the robot in degrees. This heading is based on integration
  * of the returned rate from the gyro.
  */
-float Gyro::GetAngle( void )
+float Gyro::GetAngle() const
 {
 	int64_t rawValue;
 	uint32_t count;
@@ -169,7 +169,7 @@ float Gyro::GetAngle( void )
  *
  * @return the current rate in degrees per second
  */
-double Gyro::GetRate( void )
+double Gyro::GetRate() const
 {
 	return (m_analog->GetAverageValue() - ((double)m_center + m_offset)) * 1e-9 * m_analog->GetLSBWeight()
 			/ ((1 << m_analog->GetOversampleBits()) * m_voltsPerDegreePerSecond);
@@ -220,7 +220,7 @@ void Gyro::SetPIDSourceParameter(PIDSourceParameter pidSource)
  *
  * @return The PIDOutput (angle or rate, defaults to angle)
  */
-double Gyro::PIDGet()
+double Gyro::PIDGet() const
 {
 	switch(m_pidSource){
 	case kRate:
@@ -246,7 +246,7 @@ void Gyro::StopLiveWindowMode() {
 
 }
 
-std::string Gyro::GetSmartDashboardType() {
+std::string Gyro::GetSmartDashboardType() const {
 	return "Gyro";
 }
 
@@ -255,6 +255,6 @@ void Gyro::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable * Gyro::GetTable() {
+ITable * Gyro::GetTable() const {
 	return m_table;
 }

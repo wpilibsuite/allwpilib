@@ -26,7 +26,7 @@ class Timer
 public:
 	Timer();
 	virtual ~Timer();
-	double Get();
+	double Get() const;
 	void Reset();
 	void Start();
 	void Stop();

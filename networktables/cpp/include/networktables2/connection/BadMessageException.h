@@ -16,7 +16,7 @@ class BadMessageException : public std::exception
 public:
 	BadMessageException(const char* message);
 	~BadMessageException() throw ();
-	const char* what();
+	const char* what() const noexcept;
 private:
 	std::string message;
 };

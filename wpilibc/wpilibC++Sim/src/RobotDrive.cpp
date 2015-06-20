@@ -698,17 +698,17 @@ void RobotDrive::SetExpiration(float timeout)
 	// FIXME: m_safetyHelper->SetExpiration(timeout);
 }
 
-float RobotDrive::GetExpiration()
+float RobotDrive::GetExpiration() const
 {
     return -1; // FIXME: return m_safetyHelper->GetExpiration();
 }
 
-bool RobotDrive::IsAlive()
+bool RobotDrive::IsAlive() const
 {
     return true; // FIXME: m_safetyHelper->IsAlive();
 }
 
-bool RobotDrive::IsSafetyEnabled()
+bool RobotDrive::IsSafetyEnabled() const
 {
     return false; // FIXME: return m_safetyHelper->IsSafetyEnabled();
 }
@@ -718,7 +718,7 @@ void RobotDrive::SetSafetyEnabled(bool enabled)
 	// FIXME: m_safetyHelper->SetSafetyEnabled(enabled);
 }
 
-void RobotDrive::GetDescription(char *desc)
+void RobotDrive::GetDescription(char *desc) const
 {
 	sprintf(desc, "RobotDrive");
 }

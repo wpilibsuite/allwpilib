@@ -50,37 +50,37 @@ public:
 	Joystick(uint32_t port, uint32_t numAxisTypes, uint32_t numButtonTypes);
 	virtual ~Joystick();
 
-	uint32_t GetAxisChannel(AxisType axis);
+	uint32_t GetAxisChannel(AxisType axis) const;
 	void SetAxisChannel(AxisType axis, uint32_t channel);
 
-	virtual float GetX(JoystickHand hand = kRightHand);
-	virtual float GetY(JoystickHand hand = kRightHand);
-	virtual float GetZ();
-	virtual float GetTwist();
-	virtual float GetThrottle();
-	virtual float GetAxis(AxisType axis);
-	float GetRawAxis(uint32_t axis);
+	virtual float GetX(JoystickHand hand = kRightHand) const override;
+	virtual float GetY(JoystickHand hand = kRightHand) const override;
+	virtual float GetZ() const override;
+	virtual float GetTwist() const override;
+	virtual float GetThrottle() const override;
+	virtual float GetAxis(AxisType axis) const;
+	float GetRawAxis(uint32_t axis) const override;
 
-	virtual bool GetTrigger(JoystickHand hand = kRightHand);
-	virtual bool GetTop(JoystickHand hand = kRightHand);
-	virtual bool GetBumper(JoystickHand hand = kRightHand);
-	virtual bool GetRawButton(uint32_t button);
-	virtual int GetPOV(uint32_t pov = 0);
-	bool GetButton(ButtonType button);
+	virtual bool GetTrigger(JoystickHand hand = kRightHand) const override;
+	virtual bool GetTop(JoystickHand hand = kRightHand) const override;
+	virtual bool GetBumper(JoystickHand hand = kRightHand) const override;
+	virtual bool GetRawButton(uint32_t button) const override;
+	virtual int GetPOV(uint32_t pov = 0) const override;
+	bool GetButton(ButtonType button) const;
 	static Joystick* GetStickForPort(uint32_t port);
 
-	virtual float GetMagnitude();
-	virtual float GetDirectionRadians();
-	virtual float GetDirectionDegrees();
+	virtual float GetMagnitude() const;
+	virtual float GetDirectionRadians() const;
+	virtual float GetDirectionDegrees() const;
 
-	bool GetIsXbox();
-	Joystick::HIDType GetType();
-	std::string GetName();
-	int GetAxisType(uint8_t axis);
+	bool GetIsXbox() const;
+	Joystick::HIDType GetType() const;
+	std::string GetName() const;
+	int GetAxisType(uint8_t axis) const;
 	
-	int GetAxisCount();
-	int GetButtonCount();
-	int GetPOVCount();
+	int GetAxisCount() const;
+	int GetButtonCount() const;
+	int GetPOVCount() const;
 	
 	void SetRumble(RumbleType type, float value);
 	void SetOutput(uint8_t outputNumber, bool value);

@@ -43,15 +43,15 @@ public:
 	virtual ~Relay();
 
 	void Set(Value value);
-	Value Get();
+	Value Get() const;
 
-	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
-	void UpdateTable();
-	void StartLiveWindowMode();
-	void StopLiveWindowMode();
-	std::string GetSmartDashboardType();
-	void InitTable(ITable *subTable);
-	ITable * GetTable();
+	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) override;
+	void UpdateTable() override;
+	void StartLiveWindowMode() override;
+	void StopLiveWindowMode() override;
+	std::string GetSmartDashboardType() const override;
+	void InitTable(ITable *subTable) override;
+	ITable * GetTable() const override;
 
 	ITable *m_table;
 

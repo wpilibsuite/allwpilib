@@ -23,29 +23,29 @@ public:
 
 	void Start();
 	void Stop();
-	bool Enabled();
+	bool Enabled() const;
 
-	bool GetPressureSwitchValue();
+	bool GetPressureSwitchValue() const;
 
-	float GetCompressorCurrent();
+	float GetCompressorCurrent() const;
 
 	void SetClosedLoopControl(bool on);
-	bool GetClosedLoopControl();
+	bool GetClosedLoopControl() const;
 
-	bool GetCompressorCurrentTooHighFault();
-	bool GetCompressorCurrentTooHighStickyFault();
-	bool GetCompressorShortedStickyFault();
-	bool GetCompressorShortedFault();
-	bool GetCompressorNotConnectedStickyFault();
-	bool GetCompressorNotConnectedFault();
+	bool GetCompressorCurrentTooHighFault() const;
+	bool GetCompressorCurrentTooHighStickyFault() const;
+	bool GetCompressorShortedStickyFault() const;
+	bool GetCompressorShortedFault() const;
+	bool GetCompressorNotConnectedStickyFault() const;
+	bool GetCompressorNotConnectedFault() const;
 	void ClearAllPCMStickyFaults();
 
-	void UpdateTable();
-	void StartLiveWindowMode();
-	void StopLiveWindowMode();
-	std::string GetSmartDashboardType();
-	void InitTable(ITable *subTable);
-	ITable *GetTable();
+	void UpdateTable() override;
+	void StartLiveWindowMode() override;
+	void StopLiveWindowMode() override;
+	std::string GetSmartDashboardType() const override;
+	void InitTable(ITable *subTable) override;
+	ITable *GetTable() const override;
 	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
 
 protected:

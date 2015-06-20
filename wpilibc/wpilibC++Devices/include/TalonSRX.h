@@ -18,11 +18,11 @@ class TalonSRX : public SafePWM, public SpeedController
 public:
 	explicit TalonSRX(uint32_t channel);
 	virtual ~TalonSRX();
-	virtual void Set(float value, uint8_t syncGroup = 0);
-	virtual float Get();
-	virtual void Disable();
+	virtual void Set(float value, uint8_t syncGroup = 0) override;
+	virtual float Get() const override;
+	virtual void Disable() override;
 
-	virtual void PIDWrite(float output);
+	virtual void PIDWrite(float output) override;
 
 private:
 	void InitTalonSRX();

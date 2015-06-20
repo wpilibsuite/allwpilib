@@ -30,11 +30,11 @@ public:
 	static RobotBase &getInstance();
 	static void setInstance(RobotBase* robot);
 
-	bool IsEnabled();
-	bool IsDisabled();
-	bool IsAutonomous();
-	bool IsOperatorControl();
-	bool IsTest();
+	bool IsEnabled() const;
+	bool IsDisabled() const;
+	bool IsAutonomous() const;
+	bool IsOperatorControl() const;
+	bool IsTest() const;
 	virtual void StartCompetition() = 0;
 
 protected:

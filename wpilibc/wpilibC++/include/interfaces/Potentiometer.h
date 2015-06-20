@@ -21,7 +21,7 @@ public:
 	 * 
 	 * @return The current set speed.  Value is between -1.0 and 1.0.
 	 */
-	virtual double Get() = 0;
+	virtual double Get() const = 0;
 };
 
 #endif

@@ -159,7 +159,7 @@ void DriverStation::GetData()
  *
  * @return The battery voltage in Volts.
  */
-float DriverStation::GetBatteryVoltage()
+float DriverStation::GetBatteryVoltage() const
 {
 	int32_t status = 0;
 	float voltage = getVinVoltage(&status);
@@ -186,7 +186,7 @@ void DriverStation::ReportJoystickUnpluggedError(std::string message) {
  * @param stick The joystick port number
  * @return The number of axes on the indicated joystick
  */
-int DriverStation::GetStickAxisCount(uint32_t stick)
+int DriverStation::GetStickAxisCount(uint32_t stick) const
 {
     if (stick >= kJoystickPorts)
     {
@@ -204,7 +204,7 @@ int DriverStation::GetStickAxisCount(uint32_t stick)
  *@param stick The joystick port number
  *@return The name of the joystick at the given port
  */
-std::string DriverStation::GetJoystickName(uint32_t stick)
+std::string DriverStation::GetJoystickName(uint32_t stick) const
 {
 	if (stick >= kJoystickPorts)
 	{
@@ -220,7 +220,7 @@ std::string DriverStation::GetJoystickName(uint32_t stick)
  *@param stick The joystick port number
  *@return The HID type of joystick at the given port
  */
-int DriverStation::GetJoystickType(uint32_t stick)
+int DriverStation::GetJoystickType(uint32_t stick) const
 {
 	if (stick >= kJoystickPorts)
 	{
@@ -236,7 +236,7 @@ int DriverStation::GetJoystickType(uint32_t stick)
  *@param stick The joystick port number
  *@return A boolean that is true if the controller is an xbox controller.
  */
-bool DriverStation::GetJoystickIsXbox(uint32_t stick)
+bool DriverStation::GetJoystickIsXbox(uint32_t stick) const
 {
 	if (stick >= kJoystickPorts)
 	{
@@ -252,7 +252,7 @@ bool DriverStation::GetJoystickIsXbox(uint32_t stick)
  *@param stick The joystick port number and the target axis
  *@return What type of axis the axis is reporting to be
  */
-int DriverStation::GetJoystickAxisType(uint32_t stick, uint8_t axis)
+int DriverStation::GetJoystickAxisType(uint32_t stick, uint8_t axis) const
 {
 	if (stick >= kJoystickPorts)
 	{
@@ -268,7 +268,7 @@ int DriverStation::GetJoystickAxisType(uint32_t stick, uint8_t axis)
  * @param stick The joystick port number
  * @return The number of POVs on the indicated joystick
  */
-int DriverStation::GetStickPOVCount(uint32_t stick)
+int DriverStation::GetStickPOVCount(uint32_t stick) const
 {
     if (stick >= kJoystickPorts)
     {
@@ -286,7 +286,7 @@ int DriverStation::GetStickPOVCount(uint32_t stick)
  * @param stick The joystick port number
  * @return The number of buttons on the indicated joystick
  */
-int DriverStation::GetStickButtonCount(uint32_t stick)
+int DriverStation::GetStickButtonCount(uint32_t stick) const
 {
     if (stick >= kJoystickPorts)
     {
@@ -365,7 +365,7 @@ int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
  * @param stick The joystick to read.
  * @return The state of the buttons on the joystick.
  */
-uint32_t DriverStation::GetStickButtons(uint32_t stick)
+uint32_t DriverStation::GetStickButtons(uint32_t stick) const
 {
 	if (stick >= kJoystickPorts)
 	{
@@ -408,7 +408,7 @@ bool DriverStation::GetStickButton(uint32_t stick, uint8_t button)
  * Check if the DS has enabled the robot
  * @return True if the robot is enabled and the DS is connected
  */
-bool DriverStation::IsEnabled()
+bool DriverStation::IsEnabled() const
 {
 	HALControlWord controlWord;
     memset(&controlWord, 0, sizeof(controlWord));
@@ -420,7 +420,7 @@ bool DriverStation::IsEnabled()
  * Check if the robot is disabled
  * @return True if the robot is explicitly disabled or the DS is not connected
  */
-bool DriverStation::IsDisabled()
+bool DriverStation::IsDisabled() const
 {
 	HALControlWord controlWord;
     memset(&controlWord, 0, sizeof(controlWord));
@@ -432,7 +432,7 @@ bool DriverStation::IsDisabled()
  * Check if the DS is commanding autonomous mode
  * @return True if the robot is being commanded to be in autonomous mode
  */
-bool DriverStation::IsAutonomous()
+bool DriverStation::IsAutonomous() const
 {
 	HALControlWord controlWord;
     memset(&controlWord, 0, sizeof(controlWord));
@@ -444,7 +444,7 @@ bool DriverStation::IsAutonomous()
  * Check if the DS is commanding teleop mode
  * @return True if the robot is being commanded to be in teleop mode
  */
-bool DriverStation::IsOperatorControl()
+bool DriverStation::IsOperatorControl() const
 {
 	HALControlWord controlWord;
     memset(&controlWord, 0, sizeof(controlWord));
@@ -456,7 +456,7 @@ bool DriverStation::IsOperatorControl()
  * Check if the DS is commanding test mode
  * @return True if the robot is being commanded to be in test mode
  */
-bool DriverStation::IsTest()
+bool DriverStation::IsTest() const
 {
 	HALControlWord controlWord;
 	HALGetControlWord(&controlWord);
@@ -467,7 +467,7 @@ bool DriverStation::IsTest()
  * Check if the DS is attached
  * @return True if the DS is connected to the robot
  */
-bool DriverStation::IsDSAttached()
+bool DriverStation::IsDSAttached() const
 {
 	HALControlWord controlWord;
     memset(&controlWord, 0, sizeof(controlWord));
@@ -480,7 +480,7 @@ bool DriverStation::IsDSAttached()
  * or e-stopped, the watchdog has expired, or if the roboRIO browns out.
  * @return True if the FPGA outputs are enabled.
  */
-bool DriverStation::IsSysActive()
+bool DriverStation::IsSysActive() const
 {
 	int32_t status = 0;
 	bool retVal = HALGetSystemActive(&status);
@@ -492,7 +492,7 @@ bool DriverStation::IsSysActive()
  * Check if the system is browned out.
  * @return True if the system is browned out
  */
-bool DriverStation::IsSysBrownedOut()
+bool DriverStation::IsSysBrownedOut() const
 {
 	int32_t status = 0;
 	bool retVal = HALGetBrownedOut(&status);
@@ -506,7 +506,7 @@ bool DriverStation::IsSysBrownedOut()
  * you will not get the get the intended behaviour.
  * @return True if the control data has been updated since the last call.
  */
-bool DriverStation::IsNewControlData()
+bool DriverStation::IsNewControlData() const
 {
 	return tryTakeSemaphore(m_newControlData) == 0;
 }
@@ -515,7 +515,7 @@ bool DriverStation::IsNewControlData()
  * Is the driver station attached to a Field Management System?
  * @return True if the robot is competing on a field being controlled by a Field Management System
  */
-bool DriverStation::IsFMSAttached()
+bool DriverStation::IsFMSAttached() const
 {
 	HALControlWord controlWord;
 	HALGetControlWord(&controlWord);
@@ -527,7 +527,7 @@ bool DriverStation::IsFMSAttached()
  * This could return kRed or kBlue
  * @return The Alliance enum (kRed, kBlue or kInvalid)
  */
-DriverStation::Alliance DriverStation::GetAlliance()
+DriverStation::Alliance DriverStation::GetAlliance() const
 {
 	HALAllianceStationID allianceStationID;
 	HALGetAllianceStation(&allianceStationID);
@@ -551,7 +551,7 @@ DriverStation::Alliance DriverStation::GetAlliance()
  * This could return 1, 2, or 3
  * @return The location of the driver station (1-3, 0 for invalid)
  */
-uint32_t DriverStation::GetLocation()
+uint32_t DriverStation::GetLocation() const
 {
 	HALAllianceStationID allianceStationID;
 	HALGetAllianceStation(&allianceStationID);
@@ -590,7 +590,7 @@ void DriverStation::WaitForData()
  * The Practice Match function of the DS approximates the behaviour seen on the field.
  * @return Time remaining in current match period (auto or teleop)
  */
-double DriverStation::GetMatchTime()
+double DriverStation::GetMatchTime() const
 {
 	float matchTime;
 	HALGetMatchTime(&matchTime);

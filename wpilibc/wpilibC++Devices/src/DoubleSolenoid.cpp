@@ -129,7 +129,7 @@ void DoubleSolenoid::Set(Value value)
  *
  * @return The current value of the solenoid.
  */
-DoubleSolenoid::Value DoubleSolenoid::Get()
+DoubleSolenoid::Value DoubleSolenoid::Get() const
 {
 	if (StatusIsFatal()) return kOff;
 	uint8_t value = GetAll(m_moduleNumber);
@@ -146,7 +146,7 @@ DoubleSolenoid::Value DoubleSolenoid::Get()
  *
  * @return If solenoid is disabled due to short.
  */
-bool DoubleSolenoid::IsFwdSolenoidBlackListed()
+bool DoubleSolenoid::IsFwdSolenoidBlackListed() const
 {
 	int blackList = GetPCMSolenoidBlackList(m_moduleNumber);
 	return (blackList & m_forwardMask) ? 1 : 0;
@@ -159,7 +159,7 @@ bool DoubleSolenoid::IsFwdSolenoidBlackListed()
  *
  * @return If solenoid is disabled due to short.
  */
-bool DoubleSolenoid::IsRevSolenoidBlackListed()
+bool DoubleSolenoid::IsRevSolenoidBlackListed() const
 {
 	int blackList = GetPCMSolenoidBlackList(m_moduleNumber);
 	return (blackList & m_reverseMask) ? 1 : 0;
@@ -195,7 +195,7 @@ void DoubleSolenoid::StopLiveWindowMode() {
 	}
 }
 
-std::string DoubleSolenoid::GetSmartDashboardType() {
+std::string DoubleSolenoid::GetSmartDashboardType() const {
 	return "Double Solenoid";
 }
 
@@ -204,6 +204,6 @@ void DoubleSolenoid::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable * DoubleSolenoid::GetTable() {
+ITable * DoubleSolenoid::GetTable() const {
 	return m_table;
 }

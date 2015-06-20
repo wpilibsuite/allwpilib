@@ -18,7 +18,7 @@ class DigitalSource : public InterruptableSensorBase
 {
 public:
 	virtual ~DigitalSource();
-	virtual uint32_t GetChannelForRouting() = 0;
-	virtual uint32_t GetModuleForRouting() = 0;
-	virtual bool GetAnalogTriggerForRouting() = 0;
+	virtual uint32_t GetChannelForRouting() const = 0;
+	virtual uint32_t GetModuleForRouting() const = 0;
+	virtual bool GetAnalogTriggerForRouting() const = 0;
 };

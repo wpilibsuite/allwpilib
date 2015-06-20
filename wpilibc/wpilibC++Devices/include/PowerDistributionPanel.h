@@ -21,21 +21,21 @@ class PowerDistributionPanel : public SensorBase, public LiveWindowSendable {
 		PowerDistributionPanel();
 		PowerDistributionPanel(uint8_t module);
 		
-		double GetVoltage();
-		double GetTemperature();
-		double GetCurrent(uint8_t channel);
-		double GetTotalCurrent();
-		double GetTotalPower();
-		double GetTotalEnergy();
+		double GetVoltage() const;
+		double GetTemperature() const;
+		double GetCurrent(uint8_t channel) const;
+		double GetTotalCurrent() const;
+		double GetTotalPower() const;
+		double GetTotalEnergy() const;
 		void ResetTotalEnergy();
 		void ClearStickyFaults();
 
-		void UpdateTable();
-		void StartLiveWindowMode();
-		void StopLiveWindowMode();
-		std::string GetSmartDashboardType();
-		void InitTable(ITable *subTable);
-		ITable * GetTable();
+		void UpdateTable() override;
+		void StartLiveWindowMode() override;
+		void StopLiveWindowMode() override;
+		std::string GetSmartDashboardType() const override;
+		void InitTable(ITable *subTable) override;
+		ITable * GetTable() const override;
 
 	private:
 		ITable *m_table;

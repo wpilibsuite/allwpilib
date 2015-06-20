@@ -40,7 +40,7 @@ public:
 	virtual void PIDWrite(float output);
 
 	// PIDSource interface
-	virtual double PIDGet();
+	virtual double PIDGet() const;
 	void SetSetpoint(double setpoint);
 	void SetSetpointRelative(double deltaSetpoint);
 	void SetInputRange(float minimumInput, float maximumInput);
@@ -50,12 +50,12 @@ public:
 
 	virtual void SetAbsoluteTolerance(float absValue);
 	virtual void SetPercentTolerance(float percent);
-	virtual bool OnTarget();
+	virtual bool OnTarget() const;
 
 protected:
 	PIDController *GetPIDController();
 
-	virtual double ReturnPIDInput() = 0;
+	virtual double ReturnPIDInput() const = 0;
 	virtual void UsePIDOutput(double output) = 0;
 
 private:
@@ -64,7 +64,7 @@ private:
 
 public:
 	virtual void InitTable(ITable* table);
-	virtual std::string GetSmartDashboardType();
+	virtual std::string GetSmartDashboardType() const;
 };
 
 #endif

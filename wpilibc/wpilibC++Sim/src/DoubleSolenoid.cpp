@@ -86,7 +86,7 @@ void DoubleSolenoid::Set(Value value)
  *
  * @return The current value of the solenoid.
  */
-DoubleSolenoid::Value DoubleSolenoid::Get()
+DoubleSolenoid::Value DoubleSolenoid::Get() const
 {
 	return m_value;
 }
@@ -121,7 +121,7 @@ void DoubleSolenoid::StopLiveWindowMode() {
 	}
 }
 
-std::string DoubleSolenoid::GetSmartDashboardType() {
+std::string DoubleSolenoid::GetSmartDashboardType() const {
 	return "Double Solenoid";
 }
 
@@ -130,6 +130,6 @@ void DoubleSolenoid::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable * DoubleSolenoid::GetTable() {
+ITable * DoubleSolenoid::GetTable() const {
 	return m_table;
 }

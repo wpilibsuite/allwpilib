@@ -186,7 +186,7 @@ Encoder::~Encoder()
  * The encoding scale factor 1x, 2x, or 4x, per the requested encodingType.
  * Used to divide raw edge counts down to spec'd counts.
  */
-int32_t Encoder::GetEncodingScale() { return m_encodingScale; }
+int32_t Encoder::GetEncodingScale() const { return m_encodingScale; }
 
 /**
  * Gets the raw value from the encoder.
@@ -194,7 +194,7 @@ int32_t Encoder::GetEncodingScale() { return m_encodingScale; }
  * factor.
  * @return Current raw count from the encoder
  */
-int32_t Encoder::GetRaw()
+int32_t Encoder::GetRaw() const
 {
 	if (StatusIsFatal()) return 0;
 	int32_t value;
@@ -216,7 +216,7 @@ int32_t Encoder::GetRaw()
  *
  * @return Current count from the Encoder adjusted for the 1x, 2x, or 4x scale factor.
  */
-int32_t Encoder::Get()
+int32_t Encoder::Get() const
 {
 	if (StatusIsFatal()) return 0;
 	return (int32_t) (GetRaw() * DecodingScaleFactor());
@@ -248,7 +248,7 @@ void Encoder::Reset()
  *
  * @return Period in seconds of the most recent pulse.
  */
-double Encoder::GetPeriod()
+double Encoder::GetPeriod() const
 {
 	if (StatusIsFatal()) return 0.0;
 	if (m_counter)
@@ -299,7 +299,7 @@ void Encoder::SetMaxPeriod(double maxPeriod)
  * width exceeds the MaxPeriod.
  * @return True if the encoder is considered stopped.
  */
-bool Encoder::GetStopped()
+bool Encoder::GetStopped() const
 {
 	if (StatusIsFatal()) return true;
 	if (m_counter)
@@ -319,7 +319,7 @@ bool Encoder::GetStopped()
  * The last direction the encoder value changed.
  * @return The last direction the encoder value changed.
  */
-bool Encoder::GetDirection()
+bool Encoder::GetDirection() const
 {
 	if (StatusIsFatal()) return false;
 	if (m_counter)
@@ -338,7 +338,7 @@ bool Encoder::GetDirection()
 /**
  * The scale needed to convert a raw counter value into a number of encoder pulses.
  */
-double Encoder::DecodingScaleFactor()
+double Encoder::DecodingScaleFactor() const
 {
 	if (StatusIsFatal()) return 0.0;
 	switch (m_encodingType)
@@ -359,7 +359,7 @@ double Encoder::DecodingScaleFactor()
  *
  * @return The distance driven since the last reset as scaled by the value from SetDistancePerPulse().
  */
-double Encoder::GetDistance()
+double Encoder::GetDistance() const
 {
 	if (StatusIsFatal()) return 0.0;
 	return GetRaw() * DecodingScaleFactor() * m_distancePerPulse;
@@ -371,7 +371,7 @@ double Encoder::GetDistance()
  *
  * @return The current rate of the encoder.
  */
-double Encoder::GetRate()
+double Encoder::GetRate() const
 {
 	if (StatusIsFatal()) return 0.0;
 	return (m_distancePerPulse / GetPeriod());
@@ -458,7 +458,7 @@ void Encoder::SetSamplesToAverage(int samplesToAverage)
  * mechanical imperfections or as oversampling to increase resolution.
  * @return SamplesToAverage The number of samples being averaged (from 1 to 127)
  */
-int Encoder::GetSamplesToAverage()
+int Encoder::GetSamplesToAverage() const
 {
 	int result = 1;
 	int32_t status = 0;
@@ -493,7 +493,7 @@ void Encoder::SetPIDSourceParameter(PIDSourceParameter pidSource)
  *
  * @return The current value of the selected source parameter.
  */
-double Encoder::PIDGet()
+double Encoder::PIDGet() const
 {
 	if (StatusIsFatal()) return 0.0;
 	switch (m_pidSource)
@@ -564,7 +564,7 @@ void Encoder::StopLiveWindowMode() {
 
 }
 
-std::string Encoder::GetSmartDashboardType() {
+std::string Encoder::GetSmartDashboardType() const {
 	if (m_encodingType == k4X)
 		return "Quadrature Encoder";
 	else
@@ -576,6 +576,6 @@ void Encoder::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable * Encoder::GetTable() {
+ITable * Encoder::GetTable() const {
 	return m_table;
 }

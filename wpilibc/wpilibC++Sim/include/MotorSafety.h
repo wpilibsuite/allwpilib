@@ -11,10 +11,10 @@ class MotorSafety
 {
 public:
 	virtual void SetExpiration(float timeout) = 0;
-	virtual float GetExpiration() = 0;
-	virtual bool IsAlive() = 0;
+	virtual float GetExpiration() const = 0;
+	virtual bool IsAlive() const = 0;
 	virtual void StopMotor() = 0;
 	virtual void SetSafetyEnabled(bool enabled) = 0;
-	virtual bool IsSafetyEnabled() = 0;
-	virtual void GetDescription(char *desc) = 0;
+	virtual bool IsSafetyEnabled() const = 0;
+	virtual void GetDescription(char *desc) const = 0;
 };

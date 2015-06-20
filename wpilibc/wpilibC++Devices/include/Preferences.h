@@ -52,7 +52,7 @@ public:
 	bool ContainsKey(const char *key);
 	void Remove(const char *key);
 
-	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
+	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) override;
 
 protected:
 	Preferences();

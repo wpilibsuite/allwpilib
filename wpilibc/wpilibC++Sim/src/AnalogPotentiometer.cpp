@@ -37,7 +37,7 @@ AnalogPotentiometer::~AnalogPotentiometer() {
  *
  * @return The current position of the potentiometer.
  */
-double AnalogPotentiometer::Get() {
+double AnalogPotentiometer::Get() const {
     return m_analog_input->GetVoltage() * m_scale + m_offset;
 }
 
@@ -46,7 +46,7 @@ double AnalogPotentiometer::Get() {
  *
  * @return The current reading.
  */
-double AnalogPotentiometer::PIDGet() {
+double AnalogPotentiometer::PIDGet() const {
     return Get();
 }
 
@@ -54,7 +54,7 @@ double AnalogPotentiometer::PIDGet() {
 /**
  * @return the Smart Dashboard Type
  */
-std::string AnalogPotentiometer::GetSmartDashboardType() {
+std::string AnalogPotentiometer::GetSmartDashboardType() const {
     return "Analog Input";
 }
 
@@ -72,6 +72,6 @@ void AnalogPotentiometer::UpdateTable() {
     }
 }
 
-ITable* AnalogPotentiometer::GetTable() {
+ITable* AnalogPotentiometer::GetTable() const {
     return m_table;
 }

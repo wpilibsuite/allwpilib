@@ -59,7 +59,7 @@ void Trigger::ToggleWhenActive(Command *command) {
 	tbs->Start();
 }
 
-std::string Trigger::GetSmartDashboardType(){
+std::string Trigger::GetSmartDashboardType() const {
 	return "Button";
 }
 
@@ -70,6 +70,6 @@ void Trigger::InitTable(ITable* table){
 	}
 }
 
-ITable* Trigger::GetTable(){
+ITable* Trigger::GetTable() const {
 	return m_table;
 }

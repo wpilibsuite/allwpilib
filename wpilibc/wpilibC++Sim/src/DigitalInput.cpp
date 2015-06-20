@@ -43,7 +43,7 @@ DigitalInput::~DigitalInput()
  * Get the value from a digital input channel.
  * Retrieve the value of a single digital input channel from the FPGA.
  */
-uint32_t DigitalInput::Get()
+uint32_t DigitalInput::Get() const
 {
 	return m_impl->Get();
 }
@@ -51,7 +51,7 @@ uint32_t DigitalInput::Get()
 /**
  * @return The GPIO channel number that this object represents.
  */
-uint32_t DigitalInput::GetChannel()
+uint32_t DigitalInput::GetChannel() const
 {
 	return m_channel;
 }
@@ -70,7 +70,7 @@ void DigitalInput::StopLiveWindowMode() {
 
 }
 
-std::string DigitalInput::GetSmartDashboardType() {
+std::string DigitalInput::GetSmartDashboardType() const {
 	return "DigitalInput";
 }
 
@@ -79,6 +79,6 @@ void DigitalInput::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable * DigitalInput::GetTable() {
+ITable * DigitalInput::GetTable() const {
 	return m_table;
 }

@@ -27,7 +27,7 @@ PowerDistributionPanel::PowerDistributionPanel(uint8_t module) {
  * @return The voltage of the PDP in volts
  */
 double
-PowerDistributionPanel::GetVoltage() {
+PowerDistributionPanel::GetVoltage() const {
 	int32_t status = 0;
 	
 	double voltage = getPDPVoltage(&status, m_module);
@@ -44,7 +44,7 @@ PowerDistributionPanel::GetVoltage() {
  * @return The temperature of the PDP in degrees Celsius
  */
 double
-PowerDistributionPanel::GetTemperature() {
+PowerDistributionPanel::GetTemperature() const {
 	int32_t status = 0;
 	
 	double temperature = getPDPTemperature(&status, m_module);
@@ -61,7 +61,7 @@ PowerDistributionPanel::GetTemperature() {
  * @return The current of one of the PDP channels (channels 0-15) in Amperes
  */
 double
-PowerDistributionPanel::GetCurrent(uint8_t channel) {
+PowerDistributionPanel::GetCurrent(uint8_t channel) const {
 	int32_t status = 0;
 	
 	if(!CheckPDPChannel(channel))
@@ -85,7 +85,7 @@ PowerDistributionPanel::GetCurrent(uint8_t channel) {
  * @return The the total current drawn from the PDP channels in Amperes
  */
 double
-PowerDistributionPanel::GetTotalCurrent() {
+PowerDistributionPanel::GetTotalCurrent() const {
 	int32_t status = 0;
 	
 	double current = getPDPTotalCurrent(&status, m_module);
@@ -102,7 +102,7 @@ PowerDistributionPanel::GetTotalCurrent() {
  * @return The the total power drawn from the PDP channels in Watts
  */
 double
-PowerDistributionPanel::GetTotalPower() {
+PowerDistributionPanel::GetTotalPower() const {
 	int32_t status = 0;
 	
 	double power = getPDPTotalPower(&status, m_module);
@@ -119,7 +119,7 @@ PowerDistributionPanel::GetTotalPower() {
  * @return The the total energy drawn from the PDP channels in Joules
  */
 double
-PowerDistributionPanel::GetTotalEnergy() {
+PowerDistributionPanel::GetTotalEnergy() const {
 	int32_t status = 0;
 	
 	double energy = getPDPTotalEnergy(&status, m_module);
@@ -189,7 +189,7 @@ void PowerDistributionPanel::StartLiveWindowMode() {
 void PowerDistributionPanel::StopLiveWindowMode() {
 }
 
-std::string PowerDistributionPanel::GetSmartDashboardType() {
+std::string PowerDistributionPanel::GetSmartDashboardType() const {
 	return "PowerDistributionPanel";
 }
 
@@ -198,6 +198,6 @@ void PowerDistributionPanel::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable * PowerDistributionPanel::GetTable() {
+ITable * PowerDistributionPanel::GetTable() const {
 	return m_table;
 }

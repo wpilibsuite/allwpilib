@@ -40,8 +40,8 @@ public:
 	void ToggleWhenActive(Command *command);
 	
 	virtual void InitTable(ITable* table);
-	virtual ITable* GetTable();
-	virtual std::string GetSmartDashboardType();
+	virtual ITable* GetTable() const;
+	virtual std::string GetSmartDashboardType() const;
 protected:
 	ITable* m_table;
 };

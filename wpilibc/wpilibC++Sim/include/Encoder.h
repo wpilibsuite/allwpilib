@@ -35,39 +35,40 @@ public:
 	virtual ~Encoder();
 
 	// CounterBase interface
-	int32_t Get();
-	int32_t GetRaw();
-	int32_t GetEncodingScale();
-	void Reset();
-	double GetPeriod();
-	void SetMaxPeriod(double maxPeriod);
-	bool GetStopped();
-	bool GetDirection();
-	double GetDistance();
-	double GetRate();
+	int32_t Get() const override;
+	int32_t GetRaw() const;
+	int32_t GetEncodingScale() const;
+	void Reset() override;
+	double GetPeriod() const override;
+	void SetMaxPeriod(double maxPeriod) override;
+	bool GetStopped() const override;
+	bool GetDirection() const override;
+
+	double GetDistance() const;
+	double GetRate() const;
 	void SetMinRate(double minRate);
 	void SetDistancePerPulse(double distancePerPulse);
 	void SetReverseDirection(bool reverseDirection);
 	void SetSamplesToAverage(int samplesToAverage);
-	int GetSamplesToAverage();
+	int GetSamplesToAverage() const;
 	void SetPIDSourceParameter(PIDSourceParameter pidSource);
-	double PIDGet();
+	double PIDGet() const override;
 
-	void UpdateTable();
-	void StartLiveWindowMode();
-	void StopLiveWindowMode();
-	std::string GetSmartDashboardType();
-	void InitTable(ITable *subTable);
-	ITable * GetTable();
+	void UpdateTable() override;
+	void StartLiveWindowMode() override;
+	void StopLiveWindowMode() override;
+	std::string GetSmartDashboardType() const override;
+	void InitTable(ITable *subTable) override;
+	ITable * GetTable() const override;
 
-	int32_t FPGAEncoderIndex()
+	int32_t FPGAEncoderIndex() const
 	{
 		return 0;
 	}
 
 private:
 	void InitEncoder(int channelA, int channelB, bool _reverseDirection, EncodingType encodingType);
-	double DecodingScaleFactor();
+	double DecodingScaleFactor() const;
 
 	// TODO: [Not Supported] DigitalSource *m_aSource;		// the A phase of the quad encoder
 	// TODO: [Not Supported] DigitalSource *m_bSource;		// the B phase of the quad encoder

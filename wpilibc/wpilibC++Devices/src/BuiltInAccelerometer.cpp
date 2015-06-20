@@ -63,7 +63,7 @@ double BuiltInAccelerometer::GetZ()
 	return getAccelerometerZ();
 }
 
-std::string BuiltInAccelerometer::GetSmartDashboardType() {
+std::string BuiltInAccelerometer::GetSmartDashboardType() const {
 	return "3AxisAccelerometer";
 }
 
@@ -80,6 +80,6 @@ void BuiltInAccelerometer::UpdateTable() {
 	}
 }
 
-ITable* BuiltInAccelerometer::GetTable() {
+ITable* BuiltInAccelerometer::GetTable() const {
 	return m_table;
 }

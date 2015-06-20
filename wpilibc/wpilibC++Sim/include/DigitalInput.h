@@ -19,15 +19,15 @@ class DigitalInput : public LiveWindowSendable {
 public:
 	explicit DigitalInput(uint32_t channel);
 	virtual ~DigitalInput();
-	uint32_t Get();
-	uint32_t GetChannel();
+	uint32_t Get() const;
+	uint32_t GetChannel() const;
 
-	void UpdateTable();
-	void StartLiveWindowMode();
-	void StopLiveWindowMode();
-	std::string GetSmartDashboardType();
-	void InitTable(ITable *subTable);
-	ITable * GetTable();
+	void UpdateTable() override;
+	void StartLiveWindowMode() override;
+	void StopLiveWindowMode() override;
+	std::string GetSmartDashboardType() const override;
+	void InitTable(ITable *subTable) override;
+	ITable * GetTable() const override;
 
 private:
 	void InitDigitalInput(uint32_t channel);

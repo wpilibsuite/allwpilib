@@ -56,7 +56,7 @@ void SolenoidBase::Set(uint8_t value, uint8_t mask, int module)
  * 
  * @return The current value of all 8 solenoids on the module.
  */
-uint8_t SolenoidBase::GetAll(int module)
+uint8_t SolenoidBase::GetAll(int module) const
 {
   	uint8_t value = 0;
   	int32_t status = 0;
@@ -74,7 +74,7 @@ uint8_t SolenoidBase::GetAll(int module)
  * 
  * @return The solenoid blacklist of all 8 solenoids on the module.
  */
-uint8_t SolenoidBase::GetPCMSolenoidBlackList(int module)
+uint8_t SolenoidBase::GetPCMSolenoidBlackList(int module) const
 {
 	int32_t status = 0;
 	return getPCMSolenoidBlackList(m_ports[module][0], &status);
@@ -84,7 +84,7 @@ uint8_t SolenoidBase::GetPCMSolenoidBlackList(int module)
  *			highside solenoid voltage rail is too low,
  *	 		most likely a solenoid channel is shorted.
  */
-bool SolenoidBase::GetPCMSolenoidVoltageStickyFault(int module)
+bool SolenoidBase::GetPCMSolenoidVoltageStickyFault(int module) const
 {
 	int32_t status = 0;
 	return getPCMSolenoidVoltageStickyFault(m_ports[module][0], &status);
@@ -94,7 +94,7 @@ bool SolenoidBase::GetPCMSolenoidVoltageStickyFault(int module)
  *			highside solenoid voltage rail is too low,
  *	 		most likely a solenoid channel is shorted.
  */
-bool SolenoidBase::GetPCMSolenoidVoltageFault(int module)
+bool SolenoidBase::GetPCMSolenoidVoltageFault(int module) const
 {
 	int32_t status = 0;
 	return getPCMSolenoidVoltageFault(m_ports[module][0], &status);

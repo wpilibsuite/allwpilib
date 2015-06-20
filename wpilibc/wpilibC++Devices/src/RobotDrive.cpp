@@ -717,17 +717,17 @@ void RobotDrive::SetExpiration(float timeout)
 	m_safetyHelper->SetExpiration(timeout);
 }
 
-float RobotDrive::GetExpiration()
+float RobotDrive::GetExpiration() const
 {
 	return m_safetyHelper->GetExpiration();
 }
 
-bool RobotDrive::IsAlive()
+bool RobotDrive::IsAlive() const
 {
 	return m_safetyHelper->IsAlive();
 }
 
-bool RobotDrive::IsSafetyEnabled()
+bool RobotDrive::IsSafetyEnabled() const
 {
 	return m_safetyHelper->IsSafetyEnabled();
 }
@@ -737,7 +737,7 @@ void RobotDrive::SetSafetyEnabled(bool enabled)
 	m_safetyHelper->SetSafetyEnabled(enabled);
 }
 
-void RobotDrive::GetDescription(char *desc)
+void RobotDrive::GetDescription(char *desc) const
 {
 	sprintf(desc, "RobotDrive");
 }

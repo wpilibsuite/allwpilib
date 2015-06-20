@@ -34,8 +34,8 @@ public:
 	explicit Gyro(AnalogInput *channel);
 	explicit Gyro(AnalogInput &channel);
 	virtual ~Gyro();
-	virtual float GetAngle();
-	virtual double GetRate();
+	virtual float GetAngle() const;
+	virtual double GetRate() const;
 	void SetSensitivity(float voltsPerDegreePerSecond);
 	void SetDeadband(float volts);
 	void SetPIDSourceParameter(PIDSourceParameter pidSource);
@@ -43,14 +43,14 @@ public:
 	void InitGyro();
 
 	// PIDSource interface
-	double PIDGet();
+	double PIDGet() const override;
 
-	void UpdateTable();
-	void StartLiveWindowMode();
-	void StopLiveWindowMode();
-	std::string GetSmartDashboardType();
-	void InitTable(ITable *subTable);
-	ITable * GetTable();
+	void UpdateTable() override;
+	void StartLiveWindowMode() override;
+	void StopLiveWindowMode() override;
+	std::string GetSmartDashboardType() const override;
+	void InitTable(ITable *subTable) override;
+	ITable * GetTable() const override;
 
 protected:
 	AnalogInput *m_analog;

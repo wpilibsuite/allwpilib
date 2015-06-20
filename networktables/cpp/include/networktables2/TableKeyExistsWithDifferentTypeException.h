@@ -36,7 +36,7 @@ public:
     
     TableKeyExistsWithDifferentTypeException(const std::string existingKey, NetworkTableEntryType* existingType, const char* message);
 
-    const char* what(){return "TableKeyExistsWithDifferentTypeException";};
+    const char* what() const noexcept {return "TableKeyExistsWithDifferentTypeException";};
 
     virtual ~TableKeyExistsWithDifferentTypeException() throw ();
 };

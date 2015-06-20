@@ -96,7 +96,7 @@ void Solenoid::Set(bool on)
  *
  * @return The current value of the solenoid.
  */
-bool Solenoid::Get()
+bool Solenoid::Get() const
 {
 	if (StatusIsFatal()) return false;
 	uint8_t value = GetAll(m_moduleNumber) & ( 1 << m_channel);
@@ -110,7 +110,7 @@ bool Solenoid::Get()
  *
  * @return If solenoid is disabled due to short.
  */
-bool Solenoid::IsBlackListed()
+bool Solenoid::IsBlackListed() const
 {
 	int value = GetPCMSolenoidBlackList(m_moduleNumber) & ( 1 << m_channel);
 	return (value != 0);
@@ -140,7 +140,7 @@ void Solenoid::StopLiveWindowMode() {
 	}
 }
 
-std::string Solenoid::GetSmartDashboardType() {
+std::string Solenoid::GetSmartDashboardType() const {
 	return "Solenoid";
 }
 
@@ -149,6 +149,6 @@ void Solenoid::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable * Solenoid::GetTable() {
+ITable * Solenoid::GetTable() const {
 	return m_table;
 }

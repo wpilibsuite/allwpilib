@@ -44,25 +44,25 @@ public:
 	uint32_t GetAxisChannel(AxisType axis);
 	void SetAxisChannel(AxisType axis, uint32_t channel);
 
-	virtual float GetX(JoystickHand hand = kRightHand);
-	virtual float GetY(JoystickHand hand = kRightHand);
-	virtual float GetZ();
-	virtual float GetTwist();
-	virtual float GetThrottle();
-	virtual float GetAxis(AxisType axis);
-	float GetRawAxis(uint32_t axis);
+	virtual float GetX(JoystickHand hand = kRightHand) const override;
+	virtual float GetY(JoystickHand hand = kRightHand) const override;
+	virtual float GetZ() const override;
+	virtual float GetTwist() const override;
+	virtual float GetThrottle() const override;
+	virtual float GetAxis(AxisType axis) const;
+	float GetRawAxis(uint32_t axis) const override;
 
-	virtual bool GetTrigger(JoystickHand hand = kRightHand);
-	virtual bool GetTop(JoystickHand hand = kRightHand);
-	virtual bool GetBumper(JoystickHand hand = kRightHand);
-	virtual bool GetRawButton(uint32_t button);
-	virtual int GetPOV(uint32_t pov = 1);
-	bool GetButton(ButtonType button);
+	virtual bool GetTrigger(JoystickHand hand = kRightHand) const override;
+	virtual bool GetTop(JoystickHand hand = kRightHand) const override;
+	virtual bool GetBumper(JoystickHand hand = kRightHand) const override;
+	virtual bool GetRawButton(uint32_t button) const override;
+	virtual int GetPOV(uint32_t pov = 1) const override;
+	bool GetButton(ButtonType button) const;
 	static Joystick* GetStickForPort(uint32_t port);
 
-	virtual float GetMagnitude();
-	virtual float GetDirectionRadians();
-	virtual float GetDirectionDegrees();
+	virtual float GetMagnitude() const;
+	virtual float GetDirectionRadians() const;
+	virtual float GetDirectionDegrees() const;
 
 private:
 	DISALLOW_COPY_AND_ASSIGN(Joystick);

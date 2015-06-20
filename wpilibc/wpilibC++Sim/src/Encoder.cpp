@@ -159,7 +159,7 @@ void Encoder::Reset()
  * width exceeds the MaxPeriod.
  * @return True if the encoder is considered stopped.
  */
-bool Encoder::GetStopped()
+bool Encoder::GetStopped() const
 {
     throw "Simulation doesn't currently support this method.";
 }
@@ -168,7 +168,7 @@ bool Encoder::GetStopped()
  * The last direction the encoder value changed.
  * @return The last direction the encoder value changed.
  */
-bool Encoder::GetDirection()
+bool Encoder::GetDirection() const
 {
     throw "Simulation doesn't currently support this method.";
 }
@@ -176,7 +176,7 @@ bool Encoder::GetDirection()
 /**
  * The scale needed to convert a raw counter value into a number of encoder pulses.
  */
-double Encoder::DecodingScaleFactor()
+double Encoder::DecodingScaleFactor() const
 {
 	switch (m_encodingType)
 	{
@@ -195,7 +195,7 @@ double Encoder::DecodingScaleFactor()
  * The encoding scale factor 1x, 2x, or 4x, per the requested encodingType.
  * Used to divide raw edge counts down to spec'd counts.
  */
-int32_t Encoder::GetEncodingScale() { return m_encodingScale; }
+int32_t Encoder::GetEncodingScale() const { return m_encodingScale; }
 
 /**
  * Gets the raw value from the encoder.
@@ -203,7 +203,7 @@ int32_t Encoder::GetEncodingScale() { return m_encodingScale; }
  * factor.
  * @return Current raw count from the encoder
  */
-int32_t Encoder::GetRaw()
+int32_t Encoder::GetRaw() const
 {
 	throw "Simulation doesn't currently support this method.";
 }
@@ -215,7 +215,7 @@ int32_t Encoder::GetRaw()
  *
  * @return Current count from the Encoder adjusted for the 1x, 2x, or 4x scale factor.
  */
-int32_t Encoder::Get()
+int32_t Encoder::Get() const
 {
 	throw "Simulation doesn't currently support this method.";
 }
@@ -229,7 +229,7 @@ int32_t Encoder::Get()
  *
  * @return Period in seconds of the most recent pulse.
  */
-double Encoder::GetPeriod()
+double Encoder::GetPeriod() const
 {
 	throw "Simulation doesn't currently support this method.";
 }
@@ -256,7 +256,7 @@ void Encoder::SetMaxPeriod(double maxPeriod)
  *
  * @return The distance driven since the last reset as scaled by the value from SetDistancePerPulse().
  */
-double Encoder::GetDistance()
+double Encoder::GetDistance() const
 {
     return m_distancePerPulse * impl->GetPosition();
 }
@@ -267,7 +267,7 @@ double Encoder::GetDistance()
  *
  * @return The current rate of the encoder.
  */
-double Encoder::GetRate()
+double Encoder::GetRate() const
 {
     return m_distancePerPulse * impl->GetVelocity();
 }
@@ -328,7 +328,7 @@ void Encoder::SetPIDSourceParameter(PIDSourceParameter pidSource)
  *
  * @return The current value of the selected source parameter.
  */
-double Encoder::PIDGet()
+double Encoder::PIDGet() const
 {
 	switch (m_pidSource)
 	{
@@ -357,7 +357,7 @@ void Encoder::StopLiveWindowMode() {
 
 }
 
-std::string Encoder::GetSmartDashboardType() {
+std::string Encoder::GetSmartDashboardType() const {
 	if (m_encodingType == k4X)
 		return "Quadrature Encoder";
 	else
@@ -369,6 +369,6 @@ void Encoder::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable * Encoder::GetTable() {
+ITable * Encoder::GetTable() const {
 	return m_table;
 }

@@ -9,11 +9,11 @@ class RobotStateInterface
 {
 public:
 	virtual ~RobotStateInterface() {};
-    virtual bool IsDisabled() = 0;
-	virtual bool IsEnabled() = 0;
-	virtual bool IsOperatorControl() = 0;
-	virtual bool IsAutonomous() = 0;
-	virtual bool IsTest() = 0;
+    virtual bool IsDisabled() const = 0;
+	virtual bool IsEnabled() const = 0;
+	virtual bool IsOperatorControl() const = 0;
+	virtual bool IsAutonomous() const = 0;
+	virtual bool IsTest() const = 0;
 };
 
 class RobotState

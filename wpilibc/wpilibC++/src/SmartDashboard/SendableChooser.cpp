@@ -69,10 +69,10 @@ void SendableChooser::InitTable(ITable* subtable) {
 	}
 }
 
-ITable* SendableChooser::GetTable() {
+ITable* SendableChooser::GetTable() const {
 	return m_table;
 }
 
-std::string SendableChooser::GetSmartDashboardType() {
+std::string SendableChooser::GetSmartDashboardType() const {
 	return "String Chooser";
 }

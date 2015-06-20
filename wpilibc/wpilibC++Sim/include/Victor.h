@@ -18,10 +18,10 @@ public:
 	explicit Victor(uint32_t channel);
 	virtual ~Victor();
 	virtual void Set(float value, uint8_t syncGroup = 0);
-	virtual float Get();
+	virtual float Get() const;
 	virtual void Disable();
 
-	virtual void PIDWrite(float output);
+	virtual void PIDWrite(float output) override;
 
 private:
 	void InitVictor();

@@ -19,11 +19,11 @@ class SolenoidBase : public SensorBase
 {
 public:
 	virtual ~SolenoidBase();
-	uint8_t GetAll(int module = 0);
-	
-	uint8_t GetPCMSolenoidBlackList(int module);
-	bool GetPCMSolenoidVoltageStickyFault(int module);
-	bool GetPCMSolenoidVoltageFault(int module);
+	uint8_t GetAll(int module = 0) const;
+
+	uint8_t GetPCMSolenoidBlackList(int module) const;
+	bool GetPCMSolenoidVoltageStickyFault(int module) const;
+	bool GetPCMSolenoidVoltageFault(int module) const;
 	void ClearAllPCMStickyFaults(int module);
 protected:
 	explicit SolenoidBase(uint8_t pcmID);

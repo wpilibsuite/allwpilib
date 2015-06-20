@@ -25,12 +25,12 @@ protected:
 	DigitalInput *m_input;
 	DigitalOutput *m_output;
 
-	virtual void SetUp() {
+	virtual void SetUp() override {
 		m_input = new DigitalInput(TestBench::kLoop1InputChannel);
 		m_output = new DigitalOutput(TestBench::kLoop1OutputChannel);
 	}
 
-	virtual void TearDown() {
+	virtual void TearDown() override {
 		delete m_input;
 		delete m_output;
 	}

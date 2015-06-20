@@ -21,9 +21,9 @@ public:
 	virtual ~Servo();
 	void Set(float value);
 	void SetOffline();
-	float Get();
+	float Get() const;
 	void SetAngle(float angle);
-	float GetAngle();
+	float GetAngle() const;
 	static float GetMaxAngle()
 	{
 		return kMaxServoAngle;
@@ -33,19 +33,19 @@ public:
 		return kMinServoAngle;
 	}
 
-	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
-	void UpdateTable();
-	void StartLiveWindowMode();
-	void StopLiveWindowMode();
-	std::string GetSmartDashboardType();
-	void InitTable(ITable *subTable);
-	ITable * GetTable();
+	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) override;
+	void UpdateTable() override;
+	void StartLiveWindowMode() override;
+	void StopLiveWindowMode() override;
+	std::string GetSmartDashboardType() const override;
+	void InitTable(ITable *subTable) override;
+	ITable * GetTable() const override;
 
 	ITable *m_table;
 
 private:
 	void InitServo();
-	float GetServoAngleRange()
+	float GetServoAngleRange() const
 	{
 		return kMaxServoAngle - kMinServoAngle;
 	}

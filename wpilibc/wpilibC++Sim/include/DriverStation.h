@@ -46,20 +46,20 @@ public:
 	void SetDigitalOut(uint32_t channel, bool value);
 	bool GetDigitalOut(uint32_t channel);
 
-	bool IsEnabled();
-	bool IsDisabled();
-	bool IsAutonomous();
-	bool IsOperatorControl();
-	bool IsTest();
-	bool IsFMSAttached();
+	bool IsEnabled() const;
+	bool IsDisabled() const;
+	bool IsAutonomous() const;
+	bool IsOperatorControl() const;
+	bool IsTest() const;
+	bool IsFMSAttached() const;
 
-	uint32_t GetPacketNumber();
-	Alliance GetAlliance();
-	uint32_t GetLocation();
+	uint32_t GetPacketNumber() const;
+	Alliance GetAlliance() const;
+	uint32_t GetLocation() const;
 	void WaitForData();
-	double GetMatchTime();
-	float GetBatteryVoltage();
-	uint16_t GetTeamNumber();
+	double GetMatchTime() const;
+	float GetBatteryVoltage() const;
+	uint16_t GetTeamNumber() const;
 	
 
 

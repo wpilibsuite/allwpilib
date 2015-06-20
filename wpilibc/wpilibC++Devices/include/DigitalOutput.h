@@ -20,26 +20,26 @@ public:
 	explicit DigitalOutput(uint32_t channel);
 	virtual ~DigitalOutput();
 	void Set(uint32_t value);
-	uint32_t GetChannel();
+	uint32_t GetChannel() const;
 	void Pulse(float length);
-	bool IsPulsing();
+	bool IsPulsing() const;
 	void SetPWMRate(float rate);
 	void EnablePWM(float initialDutyCycle);
 	void DisablePWM();
 	void UpdateDutyCycle(float dutyCycle);
 
 	// Digital Source Interface
-	virtual uint32_t GetChannelForRouting();
-	virtual uint32_t GetModuleForRouting();
-	virtual bool GetAnalogTriggerForRouting();
+	virtual uint32_t GetChannelForRouting() const;
+	virtual uint32_t GetModuleForRouting() const;
+	virtual bool GetAnalogTriggerForRouting() const;
 
 	virtual void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
 	void UpdateTable();
 	void StartLiveWindowMode();
 	void StopLiveWindowMode();
-	std::string GetSmartDashboardType();
+	std::string GetSmartDashboardType() const;
 	void InitTable(ITable *subTable);
-	ITable * GetTable();
+	ITable * GetTable() const;
 
 private:
 	void InitDigitalOutput(uint32_t channel);

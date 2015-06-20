@@ -100,7 +100,7 @@ DriverStation* DriverStation::GetInstance()
  *
  * @return The battery voltage.
  */
-float DriverStation::GetBatteryVoltage()
+float DriverStation::GetBatteryVoltage() const
 {
 	return 12.0; // 12 volts all the time!
 }
@@ -240,19 +240,19 @@ bool DriverStation::GetDigitalOut(uint32_t channel)
     wpi_setWPIErrorWithContext(UnsupportedInSimulation, "GetDigitalOut");
 }
 
-bool DriverStation::IsEnabled()
+bool DriverStation::IsEnabled() const
 {
     CRITICAL_REGION(m_stateSemaphore)
     return state != NULL ? state->enabled() : false;
     END_REGION
 }
 
-bool DriverStation::IsDisabled()
+bool DriverStation::IsDisabled() const
 {
     return !IsEnabled();
 }
 
-bool DriverStation::IsAutonomous()
+bool DriverStation::IsAutonomous() const
 {
     CRITICAL_REGION(m_stateSemaphore)
     return state != NULL ?
@@ -260,12 +260,12 @@ bool DriverStation::IsAutonomous()
 	END_REGION;
 }
 
-bool DriverStation::IsOperatorControl()
+bool DriverStation::IsOperatorControl() const
 {
     return !(IsAutonomous() || IsTest());
 }
 
-bool DriverStation::IsTest()
+bool DriverStation::IsTest() const
 {
     CRITICAL_REGION(m_stateSemaphore)
     return state != NULL ?
@@ -278,7 +278,7 @@ bool DriverStation::IsTest()
  * Note: This does not work with the Blue DS.
  * @return True if the robot is competing on a field being controlled by a Field Management System
  */
-bool DriverStation::IsFMSAttached()
+bool DriverStation::IsFMSAttached() const
 {
     return false; // No FMS in simulation
 }
@@ -288,7 +288,7 @@ bool DriverStation::IsFMSAttached()
  * This could return kRed or kBlue
  * @return The Alliance enum
  */
-DriverStation::Alliance DriverStation::GetAlliance()
+DriverStation::Alliance DriverStation::GetAlliance() const
 {
 	// if (m_controlData->dsID_Alliance == 'R') return kRed;
 	// if (m_controlData->dsID_Alliance == 'B') return kBlue;
@@ -301,7 +301,7 @@ DriverStation::Alliance DriverStation::GetAlliance()
  * This could return 1, 2, or 3
  * @return The location of the driver station
  */
-uint32_t DriverStation::GetLocation()
+uint32_t DriverStation::GetLocation() const
 {
     return -1; // TODO: Support locations
 }
@@ -326,7 +326,7 @@ void DriverStation::WaitForData()
  * Warning: This is not an official time (so it cannot be used to argue with referees)
  * @return Match time in seconds since the beginning of autonomous
  */
-double DriverStation::GetMatchTime()
+double DriverStation::GetMatchTime() const
 {
 	if (m_approxMatchTimeOffset < 0.0)
 		return 0.0;
@@ -346,7 +346,7 @@ void DriverStation::ReportError(std::string error)
  * Return the team number that the Driver Station is configured for
  * @return The team number
  */
-uint16_t DriverStation::GetTeamNumber()
+uint16_t DriverStation::GetTeamNumber() const
 {
     return 348;
 }

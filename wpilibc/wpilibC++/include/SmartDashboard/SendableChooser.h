@@ -35,8 +35,8 @@ public:
 	void *GetSelected();
 
 	virtual void InitTable(ITable* subtable);
-	virtual ITable* GetTable();
-	virtual std::string GetSmartDashboardType();
+	virtual ITable* GetTable() const;
+	virtual std::string GetSmartDashboardType() const;
 
 private:
 	std::string m_defaultChoice;

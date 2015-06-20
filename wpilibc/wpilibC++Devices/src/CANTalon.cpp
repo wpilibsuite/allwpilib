@@ -76,7 +76,7 @@ void CANTalon::PIDWrite(float output)
    *
    * @return The current sensor value of the Talon.
    */
-float CANTalon::Get()
+float CANTalon::Get() const
 {
   int value;
   switch(m_controlMode) {
@@ -184,7 +184,7 @@ void CANTalon::EnableControl() {
 /**
  * @return Whether the Talon is currently enabled.
  */
-bool CANTalon::IsControlEnabled() {
+bool CANTalon::IsControlEnabled() const {
   return m_controlEnabled;
 }
 
@@ -322,7 +322,7 @@ void CANTalon::SetStatusFrameRateMs(StatusFrameRate stateFrame, int periodMs)
  * @return double proportional constant for current profile.
  * @see SelectProfileSlot to choose between the two sets of gains.
  */
-double CANTalon::GetP()
+double CANTalon::GetP() const
 {
   CanTalonSRX::param_t param = m_profile ? CanTalonSRX::eProfileParamSlot1_P : CanTalonSRX::eProfileParamSlot0_P;
   // Update the info in m_impl.
@@ -343,7 +343,7 @@ double CANTalon::GetP()
  * TODO documentation (see CANJaguar.cpp)
  * @see SelectProfileSlot to choose between the two sets of gains.
  */
-double CANTalon::GetI()
+double CANTalon::GetI() const
 {
   CanTalonSRX::param_t param = m_profile ? CanTalonSRX::eProfileParamSlot1_I : CanTalonSRX::eProfileParamSlot0_I;
   // Update the info in m_impl.
@@ -365,7 +365,7 @@ double CANTalon::GetI()
  * TODO documentation (see CANJaguar.cpp)
  * @see SelectProfileSlot to choose between the two sets of gains.
  */
-double CANTalon::GetD()
+double CANTalon::GetD() const
 {
   CanTalonSRX::param_t param = m_profile ? CanTalonSRX::eProfileParamSlot1_D : CanTalonSRX::eProfileParamSlot0_D;
   // Update the info in m_impl.
@@ -386,7 +386,7 @@ double CANTalon::GetD()
  *
  * @see SelectProfileSlot to choose between the two sets of gains.
  */
-double CANTalon::GetF()
+double CANTalon::GetF() const
 {
   CanTalonSRX::param_t param = m_profile ? CanTalonSRX::eProfileParamSlot1_F : CanTalonSRX::eProfileParamSlot0_F;
   // Update the info in m_impl.
@@ -406,7 +406,7 @@ double CANTalon::GetF()
 /**
  * @see SelectProfileSlot to choose between the two sets of gains.
  */
-int CANTalon::GetIzone()
+int CANTalon::GetIzone() const
 {
   CanTalonSRX::param_t param = m_profile ? CanTalonSRX::eProfileParamSlot1_IZone: CanTalonSRX::eProfileParamSlot0_IZone;
  // Update the info in m_impl.
@@ -427,7 +427,7 @@ int CANTalon::GetIzone()
 /**
  * @return the current setpoint; ie, whatever was last passed to Set().
  */
-double CANTalon::GetSetpoint() {
+double CANTalon::GetSetpoint() const {
   return m_setPoint;
 }
 
@@ -436,7 +436,7 @@ double CANTalon::GetSetpoint() {
  *
  * @return The input voltage in volts.
  */
-float CANTalon::GetBusVoltage()
+float CANTalon::GetBusVoltage() const
 {
   double voltage;
   CTR_Code status = m_impl->GetBatteryV(voltage);
@@ -449,7 +449,7 @@ float CANTalon::GetBusVoltage()
 /**
  * @return The voltage being output by the Talon, in Volts.
  */
-float CANTalon::GetOutputVoltage()
+float CANTalon::GetOutputVoltage() const
 {
   int throttle11;
   CTR_Code status = m_impl->GetAppliedThrottle(throttle11);
@@ -464,7 +464,7 @@ float CANTalon::GetOutputVoltage()
 /**
  *  Returns the current going through the Talon, in Amperes.
  */
-float CANTalon::GetOutputCurrent()
+float CANTalon::GetOutputCurrent() const
 {
   double current;
 
@@ -479,7 +479,7 @@ float CANTalon::GetOutputCurrent()
   /**
    *  Returns temperature of Talon, in degrees Celsius.
    */
-float CANTalon::GetTemperature()
+float CANTalon::GetTemperature() const
 {
   double temp;
 
@@ -505,7 +505,7 @@ void CANTalon::SetPosition(double pos)
  * 			When using an analog encoder (wrapping around 1023 => 0 is possible) the units are still 3.3V per 1023 units.
  * 			When using quadrature, each unit is a quadrature edge (4X) mode.
  */
-double CANTalon::GetPosition()
+double CANTalon::GetPosition() const
 {
   int postition;
 
@@ -533,7 +533,7 @@ void CANTalon::SetSensorDirection(bool reverseSensor)
  *
  * @return the difference between the setpoint and the sensor value.
  */
-int CANTalon::GetClosedLoopError() {
+int CANTalon::GetClosedLoopError() const {
   int error;
   CTR_Code status = m_impl->GetCloseLoopErr(error);
 	if(status != CTR_OKAY) {
@@ -557,7 +557,7 @@ int CANTalon::GetClosedLoopError() {
  * 		An example speed of 200 would then equate to 20% of a rotation per 100ms,
  * 		or 10 rotations per second.
  */
-double CANTalon::GetSpeed()
+double CANTalon::GetSpeed() const
 {
   int speed;
   // TODO convert from int to appropriate units (or at least document it).
@@ -577,7 +577,7 @@ double CANTalon::GetSpeed()
  *								the analog pin of the Talon. The upper 14 bits
  *								tracks the overflows and underflows (continuous sensor).
  */
-int CANTalon::GetAnalogIn()
+int CANTalon::GetAnalogIn() const
 {
   int position;
   CTR_Code status = m_impl->GetAnalogInWithOv(position);
@@ -592,7 +592,7 @@ int CANTalon::GetAnalogIn()
  *
  * @returns The ADC (0 - 1023) on analog pin of the Talon.
  */
-int CANTalon::GetAnalogInRaw()
+int CANTalon::GetAnalogInRaw() const
 {
     return GetAnalogIn() & 0x3FF;
 }
@@ -602,7 +602,7 @@ int CANTalon::GetAnalogInRaw()
  *
  * @returns The value (0 - 1023) on the analog pin of the Talon.
  */
-int CANTalon::GetAnalogInVel()
+int CANTalon::GetAnalogInVel() const
 {
   int vel;
   CTR_Code status = m_impl->GetAnalogInVel(vel);
@@ -618,7 +618,7 @@ int CANTalon::GetAnalogInVel()
  *
  * @returns The value (0 - 1023) on the analog pin of the Talon.
  */
-int CANTalon::GetEncPosition()
+int CANTalon::GetEncPosition() const
 {
   int position;
   CTR_Code status = m_impl->GetEncPosition(position);
@@ -634,7 +634,7 @@ int CANTalon::GetEncPosition()
  *
  * @returns The value (0 - 1023) on the analog pin of the Talon.
  */
-int CANTalon::GetEncVel()
+int CANTalon::GetEncVel() const
 {
   int vel;
   CTR_Code status = m_impl->GetEncVel(vel);
@@ -646,7 +646,7 @@ int CANTalon::GetEncVel()
 /**
  * @return IO level of QUADA pin.
  */
-int CANTalon::GetPinStateQuadA()
+int CANTalon::GetPinStateQuadA() const
 {
 	int retval;
 	CTR_Code status = m_impl->GetQuadApin(retval);
@@ -658,7 +658,7 @@ int CANTalon::GetPinStateQuadA()
 /**
  * @return IO level of QUADB pin.
  */
-int CANTalon::GetPinStateQuadB()
+int CANTalon::GetPinStateQuadB() const
 {
 	int retval;
 	CTR_Code status = m_impl->GetQuadBpin(retval);
@@ -670,7 +670,7 @@ int CANTalon::GetPinStateQuadB()
 /**
  * @return IO level of QUAD Index pin.
  */
-int CANTalon::GetPinStateQuadIdx()
+int CANTalon::GetPinStateQuadIdx() const
 {
 	int retval;
 	CTR_Code status = m_impl->GetQuadIdxpin(retval);
@@ -683,7 +683,7 @@ int CANTalon::GetPinStateQuadIdx()
  * @return '1' iff forward limit switch is closed, 0 iff switch is open.
  * This function works regardless if limit switch feature is enabled.
  */
-int CANTalon::IsFwdLimitSwitchClosed()
+int CANTalon::IsFwdLimitSwitchClosed() const
 {
 	int retval;
 	CTR_Code status = m_impl->GetLimitSwitchClosedFor(retval); /* rename this func, '1' => open, '0' => closed */
@@ -696,7 +696,7 @@ int CANTalon::IsFwdLimitSwitchClosed()
  * @return '1' iff reverse limit switch is closed, 0 iff switch is open.
  * This function works regardless if limit switch feature is enabled.
  */
-int CANTalon::IsRevLimitSwitchClosed()
+int CANTalon::IsRevLimitSwitchClosed() const
 {
 	int retval;
 	CTR_Code status = m_impl->GetLimitSwitchClosedRev(retval); /* rename this func, '1' => open, '0' => closed */
@@ -709,7 +709,7 @@ int CANTalon::IsRevLimitSwitchClosed()
  * Simple accessor for tracked rise eventso index pin.
  * @return number of rising edges on idx pin.
  */
-int CANTalon::GetNumberOfQuadIdxRises()
+int CANTalon::GetNumberOfQuadIdxRises() const
 {
 	int rises;
 	CTR_Code status = m_impl->GetEncIndexRiseEvents(rises); /* rename this func, '1' => open, '0' => closed */
@@ -731,7 +731,7 @@ void CANTalon::SetNumberOfQuadIdxRises(int rises)
 /**
  * TODO documentation (see CANJaguar.cpp)
  */
-bool CANTalon::GetForwardLimitOK()
+bool CANTalon::GetForwardLimitOK() const
 {
 	int limSwit=0;
 	int softLim=0;
@@ -751,7 +751,7 @@ bool CANTalon::GetForwardLimitOK()
 /**
  * TODO documentation (see CANJaguar.cpp)
  */
-bool CANTalon::GetReverseLimitOK()
+bool CANTalon::GetReverseLimitOK() const
 {
 	int limSwit=0;
 	int softLim=0;
@@ -771,7 +771,7 @@ bool CANTalon::GetReverseLimitOK()
 /**
  * TODO documentation (see CANJaguar.cpp)
  */
-uint16_t CANTalon::GetFaults()
+uint16_t CANTalon::GetFaults() const
 {
 	uint16_t retval = 0;
 	int val;
@@ -821,7 +821,7 @@ uint16_t CANTalon::GetFaults()
 
 	return retval;
 }
-uint16_t CANTalon::GetStickyFaults()
+uint16_t CANTalon::GetStickyFaults() const
 {
 	uint16_t retval = 0;
 	int val;
@@ -913,7 +913,7 @@ void CANTalon::SetCloseLoopRampRate(double rampRate)
 /**
  * @return The version of the firmware running on the Talon
  */
-uint32_t CANTalon::GetFirmwareVersion()
+uint32_t CANTalon::GetFirmwareVersion() const
 {
 	int firmwareVersion;
 	CTR_Code status = m_impl->RequestParam(CanTalonSRX::eFirmVers);
@@ -937,7 +937,7 @@ uint32_t CANTalon::GetFirmwareVersion()
 /**
  * @return The accumulator for I gain.
  */
-int CANTalon::GetIaccum()
+int CANTalon::GetIaccum() const
 {
 	CTR_Code status = m_impl->RequestParam(CanTalonSRX::ePidIaccum);
 	if(status != CTR_OKAY) {
@@ -987,7 +987,7 @@ void CANTalon::ConfigNeutralMode(NeutralMode mode)
 /**
  * @return nonzero if brake is enabled during neutral.  Zero if coast is enabled during neutral.
  */
-int CANTalon::GetBrakeEnableDuringNeutral()
+int CANTalon::GetBrakeEnableDuringNeutral() const
 {
   int brakeEn = 0;
   CTR_Code status = m_impl->GetBrakeIsEnabled(brakeEn);
@@ -1217,7 +1217,7 @@ void CANTalon::SetControlMode(CANSpeedController::ControlMode mode)
 /**
  * TODO documentation (see CANJaguar.cpp)
  */
-CANSpeedController::ControlMode CANTalon::GetControlMode()
+CANSpeedController::ControlMode CANTalon::GetControlMode() const
 {
   return m_controlMode;
 }
@@ -1227,17 +1227,17 @@ void CANTalon::SetExpiration(float timeout)
 	m_safetyHelper->SetExpiration(timeout);
 }
 
-float CANTalon::GetExpiration()
+float CANTalon::GetExpiration() const
 {
 	return m_safetyHelper->GetExpiration();
 }
 
-bool CANTalon::IsAlive()
+bool CANTalon::IsAlive() const
 {
 	return m_safetyHelper->IsAlive();
 }
 
-bool CANTalon::IsSafetyEnabled()
+bool CANTalon::IsSafetyEnabled() const
 {
 	return m_safetyHelper->IsSafetyEnabled();
 }
@@ -1247,7 +1247,7 @@ void CANTalon::SetSafetyEnabled(bool enabled)
 	m_safetyHelper->SetSafetyEnabled(enabled);
 }
 
-void CANTalon::GetDescription(char *desc)
+void CANTalon::GetDescription(char *desc) const
 {
 	sprintf(desc, "CANTalon ID %d", m_deviceNumber);
 }
@@ -1292,7 +1292,7 @@ void CANTalon::StopLiveWindowMode()
 	}
 }
 
-std::string CANTalon::GetSmartDashboardType()
+std::string CANTalon::GetSmartDashboardType() const
 {
 	return "Speed Controller";
 }
@@ -1303,7 +1303,7 @@ void CANTalon::InitTable(ITable *subTable)
 	UpdateTable();
 }
 
-ITable * CANTalon::GetTable()
+ITable * CANTalon::GetTable() const
 {
 	return m_table;
 }

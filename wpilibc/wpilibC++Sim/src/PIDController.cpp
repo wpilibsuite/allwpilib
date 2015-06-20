@@ -249,7 +249,7 @@ void PIDController::SetPID(float p, float i, float d, float f)
  * Get the Proportional coefficient
  * @return proportional coefficient
  */
-float PIDController::GetP()
+float PIDController::GetP() const
 {
 	CRITICAL_REGION(m_semaphore)
 	{
@@ -262,7 +262,7 @@ float PIDController::GetP()
  * Get the Integral coefficient
  * @return integral coefficient
  */
-float PIDController::GetI()
+float PIDController::GetI() const
 {
 	CRITICAL_REGION(m_semaphore)
 	{
@@ -275,7 +275,7 @@ float PIDController::GetI()
  * Get the Differential coefficient
  * @return differential coefficient
  */
-float PIDController::GetD()
+float PIDController::GetD() const
 {
 	CRITICAL_REGION(m_semaphore)
 	{
@@ -288,7 +288,7 @@ float PIDController::GetD()
  * Get the Feed forward coefficient
  * @return Feed forward coefficient
  */
-float PIDController::GetF()
+float PIDController::GetF() const
 {
 	CRITICAL_REGION(m_semaphore)
 	{
@@ -302,7 +302,7 @@ float PIDController::GetF()
  * This is always centered on zero and constrained the the max and min outs
  * @return the latest calculated output
  */
-float PIDController::Get()
+float PIDController::Get() const
 {
 	float result;
 	CRITICAL_REGION(m_semaphore)
@@ -397,7 +397,7 @@ void PIDController::SetSetpoint(float setpoint)
  * Returns the current setpoint of the PIDController
  * @return the current setpoint
  */
-float PIDController::GetSetpoint()
+float PIDController::GetSetpoint() const
 {
 	float setpoint;
 	CRITICAL_REGION(m_semaphore)
@@ -412,7 +412,7 @@ float PIDController::GetSetpoint()
  * Retruns the current difference of the input from the setpoint
  * @return the current error
  */
-float PIDController::GetError()
+float PIDController::GetError() const
 {
 	float error;
 	CRITICAL_REGION(m_semaphore)
@@ -475,7 +475,7 @@ void PIDController::SetAbsoluteTolerance(float absTolerance)
  * Currently this just reports on target as the actual value passes through the setpoint.
  * Ideally it should be based on being within the tolerance for some period of time.
  */
-bool PIDController::OnTarget()
+bool PIDController::OnTarget() const
 {
 	bool temp;
 	CRITICAL_REGION(m_semaphore)
@@ -531,7 +531,7 @@ void PIDController::Disable()
 /**
  * Return true if PIDController is enabled.
  */
-bool PIDController::IsEnabled()
+bool PIDController::IsEnabled() const
 {
 	bool enabled;
 	CRITICAL_REGION(m_semaphore)
@@ -558,7 +558,7 @@ void PIDController::Reset()
 	END_REGION;
 }
 
-std::string PIDController::GetSmartDashboardType(){
+std::string PIDController::GetSmartDashboardType() const {
 	return "PIDController";
 }
 
@@ -577,7 +577,7 @@ void PIDController::InitTable(ITable* table){
 	}
 }
 
-ITable* PIDController::GetTable(){
+ITable* PIDController::GetTable() const {
 	return m_table;
 }
 

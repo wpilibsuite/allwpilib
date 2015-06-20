@@ -39,11 +39,11 @@ public:
 	virtual ~Ultrasonic();
 
 	void Ping();
-	bool IsRangeValid();
+	bool IsRangeValid() const;
 	static void SetAutomaticMode(bool enabling);
-	double GetRangeInches();
-	double GetRangeMM();
-	bool IsEnabled()
+	double GetRangeInches() const;
+	double GetRangeMM() const;
+	bool IsEnabled() const
 	{
 		return m_enabled;
 	}
@@ -52,16 +52,16 @@ public:
 		m_enabled = enable;
 	}
 
-	double PIDGet();
+	double PIDGet() const override;
 	void SetDistanceUnits(DistanceUnit units);
-	DistanceUnit GetDistanceUnits();
+	DistanceUnit GetDistanceUnits() const;
 
-	void UpdateTable();
-	void StartLiveWindowMode();
-	void StopLiveWindowMode();
-	std::string GetSmartDashboardType();
-	void InitTable(ITable *subTable);
-	ITable * GetTable();
+	void UpdateTable() override;
+	void StartLiveWindowMode() override;
+	void StopLiveWindowMode() override;
+	std::string GetSmartDashboardType() const override;
+	void InitTable(ITable *subTable) override;
+	ITable * GetTable() const override;
 
 private:
 	void Initialize();

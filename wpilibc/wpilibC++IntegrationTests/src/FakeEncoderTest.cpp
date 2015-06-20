@@ -21,7 +21,7 @@ protected:
 	AnalogTrigger *m_indexAnalogTrigger;
 	AnalogTriggerOutput *m_indexAnalogTriggerOutput;
 
-	virtual void SetUp() {
+	virtual void SetUp() override {
 		m_outputA = new DigitalOutput(TestBench::kLoop2OutputChannel);
 		m_outputB = new DigitalOutput(TestBench::kLoop1OutputChannel);
 		m_indexOutput = new AnalogOutput(TestBench::kAnalogOutputChannel);
@@ -33,7 +33,7 @@ protected:
 		m_indexAnalogTriggerOutput = m_indexAnalogTrigger->CreateOutput(AnalogTriggerType::kState);
 	}
 
-	virtual void TearDown() {
+	virtual void TearDown() override {
 		delete m_outputA;
 		delete m_outputB;
 		delete m_indexOutput;

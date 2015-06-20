@@ -87,7 +87,7 @@ RobotBase::~RobotBase()
  * Determine if the Robot is currently enabled.
  * @return True if the Robot is currently enabled by the field controls.
  */
-bool RobotBase::IsEnabled()
+bool RobotBase::IsEnabled() const
 {
 	return m_ds->IsEnabled();
 }
@@ -96,7 +96,7 @@ bool RobotBase::IsEnabled()
  * Determine if the Robot is currently disabled.
  * @return True if the Robot is currently disabled by the field controls.
  */
-bool RobotBase::IsDisabled()
+bool RobotBase::IsDisabled() const
 {
 	return m_ds->IsDisabled();
 }
@@ -105,7 +105,7 @@ bool RobotBase::IsDisabled()
  * Determine if the robot is currently in Autonomous mode.
  * @return True if the robot is currently operating Autonomously as determined by the field controls.
  */
-bool RobotBase::IsAutonomous()
+bool RobotBase::IsAutonomous() const
 {
 	return m_ds->IsAutonomous();
 }
@@ -114,7 +114,7 @@ bool RobotBase::IsAutonomous()
  * Determine if the robot is currently in Operator Control mode.
  * @return True if the robot is currently operating in Tele-Op mode as determined by the field controls.
  */
-bool RobotBase::IsOperatorControl()
+bool RobotBase::IsOperatorControl() const
 {
 	return m_ds->IsOperatorControl();
 }
@@ -123,7 +123,7 @@ bool RobotBase::IsOperatorControl()
  * Determine if the robot is currently in Test mode.
  * @return True if the robot is currently running tests as determined by the field controls.
  */
-bool RobotBase::IsTest()
+bool RobotBase::IsTest() const
 {
     return m_ds->IsTest();
 }
@@ -143,7 +143,7 @@ void RobotBase::Prestart()
  * Indicates if new data is available from the driver station.
  * @return Has new data arrived over the network since the last time this function was called?
  */
-bool RobotBase::IsNewDataAvailable()
+bool RobotBase::IsNewDataAvailable() const
 {
 	return m_ds->IsNewControlData();
 }

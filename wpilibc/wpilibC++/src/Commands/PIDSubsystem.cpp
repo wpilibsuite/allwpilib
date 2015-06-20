@@ -212,7 +212,7 @@ void PIDSubsystem::SetPercentTolerance(float percent) {
  *
  * @return true if the error is within the percentage tolerance of the input range
  */
-bool PIDSubsystem::OnTarget()
+bool PIDSubsystem::OnTarget() const
 {
 	return m_controller->OnTarget();
 }
@@ -231,13 +231,13 @@ void PIDSubsystem::PIDWrite(float output)
 	UsePIDOutput(output);
 }
 
-double PIDSubsystem::PIDGet()
+double PIDSubsystem::PIDGet() const
 {
 	return ReturnPIDInput();
 }
 
 
-std::string PIDSubsystem::GetSmartDashboardType(){
+std::string PIDSubsystem::GetSmartDashboardType() const {
 	return "PIDCommand";
 }
 void PIDSubsystem::InitTable(ITable* table){

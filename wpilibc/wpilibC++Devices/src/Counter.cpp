@@ -474,7 +474,7 @@ void Counter::SetPulseLengthMode(float threshold)
  * mechanical imperfections or as oversampling to increase resolution.
  * @return SamplesToAverage The number of samples being averaged (from 1 to 127)
  */
-int Counter::GetSamplesToAverage()
+int Counter::GetSamplesToAverage() const
 {
 	int32_t status = 0;
 	int32_t samples = getCounterSamplesToAverage(m_counter, &status);
@@ -503,7 +503,7 @@ void Counter::SetSamplesToAverage (int samplesToAverage) {
  * Read the value at this instant. It may still be running, so it reflects the current value. Next
  * time it is read, it might have a different value.
  */
-int32_t Counter::Get()
+int32_t Counter::Get() const
 {
 	if (StatusIsFatal()) return 0;
 	int32_t status = 0;
@@ -531,7 +531,7 @@ void Counter::Reset()
  * to determine shaft speed.
  * @returns The period between the last two pulses in units of seconds.
  */
-double Counter::GetPeriod()
+double Counter::GetPeriod() const
 {
 	if (StatusIsFatal()) return 0.0;
 	int32_t status = 0;
@@ -584,7 +584,7 @@ void Counter::SetUpdateWhenEmpty(bool enabled)
  * @return Returns true if the most recent counter period exceeds the MaxPeriod value set by
  * SetMaxPeriod.
  */
-bool Counter::GetStopped()
+bool Counter::GetStopped() const
 {
 	if (StatusIsFatal()) return false;
 	int32_t status = 0;
@@ -597,7 +597,7 @@ bool Counter::GetStopped()
  * The last direction the counter value changed.
  * @return The last direction the counter value changed.
  */
-bool Counter::GetDirection()
+bool Counter::GetDirection() const
 {
 	if (StatusIsFatal()) return false;
 	int32_t status = 0;
@@ -635,7 +635,7 @@ void Counter::StopLiveWindowMode() {
 
 }
 
-std::string Counter::GetSmartDashboardType() {
+std::string Counter::GetSmartDashboardType() const {
 	return "Counter";
 }
 
@@ -644,6 +644,6 @@ void Counter::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable * Counter::GetTable() {
+ITable * Counter::GetTable() const {
 	return m_table;
 }

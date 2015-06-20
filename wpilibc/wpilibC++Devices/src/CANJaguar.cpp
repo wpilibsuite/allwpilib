@@ -374,7 +374,7 @@ void CANJaguar::Set(float outputValue, uint8_t syncGroup)
  *
  * @return The most recently set outputValue setpoint.
  */
-float CANJaguar::Get()
+float CANJaguar::Get() const
 {
 	return m_value;
 }
@@ -441,34 +441,34 @@ uint8_t CANJaguar::packint32_t(uint8_t *buffer, int32_t value)
 	return sizeof(int32_t);
 }
 
-double CANJaguar::unpackPercentage(uint8_t *buffer)
+double CANJaguar::unpackPercentage(uint8_t *buffer) const
 {
 	int16_t value = *((int16_t*)buffer);
 	value = swap16(value);
 	return value / 32767.0;
 }
 
-double CANJaguar::unpackFXP8_8(uint8_t *buffer)
+double CANJaguar::unpackFXP8_8(uint8_t *buffer) const
 {
 	int16_t value = *((int16_t*)buffer);
 	value = swap16(value);
 	return value / 256.0;
 }
 
-double CANJaguar::unpackFXP16_16(uint8_t *buffer)
+double CANJaguar::unpackFXP16_16(uint8_t *buffer) const
 {
 	int32_t value = *((int32_t*)buffer);
 	value = swap32(value);
 	return value / 65536.0;
 }
 
-int16_t CANJaguar::unpackint16_t(uint8_t *buffer)
+int16_t CANJaguar::unpackint16_t(uint8_t *buffer) const
 {
 	int16_t value = *((int16_t*)buffer);
 	return swap16(value);
 }
 
-int32_t CANJaguar::unpackint32_t(uint8_t *buffer)
+int32_t CANJaguar::unpackint32_t(uint8_t *buffer) const
 {
 	int32_t value = *((int32_t*)buffer);
 	return swap32(value);
@@ -516,7 +516,7 @@ void CANJaguar::requestMessage(uint32_t messageID, int32_t period)
  *
  * @return true if the message was found.  Otherwise, no new message is available.
  */
-bool CANJaguar::getMessage(uint32_t messageID, uint32_t messageMask, uint8_t *data, uint8_t *dataSize)
+bool CANJaguar::getMessage(uint32_t messageID, uint32_t messageMask, uint8_t *data, uint8_t *dataSize) const
 {
 	uint32_t targetedMessageID = messageID | m_deviceNumber;
 	int32_t status = 0;
@@ -580,33 +580,39 @@ void CANJaguar::setupPeriodicStatus() {
 /**
  * Check for new periodic status updates and unpack them into local variables
  */
-void CANJaguar::updatePeriodicStatus() {
+void CANJaguar::updatePeriodicStatus() const {
 	uint8_t data[8];
 	uint8_t dataSize;
 
 	// Check if a new bus voltage/output voltage/current/temperature message
 	// has arrived and unpack the values into the cached member variables
 	if(getMessage(LM_API_PSTAT_DATA_S0, CAN_MSGID_FULL_M, data, &dataSize)) {
+		m_mutex.lock();
 		m_busVoltage    = unpackFXP8_8(data);
 		m_outputVoltage = unpackPercentage(data + 2) * m_busVoltage;
 		m_outputCurrent = unpackFXP8_8(data + 4);
 		m_temperature   = unpackFXP8_8(data + 6);
+		m_mutex.unlock();
 
 		m_receivedStatusMessage0 = true;
 	}
 
 	// Check if a new position/speed message has arrived and do the same
 	if(getMessage(LM_API_PSTAT_DATA_S1, CAN_MSGID_FULL_M, data, &dataSize)) {
+		m_mutex.lock();
 		m_position = unpackFXP16_16(data);
 		m_speed    = unpackFXP16_16(data + 4);
+		m_mutex.unlock();
 
 		m_receivedStatusMessage1 = true;
 	}
 
 	// Check if a new limits/faults message has arrived and do the same
 	if(getMessage(LM_API_PSTAT_DATA_S2, CAN_MSGID_FULL_M, data, &dataSize)) {
+		m_mutex.lock();
 		m_limits = data[0];
 		m_faults = data[1];
+		m_mutex.unlock();
 
 		m_receivedStatusMessage2 = true;
 	}
@@ -1094,7 +1100,7 @@ void CANJaguar::SetSpeedReference(uint8_t reference)
  * @return A speed reference indicating the currently selected reference device
  * for speed controller mode.
  */
-uint8_t CANJaguar::GetSpeedReference()
+uint8_t CANJaguar::GetSpeedReference() const
 {
 	return m_speedReference;
 }
@@ -1124,7 +1130,7 @@ void CANJaguar::SetPositionReference(uint8_t reference)
  *
  * @return A PositionReference indicating the currently selected reference device for position controller mode.
  */
-uint8_t CANJaguar::GetPositionReference()
+uint8_t CANJaguar::GetPositionReference() const
 {
 	return m_positionReference;
 }
@@ -1253,7 +1259,7 @@ void CANJaguar::SetD(double d)
  *
  * @return The proportional gain.
  */
-double CANJaguar::GetP()
+double CANJaguar::GetP() const
 {
 	if(m_controlMode == kPercentVbus || m_controlMode == kVoltage)
 	{
@@ -1269,7 +1275,7 @@ double CANJaguar::GetP()
  *
  * @return The integral gain.
  */
-double CANJaguar::GetI()
+double CANJaguar::GetI() const
 {
 	if(m_controlMode == kPercentVbus || m_controlMode == kVoltage)
 	{
@@ -1285,7 +1291,7 @@ double CANJaguar::GetI()
  *
  * @return The differential gain.
  */
-double CANJaguar::GetD()
+double CANJaguar::GetD() const
 {
 	if(m_controlMode == kPercentVbus || m_controlMode == kVoltage)
 	{
@@ -1659,7 +1665,7 @@ void CANJaguar::SetControlMode(ControlMode controlMode)
  *
  * @return ControlMode that the Jag is in.
  */
-CANJaguar::ControlMode CANJaguar::GetControlMode()
+CANJaguar::ControlMode CANJaguar::GetControlMode() const
 {
 	return m_controlMode;
 }
@@ -1669,9 +1675,10 @@ CANJaguar::ControlMode CANJaguar::GetControlMode()
  *
  * @return The bus voltage in volts.
  */
-float CANJaguar::GetBusVoltage()
+float CANJaguar::GetBusVoltage() const
 {
 	updatePeriodicStatus();
+	std::lock_guard<std::recursive_mutex> lock(m_mutex);
 
 	return m_busVoltage;
 }
@@ -1681,9 +1688,10 @@ float CANJaguar::GetBusVoltage()
  *
  * @return The output voltage in volts.
  */
-float CANJaguar::GetOutputVoltage()
+float CANJaguar::GetOutputVoltage() const
 {
 	updatePeriodicStatus();
+	std::lock_guard<std::recursive_mutex> lock(m_mutex);
 
 	return m_outputVoltage;
 }
@@ -1693,9 +1701,10 @@ float CANJaguar::GetOutputVoltage()
  *
  * @return The output current in amps.
  */
-float CANJaguar::GetOutputCurrent()
+float CANJaguar::GetOutputCurrent() const
 {
 	updatePeriodicStatus();
+	std::lock_guard<std::recursive_mutex> lock(m_mutex);
 
 	return m_outputCurrent;
 }
@@ -1705,9 +1714,10 @@ float CANJaguar::GetOutputCurrent()
  *
  * @return The temperature of the Jaguar in degrees Celsius.
  */
-float CANJaguar::GetTemperature()
+float CANJaguar::GetTemperature() const
 {
 	updatePeriodicStatus();
+	std::lock_guard<std::recursive_mutex> lock(m_mutex);
 
 	return m_temperature;
 }
@@ -1719,9 +1729,10 @@ float CANJaguar::GetTemperature()
  * @see CANJaguar#ConfigPotentiometerTurns(int)
  * @see CANJaguar#ConfigEncoderCodesPerRev(int)
  */
-double CANJaguar::GetPosition()
+double CANJaguar::GetPosition() const
 {
 	updatePeriodicStatus();
+	std::lock_guard<std::recursive_mutex> lock(m_mutex);
 
 	return m_position;
 }
@@ -1731,9 +1742,10 @@ double CANJaguar::GetPosition()
  *
  * @return The speed of the motor in RPM based on the configured feedback.
  */
-double CANJaguar::GetSpeed()
+double CANJaguar::GetSpeed() const
 {
 	updatePeriodicStatus();
+	std::lock_guard<std::recursive_mutex> lock(m_mutex);
 
 	return m_speed;
 }
@@ -1743,9 +1755,10 @@ double CANJaguar::GetSpeed()
  *
  * @return The motor is allowed to turn in the forward direction when true.
  */
-bool CANJaguar::GetForwardLimitOK()
+bool CANJaguar::GetForwardLimitOK() const
 {
 	updatePeriodicStatus();
+	std::lock_guard<std::recursive_mutex> lock(m_mutex);
 
 	return m_limits & kForwardLimit;
 }
@@ -1755,9 +1768,10 @@ bool CANJaguar::GetForwardLimitOK()
  *
  * @return The motor is allowed to turn in the reverse direction when true.
  */
-bool CANJaguar::GetReverseLimitOK()
+bool CANJaguar::GetReverseLimitOK() const
 {
 	updatePeriodicStatus();
+	std::lock_guard<std::recursive_mutex> lock(m_mutex);
 
 	return m_limits & kReverseLimit;
 }
@@ -1771,9 +1785,10 @@ bool CANJaguar::GetReverseLimitOK()
  * @see #kTemperatureFault
  * @see #kGateDriverFault
  */
-uint16_t CANJaguar::GetFaults()
+uint16_t CANJaguar::GetFaults() const
 {
 	updatePeriodicStatus();
+	std::lock_guard<std::recursive_mutex> lock(m_mutex);
 
 	return m_faults;
 }
@@ -1818,7 +1833,7 @@ void CANJaguar::SetVoltageRampRate(double rampRate)
  *
  * @return The firmware version.  0 if the device did not respond.
  */
-uint32_t CANJaguar::GetFirmwareVersion()
+uint32_t CANJaguar::GetFirmwareVersion() const
 {
 	return m_firmwareVersion;
 }
@@ -1828,7 +1843,7 @@ uint32_t CANJaguar::GetFirmwareVersion()
  *
  * @return The hardware version. 1: Jaguar,  2: Black Jaguar
  */
-uint8_t CANJaguar::GetHardwareVersion()
+uint8_t CANJaguar::GetHardwareVersion() const
 {
 	return m_hardwareVersion;
 }
@@ -2030,19 +2045,19 @@ void CANJaguar::SetExpiration(float timeout)
 	if (m_safetyHelper) m_safetyHelper->SetExpiration(timeout);
 }
 
-float CANJaguar::GetExpiration()
+float CANJaguar::GetExpiration() const
 {
 	if (!m_safetyHelper) return 0.0;
 	return m_safetyHelper->GetExpiration();
 }
 
-bool CANJaguar::IsAlive()
+bool CANJaguar::IsAlive() const
 {
 	if (!m_safetyHelper) return false;
 	return m_safetyHelper->IsAlive();
 }
 
-bool CANJaguar::IsSafetyEnabled()
+bool CANJaguar::IsSafetyEnabled() const
 {
 	if (!m_safetyHelper) return false;
 	return m_safetyHelper->IsSafetyEnabled();
@@ -2053,12 +2068,12 @@ void CANJaguar::SetSafetyEnabled(bool enabled)
 	if (m_safetyHelper) m_safetyHelper->SetSafetyEnabled(enabled);
 }
 
-void CANJaguar::GetDescription(char *desc)
+void CANJaguar::GetDescription(char *desc) const
 {
 	sprintf(desc, "CANJaguar ID %d", m_deviceNumber);
 }
 
-uint8_t CANJaguar::GetDeviceID()
+uint8_t CANJaguar::GetDeviceID() const
 {
 	return m_deviceNumber;
 }
@@ -2103,7 +2118,7 @@ void CANJaguar::StopLiveWindowMode()
 	}
 }
 
-std::string CANJaguar::GetSmartDashboardType()
+std::string CANJaguar::GetSmartDashboardType() const
 {
 	return "Speed Controller";
 }
@@ -2114,7 +2129,7 @@ void CANJaguar::InitTable(ITable *subTable)
 	UpdateTable();
 }
 
-ITable * CANJaguar::GetTable()
+ITable * CANJaguar::GetTable() const
 {
 	return m_table;
 }

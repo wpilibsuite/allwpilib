@@ -114,7 +114,7 @@ void Subsystem::SetCurrentCommand(Command *command)
  * Returns the command which currently claims this subsystem.
  * @return the command which currently claims this subsystem
  */
-Command *Subsystem::GetCurrentCommand()
+Command *Subsystem::GetCurrentCommand() const
 {
 	return m_currentCommand;
 }
@@ -150,7 +150,7 @@ std::string Subsystem::GetName()
 	return m_name;
 }
 
-std::string Subsystem::GetSmartDashboardType()
+std::string Subsystem::GetSmartDashboardType() const
 {
 	return "Subsystem";
 }
@@ -174,6 +174,6 @@ void Subsystem::InitTable(ITable* table)
     }
 }
 
-ITable* Subsystem::GetTable(){
+ITable* Subsystem::GetTable() const {
 	return m_table;
 }

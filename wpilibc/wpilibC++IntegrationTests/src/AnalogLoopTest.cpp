@@ -19,12 +19,12 @@ protected:
 	AnalogInput *m_input;
 	AnalogOutput *m_output;
 
-	virtual void SetUp() {
+	virtual void SetUp() override {
 		m_input = new AnalogInput(TestBench::kFakeAnalogOutputChannel);
 		m_output = new AnalogOutput(TestBench::kAnalogOutputChannel);
 	}
 
-	virtual void TearDown() {
+	virtual void TearDown() override {
 		delete m_input;
 		delete m_output;
 	}

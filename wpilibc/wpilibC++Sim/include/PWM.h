@@ -44,7 +44,7 @@ public:
 	void SetBounds(int32_t max, int32_t deadbandMax, int32_t center, int32_t deadbandMin,
 			int32_t min);
 	void SetBounds(double max, double deadbandMax, double center, double deadbandMin, double min);
-	uint32_t GetChannel()
+	uint32_t GetChannel() const
 	{
 		return m_channel;
 	}
@@ -78,20 +78,20 @@ protected:
 	static const int32_t kPwmDisabled = 0;
 
 	virtual void SetPosition(float pos);
-	virtual float GetPosition();
+	virtual float GetPosition() const;
 	virtual void SetSpeed(float speed);
-	virtual float GetSpeed();
+	virtual float GetSpeed() const;
 
 	bool m_eliminateDeadband;
 	int32_t m_centerPwm;
 
-	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
-	void UpdateTable();
-	void StartLiveWindowMode();
-	void StopLiveWindowMode();
-	std::string GetSmartDashboardType();
-	void InitTable(ITable *subTable);
-	ITable * GetTable();
+	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) override;
+	void UpdateTable() override;
+	void StartLiveWindowMode() override;
+	void StopLiveWindowMode() override;
+	std::string GetSmartDashboardType() const override;
+	void InitTable(ITable *subTable) override;
+	ITable * GetTable() const override;
 
 	ITable *m_table;
 

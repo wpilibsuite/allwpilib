@@ -18,14 +18,14 @@ protected:
 	Victor *m_victor;
 	Jaguar *m_jaguar;
 
-	virtual void SetUp() {
+	virtual void SetUp() override {
 		m_pdp = new PowerDistributionPanel();
 		m_talon = new Talon(TestBench::kTalonChannel);
 		m_victor = new Victor(TestBench::kVictorChannel);
 		m_jaguar = new Jaguar(TestBench::kJaguarChannel);
 	}
 
-	virtual void TearDown() {
+	virtual void TearDown() override {
 		delete m_pdp;
 		delete m_talon;
 		delete m_victor;

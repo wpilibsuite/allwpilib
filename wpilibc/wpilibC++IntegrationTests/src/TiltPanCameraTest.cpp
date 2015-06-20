@@ -40,7 +40,7 @@ protected:
 		delete m_gyro;
 	}
 
-	virtual void SetUp() {
+	virtual void SetUp() override {
 		m_tilt = new Servo(TestBench::kCameraTiltChannel);
 		m_pan = new Servo(TestBench::kCameraPanChannel);
 		m_spiAccel = new ADXL345_SPI(SPI::kOnboardCS0);
@@ -53,7 +53,7 @@ protected:
 		m_gyro->Reset();
 	}
 
-	virtual void TearDown() {
+	virtual void TearDown() override {
 		delete m_tilt;
 		delete m_pan;
 		delete m_spiAccel;

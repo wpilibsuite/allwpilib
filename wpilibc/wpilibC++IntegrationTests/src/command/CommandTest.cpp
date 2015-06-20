@@ -13,7 +13,7 @@
 
 class CommandTest : public testing::Test {
 protected:
-	virtual void SetUp() {
+	virtual void SetUp() override {
         RobotState::SetImplementation(DriverStation::GetInstance());
 		Scheduler::GetInstance()->SetEnabled(true);
 	}
@@ -49,7 +49,7 @@ public:
 		m_command = NULL;
 	}
 
-	virtual void InitDefaultCommand(){
+	virtual void InitDefaultCommand() override {
 		if(m_command != NULL){
 			SetDefaultCommand(m_command);
 		}
@@ -334,7 +334,7 @@ public:
 	{
 		SetTimeout(2.0);
 	}
-	bool IsFinished(){
+	bool IsFinished() override {
 		return MockCommand::IsFinished() || IsTimedOut();
 	}
 };

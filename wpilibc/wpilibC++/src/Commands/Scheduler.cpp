@@ -277,11 +277,11 @@ std::string Scheduler::GetName() {
 	return "Scheduler";
 }
 
-std::string Scheduler::GetType() {
+std::string Scheduler::GetType() const {
 	return "Scheduler";
 }
 
-std::string Scheduler::GetSmartDashboardType() {
+std::string Scheduler::GetSmartDashboardType() const {
 	return "Scheduler";
 }
 
@@ -296,6 +296,6 @@ void Scheduler::InitTable(ITable *subTable) {
 	m_table->PutValue("Cancel", *toCancel);
 }
 
-ITable * Scheduler::GetTable() {
+ITable * Scheduler::GetTable() const {
 	return m_table;
 }

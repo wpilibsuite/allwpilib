@@ -38,11 +38,11 @@ public:
 	void SetEnabled(bool enabled);
 	
 	void UpdateTable();
-	std::string GetSmartDashboardType();
+	std::string GetSmartDashboardType() const;
 	void InitTable(ITable *subTable);
-	ITable * GetTable();
+	ITable * GetTable() const;
 	std::string GetName();
-	std::string GetType();
+	std::string GetType() const;
 
 private:
 	Scheduler();

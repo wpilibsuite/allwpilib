@@ -27,18 +27,18 @@ public:
 	bool Restart();
 	bool Stop();
 
-	bool IsReady();
-	bool IsSuspended();
+	bool IsReady() const;
+	bool IsSuspended() const;
 
 	bool Suspend();
 	bool Resume();
 
-	bool Verify();
+	bool Verify() const;
 
 	int32_t GetPriority();
 	bool SetPriority(int32_t priority);
-	const char* GetName();
-	TASK GetID();
+	const char* GetName() const;
+	TASK GetID() const;
 
 private:
 	FUNCPTR m_function;

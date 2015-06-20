@@ -30,15 +30,15 @@ public:
 	DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel, uint32_t reverseChannel);
 	virtual ~DoubleSolenoid();
 	virtual void Set(Value value);
-	virtual Value Get();
+	virtual Value Get() const;
 
-	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
-	void UpdateTable();
-	void StartLiveWindowMode();
-	void StopLiveWindowMode();
-	std::string GetSmartDashboardType();
-	void InitTable(ITable *subTable);
-	ITable * GetTable();
+	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) override;
+	void UpdateTable() override;
+	void StartLiveWindowMode() override;
+	void StopLiveWindowMode() override;
+	std::string GetSmartDashboardType() const override;
+	void InitTable(ITable *subTable) override;
+	ITable * GetTable() const override;
 
 private:
     void InitSolenoid(int slot, int channel1, int channel2);

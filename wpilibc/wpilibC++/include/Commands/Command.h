@@ -50,27 +50,27 @@ public:
 	Command(double timeout);
 	Command(const char *name, double timeout);
 	virtual ~Command();
-	double TimeSinceInitialized();
+	double TimeSinceInitialized() const;
 	void Requires(Subsystem *s);
-	bool IsCanceled();
+	bool IsCanceled() const;
 	void Start();
 	bool Run();
 	void Cancel();
-	bool IsRunning();
-	bool IsInterruptible();
+	bool IsRunning() const;
+	bool IsInterruptible() const;
 	void SetInterruptible(bool interruptible);
-	bool DoesRequire(Subsystem *subsystem);
+	bool DoesRequire(Subsystem *subsystem) const;
 	typedef std::set<Subsystem *> SubsystemSet;
-	SubsystemSet GetRequirements();
-	CommandGroup *GetGroup();
+	SubsystemSet GetRequirements() const;
+	CommandGroup *GetGroup() const;
 	void SetRunWhenDisabled(bool run);
-	bool WillRunWhenDisabled();
-	int GetID();
+	bool WillRunWhenDisabled() const;
+	int GetID() const;
 
 
 protected:
 	void SetTimeout(double timeout);
-	bool IsTimedOut();
+	bool IsTimedOut() const;
 	bool AssertUnlocked(const char *message);
 	void SetParent(CommandGroup *parent);
 	/**
@@ -154,8 +154,8 @@ private:
 public:
 	virtual std::string GetName();
 	virtual void InitTable(ITable* table);
-	virtual ITable* GetTable();
-	virtual std::string GetSmartDashboardType();
+	virtual ITable* GetTable() const;
+	virtual std::string GetSmartDashboardType() const;
 	virtual void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
 protected:
 	ITable* m_table;

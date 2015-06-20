@@ -24,5 +24,5 @@ public:
 	virtual ~GearTooth();
 	void EnableDirectionSensing(bool directionSensitive);
 
-	virtual std::string GetSmartDashboardType();
+	virtual std::string GetSmartDashboardType() const override;
 };

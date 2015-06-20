@@ -72,12 +72,12 @@ void PIDCommand::PIDWrite(float output)
 	UsePIDOutput(output);
 }
 
-double PIDCommand::PIDGet()
+double PIDCommand::PIDGet() const
 {
 	return ReturnPIDInput();
 }
 
-PIDController *PIDCommand::GetPIDController()
+PIDController *PIDCommand::GetPIDController() const
 {
 	return m_controller;
 }
@@ -87,17 +87,17 @@ void PIDCommand::SetSetpoint(double setpoint)
 	m_controller->SetSetpoint(setpoint);
 }
 
-double PIDCommand::GetSetpoint()
+double PIDCommand::GetSetpoint() const
 {
 	return m_controller->GetSetpoint();
 }
 
-double PIDCommand::GetPosition()
+double PIDCommand::GetPosition() const
 {
 	return ReturnPIDInput();
 }
 
-std::string PIDCommand::GetSmartDashboardType(){
+std::string PIDCommand::GetSmartDashboardType() const {
         return "PIDCommand";
 }
 void PIDCommand::InitTable(ITable* table){

@@ -43,7 +43,7 @@ public:
      *
      * @return The current position of the potentiometer.
      */
-    virtual double Get();
+    virtual double Get() const override;
 
 
     /**
@@ -51,26 +51,26 @@ public:
      *
      * @return The current reading.
      */
-    virtual double PIDGet();
+    virtual double PIDGet() const override;
 
 
     /*
      * Live Window code, only does anything if live window is activated.
      */
-    virtual std::string GetSmartDashboardType();
-    virtual void InitTable(ITable *subtable);
-    virtual void UpdateTable();
-    virtual ITable* GetTable();
+    virtual std::string GetSmartDashboardType() const override;
+    virtual void InitTable(ITable *subtable) override;
+    virtual void UpdateTable() override;
+    virtual ITable* GetTable() const override;
 
     /**
      * AnalogPotentiometers don't have to do anything special when entering the LiveWindow.
      */
-    virtual void StartLiveWindowMode() {}
+    virtual void StartLiveWindowMode() override {}
 
     /**
      * AnalogPotentiometers don't have to do anything special when exiting the LiveWindow.
      */
-    virtual void StopLiveWindowMode() {}
+    virtual void StopLiveWindowMode() override {}
 
 private:
     double m_fullRange, m_offset;

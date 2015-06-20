@@ -45,7 +45,7 @@ AnalogInput::~AnalogInput()
  * The value is scaled to units of Volts using the calibrated scaling data from GetLSBWeight() and GetOffset().
  * @return A scaled sample straight from this channel.
  */
-float AnalogInput::GetVoltage()
+float AnalogInput::GetVoltage() const
 {
     return m_impl->Get();
 }
@@ -57,7 +57,7 @@ float AnalogInput::GetVoltage()
  * Using averaging will cause this value to be more stable, but it will update more slowly.
  * @return A scaled sample from the output of the oversample and average engine for this channel.
  */
-float AnalogInput::GetAverageVoltage()
+float AnalogInput::GetAverageVoltage() const
 {
     return m_impl->Get();
 }
@@ -66,7 +66,7 @@ float AnalogInput::GetAverageVoltage()
  * Get the channel number.
  * @return The channel number.
  */
-uint32_t AnalogInput::GetChannel()
+uint32_t AnalogInput::GetChannel() const
 {
 	return m_channel;
 }
@@ -76,7 +76,7 @@ uint32_t AnalogInput::GetChannel()
  * 
  * @return The average voltage.
  */
-double AnalogInput::PIDGet() 
+double AnalogInput::PIDGet() const
 {
 	return GetAverageVoltage();
 }
@@ -95,7 +95,7 @@ void AnalogInput::StopLiveWindowMode() {
 	
 }
 
-std::string AnalogInput::GetSmartDashboardType() {
+std::string AnalogInput::GetSmartDashboardType() const {
 	return "Analog Input";
 }
 
@@ -104,6 +104,6 @@ void AnalogInput::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable * AnalogInput::GetTable() {
+ITable * AnalogInput::GetTable() const {
 	return m_table;
 }

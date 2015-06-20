@@ -94,7 +94,7 @@ bool Task::Stop()
  * Returns true if the task is ready to execute (i.e. not suspended, delayed, or blocked).
  * @return true if ready, false if not ready.
  */
-bool Task::IsReady()
+bool Task::IsReady() const
 {
 	return isTaskReady(m_taskID);
 }
@@ -103,7 +103,7 @@ bool Task::IsReady()
  * Returns true if the task was explicitly suspended by calling Suspend()
  * @return true if suspended, false if not suspended.
  */
-bool Task::IsSuspended()
+bool Task::IsSuspended() const
 {
 	return isTaskSuspended(m_taskID);
 }
@@ -130,7 +130,7 @@ bool Task::Resume()
  * Verifies a task still exists.
  * @returns true on success.
  */
-bool Task::Verify()
+bool Task::Verify() const
 {
 	return verifyTaskID(m_taskID) == OK;
 }
@@ -164,7 +164,7 @@ bool Task::SetPriority(int32_t priority)
  * Returns the name of the task.
  * @returns Pointer to the name of the task or NULL if not allocated
  */
-const char* Task::GetName()
+const char* Task::GetName() const
 {
 	return m_taskName;
 }
@@ -173,7 +173,7 @@ const char* Task::GetName()
  * Get the ID of a task
  * @returns Task ID of this task.  Task::kInvalidTaskID (-1) if the task has not been started or has already exited.
  */
-TASK Task::GetID()
+TASK Task::GetID() const
 {
 	if (Verify())
 		return m_taskID;

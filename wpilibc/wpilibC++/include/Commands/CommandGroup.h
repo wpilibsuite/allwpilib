@@ -41,8 +41,8 @@ public:
 	void AddSequential(Command *command, double timeout);
 	void AddParallel(Command *command);
 	void AddParallel(Command *command, double timeout);
-	bool IsInterruptible();
-	int GetSize();
+	bool IsInterruptible() const;
+	int GetSize() const;
 
 protected:
 	virtual void Initialize();

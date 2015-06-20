@@ -21,9 +21,9 @@ public:
 
 	InterruptableSensorBase();
 	virtual ~InterruptableSensorBase();
-	virtual uint32_t GetChannelForRouting() = 0;
-	virtual uint32_t GetModuleForRouting() = 0;
-	virtual bool GetAnalogTriggerForRouting() = 0;
+	virtual uint32_t GetChannelForRouting() const = 0;
+	virtual uint32_t GetModuleForRouting() const = 0;
+	virtual bool GetAnalogTriggerForRouting() const = 0;
 	virtual void RequestInterrupts(InterruptHandlerFunction handler, void *param); ///< Asynchronus handler version.
 	virtual void RequestInterrupts();		///< Synchronus Wait version.
 	virtual void CancelInterrupts();			///< Free up the underlying chipobject functions.

@@ -98,7 +98,7 @@ Joystick::~Joystick()
  * Get the X value of the joystick.
  * This depends on the mapping of the joystick connected to the current port.
  */
-float Joystick::GetX(JoystickHand hand)
+float Joystick::GetX(JoystickHand hand) const
 {
 	return GetRawAxis(m_axes[kXAxis]);
 }
@@ -107,7 +107,7 @@ float Joystick::GetX(JoystickHand hand)
  * Get the Y value of the joystick.
  * This depends on the mapping of the joystick connected to the current port.
  */
-float Joystick::GetY(JoystickHand hand)
+float Joystick::GetY(JoystickHand hand) const
 {
 	return GetRawAxis(m_axes[kYAxis]);
 }
@@ -116,7 +116,7 @@ float Joystick::GetY(JoystickHand hand)
  * Get the Z value of the current joystick.
  * This depends on the mapping of the joystick connected to the current port.
  */
-float Joystick::GetZ()
+float Joystick::GetZ() const
 {
 	return GetRawAxis(m_axes[kZAxis]);
 }
@@ -125,7 +125,7 @@ float Joystick::GetZ()
  * Get the twist value of the current joystick.
  * This depends on the mapping of the joystick connected to the current port.
  */
-float Joystick::GetTwist()
+float Joystick::GetTwist() const
 {
 	return GetRawAxis(m_axes[kTwistAxis]);
 }
@@ -134,7 +134,7 @@ float Joystick::GetTwist()
  * Get the throttle value of the current joystick.
  * This depends on the mapping of the joystick connected to the current port.
  */
-float Joystick::GetThrottle()
+float Joystick::GetThrottle() const
 {
 	return GetRawAxis(m_axes[kThrottleAxis]);
 }
@@ -145,7 +145,7 @@ float Joystick::GetThrottle()
  * @param axis The axis to read [1-6].
  * @return The value of the axis.
  */
-float Joystick::GetRawAxis(uint32_t axis)
+float Joystick::GetRawAxis(uint32_t axis) const
 {
 	return m_ds->GetStickAxis(m_port, axis);
 }
@@ -159,7 +159,7 @@ float Joystick::GetRawAxis(uint32_t axis)
  * @param axis The axis to read.
  * @return The value of the axis.
  */
-float Joystick::GetAxis(AxisType axis)
+float Joystick::GetAxis(AxisType axis) const
 {
 	switch(axis)
 	{
@@ -182,7 +182,7 @@ float Joystick::GetAxis(AxisType axis)
  * @param hand This parameter is ignored for the Joystick class and is only here to complete the GenericHID interface.
  * @return The state of the trigger.
  */
-bool Joystick::GetTrigger(JoystickHand hand)
+bool Joystick::GetTrigger(JoystickHand hand) const
 {
 	return GetRawButton(m_buttons[kTriggerButton]);
 }
@@ -195,7 +195,7 @@ bool Joystick::GetTrigger(JoystickHand hand)
  * @param hand This parameter is ignored for the Joystick class and is only here to complete the GenericHID interface.
  * @return The state of the top button.
  */
-bool Joystick::GetTop(JoystickHand hand)
+bool Joystick::GetTop(JoystickHand hand) const
 {
 	return GetRawButton(m_buttons[kTopButton]);
 }
@@ -204,7 +204,7 @@ bool Joystick::GetTop(JoystickHand hand)
  * This is not supported for the Joystick.
  * This method is only here to complete the GenericHID interface.
  */
-bool Joystick::GetBumper(JoystickHand hand)
+bool Joystick::GetBumper(JoystickHand hand) const
 {
 	// Joysticks don't have bumpers.
 	return false;
@@ -219,7 +219,7 @@ bool Joystick::GetBumper(JoystickHand hand)
  * @param button The button number to be read.
  * @return The state of the button.
  **/
-bool Joystick::GetRawButton(uint32_t button)
+bool Joystick::GetRawButton(uint32_t button) const
 {
     return m_ds->GetStickButton(m_port, button);
 }
@@ -229,7 +229,7 @@ bool Joystick::GetRawButton(uint32_t button)
 *
 * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
 */
-int Joystick::GetPOV(uint32_t pov) {
+int Joystick::GetPOV(uint32_t pov) const {
 	return 0; // TODO
 }
 
@@ -241,7 +241,7 @@ int Joystick::GetPOV(uint32_t pov) {
  * @param button The type of button to read.
  * @return The state of the button.
  */
-bool Joystick::GetButton(ButtonType button)
+bool Joystick::GetButton(ButtonType button) const
 {
 	switch (button)
 	{
@@ -280,7 +280,7 @@ void Joystick::SetAxisChannel(AxisType axis, uint32_t channel)
  *
  * @return The magnitude of the direction vector
  */
-float Joystick::GetMagnitude(){
+float Joystick::GetMagnitude() const {
 	return sqrt(pow(GetX(),2) + pow(GetY(),2) );
 }
 
@@ -290,7 +290,7 @@ float Joystick::GetMagnitude(){
  *
  * @return The direction of the vector in radians
  */
-float Joystick::GetDirectionRadians(){
+float Joystick::GetDirectionRadians() const {
 	return atan2(GetX(), -GetY());
 }
 
@@ -303,6 +303,6 @@ float Joystick::GetDirectionRadians(){
  *
  * @return The direction of the vector in degrees
  */
-float Joystick::GetDirectionDegrees(){
+float Joystick::GetDirectionDegrees() const {
 	return (180/acos(-1))*GetDirectionRadians();
 }

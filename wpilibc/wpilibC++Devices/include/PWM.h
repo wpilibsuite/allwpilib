@@ -38,14 +38,14 @@ public:
 	explicit PWM(uint32_t channel);
 	virtual ~PWM();
 	virtual void SetRaw(unsigned short value);
-	virtual unsigned short GetRaw();
+	virtual unsigned short GetRaw() const;
 	void SetPeriodMultiplier(PeriodMultiplier mult);
 	void SetZeroLatch();
 	void EnableDeadbandElimination(bool eliminateDeadband);
 	void SetBounds(int32_t max, int32_t deadbandMax, int32_t center, int32_t deadbandMin,
 			int32_t min);
 	void SetBounds(double max, double deadbandMax, double center, double deadbandMin, double min);
-	uint32_t GetChannel()
+	uint32_t GetChannel() const
 	{
 		return m_channel;
 	}
@@ -79,9 +79,9 @@ protected:
 	static const int32_t kPwmDisabled = 0;
 
 	virtual void SetPosition(float pos);
-	virtual float GetPosition();
+	virtual float GetPosition() const;
 	virtual void SetSpeed(float speed);
-	virtual float GetSpeed();
+	virtual float GetSpeed() const;
 
 	bool m_eliminateDeadband;
 	int32_t m_maxPwm;
@@ -90,48 +90,48 @@ protected:
 	int32_t m_deadbandMinPwm;
 	int32_t m_minPwm;
 
-	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
-	void UpdateTable();
-	void StartLiveWindowMode();
-	void StopLiveWindowMode();
-	std::string GetSmartDashboardType();
-	void InitTable(ITable *subTable);
-	ITable * GetTable();
+	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) override;
+	void UpdateTable() override;
+	void StartLiveWindowMode() override;
+	void StopLiveWindowMode() override;
+	std::string GetSmartDashboardType() const override;
+	void InitTable(ITable *subTable) override;
+	ITable * GetTable() const override;
 
 	ITable *m_table;
 
 private:
 	void InitPWM(uint32_t channel);
 	uint32_t m_channel;
-	int32_t GetMaxPositivePwm()
+	int32_t GetMaxPositivePwm() const
 	{
 		return m_maxPwm;
 	}
-	int32_t GetMinPositivePwm()
+	int32_t GetMinPositivePwm() const
 	{
 		return m_eliminateDeadband ? m_deadbandMaxPwm : m_centerPwm + 1;
 	}
-	int32_t GetCenterPwm()
+	int32_t GetCenterPwm() const
 	{
 		return m_centerPwm;
 	}
-	int32_t GetMaxNegativePwm()
+	int32_t GetMaxNegativePwm() const
 	{
 		return m_eliminateDeadband ? m_deadbandMinPwm : m_centerPwm - 1;
 	}
-	int32_t GetMinNegativePwm()
+	int32_t GetMinNegativePwm() const
 	{
 		return m_minPwm;
 	}
-	int32_t GetPositiveScaleFactor()
+	int32_t GetPositiveScaleFactor() const
 	{
 		return GetMaxPositivePwm() - GetMinPositivePwm();
 	} ///< The scale for positive speeds.
-	int32_t GetNegativeScaleFactor()
+	int32_t GetNegativeScaleFactor() const
 	{
 		return GetMaxNegativePwm() - GetMinNegativePwm();
 	} ///< The scale for negative speeds.
-	int32_t GetFullRangeScaleFactor()
+	int32_t GetFullRangeScaleFactor() const
 	{
 		return GetMaxPositivePwm() - GetMinNegativePwm();
 	} ///< The scale for positions.

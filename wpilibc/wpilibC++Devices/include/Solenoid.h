@@ -22,16 +22,16 @@ public:
 	Solenoid(uint8_t moduleNumber, uint32_t channel);
 	virtual ~Solenoid();
 	virtual void Set(bool on);
-	virtual bool Get();
-	bool IsBlackListed();
+	virtual bool Get() const;
+	bool IsBlackListed() const;
 
 	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
 	void UpdateTable();
 	void StartLiveWindowMode();
 	void StopLiveWindowMode();
-	std::string GetSmartDashboardType();
+	std::string GetSmartDashboardType() const;
 	void InitTable(ITable *subTable);
-	ITable * GetTable();
+	ITable * GetTable() const;
 
 private:
 	void InitSolenoid();

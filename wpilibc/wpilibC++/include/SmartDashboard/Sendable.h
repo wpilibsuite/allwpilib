@@ -22,12 +22,12 @@ public:
 	/**
 	 * @return the table that is currently associated with the sendable
 	 */
-	virtual ITable* GetTable() = 0;
+	virtual ITable* GetTable() const = 0;
 
 	/**
 	 * @return the string representation of the named data type that will be used by the smart dashboard for this sendable
 	 */
-	virtual std::string GetSmartDashboardType() = 0;
+	virtual std::string GetSmartDashboardType() const = 0;
 };
 
 #endif

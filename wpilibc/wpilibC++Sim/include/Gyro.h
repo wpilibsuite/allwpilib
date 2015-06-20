@@ -34,20 +34,20 @@ public:
 
 	explicit Gyro(uint32_t channel);
 	virtual ~Gyro();
-	virtual float GetAngle();
-	virtual double GetRate();
+	virtual float GetAngle() const;
+	virtual double GetRate() const;
 	void SetPIDSourceParameter(PIDSourceParameter pidSource);
 	virtual void Reset();
 
 	// PIDSource interface
-	double PIDGet();
+	double PIDGet() const override;
 
-	void UpdateTable();
-	void StartLiveWindowMode();
-	void StopLiveWindowMode();
-	std::string GetSmartDashboardType();
-	void InitTable(ITable *subTable);
-	ITable * GetTable();
+	void UpdateTable() override;
+	void StartLiveWindowMode() override;
+	void StopLiveWindowMode() override;
+	std::string GetSmartDashboardType() const override;
+	void InitTable(ITable *subTable) override;
+	ITable * GetTable() const override;
 
 private:
 	void InitGyro(int channel);

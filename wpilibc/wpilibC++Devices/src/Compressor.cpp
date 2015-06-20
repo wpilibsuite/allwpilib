@@ -52,7 +52,7 @@ void Compressor::Stop() {
  * Check if compressor output is active
  * @return true if the compressor is on
  */
-bool Compressor::Enabled() {
+bool Compressor::Enabled() const {
 	int32_t status = 0;
 	bool value;
 
@@ -69,7 +69,7 @@ bool Compressor::Enabled() {
  * Check if the pressure switch is triggered
  * @return true if pressure is low
  */
-bool Compressor::GetPressureSwitchValue() {
+bool Compressor::GetPressureSwitchValue() const {
 	int32_t status = 0;
 	bool value;
 
@@ -87,7 +87,7 @@ bool Compressor::GetPressureSwitchValue() {
  * Query how much current the compressor is drawing
  * @return The current through the compressor, in amps
  */
-float Compressor::GetCompressorCurrent() {
+float Compressor::GetCompressorCurrent() const {
 	int32_t status = 0;
 	float value;
 
@@ -121,7 +121,7 @@ void Compressor::SetClosedLoopControl(bool on) {
  * pressure is low.
  * @return True if closed loop control of the compressor is enabled. False if disabled.
  */
-bool Compressor::GetClosedLoopControl() {
+bool Compressor::GetClosedLoopControl() const {
 	int32_t status = 0;
 	bool value;
 
@@ -139,7 +139,7 @@ bool Compressor::GetClosedLoopControl() {
  * @return true if PCM is in fault state : Compressor Drive is 
  *			disabled due to compressor current being too high.
  */
-bool Compressor::GetCompressorCurrentTooHighFault() {
+bool Compressor::GetCompressorCurrentTooHighFault() const {
 	int32_t status = 0;
 	bool value;
 
@@ -157,7 +157,7 @@ bool Compressor::GetCompressorCurrentTooHighFault() {
  * @return true if PCM sticky fault is set : Compressor Drive is 
  *			disabled due to compressor current being too high.
  */
-bool Compressor::GetCompressorCurrentTooHighStickyFault() {
+bool Compressor::GetCompressorCurrentTooHighStickyFault() const {
 	int32_t status = 0;
 	bool value;
 
@@ -175,7 +175,7 @@ bool Compressor::GetCompressorCurrentTooHighStickyFault() {
  * @return true if PCM sticky fault is set : Compressor output 
  *			appears to be shorted.
  */
-bool Compressor::GetCompressorShortedStickyFault() {
+bool Compressor::GetCompressorShortedStickyFault() const {
 	int32_t status = 0;
 	bool value;
 
@@ -192,7 +192,7 @@ bool Compressor::GetCompressorShortedStickyFault() {
  * @return true if PCM is in fault state : Compressor output 
  *			appears to be shorted.
  */
-bool Compressor::GetCompressorShortedFault() {
+bool Compressor::GetCompressorShortedFault() const {
 	int32_t status = 0;
 	bool value;
 
@@ -211,7 +211,7 @@ bool Compressor::GetCompressorShortedFault() {
  *			appear to be wired, i.e. compressor is
  * 			not drawing enough current.
  */
-bool Compressor::GetCompressorNotConnectedStickyFault() {
+bool Compressor::GetCompressorNotConnectedStickyFault() const {
 	int32_t status = 0;
 	bool value;
 
@@ -229,7 +229,7 @@ bool Compressor::GetCompressorNotConnectedStickyFault() {
  *			appear to be wired, i.e. compressor is
  * 			not drawing enough current.
  */
-bool Compressor::GetCompressorNotConnectedFault() {
+bool Compressor::GetCompressorNotConnectedFault() const {
 	int32_t status = 0;
 	bool value;
 
@@ -273,7 +273,7 @@ void Compressor::StartLiveWindowMode() {
 void Compressor::StopLiveWindowMode() {
 }
 
-std::string Compressor::GetSmartDashboardType() {
+std::string Compressor::GetSmartDashboardType() const {
 	return "Compressor";
 }
 
@@ -282,7 +282,7 @@ void Compressor::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable *Compressor::GetTable() {
+ITable *Compressor::GetTable() const {
 	return m_table;
 }
 

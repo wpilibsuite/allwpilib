@@ -30,17 +30,17 @@ public:
 	virtual void PIDWrite(float output);
 
 	// PIDSource interface
-	virtual double PIDGet();
+	virtual double PIDGet() const;
 protected:
-	PIDController *GetPIDController();
+	PIDController *GetPIDController() const;
 	virtual void _Initialize();
 	virtual void _Interrupted();
 	virtual void _End();
 	void SetSetpoint(double setpoint);
-	double GetSetpoint();
-	double GetPosition();
+	double GetSetpoint() const;
+	double GetPosition() const;
 
-	virtual double ReturnPIDInput() = 0;
+	virtual double ReturnPIDInput() const = 0;
 	virtual void UsePIDOutput(double output) = 0;
 
 private:	
@@ -49,7 +49,7 @@ private:
 
 public:
 	virtual void InitTable(ITable* table);
-	virtual std::string GetSmartDashboardType();
+	virtual std::string GetSmartDashboardType() const;
 };
 
 #endif

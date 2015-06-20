@@ -22,7 +22,7 @@ protected:
   Victor *m_victor;
   Jaguar *m_jaguar;
 
-  virtual void SetUp() {
+  virtual void SetUp() override {
     m_talonCounter = new Counter(TestBench::kTalonEncoderChannelA);
     m_victorCounter = new Counter(TestBench::kVictorEncoderChannelA);
     m_jaguarCounter = new Counter(TestBench::kJaguarEncoderChannelA);
@@ -31,7 +31,7 @@ protected:
     m_jaguar = new Jaguar(TestBench::kJaguarChannel);
   }
 
-  virtual void TearDown() {
+  virtual void TearDown() override {
     delete m_talonCounter;
     delete m_victorCounter;
     delete m_jaguarCounter;

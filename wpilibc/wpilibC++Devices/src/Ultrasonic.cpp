@@ -240,7 +240,7 @@ void Ultrasonic::Ping()
  * The ranges are accumulated in a counter that will increment on each edge of the echo (return)
  * signal. If the count is not at least 2, then the range has not yet been measured, and is invalid.
  */
-bool Ultrasonic::IsRangeValid()
+bool Ultrasonic::IsRangeValid() const
 {
 	return m_counter->Get() > 1;
 }
@@ -250,7 +250,7 @@ bool Ultrasonic::IsRangeValid()
  * @return double Range in inches of the target returned from the ultrasonic sensor. If there is
  * no valid value yet, i.e. at least one measurement hasn't completed, then return 0.
  */
-double Ultrasonic::GetRangeInches()
+double Ultrasonic::GetRangeInches() const
 {
 	if (IsRangeValid())
 		return m_counter->GetPeriod() * kSpeedOfSoundInchesPerSec / 2.0;
@@ -263,7 +263,7 @@ double Ultrasonic::GetRangeInches()
  * @return double Range in millimeters of the target returned by the ultrasonic sensor.
  * If there is no valid value yet, i.e. at least one measurement hasn't complted, then return 0.
  */
-double Ultrasonic::GetRangeMM()
+double Ultrasonic::GetRangeMM() const
 {
 	return GetRangeInches() * 25.4;
 }
@@ -273,7 +273,7 @@ double Ultrasonic::GetRangeMM()
  *
  * @return The range in DistanceUnit
  */
-double Ultrasonic::PIDGet()
+double Ultrasonic::PIDGet() const
 {
 	switch(m_units)
 	{
@@ -301,7 +301,7 @@ void Ultrasonic::SetDistanceUnits(DistanceUnit units)
  *
  * @return The type of DistanceUnit that is being used.
  */
-Ultrasonic::DistanceUnit Ultrasonic::GetDistanceUnits()
+Ultrasonic::DistanceUnit Ultrasonic::GetDistanceUnits() const
 {
 	return m_units;
 }
@@ -320,7 +320,7 @@ void Ultrasonic::StopLiveWindowMode() {
 
 }
 
-std::string Ultrasonic::GetSmartDashboardType() {
+std::string Ultrasonic::GetSmartDashboardType() const {
 	return "Ultrasonic";
 }
 
@@ -329,6 +329,6 @@ void Ultrasonic::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable * Ultrasonic::GetTable() {
+ITable * Ultrasonic::GetTable() const {
 	return m_table;
 }

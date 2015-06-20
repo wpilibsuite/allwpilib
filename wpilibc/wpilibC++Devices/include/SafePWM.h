@@ -24,12 +24,12 @@ public:
 	~SafePWM();
 
 	void SetExpiration(float timeout);
-	float GetExpiration();
-	bool IsAlive();
+	float GetExpiration() const;
+	bool IsAlive() const;
 	void StopMotor();
-	bool IsSafetyEnabled();
+	bool IsSafetyEnabled() const;
 	void SetSafetyEnabled(bool enabled);
-	void GetDescription(char *desc);
+	void GetDescription(char *desc) const;
 
 	virtual void SetSpeed(float speed);
 private:

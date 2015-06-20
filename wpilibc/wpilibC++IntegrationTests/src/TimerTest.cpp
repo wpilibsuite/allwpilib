@@ -15,11 +15,11 @@ class TimerTest : public testing::Test {
 protected:
 	Timer *m_timer;
 	
-	virtual void SetUp() {
+	virtual void SetUp() override {
 		m_timer = new Timer;
 	}
 	
-	virtual void TearDown() {
+	virtual void TearDown() override {
 		delete m_timer;
 	}
 	

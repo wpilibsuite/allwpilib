@@ -44,7 +44,7 @@ void SafePWM::SetExpiration(float timeout)
  * Return the expiration time for the PWM object.
  * @returns The expiration time value.
  */
-float SafePWM::GetExpiration()
+float SafePWM::GetExpiration() const
 {
 	return m_safetyHelper->GetExpiration();
 }
@@ -54,7 +54,7 @@ float SafePWM::GetExpiration()
  * @returns a bool value that is true if the motor has NOT timed out and should still
  * be running.
  */
-bool SafePWM::IsAlive()
+bool SafePWM::IsAlive() const
 {
 	return m_safetyHelper->IsAlive();
 }
@@ -83,12 +83,12 @@ void SafePWM::SetSafetyEnabled(bool enabled)
  * Check if motor safety is enabled for this object
  * @returns True if motor safety is enforced for this object
  */
-bool SafePWM::IsSafetyEnabled()
+bool SafePWM::IsSafetyEnabled() const
 {
 	return m_safetyHelper->IsSafetyEnabled();
 }
 
-void SafePWM::GetDescription(char *desc)
+void SafePWM::GetDescription(char *desc) const
 {
 	sprintf(desc, "PWM %d", GetChannel());
 }

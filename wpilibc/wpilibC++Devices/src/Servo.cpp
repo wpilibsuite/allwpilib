@@ -72,7 +72,7 @@ void Servo::SetOffline() {
  *
  * @return Position from 0.0 to 1.0.
  */
-float Servo::Get()
+float Servo::Get() const
 {
 	return GetPosition();
 }
@@ -108,7 +108,7 @@ void Servo::SetAngle(float degrees)
  * Assume that the servo angle is linear with respect to the PWM value (big assumption, need to test).
  * @return The angle in degrees to which the servo is set.
  */
-float Servo::GetAngle()
+float Servo::GetAngle() const
 {
 	return (float)GetPosition() * GetServoAngleRange() + kMinServoAngle;
 }
@@ -135,7 +135,7 @@ void Servo::StopLiveWindowMode() {
 	}
 }
 
-std::string Servo::GetSmartDashboardType() {
+std::string Servo::GetSmartDashboardType() const {
 	return "Servo";
 }
 
@@ -144,6 +144,6 @@ void Servo::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable * Servo::GetTable() {
+ITable * Servo::GetTable() const {
 	return m_table;
 }

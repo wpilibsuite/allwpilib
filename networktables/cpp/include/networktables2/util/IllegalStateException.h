@@ -14,7 +14,7 @@
 class IllegalStateException : public std::exception{
 public:
 	IllegalStateException(const char* message);
-	const char* what(){return message.c_str();};
+	const char* what() const noexcept {return message.c_str();};
 	~IllegalStateException() throw ();
 private:
 	std::string message;

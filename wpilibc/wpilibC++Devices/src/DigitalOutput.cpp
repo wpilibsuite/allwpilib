@@ -77,7 +77,7 @@ void DigitalOutput::Set(uint32_t value)
 /**
  * @return The GPIO channel number that this object represents.
  */
-uint32_t DigitalOutput::GetChannel()
+uint32_t DigitalOutput::GetChannel() const
 {
 	return m_channel;
 }
@@ -101,7 +101,7 @@ void DigitalOutput::Pulse(float length)
  * Determine if the pulse is still going.
  * Determine if a previously started pulse is still going.
  */
-bool DigitalOutput::IsPulsing()
+bool DigitalOutput::IsPulsing() const
 {
 	if (StatusIsFatal()) return false;
 
@@ -202,7 +202,7 @@ void DigitalOutput::UpdateDutyCycle(float dutyCycle)
 /**
  * @return The value to be written to the channel field of a routing mux.
  */
-uint32_t DigitalOutput::GetChannelForRouting()
+uint32_t DigitalOutput::GetChannelForRouting() const
 {
 	return GetChannel();
 }
@@ -210,7 +210,7 @@ uint32_t DigitalOutput::GetChannelForRouting()
 /**
  * @return The value to be written to the module field of a routing mux.
  */
-uint32_t DigitalOutput::GetModuleForRouting()
+uint32_t DigitalOutput::GetModuleForRouting() const
 {
 	return 0;
 }
@@ -218,7 +218,7 @@ uint32_t DigitalOutput::GetModuleForRouting()
 /**
  * @return The value to be written to the analog trigger field of a routing mux.
  */
-bool DigitalOutput::GetAnalogTriggerForRouting()
+bool DigitalOutput::GetAnalogTriggerForRouting() const
 {
 	return false;
 }
@@ -242,7 +242,7 @@ void DigitalOutput::StopLiveWindowMode() {
 	}
 }
 
-std::string DigitalOutput::GetSmartDashboardType() {
+std::string DigitalOutput::GetSmartDashboardType() const {
 	return "Digital Output";
 }
 
@@ -251,6 +251,6 @@ void DigitalOutput::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable * DigitalOutput::GetTable() {
+ITable * DigitalOutput::GetTable() const {
 	return m_table;
 }

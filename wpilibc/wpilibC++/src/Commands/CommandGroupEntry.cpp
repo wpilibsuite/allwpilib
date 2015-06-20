@@ -29,7 +29,7 @@ CommandGroupEntry::CommandGroupEntry(Command *command, Sequence state, double ti
 {
 }
 
-bool CommandGroupEntry::IsTimedOut()
+bool CommandGroupEntry::IsTimedOut() const
 {
 	if (m_timeout < 0.0)
 		return false;

@@ -17,7 +17,7 @@ BadMessageException::~BadMessageException() throw ()
 {
 }
 
-const char* BadMessageException::what()
+const char* BadMessageException::what() const noexcept
 {
 	return message.c_str();
 }

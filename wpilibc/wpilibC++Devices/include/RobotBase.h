@@ -35,12 +35,12 @@ public:
 	static RobotBase &getInstance();
 	static void setInstance(RobotBase* robot);
 
-	bool IsEnabled();
-	bool IsDisabled();
-	bool IsAutonomous();
-	bool IsOperatorControl();
-	bool IsTest();
-	bool IsNewDataAvailable();
+	bool IsEnabled() const;
+	bool IsDisabled() const;
+	bool IsAutonomous() const;
+	bool IsOperatorControl() const;
+	bool IsTest() const;
+	bool IsNewDataAvailable() const;
 	static void startRobotTask(FUNCPTR factory);
 	static void robotTask(FUNCPTR factory, Task *task);
 	virtual void StartCompetition() = 0;

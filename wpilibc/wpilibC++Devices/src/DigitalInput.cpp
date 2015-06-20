@@ -71,7 +71,7 @@ DigitalInput::~DigitalInput()
  * Get the value from a digital input channel.
  * Retrieve the value of a single digital input channel from the FPGA.
  */
-bool DigitalInput::Get()
+bool DigitalInput::Get() const
 {
 	int32_t status = 0;
 	bool value = getDIO(m_digital_ports[m_channel], &status);
@@ -82,7 +82,7 @@ bool DigitalInput::Get()
 /**
  * @return The GPIO channel number that this object represents.
  */
-uint32_t DigitalInput::GetChannel()
+uint32_t DigitalInput::GetChannel() const
 {
 	return m_channel;
 }
@@ -90,7 +90,7 @@ uint32_t DigitalInput::GetChannel()
 /**
  * @return The value to be written to the channel field of a routing mux.
  */
-uint32_t DigitalInput::GetChannelForRouting()
+uint32_t DigitalInput::GetChannelForRouting() const
 {
 	return GetChannel();
 }
@@ -98,7 +98,7 @@ uint32_t DigitalInput::GetChannelForRouting()
 /**
  * @return The value to be written to the module field of a routing mux.
  */
-uint32_t DigitalInput::GetModuleForRouting()
+uint32_t DigitalInput::GetModuleForRouting() const
 {
 	return 0;
 }
@@ -106,7 +106,7 @@ uint32_t DigitalInput::GetModuleForRouting()
 /**
  * @return The value to be written to the analog trigger field of a routing mux.
  */
-bool DigitalInput::GetAnalogTriggerForRouting()
+bool DigitalInput::GetAnalogTriggerForRouting() const
 {
 	return false;
 }
@@ -125,7 +125,7 @@ void DigitalInput::StopLiveWindowMode() {
 
 }
 
-std::string DigitalInput::GetSmartDashboardType() {
+std::string DigitalInput::GetSmartDashboardType() const {
 	return "DigitalInput";
 }
 
@@ -134,6 +134,6 @@ void DigitalInput::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable * DigitalInput::GetTable() {
+ITable * DigitalInput::GetTable() const {
 	return m_table;
 }

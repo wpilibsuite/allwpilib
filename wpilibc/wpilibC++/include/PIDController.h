@@ -29,30 +29,30 @@ public:
 	PIDController(float p, float i, float d, float f, PIDSource *source, PIDOutput *output,
 			float period = 0.05);
 	virtual ~PIDController();
-	virtual float Get();
+	virtual float Get() const;
 	virtual void SetContinuous(bool continuous = true);
 	virtual void SetInputRange(float minimumInput, float maximumInput);
 	virtual void SetOutputRange(float minimumOutput, float maximumOutput);
 	virtual void SetPID(float p, float i, float d);
 	virtual void SetPID(float p, float i, float d, float f);
-	virtual float GetP();
-	virtual float GetI();
-	virtual float GetD();
-	virtual float GetF();
+	virtual float GetP() const;
+	virtual float GetI() const;
+	virtual float GetD() const;
+	virtual float GetF() const;
 
 	virtual void SetSetpoint(float setpoint);
-	virtual float GetSetpoint();
+	virtual float GetSetpoint() const;
 
-	virtual float GetError();
+	virtual float GetError() const;
 
 	virtual void SetTolerance(float percent);
 	virtual void SetAbsoluteTolerance(float absValue);
 	virtual void SetPercentTolerance(float percentValue);
-	virtual bool OnTarget();
+	virtual bool OnTarget() const;
 
-	virtual void Enable();
-	virtual void Disable();
-	virtual bool IsEnabled();
+	virtual void Enable() override;
+	virtual void Disable() override;
+	virtual bool IsEnabled() const;
 
 	virtual void Reset();
 
@@ -95,8 +95,8 @@ private:
 			float period = 0.05);
 	static void CallCalculate(void *controller);
 
-	virtual ITable* GetTable();
-	virtual std::string GetSmartDashboardType();
+	virtual ITable* GetTable() const;
+	virtual std::string GetSmartDashboardType() const;
 	virtual void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
 	virtual void UpdateTable();
 	virtual void StartLiveWindowMode();

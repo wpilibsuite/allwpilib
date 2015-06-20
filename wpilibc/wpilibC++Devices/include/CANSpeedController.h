@@ -60,27 +60,27 @@ public:
 		kLimitMode_SrxDisableSwitchInputs = 2,
 	};
 
-	virtual float Get() = 0;
+	virtual float Get() const = 0;
 	virtual void Set(float value, uint8_t syncGroup=0) = 0;
 	virtual void Disable() = 0;
 	virtual void SetP(double p) = 0;
 	virtual void SetI(double i) = 0;
 	virtual void SetD(double d) = 0;
 	virtual void SetPID(double p, double i, double d) = 0;
-	virtual double GetP() = 0;
-	virtual double GetI() = 0;
-	virtual double GetD() = 0;
-	virtual float GetBusVoltage() = 0;
-	virtual float GetOutputVoltage() = 0;
-	virtual float GetOutputCurrent() = 0;
-	virtual float GetTemperature() = 0;
-	virtual double GetPosition() = 0;
-	virtual double GetSpeed() = 0;
-	virtual bool GetForwardLimitOK() = 0;
-	virtual bool GetReverseLimitOK() = 0;
-	virtual uint16_t GetFaults() = 0;
+	virtual double GetP() const = 0;
+	virtual double GetI() const = 0;
+	virtual double GetD() const = 0;
+	virtual float GetBusVoltage() const = 0;
+	virtual float GetOutputVoltage() const = 0;
+	virtual float GetOutputCurrent() const = 0;
+	virtual float GetTemperature() const = 0;
+	virtual double GetPosition() const = 0;
+	virtual double GetSpeed() const = 0;
+	virtual bool GetForwardLimitOK() const = 0;
+	virtual bool GetReverseLimitOK() const = 0;
+	virtual uint16_t GetFaults() const = 0;
 	virtual void SetVoltageRampRate(double rampRate) = 0;
-	virtual uint32_t GetFirmwareVersion() = 0;
+	virtual uint32_t GetFirmwareVersion() const = 0;
 	virtual void ConfigNeutralMode(NeutralMode mode) = 0;
 	virtual void ConfigEncoderCodesPerRev(uint16_t codesPerRev) = 0;
 	virtual void ConfigPotentiometerTurns(uint16_t turns) = 0;
@@ -93,5 +93,5 @@ public:
 	virtual void ConfigFaultTime(float faultTime) = 0;
   // Hold off on interface until we figure out ControlMode enums.
 //	virtual void SetControlMode(ControlMode mode) = 0;
-//	virtual ControlMode GetControlMode() = 0;
+//	virtual ControlMode GetControlMode() const = 0;
 };

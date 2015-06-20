@@ -179,7 +179,7 @@ void PWM::SetPosition(float pos)
  *
  * @return The position the servo is set to between 0.0 and 1.0.
  */
-float PWM::GetPosition()
+float PWM::GetPosition() const
 {
 	if (StatusIsFatal()) return 0.0;
 	int32_t value = GetRaw();
@@ -260,7 +260,7 @@ void PWM::SetSpeed(float speed)
  *
  * @return The most recently set speed between -1.0 and 1.0.
  */
-float PWM::GetSpeed()
+float PWM::GetSpeed() const
 {
 	if (StatusIsFatal()) return 0.0;
 	int32_t value = GetRaw();
@@ -313,7 +313,7 @@ void PWM::SetRaw(unsigned short value)
  *
  * @return Raw PWM control value.
  */
-unsigned short PWM::GetRaw()
+unsigned short PWM::GetRaw() const
 {
 	if (StatusIsFatal()) return 0;
 
@@ -388,7 +388,7 @@ void PWM::StopLiveWindowMode() {
 	}
 }
 
-std::string PWM::GetSmartDashboardType() {
+std::string PWM::GetSmartDashboardType() const {
 	return "Speed Controller";
 }
 
@@ -397,6 +397,6 @@ void PWM::InitTable(ITable *subTable) {
 	UpdateTable();
 }
 
-ITable * PWM::GetTable() {
+ITable * PWM::GetTable() const {
 	return m_table;
 }
