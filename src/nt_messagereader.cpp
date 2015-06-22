@@ -174,8 +174,10 @@ MessageReader::Run()
         if (!Read16(&uid)) return false;
         unsigned long size;
         if (!ReadULEB128(&size)) return false;
-        char *buf;
-        if (!Read(&buf, size)) return false;
+        char *params;
+        if (!Read(&params, size)) return false;
+        m_handler.GotExecuteRpc(id, uid, params, size);
+        break;
     }
     case NT_MSG_RPC_RESPONSE:
     {
@@ -189,8 +191,10 @@ MessageReader::Run()
         if (!Read16(&uid)) return false;
         unsigned long size;
         if (!ReadULEB128(&size)) return false;
-        char *buf;
-        if (!Read(&buf, size)) return false;
+        char *results;
+        if (!Read(&results, size)) return false;
+        m_handler.GotRpcResponse(id, uid, results, size);
+        break;
     }
     default:
         m_error = "unrecognized message type";

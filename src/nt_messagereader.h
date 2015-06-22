@@ -44,10 +44,12 @@ public:
     virtual void GotClearEntries() = 0;
     virtual void GotExecuteRpc(unsigned int id,
                                unsigned int uid,
-                               const char *params) = 0;
+                               const char *params,
+                               std::size_t params_len) = 0;
     virtual void GotRpcResponse(unsigned int id,
                                 unsigned int uid,
-                                const char *results) = 0;
+                                const char *results,
+                                std::size_t results_len) = 0;
 
 private:
     MessageHandler(const MessageHandler&);
