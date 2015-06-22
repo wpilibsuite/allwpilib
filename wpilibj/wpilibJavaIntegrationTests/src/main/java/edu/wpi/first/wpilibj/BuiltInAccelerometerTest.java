@@ -64,8 +64,8 @@ public class BuiltInAccelerometerTest extends AbstractComsSetup {
 	@Test
 	public void testAccelerometer() {
 		assertEquals(0.0, m_accelerometer.getX(), kAccelerationTolerance);
-		assertEquals(0.0, m_accelerometer.getY(), kAccelerationTolerance);
-		assertEquals(1.0, m_accelerometer.getZ(), kAccelerationTolerance);
+		assertEquals(1.0, m_accelerometer.getY(), kAccelerationTolerance);
+		assertEquals(0.0, m_accelerometer.getZ(), kAccelerationTolerance);
 	}
 
 }
