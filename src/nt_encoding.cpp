@@ -29,21 +29,6 @@ NtImpl::WriteDouble(char* &buf, double val)
     *buf++ = (char)(v & 0xff);
 }
 
-double
-NtImpl::ReadDouble(char* &buf)
-{
-    std::uint64_t val = (*((unsigned char *)buf)) & 0xff;
-    ++buf; val <<= 8; val |= (*((unsigned char *)buf)) & 0xff;
-    ++buf; val <<= 8; val |= (*((unsigned char *)buf)) & 0xff;
-    ++buf; val <<= 8; val |= (*((unsigned char *)buf)) & 0xff;
-    ++buf; val <<= 8; val |= (*((unsigned char *)buf)) & 0xff;
-    ++buf; val <<= 8; val |= (*((unsigned char *)buf)) & 0xff;
-    ++buf; val <<= 8; val |= (*((unsigned char *)buf)) & 0xff;
-    ++buf; val <<= 8; val |= (*((unsigned char *)buf)) & 0xff;
-    ++buf;
-    return *reinterpret_cast<double*>(&val);
-}
-
 size_t
 NT_WriteType(char *buf, NT_Type type, unsigned int proto_rev)
 {

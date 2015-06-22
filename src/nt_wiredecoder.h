@@ -70,13 +70,7 @@ public:
         return true;
     }
 
-    bool ReadDouble(double *val)
-    {
-        char *buf;
-        if (!Read(&buf, 8)) return false;
-        *val = NtImpl::ReadDouble(buf);
-        return true;
-    }
+    bool ReadDouble(double *val);
 
     bool ReadULEB128(unsigned long *val)
     {

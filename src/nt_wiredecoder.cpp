@@ -17,6 +17,21 @@
 
 using namespace NtImpl;
 
+static double
+read_double(char* &buf)
+{
+    std::uint64_t val = (*((unsigned char *)buf)) & 0xff;
+    ++buf; val <<= 8; val |= (*((unsigned char *)buf)) & 0xff;
+    ++buf; val <<= 8; val |= (*((unsigned char *)buf)) & 0xff;
+    ++buf; val <<= 8; val |= (*((unsigned char *)buf)) & 0xff;
+    ++buf; val <<= 8; val |= (*((unsigned char *)buf)) & 0xff;
+    ++buf; val <<= 8; val |= (*((unsigned char *)buf)) & 0xff;
+    ++buf; val <<= 8; val |= (*((unsigned char *)buf)) & 0xff;
+    ++buf; val <<= 8; val |= (*((unsigned char *)buf)) & 0xff;
+    ++buf;
+    return *reinterpret_cast<double*>(&val);
+}
+
 WireDecoder::WireDecoder(raw_istream& is, unsigned int proto_rev)
     : m_is(is)
 {
@@ -29,6 +44,15 @@ WireDecoder::WireDecoder(raw_istream& is, unsigned int proto_rev)
 WireDecoder::~WireDecoder()
 {
     std::free(m_buf);
+}
+
+bool
+WireDecoder::ReadDouble(double *val)
+{
+    char *buf;
+    if (!Read(&buf, 8)) return false;
+    *val = read_double(buf);
+    return true;
 }
 
 void
@@ -124,7 +148,7 @@ WireDecoder::ReadValue(NT_Type type, NT_Value *value)
         value->data.arr_double.arr =
                 (double *)std::malloc(size * sizeof(double));
         for (unsigned int i=0; i<size; ++i)
-            value->data.arr_double.arr[i] = NtImpl::ReadDouble(buf);
+            value->data.arr_double.arr[i] = read_double(buf);
         break;
     }
     case NT_STRING_ARRAY:

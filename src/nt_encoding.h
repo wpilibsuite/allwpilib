@@ -62,8 +62,6 @@ Read32(char* &buf)
     return val;
 }
 
-double ReadDouble(char* &buf);
-
 } // namespace NtImpl
 
 #endif /* NT_UTIL_H */
