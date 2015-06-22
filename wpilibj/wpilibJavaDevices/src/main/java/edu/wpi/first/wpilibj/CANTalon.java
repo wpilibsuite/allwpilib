@@ -16,8 +16,11 @@ import edu.wpi.first.wpilibj.hal.SWIGTYPE_p_double;
 import edu.wpi.first.wpilibj.hal.SWIGTYPE_p_int;
 import edu.wpi.first.wpilibj.hal.SWIGTYPE_p_uint32_t;
 import edu.wpi.first.wpilibj.hal.SWIGTYPE_p_CTR_Code;
+import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.wpilibj.tables.ITableListener;
 
-public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
+public class CANTalon implements MotorSafety, PIDOutput, SpeedController, LiveWindowSendable {
 	private MotorSafetyHelper m_safetyHelper;
 	public enum ControlMode {
 		PercentVbus(0), Follower(5), Voltage(4), Position(1), Speed(2), Current(3), Disabled(15);
@@ -451,14 +454,14 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
    * Also fills the modeSelecet in the control frame to disabled.
    * @param controlMode Control mode to ultimately enter once user calls set().
    * @see #set
-   */  
+   */
   private void applyControlMode(ControlMode controlMode) {
     m_controlMode = controlMode;
     if (controlMode == ControlMode.Disabled)
       m_controlEnabled = false;
     // Disable until set() is called.
     m_impl.SetModeSelect(ControlMode.Disabled.value);
-	
+
 	UsageReporting.report(tResourceType.kResourceType_CANTalonSRX, m_deviceNumber + 1, controlMode.value);
   }
   public void changeControlMode(ControlMode controlMode) {
@@ -995,6 +998,69 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
 
 	@Override
 	public String getDescription() {
-		return "CANJaguar ID "+m_deviceNumber;
+		return "CANTalon ID "+m_deviceNumber;
 	}
+
+	/*
+	* Live Window code, only does anything if live window is activated.
+	*/
+	@Override
+	public String getSmartDashboardType() {
+		return "Speed Controller";
+	}
+	private ITable m_table = null;
+	private ITableListener m_table_listener = null;
+
+	/**
+	* {@inheritDoc}
+	*/
+	@Override
+	public void initTable(ITable subtable) {
+		m_table = subtable;
+		updateTable();
+	}
+
+	/**
+	* {@inheritDoc}
+	*/
+	@Override
+	public void updateTable() {
+		if (m_table != null) {
+			m_table.putNumber("Value", get());
+		}
+	}
+
+	/**
+	* {@inheritDoc}
+	*/
+	@Override
+	public ITable getTable() {
+		return m_table;
+	}
+
+	/**
+	* {@inheritDoc}
+	*/
+	@Override
+	public void startLiveWindowMode() {
+		set(0); // Stop for safety
+		m_table_listener = new ITableListener() {
+			@Override
+			public void valueChanged(ITable itable, String key, Object value, boolean bln) {
+				set(((Double) value).doubleValue());
+			}
+		};
+		m_table.addTableListener("Value", m_table_listener, true);
+	}
+
+	/**
+	* {@inheritDoc}
+	*/
+	@Override
+	public void stopLiveWindowMode() {
+		set(0); // Stop for safety
+		// TODO: Broken, should only remove the listener from "Value" only.
+		m_table.removeTableListener(m_table_listener);
+	}
+
 }

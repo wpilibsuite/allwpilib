@@ -1262,3 +1262,48 @@ void CANTalon::StopMotor()
 {
   Disable();
 }
+
+void CANTalon::ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew)
+{
+	Set(value.f);
+}
+
+void CANTalon::UpdateTable()
+{
+	if (m_table != NULL)
+	{
+		m_table->PutNumber("Value", Get());
+	}
+}
+
+void CANTalon::StartLiveWindowMode()
+{
+	if (m_table != NULL)
+	{
+		m_table->AddTableListener("Value", this, true);
+	}
+}
+
+void CANTalon::StopLiveWindowMode()
+{
+	if (m_table != NULL)
+	{
+		m_table->RemoveTableListener(this);
+	}
+}
+
+std::string CANTalon::GetSmartDashboardType()
+{
+	return "Speed Controller";
+}
+
+void CANTalon::InitTable(ITable *subTable)
+{
+	m_table = subTable;
+	UpdateTable();
+}
+
+ITable * CANTalon::GetTable()
+{
+	return m_table;
+}

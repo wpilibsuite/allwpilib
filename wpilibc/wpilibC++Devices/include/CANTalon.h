@@ -9,6 +9,8 @@
 #include "CANSpeedController.h"
 #include "PIDOutput.h"
 #include "MotorSafetyHelper.h"
+#include "LiveWindow/LiveWindowSendable.h"
+#include "tables/ITable.h"
 
 class CanTalonSRX;
 
@@ -17,7 +19,9 @@ class CanTalonSRX;
  */
 class CANTalon : public MotorSafety,
                  public CANSpeedController,
-                 public ErrorBase
+                 public ErrorBase,
+                 public LiveWindowSendable,
+                 public ITableListener
 {
 public:
   enum FeedbackDevice {
@@ -138,6 +142,15 @@ public:
 
   bool IsControlEnabled();
   double GetSetpoint();
+
+  // LiveWindow stuff.
+	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
+	void UpdateTable();
+	void StartLiveWindowMode();
+	void StopLiveWindowMode();
+	std::string GetSmartDashboardType();
+	void InitTable(ITable *subTable);
+	ITable * GetTable();
 private:
   // Values for various modes as is sent in the CAN packets for the Talon.
   enum TalonControlMode {
@@ -168,4 +181,7 @@ private:
    * @see Set()
    */
   void ApplyControlMode(CANSpeedController::ControlMode mode);
+
+  // LiveWindow stuff.
+	ITable *m_table;
 };
