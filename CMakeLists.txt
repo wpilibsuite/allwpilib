@@ -5,7 +5,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -Wformat=2 -Wall -Wextra -Wer
 
 file(GLOB_RECURSE SRC_TARGET_FILES src/*.cpp)
 #file(GLOB_RECURSE SRC_SHARE_FILES lib/share/*.cpp)
-include_directories(include)
+include_directories(include src)
 add_library(ntcore STATIC ${SRC_SHARE_FILES} ${SRC_TARGET_FILES})
 target_link_libraries(ntcore)
 INSTALL(TARGETS ntcore ARCHIVE DESTINATION lib COMPONENT lib)

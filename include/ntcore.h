@@ -78,18 +78,6 @@ struct NT_Value {
     } data;
 };
 
-/** A NetworkTables Entry */
-struct NT_Entry {
-    /** Entry name */
-    struct NT_String name;
-
-    /** Entry value */
-    struct NT_Value value;
-
-    /** Entry flags */
-    unsigned int flags;
-};
-
 /** NetworkTables Entry Information */
 struct NT_EntryInfo {
     /** Entry name */
