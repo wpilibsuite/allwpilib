@@ -14,6 +14,12 @@
 
 namespace NtImpl {
 
+inline llvm::StringRef
+make_StringRef(const NT_String& str)
+{
+    return llvm::StringRef(str.str, str.len);
+}
+
 class StorageEntry
 {
 public:
@@ -44,7 +50,8 @@ public:
         return *m_instance;
     }
 
-    llvm::StringMap<StorageEntry> entries;
+    typedef llvm::StringMap<StorageEntry> EntriesMap;
+    EntriesMap entries;
 
 private:
     Storage();

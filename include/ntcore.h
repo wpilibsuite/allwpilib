@@ -279,8 +279,9 @@ struct NT_ConnectionInfo *NT_GetConnections(size_t *count);
 /*
  * Persistent Functions
  */
-void NT_SavePersistent(const char *filename);
-void NT_LoadPersistent(const char *filename);
+/* return error string, or NULL if successful */
+const char *NT_SavePersistent(const char *filename);
+const char *NT_LoadPersistent(const char *filename);
 
 /*
  * Utility Functions
