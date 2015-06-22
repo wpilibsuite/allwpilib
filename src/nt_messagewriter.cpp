@@ -18,14 +18,12 @@ MessageWriter::~MessageWriter()
 void
 MessageWriter::WriteKeepAlive()
 {
-    Reserve(1);
     Write8(NT_MSG_KEEP_ALIVE);
 }
 
 void
 MessageWriter::WriteClientHello(const NT_String &self_id)
 {
-    Reserve(3);
     Write8(NT_MSG_CLIENT_HELLO);
     Write16(m_proto_rev);
     if (m_proto_rev < 0x0300u)
@@ -36,7 +34,6 @@ MessageWriter::WriteClientHello(const NT_String &self_id)
 void
 MessageWriter::WriteProtoUnsup()
 {
-    Reserve(3);
     Write8(NT_MSG_PROTO_UNSUP);
     Write16(m_proto_rev);
 }
@@ -44,7 +41,6 @@ MessageWriter::WriteProtoUnsup()
 void
 MessageWriter::WriteServerHelloDone()
 {
-    Reserve(1);
     Write8(NT_MSG_SERVER_HELLO_DONE);
 }
 
@@ -53,7 +49,6 @@ MessageWriter::WriteServerHello(unsigned int flags, const NT_String &self_id)
 {
     if (m_proto_rev < 0x0300u)
         return; // new message in version 3.0
-    Reserve(2);
     Write8(NT_MSG_SERVER_HELLO);
     Write8(flags);
     WriteString(self_id);
@@ -64,7 +59,6 @@ MessageWriter::WriteClientHelloDone()
 {
     if (m_proto_rev < 0x0300u)
         return; // new message in version 3.0
-    Reserve(1);
     Write8(NT_MSG_CLIENT_HELLO_DONE);
 }
 
@@ -75,10 +69,8 @@ MessageWriter::WriteEntryAssign(const NT_String &name,
                                 const NT_Value &value,
                                 unsigned int flags)
 {
-    Reserve(1);
     Write8(NT_MSG_ENTRY_ASSIGN);
     WriteString(name);
-    Reserve(6);
     WriteType(value.type);
     Write16(id);
     Write16(seq_num);
@@ -92,7 +84,6 @@ MessageWriter::WriteEntryUpdate(unsigned int id,
                                 unsigned int seq_num,
                                 const NT_Value &value)
 {
-    Reserve(6);
     Write8(NT_MSG_ENTRY_UPDATE);
     Write16(id);
     Write16(seq_num);
@@ -106,7 +97,6 @@ MessageWriter::WriteFlagsUpdate(unsigned int id, unsigned int flags)
 {
     if (m_proto_rev < 0x0300u)
         return; // new message in version 3.0
-    Reserve(4);
     Write8(NT_MSG_FLAGS_UPDATE);
     Write16(id);
     Write8(flags);
@@ -117,7 +107,6 @@ MessageWriter::WriteEntryDelete(unsigned int id)
 {
     if (m_proto_rev < 0x0300u)
         return; // new message in version 3.0
-    Reserve(3);
     Write8(NT_MSG_ENTRY_DELETE);
     Write16(id);
 }
@@ -128,7 +117,6 @@ MessageWriter::WriteClearEntries()
     if (m_proto_rev < 0x0300u)
         return; // new message in version 3.0
 
-    Reserve(5);
     Write8(NT_MSG_CLEAR_ENTRIES);
     Write32(NT_CLEAR_ALL_MAGIC);
 }
@@ -161,7 +149,6 @@ MessageWriter::WriteRpc(unsigned int msg_type,
     if (m_proto_rev < 0x0300u)
         return; // new message in version 3.0
 
-    Reserve(5);
     Write8(msg_type);
     Write16(id);
     Write16(uid);
