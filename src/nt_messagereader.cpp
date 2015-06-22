@@ -194,6 +194,19 @@ MessageReader::Run()
         if (!Read(size)) return false;
     }
     case NT_MSG_RPC_RESPONSE:
+    {
+        if (m_proto_rev < 0x0300u)
+        {
+            m_error = "received RPC_RESPONSE in protocol < 3.0";
+            return false;
+        }
+        unsigned int id, uid;
+        if (!Read16(&id)) return false;
+        if (!Read16(&uid)) return false;
+        unsigned long size;
+        if (!ReadULEB128(&size)) return false;
+        if (!Read(size)) return false;
+    }
     default:
         m_error = "unrecognized message type";
         return false;
