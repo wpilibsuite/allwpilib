@@ -13,7 +13,6 @@
 #include "ntcore.h"
 #include "nt_leb128.h"
 #include "nt_raw_istream.h"
-#include "nt_encoding.h"
 
 namespace NtImpl {
 
@@ -50,7 +49,7 @@ public:
     {
         char *buf;
         if (!Read(&buf, 1)) return false;
-        *val = NtImpl::Read8(buf);
+        *val = (*((unsigned char *)buf)) & 0xff;
         return true;
     }
 
@@ -58,7 +57,9 @@ public:
     {
         char *buf;
         if (!Read(&buf, 2)) return false;
-        *val = NtImpl::Read16(buf);
+        unsigned int v = (*((unsigned char *)buf)) & 0xff;
+        ++buf; v <<= 8; v |= (*((unsigned char *)buf)) & 0xff;
+        *val = v;
         return true;
     }
 
@@ -66,7 +67,11 @@ public:
     {
         char *buf;
         if (!Read(&buf, 4)) return false;
-        *val = NtImpl::Read32(buf);
+        unsigned int v = (*((unsigned char *)buf)) & 0xff;
+        ++buf; v <<= 8; v |= (*((unsigned char *)buf)) & 0xff;
+        ++buf; v <<= 8; v |= (*((unsigned char *)buf)) & 0xff;
+        ++buf; v <<= 8; v |= (*((unsigned char *)buf)) & 0xff;
+        *val = v;
         return true;
     }
 

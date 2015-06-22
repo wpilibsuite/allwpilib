@@ -34,34 +34,6 @@ Write32(char* &buf, unsigned long val)
 
 void WriteDouble(char* &buf, double val);
 
-inline unsigned int
-Read8(char* &buf)
-{
-    unsigned int val = (*((unsigned char *)buf)) & 0xff;
-    ++buf;
-    return val;
-}
-
-inline unsigned int
-Read16(char* &buf)
-{
-    unsigned int val = (*((unsigned char *)buf)) & 0xff;
-    ++buf; val <<= 8; val |= (*((unsigned char *)buf)) & 0xff;
-    ++buf;
-    return val;
-}
-
-inline unsigned long
-Read32(char* &buf)
-{
-    unsigned int val = (*((unsigned char *)buf)) & 0xff;
-    ++buf; val <<= 8; val |= (*((unsigned char *)buf)) & 0xff;
-    ++buf; val <<= 8; val |= (*((unsigned char *)buf)) & 0xff;
-    ++buf; val <<= 8; val |= (*((unsigned char *)buf)) & 0xff;
-    ++buf;
-    return val;
-}
-
 } // namespace NtImpl
 
 #endif /* NT_UTIL_H */
