@@ -312,20 +312,6 @@ void NT_InitString(struct NT_String *str);
 
 void NT_DisposeConnectionInfoArray(struct NT_ConnectionInfo *arr, size_t count);
 
-/*
- * Message Encoding Functions
- */
-size_t NT_WriteType(char *buf, enum NT_Type type, unsigned int proto_rev);
-size_t NT_ReadType(const char *buf, enum NT_Type *type, unsigned int proto_rev);
-
-size_t NT_GetStringSize(const struct NT_String *value, unsigned int proto_rev);
-size_t NT_WriteString(char *buf, const struct NT_String *str,
-        unsigned int proto_rev);
-
-size_t NT_GetValueSize(const struct NT_Value *value, unsigned int proto_rev);
-size_t NT_WriteValue(char *buf, const struct NT_Value *value,
-        unsigned int proto_rev);
-
 #ifdef __cplusplus
 }
 #endif
