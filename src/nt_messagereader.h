@@ -8,12 +8,7 @@
 #ifndef NT_MESSAGEREADER_H_
 #define NT_MESSAGEREADER_H_
 
-#include <cstddef>
-
-#include "ntcore.h"
-#include "nt_leb128.h"
-#include "nt_raw_istream.h"
-#include "nt_encoding.h"
+#include "nt_wiredecoder.h"
 
 namespace NtImpl {
 
@@ -22,9 +17,8 @@ class MessageHandler
     void anchor();
 
 public:
+    // Needed for protocol rev 2.0 ENTRY_UPDATE messages.
     virtual NT_Type GetEntryType(unsigned int id) = 0;
-    virtual size_t GetRpcParamTypes(NT_Type *types, unsigned int id) = 0;
-    virtual size_t GetRpcResultTypes(NT_Type *types, unsigned int id) = 0;
 
     // All of these functions are expected to take ownership of passed
     // strings/values.
@@ -50,19 +44,17 @@ public:
     virtual void GotClearEntries() = 0;
     virtual void GotExecuteRpc(unsigned int id,
                                unsigned int uid,
-                               NT_Value *params_start,
-                               NT_Value *params_end) = 0;
+                               const char *params) = 0;
     virtual void GotRpcResponse(unsigned int id,
                                 unsigned int uid,
-                                NT_Value *results_start,
-                                NT_Value *results_end) = 0;
+                                const char *results) = 0;
 
 private:
     MessageHandler(const MessageHandler&);
     MessageHandler& operator= (const MessageHandler&);
 };
 
-class MessageReader
+class MessageReader : private WireDecoder
 {
 public:
     explicit MessageReader(MessageHandler &handler,
@@ -72,76 +64,26 @@ public:
 
     void SetProtocolRev(unsigned int proto_rev)
     {
-        m_proto_rev = proto_rev;
+        WireDecoder::SetProtocolRev(proto_rev);
     }
 
     bool Run();
 
     void Reset()
     {
-        m_error = 0;
+        WireDecoder::Reset();
     }
 
     const char *GetError() const
     {
-        return m_error;
+        return WireDecoder::GetError();
     }
-
-protected:
-    bool Read(std::size_t len)
-    {
-        if (len > m_allocated)
-            Realloc(len);
-        return m_is.read(m_buf, len);
-    }
-
-    bool Read8(unsigned int *val)
-    {
-        if (!Read(1)) return false;
-        char *buf = m_buf;
-        *val = NtImpl::Read8(buf);
-        return true;
-    }
-
-    bool Read16(unsigned int *val)
-    {
-        if (!Read(2)) return false;
-        char *buf = m_buf;
-        *val = NtImpl::Read16(buf);
-        return true;
-    }
-
-    bool Read32(unsigned long *val)
-    {
-        if (!Read(4)) return false;
-        char *buf = m_buf;
-        *val = NtImpl::Read32(buf);
-        return true;
-    }
-
-    bool ReadULEB128(unsigned long *val)
-    {
-        return read_uleb128(m_is, val);
-    }
-
-    bool ReadType(NT_Type *type);
-    bool ReadValue(NT_Type type, NT_Value *value);
-    bool ReadString(NT_String *str);
 
 private:
     MessageReader(const MessageReader&);
     MessageReader& operator= (const MessageReader&);
 
-    void Realloc(std::size_t len);
-
     MessageHandler &m_handler;
-    raw_istream &m_is;
-
-    char *m_buf;
-    std::size_t m_allocated;
-
-    unsigned int m_proto_rev;
-    const char *m_error;
     NT_Type m_rpc_types[256];
 };
 
