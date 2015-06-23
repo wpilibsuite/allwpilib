@@ -9,7 +9,7 @@
 
 using namespace NtImpl;
 
-Storage* Storage::m_instance = 0;
+Storage* Storage::m_instance = nullptr;
 
 Storage::Storage()
 {

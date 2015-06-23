@@ -29,7 +29,7 @@ public:
 
     void Reset()
     {
-        m_error = 0;
+        m_error = nullptr;
     }
 
     const char* GetError() const

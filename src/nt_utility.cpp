@@ -55,14 +55,14 @@ void
 NT_DisposeString(NT_String *str)
 {
     std::free(str->str);
-    str->str = 0;
+    str->str = nullptr;
     str->len = 0;
 }
 
 void
 NT_InitString(NT_String *str)
 {
-    str->str = 0;
+    str->str = nullptr;
     str->len = 0;
 }
 

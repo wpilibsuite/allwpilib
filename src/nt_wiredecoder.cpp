@@ -38,7 +38,7 @@ WireDecoder::WireDecoder(raw_istream& is, unsigned int proto_rev)
     m_allocated = 1024;
     m_buf = (char*)std::malloc(m_allocated);
     m_proto_rev = proto_rev;
-    m_error = 0;
+    m_error = nullptr;
 }
 
 WireDecoder::~WireDecoder()
@@ -49,7 +49,7 @@ WireDecoder::~WireDecoder()
 bool
 WireDecoder::ReadDouble(double* val)
 {
-    char *buf;
+    char* buf;
     if (!Read(&buf, 8)) return false;
     *val = read_double(buf);
     return true;

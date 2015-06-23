@@ -22,7 +22,7 @@ WireEncoder::WireEncoder(unsigned int proto_rev)
     m_start = m_cur = (char *)std::malloc(1024);
     m_end = m_start + 1024;
     m_proto_rev = proto_rev;
-    m_error = 0;
+    m_error = nullptr;
 }
 
 WireEncoder::~WireEncoder()
