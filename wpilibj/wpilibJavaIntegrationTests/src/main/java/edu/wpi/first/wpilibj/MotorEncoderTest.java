@@ -107,7 +107,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
 		assertTrue(me.getType() + " Encoder not incremented: start: "
 				+ startValue + "; current: " + currentValue,
 				startValue < currentValue);
-		
+
 	}
 
 	/**
@@ -172,7 +172,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
 	public void testPIDController() {
 		PIDController pid = new PIDController(0.003, 0.001, 0, me.getEncoder(),
 				me.getMotor());
-		pid.setAbsoluteTolerance(15);
+		pid.setAbsoluteTolerance(50);
 		pid.setOutputRange(-0.2, 0.2);
 		pid.setSetpoint(2500);
 

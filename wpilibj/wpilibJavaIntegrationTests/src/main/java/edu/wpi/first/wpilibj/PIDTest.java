@@ -43,21 +43,21 @@ import edu.wpi.first.wpilibj.test.TestBench;
 public class PIDTest extends AbstractComsSetup {
 	private static final Logger logger = Logger.getLogger(PIDTest.class.getName());
 	private NetworkTable table;
-	
-	private static final double absoluteTollerance = 20;
-	private static final double outputRange = 0.3;	
-	
+
+	private static final double absoluteTolerance = 50;
+	private static final double outputRange = 0.3;
+
 	private PIDController controller = null;
 	private static MotorEncoderFixture me = null;
-	
+
 	private final Double k_p, k_i, k_d;
-	
+
 	@Override
 	protected Logger getClassLogger(){
 		return logger;
 	}
 
-	
+
 	public PIDTest(Double p, Double i, Double d, MotorEncoderFixture mef){
 		logger.fine("Constructor with: " + mef.getType());
 		if(PIDTest.me != null && !PIDTest.me.equals(mef)) PIDTest.me.teardown();
@@ -66,8 +66,8 @@ public class PIDTest extends AbstractComsSetup {
 		this.k_i = i;
 		this.k_d = d;
 	}
-	
-	
+
+
 	@Parameters
 	public static Collection<Object[]> generateData(){
 		//logger.fine("Loading the MotorList");
@@ -124,17 +124,17 @@ public class PIDTest extends AbstractComsSetup {
 		controller = null;
 		me.reset();
 	}
-	
-	private void setupAbsoluteTollerance(){
-		controller.setAbsoluteTolerance(absoluteTollerance);
+
+	private void setupAbsoluteTolerance(){
+		controller.setAbsoluteTolerance(absoluteTolerance);
 	}
 	private void setupOutputRange(){
 		controller.setOutputRange(-outputRange, outputRange);
 	}
-	
+
 	@Test
 	public void testInitialSettings(){
-		setupAbsoluteTollerance();
+		setupAbsoluteTolerance();
 		setupOutputRange();
 		double setpoint = 2500.0;
 		controller.setSetpoint(setpoint);
@@ -146,10 +146,10 @@ public class PIDTest extends AbstractComsSetup {
 		assertEquals(setpoint, table.getNumber("setpoint"), 0);
 		assertFalse(table.getBoolean("enabled"));
 	}
-	
+
 	@Test
 	public void testRestartAfterEnable(){
-		setupAbsoluteTollerance();
+		setupAbsoluteTolerance();
 		setupOutputRange();
 		double setpoint = 2500.0;
 		controller.setSetpoint(setpoint);
@@ -163,10 +163,10 @@ public class PIDTest extends AbstractComsSetup {
 		assertFalse(controller.isEnable());
 		assertEquals(0, me.getMotor().get(), 0);
 	}
-	
+
 	@Test
 	public void testSetSetpoint(){
-		setupAbsoluteTollerance();
+		setupAbsoluteTolerance();
 		setupOutputRange();
 		Double setpoint = 2500.0;
 		controller.disable();
@@ -175,27 +175,27 @@ public class PIDTest extends AbstractComsSetup {
 		assertEquals("Did not correctly set set-point",setpoint, new Double(controller.getSetpoint()));
 	}
 
-	@Test (timeout = 15000)
+	@Test (timeout = 10000)
 	public void testRotateToTarget() {
-		setupAbsoluteTollerance();
+		setupAbsoluteTolerance();
 		setupOutputRange();
 		double setpoint = 2500.0;
 		assertEquals(pidData() + "did not start at 0", 0, controller.get(), 0);
 		controller.setSetpoint(setpoint);
 		assertEquals(pidData() +"did not have an error of " + setpoint, setpoint, controller.getError(), 0);
 		controller.enable();
-		Timer.delay(10);
+		Timer.delay(5);
 		controller.disable();
 		assertTrue(pidData() + "Was not on Target. Controller Error: " + controller.getError(), controller.onTarget());
 	}
-	
+
 	private String pidData(){
 		return me.getType() + " PID {P:" +controller.getP() + " I:" + controller.getI() + " D:" + controller.getD() +"} ";
 	}
-	
-	
+
+
 	@Test(expected = RuntimeException.class)
-	public void testOnTargetNoTolleranceSet(){
+	public void testOnTargetNoToleranceSet(){
 		setupOutputRange();
 		controller.onTarget();
 	}
