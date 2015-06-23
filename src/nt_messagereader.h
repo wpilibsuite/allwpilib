@@ -25,30 +25,30 @@ public:
     virtual ~MessageHandler() {}
     virtual void GotKeepAlive() = 0;
     virtual void GotClientHello(unsigned int proto_rev,
-                                NT_String &self_id) = 0;
+                                NT_String& self_id) = 0;
     virtual void GotProtoUnsup(unsigned int proto_rev) = 0;
     virtual void GotServerHelloDone() = 0;
     virtual void GotServerHello(unsigned int flags,
-                                NT_String &self_id) = 0;
+                                NT_String& self_id) = 0;
     virtual void GotClientHelloDone() = 0;
-    virtual void GotEntryAssign(NT_String &name,
+    virtual void GotEntryAssign(NT_String& name,
                                 unsigned int id,
                                 unsigned int seq_num,
-                                NT_Value &value,
+                                NT_Value& value,
                                 unsigned int flags) = 0;
     virtual void GotEntryUpdate(unsigned int id,
                                 unsigned int seq_num,
-                                NT_Value &value) = 0;
+                                NT_Value& value) = 0;
     virtual void GotFlagsUpdate(unsigned int id, unsigned int flags) = 0;
     virtual void GotEntryDelete(unsigned int id) = 0;
     virtual void GotClearEntries() = 0;
     virtual void GotExecuteRpc(unsigned int id,
                                unsigned int uid,
-                               const char *params,
+                               const char* params,
                                std::size_t params_len) = 0;
     virtual void GotRpcResponse(unsigned int id,
                                 unsigned int uid,
-                                const char *results,
+                                const char* results,
                                 std::size_t results_len) = 0;
 
 private:
@@ -76,7 +76,7 @@ public:
         WireDecoder::Reset();
     }
 
-    const char *GetError() const
+    const char* GetError() const
     {
         return WireDecoder::GetError();
     }
@@ -85,8 +85,7 @@ private:
     MessageReader(const MessageReader&);
     MessageReader& operator= (const MessageReader&);
 
-    MessageHandler &m_handler;
-    NT_Type m_rpc_types[256];
+    MessageHandler& m_handler;
 };
 
 } // namespace NtImpl

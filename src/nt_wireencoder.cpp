@@ -103,7 +103,7 @@ WireEncoder::WriteType(NT_Type type)
 }
 
 std::size_t
-WireEncoder::GetValueSize(const NT_Value &value)
+WireEncoder::GetValueSize(const NT_Value& value)
 {
     switch (value.type)
     {
@@ -135,7 +135,7 @@ WireEncoder::GetValueSize(const NT_Value &value)
 }
 
 void
-WireEncoder::WriteValue(const NT_Value &value)
+WireEncoder::WriteValue(const NT_Value& value)
 {
     switch (value.type)
     {
@@ -199,7 +199,7 @@ WireEncoder::WriteValue(const NT_Value &value)
 }
 
 std::size_t
-WireEncoder::GetStringSize(const NT_String &str)
+WireEncoder::GetStringSize(const NT_String& str)
 {
     if (m_proto_rev < 0x0300u)
         return 2 + str.len;
@@ -207,7 +207,7 @@ WireEncoder::GetStringSize(const NT_String &str)
 }
 
 void
-WireEncoder::WriteString(const NT_String &str)
+WireEncoder::WriteString(const NT_String& str)
 {
     // length
     std::size_t len = str.len;

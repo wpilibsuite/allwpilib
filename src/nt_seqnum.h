@@ -30,41 +30,41 @@ public:
         return tmp;
     }
 
-    friend bool operator< (const SequenceNumber &lhs,
-                           const SequenceNumber &rhs);
-    friend bool operator> (const SequenceNumber &lhs,
-                           const SequenceNumber &rhs);
-    friend bool operator<= (const SequenceNumber &lhs,
-                            const SequenceNumber &rhs);
-    friend bool operator>= (const SequenceNumber &lhs,
-                            const SequenceNumber &rhs);
-    friend bool operator== (const SequenceNumber &lhs,
-                            const SequenceNumber &rhs);
-    friend bool operator!= (const SequenceNumber &lhs,
-                            const SequenceNumber &rhs);
+    friend bool operator< (const SequenceNumber& lhs,
+                           const SequenceNumber& rhs);
+    friend bool operator> (const SequenceNumber& lhs,
+                           const SequenceNumber& rhs);
+    friend bool operator<= (const SequenceNumber& lhs,
+                            const SequenceNumber& rhs);
+    friend bool operator>= (const SequenceNumber& lhs,
+                            const SequenceNumber& rhs);
+    friend bool operator== (const SequenceNumber& lhs,
+                            const SequenceNumber& rhs);
+    friend bool operator!= (const SequenceNumber& lhs,
+                            const SequenceNumber& rhs);
 private:
     unsigned int m_val;
 };
 
-bool operator< (const SequenceNumber &lhs, const SequenceNumber &rhs);
-bool operator> (const SequenceNumber &lhs, const SequenceNumber &rhs);
+bool operator< (const SequenceNumber& lhs, const SequenceNumber& rhs);
+bool operator> (const SequenceNumber& lhs, const SequenceNumber& rhs);
 
-inline bool operator<= (const SequenceNumber &lhs, const SequenceNumber &rhs)
+inline bool operator<= (const SequenceNumber& lhs, const SequenceNumber& rhs)
 {
     return lhs == rhs || lhs < rhs;
 }
 
-inline bool operator>= (const SequenceNumber &lhs, const SequenceNumber &rhs)
+inline bool operator>= (const SequenceNumber& lhs, const SequenceNumber& rhs)
 {
     return lhs == rhs || lhs > rhs;
 }
 
-inline bool operator== (const SequenceNumber &lhs, const SequenceNumber &rhs)
+inline bool operator== (const SequenceNumber& lhs, const SequenceNumber& rhs)
 {
     return lhs.m_val == rhs.m_val;
 }
 
-inline bool operator!= (const SequenceNumber &lhs, const SequenceNumber &rhs)
+inline bool operator!= (const SequenceNumber& lhs, const SequenceNumber& rhs)
 {
     return lhs.m_val != rhs.m_val;
 }

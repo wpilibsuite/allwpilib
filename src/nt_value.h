@@ -14,6 +14,6 @@ namespace NtImpl {
 
 } // namespace NtImpl
 
-bool operator== (const NT_Value &lhs, const NT_Value &rhs);
+bool operator== (const NT_Value& lhs, const NT_Value& rhs);
 
 #endif /* NT_VALUE_H_ */

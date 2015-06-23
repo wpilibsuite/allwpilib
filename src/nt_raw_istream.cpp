@@ -17,7 +17,7 @@ raw_istream::anchor()
 }
 
 bool
-raw_mem_istream::read(void *data, std::size_t len)
+raw_mem_istream::read(void* data, std::size_t len)
 {
     if (len > m_left)
         return false;

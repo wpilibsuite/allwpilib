@@ -32,12 +32,12 @@ public:
         m_error = 0;
     }
 
-    const char *GetError() const
+    const char* GetError() const
     {
         return m_error;
     }
 
-    const char *GetData() const
+    const char* GetData() const
     {
         return m_start;
     }
@@ -80,15 +80,15 @@ public:
 
     void WriteULEB128(unsigned long val);
     void WriteType(NT_Type type);
-    void WriteValue(const NT_Value &value);
-    void WriteString(const NT_String &str);
+    void WriteValue(const NT_Value& value);
+    void WriteString(const NT_String& str);
 
-    std::size_t GetValueSize(const NT_Value &value);
-    std::size_t GetStringSize(const NT_String &str);
+    std::size_t GetValueSize(const NT_Value& value);
+    std::size_t GetStringSize(const NT_String& str);
 
 protected:
     unsigned int m_proto_rev;
-    const char *m_error;
+    const char* m_error;
 
 private:
     WireEncoder(const WireEncoder&);
@@ -96,9 +96,9 @@ private:
 
     void ReserveSlow(std::size_t len);
 
-    char *m_start;
-    char *m_cur;
-    char *m_end;
+    char* m_start;
+    char* m_cur;
+    char* m_end;
 };
 
 } // namespace NtImpl

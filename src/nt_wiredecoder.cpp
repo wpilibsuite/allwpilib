@@ -18,7 +18,7 @@
 using namespace NtImpl;
 
 static double
-read_double(char* &buf)
+read_double(char*& buf)
 {
     std::uint64_t val = (*((unsigned char *)buf)) & 0xff;
     ++buf; val <<= 8; val |= (*((unsigned char *)buf)) & 0xff;
@@ -36,7 +36,7 @@ WireDecoder::WireDecoder(raw_istream& is, unsigned int proto_rev)
     : m_is(is)
 {
     m_allocated = 1024;
-    m_buf = (char *)std::malloc(m_allocated);
+    m_buf = (char*)std::malloc(m_allocated);
     m_proto_rev = proto_rev;
     m_error = 0;
 }
@@ -47,7 +47,7 @@ WireDecoder::~WireDecoder()
 }
 
 bool
-WireDecoder::ReadDouble(double *val)
+WireDecoder::ReadDouble(double* val)
 {
     char *buf;
     if (!Read(&buf, 8)) return false;
@@ -68,7 +68,7 @@ WireDecoder::Realloc(std::size_t len)
 }
 
 bool
-WireDecoder::ReadType(NT_Type *type)
+WireDecoder::ReadType(NT_Type* type)
 {
     unsigned int itype;
     if (!Read8(&itype)) return false;
@@ -90,7 +90,7 @@ WireDecoder::ReadType(NT_Type *type)
 }
 
 bool
-WireDecoder::ReadValue(NT_Type type, NT_Value *value)
+WireDecoder::ReadValue(NT_Type type, NT_Value* value)
 {
     value->type = type;
     value->last_change = 0;
@@ -128,9 +128,9 @@ WireDecoder::ReadValue(NT_Type type, NT_Value *value)
         value->data.arr_boolean.size = size;
 
         // array values
-        char *buf;
+        char* buf;
         if (!Read(&buf, size)) return false;
-        value->data.arr_boolean.arr = (int *)std::malloc(size * sizeof(int));
+        value->data.arr_boolean.arr = (int*)std::malloc(size * sizeof(int));
         for (unsigned int i=0; i<size; ++i)
             value->data.arr_boolean.arr[i] = buf[i] ? 1 : 0;
         break;
@@ -143,10 +143,10 @@ WireDecoder::ReadValue(NT_Type type, NT_Value *value)
         value->data.arr_double.size = size;
 
         // array values
-        char *buf;
+        char* buf;
         if (!Read(&buf, size*8)) return false;
         value->data.arr_double.arr =
-                (double *)std::malloc(size * sizeof(double));
+                (double*)std::malloc(size * sizeof(double));
         for (unsigned int i=0; i<size; ++i)
             value->data.arr_double.arr[i] = read_double(buf);
         break;
@@ -160,7 +160,7 @@ WireDecoder::ReadValue(NT_Type type, NT_Value *value)
 
         // array values
         value->data.arr_string.arr =
-                (NT_String *)std::malloc(size * sizeof(NT_String));
+                (NT_String*)std::malloc(size * sizeof(NT_String));
         for (unsigned int i=0; i<size; ++i)
         {
             if (!ReadString(&value->data.arr_string.arr[i]))
@@ -184,7 +184,7 @@ WireDecoder::ReadValue(NT_Type type, NT_Value *value)
 }
 
 bool
-WireDecoder::ReadString(NT_String *str)
+WireDecoder::ReadString(NT_String* str)
 {
     if (m_proto_rev < 0x0300u)
     {
@@ -198,7 +198,7 @@ WireDecoder::ReadString(NT_String *str)
         if (!ReadULEB128(&v)) return false;
         str->len = v;
     }
-    str->str = (char *)std::malloc(str->len + 1);
+    str->str = (char*)std::malloc(str->len + 1);
     if (!m_is.read(str->str, str->len))
     {
         std::free(str->str);

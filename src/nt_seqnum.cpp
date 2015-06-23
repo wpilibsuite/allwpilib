@@ -9,7 +9,7 @@
 
 namespace NtImpl {
 
-bool operator< (const SequenceNumber &lhs, const SequenceNumber &rhs)
+bool operator< (const SequenceNumber& lhs, const SequenceNumber& rhs)
 {
     if (lhs.m_val < rhs.m_val)
         return (rhs.m_val - lhs.m_val) < (1u<<15);
@@ -19,7 +19,7 @@ bool operator< (const SequenceNumber &lhs, const SequenceNumber &rhs)
         return false;
 }
 
-bool operator> (const SequenceNumber &lhs, const SequenceNumber &rhs)
+bool operator> (const SequenceNumber& lhs, const SequenceNumber& rhs)
 {
     if (lhs.m_val < rhs.m_val)
         return (rhs.m_val - lhs.m_val) > (1u<<15);

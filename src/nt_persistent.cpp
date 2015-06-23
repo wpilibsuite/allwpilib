@@ -16,7 +16,7 @@
 using namespace NtImpl;
 
 static void
-write_string(FILE *f, llvm::StringRef str)
+write_string(FILE* f, llvm::StringRef str)
 {
     fputc('"', f);
     for (unsigned int i = 0, e = str.size(); i != e; ++i)
@@ -45,26 +45,26 @@ write_string(FILE *f, llvm::StringRef str)
     fputc('"', f);
 }
 
-const char *
-NT_SavePersistent(const char *filename)
+const char*
+NT_SavePersistent(const char* filename)
 {
-    FILE *f = fopen(filename, "wt");
+    FILE* f = fopen(filename, "wt");
     if (!f)
         return "could not open file";
 
     fputs("[NetworkTables Storage 3.0]\n", f);
 
-    Storage &storage = Storage::GetInstance();
+    Storage& storage = Storage::GetInstance();
     for (Storage::EntriesMap::const_iterator i = storage.entries.begin(),
          end = storage.entries.end(); i != end; ++i)
     {
-        const StorageEntry &entry = i->getValue();
+        const StorageEntry& entry = i->getValue();
         // only write persistent-flagged values
         if ((entry.flags & NT_PERSISTENT) == 0)
             continue;
 
         // type
-        const NT_Value &v = entry.value;
+        const NT_Value& v = entry.value;
         switch (v.type)
         {
         case NT_BOOLEAN:        fputs("boolean ", f); break;
@@ -98,7 +98,7 @@ NT_SavePersistent(const char *filename)
             break;
         case NT_RAW:
         {
-            char *buf = new char[base64encode_len(v.data.v_raw.len)];
+            char* buf = new char[base64encode_len(v.data.v_raw.len)];
             base64encode(buf,
                     reinterpret_cast<const unsigned char*>(v.data.v_raw.str),
                     v.data.v_raw.len);
@@ -142,10 +142,10 @@ NT_SavePersistent(const char *filename)
     return 0;
 }
 
-const char *
-NT_LoadPersistent(const char *filename)
+const char*
+NT_LoadPersistent(const char* filename)
 {
-    FILE *f = fopen(filename, "rt");
+    FILE* f = fopen(filename, "rt");
     if (!f)
         return "could not open file";
 

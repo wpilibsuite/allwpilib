@@ -13,7 +13,7 @@
 #include "ntcore.h"
 
 bool
-operator== (const NT_Value &lhs, const NT_Value &rhs)
+operator== (const NT_Value& lhs, const NT_Value& rhs)
 {
     if (lhs.type != rhs.type)
         return 0;

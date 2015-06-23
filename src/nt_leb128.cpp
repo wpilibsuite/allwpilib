@@ -42,7 +42,7 @@ size_uleb128(unsigned long val)
  * the number of bytes written.
  */
 std::size_t
-write_uleb128(char *addr, unsigned long val)
+write_uleb128(char* addr, unsigned long val)
 {
     std::size_t count = 0;
 
@@ -72,7 +72,7 @@ write_uleb128(char *addr, unsigned long val)
  * the number of bytes read.
  */
 std::size_t
-read_uleb128(char *addr, unsigned long *ret)
+read_uleb128(char* addr, unsigned long* ret)
 {
     unsigned long result = 0;
     int shift = 0;
@@ -107,7 +107,7 @@ read_uleb128(char *addr, unsigned long *ret)
  * false on stream error, true on success.
  */
 bool
-read_uleb128(raw_istream &is, unsigned long *ret)
+read_uleb128(raw_istream& is, unsigned long* ret)
 {
     unsigned long result = 0;
     int shift = 0;

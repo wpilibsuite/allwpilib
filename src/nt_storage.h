@@ -43,7 +43,7 @@ private:
 class Storage
 {
 public:
-    static Storage &GetInstance()
+    static Storage& GetInstance()
     {
         if (!m_instance)
             m_instance = new Storage;
@@ -59,7 +59,7 @@ private:
     Storage(const Storage&);
     Storage& operator= (const Storage&);
 
-    static Storage *m_instance;
+    static Storage* m_instance;
 };
 
 } // namespace NtImpl

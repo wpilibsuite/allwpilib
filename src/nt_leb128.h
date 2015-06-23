@@ -15,9 +15,9 @@ namespace NtImpl {
 class raw_istream;
 
 std::size_t size_uleb128(unsigned long val);
-std::size_t write_uleb128(char *addr, unsigned long val);
-std::size_t read_uleb128(char *addr, unsigned long *ret);
-bool read_uleb128(raw_istream &is, unsigned long *ret);
+std::size_t write_uleb128(char* addr, unsigned long val);
+std::size_t read_uleb128(char* addr, unsigned long* ret);
+bool read_uleb128(raw_istream& is, unsigned long* ret);
 
 } // namespace NtImpl
 

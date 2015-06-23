@@ -21,7 +21,7 @@ MessageHandler::anchor()
 {
 }
 
-MessageReader::MessageReader(MessageHandler &handler,
+MessageReader::MessageReader(MessageHandler& handler,
                              raw_istream& is,
                              unsigned int proto_rev)
     : WireDecoder(is, proto_rev)

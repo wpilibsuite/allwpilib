@@ -32,12 +32,12 @@ public:
         m_error = 0;
     }
 
-    const char *GetError() const
+    const char* GetError() const
     {
         return m_error;
     }
 
-    bool Read(char **buf, std::size_t len)
+    bool Read(char** buf, std::size_t len)
     {
         if (len > m_allocated)
             Realloc(len);
@@ -45,17 +45,17 @@ public:
         return m_is.read(m_buf, len);
     }
 
-    bool Read8(unsigned int *val)
+    bool Read8(unsigned int* val)
     {
-        char *buf;
+        char* buf;
         if (!Read(&buf, 1)) return false;
         *val = (*((unsigned char *)buf)) & 0xff;
         return true;
     }
 
-    bool Read16(unsigned int *val)
+    bool Read16(unsigned int* val)
     {
-        char *buf;
+        char* buf;
         if (!Read(&buf, 2)) return false;
         unsigned int v = (*((unsigned char *)buf)) & 0xff;
         ++buf; v <<= 8; v |= (*((unsigned char *)buf)) & 0xff;
@@ -65,7 +65,7 @@ public:
 
     bool Read32(unsigned long *val)
     {
-        char *buf;
+        char* buf;
         if (!Read(&buf, 4)) return false;
         unsigned int v = (*((unsigned char *)buf)) & 0xff;
         ++buf; v <<= 8; v |= (*((unsigned char *)buf)) & 0xff;
@@ -75,20 +75,20 @@ public:
         return true;
     }
 
-    bool ReadDouble(double *val);
+    bool ReadDouble(double* val);
 
-    bool ReadULEB128(unsigned long *val)
+    bool ReadULEB128(unsigned long* val)
     {
         return read_uleb128(m_is, val);
     }
 
-    bool ReadType(NT_Type *type);
-    bool ReadValue(NT_Type type, NT_Value *value);
-    bool ReadString(NT_String *str);
+    bool ReadType(NT_Type* type);
+    bool ReadValue(NT_Type type, NT_Value* value);
+    bool ReadString(NT_String* str);
 
 protected:
     unsigned int m_proto_rev;
-    const char *m_error;
+    const char* m_error;
 
 private:
     WireDecoder(const WireDecoder&);
@@ -96,9 +96,9 @@ private:
 
     void Realloc(std::size_t len);
 
-    raw_istream &m_is;
+    raw_istream& m_is;
 
-    char *m_buf;
+    char* m_buf;
     std::size_t m_allocated;
 };
 
