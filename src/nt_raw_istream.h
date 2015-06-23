@@ -20,9 +20,9 @@ public:
     virtual ~raw_istream() {}
     virtual bool read(void* data, std::size_t len) = 0;
     virtual void close() = 0;
-private:
-    raw_istream(const raw_istream&);
-    raw_istream& operator= (const raw_istream&);
+
+    raw_istream(const raw_istream&) = delete;
+    raw_istream& operator= (const raw_istream&) = delete;
 };
 
 class raw_mem_istream : public raw_istream

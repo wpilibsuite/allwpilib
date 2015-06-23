@@ -69,10 +69,10 @@ public:
                           const NT_Value* results_start,
                           const NT_Value* results_end);
 
-private:
-    MessageWriter(const MessageWriter&);
-    MessageWriter& operator= (const MessageWriter&);
+    MessageWriter(const MessageWriter&) = delete;
+    MessageWriter& operator= (const MessageWriter&) = delete;
 
+private:
     void WriteRpc(unsigned int msg_type,
                   unsigned int id,
                   unsigned int uid,

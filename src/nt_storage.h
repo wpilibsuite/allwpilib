@@ -35,9 +35,8 @@ public:
     NT_Value value;
     unsigned int flags;
 
-private:
-    StorageEntry(const StorageEntry&);
-    StorageEntry& operator= (const StorageEntry&);
+    StorageEntry(const StorageEntry&) = delete;
+    StorageEntry& operator= (const StorageEntry&) = delete;
 };
 
 class Storage
@@ -56,8 +55,8 @@ public:
 private:
     Storage();
     ~Storage();
-    Storage(const Storage&);
-    Storage& operator= (const Storage&);
+    Storage(const Storage&) = delete;
+    Storage& operator= (const Storage&) = delete;
 
     static Storage* m_instance;
 };

@@ -86,14 +86,14 @@ public:
     bool ReadValue(NT_Type type, NT_Value* value);
     bool ReadString(NT_String* str);
 
+    WireDecoder(const WireDecoder&) = delete;
+    WireDecoder& operator= (const WireDecoder&) = delete;
+
 protected:
     unsigned int m_proto_rev;
     const char* m_error;
 
 private:
-    WireDecoder(const WireDecoder&);
-    WireDecoder& operator= (const WireDecoder&);
-
     void Realloc(std::size_t len);
 
     raw_istream& m_is;

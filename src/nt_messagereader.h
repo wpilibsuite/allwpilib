@@ -51,9 +51,9 @@ public:
                                 const char* results,
                                 std::size_t results_len) = 0;
 
-private:
-    MessageHandler(const MessageHandler&);
-    MessageHandler& operator= (const MessageHandler&);
+    MessageHandler() = default;
+    MessageHandler(const MessageHandler&) = delete;
+    MessageHandler& operator= (const MessageHandler&) = delete;
 };
 
 class MessageReader : private WireDecoder
@@ -81,10 +81,10 @@ public:
         return WireDecoder::GetError();
     }
 
-private:
-    MessageReader(const MessageReader&);
-    MessageReader& operator= (const MessageReader&);
+    MessageReader(const MessageReader&) = delete;
+    MessageReader& operator= (const MessageReader&) = delete;
 
+private:
     MessageHandler& m_handler;
 };
 

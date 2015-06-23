@@ -86,14 +86,14 @@ public:
     std::size_t GetValueSize(const NT_Value& value);
     std::size_t GetStringSize(const NT_String& str);
 
+    WireEncoder(const WireEncoder&) = delete;
+    WireEncoder& operator= (const WireEncoder&) = delete;
+
 protected:
     unsigned int m_proto_rev;
     const char* m_error;
 
 private:
-    WireEncoder(const WireEncoder&);
-    WireEncoder& operator= (const WireEncoder&);
-
     void ReserveSlow(std::size_t len);
 
     char* m_start;
