@@ -57,7 +57,7 @@ struct NT_String {
 /** NetworkTables Entry Value.  Note this is a typed union. */
 struct NT_Value {
     enum NT_Type type;
-    unsigned long last_change;
+    unsigned long long last_change;
     union {
         int v_boolean;
         double v_double;
@@ -90,7 +90,7 @@ struct NT_EntryInfo {
     unsigned int flags;
 
     /** Timestamp of last change to entry (type or value). */
-    unsigned long last_change;
+    unsigned long long last_change;
 };
 
 /** NetworkTables Connection Information */
@@ -98,7 +98,7 @@ struct NT_ConnectionInfo {
     struct NT_String remote_id;
     const char *remote_name;
     unsigned int remote_port;
-    long last_update;
+    unsigned long long last_update;
     unsigned int protocol_version;
 };
 
@@ -300,6 +300,9 @@ void NT_DisposeString(struct NT_String *str);
 void NT_InitString(struct NT_String *str);
 
 void NT_DisposeConnectionInfoArray(struct NT_ConnectionInfo *arr, size_t count);
+
+/* timestamp */
+unsigned long long NT_Now(void);
 
 #ifdef __cplusplus
 }
