@@ -24,7 +24,7 @@
  */
 void Encoder::InitEncoder(int channelA, int channelB, bool reverseDirection, EncodingType encodingType)
 {
-	m_table = NULL;
+	m_table = nullptr;
 	this->channelA = channelA;
 	this->channelB = channelB;
 	m_encodingType = encodingType;
@@ -92,14 +92,14 @@ Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection, En
  * or be double (2x) the spec'd count.
  */
 /* TODO: [Not Supported] Encoder::Encoder(DigitalSource *aSource, DigitalSource *bSource, bool reverseDirection, EncodingType encodingType) :
-	m_encoder(NULL),
-	m_counter(NULL)
+	m_encoder(nullptr),
+	m_counter(nullptr)
 {
 	m_aSource = aSource;
 	m_bSource = bSource;
 	m_allocatedASource = false;
 	m_allocatedBSource = false;
-	if (m_aSource == NULL || m_bSource == NULL)
+	if (m_aSource == nullptr || m_bSource == nullptr)
 		wpi_setWPIError(NullParameter);
 	else
 		InitEncoder(reverseDirection, encodingType);
@@ -124,8 +124,8 @@ Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection, En
  * or be double (2x) the spec'd count.
  */
 /*// TODO: [Not Supported] Encoder::Encoder(DigitalSource &aSource, DigitalSource &bSource, bool reverseDirection, EncodingType encodingType) :
-	m_encoder(NULL),
-	m_counter(NULL)
+	m_encoder(nullptr),
+	m_counter(nullptr)
 {
 	m_aSource = &aSource;
 	m_bSource = &bSource;
@@ -342,7 +342,7 @@ double Encoder::PIDGet() const
 }
 
 void Encoder::UpdateTable() {
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
         m_table->PutNumber("Speed", GetRate());
         m_table->PutNumber("Distance", GetDistance());
         m_table->PutNumber("Distance per Tick", m_reverseDirection ? -m_distancePerPulse : m_distancePerPulse);

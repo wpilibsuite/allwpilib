@@ -151,7 +151,7 @@ int32_t SPI::Write(uint8_t* data, uint8_t size) {
 int32_t SPI::Read(bool initiate, uint8_t* dataReceived, uint8_t size) {
   int32_t retVal = 0;
   if (initiate) {
-    uint8_t* dataToSend = new uint8_t[size];
+    auto dataToSend = new uint8_t[size];
     memset(dataToSend, 0, size);
     retVal = spiTransaction(m_port, dataToSend, dataReceived, size);
   } else

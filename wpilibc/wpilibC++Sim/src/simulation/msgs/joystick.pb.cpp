@@ -21,9 +21,9 @@ namespace msgs {
 
 namespace {
 
-const ::google::protobuf::Descriptor* Joystick_descriptor_ = NULL;
+const ::google::protobuf::Descriptor* Joystick_descriptor_ = nullptr;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  Joystick_reflection_ = NULL;
+  Joystick_reflection_ = nullptr;
 
 }  // namespace
 
@@ -33,7 +33,7 @@ void protobuf_AssignDesc_msgs_2fjoystick_2eproto() {
   const ::google::protobuf::FileDescriptor* file =
     ::google::protobuf::DescriptorPool::generated_pool()->FindFileByName(
       "msgs/joystick.proto");
-  GOOGLE_CHECK(file != NULL);
+  GOOGLE_CHECK(file != nullptr);
   Joystick_descriptor_ = file->message_type(0);
   static const int Joystick_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Joystick, axes_),
@@ -143,11 +143,11 @@ const ::google::protobuf::Descriptor* Joystick::descriptor() {
 }
 
 const Joystick& Joystick::default_instance() {
-  if (default_instance_ == NULL) protobuf_AddDesc_msgs_2fjoystick_2eproto();
+  if (default_instance_ == nullptr) protobuf_AddDesc_msgs_2fjoystick_2eproto();
   return *default_instance_;
 }
 
-Joystick* Joystick::default_instance_ = NULL;
+Joystick* Joystick::default_instance_ = nullptr;
 
 Joystick* Joystick::New() const {
   return new Joystick;
@@ -300,7 +300,7 @@ void Joystick::MergeFrom(const ::google::protobuf::Message& from) {
   const Joystick* source =
     ::google::protobuf::internal::dynamic_cast_if_available<const Joystick*>(
       &from);
-  if (source == NULL) {
+  if (source == nullptr) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
     MergeFrom(*source);

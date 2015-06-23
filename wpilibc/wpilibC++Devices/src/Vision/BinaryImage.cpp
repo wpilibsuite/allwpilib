@@ -107,8 +107,7 @@ void BinaryImage::GetParticleAnalysisReport(int particleNumber,
  */
 vector<ParticleAnalysisReport> *
 BinaryImage::GetOrderedParticleAnalysisReports() {
-  vector<ParticleAnalysisReport> *particles =
-      new vector<ParticleAnalysisReport>;
+  auto particles = new vector<ParticleAnalysisReport>;
   int particleCount = GetNumberParticles();
   for (int particleIndex = 0; particleIndex < particleCount; particleIndex++) {
     particles->push_back(GetParticleAnalysisReport(particleIndex));
@@ -197,23 +196,23 @@ bool BinaryImage::CompareParticleSizes(ParticleAnalysisReport particle1,
 }
 
 BinaryImage *BinaryImage::RemoveSmallObjects(bool connectivity8, int erosions) {
-  BinaryImage *result = new BinaryImage();
+  auto result = new BinaryImage();
   int success = imaqSizeFilter(result->GetImaqImage(), m_imaqImage,
-                               connectivity8, erosions, IMAQ_KEEP_LARGE, NULL);
+                               connectivity8, erosions, IMAQ_KEEP_LARGE, nullptr);
   wpi_setImaqErrorWithContext(success, "Error in RemoveSmallObjects");
   return result;
 }
 
 BinaryImage *BinaryImage::RemoveLargeObjects(bool connectivity8, int erosions) {
-  BinaryImage *result = new BinaryImage();
+  auto result = new BinaryImage();
   int success = imaqSizeFilter(result->GetImaqImage(), m_imaqImage,
-                               connectivity8, erosions, IMAQ_KEEP_SMALL, NULL);
+                               connectivity8, erosions, IMAQ_KEEP_SMALL, nullptr);
   wpi_setImaqErrorWithContext(success, "Error in RemoveLargeObjects");
   return result;
 }
 
 BinaryImage *BinaryImage::ConvexHull(bool connectivity8) {
-  BinaryImage *result = new BinaryImage();
+  auto result = new BinaryImage();
   int success =
       imaqConvexHull(result->GetImaqImage(), m_imaqImage, connectivity8);
   wpi_setImaqErrorWithContext(success, "Error in convex hull operation");
@@ -222,12 +221,12 @@ BinaryImage *BinaryImage::ConvexHull(bool connectivity8) {
 
 BinaryImage *BinaryImage::ParticleFilter(ParticleFilterCriteria2 *criteria,
                                          int criteriaCount) {
-  BinaryImage *result = new BinaryImage();
+  auto result = new BinaryImage();
   int numParticles;
   ParticleFilterOptions2 filterOptions = {0, 0, 0, 1};
   int success =
       imaqParticleFilter4(result->GetImaqImage(), m_imaqImage, criteria,
-                          criteriaCount, &filterOptions, NULL, &numParticles);
+                          criteriaCount, &filterOptions, nullptr, &numParticles);
   wpi_setImaqErrorWithContext(success, "Error in particle filter operation");
   return result;
 }

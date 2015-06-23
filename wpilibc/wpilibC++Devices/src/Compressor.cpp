@@ -6,7 +6,7 @@
 #include "WPIErrors.h"
 
 void Compressor::InitCompressor(uint8_t pcmID) {
-  m_table = 0;
+  m_table = nullptr;
   m_pcm_pointer = initializeCompressor(pcmID);
 
   SetClosedLoopControl(true);

@@ -129,7 +129,7 @@ void dprintf(const char *tempString, ...) /* Variable argument list */
       break;
     case DEBUG_MOSTLY_OFF:
       if (fatalFlag) {
-        if ((outfile_fd = fopen(filepath, "a+")) != NULL) {
+        if ((outfile_fd = fopen(filepath, "a+")) != nullptr) {
           fwrite(outtext, sizeof(char), strlen(outtext), outfile_fd);
           fclose(outfile_fd);
         }
@@ -139,14 +139,14 @@ void dprintf(const char *tempString, ...) /* Variable argument list */
       printf("%s", outtext);
       break;
     case DEBUG_FILE_ONLY:
-      if ((outfile_fd = fopen(filepath, "a+")) != NULL) {
+      if ((outfile_fd = fopen(filepath, "a+")) != nullptr) {
         fwrite(outtext, sizeof(char), strlen(outtext), outfile_fd);
         fclose(outfile_fd);
       }
       break;
     case DEBUG_SCREEN_AND_FILE:  // BOTH
       printf("%s", outtext);
-      if ((outfile_fd = fopen(filepath, "a+")) != NULL) {
+      if ((outfile_fd = fopen(filepath, "a+")) != nullptr) {
         fwrite(outtext, sizeof(char), strlen(outtext), outfile_fd);
         fclose(outfile_fd);
       }
@@ -223,7 +223,7 @@ double SinPosition(double *period, double sinStart) {
   double sinArg;
 
   // 1st call
-  if (period != NULL) {
+  if (period != nullptr) {
     sinePeriod = *period;
     timestamp = GetTime();
     return 0.0;
@@ -270,7 +270,7 @@ void panInit(double period) {
 void panForTarget(Servo *panServo) { panForTarget(panServo, 0.0); }
 
 void panForTarget(Servo *panServo, double sinStart) {
-  float normalizedSinPosition = (float)SinPosition(NULL, sinStart);
+  float normalizedSinPosition = (float)SinPosition(nullptr, sinStart);
   float newServoPosition = NormalizeToRange(normalizedSinPosition);
   panServo->Set(newServoPosition);
   // ShowActivity ("pan x: normalized %f newServoPosition = %f" ,
@@ -296,13 +296,13 @@ int processFile(char *inputFile, char *outputString, int lineNumber) {
 
   if (lineNumber < 0) return (-1);
 
-  if ((infile = fopen(inputFile, "r")) == NULL) {
+  if ((infile = fopen(inputFile, "r")) == nullptr) {
     printf("Fatal error opening file %s\n", inputFile);
     return (0);
   }
 
   while (!feof(infile)) {
-    if (fgets(inputStr, stringSize, infile) != NULL) {
+    if (fgets(inputStr, stringSize, infile) != nullptr) {
       // Skip empty lines
       if (emptyString(inputStr)) continue;
       // Skip comment lines
@@ -339,7 +339,7 @@ int processFile(char *inputFile, char *outputString, int lineNumber) {
 int emptyString(char *string) {
   int i, len;
 
-  if (string == NULL) return (1);
+  if (string == nullptr) return (1);
 
   len = strlen(string);
   for (i = 0; i < len; i++) {
@@ -358,7 +358,7 @@ int emptyString(char *string) {
 void stripString(char *string) {
   int i, j, len;
 
-  if (string == NULL) return;
+  if (string == nullptr) return;
 
   len = strlen(string);
   for (i = 0, j = 0; i < len; i++) {

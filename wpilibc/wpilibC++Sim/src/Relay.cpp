@@ -17,7 +17,7 @@
  */
 void Relay::InitRelay()
 {
-	m_table = NULL;
+	m_table = nullptr;
 	char buf[64];
 	if (!SensorBase::CheckRelayChannel(m_channel))
 	{
@@ -156,7 +156,7 @@ void Relay::ValueChanged(ITable* source, const std::string& key, EntryValue valu
 }
 
 void Relay::UpdateTable() {
-	if(m_table != NULL){
+	if(m_table != nullptr){
 		if (Get() == kOn) {
 			m_table->PutString("Value", "On");
 		}
@@ -173,13 +173,13 @@ void Relay::UpdateTable() {
 }
 
 void Relay::StartLiveWindowMode() {
-	if(m_table != NULL){
+	if(m_table != nullptr){
 		m_table->AddTableListener("Value", this, true);
 	}
 }
 
 void Relay::StopLiveWindowMode() {
-	if(m_table != NULL){
+	if(m_table != nullptr){
 		m_table->RemoveTableListener(this);
 	}
 }

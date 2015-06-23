@@ -22,7 +22,7 @@ ColorImage::~ColorImage() {}
 BinaryImage *ColorImage::ComputeThreshold(ColorMode colorMode, int low1,
                                           int high1, int low2, int high2,
                                           int low3, int high3) {
-  BinaryImage *result = new BinaryImage();
+  auto result = new BinaryImage();
   Range range1 = {low1, high1}, range2 = {low2, high2}, range3 = {low3, high3};
 
   int success = imaqColorThreshold(result->GetImaqImage(), m_imaqImage, 1,
@@ -154,12 +154,12 @@ BinaryImage *ColorImage::ThresholdHSI(Threshold &t) {
  * @returns A pointer to a MonoImage that represents the extracted plane.
  */
 MonoImage *ColorImage::ExtractColorPlane(ColorMode mode, int planeNumber) {
-  MonoImage *result = new MonoImage();
-  if (m_imaqImage == NULL) wpi_setWPIError(NullParameter);
+  auto result = new MonoImage();
+  if (m_imaqImage == nullptr) wpi_setWPIError(NullParameter);
   int success = imaqExtractColorPlanes(
-      m_imaqImage, mode, (planeNumber == 1) ? result->GetImaqImage() : NULL,
-      (planeNumber == 2) ? result->GetImaqImage() : NULL,
-      (planeNumber == 3) ? result->GetImaqImage() : NULL);
+      m_imaqImage, mode, (planeNumber == 1) ? result->GetImaqImage() : nullptr,
+      (planeNumber == 2) ? result->GetImaqImage() : nullptr,
+      (planeNumber == 3) ? result->GetImaqImage() : nullptr);
   wpi_setImaqErrorWithContext(success, "Imaq ExtractColorPlanes failed");
   return result;
 }
@@ -274,9 +274,9 @@ void ColorImage::ReplacePlane(ColorMode mode, MonoImage *plane,
                               int planeNumber) {
   int success =
       imaqReplaceColorPlanes(m_imaqImage, (const Image *)m_imaqImage, mode,
-                             (planeNumber == 1) ? plane->GetImaqImage() : NULL,
-                             (planeNumber == 2) ? plane->GetImaqImage() : NULL,
-                             (planeNumber == 3) ? plane->GetImaqImage() : NULL);
+                             (planeNumber == 1) ? plane->GetImaqImage() : nullptr,
+                             (planeNumber == 2) ? plane->GetImaqImage() : nullptr,
+                             (planeNumber == 3) ? plane->GetImaqImage() : nullptr);
   wpi_setImaqErrorWithContext(success, "Imaq ReplaceColorPlanes failed");
 }
 

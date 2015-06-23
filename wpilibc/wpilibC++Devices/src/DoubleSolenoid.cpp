@@ -13,7 +13,7 @@
  * Common function to implement constructor behaviour.
  */
 void DoubleSolenoid::InitSolenoid() {
-  m_table = NULL;
+  m_table = nullptr;
   char buf[64];
   if (!CheckSolenoidModule(m_moduleNumber)) {
     snprintf(buf, 64, "Solenoid Module %d", m_moduleNumber);
@@ -171,7 +171,7 @@ void DoubleSolenoid::ValueChanged(ITable *source, const std::string &key,
 }
 
 void DoubleSolenoid::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutString(
         "Value", (Get() == kForward ? "Forward"
                                     : (Get() == kReverse ? "Reverse" : "Off")));
@@ -180,14 +180,14 @@ void DoubleSolenoid::UpdateTable() {
 
 void DoubleSolenoid::StartLiveWindowMode() {
   Set(kOff);
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->AddTableListener("Value", this, true);
   }
 }
 
 void DoubleSolenoid::StopLiveWindowMode() {
   Set(kOff);
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->RemoveTableListener(this);
   }
 }

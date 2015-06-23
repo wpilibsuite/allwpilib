@@ -41,7 +41,7 @@ Task::Task(const char* name, FUNCPTR function, int32_t priority,
 Task::~Task() {
   if (m_taskID != NULL_TASK) Stop();
   delete[] m_taskName;
-  m_taskName = NULL;
+  m_taskName = nullptr;
 }
 
 /**
@@ -144,7 +144,7 @@ bool Task::SetPriority(int32_t priority) {
 
 /**
  * Returns the name of the task.
- * @returns Pointer to the name of the task or NULL if not allocated
+ * @returns Pointer to the name of the task or nullptr if not allocated
  */
 const char* Task::GetName() const { return m_taskName; }
 

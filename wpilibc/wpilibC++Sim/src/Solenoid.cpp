@@ -76,21 +76,21 @@ void Solenoid::ValueChanged(ITable* source, const std::string& key, EntryValue v
 }
 
 void Solenoid::UpdateTable() {
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
 		m_table->PutBoolean("Value", Get());
 	}
 }
 
 void Solenoid::StartLiveWindowMode() {
 	Set(false);
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
 		m_table->AddTableListener("Value", this, true);
 	}
 }
 
 void Solenoid::StopLiveWindowMode() {
 	Set(false);
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
 		m_table->RemoveTableListener(this);
 	}
 }

@@ -72,7 +72,7 @@ bool I2C::Transaction(uint8_t *dataToSend, uint8_t sendSize,
  */
 bool I2C::AddressOnly() {
   int32_t status = 0;
-  status = Transaction(NULL, 0, NULL, 0);
+  status = Transaction(nullptr, 0, nullptr, 0);
   return status < 0;
 }
 
@@ -131,7 +131,7 @@ bool I2C::Read(uint8_t registerAddress, uint8_t count, uint8_t *buffer) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "count");
     return true;
   }
-  if (buffer == NULL) {
+  if (buffer == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "buffer");
     return true;
   }
@@ -160,7 +160,7 @@ bool I2C::ReadOnly(uint8_t count, uint8_t *buffer) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "count");
     return true;
   }
-  if (buffer == NULL) {
+  if (buffer == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "buffer");
     return true;
   }

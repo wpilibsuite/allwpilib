@@ -21,10 +21,10 @@ namespace msgs {
 
 namespace {
 
-const ::google::protobuf::Descriptor* DriverStation_descriptor_ = NULL;
+const ::google::protobuf::Descriptor* DriverStation_descriptor_ = nullptr;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  DriverStation_reflection_ = NULL;
-const ::google::protobuf::EnumDescriptor* DriverStation_State_descriptor_ = NULL;
+  DriverStation_reflection_ = nullptr;
+const ::google::protobuf::EnumDescriptor* DriverStation_State_descriptor_ = nullptr;
 
 }  // namespace
 
@@ -34,7 +34,7 @@ void protobuf_AssignDesc_msgs_2fdriver_2dstation_2eproto() {
   const ::google::protobuf::FileDescriptor* file =
     ::google::protobuf::DescriptorPool::generated_pool()->FindFileByName(
       "msgs/driver-station.proto");
-  GOOGLE_CHECK(file != NULL);
+  GOOGLE_CHECK(file != nullptr);
   DriverStation_descriptor_ = file->message_type(0);
   static const int DriverStation_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DriverStation, enabled_),
@@ -172,11 +172,11 @@ const ::google::protobuf::Descriptor* DriverStation::descriptor() {
 }
 
 const DriverStation& DriverStation::default_instance() {
-  if (default_instance_ == NULL) protobuf_AddDesc_msgs_2fdriver_2dstation_2eproto();
+  if (default_instance_ == nullptr) protobuf_AddDesc_msgs_2fdriver_2dstation_2eproto();
   return *default_instance_;
 }
 
-DriverStation* DriverStation::default_instance_ = NULL;
+DriverStation* DriverStation::default_instance_ = nullptr;
 
 DriverStation* DriverStation::New() const {
   return new DriverStation;
@@ -320,7 +320,7 @@ void DriverStation::MergeFrom(const ::google::protobuf::Message& from) {
   const DriverStation* source =
     ::google::protobuf::internal::dynamic_cast_if_available<const DriverStation*>(
       &from);
-  if (source == NULL) {
+  if (source == nullptr) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
     MergeFrom(*source);

@@ -62,7 +62,7 @@ bool wpi_assert_impl(bool conditionValue, const char *conditionText,
     std::cout << error << std::endl;
     HALSetErrorData(error.c_str(), error.size(), 100);
 
-    if (suspendOnAssertEnabled) suspendTask(0);
+    if (suspendOnAssertEnabled) suspendTask(nullptr);
   }
 
   return conditionValue;
@@ -99,7 +99,7 @@ void wpi_assertEqual_common_impl(const char *valueA, const char *valueB,
   std::cout << error << std::endl;
   HALSetErrorData(error.c_str(), error.size(), 100);
 
-  if (suspendOnAssertEnabled) suspendTask(0);
+  if (suspendOnAssertEnabled) suspendTask(nullptr);
 }
 
 /**
@@ -200,7 +200,7 @@ static std::string demangle(char const *mangledSymbol) {
   int status;
 
   if (sscanf(mangledSymbol, "%*[^(]%*[(]%255[^)+]", buffer)) {
-    char *symbol = abi::__cxa_demangle(buffer, NULL, &length, &status);
+    char *symbol = abi::__cxa_demangle(buffer, nullptr, &length, &status);
     if (status == 0) {
       return symbol;
     } else {

@@ -21,9 +21,9 @@ namespace msgs {
 
 namespace {
 
-const ::google::protobuf::Descriptor* Bool_descriptor_ = NULL;
+const ::google::protobuf::Descriptor* Bool_descriptor_ = nullptr;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  Bool_reflection_ = NULL;
+  Bool_reflection_ = nullptr;
 
 }  // namespace
 
@@ -33,7 +33,7 @@ void protobuf_AssignDesc_msgs_2fbool_2eproto() {
   const ::google::protobuf::FileDescriptor* file =
     ::google::protobuf::DescriptorPool::generated_pool()->FindFileByName(
       "msgs/bool.proto");
-  GOOGLE_CHECK(file != NULL);
+  GOOGLE_CHECK(file != nullptr);
   Bool_descriptor_ = file->message_type(0);
   static const int Bool_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Bool, data_),
@@ -141,11 +141,11 @@ const ::google::protobuf::Descriptor* Bool::descriptor() {
 }
 
 const Bool& Bool::default_instance() {
-  if (default_instance_ == NULL) protobuf_AddDesc_msgs_2fbool_2eproto();
+  if (default_instance_ == nullptr) protobuf_AddDesc_msgs_2fbool_2eproto();
   return *default_instance_;
 }
 
-Bool* Bool::default_instance_ = NULL;
+Bool* Bool::default_instance_ = nullptr;
 
 Bool* Bool::New() const {
   return new Bool;
@@ -249,7 +249,7 @@ void Bool::MergeFrom(const ::google::protobuf::Message& from) {
   const Bool* source =
     ::google::protobuf::internal::dynamic_cast_if_available<const Bool*>(
       &from);
-  if (source == NULL) {
+  if (source == nullptr) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
     MergeFrom(*source);

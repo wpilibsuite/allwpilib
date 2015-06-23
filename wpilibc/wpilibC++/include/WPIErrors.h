@@ -27,7 +27,7 @@ S(ChannelIndexOutOfRange, -1, "Allocating channel that is out of range");
 S(NotAllocated, -2, "Attempting to free unallocated resource");
 S(ResourceAlreadyAllocated, -3, "Attempted to reuse an allocated resource");
 S(NoAvailableResources, -4, "No available resources to allocate");
-S(NullParameter, -5, "A pointer parameter to a method is NULL");
+S(NullParameter, -5, "A pointer parameter to a method is nullptr");
 S(Timeout, -6, "A timeout has been exceeded");
 S(CompassManufacturerError, -7, "Compass manufacturer doesn't match HiTechnic");
 S(CompassTypeError, -8,

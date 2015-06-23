@@ -13,7 +13,7 @@
  */
 void AnalogInput::InitAnalogInput(uint32_t channel)
 {
-    m_table = NULL;
+    m_table = nullptr;
 
 	m_channel = channel;
 	char buffer[50];
@@ -82,7 +82,7 @@ double AnalogInput::PIDGet() const
 }
 
 void AnalogInput::UpdateTable() {
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
 		m_table->PutNumber("Value", GetAverageVoltage());
 	}
 }

@@ -102,21 +102,21 @@ void DoubleSolenoid::ValueChanged(ITable* source, const std::string& key, EntryV
 }
 
 void DoubleSolenoid::UpdateTable() {
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
 		m_table->PutString("Value", (Get() == kForward ? "Forward" : (Get() == kReverse ? "Reverse" : "Off")));
 	}
 }
 
 void DoubleSolenoid::StartLiveWindowMode() {
 	Set(kOff);
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
 		m_table->AddTableListener("Value", this, true);
 	}
 }
 
 void DoubleSolenoid::StopLiveWindowMode() {
 	Set(kOff);
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
 		m_table->RemoveTableListener(this);
 	}
 }

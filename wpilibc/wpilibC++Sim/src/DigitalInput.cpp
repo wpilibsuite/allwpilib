@@ -14,7 +14,7 @@
  */
 void DigitalInput::InitDigitalInput(uint32_t channel)
 {
-	m_table = NULL;
+	m_table = nullptr;
 	char buf[64];
 	m_channel = channel;
 	int n = sprintf(buf, "dio/%d", channel);
@@ -57,7 +57,7 @@ uint32_t DigitalInput::GetChannel() const
 }
 
 void DigitalInput::UpdateTable() {
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
 		m_table->PutBoolean("Value", Get());
 	}
 }

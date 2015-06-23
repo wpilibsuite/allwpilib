@@ -14,7 +14,7 @@
  * Common function for initializing the accelerometer.
  */
 void AnalogAccelerometer::InitAccelerometer() {
-  m_table = NULL;
+  m_table = nullptr;
   m_voltsPerG = 1.0;
   m_zeroGVoltage = 2.5;
   HALReport(HALUsageReporting::kResourceType_Accelerometer,
@@ -46,7 +46,7 @@ AnalogAccelerometer::AnalogAccelerometer(int32_t channel) {
  * accelerometer is connected to
  */
 AnalogAccelerometer::AnalogAccelerometer(AnalogInput *channel) {
-  if (channel == NULL) {
+  if (channel == nullptr) {
     wpi_setWPIError(NullParameter);
   } else {
     m_AnalogInput = channel;
@@ -107,7 +107,7 @@ void AnalogAccelerometer::SetZero(float zero) { m_zeroGVoltage = zero; }
 double AnalogAccelerometer::PIDGet() const { return GetAcceleration(); }
 
 void AnalogAccelerometer::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("Value", GetAcceleration());
   }
 }

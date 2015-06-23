@@ -20,9 +20,9 @@ class Victor : public SafePWM, public SpeedController {
  public:
   explicit Victor(uint32_t channel);
   virtual ~Victor();
-  virtual void Set(float value, uint8_t syncGroup = 0);
-  virtual float Get() const;
-  virtual void Disable();
+  virtual void Set(float value, uint8_t syncGroup = 0) override;
+  virtual float Get() const override;
+  virtual void Disable() override;
 
   virtual void PIDWrite(float output) override;
 

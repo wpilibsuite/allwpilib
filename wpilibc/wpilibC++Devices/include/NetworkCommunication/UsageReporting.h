@@ -128,7 +128,7 @@ typedef enum {
  * change the feature string.
  */
 uint32_t EXPORT_FUNC report(tResourceType resource, uint8_t instanceNumber,
-                            uint8_t context = 0, const char *feature = NULL);
+                            uint8_t context = 0, const char *feature = nullptr);
 }
 
 #ifdef __cplusplus

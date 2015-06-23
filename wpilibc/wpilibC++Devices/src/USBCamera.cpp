@@ -148,7 +148,7 @@ void USBCamera::UpdateSettings() {
 
   uInt32 count = 0;
   uInt32 currentMode = 0;
-  SAFE_IMAQ_CALL(IMAQdxEnumerateVideoModes, m_id, NULL, &count, &currentMode);
+  SAFE_IMAQ_CALL(IMAQdxEnumerateVideoModes, m_id, nullptr, &count, &currentMode);
   IMAQdxVideoMode modes[count];
   SAFE_IMAQ_CALL(IMAQdxEnumerateVideoModes, m_id, modes, &count, &currentMode);
 

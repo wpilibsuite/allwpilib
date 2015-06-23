@@ -53,7 +53,7 @@ SerialPort::SerialPort(uint32_t baudRate, Port port, uint8_t dataBits,
 
   // viInstallHandler(m_portHandle, VI_EVENT_IO_COMPLETION, ioCompleteHandler,
   // this);
-  // viEnableEvent(m_portHandle, VI_EVENT_IO_COMPLETION, VI_HNDLR, VI_NULL);
+  // viEnableEvent(m_portHandle, VI_EVENT_IO_COMPLETION, VI_HNDLR, VI_nullptr);
 
   HALReport(HALUsageReporting::kResourceType_SerialPort, 0);
 }

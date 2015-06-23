@@ -9,9 +9,9 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 
-Notifier *Notifier::timerQueueHead = NULL;
+Notifier *Notifier::timerQueueHead = nullptr;
 ReentrantSemaphore Notifier::queueSemaphore;
-Task* Notifier::task = NULL;
+Task* Notifier::task = nullptr;
 int Notifier::refcount = 0;
 
 /**
@@ -21,14 +21,14 @@ int Notifier::refcount = 0;
  */
 Notifier::Notifier(TimerEventHandler handler, void *param)
 {
-	if (handler == NULL)
-		wpi_setWPIErrorWithContext(NullParameter, "handler must not be NULL");
+	if (handler == nullptr)
+		wpi_setWPIErrorWithContext(NullParameter, "handler must not be nullptr");
 	m_handler = handler;
 	m_param = param;
 	m_periodic = false;
 	m_expirationTime = 0;
 	m_period = 0;
-	m_nextEvent = NULL;
+	m_nextEvent = nullptr;
 	m_queued = false;
 	m_handlerSemaphore = initializeSemaphore(SEMAPHORE_FULL);
 	{
@@ -95,7 +95,7 @@ void Notifier::ProcessQueue(uint32_t mask, void *params)
 			Synchronized sync(queueSemaphore);
 			double currentTime = GetClock();
 			current = timerQueueHead;
-			if (current == NULL || current->m_expirationTime > currentTime)
+			if (current == nullptr || current->m_expirationTime > currentTime)
 			{
 				break;		// no more timer events to process
 			}
@@ -144,7 +144,7 @@ void Notifier::InsertInQueue(bool reschedule)
 	{
 		m_expirationTime = GetClock() + m_period;
 	}
-	if (timerQueueHead == NULL || timerQueueHead->m_expirationTime >= this->m_expirationTime)
+	if (timerQueueHead == nullptr || timerQueueHead->m_expirationTime >= this->m_expirationTime)
 	{
 		// the queue is empty or greater than the new entry
 		// the new entry becomes the first element
@@ -161,7 +161,7 @@ void Notifier::InsertInQueue(bool reschedule)
 		for (Notifier **npp = &(timerQueueHead->m_nextEvent); ; npp = &(*npp)->m_nextEvent)
 		{
 			Notifier *n = *npp;
-			if (n == NULL || n->m_expirationTime > this->m_expirationTime)
+			if (n == nullptr || n->m_expirationTime > this->m_expirationTime)
 			{
 				*npp = this;
 				this->m_nextEvent = n;
@@ -184,7 +184,7 @@ void Notifier::DeleteFromQueue()
 	if (m_queued)
 	{
 		m_queued = false;
-		wpi_assert(timerQueueHead != NULL);
+		wpi_assert(timerQueueHead != nullptr);
 		if (timerQueueHead == this)
 		{
 			// remove the first item in the list - update the alarm
@@ -193,7 +193,7 @@ void Notifier::DeleteFromQueue()
 		}
 		else
 		{
-			for (Notifier *n = timerQueueHead; n != NULL; n = n->m_nextEvent)
+			for (Notifier *n = timerQueueHead; n != nullptr; n = n->m_nextEvent)
 			{
 				if (n->m_nextEvent == this)
 				{
@@ -253,8 +253,8 @@ void Notifier::Stop()
 
 void Notifier::Run() {
     while (true) {
-        Notifier::ProcessQueue(0, NULL);
-        if (timerQueueHead != NULL)
+        Notifier::ProcessQueue(0, nullptr);
+        if (timerQueueHead != nullptr)
         {
             Wait(timerQueueHead->m_expirationTime - GetClock());
         }

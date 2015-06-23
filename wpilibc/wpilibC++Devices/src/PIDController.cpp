@@ -58,7 +58,7 @@ PIDController::PIDController(float Kp, float Ki, float Kd, float Kf,
 void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
                                PIDSource *source, PIDOutput *output,
                                float period) {
-  m_table = NULL;
+  m_table = nullptr;
 
   m_semaphore = initializeMutexNormal();
 
@@ -140,8 +140,8 @@ void PIDController::Calculate() {
   }
   END_REGION;
 
-  if (pidInput == NULL) return;
-  if (pidOutput == NULL) return;
+  if (pidInput == nullptr) return;
+  if (pidOutput == nullptr) return;
 
   if (enabled) {
     {
@@ -205,7 +205,7 @@ void PIDController::SetPID(double p, double i, double d) {
   }
   END_REGION;
 
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("p", m_P);
     m_table->PutNumber("i", m_I);
     m_table->PutNumber("d", m_D);
@@ -229,7 +229,7 @@ void PIDController::SetPID(double p, double i, double d, double f) {
   }
   END_REGION;
 
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("p", m_P);
     m_table->PutNumber("i", m_I);
     m_table->PutNumber("d", m_D);
@@ -346,7 +346,7 @@ void PIDController::SetSetpoint(float setpoint) {
   }
   END_REGION;
 
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("setpoint", m_setpoint);
   }
 }
@@ -451,7 +451,7 @@ void PIDController::Enable() {
   CRITICAL_REGION(m_semaphore) { m_enabled = true; }
   END_REGION;
 
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutBoolean("enabled", true);
   }
 }
@@ -466,7 +466,7 @@ void PIDController::Disable() {
   }
   END_REGION;
 
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutBoolean("enabled", false);
   }
 }
@@ -500,9 +500,9 @@ std::string PIDController::GetSmartDashboardType() const {
 }
 
 void PIDController::InitTable(ITable *table) {
-  if (m_table != NULL) m_table->RemoveTableListener(this);
+  if (m_table != nullptr) m_table->RemoveTableListener(this);
   m_table = table;
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber(kP, GetP());
     m_table->PutNumber(kI, GetI());
     m_table->PutNumber(kD, GetD());

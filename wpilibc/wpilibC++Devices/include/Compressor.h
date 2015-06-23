@@ -49,7 +49,7 @@ class Compressor : public SensorBase,
   void InitTable(ITable *subTable) override;
   ITable *GetTable() const override;
   void ValueChanged(ITable *source, const std::string &key, EntryValue value,
-                    bool isNew);
+                    bool isNew) override;
 
  protected:
   void *m_pcm_pointer;

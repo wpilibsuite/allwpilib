@@ -23,5 +23,5 @@ void WaitForChildren::End() {}
 void WaitForChildren::Interrupted() {}
 
 bool WaitForChildren::IsFinished() {
-  return GetGroup() == NULL || GetGroup()->GetSize() == 0;
+  return GetGroup() == nullptr || GetGroup()->GetSize() == 0;
 }

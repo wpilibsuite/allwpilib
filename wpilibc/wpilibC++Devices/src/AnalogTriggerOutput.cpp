@@ -30,11 +30,11 @@ AnalogTriggerOutput::AnalogTriggerOutput(AnalogTrigger *trigger,
 }
 
 AnalogTriggerOutput::~AnalogTriggerOutput() {
-  if (m_interrupt != NULL) {
+  if (m_interrupt != nullptr) {
     int32_t status = 0;
     cleanInterrupts(m_interrupt, &status);
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
-    m_interrupt = NULL;
+    m_interrupt = nullptr;
     m_interrupts->Free(m_interruptIndex);
   }
 }

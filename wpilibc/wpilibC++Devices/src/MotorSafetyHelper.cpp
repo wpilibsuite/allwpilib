@@ -14,7 +14,7 @@
 
 #include <stdio.h>
 
-MotorSafetyHelper *MotorSafetyHelper::m_headHelper = NULL;
+MotorSafetyHelper *MotorSafetyHelper::m_headHelper = nullptr;
 ReentrantSemaphore MotorSafetyHelper::m_listMutex;
 
 /**
@@ -46,9 +46,9 @@ MotorSafetyHelper::~MotorSafetyHelper() {
   if (m_headHelper == this) {
     m_headHelper = m_nextHelper;
   } else {
-    MotorSafetyHelper *prev = NULL;
+    MotorSafetyHelper *prev = nullptr;
     MotorSafetyHelper *cur = m_headHelper;
-    while (cur != this && cur != NULL) prev = cur, cur = cur->m_nextHelper;
+    while (cur != this && cur != nullptr) prev = cur, cur = cur->m_nextHelper;
     if (cur == this) prev->m_nextHelper = cur->m_nextHelper;
   }
 }
@@ -141,7 +141,7 @@ bool MotorSafetyHelper::IsSafetyEnabled() const {
  */
 void MotorSafetyHelper::CheckMotors() {
   Synchronized sync(m_listMutex);
-  for (MotorSafetyHelper *msh = m_headHelper; msh != NULL;
+  for (MotorSafetyHelper *msh = m_headHelper; msh != nullptr;
        msh = msh->m_nextHelper) {
     msh->Check();
   }

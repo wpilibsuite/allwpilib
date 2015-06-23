@@ -31,7 +31,7 @@ int VisionAPI_debugFlag = 1;
 *
 * @param type Type of image to create
 * @return Image* On success, this function returns the created image. On
-* failure, it returns NULL.
+* failure, it returns nullptr.
 */
 Image* frcCreateImage(ImageType type) {
   return imaqCreateImage(type, DEFAULT_BORDER_SIZE);
@@ -50,7 +50,7 @@ int frcDispose(void* object) { return imaqDispose(object); }
 *
 * @param functionName The name of the function
 * @param ... A list of pointers to structures that need to be disposed of.
-* The last pointer in the list should always be set to NULL.
+* The last pointer in the list should always be set to nullptr.
 *
 * @return On success: 1. On failure: 0. To get extended error information, call
 * GetLastError().
@@ -63,7 +63,7 @@ int frcDispose(const char* functionName, ...) /* Variable argument list */
 
   va_start(disposalPtrList, functionName); /* start of variable list */
   disposalPtr = va_arg(disposalPtrList, void*);
-  while (disposalPtr != NULL) {
+  while (disposalPtr != nullptr) {
     success = imaqDispose(disposalPtr);
     if (!success) {
       returnValue = 0;
@@ -78,7 +78,7 @@ int frcDispose(const char* functionName, ...) /* Variable argument list */
 * Supports IMAQ_IMAGE_U8, IMAQ_IMAGE_I16, IMAQ_IMAGE_SGL, IMAQ_IMAGE_RGB,
 * IMAQ_IMAGE_HSL.
 *
-* @param dest Copy of image. On failure, dest is NULL. Must have already been
+* @param dest Copy of image. On failure, dest is nullptr. Must have already been
 * created using frcCreateImage().
 * When you are finished with the created image, dispose of it by calling
 * frcDispose().
@@ -135,13 +135,13 @@ int frcScale(Image* dest, const Image* source, int xScale, int yScale,
  * IMAQ_IMAGE_RGB, IMAQ_IMAGE_HSL, IMAQ_IMAGE_RGB_U64.
  *
  * @param image Image read in
- * @param fileName File to read. Cannot be NULL
+ * @param fileName File to read. Cannot be nullptr
  *
  * @return On success: 1. On failure: 0. To get extended error information, call
  * GetLastError().
  */
 int frcReadImage(Image* image, const char* fileName) {
-  return imaqReadFile(image, fileName, NULL, NULL);
+  return imaqReadFile(image, fileName, nullptr, nullptr);
 }
 
 /**
@@ -168,14 +168,14 @@ int frcReadImage(Image* image, const char* fileName) {
 * 		PNG, TIFF, JPEG2000 		8-bit, 16-bit, RGB, RGBU64
 *
 * @param image Image to write
-* @param fileName File to read. Cannot be NULL. The extension determines the
+* @param fileName File to read. Cannot be nullptr. The extension determines the
 * file format that is written.
 *
 * @return On success: 1. On failure: 0. To get extended error information, call
 * GetLastError().
 */
 int frcWriteImage(const Image* image, const char* fileName) {
-  RGBValue* colorTable = NULL;
+  RGBValue* colorTable = nullptr;
   return imaqWriteFile(image, fileName, colorTable);
 }
 
@@ -214,7 +214,7 @@ int frcWriteImage(const Image* image, const char* fileName) {
 * @return On success, this function returns a report describing the pixel value
 * classification.
 * When you are finished with the report, dispose of it by calling frcDispose().
-* On failure, this function returns NULL. To get extended error information,
+* On failure, this function returns nullptr. To get extended error information,
 * call GetLastError().
 *
 */
@@ -233,24 +233,24 @@ HistogramReport* frcHistogram(const Image* image, int numClasses, float min,
   success = imaqAddRectContour(pRoi, rect);
   if (!success) {
     GetLastVisionError();
-    return NULL;
+    return nullptr;
   }
 
   /* make a mask from the ROI */
   Image* pMask = frcCreateImage(IMAQ_IMAGE_U8);
-  success = imaqROIToMask(pMask, pRoi, fillValue, NULL, NULL);
+  success = imaqROIToMask(pMask, pRoi, fillValue, nullptr, nullptr);
   if (!success) {
     GetLastVisionError();
-    frcDispose(__FUNCTION__, pRoi, NULL);
-    return NULL;
+    frcDispose(__FUNCTION__, pRoi, nullptr);
+    return nullptr;
   }
 
   /* get a histogram report */
-  HistogramReport* pHr = NULL;
+  HistogramReport* pHr = nullptr;
   pHr = imaqHistogram(image, numClasses, min, max, pMask);
 
   /* clean up */
-  frcDispose(__FUNCTION__, pRoi, pMask, NULL);
+  frcDispose(__FUNCTION__, pRoi, pMask, nullptr);
 
   return pHr;
 }
@@ -268,7 +268,7 @@ HistogramReport* frcHistogram(const Image* image, int numClasses, float min,
 * @param mask An optional mask image. This image must be an IMAQ_IMAGE_U8 image.
 * The function calculates the histogram using only those pixels in the image
 * whose
-* corresponding pixels in the mask are non-zero. Set this parameter to NULL to
+* corresponding pixels in the mask are non-zero. Set this parameter to nullptr to
 * calculate
 * the histogram of the entire image, or use the simplified call.
 *
@@ -276,17 +276,17 @@ HistogramReport* frcHistogram(const Image* image, int numClasses, float min,
 * classification
 * of each plane in a HistogramReport.
 * When you are finished with the report, dispose of it by calling frcDispose().
-* On failure, this function returns NULL.
+* On failure, this function returns nullptr.
 * To get extended error information, call imaqGetLastError().
 */
 ColorHistogramReport* frcColorHistogram(const Image* image, int numClasses,
                                         ColorMode mode) {
-  return frcColorHistogram(image, numClasses, mode, NULL);
+  return frcColorHistogram(image, numClasses, mode, nullptr);
 }
 
 ColorHistogramReport* frcColorHistogram(const Image* image, int numClasses,
                                         ColorMode mode, Image* mask) {
-  return imaqColorHistogram2((Image*)image, numClasses, mode, NULL, mask);
+  return imaqColorHistogram2((Image*)image, numClasses, mode, nullptr, mask);
 }
 
 /**
@@ -299,7 +299,7 @@ ColorHistogramReport* frcColorHistogram(const Image* image, int numClasses,
 * @param image The image whose pixel value the function queries
 * @param pixel The coordinates of the pixel that the function queries
 * @param value On return, the value of the specified image pixel. This parameter
-* cannot be NULL.
+* cannot be nullptr.
 * This data structure contains either grayscale, RGB, HSL, Complex or
 * RGBU64Value depending on the type of image.
 * @return On success: 1. On failure: 0. To get extended error information, call
@@ -319,7 +319,7 @@ int frcGetPixelValue(const Image* image, Point pixel, PixelValue* value) {
 * as the Source image. It will contain only the filtered particles.
 * @param source The image containing the particles to filter.
 * @param criteria An array of criteria to apply to the particles in the source
-* image. This array cannot be NULL.
+* image. This array cannot be nullptr.
 * See the NIVisionCVI.chm help file for definitions of criteria.
 * @param criteriaCount The number of elements in the criteria array.
 * @param options Binary filter options, including rejectMatches, rejectBorder,
@@ -371,7 +371,7 @@ int frcParticleFilter(Image* dest, Image* source,
 * GetLastError().
 */
 int frcMorphology(Image* dest, Image* source, MorphologyMethod method) {
-  return imaqMorphology(dest, source, method, NULL);
+  return imaqMorphology(dest, source, method, nullptr);
 }
 
 int frcMorphology(Image* dest, Image* source, MorphologyMethod method,
@@ -539,7 +539,7 @@ int frcParticleAnalysis(Image* image, int particleNumber,
 * will be copied. Only those pixels in the Image Src (Small) image that
 * correspond to an equivalent non-zero pixel in the mask image are copied. All
 * other pixels keep their original values. The entire image is processed if Image
-* Mask is NULL or this parameter is omitted.
+* Mask is nullptr or this parameter is omitted.
 * @return On success: 1. On failure: 0. To get extended error information, call
 * GetLastError().
 *
@@ -548,7 +548,7 @@ int frcParticleAnalysis(Image* image, int particleNumber,
 * 		minMatchScore = DEFAULT_MINMAX_SCORE (800)
 */
 int frcEqualize(Image* dest, const Image* source, float min, float max) {
-  return frcEqualize(dest, source, min, max, NULL);
+  return frcEqualize(dest, source, min, max, nullptr);
 }
 
 int frcEqualize(Image* dest, const Image* source, float min, float max,
@@ -695,11 +695,11 @@ int frcSimpleThreshold(Image* dest, const Image* source, float rangeMin,
 * @param mode The color space to perform the threshold in. valid values are:
 * IMAQ_RGB, IMAQ_HSL.
 * @param plane1Range The selection range for the first plane of the image. Set
-* this parameter to NULL to use a selection range from 0 to 255.
+* this parameter to nullptr to use a selection range from 0 to 255.
 * @param plane2Range The selection range for the second plane of the image. Set
-* this parameter to NULL to use a selection range from 0 to 255.
+* this parameter to nullptr to use a selection range from 0 to 255.
 * @param plane3Range The selection range for the third plane of the image. Set
-* this parameter to NULL to use a selection range from 0 to 255.
+* this parameter to nullptr to use a selection range from 0 to 255.
 *
 * @return On success: 1. On failure: 0. To get extended error information, call
 * GetLastError().
@@ -726,11 +726,11 @@ int frcColorThreshold(Image* dest, const Image* source, ColorMode mode,
 * @param mode The color space to perform the threshold in. valid values are:
 * IMAQ_RGB, IMAQ_HSL.
 * @param plane1Range The selection range for the first plane of the image. Set
-* this parameter to NULL to use a selection range from 0 to 255.
+* this parameter to nullptr to use a selection range from 0 to 255.
 * @param plane2Range The selection range for the second plane of the image. Set
-* this parameter to NULL to use a selection range from 0 to 255.
+* this parameter to nullptr to use a selection range from 0 to 255.
 * @param plane3Range The selection range for the third plane of the image. Set
-* this parameter to NULL to use a selection range from 0 to 255.
+* this parameter to nullptr to use a selection range from 0 to 255.
 *
 * @return On success: 1. On failure: 0. To get extended error information, call
 * GetLastError().
@@ -784,11 +784,11 @@ int frcHueThreshold(Image* dest, const Image* source, const Range* hueRange,
 * @param image The source image that the function extracts the planes from.
 * @param mode The color space that the function extracts the planes from. Valid
 * values are IMAQ_RGB, IMAQ_HSL, IMAQ_HSV, IMAQ_HSI.
-* @param plane1 On return, the first extracted plane. Set this parameter to NULL
+* @param plane1 On return, the first extracted plane. Set this parameter to nullptr
 * if you do not need this information. RGB-Red, HSL/HSV/HSI-Hue.
 * @param plane2 On return, the second extracted plane. Set this parameter to
-* NULL if you do not need this information. RGB-Green, HSL/HSV/HSI-Saturation.
-* @param plane3 On return, the third extracted plane. Set this parameter to NULL
+* nullptr if you do not need this information. RGB-Green, HSL/HSV/HSI-Saturation.
+* @param plane3 On return, the third extracted plane. Set this parameter to nullptr
 * if you do not need this information. RGB-Blue, HSL-Luminance, HSV-Value,
 * HSI-Intensity.
 *
@@ -816,5 +816,5 @@ int frcExtractHuePlane(const Image* image, Image* huePlane) {
 }
 
 int frcExtractHuePlane(const Image* image, Image* huePlane, int minSaturation) {
-  return frcExtractColorPlanes(image, IMAQ_HSL, huePlane, NULL, NULL);
+  return frcExtractColorPlanes(image, IMAQ_HSL, huePlane, nullptr, nullptr);
 }

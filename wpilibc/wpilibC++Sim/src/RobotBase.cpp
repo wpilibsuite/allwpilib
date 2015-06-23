@@ -10,11 +10,11 @@
 
 #include <cstring>
 
-RobotBase* RobotBase::m_instance = NULL;
+RobotBase* RobotBase::m_instance = nullptr;
 
 void RobotBase::setInstance(RobotBase* robot)
 {
-	wpi_assert(m_instance == NULL);
+	wpi_assert(m_instance == nullptr);
 	m_instance = robot;
 }
 

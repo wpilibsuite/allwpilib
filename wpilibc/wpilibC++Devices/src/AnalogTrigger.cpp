@@ -156,6 +156,6 @@ bool AnalogTrigger::GetTriggerState() {
  * @return A pointer to a new AnalogTriggerOutput object.
  */
 AnalogTriggerOutput *AnalogTrigger::CreateOutput(AnalogTriggerType type) {
-  if (StatusIsFatal()) return NULL;
+  if (StatusIsFatal()) return nullptr;
   return new AnalogTriggerOutput(this, type);
 }

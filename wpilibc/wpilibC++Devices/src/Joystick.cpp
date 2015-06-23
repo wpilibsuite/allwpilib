@@ -30,10 +30,10 @@ static bool joySticksInitialized = false;
  * (0-5).
  */
 Joystick::Joystick(uint32_t port)
-    : m_ds(NULL),
+    : m_ds(nullptr),
       m_port(port),
-      m_axes(NULL),
-      m_buttons(NULL),
+      m_axes(nullptr),
+      m_buttons(nullptr),
       m_outputs(0),
       m_leftRumble(0),
       m_rightRumble(0) {
@@ -63,14 +63,13 @@ Joystick::Joystick(uint32_t port)
  */
 Joystick::Joystick(uint32_t port, uint32_t numAxisTypes,
                    uint32_t numButtonTypes)
-    : m_ds(NULL), m_port(port), m_axes(NULL), m_buttons(NULL) {
+    : m_ds(nullptr), m_port(port), m_axes(nullptr), m_buttons(nullptr) {
   InitJoystick(numAxisTypes, numButtonTypes);
 }
 
 void Joystick::InitJoystick(uint32_t numAxisTypes, uint32_t numButtonTypes) {
   if (!joySticksInitialized) {
-    for (unsigned i = 0; i < DriverStation::kJoystickPorts; i++)
-      joysticks[i] = NULL;
+    for (auto& joystick : joysticks) joystick = nullptr;
     joySticksInitialized = true;
   }
   if (m_port >= DriverStation::kJoystickPorts) {
@@ -86,7 +85,7 @@ void Joystick::InitJoystick(uint32_t numAxisTypes, uint32_t numButtonTypes) {
 
 Joystick *Joystick::GetStickForPort(uint32_t port) {
   Joystick *stick = joysticks[port];
-  if (stick == NULL) {
+  if (stick == nullptr) {
     stick = new Joystick(port);
     joysticks[port] = stick;
   }

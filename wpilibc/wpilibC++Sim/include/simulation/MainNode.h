@@ -10,7 +10,7 @@ using namespace gazebo;
 class MainNode {
 public:
 	static MainNode* GetInstance() {
-		if (instance == NULL) {
+		if (instance == nullptr) {
 			instance = new MainNode();
 		}
 		return instance;

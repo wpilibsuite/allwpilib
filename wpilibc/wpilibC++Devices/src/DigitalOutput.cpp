@@ -15,7 +15,7 @@
  * constructors.
  */
 void DigitalOutput::InitDigitalOutput(uint32_t channel) {
-  m_table = NULL;
+  m_table = nullptr;
   char buf[64];
 
   if (!CheckDigitalChannel(channel)) {
@@ -210,13 +210,13 @@ void DigitalOutput::ValueChanged(ITable *source, const std::string &key,
 void DigitalOutput::UpdateTable() {}
 
 void DigitalOutput::StartLiveWindowMode() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->AddTableListener("Value", this, true);
   }
 }
 
 void DigitalOutput::StopLiveWindowMode() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->RemoveTableListener(this);
   }
 }

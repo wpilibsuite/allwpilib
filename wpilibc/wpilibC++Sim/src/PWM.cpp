@@ -24,7 +24,7 @@ const int32_t PWM::kPwmDisabled;
  */
 void PWM::InitPWM(uint32_t channel)
 {
-	m_table = NULL;
+	m_table = nullptr;
 	char buf[64];
 
 	if (!CheckPWMChannel(channel))
@@ -240,21 +240,21 @@ void PWM::ValueChanged(ITable* source, const std::string& key, EntryValue value,
 }
 
 void PWM::UpdateTable() {
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
 		m_table->PutNumber("Value", GetSpeed());
 	}
 }
 
 void PWM::StartLiveWindowMode() {
 	SetSpeed(0);
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
 		m_table->AddTableListener("Value", this, true);
 	}
 }
 
 void PWM::StopLiveWindowMode() {
 	SetSpeed(0);
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
 		m_table->RemoveTableListener(this);
 	}
 }

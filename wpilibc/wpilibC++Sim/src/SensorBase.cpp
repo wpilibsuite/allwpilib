@@ -16,7 +16,7 @@ const uint32_t SensorBase::kPwmChannels;
 const uint32_t SensorBase::kRelayChannels;
 const uint32_t SensorBase::kPDPChannels;
 const uint32_t SensorBase::kChassisSlots;
-SensorBase *SensorBase::m_singletonList = NULL;
+SensorBase *SensorBase::m_singletonList = nullptr;
 
 /**
  * Creates an instance of the sensor base and gets an FPGA handle
@@ -54,13 +54,13 @@ void SensorBase::AddToSingletonList()
  */
 void SensorBase::DeleteSingletons()
 {
-	for (SensorBase *next = m_singletonList; next != NULL;)
+	for (SensorBase *next = m_singletonList; next != nullptr;)
 	{
 		SensorBase *tmp = next;
 		next = next->m_nextSingleton;
 		delete tmp;
 	}
-	m_singletonList = NULL;
+	m_singletonList = nullptr;
 }
 
 /**

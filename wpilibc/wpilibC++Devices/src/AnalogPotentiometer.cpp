@@ -103,7 +103,7 @@ void AnalogPotentiometer::InitTable(ITable *subtable) {
 }
 
 void AnalogPotentiometer::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("Value", Get());
   }
 }

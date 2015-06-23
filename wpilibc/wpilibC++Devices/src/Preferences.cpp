@@ -25,12 +25,12 @@ static const char *kValuePrefix = "=\"";
 /** The characters to put after the value */
 static const char *kValueSuffix = "\"\n";
 /** The singleton instance */
-Preferences *Preferences::_instance = NULL;
+Preferences *Preferences::_instance = nullptr;
 
 Preferences::Preferences()
-    : m_fileLock(NULL),
-      m_fileOpStarted(NULL),
-      m_tableLock(NULL),
+    : m_fileLock(nullptr),
+      m_fileOpStarted(nullptr),
+      m_tableLock(nullptr),
       m_readTask("PreferencesReadTask", (FUNCPTR)Preferences::InitReadTask),
       m_writeTask("PreferencesWriteTask", (FUNCPTR)Preferences::InitWriteTask) {
   m_fileLock = initializeMutexRecursive();
@@ -57,7 +57,7 @@ Preferences::~Preferences() {
  * @return pointer to the {@link Preferences}
  */
 Preferences *Preferences::GetInstance() {
-  if (_instance == NULL) _instance = new Preferences;
+  if (_instance == nullptr) _instance = new Preferences;
   return _instance;
 }
 
@@ -106,7 +106,7 @@ int Preferences::GetInt(const char *key, int defaultValue) {
   std::string value = Get(key);
   if (value.empty()) return defaultValue;
 
-  return strtol(value.c_str(), NULL, 0);
+  return strtol(value.c_str(), nullptr, 0);
 }
 
 /**
@@ -120,7 +120,7 @@ double Preferences::GetDouble(const char *key, double defaultValue) {
   std::string value = Get(key);
   if (value.empty()) return defaultValue;
 
-  return strtod(value.c_str(), NULL);
+  return strtod(value.c_str(), nullptr);
 }
 
 /**
@@ -134,7 +134,7 @@ float Preferences::GetFloat(const char *key, float defaultValue) {
   std::string value = Get(key);
   if (value.empty()) return defaultValue;
 
-  return strtod(value.c_str(), NULL);
+  return strtod(value.c_str(), nullptr);
 }
 
 /**
@@ -172,7 +172,7 @@ int64_t Preferences::GetLong(const char *key, int64_t defaultValue) {
   if (value.empty()) return defaultValue;
 
   // Ummm... not available in our VxWorks...
-  // return strtoll(value.c_str(), NULL, 0);
+  // return strtoll(value.c_str(), nullptr, 0);
   int64_t intVal;
   sscanf(value.c_str(), "%lld", &intVal);
   return intVal;
@@ -192,7 +192,7 @@ int64_t Preferences::GetLong(const char *key, int64_t defaultValue) {
  * @param value the value
  */
 void Preferences::PutString(const char *key, const char *value) {
-  if (value == NULL) {
+  if (value == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "value");
     return;
   }
@@ -323,7 +323,7 @@ bool Preferences::ContainsKey(const char *key) { return !Get(key).empty(); }
  */
 void Preferences::Remove(const char *key) {
   m_values.erase(std::string(key));
-  std::vector<std::string>::iterator it = m_keys.begin();
+  auto it = m_keys.begin();
   for (; it != m_keys.end(); it++) {
     if (it->compare(key) == 0) {
       m_keys.erase(it);
@@ -339,7 +339,7 @@ void Preferences::Remove(const char *key) {
  */
 std::string Preferences::Get(const char *key) {
   Synchronized sync(m_tableLock);
-  if (key == NULL) {
+  if (key == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "key");
     return std::string("");
   }
@@ -353,7 +353,7 @@ std::string Preferences::Get(const char *key) {
  */
 void Preferences::Put(const char *key, std::string value) {
   Synchronized sync(m_tableLock);
-  if (key == NULL) {
+  if (key == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "key");
     return;
   }
@@ -385,10 +385,10 @@ void Preferences::ReadTaskRun() {
 
   std::string comment;
 
-  FILE *file = NULL;
+  FILE *file = nullptr;
   file = fopen(kFileName, "r");
 
-  if (file != NULL) {
+  if (file != nullptr) {
     std::string buffer;
     while (true) {
       char value;
@@ -469,7 +469,7 @@ void Preferences::ReadTaskRun() {
     wpi_setErrnoErrorWithContext("Opening preferences file");
   }
 
-  if (file != NULL) fclose(file);
+  if (file != nullptr) fclose(file);
 
   if (!comment.empty()) m_endComment = comment;
 
@@ -486,11 +486,11 @@ void Preferences::WriteTaskRun() {
   Synchronized sync(m_tableLock);
   giveSemaphore(m_fileOpStarted);
 
-  FILE *file = NULL;
+  FILE *file = nullptr;
   file = fopen(kFileName, "w");
 
   fputs("[Preferences]\n", file);
-  std::vector<std::string>::iterator it = m_keys.begin();
+  auto it = m_keys.begin();
   for (; it != m_keys.end(); it++) {
     std::string key = *it;
     std::string value = m_values[key];
@@ -506,14 +506,13 @@ void Preferences::WriteTaskRun() {
 
   if (!m_endComment.empty()) fputs(m_endComment.c_str(), file);
 
-  if (file != NULL) fclose(file);
+  if (file != nullptr) fclose(file);
 
   NetworkTable::GetTable(kTableName)->PutBoolean(kSaveField, false);
 }
 
 static bool isKeyAcceptable(const std::string &value) {
-  for (unsigned int i = 0; i < value.length(); i++) {
-    char letter = value.at(i);
+  for (auto letter : value) {
     switch (letter) {
       case '=':
       case '\n':
@@ -538,7 +537,7 @@ void Preferences::ValueChanged(ITable *table, const std::string &key,
         table->GetString(key, "").find('"') != std::string::npos) {
       if (m_values.find(key) != m_values.end()) {
         m_values.erase(key);
-        std::vector<std::string>::iterator it = m_keys.begin();
+        auto it = m_keys.begin();
         for (; it != m_keys.end(); it++) {
           if (key == *it) {
             m_keys.erase(it);

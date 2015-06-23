@@ -25,7 +25,7 @@ constexpr float Gyro::kDefaultVoltsPerDegreePerSecond;
  */
 void Gyro::InitGyro(int channel)
 {
-	m_table = NULL;
+	m_table = nullptr;
 	SetPIDSourceParameter(kAngle);
 
 	char buffer[50];
@@ -116,7 +116,7 @@ double Gyro::PIDGet() const
 }
 
 void Gyro::UpdateTable() {
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
 		m_table->PutNumber("Value", GetAngle());
 	}
 }

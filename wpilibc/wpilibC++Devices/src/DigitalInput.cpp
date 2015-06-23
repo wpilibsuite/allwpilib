@@ -17,7 +17,7 @@
  * constructors.
  */
 void DigitalInput::InitDigitalInput(uint32_t channel) {
-  m_table = NULL;
+  m_table = nullptr;
   char buf[64];
 
   if (!CheckDigitalChannel(channel)) {
@@ -48,11 +48,11 @@ DigitalInput::DigitalInput(uint32_t channel) { InitDigitalInput(channel); }
  */
 DigitalInput::~DigitalInput() {
   if (StatusIsFatal()) return;
-  if (m_interrupt != NULL) {
+  if (m_interrupt != nullptr) {
     int32_t status = 0;
     cleanInterrupts(m_interrupt, &status);
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
-    m_interrupt = NULL;
+    m_interrupt = nullptr;
     m_interrupts->Free(m_interruptIndex);
   }
 
@@ -93,7 +93,7 @@ uint32_t DigitalInput::GetModuleForRouting() const { return 0; }
 bool DigitalInput::GetAnalogTriggerForRouting() const { return false; }
 
 void DigitalInput::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutBoolean("Value", Get());
   }
 }

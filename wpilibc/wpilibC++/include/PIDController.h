@@ -59,7 +59,7 @@ class PIDController : public LiveWindowSendable,
 
   virtual void Reset() override;
 
-  virtual void InitTable(ITable *table);
+  virtual void InitTable(ITable *table) override;
 
  private:
   float m_P;              // factor for "proportional" control
@@ -94,13 +94,13 @@ class PIDController : public LiveWindowSendable,
                   PIDOutput *output, float period = 0.05);
   static void CallCalculate(void *controller);
 
-  virtual ITable *GetTable() const;
-  virtual std::string GetSmartDashboardType() const;
+  virtual ITable *GetTable() const override;
+  virtual std::string GetSmartDashboardType() const override;
   virtual void ValueChanged(ITable *source, const std::string &key,
-                            EntryValue value, bool isNew);
-  virtual void UpdateTable();
-  virtual void StartLiveWindowMode();
-  virtual void StopLiveWindowMode();
+                            EntryValue value, bool isNew) override;
+  virtual void UpdateTable() override;
+  virtual void StartLiveWindowMode() override;
+  virtual void StopLiveWindowMode() override;
 
  protected:
   ITable *m_table;

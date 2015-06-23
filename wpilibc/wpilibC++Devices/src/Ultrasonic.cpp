@@ -28,9 +28,9 @@ Task Ultrasonic::m_task(
     (FUNCPTR)
         UltrasonicChecker);  // task doing the round-robin automatic sensing
 Ultrasonic *Ultrasonic::m_firstSensor =
-    NULL;  // head of the ultrasonic sensor list
+    nullptr;  // head of the ultrasonic sensor list
 bool Ultrasonic::m_automaticEnabled = false;  // automatic round robin mode
-SEMAPHORE_ID Ultrasonic::m_semaphore = 0;
+SEMAPHORE_ID Ultrasonic::m_semaphore = nullptr;
 
 /**
  * Background task that goes through the list of ultrasonic sensors and pings
@@ -45,10 +45,10 @@ SEMAPHORE_ID Ultrasonic::m_semaphore = 0;
  * anything with the sensors!!
  */
 void Ultrasonic::UltrasonicChecker() {
-  Ultrasonic *u = NULL;
+  Ultrasonic *u = nullptr;
   while (m_automaticEnabled) {
-    if (u == NULL) u = m_firstSensor;
-    if (u == NULL) return;
+    if (u == nullptr) u = m_firstSensor;
+    if (u == nullptr) return;
     if (u->IsEnabled()) u->m_pingChannel->Pulse(kPingTime);  // do the ping
     u = u->m_nextSensor;
     Wait(0.1);  // wait for ping to return
@@ -66,9 +66,9 @@ void Ultrasonic::UltrasonicChecker() {
  * restored.
  */
 void Ultrasonic::Initialize() {
-  m_table = NULL;
+  m_table = nullptr;
   bool originalMode = m_automaticEnabled;
-  if (m_semaphore == 0) m_semaphore = initializeSemaphore(SEMAPHORE_FULL);
+  if (m_semaphore == nullptr) m_semaphore = initializeSemaphore(SEMAPHORE_FULL);
   SetAutomaticMode(false);     // kill task when adding a new sensor
   takeSemaphore(m_semaphore);  // link this instance on the list
   {
@@ -124,7 +124,7 @@ Ultrasonic::Ultrasonic(uint32_t pingChannel, uint32_t echoChannel,
  */
 Ultrasonic::Ultrasonic(DigitalOutput *pingChannel, DigitalInput *echoChannel,
                        DistanceUnit units) {
-  if (pingChannel == NULL || echoChannel == NULL) {
+  if (pingChannel == nullptr || echoChannel == nullptr) {
     wpi_setWPIError(NullParameter);
     return;
   }
@@ -169,18 +169,18 @@ Ultrasonic::~Ultrasonic() {
     delete m_pingChannel;
     delete m_echoChannel;
   }
-  wpi_assert(m_firstSensor != NULL);
+  wpi_assert(m_firstSensor != nullptr);
 
   takeSemaphore(m_semaphore);
   {
     if (this == m_firstSensor) {
       m_firstSensor = m_nextSensor;
-      if (m_firstSensor == NULL) {
+      if (m_firstSensor == nullptr) {
         SetAutomaticMode(false);
       }
     } else {
-      wpi_assert(m_firstSensor->m_nextSensor != NULL);
-      for (Ultrasonic *s = m_firstSensor; s != NULL; s = s->m_nextSensor) {
+      wpi_assert(m_firstSensor->m_nextSensor != nullptr);
+      for (Ultrasonic *s = m_firstSensor; s != nullptr; s = s->m_nextSensor) {
         if (this == s->m_nextSensor) {
           s->m_nextSensor = s->m_nextSensor->m_nextSensor;
           break;
@@ -189,7 +189,7 @@ Ultrasonic::~Ultrasonic() {
     }
   }
   giveSemaphore(m_semaphore);
-  if (m_firstSensor != NULL && wasAutomaticMode) SetAutomaticMode(true);
+  if (m_firstSensor != nullptr && wasAutomaticMode) SetAutomaticMode(true);
 }
 
 /**
@@ -211,7 +211,7 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
   if (enabling) {
     // enabling automatic mode.
     // Clear all the counters so no data is valid
-    for (Ultrasonic *u = m_firstSensor; u != NULL; u = u->m_nextSensor) {
+    for (Ultrasonic *u = m_firstSensor; u != nullptr; u = u->m_nextSensor) {
       u->m_counter->Reset();
     }
     // Start round robin task
@@ -225,7 +225,7 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
                    // stop
 
     // clear all the counters (data now invalid) since automatic mode is stopped
-    for (Ultrasonic *u = m_firstSensor; u != NULL; u = u->m_nextSensor) {
+    for (Ultrasonic *u = m_firstSensor; u != nullptr; u = u->m_nextSensor) {
       u->m_counter->Reset();
     }
     m_task.Stop();
@@ -313,7 +313,7 @@ Ultrasonic::DistanceUnit Ultrasonic::GetDistanceUnits() const {
 }
 
 void Ultrasonic::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("Value", GetRangeInches());
   }
 }

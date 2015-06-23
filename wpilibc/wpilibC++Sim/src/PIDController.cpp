@@ -60,7 +60,7 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
 								PIDSource *source, PIDOutput *output,
 								float period)
 {
-	m_table = NULL;
+	m_table = nullptr;
 
 	m_P = Kp;
 	m_I = Ki;
@@ -211,7 +211,7 @@ void PIDController::SetPID(double p, double i, double d)
 	}
 	END_REGION;
 
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
 		m_table->PutNumber("p", m_P);
 		m_table->PutNumber("i", m_I);
 		m_table->PutNumber("d", m_D);
@@ -237,7 +237,7 @@ void PIDController::SetPID(double p, double i, double d, double f)
 	}
 	END_REGION;
 
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
 		m_table->PutNumber("p", m_P);
 		m_table->PutNumber("i", m_I);
 		m_table->PutNumber("d", m_D);
@@ -386,9 +386,9 @@ void PIDController::SetSetpoint(float setpoint)
 			m_setpoint = setpoint;
 		}
 	}
-	END_REGION;
-
-	if (m_table != NULL) {
+	END_REGION;	
+	
+	if (m_table != nullptr) {
 		m_table->PutNumber("setpoint", m_setpoint);
 	}
 }
@@ -504,9 +504,9 @@ void PIDController::Enable()
 	{
 		m_enabled = true;
 	}
-	END_REGION;
-
-	if (m_table != NULL) {
+	END_REGION;	
+	
+	if (m_table != nullptr) {
 		m_table->PutBoolean("enabled", true);
 	}
 }
@@ -522,8 +522,8 @@ void PIDController::Disable()
 		m_enabled = false;
 	}
 	END_REGION;
-
-	if (m_table != NULL) {
+	
+	if (m_table != nullptr) {
 		m_table->PutBoolean("enabled", false);
 	}
 }
@@ -563,10 +563,10 @@ std::string PIDController::GetSmartDashboardType() const {
 }
 
 void PIDController::InitTable(ITable* table){
-	if(m_table!=NULL)
+	if(m_table!=nullptr)
 		m_table->RemoveTableListener(this);
 	m_table = table;
-	if(m_table!=NULL){
+	if(m_table!=nullptr){
 		m_table->PutNumber(kP, GetP());
 		m_table->PutNumber(kI, GetI());
 		m_table->PutNumber(kD, GetD());

@@ -40,7 +40,7 @@ ADXL345_I2C::ADXL345_I2C(Port port, Range range) : I2C(port, kAddress) {
  */
 ADXL345_I2C::~ADXL345_I2C() {
   // delete m_i2c;
-  // m_i2c = NULL;
+  // m_i2c = nullptr;
 }
 
 /** {@inheritdoc} */
@@ -102,7 +102,7 @@ void ADXL345_I2C::InitTable(ITable *subtable) {
 }
 
 void ADXL345_I2C::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("X", GetX());
     m_table->PutNumber("Y", GetY());
     m_table->PutNumber("Z", GetZ());

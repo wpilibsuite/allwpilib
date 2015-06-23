@@ -150,7 +150,7 @@ void PowerDistributionPanel::ClearStickyFaults() {
 }
 
 void PowerDistributionPanel::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("Chan0", GetCurrent(0));
     m_table->PutNumber("Chan1", GetCurrent(1));
     m_table->PutNumber("Chan2", GetCurrent(2));

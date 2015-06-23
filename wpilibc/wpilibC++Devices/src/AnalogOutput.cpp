@@ -10,10 +10,10 @@
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 
-static Resource *outputs = NULL;
+static Resource *outputs = nullptr;
 
 void AnalogOutput::InitAnalogOutput(uint32_t channel) {
-  m_table = NULL;
+  m_table = nullptr;
 
   Resource::CreateResourceObject(&outputs, kAnalogOutputs);
 
@@ -80,7 +80,7 @@ float AnalogOutput::GetVoltage() const {
 }
 
 void AnalogOutput::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("Value", GetVoltage());
   }
 }

@@ -1,6 +1,6 @@
 #include "RobotState.h"
 
-RobotStateInterface* RobotState::impl = 0;
+RobotStateInterface* RobotState::impl = nullptr;
 
 void RobotState::SetImplementation(RobotStateInterface* i) { impl = i; }
 

@@ -1,3 +1,3 @@
 
 #include "simulation/MainNode.h"
-MainNode* MainNode::instance = NULL;
+MainNode* MainNode::instance = nullptr;

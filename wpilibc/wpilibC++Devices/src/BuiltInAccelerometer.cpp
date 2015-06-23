@@ -60,7 +60,7 @@ void BuiltInAccelerometer::InitTable(ITable* subtable) {
 }
 
 void BuiltInAccelerometer::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("X", GetX());
     m_table->PutNumber("Y", GetY());
     m_table->PutNumber("Z", GetZ());

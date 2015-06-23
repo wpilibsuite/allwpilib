@@ -11,7 +11,7 @@
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 
-static Resource *inputs = NULL;
+static Resource *inputs = nullptr;
 
 const uint8_t AnalogInput::kAccumulatorModuleNumber;
 const uint32_t AnalogInput::kAccumulatorNumChannels;
@@ -21,7 +21,7 @@ const uint32_t AnalogInput::kAccumulatorChannels[] = {0, 1};
  * Common initialization.
  */
 void AnalogInput::InitAnalogInput(uint32_t channel) {
-  m_table = NULL;
+  m_table = nullptr;
   char buf[64];
   Resource::CreateResourceObject(&inputs, kAnalogInputs);
 
@@ -405,7 +405,7 @@ double AnalogInput::PIDGet() const {
 }
 
 void AnalogInput::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("Value", GetAverageVoltage());
   }
 }

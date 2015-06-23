@@ -16,21 +16,21 @@
 #include <set>
 #include <algorithm>
 
-Scheduler *Scheduler::_instance = NULL;
+Scheduler *Scheduler::_instance = nullptr;
 
 Scheduler::Scheduler()
-    : m_buttonsLock(NULL), m_additionsLock(NULL), m_adding(false) {
+    : m_buttonsLock(nullptr), m_additionsLock(nullptr), m_adding(false) {
   m_buttonsLock = initializeMutexNormal();
   m_additionsLock = initializeMutexNormal();
 
   HLUsageReporting::ReportScheduler();
 
-  m_table = NULL;
+  m_table = nullptr;
   m_enabled = true;
   m_runningCommandsChanged = false;
-  toCancel = NULL;
-  commands = NULL;
-  ids = NULL;
+  toCancel = nullptr;
+  commands = nullptr;
+  ids = nullptr;
 }
 
 Scheduler::~Scheduler() {
@@ -46,7 +46,7 @@ Scheduler::~Scheduler() {
  * @return the {@link Scheduler}
  */
 Scheduler *Scheduler::GetInstance() {
-  if (_instance == NULL) _instance = new Scheduler();
+  if (_instance == nullptr) _instance = new Scheduler();
   return _instance;
 }
 
@@ -73,7 +73,7 @@ void Scheduler::AddButton(ButtonScheduler *button) {
 }
 
 void Scheduler::ProcessCommandAddition(Command *command) {
-  if (command == NULL) return;
+  if (command == nullptr) return;
 
   // Check to make sure no adding during adding
   if (m_adding) {
@@ -83,14 +83,14 @@ void Scheduler::ProcessCommandAddition(Command *command) {
   }
 
   // Only add if not already in
-  CommandSet::iterator found = m_commands.find(command);
+  auto found = m_commands.find(command);
   if (found == m_commands.end()) {
     // Check that the requirements can be had
     Command::SubsystemSet requirements = command->GetRequirements();
     Command::SubsystemSet::iterator iter;
     for (iter = requirements.begin(); iter != requirements.end(); iter++) {
       Subsystem *lock = *iter;
-      if (lock->GetCurrentCommand() != NULL &&
+      if (lock->GetCurrentCommand() != nullptr &&
           !lock->GetCurrentCommand()->IsInterruptible())
         return;
     }
@@ -99,7 +99,7 @@ void Scheduler::ProcessCommandAddition(Command *command) {
     m_adding = true;
     for (iter = requirements.begin(); iter != requirements.end(); iter++) {
       Subsystem *lock = *iter;
-      if (lock->GetCurrentCommand() != NULL) {
+      if (lock->GetCurrentCommand() != nullptr) {
         lock->GetCurrentCommand()->Cancel();
         Remove(lock->GetCurrentCommand());
       }
@@ -133,7 +133,7 @@ void Scheduler::Run() {
     if (!m_enabled) return;
 
     Synchronized sync(m_buttonsLock);
-    ButtonVector::reverse_iterator rButtonIter = m_buttons.rbegin();
+    auto rButtonIter = m_buttons.rbegin();
     for (; rButtonIter != m_buttons.rend(); rButtonIter++) {
       (*rButtonIter)->Execute();
     }
@@ -142,7 +142,7 @@ void Scheduler::Run() {
   m_runningCommandsChanged = false;
 
   // Loop through the commands
-  CommandSet::iterator commandIter = m_commands.begin();
+  auto commandIter = m_commands.begin();
   for (; commandIter != m_commands.end();) {
     Command *command = *commandIter;
     // Increment before potentially removing to keep the iterator valid
@@ -156,7 +156,7 @@ void Scheduler::Run() {
   // Add the new things
   {
     Synchronized sync(m_additionsLock);
-    CommandVector::iterator additionsIter = m_additions.begin();
+    auto additionsIter = m_additions.begin();
     for (; additionsIter != m_additions.end(); additionsIter++) {
       ProcessCommandAddition(*additionsIter);
     }
@@ -164,10 +164,10 @@ void Scheduler::Run() {
   }
 
   // Add in the defaults
-  Command::SubsystemSet::iterator subsystemIter = m_subsystems.begin();
+  auto subsystemIter = m_subsystems.begin();
   for (; subsystemIter != m_subsystems.end(); subsystemIter++) {
     Subsystem *lock = *subsystemIter;
-    if (lock->GetCurrentCommand() == NULL) {
+    if (lock->GetCurrentCommand() == nullptr) {
       ProcessCommandAddition(lock->GetDefaultCommand());
     }
     lock->ConfirmCommand();
@@ -184,7 +184,7 @@ void Scheduler::Run() {
  * @param system the system
  */
 void Scheduler::RegisterSubsystem(Subsystem *subsystem) {
-  if (subsystem == NULL) {
+  if (subsystem == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "subsystem");
     return;
   }
@@ -196,7 +196,7 @@ void Scheduler::RegisterSubsystem(Subsystem *subsystem) {
  * @param command the command to remove
  */
 void Scheduler::Remove(Command *command) {
-  if (command == NULL) {
+  if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
     return;
   }
@@ -204,10 +204,10 @@ void Scheduler::Remove(Command *command) {
   if (!m_commands.erase(command)) return;
 
   Command::SubsystemSet requirements = command->GetRequirements();
-  Command::SubsystemSet::iterator iter = requirements.begin();
+  auto iter = requirements.begin();
   for (; iter != requirements.end(); iter++) {
     Subsystem *lock = *iter;
-    lock->SetCurrentCommand(NULL);
+    lock->SetCurrentCommand(nullptr);
   }
 
   command->Removed();
@@ -228,7 +228,7 @@ void Scheduler::ResetAll() {
   m_buttons.clear();
   m_additions.clear();
   m_commands.clear();
-  m_table = NULL;
+  m_table = nullptr;
 }
 
 /**
@@ -237,7 +237,7 @@ void Scheduler::ResetAll() {
  */
 void Scheduler::UpdateTable() {
   CommandSet::iterator commandIter;
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     // Get the list of possible commands to cancel
     m_table->RetrieveValue("Cancel", *toCancel);
     //		m_table->RetrieveValue("Ids", *ids);

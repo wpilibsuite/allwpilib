@@ -26,10 +26,10 @@
 #include <taskLib.h>
 #endif
 
-RobotBase *RobotBase::m_instance = NULL;
+RobotBase *RobotBase::m_instance = nullptr;
 
 void RobotBase::setInstance(RobotBase *robot) {
-  wpi_assert(m_instance == NULL);
+  wpi_assert(m_instance == nullptr);
   m_instance = robot;
 }
 
@@ -52,18 +52,18 @@ void RobotBase::robotSetup(RobotBase *robot) {
  * nice to put this code into it's own task that loads on boot so ensure that it
  * runs.
  */
-RobotBase::RobotBase() : m_task(NULL), m_ds(NULL) {
+RobotBase::RobotBase() : m_task(nullptr), m_ds(nullptr) {
   m_ds = DriverStation::GetInstance();
   RobotState::SetImplementation(DriverStation::GetInstance());
   HLUsageReporting::SetImplementation(new HardwareHLReporting());
 
   RobotBase::setInstance(this);
 
-  FILE *file = NULL;
+  FILE *file = nullptr;
   file = fopen("/tmp/frc_versions/FRC_Lib_Version.ini", "w");
 
   fputs("2015 C++ 1.2.0", file);
-  if (file != NULL) fclose(file);
+  if (file != nullptr) fclose(file);
 }
 
 /**
@@ -75,8 +75,8 @@ RobotBase::RobotBase() : m_task(NULL), m_ds(NULL) {
 RobotBase::~RobotBase() {
   SensorBase::DeleteSingletons();
   delete m_task;
-  m_task = NULL;
-  m_instance = NULL;
+  m_task = nullptr;
+  m_instance = nullptr;
 }
 
 /**

@@ -24,7 +24,7 @@ constexpr float Servo::kDefaultMinServoPWM;
  * well as the minimum and maximum PWM values supported by the servo.
  */
 void Servo::InitServo() {
-  m_table = NULL;
+  m_table = nullptr;
   SetBounds(kDefaultMaxServoPWM, 0.0, 0.0, 0.0, kDefaultMinServoPWM);
   SetPeriodMultiplier(kPeriodMultiplier_4X);
 
@@ -112,19 +112,19 @@ void Servo::ValueChanged(ITable* source, const std::string& key,
 }
 
 void Servo::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("Value", Get());
   }
 }
 
 void Servo::StartLiveWindowMode() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->AddTableListener("Value", this, true);
   }
 }
 
 void Servo::StopLiveWindowMode() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->RemoveTableListener(this);
   }
 }

@@ -26,10 +26,10 @@ static bool joySticksInitialized = false;
  * @param port The port on the driver station that the joystick is plugged into.
  */
 Joystick::Joystick(uint32_t port)
-	: m_ds (NULL)
+	: m_ds (nullptr)
 	, m_port (port)
-	, m_axes (NULL)
-	, m_buttons (NULL)
+	, m_axes (nullptr)
+	, m_buttons (nullptr)
 {
 	InitJoystick(kNumAxisTypes, kNumButtonTypes);
 
@@ -54,10 +54,10 @@ Joystick::Joystick(uint32_t port)
  * @param numButtonTypes The number of button types in the enum.
  */
 Joystick::Joystick(uint32_t port, uint32_t numAxisTypes, uint32_t numButtonTypes)
-	: m_ds (NULL)
+	: m_ds (nullptr)
 	, m_port (port)
-	, m_axes (NULL)
-	, m_buttons (NULL)
+	, m_axes (nullptr)
+	, m_buttons (nullptr)
 {
 	InitJoystick(numAxisTypes, numButtonTypes);
 }
@@ -67,7 +67,7 @@ void Joystick::InitJoystick(uint32_t numAxisTypes, uint32_t numButtonTypes)
 	if ( !joySticksInitialized )
 	{
 		for (unsigned i = 0; i < DriverStation::kJoystickPorts; i++)
-			joysticks[i] = NULL;
+			joysticks[i] = nullptr;
 		joySticksInitialized = true;
 	}
 	joysticks[m_port] = this;
@@ -80,7 +80,7 @@ void Joystick::InitJoystick(uint32_t numAxisTypes, uint32_t numButtonTypes)
 Joystick * Joystick::GetStickForPort(uint32_t port)
 {
 	Joystick *stick = joysticks[port];
-	if (stick == NULL)
+	if (stick == nullptr)
 	{
 		stick = new Joystick(port);
 		joysticks[port] = stick;

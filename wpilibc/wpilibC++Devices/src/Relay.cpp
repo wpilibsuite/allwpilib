@@ -15,7 +15,7 @@
 #include "HAL/HAL.hpp"
 
 // Allocate each direction separately.
-static Resource *relayChannels = NULL;
+static Resource *relayChannels = nullptr;
 
 /**
  * Common relay initialization method.
@@ -25,7 +25,7 @@ static Resource *relayChannels = NULL;
  * lines at 0v.
  */
 void Relay::InitRelay() {
-  m_table = NULL;
+  m_table = nullptr;
   char buf[64];
   Resource::CreateResourceObject(&relayChannels,
                                  dio_kNumSystems * kRelayChannels * 2);
@@ -210,7 +210,7 @@ void Relay::ValueChanged(ITable *source, const std::string &key,
 }
 
 void Relay::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     if (Get() == kOn) {
       m_table->PutString("Value", "On");
     } else if (Get() == kForward) {
@@ -224,13 +224,13 @@ void Relay::UpdateTable() {
 }
 
 void Relay::StartLiveWindowMode() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->AddTableListener("Value", this, true);
   }
 }
 
 void Relay::StopLiveWindowMode() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->RemoveTableListener(this);
   }
 }

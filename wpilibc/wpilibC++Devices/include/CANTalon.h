@@ -66,7 +66,7 @@ class CANTalon : public MotorSafety,
   virtual void SetSetpoint(float value) override;
   virtual void Disable() override;
   virtual void EnableControl();
-  virtual void Enable();
+  virtual void Enable() override;
   virtual void SetP(double p) override;
   virtual void SetI(double i) override;
   virtual void SetD(double d) override;

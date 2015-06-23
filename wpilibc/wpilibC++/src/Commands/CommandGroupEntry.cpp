@@ -10,7 +10,7 @@
 #include "Commands/Command.h"
 
 CommandGroupEntry::CommandGroupEntry()
-    : m_timeout(-1.0), m_command(NULL), m_state(kSequence_InSequence) {}
+    : m_timeout(-1.0), m_command(nullptr), m_state(kSequence_InSequence) {}
 
 CommandGroupEntry::CommandGroupEntry(Command *command, Sequence state)
     : m_timeout(-1.0), m_command(command), m_state(state) {}

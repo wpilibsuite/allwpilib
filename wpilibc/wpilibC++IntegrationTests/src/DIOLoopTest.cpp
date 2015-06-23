@@ -104,7 +104,7 @@ static void *InterruptTriggerer(void *data) {
   output->Set(false);
   Wait(kSynchronousInterruptTime);
   output->Set(true);
-  return NULL;
+  return nullptr;
 }
 
 TEST_F(DIOLoopTest, SynchronousInterruptWorks) {
@@ -113,7 +113,7 @@ TEST_F(DIOLoopTest, SynchronousInterruptWorks) {
 
   // If we have another thread trigger the interrupt in a few seconds
   pthread_t interruptTriggererLoop;
-  pthread_create(&interruptTriggererLoop, NULL, InterruptTriggerer, m_output);
+  pthread_create(&interruptTriggererLoop, nullptr, InterruptTriggerer, m_output);
 
   // Then this thread should pause and resume after that number of seconds
   Timer timer;

@@ -44,13 +44,13 @@ void SendableChooser::AddDefault(const char *name, void *object) {
 /**
  * Returns the selected option.  If there is none selected, it will return the
  * default.  If there is none selected
- * and no default, then it will return {@code NULL}.
+ * and no default, then it will return {@code nullptr}.
  * @return the option selected
  */
 void *SendableChooser::GetSelected() {
   std::string selected = m_table->GetString(kSelected, m_defaultChoice);
   if (selected == "")
-    return NULL;
+    return nullptr;
   else
     return m_choices[selected];
 }
@@ -58,7 +58,7 @@ void *SendableChooser::GetSelected() {
 void SendableChooser::InitTable(ITable *subtable) {
   StringArray keys;
   m_table = subtable;
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     std::map<std::string, void *>::iterator iter;
     for (iter = m_choices.begin(); iter != m_choices.end(); iter++) {
       keys.add(iter->first);

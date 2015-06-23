@@ -165,7 +165,7 @@ void ErrorBase::SetGlobalError(Error::Code code, const char* contextMessage,
 
     //  Set the current error information for this object.
     _globalError.Set(code, contextMessage, filename, function, lineNumber,
-                     NULL);
+                     nullptr);
   }
 }
 
@@ -180,7 +180,7 @@ void ErrorBase::SetGlobalWPIError(const char* errorMessage,
   if (_globalError.GetCode() != 0) {
     _globalError.Clear();
   }
-  _globalError.Set(-1, err, filename, function, lineNumber, NULL);
+  _globalError.Set(-1, err, filename, function, lineNumber, nullptr);
 }
 
 /**

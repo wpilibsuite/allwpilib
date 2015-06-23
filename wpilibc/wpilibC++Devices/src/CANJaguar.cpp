@@ -32,7 +32,7 @@ static const uint32_t kFullMessageIDMask =
 
 static const int32_t kReceiveStatusAttempts = 50;
 
-static Resource *allocated = NULL;
+static Resource *allocated = nullptr;
 
 static int32_t sendMessageHelper(uint32_t messageID, const uint8_t *data,
                                  uint8_t dataSize, int32_t period) {
@@ -43,9 +43,8 @@ static int32_t sendMessageHelper(uint32_t messageID, const uint8_t *data,
 
   int32_t status = 0;
 
-  for (uint8_t i = 0;
-       i < (sizeof(kTrustedMessages) / sizeof(kTrustedMessages[0])); i++) {
-    if ((kFullMessageIDMask & messageID) == kTrustedMessages[i]) {
+  for (auto& kTrustedMessage : kTrustedMessages) {
+    if ((kFullMessageIDMask & messageID) == kTrustedMessage) {
       uint8_t dataBuffer[8];
       dataBuffer[0] = 0;
       dataBuffer[1] = 0;
@@ -74,7 +73,7 @@ static int32_t sendMessageHelper(uint32_t messageID, const uint8_t *data,
  * Common initialization code called by all constructors.
  */
 void CANJaguar::InitCANJaguar() {
-  m_table = NULL;
+  m_table = nullptr;
   m_safetyHelper = new MotorSafetyHelper(this);
 
   m_value = 0.0f;
@@ -231,7 +230,7 @@ void CANJaguar::InitCANJaguar() {
 CANJaguar::CANJaguar(uint8_t deviceNumber)
     : m_deviceNumber(deviceNumber),
       m_maxOutputVoltage(kApproxBusVoltage),
-      m_safetyHelper(NULL) {
+      m_safetyHelper(nullptr) {
   char buf[64];
   snprintf(buf, 64, "CANJaguar device number %d", m_deviceNumber);
   Resource::CreateResourceObject(&allocated, 63);
@@ -254,27 +253,27 @@ CANJaguar::~CANJaguar() {
   // Disable periodic setpoints
   if (m_controlMode == kPercentVbus)
     FRC_NetworkCommunication_CANSessionMux_sendMessage(
-        m_deviceNumber | LM_API_VOLT_T_SET, NULL, 0,
+        m_deviceNumber | LM_API_VOLT_T_SET, nullptr, 0,
         CAN_SEND_PERIOD_STOP_REPEATING, &status);
   else if (m_controlMode == kSpeed)
     FRC_NetworkCommunication_CANSessionMux_sendMessage(
-        m_deviceNumber | LM_API_SPD_T_SET, NULL, 0,
+        m_deviceNumber | LM_API_SPD_T_SET, nullptr, 0,
         CAN_SEND_PERIOD_STOP_REPEATING, &status);
   else if (m_controlMode == kPosition)
     FRC_NetworkCommunication_CANSessionMux_sendMessage(
-        m_deviceNumber | LM_API_POS_T_SET, NULL, 0,
+        m_deviceNumber | LM_API_POS_T_SET, nullptr, 0,
         CAN_SEND_PERIOD_STOP_REPEATING, &status);
   else if (m_controlMode == kCurrent)
     FRC_NetworkCommunication_CANSessionMux_sendMessage(
-        m_deviceNumber | LM_API_ICTRL_T_SET, NULL, 0,
+        m_deviceNumber | LM_API_ICTRL_T_SET, nullptr, 0,
         CAN_SEND_PERIOD_STOP_REPEATING, &status);
   else if (m_controlMode == kVoltage)
     FRC_NetworkCommunication_CANSessionMux_sendMessage(
-        m_deviceNumber | LM_API_VCOMP_T_SET, NULL, 0,
+        m_deviceNumber | LM_API_VCOMP_T_SET, nullptr, 0,
         CAN_SEND_PERIOD_STOP_REPEATING, &status);
 
   delete m_safetyHelper;
-  m_safetyHelper = NULL;
+  m_safetyHelper = nullptr;
 }
 
 /**
@@ -478,7 +477,7 @@ void CANJaguar::sendMessage(uint32_t messageID, const uint8_t *data,
  * 	every "period" milliseconds.
  */
 void CANJaguar::requestMessage(uint32_t messageID, int32_t period) {
-  sendMessageHelper(messageID | m_deviceNumber, NULL, 0, period);
+  sendMessageHelper(messageID | m_deviceNumber, nullptr, 0, period);
 }
 
 /**
@@ -2000,19 +1999,19 @@ void CANJaguar::ValueChanged(ITable *source, const std::string &key,
 }
 
 void CANJaguar::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("Value", Get());
   }
 }
 
 void CANJaguar::StartLiveWindowMode() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->AddTableListener("Value", this, true);
   }
 }
 
 void CANJaguar::StopLiveWindowMode() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->RemoveTableListener(this);
   }
 }

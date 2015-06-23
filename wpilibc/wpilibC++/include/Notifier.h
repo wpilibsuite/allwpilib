@@ -14,7 +14,7 @@ typedef void (*TimerEventHandler)(void *param);
 
 class Notifier : public ErrorBase {
  public:
-  Notifier(TimerEventHandler handler, void *param = NULL);
+  Notifier(TimerEventHandler handler, void *param = nullptr);
   virtual ~Notifier();
   void StartSingle(double delay);
   void StartPeriodic(double period);

@@ -14,7 +14,7 @@
  * Common function to implement constructor behavior.
  */
 void Solenoid::InitSolenoid() {
-  m_table = NULL;
+  m_table = nullptr;
   char buf[64];
   if (!CheckSolenoidModule(m_moduleNumber)) {
     snprintf(buf, 64, "Solenoid Module %d", m_moduleNumber);
@@ -113,21 +113,21 @@ void Solenoid::ValueChanged(ITable* source, const std::string& key,
 }
 
 void Solenoid::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutBoolean("Value", Get());
   }
 }
 
 void Solenoid::StartLiveWindowMode() {
   Set(false);
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->AddTableListener("Value", this, true);
   }
 }
 
 void Solenoid::StopLiveWindowMode() {
   Set(false);
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->RemoveTableListener(this);
   }
 }
