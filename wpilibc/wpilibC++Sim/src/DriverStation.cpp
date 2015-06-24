@@ -26,7 +26,6 @@ const uint32_t DriverStation::kBatteryChannel;
 const uint32_t DriverStation::kJoystickPorts;
 const uint32_t DriverStation::kJoystickAxes;
 constexpr float DriverStation::kUpdatePeriod;
-DriverStation* DriverStation::m_instance = nullptr;
 uint8_t DriverStation::m_updateNumber = 0;
 
 /**
@@ -70,7 +69,6 @@ DriverStation::DriverStation()
 
 DriverStation::~DriverStation()
 {
-	m_instance = nullptr;
 	deleteMultiWait(m_waitForDataSem);
 	deleteMutex(m_waitForDataMutex);
 	// TODO: Release m_stateSemaphore and m_joystickSemaphore?
@@ -81,11 +79,8 @@ DriverStation::~DriverStation()
  */
 DriverStation* DriverStation::GetInstance()
 {
-	if (m_instance == nullptr)
-	{
-		m_instance = new DriverStation();
-	}
-	return m_instance;
+	static DriverStation instance;
+	return &instance;
 }
 
 /**

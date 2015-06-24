@@ -10,9 +10,8 @@
  * how many times GetInstance is called.
  */
 LiveWindow *LiveWindow::GetInstance() {
-  static LiveWindow *instance = new LiveWindow();
-
-  return instance;
+  static LiveWindow instance;
+  return &instance;
 }
 
 /**

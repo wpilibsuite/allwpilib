@@ -28,7 +28,6 @@ const double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
   Log().Get(level)
 
 const uint32_t DriverStation::kJoystickPorts;
-DriverStation* DriverStation::m_instance = nullptr;
 
 /**
  * DriverStation constructor.
@@ -73,7 +72,6 @@ DriverStation::DriverStation() {
 
 DriverStation::~DriverStation() {
   m_task.Stop();
-  m_instance = nullptr;
   deleteMultiWait(m_waitForDataSem);
   // Unregister our semaphore.
   HALSetNewDataSem(nullptr);
@@ -111,10 +109,8 @@ void DriverStation::Run() {
  * @return Pointer to the DS instance
  */
 DriverStation* DriverStation::GetInstance() {
-  if (m_instance == nullptr) {
-    m_instance = new DriverStation();
-  }
-  return m_instance;
+  static DriverStation instance;
+  return &instance;
 }
 
 /**

@@ -50,7 +50,6 @@ class Scheduler : public ErrorBase, public NamedSendable {
 
   void ProcessCommandAddition(Command *command);
 
-  static Scheduler *_instance;
   Command::SubsystemSet m_subsystems;
   MUTEX_ID m_buttonsLock = nullptr;
   typedef std::vector<ButtonScheduler *> ButtonVector;

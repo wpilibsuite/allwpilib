@@ -24,8 +24,6 @@ static const char *kFileName = "/home/lvuser/wpilib-preferences.ini";
 static const char *kValuePrefix = "=\"";
 /** The characters to put after the value */
 static const char *kValueSuffix = "\"\n";
-/** The singleton instance */
-Preferences *Preferences::_instance = nullptr;
 
 Preferences::Preferences()
     : m_readTask("PreferencesReadTask", (FUNCPTR)Preferences::InitReadTask),
@@ -54,8 +52,8 @@ Preferences::~Preferences() {
  * @return pointer to the {@link Preferences}
  */
 Preferences *Preferences::GetInstance() {
-  if (_instance == nullptr) _instance = new Preferences;
-  return _instance;
+  static Preferences instance;
+  return &instance;
 }
 
 /**

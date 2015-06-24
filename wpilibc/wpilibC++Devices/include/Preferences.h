@@ -82,8 +82,6 @@ class Preferences : public ErrorBase, public ITableListener {
     return 0;
   }
 
-  static Preferences *_instance;
-
   /** The semaphore for accessing the file */
   MUTEX_ID m_fileLock = nullptr;
   /** The semaphore for beginning reads and writes to the file */

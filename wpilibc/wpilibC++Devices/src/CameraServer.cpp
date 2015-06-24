@@ -10,13 +10,10 @@
 #include <netdb.h>
 
 constexpr uint8_t CameraServer::kMagicNumber[];
-CameraServer* CameraServer::s_instance = nullptr;
 
 CameraServer* CameraServer::GetInstance() {
-  if (s_instance == nullptr) {
-    s_instance = new CameraServer;
-  }
-  return s_instance;
+  static CameraServer instance;
+  return &instance;
 }
 
 CameraServer::CameraServer()

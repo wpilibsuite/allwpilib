@@ -16,8 +16,6 @@
 #include <set>
 #include <algorithm>
 
-Scheduler *Scheduler::_instance = nullptr;
-
 Scheduler::Scheduler() {
   m_buttonsLock = initializeMutexNormal();
   m_additionsLock = initializeMutexNormal();
@@ -38,8 +36,8 @@ Scheduler::~Scheduler() {
  * @return the {@link Scheduler}
  */
 Scheduler *Scheduler::GetInstance() {
-  if (_instance == nullptr) _instance = new Scheduler();
-  return _instance;
+  static Scheduler instance;
+  return &instance;
 }
 
 void Scheduler::SetEnabled(bool enabled) { m_enabled = enabled; }
