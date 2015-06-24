@@ -5,6 +5,7 @@
 #include <regex>
 #include <chrono>
 #include <thread>
+#include <memory>
 #include <iostream>
 #include <iomanip>
 
@@ -130,8 +131,8 @@ void USBCamera::UpdateSettings() {
   uInt32 count = 0;
   uInt32 currentMode = 0;
   SAFE_IMAQ_CALL(IMAQdxEnumerateVideoModes, m_id, nullptr, &count, &currentMode);
-  IMAQdxVideoMode modes[count];
-  SAFE_IMAQ_CALL(IMAQdxEnumerateVideoModes, m_id, modes, &count, &currentMode);
+  auto modes = std::make_unique<IMAQdxVideoMode[]>(count);
+  SAFE_IMAQ_CALL(IMAQdxEnumerateVideoModes, m_id, modes.get(), &count, &currentMode);
 
   // Groups are:
   //   0 - width

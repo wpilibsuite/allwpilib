@@ -1,9 +1,5 @@
 #include "networktables2/connection/DataIOStream.h"
-
-//TODO remove this when alloca is solved
-#ifdef WIN32
-#include <malloc.h>
-#endif
+#include <memory>
 
 ///This is used in case NULL is passed so all logic calls to IOstream can continue to assume there is never a null pointer
 class InertStream : public IOStream
@@ -73,14 +69,8 @@ uint16_t DataIOStream::read2BytesBE()
 }
 std::string* DataIOStream::readString()
 {
-	
 	unsigned int byteLength = read2BytesBE();
-#ifndef WIN32
-	uint8_t bytes[byteLength+1];//FIXME figure out why this doesn't work on windows
-#else
-	uint8_t* bytes = (uint8_t*)alloca(byteLength+1);
-#endif
-	iostream->read(bytes, byteLength);
-	bytes[byteLength] = 0;
-	return new std::string((char*)bytes);//FIXME implement UTF-8 aware version
+	auto bytes = std::make_unique<char[]>(byteLength);
+	iostream->read(bytes.get(), byteLength);
+	return new std::string(bytes.get());//FIXME implement UTF-8 aware version
 }
