@@ -40,7 +40,12 @@ public:
 	int GetStickAxisCount(uint32_t stick);
 	int GetStickPOVCount(uint32_t stick);
 	int GetStickButtonCount(uint32_t stick);
-
+	
+	bool GetJoystickIsXbox(uint32_t stick);
+	int GetJoystickType(uint32_t stick);
+	std::string GetJoystickName(uint32_t stick);
+	int GetJoystickAxisType(uint32_t stick, uint8_t axis);
+	
 	bool IsEnabled();
 	bool IsDisabled();
 	bool IsAutonomous();
@@ -100,6 +105,7 @@ private:
 	HALJoystickAxes m_joystickAxes[kJoystickPorts];
 	HALJoystickPOVs m_joystickPOVs[kJoystickPorts];
 	HALJoystickButtons m_joystickButtons[kJoystickPorts];
+	HALJoystickDescriptor m_joystickDescriptor[kJoystickPorts];
 	Task m_task;
 	SEMAPHORE_ID m_newControlData;
 	MULTIWAIT_ID m_packetDataAvailableMultiWait;

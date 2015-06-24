@@ -49,6 +49,9 @@ DriverStation::DriverStation()
 		m_joystickAxes[i].count = 0;
 		m_joystickPOVs[i].count = 0;
 		m_joystickButtons[i].count = 0;
+		m_joystickDescriptor[i].isXbox = 0;
+		m_joystickDescriptor[i].type = -1;
+		m_joystickDescriptor[i].name[0] = '\0';
 	}
 	// Create a new semaphore
 	m_packetDataAvailableMultiWait = initializeMultiWait();
@@ -146,6 +149,7 @@ void DriverStation::GetData()
 		HALGetJoystickAxes(stick, &m_joystickAxes[stick]);
 		HALGetJoystickPOVs(stick, &m_joystickPOVs[stick]);
 		HALGetJoystickButtons(stick, &m_joystickButtons[stick]);
+		HALGetJoystickDescriptor(stick, &m_joystickDescriptor[stick]);
 	}
 	giveSemaphore(m_newControlData);
 }
@@ -195,6 +199,70 @@ int DriverStation::GetStickAxisCount(uint32_t stick)
 }
 
 /**
+ *Returns the name of the joystick at the given port
+ *
+ *@param stick The joystick port number
+ *@return The name of the joystick at the given port
+ */
+std::string DriverStation::GetJoystickName(uint32_t stick)
+{
+	if (stick >= kJoystickPorts)
+	{
+		wpi_setWPIError(BadJoystickIndex);
+	}
+	std::string retVal(m_joystickDescriptor[0].name);
+	return retVal;
+}
+
+/**
+ *Returns the type of joystick at a given port
+ *
+ *@param stick The joystick port number
+ *@return The HID type of joystick at the given port
+ */
+int DriverStation::GetJoystickType(uint32_t stick)
+{
+	if (stick >= kJoystickPorts)
+	{
+		wpi_setWPIError(BadJoystickIndex);
+		return -1;
+	}
+	return (int)m_joystickDescriptor[stick].type;
+}
+
+/**
+ *Returns a boolean indicating if the controller is an xbox controller.
+ *
+ *@param stick The joystick port number
+ *@return A boolean that is true if the controller is an xbox controller.
+ */
+bool DriverStation::GetJoystickIsXbox(uint32_t stick)
+{
+	if (stick >= kJoystickPorts)
+	{
+		wpi_setWPIError(BadJoystickIndex);
+		return false;
+	}
+	return (bool)m_joystickDescriptor[stick].isXbox;
+}
+
+/**
+ *Returns the types of Axes on a given joystick port
+ *
+ *@param stick The joystick port number and the target axis
+ *@return What type of axis the axis is reporting to be
+ */
+int DriverStation::GetJoystickAxisType(uint32_t stick, uint8_t axis)
+{
+	if (stick >= kJoystickPorts)
+	{
+		wpi_setWPIError(BadJoystickIndex);
+		return -1;
+	}
+	return m_joystickDescriptor[stick].axisTypes[axis];
+}
+
+/**	
  * Returns the number of POVs on a given joystick port
  *
  * @param stick The joystick port number

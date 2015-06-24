@@ -214,7 +214,57 @@ int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons)
 int HALGetJoystickDescriptor(uint8_t joystickNum, HALJoystickDescriptor *desc)
 {
 	return FRC_NetworkCommunication_getJoystickDesc(joystickNum, &desc->isXbox, &desc->type, (char *)(&desc->name), 
-		&desc->axisCount, &desc->axisTypes, &desc->buttonCount, &desc->povCount);
+		&desc->axisCount, (uint8_t *)&desc->axisTypes, &desc->buttonCount, &desc->povCount);
+}
+
+int HALGetJoystickIsXbox(uint8_t joystickNum)
+{
+	HALJoystickDescriptor joystickDesc;
+	if(HALGetJoystickDescriptor(joystickNum, &joystickDesc)<0)
+	{
+		return 0;
+	}else
+	{
+	return joystickDesc.isXbox;
+	}
+}
+
+int HALGetJoystickType(uint8_t joystickNum)
+{
+	HALJoystickDescriptor joystickDesc;
+	if(HALGetJoystickDescriptor(joystickNum, &joystickDesc)<0)
+	{
+		return -1;
+	} else
+	{
+	return joystickDesc.type;
+	}
+}
+
+const char* HALGetJoystickName(uint8_t joystickNum)
+{
+	HALJoystickDescriptor joystickDesc;
+	if(HALGetJoystickDescriptor(joystickNum, &joystickDesc)<0)
+	{
+		const char* retval = "";
+		return retval;
+	} else
+	{
+	const char* retval(joystickDesc.name);
+	return retval;
+	}
+}
+
+int HALGetJoystickAxisType(uint8_t joystickNum, int axis)
+{
+	HALJoystickDescriptor joystickDesc;
+	if(HALGetJoystickDescriptor(joystickNum, &joystickDesc)<0)
+	{
+		return -1;
+	} else
+	{
+	return joystickDesc.axisTypes[axis];
+	}
 }
 
 int HALSetJoystickOutputs(uint8_t joystickNum, uint32_t outputs, uint16_t leftRumble, uint16_t rightRumble)
