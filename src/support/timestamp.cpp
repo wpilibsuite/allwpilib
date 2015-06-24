@@ -15,7 +15,7 @@ zerotime()
 {
 #ifdef _WIN32
     FILETIME ft;
-    unsigned long long tmpres =0;
+    unsigned long long tmpres = 0;
     // 100-nanosecond intervals since January 1, 1601 (UTC)
     // which means 0.1 us
     GetSystemTimeAsFileTime(&ft);
@@ -33,7 +33,7 @@ zerotime()
     clock_gettime(CLOCK_REALTIME, &ts);
 
     // in 100-ns intervals
-    return static_cast<unsigned long long>(ts.tv_sec) * 10000000u +
+    return static_cast<unsigned long long>(ts.tv_sec) * 10000000ull +
         static_cast<unsigned long long>(ts.tv_nsec) / 100u;
 #endif
 }
@@ -54,7 +54,7 @@ timestamp()
     // access the clock
     clock_gettime(CLOCK_MONOTONIC, &ts);
     // in ns
-    return static_cast<unsigned long long>(ts.tv_sec) * 1000000000u +
+    return static_cast<unsigned long long>(ts.tv_sec) * 1000000000ull +
         static_cast<unsigned long long>(ts.tv_nsec);
 #endif
 }
@@ -82,8 +82,8 @@ update_frequency()
     assert(!ts.tv_sec);
 
     // this is the precision of the clock, we want the number of updates per
-    // second, which is 1 / ts.tvnsec * 1,000,000,000
-    static const unsigned long long billion = 1000000000;
+    // second, which is 1 / ts.tv_nsec * 1,000,000,000
+    static const unsigned long long billion = 1000000000ull;
 
     return billion / static_cast<unsigned long long>(ts.tv_nsec);
 #endif
@@ -101,6 +101,6 @@ NT_Now()
     unsigned long long delta = timestamp() - offset_val;
     // because the frequency is in update per seconds, we have to multiply the
     // delta by 10,000,000
-    unsigned long long delta_in_us = delta * 10000000u / frequency_val;
+    unsigned long long delta_in_us = delta * 10000000ull / frequency_val;
     return delta_in_us + zerotime_val;
 }
