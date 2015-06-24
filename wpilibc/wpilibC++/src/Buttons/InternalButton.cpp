@@ -7,8 +7,6 @@
 
 #include "Buttons/InternalButton.h"
 
-InternalButton::InternalButton() : m_pressed(false), m_inverted(false) {}
-
 InternalButton::InternalButton(bool inverted)
     : m_pressed(inverted), m_inverted(inverted) {}
 

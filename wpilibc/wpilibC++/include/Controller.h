@@ -20,7 +20,7 @@
  */
 class Controller {
  public:
-  virtual ~Controller(){};
+  virtual ~Controller() = default;
 
   /**
    * Allows the control loop to run

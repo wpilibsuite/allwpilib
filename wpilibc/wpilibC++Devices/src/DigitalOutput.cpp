@@ -15,7 +15,6 @@
  * constructors.
  */
 void DigitalOutput::InitDigitalOutput(uint32_t channel) {
-  m_table = nullptr;
   char buf[64];
 
   if (!CheckDigitalChannel(channel)) {

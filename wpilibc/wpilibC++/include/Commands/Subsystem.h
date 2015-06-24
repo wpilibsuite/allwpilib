@@ -19,7 +19,7 @@ class Subsystem : public ErrorBase, public NamedSendable {
 
  public:
   Subsystem(const char *name);
-  virtual ~Subsystem() {}
+  virtual ~Subsystem() = default;
 
   void SetDefaultCommand(Command *command);
   Command *GetDefaultCommand();
@@ -30,11 +30,11 @@ class Subsystem : public ErrorBase, public NamedSendable {
  private:
   void ConfirmCommand();
 
-  Command *m_currentCommand;
-  bool m_currentCommandChanged;
-  Command *m_defaultCommand;
+  Command *m_currentCommand = nullptr;
+  bool m_currentCommandChanged = true;
+  Command *m_defaultCommand = nullptr;
   std::string m_name;
-  bool m_initializedDefaultCommand;
+  bool m_initializedDefaultCommand = false;
 
  public:
   virtual std::string GetName();
@@ -43,7 +43,7 @@ class Subsystem : public ErrorBase, public NamedSendable {
   virtual std::string GetSmartDashboardType() const;
 
  protected:
-  ITable *m_table;
+  ITable *m_table = nullptr;
 };
 
 #endif

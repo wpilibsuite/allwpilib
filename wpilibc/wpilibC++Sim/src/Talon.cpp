@@ -39,10 +39,6 @@ Talon::Talon(uint32_t channel) : SafePWM(channel)
 	InitTalon();
 }
 
-Talon::~Talon()
-{
-}
-
 /**
  * Set the PWM value.
  *

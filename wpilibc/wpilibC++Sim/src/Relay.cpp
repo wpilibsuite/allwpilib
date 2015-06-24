@@ -17,7 +17,6 @@
  */
 void Relay::InitRelay()
 {
-	m_table = nullptr;
 	char buf[64];
 	if (!SensorBase::CheckRelayChannel(m_channel))
 	{

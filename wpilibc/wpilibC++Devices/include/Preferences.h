@@ -85,11 +85,11 @@ class Preferences : public ErrorBase, public ITableListener {
   static Preferences *_instance;
 
   /** The semaphore for accessing the file */
-  MUTEX_ID m_fileLock;
+  MUTEX_ID m_fileLock = nullptr;
   /** The semaphore for beginning reads and writes to the file */
-  SEMAPHORE_ID m_fileOpStarted;
+  SEMAPHORE_ID m_fileOpStarted = nullptr;
   /** The semaphore for reading from the table */
-  MUTEX_ID m_tableLock;
+  MUTEX_ID m_tableLock = nullptr;
   typedef std::map<std::string, std::string> StringMap;
   /** The actual values (String->String) */
   StringMap m_values;

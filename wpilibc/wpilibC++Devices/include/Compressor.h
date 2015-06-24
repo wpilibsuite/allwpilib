@@ -19,9 +19,9 @@ class Compressor : public SensorBase,
                    public LiveWindowSendable,
                    public ITableListener {
  public:
-  explicit Compressor(uint8_t pcmID);
-  Compressor();
-  virtual ~Compressor();
+  // Default PCM ID is 0
+  explicit Compressor(uint8_t pcmID = GetDefaultSolenoidModule());
+  virtual ~Compressor() = default;
 
   void Start();
   void Stop();
@@ -55,10 +55,9 @@ class Compressor : public SensorBase,
   void *m_pcm_pointer;
 
  private:
-  void InitCompressor(uint8_t module);
   void SetCompressor(bool on);
 
-  ITable *m_table;
+  ITable *m_table = nullptr;
 };
 
 #endif /* Compressor_H_ */

@@ -33,8 +33,7 @@ static const char *kEnabled = "enabled";
  * integral and differental terms. The default is 50ms.
  */
 PIDController::PIDController(float Kp, float Ki, float Kd, PIDSource *source,
-                             PIDOutput *output, float period)
-    : m_semaphore(0) {
+                             PIDOutput *output, float period) {
   Initialize(Kp, Ki, Kd, 0.0f, source, output, period);
 }
 
@@ -50,16 +49,13 @@ PIDController::PIDController(float Kp, float Ki, float Kd, PIDSource *source,
  * integral and differental terms. The default is 50ms.
  */
 PIDController::PIDController(float Kp, float Ki, float Kd, float Kf,
-                             PIDSource *source, PIDOutput *output, float period)
-    : m_semaphore(0) {
+                             PIDSource *source, PIDOutput *output, float period) {
   Initialize(Kp, Ki, Kd, Kf, source, output, period);
 }
 
 void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
                                PIDSource *source, PIDOutput *output,
                                float period) {
-  m_table = nullptr;
-
   m_semaphore = initializeMutexNormal();
 
   m_controlLoop = new Notifier(PIDController::CallCalculate, this);
@@ -68,22 +64,6 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
   m_I = Ki;
   m_D = Kd;
   m_F = Kf;
-
-  m_maximumOutput = 1.0;
-  m_minimumOutput = -1.0;
-
-  m_maximumInput = 0;
-  m_minimumInput = 0;
-
-  m_continuous = false;
-  m_enabled = false;
-  m_setpoint = 0;
-
-  m_prevError = 0;
-  m_totalError = 0;
-  m_tolerance = .05;
-
-  m_result = 0;
 
   m_pidInput = source;
   m_pidOutput = output;
@@ -94,8 +74,6 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
   static int32_t instances = 0;
   instances++;
   HALReport(HALUsageReporting::kResourceType_PIDController, instances);
-
-  m_toleranceType = kNoTolerance;
 }
 
 /**

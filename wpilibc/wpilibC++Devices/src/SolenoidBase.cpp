@@ -28,11 +28,6 @@ SolenoidBase::SolenoidBase(uint8_t moduleNumber)
 }
 
 /**
- * Destructor.
- */
-SolenoidBase::~SolenoidBase() {}
-
-/**
  * Set the value of a solenoid.
  *
  * @param value The value you want to set on the module.

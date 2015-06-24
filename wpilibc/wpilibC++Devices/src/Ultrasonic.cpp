@@ -66,7 +66,6 @@ void Ultrasonic::UltrasonicChecker() {
  * restored.
  */
 void Ultrasonic::Initialize() {
-  m_table = nullptr;
   bool originalMode = m_automaticEnabled;
   if (m_semaphore == nullptr) m_semaphore = initializeSemaphore(SEMAPHORE_FULL);
   SetAutomaticMode(false);     // kill task when adding a new sensor

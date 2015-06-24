@@ -26,13 +26,6 @@ SensorBase::SensorBase()
 }
 
 /**
- * Frees the resources for a SensorBase.
- */
-SensorBase::~SensorBase()
-{
-}
-
-/**
  * Add sensor to the singleton list.
  * Add this sensor to the list of singletons that need to be deleted when
  * the robot program exits. Each of the sensors on this list are singletons,

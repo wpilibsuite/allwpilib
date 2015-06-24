@@ -15,11 +15,7 @@
 CANTalon::CANTalon(int deviceNumber)
     : m_deviceNumber(deviceNumber),
       m_impl(new CanTalonSRX(deviceNumber)),
-      m_safetyHelper(new MotorSafetyHelper(this)),
-      m_profile(0),
-      m_controlEnabled(true),
-      m_controlMode(kPercentVbus),
-      m_setPoint(0) {
+      m_safetyHelper(new MotorSafetyHelper(this)) {
   ApplyControlMode(m_controlMode);
   m_impl->SetProfileSlotSelect(m_profile);
   m_isInverted = false;

@@ -89,27 +89,27 @@ class AxisCamera : public ErrorBase {
  private:
   std::thread m_captureThread;
   std::string m_cameraHost;
-  int m_cameraSocket;
+  int m_cameraSocket = -1;
   std::mutex m_captureMutex;
 
   std::mutex m_imageDataMutex;
   std::vector<uint8_t> m_imageData;
-  bool m_freshImage;
+  bool m_freshImage = false;
 
-  int m_brightness;
-  WhiteBalance m_whiteBalance;
-  int m_colorLevel;
-  ExposureControl m_exposureControl;
-  int m_exposurePriority;
-  int m_maxFPS;
-  Resolution m_resolution;
-  int m_compression;
-  Rotation m_rotation;
-  bool m_parametersDirty;
-  bool m_streamDirty;
+  int m_brightness = 50;
+  WhiteBalance m_whiteBalance = kWhiteBalance_Automatic;
+  int m_colorLevel = 50;
+  ExposureControl m_exposureControl = kExposureControl_Automatic;
+  int m_exposurePriority = 50;
+  int m_maxFPS = 0;
+  Resolution m_resolution = kResolution_640x480;
+  int m_compression = 50;
+  Rotation m_rotation = kRotation_0;
+  bool m_parametersDirty = true;
+  bool m_streamDirty = true;
   std::mutex m_parametersMutex;
 
-  bool m_done;
+  bool m_done = false;
 
   void Capture();
   void ReadImagesFromCamera();

@@ -14,7 +14,7 @@ class WaitUntilCommand : public Command {
  public:
   WaitUntilCommand(double time);
   WaitUntilCommand(const char *name, double time);
-  virtual ~WaitUntilCommand() {}
+  virtual ~WaitUntilCommand() = default;
 
  protected:
   virtual void Initialize();

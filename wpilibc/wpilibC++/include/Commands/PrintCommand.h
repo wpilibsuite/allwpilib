@@ -14,7 +14,7 @@
 class PrintCommand : public Command {
  public:
   PrintCommand(const char *message);
-  virtual ~PrintCommand() {}
+  virtual ~PrintCommand() = default;
 
  protected:
   virtual void Initialize();

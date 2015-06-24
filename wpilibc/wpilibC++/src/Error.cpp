@@ -19,10 +19,7 @@
 #include "Utility.h"
 bool Error::m_suspendOnErrorEnabled = false;
 
-Error::Error()
-    : m_code(0), m_lineNumber(0), m_originatingObject(nullptr), m_timestamp(0.0) {}
-
-Error::~Error() {}
+Error::Error() {}
 
 void Error::Clone(Error& error) {
   m_code = error.m_code;

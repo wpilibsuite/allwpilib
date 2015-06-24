@@ -30,13 +30,7 @@ static bool joySticksInitialized = false;
  * (0-5).
  */
 Joystick::Joystick(uint32_t port)
-    : m_ds(nullptr),
-      m_port(port),
-      m_axes(nullptr),
-      m_buttons(nullptr),
-      m_outputs(0),
-      m_leftRumble(0),
-      m_rightRumble(0) {
+    : m_port(port) {
   InitJoystick(kNumAxisTypes, kNumButtonTypes);
 
   m_axes[kXAxis] = kDefaultXAxis;
@@ -63,7 +57,7 @@ Joystick::Joystick(uint32_t port)
  */
 Joystick::Joystick(uint32_t port, uint32_t numAxisTypes,
                    uint32_t numButtonTypes)
-    : m_ds(nullptr), m_port(port), m_axes(nullptr), m_buttons(nullptr) {
+    : m_port(port) {
   InitJoystick(numAxisTypes, numButtonTypes);
 }
 

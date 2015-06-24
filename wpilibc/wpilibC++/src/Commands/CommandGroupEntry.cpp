@@ -9,12 +9,6 @@
 
 #include "Commands/Command.h"
 
-CommandGroupEntry::CommandGroupEntry()
-    : m_timeout(-1.0), m_command(nullptr), m_state(kSequence_InSequence) {}
-
-CommandGroupEntry::CommandGroupEntry(Command *command, Sequence state)
-    : m_timeout(-1.0), m_command(command), m_state(state) {}
-
 CommandGroupEntry::CommandGroupEntry(Command *command, Sequence state,
                                      double timeout)
     : m_timeout(timeout), m_command(command), m_state(state) {}

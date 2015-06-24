@@ -11,10 +11,6 @@
 
 using namespace std;
 
-BinaryImage::BinaryImage() : MonoImage() {}
-
-BinaryImage::~BinaryImage() {}
-
 /**
  * Get then number of particles for the image.
  * @returns the number of particles found for the image.

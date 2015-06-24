@@ -9,11 +9,9 @@
 #include "WPILib.h"
 
 class TestEnvironment : public testing::Environment {
-  bool m_alreadySetUp;
+  bool m_alreadySetUp = false;
 
  public:
-  TestEnvironment() : m_alreadySetUp(false) {}
-
   virtual void SetUp() override {
     /* Only set up once.  This allows gtest_repeat to be used to
             automatically repeat tests. */

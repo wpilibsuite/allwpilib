@@ -12,9 +12,9 @@
 
 class InternalButton : public Button {
  public:
-  InternalButton();
+  InternalButton() = default;
   InternalButton(bool inverted);
-  virtual ~InternalButton() {}
+  virtual ~InternalButton() = default;
 
   void SetInverted(bool inverted);
   void SetPressed(bool pressed);
@@ -22,8 +22,8 @@ class InternalButton : public Button {
   virtual bool Get();
 
  private:
-  bool m_pressed;
-  bool m_inverted;
+  bool m_pressed = false;
+  bool m_inverted = false;
 };
 
 #endif

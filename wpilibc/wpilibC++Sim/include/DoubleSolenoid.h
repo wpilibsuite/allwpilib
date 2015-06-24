@@ -28,7 +28,7 @@ public:
 
 	explicit DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel);
 	DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel, uint32_t reverseChannel);
-	virtual ~DoubleSolenoid();
+	virtual ~DoubleSolenoid() = default;
 	virtual void Set(Value value);
 	virtual Value Get() const;
 

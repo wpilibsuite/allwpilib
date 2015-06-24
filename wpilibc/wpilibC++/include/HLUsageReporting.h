@@ -7,7 +7,7 @@
 
 class HLUsageReportingInterface {
  public:
-  virtual ~HLUsageReportingInterface(){};
+  virtual ~HLUsageReportingInterface() = default;
   virtual void ReportScheduler() = 0;
   virtual void ReportSmartDashboard() = 0;
 };

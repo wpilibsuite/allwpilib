@@ -31,7 +31,6 @@ constexpr float Gyro::kDefaultVoltsPerDegreePerSecond;
  * rest before the competition starts.
  */
 void Gyro::InitGyro() {
-  m_table = nullptr;
   if (!m_analog->IsAccumulatorChannel()) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange,
                                " channel (must be accumulator channel)");

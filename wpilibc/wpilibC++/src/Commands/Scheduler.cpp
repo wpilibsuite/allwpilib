@@ -18,19 +18,11 @@
 
 Scheduler *Scheduler::_instance = nullptr;
 
-Scheduler::Scheduler()
-    : m_buttonsLock(nullptr), m_additionsLock(nullptr), m_adding(false) {
+Scheduler::Scheduler() {
   m_buttonsLock = initializeMutexNormal();
   m_additionsLock = initializeMutexNormal();
 
   HLUsageReporting::ReportScheduler();
-
-  m_table = nullptr;
-  m_enabled = true;
-  m_runningCommandsChanged = false;
-  toCancel = nullptr;
-  commands = nullptr;
-  ids = nullptr;
 }
 
 Scheduler::~Scheduler() {

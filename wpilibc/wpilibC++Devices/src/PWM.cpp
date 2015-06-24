@@ -30,7 +30,6 @@ const int32_t PWM::kPwmDisabled;
  * port
  */
 void PWM::InitPWM(uint32_t channel) {
-  m_table = nullptr;
   char buf[64];
 
   if (!CheckPWMChannel(channel)) {

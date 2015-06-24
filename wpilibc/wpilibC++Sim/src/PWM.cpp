@@ -24,7 +24,6 @@ const int32_t PWM::kPwmDisabled;
  */
 void PWM::InitPWM(uint32_t channel)
 {
-	m_table = nullptr;
 	char buf[64];
 
 	if (!CheckPWMChannel(channel))
@@ -50,15 +49,6 @@ void PWM::InitPWM(uint32_t channel)
 PWM::PWM(uint32_t channel)
 {
 	InitPWM(channel);
-}
-
-/**
- * Free the PWM channel.
- *
- * Free the resource associated with the PWM channel and set the value to 0.
- */
-PWM::~PWM()
-{
 }
 
 /**

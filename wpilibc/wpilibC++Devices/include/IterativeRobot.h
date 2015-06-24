@@ -72,12 +72,12 @@ class IterativeRobot : public RobotBase {
  protected:
   virtual void Prestart();
 
-  virtual ~IterativeRobot();
+  virtual ~IterativeRobot() = default;
   IterativeRobot();
 
  private:
-  bool m_disabledInitialized;
-  bool m_autonomousInitialized;
-  bool m_teleopInitialized;
-  bool m_testInitialized;
+  bool m_disabledInitialized = false;
+  bool m_autonomousInitialized = false;
+  bool m_teleopInitialized = false;
+  bool m_testInitialized = false;
 };

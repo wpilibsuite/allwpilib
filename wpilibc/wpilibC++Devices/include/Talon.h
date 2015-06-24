@@ -16,7 +16,7 @@
 class Talon : public SafePWM, public SpeedController {
  public:
   explicit Talon(uint32_t channel);
-  virtual ~Talon();
+  virtual ~Talon() = default;
   virtual void Set(float value, uint8_t syncGroup = 0) override;
   virtual float Get() const override;
   virtual void Disable() override;
@@ -27,5 +27,5 @@ class Talon : public SafePWM, public SpeedController {
 
  private:
   void InitTalon();
-  bool m_isInverted;
+  bool m_isInverted = false;
 };

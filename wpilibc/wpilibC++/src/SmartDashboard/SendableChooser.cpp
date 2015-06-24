@@ -14,8 +14,6 @@ static const char *kDefault = "default";
 static const char *kOptions = "options";
 static const char *kSelected = "selected";
 
-SendableChooser::SendableChooser() { m_defaultChoice = ""; }
-
 /**
  * Adds the given object to the list of options.  On the {@link SmartDashboard}
  * on the desktop,

@@ -41,5 +41,5 @@ class Solenoid : public SolenoidBase,
   void InitSolenoid();
 
   uint32_t m_channel;  ///< The channel on the module to control.
-  ITable* m_table;
+  ITable* m_table = nullptr;
 };

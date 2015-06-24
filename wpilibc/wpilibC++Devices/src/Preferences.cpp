@@ -28,10 +28,7 @@ static const char *kValueSuffix = "\"\n";
 Preferences *Preferences::_instance = nullptr;
 
 Preferences::Preferences()
-    : m_fileLock(nullptr),
-      m_fileOpStarted(nullptr),
-      m_tableLock(nullptr),
-      m_readTask("PreferencesReadTask", (FUNCPTR)Preferences::InitReadTask),
+    : m_readTask("PreferencesReadTask", (FUNCPTR)Preferences::InitReadTask),
       m_writeTask("PreferencesWriteTask", (FUNCPTR)Preferences::InitWriteTask) {
   m_fileLock = initializeMutexRecursive();
   m_fileOpStarted = initializeSemaphore(SEMAPHORE_EMPTY);

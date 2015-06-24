@@ -10,8 +10,6 @@
 
 ColorImage::ColorImage(ImageType type) : ImageBase(type) {}
 
-ColorImage::~ColorImage() {}
-
 /**
  * Perform a threshold operation on a ColorImage.
  * Perform a threshold operation on a ColorImage using the ColorMode supplied

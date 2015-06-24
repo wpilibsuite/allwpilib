@@ -52,20 +52,20 @@ class Scheduler : public ErrorBase, public NamedSendable {
 
   static Scheduler *_instance;
   Command::SubsystemSet m_subsystems;
-  MUTEX_ID m_buttonsLock;
+  MUTEX_ID m_buttonsLock = nullptr;
   typedef std::vector<ButtonScheduler *> ButtonVector;
   ButtonVector m_buttons;
   typedef std::vector<Command *> CommandVector;
-  MUTEX_ID m_additionsLock;
+  MUTEX_ID m_additionsLock = nullptr;
   CommandVector m_additions;
   typedef std::set<Command *> CommandSet;
   CommandSet m_commands;
-  bool m_adding;
-  bool m_enabled;
-  StringArray *commands;
-  NumberArray *ids;
-  NumberArray *toCancel;
-  ITable *m_table;
-  bool m_runningCommandsChanged;
+  bool m_adding = false;
+  bool m_enabled = true;
+  StringArray *commands = nullptr;
+  NumberArray *ids = nullptr;
+  NumberArray *toCancel = nullptr;
+  ITable *m_table = nullptr;
+  bool m_runningCommandsChanged = false;
 };
 #endif

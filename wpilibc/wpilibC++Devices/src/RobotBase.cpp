@@ -52,7 +52,7 @@ void RobotBase::robotSetup(RobotBase *robot) {
  * nice to put this code into it's own task that loads on boot so ensure that it
  * runs.
  */
-RobotBase::RobotBase() : m_task(nullptr), m_ds(nullptr) {
+RobotBase::RobotBase() {
   m_ds = DriverStation::GetInstance();
   RobotState::SetImplementation(DriverStation::GetInstance());
   HLUsageReporting::SetImplementation(new HardwareHLReporting());

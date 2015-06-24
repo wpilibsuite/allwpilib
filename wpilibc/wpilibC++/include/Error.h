@@ -21,7 +21,6 @@ class Error {
   typedef int32_t Code;
 
   Error();
-  ~Error();
   void Clone(Error& error);
   Code GetCode() const;
   const char* GetMessage() const;
@@ -41,13 +40,13 @@ class Error {
  private:
   void Report();
 
-  Code m_code;
+  Code m_code = 0;
   std::string m_message;
   std::string m_filename;
   std::string m_function;
-  uint32_t m_lineNumber;
-  const ErrorBase* m_originatingObject;
-  double m_timestamp;
+  uint32_t m_lineNumber = 0;
+  const ErrorBase* m_originatingObject = nullptr;
+  double m_timestamp = 0.0;
 
   static bool m_suspendOnErrorEnabled;
   DISALLOW_COPY_AND_ASSIGN(Error);

@@ -39,7 +39,6 @@ void Victor::InitVictor() {
 
   LiveWindow::GetInstance()->AddActuator("Victor", GetChannel(), this);
   HALReport(HALUsageReporting::kResourceType_Victor, GetChannel());
-  m_isInverted = false;
 }
 
 /**
@@ -48,8 +47,6 @@ void Victor::InitVictor() {
  * on-board, 10-19 are on the MXP port
  */
 Victor::Victor(uint32_t channel) : SafePWM(channel) { InitVictor(); }
-
-Victor::~Victor() {}
 
 /**
  * Set the PWM value.

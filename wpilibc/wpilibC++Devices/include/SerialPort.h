@@ -62,9 +62,9 @@ class SerialPort : public ErrorBase {
   void Reset();
 
  private:
-  uint32_t m_resourceManagerHandle;
-  uint32_t m_portHandle;
-  bool m_consoleModeEnabled;
+  uint32_t m_resourceManagerHandle = 0;
+  uint32_t m_portHandle = 0;
+  bool m_consoleModeEnabled = false;
   uint8_t m_port;
 
   DISALLOW_COPY_AND_ASSIGN(SerialPort);

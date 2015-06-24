@@ -14,7 +14,6 @@
  * Common function to implement constructor behavior.
  */
 void Solenoid::InitSolenoid() {
-  m_table = nullptr;
   char buf[64];
   if (!CheckSolenoidModule(m_moduleNumber)) {
     snprintf(buf, 64, "Solenoid Module %d", m_moduleNumber);

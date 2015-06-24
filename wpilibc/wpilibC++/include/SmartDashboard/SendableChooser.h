@@ -32,8 +32,7 @@
  */
 class SendableChooser : public Sendable {
  public:
-  SendableChooser();
-  virtual ~SendableChooser(){};
+  virtual ~SendableChooser() = default;
 
   void AddObject(const char *name, void *object);
   void AddDefault(const char *name, void *object);

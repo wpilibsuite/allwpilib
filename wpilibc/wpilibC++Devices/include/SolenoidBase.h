@@ -18,7 +18,7 @@
  */
 class SolenoidBase : public SensorBase {
  public:
-  virtual ~SolenoidBase();
+  virtual ~SolenoidBase() = default;
   uint8_t GetAll(int module = 0) const;
 
   uint8_t GetPCMSolenoidBlackList(int module) const;

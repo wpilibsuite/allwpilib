@@ -35,13 +35,6 @@ uint8_t DriverStation::m_updateNumber = 0;
  * This is only called once the first time GetInstance() is called
  */
 DriverStation::DriverStation()
-	: m_digitalOut (0)
-	, m_waitForDataSem(0)
-	, m_approxMatchTimeOffset(-1.0)
-	, m_userInDisabled(false)
-	, m_userInAutonomous(false)
-	, m_userInTeleop(false)
-	, m_userInTest(false)
 {
 	// Create a new semaphore
 	m_waitForDataSem = initializeMultiWait();

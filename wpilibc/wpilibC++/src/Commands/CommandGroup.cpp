@@ -9,19 +9,10 @@
 #include "WPIErrors.h"
 
 /**
- * Creates a new {@link CommandGroup CommandGroup}.
- */
-CommandGroup::CommandGroup() { m_currentCommandIndex = -1; }
-
-/**
  * Creates a new {@link CommandGroup CommandGroup} with the given name.
  * @param name the name for this command group
  */
-CommandGroup::CommandGroup(const char *name) : Command(name) {
-  m_currentCommandIndex = -1;
-}
-
-CommandGroup::~CommandGroup() {}
+CommandGroup::CommandGroup(const char *name) : Command(name) {}
 
 /**
  * Adds a new {@link Command Command} to the group.  The {@link Command Command}

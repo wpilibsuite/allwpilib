@@ -59,11 +59,7 @@ double GetTime() {
  * not running and
  * must be started.
  */
-Timer::Timer()
-    : m_startTime(0.0),
-      m_accumulatedTime(0.0),
-      m_running(false),
-      m_semaphore(nullptr) {
+Timer::Timer() {
   // Creates a semaphore to control access to critical regions.
   // Initially 'open'
   m_semaphore = initializeMutexNormal();

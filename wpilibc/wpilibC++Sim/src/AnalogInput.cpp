@@ -13,8 +13,6 @@
  */
 void AnalogInput::InitAnalogInput(uint32_t channel)
 {
-    m_table = nullptr;
-
 	m_channel = channel;
 	char buffer[50];
 	int n = sprintf(buffer, "analog/%d", channel);
@@ -31,13 +29,6 @@ void AnalogInput::InitAnalogInput(uint32_t channel)
 AnalogInput::AnalogInput(uint32_t channel)
 {
 	InitAnalogInput(channel);
-}
-
-/**
- * Channel destructor.
- */
-AnalogInput::~AnalogInput()
-{
 }
 
 /**

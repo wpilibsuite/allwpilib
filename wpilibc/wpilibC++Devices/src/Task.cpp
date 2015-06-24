@@ -25,7 +25,6 @@ const uint32_t Task::kDefaultPriority;
  */
 Task::Task(const char* name, FUNCPTR function, int32_t priority,
            uint32_t stackSize) {
-  m_taskID = NULL_TASK;
   m_function = function;
   m_priority = priority;
   m_stackSize = stackSize;

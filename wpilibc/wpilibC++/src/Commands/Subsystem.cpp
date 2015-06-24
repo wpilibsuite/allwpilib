@@ -15,14 +15,9 @@
  * Creates a subsystem with the given name
  * @param name the name of the subsystem
  */
-Subsystem::Subsystem(const char *name)
-    : m_currentCommand(nullptr),
-      m_defaultCommand(nullptr),
-      m_initializedDefaultCommand(false) {
+Subsystem::Subsystem(const char *name) {
   m_name = name;
   Scheduler::GetInstance()->RegisterSubsystem(this);
-  m_table = nullptr;
-  m_currentCommandChanged = true;
 }
 /**
  * Initialize the default command for this subsystem

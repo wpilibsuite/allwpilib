@@ -24,7 +24,6 @@ constexpr float Servo::kDefaultMinServoPWM;
  * well as the minimum and maximum PWM values supported by the servo.
  */
 void Servo::InitServo() {
-  m_table = nullptr;
   SetBounds(kDefaultMaxServoPWM, 0.0, 0.0, 0.0, kDefaultMinServoPWM);
   SetPeriodMultiplier(kPeriodMultiplier_4X);
 

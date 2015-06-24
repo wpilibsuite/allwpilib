@@ -12,11 +12,8 @@
 Resource *InterruptableSensorBase::m_interrupts = nullptr;
 
 InterruptableSensorBase::InterruptableSensorBase() {
-  m_interrupt = nullptr;
   Resource::CreateResourceObject(&m_interrupts, interrupt_kNumSystems);
 }
-
-InterruptableSensorBase::~InterruptableSensorBase() {}
 
 /**
 * Request one of the 8 interrupts asynchronously on this digital input.

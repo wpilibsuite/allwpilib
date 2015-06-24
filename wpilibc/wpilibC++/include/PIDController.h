@@ -66,24 +66,28 @@ class PIDController : public LiveWindowSendable,
   float m_I;              // factor for "integral" control
   float m_D;              // factor for "derivative" control
   float m_F;              // factor for "feed forward" control
-  float m_maximumOutput;  // |maximum output|
-  float m_minimumOutput;  // |minimum output|
-  float m_maximumInput;   // maximum input - limit setpoint to this
-  float m_minimumInput;   // minimum input - limit setpoint to this
-  bool m_continuous;      // do the endpoints wrap around? eg. Absolute encoder
-  bool m_enabled;  // is the pid controller enabled
+  float m_maximumOutput = 1.0;  // |maximum output|
+  float m_minimumOutput = -1.0;  // |minimum output|
+  float m_maximumInput = 0;   // maximum input - limit setpoint to this
+  float m_minimumInput = 0;   // minimum input - limit setpoint to this
+  bool m_continuous = false;      // do the endpoints wrap around? eg. Absolute encoder
+  bool m_enabled = false;  // is the pid controller enabled
   bool m_destruct;    // should the calculate thread stop running
-  float m_prevError;  // the prior sensor input (used to compute velocity)
-  double m_totalError;  // the sum of the errors for use in the integral calc
-  enum { kAbsoluteTolerance, kPercentTolerance, kNoTolerance } m_toleranceType;
-  float m_tolerance;  // the percetage or absolute error that is considered on
+  float m_prevError = 0;  // the prior sensor input (used to compute velocity)
+  double m_totalError = 0;  // the sum of the errors for use in the integral calc
+  enum {
+    kAbsoluteTolerance,
+    kPercentTolerance,
+    kNoTolerance
+  } m_toleranceType = kNoTolerance;
+  float m_tolerance = 0.05;  // the percetage or absolute error that is considered on
                       // target
-  float m_setpoint;
+  float m_setpoint = 0;
   float m_error;
-  float m_result;
+  float m_result = 0;
   float m_period;
 
-  MUTEX_ID m_semaphore;
+  MUTEX_ID m_semaphore = 0;
 
   PIDSource *m_pidInput;
   PIDOutput *m_pidOutput;
@@ -103,7 +107,7 @@ class PIDController : public LiveWindowSendable,
   virtual void StopLiveWindowMode() override;
 
  protected:
-  ITable *m_table;
+  ITable *m_table = nullptr;
   virtual void Calculate();
 
   DISALLOW_COPY_AND_ASSIGN(PIDController);

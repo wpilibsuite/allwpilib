@@ -35,14 +35,6 @@ ADXL345_I2C::ADXL345_I2C(Port port, Range range) : I2C(port, kAddress) {
   LiveWindow::GetInstance()->AddSensor("ADXL345_I2C", port, this);
 }
 
-/**
- * Destructor.
- */
-ADXL345_I2C::~ADXL345_I2C() {
-  // delete m_i2c;
-  // m_i2c = nullptr;
-}
-
 /** {@inheritdoc} */
 void ADXL345_I2C::SetRange(Range range) {
   Write(kDataFormatRegister, kDataFormat_FullRes | (uint8_t)range);

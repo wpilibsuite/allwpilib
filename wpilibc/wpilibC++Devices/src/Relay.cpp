@@ -25,7 +25,6 @@ static Resource *relayChannels = nullptr;
  * lines at 0v.
  */
 void Relay::InitRelay() {
-  m_table = nullptr;
   char buf[64];
   Resource::CreateResourceObject(&relayChannels,
                                  dio_kNumSystems * kRelayChannels * 2);

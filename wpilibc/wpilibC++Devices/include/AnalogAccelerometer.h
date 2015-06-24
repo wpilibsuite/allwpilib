@@ -43,9 +43,9 @@ class AnalogAccelerometer : public SensorBase,
   void InitAccelerometer();
 
   AnalogInput *m_AnalogInput;
-  float m_voltsPerG;
-  float m_zeroGVoltage;
+  float m_voltsPerG = 1.0;
+  float m_zeroGVoltage = 2.5;
   bool m_allocatedChannel;
 
-  ITable *m_table;
+  ITable *m_table = nullptr;
 };

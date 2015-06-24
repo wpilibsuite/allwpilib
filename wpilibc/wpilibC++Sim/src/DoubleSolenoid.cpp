@@ -53,13 +53,6 @@ DoubleSolenoid::DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel, ui
 }
 
 /**
- * Destructor.
- */
-DoubleSolenoid::~DoubleSolenoid()
-{
-}
-
-/**
  * Set the value of a solenoid.
  *
  * @param value Move the solenoid to forward, reverse, or don't move it.

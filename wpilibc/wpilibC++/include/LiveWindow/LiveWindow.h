@@ -12,7 +12,7 @@ struct LiveWindowComponent {
   std::string name;
   bool isSensor;
 
-  LiveWindowComponent() {}
+  LiveWindowComponent() = default;
   LiveWindowComponent(std::string subsystem, std::string name, bool isSensor) {
     this->subsystem = subsystem;
     this->name = name;
@@ -46,7 +46,7 @@ class LiveWindow {
 
  protected:
   LiveWindow();
-  virtual ~LiveWindow();
+  virtual ~LiveWindow() = default;
 
  private:
   void UpdateValues();
@@ -61,8 +61,8 @@ class LiveWindow {
 
   Scheduler *m_scheduler;
 
-  bool m_enabled;
-  bool m_firstTime;
+  bool m_enabled = false;
+  bool m_firstTime = true;
 };
 
 #endif

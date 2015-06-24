@@ -13,15 +13,13 @@
  * Constructor.
  * @param range The range the accelerometer will measure
  */
-BuiltInAccelerometer::BuiltInAccelerometer(Range range) : m_table(0) {
+BuiltInAccelerometer::BuiltInAccelerometer(Range range) {
   SetRange(range);
 
   HALReport(HALUsageReporting::kResourceType_Accelerometer, 0, 0,
             "Built-in accelerometer");
   LiveWindow::GetInstance()->AddSensor((std::string) "BuiltInAccel", 0, this);
 }
-
-BuiltInAccelerometer::~BuiltInAccelerometer() {}
 
 /** {@inheritdoc} */
 void BuiltInAccelerometer::SetRange(Range range) {

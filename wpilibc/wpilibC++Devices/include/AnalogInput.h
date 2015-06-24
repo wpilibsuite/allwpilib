@@ -80,5 +80,5 @@ class AnalogInput : public SensorBase,
   void *m_port;
   int64_t m_accumulatorOffset;
 
-  ITable *m_table;
+  ITable *m_table = nullptr;
 };

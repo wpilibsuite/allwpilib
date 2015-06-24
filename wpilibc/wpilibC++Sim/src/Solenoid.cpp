@@ -43,13 +43,6 @@ Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel)
 }
 
 /**
- * Destructor.
- */
-Solenoid::~Solenoid()
-{
-}
-
-/**
  * Set the value of a solenoid.
  *
  * @param on Turn the solenoid output off or on.

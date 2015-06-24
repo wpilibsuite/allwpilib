@@ -16,7 +16,7 @@ PowerDistributionPanel::PowerDistributionPanel() : PowerDistributionPanel(0) {}
  * Initialize the PDP.
  */
 PowerDistributionPanel::PowerDistributionPanel(uint8_t module)
-    : m_table(nullptr), m_module(module) {
+    : m_module(module) {
   initializePDP(m_module);
 }
 

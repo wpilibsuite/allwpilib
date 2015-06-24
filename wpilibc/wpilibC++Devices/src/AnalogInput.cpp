@@ -21,7 +21,6 @@ const uint32_t AnalogInput::kAccumulatorChannels[] = {0, 1};
  * Common initialization.
  */
 void AnalogInput::InitAnalogInput(uint32_t channel) {
-  m_table = nullptr;
   char buf[64];
   Resource::CreateResourceObject(&inputs, kAnalogInputs);
 

@@ -16,23 +16,6 @@
 
 constexpr double IterativeRobot::kDefaultPeriod;
 
-/**
- * Constructor for RobotIterativeBase
- *
- * The constructor initializes the instance variables for the robot to indicate
- * the status of initialization for disabled, autonomous, teleop, and test code.
- */
-IterativeRobot::IterativeRobot()
-    : m_disabledInitialized(false),
-      m_autonomousInitialized(false),
-      m_teleopInitialized(false),
-      m_testInitialized(false) {}
-
-/**
- * Free the resources for a RobotIterativeBase class.
- */
-IterativeRobot::~IterativeRobot() {}
-
 void IterativeRobot::Prestart() {
   // Don't immediately say that the robot's ready to be enabled.
   // See below.

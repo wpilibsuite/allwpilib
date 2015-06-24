@@ -96,14 +96,14 @@ class Encoder : public SensorBase,
   DigitalSource *m_bSource;  // the B phase of the quad encoder
   bool m_allocatedASource;   // was the A source allocated locally?
   bool m_allocatedBSource;   // was the B source allocated locally?
-  void *m_encoder;
-  int32_t m_index;              // The encoder's FPGA index.
-  double m_distancePerPulse;    // distance of travel for each encoder tick
-  Counter *m_counter;           // Counter object for 1x and 2x encoding
-  EncodingType m_encodingType;  // Encoding type
-  int32_t m_encodingScale;      // 1x, 2x, or 4x, per the encodingType
+  void *m_encoder = nullptr;
+  int32_t m_index = 0;             // The encoder's FPGA index.
+  double m_distancePerPulse = 1.0; // distance of travel for each encoder tick
+  Counter *m_counter = nullptr;    // Counter object for 1x and 2x encoding
+  EncodingType m_encodingType;     // Encoding type
+  int32_t m_encodingScale;         // 1x, 2x, or 4x, per the encodingType
   PIDSourceParameter
-      m_pidSource;  // Encoder parameter that sources a PID controller
+      m_pidSource = kDistance; // Encoder parameter that sources a PID controller
 
-  ITable *m_table;
+  ITable *m_table = nullptr;
 };

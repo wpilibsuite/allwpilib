@@ -13,7 +13,7 @@
 class MonoImage : public ImageBase {
  public:
   MonoImage();
-  virtual ~MonoImage();
+  virtual ~MonoImage() = default;
 
   std::vector<EllipseMatch> *DetectEllipses(
       EllipseDescriptor *ellipseDescriptor, CurveOptions *curveOptions,

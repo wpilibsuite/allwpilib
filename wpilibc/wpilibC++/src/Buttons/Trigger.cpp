@@ -13,8 +13,6 @@
 #include "Buttons/ToggleButtonScheduler.h"
 #include "Buttons/CancelButtonScheduler.h"
 
-Trigger::Trigger() { m_table = nullptr; }
-
 bool Trigger::Grab() {
   if (Get())
     return true;

@@ -21,17 +21,9 @@
  * @param mode The counter mode
  */
 void Counter::InitCounter(Mode mode) {
-  m_table = nullptr;
-
   int32_t status = 0;
-  m_index = 0;
   m_counter = initializeCounter(mode, &m_index, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
-
-  m_upSource = nullptr;
-  m_downSource = nullptr;
-  m_allocatedUpSource = false;
-  m_allocatedDownSource = false;
 
   SetMaxPeriod(.5);
 
@@ -46,7 +38,7 @@ void Counter::InitCounter(Mode mode) {
  *
  * The counter will start counting immediately.
  */
-Counter::Counter() : m_upSource(nullptr), m_downSource(nullptr), m_counter(nullptr) {
+Counter::Counter() {
   InitCounter();
 }
 
@@ -62,8 +54,7 @@ Counter::Counter() : m_upSource(nullptr), m_downSource(nullptr), m_counter(nullp
  * @param source A pointer to the existing DigitalSource object. It will be set
  * as the Up Source.
  */
-Counter::Counter(DigitalSource *source)
-    : m_upSource(nullptr), m_downSource(nullptr), m_counter(nullptr) {
+Counter::Counter(DigitalSource *source) {
   InitCounter();
   SetUpSource(source);
   ClearDownSource();
@@ -81,8 +72,7 @@ Counter::Counter(DigitalSource *source)
  * @param source A reference to the existing DigitalSource object. It will be
  * set as the Up Source.
  */
-Counter::Counter(DigitalSource &source)
-    : m_upSource(nullptr), m_downSource(nullptr), m_counter(nullptr) {
+Counter::Counter(DigitalSource &source) {
   InitCounter();
   SetUpSource(&source);
   ClearDownSource();
@@ -96,8 +86,7 @@ Counter::Counter(DigitalSource &source)
  * @param channel The DIO channel to use as the up source. 0-9 are on-board,
  * 10-25 are on the MXP
  */
-Counter::Counter(int32_t channel)
-    : m_upSource(nullptr), m_downSource(nullptr), m_counter(nullptr) {
+Counter::Counter(int32_t channel) {
   InitCounter();
   SetUpSource(channel);
   ClearDownSource();
@@ -111,8 +100,7 @@ Counter::Counter(int32_t channel)
  * The counter will start counting immediately.
  * @param trigger The pointer to the existing AnalogTrigger object.
  */
-Counter::Counter(AnalogTrigger *trigger)
-    : m_upSource(nullptr), m_downSource(nullptr), m_counter(nullptr) {
+Counter::Counter(AnalogTrigger *trigger) {
   InitCounter();
   SetUpSource(trigger->CreateOutput(kState));
   ClearDownSource();
@@ -127,8 +115,7 @@ Counter::Counter(AnalogTrigger *trigger)
  * The counter will start counting immediately.
  * @param trigger The reference to the existing AnalogTrigger object.
  */
-Counter::Counter(AnalogTrigger &trigger)
-    : m_upSource(nullptr), m_downSource(nullptr), m_counter(nullptr) {
+Counter::Counter(AnalogTrigger &trigger) {
   InitCounter();
   SetUpSource(trigger.CreateOutput(kState));
   ClearDownSource();
@@ -145,8 +132,7 @@ Counter::Counter(AnalogTrigger &trigger)
  */
 
 Counter::Counter(EncodingType encodingType, DigitalSource *upSource,
-                 DigitalSource *downSource, bool inverted)
-    : m_upSource(nullptr), m_downSource(nullptr), m_counter(nullptr) {
+                 DigitalSource *downSource, bool inverted) {
   if (encodingType != k1X && encodingType != k2X) {
     wpi_setWPIErrorWithContext(
         ParameterOutOfRange,

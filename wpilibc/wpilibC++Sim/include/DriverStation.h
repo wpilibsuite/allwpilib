@@ -116,16 +116,16 @@ private:
     void joystickCallback4(const msgs::ConstJoystickPtr &msg);
     void joystickCallback5(const msgs::ConstJoystickPtr &msg);
 
-	uint8_t m_digitalOut;
-	MULTIWAIT_ID m_waitForDataSem;
+	uint8_t m_digitalOut = 0;
+	MULTIWAIT_ID m_waitForDataSem = 0;
 	MUTEX_ID m_waitForDataMutex;
 	MUTEX_ID m_stateSemaphore;
 	MUTEX_ID m_joystickSemaphore;
-	double m_approxMatchTimeOffset;
-	bool m_userInDisabled;
-	bool m_userInAutonomous;
-	bool m_userInTeleop;
-	bool m_userInTest;
+	double m_approxMatchTimeOffset = -1.0;
+	bool m_userInDisabled = false;
+	bool m_userInAutonomous = false;
+	bool m_userInTeleop = false;
+	bool m_userInTest = false;
 
     transport::SubscriberPtr stateSub;
     transport::SubscriberPtr joysticksSub[6];

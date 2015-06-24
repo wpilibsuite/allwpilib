@@ -32,7 +32,7 @@ public:
 			EncodingType encodingType = k4X);
 	// TODO: [Not Supported] Encoder(DigitalSource *aSource, DigitalSource *bSource, bool reverseDirection=false, EncodingType encodingType = k4X);
 	// TODO: [Not Supported] Encoder(DigitalSource &aSource, DigitalSource &bSource, bool reverseDirection=false, EncodingType encodingType = k4X);
-	virtual ~Encoder();
+	virtual ~Encoder() = default;
 
 	// CounterBase interface
 	int32_t Get() const override;

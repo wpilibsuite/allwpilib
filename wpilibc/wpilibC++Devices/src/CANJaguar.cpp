@@ -8,7 +8,6 @@
 #include "Timer.h"
 #define tNIRIO_i32 int
 #include "NetworkCommunication/CANSessionMux.h"
-#include "CAN/can_proto.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "WPIErrors.h"
 #include <cstdio>
@@ -73,56 +72,7 @@ static int32_t sendMessageHelper(uint32_t messageID, const uint8_t *data,
  * Common initialization code called by all constructors.
  */
 void CANJaguar::InitCANJaguar() {
-  m_table = nullptr;
   m_safetyHelper = new MotorSafetyHelper(this);
-
-  m_value = 0.0f;
-  m_speedReference = LM_REF_NONE;
-  m_positionReference = LM_REF_NONE;
-  m_p = 0.0;
-  m_i = 0.0;
-  m_d = 0.0;
-  m_busVoltage = 0.0f;
-  m_outputVoltage = 0.0f;
-  m_outputCurrent = 0.0f;
-  m_temperature = 0.0f;
-  m_position = 0.0;
-  m_speed = 0.0;
-  m_limits = 0x00;
-  m_faults = 0x0000;
-  m_firmwareVersion = 0;
-  m_hardwareVersion = 0;
-  m_neutralMode = kNeutralMode_Jumper;
-  m_encoderCodesPerRev = 0;
-  m_potentiometerTurns = 0;
-  m_limitMode = kLimitMode_SwitchInputsOnly;
-  m_forwardLimit = 0.0;
-  m_reverseLimit = 0.0;
-  m_maxOutputVoltage = 30.0;
-  m_voltageRampRate = 0.0;
-  m_faultTime = 0.0f;
-
-  // Parameters only need to be verified if they are set
-  m_controlModeVerified =
-      false;  // Needs to be verified because it's set in the constructor
-  m_speedRefVerified = true;
-  m_posRefVerified = true;
-  m_pVerified = true;
-  m_iVerified = true;
-  m_dVerified = true;
-  m_neutralModeVerified = true;
-  m_encoderCodesPerRevVerified = true;
-  m_potentiometerTurnsVerified = true;
-  m_limitModeVerified = true;
-  m_forwardLimitVerified = true;
-  m_reverseLimitVerified = true;
-  m_maxOutputVoltageVerified = true;
-  m_voltageRampRateVerified = true;
-  m_faultTimeVerified = true;
-
-  m_receivedStatusMessage0 = false;
-  m_receivedStatusMessage1 = false;
-  m_receivedStatusMessage2 = false;
 
   bool receivedFirmwareVersion = false;
   uint8_t dataBuffer[8];
@@ -197,7 +147,6 @@ void CANJaguar::InitCANJaguar() {
     default:
       break;
   }
-  m_isInverted = false;
   HALReport(HALUsageReporting::kResourceType_CANJaguar, m_deviceNumber,
             m_controlMode);
   LiveWindow::GetInstance()->AddActuator("CANJaguar", m_deviceNumber, this);
@@ -228,9 +177,7 @@ void CANJaguar::InitCANJaguar() {
  * @see CANJaguar#SetVoltageMode(QuadEncoderTag, int)
  */
 CANJaguar::CANJaguar(uint8_t deviceNumber)
-    : m_deviceNumber(deviceNumber),
-      m_maxOutputVoltage(kApproxBusVoltage),
-      m_safetyHelper(nullptr) {
+    : m_deviceNumber(deviceNumber) {
   char buf[64];
   snprintf(buf, 64, "CANJaguar device number %d", m_deviceNumber);
   Resource::CreateResourceObject(&allocated, 63);

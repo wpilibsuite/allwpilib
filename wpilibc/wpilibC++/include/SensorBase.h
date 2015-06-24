@@ -19,7 +19,7 @@
 class SensorBase : public ErrorBase {
  public:
   SensorBase();
-  virtual ~SensorBase();
+  virtual ~SensorBase() = default;
   static void DeleteSingletons();
 
   static uint32_t GetDefaultSolenoidModule() { return 0; }

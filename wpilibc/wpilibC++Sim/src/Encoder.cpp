@@ -135,15 +135,6 @@ Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection, En
     }*/
 
 /**
- * Free the resources for an Encoder.
- * Frees the FPGA resources associated with an Encoder.
- */
-Encoder::~Encoder()
-{
-
-}
-
-/**
  * Reset the Encoder distance to zero.
  * Resets the current count to zero on the encoder.
  */

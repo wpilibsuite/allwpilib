@@ -36,9 +36,9 @@
  */
 class CommandGroup : public Command {
  public:
-  CommandGroup();
+  CommandGroup() = default;
   CommandGroup(const char *name);
-  virtual ~CommandGroup();
+  virtual ~CommandGroup() = default;
 
   void AddSequential(Command *command);
   void AddSequential(Command *command, double timeout);
@@ -61,14 +61,14 @@ class CommandGroup : public Command {
  private:
   void CancelConflicts(Command *command);
 
-  typedef std::vector<CommandGroupEntry> CommandVector;
   /** The commands in this group (stored in entries) */
-  CommandVector m_commands;
-  typedef std::list<CommandGroupEntry> CommandList;
+  std::vector<CommandGroupEntry> m_commands;
+
   /** The active children in this group (stored in entries) */
-  CommandList m_children;
+  std::list<CommandGroupEntry> m_children;
+
   /** The current command, -1 signifies that none have been run */
-  int m_currentCommandIndex;
+  int m_currentCommandIndex = -1;
 };
 
 #endif

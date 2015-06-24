@@ -17,7 +17,7 @@
 class TalonSRX : public SafePWM, public SpeedController {
  public:
   explicit TalonSRX(uint32_t channel);
-  virtual ~TalonSRX();
+  virtual ~TalonSRX() = default;
   virtual void Set(float value, uint8_t syncGroup = 0) override;
   virtual float Get() const override;
   virtual void Disable() override;
@@ -28,5 +28,5 @@ class TalonSRX : public SafePWM, public SpeedController {
 
  private:
   void InitTalonSRX();
-  bool m_isInverted;
+  bool m_isInverted = false;
 };

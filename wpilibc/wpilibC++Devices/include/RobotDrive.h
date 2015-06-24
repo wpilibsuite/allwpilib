@@ -97,15 +97,15 @@ class RobotDrive : public MotorSafety, public ErrorBase {
   void RotateVector(double &x, double &y, double angle);
 
   static const int32_t kMaxNumberOfMotors = 4;
-  float m_sensitivity;
-  double m_maxOutput;
+  float m_sensitivity = 0.5;
+  double m_maxOutput = 1.0;
   bool m_deleteSpeedControllers;
-  SpeedController *m_frontLeftMotor;
-  SpeedController *m_frontRightMotor;
-  SpeedController *m_rearLeftMotor;
-  SpeedController *m_rearRightMotor;
-  MotorSafetyHelper *m_safetyHelper;
-  uint8_t m_syncGroup;
+  SpeedController *m_frontLeftMotor = nullptr;
+  SpeedController *m_frontRightMotor = nullptr;
+  SpeedController *m_rearLeftMotor = nullptr;
+  SpeedController *m_rearRightMotor = nullptr;
+  MotorSafetyHelper *m_safetyHelper = nullptr;
+  uint8_t m_syncGroup = 0;
 
  private:
   int32_t GetNumMotors() {

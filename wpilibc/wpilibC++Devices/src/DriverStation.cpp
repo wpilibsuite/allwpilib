@@ -35,16 +35,7 @@ DriverStation* DriverStation::m_instance = nullptr;
  *
  * This is only called once the first time GetInstance() is called
  */
-DriverStation::DriverStation()
-    : m_task("DriverStation", (FUNCPTR)DriverStation::InitTask),
-      m_newControlData(0),
-      m_packetDataAvailableMultiWait(0),
-      m_waitForDataSem(0),
-      m_userInDisabled(false),
-      m_userInAutonomous(false),
-      m_userInTeleop(false),
-      m_userInTest(false),
-      m_nextMessageTime(0) {
+DriverStation::DriverStation() {
   // All joysticks should default to having zero axes, povs and buttons, so
   // uninitialized memory doesn't get sent to speed controllers.
   for (unsigned int i = 0; i < kJoystickPorts; i++) {

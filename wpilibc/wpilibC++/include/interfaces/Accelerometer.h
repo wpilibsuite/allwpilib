@@ -10,7 +10,7 @@
  */
 class Accelerometer {
  public:
-  virtual ~Accelerometer(){};
+  virtual ~Accelerometer() = default;
 
   enum Range { kRange_2G = 0, kRange_4G = 1, kRange_8G = 2, kRange_16G = 3 };
 

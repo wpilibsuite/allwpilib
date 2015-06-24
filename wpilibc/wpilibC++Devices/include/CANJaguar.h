@@ -16,6 +16,7 @@
 #include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITable.h"
 #include "NetworkCommunication/CANSessionMux.h"
+#include "CAN/can_proto.h"
 
 #include <atomic>
 #include <mutex>
@@ -170,64 +171,64 @@ class CANJaguar : public MotorSafety,
   mutable std::recursive_mutex m_mutex;
 
   uint8_t m_deviceNumber;
-  float m_value;
+  float m_value = 0.0f;
 
   // Parameters/configuration
   ControlMode m_controlMode;
-  uint8_t m_speedReference;
-  uint8_t m_positionReference;
-  double m_p;
-  double m_i;
-  double m_d;
-  NeutralMode m_neutralMode;
-  uint16_t m_encoderCodesPerRev;
-  uint16_t m_potentiometerTurns;
-  LimitMode m_limitMode;
-  double m_forwardLimit;
-  double m_reverseLimit;
-  double m_maxOutputVoltage;
-  double m_voltageRampRate;
-  float m_faultTime;
+  uint8_t m_speedReference = LM_REF_NONE;
+  uint8_t m_positionReference = LM_REF_NONE;
+  double m_p = 0.0;
+  double m_i = 0.0;
+  double m_d = 0.0;
+  NeutralMode m_neutralMode = kNeutralMode_Jumper;
+  uint16_t m_encoderCodesPerRev = 0;
+  uint16_t m_potentiometerTurns = 0;
+  LimitMode m_limitMode = kLimitMode_SwitchInputsOnly;
+  double m_forwardLimit = 0.0;
+  double m_reverseLimit = 0.0;
+  double m_maxOutputVoltage = 30.0;
+  double m_voltageRampRate = 0.0;
+  float m_faultTime = 0.0f;
 
   // Which parameters have been verified since they were last set?
-  bool m_controlModeVerified;
-  bool m_speedRefVerified;
-  bool m_posRefVerified;
-  bool m_pVerified;
-  bool m_iVerified;
-  bool m_dVerified;
-  bool m_neutralModeVerified;
-  bool m_encoderCodesPerRevVerified;
-  bool m_potentiometerTurnsVerified;
-  bool m_forwardLimitVerified;
-  bool m_reverseLimitVerified;
-  bool m_limitModeVerified;
-  bool m_maxOutputVoltageVerified;
-  bool m_voltageRampRateVerified;
-  bool m_faultTimeVerified;
+  bool m_controlModeVerified = false; // Needs to be verified because it's set in the constructor
+  bool m_speedRefVerified = true;
+  bool m_posRefVerified = true;
+  bool m_pVerified = true;
+  bool m_iVerified = true;
+  bool m_dVerified = true;
+  bool m_neutralModeVerified = true;
+  bool m_encoderCodesPerRevVerified = true;
+  bool m_potentiometerTurnsVerified = true;
+  bool m_forwardLimitVerified = true;
+  bool m_reverseLimitVerified = true;
+  bool m_limitModeVerified = true;
+  bool m_maxOutputVoltageVerified = true;
+  bool m_voltageRampRateVerified = true;
+  bool m_faultTimeVerified = true;
 
   // Status data
-  mutable float m_busVoltage;
-  mutable float m_outputVoltage;
-  mutable float m_outputCurrent;
-  mutable float m_temperature;
-  mutable double m_position;
-  mutable double m_speed;
-  mutable uint8_t m_limits;
-  mutable uint16_t m_faults;
-  uint32_t m_firmwareVersion;
-  uint8_t m_hardwareVersion;
+  mutable float m_busVoltage = 0.0f;
+  mutable float m_outputVoltage = 0.0f;
+  mutable float m_outputCurrent = 0.0f;
+  mutable float m_temperature = 0.0f;
+  mutable double m_position = 0.0;
+  mutable double m_speed = 0.0;
+  mutable uint8_t m_limits = 0x00;
+  mutable uint16_t m_faults = 0x0000;
+  uint32_t m_firmwareVersion = 0;
+  uint8_t m_hardwareVersion = 0;
 
   // Which periodic status messages have we received at least once?
-  mutable std::atomic<bool> m_receivedStatusMessage0;
-  mutable std::atomic<bool> m_receivedStatusMessage1;
-  mutable std::atomic<bool> m_receivedStatusMessage2;
+  mutable std::atomic<bool> m_receivedStatusMessage0{false};
+  mutable std::atomic<bool> m_receivedStatusMessage1{false};
+  mutable std::atomic<bool> m_receivedStatusMessage2{false};
 
   bool m_controlEnabled;
 
   void verify();
 
-  MotorSafetyHelper *m_safetyHelper;
+  MotorSafetyHelper *m_safetyHelper = nullptr;
 
   void ValueChanged(ITable *source, const std::string &key, EntryValue value,
                     bool isNew) override;
@@ -238,9 +239,9 @@ class CANJaguar : public MotorSafety,
   void InitTable(ITable *subTable) override;
   ITable *GetTable() const override;
 
-  ITable *m_table;
+  ITable *m_table = nullptr;
 
  private:
   void InitCANJaguar();
-  bool m_isInverted;
+  bool m_isInverted = false;
 };

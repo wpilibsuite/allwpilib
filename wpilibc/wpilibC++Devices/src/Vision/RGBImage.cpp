@@ -19,5 +19,3 @@ RGBImage::RGBImage(const char *fileName) : ColorImage(IMAQ_IMAGE_RGB) {
   int success = imaqReadFile(m_imaqImage, fileName, nullptr, nullptr);
   wpi_setImaqErrorWithContext(success, "Imaq ReadFile error");
 }
-
-RGBImage::~RGBImage() {}

@@ -14,7 +14,6 @@
  */
 void DigitalInput::InitDigitalInput(uint32_t channel)
 {
-	m_table = nullptr;
 	char buf[64];
 	m_channel = channel;
 	int n = sprintf(buf, "dio/%d", channel);
@@ -30,13 +29,6 @@ void DigitalInput::InitDigitalInput(uint32_t channel)
 DigitalInput::DigitalInput(uint32_t channel)
 {
 	InitDigitalInput(channel);
-}
-
-/**
- * Free resources associated with the Digital Input class.
- */
-DigitalInput::~DigitalInput()
-{
 }
 
 /*

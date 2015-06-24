@@ -38,15 +38,6 @@ RobotBase::RobotBase()
 }
 
 /**
- * Free the resources for a RobotBase class.
- * This includes deleting all classes that might have been allocated as Singletons to they
- * would never be deleted except here.
- */
-RobotBase::~RobotBase()
-{
-}
-
-/**
  * Determine if the Robot is currently enabled.
  * @return True if the Robot is currently enabled by the field controls.
  */
@@ -109,7 +100,6 @@ bool RobotBase::IsTest() const
 class RobotDeleter
 {
 public:
-	RobotDeleter() {}
 	~RobotDeleter()
 	{
 		delete &RobotBase::getInstance();

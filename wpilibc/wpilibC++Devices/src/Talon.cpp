@@ -36,7 +36,6 @@ void Talon::InitTalon() {
 
   HALReport(HALUsageReporting::kResourceType_Talon, GetChannel());
   LiveWindow::GetInstance()->AddActuator("Talon", GetChannel(), this);
-  m_isInverted = false;
 }
 
 /**
@@ -45,8 +44,6 @@ void Talon::InitTalon() {
  * on-board, 10-19 are on the MXP port
  */
 Talon::Talon(uint32_t channel) : SafePWM(channel) { InitTalon(); }
-
-Talon::~Talon() {}
 
 /**
  * Set the PWM value.

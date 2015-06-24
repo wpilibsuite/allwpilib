@@ -15,7 +15,7 @@ class NetworkButton : public Button {
  public:
   NetworkButton(const char *tableName, const char *field);
   NetworkButton(ITable *table, const char *field);
-  virtual ~NetworkButton() {}
+  virtual ~NetworkButton() = default;
 
   virtual bool Get();
 

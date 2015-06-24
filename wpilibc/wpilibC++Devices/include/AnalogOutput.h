@@ -34,5 +34,5 @@ class AnalogOutput : public SensorBase, public LiveWindowSendable {
   uint32_t m_channel;
   void *m_port;
 
-  ITable *m_table;
+  ITable *m_table = nullptr;
 };

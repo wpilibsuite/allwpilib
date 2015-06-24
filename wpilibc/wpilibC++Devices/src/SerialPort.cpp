@@ -27,7 +27,7 @@
  */
 SerialPort::SerialPort(uint32_t baudRate, Port port, uint8_t dataBits,
                        SerialPort::Parity parity, SerialPort::StopBits stopBits)
-    : m_resourceManagerHandle(0), m_portHandle(0), m_consoleModeEnabled(false) {
+{
   int32_t status = 0;
 
   m_port = port;

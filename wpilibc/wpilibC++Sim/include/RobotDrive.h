@@ -83,13 +83,13 @@ protected:
 	static const int32_t kMaxNumberOfMotors = 4;
 
 	int32_t m_invertedMotors[kMaxNumberOfMotors];
-	float m_sensitivity;
-	double m_maxOutput;
+	float m_sensitivity = 0.5;
+	double m_maxOutput = 1.0;
 	bool m_deleteSpeedControllers;
-	SpeedController *m_frontLeftMotor;
-	SpeedController *m_frontRightMotor;
-	SpeedController *m_rearLeftMotor;
-	SpeedController *m_rearRightMotor;
+	SpeedController *m_frontLeftMotor = nullptr;
+	SpeedController *m_frontRightMotor = nullptr;
+	SpeedController *m_rearLeftMotor = nullptr;
+	SpeedController *m_rearRightMotor = nullptr;
 	// FIXME: MotorSafetyHelper *m_safetyHelper;
 
 private:

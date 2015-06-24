@@ -31,9 +31,7 @@
  * or be double (2x) the spec'd count.
  */
 void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
-  m_table = nullptr;
   m_encodingType = encodingType;
-  m_index = 0;
   switch (encodingType) {
     case k4X: {
       m_encodingScale = 4;
@@ -69,8 +67,6 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
       wpi_setErrorWithContext(-1, "Invalid encodingType argument");
       break;
   }
-  m_distancePerPulse = 1.0;
-  m_pidSource = kDistance;
 
   HALReport(HALUsageReporting::kResourceType_Encoder, m_index, encodingType);
   LiveWindow::GetInstance()->AddSensor("Encoder",
@@ -101,8 +97,7 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
  * or be double (2x) the spec'd count.
  */
 Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection,
-                 EncodingType encodingType)
-    : m_encoder(nullptr), m_counter(nullptr) {
+                 EncodingType encodingType) {
   m_aSource = new DigitalInput(aChannel);
   m_bSource = new DigitalInput(bChannel);
   InitEncoder(reverseDirection, encodingType);
@@ -136,8 +131,7 @@ Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection,
  * or be double (2x) the spec'd count.
  */
 Encoder::Encoder(DigitalSource *aSource, DigitalSource *bSource,
-                 bool reverseDirection, EncodingType encodingType)
-    : m_encoder(nullptr), m_counter(nullptr) {
+                 bool reverseDirection, EncodingType encodingType) {
   m_aSource = aSource;
   m_bSource = bSource;
   m_allocatedASource = false;
@@ -174,8 +168,7 @@ Encoder::Encoder(DigitalSource *aSource, DigitalSource *bSource,
  * or be double (2x) the spec'd count.
  */
 Encoder::Encoder(DigitalSource &aSource, DigitalSource &bSource,
-                 bool reverseDirection, EncodingType encodingType)
-    : m_encoder(nullptr), m_counter(nullptr) {
+                 bool reverseDirection, EncodingType encodingType) {
   m_aSource = &aSource;
   m_bSource = &bSource;
   m_allocatedASource = false;

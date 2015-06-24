@@ -14,7 +14,7 @@ class WaitForChildren : public Command {
  public:
   WaitForChildren(double timeout);
   WaitForChildren(const char *name, double timeout);
-  virtual ~WaitForChildren() {}
+  virtual ~WaitForChildren() = default;
 
  protected:
   virtual void Initialize();

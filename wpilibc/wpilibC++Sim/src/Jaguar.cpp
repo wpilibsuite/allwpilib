@@ -38,10 +38,6 @@ Jaguar::Jaguar(uint32_t channel) : SafePWM(channel)
 	InitJaguar();
 }
 
-Jaguar::~Jaguar()
-{
-}
-
 /**
  * Set the PWM value.
  *

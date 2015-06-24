@@ -64,16 +64,16 @@ public:
 	double GetLoopsPerSec();
 
 protected:
-	virtual ~IterativeRobot();
-	IterativeRobot();
+	virtual ~IterativeRobot() = default;
+	IterativeRobot() = default;
 
 private:
 	bool NextPeriodReady();
 
-	bool m_disabledInitialized;
-	bool m_autonomousInitialized;
-	bool m_teleopInitialized;
-	bool m_testInitialized;
-	double m_period;
+	bool m_disabledInitialized = false;
+	bool m_autonomousInitialized = false;
+	bool m_teleopInitialized = false;
+	bool m_testInitialized = false;
+	double m_period = kDefaultPeriod;
 	Timer m_mainLoopTimer;
 };

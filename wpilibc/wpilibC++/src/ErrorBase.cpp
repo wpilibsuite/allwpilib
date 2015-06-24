@@ -21,8 +21,6 @@ Error ErrorBase::_globalError;
  */
 ErrorBase::ErrorBase() {}
 
-ErrorBase::~ErrorBase() {}
-
 /**
  * @brief Retrieve the current error.
  * Get the current error information associated with this sensor.

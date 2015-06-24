@@ -41,10 +41,6 @@ Victor::Victor(uint32_t channel) : SafePWM(channel)
 	InitVictor();
 }
 
-Victor::~Victor()
-{
-}
-
 /**
  * Set the PWM value.
  *

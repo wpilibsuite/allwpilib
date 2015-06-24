@@ -43,21 +43,7 @@ static const std::string kRotationStrings[] = {
  * @param cameraHost The host to find the camera at, typically an IP address
  */
 AxisCamera::AxisCamera(std::string const &cameraHost)
-    : m_cameraHost(cameraHost),
-      m_cameraSocket(-1),
-      m_freshImage(false),
-      m_brightness(50),
-      m_whiteBalance(kWhiteBalance_Automatic),
-      m_colorLevel(50),
-      m_exposureControl(kExposureControl_Automatic),
-      m_exposurePriority(50),
-      m_maxFPS(0),
-      m_resolution(kResolution_640x480),
-      m_compression(50),
-      m_rotation(kRotation_0),
-      m_parametersDirty(true),
-      m_streamDirty(true),
-      m_done(false) {
+    : m_cameraHost(cameraHost) {
   m_captureThread = std::thread(&AxisCamera::Capture, this);
 }
 

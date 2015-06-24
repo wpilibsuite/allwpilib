@@ -32,12 +32,6 @@ const int32_t RobotDrive::kMaxNumberOfMotors;
  * initialize all the motor assignments. The default timeout is set for the robot drive.
  */
 void RobotDrive::InitRobotDrive() {
-	m_frontLeftMotor = nullptr;
-	m_frontRightMotor = nullptr;
-	m_rearRightMotor = nullptr;
-	m_rearLeftMotor = nullptr;
-	m_sensitivity = 0.5;
-	m_maxOutput = 1.0;
 	// FIXME: m_safetyHelper = new MotorSafetyHelper(this);
 	// FIXME: m_safetyHelper->SetSafetyEnabled(true);
 }

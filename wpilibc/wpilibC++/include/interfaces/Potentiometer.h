@@ -15,7 +15,7 @@
  */
 class Potentiometer : public PIDSource {
  public:
-  virtual ~Potentiometer(){};
+  virtual ~Potentiometer() = default;
   /**
    * Common interface for getting the current value of a potentiometer.
    *

@@ -41,10 +41,10 @@ class CommandTest : public testing::Test {
 
 class ASubsystem : public Subsystem {
  private:
-  Command *m_command;
+  Command *m_command = nullptr;
 
  public:
-  ASubsystem(const char *name) : Subsystem(name) { m_command = nullptr; }
+  ASubsystem(const char *name) : Subsystem(name) {}
 
   virtual void InitDefaultCommand() override {
     if (m_command != nullptr) {

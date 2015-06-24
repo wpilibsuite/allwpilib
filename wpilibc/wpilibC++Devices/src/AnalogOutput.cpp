@@ -13,8 +13,6 @@
 static Resource *outputs = nullptr;
 
 void AnalogOutput::InitAnalogOutput(uint32_t channel) {
-  m_table = nullptr;
-
   Resource::CreateResourceObject(&outputs, kAnalogOutputs);
 
   char buf[64];

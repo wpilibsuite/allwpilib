@@ -18,7 +18,7 @@
 class DigitalInput : public LiveWindowSendable {
 public:
 	explicit DigitalInput(uint32_t channel);
-	virtual ~DigitalInput();
+	virtual ~DigitalInput() = default;
 	uint32_t Get() const;
 	uint32_t GetChannel() const;
 
@@ -35,5 +35,5 @@ private:
 	bool m_lastValue;
 	SimDigitalInput *m_impl;
 
-	ITable *m_table;
+	ITable *m_table = nullptr;
 };

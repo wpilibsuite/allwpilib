@@ -11,8 +11,6 @@ using namespace std;
 
 MonoImage::MonoImage() : ImageBase(IMAQ_IMAGE_U8) {}
 
-MonoImage::~MonoImage() {}
-
 /**
  * Look for ellipses in an image.
  * Given some input parameters, look for any number of ellipses in an image.

@@ -5,28 +5,15 @@
 #include "Compressor.h"
 #include "WPIErrors.h"
 
-void Compressor::InitCompressor(uint8_t pcmID) {
-  m_table = nullptr;
-  m_pcm_pointer = initializeCompressor(pcmID);
-
-  SetClosedLoopControl(true);
-}
-
-/**
- * Constructor
- *
- * Uses the default PCM ID (0)
- */
-Compressor::Compressor() { InitCompressor(GetDefaultSolenoidModule()); }
-
 /**
  * Constructor
  *
  * @param module The PCM ID to use (0-62)
  */
-Compressor::Compressor(uint8_t pcmID) { InitCompressor(pcmID); }
-
-Compressor::~Compressor() {}
+Compressor::Compressor(uint8_t pcmID) {
+  m_pcm_pointer = initializeCompressor(pcmID);
+  SetClosedLoopControl(true);
+}
 
 /**
  *  Starts closed-loop control. Note that closed loop control is enabled by

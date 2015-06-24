@@ -14,9 +14,6 @@
  * Common function for initializing the accelerometer.
  */
 void AnalogAccelerometer::InitAccelerometer() {
-  m_table = nullptr;
-  m_voltsPerG = 1.0;
-  m_zeroGVoltage = 2.5;
   HALReport(HALUsageReporting::kResourceType_Accelerometer,
             m_AnalogInput->GetChannel());
   LiveWindow::GetInstance()->AddSensor("Accelerometer",

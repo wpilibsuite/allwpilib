@@ -20,7 +20,6 @@ LiveWindow *LiveWindow::GetInstance() {
  * Allocate the necessary tables.
  */
 LiveWindow::LiveWindow() {
-  m_enabled = false;
   m_liveWindowTable = NetworkTable::GetTable("LiveWindow");
   m_statusTable = m_liveWindowTable->GetSubTable("~STATUS~");
   m_scheduler = Scheduler::GetInstance();
@@ -51,8 +50,6 @@ void LiveWindow::SetEnabled(bool enabled) {
   m_enabled = enabled;
   m_statusTable->PutBoolean("LW Enabled", m_enabled);
 }
-
-LiveWindow::~LiveWindow() {}
 
 /**
  * Add a Sensor associated with the subsystem and with call it by the given

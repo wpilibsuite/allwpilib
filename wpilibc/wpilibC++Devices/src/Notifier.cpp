@@ -26,11 +26,6 @@ Notifier::Notifier(TimerEventHandler handler, void *param) {
     wpi_setWPIErrorWithContext(NullParameter, "handler must not be nullptr");
   m_handler = handler;
   m_param = param;
-  m_periodic = false;
-  m_expirationTime = 0;
-  m_period = 0;
-  m_nextEvent = nullptr;
-  m_queued = false;
   m_handlerSemaphore = initializeSemaphore(SEMAPHORE_FULL);
   {
     Synchronized sync(queueSemaphore);

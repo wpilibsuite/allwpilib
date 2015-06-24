@@ -37,15 +37,8 @@ const int32_t RobotDrive::kMaxNumberOfMotors;
  * robot drive.
  */
 void RobotDrive::InitRobotDrive() {
-  m_frontLeftMotor = nullptr;
-  m_frontRightMotor = nullptr;
-  m_rearRightMotor = nullptr;
-  m_rearLeftMotor = nullptr;
-  m_sensitivity = 0.5;
-  m_maxOutput = 1.0;
   m_safetyHelper = new MotorSafetyHelper(this);
   m_safetyHelper->SetSafetyEnabled(true);
-  m_syncGroup = 0;
 }
 
 /**

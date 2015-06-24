@@ -29,7 +29,6 @@ void Jaguar::InitJaguar() {
 
   HALReport(HALUsageReporting::kResourceType_Jaguar, GetChannel());
   LiveWindow::GetInstance()->AddActuator("Jaguar", GetChannel(), this);
-  m_isInverted = false;
 }
 
 /**
@@ -38,8 +37,6 @@ void Jaguar::InitJaguar() {
  * on-board, 10-19 are on the MXP port
  */
 Jaguar::Jaguar(uint32_t channel) : SafePWM(channel) { InitJaguar(); }
-
-Jaguar::~Jaguar() {}
 
 /**
  * Set the PWM value.

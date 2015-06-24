@@ -35,7 +35,6 @@ void TalonSRX::InitTalonSRX() {
 
   HALReport(HALUsageReporting::kResourceType_TalonSRX, GetChannel());
   LiveWindow::GetInstance()->AddActuator("TalonSRX", GetChannel(), this);
-  m_isInverted = false;
 }
 
 /**
@@ -44,8 +43,6 @@ void TalonSRX::InitTalonSRX() {
  * on-board, 10-19 are on the MXP port
  */
 TalonSRX::TalonSRX(uint32_t channel) : SafePWM(channel) { InitTalonSRX(); }
-
-TalonSRX::~TalonSRX() {}
 
 /**
  * Set the PWM value.

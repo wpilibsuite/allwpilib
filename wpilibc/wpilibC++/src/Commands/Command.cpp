@@ -20,18 +20,8 @@ static const char *kIsParented = "isParented";
 int Command::m_commandCounter = 0;
 
 void Command::InitCommand(const char *name, double timeout) {
-  m_commandID = m_commandCounter++;
   m_timeout = timeout;
-  m_locked = false;
-  m_startTime = -1;
-  m_initialized = false;
-  m_running = false;
-  m_interruptible = true;
-  m_canceled = false;
-  m_runWhenDisabled = false;
-  m_parent = nullptr;
   m_name = name == nullptr ? std::string() : name;
-  m_table = nullptr;
 }
 
 /**
