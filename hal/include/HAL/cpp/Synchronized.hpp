@@ -7,11 +7,12 @@
 
 #include "HAL/Semaphore.hpp"
 
-// A macro to disallow the copy constructor and operator= functions
-// This should be used in the private: declarations for a class
-#define DISALLOW_COPY_AND_ASSIGN(TypeName) \
-  TypeName(const TypeName&);               \
-  void operator=(const TypeName&)
+// A macro for making a class move-only
+#define DISALLOW_COPY_AND_ASSIGN(TypeName)       \
+  TypeName(const TypeName&) = delete;            \
+  TypeName& operator=(const TypeName&) = delete; \
+  TypeName(TypeName&&) = default;                \
+  TypeName& operator=(TypeName&&) = default
 
 #define CRITICAL_REGION(s) { Synchronized _sync(s);
 #define END_REGION }
