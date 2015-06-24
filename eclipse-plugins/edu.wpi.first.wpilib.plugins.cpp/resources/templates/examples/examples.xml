@@ -261,6 +261,26 @@
     <file source="examples/MecanumDrive/src/Robot.cpp" destination="src/Robot.cpp"></file>
   </files>
   </example>
+  
+  
+<example>
+  <name>Ultrasonic</name>
+  <description>Demonstrate maintaining a set distance using an ultrasonic sensor.</description>
+  <tags>
+    <tag>Getting Started with C++</tag>
+    <tag>Robot and Motor</tag>
+    <tag>CAN</tag>
+    <tag>Complete List</tag>
+	<tag>Sensors</tag>
+  </tags>
+  <packages>
+    <package>src</package>
+  </packages>
+  <files>
+    <file source="examples/Ultrasonic/src/Robot.cpp" destination="src/Robot.cpp"></file>
+  </files>
+  </example>
+
 
 
   <example>
