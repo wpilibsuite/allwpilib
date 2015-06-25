@@ -14,26 +14,25 @@
 /**
  * MXP analog output class.
  */
-class AnalogOutput : public SensorBase, public LiveWindowSendable
-{
-public:
-    explicit AnalogOutput(uint32_t channel);
-    virtual ~AnalogOutput();
+class AnalogOutput : public SensorBase, public LiveWindowSendable {
+ public:
+  explicit AnalogOutput(uint32_t channel);
+  virtual ~AnalogOutput();
 
-    void SetVoltage(float voltage);
-    float GetVoltage() const;
+  void SetVoltage(float voltage);
+  float GetVoltage() const;
 
-    void UpdateTable() override;
-    void StartLiveWindowMode() override;
-    void StopLiveWindowMode() override;
-    std::string GetSmartDashboardType() const override;
-    void InitTable(ITable *subTable) override;
-    ITable *GetTable() const override;
+  void UpdateTable() override;
+  void StartLiveWindowMode() override;
+  void StopLiveWindowMode() override;
+  std::string GetSmartDashboardType() const override;
+  void InitTable(ITable *subTable) override;
+  ITable *GetTable() const override;
 
-protected:
-    void InitAnalogOutput(uint32_t channel);
-    uint32_t m_channel;
-    void* m_port;
+ protected:
+  void InitAnalogOutput(uint32_t channel);
+  uint32_t m_channel;
+  void *m_port;
 
-    ITable *m_table;
+  ITable *m_table;
 };

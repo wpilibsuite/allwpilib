@@ -23,12 +23,18 @@ typedef enum whiteBalance_enum {
 
 class USBCamera : public ErrorBase {
  private:
-  static constexpr char const *ATTR_WB_MODE = "CameraAttributes::WhiteBalance::Mode";
-  static constexpr char const *ATTR_WB_VALUE = "CameraAttributes::WhiteBalance::Value";
-  static constexpr char const *ATTR_EX_MODE = "CameraAttributes::Exposure::Mode";
-  static constexpr char const *ATTR_EX_VALUE = "CameraAttributes::Exposure::Value";
-  static constexpr char const *ATTR_BR_MODE = "CameraAttributes::Brightness::Mode";
-  static constexpr char const *ATTR_BR_VALUE = "CameraAttributes::Brightness::Value";
+  static constexpr char const *ATTR_WB_MODE =
+      "CameraAttributes::WhiteBalance::Mode";
+  static constexpr char const *ATTR_WB_VALUE =
+      "CameraAttributes::WhiteBalance::Value";
+  static constexpr char const *ATTR_EX_MODE =
+      "CameraAttributes::Exposure::Mode";
+  static constexpr char const *ATTR_EX_VALUE =
+      "CameraAttributes::Exposure::Value";
+  static constexpr char const *ATTR_BR_MODE =
+      "CameraAttributes::Brightness::Mode";
+  static constexpr char const *ATTR_BR_VALUE =
+      "CameraAttributes::Brightness::Value";
 
  protected:
   IMAQdxSession m_id;
@@ -51,13 +57,13 @@ class USBCamera : public ErrorBase {
   unsigned int m_brightness;
   bool m_needSettingsUpdate;
 
-  unsigned int GetJpegSize(void* buffer, unsigned int buffSize);
+  unsigned int GetJpegSize(void *buffer, unsigned int buffSize);
 
  public:
   static constexpr char const *kDefaultCameraName = "cam0";
 
   USBCamera(std::string name, bool useJpeg);
-  
+
   void OpenCamera();
   void CloseCamera();
   void StartCapture();
@@ -105,7 +111,7 @@ class USBCamera : public ErrorBase {
    * Set the exposure to manual, with a given percentage (0-100)
    */
   void SetExposureManual(unsigned int expValue);
-  
-  void GetImage(Image* image);
-  unsigned int GetImageData(void* buffer, unsigned int bufferSize);
+
+  void GetImage(Image *image);
+  unsigned int GetImageData(void *buffer, unsigned int bufferSize);
 };

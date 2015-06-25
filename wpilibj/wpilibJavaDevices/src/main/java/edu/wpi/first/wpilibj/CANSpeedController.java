@@ -1,35 +1,31 @@
 package edu.wpi.first.wpilibj;
 
 public interface CANSpeedController extends SpeedController {
-	/**
-	* Mode determines how the motor is controlled, used internally.
-  *
-  * Note that the Jaguar does not support follower mode.
-	*/
-	public enum ControlMode {
-		PercentVbus((byte)0),
-    Current((byte)1),
-    Speed((byte)2),
-    Position((byte)3),
-    Voltage((byte)4),
-    Follower((byte)5); // Not supported by Jaguar.
+  /**
+   * Mode determines how the motor is controlled, used internally.
+   *
+   * Note that the Jaguar does not support follower mode.
+   */
+  public enum ControlMode {
+    PercentVbus((byte) 0), Current((byte) 1), Speed((byte) 2), Position((byte) 3), Voltage((byte) 4), Follower(
+        (byte) 5); // Not supported by Jaguar.
 
-		public byte value;
+    public byte value;
 
-		public static ControlMode valueOf(byte value) {
-			for(ControlMode mode : values()) {
-				if(mode.value == value) {
-					return mode;
-				}
-			}
+    public static ControlMode valueOf(byte value) {
+      for (ControlMode mode : values()) {
+        if (mode.value == value) {
+          return mode;
+        }
+      }
 
-			return null;
-		}
+      return null;
+    }
 
-		private ControlMode(byte value) {
-			this.value = value;
-		}
-	}
+    private ControlMode(byte value) {
+      this.value = value;
+    }
+  }
 
   /**
    * Return the current setpoint.
@@ -97,7 +93,7 @@ public interface CANSpeedController extends SpeedController {
    * Return the current position of whatever the current selected sensor is.
    *
    * See specific implementations for more information on selecting feedback
-   *   sensors.
+   * sensors.
    *
    * @return the current sensor position.
    */
@@ -107,7 +103,7 @@ public interface CANSpeedController extends SpeedController {
    * Return the current velocity of whatever the current selected sensor is.
    *
    * See specific implementations for more information on selecting feedback
-   *   sensors.
+   * sensors.
    *
    * @return the current sensor velocity.
    */

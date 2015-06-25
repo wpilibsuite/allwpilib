@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* Copyright (c) FIRST 2008-2014. All Rights Reserved. */
+/* Open Source Software - may be modified and shared by FRC teams. The code */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
+/* the project. */
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
@@ -24,117 +24,130 @@ import edu.wpi.first.wpilibj.test.TestBench;
 
 /**
  * Tests to see if the Digital ports are working properly
+ *$
  * @author jonathanleitschuh
  */
 @RunWith(Parameterized.class)
 public class DIOCrossConnectTest extends AbstractInterruptTest {
-	private static final Logger logger = Logger.getLogger(DIOCrossConnectTest.class.getName());
+  private static final Logger logger = Logger.getLogger(DIOCrossConnectTest.class.getName());
 
-	private static DIOCrossConnectFixture dio = null;
-	
-	@Override
-	protected Logger getClassLogger(){
-		return logger;
-	}
+  private static DIOCrossConnectFixture dio = null;
 
-	/**
-	 * Default constructor for the DIOCrossConnectTest
-	 * This test is parameterized in order to allow it to be tested using a variety of different input/output pairs
-	 * without duplicate code.<br>
-	 * This class takes Integer port values instead of DigitalClasses because it would force them to be instantiated
-	 * at the same time which could (untested) cause port binding errors.
-	 * 
-	 * @param input The port for the input wire
-	 * @param output The port for the output wire
-	 */
-	public DIOCrossConnectTest(Integer input, Integer output) {
-		if(dio != null){
-			dio.teardown();
-		}
-		dio = new DIOCrossConnectFixture(input, output);
-	}
-	
-	
+  @Override
+  protected Logger getClassLogger() {
+    return logger;
+  }
 
-	/**
-	 * Test data generator. This method is called the the JUnit
-	 * parameterized test runner and returns a Collection of Arrays. For each
-	 * Array in the Collection, each array element corresponds to a parameter
-	 * in the constructor.
-	 */
-	@Parameters(name= "{index}: Input Port: {0} Output Port: {1}")
-	public static Collection<Integer[]> generateData() {
-		// In this example, the parameter generator returns a List of
-		// arrays. Each array has two elements: { Digital input port, Digital output port}.
-		// These data are hard-coded into the class, but they could be
-		// generated or loaded in any way you like.
-		return TestBench.getInstance().getDIOCrossConnectCollection();
-	}
+  /**
+   * Default constructor for the DIOCrossConnectTest This test is parameterized
+   * in order to allow it to be tested using a variety of different input/output
+   * pairs without duplicate code.<br>
+   * This class takes Integer port values instead of DigitalClasses because it
+   * would force them to be instantiated at the same time which could (untested)
+   * cause port binding errors.
+   *$
+   * @param input The port for the input wire
+   * @param output The port for the output wire
+   */
+  public DIOCrossConnectTest(Integer input, Integer output) {
+    if (dio != null) {
+      dio.teardown();
+    }
+    dio = new DIOCrossConnectFixture(input, output);
+  }
 
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-		dio.teardown();
-		dio=null;
-	}
 
-	@After
-	public void tearDown() throws Exception {
-		dio.reset();
-	}
 
-	/**
-	 * Tests to see if the DIO can create and recognize a high value
-	 */
-	@Test
-	public void testSetHigh() {
-		dio.getOutput().set(true);
-		assertTrue("DIO Not High after no delay", dio.getInput().get());
-		Timer.delay(.02);
-		assertTrue("DIO Not High after .05s delay", dio.getInput().get());
-	}
-	
-	/**
-	 * Tests to see if the DIO can create and recognize a low value
-	 */
-	@Test
-	public void testSetLow() {
-		dio.getOutput().set(false);
-		assertFalse("DIO Not Low after no delay", dio.getInput().get());
-		Timer.delay(.02);
-		assertFalse("DIO Not Low after .05s delay", dio.getInput().get());
-	}
+  /**
+   * Test data generator. This method is called the the JUnit parameterized test
+   * runner and returns a Collection of Arrays. For each Array in the
+   * Collection, each array element corresponds to a parameter in the
+   * constructor.
+   */
+  @Parameters(name = "{index}: Input Port: {0} Output Port: {1}")
+  public static Collection<Integer[]> generateData() {
+    // In this example, the parameter generator returns a List of
+    // arrays. Each array has two elements: { Digital input port, Digital output
+    // port}.
+    // These data are hard-coded into the class, but they could be
+    // generated or loaded in any way you like.
+    return TestBench.getInstance().getDIOCrossConnectCollection();
+  }
 
-	/* (non-Javadoc)
-	 * @see edu.wpi.first.wpilibj.AbstractInterruptTest#giveInterruptableSensorBase()
-	 */
-	@Override
-	InterruptableSensorBase giveInterruptableSensorBase() {
-		return dio.getInput();
-	}
+  @AfterClass
+  public static void tearDownAfterClass() throws Exception {
+    dio.teardown();
+    dio = null;
+  }
 
-	/* (non-Javadoc)
-	 * @see edu.wpi.first.wpilibj.AbstractInterruptTest#freeInterruptableSensorBase()
-	 */
-	@Override
-	void freeInterruptableSensorBase() {
-		// Handled in the fixture
-	}
+  @After
+  public void tearDown() throws Exception {
+    dio.reset();
+  }
 
-	/* (non-Javadoc)
-	 * @see edu.wpi.first.wpilibj.AbstractInterruptTest#setInterruptHigh()
-	 */
-	@Override
-	void setInterruptHigh() {
-		dio.getOutput().set(true);
-	}
+  /**
+   * Tests to see if the DIO can create and recognize a high value
+   */
+  @Test
+  public void testSetHigh() {
+    dio.getOutput().set(true);
+    assertTrue("DIO Not High after no delay", dio.getInput().get());
+    Timer.delay(.02);
+    assertTrue("DIO Not High after .05s delay", dio.getInput().get());
+  }
 
-	/* (non-Javadoc)
-	 * @see edu.wpi.first.wpilibj.AbstractInterruptTest#setInterruptLow()
-	 */
-	@Override
-	void setInterruptLow() {
-		dio.getOutput().set(false);
-		
-	}
-	
+  /**
+   * Tests to see if the DIO can create and recognize a low value
+   */
+  @Test
+  public void testSetLow() {
+    dio.getOutput().set(false);
+    assertFalse("DIO Not Low after no delay", dio.getInput().get());
+    Timer.delay(.02);
+    assertFalse("DIO Not Low after .05s delay", dio.getInput().get());
+  }
+
+  /*
+   * (non-Javadoc)
+   *$
+   * @see
+   * edu.wpi.first.wpilibj.AbstractInterruptTest#giveInterruptableSensorBase()
+   */
+  @Override
+  InterruptableSensorBase giveInterruptableSensorBase() {
+    return dio.getInput();
+  }
+
+  /*
+   * (non-Javadoc)
+   *$
+   * @see
+   * edu.wpi.first.wpilibj.AbstractInterruptTest#freeInterruptableSensorBase()
+   */
+  @Override
+  void freeInterruptableSensorBase() {
+    // Handled in the fixture
+  }
+
+  /*
+   * (non-Javadoc)
+   *$
+   * @see edu.wpi.first.wpilibj.AbstractInterruptTest#setInterruptHigh()
+   */
+  @Override
+  void setInterruptHigh() {
+    dio.getOutput().set(true);
+  }
+
+  /*
+   * (non-Javadoc)
+   *$
+   * @see edu.wpi.first.wpilibj.AbstractInterruptTest#setInterruptLow()
+   */
+  @Override
+  void setInterruptLow() {
+    dio.getOutput().set(false);
+
+  }
+
 }

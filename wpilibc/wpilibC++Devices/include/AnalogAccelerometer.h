@@ -1,5 +1,6 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+/* Copyright (c) FIRST 2008. All Rights Reserved.
+ */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
@@ -12,35 +13,39 @@
 
 /**
  * Handle operation of an analog accelerometer.
- * The accelerometer reads acceleration directly through the sensor. Many sensors have
- * multiple axis and can be treated as multiple devices. Each is calibrated by finding
+ * The accelerometer reads acceleration directly through the sensor. Many
+ * sensors have
+ * multiple axis and can be treated as multiple devices. Each is calibrated by
+ * finding
  * the center value over a period of time.
  */
-class AnalogAccelerometer : public SensorBase, public PIDSource, public LiveWindowSendable {
-public:
-	explicit AnalogAccelerometer(int32_t channel);
-	explicit AnalogAccelerometer(AnalogInput *channel);
-	virtual ~AnalogAccelerometer();
+class AnalogAccelerometer : public SensorBase,
+                            public PIDSource,
+                            public LiveWindowSendable {
+ public:
+  explicit AnalogAccelerometer(int32_t channel);
+  explicit AnalogAccelerometer(AnalogInput *channel);
+  virtual ~AnalogAccelerometer();
 
-	float GetAcceleration() const;
-	void SetSensitivity(float sensitivity);
-	void SetZero(float zero);
-	double PIDGet() const override;
+  float GetAcceleration() const;
+  void SetSensitivity(float sensitivity);
+  void SetZero(float zero);
+  double PIDGet() const override;
 
-	void UpdateTable() override;
-	void StartLiveWindowMode() override;
-	void StopLiveWindowMode() override;
-	std::string GetSmartDashboardType() const override;
-	void InitTable(ITable *subTable) override;
-	ITable * GetTable() const override;
+  void UpdateTable() override;
+  void StartLiveWindowMode() override;
+  void StopLiveWindowMode() override;
+  std::string GetSmartDashboardType() const override;
+  void InitTable(ITable *subTable) override;
+  ITable *GetTable() const override;
 
-private:
-	void InitAccelerometer();
+ private:
+  void InitAccelerometer();
 
-	AnalogInput *m_AnalogInput;
-	float m_voltsPerG;
-	float m_zeroGVoltage;
-	bool m_allocatedChannel;
+  AnalogInput *m_AnalogInput;
+  float m_voltsPerG;
+  float m_zeroGVoltage;
+  bool m_allocatedChannel;
 
-	ITable *m_table;
+  ITable *m_table;
 };

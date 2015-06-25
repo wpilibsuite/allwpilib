@@ -30,8 +30,7 @@ public class Notifier {
 
         if (current.m_periodic) {
           current.insertInQueue(true);
-        }
-        else {
+        } else {
           current.m_queued = false;
         }
 
@@ -89,21 +88,22 @@ public class Notifier {
   // destructed.
   private ReentrantLock m_handlerLock = new ReentrantLock();
 
-	/**
-	 * This is done to store the JVM variable in the InterruptJNI
-	 * This is done because the HAL must have access to the JVM variable
-	 * in order to attach the newly spawned thread when an interrupt is fired.
-	 */
-	static {
-		ByteBuffer status = pointer();
-		NotifierJNI.initializeNotifierJVM(status.asIntBuffer());
-		HALUtil.checkStatus(status.asIntBuffer());
-	}
+  /**
+   * This is done to store the JVM variable in the InterruptJNI This is done
+   * because the HAL must have access to the JVM variable in order to attach the
+   * newly spawned thread when an interrupt is fired.
+   */
+  static {
+    ByteBuffer status = pointer();
+    NotifierJNI.initializeNotifierJVM(status.asIntBuffer());
+    HALUtil.checkStatus(status.asIntBuffer());
+  }
 
   /**
    * Create a Notifier for timer event notification.
+   *$
    * @param handler The handler is called at the notification time which is set
-   * using StartSingle or StartPeriodic.
+   *        using StartSingle or StartPeriodic.
    */
   public Notifier(Runnable run) {
     if (refcount == 0) {
@@ -133,37 +133,35 @@ public class Notifier {
 
   /**
    * Update the alarm hardware to reflect the current first element in the
-   * queue.
-   * Compute the time the next alarm should occur based on the current time and
-   * the period for the first element in the timer queue.
-   * WARNING: this method does not do synchronization! It must be called from
-   * somewhere that is taking care of synchronizing access to the queue.
+   * queue. Compute the time the next alarm should occur based on the current
+   * time and the period for the first element in the timer queue. WARNING: this
+   * method does not do synchronization! It must be called from somewhere that
+   * is taking care of synchronizing access to the queue.
    */
   static protected void updateAlarm() {
     if (timerQueueHead != null) {
       ByteBuffer status = pointer();
-      NotifierJNI.updateNotifierAlarm(
-          m_notifier, (int)(timerQueueHead.m_expirationTime * 1e6),
+      NotifierJNI.updateNotifierAlarm(m_notifier, (int) (timerQueueHead.m_expirationTime * 1e6),
           status.asIntBuffer());
       HALUtil.checkStatus(status.asIntBuffer());
     }
   }
 
   /**
-   * Insert this Notifier into the timer queue in right place.
-   * WARNING: this method does not do synchronization! It must be called from
-   * somewhere that is taking care of synchronizing access to the queue.
+   * Insert this Notifier into the timer queue in right place. WARNING: this
+   * method does not do synchronization! It must be called from somewhere that
+   * is taking care of synchronizing access to the queue.
+   *$
    * @param reschedule If false, the scheduled alarm is based on the current
-   * time and UpdateAlarm method is called which will enable the alarm if
-   * necessary. If true, update the time by adding the period (no drift) when
-   * rescheduled periodic from ProcessQueue. This ensures that the public
-   * methods only update the queue after finishing inserting.
+   *        time and UpdateAlarm method is called which will enable the alarm if
+   *        necessary. If true, update the time by adding the period (no drift)
+   *        when rescheduled periodic from ProcessQueue. This ensures that the
+   *        public methods only update the queue after finishing inserting.
    */
   protected void insertInQueue(boolean reschedule) {
     if (reschedule) {
       m_expirationTime += m_period;
-    }
-    else {
+    } else {
       m_expirationTime = Utility.getFPGATime() * 1e-6 + m_period;
     }
 
@@ -178,14 +176,13 @@ public class Notifier {
       timerQueueHead = this;
 
       if (!reschedule) {
-        // since the first element changed, update alarm, unless we already plan to
+        // since the first element changed, update alarm, unless we already plan
+        // to
         updateAlarm();
       }
-    }
-    else {
-      for (Notifier n = timerQueueHead; ; n = n.m_nextEvent) {
-        if (n.m_nextEvent == null ||
-            n.m_nextEvent.m_expirationTime > this.m_expirationTime) {
+    } else {
+      for (Notifier n = timerQueueHead;; n = n.m_nextEvent) {
+        if (n.m_nextEvent == null || n.m_nextEvent.m_expirationTime > this.m_expirationTime) {
           this.m_nextEvent = n.m_nextEvent;
           n.m_nextEvent = this;
           break;
@@ -197,22 +194,21 @@ public class Notifier {
   }
 
   /**
-   * Delete this Notifier from the timer queue.
-   * WARNING: this method does not do synchronization! It must be called from
-   * somewhere that is taking care of synchronizing access to the queue.
-   * Remove this Notifier from the timer queue and adjust the next interrupt
-   * time to reflect the current top of the queue.
+   * Delete this Notifier from the timer queue. WARNING: this method does not do
+   * synchronization! It must be called from somewhere that is taking care of
+   * synchronizing access to the queue. Remove this Notifier from the timer
+   * queue and adjust the next interrupt time to reflect the current top of the
+   * queue.
    */
   private void deleteFromQueue() {
     if (m_queued) {
       m_queued = false;
-      assert(timerQueueHead != null);
+      assert (timerQueueHead != null);
       if (timerQueueHead == this) {
         // removing the first item in the list - update the alarm
         timerQueueHead = this.m_nextEvent;
         updateAlarm();
-      }
-      else {
+      } else {
         for (Notifier n = timerQueueHead; n != null; n = n.m_nextEvent) {
           if (n.m_nextEvent == this) {
             // this element is the next element from *n from the queue
@@ -225,8 +221,9 @@ public class Notifier {
   }
 
   /**
-   * Register for single event notification.
-   * A timer event is queued for a single event after the specified delay.
+   * Register for single event notification. A timer event is queued for a
+   * single event after the specified delay.
+   *$
    * @param delay Seconds to wait before the handler is called.
    */
   public void startSingle(double delay) {
@@ -239,12 +236,12 @@ public class Notifier {
   }
 
   /**
-   * Register for periodic event notification.
-   * A timer event is queued for periodic event notification. Each time the
-   * interrupt occurs, the event will be immediately requeued for the same time
-   * interval.
+   * Register for periodic event notification. A timer event is queued for
+   * periodic event notification. Each time the interrupt occurs, the event will
+   * be immediately requeued for the same time interval.
+   *$
    * @param period Period in seconds to call the handler starting one period
-   * after the call to this method.
+   *        after the call to this method.
    */
   public void startPeriodic(double period) {
     queueLock.lock();
@@ -256,10 +253,9 @@ public class Notifier {
   }
 
   /**
-   * Stop timer events from occuring.
-   * Stop any repeating timer events from occuring. This will also remove any
-   * single notification events from the queue.
-   * If a timer-based call to the registered handler is in progress, this
+   * Stop timer events from occuring. Stop any repeating timer events from
+   * occuring. This will also remove any single notification events from the
+   * queue. If a timer-based call to the registered handler is in progress, this
    * function will block until the handler call is complete.
    */
   public void stop() {
@@ -278,7 +274,7 @@ public class Notifier {
     ByteBuffer status = pointer();
     m_processQueue = new ProcessQueue();
     m_notifier = NotifierJNI.initializeNotifier(m_processQueue, status.asIntBuffer());
-		HALUtil.checkStatus(status.asIntBuffer());
+    HALUtil.checkStatus(status.asIntBuffer());
   }
 
   // Returns a ByteBuffer with the appropriate length and endianness to pass to

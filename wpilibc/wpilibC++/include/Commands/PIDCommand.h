@@ -1,5 +1,6 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2011. All Rights Reserved.							  */
+/* Copyright (c) FIRST 2011. All Rights Reserved.
+ */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
@@ -13,44 +14,44 @@
 
 class PIDController;
 
-class PIDCommand : public Command, public PIDOutput, public PIDSource
-{
-public:
-	PIDCommand(const char *name, double p, double i, double d);
-	PIDCommand(const char *name, double p, double i, double d, double period);
-	PIDCommand(const char *name, double p, double i, double d, double f, double perioid);
-	PIDCommand(double p, double i, double d);
-	PIDCommand(double p, double i, double d, double period);
-	PIDCommand(double p, double i, double d, double f, double period);
-	virtual ~PIDCommand();
-	
-	void SetSetpointRelative(double deltaSetpoint);
+class PIDCommand : public Command, public PIDOutput, public PIDSource {
+ public:
+  PIDCommand(const char *name, double p, double i, double d);
+  PIDCommand(const char *name, double p, double i, double d, double period);
+  PIDCommand(const char *name, double p, double i, double d, double f,
+             double perioid);
+  PIDCommand(double p, double i, double d);
+  PIDCommand(double p, double i, double d, double period);
+  PIDCommand(double p, double i, double d, double f, double period);
+  virtual ~PIDCommand();
 
-	// PIDOutput interface
-	virtual void PIDWrite(float output);
+  void SetSetpointRelative(double deltaSetpoint);
 
-	// PIDSource interface
-	virtual double PIDGet() const;
-protected:
-	PIDController *GetPIDController() const;
-	virtual void _Initialize();
-	virtual void _Interrupted();
-	virtual void _End();
-	void SetSetpoint(double setpoint);
-	double GetSetpoint() const;
-	double GetPosition() const;
+  // PIDOutput interface
+  virtual void PIDWrite(float output);
 
-	virtual double ReturnPIDInput() const = 0;
-	virtual void UsePIDOutput(double output) = 0;
+  // PIDSource interface
+  virtual double PIDGet() const;
 
-private:	
-	/** The internal {@link PIDController} */
-	PIDController *m_controller;
+ protected:
+  PIDController *GetPIDController() const;
+  virtual void _Initialize();
+  virtual void _Interrupted();
+  virtual void _End();
+  void SetSetpoint(double setpoint);
+  double GetSetpoint() const;
+  double GetPosition() const;
 
-public:
-	virtual void InitTable(ITable* table);
-	virtual std::string GetSmartDashboardType() const;
+  virtual double ReturnPIDInput() const = 0;
+  virtual void UsePIDOutput(double output) = 0;
+
+ private:
+  /** The internal {@link PIDController} */
+  PIDController *m_controller;
+
+ public:
+  virtual void InitTable(ITable *table);
+  virtual std::string GetSmartDashboardType() const;
 };
 
 #endif
-

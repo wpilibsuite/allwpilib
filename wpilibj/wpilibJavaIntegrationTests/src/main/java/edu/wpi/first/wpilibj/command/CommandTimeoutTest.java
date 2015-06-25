@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* Copyright (c) FIRST 2008-2014. All Rights Reserved. */
+/* Open Source Software - may be modified and shared by FRC teams. The code */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
+/* the project. */
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj.command;
 
@@ -23,75 +23,71 @@ import edu.wpi.first.wpilibj.mocks.MockCommand;
  *
  */
 public class CommandTimeoutTest extends AbstractCommandTest {
-	private static final Logger logger = Logger.getLogger(CommandTimeoutTest.class.getName());
-	
-	protected Logger getClassLogger(){
-		return logger;
-	}
+  private static final Logger logger = Logger.getLogger(CommandTimeoutTest.class.getName());
 
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
+  protected Logger getClassLogger() {
+    return logger;
+  }
 
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
+  /**
+   * @throws java.lang.Exception
+   */
+  @BeforeClass
+  public static void setUpBeforeClass() throws Exception {}
 
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@Before
-	public void setUp() throws Exception {
-	}
+  /**
+   * @throws java.lang.Exception
+   */
+  @AfterClass
+  public static void tearDownAfterClass() throws Exception {}
 
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@After
-	public void tearDown() throws Exception {
-	}
+  /**
+   * @throws java.lang.Exception
+   */
+  @Before
+  public void setUp() throws Exception {}
 
-	/**
-	 * Command 2 second Timeout Test
-	 */
-	@Test
-	public void testTwoSecondTimeout() {
-		 final ASubsystem subsystem = new ASubsystem();
+  /**
+   * @throws java.lang.Exception
+   */
+  @After
+  public void tearDown() throws Exception {}
+
+  /**
+   * Command 2 second Timeout Test
+   */
+  @Test
+  public void testTwoSecondTimeout() {
+    final ASubsystem subsystem = new ASubsystem();
 
 
-         MockCommand command = new MockCommand() {
-             {
-                 requires(subsystem);
-                 setTimeout(2);
-             }
-             
-             @Override
-             public boolean isFinished(){
-                 return super.isFinished() || isTimedOut();
-             }
-         };
-         
-         command.start();
-         assertCommandState(command, 0, 0, 0, 0, 0);
-         Scheduler.getInstance().run();
-         assertCommandState(command, 0, 0, 0, 0, 0);
-         Scheduler.getInstance().run();
-         assertCommandState(command, 1, 1, 1, 0, 0);
-         Scheduler.getInstance().run();
-         assertCommandState(command, 1, 2, 2, 0, 0);
-         Scheduler.getInstance().run();
-         assertCommandState(command, 1, 3, 3, 0, 0);
-         sleep(2000);
-         Scheduler.getInstance().run();
-         assertCommandState(command, 1, 4, 4, 1, 0);
-         Scheduler.getInstance().run();
-         assertCommandState(command, 1, 4, 4, 1, 0);
-	}
+    MockCommand command = new MockCommand() {
+      {
+        requires(subsystem);
+        setTimeout(2);
+      }
+
+      @Override
+      public boolean isFinished() {
+        return super.isFinished() || isTimedOut();
+      }
+    };
+
+    command.start();
+    assertCommandState(command, 0, 0, 0, 0, 0);
+    Scheduler.getInstance().run();
+    assertCommandState(command, 0, 0, 0, 0, 0);
+    Scheduler.getInstance().run();
+    assertCommandState(command, 1, 1, 1, 0, 0);
+    Scheduler.getInstance().run();
+    assertCommandState(command, 1, 2, 2, 0, 0);
+    Scheduler.getInstance().run();
+    assertCommandState(command, 1, 3, 3, 0, 0);
+    sleep(2000);
+    Scheduler.getInstance().run();
+    assertCommandState(command, 1, 4, 4, 1, 0);
+    Scheduler.getInstance().run();
+    assertCommandState(command, 1, 4, 4, 1, 0);
+  }
 
 }

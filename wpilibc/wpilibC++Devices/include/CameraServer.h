@@ -21,7 +21,7 @@
 class CameraServer : public ErrorBase {
  private:
   static constexpr uint16_t kPort = 1180;
-  static constexpr uint8_t kMagicNumber[] = { 0x01, 0x00, 0x00, 0x00 };
+  static constexpr uint8_t kMagicNumber[] = {0x01, 0x00, 0x00, 0x00};
   static constexpr uint32_t kSize640x480 = 0;
   static constexpr uint32_t kSize320x240 = 1;
   static constexpr uint32_t kSize160x120 = 2;
@@ -30,7 +30,7 @@ class CameraServer : public ErrorBase {
 
  protected:
   CameraServer();
- 
+
   std::shared_ptr<USBCamera> m_camera;
   std::thread m_serverThread;
   std::thread m_captureThread;
@@ -44,8 +44,10 @@ class CameraServer : public ErrorBase {
 
   void Serve();
   void AutoCapture();
-  void SetImageData(uint8_t* data, unsigned int size, unsigned int start = 0, bool imaqData = false);
-  void FreeImageData(std::tuple<uint8_t*, unsigned int, unsigned int, bool> imageData);
+  void SetImageData(uint8_t* data, unsigned int size, unsigned int start = 0,
+                    bool imaqData = false);
+  void FreeImageData(
+      std::tuple<uint8_t*, unsigned int, unsigned int, bool> imageData);
 
   struct Request {
     uint32_t fps;
@@ -54,12 +56,13 @@ class CameraServer : public ErrorBase {
   };
 
   static CameraServer* s_instance;
-  
+
  public:
   static CameraServer* GetInstance();
-  void SetImage(Image const *image);
+  void SetImage(Image const* image);
 
-  void StartAutomaticCapture(char const *cameraName = USBCamera::kDefaultCameraName);
+  void StartAutomaticCapture(
+      char const* cameraName = USBCamera::kDefaultCameraName);
 
   /**
    * Start automatically capturing images to send to the dashboard.

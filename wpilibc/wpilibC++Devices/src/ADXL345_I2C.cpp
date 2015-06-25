@@ -1,5 +1,6 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+/* Copyright (c) FIRST 2008. All Rights Reserved.
+ */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
@@ -21,52 +22,40 @@ constexpr double ADXL345_I2C::kGsPerLSB;
  * @param port The I2C port the accelerometer is attached to
  * @param range The range (+ or -) that the accelerometer will measure.
  */
-ADXL345_I2C::ADXL345_I2C(Port port, Range range):
-		I2C(port, kAddress)
-{
-		//m_i2c = new I2C((I2C::Port)port, kAddress);
+ADXL345_I2C::ADXL345_I2C(Port port, Range range) : I2C(port, kAddress) {
+  // m_i2c = new I2C((I2C::Port)port, kAddress);
 
-		// Turn on the measurements
-		Write(kPowerCtlRegister, kPowerCtl_Measure);
-		// Specify the data format to read
-		SetRange(range);
+  // Turn on the measurements
+  Write(kPowerCtlRegister, kPowerCtl_Measure);
+  // Specify the data format to read
+  SetRange(range);
 
-		HALReport(HALUsageReporting::kResourceType_ADXL345, HALUsageReporting::kADXL345_I2C, 0);
-		LiveWindow::GetInstance()->AddSensor("ADXL345_I2C", port, this);
+  HALReport(HALUsageReporting::kResourceType_ADXL345,
+            HALUsageReporting::kADXL345_I2C, 0);
+  LiveWindow::GetInstance()->AddSensor("ADXL345_I2C", port, this);
 }
 
 /**
  * Destructor.
  */
-ADXL345_I2C::~ADXL345_I2C()
-{
-	//delete m_i2c;
-	//m_i2c = NULL;
+ADXL345_I2C::~ADXL345_I2C() {
+  // delete m_i2c;
+  // m_i2c = NULL;
 }
 
 /** {@inheritdoc} */
-void ADXL345_I2C::SetRange(Range range)
-{
-	Write(kDataFormatRegister, kDataFormat_FullRes | (uint8_t)range);
+void ADXL345_I2C::SetRange(Range range) {
+  Write(kDataFormatRegister, kDataFormat_FullRes | (uint8_t)range);
 }
 
 /** {@inheritdoc} */
-double ADXL345_I2C::GetX()
-{
-	return GetAcceleration(kAxis_X);
-}
+double ADXL345_I2C::GetX() { return GetAcceleration(kAxis_X); }
 
 /** {@inheritdoc} */
-double ADXL345_I2C::GetY()
-{
-	return GetAcceleration(kAxis_Y);
-}
+double ADXL345_I2C::GetY() { return GetAcceleration(kAxis_Y); }
 
 /** {@inheritdoc} */
-double ADXL345_I2C::GetZ()
-{
-	return GetAcceleration(kAxis_Z);
-}
+double ADXL345_I2C::GetZ() { return GetAcceleration(kAxis_Z); }
 
 /**
  * Get the acceleration of one axis in Gs.
@@ -74,53 +63,50 @@ double ADXL345_I2C::GetZ()
  * @param axis The axis to read from.
  * @return Acceleration of the ADXL345 in Gs.
  */
-double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis)
-{
-	int16_t rawAccel = 0;
-	//if(m_i2c)
-	//{
-		Read(kDataRegister + (uint8_t)axis, sizeof(rawAccel), (uint8_t *)&rawAccel);
-	//}
-	return rawAccel * kGsPerLSB;
+double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis) {
+  int16_t rawAccel = 0;
+  // if(m_i2c)
+  //{
+  Read(kDataRegister + (uint8_t)axis, sizeof(rawAccel), (uint8_t *)&rawAccel);
+  //}
+  return rawAccel * kGsPerLSB;
 }
 
 /**
  * Get the acceleration of all axes in Gs.
  *
- * @return An object containing the acceleration measured on each axis of the ADXL345 in Gs.
+ * @return An object containing the acceleration measured on each axis of the
+ * ADXL345 in Gs.
  */
-ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations()
-{
-	AllAxes data = AllAxes();
-	int16_t rawData[3];
-	//if (m_i2c)
-	//{
-		Read(kDataRegister, sizeof(rawData), (uint8_t*)rawData);
+ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations() {
+  AllAxes data = AllAxes();
+  int16_t rawData[3];
+  // if (m_i2c)
+  //{
+  Read(kDataRegister, sizeof(rawData), (uint8_t *)rawData);
 
-		data.XAxis = rawData[0] * kGsPerLSB;
-		data.YAxis = rawData[1] * kGsPerLSB;
-		data.ZAxis = rawData[2] * kGsPerLSB;
-	//}
-	return data;
+  data.XAxis = rawData[0] * kGsPerLSB;
+  data.YAxis = rawData[1] * kGsPerLSB;
+  data.ZAxis = rawData[2] * kGsPerLSB;
+  //}
+  return data;
 }
 
 std::string ADXL345_I2C::GetSmartDashboardType() const {
-	return "3AxisAccelerometer";
+  return "3AxisAccelerometer";
 }
 
 void ADXL345_I2C::InitTable(ITable *subtable) {
-	m_table = subtable;
-	UpdateTable();
+  m_table = subtable;
+  UpdateTable();
 }
 
 void ADXL345_I2C::UpdateTable() {
-	if (m_table != NULL) {
-		m_table->PutNumber("X", GetX());
-		m_table->PutNumber("Y", GetY());
-		m_table->PutNumber("Z", GetZ());
-	}
+  if (m_table != NULL) {
+    m_table->PutNumber("X", GetX());
+    m_table->PutNumber("Y", GetY());
+    m_table->PutNumber("Z", GetZ());
+  }
 }
 
-ITable* ADXL345_I2C::GetTable() const {
-	return m_table;
-}
+ITable *ADXL345_I2C::GetTable() const { return m_table; }

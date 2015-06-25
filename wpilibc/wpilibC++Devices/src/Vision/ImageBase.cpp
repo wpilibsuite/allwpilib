@@ -13,19 +13,16 @@
  * creates any type of image and stores the pointer to it in the class.
  * @param type The type of image to create
  */
-ImageBase::ImageBase(ImageType type)
-{
-	m_imaqImage = imaqCreateImage(type, DEFAULT_BORDER_SIZE);
+ImageBase::ImageBase(ImageType type) {
+  m_imaqImage = imaqCreateImage(type, DEFAULT_BORDER_SIZE);
 }
 
 /**
  * Frees memory associated with an ImageBase.
  * Destructor frees the imaq image allocated with the class.
  */
-ImageBase::~ImageBase()
-{
-	if(m_imaqImage)
-		imaqDispose(m_imaqImage);
+ImageBase::~ImageBase() {
+  if (m_imaqImage) imaqDispose(m_imaqImage);
 }
 
 /**
@@ -33,41 +30,34 @@ ImageBase::~ImageBase()
  * Write the image to a file in the flash on the cRIO.
  * @param fileName The name of the file to write
  */
-void ImageBase::Write(const char *fileName)
-{
-	int success = imaqWriteFile(m_imaqImage, fileName, NULL);
-	wpi_setImaqErrorWithContext(success, "Imaq Image writeFile error");
+void ImageBase::Write(const char *fileName) {
+  int success = imaqWriteFile(m_imaqImage, fileName, NULL);
+  wpi_setImaqErrorWithContext(success, "Imaq Image writeFile error");
 }
 
 /**
  * Gets the height of an image.
  * @return The height of the image in pixels.
  */
-int ImageBase::GetHeight()
-{
-	int height;
-	imaqGetImageSize(m_imaqImage, NULL, &height);
-	return height;
+int ImageBase::GetHeight() {
+  int height;
+  imaqGetImageSize(m_imaqImage, NULL, &height);
+  return height;
 }
 
 /**
  * Gets the width of an image.
  * @return The width of the image in pixels.
  */
-int ImageBase::GetWidth()
-{
-	int width;
-	imaqGetImageSize(m_imaqImage, &width, NULL);
-	return width;
+int ImageBase::GetWidth() {
+  int width;
+  imaqGetImageSize(m_imaqImage, &width, NULL);
+  return width;
 }
 
 /**
  * Access the internal IMAQ Image data structure.
- * 
+ *
  * @return A pointer to the internal IMAQ Image data structure.
  */
-Image *ImageBase::GetImaqImage()
-{
-	return m_imaqImage;
-}
-
+Image *ImageBase::GetImaqImage() { return m_imaqImage; }

@@ -13,34 +13,32 @@
 static Resource *outputs = NULL;
 
 void AnalogOutput::InitAnalogOutput(uint32_t channel) {
-    m_table = NULL;
+  m_table = NULL;
 
-    Resource::CreateResourceObject(&outputs, kAnalogOutputs);
+  Resource::CreateResourceObject(&outputs, kAnalogOutputs);
 
-    char buf[64];
+  char buf[64];
 
-    if(!checkAnalogOutputChannel(channel))
-    {
-        snprintf(buf, 64, "analog input %d", channel);
-        wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
-        return;
-    }
+  if (!checkAnalogOutputChannel(channel)) {
+    snprintf(buf, 64, "analog input %d", channel);
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
+    return;
+  }
 
-    if(outputs->Allocate(channel, buf) == ~0ul)
-    {
-        CloneError(outputs);
-        return;
-    }
+  if (outputs->Allocate(channel, buf) == ~0ul) {
+    CloneError(outputs);
+    return;
+  }
 
-    m_channel = channel;
+  m_channel = channel;
 
-    void* port = getPort(m_channel);
-    int32_t status = 0;
-    m_port = initializeAnalogOutputPort(port, &status);
-    wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  void *port = getPort(m_channel);
+  int32_t status = 0;
+  m_port = initializeAnalogOutputPort(port, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
-    LiveWindow::GetInstance()->AddActuator("AnalogOutput", m_channel, this);
-    HALReport(HALUsageReporting::kResourceType_AnalogOutput, m_channel);
+  LiveWindow::GetInstance()->AddActuator("AnalogOutput", m_channel, this);
+  HALReport(HALUsageReporting::kResourceType_AnalogOutput, m_channel);
 }
 
 /**
@@ -48,16 +46,12 @@ void AnalogOutput::InitAnalogOutput(uint32_t channel) {
  * All analog outputs are located on the MXP port.
  * @param The channel number on the roboRIO to represent.
  */
-AnalogOutput::AnalogOutput(uint32_t channel) {
-    InitAnalogOutput(channel);
-}
+AnalogOutput::AnalogOutput(uint32_t channel) { InitAnalogOutput(channel); }
 
 /**
  * Destructor. Frees analog output resource
  */
-AnalogOutput::~AnalogOutput() {
-    outputs->Free(m_channel);
-}
+AnalogOutput::~AnalogOutput() { outputs->Free(m_channel); }
 
 /**
  * Set the value of the analog output
@@ -65,10 +59,10 @@ AnalogOutput::~AnalogOutput() {
  * @param voltage The output value in Volts, from 0.0 to +5.0
  */
 void AnalogOutput::SetVoltage(float voltage) {
-    int32_t status = 0;
-    setAnalogOutput(m_port, voltage, &status);
+  int32_t status = 0;
+  setAnalogOutput(m_port, voltage, &status);
 
-    wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
@@ -77,35 +71,31 @@ void AnalogOutput::SetVoltage(float voltage) {
  * @return The value in Volts, from 0.0 to +5.0
  */
 float AnalogOutput::GetVoltage() const {
-    int32_t status = 0;
-    float voltage = getAnalogOutput(m_port, &status);
+  int32_t status = 0;
+  float voltage = getAnalogOutput(m_port, &status);
 
-    wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
-    return voltage;
+  return voltage;
 }
 
 void AnalogOutput::UpdateTable() {
-    if (m_table != NULL) {
-        m_table->PutNumber("Value", GetVoltage());
-    }
+  if (m_table != NULL) {
+    m_table->PutNumber("Value", GetVoltage());
+  }
 }
 
-void AnalogOutput::StartLiveWindowMode() {
-}
+void AnalogOutput::StartLiveWindowMode() {}
 
-void AnalogOutput::StopLiveWindowMode() {
-}
+void AnalogOutput::StopLiveWindowMode() {}
 
 std::string AnalogOutput::GetSmartDashboardType() const {
-    return "Analog Output";
+  return "Analog Output";
 }
 
 void AnalogOutput::InitTable(ITable *subTable) {
-    m_table = subTable;
-    UpdateTable();
+  m_table = subTable;
+  UpdateTable();
 }
 
-ITable *AnalogOutput::GetTable() const {
-    return m_table;
-}
+ITable *AnalogOutput::GetTable() const { return m_table; }

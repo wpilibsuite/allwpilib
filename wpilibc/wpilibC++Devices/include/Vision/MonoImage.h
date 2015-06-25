@@ -10,16 +10,14 @@
 
 #include <vector>
 
-class MonoImage : public ImageBase
-{
-public:
-	MonoImage();
-	virtual ~MonoImage();
+class MonoImage : public ImageBase {
+ public:
+  MonoImage();
+  virtual ~MonoImage();
 
-	std::vector<EllipseMatch> *DetectEllipses(EllipseDescriptor *ellipseDescriptor,
-	                                          CurveOptions *curveOptions,
-	                                          ShapeDetectionOptions *shapeDetectionOptions,
-	                                          ROI *roi);
-	std::vector<EllipseMatch> * DetectEllipses(EllipseDescriptor *ellipseDescriptor);
+  std::vector<EllipseMatch> *DetectEllipses(
+      EllipseDescriptor *ellipseDescriptor, CurveOptions *curveOptions,
+      ShapeDetectionOptions *shapeDetectionOptions, ROI *roi);
+  std::vector<EllipseMatch> *DetectEllipses(
+      EllipseDescriptor *ellipseDescriptor);
 };
-

@@ -12,16 +12,15 @@
 
 #define DEFAULT_BORDER_SIZE 3
 
-class ImageBase : public ErrorBase
-{
-public:
-	ImageBase(ImageType type);
-	virtual ~ImageBase();
-	virtual void Write(const char *fileName);
-	int GetHeight();
-	int GetWidth();
-	Image *GetImaqImage();
-protected:
-	Image *m_imaqImage;
-};
+class ImageBase : public ErrorBase {
+ public:
+  ImageBase(ImageType type);
+  virtual ~ImageBase();
+  virtual void Write(const char *fileName);
+  int GetHeight();
+  int GetWidth();
+  Image *GetImaqImage();
 
+ protected:
+  Image *m_imaqImage;
+};

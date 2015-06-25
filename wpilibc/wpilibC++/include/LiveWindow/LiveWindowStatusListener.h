@@ -5,8 +5,9 @@
 #include "tables/ITableListener.h"
 
 class LiveWindowStatusListener : public ITableListener {
-public:
-	virtual void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
+ public:
+  virtual void ValueChanged(ITable* source, const std::string& key,
+                            EntryValue value, bool isNew);
 };
 
-#endif 
+#endif

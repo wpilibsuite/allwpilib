@@ -1,5 +1,6 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2011. All Rights Reserved.							  */
+/* Copyright (c) FIRST 2011. All Rights Reserved.
+ */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
@@ -18,18 +19,19 @@
  *
  * This class represents a subclass of Trigger that is specifically aimed at
  * buttons on an operator interface as a common use case of the more generalized
- * Trigger objects. This is a simple wrapper around Trigger with the method names
+ * Trigger objects. This is a simple wrapper around Trigger with the method
+ * names
  * renamed to fit the Button object use.
- * 
+ *
  * @author brad
  */
 class Button : public Trigger {
-public:
-	virtual void WhenPressed(Command *command);
-	virtual void WhileHeld(Command *command);
-	virtual void WhenReleased(Command *command);
-	virtual void CancelWhenPressed(Command *command);
-	virtual void ToggleWhenPressed(Command *command);
+ public:
+  virtual void WhenPressed(Command *command);
+  virtual void WhileHeld(Command *command);
+  virtual void WhenReleased(Command *command);
+  virtual void CancelWhenPressed(Command *command);
+  virtual void ToggleWhenPressed(Command *command);
 };
 
 #endif

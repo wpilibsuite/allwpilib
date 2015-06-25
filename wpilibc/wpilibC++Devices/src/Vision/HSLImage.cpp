@@ -9,20 +9,15 @@
 /**
  * Create a new image that uses the Hue, Saturation, and Luminance planes.
  */
-HSLImage::HSLImage() : ColorImage(IMAQ_IMAGE_HSL)
-{
-}
+HSLImage::HSLImage() : ColorImage(IMAQ_IMAGE_HSL) {}
 
 /**
  * Create a new image by loading a file.
  * @param fileName The path of the file to load.
  */
-HSLImage::HSLImage(const char *fileName) : ColorImage(IMAQ_IMAGE_HSL)
-{
-	int success = imaqReadFile(m_imaqImage, fileName, NULL, NULL);
-	wpi_setImaqErrorWithContext(success, "Imaq ReadFile error");
+HSLImage::HSLImage(const char *fileName) : ColorImage(IMAQ_IMAGE_HSL) {
+  int success = imaqReadFile(m_imaqImage, fileName, NULL, NULL);
+  wpi_setImaqErrorWithContext(success, "Imaq ReadFile error");
 }
 
-HSLImage::~HSLImage()
-{
-}
+HSLImage::~HSLImage() {}

@@ -7,14 +7,14 @@ package com.ni.vision;
 
 public class VisionException extends RuntimeException {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public VisionException(String msg) {
-        super(msg);
-    }
+  public VisionException(String msg) {
+    super(msg);
+  }
 
-    @Override
-    public String toString() {
-        return "VisionException [" + super.toString() + "]";
-    }
+  @Override
+  public String toString() {
+    return "VisionException [" + super.toString() + "]";
+  }
 }
