@@ -120,8 +120,8 @@ public abstract class AbstractInstaller {
 					String.format("Could not update the old wpilib folder.%n"
 							+ "Please close any WPILib tools and restart Eclipse."));
 			}
-			else
-				removeFileHandler(installLocation, false);
+			
+				//removeFileHandler(installLocation, false);
 		}
 
 		installLocation.mkdirs();
