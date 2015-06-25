@@ -10,7 +10,7 @@
 #include "WPIErrors.h"
 
 Notifier *Notifier::timerQueueHead = nullptr;
-ReentrantSemaphore Notifier::queueSemaphore;
+priority_recursive_mutex Notifier::queueMutex;
 Task* Notifier::task = nullptr;
 int Notifier::refcount = 0;
 
@@ -30,9 +30,8 @@ Notifier::Notifier(TimerEventHandler handler, void *param)
 	m_period = 0;
 	m_nextEvent = nullptr;
 	m_queued = false;
-	m_handlerSemaphore = initializeSemaphore(SEMAPHORE_FULL);
 	{
-		Synchronized sync(queueSemaphore);
+		std::unique_lock<priority_recursive_mutex> sync(queueMutex);
 		// do the first time intialization of static variables
 		if (refcount == 0)
 		{
@@ -51,7 +50,7 @@ Notifier::Notifier(TimerEventHandler handler, void *param)
 Notifier::~Notifier()
 {
 	{
-		Synchronized sync(queueSemaphore);
+		std::unique_lock<priority_recursive_mutex> sync(queueMutex);
 		DeleteFromQueue();
 
 		// Delete the static variables when the last one is going away
@@ -64,9 +63,7 @@ Notifier::~Notifier()
 
 	// Acquire the semaphore; this makes certain that the handler is 
 	// not being executed by the interrupt manager.
-	takeSemaphore(m_handlerSemaphore);
-	// Delete while holding the semaphore so there can be no race.
-	deleteSemaphore(m_handlerSemaphore);
+	std::unique_lock<priority_mutex> lock(m_handlerMutex);
 }
 
 /**
@@ -92,7 +89,7 @@ void Notifier::ProcessQueue(uint32_t mask, void *params)
 	while (true)				// keep processing past events until no more
 	{
 		{
-			Synchronized sync(queueSemaphore);
+			std::unique_lock<priority_recursive_mutex> sync(queueMutex);
 			double currentTime = GetClock();
 			current = timerQueueHead;
 			if (current == nullptr || current->m_expirationTime > currentTime)
@@ -112,16 +109,16 @@ void Notifier::ProcessQueue(uint32_t mask, void *params)
 				// not periodic; removed from queue
 				current->m_queued = false;
 			}
-			// Take handler semaphore while holding queue semaphore to make sure
+			// Take handler mutex while holding queue semaphore to make sure
 			//  the handler will execute to completion in case we are being deleted.
-			takeSemaphore(current->m_handlerSemaphore);
+			current->m_handlerMutex.lock();
 		}
 
 		current->m_handler(current->m_param);	// call the event handler
-		giveSemaphore(current->m_handlerSemaphore);
+		current->m_handlerMutex.unlock();
 	}
 	// reschedule the first item in the queue
-	Synchronized sync(queueSemaphore);
+	std::unique_lock<priority_recursive_mutex> sync(queueMutex);
 	UpdateAlarm();
 }
 
@@ -212,7 +209,7 @@ void Notifier::DeleteFromQueue()
  */
 void Notifier::StartSingle(double delay)
 {
-	Synchronized sync(queueSemaphore);
+	std::unique_lock<priority_recursive_mutex> sync(queueMutex);
 	m_periodic = false;
 	m_period = delay;
 	DeleteFromQueue();
@@ -227,7 +224,7 @@ void Notifier::StartSingle(double delay)
  */
 void Notifier::StartPeriodic(double period)
 {
-	Synchronized sync(queueSemaphore);
+	std::unique_lock<priority_recursive_mutex> sync(queueMutex);
 	m_periodic = true;
 	m_period = period;
 	DeleteFromQueue();
@@ -244,11 +241,11 @@ void Notifier::StartPeriodic(double period)
 void Notifier::Stop()
 {
 	{
-		Synchronized sync(queueSemaphore);
+		std::unique_lock<priority_recursive_mutex> sync(queueMutex);
 		DeleteFromQueue();
 	}
 	// Wait for a currently executing handler to complete before returning from Stop()
-	Synchronized sync(m_handlerSemaphore);
+	std::unique_lock<priority_mutex> sync(m_handlerMutex);
 }
 
 void Notifier::Run() {

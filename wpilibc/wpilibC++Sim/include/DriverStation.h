@@ -10,6 +10,8 @@
 #include "SensorBase.h"
 #include "RobotState.h"
 #include "Task.h"
+#include "HAL/cpp/priority_mutex.h"
+#include "HAL/cpp/priority_condition_variable.h"
 
 struct HALCommonControlData;
 class AnalogInput;
@@ -29,7 +31,7 @@ public:
 		kInvalid
 	};
 
-	virtual ~DriverStation();
+	virtual ~DriverStation() = default;
 	static DriverStation *GetInstance();
 	static void ReportError(std::string error);
 
@@ -117,11 +119,11 @@ private:
     void joystickCallback5(const msgs::ConstJoystickPtr &msg);
 
 	uint8_t m_digitalOut = 0;
-	MULTIWAIT_ID m_waitForDataSem = 0;
-	MUTEX_ID m_waitForDataMutex;
-	MUTEX_ID m_stateSemaphore;
-	MUTEX_ID m_joystickSemaphore;
-	double m_approxMatchTimeOffset = -1.0;
+	priority_condition_variable m_waitForDataCond;
+	priority_mutex m_waitForDataMutex;
+	mutable priority_recursive_mutex m_stateMutex;
+	priority_recursive_mutex m_joystickMutex;
+	double m_approxMatchTimeOffset = 0;
 	bool m_userInDisabled = false;
 	bool m_userInAutonomous = false;
 	bool m_userInTeleop = false;

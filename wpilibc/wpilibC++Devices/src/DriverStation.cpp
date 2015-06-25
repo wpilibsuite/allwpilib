@@ -7,7 +7,6 @@
 
 #include "DriverStation.h"
 #include "AnalogInput.h"
-#include "HAL/cpp/Synchronized.hpp"
 #include "Timer.h"
 #include "NetworkCommunication/FRCComm.h"
 #include "NetworkCommunication/UsageReporting.h"
@@ -45,19 +44,9 @@ DriverStation::DriverStation() {
     m_joystickDescriptor[i].type = -1;
     m_joystickDescriptor[i].name[0] = '\0';
   }
-  // Create a new semaphore
-  m_packetDataAvailableMultiWait = initializeMultiWait();
-  m_newControlData = initializeSemaphore(SEMAPHORE_EMPTY);
-
-  m_waitForDataSem = initializeMultiWait();
-  m_waitForDataMutex = initializeMutexNormal();
-
-  m_packetDataAvailableMultiWait = initializeMultiWait();
-  m_packetDataAvailableMutex = initializeMutexNormal();
-
   // Register that semaphore with the network communications task.
   // It will signal when new packet data is available.
-  HALSetNewDataSem(m_packetDataAvailableMultiWait);
+  HALSetNewDataSem(m_packetDataAvailableCond.native_handle());
 
   AddToSingletonList();
 
@@ -72,12 +61,8 @@ DriverStation::DriverStation() {
 
 DriverStation::~DriverStation() {
   m_task.Stop();
-  deleteMultiWait(m_waitForDataSem);
   // Unregister our semaphore.
   HALSetNewDataSem(nullptr);
-  deleteMultiWait(m_packetDataAvailableMultiWait);
-  deleteMutex(m_packetDataAvailableMutex);
-  deleteMutex(m_waitForDataMutex);
 }
 
 // XXX: This assumes that the calling convention treats pointers and uint32_ts
@@ -87,10 +72,12 @@ void DriverStation::InitTask(DriverStation* ds) { ds->Run(); }
 void DriverStation::Run() {
   int period = 0;
   while (true) {
-    takeMultiWait(m_packetDataAvailableMultiWait, m_packetDataAvailableMutex,
-                  0);
+    {
+      std::unique_lock<priority_mutex> lock(m_packetDataAvailableMutex);
+      m_packetDataAvailableCond.wait(lock);
+    }
     GetData();
-    giveMultiWait(m_waitForDataSem);
+    m_waitForDataCond.notify_all();
 
     if (++period >= 4) {
       MotorSafetyHelper::CheckMotors();
@@ -126,7 +113,7 @@ void DriverStation::GetData() {
     HALGetJoystickButtons(stick, &m_joystickButtons[stick]);
     HALGetJoystickDescriptor(stick, &m_joystickDescriptor[stick]);
   }
-  giveSemaphore(m_newControlData);
+  m_newControlData.give();
 }
 
 /**
@@ -454,7 +441,7 @@ bool DriverStation::IsSysBrownedOut() const {
  * @return True if the control data has been updated since the last call.
  */
 bool DriverStation::IsNewControlData() const {
-  return tryTakeSemaphore(m_newControlData) == 0;
+  return m_newControlData.tryTake() == false;
 }
 
 /**
@@ -520,7 +507,8 @@ uint32_t DriverStation::GetLocation() const {
  * to act on
  */
 void DriverStation::WaitForData() {
-  takeMultiWait(m_waitForDataSem, m_waitForDataMutex, SEMAPHORE_WAIT_FOREVER);
+  std::unique_lock<priority_mutex> lock(m_waitForDataMutex);
+  m_waitForDataCond.wait(lock);
 }
 
 /**

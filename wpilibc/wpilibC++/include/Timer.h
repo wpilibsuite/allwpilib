@@ -6,8 +6,8 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-#include "HAL/Semaphore.hpp"
 #include "Base.h"
+#include "HAL/cpp/priority_mutex.h"
 
 typedef void (*TimerInterruptHandler)(void *param);
 
@@ -28,7 +28,7 @@ double GetTime();
 class Timer {
  public:
   Timer();
-  virtual ~Timer();
+  virtual ~Timer() = default;
   double Get() const;
   void Reset();
   void Start();
@@ -46,6 +46,6 @@ class Timer {
   double m_startTime = 0.0;
   double m_accumulatedTime = 0.0;
   bool m_running = false;
-  MUTEX_ID m_semaphore = nullptr;
+  mutable priority_mutex m_mutex;
   DISALLOW_COPY_AND_ASSIGN(Timer);
 };

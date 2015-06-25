@@ -7,8 +7,9 @@
 #pragma once
 
 #include "ErrorBase.h"
-#include "HAL/cpp/Synchronized.hpp"
 #include <stdint.h>
+
+#include "HAL/cpp/priority_mutex.h"
 
 /**
  * The Resource class is a convenient way to track allocated resources.
@@ -31,10 +32,10 @@ class Resource : public ErrorBase {
   explicit Resource(uint32_t size);
 
   bool *m_isAllocated;
-  ReentrantSemaphore m_allocateLock;
+  priority_recursive_mutex m_allocateLock;
   uint32_t m_size;
 
-  static ReentrantSemaphore m_createLock;
+  static priority_recursive_mutex m_createLock;
 
   DISALLOW_COPY_AND_ASSIGN(Resource);
 };

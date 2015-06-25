@@ -11,7 +11,7 @@
 #include "nivision.h"
 #include "NIIMAQdx.h"
 
-#include <mutex>
+#include "HAL/cpp/priority_mutex.h"
 #include <thread>
 #include <memory>
 #include <condition_variable>
@@ -34,7 +34,7 @@ class CameraServer : public ErrorBase {
   std::shared_ptr<USBCamera> m_camera;
   std::thread m_serverThread;
   std::thread m_captureThread;
-  std::recursive_mutex m_imageMutex;
+  priority_recursive_mutex m_imageMutex;
   std::condition_variable_any m_newImageVariable;
   std::vector<uint8_t*> m_dataPool;
   unsigned int m_quality;

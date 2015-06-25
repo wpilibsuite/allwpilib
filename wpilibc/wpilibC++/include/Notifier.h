@@ -8,7 +8,7 @@
 
 #include "ErrorBase.h"
 #include "Task.h"
-#include "HAL/cpp/Synchronized.hpp"
+#include "HAL/cpp/priority_mutex.h"
 
 typedef void (*TimerEventHandler)(void *param);
 
@@ -22,7 +22,7 @@ class Notifier : public ErrorBase {
 
  private:
   static Notifier *timerQueueHead;
-  static ReentrantSemaphore queueSemaphore;
+  static priority_recursive_mutex queueMutex;
   static void *m_notifier;
   static int refcount;
 
@@ -40,7 +40,7 @@ class Notifier : public ErrorBase {
   Notifier *m_nextEvent = nullptr;    // next Nofifier event
   bool m_periodic = false;          // true if this is a periodic event
   bool m_queued = false;            // indicates if this entry is queued
-  SEMAPHORE_ID m_handlerSemaphore;  // held by interrupt manager task while
+  priority_mutex m_handlerMutex;  // held by interrupt manager task while
                                     // handler call is in progress
 
   DISALLOW_COPY_AND_ASSIGN(Notifier);

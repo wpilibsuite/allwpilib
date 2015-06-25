@@ -11,6 +11,13 @@
 #include <string.h>
 #include <stdio.h>
 
+#ifndef OK
+#define OK 0
+#endif /* OK */
+#ifndef ERROR
+#define ERROR (-1)
+#endif /* ERROR */
+
 const uint32_t Task::kDefaultPriority;
 
 /**

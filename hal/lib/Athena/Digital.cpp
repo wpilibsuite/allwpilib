@@ -4,11 +4,12 @@
 #include "Port.h"
 #include "HAL/HAL.hpp"
 #include "ChipObject.h"
-#include "HAL/cpp/Synchronized.hpp"
 #include "HAL/cpp/Resource.hpp"
+#include "HAL/cpp/priority_mutex.h"
 #include "NetworkCommunication/LoadOut.h"
 #include <stdio.h>
 #include <math.h>
+#include <mutex>
 #include "i2clib/i2c-lib.h"
 #include "spilib/spi-lib.h"
 
@@ -53,11 +54,14 @@ struct DigitalPort {
 };
 
 // XXX: Set these back to static once we figure out the memory clobbering issue
-MUTEX_ID digitalDIOSemaphore = NULL;
-MUTEX_ID digitalRelaySemaphore = NULL;
-MUTEX_ID digitalPwmSemaphore = NULL;
-MUTEX_ID digitalI2COnBoardSemaphore = NULL;
-MUTEX_ID digitalI2CMXPSemaphore = NULL;
+// Create a mutex to protect changes to the digital output values
+priority_recursive_mutex digitalDIOMutex;
+// Create a mutex to protect changes to the relay values
+priority_recursive_mutex digitalRelayMutex;
+// Create a mutex to protect changes to the DO PWM config
+priority_recursive_mutex digitalPwmMutex;
+priority_recursive_mutex digitalI2COnBoardMutex;
+priority_recursive_mutex digitalI2CMXPMutex;
 
 tDIO* digitalSystem = NULL;
 tRelay* relaySystem = NULL;
@@ -78,8 +82,8 @@ int32_t m_spiCS1Handle = 0;
 int32_t m_spiCS2Handle = 0;
 int32_t m_spiCS3Handle = 0;
 int32_t m_spiMXPHandle = 0;
-MUTEX_ID spiOnboardSemaphore = NULL;
-MUTEX_ID spiMXPSemaphore = NULL;
+priority_recursive_mutex spiOnboardSemaphore;
+priority_recursive_mutex spiMXPSemaphore;
 tSPI *spiSystem;
 
 /**
@@ -87,18 +91,6 @@ tSPI *spiSystem;
  */
 void initializeDigital(int32_t *status) {
   if (digitalSystemsInitialized) return;
-
-  // Create a semaphore to protect changes to the digital output values
-  digitalDIOSemaphore = initializeMutexRecursive();
-
-  // Create a semaphore to protect changes to the relay values
-  digitalRelaySemaphore = initializeMutexRecursive();
-
-  // Create a semaphore to protect changes to the DO PWM config
-  digitalPwmSemaphore = initializeMutexRecursive();
-
-  digitalI2COnBoardSemaphore = initializeMutexRecursive();
-  digitalI2CMXPSemaphore = initializeMutexRecursive();
 
   Resource::CreateResourceObject(&DIOChannels, tDIO::kNumSystems * kDigitalPins);
   Resource::CreateResourceObject(&DO_PWMGenerators, tDIO::kNumPWMDutyCycleAElements + tDIO::kNumPWMDutyCycleBElements);
@@ -292,7 +284,7 @@ void setPWMDutyCycle(void* pwmGenerator, double dutyCycle, int32_t *status) {
   float rawDutyCycle = 256.0 * dutyCycle;
   if (rawDutyCycle > 255.5) rawDutyCycle = 255.5;
   {
-    Synchronized sync(digitalPwmSemaphore);
+	std::unique_lock<priority_recursive_mutex> sync(digitalPwmMutex);
     uint8_t pwmPeriodPower = digitalSystem->readPWMPeriodPower(status);
     if (pwmPeriodPower < 4) {
 	  // The resolution of the duty cycle drops close to the highest frequencies.
@@ -326,7 +318,7 @@ void setRelayForward(void* digital_port_pointer, bool on, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   checkRelayChannel(port);
   {
-    Synchronized sync(digitalRelaySemaphore);
+    std::unique_lock<priority_recursive_mutex> sync(digitalRelayMutex);
     uint8_t forwardRelays = relaySystem->readValue_Forward(status);
     if (on)
       forwardRelays |= 1 << port->port.pin;
@@ -345,7 +337,7 @@ void setRelayReverse(void* digital_port_pointer, bool on, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   checkRelayChannel(port);
   {
-    Synchronized sync(digitalRelaySemaphore);
+    std::unique_lock<priority_recursive_mutex> sync(digitalRelayMutex);
     uint8_t reverseRelays = relaySystem->readValue_Reverse(status);
     if (on)
       reverseRelays |= 1 << port->port.pin;
@@ -392,7 +384,7 @@ bool allocateDIO(void* digital_port_pointer, bool input, int32_t *status) {
   }
 
   {
-    Synchronized sync(digitalDIOSemaphore);
+    std::unique_lock<priority_recursive_mutex> sync(digitalDIOMutex);
 
     tDIO::tOutputEnable outputEnable = digitalSystem->readOutputEnable(status);
 
@@ -476,7 +468,7 @@ void setDIO(void* digital_port_pointer, short value, int32_t *status) {
       value = 1;
   }
   {
-    Synchronized sync(digitalDIOSemaphore);
+    std::unique_lock<priority_recursive_mutex> sync(digitalDIOMutex);
     tDIO::tDO currentDIO = digitalSystem->readDO(status);
 
     if(port->port.pin < kNumHeaders) {
@@ -1113,8 +1105,6 @@ uint16_t getLoopTiming(int32_t *status) {
 void spiInitialize(uint8_t port, int32_t *status) {
 	if(spiSystem == NULL)
 		spiSystem = tSPI::create(status);
-	if(spiGetSemaphore(port) == NULL)
-		spiSetSemaphore(port, initializeMutexRecursive());
 	if(spiGetHandle(port) !=0 ) return;
 	switch(port){
 	case 0:
@@ -1157,7 +1147,7 @@ void spiInitialize(uint8_t port, int32_t *status) {
  */
 int32_t spiTransaction(uint8_t port, uint8_t *dataToSend, uint8_t *dataReceived, uint8_t size)
 {
-	Synchronized sync(spiGetSemaphore(port));
+	std::unique_lock<priority_recursive_mutex> sync(spiGetSemaphore(port));
 	return spilib_writeread(spiGetHandle(port), (const char*) dataToSend, (char*) dataReceived, (int32_t) size);
 }
 
@@ -1173,7 +1163,7 @@ int32_t spiTransaction(uint8_t port, uint8_t *dataToSend, uint8_t *dataReceived,
  */
 int32_t spiWrite(uint8_t port, uint8_t* dataToSend, uint8_t sendSize)
 {
-	Synchronized sync(spiGetSemaphore(port));
+	std::unique_lock<priority_recursive_mutex> sync(spiGetSemaphore(port));
 	return spilib_write(spiGetHandle(port), (const char*) dataToSend, (int32_t) sendSize);
 }
 
@@ -1191,7 +1181,7 @@ int32_t spiWrite(uint8_t port, uint8_t* dataToSend, uint8_t sendSize)
  */
 int32_t spiRead(uint8_t port, uint8_t *buffer, uint8_t count)
 {
-	Synchronized sync(spiGetSemaphore(port));
+	std::unique_lock<priority_recursive_mutex> sync(spiGetSemaphore(port));
 	return spilib_read(spiGetHandle(port), (char*) buffer, (int32_t) count);
 }
 
@@ -1201,7 +1191,7 @@ int32_t spiRead(uint8_t port, uint8_t *buffer, uint8_t count)
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
  */
 void spiClose(uint8_t port) {
-	Synchronized sync(spiGetSemaphore(port));
+	std::unique_lock<priority_recursive_mutex> sync(spiGetSemaphore(port));
 	spilib_close(spiGetHandle(port));
 	spiSetHandle(port, 0);
 	return;
@@ -1214,7 +1204,7 @@ void spiClose(uint8_t port) {
  * @param speed The speed in Hz (0-1MHz)
  */
 void spiSetSpeed(uint8_t port, uint32_t speed) {
-	Synchronized sync(spiGetSemaphore(port));
+	std::unique_lock<priority_recursive_mutex> sync(spiGetSemaphore(port));
 	spilib_setspeed(spiGetHandle(port), speed);
 }
 
@@ -1227,7 +1217,7 @@ void spiSetSpeed(uint8_t port, uint32_t speed) {
  * @param clk_idle_high True to set the clock to active low, False to set the clock active high
  */
 void spiSetOpts(uint8_t port, int msb_first, int sample_on_trailing, int clk_idle_high) {
-	Synchronized sync(spiGetSemaphore(port));
+	std::unique_lock<priority_recursive_mutex> sync(spiGetSemaphore(port));
 	spilib_setopts(spiGetHandle(port), msb_first, sample_on_trailing, clk_idle_high);
 }
 
@@ -1237,7 +1227,7 @@ void spiSetOpts(uint8_t port, int msb_first, int sample_on_trailing, int clk_idl
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
  */
 void spiSetChipSelectActiveHigh(uint8_t port, int32_t *status){
-	Synchronized sync(spiGetSemaphore(port));
+	std::unique_lock<priority_recursive_mutex> sync(spiGetSemaphore(port));
 	if(port < 4)
 	{
 		spiSystem->writeChipSelectActiveHigh_Hdr(spiSystem->readChipSelectActiveHigh_Hdr(status) | (1<<port), status);
@@ -1254,7 +1244,7 @@ void spiSetChipSelectActiveHigh(uint8_t port, int32_t *status){
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
  */
 void spiSetChipSelectActiveLow(uint8_t port, int32_t *status){
-	Synchronized sync(spiGetSemaphore(port));
+	std::unique_lock<priority_recursive_mutex> sync(spiGetSemaphore(port));
 	if(port < 4)
 	{
 		spiSystem->writeChipSelectActiveHigh_Hdr(spiSystem->readChipSelectActiveHigh_Hdr(status) & ~(1<<port), status);
@@ -1272,7 +1262,7 @@ void spiSetChipSelectActiveLow(uint8_t port, int32_t *status){
  * @return The stored handle for the SPI port. 0 represents no stored handle.
  */
 int32_t spiGetHandle(uint8_t port){
-	Synchronized sync(spiGetSemaphore(port));
+	std::unique_lock<priority_recursive_mutex> sync(spiGetSemaphore(port));
 	switch(port){
 	case 0:
 		return m_spiCS0Handle;
@@ -1296,7 +1286,7 @@ int32_t spiGetHandle(uint8_t port){
  * @param handle The value of the handle for the port.
  */
 void spiSetHandle(uint8_t port, int32_t handle){
-	Synchronized sync(spiGetSemaphore(port));
+	std::unique_lock<priority_recursive_mutex> sync(spiGetSemaphore(port));
 	switch(port){
 	case 0:
 		m_spiCS0Handle = handle;
@@ -1322,26 +1312,13 @@ void spiSetHandle(uint8_t port, int32_t handle){
  * Get the semaphore for a SPI port
  *
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
- * @return The semaphore for the SPI port. NULL represents no stored semaphore.
+ * @return The semaphore for the SPI port.
  */
-MUTEX_ID spiGetSemaphore(uint8_t port){
+priority_recursive_mutex& spiGetSemaphore(uint8_t port) {
 	if(port < 4)
 		return spiOnboardSemaphore;
 	else
 		return spiMXPSemaphore;
-}
-
-/**
- * Set the semaphore for a SPI port
- *
- * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
- * @param semaphore The semaphore for the SPI port.
- */
-void spiSetSemaphore(uint8_t port, MUTEX_ID semaphore){
-	if (port < 4)
-		spiOnboardSemaphore = semaphore;
-	else
-		spiMXPSemaphore = semaphore;
 }
 
 /*
@@ -1358,9 +1335,9 @@ void i2CInitialize(uint8_t port, int32_t *status) {
 		return;
 	}
 
-	MUTEX_ID lock = port == 0 ? digitalI2COnBoardSemaphore:digitalI2CMXPSemaphore;
+	priority_recursive_mutex &lock = port == 0 ? digitalI2COnBoardMutex : digitalI2CMXPMutex;
 	{
-		Synchronized sync(lock);
+		std::unique_lock<priority_recursive_mutex> sync(lock);
 		if(port == 0) {
 			i2COnboardObjCount++;
 			if (i2COnBoardHandle > 0) return;
@@ -1405,10 +1382,10 @@ int32_t i2CTransaction(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend,
 		return true;
 	}*/
 	int32_t handle = port == 0 ? i2COnBoardHandle:i2CMXPHandle;
-	MUTEX_ID lock = port == 0 ? digitalI2COnBoardSemaphore:digitalI2CMXPSemaphore;
+	priority_recursive_mutex &lock = port == 0 ? digitalI2COnBoardMutex : digitalI2CMXPMutex;
 
 	{
-		Synchronized sync(lock);
+		std::unique_lock<priority_recursive_mutex> sync(lock);
 		return i2clib_writeread(handle, deviceAddress, (const char*) dataToSend, (int32_t) sendSize, (char*) dataReceived, (int32_t) receiveSize);
 	}
 }
@@ -1435,9 +1412,9 @@ int32_t i2CWrite(uint8_t port, uint8_t deviceAddress, uint8_t* dataToSend, uint8
 		return true;
 	}*/
 	int32_t handle = port == 0 ? i2COnBoardHandle:i2CMXPHandle;
-	MUTEX_ID lock = port == 0 ? digitalI2COnBoardSemaphore:digitalI2CMXPSemaphore;
+	priority_recursive_mutex &lock = port == 0 ? digitalI2COnBoardMutex : digitalI2CMXPMutex;
 	{
-		Synchronized sync(lock);
+		std::unique_lock<priority_recursive_mutex> sync(lock);
 		return i2clib_write(handle, deviceAddress, (const char*) dataToSend, (int32_t) sendSize);
 	}
 }
@@ -1472,9 +1449,9 @@ int32_t i2CRead(uint8_t port, uint8_t deviceAddress, uint8_t *buffer, uint8_t co
 			return true;
 		}*/
 	int32_t handle = port == 0 ? i2COnBoardHandle:i2CMXPHandle;
-	MUTEX_ID lock = port == 0 ? digitalI2COnBoardSemaphore:digitalI2CMXPSemaphore;
+	priority_recursive_mutex &lock = port == 0 ? digitalI2COnBoardMutex : digitalI2CMXPMutex;
 	{
-		Synchronized sync(lock);
+		std::unique_lock<priority_recursive_mutex> sync(lock);
 		return i2clib_read(handle, deviceAddress, (char*) buffer, (int32_t) count);
 	}
 
@@ -1485,9 +1462,9 @@ void i2CClose(uint8_t port) {
 		//Set port out of range error here
 		return;
 	}
-	MUTEX_ID lock = port == 0 ? digitalI2COnBoardSemaphore:digitalI2CMXPSemaphore;
+	priority_recursive_mutex &lock = port == 0 ? digitalI2COnBoardMutex : digitalI2CMXPMutex;
 	{
-		Synchronized sync(lock);
+		std::unique_lock<priority_recursive_mutex> sync(lock);
 		if((port == 0 ? i2COnboardObjCount--:i2CMXPObjCount--) == 0) {
 			int32_t handle = port == 0 ? i2COnBoardHandle:i2CMXPHandle;
 			i2clib_close(handle);

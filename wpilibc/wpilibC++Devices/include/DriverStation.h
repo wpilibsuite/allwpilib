@@ -9,6 +9,10 @@
 #include "RobotState.h"
 #include "Task.h"
 #include "HAL/HAL.hpp"
+#include "HAL/cpp/Semaphore.hpp"
+#include "HAL/cpp/priority_mutex.h"
+#include "HAL/cpp/priority_condition_variable.h"
+#include <condition_variable>
 
 struct HALControlWord;
 class AnalogInput;
@@ -98,11 +102,11 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   HALJoystickButtons m_joystickButtons[kJoystickPorts];
   HALJoystickDescriptor m_joystickDescriptor[kJoystickPorts];
   Task m_task{"DriverStation", (FUNCPTR)DriverStation::InitTask};
-  SEMAPHORE_ID m_newControlData = 0;
-  MULTIWAIT_ID m_packetDataAvailableMultiWait = 0;
-  MUTEX_ID m_packetDataAvailableMutex;
-  MULTIWAIT_ID m_waitForDataSem = 0;
-  MUTEX_ID m_waitForDataMutex;
+  mutable Semaphore m_newControlData{Semaphore::kEmpty};
+  mutable priority_condition_variable m_packetDataAvailableCond;
+  priority_mutex m_packetDataAvailableMutex;
+  std::condition_variable_any m_waitForDataCond;
+  priority_mutex m_waitForDataMutex;
   bool m_userInDisabled = false;
   bool m_userInAutonomous = false;
   bool m_userInTeleop = false;

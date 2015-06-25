@@ -77,7 +77,6 @@
 #include "Solenoid.h"
 #include "SpeedController.h"
 #include "SPI.h"
-#include "HAL/cpp/Synchronized.hpp"
 #include "Talon.h"
 #include "TalonSRX.h"
 #include "Task.h"

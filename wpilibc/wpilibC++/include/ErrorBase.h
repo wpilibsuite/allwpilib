@@ -8,7 +8,8 @@
 
 #include "Base.h"
 #include "Error.h"
-#include "HAL/Semaphore.hpp"
+
+#include "HAL/cpp/priority_mutex.h"
 
 #define wpi_setErrnoErrorWithContext(context) \
   (this->SetErrnoError((context), __FILE__, __FUNCTION__, __LINE__))
@@ -81,7 +82,7 @@ class ErrorBase {
  protected:
   mutable Error m_error;
   // TODO: Replace globalError with a global list of all errors.
-  static MUTEX_ID _globalErrorMutex;
+  static priority_mutex _globalErrorMutex;
   static Error _globalError;
 
  private:

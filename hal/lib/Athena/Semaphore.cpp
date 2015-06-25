@@ -45,8 +45,8 @@ MUTEX_ID initializeMutexNormal()
 
 void deleteMutex(MUTEX_ID sem)
 {
-	pthread_mutex_destroy(sem);
-	delete sem;
+       pthread_mutex_destroy(sem);
+       delete sem;
 }
 
 /**
@@ -69,7 +69,7 @@ int8_t tryTakeMutex(MUTEX_ID sem)
  */
 int8_t giveMutex(MUTEX_ID sem)
 {
-	return pthread_mutex_unlock(sem);
+       return pthread_mutex_unlock(sem);
 }
 
 SEMAPHORE_ID initializeSemaphore(uint32_t initial_value) {
@@ -134,5 +134,3 @@ int8_t takeMultiWait(MULTIWAIT_ID sem, MUTEX_ID m, int32_t timeout) {
 int8_t giveMultiWait(MULTIWAIT_ID sem) {
   return pthread_cond_broadcast(sem);
 }
-
-

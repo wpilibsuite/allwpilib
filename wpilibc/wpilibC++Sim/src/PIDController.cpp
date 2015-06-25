@@ -9,7 +9,6 @@
 #include "PIDSource.h"
 #include "PIDOutput.h"
 #include <math.h>
-#include "HAL/cpp/Synchronized.hpp"
 
 static const char *kP = "p";
 static const char *kI = "i";
@@ -31,8 +30,7 @@ static const char *kEnabled = "enabled";
  */
 PIDController::PIDController(float Kp, float Ki, float Kd,
 								PIDSource *source, PIDOutput *output,
-								float period) :
-	m_semaphore (0)
+								float period)
 {
 	Initialize(Kp, Ki, Kd, 0.0f, source, output, period);
 }
@@ -49,8 +47,7 @@ PIDController::PIDController(float Kp, float Ki, float Kd,
  */
 PIDController::PIDController(float Kp, float Ki, float Kd, float Kf,
 								PIDSource *source, PIDOutput *output,
-								float period) :
-	m_semaphore (0)
+								float period)
 {
 	Initialize(Kp, Ki, Kd, Kf, source, output, period);
 }
@@ -87,8 +84,6 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
 	m_pidOutput = output;
 	m_period = period;
 
-
-	m_semaphore = initializeMutexRecursive();
 	m_controlLoop = new Notifier(PIDController::CallCalculate, this);
 	m_controlLoop->StartPeriodic(m_period);
 
@@ -103,8 +98,6 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
  */
 PIDController::~PIDController()
 {
-	takeMutex(m_semaphore);
-	deleteMutex(m_semaphore);
 	delete m_controlLoop;
 }
 
@@ -131,14 +124,13 @@ void PIDController::Calculate()
 	bool enabled;
 	PIDSource *pidInput;
 
-	CRITICAL_REGION(m_semaphore)
 	{
+		std::unique_lock<priority_mutex> lock(m_mutex);
 		if (m_pidInput == 0) return;
 		if (m_pidOutput == 0) return;
 		enabled = m_enabled;
 		pidInput = m_pidInput;
 	}
-	END_REGION;
 
 	if (enabled)
 	{
@@ -147,7 +139,7 @@ void PIDController::Calculate()
 		PIDOutput *pidOutput;
 
 		{
-			Synchronized sync(m_semaphore);
+			std::unique_lock<priority_mutex> sync(m_mutex);
 			m_error = m_setpoint - input;
 			if (m_continuous)
 			{
@@ -203,13 +195,12 @@ void PIDController::Calculate()
  */
 void PIDController::SetPID(double p, double i, double d)
 {
-	CRITICAL_REGION(m_semaphore)
 	{
+		std::unique_lock<priority_mutex> lock(m_mutex);
 		m_P = p;
 		m_I = i;
 		m_D = d;
 	}
-	END_REGION;
 
 	if (m_table != nullptr) {
 		m_table->PutNumber("p", m_P);
@@ -228,14 +219,13 @@ void PIDController::SetPID(double p, double i, double d)
  */
 void PIDController::SetPID(double p, double i, double d, double f)
 {
-	CRITICAL_REGION(m_semaphore)
 	{
+		std::unique_lock<priority_mutex> lock(m_mutex);
 		m_P = p;
 		m_I = i;
 		m_D = d;
 		m_F = f;
 	}
-	END_REGION;
 
 	if (m_table != nullptr) {
 		m_table->PutNumber("p", m_P);
@@ -251,11 +241,8 @@ void PIDController::SetPID(double p, double i, double d, double f)
  */
 double PIDController::GetP() const
 {
-	CRITICAL_REGION(m_semaphore)
-	{
-		return m_P;
-	}
-	END_REGION;
+	std::unique_lock<priority_mutex> lock(m_mutex);
+	return m_P;
 }
 
 /**
@@ -264,11 +251,8 @@ double PIDController::GetP() const
  */
 double PIDController::GetI() const
 {
-	CRITICAL_REGION(m_semaphore)
-	{
-		return m_I;
-	}
-	END_REGION;
+	std::unique_lock<priority_mutex> lock(m_mutex);
+	return m_I;
 }
 
 /**
@@ -277,11 +261,8 @@ double PIDController::GetI() const
  */
 double PIDController::GetD() const
 {
-	CRITICAL_REGION(m_semaphore)
-	{
-		return m_D;
-	}
-	END_REGION;
+	std::unique_lock<priority_mutex> lock(m_mutex);
+	return m_D;
 }
 
 /**
@@ -290,11 +271,8 @@ double PIDController::GetD() const
  */
 double PIDController::GetF() const
 {
-	CRITICAL_REGION(m_semaphore)
-	{
-		return m_F;
-	}
-	END_REGION;
+	std::unique_lock<priority_mutex> lock(m_mutex);
+	return m_F;
 }
 
 /**
@@ -304,13 +282,8 @@ double PIDController::GetF() const
  */
 float PIDController::Get() const
 {
-	float result;
-	CRITICAL_REGION(m_semaphore)
-	{
-		result = m_result;
-	}
-	END_REGION;
-	return result;
+	std::unique_lock<priority_mutex> lock(m_mutex);
+	return m_result;
 }
 
 /**
@@ -322,12 +295,8 @@ float PIDController::Get() const
  */
 void PIDController::SetContinuous(bool continuous)
 {
-	CRITICAL_REGION(m_semaphore)
-	{
-		m_continuous = continuous;
-	}
-	END_REGION;
-
+	std::unique_lock<priority_mutex> lock(m_mutex);
+	m_continuous = continuous;
 }
 
 /**
@@ -338,12 +307,11 @@ void PIDController::SetContinuous(bool continuous)
  */
 void PIDController::SetInputRange(float minimumInput, float maximumInput)
 {
-	CRITICAL_REGION(m_semaphore)
 	{
+		std::unique_lock<priority_mutex> lock(m_mutex);
 		m_minimumInput = minimumInput;
 		m_maximumInput = maximumInput;
 	}
-	END_REGION;
 
 	SetSetpoint(m_setpoint);
 }
@@ -356,12 +324,9 @@ void PIDController::SetInputRange(float minimumInput, float maximumInput)
  */
 void PIDController::SetOutputRange(float minimumOutput, float maximumOutput)
 {
-	CRITICAL_REGION(m_semaphore)
-	{
-		m_minimumOutput = minimumOutput;
-		m_maximumOutput = maximumOutput;
-	}
-	END_REGION;
+	std::unique_lock<priority_mutex> lock(m_mutex);
+	m_minimumOutput = minimumOutput;
+	m_maximumOutput = maximumOutput;
 }
 
 /**
@@ -370,8 +335,8 @@ void PIDController::SetOutputRange(float minimumOutput, float maximumOutput)
  */
 void PIDController::SetSetpoint(float setpoint)
 {
-	CRITICAL_REGION(m_semaphore)
 	{
+		std::unique_lock<priority_mutex> lock(m_mutex);
 		if (m_maximumInput > m_minimumInput)
 		{
 			if (setpoint > m_maximumInput)
@@ -386,8 +351,7 @@ void PIDController::SetSetpoint(float setpoint)
 			m_setpoint = setpoint;
 		}
 	}
-	END_REGION;	
-	
+
 	if (m_table != nullptr) {
 		m_table->PutNumber("setpoint", m_setpoint);
 	}
@@ -399,13 +363,8 @@ void PIDController::SetSetpoint(float setpoint)
  */
 double PIDController::GetSetpoint() const
 {
-	float setpoint;
-	CRITICAL_REGION(m_semaphore)
-	{
-		setpoint = m_setpoint;
-	}
-	END_REGION;
-	return setpoint;
+	std::unique_lock<priority_mutex> lock(m_mutex);
+	return m_setpoint;
 }
 
 /**
@@ -414,13 +373,12 @@ double PIDController::GetSetpoint() const
  */
 float PIDController::GetError() const
 {
-	float error;
-	CRITICAL_REGION(m_semaphore)
+	double pidInput;
 	{
-		error = m_setpoint - m_pidInput->PIDGet();
+		std::unique_lock<priority_mutex> lock(m_mutex);
+		pidInput = m_pidInput->PIDGet();
 	}
-	END_REGION;
-	return error;
+	return GetSetpoint() - pidInput;
 }
 
 /*
@@ -430,12 +388,9 @@ float PIDController::GetError() const
  */
 void PIDController::SetTolerance(float percent)
 {
-	CRITICAL_REGION(m_semaphore)
-	{
-		m_toleranceType = kPercentTolerance;
-		m_tolerance = percent;
-	}
-	END_REGION;
+	std::unique_lock<priority_mutex> lock(m_mutex);
+	m_toleranceType = kPercentTolerance;
+	m_tolerance = percent;
 }
 
 /*
@@ -445,12 +400,9 @@ void PIDController::SetTolerance(float percent)
  */
 void PIDController::SetPercentTolerance(float percent)
 {
-	CRITICAL_REGION(m_semaphore)
-	{
-		m_toleranceType = kPercentTolerance;
-		m_tolerance = percent;
-	}
-	END_REGION;
+	std::unique_lock<priority_mutex> lock(m_mutex);
+	m_toleranceType = kPercentTolerance;
+	m_tolerance = percent;
 }
 
 /*
@@ -460,12 +412,9 @@ void PIDController::SetPercentTolerance(float percent)
  */
 void PIDController::SetAbsoluteTolerance(float absTolerance)
 {
-	CRITICAL_REGION(m_semaphore)
-	{
-		m_toleranceType = kAbsoluteTolerance;
-		m_tolerance = absTolerance;
-	}
-	END_REGION;
+	std::unique_lock<priority_mutex> lock(m_mutex);
+	m_toleranceType = kAbsoluteTolerance;
+	m_tolerance = absTolerance;
 }
 
 /*
@@ -477,22 +426,20 @@ void PIDController::SetAbsoluteTolerance(float absTolerance)
  */
 bool PIDController::OnTarget() const
 {
-	bool temp;
-	CRITICAL_REGION(m_semaphore)
-	{
-		switch (m_toleranceType) {
-		case kPercentTolerance:
-			temp = fabs(GetError()) < (m_tolerance / 100 * (m_maximumInput - m_minimumInput));
-			break;
-		case kAbsoluteTolerance:
-			temp = fabs(GetError()) < m_tolerance;
-			break;
-		case kNoTolerance: // TODO: this case needs an error
-			temp = false;
-		}
+	double error = GetError();
+
+	std::unique_lock<priority_mutex> sync(m_mutex);
+	switch (m_toleranceType) {
+	case kPercentTolerance:
+		return fabs(error) < m_tolerance / 100 * (m_maximumInput - m_minimumInput);
+		break;
+	case kAbsoluteTolerance:
+		return fabs(error) < m_tolerance;
+		break;
+	case kNoTolerance: // TODO: this case needs an error
+		return false;
 	}
-	END_REGION;
-	return temp;
+	return false;
 }
 
 /**
@@ -500,12 +447,11 @@ bool PIDController::OnTarget() const
  */
 void PIDController::Enable()
 {
-	CRITICAL_REGION(m_semaphore)
 	{
+		std::unique_lock<priority_mutex> lock(m_mutex);
 		m_enabled = true;
 	}
-	END_REGION;	
-	
+
 	if (m_table != nullptr) {
 		m_table->PutBoolean("enabled", true);
 	}
@@ -516,13 +462,12 @@ void PIDController::Enable()
  */
 void PIDController::Disable()
 {
-	CRITICAL_REGION(m_semaphore)
 	{
+		std::unique_lock<priority_mutex> lock(m_mutex);
 		m_pidOutput->PIDWrite(0);
 		m_enabled = false;
 	}
-	END_REGION;
-	
+
 	if (m_table != nullptr) {
 		m_table->PutBoolean("enabled", false);
 	}
@@ -533,13 +478,8 @@ void PIDController::Disable()
  */
 bool PIDController::IsEnabled() const
 {
-	bool enabled;
-	CRITICAL_REGION(m_semaphore)
-	{
-		enabled = m_enabled;
-	}
-	END_REGION;
-	return enabled;
+	std::unique_lock<priority_mutex> lock(m_mutex);
+	return m_enabled;
 }
 
 /**
@@ -549,13 +489,10 @@ void PIDController::Reset()
 {
 	Disable();
 
-	CRITICAL_REGION(m_semaphore)
-	{
-		m_prevError = 0;
-		m_totalError = 0;
-		m_result = 0;
-	}
-	END_REGION;
+	std::unique_lock<priority_mutex> lock(m_mutex);
+	m_prevError = 0;
+	m_totalError = 0;
+	m_result = 0;
 }
 
 std::string PIDController::GetSmartDashboardType() const {

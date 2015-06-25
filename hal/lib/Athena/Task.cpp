@@ -1,6 +1,13 @@
 
 #include "HAL/Task.hpp"
 
+#ifndef OK
+#define OK             0
+#endif /* OK */
+#ifndef ERROR
+#define ERROR          (-1)
+#endif /* ERROR */
+
 #include <stdio.h>
 #include <signal.h>
 

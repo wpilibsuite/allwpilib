@@ -6,7 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "ErrorBase.h"
-#include "HAL/cpp/Synchronized.hpp"
 #define WPI_ERRORS_DEFINE_STRINGS
 #include "WPIErrors.h"
 
@@ -14,7 +13,7 @@
 #include <cstring>
 #include <cstdio>
 
-MUTEX_ID ErrorBase::_globalErrorMutex = initializeMutexNormal();
+priority_mutex ErrorBase::_globalErrorMutex;
 Error ErrorBase::_globalError;
 /**
  * @brief Initialize the instance status to 0 for now.
@@ -58,7 +57,7 @@ void ErrorBase::SetErrnoError(const char* contextMessage, const char* filename,
   m_error.Set(-1, err, filename, function, lineNumber, this);
 
   // Update the global error if there is not one already set.
-  Synchronized mutex(_globalErrorMutex);
+  std::unique_lock<priority_mutex> mutex(_globalErrorMutex);
   if (_globalError.GetCode() == 0) {
     _globalError.Clone(m_error);
   }
@@ -86,7 +85,7 @@ void ErrorBase::SetImaqError(int success, const char* contextMessage,
     m_error.Set(success, err, filename, function, lineNumber, this);
 
     // Update the global error if there is not one already set.
-    Synchronized mutex(_globalErrorMutex);
+    std::unique_lock<priority_mutex> mutex(_globalErrorMutex);
     if (_globalError.GetCode() == 0) {
       _globalError.Clone(m_error);
     }
@@ -111,7 +110,7 @@ void ErrorBase::SetError(Error::Code code, const char* contextMessage,
     m_error.Set(code, contextMessage, filename, function, lineNumber, this);
 
     // Update the global error if there is not one already set.
-    Synchronized mutex(_globalErrorMutex);
+    std::unique_lock<priority_mutex> mutex(_globalErrorMutex);
     if (_globalError.GetCode() == 0) {
       _globalError.Clone(m_error);
     }
@@ -137,7 +136,7 @@ void ErrorBase::SetWPIError(const char* errorMessage, Error::Code code,
   m_error.Set(code, err, filename, function, lineNumber, this);
 
   // Update the global error if there is not one already set.
-  Synchronized mutex(_globalErrorMutex);
+  std::unique_lock<priority_mutex> mutex(_globalErrorMutex);
   if (_globalError.GetCode() == 0) {
     _globalError.Clone(m_error);
   }
@@ -159,7 +158,7 @@ void ErrorBase::SetGlobalError(Error::Code code, const char* contextMessage,
                                uint32_t lineNumber) {
   //  If there was an error
   if (code != 0) {
-    Synchronized mutex(_globalErrorMutex);
+    std::unique_lock<priority_mutex> mutex(_globalErrorMutex);
 
     //  Set the current error information for this object.
     _globalError.Set(code, contextMessage, filename, function, lineNumber,
@@ -174,7 +173,7 @@ void ErrorBase::SetGlobalWPIError(const char* errorMessage,
   char err[256];
   sprintf(err, "%s: %s", errorMessage, contextMessage);
 
-  Synchronized mutex(_globalErrorMutex);
+  std::unique_lock<priority_mutex> mutex(_globalErrorMutex);
   if (_globalError.GetCode() != 0) {
     _globalError.Clear();
   }
@@ -185,6 +184,6 @@ void ErrorBase::SetGlobalWPIError(const char* errorMessage,
   * Retrieve the current global error.
 */
 Error& ErrorBase::GetGlobalError() {
-  Synchronized mutex(_globalErrorMutex);
+  std::unique_lock<priority_mutex> mutex(_globalErrorMutex);
   return _globalError;
 }

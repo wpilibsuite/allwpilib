@@ -15,11 +15,11 @@
 #include "networktables2/type/NumberArray.h"
 #include "networktables2/type/StringArray.h"
 #include "SmartDashboard/SmartDashboard.h"
-#include "HAL/Semaphore.hpp"
 #include <list>
 #include <map>
 #include <set>
 #include <vector>
+#include "HAL/cpp/priority_mutex.h"
 
 class ButtonScheduler;
 class Subsystem;
@@ -46,16 +46,16 @@ class Scheduler : public ErrorBase, public NamedSendable {
 
  private:
   Scheduler();
-  virtual ~Scheduler();
+  virtual ~Scheduler() = default;
 
   void ProcessCommandAddition(Command *command);
 
   Command::SubsystemSet m_subsystems;
-  MUTEX_ID m_buttonsLock = nullptr;
+  priority_mutex m_buttonsLock;
   typedef std::vector<ButtonScheduler *> ButtonVector;
   ButtonVector m_buttons;
   typedef std::vector<Command *> CommandVector;
-  MUTEX_ID m_additionsLock = nullptr;
+  priority_mutex m_additionsLock;
   CommandVector m_additions;
   typedef std::set<Command *> CommandSet;
   CommandSet m_commands;

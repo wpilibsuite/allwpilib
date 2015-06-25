@@ -11,7 +11,7 @@
 #include "MotorSafetyHelper.h"
 #include "PIDOutput.h"
 #include "CANSpeedController.h"
-#include "HAL/Semaphore.hpp"
+#include "HAL/cpp/Semaphore.hpp"
 #include "HAL/HAL.hpp"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITable.h"
@@ -19,7 +19,7 @@
 #include "CAN/can_proto.h"
 
 #include <atomic>
-#include <mutex>
+#include "HAL/cpp/priority_mutex.h"
 #include <utility>
 
 /**
@@ -168,7 +168,7 @@ class CANJaguar : public MotorSafety,
   void setupPeriodicStatus();
   void updatePeriodicStatus() const;
 
-  mutable std::recursive_mutex m_mutex;
+  mutable priority_recursive_mutex m_mutex;
 
   uint8_t m_deviceNumber;
   float m_value = 0.0f;

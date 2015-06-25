@@ -9,8 +9,8 @@
 #include "ErrorBase.h"
 #include "nivision.h"
 #include "NIIMAQdx.h"
+#include "HAL/cpp/priority_mutex.h"
 
-#include <mutex>
 #include <string>
 
 typedef enum whiteBalance_enum {
@@ -47,7 +47,7 @@ class USBCamera : public ErrorBase {
   bool m_active = false;
   bool m_open = false;
 
-  std::recursive_mutex m_mutex;
+  priority_recursive_mutex m_mutex;
 
   unsigned int m_width = 320;
   unsigned int m_height = 240;

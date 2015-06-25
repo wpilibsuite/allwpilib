@@ -9,8 +9,8 @@
 #include "Base.h"
 #include "Controller.h"
 #include "LiveWindow/LiveWindow.h"
-#include "HAL/Semaphore.hpp"
 #include "PIDInterface.h"
+#include "HAL/cpp/priority_mutex.h"
 
 class PIDOutput;
 class PIDSource;
@@ -87,7 +87,7 @@ class PIDController : public LiveWindowSendable,
   float m_result = 0;
   float m_period;
 
-  MUTEX_ID m_semaphore = 0;
+  mutable priority_mutex m_mutex;
 
   PIDSource *m_pidInput;
   PIDOutput *m_pidOutput;

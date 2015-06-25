@@ -7,7 +7,6 @@
 #include "Preferences.h"
 
 //#include "NetworkCommunication/UsageReporting.h"
-#include "HAL/cpp/Synchronized.hpp"
 #include "WPIErrors.h"
 #include "HAL/HAL.hpp"
 
@@ -28,23 +27,16 @@ static const char *kValueSuffix = "\"\n";
 Preferences::Preferences()
     : m_readTask("PreferencesReadTask", (FUNCPTR)Preferences::InitReadTask),
       m_writeTask("PreferencesWriteTask", (FUNCPTR)Preferences::InitWriteTask) {
-  m_fileLock = initializeMutexRecursive();
-  m_fileOpStarted = initializeSemaphore(SEMAPHORE_EMPTY);
-  m_tableLock = initializeMutexRecursive();
-
-  Synchronized sync(m_fileLock);
+  std::unique_lock<priority_recursive_mutex> sync(m_fileLock);
   m_readTask.Start((uint32_t) this);
-  takeSemaphore(m_fileOpStarted);
+
+  /* The main thread initially blocks on the semaphore. The read task signals
+   * the main thread to continue after it has locked the table mutex (so the
+   * table will be fully populated when the main thread can finally access it).
+   */
+  m_fileOpStarted.take();
 
   HALReport(HALUsageReporting::kResourceType_Preferences, 0);
-}
-
-Preferences::~Preferences() {
-  takeMutex(m_tableLock);
-  deleteMutex(m_tableLock);
-  takeMutex(m_fileLock);
-  deleteSemaphore(m_fileOpStarted);
-  deleteMutex(m_fileLock);
 }
 
 /**
@@ -300,9 +292,9 @@ void Preferences::PutLong(const char *key, int64_t value) {
  * saved before continuing.</p>
  */
 void Preferences::Save() {
-  Synchronized sync(m_fileLock);
+  std::unique_lock<priority_recursive_mutex> sync(m_fileLock);
   m_writeTask.Start((uint32_t) this);
-  takeSemaphore(m_fileOpStarted);
+  m_fileOpStarted.take();
 }
 
 /**
@@ -333,7 +325,7 @@ void Preferences::Remove(const char *key) {
  * @return the value (or empty if none exists)
  */
 std::string Preferences::Get(const char *key) {
-  Synchronized sync(m_tableLock);
+  std::unique_lock<priority_recursive_mutex> sync(m_tableLock);
   if (key == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "key");
     return "";
@@ -347,7 +339,7 @@ std::string Preferences::Get(const char *key) {
  * @param value the value
  */
 void Preferences::Put(const char *key, std::string value) {
-  Synchronized sync(m_tableLock);
+  std::unique_lock<priority_recursive_mutex> sync(m_tableLock);
   if (key == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "key");
     return;
@@ -375,8 +367,8 @@ void Preferences::Put(const char *key, std::string value) {
  * first created.
  */
 void Preferences::ReadTaskRun() {
-  Synchronized sync(m_tableLock);
-  giveSemaphore(m_fileOpStarted);
+  std::unique_lock<priority_recursive_mutex> sync(m_tableLock);
+  m_fileOpStarted.give();
 
   std::string comment;
 
@@ -478,8 +470,8 @@ void Preferences::ReadTaskRun() {
  * called.
  */
 void Preferences::WriteTaskRun() {
-  Synchronized sync(m_tableLock);
-  giveSemaphore(m_fileOpStarted);
+  std::unique_lock<priority_recursive_mutex> sync(m_tableLock);
+  m_fileOpStarted.give();
 
   FILE *file = nullptr;
   file = fopen(kFileName, "w");
@@ -521,12 +513,13 @@ static bool isKeyAcceptable(const std::string &value) {
   }
   return true;
 }
+
 void Preferences::ValueChanged(ITable *table, const std::string &key,
                                EntryValue value, bool isNew) {
   if (key == kSaveField) {
     if (table->GetBoolean(kSaveField, false)) Save();
   } else {
-    Synchronized sync(m_tableLock);
+    std::unique_lock<priority_recursive_mutex> sync(m_tableLock);
 
     if (!isKeyAcceptable(key) ||
         table->GetString(key, "").find('"') != std::string::npos) {

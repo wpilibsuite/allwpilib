@@ -33,10 +33,10 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_initializeMutex
 (JNIEnv * env, jclass)
 {
 	HALUTIL_LOG(logDEBUG) << "Calling HALUtil initializeMutex";
-	MUTEX_ID* mutexPtr = (MUTEX_ID*)new unsigned char[4];
+	MUTEX_ID* mutexPtr = (MUTEX_ID*)new unsigned char[sizeof(MUTEX_ID)];
 	*mutexPtr = initializeMutexNormal();
 	HALUTIL_LOG(logDEBUG) << "Mutex Ptr = " << *mutexPtr;
-	return env->NewDirectByteBuffer( mutexPtr, 4);
+	return env->NewDirectByteBuffer(mutexPtr, sizeof(MUTEX_ID));
 }
 
 /*
@@ -51,6 +51,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_deleteMutex
 	MUTEX_ID* javaId = (MUTEX_ID*)env->GetDirectBufferAddress(id);
 	HALUTIL_LOG(logDEBUG) << "Mutex Ptr = " << *javaId;
 	deleteMutex( *javaId );
+	delete[] javaId;
 }
 
 /*

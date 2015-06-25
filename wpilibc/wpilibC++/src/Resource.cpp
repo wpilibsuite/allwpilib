@@ -9,7 +9,7 @@
 #include "WPIErrors.h"
 #include "ErrorBase.h"
 
-ReentrantSemaphore Resource::m_createLock;
+priority_recursive_mutex Resource::m_createLock;
 
 /**
  * Allocate storage for a new instance of Resource.
@@ -19,7 +19,7 @@ ReentrantSemaphore Resource::m_createLock;
  * 1].
  */
 Resource::Resource(uint32_t elements) {
-  Synchronized sync(m_createLock);
+  std::unique_lock<priority_recursive_mutex> sync(m_createLock);
   m_size = elements;
   m_isAllocated = new bool[m_size];
   for (uint32_t i = 0; i < m_size; i++) {
@@ -39,7 +39,7 @@ Resource::Resource(uint32_t elements) {
  */
 /*static*/ void Resource::CreateResourceObject(Resource **r,
                                                uint32_t elements) {
-  Synchronized sync(m_createLock);
+  std::unique_lock<priority_recursive_mutex> sync(m_createLock);
   if (*r == nullptr) {
     *r = new Resource(elements);
   }
@@ -59,7 +59,7 @@ Resource::~Resource() { delete[] m_isAllocated; }
  * within the range is located and returned after it is marked allocated.
  */
 uint32_t Resource::Allocate(const char *resourceDesc) {
-  Synchronized sync(m_allocateLock);
+  std::unique_lock<priority_recursive_mutex> sync(m_allocateLock);
   for (uint32_t i = 0; i < m_size; i++) {
     if (!m_isAllocated[i]) {
       m_isAllocated[i] = true;
@@ -77,7 +77,7 @@ uint32_t Resource::Allocate(const char *resourceDesc) {
  * unallocated, then returned.
  */
 uint32_t Resource::Allocate(uint32_t index, const char *resourceDesc) {
-  Synchronized sync(m_allocateLock);
+  std::unique_lock<priority_recursive_mutex> sync(m_allocateLock);
   if (index >= m_size) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, resourceDesc);
     return ~0ul;
@@ -98,7 +98,7 @@ uint32_t Resource::Allocate(uint32_t index, const char *resourceDesc) {
  * else in the program.
  */
 void Resource::Free(uint32_t index) {
-  Synchronized sync(m_allocateLock);
+  std::unique_lock<priority_recursive_mutex> sync(m_allocateLock);
   if (index == ~0ul) return;
   if (index >= m_size) {
     wpi_setWPIError(NotAllocated);

@@ -10,25 +10,13 @@
 #include "Buttons/ButtonScheduler.h"
 #include "Commands/Subsystem.h"
 #include "HLUsageReporting.h"
-#include "HAL/cpp/Synchronized.hpp"
 #include "WPIErrors.h"
 #include <iostream>
 #include <set>
 #include <algorithm>
 
 Scheduler::Scheduler() {
-  m_buttonsLock = initializeMutexNormal();
-  m_additionsLock = initializeMutexNormal();
-
   HLUsageReporting::ReportScheduler();
-}
-
-Scheduler::~Scheduler() {
-  takeMutex(m_additionsLock);
-  deleteMutex(m_additionsLock);
-
-  takeMutex(m_buttonsLock);
-  deleteMutex(m_buttonsLock);
 }
 
 /**
@@ -50,7 +38,7 @@ void Scheduler::SetEnabled(bool enabled) { m_enabled = enabled; }
  * @param command The command to be scheduled
  */
 void Scheduler::AddCommand(Command *command) {
-  Synchronized sync(m_additionsLock);
+  std::unique_lock<priority_mutex> sync(m_additionsLock);
   if (std::find(m_additions.begin(), m_additions.end(), command) !=
       m_additions.end())
     return;
@@ -58,7 +46,7 @@ void Scheduler::AddCommand(Command *command) {
 }
 
 void Scheduler::AddButton(ButtonScheduler *button) {
-  Synchronized sync(m_buttonsLock);
+  std::unique_lock<priority_mutex> sync(m_buttonsLock);
   m_buttons.push_back(button);
 }
 
@@ -122,7 +110,7 @@ void Scheduler::Run() {
   {
     if (!m_enabled) return;
 
-    Synchronized sync(m_buttonsLock);
+    std::unique_lock<priority_mutex> sync(m_buttonsLock);
     auto rButtonIter = m_buttons.rbegin();
     for (; rButtonIter != m_buttons.rend(); rButtonIter++) {
       (*rButtonIter)->Execute();
@@ -145,7 +133,7 @@ void Scheduler::Run() {
 
   // Add the new things
   {
-    Synchronized sync(m_additionsLock);
+    std::unique_lock<priority_mutex> sync(m_additionsLock);
     auto additionsIter = m_additions.begin();
     for (; additionsIter != m_additions.end(); additionsIter++) {
       ProcessCommandAddition(*additionsIter);

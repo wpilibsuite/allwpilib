@@ -70,7 +70,7 @@ int AxisCamera::GetImage(Image *image) {
     return 0;
   }
 
-  std::lock_guard<std::mutex> lock(m_imageDataMutex);
+  std::lock_guard<priority_mutex> lock(m_imageDataMutex);
 
   Priv_ReadJPEGString_C(image, m_imageData.data(), m_imageData.size());
 
@@ -116,7 +116,7 @@ HSLImage *AxisCamera::GetImage() {
  */
 int AxisCamera::CopyJPEG(char **destImage, unsigned int &destImageSize,
                          unsigned int &destImageBufferSize) {
-  std::lock_guard<std::mutex> lock(m_imageDataMutex);
+  std::lock_guard<priority_mutex> lock(m_imageDataMutex);
   if (destImage == nullptr)
     wpi_setWPIErrorWithContext(NullParameter, "destImage must not be nullptr");
 
@@ -152,7 +152,7 @@ void AxisCamera::WriteBrightness(int brightness) {
     return;
   }
 
-  std::lock_guard<std::mutex> lock(m_parametersMutex);
+  std::lock_guard<priority_mutex> lock(m_parametersMutex);
 
   if (m_brightness != brightness) {
     m_brightness = brightness;
@@ -164,7 +164,7 @@ void AxisCamera::WriteBrightness(int brightness) {
  * @return The configured brightness of the camera images
  */
 int AxisCamera::GetBrightness() {
-  std::lock_guard<std::mutex> lock(m_parametersMutex);
+  std::lock_guard<priority_mutex> lock(m_parametersMutex);
   return m_brightness;
 }
 
@@ -173,7 +173,7 @@ int AxisCamera::GetBrightness() {
  * @param whiteBalance Valid values from the <code>WhiteBalance</code> enum.
  */
 void AxisCamera::WriteWhiteBalance(AxisCamera::WhiteBalance whiteBalance) {
-  std::lock_guard<std::mutex> lock(m_parametersMutex);
+  std::lock_guard<priority_mutex> lock(m_parametersMutex);
 
   if (m_whiteBalance != whiteBalance) {
     m_whiteBalance = whiteBalance;
@@ -185,7 +185,7 @@ void AxisCamera::WriteWhiteBalance(AxisCamera::WhiteBalance whiteBalance) {
  * @return The configured white balances of the camera images
  */
 AxisCamera::WhiteBalance AxisCamera::GetWhiteBalance() {
-  std::lock_guard<std::mutex> lock(m_parametersMutex);
+  std::lock_guard<priority_mutex> lock(m_parametersMutex);
   return m_whiteBalance;
 }
 
@@ -200,7 +200,7 @@ void AxisCamera::WriteColorLevel(int colorLevel) {
     return;
   }
 
-  std::lock_guard<std::mutex> lock(m_parametersMutex);
+  std::lock_guard<priority_mutex> lock(m_parametersMutex);
 
   if (m_colorLevel != colorLevel) {
     m_colorLevel = colorLevel;
@@ -212,7 +212,7 @@ void AxisCamera::WriteColorLevel(int colorLevel) {
  * @return The configured color level of the camera images
  */
 int AxisCamera::GetColorLevel() {
-  std::lock_guard<std::mutex> lock(m_parametersMutex);
+  std::lock_guard<priority_mutex> lock(m_parametersMutex);
   return m_colorLevel;
 }
 
@@ -222,7 +222,7 @@ int AxisCamera::GetColorLevel() {
  */
 void AxisCamera::WriteExposureControl(
     AxisCamera::ExposureControl exposureControl) {
-  std::lock_guard<std::mutex> lock(m_parametersMutex);
+  std::lock_guard<priority_mutex> lock(m_parametersMutex);
 
   if (m_exposureControl != exposureControl) {
     m_exposureControl = exposureControl;
@@ -234,7 +234,7 @@ void AxisCamera::WriteExposureControl(
  * @return The configured exposure control mode of the camera
  */
 AxisCamera::ExposureControl AxisCamera::GetExposureControl() {
-  std::lock_guard<std::mutex> lock(m_parametersMutex);
+  std::lock_guard<priority_mutex> lock(m_parametersMutex);
   return m_exposureControl;
 }
 
@@ -253,7 +253,7 @@ void AxisCamera::WriteExposurePriority(int exposurePriority) {
     return;
   }
 
-  std::lock_guard<std::mutex> lock(m_parametersMutex);
+  std::lock_guard<priority_mutex> lock(m_parametersMutex);
 
   if (m_exposurePriority != exposurePriority) {
     m_exposurePriority = exposurePriority;
@@ -265,7 +265,7 @@ void AxisCamera::WriteExposurePriority(int exposurePriority) {
  * @return The configured exposure priority of the camera
  */
 int AxisCamera::GetExposurePriority() {
-  std::lock_guard<std::mutex> lock(m_parametersMutex);
+  std::lock_guard<priority_mutex> lock(m_parametersMutex);
   return m_exposurePriority;
 }
 
@@ -276,7 +276,7 @@ int AxisCamera::GetExposurePriority() {
  * exposure permitting.
  */
 void AxisCamera::WriteMaxFPS(int maxFPS) {
-  std::lock_guard<std::mutex> lock(m_parametersMutex);
+  std::lock_guard<priority_mutex> lock(m_parametersMutex);
 
   if (m_maxFPS != maxFPS) {
     m_maxFPS = maxFPS;
@@ -289,7 +289,7 @@ void AxisCamera::WriteMaxFPS(int maxFPS) {
  * @return The configured maximum FPS of the camera
  */
 int AxisCamera::GetMaxFPS() {
-  std::lock_guard<std::mutex> lock(m_parametersMutex);
+  std::lock_guard<priority_mutex> lock(m_parametersMutex);
   return m_maxFPS;
 }
 
@@ -298,7 +298,7 @@ int AxisCamera::GetMaxFPS() {
  * @param resolution The camera resolution value to write to the camera.
  */
 void AxisCamera::WriteResolution(AxisCamera::Resolution resolution) {
-  std::lock_guard<std::mutex> lock(m_parametersMutex);
+  std::lock_guard<priority_mutex> lock(m_parametersMutex);
 
   if (m_resolution != resolution) {
     m_resolution = resolution;
@@ -312,7 +312,7 @@ void AxisCamera::WriteResolution(AxisCamera::Resolution resolution) {
  * resolution as the most recent image, if it was changed recently.)
  */
 AxisCamera::Resolution AxisCamera::GetResolution() {
-  std::lock_guard<std::mutex> lock(m_parametersMutex);
+  std::lock_guard<priority_mutex> lock(m_parametersMutex);
   return m_resolution;
 }
 
@@ -324,7 +324,7 @@ AxisCamera::Resolution AxisCamera::GetResolution() {
  * or <code>AxisCamera::Rotation::k180</code>)
  */
 void AxisCamera::WriteRotation(AxisCamera::Rotation rotation) {
-  std::lock_guard<std::mutex> lock(m_parametersMutex);
+  std::lock_guard<priority_mutex> lock(m_parametersMutex);
 
   if (m_rotation != rotation) {
     m_rotation = rotation;
@@ -337,7 +337,7 @@ void AxisCamera::WriteRotation(AxisCamera::Rotation rotation) {
  * @return The configured rotation mode of the camera
  */
 AxisCamera::Rotation AxisCamera::GetRotation() {
-  std::lock_guard<std::mutex> lock(m_parametersMutex);
+  std::lock_guard<priority_mutex> lock(m_parametersMutex);
   return m_rotation;
 }
 
@@ -352,7 +352,7 @@ void AxisCamera::WriteCompression(int compression) {
     return;
   }
 
-  std::lock_guard<std::mutex> lock(m_parametersMutex);
+  std::lock_guard<priority_mutex> lock(m_parametersMutex);
 
   if (m_compression != compression) {
     m_compression = compression;
@@ -365,7 +365,7 @@ void AxisCamera::WriteCompression(int compression) {
  * @return The configured compression level of the camera
  */
 int AxisCamera::GetCompression() {
-  std::lock_guard<std::mutex> lock(m_parametersMutex);
+  std::lock_guard<priority_mutex> lock(m_parametersMutex);
   return m_compression;
 }
 
@@ -468,7 +468,7 @@ void AxisCamera::ReadImagesFromCamera() {
 
     // Update image
     {
-      std::lock_guard<std::mutex> lock(m_imageDataMutex);
+      std::lock_guard<priority_mutex> lock(m_imageDataMutex);
 
       m_imageData.assign(imgBuffer, imgBuffer + imgBufferLength);
       m_freshImage = true;

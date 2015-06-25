@@ -1,5 +1,7 @@
 #pragma once
 
+#include "HAL/Semaphore.hpp"
+
 namespace wpilib { namespace internal {
     extern double simTime;
 	extern MULTIWAIT_ID time_wait;

@@ -13,8 +13,7 @@
 
 #include <stdio.h>
 
-MotorSafetyHelper *MotorSafetyHelper::m_headHelper = nullptr;
-ReentrantSemaphore MotorSafetyHelper::m_listMutex;
+priority_recursive_mutex MotorSafetyHelper::m_listMutex;
 
 /**
  * The constructor for a MotorSafetyHelper object.
@@ -32,7 +31,7 @@ MotorSafetyHelper::MotorSafetyHelper(MotorSafety *safeObject)
 	m_expiration = DEFAULT_SAFETY_EXPIRATION;
 	m_stopTime = Timer::GetFPGATimestamp();
 
-	Synchronized sync(m_listMutex);
+	std::unique_lock<priority_recursive_mutex> sync(m_listMutex);
 	m_nextHelper = m_headHelper;
 	m_headHelper = this;
 }
@@ -40,7 +39,7 @@ MotorSafetyHelper::MotorSafetyHelper(MotorSafety *safeObject)
 
 MotorSafetyHelper::~MotorSafetyHelper()
 {
-	Synchronized sync(m_listMutex);
+	std::unique_lock<priority_recursive_mutex> sync(m_listMutex);
 	if (m_headHelper == this)
 	{
 		m_headHelper = m_nextHelper;
@@ -62,7 +61,7 @@ MotorSafetyHelper::~MotorSafetyHelper()
  */
 void MotorSafetyHelper::Feed()
 {
-	Synchronized sync(m_syncMutex);
+	std::unique_lock<priority_recursive_mutex> sync(m_syncMutex);
 	m_stopTime = Timer::GetFPGATimestamp() + m_expiration;
 }
 
@@ -72,7 +71,7 @@ void MotorSafetyHelper::Feed()
  */
 void MotorSafetyHelper::SetExpiration(float expirationTime)
 {
-	Synchronized sync(m_syncMutex);
+	std::unique_lock<priority_recursive_mutex> sync(m_syncMutex);
 	m_expiration = expirationTime;
 }
 
@@ -82,7 +81,7 @@ void MotorSafetyHelper::SetExpiration(float expirationTime)
  */
 float MotorSafetyHelper::GetExpiration() const
 {
-	Synchronized sync(m_syncMutex);
+	std::unique_lock<priority_recursive_mutex> sync(m_syncMutex);
 	return m_expiration;
 }
 
@@ -92,7 +91,7 @@ float MotorSafetyHelper::GetExpiration() const
  */
 bool MotorSafetyHelper::IsAlive() const
 {
-	Synchronized sync(m_syncMutex);
+	std::unique_lock<priority_recursive_mutex> sync(m_syncMutex);
 	return !m_enabled || m_stopTime > Timer::GetFPGATimestamp();
 }
 
@@ -107,7 +106,7 @@ void MotorSafetyHelper::Check()
 	DriverStation *ds = DriverStation::GetInstance();
 	if (!m_enabled || ds->IsDisabled() || ds->IsTest()) return;
 
-	Synchronized sync(m_syncMutex);
+	std::unique_lock<priority_recursive_mutex> sync(m_syncMutex);
 	if (m_stopTime < Timer::GetFPGATimestamp())
 	{
 		char buf[128];
@@ -126,7 +125,7 @@ void MotorSafetyHelper::Check()
  */
 void MotorSafetyHelper::SetSafetyEnabled(bool enabled)
 {
-	Synchronized sync(m_syncMutex);
+	std::unique_lock<priority_recursive_mutex> sync(m_syncMutex);
 	m_enabled = enabled;
 }
 
@@ -137,7 +136,7 @@ void MotorSafetyHelper::SetSafetyEnabled(bool enabled)
  */
 bool MotorSafetyHelper::IsSafetyEnabled() const
 {
-	Synchronized sync(m_syncMutex);
+	std::unique_lock<priority_recursive_mutex> sync(m_syncMutex);
 	return m_enabled;
 }
 
@@ -148,7 +147,7 @@ bool MotorSafetyHelper::IsSafetyEnabled() const
  */
 void MotorSafetyHelper::CheckMotors()
 {
-	Synchronized sync(m_listMutex);
+	std::unique_lock<priority_recursive_mutex> sync(m_listMutex);
 	for (MotorSafetyHelper *msh = m_headHelper; msh != nullptr; msh = msh->m_nextHelper)
 	{
 		msh->Check();

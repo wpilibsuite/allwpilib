@@ -30,7 +30,7 @@ Task Ultrasonic::m_task(
 Ultrasonic *Ultrasonic::m_firstSensor =
     nullptr;  // head of the ultrasonic sensor list
 bool Ultrasonic::m_automaticEnabled = false;  // automatic round robin mode
-SEMAPHORE_ID Ultrasonic::m_semaphore = nullptr;
+priority_mutex Ultrasonic::m_mutex;
 
 /**
  * Background task that goes through the list of ultrasonic sensors and pings
@@ -67,14 +67,13 @@ void Ultrasonic::UltrasonicChecker() {
  */
 void Ultrasonic::Initialize() {
   bool originalMode = m_automaticEnabled;
-  if (m_semaphore == nullptr) m_semaphore = initializeSemaphore(SEMAPHORE_FULL);
   SetAutomaticMode(false);     // kill task when adding a new sensor
-  takeSemaphore(m_semaphore);  // link this instance on the list
+  // link this instance on the list
   {
+    std::unique_lock<priority_mutex> lock(m_mutex);
     m_nextSensor = m_firstSensor;
     m_firstSensor = this;
   }
-  giveSemaphore(m_semaphore);
 
   m_counter = new Counter(m_echoChannel);  // set up counter for this sensor
   m_counter->SetMaxPeriod(1.0);
@@ -170,8 +169,8 @@ Ultrasonic::~Ultrasonic() {
   }
   wpi_assert(m_firstSensor != nullptr);
 
-  takeSemaphore(m_semaphore);
   {
+    std::unique_lock<priority_mutex> lock(m_mutex);
     if (this == m_firstSensor) {
       m_firstSensor = m_nextSensor;
       if (m_firstSensor == nullptr) {
@@ -187,7 +186,6 @@ Ultrasonic::~Ultrasonic() {
       }
     }
   }
-  giveSemaphore(m_semaphore);
   if (m_firstSensor != nullptr && wasAutomaticMode) SetAutomaticMode(true);
 }
 

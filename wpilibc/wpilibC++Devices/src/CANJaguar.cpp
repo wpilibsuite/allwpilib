@@ -1551,7 +1551,7 @@ CANJaguar::ControlMode CANJaguar::GetControlMode() const {
  */
 float CANJaguar::GetBusVoltage() const {
   updatePeriodicStatus();
-  std::lock_guard<std::recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
 
   return m_busVoltage;
 }
@@ -1563,7 +1563,7 @@ float CANJaguar::GetBusVoltage() const {
  */
 float CANJaguar::GetOutputVoltage() const {
   updatePeriodicStatus();
-  std::lock_guard<std::recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
 
   return m_outputVoltage;
 }
@@ -1575,7 +1575,7 @@ float CANJaguar::GetOutputVoltage() const {
  */
 float CANJaguar::GetOutputCurrent() const {
   updatePeriodicStatus();
-  std::lock_guard<std::recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
 
   return m_outputCurrent;
 }
@@ -1587,7 +1587,7 @@ float CANJaguar::GetOutputCurrent() const {
  */
 float CANJaguar::GetTemperature() const {
   updatePeriodicStatus();
-  std::lock_guard<std::recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
 
   return m_temperature;
 }
@@ -1602,7 +1602,7 @@ float CANJaguar::GetTemperature() const {
  */
 double CANJaguar::GetPosition() const {
   updatePeriodicStatus();
-  std::lock_guard<std::recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
 
   return m_position;
 }
@@ -1614,7 +1614,7 @@ double CANJaguar::GetPosition() const {
  */
 double CANJaguar::GetSpeed() const {
   updatePeriodicStatus();
-  std::lock_guard<std::recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
 
   return m_speed;
 }
@@ -1626,7 +1626,7 @@ double CANJaguar::GetSpeed() const {
  */
 bool CANJaguar::GetForwardLimitOK() const {
   updatePeriodicStatus();
-  std::lock_guard<std::recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
 
   return m_limits & kForwardLimit;
 }
@@ -1638,7 +1638,7 @@ bool CANJaguar::GetForwardLimitOK() const {
  */
 bool CANJaguar::GetReverseLimitOK() const {
   updatePeriodicStatus();
-  std::lock_guard<std::recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
 
   return m_limits & kReverseLimit;
 }
@@ -1654,7 +1654,7 @@ bool CANJaguar::GetReverseLimitOK() const {
  */
 uint16_t CANJaguar::GetFaults() const {
   updatePeriodicStatus();
-  std::lock_guard<std::recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
 
   return m_faults;
 }

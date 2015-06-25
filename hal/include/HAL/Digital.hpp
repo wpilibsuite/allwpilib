@@ -4,7 +4,8 @@
 #else
 #include <stdint.h>
 #endif
-#include "HAL/cpp/Synchronized.hpp"
+
+#include "HAL/cpp/priority_mutex.h"
 
 enum Mode
 {
@@ -13,6 +14,8 @@ enum Mode
 	kPulseLength = 2,
 	kExternalDirection = 3
 };
+
+priority_recursive_mutex& spiGetSemaphore(uint8_t port);
 
 extern "C"
 {
@@ -103,8 +106,6 @@ extern "C"
 	void spiSetChipSelectActiveLow(uint8_t port, int32_t *status);
 	int32_t spiGetHandle(uint8_t port);
 	void spiSetHandle(uint8_t port, int32_t handle);
-	MUTEX_ID spiGetSemaphore(uint8_t port);
-	void spiSetSemaphore(uint8_t port, MUTEX_ID semaphore);
 
 	void i2CInitialize(uint8_t port, int32_t *status);
 	int32_t i2CTransaction(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived, uint8_t receiveSize);

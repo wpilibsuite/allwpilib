@@ -1,10 +1,10 @@
 
 #include "HAL/Analog.hpp"
 
+#include "HAL/cpp/priority_mutex.h"
 #include "Port.h"
 #include "HAL/HAL.hpp"
 #include "ChipObject.h"
-#include "HAL/cpp/Synchronized.hpp"
 #include "HAL/cpp/Resource.hpp"
 #include "NetworkCommunication/AICalibration.h"
 #include "NetworkCommunication/LoadOut.h"
@@ -25,7 +25,7 @@ struct AnalogPort {
 };
 
 bool analogSampleRateSet = false;
-MUTEX_ID analogRegisterWindowSemaphore = NULL;
+priority_recursive_mutex analogRegisterWindowMutex;
 tAI* analogInputSystem = NULL;
 tAO* analogOutputSystem = NULL;
 uint32_t analogNumChannelsToActivate = 0;
@@ -41,8 +41,8 @@ bool analogSystemInitialized = false;
  * Initialize the analog System.
  */
 void initializeAnalog(int32_t *status) {
+  std::unique_lock<priority_recursive_mutex> sync(analogRegisterWindowMutex);
   if (analogSystemInitialized) return;
-  analogRegisterWindowSemaphore = initializeMutexRecursive();
   analogInputSystem = tAI::create(status);
   analogOutputSystem = tAO::create(status);
   setAnalogNumChannelsToActivate(kAnalogInputPins);
@@ -265,7 +265,7 @@ int16_t getAnalogValue(void* analog_port_pointer, int32_t *status) {
   readSelect.Averaged = false;
 
   {
-    Synchronized sync(analogRegisterWindowSemaphore);
+    std::unique_lock<priority_recursive_mutex> sync(analogRegisterWindowMutex);
     analogInputSystem->writeReadSelect(readSelect, status);
     analogInputSystem->strobeLatchOutput(status);
     value = (int16_t) analogInputSystem->readOutput(status);
@@ -296,7 +296,7 @@ int32_t getAnalogAverageValue(void* analog_port_pointer, int32_t *status) {
   readSelect.Averaged = true;
 
   {
-    Synchronized sync(analogRegisterWindowSemaphore);
+    std::unique_lock<priority_recursive_mutex> sync(analogRegisterWindowMutex);
     analogInputSystem->writeReadSelect(readSelect, status);
     analogInputSystem->strobeLatchOutput(status);
     value = (int32_t) analogInputSystem->readOutput(status);

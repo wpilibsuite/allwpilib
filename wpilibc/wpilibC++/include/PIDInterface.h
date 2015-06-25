@@ -3,7 +3,6 @@
 #include "Base.h"
 #include "Controller.h"
 #include "LiveWindow/LiveWindow.h"
-#include "HAL/Semaphore.hpp"
 
 class PIDInterface : public Controller {
   virtual void SetPID(double p, double i, double d) = 0;

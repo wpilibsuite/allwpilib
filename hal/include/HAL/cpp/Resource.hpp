@@ -6,12 +6,12 @@
 #pragma once
 
 #include "../Errors.hpp"
-#include "Synchronized.hpp"
 #ifdef __vxworks
 #include <vxWorks.h>
 #else
 #include <stdint.h>
 #endif
+#include "HAL/cpp/priority_mutex.h"
 
 /**
  * The Resource class is a convenient way to track allocated resources.
@@ -25,6 +25,8 @@
 class Resource
 {
 public:
+	Resource(const Resource&) = delete;
+	Resource& operator=(const Resource&) = delete;
 	virtual ~Resource();
 	static void CreateResourceObject(Resource **r, uint32_t elements);
 	uint32_t Allocate(const char *resourceDesc);
@@ -35,11 +37,9 @@ private:
 	explicit Resource(uint32_t size);
 
 	bool *m_isAllocated;
-	ReentrantSemaphore m_allocateLock;
+	priority_recursive_mutex m_allocateLock;
 	uint32_t m_size;
 
-	static ReentrantSemaphore m_createLock;
-
-	DISALLOW_COPY_AND_ASSIGN(Resource);
+	static priority_recursive_mutex m_createLock;
 };
 

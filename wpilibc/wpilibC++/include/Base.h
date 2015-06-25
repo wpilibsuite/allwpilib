@@ -5,12 +5,6 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-// If don't have C++11, define constexpr as const for WindRiver
-#if __cplusplus < 201103L
-#define constexpr const
-#define nullptr NULL
-#endif
-
 // A macro for making a class move-only
 #define DISALLOW_COPY_AND_ASSIGN(TypeName)       \
   TypeName(const TypeName&) = delete;            \

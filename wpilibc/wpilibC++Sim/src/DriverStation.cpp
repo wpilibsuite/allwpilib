@@ -5,7 +5,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "DriverStation.h"
-#include "HAL/cpp/Synchronized.hpp"
 #include "Timer.h"
 #include "simulation/MainNode.h"
 //#include "MotorSafetyHelper.h"
@@ -33,14 +32,7 @@ uint8_t DriverStation::m_updateNumber = 0;
  * 
  * This is only called once the first time GetInstance() is called
  */
-DriverStation::DriverStation()
-{
-	// Create a new semaphore
-	m_waitForDataSem = initializeMultiWait();
-	m_waitForDataMutex = initializeMutexNormal();
-	m_stateSemaphore = initializeMutexRecursive();
-	m_joystickSemaphore = initializeMutexRecursive();
-
+DriverStation::DriverStation() {
 	state = msgs::DriverStationPtr(new msgs::DriverStation());
 	stateSub = MainNode::Subscribe("~/ds/state",
 		                   &DriverStation::stateCallback, this);
@@ -65,13 +57,6 @@ DriverStation::DriverStation()
 	                                   &DriverStation::joystickCallback5, this);
 
 	AddToSingletonList();
-}
-
-DriverStation::~DriverStation()
-{
-	deleteMultiWait(m_waitForDataSem);
-	deleteMutex(m_waitForDataMutex);
-	// TODO: Release m_stateSemaphore and m_joystickSemaphore?
 }
 
 /**
@@ -113,13 +98,13 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
 		wpi_setWPIError(BadJoystickIndex);
 		return 0.0;
 	}
-	CRITICAL_REGION(m_joystickSemaphore)
+
+	std::unique_lock<priority_recursive_mutex> lock(m_joystickMutex);
 	if (joysticks[stick] == nullptr || axis >= joysticks[stick]->axes().size())
 	{
 		return 0.0;
 	}
 	return joysticks[stick]->axes(axis);
-	END_REGION
 }
 
 /**
@@ -137,13 +122,13 @@ bool DriverStation::GetStickButton(uint32_t stick, uint32_t button)
 		wpi_setWPIErrorWithContext(ParameterOutOfRange, "stick must be between 0 and 5");
 		return false;
 	}
-	CRITICAL_REGION(m_joystickSemaphore)
+
+	std::unique_lock<priority_recursive_mutex> lock(m_joystickMutex);
 	if (joysticks[stick] == nullptr || button >= joysticks[stick]->buttons().size())
 	{
-	        return false;
+		return false;
 	}
 	return joysticks[stick]->buttons(button-1);
-	END_REGION
 }
 
 /**
@@ -161,7 +146,8 @@ short DriverStation::GetStickButtons(uint32_t stick)
 		return false;
 	}
 	short btns = 0, btnid;
-	CRITICAL_REGION(m_joystickSemaphore)
+
+	std::unique_lock<priority_recursive_mutex> lock(m_joystickMutex);
 	msgs::JoystickPtr joy = joysticks[stick];
 	for (btnid = 0; btnid < joy->buttons().size() && btnid < 12; btnid++)
 	{
@@ -171,7 +157,6 @@ short DriverStation::GetStickButtons(uint32_t stick)
 		}
 	}
 	return btns;
-	END_REGION
 }
 
 // 5V divided by 10 bits
@@ -230,9 +215,8 @@ bool DriverStation::GetDigitalOut(uint32_t channel)
 
 bool DriverStation::IsEnabled() const
 {
-    CRITICAL_REGION(m_stateSemaphore)
+	std::unique_lock<priority_recursive_mutex> lock(m_stateMutex);
     return state != nullptr ? state->enabled() : false;
-    END_REGION
 }
 
 bool DriverStation::IsDisabled() const
@@ -242,10 +226,9 @@ bool DriverStation::IsDisabled() const
 
 bool DriverStation::IsAutonomous() const
 {
-    CRITICAL_REGION(m_stateSemaphore)
+	std::unique_lock<priority_recursive_mutex> lock(m_stateMutex);
     return state != nullptr ?
       state->state() == msgs::DriverStation_State_AUTO : false;
-	END_REGION;
 }
 
 bool DriverStation::IsOperatorControl() const
@@ -255,10 +238,9 @@ bool DriverStation::IsOperatorControl() const
 
 bool DriverStation::IsTest() const
 {
-    CRITICAL_REGION(m_stateSemaphore)
+	std::unique_lock<priority_recursive_mutex> lock(m_stateMutex);
     return state != nullptr ?
       state->state() == msgs::DriverStation_State_TEST : false;
-	END_REGION;
 }
 
 /**
@@ -301,7 +283,8 @@ uint32_t DriverStation::GetLocation() const
  */
 void DriverStation::WaitForData()
 {
-	takeMultiWait(m_waitForDataSem, m_waitForDataMutex, SEMAPHORE_WAIT_FOREVER);
+	std::unique_lock<priority_mutex> lock(m_waitForDataMutex);
+	m_waitForDataCond.wait(lock);
 }
 
 /**
@@ -341,18 +324,18 @@ uint16_t DriverStation::GetTeamNumber() const
 
 void DriverStation::stateCallback(const msgs::ConstDriverStationPtr &msg)
 {
-    CRITICAL_REGION(m_stateSemaphore)
-    *state = *msg;
-	END_REGION;
-    giveMultiWait(m_waitForDataSem);
+    {
+		std::unique_lock<priority_recursive_mutex> lock(m_stateMutex); 
+    	*state = *msg;
+	}
+    m_waitForDataCond.notify_all();
 }
 
 void DriverStation::joystickCallback(const msgs::ConstJoystickPtr &msg,
                                      int i)
 {
-    CRITICAL_REGION(m_joystickSemaphore)
+	std::unique_lock<priority_recursive_mutex> lock(m_joystickMutex);
     *(joysticks[i]) = *msg;
-	END_REGION;
 }
 
 void DriverStation::joystickCallback0(const msgs::ConstJoystickPtr &msg)

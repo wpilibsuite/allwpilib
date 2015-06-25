@@ -8,7 +8,7 @@
 
 #include <thread>
 #include <string>
-#include <mutex>
+#include "HAL/cpp/priority_mutex.h"
 
 #include "ErrorBase.h"
 #include "Vision/ColorImage.h"
@@ -90,9 +90,9 @@ class AxisCamera : public ErrorBase {
   std::thread m_captureThread;
   std::string m_cameraHost;
   int m_cameraSocket = -1;
-  std::mutex m_captureMutex;
+  priority_mutex m_captureMutex;
 
-  std::mutex m_imageDataMutex;
+  priority_mutex m_imageDataMutex;
   std::vector<uint8_t> m_imageData;
   bool m_freshImage = false;
 
@@ -107,7 +107,7 @@ class AxisCamera : public ErrorBase {
   Rotation m_rotation = kRotation_0;
   bool m_parametersDirty = true;
   bool m_streamDirty = true;
-  std::mutex m_parametersMutex;
+  priority_mutex m_parametersMutex;
 
   bool m_done = false;
 

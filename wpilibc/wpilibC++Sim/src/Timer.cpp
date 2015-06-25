@@ -8,7 +8,6 @@
 
 #include <time.h>
 
-#include "HAL/cpp/Synchronized.hpp"
 #include "simulation/simTime.h"
 #include "Utility.h"
 
@@ -62,17 +61,10 @@ Timer::Timer()
 	: m_startTime (0.0)
 	, m_accumulatedTime (0.0)
 	, m_running (false)
-	, m_semaphore (0)
 {
 	//Creates a semaphore to control access to critical regions.
 	//Initially 'open'
-	m_semaphore = initializeMutexNormal();
 	Reset();
-}
-
-Timer::~Timer()
-{
-	deleteMutex(m_semaphore);
 }
 
 /**
@@ -87,7 +79,7 @@ double Timer::Get() const
 	double result;
 	double currentTime = GetFPGATimestamp();
 
-	Synchronized sync(m_semaphore);
+	std::unique_lock<priority_mutex> sync(m_mutex);
 	if(m_running)
 	{
 		// This math won't work if the timer rolled over (71 minutes after boot).
@@ -109,7 +101,7 @@ double Timer::Get() const
  */
 void Timer::Reset()
 {
-	Synchronized sync(m_semaphore);
+	std::unique_lock<priority_mutex> sync(m_mutex);
 	m_accumulatedTime = 0;
 	m_startTime = GetFPGATimestamp();
 }
@@ -121,7 +113,7 @@ void Timer::Reset()
  */
 void Timer::Start()
 {
-	Synchronized sync(m_semaphore);
+	std::unique_lock<priority_mutex> sync(m_mutex);
 	if (!m_running)
 	{
 		m_startTime = GetFPGATimestamp();
@@ -139,7 +131,7 @@ void Timer::Stop()
 {
 	double temp = Get();
 
-	Synchronized sync(m_semaphore);
+	std::unique_lock<priority_mutex> sync(m_mutex);
 	if (m_running)
 	{
 		m_accumulatedTime = temp;
@@ -159,7 +151,7 @@ bool Timer::HasPeriodPassed(double period)
 {
 	if (Get() > period)
 	{
-		Synchronized sync(m_semaphore);
+		std::unique_lock<priority_mutex> sync(m_mutex);
 		// Advance the start time by the period.
 		// Don't set it to the current time... we want to avoid drift.
 		m_startTime += period;
@@ -203,8 +195,6 @@ extern "C"
 #include "simulation/MainNode.h"
 namespace wpilib { namespace internal {
     double simTime = 0;
-    MULTIWAIT_ID time_wait = initializeMultiWait();
-    MUTEX_ID time_wait_mutex = initializeMutexNormal();
 
     void time_callback(const msgs::ConstFloat64Ptr &msg) {
         simTime = msg->data();

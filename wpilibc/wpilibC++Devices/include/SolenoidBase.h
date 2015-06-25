@@ -9,7 +9,6 @@
 #include "Resource.h"
 #include "SensorBase.h"
 #include "HAL/HAL.hpp"
-#include "HAL/cpp/Synchronized.hpp"
 #include "Port.h"
 
 /**

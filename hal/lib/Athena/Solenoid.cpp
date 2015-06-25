@@ -4,7 +4,6 @@
 #include "Port.h"
 #include "HAL/Errors.hpp"
 #include "ChipObject.h"
-#include "HAL/cpp/Synchronized.hpp"
 #include "NetworkCommunication/LoadOut.h"
 #include "ctre/PCM.h"
 

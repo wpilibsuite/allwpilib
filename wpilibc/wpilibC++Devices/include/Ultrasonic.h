@@ -11,6 +11,8 @@
 #include "PIDSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
 
+#include "HAL/cpp/priority_mutex.h"
+
 class Counter;
 class DigitalInput;
 class DigitalOutput;
@@ -80,7 +82,7 @@ class Ultrasonic : public SensorBase,
   static Task m_task;  // task doing the round-robin automatic sensing
   static Ultrasonic *m_firstSensor;  // head of the ultrasonic sensor list
   static bool m_automaticEnabled;    // automatic round robin mode
-  static SEMAPHORE_ID m_semaphore;  // synchronize access to the list of sensors
+  static priority_mutex m_mutex;  // synchronize access to the list of sensors
 
   DigitalInput *m_echoChannel;
   DigitalOutput *m_pingChannel;

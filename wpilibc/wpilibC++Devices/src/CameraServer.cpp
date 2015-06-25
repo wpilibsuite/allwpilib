@@ -35,14 +35,14 @@ void CameraServer::FreeImageData(
   if (std::get<3>(imageData))
     imaqDispose(std::get<0>(imageData));
   else if (std::get<0>(imageData) != nullptr) {
-    std::unique_lock<std::recursive_mutex> lock(m_imageMutex);
+    std::unique_lock<priority_recursive_mutex> lock(m_imageMutex);
     m_dataPool.push_back(std::get<0>(imageData));
   }
 }
 
 void CameraServer::SetImageData(uint8_t* data, unsigned int size,
                                 unsigned int start, bool imaqData) {
-  std::unique_lock<std::recursive_mutex> lock(m_imageMutex);
+  std::unique_lock<priority_recursive_mutex> lock(m_imageMutex);
   FreeImageData(m_imageData);
   m_imageData = std::make_tuple(data, size, start, imaqData);
   m_newImageVariable.notify_all();
@@ -58,7 +58,7 @@ void CameraServer::SetImage(Image const* image) {
   bool hwClient;
   {
     // Make a local copy of the hwClient variable so that we can safely use it.
-    std::unique_lock<std::recursive_mutex> lock(m_imageMutex);
+    std::unique_lock<priority_recursive_mutex> lock(m_imageMutex);
     hwClient = m_hwClient;
   }
   unsigned int start = 0;
@@ -83,7 +83,7 @@ void CameraServer::AutoCapture() {
     bool hwClient;
     uint8_t* data = nullptr;
     {
-      std::unique_lock<std::recursive_mutex> lock(m_imageMutex);
+      std::unique_lock<priority_recursive_mutex> lock(m_imageMutex);
       hwClient = m_hwClient;
       if (hwClient) {
         data = m_dataPool.back();
@@ -109,7 +109,7 @@ void CameraServer::StartAutomaticCapture(char const* cameraName) {
 }
 
 void CameraServer::StartAutomaticCapture(std::shared_ptr<USBCamera> camera) {
-  std::unique_lock<std::recursive_mutex> lock(m_imageMutex);
+  std::unique_lock<priority_recursive_mutex> lock(m_imageMutex);
   if (m_autoCaptureStarted) return;
 
   m_camera = camera;
@@ -121,12 +121,12 @@ void CameraServer::StartAutomaticCapture(std::shared_ptr<USBCamera> camera) {
 }
 
 bool CameraServer::IsAutoCaptureStarted() {
-  std::unique_lock<std::recursive_mutex> lock(m_imageMutex);
+  std::unique_lock<priority_recursive_mutex> lock(m_imageMutex);
   return m_autoCaptureStarted;
 }
 
 void CameraServer::SetSize(unsigned int size) {
-  std::unique_lock<std::recursive_mutex> lock(m_imageMutex);
+  std::unique_lock<priority_recursive_mutex> lock(m_imageMutex);
   if (!m_camera) return;
   if (size == kSize160x120)
     m_camera->SetSize(160, 120);
@@ -137,12 +137,12 @@ void CameraServer::SetSize(unsigned int size) {
 }
 
 void CameraServer::SetQuality(unsigned int quality) {
-  std::unique_lock<std::recursive_mutex> lock(m_imageMutex);
+  std::unique_lock<priority_recursive_mutex> lock(m_imageMutex);
   m_quality = quality > 100 ? 100 : quality;
 }
 
 unsigned int CameraServer::GetQuality() {
-  std::unique_lock<std::recursive_mutex> lock(m_imageMutex);
+  std::unique_lock<priority_recursive_mutex> lock(m_imageMutex);
   return m_quality;
 }
 
@@ -201,7 +201,7 @@ void CameraServer::Serve() {
 
     {
       // Wait for the camera to be setw
-      std::unique_lock<std::recursive_mutex> lock(m_imageMutex);
+      std::unique_lock<priority_recursive_mutex> lock(m_imageMutex);
       if (!m_camera) {
         std::cout << "Camera not yet ready, awaiting first image" << std::endl;
         m_newImageVariable.wait(lock);
@@ -219,7 +219,7 @@ void CameraServer::Serve() {
       auto startTime = std::chrono::steady_clock::now();
       std::tuple<uint8_t*, unsigned int, unsigned int, bool> imageData;
       {
-        std::unique_lock<std::recursive_mutex> lock(m_imageMutex);
+        std::unique_lock<priority_recursive_mutex> lock(m_imageMutex);
         m_newImageVariable.wait(lock);
         imageData = m_imageData;
         m_imageData = std::make_tuple<uint8_t*>(nullptr, 0, 0, false);

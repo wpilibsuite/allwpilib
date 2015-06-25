@@ -22,13 +22,6 @@ typedef int (*FUNCPTR) (); /* ptr to function returning int */
 typedef int STATUS;
 #endif /* _STATUS_DEFINED */
 
-#ifndef OK
-#define OK		0
-#endif /* OK */
-#ifndef ERROR
-#define ERROR		(-1)
-#endif /* ERROR */
-
 #ifdef __vxworks
 #define NULL_TASK -1
 typedef int32_t TASK;

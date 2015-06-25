@@ -9,9 +9,9 @@
 #include "ErrorBase.h"
 #include "Task.h"
 #include <map>
-#include "HAL/Semaphore.hpp"
 #include <string>
 #include <vector>
+#include "HAL/cpp/Semaphore.hpp"
 #include "tables/ITableListener.h"
 #include "networktables/NetworkTable.h"
 
@@ -64,7 +64,7 @@ class Preferences : public ErrorBase, public ITableListener {
 
  protected:
   Preferences();
-  virtual ~Preferences();
+  virtual ~Preferences() = default;
 
  private:
   std::string Get(const char *key);
@@ -83,11 +83,11 @@ class Preferences : public ErrorBase, public ITableListener {
   }
 
   /** The semaphore for accessing the file */
-  MUTEX_ID m_fileLock = nullptr;
+  priority_recursive_mutex m_fileLock;
   /** The semaphore for beginning reads and writes to the file */
-  SEMAPHORE_ID m_fileOpStarted = nullptr;
+  Semaphore m_fileOpStarted{Semaphore::kEmpty};
   /** The semaphore for reading from the table */
-  MUTEX_ID m_tableLock = nullptr;
+  priority_recursive_mutex m_tableLock;
   typedef std::map<std::string, std::string> StringMap;
   /** The actual values (String->String) */
   StringMap m_values;
