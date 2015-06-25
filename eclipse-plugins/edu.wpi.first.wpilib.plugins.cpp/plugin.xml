@@ -190,6 +190,12 @@
             modes="run,debug">
             <contextualLaunch>
             <enablement>
+			   <with 
+			      variable="activeWorkbenchWindow.activePerspective">
+			      <equals
+			         value="org.eclipse.cdt.ui.CPerspective">
+			      </equals>
+			   </with>
                <with
                      variable="selection">
                   <iterate>
@@ -225,6 +231,12 @@
             modes="run,debug">
             <contextualLaunch>
             <enablement>
+			   <with 
+			      variable="activeWorkbenchWindow.activePerspective">
+			      <equals
+			         value="org.eclipse.cdt.ui.CPerspective">
+			      </equals>
+				  </with>
                <with
                      variable="selection">
                   <iterate>
