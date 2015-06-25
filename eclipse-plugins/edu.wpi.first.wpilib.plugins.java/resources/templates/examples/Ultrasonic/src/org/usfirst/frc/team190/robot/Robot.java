@@ -1,5 +1,5 @@
 
-package org.usfirst.frc.team190.robot;
+package $package;
 
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.SampleRobot;
@@ -9,6 +9,10 @@ import edu.wpi.first.wpilibj.AnalogInput;
 /**
  * This is a sample program demonstrating how to use an ultrasonic sensor and proportional 
  * control to maintain a set distance from an object.
+ * 
+ * WARNING: While it may look like a good choice to use for your code if you're inexperienced,
+ * don't. Unless you know what you are doing, complex code will be much more difficult under
+ * this system. Use IterativeRobot or Command-Based instead if you're new.
  */
 
 public class Robot extends SampleRobot {
@@ -48,7 +52,7 @@ public class Robot extends SampleRobot {
     public void operatorControl() {
 
 	double currentDistance; //distance measured from the ultrasonic sensor values
-	double currentSpeed; //speed to set the motor
+	double currentSpeed; //speed to set the drive train motors
 	
 	while (isOperatorControl() && isEnabled()) {
             currentDistance = ultrasonic.getValue()*valueToInches; //sensor returns a value from 0-4095 that is scaled to inches 

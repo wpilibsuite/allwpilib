@@ -1,8 +1,12 @@
 #include "WPILib.h"
 
 /**
- * This is a sample program demonstrating how to use an ultrasonic sensor and proportional control to
- * maintain a set distance from an object.
+ * This is a sample program demonstrating how to use an ultrasonic sensor and proportional
+ * control to maintain a set distance from an object.
+ *
+ * WARNING: While it may look like a good choice to use for your code if you're inexperienced,
+ * don't. Unless you know what you are doing, complex code will be much more difficult under
+ * this system. Use IterativeRobot or Command-Based instead if you're new.
  */
 class Robot: public SampleRobot {
 	AnalogInput *ultrasonic; //ultrasonic sensor
@@ -46,7 +50,7 @@ public:
 	void OperatorControl() {
 
 		double currentDistance; //distance measured from the ultrasonic sensor values
-		double currentSpeed; //speed to set the motor
+		double currentSpeed; //speed to set the drive train motors
 
 		while (IsOperatorControl() && IsEnabled()) {
 			currentDistance = ultrasonic->GetValue() * valueToInches; //sensor returns a value from 0-4095 that is scaled to inches
