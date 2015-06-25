@@ -13,7 +13,7 @@ BadMessageException::BadMessageException(const char* msg)
 
 }
 
-BadMessageException::~BadMessageException() throw ()
+BadMessageException::~BadMessageException() noexcept
 {
 }
 
