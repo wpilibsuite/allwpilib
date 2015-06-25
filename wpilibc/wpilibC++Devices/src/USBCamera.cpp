@@ -12,9 +12,10 @@
 // properly checked for an error, calling the wpi_setImaqErrorWithContext
 // macro
 // To call it, just give the name of the function and the arguments
-#define SAFE_IMAQ_CALL(funName, ...) { \
-    unsigned int error = funName(__VA_ARGS__); \
-    if (error != IMAQdxErrorSuccess) \
+#define SAFE_IMAQ_CALL(funName, ...)                \
+  {                                                 \
+    unsigned int error = funName(__VA_ARGS__);      \
+    if (error != IMAQdxErrorSuccess)                \
       wpi_setImaqErrorWithContext(error, #funName); \
   }
 
@@ -29,40 +30,44 @@ static const std::string MANUAL = "Manual";
  * the SOS flag explanation.
  */
 unsigned int USBCamera::GetJpegSize(void* buffer, unsigned int buffSize) {
-  uint8_t* data = (uint8_t*) buffer;
+  uint8_t* data = (uint8_t*)buffer;
   if (!wpi_assert(data[0] == 0xff && data[1] == 0xd8)) return 0;
   unsigned int pos = 2;
   while (pos < buffSize) {
     // All control markers start with 0xff, so if this isn't present,
     // the JPEG is not valid
     if (!wpi_assert(data[pos] == 0xff)) return 0;
-    unsigned char t = data[pos+1];
+    unsigned char t = data[pos + 1];
     // These are RST markers. We just skip them and move onto the next marker
     if (t == 0x01 || (t >= 0xd0 && t <= 0xd7)) {
       pos += 2;
     } else if (t == 0xd9) {
       // End of Image, add 2 for this and 0-indexed
       return pos + 2;
-    } else if (!wpi_assert(t != 0xd8))  {
+    } else if (!wpi_assert(t != 0xd8)) {
       // Another start of image, invalid image
       return 0;
     } else if (t == 0xda) {
       // SOS marker. The next two bytes are a 16-bit big-endian int that is
       // the length of the SOS header, skip that
-      unsigned int len = (((unsigned int) (data[pos+2] & 0xff)) << 8 | ((unsigned int) data[pos+3] & 0xff));
+      unsigned int len = (((unsigned int)(data[pos + 2] & 0xff)) << 8 |
+                          ((unsigned int)data[pos + 3] & 0xff));
       pos += len + 2;
       // The next marker is the first marker that is 0xff followed by a non-RST
       // element. 0xff followed by 0x00 is an escaped 0xff. 0xd0-0xd7 are RST
       // markers
-      while (data[pos] != 0xff || data[pos+1] == 0x00 || (data[pos+1] >= 0xd0 && data[pos+1] <= 0xd7)) {
+      while (data[pos] != 0xff || data[pos + 1] == 0x00 ||
+             (data[pos + 1] >= 0xd0 && data[pos + 1] <= 0xd7)) {
         pos += 1;
         if (pos >= buffSize) return 0;
       }
     } else {
-      // This is one of several possible markers. The next two bytes are a 16-bit
+      // This is one of several possible markers. The next two bytes are a
+      // 16-bit
       // big-endian int with the length of the marker header, skip that then
       // continue searching
-      unsigned int len = (((unsigned int) (data[pos+2] & 0xff)) << 8 | ((unsigned int) data[pos+3] & 0xff));
+      unsigned int len = (((unsigned int)(data[pos + 2] & 0xff)) << 8 |
+                          ((unsigned int)data[pos + 3] & 0xff));
       pos += len + 2;
     }
   }
@@ -70,36 +75,35 @@ unsigned int USBCamera::GetJpegSize(void* buffer, unsigned int buffSize) {
   return 0;
 }
 
-USBCamera::USBCamera(std::string name, bool useJpeg) :
-  m_id(0),
-  m_name(name),
-  m_useJpeg(useJpeg),
-  m_active(false),
-  m_open(false),
-  m_mutex(),
-  m_width(320),
-  m_height(240),
-  m_fps(30),
-  m_whiteBalance(AUTO),
-  m_whiteBalanceValue(0),
-  m_whiteBalanceValuePresent(false),
-  m_exposure(MANUAL),
-  m_exposureValue(50),
-  m_exposureValuePresent(false),
-  m_brightness(80),
-  m_needSettingsUpdate(true) {
-}
+USBCamera::USBCamera(std::string name, bool useJpeg)
+    : m_id(0),
+      m_name(name),
+      m_useJpeg(useJpeg),
+      m_active(false),
+      m_open(false),
+      m_mutex(),
+      m_width(320),
+      m_height(240),
+      m_fps(30),
+      m_whiteBalance(AUTO),
+      m_whiteBalanceValue(0),
+      m_whiteBalanceValuePresent(false),
+      m_exposure(MANUAL),
+      m_exposureValue(50),
+      m_exposureValuePresent(false),
+      m_brightness(80),
+      m_needSettingsUpdate(true) {}
 
 void USBCamera::OpenCamera() {
   std::unique_lock<std::recursive_mutex> lock(m_mutex);
   for (unsigned int i = 0; i < 3; i++) {
     uInt32 id = 0;
     // Can't use SAFE_IMAQ_CALL here because we only error on the third time
-    IMAQdxError error = IMAQdxOpenCamera(m_name.c_str(), IMAQdxCameraControlModeController, &id);
+    IMAQdxError error = IMAQdxOpenCamera(
+        m_name.c_str(), IMAQdxCameraControlModeController, &id);
     if (error != IMAQdxErrorSuccess) {
       // Only error on the 3rd try
-      if (i >= 2)
-        wpi_setImaqErrorWithContext(error, "IMAQdxOpenCamera");
+      if (i >= 2) wpi_setImaqErrorWithContext(error, "IMAQdxOpenCamera");
       // Sleep for a few seconds to ensure the error has been dealt with
       std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     } else {
@@ -138,10 +142,8 @@ void USBCamera::UpdateSettings() {
   std::unique_lock<std::recursive_mutex> lock(m_mutex);
   bool wasActive = m_active;
 
-  if (wasActive)
-    StopCapture();
-  if (m_open)
-    CloseCamera();
+  if (wasActive) StopCapture();
+  if (m_open) CloseCamera();
   OpenCamera();
 
   uInt32 count = 0;
@@ -163,63 +165,71 @@ void USBCamera::UpdateSettings() {
   // Loop through the modes, and find the match with the lowest fps
   for (unsigned int i = 0; i < count; i++) {
     std::cmatch m;
-    if (!std::regex_match(modes[i].Name, m, reMode))
-      continue;
-    unsigned int width = (unsigned int) std::stoul(m[1].str());
-    unsigned int height = (unsigned int) std::stoul(m[2].str());
-    if (width != m_width)
-      continue;
-    if (height != m_height)
-      continue;
+    if (!std::regex_match(modes[i].Name, m, reMode)) continue;
+    unsigned int width = (unsigned int)std::stoul(m[1].str());
+    unsigned int height = (unsigned int)std::stoul(m[2].str());
+    if (width != m_width) continue;
+    if (height != m_height) continue;
     double fps = atof(m[4].str().c_str());
-    if (fps < m_fps)
-      continue;
-    if (fps > foundFps)
-      continue;
-    bool isJpeg = m[3].str().compare("jpeg") == 0 || m[3].str().compare("JPEG") == 0;
-    if ((m_useJpeg && !isJpeg) || (!m_useJpeg && isJpeg))
-      continue;
+    if (fps < m_fps) continue;
+    if (fps > foundFps) continue;
+    bool isJpeg =
+        m[3].str().compare("jpeg") == 0 || m[3].str().compare("JPEG") == 0;
+    if ((m_useJpeg && !isJpeg) || (!m_useJpeg && isJpeg)) continue;
     foundMode = &modes[i];
     foundFps = fps;
   }
   if (foundMode != nullptr) {
     if (foundMode->Value != currentModePtr->Value) {
-      SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, IMAQdxAttributeVideoMode, IMAQdxValueTypeU32, foundMode->Value);
+      SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, IMAQdxAttributeVideoMode,
+                     IMAQdxValueTypeU32, foundMode->Value);
     }
-  } 
+  }
 
   if (m_whiteBalance.compare(AUTO) == 0) {
-    SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_WB_MODE, IMAQdxValueTypeString, AUTO.c_str());
+    SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_WB_MODE,
+                   IMAQdxValueTypeString, AUTO.c_str());
   } else {
-    SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_WB_MODE, IMAQdxValueTypeString, MANUAL.c_str());
+    SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_WB_MODE,
+                   IMAQdxValueTypeString, MANUAL.c_str());
     if (m_whiteBalanceValuePresent)
-      SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_WB_VALUE, IMAQdxValueTypeU32, m_whiteBalanceValue);
+      SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_WB_VALUE,
+                     IMAQdxValueTypeU32, m_whiteBalanceValue);
   }
 
   if (m_exposure.compare(AUTO) == 0) {
-    SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_EX_MODE, IMAQdxValueTypeString, std::string("AutoAperaturePriority").c_str());
+    SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_EX_MODE,
+                   IMAQdxValueTypeString,
+                   std::string("AutoAperaturePriority").c_str());
   } else {
-    SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_EX_MODE, IMAQdxValueTypeString, MANUAL.c_str());
+    SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_EX_MODE,
+                   IMAQdxValueTypeString, MANUAL.c_str());
     if (m_exposureValuePresent) {
       double minv = 0.0;
       double maxv = 0.0;
-      SAFE_IMAQ_CALL(IMAQdxGetAttributeMinimum, m_id, ATTR_EX_VALUE, IMAQdxValueTypeF64, &minv);
-      SAFE_IMAQ_CALL(IMAQdxGetAttributeMaximum, m_id, ATTR_EX_VALUE, IMAQdxValueTypeF64, &maxv);
-      double val = minv + ((maxv - minv) * ((double) m_exposureValue / 100.0));
-      SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_EX_VALUE, IMAQdxValueTypeF64, val);
+      SAFE_IMAQ_CALL(IMAQdxGetAttributeMinimum, m_id, ATTR_EX_VALUE,
+                     IMAQdxValueTypeF64, &minv);
+      SAFE_IMAQ_CALL(IMAQdxGetAttributeMaximum, m_id, ATTR_EX_VALUE,
+                     IMAQdxValueTypeF64, &maxv);
+      double val = minv + ((maxv - minv) * ((double)m_exposureValue / 100.0));
+      SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_EX_VALUE,
+                     IMAQdxValueTypeF64, val);
     }
   }
 
-  SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_BR_MODE, IMAQdxValueTypeString, MANUAL.c_str());
+  SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_BR_MODE, IMAQdxValueTypeString,
+                 MANUAL.c_str());
   double minv = 0.0;
   double maxv = 0.0;
-  SAFE_IMAQ_CALL(IMAQdxGetAttributeMinimum, m_id, ATTR_BR_VALUE, IMAQdxValueTypeF64, &minv);
-  SAFE_IMAQ_CALL(IMAQdxGetAttributeMaximum, m_id, ATTR_BR_VALUE, IMAQdxValueTypeF64, &maxv);
-  double val = minv + ((maxv - minv) * ((double) m_brightness / 100.0));
-  SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_BR_VALUE, IMAQdxValueTypeF64, val);
+  SAFE_IMAQ_CALL(IMAQdxGetAttributeMinimum, m_id, ATTR_BR_VALUE,
+                 IMAQdxValueTypeF64, &minv);
+  SAFE_IMAQ_CALL(IMAQdxGetAttributeMaximum, m_id, ATTR_BR_VALUE,
+                 IMAQdxValueTypeF64, &maxv);
+  double val = minv + ((maxv - minv) * ((double)m_brightness / 100.0));
+  SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_BR_VALUE, IMAQdxValueTypeF64,
+                 val);
 
-  if (wasActive)
-    StartCapture();
+  if (wasActive) StartCapture();
 }
 
 void USBCamera::SetFPS(double fps) {
@@ -295,8 +305,10 @@ void USBCamera::SetExposureHoldCurrent() {
 void USBCamera::SetExposureManual(unsigned int level) {
   std::unique_lock<std::recursive_mutex> lock(m_mutex);
   m_exposure = MANUAL;
-  if (level > 100) m_exposureValue = 100;
-  else m_exposureValue = level;
+  if (level > 100)
+    m_exposureValue = 100;
+  else
+    m_exposureValue = level;
   m_exposureValuePresent = true;
   m_needSettingsUpdate = true;
 }
@@ -323,6 +335,7 @@ unsigned int USBCamera::GetImageData(void* buffer, unsigned int bufferSize) {
   }
   // BufNum is not actually used for anything at our level
   uInt32 bufNum;
-  SAFE_IMAQ_CALL(IMAQdxGetImageData, m_id, buffer, bufferSize, IMAQdxBufferNumberModeLast, 0, &bufNum);
+  SAFE_IMAQ_CALL(IMAQdxGetImageData, m_id, buffer, bufferSize,
+                 IMAQdxBufferNumberModeLast, 0, &bufNum);
   return GetJpegSize(buffer, bufferSize);
 }

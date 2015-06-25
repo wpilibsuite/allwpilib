@@ -5,15 +5,16 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-	uint32_t FRC_NetworkCommunication_nAICalibration_getLSBWeight(const uint32_t aiSystemIndex, const uint32_t channel, int32_t *status);
-	int32_t FRC_NetworkCommunication_nAICalibration_getOffset(const uint32_t aiSystemIndex, const uint32_t channel, int32_t *status);
+uint32_t FRC_NetworkCommunication_nAICalibration_getLSBWeight(
+    const uint32_t aiSystemIndex, const uint32_t channel, int32_t *status);
+int32_t FRC_NetworkCommunication_nAICalibration_getOffset(
+    const uint32_t aiSystemIndex, const uint32_t channel, int32_t *status);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // __AICalibration_h__
+#endif  // __AICalibration_h__

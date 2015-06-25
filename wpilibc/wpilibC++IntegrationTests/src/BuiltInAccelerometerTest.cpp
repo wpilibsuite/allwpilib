@@ -14,13 +14,13 @@ static constexpr double kAccelerationTolerance = 0.1;
  * but checking for gravity is probably good enough to tell that it's working.
  */
 TEST(BuiltInAccelerometerTest, Accelerometer) {
-	BuiltInAccelerometer accelerometer;
+  BuiltInAccelerometer accelerometer;
 
-	/* The testbench sometimes shakes a little from a previous test.  Give it
-		some time. */
-	Wait(1.0);
+  /* The testbench sometimes shakes a little from a previous test.  Give it
+          some time. */
+  Wait(1.0);
 
-	ASSERT_NEAR(0.0, accelerometer.GetX(), kAccelerationTolerance);
-	ASSERT_NEAR(1.0, accelerometer.GetY(), kAccelerationTolerance);
-	ASSERT_NEAR(0.0, accelerometer.GetZ(), kAccelerationTolerance);
+  ASSERT_NEAR(0.0, accelerometer.GetX(), kAccelerationTolerance);
+  ASSERT_NEAR(1.0, accelerometer.GetY(), kAccelerationTolerance);
+  ASSERT_NEAR(0.0, accelerometer.GetZ(), kAccelerationTolerance);
 }

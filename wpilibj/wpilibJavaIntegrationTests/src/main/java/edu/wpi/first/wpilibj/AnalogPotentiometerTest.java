@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* Copyright (c) FIRST 2008-2014. All Rights Reserved. */
+/* Open Source Software - may be modified and shared by FRC teams. The code */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
+/* the project. */
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
@@ -24,53 +24,53 @@ import edu.wpi.first.wpilibj.test.TestBench;
  *
  */
 public class AnalogPotentiometerTest extends AbstractComsSetup {
-	private static final Logger logger = Logger.getLogger(AnalogPotentiometerTest.class.getName());
-	private AnalogCrossConnectFixture analogIO;
-	private FakePotentiometerSource potSource;
-	private AnalogPotentiometer pot;
-	
-	private static final double DOUBLE_COMPARISON_DELTA = 2.0;
+  private static final Logger logger = Logger.getLogger(AnalogPotentiometerTest.class.getName());
+  private AnalogCrossConnectFixture analogIO;
+  private FakePotentiometerSource potSource;
+  private AnalogPotentiometer pot;
 
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@Before
-	public void setUp() throws Exception {
-		analogIO = TestBench.getAnalogCrossConnectFixture();
-		potSource = new FakePotentiometerSource(analogIO.getOutput(), 360);
-		pot = new AnalogPotentiometer(analogIO.getInput(), 360.0, 0);
-		
-	}
+  private static final double DOUBLE_COMPARISON_DELTA = 2.0;
 
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@After
-	public void tearDown() throws Exception {
-		potSource.reset();
-		pot.free();
-		analogIO.teardown();
-	}
-	
-	@Override
-	protected Logger getClassLogger() {
-		return logger;
-	}
-	
-	@Test
-	public void testInitialSettings(){
-		assertEquals(0, pot.get(), DOUBLE_COMPARISON_DELTA);
-	}
-	
-	@Test
-	public void testRangeValues(){
-		for(double i = 0.0; i < 360.0; i = i+1.0){
-			potSource.setAngle(i);
-			potSource.setMaxVoltage(ControllerPower.getVoltage5V());
-			Timer.delay(.02);
-			assertEquals(i, pot.get(), DOUBLE_COMPARISON_DELTA);
-		}
-	}
+  /**
+   * @throws java.lang.Exception
+   */
+  @Before
+  public void setUp() throws Exception {
+    analogIO = TestBench.getAnalogCrossConnectFixture();
+    potSource = new FakePotentiometerSource(analogIO.getOutput(), 360);
+    pot = new AnalogPotentiometer(analogIO.getInput(), 360.0, 0);
+
+  }
+
+  /**
+   * @throws java.lang.Exception
+   */
+  @After
+  public void tearDown() throws Exception {
+    potSource.reset();
+    pot.free();
+    analogIO.teardown();
+  }
+
+  @Override
+  protected Logger getClassLogger() {
+    return logger;
+  }
+
+  @Test
+  public void testInitialSettings() {
+    assertEquals(0, pot.get(), DOUBLE_COMPARISON_DELTA);
+  }
+
+  @Test
+  public void testRangeValues() {
+    for (double i = 0.0; i < 360.0; i = i + 1.0) {
+      potSource.setAngle(i);
+      potSource.setMaxVoltage(ControllerPower.getVoltage5V());
+      Timer.delay(.02);
+      assertEquals(i, pot.get(), DOUBLE_COMPARISON_DELTA);
+    }
+  }
 
 
 }

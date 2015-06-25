@@ -1,6 +1,6 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * To change this template, choose Tools | Templates and open the template in
+ * the editor.
  */
 package edu.wpi.first.wpilibj;
 
@@ -12,14 +12,14 @@ package edu.wpi.first.wpilibj;
  * @author alex
  */
 interface Controller {
-    /**
-     * Allows the control loop to run.
-     */
-    public void enable();
+  /**
+   * Allows the control loop to run.
+   */
+  public void enable();
 
-    /**
-     * Stops the control loop from running until explicitly re-enabled by calling
-     * {@link enable()}.
-     */
-    public void disable();
+  /**
+   * Stops the control loop from running until explicitly re-enabled by calling
+   * {@link enable()}.
+   */
+  public void disable();
 }

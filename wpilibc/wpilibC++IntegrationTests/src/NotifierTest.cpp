@@ -9,31 +9,29 @@
 #include "gtest/gtest.h"
 #include "TestBench.h"
 
-
 unsigned notifierCounter;
 
-void notifierHandler(void *)
-{
-	notifierCounter++;
-}
+void notifierHandler(void *) { notifierCounter++; }
 
 /**
  * Test if the Wait function works
  */
 TEST(NotifierTest, DISABLED_TestTimerNotifications) {
-    std::cout << "NotifierTest..." << std::endl;
-  	notifierCounter = 0;
-    std::cout << "notifier(notifierHandler, NULL)..." << std::endl;
-	Notifier notifier(notifierHandler, NULL);
-    std::cout << "Start Periodic..." << std::endl;
-	notifier.StartPeriodic(1.0);
+  std::cout << "NotifierTest..." << std::endl;
+  notifierCounter = 0;
+  std::cout << "notifier(notifierHandler, NULL)..." << std::endl;
+  Notifier notifier(notifierHandler, NULL);
+  std::cout << "Start Periodic..." << std::endl;
+  notifier.StartPeriodic(1.0);
 
-    std::cout << "Wait..." << std::endl;
-	Wait(10.5);
-    std::cout << "...Wait" << std::endl;
+  std::cout << "Wait..." << std::endl;
+  Wait(10.5);
+  std::cout << "...Wait" << std::endl;
 
-    EXPECT_EQ(10u, notifierCounter) << "Received " << notifierCounter << " notifications in 10.5 seconds";
-    std::cout << "Received " << notifierCounter << " notifications in 10.5 seconds";
+  EXPECT_EQ(10u, notifierCounter) << "Received " << notifierCounter
+                                  << " notifications in 10.5 seconds";
+  std::cout << "Received " << notifierCounter
+            << " notifications in 10.5 seconds";
 
-    std::cout << "...NotifierTest" << std::endl;
+  std::cout << "...NotifierTest" << std::endl;
 }

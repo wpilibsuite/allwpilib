@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* Copyright (c) FIRST 2008-2014. All Rights Reserved. */
+/* Open Source Software - may be modified and shared by FRC teams. The code */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
+/* the project. */
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
@@ -26,31 +26,31 @@ import edu.wpi.first.wpilibj.hal.SWIGTYPE_p_double;
  * Basic test (borrowed straight from SampleTest) for running the CAN TalonSRX.
  */
 public class CANTalonTest extends AbstractComsSetup {
-	private static final Logger logger = Logger.getLogger(SampleTest.class.getName());
+  private static final Logger logger = Logger.getLogger(SampleTest.class.getName());
 
-	static SampleFixture fixture = new SampleFixture();
+  static SampleFixture fixture = new SampleFixture();
 
-	protected Logger getClassLogger(){
-		return logger;
-	}
+  protected Logger getClassLogger() {
+    return logger;
+  }
 
-	@BeforeClass
-	public static void classSetup() {
-		// Set up the fixture before the test is created
-		fixture.setup();
-	}
+  @BeforeClass
+  public static void classSetup() {
+    // Set up the fixture before the test is created
+    fixture.setup();
+  }
 
-	@Before
-	public void setUp() {
-		// Reset the fixture elements before every test
-		fixture.reset();
-	}
+  @Before
+  public void setUp() {
+    // Reset the fixture elements before every test
+    fixture.reset();
+  }
 
-	@AfterClass
-	public static void tearDown() {
-		// Clean up the fixture after the test
-		fixture.teardown();
-	}
+  @AfterClass
+  public static void tearDown() {
+    // Clean up the fixture after the test
+    fixture.teardown();
+  }
 
   private String errorMessage(double actual, double expected) {
     String start = "Actual value was: ";
@@ -60,11 +60,11 @@ public class CANTalonTest extends AbstractComsSetup {
     return start;
   }
 
-	/**
+  /**
    * Briefly run a CAN Talon and assert true.
-	 */
-	@Test
-	public void throttle() {
+   */
+  @Test
+  public void throttle() {
     double throttle = 0.1;
     CANTalon tal = new CANTalon(0);
     tal.set(throttle);
@@ -82,22 +82,23 @@ public class CANTalonTest extends AbstractComsSetup {
     tal.disable();
     Timer.delay(0.2);
     assertTrue(errorMessage(tal.get(), 0.0), Math.abs(tal.get()) < 1e-10);
-	}
+  }
 
   @Test
   public void SetGetPID() {
     CANTalon talon = new CANTalon(0);
     talon.changeControlMode(CANTalon.TalonControlMode.Position);
     double p = 0.05, i = 0.098, d = 1.23;
-    talon.setPID(p, i , d);
+    talon.setPID(p, i, d);
     assertTrue(errorMessage(talon.getP(), p), Math.abs(p - talon.getP()) < 1e-5);
     assertTrue(errorMessage(talon.getI(), i), Math.abs(i - talon.getI()) < 1e-5);
     assertTrue(errorMessage(talon.getD(), d), Math.abs(d - talon.getD()) < 1e-5);
-    // Test with new values in case the talon was already set to the previous ones.
+    // Test with new values in case the talon was already set to the previous
+    // ones.
     p = 0.15;
     i = 0.198;
     d = 1.03;
-    talon.setPID(p, i , d);
+    talon.setPID(p, i, d);
     assertTrue(errorMessage(talon.getP(), p), Math.abs(p - talon.getP()) < 1e-5);
     assertTrue(errorMessage(talon.getI(), i), Math.abs(i - talon.getI()) < 1e-5);
     assertTrue(errorMessage(talon.getD(), d), Math.abs(d - talon.getD()) < 1e-5);
@@ -110,12 +111,13 @@ public class CANTalonTest extends AbstractComsSetup {
     talon.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot);
     Timer.delay(0.2);
     double p = 1.0, i = 0.0, d = 0.00;
-    talon.setPID(p, i , d);
+    talon.setPID(p, i, d);
     talon.set(100);
     Timer.delay(5.0);
     talon.reverseOutput(true);
     Timer.delay(5.0);
-    //assertTrue(errorMessage(talon.get(), 100), Math.abs(100 - talon.get()) < 10);
+    // assertTrue(errorMessage(talon.get(), 100), Math.abs(100 - talon.get()) <
+    // 10);
     assertTrue(true);
   }
 

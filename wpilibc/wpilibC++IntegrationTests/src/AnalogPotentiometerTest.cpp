@@ -15,13 +15,14 @@ static const double kVoltage = 3.33;
 static const double kAngle = 180.0;
 
 class AnalogPotentiometerTest : public testing::Test {
-protected:
+ protected:
   AnalogOutput *m_fakePot;
   AnalogPotentiometer *m_pot;
 
   virtual void SetUp() override {
     m_fakePot = new AnalogOutput(TestBench::kAnalogOutputChannel);
-    m_pot = new AnalogPotentiometer(TestBench::kFakeAnalogOutputChannel,kScale);
+    m_pot =
+        new AnalogPotentiometer(TestBench::kFakeAnalogOutputChannel, kScale);
   }
 
   virtual void TearDown() override {
@@ -33,13 +34,13 @@ protected:
 TEST_F(AnalogPotentiometerTest, TestInitialSettings) {
   m_fakePot->SetVoltage(0.0);
   Wait(0.1);
-  EXPECT_NEAR(0.0,m_pot->Get(),5.0)
-    <<"The potentiometer did not initialize to 0.";
+  EXPECT_NEAR(0.0, m_pot->Get(), 5.0)
+      << "The potentiometer did not initialize to 0.";
 }
 
-TEST_F(AnalogPotentiometerTest,TestRangeValues) {
+TEST_F(AnalogPotentiometerTest, TestRangeValues) {
   m_fakePot->SetVoltage(kVoltage);
   Wait(0.1);
   EXPECT_NEAR(kAngle, m_pot->Get(), 2.0)
-    << "The potentiometer did not measure the correct angle.";
+      << "The potentiometer did not measure the correct angle.";
 }

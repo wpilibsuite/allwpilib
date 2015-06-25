@@ -13,7 +13,7 @@ const int deviceId = 0;
 
 TEST(CANTalonTest, QuickTest) {
   double throttle = 0.1;
-	CANTalon talon(deviceId);
+  CANTalon talon(deviceId);
   talon.SetControlMode(CANSpeedController::kPercentVbus);
   talon.EnableControl();
   talon.Set(throttle);
@@ -32,16 +32,17 @@ TEST(CANTalonTest, SetGetPID) {
   // Tests that we can actually set and get PID values as intended.
   CANTalon talon(deviceId);
   double p = 0.05, i = 0.098, d = 1.23;
-  talon.SetPID(p, i , d);
+  talon.SetPID(p, i, d);
   // Wait(0.03);
   EXPECT_NEAR(p, talon.GetP(), 1e-5);
   EXPECT_NEAR(i, talon.GetI(), 1e-5);
   EXPECT_NEAR(d, talon.GetD(), 1e-5);
-  // Test with new values in case the talon was already set to the previous ones.
+  // Test with new values in case the talon was already set to the previous
+  // ones.
   p = 0.15;
   i = 0.198;
   d = 1.03;
-  talon.SetPID(p, i , d);
+  talon.SetPID(p, i, d);
   // Wait(0.03);
   EXPECT_NEAR(p, talon.GetP(), 1e-5);
   EXPECT_NEAR(i, talon.GetI(), 1e-5);

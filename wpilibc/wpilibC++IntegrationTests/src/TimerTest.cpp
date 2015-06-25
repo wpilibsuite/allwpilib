@@ -12,34 +12,27 @@
 static const double kWaitTime = 0.5;
 
 class TimerTest : public testing::Test {
-protected:
-	Timer *m_timer;
-	
-	virtual void SetUp() override {
-		m_timer = new Timer;
-	}
-	
-	virtual void TearDown() override {
-		delete m_timer;
-	}
-	
-	void Reset() {
-		m_timer->Reset();
-	}
+ protected:
+  Timer *m_timer;
+
+  virtual void SetUp() override { m_timer = new Timer; }
+
+  virtual void TearDown() override { delete m_timer; }
+
+  void Reset() { m_timer->Reset(); }
 };
 
 /**
  * Test if the Wait function works
  */
 TEST_F(TimerTest, Wait) {
-	Reset();
-	
-	double initialTime = m_timer->GetFPGATimestamp();
-	
-	Wait(kWaitTime);
-	
-	double finalTime = m_timer->GetFPGATimestamp();
-	
-	EXPECT_NEAR(kWaitTime, finalTime - initialTime, 0.001);
-}
+  Reset();
 
+  double initialTime = m_timer->GetFPGATimestamp();
+
+  Wait(kWaitTime);
+
+  double finalTime = m_timer->GetFPGATimestamp();
+
+  EXPECT_NEAR(kWaitTime, finalTime - initialTime, 0.001);
+}

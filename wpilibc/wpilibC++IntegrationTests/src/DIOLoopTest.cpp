@@ -21,23 +21,21 @@ static const double kSynchronousInterruptTimeTolerance = 0.01;
  * together.
  */
 class DIOLoopTest : public testing::Test {
-protected:
-	DigitalInput *m_input;
-	DigitalOutput *m_output;
+ protected:
+  DigitalInput *m_input;
+  DigitalOutput *m_output;
 
-	virtual void SetUp() override {
-		m_input = new DigitalInput(TestBench::kLoop1InputChannel);
-		m_output = new DigitalOutput(TestBench::kLoop1OutputChannel);
-	}
+  virtual void SetUp() override {
+    m_input = new DigitalInput(TestBench::kLoop1InputChannel);
+    m_output = new DigitalOutput(TestBench::kLoop1OutputChannel);
+  }
 
-	virtual void TearDown() override {
-		delete m_input;
-		delete m_output;
-	}
+  virtual void TearDown() override {
+    delete m_input;
+    delete m_output;
+  }
 
-	void Reset() {
-		m_output->Set(false);
-	}
+  void Reset() { m_output->Set(false); }
 };
 
 /**
@@ -45,17 +43,17 @@ protected:
  * reading the input.
  */
 TEST_F(DIOLoopTest, Loop) {
-	Reset();
+  Reset();
 
-	m_output->Set(false);
-	Wait(kDelayTime);
-	EXPECT_FALSE(m_input->Get()) << "The digital output was turned off, but "
-		<< "the digital input is on.";
+  m_output->Set(false);
+  Wait(kDelayTime);
+  EXPECT_FALSE(m_input->Get()) << "The digital output was turned off, but "
+                               << "the digital input is on.";
 
-	m_output->Set(true);
-	Wait(kDelayTime);
-	EXPECT_TRUE(m_input->Get()) << "The digital output was turned on, but "
-		<< "the digital input is off.";
+  m_output->Set(true);
+  Wait(kDelayTime);
+  EXPECT_TRUE(m_input->Get()) << "The digital output was turned on, but "
+                              << "the digital input is off.";
 }
 
 /**
@@ -63,63 +61,64 @@ TEST_F(DIOLoopTest, Loop) {
  * Counter class works
  */
 TEST_F(DIOLoopTest, FakeCounter) {
-	Reset();
+  Reset();
 
-	Counter counter(m_input);
+  Counter counter(m_input);
 
-	EXPECT_EQ(0, counter.Get()) << "Counter did not initialize to 0.";
+  EXPECT_EQ(0, counter.Get()) << "Counter did not initialize to 0.";
 
-	/* Count 100 ticks.  The counter value should be 100 after this loop. */
-	for(int i = 0; i < 100; i++) {
-		m_output->Set(true);
-		Wait(kCounterTime);
-		m_output->Set(false);
-		Wait(kCounterTime);
-	}
+  /* Count 100 ticks.  The counter value should be 100 after this loop. */
+  for (int i = 0; i < 100; i++) {
+    m_output->Set(true);
+    Wait(kCounterTime);
+    m_output->Set(false);
+    Wait(kCounterTime);
+  }
 
-	EXPECT_EQ(100, counter.Get()) << "Counter did not count up to 100.";
+  EXPECT_EQ(100, counter.Get()) << "Counter did not count up to 100.";
 }
 
 static void InterruptHandler(uint32_t interruptAssertedMask, void *param) {
-	*(int *)param = 12345;
+  *(int *)param = 12345;
 }
 
 TEST_F(DIOLoopTest, AsynchronousInterruptWorks) {
-	int param = 0;
+  int param = 0;
 
-	// Given an interrupt handler that sets an int to 12345
-	m_input->RequestInterrupts(InterruptHandler, &param);
-	m_input->EnableInterrupts();
+  // Given an interrupt handler that sets an int to 12345
+  m_input->RequestInterrupts(InterruptHandler, &param);
+  m_input->EnableInterrupts();
 
-	// If the voltage rises
-	m_output->Set(false);
-	m_output->Set(true);
-	m_input->CancelInterrupts();
+  // If the voltage rises
+  m_output->Set(false);
+  m_output->Set(true);
+  m_input->CancelInterrupts();
 
-	// Then the int should be 12345
-	Wait(kDelayTime);
-	EXPECT_EQ(12345, param) << "The interrupt did not run.";
+  // Then the int should be 12345
+  Wait(kDelayTime);
+  EXPECT_EQ(12345, param) << "The interrupt did not run.";
 }
 
 static void *InterruptTriggerer(void *data) {
-	DigitalOutput *output = static_cast<DigitalOutput *>(data);
-	output->Set(false);
-	Wait(kSynchronousInterruptTime);
-	output->Set(true);
-	return NULL;
+  DigitalOutput *output = static_cast<DigitalOutput *>(data);
+  output->Set(false);
+  Wait(kSynchronousInterruptTime);
+  output->Set(true);
+  return NULL;
 }
 
 TEST_F(DIOLoopTest, SynchronousInterruptWorks) {
-	// Given a synchronous interrupt
-	m_input->RequestInterrupts();
+  // Given a synchronous interrupt
+  m_input->RequestInterrupts();
 
-	// If we have another thread trigger the interrupt in a few seconds
-	pthread_t interruptTriggererLoop;
-	pthread_create(&interruptTriggererLoop, NULL, InterruptTriggerer, m_output);
+  // If we have another thread trigger the interrupt in a few seconds
+  pthread_t interruptTriggererLoop;
+  pthread_create(&interruptTriggererLoop, NULL, InterruptTriggerer, m_output);
 
-	// Then this thread should pause and resume after that number of seconds
-	Timer timer;
-	timer.Start();
-	m_input->WaitForInterrupt(kSynchronousInterruptTime + 1.0);
-	EXPECT_NEAR(kSynchronousInterruptTime, timer.Get(), kSynchronousInterruptTimeTolerance);
+  // Then this thread should pause and resume after that number of seconds
+  Timer timer;
+  timer.Start();
+  m_input->WaitForInterrupt(kSynchronousInterruptTime + 1.0);
+  EXPECT_NEAR(kSynchronousInterruptTime, timer.Get(),
+              kSynchronousInterruptTimeTolerance);
 }

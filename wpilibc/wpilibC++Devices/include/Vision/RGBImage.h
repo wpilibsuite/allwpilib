@@ -11,11 +11,9 @@
 /**
  * A color image represented in RGB color space at 3 bytes per pixel.
  */
-class RGBImage : public ColorImage
-{
-public:
-    RGBImage();
-    RGBImage(const char *fileName);
-    virtual ~RGBImage();
+class RGBImage : public ColorImage {
+ public:
+  RGBImage();
+  RGBImage(const char *fileName);
+  virtual ~RGBImage();
 };
-

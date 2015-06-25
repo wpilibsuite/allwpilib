@@ -15,47 +15,50 @@
 /**
  * PCM compressor
  */
-class Compressor: public SensorBase, public LiveWindowSendable, public ITableListener {
-public:
-	explicit Compressor(uint8_t pcmID);
-	Compressor();
-	virtual ~Compressor();
+class Compressor : public SensorBase,
+                   public LiveWindowSendable,
+                   public ITableListener {
+ public:
+  explicit Compressor(uint8_t pcmID);
+  Compressor();
+  virtual ~Compressor();
 
-	void Start();
-	void Stop();
-	bool Enabled() const;
+  void Start();
+  void Stop();
+  bool Enabled() const;
 
-	bool GetPressureSwitchValue() const;
+  bool GetPressureSwitchValue() const;
 
-	float GetCompressorCurrent() const;
+  float GetCompressorCurrent() const;
 
-	void SetClosedLoopControl(bool on);
-	bool GetClosedLoopControl() const;
+  void SetClosedLoopControl(bool on);
+  bool GetClosedLoopControl() const;
 
-	bool GetCompressorCurrentTooHighFault() const;
-	bool GetCompressorCurrentTooHighStickyFault() const;
-	bool GetCompressorShortedStickyFault() const;
-	bool GetCompressorShortedFault() const;
-	bool GetCompressorNotConnectedStickyFault() const;
-	bool GetCompressorNotConnectedFault() const;
-	void ClearAllPCMStickyFaults();
+  bool GetCompressorCurrentTooHighFault() const;
+  bool GetCompressorCurrentTooHighStickyFault() const;
+  bool GetCompressorShortedStickyFault() const;
+  bool GetCompressorShortedFault() const;
+  bool GetCompressorNotConnectedStickyFault() const;
+  bool GetCompressorNotConnectedFault() const;
+  void ClearAllPCMStickyFaults();
 
-	void UpdateTable() override;
-	void StartLiveWindowMode() override;
-	void StopLiveWindowMode() override;
-	std::string GetSmartDashboardType() const override;
-	void InitTable(ITable *subTable) override;
-	ITable *GetTable() const override;
-	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
+  void UpdateTable() override;
+  void StartLiveWindowMode() override;
+  void StopLiveWindowMode() override;
+  std::string GetSmartDashboardType() const override;
+  void InitTable(ITable *subTable) override;
+  ITable *GetTable() const override;
+  void ValueChanged(ITable *source, const std::string &key, EntryValue value,
+                    bool isNew);
 
-protected:
-	void *m_pcm_pointer;
+ protected:
+  void *m_pcm_pointer;
 
-private:
-	void InitCompressor(uint8_t module);
-	void SetCompressor(bool on);
+ private:
+  void InitCompressor(uint8_t module);
+  void SetCompressor(bool on);
 
-	ITable *m_table;
+  ITable *m_table;
 };
 
 #endif /* Compressor_H_ */

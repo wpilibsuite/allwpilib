@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* Copyright (c) FIRST 2008-2012. All Rights Reserved. */
+/* Open Source Software - may be modified and shared by FRC teams. The code */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
+/* the project. */
 /*----------------------------------------------------------------------------*/
 
 package edu.wpi.first.wpilibj;
@@ -27,97 +27,95 @@ import edu.wpi.first.wpilibj.tables.ITable;
  */
 public class DigitalInput extends DigitalSource implements LiveWindowSendable {
 
-	/**
-	 * Create an instance of a Digital Input class. Creates a digital input
-	 * given a channel.
-	 *
-	 * @param channel
-	 *            the DIO channel for the digital input 0-9 are on-board, 10-25 are on the MXP
-	 */
-	public DigitalInput(int channel) {
-        initDigitalPort(channel, true);
+  /**
+   * Create an instance of a Digital Input class. Creates a digital input given
+   * a channel.
+   *
+   * @param channel the DIO channel for the digital input 0-9 are on-board,
+   *        10-25 are on the MXP
+   */
+  public DigitalInput(int channel) {
+    initDigitalPort(channel, true);
 
-        LiveWindow.addSensor("DigitalInput", channel, this);
-        UsageReporting.report(tResourceType.kResourceType_DigitalInput, channel);
-	}
+    LiveWindow.addSensor("DigitalInput", channel, this);
+    UsageReporting.report(tResourceType.kResourceType_DigitalInput, channel);
+  }
 
-	/**
-	 * Get the value from a digital input channel. Retrieve the value of a
-	 * single digital input channel from the FPGA.
-	 *
-	 * @return the status of the digital input
-	 */
-	public boolean get() {
-		ByteBuffer status = ByteBuffer.allocateDirect(4);
-		// set the byte order
-		status.order(ByteOrder.LITTLE_ENDIAN);
-		boolean value = DIOJNI.getDIO(m_port, status.asIntBuffer()) != 0;
-		HALUtil.checkStatus(status.asIntBuffer());
-		return value;
-	}
+  /**
+   * Get the value from a digital input channel. Retrieve the value of a single
+   * digital input channel from the FPGA.
+   *
+   * @return the status of the digital input
+   */
+  public boolean get() {
+    ByteBuffer status = ByteBuffer.allocateDirect(4);
+    // set the byte order
+    status.order(ByteOrder.LITTLE_ENDIAN);
+    boolean value = DIOJNI.getDIO(m_port, status.asIntBuffer()) != 0;
+    HALUtil.checkStatus(status.asIntBuffer());
+    return value;
+  }
 
-	/**
-	 * Get the channel of the digital input
-	 *
-	 * @return The GPIO channel number that this object represents.
-	 */
-	public int getChannel() {
-		return m_channel;
-	}
+  /**
+   * Get the channel of the digital input
+   *
+   * @return The GPIO channel number that this object represents.
+   */
+  public int getChannel() {
+    return m_channel;
+  }
 
-	@Override
-	public boolean getAnalogTriggerForRouting() {
-		return false;
-	}
+  @Override
+  public boolean getAnalogTriggerForRouting() {
+    return false;
+  }
 
-	/*
-	 * Live Window code, only does anything if live window is activated.
-	 */
-	@Override
-	public String getSmartDashboardType() {
-		return "Digital Input";
-	}
+  /*
+   * Live Window code, only does anything if live window is activated.
+   */
+  @Override
+  public String getSmartDashboardType() {
+    return "Digital Input";
+  }
 
-	private ITable m_table;
+  private ITable m_table;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void initTable(ITable subtable) {
-		m_table = subtable;
-		updateTable();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void initTable(ITable subtable) {
+    m_table = subtable;
+    updateTable();
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void updateTable() {
-		if (m_table != null) {
-			m_table.putBoolean("Value", get());
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void updateTable() {
+    if (m_table != null) {
+      m_table.putBoolean("Value", get());
+    }
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ITable getTable() {
-		return m_table;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ITable getTable() {
+    return m_table;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void startLiveWindowMode() {
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void startLiveWindowMode() {}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void stopLiveWindowMode() {
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void stopLiveWindowMode() {}
 }

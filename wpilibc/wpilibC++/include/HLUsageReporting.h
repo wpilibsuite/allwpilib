@@ -5,21 +5,19 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-class HLUsageReportingInterface
-{
-public:
-	virtual ~HLUsageReportingInterface() {};
-	virtual void ReportScheduler() = 0;
-    virtual void ReportSmartDashboard() = 0;
+class HLUsageReportingInterface {
+ public:
+  virtual ~HLUsageReportingInterface(){};
+  virtual void ReportScheduler() = 0;
+  virtual void ReportSmartDashboard() = 0;
 };
 
-class HLUsageReporting
-{
-private:
-	static HLUsageReportingInterface* impl;
-	
-public:
-	static void SetImplementation(HLUsageReportingInterface* i);
-	static void ReportScheduler();
-    static void ReportSmartDashboard();
+class HLUsageReporting {
+ private:
+  static HLUsageReportingInterface* impl;
+
+ public:
+  static void SetImplementation(HLUsageReportingInterface* i);
+  static void ReportScheduler();
+  static void ReportSmartDashboard();
 };

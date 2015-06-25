@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* Copyright (c) FIRST 2008-2014. All Rights Reserved. */
+/* Open Source Software - may be modified and shared by FRC teams. The code */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
+/* the project. */
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
@@ -20,86 +20,86 @@ import edu.wpi.first.wpilibj.test.TestBench;
 
 public class GyroTest extends AbstractComsSetup {
 
-    private static final Logger logger = Logger.getLogger(GyroTest.class.getName());
+  private static final Logger logger = Logger.getLogger(GyroTest.class.getName());
 
-    public static final double TEST_ANGLE = 90.0;
+  public static final double TEST_ANGLE = 90.0;
 
-    private TiltPanCameraFixture tpcam;
+  private TiltPanCameraFixture tpcam;
 
-    @Override
-    protected Logger getClassLogger() {
-        return logger;
+  @Override
+  protected Logger getClassLogger() {
+    return logger;
+  }
+
+  @Before
+  public void setUp() throws Exception {
+    logger.fine("Setup: TiltPan camera");
+    tpcam = TestBench.getInstance().getTiltPanCam();
+    tpcam.setup();
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    tpcam.reset();
+    tpcam.teardown();
+  }
+
+  @Test
+  public void testInitial() {
+    double angle = tpcam.getGyro().getAngle();
+    assertEquals(errorMessage(angle, 0), 0, angle, .5);
+  }
+
+  /**
+   * Test to see if the Servo and the gyroscope is turning 90 degrees Note servo
+   * on TestBench is not the same type of servo that servo class was designed
+   * for so setAngle is significantly off. This has been calibrated for the
+   * servo on the rig.
+   */
+  @Test
+  public void testGyroAngle() {
+    // Set angle
+    for (int i = 0; i < 5; i++) {
+      tpcam.getPan().set(0);
+      Timer.delay(.1);
     }
 
-    @Before
-    public void setUp() throws Exception {
-        logger.fine("Setup: TiltPan camera");
-        tpcam = TestBench.getInstance().getTiltPanCam();
-        tpcam.setup();
+    Timer.delay(0.5);
+    // Reset for setup
+    tpcam.getGyro().reset();
+    Timer.delay(0.5);
+
+    // Perform test
+    for (int i = 0; i < 53; i++) {
+      tpcam.getPan().set(i / 100.0);
+      Timer.delay(0.05);
     }
+    Timer.delay(1.2);
 
-    @After
-    public void tearDown() throws Exception {
-        tpcam.reset();
-        tpcam.teardown();
-    }
+    double angle = tpcam.getGyro().getAngle();
 
-    @Test
-    public void testInitial() {
-        double angle = tpcam.getGyro().getAngle();
-        assertEquals(errorMessage(angle, 0), 0, angle, .5);
-    }
+    double difference = TEST_ANGLE - angle;
 
-    /**
-     * Test to see if the Servo and the gyroscope is turning 90 degrees Note
-     * servo on TestBench is not the same type of servo that servo class was
-     * designed for so setAngle is significantly off. This has been calibrated
-     * for the servo on the rig.
-     */
-    @Test
-    public void testGyroAngle() {
-        //Set angle
-        for (int i = 0; i < 5; i++) {
-            tpcam.getPan().set(0);
-            Timer.delay(.1);
-        }
+    double diff = Math.abs(difference);
 
-        Timer.delay(0.5);
-        //Reset for setup
-        tpcam.getGyro().reset();
-        Timer.delay(0.5);
+    assertEquals(errorMessage(diff, TEST_ANGLE), TEST_ANGLE, angle, 10);
+  }
 
-        //Perform test
-        for (int i = 0; i < 53; i++) {
-            tpcam.getPan().set(i / 100.0);
-            Timer.delay(0.05);
-        }
-        Timer.delay(1.2);
+  @Test
+  public void testDeviationOverTime() {
+    // Make sure that the test isn't influenced by any previous motions.
+    Timer.delay(0.25);
+    tpcam.getGyro().reset();
+    Timer.delay(0.25);
+    double angle = tpcam.getGyro().getAngle();
+    assertEquals(errorMessage(angle, 0), 0, angle, .5);
+    Timer.delay(5);
+    angle = tpcam.getGyro().getAngle();
+    assertEquals("After 5 seconds " + errorMessage(angle, 0), 0, angle, 1);
+  }
 
-        double angle = tpcam.getGyro().getAngle();
-
-        double difference = TEST_ANGLE - angle;
-
-        double diff = Math.abs(difference);
-
-        assertEquals(errorMessage(diff, TEST_ANGLE), TEST_ANGLE, angle, 10);
-    }
-
-    @Test
-    public void testDeviationOverTime() {
-        // Make sure that the test isn't influenced by any previous motions.
-        Timer.delay(0.25);
-        tpcam.getGyro().reset();
-        Timer.delay(0.25);
-        double angle = tpcam.getGyro().getAngle();
-        assertEquals(errorMessage(angle, 0), 0, angle, .5);
-        Timer.delay(5);
-        angle = tpcam.getGyro().getAngle();
-        assertEquals("After 5 seconds " + errorMessage(angle, 0), 0, angle, 1);
-    }
-
-    private String errorMessage(double difference, double target) {
-        return "Gyro angle skewed " + difference + " deg away from target " + target;
-    }
+  private String errorMessage(double difference, double target) {
+    return "Gyro angle skewed " + difference + " deg away from target " + target;
+  }
 
 }

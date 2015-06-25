@@ -1,5 +1,6 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2011. All Rights Reserved.							  */
+/* Copyright (c) FIRST 2011. All Rights Reserved.
+ */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
@@ -8,30 +9,20 @@
 #include "stdio.h"
 #include <sstream>
 
-PrintCommand::PrintCommand(const char *message) :
-	Command(((std::stringstream&)(std::stringstream("Print \"") << message << "\"")).str().c_str())
-{
-	m_message = message;
+PrintCommand::PrintCommand(const char *message)
+    : Command(((std::stringstream &)(std::stringstream("Print \"") << message
+                                                                   << "\""))
+                  .str()
+                  .c_str()) {
+  m_message = message;
 }
 
-void PrintCommand::Initialize()
-{
-	printf("%s", m_message.c_str());
-}
+void PrintCommand::Initialize() { printf("%s", m_message.c_str()); }
 
-void PrintCommand::Execute()
-{
-}
+void PrintCommand::Execute() {}
 
-bool PrintCommand::IsFinished()
-{
-	return true;
-}
+bool PrintCommand::IsFinished() { return true; }
 
-void PrintCommand::End()
-{
-}
+void PrintCommand::End() {}
 
-void PrintCommand::Interrupted()
-{
-}
+void PrintCommand::Interrupted() {}

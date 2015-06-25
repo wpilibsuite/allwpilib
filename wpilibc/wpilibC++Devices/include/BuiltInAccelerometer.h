@@ -14,25 +14,26 @@
  *
  * This class allows access to the RoboRIO's internal accelerometer.
  */
-class BuiltInAccelerometer : public Accelerometer, public SensorBase, public LiveWindowSendable
-{
-public:
-	BuiltInAccelerometer(Range range = kRange_8G);
-        virtual ~BuiltInAccelerometer();
+class BuiltInAccelerometer : public Accelerometer,
+                             public SensorBase,
+                             public LiveWindowSendable {
+ public:
+  BuiltInAccelerometer(Range range = kRange_8G);
+  virtual ~BuiltInAccelerometer();
 
-	// Accelerometer interface
-	virtual void SetRange(Range range) override;
-	virtual double GetX() override;
-	virtual double GetY() override;
-	virtual double GetZ() override;
+  // Accelerometer interface
+  virtual void SetRange(Range range) override;
+  virtual double GetX() override;
+  virtual double GetY() override;
+  virtual double GetZ() override;
 
-	virtual std::string GetSmartDashboardType() const override;
-	virtual void InitTable(ITable *subtable) override;
-	virtual void UpdateTable() override;
-	virtual ITable* GetTable() const override;
-	virtual void StartLiveWindowMode() override {}
-	virtual void StopLiveWindowMode() override {}
+  virtual std::string GetSmartDashboardType() const override;
+  virtual void InitTable(ITable *subtable) override;
+  virtual void UpdateTable() override;
+  virtual ITable *GetTable() const override;
+  virtual void StartLiveWindowMode() override {}
+  virtual void StopLiveWindowMode() override {}
 
-private:
-	ITable *m_table;
+ private:
+  ITable *m_table;
 };

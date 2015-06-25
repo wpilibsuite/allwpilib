@@ -10,7 +10,7 @@
 #include <netdb.h>
 
 constexpr uint8_t CameraServer::kMagicNumber[];
-CameraServer *CameraServer::s_instance = nullptr;
+CameraServer* CameraServer::s_instance = nullptr;
 
 CameraServer* CameraServer::GetInstance() {
   if (s_instance == NULL) {
@@ -19,39 +19,43 @@ CameraServer* CameraServer::GetInstance() {
   return s_instance;
 }
 
-CameraServer::CameraServer() :
-  m_camera(),
-  m_serverThread(&CameraServer::Serve, this),
-  m_captureThread(),
-  m_imageMutex(),
-  m_newImageVariable(),
-  m_dataPool(3),
-  m_quality(50),
-  m_autoCaptureStarted(false),
-  m_hwClient(true),
-  m_imageData(nullptr, 0, 0, false) {
-  for (int i = 0; i < 3; i++)
-    m_dataPool.push_back(new uint8_t[kMaxImageSize]);
+CameraServer::CameraServer()
+    : m_camera(),
+      m_serverThread(&CameraServer::Serve, this),
+      m_captureThread(),
+      m_imageMutex(),
+      m_newImageVariable(),
+      m_dataPool(3),
+      m_quality(50),
+      m_autoCaptureStarted(false),
+      m_hwClient(true),
+      m_imageData(nullptr, 0, 0, false) {
+  for (int i = 0; i < 3; i++) m_dataPool.push_back(new uint8_t[kMaxImageSize]);
 }
 
-void CameraServer::FreeImageData(std::tuple<uint8_t*, unsigned int, unsigned int, bool> imageData) {
-  if (std::get<3>(imageData)) imaqDispose(std::get<0>(imageData));
+void CameraServer::FreeImageData(
+    std::tuple<uint8_t*, unsigned int, unsigned int, bool> imageData) {
+  if (std::get<3>(imageData))
+    imaqDispose(std::get<0>(imageData));
   else if (std::get<0>(imageData) != nullptr) {
     std::unique_lock<std::recursive_mutex> lock(m_imageMutex);
     m_dataPool.push_back(std::get<0>(imageData));
   }
 }
 
-void CameraServer::SetImageData(uint8_t* data, unsigned int size, unsigned int start, bool imaqData) {
+void CameraServer::SetImageData(uint8_t* data, unsigned int size,
+                                unsigned int start, bool imaqData) {
   std::unique_lock<std::recursive_mutex> lock(m_imageMutex);
   FreeImageData(m_imageData);
   m_imageData = std::make_tuple(data, size, start, imaqData);
   m_newImageVariable.notify_all();
 }
-  
-void CameraServer::SetImage(Image const *image) {
+
+void CameraServer::SetImage(Image const* image) {
   unsigned int dataSize = 0;
-  uint8_t* data = (uint8_t*) imaqFlatten(image, IMAQ_FLATTEN_IMAGE, IMAQ_COMPRESSION_JPEG, 10 * m_quality, &dataSize);
+  uint8_t* data =
+      (uint8_t*)imaqFlatten(image, IMAQ_FLATTEN_IMAGE, IMAQ_COMPRESSION_JPEG,
+                            10 * m_quality, &dataSize);
 
   // If we're using a HW camera, then find the start of the data
   bool hwClient;
@@ -63,15 +67,17 @@ void CameraServer::SetImage(Image const *image) {
   unsigned int start = 0;
   if (hwClient) {
     while (start < dataSize - 1) {
-      if (data[start] == 0xFF && data[start + 1] == 0xD8) break;
-      else start++;
+      if (data[start] == 0xFF && data[start + 1] == 0xD8)
+        break;
+      else
+        start++;
     }
   }
   dataSize -= start;
 
   wpi_assert(dataSize > 2);
   SetImageData(data, dataSize, start, true);
-}  
+}
 
 void CameraServer::AutoCapture() {
   Image* frame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
@@ -98,8 +104,9 @@ void CameraServer::AutoCapture() {
   }
 }
 
-void CameraServer::StartAutomaticCapture(char const *cameraName) {
-  std::shared_ptr<USBCamera> camera = std::make_shared<USBCamera>(cameraName, true);
+void CameraServer::StartAutomaticCapture(char const* cameraName) {
+  std::shared_ptr<USBCamera> camera =
+      std::make_shared<USBCamera>(cameraName, true);
   camera->OpenCamera();
   StartAutomaticCapture(camera);
 }
@@ -124,9 +131,12 @@ bool CameraServer::IsAutoCaptureStarted() {
 void CameraServer::SetSize(unsigned int size) {
   std::unique_lock<std::recursive_mutex> lock(m_imageMutex);
   if (!m_camera) return;
-  if (size == kSize160x120) m_camera->SetSize(160, 120);
-  else if (size == kSize320x240) m_camera->SetSize(320, 240);
-  else if (size == kSize640x480) m_camera->SetSize(640, 480);
+  if (size == kSize160x120)
+    m_camera->SetSize(160, 120);
+  else if (size == kSize320x240)
+    m_camera->SetSize(320, 240);
+  else if (size == kSize640x480)
+    m_camera->SetSize(640, 480);
 }
 
 void CameraServer::SetQuality(unsigned int quality) {
@@ -142,11 +152,11 @@ unsigned int CameraServer::GetQuality() {
 void CameraServer::Serve() {
   int sock = socket(AF_INET, SOCK_STREAM, 0);
 
-  if (sock == -1)
-    wpi_setErrnoError();
+  if (sock == -1) wpi_setErrnoError();
 
   int reuseAddr = 1;
-  if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &reuseAddr, sizeof(reuseAddr)) == -1)
+  if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &reuseAddr,
+                 sizeof(reuseAddr)) == -1)
     wpi_setErrnoError();
 
   sockaddr_in address, clientAddress;
@@ -156,16 +166,16 @@ void CameraServer::Serve() {
   address.sin_addr.s_addr = htonl(INADDR_ANY);
   address.sin_port = htons(kPort);
 
-  if (bind(sock, (struct sockaddr *)&address, sizeof(address)) == -1)
+  if (bind(sock, (struct sockaddr*)&address, sizeof(address)) == -1)
     wpi_setErrnoError();
 
-  if (listen(sock, 10) == -1)
-    wpi_setErrnoError();
+  if (listen(sock, 10) == -1) wpi_setErrnoError();
 
-  while(true) {
+  while (true) {
     socklen_t clientAddressLen = sizeof(clientAddress);
 
-    int conn = accept(sock, (struct sockaddr*)&clientAddress, &clientAddressLen);
+    int conn =
+        accept(sock, (struct sockaddr*)&clientAddress, &clientAddressLen);
     if (conn == -1) {
       wpi_setErrnoError();
       continue;
@@ -182,10 +192,12 @@ void CameraServer::Serve() {
       req.size = ntohl(req.size);
     }
 
-    // TODO: Support the SW Compression. The rest of the code below will work as though this
+    // TODO: Support the SW Compression. The rest of the code below will work as
+    // though this
     // check isn't here
     if (req.compression != kHardwareCompression) {
-      wpi_setWPIErrorWithContext(IncompatibleState, "Choose \"USB Camera HW\" on the dashboard");
+      wpi_setWPIErrorWithContext(IncompatibleState,
+                                 "Choose \"USB Camera HW\" on the dashboard");
       close(conn);
       continue;
     }
@@ -198,8 +210,10 @@ void CameraServer::Serve() {
         m_newImageVariable.wait(lock);
       }
       m_hwClient = req.compression == kHardwareCompression;
-      if (!m_hwClient) SetQuality(100 - req.compression);
-      else if (m_camera) m_camera->SetFPS(req.fps);
+      if (!m_hwClient)
+        SetQuality(100 - req.compression);
+      else if (m_camera)
+        m_camera->SetFPS(req.fps);
       SetSize(req.size);
     }
 
@@ -217,12 +231,13 @@ void CameraServer::Serve() {
       unsigned int size = std::get<1>(imageData);
       unsigned int netSize = htonl(size);
       unsigned int start = std::get<2>(imageData);
-      uint8_t *data = std::get<0>(imageData);
+      uint8_t* data = std::get<0>(imageData);
 
       if (data == nullptr) continue;
 
       if (write(conn, kMagicNumber, sizeof(kMagicNumber)) == -1) {
-        wpi_setErrnoErrorWithContext("[CameraServer] Error sending magic number");
+        wpi_setErrnoErrorWithContext(
+            "[CameraServer] Error sending magic number");
         FreeImageData(imageData);
         break;
       }

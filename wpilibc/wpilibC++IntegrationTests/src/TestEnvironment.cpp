@@ -9,38 +9,38 @@
 #include "WPILib.h"
 
 class TestEnvironment : public testing::Environment {
-	bool m_alreadySetUp;
+  bool m_alreadySetUp;
 
-public:
-	TestEnvironment(): m_alreadySetUp(false) {}
+ public:
+  TestEnvironment() : m_alreadySetUp(false) {}
 
-	virtual void SetUp() override {
-		/* Only set up once.  This allows gtest_repeat to be used to
-			automatically repeat tests. */
-		if(m_alreadySetUp) return;
-		m_alreadySetUp = true;
+  virtual void SetUp() override {
+    /* Only set up once.  This allows gtest_repeat to be used to
+            automatically repeat tests. */
+    if (m_alreadySetUp) return;
+    m_alreadySetUp = true;
 
-		if(!HALInitialize()) {
-			std::cerr << "FATAL ERROR: HAL could not be initialized" << std::endl;
-			exit(-1);
-		}
+    if (!HALInitialize()) {
+      std::cerr << "FATAL ERROR: HAL could not be initialized" << std::endl;
+      exit(-1);
+    }
 
-		/* This sets up the network communications library to enable the driver
-			station. After starting network coms, it will loop until the driver
-			station returns that the robot is enabled, to ensure that tests
-			will be able to run on the hardware. */
-		HALNetworkCommunicationObserveUserProgramStarting();
-		LiveWindow::GetInstance()->SetEnabled(false);
+    /* This sets up the network communications library to enable the driver
+            station. After starting network coms, it will loop until the driver
+            station returns that the robot is enabled, to ensure that tests
+            will be able to run on the hardware. */
+    HALNetworkCommunicationObserveUserProgramStarting();
+    LiveWindow::GetInstance()->SetEnabled(false);
 
-		std::cout << "Waiting for enable" << std::endl;
+    std::cout << "Waiting for enable" << std::endl;
 
-		while(!DriverStation::GetInstance()->IsEnabled()) {
-			Wait(0.1);
-		}
-	}
+    while (!DriverStation::GetInstance()->IsEnabled()) {
+      Wait(0.1);
+    }
+  }
 
-	virtual void TearDown() override {
-	}
+  virtual void TearDown() override {}
 };
 
-testing::Environment *const environment = testing::AddGlobalTestEnvironment(new TestEnvironment);
+testing::Environment *const environment =
+    testing::AddGlobalTestEnvironment(new TestEnvironment);

@@ -14,7 +14,7 @@ static const double kMotorDelay = 2.5;
 static const double kMaxPeriod = 2.0;
 
 class CounterTest : public testing::Test {
-protected:
+ protected:
   Counter *m_talonCounter;
   Counter *m_victorCounter;
   Counter *m_jaguarCounter;
@@ -38,16 +38,16 @@ protected:
     delete m_victor;
     delete m_talon;
     delete m_jaguar;
-    }
+  }
 
-    void Reset() {
-      m_talonCounter->Reset();
-      m_victorCounter->Reset();
-      m_jaguarCounter->Reset();
-      m_talon->Set(0.0f);
-      m_victor->Set(0.0f);
-      m_jaguar->Set(0.0f);
-    }
+  void Reset() {
+    m_talonCounter->Reset();
+    m_victorCounter->Reset();
+    m_jaguarCounter->Reset();
+    m_talon->Set(0.0f);
+    m_victor->Set(0.0f);
+    m_jaguar->Set(0.0f);
+  }
 };
 
 /**
@@ -59,14 +59,13 @@ TEST_F(CounterTest, CountTalon) {
   /* Run the motor forward and determine if the counter is counting. */
   m_talon->Set(1.0f);
   Wait(0.5);
-  EXPECT_NE(0.0f, m_talonCounter->Get())
-    << "The counter did not count (talon)";
+  EXPECT_NE(0.0f, m_talonCounter->Get()) << "The counter did not count (talon)";
   /* Set the motor to 0 and determine if the counter resets to 0. */
   m_talon->Set(0.0f);
   Wait(0.5);
   m_talonCounter->Reset();
   EXPECT_FLOAT_EQ(0.0f, m_talonCounter->Get())
-    << "The counter did not restart to 0 (talon)";
+      << "The counter did not restart to 0 (talon)";
 }
 
 TEST_F(CounterTest, CountVictor) {
@@ -75,13 +74,13 @@ TEST_F(CounterTest, CountVictor) {
   m_victor->Set(1.0f);
   Wait(0.5);
   EXPECT_NE(0.0f, m_victorCounter->Get())
-    << "The counter did not count (victor)";
+      << "The counter did not count (victor)";
   /* Set the motor to 0 and determine if the counter resets to 0. */
   m_victor->Set(0.0f);
   Wait(0.5);
   m_victorCounter->Reset();
   EXPECT_FLOAT_EQ(0.0f, m_victorCounter->Get())
-    << "The counter did not restart to 0 (jaguar)";
+      << "The counter did not restart to 0 (jaguar)";
 }
 
 TEST_F(CounterTest, CountJaguar) {
@@ -90,13 +89,13 @@ TEST_F(CounterTest, CountJaguar) {
   m_jaguar->Set(1.0f);
   Wait(0.5);
   EXPECT_NE(0.0f, m_jaguarCounter->Get())
-    << "The counter did not count (jaguar)";
+      << "The counter did not count (jaguar)";
   /* Set the motor to 0 and determine if the counter resets to 0. */
   m_jaguar->Set(0.0f);
   Wait(0.5);
   m_jaguarCounter->Reset();
   EXPECT_FLOAT_EQ(0.0f, m_jaguarCounter->Get())
-    << "The counter did not restart to 0 (jaguar)";
+      << "The counter did not restart to 0 (jaguar)";
 }
 
 /**
@@ -109,13 +108,12 @@ TEST_F(CounterTest, TalonGetStopped) {
   m_talonCounter->SetMaxPeriod(kMaxPeriod);
   m_talon->Set(1.0f);
   Wait(0.5);
-  EXPECT_FALSE(m_talonCounter->GetStopped())
-    << "The counter did not count.";
+  EXPECT_FALSE(m_talonCounter->GetStopped()) << "The counter did not count.";
   /* Stop the motor and wait until the Max Period is exceeded */
   m_talon->Set(0.0f);
   Wait(kMotorDelay);
   EXPECT_TRUE(m_talonCounter->GetStopped())
-    << "The counter did not stop counting.";
+      << "The counter did not stop counting.";
 }
 
 TEST_F(CounterTest, VictorGetStopped) {
@@ -124,13 +122,12 @@ TEST_F(CounterTest, VictorGetStopped) {
   m_victorCounter->SetMaxPeriod(kMaxPeriod);
   m_victor->Set(1.0f);
   Wait(0.5);
-  EXPECT_FALSE(m_victorCounter->GetStopped())
-    << "The counter did not count.";
+  EXPECT_FALSE(m_victorCounter->GetStopped()) << "The counter did not count.";
   /* Stop the motor and wait until the Max Period is exceeded */
   m_victor->Set(0.0f);
   Wait(kMotorDelay);
   EXPECT_TRUE(m_victorCounter->GetStopped())
-    << "The counter did not stop counting.";
+      << "The counter did not stop counting.";
 }
 
 TEST_F(CounterTest, JaguarGetStopped) {
@@ -139,11 +136,10 @@ TEST_F(CounterTest, JaguarGetStopped) {
   m_jaguarCounter->SetMaxPeriod(kMaxPeriod);
   m_jaguar->Set(1.0f);
   Wait(0.5);
-  EXPECT_FALSE(m_jaguarCounter->GetStopped())
-    << "The counter did not count.";
+  EXPECT_FALSE(m_jaguarCounter->GetStopped()) << "The counter did not count.";
   /* Stop the motor and wait until the Max Period is exceeded */
   m_jaguar->Set(0.0f);
   Wait(kMotorDelay);
   EXPECT_TRUE(m_jaguarCounter->GetStopped())
-    << "The counter did not stop counting.";
+      << "The counter did not stop counting.";
 }

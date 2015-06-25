@@ -12,59 +12,64 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 
-public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface, CANSpeedController, LiveWindowSendable {
-	private MotorSafetyHelper m_safetyHelper;
+public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface,
+    CANSpeedController, LiveWindowSendable {
+  private MotorSafetyHelper m_safetyHelper;
   private boolean isInverted = false;
-	public enum TalonControlMode {
-		PercentVbus(0), Follower(5), Voltage(4), Position(1), Speed(2), Current(3), Disabled(15);
+
+  public enum TalonControlMode {
+    PercentVbus(0), Follower(5), Voltage(4), Position(1), Speed(2), Current(3), Disabled(15);
 
     public int value;
-    public static TalonControlMode valueOf(int value) {
-			for(TalonControlMode mode : values()) {
-				if(mode.value == value) {
-					return mode;
-				}
-			}
 
-			return null;
+    public static TalonControlMode valueOf(int value) {
+      for (TalonControlMode mode : values()) {
+        if (mode.value == value) {
+          return mode;
+        }
+      }
+
+      return null;
     }
 
     private TalonControlMode(int value) {
       this.value = value;
     }
-	}
+  }
 
   public enum FeedbackDevice {
-		QuadEncoder(0), AnalogPot(2), AnalogEncoder(3), EncRising(4), EncFalling(5);
+    QuadEncoder(0), AnalogPot(2), AnalogEncoder(3), EncRising(4), EncFalling(5);
 
     public int value;
 
     public static FeedbackDevice valueOf(int value) {
-			for(FeedbackDevice mode : values()) {
-				if(mode.value == value) {
-					return mode;
-				}
-			}
+      for (FeedbackDevice mode : values()) {
+        if (mode.value == value) {
+          return mode;
+        }
+      }
 
-			return null;
+      return null;
     }
 
     private FeedbackDevice(int value) {
       this.value = value;
     }
-	}
+  }
   /** enumerated types for frame rate ms */
   public enum StatusFrameRate {
-		General(0), Feedback(1), QuadEncoder(2), AnalogTempVbat(3);
+    General(0), Feedback(1), QuadEncoder(2), AnalogTempVbat(3);
     public int value;
+
     public static StatusFrameRate valueOf(int value) {
-			for(StatusFrameRate mode : values()) {
-				if(mode.value == value) {
-					return mode;
-				}
-			}
-			return null;
+      for (StatusFrameRate mode : values()) {
+        if (mode.value == value) {
+          return mode;
+        }
+      }
+      return null;
     }
+
     private StatusFrameRate(int value) {
       this.value = value;
     }
@@ -94,9 +99,13 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
     applyControlMode(TalonControlMode.PercentVbus);
   }
 
-  public CANTalon(int deviceNumber,int controlPeriodMs) {
+  public CANTalon(int deviceNumber, int controlPeriodMs) {
     m_deviceNumber = deviceNumber;
-    m_impl = new CanTalonSRX(deviceNumber,controlPeriodMs); /* bound period to be within [1 ms,95 ms] */
+    m_impl = new CanTalonSRX(deviceNumber, controlPeriodMs); /*
+                                                              * bound period to
+                                                              * be within [1
+                                                              * ms,95 ms]
+                                                              */
     m_safetyHelper = new MotorSafetyHelper(this);
     m_controlEnabled = true;
     m_profile = 0;
@@ -106,13 +115,11 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   }
 
   @Override
-  public void pidWrite(double output)
-     {
+  public void pidWrite(double output) {
     if (getControlMode() == TalonControlMode.PercentVbus) {
       set(output);
-    }
-    else {
-			throw new IllegalStateException("PID only supported in PercentVbus mode");
+    } else {
+      throw new IllegalStateException("PID only supported in PercentVbus mode");
     }
   }
 
@@ -128,13 +135,12 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   /**
    * Sets the appropriate output on the talon, depending on the mode.
    *
-   * In PercentVbus, the output is between -1.0 and 1.0, with 0.0 as stopped.
-   * In Follower mode, the output is the integer device ID of the talon to duplicate.
-   * In Voltage mode, outputValue is in volts.
-   * In Current mode, outputValue is in amperes.
-   * In Speed mode, outputValue is in position change / 10ms.
-   * In Position mode, outputValue is in encoder ticks or an analog value,
-   *   depending on the sensor.
+   * In PercentVbus, the output is between -1.0 and 1.0, with 0.0 as stopped. In
+   * Follower mode, the output is the integer device ID of the talon to
+   * duplicate. In Voltage mode, outputValue is in volts. In Current mode,
+   * outputValue is in amperes. In Speed mode, outputValue is in position change
+   * / 10ms. In Position mode, outputValue is in encoder ticks or an analog
+   * value, depending on the sensor.
    *
    * @param outputValue The setpoint value, as described above.
    */
@@ -145,21 +151,21 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
       m_setPoint = outputValue;
       switch (m_controlMode) {
         case PercentVbus:
-          m_impl.Set(isInverted ? -outputValue: outputValue);
+          m_impl.Set(isInverted ? -outputValue : outputValue);
           break;
         case Follower:
-          m_impl.SetDemand((int)outputValue);
+          m_impl.SetDemand((int) outputValue);
           break;
         case Voltage:
           // Voltage is an 8.8 fixed point number.
-          int volts = (int)((isInverted ? -outputValue: outputValue) * 256);
+          int volts = (int) ((isInverted ? -outputValue : outputValue) * 256);
           m_impl.SetDemand(volts);
           break;
         case Speed:
-          m_impl.SetDemand((int)(isInverted ? -outputValue: outputValue));
+          m_impl.SetDemand((int) (isInverted ? -outputValue : outputValue));
           break;
         case Position:
-          m_impl.SetDemand((int)outputValue);
+          m_impl.SetDemand((int) outputValue);
           break;
         default:
           break;
@@ -168,33 +174,34 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
     }
   }
 
-    /**
-     * Inverts the direction of the motor's rotation.
-     * Only works in PercentVbus mode.
-     *
-     * @param isInverted The state of inversion, true is inverted.
-     */
-    @Override
-    public void setInverted(boolean isInverted) {
-        this.isInverted = isInverted;
-    }
-     
-    /**
-     * Common interface for the inverting direction of a speed controller.
-     *
-     * @return isInverted The state of inversion, true is inverted.
-     *
-     */
-    @Override
-    public boolean getInverted() {
-        return this.isInverted;
-    }
+  /**
+   * Inverts the direction of the motor's rotation. Only works in PercentVbus
+   * mode.
+   *
+   * @param isInverted The state of inversion, true is inverted.
+   */
+  @Override
+  public void setInverted(boolean isInverted) {
+    this.isInverted = isInverted;
+  }
 
-    /**
+  /**
+   * Common interface for the inverting direction of a speed controller.
+   *
+   * @return isInverted The state of inversion, true is inverted.
+   *
+   */
+  @Override
+  public boolean getInverted() {
+    return this.isInverted;
+  }
+
+  /**
    * Sets the output of the Talon.
    *
    * @param outputValue See set().
-   * @param thisValueDoesNotDoAnything corresponds to syncGroup from Jaguar; not relevant here.
+   * @param thisValueDoesNotDoAnything corresponds to syncGroup from Jaguar; not
+   *        relevant here.
    */
   @Override
   public void set(double outputValue, byte thisValueDoesNotDoAnything) {
@@ -228,20 +235,24 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
    * @return The error in units corresponding to whichever mode we are in.
    * @see #set(double) set() for a detailed description of the various units.
    */
-  public double getError() {return getClosedLoopError();}
+  public double getError() {
+    return getClosedLoopError();
+  }
 
   /**
    * Calls {@link #set(double)}.
    */
-  public void setSetpoint(double setpoint) { set(setpoint); }
+  public void setSetpoint(double setpoint) {
+    set(setpoint);
+  }
 
   /**
    * Flips the sign (multiplies by negative one) the sensor values going into
-   *the talon.
+   * the talon.
    *
    * This only affects position and velocity closed loop control. Allows for
-   *   situations where you may have a sensor flipped and going in the wrong
-   *   direction.
+   * situations where you may have a sensor flipped and going in the wrong
+   * direction.
    *
    * @param flip True if sensor input should be flipped; False if not.
    */
@@ -249,12 +260,12 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
     m_impl.SetRevFeedbackSensor(flip ? 1 : 0);
   }
 
-   /**
-    * Flips the sign (multiplies by negative one) the throttle values going into
-    *  the motor on the talon in closed loop modes.
-    *
-    * @param flip True if motor output should be flipped; False if not.
-    */
+  /**
+   * Flips the sign (multiplies by negative one) the throttle values going into
+   * the motor on the talon in closed loop modes.
+   *
+   * @param flip True if motor output should be flipped; False if not.
+   */
   public void reverseOutput(boolean flip) {
     m_impl.SetRevMotDuringCloseLoopEn(flip ? 1 : 0);
   }
@@ -262,10 +273,9 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   /**
    * Gets the current status of the Talon (usually a sensor value).
    *
-   * In Current mode: returns output current.
-   * In Speed mode: returns current speed.
-   * In Position mode: returns current sensor position.
-   * In PercentVbus and Follower modes: returns current applied throttle.
+   * In Current mode: returns output current. In Speed mode: returns current
+   * speed. In Position mode: returns current sensor position. In PercentVbus
+   * and Follower modes: returns current applied throttle.
    *
    * @return The current sensor value of the Talon.
    */
@@ -279,19 +289,20 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
         return getOutputCurrent();
       case Speed:
         m_impl.GetSensorVelocity(swigp);
-        return (double)CanTalonJNI.intp_value(valuep);
+        return (double) CanTalonJNI.intp_value(valuep);
       case Position:
         m_impl.GetSensorPosition(swigp);
-        return (double)CanTalonJNI.intp_value(valuep);
+        return (double) CanTalonJNI.intp_value(valuep);
       case PercentVbus:
       default:
         m_impl.GetAppliedThrottle(swigp);
-        return (double)CanTalonJNI.intp_value(valuep) / 1023.0;
+        return (double) CanTalonJNI.intp_value(valuep) / 1023.0;
     }
   }
 
   /**
-   * Get the current encoder position, regardless of whether it is the current feedback device.
+   * Get the current encoder position, regardless of whether it is the current
+   * feedback device.
    *
    * @return The current position of the encoder.
    */
@@ -303,7 +314,8 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   }
 
   /**
-   * Get the current encoder velocity, regardless of whether it is the current feedback device.
+   * Get the current encoder velocity, regardless of whether it is the current
+   * feedback device.
    *
    * @return The current speed of the encoder.
    */
@@ -325,15 +337,17 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
     m_impl.GetEncIndexRiseEvents(swigp);
     return CanTalonJNI.intp_value(valuep);
   }
+
   /**
    * @return IO level of QUADA pin.
    */
-  public int getPinStateQuadA(){
+  public int getPinStateQuadA() {
     long valuep = CanTalonJNI.new_intp();
     SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
     m_impl.GetQuadApin(swigp);
     return CanTalonJNI.intp_value(valuep);
   }
+
   /**
    * @return IO level of QUADB pin.
    */
@@ -343,10 +357,11 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
     m_impl.GetQuadBpin(swigp);
     return CanTalonJNI.intp_value(valuep);
   }
+
   /**
    * @return IO level of QUAD Index pin.
    */
-  public int getPinStateQuadIdx(){
+  public int getPinStateQuadIdx() {
     long valuep = CanTalonJNI.new_intp();
     SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
     m_impl.GetQuadIdxpin(swigp);
@@ -357,9 +372,9 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
    * Get the current analog in position, regardless of whether it is the current
    * feedback device.
    *
-   * @return The 24bit analog position.  The bottom ten bits is the ADC (0 - 1023) on
-   *								the analog pin of the Talon. The upper 14 bits
-   *								tracks the overflows and underflows (continuous sensor).
+   * @return The 24bit analog position. The bottom ten bits is the ADC (0 -
+   *         1023) on the analog pin of the Talon. The upper 14 bits tracks the
+   *         overflows and underflows (continuous sensor).
    */
   public int getAnalogInPosition() {
     long valuep = CanTalonJNI.new_intp();
@@ -367,14 +382,17 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
     m_impl.GetAnalogInWithOv(swigp);
     return CanTalonJNI.intp_value(valuep);
   }
+
   /**
    * Get the current analog in position, regardless of whether it is the current
    * feedback device.
+   *$
    * @return The ADC (0 - 1023) on analog pin of the Talon.
    */
   public int getAnalogInRaw() {
     return getAnalogInPosition() & 0x3FF;
   }
+
   /**
    * Get the current encoder velocity, regardless of whether it is the current
    * feedback device.
@@ -399,29 +417,33 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
     m_impl.GetCloseLoopErr(swigp);
     return CanTalonJNI.intp_value(valuep);
   }
+
   // Returns true if limit switch is closed. false if open.
   public boolean isFwdLimitSwitchClosed() {
     long valuep = CanTalonJNI.new_intp();
     SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
     m_impl.GetLimitSwitchClosedFor(swigp);
-    return (CanTalonJNI.intp_value(valuep)==0) ? true : false;
+    return (CanTalonJNI.intp_value(valuep) == 0) ? true : false;
   }
+
   // Returns true if limit switch is closed. false if open.
   public boolean isRevLimitSwitchClosed() {
     long valuep = CanTalonJNI.new_intp();
     SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
     m_impl.GetLimitSwitchClosedRev(swigp);
-    return (CanTalonJNI.intp_value(valuep)==0) ? true : false;
+    return (CanTalonJNI.intp_value(valuep) == 0) ? true : false;
   }
+
   // Returns true if break is enabled during neutral. false if coast.
   public boolean getBrakeEnableDuringNeutral() {
     long valuep = CanTalonJNI.new_intp();
     SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
     m_impl.GetBrakeIsEnabled(swigp);
-    return (CanTalonJNI.intp_value(valuep)==0) ? false : true;
+    return (CanTalonJNI.intp_value(valuep) == 0) ? false : true;
   }
+
   /**
-   *  Returns temperature of Talon, in degrees Celsius.
+   * Returns temperature of Talon, in degrees Celsius.
    */
   public double getTemperature() {
     long tempp = CanTalonJNI.new_doublep(); // Create a new swig pointer.
@@ -430,7 +452,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   }
 
   /**
-   *  Returns the current going through the Talon, in Amperes.
+   * Returns the current going through the Talon, in Amperes.
    */
   public double getOutputCurrent() {
     long curp = CanTalonJNI.new_doublep(); // Create a new swig pointer.
@@ -444,7 +466,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   public double getOutputVoltage() {
     long throttlep = CanTalonJNI.new_intp();
     m_impl.GetAppliedThrottle(new SWIGTYPE_p_int(throttlep, true));
-    double voltage = getBusVoltage() * (double)CanTalonJNI.intp_value(throttlep) / 1023.0;
+    double voltage = getBusVoltage() * (double) CanTalonJNI.intp_value(throttlep) / 1023.0;
     return voltage;
   }
 
@@ -454,24 +476,25 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   public double getBusVoltage() {
     long voltagep = CanTalonJNI.new_doublep();
     SWIGTYPE_p_CTR_Code status = m_impl.GetBatteryV(new SWIGTYPE_p_double(voltagep, true));
-    /* Note: This section needs the JNI bindings regenerated with
-     pointer_functions for CTR_Code included in order to be able to catch notice
-     and throw errors.
-     if (CanTalonJNI.CTR_Codep_value(status) != 0) {
-       // TODO throw an error.
-     }*/
+    /*
+     * Note: This section needs the JNI bindings regenerated with
+     * pointer_functions for CTR_Code included in order to be able to catch
+     * notice and throw errors. if (CanTalonJNI.CTR_Codep_value(status) != 0) {
+     * // TODO throw an error. }
+     */
 
     return CanTalonJNI.doublep_value(voltagep);
   }
 
   /**
- * TODO documentation (see CANJaguar.java)
- *
- * @return The position of the sensor currently providing feedback.
- * 			When using analog sensors, 0 units corresponds to 0V, 1023 units corresponds to 3.3V
- * 			When using an analog encoder (wrapping around 1023 to 0 is possible) the units are still 3.3V per 1023 units.
- * 			When using quadrature, each unit is a quadrature edge (4X) mode.
- */
+   * TODO documentation (see CANJaguar.java)
+   *
+   * @return The position of the sensor currently providing feedback. When using
+   *         analog sensors, 0 units corresponds to 0V, 1023 units corresponds
+   *         to 3.3V When using an analog encoder (wrapping around 1023 to 0 is
+   *         possible) the units are still 3.3V per 1023 units. When using
+   *         quadrature, each unit is a quadrature edge (4X) mode.
+   */
   public double getPosition() {
     long positionp = CanTalonJNI.new_intp();
     m_impl.GetSensorPosition(new SWIGTYPE_p_int(positionp, true));
@@ -479,24 +502,24 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   }
 
   public void setPosition(double pos) {
-    m_impl.SetSensorPosition((int)pos);
+    m_impl.SetSensorPosition((int) pos);
   }
 
-/**
- * TODO documentation (see CANJaguar.java)
- *
- * @return The speed of the sensor currently providing feedback.
- *
- * The speed units will be in the sensor's native ticks per 100ms.
- *
- * For analog sensors, 3.3V corresponds to 1023 units.
- * 		So a speed of 200 equates to ~0.645 dV per 100ms or 6.451 dV per second.
- * 		If this is an analog encoder, that likely means 1.9548 rotations per sec.
- * For quadrature encoders, each unit corresponds a quadrature edge (4X).
- * 		So a 250 count encoder will produce 1000 edge events per rotation.
- * 		An example speed of 200 would then equate to 20% of a rotation per 100ms,
- * 		or 10 rotations per second.
- */
+  /**
+   * TODO documentation (see CANJaguar.java)
+   *
+   * @return The speed of the sensor currently providing feedback.
+   *
+   *         The speed units will be in the sensor's native ticks per 100ms.
+   *
+   *         For analog sensors, 3.3V corresponds to 1023 units. So a speed of
+   *         200 equates to ~0.645 dV per 100ms or 6.451 dV per second. If this
+   *         is an analog encoder, that likely means 1.9548 rotations per sec.
+   *         For quadrature encoders, each unit corresponds a quadrature edge
+   *         (4X). So a 250 count encoder will produce 1000 edge events per
+   *         rotation. An example speed of 200 would then equate to 20% of a
+   *         rotation per 100ms, or 10 rotations per second.
+   */
   public double getSpeed() {
     long speedp = CanTalonJNI.new_intp();
     m_impl.GetSensorVelocity(new SWIGTYPE_p_int(speedp, true));
@@ -506,9 +529,11 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   public TalonControlMode getControlMode() {
     return m_controlMode;
   }
+
   /**
-   * Fixup the m_controlMode so set() serializes the correct demand value.
-   * Also fills the modeSelecet in the control frame to disabled.
+   * Fixup the m_controlMode so set() serializes the correct demand value. Also
+   * fills the modeSelecet in the control frame to disabled.
+   *$
    * @param controlMode Control mode to ultimately enter once user calls set().
    * @see #set
    */
@@ -519,12 +544,14 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
     // Disable until set() is called.
     m_impl.SetModeSelect(TalonControlMode.Disabled.value);
 
-	UsageReporting.report(tResourceType.kResourceType_CANTalonSRX, m_deviceNumber + 1, controlMode.value);
+    UsageReporting.report(tResourceType.kResourceType_CANTalonSRX, m_deviceNumber + 1,
+        controlMode.value);
   }
+
   public void changeControlMode(TalonControlMode controlMode) {
-    if(m_controlMode == controlMode){
+    if (m_controlMode == controlMode) {
       /* we already are in this mode, don't perform disable workaround */
-    }else{
+    } else {
       applyControlMode(controlMode);
     }
   }
@@ -532,20 +559,23 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   public void setFeedbackDevice(FeedbackDevice device) {
     m_impl.SetFeedbackDeviceSelect(device.value);
   }
-  public void setStatusFrameRateMs(StatusFrameRate stateFrame, int periodMs){
-    m_impl.SetStatusFrameRate(stateFrame.value,periodMs);
+
+  public void setStatusFrameRateMs(StatusFrameRate stateFrame, int periodMs) {
+    m_impl.SetStatusFrameRate(stateFrame.value, periodMs);
   }
+
   public void enableControl() {
     changeControlMode(m_controlMode);
-		m_controlEnabled = true;
+    m_controlEnabled = true;
   }
+
   public void enable() {
     enableControl();
   }
 
   public void disableControl() {
     m_impl.SetModeSelect(TalonControlMode.Disabled.value);
-		m_controlEnabled = false;
+    m_controlEnabled = false;
   }
 
   public boolean isControlEnabled() {
@@ -558,9 +588,11 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
    * @return double proportional constant for current profile.
    */
   public double getP() {
-		//if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
-		//	throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
-		//}
+    // if(!(m_controlMode.equals(ControlMode.Position) ||
+    // m_controlMode.equals(ControlMode.Speed))) {
+    // throw new
+    // IllegalStateException("PID mode only applies in Position and Speed modes.");
+    // }
 
     // Update the information that we have.
     if (m_profile == 0)
@@ -577,9 +609,11 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   }
 
   public double getI() {
-		//if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
-		//	throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
-		//}
+    // if(!(m_controlMode.equals(ControlMode.Position) ||
+    // m_controlMode.equals(ControlMode.Speed))) {
+    // throw new
+    // IllegalStateException("PID mode only applies in Position and Speed modes.");
+    // }
 
     // Update the information that we have.
     if (m_profile == 0)
@@ -596,9 +630,11 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   }
 
   public double getD() {
-		//if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
-		//	throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
-		//}
+    // if(!(m_controlMode.equals(ControlMode.Position) ||
+    // m_controlMode.equals(ControlMode.Speed))) {
+    // throw new
+    // IllegalStateException("PID mode only applies in Position and Speed modes.");
+    // }
 
     // Update the information that we have.
     if (m_profile == 0)
@@ -615,9 +651,11 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   }
 
   public double getF() {
-		//if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
-		//	throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
-		//}
+    // if(!(m_controlMode.equals(ControlMode.Position) ||
+    // m_controlMode.equals(ControlMode.Speed))) {
+    // throw new
+    // IllegalStateException("PID mode only applies in Position and Speed modes.");
+    // }
 
     // Update the information that we have.
     if (m_profile == 0)
@@ -634,9 +672,11 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   }
 
   public double getIZone() {
-		//if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
-		//	throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
-		//}
+    // if(!(m_controlMode.equals(ControlMode.Position) ||
+    // m_controlMode.equals(ControlMode.Speed))) {
+    // throw new
+    // IllegalStateException("PID mode only applies in Position and Speed modes.");
+    // }
 
     // Update the information that we have.
     if (m_profile == 0)
@@ -651,19 +691,22 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
     m_impl.GetIzone(m_profile, new SWIGTYPE_p_int(fp, true));
     return CanTalonJNI.intp_value(fp);
   }
+
   /**
    * Get the closed loop ramp rate for the current profile.
    *
-   * Limits the rate at which the throttle will change.
-   * Only affects position and speed closed loop modes.
+   * Limits the rate at which the throttle will change. Only affects position
+   * and speed closed loop modes.
    *
    * @return rampRate Maximum change in voltage, in volts / sec.
    * @see #setProfile For selecting a certain profile.
    */
   public double getCloseLoopRampRate() {
-	//	if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
-	//		throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
-	//	}
+    // if(!(m_controlMode.equals(ControlMode.Position) ||
+    // m_controlMode.equals(ControlMode.Speed))) {
+    // throw new
+    // IllegalStateException("PID mode only applies in Position and Speed modes.");
+    // }
 
     // Update the information that we have.
     if (m_profile == 0)
@@ -677,11 +720,12 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
     long fp = CanTalonJNI.new_intp();
     m_impl.GetCloseLoopRampRate(m_profile, new SWIGTYPE_p_int(fp, true));
     double throttlePerMs = CanTalonJNI.intp_value(fp);
-	return throttlePerMs / 1023.0 * 12.0 * 1000.0;
+    return throttlePerMs / 1023.0 * 12.0 * 1000.0;
   }
+
   /**
-  * @return The version of the firmware running on the Talon
-  */
+   * @return The version of the firmware running on the Talon
+   */
   public long GetFirmwareVersion() {
 
     // Update the information that we have.
@@ -694,6 +738,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
     m_impl.GetParamResponseInt32(CanTalonSRX.param_t.eFirmVers, new SWIGTYPE_p_int(fp, true));
     return CanTalonJNI.intp_value(fp);
   }
+
   public long GetIaccum() {
 
     // Update the information that we have.
@@ -747,17 +792,17 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
     m_impl.SetFgain(m_profile, f);
   }
 
-   /**
-    * Set the integration zone of the current Closed Loop profile.
-    *
-    * Whenever the error is larger than the izone value, the accumulated
-    *  integration error is cleared so that high errors aren't racked up when at
-    *  high errors.
-    * An izone value of 0 means no difference from a standard PIDF loop.
-    *
-    * @param izone Width of the integration zone.
-    * @see #setProfile For selecting a certain profile.
-    */
+  /**
+   * Set the integration zone of the current Closed Loop profile.
+   *
+   * Whenever the error is larger than the izone value, the accumulated
+   * integration error is cleared so that high errors aren't racked up when at
+   * high errors. An izone value of 0 means no difference from a standard PIDF
+   * loop.
+   *
+   * @param izone Width of the integration zone.
+   * @see #setProfile For selecting a certain profile.
+   */
   public void setIZone(int izone) {
     m_impl.SetIzone(m_profile, izone);
   }
@@ -765,8 +810,8 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   /**
    * Set the closed loop ramp rate for the current profile.
    *
-   * Limits the rate at which the throttle will change.
-   * Only affects position and speed closed loop modes.
+   * Limits the rate at which the throttle will change. Only affects position
+   * and speed closed loop modes.
    *
    * @param rampRate Maximum change in voltage, in volts / sec.
    * @see #setProfile For selecting a certain profile.
@@ -780,24 +825,22 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   /**
    * Set the voltage ramp rate for the current profile.
    *
-   * Limits the rate at which the throttle will change.
-   * Affects all modes.
+   * Limits the rate at which the throttle will change. Affects all modes.
    *
    * @param rampRate Maximum change in voltage, in volts / sec.
    */
   public void setVoltageRampRate(double rampRate) {
     // CanTalonSRX takes units of Throttle (0 - 1023) / 10ms.
-    int rate = (int) (rampRate * 1023.0 / 12.0 /100.0);
+    int rate = (int) (rampRate * 1023.0 / 12.0 / 100.0);
     m_impl.SetRampThrottle(rate);
   }
 
-	/**
-	 * Clear the accumulator for I gain.
-	 */
-	public void ClearIaccum()
-	{
-		SWIGTYPE_p_CTR_Code status = m_impl.SetParam(CanTalonSRX.param_t.ePidIaccum, 0);
-	}
+  /**
+   * Clear the accumulator for I gain.
+   */
+  public void ClearIaccum() {
+    SWIGTYPE_p_CTR_Code status = m_impl.SetParam(CanTalonSRX.param_t.ePidIaccum, 0);
+  }
 
   /**
    * Sets control values for closed loop control.
@@ -807,15 +850,16 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
    * @param d Differential constant.
    * @param f Feedforward constant.
    * @param izone Integration zone -- prevents accumulation of integration error
-   *   with large errors. Setting this to zero will ignore any izone stuff.
-   * @param closeLoopRampRate Closed loop ramp rate. Maximum change in voltage, in volts / sec.
+   *        with large errors. Setting this to zero will ignore any izone stuff.
+   * @param closeLoopRampRate Closed loop ramp rate. Maximum change in voltage,
+   *        in volts / sec.
    * @param profile which profile to set the pid constants for. You can have two
-   *   profiles, with values of 0 or 1, allowing you to keep a second set of values
-   *   on hand in the talon. In order to switch profiles without recalling setPID,
-   *   you must call setProfile().
+   *        profiles, with values of 0 or 1, allowing you to keep a second set
+   *        of values on hand in the talon. In order to switch profiles without
+   *        recalling setPID, you must call setProfile().
    */
-  public void setPID(double p, double i, double d, double f, int izone, double closeLoopRampRate, int profile)
-    {
+  public void setPID(double p, double i, double d, double f, int izone, double closeLoopRampRate,
+      int profile) {
     if (profile != 0 && profile != 1)
       throw new IllegalArgumentException("Talon PID profile must be 0 or 1.");
     m_profile = profile;
@@ -843,38 +887,38 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
    * Select which closed loop profile to use, and uses whatever PIDF gains and
    * the such that are already there.
    */
-  public void setProfile(int profile)
-     {
+  public void setProfile(int profile) {
     if (profile != 0 && profile != 1)
       throw new IllegalArgumentException("Talon PID profile must be 0 or 1.");
     m_profile = profile;
     m_impl.SetProfileSlotSelect(m_profile);
   }
 
-        /**
-	* Common interface for stopping a motor.
-	*
-	* @deprecated Use disableControl instead.
-	*/
-	@Override
-	@Deprecated
-	public void stopMotor() {
-		disableControl();
-	}
+  /**
+   * Common interface for stopping a motor.
+   *
+   * @deprecated Use disableControl instead.
+   */
+  @Override
+  @Deprecated
+  public void stopMotor() {
+    disableControl();
+  }
 
   @Override
   public void disable() {
     disableControl();
   }
 
-	public int getDeviceID() {
-		return m_deviceNumber;
-	}
+  public int getDeviceID() {
+    return m_deviceNumber;
+  }
 
   // TODO: Documentation for all these accessors/setters for misc. stuff.
   public void clearIAccum() {
- 		SWIGTYPE_p_CTR_Code status = m_impl.SetParam(CanTalonSRX.param_t.ePidIaccum, 0);
+    SWIGTYPE_p_CTR_Code status = m_impl.SetParam(CanTalonSRX.param_t.ePidIaccum, 0);
   }
+
   public void setForwardSoftLimit(int forwardLimit) {
     m_impl.SetForwardSoftLimit(forwardLimit);
   }
@@ -892,7 +936,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   public boolean isForwardSoftLimitEnabled() {
     long valuep = CanTalonJNI.new_intp();
     m_impl.GetForwardSoftEnable(new SWIGTYPE_p_int(valuep, true));
-    return (CanTalonJNI.intp_value(valuep)==0) ? false : true;
+    return (CanTalonJNI.intp_value(valuep) == 0) ? false : true;
   }
 
   public void setReverseSoftLimit(int reverseLimit) {
@@ -912,7 +956,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   public boolean isReverseSoftLimitEnabled() {
     long valuep = CanTalonJNI.new_intp();
     m_impl.GetReverseSoftEnable(new SWIGTYPE_p_int(valuep, true));
-    return (CanTalonJNI.intp_value(valuep)==0) ? false : true;
+    return (CanTalonJNI.intp_value(valuep) == 0) ? false : true;
   }
 
   public void clearStickyFaults() {
@@ -923,33 +967,37 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
     int mask = 4 + (forward ? 1 : 0) * 2 + (reverse ? 1 : 0);
     m_impl.SetOverrideLimitSwitchEn(mask);
   }
+
   /**
    * Configure the fwd limit switch to be normally open or normally closed.
-   * Talon will disable momentarilly if the Talon's current setting
-   * is dissimilar to the caller's requested setting.
+   * Talon will disable momentarilly if the Talon's current setting is
+   * dissimilar to the caller's requested setting.
    *
-   * Since Talon saves setting to flash this should only affect
-   * a given Talon initially during robot install.
+   * Since Talon saves setting to flash this should only affect a given Talon
+   * initially during robot install.
    *
-   * @param normallyOpen true for normally open.  false for normally closed.
+   * @param normallyOpen true for normally open. false for normally closed.
    */
-  public void ConfigFwdLimitSwitchNormallyOpen(boolean normallyOpen)
-  {
-	SWIGTYPE_p_CTR_Code status = m_impl.SetParam(CanTalonSRX.param_t.eOnBoot_LimitSwitch_Forward_NormallyClosed,normallyOpen ? 0 : 1);
+  public void ConfigFwdLimitSwitchNormallyOpen(boolean normallyOpen) {
+    SWIGTYPE_p_CTR_Code status =
+        m_impl.SetParam(CanTalonSRX.param_t.eOnBoot_LimitSwitch_Forward_NormallyClosed,
+            normallyOpen ? 0 : 1);
   }
+
   /**
    * Configure the rev limit switch to be normally open or normally closed.
-   * Talon will disable momentarilly if the Talon's current setting
-   * is dissimilar to the caller's requested setting.
+   * Talon will disable momentarilly if the Talon's current setting is
+   * dissimilar to the caller's requested setting.
    *
-   * Since Talon saves setting to flash this should only affect
-   * a given Talon initially during robot install.
+   * Since Talon saves setting to flash this should only affect a given Talon
+   * initially during robot install.
    *
-   * @param normallyOpen true for normally open.  false for normally closed.
+   * @param normallyOpen true for normally open. false for normally closed.
    */
-  public void ConfigRevLimitSwitchNormallyOpen(boolean normallyOpen)
-  {
-	SWIGTYPE_p_CTR_Code status = m_impl.SetParam(CanTalonSRX.param_t.eOnBoot_LimitSwitch_Reverse_NormallyClosed,normallyOpen ? 0 : 1);
+  public void ConfigRevLimitSwitchNormallyOpen(boolean normallyOpen) {
+    SWIGTYPE_p_CTR_Code status =
+        m_impl.SetParam(CanTalonSRX.param_t.eOnBoot_LimitSwitch_Reverse_NormallyClosed,
+            normallyOpen ? 0 : 1);
   }
 
   public void enableBrakeMode(boolean brake) {
@@ -1035,96 +1083,97 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   }
 
 
-	@Override
-	public void setExpiration(double timeout) {
-		m_safetyHelper.setExpiration(timeout);
-	}
+  @Override
+  public void setExpiration(double timeout) {
+    m_safetyHelper.setExpiration(timeout);
+  }
 
-	@Override
-	public double getExpiration() {
-		return m_safetyHelper.getExpiration();
-	}
+  @Override
+  public double getExpiration() {
+    return m_safetyHelper.getExpiration();
+  }
 
-	@Override
-	public boolean isAlive() {
-		return m_safetyHelper.isAlive();
-	}
+  @Override
+  public boolean isAlive() {
+    return m_safetyHelper.isAlive();
+  }
 
-	@Override
-	public boolean isSafetyEnabled() {
-		return m_safetyHelper.isSafetyEnabled();
-	}
+  @Override
+  public boolean isSafetyEnabled() {
+    return m_safetyHelper.isSafetyEnabled();
+  }
 
-	@Override
-	public void setSafetyEnabled(boolean enabled) {
-		m_safetyHelper.setSafetyEnabled(enabled);
-	}
+  @Override
+  public void setSafetyEnabled(boolean enabled) {
+    m_safetyHelper.setSafetyEnabled(enabled);
+  }
 
-	@Override
-	public String getDescription() {
-		return "CANTalon ID "+m_deviceNumber;
-	}
+  @Override
+  public String getDescription() {
+    return "CANTalon ID " + m_deviceNumber;
+  }
 
-	/*
-	* Live Window code, only does anything if live window is activated.
-	*/
-	@Override
-	public String getSmartDashboardType() {
-		return "Speed Controller";
-	}
-	private ITable m_table = null;
-	private ITableListener m_table_listener = null;
+  /*
+   * Live Window code, only does anything if live window is activated.
+   */
+  @Override
+  public String getSmartDashboardType() {
+    return "Speed Controller";
+  }
 
-	/**
-	* {@inheritDoc}
-	*/
-	@Override
-	public void initTable(ITable subtable) {
-		m_table = subtable;
-		updateTable();
-	}
+  private ITable m_table = null;
+  private ITableListener m_table_listener = null;
 
-	/**
-	* {@inheritDoc}
-	*/
-	@Override
-	public void updateTable() {
-		if (m_table != null) {
-			m_table.putNumber("Value", get());
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void initTable(ITable subtable) {
+    m_table = subtable;
+    updateTable();
+  }
 
-	/**
-	* {@inheritDoc}
-	*/
-	@Override
-	public ITable getTable() {
-		return m_table;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void updateTable() {
+    if (m_table != null) {
+      m_table.putNumber("Value", get());
+    }
+  }
 
-	/**
-	* {@inheritDoc}
-	*/
-	@Override
-	public void startLiveWindowMode() {
-		set(0); // Stop for safety
-		m_table_listener = new ITableListener() {
-			@Override
-			public void valueChanged(ITable itable, String key, Object value, boolean bln) {
-				set(((Double) value).doubleValue());
-			}
-		};
-		m_table.addTableListener("Value", m_table_listener, true);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ITable getTable() {
+    return m_table;
+  }
 
-	/**
-	* {@inheritDoc}
-	*/
-	@Override
-	public void stopLiveWindowMode() {
-		set(0); // Stop for safety
-		// TODO: Broken, should only remove the listener from "Value" only.
-		m_table.removeTableListener(m_table_listener);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void startLiveWindowMode() {
+    set(0); // Stop for safety
+    m_table_listener = new ITableListener() {
+      @Override
+      public void valueChanged(ITable itable, String key, Object value, boolean bln) {
+        set(((Double) value).doubleValue());
+      }
+    };
+    m_table.addTableListener("Value", m_table_listener, true);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void stopLiveWindowMode() {
+    set(0); // Stop for safety
+    // TODO: Broken, should only remove the listener from "Value" only.
+    m_table.removeTableListener(m_table_listener);
+  }
 
 }

@@ -11,12 +11,9 @@
 /**
  * A color image represented in HSL color space at 3 bytes per pixel.
  */
-class HSLImage : public ColorImage
-{
-public:
-    HSLImage();
-    HSLImage(const char *fileName);
-    virtual ~HSLImage();
+class HSLImage : public ColorImage {
+ public:
+  HSLImage();
+  HSLImage(const char *fileName);
+  virtual ~HSLImage();
 };
-
-

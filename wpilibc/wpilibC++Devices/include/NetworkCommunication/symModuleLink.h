@@ -7,10 +7,9 @@
 extern "C" {
 #endif
 
-extern STATUS    moduleNameFindBySymbolName
-    (
-        const char *    symbol,        /* symbol name to look for */
-        char * module        /* where to return module name */
+extern STATUS moduleNameFindBySymbolName(
+    const char* symbol, /* symbol name to look for */
+    char* module        /* where to return module name */
     );
 
 #ifdef __cplusplus
@@ -18,4 +17,3 @@ extern STATUS    moduleNameFindBySymbolName
 #endif
 
 #endif
-

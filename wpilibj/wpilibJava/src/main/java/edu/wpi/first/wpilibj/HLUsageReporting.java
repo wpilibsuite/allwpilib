@@ -8,45 +8,49 @@ import edu.wpi.first.wpilibj.util.BaseSystemNotInitializedException;
  * @author alex
  */
 public class HLUsageReporting {
-	private static Interface impl;
+  private static Interface impl;
 
-	public static void SetImplementation(Interface i) {
-		impl = i;
-	}
+  public static void SetImplementation(Interface i) {
+    impl = i;
+  }
 
-	public static void reportScheduler() {
-		if (impl != null) {
-			impl.reportScheduler();
-		} else {
-			throw new BaseSystemNotInitializedException(Interface.class, HLUsageReporting.class);
-		}
-	}
+  public static void reportScheduler() {
+    if (impl != null) {
+      impl.reportScheduler();
+    } else {
+      throw new BaseSystemNotInitializedException(Interface.class, HLUsageReporting.class);
+    }
+  }
 
-	public static void reportPIDController(int num) {
-		if (impl != null) {
-			impl.reportPIDController(num);
-		} else {
-			throw new BaseSystemNotInitializedException(Interface.class, HLUsageReporting.class);
-		}
-	}
+  public static void reportPIDController(int num) {
+    if (impl != null) {
+      impl.reportPIDController(num);
+    } else {
+      throw new BaseSystemNotInitializedException(Interface.class, HLUsageReporting.class);
+    }
+  }
 
-	public static void reportSmartDashboard() {
-		if(impl != null) {
-			impl.reportSmartDashboard();
-		} else {
-			throw new BaseSystemNotInitializedException(Interface.class, HLUsageReporting.class);
-		}
-	}
+  public static void reportSmartDashboard() {
+    if (impl != null) {
+      impl.reportSmartDashboard();
+    } else {
+      throw new BaseSystemNotInitializedException(Interface.class, HLUsageReporting.class);
+    }
+  }
 
-	public interface Interface {
-		void reportScheduler();
-		void reportPIDController(int num);
-		void reportSmartDashboard();
-	}
+  public interface Interface {
+    void reportScheduler();
 
-    public static class Null implements Interface {
-        public void reportScheduler() {}
-		public void reportPIDController(int num) {}
-		public void reportSmartDashboard() {}
-	}
+    void reportPIDController(int num);
+
+    void reportSmartDashboard();
+  }
+
+  public static class Null implements Interface {
+    public void reportScheduler() {}
+
+    public void reportPIDController(int num) {}
+
+    public void reportSmartDashboard() {}
+  }
 }

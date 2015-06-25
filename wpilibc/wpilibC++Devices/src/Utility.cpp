@@ -1,5 +1,6 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+/* Copyright (c) FIRST 2008. All Rights Reserved.
+ */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
@@ -23,154 +24,130 @@ static bool suspendOnAssertEnabled = false;
 /**
  * Enable suspend on assert.
  * If enabled, the user task will be suspended whenever an assert fails. This
- * will allow the user to attach to the task with the debugger and examine variables
+ * will allow the user to attach to the task with the debugger and examine
+ * variables
  * around the failure.
  */
-void wpi_suspendOnAssertEnabled(bool enabled)
-{
-	suspendOnAssertEnabled = enabled;
+void wpi_suspendOnAssertEnabled(bool enabled) {
+  suspendOnAssertEnabled = enabled;
 }
 
 /**
  * Assert implementation.
  * This allows breakpoints to be set on an assert.
- * The users don't call this, but instead use the wpi_assert macros in Utility.h.
+ * The users don't call this, but instead use the wpi_assert macros in
+ * Utility.h.
  */
-bool wpi_assert_impl(bool conditionValue,
-                     const char *conditionText,
-                     const char *message,
-                     const char *fileName,
-                     uint32_t lineNumber,
-                     const char *funcName)
-{
-	if(!conditionValue)
-	{
-		std::stringstream errorStream;
+bool wpi_assert_impl(bool conditionValue, const char *conditionText,
+                     const char *message, const char *fileName,
+                     uint32_t lineNumber, const char *funcName) {
+  if (!conditionValue) {
+    std::stringstream errorStream;
 
-		errorStream << "Assertion \"" << conditionText << "\" ";
-		errorStream << "on line " << lineNumber << " ";
-		errorStream << "of "<< basename(fileName) << " ";
+    errorStream << "Assertion \"" << conditionText << "\" ";
+    errorStream << "on line " << lineNumber << " ";
+    errorStream << "of " << basename(fileName) << " ";
 
-		if(message)
-		{
-			errorStream << "failed: " << message << std::endl;
-		}
-		else
-		{
-			errorStream << "failed." << std::endl;
-		}
+    if (message) {
+      errorStream << "failed: " << message << std::endl;
+    } else {
+      errorStream << "failed." << std::endl;
+    }
 
-		errorStream << GetStackTrace(2);
+    errorStream << GetStackTrace(2);
 
-		std::string error = errorStream.str();
+    std::string error = errorStream.str();
 
-		// Print the error and send it to the DriverStation
-		std::cout << error << std::endl;
-		HALSetErrorData(error.c_str(), error.size(), 100);
+    // Print the error and send it to the DriverStation
+    std::cout << error << std::endl;
+    HALSetErrorData(error.c_str(), error.size(), 100);
 
-		if (suspendOnAssertEnabled) suspendTask(0);
-	}
+    if (suspendOnAssertEnabled) suspendTask(0);
+  }
 
-	return conditionValue;
+  return conditionValue;
 }
 
 /**
  * Common error routines for wpi_assertEqual_impl and wpi_assertNotEqual_impl
- * This should not be called directly; it should only be used by wpi_assertEqual_impl
+ * This should not be called directly; it should only be used by
+ * wpi_assertEqual_impl
  * and wpi_assertNotEqual_impl.
  */
-void wpi_assertEqual_common_impl(const char *valueA,
-                                 const char *valueB,
-                                 const char *equalityType,
-                                 const char *message,
-                                 const char *fileName,
-                                 uint32_t lineNumber,
-                                 const char *funcName)
-{
-	std::stringstream errorStream;
+void wpi_assertEqual_common_impl(const char *valueA, const char *valueB,
+                                 const char *equalityType, const char *message,
+                                 const char *fileName, uint32_t lineNumber,
+                                 const char *funcName) {
+  std::stringstream errorStream;
 
-	errorStream << "Assertion \"" << valueA << " " << equalityType << " " << valueB << "\" ";
-	errorStream << "on line " << lineNumber << " ";
-	errorStream << "of "<< basename(fileName) << " ";
+  errorStream << "Assertion \"" << valueA << " " << equalityType << " "
+              << valueB << "\" ";
+  errorStream << "on line " << lineNumber << " ";
+  errorStream << "of " << basename(fileName) << " ";
 
-	if(message)
-	{
-		errorStream << "failed: " << message << std::endl;
-	}
-	else
-	{
-		errorStream << "failed." << std::endl;
-	}
+  if (message) {
+    errorStream << "failed: " << message << std::endl;
+  } else {
+    errorStream << "failed." << std::endl;
+  }
 
-	errorStream << GetStackTrace(3);
+  errorStream << GetStackTrace(3);
 
-	std::string error = errorStream.str();
+  std::string error = errorStream.str();
 
-	// Print the error and send it to the DriverStation
-	std::cout << error << std::endl;
-	HALSetErrorData(error.c_str(), error.size(), 100);
+  // Print the error and send it to the DriverStation
+  std::cout << error << std::endl;
+  HALSetErrorData(error.c_str(), error.size(), 100);
 
-	if (suspendOnAssertEnabled) suspendTask(0);
+  if (suspendOnAssertEnabled) suspendTask(0);
 }
 
 /**
  * Assert equal implementation.
  * This determines whether the two given integers are equal. If not,
  * the value of each is printed along with an optional message string.
- * The users don't call this, but instead use the wpi_assertEqual macros in Utility.h.
+ * The users don't call this, but instead use the wpi_assertEqual macros in
+ * Utility.h.
  */
-bool wpi_assertEqual_impl(int valueA,
-                          int valueB,
-                          const char *valueAString,
-                          const char *valueBString,
-                          const char *message,
-                          const char *fileName,
-                          uint32_t lineNumber,
-                          const char *funcName)
-{
-	if(!(valueA == valueB))
-	{
-		wpi_assertEqual_common_impl(valueAString, valueBString,
-			"==", message, fileName, lineNumber, funcName);
-	}
-	return valueA == valueB;
+bool wpi_assertEqual_impl(int valueA, int valueB, const char *valueAString,
+                          const char *valueBString, const char *message,
+                          const char *fileName, uint32_t lineNumber,
+                          const char *funcName) {
+  if (!(valueA == valueB)) {
+    wpi_assertEqual_common_impl(valueAString, valueBString, "==", message,
+                                fileName, lineNumber, funcName);
+  }
+  return valueA == valueB;
 }
 
 /**
  * Assert not equal implementation.
  * This determines whether the two given integers are equal. If so,
  * the value of each is printed along with an optional message string.
- * The users don't call this, but instead use the wpi_assertNotEqual macros in Utility.h.
+ * The users don't call this, but instead use the wpi_assertNotEqual macros in
+ * Utility.h.
  */
-bool wpi_assertNotEqual_impl(int valueA,
-                             int valueB,
-                             const char *valueAString,
-                             const char *valueBString,
-                             const char *message,
-                             const char *fileName,
-                             uint32_t lineNumber,
-                             const char *funcName)
-{
-	if(!(valueA != valueB))
-	{
-		wpi_assertEqual_common_impl(valueAString, valueBString,
-			"!=", message, fileName, lineNumber, funcName);
-	}
-	return valueA != valueB;
+bool wpi_assertNotEqual_impl(int valueA, int valueB, const char *valueAString,
+                             const char *valueBString, const char *message,
+                             const char *fileName, uint32_t lineNumber,
+                             const char *funcName) {
+  if (!(valueA != valueB)) {
+    wpi_assertEqual_common_impl(valueAString, valueBString, "!=", message,
+                                fileName, lineNumber, funcName);
+  }
+  return valueA != valueB;
 }
-
 
 /**
  * Return the FPGA Version number.
  * For now, expect this to be competition year.
  * @return FPGA Version number.
  */
-uint16_t GetFPGAVersion()
-{
-	int32_t status = 0;
-	uint16_t version = getFPGAVersion(&status);
-	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
-	return version;
+uint16_t GetFPGAVersion() {
+  int32_t status = 0;
+  uint16_t version = getFPGAVersion(&status);
+  wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
+  return version;
 }
 
 /**
@@ -181,91 +158,80 @@ uint16_t GetFPGAVersion()
  * The 12 least significant bits are the Build Number.
  * @return FPGA Revision number.
  */
-uint32_t GetFPGARevision()
-{
-	int32_t status = 0;
-	uint32_t revision = getFPGARevision(&status);
-	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
-	return revision;
+uint32_t GetFPGARevision() {
+  int32_t status = 0;
+  uint32_t revision = getFPGARevision(&status);
+  wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
+  return revision;
 }
 
 /**
  * Read the microsecond-resolution timer on the FPGA.
  *
- * @return The current time in microseconds according to the FPGA (since FPGA reset).
+ * @return The current time in microseconds according to the FPGA (since FPGA
+ * reset).
  */
-uint32_t GetFPGATime()
-{
-	int32_t status = 0;
-	uint32_t time = getFPGATime(&status);
-	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
-	return time;
+uint32_t GetFPGATime() {
+  int32_t status = 0;
+  uint32_t time = getFPGATime(&status);
+  wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
+  return time;
 }
 
 /**
  * Get the state of the "USER" button on the RoboRIO
  * @return True if the button is currently pressed down
  */
-bool GetUserButton()
-{
-	int32_t status = 0;
+bool GetUserButton() {
+  int32_t status = 0;
 
-	bool value = getFPGAButton(&status);
-	wpi_setGlobalError(status);
+  bool value = getFPGAButton(&status);
+  wpi_setGlobalError(status);
 
-	return value;
+  return value;
 }
 
 /**
  * Demangle a C++ symbol, used for printing stack traces.
  */
-static std::string demangle(char const *mangledSymbol)
-{
-	char buffer[256];
-	size_t length;
-	int status;
+static std::string demangle(char const *mangledSymbol) {
+  char buffer[256];
+  size_t length;
+  int status;
 
+  if (sscanf(mangledSymbol, "%*[^(]%*[(]%255[^)+]", buffer)) {
+    char *symbol = abi::__cxa_demangle(buffer, NULL, &length, &status);
+    if (status == 0) {
+      return symbol;
+    } else {
+      // If the symbol couldn't be demangled, it's probably a C function,
+      // so just return it as-is.
+      return buffer;
+    }
+  }
 
-	if(sscanf(mangledSymbol, "%*[^(]%*[(]%255[^)+]", buffer))
-	{
-		char *symbol = abi::__cxa_demangle(buffer, NULL, &length, &status);
-		if(status == 0)
-		{
-			return symbol;
-		}
-		else
-		{
-			// If the symbol couldn't be demangled, it's probably a C function,
-			// so just return it as-is.
-			return buffer;
-		}
-	}
-
-	// If everything else failed, just return the mangled symbol
-	return mangledSymbol;
+  // If everything else failed, just return the mangled symbol
+  return mangledSymbol;
 }
 
 /**
  * Get a stack trace, ignoring the first "offset" symbols.
  * @param offset The number of symbols at the top of the stack to ignore
  */
-std::string GetStackTrace(uint32_t offset)
-{
-	void *stackTrace[128];
-	int stackSize = backtrace(stackTrace, 128);
-	char **mangledSymbols = backtrace_symbols(stackTrace, stackSize);
-	std::stringstream trace;
+std::string GetStackTrace(uint32_t offset) {
+  void *stackTrace[128];
+  int stackSize = backtrace(stackTrace, 128);
+  char **mangledSymbols = backtrace_symbols(stackTrace, stackSize);
+  std::stringstream trace;
 
-	for(int i = offset; i < stackSize; i++)
-	{
-		// Only print recursive functions once in a row.
-		if(i == 0 ||stackTrace[i] != stackTrace[i - 1])
-		{
-			trace << "\tat " << demangle(mangledSymbols[i]) << std::endl;
-		}
-	}
+  for (int i = offset; i < stackSize; i++) {
+    // Only print recursive functions once in a row.
+    if (i == 0 || stackTrace[i] != stackTrace[i - 1]) {
+      trace << "\tat " << demangle(mangledSymbols[i]) << std::endl;
+    }
+  }
 
-	free(mangledSymbols);
+  free(mangledSymbols);
 
-	return trace.str();
+  return trace.str();
 }
