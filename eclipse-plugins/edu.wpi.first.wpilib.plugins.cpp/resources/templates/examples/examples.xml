@@ -267,11 +267,11 @@
   <name>Ultrasonic</name>
   <description>Demonstrate maintaining a set distance using an ultrasonic sensor.</description>
   <tags>
-    <tag>Getting Started with C++</tag>
     <tag>Robot and Motor</tag>
     <tag>CAN</tag>
     <tag>Complete List</tag>
 	<tag>Sensors</tag>
+	<tag>Analog</tag>
   </tags>
   <packages>
     <package>src</package>
@@ -282,7 +282,103 @@
   </example>
 
 
-
+<example>
+  <name>UltrasonicPID</name>
+  <description>Demonstrate maintaining a set distance using an ultrasonic sensor and PID control.</description>
+  <tags>
+    <tag>Robot and Motor</tag>
+    <tag>CAN</tag>
+    <tag>Complete List</tag>
+	<tag>Sensors</tag>
+	<tag>Analog</tag>
+  </tags>
+  <packages>
+    <package>src</package>
+  </packages>
+  <files>
+    <file source="examples/UltrasonicPID/src/Robot.cpp" destination="src/Robot.cpp"></file>
+  </files>
+  </example>
+  
+  
+  <example>
+  <name>Gyro</name>
+  <description>An example program showing how to drive straight with using a gyro sensor.</description>
+  <tags>
+    <tag>Robot and Motor</tag>
+    <tag>CAN</tag>
+    <tag>Complete List</tag>
+	<tag>Sensors</tag>
+	<tag>Analog</tag>
+	<tag>Joystick</tag>
+  </tags>
+  <packages>
+    <package>src</package>
+  </packages>
+  <files>
+    <file source="examples/Gyro/src/Robot.cpp" destination="src/Robot.cpp"></file>
+  </files>
+  </example>
+  
+  
+    <example>
+  <name>Gyro Mecanum</name>
+  <description>An example program showing how to perform mecanum drive with field oriented controls.</description>
+  <tags>
+    <tag>Robot and Motor</tag>
+    <tag>CAN</tag>
+    <tag>Complete List</tag>
+	<tag>Sensors</tag>
+	<tag>Analog</tag>
+	<tag>Joysitck</tag>
+  </tags>
+  <packages>
+    <package>src</package>
+  </packages>
+  <files>
+    <file source="examples/GyroMecanum/src/Robot.cpp" destination="src/Robot.cpp"></file>
+  </files>
+  </example>
+  
+  
+    <example>
+  <name>PotentiometerPID</name>
+  <description>An example to demonstrate the use of a potentiometer and PID control to reach elevator position setpoints.</description>
+  <tags>
+	<tag>Joystick</tag>
+	<tag>Actuators</tag>
+    <tag>Complete List</tag>
+	<tag>Sensors</tag>
+	<tag>Analog</tag>
+  </tags>
+  <packages>
+    <package>src</package>
+  </packages>
+  <files>
+    <file source="examples/PotentiometerPID/src/Robot.cpp" destination="src/Robot.cpp"></file>
+  </files>
+  </example>
+  
+  
+      <example>
+  <name>Potentiometer</name>
+  <description>An example to demonstrate the use of a potentiometer and basic proportional control to reach elevator position setpoints.</description>
+  <tags>
+	<tag>Joystick</tag>
+	<tag>Actuators</tag>
+    <tag>Complete List</tag>
+	<tag>Sensors</tag>
+	<tag>Analog</tag>
+  </tags>
+  <packages>
+    <package>src</package>
+  </packages>
+  <files>
+    <file source="examples/Potentiometer/src/Robot.cpp" destination="src/Robot.cpp"></file>
+  </files>
+  </example>
+  
+  
   <example>
   <name>Getting Started</name>
   <description>An example program which demonstrates the simplest autonomous and
