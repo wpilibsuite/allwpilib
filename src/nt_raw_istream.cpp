@@ -9,20 +9,14 @@
 
 #include <cstring>
 
-using namespace NtImpl;
+using namespace ntimpl;
 
-void
-raw_istream::anchor()
-{
-}
+void raw_istream::anchor() {}
 
-bool
-raw_mem_istream::read(void* data, std::size_t len)
-{
-    if (len > m_left)
-        return false;
-    std::memcpy(data, m_cur, len);
-    m_cur += len;
-    m_left -= len;
-    return true;
+bool raw_mem_istream::read(void* data, std::size_t len) {
+  if (len > m_left) return false;
+  std::memcpy(data, m_cur, len);
+  m_cur += len;
+  m_left -= len;
+  return true;
 }

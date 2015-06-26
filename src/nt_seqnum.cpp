@@ -7,26 +7,24 @@
 
 #include "nt_seqnum.h"
 
-namespace NtImpl {
+namespace ntimpl {
 
-bool operator< (const SequenceNumber& lhs, const SequenceNumber& rhs)
-{
-    if (lhs.m_val < rhs.m_val)
-        return (rhs.m_val - lhs.m_val) < (1u<<15);
-    else if (lhs.m_val > rhs.m_val)
-        return (lhs.m_val - rhs.m_val) > (1u<<15);
-    else
-        return false;
+bool operator<(const SequenceNumber& lhs, const SequenceNumber& rhs) {
+  if (lhs.m_val < rhs.m_val)
+    return (rhs.m_val - lhs.m_val) < (1u << 15);
+  else if (lhs.m_val > rhs.m_val)
+    return (lhs.m_val - rhs.m_val) > (1u << 15);
+  else
+    return false;
 }
 
-bool operator> (const SequenceNumber& lhs, const SequenceNumber& rhs)
-{
-    if (lhs.m_val < rhs.m_val)
-        return (rhs.m_val - lhs.m_val) > (1u<<15);
-    else if (lhs.m_val > rhs.m_val)
-        return (lhs.m_val - rhs.m_val) < (1u<<15);
-    else
-        return false;
+bool operator>(const SequenceNumber& lhs, const SequenceNumber& rhs) {
+  if (lhs.m_val < rhs.m_val)
+    return (rhs.m_val - lhs.m_val) > (1u << 15);
+  else if (lhs.m_val > rhs.m_val)
+    return (lhs.m_val - rhs.m_val) < (1u << 15);
+  else
+    return false;
 }
 
-} // namespace NtImpl
+}  // namespace ntimpl

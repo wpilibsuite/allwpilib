@@ -7,14 +7,10 @@
 
 #include "nt_storage.h"
 
-using namespace NtImpl;
+using namespace ntimpl;
 
 Storage* Storage::m_instance = nullptr;
 
-Storage::Storage()
-{
-}
+Storage::Storage() {}
 
-Storage::~Storage()
-{
-}
+Storage::~Storage() {}

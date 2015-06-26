@@ -13,94 +13,75 @@
 
 #include "ntcore.h"
 
-namespace NtImpl {
+namespace ntimpl {
 
-class WireEncoder
-{
-public:
-    explicit WireEncoder(unsigned int proto_rev);
-    ~WireEncoder();
+class WireEncoder {
+ public:
+  explicit WireEncoder(unsigned int proto_rev);
+  ~WireEncoder();
 
-    void SetProtocolRev(unsigned int proto_rev)
-    {
-        m_proto_rev = proto_rev;
-    }
+  void SetProtocolRev(unsigned int proto_rev) { m_proto_rev = proto_rev; }
 
-    void Reset()
-    {
-        m_cur = m_start;
-        m_error = nullptr;
-    }
+  void Reset() {
+    m_cur = m_start;
+    m_error = nullptr;
+  }
 
-    const char* GetError() const
-    {
-        return m_error;
-    }
+  const char* GetError() const { return m_error; }
 
-    const char* GetData() const
-    {
-        return m_start;
-    }
+  const char* GetData() const { return m_start; }
 
-    std::size_t GetSize() const
-    {
-        return m_cur - m_start;
-    }
+  std::size_t GetSize() const { return m_cur - m_start; }
 
-    void Reserve(std::size_t len)
-    {
-        //assert(m_end > m_cur);
-        if (static_cast<size_t>(m_end - m_cur) < len)
-            ReserveSlow(len);
-    }
+  void Reserve(std::size_t len) {
+    // assert(m_end > m_cur);
+    if (static_cast<size_t>(m_end - m_cur) < len) ReserveSlow(len);
+  }
 
-    void Write8(unsigned int val)
-    {
-        Reserve(1);
-        *m_cur++ = (char)(val & 0xff);
-    }
+  void Write8(unsigned int val) {
+    Reserve(1);
+    *m_cur++ = (char)(val & 0xff);
+  }
 
-    void Write16(unsigned int val)
-    {
-        Reserve(2);
-        *m_cur++ = (char)((val >> 8) & 0xff);
-        *m_cur++ = (char)(val & 0xff);
-    }
+  void Write16(unsigned int val) {
+    Reserve(2);
+    *m_cur++ = (char)((val >> 8) & 0xff);
+    *m_cur++ = (char)(val & 0xff);
+  }
 
-    void Write32(unsigned long val)
-    {
-        Reserve(4);
-        *m_cur++ = (char)((val >> 24) & 0xff);
-        *m_cur++ = (char)((val >> 16) & 0xff);
-        *m_cur++ = (char)((val >> 8) & 0xff);
-        *m_cur++ = (char)(val & 0xff);
-    }
+  void Write32(unsigned long val) {
+    Reserve(4);
+    *m_cur++ = (char)((val >> 24) & 0xff);
+    *m_cur++ = (char)((val >> 16) & 0xff);
+    *m_cur++ = (char)((val >> 8) & 0xff);
+    *m_cur++ = (char)(val & 0xff);
+  }
 
-    void WriteDouble(double val);
+  void WriteDouble(double val);
 
-    void WriteULEB128(unsigned long val);
-    void WriteType(NT_Type type);
-    void WriteValue(const NT_Value& value);
-    void WriteString(const NT_String& str);
+  void WriteULEB128(unsigned long val);
+  void WriteType(NT_Type type);
+  void WriteValue(const NT_Value& value);
+  void WriteString(const NT_String& str);
 
-    std::size_t GetValueSize(const NT_Value& value);
-    std::size_t GetStringSize(const NT_String& str);
+  std::size_t GetValueSize(const NT_Value& value);
+  std::size_t GetStringSize(const NT_String& str);
 
-    WireEncoder(const WireEncoder&) = delete;
-    WireEncoder& operator= (const WireEncoder&) = delete;
+  WireEncoder(const WireEncoder&) = delete;
+  WireEncoder& operator=(const WireEncoder&) = delete;
 
-protected:
-    unsigned int m_proto_rev;
-    const char* m_error;
+ protected:
+  unsigned int m_proto_rev;
+  const char* m_error;
 
-private:
-    void ReserveSlow(std::size_t len);
+ private:
+  void ReserveSlow(std::size_t len);
 
-    char* m_start;
-    char* m_cur;
-    char* m_end;
+  char* m_start;
+  char* m_cur;
+  char* m_end;
 };
 
-} // namespace NtImpl
+}  // namespace ntimpl
 
-#endif /* NT_WIREENCODER_H_ */
+#endif  // NT_WIREENCODER_H_

@@ -10,10 +10,8 @@
 
 struct NT_Value;
 
-namespace NtImpl {
+namespace ntimpl {}  // namespace ntimpl
 
-} // namespace NtImpl
+bool operator==(const NT_Value& lhs, const NT_Value& rhs);
 
-bool operator== (const NT_Value& lhs, const NT_Value& rhs);
-
-#endif /* NT_VALUE_H_ */
+#endif  // NT_VALUE_H_

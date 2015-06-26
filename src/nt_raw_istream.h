@@ -10,35 +10,33 @@
 
 #include <cstddef>
 
-namespace NtImpl {
+namespace ntimpl {
 
-class raw_istream
-{
-    void anchor();
-public:
-    raw_istream() {}
-    virtual ~raw_istream() {}
-    virtual bool read(void* data, std::size_t len) = 0;
-    virtual void close() = 0;
+class raw_istream {
+  void anchor();
 
-    raw_istream(const raw_istream&) = delete;
-    raw_istream& operator= (const raw_istream&) = delete;
+ public:
+  raw_istream() {}
+  virtual ~raw_istream() {}
+  virtual bool read(void* data, std::size_t len) = 0;
+  virtual void close() = 0;
+
+  raw_istream(const raw_istream&) = delete;
+  raw_istream& operator=(const raw_istream&) = delete;
 };
 
-class raw_mem_istream : public raw_istream
-{
-public:
-    raw_mem_istream(const char* mem, std::size_t len)
-        : m_cur(mem), m_left(len)
-    {}
-    virtual ~raw_mem_istream() {}
-    virtual bool read(void* data, std::size_t len);
-    virtual void close() {}
-private:
-    const char* m_cur;
-    std::size_t m_left;
+class raw_mem_istream : public raw_istream {
+ public:
+  raw_mem_istream(const char* mem, std::size_t len) : m_cur(mem), m_left(len) {}
+  virtual ~raw_mem_istream() {}
+  virtual bool read(void* data, std::size_t len);
+  virtual void close() {}
+
+ private:
+  const char* m_cur;
+  std::size_t m_left;
 };
 
-} // namespace NtImpl
+}  // namespace ntimpl
 
-#endif /* NT_RAW_ISTREAM_H_ */
+#endif  // NT_RAW_ISTREAM_H_

@@ -12,55 +12,46 @@
 
 #include "llvm/StringMap.h"
 
-namespace NtImpl {
+namespace ntimpl {
 
-inline llvm::StringRef
-make_StringRef(const NT_String& str)
-{
-    return llvm::StringRef(str.str, str.len);
+inline llvm::StringRef make_StringRef(const NT_String& str) {
+  return llvm::StringRef(str.str, str.len);
 }
 
-class StorageEntry
-{
-public:
-    StorageEntry()
-    {
-        NT_InitValue(&value);
-        flags = 0;
-    }
-    ~StorageEntry()
-    {
-        NT_DisposeValue(&value);
-    }
-    NT_Value value;
-    unsigned int flags;
+class StorageEntry {
+ public:
+  StorageEntry() {
+    NT_InitValue(&value);
+    flags = 0;
+  }
+  ~StorageEntry() { NT_DisposeValue(&value); }
 
-    StorageEntry(const StorageEntry&) = delete;
-    StorageEntry& operator= (const StorageEntry&) = delete;
+  NT_Value value;
+  unsigned int flags;
+
+  StorageEntry(const StorageEntry&) = delete;
+  StorageEntry& operator=(const StorageEntry&) = delete;
 };
 
-class Storage
-{
-public:
-    static Storage& GetInstance()
-    {
-        if (!m_instance)
-            m_instance = new Storage;
-        return *m_instance;
-    }
+class Storage {
+ public:
+  static Storage& GetInstance() {
+    if (!m_instance) m_instance = new Storage;
+    return *m_instance;
+  }
 
-    typedef llvm::StringMap<StorageEntry> EntriesMap;
-    EntriesMap entries;
+  typedef llvm::StringMap<StorageEntry> EntriesMap;
+  EntriesMap entries;
 
-private:
-    Storage();
-    ~Storage();
-    Storage(const Storage&) = delete;
-    Storage& operator= (const Storage&) = delete;
+ private:
+  Storage();
+  ~Storage();
+  Storage(const Storage&) = delete;
+  Storage& operator=(const Storage&) = delete;
 
-    static Storage* m_instance;
+  static Storage* m_instance;
 };
 
-} // namespace NtImpl
+}  // namespace ntimpl
 
-#endif /* NT_STORAGE_H_ */
+#endif  // NT_STORAGE_H_

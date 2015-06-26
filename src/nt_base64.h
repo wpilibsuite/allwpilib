@@ -10,7 +10,7 @@
 
 #include <cstddef>
 
-namespace NtImpl {
+namespace ntimpl {
 
 std::size_t base64decode_len(const char *bufcoded);
 std::size_t base64decode(char *bufplain, const char *bufcoded);
@@ -18,6 +18,6 @@ std::size_t base64encode_len(std::size_t len);
 std::size_t base64encode(char *encoded, const unsigned char *string,
                          std::size_t len);
 
-} // namespace NtImpl
+}  // namespace ntimpl
 
-#endif /* NT_BASE64_H_ */
+#endif  // NT_BASE64_H_
