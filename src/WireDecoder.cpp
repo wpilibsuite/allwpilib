@@ -17,7 +17,8 @@
 
 using namespace ntimpl;
 
-static double read_double(char*& buf) {
+static double ReadDouble(char*& buf) {
+  // Fast but non-portable!
   std::uint64_t val = (*((unsigned char*)buf)) & 0xff;
   ++buf;
   val <<= 8;
@@ -45,8 +46,10 @@ static double read_double(char*& buf) {
 }
 
 WireDecoder::WireDecoder(raw_istream& is, unsigned int proto_rev) : m_is(is) {
+  // Start with a 1K temporary buffer.  Use malloc instead of new so we can
+  // realloc.
   m_allocated = 1024;
-  m_buf = (char*)std::malloc(m_allocated);
+  m_buf = static_cast<char*>(std::malloc(m_allocated));
   m_proto_rev = proto_rev;
   m_error = nullptr;
 }
@@ -56,21 +59,23 @@ WireDecoder::~WireDecoder() { std::free(m_buf); }
 bool WireDecoder::ReadDouble(double* val) {
   char* buf;
   if (!Read(&buf, 8)) return false;
-  *val = read_double(buf);
+  *val = ::ReadDouble(buf);
   return true;
 }
 
 void WireDecoder::Realloc(std::size_t len) {
+  // Double current buffer size until we have enough space.
   if (m_allocated >= len) return;
   std::size_t newlen = m_allocated * 2;
   while (newlen < len) newlen *= 2;
-  m_buf = (char*)std::realloc(m_buf, newlen);
+  m_buf = static_cast<char*>(std::realloc(m_buf, newlen));
   m_allocated = newlen;
 }
 
 bool WireDecoder::ReadType(NT_Type* type) {
   unsigned int itype;
   if (!Read8(&itype)) return false;
+  // Convert from byte value to enum
   switch (itype) {
     case 0x00:
       *type = NT_BOOLEAN;
@@ -137,7 +142,8 @@ bool WireDecoder::ReadValue(NT_Type type, NT_Value* value) {
       // array values
       char* buf;
       if (!Read(&buf, size)) return false;
-      value->data.arr_boolean.arr = (int*)std::malloc(size * sizeof(int));
+      value->data.arr_boolean.arr =
+          static_cast<int*>(std::malloc(size * sizeof(int)));
       for (unsigned int i = 0; i < size; ++i)
         value->data.arr_boolean.arr[i] = buf[i] ? 1 : 0;
       break;
@@ -151,9 +157,10 @@ bool WireDecoder::ReadValue(NT_Type type, NT_Value* value) {
       // array values
       char* buf;
       if (!Read(&buf, size * 8)) return false;
-      value->data.arr_double.arr = (double*)std::malloc(size * sizeof(double));
+      value->data.arr_double.arr =
+          static_cast<double*>(std::malloc(size * sizeof(double)));
       for (unsigned int i = 0; i < size; ++i)
-        value->data.arr_double.arr[i] = read_double(buf);
+        value->data.arr_double.arr[i] = ::ReadDouble(buf);
       break;
     }
     case NT_STRING_ARRAY: {
@@ -164,7 +171,7 @@ bool WireDecoder::ReadValue(NT_Type type, NT_Value* value) {
 
       // array values
       value->data.arr_string.arr =
-          (NT_String*)std::malloc(size * sizeof(NT_String));
+          static_cast<NT_String*>(std::malloc(size * sizeof(NT_String)));
       for (unsigned int i = 0; i < size; ++i) {
         if (!ReadString(&value->data.arr_string.arr[i])) {
           // cleanup to avoid memory leaks
@@ -194,12 +201,12 @@ bool WireDecoder::ReadString(NT_String* str) {
     if (!ReadUleb128(&v)) return false;
     str->len = v;
   }
-  str->str = (char*)std::malloc(str->len + 1);
+  str->str = static_cast<char*>(std::malloc(str->len + 1));  // +1 for nul
   if (!m_is.read(str->str, str->len)) {
     std::free(str->str);
     str->str = 0;
     return false;
   }
-  str->str[str->len] = '\0';
+  str->str[str->len] = '\0'; // be nice and nul-terminate it
   return true;
 }

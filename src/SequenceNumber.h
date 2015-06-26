@@ -10,14 +10,15 @@
 
 namespace ntimpl {
 
+/* A sequence number per RFC 1982 */
 class SequenceNumber {
  public:
-  explicit SequenceNumber(unsigned int val) : m_val(val) {}
-  unsigned int GetVal() const { return m_val; }
+  explicit SequenceNumber(unsigned int value) : m_value(value) {}
+  unsigned int value() const { return m_value; }
 
   SequenceNumber& operator++() {
-    ++m_val;
-    if (m_val > 0xffff) m_val = 0;
+    ++m_value;
+    if (m_value > 0xffff) m_value = 0;
     return *this;
   }
   SequenceNumber operator++(int) {
@@ -34,7 +35,7 @@ class SequenceNumber {
   friend bool operator!=(const SequenceNumber& lhs, const SequenceNumber& rhs);
 
  private:
-  unsigned int m_val;
+  unsigned int m_value;
 };
 
 bool operator<(const SequenceNumber& lhs, const SequenceNumber& rhs);
@@ -49,11 +50,11 @@ inline bool operator>=(const SequenceNumber& lhs, const SequenceNumber& rhs) {
 }
 
 inline bool operator==(const SequenceNumber& lhs, const SequenceNumber& rhs) {
-  return lhs.m_val == rhs.m_val;
+  return lhs.m_value == rhs.m_value;
 }
 
 inline bool operator!=(const SequenceNumber& lhs, const SequenceNumber& rhs) {
-  return lhs.m_val != rhs.m_val;
+  return lhs.m_value != rhs.m_value;
 }
 
 }  // namespace ntimpl
