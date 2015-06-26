@@ -43,7 +43,7 @@ task eclipsePlugins(type: Exec) {
     group = 'WPILib'
     workingDir 'eclipse-plugins'
     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-        executable 'mvn.bat'
+        executable 'mvn.cmd'
     } else {
         executable 'mvn'
     }
@@ -57,7 +57,7 @@ task cleanEclipsePlugins(type: Exec) {
     group = 'WPILib'
     workingDir 'eclipse-plugins'
     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-        executable 'mvn.bat'
+        executable 'mvn.cmd'
     } else {
         executable 'mvn'
     }
