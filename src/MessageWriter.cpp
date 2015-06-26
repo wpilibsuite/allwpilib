@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "nt_messagewriter.h"
+#include "MessageWriter.h"
 
-#include "nt_internal.h"
+#include "internal.h"
 
 using namespace ntimpl;
 

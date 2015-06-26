@@ -5,18 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "nt_raw_istream.h"
-
-#include <cstring>
+#include "Storage.h"
 
 using namespace ntimpl;
 
-void raw_istream::anchor() {}
+Storage* Storage::m_instance = nullptr;
 
-bool raw_mem_istream::read(void* data, std::size_t len) {
-  if (len > m_left) return false;
-  std::memcpy(data, m_cur, len);
-  m_cur += len;
-  m_left -= len;
-  return true;
-}
+Storage::Storage() {}
+
+Storage::~Storage() {}

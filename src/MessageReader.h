@@ -8,7 +8,7 @@
 #ifndef NT_MESSAGEREADER_H_
 #define NT_MESSAGEREADER_H_
 
-#include "nt_wiredecoder.h"
+#include "WireDecoder.h"
 
 namespace ntimpl {
 

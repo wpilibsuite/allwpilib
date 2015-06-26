@@ -8,7 +8,7 @@
 #ifndef NT_MESSAGEWRITER_H_
 #define NT_MESSAGEWRITER_H_
 
-#include "nt_wireencoder.h"
+#include "WireEncoder.h"
 
 namespace ntimpl {
 

@@ -10,8 +10,8 @@
 #include <cstdio>
 
 #include "llvm/StringExtras.h"
-#include "nt_base64.h"
-#include "nt_storage.h"
+#include "base64.h"
+#include "Storage.h"
 
 using namespace ntimpl;
 

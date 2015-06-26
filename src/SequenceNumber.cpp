@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "nt_seqnum.h"
+#include "SequenceNumber.h"
 
 namespace ntimpl {
 

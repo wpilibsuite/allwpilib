@@ -5,15 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "nt_wiredecoder.h"
+#include "WireDecoder.h"
 
 #include <cassert>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
 
-#include "nt_internal.h"
-#include "nt_leb128.h"
+#include "internal.h"
+#include "leb128.h"
 
 using namespace ntimpl;
 

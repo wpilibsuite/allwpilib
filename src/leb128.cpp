@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "nt_leb128.h"
+#include "leb128.h"
 
-#include "nt_raw_istream.h"
+#include "raw_istream.h"
 
 namespace ntimpl {
 

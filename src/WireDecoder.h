@@ -11,8 +11,8 @@
 #include <cstddef>
 
 #include "ntcore.h"
-#include "nt_leb128.h"
-#include "nt_raw_istream.h"
+#include "leb128.h"
+#include "raw_istream.h"
 
 namespace ntimpl {
 
