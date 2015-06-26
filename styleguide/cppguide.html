@@ -15,9 +15,21 @@
 
 <h2 class="ignoreLink" id="Background">Background</h2>
 
+<p><strong>This guide is a work in progress.</strong>
+We are currently working on getting this guide updated to
+a point where it is useful for WPILib developers to use.</p>
+
 <p>C++ is one of the two main languages (Java being the other)
 used in WPILib; in order to maintain consistency and keep the
 maintenance of the code manageable, we use this style guide.</p>
+
+<p>There are two main overarching purposes to this guide. The first
+is to act as a normal C++ style guide (both in terms fo formatting
+and programming practices) for C++ developers of WPILib.
+The other purpose is to help Java programmers who may
+know a moderate amount of C++ but may not be fully
+up to date with things like C++11 and so may not even
+realize that certain C++ features exist.</p>
 
 <p>This style guide is a heavily modified version of the
 <a href=http://google-styleguide.googlecode.com/svn/trunk/cppguide.html>
@@ -81,6 +93,83 @@ use your judgement and ask others in cases where
 there is something which may violate anything
 in this guide.</p>
 
+<h2 id="Programming_Guidelines">Programming Guidelines</h2>
+<p>C++ is a large, complicated language, and in order
+to ensure that we stay consistent and maintain certain
+best practices, we have certain rules. For the most part
+these are common sense rules and in some cases exist
+solely to point out features of C++ that someone more
+familiar with Java may not realize even exist.</p>
+
+<h3 id="Pointers">Pointers</h3>
+<p>In general, we strongly discourage the use of
+raw pointers in C++ code; instead, references or
+STL pointers should be used where appropriate.
+There are two exceptions to this rule:</p>
+<ul>
+  <li>When interfacing with lower-level C code or
+  with any libraries which force you to use raw pointers.</li>
+  <li>In order to keep user interfaces consistent,
+  we may keep around deprecated functions which
+  take raw pointers. Any user-facing functions
+  which take raw pointers should be deprecated
+  using the
+  <a href=https://en.wikipedia.org/wiki/C%2B%2B14#The_attribute_.5B.5Bdeprecated.5D.5D><code>[[deprecated]]</code></a>
+  attribute and replaced with either references
+  or STL pointers.</li>
+</ul>
+<p>As of C++11, the following are options in the
+place of raw pointers:</p>
+<ul>
+  <li><code>std::unique_ptr</code> Should be used
+  when you still need to use a pointer, but you
+  only need one entity to own the pointer. The
+  <code>std::unique_ptr</code> will automatically
+  be deleted when there are no more references to
+  it.</li>
+  <li><code>std::shared_ptr</code> Should be used
+  when you still need to use a pointer and you
+  need many references to the object. When
+  there are zero remaining references to the
+  object, it will be deleted. Use <code>std::weak_ptr</code>
+  where necessary to avoid circular dependencies
+  or other potential issues.</li>
+  <li>L-value references (the traditional sort
+  of reference that has been around since before C++11)
+  should be used when you want to pass around a
+  reference to an object and want to guarantee
+  that it won't be null. Use const references
+  if you want to avoid copying a large object
+  but don't want to modify it.</li>
+  <li>R-value references were introduced in C++11
+  and allow for the use of <code>std::move</code>.
+  R-value references should be used where it makes
+  sense that a parameter to a function is having
+  its ownership passed from one place to another.
+  In general, R-value references are not inherently
+  bad, but they do introduce additional complexity
+  that may confuse people who are not familiar
+  with them.</li>
+</ul>
+
+<h3 id="Deprecation">Deprecation</h3>
+<p>When updating APIs, make liberal use of the
+<code>[[deprecated]]</code> attribute (although if
+it is reasonable to simply remove any old interfaces
+then do so) to indicate that users should no longer
+use the function. Currently, this will cause warnings
+in user code and errors in the WPILib build.</p>
+
+<pre>
+[[deprecated("This is a deprecated function; this text will be displayed when"
+             " the compiler throws a warning.")]]
+void foo() {}
+class [[deprecated("This is a deprecated class.")]] Foo {};
+int bar [[deprecated("This is a deprecated variable.")]];
+</pre>
+
+<p>See <a href=http://josephmansfield.uk/articles/marking-deprecated-c++14.html>
+here</a> for more information on deprecation.</p>
 
 <h2 id="Header_Files">Header Files</h2>
 
