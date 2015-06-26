@@ -52,15 +52,11 @@ class MessageReader : private WireDecoder {
                          unsigned int proto_rev);
   ~MessageReader();
 
-  void SetProtocolRev(unsigned int proto_rev) {
-    WireDecoder::SetProtocolRev(proto_rev);
-  }
-
   bool Run();
 
-  void Reset() { WireDecoder::Reset(); }
-
-  const char* GetError() const { return WireDecoder::GetError(); }
+  using WireDecoder::set_proto_rev;
+  using WireDecoder::Reset;
+  using WireDecoder::error;
 
   MessageReader(const MessageReader&) = delete;
   MessageReader& operator=(const MessageReader&) = delete;

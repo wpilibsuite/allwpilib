@@ -17,17 +17,11 @@ class MessageWriter : private WireEncoder {
   explicit MessageWriter(unsigned int proto_rev) : WireEncoder(proto_rev) {}
   ~MessageWriter();
 
-  void SetProtocolRev(unsigned int proto_rev) {
-    WireEncoder::SetProtocolRev(proto_rev);
-  }
-
-  void Reset() { WireEncoder::Reset(); }
-
-  const char* GetError() const { return WireEncoder::GetError(); }
-
-  const char* GetData() const { return WireEncoder::GetData(); }
-
-  std::size_t GetSize() const { return WireEncoder::GetSize(); }
+  using WireEncoder::set_proto_rev;
+  using WireEncoder::Reset;
+  using WireEncoder::error;
+  using WireEncoder::data;
+  using WireEncoder::size;
 
   void WriteKeepAlive();
   void WriteClientHello(const NT_String& self_id);

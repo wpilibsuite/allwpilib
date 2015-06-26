@@ -20,18 +20,18 @@ class WireEncoder {
   explicit WireEncoder(unsigned int proto_rev);
   ~WireEncoder();
 
-  void SetProtocolRev(unsigned int proto_rev) { m_proto_rev = proto_rev; }
+  void set_proto_rev(unsigned int proto_rev) { m_proto_rev = proto_rev; }
 
   void Reset() {
     m_cur = m_start;
     m_error = nullptr;
   }
 
-  const char* GetError() const { return m_error; }
+  const char* error() const { return m_error; }
 
-  const char* GetData() const { return m_start; }
+  const char* data() const { return m_start; }
 
-  std::size_t GetSize() const { return m_cur - m_start; }
+  std::size_t size() const { return m_cur - m_start; }
 
   void Reserve(std::size_t len) {
     // assert(m_end > m_cur);

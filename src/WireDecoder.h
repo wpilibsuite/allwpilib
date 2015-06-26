@@ -21,11 +21,11 @@ class WireDecoder {
   explicit WireDecoder(raw_istream& is, unsigned int proto_rev);
   ~WireDecoder();
 
-  void SetProtocolRev(unsigned int proto_rev) { m_proto_rev = proto_rev; }
+  void set_proto_rev(unsigned int proto_rev) { m_proto_rev = proto_rev; }
 
   void Reset() { m_error = nullptr; }
 
-  const char* GetError() const { return m_error; }
+  const char* error() const { return m_error; }
 
   bool Read(char** buf, std::size_t len) {
     if (len > m_allocated) Realloc(len);
