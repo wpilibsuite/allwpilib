@@ -191,7 +191,7 @@ bool WireDecoder::ReadString(NT_String* str) {
     str->len = v;
   } else {
     unsigned long v;
-    if (!ReadULEB128(&v)) return false;
+    if (!ReadUleb128(&v)) return false;
     str->len = v;
   }
   str->str = (char*)std::malloc(str->len + 1);

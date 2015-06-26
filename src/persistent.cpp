@@ -15,7 +15,7 @@
 
 using namespace ntimpl;
 
-static void write_string(FILE* f, llvm::StringRef str) {
+static void WriteString(FILE* f, llvm::StringRef str) {
   fputc('"', f);
   for (unsigned int i = 0, e = str.size(); i != e; ++i) {
     unsigned char c = str[i];
@@ -91,7 +91,7 @@ const char* NT_SavePersistent(const char* filename) {
     }
 
     // name
-    write_string(f, i->getKey());
+    WriteString(f, i->getKey());
 
     // =
     fputc('=', f);
@@ -105,11 +105,11 @@ const char* NT_SavePersistent(const char* filename) {
         fprintf(f, "%g", v.data.v_double);
         break;
       case NT_STRING:
-        write_string(f, make_StringRef(v.data.v_string));
+        WriteString(f, make_StringRef(v.data.v_string));
         break;
       case NT_RAW: {
-        char* buf = new char[base64encode_len(v.data.v_raw.len)];
-        base64encode(buf,
+        char* buf = new char[Base64EncodeLen(v.data.v_raw.len)];
+        Base64Encode(buf,
                      reinterpret_cast<const unsigned char*>(v.data.v_raw.str),
                      v.data.v_raw.len);
         fputs(buf, f);
@@ -130,7 +130,7 @@ const char* NT_SavePersistent(const char* filename) {
         break;
       case NT_STRING_ARRAY:
         for (size_t i = 0; i < v.data.arr_double.size; ++i) {
-          write_string(f, make_StringRef(v.data.arr_string.arr[i]));
+          WriteString(f, make_StringRef(v.data.arr_string.arr[i]));
           if (i != (v.data.arr_double.size - 1)) fputc(',', f);
         }
         break;

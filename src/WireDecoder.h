@@ -70,7 +70,9 @@ class WireDecoder {
 
   bool ReadDouble(double* val);
 
-  bool ReadULEB128(unsigned long* val) { return read_uleb128(m_is, val); }
+  bool ReadUleb128(unsigned long* val) {
+    return ntimpl::ReadUleb128(m_is, val);
+  }
 
   bool ReadType(NT_Type* type);
   bool ReadValue(NT_Type type, NT_Value* value);

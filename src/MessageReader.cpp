@@ -140,7 +140,7 @@ bool MessageReader::Run() {
       if (!Read16(&id)) return false;
       if (!Read16(&uid)) return false;
       unsigned long size;
-      if (!ReadULEB128(&size)) return false;
+      if (!ReadUleb128(&size)) return false;
       char* params;
       if (!Read(&params, size)) return false;
       m_handler.GotExecuteRpc(id, uid, params, size);
@@ -155,7 +155,7 @@ bool MessageReader::Run() {
       if (!Read16(&id)) return false;
       if (!Read16(&uid)) return false;
       unsigned long size;
-      if (!ReadULEB128(&size)) return false;
+      if (!ReadUleb128(&size)) return false;
       char* results;
       if (!Read(&results, size)) return false;
       m_handler.GotRpcResponse(id, uid, results, size);

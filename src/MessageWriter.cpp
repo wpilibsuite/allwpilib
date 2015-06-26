@@ -108,7 +108,7 @@ void MessageWriter::WriteRpc(unsigned int msg_type, unsigned int id,
   unsigned long len = 0;
   for (const NT_Value* value = values_start; value != values_end; ++value)
     len += GetValueSize(*value);
-  WriteULEB128(len);
+  WriteUleb128(len);
 
   for (const NT_Value* value = values_start; value != values_end; ++value)
     WriteValue(*value);

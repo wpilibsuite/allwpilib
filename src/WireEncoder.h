@@ -59,7 +59,7 @@ class WireEncoder {
 
   void WriteDouble(double val);
 
-  void WriteULEB128(unsigned long val);
+  void WriteUleb128(unsigned long val);
   void WriteType(NT_Type type);
   void WriteValue(const NT_Value& value);
   void WriteString(const NT_String& str);

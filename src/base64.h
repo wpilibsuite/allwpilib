@@ -12,10 +12,10 @@
 
 namespace ntimpl {
 
-std::size_t base64decode_len(const char *bufcoded);
-std::size_t base64decode(char *bufplain, const char *bufcoded);
-std::size_t base64encode_len(std::size_t len);
-std::size_t base64encode(char *encoded, const unsigned char *string,
+std::size_t Base64DecodeLen(const char *bufcoded);
+std::size_t Base64Decode(char *bufplain, const char *bufcoded);
+std::size_t Base64EncodeLen(std::size_t len);
+std::size_t Base64Encode(char *encoded, const unsigned char *string,
                          std::size_t len);
 
 }  // namespace ntimpl

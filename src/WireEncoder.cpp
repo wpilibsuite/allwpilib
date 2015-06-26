@@ -50,9 +50,9 @@ void WireEncoder::ReserveSlow(std::size_t len) {
   m_end = m_start + newlen;
 }
 
-void WireEncoder::WriteULEB128(unsigned long val) {
-  Reserve(size_uleb128(val));
-  m_cur += write_uleb128(m_cur, val);
+void WireEncoder::WriteUleb128(unsigned long val) {
+  Reserve(SizeUleb128(val));
+  m_cur += ntimpl::WriteUleb128(m_cur, val);
 }
 
 void WireEncoder::WriteType(NT_Type type) {
@@ -180,7 +180,7 @@ void WireEncoder::WriteValue(const NT_Value& value) {
 
 std::size_t WireEncoder::GetStringSize(const NT_String& str) {
   if (m_proto_rev < 0x0300u) return 2 + str.len;
-  return size_uleb128(str.len) + str.len;
+  return SizeUleb128(str.len) + str.len;
 }
 
 void WireEncoder::WriteString(const NT_String& str) {
@@ -191,7 +191,7 @@ void WireEncoder::WriteString(const NT_String& str) {
     if (len > 0xffff) len = 0xffff;
     Write16(len);
   } else
-    WriteULEB128(len);
+    WriteUleb128(len);
 
   // contents
   Reserve(len);

@@ -12,7 +12,7 @@
 namespace ntimpl {
 
 /**
- * size_uleb128 - get size of unsigned LEB128 data
+ * Get size of unsigned LEB128 data
  * @val: value
  *
  * Determine the number of bytes required to encode an unsigned LEB128 datum.
@@ -20,7 +20,7 @@ namespace ntimpl {
  * on the encodings refer to section "7.6 - Variable Length Data". Return
  * the number of bytes required.
  */
-std::size_t size_uleb128(unsigned long val) {
+std::size_t SizeUleb128(unsigned long val) {
   std::size_t count = 0;
   do {
     val >>= 7;
@@ -30,7 +30,7 @@ std::size_t size_uleb128(unsigned long val) {
 }
 
 /**
- * write_uleb128 - write unsigned LEB128 data
+ * Write unsigned LEB128 data
  * @addr: the address where the ULEB128 data is to be stored
  * @val: value to be stored
  *
@@ -39,7 +39,7 @@ std::size_t size_uleb128(unsigned long val) {
  * encodings refer to section "7.6 - Variable Length Data". Return
  * the number of bytes written.
  */
-std::size_t write_uleb128(char* addr, unsigned long val) {
+std::size_t WriteUleb128(char* addr, unsigned long val) {
   std::size_t count = 0;
 
   do {
@@ -58,7 +58,7 @@ std::size_t write_uleb128(char* addr, unsigned long val) {
 }
 
 /**
- * read_uleb128 - read unsigned LEB128 data
+ * Read unsigned LEB128 data
  * @addr: the address where the ULEB128 data is stored
  * @ret: address to store the result
  *
@@ -67,7 +67,7 @@ std::size_t write_uleb128(char* addr, unsigned long val) {
  * encodings refer to section "7.6 - Variable Length Data". Return
  * the number of bytes read.
  */
-std::size_t read_uleb128(char* addr, unsigned long* ret) {
+std::size_t ReadUleb128(char* addr, unsigned long* ret) {
   unsigned long result = 0;
   int shift = 0;
   std::size_t count = 0;
@@ -89,7 +89,7 @@ std::size_t read_uleb128(char* addr, unsigned long* ret) {
 }
 
 /**
- * read_uleb128 - read unsigned LEB128 data from a stream
+ * Read unsigned LEB128 data from a stream
  * @is: the input stream where the ULEB128 data is to be read from
  * @ret: address to store the result
  *
@@ -98,7 +98,7 @@ std::size_t read_uleb128(char* addr, unsigned long* ret) {
  * encodings refer to section "7.6 - Variable Length Data". Return
  * false on stream error, true on success.
  */
-bool read_uleb128(raw_istream& is, unsigned long* ret) {
+bool ReadUleb128(raw_istream& is, unsigned long* ret) {
   unsigned long result = 0;
   int shift = 0;
 
