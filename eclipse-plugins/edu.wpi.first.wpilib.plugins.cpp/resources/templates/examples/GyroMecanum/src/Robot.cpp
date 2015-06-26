@@ -8,7 +8,6 @@
  * don't. Unless you know what you are doing, complex code will be much more difficult under
  * this system. Use IterativeRobot or Command-Based instead if you're new.
  */
- */
 class Robot: public SampleRobot {
 	Joystick *joystick;
 	RobotDrive *myRobot;

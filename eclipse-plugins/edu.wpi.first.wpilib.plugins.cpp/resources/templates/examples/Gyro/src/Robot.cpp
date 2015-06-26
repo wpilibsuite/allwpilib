@@ -20,7 +20,7 @@ class Robot: public SampleRobot {
 	 const int rightRearMotorChannel = 2;
 
 	 double angleSetpoint = 0.0;
-	 const double pGain = .005; //propotional turning constant
+	 const double pGain = .006; //propotional turning constant
 
 	 //gyro calibration constant, may need to be adjusted
 	 //gyro value of 360 is set to correspond to one full revolution

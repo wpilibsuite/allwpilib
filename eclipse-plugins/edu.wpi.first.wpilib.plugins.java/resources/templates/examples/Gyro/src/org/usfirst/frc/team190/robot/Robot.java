@@ -28,7 +28,7 @@ public class Robot extends SampleRobot {
     final int rightRearMotorChannel = 2;
     
     double angleSetpoint = 0.0;
-    final double pGain = .005; //propotional turning constant
+    final double pGain = .006; //propotional turning constant
     
     //gyro calibration constant, may need to be adjusted; 
     //gyro value of 360 is set to correspond to one full revolution
