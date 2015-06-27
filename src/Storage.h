@@ -8,6 +8,9 @@
 #ifndef NT_STORAGE_H_
 #define NT_STORAGE_H_
 
+#include <iosfwd>
+#include <cstddef>
+
 #include "ntcore.h"
 
 #include "llvm/StringMap.h"
@@ -44,6 +47,10 @@ class Storage {
 
   EntriesMap& entries() { return m_entries; }
   const EntriesMap& entries() const { return m_entries; }
+
+  void SavePersistent(std::ostream& os) const;
+  void LoadPersistent(std::istream& is,
+                      void (*warn)(std::size_t line, const char* msg));
 
  private:
   Storage();
