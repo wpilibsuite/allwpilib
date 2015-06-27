@@ -105,7 +105,7 @@ const char* NT_SavePersistent(const char* filename) {
         fprintf(f, "%g", v.data.v_double);
         break;
       case NT_STRING:
-        WriteString(f, make_StringRef(v.data.v_string));
+        WriteString(f, MakeStringRef(v.data.v_string));
         break;
       case NT_RAW: {
         char* buf = new char[Base64EncodeLen(v.data.v_raw.len)];
@@ -130,7 +130,7 @@ const char* NT_SavePersistent(const char* filename) {
         break;
       case NT_STRING_ARRAY:
         for (size_t i = 0; i < v.data.arr_double.size; ++i) {
-          WriteString(f, make_StringRef(v.data.arr_string.arr[i]));
+          WriteString(f, MakeStringRef(v.data.arr_string.arr[i]));
           if (i != (v.data.arr_double.size - 1)) fputc(',', f);
         }
         break;

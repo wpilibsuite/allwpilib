@@ -14,7 +14,7 @@
 
 namespace ntimpl {
 
-inline llvm::StringRef make_StringRef(const NT_String& str) {
+inline llvm::StringRef MakeStringRef(const NT_String& str) {
   return llvm::StringRef(str.str, str.len);
 }
 
