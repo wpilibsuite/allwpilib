@@ -19,20 +19,20 @@ extern "C" {
 
 /** NetworkTables data types. */
 enum NT_Type {
-    NT_UNASSIGNED       = 0,
-    NT_BOOLEAN          = 0x01,
-    NT_DOUBLE           = 0x02,
-    NT_STRING           = 0x04,
-    NT_RAW              = 0x08,
-    NT_BOOLEAN_ARRAY    = 0x10,
-    NT_DOUBLE_ARRAY     = 0x20,
-    NT_STRING_ARRAY     = 0x40,
-    NT_RPC              = 0x80
+  NT_UNASSIGNED = 0,
+  NT_BOOLEAN = 0x01,
+  NT_DOUBLE = 0x02,
+  NT_STRING = 0x04,
+  NT_RAW = 0x08,
+  NT_BOOLEAN_ARRAY = 0x10,
+  NT_DOUBLE_ARRAY = 0x20,
+  NT_STRING_ARRAY = 0x40,
+  NT_RPC = 0x80
 };
 
 /** NetworkTables entry flags. */
 enum NT_EntryFlags {
-    NT_PERSISTENT       = 0x01
+  NT_PERSISTENT = 0x01
 };
 
 /*
@@ -41,87 +41,87 @@ enum NT_EntryFlags {
 
 /** A NetworkTables string. */
 struct NT_String {
-    /** String contents (UTF-8).
-     * The string is NOT required to be zero-terminated.
-     * When returned by the library, this is zero-terminated and allocated with
-     * malloc().
-     */
-    char *str;
+  /** String contents (UTF-8).
+   * The string is NOT required to be zero-terminated.
+   * When returned by the library, this is zero-terminated and allocated with
+   * malloc().
+   */
+  char *str;
 
-    /** Length of the string in bytes.  If the string happens to be zero
-     * terminated, this does not include the zero-termination.
-     */
-    size_t len;
+  /** Length of the string in bytes.  If the string happens to be zero
+   * terminated, this does not include the zero-termination.
+   */
+  size_t len;
 };
 
 /** NetworkTables Entry Value.  Note this is a typed union. */
 struct NT_Value {
-    enum NT_Type type;
-    unsigned long long last_change;
-    union {
-        int v_boolean;
-        double v_double;
-        struct NT_String v_string;
-        struct NT_String v_raw;
-        struct {
-            int *arr;
-            size_t size;
-        } arr_boolean;
-        struct {
-            double *arr;
-            size_t size;
-        } arr_double;
-        struct {
-            struct NT_String *arr;
-            size_t size;
-        } arr_string;
-    } data;
+  enum NT_Type type;
+  unsigned long long last_change;
+  union {
+    int v_boolean;
+    double v_double;
+    struct NT_String v_string;
+    struct NT_String v_raw;
+    struct {
+      int *arr;
+      size_t size;
+    } arr_boolean;
+    struct {
+      double *arr;
+      size_t size;
+    } arr_double;
+    struct {
+      struct NT_String *arr;
+      size_t size;
+    } arr_string;
+  } data;
 };
 
 /** NetworkTables Entry Information */
 struct NT_EntryInfo {
-    /** Entry name */
-    struct NT_String name;
+  /** Entry name */
+  struct NT_String name;
 
-    /** Entry type */
-    enum NT_Type type;
+  /** Entry type */
+  enum NT_Type type;
 
-    /** Entry flags */
-    unsigned int flags;
+  /** Entry flags */
+  unsigned int flags;
 
-    /** Timestamp of last change to entry (type or value). */
-    unsigned long long last_change;
+  /** Timestamp of last change to entry (type or value). */
+  unsigned long long last_change;
 };
 
 /** NetworkTables Connection Information */
 struct NT_ConnectionInfo {
-    struct NT_String remote_id;
-    const char *remote_name;
-    unsigned int remote_port;
-    unsigned long long last_update;
-    unsigned int protocol_version;
+  struct NT_String remote_id;
+  const char *remote_name;
+  unsigned int remote_port;
+  unsigned long long last_update;
+  unsigned int protocol_version;
 };
 
 /** NetworkTables RPC Parameter Definition */
 struct NT_RpcParamDef {
-    struct NT_String name;
-    struct NT_Value def_value;
+  struct NT_String name;
+  struct NT_Value def_value;
 };
 
 /** NetworkTables RPC Result Definition */
 struct NT_RpcResultDef {
-    struct NT_String name;
-    enum NT_Type type;
+  struct NT_String name;
+  enum NT_Type type;
 };
 
 /** NetworkTables RPC Definition */
 struct NT_RpcDefinition {
-    unsigned int version;
-    struct NT_String name;
-    size_t num_params;
-    NT_RpcParamDef *params;
-    size_t num_results;
-    NT_RpcResultDef *results;
+  unsigned int version;
+  struct NT_String name;
+  size_t num_params;
+  NT_RpcParamDef *params;
+  size_t num_results;
+  NT_RpcResultDef *results;
 };
 
 /*
@@ -141,7 +141,7 @@ struct NT_RpcDefinition {
  * purpose).
  */
 void NT_GetEntryValue(const char *name, size_t name_len,
-        struct NT_Value *value);
+                      struct NT_Value *value);
 
 /** Set Entry Value.
  * Sets new entry value.  If type of new value differs from the type of the
@@ -153,7 +153,7 @@ void NT_GetEntryValue(const char *name, size_t name_len,
  * @return 0 on error (type mismatch), 1 on success
  */
 int NT_SetEntryValue(const char *name, size_t name_len,
-        const struct NT_Value *value);
+                     const struct NT_Value *value);
 
 /** Set Entry Type and Value.
  * Sets new entry value.  If type of new value differs from the type of the
@@ -168,7 +168,7 @@ int NT_SetEntryValue(const char *name, size_t name_len,
  * @param value     new entry value
  */
 void NT_SetEntryTypeValue(const char *name, size_t name_len,
-        const struct NT_Value *value);
+                          const struct NT_Value *value);
 
 /** Set Entry Flags.
  */
@@ -218,7 +218,7 @@ void NT_DeleteAllEntries(void);
  * @return Array of entry information.
  */
 struct NT_EntryInfo *NT_GetEntryInfo(const char *prefix, size_t prefix_len,
-        unsigned int types, size_t *count);
+                                     unsigned int types, size_t *count);
 
 /** Flush Entries.
  * Forces an immediate flush of all local entry changes to network.
@@ -235,33 +235,36 @@ void NT_Flush(void);
  * Callback Creation Functions
  */
 
-typedef void (*NT_EntryListenerCallback) (unsigned int uid, void *data,
-        const char *name, size_t name_len, struct NT_Value *value);
+typedef void (*NT_EntryListenerCallback)(
+    unsigned int uid, void *data, const char *name, size_t name_len,
+    struct NT_Value *value);
 
-typedef void (*NT_ConnectionListenerCallback) (unsigned int uid, void *data,
-        int connected, const struct NT_ConnectionInfo *conn);
+typedef void (*NT_ConnectionListenerCallback)(
+    unsigned int uid, void *data, int connected,
+    const struct NT_ConnectionInfo *conn);
 
 unsigned int NT_AddEntryListener(const char *prefix, size_t prefix_len,
-        void *data, NT_EntryListenerCallback callback);
+                                 void *data, NT_EntryListenerCallback callback);
 void NT_RemoveEntryListener(unsigned int entry_listener_uid);
 unsigned int NT_AddConnectionListener(void *data,
-        NT_ConnectionListenerCallback callback);
+                                      NT_ConnectionListenerCallback callback);
 void NT_RemoveConnectionListener(unsigned int conn_listener_uid);
 
 /*
  * Remote Procedure Call Functions
  */
 
-typedef NT_Value * (*NT_RpcCallback) (unsigned int uid, void *data,
-        const char *name, size_t name_len,
-        NT_Value *params, size_t params_len,
-        size_t *results_len);
+typedef NT_Value *(*NT_RpcCallback)(unsigned int uid, void *data,
+                                    const char *name, size_t name_len,
+                                    NT_Value *params, size_t params_len,
+                                    size_t *results_len);
 
 unsigned int NT_CreateRpc(const char *name, size_t name_len,
-        const NT_RpcDefinition *def, void *data, NT_RpcCallback callback);
+                          const NT_RpcDefinition *def, void *data,
+                          NT_RpcCallback callback);
 void NT_DeleteRpc(unsigned int rpc_uid);
 unsigned int NT_CallRpc(const char *name, size_t name_len,
-        const NT_Value *params, size_t params_len);
+                        const NT_Value *params, size_t params_len);
 NT_Value *NT_GetRpcResult(unsigned int result_uid, size_t *results_len);
 
 /*
@@ -269,7 +272,7 @@ NT_Value *NT_GetRpcResult(unsigned int result_uid, size_t *results_len);
  */
 void NT_SetNetworkIdentity(const char *name, size_t name_len);
 void NT_StartServer(const char *persist_filename, const char *listen_address,
-        unsigned int port);
+                    unsigned int port);
 void NT_StopServer(void);
 void NT_StartClient(const char *server_name, unsigned int port);
 void NT_StopClient(void);
@@ -281,7 +284,8 @@ struct NT_ConnectionInfo *NT_GetConnections(size_t *count);
  */
 /* return error string, or NULL if successful */
 const char *NT_SavePersistent(const char *filename);
-const char *NT_LoadPersistent(const char *filename);
+const char *NT_LoadPersistent(const char *filename,
+                              void (*warn)(size_t line, const char *msg));
 
 /*
  * Utility Functions
