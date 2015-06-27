@@ -41,13 +41,17 @@ class Storage {
   }
 
   typedef llvm::StringMap<StorageEntry> EntriesMap;
-  EntriesMap entries;
+
+  EntriesMap& entries() { return m_entries; }
+  const EntriesMap& entries() const { return m_entries; }
 
  private:
   Storage();
   ~Storage();
   Storage(const Storage&) = delete;
   Storage& operator=(const Storage&) = delete;
+
+  EntriesMap m_entries;
 
   static Storage* m_instance;
 };

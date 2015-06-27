@@ -55,9 +55,8 @@ const char* NT_SavePersistent(const char* filename) {
   os << "[NetworkTables Storage 3.0]\n";
 
   const Storage& storage = Storage::GetInstance();
-  for (auto i = storage.entries.begin(), end = storage.entries.end();
-       i != end; ++i) {
-    const StorageEntry& entry = i->getValue();
+  for (auto& i : storage.entries()) {
+    const StorageEntry& entry = i.getValue();
     // only write persistent-flagged values
     if ((entry.flags & NT_PERSISTENT) == 0) continue;
 
@@ -90,7 +89,7 @@ const char* NT_SavePersistent(const char* filename) {
     }
 
     // name
-    WriteString(os, i->getKey());
+    WriteString(os, i.getKey());
 
     // =
     os << '=';
