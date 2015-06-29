@@ -77,4 +77,15 @@ else
 	eval ${SCP_GET_JAVA_TEST_RESULT}
 fi
 
+# Make sure that we got test results back.
+if [ ! -e ${DEFAULT_LOCAL_CPP_TEST_RESULT} ]; then
+  echo "There are no results from the C++ tests; they must have failed."
+  exit 100
+fi
+
+if [ ! -e ${DEFAULT_LOCAL_JAVA_TEST_RESULT} ]; then
+  echo "There are no results from the Java tests; they must have failed."
+  exit 101
+fi
+
 # The mutex is released when this program exits
