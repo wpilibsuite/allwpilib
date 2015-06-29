@@ -12,9 +12,9 @@
 
 #include "ntcore.h"
 
-bool operator==(const NT_Value& lhs, const NT_Value& rhs) {
-  if (lhs.type != rhs.type) return false;
-  switch (lhs.type) {
+bool ntimpl::operator==(const Value& lhs, const Value& rhs) {
+  if (lhs.type() != rhs.type()) return false;
+  switch (lhs.type()) {
     case NT_UNASSIGNED:
       return true;  // XXX: is this better being false instead?
     case NT_BOOLEAN:

@@ -108,7 +108,7 @@ const char *NT_LoadPersistent(const char *filename,
   Storage& storage = Storage::GetInstance();
   std::ifstream is(filename);
   if (!is) return "could not open file";
-  storage.LoadPersistent(is, warn);
+  if (!storage.LoadPersistent(is, warn)) return "error reading file";
   return nullptr;
 }
 

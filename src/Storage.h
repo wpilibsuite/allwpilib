@@ -13,27 +13,28 @@
 
 #include "ntcore.h"
 
+#include "Value.h"
 #include "llvm/StringMap.h"
 
 namespace ntimpl {
 
-inline llvm::StringRef MakeStringRef(const NT_String& str) {
-  return llvm::StringRef(str.str, str.len);
-}
-
 class StorageEntry {
  public:
-  StorageEntry() {
-    NT_InitValue(&value);
-    flags = 0;
-  }
-  ~StorageEntry() { NT_DisposeValue(&value); }
+  StorageEntry() { m_flags = 0; }
 
-  NT_Value value;
-  unsigned int flags;
+  Value& value() { return m_value; }
+  const Value& value() const { return m_value; }
+
+  unsigned int flags() const { return m_flags; }
+  void set_flags(unsigned int flags) { m_flags = flags; }
+  bool IsPersistent() const { return (m_flags & NT_PERSISTENT) != 0; }
 
   StorageEntry(const StorageEntry&) = delete;
   StorageEntry& operator=(const StorageEntry&) = delete;
+
+private:
+  Value m_value;
+  unsigned int m_flags;
 };
 
 class Storage {
@@ -49,7 +50,7 @@ class Storage {
   const EntriesMap& entries() const { return m_entries; }
 
   void SavePersistent(std::ostream& os) const;
-  void LoadPersistent(std::istream& is,
+  bool LoadPersistent(std::istream& is,
                       void (*warn)(std::size_t line, const char* msg));
 
  private:
