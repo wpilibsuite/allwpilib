@@ -140,7 +140,7 @@ void Storage::SavePersistent(std::ostream& os) const {
       }
       case NT_STRING_ARRAY: {
         bool first = true;
-        for (auto elem : v.GetStringArray()) {
+        for (auto& elem : v.GetStringArray()) {
           if (!first) {
             os << ',';
             first = false;

@@ -20,6 +20,9 @@ namespace ntimpl {
 class Storage;
 class Value;
 
+/*
+ * C++ wrapper class around NT_String.
+ */
 class StringValue : private NT_String {
   friend class Value;
  public:
@@ -27,8 +30,14 @@ class StringValue : private NT_String {
   ~StringValue() { NT_DisposeString(this); }
 
   operator llvm::StringRef() const { return llvm::StringRef(str, len); }
+
+  StringValue(const StringValue&) = delete;
+  StringValue& operator=(const StringValue&) = delete;
 };
 
+/*
+ * C++ wrapper class around NT_Value.
+ */
 class Value : private NT_Value {
   friend class Storage;
  public:
