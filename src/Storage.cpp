@@ -54,6 +54,8 @@ static void WriteString(std::ostream& os, llvm::StringRef str) {
 }
 
 void Storage::SavePersistent(std::ostream& os) const {
+  std::string base64_encoded;
+
   // header
   os << "[NetworkTables Storage 3.0]\n";
 
@@ -107,15 +109,10 @@ void Storage::SavePersistent(std::ostream& os) const {
       case NT_STRING:
         WriteString(os, v.GetString());
         break;
-      case NT_RAW: {
-        char* buf = new char[Base64EncodeLen(v.data.v_raw.len)];
-        Base64Encode(buf,
-                     reinterpret_cast<const unsigned char*>(v.data.v_raw.str),
-                     v.data.v_raw.len);
-        os << buf;
-        delete[] buf;
+      case NT_RAW:
+        Base64Encode(v.GetRaw(), &base64_encoded);
+        os << base64_encoded;
         break;
-      }
       case NT_BOOLEAN_ARRAY: {
         bool first = true;
         for (auto elem : v.GetBooleanArray()) {

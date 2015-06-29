@@ -9,14 +9,14 @@
 #define NT_BASE64_H_
 
 #include <cstddef>
+#include <string>
+
+#include "llvm/StringRef.h"
 
 namespace ntimpl {
 
-std::size_t Base64DecodeLen(const char *bufcoded);
-std::size_t Base64Decode(char *bufplain, const char *bufcoded);
-std::size_t Base64EncodeLen(std::size_t len);
-std::size_t Base64Encode(char *encoded, const unsigned char *string,
-                         std::size_t len);
+std::size_t Base64Decode(llvm::StringRef encoded, std::string* plain);
+void Base64Encode(llvm::StringRef plain, std::string* encoded);
 
 }  // namespace ntimpl
 
