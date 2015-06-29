@@ -11,7 +11,7 @@
 #include <tuple>
 
 #include "llvm/StringExtras.h"
-#include "base64.h"
+#include "Base64.h"
 
 using namespace ntimpl;
 
