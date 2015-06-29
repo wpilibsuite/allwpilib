@@ -10,14 +10,13 @@
 #include "HAL/PDP.hpp"
 #include "LiveWindow/LiveWindow.h"
 
-PowerDistributionPanel::PowerDistributionPanel() { PowerDistributionPanel(0); }
+PowerDistributionPanel::PowerDistributionPanel() : PowerDistributionPanel(0) {}
 
 /**
  * Initialize the PDP.
  */
-PowerDistributionPanel::PowerDistributionPanel(uint8_t module) {
-  m_table = NULL;
-  m_module = module;
+PowerDistributionPanel::PowerDistributionPanel(uint8_t module)
+    : m_table(nullptr), m_module(module) {
   initializePDP(m_module);
 }
 
