@@ -10,35 +10,13 @@
 #include "LiveWindow/LiveWindow.h"
 
 /**
- * Common function to implement constructor behavior.
- */
-void DoubleSolenoid::InitSolenoid(int slot, int forwardChannel, int reverseChannel)
-{
-    m_reversed = false;
-    if (reverseChannel < forwardChannel) { // Swap ports to get the right address
-        int channel = reverseChannel;
-        reverseChannel = forwardChannel;
-        forwardChannel = channel;
-        m_reversed = true;
-    }
-    char buffer[50];
-    int n = sprintf(buffer, "pneumatic/%d/%d/%d/%d", slot, forwardChannel,
-                    slot, reverseChannel);
-    m_impl = new SimContinuousOutput(buffer);  
-  
-	LiveWindow::GetInstance()->AddActuator("DoubleSolenoid", slot, forwardChannel, this);
-}
-
-/**
  * Constructor.
  *
  * @param forwardChannel The forward channel on the module to control.
  * @param reverseChannel The reverse channel on the module to control.
  */
 DoubleSolenoid::DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel)
-{
-    InitSolenoid(1, forwardChannel, reverseChannel);
-}
+  : DoubleSolenoid(1, forwardChannel, reverseChannel) {}
 
 /**
  * Constructor.
@@ -49,7 +27,20 @@ DoubleSolenoid::DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel)
  */
 DoubleSolenoid::DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel, uint32_t reverseChannel)
 {
-    InitSolenoid(moduleNumber, forwardChannel, reverseChannel);
+    m_reversed = false;
+    if (reverseChannel < forwardChannel) { // Swap ports to get the right address
+        int channel = reverseChannel;
+        reverseChannel = forwardChannel;
+        forwardChannel = channel;
+        m_reversed = true;
+    }
+    char buffer[50];
+    int n = sprintf(buffer, "pneumatic/%d/%d/%d/%d", moduleNumber,
+                    forwardChannel, moduleNumber, reverseChannel);
+    m_impl = new SimContinuousOutput(buffer);  
+  
+	LiveWindow::GetInstance()->AddActuator("DoubleSolenoid", moduleNumber,
+                                           forwardChannel, this);
 }
 
 /**

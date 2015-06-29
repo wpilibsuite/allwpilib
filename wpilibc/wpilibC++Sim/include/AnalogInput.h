@@ -45,7 +45,6 @@ public:
 	ITable * GetTable() const override;
 
 private:
-	void InitAnalogInput(uint32_t channel);
 	uint32_t m_channel;
 	SimFloatInput* m_impl;
 	int64_t m_accumulatorOffset;

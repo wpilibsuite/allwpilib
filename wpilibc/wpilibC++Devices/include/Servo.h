@@ -40,7 +40,6 @@ class Servo : public SafePWM {
   ITable* m_table = nullptr;
 
  private:
-  void InitServo();
   float GetServoAngleRange() const { return kMaxServoAngle - kMinServoAngle; }
 
   static constexpr float kMaxServoAngle = 180.0;

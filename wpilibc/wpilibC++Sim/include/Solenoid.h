@@ -33,7 +33,6 @@ public:
 	ITable * GetTable() const override;
 
 private:
-	void InitSolenoid(int slot, int channel);
     SimContinuousOutput* m_impl;
     bool m_on; 
 

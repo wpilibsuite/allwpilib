@@ -96,7 +96,6 @@ protected:
 	ITable *m_table = nullptr;
 
 private:
-	void InitPWM(uint32_t channel);
 	uint32_t m_channel;
 	SimContinuousOutput* impl;
 };

@@ -75,7 +75,6 @@ class AnalogInput : public SensorBase,
   ITable *GetTable() const override;
 
  private:
-  void InitAnalogInput(uint32_t channel);
   uint32_t m_channel;
   void *m_port;
   int64_t m_accumulatorOffset;

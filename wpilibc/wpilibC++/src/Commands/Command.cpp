@@ -19,36 +19,24 @@ static const char *kIsParented = "isParented";
 
 int Command::m_commandCounter = 0;
 
-void Command::InitCommand(const char *name, double timeout) {
-  m_timeout = timeout;
-  m_name = name == nullptr ? std::string() : name;
-}
-
 /**
  * Creates a new command.
  * The name of this command will be default.
  */
-Command::Command() { InitCommand(nullptr, -1.0); }
+Command::Command() : Command(nullptr, -1.0) {}
 
 /**
  * Creates a new command with the given name and no timeout.
  * @param name the name for this command
  */
-Command::Command(const char *name) {
-  if (name == nullptr) wpi_setWPIErrorWithContext(NullParameter, "name");
-  InitCommand(name, -1.0);
-}
+Command::Command(const char *name) : Command(name, -1.0) {}
 
 /**
  * Creates a new command with the given timeout and a default name.
  * @param timeout the time (in seconds) before this command "times out"
  * @see Command#isTimedOut() isTimedOut()
  */
-Command::Command(double timeout) {
-  if (timeout < 0.0)
-    wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
-  InitCommand(nullptr, timeout);
-}
+Command::Command(double timeout) : Command(nullptr, timeout) {}
 
 /**
  * Creates a new command with the given name and timeout.
@@ -60,7 +48,9 @@ Command::Command(const char *name, double timeout) {
   if (name == nullptr) wpi_setWPIErrorWithContext(NullParameter, "name");
   if (timeout < 0.0)
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
-  InitCommand(name, timeout);
+
+  m_timeout = timeout;
+  m_name = name == nullptr ? std::string() : name;
 }
 
 Command::~Command() {  // TODO deal with cleaning up all listeners

@@ -30,6 +30,5 @@ class Victor : public SafePWM, public SpeedController {
   virtual bool GetInverted() const override;
 
  private:
-  void InitVictor();
   bool m_isInverted = false;
 };

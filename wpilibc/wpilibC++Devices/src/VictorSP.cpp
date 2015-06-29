@@ -11,8 +11,6 @@
 #include "LiveWindow/LiveWindow.h"
 
 /**
- * Common initialization code called by all constructors.
- *
  * Note that the VictorSP uses the following bounds for PWM values. These values
  * should work reasonably well for
  * most controllers, but if users experience issues such as asymmetric behavior
@@ -28,7 +26,13 @@
  *   1.48ms = the "low end" of the deadband range
  *   0.997ms = full "reverse"
  */
-void VictorSP::InitVictorSP() {
+
+/**
+ * Constructor for a VictorSP
+ * @param channel The PWM channel that the VictorSP is attached to. 0-9 are
+ * on-board, 10-19 are on the MXP port
+ */
+VictorSP::VictorSP(uint32_t channel) : SafePWM(channel) {
   SetBounds(2.004, 1.52, 1.50, 1.48, .997);
   SetPeriodMultiplier(kPeriodMultiplier_1X);
   SetRaw(m_centerPwm);
@@ -37,13 +41,6 @@ void VictorSP::InitVictorSP() {
   HALReport(HALUsageReporting::kResourceType_VictorSP, GetChannel());
   LiveWindow::GetInstance()->AddActuator("VictorSP", GetChannel(), this);
 }
-
-/**
- * Constructor for a VictorSP
- * @param channel The PWM channel that the VictorSP is attached to. 0-9 are
- * on-board, 10-19 are on the MXP port
- */
-VictorSP::VictorSP(uint32_t channel) : SafePWM(channel) { InitVictorSP(); }
 
 /**
  * Set the PWM value.

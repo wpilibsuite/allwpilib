@@ -41,7 +41,6 @@ public:
 	ITable * GetTable() const override;
 
 private:
-    void InitSolenoid(int slot, int channel1, int channel2);
     SimContinuousOutput* m_impl;
     Value m_value;
     bool m_reversed;

@@ -27,7 +27,7 @@ class Counter : public SensorBase,
                 public CounterBase,
                 public LiveWindowSendable {
  public:
-  Counter();
+  explicit Counter(Mode mode = kTwoPulse);
   explicit Counter(int32_t channel);
   explicit Counter(DigitalSource *source);
   explicit Counter(DigitalSource &source);
@@ -87,8 +87,6 @@ class Counter : public SensorBase,
   DigitalSource *m_downSource = nullptr; ///< What makes the counter count down.
   void *m_counter = nullptr;             ///< The FPGA counter object.
  private:
-  void InitCounter(Mode mode = kTwoPulse);
-
   bool m_allocatedUpSource = false;    ///< Was the upSource allocated locally?
   bool m_allocatedDownSource = false;  ///< Was the downSource allocated locally?
   uint32_t m_index = 0;            ///< The index of this counter.

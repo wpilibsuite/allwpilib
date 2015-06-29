@@ -46,8 +46,6 @@ class DigitalOutput : public DigitalSource,
   ITable *GetTable() const;
 
  private:
-  void InitDigitalOutput(uint32_t channel);
-
   uint32_t m_channel;
   void *m_pwmGenerator;
 

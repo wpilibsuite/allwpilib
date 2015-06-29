@@ -16,13 +16,15 @@ const int32_t PWM::kDefaultPwmStepsDown;
 const int32_t PWM::kPwmDisabled;
 
 /**
- * Initialize PWMs given a channel.
+ * Allocate a PWM given a channel number.
  *
- * This method is private and is the common path for all the constructors for creating PWM
- * instances. Checks channel value range and allocates the appropriate channel.
- * The allocation is only done to help users ensure that they don't double assign channels.
+ * Checks channel value range and allocates the appropriate channel.
+ * The allocation is only done to help users ensure that they don't double
+ * assign channels.
+ * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP
+ * port
  */
-void PWM::InitPWM(uint32_t channel)
+PWM::PWM(uint32_t channel)
 {
 	char buf[64];
 
@@ -39,16 +41,6 @@ void PWM::InitPWM(uint32_t channel)
 	m_eliminateDeadband = false;
 
 	m_centerPwm = kPwmDisabled; // In simulation, the same thing.
-}
-
-/**
- * Allocate a PWM given a channel number.
- *
- * @param channel The PWM channel.
- */
-PWM::PWM(uint32_t channel)
-{
-	InitPWM(channel);
 }
 
 /**

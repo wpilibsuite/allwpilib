@@ -10,9 +10,9 @@
 #include "LiveWindow/LiveWindow.h"
 
 /**
- * Common initialization code called by all constructors.
+ * @param channel The PWM channel that the Jaguar is attached to.
  */
-void Jaguar::InitJaguar()
+Jaguar::Jaguar(uint32_t channel) : SafePWM(channel)
 {
 	/*
 	 * Input profile defined by Luminary Micro.
@@ -28,14 +28,6 @@ void Jaguar::InitJaguar()
 	SetRaw(m_centerPwm);
 
 	LiveWindow::GetInstance()->AddActuator("Jaguar", GetChannel(), this);
-}
-
-/**
- * @param channel The PWM channel that the Jaguar is attached to.
- */
-Jaguar::Jaguar(uint32_t channel) : SafePWM(channel)
-{
-	InitJaguar();
 }
 
 /**

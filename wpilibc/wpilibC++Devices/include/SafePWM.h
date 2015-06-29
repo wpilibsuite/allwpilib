@@ -36,6 +36,5 @@ class SafePWM : public PWM, public MotorSafety {
   virtual void SetSpeed(float speed);
 
  private:
-  void InitSafePWM();
   MotorSafetyHelper *m_safetyHelper;
 };

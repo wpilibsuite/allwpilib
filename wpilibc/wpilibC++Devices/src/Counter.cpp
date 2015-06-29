@@ -13,14 +13,18 @@
 #include "WPIErrors.h"
 
 /**
- * Create an instance of a counter object.
+ * Create an instance of a counter where no sources are selected.
+ * They all must be selected by calling functions to specify the upsource and
+ * the downsource
+ * independently.
+ *
  * This creates a ChipObject counter and initializes status variables
- * appropriately
+ * appropriately.
  *
  * The counter will start counting immediately.
  * @param mode The counter mode
  */
-void Counter::InitCounter(Mode mode) {
+Counter::Counter(Mode mode) {
   int32_t status = 0;
   m_counter = initializeCounter(mode, &m_index, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -28,18 +32,6 @@ void Counter::InitCounter(Mode mode) {
   SetMaxPeriod(.5);
 
   HALReport(HALUsageReporting::kResourceType_Counter, m_index, mode);
-}
-
-/**
- * Create an instance of a counter where no sources are selected.
- * They all must be selected by calling functions to specify the upsource and
- * the downsource
- * independently.
- *
- * The counter will start counting immediately.
- */
-Counter::Counter() {
-  InitCounter();
 }
 
 /**
@@ -54,8 +46,7 @@ Counter::Counter() {
  * @param source A pointer to the existing DigitalSource object. It will be set
  * as the Up Source.
  */
-Counter::Counter(DigitalSource *source) {
-  InitCounter();
+Counter::Counter(DigitalSource *source) : Counter() {
   SetUpSource(source);
   ClearDownSource();
 }
@@ -72,8 +63,7 @@ Counter::Counter(DigitalSource *source) {
  * @param source A reference to the existing DigitalSource object. It will be
  * set as the Up Source.
  */
-Counter::Counter(DigitalSource &source) {
-  InitCounter();
+Counter::Counter(DigitalSource &source) : Counter() {
   SetUpSource(&source);
   ClearDownSource();
 }
@@ -86,8 +76,7 @@ Counter::Counter(DigitalSource &source) {
  * @param channel The DIO channel to use as the up source. 0-9 are on-board,
  * 10-25 are on the MXP
  */
-Counter::Counter(int32_t channel) {
-  InitCounter();
+Counter::Counter(int32_t channel) : Counter() {
   SetUpSource(channel);
   ClearDownSource();
 }
@@ -100,8 +89,7 @@ Counter::Counter(int32_t channel) {
  * The counter will start counting immediately.
  * @param trigger The pointer to the existing AnalogTrigger object.
  */
-Counter::Counter(AnalogTrigger *trigger) {
-  InitCounter();
+Counter::Counter(AnalogTrigger *trigger) : Counter() {
   SetUpSource(trigger->CreateOutput(kState));
   ClearDownSource();
   m_allocatedUpSource = true;
@@ -115,8 +103,7 @@ Counter::Counter(AnalogTrigger *trigger) {
  * The counter will start counting immediately.
  * @param trigger The reference to the existing AnalogTrigger object.
  */
-Counter::Counter(AnalogTrigger &trigger) {
-  InitCounter();
+Counter::Counter(AnalogTrigger &trigger) : Counter() {
   SetUpSource(trigger.CreateOutput(kState));
   ClearDownSource();
   m_allocatedUpSource = true;
@@ -132,14 +119,14 @@ Counter::Counter(AnalogTrigger &trigger) {
  */
 
 Counter::Counter(EncodingType encodingType, DigitalSource *upSource,
-                 DigitalSource *downSource, bool inverted) {
+                 DigitalSource *downSource, bool inverted)
+               : Counter(kExternalDirection) {
   if (encodingType != k1X && encodingType != k2X) {
     wpi_setWPIErrorWithContext(
         ParameterOutOfRange,
         "Counter only supports 1X and 2X quadrature decoding.");
     return;
   }
-  InitCounter(kExternalDirection);
   SetUpSource(upSource);
   SetDownSource(downSource);
   int32_t status = 0;

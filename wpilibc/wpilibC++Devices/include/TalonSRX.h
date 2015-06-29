@@ -27,6 +27,5 @@ class TalonSRX : public SafePWM, public SpeedController {
   virtual bool GetInverted() const override;
 
  private:
-  void InitTalonSRX();
   bool m_isInverted = false;
 };

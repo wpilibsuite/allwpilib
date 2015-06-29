@@ -12,11 +12,12 @@
 #include "LiveWindow/LiveWindow.h"
 
 /**
- * Create an instance of a DigitalInput.
- * Creates a digital input given a channel. Common creation routine for all
- * constructors.
+ * Create an instance of a Digital Input class.
+ * Creates a digital input given a channel.
+ *
+ * @param channel The DIO channel 0-9 are on-board, 10-25 are on the MXP port
  */
-void DigitalInput::InitDigitalInput(uint32_t channel) {
+DigitalInput::DigitalInput(uint32_t channel) {
   char buf[64];
 
   if (!CheckDigitalChannel(channel)) {
@@ -33,14 +34,6 @@ void DigitalInput::InitDigitalInput(uint32_t channel) {
   LiveWindow::GetInstance()->AddSensor("DigitalInput", channel, this);
   HALReport(HALUsageReporting::kResourceType_DigitalInput, channel);
 }
-
-/**
- * Create an instance of a Digital Input class.
- * Creates a digital input given a channel.
- *
- * @param channel The DIO channel 0-9 are on-board, 10-25 are on the MXP port
- */
-DigitalInput::DigitalInput(uint32_t channel) { InitDigitalInput(channel); }
 
 /**
  * Free resources associated with the Digital Input class.

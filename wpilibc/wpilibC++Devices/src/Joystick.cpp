@@ -30,9 +30,7 @@ static bool joySticksInitialized = false;
  * (0-5).
  */
 Joystick::Joystick(uint32_t port)
-    : m_port(port) {
-  InitJoystick(kNumAxisTypes, kNumButtonTypes);
-
+    : Joystick(port, kNumAxisTypes, kNumButtonTypes) {
   m_axes[kXAxis] = kDefaultXAxis;
   m_axes[kYAxis] = kDefaultYAxis;
   m_axes[kZAxis] = kDefaultZAxis;
@@ -58,10 +56,6 @@ Joystick::Joystick(uint32_t port)
 Joystick::Joystick(uint32_t port, uint32_t numAxisTypes,
                    uint32_t numButtonTypes)
     : m_port(port) {
-  InitJoystick(numAxisTypes, numButtonTypes);
-}
-
-void Joystick::InitJoystick(uint32_t numAxisTypes, uint32_t numButtonTypes) {
   if (!joySticksInitialized) {
     for (auto& joystick : joysticks) joystick = nullptr;
     joySticksInitialized = true;

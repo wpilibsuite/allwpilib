@@ -50,8 +50,6 @@ class Relay : public SensorBase,
   ITable* m_table = nullptr;
 
  private:
-  void InitRelay();
-
   uint32_t m_channel;
   Direction m_direction;
 };

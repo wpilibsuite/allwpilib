@@ -8,19 +8,6 @@
 #include "WPIErrors.h"
 
 /**
- * Create an instance of a DigitalInput.
- * Creates a digital input given a channel. Common creation routine for all
- * constructors.
- */
-void DigitalInput::InitDigitalInput(uint32_t channel)
-{
-	char buf[64];
-	m_channel = channel;
-	int n = sprintf(buf, "dio/%d", channel);
-	m_impl = new SimDigitalInput(buf);
-}
-
-/**
  * Create an instance of a Digital Input class.
  * Creates a digital input given a channel and uses the default module.
  *
@@ -28,7 +15,10 @@ void DigitalInput::InitDigitalInput(uint32_t channel)
  */
 DigitalInput::DigitalInput(uint32_t channel)
 {
-	InitDigitalInput(channel);
+	char buf[64];
+	m_channel = channel;
+	int n = sprintf(buf, "dio/%d", channel);
+	m_impl = new SimDigitalInput(buf);
 }
 
 /*

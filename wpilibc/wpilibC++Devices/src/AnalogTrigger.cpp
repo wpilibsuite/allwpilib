@@ -13,9 +13,12 @@
 #include "WPIErrors.h"
 
 /**
- * Initialize an analog trigger from a channel.
+ * Constructor for an analog trigger given a channel number.
+ *
+ * @param channel The channel number on the roboRIO to represent. 0-3 are
+ * on-board 4-7 are on the MXP port.
  */
-void AnalogTrigger::InitTrigger(uint32_t channel) {
+AnalogTrigger::AnalogTrigger(int32_t channel) {
   void *port = getPort(channel);
   int32_t status = 0;
   uint32_t index = 0;
@@ -27,21 +30,13 @@ void AnalogTrigger::InitTrigger(uint32_t channel) {
 }
 
 /**
- * Constructor for an analog trigger given a channel number.
- *
- * @param channel The channel number on the roboRIO to represent. 0-3 are
- * on-board 4-7 are on the MXP port.
- */
-AnalogTrigger::AnalogTrigger(int32_t channel) { InitTrigger(channel); }
-
-/**
  * Construct an analog trigger given an analog input.
  * This should be used in the case of sharing an analog channel between the
  * trigger and an analog input object.
  * @param channel The pointer to the existing AnalogInput object
  */
-AnalogTrigger::AnalogTrigger(AnalogInput *input) {
-  InitTrigger(input->GetChannel());
+AnalogTrigger::AnalogTrigger(AnalogInput *input) :
+    AnalogTrigger(input->GetChannel()) {
 }
 
 AnalogTrigger::~AnalogTrigger() {

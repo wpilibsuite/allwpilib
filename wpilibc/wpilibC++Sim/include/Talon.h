@@ -22,7 +22,4 @@ public:
 	virtual void Disable();
 
 	virtual void PIDWrite(float output) override;
-
-private:
-	void InitTalon();
 };

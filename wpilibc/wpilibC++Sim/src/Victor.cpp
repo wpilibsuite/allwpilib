@@ -10,35 +10,30 @@
 #include "LiveWindow/LiveWindow.h"
 
 /**
- * Common initialization code called by all constructors.
- *
- * Note that the Victor uses the following bounds for PWM values.  These values were determined
- * empirically and optimized for the Victor 888. These values should work reasonably well for
- * Victor 884 controllers as well but if users experience issues such as asymmetric behavior around
- * the deadband or inability to saturate the controller in either direction, calibration is recommended.
- * The calibration procedure can be found in the Victor 884 User Manual available from IFI.
- *
- *   - 206 = full "forward"
- *   - 131 = the "high end" of the deadband range
- *   - 128 = center of the deadband range (off)
- *   - 125 = the "low end" of the deadband range
- *   - 56 = full "reverse"
- */
-void Victor::InitVictor() {
-	SetBounds(2.027, 1.525, 1.507, 1.49, 1.026);
-
-	SetPeriodMultiplier(kPeriodMultiplier_2X);
-	SetRaw(m_centerPwm);
-
-	LiveWindow::GetInstance()->AddActuator("Victor", GetChannel(), this);
-}
-
-/**
  * @param channel The PWM channel that the Victor is attached to.
  */
 Victor::Victor(uint32_t channel) : SafePWM(channel)
 {
-	InitVictor();
+  /* Note that the Victor uses the following bounds for PWM values. These values
+   * were determined empirically and optimized for the Victor 888. These values
+   * should work reasonably well for Victor 884 controllers as well but if users
+   * experience issues such as asymmetric behavior around the deadband or
+   * inability to saturate the controller in either direction, calibration is
+   * recommended. The calibration procedure can be found in the Victor 884 User
+   * Manual available from IFI.
+   *
+   *   - 206 = full "forward"
+   *   - 131 = the "high end" of the deadband range
+   *   - 128 = center of the deadband range (off)
+   *   - 125 = the "low end" of the deadband range
+   *   - 56 = full "reverse"
+   */
+
+  SetBounds(2.027, 1.525, 1.507, 1.49, 1.026);
+  SetPeriodMultiplier(kPeriodMultiplier_2X);
+  SetRaw(m_centerPwm);
+
+  LiveWindow::GetInstance()->AddActuator("Victor", GetChannel(), this);
 }
 
 /**

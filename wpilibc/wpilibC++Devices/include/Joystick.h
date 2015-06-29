@@ -102,7 +102,6 @@ class Joystick : public GenericHID, public ErrorBase {
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Joystick);
-  void InitJoystick(uint32_t numAxisTypes, uint32_t numButtonTypes);
 
   DriverStation *m_ds = nullptr;
   uint32_t m_port;

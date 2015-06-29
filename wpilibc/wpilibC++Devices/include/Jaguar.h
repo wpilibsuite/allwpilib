@@ -26,6 +26,5 @@ class Jaguar : public SafePWM, public SpeedController {
   virtual bool GetInverted() const override;
 
  private:
-  void InitJaguar();
   bool m_isInverted = false;
 };

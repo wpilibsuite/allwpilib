@@ -30,7 +30,6 @@ public:
 	ITable * GetTable() const override;
 
 private:
-	void InitDigitalInput(uint32_t channel);
 	uint32_t m_channel;
 	bool m_lastValue;
 	SimDigitalInput *m_impl;

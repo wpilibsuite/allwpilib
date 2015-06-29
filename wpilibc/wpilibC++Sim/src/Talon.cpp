@@ -10,33 +10,28 @@
 #include "LiveWindow/LiveWindow.h"
 
 /**
- * Common initialization code called by all constructors.
- *
- * Note that the Talon uses the following bounds for PWM values. These values should work reasonably well for
- * most controllers, but if users experience issues such as asymmetric behavior around
- * the deadband or inability to saturate the controller in either direction, calibration is recommended.
- * The calibration procedure can be found in the Talon User Manual available from CTRE.
- *
- *   - 211 = full "forward"
- *   - 133 = the "high end" of the deadband range
- *   - 129 = center of the deadband range (off)
- *   - 125 = the "low end" of the deadband range
- *   - 49 = full "reverse"
- */
-void Talon::InitTalon() {
-	SetBounds(2.037, 1.539, 1.513, 1.487, .989);
-	SetPeriodMultiplier(kPeriodMultiplier_2X);
-	SetRaw(m_centerPwm);
-
-	LiveWindow::GetInstance()->AddActuator("Talon", GetChannel(), this);
-}
-
-/**
  * @param channel The PWM channel that the Talon is attached to.
  */
 Talon::Talon(uint32_t channel) : SafePWM(channel)
 {
-	InitTalon();
+  /* Note that the Talon uses the following bounds for PWM values. These values
+   * should work reasonably well for most controllers, but if users experience
+   * issues such as asymmetric behavior around the deadband or inability to
+   * saturate the controller in either direction, calibration is recommended.
+   * The calibration procedure can be found in the Talon User Manual available
+   * from CTRE.
+   *
+   *   - 211 = full "forward"
+   *   - 133 = the "high end" of the deadband range
+   *   - 129 = center of the deadband range (off)
+   *   - 125 = the "low end" of the deadband range
+   *   - 49 = full "reverse"
+   */
+  SetBounds(2.037, 1.539, 1.513, 1.487, .989);
+  SetPeriodMultiplier(kPeriodMultiplier_2X);
+  SetRaw(m_centerPwm);
+
+  LiveWindow::GetInstance()->AddActuator("Talon", GetChannel(), this);
 }
 
 /**

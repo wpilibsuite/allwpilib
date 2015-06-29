@@ -5,6 +5,7 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
+#include "HAL/HAL.hpp"
 #include "CounterBase.h"
 #include "SensorBase.h"
 #include "LiveWindow/LiveWindowSendable.h"
@@ -22,7 +23,7 @@ class Counter : public SensorBase, public CounterBase, public LiveWindowSendable
 {
 public:
 
-	Counter();
+	explicit Counter(Mode mode = kTwoPulse);
 	explicit Counter(uint32_t channel);
 	// TODO: [Not Supported] explicit Counter(DigitalSource *source);
 	// TODO: [Not Supported] explicit Counter(DigitalSource &source);
@@ -81,7 +82,6 @@ protected:
 	// TODO: [Not Supported] DigitalSource *m_downSource;	///< What makes the counter count down.
 	void* m_counter;				///< The FPGA counter object.	
 private:
-	// TODO: [Not Supported] void InitCounter(Mode mode = kTwoPulse);
 
 	bool m_allocatedUpSource;		///< Was the upSource allocated locally?
 	bool m_allocatedDownSource;	///< Was the downSource allocated locally?

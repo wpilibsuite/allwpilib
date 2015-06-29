@@ -131,7 +131,6 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
   virtual void _Cancel();
 
  private:
-  void InitCommand(const char *name, double timeout);
   void LockChanges();
   /*synchronized*/ void Removed();
   void StartRunning();
