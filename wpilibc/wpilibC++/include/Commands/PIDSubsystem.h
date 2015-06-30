@@ -13,6 +13,8 @@
 #include "PIDSource.h"
 #include "PIDOutput.h"
 
+#include <memory>
+
 /**
  * This class is designed to handle the case where there is a {@link Subsystem}
  * which uses a single {@link PIDController} almost constantly (for instance,
@@ -34,7 +36,7 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
   PIDSubsystem(double p, double i, double d);
   PIDSubsystem(double p, double i, double d, double f);
   PIDSubsystem(double p, double i, double d, double f, double period);
-  virtual ~PIDSubsystem();
+  virtual ~PIDSubsystem() = default;
 
   void Enable();
   void Disable();
@@ -63,10 +65,10 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
 
  private:
   /** The internal {@link PIDController} */
-  PIDController *m_controller;
+  std::unique_ptr<PIDController> m_controller;
 
  public:
-  virtual void InitTable(ITable *table);
+  virtual void InitTable(::std::shared_ptr<ITable> table);
   virtual std::string GetSmartDashboardType() const;
 };
 

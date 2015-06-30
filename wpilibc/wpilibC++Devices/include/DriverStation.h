@@ -27,7 +27,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   enum Alliance { kRed, kBlue, kInvalid };
 
   virtual ~DriverStation();
-  static DriverStation *GetInstance();
+  static DriverStation &GetInstance();
   static void ReportError(std::string error);
 
   static const uint32_t kJoystickPorts = 6;

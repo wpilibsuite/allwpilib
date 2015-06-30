@@ -11,6 +11,7 @@
 #include "ErrorBase.h"
 #include "SmartDashboard/NamedSendable.h"
 #include <string>
+#include <memory>
 
 class Command;
 
@@ -38,12 +39,12 @@ class Subsystem : public ErrorBase, public NamedSendable {
 
  public:
   virtual std::string GetName();
-  virtual void InitTable(ITable *table);
-  virtual ITable *GetTable() const;
+  virtual void InitTable(::std::shared_ptr<ITable> table);
+  virtual ::std::shared_ptr<ITable> GetTable() const;
   virtual std::string GetSmartDashboardType() const;
 
  protected:
-  ITable *m_table = nullptr;
+  ::std::shared_ptr<ITable> m_table = nullptr;
 };
 
 #endif

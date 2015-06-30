@@ -62,7 +62,7 @@ class RobotBase {
   virtual void Prestart();
 
   Task *m_task = nullptr;
-  DriverStation *m_ds = nullptr;
+  DriverStation &m_ds;
 
  private:
   static RobotBase *m_instance;

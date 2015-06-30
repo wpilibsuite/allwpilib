@@ -8,6 +8,7 @@
 #include "DriverStation.h"
 #include "WPIErrors.h"
 #include <math.h>
+#include <memory>
 
 const uint32_t Joystick::kDefaultXAxis;
 const uint32_t Joystick::kDefaultYAxis;
@@ -60,8 +61,8 @@ Joystick::Joystick(uint32_t port, uint32_t numAxisTypes, uint32_t numButtonTypes
 	joysticks[m_port] = this;
 
 	m_ds = DriverStation::GetInstance();
-	m_axes = new uint32_t[numAxisTypes];
-	m_buttons = new uint32_t[numButtonTypes];
+	m_axes = std::make_unique<uint32_t[]>(numAxisTypes);
+	m_buttons = std::make_unique<uint32_t[]>(numButtonTypes);
 }
 
 Joystick * Joystick::GetStickForPort(uint32_t port)
@@ -73,12 +74,6 @@ Joystick * Joystick::GetStickForPort(uint32_t port)
 		joysticks[port] = stick;
 	}
 	return stick;
-}
-
-Joystick::~Joystick()
-{
-	delete [] m_buttons;
-	delete [] m_axes;
 }
 
 /**

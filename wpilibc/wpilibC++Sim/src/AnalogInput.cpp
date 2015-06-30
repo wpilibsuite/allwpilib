@@ -20,7 +20,7 @@ AnalogInput::AnalogInput(uint32_t channel)
 	int n = sprintf(buffer, "analog/%d", channel);
 	m_impl = new SimFloatInput(buffer);
 
-	LiveWindow::GetInstance()->AddSensor("AnalogInput", channel, this);
+	LiveWindow::GetInstance().AddSensor("AnalogInput", channel, this);
 }
 
 /**
@@ -82,11 +82,11 @@ std::string AnalogInput::GetSmartDashboardType() const {
 	return "Analog Input";
 }
 
-void AnalogInput::InitTable(ITable *subTable) {
+void AnalogInput::InitTable(::std::shared_ptr<ITable> subTable) {
 	m_table = subTable;
 	UpdateTable();
 }
 
-ITable * AnalogInput::GetTable() const {
+::std::shared_ptr<ITable> AnalogInput::GetTable() const {
 	return m_table;
 }

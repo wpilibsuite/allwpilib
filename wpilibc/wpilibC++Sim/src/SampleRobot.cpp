@@ -20,7 +20,7 @@ SampleRobot::SampleRobot()
 
 /**
  * Robot-wide initialization code should go here.
- * 
+ *
  * Programmers should override this method for default Robot-wide initialization which will
  * be called each time the robot enters the disabled state.
  */
@@ -73,11 +73,11 @@ void SampleRobot::Test()
 
 /**
  * Robot main program for free-form programs.
- * 
+ *
  * This should be overridden by user subclasses if the intent is to not use the Autonomous() and
  * OperatorControl() methods. In that case, the program is responsible for sensing when to run
  * the autonomous and operator control functions in their program.
- * 
+ *
  * This method will be called immediately after the constructor is called. If it has not been
  * overridden by a user subclass (i.e. the default version runs), then the Autonomous() and
  * OperatorControl() methods will be called.
@@ -97,17 +97,17 @@ void SampleRobot::RobotMain()
  */
 void SampleRobot::StartCompetition()
 {
-	LiveWindow *lw = LiveWindow::GetInstance();
+	LiveWindow &lw = LiveWindow::GetInstance();
 
 	SmartDashboard::init();
 	NetworkTable::GetTable("LiveWindow")->GetSubTable("~STATUS~")->PutBoolean("LW Enabled", false);
 
 	RobotMain();
-	
+
 	if (!m_robotMainOverridden)
 	{
 		// first and one-time initialization
-		lw->SetEnabled(false);
+		lw.SetEnabled(false);
 		RobotInit();
 
 		while (true)
@@ -128,12 +128,12 @@ void SampleRobot::StartCompetition()
 			}
             else if (IsTest())
             {
-            	lw->SetEnabled(true);
+            	lw.SetEnabled(true);
             	m_ds->InTest(true);
                 Test();
                 m_ds->InTest(false);
                 while (IsTest() && IsEnabled()) sleep(1); //m_ds->WaitForData();
-                lw->SetEnabled(false);
+                lw.SetEnabled(false);
             }
 			else
 			{

@@ -10,17 +10,18 @@
 
 #include "Buttons/Button.h"
 #include <string>
+#include <memory>
 
 class NetworkButton : public Button {
  public:
   NetworkButton(const char *tableName, const char *field);
-  NetworkButton(ITable *table, const char *field);
+  NetworkButton(::std::shared_ptr<ITable> table, const char *field);
   virtual ~NetworkButton() = default;
 
   virtual bool Get();
 
  private:
-  ITable *m_netTable;
+  ::std::shared_ptr<ITable> m_netTable;
   std::string m_field;
 };
 

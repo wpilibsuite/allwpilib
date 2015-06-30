@@ -10,6 +10,8 @@
 #include "PIDSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
 
+#include <memory>
+
 class AnalogInput;
 
 /**
@@ -37,9 +39,12 @@ class Gyro : public SensorBase, public PIDSource, public LiveWindowSendable {
   static constexpr float kDefaultVoltsPerDegreePerSecond = 0.007;
 
   explicit Gyro(int32_t channel);
+  [[deprecated(
+      "Raw pointers are deprecated; consider calling the Gyro constructor with "
+      "a channel number or passing a shared_ptr instead.")]]
   explicit Gyro(AnalogInput *channel);
-  explicit Gyro(AnalogInput &channel);
-  virtual ~Gyro();
+  explicit Gyro(::std::shared_ptr<AnalogInput> channel);
+  virtual ~Gyro() = default;
   virtual float GetAngle() const;
   virtual double GetRate() const;
   void SetSensitivity(float voltsPerDegreePerSecond);
@@ -55,18 +60,17 @@ class Gyro : public SensorBase, public PIDSource, public LiveWindowSendable {
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(ITable *subTable) override;
-  ITable *GetTable() const override;
+  void InitTable(::std::shared_ptr<ITable> subTable) override;
+  ::std::shared_ptr<ITable> GetTable() const override;
 
  protected:
-  AnalogInput *m_analog;
+  ::std::shared_ptr<AnalogInput> m_analog;
 
  private:
   float m_voltsPerDegreePerSecond;
   float m_offset;
-  bool m_channelAllocated;
   uint32_t m_center;
   PIDSourceParameter m_pidSource;
 
-  ITable *m_table = nullptr;
+  ::std::shared_ptr<ITable> m_table = nullptr;
 };

@@ -60,11 +60,11 @@ Counter::Counter(DigitalSource *source) : Counter() {
  * an Analog Trigger).
  *
  * The counter will start counting immediately.
- * @param source A reference to the existing DigitalSource object. It will be
+ * @param source A pointer to the existing DigitalSource object. It will be
  * set as the Up Source.
  */
-Counter::Counter(DigitalSource &source) : Counter() {
-  SetUpSource(&source);
+Counter::Counter(::std::shared_ptr<DigitalSource> source) : Counter() {
+  SetUpSource(source);
   ClearDownSource();
 }
 
@@ -92,7 +92,6 @@ Counter::Counter(int32_t channel) : Counter() {
 Counter::Counter(AnalogTrigger *trigger) : Counter() {
   SetUpSource(trigger->CreateOutput(kState));
   ClearDownSource();
-  m_allocatedUpSource = true;
 }
 
 /**
@@ -103,10 +102,9 @@ Counter::Counter(AnalogTrigger *trigger) : Counter() {
  * The counter will start counting immediately.
  * @param trigger The reference to the existing AnalogTrigger object.
  */
-Counter::Counter(AnalogTrigger &trigger) : Counter() {
+Counter::Counter(const AnalogTrigger &trigger) : Counter() {
   SetUpSource(trigger.CreateOutput(kState));
   ClearDownSource();
-  m_allocatedUpSource = true;
 }
 
 /**
@@ -117,10 +115,27 @@ Counter::Counter(AnalogTrigger &trigger) : Counter() {
  * @param downSource The pointer to the DigitalSource to set as the down source
  * @param inverted True to invert the output (reverse the direction)
  */
-
 Counter::Counter(EncodingType encodingType, DigitalSource *upSource,
                  DigitalSource *downSource, bool inverted)
-               : Counter(kExternalDirection) {
+    : Counter(encodingType,
+              ::std::shared_ptr<DigitalSource>(upSource,
+                                               NullDeleter<DigitalSource>()),
+              ::std::shared_ptr<DigitalSource>(downSource,
+                                               NullDeleter<DigitalSource>()),
+              inverted) {}
+
+/**
+ * Create an instance of a Counter object.
+ * Creates a full up-down counter given two Digital Sources
+ * @param encodingType The quadrature decoding mode (1x or 2x)
+ * @param upSource The pointer to the DigitalSource to set as the up source
+ * @param downSource The pointer to the DigitalSource to set as the down source
+ * @param inverted True to invert the output (reverse the direction)
+ */
+Counter::Counter(EncodingType encodingType,
+                 ::std::shared_ptr<DigitalSource> upSource,
+                 ::std::shared_ptr<DigitalSource> downSource, bool inverted)
+    : Counter(kExternalDirection) {
   if (encodingType != k1X && encodingType != k2X) {
     wpi_setWPIErrorWithContext(
         ParameterOutOfRange,
@@ -148,14 +163,6 @@ Counter::Counter(EncodingType encodingType, DigitalSource *upSource,
  */
 Counter::~Counter() {
   SetUpdateWhenEmpty(true);
-  if (m_allocatedUpSource) {
-    delete m_upSource;
-    m_upSource = nullptr;
-  }
-  if (m_allocatedDownSource) {
-    delete m_downSource;
-    m_downSource = nullptr;
-  }
 
   int32_t status = 0;
   freeCounter(m_counter, &status);
@@ -170,8 +177,7 @@ Counter::~Counter() {
  */
 void Counter::SetUpSource(int32_t channel) {
   if (StatusIsFatal()) return;
-  SetUpSource(new DigitalInput(channel));
-  m_allocatedUpSource = true;
+  SetUpSource(::std::make_shared<DigitalInput>(channel));
 }
 
 /**
@@ -181,9 +187,9 @@ void Counter::SetUpSource(int32_t channel) {
  */
 void Counter::SetUpSource(AnalogTrigger *analogTrigger,
                           AnalogTriggerType triggerType) {
-  if (StatusIsFatal()) return;
-  SetUpSource(analogTrigger->CreateOutput(triggerType));
-  m_allocatedUpSource = true;
+  SetUpSource(::std::shared_ptr<AnalogTrigger>(analogTrigger,
+                                               NullDeleter<AnalogTrigger>()),
+              triggerType);
 }
 
 /**
@@ -191,9 +197,10 @@ void Counter::SetUpSource(AnalogTrigger *analogTrigger,
  * @param analogTrigger The analog trigger object that is used for the Up Source
  * @param triggerType The analog trigger output that will trigger the counter.
  */
-void Counter::SetUpSource(AnalogTrigger &analogTrigger,
+void Counter::SetUpSource(::std::shared_ptr<AnalogTrigger> analogTrigger,
                           AnalogTriggerType triggerType) {
-  SetUpSource(&analogTrigger, triggerType);
+  if (StatusIsFatal()) return;
+  SetUpSource(analogTrigger->CreateOutput(triggerType));
 }
 
 /**
@@ -201,16 +208,11 @@ void Counter::SetUpSource(AnalogTrigger &analogTrigger,
  * Set the up counting DigitalSource.
  * @param source Pointer to the DigitalSource object to set as the up source
  */
-void Counter::SetUpSource(DigitalSource *source) {
+void Counter::SetUpSource(::std::shared_ptr<DigitalSource> source) {
   if (StatusIsFatal()) return;
-  if (m_allocatedUpSource) {
-    delete m_upSource;
-    m_upSource = nullptr;
-    m_allocatedUpSource = false;
-  }
   m_upSource = source;
   if (m_upSource->StatusIsFatal()) {
-    CloneError(m_upSource);
+    CloneError(*m_upSource);
   } else {
     int32_t status = 0;
     setCounterUpSource(m_counter, source->GetChannelForRouting(),
@@ -219,12 +221,20 @@ void Counter::SetUpSource(DigitalSource *source) {
   }
 }
 
+void Counter::SetUpSource(DigitalSource *source) {
+  SetUpSource(
+      ::std::shared_ptr<DigitalSource>(source, NullDeleter<DigitalSource>()));
+}
+
 /**
  * Set the source object that causes the counter to count up.
  * Set the up counting DigitalSource.
  * @param source Reference to the DigitalSource object to set as the up source
  */
-void Counter::SetUpSource(DigitalSource &source) { SetUpSource(&source); }
+void Counter::SetUpSource(DigitalSource &source) {
+  SetUpSource(
+      ::std::shared_ptr<DigitalSource>(&source, NullDeleter<DigitalSource>()));
+}
 
 /**
  * Set the edge sensitivity on an up counting source.
@@ -249,11 +259,7 @@ void Counter::SetUpSourceEdge(bool risingEdge, bool fallingEdge) {
  */
 void Counter::ClearUpSource() {
   if (StatusIsFatal()) return;
-  if (m_allocatedUpSource) {
-    delete m_upSource;
-    m_upSource = nullptr;
-    m_allocatedUpSource = false;
-  }
+  m_upSource.reset();
   int32_t status = 0;
   clearCounterUpSource(m_counter, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -266,8 +272,7 @@ void Counter::ClearUpSource() {
  */
 void Counter::SetDownSource(int32_t channel) {
   if (StatusIsFatal()) return;
-  SetDownSource(new DigitalInput(channel));
-  m_allocatedDownSource = true;
+  SetDownSource(::std::make_shared<DigitalInput>(channel));
 }
 
 /**
@@ -278,9 +283,7 @@ void Counter::SetDownSource(int32_t channel) {
  */
 void Counter::SetDownSource(AnalogTrigger *analogTrigger,
                             AnalogTriggerType triggerType) {
-  if (StatusIsFatal()) return;
-  SetDownSource(analogTrigger->CreateOutput(triggerType));
-  m_allocatedDownSource = true;
+  SetDownSource(::std::shared_ptr<AnalogTrigger>(analogTrigger, NullDeleter<AnalogTrigger>()), triggerType);
 }
 
 /**
@@ -289,9 +292,10 @@ void Counter::SetDownSource(AnalogTrigger *analogTrigger,
  * Source
  * @param triggerType The analog trigger output that will trigger the counter.
  */
-void Counter::SetDownSource(AnalogTrigger &analogTrigger,
+void Counter::SetDownSource(::std::shared_ptr<AnalogTrigger> analogTrigger,
                             AnalogTriggerType triggerType) {
-  SetDownSource(&analogTrigger, triggerType);
+  if (StatusIsFatal()) return;
+  SetDownSource(analogTrigger->CreateOutput(triggerType));
 }
 
 /**
@@ -299,16 +303,11 @@ void Counter::SetDownSource(AnalogTrigger &analogTrigger,
  * Set the down counting DigitalSource.
  * @param source Pointer to the DigitalSource object to set as the down source
  */
-void Counter::SetDownSource(DigitalSource *source) {
+void Counter::SetDownSource(::std::shared_ptr<DigitalSource> source) {
   if (StatusIsFatal()) return;
-  if (m_allocatedDownSource) {
-    delete m_downSource;
-    m_downSource = nullptr;
-    m_allocatedDownSource = false;
-  }
   m_downSource = source;
   if (m_downSource->StatusIsFatal()) {
-    CloneError(m_downSource);
+    CloneError(*m_downSource);
   } else {
     int32_t status = 0;
     setCounterDownSource(m_counter, source->GetChannelForRouting(),
@@ -317,12 +316,18 @@ void Counter::SetDownSource(DigitalSource *source) {
   }
 }
 
+void Counter::SetDownSource(DigitalSource *source) {
+  SetDownSource(::std::shared_ptr<DigitalSource>(source, NullDeleter<DigitalSource>()));
+}
+
 /**
  * Set the source object that causes the counter to count down.
  * Set the down counting DigitalSource.
  * @param source Reference to the DigitalSource object to set as the down source
  */
-void Counter::SetDownSource(DigitalSource &source) { SetDownSource(&source); }
+void Counter::SetDownSource(DigitalSource &source) {
+  SetDownSource(::std::shared_ptr<DigitalSource>(&source, NullDeleter<DigitalSource>()));
+}
 
 /**
  * Set the edge sensitivity on a down counting source.
@@ -347,11 +352,7 @@ void Counter::SetDownSourceEdge(bool risingEdge, bool fallingEdge) {
  */
 void Counter::ClearDownSource() {
   if (StatusIsFatal()) return;
-  if (m_allocatedDownSource) {
-    delete m_downSource;
-    m_downSource = nullptr;
-    m_allocatedDownSource = false;
-  }
+  m_downSource.reset();
   int32_t status = 0;
   clearCounterDownSource(m_counter, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -581,9 +582,9 @@ void Counter::StopLiveWindowMode() {}
 
 std::string Counter::GetSmartDashboardType() const { return "Counter"; }
 
-void Counter::InitTable(ITable *subTable) {
+void Counter::InitTable(::std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-ITable *Counter::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> Counter::GetTable() const { return m_table; }

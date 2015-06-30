@@ -24,10 +24,10 @@ class AnalogTrigger : public SensorBase {
   void SetLimitsRaw(int32_t lower, int32_t upper);
   void SetAveraged(bool useAveragedValue);
   void SetFiltered(bool useFilteredValue);
-  uint32_t GetIndex();
+  uint32_t GetIndex() const;
   bool GetInWindow();
   bool GetTriggerState();
-  AnalogTriggerOutput *CreateOutput(AnalogTriggerType type);
+  ::std::shared_ptr<AnalogTriggerOutput> CreateOutput(AnalogTriggerType type) const;
 
  private:
   uint8_t m_index;

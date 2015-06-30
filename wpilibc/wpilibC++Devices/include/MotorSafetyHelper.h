@@ -9,6 +9,8 @@
 #include "ErrorBase.h"
 #include "HAL/cpp/priority_mutex.h"
 
+#include <set>
+
 class MotorSafety;
 
 class MotorSafetyHelper : public ErrorBase {
@@ -31,10 +33,8 @@ class MotorSafetyHelper : public ErrorBase {
   mutable priority_recursive_mutex
       m_syncMutex;            // protect accesses to the state for this object
   MotorSafety *m_safeObject;  // the object that is using the helper
-  MotorSafetyHelper *
-      m_nextHelper;  // next object in the list of MotorSafetyHelpers
-  static MotorSafetyHelper *
-      m_headHelper;  // the head of the list of MotorSafetyHelper objects
+  // List of all existing MotorSafetyHelper objects.
+  static ::std::set<MotorSafetyHelper*> m_helperList;
   static priority_recursive_mutex
       m_listMutex;  // protect accesses to the list of helpers
 };

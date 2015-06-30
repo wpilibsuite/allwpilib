@@ -28,7 +28,7 @@ Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel)
     int n = sprintf(buffer, "pneumatic/%d/%d", moduleNumber, channel);
     m_impl = new SimContinuousOutput(buffer);
   
-	LiveWindow::GetInstance()->AddActuator("Solenoid", moduleNumber, channel,
+	LiveWindow::GetInstance().AddActuator("Solenoid", moduleNumber, channel,
                                            this);
 }
 
@@ -54,7 +54,7 @@ bool Solenoid::Get() const
 }
 
 
-void Solenoid::ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) {
+void Solenoid::ValueChanged(::std::shared_ptr<ITable> source, const std::string& key, EntryValue value, bool isNew) {
 	Set(value.b);
 }
 
@@ -82,11 +82,11 @@ std::string Solenoid::GetSmartDashboardType() const {
 	return "Solenoid";
 }
 
-void Solenoid::InitTable(ITable *subTable) {
+void Solenoid::InitTable(::std::shared_ptr<ITable> subTable) {
 	m_table = subTable;
 	UpdateTable();
 }
 
-ITable * Solenoid::GetTable() const {
+::std::shared_ptr<ITable> Solenoid::GetTable() const {
 	return m_table;
 }

@@ -217,7 +217,7 @@ void PWM::SetPeriodMultiplier(PeriodMultiplier mult)
 }
 
 
-void PWM::ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) {
+void PWM::ValueChanged(::std::shared_ptr<ITable> source, const std::string& key, EntryValue value, bool isNew) {
 	SetSpeed(value.f);
 }
 
@@ -245,11 +245,11 @@ std::string PWM::GetSmartDashboardType() const {
 	return "Speed Controller";
 }
 
-void PWM::InitTable(ITable *subTable) {
+void PWM::InitTable(::std::shared_ptr<ITable> subTable) {
 	m_table = subTable;
 	UpdateTable();
 }
 
-ITable * PWM::GetTable() const {
+::std::shared_ptr<ITable> PWM::GetTable() const {
 	return m_table;
 }

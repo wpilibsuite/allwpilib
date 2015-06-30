@@ -12,6 +12,8 @@
 #include "SensorBase.h"
 #include "LiveWindow/LiveWindowSendable.h"
 
+#include <memory>
+
 /**
  * Class for getting voltage, current, temperature, power and energy from the
  * CAN PDP.
@@ -36,11 +38,11 @@ class PowerDistributionPanel : public SensorBase, public LiveWindowSendable {
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(ITable *subTable) override;
-  ITable *GetTable() const override;
+  void InitTable(::std::shared_ptr<ITable> subTable) override;
+  ::std::shared_ptr<ITable> GetTable() const override;
 
  private:
-  ITable *m_table = nullptr;
+  ::std::shared_ptr<ITable> m_table = nullptr;
   uint8_t m_module;
 };
 

@@ -61,7 +61,7 @@ std::string AnalogPotentiometer::GetSmartDashboardType() const {
 /**
  * Live Window code, only does anything if live window is activated.
  */
-void AnalogPotentiometer::InitTable(ITable *subtable) {
+void AnalogPotentiometer::InitTable(::std::shared_ptr<ITable> subtable) {
     m_table = subtable;
     UpdateTable();
 }
@@ -72,6 +72,6 @@ void AnalogPotentiometer::UpdateTable() {
     }
 }
 
-ITable* AnalogPotentiometer::GetTable() const {
+::std::shared_ptr<ITable> AnalogPotentiometer::GetTable() const {
     return m_table;
 }

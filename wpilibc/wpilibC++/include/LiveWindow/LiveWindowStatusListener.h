@@ -6,7 +6,7 @@
 
 class LiveWindowStatusListener : public ITableListener {
  public:
-  virtual void ValueChanged(ITable* source, const std::string& key,
+  virtual void ValueChanged(::std::shared_ptr<ITable> source, const std::string& key,
                             EntryValue value, bool isNew);
 };
 

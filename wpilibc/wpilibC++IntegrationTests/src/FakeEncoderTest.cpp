@@ -20,7 +20,7 @@ class FakeEncoderTest : public testing::Test {
 
   Encoder *m_encoder;
   AnalogTrigger *m_indexAnalogTrigger;
-  AnalogTriggerOutput *m_indexAnalogTriggerOutput;
+  ::std::shared_ptr<AnalogTriggerOutput> m_indexAnalogTriggerOutput;
 
   virtual void SetUp() override {
     m_outputA = new DigitalOutput(TestBench::kLoop2OutputChannel);
@@ -43,7 +43,6 @@ class FakeEncoderTest : public testing::Test {
     delete m_indexOutput;
     delete m_encoder;
     delete m_indexAnalogTrigger;
-    delete m_indexAnalogTriggerOutput;
   }
 
   /**
@@ -95,7 +94,7 @@ TEST_F(FakeEncoderTest, TestCountUp) {
  * Test that the encoder can stay reset while the index source is high
  */
 TEST_F(FakeEncoderTest, TestResetWhileHigh) {
-  m_encoder->SetIndexSource(m_indexAnalogTriggerOutput,
+  m_encoder->SetIndexSource(*m_indexAnalogTriggerOutput,
                             Encoder::IndexingType::kResetWhileHigh);
 
   SetIndexLow();
@@ -111,7 +110,7 @@ TEST_F(FakeEncoderTest, TestResetWhileHigh) {
  * Test that the encoder can reset when the index source goes from low to high
  */
 TEST_F(FakeEncoderTest, TestResetOnRisingEdge) {
-  m_encoder->SetIndexSource(m_indexAnalogTriggerOutput,
+  m_encoder->SetIndexSource(*m_indexAnalogTriggerOutput,
                             Encoder::IndexingType::kResetOnRisingEdge);
 
   SetIndexLow();
@@ -127,7 +126,7 @@ TEST_F(FakeEncoderTest, TestResetOnRisingEdge) {
  * Test that the encoder can stay reset while the index source is low
  */
 TEST_F(FakeEncoderTest, TestResetWhileLow) {
-  m_encoder->SetIndexSource(m_indexAnalogTriggerOutput,
+  m_encoder->SetIndexSource(*m_indexAnalogTriggerOutput,
                             Encoder::IndexingType::kResetWhileLow);
 
   SetIndexHigh();
@@ -143,7 +142,7 @@ TEST_F(FakeEncoderTest, TestResetWhileLow) {
  * Test that the encoder can reset when the index source goes from high to low
  */
 TEST_F(FakeEncoderTest, TestResetOnFallingEdge) {
-  m_encoder->SetIndexSource(m_indexAnalogTriggerOutput,
+  m_encoder->SetIndexSource(*m_indexAnalogTriggerOutput,
                             Encoder::IndexingType::kResetOnFallingEdge);
 
   SetIndexHigh();

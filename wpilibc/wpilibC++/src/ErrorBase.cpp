@@ -12,6 +12,7 @@
 #include <errno.h>
 #include <cstring>
 #include <cstdio>
+#include <sstream>
 
 priority_mutex ErrorBase::_globalErrorMutex;
 Error ErrorBase::_globalError;
@@ -42,15 +43,19 @@ void ErrorBase::ClearError() const { m_error.Clear(); }
  * @param function Function of the error source
  * @param lineNumber Line number of the error source
  */
-void ErrorBase::SetErrnoError(const char* contextMessage, const char* filename,
-                              const char* function, uint32_t lineNumber) const {
-  char err[256];
+void ErrorBase::SetErrnoError(const std::string& contextMessage,
+                              const std::string& filename,
+                              const std::string& function,
+                              uint32_t lineNumber) const {
+  std::string err;
   int errNo = errno;
   if (errNo == 0) {
-    sprintf(err, "OK: %s", contextMessage);
+    err = "OK: " + contextMessage;
   } else {
-    snprintf(err, 256, "%s (0x%08X): %s", strerror(errNo), errNo,
-             contextMessage);
+    char buf[256];
+    snprintf(buf, 256, "%s (0x%08X): %s", strerror(errNo), errNo,
+             contextMessage.c_str());
+    err = buf;
   }
 
   //  Set the current error information for this object.
@@ -73,16 +78,17 @@ void ErrorBase::SetErrnoError(const char* contextMessage, const char* filename,
  * @param function Function of the error source
  * @param lineNumber Line number of the error source
  */
-void ErrorBase::SetImaqError(int success, const char* contextMessage,
-                             const char* filename, const char* function,
+void ErrorBase::SetImaqError(int success, const std::string& contextMessage,
+                             const std::string& filename,
+                             const std::string& function,
                              uint32_t lineNumber) const {
   //  If there was an error
   if (success <= 0) {
-    char err[256];
-    sprintf(err, "%i: %s", success, contextMessage);
+    std::stringstream err;
+    err << success << ": " << contextMessage;
 
     //  Set the current error information for this object.
-    m_error.Set(success, err, filename, function, lineNumber, this);
+    m_error.Set(success, err.str(), filename, function, lineNumber, this);
 
     // Update the global error if there is not one already set.
     std::unique_lock<priority_mutex> mutex(_globalErrorMutex);
@@ -101,8 +107,9 @@ void ErrorBase::SetImaqError(int success, const char* contextMessage,
  * @param function Function of the error source
  * @param lineNumber Line number of the error source
  */
-void ErrorBase::SetError(Error::Code code, const char* contextMessage,
-                         const char* filename, const char* function,
+void ErrorBase::SetError(Error::Code code, const std::string& contextMessage,
+                         const std::string& filename,
+                         const std::string& function,
                          uint32_t lineNumber) const {
   //  If there was an error
   if (code != 0) {
@@ -126,11 +133,12 @@ void ErrorBase::SetError(Error::Code code, const char* contextMessage,
  * @param function Function of the error source
  * @param lineNumber Line number of the error source
  */
-void ErrorBase::SetWPIError(const char* errorMessage, Error::Code code,
-                            const char* contextMessage, const char* filename,
-                            const char* function, uint32_t lineNumber) const {
-  char err[256];
-  sprintf(err, "%s: %s", errorMessage, contextMessage);
+void ErrorBase::SetWPIError(const std::string& errorMessage, Error::Code code,
+                            const std::string& contextMessage,
+                            const std::string& filename,
+                            const std::string& function,
+                            uint32_t lineNumber) const {
+  std::string err = errorMessage + ": " + contextMessage;
 
   //  Set the current error information for this object.
   m_error.Set(code, err, filename, function, lineNumber, this);
@@ -142,8 +150,8 @@ void ErrorBase::SetWPIError(const char* errorMessage, Error::Code code,
   }
 }
 
-void ErrorBase::CloneError(ErrorBase* rhs) const {
-  m_error.Clone(rhs->GetError());
+void ErrorBase::CloneError(const ErrorBase& rhs) const {
+  m_error.Clone(rhs.GetError());
 }
 
 /**
@@ -153,8 +161,10 @@ void ErrorBase::CloneError(ErrorBase* rhs) const {
 */
 bool ErrorBase::StatusIsFatal() const { return m_error.GetCode() < 0; }
 
-void ErrorBase::SetGlobalError(Error::Code code, const char* contextMessage,
-                               const char* filename, const char* function,
+void ErrorBase::SetGlobalError(Error::Code code,
+                               const std::string& contextMessage,
+                               const std::string& filename,
+                               const std::string& function,
                                uint32_t lineNumber) {
   //  If there was an error
   if (code != 0) {
@@ -166,12 +176,12 @@ void ErrorBase::SetGlobalError(Error::Code code, const char* contextMessage,
   }
 }
 
-void ErrorBase::SetGlobalWPIError(const char* errorMessage,
-                                  const char* contextMessage,
-                                  const char* filename, const char* function,
+void ErrorBase::SetGlobalWPIError(const std::string& errorMessage,
+                                  const std::string& contextMessage,
+                                  const std::string& filename,
+                                  const std::string& function,
                                   uint32_t lineNumber) {
-  char err[256];
-  sprintf(err, "%s: %s", errorMessage, contextMessage);
+  std::string err = errorMessage + ": " + contextMessage;
 
   std::unique_lock<priority_mutex> mutex(_globalErrorMutex);
   if (_globalError.GetCode() != 0) {

@@ -10,6 +10,8 @@
 #include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITableListener.h"
 
+#include <memory>
+
 /**
  * Class implements the PWM generation in the FPGA.
  *
@@ -97,16 +99,16 @@ class PWM : public SensorBase,
   int32_t m_deadbandMinPwm;
   int32_t m_minPwm;
 
-  void ValueChanged(ITable* source, const std::string& key, EntryValue value,
+  void ValueChanged(::std::shared_ptr<ITable> source, const std::string& key, EntryValue value,
                     bool isNew) override;
   void UpdateTable() override;
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(ITable* subTable) override;
-  ITable* GetTable() const override;
+  void InitTable(::std::shared_ptr<ITable> subTable) override;
+  ::std::shared_ptr<ITable> GetTable() const override;
 
-  ITable* m_table = nullptr;
+  ::std::shared_ptr<ITable> m_table = nullptr;
 
  private:
   uint32_t m_channel;

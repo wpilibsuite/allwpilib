@@ -17,6 +17,7 @@
 #include "SmartDashboard/SmartDashboard.h"
 #include <list>
 #include <map>
+#include <memory>
 #include <set>
 #include <vector>
 #include "HAL/cpp/priority_mutex.h"
@@ -26,7 +27,7 @@ class Subsystem;
 
 class Scheduler : public ErrorBase, public NamedSendable {
  public:
-  static Scheduler *GetInstance();
+  static Scheduler &GetInstance();
 
   void AddCommand(Command *command);
   void AddButton(ButtonScheduler *button);
@@ -39,8 +40,8 @@ class Scheduler : public ErrorBase, public NamedSendable {
 
   void UpdateTable();
   std::string GetSmartDashboardType() const;
-  void InitTable(ITable *subTable);
-  ITable *GetTable() const;
+  void InitTable(::std::shared_ptr<ITable> subTable);
+  ::std::shared_ptr<ITable> GetTable() const;
   std::string GetName();
   std::string GetType() const;
 
@@ -64,7 +65,7 @@ class Scheduler : public ErrorBase, public NamedSendable {
   StringArray *commands = nullptr;
   NumberArray *ids = nullptr;
   NumberArray *toCancel = nullptr;
-  ITable *m_table = nullptr;
+  ::std::shared_ptr<ITable> m_table = nullptr;
   bool m_runningCommandsChanged = false;
 };
 #endif

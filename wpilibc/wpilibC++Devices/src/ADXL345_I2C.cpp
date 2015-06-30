@@ -32,7 +32,7 @@ ADXL345_I2C::ADXL345_I2C(Port port, Range range) : I2C(port, kAddress) {
 
   HALReport(HALUsageReporting::kResourceType_ADXL345,
             HALUsageReporting::kADXL345_I2C, 0);
-  LiveWindow::GetInstance()->AddSensor("ADXL345_I2C", port, this);
+  LiveWindow::GetInstance().AddSensor("ADXL345_I2C", port, this);
 }
 
 /** {@inheritdoc} */
@@ -88,17 +88,15 @@ std::string ADXL345_I2C::GetSmartDashboardType() const {
   return "3AxisAccelerometer";
 }
 
-void ADXL345_I2C::InitTable(ITable *subtable) {
+void ADXL345_I2C::InitTable(::std::shared_ptr<ITable> subtable) {
   m_table = subtable;
   UpdateTable();
 }
 
 void ADXL345_I2C::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("X", GetX());
-    m_table->PutNumber("Y", GetY());
-    m_table->PutNumber("Z", GetZ());
-  }
+  m_table->PutNumber("X", GetX());
+  m_table->PutNumber("Y", GetY());
+  m_table->PutNumber("Z", GetZ());
 }
 
-ITable *ADXL345_I2C::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> ADXL345_I2C::GetTable() const { return m_table; }

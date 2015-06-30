@@ -11,6 +11,8 @@
 #include "HAL/HAL.hpp"
 #include "Port.h"
 
+#include <memory>
+
 /**
  * SolenoidBase class is the common base class for the Solenoid and
  * DoubleSolenoid classes.
@@ -33,5 +35,5 @@ class SolenoidBase : public SensorBase {
   static void* m_ports[m_maxModules][m_maxPorts];
   uint32_t m_moduleNumber;  ///< Slot number where the module is plugged into
                             ///the chassis.
-  static Resource* m_allocated;
+  static ::std::unique_ptr<Resource> m_allocated;
 };

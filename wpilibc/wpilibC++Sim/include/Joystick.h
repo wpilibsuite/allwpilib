@@ -7,6 +7,7 @@
 #ifndef JOYSTICK_H_
 #define JOYSTICK_H_
 
+#include <memory>
 #include "GenericHID.h"
 #include "ErrorBase.h"
 
@@ -39,7 +40,7 @@ public:
 
 	explicit Joystick(uint32_t port);
 	Joystick(uint32_t port, uint32_t numAxisTypes, uint32_t numButtonTypes);
-	virtual ~Joystick();
+	virtual ~Joystick() = default;
 
 	uint32_t GetAxisChannel(AxisType axis);
 	void SetAxisChannel(AxisType axis, uint32_t channel);
@@ -69,8 +70,8 @@ private:
 
 	DriverStation *m_ds = nullptr;
 	uint32_t m_port;
-	uint32_t *m_axes = nullptr;
-	uint32_t *m_buttons = nullptr;
+	std::unique_ptr<uint32_t[]> m_axes;
+	std::unique_ptr<uint32_t[]> m_buttons;
 };
 
 #endif

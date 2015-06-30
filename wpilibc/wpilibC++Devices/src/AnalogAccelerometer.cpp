@@ -15,9 +15,9 @@
  */
 void AnalogAccelerometer::InitAccelerometer() {
   HALReport(HALUsageReporting::kResourceType_Accelerometer,
-            m_AnalogInput->GetChannel());
-  LiveWindow::GetInstance()->AddSensor("Accelerometer",
-                                       m_AnalogInput->GetChannel(), this);
+            m_analogInput->GetChannel());
+  LiveWindow::GetInstance().AddSensor("Accelerometer",
+                                       m_analogInput->GetChannel(), this);
 }
 
 /**
@@ -27,37 +27,41 @@ void AnalogAccelerometer::InitAccelerometer() {
  * connected to
  */
 AnalogAccelerometer::AnalogAccelerometer(int32_t channel) {
-  m_AnalogInput = new AnalogInput(channel);
-  m_allocatedChannel = true;
+  m_analogInput = ::std::make_shared<AnalogInput>(channel);
   InitAccelerometer();
 }
 
 /**
  * Create a new instance of Accelerometer from an existing AnalogInput.
  * Make a new instance of accelerometer given an AnalogInput. This is
- * particularly
- * useful if the port is going to be read as an analog channel as well as
- * through
- * the Accelerometer class.
+ * particularly useful if the port is going to be read as an analog channel as
+ * well as through the Accelerometer class.
  * @param channel The existing AnalogInput object for the analog input the
  * accelerometer is connected to
  */
-AnalogAccelerometer::AnalogAccelerometer(AnalogInput *channel) {
+AnalogAccelerometer::AnalogAccelerometer(AnalogInput *channel)
+    : m_analogInput(channel, NullDeleter<AnalogInput>()) {
   if (channel == nullptr) {
     wpi_setWPIError(NullParameter);
   } else {
-    m_AnalogInput = channel;
     InitAccelerometer();
   }
-  m_allocatedChannel = false;
 }
 
 /**
- * Delete the analog components used for the accelerometer.
+ * Create a new instance of Accelerometer from an existing AnalogInput.
+ * Make a new instance of accelerometer given an AnalogInput. This is
+ * particularly useful if the port is going to be read as an analog channel as
+ * well as through the Accelerometer class.
+ * @param channel The existing AnalogInput object for the analog input the
+ * accelerometer is connected to
  */
-AnalogAccelerometer::~AnalogAccelerometer() {
-  if (m_allocatedChannel) {
-    delete m_AnalogInput;
+AnalogAccelerometer::AnalogAccelerometer(::std::shared_ptr<AnalogInput> channel)
+    : m_analogInput(channel) {
+  if (channel == nullptr) {
+    wpi_setWPIError(NullParameter);
+  } else {
+    InitAccelerometer();
   }
 }
 
@@ -69,7 +73,7 @@ AnalogAccelerometer::~AnalogAccelerometer() {
  * @return The current acceleration of the sensor in Gs.
  */
 float AnalogAccelerometer::GetAcceleration() const {
-  return (m_AnalogInput->GetAverageVoltage() - m_zeroGVoltage) / m_voltsPerG;
+  return (m_analogInput->GetAverageVoltage() - m_zeroGVoltage) / m_voltsPerG;
 }
 
 /**
@@ -117,9 +121,9 @@ std::string AnalogAccelerometer::GetSmartDashboardType() const {
   return "Accelerometer";
 }
 
-void AnalogAccelerometer::InitTable(ITable *subTable) {
+void AnalogAccelerometer::InitTable(::std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-ITable *AnalogAccelerometer::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> AnalogAccelerometer::GetTable() const { return m_table; }

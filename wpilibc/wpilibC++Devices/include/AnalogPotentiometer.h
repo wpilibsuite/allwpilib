@@ -1,7 +1,8 @@
-
 #include "AnalogInput.h"
 #include "interfaces/Potentiometer.h"
 #include "LiveWindow/LiveWindowSendable.h"
+
+#include <memory>
 
 /**
  * Class for reading analog potentiometers. Analog potentiometers read
@@ -35,13 +36,18 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
   explicit AnalogPotentiometer(int channel, double fullRange = 1.0,
                                double offset = 0.0);
 
+  [[deprecated(
+      "Raw pointers are deprecated; if you just want to construct an "
+      "AnalogPotentiometer with its own AnalogInput, then call the "
+      "AnalogPotentiometer(int channel). If you want to keep your own copy of "
+      "the AnalogInput, use std::shared_ptr.")]]
   explicit AnalogPotentiometer(AnalogInput *input, double fullRange = 1.0,
                                double offset = 0.0);
 
-  explicit AnalogPotentiometer(AnalogInput &input, double fullRange = 1.0,
-                               double offset = 0.0);
+  explicit AnalogPotentiometer(::std::shared_ptr<AnalogInput> input,
+                               double fullRange = 1.0, double offset = 0.0);
 
-  virtual ~AnalogPotentiometer();
+  virtual ~AnalogPotentiometer() = default;
 
   /**
    * Get the current reading of the potentiomer.
@@ -61,9 +67,9 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
    * Live Window code, only does anything if live window is activated.
    */
   virtual std::string GetSmartDashboardType() const override;
-  virtual void InitTable(ITable *subtable) override;
+  virtual void InitTable(::std::shared_ptr<ITable> subtable) override;
   virtual void UpdateTable() override;
-  virtual ITable *GetTable() const override;
+  virtual ::std::shared_ptr<ITable> GetTable() const override;
 
   /**
    * AnalogPotentiometers don't have to do anything special when entering the
@@ -78,13 +84,8 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
   virtual void StopLiveWindowMode() override {}
 
  private:
+  ::std::shared_ptr<AnalogInput> m_analog_input;
   double m_fullRange, m_offset;
-  AnalogInput *m_analog_input;
-  ITable *m_table;
+  ::std::shared_ptr<ITable> m_table;
   bool m_init_analog_input;
-
-  /**
-   * Common initialization code called by all constructors.
-   */
-  void initPot(AnalogInput *input, double fullRange, double offset);
 };

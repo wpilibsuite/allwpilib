@@ -10,6 +10,8 @@
 #include "PIDSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
 
+#include <memory>
+
 /**
  * Analog input class.
  *
@@ -41,13 +43,13 @@ public:
 	void StartLiveWindowMode() override;
 	void StopLiveWindowMode() override;
 	std::string GetSmartDashboardType() const override;
-	void InitTable(ITable *subTable) override;
-	ITable * GetTable() const override;
+	void InitTable(::std::shared_ptr<ITable> subTable) override;
+	::std::shared_ptr<ITable> GetTable() const override;
 
 private:
 	uint32_t m_channel;
 	SimFloatInput* m_impl;
 	int64_t m_accumulatorOffset;
 
-	ITable *m_table = nullptr;
+	::std::shared_ptr<ITable> m_table = nullptr;
 };

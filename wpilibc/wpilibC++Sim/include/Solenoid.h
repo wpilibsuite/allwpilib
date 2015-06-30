@@ -9,9 +9,11 @@
 #include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITableListener.h"
 
+#include <memory>
+
 /**
  * Solenoid class for running high voltage Digital Output (PCM).
- * 
+ *
  * The Solenoid class is typically used for pneumatics solenoids, but could be used
  * for any device within the current spec of the PCM.
  */
@@ -24,17 +26,17 @@ public:
 	virtual void Set(bool on);
 	virtual bool Get() const;
 
-	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) override;
+	void ValueChanged(::std::shared_ptr<ITable> source, const std::string& key, EntryValue value, bool isNew) override;
 	void UpdateTable() override;
 	void StartLiveWindowMode() override;
 	void StopLiveWindowMode() override;
 	std::string GetSmartDashboardType() const override;
-	void InitTable(ITable *subTable) override;
-	ITable * GetTable() const override;
+	void InitTable(::std::shared_ptr<ITable> subTable) override;
+	::std::shared_ptr<ITable> GetTable() const override;
 
 private:
     SimContinuousOutput* m_impl;
-    bool m_on; 
+    bool m_on;
 
-	ITable *m_table;
+	::std::shared_ptr<ITable> m_table;
 };

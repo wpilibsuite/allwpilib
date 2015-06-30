@@ -19,7 +19,7 @@
 
 Error::Error() {}
 
-void Error::Clone(Error& error) {
+void Error::Clone(const Error& error) {
   m_code = error.m_code;
   m_message = error.m_message;
   m_filename = error.m_filename;
@@ -31,11 +31,11 @@ void Error::Clone(Error& error) {
 
 Error::Code Error::GetCode() const { return m_code; }
 
-const char* Error::GetMessage() const { return m_message.c_str(); }
+std::string Error::GetMessage() const { return m_message; }
 
-const char* Error::GetFilename() const { return m_filename.c_str(); }
+std::string Error::GetFilename() const { return m_filename; }
 
-const char* Error::GetFunction() const { return m_function.c_str(); }
+std::string Error::GetFunction() const { return m_function; }
 
 uint32_t Error::GetLineNumber() const { return m_lineNumber; }
 
@@ -45,9 +45,9 @@ const ErrorBase* Error::GetOriginatingObject() const {
 
 double Error::GetTimestamp() const { return m_timestamp; }
 
-void Error::Set(Code code, const char* contextMessage, const char* filename,
-                const char* function, uint32_t lineNumber,
-                const ErrorBase* originatingObject) {
+void Error::Set(Code code, const std::string& contextMessage,
+                const std::string& filename, const std::string& function,
+                uint32_t lineNumber, const ErrorBase* originatingObject) {
   bool report = true;
 
   if (code == m_code && GetTime() - m_timestamp < 1) {

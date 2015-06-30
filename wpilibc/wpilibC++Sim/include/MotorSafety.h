@@ -7,6 +7,8 @@
 
 #define DEFAULT_SAFETY_EXPIRATION 0.1
 
+#include <sstream>
+
 class MotorSafety
 {
 public:
@@ -16,5 +18,5 @@ public:
 	virtual void StopMotor() = 0;
 	virtual void SetSafetyEnabled(bool enabled) = 0;
 	virtual bool IsSafetyEnabled() const = 0;
-	virtual void GetDescription(char *desc) const = 0;
+	virtual void GetDescription(std::ostringstream& desc) const = 0;
 };

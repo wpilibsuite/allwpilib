@@ -36,7 +36,7 @@ void Encoder::InitEncoder(int channelA, int channelB, bool reverseDirection, Enc
 	m_distancePerPulse = 1.0;
 	m_pidSource = kDistance;
 
-	LiveWindow::GetInstance()->AddSensor("Encoder", channelA, this);
+	LiveWindow::GetInstance().AddSensor("Encoder", channelA, this);
 
 	if (channelB < channelA) { // Swap ports
 		int channel = channelB;
@@ -355,11 +355,11 @@ std::string Encoder::GetSmartDashboardType() const {
 		return "Encoder";
 }
 
-void Encoder::InitTable(ITable *subTable) {
+void Encoder::InitTable(::std::shared_ptr<ITable> subTable) {
 	m_table = subTable;
 	UpdateTable();
 }
 
-ITable * Encoder::GetTable() const {
+::std::shared_ptr<ITable> Encoder::GetTable() const {
 	return m_table;
 }

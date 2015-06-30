@@ -109,11 +109,10 @@ void MotorSafetyHelper::Check()
 	std::unique_lock<priority_recursive_mutex> sync(m_syncMutex);
 	if (m_stopTime < Timer::GetFPGATimestamp())
 	{
-		char buf[128];
-		char desc[64];
-		m_safeObject->GetDescription(desc);
-		snprintf(buf, 128, "%s... Output not updated often enough.", desc);
-		wpi_setWPIErrorWithContext(Timeout, buf);
+    std::ostringstream desc;
+    m_safeObject->GetDescription(desc);
+    desc <<  "... Output not updated often enough.";
+		wpi_setWPIErrorWithContext(Timeout, desc.str().c_str());
 		m_safeObject->StopMotor();
 	}
 }

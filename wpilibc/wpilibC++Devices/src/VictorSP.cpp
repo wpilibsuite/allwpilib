@@ -39,7 +39,7 @@ VictorSP::VictorSP(uint32_t channel) : SafePWM(channel) {
   SetZeroLatch();
 
   HALReport(HALUsageReporting::kResourceType_VictorSP, GetChannel());
-  LiveWindow::GetInstance()->AddActuator("VictorSP", GetChannel(), this);
+  LiveWindow::GetInstance().AddActuator("VictorSP", GetChannel(), this);
 }
 
 /**

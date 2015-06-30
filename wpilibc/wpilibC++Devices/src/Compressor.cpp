@@ -260,14 +260,14 @@ void Compressor::StopLiveWindowMode() {}
 
 std::string Compressor::GetSmartDashboardType() const { return "Compressor"; }
 
-void Compressor::InitTable(ITable* subTable) {
+void Compressor::InitTable(::std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-ITable* Compressor::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> Compressor::GetTable() const { return m_table; }
 
-void Compressor::ValueChanged(ITable* source, const std::string& key,
+void Compressor::ValueChanged(::std::shared_ptr<ITable> source, const std::string& key,
                               EntryValue value, bool isNew) {
   if (value.b)
     Start();

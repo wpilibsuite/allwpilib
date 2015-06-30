@@ -1,8 +1,18 @@
 #include "RobotState.h"
 
-RobotStateInterface* RobotState::impl = nullptr;
+#include "Base.h"
 
-void RobotState::SetImplementation(RobotStateInterface* i) { impl = i; }
+::std::shared_ptr<RobotStateInterface> RobotState::impl = nullptr;
+
+void RobotState::SetImplementation(RobotStateInterface& i) {
+  impl = ::std::shared_ptr<RobotStateInterface>(
+      &i, NullDeleter<RobotStateInterface>());
+}
+
+void RobotState::SetImplementation(
+    ::std::shared_ptr<RobotStateInterface> i) {
+  impl = i;
+}
 
 bool RobotState::IsDisabled() {
   if (impl != nullptr) {

@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 2.8)
 project(All-WPILib)
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter -fPIC")
+# TODO: When the compiler allows us to actually call deprecated functions from
+#       within deprecated functions, remove -Wno-error=deprecated-declarations
+#       (this will cause calling deprecated functions to be treated as a warning
+#       rather than an error).
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter -Wno-error=deprecated-declarations -fPIC")
 
 file(GLOB_RECURSE NI_LIBS ni-libraries/*.so*)
 list(REMOVE_ITEM NI_LIBS ${CMAKE_CURRENT_SOURCE_DIR}/ni-libraries/libwpi.so ${CMAKE_CURRENT_SOURCE_DIR}/ni-libraries/libwpi_2015.so)

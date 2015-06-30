@@ -356,7 +356,8 @@ void Preferences::Put(const char *key, std::string value) {
   else
     ret.first->second = value;
 
-  NetworkTable::GetTable(kTableName)->PutString(key, value);
+  NetworkTable* table = NetworkTable::GetTable(kTableName);
+  table->PutString(key, value);
 }
 
 /**
@@ -512,7 +513,7 @@ static bool isKeyAcceptable(const std::string &value) {
   return true;
 }
 
-void Preferences::ValueChanged(ITable *table, const std::string &key,
+void Preferences::ValueChanged(::std::shared_ptr<ITable> table, const std::string &key,
                                EntryValue value, bool isNew) {
   if (key == kSaveField) {
     if (table->GetBoolean(kSaveField, false)) Save();

@@ -12,6 +12,8 @@
 #include "PIDSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
 
+#include <memory>
+
 /**
  * Class to read quad encoders.
  * Quadrature encoders are devices that count shaft rotation and can sense direction. The output of
@@ -58,8 +60,8 @@ public:
 	void StartLiveWindowMode() override;
 	void StopLiveWindowMode() override;
 	std::string GetSmartDashboardType() const override;
-	void InitTable(ITable *subTable) override;
-	ITable * GetTable() const override;
+	void InitTable(::std::shared_ptr<ITable> subTable) override;
+	::std::shared_ptr<ITable> GetTable() const override;
 
 	int32_t FPGAEncoderIndex() const
 	{
@@ -82,5 +84,5 @@ private:
 	bool m_reverseDirection;
 	SimEncoder* impl;
 
-	ITable *m_table;
+	::std::shared_ptr<ITable> m_table;
 };

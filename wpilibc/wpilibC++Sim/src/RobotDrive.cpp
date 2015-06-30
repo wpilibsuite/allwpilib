@@ -551,7 +551,7 @@ void RobotDrive::MecanumDrive_Polar(float magnitude, float direction, float rota
 	m_rearRightMotor->Set(wheelSpeeds[kRearRightMotor] * m_invertedMotors[kRearRightMotor] * m_maxOutput, syncGroup);
 
 	// CANJaguar::UpdateSyncGroup(syncGroup);
-	
+
 	// FIXME: m_safetyHelper->Feed();
 }
 
@@ -712,9 +712,9 @@ void RobotDrive::SetSafetyEnabled(bool enabled)
 	// FIXME: m_safetyHelper->SetSafetyEnabled(enabled);
 }
 
-void RobotDrive::GetDescription(char *desc) const
+void RobotDrive::GetDescription(std::ostringstream& desc) const
 {
-	sprintf(desc, "RobotDrive");
+	desc << "RobotDrive";
 }
 
 void RobotDrive::StopMotor()

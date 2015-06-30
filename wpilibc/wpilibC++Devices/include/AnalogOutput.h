@@ -10,6 +10,7 @@
 #include "HAL/HAL.hpp"
 #include "SensorBase.h"
 #include "LiveWindow/LiveWindowSendable.h"
+#include <memory>
 
 /**
  * MXP analog output class.
@@ -26,12 +27,12 @@ class AnalogOutput : public SensorBase, public LiveWindowSendable {
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(ITable *subTable) override;
-  ITable *GetTable() const override;
+  void InitTable(::std::shared_ptr<ITable> subTable) override;
+  ::std::shared_ptr<ITable> GetTable() const override;
 
  protected:
   uint32_t m_channel;
   void *m_port;
 
-  ITable *m_table = nullptr;
+  ::std::shared_ptr<ITable> m_table = nullptr;
 };

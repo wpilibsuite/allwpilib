@@ -11,7 +11,7 @@
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 
-static Resource *inputs = nullptr;
+static ::std::unique_ptr<Resource> inputs;
 
 const uint8_t AnalogInput::kAccumulatorModuleNumber;
 const uint32_t AnalogInput::kAccumulatorNumChannels;
@@ -25,7 +25,7 @@ const uint32_t AnalogInput::kAccumulatorChannels[] = {0, 1};
  */
 AnalogInput::AnalogInput(uint32_t channel) {
   char buf[64];
-  Resource::CreateResourceObject(&inputs, kAnalogInputs);
+  Resource::CreateResourceObject(inputs, kAnalogInputs);
 
   if (!checkAnalogInputChannel(channel)) {
     snprintf(buf, 64, "analog input %d", channel);
@@ -35,7 +35,7 @@ AnalogInput::AnalogInput(uint32_t channel) {
 
   snprintf(buf, 64, "Analog Input %d", channel);
   if (inputs->Allocate(channel, buf) == ~0ul) {
-    CloneError(inputs);
+    CloneError(*inputs);
     return;
   }
 
@@ -46,7 +46,7 @@ AnalogInput::AnalogInput(uint32_t channel) {
   m_port = initializeAnalogInputPort(port, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
-  LiveWindow::GetInstance()->AddSensor("AnalogInput", channel, this);
+  LiveWindow::GetInstance().AddSensor("AnalogInput", channel, this);
   HALReport(HALUsageReporting::kResourceType_AnalogChannel, channel);
 }
 
@@ -353,15 +353,15 @@ uint32_t AnalogInput::GetAccumulatorCount() const {
  * This function reads the value and count from the FPGA atomically.
  * This can be used for averaging.
  *
- * @param value Pointer to the 64-bit accumulated output.
- * @param count Pointer to the number of accumulation cycles.
+ * @param value Reference to the 64-bit accumulated output.
+ * @param count Reference to the number of accumulation cycles.
  */
-void AnalogInput::GetAccumulatorOutput(int64_t *value, uint32_t *count) const {
+void AnalogInput::GetAccumulatorOutput(int64_t &value, uint32_t &count) const {
   if (StatusIsFatal()) return;
   int32_t status = 0;
-  getAccumulatorOutput(m_port, value, count, &status);
+  getAccumulatorOutput(m_port, &value, &count, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
-  *value += m_accumulatorOffset;
+  value += m_accumulatorOffset;
 }
 
 /**
@@ -412,9 +412,9 @@ std::string AnalogInput::GetSmartDashboardType() const {
   return "Analog Input";
 }
 
-void AnalogInput::InitTable(ITable *subTable) {
+void AnalogInput::InitTable(::std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-ITable *AnalogInput::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> AnalogInput::GetTable() const { return m_table; }

@@ -13,8 +13,9 @@
 #include "WPIErrors.h"
 
 #include <stdio.h>
+#include <sstream>
 
-MotorSafetyHelper *MotorSafetyHelper::m_headHelper = nullptr;
+::std::set<MotorSafetyHelper*> MotorSafetyHelper::m_helperList;
 priority_recursive_mutex MotorSafetyHelper::m_listMutex;
 
 /**
@@ -30,27 +31,19 @@ priority_recursive_mutex MotorSafetyHelper::m_listMutex;
  * This is used
  * to call the Stop() method on the motor.
  */
-MotorSafetyHelper::MotorSafetyHelper(MotorSafety *safeObject) {
-  m_safeObject = safeObject;
+MotorSafetyHelper::MotorSafetyHelper(MotorSafety *safeObject)
+    : m_safeObject(safeObject) {
   m_enabled = false;
   m_expiration = DEFAULT_SAFETY_EXPIRATION;
   m_stopTime = Timer::GetFPGATimestamp();
 
   std::unique_lock<priority_recursive_mutex> sync(m_listMutex);
-  m_nextHelper = m_headHelper;
-  m_headHelper = this;
+  m_helperList.insert(this);
 }
 
 MotorSafetyHelper::~MotorSafetyHelper() {
   std::unique_lock<priority_recursive_mutex> sync(m_listMutex);
-  if (m_headHelper == this) {
-    m_headHelper = m_nextHelper;
-  } else {
-    MotorSafetyHelper *prev = nullptr;
-    MotorSafetyHelper *cur = m_headHelper;
-    while (cur != this && cur != nullptr) prev = cur, cur = cur->m_nextHelper;
-    if (cur == this) prev->m_nextHelper = cur->m_nextHelper;
-  }
+  m_helperList.erase(this);
 }
 
 /**
@@ -99,16 +92,15 @@ bool MotorSafetyHelper::IsAlive() const {
  * updated again.
  */
 void MotorSafetyHelper::Check() {
-  DriverStation *ds = DriverStation::GetInstance();
-  if (!m_enabled || ds->IsDisabled() || ds->IsTest()) return;
+  DriverStation &ds = DriverStation::GetInstance();
+  if (!m_enabled || ds.IsDisabled() || ds.IsTest()) return;
 
   std::unique_lock<priority_recursive_mutex> sync(m_syncMutex);
   if (m_stopTime < Timer::GetFPGATimestamp()) {
-    char buf[128];
-    char desc[64];
+    std::ostringstream desc;
     m_safeObject->GetDescription(desc);
-    snprintf(buf, 128, "%s... Output not updated often enough.", desc);
-    wpi_setWPIErrorWithContext(Timeout, buf);
+    desc <<  "... Output not updated often enough.";
+    wpi_setWPIErrorWithContext(Timeout, desc.str().c_str());
     m_safeObject->StopMotor();
   }
 }
@@ -141,8 +133,7 @@ bool MotorSafetyHelper::IsSafetyEnabled() const {
  */
 void MotorSafetyHelper::CheckMotors() {
   std::unique_lock<priority_recursive_mutex> sync(m_listMutex);
-  for (MotorSafetyHelper *msh = m_headHelper; msh != nullptr;
-       msh = msh->m_nextHelper) {
-    msh->Check();
+  for (auto elem : m_helperList) {
+    elem->Check();
   }
 }

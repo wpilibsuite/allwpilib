@@ -1,7 +1,10 @@
+#pragma once
 
 #include "AnalogInput.h"
 #include "interfaces/Potentiometer.h"
 #include "LiveWindow/LiveWindowSendable.h"
+
+#include <memory>
 
 /**
  * Class for reading analog potentiometers. Analog potentiometers read
@@ -55,9 +58,9 @@ public:
      * Live Window code, only does anything if live window is activated.
      */
     virtual std::string GetSmartDashboardType() const override;
-    virtual void InitTable(ITable *subtable) override;
+    virtual void InitTable(::std::shared_ptr<ITable> subtable) override;
     virtual void UpdateTable() override;
-    virtual ITable* GetTable() const override;
+    virtual ::std::shared_ptr<ITable> GetTable() const override;
 
     /**
      * AnalogPotentiometers don't have to do anything special when entering the LiveWindow.
@@ -72,7 +75,7 @@ public:
 private:
     double m_scale, m_offset;
     AnalogInput* m_analog_input;
-    ITable* m_table;
+    ::std::shared_ptr<ITable> m_table;
     bool m_init_analog_input;
 
     /**

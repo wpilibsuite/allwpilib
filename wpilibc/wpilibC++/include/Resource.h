@@ -8,6 +8,8 @@
 
 #include "ErrorBase.h"
 #include <stdint.h>
+#include <memory>
+#include <vector>
 
 #include "HAL/cpp/priority_mutex.h"
 
@@ -22,18 +24,16 @@
  */
 class Resource : public ErrorBase {
  public:
-  virtual ~Resource();
-  static void CreateResourceObject(Resource **r, uint32_t elements);
+  virtual ~Resource() = default;
+  static void CreateResourceObject(::std::unique_ptr<Resource>& r, uint32_t elements);
+  explicit Resource(uint32_t size);
   uint32_t Allocate(const char *resourceDesc);
   uint32_t Allocate(uint32_t index, const char *resourceDesc);
   void Free(uint32_t index);
 
  private:
-  explicit Resource(uint32_t size);
-
-  bool *m_isAllocated;
+  std::vector<bool> m_isAllocated;
   priority_recursive_mutex m_allocateLock;
-  uint32_t m_size;
 
   static priority_recursive_mutex m_createLock;
 

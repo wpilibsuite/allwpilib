@@ -31,7 +31,7 @@ void Gyro::InitGyro(int channel)
 	int n = sprintf(buffer, "analog/%d", channel);
 	impl = new SimGyro(buffer);
     
-	LiveWindow::GetInstance()->AddSensor("Gyro", channel, this);
+	LiveWindow::GetInstance().AddSensor("Gyro", channel, this);
 }
 
 /**
@@ -125,11 +125,11 @@ std::string Gyro::GetSmartDashboardType() const {
 	return "Gyro";
 }
 
-void Gyro::InitTable(ITable *subTable) {
+void Gyro::InitTable(::std::shared_ptr<ITable> subTable) {
 	m_table = subTable;
 	UpdateTable();
 }
 
-ITable * Gyro::GetTable() const {
+::std::shared_ptr<ITable> Gyro::GetTable() const {
 	return m_table;
 }

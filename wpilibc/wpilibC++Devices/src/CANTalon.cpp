@@ -8,10 +8,12 @@
 #include "WPIErrors.h"
 #include "ctre/CanTalonSRX.h"
 #include <unistd.h>  // usleep
-                     /**
-                      * Constructor for the CANTalon device.
-                      * @param deviceNumber The CAN ID of the Talon SRX
-                      */
+#include <sstream>
+
+/**
+ * Constructor for the CANTalon device.
+ * @param deviceNumber The CAN ID of the Talon SRX
+ */
 CANTalon::CANTalon(int deviceNumber)
     : m_deviceNumber(deviceNumber),
       m_impl(new CanTalonSRX(deviceNumber)),
@@ -40,10 +42,6 @@ CANTalon::CANTalon(int deviceNumber, int controlPeriodMs)
       m_setPoint(0) {
   ApplyControlMode(m_controlMode);
   m_impl->SetProfileSlotSelect(m_profile);
-}
-CANTalon::~CANTalon() {
-  delete m_impl;
-  delete m_safetyHelper;
 }
 
 /**
@@ -1246,8 +1244,8 @@ void CANTalon::SetSafetyEnabled(bool enabled) {
   m_safetyHelper->SetSafetyEnabled(enabled);
 }
 
-void CANTalon::GetDescription(char* desc) const {
-  sprintf(desc, "CANTalon ID %d", m_deviceNumber);
+void CANTalon::GetDescription(std::ostringstream& desc) const {
+  desc << "CANTalon ID " <<  m_deviceNumber;
 }
 
 /**
@@ -1273,7 +1271,7 @@ bool CANTalon::GetInverted() const { return m_isInverted; }
 */
 void CANTalon::StopMotor() { Disable(); }
 
-void CANTalon::ValueChanged(ITable* source, const std::string& key,
+void CANTalon::ValueChanged(::std::shared_ptr<ITable> source, const std::string& key,
                             EntryValue value, bool isNew) {
   Set(value.f);
 }
@@ -1300,9 +1298,9 @@ std::string CANTalon::GetSmartDashboardType() const {
   return "Speed Controller";
 }
 
-void CANTalon::InitTable(ITable* subTable) {
+void CANTalon::InitTable(::std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-ITable* CANTalon::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> CANTalon::GetTable() const { return m_table; }

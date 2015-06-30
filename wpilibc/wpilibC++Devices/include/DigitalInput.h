@@ -9,6 +9,8 @@
 #include "DigitalSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
 
+#include <memory>
+
 /**
  * Class to read a digital input.
  * This class will read digital inputs and return the current value on the
@@ -35,11 +37,11 @@ class DigitalInput : public DigitalSource, public LiveWindowSendable {
   void StartLiveWindowMode();
   void StopLiveWindowMode();
   std::string GetSmartDashboardType() const;
-  void InitTable(ITable *subTable);
-  ITable *GetTable() const;
+  void InitTable(::std::shared_ptr<ITable> subTable);
+  ::std::shared_ptr<ITable> GetTable() const;
 
  private:
   uint32_t m_channel;
 
-  ITable *m_table = nullptr;
+  ::std::shared_ptr<ITable> m_table = nullptr;
 };

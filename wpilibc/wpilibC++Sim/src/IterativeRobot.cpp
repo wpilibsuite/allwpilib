@@ -16,7 +16,7 @@ constexpr double IterativeRobot::kDefaultPeriod;
 
 /**
  * Set the period for the periodic functions.
- * 
+ *
  * @param period The period of the periodic function calls.  0.0 means sync to driver station control data.
  */
 void IterativeRobot::SetPeriod(double period)
@@ -60,22 +60,22 @@ double IterativeRobot::GetLoopsPerSec()
 
 /**
  * Provide an alternate "main loop" via StartCompetition().
- * 
+ *
  * This specific StartCompetition() implements "main loop" behavior like that of the FRC
  * control system in 2008 and earlier, with a primary (slow) loop that is
- * called periodically, and a "fast loop" (a.k.a. "spin loop") that is 
- * called as fast as possible with no delay between calls. 
+ * called periodically, and a "fast loop" (a.k.a. "spin loop") that is
+ * called as fast as possible with no delay between calls.
  */
 void IterativeRobot::StartCompetition()
 {
-	LiveWindow *lw = LiveWindow::GetInstance();
+	LiveWindow &lw = LiveWindow::GetInstance();
 	// first and one-time initialization
 	SmartDashboard::init();
 	NetworkTable::GetTable("LiveWindow")->GetSubTable("~STATUS~")->PutBoolean("LW Enabled", false);
 	RobotInit();
 
 	// loop forever, calling the appropriate mode-dependent function
-	lw->SetEnabled(false);
+	lw.SetEnabled(false);
 	while (true)
 	{
 		// Call the appropriate function depending upon the current robot mode
@@ -85,7 +85,7 @@ void IterativeRobot::StartCompetition()
 			// either a different mode or from power-on
 			if(!m_disabledInitialized)
 			{
-				lw->SetEnabled(false);
+				lw.SetEnabled(false);
 				DisabledInit();
 				m_disabledInitialized = true;
 				// reset the initialization flags for the other modes
@@ -105,7 +105,7 @@ void IterativeRobot::StartCompetition()
 			// either a different mode or from power-on
 			if(!m_autonomousInitialized)
 			{
-				lw->SetEnabled(false);
+				lw.SetEnabled(false);
 				AutonomousInit();
 				m_autonomousInitialized = true;
 				// reset the initialization flags for the other modes
@@ -125,7 +125,7 @@ void IterativeRobot::StartCompetition()
             // either a different mode or from power-on
             if(!m_testInitialized)
             {
-            	lw->SetEnabled(true);
+            	lw.SetEnabled(true);
                 TestInit();
                 m_testInitialized = true;
                 // reset the initialization flags for the other modes
@@ -145,14 +145,14 @@ void IterativeRobot::StartCompetition()
 			// either a different mode or from power-on
 			if(!m_teleopInitialized)
 			{
-				lw->SetEnabled(false);
+				lw.SetEnabled(false);
 				TeleopInit();
 				m_teleopInitialized = true;
 				// reset the initialization flags for the other modes
 				m_disabledInitialized = false;
                 m_autonomousInitialized = false;
                 m_testInitialized = false;
-                Scheduler::GetInstance()->SetEnabled(true);
+                Scheduler::GetInstance().SetEnabled(true);
 			}
 			if (NextPeriodReady())
 			{
@@ -162,7 +162,7 @@ void IterativeRobot::StartCompetition()
 		}
 		// wait for driver station data so the loop doesn't hog the CPU
 		m_ds->WaitForData();
-	}	
+	}
 }
 
 /**
@@ -190,7 +190,7 @@ bool IterativeRobot::NextPeriodReady()
 
 /**
  * Robot-wide initialization code should go here.
- * 
+ *
  * Users should override this method for default Robot-wide initialization which will
  * be called when the robot is first powered on.  It will be called exactly 1 time.
  */
@@ -201,7 +201,7 @@ void IterativeRobot::RobotInit()
 
 /**
  * Initialization code for disabled mode should go here.
- * 
+ *
  * Users should override this method for initialization code which will be called each time
  * the robot enters disabled mode.
  */
@@ -212,7 +212,7 @@ void IterativeRobot::DisabledInit()
 
 /**
  * Initialization code for autonomous mode should go here.
- * 
+ *
  * Users should override this method for initialization code which will be called each time
  * the robot enters autonomous mode.
  */
@@ -223,7 +223,7 @@ void IterativeRobot::AutonomousInit()
 
 /**
  * Initialization code for teleop mode should go here.
- * 
+ *
  * Users should override this method for initialization code which will be called each time
  * the robot enters teleop mode.
  */
@@ -234,7 +234,7 @@ void IterativeRobot::TeleopInit()
 
 /**
  * Initialization code for test mode should go here.
- * 
+ *
  * Users should override this method for initialization code which will be called each time
  * the robot enters test mode.
  */
@@ -245,7 +245,7 @@ void IterativeRobot::TestInit()
 
 /**
  * Periodic code for disabled mode should go here.
- * 
+ *
  * Users should override this method for code which will be called periodically at a regular
  * rate while the robot is in disabled mode.
  */

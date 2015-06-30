@@ -9,6 +9,7 @@
 #define __TRIGGER_H__
 
 #include "SmartDashboard/Sendable.h"
+#include <memory>
 
 class Command;
 
@@ -41,12 +42,12 @@ class Trigger : public Sendable {
   void CancelWhenActive(Command *command);
   void ToggleWhenActive(Command *command);
 
-  virtual void InitTable(ITable *table);
-  virtual ITable *GetTable() const;
+  virtual void InitTable(::std::shared_ptr<ITable> table);
+  virtual ::std::shared_ptr<ITable> GetTable() const;
   virtual std::string GetSmartDashboardType() const;
 
  protected:
-  ITable *m_table = nullptr;
+  ::std::shared_ptr<ITable> m_table = nullptr;
 };
 
 #endif

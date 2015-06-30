@@ -45,8 +45,7 @@ void RobotBase::robotSetup(RobotBase *robot) {
  * nice to put this code into it's own task that loads on boot so ensure that it
  * runs.
  */
-RobotBase::RobotBase() {
-  m_ds = DriverStation::GetInstance();
+RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   RobotState::SetImplementation(DriverStation::GetInstance());
   HLUsageReporting::SetImplementation(new HardwareHLReporting());
 
@@ -76,34 +75,34 @@ RobotBase::~RobotBase() {
  * Determine if the Robot is currently enabled.
  * @return True if the Robot is currently enabled by the field controls.
  */
-bool RobotBase::IsEnabled() const { return m_ds->IsEnabled(); }
+bool RobotBase::IsEnabled() const { return m_ds.IsEnabled(); }
 
 /**
  * Determine if the Robot is currently disabled.
  * @return True if the Robot is currently disabled by the field controls.
  */
-bool RobotBase::IsDisabled() const { return m_ds->IsDisabled(); }
+bool RobotBase::IsDisabled() const { return m_ds.IsDisabled(); }
 
 /**
  * Determine if the robot is currently in Autonomous mode.
  * @return True if the robot is currently operating Autonomously as determined
  * by the field controls.
  */
-bool RobotBase::IsAutonomous() const { return m_ds->IsAutonomous(); }
+bool RobotBase::IsAutonomous() const { return m_ds.IsAutonomous(); }
 
 /**
  * Determine if the robot is currently in Operator Control mode.
  * @return True if the robot is currently operating in Tele-Op mode as
  * determined by the field controls.
  */
-bool RobotBase::IsOperatorControl() const { return m_ds->IsOperatorControl(); }
+bool RobotBase::IsOperatorControl() const { return m_ds.IsOperatorControl(); }
 
 /**
  * Determine if the robot is currently in Test mode.
  * @return True if the robot is currently running tests as determined by the
  * field controls.
  */
-bool RobotBase::IsTest() const { return m_ds->IsTest(); }
+bool RobotBase::IsTest() const { return m_ds.IsTest(); }
 
 /**
  * This hook is called right before startCompetition(). By default, tell the DS
@@ -123,7 +122,7 @@ void RobotBase::Prestart() {
  * @return Has new data arrived over the network since the last time this
  * function was called?
  */
-bool RobotBase::IsNewDataAvailable() const { return m_ds->IsNewControlData(); }
+bool RobotBase::IsNewDataAvailable() const { return m_ds.IsNewControlData(); }
 
 /**
  * This class exists for the sole purpose of getting its destructor called when

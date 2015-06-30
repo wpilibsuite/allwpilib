@@ -12,6 +12,8 @@
 #include "PIDSource.h"
 #include "PIDOutput.h"
 
+#include <memory>
+
 class PIDController;
 
 class PIDCommand : public Command, public PIDOutput, public PIDSource {
@@ -23,7 +25,7 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
   PIDCommand(double p, double i, double d);
   PIDCommand(double p, double i, double d, double period);
   PIDCommand(double p, double i, double d, double f, double period);
-  virtual ~PIDCommand();
+  virtual ~PIDCommand() = default;
 
   void SetSetpointRelative(double deltaSetpoint);
 
@@ -47,10 +49,10 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
 
  private:
   /** The internal {@link PIDController} */
-  PIDController *m_controller;
+  std::unique_ptr<PIDController> m_controller;
 
  public:
-  virtual void InitTable(ITable *table);
+  virtual void InitTable(::std::shared_ptr<ITable> table);
   virtual std::string GetSmartDashboardType() const;
 };
 

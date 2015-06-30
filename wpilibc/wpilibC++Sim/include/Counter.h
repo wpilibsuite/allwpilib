@@ -10,6 +10,8 @@
 #include "SensorBase.h"
 #include "LiveWindow/LiveWindowSendable.h"
 
+#include <memory>
+
 /**
  * Class for counting the number of ticks on a digital input channel.
  * This is a general purpose class for counting repetitive events. It can return the number
@@ -75,17 +77,17 @@ public:
 	void StartLiveWindowMode() override;
 	void StopLiveWindowMode() override;
 	virtual std::string GetSmartDashboardType() const override;
-	void InitTable(ITable *subTable) override;
-	ITable * GetTable() const override;
+	void InitTable(::std::shared_ptr<ITable> subTable) override;
+	::std::shared_ptr<ITable> GetTable() const override;
 protected:
 	// TODO: [Not Supported] DigitalSource *m_upSource;		///< What makes the counter count up.
 	// TODO: [Not Supported] DigitalSource *m_downSource;	///< What makes the counter count down.
-	void* m_counter;				///< The FPGA counter object.	
+	void* m_counter;				///< The FPGA counter object.
 private:
 
 	bool m_allocatedUpSource;		///< Was the upSource allocated locally?
 	bool m_allocatedDownSource;	///< Was the downSource allocated locally?
 	uint32_t m_index;					///< The index of this counter.
 
-	ITable *m_table;
+	::std::shared_ptr<ITable> m_table;
 };

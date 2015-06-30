@@ -27,14 +27,14 @@ RobotBase &RobotBase::getInstance()
  * Constructor for a generic robot program.
  * User code should be placed in the constuctor that runs before the Autonomous or Operator
  * Control period starts. The constructor will run to completion before Autonomous is entered.
- * 
+ *
  * This must be used to ensure that the communications code starts. In the future it would be
  * nice to put this code into it's own task that loads on boot so ensure that it runs.
  */
 RobotBase::RobotBase()
 {
 	m_ds = DriverStation::GetInstance();
-    RobotState::SetImplementation(DriverStation::GetInstance());
+  RobotState::SetImplementation(*DriverStation::GetInstance());
 }
 
 /**

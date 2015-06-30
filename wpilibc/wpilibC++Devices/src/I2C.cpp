@@ -177,6 +177,7 @@ bool I2C::ReadOnly(uint8_t count, uint8_t *buffer) {
  * @param registerAddress The register to write on all devices on the bus.
  * @param data The value to write to the devices.
  */
+[[gnu::warning("I2C::Broadcast() is not implemented.")]]
 void I2C::Broadcast(uint8_t registerAddress, uint8_t data) {}
 
 /**

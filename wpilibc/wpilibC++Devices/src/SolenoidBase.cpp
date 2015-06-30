@@ -7,9 +7,6 @@
 
 #include "SolenoidBase.h"
 
-// Needs to be global since the protected resource spans all Solenoid objects.
-Resource* SolenoidBase::m_allocated = nullptr;
-
 void* SolenoidBase::m_ports[m_maxModules][m_maxPorts];
 /**
  * Constructor

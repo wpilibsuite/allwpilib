@@ -20,7 +20,9 @@
 
 #include <atomic>
 #include "HAL/cpp/priority_mutex.h"
+#include <memory>
 #include <utility>
+#include <sstream>
 
 /**
  * Luminary Micro / Vex Robotics Jaguar Speed Control
@@ -132,7 +134,7 @@ class CANJaguar : public MotorSafety,
   void StopMotor() override;
   bool IsSafetyEnabled() const override;
   void SetSafetyEnabled(bool enabled) override;
-  void GetDescription(char *desc) const override;
+  void GetDescription(std::ostringstream& desc) const override;
   uint8_t GetDeviceID() const;
 
   // SpeedController overrides
@@ -228,18 +230,18 @@ class CANJaguar : public MotorSafety,
 
   void verify();
 
-  MotorSafetyHelper *m_safetyHelper = nullptr;
+  std::unique_ptr<MotorSafetyHelper> m_safetyHelper;
 
-  void ValueChanged(ITable *source, const std::string &key, EntryValue value,
+  void ValueChanged(::std::shared_ptr<ITable> source, const std::string &key, EntryValue value,
                     bool isNew) override;
   void UpdateTable() override;
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(ITable *subTable) override;
-  ITable *GetTable() const override;
+  void InitTable(::std::shared_ptr<ITable> subTable) override;
+  ::std::shared_ptr<ITable> GetTable() const override;
 
-  ITable *m_table = nullptr;
+  ::std::shared_ptr<ITable> m_table = nullptr;
 
  private:
   void InitCANJaguar();

@@ -66,9 +66,9 @@ priority_recursive_mutex digitalI2CMXPMutex;
 tDIO* digitalSystem = NULL;
 tRelay* relaySystem = NULL;
 tPWM* pwmSystem = NULL;
-Resource *DIOChannels = NULL;
-Resource *DO_PWMGenerators = NULL;
-Resource *PWMChannels = NULL;
+hal::Resource *DIOChannels = NULL;
+hal::Resource *DO_PWMGenerators = NULL;
+hal::Resource *PWMChannels = NULL;
 
 bool digitalSystemsInitialized = false;
 
@@ -92,9 +92,9 @@ tSPI *spiSystem;
 void initializeDigital(int32_t *status) {
   if (digitalSystemsInitialized) return;
 
-  Resource::CreateResourceObject(&DIOChannels, tDIO::kNumSystems * kDigitalPins);
-  Resource::CreateResourceObject(&DO_PWMGenerators, tDIO::kNumPWMDutyCycleAElements + tDIO::kNumPWMDutyCycleBElements);
-  Resource::CreateResourceObject(&PWMChannels, tPWM::kNumSystems * kPwmPins);
+  hal::Resource::CreateResourceObject(&DIOChannels, tDIO::kNumSystems * kDigitalPins);
+  hal::Resource::CreateResourceObject(&DO_PWMGenerators, tDIO::kNumPWMDutyCycleAElements + tDIO::kNumPWMDutyCycleBElements);
+  hal::Resource::CreateResourceObject(&PWMChannels, tPWM::kNumSystems * kPwmPins);
   digitalSystem = tDIO::create(status);
 
   // Relay Setup
@@ -292,7 +292,7 @@ void setPWMDutyCycle(void* pwmGenerator, double dutyCycle, int32_t *status) {
 	}
 	if(id < 4)
 		digitalSystem->writePWMDutyCycleA(id, (uint8_t)rawDutyCycle, status);
-	else 
+	else
 		digitalSystem->writePWMDutyCycleB(id - 4, (uint8_t)rawDutyCycle, status);
   }
 }
@@ -594,10 +594,10 @@ struct counter_t {
 };
 typedef struct counter_t Counter;
 
-static Resource *counters = NULL;
+static hal::Resource *counters = NULL;
 
 void* initializeCounter(Mode mode, uint32_t *index, int32_t *status) {
-	Resource::CreateResourceObject(&counters, tCounter::kNumSystems);
+	hal::Resource::CreateResourceObject(&counters, tCounter::kNumSystems);
 	*index = counters->Allocate("Counter");
 	if (*index == ~0ul) {
 		*status = NO_AVAILABLE_RESOURCES;
@@ -919,7 +919,7 @@ struct encoder_t {
 typedef struct encoder_t Encoder;
 
 static const double DECODING_SCALING_FACTOR = 0.25;
-static Resource *quadEncoders = NULL;
+static hal::Resource *quadEncoders = NULL;
 
 void* initializeEncoder(uint8_t port_a_module, uint32_t port_a_pin, bool port_a_analog_trigger,
 						uint8_t port_b_module, uint32_t port_b_pin, bool port_b_analog_trigger,
@@ -931,7 +931,7 @@ void* initializeEncoder(uint8_t port_a_module, uint32_t port_a_pin, bool port_a_
   remapDigitalSource(port_a_analog_trigger, port_a_pin, port_a_module);
   remapDigitalSource(port_b_analog_trigger, port_b_pin, port_b_module);
 
-  Resource::CreateResourceObject(&quadEncoders, tEncoder::kNumSystems);
+  hal::Resource::CreateResourceObject(&quadEncoders, tEncoder::kNumSystems);
   encoder->index = quadEncoders->Allocate("4X Encoder");
   *index = encoder->index;
   // TODO: if (index == ~0ul) { CloneError(quadEncoders); return; }

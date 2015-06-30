@@ -8,6 +8,8 @@
 #include "simulation/SimDigitalInput.h"
 #include "LiveWindow/LiveWindowSendable.h"
 
+#include <memory>
+
 /**
  * Class to read a digital input.
  * This class will read digital inputs and return the current value on the channel. Other devices
@@ -26,13 +28,13 @@ public:
 	void StartLiveWindowMode() override;
 	void StopLiveWindowMode() override;
 	std::string GetSmartDashboardType() const override;
-	void InitTable(ITable *subTable) override;
-	ITable * GetTable() const override;
+	void InitTable(::std::shared_ptr<ITable> subTable) override;
+	::std::shared_ptr<ITable> GetTable() const override;
 
 private:
 	uint32_t m_channel;
 	bool m_lastValue;
 	SimDigitalInput *m_impl;
 
-	ITable *m_table = nullptr;
+	::std::shared_ptr<ITable> m_table = nullptr;
 };

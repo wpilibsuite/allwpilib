@@ -1,16 +1,5 @@
-
 #include "AnalogPotentiometer.h"
 #include "ControllerPower.h"
-
-/**
- * Common initialization code called by all constructors.
- */
-void AnalogPotentiometer::initPot(AnalogInput *input, double fullRange,
-                                  double offset) {
-  m_fullRange = fullRange;
-  m_offset = offset;
-  m_analog_input = input;
-}
 
 /**
  * Construct an Analog Potentiometer object from a channel number.
@@ -22,10 +11,10 @@ void AnalogPotentiometer::initPot(AnalogInput *input, double fullRange,
  * output at 0V.
  */
 AnalogPotentiometer::AnalogPotentiometer(int channel, double fullRange,
-                                         double offset) {
-  m_init_analog_input = true;
-  initPot(new AnalogInput(channel), fullRange, offset);
-}
+                                         double offset)
+    : m_analog_input(::std::make_unique<AnalogInput>(channel)),
+      m_fullRange(fullRange),
+      m_offset(offset) {}
 
 /**
  * Construct an Analog Potentiometer object from an existing Analog Input
@@ -37,36 +26,23 @@ AnalogPotentiometer::AnalogPotentiometer(int channel, double fullRange,
  * output at 0V.
  */
 AnalogPotentiometer::AnalogPotentiometer(AnalogInput *input, double fullRange,
-                                         double offset) {
-  m_init_analog_input = false;
-  initPot(input, fullRange, offset);
-}
+                                         double offset)
+    : m_analog_input(input, NullDeleter<AnalogInput>()),
+      m_fullRange(fullRange),
+      m_offset(offset) {}
 
 /**
  * Construct an Analog Potentiometer object from an existing Analog Input
- * reference.
- * @param channel The existing Analog Input reference
+ * pointer.
+ * @param channel The existing Analog Input pointer
  * @param fullRange The angular value (in desired units) representing the full
  * 0-5V range of the input.
  * @param offset The angular value (in desired units) representing the angular
  * output at 0V.
  */
-AnalogPotentiometer::AnalogPotentiometer(AnalogInput &input, double fullRange,
-                                         double offset) {
-  m_init_analog_input = false;
-  initPot(&input, fullRange, offset);
-}
-
-/**
- * Destructor. Releases the Analog Input resource if it was allocated by this
- * object
- */
-AnalogPotentiometer::~AnalogPotentiometer() {
-  if (m_init_analog_input) {
-    delete m_analog_input;
-    m_init_analog_input = false;
-  }
-}
+AnalogPotentiometer::AnalogPotentiometer(::std::shared_ptr<AnalogInput> input,
+                                         double fullRange, double offset)
+    : m_analog_input(input), m_fullRange(fullRange), m_offset(offset) {}
 
 /**
  * Get the current reading of the potentiometer.
@@ -97,7 +73,7 @@ std::string AnalogPotentiometer::GetSmartDashboardType() const {
 /**
  * Live Window code, only does anything if live window is activated.
  */
-void AnalogPotentiometer::InitTable(ITable *subtable) {
+void AnalogPotentiometer::InitTable(::std::shared_ptr<ITable> subtable) {
   m_table = subtable;
   UpdateTable();
 }
@@ -108,4 +84,4 @@ void AnalogPotentiometer::UpdateTable() {
   }
 }
 
-ITable *AnalogPotentiometer::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> AnalogPotentiometer::GetTable() const { return m_table; }

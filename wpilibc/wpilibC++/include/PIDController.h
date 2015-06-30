@@ -11,10 +11,12 @@
 #include "LiveWindow/LiveWindow.h"
 #include "PIDInterface.h"
 #include "HAL/cpp/priority_mutex.h"
+#include "Notifier.h"
+
+#include <memory>
 
 class PIDOutput;
 class PIDSource;
-class Notifier;
 
 /**
  * Class implements a PID Control Loop.
@@ -31,7 +33,7 @@ class PIDController : public LiveWindowSendable,
                 float period = 0.05);
   PIDController(float p, float i, float d, float f, PIDSource *source,
                 PIDOutput *output, float period = 0.05);
-  virtual ~PIDController();
+  virtual ~PIDController() = default;
   virtual float Get() const;
   virtual void SetContinuous(bool continuous = true);
   virtual void SetInputRange(float minimumInput, float maximumInput);
@@ -59,7 +61,7 @@ class PIDController : public LiveWindowSendable,
 
   virtual void Reset() override;
 
-  virtual void InitTable(ITable *table) override;
+  virtual void InitTable(::std::shared_ptr<ITable> table) override;
 
  private:
   float m_P;              // factor for "proportional" control
@@ -92,22 +94,22 @@ class PIDController : public LiveWindowSendable,
   PIDSource *m_pidInput;
   PIDOutput *m_pidOutput;
 
-  Notifier *m_controlLoop;
+  std::unique_ptr<Notifier> m_controlLoop;
 
   void Initialize(float p, float i, float d, float f, PIDSource *source,
                   PIDOutput *output, float period = 0.05);
   static void CallCalculate(void *controller);
 
-  virtual ITable *GetTable() const override;
+  virtual ::std::shared_ptr<ITable> GetTable() const override;
   virtual std::string GetSmartDashboardType() const override;
-  virtual void ValueChanged(ITable *source, const std::string &key,
+  virtual void ValueChanged(::std::shared_ptr<ITable> source, const std::string &key,
                             EntryValue value, bool isNew) override;
   virtual void UpdateTable() override;
   virtual void StartLiveWindowMode() override;
   virtual void StopLiveWindowMode() override;
 
  protected:
-  ITable *m_table = nullptr;
+  ::std::shared_ptr<ITable> m_table = nullptr;
   virtual void Calculate();
 
   DISALLOW_COPY_AND_ASSIGN(PIDController);

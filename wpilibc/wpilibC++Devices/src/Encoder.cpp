@@ -36,11 +36,11 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
     case k4X: {
       m_encodingScale = 4;
       if (m_aSource->StatusIsFatal()) {
-        CloneError(m_aSource);
+        CloneError(*m_aSource);
         return;
       }
       if (m_bSource->StatusIsFatal()) {
-        CloneError(m_bSource);
+        CloneError(*m_bSource);
         return;
       }
       int32_t status = 0;
@@ -58,8 +58,8 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
     case k1X:
     case k2X: {
       m_encodingScale = encodingType == k1X ? 1 : 2;
-      m_counter =
-          new Counter(m_encodingType, m_aSource, m_bSource, reverseDirection);
+      m_counter = ::std::make_unique<Counter>(m_encodingType, m_aSource,
+                                              m_bSource, reverseDirection);
       m_index = m_counter->GetFPGAIndex();
       break;
     }
@@ -69,7 +69,7 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
   }
 
   HALReport(HALUsageReporting::kResourceType_Encoder, m_index, encodingType);
-  LiveWindow::GetInstance()->AddSensor("Encoder",
+  LiveWindow::GetInstance().AddSensor("Encoder",
                                        m_aSource->GetChannelForRouting(), this);
 }
 
@@ -98,21 +98,16 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
  */
 Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection,
                  EncodingType encodingType) {
-  m_aSource = new DigitalInput(aChannel);
-  m_bSource = new DigitalInput(bChannel);
+  m_aSource = ::std::make_shared<DigitalInput>(aChannel);
+  m_bSource = ::std::make_shared<DigitalInput>(bChannel);
   InitEncoder(reverseDirection, encodingType);
-  m_allocatedASource = true;
-  m_allocatedBSource = true;
 }
 
 /**
  * Encoder constructor.
  * Construct a Encoder given a and b channels as digital inputs. This is used in
- * the case
- * where the digital inputs are shared. The Encoder class will not allocate the
- * digital inputs
- * and assume that they already are counted.
- *
+ * the case where the digital inputs are shared. The Encoder class will not
+ * allocate the digital inputs and assume that they already are counted.
  * The counter will start counting immediately.
  *
  * @param aSource The source that should be used for the a channel.
@@ -131,11 +126,19 @@ Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection,
  * or be double (2x) the spec'd count.
  */
 Encoder::Encoder(DigitalSource *aSource, DigitalSource *bSource,
-                 bool reverseDirection, EncodingType encodingType) {
-  m_aSource = aSource;
-  m_bSource = bSource;
-  m_allocatedASource = false;
-  m_allocatedBSource = false;
+                 bool reverseDirection, EncodingType encodingType)
+    : m_aSource(aSource, NullDeleter<DigitalSource>()),
+      m_bSource(bSource, NullDeleter<DigitalSource>()) {
+  if (m_aSource == nullptr || m_bSource == nullptr)
+    wpi_setWPIError(NullParameter);
+  else
+    InitEncoder(reverseDirection, encodingType);
+}
+
+Encoder::Encoder(::std::shared_ptr<DigitalSource> aSource,
+                 ::std::shared_ptr<DigitalSource> bSource,
+                 bool reverseDirection, EncodingType encodingType)
+    : m_aSource(aSource), m_bSource(bSource) {
   if (m_aSource == nullptr || m_bSource == nullptr)
     wpi_setWPIError(NullParameter);
   else
@@ -168,11 +171,10 @@ Encoder::Encoder(DigitalSource *aSource, DigitalSource *bSource,
  * or be double (2x) the spec'd count.
  */
 Encoder::Encoder(DigitalSource &aSource, DigitalSource &bSource,
-                 bool reverseDirection, EncodingType encodingType) {
-  m_aSource = &aSource;
-  m_bSource = &bSource;
-  m_allocatedASource = false;
-  m_allocatedBSource = false;
+                 bool reverseDirection, EncodingType encodingType)
+    : m_aSource(&aSource, NullDeleter<DigitalSource>()),
+      m_bSource(&bSource, NullDeleter<DigitalSource>())
+{
   InitEncoder(reverseDirection, encodingType);
 }
 
@@ -181,11 +183,7 @@ Encoder::Encoder(DigitalSource &aSource, DigitalSource &bSource,
  * Frees the FPGA resources associated with an Encoder.
  */
 Encoder::~Encoder() {
-  if (m_allocatedASource) delete m_aSource;
-  if (m_allocatedBSource) delete m_bSource;
-  if (m_counter) {
-    delete m_counter;
-  } else {
+  if (!m_counter) {
     int32_t status = 0;
     freeEncoder(m_encoder, &status);
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -524,15 +522,7 @@ void Encoder::SetIndexSource(uint32_t channel, Encoder::IndexingType type) {
  */
 void Encoder::SetIndexSource(DigitalSource *source,
                              Encoder::IndexingType type) {
-  int32_t status = 0;
-  bool activeHigh = (type == kResetWhileHigh) || (type == kResetOnRisingEdge);
-  bool edgeSensitive =
-      (type == kResetOnFallingEdge) || (type == kResetOnRisingEdge);
-
-  setEncoderIndexSource(m_encoder, source->GetChannelForRouting(),
-                        source->GetAnalogTriggerForRouting(), activeHigh,
-                        edgeSensitive, &status);
-  wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
+  SetIndexSource(*source, type);
 }
 
 /**
@@ -542,9 +532,17 @@ void Encoder::SetIndexSource(DigitalSource *source,
  * @param channel A digital source to set as the encoder index
  * @param type The state that will cause the encoder to reset
  */
-void Encoder::SetIndexSource(DigitalSource &source,
+void Encoder::SetIndexSource(const DigitalSource &source,
                              Encoder::IndexingType type) {
-  SetIndexSource(&source, type);
+  int32_t status = 0;
+  bool activeHigh = (type == kResetWhileHigh) || (type == kResetOnRisingEdge);
+  bool edgeSensitive =
+      (type == kResetOnFallingEdge) || (type == kResetOnRisingEdge);
+
+  setEncoderIndexSource(m_encoder, source.GetChannelForRouting(),
+                        source.GetAnalogTriggerForRouting(), activeHigh,
+                        edgeSensitive, &status);
+  wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
 }
 
 void Encoder::UpdateTable() {
@@ -566,9 +564,9 @@ std::string Encoder::GetSmartDashboardType() const {
     return "Encoder";
 }
 
-void Encoder::InitTable(ITable *subTable) {
+void Encoder::InitTable(::std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-ITable *Encoder::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> Encoder::GetTable() const { return m_table; }

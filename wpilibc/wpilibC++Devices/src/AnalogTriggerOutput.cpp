@@ -22,11 +22,11 @@
  * @param outputType An enum that specifies the output on the trigger to
  * represent.
  */
-AnalogTriggerOutput::AnalogTriggerOutput(AnalogTrigger *trigger,
+AnalogTriggerOutput::AnalogTriggerOutput(const AnalogTrigger &trigger,
                                          AnalogTriggerType outputType)
     : m_trigger(trigger), m_outputType(outputType) {
   HALReport(HALUsageReporting::kResourceType_AnalogTriggerOutput,
-            trigger->GetIndex(), outputType);
+            trigger.GetIndex(), outputType);
 }
 
 AnalogTriggerOutput::~AnalogTriggerOutput() {
@@ -46,7 +46,7 @@ AnalogTriggerOutput::~AnalogTriggerOutput() {
 bool AnalogTriggerOutput::Get() const {
   int32_t status = 0;
   bool result =
-      getAnalogTriggerOutput(m_trigger->m_trigger, m_outputType, &status);
+      getAnalogTriggerOutput(m_trigger.m_trigger, m_outputType, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
   return result;
 }
@@ -55,7 +55,7 @@ bool AnalogTriggerOutput::Get() const {
  * @return The value to be written to the channel field of a routing mux.
  */
 uint32_t AnalogTriggerOutput::GetChannelForRouting() const {
-  return (m_trigger->m_index << 2) + m_outputType;
+  return (m_trigger.m_index << 2) + m_outputType;
 }
 
 /**

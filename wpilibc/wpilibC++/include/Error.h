@@ -21,18 +21,18 @@ class Error {
   typedef int32_t Code;
 
   Error();
-  void Clone(Error& error);
+  void Clone(const Error& error);
   Code GetCode() const;
-  const char* GetMessage() const;
-  const char* GetFilename() const;
-  const char* GetFunction() const;
+  std::string GetMessage() const;
+  std::string GetFilename() const;
+  std::string GetFunction() const;
   uint32_t GetLineNumber() const;
   const ErrorBase* GetOriginatingObject() const;
   double GetTimestamp() const;
   void Clear();
-  void Set(Code code, const char* contextMessage, const char* filename,
-           const char* function, uint32_t lineNumber,
-           const ErrorBase* originatingObject);
+  void Set(Code code, const std::string& contextMessage,
+           const std::string& filename, const std::string& function,
+           uint32_t lineNumber, const ErrorBase* originatingObject);
 
  private:
   void Report();

@@ -14,6 +14,8 @@
 #include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITable.h"
 
+#include <memory>
+
 class CanTalonSRX;
 
 /**
@@ -42,7 +44,7 @@ class CANTalon : public MotorSafety,
   };
   explicit CANTalon(int deviceNumber);
   explicit CANTalon(int deviceNumber, int controlPeriodMs);
-  virtual ~CANTalon();
+  virtual ~CANTalon() = default;
 
   // PIDOutput interface
   virtual void PIDWrite(float output) override;
@@ -57,7 +59,7 @@ class CANTalon : public MotorSafety,
   virtual void StopMotor() override;
   virtual void SetSafetyEnabled(bool enabled) override;
   virtual bool IsSafetyEnabled() const override;
-  virtual void GetDescription(char *desc) const override;
+  virtual void GetDescription(std::ostringstream& desc) const override;
 
   // CANSpeedController interface
   virtual float Get() const override;
@@ -155,14 +157,14 @@ class CANTalon : public MotorSafety,
   double GetSetpoint() const override;
 
   // LiveWindow stuff.
-  void ValueChanged(ITable *source, const std::string &key, EntryValue value,
+  void ValueChanged(::std::shared_ptr<ITable> source, const std::string &key, EntryValue value,
                     bool isNew) override;
   void UpdateTable() override;
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(ITable *subTable) override;
-  ITable *GetTable() const override;
+  void InitTable(::std::shared_ptr<ITable> subTable) override;
+  ::std::shared_ptr<ITable> GetTable() const override;
 
   // SpeedController overrides
   virtual void SetInverted(bool isInverted) override;
@@ -181,10 +183,10 @@ class CANTalon : public MotorSafety,
   };
 
   int m_deviceNumber;
-  CanTalonSRX *m_impl;
-  MotorSafetyHelper *m_safetyHelper;
+  std::unique_ptr<CanTalonSRX> m_impl;
+  std::unique_ptr<MotorSafetyHelper> m_safetyHelper;
   int m_profile = 0;  // Profile from CANTalon to use. Set to zero until we can
-                      // actually test this.
+                  // actually test this.
 
   bool m_controlEnabled = true;
   ControlMode m_controlMode = kPercentVbus;
@@ -201,6 +203,6 @@ class CANTalon : public MotorSafety,
   void ApplyControlMode(CANSpeedController::ControlMode mode);
 
   // LiveWindow stuff.
-  ITable *m_table;
+  ::std::shared_ptr<ITable> m_table;
   bool m_isInverted;
 };

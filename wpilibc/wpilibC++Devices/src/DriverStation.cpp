@@ -88,9 +88,9 @@ void DriverStation::Run() {
  * Return a pointer to the singleton DriverStation.
  * @return Pointer to the DS instance
  */
-DriverStation* DriverStation::GetInstance() {
+DriverStation &DriverStation::GetInstance() {
   static DriverStation instance;
-  return &instance;
+  return instance;
 }
 
 /**

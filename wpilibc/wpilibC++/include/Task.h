@@ -12,6 +12,8 @@
 #include <string>
 #include <thread>
 
+#include <string>
+
 /**
  * WPI task is a wrapper for the native Task object.
  * All WPILib tasks are managed by a static task manager for simplified cleanup.

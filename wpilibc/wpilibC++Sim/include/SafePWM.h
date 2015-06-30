@@ -7,8 +7,8 @@
 
 #include "MotorSafety.h"
 #include "PWM.h"
-
-class MotorSafetyHelper;
+#include "MotorSafetyHelper.h"
+#include <memory>
 
 /**
  * A safe version of the PWM class.
@@ -21,7 +21,7 @@ class SafePWM : public PWM, public MotorSafety
 {
 public:
 	explicit SafePWM(uint32_t channel);
-	~SafePWM();
+	virtual ~SafePWM() = default;
 
 	void SetExpiration(float timeout);
 	float GetExpiration() const;
@@ -29,9 +29,9 @@ public:
 	void StopMotor();
 	bool IsSafetyEnabled() const;
 	void SetSafetyEnabled(bool enabled);
-	void GetDescription(char *desc) const;
+	void GetDescription(std::ostringstream& desc) const;
 
 	virtual void SetSpeed(float speed);
 private:
-	MotorSafetyHelper *m_safetyHelper;
+	std::unique_ptr<MotorSafetyHelper> m_safetyHelper;
 };

@@ -15,7 +15,7 @@
 #include "HAL/HAL.hpp"
 
 // Allocate each direction separately.
-static Resource *relayChannels = nullptr;
+static ::std::unique_ptr<Resource> relayChannels;
 
 /**
  * Relay constructor given a channel.
@@ -28,7 +28,7 @@ static Resource *relayChannels = nullptr;
 Relay::Relay(uint32_t channel, Relay::Direction direction)
     : m_channel(channel), m_direction(direction) {
   char buf[64];
-  Resource::CreateResourceObject(&relayChannels,
+  Resource::CreateResourceObject(relayChannels,
                                  dio_kNumSystems * kRelayChannels * 2);
   if (!SensorBase::CheckRelayChannel(m_channel)) {
     snprintf(buf, 64, "Relay Channel %d", m_channel);
@@ -39,7 +39,7 @@ Relay::Relay(uint32_t channel, Relay::Direction direction)
   if (m_direction == kBothDirections || m_direction == kForwardOnly) {
     snprintf(buf, 64, "Forward Relay %d", m_channel);
     if (relayChannels->Allocate(m_channel * 2, buf) == ~0ul) {
-      CloneError(relayChannels);
+      CloneError(*relayChannels);
       return;
     }
 
@@ -48,7 +48,7 @@ Relay::Relay(uint32_t channel, Relay::Direction direction)
   if (m_direction == kBothDirections || m_direction == kReverseOnly) {
     snprintf(buf, 64, "Reverse Relay %d", m_channel);
     if (relayChannels->Allocate(m_channel * 2 + 1, buf) == ~0ul) {
-      CloneError(relayChannels);
+      CloneError(*relayChannels);
       return;
     }
 
@@ -60,7 +60,7 @@ Relay::Relay(uint32_t channel, Relay::Direction direction)
   setRelayReverse(m_relay_ports[m_channel], false, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
-  LiveWindow::GetInstance()->AddActuator("Relay", 1, m_channel, this);
+  LiveWindow::GetInstance().AddActuator("Relay", 1, m_channel, this);
 }
 
 /**
@@ -187,7 +187,7 @@ Relay::Value Relay::Get() const {
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
-void Relay::ValueChanged(ITable *source, const std::string &key,
+void Relay::ValueChanged(::std::shared_ptr<ITable> source, const std::string &key,
                          EntryValue value, bool isNew) {
   std::string *val = (std::string *)value.ptr;
   if (*val == "Off")
@@ -228,9 +228,9 @@ void Relay::StopLiveWindowMode() {
 
 std::string Relay::GetSmartDashboardType() const { return "Relay"; }
 
-void Relay::InitTable(ITable *subTable) {
+void Relay::InitTable(::std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-ITable *Relay::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> Relay::GetTable() const { return m_table; }

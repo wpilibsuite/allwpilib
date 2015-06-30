@@ -34,10 +34,7 @@ void Gyro::InitGyro() {
   if (!m_analog->IsAccumulatorChannel()) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange,
                                " channel (must be accumulator channel)");
-    if (m_channelAllocated) {
-      delete m_analog;
-      m_analog = nullptr;
-    }
+    m_analog = nullptr;
     return;
   }
 
@@ -55,7 +52,7 @@ void Gyro::InitGyro() {
 
   int64_t value;
   uint32_t count;
-  m_analog->GetAccumulatorOutput(&value, &count);
+  m_analog->GetAccumulatorOutput(value, count);
 
   m_center = (uint32_t)((float)value / (float)count + .5);
 
@@ -68,7 +65,7 @@ void Gyro::InitGyro() {
   SetPIDSourceParameter(kAngle);
 
   HALReport(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel());
-  LiveWindow::GetInstance()->AddSensor("Gyro", m_analog->GetChannel(), this);
+  LiveWindow::GetInstance().AddSensor("Gyro", m_analog->GetChannel(), this);
 }
 
 /**
@@ -78,8 +75,7 @@ void Gyro::InitGyro() {
                       can only be used on on-board Analog Inputs 0-1.
  */
 Gyro::Gyro(int32_t channel) {
-  m_analog = new AnalogInput(channel);
-  m_channelAllocated = true;
+  m_analog = ::std::make_shared<AnalogInput>(channel);
   InitGyro();
 }
 
@@ -92,28 +88,24 @@ Gyro::Gyro(int32_t channel) {
  * @param channel A pointer to the AnalogInput object that the gyro is connected
  * to.
  */
-Gyro::Gyro(AnalogInput *channel) {
-  m_analog = channel;
-  m_channelAllocated = false;
-  if (channel == nullptr) {
-    wpi_setWPIError(NullParameter);
-  } else {
-    InitGyro();
-  }
-}
+Gyro::Gyro(AnalogInput *channel)
+    : Gyro(::std::shared_ptr<AnalogInput>(channel,
+                                          NullDeleter<AnalogInput>())) {}
 
 /**
  * Gyro constructor with a precreated AnalogInput object.
  * Use this constructor when the analog channel needs to be shared.
  * This object will not clean up the AnalogInput object when using this
  * constructor
- * @param channel A reference to the AnalogInput object that the gyro is
+ * @param channel A pointer to the AnalogInput object that the gyro is
  * connected to.
  */
-Gyro::Gyro(AnalogInput &channel) {
-  m_analog = &channel;
-  m_channelAllocated = false;
-  InitGyro();
+Gyro::Gyro(::std::shared_ptr<AnalogInput> channel) : m_analog(channel) {
+  if (channel == nullptr) {
+    wpi_setWPIError(NullParameter);
+  } else {
+    InitGyro();
+  }
 }
 
 /**
@@ -123,13 +115,6 @@ Gyro::Gyro(AnalogInput &channel) {
  * drift in the gyro and it needs to be recalibrated after it has been running.
  */
 void Gyro::Reset() { m_analog->ResetAccumulator(); }
-
-/**
- * Delete (free) the accumulator and the analog components used for the gyro.
- */
-Gyro::~Gyro() {
-  if (m_channelAllocated) delete m_analog;
-}
 
 /**
  * Return the actual angle in degrees that the robot is currently facing.
@@ -149,7 +134,7 @@ Gyro::~Gyro() {
 float Gyro::GetAngle() const {
   int64_t rawValue;
   uint32_t count;
-  m_analog->GetAccumulatorOutput(&rawValue, &count);
+  m_analog->GetAccumulatorOutput(rawValue, count);
 
   int64_t value = rawValue - (int64_t)((float)count * m_offset);
 
@@ -240,9 +225,9 @@ void Gyro::StopLiveWindowMode() {}
 
 std::string Gyro::GetSmartDashboardType() const { return "Gyro"; }
 
-void Gyro::InitTable(ITable *subTable) {
+void Gyro::InitTable(::std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-ITable *Gyro::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> Gyro::GetTable() const { return m_table; }

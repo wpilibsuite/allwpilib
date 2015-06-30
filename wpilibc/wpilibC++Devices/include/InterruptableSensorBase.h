@@ -10,6 +10,8 @@
 #include "SensorBase.h"
 #include "Resource.h"
 
+#include <memory>
+
 class InterruptableSensorBase : public SensorBase {
  public:
   enum WaitResult {
@@ -46,5 +48,5 @@ class InterruptableSensorBase : public SensorBase {
   uint32_t m_interruptIndex;
   void AllocateInterrupts(bool watcher);
 
-  static Resource *m_interrupts;
+  static ::std::unique_ptr<Resource> m_interrupts;
 };

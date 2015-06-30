@@ -9,10 +9,10 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 
-Resource *InterruptableSensorBase::m_interrupts = nullptr;
+::std::unique_ptr<Resource> InterruptableSensorBase::m_interrupts =
+    ::std::make_unique<Resource>(interrupt_kNumSystems);
 
 InterruptableSensorBase::InterruptableSensorBase() {
-  Resource::CreateResourceObject(&m_interrupts, interrupt_kNumSystems);
 }
 
 /**
@@ -29,7 +29,7 @@ void InterruptableSensorBase::RequestInterrupts(
   if (StatusIsFatal()) return;
   uint32_t index = m_interrupts->Allocate("Async Interrupt");
   if (index == ~0ul) {
-    CloneError(m_interrupts);
+    CloneError(*m_interrupts);
     return;
   }
   m_interruptIndex = index;
@@ -56,7 +56,7 @@ void InterruptableSensorBase::RequestInterrupts() {
   if (StatusIsFatal()) return;
   uint32_t index = m_interrupts->Allocate("Sync Interrupt");
   if (index == ~0ul) {
-    CloneError(m_interrupts);
+    CloneError(*m_interrupts);
     return;
   }
   m_interruptIndex = index;

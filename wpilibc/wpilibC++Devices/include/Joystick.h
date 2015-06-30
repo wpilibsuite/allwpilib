@@ -9,6 +9,8 @@
 #define JOYSTICK_H_
 
 #include <cstdint>
+#include <memory>
+#include <vector>
 #include "GenericHID.h"
 #include "ErrorBase.h"
 
@@ -62,7 +64,7 @@ class Joystick : public GenericHID, public ErrorBase {
   } HIDType;
   explicit Joystick(uint32_t port);
   Joystick(uint32_t port, uint32_t numAxisTypes, uint32_t numButtonTypes);
-  virtual ~Joystick();
+  virtual ~Joystick() = default;
 
   uint32_t GetAxisChannel(AxisType axis) const;
   void SetAxisChannel(AxisType axis, uint32_t channel);
@@ -103,10 +105,10 @@ class Joystick : public GenericHID, public ErrorBase {
  private:
   DISALLOW_COPY_AND_ASSIGN(Joystick);
 
-  DriverStation *m_ds = nullptr;
+  DriverStation &m_ds;
   uint32_t m_port;
-  uint32_t *m_axes = nullptr;
-  uint32_t *m_buttons = nullptr;
+  ::std::vector<uint32_t> m_axes;
+  ::std::vector<uint32_t> m_buttons;
   uint32_t m_outputs = 0;
   uint16_t m_leftRumble = 0;
   uint16_t m_rightRumble = 0;

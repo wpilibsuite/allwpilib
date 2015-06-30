@@ -31,7 +31,7 @@ DigitalInput::DigitalInput(uint32_t channel) {
   allocateDIO(m_digital_ports[channel], true, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
-  LiveWindow::GetInstance()->AddSensor("DigitalInput", channel, this);
+  LiveWindow::GetInstance().AddSensor("DigitalInput", channel, this);
   HALReport(HALUsageReporting::kResourceType_DigitalInput, channel);
 }
 
@@ -98,9 +98,9 @@ std::string DigitalInput::GetSmartDashboardType() const {
   return "DigitalInput";
 }
 
-void DigitalInput::InitTable(ITable *subTable) {
+void DigitalInput::InitTable(::std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-ITable *DigitalInput::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> DigitalInput::GetTable() const { return m_table; }

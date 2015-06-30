@@ -9,6 +9,8 @@
 #include <cstddef>
 #include "HAL/cpp/priority_mutex.h"
 
+namespace hal {
+
 priority_recursive_mutex Resource::m_createLock;
 
 /**
@@ -16,15 +18,9 @@ priority_recursive_mutex Resource::m_createLock;
  * Allocate a bool array of values that will get initialized to indicate that no resources
  * have been allocated yet. The indicies of the resources are [0 .. elements - 1].
  */
-Resource::Resource(uint32_t elements)
-{
-	std::unique_lock<priority_recursive_mutex> sync(m_createLock);
-	m_size = elements;
-	m_isAllocated = new bool[m_size];
-	for (uint32_t i=0; i < m_size; i++)
-	{
-		m_isAllocated[i] = false;
-	}
+Resource::Resource(uint32_t elements) {
+  std::unique_lock<priority_recursive_mutex> sync(m_createLock);
+  m_isAllocated = std::vector<bool>(elements, false);
 }
 
 /**
@@ -47,15 +43,6 @@ Resource::Resource(uint32_t elements)
 }
 
 /**
- * Delete the allocated array or resources.
- * This happens when the module is unloaded (provided it was statically allocated).
- */
-Resource::~Resource()
-{
-	delete[] m_isAllocated;
-}
-
-/**
  * Allocate a resource.
  * When a resource is requested, mark it allocated. In this case, a free resource value
  * within the range is located and returned after it is marked allocated.
@@ -63,7 +50,7 @@ Resource::~Resource()
 uint32_t Resource::Allocate(const char *resourceDesc)
 {
 	std::unique_lock<priority_recursive_mutex> sync(m_allocateLock);
-	for (uint32_t i=0; i < m_size; i++)
+	for (uint32_t i=0; i < m_isAllocated.size(); i++)
 	{
 		if (!m_isAllocated[i])
 		{
@@ -83,7 +70,7 @@ uint32_t Resource::Allocate(const char *resourceDesc)
 uint32_t Resource::Allocate(uint32_t index, const char *resourceDesc)
 {
 	std::unique_lock<priority_recursive_mutex> sync(m_allocateLock);
-	if (index >= m_size)
+	if (index >= m_isAllocated.size())
 	{
 		// TODO: wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, resourceDesc);
 		return ~0ul;
@@ -107,7 +94,7 @@ void Resource::Free(uint32_t index)
 {
 	std::unique_lock<priority_recursive_mutex> sync(m_allocateLock);
 	if (index == ~0ul) return;
-	if (index >= m_size)
+	if (index >= m_isAllocated.size())
 	{
 		// TODO: wpi_setWPIError(NotAllocated);
 		return;
@@ -119,3 +106,5 @@ void Resource::Free(uint32_t index)
 	}
 	m_isAllocated[index] = false;
 }
+
+}  // namespace hal

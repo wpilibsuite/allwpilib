@@ -18,7 +18,7 @@ BuiltInAccelerometer::BuiltInAccelerometer(Range range) {
 
   HALReport(HALUsageReporting::kResourceType_Accelerometer, 0, 0,
             "Built-in accelerometer");
-  LiveWindow::GetInstance()->AddSensor((std::string) "BuiltInAccel", 0, this);
+  LiveWindow::GetInstance().AddSensor((std::string) "BuiltInAccel", 0, this);
 }
 
 /** {@inheritdoc} */
@@ -52,7 +52,7 @@ std::string BuiltInAccelerometer::GetSmartDashboardType() const {
   return "3AxisAccelerometer";
 }
 
-void BuiltInAccelerometer::InitTable(ITable* subtable) {
+void BuiltInAccelerometer::InitTable(::std::shared_ptr<ITable> subtable) {
   m_table = subtable;
   UpdateTable();
 }
@@ -65,4 +65,4 @@ void BuiltInAccelerometer::UpdateTable() {
   }
 }
 
-ITable* BuiltInAccelerometer::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> BuiltInAccelerometer::GetTable() const { return m_table; }

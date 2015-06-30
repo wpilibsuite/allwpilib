@@ -11,6 +11,7 @@
 //#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
 #include "WPIErrors.h"
+#include <memory>
 
 /**
  * Constructor for an analog trigger given a channel number.
@@ -109,7 +110,7 @@ void AnalogTrigger::SetFiltered(bool useFilteredValue) {
  * This is the FPGA index of this analog trigger instance.
  * @return The index of the analog trigger.
  */
-uint32_t AnalogTrigger::GetIndex() {
+uint32_t AnalogTrigger::GetIndex() const {
   if (StatusIsFatal()) return ~0ul;
   return m_index;
 }
@@ -150,7 +151,9 @@ bool AnalogTrigger::GetTriggerState() {
  * @param type An enum of the type of output object to create.
  * @return A pointer to a new AnalogTriggerOutput object.
  */
-AnalogTriggerOutput *AnalogTrigger::CreateOutput(AnalogTriggerType type) {
+::std::shared_ptr<AnalogTriggerOutput> AnalogTrigger::CreateOutput(
+    AnalogTriggerType type) const {
   if (StatusIsFatal()) return nullptr;
-  return new AnalogTriggerOutput(this, type);
+  return ::std::shared_ptr<AnalogTriggerOutput>(
+      new AnalogTriggerOutput(*this, type), NullDeleter<AnalogTriggerOutput>());
 }

@@ -84,21 +84,13 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
 	m_pidOutput = output;
 	m_period = period;
 
-	m_controlLoop = new Notifier(PIDController::CallCalculate, this);
+	m_controlLoop = ::std::make_unique<Notifier>(PIDController::CallCalculate, this);
 	m_controlLoop->StartPeriodic(m_period);
 
 	static int32_t instances = 0;
 	instances++;
 
 	m_toleranceType = kNoTolerance;
-}
-
-/**
- * Free the PID object
- */
-PIDController::~PIDController()
-{
-	delete m_controlLoop;
 }
 
 /**
@@ -499,7 +491,7 @@ std::string PIDController::GetSmartDashboardType() const {
 	return "PIDController";
 }
 
-void PIDController::InitTable(ITable* table){
+void PIDController::InitTable(::std::shared_ptr<ITable> table){
 	if(m_table!=nullptr)
 		m_table->RemoveTableListener(this);
 	m_table = table;
@@ -514,11 +506,11 @@ void PIDController::InitTable(ITable* table){
 	}
 }
 
-ITable* PIDController::GetTable() const {
+::std::shared_ptr<ITable> PIDController::GetTable() const {
 	return m_table;
 }
 
-void PIDController::ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew){
+void PIDController::ValueChanged(::std::shared_ptr<ITable> source, const std::string& key, EntryValue value, bool isNew){
 	if (key==kP || key==kI || key==kD || key==kF) {
 		if (m_P != m_table->GetNumber(kP) || m_I != m_table->GetNumber(kI) || m_D != m_table->GetNumber(kD) || m_F != m_table->GetNumber(kF)  ) {
 			SetPID(m_table->GetNumber(kP, 0.0), m_table->GetNumber(kI, 0.0), m_table->GetNumber(kD, 0.0), m_table->GetNumber(kF, 0.0));

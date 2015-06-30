@@ -23,9 +23,9 @@ Scheduler::Scheduler() {
  * Returns the {@link Scheduler}, creating it if one does not exist.
  * @return the {@link Scheduler}
  */
-Scheduler *Scheduler::GetInstance() {
+Scheduler &Scheduler::GetInstance() {
   static Scheduler instance;
-  return &instance;
+  return instance;
 }
 
 void Scheduler::SetEnabled(bool enabled) { m_enabled = enabled; }
@@ -258,7 +258,7 @@ std::string Scheduler::GetType() const { return "Scheduler"; }
 
 std::string Scheduler::GetSmartDashboardType() const { return "Scheduler"; }
 
-void Scheduler::InitTable(ITable *subTable) {
+void Scheduler::InitTable(::std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   commands = new StringArray();
   ids = new NumberArray();
@@ -269,4 +269,4 @@ void Scheduler::InitTable(ITable *subTable) {
   m_table->PutValue("Cancel", *toCancel);
 }
 
-ITable *Scheduler::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> Scheduler::GetTable() const { return m_table; }

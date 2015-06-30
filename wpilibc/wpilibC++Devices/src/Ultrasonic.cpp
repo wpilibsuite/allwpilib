@@ -72,17 +72,16 @@ void Ultrasonic::Initialize() {
     m_firstSensor = this;
   }
 
-  m_counter = new Counter(m_echoChannel);  // set up counter for this sensor
-  m_counter->SetMaxPeriod(1.0);
-  m_counter->SetSemiPeriodMode(true);
-  m_counter->Reset();
+  m_counter.SetMaxPeriod(1.0);
+  m_counter.SetSemiPeriodMode(true);
+  m_counter.Reset();
   m_enabled = true;  // make it available for round robin scheduling
   SetAutomaticMode(originalMode);
 
   static int instances = 0;
   instances++;
   HALReport(HALUsageReporting::kResourceType_Ultrasonic, instances);
-  LiveWindow::GetInstance()->AddSensor("Ultrasonic",
+  LiveWindow::GetInstance().AddSensor("Ultrasonic",
                                        m_echoChannel->GetChannel(), this);
 }
 
@@ -99,10 +98,10 @@ void Ultrasonic::Initialize() {
  * @param units The units returned in either kInches or kMilliMeters
  */
 Ultrasonic::Ultrasonic(uint32_t pingChannel, uint32_t echoChannel,
-                       DistanceUnit units) {
-  m_pingChannel = new DigitalOutput(pingChannel);
-  m_echoChannel = new DigitalInput(echoChannel);
-  m_allocatedChannels = true;
+                       DistanceUnit units)
+    : m_pingChannel(::std::make_shared<DigitalOutput>(pingChannel)),
+      m_echoChannel(::std::make_shared<DigitalInput>(echoChannel)),
+      m_counter(m_echoChannel) {
   m_units = units;
   Initialize();
 }
@@ -118,14 +117,14 @@ Ultrasonic::Ultrasonic(uint32_t pingChannel, uint32_t echoChannel,
  * @param units The units returned in either kInches or kMilliMeters
  */
 Ultrasonic::Ultrasonic(DigitalOutput *pingChannel, DigitalInput *echoChannel,
-                       DistanceUnit units) {
+                       DistanceUnit units)
+    : m_pingChannel(pingChannel, NullDeleter<DigitalOutput>()),
+      m_echoChannel(echoChannel, NullDeleter<DigitalInput>()),
+      m_counter(m_echoChannel) {
   if (pingChannel == nullptr || echoChannel == nullptr) {
     wpi_setWPIError(NullParameter);
     return;
   }
-  m_allocatedChannels = false;
-  m_pingChannel = pingChannel;
-  m_echoChannel = echoChannel;
   m_units = units;
   Initialize();
 }
@@ -141,10 +140,30 @@ Ultrasonic::Ultrasonic(DigitalOutput *pingChannel, DigitalInput *echoChannel,
  * @param units The units returned in either kInches or kMilliMeters
  */
 Ultrasonic::Ultrasonic(DigitalOutput &pingChannel, DigitalInput &echoChannel,
-                       DistanceUnit units) {
-  m_allocatedChannels = false;
-  m_pingChannel = &pingChannel;
-  m_echoChannel = &echoChannel;
+                       DistanceUnit units)
+    : m_pingChannel(&pingChannel, NullDeleter<DigitalOutput>()),
+      m_echoChannel(&echoChannel, NullDeleter<DigitalInput>()),
+      m_counter(m_echoChannel) {
+  m_units = units;
+  Initialize();
+}
+
+/**
+ * Create an instance of an Ultrasonic Sensor from a DigitalInput for the echo
+ * channel and a DigitalOutput
+ * for the ping channel.
+ * @param pingChannel The digital output object that starts the sensor doing a
+ * ping. Requires a 10uS pulse to start.
+ * @param echoChannel The digital input object that times the return pulse to
+ * determine the range.
+ * @param units The units returned in either kInches or kMilliMeters
+ */
+Ultrasonic::Ultrasonic(::std::shared_ptr<DigitalOutput> pingChannel,
+                       ::std::shared_ptr<DigitalInput> echoChannel,
+                       DistanceUnit units)
+    : m_pingChannel(pingChannel),
+      m_echoChannel(echoChannel),
+      m_counter(m_echoChannel) {
   m_units = units;
   Initialize();
 }
@@ -160,10 +179,6 @@ Ultrasonic::Ultrasonic(DigitalOutput &pingChannel, DigitalInput &echoChannel,
 Ultrasonic::~Ultrasonic() {
   bool wasAutomaticMode = m_automaticEnabled;
   SetAutomaticMode(false);
-  if (m_allocatedChannels) {
-    delete m_pingChannel;
-    delete m_echoChannel;
-  }
   wpi_assert(m_firstSensor != nullptr);
 
   {
@@ -194,7 +209,7 @@ Ultrasonic::~Ultrasonic() {
  * the ultrasonic sensors. This
  * scheduling method assures that the sensors are non-interfering because no two
  * sensors fire at the same time.
- * If another scheduling algorithm is preffered, it can be implemented by
+ * If another scheduling algorithm is prefered, it can be implemented by
  * pinging the sensors manually and waiting
  * for the results to come back.
  */
@@ -206,7 +221,7 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
     // enabling automatic mode.
     // Clear all the counters so no data is valid
     for (Ultrasonic *u = m_firstSensor; u != nullptr; u = u->m_nextSensor) {
-      u->m_counter->Reset();
+      u->m_counter.Reset();
     }
     // Start round robin task
     wpi_assert(m_task.Verify() ==
@@ -225,7 +240,7 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
 
     // clear all the counters (data now invalid) since automatic mode is stopped
     for (Ultrasonic *u = m_firstSensor; u != nullptr; u = u->m_nextSensor) {
-      u->m_counter->Reset();
+      u->m_counter.Reset();
     }
     m_automaticEnabled = false;
     m_task.join();
@@ -242,7 +257,7 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
  */
 void Ultrasonic::Ping() {
   wpi_assert(!m_automaticEnabled);
-  m_counter->Reset();  // reset the counter to zero (invalid data now)
+  m_counter.Reset();  // reset the counter to zero (invalid data now)
   m_pingChannel->Pulse(
       kPingTime);  // do the ping to start getting a single range
 }
@@ -254,7 +269,7 @@ void Ultrasonic::Ping() {
  * signal. If the count is not at least 2, then the range has not yet been
  * measured, and is invalid.
  */
-bool Ultrasonic::IsRangeValid() const { return m_counter->Get() > 1; }
+bool Ultrasonic::IsRangeValid() const { return m_counter.Get() > 1; }
 
 /**
  * Get the range in inches from the ultrasonic sensor.
@@ -265,7 +280,7 @@ bool Ultrasonic::IsRangeValid() const { return m_counter->Get() > 1; }
  */
 double Ultrasonic::GetRangeInches() const {
   if (IsRangeValid())
-    return m_counter->GetPeriod() * kSpeedOfSoundInchesPerSec / 2.0;
+    return m_counter.GetPeriod() * kSpeedOfSoundInchesPerSec / 2.0;
   else
     return 0;
 }
@@ -324,9 +339,9 @@ void Ultrasonic::StopLiveWindowMode() {}
 
 std::string Ultrasonic::GetSmartDashboardType() const { return "Ultrasonic"; }
 
-void Ultrasonic::InitTable(ITable *subTable) {
+void Ultrasonic::InitTable(::std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-ITable *Ultrasonic::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> Ultrasonic::GetTable() const { return m_table; }

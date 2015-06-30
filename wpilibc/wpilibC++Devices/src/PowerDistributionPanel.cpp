@@ -180,9 +180,9 @@ std::string PowerDistributionPanel::GetSmartDashboardType() const {
   return "PowerDistributionPanel";
 }
 
-void PowerDistributionPanel::InitTable(ITable *subTable) {
+void PowerDistributionPanel::InitTable(::std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-ITable *PowerDistributionPanel::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> PowerDistributionPanel::GetTable() const { return m_table; }

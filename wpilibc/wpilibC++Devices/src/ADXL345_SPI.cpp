@@ -25,14 +25,14 @@ constexpr double ADXL345_SPI::kGsPerLSB;
 ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::Range range) {
   m_port = port;
   Init(range);
-  LiveWindow::GetInstance()->AddSensor("ADXL345_SPI", port, this);
+  LiveWindow::GetInstance().AddSensor("ADXL345_SPI", port, this);
 }
 
 /**
  * Internal common init function.
  */
 void ADXL345_SPI::Init(Range range) {
-  m_spi = new SPI(m_port);
+  m_spi = std::make_unique<SPI>(m_port);
   m_spi->SetClockRate(500000);
   m_spi->SetMSBFirst();
   m_spi->SetSampleDataOnFalling();
@@ -49,14 +49,6 @@ void ADXL345_SPI::Init(Range range) {
 
   HALReport(HALUsageReporting::kResourceType_ADXL345,
             HALUsageReporting::kADXL345_SPI);
-}
-
-/**
- * Destructor.
- */
-ADXL345_SPI::~ADXL345_SPI() {
-  delete m_spi;
-  m_spi = nullptr;
 }
 
 /** {@inheritdoc} */
@@ -130,7 +122,7 @@ std::string ADXL345_SPI::GetSmartDashboardType() const {
   return "3AxisAccelerometer";
 }
 
-void ADXL345_SPI::InitTable(ITable* subtable) {
+void ADXL345_SPI::InitTable(::std::shared_ptr<ITable> subtable) {
   m_table = subtable;
   UpdateTable();
 }
@@ -143,4 +135,4 @@ void ADXL345_SPI::UpdateTable() {
   }
 }
 
-ITable* ADXL345_SPI::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> ADXL345_SPI::GetTable() const { return m_table; }

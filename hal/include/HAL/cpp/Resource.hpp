@@ -9,6 +9,12 @@
 #include "HAL/cpp/priority_mutex.h"
 #include <stdint.h>
 
+#include <vector>
+
+// TODO: Replace this with something appropriate to avoid conflicts with
+// wpilibC++ Resource class (which performs an essentially identical function).
+namespace hal {
+
 /**
  * The Resource class is a convenient way to track allocated resources.
  * It tracks them as indicies in the range [0 .. elements - 1].
@@ -23,19 +29,18 @@ class Resource
 public:
 	Resource(const Resource&) = delete;
 	Resource& operator=(const Resource&) = delete;
-	virtual ~Resource();
+	explicit Resource(uint32_t size);
+	virtual ~Resource() = default;
 	static void CreateResourceObject(Resource **r, uint32_t elements);
 	uint32_t Allocate(const char *resourceDesc);
 	uint32_t Allocate(uint32_t index, const char *resourceDesc);
 	void Free(uint32_t index);
 
 private:
-	explicit Resource(uint32_t size);
-
-	bool *m_isAllocated;
+	::std::vector<bool> m_isAllocated;
 	priority_recursive_mutex m_allocateLock;
-	uint32_t m_size;
 
 	static priority_recursive_mutex m_createLock;
 };
 
+}  // namespace hal

@@ -13,33 +13,31 @@
 PIDCommand::PIDCommand(const char *name, double p, double i, double d, double f,
                        double period)
     : Command(name) {
-  m_controller = new PIDController(p, i, d, this, this, period);
+  m_controller = std::make_unique<PIDController>(p, i, d, this, this, period);
 }
 
 PIDCommand::PIDCommand(double p, double i, double d, double f, double period) {
-  m_controller = new PIDController(p, i, d, f, this, this, period);
+  m_controller = std::make_unique<PIDController>(p, i, d, f, this, this, period);
 }
 
 PIDCommand::PIDCommand(const char *name, double p, double i, double d)
     : Command(name) {
-  m_controller = new PIDController(p, i, d, this, this);
+  m_controller = std::make_unique<PIDController>(p, i, d, this, this);
 }
 
 PIDCommand::PIDCommand(const char *name, double p, double i, double d,
                        double period)
     : Command(name) {
-  m_controller = new PIDController(p, i, d, this, this, period);
+  m_controller = std::make_unique<PIDController>(p, i, d, this, this, period);
 }
 
 PIDCommand::PIDCommand(double p, double i, double d) {
-  m_controller = new PIDController(p, i, d, this, this);
+  m_controller = std::make_unique<PIDController>(p, i, d, this, this);
 }
 
 PIDCommand::PIDCommand(double p, double i, double d, double period) {
-  m_controller = new PIDController(p, i, d, this, this, period);
+  m_controller = std::make_unique<PIDController>(p, i, d, this, this, period);
 }
-
-PIDCommand::~PIDCommand() { delete m_controller; }
 
 void PIDCommand::_Initialize() { m_controller->Enable(); }
 
@@ -55,7 +53,7 @@ void PIDCommand::PIDWrite(float output) { UsePIDOutput(output); }
 
 double PIDCommand::PIDGet() const { return ReturnPIDInput(); }
 
-PIDController *PIDCommand::GetPIDController() const { return m_controller; }
+PIDController *PIDCommand::GetPIDController() const { return m_controller.get(); }
 
 void PIDCommand::SetSetpoint(double setpoint) {
   m_controller->SetSetpoint(setpoint);
@@ -66,7 +64,7 @@ double PIDCommand::GetSetpoint() const { return m_controller->GetSetpoint(); }
 double PIDCommand::GetPosition() const { return ReturnPIDInput(); }
 
 std::string PIDCommand::GetSmartDashboardType() const { return "PIDCommand"; }
-void PIDCommand::InitTable(ITable *table) {
+void PIDCommand::InitTable(::std::shared_ptr<ITable> table) {
   m_controller->InitTable(table);
   Command::InitTable(table);
 }

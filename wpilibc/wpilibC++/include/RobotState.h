@@ -5,6 +5,8 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
+#include <memory>
+
 class RobotStateInterface {
  public:
   virtual ~RobotStateInterface() = default;
@@ -17,10 +19,11 @@ class RobotStateInterface {
 
 class RobotState {
  private:
-  static RobotStateInterface* impl;
+  static ::std::shared_ptr<RobotStateInterface> impl;
 
  public:
-  static void SetImplementation(RobotStateInterface* i);
+  static void SetImplementation(RobotStateInterface& i);
+  static void SetImplementation(::std::shared_ptr<RobotStateInterface> i);
   static bool IsDisabled();
   static bool IsEnabled();
   static bool IsOperatorControl();

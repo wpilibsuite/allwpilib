@@ -6,6 +6,7 @@
 #include "Commands/Scheduler.h"
 #include <vector>
 #include <map>
+#include <memory>
 
 struct LiveWindowComponent {
   std::string subsystem;
@@ -29,12 +30,22 @@ struct LiveWindowComponent {
  */
 class LiveWindow {
  public:
-  static LiveWindow *GetInstance();
+  static LiveWindow &GetInstance();
   void Run();
+  [[deprecated(
+      "Raw pointers are deprecated; pass the component using shared_ptr "
+      "instead.")]]
   void AddSensor(const char *subsystem, const char *name,
                  LiveWindowSendable *component);
+  void AddSensor(const char *subsystem, const char *name,
+                 ::std::shared_ptr<LiveWindowSendable> component);
+  [[deprecated(
+      "Raw pointers are deprecated; pass the component using shared_ptr "
+      "instead.")]]
   void AddActuator(const char *subsystem, const char *name,
                    LiveWindowSendable *component);
+  void AddActuator(const char *subsystem, const char *name,
+                   ::std::shared_ptr<LiveWindowSendable> component);
   void AddSensor(std::string type, int channel, LiveWindowSendable *component);
   void AddActuator(std::string type, int channel,
                    LiveWindowSendable *component);
@@ -53,13 +64,13 @@ class LiveWindow {
   void Initialize();
   void InitializeLiveWindowComponents();
 
-  std::vector<LiveWindowSendable *> m_sensors;
-  std::map<LiveWindowSendable *, LiveWindowComponent> m_components;
+  std::vector<::std::shared_ptr<LiveWindowSendable>> m_sensors;
+  std::map<::std::shared_ptr<LiveWindowSendable>, LiveWindowComponent> m_components;
 
-  ITable *m_liveWindowTable;
-  ITable *m_statusTable;
+  ::std::shared_ptr<ITable> m_liveWindowTable;
+  ::std::shared_ptr<ITable> m_statusTable;
 
-  Scheduler *m_scheduler;
+  Scheduler &m_scheduler;
 
   bool m_enabled = false;
   bool m_firstTime = true;

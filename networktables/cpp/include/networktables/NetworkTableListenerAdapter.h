@@ -14,17 +14,22 @@ class NetworkTableListenerAdapter;
 #include "tables/ITable.h"
 #include <string>
 
+class NetworkTableListenerAdapter : public ITableListener {
+ private:
+  std::string prefix;
+  ITable* targetSource;
+  ITableListener* targetListener;
 
-class NetworkTableListenerAdapter : public ITableListener{
-private:
-	std::string prefix;
-	ITable* targetSource;
-	ITableListener* targetListener;
-public:
-	NetworkTableListenerAdapter(std::string prefix, ITable* targetSource, ITableListener* targetListener);
-	virtual ~NetworkTableListenerAdapter();
-    void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
+ public:
+  NetworkTableListenerAdapter(std::string prefix, ITable* targetSource,
+                              ITableListener* targetListener);
+  virtual ~NetworkTableListenerAdapter();
+  void ValueChanged(ITable* source, const std::string& key, EntryValue value,
+                    bool isNew);
+  void ValueChanged(::std::shared_ptr<ITable> source, const std::string& key,
+                    EntryValue value, bool isNew) {
+    ValueChanged(source.get(), key, value, isNew);
+  }
 };
-
 
 #endif /* NETWORKTABLELISTENERADAPTER_H_ */

@@ -14,12 +14,11 @@ class ITableListener;
 
 #include "tables/ITable.h"
 
-
-
+#include <memory>
 
 /**
  * A listener that listens to changes in values in a {@link ITable}
- * 
+ *
  * @author Mitchell
  *
  */
@@ -34,7 +33,18 @@ class ITableListener {
      * @param value the new value
      * @param isNew true if the key did not previously exist in the table, otherwise it is false
      */
-    virtual void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) = 0;
+    virtual void ValueChanged(::std::shared_ptr<ITable> source, const std::string& key, EntryValue value, bool isNew) = 0;
+
+    virtual void ValueChanged(ITable* source, const std::string& key,
+                              EntryValue value, bool isNew) {
+      ValueChanged(::std::shared_ptr<ITable>(source, NullDeleter<ITable>()), key, value, isNew);
+    }
+
+ private:
+  template <class T>
+  struct[[deprecated]] NullDeleter {
+    void operator()(T*) const noexcept {};
+  };
 };
 
 

@@ -5,8 +5,8 @@
 /*----------------------------------------------------------------------------*/
 
 #include "SafePWM.h"
-
-#include "MotorSafetyHelper.h"
+#include <sstream>
+#include <memory>
 
 /**
  * Constructor for a SafePWM object taking a channel number.
@@ -14,13 +14,8 @@
  */
 SafePWM::SafePWM(uint32_t channel): PWM(channel)
 {
-	m_safetyHelper = new MotorSafetyHelper(this);
+	m_safetyHelper = std::make_unique<MotorSafetyHelper>(this);
 	m_safetyHelper->SetSafetyEnabled(false);
-}
-
-SafePWM::~SafePWM()
-{
-	delete m_safetyHelper;
 }
 
 /*
@@ -80,9 +75,9 @@ bool SafePWM::IsSafetyEnabled() const
 	return m_safetyHelper->IsSafetyEnabled();
 }
 
-void SafePWM::GetDescription(char *desc) const
+void SafePWM::GetDescription(std::ostringstream& desc) const
 {
-	sprintf(desc, "PWM %d", GetChannel());
+	desc << "PWM " << GetChannel();
 }
 
 /**

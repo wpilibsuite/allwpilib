@@ -55,7 +55,7 @@ PIDController::PIDController(float Kp, float Ki, float Kd, float Kf,
 void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
                                PIDSource *source, PIDOutput *output,
                                float period) {
-  m_controlLoop = new Notifier(PIDController::CallCalculate, this);
+  m_controlLoop = std::make_unique<Notifier>(PIDController::CallCalculate, this);
 
   m_P = Kp;
   m_I = Ki;
@@ -71,13 +71,6 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
   static int32_t instances = 0;
   instances++;
   HALReport(HALUsageReporting::kResourceType_PIDController, instances);
-}
-
-/**
- * Free the PID object
- */
-PIDController::~PIDController() {
-  delete m_controlLoop;
 }
 
 /**
@@ -463,7 +456,7 @@ std::string PIDController::GetSmartDashboardType() const {
   return "PIDController";
 }
 
-void PIDController::InitTable(ITable *table) {
+void PIDController::InitTable(::std::shared_ptr<ITable> table) {
   if (m_table != nullptr) m_table->RemoveTableListener(this);
   m_table = table;
   if (m_table != nullptr) {
@@ -477,9 +470,9 @@ void PIDController::InitTable(ITable *table) {
   }
 }
 
-ITable *PIDController::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> PIDController::GetTable() const { return m_table; }
 
-void PIDController::ValueChanged(ITable *source, const std::string &key,
+void PIDController::ValueChanged(::std::shared_ptr<ITable> source, const std::string &key,
                                  EntryValue value, bool isNew) {
   if (key == kP || key == kI || key == kD || key == kF) {
     if (m_P != m_table->GetNumber(kP) || m_I != m_table->GetNumber(kI) ||

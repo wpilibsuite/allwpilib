@@ -56,11 +56,11 @@ std::string DigitalInput::GetSmartDashboardType() const {
 	return "DigitalInput";
 }
 
-void DigitalInput::InitTable(ITable *subTable) {
+void DigitalInput::InitTable(::std::shared_ptr<ITable> subTable) {
 	m_table = subTable;
 	UpdateTable();
 }
 
-ITable * DigitalInput::GetTable() const {
+::std::shared_ptr<ITable> DigitalInput::GetTable() const {
 	return m_table;
 }

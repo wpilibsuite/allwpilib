@@ -20,11 +20,7 @@ priority_recursive_mutex Resource::m_createLock;
  */
 Resource::Resource(uint32_t elements) {
   std::unique_lock<priority_recursive_mutex> sync(m_createLock);
-  m_size = elements;
-  m_isAllocated = new bool[m_size];
-  for (uint32_t i = 0; i < m_size; i++) {
-    m_isAllocated[i] = false;
-  }
+  m_isAllocated = ::std::vector<bool>(elements, false);
 }
 
 /**
@@ -37,20 +33,13 @@ Resource::Resource(uint32_t elements) {
  *    track, that is, it will allocate resource numbers in the range
  *    [0 .. elements - 1].
  */
-/*static*/ void Resource::CreateResourceObject(Resource **r,
+/*static*/ void Resource::CreateResourceObject(::std::unique_ptr<Resource>& r,
                                                uint32_t elements) {
   std::unique_lock<priority_recursive_mutex> sync(m_createLock);
-  if (*r == nullptr) {
-    *r = new Resource(elements);
+  if (!r) {
+    r = std::make_unique<Resource>(elements);
   }
 }
-
-/**
- * Delete the allocated array or resources.
- * This happens when the module is unloaded (provided it was statically
- * allocated).
- */
-Resource::~Resource() { delete[] m_isAllocated; }
 
 /**
  * Allocate a resource.
@@ -60,7 +49,7 @@ Resource::~Resource() { delete[] m_isAllocated; }
  */
 uint32_t Resource::Allocate(const char *resourceDesc) {
   std::unique_lock<priority_recursive_mutex> sync(m_allocateLock);
-  for (uint32_t i = 0; i < m_size; i++) {
+  for (uint32_t i = 0; i < m_isAllocated.size(); i++) {
     if (!m_isAllocated[i]) {
       m_isAllocated[i] = true;
       return i;
@@ -78,7 +67,7 @@ uint32_t Resource::Allocate(const char *resourceDesc) {
  */
 uint32_t Resource::Allocate(uint32_t index, const char *resourceDesc) {
   std::unique_lock<priority_recursive_mutex> sync(m_allocateLock);
-  if (index >= m_size) {
+  if (index >= m_isAllocated.size()) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, resourceDesc);
     return ~0ul;
   }
@@ -100,7 +89,7 @@ uint32_t Resource::Allocate(uint32_t index, const char *resourceDesc) {
 void Resource::Free(uint32_t index) {
   std::unique_lock<priority_recursive_mutex> sync(m_allocateLock);
   if (index == ~0ul) return;
-  if (index >= m_size) {
+  if (index >= m_isAllocated.size()) {
     wpi_setWPIError(NotAllocated);
     return;
   }

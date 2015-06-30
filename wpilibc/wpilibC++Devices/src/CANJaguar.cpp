@@ -31,7 +31,7 @@ static const uint32_t kFullMessageIDMask =
 
 static const int32_t kReceiveStatusAttempts = 50;
 
-static Resource *allocated = nullptr;
+static ::std::unique_ptr<Resource> allocated;
 
 static int32_t sendMessageHelper(uint32_t messageID, const uint8_t *data,
                                  uint8_t dataSize, int32_t period) {
@@ -72,7 +72,7 @@ static int32_t sendMessageHelper(uint32_t messageID, const uint8_t *data,
  * Common initialization code called by all constructors.
  */
 void CANJaguar::InitCANJaguar() {
-  m_safetyHelper = new MotorSafetyHelper(this);
+  m_safetyHelper = std::make_unique<MotorSafetyHelper>(this);
 
   bool receivedFirmwareVersion = false;
   uint8_t dataBuffer[8];
@@ -149,7 +149,7 @@ void CANJaguar::InitCANJaguar() {
   }
   HALReport(HALUsageReporting::kResourceType_CANJaguar, m_deviceNumber,
             m_controlMode);
-  LiveWindow::GetInstance()->AddActuator("CANJaguar", m_deviceNumber, this);
+  LiveWindow::GetInstance().AddActuator("CANJaguar", m_deviceNumber, this);
 }
 
 /**
@@ -180,10 +180,10 @@ CANJaguar::CANJaguar(uint8_t deviceNumber)
     : m_deviceNumber(deviceNumber) {
   char buf[64];
   snprintf(buf, 64, "CANJaguar device number %d", m_deviceNumber);
-  Resource::CreateResourceObject(&allocated, 63);
+  Resource::CreateResourceObject(allocated, 63);
 
   if (allocated->Allocate(m_deviceNumber - 1, buf) == ~0ul) {
-    CloneError(allocated);
+    CloneError(*allocated);
     return;
   }
 
@@ -218,9 +218,6 @@ CANJaguar::~CANJaguar() {
     FRC_NetworkCommunication_CANSessionMux_sendMessage(
         m_deviceNumber | LM_API_VCOMP_T_SET, nullptr, 0,
         CAN_SEND_PERIOD_STOP_REPEATING, &status);
-
-  delete m_safetyHelper;
-  m_safetyHelper = nullptr;
 }
 
 /**
@@ -1926,8 +1923,8 @@ void CANJaguar::SetSafetyEnabled(bool enabled) {
   if (m_safetyHelper) m_safetyHelper->SetSafetyEnabled(enabled);
 }
 
-void CANJaguar::GetDescription(char *desc) const {
-  sprintf(desc, "CANJaguar ID %d", m_deviceNumber);
+void CANJaguar::GetDescription(std::ostringstream& desc) const {
+  desc << "CANJaguar ID " << m_deviceNumber;
 }
 
 uint8_t CANJaguar::GetDeviceID() const { return m_deviceNumber; }
@@ -1940,7 +1937,7 @@ uint8_t CANJaguar::GetDeviceID() const { return m_deviceNumber; }
  */
 void CANJaguar::StopMotor() { DisableControl(); }
 
-void CANJaguar::ValueChanged(ITable *source, const std::string &key,
+void CANJaguar::ValueChanged(::std::shared_ptr<ITable> source, const std::string &key,
                              EntryValue value, bool isNew) {
   Set(value.f);
 }
@@ -1982,9 +1979,9 @@ std::string CANJaguar::GetSmartDashboardType() const {
   return "Speed Controller";
 }
 
-void CANJaguar::InitTable(ITable *subTable) {
+void CANJaguar::InitTable(::std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-ITable *CANJaguar::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> CANJaguar::GetTable() const { return m_table; }

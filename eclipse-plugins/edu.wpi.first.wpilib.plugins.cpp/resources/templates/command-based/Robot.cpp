@@ -27,7 +27,7 @@ private:
 	
 	void DisabledPeriodic()
 	{
-		Scheduler::GetInstance()->Run();
+		Scheduler::GetInstance().Run();
 	}
 
 	void AutonomousInit()
@@ -38,7 +38,7 @@ private:
 
 	void AutonomousPeriodic()
 	{
-		Scheduler::GetInstance()->Run();
+		Scheduler::GetInstance().Run();
 	}
 
 	void TeleopInit()
@@ -53,7 +53,7 @@ private:
 
 	void TeleopPeriodic()
 	{
-		Scheduler::GetInstance()->Run();
+		Scheduler::GetInstance().Run();
 	}
 
 	void TestPeriodic()

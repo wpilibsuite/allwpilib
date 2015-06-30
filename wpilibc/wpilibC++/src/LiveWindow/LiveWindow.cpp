@@ -9,19 +9,18 @@
  * regardless of
  * how many times GetInstance is called.
  */
-LiveWindow *LiveWindow::GetInstance() {
+LiveWindow &LiveWindow::GetInstance() {
   static LiveWindow instance;
-  return &instance;
+  return instance;
 }
 
 /**
  * LiveWindow constructor.
  * Allocate the necessary tables.
  */
-LiveWindow::LiveWindow() {
-  m_liveWindowTable = NetworkTable::GetTable("LiveWindow");
-  m_statusTable = m_liveWindowTable->GetSubTable("~STATUS~");
-  m_scheduler = Scheduler::GetInstance();
+LiveWindow::LiveWindow() : m_scheduler(Scheduler::GetInstance()) {
+  m_liveWindowTable.reset(NetworkTable::GetTable("LiveWindow"));
+  m_statusTable.reset(m_liveWindowTable->GetSubTable("~STATUS~"));
 }
 
 /**
@@ -35,8 +34,8 @@ void LiveWindow::SetEnabled(bool enabled) {
       InitializeLiveWindowComponents();
       m_firstTime = false;
     }
-    m_scheduler->SetEnabled(false);
-    m_scheduler->RemoveAll();
+    m_scheduler.SetEnabled(false);
+    m_scheduler.RemoveAll();
     for (auto& elem : m_components) {
       elem.first->StartLiveWindowMode();
     }
@@ -44,7 +43,7 @@ void LiveWindow::SetEnabled(bool enabled) {
     for (auto& elem : m_components) {
       elem.first->StopLiveWindowMode();
     }
-    m_scheduler->SetEnabled(true);
+    m_scheduler.SetEnabled(true);
   }
   m_enabled = enabled;
   m_statusTable->PutBoolean("LW Enabled", m_enabled);
@@ -58,10 +57,15 @@ void LiveWindow::SetEnabled(bool enabled) {
  * @param component A LiveWindowSendable component that represents a sensor.
  */
 void LiveWindow::AddSensor(const char *subsystem, const char *name,
-                           LiveWindowSendable *component) {
+                           ::std::shared_ptr<LiveWindowSendable> component) {
   m_components[component].subsystem = subsystem;
   m_components[component].name = name;
   m_components[component].isSensor = true;
+}
+
+void LiveWindow::AddSensor(const char *subsystem, const char *name, LiveWindowSendable *component) {
+  AddSensor(subsystem, name, ::std::shared_ptr<LiveWindowSendable>(
+                                 component, NullDeleter<LiveWindowSendable>()));
 }
 
 /**
@@ -72,15 +76,23 @@ void LiveWindow::AddSensor(const char *subsystem, const char *name,
  * @param component A LiveWindowSendable component that represents a actuator.
  */
 void LiveWindow::AddActuator(const char *subsystem, const char *name,
-                             LiveWindowSendable *component) {
+                             ::std::shared_ptr<LiveWindowSendable> component) {
   m_components[component].subsystem = subsystem;
   m_components[component].name = name;
   m_components[component].isSensor = false;
 }
 
+void LiveWindow::AddActuator(const char *subsystem, const char *name,
+                             LiveWindowSendable *component) {
+  AddActuator(subsystem, name,
+              ::std::shared_ptr<LiveWindowSendable>(
+                  component, NullDeleter<LiveWindowSendable>()));
+}
+
 /**
  * INTERNAL
  */
+[[deprecated]]
 void LiveWindow::AddSensor(std::string type, int channel,
                            LiveWindowSendable *component) {
   std::ostringstream oss;
@@ -90,9 +102,11 @@ void LiveWindow::AddSensor(std::string type, int channel,
   types.copy(cc, types.size());
   cc[types.size()] = '\0';
   AddSensor("Ungrouped", cc, component);
-  if (std::find(m_sensors.begin(), m_sensors.end(), component) ==
+  ::std::shared_ptr<LiveWindowSendable> component_stl(
+      component, NullDeleter<LiveWindowSendable>());
+  if (std::find(m_sensors.begin(), m_sensors.end(), component_stl) ==
       m_sensors.end())
-    m_sensors.push_back(component);
+    m_sensors.push_back(component_stl);
 }
 
 /**
@@ -106,7 +120,8 @@ void LiveWindow::AddActuator(std::string type, int channel,
   auto cc = new char[types.size() + 1];
   types.copy(cc, types.size());
   cc[types.size()] = '\0';
-  AddActuator("Ungrouped", cc, component);
+  AddActuator("Ungrouped", cc, ::std::shared_ptr<LiveWindowSendable>(
+                                   component, [](LiveWindowSendable *) {}));
 }
 
 /**
@@ -120,7 +135,8 @@ void LiveWindow::AddActuator(std::string type, int module, int channel,
   auto cc = new char[types.size() + 1];
   types.copy(cc, types.size());
   cc[types.size()] = '\0';
-  AddActuator("Ungrouped", cc, component);
+  AddActuator("Ungrouped", cc, ::std::shared_ptr<LiveWindowSendable>(
+                                   component, [](LiveWindowSendable *) {}));
 }
 
 /**
@@ -146,25 +162,21 @@ void LiveWindow::Run() {
 
 /**
  * Initialize all the LiveWindow elements the first time we enter LiveWindow
- * mode.
- * By holding off creating the NetworkTable entries, it allows them to be
- * redefined
- * before the first time in LiveWindow mode. This allows default sensor and
- * actuator
- * values to be created that are replaced with the custom names from users
- * calling
- * addActuator and addSensor.
+ * mode. By holding off creating the NetworkTable entries, it allows them to be
+ * redefined before the first time in LiveWindow mode. This allows default
+ * sensor and actuator values to be created that are replaced with the custom
+ * names from users calling addActuator and addSensor.
  */
 void LiveWindow::InitializeLiveWindowComponents() {
   for (auto& elem : m_components) {
-    LiveWindowSendable *component = elem.first;
+    ::std::shared_ptr<LiveWindowSendable> component = elem.first;
     LiveWindowComponent c = elem.second;
     std::string subsystem = c.subsystem;
     std::string name = c.name;
     m_liveWindowTable->GetSubTable(subsystem)
         ->PutString("~TYPE~", "LW Subsystem");
-    ITable *table =
-        m_liveWindowTable->GetSubTable(subsystem)->GetSubTable(name);
+    ::std::shared_ptr<ITable> table(
+        m_liveWindowTable->GetSubTable(subsystem)->GetSubTable(name));
     table->PutString("~TYPE~", component->GetSmartDashboardType());
     table->PutString("Name", name);
     table->PutString("Subsystem", subsystem);

@@ -37,16 +37,16 @@ Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel)
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
     return;
   }
-  Resource::CreateResourceObject(&m_allocated, kSolenoidChannels * 63);
+  Resource::CreateResourceObject(m_allocated, kSolenoidChannels * 63);
 
   snprintf(buf, 64, "Solenoid %d (Module: %d)", m_channel, m_moduleNumber);
   if (m_allocated->Allocate(m_moduleNumber * kSolenoidChannels + m_channel,
                             buf) == ~0ul) {
-    CloneError(m_allocated);
+    CloneError(*m_allocated);
     return;
   }
 
-  LiveWindow::GetInstance()->AddActuator("Solenoid", m_moduleNumber, m_channel,
+  LiveWindow::GetInstance().AddActuator("Solenoid", m_moduleNumber, m_channel,
                                          this);
   HALReport(HALUsageReporting::kResourceType_Solenoid, m_channel,
             m_moduleNumber);
@@ -97,7 +97,7 @@ bool Solenoid::IsBlackListed() const {
   return (value != 0);
 }
 
-void Solenoid::ValueChanged(ITable* source, const std::string& key,
+void Solenoid::ValueChanged(::std::shared_ptr<ITable> source, const std::string& key,
                             EntryValue value, bool isNew) {
   Set(value.b);
 }
@@ -124,9 +124,9 @@ void Solenoid::StopLiveWindowMode() {
 
 std::string Solenoid::GetSmartDashboardType() const { return "Solenoid"; }
 
-void Solenoid::InitTable(ITable* subTable) {
+void Solenoid::InitTable(::std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-ITable* Solenoid::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> Solenoid::GetTable() const { return m_table; }

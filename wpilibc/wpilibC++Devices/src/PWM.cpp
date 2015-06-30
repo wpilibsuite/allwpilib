@@ -335,7 +335,7 @@ void PWM::SetZeroLatch() {
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
-void PWM::ValueChanged(ITable* source, const std::string& key, EntryValue value,
+void PWM::ValueChanged(::std::shared_ptr<ITable> source, const std::string& key, EntryValue value,
                        bool isNew) {
   SetSpeed(value.f);
 }
@@ -362,9 +362,9 @@ void PWM::StopLiveWindowMode() {
 
 std::string PWM::GetSmartDashboardType() const { return "Speed Controller"; }
 
-void PWM::InitTable(ITable* subTable) {
+void PWM::InitTable(::std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-ITable* PWM::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> PWM::GetTable() const { return m_table; }

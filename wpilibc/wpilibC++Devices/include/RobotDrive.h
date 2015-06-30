@@ -8,6 +8,8 @@
 
 #include "ErrorBase.h"
 #include <stdlib.h>
+#include <memory>
+#include <sstream>
 #include "HAL/HAL.hpp"
 #include "MotorSafety.h"
 #include "MotorSafetyHelper.h"
@@ -42,13 +44,23 @@ class RobotDrive : public MotorSafety, public ErrorBase {
   RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel);
   RobotDrive(uint32_t frontLeftMotorChannel, uint32_t rearLeftMotorChannel,
              uint32_t frontRightMotorChannel, uint32_t rearRightMotorChannel);
+  [[deprecated("Raw pointers are deprecated; use shared_ptr instead.")]]
   RobotDrive(SpeedController *leftMotor, SpeedController *rightMotor);
+  [[deprecated("References are deprecated; use shared_ptr instead.")]]
   RobotDrive(SpeedController &leftMotor, SpeedController &rightMotor);
+  RobotDrive(::std::shared_ptr<SpeedController> leftMotor,
+             ::std::shared_ptr<SpeedController> rightMotor);
+  [[deprecated("Raw pointers are deprecated; use shared_ptr instead.")]]
   RobotDrive(SpeedController *frontLeftMotor, SpeedController *rearLeftMotor,
              SpeedController *frontRightMotor, SpeedController *rearRightMotor);
+  [[deprecated("References are deprecated; use shared_ptr instead.")]]
   RobotDrive(SpeedController &frontLeftMotor, SpeedController &rearLeftMotor,
              SpeedController &frontRightMotor, SpeedController &rearRightMotor);
-  virtual ~RobotDrive();
+  RobotDrive(::std::shared_ptr<SpeedController> frontLeftMotor,
+             ::std::shared_ptr<SpeedController> rearLeftMotor,
+             ::std::shared_ptr<SpeedController> frontRightMotor,
+             ::std::shared_ptr<SpeedController> rearRightMotor);
+  virtual ~RobotDrive() = default;
 
   void Drive(float outputMagnitude, float curve);
   void TankDrive(GenericHID *leftStick, GenericHID *rightStick,
@@ -88,7 +100,7 @@ class RobotDrive : public MotorSafety, public ErrorBase {
   void StopMotor() override;
   bool IsSafetyEnabled() const override;
   void SetSafetyEnabled(bool enabled) override;
-  void GetDescription(char *desc) const override;
+  void GetDescription(std::ostringstream& desc) const override;
 
  protected:
   void InitRobotDrive();
@@ -99,12 +111,11 @@ class RobotDrive : public MotorSafety, public ErrorBase {
   static const int32_t kMaxNumberOfMotors = 4;
   float m_sensitivity = 0.5;
   double m_maxOutput = 1.0;
-  bool m_deleteSpeedControllers;
-  SpeedController *m_frontLeftMotor = nullptr;
-  SpeedController *m_frontRightMotor = nullptr;
-  SpeedController *m_rearLeftMotor = nullptr;
-  SpeedController *m_rearRightMotor = nullptr;
-  MotorSafetyHelper *m_safetyHelper = nullptr;
+  ::std::shared_ptr<SpeedController> m_frontLeftMotor = nullptr;
+  ::std::shared_ptr<SpeedController> m_frontRightMotor = nullptr;
+  ::std::shared_ptr<SpeedController> m_rearLeftMotor = nullptr;
+  ::std::shared_ptr<SpeedController> m_rearRightMotor = nullptr;
+  std::unique_ptr<MotorSafetyHelper> m_safetyHelper;
   uint8_t m_syncGroup = 0;
 
  private:

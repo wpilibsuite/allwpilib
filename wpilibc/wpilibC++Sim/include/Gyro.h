@@ -10,6 +10,8 @@
 #include "LiveWindow/LiveWindowSendable.h"
 #include "simulation/SimGyro.h"
 
+#include <memory>
+
 class AnalogInput;
 class AnalogModule;
 
@@ -46,8 +48,8 @@ public:
 	void StartLiveWindowMode() override;
 	void StopLiveWindowMode() override;
 	std::string GetSmartDashboardType() const override;
-	void InitTable(ITable *subTable) override;
-	ITable * GetTable() const override;
+	void InitTable(::std::shared_ptr<ITable> subTable) override;
+	::std::shared_ptr<ITable> GetTable() const override;
 
 private:
 	void InitGyro(int channel);
@@ -55,5 +57,5 @@ private:
 	SimGyro* impl;
 	PIDSourceParameter m_pidSource;
 
-	ITable *m_table = nullptr;
+	::std::shared_ptr<ITable> m_table = nullptr;
 };

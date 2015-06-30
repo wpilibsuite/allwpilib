@@ -9,6 +9,7 @@
 #include "interfaces/Accelerometer.h"
 #include "I2C.h"
 #include "LiveWindow/LiveWindowSendable.h"
+#include <memory>
 
 /**
  * ADXL345 Accelerometer on I2C.
@@ -63,12 +64,12 @@ class ADXL345_I2C : public Accelerometer,
   virtual AllAxes GetAccelerations();
 
   virtual std::string GetSmartDashboardType() const override;
-  virtual void InitTable(ITable *subtable) override;
+  virtual void InitTable(::std::shared_ptr<ITable> subtable) override;
   virtual void UpdateTable() override;
-  virtual ITable *GetTable() const override;
+  virtual ::std::shared_ptr<ITable> GetTable() const override;
   virtual void StartLiveWindowMode() override {}
   virtual void StopLiveWindowMode() override {}
 
  private:
-  ITable *m_table;
+  ::std::shared_ptr<ITable> m_table;
 };

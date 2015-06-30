@@ -10,7 +10,7 @@
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 
-static Resource *outputs = nullptr;
+static ::std::unique_ptr<Resource> outputs;
 
 /**
  * Construct an analog output on the given channel.
@@ -18,7 +18,7 @@ static Resource *outputs = nullptr;
  * @param The channel number on the roboRIO to represent.
  */
 AnalogOutput::AnalogOutput(uint32_t channel) {
-  Resource::CreateResourceObject(&outputs, kAnalogOutputs);
+  Resource::CreateResourceObject(outputs, kAnalogOutputs);
 
   char buf[64];
 
@@ -29,7 +29,7 @@ AnalogOutput::AnalogOutput(uint32_t channel) {
   }
 
   if (outputs->Allocate(channel, buf) == ~0ul) {
-    CloneError(outputs);
+    CloneError(*outputs);
     return;
   }
 
@@ -40,7 +40,7 @@ AnalogOutput::AnalogOutput(uint32_t channel) {
   m_port = initializeAnalogOutputPort(port, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
-  LiveWindow::GetInstance()->AddActuator("AnalogOutput", m_channel, this);
+  LiveWindow::GetInstance().AddActuator("AnalogOutput", m_channel, this);
   HALReport(HALUsageReporting::kResourceType_AnalogOutput, m_channel);
 }
 
@@ -89,9 +89,9 @@ std::string AnalogOutput::GetSmartDashboardType() const {
   return "Analog Output";
 }
 
-void AnalogOutput::InitTable(ITable *subTable) {
+void AnalogOutput::InitTable(::std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-ITable *AnalogOutput::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> AnalogOutput::GetTable() const { return m_table; }

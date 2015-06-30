@@ -72,7 +72,7 @@ public:
 	void StopMotor() override;
 	bool IsSafetyEnabled() const override;
 	void SetSafetyEnabled(bool enabled) override;
-	void GetDescription(char *desc) const override;
+	void GetDescription(std::ostringstream& desc) const override;
 
 protected:
 	void InitRobotDrive();

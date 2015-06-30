@@ -194,7 +194,7 @@ uint32_t DigitalOutput::GetModuleForRouting() const { return 0; }
  */
 bool DigitalOutput::GetAnalogTriggerForRouting() const { return false; }
 
-void DigitalOutput::ValueChanged(ITable *source, const std::string &key,
+void DigitalOutput::ValueChanged(::std::shared_ptr<ITable> source, const std::string &key,
                                  EntryValue value, bool isNew) {
   Set(value.b);
 }
@@ -217,9 +217,9 @@ std::string DigitalOutput::GetSmartDashboardType() const {
   return "Digital Output";
 }
 
-void DigitalOutput::InitTable(ITable *subTable) {
+void DigitalOutput::InitTable(::std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-ITable *DigitalOutput::GetTable() const { return m_table; }
+::std::shared_ptr<ITable> DigitalOutput::GetTable() const { return m_table; }

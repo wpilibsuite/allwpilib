@@ -574,11 +574,11 @@ struct trigger_t {
 };
 typedef struct trigger_t AnalogTrigger;
 
-static Resource *triggers = NULL;
+static hal::Resource *triggers = NULL;
 
 void* initializeAnalogTrigger(void* port_pointer, uint32_t *index, int32_t *status) {
   Port* port = (Port*) port_pointer;
-  Resource::CreateResourceObject(&triggers, tAnalogTrigger::kNumSystems);
+  hal::Resource::CreateResourceObject(&triggers, tAnalogTrigger::kNumSystems);
 
   AnalogTrigger* trigger = new AnalogTrigger();
   trigger->port = (AnalogPort*) initializeAnalogInputPort(port, status);

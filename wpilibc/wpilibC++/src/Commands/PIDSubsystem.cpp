@@ -19,7 +19,7 @@
  */
 PIDSubsystem::PIDSubsystem(const char *name, double p, double i, double d)
     : Subsystem(name) {
-  m_controller = new PIDController(p, i, d, this, this);
+  m_controller = std::make_unique<PIDController>(p, i, d, this, this);
 }
 
 /**
@@ -34,7 +34,7 @@ PIDSubsystem::PIDSubsystem(const char *name, double p, double i, double d)
 PIDSubsystem::PIDSubsystem(const char *name, double p, double i, double d,
                            double f)
     : Subsystem(name) {
-  m_controller = new PIDController(p, i, d, f, this, this);
+  m_controller = std::make_unique<PIDController>(p, i, d, f, this, this);
 }
 
 /**
@@ -51,7 +51,7 @@ PIDSubsystem::PIDSubsystem(const char *name, double p, double i, double d,
 PIDSubsystem::PIDSubsystem(const char *name, double p, double i, double d,
                            double f, double period)
     : Subsystem(name) {
-  m_controller = new PIDController(p, i, d, f, this, this, period);
+  m_controller = std::make_unique<PIDController>(p, i, d, f, this, this, period);
 }
 
 /**
@@ -64,7 +64,7 @@ PIDSubsystem::PIDSubsystem(const char *name, double p, double i, double d,
  */
 PIDSubsystem::PIDSubsystem(double p, double i, double d)
     : Subsystem("PIDSubsystem") {
-  m_controller = new PIDController(p, i, d, this, this);
+  m_controller = std::make_unique<PIDController>(p, i, d, this, this);
 }
 
 /**
@@ -78,7 +78,7 @@ PIDSubsystem::PIDSubsystem(double p, double i, double d)
  */
 PIDSubsystem::PIDSubsystem(double p, double i, double d, double f)
     : Subsystem("PIDSubsystem") {
-  m_controller = new PIDController(p, i, d, f, this, this);
+  m_controller = std::make_unique<PIDController>(p, i, d, f, this, this);
 }
 
 /**
@@ -96,10 +96,8 @@ PIDSubsystem::PIDSubsystem(double p, double i, double d, double f)
 PIDSubsystem::PIDSubsystem(double p, double i, double d, double f,
                            double period)
     : Subsystem("PIDSubsystem") {
-  m_controller = new PIDController(p, i, d, f, this, this, period);
+  m_controller = std::make_unique<PIDController>(p, i, d, f, this, this, period);
 }
-
-PIDSubsystem::~PIDSubsystem() { delete m_controller; }
 
 /**
  * Enables the internal {@link PIDController}
@@ -117,7 +115,7 @@ void PIDSubsystem::Disable() { m_controller->Disable(); }
  *
  * @return the {@link PIDController} used by this {@link PIDSubsystem}
  */
-PIDController *PIDSubsystem::GetPIDController() { return m_controller; }
+PIDController *PIDSubsystem::GetPIDController() { return m_controller.get(); }
 
 /**
  * Sets the setpoint to the given value.  If {@link PIDCommand#SetRange(double,
@@ -213,7 +211,7 @@ void PIDSubsystem::PIDWrite(float output) { UsePIDOutput(output); }
 double PIDSubsystem::PIDGet() const { return ReturnPIDInput(); }
 
 std::string PIDSubsystem::GetSmartDashboardType() const { return "PIDCommand"; }
-void PIDSubsystem::InitTable(ITable *table) {
+void PIDSubsystem::InitTable(::std::shared_ptr<ITable> table) {
   m_controller->InitTable(table);
   Subsystem::InitTable(table);
 }

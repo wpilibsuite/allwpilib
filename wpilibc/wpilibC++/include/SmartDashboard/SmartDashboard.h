@@ -43,14 +43,14 @@ class SmartDashboard : public SensorBase {
   virtual ~SmartDashboard() = default;
 
   /** The {@link NetworkTable} used by {@link SmartDashboard} */
-  static ITable *m_table;
+  static ::std::shared_ptr<ITable> m_table;
 
   /**
    * A map linking tables in the SmartDashboard to the {@link
    * SmartDashboardData} objects
    * they came from.
    */
-  static std::map<ITable *, Sendable *> m_tablesToData;
+  static std::map<::std::shared_ptr<ITable> , Sendable *> m_tablesToData;
 };
 
 #endif

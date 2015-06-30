@@ -13,11 +13,11 @@
 #include "networktables/NetworkTable.h"
 #include "HLUsageReporting.h"
 
-ITable *SmartDashboard::m_table = nullptr;
-std::map<ITable *, Sendable *> SmartDashboard::m_tablesToData;
+::std::shared_ptr<ITable> SmartDashboard::m_table = nullptr;
+std::map<::std::shared_ptr<ITable> , Sendable *> SmartDashboard::m_tablesToData;
 
 void SmartDashboard::init() {
-  m_table = NetworkTable::GetTable("SmartDashboard");
+  m_table.reset(NetworkTable::GetTable("SmartDashboard"));
 
   HLUsageReporting::ReportSmartDashboard();
 }
@@ -35,7 +35,7 @@ void SmartDashboard::PutData(std::string key, Sendable *data) {
     wpi_setGlobalWPIErrorWithContext(NullParameter, "value");
     return;
   }
-  ITable *dataTable = m_table->GetSubTable(key);
+  ::std::shared_ptr<ITable> dataTable(m_table->GetSubTable(key));
   dataTable->PutString("~TYPE~", data->GetSmartDashboardType());
   data->InitTable(dataTable);
   m_tablesToData[dataTable] = data;
@@ -63,7 +63,7 @@ void SmartDashboard::PutData(NamedSendable *value) {
  * @return the value
  */
 Sendable *SmartDashboard::GetData(std::string key) {
-  ITable *subtable = m_table->GetSubTable(key);
+  ::std::shared_ptr<ITable> subtable(m_table->GetSubTable(key));
   Sendable *data = m_tablesToData[subtable];
   if (data == nullptr) {
     wpi_setGlobalWPIErrorWithContext(SmartDashboardMissingKey, key.c_str());

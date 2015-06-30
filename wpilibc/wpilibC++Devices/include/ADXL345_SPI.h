@@ -11,6 +11,8 @@
 #include "SPI.h"
 #include "LiveWindow/LiveWindowSendable.h"
 
+#include <memory>
+
 class DigitalInput;
 class DigitalOutput;
 
@@ -54,7 +56,7 @@ class ADXL345_SPI : public Accelerometer,
 
  public:
   ADXL345_SPI(SPI::Port port, Range range = kRange_2G);
-  virtual ~ADXL345_SPI();
+  virtual ~ADXL345_SPI() = default;
 
   // Accelerometer interface
   virtual void SetRange(Range range) override;
@@ -66,18 +68,18 @@ class ADXL345_SPI : public Accelerometer,
   virtual AllAxes GetAccelerations();
 
   virtual std::string GetSmartDashboardType() const override;
-  virtual void InitTable(ITable* subtable) override;
+  virtual void InitTable(::std::shared_ptr<ITable> subtable) override;
   virtual void UpdateTable() override;
-  virtual ITable* GetTable() const override;
+  virtual ::std::shared_ptr<ITable> GetTable() const override;
   virtual void StartLiveWindowMode() override {}
   virtual void StopLiveWindowMode() override {}
 
  protected:
   void Init(Range range);
 
-  SPI* m_spi;
+  std::unique_ptr<SPI> m_spi;
   SPI::Port m_port;
 
  private:
-  ITable* m_table;
+  ::std::shared_ptr<ITable> m_table;
 };

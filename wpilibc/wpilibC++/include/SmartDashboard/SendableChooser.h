@@ -11,6 +11,7 @@
 #include "SmartDashboard/Sendable.h"
 #include "tables/ITable.h"
 #include <map>
+#include <memory>
 #include <string>
 
 /**
@@ -38,14 +39,14 @@ class SendableChooser : public Sendable {
   void AddDefault(const char *name, void *object);
   void *GetSelected();
 
-  virtual void InitTable(ITable *subtable);
-  virtual ITable *GetTable() const;
+  virtual void InitTable(::std::shared_ptr<ITable> subtable);
+  virtual ::std::shared_ptr<ITable> GetTable() const;
   virtual std::string GetSmartDashboardType() const;
 
  private:
   std::string m_defaultChoice;
   std::map<std::string, void *> m_choices;
-  ITable *m_table;
+  ::std::shared_ptr<ITable> m_table;
 };
 
 #endif
