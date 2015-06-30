@@ -28,7 +28,7 @@ class Task : public ErrorBase {
   Task& operator=(Task&& task);
 
   template <class Function, class... Args>
-  Task(const char* name, Function&& function, Args&&... args);
+  Task(const std::string& name, Function&& function, Args&&... args);
 
   virtual ~Task();
 

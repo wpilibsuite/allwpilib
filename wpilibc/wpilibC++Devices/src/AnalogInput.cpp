@@ -11,6 +11,8 @@
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 
+#include <sstream>
+
 static ::std::unique_ptr<Resource> inputs;
 
 const uint8_t AnalogInput::kAccumulatorModuleNumber;
@@ -24,17 +26,16 @@ const uint32_t AnalogInput::kAccumulatorChannels[] = {0, 1};
  * on-board 4-7 are on the MXP port.
  */
 AnalogInput::AnalogInput(uint32_t channel) {
-  char buf[64];
+  std::stringstream buf;
+  buf << "Analog Input " << channel;
   Resource::CreateResourceObject(inputs, kAnalogInputs);
 
   if (!checkAnalogInputChannel(channel)) {
-    snprintf(buf, 64, "analog input %d", channel);
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
     return;
   }
 
-  snprintf(buf, 64, "Analog Input %d", channel);
-  if (inputs->Allocate(channel, buf) == ~0ul) {
+  if (inputs->Allocate(channel, buf.str()) == ~0ul) {
     CloneError(*inputs);
     return;
   }

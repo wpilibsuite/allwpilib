@@ -9,6 +9,8 @@
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 
+#include <sstream>
+
 ::std::unique_ptr<Resource> SolenoidBase::m_allocated =
     ::std::make_unique<Resource>(solenoid_kNumDO7_0Elements *
                                  kSolenoidChannels);
@@ -34,37 +36,39 @@ DoubleSolenoid::DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel,
     : SolenoidBase(moduleNumber),
       m_forwardChannel(forwardChannel),
       m_reverseChannel(reverseChannel) {
-  char buf[64];
+  std::stringstream buf;
   if (!CheckSolenoidModule(m_moduleNumber)) {
-    snprintf(buf, 64, "Solenoid Module %d", m_moduleNumber);
-    wpi_setWPIErrorWithContext(ModuleIndexOutOfRange, buf);
+    buf << "Solenoid Module " << m_moduleNumber;
+    wpi_setWPIErrorWithContext(ModuleIndexOutOfRange, buf.str());
     return;
   }
   if (!CheckSolenoidChannel(m_forwardChannel)) {
-    snprintf(buf, 64, "Solenoid Channel %d", m_forwardChannel);
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
+    buf << "Solenoid Module " << m_forwardChannel;
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
     return;
   }
   if (!CheckSolenoidChannel(m_reverseChannel)) {
-    snprintf(buf, 64, "Solenoid Channel %d", m_reverseChannel);
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
+    buf << "Solenoid Module " << m_reverseChannel;
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
     return;
   }
   Resource::CreateResourceObject(
       m_allocated, solenoid_kNumDO7_0Elements * kSolenoidChannels);
 
-  snprintf(buf, 64, "Solenoid %d (Module: %d)", m_forwardChannel,
-           m_moduleNumber);
+  buf << "Solenoid " << m_forwardChannel << " (Module: " << m_moduleNumber
+      << ")";
   if (m_allocated->Allocate(
-          m_moduleNumber * kSolenoidChannels + m_forwardChannel, buf) == ~0ul) {
+          m_moduleNumber * kSolenoidChannels + m_forwardChannel, buf.str()) ==
+      ~0ul) {
     CloneError(*m_allocated);
     return;
   }
 
-  snprintf(buf, 64, "Solenoid %d (Module: %d)", m_reverseChannel,
-           m_moduleNumber);
+  buf << "Solenoid " << m_reverseChannel << " (Module: " << m_moduleNumber
+      << ")";
   if (m_allocated->Allocate(
-          m_moduleNumber * kSolenoidChannels + m_reverseChannel, buf) == ~0ul) {
+          m_moduleNumber * kSolenoidChannels + m_reverseChannel, buf.str()) ==
+      ~0ul) {
     CloneError(*m_allocated);
     return;
   }

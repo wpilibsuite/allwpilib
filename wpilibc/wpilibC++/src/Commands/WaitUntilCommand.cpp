@@ -19,7 +19,7 @@ WaitUntilCommand::WaitUntilCommand(double time)
   m_time = time;
 }
 
-WaitUntilCommand::WaitUntilCommand(const char *name, double time)
+WaitUntilCommand::WaitUntilCommand(const std::string &name, double time)
     : Command(name, time) {
   m_time = time;
 }

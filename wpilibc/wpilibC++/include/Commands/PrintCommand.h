@@ -13,7 +13,7 @@
 
 class PrintCommand : public Command {
  public:
-  PrintCommand(const char *message);
+  PrintCommand(const std::string &message);
   virtual ~PrintCommand() = default;
 
  protected:

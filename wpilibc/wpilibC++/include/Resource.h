@@ -27,8 +27,8 @@ class Resource : public ErrorBase {
   virtual ~Resource() = default;
   static void CreateResourceObject(::std::unique_ptr<Resource>& r, uint32_t elements);
   explicit Resource(uint32_t size);
-  uint32_t Allocate(const char *resourceDesc);
-  uint32_t Allocate(uint32_t index, const char *resourceDesc);
+  uint32_t Allocate(const std::string &resourceDesc);
+  uint32_t Allocate(uint32_t index, const std::string &resourceDesc);
   void Free(uint32_t index);
 
  private:

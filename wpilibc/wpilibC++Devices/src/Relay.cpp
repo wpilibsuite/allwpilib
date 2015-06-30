@@ -14,6 +14,8 @@
 #include "LiveWindow/LiveWindow.h"
 #include "HAL/HAL.hpp"
 
+#include <sstream>
+
 // Allocate each direction separately.
 static ::std::unique_ptr<Resource> relayChannels;
 
@@ -27,18 +29,18 @@ static ::std::unique_ptr<Resource> relayChannels;
  */
 Relay::Relay(uint32_t channel, Relay::Direction direction)
     : m_channel(channel), m_direction(direction) {
-  char buf[64];
+  std::stringstream buf;
   Resource::CreateResourceObject(relayChannels,
                                  dio_kNumSystems * kRelayChannels * 2);
   if (!SensorBase::CheckRelayChannel(m_channel)) {
-    snprintf(buf, 64, "Relay Channel %d", m_channel);
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
+    buf << "Relay Channel " << m_channel;
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
     return;
   }
 
   if (m_direction == kBothDirections || m_direction == kForwardOnly) {
-    snprintf(buf, 64, "Forward Relay %d", m_channel);
-    if (relayChannels->Allocate(m_channel * 2, buf) == ~0ul) {
+    buf << "Forward Relay " << m_channel;
+    if (relayChannels->Allocate(m_channel * 2, buf.str()) == ~0ul) {
       CloneError(*relayChannels);
       return;
     }
@@ -46,8 +48,8 @@ Relay::Relay(uint32_t channel, Relay::Direction direction)
     HALReport(HALUsageReporting::kResourceType_Relay, m_channel);
   }
   if (m_direction == kBothDirections || m_direction == kReverseOnly) {
-    snprintf(buf, 64, "Reverse Relay %d", m_channel);
-    if (relayChannels->Allocate(m_channel * 2 + 1, buf) == ~0ul) {
+    buf << "Reverse Relay " << m_channel;
+    if (relayChannels->Allocate(m_channel * 2 + 1, buf.str()) == ~0ul) {
       CloneError(*relayChannels);
       return;
     }

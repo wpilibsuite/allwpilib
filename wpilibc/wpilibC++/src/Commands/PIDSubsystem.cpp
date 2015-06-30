@@ -17,7 +17,7 @@
  * @param i the integral value
  * @param d the derivative value
  */
-PIDSubsystem::PIDSubsystem(const char *name, double p, double i, double d)
+PIDSubsystem::PIDSubsystem(const std::string &name, double p, double i, double d)
     : Subsystem(name) {
   m_controller = std::make_unique<PIDController>(p, i, d, this, this);
 }
@@ -31,7 +31,7 @@ PIDSubsystem::PIDSubsystem(const char *name, double p, double i, double d)
  * @param d the derivative value
  * @param f the feedforward value
  */
-PIDSubsystem::PIDSubsystem(const char *name, double p, double i, double d,
+PIDSubsystem::PIDSubsystem(const std::string &name, double p, double i, double d,
                            double f)
     : Subsystem(name) {
   m_controller = std::make_unique<PIDController>(p, i, d, f, this, this);
@@ -48,7 +48,7 @@ PIDSubsystem::PIDSubsystem(const char *name, double p, double i, double d,
  * @param f the feedfoward value
  * @param period the time (in seconds) between calculations
  */
-PIDSubsystem::PIDSubsystem(const char *name, double p, double i, double d,
+PIDSubsystem::PIDSubsystem(const std::string &name, double p, double i, double d,
                            double f, double period)
     : Subsystem(name) {
   m_controller = std::make_unique<PIDController>(p, i, d, f, this, this, period);

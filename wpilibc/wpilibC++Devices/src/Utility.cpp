@@ -25,17 +25,17 @@
  * The users don't call this, but instead use the wpi_assert macros in
  * Utility.h.
  */
-bool wpi_assert_impl(bool conditionValue, const char *conditionText,
-                     const char *message, const char *fileName,
-                     uint32_t lineNumber, const char *funcName) {
+bool wpi_assert_impl(bool conditionValue, const std::string &conditionText,
+                     const std::string &message, const std::string &fileName,
+                     uint32_t lineNumber, const std::string &funcName) {
   if (!conditionValue) {
     std::stringstream errorStream;
 
     errorStream << "Assertion \"" << conditionText << "\" ";
     errorStream << "on line " << lineNumber << " ";
-    errorStream << "of " << basename(fileName) << " ";
+    errorStream << "of " << basename(fileName.c_str()) << " ";
 
-    if (message) {
+    if (message.size() > 0) {
       errorStream << "failed: " << message << std::endl;
     } else {
       errorStream << "failed." << std::endl;
@@ -59,18 +59,18 @@ bool wpi_assert_impl(bool conditionValue, const char *conditionText,
  * wpi_assertEqual_impl
  * and wpi_assertNotEqual_impl.
  */
-void wpi_assertEqual_common_impl(const char *valueA, const char *valueB,
-                                 const char *equalityType, const char *message,
-                                 const char *fileName, uint32_t lineNumber,
-                                 const char *funcName) {
+void wpi_assertEqual_common_impl(const std::string &valueA, const std::string &valueB,
+                                 const std::string &equalityType, const std::string &message,
+                                 const std::string &fileName, uint32_t lineNumber,
+                                 const std::string &funcName) {
   std::stringstream errorStream;
 
   errorStream << "Assertion \"" << valueA << " " << equalityType << " "
               << valueB << "\" ";
   errorStream << "on line " << lineNumber << " ";
-  errorStream << "of " << basename(fileName) << " ";
+  errorStream << "of " << basename(fileName.c_str()) << " ";
 
-  if (message) {
+  if (message.size() > 0) {
     errorStream << "failed: " << message << std::endl;
   } else {
     errorStream << "failed." << std::endl;
@@ -92,10 +92,10 @@ void wpi_assertEqual_common_impl(const char *valueA, const char *valueB,
  * The users don't call this, but instead use the wpi_assertEqual macros in
  * Utility.h.
  */
-bool wpi_assertEqual_impl(int valueA, int valueB, const char *valueAString,
-                          const char *valueBString, const char *message,
-                          const char *fileName, uint32_t lineNumber,
-                          const char *funcName) {
+bool wpi_assertEqual_impl(int valueA, int valueB, const std::string &valueAString,
+                          const std::string &valueBString, const std::string &message,
+                          const std::string &fileName, uint32_t lineNumber,
+                          const std::string &funcName) {
   if (!(valueA == valueB)) {
     wpi_assertEqual_common_impl(valueAString, valueBString, "==", message,
                                 fileName, lineNumber, funcName);
@@ -110,10 +110,10 @@ bool wpi_assertEqual_impl(int valueA, int valueB, const char *valueAString,
  * The users don't call this, but instead use the wpi_assertNotEqual macros in
  * Utility.h.
  */
-bool wpi_assertNotEqual_impl(int valueA, int valueB, const char *valueAString,
-                             const char *valueBString, const char *message,
-                             const char *fileName, uint32_t lineNumber,
-                             const char *funcName) {
+bool wpi_assertNotEqual_impl(int valueA, int valueB, const std::string &valueAString,
+                             const std::string &valueBString, const std::string &message,
+                             const std::string &fileName, uint32_t lineNumber,
+                             const std::string &funcName) {
   if (!(valueA != valueB)) {
     wpi_assertEqual_common_impl(valueAString, valueBString, "!=", message,
                                 fileName, lineNumber, funcName);

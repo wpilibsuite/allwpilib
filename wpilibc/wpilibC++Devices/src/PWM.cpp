@@ -13,6 +13,8 @@
 #include "WPIErrors.h"
 #include "HAL/HAL.hpp"
 
+#include <sstream>
+
 constexpr float PWM::kDefaultPwmPeriod;
 constexpr float PWM::kDefaultPwmCenter;
 const int32_t PWM::kDefaultPwmStepsDown;
@@ -28,11 +30,11 @@ const int32_t PWM::kPwmDisabled;
  * port
  */
 PWM::PWM(uint32_t channel) {
-  char buf[64];
+  std::stringstream buf;
 
   if (!CheckPWMChannel(channel)) {
-    snprintf(buf, 64, "PWM Channel %d", channel);
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
+    buf << "PWM Channel " << channel;
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
     return;
   }
 

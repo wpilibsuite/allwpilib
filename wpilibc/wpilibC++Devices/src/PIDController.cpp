@@ -13,12 +13,12 @@
 #include <vector>
 #include "HAL/HAL.hpp"
 
-static const char *kP = "p";
-static const char *kI = "i";
-static const char *kD = "d";
-static const char *kF = "f";
-static const char *kSetpoint = "setpoint";
-static const char *kEnabled = "enabled";
+static const std::string kP = "p";
+static const std::string kI = "i";
+static const std::string kD = "d";
+static const std::string kF = "f";
+static const std::string kSetpoint = "setpoint";
+static const std::string kEnabled = "enabled";
 
 /**
  * Allocate a PID object with the given constants for P, I, D

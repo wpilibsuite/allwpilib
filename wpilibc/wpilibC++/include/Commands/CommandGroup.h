@@ -37,7 +37,7 @@
 class CommandGroup : public Command {
  public:
   CommandGroup() = default;
-  CommandGroup(const char *name);
+  CommandGroup(const std::string &name);
   virtual ~CommandGroup() = default;
 
   void AddSequential(Command *command);

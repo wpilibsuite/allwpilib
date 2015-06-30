@@ -12,7 +12,7 @@
  * Creates a new {@link CommandGroup CommandGroup} with the given name.
  * @param name the name for this command group
  */
-CommandGroup::CommandGroup(const char *name) : Command(name) {}
+CommandGroup::CommandGroup(const std::string &name) : Command(name) {}
 
 /**
  * Adds a new {@link Command Command} to the group.  The {@link Command Command}

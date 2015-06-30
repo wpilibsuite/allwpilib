@@ -39,6 +39,11 @@ AnalogAccelerometer::AnalogAccelerometer(int32_t channel) {
  * @param channel The existing AnalogInput object for the analog input the
  * accelerometer is connected to
  */
+[[deprecated(
+    "Raw pointers are deprecated; if you just want to construct an "
+    "AnalogAccelerometer with its own AnalogInput, then call the "
+    "AnalogAccelerometer(int channel). If you want to keep your own copy of "
+    "the AnalogInput, use std::shared_ptr.")]]
 AnalogAccelerometer::AnalogAccelerometer(AnalogInput *channel)
     : m_analogInput(channel, NullDeleter<AnalogInput>()) {
   if (channel == nullptr) {

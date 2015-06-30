@@ -10,6 +10,8 @@
 #include "HAL/PDP.hpp"
 #include "LiveWindow/LiveWindow.h"
 
+#include <sstream>
+
 PowerDistributionPanel::PowerDistributionPanel() : PowerDistributionPanel(0) {}
 
 /**
@@ -60,9 +62,9 @@ double PowerDistributionPanel::GetCurrent(uint8_t channel) const {
   int32_t status = 0;
 
   if (!CheckPDPChannel(channel)) {
-    char buf[64];
-    snprintf(buf, 64, "PDP Channel %d", channel);
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
+    std::stringstream buf;
+    buf << "PDP Channel " << channel;
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
   }
 
   double current = getPDPChannelCurrent(channel, &status, m_module);

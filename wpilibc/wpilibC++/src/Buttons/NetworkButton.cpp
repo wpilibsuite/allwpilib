@@ -8,12 +8,12 @@
 #include "Buttons/NetworkButton.h"
 #include "networktables/NetworkTable.h"
 
-NetworkButton::NetworkButton(const char *tableName, const char *field)
+NetworkButton::NetworkButton(const std::string &tableName, const std::string &field)
     :  // TODO how is this supposed to work???
       m_netTable(NetworkTable::GetTable(tableName)),
       m_field(field) {}
 
-NetworkButton::NetworkButton(::std::shared_ptr<ITable> table, const char *field)
+NetworkButton::NetworkButton(::std::shared_ptr<ITable> table, const std::string &field)
     : m_netTable(table), m_field(field) {}
 
 bool NetworkButton::Get() {

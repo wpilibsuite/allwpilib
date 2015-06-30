@@ -47,7 +47,7 @@ Resource::Resource(uint32_t elements) {
  * resource value
  * within the range is located and returned after it is marked allocated.
  */
-uint32_t Resource::Allocate(const char *resourceDesc) {
+uint32_t Resource::Allocate(const std::string &resourceDesc) {
   std::unique_lock<priority_recursive_mutex> sync(m_allocateLock);
   for (uint32_t i = 0; i < m_isAllocated.size(); i++) {
     if (!m_isAllocated[i]) {
@@ -65,7 +65,7 @@ uint32_t Resource::Allocate(const char *resourceDesc) {
  * verified
  * unallocated, then returned.
  */
-uint32_t Resource::Allocate(uint32_t index, const char *resourceDesc) {
+uint32_t Resource::Allocate(uint32_t index, const std::string &resourceDesc) {
   std::unique_lock<priority_recursive_mutex> sync(m_allocateLock);
   if (index >= m_isAllocated.size()) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, resourceDesc);

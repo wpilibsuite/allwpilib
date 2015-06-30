@@ -14,8 +14,8 @@
 
 class NetworkButton : public Button {
  public:
-  NetworkButton(const char *tableName, const char *field);
-  NetworkButton(::std::shared_ptr<ITable> table, const char *field);
+  NetworkButton(const std::string &tableName, const std::string &field);
+  NetworkButton(::std::shared_ptr<ITable> table, const std::string &field);
   virtual ~NetworkButton() = default;
 
   virtual bool Get();

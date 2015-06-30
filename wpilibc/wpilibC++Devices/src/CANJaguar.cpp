@@ -111,10 +111,10 @@ void CANJaguar::InitCANJaguar() {
     m_hardwareVersion = dataBuffer[0];
 
   if (m_deviceNumber < 1 || m_deviceNumber > 63) {
-    char buf[256];
-    snprintf(buf, 256, "device number \"%d\" must be between 1 and 63",
-             m_deviceNumber);
-    wpi_setWPIErrorWithContext(ParameterOutOfRange, buf);
+    std::stringstream buf;
+    buf << "device number \"" << m_deviceNumber
+        << "\" must be between 1 and 63";
+    wpi_setWPIErrorWithContext(ParameterOutOfRange, buf.str());
     return;
   }
 
@@ -122,19 +122,17 @@ void CANJaguar::InitCANJaguar() {
 
   // 3330 was the first shipping RDK firmware version for the Jaguar
   if (m_firmwareVersion >= 3330 || m_firmwareVersion < 108) {
-    char buf[256];
+    std::stringstream buf;
     if (m_firmwareVersion < 3330) {
-      snprintf(buf, 256,
-               "Jag #%d firmware (%d) is too old (must be at least version 108 "
-               "of the FIRST approved firmware)",
-               m_deviceNumber, m_firmwareVersion);
+      buf << "Jag #" << m_deviceNumber << " firmware (" << m_firmwareVersion
+          << ") is too old (must be at least version 108 "
+             "of the FIRST approved firmware)";
     } else {
-      snprintf(buf, 256,
-               "Jag #%d firmware (%d) is not FIRST approved (must be at least "
-               "version 108 of the FIRST approved firmware)",
-               m_deviceNumber, m_firmwareVersion);
+      buf << "Jag #" << m_deviceNumber << " firmware (" << m_firmwareVersion
+          << ") is not FIRST approved (must be at least "
+             "version 108 of the FIRST approved firmware)";
     }
-    wpi_setWPIErrorWithContext(JaguarVersionError, buf);
+    wpi_setWPIErrorWithContext(JaguarVersionError, buf.str());
     return;
   }
 
@@ -178,11 +176,11 @@ void CANJaguar::InitCANJaguar() {
  */
 CANJaguar::CANJaguar(uint8_t deviceNumber)
     : m_deviceNumber(deviceNumber) {
-  char buf[64];
-  snprintf(buf, 64, "CANJaguar device number %d", m_deviceNumber);
+  std::stringstream buf;
+  buf << "CANJaguar device number " << m_deviceNumber;
   Resource::CreateResourceObject(allocated, 63);
 
-  if (allocated->Allocate(m_deviceNumber - 1, buf) == ~0ul) {
+  if (allocated->Allocate(m_deviceNumber - 1, buf.str()) == ~0ul) {
     CloneError(*allocated);
     return;
   }

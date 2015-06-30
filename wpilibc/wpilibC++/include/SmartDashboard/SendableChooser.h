@@ -35,8 +35,8 @@ class SendableChooser : public Sendable {
  public:
   virtual ~SendableChooser() = default;
 
-  void AddObject(const char *name, void *object);
-  void AddDefault(const char *name, void *object);
+  void AddObject(const std::string &name, void *object);
+  void AddDefault(const std::string &name, void *object);
   void *GetSelected();
 
   virtual void InitTable(::std::shared_ptr<ITable> subtable);

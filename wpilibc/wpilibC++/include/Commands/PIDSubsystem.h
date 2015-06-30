@@ -29,9 +29,9 @@
  */
 class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
  public:
-  PIDSubsystem(const char *name, double p, double i, double d);
-  PIDSubsystem(const char *name, double p, double i, double d, double f);
-  PIDSubsystem(const char *name, double p, double i, double d, double f,
+  PIDSubsystem(const std::string &name, double p, double i, double d);
+  PIDSubsystem(const std::string &name, double p, double i, double d, double f);
+  PIDSubsystem(const std::string &name, double p, double i, double d, double f,
                double period);
   PIDSubsystem(double p, double i, double d);
   PIDSubsystem(double p, double i, double d, double f);

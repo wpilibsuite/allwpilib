@@ -46,6 +46,10 @@ Counter::Counter(Mode mode) {
  * @param source A pointer to the existing DigitalSource object. It will be set
  * as the Up Source.
  */
+[[deprecated(
+    "Raw pointers are deprecated; if you just want to construct a Counter with "
+    "its own DigitalSource, then call the Counter(int channel). If you want to "
+    "keep your own copy of the DigitalSource, use std::shared_ptr.")]]
 Counter::Counter(DigitalSource *source) : Counter() {
   SetUpSource(source);
   ClearDownSource();
@@ -89,6 +93,8 @@ Counter::Counter(int32_t channel) : Counter() {
  * The counter will start counting immediately.
  * @param trigger The pointer to the existing AnalogTrigger object.
  */
+[[deprecated(
+    "Raw pointers are deprecated. Use pass-by-reference instead.")]]
 Counter::Counter(AnalogTrigger *trigger) : Counter() {
   SetUpSource(trigger->CreateOutput(kState));
   ClearDownSource();
@@ -115,6 +121,8 @@ Counter::Counter(const AnalogTrigger &trigger) : Counter() {
  * @param downSource The pointer to the DigitalSource to set as the down source
  * @param inverted True to invert the output (reverse the direction)
  */
+[[deprecated(
+    "Raw pointers are deprecated; prefer to use shared_ptr instead.")]]
 Counter::Counter(EncodingType encodingType, DigitalSource *upSource,
                  DigitalSource *downSource, bool inverted)
     : Counter(encodingType,
@@ -185,6 +193,9 @@ void Counter::SetUpSource(int32_t channel) {
  * @param analogTrigger The analog trigger object that is used for the Up Source
  * @param triggerType The analog trigger output that will trigger the counter.
  */
+[[deprecated(
+    "Raw pointers are deprecated; prefer to call either SetUpSource(int) or "
+    "SetUpSource(shared_ptr).")]]
 void Counter::SetUpSource(AnalogTrigger *analogTrigger,
                           AnalogTriggerType triggerType) {
   SetUpSource(::std::shared_ptr<AnalogTrigger>(analogTrigger,
@@ -221,6 +232,7 @@ void Counter::SetUpSource(::std::shared_ptr<DigitalSource> source) {
   }
 }
 
+[[deprecated("Raw pointers are deprecated. Use std::shared_ptr instead.")]]
 void Counter::SetUpSource(DigitalSource *source) {
   SetUpSource(
       ::std::shared_ptr<DigitalSource>(source, NullDeleter<DigitalSource>()));
@@ -231,6 +243,7 @@ void Counter::SetUpSource(DigitalSource *source) {
  * Set the up counting DigitalSource.
  * @param source Reference to the DigitalSource object to set as the up source
  */
+[[deprecated("References are deprecated. Use std::shared_ptr instead.")]]
 void Counter::SetUpSource(DigitalSource &source) {
   SetUpSource(
       ::std::shared_ptr<DigitalSource>(&source, NullDeleter<DigitalSource>()));
@@ -281,6 +294,9 @@ void Counter::SetDownSource(int32_t channel) {
  * Source
  * @param triggerType The analog trigger output that will trigger the counter.
  */
+[[deprecated(
+    "Raw pointers are deprecated; prefer to call either SetUpSource(int) or "
+    "SetUpSource(shared_ptr).")]]
 void Counter::SetDownSource(AnalogTrigger *analogTrigger,
                             AnalogTriggerType triggerType) {
   SetDownSource(::std::shared_ptr<AnalogTrigger>(analogTrigger, NullDeleter<AnalogTrigger>()), triggerType);
@@ -316,6 +332,7 @@ void Counter::SetDownSource(::std::shared_ptr<DigitalSource> source) {
   }
 }
 
+[[deprecated("Raw pointers are deprecated. Use std::shared_ptr instead.")]]
 void Counter::SetDownSource(DigitalSource *source) {
   SetDownSource(::std::shared_ptr<DigitalSource>(source, NullDeleter<DigitalSource>()));
 }
@@ -325,6 +342,7 @@ void Counter::SetDownSource(DigitalSource *source) {
  * Set the down counting DigitalSource.
  * @param source Reference to the DigitalSource object to set as the down source
  */
+[[deprecated("References are deprecated. Use std::shared_ptr instead.")]]
 void Counter::SetDownSource(DigitalSource &source) {
   SetDownSource(::std::shared_ptr<DigitalSource>(&source, NullDeleter<DigitalSource>()));
 }

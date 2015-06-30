@@ -15,7 +15,7 @@ WaitCommand::WaitCommand(double timeout)
               .c_str(),
           timeout) {}
 
-WaitCommand::WaitCommand(const char *name, double timeout)
+WaitCommand::WaitCommand(const std::string &name, double timeout)
     : Command(name, timeout) {}
 
 void WaitCommand::Initialize() {}

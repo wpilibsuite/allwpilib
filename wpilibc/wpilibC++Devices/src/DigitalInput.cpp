@@ -11,6 +11,8 @@
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 
+#include <sstream>
+
 /**
  * Create an instance of a Digital Input class.
  * Creates a digital input given a channel.
@@ -18,11 +20,11 @@
  * @param channel The DIO channel 0-9 are on-board, 10-25 are on the MXP port
  */
 DigitalInput::DigitalInput(uint32_t channel) {
-  char buf[64];
+  std::stringstream buf;
 
   if (!CheckDigitalChannel(channel)) {
-    snprintf(buf, 64, "Digital Channel %d", channel);
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
+    buf << "Digital Channel " << channel;
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
     return;
   }
   m_channel = channel;

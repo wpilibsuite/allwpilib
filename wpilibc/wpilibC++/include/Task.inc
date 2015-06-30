@@ -10,7 +10,7 @@
  * @param stackSize The size of the stack for the task
  */
 template <class Function, class... Args>
-Task::Task(const char* name, Function&& function, Args&&... args) {
+Task::Task(const std::string& name, Function&& function, Args&&... args) {
   m_taskName = "FRC_";
   m_taskName += name;
 

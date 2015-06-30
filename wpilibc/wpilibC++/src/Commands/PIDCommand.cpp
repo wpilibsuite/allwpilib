@@ -10,7 +10,7 @@
 #include "PIDController.h"
 #include "float.h"
 
-PIDCommand::PIDCommand(const char *name, double p, double i, double d, double f,
+PIDCommand::PIDCommand(const std::string &name, double p, double i, double d, double f,
                        double period)
     : Command(name) {
   m_controller = std::make_unique<PIDController>(p, i, d, this, this, period);
@@ -20,12 +20,12 @@ PIDCommand::PIDCommand(double p, double i, double d, double f, double period) {
   m_controller = std::make_unique<PIDController>(p, i, d, f, this, this, period);
 }
 
-PIDCommand::PIDCommand(const char *name, double p, double i, double d)
+PIDCommand::PIDCommand(const std::string &name, double p, double i, double d)
     : Command(name) {
   m_controller = std::make_unique<PIDController>(p, i, d, this, this);
 }
 
-PIDCommand::PIDCommand(const char *name, double p, double i, double d,
+PIDCommand::PIDCommand(const std::string &name, double p, double i, double d,
                        double period)
     : Command(name) {
   m_controller = std::make_unique<PIDController>(p, i, d, this, this, period);

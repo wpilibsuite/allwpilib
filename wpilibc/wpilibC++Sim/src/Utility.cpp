@@ -56,34 +56,30 @@ static void wpi_handleTracing()
  * This allows breakpoints to be set on an assert.
  * The users don't call this, but instead use the wpi_assert macros in Utility.h.
  */
-bool wpi_assert_impl(bool conditionValue,
-					 const char *conditionText,
-					 const char *message,
-					 const char *fileName,
-					 uint32_t lineNumber,
-					 const char *funcName)
-{
-	if (!conditionValue)
-	{
-		// Error string buffer
-		char error[256];
+bool wpi_assert_impl(bool conditionValue, const std::string &conditionText,
+                     const std::string &message, const std::string &fileName,
+                     uint32_t lineNumber, const std::string &funcName) {
+  if (!conditionValue) {
+    // Error string buffer
+    std::stringstream error;
 
-		// If an error message was specified, include it
-		// Build error string
-		if(message != nullptr) {
-			sprintf(error, "Assertion failed: \"%s\", \"%s\" failed in %s() in %s at line %dd\n",
-							 message, conditionText, funcName, fileName, lineNumber);
-		} else {
-			sprintf(error, "Assertion failed: \"%s\" in %s() in %s at line %dd\n",
-							 conditionText, funcName, fileName, lineNumber);
-		}
+    // If an error message was specified, include it
+    // Build error string
+    if (message.size()) {
+      error << "Assertion failed: \"" << message << "\", \"" << conditionText
+            << "\" failed in " << funcName + "() in " << fileName << " at line "
+            << lineNumber;
+    } else {
+      error << "Assertion failed: \"" << conditionText << "\" in " << funcName
+            << "() in " << fileName << " at line " << lineNumber;
+    }
 
-		// Print to console and send to remote dashboard
-		printf("\n\n>>>>%s", error);
+    // Print to console and send to remote dashboard
+    ::std::cout << "\n\n>>>>" << error;
 
-		wpi_handleTracing();
-	}
-	return conditionValue;
+    wpi_handleTracing();
+  }
+  return conditionValue;
 }
 
 /**
@@ -91,31 +87,31 @@ bool wpi_assert_impl(bool conditionValue,
  * This should not be called directly; it should only be used by wpi_assertEqual_impl
  * and wpi_assertNotEqual_impl.
  */
-void wpi_assertEqual_common_impl(int valueA,
-					 	         int valueB,
-					 	         const char *equalityType,
-						         const char *message,
-						         const char *fileName,
-						         uint32_t lineNumber,
-						         const char *funcName)
-{
-	// Error string buffer
-	char error[256];
+void wpi_assertEqual_common_impl(int valueA, int valueB,
+                                 const std::string &equalityType,
+                                 const std::string &message,
+                                 const std::string &fileName,
+                                 uint32_t lineNumber,
+                                 const std::string &funcName) {
+  // Error string buffer
+  std::stringstream error;
 
-	// If an error message was specified, include it
-	// Build error string
-	if(message != nullptr) {
-		sprintf(error, "Assertion failed: \"%s\", \"%d\" %s \"%d\" in %s() in %s at line %d\n",
-						 message, valueA, equalityType, valueB, funcName, fileName, lineNumber);
-	} else {
-		sprintf(error, "Assertion failed: \"%d\" %s \"%d\" in %s() in %s at line %d\n",
-						 valueA, equalityType, valueB, funcName, fileName, lineNumber);
-	}
+  // If an error message was specified, include it
+  // Build error string
+  if (message.size() > 0) {
+    error << "Assertion failed: \"" << message << "\", \"" << valueA << "\" "
+          << equalityType << " \"" << valueB << "\" in " << funcName << "() in "
+          << fileName << " at line " << lineNumber << "\n";
+  } else {
+    error << "Assertion failed: \"" << valueA << "\" " << equalityType << " \""
+          << valueB << "\" in " << funcName << "() in " << fileName
+          << " at line " << lineNumber << "\n";
+  }
 
-	// Print to console and send to remote dashboard
-	printf("\n\n>>>>%s", error);
+  // Print to console and send to remote dashboard
+  std::cout << "\n\n>>>>" << error;
 
-	wpi_handleTracing();
+  wpi_handleTracing();
 }
 
 /**
@@ -126,10 +122,10 @@ void wpi_assertEqual_common_impl(int valueA,
  */
 bool wpi_assertEqual_impl(int valueA,
 					 	  int valueB,
-						  const char *message,
-						  const char *fileName,
+						  const std::string &message,
+						  const std::string &fileName,
 						  uint32_t lineNumber,
-						  const char *funcName)
+						  const std::string &funcName)
 {
 	if(!(valueA == valueB))
 	{
@@ -146,10 +142,10 @@ bool wpi_assertEqual_impl(int valueA,
  */
 bool wpi_assertNotEqual_impl(int valueA,
 					 	     int valueB,
-						     const char *message,
-						     const char *fileName,
+						     const std::string &message,
+						     const std::string &fileName,
 						     uint32_t lineNumber,
-						     const char *funcName)
+						     const std::string &funcName)
 {
 	if(!(valueA != valueB))
 	{

@@ -9,7 +9,7 @@
 #include "stdio.h"
 #include <sstream>
 
-PrintCommand::PrintCommand(const char *message)
+PrintCommand::PrintCommand(const std::string &message)
     : Command(((std::stringstream &)(std::stringstream("Print \"") << message
                                                                    << "\""))
                   .str()

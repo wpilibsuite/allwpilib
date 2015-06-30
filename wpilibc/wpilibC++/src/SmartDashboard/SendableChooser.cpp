@@ -10,9 +10,9 @@
 
 #include <stdio.h>
 
-static const char *kDefault = "default";
-static const char *kOptions = "options";
-static const char *kSelected = "selected";
+static const std::string kDefault = "default";
+static const std::string kOptions = "options";
+static const std::string kSelected = "selected";
 
 /**
  * Adds the given object to the list of options.  On the {@link SmartDashboard}
@@ -21,7 +21,7 @@ static const char *kSelected = "selected";
  * @param name the name of the option
  * @param object the option
  */
-void SendableChooser::AddObject(const char *name, void *object) {
+void SendableChooser::AddObject(const std::string &name, void *object) {
   m_choices[name] = object;
 }
 
@@ -34,7 +34,7 @@ void SendableChooser::AddObject(const char *name, void *object) {
  * @param name the name of the option
  * @param object the option
  */
-void SendableChooser::AddDefault(const char *name, void *object) {
+void SendableChooser::AddDefault(const std::string &name, void *object) {
   m_defaultChoice = name;
   AddObject(name, object);
 }

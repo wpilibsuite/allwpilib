@@ -44,7 +44,7 @@ class ASubsystem : public Subsystem {
   Command *m_command = nullptr;
 
  public:
-  ASubsystem(const char *name) : Subsystem(name) {}
+  ASubsystem(const std::string &name) : Subsystem(name) {}
 
   virtual void InitDefaultCommand() override {
     if (m_command != nullptr) {

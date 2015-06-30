@@ -10,6 +10,8 @@
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 
+#include <sstream>
+
 /**
  * Constructor using the default PCM ID (0).
  *
@@ -26,22 +28,22 @@ Solenoid::Solenoid(uint32_t channel)
  */
 Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel)
     : SolenoidBase(moduleNumber), m_channel(channel) {
-  char buf[64];
+  std::stringstream buf;
   if (!CheckSolenoidModule(m_moduleNumber)) {
-    snprintf(buf, 64, "Solenoid Module %d", m_moduleNumber);
-    wpi_setWPIErrorWithContext(ModuleIndexOutOfRange, buf);
+    buf << "Solenoid Module " << m_moduleNumber;
+    wpi_setWPIErrorWithContext(ModuleIndexOutOfRange, buf.str());
     return;
   }
   if (!CheckSolenoidChannel(m_channel)) {
-    snprintf(buf, 64, "Solenoid Channel %d", m_channel);
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
+    buf << "Solenoid Module " << m_channel;
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
     return;
   }
   Resource::CreateResourceObject(m_allocated, kSolenoidChannels * 63);
 
-  snprintf(buf, 64, "Solenoid %d (Module: %d)", m_channel, m_moduleNumber);
+  buf << "Solenoid " << m_channel << " (Module: " << m_moduleNumber << ")";
   if (m_allocated->Allocate(m_moduleNumber * kSolenoidChannels + m_channel,
-                            buf) == ~0ul) {
+                            buf.str()) == ~0ul) {
     CloneError(*m_allocated);
     return;
   }

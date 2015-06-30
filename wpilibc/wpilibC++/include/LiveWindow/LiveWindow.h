@@ -35,16 +35,16 @@ class LiveWindow {
   [[deprecated(
       "Raw pointers are deprecated; pass the component using shared_ptr "
       "instead.")]]
-  void AddSensor(const char *subsystem, const char *name,
+  void AddSensor(const std::string &subsystem, const std::string &name,
                  LiveWindowSendable *component);
-  void AddSensor(const char *subsystem, const char *name,
+  void AddSensor(const std::string &subsystem, const std::string &name,
                  ::std::shared_ptr<LiveWindowSendable> component);
   [[deprecated(
       "Raw pointers are deprecated; pass the component using shared_ptr "
       "instead.")]]
-  void AddActuator(const char *subsystem, const char *name,
+  void AddActuator(const std::string &subsystem, const std::string &name,
                    LiveWindowSendable *component);
-  void AddActuator(const char *subsystem, const char *name,
+  void AddActuator(const std::string &subsystem, const std::string &name,
                    ::std::shared_ptr<LiveWindowSendable> component);
   void AddSensor(std::string type, int channel, LiveWindowSendable *component);
   void AddActuator(std::string type, int channel,

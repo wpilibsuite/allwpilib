@@ -13,9 +13,9 @@
 #include "WPIErrors.h"
 #include <typeinfo>
 
-static const char *kName = "name";
-static const char *kRunning = "running";
-static const char *kIsParented = "isParented";
+static const std::string kName = "name";
+static const std::string kRunning = "running";
+static const std::string kIsParented = "isParented";
 
 int Command::m_commandCounter = 0;
 
@@ -29,7 +29,7 @@ Command::Command() : Command(nullptr, -1.0) {}
  * Creates a new command with the given name and no timeout.
  * @param name the name for this command
  */
-Command::Command(const char *name) : Command(name, -1.0) {}
+Command::Command(const std::string &name) : Command(name, -1.0) {}
 
 /**
  * Creates a new command with the given timeout and a default name.
@@ -44,13 +44,13 @@ Command::Command(double timeout) : Command(nullptr, timeout) {}
  * @param timeout the time (in seconds) before this command "times out"
  * @see Command#isTimedOut() isTimedOut()
  */
-Command::Command(const char *name, double timeout) {
-  if (name == nullptr) wpi_setWPIErrorWithContext(NullParameter, "name");
+Command::Command(const std::string &name, double timeout) {
+  if (name.size() == 0) wpi_setWPIErrorWithContext(NullParameter, "name");
   if (timeout < 0.0)
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
 
   m_timeout = timeout;
-  m_name = name == nullptr ? std::string() : name;
+  m_name = name;
 }
 
 Command::~Command() {  // TODO deal with cleaning up all listeners
@@ -218,12 +218,9 @@ void Command::LockChanges() { m_locked = true; }
  * message)
  * @return true if assert passed, false if assert failed
  */
-bool Command::AssertUnlocked(const char *message) {
+bool Command::AssertUnlocked(const std::string &message) {
   if (m_locked) {
-    char buf[128];
-    snprintf(buf, 128,
-             "%s after being started or being added to a command group",
-             message);
+    std::string buf = message + " after being started or being added to a command group";
     wpi_setWPIErrorWithContext(CommandIllegalUse, buf);
     return false;
   }

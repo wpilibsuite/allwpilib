@@ -9,6 +9,8 @@
 #include "Resource.h"
 #include "WPIErrors.h"
 
+#include <sstream>
+
 /**
  * Create an instance of a digital output.
  * Create a digital output given a channel.
@@ -17,11 +19,11 @@
  * port
  */
 DigitalOutput::DigitalOutput(uint32_t channel) {
-  char buf[64];
+  std::stringstream buf;
 
   if (!CheckDigitalChannel(channel)) {
-    snprintf(buf, 64, "Digital Channel %d", channel);
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
+    buf << "Digital Channel " << channel;
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
     return;
   }
   m_channel = channel;

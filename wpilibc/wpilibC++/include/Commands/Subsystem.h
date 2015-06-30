@@ -19,7 +19,7 @@ class Subsystem : public ErrorBase, public NamedSendable {
   friend class Scheduler;
 
  public:
-  Subsystem(const char *name);
+  Subsystem(const std::string &name);
   virtual ~Subsystem() = default;
 
   void SetDefaultCommand(Command *command);

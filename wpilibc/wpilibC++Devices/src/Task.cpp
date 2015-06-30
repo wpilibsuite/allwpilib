@@ -91,7 +91,7 @@ bool Task::SetPriority(int32_t priority) {
 
 /**
  * Returns the name of the task.
- * @returns Pointer to the name of the task or nullptr if not allocated
+ * @returns The name of the task (0 length if not allocated).
  */
 std::string Task::GetName() const { return m_taskName; }
 

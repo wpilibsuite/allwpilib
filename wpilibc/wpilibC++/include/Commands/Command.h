@@ -56,9 +56,9 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
 
  public:
   Command();
-  Command(const char *name);
+  Command(const std::string &name);
   Command(double timeout);
-  Command(const char *name, double timeout);
+  Command(const std::string &name, double timeout);
   virtual ~Command();
   double TimeSinceInitialized() const;
   void Requires(Subsystem *s);
@@ -80,7 +80,7 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
  protected:
   void SetTimeout(double timeout);
   bool IsTimedOut() const;
-  bool AssertUnlocked(const char *message);
+  bool AssertUnlocked(const std::string &message);
   void SetParent(CommandGroup *parent);
   /**
    * The initialize method is called the first time this Command is run after

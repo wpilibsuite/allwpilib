@@ -56,14 +56,17 @@ void LiveWindow::SetEnabled(bool enabled) {
  * @param name The name of this component.
  * @param component A LiveWindowSendable component that represents a sensor.
  */
-void LiveWindow::AddSensor(const char *subsystem, const char *name,
+void LiveWindow::AddSensor(const std::string &subsystem, const std::string &name,
                            ::std::shared_ptr<LiveWindowSendable> component) {
   m_components[component].subsystem = subsystem;
   m_components[component].name = name;
   m_components[component].isSensor = true;
 }
 
-void LiveWindow::AddSensor(const char *subsystem, const char *name, LiveWindowSendable *component) {
+[[deprecated(
+    "Raw pointers are deprecated; pass the component using shared_ptr "
+    "instead.")]]
+void LiveWindow::AddSensor(const std::string &subsystem, const std::string &name, LiveWindowSendable *component) {
   AddSensor(subsystem, name, ::std::shared_ptr<LiveWindowSendable>(
                                  component, NullDeleter<LiveWindowSendable>()));
 }
@@ -75,14 +78,17 @@ void LiveWindow::AddSensor(const char *subsystem, const char *name, LiveWindowSe
  * @param name The name of this component.
  * @param component A LiveWindowSendable component that represents a actuator.
  */
-void LiveWindow::AddActuator(const char *subsystem, const char *name,
+void LiveWindow::AddActuator(const std::string &subsystem, const std::string &name,
                              ::std::shared_ptr<LiveWindowSendable> component) {
   m_components[component].subsystem = subsystem;
   m_components[component].name = name;
   m_components[component].isSensor = false;
 }
 
-void LiveWindow::AddActuator(const char *subsystem, const char *name,
+[[deprecated(
+    "Raw pointers are deprecated; pass the component using shared_ptr "
+    "instead.")]]
+void LiveWindow::AddActuator(const std::string &subsystem, const std::string &name,
                              LiveWindowSendable *component) {
   AddActuator(subsystem, name,
               ::std::shared_ptr<LiveWindowSendable>(

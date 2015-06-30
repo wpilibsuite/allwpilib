@@ -15,7 +15,7 @@
  * Creates a subsystem with the given name
  * @param name the name of the subsystem
  */
-Subsystem::Subsystem(const char *name) {
+Subsystem::Subsystem(const std::string &name) {
   m_name = name;
   Scheduler::GetInstance().RegisterSubsystem(this);
 }

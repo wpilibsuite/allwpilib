@@ -10,6 +10,8 @@
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 
+#include <sstream>
+
 static ::std::unique_ptr<Resource> outputs;
 
 /**
@@ -20,15 +22,15 @@ static ::std::unique_ptr<Resource> outputs;
 AnalogOutput::AnalogOutput(uint32_t channel) {
   Resource::CreateResourceObject(outputs, kAnalogOutputs);
 
-  char buf[64];
+  std::stringstream buf;
+  buf << "analog input " << channel;
 
   if (!checkAnalogOutputChannel(channel)) {
-    snprintf(buf, 64, "analog input %d", channel);
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
     return;
   }
 
-  if (outputs->Allocate(channel, buf) == ~0ul) {
+  if (outputs->Allocate(channel, buf.str()) == ~0ul) {
     CloneError(*outputs);
     return;
   }
