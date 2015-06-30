@@ -8,9 +8,93 @@
 #include "Value.h"
 
 #include <cassert>
+#include <cstdlib>
 #include <cstring>
 
 #include "ntcore.h"
+
+using namespace ntimpl;
+
+StringValue::StringValue(llvm::StringRef val) {
+  len = val.size();
+  str = static_cast<char*>(std::malloc(len+1));
+  std::memcpy(str, val.data(), len);
+  str[len] = '\0';
+}
+
+void Value::SetBooleanArray(llvm::ArrayRef<int> value) {
+  // handle type change
+  if (NT_Value::type != NT_BOOLEAN_ARRAY) {
+    NT_DisposeValue(this);
+    data.arr_boolean.arr = nullptr;
+    data.arr_boolean.size = 0;  // set to zero so size change is hit below
+    NT_Value::type = NT_BOOLEAN_ARRAY;
+  }
+  // handle size change
+  if (data.arr_boolean.size != value.size()) {
+    std::free(data.arr_boolean.arr);
+    data.arr_boolean.arr =
+        static_cast<int*>(std::malloc(value.size()*sizeof(int)));
+    data.arr_boolean.size = value.size();
+  }
+  std::copy(value.begin(), value.end(), data.arr_boolean.arr);
+}
+
+void Value::SetBooleanArray(llvm::ArrayRef<bool> value) {
+  // handle type change
+  if (NT_Value::type != NT_BOOLEAN_ARRAY) {
+    NT_DisposeValue(this);
+    data.arr_boolean.arr = nullptr;
+    data.arr_boolean.size = 0;  // set to zero so size change is hit below
+    NT_Value::type = NT_BOOLEAN_ARRAY;
+  }
+  // handle size change
+  if (data.arr_boolean.size != value.size()) {
+    std::free(data.arr_boolean.arr);
+    data.arr_boolean.arr =
+        static_cast<int*>(std::malloc(value.size()*sizeof(int)));
+    data.arr_boolean.size = value.size();
+  }
+  std::copy(value.begin(), value.end(), data.arr_boolean.arr);
+}
+
+void Value::SetDoubleArray(llvm::ArrayRef<double> value) {
+  // handle type change
+  if (NT_Value::type != NT_DOUBLE_ARRAY) {
+    NT_DisposeValue(this);
+    data.arr_double.arr = nullptr;
+    data.arr_double.size = 0;  // set to zero so size change is hit below
+    NT_Value::type = NT_DOUBLE_ARRAY;
+  }
+  // handle size change
+  if (data.arr_double.size != value.size()) {
+    std::free(data.arr_double.arr);
+    data.arr_double.arr =
+        static_cast<double*>(std::malloc(value.size()*sizeof(double)));
+    data.arr_double.size = value.size();
+  }
+  std::copy(value.begin(), value.end(), data.arr_double.arr);
+}
+
+void Value::SetStringArray(std::vector<StringValue>& value) {
+  // handle type change
+  if (NT_Value::type != NT_STRING_ARRAY) {
+    NT_DisposeValue(this);
+    data.arr_string.arr = nullptr;
+    data.arr_string.size = 0;  // set to zero so size change is hit below
+    NT_Value::type = NT_STRING_ARRAY;
+  }
+  // handle size change
+  if (data.arr_string.size != value.size()) {
+    std::free(data.arr_string.arr);
+    data.arr_string.arr =
+        static_cast<NT_String*>(std::malloc(value.size()*sizeof(NT_String)));
+    data.arr_string.size = value.size();
+  }
+  std::move(value.begin(), value.end(),
+            static_cast<StringValue*>(data.arr_string.arr));
+  value.clear();
+}
 
 bool ntimpl::operator==(const Value& lhs, const Value& rhs) {
   if (lhs.type() != rhs.type()) return false;

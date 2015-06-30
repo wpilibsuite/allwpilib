@@ -9,6 +9,7 @@
 #define NT_VALUE_H_
 
 #include <cassert>
+#include <vector>
 
 #include "ntcore.h"
 
@@ -27,12 +28,31 @@ class StringValue : private NT_String {
   friend class Value;
  public:
   StringValue() { NT_InitString(this); }
+  /*implicit*/ StringValue(llvm::StringRef val);
   ~StringValue() { NT_DisposeString(this); }
 
   operator llvm::StringRef() const { return llvm::StringRef(str, len); }
 
   StringValue(const StringValue&) = delete;
   StringValue& operator=(const StringValue&) = delete;
+
+  StringValue(StringValue&& other) {
+    str = other.str;
+    len = other.len;
+    other.str = nullptr;
+    other.len = 0;
+  }
+
+  StringValue& operator=(StringValue&& other) {
+    if (this != &other) {
+      NT_DisposeString(this);
+      str = other.str;
+      len = other.len;
+      other.str = nullptr;
+      other.len = 0;
+    }
+    return *this;
+  }
 };
 
 /*
@@ -85,25 +105,70 @@ class Value : private NT_Value {
   /*
    * Type-Safe Setters
    */
-  void SetBoolean(bool value);
-  void SetDouble(double value);
-  void SetString(llvm::StringRef value);
-  void SetRaw(llvm::StringRef value);
-
-  template<typename It>
-  void SetBooleanArray(It begin, It end) {
+  void SetBoolean(bool value) {
+    if (NT_Value::type != NT_BOOLEAN) {
+      NT_DisposeValue(this);
+      NT_Value::type = NT_BOOLEAN;
+    }
+    data.v_boolean = value ? 1 : 0;
+  }
+  void SetDouble(double value) {
+    if (NT_Value::type != NT_DOUBLE) {
+      NT_DisposeValue(this);
+      NT_Value::type = NT_DOUBLE;
+    }
+    data.v_double = value;
+  }
+  void SetString(llvm::StringRef value) { SetString(StringValue(value)); }
+  void SetString(StringValue&& value) {
+    if (NT_Value::type != NT_STRING) {
+      NT_DisposeValue(this);
+      data.v_string.str = nullptr;
+      data.v_string.len = 0;
+      NT_Value::type = NT_STRING;
+    }
+    data.v_string = value;
+  }
+  void SetRaw(llvm::StringRef value) { SetRaw(StringValue(value)); }
+  void SetRaw(StringValue&& value) {
+    if (NT_Value::type != NT_RAW) {
+      NT_DisposeValue(this);
+      data.v_raw.str = nullptr;
+      data.v_raw.len = 0;
+      NT_Value::type = NT_RAW;
+    }
+    data.v_raw = value;
   }
 
-  template<typename It>
-  void SetDoubleArray(It begin, It end) {
-  }
+  void SetBooleanArray(llvm::ArrayRef<int> value);
+  void SetBooleanArray(llvm::ArrayRef<bool> value);
+  void SetDoubleArray(llvm::ArrayRef<double> value);
 
-  template<typename It>
-  void SetStringArray(It begin, It end) {
-  }
+  // Note: This function moves the values out of the vector.
+  void SetStringArray(std::vector<StringValue>& value);
 
   Value(const Value&) = delete;
   Value& operator=(const Value&) = delete;
+
+  Value(Value&& other) {
+    NT_Value::type = static_cast<NT_Value&>(other).type;
+    last_change = other.last_change;
+    data = other.data;
+    static_cast<NT_Value&>(other).type = NT_UNASSIGNED;
+    other.last_change = 0;
+  }
+
+  Value& operator=(Value&& other) {
+    if (this != &other) {
+      NT_DisposeValue(this);
+      NT_Value::type = static_cast<NT_Value&>(other).type;
+      last_change = other.last_change;
+      data = other.data;
+      static_cast<NT_Value&>(other).type = NT_UNASSIGNED;
+      other.last_change = 0;
+    }
+    return *this;
+  }
 
   friend bool operator==(const Value& lhs, const Value& rhs);
 };

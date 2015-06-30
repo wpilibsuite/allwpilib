@@ -236,10 +236,21 @@ bool Storage::LoadPersistent(std::istream& is,
                              void (*warn)(std::size_t line, const char* msg)) {
   std::string line_str;
   std::size_t line_num = 1;
-  std::string name;
+
+  // declare these outside the loop to reduce reallocs
+  std::string name, str;
+  std::vector<int> boolean_array;
+  std::vector<double> double_array;
+  std::vector<StringValue> string_array;
+
+  // ignore blank lines and lines that start with ; or # (comments)
+  while (std::getline(is, line_str)) {
+    llvm::StringRef line = llvm::StringRef(line_str).trim();
+    if (!line.empty() && line.front() != ';' && line.front() != '#')
+      break;
+  }
 
   // header
-  std::getline(is, line_str);
   if (line_str != "[NetworkTables Storage 3.0]") {
     if (warn) warn(line_num, "header line mismatch, ignoring rest of file");
     return false;
@@ -248,6 +259,10 @@ bool Storage::LoadPersistent(std::istream& is,
   while (std::getline(is, line_str)) {
     llvm::StringRef line = llvm::StringRef(line_str).trim();
     ++line_num;
+
+    // ignore blank lines and lines that start with ; or # (comments)
+    if (line.empty() || line.front() == ';' || line.front() == '#')
+      continue;
 
     // type
     llvm::StringRef type_tok;
@@ -294,50 +309,124 @@ bool Storage::LoadPersistent(std::istream& is,
     StorageEntry entry;
     switch (type) {
       case NT_BOOLEAN:
-        //os << (v.data.v_boolean ? "true" : "false");
-        //if (line == "true")
-          //entry.value.
+        // only true or false is accepted
+        if (line == "true")
+          entry.value().SetBoolean(true);
+        else if (line == "false")
+          entry.value().SetBoolean(false);
+        else {
+          if (warn)
+            warn(line_num, "unrecognized boolean value, not 'true' or 'false'");
+          goto next_line;
+        }
         break;
-      case NT_DOUBLE:
-        //os << v.data.v_double;
-        break;
-      case NT_STRING:
-        //WriteString(os, MakeStringRef(v.data.v_string));
-        break;
-      case NT_RAW: {
-        //char* buf = new char[Base64EncodeLen(v.data.v_raw.len)];
-        //Base64Encode(buf,
-                     //reinterpret_cast<const unsigned char*>(v.data.v_raw.str),
-                     //v.data.v_raw.len);
-        //os << buf;
-        //delete[] buf;
+      case NT_DOUBLE: {
+        // need to convert to null-terminated string for strtod()
+        str.clear();
+        str += line;
+        char* end;
+        double v = std::strtod(str.c_str(), &end);
+        if (*end != '\0') {
+          if (warn) warn(line_num, "invalid double value");
+          goto next_line;
+        }
+        entry.value().SetDouble(v);
         break;
       }
-      case NT_BOOLEAN_ARRAY:
-        //for (size_t i = 0; i < v.data.arr_boolean.size; ++i) {
-          //os << (v.data.arr_boolean.arr[i] ? "true" : "false");
-          //if (i != (v.data.arr_boolean.size - 1))
-            //os << ',';
-        //}
+      case NT_STRING: {
+        llvm::StringRef str_tok;
+        std::tie(str_tok, line) = ReadStringToken(line);
+        if (str_tok.empty()) {
+          if (warn) warn(line_num, "missing string value");
+          goto next_line;
+        }
+        if (str_tok.back() != '"') {
+          if (warn) warn(line_num, "unterminated string value");
+          goto next_line;
+        }
+        UnescapeString(str_tok, &str);
+        entry.value().SetString(str);
         break;
-      case NT_DOUBLE_ARRAY:
-        //for (size_t i = 0; i < v.data.arr_double.size; ++i) {
-          //os << v.data.arr_double.arr[i];
-          //if (i != (v.data.arr_double.size - 1))
-            //os << ',';
-        //}
+      }
+      case NT_RAW:
+        Base64Decode(line, &str);
+        entry.value().SetRaw(str);
         break;
-      case NT_STRING_ARRAY:
-        //for (size_t i = 0; i < v.data.arr_double.size; ++i) {
-          //WriteString(os, MakeStringRef(v.data.arr_string.arr[i]));
-          //if (i != (v.data.arr_double.size - 1))
-            //os << ',';
-        //}
+      case NT_BOOLEAN_ARRAY: {
+        llvm::StringRef elem_tok;
+        boolean_array.clear();
+        while (!line.empty()) {
+          std::tie(elem_tok, line) = line.split(',');
+          elem_tok = elem_tok.trim(" \t");
+          if (elem_tok == "true")
+            boolean_array.push_back(1);
+          else if (elem_tok == "false")
+            boolean_array.push_back(0);
+          else {
+            if (warn)
+              warn(line_num,
+                   "unrecognized boolean value, not 'true' or 'false'");
+            goto next_line;
+          }
+        }
+
+        entry.value().SetBooleanArray(boolean_array);
         break;
+      }
+      case NT_DOUBLE_ARRAY: {
+        llvm::StringRef elem_tok;
+        double_array.clear();
+        while (!line.empty()) {
+          std::tie(elem_tok, line) = line.split(',');
+          elem_tok = elem_tok.trim(" \t");
+          // need to convert to null-terminated string for strtod()
+          str.clear();
+          str += elem_tok;
+          char* end;
+          double v = std::strtod(str.c_str(), &end);
+          if (*end != '\0') {
+            if (warn) warn(line_num, "invalid double value");
+            goto next_line;
+          }
+          double_array.push_back(v);
+        }
+
+        entry.value().SetDoubleArray(double_array);
+        break;
+      }
+      case NT_STRING_ARRAY: {
+        llvm::StringRef elem_tok;
+        double_array.clear();
+        while (!line.empty()) {
+          std::tie(elem_tok, line) = ReadStringToken(line);
+          if (elem_tok.empty()) {
+            if (warn) warn(line_num, "missing string value");
+            goto next_line;
+          }
+          if (elem_tok.back() != '"') {
+            if (warn) warn(line_num, "unterminated string value");
+            goto next_line;
+          }
+          line = line.ltrim(" \t");
+          if (line.empty()) break;
+          if (line.front() != ',') {
+            if (warn) warn(line_num, "expected comma between strings");
+            goto next_line;
+          }
+          line = line.drop_front().ltrim(" \t");
+
+          UnescapeString(elem_tok, &str);
+          string_array.push_back(StringValue(str));
+        }
+
+        entry.value().SetStringArray(string_array);
+        break;
+      }
       default:
         break;
     }
-
+next_line:
+    ;
   }
   return true;
 }
