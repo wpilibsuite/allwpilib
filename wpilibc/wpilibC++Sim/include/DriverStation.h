@@ -9,9 +9,8 @@
 #include <gazebo/transport/transport.hh>
 #include "SensorBase.h"
 #include "RobotState.h"
-#include "Task.h"
-#include "HAL/cpp/priority_mutex.h"
-#include "HAL/cpp/priority_condition_variable.h"
+#include <mutex>
+#include <condition_variable>
 
 struct HALCommonControlData;
 class AnalogInput;
@@ -62,7 +61,7 @@ public:
 	double GetMatchTime() const;
 	float GetBatteryVoltage() const;
 	uint16_t GetTeamNumber() const;
-	
+
 
 
 	void IncrementUpdateNumber()
@@ -119,10 +118,10 @@ private:
     void joystickCallback5(const msgs::ConstJoystickPtr &msg);
 
 	uint8_t m_digitalOut = 0;
-	priority_condition_variable m_waitForDataCond;
-	priority_mutex m_waitForDataMutex;
-	mutable priority_recursive_mutex m_stateMutex;
-	priority_recursive_mutex m_joystickMutex;
+	::std::condition_variable m_waitForDataCond;
+	::std::mutex m_waitForDataMutex;
+  mutable ::std::recursive_mutex m_stateMutex;
+	::std::recursive_mutex m_joystickMutex;
 	double m_approxMatchTimeOffset = 0;
 	bool m_userInDisabled = false;
 	bool m_userInAutonomous = false;

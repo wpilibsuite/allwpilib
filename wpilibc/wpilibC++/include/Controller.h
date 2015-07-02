@@ -5,11 +5,6 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-#include <stdint.h>
-#include <cmath>
-#include <pthread.h>
-#include <semaphore.h>
-
 /**
  * Interface for Controllers
  * Common interface for controllers. Controllers run control loops, the most

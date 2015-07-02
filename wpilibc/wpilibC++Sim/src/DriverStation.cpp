@@ -29,7 +29,7 @@ uint8_t DriverStation::m_updateNumber = 0;
 
 /**
  * DriverStation contructor.
- * 
+ *
  * This is only called once the first time GetInstance() is called
  */
 DriverStation::DriverStation() {
@@ -81,7 +81,7 @@ float DriverStation::GetBatteryVoltage() const
 /**
  * Get the value of the axis on a joystick.
  * This depends on the mapping of the joystick connected to the specified port.
- * 
+ *
  * @param stick The joystick to read.
  * @param axis The analog axis value to read from the joystick.
  * @return The value of the axis on the joystick.
@@ -99,7 +99,7 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
 		return 0.0;
 	}
 
-	std::unique_lock<priority_recursive_mutex> lock(m_joystickMutex);
+	::std::unique_lock<::std::recursive_mutex> lock(m_joystickMutex);
 	if (joysticks[stick] == nullptr || axis >= joysticks[stick]->axes().size())
 	{
 		return 0.0;
@@ -110,7 +110,7 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
 /**
  * The state of a specific button (1 - 12) on the joystick.
  * This method only works in simulation, but is more efficient than GetStickButtons.
- * 
+ *
  * @param stick The joystick to read.
  * @param button The button number to check.
  * @return If the button is pressed.
@@ -123,7 +123,7 @@ bool DriverStation::GetStickButton(uint32_t stick, uint32_t button)
 		return false;
 	}
 
-	std::unique_lock<priority_recursive_mutex> lock(m_joystickMutex);
+	::std::unique_lock<::std::recursive_mutex> lock(m_joystickMutex);
 	if (joysticks[stick] == nullptr || button >= joysticks[stick]->buttons().size())
 	{
 		return false;
@@ -147,7 +147,7 @@ short DriverStation::GetStickButtons(uint32_t stick)
 	}
 	short btns = 0, btnid;
 
-	std::unique_lock<priority_recursive_mutex> lock(m_joystickMutex);
+	::std::unique_lock<::std::recursive_mutex> lock(m_joystickMutex);
 	msgs::JoystickPtr joy = joysticks[stick];
 	for (btnid = 0; btnid < joy->buttons().size() && btnid < 12; btnid++)
 	{
@@ -191,10 +191,10 @@ bool DriverStation::GetDigitalIn(uint32_t channel)
 
 /**
  * Set a value for the digital outputs on the Driver Station.
- * 
+ *
  * Control digital outputs on the Drivers Station. These values are typically used for
  * giving feedback on a custom operator station such as LEDs.
- * 
+ *
  * @param channel The digital output to set. Valid range is 1 - 8.
  * @param value The state to set the digital output.
  */
@@ -215,7 +215,7 @@ bool DriverStation::GetDigitalOut(uint32_t channel)
 
 bool DriverStation::IsEnabled() const
 {
-	std::unique_lock<priority_recursive_mutex> lock(m_stateMutex);
+	::std::unique_lock<::std::recursive_mutex> lock(m_stateMutex);
     return state != nullptr ? state->enabled() : false;
 }
 
@@ -226,7 +226,7 @@ bool DriverStation::IsDisabled() const
 
 bool DriverStation::IsAutonomous() const
 {
-	std::unique_lock<priority_recursive_mutex> lock(m_stateMutex);
+	::std::unique_lock<::std::recursive_mutex> lock(m_stateMutex);
     return state != nullptr ?
       state->state() == msgs::DriverStation_State_AUTO : false;
 }
@@ -238,7 +238,7 @@ bool DriverStation::IsOperatorControl() const
 
 bool DriverStation::IsTest() const
 {
-	std::unique_lock<priority_recursive_mutex> lock(m_stateMutex);
+	::std::unique_lock<::std::recursive_mutex> lock(m_stateMutex);
     return state != nullptr ?
       state->state() == msgs::DriverStation_State_TEST : false;
 }
@@ -283,7 +283,7 @@ uint32_t DriverStation::GetLocation() const
  */
 void DriverStation::WaitForData()
 {
-	std::unique_lock<priority_mutex> lock(m_waitForDataMutex);
+	::std::unique_lock<::std::mutex> lock(m_waitForDataMutex);
 	m_waitForDataCond.wait(lock);
 }
 
@@ -308,9 +308,9 @@ double DriverStation::GetMatchTime() const
  * Report an error to the DriverStation messages window.
  * The error is also printed to the program console.
  */
-void DriverStation::ReportError(std::string error)
+void DriverStation::ReportError(::std::string error)
 {
-	std::cout << error << std::endl;
+	::std::cout << error << ::std::endl;
 }
 
 /**
@@ -325,7 +325,7 @@ uint16_t DriverStation::GetTeamNumber() const
 void DriverStation::stateCallback(const msgs::ConstDriverStationPtr &msg)
 {
     {
-		std::unique_lock<priority_recursive_mutex> lock(m_stateMutex); 
+		::std::unique_lock<::std::recursive_mutex> lock(m_stateMutex);
     	*state = *msg;
 	}
     m_waitForDataCond.notify_all();
@@ -334,7 +334,7 @@ void DriverStation::stateCallback(const msgs::ConstDriverStationPtr &msg)
 void DriverStation::joystickCallback(const msgs::ConstJoystickPtr &msg,
                                      int i)
 {
-	std::unique_lock<priority_recursive_mutex> lock(m_joystickMutex);
+	::std::unique_lock<::std::recursive_mutex> lock(m_joystickMutex);
     *(joysticks[i]) = *msg;
 }
 

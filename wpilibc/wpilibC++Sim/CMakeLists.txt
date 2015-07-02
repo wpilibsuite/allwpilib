@@ -15,10 +15,7 @@ endif()
 find_package(gazebo REQUIRED)
 
 file(GLOB_RECURSE SRC_FILES src/*.cpp ../../networktables/cpp/lib/share/*.cpp
-                                      ../../networktables/cpp/lib/Athena/*.cpp
-                                      ../../hal/lib/Athena/Task.cpp
-                                      ../../hal/lib/Athena/Semaphore.cpp
-                                      ../../hal/lib/Athena/cpp/Synchronized.cpp)
+                                      ../../networktables/cpp/lib/Athena/*.cpp)
 
 file(GLOB_RECURSE COM_SRC_FILES ../wpilibC++/src/*.cpp)
 

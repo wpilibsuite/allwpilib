@@ -1,14 +1,14 @@
 /*************************************************************
  * 					NOTICE
- * 
+ *
  * 	These are the only externally exposed functions to the
  *   NetworkCommunication library
- * 
+ *
  * This is an implementation of FRC Spec for Comm Protocol
  * Revision 4.5, June 30, 2008
  *
  * Copyright (c) National Instruments 2008.  All Rights Reserved.
- * 
+ *
  *************************************************************/
 
 #ifndef __FRC_COMM_H__
@@ -92,7 +92,7 @@ extern "C" {
 			const char *userDataHigh, int userDataHighLength,
 			const char *userDataLow, int userDataLowLength, int wait_ms);
 	int EXPORT_FUNC setErrorData(const char *errors, int errorsLength, int wait_ms);
-	
+
 #ifdef SIMULATION
 	void EXPORT_FUNC setNewDataSem(HANDLE);
 #else

@@ -13,11 +13,11 @@
 
 /**
  * Pause the task for a specified time.
- * 
+ *
  * Pause the execution of the program for a specified period of time given in seconds.
  * Motors will continue to run at their last assigned values, and sensors will continue to
  * update. Only the task containing the wait will pause until the wait time is expired.
- * 
+ *
  * @param seconds Length of time to pause, in seconds.
  */
 void Wait(double seconds)
@@ -25,10 +25,10 @@ void Wait(double seconds)
     if (seconds < 0.0) return;
 
     double start = wpilib::internal::simTime;
-    	
+
     while ((wpilib::internal::simTime - start) < seconds) {
-      takeMultiWait(wpilib::internal::time_wait,
-                    wpilib::internal::time_wait_mutex, 0);
+      ::std::unique_lock<::std::mutex> lock(wpilib::internal::time_wait_mutex);
+      wpilib::internal::time_wait.wait(lock);
     }
 }
 
@@ -53,7 +53,7 @@ double GetTime()
 
 /**
  * Create a new timer object.
- * 
+ *
  * Create a new timer object and reset the time to zero. The timer is initially not running and
  * must be started.
  */
@@ -71,7 +71,7 @@ Timer::Timer()
  * Get the current time from the timer. If the clock is running it is derived from
  * the current system clock the start time stored in the timer class. If the clock
  * is not running, then return the time when it was last stopped.
- * 
+ *
  * @return unsigned Current time value for this timer in seconds
  */
 double Timer::Get() const
@@ -96,7 +96,7 @@ double Timer::Get() const
 
 /**
  * Reset the timer by setting the time to 0.
- * 
+ *
  * Make the timer startTime the current time so new requests will be relative to now
  */
 void Timer::Reset()
@@ -162,7 +162,7 @@ bool Timer::HasPeriodPassed(double period)
 
 /*
  * Return the FPGA system clock time in seconds.
- * 
+ *
  * Return the time from the FPGA hardware clock in seconds since the FPGA
  * started.
  * Rolls over after 71 minutes.
@@ -198,7 +198,7 @@ namespace wpilib { namespace internal {
 
     void time_callback(const msgs::ConstFloat64Ptr &msg) {
         simTime = msg->data();
-        giveMultiWait(time_wait);
+        time_wait.notify_all();
     }
 
     transport::SubscriberPtr time_pub = MainNode::Subscribe("~/time", &time_callback);

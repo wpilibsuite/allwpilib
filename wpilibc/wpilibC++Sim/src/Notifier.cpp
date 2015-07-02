@@ -11,8 +11,8 @@
 
 Notifier *Notifier::timerQueueHead = nullptr;
 priority_recursive_mutex Notifier::queueMutex;
-Task* Notifier::task = nullptr;
 int Notifier::refcount = 0;
+::std::atomic<bool> Notifier::m_stopped(false);
 
 /**
  * Create a Notifier for timer event notification.
@@ -35,8 +35,7 @@ Notifier::Notifier(TimerEventHandler handler, void *param)
 		// do the first time intialization of static variables
 		if (refcount == 0)
 		{
-			task = new Task("NotifierTask", (FUNCPTR)Notifier::Run, Task::kDefaultPriority, 64000);
-			task->Start();
+			m_task = ::std::thread(Run);
 		}
 		refcount++;
 	}
@@ -56,12 +55,12 @@ Notifier::~Notifier()
 		// Delete the static variables when the last one is going away
 		if (!(--refcount))
 		{
-			task->Stop();
-			delete task;
+      m_stopped = true;
+			m_task.join();
 		}
 	}
 
-	// Acquire the semaphore; this makes certain that the handler is 
+	// Acquire the semaphore; this makes certain that the handler is
 	// not being executed by the interrupt manager.
 	std::unique_lock<priority_mutex> lock(m_handlerMutex);
 }
@@ -80,7 +79,7 @@ void Notifier::UpdateAlarm()
 /**
  * ProcessQueue is called whenever there is a timer interrupt.
  * We need to wake up and process the current top item in the timer queue as long
- * as its scheduled time is after the current time. Then the item is removed or 
+ * as its scheduled time is after the current time. Then the item is removed or
  * rescheduled (repetitive events) in the queue.
  */
 void Notifier::ProcessQueue(uint32_t mask, void *params)
@@ -249,7 +248,7 @@ void Notifier::Stop()
 }
 
 void Notifier::Run() {
-    while (true) {
+    while (!m_stopped) {
         Notifier::ProcessQueue(0, nullptr);
         if (timerQueueHead != nullptr)
         {

@@ -1,9 +1,16 @@
 #pragma once
 
-#include <pthread.h>
-
 // Allows usage with std::unique_lock without including <mutex> separately
 #include <mutex>
+
+#ifdef FRC_SIMULATOR
+// We do not want to use pthreads if in the simulator; however, in the
+// simulator, we do not care about priority inversion.
+typedef ::std::mutex priority_mutex;
+typedef ::std::recursive_mutex priority_recursive_mutex;
+#else // Covers rest of file.
+
+#include <pthread.h>
 
 class priority_recursive_mutex {
  public:
@@ -65,3 +72,5 @@ class priority_mutex {
       {0, 0, 0, 0x20, 0, {0}}};
 #endif
 };
+
+#endif  // FRC_SIMULATOR

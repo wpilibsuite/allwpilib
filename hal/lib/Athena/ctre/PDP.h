@@ -3,7 +3,6 @@
 #include "ctre.h"				//BIT Defines + Typedefs
 #include <NetworkCommunication/CANSessionMux.h>	//CAN Comm
 #include "CtreCanNode.h"
-#include <pthread.h>
 class PDP : public CtreCanNode
 {
 public:

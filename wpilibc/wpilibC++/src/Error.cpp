@@ -12,7 +12,6 @@
 #include <cstring>
 #include <cstdlib>
 #include <stdint.h>
-#include "HAL/Task.hpp"
 
 #include "DriverStation.h"
 #include "Timer.h"
@@ -67,8 +66,6 @@ void Error::Set(Code code, const char* contextMessage, const char* filename,
     m_timestamp = GetTime();
     Report();
   }
-
-  if (m_suspendOnErrorEnabled) suspendTask(nullptr);
 }
 
 void Error::Report() {

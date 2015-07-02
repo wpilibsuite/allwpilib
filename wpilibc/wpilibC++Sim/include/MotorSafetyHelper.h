@@ -6,7 +6,6 @@
 #pragma once
 
 #include "ErrorBase.h"
-#include "HAL/cpp/priority_mutex.h"
 
 class MotorSafety;
 

@@ -3,13 +3,12 @@
 #include "ctre.h"				//BIT Defines + Typedefs
 #include <NetworkCommunication/CANSessionMux.h>	//CAN Comm
 #include "CtreCanNode.h"
-#include <pthread.h>
 class PCM : public CtreCanNode
 {
 public:
     PCM(UINT8 deviceNumber=0);
     ~PCM();
-    
+
     /* Set PCM solenoid state
      *
      * @Return	-	CTR_Code	-	Error code (if any) for setting solenoid
@@ -28,7 +27,7 @@ public:
      * @Return	-	CTR_Code	-	Error code (if any) for setting solenoid
      */
     CTR_Code 	ClearStickyFaults();
-    
+
     /* Get solenoid state
      *
      * @Return	-	CTR_Code	-	Error code (if any)
@@ -103,13 +102,13 @@ public:
     CTR_Code 	GetCompressorShortedFault(bool &status);
     /* Get compressor is not connected sticky fault value
      * @Return	-	CTR_Code	-	Error code (if any)
-     * @Param	-	status		-	True if compressor current is too low, 
+     * @Param	-	status		-	True if compressor current is too low,
      * 					indicating compressor is not connected, false if otherwise
      */
     CTR_Code 	GetCompressorNotConnectedStickyFault(bool &status);
     /* Get compressor is not connected fault value
      * @Return	-	CTR_Code	-	Error code (if any)
-     * @Param	-	status		-	True if compressor current is too low, 
+     * @Param	-	status		-	True if compressor current is too low,
      * 					indicating compressor is not connected, false if otherwise
      */
     CTR_Code 	GetCompressorNotConnectedFault(bool &status);
@@ -126,7 +125,7 @@ public:
      * @Param	-	status		-	Voltage across PCM power ports in Volts (V)
      */
     CTR_Code 	GetBatteryVoltage(float &status);
-    
+
     /* Set PCM Device Number and according CAN frame IDs
      * @Return	-	void
      * @Param	-	deviceNumber	-	Device number of PCM to control
@@ -140,7 +139,7 @@ public:
      * 				See function EnableSeekDebugFrames
      */
 	CTR_Code GetNumberOfFailedControlFrames(UINT16 &status);
-    
+
     /* Get raw Solenoid Blacklist
      * @Return	-	CTR_Code	-	Error code (if any)
      * @Param	-	status		-	Raw binary breakdown of Solenoid Blacklist

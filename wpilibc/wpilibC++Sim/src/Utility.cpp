@@ -6,7 +6,6 @@
 
 #include "Utility.h"
 
-#include "Task.h"
 #include "Timer.h"
 #include "simulation/simTime.h"
 #include <stdio.h>
@@ -57,33 +56,32 @@ static void wpi_handleTracing()
  * This allows breakpoints to be set on an assert.
  * The users don't call this, but instead use the wpi_assert macros in Utility.h.
  */
-bool wpi_assert_impl(bool conditionValue, 
+bool wpi_assert_impl(bool conditionValue,
 					 const char *conditionText,
 					 const char *message,
 					 const char *fileName,
-					 uint32_t lineNumber, 
+					 uint32_t lineNumber,
 					 const char *funcName)
 {
 	if (!conditionValue)
-	{   
+	{
 		// Error string buffer
 		char error[256];
-				
+
 		// If an error message was specified, include it
 		// Build error string
 		if(message != nullptr) {
-			sprintf(error, "Assertion failed: \"%s\", \"%s\" failed in %s() in %s at line %dd\n", 
+			sprintf(error, "Assertion failed: \"%s\", \"%s\" failed in %s() in %s at line %dd\n",
 							 message, conditionText, funcName, fileName, lineNumber);
 		} else {
-			sprintf(error, "Assertion failed: \"%s\" in %s() in %s at line %dd\n", 
+			sprintf(error, "Assertion failed: \"%s\" in %s() in %s at line %dd\n",
 							 conditionText, funcName, fileName, lineNumber);
 		}
-		
+
 		// Print to console and send to remote dashboard
 		printf("\n\n>>>>%s", error);
-		
+
 		wpi_handleTracing();
-		if (suspendOnAssertEnabled) suspendTask(0);
 	}
 	return conditionValue;
 }
@@ -98,27 +96,26 @@ void wpi_assertEqual_common_impl(int valueA,
 					 	         const char *equalityType,
 						         const char *message,
 						         const char *fileName,
-						         uint32_t lineNumber, 
+						         uint32_t lineNumber,
 						         const char *funcName)
 {
 	// Error string buffer
 	char error[256];
-			
+
 	// If an error message was specified, include it
 	// Build error string
 	if(message != nullptr) {
-		sprintf(error, "Assertion failed: \"%s\", \"%d\" %s \"%d\" in %s() in %s at line %d\n", 
+		sprintf(error, "Assertion failed: \"%s\", \"%d\" %s \"%d\" in %s() in %s at line %d\n",
 						 message, valueA, equalityType, valueB, funcName, fileName, lineNumber);
 	} else {
-		sprintf(error, "Assertion failed: \"%d\" %s \"%d\" in %s() in %s at line %d\n", 
+		sprintf(error, "Assertion failed: \"%d\" %s \"%d\" in %s() in %s at line %d\n",
 						 valueA, equalityType, valueB, funcName, fileName, lineNumber);
 	}
-	
+
 	// Print to console and send to remote dashboard
 	printf("\n\n>>>>%s", error);
-	
+
 	wpi_handleTracing();
-	if (suspendOnAssertEnabled) suspendTask(0);
 }
 
 /**
@@ -131,7 +128,7 @@ bool wpi_assertEqual_impl(int valueA,
 					 	  int valueB,
 						  const char *message,
 						  const char *fileName,
-						  uint32_t lineNumber, 
+						  uint32_t lineNumber,
 						  const char *funcName)
 {
 	if(!(valueA == valueB))
@@ -151,7 +148,7 @@ bool wpi_assertNotEqual_impl(int valueA,
 					 	     int valueB,
 						     const char *message,
 						     const char *fileName,
-						     uint32_t lineNumber, 
+						     uint32_t lineNumber,
 						     const char *funcName)
 {
 	if(!(valueA != valueB))
@@ -163,7 +160,7 @@ bool wpi_assertNotEqual_impl(int valueA,
 
 /**
  * Read the microsecond-resolution timer on the FPGA.
- * 
+ *
  * @return The current time in microseconds according to the FPGA (since FPGA reset).
  */
 uint32_t GetFPGATime()

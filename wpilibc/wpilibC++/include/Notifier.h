@@ -7,8 +7,9 @@
 #pragma once
 
 #include "ErrorBase.h"
-#include "Task.h"
 #include "HAL/cpp/priority_mutex.h"
+#include <thread>
+#include <atomic>
 
 typedef void (*TimerEventHandler)(void *param);
 
@@ -45,6 +46,9 @@ class Notifier : public ErrorBase {
 
   DISALLOW_COPY_AND_ASSIGN(Notifier);
 
-  static Task *task;
+#ifdef FRC_SIMULATOR
+  static ::std::thread m_task;
+  static ::std::atomic<bool> m_stopped;
+#endif
   static void Run();
 };
