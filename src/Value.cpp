@@ -40,24 +40,6 @@ void Value::SetBooleanArray(llvm::ArrayRef<int> value) {
   std::copy(value.begin(), value.end(), data.arr_boolean.arr);
 }
 
-void Value::SetBooleanArray(llvm::ArrayRef<bool> value) {
-  // handle type change
-  if (NT_Value::type != NT_BOOLEAN_ARRAY) {
-    NT_DisposeValue(this);
-    data.arr_boolean.arr = nullptr;
-    data.arr_boolean.size = 0;  // set to zero so size change is hit below
-    NT_Value::type = NT_BOOLEAN_ARRAY;
-  }
-  // handle size change
-  if (data.arr_boolean.size != value.size()) {
-    std::free(data.arr_boolean.arr);
-    data.arr_boolean.arr =
-        static_cast<int*>(std::malloc(value.size()*sizeof(int)));
-    data.arr_boolean.size = value.size();
-  }
-  std::copy(value.begin(), value.end(), data.arr_boolean.arr);
-}
-
 void Value::SetDoubleArray(llvm::ArrayRef<double> value) {
   // handle type change
   if (NT_Value::type != NT_DOUBLE_ARRAY) {
@@ -89,6 +71,11 @@ void Value::SetStringArray(std::vector<StringValue>& value) {
     std::free(data.arr_string.arr);
     data.arr_string.arr =
         static_cast<NT_String*>(std::malloc(value.size()*sizeof(NT_String)));
+    // need to initialize array to avoid invalid frees in std::move below.
+    for (size_t i=0; i<value.size(); ++i) {
+      data.arr_string.arr[i].str = nullptr;
+      data.arr_string.arr[i].len = 0;
+    }
     data.arr_string.size = value.size();
   }
   std::move(value.begin(), value.end(),

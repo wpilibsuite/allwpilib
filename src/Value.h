@@ -18,13 +18,16 @@
 
 namespace ntimpl {
 
+class StringValueTest;
 class Storage;
 class Value;
+class ValueTest;
 
 /*
  * C++ wrapper class around NT_String.
  */
 class StringValue : private NT_String {
+  friend class StringValueTest;
   friend class Value;
  public:
   StringValue() { NT_InitString(this); }
@@ -59,6 +62,7 @@ class StringValue : private NT_String {
  * C++ wrapper class around NT_Value.
  */
 class Value : private NT_Value {
+  friend class ValueTest;
   friend class Storage;
  public:
   Value() { NT_InitValue(this); }
@@ -86,8 +90,6 @@ class Value : private NT_Value {
     assert(NT_Value::type == NT_RAW);
     return static_cast<const StringValue&>(data.v_raw);
   }
-  // Ideally this would return llvm::ArrayRef<bool> but the C headers must
-  // use "int" and casting may be very unsafe.
   llvm::ArrayRef<int> GetBooleanArray() const {
     assert(NT_Value::type == NT_BOOLEAN_ARRAY);
     return llvm::ArrayRef<int>(data.arr_boolean.arr, data.arr_boolean.size);
@@ -97,7 +99,7 @@ class Value : private NT_Value {
     return llvm::ArrayRef<double>(data.arr_double.arr, data.arr_double.size);
   }
   llvm::ArrayRef<StringValue> GetStringArray() const {
-    assert(NT_Value::type == NT_BOOLEAN_ARRAY);
+    assert(NT_Value::type == NT_STRING_ARRAY);
     return llvm::ArrayRef<StringValue>(
         static_cast<StringValue*>(data.arr_string.arr), data.arr_string.size);
   }
@@ -127,7 +129,7 @@ class Value : private NT_Value {
       data.v_string.len = 0;
       NT_Value::type = NT_STRING;
     }
-    data.v_string = value;
+    static_cast<StringValue&>(data.v_string) = std::move(value);
   }
   void SetRaw(llvm::StringRef value) { SetRaw(StringValue(value)); }
   void SetRaw(StringValue&& value) {
@@ -137,11 +139,10 @@ class Value : private NT_Value {
       data.v_raw.len = 0;
       NT_Value::type = NT_RAW;
     }
-    data.v_raw = value;
+    static_cast<StringValue&>(data.v_raw) = std::move(value);
   }
 
   void SetBooleanArray(llvm::ArrayRef<int> value);
-  void SetBooleanArray(llvm::ArrayRef<bool> value);
   void SetDoubleArray(llvm::ArrayRef<double> value);
 
   // Note: This function moves the values out of the vector.
@@ -174,6 +175,9 @@ class Value : private NT_Value {
 };
 
 bool operator==(const Value& lhs, const Value& rhs);
+inline bool operator!=(const Value& lhs, const Value& rhs) {
+  return !(lhs == rhs);
+}
 
 }  // namespace ntimpl
 
