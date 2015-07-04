@@ -16,7 +16,7 @@ class raw_istream;
 
 std::size_t SizeUleb128(unsigned long val);
 std::size_t WriteUleb128(char* addr, unsigned long val);
-std::size_t ReadUleb128(char* addr, unsigned long* ret);
+std::size_t ReadUleb128(const char* addr, unsigned long* ret);
 bool ReadUleb128(raw_istream& is, unsigned long* ret);
 
 }  // namespace ntimpl

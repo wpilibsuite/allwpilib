@@ -67,7 +67,7 @@ std::size_t WriteUleb128(char* addr, unsigned long val) {
  * encodings refer to section "7.6 - Variable Length Data". Return
  * the number of bytes read.
  */
-std::size_t ReadUleb128(char* addr, unsigned long* ret) {
+std::size_t ReadUleb128(const char* addr, unsigned long* ret) {
   unsigned long result = 0;
   int shift = 0;
   std::size_t count = 0;
