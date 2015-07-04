@@ -178,7 +178,7 @@ void WireEncoder::WriteValue(const NT_Value& value) {
       Write8(size);
 
       for (std::size_t i = 0; i < size; ++i)
-        WriteDouble(value.data.arr_double.arr[i] ? 1 : 0);
+        WriteDouble(value.data.arr_double.arr[i]);
       break;
     }
     case NT_STRING_ARRAY: {

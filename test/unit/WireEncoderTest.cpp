@@ -7,6 +7,9 @@
 
 #include "WireEncoder.h"
 
+#include "StringValueTest.h"
+#include "ValueTest.h"
+
 #include "gtest/gtest.h"
 
 #include <cfloat>
@@ -19,20 +22,65 @@
 
 namespace ntimpl {
 
-TEST(WireEncoderTest, Construct) {
+class WireEncoderTest : public ::testing::Test {
+ protected:
+  virtual void SetUp() {
+    Value v;
+    v_boolean.SetBoolean(true);
+    v_double.SetDouble(1.0);
+    v_string.SetString("hello");
+    v_raw.SetRaw("hello");
+    v_boolean_array.SetBooleanArray(std::vector<int>{0, 1, 0});
+    v_boolean_array_big.SetBooleanArray(std::vector<int>(256));
+    v_double_array.SetDoubleArray(std::vector<double>{0.5, 0.25});
+    v_double_array_big.SetDoubleArray(std::vector<double>(256));
+
+    std::vector<StringValue> sa;
+    sa.push_back(StringValue("hello"));
+    sa.push_back(StringValue("goodbye"));
+    v_string_array.SetStringArray(sa);
+
+    sa.clear();
+    for (int i=0; i<256; ++i)
+      sa.push_back(StringValue("h"));
+    v_string_array_big.SetStringArray(sa);
+
+    sv_normal = StringValue("hello");
+
+    std::string longstr;
+    longstr.append(127, '*');
+    longstr.push_back('x');
+    sv_long = StringValue(longstr);
+
+    longstr.clear();
+    longstr.append(65534, '*');
+    longstr.append(3, 'x');
+    sv_big = StringValue(longstr);
+  }
+
+  Value v_empty;
+  Value v_boolean, v_double, v_string, v_raw;
+  Value v_boolean_array, v_boolean_array_big;
+  Value v_double_array, v_double_array_big;
+  Value v_string_array, v_string_array_big;
+
+  StringValue sv_normal, sv_long, sv_big;
+};
+
+TEST_F(WireEncoderTest, Construct) {
   WireEncoder e(0x0300u);
   EXPECT_EQ(0u, e.size());
   EXPECT_EQ(nullptr, e.error());
   EXPECT_EQ(0x0300u, e.proto_rev());
 }
 
-TEST(WireEncoderTest, SetProtoRev) {
+TEST_F(WireEncoderTest, SetProtoRev) {
   WireEncoder e(0x0300u);
   e.set_proto_rev(0x0200u);
   EXPECT_EQ(0x0200u, e.proto_rev());
 }
 
-TEST(WireEncoderTest, Write8) {
+TEST_F(WireEncoderTest, Write8) {
   std::size_t off = BUFSIZE-1;
   WireEncoder e(0x0300u);
   for(std::size_t i=0; i<off; ++i) e.Write8(0u);  // test across Reserve()
@@ -44,7 +92,7 @@ TEST(WireEncoderTest, Write8) {
             llvm::StringRef(e.data(), e.size()).substr(off));
 }
 
-TEST(WireEncoderTest, Write16) {
+TEST_F(WireEncoderTest, Write16) {
   std::size_t off = BUFSIZE-2;
   WireEncoder e(0x0300u);
   for(std::size_t i=0; i<off; ++i) e.Write8(0u);  // test across Reserve()
@@ -57,7 +105,7 @@ TEST(WireEncoderTest, Write16) {
             llvm::StringRef(e.data(), e.size()).substr(off));
 }
 
-TEST(WireEncoderTest, Write32) {
+TEST_F(WireEncoderTest, Write32) {
   std::size_t off = BUFSIZE-4;
   WireEncoder e(0x0300u);
   for(std::size_t i=0; i<off; ++i) e.Write8(0u);  // test across Reserve()
@@ -74,7 +122,7 @@ TEST(WireEncoderTest, Write32) {
             llvm::StringRef(e.data(), e.size()).substr(off));
 }
 
-TEST(WireEncoderTest, WriteDouble) {
+TEST_F(WireEncoderTest, WriteDouble) {
   std::size_t off = BUFSIZE-8;
   WireEncoder e(0x0300u);
   for(std::size_t i=0; i<off; ++i) e.Write8(0u);  // test across Reserve()
@@ -96,7 +144,7 @@ TEST(WireEncoderTest, WriteDouble) {
             llvm::StringRef(e.data(), e.size()).substr(off));
 }
 
-TEST(WireEncoderTest, WriteUleb128) {
+TEST_F(WireEncoderTest, WriteUleb128) {
   std::size_t off = BUFSIZE-2;
   WireEncoder e(0x0300u);
   for(std::size_t i=0; i<off; ++i) e.Write8(0u);  // test across Reserve()
@@ -108,7 +156,7 @@ TEST(WireEncoderTest, WriteUleb128) {
             llvm::StringRef(e.data(), e.size()).substr(off));
 }
 
-TEST(WireEncoderTest, WriteType) {
+TEST_F(WireEncoderTest, WriteType) {
   std::size_t off = BUFSIZE-1;
   WireEncoder e(0x0300u);
   for(std::size_t i=0; i<off; ++i) e.Write8(0u);  // test across Reserve()
@@ -125,7 +173,7 @@ TEST(WireEncoderTest, WriteType) {
             llvm::StringRef(e.data(), e.size()).substr(off));
 }
 
-TEST(WireEncoderTest, WriteTypeError) {
+TEST_F(WireEncoderTest, WriteTypeError) {
   WireEncoder e(0x0200u);
   e.WriteType(NT_UNASSIGNED);
   EXPECT_EQ(0u, e.size());
@@ -142,7 +190,7 @@ TEST(WireEncoderTest, WriteTypeError) {
   EXPECT_EQ(std::string("RPC type not supported in protocol < 3.0"), e.error());
 }
 
-TEST(WireEncoderTest, Reset) {
+TEST_F(WireEncoderTest, Reset) {
   WireEncoder e(0x0300u);
   e.WriteType(NT_UNASSIGNED);
   EXPECT_NE(nullptr, e.error());
@@ -153,6 +201,305 @@ TEST(WireEncoderTest, Reset) {
   EXPECT_EQ(1u, e.size());
   e.Reset();
   EXPECT_EQ(0u, e.size());
+}
+
+TEST_F(WireEncoderTest, GetValueSize2) {
+  WireEncoder e(0x0200u);
+  EXPECT_EQ(0u, e.GetValueSize(ValueTest::ToNT(v_empty)));  // empty
+  EXPECT_EQ(1u, e.GetValueSize(ValueTest::ToNT(v_boolean)));
+  EXPECT_EQ(8u, e.GetValueSize(ValueTest::ToNT(v_double)));
+  EXPECT_EQ(7u, e.GetValueSize(ValueTest::ToNT(v_string)));
+  EXPECT_EQ(0u, e.GetValueSize(ValueTest::ToNT(v_raw)));  // not supported
+
+  EXPECT_EQ(1u+3u, e.GetValueSize(ValueTest::ToNT(v_boolean_array)));
+  // truncated
+  EXPECT_EQ(1u+255u, e.GetValueSize(ValueTest::ToNT(v_boolean_array_big)));
+
+  EXPECT_EQ(1u+2u*8u, e.GetValueSize(ValueTest::ToNT(v_double_array)));
+  // truncated
+  EXPECT_EQ(1u+255u*8u, e.GetValueSize(ValueTest::ToNT(v_double_array_big)));
+
+  EXPECT_EQ(1u+7u+9u, e.GetValueSize(ValueTest::ToNT(v_string_array)));
+  // truncated
+  EXPECT_EQ(1u+255u*3u, e.GetValueSize(ValueTest::ToNT(v_string_array_big)));
+}
+
+TEST_F(WireEncoderTest, WriteBooleanValue2) {
+  WireEncoder e(0x0200u);
+  e.WriteValue(ValueTest::ToNT(v_boolean));
+  Value v_false;
+  v_false.SetBoolean(false);
+  e.WriteValue(ValueTest::ToNT(v_false));
+  ASSERT_EQ(nullptr, e.error());
+  ASSERT_EQ(2u, e.size());
+  ASSERT_EQ(llvm::StringRef("\x01\x00", 2),
+            llvm::StringRef(e.data(), e.size()));
+}
+
+TEST_F(WireEncoderTest, WriteDoubleValue2) {
+  WireEncoder e(0x0200u);
+  e.WriteValue(ValueTest::ToNT(v_double));
+  ASSERT_EQ(nullptr, e.error());
+  ASSERT_EQ(8u, e.size());
+  ASSERT_EQ(llvm::StringRef("\x3f\xf0\x00\x00\x00\x00\x00\x00", 8),
+            llvm::StringRef(e.data(), e.size()));
+}
+
+TEST_F(WireEncoderTest, WriteStringValue2) {
+  WireEncoder e(0x0200u);
+  e.WriteValue(ValueTest::ToNT(v_string));
+  ASSERT_EQ(nullptr, e.error());
+  ASSERT_EQ(7u, e.size());
+  ASSERT_EQ(llvm::StringRef("\x00\x05hello", 7),
+            llvm::StringRef(e.data(), e.size()));
+}
+
+TEST_F(WireEncoderTest, WriteBooleanArrayValue2) {
+  WireEncoder e(0x0200u);
+  e.WriteValue(ValueTest::ToNT(v_boolean_array));
+  ASSERT_EQ(nullptr, e.error());
+  ASSERT_EQ(1u+3u, e.size());
+  ASSERT_EQ(llvm::StringRef("\x03\x00\x01\x00", 4),
+            llvm::StringRef(e.data(), e.size()));
+
+  // truncated
+  e.Reset();
+  e.WriteValue(ValueTest::ToNT(v_boolean_array_big));
+  ASSERT_EQ(nullptr, e.error());
+  ASSERT_EQ(1u+255u, e.size());
+  ASSERT_EQ(llvm::StringRef("\xff\x00", 2), llvm::StringRef(e.data(), 2));
+}
+
+TEST_F(WireEncoderTest, WriteDoubleArrayValue2) {
+  WireEncoder e(0x0200u);
+  e.WriteValue(ValueTest::ToNT(v_double_array));
+  ASSERT_EQ(nullptr, e.error());
+  ASSERT_EQ(1u+2u*8u, e.size());
+  ASSERT_EQ(llvm::StringRef("\x02\x3f\xe0\x00\x00\x00\x00\x00\x00"
+                            "\x3f\xd0\x00\x00\x00\x00\x00\x00", 17),
+            llvm::StringRef(e.data(), e.size()));
+
+  // truncated
+  e.Reset();
+  e.WriteValue(ValueTest::ToNT(v_double_array_big));
+  ASSERT_EQ(nullptr, e.error());
+  ASSERT_EQ(1u+255u*8u, e.size());
+  ASSERT_EQ(llvm::StringRef("\xff\x00", 2), llvm::StringRef(e.data(), 2));
+}
+
+TEST_F(WireEncoderTest, WriteStringArrayValue2) {
+  WireEncoder e(0x0200u);
+  e.WriteValue(ValueTest::ToNT(v_string_array));
+  ASSERT_EQ(nullptr, e.error());
+  ASSERT_EQ(1u+7u+9u, e.size());
+  ASSERT_EQ(llvm::StringRef("\x02\x00\x05hello\x00\x07goodbye", 17),
+            llvm::StringRef(e.data(), e.size()));
+
+  // truncated
+  e.Reset();
+  e.WriteValue(ValueTest::ToNT(v_string_array_big));
+  ASSERT_EQ(nullptr, e.error());
+  ASSERT_EQ(1u+255u*3u, e.size());
+  ASSERT_EQ(llvm::StringRef("\xff\x00\x01", 3), llvm::StringRef(e.data(), 3));
+}
+
+TEST_F(WireEncoderTest, WriteValueError2) {
+  WireEncoder e(0x0200u);
+  e.WriteValue(ValueTest::ToNT(v_empty));  // empty
+  ASSERT_EQ(0u, e.size());
+  ASSERT_NE(nullptr, e.error());
+
+  e.Reset();
+  e.WriteValue(ValueTest::ToNT(v_raw));  // not supported
+  ASSERT_EQ(0u, e.size());
+  ASSERT_NE(nullptr, e.error());
+}
+
+TEST_F(WireEncoderTest, GetValueSize3) {
+  WireEncoder e(0x0300u);
+  EXPECT_EQ(0u, e.GetValueSize(ValueTest::ToNT(v_empty)));  // empty
+  EXPECT_EQ(1u, e.GetValueSize(ValueTest::ToNT(v_boolean)));
+  EXPECT_EQ(8u, e.GetValueSize(ValueTest::ToNT(v_double)));
+  EXPECT_EQ(6u, e.GetValueSize(ValueTest::ToNT(v_string)));
+  EXPECT_EQ(6u, e.GetValueSize(ValueTest::ToNT(v_raw)));
+
+  EXPECT_EQ(1u+3u, e.GetValueSize(ValueTest::ToNT(v_boolean_array)));
+  // truncated
+  EXPECT_EQ(1u+255u, e.GetValueSize(ValueTest::ToNT(v_boolean_array_big)));
+
+  EXPECT_EQ(1u+2u*8u, e.GetValueSize(ValueTest::ToNT(v_double_array)));
+  // truncated
+  EXPECT_EQ(1u+255u*8u, e.GetValueSize(ValueTest::ToNT(v_double_array_big)));
+
+  EXPECT_EQ(1u+6u+8u, e.GetValueSize(ValueTest::ToNT(v_string_array)));
+  // truncated
+  EXPECT_EQ(1u+255u*2u, e.GetValueSize(ValueTest::ToNT(v_string_array_big)));
+}
+
+TEST_F(WireEncoderTest, WriteBooleanValue3) {
+  WireEncoder e(0x0300u);
+  e.WriteValue(ValueTest::ToNT(v_boolean));
+  Value v_false;
+  v_false.SetBoolean(false);
+  e.WriteValue(ValueTest::ToNT(v_false));
+  ASSERT_EQ(nullptr, e.error());
+  ASSERT_EQ(2u, e.size());
+  ASSERT_EQ(llvm::StringRef("\x01\x00", 2),
+            llvm::StringRef(e.data(), e.size()));
+}
+
+TEST_F(WireEncoderTest, WriteDoubleValue3) {
+  WireEncoder e(0x0300u);
+  e.WriteValue(ValueTest::ToNT(v_double));
+  ASSERT_EQ(nullptr, e.error());
+  ASSERT_EQ(8u, e.size());
+  ASSERT_EQ(llvm::StringRef("\x3f\xf0\x00\x00\x00\x00\x00\x00", 8),
+            llvm::StringRef(e.data(), e.size()));
+}
+
+TEST_F(WireEncoderTest, WriteStringValue3) {
+  WireEncoder e(0x0300u);
+  e.WriteValue(ValueTest::ToNT(v_string));
+  ASSERT_EQ(nullptr, e.error());
+  ASSERT_EQ(6u, e.size());
+  ASSERT_EQ(llvm::StringRef("\x05hello", 6),
+            llvm::StringRef(e.data(), e.size()));
+}
+
+TEST_F(WireEncoderTest, WriteRawValue3) {
+  WireEncoder e(0x0300u);
+  e.WriteValue(ValueTest::ToNT(v_raw));
+  ASSERT_EQ(nullptr, e.error());
+  ASSERT_EQ(6u, e.size());
+  ASSERT_EQ(llvm::StringRef("\x05hello", 6),
+            llvm::StringRef(e.data(), e.size()));
+}
+
+TEST_F(WireEncoderTest, WriteBooleanArrayValue3) {
+  WireEncoder e(0x0300u);
+  e.WriteValue(ValueTest::ToNT(v_boolean_array));
+  ASSERT_EQ(nullptr, e.error());
+  ASSERT_EQ(1u+3u, e.size());
+  ASSERT_EQ(llvm::StringRef("\x03\x00\x01\x00", 4),
+            llvm::StringRef(e.data(), e.size()));
+
+  // truncated
+  e.Reset();
+  e.WriteValue(ValueTest::ToNT(v_boolean_array_big));
+  ASSERT_EQ(nullptr, e.error());
+  ASSERT_EQ(1u+255u, e.size());
+  ASSERT_EQ(llvm::StringRef("\xff\x00", 2), llvm::StringRef(e.data(), 2));
+}
+
+TEST_F(WireEncoderTest, WriteDoubleArrayValue3) {
+  WireEncoder e(0x0300u);
+  e.WriteValue(ValueTest::ToNT(v_double_array));
+  ASSERT_EQ(nullptr, e.error());
+  ASSERT_EQ(1u+2u*8u, e.size());
+  ASSERT_EQ(llvm::StringRef("\x02\x3f\xe0\x00\x00\x00\x00\x00\x00"
+                            "\x3f\xd0\x00\x00\x00\x00\x00\x00", 17),
+            llvm::StringRef(e.data(), e.size()));
+
+  // truncated
+  e.Reset();
+  e.WriteValue(ValueTest::ToNT(v_double_array_big));
+  ASSERT_EQ(nullptr, e.error());
+  ASSERT_EQ(1u+255u*8u, e.size());
+  ASSERT_EQ(llvm::StringRef("\xff\x00", 2), llvm::StringRef(e.data(), 2));
+}
+
+TEST_F(WireEncoderTest, WriteStringArrayValue3) {
+  WireEncoder e(0x0300u);
+  e.WriteValue(ValueTest::ToNT(v_string_array));
+  ASSERT_EQ(nullptr, e.error());
+  ASSERT_EQ(1u+6u+8u, e.size());
+  ASSERT_EQ(llvm::StringRef("\x02\x05hello\x07goodbye", 15),
+            llvm::StringRef(e.data(), e.size()));
+
+  // truncated
+  e.Reset();
+  e.WriteValue(ValueTest::ToNT(v_string_array_big));
+  ASSERT_EQ(nullptr, e.error());
+  ASSERT_EQ(1u+255u*2u, e.size());
+  ASSERT_EQ(llvm::StringRef("\xff\x01", 2), llvm::StringRef(e.data(), 2));
+}
+
+TEST_F(WireEncoderTest, WriteValueError3) {
+  WireEncoder e(0x0300u);
+  e.WriteValue(ValueTest::ToNT(v_empty));  // empty
+  ASSERT_EQ(0u, e.size());
+  ASSERT_NE(nullptr, e.error());
+}
+
+TEST_F(WireEncoderTest, GetStringSize2) {
+  // 2-byte length
+  WireEncoder e(0x0200u);
+  EXPECT_EQ(7u, e.GetStringSize(StringValueTest::ToNT(sv_normal)));
+  EXPECT_EQ(130u, e.GetStringSize(StringValueTest::ToNT(sv_long)));
+  // truncated
+  EXPECT_EQ(65537u, e.GetStringSize(StringValueTest::ToNT(sv_big)));
+}
+
+TEST_F(WireEncoderTest, WriteString2) {
+  WireEncoder e(0x0200u);
+  e.WriteString(StringValueTest::ToNT(sv_normal));
+  EXPECT_EQ(nullptr, e.error());
+  EXPECT_EQ(7u, e.size());
+  EXPECT_EQ(llvm::StringRef("\x00\x05hello", 7),
+            llvm::StringRef(e.data(), e.size()));
+
+  e.Reset();
+  e.WriteString(StringValueTest::ToNT(sv_long));
+  EXPECT_EQ(nullptr, e.error());
+  ASSERT_EQ(130u, e.size());
+  EXPECT_EQ(llvm::StringRef("\x00\x80**", 4), llvm::StringRef(e.data(), 4));
+  EXPECT_EQ('*', e.data()[128]);
+  EXPECT_EQ('x', e.data()[129]);
+
+  // truncated
+  e.Reset();
+  e.WriteString(StringValueTest::ToNT(sv_big));
+  EXPECT_EQ(nullptr, e.error());
+  ASSERT_EQ(65537u, e.size());
+  EXPECT_EQ(llvm::StringRef("\xff\xff**", 4), llvm::StringRef(e.data(), 4));
+  EXPECT_EQ('*', e.data()[65535]);
+  EXPECT_EQ('x', e.data()[65536]);
+}
+
+TEST_F(WireEncoderTest, GetStringSize3) {
+  // leb128-encoded length
+  WireEncoder e(0x0300u);
+  EXPECT_EQ(6u, e.GetStringSize(StringValueTest::ToNT(sv_normal)));
+  EXPECT_EQ(130u, e.GetStringSize(StringValueTest::ToNT(sv_long)));
+  EXPECT_EQ(65540u, e.GetStringSize(StringValueTest::ToNT(sv_big)));
+}
+
+TEST_F(WireEncoderTest, WriteString3) {
+  WireEncoder e(0x0300u);
+  e.WriteString(StringValueTest::ToNT(sv_normal));
+  EXPECT_EQ(nullptr, e.error());
+  EXPECT_EQ(6u, e.size());
+  EXPECT_EQ(llvm::StringRef("\x05hello", 6),
+            llvm::StringRef(e.data(), e.size()));
+
+  e.Reset();
+  e.WriteString(StringValueTest::ToNT(sv_long));
+  EXPECT_EQ(nullptr, e.error());
+  ASSERT_EQ(130u, e.size());
+  EXPECT_EQ(llvm::StringRef("\x80\x01**", 4), llvm::StringRef(e.data(), 4));
+  EXPECT_EQ('*', e.data()[128]);
+  EXPECT_EQ('x', e.data()[129]);
+
+  // NOT truncated
+  e.Reset();
+  e.WriteString(StringValueTest::ToNT(sv_big));
+  EXPECT_EQ(nullptr, e.error());
+  ASSERT_EQ(65540u, e.size());
+  EXPECT_EQ(llvm::StringRef("\x81\x80\x04*", 4), llvm::StringRef(e.data(), 4));
+  EXPECT_EQ('*', e.data()[65536]);
+  EXPECT_EQ('x', e.data()[65537]);
+  EXPECT_EQ('x', e.data()[65538]);
+  EXPECT_EQ('x', e.data()[65539]);
 }
 
 }  // namespace ntimpl
