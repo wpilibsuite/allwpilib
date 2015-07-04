@@ -6,7 +6,7 @@ namespace ntimpl {
 
 class StringValueTest : public ::testing::Test {
  public:
-  NT_String& ToNT(StringValue& v) { return v; }
+  static NT_String& ToNT(StringValue& v) { return v; }
 };
 
 }  // namespace ntimpl
