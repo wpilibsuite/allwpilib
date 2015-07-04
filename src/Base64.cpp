@@ -126,16 +126,15 @@ void Base64Encode(llvm::StringRef plain, std::string* encoded) {
   std::size_t len = plain.size();
   encoded->reserve(((len + 2) / 3 * 4) + 1);
 
-  std::size_t i = 0;
-  if (len >= 2)
-    for (; i < len - 2; i += 3) {
-      (*encoded) += basis_64[(plain[i] >> 2) & 0x3F];
-      (*encoded) +=
-          basis_64[((plain[i] & 0x3) << 4) | ((int)(plain[i + 1] & 0xF0) >> 4)];
-      (*encoded) += basis_64[((plain[i + 1] & 0xF) << 2) |
-                             ((int)(plain[i + 2] & 0xC0) >> 6)];
-      (*encoded) += basis_64[plain[i + 2] & 0x3F];
-    }
+  std::size_t i;
+  for (i = 0; (i + 2) < len; i += 3) {
+    (*encoded) += basis_64[(plain[i] >> 2) & 0x3F];
+    (*encoded) +=
+        basis_64[((plain[i] & 0x3) << 4) | ((int)(plain[i + 1] & 0xF0) >> 4)];
+    (*encoded) += basis_64[((plain[i + 1] & 0xF) << 2) |
+                           ((int)(plain[i + 2] & 0xC0) >> 6)];
+    (*encoded) += basis_64[plain[i + 2] & 0x3F];
+  }
   if (i < len) {
     (*encoded) += basis_64[(plain[i] >> 2) & 0x3F];
     if (i == (len - 1)) {
