@@ -42,7 +42,7 @@ static double ReadDouble(char*& buf) {
   val <<= 8;
   val |= (*((unsigned char*)buf)) & 0xff;
   ++buf;
-  return *reinterpret_cast<double*>(&val);
+  return reinterpret_cast<double&>(val);
 }
 
 WireDecoder::WireDecoder(raw_istream& is, unsigned int proto_rev) : m_is(is) {
