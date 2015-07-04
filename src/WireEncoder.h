@@ -66,17 +66,19 @@ class WireEncoder {
   /* Writes a 16-bit word. */
   void Write16(unsigned int val) {
     Reserve(2);
-    *m_cur++ = (char)((val >> 8) & 0xff);
-    *m_cur++ = (char)(val & 0xff);
+    m_cur[1] = (char)(val & 0xff); val >>= 8;
+    m_cur[0] = (char)(val & 0xff);
+    m_cur += 2;
   }
 
   /* Writes a 32-bit word. */
   void Write32(unsigned long val) {
     Reserve(4);
-    *m_cur++ = (char)((val >> 24) & 0xff);
-    *m_cur++ = (char)((val >> 16) & 0xff);
-    *m_cur++ = (char)((val >> 8) & 0xff);
-    *m_cur++ = (char)(val & 0xff);
+    m_cur[3] = (char)(val & 0xff); val >>= 8;
+    m_cur[2] = (char)(val & 0xff); val >>= 8;
+    m_cur[1] = (char)(val & 0xff); val >>= 8;
+    m_cur[0] = (char)(val & 0xff);
+    m_cur += 4;
   }
 
   /* Writes a double. */

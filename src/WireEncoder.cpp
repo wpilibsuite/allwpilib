@@ -31,15 +31,16 @@ WireEncoder::~WireEncoder() { std::free(m_start); }
 void WireEncoder::WriteDouble(double val) {
   Reserve(8);
   // The highest performance way to do this, albeit non-portable.
-  std::uint64_t v = *reinterpret_cast<uint64_t*>(&val);
-  *m_cur++ = (char)((v >> 56) & 0xff);
-  *m_cur++ = (char)((v >> 48) & 0xff);
-  *m_cur++ = (char)((v >> 40) & 0xff);
-  *m_cur++ = (char)((v >> 32) & 0xff);
-  *m_cur++ = (char)((v >> 24) & 0xff);
-  *m_cur++ = (char)((v >> 16) & 0xff);
-  *m_cur++ = (char)((v >> 8) & 0xff);
-  *m_cur++ = (char)(v & 0xff);
+  std::uint64_t v = reinterpret_cast<uint64_t&>(val);
+  m_cur[7] = (char)(v & 0xff); v >>= 8;
+  m_cur[6] = (char)(v & 0xff); v >>= 8;
+  m_cur[5] = (char)(v & 0xff); v >>= 8;
+  m_cur[4] = (char)(v & 0xff); v >>= 8;
+  m_cur[3] = (char)(v & 0xff); v >>= 8;
+  m_cur[2] = (char)(v & 0xff); v >>= 8;
+  m_cur[1] = (char)(v & 0xff); v >>= 8;
+  m_cur[0] = (char)(v & 0xff);
+  m_cur += 8;
 }
 
 void WireEncoder::ReserveSlow(std::size_t len) {
