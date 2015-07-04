@@ -91,7 +91,7 @@ static const unsigned char pr2six[256] =
 std::size_t Base64Decode(llvm::StringRef encoded, std::string* plain) {
   const unsigned char *bufin = encoded.bytes_begin();
   while (pr2six[*bufin] <= 63 && bufin != encoded.bytes_end()) ++bufin;
-  std::size_t nprbytes = (bufin - encoded.bytes_begin()) - 1;
+  std::size_t nprbytes = bufin - encoded.bytes_begin();
   std::size_t nbytesdecoded = ((nprbytes + 3) / 4) * 3;
 
   plain->clear();
@@ -121,18 +121,21 @@ static const char basis_64[] =
 
 void Base64Encode(llvm::StringRef plain, std::string* encoded) {
   encoded->clear();
+  if (plain.empty())
+    return;
   std::size_t len = plain.size();
   encoded->reserve(((len + 2) / 3 * 4) + 1);
 
-  std::size_t i;
-  for (i = 0; i < len - 2; i += 3) {
-    (*encoded) += basis_64[(plain[i] >> 2) & 0x3F];
-    (*encoded) +=
-        basis_64[((plain[i] & 0x3) << 4) | ((int)(plain[i + 1] & 0xF0) >> 4)];
-    (*encoded) += basis_64[((plain[i + 1] & 0xF) << 2) |
-                           ((int)(plain[i + 2] & 0xC0) >> 6)];
-    (*encoded) += basis_64[plain[i + 2] & 0x3F];
-  }
+  std::size_t i = 0;
+  if (len >= 2)
+    for (; i < len - 2; i += 3) {
+      (*encoded) += basis_64[(plain[i] >> 2) & 0x3F];
+      (*encoded) +=
+          basis_64[((plain[i] & 0x3) << 4) | ((int)(plain[i + 1] & 0xF0) >> 4)];
+      (*encoded) += basis_64[((plain[i + 1] & 0xF) << 2) |
+                             ((int)(plain[i + 2] & 0xC0) >> 6)];
+      (*encoded) += basis_64[plain[i + 2] & 0x3F];
+    }
   if (i < len) {
     (*encoded) += basis_64[(plain[i] >> 2) & 0x3F];
     if (i == (len - 1)) {
