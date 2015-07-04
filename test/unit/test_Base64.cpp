@@ -42,8 +42,7 @@ static Base64TestParam sample[] = {
      "mQgc28gb24uLi4K"},
 };
 
-INSTANTIATE_TEST_CASE_P(Base64Sample, Base64Test,
-                        ::testing::ValuesIn(sample));
+INSTANTIATE_TEST_CASE_P(Base64Sample, Base64Test, ::testing::ValuesIn(sample));
 
 static Base64TestParam standard[] = {
     {0, "", ""},
@@ -58,5 +57,5 @@ static Base64TestParam standard[] = {
 
 INSTANTIATE_TEST_CASE_P(Base64Standard, Base64Test,
                         ::testing::ValuesIn(standard));
- 
+
 }  // namespace ntimpl
