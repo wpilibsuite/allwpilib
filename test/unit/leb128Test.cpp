@@ -26,7 +26,7 @@
 
 namespace ntimpl {
 
-TEST(LEB128Test, WriteULEB128) {
+TEST(LEB128Test, WriteUleb128) {
 #define EXPECT_ULEB128_EQ(EXPECTED, VALUE, PAD) \
   do { \
     llvm::StringRef expected(EXPECTED, sizeof(EXPECTED)-1); \
