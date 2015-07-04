@@ -1,13 +1,6 @@
-#include "Value.h"
-
-#include "gtest/gtest.h"
+#include "StringValueTest.h"
 
 namespace ntimpl {
-
-class StringValueTest : public ::testing::Test {
- public:
-  NT_String& ToNT(StringValue& v) { return v; }
-};
 
 TEST_F(StringValueTest, ConstructEmpty) {
   StringValue v;

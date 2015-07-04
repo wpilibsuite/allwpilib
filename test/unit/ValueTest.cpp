@@ -1,13 +1,6 @@
-#include "Value.h"
-
-#include "gtest/gtest.h"
+#include "ValueTest.h"
 
 namespace ntimpl {
-
-class ValueTest : public ::testing::Test {
- public:
-  NT_Value& ToNT(Value& v) { return v; }
-};
 
 typedef ValueTest ValueDeathTest;
 
