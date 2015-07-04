@@ -30,6 +30,9 @@ class WireDecoder {
 
   void set_proto_rev(unsigned int proto_rev) { m_proto_rev = proto_rev; }
 
+  /* Get the active protocol revision. */
+  unsigned int proto_rev() const { return m_proto_rev; }
+
   /* Clears error indicator. */
   void Reset() { m_error = nullptr; }
 
