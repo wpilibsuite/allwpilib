@@ -13,158 +13,158 @@ typedef ValueTest ValueDeathTest;
 
 TEST_F(ValueTest, ConstructEmpty) {
   Value v;
-  ASSERT_EQ(ToNT(v).type, NT_UNASSIGNED);
-  ASSERT_EQ(ToNT(v).last_change, 0u);
-  ASSERT_EQ(v.type(), NT_UNASSIGNED);
+  ASSERT_EQ(NT_UNASSIGNED, ToNT(v).type);
+  ASSERT_EQ(0u, ToNT(v).last_change);
+  ASSERT_EQ(NT_UNASSIGNED, v.type());
 }
 
 TEST_F(ValueTest, ConstructMove) {
   Value v;
   v.SetString("hello");
-  ASSERT_EQ(v.type(), NT_STRING);
+  ASSERT_EQ(NT_STRING, v.type());
   Value v2(std::move(v));
-  ASSERT_EQ(v.type(), NT_UNASSIGNED);
-  ASSERT_EQ(v2.type(), NT_STRING);
+  ASSERT_EQ(NT_UNASSIGNED, v.type());
+  ASSERT_EQ(NT_STRING, v2.type());
 }
 
 TEST_F(ValueTest, AssignMove) {
   Value v;
   v.SetString("hello");
-  ASSERT_EQ(v.type(), NT_STRING);
+  ASSERT_EQ(NT_STRING, v.type());
   Value v2;
   v2.SetDouble(0.5);
-  ASSERT_EQ(v2.type(), NT_DOUBLE);
+  ASSERT_EQ(NT_DOUBLE, v2.type());
   v2 = std::move(v);
-  ASSERT_EQ(v.type(), NT_UNASSIGNED);
-  ASSERT_EQ(v2.type(), NT_STRING);
+  ASSERT_EQ(NT_UNASSIGNED, v.type());
+  ASSERT_EQ(NT_STRING, v2.type());
 }
 
 TEST_F(ValueTest, Boolean) {
   Value v;
   v.SetBoolean(false);
-  ASSERT_EQ(ToNT(v).type, NT_BOOLEAN);
-  ASSERT_EQ(ToNT(v).data.v_boolean, false);
-  ASSERT_EQ(v.type(), NT_BOOLEAN);
-  ASSERT_EQ(v.GetBoolean(), false);
+  ASSERT_EQ(NT_BOOLEAN, ToNT(v).type);
+  ASSERT_EQ(0, ToNT(v).data.v_boolean);
+  ASSERT_EQ(NT_BOOLEAN, v.type());
+  ASSERT_FALSE(v.GetBoolean());
   v.SetBoolean(true);
-  ASSERT_EQ(ToNT(v).type, NT_BOOLEAN);
-  ASSERT_EQ(ToNT(v).data.v_boolean, true);
-  ASSERT_EQ(v.type(), NT_BOOLEAN);
-  ASSERT_EQ(v.GetBoolean(), true);
+  ASSERT_EQ(NT_BOOLEAN, ToNT(v).type);
+  ASSERT_EQ(1, ToNT(v).data.v_boolean);
+  ASSERT_EQ(NT_BOOLEAN, v.type());
+  ASSERT_TRUE(v.GetBoolean());
 }
 
 TEST_F(ValueTest, Double) {
   Value v;
   v.SetDouble(0.5);
-  ASSERT_EQ(ToNT(v).type, NT_DOUBLE);
-  ASSERT_EQ(ToNT(v).data.v_double, 0.5);
-  ASSERT_EQ(v.type(), NT_DOUBLE);
-  ASSERT_EQ(v.GetDouble(), 0.5);
+  ASSERT_EQ(NT_DOUBLE, ToNT(v).type);
+  ASSERT_EQ(0.5, ToNT(v).data.v_double);
+  ASSERT_EQ(NT_DOUBLE, v.type());
+  ASSERT_EQ(0.5, v.GetDouble());
   v.SetDouble(0.25);
-  ASSERT_EQ(ToNT(v).type, NT_DOUBLE);
-  ASSERT_EQ(ToNT(v).data.v_double, 0.25);
-  ASSERT_EQ(v.type(), NT_DOUBLE);
-  ASSERT_EQ(v.GetDouble(), 0.25);
+  ASSERT_EQ(NT_DOUBLE, ToNT(v).type);
+  ASSERT_EQ(0.25, ToNT(v).data.v_double);
+  ASSERT_EQ(NT_DOUBLE, v.type());
+  ASSERT_EQ(0.25, v.GetDouble());
 }
 
 TEST_F(ValueTest, String) {
   Value v;
   v.SetString("hello");
-  ASSERT_EQ(ToNT(v).type, NT_STRING);
-  ASSERT_EQ(ToNT(v).data.v_string.str, llvm::StringRef("hello"));
-  ASSERT_EQ(ToNT(v).data.v_string.len, 5u);
-  ASSERT_EQ(v.type(), NT_STRING);
-  ASSERT_EQ(v.GetString(), "hello");
+  ASSERT_EQ(NT_STRING, ToNT(v).type);
+  ASSERT_EQ(llvm::StringRef("hello"), ToNT(v).data.v_string.str);
+  ASSERT_EQ(5u, ToNT(v).data.v_string.len);
+  ASSERT_EQ(NT_STRING, v.type());
+  ASSERT_EQ("hello", v.GetString());
   v.SetString("goodbye");
-  ASSERT_EQ(ToNT(v).type, NT_STRING);
-  ASSERT_EQ(ToNT(v).data.v_string.str, llvm::StringRef("goodbye"));
-  ASSERT_EQ(ToNT(v).data.v_string.len, 7u);
-  ASSERT_EQ(v.type(), NT_STRING);
-  ASSERT_EQ(v.GetString(), "goodbye");
+  ASSERT_EQ(NT_STRING, ToNT(v).type);
+  ASSERT_EQ(llvm::StringRef("goodbye"), ToNT(v).data.v_string.str);
+  ASSERT_EQ(7u, ToNT(v).data.v_string.len);
+  ASSERT_EQ(NT_STRING, v.type());
+  ASSERT_EQ("goodbye", v.GetString());
 }
 
 TEST_F(ValueTest, Raw) {
   Value v;
   v.SetRaw("hello");
-  ASSERT_EQ(ToNT(v).type, NT_RAW);
-  ASSERT_EQ(ToNT(v).data.v_string.str, llvm::StringRef("hello"));
-  ASSERT_EQ(ToNT(v).data.v_string.len, 5u);
-  ASSERT_EQ(v.type(), NT_RAW);
-  ASSERT_EQ(v.GetRaw(), "hello");
+  ASSERT_EQ(NT_RAW, ToNT(v).type);
+  ASSERT_EQ(llvm::StringRef("hello"), ToNT(v).data.v_string.str);
+  ASSERT_EQ(5u, ToNT(v).data.v_string.len);
+  ASSERT_EQ(NT_RAW, v.type());
+  ASSERT_EQ("hello", v.GetRaw());
   v.SetRaw("goodbye");
-  ASSERT_EQ(ToNT(v).type, NT_RAW);
-  ASSERT_EQ(ToNT(v).data.v_string.str, llvm::StringRef("goodbye"));
-  ASSERT_EQ(ToNT(v).data.v_string.len, 7u);
-  ASSERT_EQ(v.type(), NT_RAW);
-  ASSERT_EQ(v.GetRaw(), "goodbye");
+  ASSERT_EQ(NT_RAW, ToNT(v).type);
+  ASSERT_EQ(llvm::StringRef("goodbye"), ToNT(v).data.v_string.str);
+  ASSERT_EQ(7u, ToNT(v).data.v_string.len);
+  ASSERT_EQ(NT_RAW, v.type());
+  ASSERT_EQ("goodbye", v.GetRaw());
 }
 
 TEST_F(ValueTest, BooleanArray) {
   Value v;
   std::vector<int> vec{1,0,1};
   v.SetBooleanArray(vec);
-  ASSERT_EQ(ToNT(v).type, NT_BOOLEAN_ARRAY);
-  ASSERT_EQ(ToNT(v).data.arr_boolean.size, 3u);
-  ASSERT_EQ(ToNT(v).data.arr_boolean.arr[0], vec[0]);
-  ASSERT_EQ(ToNT(v).data.arr_boolean.arr[1], vec[1]);
-  ASSERT_EQ(ToNT(v).data.arr_boolean.arr[2], vec[2]);
-  ASSERT_EQ(v.type(), NT_BOOLEAN_ARRAY);
-  ASSERT_EQ(v.GetBooleanArray(), llvm::ArrayRef<int>(vec));
+  ASSERT_EQ(NT_BOOLEAN_ARRAY, ToNT(v).type);
+  ASSERT_EQ(3u, ToNT(v).data.arr_boolean.size);
+  ASSERT_EQ(vec[0], ToNT(v).data.arr_boolean.arr[0]);
+  ASSERT_EQ(vec[1], ToNT(v).data.arr_boolean.arr[1]);
+  ASSERT_EQ(vec[2], ToNT(v).data.arr_boolean.arr[2]);
+  ASSERT_EQ(NT_BOOLEAN_ARRAY, v.type());
+  ASSERT_EQ(llvm::ArrayRef<int>(vec), v.GetBooleanArray());
 
   // assign with same size
   vec = {0,1,0};
   v.SetBooleanArray(vec);
-  ASSERT_EQ(ToNT(v).type, NT_BOOLEAN_ARRAY);
-  ASSERT_EQ(ToNT(v).data.arr_boolean.size, 3u);
-  ASSERT_EQ(ToNT(v).data.arr_boolean.arr[0], vec[0]);
-  ASSERT_EQ(ToNT(v).data.arr_boolean.arr[1], vec[1]);
-  ASSERT_EQ(ToNT(v).data.arr_boolean.arr[2], vec[2]);
-  ASSERT_EQ(v.type(), NT_BOOLEAN_ARRAY);
-  ASSERT_EQ(v.GetBooleanArray(), llvm::ArrayRef<int>(vec));
+  ASSERT_EQ(NT_BOOLEAN_ARRAY, ToNT(v).type);
+  ASSERT_EQ(3u, ToNT(v).data.arr_boolean.size);
+  ASSERT_EQ(vec[0], ToNT(v).data.arr_boolean.arr[0]);
+  ASSERT_EQ(vec[1], ToNT(v).data.arr_boolean.arr[1]);
+  ASSERT_EQ(vec[2], ToNT(v).data.arr_boolean.arr[2]);
+  ASSERT_EQ(NT_BOOLEAN_ARRAY, v.type());
+  ASSERT_EQ(llvm::ArrayRef<int>(vec), v.GetBooleanArray());
 
   // assign with different size
   vec = {1,0};
   v.SetBooleanArray(vec);
-  ASSERT_EQ(ToNT(v).type, NT_BOOLEAN_ARRAY);
-  ASSERT_EQ(ToNT(v).data.arr_boolean.size, 2u);
-  ASSERT_EQ(ToNT(v).data.arr_boolean.arr[0], vec[0]);
-  ASSERT_EQ(ToNT(v).data.arr_boolean.arr[1], vec[1]);
-  ASSERT_EQ(v.type(), NT_BOOLEAN_ARRAY);
-  ASSERT_EQ(v.GetBooleanArray(), llvm::ArrayRef<int>(vec));
+  ASSERT_EQ(NT_BOOLEAN_ARRAY, ToNT(v).type);
+  ASSERT_EQ(2u, ToNT(v).data.arr_boolean.size);
+  ASSERT_EQ(vec[0], ToNT(v).data.arr_boolean.arr[0]);
+  ASSERT_EQ(vec[1], ToNT(v).data.arr_boolean.arr[1]);
+  ASSERT_EQ(NT_BOOLEAN_ARRAY, v.type());
+  ASSERT_EQ(llvm::ArrayRef<int>(vec), v.GetBooleanArray());
 }
 
 TEST_F(ValueTest, DoubleArray) {
   Value v;
   std::vector<double> vec{0.5,0.25,0.5};
   v.SetDoubleArray(vec);
-  ASSERT_EQ(ToNT(v).type, NT_DOUBLE_ARRAY);
-  ASSERT_EQ(ToNT(v).data.arr_double.size, 3u);
-  ASSERT_EQ(ToNT(v).data.arr_double.arr[0], vec[0]);
-  ASSERT_EQ(ToNT(v).data.arr_double.arr[1], vec[1]);
-  ASSERT_EQ(ToNT(v).data.arr_double.arr[2], vec[2]);
-  ASSERT_EQ(v.type(), NT_DOUBLE_ARRAY);
-  ASSERT_EQ(v.GetDoubleArray(), llvm::ArrayRef<double>(vec));
+  ASSERT_EQ(NT_DOUBLE_ARRAY, ToNT(v).type);
+  ASSERT_EQ(3u, ToNT(v).data.arr_double.size);
+  ASSERT_EQ(vec[0], ToNT(v).data.arr_double.arr[0]);
+  ASSERT_EQ(vec[1], ToNT(v).data.arr_double.arr[1]);
+  ASSERT_EQ(vec[2], ToNT(v).data.arr_double.arr[2]);
+  ASSERT_EQ(NT_DOUBLE_ARRAY, v.type());
+  ASSERT_EQ(llvm::ArrayRef<double>(vec), v.GetDoubleArray());
 
   // assign with same size
   vec = {0.25,0.5,0.25};
   v.SetDoubleArray(vec);
-  ASSERT_EQ(ToNT(v).type, NT_DOUBLE_ARRAY);
-  ASSERT_EQ(ToNT(v).data.arr_double.size, 3u);
-  ASSERT_EQ(ToNT(v).data.arr_double.arr[0], vec[0]);
-  ASSERT_EQ(ToNT(v).data.arr_double.arr[1], vec[1]);
-  ASSERT_EQ(ToNT(v).data.arr_double.arr[2], vec[2]);
-  ASSERT_EQ(v.type(), NT_DOUBLE_ARRAY);
-  ASSERT_EQ(v.GetDoubleArray(), llvm::ArrayRef<double>(vec));
+  ASSERT_EQ(NT_DOUBLE_ARRAY, ToNT(v).type);
+  ASSERT_EQ(3u, ToNT(v).data.arr_double.size);
+  ASSERT_EQ(vec[0], ToNT(v).data.arr_double.arr[0]);
+  ASSERT_EQ(vec[1], ToNT(v).data.arr_double.arr[1]);
+  ASSERT_EQ(vec[2], ToNT(v).data.arr_double.arr[2]);
+  ASSERT_EQ(NT_DOUBLE_ARRAY, v.type());
+  ASSERT_EQ(llvm::ArrayRef<double>(vec), v.GetDoubleArray());
 
   // assign with different size
   vec = {0.5,0.25};
   v.SetDoubleArray(vec);
-  ASSERT_EQ(ToNT(v).type, NT_DOUBLE_ARRAY);
-  ASSERT_EQ(ToNT(v).data.arr_double.size, 2u);
-  ASSERT_EQ(ToNT(v).data.arr_double.arr[0], vec[0]);
-  ASSERT_EQ(ToNT(v).data.arr_double.arr[1], vec[1]);
-  ASSERT_EQ(v.type(), NT_DOUBLE_ARRAY);
-  ASSERT_EQ(v.GetDoubleArray(), llvm::ArrayRef<double>(vec));
+  ASSERT_EQ(NT_DOUBLE_ARRAY, ToNT(v).type);
+  ASSERT_EQ(2u, ToNT(v).data.arr_double.size);
+  ASSERT_EQ(vec[0], ToNT(v).data.arr_double.arr[0]);
+  ASSERT_EQ(vec[1], ToNT(v).data.arr_double.arr[1]);
+  ASSERT_EQ(NT_DOUBLE_ARRAY, v.type());
+  ASSERT_EQ(llvm::ArrayRef<double>(vec), v.GetDoubleArray());
 }
 
 TEST_F(ValueTest, StringArray) {
@@ -175,15 +175,15 @@ TEST_F(ValueTest, StringArray) {
   vec.push_back(StringValue("string"));
   v.SetStringArray(vec);
   ASSERT_TRUE(vec.empty());
-  ASSERT_EQ(ToNT(v).type, NT_STRING_ARRAY);
-  ASSERT_EQ(ToNT(v).data.arr_string.size, 3u);
-  ASSERT_EQ(ToNT(v).data.arr_string.arr[0].str, llvm::StringRef("hello"));
-  ASSERT_EQ(ToNT(v).data.arr_string.arr[1].str, llvm::StringRef("goodbye"));
-  ASSERT_EQ(ToNT(v).data.arr_string.arr[2].str, llvm::StringRef("string"));
-  ASSERT_EQ(v.type(), NT_STRING_ARRAY);
-  ASSERT_EQ(v.GetStringArray()[0], llvm::StringRef("hello"));
-  ASSERT_EQ(v.GetStringArray()[1], llvm::StringRef("goodbye"));
-  ASSERT_EQ(v.GetStringArray()[2], llvm::StringRef("string"));
+  ASSERT_EQ(NT_STRING_ARRAY, ToNT(v).type);
+  ASSERT_EQ(3u, ToNT(v).data.arr_string.size);
+  ASSERT_EQ(llvm::StringRef("hello"), ToNT(v).data.arr_string.arr[0].str);
+  ASSERT_EQ(llvm::StringRef("goodbye"), ToNT(v).data.arr_string.arr[1].str);
+  ASSERT_EQ(llvm::StringRef("string"), ToNT(v).data.arr_string.arr[2].str);
+  ASSERT_EQ(NT_STRING_ARRAY, v.type());
+  ASSERT_EQ(llvm::StringRef("hello"), v.GetStringArray()[0]);
+  ASSERT_EQ(llvm::StringRef("goodbye"), v.GetStringArray()[1]);
+  ASSERT_EQ(llvm::StringRef("string"), v.GetStringArray()[2]);
 
   // assign with same size
   vec.clear();
@@ -192,15 +192,15 @@ TEST_F(ValueTest, StringArray) {
   vec.push_back(StringValue("string3"));
   v.SetStringArray(vec);
   ASSERT_TRUE(vec.empty());
-  ASSERT_EQ(ToNT(v).type, NT_STRING_ARRAY);
-  ASSERT_EQ(ToNT(v).data.arr_string.size, 3u);
-  ASSERT_EQ(ToNT(v).data.arr_string.arr[0].str, llvm::StringRef("s1"));
-  ASSERT_EQ(ToNT(v).data.arr_string.arr[1].str, llvm::StringRef("str2"));
-  ASSERT_EQ(ToNT(v).data.arr_string.arr[2].str, llvm::StringRef("string3"));
-  ASSERT_EQ(v.type(), NT_STRING_ARRAY);
-  ASSERT_EQ(v.GetStringArray()[0], llvm::StringRef("s1"));
-  ASSERT_EQ(v.GetStringArray()[1], llvm::StringRef("str2"));
-  ASSERT_EQ(v.GetStringArray()[2], llvm::StringRef("string3"));
+  ASSERT_EQ(NT_STRING_ARRAY, ToNT(v).type);
+  ASSERT_EQ(3u, ToNT(v).data.arr_string.size);
+  ASSERT_EQ(llvm::StringRef("s1"), ToNT(v).data.arr_string.arr[0].str);
+  ASSERT_EQ(llvm::StringRef("str2"), ToNT(v).data.arr_string.arr[1].str);
+  ASSERT_EQ(llvm::StringRef("string3"), ToNT(v).data.arr_string.arr[2].str);
+  ASSERT_EQ(NT_STRING_ARRAY, v.type());
+  ASSERT_EQ(llvm::StringRef("s1"), v.GetStringArray()[0]);
+  ASSERT_EQ(llvm::StringRef("str2"), v.GetStringArray()[1]);
+  ASSERT_EQ(llvm::StringRef("string3"), v.GetStringArray()[2]);
 
   // assign with different size
   vec.clear();
@@ -208,13 +208,13 @@ TEST_F(ValueTest, StringArray) {
   vec.push_back(StringValue("er"));
   v.SetStringArray(vec);
   ASSERT_TRUE(vec.empty());
-  ASSERT_EQ(ToNT(v).type, NT_STRING_ARRAY);
-  ASSERT_EQ(ToNT(v).data.arr_string.size, 2u);
-  ASSERT_EQ(ToNT(v).data.arr_string.arr[0].str, llvm::StringRef("short"));
-  ASSERT_EQ(ToNT(v).data.arr_string.arr[1].str, llvm::StringRef("er"));
-  ASSERT_EQ(v.type(), NT_STRING_ARRAY);
-  ASSERT_EQ(v.GetStringArray()[0], llvm::StringRef("short"));
-  ASSERT_EQ(v.GetStringArray()[1], llvm::StringRef("er"));
+  ASSERT_EQ(NT_STRING_ARRAY, ToNT(v).type);
+  ASSERT_EQ(2u, ToNT(v).data.arr_string.size);
+  ASSERT_EQ(llvm::StringRef("short"), ToNT(v).data.arr_string.arr[0].str);
+  ASSERT_EQ(llvm::StringRef("er"), ToNT(v).data.arr_string.arr[1].str);
+  ASSERT_EQ(NT_STRING_ARRAY, v.type());
+  ASSERT_EQ(llvm::StringRef("short"), v.GetStringArray()[0]);
+  ASSERT_EQ(llvm::StringRef("er"), v.GetStringArray()[1]);
 }
 
 TEST_F(ValueDeathTest, GetAssertions) {
