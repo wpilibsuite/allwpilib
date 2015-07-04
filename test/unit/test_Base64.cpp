@@ -10,6 +10,13 @@ struct Base64TestParam {
   const char* encoded;
 };
 
+std::ostream& operator<<(std::ostream& os, const Base64TestParam& param) {
+  os << "Base64TestParam(Len: " << param.plain_len << ", "
+     << "Plain: \"" << param.plain << "\", "
+     << "Encoded: \"" << param.encoded << "\")";
+  return os;
+}
+
 class Base64Test : public ::testing::TestWithParam<Base64TestParam> {
  protected:
   llvm::StringRef GetPlain() {
@@ -28,7 +35,8 @@ TEST_P(Base64Test, Encode) {
 
 TEST_P(Base64Test, Decode) {
   std::string s;
-  Base64Decode(GetParam().encoded, &s);
+  llvm::StringRef encoded = GetParam().encoded;
+  EXPECT_EQ(encoded.size(), Base64Decode(encoded, &s));
   ASSERT_EQ(GetPlain(), s);
 }
 

@@ -89,31 +89,31 @@ static const unsigned char pr2six[256] =
 };
 
 std::size_t Base64Decode(llvm::StringRef encoded, std::string* plain) {
-  const unsigned char *bufin = encoded.bytes_begin();
-  while (pr2six[*bufin] <= 63 && bufin != encoded.bytes_end()) ++bufin;
-  std::size_t nprbytes = bufin - encoded.bytes_begin();
-  std::size_t nbytesdecoded = ((nprbytes + 3) / 4) * 3;
+  const unsigned char *end = encoded.bytes_begin();
+  while (pr2six[*end] <= 63 && end != encoded.bytes_end()) ++end;
+  std::size_t nprbytes = end - encoded.bytes_begin();
 
   plain->clear();
-  plain->reserve(nbytesdecoded);
+  if (nprbytes == 0)
+    return 0;
+  plain->reserve(((nprbytes + 3) / 4) * 3);
 
-  bufin = encoded.bytes_begin();
+  const unsigned char *cur = encoded.bytes_begin();
 
   while (nprbytes > 4) {
-    (*plain) += (pr2six[*bufin] << 2 | pr2six[bufin[1]] >> 4);
-    (*plain) += (pr2six[bufin[1]] << 4 | pr2six[bufin[2]] >> 2);
-    (*plain) += (pr2six[bufin[2]] << 6 | pr2six[bufin[3]]);
-    bufin += 4;
+    (*plain) += (pr2six[cur[0]] << 2 | pr2six[cur[1]] >> 4);
+    (*plain) += (pr2six[cur[1]] << 4 | pr2six[cur[2]] >> 2);
+    (*plain) += (pr2six[cur[2]] << 6 | pr2six[cur[3]]);
+    cur += 4;
     nprbytes -= 4;
   }
 
   // Note: (nprbytes == 1) would be an error, so just ignore that case
-  if (nprbytes > 1) (*plain) += (pr2six[*bufin] << 2 | pr2six[bufin[1]] >> 4);
-  if (nprbytes > 2) (*plain) += (pr2six[bufin[1]] << 4 | pr2six[bufin[2]] >> 2);
-  if (nprbytes > 3) (*plain) += (pr2six[bufin[2]] << 6 | pr2six[bufin[3]]);
+  if (nprbytes > 1) (*plain) += (pr2six[cur[0]] << 2 | pr2six[cur[1]] >> 4);
+  if (nprbytes > 2) (*plain) += (pr2six[cur[1]] << 4 | pr2six[cur[2]] >> 2);
+  if (nprbytes > 3) (*plain) += (pr2six[cur[2]] << 6 | pr2six[cur[3]]);
 
-  nbytesdecoded -= (4 - nprbytes) & 3;
-  return nbytesdecoded;
+  return (end - encoded.bytes_begin()) + ((4 - nprbytes) & 3);
 }
 
 static const char basis_64[] =
