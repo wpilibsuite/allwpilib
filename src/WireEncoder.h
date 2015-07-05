@@ -13,6 +13,8 @@
 
 #include "ntcore.h"
 
+#include "llvm/StringRef.h"
+
 namespace ntimpl {
 
 /* Encodes native data for network transmission.
@@ -89,7 +91,10 @@ class WireEncoder {
 
   void WriteType(NT_Type type);
   void WriteValue(const NT_Value& value);
-  void WriteString(const NT_String& str);
+  void WriteString(const NT_String& str) {
+    WriteString(llvm::StringRef(str.str, str.len));
+  }
+  void WriteString(llvm::StringRef str);
 
   /* Utility function to get the written size of a value (without actually
    * writing it).
@@ -99,7 +104,10 @@ class WireEncoder {
   /* Utility function to get the written size of a string (without actually
    * writing it).
    */
-  std::size_t GetStringSize(const NT_String& str) const;
+  std::size_t GetStringSize(const NT_String& str) const {
+    return GetStringSize(llvm::StringRef(str.str, str.len));
+  }
+  std::size_t GetStringSize(llvm::StringRef str) const;
 
   WireEncoder(const WireEncoder&) = delete;
   WireEncoder& operator=(const WireEncoder&) = delete;

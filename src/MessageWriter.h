@@ -10,6 +10,9 @@
 
 #include "WireEncoder.h"
 
+#include "llvm/ArrayRef.h"
+#include "llvm/StringRef.h"
+
 namespace ntimpl {
 
 class MessageWriter : private WireEncoder {
@@ -24,12 +27,12 @@ class MessageWriter : private WireEncoder {
   using WireEncoder::size;
 
   void WriteKeepAlive();
-  void WriteClientHello(const NT_String& self_id);
+  void WriteClientHello(llvm::StringRef self_id);
   void WriteProtoUnsup();
   void WriteServerHelloDone();
-  void WriteServerHello(unsigned int flags, const NT_String& self_id);
+  void WriteServerHello(unsigned int flags, llvm::StringRef self_id);
   void WriteClientHelloDone();
-  void WriteEntryAssign(const NT_String& name, unsigned int id,
+  void WriteEntryAssign(llvm::StringRef name, unsigned int id,
                         unsigned int seq_num, const NT_Value& value,
                         unsigned int flags);
   void WriteEntryUpdate(unsigned int id, unsigned int seq_num,
@@ -38,18 +41,16 @@ class MessageWriter : private WireEncoder {
   void WriteEntryDelete(unsigned int id);
   void WriteClearEntries();
   void WriteExecuteRpc(unsigned int id, unsigned int uid,
-                       const NT_Value* params_start,
-                       const NT_Value* params_end);
+                       llvm::ArrayRef<NT_Value> params);
   void WriteRpcResponse(unsigned int id, unsigned int uid,
-                        const NT_Value* results_start,
-                        const NT_Value* results_end);
+                        llvm::ArrayRef<NT_Value> results);
 
   MessageWriter(const MessageWriter&) = delete;
   MessageWriter& operator=(const MessageWriter&) = delete;
 
  private:
   void WriteRpc(unsigned int msg_type, unsigned int id, unsigned int uid,
-                const NT_Value* values_start, const NT_Value* values_end);
+                llvm::ArrayRef<NT_Value> values);
 };
 
 }  // namespace ntimpl

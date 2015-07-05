@@ -197,18 +197,18 @@ void WireEncoder::WriteValue(const NT_Value& value) {
   }
 }
 
-std::size_t WireEncoder::GetStringSize(const NT_String& str) const {
+std::size_t WireEncoder::GetStringSize(llvm::StringRef str) const {
   if (m_proto_rev < 0x0300u) {
-    std::size_t len = str.len;
+    std::size_t len = str.size();
     if (len > 0xffff) len = 0xffff; // Limited to 64K length; truncate
     return 2 + len;
   }
-  return SizeUleb128(str.len) + str.len;
+  return SizeUleb128(str.size()) + str.size();
 }
 
-void WireEncoder::WriteString(const NT_String& str) {
+void WireEncoder::WriteString(llvm::StringRef str) {
   // length
-  std::size_t len = str.len;
+  std::size_t len = str.size();
   if (m_proto_rev < 0x0300u) {
     if (len > 0xffff) len = 0xffff; // Limited to 64K length; truncate
     Write16(len);
@@ -217,6 +217,6 @@ void WireEncoder::WriteString(const NT_String& str) {
 
   // contents
   Reserve(len);
-  std::memcpy(m_cur, str.str, len);
+  std::memcpy(m_cur, str.data(), len);
   m_cur += len;
 }

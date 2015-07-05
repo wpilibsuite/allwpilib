@@ -15,7 +15,7 @@ MessageWriter::~MessageWriter() {}
 
 void MessageWriter::WriteKeepAlive() { Write8(NT_MSG_KEEP_ALIVE); }
 
-void MessageWriter::WriteClientHello(const NT_String& self_id) {
+void MessageWriter::WriteClientHello(llvm::StringRef self_id) {
   Write8(NT_MSG_CLIENT_HELLO);
   Write16(m_proto_rev);
   if (m_proto_rev < 0x0300u) return;
@@ -30,7 +30,7 @@ void MessageWriter::WriteProtoUnsup() {
 void MessageWriter::WriteServerHelloDone() { Write8(NT_MSG_SERVER_HELLO_DONE); }
 
 void MessageWriter::WriteServerHello(unsigned int flags,
-                                     const NT_String& self_id) {
+                                     llvm::StringRef self_id) {
   if (m_proto_rev < 0x0300u) return;  // new message in version 3.0
   Write8(NT_MSG_SERVER_HELLO);
   Write8(flags);
@@ -42,7 +42,7 @@ void MessageWriter::WriteClientHelloDone() {
   Write8(NT_MSG_CLIENT_HELLO_DONE);
 }
 
-void MessageWriter::WriteEntryAssign(const NT_String& name, unsigned int id,
+void MessageWriter::WriteEntryAssign(llvm::StringRef name, unsigned int id,
                                      unsigned int seq_num,
                                      const NT_Value& value,
                                      unsigned int flags) {
@@ -85,20 +85,18 @@ void MessageWriter::WriteClearEntries() {
 }
 
 void MessageWriter::WriteExecuteRpc(unsigned int id, unsigned int uid,
-                                    const NT_Value* params_start,
-                                    const NT_Value* params_end) {
-  WriteRpc(NT_MSG_EXECUTE_RPC, id, uid, params_start, params_end);
+                                    llvm::ArrayRef<NT_Value> params) {
+  WriteRpc(NT_MSG_EXECUTE_RPC, id, uid, params);
 }
 
 void MessageWriter::WriteRpcResponse(unsigned int id, unsigned int uid,
-                                     const NT_Value* results_start,
-                                     const NT_Value* results_end) {
-  WriteRpc(NT_MSG_RPC_RESPONSE, id, uid, results_start, results_end);
+                                     llvm::ArrayRef<NT_Value> results) {
+  WriteRpc(NT_MSG_RPC_RESPONSE, id, uid, results);
 }
 
 void MessageWriter::WriteRpc(unsigned int msg_type, unsigned int id,
-                             unsigned int uid, const NT_Value* values_start,
-                             const NT_Value* values_end) {
+                             unsigned int uid,
+                             llvm::ArrayRef<NT_Value> values) {
   if (m_proto_rev < 0x0300u) return;  // new message in version 3.0
 
   Write8(msg_type);
@@ -106,10 +104,8 @@ void MessageWriter::WriteRpc(unsigned int msg_type, unsigned int id,
   Write16(uid);
 
   unsigned long len = 0;
-  for (const NT_Value* value = values_start; value != values_end; ++value)
-    len += GetValueSize(*value);
+  for (auto& value : values) len += GetValueSize(value);
   WriteUleb128(len);
 
-  for (const NT_Value* value = values_start; value != values_end; ++value)
-    WriteValue(*value);
+  for (auto& value : values) WriteValue(value);
 }
