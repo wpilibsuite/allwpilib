@@ -22,6 +22,7 @@ class StringValueTest;
 class Storage;
 class Value;
 class ValueTest;
+class WireDecoder;
 
 /*
  * C++ wrapper class around NT_String.
@@ -29,9 +30,10 @@ class ValueTest;
 class StringValue : private NT_String {
   friend class StringValueTest;
   friend class Value;
+  friend class WireDecoder;
  public:
   StringValue() { NT_InitString(this); }
-  /*implicit*/ StringValue(llvm::StringRef val);
+  explicit StringValue(llvm::StringRef val);
   ~StringValue() { NT_DisposeString(this); }
 
   operator llvm::StringRef() const { return llvm::StringRef(str, len); }
@@ -58,12 +60,32 @@ class StringValue : private NT_String {
   }
 };
 
+inline bool operator==(const StringValue& lhs, const StringValue& rhs) {
+  return llvm::StringRef(lhs) == llvm::StringRef(rhs);
+}
+inline bool operator!=(const StringValue& lhs, const StringValue& rhs) {
+  return llvm::StringRef(lhs) != llvm::StringRef(rhs);
+}
+inline bool operator==(llvm::StringRef lhs, const StringValue& rhs) {
+  return lhs == llvm::StringRef(rhs);
+}
+inline bool operator!=(llvm::StringRef lhs, const StringValue& rhs) {
+  return lhs != llvm::StringRef(rhs);
+}
+inline bool operator==(const StringValue& lhs, llvm::StringRef rhs) {
+  return llvm::StringRef(lhs) == rhs;
+}
+inline bool operator!=(const StringValue& lhs, llvm::StringRef rhs) {
+  return llvm::StringRef(lhs) != rhs;
+}
+
 /*
  * C++ wrapper class around NT_Value.
  */
 class Value : private NT_Value {
   friend class ValueTest;
   friend class Storage;
+  friend class WireDecoder;
  public:
   Value() { NT_InitValue(this); }
   ~Value() { NT_DisposeValue(this); }

@@ -13,6 +13,7 @@
 #include "ntcore.h"
 #include "leb128.h"
 #include "raw_istream.h"
+#include "Value.h"
 
 namespace ntimpl {
 
@@ -100,6 +101,15 @@ class WireDecoder {
   bool ReadType(NT_Type* type);
   bool ReadValue(NT_Type type, NT_Value* value);
   bool ReadString(NT_String* str);
+
+  bool ReadValue(NT_Type type, Value* value) {
+    NT_DisposeValue(value);
+    return ReadValue(type, static_cast<NT_Value*>(value));
+  }
+  bool ReadString(StringValue* str) {
+    NT_DisposeString(str);
+    return ReadString(static_cast<NT_String*>(str));
+  }
 
   WireDecoder(const WireDecoder&) = delete;
   WireDecoder& operator=(const WireDecoder&) = delete;

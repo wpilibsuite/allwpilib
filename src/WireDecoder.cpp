@@ -102,6 +102,7 @@ bool WireDecoder::ReadType(NT_Type* type) {
       *type = NT_RPC;
       break;
     default:
+      *type = NT_UNASSIGNED;
       m_error = "unrecognized value type";
       return false;
   }
@@ -109,8 +110,6 @@ bool WireDecoder::ReadType(NT_Type* type) {
 }
 
 bool WireDecoder::ReadValue(NT_Type type, NT_Value* value) {
-  value->type = type;
-  value->last_change = 0;
   switch (type) {
     case NT_BOOLEAN: {
       unsigned int v;
@@ -188,6 +187,8 @@ bool WireDecoder::ReadValue(NT_Type type, NT_Value* value) {
       m_error = "invalid type when trying to read value";
       return false;
   }
+  value->type = type;
+  value->last_change = 0;
   return true;
 }
 
