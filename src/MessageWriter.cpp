@@ -79,7 +79,6 @@ void MessageWriter::WriteEntryDelete(unsigned int id) {
 
 void MessageWriter::WriteClearEntries() {
   if (m_proto_rev < 0x0300u) return;  // new message in version 3.0
-
   Write8(NT_MSG_CLEAR_ENTRIES);
   Write32(NT_CLEAR_ALL_MAGIC);
 }
