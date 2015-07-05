@@ -168,6 +168,7 @@ TEST_F(WireEncoderTest, WriteType) {
   e.WriteType(NT_DOUBLE_ARRAY);
   e.WriteType(NT_STRING_ARRAY);
   e.WriteType(NT_RPC);
+  ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(8u, e.size()-off);
   ASSERT_EQ(llvm::StringRef("\x00\x01\x02\x03\x10\x11\x12\x20", 8),
             llvm::StringRef(e.data(), e.size()).substr(off));
