@@ -8,6 +8,7 @@
 #ifndef NT_MESSAGEREADER_H_
 #define NT_MESSAGEREADER_H_
 
+#include "Value.h"
 #include "WireDecoder.h"
 
 namespace ntimpl {
@@ -19,20 +20,19 @@ class MessageHandler {
   // Needed for protocol rev 2.0 ENTRY_UPDATE messages.
   virtual NT_Type GetEntryType(unsigned int id) = 0;
 
-  // All of these functions are expected to take ownership of passed
-  // strings/values.
   virtual ~MessageHandler() {}
   virtual void GotKeepAlive() = 0;
-  virtual void GotClientHello(unsigned int proto_rev, NT_String& self_id) = 0;
+  virtual void GotClientHello(unsigned int proto_rev,
+                              StringValue&& self_id) = 0;
   virtual void GotProtoUnsup(unsigned int proto_rev) = 0;
   virtual void GotServerHelloDone() = 0;
-  virtual void GotServerHello(unsigned int flags, NT_String& self_id) = 0;
+  virtual void GotServerHello(unsigned int flags, StringValue&& self_id) = 0;
   virtual void GotClientHelloDone() = 0;
-  virtual void GotEntryAssign(NT_String& name, unsigned int id,
-                              unsigned int seq_num, NT_Value& value,
+  virtual void GotEntryAssign(StringValue&& name, unsigned int id,
+                              unsigned int seq_num, Value&& value,
                               unsigned int flags) = 0;
   virtual void GotEntryUpdate(unsigned int id, unsigned int seq_num,
-                              NT_Value& value) = 0;
+                              Value&& value) = 0;
   virtual void GotFlagsUpdate(unsigned int id, unsigned int flags) = 0;
   virtual void GotEntryDelete(unsigned int id) = 0;
   virtual void GotClearEntries() = 0;

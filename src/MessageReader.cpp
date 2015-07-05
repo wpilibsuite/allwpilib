@@ -34,14 +34,13 @@ bool MessageReader::Run() {
     case NT_MSG_CLIENT_HELLO: {
       unsigned int proto_rev;
       if (!Read16(&proto_rev)) return false;
-      NT_String self_id;
-      NT_InitString(&self_id);
+      StringValue self_id;
       // This intentionally uses the provided proto_rev instead of
       // m_proto_rev.
       if (proto_rev >= 0x0300u) {
         if (!ReadString(&self_id)) return false;
       }
-      m_handler.GotClientHello(proto_rev, self_id);
+      m_handler.GotClientHello(proto_rev, std::move(self_id));
       break;
     }
     case NT_MSG_PROTO_UNSUP: {
@@ -65,24 +64,26 @@ bool MessageReader::Run() {
       m_handler.GotClientHelloDone();
       break;
     case NT_MSG_ENTRY_ASSIGN: {
-      NT_String name;
+      StringValue name;
       if (!ReadString(&name)) return false;
       NT_Type type;
+      if (!ReadType(&type)) return false;
       unsigned int id, seq_num;
+      if (!Read16(&id)) return false;
+      if (!Read16(&seq_num)) return false;
       unsigned int flags = 0;
-      NT_Value value;
-      if (!ReadType(&type) || !Read16(&id) || !Read16(&seq_num) ||
-          (m_proto_rev >= 0x0300u && !Read8(&flags)) ||
-          !ReadValue(type, &value)) {
-        NT_DisposeString(&name);
-        return false;
+      if (m_proto_rev >= 0x0300u) {
+        if (!Read8(&flags)) return false;
       }
-      m_handler.GotEntryAssign(name, id, seq_num, value, flags);
+      Value value;
+      if (!ReadValue(type, &value)) return false;
+      m_handler.GotEntryAssign(std::move(name), id, seq_num, std::move(value),
+                               flags);
       break;
     }
     case NT_MSG_ENTRY_UPDATE: {
       unsigned int id, seq_num;
-      NT_Value value;
+      Value value;
       if (!Read16(&id)) return false;
       if (!Read16(&seq_num)) return false;
       NT_Type type;
@@ -93,7 +94,7 @@ bool MessageReader::Run() {
       } else
         type = m_handler.GetEntryType(id);
       if (!ReadValue(type, &value)) return false;
-      m_handler.GotEntryUpdate(id, seq_num, value);
+      m_handler.GotEntryUpdate(id, seq_num, std::move(value));
       break;
     }
     case NT_MSG_FLAGS_UPDATE: {
