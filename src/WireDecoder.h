@@ -45,8 +45,9 @@ class WireDecoder {
   /* Reads the specified number of bytes.
    * @param buf pointer to read data (output parameter)
    * @param len number of bytes to read
+   * Caution: the buffer is only temporarily valid.
    */
-  bool Read(char** buf, std::size_t len) {
+  bool Read(const char** buf, std::size_t len) {
     if (len > m_allocated) Realloc(len);
     *buf = m_buf;
     return m_is.read(m_buf, len);
@@ -54,7 +55,7 @@ class WireDecoder {
 
   /* Reads a single byte. */
   bool Read8(unsigned int* val) {
-    char* buf;
+    const char* buf;
     if (!Read(&buf, 1)) return false;
     *val = (*((unsigned char*)buf)) & 0xff;
     return true;
@@ -62,7 +63,7 @@ class WireDecoder {
 
   /* Reads a 16-bit word. */
   bool Read16(unsigned int* val) {
-    char* buf;
+    const char* buf;
     if (!Read(&buf, 2)) return false;
     unsigned int v = (*((unsigned char*)buf)) & 0xff;
     ++buf;
@@ -74,7 +75,7 @@ class WireDecoder {
 
   /* Reads a 32-bit word. */
   bool Read32(unsigned long* val) {
-    char* buf;
+    const char* buf;
     if (!Read(&buf, 4)) return false;
     unsigned int v = (*((unsigned char*)buf)) & 0xff;
     ++buf;

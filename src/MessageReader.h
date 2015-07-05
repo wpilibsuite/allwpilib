@@ -37,9 +37,9 @@ class MessageHandler {
   virtual void GotEntryDelete(unsigned int id) = 0;
   virtual void GotClearEntries() = 0;
   virtual void GotExecuteRpc(unsigned int id, unsigned int uid,
-                             const char* params, std::size_t params_len) = 0;
+                             llvm::StringRef params) = 0;
   virtual void GotRpcResponse(unsigned int id, unsigned int uid,
-                              const char* results, std::size_t results_len) = 0;
+                              llvm::StringRef results) = 0;
 
   MessageHandler() = default;
   MessageHandler(const MessageHandler&) = delete;

@@ -141,9 +141,9 @@ bool MessageReader::Run() {
       if (!Read16(&uid)) return false;
       unsigned long size;
       if (!ReadUleb128(&size)) return false;
-      char* params;
+      const char* params;
       if (!Read(&params, size)) return false;
-      m_handler.GotExecuteRpc(id, uid, params, size);
+      m_handler.GotExecuteRpc(id, uid, llvm::StringRef(params, size));
       break;
     }
     case NT_MSG_RPC_RESPONSE: {
@@ -156,9 +156,9 @@ bool MessageReader::Run() {
       if (!Read16(&uid)) return false;
       unsigned long size;
       if (!ReadUleb128(&size)) return false;
-      char* results;
+      const char* results;
       if (!Read(&results, size)) return false;
-      m_handler.GotRpcResponse(id, uid, results, size);
+      m_handler.GotRpcResponse(id, uid, llvm::StringRef(results, size));
       break;
     }
     default:

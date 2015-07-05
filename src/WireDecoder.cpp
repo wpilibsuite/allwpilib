@@ -17,7 +17,7 @@
 
 using namespace ntimpl;
 
-static double ReadDouble(char*& buf) {
+static double ReadDouble(const char*& buf) {
   // Fast but non-portable!
   std::uint64_t val = (*((unsigned char*)buf)) & 0xff;
   ++buf;
@@ -57,7 +57,7 @@ WireDecoder::WireDecoder(raw_istream& is, unsigned int proto_rev) : m_is(is) {
 WireDecoder::~WireDecoder() { std::free(m_buf); }
 
 bool WireDecoder::ReadDouble(double* val) {
-  char* buf;
+  const char* buf;
   if (!Read(&buf, 8)) return false;
   *val = ::ReadDouble(buf);
   return true;
@@ -139,7 +139,7 @@ bool WireDecoder::ReadValue(NT_Type type, NT_Value* value) {
       value->data.arr_boolean.size = size;
 
       // array values
-      char* buf;
+      const char* buf;
       if (!Read(&buf, size)) return false;
       value->data.arr_boolean.arr =
           static_cast<int*>(std::malloc(size * sizeof(int)));
@@ -154,7 +154,7 @@ bool WireDecoder::ReadValue(NT_Type type, NT_Value* value) {
       value->data.arr_double.size = size;
 
       // array values
-      char* buf;
+      const char* buf;
       if (!Read(&buf, size * 8)) return false;
       value->data.arr_double.arr =
           static_cast<double*>(std::malloc(size * sizeof(double)));
