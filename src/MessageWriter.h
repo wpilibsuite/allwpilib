@@ -21,6 +21,7 @@ class MessageWriter : private WireEncoder {
   ~MessageWriter();
 
   using WireEncoder::set_proto_rev;
+  using WireEncoder::proto_rev;
   using WireEncoder::Reset;
   using WireEncoder::error;
   using WireEncoder::data;

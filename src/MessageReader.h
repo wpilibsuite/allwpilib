@@ -55,6 +55,7 @@ class MessageReader : private WireDecoder {
   bool Run();
 
   using WireDecoder::set_proto_rev;
+  using WireDecoder::proto_rev;
   using WireDecoder::Reset;
   using WireDecoder::error;
 
