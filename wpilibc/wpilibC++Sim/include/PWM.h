@@ -37,7 +37,7 @@ public:
 	};
 
 	explicit PWM(uint32_t channel);
-	virtual ~PWM();
+	virtual ~PWM() = default;
 	virtual void SetRaw(unsigned short value);
 	void SetPeriodMultiplier(PeriodMultiplier mult);
 	void EnableDeadbandElimination(bool eliminateDeadband);
@@ -93,10 +93,9 @@ protected:
 	void InitTable(ITable *subTable) override;
 	ITable * GetTable() const override;
 
-	ITable *m_table;
+	ITable *m_table = nullptr;
 
 private:
-	void InitPWM(uint32_t channel);
 	uint32_t m_channel;
 	SimContinuousOutput* impl;
 };

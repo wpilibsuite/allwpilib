@@ -10,26 +10,11 @@
 #include "simulation/simTime.h"
 
 /**
- * Common function to implement constructor behavior.
- */
-void Solenoid::InitSolenoid(int slot, int channel)
-{
-    char buffer[50];
-    int n = sprintf(buffer, "pneumatic/%d/%d", slot, channel);
-    m_impl = new SimContinuousOutput(buffer);
-  
-	LiveWindow::GetInstance()->AddActuator("Solenoid", slot, channel, this);
-}
-
-/**
  * Constructor.
  *
  * @param channel The channel on the solenoid module to control (1..8).
  */
-Solenoid::Solenoid(uint32_t channel)
-{
-    InitSolenoid(1, channel);
-}
+Solenoid::Solenoid(uint32_t channel) : Solenoid(1, channel) {}
 
 /**
  * Constructor.
@@ -39,14 +24,12 @@ Solenoid::Solenoid(uint32_t channel)
  */
 Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel)
 {
-    InitSolenoid(moduleNumber, channel);
-}
-
-/**
- * Destructor.
- */
-Solenoid::~Solenoid()
-{
+    char buffer[50];
+    int n = sprintf(buffer, "pneumatic/%d/%d", moduleNumber, channel);
+    m_impl = new SimContinuousOutput(buffer);
+  
+	LiveWindow::GetInstance()->AddActuator("Solenoid", moduleNumber, channel,
+                                           this);
 }
 
 /**
@@ -76,21 +59,21 @@ void Solenoid::ValueChanged(ITable* source, const std::string& key, EntryValue v
 }
 
 void Solenoid::UpdateTable() {
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
 		m_table->PutBoolean("Value", Get());
 	}
 }
 
 void Solenoid::StartLiveWindowMode() {
 	Set(false);
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
 		m_table->AddTableListener("Value", this, true);
 	}
 }
 
 void Solenoid::StopLiveWindowMode() {
 	Set(false);
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
 		m_table->RemoveTableListener(this);
 	}
 }

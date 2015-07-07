@@ -58,7 +58,7 @@ class TiltPanCameraTest : public testing::Test {
   }
 };
 
-Gyro *TiltPanCameraTest::m_gyro = 0;
+Gyro *TiltPanCameraTest::m_gyro = nullptr;
 
 /**
  * Test if the gyro angle defaults to 0 immediately after being reset.

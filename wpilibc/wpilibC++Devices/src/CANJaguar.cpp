@@ -8,7 +8,6 @@
 #include "Timer.h"
 #define tNIRIO_i32 int
 #include "NetworkCommunication/CANSessionMux.h"
-#include "CAN/can_proto.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "WPIErrors.h"
 #include <cstdio>
@@ -32,7 +31,7 @@ static const uint32_t kFullMessageIDMask =
 
 static const int32_t kReceiveStatusAttempts = 50;
 
-static Resource *allocated = NULL;
+static Resource *allocated = nullptr;
 
 static int32_t sendMessageHelper(uint32_t messageID, const uint8_t *data,
                                  uint8_t dataSize, int32_t period) {
@@ -43,9 +42,8 @@ static int32_t sendMessageHelper(uint32_t messageID, const uint8_t *data,
 
   int32_t status = 0;
 
-  for (uint8_t i = 0;
-       i < (sizeof(kTrustedMessages) / sizeof(kTrustedMessages[0])); i++) {
-    if ((kFullMessageIDMask & messageID) == kTrustedMessages[i]) {
+  for (auto& kTrustedMessage : kTrustedMessages) {
+    if ((kFullMessageIDMask & messageID) == kTrustedMessage) {
       uint8_t dataBuffer[8];
       dataBuffer[0] = 0;
       dataBuffer[1] = 0;
@@ -74,56 +72,7 @@ static int32_t sendMessageHelper(uint32_t messageID, const uint8_t *data,
  * Common initialization code called by all constructors.
  */
 void CANJaguar::InitCANJaguar() {
-  m_table = NULL;
   m_safetyHelper = new MotorSafetyHelper(this);
-
-  m_value = 0.0f;
-  m_speedReference = LM_REF_NONE;
-  m_positionReference = LM_REF_NONE;
-  m_p = 0.0;
-  m_i = 0.0;
-  m_d = 0.0;
-  m_busVoltage = 0.0f;
-  m_outputVoltage = 0.0f;
-  m_outputCurrent = 0.0f;
-  m_temperature = 0.0f;
-  m_position = 0.0;
-  m_speed = 0.0;
-  m_limits = 0x00;
-  m_faults = 0x0000;
-  m_firmwareVersion = 0;
-  m_hardwareVersion = 0;
-  m_neutralMode = kNeutralMode_Jumper;
-  m_encoderCodesPerRev = 0;
-  m_potentiometerTurns = 0;
-  m_limitMode = kLimitMode_SwitchInputsOnly;
-  m_forwardLimit = 0.0;
-  m_reverseLimit = 0.0;
-  m_maxOutputVoltage = 30.0;
-  m_voltageRampRate = 0.0;
-  m_faultTime = 0.0f;
-
-  // Parameters only need to be verified if they are set
-  m_controlModeVerified =
-      false;  // Needs to be verified because it's set in the constructor
-  m_speedRefVerified = true;
-  m_posRefVerified = true;
-  m_pVerified = true;
-  m_iVerified = true;
-  m_dVerified = true;
-  m_neutralModeVerified = true;
-  m_encoderCodesPerRevVerified = true;
-  m_potentiometerTurnsVerified = true;
-  m_limitModeVerified = true;
-  m_forwardLimitVerified = true;
-  m_reverseLimitVerified = true;
-  m_maxOutputVoltageVerified = true;
-  m_voltageRampRateVerified = true;
-  m_faultTimeVerified = true;
-
-  m_receivedStatusMessage0 = false;
-  m_receivedStatusMessage1 = false;
-  m_receivedStatusMessage2 = false;
 
   bool receivedFirmwareVersion = false;
   uint8_t dataBuffer[8];
@@ -198,7 +147,6 @@ void CANJaguar::InitCANJaguar() {
     default:
       break;
   }
-  m_isInverted = false;
   HALReport(HALUsageReporting::kResourceType_CANJaguar, m_deviceNumber,
             m_controlMode);
   LiveWindow::GetInstance()->AddActuator("CANJaguar", m_deviceNumber, this);
@@ -229,9 +177,7 @@ void CANJaguar::InitCANJaguar() {
  * @see CANJaguar#SetVoltageMode(QuadEncoderTag, int)
  */
 CANJaguar::CANJaguar(uint8_t deviceNumber)
-    : m_deviceNumber(deviceNumber),
-      m_maxOutputVoltage(kApproxBusVoltage),
-      m_safetyHelper(NULL) {
+    : m_deviceNumber(deviceNumber) {
   char buf[64];
   snprintf(buf, 64, "CANJaguar device number %d", m_deviceNumber);
   Resource::CreateResourceObject(&allocated, 63);
@@ -254,27 +200,27 @@ CANJaguar::~CANJaguar() {
   // Disable periodic setpoints
   if (m_controlMode == kPercentVbus)
     FRC_NetworkCommunication_CANSessionMux_sendMessage(
-        m_deviceNumber | LM_API_VOLT_T_SET, NULL, 0,
+        m_deviceNumber | LM_API_VOLT_T_SET, nullptr, 0,
         CAN_SEND_PERIOD_STOP_REPEATING, &status);
   else if (m_controlMode == kSpeed)
     FRC_NetworkCommunication_CANSessionMux_sendMessage(
-        m_deviceNumber | LM_API_SPD_T_SET, NULL, 0,
+        m_deviceNumber | LM_API_SPD_T_SET, nullptr, 0,
         CAN_SEND_PERIOD_STOP_REPEATING, &status);
   else if (m_controlMode == kPosition)
     FRC_NetworkCommunication_CANSessionMux_sendMessage(
-        m_deviceNumber | LM_API_POS_T_SET, NULL, 0,
+        m_deviceNumber | LM_API_POS_T_SET, nullptr, 0,
         CAN_SEND_PERIOD_STOP_REPEATING, &status);
   else if (m_controlMode == kCurrent)
     FRC_NetworkCommunication_CANSessionMux_sendMessage(
-        m_deviceNumber | LM_API_ICTRL_T_SET, NULL, 0,
+        m_deviceNumber | LM_API_ICTRL_T_SET, nullptr, 0,
         CAN_SEND_PERIOD_STOP_REPEATING, &status);
   else if (m_controlMode == kVoltage)
     FRC_NetworkCommunication_CANSessionMux_sendMessage(
-        m_deviceNumber | LM_API_VCOMP_T_SET, NULL, 0,
+        m_deviceNumber | LM_API_VCOMP_T_SET, nullptr, 0,
         CAN_SEND_PERIOD_STOP_REPEATING, &status);
 
   delete m_safetyHelper;
-  m_safetyHelper = NULL;
+  m_safetyHelper = nullptr;
 }
 
 /**
@@ -478,7 +424,7 @@ void CANJaguar::sendMessage(uint32_t messageID, const uint8_t *data,
  * 	every "period" milliseconds.
  */
 void CANJaguar::requestMessage(uint32_t messageID, int32_t period) {
-  sendMessageHelper(messageID | m_deviceNumber, NULL, 0, period);
+  sendMessageHelper(messageID | m_deviceNumber, nullptr, 0, period);
 }
 
 /**
@@ -2000,19 +1946,19 @@ void CANJaguar::ValueChanged(ITable *source, const std::string &key,
 }
 
 void CANJaguar::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("Value", Get());
   }
 }
 
 void CANJaguar::StartLiveWindowMode() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->AddTableListener("Value", this, true);
   }
 }
 
 void CANJaguar::StopLiveWindowMode() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->RemoveTableListener(this);
   }
 }

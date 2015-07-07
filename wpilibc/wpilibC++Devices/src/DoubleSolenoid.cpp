@@ -10,10 +10,26 @@
 #include "LiveWindow/LiveWindow.h"
 
 /**
- * Common function to implement constructor behaviour.
+ * Constructor.
+ * Uses the default PCM ID of 0
+ * @param forwardChannel The forward channel number on the PCM (0..7).
+ * @param reverseChannel The reverse channel number on the PCM (0..7).
  */
-void DoubleSolenoid::InitSolenoid() {
-  m_table = NULL;
+DoubleSolenoid::DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel)
+    : DoubleSolenoid(GetDefaultSolenoidModule(), forwardChannel, reverseChannel) {}
+
+/**
+ * Constructor.
+ *
+ * @param moduleNumber The CAN ID of the PCM.
+ * @param forwardChannel The forward channel on the PCM to control (0..7).
+ * @param reverseChannel The reverse channel on the PCM to control (0..7).
+ */
+DoubleSolenoid::DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel,
+                               uint32_t reverseChannel)
+    : SolenoidBase(moduleNumber),
+      m_forwardChannel(forwardChannel),
+      m_reverseChannel(reverseChannel) {
   char buf[64];
   if (!CheckSolenoidModule(m_moduleNumber)) {
     snprintf(buf, 64, "Solenoid Module %d", m_moduleNumber);
@@ -57,34 +73,6 @@ void DoubleSolenoid::InitSolenoid() {
             m_moduleNumber);
   LiveWindow::GetInstance()->AddActuator("DoubleSolenoid", m_moduleNumber,
                                          m_forwardChannel, this);
-}
-
-/**
- * Constructor.
- * Uses the default PCM ID of 0
- * @param forwardChannel The forward channel number on the PCM (0..7).
- * @param reverseChannel The reverse channel number on the PCM (0..7).
- */
-DoubleSolenoid::DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel)
-    : SolenoidBase(GetDefaultSolenoidModule()),
-      m_forwardChannel(forwardChannel),
-      m_reverseChannel(reverseChannel) {
-  InitSolenoid();
-}
-
-/**
- * Constructor.
- *
- * @param moduleNumber The CAN ID of the PCM.
- * @param forwardChannel The forward channel on the PCM to control (0..7).
- * @param reverseChannel The reverse channel on the PCM to control (0..7).
- */
-DoubleSolenoid::DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel,
-                               uint32_t reverseChannel)
-    : SolenoidBase(moduleNumber),
-      m_forwardChannel(forwardChannel),
-      m_reverseChannel(reverseChannel) {
-  InitSolenoid();
 }
 
 /**
@@ -171,7 +159,7 @@ void DoubleSolenoid::ValueChanged(ITable *source, const std::string &key,
 }
 
 void DoubleSolenoid::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutString(
         "Value", (Get() == kForward ? "Forward"
                                     : (Get() == kReverse ? "Reverse" : "Off")));
@@ -180,14 +168,14 @@ void DoubleSolenoid::UpdateTable() {
 
 void DoubleSolenoid::StartLiveWindowMode() {
   Set(kOff);
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->AddTableListener("Value", this, true);
   }
 }
 
 void DoubleSolenoid::StopLiveWindowMode() {
   Set(kOff);
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->RemoveTableListener(this);
   }
 }

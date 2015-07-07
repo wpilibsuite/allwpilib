@@ -10,9 +10,8 @@
  * how many times GetInstance is called.
  */
 LiveWindow *LiveWindow::GetInstance() {
-  static LiveWindow *instance = new LiveWindow();
-
-  return instance;
+  static LiveWindow instance;
+  return &instance;
 }
 
 /**
@@ -20,7 +19,6 @@ LiveWindow *LiveWindow::GetInstance() {
  * Allocate the necessary tables.
  */
 LiveWindow::LiveWindow() {
-  m_enabled = false;
   m_liveWindowTable = NetworkTable::GetTable("LiveWindow");
   m_statusTable = m_liveWindowTable->GetSubTable("~STATUS~");
   m_scheduler = Scheduler::GetInstance();
@@ -39,24 +37,18 @@ void LiveWindow::SetEnabled(bool enabled) {
     }
     m_scheduler->SetEnabled(false);
     m_scheduler->RemoveAll();
-    for (std::map<LiveWindowSendable *, LiveWindowComponent>::iterator it =
-             m_components.begin();
-         it != m_components.end(); ++it) {
-      it->first->StartLiveWindowMode();
+    for (auto& elem : m_components) {
+      elem.first->StartLiveWindowMode();
     }
   } else {
-    for (std::map<LiveWindowSendable *, LiveWindowComponent>::iterator it =
-             m_components.begin();
-         it != m_components.end(); ++it) {
-      it->first->StopLiveWindowMode();
+    for (auto& elem : m_components) {
+      elem.first->StopLiveWindowMode();
     }
     m_scheduler->SetEnabled(true);
   }
   m_enabled = enabled;
   m_statusTable->PutBoolean("LW Enabled", m_enabled);
 }
-
-LiveWindow::~LiveWindow() {}
 
 /**
  * Add a Sensor associated with the subsystem and with call it by the given
@@ -94,7 +86,7 @@ void LiveWindow::AddSensor(std::string type, int channel,
   std::ostringstream oss;
   oss << type << "[" << channel << "]";
   std::string types(oss.str());
-  char *cc = new char[types.size() + 1];
+  auto cc = new char[types.size() + 1];
   types.copy(cc, types.size());
   cc[types.size()] = '\0';
   AddSensor("Ungrouped", cc, component);
@@ -111,7 +103,7 @@ void LiveWindow::AddActuator(std::string type, int channel,
   std::ostringstream oss;
   oss << type << "[" << channel << "]";
   std::string types(oss.str());
-  char *cc = new char[types.size() + 1];
+  auto cc = new char[types.size() + 1];
   types.copy(cc, types.size());
   cc[types.size()] = '\0';
   AddActuator("Ungrouped", cc, component);
@@ -125,7 +117,7 @@ void LiveWindow::AddActuator(std::string type, int module, int channel,
   std::ostringstream oss;
   oss << type << "[" << module << "," << channel << "]";
   std::string types(oss.str());
-  char *cc = new char[types.size() + 1];
+  auto cc = new char[types.size() + 1];
   types.copy(cc, types.size());
   cc[types.size()] = '\0';
   AddActuator("Ungrouped", cc, component);
@@ -137,8 +129,8 @@ void LiveWindow::AddActuator(std::string type, int module, int channel,
  * SmartDashboard widgets.
  */
 void LiveWindow::UpdateValues() {
-  for (unsigned int i = 0; i < m_sensors.size(); i++) {
-    m_sensors[i]->UpdateTable();
+  for (auto& elem : m_sensors) {
+    elem->UpdateTable();
   }
 }
 
@@ -164,11 +156,9 @@ void LiveWindow::Run() {
  * addActuator and addSensor.
  */
 void LiveWindow::InitializeLiveWindowComponents() {
-  for (std::map<LiveWindowSendable *, LiveWindowComponent>::iterator it =
-           m_components.begin();
-       it != m_components.end(); ++it) {
-    LiveWindowSendable *component = it->first;
-    LiveWindowComponent c = it->second;
+  for (auto& elem : m_components) {
+    LiveWindowSendable *component = elem.first;
+    LiveWindowComponent c = elem.second;
     std::string subsystem = c.subsystem;
     std::string name = c.name;
     m_liveWindowTable->GetSubTable(subsystem)

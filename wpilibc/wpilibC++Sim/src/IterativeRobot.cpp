@@ -15,28 +15,6 @@
 constexpr double IterativeRobot::kDefaultPeriod;
 
 /**
- * Constructor for RobotIterativeBase
- * 
- * The constructor initializes the instance variables for the robot to indicate
- * the status of initialization for disabled, autonomous, teleop, and test code.
- */
-IterativeRobot::IterativeRobot()
-	: m_disabledInitialized (false)
-	, m_autonomousInitialized (false)
-	, m_teleopInitialized (false)
-	, m_testInitialized (false)
-	, m_period (kDefaultPeriod)
-{
-}
-
-/**
- * Free the resources for a RobotIterativeBase class.
- */
-IterativeRobot::~IterativeRobot()
-{
-}
-
-/**
  * Set the period for the periodic functions.
  * 
  * @param period The period of the periodic function calls.  0.0 means sync to driver station control data.

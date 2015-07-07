@@ -28,7 +28,7 @@ public:
 	static const uint32_t kAccumulatorChannels[kAccumulatorNumChannels];
 
 	explicit AnalogInput(uint32_t channel);
-	virtual ~AnalogInput();
+	virtual ~AnalogInput() = default;
 
 	float GetVoltage() const;
 	float GetAverageVoltage() const;
@@ -45,10 +45,9 @@ public:
 	ITable * GetTable() const override;
 
 private:
-	void InitAnalogInput(uint32_t channel);
 	uint32_t m_channel;
 	SimFloatInput* m_impl;
 	int64_t m_accumulatorOffset;
 
-	ITable *m_table;
+	ITable *m_table = nullptr;
 };

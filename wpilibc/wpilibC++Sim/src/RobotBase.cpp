@@ -10,11 +10,11 @@
 
 #include <cstring>
 
-RobotBase* RobotBase::m_instance = NULL;
+RobotBase* RobotBase::m_instance = nullptr;
 
 void RobotBase::setInstance(RobotBase* robot)
 {
-	wpi_assert(m_instance == NULL);
+	wpi_assert(m_instance == nullptr);
 	m_instance = robot;
 }
 
@@ -35,15 +35,6 @@ RobotBase::RobotBase()
 {
 	m_ds = DriverStation::GetInstance();
     RobotState::SetImplementation(DriverStation::GetInstance());
-}
-
-/**
- * Free the resources for a RobotBase class.
- * This includes deleting all classes that might have been allocated as Singletons to they
- * would never be deleted except here.
- */
-RobotBase::~RobotBase()
-{
 }
 
 /**
@@ -109,7 +100,6 @@ bool RobotBase::IsTest() const
 class RobotDeleter
 {
 public:
-	RobotDeleter() {}
 	~RobotDeleter()
 	{
 		delete &RobotBase::getInstance();

@@ -9,19 +9,10 @@
 #include "WPIErrors.h"
 
 /**
- * Creates a new {@link CommandGroup CommandGroup}.
- */
-CommandGroup::CommandGroup() { m_currentCommandIndex = -1; }
-
-/**
  * Creates a new {@link CommandGroup CommandGroup} with the given name.
  * @param name the name for this command group
  */
-CommandGroup::CommandGroup(const char *name) : Command(name) {
-  m_currentCommandIndex = -1;
-}
-
-CommandGroup::~CommandGroup() {}
+CommandGroup::CommandGroup(const char *name) : Command(name) {}
 
 /**
  * Adds a new {@link Command Command} to the group.  The {@link Command Command}
@@ -39,7 +30,7 @@ CommandGroup::~CommandGroup() {}
  * @param command The {@link Command Command} to be added
  */
 void CommandGroup::AddSequential(Command *command) {
-  if (command == NULL) {
+  if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
     return;
   }
@@ -52,7 +43,7 @@ void CommandGroup::AddSequential(Command *command) {
   // Iterate through command->GetRequirements() and call Requires() on each
   // required subsystem
   Command::SubsystemSet requirements = command->GetRequirements();
-  Command::SubsystemSet::iterator iter = requirements.begin();
+  auto iter = requirements.begin();
   for (; iter != requirements.end(); iter++) Requires(*iter);
 }
 
@@ -79,7 +70,7 @@ void CommandGroup::AddSequential(Command *command) {
  * @param timeout The timeout (in seconds)
  */
 void CommandGroup::AddSequential(Command *command, double timeout) {
-  if (command == NULL) {
+  if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
     return;
   }
@@ -96,7 +87,7 @@ void CommandGroup::AddSequential(Command *command, double timeout) {
   // Iterate through command->GetRequirements() and call Requires() on each
   // required subsystem
   Command::SubsystemSet requirements = command->GetRequirements();
-  Command::SubsystemSet::iterator iter = requirements.begin();
+  auto iter = requirements.begin();
   for (; iter != requirements.end(); iter++) Requires(*iter);
 }
 
@@ -126,7 +117,7 @@ void CommandGroup::AddSequential(Command *command, double timeout) {
  * @param command The command to be added
  */
 void CommandGroup::AddParallel(Command *command) {
-  if (command == NULL) {
+  if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
     return;
   }
@@ -139,7 +130,7 @@ void CommandGroup::AddParallel(Command *command) {
   // Iterate through command->GetRequirements() and call Requires() on each
   // required subsystem
   Command::SubsystemSet requirements = command->GetRequirements();
-  Command::SubsystemSet::iterator iter = requirements.begin();
+  auto iter = requirements.begin();
   for (; iter != requirements.end(); iter++) Requires(*iter);
 }
 
@@ -177,7 +168,7 @@ void CommandGroup::AddParallel(Command *command) {
  * @param timeout The timeout (in seconds)
  */
 void CommandGroup::AddParallel(Command *command, double timeout) {
-  if (command == NULL) {
+  if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
     return;
   }
@@ -194,7 +185,7 @@ void CommandGroup::AddParallel(Command *command, double timeout) {
   // Iterate through command->GetRequirements() and call Requires() on each
   // required subsystem
   Command::SubsystemSet requirements = command->GetRequirements();
-  Command::SubsystemSet::iterator iter = requirements.begin();
+  auto iter = requirements.begin();
   for (; iter != requirements.end(); iter++) Requires(*iter);
 }
 
@@ -202,7 +193,7 @@ void CommandGroup::_Initialize() { m_currentCommandIndex = -1; }
 
 void CommandGroup::_Execute() {
   CommandGroupEntry entry;
-  Command *cmd = NULL;
+  Command *cmd = nullptr;
   bool firstRun = false;
 
   if (m_currentCommandIndex == -1) {
@@ -211,7 +202,7 @@ void CommandGroup::_Execute() {
   }
 
   while ((unsigned)m_currentCommandIndex < m_commands.size()) {
-    if (cmd != NULL) {
+    if (cmd != nullptr) {
       if (entry.IsTimedOut()) cmd->_Cancel();
 
       if (cmd->Run()) {
@@ -220,13 +211,13 @@ void CommandGroup::_Execute() {
         cmd->Removed();
         m_currentCommandIndex++;
         firstRun = true;
-        cmd = NULL;
+        cmd = nullptr;
         continue;
       }
     }
 
     entry = m_commands[m_currentCommandIndex];
-    cmd = NULL;
+    cmd = nullptr;
 
     switch (entry.m_state) {
       case CommandGroupEntry::kSequence_InSequence:
@@ -253,7 +244,7 @@ void CommandGroup::_Execute() {
   }
 
   // Run Children
-  CommandList::iterator iter = m_children.begin();
+  auto iter = m_children.begin();
   for (; iter != m_children.end();) {
     entry = *iter;
     Command *child = entry.m_command;
@@ -278,7 +269,7 @@ void CommandGroup::_End() {
     cmd->Removed();
   }
 
-  CommandList::iterator iter = m_children.begin();
+  auto iter = m_children.begin();
   for (; iter != m_children.end(); iter++) {
     Command *cmd = iter->m_command;
     cmd->_Cancel();
@@ -315,7 +306,7 @@ bool CommandGroup::IsInterruptible() const {
     if (!cmd->IsInterruptible()) return false;
   }
 
-  CommandList::const_iterator iter = m_children.cbegin();
+  auto iter = m_children.cbegin();
   for (; iter != m_children.cend(); iter++) {
     if (!iter->m_command->IsInterruptible()) return false;
   }
@@ -324,13 +315,13 @@ bool CommandGroup::IsInterruptible() const {
 }
 
 void CommandGroup::CancelConflicts(Command *command) {
-  CommandList::iterator childIter = m_children.begin();
+  auto childIter = m_children.begin();
   for (; childIter != m_children.end();) {
     Command *child = childIter->m_command;
     bool erased = false;
 
     Command::SubsystemSet requirements = command->GetRequirements();
-    Command::SubsystemSet::iterator requirementIter = requirements.begin();
+    auto requirementIter = requirements.begin();
     for (; requirementIter != requirements.end(); requirementIter++) {
       if (child->DoesRequire(*requirementIter)) {
         child->_Cancel();

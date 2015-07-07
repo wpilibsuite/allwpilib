@@ -21,9 +21,9 @@ namespace msgs {
 
 namespace {
 
-const ::google::protobuf::Descriptor* Float64_descriptor_ = NULL;
+const ::google::protobuf::Descriptor* Float64_descriptor_ = nullptr;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  Float64_reflection_ = NULL;
+  Float64_reflection_ = nullptr;
 
 }  // namespace
 
@@ -33,7 +33,7 @@ void protobuf_AssignDesc_msgs_2ffloat64_2eproto() {
   const ::google::protobuf::FileDescriptor* file =
     ::google::protobuf::DescriptorPool::generated_pool()->FindFileByName(
       "msgs/float64.proto");
-  GOOGLE_CHECK(file != NULL);
+  GOOGLE_CHECK(file != nullptr);
   Float64_descriptor_ = file->message_type(0);
   static const int Float64_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Float64, data_),
@@ -141,11 +141,11 @@ const ::google::protobuf::Descriptor* Float64::descriptor() {
 }
 
 const Float64& Float64::default_instance() {
-  if (default_instance_ == NULL) protobuf_AddDesc_msgs_2ffloat64_2eproto();
+  if (default_instance_ == nullptr) protobuf_AddDesc_msgs_2ffloat64_2eproto();
   return *default_instance_;
 }
 
-Float64* Float64::default_instance_ = NULL;
+Float64* Float64::default_instance_ = nullptr;
 
 Float64* Float64::New() const {
   return new Float64;
@@ -249,7 +249,7 @@ void Float64::MergeFrom(const ::google::protobuf::Message& from) {
   const Float64* source =
     ::google::protobuf::internal::dynamic_cast_if_available<const Float64*>(
       &from);
-  if (source == NULL) {
+  if (source == nullptr) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
     MergeFrom(*source);

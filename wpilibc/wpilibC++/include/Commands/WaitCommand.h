@@ -14,7 +14,7 @@ class WaitCommand : public Command {
  public:
   WaitCommand(double timeout);
   WaitCommand(const char *name, double timeout);
-  virtual ~WaitCommand() {}
+  virtual ~WaitCommand() = default;
 
  protected:
   virtual void Initialize();

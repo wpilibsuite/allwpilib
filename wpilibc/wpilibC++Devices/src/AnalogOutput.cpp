@@ -10,11 +10,14 @@
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 
-static Resource *outputs = NULL;
+static Resource *outputs = nullptr;
 
-void AnalogOutput::InitAnalogOutput(uint32_t channel) {
-  m_table = NULL;
-
+/**
+ * Construct an analog output on the given channel.
+ * All analog outputs are located on the MXP port.
+ * @param The channel number on the roboRIO to represent.
+ */
+AnalogOutput::AnalogOutput(uint32_t channel) {
   Resource::CreateResourceObject(&outputs, kAnalogOutputs);
 
   char buf[64];
@@ -40,13 +43,6 @@ void AnalogOutput::InitAnalogOutput(uint32_t channel) {
   LiveWindow::GetInstance()->AddActuator("AnalogOutput", m_channel, this);
   HALReport(HALUsageReporting::kResourceType_AnalogOutput, m_channel);
 }
-
-/**
- * Construct an analog output on the given channel.
- * All analog outputs are located on the MXP port.
- * @param The channel number on the roboRIO to represent.
- */
-AnalogOutput::AnalogOutput(uint32_t channel) { InitAnalogOutput(channel); }
 
 /**
  * Destructor. Frees analog output resource
@@ -80,7 +76,7 @@ float AnalogOutput::GetVoltage() const {
 }
 
 void AnalogOutput::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("Value", GetVoltage());
   }
 }

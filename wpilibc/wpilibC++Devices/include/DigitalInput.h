@@ -39,9 +39,8 @@ class DigitalInput : public DigitalSource, public LiveWindowSendable {
   ITable *GetTable() const;
 
  private:
-  void InitDigitalInput(uint32_t channel);
   uint32_t m_channel;
   bool m_lastValue;
 
-  ITable *m_table;
+  ITable *m_table = nullptr;
 };

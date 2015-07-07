@@ -18,7 +18,7 @@
  */
 class SolenoidBase : public SensorBase {
  public:
-  virtual ~SolenoidBase();
+  virtual ~SolenoidBase() = default;
   uint8_t GetAll(int module = 0) const;
 
   uint8_t GetPCMSolenoidBlackList(int module) const;
@@ -29,7 +29,6 @@ class SolenoidBase : public SensorBase {
  protected:
   explicit SolenoidBase(uint8_t pcmID);
   void Set(uint8_t value, uint8_t mask, int module);
-  virtual void InitSolenoid() = 0;
   const static int m_maxModules = 63;
   const static int m_maxPorts = 8;
   static void* m_ports[m_maxModules][m_maxPorts];

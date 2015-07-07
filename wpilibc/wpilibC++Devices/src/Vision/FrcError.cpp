@@ -319,7 +319,7 @@ const char* GetVisionErrorText(int errorCode) {
       break;
     }
     case -1074395269: {
-      errorText = "ERR_NULL_POINTER";
+      errorText = "ERR_nullptr_POINTER";
       break;
     }
     case -1074395270: {
@@ -563,7 +563,7 @@ const char* GetVisionErrorText(int errorCode) {
       break;
     }
     case -1074395343: {
-      errorText = "ERR_FILE_FILENAME_NULL";
+      errorText = "ERR_FILE_FILENAME_nullptr";
       break;
     }
     case -1074395345: {
@@ -2083,7 +2083,7 @@ const char* GetVisionErrorText(int errorCode) {
       break;
     }
     case -1074396098: {
-      errorText = "ERR_RESERVED_MUST_BE_NULL";
+      errorText = "ERR_RESERVED_MUST_BE_nullptr";
       break;
     }
     case -1074396099: {

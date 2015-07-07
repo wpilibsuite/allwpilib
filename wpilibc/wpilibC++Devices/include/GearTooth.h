@@ -23,7 +23,7 @@ class GearTooth : public Counter {
   GearTooth(uint32_t channel, bool directionSensitive = false);
   GearTooth(DigitalSource *source, bool directionSensitive = false);
   GearTooth(DigitalSource &source, bool directionSensitive = false);
-  virtual ~GearTooth();
+  virtual ~GearTooth() = default;
   void EnableDirectionSensing(bool directionSensitive);
 
   virtual std::string GetSmartDashboardType() const override;

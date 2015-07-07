@@ -61,9 +61,4 @@ GearTooth::GearTooth(DigitalSource &source, bool directionSensitive)
   EnableDirectionSensing(directionSensitive);
 }
 
-/**
- * Free the resources associated with a gear tooth sensor.
- */
-GearTooth::~GearTooth() {}
-
 std::string GearTooth::GetSmartDashboardType() const { return "GearTooth"; }

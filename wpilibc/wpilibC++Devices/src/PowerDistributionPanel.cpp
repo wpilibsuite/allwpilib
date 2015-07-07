@@ -16,7 +16,7 @@ PowerDistributionPanel::PowerDistributionPanel() : PowerDistributionPanel(0) {}
  * Initialize the PDP.
  */
 PowerDistributionPanel::PowerDistributionPanel(uint8_t module)
-    : m_table(nullptr), m_module(module) {
+    : m_module(module) {
   initializePDP(m_module);
 }
 
@@ -150,7 +150,7 @@ void PowerDistributionPanel::ClearStickyFaults() {
 }
 
 void PowerDistributionPanel::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("Chan0", GetCurrent(0));
     m_table->PutNumber("Chan1", GetCurrent(1));
     m_table->PutNumber("Chan2", GetCurrent(2));

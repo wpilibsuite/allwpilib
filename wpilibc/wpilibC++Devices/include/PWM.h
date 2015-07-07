@@ -106,10 +106,9 @@ class PWM : public SensorBase,
   void InitTable(ITable* subTable) override;
   ITable* GetTable() const override;
 
-  ITable* m_table;
+  ITable* m_table = nullptr;
 
  private:
-  void InitPWM(uint32_t channel);
   uint32_t m_channel;
   int32_t GetMaxPositivePwm() const { return m_maxPwm; }
   int32_t GetMinPositivePwm() const {

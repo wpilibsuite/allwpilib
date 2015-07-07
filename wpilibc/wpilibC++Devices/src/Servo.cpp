@@ -17,27 +17,16 @@ constexpr float Servo::kDefaultMaxServoPWM;
 constexpr float Servo::kDefaultMinServoPWM;
 
 /**
- * Common initialization code called by all constructors.
- *
- * InitServo() assigns defaults for the period multiplier for the servo PWM
- * control signal, as
- * well as the minimum and maximum PWM values supported by the servo.
- */
-void Servo::InitServo() {
-  m_table = NULL;
-  SetBounds(kDefaultMaxServoPWM, 0.0, 0.0, 0.0, kDefaultMinServoPWM);
-  SetPeriodMultiplier(kPeriodMultiplier_4X);
-
-  LiveWindow::GetInstance()->AddActuator("Servo", GetChannel(), this);
-  HALReport(HALUsageReporting::kResourceType_Servo, GetChannel());
-}
-
-/**
  * @param channel The PWM channel to which the servo is attached. 0-9 are
  * on-board, 10-19 are on the MXP port
  */
 Servo::Servo(uint32_t channel) : SafePWM(channel) {
-  InitServo();
+  // Set minimum and maximum PWM values supported by the servo
+  SetBounds(kDefaultMaxServoPWM, 0.0, 0.0, 0.0, kDefaultMinServoPWM);
+
+  // Assign defaults for period multiplier for the servo PWM control signal
+  SetPeriodMultiplier(kPeriodMultiplier_4X);
+
   //	printf("Done initializing servo %d\n", channel);
 }
 
@@ -112,19 +101,19 @@ void Servo::ValueChanged(ITable* source, const std::string& key,
 }
 
 void Servo::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("Value", Get());
   }
 }
 
 void Servo::StartLiveWindowMode() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->AddTableListener("Value", this, true);
   }
 }
 
 void Servo::StopLiveWindowMode() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->RemoveTableListener(this);
   }
 }

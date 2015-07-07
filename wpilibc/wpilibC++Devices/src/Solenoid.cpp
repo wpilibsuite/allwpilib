@@ -11,10 +11,21 @@
 #include "LiveWindow/LiveWindow.h"
 
 /**
- * Common function to implement constructor behavior.
+ * Constructor using the default PCM ID (0).
+ *
+ * @param channel The channel on the PCM to control (0..7).
  */
-void Solenoid::InitSolenoid() {
-  m_table = NULL;
+Solenoid::Solenoid(uint32_t channel)
+    : Solenoid(GetDefaultSolenoidModule(), channel) {}
+
+/**
+ * Constructor.
+ *
+ * @param moduleNumber The CAN ID of the PCM the solenoid is attached to
+ * @param channel The channel on the PCM to control (0..7).
+ */
+Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel)
+    : SolenoidBase(moduleNumber), m_channel(channel) {
   char buf[64];
   if (!CheckSolenoidModule(m_moduleNumber)) {
     snprintf(buf, 64, "Solenoid Module %d", m_moduleNumber);
@@ -39,27 +50,6 @@ void Solenoid::InitSolenoid() {
                                          this);
   HALReport(HALUsageReporting::kResourceType_Solenoid, m_channel,
             m_moduleNumber);
-}
-
-/**
- * Constructor using the default PCM ID (0).
- *
- * @param channel The channel on the PCM to control (0..7).
- */
-Solenoid::Solenoid(uint32_t channel)
-    : SolenoidBase(GetDefaultSolenoidModule()), m_channel(channel) {
-  InitSolenoid();
-}
-
-/**
- * Constructor.
- *
- * @param moduleNumber The CAN ID of the PCM the solenoid is attached to
- * @param channel The channel on the PCM to control (0..7).
- */
-Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel)
-    : SolenoidBase(moduleNumber), m_channel(channel) {
-  InitSolenoid();
 }
 
 /**
@@ -113,21 +103,21 @@ void Solenoid::ValueChanged(ITable* source, const std::string& key,
 }
 
 void Solenoid::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutBoolean("Value", Get());
   }
 }
 
 void Solenoid::StartLiveWindowMode() {
   Set(false);
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->AddTableListener("Value", this, true);
   }
 }
 
 void Solenoid::StopLiveWindowMode() {
   Set(false);
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->RemoveTableListener(this);
   }
 }

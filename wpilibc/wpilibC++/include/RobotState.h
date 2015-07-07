@@ -7,7 +7,7 @@
 
 class RobotStateInterface {
  public:
-  virtual ~RobotStateInterface(){};
+  virtual ~RobotStateInterface() = default;
   virtual bool IsDisabled() const = 0;
   virtual bool IsEnabled() const = 0;
   virtual bool IsOperatorControl() const = 0;

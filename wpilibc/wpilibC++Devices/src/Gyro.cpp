@@ -31,13 +31,12 @@ constexpr float Gyro::kDefaultVoltsPerDegreePerSecond;
  * rest before the competition starts.
  */
 void Gyro::InitGyro() {
-  m_table = NULL;
   if (!m_analog->IsAccumulatorChannel()) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange,
                                " channel (must be accumulator channel)");
     if (m_channelAllocated) {
       delete m_analog;
-      m_analog = NULL;
+      m_analog = nullptr;
     }
     return;
   }
@@ -96,7 +95,7 @@ Gyro::Gyro(int32_t channel) {
 Gyro::Gyro(AnalogInput *channel) {
   m_analog = channel;
   m_channelAllocated = false;
-  if (channel == NULL) {
+  if (channel == nullptr) {
     wpi_setWPIError(NullParameter);
   } else {
     InitGyro();
@@ -230,7 +229,7 @@ double Gyro::PIDGet() const {
 }
 
 void Gyro::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("Value", GetAngle());
   }
 }

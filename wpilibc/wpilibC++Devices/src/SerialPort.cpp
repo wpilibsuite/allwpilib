@@ -27,7 +27,7 @@
  */
 SerialPort::SerialPort(uint32_t baudRate, Port port, uint8_t dataBits,
                        SerialPort::Parity parity, SerialPort::StopBits stopBits)
-    : m_resourceManagerHandle(0), m_portHandle(0), m_consoleModeEnabled(false) {
+{
   int32_t status = 0;
 
   m_port = port;
@@ -53,7 +53,7 @@ SerialPort::SerialPort(uint32_t baudRate, Port port, uint8_t dataBits,
 
   // viInstallHandler(m_portHandle, VI_EVENT_IO_COMPLETION, ioCompleteHandler,
   // this);
-  // viEnableEvent(m_portHandle, VI_EVENT_IO_COMPLETION, VI_HNDLR, VI_NULL);
+  // viEnableEvent(m_portHandle, VI_EVENT_IO_COMPLETION, VI_HNDLR, VI_nullptr);
 
   HALReport(HALUsageReporting::kResourceType_SerialPort, 0);
 }

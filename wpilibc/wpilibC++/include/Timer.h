@@ -43,9 +43,9 @@ class Timer {
   static constexpr double kRolloverTime = (1ll << 32) / 1e6;
 
  private:
-  double m_startTime;
-  double m_accumulatedTime;
-  bool m_running;
-  MUTEX_ID m_semaphore;
+  double m_startTime = 0.0;
+  double m_accumulatedTime = 0.0;
+  bool m_running = false;
+  MUTEX_ID m_semaphore = nullptr;
   DISALLOW_COPY_AND_ASSIGN(Timer);
 };

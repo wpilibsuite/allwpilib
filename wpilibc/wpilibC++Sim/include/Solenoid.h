@@ -20,7 +20,7 @@ class Solenoid : public LiveWindowSendable, public ITableListener
 public:
 	explicit Solenoid(uint32_t channel);
 	Solenoid(uint8_t moduleNumber, uint32_t channel);
-	virtual ~Solenoid();
+	virtual ~Solenoid() = default;
 	virtual void Set(bool on);
 	virtual bool Get() const;
 
@@ -33,7 +33,6 @@ public:
 	ITable * GetTable() const override;
 
 private:
-	void InitSolenoid(int slot, int channel);
     SimContinuousOutput* m_impl;
     bool m_on; 
 

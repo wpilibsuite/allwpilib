@@ -30,8 +30,6 @@ class AnalogTrigger : public SensorBase {
   AnalogTriggerOutput *CreateOutput(AnalogTriggerType type);
 
  private:
-  void InitTrigger(uint32_t channel);
-
   uint8_t m_index;
   void *m_trigger;
 };

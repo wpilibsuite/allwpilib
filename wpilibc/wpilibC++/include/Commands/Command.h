@@ -131,7 +131,6 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
   virtual void _Cancel();
 
  private:
-  void InitCommand(const char *name, double timeout);
   void LockChanges();
   /*synchronized*/ void Removed();
   void StartRunning();
@@ -139,28 +138,39 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
 
   /** The name of this command */
   std::string m_name;
+
   /** The time since this command was initialized */
-  double m_startTime;
+  double m_startTime = -1;
+
   /** The time (in seconds) before this command "times out" (or -1 if no
    * timeout) */
   double m_timeout;
+
   /** Whether or not this command has been initialized */
-  bool m_initialized;
+  bool m_initialized = false;
+
   /** The requirements (or null if no requirements) */
   SubsystemSet m_requirements;
+
   /** Whether or not it is running */
-  bool m_running;
+  bool m_running = false;
+
   /** Whether or not it is interruptible*/
-  bool m_interruptible;
+  bool m_interruptible = true;
+
   /** Whether or not it has been canceled */
-  bool m_canceled;
+  bool m_canceled = false;
+
   /** Whether or not it has been locked */
-  bool m_locked;
+  bool m_locked = false;
+
   /** Whether this command should run when the robot is disabled */
-  bool m_runWhenDisabled;
+  bool m_runWhenDisabled = false;
+
   /** The {@link CommandGroup} this is in */
-  CommandGroup *m_parent;
-  int m_commandID;
+  CommandGroup *m_parent = nullptr;
+
+  int m_commandID = m_commandCounter++;
   static int m_commandCounter;
 
  public:
@@ -172,7 +182,7 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
                             EntryValue value, bool isNew);
 
  protected:
-  ITable *m_table;
+  ITable *m_table = nullptr;
 };
 
 #endif

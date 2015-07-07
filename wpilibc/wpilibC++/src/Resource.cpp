@@ -30,8 +30,8 @@ Resource::Resource(uint32_t elements) {
 /**
  * Factory method to create a Resource allocation-tracker *if* needed.
  *
- * @param r -- address of the caller's Resource pointer. If *r == NULL, this
- *    will construct a Resource and make *r point to it. If *r != NULL, i.e.
+ * @param r -- address of the caller's Resource pointer. If *r == nullptr, this
+ *    will construct a Resource and make *r point to it. If *r != nullptr, i.e.
  *    the caller already has a Resource instance, this won't do anything.
  * @param elements -- the number of elements for this Resource allocator to
  *    track, that is, it will allocate resource numbers in the range
@@ -40,7 +40,7 @@ Resource::Resource(uint32_t elements) {
 /*static*/ void Resource::CreateResourceObject(Resource **r,
                                                uint32_t elements) {
   Synchronized sync(m_createLock);
-  if (*r == NULL) {
+  if (*r == nullptr) {
     *r = new Resource(elements);
   }
 }

@@ -71,7 +71,7 @@ bool wpi_assert_impl(bool conditionValue,
 				
 		// If an error message was specified, include it
 		// Build error string
-		if(message != NULL) {
+		if(message != nullptr) {
 			sprintf(error, "Assertion failed: \"%s\", \"%s\" failed in %s() in %s at line %dd\n", 
 							 message, conditionText, funcName, fileName, lineNumber);
 		} else {
@@ -106,7 +106,7 @@ void wpi_assertEqual_common_impl(int valueA,
 			
 	// If an error message was specified, include it
 	// Build error string
-	if(message != NULL) {
+	if(message != nullptr) {
 		sprintf(error, "Assertion failed: \"%s\", \"%d\" %s \"%d\" in %s() in %s at line %d\n", 
 						 message, valueA, equalityType, valueB, funcName, fileName, lineNumber);
 	} else {
@@ -183,7 +183,7 @@ static std::string demangle(char const *mangledSymbol)
 
 	if(sscanf(mangledSymbol, "%*[^(]%*[^_]%255[^)+]", buffer))
 	{
-		char *symbol = abi::__cxa_demangle(buffer, NULL, &length, &status);
+		char *symbol = abi::__cxa_demangle(buffer, nullptr, &length, &status);
 
 		if(status == 0)
 		{

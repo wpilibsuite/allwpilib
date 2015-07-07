@@ -26,7 +26,6 @@ const uint32_t DriverStation::kBatteryChannel;
 const uint32_t DriverStation::kJoystickPorts;
 const uint32_t DriverStation::kJoystickAxes;
 constexpr float DriverStation::kUpdatePeriod;
-DriverStation* DriverStation::m_instance = NULL;
 uint8_t DriverStation::m_updateNumber = 0;
 
 /**
@@ -35,13 +34,6 @@ uint8_t DriverStation::m_updateNumber = 0;
  * This is only called once the first time GetInstance() is called
  */
 DriverStation::DriverStation()
-	: m_digitalOut (0)
-	, m_waitForDataSem(0)
-	, m_approxMatchTimeOffset(-1.0)
-	, m_userInDisabled(false)
-	, m_userInAutonomous(false)
-	, m_userInTeleop(false)
-	, m_userInTest(false)
 {
 	// Create a new semaphore
 	m_waitForDataSem = initializeMultiWait();
@@ -77,7 +69,6 @@ DriverStation::DriverStation()
 
 DriverStation::~DriverStation()
 {
-	m_instance = NULL;
 	deleteMultiWait(m_waitForDataSem);
 	deleteMutex(m_waitForDataMutex);
 	// TODO: Release m_stateSemaphore and m_joystickSemaphore?
@@ -88,11 +79,8 @@ DriverStation::~DriverStation()
  */
 DriverStation* DriverStation::GetInstance()
 {
-	if (m_instance == NULL)
-	{
-		m_instance = new DriverStation();
-	}
-	return m_instance;
+	static DriverStation instance;
+	return &instance;
 }
 
 /**
@@ -126,7 +114,7 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
 		return 0.0;
 	}
 	CRITICAL_REGION(m_joystickSemaphore)
-	if (joysticks[stick] == NULL || axis >= joysticks[stick]->axes().size())
+	if (joysticks[stick] == nullptr || axis >= joysticks[stick]->axes().size())
 	{
 		return 0.0;
 	}
@@ -150,7 +138,7 @@ bool DriverStation::GetStickButton(uint32_t stick, uint32_t button)
 		return false;
 	}
 	CRITICAL_REGION(m_joystickSemaphore)
-	if (joysticks[stick] == NULL || button >= joysticks[stick]->buttons().size())
+	if (joysticks[stick] == nullptr || button >= joysticks[stick]->buttons().size())
 	{
 	        return false;
 	}
@@ -243,7 +231,7 @@ bool DriverStation::GetDigitalOut(uint32_t channel)
 bool DriverStation::IsEnabled() const
 {
     CRITICAL_REGION(m_stateSemaphore)
-    return state != NULL ? state->enabled() : false;
+    return state != nullptr ? state->enabled() : false;
     END_REGION
 }
 
@@ -255,7 +243,7 @@ bool DriverStation::IsDisabled() const
 bool DriverStation::IsAutonomous() const
 {
     CRITICAL_REGION(m_stateSemaphore)
-    return state != NULL ?
+    return state != nullptr ?
       state->state() == msgs::DriverStation_State_AUTO : false;
 	END_REGION;
 }
@@ -268,7 +256,7 @@ bool DriverStation::IsOperatorControl() const
 bool DriverStation::IsTest() const
 {
     CRITICAL_REGION(m_stateSemaphore)
-    return state != NULL ?
+    return state != nullptr ?
       state->state() == msgs::DriverStation_State_TEST : false;
 	END_REGION;
 }

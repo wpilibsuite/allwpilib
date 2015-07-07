@@ -102,15 +102,14 @@ class Joystick : public GenericHID, public ErrorBase {
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Joystick);
-  void InitJoystick(uint32_t numAxisTypes, uint32_t numButtonTypes);
 
-  DriverStation *m_ds;
+  DriverStation *m_ds = nullptr;
   uint32_t m_port;
-  uint32_t *m_axes;
-  uint32_t *m_buttons;
-  uint32_t m_outputs;
-  uint16_t m_leftRumble;
-  uint16_t m_rightRumble;
+  uint32_t *m_axes = nullptr;
+  uint32_t *m_buttons = nullptr;
+  uint32_t m_outputs = 0;
+  uint16_t m_leftRumble = 0;
+  uint16_t m_rightRumble = 0;
 };
 
 #endif

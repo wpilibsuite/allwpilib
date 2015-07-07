@@ -63,14 +63,14 @@ TEST(PreferencesTest, WritePreferencesToFile) {
       "testFileGetLong=\"1000000000000000000\""};
 
   std::ifstream preferencesFile(kFileName);
-  for (int i = 0; i < 7; i++) {
+  for (auto& kExpectedFileContent : kExpectedFileContents) {
     ASSERT_FALSE(preferencesFile.eof())
         << "Preferences file prematurely reached EOF";
 
     std::string line;
     std::getline(preferencesFile, line);
 
-    ASSERT_EQ(kExpectedFileContents[i], line)
+    ASSERT_EQ(kExpectedFileContent, line)
         << "A line in wpilib-preferences.ini was not correct";
   }
 }

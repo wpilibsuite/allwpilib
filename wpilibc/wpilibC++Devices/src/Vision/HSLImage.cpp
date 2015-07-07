@@ -16,8 +16,6 @@ HSLImage::HSLImage() : ColorImage(IMAQ_IMAGE_HSL) {}
  * @param fileName The path of the file to load.
  */
 HSLImage::HSLImage(const char *fileName) : ColorImage(IMAQ_IMAGE_HSL) {
-  int success = imaqReadFile(m_imaqImage, fileName, NULL, NULL);
+  int success = imaqReadFile(m_imaqImage, fileName, nullptr, nullptr);
   wpi_setImaqErrorWithContext(success, "Imaq ReadFile error");
 }
-
-HSLImage::~HSLImage() {}

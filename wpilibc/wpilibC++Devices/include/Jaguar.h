@@ -16,16 +16,15 @@
 class Jaguar : public SafePWM, public SpeedController {
  public:
   explicit Jaguar(uint32_t channel);
-  virtual ~Jaguar();
-  virtual void Set(float value, uint8_t syncGroup = 0);
-  virtual float Get() const;
-  virtual void Disable();
+  virtual ~Jaguar() = default;
+  virtual void Set(float value, uint8_t syncGroup = 0) override;
+  virtual float Get() const override;
+  virtual void Disable() override;
 
   virtual void PIDWrite(float output) override;
   virtual void SetInverted(bool isInverted) override;
   virtual bool GetInverted() const override;
 
  private:
-  void InitJaguar();
-  bool m_isInverted;
+  bool m_isInverted = false;
 };

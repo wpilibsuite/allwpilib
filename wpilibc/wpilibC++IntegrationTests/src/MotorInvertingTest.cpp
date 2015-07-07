@@ -32,7 +32,7 @@ class MotorInvertingTest
  protected:
   SpeedController *m_speedController;
   Encoder *m_encoder;
-  virtual void SetUp() {
+  virtual void SetUp() override {
     switch (GetParam()) {
       case TEST_VICTOR:
         m_speedController = new Victor(TestBench::kVictorChannel);
@@ -53,7 +53,7 @@ class MotorInvertingTest
         break;
     }
   }
-  virtual void TearDown() {
+  virtual void TearDown() override {
     delete m_speedController;
     delete m_encoder;
   }

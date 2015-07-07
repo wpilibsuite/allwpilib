@@ -11,9 +11,9 @@
 #include "WPIErrors.h"
 #include "HAL/HAL.hpp"
 
-Notifier *Notifier::timerQueueHead = NULL;
+Notifier *Notifier::timerQueueHead = nullptr;
 ReentrantSemaphore Notifier::queueSemaphore;
-void *Notifier::m_notifier = NULL;
+void *Notifier::m_notifier = nullptr;
 int Notifier::refcount = 0;
 
 /**
@@ -22,15 +22,10 @@ int Notifier::refcount = 0;
  * using StartSingle or StartPeriodic.
  */
 Notifier::Notifier(TimerEventHandler handler, void *param) {
-  if (handler == NULL)
-    wpi_setWPIErrorWithContext(NullParameter, "handler must not be NULL");
+  if (handler == nullptr)
+    wpi_setWPIErrorWithContext(NullParameter, "handler must not be nullptr");
   m_handler = handler;
   m_param = param;
-  m_periodic = false;
-  m_expirationTime = 0;
-  m_period = 0;
-  m_nextEvent = NULL;
-  m_queued = false;
   m_handlerSemaphore = initializeSemaphore(SEMAPHORE_FULL);
   {
     Synchronized sync(queueSemaphore);
@@ -79,7 +74,7 @@ Notifier::~Notifier() {
  * that is taking care of synchronizing access to the queue.
  */
 void Notifier::UpdateAlarm() {
-  if (timerQueueHead != NULL) {
+  if (timerQueueHead != nullptr) {
     int32_t status = 0;
     updateNotifierAlarm(m_notifier,
                         (uint32_t)(timerQueueHead->m_expirationTime * 1e6),
@@ -104,7 +99,7 @@ void Notifier::ProcessQueue(uint32_t mask, void *params) {
       Synchronized sync(queueSemaphore);
       double currentTime = GetClock();
       current = timerQueueHead;
-      if (current == NULL || current->m_expirationTime > currentTime) {
+      if (current == nullptr || current->m_expirationTime > currentTime) {
         break;  // no more timer events to process
       }
       // need to process this entry
@@ -152,7 +147,7 @@ void Notifier::InsertInQueue(bool reschedule) {
   if (m_expirationTime > Timer::kRolloverTime) {
     m_expirationTime -= Timer::kRolloverTime;
   }
-  if (timerQueueHead == NULL ||
+  if (timerQueueHead == nullptr ||
       timerQueueHead->m_expirationTime >= this->m_expirationTime) {
     // the queue is empty or greater than the new entry
     // the new entry becomes the first element
@@ -167,7 +162,7 @@ void Notifier::InsertInQueue(bool reschedule) {
     for (Notifier **npp = &(timerQueueHead->m_nextEvent);;
          npp = &(*npp)->m_nextEvent) {
       Notifier *n = *npp;
-      if (n == NULL || n->m_expirationTime > this->m_expirationTime) {
+      if (n == nullptr || n->m_expirationTime > this->m_expirationTime) {
         *npp = this;
         this->m_nextEvent = n;
         break;
@@ -189,13 +184,13 @@ void Notifier::InsertInQueue(bool reschedule) {
 void Notifier::DeleteFromQueue() {
   if (m_queued) {
     m_queued = false;
-    wpi_assert(timerQueueHead != NULL);
+    wpi_assert(timerQueueHead != nullptr);
     if (timerQueueHead == this) {
       // remove the first item in the list - update the alarm
       timerQueueHead = this->m_nextEvent;
       UpdateAlarm();
     } else {
-      for (Notifier *n = timerQueueHead; n != NULL; n = n->m_nextEvent) {
+      for (Notifier *n = timerQueueHead; n != nullptr; n = n->m_nextEvent) {
         if (n->m_nextEvent == this) {
           // this element is the next element from *n from the queue
           n->m_nextEvent = this->m_nextEvent;  // point around this one

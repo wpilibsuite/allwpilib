@@ -31,7 +31,7 @@ class CANInterfacePlugin {
    * @param messageID The 29-bit CAN message ID in the lsbs.  The msb can
    * indicate a remote frame.
    * @param data A pointer to a buffer containing between 0 and 8 bytes to send
-   * with the message.  May be NULL if dataSize is 0.
+   * with the message.  May be nullptr if dataSize is 0.
    * @param dataSize The number of bytes to send with the message.
    * @return Return any error code.  On success return 0.
    */
@@ -101,7 +101,7 @@ class CANInterfacePlugin {
  *
  * @param interface A pointer to an object that inherits from CANInterfacePlugin
  * and implements
- * the pure virtual interface.  If NULL, unregister the current plugin.
+ * the pure virtual interface.  If nullptr, unregister the current plugin.
  */
 void FRC_NetworkCommunication_CANSessionMux_registerInterface(
     CANInterfacePlugin *interface);

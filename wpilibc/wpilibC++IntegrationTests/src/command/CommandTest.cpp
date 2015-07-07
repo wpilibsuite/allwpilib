@@ -41,13 +41,13 @@ class CommandTest : public testing::Test {
 
 class ASubsystem : public Subsystem {
  private:
-  Command *m_command;
+  Command *m_command = nullptr;
 
  public:
-  ASubsystem(const char *name) : Subsystem(name) { m_command = NULL; }
+  ASubsystem(const char *name) : Subsystem(name) {}
 
   virtual void InitDefaultCommand() override {
-    if (m_command != NULL) {
+    if (m_command != nullptr) {
       SetDefaultCommand(m_command);
     }
   }
@@ -214,7 +214,7 @@ TEST_F(CommandTest, ThreeCommandOnSubSystem) {
 
 // CommandSequentialGroupTest ported from CommandSequentialGroupTest.java
 TEST_F(CommandTest, OneCommandSupersedingAnotherBecauseOfDependencies) {
-  ASubsystem *subsystem = new ASubsystem("Command Superseding Test Subsystem");
+  auto subsystem = new ASubsystem("Command Superseding Test Subsystem");
   MockCommand command1;
   command1.Requires(subsystem);
   MockCommand command2;

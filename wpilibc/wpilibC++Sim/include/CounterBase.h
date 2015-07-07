@@ -23,7 +23,7 @@ public:
 		k4X
 	};
 
-	virtual ~CounterBase() {}
+	virtual ~CounterBase() = default;
 	virtual int32_t Get() const = 0;
 	virtual void Reset() = 0;
 	virtual double GetPeriod() const = 0;

@@ -30,9 +30,8 @@ class AnalogOutput : public SensorBase, public LiveWindowSendable {
   ITable *GetTable() const override;
 
  protected:
-  void InitAnalogOutput(uint32_t channel);
   uint32_t m_channel;
   void *m_port;
 
-  ITable *m_table;
+  ITable *m_table = nullptr;
 };

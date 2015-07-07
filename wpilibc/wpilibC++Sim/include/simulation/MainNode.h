@@ -10,10 +10,8 @@ using namespace gazebo;
 class MainNode {
 public:
 	static MainNode* GetInstance() {
-		if (instance == NULL) {
-			instance = new MainNode();
-		}
-		return instance;
+		static MainNode instance;
+		return &instance;
 	}
 
 	template<typename M>
@@ -39,8 +37,6 @@ public:
   
 	transport::NodePtr main;
 private:
-  	static MainNode* instance;
-
 	MainNode() {
 		gazebo::transport::init();
 		main = transport::NodePtr(new transport::Node());

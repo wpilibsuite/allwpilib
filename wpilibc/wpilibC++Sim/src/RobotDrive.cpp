@@ -32,12 +32,6 @@ const int32_t RobotDrive::kMaxNumberOfMotors;
  * initialize all the motor assignments. The default timeout is set for the robot drive.
  */
 void RobotDrive::InitRobotDrive() {
-	m_frontLeftMotor = NULL;
-	m_frontRightMotor = NULL;
-	m_rearRightMotor = NULL;
-	m_rearLeftMotor = NULL;
-	m_sensitivity = 0.5;
-	m_maxOutput = 1.0;
 	// FIXME: m_safetyHelper = new MotorSafetyHelper(this);
 	// FIXME: m_safetyHelper->SetSafetyEnabled(true);
 }
@@ -99,10 +93,10 @@ RobotDrive::RobotDrive(uint32_t frontLeftMotor, uint32_t rearLeftMotor,
 RobotDrive::RobotDrive(SpeedController *leftMotor, SpeedController *rightMotor)
 {
 	InitRobotDrive();
-	if (leftMotor == NULL || rightMotor == NULL)
+	if (leftMotor == nullptr || rightMotor == nullptr)
 	{
 		wpi_setWPIError(NullParameter);
-		m_rearLeftMotor = m_rearRightMotor = NULL;
+		m_rearLeftMotor = m_rearRightMotor = nullptr;
 		return;
 	}
 	m_rearLeftMotor = leftMotor;
@@ -138,7 +132,7 @@ RobotDrive::RobotDrive(SpeedController *frontLeftMotor, SpeedController *rearLef
 						SpeedController *frontRightMotor, SpeedController *rearRightMotor)
 {
 	InitRobotDrive();
-	if (frontLeftMotor == NULL || rearLeftMotor == NULL || frontRightMotor == NULL || rearRightMotor == NULL)
+	if (frontLeftMotor == nullptr || rearLeftMotor == nullptr || frontRightMotor == nullptr || rearRightMotor == nullptr)
 	{
 		wpi_setWPIError(NullParameter);
 		return;
@@ -239,7 +233,7 @@ void RobotDrive::Drive(float outputMagnitude, float curve)
  */
 void RobotDrive::TankDrive(GenericHID *leftStick, GenericHID *rightStick, bool squaredInputs)
 {
-	if (leftStick == NULL || rightStick == NULL)
+	if (leftStick == nullptr || rightStick == nullptr)
 	{
 		wpi_setWPIError(NullParameter);
 		return;
@@ -264,7 +258,7 @@ void RobotDrive::TankDrive(GenericHID &leftStick, GenericHID &rightStick, bool s
 void RobotDrive::TankDrive(GenericHID *leftStick, uint32_t leftAxis,
 		GenericHID *rightStick, uint32_t rightAxis, bool squaredInputs)
 {
-	if (leftStick == NULL || rightStick == NULL)
+	if (leftStick == nullptr || rightStick == nullptr)
 	{
 		wpi_setWPIError(NullParameter);
 		return;
@@ -586,15 +580,15 @@ void RobotDrive::HolonomicDrive(float magnitude, float direction, float rotation
  */
 void RobotDrive::SetLeftRightMotorOutputs(float leftOutput, float rightOutput)
 {
-	wpi_assert(m_rearLeftMotor != NULL && m_rearRightMotor != NULL);
+	wpi_assert(m_rearLeftMotor != nullptr && m_rearRightMotor != nullptr);
 
 	uint8_t syncGroup = 0x80;
 
-	if (m_frontLeftMotor != NULL)
+	if (m_frontLeftMotor != nullptr)
 		m_frontLeftMotor->Set(Limit(leftOutput) * m_invertedMotors[kFrontLeftMotor] * m_maxOutput, syncGroup);
 	m_rearLeftMotor->Set(Limit(leftOutput) * m_invertedMotors[kRearLeftMotor] * m_maxOutput, syncGroup);
 
-	if (m_frontRightMotor != NULL)
+	if (m_frontRightMotor != nullptr)
 		m_frontRightMotor->Set(-Limit(rightOutput) * m_invertedMotors[kFrontRightMotor] * m_maxOutput, syncGroup);
 	m_rearRightMotor->Set(-Limit(rightOutput) * m_invertedMotors[kRearRightMotor] * m_maxOutput, syncGroup);
 
@@ -725,8 +719,8 @@ void RobotDrive::GetDescription(char *desc) const
 
 void RobotDrive::StopMotor()
 {
-	if (m_frontLeftMotor != NULL) m_frontLeftMotor->Disable();
-	if (m_frontRightMotor != NULL) m_frontRightMotor->Disable();
-	if (m_rearLeftMotor != NULL) m_rearLeftMotor->Disable();
-	if (m_rearRightMotor != NULL) m_rearRightMotor->Disable();
+	if (m_frontLeftMotor != nullptr) m_frontLeftMotor->Disable();
+	if (m_frontRightMotor != nullptr) m_frontRightMotor->Disable();
+	if (m_rearLeftMotor != nullptr) m_rearLeftMotor->Disable();
+	if (m_rearRightMotor != nullptr) m_rearRightMotor->Disable();
 }

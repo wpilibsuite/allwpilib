@@ -56,7 +56,7 @@ void ADXL345_SPI::Init(Range range) {
  */
 ADXL345_SPI::~ADXL345_SPI() {
   delete m_spi;
-  m_spi = NULL;
+  m_spi = nullptr;
 }
 
 /** {@inheritdoc} */
@@ -136,7 +136,7 @@ void ADXL345_SPI::InitTable(ITable* subtable) {
 }
 
 void ADXL345_SPI::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("X", GetX());
     m_table->PutNumber("Y", GetY());
     m_table->PutNumber("Z", GetZ());

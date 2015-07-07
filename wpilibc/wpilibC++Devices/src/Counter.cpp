@@ -13,41 +13,25 @@
 #include "WPIErrors.h"
 
 /**
- * Create an instance of a counter object.
- * This creates a ChipObject counter and initializes status variables
- * appropriately
- *
- * The counter will start counting immediately.
- * @param mode The counter mode
- */
-void Counter::InitCounter(Mode mode) {
-  m_table = NULL;
-
-  int32_t status = 0;
-  m_index = 0;
-  m_counter = initializeCounter(mode, &m_index, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
-
-  m_upSource = NULL;
-  m_downSource = NULL;
-  m_allocatedUpSource = false;
-  m_allocatedDownSource = false;
-
-  SetMaxPeriod(.5);
-
-  HALReport(HALUsageReporting::kResourceType_Counter, m_index, mode);
-}
-
-/**
  * Create an instance of a counter where no sources are selected.
  * They all must be selected by calling functions to specify the upsource and
  * the downsource
  * independently.
  *
+ * This creates a ChipObject counter and initializes status variables
+ * appropriately.
+ *
  * The counter will start counting immediately.
+ * @param mode The counter mode
  */
-Counter::Counter() : m_upSource(NULL), m_downSource(NULL), m_counter(NULL) {
-  InitCounter();
+Counter::Counter(Mode mode) {
+  int32_t status = 0;
+  m_counter = initializeCounter(mode, &m_index, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+
+  SetMaxPeriod(.5);
+
+  HALReport(HALUsageReporting::kResourceType_Counter, m_index, mode);
 }
 
 /**
@@ -62,9 +46,7 @@ Counter::Counter() : m_upSource(NULL), m_downSource(NULL), m_counter(NULL) {
  * @param source A pointer to the existing DigitalSource object. It will be set
  * as the Up Source.
  */
-Counter::Counter(DigitalSource *source)
-    : m_upSource(NULL), m_downSource(NULL), m_counter(NULL) {
-  InitCounter();
+Counter::Counter(DigitalSource *source) : Counter() {
   SetUpSource(source);
   ClearDownSource();
 }
@@ -81,9 +63,7 @@ Counter::Counter(DigitalSource *source)
  * @param source A reference to the existing DigitalSource object. It will be
  * set as the Up Source.
  */
-Counter::Counter(DigitalSource &source)
-    : m_upSource(NULL), m_downSource(NULL), m_counter(NULL) {
-  InitCounter();
+Counter::Counter(DigitalSource &source) : Counter() {
   SetUpSource(&source);
   ClearDownSource();
 }
@@ -96,9 +76,7 @@ Counter::Counter(DigitalSource &source)
  * @param channel The DIO channel to use as the up source. 0-9 are on-board,
  * 10-25 are on the MXP
  */
-Counter::Counter(int32_t channel)
-    : m_upSource(NULL), m_downSource(NULL), m_counter(NULL) {
-  InitCounter();
+Counter::Counter(int32_t channel) : Counter() {
   SetUpSource(channel);
   ClearDownSource();
 }
@@ -111,9 +89,7 @@ Counter::Counter(int32_t channel)
  * The counter will start counting immediately.
  * @param trigger The pointer to the existing AnalogTrigger object.
  */
-Counter::Counter(AnalogTrigger *trigger)
-    : m_upSource(NULL), m_downSource(NULL), m_counter(NULL) {
-  InitCounter();
+Counter::Counter(AnalogTrigger *trigger) : Counter() {
   SetUpSource(trigger->CreateOutput(kState));
   ClearDownSource();
   m_allocatedUpSource = true;
@@ -127,9 +103,7 @@ Counter::Counter(AnalogTrigger *trigger)
  * The counter will start counting immediately.
  * @param trigger The reference to the existing AnalogTrigger object.
  */
-Counter::Counter(AnalogTrigger &trigger)
-    : m_upSource(NULL), m_downSource(NULL), m_counter(NULL) {
-  InitCounter();
+Counter::Counter(AnalogTrigger &trigger) : Counter() {
   SetUpSource(trigger.CreateOutput(kState));
   ClearDownSource();
   m_allocatedUpSource = true;
@@ -146,14 +120,13 @@ Counter::Counter(AnalogTrigger &trigger)
 
 Counter::Counter(EncodingType encodingType, DigitalSource *upSource,
                  DigitalSource *downSource, bool inverted)
-    : m_upSource(NULL), m_downSource(NULL), m_counter(NULL) {
+               : Counter(kExternalDirection) {
   if (encodingType != k1X && encodingType != k2X) {
     wpi_setWPIErrorWithContext(
         ParameterOutOfRange,
         "Counter only supports 1X and 2X quadrature decoding.");
     return;
   }
-  InitCounter(kExternalDirection);
   SetUpSource(upSource);
   SetDownSource(downSource);
   int32_t status = 0;
@@ -177,17 +150,17 @@ Counter::~Counter() {
   SetUpdateWhenEmpty(true);
   if (m_allocatedUpSource) {
     delete m_upSource;
-    m_upSource = NULL;
+    m_upSource = nullptr;
   }
   if (m_allocatedDownSource) {
     delete m_downSource;
-    m_downSource = NULL;
+    m_downSource = nullptr;
   }
 
   int32_t status = 0;
   freeCounter(m_counter, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
-  m_counter = NULL;
+  m_counter = nullptr;
 }
 
 /**
@@ -232,7 +205,7 @@ void Counter::SetUpSource(DigitalSource *source) {
   if (StatusIsFatal()) return;
   if (m_allocatedUpSource) {
     delete m_upSource;
-    m_upSource = NULL;
+    m_upSource = nullptr;
     m_allocatedUpSource = false;
   }
   m_upSource = source;
@@ -261,10 +234,10 @@ void Counter::SetUpSource(DigitalSource &source) { SetUpSource(&source); }
  */
 void Counter::SetUpSourceEdge(bool risingEdge, bool fallingEdge) {
   if (StatusIsFatal()) return;
-  if (m_upSource == NULL) {
+  if (m_upSource == nullptr) {
     wpi_setWPIErrorWithContext(
         NullParameter,
-        "Must set non-NULL UpSource before setting UpSourceEdge");
+        "Must set non-nullptr UpSource before setting UpSourceEdge");
   }
   int32_t status = 0;
   setCounterUpSourceEdge(m_counter, risingEdge, fallingEdge, &status);
@@ -278,7 +251,7 @@ void Counter::ClearUpSource() {
   if (StatusIsFatal()) return;
   if (m_allocatedUpSource) {
     delete m_upSource;
-    m_upSource = NULL;
+    m_upSource = nullptr;
     m_allocatedUpSource = false;
   }
   int32_t status = 0;
@@ -330,7 +303,7 @@ void Counter::SetDownSource(DigitalSource *source) {
   if (StatusIsFatal()) return;
   if (m_allocatedDownSource) {
     delete m_downSource;
-    m_downSource = NULL;
+    m_downSource = nullptr;
     m_allocatedDownSource = false;
   }
   m_downSource = source;
@@ -359,10 +332,10 @@ void Counter::SetDownSource(DigitalSource &source) { SetDownSource(&source); }
  */
 void Counter::SetDownSourceEdge(bool risingEdge, bool fallingEdge) {
   if (StatusIsFatal()) return;
-  if (m_downSource == NULL) {
+  if (m_downSource == nullptr) {
     wpi_setWPIErrorWithContext(
         NullParameter,
-        "Must set non-NULL DownSource before setting DownSourceEdge");
+        "Must set non-nullptr DownSource before setting DownSourceEdge");
   }
   int32_t status = 0;
   setCounterDownSourceEdge(m_counter, risingEdge, fallingEdge, &status);
@@ -376,7 +349,7 @@ void Counter::ClearDownSource() {
   if (StatusIsFatal()) return;
   if (m_allocatedDownSource) {
     delete m_downSource;
-    m_downSource = NULL;
+    m_downSource = nullptr;
     m_allocatedDownSource = false;
   }
   int32_t status = 0;
@@ -597,7 +570,7 @@ void Counter::SetReverseDirection(bool reverseDirection) {
 }
 
 void Counter::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("Value", Get());
   }
 }

@@ -31,8 +31,8 @@ class Command;
  */
 class Trigger : public Sendable {
  public:
-  Trigger();
-  virtual ~Trigger() {}
+  Trigger() = default;
+  virtual ~Trigger() = default;
   bool Grab();
   virtual bool Get() = 0;
   void WhenActive(Command *command);
@@ -46,7 +46,7 @@ class Trigger : public Sendable {
   virtual std::string GetSmartDashboardType() const;
 
  protected:
-  ITable *m_table;
+  ITable *m_table = nullptr;
 };
 
 #endif

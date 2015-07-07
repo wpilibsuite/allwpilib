@@ -40,9 +40,7 @@ class SmartDashboard : public SensorBase {
   static void RetrieveValue(std::string keyName, ComplexData &value);
 
  private:
-  SmartDashboard();
-  virtual ~SmartDashboard();
-  DISALLOW_COPY_AND_ASSIGN(SmartDashboard);
+  virtual ~SmartDashboard() = default;
 
   /** The {@link NetworkTable} used by {@link SmartDashboard} */
   static ITable *m_table;

@@ -11,17 +11,19 @@
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 
-static Resource *inputs = NULL;
+static Resource *inputs = nullptr;
 
 const uint8_t AnalogInput::kAccumulatorModuleNumber;
 const uint32_t AnalogInput::kAccumulatorNumChannels;
 const uint32_t AnalogInput::kAccumulatorChannels[] = {0, 1};
 
 /**
- * Common initialization.
+ * Construct an analog input.
+ *
+ * @param channel The channel number on the roboRIO to represent. 0-3 are
+ * on-board 4-7 are on the MXP port.
  */
-void AnalogInput::InitAnalogInput(uint32_t channel) {
-  m_table = NULL;
+AnalogInput::AnalogInput(uint32_t channel) {
   char buf[64];
   Resource::CreateResourceObject(&inputs, kAnalogInputs);
 
@@ -47,14 +49,6 @@ void AnalogInput::InitAnalogInput(uint32_t channel) {
   LiveWindow::GetInstance()->AddSensor("AnalogInput", channel, this);
   HALReport(HALUsageReporting::kResourceType_AnalogChannel, channel);
 }
-
-/**
- * Construct an analog input.
- *
- * @param channel The channel number on the roboRIO to represent. 0-3 are
- * on-board 4-7 are on the MXP port.
- */
-AnalogInput::AnalogInput(uint32_t channel) { InitAnalogInput(channel); }
 
 /**
  * Channel destructor.
@@ -405,7 +399,7 @@ double AnalogInput::PIDGet() const {
 }
 
 void AnalogInput::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("Value", GetAverageVoltage());
   }
 }

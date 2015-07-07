@@ -43,21 +43,7 @@ static const std::string kRotationStrings[] = {
  * @param cameraHost The host to find the camera at, typically an IP address
  */
 AxisCamera::AxisCamera(std::string const &cameraHost)
-    : m_cameraHost(cameraHost),
-      m_cameraSocket(-1),
-      m_freshImage(false),
-      m_brightness(50),
-      m_whiteBalance(kWhiteBalance_Automatic),
-      m_colorLevel(50),
-      m_exposureControl(kExposureControl_Automatic),
-      m_exposurePriority(50),
-      m_maxFPS(0),
-      m_resolution(kResolution_640x480),
-      m_compression(50),
-      m_rotation(kRotation_0),
-      m_parametersDirty(true),
-      m_streamDirty(true),
-      m_done(false) {
+    : m_cameraHost(cameraHost) {
   m_captureThread = std::thread(&AxisCamera::Capture, this);
 }
 
@@ -112,7 +98,7 @@ int AxisCamera::GetImage(ColorImage *image) {
  * @return a pointer to an HSLImage object
  */
 HSLImage *AxisCamera::GetImage() {
-  HSLImage *image = new HSLImage();
+  auto image = new HSLImage();
   GetImage(image);
   return image;
 }
@@ -131,22 +117,22 @@ HSLImage *AxisCamera::GetImage() {
 int AxisCamera::CopyJPEG(char **destImage, unsigned int &destImageSize,
                          unsigned int &destImageBufferSize) {
   std::lock_guard<std::mutex> lock(m_imageDataMutex);
-  if (destImage == NULL)
-    wpi_setWPIErrorWithContext(NullParameter, "destImage must not be NULL");
+  if (destImage == nullptr)
+    wpi_setWPIErrorWithContext(NullParameter, "destImage must not be nullptr");
 
   if (m_imageData.size() == 0) return 0;  // if no source image
 
   if (destImageBufferSize <
       m_imageData.size())  // if current destination buffer too small
   {
-    if (*destImage != NULL) delete[] * destImage;
+    if (*destImage != nullptr) delete[] * destImage;
     destImageBufferSize = m_imageData.size() + kImageBufferAllocationIncrement;
     *destImage = new char[destImageBufferSize];
-    if (*destImage == NULL) return 0;
+    if (*destImage == nullptr) return 0;
   }
   // copy this image into destination buffer
-  if (*destImage == NULL) {
-    wpi_setWPIErrorWithContext(NullParameter, "*destImage must not be NULL");
+  if (*destImage == nullptr) {
+    wpi_setWPIErrorWithContext(NullParameter, "*destImage must not be nullptr");
   }
 
   std::copy(m_imageData.begin(), m_imageData.end(), *destImage);
@@ -415,7 +401,7 @@ void AxisCamera::Capture() {
  * This function actually reads the images from the camera.
  */
 void AxisCamera::ReadImagesFromCamera() {
-  char *imgBuffer = NULL;
+  char *imgBuffer = nullptr;
   int imgBufferLength = 0;
 
   // TODO: these recv calls must be non-blocking. Otherwise if the camera
@@ -441,7 +427,7 @@ void AxisCamera::ReadImagesFromCamera() {
       // after
       // there is at least 4 bytes total. Kind of obscure.
       // look for 2 blank lines (\r\n)
-      if (NULL != strstr(trailingPtr, "\r\n\r\n")) {
+      if (nullptr != strstr(trailingPtr, "\r\n\r\n")) {
         --counter;
       }
       if (++trailingCounter >= 4) {
@@ -450,7 +436,7 @@ void AxisCamera::ReadImagesFromCamera() {
     }
     counter = 1;
     char *contentLength = strstr(initialReadBuffer, "Content-Length: ");
-    if (contentLength == NULL) {
+    if (contentLength == nullptr) {
       wpi_setWPIErrorWithContext(IncompatibleMode,
                                  "No content-length token found in packet");
       close(m_cameraSocket);
@@ -464,7 +450,7 @@ void AxisCamera::ReadImagesFromCamera() {
       if (imgBuffer) delete[] imgBuffer;
       imgBufferLength = readLength + kImageBufferAllocationIncrement;
       imgBuffer = new char[imgBufferLength];
-      if (imgBuffer == NULL) {
+      if (imgBuffer == nullptr) {
         imgBufferLength = 0;
         continue;
       }
@@ -567,7 +553,7 @@ bool AxisCamera::WriteParameters() {
  */
 int AxisCamera::CreateCameraSocket(std::string const &requestString,
                                    bool setError) {
-  struct addrinfo *address = 0;
+  struct addrinfo *address = nullptr;
   int camSocket;
 
   /* create socket */
@@ -577,7 +563,7 @@ int AxisCamera::CreateCameraSocket(std::string const &requestString,
     return -1;
   }
 
-  if (getaddrinfo(m_cameraHost.c_str(), "80", 0, &address) == -1) {
+  if (getaddrinfo(m_cameraHost.c_str(), "80", nullptr, &address) == -1) {
     if (setError)
       wpi_setErrnoErrorWithContext("Failed to create the camera socket");
     return -1;

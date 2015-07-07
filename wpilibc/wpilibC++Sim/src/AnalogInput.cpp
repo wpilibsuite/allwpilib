@@ -9,35 +9,18 @@
 #include "LiveWindow/LiveWindow.h"
 
 /**
- * Common initialization.
- */
-void AnalogInput::InitAnalogInput(uint32_t channel)
-{
-    m_table = NULL;
-
-	m_channel = channel;
-	char buffer[50];
-	int n = sprintf(buffer, "analog/%d", channel);
-	m_impl = new SimFloatInput(buffer);
-
-	LiveWindow::GetInstance()->AddSensor("AnalogInput", channel, this);
-}
-
-/**
  * Construct an analog input.
  * 
  * @param channel The channel number to represent.
  */
 AnalogInput::AnalogInput(uint32_t channel)
 {
-	InitAnalogInput(channel);
-}
+	m_channel = channel;
+	char buffer[50];
+	int n = sprintf(buffer, "analog/%d", channel);
+	m_impl = new SimFloatInput(buffer);
 
-/**
- * Channel destructor.
- */
-AnalogInput::~AnalogInput()
-{
+	LiveWindow::GetInstance()->AddSensor("AnalogInput", channel, this);
 }
 
 /**
@@ -82,7 +65,7 @@ double AnalogInput::PIDGet() const
 }
 
 void AnalogInput::UpdateTable() {
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
 		m_table->PutNumber("Value", GetAverageVoltage());
 	}
 }

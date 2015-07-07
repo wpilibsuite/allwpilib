@@ -10,9 +10,11 @@
 #include "LiveWindow/LiveWindow.h"
 
 /**
- * Common initialization code called by all constructors.
+ * Constructor for a Jaguar connected via PWM
+ * @param channel The PWM channel that the Jaguar is attached to. 0-9 are
+ * on-board, 10-19 are on the MXP port
  */
-void Jaguar::InitJaguar() {
+Jaguar::Jaguar(uint32_t channel) : SafePWM(channel) {
   /**
    * Input profile defined by Luminary Micro.
    *
@@ -29,17 +31,7 @@ void Jaguar::InitJaguar() {
 
   HALReport(HALUsageReporting::kResourceType_Jaguar, GetChannel());
   LiveWindow::GetInstance()->AddActuator("Jaguar", GetChannel(), this);
-  m_isInverted = false;
 }
-
-/**
- * Constructor for a Jaguar connected via PWM
- * @param channel The PWM channel that the Jaguar is attached to. 0-9 are
- * on-board, 10-19 are on the MXP port
- */
-Jaguar::Jaguar(uint32_t channel) : SafePWM(channel) { InitJaguar(); }
-
-Jaguar::~Jaguar() {}
 
 /**
  * Set the PWM value.

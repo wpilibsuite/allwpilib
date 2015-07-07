@@ -20,7 +20,7 @@ class InterruptableSensorBase : public SensorBase {
   };
 
   InterruptableSensorBase();
-  virtual ~InterruptableSensorBase();
+  virtual ~InterruptableSensorBase() = default;
   virtual uint32_t GetChannelForRouting() const = 0;
   virtual uint32_t GetModuleForRouting() const = 0;
   virtual bool GetAnalogTriggerForRouting() const = 0;
@@ -42,7 +42,7 @@ class InterruptableSensorBase : public SensorBase {
   virtual void SetUpSourceEdge(bool risingEdge, bool fallingEdge);
 
  protected:
-  void *m_interrupt;
+  void *m_interrupt = nullptr;
   uint32_t m_interruptIndex;
   void AllocateInterrupts(bool watcher);
 

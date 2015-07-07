@@ -10,19 +10,14 @@
 #include "MotorSafetyHelper.h"
 
 /**
- * Initialize a SafePWM object by setting defaults
- */
-void SafePWM::InitSafePWM() {
-  m_safetyHelper = new MotorSafetyHelper(this);
-  m_safetyHelper->SetSafetyEnabled(false);
-}
-
-/**
  * Constructor for a SafePWM object taking a channel number.
  * @param channel The PWM channel number 0-9 are on-board, 10-19 are on the MXP
  * port
  */
-SafePWM::SafePWM(uint32_t channel) : PWM(channel) { InitSafePWM(); }
+SafePWM::SafePWM(uint32_t channel) : PWM(channel) {
+  m_safetyHelper = new MotorSafetyHelper(this);
+  m_safetyHelper->SetSafetyEnabled(false);
+}
 
 SafePWM::~SafePWM() { delete m_safetyHelper; }
 

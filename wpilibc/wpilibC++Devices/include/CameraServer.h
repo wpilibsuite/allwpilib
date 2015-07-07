@@ -55,8 +55,6 @@ class CameraServer : public ErrorBase {
     uint32_t size;
   };
 
-  static CameraServer* s_instance;
-
  public:
   static CameraServer* GetInstance();
   void SetImage(Image const* image);

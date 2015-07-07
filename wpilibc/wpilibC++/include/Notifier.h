@@ -14,7 +14,7 @@ typedef void (*TimerEventHandler)(void *param);
 
 class Notifier : public ErrorBase {
  public:
-  Notifier(TimerEventHandler handler, void *param = NULL);
+  Notifier(TimerEventHandler handler, void *param = nullptr);
   virtual ~Notifier();
   void StartSingle(double delay);
   void StartPeriodic(double period);
@@ -35,11 +35,11 @@ class Notifier : public ErrorBase {
   void DeleteFromQueue();       // delete this Notifier from the timer queue
   TimerEventHandler m_handler;  // address of the handler
   void *m_param;                // a parameter to pass to the handler
-  double m_period;              // the relative time (either periodic or single)
-  double m_expirationTime;  // absolute expiration time for the current event
-  Notifier *m_nextEvent;    // next Nofifier event
-  bool m_periodic;          // true if this is a periodic event
-  bool m_queued;            // indicates if this entry is queued
+  double m_period = 0;              // the relative time (either periodic or single)
+  double m_expirationTime = 0;  // absolute expiration time for the current event
+  Notifier *m_nextEvent = nullptr;    // next Nofifier event
+  bool m_periodic = false;          // true if this is a periodic event
+  bool m_queued = false;            // indicates if this entry is queued
   SEMAPHORE_ID m_handlerSemaphore;  // held by interrupt manager task while
                                     // handler call is in progress
 

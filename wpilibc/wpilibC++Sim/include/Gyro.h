@@ -33,7 +33,7 @@ public:
 	static constexpr float kDefaultVoltsPerDegreePerSecond = 0.007;
 
 	explicit Gyro(uint32_t channel);
-	virtual ~Gyro();
+	virtual ~Gyro() = default;
 	virtual float GetAngle() const;
 	virtual double GetRate() const;
 	void SetPIDSourceParameter(PIDSourceParameter pidSource);
@@ -55,5 +55,5 @@ private:
 	SimGyro* impl;
 	PIDSourceParameter m_pidSource;
 
-	ITable *m_table;
+	ITable *m_table = nullptr;
 };

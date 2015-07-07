@@ -19,8 +19,8 @@ void notifierHandler(void *) { notifierCounter++; }
 TEST(NotifierTest, DISABLED_TestTimerNotifications) {
   std::cout << "NotifierTest..." << std::endl;
   notifierCounter = 0;
-  std::cout << "notifier(notifierHandler, NULL)..." << std::endl;
-  Notifier notifier(notifierHandler, NULL);
+  std::cout << "notifier(notifierHandler, nullptr)..." << std::endl;
+  Notifier notifier(notifierHandler, nullptr);
   std::cout << "Start Periodic..." << std::endl;
   notifier.StartPeriodic(1.0);
 

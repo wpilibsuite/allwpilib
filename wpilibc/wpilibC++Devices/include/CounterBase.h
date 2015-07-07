@@ -20,7 +20,7 @@ class CounterBase {
  public:
   enum EncodingType { k1X, k2X, k4X };
 
-  virtual ~CounterBase() {}
+  virtual ~CounterBase() = default;
   virtual int32_t Get() const = 0;
   virtual void Reset() = 0;
   virtual double GetPeriod() const = 0;

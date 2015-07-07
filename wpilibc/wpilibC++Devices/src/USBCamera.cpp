@@ -19,10 +19,6 @@
       wpi_setImaqErrorWithContext(error, #funName); \
   }
 
-// Constants for the manual and auto types
-static const std::string AUTO = "Auto";
-static const std::string MANUAL = "Manual";
-
 /**
  * Helper function to determine the size of a jpeg. The general structure of
  * how to parse a jpeg for length can be found in this stackoverflow article:
@@ -76,23 +72,8 @@ unsigned int USBCamera::GetJpegSize(void* buffer, unsigned int buffSize) {
 }
 
 USBCamera::USBCamera(std::string name, bool useJpeg)
-    : m_id(0),
-      m_name(name),
-      m_useJpeg(useJpeg),
-      m_active(false),
-      m_open(false),
-      m_mutex(),
-      m_width(320),
-      m_height(240),
-      m_fps(30),
-      m_whiteBalance(AUTO),
-      m_whiteBalanceValue(0),
-      m_whiteBalanceValuePresent(false),
-      m_exposure(MANUAL),
-      m_exposureValue(50),
-      m_exposureValuePresent(false),
-      m_brightness(80),
-      m_needSettingsUpdate(true) {}
+    : m_name(name),
+      m_useJpeg(useJpeg) {}
 
 void USBCamera::OpenCamera() {
   std::unique_lock<std::recursive_mutex> lock(m_mutex);
@@ -148,7 +129,7 @@ void USBCamera::UpdateSettings() {
 
   uInt32 count = 0;
   uInt32 currentMode = 0;
-  SAFE_IMAQ_CALL(IMAQdxEnumerateVideoModes, m_id, NULL, &count, &currentMode);
+  SAFE_IMAQ_CALL(IMAQdxEnumerateVideoModes, m_id, nullptr, &count, &currentMode);
   IMAQdxVideoMode modes[count];
   SAFE_IMAQ_CALL(IMAQdxEnumerateVideoModes, m_id, modes, &count, &currentMode);
 
@@ -188,10 +169,10 @@ void USBCamera::UpdateSettings() {
 
   if (m_whiteBalance.compare(AUTO) == 0) {
     SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_WB_MODE,
-                   IMAQdxValueTypeString, AUTO.c_str());
+                   IMAQdxValueTypeString, AUTO);
   } else {
     SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_WB_MODE,
-                   IMAQdxValueTypeString, MANUAL.c_str());
+                   IMAQdxValueTypeString, MANUAL);
     if (m_whiteBalanceValuePresent)
       SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_WB_VALUE,
                      IMAQdxValueTypeU32, m_whiteBalanceValue);
@@ -203,7 +184,7 @@ void USBCamera::UpdateSettings() {
                    std::string("AutoAperaturePriority").c_str());
   } else {
     SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_EX_MODE,
-                   IMAQdxValueTypeString, MANUAL.c_str());
+                   IMAQdxValueTypeString, MANUAL);
     if (m_exposureValuePresent) {
       double minv = 0.0;
       double maxv = 0.0;
@@ -218,7 +199,7 @@ void USBCamera::UpdateSettings() {
   }
 
   SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_BR_MODE, IMAQdxValueTypeString,
-                 MANUAL.c_str());
+                 MANUAL);
   double minv = 0.0;
   double maxv = 0.0;
   SAFE_IMAQ_CALL(IMAQdxGetAttributeMinimum, m_id, ATTR_BR_VALUE,

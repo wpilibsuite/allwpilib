@@ -11,8 +11,6 @@ using namespace std;
 
 MonoImage::MonoImage() : ImageBase(IMAQ_IMAGE_U8) {}
 
-MonoImage::~MonoImage() {}
-
 /**
  * Look for ellipses in an image.
  * Given some input parameters, look for any number of ellipses in an image.
@@ -29,8 +27,8 @@ vector<EllipseMatch> *MonoImage::DetectEllipses(
   EllipseMatch *e =
       imaqDetectEllipses(m_imaqImage, ellipseDescriptor, curveOptions,
                          shapeDetectionOptions, roi, &numberOfMatches);
-  vector<EllipseMatch> *ellipses = new vector<EllipseMatch>;
-  if (e == NULL) {
+  auto ellipses = new vector<EllipseMatch>;
+  if (e == nullptr) {
     return ellipses;
   }
   for (int i = 0; i < numberOfMatches; i++) {
@@ -43,6 +41,6 @@ vector<EllipseMatch> *MonoImage::DetectEllipses(
 vector<EllipseMatch> *MonoImage::DetectEllipses(
     EllipseDescriptor *ellipseDescriptor) {
   vector<EllipseMatch> *ellipses =
-      DetectEllipses(ellipseDescriptor, NULL, NULL, NULL);
+      DetectEllipses(ellipseDescriptor, nullptr, nullptr, nullptr);
   return ellipses;
 }

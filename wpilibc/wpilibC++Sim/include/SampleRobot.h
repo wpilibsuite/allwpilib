@@ -11,7 +11,7 @@ class SampleRobot : public RobotBase
 {
 public:
 	SampleRobot();
-	virtual ~SampleRobot() {}
+	virtual ~SampleRobot() = default;
 	virtual void RobotInit();
 	virtual void Disabled();
 	virtual void Autonomous();

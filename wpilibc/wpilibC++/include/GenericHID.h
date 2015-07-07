@@ -14,7 +14,7 @@ class GenericHID {
  public:
   enum JoystickHand { kLeftHand = 0, kRightHand = 1 };
 
-  virtual ~GenericHID() {}
+  virtual ~GenericHID() = default;
 
   virtual float GetX(JoystickHand hand = kRightHand) const = 0;
   virtual float GetY(JoystickHand hand = kRightHand) const = 0;

@@ -15,17 +15,18 @@
 #include "HAL/HAL.hpp"
 
 // Allocate each direction separately.
-static Resource *relayChannels = NULL;
+static Resource *relayChannels = nullptr;
 
 /**
- * Common relay initialization method.
- * This code is common to all Relay constructors and initializes the relay and
- * reserves
- * all resources that need to be locked. Initially the relay is set to both
- * lines at 0v.
+ * Relay constructor given a channel.
+ *
+ * This code initializes the relay and reserves all resources that need to be
+ * locked. Initially the relay is set to both lines at 0v.
+ * @param channel The channel number (0-3).
+ * @param direction The direction that the Relay object will control.
  */
-void Relay::InitRelay() {
-  m_table = NULL;
+Relay::Relay(uint32_t channel, Relay::Direction direction)
+    : m_channel(channel), m_direction(direction) {
   char buf[64];
   Resource::CreateResourceObject(&relayChannels,
                                  dio_kNumSystems * kRelayChannels * 2);
@@ -60,16 +61,6 @@ void Relay::InitRelay() {
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
   LiveWindow::GetInstance()->AddActuator("Relay", 1, m_channel, this);
-}
-
-/**
- * Relay constructor given a channel.
- * @param channel The channel number (0-3).
- * @param direction The direction that the Relay object will control.
- */
-Relay::Relay(uint32_t channel, Relay::Direction direction)
-    : m_channel(channel), m_direction(direction) {
-  InitRelay();
 }
 
 /**
@@ -210,7 +201,7 @@ void Relay::ValueChanged(ITable *source, const std::string &key,
 }
 
 void Relay::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     if (Get() == kOn) {
       m_table->PutString("Value", "On");
     } else if (Get() == kForward) {
@@ -224,13 +215,13 @@ void Relay::UpdateTable() {
 }
 
 void Relay::StartLiveWindowMode() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->AddTableListener("Value", this, true);
   }
 }
 
 void Relay::StopLiveWindowMode() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->RemoveTableListener(this);
   }
 }

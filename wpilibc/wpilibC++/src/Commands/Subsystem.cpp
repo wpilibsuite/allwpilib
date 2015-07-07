@@ -15,14 +15,9 @@
  * Creates a subsystem with the given name
  * @param name the name of the subsystem
  */
-Subsystem::Subsystem(const char *name)
-    : m_currentCommand(NULL),
-      m_defaultCommand(NULL),
-      m_initializedDefaultCommand(false) {
+Subsystem::Subsystem(const char *name) {
   m_name = name;
   Scheduler::GetInstance()->RegisterSubsystem(this);
-  m_table = NULL;
-  m_currentCommandChanged = true;
 }
 /**
  * Initialize the default command for this subsystem
@@ -47,12 +42,12 @@ void Subsystem::InitDefaultCommand() {}
  * @param command the default command (or null if there should be none)
  */
 void Subsystem::SetDefaultCommand(Command *command) {
-  if (command == NULL) {
-    m_defaultCommand = NULL;
+  if (command == nullptr) {
+    m_defaultCommand = nullptr;
   } else {
     bool found = false;
     Command::SubsystemSet requirements = command->GetRequirements();
-    Command::SubsystemSet::iterator iter = requirements.begin();
+    auto iter = requirements.begin();
     for (; iter != requirements.end(); iter++) {
       if (*iter == this) {
         found = true;
@@ -68,8 +63,8 @@ void Subsystem::SetDefaultCommand(Command *command) {
 
     m_defaultCommand = command;
   }
-  if (m_table != NULL) {
-    if (m_defaultCommand != NULL) {
+  if (m_table != nullptr) {
+    if (m_defaultCommand != nullptr) {
       m_table->PutBoolean("hasDefault", true);
       m_table->PutString("default", m_defaultCommand->GetName());
     } else {
@@ -115,8 +110,8 @@ Command *Subsystem::GetCurrentCommand() const { return m_currentCommand; }
  */
 void Subsystem::ConfirmCommand() {
   if (m_currentCommandChanged) {
-    if (m_table != NULL) {
-      if (m_currentCommand != NULL) {
+    if (m_table != nullptr) {
+      if (m_currentCommand != nullptr) {
         m_table->PutBoolean("hasCommand", true);
         m_table->PutString("command", m_currentCommand->GetName());
       } else {
@@ -133,14 +128,14 @@ std::string Subsystem::GetSmartDashboardType() const { return "Subsystem"; }
 
 void Subsystem::InitTable(ITable *table) {
   m_table = table;
-  if (m_table != NULL) {
-    if (m_defaultCommand != NULL) {
+  if (m_table != nullptr) {
+    if (m_defaultCommand != nullptr) {
       m_table->PutBoolean("hasDefault", true);
       m_table->PutString("default", m_defaultCommand->GetName());
     } else {
       m_table->PutBoolean("hasDefault", false);
     }
-    if (m_currentCommand != NULL) {
+    if (m_currentCommand != nullptr) {
       m_table->PutBoolean("hasCommand", true);
       m_table->PutString("command", m_currentCommand->GetName());
     } else {

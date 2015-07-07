@@ -38,7 +38,7 @@ public:
 	virtual void StartCompetition() = 0;
 
 protected:
-	virtual ~RobotBase();
+	virtual ~RobotBase() = default;
 	RobotBase();
 
 	DriverStation *m_ds;

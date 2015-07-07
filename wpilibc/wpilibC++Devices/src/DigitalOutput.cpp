@@ -10,12 +10,13 @@
 #include "WPIErrors.h"
 
 /**
- * Create an instance of a DigitalOutput.
- * Creates a digital output given a channel. Common creation routine for all
- * constructors.
+ * Create an instance of a digital output.
+ * Create a digital output given a channel.
+ *
+ * @param channel The digital channel 0-9 are on-board, 10-25 are on the MXP
+ * port
  */
-void DigitalOutput::InitDigitalOutput(uint32_t channel) {
-  m_table = NULL;
+DigitalOutput::DigitalOutput(uint32_t channel) {
   char buf[64];
 
   if (!CheckDigitalChannel(channel)) {
@@ -32,15 +33,6 @@ void DigitalOutput::InitDigitalOutput(uint32_t channel) {
 
   HALReport(HALUsageReporting::kResourceType_DigitalOutput, channel);
 }
-
-/**
- * Create an instance of a digital output.
- * Create a digital output given a channel.
- *
- * @param channel The digital channel 0-9 are on-board, 10-25 are on the MXP
- * port
- */
-DigitalOutput::DigitalOutput(uint32_t channel) { InitDigitalOutput(channel); }
 
 /**
  * Free the resources associated with a digital output.
@@ -210,13 +202,13 @@ void DigitalOutput::ValueChanged(ITable *source, const std::string &key,
 void DigitalOutput::UpdateTable() {}
 
 void DigitalOutput::StartLiveWindowMode() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->AddTableListener("Value", this, true);
   }
 }
 
 void DigitalOutput::StopLiveWindowMode() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->RemoveTableListener(this);
   }
 }

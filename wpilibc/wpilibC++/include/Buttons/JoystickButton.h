@@ -14,7 +14,7 @@
 class JoystickButton : public Button {
  public:
   JoystickButton(GenericHID *joystick, int buttonNumber);
-  virtual ~JoystickButton() {}
+  virtual ~JoystickButton() = default;
 
   virtual bool Get();
 

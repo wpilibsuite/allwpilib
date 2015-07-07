@@ -13,7 +13,7 @@
 #include "networktables/NetworkTable.h"
 #include "HLUsageReporting.h"
 
-ITable *SmartDashboard::m_table = NULL;
+ITable *SmartDashboard::m_table = nullptr;
 std::map<ITable *, Sendable *> SmartDashboard::m_tablesToData;
 
 void SmartDashboard::init() {
@@ -24,14 +24,14 @@ void SmartDashboard::init() {
 
 /**
  * Maps the specified key to the specified value in this table.
- * The key can not be NULL.
+ * The key can not be nullptr.
  * The value can be retrieved by calling the get method with a key that is equal
  * to the original key.
  * @param keyName the key
  * @param value the value
  */
 void SmartDashboard::PutData(std::string key, Sendable *data) {
-  if (data == NULL) {
+  if (data == nullptr) {
     wpi_setGlobalWPIErrorWithContext(NullParameter, "value");
     return;
   }
@@ -50,7 +50,7 @@ void SmartDashboard::PutData(std::string key, Sendable *data) {
  * @param value the value
  */
 void SmartDashboard::PutData(NamedSendable *value) {
-  if (value == NULL) {
+  if (value == nullptr) {
     wpi_setGlobalWPIErrorWithContext(NullParameter, "value");
     return;
   }
@@ -65,9 +65,9 @@ void SmartDashboard::PutData(NamedSendable *value) {
 Sendable *SmartDashboard::GetData(std::string key) {
   ITable *subtable = m_table->GetSubTable(key);
   Sendable *data = m_tablesToData[subtable];
-  if (data == NULL) {
+  if (data == nullptr) {
     wpi_setGlobalWPIErrorWithContext(SmartDashboardMissingKey, key.c_str());
-    return NULL;
+    return nullptr;
   }
   return data;
 }
@@ -75,7 +75,7 @@ Sendable *SmartDashboard::GetData(std::string key) {
 /**
  * Maps the specified key to the specified complex value (such as an array) in
  * this table.
- * The key can not be NULL.
+ * The key can not be nullptr.
  * The value can be retrieved by calling the RetrieveValue method with a key
  * that is equal to the original key.
  * @param keyName the key
@@ -88,7 +88,7 @@ void SmartDashboard::PutValue(std::string keyName, ComplexData &value) {
 /**
  * Retrieves the complex value (such as an array) in this table into the complex
  * data object
- * The key can not be NULL.
+ * The key can not be nullptr.
  * @param keyName the key
  * @param value the object to retrieve the value into
  */
@@ -98,7 +98,7 @@ void SmartDashboard::RetrieveValue(std::string keyName, ComplexData &value) {
 
 /**
  * Maps the specified key to the specified value in this table.
- * The key can not be NULL.
+ * The key can not be nullptr.
  * The value can be retrieved by calling the get method with a key that is equal
  * to the original key.
  * @param keyName the key
@@ -130,7 +130,7 @@ bool SmartDashboard::GetBoolean(std::string keyName, bool defaultValue) {
 
 /**
  * Maps the specified key to the specified value in this table.
- * The key can not be NULL.
+ * The key can not be nullptr.
  * The value can be retrieved by calling the get method with a key that is equal
  * to the original key.
  * @param keyName the key
@@ -162,7 +162,7 @@ double SmartDashboard::GetNumber(std::string keyName, double defaultValue) {
 
 /**
  * Maps the specified key to the specified value in this table.
- * Neither the key nor the value can be NULL.
+ * Neither the key nor the value can be nullptr.
  * The value can be retrieved by calling the get method with a key that is equal
  * to the original key.
  * @param keyName the key

@@ -297,9 +297,7 @@ TEST_F(CANJaguarTest, VoltageModeWorks) {
 
   float setpoints[] = {M_PI, 8.0f, -10.0f};
 
-  for (unsigned int i = 0; i < sizeof(setpoints) / sizeof(setpoints[0]); i++) {
-    float setpoint = setpoints[i];
-
+  for (auto setpoint : setpoints) {
     SetJaguar(kMotorTime, setpoint);
     EXPECT_NEAR(setpoint, m_jaguar->GetOutputVoltage(), kVoltageTolerance);
   }
@@ -354,9 +352,9 @@ TEST_F(CANJaguarTest, DISABLED_CurrentModeWorks) {
 
   float setpoints[] = {1.6f, 2.0f, -1.6f};
 
-  for (unsigned int i = 0; i < sizeof(setpoints) / sizeof(setpoints[0]); i++) {
-    float setpoint = setpoints[i];
-    float expectedCurrent = std::abs(setpoints[i]);
+  for (auto& setpoints_i : setpoints) {
+    float setpoint = setpoints_i;
+    float expectedCurrent = std::abs(setpoints_i);
 
     /* It should get to each setpoint within 10 seconds */
     for (int j = 0; j < 10; j++) {

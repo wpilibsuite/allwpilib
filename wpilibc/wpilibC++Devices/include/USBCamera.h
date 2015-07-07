@@ -36,26 +36,30 @@ class USBCamera : public ErrorBase {
   static constexpr char const *ATTR_BR_VALUE =
       "CameraAttributes::Brightness::Value";
 
+  // Constants for the manual and auto types
+  static constexpr char const* AUTO = "Auto";
+  static constexpr char const* MANUAL = "Manual";
+
  protected:
-  IMAQdxSession m_id;
+  IMAQdxSession m_id = 0;
   std::string m_name;
   bool m_useJpeg;
-  bool m_active;
-  bool m_open;
+  bool m_active = false;
+  bool m_open = false;
 
   std::recursive_mutex m_mutex;
 
-  unsigned int m_width;
-  unsigned int m_height;
-  double m_fps;
-  std::string m_whiteBalance;
-  unsigned int m_whiteBalanceValue;
-  bool m_whiteBalanceValuePresent;
-  std::string m_exposure;
-  unsigned int m_exposureValue;
-  bool m_exposureValuePresent;
-  unsigned int m_brightness;
-  bool m_needSettingsUpdate;
+  unsigned int m_width = 320;
+  unsigned int m_height = 240;
+  double m_fps = 30;
+  std::string m_whiteBalance = AUTO;
+  unsigned int m_whiteBalanceValue = 0;
+  bool m_whiteBalanceValuePresent = false;
+  std::string m_exposure = MANUAL;
+  unsigned int m_exposureValue = 50;
+  bool m_exposureValuePresent = false;
+  unsigned int m_brightness = 80;
+  bool m_needSettingsUpdate = true;
 
   unsigned int GetJpegSize(void *buffer, unsigned int buffSize);
 

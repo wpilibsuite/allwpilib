@@ -16,15 +16,16 @@ const int32_t PWM::kDefaultPwmStepsDown;
 const int32_t PWM::kPwmDisabled;
 
 /**
- * Initialize PWMs given a channel.
+ * Allocate a PWM given a channel number.
  *
- * This method is private and is the common path for all the constructors for creating PWM
- * instances. Checks channel value range and allocates the appropriate channel.
- * The allocation is only done to help users ensure that they don't double assign channels.
+ * Checks channel value range and allocates the appropriate channel.
+ * The allocation is only done to help users ensure that they don't double
+ * assign channels.
+ * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP
+ * port
  */
-void PWM::InitPWM(uint32_t channel)
+PWM::PWM(uint32_t channel)
 {
-	m_table = NULL;
 	char buf[64];
 
 	if (!CheckPWMChannel(channel))
@@ -40,25 +41,6 @@ void PWM::InitPWM(uint32_t channel)
 	m_eliminateDeadband = false;
 
 	m_centerPwm = kPwmDisabled; // In simulation, the same thing.
-}
-
-/**
- * Allocate a PWM given a channel number.
- *
- * @param channel The PWM channel.
- */
-PWM::PWM(uint32_t channel)
-{
-	InitPWM(channel);
-}
-
-/**
- * Free the PWM channel.
- *
- * Free the resource associated with the PWM channel and set the value to 0.
- */
-PWM::~PWM()
-{
 }
 
 /**
@@ -240,21 +222,21 @@ void PWM::ValueChanged(ITable* source, const std::string& key, EntryValue value,
 }
 
 void PWM::UpdateTable() {
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
 		m_table->PutNumber("Value", GetSpeed());
 	}
 }
 
 void PWM::StartLiveWindowMode() {
 	SetSpeed(0);
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
 		m_table->AddTableListener("Value", this, true);
 	}
 }
 
 void PWM::StopLiveWindowMode() {
 	SetSpeed(0);
-	if (m_table != NULL) {
+	if (m_table != nullptr) {
 		m_table->RemoveTableListener(this);
 	}
 }

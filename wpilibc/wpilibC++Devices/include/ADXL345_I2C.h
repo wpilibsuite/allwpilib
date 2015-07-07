@@ -51,7 +51,7 @@ class ADXL345_I2C : public Accelerometer,
 
  public:
   explicit ADXL345_I2C(Port port, Range range = kRange_2G);
-  virtual ~ADXL345_I2C();
+  virtual ~ADXL345_I2C() = default;
 
   // Accelerometer interface
   virtual void SetRange(Range range) override;
@@ -69,8 +69,6 @@ class ADXL345_I2C : public Accelerometer,
   virtual void StartLiveWindowMode() override {}
   virtual void StopLiveWindowMode() override {}
 
- protected:
-  // I2C* m_i2c;
  private:
   ITable *m_table;
 };

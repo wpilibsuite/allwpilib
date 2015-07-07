@@ -19,7 +19,7 @@ class BuiltInAccelerometer : public Accelerometer,
                              public LiveWindowSendable {
  public:
   BuiltInAccelerometer(Range range = kRange_8G);
-  virtual ~BuiltInAccelerometer();
+  virtual ~BuiltInAccelerometer() = default;
 
   // Accelerometer interface
   virtual void SetRange(Range range) override;
@@ -35,5 +35,5 @@ class BuiltInAccelerometer : public Accelerometer,
   virtual void StopLiveWindowMode() override {}
 
  private:
-  ITable *m_table;
+  ITable *m_table = nullptr;
 };

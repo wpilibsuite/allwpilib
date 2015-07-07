@@ -51,7 +51,8 @@
 class ErrorBase {
   // TODO: Consider initializing instance variables and cleanup in destructor
  public:
-  virtual ~ErrorBase();
+  ErrorBase();
+  virtual ~ErrorBase() = default;
   virtual Error& GetError();
   virtual const Error& GetError() const;
   virtual void SetErrnoError(const char* contextMessage, const char* filename,
@@ -82,7 +83,6 @@ class ErrorBase {
   // TODO: Replace globalError with a global list of all errors.
   static MUTEX_ID _globalErrorMutex;
   static Error _globalError;
-  ErrorBase();
 
  private:
   DISALLOW_COPY_AND_ASSIGN(ErrorBase);

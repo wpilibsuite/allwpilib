@@ -31,9 +31,7 @@
  * or be double (2x) the spec'd count.
  */
 void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
-  m_table = NULL;
   m_encodingType = encodingType;
-  m_index = 0;
   switch (encodingType) {
     case k4X: {
       m_encodingScale = 4;
@@ -53,7 +51,7 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
           m_bSource->GetAnalogTriggerForRouting(), reverseDirection, &m_index,
           &status);
       wpi_setErrorWithContext(status, getHALErrorMessage(status));
-      m_counter = NULL;
+      m_counter = nullptr;
       SetMaxPeriod(.5);
       break;
     }
@@ -69,8 +67,6 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
       wpi_setErrorWithContext(-1, "Invalid encodingType argument");
       break;
   }
-  m_distancePerPulse = 1.0;
-  m_pidSource = kDistance;
 
   HALReport(HALUsageReporting::kResourceType_Encoder, m_index, encodingType);
   LiveWindow::GetInstance()->AddSensor("Encoder",
@@ -101,8 +97,7 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
  * or be double (2x) the spec'd count.
  */
 Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection,
-                 EncodingType encodingType)
-    : m_encoder(NULL), m_counter(NULL) {
+                 EncodingType encodingType) {
   m_aSource = new DigitalInput(aChannel);
   m_bSource = new DigitalInput(bChannel);
   InitEncoder(reverseDirection, encodingType);
@@ -136,13 +131,12 @@ Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection,
  * or be double (2x) the spec'd count.
  */
 Encoder::Encoder(DigitalSource *aSource, DigitalSource *bSource,
-                 bool reverseDirection, EncodingType encodingType)
-    : m_encoder(NULL), m_counter(NULL) {
+                 bool reverseDirection, EncodingType encodingType) {
   m_aSource = aSource;
   m_bSource = bSource;
   m_allocatedASource = false;
   m_allocatedBSource = false;
-  if (m_aSource == NULL || m_bSource == NULL)
+  if (m_aSource == nullptr || m_bSource == nullptr)
     wpi_setWPIError(NullParameter);
   else
     InitEncoder(reverseDirection, encodingType);
@@ -174,8 +168,7 @@ Encoder::Encoder(DigitalSource *aSource, DigitalSource *bSource,
  * or be double (2x) the spec'd count.
  */
 Encoder::Encoder(DigitalSource &aSource, DigitalSource &bSource,
-                 bool reverseDirection, EncodingType encodingType)
-    : m_encoder(NULL), m_counter(NULL) {
+                 bool reverseDirection, EncodingType encodingType) {
   m_aSource = &aSource;
   m_bSource = &bSource;
   m_allocatedASource = false;
@@ -555,7 +548,7 @@ void Encoder::SetIndexSource(DigitalSource &source,
 }
 
 void Encoder::UpdateTable() {
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("Speed", GetRate());
     m_table->PutNumber("Distance", GetDistance());
     m_table->PutNumber("Distance per Tick", m_distancePerPulse);

@@ -8,7 +8,7 @@
 #include "SolenoidBase.h"
 
 // Needs to be global since the protected resource spans all Solenoid objects.
-Resource* SolenoidBase::m_allocated = NULL;
+Resource* SolenoidBase::m_allocated = nullptr;
 
 void* SolenoidBase::m_ports[m_maxModules][m_maxPorts];
 /**
@@ -26,11 +26,6 @@ SolenoidBase::SolenoidBase(uint8_t moduleNumber)
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
   }
 }
-
-/**
- * Destructor.
- */
-SolenoidBase::~SolenoidBase() {}
 
 /**
  * Set the value of a solenoid.

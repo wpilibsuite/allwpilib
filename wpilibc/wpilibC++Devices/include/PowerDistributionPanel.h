@@ -40,7 +40,7 @@ class PowerDistributionPanel : public SensorBase, public LiveWindowSendable {
   ITable *GetTable() const override;
 
  private:
-  ITable *m_table;
+  ITable *m_table = nullptr;
   uint8_t m_module;
 };
 

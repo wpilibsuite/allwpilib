@@ -68,5 +68,5 @@ class Gyro : public SensorBase, public PIDSource, public LiveWindowSendable {
   uint32_t m_center;
   PIDSourceParameter m_pidSource;
 
-  ITable *m_table;
+  ITable *m_table = nullptr;
 };

@@ -28,23 +28,13 @@ const double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
   Log().Get(level)
 
 const uint32_t DriverStation::kJoystickPorts;
-DriverStation* DriverStation::m_instance = NULL;
 
 /**
  * DriverStation constructor.
  *
  * This is only called once the first time GetInstance() is called
  */
-DriverStation::DriverStation()
-    : m_task("DriverStation", (FUNCPTR)DriverStation::InitTask),
-      m_newControlData(0),
-      m_packetDataAvailableMultiWait(0),
-      m_waitForDataSem(0),
-      m_userInDisabled(false),
-      m_userInAutonomous(false),
-      m_userInTeleop(false),
-      m_userInTest(false),
-      m_nextMessageTime(0) {
+DriverStation::DriverStation() {
   // All joysticks should default to having zero axes, povs and buttons, so
   // uninitialized memory doesn't get sent to speed controllers.
   for (unsigned int i = 0; i < kJoystickPorts; i++) {
@@ -82,10 +72,9 @@ DriverStation::DriverStation()
 
 DriverStation::~DriverStation() {
   m_task.Stop();
-  m_instance = NULL;
   deleteMultiWait(m_waitForDataSem);
   // Unregister our semaphore.
-  HALSetNewDataSem(0);
+  HALSetNewDataSem(nullptr);
   deleteMultiWait(m_packetDataAvailableMultiWait);
   deleteMutex(m_packetDataAvailableMutex);
   deleteMutex(m_waitForDataMutex);
@@ -120,10 +109,8 @@ void DriverStation::Run() {
  * @return Pointer to the DS instance
  */
 DriverStation* DriverStation::GetInstance() {
-  if (m_instance == NULL) {
-    m_instance = new DriverStation();
-  }
-  return m_instance;
+  static DriverStation instance;
+  return &instance;
 }
 
 /**

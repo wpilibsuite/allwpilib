@@ -44,7 +44,7 @@ class Task : public ErrorBase {
  private:
   FUNCPTR m_function;
   char* m_taskName;
-  TASK m_taskID;
+  TASK m_taskID = NULL_TASK;
   uint32_t m_stackSize;
   int m_priority;
   bool HandleError(STATUS results);

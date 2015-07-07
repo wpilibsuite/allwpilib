@@ -33,8 +33,7 @@ static const char *kEnabled = "enabled";
  * integral and differental terms. The default is 50ms.
  */
 PIDController::PIDController(float Kp, float Ki, float Kd, PIDSource *source,
-                             PIDOutput *output, float period)
-    : m_semaphore(0) {
+                             PIDOutput *output, float period) {
   Initialize(Kp, Ki, Kd, 0.0f, source, output, period);
 }
 
@@ -50,16 +49,13 @@ PIDController::PIDController(float Kp, float Ki, float Kd, PIDSource *source,
  * integral and differental terms. The default is 50ms.
  */
 PIDController::PIDController(float Kp, float Ki, float Kd, float Kf,
-                             PIDSource *source, PIDOutput *output, float period)
-    : m_semaphore(0) {
+                             PIDSource *source, PIDOutput *output, float period) {
   Initialize(Kp, Ki, Kd, Kf, source, output, period);
 }
 
 void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
                                PIDSource *source, PIDOutput *output,
                                float period) {
-  m_table = NULL;
-
   m_semaphore = initializeMutexNormal();
 
   m_controlLoop = new Notifier(PIDController::CallCalculate, this);
@@ -68,22 +64,6 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
   m_I = Ki;
   m_D = Kd;
   m_F = Kf;
-
-  m_maximumOutput = 1.0;
-  m_minimumOutput = -1.0;
-
-  m_maximumInput = 0;
-  m_minimumInput = 0;
-
-  m_continuous = false;
-  m_enabled = false;
-  m_setpoint = 0;
-
-  m_prevError = 0;
-  m_totalError = 0;
-  m_tolerance = .05;
-
-  m_result = 0;
 
   m_pidInput = source;
   m_pidOutput = output;
@@ -94,8 +74,6 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
   static int32_t instances = 0;
   instances++;
   HALReport(HALUsageReporting::kResourceType_PIDController, instances);
-
-  m_toleranceType = kNoTolerance;
 }
 
 /**
@@ -140,8 +118,8 @@ void PIDController::Calculate() {
   }
   END_REGION;
 
-  if (pidInput == NULL) return;
-  if (pidOutput == NULL) return;
+  if (pidInput == nullptr) return;
+  if (pidOutput == nullptr) return;
 
   if (enabled) {
     {
@@ -205,7 +183,7 @@ void PIDController::SetPID(double p, double i, double d) {
   }
   END_REGION;
 
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("p", m_P);
     m_table->PutNumber("i", m_I);
     m_table->PutNumber("d", m_D);
@@ -229,7 +207,7 @@ void PIDController::SetPID(double p, double i, double d, double f) {
   }
   END_REGION;
 
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("p", m_P);
     m_table->PutNumber("i", m_I);
     m_table->PutNumber("d", m_D);
@@ -346,7 +324,7 @@ void PIDController::SetSetpoint(float setpoint) {
   }
   END_REGION;
 
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber("setpoint", m_setpoint);
   }
 }
@@ -451,7 +429,7 @@ void PIDController::Enable() {
   CRITICAL_REGION(m_semaphore) { m_enabled = true; }
   END_REGION;
 
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutBoolean("enabled", true);
   }
 }
@@ -466,7 +444,7 @@ void PIDController::Disable() {
   }
   END_REGION;
 
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutBoolean("enabled", false);
   }
 }
@@ -500,9 +478,9 @@ std::string PIDController::GetSmartDashboardType() const {
 }
 
 void PIDController::InitTable(ITable *table) {
-  if (m_table != NULL) m_table->RemoveTableListener(this);
+  if (m_table != nullptr) m_table->RemoveTableListener(this);
   m_table = table;
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutNumber(kP, GetP());
     m_table->PutNumber(kI, GetI());
     m_table->PutNumber(kD, GetD());

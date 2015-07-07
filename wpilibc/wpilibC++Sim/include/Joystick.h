@@ -66,12 +66,11 @@ public:
 
 private:
 	DISALLOW_COPY_AND_ASSIGN(Joystick);
-	void InitJoystick(uint32_t numAxisTypes, uint32_t numButtonTypes);
 
-	DriverStation *m_ds;
+	DriverStation *m_ds = nullptr;
 	uint32_t m_port;
-	uint32_t *m_axes;
-	uint32_t *m_buttons;
+	uint32_t *m_axes = nullptr;
+	uint32_t *m_buttons = nullptr;
 };
 
 #endif

@@ -19,46 +19,24 @@ static const char *kIsParented = "isParented";
 
 int Command::m_commandCounter = 0;
 
-void Command::InitCommand(const char *name, double timeout) {
-  m_commandID = m_commandCounter++;
-  m_timeout = timeout;
-  m_locked = false;
-  m_startTime = -1;
-  m_initialized = false;
-  m_running = false;
-  m_interruptible = true;
-  m_canceled = false;
-  m_runWhenDisabled = false;
-  m_parent = NULL;
-  m_name = name == NULL ? std::string() : name;
-  m_table = NULL;
-}
-
 /**
  * Creates a new command.
  * The name of this command will be default.
  */
-Command::Command() { InitCommand(NULL, -1.0); }
+Command::Command() : Command(nullptr, -1.0) {}
 
 /**
  * Creates a new command with the given name and no timeout.
  * @param name the name for this command
  */
-Command::Command(const char *name) {
-  if (name == NULL) wpi_setWPIErrorWithContext(NullParameter, "name");
-  InitCommand(name, -1.0);
-}
+Command::Command(const char *name) : Command(name, -1.0) {}
 
 /**
  * Creates a new command with the given timeout and a default name.
  * @param timeout the time (in seconds) before this command "times out"
  * @see Command#isTimedOut() isTimedOut()
  */
-Command::Command(double timeout) {
-  if (timeout < 0.0)
-    wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
-  InitCommand(NULL, timeout);
-}
+Command::Command(double timeout) : Command(nullptr, timeout) {}
 
 /**
  * Creates a new command with the given name and timeout.
@@ -67,14 +45,16 @@ Command::Command(double timeout) {
  * @see Command#isTimedOut() isTimedOut()
  */
 Command::Command(const char *name, double timeout) {
-  if (name == NULL) wpi_setWPIErrorWithContext(NullParameter, "name");
+  if (name == nullptr) wpi_setWPIErrorWithContext(NullParameter, "name");
   if (timeout < 0.0)
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
-  InitCommand(name, timeout);
+
+  m_timeout = timeout;
+  m_name = name == nullptr ? std::string() : name;
 }
 
 Command::~Command() {  // TODO deal with cleaning up all listeners
-  /*if (m_table != NULL){
+  /*if (m_table != nullptr){
           m_table->RemoveChangeListener(kRunning, this);
   }*/
 }
@@ -124,7 +104,7 @@ double Command::TimeSinceInitialized() const {
 void Command::Requires(Subsystem *subsystem) {
   if (!AssertUnlocked("Can not add new requirement to command")) return;
 
-  if (subsystem != NULL)
+  if (subsystem != nullptr)
     m_requirements.insert(subsystem);
   else
     wpi_setWPIErrorWithContext(NullParameter, "subsystem");
@@ -148,7 +128,7 @@ void Command::Removed() {
   m_initialized = false;
   m_canceled = false;
   m_running = false;
-  if (m_table != NULL) m_table->PutBoolean(kRunning, false);
+  if (m_table != nullptr) m_table->PutBoolean(kRunning, false);
 }
 
 /**
@@ -160,7 +140,7 @@ void Command::Removed() {
  */
 void Command::Start() {
   LockChanges();
-  if (m_parent != NULL)
+  if (m_parent != nullptr)
     wpi_setWPIErrorWithContext(
         CommandIllegalUse,
         "Can not start a command that is part of a command group");
@@ -173,7 +153,7 @@ void Command::Start() {
  * @return whether or not the command should stay within the {@link Scheduler}.
  */
 bool Command::Run() {
-  if (!m_runWhenDisabled && m_parent == NULL && RobotState::IsDisabled())
+  if (!m_runWhenDisabled && m_parent == nullptr && RobotState::IsDisabled())
     Cancel();
 
   if (IsCanceled()) return false;
@@ -255,16 +235,16 @@ bool Command::AssertUnlocked(const char *message) {
  * @param parent the parent
  */
 void Command::SetParent(CommandGroup *parent) {
-  if (parent == NULL) {
+  if (parent == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "parent");
-  } else if (m_parent != NULL) {
+  } else if (m_parent != nullptr) {
     wpi_setWPIErrorWithContext(CommandIllegalUse,
                                "Can not give command to a command group after "
                                "already being put in a command group");
   } else {
     LockChanges();
     m_parent = parent;
-    if (m_table != NULL) {
+    if (m_table != nullptr) {
       m_table->PutBoolean(kIsParented, true);
     }
   }
@@ -285,7 +265,7 @@ void Command::SetParent(CommandGroup *parent) {
 void Command::StartRunning() {
   m_running = true;
   m_startTime = -1;
-  if (m_table != NULL) m_table->PutBoolean(kRunning, true);
+  if (m_table != nullptr) m_table->PutBoolean(kRunning, true);
 }
 
 /**
@@ -308,7 +288,7 @@ bool Command::IsRunning() const { return m_running; }
  * instead.</p>
  */
 void Command::Cancel() {
-  if (m_parent != NULL)
+  if (m_parent != nullptr)
     wpi_setWPIErrorWithContext(
         CommandIllegalUse,
         "Can not cancel a command that is part of a command group");
@@ -348,7 +328,7 @@ void Command::SetInterruptible(bool interruptible) {
 /**
  * Checks if the command requires the given {@link Subsystem}.
  * @param system the system
- * @return whether or not the subsystem is required (false if given NULL)
+ * @return whether or not the subsystem is required (false if given nullptr)
  */
 bool Command::DoesRequire(Subsystem *system) const {
   return m_requirements.count(system) > 0;
@@ -390,12 +370,12 @@ std::string Command::GetName() {
 std::string Command::GetSmartDashboardType() const { return "Command"; }
 
 void Command::InitTable(ITable *table) {
-  if (m_table != NULL) m_table->RemoveTableListener(this);
+  if (m_table != nullptr) m_table->RemoveTableListener(this);
   m_table = table;
-  if (m_table != NULL) {
+  if (m_table != nullptr) {
     m_table->PutString(kName, GetName());
     m_table->PutBoolean(kRunning, IsRunning());
-    m_table->PutBoolean(kIsParented, m_parent != NULL);
+    m_table->PutBoolean(kIsParented, m_parent != nullptr);
     m_table->AddTableListener(kRunning, this, false);
   }
 }

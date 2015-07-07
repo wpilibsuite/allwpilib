@@ -14,18 +14,18 @@
 #include <string>
 
 #define wpi_assert(condition) \
-  wpi_assert_impl(condition, #condition, NULL, __FILE__, __LINE__, __FUNCTION__)
+  wpi_assert_impl(condition, #condition, nullptr, __FILE__, __LINE__, __FUNCTION__)
 #define wpi_assertWithMessage(condition, message)                     \
   wpi_assert_impl(condition, #condition, message, __FILE__, __LINE__, \
                   __FUNCTION__)
 
 #define wpi_assertEqual(a, b) \
-  wpi_assertEqual_impl(a, b, #a, #b, NULL, __FILE__, __LINE__, __FUNCTION__)
+  wpi_assertEqual_impl(a, b, #a, #b, nullptr, __FILE__, __LINE__, __FUNCTION__)
 #define wpi_assertEqualWithMessage(a, b, message) \
   wpi_assertEqual_impl(a, b, #a, #b, message, __FILE__, __LINE__, __FUNCTION__)
 
 #define wpi_assertNotEqual(a, b) \
-  wpi_assertNotEqual_impl(a, b, #a, #b, NULL, __FILE__, __LINE__, __FUNCTION__)
+  wpi_assertNotEqual_impl(a, b, #a, #b, nullptr, __FILE__, __LINE__, __FUNCTION__)
 #define wpi_assertNotEqualWithMessage(a, b, message)                 \
   wpi_assertNotEqual_impl(a, b, #a, #b, message, __FILE__, __LINE__, \
                           __FUNCTION__)

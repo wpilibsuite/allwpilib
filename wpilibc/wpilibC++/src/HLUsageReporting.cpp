@@ -1,20 +1,20 @@
 
 #include "HLUsageReporting.h"
 
-HLUsageReportingInterface* HLUsageReporting::impl = 0;
+HLUsageReportingInterface* HLUsageReporting::impl = nullptr;
 
 void HLUsageReporting::SetImplementation(HLUsageReportingInterface* i) {
   impl = i;
 }
 
 void HLUsageReporting::ReportScheduler() {
-  if (impl != 0) {
+  if (impl != nullptr) {
     impl->ReportScheduler();
   }
 }
 
 void HLUsageReporting::ReportSmartDashboard() {
-  if (impl != 0) {
+  if (impl != nullptr) {
     impl->ReportSmartDashboard();
   }
 }

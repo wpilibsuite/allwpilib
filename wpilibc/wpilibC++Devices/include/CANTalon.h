@@ -66,7 +66,7 @@ class CANTalon : public MotorSafety,
   virtual void SetSetpoint(float value) override;
   virtual void Disable() override;
   virtual void EnableControl();
-  virtual void Enable();
+  virtual void Enable() override;
   virtual void SetP(double p) override;
   virtual void SetI(double i) override;
   virtual void SetD(double d) override;
@@ -183,14 +183,14 @@ class CANTalon : public MotorSafety,
   int m_deviceNumber;
   CanTalonSRX *m_impl;
   MotorSafetyHelper *m_safetyHelper;
-  int m_profile;  // Profile from CANTalon to use. Set to zero until we can
-                  // actually test this.
+  int m_profile = 0;  // Profile from CANTalon to use. Set to zero until we can
+                      // actually test this.
 
-  bool m_controlEnabled;
-  ControlMode m_controlMode;
+  bool m_controlEnabled = true;
+  ControlMode m_controlMode = kPercentVbus;
   TalonControlMode m_sendMode;
 
-  double m_setPoint;
+  double m_setPoint = 0;
   static const unsigned int kDelayForSolicitedSignalsUs = 4000;
   /**
    * Fixup the sendMode so Set() serializes the correct demand value.

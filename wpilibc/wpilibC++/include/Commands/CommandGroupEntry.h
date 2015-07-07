@@ -18,14 +18,13 @@ class CommandGroupEntry {
     kSequence_BranchChild
   } Sequence;
 
-  CommandGroupEntry();
-  CommandGroupEntry(Command *command, Sequence state);
-  CommandGroupEntry(Command *command, Sequence state, double timeout);
+  CommandGroupEntry() = default;
+  CommandGroupEntry(Command *command, Sequence state, double timeout = -1.0);
   bool IsTimedOut() const;
 
   double m_timeout;
-  Command *m_command;
-  Sequence m_state;
+  Command *m_command = nullptr;
+  Sequence m_state = kSequence_InSequence;
 };
 
 #endif

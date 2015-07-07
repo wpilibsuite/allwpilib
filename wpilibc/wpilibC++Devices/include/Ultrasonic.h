@@ -90,5 +90,5 @@ class Ultrasonic : public SensorBase,
   Ultrasonic *m_nextSensor;
   DistanceUnit m_units;
 
-  ITable *m_table;
+  ITable *m_table = nullptr;
 };

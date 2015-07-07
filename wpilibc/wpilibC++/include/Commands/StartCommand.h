@@ -13,7 +13,7 @@
 class StartCommand : public Command {
  public:
   StartCommand(Command *commandToStart);
-  virtual ~StartCommand() {}
+  virtual ~StartCommand() = default;
 
  protected:
   virtual void Initialize();

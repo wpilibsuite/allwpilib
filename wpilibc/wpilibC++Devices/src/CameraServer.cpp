@@ -10,13 +10,10 @@
 #include <netdb.h>
 
 constexpr uint8_t CameraServer::kMagicNumber[];
-CameraServer* CameraServer::s_instance = nullptr;
 
 CameraServer* CameraServer::GetInstance() {
-  if (s_instance == NULL) {
-    s_instance = new CameraServer;
-  }
-  return s_instance;
+  static CameraServer instance;
+  return &instance;
 }
 
 CameraServer::CameraServer()
@@ -225,7 +222,7 @@ void CameraServer::Serve() {
         std::unique_lock<std::recursive_mutex> lock(m_imageMutex);
         m_newImageVariable.wait(lock);
         imageData = m_imageData;
-        m_imageData = std::make_tuple(nullptr, 0, 0, false);
+        m_imageData = std::make_tuple<uint8_t*>(nullptr, 0, 0, false);
       }
 
       unsigned int size = std::get<1>(imageData);

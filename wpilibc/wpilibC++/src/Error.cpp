@@ -19,10 +19,7 @@
 #include "Utility.h"
 bool Error::m_suspendOnErrorEnabled = false;
 
-Error::Error()
-    : m_code(0), m_lineNumber(0), m_originatingObject(NULL), m_timestamp(0.0) {}
-
-Error::~Error() {}
+Error::Error() {}
 
 void Error::Clone(Error& error) {
   m_code = error.m_code;
@@ -71,7 +68,7 @@ void Error::Set(Code code, const char* contextMessage, const char* filename,
     Report();
   }
 
-  if (m_suspendOnErrorEnabled) suspendTask(0);
+  if (m_suspendOnErrorEnabled) suspendTask(nullptr);
 }
 
 void Error::Report() {
@@ -93,6 +90,6 @@ void Error::Clear() {
   m_filename = "";
   m_function = "";
   m_lineNumber = 0;
-  m_originatingObject = NULL;
+  m_originatingObject = nullptr;
   m_timestamp = 0.0;
 }

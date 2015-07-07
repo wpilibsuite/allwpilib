@@ -11,13 +11,17 @@
 #include "LiveWindow/LiveWindow.h"
 
 /**
- * Common relay initialization method.
- * This code is common to all Relay constructors and initializes the relay and reserves
- * all resources that need to be locked. Initially the relay is set to both lines at 0v.
+ * Relay constructor given a channel.
+ *
+ * This code initializes the relay and reserves all resources that need to be
+ * locked. Initially the relay is set to both lines at 0v.
+ * @param channel The channel number (0-3).
+ * @param direction The direction that the Relay object will control.
  */
-void Relay::InitRelay()
+Relay::Relay(uint32_t channel, Relay::Direction direction)
+	: m_channel (channel)
+	, m_direction (direction)
 {
-	m_table = NULL;
 	char buf[64];
 	if (!SensorBase::CheckRelayChannel(m_channel))
 	{
@@ -30,18 +34,6 @@ void Relay::InitRelay()
 	impl = new SimContinuousOutput(buf); // TODO: Allow two different relays (targetting the different halves of a relay) to be combined to control one motor.
 	LiveWindow::GetInstance()->AddActuator("Relay", 1, m_channel, this);
 	go_pos = go_neg = false;
-}
-
-/**
- * Relay constructor given a channel.
- * @param channel The channel number.
- * @param direction The direction that the Relay object will control.
- */
-Relay::Relay(uint32_t channel, Relay::Direction direction)
-	: m_channel (channel)
-	, m_direction (direction)
-{
-	InitRelay();
 }
 
 /**
@@ -156,7 +148,7 @@ void Relay::ValueChanged(ITable* source, const std::string& key, EntryValue valu
 }
 
 void Relay::UpdateTable() {
-	if(m_table != NULL){
+	if(m_table != nullptr){
 		if (Get() == kOn) {
 			m_table->PutString("Value", "On");
 		}
@@ -173,13 +165,13 @@ void Relay::UpdateTable() {
 }
 
 void Relay::StartLiveWindowMode() {
-	if(m_table != NULL){
+	if(m_table != nullptr){
 		m_table->AddTableListener("Value", this, true);
 	}
 }
 
 void Relay::StopLiveWindowMode() {
-	if(m_table != NULL){
+	if(m_table != nullptr){
 		m_table->RemoveTableListener(this);
 	}
 }
