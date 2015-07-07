@@ -52,7 +52,7 @@ class MessageReader : private WireDecoder {
                          unsigned int proto_rev);
   ~MessageReader();
 
-  bool Run();
+  bool ReadMessage();
 
   using WireDecoder::set_proto_rev;
   using WireDecoder::proto_rev;

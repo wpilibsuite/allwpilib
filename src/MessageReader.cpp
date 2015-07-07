@@ -24,7 +24,7 @@ MessageReader::MessageReader(MessageHandler& handler, raw_istream& is,
 
 MessageReader::~MessageReader() {}
 
-bool MessageReader::Run() {
+bool MessageReader::ReadMessage() {
   unsigned int msg_type;
   if (!Read8(&msg_type)) return false;
   switch (msg_type) {
