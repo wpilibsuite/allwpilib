@@ -46,10 +46,8 @@ void Subsystem::SetDefaultCommand(Command* command) {
     m_defaultCommand = nullptr;
   } else {
     bool found = false;
-    Command::SubsystemSet requirements = command->GetRequirements();
-    auto iter = requirements.begin();
-    for (; iter != requirements.end(); iter++) {
-      if (*iter == this) {
+    for (auto requirement : command->GetRequirements()) {
+      if (requirement == this) {
         found = true;
         break;
       }

@@ -61,9 +61,8 @@ void SendableChooser::InitTable(std::shared_ptr<ITable> subtable) {
   std::vector<std::string> keys;
   m_table = subtable;
   if (m_table != nullptr) {
-    std::map<std::string, void*>::iterator iter;
-    for (iter = m_choices.begin(); iter != m_choices.end(); iter++) {
-      keys.push_back(iter->first);
+    for (auto& choice : m_choices) {
+      keys.push_back(choice.first);
     }
     m_table->PutValue(kOptions, nt::Value::MakeStringArray(std::move(keys)));
     m_table->PutString(kDefault, m_defaultChoice);

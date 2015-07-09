@@ -220,7 +220,7 @@ bool Command::IsTimedOut() const {
  * @return the requirements (as an std::set of {@link Subsystem Subsystems}
  *         pointers) of this command
  */
-Command::SubsystemSet Command::GetRequirements() const {
+const Command::SubsystemSet& Command::GetRequirements() const {
   return m_requirements;
 }
 

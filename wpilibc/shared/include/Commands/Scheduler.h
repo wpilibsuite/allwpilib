@@ -51,7 +51,7 @@ class Scheduler : public ErrorBase, public NamedSendable {
 
   Command::SubsystemSet m_subsystems;
   priority_mutex m_buttonsLock;
-  typedef std::vector<ButtonScheduler*> ButtonVector;
+  typedef std::vector<std::unique_ptr<ButtonScheduler>> ButtonVector;
   ButtonVector m_buttons;
   typedef std::vector<Command*> CommandVector;
   priority_mutex m_additionsLock;
