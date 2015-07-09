@@ -72,9 +72,9 @@ public class I2C extends SensorBase {
    * over each transaction.
    *
    * @param dataToSend Buffer of data to send as part of the transaction.
-   * @param sendSize Number of bytes to send as part of the transaction. [0..6]
+   * @param sendSize Number of bytes to send as part of the transaction.
    * @param dataReceived Buffer to read data into.
-   * @param receiveSize Number of bytes to read from the device. [0..7]
+   * @param receiveSize Number of bytes to read from the device.
    * @return Transfer Aborted... false for success, true for aborted.
    */
   public synchronized boolean transaction(byte[] dataToSend, int sendSize, byte[] dataReceived,
@@ -88,15 +88,6 @@ public class I2C extends SensorBase {
     aborted =
         I2CJNI.i2CTransaction((byte) m_port.getValue(), (byte) m_deviceAddress, dataToSendBuffer,
             (byte) sendSize, dataReceivedBuffer, (byte) receiveSize) != 0;
-    /*
-     * if (status.get() == HALUtil.PARAMETER_OUT_OF_RANGE) { if (sendSize > 6) {
-     * throw new BoundaryException(BoundaryException.getMessage( sendSize, 0,
-     * 6)); } else if (receiveSize > 7) { throw new
-     * BoundaryException(BoundaryException.getMessage( receiveSize, 0, 7)); }
-     * else { throw new RuntimeException(
-     * HALLibrary.PARAMETER_OUT_OF_RANGE_MESSAGE); } }
-     * HALUtil.checkStatus(status);
-     */
     if (receiveSize > 0 && dataReceived != null) {
       dataReceivedBuffer.get(dataReceived);
     }
@@ -156,18 +147,22 @@ public class I2C extends SensorBase {
   /**
    * Execute a read transaction with the device.
    *
-   * Read 1 to 7 bytes from a device. Most I2C devices will auto-increment the
-   * register pointer internally allowing you to read up to 7 consecutive
+   * Read bytes from a device. Most I2C devices will auto-increment the
+   * register pointer internally allowing you to read consecutive
    * registers on a device in a single transaction.
    *
    * @param registerAddress The register to read first in the transaction.
-   * @param count The number of bytes to read in the transaction. [1..7]
+   * @param count The number of bytes to read in the transaction.
    * @param buffer A pointer to the array of bytes to store the data read from
    *        the device.
    * @return Transfer Aborted... false for success, true for aborted.
    */
   public boolean read(int registerAddress, int count, byte[] buffer) {
-    BoundaryException.assertWithinBounds(count, 1, 7);
+    if (count < 1) {
+      throw new BoundaryException("Value must be at least 1, " + count +
+                                  " given");
+    }
+
     if (buffer == null) {
       throw new NullPointerException("Null return buffer was given");
     }
@@ -180,16 +175,20 @@ public class I2C extends SensorBase {
   /**
    * Execute a read only transaction with the device.
    *
-   * Read 1 to 7 bytes from a device. This method does not write any data to
-   * prompt the device.
+   * Read bytes from a device. This method does not write any data to prompt
+   * the device.
    *
    * @param buffer A pointer to the array of bytes to store the data read from
    *        the device.
-   * @param count The number of bytes to read in the transaction. [1..7]
+   * @param count The number of bytes to read in the transaction.
    * @return Transfer Aborted... false for success, true for aborted.
    */
   public boolean readOnly(byte[] buffer, int count) {
-    BoundaryException.assertWithinBounds(count, 1, 7);
+    if (count < 1) {
+      throw new BoundaryException("Value must be at least 1, " + count +
+                                  " given");
+    }
+
     if (buffer == null) {
       throw new NullPointerException("Null return buffer was given");
     }

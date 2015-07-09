@@ -37,24 +37,13 @@ I2C::~I2C() { i2CClose(m_port); }
  * over each transaction.
  *
  * @param dataToSend Buffer of data to send as part of the transaction.
- * @param sendSize Number of bytes to send as part of the transaction. [0..6]
+ * @param sendSize Number of bytes to send as part of the transaction.
  * @param dataReceived Buffer to read data into.
- * @param receiveSize Number of bytes to read from the device. [0..7]
+ * @param receiveSize Number of bytes to read from the device.
  * @return Transfer Aborted... false for success, true for aborted.
  */
 bool I2C::Transaction(uint8_t *dataToSend, uint8_t sendSize,
                       uint8_t *dataReceived, uint8_t receiveSize) {
-  if (sendSize > 6)  // Optional, provides better error message.
-  {
-    wpi_setWPIErrorWithContext(ParameterOutOfRange, "sendSize");
-    return true;
-  }
-  if (receiveSize > 7)  // Optional, provides better error message.
-  {
-    wpi_setWPIErrorWithContext(ParameterOutOfRange, "receiveSize");
-    return true;
-  }
-
   int32_t status = 0;
   status = i2CTransaction(m_port, m_deviceAddress, dataToSend, sendSize,
                           dataReceived, receiveSize);
@@ -115,19 +104,18 @@ bool I2C::WriteBulk(uint8_t *data, uint8_t count) {
 /**
  * Execute a read transaction with the device.
  *
- * Read 1 to 7 bytes from a device.
- * Most I2C devices will auto-increment the register pointer internally
- *   allowing you to read up to 7 consecutive registers on a device in a
- *   single transaction.
+ * Read bytes from a device.
+ * Most I2C devices will auto-increment the register pointer internally allowing
+ *   you to read consecutive registers on a device in a single transaction.
  *
  * @param registerAddress The register to read first in the transaction.
- * @param count The number of bytes to read in the transaction. [1..7]
+ * @param count The number of bytes to read in the transaction.
  * @param buffer A pointer to the array of bytes to store the data read from the
  * device.
  * @return Transfer Aborted... false for success, true for aborted.
  */
 bool I2C::Read(uint8_t registerAddress, uint8_t count, uint8_t *buffer) {
-  if (count < 1 || count > 7) {
+  if (count < 1) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "count");
     return true;
   }
@@ -144,19 +132,18 @@ bool I2C::Read(uint8_t registerAddress, uint8_t count, uint8_t *buffer) {
 /**
  * Execute a read only transaction with the device.
  *
- * Read 1 to 7 bytes from a device. This method does not write any data to
- * prompt
- * the device.
+ * Read bytes from a device. This method does not write any data to prompt the
+ * device.
  *
  * @param buffer
  *            A pointer to the array of bytes to store the data read from
  *            the device.
  * @param count
- *            The number of bytes to read in the transaction. [1..7]
+              The number of bytes to read in the transaction.
  * @return Transfer Aborted... false for success, true for aborted.
  */
 bool I2C::ReadOnly(uint8_t count, uint8_t *buffer) {
-  if (count < 1 || count > 7) {
+  if (count < 1) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "count");
     return true;
   }

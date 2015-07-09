@@ -644,7 +644,6 @@ void remapDigitalSource(bool analogTrigger, uint32_t &pin, uint8_t &module) {
   }
 }
 
-
 /**
  * Set the source object that causes the counter to count up.
  * Set the up counting DigitalSource.
@@ -1360,9 +1359,9 @@ void i2CInitialize(uint8_t port, int32_t *status) {
  * This is a lower-level interface to the I2C hardware giving you more control over each transaction.
  *
  * @param dataToSend Buffer of data to send as part of the transaction.
- * @param sendSize Number of bytes to send as part of the transaction. [0..6]
+ * @param sendSize Number of bytes to send as part of the transaction.
  * @param dataReceived Buffer to read data into.
- * @param receiveSize Number of bytes to read from the device. [0..7]
+ * @param receiveSize Number of bytes to read from the device.
  * @return Transfer Aborted... false for success, true for aborted.
  */
 int32_t i2CTransaction(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived, uint8_t receiveSize)
@@ -1371,16 +1370,7 @@ int32_t i2CTransaction(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend,
 		//Set port out of range error here
 		return -1;
 	}
-	/*if (sendSize > 6) // Optional, provides better error message.	TODO: Are these limits still right? Implement error. Check for null buffer
-	{
-		wpi_setWPIErrorWithContext(ParameterOutOfRange, "sendSize");
-		return true;
-	}
-	if (receiveSize > 7) // Optional, provides better error message.
-	{
-		wpi_setWPIErrorWithContext(ParameterOutOfRange, "receiveSize");
-		return true;
-	}*/
+
 	int32_t handle = port == 0 ? i2COnBoardHandle:i2CMXPHandle;
 	priority_recursive_mutex &lock = port == 0 ? digitalI2COnBoardMutex : digitalI2CMXPMutex;
 
@@ -1406,11 +1396,7 @@ int32_t i2CWrite(uint8_t port, uint8_t deviceAddress, uint8_t* dataToSend, uint8
 		//Set port out of range error here
 		return -1;
 	}
-	/*if (sendSize > 6) // Optional, provides better error message.	TODO: Are these limits still right? Implement error. Check for null buffer
-	{
-		wpi_setWPIErrorWithContext(ParameterOutOfRange, "sendSize");
-		return true;
-	}*/
+
 	int32_t handle = port == 0 ? i2COnBoardHandle:i2CMXPHandle;
 	priority_recursive_mutex &lock = port == 0 ? digitalI2COnBoardMutex : digitalI2CMXPMutex;
 	{
@@ -1422,13 +1408,12 @@ int32_t i2CWrite(uint8_t port, uint8_t deviceAddress, uint8_t* dataToSend, uint8
 /**
  * Execute a read transaction with the device.
  *
- * Read 1 to 7 bytes from a device.
- * Most I2C devices will auto-increment the register pointer internally
- *   allowing you to read up to 7 consecutive registers on a device in a
- *   single transaction.
+ * Read bytes from a device.
+ * Most I2C devices will auto-increment the register pointer internally allowing
+ *   you to read consecutive registers on a device in a single transaction.
  *
  * @param registerAddress The register to read first in the transaction.
- * @param count The number of bytes to read in the transaction. [1..7]
+ * @param count The number of bytes to read in the transaction.
  * @param buffer A pointer to the array of bytes to store the data read from the device.
  * @return Transfer Aborted... false for success, true for aborted.
  */
@@ -1438,16 +1423,7 @@ int32_t i2CRead(uint8_t port, uint8_t deviceAddress, uint8_t *buffer, uint8_t co
 		//Set port out of range error here
 		return -1;
 	}
-	/*	if (count < 1 || count > 7) Todo: Are these limits still right? Implement error
-		{
-			wpi_setWPIErrorWithContext(ParameterOutOfRange, "count");
-			return true;
-		}
-		if (buffer == NULL)
-		{
-			wpi_setWPIErrorWithContext(NullParameter, "buffer");
-			return true;
-		}*/
+
 	int32_t handle = port == 0 ? i2COnBoardHandle:i2CMXPHandle;
 	priority_recursive_mutex &lock = port == 0 ? digitalI2COnBoardMutex : digitalI2CMXPMutex;
 	{
