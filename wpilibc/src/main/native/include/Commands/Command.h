@@ -195,7 +195,7 @@ class Command : public ErrorBase, public SendableBase {
    * @return The requirements (as an std::set of Subsystem pointers) of this
    *         command
    */
-  SubsystemSet GetRequirements() const;
+  const SubsystemSet& GetRequirements() const;
 
   /**
    * Returns the CommandGroup that this command is a part of.

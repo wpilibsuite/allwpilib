@@ -34,14 +34,14 @@ class CommandTest : public testing::Test {
    */
   void TeardownScheduler() { Scheduler::GetInstance()->ResetAll(); }
 
-  void AssertCommandState(MockCommand& command, int32_t initialize,
+  void AssertCommandState(MockCommand* command, int32_t initialize,
                           int32_t execute, int32_t isFinished, int32_t end,
                           int32_t interrupted) {
-    EXPECT_EQ(initialize, command.GetInitializeCount());
-    EXPECT_EQ(execute, command.GetExecuteCount());
-    EXPECT_EQ(isFinished, command.GetIsFinishedCount());
-    EXPECT_EQ(end, command.GetEndCount());
-    EXPECT_EQ(interrupted, command.GetInterruptedCount());
+    EXPECT_EQ(initialize, command->GetInitializeCount());
+    EXPECT_EQ(execute, command->GetExecuteCount());
+    EXPECT_EQ(isFinished, command->GetIsFinishedCount());
+    EXPECT_EQ(end, command->GetEndCount());
+    EXPECT_EQ(interrupted, command->GetInterruptedCount());
   }
 };
 
@@ -63,12 +63,12 @@ class ASubsystem : public Subsystem {
 
 // CommandParallelGroupTest ported from CommandParallelGroupTest.java
 TEST_F(CommandTest, ParallelCommands) {
-  MockCommand command1;
-  MockCommand command2;
+  auto command1 = new MockCommand;
+  auto command2 = new MockCommand;
   CommandGroup commandGroup;
 
-  commandGroup.AddParallel(&command1);
-  commandGroup.AddParallel(&command2);
+  commandGroup.AddParallel(command1);
+  commandGroup.AddParallel(command2);
 
   AssertCommandState(command1, 0, 0, 0, 0, 0);
   AssertCommandState(command2, 0, 0, 0, 0, 0);
@@ -84,14 +84,14 @@ TEST_F(CommandTest, ParallelCommands) {
   Scheduler::GetInstance()->Run();
   AssertCommandState(command1, 1, 2, 2, 0, 0);
   AssertCommandState(command2, 1, 2, 2, 0, 0);
-  command1.SetHasFinished(true);
+  command1->SetHasFinished(true);
   Scheduler::GetInstance()->Run();
   AssertCommandState(command1, 1, 3, 3, 1, 0);
   AssertCommandState(command2, 1, 3, 3, 0, 0);
   Scheduler::GetInstance()->Run();
   AssertCommandState(command1, 1, 3, 3, 1, 0);
   AssertCommandState(command2, 1, 4, 4, 0, 0);
-  command2.SetHasFinished(true);
+  command2->SetHasFinished(true);
   Scheduler::GetInstance()->Run();
   AssertCommandState(command1, 1, 3, 3, 1, 0);
   AssertCommandState(command2, 1, 5, 5, 1, 0);
@@ -104,19 +104,19 @@ TEST_F(CommandTest, ParallelCommands) {
 TEST_F(CommandTest, RunAndTerminate) {
   MockCommand command;
   command.Start();
-  AssertCommandState(command, 0, 0, 0, 0, 0);
+  AssertCommandState(&command, 0, 0, 0, 0, 0);
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command, 0, 0, 0, 0, 0);
+  AssertCommandState(&command, 0, 0, 0, 0, 0);
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command, 1, 1, 1, 0, 0);
+  AssertCommandState(&command, 1, 1, 1, 0, 0);
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command, 1, 2, 2, 0, 0);
+  AssertCommandState(&command, 1, 2, 2, 0, 0);
   command.SetHasFinished(true);
-  AssertCommandState(command, 1, 2, 2, 0, 0);
+  AssertCommandState(&command, 1, 2, 2, 0, 0);
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command, 1, 3, 3, 1, 0);
+  AssertCommandState(&command, 1, 3, 3, 1, 0);
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command, 1, 3, 3, 1, 0);
+  AssertCommandState(&command, 1, 3, 3, 1, 0);
 
   TeardownScheduler();
 }
@@ -124,21 +124,21 @@ TEST_F(CommandTest, RunAndTerminate) {
 TEST_F(CommandTest, RunAndCancel) {
   MockCommand command;
   command.Start();
-  AssertCommandState(command, 0, 0, 0, 0, 0);
+  AssertCommandState(&command, 0, 0, 0, 0, 0);
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command, 0, 0, 0, 0, 0);
+  AssertCommandState(&command, 0, 0, 0, 0, 0);
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command, 1, 1, 1, 0, 0);
+  AssertCommandState(&command, 1, 1, 1, 0, 0);
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command, 1, 2, 2, 0, 0);
+  AssertCommandState(&command, 1, 2, 2, 0, 0);
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command, 1, 3, 3, 0, 0);
+  AssertCommandState(&command, 1, 3, 3, 0, 0);
   command.Cancel();
-  AssertCommandState(command, 1, 3, 3, 0, 0);
+  AssertCommandState(&command, 1, 3, 3, 0, 0);
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command, 1, 3, 3, 0, 1);
+  AssertCommandState(&command, 1, 3, 3, 0, 1);
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command, 1, 3, 3, 0, 1);
+  AssertCommandState(&command, 1, 3, 3, 0, 1);
 
   TeardownScheduler();
 }
@@ -147,17 +147,17 @@ TEST_F(CommandTest, RunAndCancel) {
 // CommandSequentialGroupTest ported from CommandSequentialGroupTest.java
 TEST_F(CommandTest, ThreeCommandOnSubSystem) {
   ASubsystem subsystem("Three Command Test Subsystem");
-  MockCommand command1;
-  command1.Requires(&subsystem);
-  MockCommand command2;
-  command2.Requires(&subsystem);
-  MockCommand command3;
-  command3.Requires(&subsystem);
+  auto command1 = new MockCommand;
+  command1->Requires(&subsystem);
+  auto command2 = new MockCommand;
+  command2->Requires(&subsystem);
+  auto command3 = new MockCommand;
+  command3->Requires(&subsystem);
 
   CommandGroup commandGroup;
-  commandGroup.AddSequential(&command1, 1.0);
-  commandGroup.AddSequential(&command2, 2.0);
-  commandGroup.AddSequential(&command3);
+  commandGroup.AddSequential(command1, 1.0);
+  commandGroup.AddSequential(command2, 2.0);
+  commandGroup.AddSequential(command3);
 
   AssertCommandState(command1, 0, 0, 0, 0, 0);
   AssertCommandState(command2, 0, 0, 0, 0, 0);
@@ -199,7 +199,7 @@ TEST_F(CommandTest, ThreeCommandOnSubSystem) {
   AssertCommandState(command1, 1, 1, 1, 0, 1);
   AssertCommandState(command2, 1, 2, 2, 0, 1);
   AssertCommandState(command3, 1, 2, 2, 0, 0);
-  command3.SetHasFinished(true);
+  command3->SetHasFinished(true);
   AssertCommandState(command1, 1, 1, 1, 0, 1);
   AssertCommandState(command2, 1, 2, 2, 0, 1);
   AssertCommandState(command3, 1, 2, 2, 0, 0);
@@ -220,54 +220,54 @@ TEST_F(CommandTest, ThreeCommandOnSubSystem) {
 
 // CommandSequentialGroupTest ported from CommandSequentialGroupTest.java
 TEST_F(CommandTest, OneCommandSupersedingAnotherBecauseOfDependencies) {
-  auto subsystem = new ASubsystem("Command Superseding Test Subsystem");
+  ASubsystem subsystem("Command Superseding Test Subsystem");
   MockCommand command1;
-  command1.Requires(subsystem);
+  command1.Requires(&subsystem);
   MockCommand command2;
-  command2.Requires(subsystem);
+  command2.Requires(&subsystem);
 
-  AssertCommandState(command1, 0, 0, 0, 0, 0);
-  AssertCommandState(command2, 0, 0, 0, 0, 0);
+  AssertCommandState(&command1, 0, 0, 0, 0, 0);
+  AssertCommandState(&command2, 0, 0, 0, 0, 0);
 
   command1.Start();
-  AssertCommandState(command1, 0, 0, 0, 0, 0);
-  AssertCommandState(command2, 0, 0, 0, 0, 0);
+  AssertCommandState(&command1, 0, 0, 0, 0, 0);
+  AssertCommandState(&command2, 0, 0, 0, 0, 0);
 
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command1, 0, 0, 0, 0, 0);
-  AssertCommandState(command2, 0, 0, 0, 0, 0);
+  AssertCommandState(&command1, 0, 0, 0, 0, 0);
+  AssertCommandState(&command2, 0, 0, 0, 0, 0);
 
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command1, 1, 1, 1, 0, 0);
-  AssertCommandState(command2, 0, 0, 0, 0, 0);
+  AssertCommandState(&command1, 1, 1, 1, 0, 0);
+  AssertCommandState(&command2, 0, 0, 0, 0, 0);
 
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command1, 1, 2, 2, 0, 0);
-  AssertCommandState(command2, 0, 0, 0, 0, 0);
+  AssertCommandState(&command1, 1, 2, 2, 0, 0);
+  AssertCommandState(&command2, 0, 0, 0, 0, 0);
 
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command1, 1, 3, 3, 0, 0);
-  AssertCommandState(command2, 0, 0, 0, 0, 0);
+  AssertCommandState(&command1, 1, 3, 3, 0, 0);
+  AssertCommandState(&command2, 0, 0, 0, 0, 0);
 
   command2.Start();
-  AssertCommandState(command1, 1, 3, 3, 0, 0);
-  AssertCommandState(command2, 0, 0, 0, 0, 0);
+  AssertCommandState(&command1, 1, 3, 3, 0, 0);
+  AssertCommandState(&command2, 0, 0, 0, 0, 0);
 
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command1, 1, 4, 4, 0, 1);
-  AssertCommandState(command2, 0, 0, 0, 0, 0);
+  AssertCommandState(&command1, 1, 4, 4, 0, 1);
+  AssertCommandState(&command2, 0, 0, 0, 0, 0);
 
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command1, 1, 4, 4, 0, 1);
-  AssertCommandState(command2, 1, 1, 1, 0, 0);
+  AssertCommandState(&command1, 1, 4, 4, 0, 1);
+  AssertCommandState(&command2, 1, 1, 1, 0, 0);
 
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command1, 1, 4, 4, 0, 1);
-  AssertCommandState(command2, 1, 2, 2, 0, 0);
+  AssertCommandState(&command1, 1, 4, 4, 0, 1);
+  AssertCommandState(&command2, 1, 2, 2, 0, 0);
 
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command1, 1, 4, 4, 0, 1);
-  AssertCommandState(command2, 1, 3, 3, 0, 0);
+  AssertCommandState(&command1, 1, 4, 4, 0, 1);
+  AssertCommandState(&command2, 1, 3, 3, 0, 0);
 
   TeardownScheduler();
 }
@@ -283,36 +283,36 @@ TEST_F(CommandTest,
   MockCommand command2;
   command2.Requires(&subsystem);
 
-  AssertCommandState(command1, 0, 0, 0, 0, 0);
-  AssertCommandState(command2, 0, 0, 0, 0, 0);
+  AssertCommandState(&command1, 0, 0, 0, 0, 0);
+  AssertCommandState(&command2, 0, 0, 0, 0, 0);
 
   command1.Start();
-  AssertCommandState(command1, 0, 0, 0, 0, 0);
-  AssertCommandState(command2, 0, 0, 0, 0, 0);
+  AssertCommandState(&command1, 0, 0, 0, 0, 0);
+  AssertCommandState(&command2, 0, 0, 0, 0, 0);
 
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command1, 0, 0, 0, 0, 0);
-  AssertCommandState(command2, 0, 0, 0, 0, 0);
+  AssertCommandState(&command1, 0, 0, 0, 0, 0);
+  AssertCommandState(&command2, 0, 0, 0, 0, 0);
 
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command1, 1, 1, 1, 0, 0);
-  AssertCommandState(command2, 0, 0, 0, 0, 0);
+  AssertCommandState(&command1, 1, 1, 1, 0, 0);
+  AssertCommandState(&command2, 0, 0, 0, 0, 0);
 
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command1, 1, 2, 2, 0, 0);
-  AssertCommandState(command2, 0, 0, 0, 0, 0);
+  AssertCommandState(&command1, 1, 2, 2, 0, 0);
+  AssertCommandState(&command2, 0, 0, 0, 0, 0);
 
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command1, 1, 3, 3, 0, 0);
-  AssertCommandState(command2, 0, 0, 0, 0, 0);
+  AssertCommandState(&command1, 1, 3, 3, 0, 0);
+  AssertCommandState(&command2, 0, 0, 0, 0, 0);
 
   command2.Start();
-  AssertCommandState(command1, 1, 3, 3, 0, 0);
-  AssertCommandState(command2, 0, 0, 0, 0, 0);
+  AssertCommandState(&command1, 1, 3, 3, 0, 0);
+  AssertCommandState(&command2, 0, 0, 0, 0, 0);
 
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command1, 1, 4, 4, 0, 0);
-  AssertCommandState(command2, 0, 0, 0, 0, 0);
+  AssertCommandState(&command1, 1, 4, 4, 0, 0);
+  AssertCommandState(&command2, 0, 0, 0, 0, 0);
 
   TeardownScheduler();
 }
@@ -333,33 +333,33 @@ TEST_F(CommandTest, TwoSecondTimeout) {
   command.Requires(&subsystem);
 
   command.Start();
-  AssertCommandState(command, 0, 0, 0, 0, 0);
+  AssertCommandState(&command, 0, 0, 0, 0, 0);
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command, 0, 0, 0, 0, 0);
+  AssertCommandState(&command, 0, 0, 0, 0, 0);
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command, 1, 1, 1, 0, 0);
+  AssertCommandState(&command, 1, 1, 1, 0, 0);
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command, 1, 2, 2, 0, 0);
+  AssertCommandState(&command, 1, 2, 2, 0, 0);
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command, 1, 3, 3, 0, 0);
+  AssertCommandState(&command, 1, 3, 3, 0, 0);
   Wait(2);
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command, 1, 4, 4, 1, 0);
+  AssertCommandState(&command, 1, 4, 4, 1, 0);
   Scheduler::GetInstance()->Run();
-  AssertCommandState(command, 1, 4, 4, 1, 0);
+  AssertCommandState(&command, 1, 4, 4, 1, 0);
 
   TeardownScheduler();
 }
 
 TEST_F(CommandTest, DefaultCommandWhereTheInteruptingCommandEndsItself) {
   ASubsystem subsystem("Default Command Test Subsystem");
-  MockCommand defaultCommand;
-  defaultCommand.Requires(&subsystem);
+  auto defaultCommand = new MockCommand;
+  defaultCommand->Requires(&subsystem);
   MockCommand anotherCommand;
   anotherCommand.Requires(&subsystem);
 
   AssertCommandState(defaultCommand, 0, 0, 0, 0, 0);
-  subsystem.Init(&defaultCommand);
+  subsystem.Init(defaultCommand);
 
   AssertCommandState(defaultCommand, 0, 0, 0, 0, 0);
   Scheduler::GetInstance()->Run();
@@ -371,42 +371,41 @@ TEST_F(CommandTest, DefaultCommandWhereTheInteruptingCommandEndsItself) {
 
   anotherCommand.Start();
   AssertCommandState(defaultCommand, 1, 2, 2, 0, 0);
-  AssertCommandState(anotherCommand, 0, 0, 0, 0, 0);
+  AssertCommandState(&anotherCommand, 0, 0, 0, 0, 0);
   Scheduler::GetInstance()->Run();
   AssertCommandState(defaultCommand, 1, 3, 3, 0, 1);
-  AssertCommandState(anotherCommand, 0, 0, 0, 0, 0);
+  AssertCommandState(&anotherCommand, 0, 0, 0, 0, 0);
   Scheduler::GetInstance()->Run();
   AssertCommandState(defaultCommand, 1, 3, 3, 0, 1);
-  AssertCommandState(anotherCommand, 1, 1, 1, 0, 0);
+  AssertCommandState(&anotherCommand, 1, 1, 1, 0, 0);
   Scheduler::GetInstance()->Run();
   AssertCommandState(defaultCommand, 1, 3, 3, 0, 1);
-  AssertCommandState(anotherCommand, 1, 2, 2, 0, 0);
+  AssertCommandState(&anotherCommand, 1, 2, 2, 0, 0);
   anotherCommand.SetHasFinished(true);
   AssertCommandState(defaultCommand, 1, 3, 3, 0, 1);
-  AssertCommandState(anotherCommand, 1, 2, 2, 0, 0);
+  AssertCommandState(&anotherCommand, 1, 2, 2, 0, 0);
   Scheduler::GetInstance()->Run();
   AssertCommandState(defaultCommand, 1, 3, 3, 0, 1);
-  AssertCommandState(anotherCommand, 1, 3, 3, 1, 0);
+  AssertCommandState(&anotherCommand, 1, 3, 3, 1, 0);
   Scheduler::GetInstance()->Run();
   AssertCommandState(defaultCommand, 2, 4, 4, 0, 1);
-  AssertCommandState(anotherCommand, 1, 3, 3, 1, 0);
+  AssertCommandState(&anotherCommand, 1, 3, 3, 1, 0);
   Scheduler::GetInstance()->Run();
   AssertCommandState(defaultCommand, 2, 5, 5, 0, 1);
-  AssertCommandState(anotherCommand, 1, 3, 3, 1, 0);
+  AssertCommandState(&anotherCommand, 1, 3, 3, 1, 0);
 
   TeardownScheduler();
 }
 
 TEST_F(CommandTest, DefaultCommandsInterruptingCommandCanceled) {
   ASubsystem subsystem("Default Command Test Subsystem");
-  MockCommand defaultCommand;
-  defaultCommand.Requires(&subsystem);
+  auto defaultCommand = new MockCommand;
+  defaultCommand->Requires(&subsystem);
   MockCommand anotherCommand;
   anotherCommand.Requires(&subsystem);
 
   AssertCommandState(defaultCommand, 0, 0, 0, 0, 0);
-  subsystem.Init(&defaultCommand);
-  subsystem.InitDefaultCommand();
+  subsystem.Init(defaultCommand);
   AssertCommandState(defaultCommand, 0, 0, 0, 0, 0);
   Scheduler::GetInstance()->Run();
   AssertCommandState(defaultCommand, 0, 0, 0, 0, 0);
@@ -417,28 +416,28 @@ TEST_F(CommandTest, DefaultCommandsInterruptingCommandCanceled) {
 
   anotherCommand.Start();
   AssertCommandState(defaultCommand, 1, 2, 2, 0, 0);
-  AssertCommandState(anotherCommand, 0, 0, 0, 0, 0);
+  AssertCommandState(&anotherCommand, 0, 0, 0, 0, 0);
   Scheduler::GetInstance()->Run();
   AssertCommandState(defaultCommand, 1, 3, 3, 0, 1);
-  AssertCommandState(anotherCommand, 0, 0, 0, 0, 0);
+  AssertCommandState(&anotherCommand, 0, 0, 0, 0, 0);
   Scheduler::GetInstance()->Run();
   AssertCommandState(defaultCommand, 1, 3, 3, 0, 1);
-  AssertCommandState(anotherCommand, 1, 1, 1, 0, 0);
+  AssertCommandState(&anotherCommand, 1, 1, 1, 0, 0);
   Scheduler::GetInstance()->Run();
   AssertCommandState(defaultCommand, 1, 3, 3, 0, 1);
-  AssertCommandState(anotherCommand, 1, 2, 2, 0, 0);
+  AssertCommandState(&anotherCommand, 1, 2, 2, 0, 0);
   anotherCommand.Cancel();
   AssertCommandState(defaultCommand, 1, 3, 3, 0, 1);
-  AssertCommandState(anotherCommand, 1, 2, 2, 0, 0);
+  AssertCommandState(&anotherCommand, 1, 2, 2, 0, 0);
   Scheduler::GetInstance()->Run();
   AssertCommandState(defaultCommand, 1, 3, 3, 0, 1);
-  AssertCommandState(anotherCommand, 1, 2, 2, 0, 1);
+  AssertCommandState(&anotherCommand, 1, 2, 2, 0, 1);
   Scheduler::GetInstance()->Run();
   AssertCommandState(defaultCommand, 2, 4, 4, 0, 1);
-  AssertCommandState(anotherCommand, 1, 2, 2, 0, 1);
+  AssertCommandState(&anotherCommand, 1, 2, 2, 0, 1);
   Scheduler::GetInstance()->Run();
   AssertCommandState(defaultCommand, 2, 5, 5, 0, 1);
-  AssertCommandState(anotherCommand, 1, 2, 2, 0, 1);
+  AssertCommandState(&anotherCommand, 1, 2, 2, 0, 1);
 
   TeardownScheduler();
 }
