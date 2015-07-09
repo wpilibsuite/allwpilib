@@ -32,7 +32,8 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
  * allows the two channels (forward and reverse) to be used independently for
  * something that does not care about voltage polarity (like a solenoid).
  */
-public class Relay extends SensorBase implements LiveWindowSendable {
+public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable {
+  private MotorSafetyHelper m_safetyHelper;
 
   /**
    * This class represents errors in trying to set relay values contradictory to
@@ -141,6 +142,9 @@ public class Relay extends SensorBase implements LiveWindowSendable {
 
     m_port = DIOJNI.initializeDigitalPort(DIOJNI.getPort((byte) m_channel), status.asIntBuffer());
     HALUtil.checkStatus(status.asIntBuffer());
+
+    m_safetyHelper = new MotorSafetyHelper(this);
+    m_safetyHelper.setSafetyEnabled(false);
 
     LiveWindow.addActuator("Relay", m_channel, this);
   }
@@ -288,6 +292,50 @@ public class Relay extends SensorBase implements LiveWindowSendable {
         return Value.kOff;
       }
     }
+  }
+
+  /**
+   * Get the channel number.
+   *
+   * @return The channel number.
+   */
+  public int getChannel() {
+    return m_channel;
+  }
+
+  @Override
+  public void setExpiration(double timeout) {
+    m_safetyHelper.setExpiration(timeout);
+  }
+
+  @Override
+  public double getExpiration() {
+    return m_safetyHelper.getExpiration();
+  }
+
+  @Override
+  public boolean isAlive() {
+    return m_safetyHelper.isAlive();
+  }
+
+  @Override
+  public void stopMotor() {
+    set(Value.kOff);
+  }
+
+  @Override
+  public boolean isSafetyEnabled() {
+    return m_safetyHelper.isSafetyEnabled();
+  }
+
+  @Override
+  public void setSafetyEnabled(boolean enabled) {
+    m_safetyHelper.setSafetyEnabled(enabled);
+  }
+
+  @Override
+  public String getDescription() {
+    return "Relay ID " + getChannel();
   }
 
   /**

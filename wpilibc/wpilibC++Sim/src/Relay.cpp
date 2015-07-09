@@ -6,6 +6,7 @@
 
 #include "Relay.h"
 
+#include "MotorSafetyHelper.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
@@ -29,6 +30,9 @@ Relay::Relay(uint32_t channel, Relay::Direction direction)
 		wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
 		return;
 	}
+
+    m_safetyHelper = std::make_unique<MotorSafetyHelper>(this);
+    m_safetyHelper->SetSafetyEnabled(false);
 
 	sprintf(buf, "relay/%d", m_channel);
 	impl = new SimContinuousOutput(buf); // TODO: Allow two different relays (targetting the different halves of a relay) to be combined to control one motor.
@@ -141,12 +145,65 @@ Relay::Value Relay::Get() const {
 	}
 }
 
+uint32_t Relay::GetChannel() const {
+  return m_channel;
+}
+
+/**
+ * Set the expiration time for the Relay object
+ * @param timeout The timeout (in seconds) for this relay object
+ */
+void Relay::SetExpiration(float timeout) {
+  m_safetyHelper->SetExpiration(timeout);
+}
+
+/**
+ * Return the expiration time for the relay object.
+ * @return The expiration time value.
+ */
+float Relay::GetExpiration() const { return m_safetyHelper->GetExpiration(); }
+
+/**
+ * Check if the relay object is currently alive or stopped due to a timeout.
+ * @returns a bool value that is true if the motor has NOT timed out and should
+ * still be running.
+ */
+bool Relay::IsAlive() const { return m_safetyHelper->IsAlive(); }
+
+/**
+ * Stop the motor associated with this PWM object.
+ * This is called by the MotorSafetyHelper object when it has a timeout for this
+ * relay and needs to stop it from running.
+ */
+void Relay::StopMotor() { Set(kOff); }
+
+/**
+ * Enable/disable motor safety for this device
+ * Turn on and off the motor safety option for this relay object.
+ * @param enabled True if motor safety is enforced for this object
+ */
+void Relay::SetSafetyEnabled(bool enabled) {
+  m_safetyHelper->SetSafetyEnabled(enabled);
+}
+
+/**
+ * Check if motor safety is enabled for this object
+ * @returns True if motor safety is enforced for this object
+ */
+bool Relay::IsSafetyEnabled() const {
+  return m_safetyHelper->IsSafetyEnabled();
+}
+
+void Relay::GetDescription(std::ostringstream& desc) const {
+  desc << "Relay " << GetChannel();
+}
+
 void Relay::ValueChanged(ITable* source, llvm::StringRef key,
                          std::shared_ptr<nt::Value> value, bool isNew) {
   if (!value->IsString()) return;
-	if (value->GetString() == "Off") Set(kOff);
-	else if (value->GetString() == "Forward") Set(kForward);
-	else if (value->GetString() == "Reverse") Set(kReverse);
+  if (value->GetString() == "Off") Set(kOff);
+  else if (value->GetString() == "Forward") Set(kForward);
+  else if (value->GetString() == "Reverse") Set(kReverse);
 }
 
 void Relay::UpdateTable() {

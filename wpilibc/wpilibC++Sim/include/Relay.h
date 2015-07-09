@@ -5,6 +5,7 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
+#include "MotorSafety.h"
 #include "SensorBase.h"
 #include "simulation/SimContinuousOutput.h"
 #include "tables/ITableListener.h"
@@ -13,6 +14,7 @@
 
 #include <memory>
 
+class MotorSafetyHelper;
 class DigitalModule;
 
 /**
@@ -24,8 +26,10 @@ class DigitalModule;
  * variable speed.  It also allows the two channels (forward and reverse) to be used independently
  * for something that does not care about voltage polatiry (like a solenoid).
  */
-class Relay : public SensorBase, public ITableListener, public LiveWindowSendable
-{
+class Relay : public MotorSafety,
+              public SensorBase,
+              public ITableListener,
+              public LiveWindowSendable {
 public:
 	enum Value
 	{
@@ -46,6 +50,15 @@ public:
 
 	void Set(Value value);
 	Value Get() const;
+    uint32_t GetChannel() const;
+
+  void SetExpiration(float timeout) override;
+  float GetExpiration() const override;
+  bool IsAlive() const override;
+  void StopMotor() override;
+  bool IsSafetyEnabled() const override;
+  void SetSafetyEnabled(bool enabled) override;
+  void GetDescription(std::ostringstream& desc) const override;
 
 	void ValueChanged(ITable* source, llvm::StringRef key,
                     std::shared_ptr<nt::Value> value, bool isNew) override;
@@ -61,6 +74,7 @@ public:
 private:
 	uint32_t m_channel;
 	Direction m_direction;
+    std::unique_ptr<MotorSafetyHelper> m_safetyHelper;
 	SimContinuousOutput* impl;
 	bool go_pos, go_neg;
 };

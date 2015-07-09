@@ -6,12 +6,15 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
+#include "MotorSafety.h"
 #include "SensorBase.h"
 #include "tables/ITableListener.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITable.h"
 
 #include <memory>
+
+class MotorSafetyHelper;
 
 /**
  * Class for Spike style relay outputs.
@@ -27,7 +30,8 @@
  * used independently
  * for something that does not care about voltage polatiry (like a solenoid).
  */
-class Relay : public SensorBase,
+class Relay : public MotorSafety,
+              public SensorBase,
               public ITableListener,
               public LiveWindowSendable {
  public:
@@ -39,6 +43,15 @@ class Relay : public SensorBase,
 
   void Set(Value value);
   Value Get() const;
+  uint32_t GetChannel() const;
+
+  void SetExpiration(float timeout) override;
+  float GetExpiration() const override;
+  bool IsAlive() const override;
+  void StopMotor() override;
+  bool IsSafetyEnabled() const override;
+  void SetSafetyEnabled(bool enabled) override;
+  void GetDescription(std::ostringstream& desc) const override;
 
   void ValueChanged(ITable* source, llvm::StringRef key,
                     std::shared_ptr<nt::Value> value, bool isNew) override;
@@ -54,4 +67,6 @@ class Relay : public SensorBase,
  private:
   uint32_t m_channel;
   Direction m_direction;
+
+  std::unique_ptr<MotorSafetyHelper> m_safetyHelper;
 };
