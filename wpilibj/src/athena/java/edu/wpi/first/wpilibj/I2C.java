@@ -76,7 +76,9 @@ public class I2C extends SensorBase {
     boolean aborted = true;
 
     ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(sendSize);
-    dataToSendBuffer.put(dataToSend);
+    if (sendSize > 0 && dataToSend != null) {
+      dataToSendBuffer.put(dataToSend);
+    }
     ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(receiveSize);
 
     aborted =
