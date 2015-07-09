@@ -66,8 +66,7 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
   bool IsInterruptible() const;
   void SetInterruptible(bool interruptible);
   bool DoesRequire(Subsystem* subsystem) const;
-  typedef std::set<Subsystem*> SubsystemSet;
-  SubsystemSet GetRequirements() const;
+  const std::set<Subsystem*>& GetRequirements() const;
   CommandGroup* GetGroup() const;
   void SetRunWhenDisabled(bool run);
   bool WillRunWhenDisabled() const;
@@ -143,7 +142,7 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
   bool m_initialized = false;
 
   /** The requirements (or null if no requirements) */
-  SubsystemSet m_requirements;
+  std::set<Subsystem*> m_requirements;
 
   /** Whether or not it is running */
   bool m_running = false;

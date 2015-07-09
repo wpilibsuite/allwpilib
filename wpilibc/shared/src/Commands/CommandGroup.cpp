@@ -33,15 +33,13 @@ void CommandGroup::AddSequential(Command* command) {
   }
   if (!AssertUnlocked("Cannot add new command to command group")) return;
 
+  m_commands.emplace_back(command, CommandGroupEntry::kSequence_InSequence);
+
   command->SetParent(this);
 
-  m_commands.push_back(
-      CommandGroupEntry(command, CommandGroupEntry::kSequence_InSequence));
   // Iterate through command->GetRequirements() and call Requires() on each
   // required subsystem
-  Command::SubsystemSet requirements = command->GetRequirements();
-  auto iter = requirements.begin();
-  for (; iter != requirements.end(); iter++) Requires(*iter);
+  for (auto requirement : command->GetRequirements()) Requires(requirement);
 }
 
 /**
@@ -73,15 +71,14 @@ void CommandGroup::AddSequential(Command* command, double timeout) {
     return;
   }
 
+  m_commands.emplace_back(command, CommandGroupEntry::kSequence_InSequence,
+                          timeout);
+
   command->SetParent(this);
 
-  m_commands.push_back(CommandGroupEntry(
-      command, CommandGroupEntry::kSequence_InSequence, timeout));
   // Iterate through command->GetRequirements() and call Requires() on each
   // required subsystem
-  Command::SubsystemSet requirements = command->GetRequirements();
-  auto iter = requirements.begin();
-  for (; iter != requirements.end(); iter++) Requires(*iter);
+  for (auto requirement : command->GetRequirements()) Requires(requirement);
 }
 
 /**
@@ -110,15 +107,13 @@ void CommandGroup::AddParallel(Command* command) {
   }
   if (!AssertUnlocked("Cannot add new command to command group")) return;
 
+  m_commands.emplace_back(command, CommandGroupEntry::kSequence_BranchChild);
+
   command->SetParent(this);
 
-  m_commands.push_back(
-      CommandGroupEntry(command, CommandGroupEntry::kSequence_BranchChild));
   // Iterate through command->GetRequirements() and call Requires() on each
   // required subsystem
-  Command::SubsystemSet requirements = command->GetRequirements();
-  auto iter = requirements.begin();
-  for (; iter != requirements.end(); iter++) Requires(*iter);
+  for (auto requirement : command->GetRequirements()) Requires(requirement);
 }
 
 /**
@@ -158,21 +153,20 @@ void CommandGroup::AddParallel(Command* command, double timeout) {
     return;
   }
 
+  m_commands.emplace_back(command, CommandGroupEntry::kSequence_BranchChild,
+                          timeout);
+
   command->SetParent(this);
 
-  m_commands.push_back(CommandGroupEntry(
-      command, CommandGroupEntry::kSequence_BranchChild, timeout));
   // Iterate through command->GetRequirements() and call Requires() on each
   // required subsystem
-  Command::SubsystemSet requirements = command->GetRequirements();
-  auto iter = requirements.begin();
-  for (; iter != requirements.end(); iter++) Requires(*iter);
+  for (auto requirement : command->GetRequirements()) Requires(requirement);
 }
 
 void CommandGroup::_Initialize() { m_currentCommandIndex = -1; }
 
 void CommandGroup::_Execute() {
-  CommandGroupEntry entry;
+  CommandGroupEntry* entry;
   Command* cmd = nullptr;
   bool firstRun = false;
 
@@ -181,14 +175,20 @@ void CommandGroup::_Execute() {
     m_currentCommandIndex = 0;
   }
 
+  // While there are still commands in this group to run
   while ((unsigned)m_currentCommandIndex < m_commands.size()) {
+    // If a command is prepared to run
     if (cmd != nullptr) {
-      if (entry.IsTimedOut()) cmd->_Cancel();
+      // If command timed out, cancel it so it's removed from the Scheduler
+      if (entry->IsTimedOut()) cmd->_Cancel();
 
+      // If command finished or was cancelled (needs removal from Scheduler)
       if (cmd->Run()) {
         break;
       } else {
         cmd->Removed();
+
+        // Advance to next command in group
         m_currentCommandIndex++;
         firstRun = true;
         cmd = nullptr;
@@ -196,12 +196,12 @@ void CommandGroup::_Execute() {
       }
     }
 
-    entry = m_commands[m_currentCommandIndex];
+    entry = &m_commands[m_currentCommandIndex];
     cmd = nullptr;
 
-    switch (entry.m_state) {
+    switch (entry->m_state) {
       case CommandGroupEntry::kSequence_InSequence:
-        cmd = entry.m_command;
+        cmd = entry->m_command;
         if (firstRun) {
           cmd->StartRunning();
           CancelConflicts(cmd);
@@ -210,26 +210,36 @@ void CommandGroup::_Execute() {
         break;
 
       case CommandGroupEntry::kSequence_BranchPeer:
+        // Start executing a parallel command and advance to next entry in group
         m_currentCommandIndex++;
-        entry.m_command->Start();
+        entry->m_command->Start();
         break;
 
       case CommandGroupEntry::kSequence_BranchChild:
         m_currentCommandIndex++;
-        CancelConflicts(entry.m_command);
-        entry.m_command->StartRunning();
+
+        /* Causes scheduler to skip children of current command which require
+         * the same subsystems as it
+         */
+        CancelConflicts(entry->m_command);
+        entry->m_command->StartRunning();
+
+        // Add current command entry to list of children of this group
         m_children.push_back(entry);
         break;
     }
   }
 
   // Run Children
-  auto iter = m_children.begin();
-  for (; iter != m_children.end();) {
+  for (auto iter = m_children.begin(); iter != m_children.end();) {
     entry = *iter;
-    Command* child = entry.m_command;
-    if (entry.IsTimedOut()) child->_Cancel();
+    Command* child = entry->m_command;
+    if (entry->IsTimedOut()) child->_Cancel();
 
+    /* If child finished or was cancelled, remove it from the list of children
+     * to execute. Otherwise, the iterator hasn't changed so increment it to the
+     * next child.
+     */
     if (!child->Run()) {
       child->Removed();
       iter = m_children.erase(iter);
@@ -249,9 +259,8 @@ void CommandGroup::_End() {
     cmd->Removed();
   }
 
-  auto iter = m_children.begin();
-  for (; iter != m_children.end(); iter++) {
-    Command* cmd = iter->m_command;
+  for (auto child : m_children) {
+    Command* cmd = child->m_command;
     cmd->_Cancel();
     cmd->Removed();
   }
@@ -286,24 +295,20 @@ bool CommandGroup::IsInterruptible() const {
     if (!cmd->IsInterruptible()) return false;
   }
 
-  auto iter = m_children.cbegin();
-  for (; iter != m_children.cend(); iter++) {
-    if (!iter->m_command->IsInterruptible()) return false;
+  for (const auto& child : m_children) {
+    if (!child->m_command->IsInterruptible()) return false;
   }
 
   return true;
 }
 
 void CommandGroup::CancelConflicts(Command* command) {
-  auto childIter = m_children.begin();
-  for (; childIter != m_children.end();) {
-    Command* child = childIter->m_command;
+  for (auto childIter = m_children.begin(); childIter != m_children.end();) {
+    Command* child = (*childIter)->m_command;
     bool erased = false;
 
-    Command::SubsystemSet requirements = command->GetRequirements();
-    auto requirementIter = requirements.begin();
-    for (; requirementIter != requirements.end(); requirementIter++) {
-      if (child->DoesRequire(*requirementIter)) {
+    for (auto requirement : command->GetRequirements()) {
+      if (child->DoesRequire(requirement)) {
         child->_Cancel();
         child->Removed();
         childIter = m_children.erase(childIter);

@@ -49,15 +49,12 @@ class Scheduler : public ErrorBase, public NamedSendable {
 
   void ProcessCommandAddition(Command* command);
 
-  Command::SubsystemSet m_subsystems;
+  std::set<Subsystem*> m_subsystems;
   priority_mutex m_buttonsLock;
-  typedef std::vector<ButtonScheduler*> ButtonVector;
-  ButtonVector m_buttons;
-  typedef std::vector<Command*> CommandVector;
+  std::vector<std::unique_ptr<ButtonScheduler>> m_buttons;
   priority_mutex m_additionsLock;
-  CommandVector m_additions;
-  typedef std::set<Command*> CommandSet;
-  CommandSet m_commands;
+  std::vector<Command*> m_additions;
+  std::set<Command*> m_commands;
   bool m_adding = false;
   bool m_enabled = true;
   std::vector<std::string> commands;

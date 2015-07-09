@@ -47,7 +47,7 @@ void Scheduler::AddCommand(Command* command) {
 
 void Scheduler::AddButton(ButtonScheduler* button) {
   std::lock_guard<priority_mutex> sync(m_buttonsLock);
-  m_buttons.push_back(button);
+  m_buttons.emplace_back(button);
 }
 
 void Scheduler::ProcessCommandAddition(Command* command) {
@@ -64,24 +64,20 @@ void Scheduler::ProcessCommandAddition(Command* command) {
   auto found = m_commands.find(command);
   if (found == m_commands.end()) {
     // Check that the requirements can be had
-    Command::SubsystemSet requirements = command->GetRequirements();
-    Command::SubsystemSet::iterator iter;
-    for (iter = requirements.begin(); iter != requirements.end(); iter++) {
-      Subsystem* lock = *iter;
-      if (lock->GetCurrentCommand() != nullptr &&
-          !lock->GetCurrentCommand()->IsInterruptible())
+    for (auto requirement : command->GetRequirements()) {
+      if (requirement->GetCurrentCommand() != nullptr &&
+          !requirement->GetCurrentCommand()->IsInterruptible())
         return;
     }
 
     // Give it the requirements
     m_adding = true;
-    for (iter = requirements.begin(); iter != requirements.end(); iter++) {
-      Subsystem* lock = *iter;
-      if (lock->GetCurrentCommand() != nullptr) {
-        lock->GetCurrentCommand()->Cancel();
-        Remove(lock->GetCurrentCommand());
+    for (auto requirement : command->GetRequirements()) {
+      if (requirement->GetCurrentCommand() != nullptr) {
+        requirement->GetCurrentCommand()->Cancel();
+        Remove(requirement->GetCurrentCommand());
       }
-      lock->SetCurrentCommand(command);
+      requirement->SetCurrentCommand(command);
     }
     m_adding = false;
 
@@ -112,20 +108,18 @@ void Scheduler::Run() {
     if (!m_enabled) return;
 
     std::lock_guard<priority_mutex> sync(m_buttonsLock);
-    auto rButtonIter = m_buttons.rbegin();
-    for (; rButtonIter != m_buttons.rend(); rButtonIter++) {
-      (*rButtonIter)->Execute();
+    for (auto& button : m_buttons) {
+      button->Execute();
     }
   }
 
   m_runningCommandsChanged = false;
 
   // Loop through the commands
-  auto commandIter = m_commands.begin();
-  for (; commandIter != m_commands.end();) {
-    Command* command = *commandIter;
+  for (auto cmdIter = m_commands.begin(); cmdIter != m_commands.end();) {
+    Command* command = *cmdIter;
     // Increment before potentially removing to keep the iterator valid
-    commandIter++;
+    cmdIter++;
     if (!command->Run()) {
       Remove(command);
       m_runningCommandsChanged = true;
@@ -135,21 +129,18 @@ void Scheduler::Run() {
   // Add the new things
   {
     std::lock_guard<priority_mutex> sync(m_additionsLock);
-    auto additionsIter = m_additions.begin();
-    for (; additionsIter != m_additions.end(); additionsIter++) {
-      ProcessCommandAddition(*additionsIter);
+    for (auto addition : m_additions) {
+      ProcessCommandAddition(addition);
     }
     m_additions.clear();
   }
 
   // Add in the defaults
-  auto subsystemIter = m_subsystems.begin();
-  for (; subsystemIter != m_subsystems.end(); subsystemIter++) {
-    Subsystem* lock = *subsystemIter;
-    if (lock->GetCurrentCommand() == nullptr) {
-      ProcessCommandAddition(lock->GetDefaultCommand());
+  for (auto subsystem : m_subsystems) {
+    if (subsystem->GetCurrentCommand() == nullptr) {
+      ProcessCommandAddition(subsystem->GetDefaultCommand());
     }
-    lock->ConfirmCommand();
+    subsystem->ConfirmCommand();
   }
 
   UpdateTable();
@@ -184,11 +175,8 @@ void Scheduler::Remove(Command* command) {
 
   if (!m_commands.erase(command)) return;
 
-  Command::SubsystemSet requirements = command->GetRequirements();
-  auto iter = requirements.begin();
-  for (; iter != requirements.end(); iter++) {
-    Subsystem* lock = *iter;
-    lock->SetCurrentCommand(nullptr);
+  for (auto requirement : command->GetRequirements()) {
+    requirement->SetCurrentCommand(nullptr);
   }
 
   command->Removed();
@@ -217,7 +205,6 @@ void Scheduler::ResetAll() {
  * SmartDashboard.
  */
 void Scheduler::UpdateTable() {
-  CommandSet::iterator commandIter;
   if (m_table != nullptr) {
     // Get the list of possible commands to cancel
     auto new_toCancel = m_table->GetValue("Cancel");
@@ -225,17 +212,16 @@ void Scheduler::UpdateTable() {
       toCancel = new_toCancel->GetDoubleArray();
     else
       toCancel.resize(0);
-    //		m_table->RetrieveValue("Ids", *ids);
 
-    // cancel commands that have had the cancel buttons pressed
-    // on the SmartDashboad
+    /*
+     * Cancel commands that have had the cancel buttons pressed on the
+     * SmartDashboard
+     */
     if (!toCancel.empty()) {
-      for (commandIter = m_commands.begin(); commandIter != m_commands.end();
-           ++commandIter) {
-        for (unsigned i = 0; i < toCancel.size(); i++) {
-          Command* c = *commandIter;
-          if (c->GetID() == toCancel[i]) {
-            c->Cancel();
+      for (auto command : m_commands) {
+        for (auto& cancelled : toCancel) {
+          if (command->GetID() == cancelled) {
+            command->Cancel();
           }
         }
       }
@@ -247,11 +233,9 @@ void Scheduler::UpdateTable() {
     if (m_runningCommandsChanged) {
       commands.resize(0);
       ids.resize(0);
-      for (commandIter = m_commands.begin(); commandIter != m_commands.end();
-           ++commandIter) {
-        Command* c = *commandIter;
-        commands.push_back(c->GetName());
-        ids.push_back(c->GetID());
+      for (auto command : m_commands) {
+        commands.emplace_back(command->GetName());
+        ids.emplace_back(command->GetID());
       }
       m_table->PutValue("Names", nt::Value::MakeStringArray(commands));
       m_table->PutValue("Ids", nt::Value::MakeDoubleArray(ids));

@@ -63,7 +63,7 @@ class CommandGroup : public Command {
   std::vector<CommandGroupEntry> m_commands;
 
   /** The active children in this group (stored in entries) */
-  std::list<CommandGroupEntry> m_children;
+  std::list<CommandGroupEntry*> m_children;
 
   /** The current command, -1 signifies that none have been run */
   int m_currentCommandIndex = -1;
