@@ -122,7 +122,7 @@ void Subsystem::ConfirmCommand() {
   }
 }
 
-std::string Subsystem::GetName() { return m_name; }
+std::string Subsystem::GetName() const { return m_name; }
 
 std::string Subsystem::GetSmartDashboardType() const { return "Subsystem"; }
 

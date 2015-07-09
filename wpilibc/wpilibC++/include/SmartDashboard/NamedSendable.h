@@ -22,7 +22,7 @@ class NamedSendable : public Sendable {
    * @return the name of the subtable of SmartDashboard that the Sendable object
    * will use
    */
-  virtual std::string GetName() = 0;
+  virtual std::string GetName() const = 0;
 };
 
 #endif /* NAMEDSENDABLE_H_ */

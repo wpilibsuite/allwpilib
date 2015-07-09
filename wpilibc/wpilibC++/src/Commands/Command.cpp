@@ -23,7 +23,7 @@ int Command::m_commandCounter = 0;
  * Creates a new command.
  * The name of this command will be default.
  */
-Command::Command() : Command(nullptr, -1.0) {}
+Command::Command() : Command("", -1.0) {}
 
 /**
  * Creates a new command with the given name and no timeout.
@@ -50,7 +50,14 @@ Command::Command(const std::string &name, double timeout) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
 
   m_timeout = timeout;
-  m_name = name;
+
+  // If name contains an empty string
+  if (name.length() == 0) {
+    m_name = std::string("Command_") + std::string(typeid(*this).name());
+  }
+  else {
+    m_name = name;
+  }
 }
 
 Command::~Command() {  // TODO deal with cleaning up all listeners
@@ -357,10 +364,7 @@ void Command::SetRunWhenDisabled(bool run) { m_runWhenDisabled = run; }
  */
 bool Command::WillRunWhenDisabled() const { return m_runWhenDisabled; }
 
-std::string Command::GetName() {
-  if (m_name.length() == 0) {
-    m_name = std::string("Command_") + std::string(typeid(*this).name());
-  }
+std::string Command::GetName() const {
   return m_name;
 }
 
