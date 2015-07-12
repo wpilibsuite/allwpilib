@@ -18,6 +18,7 @@
 
 namespace ntimpl {
 
+class Message;
 class StringValueTest;
 class Storage;
 class Value;
@@ -28,6 +29,7 @@ class WireDecoder;
  * C++ wrapper class around NT_String.
  */
 class StringValue : private NT_String {
+  friend class Message;
   friend class StringValueTest;
   friend class Value;
   friend class WireDecoder;
@@ -83,8 +85,9 @@ inline bool operator!=(const StringValue& lhs, llvm::StringRef rhs) {
  * C++ wrapper class around NT_Value.
  */
 class Value : private NT_Value {
-  friend class ValueTest;
+  friend class Message;
   friend class Storage;
+  friend class ValueTest;
   friend class WireDecoder;
  public:
   Value() { NT_InitValue(this); }

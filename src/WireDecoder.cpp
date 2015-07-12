@@ -12,7 +12,6 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "internal.h"
 #include "leb128.h"
 
 using namespace ntimpl;

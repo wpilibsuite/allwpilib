@@ -50,6 +50,10 @@ class WireEncoder {
   /* Returns number of bytes written to memory buffer. */
   std::size_t size() const { return m_cur - m_start; }
 
+  llvm::StringRef ToStringRef() const {
+    return llvm::StringRef(m_start, m_cur - m_start);
+  }
+
   /* Ensures the buffer has sufficient space to write len bytes.  Reallocates
    * the buffer if necessary.
    */

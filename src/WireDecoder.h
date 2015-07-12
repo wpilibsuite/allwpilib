@@ -42,6 +42,8 @@ class WireDecoder {
    */
   const char* error() const { return m_error; }
 
+  void set_error(const char* error) { m_error = error; }
+
   /* Reads the specified number of bytes.
    * @param buf pointer to read data (output parameter)
    * @param len number of bytes to read
