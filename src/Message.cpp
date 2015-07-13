@@ -173,13 +173,13 @@ bool Message::Read(WireDecoder& decoder,
 
 Message Message::ClientHello(llvm::StringRef self_id) {
   Message msg(kClientHello);
-  msg.m_str = StringValue(self_id);
+  msg.m_str = self_id;
   return msg;
 }
 
 Message Message::ServerHello(unsigned int flags, llvm::StringRef self_id) {
   Message msg(kServerHello);
-  msg.m_str = StringValue(self_id);
+  msg.m_str = self_id;
   msg.m_flags = flags;
   return msg;
 }
@@ -188,7 +188,7 @@ Message Message::EntryAssign(llvm::StringRef name, unsigned int id,
                              unsigned int seq_num, std::shared_ptr<Value> value,
                              unsigned int flags) {
   Message msg(kEntryAssign);
-  msg.m_str = StringValue(name);
+  msg.m_str = name;
   msg.m_value = value;
   msg.m_id = id;
   msg.m_flags = flags;
@@ -228,7 +228,7 @@ Message Message::ExecuteRpc(unsigned int id, unsigned int uid,
 Message Message::ExecuteRpc(unsigned int id, unsigned int uid,
                             llvm::StringRef params) {
   Message msg(kExecuteRpc);
-  msg.m_str = StringValue(params);
+  msg.m_str = params;
   msg.m_id = id;
   msg.m_seq_num_uid = uid;
   return msg;
@@ -244,7 +244,7 @@ Message Message::RpcResponse(unsigned int id, unsigned int uid,
 Message Message::RpcResponse(unsigned int id, unsigned int uid,
                              llvm::StringRef results) {
   Message msg(kRpcResponse);
-  msg.m_str = StringValue(results);
+  msg.m_str = results;
   msg.m_id = id;
   msg.m_seq_num_uid = uid;
   return msg;
