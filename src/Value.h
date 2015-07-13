@@ -35,7 +35,7 @@ class StringValue : private NT_String {
   friend class WireDecoder;
  public:
   StringValue() { NT_InitString(this); }
-  explicit StringValue(llvm::StringRef val);
+  StringValue(llvm::StringRef val);
   ~StringValue() { NT_DisposeString(this); }
 
   operator llvm::StringRef() const { return llvm::StringRef(str, len); }
@@ -60,6 +60,8 @@ class StringValue : private NT_String {
     }
     return *this;
   }
+
+  StringValue& operator=(llvm::StringRef val);
 };
 
 inline bool operator==(const StringValue& lhs, const StringValue& rhs) {

@@ -22,6 +22,16 @@ StringValue::StringValue(llvm::StringRef val) {
   str[len] = '\0';
 }
 
+StringValue& StringValue::operator=(llvm::StringRef val) {
+  NT_DisposeString(this);
+  str = nullptr;
+  len = val.size();
+  str = static_cast<char*>(std::malloc(len+1));
+  std::memcpy(str, val.data(), len);
+  str[len] = '\0';
+  return *this;
+}
+
 void Value::SetBooleanArray(llvm::ArrayRef<int> value) {
   // handle type change
   if (NT_Value::type != NT_BOOLEAN_ARRAY) {
