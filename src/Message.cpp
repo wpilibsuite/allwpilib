@@ -18,29 +18,23 @@ bool Message::Read(WireDecoder& decoder,
                    NT_Type (*get_entry_type)(unsigned int id), Message* msg) {
   unsigned int msg_type;
   if (!decoder.Read8(&msg_type)) return false;
+  *msg = Message(static_cast<MsgType>(msg_type));
   switch (msg_type) {
     case kKeepAlive:
-      *msg = KeepAlive();
       break;
     case kClientHello: {
       unsigned int proto_rev;
       if (!decoder.Read16(&proto_rev)) return false;
-      StringValue self_id;
+      msg->m_id = proto_rev;
       // This intentionally uses the provided proto_rev instead of
       // decoder.proto_rev().
       if (proto_rev >= 0x0300u) {
-        if (!decoder.ReadString(&self_id)) return false;
+        if (!decoder.ReadString(&msg->m_str)) return false;
       }
-      *msg = Message(kClientHello);
-      msg->m_str = std::move(self_id);
-      msg->m_id = proto_rev;
       break;
     }
     case kProtoUnsup: {
-      unsigned int proto_rev;
-      if (!decoder.Read16(&proto_rev)) return false;
-      *msg = ProtoUnsup();
-      msg->m_id = proto_rev;
+      if (!decoder.Read16(&msg->m_id)) return false;  // proto rev
       break;
     }
     case kServerHelloDone:
@@ -48,54 +42,38 @@ bool Message::Read(WireDecoder& decoder,
         decoder.set_error("received SERVER_HELLO_DONE in protocol < 3.0");
         return false;
       }
-      *msg = ServerHelloDone();
       break;
     case kClientHelloDone:
       if (decoder.proto_rev() < 0x0300u) {
         decoder.set_error("received CLIENT_HELLO_DONE in protocol < 3.0");
         return false;
       }
-      *msg = ClientHelloDone();
       break;
     case kEntryAssign: {
-      StringValue name;
-      if (!decoder.ReadString(&name)) return false;
+      if (!decoder.ReadString(&msg->m_str)) return false;
       NT_Type type;
-      if (!decoder.ReadType(&type)) return false;
-      unsigned int id, seq_num;
-      if (!decoder.Read16(&id)) return false;
-      if (!decoder.Read16(&seq_num)) return false;
-      unsigned int flags = 0;
+      if (!decoder.ReadType(&type)) return false;  // name
+      if (!decoder.Read16(&msg->m_id)) return false;  // id
+      if (!decoder.Read16(&msg->m_seq_num_uid)) return false;  // seq num
       if (decoder.proto_rev() >= 0x0300u) {
-        if (!decoder.Read8(&flags)) return false;
+        if (!decoder.Read8(&msg->m_flags)) return false;  // flags
       }
-      Value value;
-      if (!decoder.ReadValue(type, &value)) return false;
-      *msg = Message(kEntryAssign);
-      msg->m_str = std::move(name);
-      msg->m_value = std::make_shared<Value>(std::move(value));
-      msg->m_id = id;
-      msg->m_flags = flags;
-      msg->m_seq_num_uid = seq_num;
+      msg->m_value = std::make_shared<Value>();
+      if (!decoder.ReadValue(type, &(*msg->m_value))) return false;
       break;
     }
     case kEntryUpdate: {
-      unsigned int id, seq_num;
-      if (!decoder.Read16(&id)) return false;
-      if (!decoder.Read16(&seq_num)) return false;
+      if (!decoder.Read16(&msg->m_id)) return false;  // id
+      if (!decoder.Read16(&msg->m_seq_num_uid)) return false;  // seq num
       NT_Type type;
       if (decoder.proto_rev() >= 0x0300u) {
         unsigned int itype;
         if (!decoder.Read8(&itype)) return false;
         type = static_cast<NT_Type>(itype);
       } else
-        type = get_entry_type(id);
-      Value value;
-      if (!decoder.ReadValue(type, &value)) return false;
-      *msg = Message(kEntryUpdate);
-      msg->m_value = std::make_shared<Value>(std::move(value));
-      msg->m_id = id;
-      msg->m_seq_num_uid = seq_num;
+        type = get_entry_type(msg->m_id);
+      msg->m_value = std::make_shared<Value>();
+      if (!decoder.ReadValue(type, &(*msg->m_value))) return false;
       break;
     }
     case kFlagsUpdate: {
@@ -103,10 +81,8 @@ bool Message::Read(WireDecoder& decoder,
         decoder.set_error("received FLAGS_UPDATE in protocol < 3.0");
         return false;
       }
-      unsigned int id, flags;
-      if (!decoder.Read16(&id)) return false;
-      if (!decoder.Read8(&flags)) return false;
-      *msg = FlagsUpdate(id, flags);
+      if (!decoder.Read16(&msg->m_id)) return false;
+      if (!decoder.Read8(&msg->m_flags)) return false;
       break;
     }
     case kEntryDelete: {
@@ -114,9 +90,7 @@ bool Message::Read(WireDecoder& decoder,
         decoder.set_error("received ENTRY_DELETE in protocol < 3.0");
         return false;
       }
-      unsigned int id;
-      if (!decoder.Read16(&id)) return false;
-      *msg = EntryDelete(id);
+      if (!decoder.Read16(&msg->m_id)) return false;
       break;
     }
     case kClearEntries: {
@@ -131,7 +105,6 @@ bool Message::Read(WireDecoder& decoder,
             "received incorrect CLEAR_ENTRIES magic value, ignoring");
         return true;
       }
-      *msg = ClearEntries();
       break;
     }
     case kExecuteRpc: {
@@ -139,14 +112,13 @@ bool Message::Read(WireDecoder& decoder,
         decoder.set_error("received EXECUTE_RPC in protocol < 3.0");
         return false;
       }
-      unsigned int id, uid;
-      if (!decoder.Read16(&id)) return false;
-      if (!decoder.Read16(&uid)) return false;
+      if (!decoder.Read16(&msg->m_id)) return false;
+      if (!decoder.Read16(&msg->m_seq_num_uid)) return false;  // uid
       unsigned long size;
       if (!decoder.ReadUleb128(&size)) return false;
       const char* params;
       if (!decoder.Read(&params, size)) return false;
-      *msg = ExecuteRpc(id, uid, llvm::StringRef(params, size));
+      msg->m_str = llvm::StringRef(params, size);
       break;
     }
     case kRpcResponse: {
@@ -154,14 +126,13 @@ bool Message::Read(WireDecoder& decoder,
         decoder.set_error("received RPC_RESPONSE in protocol < 3.0");
         return false;
       }
-      unsigned int id, uid;
-      if (!decoder.Read16(&id)) return false;
-      if (!decoder.Read16(&uid)) return false;
+      if (!decoder.Read16(&msg->m_id)) return false;
+      if (!decoder.Read16(&msg->m_seq_num_uid)) return false;  // uid
       unsigned long size;
       if (!decoder.ReadUleb128(&size)) return false;
       const char* results;
       if (!decoder.Read(&results, size)) return false;
-      *msg = RpcResponse(id, uid, llvm::StringRef(results, size));
+      msg->m_str = llvm::StringRef(results, size);
       break;
     }
     default:
