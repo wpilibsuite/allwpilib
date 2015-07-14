@@ -15,6 +15,11 @@
 template <typename T>
 class ConcurrentQueue {
  public:
+  bool empty() const {
+    std::unique_lock<std::mutex> mlock(mutex_);
+    return queue_.empty();
+  }
+
   T pop() {
     std::unique_lock<std::mutex> mlock(mutex_);
     while (queue_.empty()) {
