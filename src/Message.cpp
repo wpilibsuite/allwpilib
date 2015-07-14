@@ -14,8 +14,8 @@ static constexpr unsigned long kClearAllMagic = 0xD06CB27Aul;
 
 using namespace ntimpl;
 
-bool Message::Read(WireDecoder& decoder,
-                   NT_Type (*get_entry_type)(unsigned int id), Message* msg) {
+bool Message::Read(WireDecoder& decoder, GetEntryTypeFunc get_entry_type,
+                   Message* msg) {
   unsigned int msg_type;
   if (!decoder.Read8(&msg_type)) return false;
   *msg = Message(static_cast<MsgType>(msg_type));

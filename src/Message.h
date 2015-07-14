@@ -35,6 +35,7 @@ class Message {
     kExecuteRpc = 0x20,
     kRpcResponse = 0x21
   };
+  typedef NT_Type (*GetEntryTypeFunc)(unsigned int id);
 
   Message() : m_type(kUnknown), m_id(0), m_flags(0), m_seq_num_uid(0) {}
 
@@ -43,8 +44,8 @@ class Message {
 
   // Read and write from wire representation
   void Write(WireEncoder& encoder) const;
-  static bool Read(WireDecoder& decoder,
-                   NT_Type (*get_entry_type)(unsigned int id), Message* msg);
+  static bool Read(WireDecoder& decoder, GetEntryTypeFunc get_entry_type,
+                   Message* msg);
 
   // Create messages without data
   static Message KeepAlive() { return Message(kKeepAlive); }
