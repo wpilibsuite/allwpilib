@@ -8,8 +8,9 @@
 #ifndef NT_STORAGE_H_
 #define NT_STORAGE_H_
 
-#include <iosfwd>
 #include <cstddef>
+#include <iosfwd>
+#include <memory>
 
 #include "ntcore.h"
 
@@ -40,9 +41,10 @@ private:
 class Storage {
  public:
   static Storage& GetInstance() {
-    if (!m_instance) m_instance = new Storage;
+    if (!m_instance) m_instance.reset(new Storage);
     return *m_instance;
   }
+  ~Storage();
 
   typedef llvm::StringMap<StorageEntry> EntriesMap;
 
@@ -55,13 +57,12 @@ class Storage {
 
  private:
   Storage();
-  ~Storage();
   Storage(const Storage&) = delete;
   Storage& operator=(const Storage&) = delete;
 
   EntriesMap m_entries;
 
-  static Storage* m_instance;
+  static std::unique_ptr<Storage> m_instance;
 };
 
 }  // namespace ntimpl

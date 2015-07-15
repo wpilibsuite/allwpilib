@@ -15,7 +15,7 @@
 
 using namespace ntimpl;
 
-Storage* Storage::m_instance = nullptr;
+std::unique_ptr<Storage> Storage::m_instance;
 
 Storage::Storage() {}
 
