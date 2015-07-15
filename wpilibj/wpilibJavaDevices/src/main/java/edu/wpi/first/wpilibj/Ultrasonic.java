@@ -29,26 +29,15 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
   /**
    * The units to return when PIDGet is called
    */
-  public static class Unit {
-
-    /**
-     * The integer value representing this enumeration
-     */
-    public final int value;
-    static final int kInches_val = 0;
-    static final int kMillimeters_val = 1;
+  public static enum Unit {
     /**
      * Use inches for PIDGet
      */
-    public static final Unit kInches = new Unit(kInches_val);
+    kInches,
     /**
      * Use millimeters for PIDGet
      */
-    public static final Unit kMillimeter = new Unit(kMillimeters_val);
-
-    private Unit(int value) {
-      this.value = value;
-    }
+    kMillimeters
   }
 
   private static final double kPingTime = 10 * 1e-6; // /< Time (sec) for the
@@ -72,6 +61,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
   // sensing
   private Unit m_units;
   private static int m_instances = 0;
+  protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
   /**
    * Background task that goes through the list of ultrasonic sensors and pings
@@ -345,15 +335,32 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
   }
 
   /**
+   * {@inheritDoc}
+   */
+  public void setPIDSourceType(PIDSourceType pidSource) {
+    if (!pidSource.equals(PIDSourceType.kDisplacement)) {
+      throw new IllegalArgumentException("Only displacement PID is allowed for potentiometers.");
+    }
+    m_pidSource = pidSource;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public PIDSourceType getPIDSourceType() {
+    return m_pidSource;
+  }
+
+  /**
    * Get the range in the current DistanceUnit for the PIDSource base object.
    *
    * @return The range in DistanceUnit
    */
   public double pidGet() {
-    switch (m_units.value) {
-      case Unit.kInches_val:
+    switch (m_units) {
+      case kInches:
         return getRangeInches();
-      case Unit.kMillimeters_val:
+      case kMillimeters:
         return getRangeMM();
       default:
         return 0.0;

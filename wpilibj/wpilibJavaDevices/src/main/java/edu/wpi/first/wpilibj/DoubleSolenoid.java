@@ -26,19 +26,10 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
   /**
    * Possible values for a DoubleSolenoid
    */
-  public static class Value {
-
-    public final int value;
-    public static final int kOff_val = 0;
-    public static final int kForward_val = 1;
-    public static final int kReverse_val = 2;
-    public static final Value kOff = new Value(kOff_val);
-    public static final Value kForward = new Value(kForward_val);
-    public static final Value kReverse = new Value(kReverse_val);
-
-    private Value(int value) {
-      this.value = value;
-    }
+  public static enum Value {
+    kOff,
+    kForward,
+    kReverse
   }
 
   private int m_forwardChannel; // /< The forward channel on the module to
@@ -119,14 +110,14 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
   public void set(final Value value) {
     byte rawValue = 0;
 
-    switch (value.value) {
-      case Value.kOff_val:
+    switch (value) {
+      case kOff:
         rawValue = 0x00;
         break;
-      case Value.kForward_val:
+      case kForward:
         rawValue = m_forwardMask;
         break;
-      case Value.kReverse_val:
+      case kReverse:
         rawValue = m_reverseMask;
         break;
     }

@@ -46,6 +46,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
   private int m_channel;
   private static final int[] kAccumulatorChannels = {0, 1};
   private long m_accumulatorOffset;
+  protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
   /**
    * Construct an analog channel.
@@ -458,6 +459,20 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
     HALUtil.checkStatus(status.asIntBuffer());
 
     return value;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void setPIDSourceType(PIDSourceType pidSource) {
+    m_pidSource = pidSource;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public PIDSourceType getPIDSourceType() {
+    return m_pidSource;
   }
 
   /**

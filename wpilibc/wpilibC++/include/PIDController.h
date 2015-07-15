@@ -10,13 +10,13 @@
 #include "Controller.h"
 #include "LiveWindow/LiveWindow.h"
 #include "PIDInterface.h"
-#include "HAL/cpp/priority_mutex.h"
+#include "PIDSource.h"
 #include "Notifier.h"
+#include "HAL/cpp/priority_mutex.h"
 
 #include <memory>
 
 class PIDOutput;
-class PIDSource;
 
 /**
  * Class implements a PID Control Loop.
@@ -54,6 +54,9 @@ class PIDController : public LiveWindowSendable,
 
   virtual float GetError() const;
 
+  virtual void SetPIDSourceType(PIDSourceType pidSource);
+  virtual PIDSourceType GetPIDSourceType() const;
+
   virtual void SetTolerance(float percent);
   virtual void SetAbsoluteTolerance(float absValue);
   virtual void SetPercentTolerance(float percentValue);
@@ -66,6 +69,13 @@ class PIDController : public LiveWindowSendable,
   virtual void Reset() override;
 
   virtual void InitTable(std::shared_ptr<ITable> table) override;
+
+ protected:
+  PIDSource *m_pidInput;
+  PIDOutput *m_pidOutput;
+
+  std::shared_ptr<ITable> m_table;
+  virtual void Calculate();
 
  private:
   float m_P;              // factor for "proportional" control
@@ -95,9 +105,6 @@ class PIDController : public LiveWindowSendable,
 
   mutable priority_mutex m_mutex;
 
-  PIDSource *m_pidInput;
-  PIDOutput *m_pidOutput;
-
   std::unique_ptr<Notifier> m_controlLoop;
 
   void Initialize(float p, float i, float d, float f, PIDSource *source,
@@ -111,8 +118,4 @@ class PIDController : public LiveWindowSendable,
   virtual void UpdateTable() override;
   virtual void StartLiveWindowMode() override;
   virtual void StopLiveWindowMode() override;
-
- protected:
-  std::shared_ptr<ITable> m_table = nullptr;
-  virtual void Calculate();
 };

@@ -43,8 +43,8 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   private double m_error = 0.0;
   private double m_result = 0.0;
   private double m_period = kDefaultPeriod;
-  PIDSource m_pidInput;
-  PIDOutput m_pidOutput;
+  protected PIDSource m_pidInput;
+  protected PIDOutput m_pidOutput;
   java.util.Timer m_controlLoop;
   private boolean m_freed = false;
   private boolean m_usingPercentTolerance;
@@ -256,21 +256,39 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
           }
         }
 
-        if (m_I != 0) {
-          double potentialIGain = (m_totalError + m_error) * m_I;
-          if (potentialIGain < m_maximumOutput) {
-            if (potentialIGain > m_minimumOutput) {
-              m_totalError += m_error;
+        if (m_pidInput.getPIDSourceType().equals(PIDSourceType.kRate)) {
+          if (m_P != 0) {
+            double potentialPGain = (m_totalError + m_error) * m_P;
+            if (potentialPGain < m_maximumOutput) {
+              if (potentialPGain > m_minimumOutput) {
+                m_totalError += m_error;
+              } else {
+                m_totalError = m_minimumOutput / m_P;
+              }
             } else {
-              m_totalError = m_minimumOutput / m_I;
+              m_totalError = m_maximumOutput / m_P;
             }
-          } else {
-            m_totalError = m_maximumOutput / m_I;
+
+            m_result = m_P * m_totalError + m_D * m_error + m_setpoint * m_F;
           }
         }
+        else {
+          if (m_I != 0) {
+            double potentialIGain = (m_totalError + m_error) * m_I;
+            if (potentialIGain < m_maximumOutput) {
+              if (potentialIGain > m_minimumOutput) {
+                m_totalError += m_error;
+              } else {
+                m_totalError = m_minimumOutput / m_I;
+              }
+            } else {
+              m_totalError = m_maximumOutput / m_I;
+            }
+          }
 
-        m_result =
-            m_P * m_error + m_I * m_totalError + m_D * (m_prevInput - input) + m_setpoint * m_F;
+          m_result =
+              m_P * m_error + m_I * m_totalError + m_D * (m_prevInput - input) + m_setpoint * m_F;
+        }
         m_prevInput = input;
 
         if (m_result > m_maximumOutput) {
@@ -464,6 +482,24 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   public synchronized double getError() {
     // return m_error;
     return getSetpoint() - m_pidInput.pidGet();
+  }
+
+  /**
+   * Sets what type of input the PID controller will use
+   *$
+   * @param pidSource the type of input
+   */
+  void setPIDSourceType(PIDSourceType pidSource) {
+    m_pidInput.setPIDSourceType(pidSource);
+  }
+
+  /**
+   * Returns the type of input the PID controller is using
+   *$
+   * @return the PID controller input type
+   */
+  PIDSourceType getPIDSourceType() {
+    return m_pidInput.getPIDSourceType();
   }
 
   /**

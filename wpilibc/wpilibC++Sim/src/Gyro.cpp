@@ -25,7 +25,7 @@ constexpr float Gyro::kDefaultVoltsPerDegreePerSecond;
  */
 void Gyro::InitGyro(int channel)
 {
-	SetPIDSourceParameter(kAngle);
+	SetPIDSourceType(PIDSourceType::kDisplacement);
 
 	char buffer[50];
 	int n = sprintf(buffer, "analog/%d", channel);
@@ -83,10 +83,8 @@ double Gyro::GetRate() const
     return impl->GetVelocity();
 }
 
-void Gyro::SetPIDSourceParameter(PIDSourceParameter pidSource)
+void Gyro::SetPIDSourceType(PIDSourceType pidSource)
 {
-	if(pidSource == 0 || pidSource > 2)
-		wpi_setWPIErrorWithContext(ParameterOutOfRange, "Gyro pidSource");
     m_pidSource = pidSource;
 }
 
@@ -97,10 +95,10 @@ void Gyro::SetPIDSourceParameter(PIDSourceParameter pidSource)
  */
 double Gyro::PIDGet() const
 {
-	switch(m_pidSource){
-	case kRate:
+	switch(GetPIDSourceType()){
+	case PIDSourceType::kRate:
 		return GetRate();
-	case kAngle:
+	case PIDSourceType::kDisplacement:
 		return GetAngle();
 	default:
 		return 0;

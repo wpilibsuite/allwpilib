@@ -34,7 +34,6 @@ void Encoder::InitEncoder(int channelA, int channelB, bool reverseDirection, Enc
 
 	int32_t index = 0;
 	m_distancePerPulse = 1.0;
-	m_pidSource = kDistance;
 
 	LiveWindow::GetInstance().AddSensor("Encoder", channelA, this);
 
@@ -309,7 +308,7 @@ void Encoder::SetReverseDirection(bool reverseDirection)
  *
  * @param pidSource An enum to select the parameter.
  */
-void Encoder::SetPIDSourceParameter(PIDSourceParameter pidSource)
+void Encoder::SetPIDSourceType(PIDSourceType pidSource)
 {
 	m_pidSource = pidSource;
 }
@@ -323,9 +322,9 @@ double Encoder::PIDGet() const
 {
 	switch (m_pidSource)
 	{
-	case kDistance:
+	case PIDSourceType::kDisplacement:
 		return GetDistance();
-	case kRate:
+	case PIDSourceType::kRate:
 		return GetRate();
 	default:
 		return 0.0;

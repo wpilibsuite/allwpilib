@@ -28,6 +28,7 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
   private double m_fullRange, m_offset;
   private AnalogInput m_analog_input;
   private boolean m_init_analog_input;
+  protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
   /**
    * Common initialization code called by all constructors.
@@ -150,6 +151,23 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
    */
   public double get() {
     return (m_analog_input.getVoltage() / ControllerPower.getVoltage5V()) * m_fullRange + m_offset;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void setPIDSourceType(PIDSourceType pidSource) {
+    if (!pidSource.equals(PIDSourceType.kDisplacement)) {
+      throw new IllegalArgumentException("Only displacement PID is allowed for potentiometers.");
+    }
+    m_pidSource = pidSource;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public PIDSourceType getPIDSourceType() {
+    return m_pidSource;
   }
 
   /**

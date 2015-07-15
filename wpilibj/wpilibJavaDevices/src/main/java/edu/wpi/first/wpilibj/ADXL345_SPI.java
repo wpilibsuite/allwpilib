@@ -42,18 +42,15 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
   private static final int kDataFormat_FullRes = 0x08;
   private static final int kDataFormat_Justify = 0x04;
 
-  public static class Axes {
+  public static enum Axes {
+    kX((byte) 0x00),
+    kY((byte) 0x02),
+    kZ((byte) 0x04);
 
     /**
      * The integer value representing this enumeration
      */
     public final byte value;
-    static final byte kX_val = 0x00;
-    static final byte kY_val = 0x02;
-    static final byte kZ_val = 0x04;
-    public static final ADXL345_SPI.Axes kX = new ADXL345_SPI.Axes(kX_val);
-    public static final ADXL345_SPI.Axes kY = new ADXL345_SPI.Axes(kY_val);
-    public static final ADXL345_SPI.Axes kZ = new ADXL345_SPI.Axes(kZ_val);
 
     private Axes(byte value) {
       this.value = value;

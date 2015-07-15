@@ -206,6 +206,12 @@ bool PIDSubsystem::OnTarget() const { return m_controller->OnTarget(); }
  */
 double PIDSubsystem::GetPosition() { return ReturnPIDInput(); }
 
+/**
+ * Returns the current rate
+ * @return the current rate
+ */
+double PIDSubsystem::GetRate() { return ReturnPIDInput(); }
+
 void PIDSubsystem::PIDWrite(float output) { UsePIDOutput(output); }
 
 double PIDSubsystem::PIDGet() const { return ReturnPIDInput(); }

@@ -6,6 +6,8 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
+enum class PIDSourceType { kDisplacement, kRate };
+
 /**
  * PIDSource interface is a generic sensor source for the PID class.
  * All sensors that can be used with the PID class will implement the PIDSource
@@ -14,6 +16,10 @@
  */
 class PIDSource {
  public:
-  enum PIDSourceParameter { kDistance, kRate, kAngle };
+  virtual void SetPIDSourceType(PIDSourceType pidSource);
+  PIDSourceType GetPIDSourceType() const;
   virtual double PIDGet() const = 0;
+
+ protected:
+  PIDSourceType m_pidSource = PIDSourceType::kDisplacement;
 };

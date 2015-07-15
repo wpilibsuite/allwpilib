@@ -30,18 +30,15 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
   private static final byte kDataFormat_SelfTest = (byte) 0x80, kDataFormat_SPI = 0x40,
       kDataFormat_IntInvert = 0x20, kDataFormat_FullRes = 0x08, kDataFormat_Justify = 0x04;
 
-  public static class Axes {
+  public static enum Axes {
+    kX((byte) 0x00),
+    kY((byte) 0x02),
+    kZ((byte) 0x04);
 
     /**
      * The integer value representing this enumeration
      */
     public final byte value;
-    static final byte kX_val = 0x00;
-    static final byte kY_val = 0x02;
-    static final byte kZ_val = 0x04;
-    public static final Axes kX = new Axes(kX_val);
-    public static final Axes kY = new Axes(kY_val);
-    public static final Axes kZ = new Axes(kZ_val);
 
     private Axes(byte value) {
       this.value = value;

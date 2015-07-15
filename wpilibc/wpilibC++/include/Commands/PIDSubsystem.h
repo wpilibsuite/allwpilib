@@ -52,6 +52,7 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
   void SetOutputRange(float minimumOutput, float maximumOutput);
   double GetSetpoint();
   double GetPosition();
+  double GetRate();
 
   virtual void SetAbsoluteTolerance(float absValue);
   virtual void SetPercentTolerance(float percent);

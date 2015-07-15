@@ -122,11 +122,12 @@ TEST_P(MotorEncoderTest, ClampSpeed) {
 }
 
 /**
- * Test if PID loops work
+ * Test if position PID loop works
  */
-TEST_P(MotorEncoderTest, PIDController) {
+TEST_P(MotorEncoderTest, PositionPIDController) {
   Reset();
 
+  m_encoder->SetPIDSourceType(PIDSourceType::kDisplacement);
   PIDController pid(0.001f, 0.0005f, 0.0f, m_encoder, m_speedController);
   pid.SetAbsoluteTolerance(20.0f);
   pid.SetOutputRange(-0.3f, 0.3f);
@@ -140,6 +141,29 @@ TEST_P(MotorEncoderTest, PIDController) {
   RecordProperty("PIDError", pid.GetError());
 
   EXPECT_TRUE(pid.OnTarget()) << "PID loop did not converge within 10 seconds.";
+}
+
+/**
+ * Test if velocity PID loop works
+ */
+TEST_P(MotorEncoderTest, VelocityPIDController) {
+  Reset();
+
+  m_encoder->SetPIDSourceType(PIDSourceType::kRate);
+  PIDController pid(0.002f, 0.0f, 0.0001f, m_encoder, m_speedController);
+  pid.SetAbsoluteTolerance(20.0f);
+  pid.SetOutputRange(-0.3f, 0.3f);
+  pid.SetSetpoint(30);
+
+  /* 10 seconds should be plenty time to get to the setpoint */
+  pid.Enable();
+  Wait(10.0);
+
+  RecordProperty("PIDError", pid.GetError());
+
+  EXPECT_TRUE(pid.OnTarget()) << "PID loop did not converge within 10 seconds.";
+
+  pid.Disable();
 }
 
 /**

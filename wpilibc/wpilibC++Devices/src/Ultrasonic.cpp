@@ -316,6 +316,12 @@ double Ultrasonic::PIDGet() const {
   }
 }
 
+void Ultrasonic::SetPIDSourceType(PIDSourceType pidSource) {
+  if (wpi_assert(pidSource == PIDSourceType::kDisplacement)) {
+    m_pidSource = pidSource;
+  }
+}
+
 /**
  * Set the current DistanceUnit that should be used for the PIDSource base
  * object.

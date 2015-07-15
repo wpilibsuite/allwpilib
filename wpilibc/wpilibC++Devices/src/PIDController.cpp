@@ -127,20 +127,37 @@ void PIDController::Calculate() {
         }
       }
 
-      if (m_I != 0) {
-        double potentialIGain = (m_totalError + m_error) * m_I;
-        if (potentialIGain < m_maximumOutput) {
-          if (potentialIGain > m_minimumOutput)
-            m_totalError += m_error;
-          else
-            m_totalError = m_minimumOutput / m_I;
-        } else {
-          m_totalError = m_maximumOutput / m_I;
+      if (m_pidInput->GetPIDSourceType() == PIDSourceType::kRate) {
+        if (m_P != 0) {
+          double potentialPGain = (m_totalError + m_error) * m_P;
+          if (potentialPGain < m_maximumOutput) {
+            if (potentialPGain > m_minimumOutput)
+              m_totalError += m_error;
+            else
+              m_totalError = m_minimumOutput / m_P;
+          } else {
+            m_totalError = m_maximumOutput / m_P;
+          }
         }
-      }
 
-      m_result = m_P * m_error + m_I * m_totalError +
-                 m_D * (m_prevInput - input) + m_setpoint * m_F;
+        m_result = m_D * m_error + m_P * m_totalError + m_setpoint * m_F;
+      }
+      else {
+        if (m_I != 0) {
+          double potentialIGain = (m_totalError + m_error) * m_I;
+          if (potentialIGain < m_maximumOutput) {
+            if (potentialIGain > m_minimumOutput)
+              m_totalError += m_error;
+            else
+              m_totalError = m_minimumOutput / m_I;
+          } else {
+            m_totalError = m_maximumOutput / m_I;
+          }
+        }
+
+        m_result = m_P * m_error + m_I * m_totalError +
+                   m_D * (m_prevInput - input) + m_setpoint * m_F;
+      }
       m_prevInput = input;
 
       if (m_result > m_maximumOutput)
@@ -325,7 +342,7 @@ double PIDController::GetSetpoint() const {
 }
 
 /**
- * Retruns the current difference of the input from the setpoint
+ * Returns the current difference of the input from the setpoint
  * @return the current error
  */
 float PIDController::GetError() const {
@@ -335,6 +352,20 @@ float PIDController::GetError() const {
     pidInput = m_pidInput->PIDGet();
   }
   return GetSetpoint() - pidInput;
+}
+
+/**
+ * Sets what type of input the PID controller will use
+ */
+void PIDController::SetPIDSourceType(PIDSourceType pidSource) {
+  m_pidInput->SetPIDSourceType(pidSource);
+}
+/**
+ * Returns the type of input the PID controller is using
+ * @return the PID controller input type
+ */
+PIDSourceType PIDController::GetPIDSourceType() const {
+  return m_pidInput->GetPIDSourceType();
 }
 
 /*

@@ -31,6 +31,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 
 	private SimFloatInput m_impl;
 	private int m_channel;
+  protected PIDSourceParameter m_pidSource = PIDSourceParameter.kDistance;
 
 	/**
 	 * Construct an analog channel.
@@ -86,6 +87,20 @@ public class AnalogInput extends SensorBase implements PIDSource,
 	public int getChannel() {
 		return m_channel;
 	}
+
+  /**
+   * {@inheritDoc}
+   */
+  public void setPIDSourceParameter(PIDSourceParameter pidSource) {
+    m_pidSource = pidSource;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public PIDSourceParameter getPIDSourceParameter() {
+    return m_pidSource;
+  }
 
 	/**
 	 * Get the average value for use with PIDController
