@@ -79,7 +79,7 @@ class Message {
   Message& operator=(Message&&) = default;
 
  private:
-  Message(MsgType type);
+  Message(MsgType type) : m_type(type), m_id(0), m_flags(0), m_seq_num_uid(0) {}
 
   MsgType m_type;
 
