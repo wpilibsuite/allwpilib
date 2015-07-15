@@ -27,6 +27,7 @@ NetworkConnection::NetworkConnection(std::unique_ptr<TCPStream> stream,
 NetworkConnection::~NetworkConnection() { Stop(); }
 
 void NetworkConnection::Start() {
+  if (m_active) return;
   m_active = true;
   m_write_thread = std::thread(&NetworkConnection::WriteThreadMain, this);
   m_read_thread = std::thread(&NetworkConnection::ReadThreadMain, this);
