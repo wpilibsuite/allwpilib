@@ -79,7 +79,7 @@ class PIDController : public LiveWindowSendable,
   bool m_continuous = false;      // do the endpoints wrap around? eg. Absolute encoder
   bool m_enabled = false;  // is the pid controller enabled
   bool m_destruct;    // should the calculate thread stop running
-  float m_prevError = 0;  // the prior sensor input (used to compute velocity)
+  float m_prevInput = 0;  // the prior sensor input (used to compute velocity)
   double m_totalError = 0;  // the sum of the errors for use in the integral calc
   enum {
     kAbsoluteTolerance,

@@ -140,8 +140,8 @@ void PIDController::Calculate() {
       }
 
       m_result = m_P * m_error + m_I * m_totalError +
-                 m_D * (m_error - m_prevError) + m_setpoint * m_F;
-      m_prevError = m_error;
+                 m_D * (m_prevInput - input) + m_setpoint * m_F;
+      m_prevInput = input;
 
       if (m_result > m_maximumOutput)
         m_result = m_maximumOutput;
@@ -447,7 +447,7 @@ void PIDController::Reset() {
   Disable();
 
   std::unique_lock<priority_mutex> sync(m_mutex);
-  m_prevError = 0;
+  m_prevInput = 0;
   m_totalError = 0;
   m_result = 0;
 }

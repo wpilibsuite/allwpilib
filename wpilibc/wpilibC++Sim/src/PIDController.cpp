@@ -74,7 +74,7 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
 	m_enabled = false;
 	m_setpoint = 0;
 
-	m_prevError = 0;
+	m_prevInput = 0;
 	m_totalError = 0;
 	m_tolerance = .05;
 
@@ -164,8 +164,8 @@ void PIDController::Calculate()
 				}
 			}
 
-			m_result = m_P * m_error + m_I * m_totalError + m_D * (m_error - m_prevError) + m_setpoint * m_F;
-			m_prevError = m_error;
+			m_result = m_P * m_error + m_I * m_totalError + m_D * (m_prevInput - input) + m_setpoint * m_F;
+			m_prevInput = input;
 
 			if (m_result > m_maximumOutput) m_result = m_maximumOutput;
 			else if (m_result < m_minimumOutput) m_result = m_minimumOutput;
@@ -482,7 +482,7 @@ void PIDController::Reset()
 	Disable();
 
 	std::unique_lock<priority_mutex> lock(m_mutex);
-	m_prevError = 0;
+	m_prevInput = 0;
 	m_totalError = 0;
 	m_result = 0;
 }

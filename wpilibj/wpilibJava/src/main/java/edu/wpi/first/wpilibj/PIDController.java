@@ -33,7 +33,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   private boolean m_continuous = false; // do the endpoints wrap around? eg.
                                         // Absolute encoder
   private boolean m_enabled = false; // is the pid controller enabled
-  private double m_prevError = 0.0; // the prior sensor input (used to compute
+  private double m_prevInput = 0.0; // the prior sensor input (used to compute
                                     // velocity)
   private double m_totalError = 0.0; // the sum of the errors for use in the
                                      // integral calc
@@ -270,8 +270,8 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
         }
 
         m_result =
-            m_P * m_error + m_I * m_totalError + m_D * (m_error - m_prevError) + m_setpoint * m_F;
-        m_prevError = m_error;
+            m_P * m_error + m_I * m_totalError + m_D * (m_prevInput - input) + m_setpoint * m_F;
+        m_prevInput = input;
 
         if (m_result > m_maximumOutput) {
           m_result = m_maximumOutput;
@@ -572,7 +572,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    */
   public synchronized void reset() {
     disable();
-    m_prevError = 0;
+    m_prevInput = 0;
     m_totalError = 0;
     m_result = 0;
   }
