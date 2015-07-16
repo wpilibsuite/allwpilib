@@ -14,210 +14,216 @@ static constexpr unsigned long kClearAllMagic = 0xD06CB27Aul;
 
 using namespace ntimpl;
 
-bool Message::Read(WireDecoder& decoder, GetEntryTypeFunc get_entry_type,
-                   Message* msg) {
+std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
+                                       GetEntryTypeFunc get_entry_type) {
   unsigned int msg_type;
-  if (!decoder.Read8(&msg_type)) return false;
-  *msg = Message(static_cast<MsgType>(msg_type));
+  if (!decoder.Read8(&msg_type)) return nullptr;
+  auto msg =
+      std::make_shared<Message>(static_cast<MsgType>(msg_type), private_init());
   switch (msg_type) {
     case kKeepAlive:
       break;
     case kClientHello: {
       unsigned int proto_rev;
-      if (!decoder.Read16(&proto_rev)) return false;
+      if (!decoder.Read16(&proto_rev)) return nullptr;
       msg->m_id = proto_rev;
       // This intentionally uses the provided proto_rev instead of
       // decoder.proto_rev().
       if (proto_rev >= 0x0300u) {
-        if (!decoder.ReadString(&msg->m_str)) return false;
+        if (!decoder.ReadString(&msg->m_str)) return nullptr;
       }
       break;
     }
     case kProtoUnsup: {
-      if (!decoder.Read16(&msg->m_id)) return false;  // proto rev
+      if (!decoder.Read16(&msg->m_id)) return nullptr;  // proto rev
       break;
     }
     case kServerHelloDone:
       if (decoder.proto_rev() < 0x0300u) {
         decoder.set_error("received SERVER_HELLO_DONE in protocol < 3.0");
-        return false;
+        return nullptr;
       }
       break;
     case kClientHelloDone:
       if (decoder.proto_rev() < 0x0300u) {
         decoder.set_error("received CLIENT_HELLO_DONE in protocol < 3.0");
-        return false;
+        return nullptr;
       }
       break;
     case kEntryAssign: {
-      if (!decoder.ReadString(&msg->m_str)) return false;
+      if (!decoder.ReadString(&msg->m_str)) return nullptr;
       NT_Type type;
-      if (!decoder.ReadType(&type)) return false;  // name
-      if (!decoder.Read16(&msg->m_id)) return false;  // id
-      if (!decoder.Read16(&msg->m_seq_num_uid)) return false;  // seq num
+      if (!decoder.ReadType(&type)) return nullptr;  // name
+      if (!decoder.Read16(&msg->m_id)) return nullptr;  // id
+      if (!decoder.Read16(&msg->m_seq_num_uid)) return nullptr;  // seq num
       if (decoder.proto_rev() >= 0x0300u) {
-        if (!decoder.Read8(&msg->m_flags)) return false;  // flags
+        if (!decoder.Read8(&msg->m_flags)) return nullptr;  // flags
       }
       msg->m_value = std::make_shared<Value>();
-      if (!decoder.ReadValue(type, &(*msg->m_value))) return false;
+      if (!decoder.ReadValue(type, &(*msg->m_value))) return nullptr;
       break;
     }
     case kEntryUpdate: {
-      if (!decoder.Read16(&msg->m_id)) return false;  // id
-      if (!decoder.Read16(&msg->m_seq_num_uid)) return false;  // seq num
+      if (!decoder.Read16(&msg->m_id)) return nullptr;  // id
+      if (!decoder.Read16(&msg->m_seq_num_uid)) return nullptr;  // seq num
       NT_Type type;
       if (decoder.proto_rev() >= 0x0300u) {
         unsigned int itype;
-        if (!decoder.Read8(&itype)) return false;
+        if (!decoder.Read8(&itype)) return nullptr;
         type = static_cast<NT_Type>(itype);
       } else
         type = get_entry_type(msg->m_id);
       msg->m_value = std::make_shared<Value>();
-      if (!decoder.ReadValue(type, &(*msg->m_value))) return false;
+      if (!decoder.ReadValue(type, &(*msg->m_value))) return nullptr;
       break;
     }
     case kFlagsUpdate: {
       if (decoder.proto_rev() < 0x0300u) {
         decoder.set_error("received FLAGS_UPDATE in protocol < 3.0");
-        return false;
+        return nullptr;
       }
-      if (!decoder.Read16(&msg->m_id)) return false;
-      if (!decoder.Read8(&msg->m_flags)) return false;
+      if (!decoder.Read16(&msg->m_id)) return nullptr;
+      if (!decoder.Read8(&msg->m_flags)) return nullptr;
       break;
     }
     case kEntryDelete: {
       if (decoder.proto_rev() < 0x0300u) {
         decoder.set_error("received ENTRY_DELETE in protocol < 3.0");
-        return false;
+        return nullptr;
       }
-      if (!decoder.Read16(&msg->m_id)) return false;
+      if (!decoder.Read16(&msg->m_id)) return nullptr;
       break;
     }
     case kClearEntries: {
       if (decoder.proto_rev() < 0x0300u) {
         decoder.set_error("received CLEAR_ENTRIES in protocol < 3.0");
-        return false;
+        return nullptr;
       }
       unsigned long magic;
-      if (!decoder.Read32(&magic)) return false;
+      if (!decoder.Read32(&magic)) return nullptr;
       if (magic != kClearAllMagic) {
         decoder.set_error(
             "received incorrect CLEAR_ENTRIES magic value, ignoring");
-        return true;
+        return nullptr;
       }
       break;
     }
     case kExecuteRpc: {
       if (decoder.proto_rev() < 0x0300u) {
         decoder.set_error("received EXECUTE_RPC in protocol < 3.0");
-        return false;
+        return nullptr;
       }
-      if (!decoder.Read16(&msg->m_id)) return false;
-      if (!decoder.Read16(&msg->m_seq_num_uid)) return false;  // uid
+      if (!decoder.Read16(&msg->m_id)) return nullptr;
+      if (!decoder.Read16(&msg->m_seq_num_uid)) return nullptr;  // uid
       unsigned long size;
-      if (!decoder.ReadUleb128(&size)) return false;
+      if (!decoder.ReadUleb128(&size)) return nullptr;
       const char* params;
-      if (!decoder.Read(&params, size)) return false;
+      if (!decoder.Read(&params, size)) return nullptr;
       msg->m_str = llvm::StringRef(params, size);
       break;
     }
     case kRpcResponse: {
       if (decoder.proto_rev() < 0x0300u) {
         decoder.set_error("received RPC_RESPONSE in protocol < 3.0");
-        return false;
+        return nullptr;
       }
-      if (!decoder.Read16(&msg->m_id)) return false;
-      if (!decoder.Read16(&msg->m_seq_num_uid)) return false;  // uid
+      if (!decoder.Read16(&msg->m_id)) return nullptr;
+      if (!decoder.Read16(&msg->m_seq_num_uid)) return nullptr;  // uid
       unsigned long size;
-      if (!decoder.ReadUleb128(&size)) return false;
+      if (!decoder.ReadUleb128(&size)) return nullptr;
       const char* results;
-      if (!decoder.Read(&results, size)) return false;
+      if (!decoder.Read(&results, size)) return nullptr;
       msg->m_str = llvm::StringRef(results, size);
       break;
     }
     default:
       decoder.set_error("unrecognized message type");
-      return false;
+      return nullptr;
   }
-  return true;
-}
-
-Message Message::ClientHello(llvm::StringRef self_id) {
-  Message msg(kClientHello);
-  msg.m_str = self_id;
   return msg;
 }
 
-Message Message::ServerHello(unsigned int flags, llvm::StringRef self_id) {
-  Message msg(kServerHello);
-  msg.m_str = self_id;
-  msg.m_flags = flags;
+std::shared_ptr<Message> Message::ClientHello(llvm::StringRef self_id) {
+  auto msg = std::make_shared<Message>(kClientHello, private_init());
+  msg->m_str = self_id;
   return msg;
 }
 
-Message Message::EntryAssign(llvm::StringRef name, unsigned int id,
-                             unsigned int seq_num, std::shared_ptr<Value> value,
-                             unsigned int flags) {
-  Message msg(kEntryAssign);
-  msg.m_str = name;
-  msg.m_value = value;
-  msg.m_id = id;
-  msg.m_flags = flags;
-  msg.m_seq_num_uid = seq_num;
+std::shared_ptr<Message> Message::ServerHello(unsigned int flags,
+                                              llvm::StringRef self_id) {
+  auto msg = std::make_shared<Message>(kServerHello, private_init());
+  msg->m_str = self_id;
+  msg->m_flags = flags;
   return msg;
 }
 
-Message Message::EntryUpdate(unsigned int id, unsigned int seq_num,
-                             std::shared_ptr<Value> value) {
-  Message msg(kEntryUpdate);
-  msg.m_value = value;
-  msg.m_id = id;
-  msg.m_seq_num_uid = seq_num;
+std::shared_ptr<Message> Message::EntryAssign(llvm::StringRef name,
+                                              unsigned int id,
+                                              unsigned int seq_num,
+                                              std::shared_ptr<Value> value,
+                                              unsigned int flags) {
+  auto msg = std::make_shared<Message>(kEntryAssign, private_init());
+  msg->m_str = name;
+  msg->m_value = value;
+  msg->m_id = id;
+  msg->m_flags = flags;
+  msg->m_seq_num_uid = seq_num;
   return msg;
 }
 
-Message Message::FlagsUpdate(unsigned int id, unsigned int flags) {
-  Message msg(kFlagsUpdate);
-  msg.m_id = id;
-  msg.m_flags = flags;
+std::shared_ptr<Message> Message::EntryUpdate(unsigned int id,
+                                              unsigned int seq_num,
+                                              std::shared_ptr<Value> value) {
+  auto msg = std::make_shared<Message>(kEntryUpdate, private_init());
+  msg->m_value = value;
+  msg->m_id = id;
+  msg->m_seq_num_uid = seq_num;
   return msg;
 }
 
-Message Message::EntryDelete(unsigned int id) {
-  Message msg(kEntryDelete);
-  msg.m_id = id;
+std::shared_ptr<Message> Message::FlagsUpdate(unsigned int id,
+                                              unsigned int flags) {
+  auto msg = std::make_shared<Message>(kFlagsUpdate, private_init());
+  msg->m_id = id;
+  msg->m_flags = flags;
   return msg;
 }
 
-Message Message::ExecuteRpc(unsigned int id, unsigned int uid,
-                            llvm::ArrayRef<NT_Value> params) {
+std::shared_ptr<Message> Message::EntryDelete(unsigned int id) {
+  auto msg = std::make_shared<Message>(kEntryDelete, private_init());
+  msg->m_id = id;
+  return msg;
+}
+
+std::shared_ptr<Message> Message::ExecuteRpc(unsigned int id, unsigned int uid,
+                                             llvm::ArrayRef<NT_Value> params) {
   WireEncoder enc(0x0300);
   for (auto& param : params) enc.WriteValue(param);
   return ExecuteRpc(id, uid, enc.ToStringRef());
 }
 
-Message Message::ExecuteRpc(unsigned int id, unsigned int uid,
-                            llvm::StringRef params) {
-  Message msg(kExecuteRpc);
-  msg.m_str = params;
-  msg.m_id = id;
-  msg.m_seq_num_uid = uid;
+std::shared_ptr<Message> Message::ExecuteRpc(unsigned int id, unsigned int uid,
+                                             llvm::StringRef params) {
+  auto msg = std::make_shared<Message>(kExecuteRpc, private_init());
+  msg->m_str = params;
+  msg->m_id = id;
+  msg->m_seq_num_uid = uid;
   return msg;
 }
 
-Message Message::RpcResponse(unsigned int id, unsigned int uid,
-                             llvm::ArrayRef<NT_Value> results) {
+std::shared_ptr<Message> Message::RpcResponse(
+    unsigned int id, unsigned int uid, llvm::ArrayRef<NT_Value> results) {
   WireEncoder enc(0x0300);
   for (auto& result : results) enc.WriteValue(result);
   return RpcResponse(id, uid, enc.ToStringRef());
 }
 
-Message Message::RpcResponse(unsigned int id, unsigned int uid,
-                             llvm::StringRef results) {
-  Message msg(kRpcResponse);
-  msg.m_str = results;
-  msg.m_id = id;
-  msg.m_seq_num_uid = uid;
+std::shared_ptr<Message> Message::RpcResponse(unsigned int id, unsigned int uid,
+                                              llvm::StringRef results) {
+  auto msg = std::make_shared<Message>(kRpcResponse, private_init());
+  msg->m_str = results;
+  msg->m_id = id;
+  msg->m_seq_num_uid = uid;
   return msg;
 }
 

@@ -18,6 +18,8 @@ class WireDecoder;
 class WireEncoder;
 
 class Message {
+  struct private_init {};
+
  public:
   enum MsgType {
     kUnknown = -1,
@@ -38,40 +40,57 @@ class Message {
   typedef NT_Type (*GetEntryTypeFunc)(unsigned int id);
 
   Message() : m_type(kUnknown), m_id(0), m_flags(0), m_seq_num_uid(0) {}
+  Message(MsgType type, const private_init&)
+      : m_type(type), m_id(0), m_flags(0), m_seq_num_uid(0) {}
 
   MsgType type() const { return m_type; }
   bool Is(MsgType type) const { return type == m_type; }
 
   // Read and write from wire representation
   void Write(WireEncoder& encoder) const;
-  static bool Read(WireDecoder& decoder, GetEntryTypeFunc get_entry_type,
-                   Message* msg);
+  static std::shared_ptr<Message> Read(WireDecoder& decoder,
+                                       GetEntryTypeFunc get_entry_type);
 
   // Create messages without data
-  static Message KeepAlive() { return Message(kKeepAlive); }
-  static Message ProtoUnsup() { return Message(kProtoUnsup); }
-  static Message ServerHelloDone() { return Message(kServerHelloDone); }
-  static Message ClientHelloDone() { return Message(kClientHelloDone); }
-  static Message ClearEntries() { return Message(kClearEntries); }
+  static std::shared_ptr<Message> KeepAlive() {
+    return std::make_shared<Message>(kKeepAlive, private_init());
+  }
+  static std::shared_ptr<Message> ProtoUnsup() {
+    return std::make_shared<Message>(kProtoUnsup, private_init());
+  }
+  static std::shared_ptr<Message> ServerHelloDone() {
+    return std::make_shared<Message>(kServerHelloDone, private_init());
+  }
+  static std::shared_ptr<Message> ClientHelloDone() {
+    return std::make_shared<Message>(kClientHelloDone, private_init());
+  }
+  static std::shared_ptr<Message> ClearEntries() {
+    return std::make_shared<Message>(kClearEntries, private_init());
+  }
 
   // Create messages with data
-  static Message ClientHello(llvm::StringRef self_id);
-  static Message ServerHello(unsigned int flags, llvm::StringRef self_id);
-  static Message EntryAssign(llvm::StringRef name, unsigned int id,
-                             unsigned int seq_num, std::shared_ptr<Value> value,
-                             unsigned int flags);
-  static Message EntryUpdate(unsigned int id, unsigned int seq_num,
-                             std::shared_ptr<Value> value);
-  static Message FlagsUpdate(unsigned int id, unsigned int flags);
-  static Message EntryDelete(unsigned int id);
-  static Message ExecuteRpc(unsigned int id, unsigned int uid,
-                            llvm::ArrayRef<NT_Value> params);
-  static Message ExecuteRpc(unsigned int id, unsigned int uid,
-                            llvm::StringRef params);
-  static Message RpcResponse(unsigned int id, unsigned int uid,
-                             llvm::ArrayRef<NT_Value> results);
-  static Message RpcResponse(unsigned int id, unsigned int uid,
-                             llvm::StringRef results);
+  static std::shared_ptr<Message> ClientHello(llvm::StringRef self_id);
+  static std::shared_ptr<Message> ServerHello(unsigned int flags,
+                                              llvm::StringRef self_id);
+  static std::shared_ptr<Message> EntryAssign(llvm::StringRef name,
+                                              unsigned int id,
+                                              unsigned int seq_num,
+                                              std::shared_ptr<Value> value,
+                                              unsigned int flags);
+  static std::shared_ptr<Message> EntryUpdate(unsigned int id,
+                                              unsigned int seq_num,
+                                              std::shared_ptr<Value> value);
+  static std::shared_ptr<Message> FlagsUpdate(unsigned int id,
+                                              unsigned int flags);
+  static std::shared_ptr<Message> EntryDelete(unsigned int id);
+  static std::shared_ptr<Message> ExecuteRpc(unsigned int id, unsigned int uid,
+                                             llvm::ArrayRef<NT_Value> params);
+  static std::shared_ptr<Message> ExecuteRpc(unsigned int id, unsigned int uid,
+                                             llvm::StringRef params);
+  static std::shared_ptr<Message> RpcResponse(unsigned int id, unsigned int uid,
+                                              llvm::ArrayRef<NT_Value> results);
+  static std::shared_ptr<Message> RpcResponse(unsigned int id, unsigned int uid,
+                                              llvm::StringRef results);
 
   Message(const Message&) = delete;
   Message& operator=(const Message&) = delete;
@@ -79,8 +98,6 @@ class Message {
   Message& operator=(Message&&) = default;
 
  private:
-  Message(MsgType type) : m_type(type), m_id(0), m_flags(0), m_seq_num_uid(0) {}
-
   MsgType m_type;
 
   // Message data.  Use varies by message type.

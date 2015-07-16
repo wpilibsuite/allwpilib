@@ -15,11 +15,8 @@
 using namespace ntimpl;
 
 NetworkConnection::NetworkConnection(std::unique_ptr<TCPStream> stream,
-                                     BatchQueue& outgoing, Queue& incoming,
                                      Message::GetEntryTypeFunc get_entry_type)
     : m_stream(std::move(stream)),
-      m_outgoing(outgoing),
-      m_incoming(incoming),
       m_get_entry_type(get_entry_type),
       m_active(false),
       m_proto_rev(0x0300) {}
@@ -49,8 +46,12 @@ void NetworkConnection::ReadThreadMain() {
       break;
     decoder.set_proto_rev(m_proto_rev);
     decoder.Reset();
-    auto msg = std::make_shared<Message>();
-    if (!Message::Read(decoder, m_get_entry_type, &(*msg))) break;
+    auto msg = Message::Read(decoder, m_get_entry_type);
+    if (!msg) {
+      // terminate connection on bad message
+      m_stream->close();
+      break;
+    }
     m_incoming.push(msg);
   }
   m_active = false;
