@@ -11,9 +11,8 @@
 #include <cassert>
 #include <cstddef>
 
-#include "ntcore.h"
-
 #include "llvm/StringRef.h"
+#include "Value.h"
 
 namespace ntimpl {
 
@@ -94,23 +93,17 @@ class WireEncoder {
   void WriteUleb128(unsigned long val);
 
   void WriteType(NT_Type type);
-  void WriteValue(const NT_Value& value);
-  void WriteString(const NT_String& str) {
-    WriteString(llvm::StringRef(str.str, str.len));
-  }
+  void WriteValue(const Value& value);
   void WriteString(llvm::StringRef str);
 
   /* Utility function to get the written size of a value (without actually
    * writing it).
    */
-  std::size_t GetValueSize(const NT_Value& value) const;
+  std::size_t GetValueSize(const Value& value) const;
 
   /* Utility function to get the written size of a string (without actually
    * writing it).
    */
-  std::size_t GetStringSize(const NT_String& str) const {
-    return GetStringSize(llvm::StringRef(str.str, str.len));
-  }
   std::size_t GetStringSize(llvm::StringRef str) const;
 
   WireEncoder(const WireEncoder&) = delete;

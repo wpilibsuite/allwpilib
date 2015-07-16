@@ -9,6 +9,7 @@
 #define NT_MESSAGE_H_
 
 #include <memory>
+#include <string>
 
 #include "Value.h"
 
@@ -84,24 +85,22 @@ class Message {
                                               unsigned int flags);
   static std::shared_ptr<Message> EntryDelete(unsigned int id);
   static std::shared_ptr<Message> ExecuteRpc(unsigned int id, unsigned int uid,
-                                             llvm::ArrayRef<NT_Value> params);
+                                             llvm::ArrayRef<Value> params);
   static std::shared_ptr<Message> ExecuteRpc(unsigned int id, unsigned int uid,
                                              llvm::StringRef params);
   static std::shared_ptr<Message> RpcResponse(unsigned int id, unsigned int uid,
-                                              llvm::ArrayRef<NT_Value> results);
+                                              llvm::ArrayRef<Value> results);
   static std::shared_ptr<Message> RpcResponse(unsigned int id, unsigned int uid,
                                               llvm::StringRef results);
 
   Message(const Message&) = delete;
   Message& operator=(const Message&) = delete;
-  Message(Message&&) = default;
-  Message& operator=(Message&&) = default;
 
  private:
   MsgType m_type;
 
   // Message data.  Use varies by message type.
-  StringValue m_str;
+  std::string m_str;
   std::shared_ptr<Value> m_value;
   unsigned int m_id;  // also used for proto_rev
   unsigned int m_flags;

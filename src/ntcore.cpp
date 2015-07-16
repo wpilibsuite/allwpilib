@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <fstream>
 
+#include "Dispatcher.h"
 #include "Storage.h"
 
 using namespace ntimpl;
@@ -80,13 +81,37 @@ NT_Value *NT_GetRpcResult(unsigned int result_uid, size_t *results_len);
  * Client/Server Functions
  */
 
-void NT_SetNetworkIdentity(const char *name, size_t name_len) {}
+void NT_SetNetworkIdentity(const char *name, size_t name_len) {
+  Dispatcher& dispatcher = Dispatcher::GetInstance();
+  dispatcher.SetIdentity(llvm::StringRef(name, name_len));
+}
+
 void NT_StartServer(const char *persist_filename, const char *listen_address,
-                    unsigned int port) {}
-void NT_StopServer(void) {}
-void NT_StartClient(const char *server_name, unsigned int port) {}
-void NT_StopClient(void) {}
-void NT_SetUpdateRate(double interval) {}
+                    unsigned int port) {
+  Dispatcher& dispatcher = Dispatcher::GetInstance();
+  dispatcher.StartServer(listen_address, port);
+}
+
+void NT_StopServer(void) {
+  Dispatcher& dispatcher = Dispatcher::GetInstance();
+  dispatcher.Stop();
+}
+
+void NT_StartClient(const char *server_name, unsigned int port) {
+  Dispatcher& dispatcher = Dispatcher::GetInstance();
+  dispatcher.StartClient(server_name, port);
+}
+
+void NT_StopClient(void) {
+  Dispatcher& dispatcher = Dispatcher::GetInstance();
+  dispatcher.Stop();
+}
+
+void NT_SetUpdateRate(double interval) {
+  Dispatcher& dispatcher = Dispatcher::GetInstance();
+  dispatcher.SetUpdateRate(interval);
+}
+
 struct NT_ConnectionInfo *NT_GetConnections(size_t *count) {
   return nullptr;
 }

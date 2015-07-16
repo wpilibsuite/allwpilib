@@ -102,17 +102,8 @@ class WireDecoder {
   }
 
   bool ReadType(NT_Type* type);
-  bool ReadValue(NT_Type type, NT_Value* value);
-  bool ReadString(NT_String* str);
-
-  bool ReadValue(NT_Type type, Value* value) {
-    NT_DisposeValue(value);
-    return ReadValue(type, static_cast<NT_Value*>(value));
-  }
-  bool ReadString(StringValue* str) {
-    NT_DisposeString(str);
-    return ReadString(static_cast<NT_String*>(str));
-  }
+  bool ReadString(std::string* str);
+  std::shared_ptr<Value> ReadValue(NT_Type type);
 
   WireDecoder(const WireDecoder&) = delete;
   WireDecoder& operator=(const WireDecoder&) = delete;

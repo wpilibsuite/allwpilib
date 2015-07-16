@@ -65,8 +65,9 @@ void Storage::SavePersistent(std::ostream& os) const {
     if (!entry.IsPersistent()) continue;
 
     // type
-    const Value& v = entry.value();
-    switch (v.type()) {
+    auto v = entry.value();
+    if (!v) continue;
+    switch (v->type()) {
       case NT_BOOLEAN:
         os << "boolean ";
         break;
@@ -99,23 +100,23 @@ void Storage::SavePersistent(std::ostream& os) const {
     os << '=';
 
     // value
-    switch (v.type()) {
+    switch (v->type()) {
       case NT_BOOLEAN:
-        os << (v.GetBoolean() ? "true" : "false");
+        os << (v->GetBoolean() ? "true" : "false");
         break;
       case NT_DOUBLE:
-        os << v.GetDouble();
+        os << v->GetDouble();
         break;
       case NT_STRING:
-        WriteString(os, v.GetString());
+        WriteString(os, v->GetString());
         break;
       case NT_RAW:
-        Base64Encode(v.GetRaw(), &base64_encoded);
+        Base64Encode(v->GetRaw(), &base64_encoded);
         os << base64_encoded;
         break;
       case NT_BOOLEAN_ARRAY: {
         bool first = true;
-        for (auto elem : v.GetBooleanArray()) {
+        for (auto elem : v->GetBooleanArray()) {
           if (!first) {
             os << ',';
             first = false;
@@ -126,7 +127,7 @@ void Storage::SavePersistent(std::ostream& os) const {
       }
       case NT_DOUBLE_ARRAY: {
         bool first = true;
-        for (auto elem : v.GetDoubleArray()) {
+        for (auto elem : v->GetDoubleArray()) {
           if (!first) {
             os << ',';
             first = false;
@@ -137,7 +138,7 @@ void Storage::SavePersistent(std::ostream& os) const {
       }
       case NT_STRING_ARRAY: {
         bool first = true;
-        for (auto& elem : v.GetStringArray()) {
+        for (auto& elem : v->GetStringArray()) {
           if (!first) {
             os << ',';
             first = false;
@@ -241,7 +242,7 @@ bool Storage::LoadPersistent(std::istream& is,
   std::string name, str;
   std::vector<int> boolean_array;
   std::vector<double> double_array;
-  std::vector<StringValue> string_array;
+  std::vector<std::string> string_array;
 
   // ignore blank lines and lines that start with ; or # (comments)
   while (std::getline(is, line_str)) {
@@ -311,9 +312,9 @@ bool Storage::LoadPersistent(std::istream& is,
       case NT_BOOLEAN:
         // only true or false is accepted
         if (line == "true")
-          entry.value().SetBoolean(true);
+          entry.set_value(Value::MakeBoolean(true));
         else if (line == "false")
-          entry.value().SetBoolean(false);
+          entry.set_value(Value::MakeBoolean(false));
         else {
           if (warn)
             warn(line_num, "unrecognized boolean value, not 'true' or 'false'");
@@ -330,7 +331,7 @@ bool Storage::LoadPersistent(std::istream& is,
           if (warn) warn(line_num, "invalid double value");
           goto next_line;
         }
-        entry.value().SetDouble(v);
+        entry.set_value(Value::MakeDouble(v));
         break;
       }
       case NT_STRING: {
@@ -345,12 +346,12 @@ bool Storage::LoadPersistent(std::istream& is,
           goto next_line;
         }
         UnescapeString(str_tok, &str);
-        entry.value().SetString(str);
+        entry.set_value(Value::MakeString(std::move(str)));
         break;
       }
       case NT_RAW:
         Base64Decode(line, &str);
-        entry.value().SetRaw(str);
+        entry.set_value(Value::MakeRaw(std::move(str)));
         break;
       case NT_BOOLEAN_ARRAY: {
         llvm::StringRef elem_tok;
@@ -370,7 +371,7 @@ bool Storage::LoadPersistent(std::istream& is,
           }
         }
 
-        entry.value().SetBooleanArray(boolean_array);
+        entry.set_value(Value::MakeBooleanArray(std::move(boolean_array)));
         break;
       }
       case NT_DOUBLE_ARRAY: {
@@ -391,7 +392,7 @@ bool Storage::LoadPersistent(std::istream& is,
           double_array.push_back(v);
         }
 
-        entry.value().SetDoubleArray(double_array);
+        entry.set_value(Value::MakeDoubleArray(std::move(double_array)));
         break;
       }
       case NT_STRING_ARRAY: {
@@ -416,10 +417,10 @@ bool Storage::LoadPersistent(std::istream& is,
           line = line.drop_front().ltrim(" \t");
 
           UnescapeString(elem_tok, &str);
-          string_array.push_back(StringValue(str));
+          string_array.push_back(std::move(str));
         }
 
-        entry.value().SetStringArray(string_array);
+        entry.set_value(Value::MakeStringArray(std::move(string_array)));
         break;
       }
       default:

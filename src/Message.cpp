@@ -59,8 +59,8 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
       if (decoder.proto_rev() >= 0x0300u) {
         if (!decoder.Read8(&msg->m_flags)) return nullptr;  // flags
       }
-      msg->m_value = std::make_shared<Value>();
-      if (!decoder.ReadValue(type, &(*msg->m_value))) return nullptr;
+      msg->m_value = decoder.ReadValue(type);
+      if (!msg->m_value) return nullptr;
       break;
     }
     case kEntryUpdate: {
@@ -73,8 +73,8 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
         type = static_cast<NT_Type>(itype);
       } else
         type = get_entry_type(msg->m_id);
-      msg->m_value = std::make_shared<Value>();
-      if (!decoder.ReadValue(type, &(*msg->m_value))) return nullptr;
+      msg->m_value = decoder.ReadValue(type);
+      if (!msg->m_value) return nullptr;
       break;
     }
     case kFlagsUpdate: {
@@ -196,7 +196,7 @@ std::shared_ptr<Message> Message::EntryDelete(unsigned int id) {
 }
 
 std::shared_ptr<Message> Message::ExecuteRpc(unsigned int id, unsigned int uid,
-                                             llvm::ArrayRef<NT_Value> params) {
+                                             llvm::ArrayRef<Value> params) {
   WireEncoder enc(0x0300);
   for (auto& param : params) enc.WriteValue(param);
   return ExecuteRpc(id, uid, enc.ToStringRef());
@@ -212,7 +212,7 @@ std::shared_ptr<Message> Message::ExecuteRpc(unsigned int id, unsigned int uid,
 }
 
 std::shared_ptr<Message> Message::RpcResponse(
-    unsigned int id, unsigned int uid, llvm::ArrayRef<NT_Value> results) {
+    unsigned int id, unsigned int uid, llvm::ArrayRef<Value> results) {
   WireEncoder enc(0x0300);
   for (auto& result : results) enc.WriteValue(result);
   return RpcResponse(id, uid, enc.ToStringRef());

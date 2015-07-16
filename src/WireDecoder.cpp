@@ -108,105 +108,98 @@ bool WireDecoder::ReadType(NT_Type* type) {
   return true;
 }
 
-bool WireDecoder::ReadValue(NT_Type type, NT_Value* value) {
+std::shared_ptr<Value> WireDecoder::ReadValue(NT_Type type) {
   switch (type) {
     case NT_BOOLEAN: {
       unsigned int v;
-      if (!Read8(&v)) return false;
-      value->data.v_boolean = v ? 1 : 0;
-      break;
+      if (!Read8(&v)) return nullptr;
+      return Value::MakeBoolean(v != 0);
     }
     case NT_DOUBLE: {
-      if (!ReadDouble(&value->data.v_double)) return false;
-      break;
+      double v;
+      if (!ReadDouble(&v)) return nullptr;
+      return Value::MakeDouble(v);
     }
-    case NT_STRING:
-      if (!ReadString(&value->data.v_string)) return false;
-      break;
-    case NT_RAW:
-    case NT_RPC:
+    case NT_STRING: {
+      std::string v;
+      if (!ReadString(&v)) return nullptr;
+      return Value::MakeString(std::move(v));
+    }
+    case NT_RAW: {
       if (m_proto_rev < 0x0300u) {
-        m_error = "received raw or RPC value in protocol < 3.0";
-        return false;
+        m_error = "received raw value in protocol < 3.0";
+        return nullptr;
       }
-      if (!ReadString(&value->data.v_raw)) return false;
-      break;
+      std::string v;
+      if (!ReadString(&v)) return nullptr;
+      return Value::MakeRaw(std::move(v));
+    }
+    case NT_RPC: {
+      if (m_proto_rev < 0x0300u) {
+        m_error = "received RPC value in protocol < 3.0";
+        return nullptr;
+      }
+      std::string v;
+      if (!ReadString(&v)) return nullptr;
+      return Value::MakeRpc(std::move(v));
+    }
     case NT_BOOLEAN_ARRAY: {
       // size
       unsigned int size;
-      if (!Read8(&size)) return false;
-      value->data.arr_boolean.size = size;
+      if (!Read8(&size)) return nullptr;
 
       // array values
       const char* buf;
-      if (!Read(&buf, size)) return false;
-      value->data.arr_boolean.arr =
-          static_cast<int*>(std::malloc(size * sizeof(int)));
+      if (!Read(&buf, size)) return nullptr;
+      std::vector<int> v(size);
       for (unsigned int i = 0; i < size; ++i)
-        value->data.arr_boolean.arr[i] = buf[i] ? 1 : 0;
-      break;
+        v[i] = buf[i] ? 1 : 0;
+      return Value::MakeBooleanArray(std::move(v));
     }
     case NT_DOUBLE_ARRAY: {
       // size
       unsigned int size;
-      if (!Read8(&size)) return false;
-      value->data.arr_double.size = size;
+      if (!Read8(&size)) return nullptr;
 
       // array values
       const char* buf;
-      if (!Read(&buf, size * 8)) return false;
-      value->data.arr_double.arr =
-          static_cast<double*>(std::malloc(size * sizeof(double)));
+      if (!Read(&buf, size * 8)) return nullptr;
+      std::vector<double> v(size);
       for (unsigned int i = 0; i < size; ++i)
-        value->data.arr_double.arr[i] = ::ReadDouble(buf);
-      break;
+        v[i] = ::ReadDouble(buf);
+      return Value::MakeDoubleArray(std::move(v));
     }
     case NT_STRING_ARRAY: {
       // size
       unsigned int size;
-      if (!Read8(&size)) return false;
-      value->data.arr_string.size = size;
+      if (!Read8(&size)) return nullptr;
 
       // array values
-      value->data.arr_string.arr =
-          static_cast<NT_String*>(std::malloc(size * sizeof(NT_String)));
+      std::vector<std::string> v(size);
       for (unsigned int i = 0; i < size; ++i) {
-        if (!ReadString(&value->data.arr_string.arr[i])) {
-          // cleanup to avoid memory leaks
-          for (unsigned int j = 0; j < i; ++j) {
-            std::free(value->data.arr_string.arr[j].str);
-          }
-          std::free(value->data.arr_string.arr);
-          return false;
-        }
+        if (!ReadString(&v[i])) return nullptr;
       }
-      break;
+      return Value::MakeStringArray(std::move(v));
     }
     default:
       m_error = "invalid type when trying to read value";
-      return false;
+      return nullptr;
   }
-  value->type = type;
-  value->last_change = 0;
-  return true;
 }
 
-bool WireDecoder::ReadString(NT_String* str) {
+bool WireDecoder::ReadString(std::string* str) {
+  size_t len;
   if (m_proto_rev < 0x0300u) {
     unsigned int v;
     if (!Read16(&v)) return false;
-    str->len = v;
+    len = v;
   } else {
     unsigned long v;
     if (!ReadUleb128(&v)) return false;
-    str->len = v;
+    len = v;
   }
-  str->str = static_cast<char*>(std::malloc(str->len + 1));  // +1 for nul
-  if (!m_is.read(str->str, str->len)) {
-    std::free(str->str);
-    str->str = 0;
-    return false;
-  }
-  str->str[str->len] = '\0'; // be nice and nul-terminate it
+  const char* buf;
+  if (!Read(&buf, len)) return false;
+  *str = llvm::StringRef(buf, len);
   return true;
 }

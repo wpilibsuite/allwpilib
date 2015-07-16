@@ -105,36 +105,39 @@ void WireEncoder::WriteType(NT_Type type) {
   ++m_cur;
 }
 
-std::size_t WireEncoder::GetValueSize(const NT_Value& value) const {
-  switch (value.type) {
+std::size_t WireEncoder::GetValueSize(const Value& value) const {
+  switch (value.type()) {
     case NT_BOOLEAN:
       return 1;
     case NT_DOUBLE:
       return 8;
     case NT_STRING:
-      return GetStringSize(value.data.v_string);
+      return GetStringSize(value.GetString());
     case NT_RAW:
+      if (m_proto_rev < 0x0300u) return 0;
+      return GetStringSize(value.GetRaw());
     case NT_RPC:
       if (m_proto_rev < 0x0300u) return 0;
-      return GetStringSize(value.data.v_raw);
+      return GetStringSize(value.GetRpc());
     case NT_BOOLEAN_ARRAY: {
       // 1-byte size, 1 byte per element
-      std::size_t size = value.data.arr_boolean.size;
+      std::size_t size = value.GetBooleanArray().size();
       if (size > 0xff) size = 0xff; // size is only 1 byte, truncate
       return 1 + size;
     }
     case NT_DOUBLE_ARRAY: {
       // 1-byte size, 8 bytes per element
-      std::size_t size = value.data.arr_double.size;
+      std::size_t size = value.GetDoubleArray().size();
       if (size > 0xff) size = 0xff; // size is only 1 byte, truncate
       return 1 + size * 8;
     }
     case NT_STRING_ARRAY: {
-      std::size_t size = value.data.arr_string.size;
+      auto v = value.GetStringArray();
+      std::size_t size = v.size();
       if (size > 0xff) size = 0xff; // size is only 1 byte, truncate
       std::size_t len = 1; // 1-byte size
       for (std::size_t i = 0; i < size; ++i)
-        len += GetStringSize(value.data.arr_string.arr[i]);
+        len += GetStringSize(v[i]);
       return len;
     }
     default:
@@ -142,52 +145,61 @@ std::size_t WireEncoder::GetValueSize(const NT_Value& value) const {
   }
 }
 
-void WireEncoder::WriteValue(const NT_Value& value) {
-  switch (value.type) {
+void WireEncoder::WriteValue(const Value& value) {
+  switch (value.type()) {
     case NT_BOOLEAN:
-      Write8(value.data.v_boolean ? 1 : 0);
+      Write8(value.GetBoolean() ? 1 : 0);
       break;
     case NT_DOUBLE:
-      WriteDouble(value.data.v_double);
+      WriteDouble(value.GetDouble());
       break;
     case NT_STRING:
-      WriteString(value.data.v_string);
+      WriteString(value.GetString());
       break;
     case NT_RAW:
-    case NT_RPC:
       if (m_proto_rev < 0x0300u) {
-        m_error = "raw and rpc values not supported in protocol < 3.0";
+        m_error = "raw values not supported in protocol < 3.0";
         return;
       }
-      WriteString(value.data.v_raw);
+      WriteString(value.GetRaw());
+      break;
+    case NT_RPC:
+      if (m_proto_rev < 0x0300u) {
+        m_error = "RPC values not supported in protocol < 3.0";
+        return;
+      }
+      WriteString(value.GetRpc());
       break;
     case NT_BOOLEAN_ARRAY: {
-      std::size_t size = value.data.arr_boolean.size;
+      auto v = value.GetBooleanArray();
+      std::size_t size = v.size();
       if (size > 0xff) size = 0xff; // size is only 1 byte, truncate
       Reserve(1 + size);
       Write8(size);
 
       for (std::size_t i = 0; i < size; ++i)
-        Write8(value.data.arr_boolean.arr[i] ? 1 : 0);
+        Write8(v[i] ? 1 : 0);
       break;
     }
     case NT_DOUBLE_ARRAY: {
-      std::size_t size = value.data.arr_double.size;
+      auto v = value.GetDoubleArray();
+      std::size_t size = v.size();
       if (size > 0xff) size = 0xff; // size is only 1 byte, truncate
       Reserve(1 + size * 8);
       Write8(size);
 
       for (std::size_t i = 0; i < size; ++i)
-        WriteDouble(value.data.arr_double.arr[i]);
+        WriteDouble(v[i]);
       break;
     }
     case NT_STRING_ARRAY: {
-      std::size_t size = value.data.arr_string.size;
+      auto v = value.GetStringArray();
+      std::size_t size = v.size();
       if (size > 0xff) size = 0xff; // size is only 1 byte, truncate
       Write8(size);
 
       for (std::size_t i = 0; i < size; ++i)
-        WriteString(value.data.arr_string.arr[i]);
+        WriteString(v[i]);
       break;
     }
     default:

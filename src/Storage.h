@@ -21,20 +21,21 @@ namespace ntimpl {
 
 class StorageEntry {
  public:
-  StorageEntry() { m_flags = 0; }
+  StorageEntry() : m_flags(0) {}
 
-  Value& value() { return m_value; }
-  const Value& value() const { return m_value; }
+  std::shared_ptr<Value> value() const { return m_value; }
+  void set_value(std::shared_ptr<Value> value) { m_value = value; }
 
   unsigned int flags() const { return m_flags; }
   void set_flags(unsigned int flags) { m_flags = flags; }
+
   bool IsPersistent() const { return (m_flags & NT_PERSISTENT) != 0; }
 
   StorageEntry(const StorageEntry&) = delete;
   StorageEntry& operator=(const StorageEntry&) = delete;
 
 private:
-  Value m_value;
+  std::shared_ptr<Value> m_value;
   unsigned int m_flags;
 };
 
