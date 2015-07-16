@@ -41,8 +41,6 @@ class NetworkConnection {
 
   NetworkConnection(const NetworkConnection&) = delete;
   NetworkConnection& operator=(const NetworkConnection&) = delete;
-  NetworkConnection(NetworkConnection&&) = default;
-  NetworkConnection& operator=(NetworkConnection&&) = default;
 
  private:
   void ReadThreadMain();
