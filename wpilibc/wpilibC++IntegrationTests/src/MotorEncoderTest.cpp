@@ -150,18 +150,19 @@ TEST_P(MotorEncoderTest, VelocityPIDController) {
   Reset();
 
   m_encoder->SetPIDSourceType(PIDSourceType::kRate);
-  PIDController pid(0.002f, 0.0f, 0.0001f, m_encoder, m_speedController);
-  pid.SetAbsoluteTolerance(20.0f);
+  PIDController pid(1e-5, 0.0f, 3e-5, 8e-5, m_encoder, m_speedController);
+  pid.SetAbsoluteTolerance(50.0f);
+  pid.SetToleranceBuffer(10);
   pid.SetOutputRange(-0.3f, 0.3f);
-  pid.SetSetpoint(30);
+  pid.SetSetpoint(2000);
 
   /* 10 seconds should be plenty time to get to the setpoint */
   pid.Enable();
   Wait(10.0);
 
-  RecordProperty("PIDError", pid.GetError());
+  RecordProperty("PIDError", pid.GetAvgError());
 
-  EXPECT_TRUE(pid.OnTarget()) << "PID loop did not converge within 10 seconds.";
+  EXPECT_TRUE(pid.OnTarget()) << "PID loop did not converge within 10 seconds. Goal was: " << 2000 << " Error was: " << pid.GetError();
 
   pid.Disable();
 }

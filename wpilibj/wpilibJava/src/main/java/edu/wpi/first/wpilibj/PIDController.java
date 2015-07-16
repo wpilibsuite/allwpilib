@@ -6,6 +6,7 @@
 package edu.wpi.first.wpilibj;
 
 import java.util.TimerTask;
+import java.util.LinkedList;
 
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
@@ -39,6 +40,9 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
                                      // integral calc
   private Tolerance m_tolerance; // the tolerance object used to check if on
                                  // target
+  private int m_bufLength = 0;
+  private LinkedList<Double> m_buf;
+  private double m_bufTotal = 0.0;
   private double m_setpoint = 0.0;
   private double m_error = 0.0;
   private double m_result = 0.0;
@@ -79,7 +83,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
 
     @Override
     public boolean onTarget() {
-      return (Math.abs(getError()) < percentage / 100 * (m_maximumInput - m_minimumInput));
+      return (Math.abs(getAvgError()) < percentage / 100 * (m_maximumInput - m_minimumInput));
     }
   }
 
@@ -92,7 +96,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
 
     @Override
     public boolean onTarget() {
-      return Math.abs(getError()) < value;
+      return Math.abs(getAvgError()) < value;
     }
   }
 
@@ -153,6 +157,8 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     instances++;
     HLUsageReporting.reportPIDController(instances);
     m_tolerance = new NullTolerance();
+
+    m_buf = new LinkedList<Double>();
   }
 
   /**
@@ -298,6 +304,14 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
         }
         pidOutput = m_pidOutput;
         result = m_result;
+
+        // Update the buffer.
+        m_buf.push(m_error);
+        m_bufTotal += m_error;
+        // Remove old elements when the buffer is full.
+        if (m_buf.size() > m_bufLength) {
+          m_bufTotal -= m_buf.pop();
+        }
       }
 
       pidOutput.pidWrite(result);
@@ -445,6 +459,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
 
   /**
    * Set the setpoint for the PIDController
+   * Clears the queue for GetAvgError().
    *$
    * @param setpoint the desired setpoint
    */
@@ -460,6 +475,8 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     } else {
       m_setpoint = setpoint;
     }
+
+    m_buf.clear();
 
     if (table != null)
       table.putNumber("setpoint", m_setpoint);
@@ -500,6 +517,21 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    */
   PIDSourceType getPIDSourceType() {
     return m_pidInput.getPIDSourceType();
+  }
+
+  /**
+   * Returns the current difference of the error over the past few iterations.
+   * You can specify the number of iterations to average with
+   * setToleranceBuffer() (defaults to 1). getAvgError() is used for the
+   * onTarget() function.
+   *$
+   * @return the current average of the error
+   */
+  public synchronized double getAvgError() {
+    double avgError = 0;
+    // Don't divide by zero.
+    if (m_buf.size() != 0) avgError = m_bufTotal / m_buf.size();
+    return avgError;
   }
 
   /**
@@ -547,6 +579,24 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    */
   public synchronized void setPercentTolerance(double percentage) {
     m_tolerance = new PercentageTolerance(percentage);
+  }
+
+  /**
+   * Set the number of previous error samples to average for tolerancing. When
+   * determining whether a mechanism is on target, the user may want to use a
+   * rolling average of previous measurements instead of a precise position or
+   * velocity. This is useful for noisy sensors which return a few erroneous
+   * measurements when the mechanism is on target. However, the mechanism will
+   * not register as on target for at least the specified bufLength cycles.
+   * @param bufLength Number of previous cycles to average.
+   */
+  public synchronized void setToleranceBuffer(int bufLength) {
+    m_bufLength = bufLength;
+
+    // Cut the existing buffer down to size if needed.
+    while (m_buf.size() > bufLength) {
+      m_bufTotal -= m_buf.pop();
+    }
   }
 
   /**

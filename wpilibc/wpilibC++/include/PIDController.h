@@ -16,6 +16,9 @@
 
 #include <memory>
 
+#include <atomic>
+#include <queue>
+
 class PIDOutput;
 
 /**
@@ -53,6 +56,7 @@ class PIDController : public LiveWindowSendable,
   virtual double GetSetpoint() const override;
 
   virtual float GetError() const;
+  virtual float GetAvgError() const;
 
   virtual void SetPIDSourceType(PIDSourceType pidSource);
   virtual PIDSourceType GetPIDSourceType() const;
@@ -60,6 +64,7 @@ class PIDController : public LiveWindowSendable,
   virtual void SetTolerance(float percent);
   virtual void SetAbsoluteTolerance(float absValue);
   virtual void SetPercentTolerance(float percentValue);
+  virtual void SetToleranceBuffer(unsigned buf = 1);
   virtual bool OnTarget() const;
 
   virtual void Enable() override;
@@ -96,12 +101,18 @@ class PIDController : public LiveWindowSendable,
     kPercentTolerance,
     kNoTolerance
   } m_toleranceType = kNoTolerance;
-  float m_tolerance = 0.05;  // the percetage or absolute error that is considered on
-                      // target
+
+  // the percetage or absolute error that is considered on target.
+  float m_tolerance = 0.05;
   float m_setpoint = 0;
   float m_error;
   float m_result = 0;
   float m_period;
+
+  // Length of buffer for averaging for tolerances.
+  std::atomic<unsigned> m_bufLength{1};
+  std::queue<double> m_buf;
+  double m_bufTotal = 0;
 
   mutable priority_mutex m_mutex;
 

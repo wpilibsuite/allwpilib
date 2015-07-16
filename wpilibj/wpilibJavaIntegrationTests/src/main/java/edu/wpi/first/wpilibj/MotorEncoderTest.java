@@ -188,17 +188,19 @@ public class MotorEncoderTest extends AbstractComsSetup {
   @Test
   public void testVelocityPIDController() {
     me.getEncoder().setPIDSourceType(PIDSourceType.kRate);
-    PIDController pid = new PIDController(0.002, 0, 0.0001, me.getEncoder(), me.getMotor());
-    pid.setAbsoluteTolerance(50);
-    pid.setOutputRange(-0.2, 0.2);
-    pid.setSetpoint(30);
+    PIDController pid =
+        new PIDController(1e-5, 0.0, 3e-5, 8e-5, me.getEncoder(), me.getMotor());
+    pid.setAbsoluteTolerance(200);
+    pid.setToleranceBuffer(50);
+    pid.setOutputRange(-0.3, 0.3);
+    pid.setSetpoint(2000);
 
     pid.enable();
     Timer.delay(10.0);
     pid.disable();
 
     assertTrue(
-        "PID loop did not reach setpoint within 10 seconds. The error was: " + pid.getError(),
+        "PID loop did not reach setpoint within 10 seconds. The error was: " + pid.getAvgError(),
         pid.onTarget());
 
     pid.free();
