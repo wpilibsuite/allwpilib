@@ -147,7 +147,6 @@ public:
     // terminator.
     unsigned AllocSize = static_cast<unsigned>(sizeof(StringMapEntry))+
       KeyLength+1;
-    unsigned Alignment = alignof(StringMapEntry);
 
     StringMapEntry *NewItem =
       static_cast<StringMapEntry*>(std::malloc(AllocSize));
