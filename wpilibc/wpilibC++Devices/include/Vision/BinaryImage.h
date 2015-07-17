@@ -18,7 +18,6 @@
 
 class BinaryImage : public MonoImage {
  public:
-  BinaryImage();
   virtual ~BinaryImage() = default;
   int GetNumberParticles();
   ParticleAnalysisReport GetParticleAnalysisReport(int particleNumber);

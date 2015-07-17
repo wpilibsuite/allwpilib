@@ -52,7 +52,7 @@
 class ErrorBase {
   // TODO: Consider initializing instance variables and cleanup in destructor
  public:
-  ErrorBase();
+  ErrorBase() = default;
   virtual ~ErrorBase() = default;
   virtual Error& GetError();
   virtual const Error& GetError() const;

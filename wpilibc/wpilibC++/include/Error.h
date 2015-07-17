@@ -20,7 +20,7 @@ class Error {
  public:
   typedef int32_t Code;
 
-  Error();
+  Error() = default;
   void Clone(const Error& error);
   Code GetCode() const;
   std::string GetMessage() const;

@@ -73,7 +73,7 @@ class IterativeRobot : public RobotBase {
   virtual void Prestart();
 
   virtual ~IterativeRobot() = default;
-  IterativeRobot();
+  IterativeRobot() = default;
 
  private:
   bool m_disabledInitialized = false;

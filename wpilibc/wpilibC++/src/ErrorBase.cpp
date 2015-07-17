@@ -16,10 +16,6 @@
 
 priority_mutex ErrorBase::_globalErrorMutex;
 Error ErrorBase::_globalError;
-/**
- * @brief Initialize the instance status to 0 for now.
- */
-ErrorBase::ErrorBase() {}
 
 /**
  * @brief Retrieve the current error.
