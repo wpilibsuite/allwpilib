@@ -5,9 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Value.h"
+#include "nt_Value.h"
+#include "Value_internal.h"
 
-using namespace ntimpl;
+using namespace nt;
 
 Value::Value() { m_val.type = NT_UNASSIGNED; }
 
@@ -74,7 +75,7 @@ std::shared_ptr<Value> Value::MakeStringArray(
   return val;
 }
 
-void ntimpl::ConvertToC(const Value& in, NT_Value* out) {
+void nt::ConvertToC(const Value& in, NT_Value* out) {
   NT_DisposeValue(out);
   switch (in.type()) {
     case NT_UNASSIGNED:
@@ -131,7 +132,7 @@ void ntimpl::ConvertToC(const Value& in, NT_Value* out) {
   out->type = in.type();
 }
 
-void ntimpl::ConvertToC(llvm::StringRef in, NT_String* out) {
+void nt::ConvertToC(llvm::StringRef in, NT_String* out) {
   NT_DisposeString(out);
   out->len = in.size();
   out->str = static_cast<char*>(std::malloc(in.size()+1));
@@ -139,7 +140,7 @@ void ntimpl::ConvertToC(llvm::StringRef in, NT_String* out) {
   out->str[in.size()] = '\0';
 }
 
-std::shared_ptr<Value> ntimpl::ConvertFromC(const NT_Value& value) {
+std::shared_ptr<Value> nt::ConvertFromC(const NT_Value& value) {
   switch (value.type) {
     case NT_UNASSIGNED:
       return nullptr;
@@ -172,7 +173,7 @@ std::shared_ptr<Value> ntimpl::ConvertFromC(const NT_Value& value) {
   }
 }
 
-bool ntimpl::operator==(const Value& lhs, const Value& rhs) {
+bool nt::operator==(const Value& lhs, const Value& rhs) {
   if (lhs.type() != rhs.type()) return false;
   switch (lhs.type()) {
     case NT_UNASSIGNED:

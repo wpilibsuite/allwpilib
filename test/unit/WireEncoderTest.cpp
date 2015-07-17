@@ -17,7 +17,7 @@
 
 #define BUFSIZE 1024
 
-namespace ntimpl {
+namespace nt {
 
 class WireEncoderTest : public ::testing::Test {
  protected:
@@ -496,4 +496,4 @@ TEST_F(WireEncoderTest, WriteString3) {
   EXPECT_EQ('x', e.data()[65539]);
 }
 
-}  // namespace ntimpl
+}  // namespace nt

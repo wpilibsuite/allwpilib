@@ -9,15 +9,14 @@
 #define NT_STORAGE_H_
 
 #include <cstddef>
+#include <functional>
 #include <iosfwd>
 #include <memory>
 
-#include "ntcore.h"
-
-#include "Value.h"
 #include "llvm/StringMap.h"
+#include "nt_Value.h"
 
-namespace ntimpl {
+namespace nt {
 
 class StorageEntry {
  public:
@@ -53,8 +52,9 @@ class Storage {
   const EntriesMap& entries() const { return m_entries; }
 
   void SavePersistent(std::ostream& os) const;
-  bool LoadPersistent(std::istream& is,
-                      void (*warn)(std::size_t line, const char* msg));
+  bool LoadPersistent(
+      std::istream& is,
+      std::function<void(std::size_t line, const char* msg)> warn);
 
  private:
   Storage();
@@ -66,6 +66,6 @@ class Storage {
   static std::unique_ptr<Storage> m_instance;
 };
 
-}  // namespace ntimpl
+}  // namespace nt
 
 #endif  // NT_STORAGE_H_

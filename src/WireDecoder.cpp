@@ -14,7 +14,7 @@
 
 #include "leb128.h"
 
-using namespace ntimpl;
+using namespace nt;
 
 static double ReadDouble(const char*& buf) {
   // Fast but non-portable!

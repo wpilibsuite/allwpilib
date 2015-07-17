@@ -9,7 +9,7 @@
 
 #include "raw_istream.h"
 
-namespace ntimpl {
+namespace nt {
 
 /**
  * Get size of unsigned LEB128 data
@@ -117,4 +117,4 @@ bool ReadUleb128(raw_istream& is, unsigned long* ret) {
   return true;
 }
 
-}  // namespace ntimpl
+}  // namespace nt

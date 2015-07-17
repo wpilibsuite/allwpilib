@@ -18,7 +18,7 @@
 
 #include "NetworkConnection.h"
 
-namespace ntimpl {
+namespace nt {
 
 class Dispatcher {
  public:
@@ -64,6 +64,6 @@ class Dispatcher {
   static std::unique_ptr<Dispatcher> m_instance;
 };
 
-}  // namespace ntimpl
+}  // namespace nt
 
 #endif  // NT_DISPATCHER_H_

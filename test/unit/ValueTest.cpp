@@ -5,11 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Value.h"
+#include "nt_Value.h"
+#include "Value_internal.h"
 
 #include "gtest/gtest.h"
 
-namespace ntimpl {
+namespace nt {
 
 class ValueTest : public ::testing::Test {};
 
@@ -361,4 +362,4 @@ TEST_F(ValueTest, StringArrayComparison) {
   ASSERT_NE(*v1, *v2);
 }
 
-}  // namespace ntimpl
+}  // namespace nt

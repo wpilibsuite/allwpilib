@@ -24,7 +24,7 @@
 
 #include "raw_istream.h"
 
-namespace ntimpl {
+namespace nt {
 
 TEST(LEB128Test, WriteUleb128) {
 #define EXPECT_ULEB128_EQ(EXPECTED, VALUE, PAD) \
@@ -109,4 +109,4 @@ TEST(LEB128Test, SizeUleb128) {
   EXPECT_EQ(5u, SizeUleb128(UINT32_MAX));
 }
 
-}  // namespace ntimpl
+}  // namespace nt

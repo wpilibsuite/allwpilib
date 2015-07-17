@@ -13,13 +13,17 @@
 #include <string>
 #include <vector>
 
-#include "ntcore.h"
-
 #include "llvm/ArrayRef.h"
 #include "llvm/StringRef.h"
 
-namespace ntimpl {
+#include "ntcore_c.h"
 
+namespace nt {
+
+using llvm::ArrayRef;
+using llvm::StringRef;
+
+/** NetworkTables Entry Value */
 class Value {
   struct private_init {};
 
@@ -30,6 +34,7 @@ class Value {
 
   NT_Type type() const { return m_val.type; }
   const NT_Value& value() const { return m_val; }
+  unsigned long long last_change() const { return m_val.last_change; }
 
   /*
    * Type-Safe Getters
@@ -42,29 +47,29 @@ class Value {
     assert(m_val.type == NT_DOUBLE);
     return m_val.data.v_double;
   }
-  llvm::StringRef GetString() const {
+  StringRef GetString() const {
     assert(m_val.type == NT_STRING);
     return m_string;
   }
-  llvm::StringRef GetRaw() const {
+  StringRef GetRaw() const {
     assert(m_val.type == NT_RAW);
     return m_string;
   }
-  llvm::StringRef GetRpc() const {
+  StringRef GetRpc() const {
     assert(m_val.type == NT_RPC);
     return m_string;
   }
-  llvm::ArrayRef<int> GetBooleanArray() const {
+  ArrayRef<int> GetBooleanArray() const {
     assert(m_val.type == NT_BOOLEAN_ARRAY);
-    return llvm::ArrayRef<int>(m_val.data.arr_boolean.arr,
-                               m_val.data.arr_boolean.size);
+    return ArrayRef<int>(m_val.data.arr_boolean.arr,
+                         m_val.data.arr_boolean.size);
   }
-  llvm::ArrayRef<double> GetDoubleArray() const {
+  ArrayRef<double> GetDoubleArray() const {
     assert(m_val.type == NT_DOUBLE_ARRAY);
-    return llvm::ArrayRef<double>(m_val.data.arr_double.arr,
-                                  m_val.data.arr_double.size);
+    return ArrayRef<double>(m_val.data.arr_double.arr,
+                            m_val.data.arr_double.size);
   }
-  llvm::ArrayRef<std::string> GetStringArray() const {
+  ArrayRef<std::string> GetStringArray() const {
     assert(m_val.type == NT_STRING_ARRAY);
     return m_string_array;
   }
@@ -79,7 +84,7 @@ class Value {
     val->m_val.data.v_double = value;
     return val;
   }
-  static std::shared_ptr<Value> MakeString(llvm::StringRef value) {
+  static std::shared_ptr<Value> MakeString(StringRef value) {
     auto val = std::make_shared<Value>(NT_STRING, private_init());
     val->m_string = value;
     val->m_val.data.v_string.str = const_cast<char*>(val->m_string.c_str());
@@ -93,7 +98,7 @@ class Value {
     val->m_val.data.v_string.len = val->m_string.size();
     return val;
   }
-  static std::shared_ptr<Value> MakeRaw(llvm::StringRef value) {
+  static std::shared_ptr<Value> MakeRaw(StringRef value) {
     auto val = std::make_shared<Value>(NT_RAW, private_init());
     val->m_string = value;
     val->m_val.data.v_raw.str = const_cast<char*>(val->m_string.c_str());
@@ -107,7 +112,7 @@ class Value {
     val->m_val.data.v_raw.len = val->m_string.size();
     return val;
   }
-  static std::shared_ptr<Value> MakeRpc(llvm::StringRef value) {
+  static std::shared_ptr<Value> MakeRpc(StringRef value) {
     auto val = std::make_shared<Value>(NT_RPC, private_init());
     val->m_string = value;
     val->m_val.data.v_raw.str = const_cast<char*>(val->m_string.c_str());
@@ -122,10 +127,9 @@ class Value {
     return val;
   }
 
-  static std::shared_ptr<Value> MakeBooleanArray(llvm::ArrayRef<int> value);
-  static std::shared_ptr<Value> MakeDoubleArray(llvm::ArrayRef<double> value);
-  static std::shared_ptr<Value> MakeStringArray(
-      llvm::ArrayRef<std::string> value);
+  static std::shared_ptr<Value> MakeBooleanArray(ArrayRef<int> value);
+  static std::shared_ptr<Value> MakeDoubleArray(ArrayRef<double> value);
+  static std::shared_ptr<Value> MakeStringArray(ArrayRef<std::string> value);
 
   // Note: This function moves the values out of the vector.
   static std::shared_ptr<Value> MakeStringArray(
@@ -141,18 +145,11 @@ class Value {
   std::vector<std::string> m_string_array;
 };
 
-void ConvertToC(const Value& in, NT_Value* out);
-void ConvertToC(llvm::StringRef in, NT_String* out);
-std::shared_ptr<Value> ConvertFromC(const NT_Value& value);
-inline llvm::StringRef ConvertFromC(const NT_String& str) {
-  return llvm::StringRef(str.str, str.len);
-}
-
 bool operator==(const Value& lhs, const Value& rhs);
 inline bool operator!=(const Value& lhs, const Value& rhs) {
   return !(lhs == rhs);
 }
 
-}  // namespace ntimpl
+}  // namespace nt
 
 #endif  // NT_VALUE_H_

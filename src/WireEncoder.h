@@ -12,9 +12,9 @@
 #include <cstddef>
 
 #include "llvm/StringRef.h"
-#include "Value.h"
+#include "nt_Value.h"
 
-namespace ntimpl {
+namespace nt {
 
 /* Encodes native data for network transmission.
  * This class maintains an internal memory buffer for written data so that
@@ -130,6 +130,6 @@ class WireEncoder {
   char* m_end;
 };
 
-}  // namespace ntimpl
+}  // namespace nt
 
 #endif  // NT_WIREENCODER_H_

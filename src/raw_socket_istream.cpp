@@ -7,7 +7,7 @@
 
 #include "raw_socket_istream.h"
 
-using namespace ntimpl;
+using namespace nt;
 
 raw_socket_istream::~raw_socket_istream() {}
 

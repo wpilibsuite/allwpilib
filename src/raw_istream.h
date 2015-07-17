@@ -10,7 +10,7 @@
 
 #include <cstddef>
 
-namespace ntimpl {
+namespace nt {
 
 class raw_istream {
   void anchor();
@@ -37,6 +37,6 @@ class raw_mem_istream : public raw_istream {
   std::size_t m_left;
 };
 
-}  // namespace ntimpl
+}  // namespace nt
 
 #endif  // NT_RAW_ISTREAM_H_

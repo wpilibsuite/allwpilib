@@ -11,9 +11,9 @@
 #include <memory>
 #include <string>
 
-#include "Value.h"
+#include "nt_Value.h"
 
-namespace ntimpl {
+namespace nt {
 
 class WireDecoder;
 class WireEncoder;
@@ -107,6 +107,6 @@ class Message {
   unsigned int m_seq_num_uid;
 };
 
-}  // namespace ntimpl
+}  // namespace nt
 
 #endif  // NT_MESSAGE_H_

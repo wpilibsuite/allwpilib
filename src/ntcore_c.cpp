@@ -11,35 +11,45 @@
 #include <cstdlib>
 #include <fstream>
 
-#include "Dispatcher.h"
-#include "Storage.h"
+#include "Value_internal.h"
 
-using namespace ntimpl;
+using namespace nt;
 
 /*
  * Table Functions
  */
 
 void NT_GetEntryValue(const char *name, unsigned int name_len,
-                      struct NT_Value *value) {}
+                      struct NT_Value *value) {
+  NT_InitValue(value);
+  auto v = nt::GetEntryValue(StringRef(name, name_len));
+  if (!v) return;
+  ConvertToC(*v, value);
+}
 
 int NT_SetEntryValue(const char *name, unsigned int name_len,
                      const struct NT_Value *value) {
-  return 0;
+  return nt::SetEntryValue(StringRef(name, name_len), ConvertFromC(*value));
 }
 
 void NT_SetEntryTypeValue(const char *name, unsigned int name_len,
-                          const struct NT_Value *value) {}
-
-void NT_SetEntryFlags(const char *name, size_t name_len, unsigned int flags) {}
-
-unsigned int NT_GetEntryFlags(const char *name, size_t name_len) {
-  return 0;
+                          const struct NT_Value *value) {
+  nt::SetEntryTypeValue(StringRef(name, name_len), ConvertFromC(*value));
 }
 
-void NT_DeleteEntry(const char *name, unsigned int name_len) {}
+void NT_SetEntryFlags(const char *name, size_t name_len, unsigned int flags) {
+  nt::SetEntryFlags(StringRef(name, name_len), flags);
+}
 
-void NT_DeleteAllEntries(void) {}
+unsigned int NT_GetEntryFlags(const char *name, size_t name_len) {
+  return nt::GetEntryFlags(StringRef(name, name_len));
+}
+
+void NT_DeleteEntry(const char *name, unsigned int name_len) {
+  nt::DeleteEntry(StringRef(name, name_len));
+}
+
+void NT_DeleteAllEntries(void) { nt::DeleteAllEntries(); }
 
 struct NT_EntryInfo *NT_GetEntryInfo(const char *prefix,
                                      unsigned int prefix_len, int types,
@@ -47,7 +57,7 @@ struct NT_EntryInfo *NT_GetEntryInfo(const char *prefix,
   return nullptr;
 }
 
-void NT_Flush(void) {}
+void NT_Flush(void) { nt::Flush(); }
 
 /*
  * Callback Creation Functions
@@ -58,12 +68,16 @@ unsigned int NT_AddEntryListener(const char *prefix, size_t prefix_len,
                                  NT_EntryListenerCallback callback) {
   return 0;
 }
-void NT_RemoveEntryListener(unsigned int entry_listener_uid) {}
+void NT_RemoveEntryListener(unsigned int entry_listener_uid) {
+  nt::RemoveEntryListener(entry_listener_uid);
+}
 unsigned int NT_AddConnectionListener(void *data,
                                       NT_ConnectionListenerCallback callback) {
   return 0;
 }
-void NT_RemoveConnectionListener(unsigned int conn_listener_uid) {}
+void NT_RemoveConnectionListener(unsigned int conn_listener_uid) {
+  nt::RemoveConnectionListener(conn_listener_uid);
+}
 
 /*
  * Remote Procedure Call Functions
@@ -72,44 +86,56 @@ void NT_RemoveConnectionListener(unsigned int conn_listener_uid) {}
 unsigned int NT_CreateRpc(const char *name, size_t name_len,
                           const NT_RpcDefinition *def, void *data,
                           NT_RpcCallback callback);
-void NT_DeleteRpc(unsigned int rpc_uid);
+
+void NT_DeleteRpc(unsigned int rpc_uid) {
+  nt::DeleteRpc(rpc_uid);
+}
+
 unsigned int NT_CallRpc(const char *name, size_t name_len,
-                        const NT_Value *params, size_t params_len);
-NT_Value *NT_GetRpcResult(unsigned int result_uid, size_t *results_len);
+                        const NT_Value *params, size_t params_len) {
+  std::vector<std::shared_ptr<Value>> params_v;
+  params_v.reserve(params_len);
+  for (size_t i=0; i<params_len; ++i)
+    params_v.push_back(ConvertFromC(params[i]));
+  return nt::CallRpc(StringRef(name, name_len), params_v);
+}
+
+NT_Value *NT_GetRpcResult(unsigned int result_uid, size_t *results_len) {
+  auto results_v = nt::GetRpcResult(result_uid);
+  *results_len = results_v.size();
+  if (results_v.size() == 0) return nullptr;
+  NT_Value *results =
+      static_cast<NT_Value *>(std::malloc(results_v.size() * sizeof(NT_Value)));
+  for (size_t i=0; i<results_v.size(); ++i)
+    ConvertToC(*results_v[i], &results[i]);
+  return results;
+}
 
 /*
  * Client/Server Functions
  */
 
 void NT_SetNetworkIdentity(const char *name, size_t name_len) {
-  Dispatcher& dispatcher = Dispatcher::GetInstance();
-  dispatcher.SetIdentity(llvm::StringRef(name, name_len));
+  nt::SetNetworkIdentity(StringRef(name, name_len));
 }
 
 void NT_StartServer(const char *persist_filename, const char *listen_address,
                     unsigned int port) {
-  Dispatcher& dispatcher = Dispatcher::GetInstance();
-  dispatcher.StartServer(listen_address, port);
+  nt::StartServer(persist_filename, listen_address, port);
 }
 
-void NT_StopServer(void) {
-  Dispatcher& dispatcher = Dispatcher::GetInstance();
-  dispatcher.Stop();
-}
+void NT_StopServer(void) { nt::StopServer(); }
 
 void NT_StartClient(const char *server_name, unsigned int port) {
-  Dispatcher& dispatcher = Dispatcher::GetInstance();
-  dispatcher.StartClient(server_name, port);
+  nt::StartClient(server_name, port);
 }
 
 void NT_StopClient(void) {
-  Dispatcher& dispatcher = Dispatcher::GetInstance();
-  dispatcher.Stop();
+  nt::StopClient();
 }
 
 void NT_SetUpdateRate(double interval) {
-  Dispatcher& dispatcher = Dispatcher::GetInstance();
-  dispatcher.SetUpdateRate(interval);
+  nt::SetUpdateRate(interval);
 }
 
 struct NT_ConnectionInfo *NT_GetConnections(size_t *count) {
@@ -121,20 +147,12 @@ struct NT_ConnectionInfo *NT_GetConnections(size_t *count) {
  */
 
 const char *NT_SavePersistent(const char *filename) {
-  const Storage& storage = Storage::GetInstance();
-  std::ofstream os(filename);
-  if (!os) return "could not open file";
-  storage.SavePersistent(os);
-  return nullptr;
+  return nt::SavePersistent(filename);
 }
 
 const char *NT_LoadPersistent(const char *filename,
                               void (*warn)(size_t line, const char *msg)) {
-  Storage& storage = Storage::GetInstance();
-  std::ifstream is(filename);
-  if (!is) return "could not open file";
-  if (!storage.LoadPersistent(is, warn)) return "error reading file";
-  return nullptr;
+  return nt::LoadPersistent(filename, warn);
 }
 
 /*

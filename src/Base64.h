@@ -13,11 +13,11 @@
 
 #include "llvm/StringRef.h"
 
-namespace ntimpl {
+namespace nt {
 
 std::size_t Base64Decode(llvm::StringRef encoded, std::string* plain);
 void Base64Encode(llvm::StringRef plain, std::string* encoded);
 
-}  // namespace ntimpl
+}  // namespace nt
 
 #endif  // NT_BASE64_H_

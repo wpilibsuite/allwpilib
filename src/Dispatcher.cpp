@@ -10,7 +10,7 @@
 #include "tcpsockets/TCPAcceptor.h"
 #include "tcpsockets/TCPConnector.h"
 
-using namespace ntimpl;
+using namespace nt;
 
 std::unique_ptr<Dispatcher> Dispatcher::m_instance;
 

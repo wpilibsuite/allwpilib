@@ -9,7 +9,7 @@
 
 #include <cstring>
 
-using namespace ntimpl;
+using namespace nt;
 
 void raw_istream::anchor() {}
 

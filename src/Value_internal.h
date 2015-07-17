@@ -5,28 +5,26 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_RAW_SOCKET_ISTREAM_H_
-#define NT_RAW_SOCKET_ISTREAM_H_
+#ifndef NT_VALUE_INTERNAL_H_
+#define NT_VALUE_INTERNAL_H_
 
-#include "raw_istream.h"
+#include <memory>
+#include <string>
 
-#include "tcpsockets/TCPStream.h"
+#include "llvm/StringRef.h"
+#include "ntcore_c.h"
 
 namespace nt {
 
-class raw_socket_istream : public raw_istream {
- public:
-  raw_socket_istream(TCPStream& stream, int timeout = 0)
-      : m_stream(stream), m_timeout(timeout) {}
-  virtual ~raw_socket_istream();
-  virtual bool read(void* data, std::size_t len);
-  virtual void close();
+class Value;
 
- private:
-  TCPStream& m_stream;
-  int m_timeout;
-};
+void ConvertToC(const Value& in, NT_Value* out);
+std::shared_ptr<Value> ConvertFromC(const NT_Value& value);
+void ConvertToC(llvm::StringRef in, NT_String* out);
+inline llvm::StringRef ConvertFromC(const NT_String& str) {
+  return llvm::StringRef(str.str, str.len);
+}
 
 }  // namespace nt
 
-#endif  // NT_RAW_SOCKET_ISTREAM_H_
+#endif  // NT_VALUE_INTERNAL_H_

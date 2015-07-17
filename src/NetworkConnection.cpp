@@ -12,7 +12,7 @@
 #include "WireDecoder.h"
 #include "WireEncoder.h"
 
-using namespace ntimpl;
+using namespace nt;
 
 NetworkConnection::NetworkConnection(std::unique_ptr<TCPStream> stream,
                                      Message::GetEntryTypeFunc get_entry_type)

@@ -9,7 +9,7 @@
 
 #include "gtest/gtest.h"
 
-namespace ntimpl {
+namespace nt {
 
 struct Base64TestParam {
   int plain_len;
@@ -73,4 +73,4 @@ static Base64TestParam standard[] = {
 INSTANTIATE_TEST_CASE_P(Base64Standard, Base64Test,
                         ::testing::ValuesIn(standard));
 
-}  // namespace ntimpl
+}  // namespace nt

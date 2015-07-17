@@ -12,7 +12,7 @@
 
 static constexpr unsigned long kClearAllMagic = 0xD06CB27Aul;
 
-using namespace ntimpl;
+using namespace nt;
 
 std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
                                        GetEntryTypeFunc get_entry_type) {

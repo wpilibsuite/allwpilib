@@ -7,7 +7,7 @@
 
 #include "SequenceNumber.h"
 
-namespace ntimpl {
+namespace nt {
 
 bool operator<(const SequenceNumber& lhs, const SequenceNumber& rhs) {
   if (lhs.m_value < rhs.m_value)
@@ -27,4 +27,4 @@ bool operator>(const SequenceNumber& lhs, const SequenceNumber& rhs) {
     return false;
 }
 
-}  // namespace ntimpl
+}  // namespace nt

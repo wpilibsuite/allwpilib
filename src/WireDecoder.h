@@ -10,12 +10,11 @@
 
 #include <cstddef>
 
-#include "ntcore.h"
+#include "nt_Value.h"
 #include "leb128.h"
 #include "raw_istream.h"
-#include "Value.h"
 
-namespace ntimpl {
+namespace nt {
 
 /* Decodes network data into native representation.
  * This class is designed to read from a raw_istream, which provides a blocking
@@ -98,7 +97,7 @@ class WireDecoder {
 
   /* Reads an ULEB128-encoded unsigned integer. */
   bool ReadUleb128(unsigned long* val) {
-    return ntimpl::ReadUleb128(m_is, val);
+    return nt::ReadUleb128(m_is, val);
   }
 
   bool ReadType(NT_Type* type);
@@ -129,6 +128,6 @@ class WireDecoder {
   std::size_t m_allocated;
 };
 
-}  // namespace ntimpl
+}  // namespace nt
 
 #endif  // NT_WIREDECODER_H_

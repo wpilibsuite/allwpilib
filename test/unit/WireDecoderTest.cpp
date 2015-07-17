@@ -15,7 +15,7 @@
 
 #include "llvm/StringRef.h"
 
-namespace ntimpl {
+namespace nt {
 
 class WireDecoderTest : public ::testing::Test {
  protected:
@@ -599,4 +599,4 @@ TEST_F(WireDecoderTest, ReadString3) {
   ASSERT_EQ(nullptr, d.error());
 }
 
-}  // namespace ntimpl
+}  // namespace nt

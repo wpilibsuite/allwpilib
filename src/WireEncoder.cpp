@@ -14,7 +14,7 @@
 
 #include "leb128.h"
 
-using namespace ntimpl;
+using namespace nt;
 
 WireEncoder::WireEncoder(unsigned int proto_rev) {
   // Start with a 1024-byte buffer.  Use malloc instead of new so we can
@@ -59,7 +59,7 @@ void WireEncoder::ReserveSlow(std::size_t len) {
 
 void WireEncoder::WriteUleb128(unsigned long val) {
   Reserve(SizeUleb128(val));
-  m_cur += ntimpl::WriteUleb128(m_cur, val);
+  m_cur += nt::WriteUleb128(m_cur, val);
 }
 
 void WireEncoder::WriteType(NT_Type type) {

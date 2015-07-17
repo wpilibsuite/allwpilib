@@ -17,7 +17,7 @@
 
 class TCPStream;
 
-namespace ntimpl {
+namespace nt {
 
 class NetworkConnection {
  public:
@@ -56,6 +56,6 @@ class NetworkConnection {
   std::atomic_uint m_proto_rev;
 };
 
-}  // namespace ntimpl
+}  // namespace nt
 
 #endif  // NT_NETWORKCONNECTION_H_

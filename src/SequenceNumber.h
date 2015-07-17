@@ -8,7 +8,7 @@
 #ifndef NT_SEQNUM_H_
 #define NT_SEQNUM_H_
 
-namespace ntimpl {
+namespace nt {
 
 /* A sequence number per RFC 1982 */
 class SequenceNumber {
@@ -57,6 +57,6 @@ inline bool operator!=(const SequenceNumber& lhs, const SequenceNumber& rhs) {
   return lhs.m_value != rhs.m_value;
 }
 
-}  // namespace ntimpl
+}  // namespace nt
 
 #endif  // NT_SEQNUM_H_

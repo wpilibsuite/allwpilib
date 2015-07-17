@@ -13,7 +13,7 @@
 #include "llvm/StringExtras.h"
 #include "Base64.h"
 
-using namespace ntimpl;
+using namespace nt;
 
 std::unique_ptr<Storage> Storage::m_instance;
 
@@ -233,8 +233,9 @@ static void UnescapeString(llvm::StringRef source, std::string* dest) {
   }
 }
 
-bool Storage::LoadPersistent(std::istream& is,
-                             void (*warn)(std::size_t line, const char* msg)) {
+bool Storage::LoadPersistent(
+    std::istream& is,
+    std::function<void(std::size_t line, const char* msg)> warn) {
   std::string line_str;
   std::size_t line_num = 1;
 
