@@ -7,13 +7,18 @@
 
 #include "nt_Value.h"
 #include "Value_internal.h"
+#include "support/timestamp.h"
 
 using namespace nt;
 
-Value::Value() { m_val.type = NT_UNASSIGNED; }
+Value::Value() {
+  m_val.type = NT_UNASSIGNED;
+  m_val.last_change = Now();
+}
 
 Value::Value(NT_Type type, const private_init&) {
   m_val.type = type;
+  m_val.last_change = Now();
   if (m_val.type == NT_BOOLEAN_ARRAY)
     m_val.data.arr_boolean.arr = nullptr;
   else if (m_val.type == NT_DOUBLE_ARRAY)
