@@ -96,7 +96,7 @@ struct NT_EntryInfo {
 /** NetworkTables Connection Information */
 struct NT_ConnectionInfo {
   struct NT_String remote_id;
-  const char *remote_name;
+  char *remote_name;
   unsigned int remote_port;
   unsigned long long last_update;
   unsigned int protocol_version;
@@ -237,7 +237,7 @@ void NT_Flush(void);
 
 typedef void (*NT_EntryListenerCallback)(
     unsigned int uid, void *data, const char *name, size_t name_len,
-    struct NT_Value *value);
+    const struct NT_Value *value);
 
 typedef void (*NT_ConnectionListenerCallback)(
     unsigned int uid, void *data, int connected,
@@ -254,18 +254,18 @@ void NT_RemoveConnectionListener(unsigned int conn_listener_uid);
  * Remote Procedure Call Functions
  */
 
-typedef NT_Value *(*NT_RpcCallback)(unsigned int uid, void *data,
-                                    const char *name, size_t name_len,
-                                    NT_Value *params, size_t params_len,
-                                    size_t *results_len);
+typedef NT_Value **(*NT_RpcCallback)(unsigned int uid, void *data,
+                                     const char *name, size_t name_len,
+                                     const struct NT_Value **params,
+                                     size_t params_len, size_t *results_len);
 
 unsigned int NT_CreateRpc(const char *name, size_t name_len,
-                          const NT_RpcDefinition *def, void *data,
+                          const struct NT_RpcDefinition *def, void *data,
                           NT_RpcCallback callback);
 void NT_DeleteRpc(unsigned int rpc_uid);
 unsigned int NT_CallRpc(const char *name, size_t name_len,
-                        const NT_Value *params, size_t params_len);
-NT_Value *NT_GetRpcResult(unsigned int result_uid, size_t *results_len);
+                        const struct NT_Value **params, size_t params_len);
+struct NT_Value **NT_GetRpcResult(unsigned int result_uid, size_t *results_len);
 
 /*
  * Client/Server Functions
