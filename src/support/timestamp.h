@@ -17,4 +17,12 @@ unsigned long long NT_Now(void);
 }
 #endif
 
+#ifdef __cplusplus
+namespace nt {
+
+unsigned long long Now();
+
+}  // namespace nt
+#endif
+
 #endif  // NT_SUPPORT_TIMESTAMP_H_

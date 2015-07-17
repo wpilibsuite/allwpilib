@@ -91,7 +91,7 @@ static const unsigned long long zerotime_val = zerotime();
 static const unsigned long long offset_val = timestamp();
 static const unsigned long long frequency_val = update_frequency();
 
-unsigned long long NT_Now() {
+unsigned long long nt::Now() {
   assert(offset_val > 0u);
   assert(frequency_val > 0u);
   unsigned long long delta = timestamp() - offset_val;
@@ -99,4 +99,8 @@ unsigned long long NT_Now() {
   // delta by 10,000,000
   unsigned long long delta_in_us = delta * 10000000ull / frequency_val;
   return delta_in_us + zerotime_val;
+}
+
+unsigned long long NT_Now() {
+  return nt::Now();
 }
