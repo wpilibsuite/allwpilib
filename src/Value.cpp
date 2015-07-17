@@ -9,19 +9,40 @@
 
 using namespace ntimpl;
 
-Value::Value() : m_type(NT_UNASSIGNED) {}
+Value::Value() { m_val.type = NT_UNASSIGNED; }
 
-Value::Value(NT_Type type, const private_init&) : m_type(type) {}
+Value::Value(NT_Type type, const private_init&) {
+  m_val.type = type;
+  if (m_val.type == NT_BOOLEAN_ARRAY)
+    m_val.data.arr_boolean.arr = nullptr;
+  else if (m_val.type == NT_DOUBLE_ARRAY)
+    m_val.data.arr_double.arr = nullptr;
+  else if (m_val.type == NT_STRING_ARRAY)
+    m_val.data.arr_string.arr = nullptr;
+}
+
+Value::~Value() {
+  if (m_val.type == NT_BOOLEAN_ARRAY)
+    delete[] m_val.data.arr_boolean.arr;
+  else if (m_val.type == NT_DOUBLE_ARRAY)
+    delete[] m_val.data.arr_double.arr;
+  else if (m_val.type == NT_STRING_ARRAY)
+    delete[] m_val.data.arr_string.arr;
+}
 
 std::shared_ptr<Value> Value::MakeBooleanArray(llvm::ArrayRef<int> value) {
   auto val = std::make_shared<Value>(NT_BOOLEAN_ARRAY, private_init());
-  val->m_boolean_array = value;
+  val->m_val.data.arr_boolean.arr = new int[value.size()];
+  val->m_val.data.arr_boolean.size = value.size();
+  std::copy(value.begin(), value.end(), val->m_val.data.arr_boolean.arr);
   return val;
 }
 
 std::shared_ptr<Value> Value::MakeDoubleArray(llvm::ArrayRef<double> value) {
   auto val = std::make_shared<Value>(NT_DOUBLE_ARRAY, private_init());
-  val->m_double_array = value;
+  val->m_val.data.arr_double.arr = new double[value.size()];
+  val->m_val.data.arr_double.size = value.size();
+  std::copy(value.begin(), value.end(), val->m_val.data.arr_double.arr);
   return val;
 }
 
@@ -29,20 +50,12 @@ std::shared_ptr<Value> Value::MakeStringArray(
     llvm::ArrayRef<std::string> value) {
   auto val = std::make_shared<Value>(NT_STRING_ARRAY, private_init());
   val->m_string_array = value;
-  return val;
-}
-
-std::shared_ptr<Value> Value::MakeBooleanArray(std::vector<int>&& value) {
-  auto val = std::make_shared<Value>(NT_BOOLEAN_ARRAY, private_init());
-  val->m_boolean_array = std::move(value);
-  value.clear();
-  return val;
-}
-
-std::shared_ptr<Value> Value::MakeDoubleArray(std::vector<double>&& value) {
-  auto val = std::make_shared<Value>(NT_DOUBLE_ARRAY, private_init());
-  val->m_double_array = std::move(value);
-  value.clear();
+  // point NT_Value to the contents in the vector.
+  val->m_val.data.arr_string.arr = new NT_String[value.size()];
+  for (std::size_t i=0; i<value.size(); ++i) {
+    val->m_val.data.arr_string.arr[i].str = const_cast<char*>(value[i].c_str());
+    val->m_val.data.arr_string.arr[i].len = value[i].size();
+  }
   return val;
 }
 
@@ -51,6 +64,13 @@ std::shared_ptr<Value> Value::MakeStringArray(
   auto val = std::make_shared<Value>(NT_STRING_ARRAY, private_init());
   val->m_string_array = std::move(value);
   value.clear();
+  // point NT_Value to the contents in the vector.
+  val->m_val.data.arr_string.arr = new NT_String[val->m_string_array.size()];
+  for (std::size_t i=0; i<val->m_string_array.size(); ++i) {
+    val->m_val.data.arr_string.arr[i].str =
+        const_cast<char*>(val->m_string_array[i].c_str());
+    val->m_val.data.arr_string.arr[i].len = val->m_string_array[i].size();
+  }
   return val;
 }
 
@@ -158,17 +178,27 @@ bool ntimpl::operator==(const Value& lhs, const Value& rhs) {
     case NT_UNASSIGNED:
       return true;  // XXX: is this better being false instead?
     case NT_BOOLEAN:
-      return lhs.m_boolean == rhs.m_boolean;
+      return lhs.m_val.data.v_boolean == rhs.m_val.data.v_boolean;
     case NT_DOUBLE:
-      return lhs.m_double == rhs.m_double;
+      return lhs.m_val.data.v_double == rhs.m_val.data.v_double;
     case NT_STRING:
     case NT_RAW:
     case NT_RPC:
       return lhs.m_string == rhs.m_string;
     case NT_BOOLEAN_ARRAY:
-      return lhs.m_boolean_array == rhs.m_boolean_array;
+      if (lhs.m_val.data.arr_boolean.size != rhs.m_val.data.arr_boolean.size)
+        return false;
+      return std::memcmp(lhs.m_val.data.arr_boolean.arr,
+                         rhs.m_val.data.arr_boolean.arr,
+                         lhs.m_val.data.arr_boolean.size *
+                             sizeof(lhs.m_val.data.arr_boolean.arr[0])) == 0;
     case NT_DOUBLE_ARRAY:
-      return lhs.m_double_array == rhs.m_double_array;
+      if (lhs.m_val.data.arr_double.size != rhs.m_val.data.arr_double.size)
+        return false;
+      return std::memcmp(lhs.m_val.data.arr_double.arr,
+                         rhs.m_val.data.arr_double.arr,
+                         lhs.m_val.data.arr_double.size *
+                             sizeof(lhs.m_val.data.arr_double.arr[0])) == 0;
     case NT_STRING_ARRAY:
       return lhs.m_string_array == rhs.m_string_array;
     default:

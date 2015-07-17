@@ -26,83 +26,99 @@ class Value {
  public:
   Value();
   Value(NT_Type type, const private_init&);
+  ~Value();
 
-  NT_Type type() const { return m_type; }
+  NT_Type type() const { return m_val.type; }
+  const NT_Value& value() const { return m_val; }
 
   /*
    * Type-Safe Getters
    */
   bool GetBoolean() const {
-    assert(m_type == NT_BOOLEAN);
-    return m_boolean;
+    assert(m_val.type == NT_BOOLEAN);
+    return m_val.data.v_boolean != 0;
   }
   double GetDouble() const {
-    assert(m_type == NT_DOUBLE);
-    return m_double;
+    assert(m_val.type == NT_DOUBLE);
+    return m_val.data.v_double;
   }
   llvm::StringRef GetString() const {
-    assert(m_type == NT_STRING);
+    assert(m_val.type == NT_STRING);
     return m_string;
   }
   llvm::StringRef GetRaw() const {
-    assert(m_type == NT_RAW);
+    assert(m_val.type == NT_RAW);
     return m_string;
   }
   llvm::StringRef GetRpc() const {
-    assert(m_type == NT_RPC);
+    assert(m_val.type == NT_RPC);
     return m_string;
   }
   llvm::ArrayRef<int> GetBooleanArray() const {
-    assert(m_type == NT_BOOLEAN_ARRAY);
-    return m_boolean_array;
+    assert(m_val.type == NT_BOOLEAN_ARRAY);
+    return llvm::ArrayRef<int>(m_val.data.arr_boolean.arr,
+                               m_val.data.arr_boolean.size);
   }
   llvm::ArrayRef<double> GetDoubleArray() const {
-    assert(m_type == NT_DOUBLE_ARRAY);
-    return m_double_array;
+    assert(m_val.type == NT_DOUBLE_ARRAY);
+    return llvm::ArrayRef<double>(m_val.data.arr_double.arr,
+                                  m_val.data.arr_double.size);
   }
   llvm::ArrayRef<std::string> GetStringArray() const {
-    assert(m_type == NT_STRING_ARRAY);
+    assert(m_val.type == NT_STRING_ARRAY);
     return m_string_array;
   }
 
   static std::shared_ptr<Value> MakeBoolean(bool value) {
     auto val = std::make_shared<Value>(NT_BOOLEAN, private_init());
-    val->m_boolean = value;
+    val->m_val.data.v_boolean = value;
     return val;
   }
   static std::shared_ptr<Value> MakeDouble(double value) {
     auto val = std::make_shared<Value>(NT_DOUBLE, private_init());
-    val->m_double = value;
+    val->m_val.data.v_double = value;
     return val;
   }
   static std::shared_ptr<Value> MakeString(llvm::StringRef value) {
     auto val = std::make_shared<Value>(NT_STRING, private_init());
     val->m_string = value;
+    val->m_val.data.v_string.str = const_cast<char*>(val->m_string.c_str());
+    val->m_val.data.v_string.len = val->m_string.size();
     return val;
   }
   static std::shared_ptr<Value> MakeString(std::string&& value) {
     auto val = std::make_shared<Value>(NT_STRING, private_init());
     val->m_string = std::move(value);
+    val->m_val.data.v_string.str = const_cast<char*>(val->m_string.c_str());
+    val->m_val.data.v_string.len = val->m_string.size();
     return val;
   }
   static std::shared_ptr<Value> MakeRaw(llvm::StringRef value) {
     auto val = std::make_shared<Value>(NT_RAW, private_init());
     val->m_string = value;
+    val->m_val.data.v_raw.str = const_cast<char*>(val->m_string.c_str());
+    val->m_val.data.v_raw.len = val->m_string.size();
     return val;
   }
   static std::shared_ptr<Value> MakeRaw(std::string&& value) {
     auto val = std::make_shared<Value>(NT_RAW, private_init());
     val->m_string = std::move(value);
+    val->m_val.data.v_raw.str = const_cast<char*>(val->m_string.c_str());
+    val->m_val.data.v_raw.len = val->m_string.size();
     return val;
   }
   static std::shared_ptr<Value> MakeRpc(llvm::StringRef value) {
     auto val = std::make_shared<Value>(NT_RPC, private_init());
     val->m_string = value;
+    val->m_val.data.v_raw.str = const_cast<char*>(val->m_string.c_str());
+    val->m_val.data.v_raw.len = val->m_string.size();
     return val;
   }
   static std::shared_ptr<Value> MakeRpc(std::string&& value) {
     auto val = std::make_shared<Value>(NT_RPC, private_init());
     val->m_string = std::move(value);
+    val->m_val.data.v_raw.str = const_cast<char*>(val->m_string.c_str());
+    val->m_val.data.v_raw.len = val->m_string.size();
     return val;
   }
 
@@ -111,9 +127,7 @@ class Value {
   static std::shared_ptr<Value> MakeStringArray(
       llvm::ArrayRef<std::string> value);
 
-  // Note: These functions move the values out of the vector.
-  static std::shared_ptr<Value> MakeBooleanArray(std::vector<int>&& value);
-  static std::shared_ptr<Value> MakeDoubleArray(std::vector<double>&& value);
+  // Note: This function moves the values out of the vector.
   static std::shared_ptr<Value> MakeStringArray(
       std::vector<std::string>&& value);
 
@@ -122,12 +136,8 @@ class Value {
   friend bool operator==(const Value& lhs, const Value& rhs);
 
  private:
-  NT_Type m_type;
-  bool m_boolean;
-  double m_double;
+  NT_Value m_val;
   std::string m_string;
-  std::vector<int> m_boolean_array;
-  std::vector<double> m_double_array;
   std::vector<std::string> m_string_array;
 };
 
