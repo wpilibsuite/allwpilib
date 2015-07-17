@@ -19,7 +19,7 @@ using namespace nt;
 static void ConvertToC(llvm::StringRef in, char** out) {
   *out = static_cast<char*>(std::malloc(in.size() + 1));
   std::memmove(*out, in.data(), in.size());
-  out[in.size()] = '\0';
+  (*out)[in.size()] = '\0';
 }
 
 static void ConvertToC(const EntryInfo& in, NT_EntryInfo* out) {
