@@ -72,8 +72,10 @@ std::size_t TCPStream::receive(char* buffer, std::size_t len, Error* err,
 }
 
 void TCPStream::close() {
-  if (m_sd >= 0)
+  if (m_sd >= 0) {
+    ::shutdown(m_sd, SHUT_RDWR);
     ::close(m_sd);
+  }
   m_sd = -1;
 }
 
