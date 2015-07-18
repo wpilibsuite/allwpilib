@@ -34,12 +34,14 @@ class TCPAcceptor {
   int m_port;
   std::string m_address;
   bool m_listening;
+  bool m_shutdown;
 
  public:
   TCPAcceptor(int port, const char* address);
   ~TCPAcceptor();
 
   int start();
+  void shutdown();
   std::unique_ptr<TCPStream> accept();
 
  private:

@@ -30,10 +30,15 @@
 #include <unistd.h>
 
 TCPAcceptor::TCPAcceptor(int port, const char* address)
-    : m_lsd(0), m_port(port), m_address(address), m_listening(false) {}
+    : m_lsd(0),
+      m_port(port),
+      m_address(address),
+      m_listening(false),
+      m_shutdown(false) {}
 
 TCPAcceptor::~TCPAcceptor() {
   if (m_lsd > 0) {
+    shutdown();
     close(m_lsd);
   }
 }
@@ -71,6 +76,11 @@ int TCPAcceptor::start() {
   return result;
 }
 
+void TCPAcceptor::shutdown() {
+  m_shutdown = true;
+  ::shutdown(m_lsd, SHUT_RDWR);
+}
+
 std::unique_ptr<TCPStream> TCPAcceptor::accept() {
   if (!m_listening) return nullptr;
 
@@ -79,7 +89,7 @@ std::unique_ptr<TCPStream> TCPAcceptor::accept() {
   std::memset(&address, 0, sizeof(address));
   int sd = ::accept(m_lsd, (struct sockaddr*)&address, &len);
   if (sd < 0) {
-    perror("accept() failed");
+    if (!m_shutdown) perror("accept() failed");
     return nullptr;
   }
   return std::unique_ptr<TCPStream>(new TCPStream(sd, &address));
