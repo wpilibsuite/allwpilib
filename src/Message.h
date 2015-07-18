@@ -47,6 +47,14 @@ class Message {
   MsgType type() const { return m_type; }
   bool Is(MsgType type) const { return type == m_type; }
 
+  // Message data accessors.  Callers are responsible for knowing what data is
+  // actually provided for a particular message.
+  const std::string& str() const { return m_str; }
+  std::shared_ptr<Value> value() const { return m_value; }
+  unsigned int id() const { return m_id; }
+  unsigned int flags() const { return m_flags; }
+  unsigned int seq_num_uid() const { return m_seq_num_uid; }
+
   // Read and write from wire representation
   void Write(WireEncoder& encoder) const;
   static std::shared_ptr<Message> Read(WireDecoder& decoder,
