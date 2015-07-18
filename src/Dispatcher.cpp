@@ -200,7 +200,7 @@ void Dispatcher::ClientThreadMain(const char* server_name, unsigned int port) {
       continue;
     }
 
-    if (proto_rev == 0x0300) {
+    if (proto_rev >= 0x0300) {
       // should be server hello; if not, disconnect, but keep trying to connect
       if (!msg->Is(Message::kServerHello)) continue;
       conn.remote_id = msg->str();
@@ -208,6 +208,8 @@ void Dispatcher::ClientThreadMain(const char* server_name, unsigned int port) {
       msg = conn.net->incoming().pop();
     }
 
+    // receive initial assignments
+    std::vector<std::shared_ptr<Message>> incoming;
     while (true) {
       if (!msg) {
         // disconnected, retry
@@ -216,7 +218,25 @@ void Dispatcher::ClientThreadMain(const char* server_name, unsigned int port) {
         continue;
       }
       if (msg->Is(Message::kServerHelloDone)) break;
+      if (!msg->Is(Message::kEntryAssign)) {
+        // unexpected message
+        DEBUG("received message other than entry assignment during initial handshake");
+        proto_rev = 0x0300;
+        continue;
+      }
+      incoming.push_back(msg);
+      // get the next message (blocks)
+      msg = conn.net->incoming().pop();
     }
+
+    // generate outgoing assignments
+    NetworkConnection::Outgoing outgoing;
+
+    if (proto_rev >= 0x0300)
+      outgoing.push_back(Message::ClientHelloDone());
+
+    if (!outgoing.empty())
+      conn.net->outgoing().push(std::move(outgoing));
 
     // add to connections list (the dispatcher thread will handle from here)
     AddConnection(std::move(conn));
