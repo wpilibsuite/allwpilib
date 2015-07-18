@@ -21,6 +21,99 @@ Storage::Storage() {}
 
 Storage::~Storage() {}
 
+std::shared_ptr<Value> Storage::GetEntryValue(StringRef name) const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  auto i = m_entries.find(name);
+  if (i == m_entries.end())
+    return nullptr;
+  return i->getValue().value;
+}
+
+bool Storage::SetEntryValue(StringRef name, std::shared_ptr<Value> value) {
+  if (name.empty()) return true;
+  if (!value) return true;
+  std::lock_guard<std::mutex> lock(m_mutex);
+  auto& entry = m_entries[name];
+  if (entry.value && entry.value->type() != value->type())
+    return false;  // error on type mismatch
+  if (!entry.value || *entry.value != *value)
+    m_updates.push(Update{name, Update::kValueUpdate});  // put on update queue
+  entry.value = value;
+  return true;
+}
+
+void Storage::SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value) {
+  if (name.empty()) return;
+  if (!value) return;
+  std::lock_guard<std::mutex> lock(m_mutex);
+  auto& entry = m_entries[name];
+  if (!entry.value || *entry.value != *value) {
+    // put on update queue
+    if (!entry.value || entry.value->type() != value->type())
+      m_updates.push(Update{name, Update::kAssign});
+    else
+      m_updates.push(Update{name, Update::kValueUpdate});
+  }
+  entry.value = value;
+}
+
+void Storage::SetEntryFlags(StringRef name, unsigned int flags) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  auto i = m_entries.find(name);
+  if (i == m_entries.end())
+    return;
+  auto& entry = i->getValue();
+  if (entry.flags != flags)
+    m_updates.push(Update{name, Update::kFlagsUpdate});  // put on update queue
+  entry.flags = flags;
+}
+
+unsigned int Storage::GetEntryFlags(StringRef name) const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  auto i = m_entries.find(name);
+  if (i == m_entries.end())
+    return 0;
+  return i->getValue().flags;
+}
+
+void Storage::DeleteEntry(StringRef name) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  auto i = m_entries.find(name);
+  if (i == m_entries.end())
+    return;
+  auto& entry = i->getValue();
+  if (entry.value)
+    m_updates.push(Update{name, Update::kDelete});  // put on update queue
+  entry.value = nullptr;
+}
+
+void Storage::DeleteAllEntries() {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  for (auto& i : m_entries) {
+    auto& entry = i.getValue();
+    if (entry.value) entry.value = nullptr;
+  }
+  m_updates.push(Update{"", Update::kDeleteAll});  // put on update queue
+}
+
+std::vector<EntryInfo> Storage::GetEntryInfo(StringRef prefix,
+                                             unsigned int types) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  std::vector<EntryInfo> infos;
+  for (auto& i : m_entries) {
+    if (!i.getKey().startswith(prefix)) continue;
+    auto& entry = i.getValue();
+    if (!entry.value) continue;
+    EntryInfo info;
+    info.name = i.getKey();
+    info.type = entry.value->type();
+    info.flags = entry.flags;
+    info.last_change = entry.value->last_change();
+    infos.push_back(std::move(info));
+  }
+  return infos;
+}
+
 /* Escapes and writes a string, including start and end double quotes */
 static void WriteString(std::ostream& os, llvm::StringRef str) {
   os << '"';
@@ -54,18 +147,27 @@ static void WriteString(std::ostream& os, llvm::StringRef str) {
 }
 
 void Storage::SavePersistent(std::ostream& os) const {
+  // copy values out of storage as quickly as possible so lock isn't held
+  std::vector<std::pair<std::string, std::shared_ptr<Value>>> entries;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    entries.reserve(m_entries.size());
+    for (auto& i : m_entries) {
+      const StorageEntry& entry = i.getValue();
+      // only write persistent-flagged values
+      if (!entry.IsPersistent()) continue;
+      entries.push_back(std::make_pair(i.getKey(), entry.value));
+    }
+  }
+
   std::string base64_encoded;
 
   // header
   os << "[NetworkTables Storage 3.0]\n";
 
-  for (auto& i : m_entries) {
-    const StorageEntry& entry = i.getValue();
-    // only write persistent-flagged values
-    if (!entry.IsPersistent()) continue;
-
+  for (auto& i : entries) {
     // type
-    auto v = entry.value;
+    auto v = i.second;
     if (!v) continue;
     switch (v->type()) {
       case NT_BOOLEAN:
@@ -94,7 +196,7 @@ void Storage::SavePersistent(std::ostream& os) const {
     }
 
     // name
-    WriteString(os, i.getKey());
+    WriteString(os, i.first);
 
     // =
     os << '=';
@@ -239,6 +341,9 @@ bool Storage::LoadPersistent(
   std::string line_str;
   std::size_t line_num = 1;
 
+  // entries to add
+  std::vector<std::pair<std::string, std::shared_ptr<Value>>> entries;
+
   // declare these outside the loop to reduce reallocs
   std::string name, str;
   std::vector<int> boolean_array;
@@ -308,14 +413,14 @@ bool Storage::LoadPersistent(
     line = line.drop_front().ltrim(" \t");
 
     // value
-    StorageEntry entry;
+    std::shared_ptr<Value> value;
     switch (type) {
       case NT_BOOLEAN:
         // only true or false is accepted
         if (line == "true")
-          entry.value = Value::MakeBoolean(true);
+          value = Value::MakeBoolean(true);
         else if (line == "false")
-          entry.value = Value::MakeBoolean(false);
+          value = Value::MakeBoolean(false);
         else {
           if (warn)
             warn(line_num, "unrecognized boolean value, not 'true' or 'false'");
@@ -332,7 +437,7 @@ bool Storage::LoadPersistent(
           if (warn) warn(line_num, "invalid double value");
           goto next_line;
         }
-        entry.value = Value::MakeDouble(v);
+        value = Value::MakeDouble(v);
         break;
       }
       case NT_STRING: {
@@ -347,12 +452,12 @@ bool Storage::LoadPersistent(
           goto next_line;
         }
         UnescapeString(str_tok, &str);
-        entry.value = Value::MakeString(std::move(str));
+        value = Value::MakeString(std::move(str));
         break;
       }
       case NT_RAW:
         Base64Decode(line, &str);
-        entry.value = Value::MakeRaw(std::move(str));
+        value = Value::MakeRaw(std::move(str));
         break;
       case NT_BOOLEAN_ARRAY: {
         llvm::StringRef elem_tok;
@@ -372,7 +477,7 @@ bool Storage::LoadPersistent(
           }
         }
 
-        entry.value = Value::MakeBooleanArray(std::move(boolean_array));
+        value = Value::MakeBooleanArray(std::move(boolean_array));
         break;
       }
       case NT_DOUBLE_ARRAY: {
@@ -393,7 +498,7 @@ bool Storage::LoadPersistent(
           double_array.push_back(v);
         }
 
-        entry.value = Value::MakeDoubleArray(std::move(double_array));
+        value = Value::MakeDoubleArray(std::move(double_array));
         break;
       }
       case NT_STRING_ARRAY: {
@@ -421,14 +526,36 @@ bool Storage::LoadPersistent(
           string_array.push_back(std::move(str));
         }
 
-        entry.value = Value::MakeStringArray(std::move(string_array));
+        value = Value::MakeStringArray(std::move(string_array));
         break;
       }
       default:
         break;
     }
+    if (!name.empty() && value)
+      entries.push_back(std::make_pair(std::move(name), std::move(value)));
 next_line:
     ;
   }
+
+  // copy values into storage as quickly as possible so lock isn't held
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    for (auto& i : entries) {
+      auto& entry = m_entries[i.first];
+
+      // put on update queue
+      if (!entry.value || entry.value->type() != i.second->type())
+        m_updates.push(Update{i.first, Update::kAssign});
+      else if (*entry.value != *i.second)
+        m_updates.push(Update{i.first, Update::kValueUpdate});
+      if (!entry.IsPersistent())
+        m_updates.push(Update{std::move(i.first), Update::kFlagsUpdate});
+
+      entry.value = i.second;
+      entry.flags |= NT_PERSISTENT;
+    }
+  }
+
   return true;
 }

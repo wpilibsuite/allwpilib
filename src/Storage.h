@@ -12,9 +12,11 @@
 #include <functional>
 #include <iosfwd>
 #include <memory>
+#include <mutex>
 
 #include "llvm/StringMap.h"
-#include "nt_Value.h"
+#include "support/ConcurrentQueue.h"
+#include "ntcore_cpp.h"
 #include "SequenceNumber.h"
 
 namespace nt {
@@ -41,8 +43,27 @@ class Storage {
 
   typedef llvm::StringMap<StorageEntry> EntriesMap;
 
+  struct Update {
+    std::string name;
+    enum Kind { kAssign, kValueUpdate, kFlagsUpdate, kDelete, kDeleteAll };
+    Kind kind;
+  };
+  typedef ConcurrentQueue<Update> UpdateQueue;
+
+  std::mutex& mutex() { return m_mutex; }
   EntriesMap& entries() { return m_entries; }
   const EntriesMap& entries() const { return m_entries; }
+
+  UpdateQueue& updates() { return m_updates; }
+
+  std::shared_ptr<Value> GetEntryValue(StringRef name) const;
+  bool SetEntryValue(StringRef name, std::shared_ptr<Value> value);
+  void SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value);
+  void SetEntryFlags(StringRef name, unsigned int flags);
+  unsigned int GetEntryFlags(StringRef name) const;
+  void DeleteEntry(StringRef name);
+  void DeleteAllEntries();
+  std::vector<EntryInfo> GetEntryInfo(StringRef prefix, unsigned int types);
 
   void SavePersistent(std::ostream& os) const;
   bool LoadPersistent(
@@ -54,7 +75,9 @@ class Storage {
   Storage(const Storage&) = delete;
   Storage& operator=(const Storage&) = delete;
 
+  mutable std::mutex m_mutex;
   EntriesMap m_entries;
+  UpdateQueue m_updates;
 
   static std::unique_ptr<Storage> m_instance;
 };

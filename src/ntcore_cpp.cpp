@@ -22,27 +22,35 @@ namespace nt {
  */
 
 std::shared_ptr<Value> GetEntryValue(StringRef name) {
-  return nullptr;
+  return Storage::GetInstance().GetEntryValue(name);
 }
 
 bool SetEntryValue(StringRef name, std::shared_ptr<Value> value) {
-  return false;
+  return Storage::GetInstance().SetEntryValue(name, value);
 }
 
-void SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value) {}
+void SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value) {
+  Storage::GetInstance().SetEntryTypeValue(name, value);
+}
 
-void SetEntryFlags(StringRef name, unsigned int flags) {}
+void SetEntryFlags(StringRef name, unsigned int flags) {
+  Storage::GetInstance().SetEntryFlags(name, flags);
+}
 
 unsigned int GetEntryFlags(StringRef name) {
-  return 0;
+  return Storage::GetInstance().GetEntryFlags(name);
 }
 
-void DeleteEntry(StringRef name) {}
+void DeleteEntry(StringRef name) {
+  Storage::GetInstance().DeleteEntry(name);
+}
 
-void DeleteAllEntries() {}
+void DeleteAllEntries() {
+  Storage::GetInstance().DeleteAllEntries();
+}
 
 std::vector<EntryInfo> GetEntryInfo(StringRef prefix, unsigned int types) {
-  return std::vector<EntryInfo>();
+  return Storage::GetInstance().GetEntryInfo(prefix, types);
 }
 
 void Flush() {
