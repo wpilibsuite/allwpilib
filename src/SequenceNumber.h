@@ -13,6 +13,7 @@ namespace nt {
 /* A sequence number per RFC 1982 */
 class SequenceNumber {
  public:
+  SequenceNumber() : m_value(0) {}
   explicit SequenceNumber(unsigned int value) : m_value(value) {}
   unsigned int value() const { return m_value; }
 
