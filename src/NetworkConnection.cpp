@@ -31,8 +31,11 @@ void NetworkConnection::Start() {
 }
 
 void NetworkConnection::Stop() {
-  if (m_stream) m_stream->close();
   m_active = false;
+  // closing the stream so the read thread terminates
+  if (m_stream) m_stream->close();
+  // send a dummy outgoing message so the write thread terminates
+  m_outgoing.push(Outgoing{Message::KeepAlive()});
   if (m_write_thread.joinable()) m_write_thread.join();
   if (m_read_thread.joinable()) m_read_thread.join();
 }
@@ -49,11 +52,12 @@ void NetworkConnection::ReadThreadMain() {
     auto msg = Message::Read(decoder, m_get_entry_type);
     if (!msg) {
       // terminate connection on bad message
-      m_stream->close();
+      if (m_stream) m_stream->close();
       break;
     }
     m_incoming.push(msg);
   }
+  m_incoming.push(nullptr);  // notify anyone waiting that we disconnected
   m_active = false;
 }
 
@@ -62,6 +66,7 @@ void NetworkConnection::WriteThreadMain() {
 
   while (m_active) {
     auto msgs = m_outgoing.pop();
+    if (!m_active) break;
     encoder.set_proto_rev(m_proto_rev);
     encoder.Reset();
     for (auto& msg : msgs) msg->Write(encoder);
