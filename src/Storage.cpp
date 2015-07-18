@@ -65,7 +65,7 @@ void Storage::SavePersistent(std::ostream& os) const {
     if (!entry.IsPersistent()) continue;
 
     // type
-    auto v = entry.value();
+    auto v = entry.value;
     if (!v) continue;
     switch (v->type()) {
       case NT_BOOLEAN:
@@ -313,9 +313,9 @@ bool Storage::LoadPersistent(
       case NT_BOOLEAN:
         // only true or false is accepted
         if (line == "true")
-          entry.set_value(Value::MakeBoolean(true));
+          entry.value = Value::MakeBoolean(true);
         else if (line == "false")
-          entry.set_value(Value::MakeBoolean(false));
+          entry.value = Value::MakeBoolean(false);
         else {
           if (warn)
             warn(line_num, "unrecognized boolean value, not 'true' or 'false'");
@@ -332,7 +332,7 @@ bool Storage::LoadPersistent(
           if (warn) warn(line_num, "invalid double value");
           goto next_line;
         }
-        entry.set_value(Value::MakeDouble(v));
+        entry.value = Value::MakeDouble(v);
         break;
       }
       case NT_STRING: {
@@ -347,12 +347,12 @@ bool Storage::LoadPersistent(
           goto next_line;
         }
         UnescapeString(str_tok, &str);
-        entry.set_value(Value::MakeString(std::move(str)));
+        entry.value = Value::MakeString(std::move(str));
         break;
       }
       case NT_RAW:
         Base64Decode(line, &str);
-        entry.set_value(Value::MakeRaw(std::move(str)));
+        entry.value = Value::MakeRaw(std::move(str));
         break;
       case NT_BOOLEAN_ARRAY: {
         llvm::StringRef elem_tok;
@@ -372,7 +372,7 @@ bool Storage::LoadPersistent(
           }
         }
 
-        entry.set_value(Value::MakeBooleanArray(std::move(boolean_array)));
+        entry.value = Value::MakeBooleanArray(std::move(boolean_array));
         break;
       }
       case NT_DOUBLE_ARRAY: {
@@ -393,7 +393,7 @@ bool Storage::LoadPersistent(
           double_array.push_back(v);
         }
 
-        entry.set_value(Value::MakeDoubleArray(std::move(double_array)));
+        entry.value = Value::MakeDoubleArray(std::move(double_array));
         break;
       }
       case NT_STRING_ARRAY: {
@@ -421,7 +421,7 @@ bool Storage::LoadPersistent(
           string_array.push_back(std::move(str));
         }
 
-        entry.set_value(Value::MakeStringArray(std::move(string_array)));
+        entry.value = Value::MakeStringArray(std::move(string_array));
         break;
       }
       default:

@@ -15,27 +15,20 @@
 
 #include "llvm/StringMap.h"
 #include "nt_Value.h"
+#include "SequenceNumber.h"
 
 namespace nt {
 
 class StorageEntry {
  public:
-  StorageEntry() : m_flags(0) {}
+  StorageEntry() : id(0xffff), flags(0) {}
 
-  std::shared_ptr<Value> value() const { return m_value; }
-  void set_value(std::shared_ptr<Value> value) { m_value = value; }
+  bool IsPersistent() const { return (flags & NT_PERSISTENT) != 0; }
 
-  unsigned int flags() const { return m_flags; }
-  void set_flags(unsigned int flags) { m_flags = flags; }
-
-  bool IsPersistent() const { return (m_flags & NT_PERSISTENT) != 0; }
-
-  StorageEntry(const StorageEntry&) = delete;
-  StorageEntry& operator=(const StorageEntry&) = delete;
-
-private:
-  std::shared_ptr<Value> m_value;
-  unsigned int m_flags;
+  std::shared_ptr<Value> value;
+  unsigned int id;
+  unsigned int flags;
+  SequenceNumber seq_num;
 };
 
 class Storage {
