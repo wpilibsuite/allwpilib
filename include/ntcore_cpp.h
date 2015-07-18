@@ -211,10 +211,9 @@ std::vector<ConnectionInfo> GetConnections();
  * Persistent Functions
  */
 /* return error string, or nullptr if successful */
-const char* SavePersistent(const char* filename);
+const char* SavePersistent(StringRef filename);
 const char* LoadPersistent(
-    const char* filename,
-    std::function<void(size_t line, const char *msg)> warn);
+    StringRef filename, std::function<void(size_t line, const char* msg)> warn);
 
 /*
  * Utility Functions

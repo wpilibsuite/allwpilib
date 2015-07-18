@@ -8,6 +8,7 @@
 #include "ntcore.h"
 
 #include <cassert>
+#include <cstdio>
 #include <cstdlib>
 #include <fstream>
 
@@ -129,16 +130,39 @@ std::vector<ConnectionInfo> GetConnections() {
  * Persistent Functions
  */
 
-const char* SavePersistent(const char* filename) {
+const char* SavePersistent(StringRef filename) {
   const Storage& storage = Storage::GetInstance();
-  std::ofstream os(filename);
+
+  std::string fn = filename;
+  std::string tmp = filename;
+  tmp += ".tmp";
+  std::string bak = filename;
+  bak += ".bak";
+
+  // start by writing to temporary file
+  std::ofstream os(tmp);
   if (!os) return "could not open file";
   storage.SavePersistent(os);
+  os.flush();
+  if (!os) {
+    os.close();
+    std::remove(tmp.c_str());
+    return "error saving file";
+  }
+
+  // safely move to real file
+  std::remove(bak.c_str());
+  if (std::rename(fn.c_str(), bak.c_str()) != 0)
+    return "could not rename real file to backup";
+  if (std::rename(tmp.c_str(), fn.c_str()) != 0) {
+    std::rename(bak.c_str(), fn.c_str());  // attempt to restore backup
+    return "could not rename temp file to real file";
+  }
   return nullptr;
 }
 
 const char* LoadPersistent(
-    const char* filename,
+    StringRef filename,
     std::function<void(size_t line, const char* msg)> warn) {
   Storage& storage = Storage::GetInstance();
   std::ifstream is(filename);
