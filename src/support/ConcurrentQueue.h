@@ -20,6 +20,11 @@ class ConcurrentQueue {
     return queue_.empty();
   }
 
+  typename std::queue<T>::size_type size() const {
+    std::unique_lock<std::mutex> mlock(mutex_);
+    return queue_.size();
+  }
+
   T pop() {
     std::unique_lock<std::mutex> mlock(mutex_);
     while (queue_.empty()) {
