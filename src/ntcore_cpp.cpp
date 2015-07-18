@@ -44,7 +44,10 @@ std::vector<EntryInfo> GetEntryInfo(StringRef prefix, unsigned int types) {
   return std::vector<EntryInfo>();
 }
 
-void Flush() {}
+void Flush() {
+  Dispatcher& dispatcher = Dispatcher::GetInstance();
+  dispatcher.Flush();
+}
 
 /*
  * Callback Creation Functions
