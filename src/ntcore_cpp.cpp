@@ -102,7 +102,7 @@ void SetNetworkIdentity(StringRef name) {
   Dispatcher::GetInstance().SetIdentity(name);
 }
 
-void StartServer(const char *persist_filename, const char *listen_address,
+void StartServer(StringRef persist_filename, const char *listen_address,
                  unsigned int port) {
   Dispatcher& dispatcher = Dispatcher::GetInstance();
   dispatcher.StartServer(listen_address, port);

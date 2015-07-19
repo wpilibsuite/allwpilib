@@ -199,7 +199,7 @@ std::vector<std::shared_ptr<Value>> GetRpcResult(unsigned int result_uid);
  * Client/Server Functions
  */
 void SetNetworkIdentity(llvm::StringRef name);
-void StartServer(const char* persist_filename, const char* listen_address,
+void StartServer(StringRef persist_filename, const char* listen_address,
                  unsigned int port);
 void StopServer();
 void StartClient(const char* server_name, unsigned int port);
