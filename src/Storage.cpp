@@ -29,8 +29,8 @@ std::shared_ptr<StorageEntry> Storage::FindEntry(StringRef name) const {
 
 std::shared_ptr<StorageEntry> Storage::GetEntry(StringRef name) {
   std::lock_guard<std::mutex> lock(m_mutex);
-  auto entry = m_entries[name];
-  if (!entry) entry.reset(new StorageEntry);
+  auto& entry = m_entries[name];
+  if (!entry) entry = std::make_shared<StorageEntry>();
   return entry;
 }
 
@@ -549,8 +549,8 @@ next_line:
   {
     std::lock_guard<std::mutex> lock(m_mutex);
     for (auto& i : entries) {
-      auto entry = m_entries[i.first];
-      if (!entry) entry.reset(new StorageEntry);
+      auto& entry = m_entries[i.first];
+      if (!entry) entry = std::make_shared<StorageEntry>();
       auto old_value = entry->value();
       entry->set_value(i.second);
 
