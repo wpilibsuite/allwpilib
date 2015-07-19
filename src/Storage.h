@@ -8,6 +8,7 @@
 #ifndef NT_STORAGE_H_
 #define NT_STORAGE_H_
 
+#include <atomic>
 #include <cstddef>
 #include <functional>
 #include <iosfwd>
@@ -23,14 +24,49 @@ namespace nt {
 
 class StorageEntry {
  public:
-  StorageEntry() : id(0xffff), flags(0) {}
+  StorageEntry() : m_flags(0), m_id(0xffff) {}
 
-  bool IsPersistent() const { return (flags & NT_PERSISTENT) != 0; }
+  bool IsPersistent() const { return (m_flags & NT_PERSISTENT) != 0; }
 
-  std::shared_ptr<Value> value;
-  unsigned int id;
-  unsigned int flags;
-  SequenceNumber seq_num;
+  std::shared_ptr<Value> value() {
+#ifdef HAVE_SHARED_PTR_ATOMIC_LOAD
+    return std::atomic_load(&m_value);
+#else
+    std::lock_guard<std::mutex> lock(m_value_mutex);
+    return m_value;
+#endif
+  }
+  void set_value(std::shared_ptr<Value> value) {
+#ifdef HAVE_SHARED_PTR_ATOMIC_LOAD
+    std::atomic_store(&m_value, value);
+#else
+    std::lock_guard<std::mutex> lock(m_value_mutex);
+    m_value = value;
+#endif
+  }
+
+  unsigned int flags() const { return m_flags; }
+  void set_flags(unsigned int flags) { m_flags = flags; }
+
+  unsigned int id() const { return m_id; }
+  void set_id(unsigned int id) { m_id = id; }
+
+  SequenceNumber seq_num() const { return m_seq_num; }
+  void set_seq_num(SequenceNumber seq_num) { m_seq_num = seq_num; }
+
+ private:
+  // These variables are accessed by both Dispatcher and user, so must use
+  // atomic accesses. Unfortunately, atomic shared_ptr is not yet available
+  // on most compilers, so we need an explicit mutex instead.
+#ifndef HAVE_SHARED_PTR_ATOMIC_LOAD
+  std::mutex m_value_mutex;
+#endif
+  std::shared_ptr<Value> m_value;
+  std::atomic_uint m_flags;
+
+  // Only accessed from the Dispatcher, so these are NOT mutex-protected.
+  unsigned int m_id;
+  SequenceNumber m_seq_num;
 };
 
 class Storage {
@@ -41,18 +77,18 @@ class Storage {
   }
   ~Storage();
 
-  typedef llvm::StringMap<StorageEntry> EntriesMap;
+  typedef llvm::StringMap<std::shared_ptr<StorageEntry>> EntriesMap;
 
   struct Update {
-    std::string name;
+    std::shared_ptr<StorageEntry> entry;
     enum Kind { kAssign, kValueUpdate, kFlagsUpdate, kDelete, kDeleteAll };
     Kind kind;
   };
   typedef ConcurrentQueue<Update> UpdateQueue;
 
-  std::mutex& mutex() { return m_mutex; }
-  EntriesMap& entries() { return m_entries; }
-  const EntriesMap& entries() const { return m_entries; }
+  // Finds, but does not create entry.  Returns nullptr if not found.
+  std::shared_ptr<StorageEntry> FindEntry(StringRef name) const;
+  std::shared_ptr<StorageEntry> GetEntry(StringRef name);
 
   UpdateQueue& updates() { return m_updates; }
 
