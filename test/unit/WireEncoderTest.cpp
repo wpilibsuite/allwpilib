@@ -21,7 +21,7 @@ namespace nt {
 
 class WireEncoderTest : public ::testing::Test {
  protected:
-  virtual void SetUp() {
+  WireEncoderTest() {
     v_empty = std::make_shared<Value>();
     v_boolean = Value::MakeBoolean(true);
     v_double = Value::MakeDouble(1.0);

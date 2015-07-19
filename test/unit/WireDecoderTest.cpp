@@ -19,7 +19,7 @@ namespace nt {
 
 class WireDecoderTest : public ::testing::Test {
  protected:
-  virtual void SetUp() {
+  WireDecoderTest() {
     v_boolean = Value::MakeBoolean(true);
     v_double = Value::MakeDouble(1.0);
     v_string = Value::MakeString(llvm::StringRef("hello"));
