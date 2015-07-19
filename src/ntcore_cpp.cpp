@@ -54,8 +54,7 @@ std::vector<EntryInfo> GetEntryInfo(StringRef prefix, unsigned int types) {
 }
 
 void Flush() {
-  Dispatcher& dispatcher = Dispatcher::GetInstance();
-  dispatcher.Flush();
+  Dispatcher::GetInstance().Flush();
 }
 
 /*
@@ -100,8 +99,7 @@ std::vector<std::shared_ptr<Value>> GetRpcResult(unsigned int result_uid) {
  */
 
 void SetNetworkIdentity(StringRef name) {
-  Dispatcher& dispatcher = Dispatcher::GetInstance();
-  dispatcher.SetIdentity(name);
+  Dispatcher::GetInstance().SetIdentity(name);
 }
 
 void StartServer(const char *persist_filename, const char *listen_address,
@@ -111,23 +109,19 @@ void StartServer(const char *persist_filename, const char *listen_address,
 }
 
 void StopServer() {
-  Dispatcher& dispatcher = Dispatcher::GetInstance();
-  dispatcher.Stop();
+  Dispatcher::GetInstance().Stop();
 }
 
 void StartClient(const char *server_name, unsigned int port) {
-  Dispatcher& dispatcher = Dispatcher::GetInstance();
-  dispatcher.StartClient(server_name, port);
+  Dispatcher::GetInstance().StartClient(server_name, port);
 }
 
 void StopClient() {
-  Dispatcher& dispatcher = Dispatcher::GetInstance();
-  dispatcher.Stop();
+  Dispatcher::GetInstance().Stop();
 }
 
 void SetUpdateRate(double interval) {
-  Dispatcher& dispatcher = Dispatcher::GetInstance();
-  dispatcher.SetUpdateRate(interval);
+  Dispatcher::GetInstance().SetUpdateRate(interval);
 }
 
 std::vector<ConnectionInfo> GetConnections() {
