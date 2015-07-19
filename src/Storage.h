@@ -22,6 +22,8 @@
 
 namespace nt {
 
+class StorageTest;
+
 class StorageEntry {
  public:
   StorageEntry() : m_flags(0), m_id(0xffff) {}
@@ -70,14 +72,13 @@ class StorageEntry {
 };
 
 class Storage {
+  friend class StorageTest;
  public:
   static Storage& GetInstance() {
     if (!m_instance) m_instance.reset(new Storage);
     return *m_instance;
   }
   ~Storage();
-
-  typedef llvm::StringMap<std::shared_ptr<StorageEntry>> EntriesMap;
 
   struct Update {
     std::shared_ptr<StorageEntry> entry;
@@ -110,6 +111,8 @@ class Storage {
   Storage();
   Storage(const Storage&) = delete;
   Storage& operator=(const Storage&) = delete;
+
+  typedef llvm::StringMap<std::shared_ptr<StorageEntry>> EntriesMap;
 
   mutable std::mutex m_mutex;
   EntriesMap m_entries;
