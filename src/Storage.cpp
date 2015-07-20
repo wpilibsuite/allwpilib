@@ -113,6 +113,7 @@ std::vector<EntryInfo> Storage::GetEntryInfo(StringRef prefix,
     auto entry = i.getValue();
     auto value = entry->value();
     if (!value) continue;
+    if (types != 0 && (types & value->type()) == 0) continue;
     EntryInfo info;
     info.name = i.getKey();
     info.type = value->type();
