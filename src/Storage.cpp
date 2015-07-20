@@ -170,6 +170,10 @@ void Storage::SavePersistent(std::ostream& os) const {
     }
   }
 
+  // sort in name order
+  std::sort(entries.begin(), entries.end(),
+            [](const auto& a, const auto& b) { return a.first < b.first; });
+
   std::string base64_encoded;
 
   // header
@@ -229,10 +233,8 @@ void Storage::SavePersistent(std::ostream& os) const {
       case NT_BOOLEAN_ARRAY: {
         bool first = true;
         for (auto elem : v->GetBooleanArray()) {
-          if (!first) {
-            os << ',';
-            first = false;
-          }
+          if (!first) os << ',';
+          first = false;
           os << (elem ? "true" : "false");
         }
         break;
@@ -240,10 +242,8 @@ void Storage::SavePersistent(std::ostream& os) const {
       case NT_DOUBLE_ARRAY: {
         bool first = true;
         for (auto elem : v->GetDoubleArray()) {
-          if (!first) {
-            os << ',';
-            first = false;
-          }
+          if (!first) os << ',';
+          first = false;
           os << elem;
         }
         break;
@@ -251,10 +251,8 @@ void Storage::SavePersistent(std::ostream& os) const {
       case NT_STRING_ARRAY: {
         bool first = true;
         for (auto& elem : v->GetStringArray()) {
-          if (!first) {
-            os << ',';
-            first = false;
-          }
+          if (!first) os << ',';
+          first = false;
           WriteString(os, elem);
         }
         break;
