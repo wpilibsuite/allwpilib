@@ -42,18 +42,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
   /**
    * {@inheritDoc}
    */
-  public void initGyro() {
-    result = new AccumulatorResult();
-    if (m_analog == null) {
-      System.out.println("Null m_analog");
-    }
-    m_voltsPerDegreePerSecond = kDefaultVoltsPerDegreePerSecond;
-    m_analog.setAverageBits(kAverageBits);
-    m_analog.setOversampleBits(kOversampleBits);
-    double sampleRate = kSamplesPerSecond * (1 << (kAverageBits + kOversampleBits));
-    AnalogInput.setGlobalSampleRate(sampleRate);
-    Timer.delay(1.0);
-
+  public void calibrate() {
     m_analog.initAccumulator();
     m_analog.resetAccumulator();
 
@@ -67,13 +56,6 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
 
     m_analog.setAccumulatorCenter(m_center);
     m_analog.resetAccumulator();
-
-    setDeadband(0.0);
-
-    setPIDSourceType(PIDSourceType.kDisplacement);
-
-    UsageReporting.report(tResourceType.kResourceType_Gyro, m_analog.getChannel());
-    LiveWindow.addSensor("AnalogGyro", m_analog.getChannel(), this);
   }
 
   /**
@@ -99,7 +81,23 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
     if (m_analog == null) {
       throw new NullPointerException("AnalogInput supplied to Gyro constructor is null");
     }
-    initGyro();
+    result = new AccumulatorResult();
+
+    m_voltsPerDegreePerSecond = kDefaultVoltsPerDegreePerSecond;
+    m_analog.setAverageBits(kAverageBits);
+    m_analog.setOversampleBits(kOversampleBits);
+    double sampleRate = kSamplesPerSecond * (1 << (kAverageBits + kOversampleBits));
+    AnalogInput.setGlobalSampleRate(sampleRate);
+    Timer.delay(0.1);
+
+    setDeadband(0.0);
+
+    setPIDSourceType(PIDSourceType.kDisplacement);
+
+    UsageReporting.report(tResourceType.kResourceType_Gyro, m_analog.getChannel());
+    LiveWindow.addSensor("AnalogGyro", m_analog.getChannel(), this);
+
+    calibrate();
   }
 
   /**
