@@ -198,7 +198,7 @@ std::vector<std::shared_ptr<Value>> GetRpcResult(unsigned int result_uid);
 /*
  * Client/Server Functions
  */
-void SetNetworkIdentity(llvm::StringRef name);
+void SetNetworkIdentity(StringRef name);
 void StartServer(StringRef persist_filename, const char* listen_address,
                  unsigned int port);
 void StopServer();
