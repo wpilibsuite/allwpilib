@@ -9,6 +9,7 @@
 * GetConnections
 * Notifiers
 * RPC
+* Logging callback global
 
 ## Unit Test Coverage
 
