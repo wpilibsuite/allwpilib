@@ -19,6 +19,7 @@
 #include "llvm/StringRef.h"
 
 #include "NetworkConnection.h"
+#include "Storage.h"
 
 class TCPAcceptor;
 
@@ -52,6 +53,8 @@ class Dispatcher {
   void ClientThreadMain(const char* server_name, unsigned int port);
 
   void ClientReconnect();
+
+  NT_Type GetEntryType(unsigned int id) const;
 
   struct Connection {
     enum State {
@@ -89,6 +92,11 @@ class Dispatcher {
   std::condition_variable m_reconnect_cv;
   bool m_do_reconnect;
 
+  // Map from integer id to storage entry.  Id is 16-bit, so just use a vector.
+  mutable std::mutex m_idmap_mutex;
+  std::vector<std::shared_ptr<StorageEntry>> m_idmap;
+
+  // Global instance
   static std::unique_ptr<Dispatcher> m_instance;
 };
 

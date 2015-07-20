@@ -16,11 +16,6 @@ using namespace nt;
 
 std::unique_ptr<Dispatcher> Dispatcher::m_instance;
 
-static NT_Type GetEntryType(unsigned int id) {
-  // TODO
-  return NT_UNASSIGNED;
-}
-
 Dispatcher::Dispatcher()
     : m_server(false),
       m_active(false),
@@ -145,7 +140,9 @@ void Dispatcher::ServerThreadMain(const char* listen_address,
 
     // add to connections list
     Connection conn;
-    conn.net.reset(new NetworkConnection(std::move(stream), GetEntryType));
+    conn.net.reset(new NetworkConnection(
+        std::move(stream),
+        [this](unsigned int id) { return GetEntryType(id); }));
     conn.net->Start();
     AddConnection(std::move(conn));
   }
@@ -171,7 +168,9 @@ void Dispatcher::ClientThreadMain(const char* server_name, unsigned int port) {
     DEBUG("client connected");
 
     Connection conn;
-    conn.net.reset(new NetworkConnection(std::move(stream), GetEntryType));
+    conn.net.reset(new NetworkConnection(
+        std::move(stream),
+        [this](unsigned int id) { return GetEntryType(id); }));
     conn.net->set_proto_rev(proto_rev);
     conn.net->Start();
 
@@ -261,4 +260,12 @@ void Dispatcher::ClientReconnect() {
 void Dispatcher::AddConnection(Connection&& conn) {
   std::lock_guard<std::mutex> lock(m_user_mutex);
   m_connections.push_back(std::move(conn));
+}
+
+NT_Type Dispatcher::GetEntryType(unsigned int id) const {
+  std::lock_guard<std::mutex> lock(m_idmap_mutex);
+  if (id >= m_idmap.size()) return NT_UNASSIGNED;
+  auto value = m_idmap[id]->value();
+  if (!value) return NT_UNASSIGNED;
+  return value->type();
 }

@@ -8,6 +8,7 @@
 #ifndef NT_MESSAGE_H_
 #define NT_MESSAGE_H_
 
+#include <functional>
 #include <memory>
 #include <string>
 
@@ -38,7 +39,7 @@ class Message {
     kExecuteRpc = 0x20,
     kRpcResponse = 0x21
   };
-  typedef NT_Type (*GetEntryTypeFunc)(unsigned int id);
+  typedef std::function<NT_Type(unsigned int id)> GetEntryTypeFunc;
 
   Message() : m_type(kUnknown), m_id(0), m_flags(0), m_seq_num_uid(0) {}
   Message(MsgType type, const private_init&)
