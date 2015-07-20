@@ -72,7 +72,7 @@ void Storage::SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value) {
 }
 
 void Storage::SetEntryFlags(StringRef name, unsigned int flags) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  if (name.empty()) return;
   auto entry = FindEntry(name);
   if (!entry) return;
   if (entry->flags() != flags) {
