@@ -88,17 +88,19 @@ unsigned int Storage::GetEntryFlags(StringRef name) const {
 }
 
 void Storage::DeleteEntry(StringRef name) {
-  auto entry = FindEntry(name);
-  if (!entry) return;
-  if (entry->value()) {
-    entry->set_value(nullptr);
-    m_updates.push(Update{entry, Update::kDelete});  // put on update queue
-  }
+  std::lock_guard<std::mutex> lock(m_mutex);
+  auto i = m_entries.find(name);
+  if (i == m_entries.end()) return;
+  auto entry = i->getValue();
+  m_entries.erase(i);  // erase from map
+  // if it had a value, put on update queue
+  if (entry->value()) m_updates.push(Update{entry, Update::kDelete});
 }
 
 void Storage::DeleteAllEntries() {
   std::lock_guard<std::mutex> lock(m_mutex);
-  for (auto& i : m_entries) i.getValue()->set_value(nullptr);
+  if (m_entries.empty()) return;
+  m_entries.clear();
   m_updates.push(Update{nullptr, Update::kDeleteAll});  // put on update queue
 }
 
