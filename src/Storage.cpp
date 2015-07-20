@@ -302,7 +302,7 @@ static int fromxdigit(char ch) {
 }
 
 static void UnescapeString(llvm::StringRef source, std::string* dest) {
-  assert(source.size() > 2 && source.front() == '"' && source.back() == '"');
+  assert(source.size() >= 2 && source.front() == '"' && source.back() == '"');
   dest->clear();
   dest->reserve(source.size() - 2);
   for (auto s = source.begin() + 1, end = source.end() - 1; s != end; ++s) {
@@ -310,7 +310,7 @@ static void UnescapeString(llvm::StringRef source, std::string* dest) {
       dest->push_back(*s);
       continue;
     }
-    switch (*s++) {
+    switch (*++s) {
       case '\\':
       case '"':
         dest->push_back(s[-1]);
@@ -322,16 +322,14 @@ static void UnescapeString(llvm::StringRef source, std::string* dest) {
         dest->push_back('\n');
         break;
       case 'x': {
-        if (!isxdigit(*s)) {
+        if (!isxdigit(*(s+1))) {
           dest->push_back('x');  // treat it like a unknown escape
           break;
         }
-        int ch = fromxdigit(*s);
-        ++s;
-        if (isxdigit(*s)) {
+        int ch = fromxdigit(*++s);
+        if (isxdigit(*(s+1))) {
           ch <<= 4;
-          ch |= fromxdigit(*s);
-          ++s;
+          ch |= fromxdigit(*++s);
         }
         dest->push_back(static_cast<char>(ch));
         break;
@@ -511,7 +509,7 @@ bool Storage::LoadPersistent(
       }
       case NT_STRING_ARRAY: {
         llvm::StringRef elem_tok;
-        double_array.clear();
+        string_array.clear();
         while (!line.empty()) {
           std::tie(elem_tok, line) = ReadStringToken(line);
           if (elem_tok.empty()) {
@@ -522,6 +520,10 @@ bool Storage::LoadPersistent(
             if (warn) warn(line_num, "unterminated string value");
             goto next_line;
           }
+
+          UnescapeString(elem_tok, &str);
+          string_array.push_back(std::move(str));
+
           line = line.ltrim(" \t");
           if (line.empty()) break;
           if (line.front() != ',') {
@@ -529,9 +531,6 @@ bool Storage::LoadPersistent(
             goto next_line;
           }
           line = line.drop_front().ltrim(" \t");
-
-          UnescapeString(elem_tok, &str);
-          string_array.push_back(std::move(str));
         }
 
         value = Value::MakeStringArray(std::move(string_array));
@@ -554,16 +553,17 @@ next_line:
       if (!entry) entry = std::make_shared<StorageEntry>();
       auto old_value = entry->value();
       entry->set_value(i.second);
+      bool was_persist = entry->IsPersistent();
+      if (!was_persist) entry->set_flags(entry->flags() | NT_PERSISTENT);
 
       // put on update queue
       if (!old_value || old_value->type() != i.second->type())
         m_updates.push(Update{entry, Update::kAssign});
-      else if (*old_value != *i.second)
-        m_updates.push(Update{entry, Update::kValueUpdate});
-
-      if (!entry->IsPersistent()) {
-        entry->set_flags(entry->flags() | NT_PERSISTENT);
-        m_updates.push(Update{entry, Update::kFlagsUpdate});
+      else {
+        if (*old_value != *i.second)
+          m_updates.push(Update{entry, Update::kValueUpdate});
+        if (!was_persist)
+          m_updates.push(Update{entry, Update::kFlagsUpdate});
       }
     }
   }
