@@ -10,7 +10,7 @@
 #include "WireDecoder.h"
 #include "WireEncoder.h"
 
-static constexpr unsigned long kClearAllMagic = 0xD06CB27Aul;
+#define kClearAllMagic 0xD06CB27Aul
 
 using namespace nt;
 
