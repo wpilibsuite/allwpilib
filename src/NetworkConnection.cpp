@@ -17,9 +17,10 @@ using namespace nt;
 NetworkConnection::NetworkConnection(std::unique_ptr<TCPStream> stream,
                                      Message::GetEntryTypeFunc get_entry_type)
     : m_stream(std::move(stream)),
-      m_get_entry_type(get_entry_type),
-      m_active(false),
-      m_proto_rev(0x0300) {}
+      m_get_entry_type(get_entry_type) {
+  m_active = false;
+  m_proto_rev = 0x0300;
+}
 
 NetworkConnection::~NetworkConnection() { Stop(); }
 

@@ -26,7 +26,7 @@ class StorageTest;
 
 class StorageEntry {
  public:
-  StorageEntry() : m_flags(0), m_id(0xffff) {}
+  StorageEntry() : m_id(0xffff) { m_flags = 0; }
 
   bool IsPersistent() const { return (m_flags & NT_PERSISTENT) != 0; }
 
