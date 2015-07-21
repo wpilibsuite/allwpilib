@@ -76,7 +76,7 @@ void Dispatcher::SetUpdateRate(double interval) {
   // don't allow update rates faster than 100 ms
   if (interval < 0.1)
     interval = 0.1;
-  m_update_rate = interval * 1000;
+  m_update_rate = static_cast<unsigned int>(interval * 1000);
 }
 
 void Dispatcher::SetIdentity(llvm::StringRef name) {
