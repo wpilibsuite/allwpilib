@@ -16,6 +16,29 @@
 #endif
 #include <vector>
 
+#ifndef LLVM_CONSTEXPR
+# ifdef _MSC_VER
+#  if _MSC_VER >= 1900
+#   define LLVM_CONSTEXPR constexpr
+#  else
+#   define LLVM_CONSTEXPR
+#  endif
+# elif defined(__has_feature)
+#  if __has_feature(cxx_constexpr)
+#   define LLVM_CONSTEXPR constexpr
+#  else
+#   define LLVM_CONSTEXPR
+#  endif
+# elif defined(__GXX_EXPERIMENTAL_CXX0X__)
+#  define LLVM_CONSTEXPR constexpr
+# elif defined(__has_constexpr)
+#  define LLVM_CONSTEXPR constexpr
+# else
+#  define LLVM_CONSTEXPR
+# endif
+# define DEFINED_LLVM_CONSTEXPR
+#endif
+
 namespace llvm {
 
   /// ArrayRef - Represent a constant reference to an array (0 or more elements
@@ -84,7 +107,7 @@ namespace llvm {
 
     /// Construct an ArrayRef from a C array.
     template <size_t N>
-    /*implicit*/ constexpr ArrayRef(const T (&Arr)[N])
+    /*implicit*/ LLVM_CONSTEXPR ArrayRef(const T (&Arr)[N])
       : Data(Arr), Length(N) {}
 
     /// Construct an ArrayRef from a std::initializer_list.
@@ -258,7 +281,7 @@ namespace llvm {
 
     /// Construct an MutableArrayRef from a C array.
     template <size_t N>
-    /*implicit*/ constexpr MutableArrayRef(T (&Arr)[N])
+    /*implicit*/ LLVM_CONSTEXPR MutableArrayRef(T (&Arr)[N])
       : ArrayRef<T>(Arr) {}
 
     T *data() const { return const_cast<T*>(ArrayRef<T>::data()); }
@@ -377,5 +400,10 @@ namespace llvm {
     static const bool value = true;
   };
 } // namespace llvm
+
+#ifdef DEFINED_LLVM_CONSTEXPR
+# undef DEFINED_LLVM_CONSTEXPR
+# undef LLVM_CONSTEXPR
+#endif
 
 #endif
