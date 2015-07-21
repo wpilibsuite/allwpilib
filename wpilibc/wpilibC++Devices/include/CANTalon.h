@@ -10,13 +10,12 @@
 #include "PIDOutput.h"
 #include "PIDSource.h"
 #include "PIDInterface.h"
+#include "ctre/CanTalonSRX.h"
 #include "MotorSafetyHelper.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITable.h"
 
 #include <memory>
-
-class CanTalonSRX;
 
 /**
  * CTRE Talon SRX Speed Controller with CAN Control

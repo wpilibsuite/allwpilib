@@ -7,7 +7,6 @@
 #include "WPILib.h"
 #include "gtest/gtest.h"
 #include "TestBench.h"
-#include "ctre/CanTalonSRX.h"
 
 const int deviceId = 0;
 

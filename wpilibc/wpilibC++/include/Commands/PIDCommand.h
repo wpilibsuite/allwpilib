@@ -9,12 +9,11 @@
 #define __PID_COMMAND_H__
 
 #include "Commands/Command.h"
+#include "PIDController.h"
 #include "PIDSource.h"
 #include "PIDOutput.h"
 
 #include <memory>
-
-class PIDController;
 
 class PIDCommand : public Command, public PIDOutput, public PIDSource {
  public:
