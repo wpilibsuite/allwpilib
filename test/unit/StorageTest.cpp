@@ -16,6 +16,9 @@ namespace nt {
 
 class StorageTest : public ::testing::Test {
  public:
+  StorageTest() {
+    storage.EnableUpdates();
+  }
   Storage::EntriesMap& entries() { return storage.m_entries; }
   Storage::UpdateQueue& updates() { return storage.updates(); }
   Storage storage;

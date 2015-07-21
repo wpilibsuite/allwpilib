@@ -17,7 +17,9 @@ using namespace nt;
 
 std::unique_ptr<Storage> Storage::m_instance;
 
-Storage::Storage() {}
+Storage::Storage() {
+  m_updates_enabled = false;
+}
 
 Storage::~Storage() {}
 
@@ -50,9 +52,9 @@ bool Storage::SetEntryValue(StringRef name, std::shared_ptr<Value> value) {
   entry->set_value(value);
   // put on update queue
   if (!old_value)
-    m_updates.push(Update{entry, Update::kAssign});
+    AddUpdate(entry, Update::kAssign);
   else if (*old_value != *value)
-    m_updates.push(Update{entry, Update::kValueUpdate});
+    AddUpdate(entry, Update::kValueUpdate);
   return true;
 }
 
@@ -65,9 +67,9 @@ void Storage::SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value) {
   if (!old_value || *old_value != *value) {
     // put on update queue
     if (!old_value || old_value->type() != value->type())
-      m_updates.push(Update{entry, Update::kAssign});
+      AddUpdate(entry, Update::kAssign);
     else
-      m_updates.push(Update{entry, Update::kValueUpdate});
+      AddUpdate(entry, Update::kValueUpdate);
   }
 }
 
@@ -77,7 +79,7 @@ void Storage::SetEntryFlags(StringRef name, unsigned int flags) {
   if (!entry) return;
   if (entry->flags() != flags) {
     entry->set_flags(flags);
-    m_updates.push(Update{entry, Update::kFlagsUpdate});  // put on update queue
+    AddUpdate(entry, Update::kFlagsUpdate);  // put on update queue
   }
 }
 
@@ -94,14 +96,14 @@ void Storage::DeleteEntry(StringRef name) {
   auto entry = i->getValue();
   m_entries.erase(i);  // erase from map
   // if it had a value, put on update queue
-  if (entry->value()) m_updates.push(Update{entry, Update::kDelete});
+  if (entry->value()) AddUpdate(entry, Update::kDelete);
 }
 
 void Storage::DeleteAllEntries() {
   std::lock_guard<std::mutex> lock(m_mutex);
   if (m_entries.empty()) return;
   m_entries.clear();
-  m_updates.push(Update{nullptr, Update::kDeleteAll});  // put on update queue
+  AddUpdate(nullptr, Update::kDeleteAll);  // put on update queue
 }
 
 std::vector<EntryInfo> Storage::GetEntryInfo(StringRef prefix,
@@ -558,12 +560,12 @@ next_line:
 
       // put on update queue
       if (!old_value || old_value->type() != i.second->type())
-        m_updates.push(Update{entry, Update::kAssign});
+        AddUpdate(entry, Update::kAssign);
       else {
         if (*old_value != *i.second)
-          m_updates.push(Update{entry, Update::kValueUpdate});
+          AddUpdate(entry, Update::kValueUpdate);
         if (!was_persist)
-          m_updates.push(Update{entry, Update::kFlagsUpdate});
+          AddUpdate(entry, Update::kFlagsUpdate);
       }
     }
   }

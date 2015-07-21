@@ -91,8 +91,12 @@ class Storage {
   std::shared_ptr<StorageEntry> FindEntry(StringRef name) const;
   std::shared_ptr<StorageEntry> GetEntry(StringRef name);
 
+  // Accessors required by Dispatcher.
+  void EnableUpdates() { m_updates_enabled = true; }
+  void DisableUpdates() { m_updates_enabled = false; }
   UpdateQueue& updates() { return m_updates; }
 
+  // User functions
   std::shared_ptr<Value> GetEntryValue(StringRef name) const;
   bool SetEntryValue(StringRef name, std::shared_ptr<Value> value);
   void SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value);
@@ -112,11 +116,17 @@ class Storage {
   Storage(const Storage&) = delete;
   Storage& operator=(const Storage&) = delete;
 
+  void AddUpdate(std::shared_ptr<StorageEntry> entry, Update::Kind kind) {
+    if (m_updates_enabled)
+      m_updates.push(Update{entry, kind});
+  }
+
   typedef llvm::StringMap<std::shared_ptr<StorageEntry>> EntriesMap;
 
   mutable std::mutex m_mutex;
   EntriesMap m_entries;
   UpdateQueue m_updates;
+  std::atomic_bool m_updates_enabled;
 
   static std::unique_ptr<Storage> m_instance;
 };
