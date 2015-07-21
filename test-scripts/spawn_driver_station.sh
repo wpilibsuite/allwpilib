@@ -12,7 +12,9 @@ TESTSTAND_SERVE_COMMAND="/usr/local/frc/bin/teststand serve"
 
 #Checks to see if the mutex driver station is running. If it isn't then start it.
 
-SSH_CHECK_FOR_TESTSTAND="ssh -qn ${ROBOT_ADDRESS} 'pidof ${TESTSTAND_SERVE_COMMAND}' &>/dev/null"
+SSH_CHECK_FOR_TESTSTAND="ssh -qn ${ADMIN_ROBOT_ADDRESS} 'pidof ${TESTSTAND_SERVE_COMMAND}' &>/dev/null"
+
+TESTSTAND_SERVE_COMMAND="nohup ${TESTSTAND_SERVE_COMMAND} > /dev/null 2>&1 < /dev/null &"
 
 if [ $(which sshpass) ]; then
 	SSH_CHECK_FOR_TESTSTAND="sshpass -p '' ${SSH_CHECK_FOR_TESTSTAND}"
@@ -28,7 +30,7 @@ fi
 echo "Starting Driver Station";
 
 function startDS {
-	SSH_START_TESTSTAND_DRIVER_STATION="ssh ${ROBOT_ADDRESS} ${TESTSTAND_SERVE_COMMAND}"
+	SSH_START_TESTSTAND_DRIVER_STATION="ssh ${ADMIN_ROBOT_ADDRESS} ${TESTSTAND_SERVE_COMMAND}"
 	if [ $(which sshpass) ]; then
 		sshpass -p "" ${SSH_START_TESTSTAND_DRIVER_STATION}
 	else
