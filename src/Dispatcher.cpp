@@ -209,7 +209,7 @@ void Dispatcher::ClientThreadMain(const char* server_name, unsigned int port) {
 
     // receive initial assignments
     std::vector<std::shared_ptr<Message>> incoming;
-    while (true) {
+    for (;;) {
       if (!msg) {
         // disconnected, retry
         DEBUG("client disconnected waiting for initial entries");
