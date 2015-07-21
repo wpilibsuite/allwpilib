@@ -18,10 +18,11 @@ std::unique_ptr<Dispatcher> Dispatcher::m_instance;
 
 Dispatcher::Dispatcher()
     : m_server(false),
-      m_active(false),
-      m_update_rate(100),
       m_do_flush(false),
-      m_do_reconnect(false) {}
+      m_do_reconnect(false) {
+  m_active = false;
+  m_update_rate = 100;
+}
 
 Dispatcher::~Dispatcher() { Stop(); }
 
