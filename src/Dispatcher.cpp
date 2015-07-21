@@ -14,7 +14,7 @@ using namespace nt;
 
 #define DEBUG(str) puts(str)
 
-std::unique_ptr<Dispatcher> Dispatcher::m_instance;
+ATOMIC_STATIC_INIT(Dispatcher)
 
 Dispatcher::Dispatcher()
     : m_server(false),

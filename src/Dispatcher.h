@@ -18,6 +18,7 @@
 
 #include "llvm/StringRef.h"
 
+#include "atomic_static.h"
 #include "NetworkConnection.h"
 #include "Storage.h"
 
@@ -28,8 +29,8 @@ namespace nt {
 class Dispatcher {
  public:
   static Dispatcher& GetInstance() {
-    if (!m_instance) m_instance.reset(new Dispatcher);
-    return *m_instance;
+    ATOMIC_STATIC(Dispatcher, instance);
+    return instance;
   }
   ~Dispatcher();
 
@@ -96,8 +97,7 @@ class Dispatcher {
   mutable std::mutex m_idmap_mutex;
   std::vector<std::shared_ptr<StorageEntry>> m_idmap;
 
-  // Global instance
-  static std::unique_ptr<Dispatcher> m_instance;
+  ATOMIC_STATIC_DECL(Dispatcher)
 };
 
 }  // namespace nt

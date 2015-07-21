@@ -15,7 +15,7 @@
 
 using namespace nt;
 
-std::unique_ptr<Storage> Storage::m_instance;
+ATOMIC_STATIC_INIT(Storage)
 
 Storage::Storage() {
   m_updates_enabled = false;

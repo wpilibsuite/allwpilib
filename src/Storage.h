@@ -17,6 +17,7 @@
 
 #include "llvm/StringMap.h"
 #include "support/ConcurrentQueue.h"
+#include "atomic_static.h"
 #include "ntcore_cpp.h"
 #include "SequenceNumber.h"
 
@@ -75,8 +76,8 @@ class Storage {
   friend class StorageTest;
  public:
   static Storage& GetInstance() {
-    if (!m_instance) m_instance.reset(new Storage);
-    return *m_instance;
+    ATOMIC_STATIC(Storage, instance);
+    return instance;
   }
   ~Storage();
 
@@ -128,7 +129,7 @@ class Storage {
   UpdateQueue m_updates;
   std::atomic_bool m_updates_enabled;
 
-  static std::unique_ptr<Storage> m_instance;
+  ATOMIC_STATIC_DECL(Storage)
 };
 
 }  // namespace nt
