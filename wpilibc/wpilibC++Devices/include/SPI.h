@@ -25,6 +25,9 @@ class SPI : public SensorBase {
   SPI(Port SPIport);
   virtual ~SPI();
 
+  SPI(const SPI&) = delete;
+  SPI& operator=(const SPI&) = delete;
+
   void SetClockRate(double hz);
 
   void SetMSBFirst();
@@ -52,6 +55,4 @@ class SPI : public SensorBase {
 
  private:
   void Init();
-
-  DISALLOW_COPY_AND_ASSIGN(SPI);
 };

@@ -56,8 +56,11 @@ class RobotBase {
   static void robotSetup(RobotBase *robot);
 
  protected:
-  virtual ~RobotBase();
   RobotBase();
+  virtual ~RobotBase();
+
+  RobotBase(const RobotBase&) = delete;
+  RobotBase& operator=(const RobotBase&) = delete;
 
   virtual void Prestart();
 
@@ -66,6 +69,4 @@ class RobotBase {
 
  private:
   static RobotBase *m_instance;
-
-  DISALLOW_COPY_AND_ASSIGN(RobotBase);
 };

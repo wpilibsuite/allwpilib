@@ -22,6 +22,9 @@ class I2C : SensorBase {
   I2C(Port port, uint8_t deviceAddress);
   virtual ~I2C();
 
+  I2C(const I2C&) = delete;
+  I2C& operator=(const I2C&) = delete;
+
   bool Transaction(uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived,
                    uint8_t receiveSize);
   bool AddressOnly();

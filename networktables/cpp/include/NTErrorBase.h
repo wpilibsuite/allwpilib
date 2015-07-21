@@ -10,8 +10,6 @@
 #if defined WIN32
 #include <semLib.h>
 
-#define DISALLOW_COPY_AND_ASSIGN(ErrorBase) 
-
 #define wpi_setErrnoErrorWithContext(context) 
 #define wpi_setErrnoError() 
 #define wpi_setImaqErrorWithContext(code, context)  

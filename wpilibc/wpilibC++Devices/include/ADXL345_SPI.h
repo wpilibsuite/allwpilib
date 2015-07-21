@@ -58,6 +58,9 @@ class ADXL345_SPI : public Accelerometer,
   ADXL345_SPI(SPI::Port port, Range range = kRange_2G);
   virtual ~ADXL345_SPI() = default;
 
+  ADXL345_SPI(const ADXL345_SPI&) = delete;
+  ADXL345_SPI& operator=(const ADXL345_SPI&) = delete;
+
   // Accelerometer interface
   virtual void SetRange(Range range) override;
   virtual double GetX() override;

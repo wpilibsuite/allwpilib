@@ -48,6 +48,10 @@ class SerialPort : public ErrorBase {
   SerialPort(uint32_t baudRate, Port port = kOnboard, uint8_t dataBits = 8,
              Parity parity = kParity_None, StopBits stopBits = kStopBits_One);
   ~SerialPort();
+
+  SerialPort(const SerialPort&) = delete;
+  SerialPort& operator=(const SerialPort&) = delete;
+
   void SetFlowControl(FlowControl flowControl);
   void EnableTermination(char terminator = '\n');
   void DisableTermination();
@@ -66,6 +70,4 @@ class SerialPort : public ErrorBase {
   uint32_t m_portHandle = 0;
   bool m_consoleModeEnabled = false;
   uint8_t m_port;
-
-  DISALLOW_COPY_AND_ASSIGN(SerialPort);
 };

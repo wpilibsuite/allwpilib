@@ -66,6 +66,9 @@ class Joystick : public GenericHID, public ErrorBase {
   Joystick(uint32_t port, uint32_t numAxisTypes, uint32_t numButtonTypes);
   virtual ~Joystick() = default;
 
+  Joystick(const Joystick&) = delete;
+  Joystick& operator=(const Joystick&) = delete;
+
   uint32_t GetAxisChannel(AxisType axis) const;
   void SetAxisChannel(AxisType axis, uint32_t channel);
 
@@ -103,8 +106,6 @@ class Joystick : public GenericHID, public ErrorBase {
   void SetOutputs(uint32_t value);
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(Joystick);
-
   DriverStation &m_ds;
   uint32_t m_port;
   ::std::vector<uint32_t> m_axes;

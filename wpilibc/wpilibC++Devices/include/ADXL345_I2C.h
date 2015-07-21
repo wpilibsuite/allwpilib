@@ -54,6 +54,9 @@ class ADXL345_I2C : public Accelerometer,
   explicit ADXL345_I2C(Port port, Range range = kRange_2G);
   virtual ~ADXL345_I2C() = default;
 
+  ADXL345_I2C(const ADXL345_I2C&) = delete;
+  ADXL345_I2C& operator=(const ADXL345_I2C&) = delete;
+
   // Accelerometer interface
   virtual void SetRange(Range range) override;
   virtual double GetX() override;

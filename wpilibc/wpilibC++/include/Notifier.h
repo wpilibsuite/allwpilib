@@ -17,6 +17,10 @@ class Notifier : public ErrorBase {
  public:
   Notifier(TimerEventHandler handler, void *param = nullptr);
   virtual ~Notifier();
+
+  Notifier(const Notifier&) = delete;
+  Notifier& operator=(const Notifier&) = delete;
+
   void StartSingle(double delay);
   void StartPeriodic(double period);
   void Stop();
@@ -43,8 +47,6 @@ class Notifier : public ErrorBase {
   bool m_queued = false;            // indicates if this entry is queued
   priority_mutex m_handlerMutex;  // held by interrupt manager task while
                                     // handler call is in progress
-
-  DISALLOW_COPY_AND_ASSIGN(Notifier);
 
 #ifdef FRC_SIMULATOR
   static ::std::thread m_task;
