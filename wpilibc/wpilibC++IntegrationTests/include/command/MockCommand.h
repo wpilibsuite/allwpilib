@@ -1,6 +1,6 @@
 #pragma once
 
-#include "WPILib.h"
+#include <Commands/Command.h>
 
 class MockCommand : public Command {
  private:

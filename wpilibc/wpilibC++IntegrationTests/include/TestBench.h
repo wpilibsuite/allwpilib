@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "WPILib.h"
+#include <cstdint>
 
 class TestBench {
  public:

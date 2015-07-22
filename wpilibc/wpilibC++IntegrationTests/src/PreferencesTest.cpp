@@ -5,7 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "WPILib.h"
+#include <Preferences.h>
+#include <Timer.h>
 #include "gtest/gtest.h"
 #include <cstdio>
 #include <fstream>

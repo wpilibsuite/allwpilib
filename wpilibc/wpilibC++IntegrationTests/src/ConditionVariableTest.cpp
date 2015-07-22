@@ -1,14 +1,14 @@
-#include "WPILib.h"
 #include "TestBench.h"
 
 #include "HAL/cpp/priority_condition_variable.h"
 #include "HAL/cpp/priority_mutex.h"
 
 #include "gtest/gtest.h"
+#include <atomic>
+#include <chrono>
 #include <condition_variable>
 #include <mutex>
 #include <thread>
-#include <chrono>
 
 namespace wpilib {
 namespace testing {

@@ -5,11 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "WPILib.h"
+#include <Commands/CommandGroup.h>
+#include <Commands/Scheduler.h>
+#include <Commands/Subsystem.h>
+#include <DriverStation.h>
+#include <RobotState.h>
+#include <Timer.h>
 #include "command/MockCommand.h"
 #include "gtest/gtest.h"
-#include "RobotState.h"
-#include "DriverStation.h"
 
 class CommandTest : public testing::Test {
  protected:

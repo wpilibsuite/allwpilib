@@ -5,7 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "WPILib.h"
+#include <DigitalInput.h>
+#include <Relay.h>
+#include <Timer.h>
 #include "gtest/gtest.h"
 #include "TestBench.h"
 #include "Relay.h"

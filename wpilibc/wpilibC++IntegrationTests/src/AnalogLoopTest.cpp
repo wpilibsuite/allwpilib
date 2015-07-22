@@ -5,7 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "WPILib.h"
+#include <AnalogInput.h>
+#include <AnalogOutput.h>
+#include <AnalogTrigger.h>
+#include <Counter.h>
+#include <Timer.h>
 #include "gtest/gtest.h"
 #include "TestBench.h"
 

@@ -5,7 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "WPILib.h"
+#include <ADXL345_SPI.h>
+#include <Gyro.h>
+#include <Servo.h>
+#include <Timer.h>
 #include "gtest/gtest.h"
 #include "TestBench.h"
 

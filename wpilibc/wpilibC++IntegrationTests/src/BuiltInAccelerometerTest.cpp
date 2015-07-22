@@ -5,7 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "WPILib.h"
+#include <BuiltInAccelerometer.h>
+#include <Timer.h>
 #include "gtest/gtest.h"
 
 static constexpr double kAccelerationTolerance = 0.1;

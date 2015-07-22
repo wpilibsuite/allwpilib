@@ -5,8 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "WPILib.h"
-#include "AnalogOutput.h"
+#include <AnalogOutput.h>
+#include <AnalogPotentiometer.h>
+#include <Timer.h>
 #include "TestBench.h"
 #include "gtest/gtest.h"
 

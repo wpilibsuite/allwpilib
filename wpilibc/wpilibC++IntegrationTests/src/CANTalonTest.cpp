@@ -4,7 +4,8 @@
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
-#include "WPILib.h"
+#include <CANTalon.h>
+#include <Timer.h>
 #include "gtest/gtest.h"
 #include "TestBench.h"
 

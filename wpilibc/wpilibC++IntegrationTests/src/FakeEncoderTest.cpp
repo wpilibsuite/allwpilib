@@ -6,7 +6,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "WPILib.h"
+#include <AnalogOutput.h>
+#include <AnalogTrigger.h>
+#include <DigitalOutput.h>
+#include <Encoder.h>
+#include <Timer.h>
 #include "gtest/gtest.h"
 #include "TestBench.h"
 

@@ -5,7 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "WPILib.h"
+#include <AnalogInput.h>
+#include <Compressor.h>
+#include <DigitalInput.h>
+#include <DigitalOutput.h>
+#include <DoubleSolenoid.h>
+#include <Solenoid.h>
+#include <Timer.h>
 #include "gtest/gtest.h"
 #include "TestBench.h"
 

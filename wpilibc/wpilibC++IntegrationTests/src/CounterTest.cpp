@@ -5,7 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "WPILib.h"
+#include <Counter.h>
+#include <Jaguar.h>
+#include <Talon.h>
+#include <Timer.h>
+#include <Victor.h>
 #include "gtest/gtest.h"
 #include "TestBench.h"
 
