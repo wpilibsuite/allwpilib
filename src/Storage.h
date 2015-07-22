@@ -82,8 +82,10 @@ class Storage {
   ~Storage();
 
   struct Update {
-    std::shared_ptr<StorageEntry> entry;
     enum Kind { kAssign, kValueUpdate, kFlagsUpdate, kDelete, kDeleteAll };
+    Update(std::shared_ptr<StorageEntry> entry_, Kind kind_)
+        : entry(entry_), kind(kind_) {}
+    std::shared_ptr<StorageEntry> entry;
     Kind kind;
   };
   typedef ConcurrentQueue<Update> UpdateQueue;
@@ -117,9 +119,9 @@ class Storage {
   Storage(const Storage&) = delete;
   Storage& operator=(const Storage&) = delete;
 
-  void AddUpdate(std::shared_ptr<StorageEntry> entry, Update::Kind kind) {
-    if (m_updates_enabled)
-      m_updates.push(Update{entry, kind});
+  template <typename... Args>
+  void AddUpdate(Args&&... args) {
+    if (m_updates_enabled) m_updates.emplace(std::forward<Args>(args)...);
   }
 
   typedef llvm::StringMap<std::shared_ptr<StorageEntry>> EntriesMap;
