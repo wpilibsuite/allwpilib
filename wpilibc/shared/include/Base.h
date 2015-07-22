@@ -42,6 +42,16 @@ ClassName(ClassName &&) = default
   #define DEPRECATED(msg) /*nothing*/
 #endif
 
+// Provide std::decay_t when using GCC < 4.9
+#if defined(__GNUC__)
+  #if __GNUC__ == 4 && __GNUC_MINOR__ < 9
+    #include <type_traits>
+    namespace std {
+    template <class T> using decay_t = typename decay<T>::type;
+    }
+  #endif
+#endif
+
 // A struct to use as a deleter when a std::shared_ptr must wrap a raw pointer
 // that is being deleted by someone else.
 // This should only be called in deprecated functions; using it anywhere else
