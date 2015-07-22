@@ -53,7 +53,15 @@ class ConcurrentQueue {
 
   void push(T&& item) {
     std::unique_lock<std::mutex> mlock(mutex_);
-    queue_.push(std::move(item));
+    queue_.push(std::forward<T>(item));
+    mlock.unlock();
+    cond_.notify_one();
+  }
+
+  template <typename... Args>
+  void emplace(Args&&... args) {
+    std::unique_lock<std::mutex> mlock(mutex_);
+    queue_.emplace(std::forward<Args>(args)...);
     mlock.unlock();
     cond_.notify_one();
   }
