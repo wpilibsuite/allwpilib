@@ -11,6 +11,7 @@
 DEFAULT_LOCAL_TEST_RESULTS_DIR=../test-reports
 
 ROBOT_ADDRESS=lvuser@roboRIO-190.local
+ADMIN_ROBOT_ADDRESS=admin@roboRIO-190.local
 DEFAULT_LOCAL_RUN_TEST_SCRIPT="run-tests-on-robot.sh"
 
 DEFAULT_DESTINATION_DIR=/home/lvuser
