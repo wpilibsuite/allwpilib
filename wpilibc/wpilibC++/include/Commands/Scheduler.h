@@ -42,7 +42,7 @@ class Scheduler : public ErrorBase, public NamedSendable {
   std::string GetSmartDashboardType() const;
   void InitTable(::std::shared_ptr<ITable> subTable);
   ::std::shared_ptr<ITable> GetTable() const;
-  std::string GetName();
+  std::string GetName() const;
   std::string GetType() const;
 
  private:
