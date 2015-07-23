@@ -78,10 +78,6 @@ struct RpcDefinition {
  *
  * @param name      entry name (UTF-8 string)
  * @return entry value
- *
- * It is the caller's responsibility to free value once it's no longer
- * needed (the utility function NT_DisposeValue() is useful for this
- * purpose).
  */
 std::shared_ptr<Value> GetEntryValue(StringRef name);
 
