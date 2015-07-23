@@ -6,7 +6,6 @@
 
 #include "CANTalon.h"
 #include "WPIErrors.h"
-#include "ctre/CanTalonSRX.h"
 #include <unistd.h>  // usleep
 #include <sstream>
 
