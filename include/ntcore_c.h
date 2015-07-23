@@ -237,14 +237,15 @@ void NT_Flush(void);
 
 typedef void (*NT_EntryListenerCallback)(
     unsigned int uid, void *data, const char *name, size_t name_len,
-    const struct NT_Value *value);
+    const struct NT_Value *value, int is_new);
 
 typedef void (*NT_ConnectionListenerCallback)(
     unsigned int uid, void *data, int connected,
     const struct NT_ConnectionInfo *conn);
 
 unsigned int NT_AddEntryListener(const char *prefix, size_t prefix_len,
-                                 void *data, NT_EntryListenerCallback callback);
+                                 void *data, NT_EntryListenerCallback callback,
+                                 int immediate_notify);
 void NT_RemoveEntryListener(unsigned int entry_listener_uid);
 unsigned int NT_AddConnectionListener(void *data,
                                       NT_ConnectionListenerCallback callback);

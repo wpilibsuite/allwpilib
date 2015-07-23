@@ -61,8 +61,8 @@ void Flush() {
  * Callback Creation Functions
  */
 
-unsigned int AddEntryListener(StringRef prefix,
-                              EntryListenerCallback callback) {
+unsigned int AddEntryListener(StringRef prefix, EntryListenerCallback callback,
+                              bool immediate_notify) {
   return 0;
 }
 
