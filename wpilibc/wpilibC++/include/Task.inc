@@ -17,7 +17,8 @@ Task::Task(const std::string& name, Function&& function, Args&&... args) {
   std::cout << "[HAL] Starting task " << m_taskName << "..." << std::endl;
 
   m_thread = std::thread(function, args...);
-  SetPriority(kDefaultPriority);
+  //TODO: lvuser does not currently have permissions to set the priority.
+  //SetPriority(kDefaultPriority);
 
   static std::atomic<int32_t> instances{0};
   instances++;
