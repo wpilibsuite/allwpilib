@@ -32,7 +32,6 @@
 #include "SerialPort.h"
 #include "Solenoid.h"
 #include "Task.h"
-#include "Utilities.h"
 
 #define HAL_IO_CONFIG_DATA_SIZE 32
 #define HAL_SYS_STATUS_DATA_SIZE 44

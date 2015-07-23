@@ -7,9 +7,9 @@
 
 #include "Timer.h"
 
-#include <time.h>
-
+#include <chrono>
 #include <iostream>
+#include <thread>
 #include "HAL/HAL.h"
 #include "Utility.h"
 
@@ -25,7 +25,7 @@
  */
 void Wait(double seconds) {
   if (seconds < 0.0) return;
-  delaySeconds(seconds);
+  std::this_thread::sleep_for(std::chrono::duration<double>(seconds));
 }
 
 /**
@@ -41,12 +41,9 @@ double GetClock() { return Timer::GetFPGATimestamp(); }
  *         on Saturday.
  */
 double GetTime() {
-  struct timespec tp;
-
-  clock_gettime(CLOCK_REALTIME, &tp);
-  double realTime = (double)tp.tv_sec + (double)((double)tp.tv_nsec * 1e-9);
-
-  return (realTime);
+  using namespace std::chrono;
+  return duration_cast<duration<double>>(system_clock::now().time_since_epoch())
+      .count();
 }
 
 // for compatibility with msvc12--see C2864
@@ -166,10 +163,4 @@ double Timer::GetFPGATimestamp() {
   // FPGA returns the timestamp in microseconds
   // Call the helper GetFPGATime() in Utility.cpp
   return GetFPGATime() * 1.0e-6;
-}
-
-// Internal function that reads the PPC timestamp counter.
-extern "C" {
-uint32_t niTimestamp32(void);
-uint64_t niTimestamp64(void);
 }

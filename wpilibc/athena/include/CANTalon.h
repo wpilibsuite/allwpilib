@@ -500,7 +500,7 @@ class CANTalon : public MotorSafety,
    */
   FeedbackDevice m_feedbackDevice = QuadEncoder;
 
-  static const unsigned int kDelayForSolicitedSignalsUs = 4000;
+  static constexpr unsigned int kDelayForSolicitedSignalsUs = 4000;
   /**
    * @param devToLookup FeedbackDevice to lookup the scalar for.  Because Talon
    *                    allows multiple sensors to be attached simultaneously,

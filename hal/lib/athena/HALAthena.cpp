@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "HAL/HAL.h"
+#include "HAL/cpp/priority_mutex.h"
 
 #include <signal.h>  // linux for kill
 #include <stdlib.h>
@@ -15,6 +16,7 @@
 #include <fstream>
 #include <iostream>
 #include <mutex>
+#include <thread>
 
 #include "ChipObject.h"
 #include "FRC_NetworkCommunication/CANSessionMux.h"
@@ -343,7 +345,7 @@ int HALInitialize(int mode) {
     if (pid >= 2 && kill(pid, 0) == 0 && pid != getpid()) {
       std::cout << "Killing previously running FRC program..." << std::endl;
       kill(pid, SIGTERM);  // try to kill it
-      delayMillis(100);
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
       if (kill(pid, 0) == 0) {
         // still not successfull
         if (mode == 0) {
@@ -388,6 +390,5 @@ void Occur() {}
 
 void imaqGetErrorText() {}
 void imaqGetLastError() {}
-void niTimestamp64() {}
 
 }  // extern "C"

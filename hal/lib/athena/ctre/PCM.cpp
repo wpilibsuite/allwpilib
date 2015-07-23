@@ -3,7 +3,6 @@
 #include "ctre/PCM.h"
 #include "FRC_NetworkCommunication/CANSessionMux.h"
 #include <string.h> // memset
-#include <unistd.h> // usleep
 /* This can be a constant, as long as nobody needs to update solenoids within
     1/50 of a second. */
 static const INT32 kCANPeriod = 20;

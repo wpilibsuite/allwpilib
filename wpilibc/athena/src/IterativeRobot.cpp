@@ -172,7 +172,6 @@ void IterativeRobot::DisabledPeriodic() {
     printf("Default %s() method... Overload me!\n", __FUNCTION__);
     firstRun = false;
   }
-  delayTicks(1);
 }
 
 /**
@@ -187,7 +186,6 @@ void IterativeRobot::AutonomousPeriodic() {
     printf("Default %s() method... Overload me!\n", __FUNCTION__);
     firstRun = false;
   }
-  delayTicks(1);
 }
 
 /**
@@ -202,7 +200,6 @@ void IterativeRobot::TeleopPeriodic() {
     printf("Default %s() method... Overload me!\n", __FUNCTION__);
     firstRun = false;
   }
-  delayTicks(1);
 }
 
 /**
@@ -217,5 +214,4 @@ void IterativeRobot::TestPeriodic() {
     printf("Default %s() method... Overload me!\n", __FUNCTION__);
     firstRun = false;
   }
-  delayTicks(1);
 }

@@ -7,8 +7,6 @@
 
 #include "Timer.h"
 
-#include <time.h>
-
 #include "Utility.h"
 #include "simulation/simTime.h"
 
@@ -186,9 +184,3 @@ double Timer::GetFPGATimestamp() {
  * Not in a match.
  */
 double Timer::GetMatchTime() { return Timer::GetFPGATimestamp(); }
-
-// Internal function that reads the PPC timestamp counter.
-extern "C" {
-uint32_t niTimestamp32(void);
-uint64_t niTimestamp64(void);
-}

@@ -1,7 +1,6 @@
 #include "ctre/PDP.h"
 #include "FRC_NetworkCommunication/CANSessionMux.h"	//CAN Comm
 #include <string.h> // memset
-#include <unistd.h> // usleep
 
 #define STATUS_1  		0x8041400
 #define STATUS_2  		0x8041440
