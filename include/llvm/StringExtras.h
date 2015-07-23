@@ -18,6 +18,7 @@
 #include <iterator>
 
 namespace llvm {
+template<typename T> class SmallVectorImpl;
 
 /// hexdigit - Return the hexadecimal character for the
 /// given number \p X (which should be less than 16).
@@ -124,6 +125,12 @@ StringRef::size_type StrInStrNoCase(StringRef s1, StringRef s2);
 /// remaining tail string.
 std::pair<StringRef, StringRef> getToken(StringRef Source,
                                          StringRef Delimiters = " \t\n\v\f\r");
+
+/// SplitString - Split up the specified string according to the specified
+/// delimiters, appending the result fragments to the output list.
+void SplitString(StringRef Source,
+                 SmallVectorImpl<StringRef> &OutFragments,
+                 StringRef Delimiters = " \t\n\v\f\r");
 
 /// HashString - Hash function for strings.
 ///

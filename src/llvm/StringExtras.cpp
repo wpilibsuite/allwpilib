@@ -12,6 +12,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "llvm/StringExtras.h"
+#include "llvm/SmallVector.h"
 using namespace llvm;
 
 /// StrInStrNoCase - Portable version of strcasestr.  Locates the first
@@ -42,4 +43,16 @@ std::pair<StringRef, StringRef> llvm::getToken(StringRef Source,
   StringRef::size_type End = Source.find_first_of(Delimiters, Start);
 
   return std::make_pair(Source.slice(Start, End), Source.substr(End));
+}
+
+/// SplitString - Split up the specified string according to the specified
+/// delimiters, appending the result fragments to the output list.
+void llvm::SplitString(StringRef Source,
+                       SmallVectorImpl<StringRef> &OutFragments,
+                       StringRef Delimiters) {
+  std::pair<StringRef, StringRef> S = getToken(Source, Delimiters);
+  while (!S.first.empty()) {
+    OutFragments.push_back(S.first);
+    S = getToken(S.second, Delimiters);
+  }
 }

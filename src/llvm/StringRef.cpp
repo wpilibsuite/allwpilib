@@ -8,6 +8,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "llvm/StringRef.h"
+#include "llvm/SmallVector.h"
 #include <bitset>
 #include <climits>
 
@@ -259,6 +260,27 @@ StringRef::size_type StringRef::find_last_not_of(StringRef Chars,
     if (!CharBits.test((unsigned char)Data[i]))
       return i;
   return npos;
+}
+
+void StringRef::split(SmallVectorImpl<StringRef> &A,
+                      StringRef Separators, int MaxSplit,
+                      bool KeepEmpty) const {
+  StringRef rest = *this;
+
+  // rest.data() is used to distinguish cases like "a," that splits into
+  // "a" + "" and "a" that splits into "a" + 0.
+  for (int splits = 0;
+       rest.data() != nullptr && (MaxSplit < 0 || splits < MaxSplit);
+       ++splits) {
+    std::pair<StringRef, StringRef> p = rest.split(Separators);
+
+    if (KeepEmpty || p.first.size() != 0)
+      A.push_back(p.first);
+    rest = p.second;
+  }
+  // If we have a tail left, add it.
+  if (rest.data() != nullptr && (rest.size() != 0 || KeepEmpty))
+    A.push_back(rest);
 }
 
 //===----------------------------------------------------------------------===//

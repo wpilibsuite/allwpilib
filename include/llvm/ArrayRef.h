@@ -11,9 +11,7 @@
 #define LLVM_ADT_ARRAYREF_H
 
 #include "llvm/None.h"
-#if 0
-#include "llvm/ADT/SmallVector.h"
-#endif
+#include "llvm/SmallVector.h"
 #include <vector>
 
 #ifndef LLVM_CONSTEXPR
@@ -90,7 +88,6 @@ namespace llvm {
     ArrayRef(const T *begin, const T *end)
       : Data(begin), Length(end - begin) {}
 
-#if 0
     /// Construct an ArrayRef from a SmallVector. This is templated in order to
     /// avoid instantiating SmallVectorTemplateCommon<T> whenever we
     /// copy-construct an ArrayRef.
@@ -98,7 +95,6 @@ namespace llvm {
     /*implicit*/ ArrayRef(const SmallVectorTemplateCommon<T, U> &Vec)
       : Data(Vec.data()), Length(Vec.size()) {
     }
-#endif
 
     /// Construct an ArrayRef from a std::vector.
     template<typename A>
@@ -123,7 +119,6 @@ namespace llvm {
                  std::is_convertible<U *const *, T const *>::value>::type* = 0)
       : Data(A.data()), Length(A.size()) {}
 
-#if 0
     /// Construct an ArrayRef<const T*> from a SmallVector<T*>. This is
     /// templated in order to avoid instantiating SmallVectorTemplateCommon<T>
     /// whenever we copy-construct an ArrayRef.
@@ -134,7 +129,6 @@ namespace llvm {
                                                   T const *>::value>::type* = 0)
       : Data(Vec.data()), Length(Vec.size()) {
     }
-#endif
 
     /// Construct an ArrayRef<const T*> from std::vector<T*>. This uses SFINAE
     /// to ensure that only vectors of pointers can be converted.
@@ -269,11 +263,9 @@ namespace llvm {
     /// Construct an MutableArrayRef from a range.
     MutableArrayRef(T *begin, T *end) : ArrayRef<T>(begin, end) {}
 
-#if 0
     /// Construct an MutableArrayRef from a SmallVector.
     /*implicit*/ MutableArrayRef(SmallVectorImpl<T> &Vec)
     : ArrayRef<T>(Vec) {}
-#endif
 
     /// Construct a MutableArrayRef from a std::vector.
     /*implicit*/ MutableArrayRef(std::vector<T> &Vec)
@@ -352,7 +344,6 @@ namespace llvm {
     return ArrayRef<T>(begin, end);
   }
 
-#if 0
   /// Construct an ArrayRef from a SmallVector.
   template <typename T>
   ArrayRef<T> makeArrayRef(const SmallVectorImpl<T> &Vec) {
@@ -364,7 +355,6 @@ namespace llvm {
   ArrayRef<T> makeArrayRef(const SmallVector<T, N> &Vec) {
     return Vec;
   }
-#endif
 
   /// Construct an ArrayRef from a std::vector.
   template<typename T>
