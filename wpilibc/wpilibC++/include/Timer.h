@@ -29,6 +29,10 @@ class Timer {
  public:
   Timer();
   virtual ~Timer() = default;
+
+  Timer(const Timer&) = delete;
+  Timer& operator=(const Timer&) = delete;
+
   double Get() const;
   void Reset();
   void Start();
@@ -47,5 +51,4 @@ class Timer {
   double m_accumulatedTime = 0.0;
   bool m_running = false;
   mutable priority_mutex m_mutex;
-  DISALLOW_COPY_AND_ASSIGN(Timer);
 };

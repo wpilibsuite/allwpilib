@@ -20,6 +20,10 @@ class SensorBase : public ErrorBase {
  public:
   SensorBase();
   virtual ~SensorBase() = default;
+
+  SensorBase(const SensorBase&) = delete;
+  SensorBase& operator=(const SensorBase&) = delete;
+
   static void DeleteSingletons();
 
   static uint32_t GetDefaultSolenoidModule() { return 0; }
@@ -51,7 +55,6 @@ class SensorBase : public ErrorBase {
   static void* m_pwm_ports[kPwmChannels];
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(SensorBase);
   static SensorBase* m_singletonList;
   SensorBase* m_nextSingleton;
 };

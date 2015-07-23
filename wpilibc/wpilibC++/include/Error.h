@@ -21,6 +21,10 @@ class Error {
   typedef int32_t Code;
 
   Error() = default;
+
+  Error(const Error&) = delete;
+  Error& operator=(const Error&) = delete;
+
   void Clone(const Error& error);
   Code GetCode() const;
   std::string GetMessage() const;
@@ -44,6 +48,4 @@ class Error {
   uint32_t m_lineNumber = 0;
   const ErrorBase* m_originatingObject = nullptr;
   double m_timestamp = 0.0;
-
-  DISALLOW_COPY_AND_ASSIGN(Error);
 };

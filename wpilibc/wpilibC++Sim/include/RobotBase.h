@@ -38,13 +38,14 @@ public:
 	virtual void StartCompetition() = 0;
 
 protected:
-	virtual ~RobotBase() = default;
 	RobotBase();
+	virtual ~RobotBase() = default;
+
+    RobotBase(const RobotBase&) = delete;
+    RobotBase& operator=(const RobotBase&) = delete;
 
 	DriverStation *m_ds;
 
 private:
 	static RobotBase *m_instance;
-
-	DISALLOW_COPY_AND_ASSIGN(RobotBase);
 };

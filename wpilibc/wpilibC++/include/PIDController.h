@@ -34,6 +34,10 @@ class PIDController : public LiveWindowSendable,
   PIDController(float p, float i, float d, float f, PIDSource *source,
                 PIDOutput *output, float period = 0.05);
   virtual ~PIDController() = default;
+
+  PIDController(const PIDController&) = delete;
+  PIDController& operator=(const PIDController) = delete;
+
   virtual float Get() const;
   virtual void SetContinuous(bool continuous = true);
   virtual void SetInputRange(float minimumInput, float maximumInput);
@@ -111,6 +115,4 @@ class PIDController : public LiveWindowSendable,
  protected:
   ::std::shared_ptr<ITable> m_table = nullptr;
   virtual void Calculate();
-
-  DISALLOW_COPY_AND_ASSIGN(PIDController);
 };

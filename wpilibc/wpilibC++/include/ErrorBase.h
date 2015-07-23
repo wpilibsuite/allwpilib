@@ -54,6 +54,10 @@ class ErrorBase {
  public:
   ErrorBase() = default;
   virtual ~ErrorBase() = default;
+
+  ErrorBase(const ErrorBase&) = delete;
+  ErrorBase& operator=(const ErrorBase&) = delete;
+
   virtual Error& GetError();
   virtual const Error& GetError() const;
   virtual void SetErrnoError(const std::string& contextMessage,
@@ -91,7 +95,4 @@ class ErrorBase {
   // TODO: Replace globalError with a global list of all errors.
   static priority_mutex _globalErrorMutex;
   static Error _globalError;
-
- private:
-  DISALLOW_COPY_AND_ASSIGN(ErrorBase);
 };

@@ -43,6 +43,9 @@ public:
 			SpeedController &frontRightMotor, SpeedController &rearRightMotor);
 	virtual ~RobotDrive();
 
+    RobotDrive(const RobotDrive&) = delete;
+    RobotDrive& operator=(const RobotDrive&) = delete;
+
 	void Drive(float outputMagnitude, float curve);
 	void TankDrive(GenericHID *leftStick, GenericHID *rightStick, bool squaredInputs = true);
 	void TankDrive(GenericHID &leftStick, GenericHID &rightStick, bool squaredInputs = true);
@@ -106,5 +109,4 @@ private:
 			motors++;
 		return motors;
 	}
-	DISALLOW_COPY_AND_ASSIGN(RobotDrive);
 };

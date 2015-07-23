@@ -51,6 +51,9 @@ class AxisCamera : public ErrorBase {
   explicit AxisCamera(std::string const &cameraHost);
   virtual ~AxisCamera();
 
+  AxisCamera(const AxisCamera&) = delete;
+  AxisCamera& operator=(const AxisCamera&) = delete;
+
   bool IsFreshImage() const;
 
   int GetImage(Image *image);
@@ -116,6 +119,4 @@ class AxisCamera : public ErrorBase {
   bool WriteParameters();
 
   int CreateCameraSocket(std::string const &requestString, bool setError);
-
-  DISALLOW_COPY_AND_ASSIGN(AxisCamera);
 };

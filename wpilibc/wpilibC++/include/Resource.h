@@ -25,6 +25,10 @@
 class Resource : public ErrorBase {
  public:
   virtual ~Resource() = default;
+
+  Resource(const Resource&) = delete;
+  Resource& operator=(const Resource&) = delete;
+
   static void CreateResourceObject(::std::unique_ptr<Resource>& r, uint32_t elements);
   explicit Resource(uint32_t size);
   uint32_t Allocate(const std::string &resourceDesc);
@@ -36,6 +40,4 @@ class Resource : public ErrorBase {
   priority_recursive_mutex m_allocateLock;
 
   static priority_recursive_mutex m_createLock;
-
-  DISALLOW_COPY_AND_ASSIGN(Resource);
 };

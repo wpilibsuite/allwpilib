@@ -42,6 +42,9 @@ public:
 	Joystick(uint32_t port, uint32_t numAxisTypes, uint32_t numButtonTypes);
 	virtual ~Joystick() = default;
 
+    Joystick(const Joystick&) = delete;
+    Joystick& operator=(const Joystick&) = delete;
+
 	uint32_t GetAxisChannel(AxisType axis);
 	void SetAxisChannel(AxisType axis, uint32_t channel);
 
@@ -66,8 +69,6 @@ public:
 	virtual float GetDirectionDegrees() const;
 
 private:
-	DISALLOW_COPY_AND_ASSIGN(Joystick);
-
 	DriverStation *m_ds = nullptr;
 	uint32_t m_port;
 	std::unique_ptr<uint32_t[]> m_axes;

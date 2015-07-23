@@ -24,6 +24,9 @@ public:
 	NTTask(const char* name, FUNCPTR function, INT32 priority = kDefaultPriority, UINT32 stackSize = 20000);
 	virtual ~NTTask();
 
+    NTTask(const NTTask&) = delete;
+    NTTask& operator=(const NTTask&) = delete;
+
 	#ifdef WIN32
 	bool Start(void * arg0);
 	#else
@@ -66,7 +69,6 @@ private:
 	UINT32 m_stackSize;
 	INT32 m_priority;
 	bool HandleError(STATUS results);
-	DISALLOW_COPY_AND_ASSIGN(NTTask);
 };
 
 #endif // WIN32
