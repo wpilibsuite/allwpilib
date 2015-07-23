@@ -91,7 +91,8 @@ class Value {
     val->m_val.data.v_string.len = val->m_string.size();
     return val;
   }
-  static std::shared_ptr<Value> MakeString(std::string&& value) {
+  template <typename T>
+  static std::shared_ptr<Value> MakeString(T&& value) {
     auto val = std::make_shared<Value>(NT_STRING, private_init());
     val->m_string = std::move(value);
     val->m_val.data.v_string.str = const_cast<char*>(val->m_string.c_str());
@@ -105,7 +106,8 @@ class Value {
     val->m_val.data.v_raw.len = val->m_string.size();
     return val;
   }
-  static std::shared_ptr<Value> MakeRaw(std::string&& value) {
+  template <typename T>
+  static std::shared_ptr<Value> MakeRaw(T&& value) {
     auto val = std::make_shared<Value>(NT_RAW, private_init());
     val->m_string = std::move(value);
     val->m_val.data.v_raw.str = const_cast<char*>(val->m_string.c_str());
@@ -119,7 +121,8 @@ class Value {
     val->m_val.data.v_raw.len = val->m_string.size();
     return val;
   }
-  static std::shared_ptr<Value> MakeRpc(std::string&& value) {
+  template <typename T>
+  static std::shared_ptr<Value> MakeRpc(T&& value) {
     auto val = std::make_shared<Value>(NT_RPC, private_init());
     val->m_string = std::move(value);
     val->m_val.data.v_raw.str = const_cast<char*>(val->m_string.c_str());

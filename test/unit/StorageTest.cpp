@@ -51,13 +51,12 @@ class StorageTestPersistent : public StorageTest {
     storage.SetEntryTypeValue("double/neg", Value::MakeDouble(-1.5));
     storage.SetEntryTypeValue("double/zero", Value::MakeDouble(0.0));
     storage.SetEntryTypeValue("double/big", Value::MakeDouble(1.3e8));
-    storage.SetEntryTypeValue("string/empty", Value::MakeString(StringRef("")));
-    storage.SetEntryTypeValue("string/normal",
-                              Value::MakeString(StringRef("hello")));
+    storage.SetEntryTypeValue("string/empty", Value::MakeString(""));
+    storage.SetEntryTypeValue("string/normal", Value::MakeString("hello"));
     storage.SetEntryTypeValue("string/special",
                               Value::MakeString(StringRef("\0\3\5\n", 4)));
-    storage.SetEntryTypeValue("raw/empty", Value::MakeRaw(StringRef("")));
-    storage.SetEntryTypeValue("raw/normal", Value::MakeRaw(StringRef("hello")));
+    storage.SetEntryTypeValue("raw/empty", Value::MakeRaw(""));
+    storage.SetEntryTypeValue("raw/normal", Value::MakeRaw("hello"));
     storage.SetEntryTypeValue("raw/special",
                               Value::MakeRaw(StringRef("\0\3\5\n", 4)));
     storage.SetEntryTypeValue("booleanarr/empty",
@@ -578,15 +577,14 @@ TEST_F(StorageTest, LoadPersistent) {
   EXPECT_EQ(*Value::MakeDouble(-1.5), *storage.GetEntryValue("double/neg"));
   EXPECT_EQ(*Value::MakeDouble(0.0), *storage.GetEntryValue("double/zero"));
   EXPECT_EQ(*Value::MakeDouble(1.3e8), *storage.GetEntryValue("double/big"));
-  EXPECT_EQ(*Value::MakeString(StringRef("")),
-            *storage.GetEntryValue("string/empty"));
-  EXPECT_EQ(*Value::MakeString(StringRef("hello")),
+  EXPECT_EQ(*Value::MakeString(""), *storage.GetEntryValue("string/empty"));
+  EXPECT_EQ(*Value::MakeString("hello"),
             *storage.GetEntryValue("string/normal"));
   EXPECT_EQ(*Value::MakeString(StringRef("\0\3\5\n", 4)),
             *storage.GetEntryValue("string/special"));
-  EXPECT_EQ(*Value::MakeRaw(StringRef("")),
+  EXPECT_EQ(*Value::MakeRaw(""),
             *storage.GetEntryValue("raw/empty"));
-  EXPECT_EQ(*Value::MakeRaw(StringRef("hello")),
+  EXPECT_EQ(*Value::MakeRaw("hello"),
             *storage.GetEntryValue("raw/normal"));
   EXPECT_EQ(*Value::MakeRaw(StringRef("\0\3\5\n", 4)),
             *storage.GetEntryValue("raw/special"));

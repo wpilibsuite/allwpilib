@@ -62,7 +62,7 @@ TEST_F(ValueTest, Double) {
 }
 
 TEST_F(ValueTest, String) {
-  auto v = Value::MakeString(llvm::StringRef("hello"));
+  auto v = Value::MakeString("hello");
   ASSERT_EQ(NT_STRING, v->type());
   ASSERT_EQ("hello", v->GetString());
   NT_Value cv;
@@ -72,7 +72,7 @@ TEST_F(ValueTest, String) {
   ASSERT_EQ(llvm::StringRef("hello"), cv.data.v_string.str);
   ASSERT_EQ(5u, cv.data.v_string.len);
 
-  v = Value::MakeString(llvm::StringRef("goodbye"));
+  v = Value::MakeString("goodbye");
   ASSERT_EQ(NT_STRING, v->type());
   ASSERT_EQ("goodbye", v->GetString());
   ConvertToC(*v, &cv);
@@ -84,7 +84,7 @@ TEST_F(ValueTest, String) {
 }
 
 TEST_F(ValueTest, Raw) {
-  auto v = Value::MakeRaw(llvm::StringRef("hello"));
+  auto v = Value::MakeRaw("hello");
   ASSERT_EQ(NT_RAW, v->type());
   ASSERT_EQ("hello", v->GetRaw());
   NT_Value cv;
@@ -94,7 +94,7 @@ TEST_F(ValueTest, Raw) {
   ASSERT_EQ(llvm::StringRef("hello"), cv.data.v_string.str);
   ASSERT_EQ(5u, cv.data.v_string.len);
 
-  v = Value::MakeRaw(llvm::StringRef("goodbye"));
+  v = Value::MakeRaw("goodbye");
   ASSERT_EQ(NT_RAW, v->type());
   ASSERT_EQ("goodbye", v->GetRaw());
   ConvertToC(*v, &cv);
@@ -282,12 +282,12 @@ TEST_F(ValueTest, DoubleComparison) {
 }
 
 TEST_F(ValueTest, StringComparison) {
-  auto v1 = Value::MakeString(llvm::StringRef("hello"));
-  auto v2 = Value::MakeString(llvm::StringRef("hello"));
+  auto v1 = Value::MakeString("hello");
+  auto v2 = Value::MakeString("hello");
   ASSERT_EQ(*v1, *v2);
-  v2 = Value::MakeString(llvm::StringRef("world"));  // different contents
+  v2 = Value::MakeString("world");  // different contents
   ASSERT_NE(*v1, *v2);
-  v2 = Value::MakeString(llvm::StringRef("goodbye"));  // different size
+  v2 = Value::MakeString("goodbye");  // different size
   ASSERT_NE(*v1, *v2);
 }
 
