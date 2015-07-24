@@ -23,7 +23,7 @@ class ITable {
    * @param key the key to search for
    * @return true if the table as a value assigned to the given key
    */
-  virtual bool ContainsKey(llvm::StringRef key) = 0;
+  virtual bool ContainsKey(llvm::StringRef key) const = 0;
 
   /**
    * Determines whether there exists a non-empty subtable for this key
@@ -33,7 +33,7 @@ class ITable {
    * @return true if there is a subtable with the key which contains at least
    * one key/subtable of its own
    */
-  virtual bool ContainsSubTable(llvm::StringRef key) = 0;
+  virtual bool ContainsSubTable(llvm::StringRef key) const = 0;
 
   /**
    * Gets the subtable in this table for the given name.
@@ -41,7 +41,7 @@ class ITable {
    * @param key the name of the table relative to this one
    * @return a sub table relative to this one
    */
-  virtual std::shared_ptr<ITable> GetSubTable(llvm::StringRef key) = 0;
+  virtual std::shared_ptr<ITable> GetSubTable(llvm::StringRef key) const = 0;
 
   /**
    * Gets the value associated with a key as an object
@@ -51,7 +51,7 @@ class ITable {
    * @throws TableKeyNotDefinedException if there is no value associated with
    * the given key
    */
-  virtual std::shared_ptr<nt::Value> GetValue(llvm::StringRef key) = 0;
+  virtual std::shared_ptr<nt::Value> GetValue(llvm::StringRef key) const = 0;
 
   /**
    * Put a value in the table
@@ -80,7 +80,7 @@ class ITable {
    * @return the value associated with the given key or the given default value
    * if there is no value associated with the key
    */
-  virtual double GetNumber(llvm::StringRef key, double defaultValue) = 0;
+  virtual double GetNumber(llvm::StringRef key, double defaultValue) const = 0;
 
   /**
    * Put a string in the table
@@ -99,7 +99,7 @@ class ITable {
    * if there is no value associated with the key
    */
   virtual std::string GetString(llvm::StringRef key,
-                                llvm::StringRef defaultValue) = 0;
+                                llvm::StringRef defaultValue) const = 0;
 
   /**
    * Put a boolean in the table
@@ -117,7 +117,7 @@ class ITable {
    * @return the value associated with the given key or the given default value
    * if there is no value associated with the key
    */
-  virtual bool GetBoolean(llvm::StringRef key, bool defaultValue) = 0;
+  virtual bool GetBoolean(llvm::StringRef key, bool defaultValue) const = 0;
 
   /**
    * Add a listener for changes to the table

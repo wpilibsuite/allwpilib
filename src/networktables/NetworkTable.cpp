@@ -99,21 +99,21 @@ void NetworkTable::RemoveTableListener(ITableListener* listener) {
   m_listeners.erase(matches_begin, m_listeners.end());
 }
 
-std::shared_ptr<ITable> NetworkTable::GetSubTable(StringRef key) {
+std::shared_ptr<ITable> NetworkTable::GetSubTable(StringRef key) const {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   path += key;
   return std::make_shared<NetworkTable>(path, private_init());
 }
 
-bool NetworkTable::ContainsKey(StringRef key) {
+bool NetworkTable::ContainsKey(StringRef key) const {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   path += key;
   return !nt::GetEntryValue(path);
 }
 
-bool NetworkTable::ContainsSubTable(StringRef key) {
+bool NetworkTable::ContainsSubTable(StringRef key) const {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   path += key;
@@ -128,7 +128,7 @@ void NetworkTable::PutNumber(StringRef key, double value) {
   nt::SetEntryValue(path, nt::Value::MakeDouble(value));
 }
 
-double NetworkTable::GetNumber(StringRef key, double defaultValue) {
+double NetworkTable::GetNumber(StringRef key, double defaultValue) const {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   path += key;
@@ -145,7 +145,8 @@ void NetworkTable::PutString(StringRef key, StringRef value) {
   nt::SetEntryValue(path, nt::Value::MakeString(value));
 }
 
-std::string NetworkTable::GetString(StringRef key, StringRef defaultValue) {
+std::string NetworkTable::GetString(StringRef key,
+                                    StringRef defaultValue) const {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   path += key;
@@ -162,7 +163,7 @@ void NetworkTable::PutBoolean(StringRef key, bool value) {
   nt::SetEntryValue(path, nt::Value::MakeBoolean(value));
 }
 
-bool NetworkTable::GetBoolean(StringRef key, bool defaultValue) {
+bool NetworkTable::GetBoolean(StringRef key, bool defaultValue) const {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   path += key;
@@ -179,7 +180,7 @@ void NetworkTable::PutValue(StringRef key, std::shared_ptr<nt::Value> value) {
   nt::SetEntryValue(path, value);
 }
 
-std::shared_ptr<nt::Value> NetworkTable::GetValue(StringRef key) {
+std::shared_ptr<nt::Value> NetworkTable::GetValue(StringRef key) const {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   path += key;

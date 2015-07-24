@@ -83,7 +83,7 @@ class NetworkTable : public ITable {
    *            the key name
    * @return the networktable to be returned
    */
-  std::shared_ptr<ITable> GetSubTable(llvm::StringRef key);
+  std::shared_ptr<ITable> GetSubTable(llvm::StringRef key) const;
 
   /**
    * Checks the table and tells if it contains the specified key
@@ -91,9 +91,9 @@ class NetworkTable : public ITable {
    * @param key
    *            the key to be checked
    */
-  bool ContainsKey(llvm::StringRef key);
+  bool ContainsKey(llvm::StringRef key) const;
 
-  bool ContainsSubTable(llvm::StringRef key);
+  bool ContainsSubTable(llvm::StringRef key) const;
 
   /**
    * Maps the specified key to the specified value in this table. The key can
@@ -117,7 +117,7 @@ class NetworkTable : public ITable {
    *            the default value if the key is null
    * @return the key
    */
-  double GetNumber(llvm::StringRef key, double defaultValue);
+  double GetNumber(llvm::StringRef key, double defaultValue) const;
 
   /**
    * Maps the specified key to the specified value in this table. The key can
@@ -141,7 +141,8 @@ class NetworkTable : public ITable {
    *            the default value if the key is null
    * @return the key
    */
-  std::string GetString(llvm::StringRef key, llvm::StringRef defaultValue);
+  std::string GetString(llvm::StringRef key,
+                        llvm::StringRef defaultValue) const;
 
   /**
    * Maps the specified key to the specified value in this table. The key can
@@ -165,7 +166,7 @@ class NetworkTable : public ITable {
    *            the default value if the key is null
    * @return the key
    */
-  bool GetBoolean(llvm::StringRef key, bool defaultValue);
+  bool GetBoolean(llvm::StringRef key, bool defaultValue) const;
 
   /**
    * Maps the specified key to the specified value in this table. The key can
@@ -186,7 +187,7 @@ class NetworkTable : public ITable {
    *            the key name
    * @return the key, or nullptr if the key is not defined
    */
-  std::shared_ptr<nt::Value> GetValue(llvm::StringRef key);
+  std::shared_ptr<nt::Value> GetValue(llvm::StringRef key) const;
 };
 
 #endif
