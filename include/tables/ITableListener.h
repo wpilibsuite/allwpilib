@@ -7,7 +7,10 @@
 
 #include <memory>
 
-#include "tables/ITable.h"
+#include "llvm/StringRef.h"
+#include "nt_Value.h"
+
+class ITable;
 
 /**
  * A listener that listens to changes in values in a {@link ITable}
