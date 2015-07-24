@@ -26,7 +26,7 @@ class ITableListener {
    * otherwise it is false
    */
   virtual void ValueChanged(ITable* source,
-                            const llvm::StringRef key,
+                            llvm::StringRef key,
                             std::shared_ptr<nt::Value> value, bool isNew) = 0;
 };
 
