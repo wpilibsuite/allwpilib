@@ -144,6 +144,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   }
 
   public void delete() {
+    disable();
     m_impl.delete();
   }
 

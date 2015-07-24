@@ -268,6 +268,8 @@ CanTalonSRX::CanTalonSRX(int deviceNumber,int controlPeriodMs): CtreCanNode(devi
  */
 CanTalonSRX::~CanTalonSRX()
 {
+  if (m_hasBeenMoved) return;
+  RegisterTx(CONTROL_1 | (UINT8)GetDeviceNumber(), 0);
 	if(_can_h){
 		FRC_NetworkCommunication_CANSessionMux_closeStreamSession(_can_h);
 		_can_h = 0;

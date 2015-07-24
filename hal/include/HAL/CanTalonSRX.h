@@ -75,9 +75,21 @@
 #include "ctre/CtreCanNode.h"
 #include <NetworkCommunication/CANSessionMux.h>	//CAN Comm
 #include <map>
+#include <atomic>
 class CanTalonSRX : public CtreCanNode
 {
 private:
+  // Use this for determining whether the default move constructor has been
+  // called; this prevents us from calling the destructor twice.
+  struct HasBeenMoved {
+    HasBeenMoved(HasBeenMoved&& other) {
+      other.moved = true;
+      moved = false;
+    }
+    HasBeenMoved() = default;
+    std::atomic<bool> moved{false};
+    operator bool() const { return moved; }
+  } m_hasBeenMoved;
 
 	/** just in case user wants to modify periods of certain status frames.
 	 * 	Default the vars to match the firmware default. */
@@ -211,7 +223,7 @@ public:
 		eResetFlags=88,
 		eFirmVers=89,
 		eSettingsChanged=90,
-		eQuadFilterEn=91,	
+		eQuadFilterEn=91,
 		ePidIaccum=93,
 	}param_t;
     /*---------------------setters and getters that use the solicated param request/response-------------*//**

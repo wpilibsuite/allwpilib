@@ -43,6 +43,11 @@ CANTalon::CANTalon(int deviceNumber, int controlPeriodMs)
   m_impl->SetProfileSlotSelect(m_profile);
 }
 
+CANTalon::~CANTalon() {
+  if (m_hasBeenMoved) return;
+  Disable();
+}
+
 /**
 * Write out the PID value as seen in the PIDOutput base object.
 *

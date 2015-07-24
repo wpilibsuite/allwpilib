@@ -43,7 +43,8 @@ class CANTalon : public MotorSafety,
   };
   explicit CANTalon(int deviceNumber);
   explicit CANTalon(int deviceNumber, int controlPeriodMs);
-  virtual ~CANTalon() = default;
+  DEFAULT_MOVE_CONSTRUCTOR(CANTalon);
+  virtual ~CANTalon();
 
   // PIDOutput interface
   virtual void PIDWrite(float output) override;
@@ -204,4 +205,6 @@ class CANTalon : public MotorSafety,
   // LiveWindow stuff.
   std::shared_ptr<ITable> m_table;
   bool m_isInverted;
+
+  HasBeenMoved m_hasBeenMoved;
 };
