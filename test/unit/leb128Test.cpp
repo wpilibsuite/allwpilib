@@ -103,8 +103,8 @@ TEST(LEB128Test, SizeUleb128) {
   EXPECT_EQ(4u, SizeUleb128(0xfffffffUL));
 
   EXPECT_EQ(5u, SizeUleb128(0x10000000UL));
-  EXPECT_EQ(5u, SizeUleb128(0x400000000UL));
-  EXPECT_EQ(5u, SizeUleb128(0x7ffffffffUL));
+  EXPECT_EQ(5u, SizeUleb128(0x40000000UL));
+  EXPECT_EQ(5u, SizeUleb128(0x7fffffffUL));
 
   EXPECT_EQ(5u, SizeUleb128(UINT32_MAX));
 }
