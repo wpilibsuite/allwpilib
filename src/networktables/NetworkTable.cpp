@@ -17,7 +17,7 @@ void NetworkTable::Initialize() {
   if (s_client)
     nt::StartClient(s_ip_address.c_str(), NT_DEFAULT_PORT);
   else
-    nt::StartServer("", "", NT_DEFAULT_PORT);
+    nt::StartServer("networktables.ini", "", NT_DEFAULT_PORT);
   s_running = true;
 }
 
