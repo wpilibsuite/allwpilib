@@ -32,7 +32,7 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
   virtual void PIDWrite(float output);
 
   // PIDSource interface
-  virtual double PIDGet() const;
+  virtual double PIDGet();
 
  protected:
   std::shared_ptr<PIDController> GetPIDController() const;
@@ -41,9 +41,9 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
   virtual void _End();
   void SetSetpoint(double setpoint);
   double GetSetpoint() const;
-  double GetPosition() const;
+  double GetPosition();
 
-  virtual double ReturnPIDInput() const = 0;
+  virtual double ReturnPIDInput() = 0;
   virtual void UsePIDOutput(double output) = 0;
 
  private:

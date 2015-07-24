@@ -5,7 +5,7 @@ class Robot: public IterativeRobot
 
 	RobotDrive myRobot; // robot drive system
 	Joystick stick; // only joystick
-	LiveWindow &lw;
+	LiveWindow *lw;
 	int autoLoopCounter;
 
 public:
@@ -47,7 +47,7 @@ private:
 
 	void TestPeriodic()
 	{
-		lw.Run();
+		lw->Run();
 	}
 };
 

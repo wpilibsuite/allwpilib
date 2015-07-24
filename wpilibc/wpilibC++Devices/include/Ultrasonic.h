@@ -69,7 +69,7 @@ class Ultrasonic : public SensorBase,
   bool IsEnabled() const { return m_enabled; }
   void SetEnabled(bool enable) { m_enabled = enable; }
 
-  double PIDGet() const override;
+  double PIDGet() override;
   void SetPIDSourceType(PIDSourceType pidSource) override;
   void SetDistanceUnits(DistanceUnit units);
   DistanceUnit GetDistanceUnits() const;

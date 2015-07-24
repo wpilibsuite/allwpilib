@@ -30,7 +30,7 @@ ADXL345_I2C::ADXL345_I2C(Port port, Range range) : I2C(port, kAddress) {
 
   HALReport(HALUsageReporting::kResourceType_ADXL345,
             HALUsageReporting::kADXL345_I2C, 0);
-  LiveWindow::GetInstance().AddSensor("ADXL345_I2C", port, this);
+  LiveWindow::GetInstance()->AddSensor("ADXL345_I2C", port, this);
 }
 
 /** {@inheritdoc} */

@@ -62,7 +62,7 @@ Relay::Relay(uint32_t channel, Relay::Direction direction)
   setRelayReverse(m_relay_ports[m_channel], false, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
-  LiveWindow::GetInstance().AddActuator("Relay", 1, m_channel, this);
+  LiveWindow::GetInstance()->AddActuator("Relay", 1, m_channel, this);
 }
 
 /**

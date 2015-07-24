@@ -39,7 +39,7 @@ void Robot::AutonomousInit() {
 }
 
 void Robot::AutonomousPeriodic() {
-	Scheduler::GetInstance().Run();
+	Scheduler::GetInstance()->Run();
 	Log();
 }
 
@@ -55,12 +55,12 @@ void Robot::TeleopInit() {
 }
 
 void Robot::TeleopPeriodic() {
-	Scheduler::GetInstance().Run();
+	Scheduler::GetInstance()->Run();
 	Log();
 }
 
 void Robot::TestPeriodic() {
-  LiveWindow::GetInstance().Run();
+  LiveWindow::GetInstance()->Run();
 }
 
 void Robot::DisabledInit() {

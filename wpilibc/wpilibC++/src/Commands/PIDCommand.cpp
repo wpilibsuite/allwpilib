@@ -50,7 +50,7 @@ void PIDCommand::SetSetpointRelative(double deltaSetpoint) {
 
 void PIDCommand::PIDWrite(float output) { UsePIDOutput(output); }
 
-double PIDCommand::PIDGet() const { return ReturnPIDInput(); }
+double PIDCommand::PIDGet() { return ReturnPIDInput(); }
 
 std::shared_ptr<PIDController> PIDCommand::GetPIDController() const {
   return m_controller;
@@ -62,7 +62,7 @@ void PIDCommand::SetSetpoint(double setpoint) {
 
 double PIDCommand::GetSetpoint() const { return m_controller->GetSetpoint(); }
 
-double PIDCommand::GetPosition() const { return ReturnPIDInput(); }
+double PIDCommand::GetPosition() { return ReturnPIDInput(); }
 
 std::string PIDCommand::GetSmartDashboardType() const { return "PIDCommand"; }
 void PIDCommand::InitTable(std::shared_ptr<ITable> table) {

@@ -35,7 +35,7 @@ public:
 	/**
 	 * @return The angle read in by the potentiometer
 	 */
-	double ReturnPIDInput() const;
+	double ReturnPIDInput();
 
 	/**
 	 * Set the motor speed based off of the PID output

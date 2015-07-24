@@ -46,7 +46,7 @@ double AnalogPotentiometer::Get() const {
  *
  * @return The current reading.
  */
-double AnalogPotentiometer::PIDGet() const {
+double AnalogPotentiometer::PIDGet() {
     return Get();
 }
 

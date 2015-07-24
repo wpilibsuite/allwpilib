@@ -35,7 +35,7 @@ void Encoder::InitEncoder(int channelA, int channelB, bool reverseDirection, Enc
 	int32_t index = 0;
 	m_distancePerPulse = 1.0;
 
-	LiveWindow::GetInstance().AddSensor("Encoder", channelA, this);
+	LiveWindow::GetInstance()->AddSensor("Encoder", channelA, this);
 
 	if (channelB < channelA) { // Swap ports
 		int channel = channelB;
@@ -318,7 +318,7 @@ void Encoder::SetPIDSourceType(PIDSourceType pidSource)
  *
  * @return The current value of the selected source parameter.
  */
-double Encoder::PIDGet() const
+double Encoder::PIDGet()
 {
 	switch (m_pidSource)
 	{

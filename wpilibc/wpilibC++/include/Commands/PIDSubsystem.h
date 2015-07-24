@@ -45,7 +45,7 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
   virtual void PIDWrite(float output);
 
   // PIDSource interface
-  virtual double PIDGet() const;
+  virtual double PIDGet();
   void SetSetpoint(double setpoint);
   void SetSetpointRelative(double deltaSetpoint);
   void SetInputRange(float minimumInput, float maximumInput);
@@ -61,7 +61,7 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
  protected:
   std::shared_ptr<PIDController> GetPIDController();
 
-  virtual double ReturnPIDInput() const = 0;
+  virtual double ReturnPIDInput() = 0;
   virtual void UsePIDOutput(double output) = 0;
 
  private:

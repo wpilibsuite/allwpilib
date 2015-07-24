@@ -11,9 +11,9 @@ Collector::Collector() :
 
 	// Put everything to the LiveWindow for testing.
 	// XXX: LiveWindow::GetInstance()->AddActuator("Collector", "Roller Motor", (Victor) rollerMotor);
-	LiveWindow::GetInstance().AddSensor("Collector", "Ball Detector", ballDetector);
-	LiveWindow::GetInstance().AddSensor("Collector", "Claw Open Detector", openDetector);
-	LiveWindow::GetInstance().AddActuator("Collector", "Piston", piston);
+	LiveWindow::GetInstance()->AddSensor("Collector", "Ball Detector", ballDetector);
+	LiveWindow::GetInstance()->AddSensor("Collector", "Claw Open Detector", openDetector);
+	LiveWindow::GetInstance()->AddActuator("Collector", "Piston", piston);
 }
 
 bool Collector::HasBall() {

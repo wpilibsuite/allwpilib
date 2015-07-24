@@ -23,14 +23,14 @@ DriveTrain::DriveTrain()
 	#endif
 
 	// Let's show everything on the LiveWindow
-	// TODO: LiveWindow::GetInstance().AddActuator("Drive Train", "Front_Left Motor", (Talon) front_left_motor);
-	// TODO: LiveWindow::GetInstance().AddActuator("Drive Train", "Back Left Motor", (Talon) back_left_motor);
-	// TODO: LiveWindow::GetInstance().AddActuator("Drive Train", "Front Right Motor", (Talon) front_right_motor);
-	// TODO: LiveWindow::GetInstance().AddActuator("Drive Train", "Back Right Motor", (Talon) back_right_motor);
-	LiveWindow::GetInstance().AddSensor("Drive Train", "Left Encoder", left_encoder);
-	LiveWindow::GetInstance().AddSensor("Drive Train", "Right Encoder", right_encoder);
-	LiveWindow::GetInstance().AddSensor("Drive Train", "Rangefinder", rangefinder);
-	LiveWindow::GetInstance().AddSensor("Drive Train", "Gyro", gyro);
+	// TODO: LiveWindow::GetInstance()->AddActuator("Drive Train", "Front_Left Motor", (Talon) front_left_motor);
+	// TODO: LiveWindow::GetInstance()->AddActuator("Drive Train", "Back Left Motor", (Talon) back_left_motor);
+	// TODO: LiveWindow::GetInstance()->AddActuator("Drive Train", "Front Right Motor", (Talon) front_right_motor);
+	// TODO: LiveWindow::GetInstance()->AddActuator("Drive Train", "Back Right Motor", (Talon) back_right_motor);
+	LiveWindow::GetInstance()->AddSensor("Drive Train", "Left Encoder", left_encoder);
+	LiveWindow::GetInstance()->AddSensor("Drive Train", "Right Encoder", right_encoder);
+	LiveWindow::GetInstance()->AddSensor("Drive Train", "Rangefinder", rangefinder);
+	LiveWindow::GetInstance()->AddSensor("Drive Train", "Gyro", gyro);
 }
 
 /**

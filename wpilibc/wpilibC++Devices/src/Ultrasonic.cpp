@@ -81,7 +81,7 @@ void Ultrasonic::Initialize() {
   static int instances = 0;
   instances++;
   HALReport(HALUsageReporting::kResourceType_Ultrasonic, instances);
-  LiveWindow::GetInstance().AddSensor("Ultrasonic",
+  LiveWindow::GetInstance()->AddSensor("Ultrasonic",
                                        m_echoChannel->GetChannel(), this);
 }
 
@@ -305,7 +305,7 @@ double Ultrasonic::GetRangeMM() const { return GetRangeInches() * 25.4; }
  *
  * @return The range in DistanceUnit
  */
-double Ultrasonic::PIDGet() const {
+double Ultrasonic::PIDGet() {
   switch (m_units) {
     case Ultrasonic::kInches:
       return GetRangeInches();

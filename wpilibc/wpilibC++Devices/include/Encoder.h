@@ -83,7 +83,7 @@ class Encoder : public SensorBase,
   void SetReverseDirection(bool reverseDirection);
   void SetSamplesToAverage(int samplesToAverage);
   int GetSamplesToAverage() const;
-  double PIDGet() const override;
+  double PIDGet() override;
 
   void SetIndexSource(uint32_t channel, IndexingType type = kResetOnRisingEdge);
   [[deprecated("Raw pointers are deprecated; use references instead.")]]

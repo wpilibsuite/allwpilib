@@ -65,7 +65,7 @@ void Gyro::InitGyro() {
   SetPIDSourceType(PIDSourceType::kDisplacement);
 
   HALReport(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel());
-  LiveWindow::GetInstance().AddSensor("Gyro", m_analog->GetChannel(), this);
+  LiveWindow::GetInstance()->AddSensor("Gyro", m_analog->GetChannel(), this);
 }
 
 /**
@@ -195,7 +195,7 @@ void Gyro::SetDeadband(float volts) {
  *
  * @return The PIDOutput (angle or rate, defaults to angle)
  */
-double Gyro::PIDGet() const {
+double Gyro::PIDGet() {
   switch (GetPIDSourceType()) {
     case PIDSourceType::kRate:
       return GetRate();

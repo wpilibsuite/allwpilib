@@ -32,7 +32,7 @@ Relay::Relay(uint32_t channel, Relay::Direction direction)
 
 	sprintf(buf, "relay/%d", m_channel);
 	impl = new SimContinuousOutput(buf); // TODO: Allow two different relays (targetting the different halves of a relay) to be combined to control one motor.
-	LiveWindow::GetInstance().AddActuator("Relay", 1, m_channel, this);
+	LiveWindow::GetInstance()->AddActuator("Relay", 1, m_channel, this);
 	go_pos = go_neg = false;
 }
 

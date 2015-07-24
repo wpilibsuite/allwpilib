@@ -38,7 +38,7 @@ class AnalogAccelerometer : public SensorBase,
   float GetAcceleration() const;
   void SetSensitivity(float sensitivity);
   void SetZero(float zero);
-  double PIDGet() const override;
+  double PIDGet() override;
 
   void UpdateTable() override;
   void StartLiveWindowMode() override;

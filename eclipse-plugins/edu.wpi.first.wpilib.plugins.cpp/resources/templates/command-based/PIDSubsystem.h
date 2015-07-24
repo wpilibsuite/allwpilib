@@ -8,7 +8,7 @@ class $classname: public PIDSubsystem
 {
 public:
 	$classname();
-	double ReturnPIDInput() const;
+	double ReturnPIDInput();
 	void UsePIDOutput(double output);
 	void InitDefaultCommand();
 };

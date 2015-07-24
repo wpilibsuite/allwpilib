@@ -17,7 +17,7 @@
  */
 Subsystem::Subsystem(const std::string &name) {
   m_name = name;
-  Scheduler::GetInstance().RegisterSubsystem(this);
+  Scheduler::GetInstance()->RegisterSubsystem(this);
 }
 /**
  * Initialize the default command for this subsystem

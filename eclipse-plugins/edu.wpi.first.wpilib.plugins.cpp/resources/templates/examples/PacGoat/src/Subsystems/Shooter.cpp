@@ -12,10 +12,10 @@ Shooter::Shooter() :
 {
 
 	// Put everything to the LiveWindow for testing.
-	LiveWindow::GetInstance().AddSensor("Shooter", "Hot Goal Sensor", hotGoalSensor);
-	LiveWindow::GetInstance().AddSensor("Shooter", "Piston1 Reed Switch Front ", piston1ReedSwitchFront);
-	LiveWindow::GetInstance().AddSensor("Shooter", "Piston1 Reed Switch Back ", piston1ReedSwitchBack);
-	LiveWindow::GetInstance().AddActuator("Shooter", "Latch Piston", latchPiston);
+	LiveWindow::GetInstance()->AddSensor("Shooter", "Hot Goal Sensor", hotGoalSensor);
+	LiveWindow::GetInstance()->AddSensor("Shooter", "Piston1 Reed Switch Front ", piston1ReedSwitchFront);
+	LiveWindow::GetInstance()->AddSensor("Shooter", "Piston1 Reed Switch Back ", piston1ReedSwitchBack);
+	LiveWindow::GetInstance()->AddActuator("Shooter", "Latch Piston", latchPiston);
 }
 
 void Shooter::InitDefaultCommand()

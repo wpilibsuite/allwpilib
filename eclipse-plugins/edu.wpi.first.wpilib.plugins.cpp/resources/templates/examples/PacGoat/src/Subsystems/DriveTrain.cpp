@@ -44,14 +44,14 @@ DriveTrain::DriveTrain()
 		leftEncoder->SetDistancePerPulse((4.0/*in*/*M_PI)/(360.0*12.0/*in/ft*/));
 	#endif
 
-	LiveWindow::GetInstance().AddSensor("DriveTrain", "Right Encoder", rightEncoder);
-	LiveWindow::GetInstance().AddSensor("DriveTrain", "Left Encoder", leftEncoder);
+	LiveWindow::GetInstance()->AddSensor("DriveTrain", "Right Encoder", rightEncoder);
+	LiveWindow::GetInstance()->AddSensor("DriveTrain", "Left Encoder", leftEncoder);
 
 	// Configure gyro
     #ifdef REAL
 		gyro->SetSensitivity(0.007); // TODO: Handle more gracefully?
     #endif
-	LiveWindow::GetInstance().AddSensor("DriveTrain", "Gyro", gyro);
+	LiveWindow::GetInstance()->AddSensor("DriveTrain", "Gyro", gyro);
 }
 
 void DriveTrain::InitDefaultCommand() {

@@ -54,7 +54,7 @@ public:
 	void SetSamplesToAverage(int samplesToAverage);
 	int GetSamplesToAverage() const;
 	void SetPIDSourceType(PIDSourceType pidSource);
-	double PIDGet() const override;
+	double PIDGet() override;
 
 	void UpdateTable() override;
 	void StartLiveWindowMode() override;

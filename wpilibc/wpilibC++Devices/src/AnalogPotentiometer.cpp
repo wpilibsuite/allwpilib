@@ -66,7 +66,7 @@ double AnalogPotentiometer::Get() const {
  *
  * @return The current reading.
  */
-double AnalogPotentiometer::PIDGet() const { return Get(); }
+double AnalogPotentiometer::PIDGet() { return Get(); }
 
 /**
  * @return the Smart Dashboard Type

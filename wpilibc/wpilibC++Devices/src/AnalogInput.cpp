@@ -47,7 +47,7 @@ AnalogInput::AnalogInput(uint32_t channel) {
   m_port = initializeAnalogInputPort(port, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
-  LiveWindow::GetInstance().AddSensor("AnalogInput", channel, this);
+  LiveWindow::GetInstance()->AddSensor("AnalogInput", channel, this);
   HALReport(HALUsageReporting::kResourceType_AnalogChannel, channel);
 }
 
@@ -394,7 +394,7 @@ float AnalogInput::GetSampleRate() {
  *
  * @return The average voltage.
  */
-double AnalogInput::PIDGet() const {
+double AnalogInput::PIDGet() {
   if (StatusIsFatal()) return 0.0;
   return GetAverageVoltage();
 }

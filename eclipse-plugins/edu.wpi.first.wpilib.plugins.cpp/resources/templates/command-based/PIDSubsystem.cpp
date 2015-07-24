@@ -12,7 +12,7 @@ $classname::$classname() :
 	// Enable() - Enables the PID controller.
 }
 
-double $classname::ReturnPIDInput() const
+double $classname::ReturnPIDInput()
 {
 	// Return your input value for the PID loop
 	// e.g. a sensor, like a potentiometer:

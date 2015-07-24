@@ -152,7 +152,7 @@ void Command::Start() {
         CommandIllegalUse,
         "Can not start a command that is part of a command group");
 
-  Scheduler::GetInstance().AddCommand(this);
+  Scheduler::GetInstance()->AddCommand(this);
 }
 
 /**

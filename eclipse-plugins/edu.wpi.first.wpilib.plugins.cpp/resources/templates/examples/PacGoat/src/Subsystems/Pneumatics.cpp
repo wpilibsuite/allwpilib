@@ -8,7 +8,7 @@ Pneumatics::Pneumatics() :
 		compressor = new Compressor(uint8_t(1)); // TODO: (1, 14, 1, 8);
 	#endif
 
-	LiveWindow::GetInstance().AddSensor("Pneumatics", "Pressure Sensor", pressureSensor);
+	LiveWindow::GetInstance()->AddSensor("Pneumatics", "Pressure Sensor", pressureSensor);
 }
 
 /**

@@ -69,7 +69,7 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
   }
 
   HALReport(HALUsageReporting::kResourceType_Encoder, m_index, encodingType);
-  LiveWindow::GetInstance().AddSensor("Encoder",
+  LiveWindow::GetInstance()->AddSensor("Encoder",
                                        m_aSource->GetChannelForRouting(), this);
 }
 
@@ -480,7 +480,7 @@ int Encoder::GetSamplesToAverage() const {
  *
  * @return The current value of the selected source parameter.
  */
-double Encoder::PIDGet() const {
+double Encoder::PIDGet() {
   if (StatusIsFatal()) return 0.0;
   switch (GetPIDSourceType()) {
     case PIDSourceType::kDisplacement:

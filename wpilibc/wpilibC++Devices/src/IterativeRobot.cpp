@@ -31,7 +31,7 @@ void IterativeRobot::StartCompetition() {
   HALReport(HALUsageReporting::kResourceType_Framework,
             HALUsageReporting::kFramework_Iterative);
 
-  LiveWindow &lw = LiveWindow::GetInstance();
+  LiveWindow *lw = LiveWindow::GetInstance();
   // first and one-time initialization
   SmartDashboard::init();
   NetworkTable::GetTable("LiveWindow")
@@ -46,14 +46,14 @@ void IterativeRobot::StartCompetition() {
   HALNetworkCommunicationObserveUserProgramStarting();
 
   // loop forever, calling the appropriate mode-dependent function
-  lw.SetEnabled(false);
+  lw->SetEnabled(false);
   while (true) {
     // Call the appropriate function depending upon the current robot mode
     if (IsDisabled()) {
       // call DisabledInit() if we are now just entering disabled mode from
       // either a different mode or from power-on
       if (!m_disabledInitialized) {
-        lw.SetEnabled(false);
+        lw->SetEnabled(false);
         DisabledInit();
         m_disabledInitialized = true;
         // reset the initialization flags for the other modes
@@ -67,7 +67,7 @@ void IterativeRobot::StartCompetition() {
       // call AutonomousInit() if we are now just entering autonomous mode from
       // either a different mode or from power-on
       if (!m_autonomousInitialized) {
-        lw.SetEnabled(false);
+        lw->SetEnabled(false);
         AutonomousInit();
         m_autonomousInitialized = true;
         // reset the initialization flags for the other modes
@@ -81,7 +81,7 @@ void IterativeRobot::StartCompetition() {
       // call TestInit() if we are now just entering test mode from
       // either a different mode or from power-on
       if (!m_testInitialized) {
-        lw.SetEnabled(true);
+        lw->SetEnabled(true);
         TestInit();
         m_testInitialized = true;
         // reset the initialization flags for the other modes
@@ -95,14 +95,14 @@ void IterativeRobot::StartCompetition() {
       // call TeleopInit() if we are now just entering teleop mode from
       // either a different mode or from power-on
       if (!m_teleopInitialized) {
-        lw.SetEnabled(false);
+        lw->SetEnabled(false);
         TeleopInit();
         m_teleopInitialized = true;
         // reset the initialization flags for the other modes
         m_disabledInitialized = false;
         m_autonomousInitialized = false;
         m_testInitialized = false;
-        Scheduler::GetInstance().SetEnabled(true);
+        Scheduler::GetInstance()->SetEnabled(true);
       }
       HALNetworkCommunicationObserveUserProgramTeleop();
       TeleopPeriodic();

@@ -42,7 +42,7 @@ AnalogOutput::AnalogOutput(uint32_t channel) {
   m_port = initializeAnalogOutputPort(port, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
-  LiveWindow::GetInstance().AddActuator("AnalogOutput", m_channel, this);
+  LiveWindow::GetInstance()->AddActuator("AnalogOutput", m_channel, this);
   HALReport(HALUsageReporting::kResourceType_AnalogOutput, m_channel);
 }
 

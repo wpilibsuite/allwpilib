@@ -25,7 +25,7 @@ private:
 class SetDistanceToBoxPIDSource: public PIDSource {
 public:
 	virtual ~SetDistanceToBoxPIDSource();
-	double PIDGet() const;
+	double PIDGet();
 };
 
 class SetDistanceToBoxPIDOutput: public PIDOutput {

@@ -18,7 +18,7 @@ class PIDSource {
  public:
   virtual void SetPIDSourceType(PIDSourceType pidSource);
   PIDSourceType GetPIDSourceType() const;
-  virtual double PIDGet() const = 0;
+  virtual double PIDGet() = 0;
 
  protected:
   PIDSourceType m_pidSource = PIDSourceType::kDisplacement;

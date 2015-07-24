@@ -37,7 +37,7 @@ public:
 
 	uint32_t GetChannel() const;
 
-	double PIDGet() const override;
+	double PIDGet() override;
 
 	void UpdateTable() override;
 	void StartLiveWindowMode() override;

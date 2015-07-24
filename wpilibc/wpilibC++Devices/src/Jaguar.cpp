@@ -30,7 +30,7 @@ Jaguar::Jaguar(uint32_t channel) : SafePWM(channel) {
   SetZeroLatch();
 
   HALReport(HALUsageReporting::kResourceType_Jaguar, GetChannel());
-  LiveWindow::GetInstance().AddActuator("Jaguar", GetChannel(), this);
+  LiveWindow::GetInstance()->AddActuator("Jaguar", GetChannel(), this);
 }
 
 /**

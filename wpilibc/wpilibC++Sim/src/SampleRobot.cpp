@@ -107,7 +107,7 @@ void SampleRobot::RobotMain()
  */
 void SampleRobot::StartCompetition()
 {
-	LiveWindow &lw = LiveWindow::GetInstance();
+	LiveWindow *lw = LiveWindow::GetInstance();
 
 	SmartDashboard::init();
 	NetworkTable::GetTable("LiveWindow")->GetSubTable("~STATUS~")->PutBoolean("LW Enabled", false);
@@ -117,7 +117,7 @@ void SampleRobot::StartCompetition()
 	if (!m_robotMainOverridden)
 	{
 		// first and one-time initialization
-		lw.SetEnabled(false);
+		lw->SetEnabled(false);
 		RobotInit();
 
 		while (true)
@@ -138,12 +138,12 @@ void SampleRobot::StartCompetition()
 			}
             else if (IsTest())
             {
-            	lw.SetEnabled(true);
+              lw->SetEnabled(true);
               m_ds.InTest(true);
               Test();
               m_ds.InTest(false);
-                while (IsTest() && IsEnabled()) sleep(1); //m_ds.WaitForData();
-                lw.SetEnabled(false);
+              while (IsTest() && IsEnabled()) sleep(1); //m_ds.WaitForData();
+              lw->SetEnabled(false);
             }
 			else
 			{

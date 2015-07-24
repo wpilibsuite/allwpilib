@@ -67,7 +67,7 @@ class AnalogInput : public SensorBase,
   static void SetSampleRate(float samplesPerSecond);
   static float GetSampleRate();
 
-  double PIDGet() const override;
+  double PIDGet() override;
 
   void UpdateTable() override;
   void StartLiveWindowMode() override;

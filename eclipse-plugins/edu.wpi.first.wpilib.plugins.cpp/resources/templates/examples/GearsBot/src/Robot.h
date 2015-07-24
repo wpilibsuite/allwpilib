@@ -28,7 +28,7 @@ public:
 
 private:
 	Autonomous autonomousCommand;
-	LiveWindow &lw = LiveWindow::GetInstance();
+	LiveWindow *lw = LiveWindow::GetInstance();
 
 	void RobotInit();
 	void AutonomousInit();

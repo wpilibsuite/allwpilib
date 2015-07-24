@@ -33,7 +33,7 @@ Victor::Victor(uint32_t channel) : SafePWM(channel)
   SetPeriodMultiplier(kPeriodMultiplier_2X);
   SetRaw(m_centerPwm);
 
-  LiveWindow::GetInstance().AddActuator("Victor", GetChannel(), this);
+  LiveWindow::GetInstance()->AddActuator("Victor", GetChannel(), this);
 }
 
 /**

@@ -50,7 +50,7 @@ class CANTalon : public MotorSafety,
   virtual void PIDWrite(float output) override;
 
   // PIDSource interface
-  virtual double PIDGet() const override;
+  virtual double PIDGet() override;
 
   // MotorSafety interface
   virtual void SetExpiration(float timeout) override;

@@ -53,7 +53,7 @@ class Gyro : public SensorBase, public PIDSource, public LiveWindowSendable {
   void InitGyro();
 
   // PIDSource interface
-  double PIDGet() const override;
+  double PIDGet() override;
 
   void UpdateTable() override;
   void StartLiveWindowMode() override;

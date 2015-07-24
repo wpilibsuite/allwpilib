@@ -31,7 +31,7 @@ void Gyro::InitGyro(int channel)
 	int n = sprintf(buffer, "analog/%d", channel);
 	impl = new SimGyro(buffer);
 
-	LiveWindow::GetInstance().AddSensor("Gyro", channel, this);
+	LiveWindow::GetInstance()->AddSensor("Gyro", channel, this);
 }
 
 /**
@@ -93,7 +93,7 @@ void Gyro::SetPIDSourceType(PIDSourceType pidSource)
  *
  * @return The angle in degrees.
  */
-double Gyro::PIDGet() const
+double Gyro::PIDGet()
 {
 	switch(GetPIDSourceType()){
 	case PIDSourceType::kRate:

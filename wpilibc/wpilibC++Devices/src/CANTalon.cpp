@@ -70,7 +70,7 @@ void CANTalon::PIDWrite(float output) {
  *
  * @return The current sensor value of the Talon.
  */
-double CANTalon::PIDGet() const { return Get(); }
+double CANTalon::PIDGet() { return Get(); }
 
 /**
  * Gets the current status of the Talon (usually a sensor value).

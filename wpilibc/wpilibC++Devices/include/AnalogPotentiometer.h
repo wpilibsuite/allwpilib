@@ -61,7 +61,7 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
    *
    * @return The current reading.
    */
-  virtual double PIDGet() const override;
+  virtual double PIDGet() override;
 
   /*
    * Live Window code, only does anything if live window is activated.

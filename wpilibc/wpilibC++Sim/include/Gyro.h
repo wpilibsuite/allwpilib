@@ -42,7 +42,7 @@ public:
 
 	// PIDSource interface
 	void SetPIDSourceType(PIDSourceType pidSource) override;
-	double PIDGet() const override;
+	double PIDGet() override;
 
 	void UpdateTable() override;
 	void StartLiveWindowMode() override;

@@ -20,16 +20,16 @@ Pivot::Pivot() :
 	#endif
 
 	// Put everything to the LiveWindow for testing.
-	LiveWindow::GetInstance().AddSensor("Pivot", "Upper Limit Switch", upperLimitSwitch);
-	LiveWindow::GetInstance().AddSensor("Pivot", "Lower Limit Switch", lowerLimitSwitch);
-	// XXX: LiveWindow::GetInstance().AddSensor("Pivot", "Pot", (AnalogPotentiometer) pot);
-	// XXX: LiveWindow::GetInstance().AddActuator("Pivot", "Motor", (Victor) motor);
-	LiveWindow::GetInstance().AddActuator("Pivot", "PIDSubsystem Controller", GetPIDController());
+	LiveWindow::GetInstance()->AddSensor("Pivot", "Upper Limit Switch", upperLimitSwitch);
+	LiveWindow::GetInstance()->AddSensor("Pivot", "Lower Limit Switch", lowerLimitSwitch);
+	// XXX: LiveWindow::GetInstance()->AddSensor("Pivot", "Pot", (AnalogPotentiometer) pot);
+	// XXX: LiveWindow::GetInstance()->AddActuator("Pivot", "Motor", (Victor) motor);
+	LiveWindow::GetInstance()->AddActuator("Pivot", "PIDSubsystem Controller", GetPIDController());
 }
 
 void InitDefaultCommand() {}
 
-double Pivot::ReturnPIDInput() const {
+double Pivot::ReturnPIDInput() {
 	return pot->Get();
 }
 

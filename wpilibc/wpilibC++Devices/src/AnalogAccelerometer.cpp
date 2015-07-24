@@ -16,7 +16,7 @@
 void AnalogAccelerometer::InitAccelerometer() {
   HALReport(HALUsageReporting::kResourceType_Accelerometer,
             m_analogInput->GetChannel());
-  LiveWindow::GetInstance().AddSensor("Accelerometer",
+  LiveWindow::GetInstance()->AddSensor("Accelerometer",
                                        m_analogInput->GetChannel(), this);
 }
 
@@ -110,7 +110,7 @@ void AnalogAccelerometer::SetZero(float zero) { m_zeroGVoltage = zero; }
  *
  * @return The current acceleration in Gs.
  */
-double AnalogAccelerometer::PIDGet() const { return GetAcceleration(); }
+double AnalogAccelerometer::PIDGet() { return GetAcceleration(); }
 
 void AnalogAccelerometer::UpdateTable() {
   if (m_table != nullptr) {

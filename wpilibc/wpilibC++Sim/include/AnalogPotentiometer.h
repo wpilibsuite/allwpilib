@@ -51,7 +51,7 @@ public:
      *
      * @return The current reading.
      */
-    virtual double PIDGet() const override;
+    virtual double PIDGet() override;
 
 
     /*
