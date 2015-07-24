@@ -96,6 +96,13 @@ class NetworkTable : public ITable {
   bool ContainsSubTable(llvm::StringRef key) const;
 
   /**
+   * Makes a key's value persistent through program restarts.
+   *
+   * @param key the key to make persistent
+   */
+  void Persist(llvm::StringRef key);
+
+  /**
    * Maps the specified key to the specified value in this table. The key can
    * not be null. The value can be retrieved by calling the get method with a
    * key that is equal to the original key.

@@ -121,6 +121,13 @@ bool NetworkTable::ContainsSubTable(StringRef key) const {
   return !nt::GetEntryInfo(path, 0).empty();
 }
 
+void NetworkTable::Persist(StringRef key) {
+  llvm::SmallString<128> path(m_path);
+  path += PATH_SEPARATOR_CHAR;
+  path += key;
+  nt::SetEntryFlags(path, NT_PERSISTENT);
+}
+
 void NetworkTable::PutNumber(StringRef key, double value) {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;

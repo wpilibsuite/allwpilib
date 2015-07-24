@@ -44,6 +44,13 @@ class ITable {
   virtual std::shared_ptr<ITable> GetSubTable(llvm::StringRef key) const = 0;
 
   /**
+   * Makes a key's value persistent through program restarts.
+   *
+   * @param key the key to make persistent
+   */
+  virtual void Persist(llvm::StringRef key) = 0;
+
+  /**
    * Gets the value associated with a key as an object
    *
    * @param key the key of the value to look up
