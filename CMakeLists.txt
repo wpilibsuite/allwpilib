@@ -33,6 +33,7 @@ ExternalProject_Add(
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gmock
     # Disable install step
     INSTALL_COMMAND ""
+    CMAKE_CACHE_ARGS -DCMAKE_TOOLCHAIN_FILE:string=${CMAKE_TOOLCHAIN_FILE}
 )
 
 # Create a libgmock target to be used as a dependency by test programs
