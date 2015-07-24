@@ -59,14 +59,14 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
   virtual bool OnTarget() const;
 
  protected:
-  PIDController *GetPIDController();
+  std::shared_ptr<PIDController> GetPIDController();
 
   virtual double ReturnPIDInput() const = 0;
   virtual void UsePIDOutput(double output) = 0;
 
  private:
   /** The internal {@link PIDController} */
-  std::unique_ptr<PIDController> m_controller;
+  std::shared_ptr<PIDController> m_controller;
 
  public:
   virtual void InitTable(std::shared_ptr<ITable> table);

@@ -3,7 +3,7 @@
 #include "Robot.h"
 
 SetCollectionSpeed::SetCollectionSpeed(double speed) {
-	Requires(Robot::collector);
+	Requires(Robot::collector.get());
 	this->speed = speed;
 }
 

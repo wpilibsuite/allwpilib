@@ -12,11 +12,11 @@ $classname::$classname() :
 	// Enable() - Enables the PID controller.
 }
 
-double $classname::ReturnPIDInput()
+double $classname::ReturnPIDInput() const
 {
 	// Return your input value for the PID loop
 	// e.g. a sensor, like a potentiometer:
-	// yourPot->SetAverageVoltage() / kYourMaxVoltage;	
+	// yourPot->SetAverageVoltage() / kYourMaxVoltage;
 }
 
 void $classname::UsePIDOutput(double output)

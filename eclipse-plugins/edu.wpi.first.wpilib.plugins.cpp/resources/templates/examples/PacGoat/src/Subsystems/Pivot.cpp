@@ -1,7 +1,15 @@
 #include "Pivot.h"
 
 Pivot::Pivot() :
-		PIDSubsystem("Pivot", 7.0, 0.0, 8.0)
+		PIDSubsystem("Pivot", 7.0, 0.0, 8.0),
+		// Sensors for measuring the position of the pivot.
+		upperLimitSwitch(new DigitalInput(13)),
+		lowerLimitSwitch(new DigitalInput(12)),
+		// 0 degrees is vertical facing up.
+		// Angle increases the more forward the pivot goes.
+		pot(new AnalogPotentiometer(1)),
+		// Motor to move the pivot.
+		motor(new Victor(5))
 {
 	SetAbsoluteTolerance(0.005);
 	GetPIDController()->SetContinuous(false);
@@ -11,28 +19,17 @@ Pivot::Pivot() :
 		SetAbsoluteTolerance(5);
 	#endif
 
-	// Motor to move the pivot.
-	motor = new Victor(5);
-
-	// Sensors for measuring the position of the pivot.
-	upperLimitSwitch = new DigitalInput(13);
-	lowerLimitSwitch = new DigitalInput(12);
-
-	// 0 degrees is vertical facing up.
-	// Angle increases the more forward the pivot goes.
-	pot = new AnalogPotentiometer(1);
-
 	// Put everything to the LiveWindow for testing.
-	LiveWindow::GetInstance()->AddSensor("Pivot", "Upper Limit Switch", upperLimitSwitch);
-	LiveWindow::GetInstance()->AddSensor("Pivot", "Lower Limit Switch", lowerLimitSwitch);
-	// XXX: LiveWindow::GetInstance()->AddSensor("Pivot", "Pot", (AnalogPotentiometer) pot);
-	// XXX: LiveWindow::GetInstance()->AddActuator("Pivot", "Motor", (Victor) motor);
-	LiveWindow::GetInstance()->AddActuator("Pivot", "PIDSubsystem Controller", GetPIDController());
+	LiveWindow::GetInstance().AddSensor("Pivot", "Upper Limit Switch", upperLimitSwitch);
+	LiveWindow::GetInstance().AddSensor("Pivot", "Lower Limit Switch", lowerLimitSwitch);
+	// XXX: LiveWindow::GetInstance().AddSensor("Pivot", "Pot", (AnalogPotentiometer) pot);
+	// XXX: LiveWindow::GetInstance().AddActuator("Pivot", "Motor", (Victor) motor);
+	LiveWindow::GetInstance().AddActuator("Pivot", "PIDSubsystem Controller", GetPIDController());
 }
 
 void InitDefaultCommand() {}
 
-double Pivot::ReturnPIDInput() {
+double Pivot::ReturnPIDInput() const {
 	return pot->Get();
 }
 

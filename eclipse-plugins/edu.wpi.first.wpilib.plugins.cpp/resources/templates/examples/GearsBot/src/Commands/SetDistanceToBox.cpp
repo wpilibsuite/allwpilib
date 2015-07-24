@@ -2,7 +2,7 @@
 #include "Robot.h"
 
 SetDistanceToBox::SetDistanceToBox(double distance) {
-	Requires(Robot::drivetrain);
+	Requires(Robot::drivetrain.get());
     pid = new PIDController(-2, 0, 0, new SetDistanceToBoxPIDSource(),
     		                          new SetDistanceToBoxPIDOutput());
     pid->SetAbsoluteTolerance(0.01);
@@ -40,7 +40,7 @@ void SetDistanceToBox::Interrupted() {
 
 
 SetDistanceToBoxPIDSource::~SetDistanceToBoxPIDSource() {}
-double SetDistanceToBoxPIDSource::PIDGet() {
+double SetDistanceToBoxPIDSource::PIDGet() const {
     return Robot::drivetrain->GetDistanceToObstacle();
 }
 

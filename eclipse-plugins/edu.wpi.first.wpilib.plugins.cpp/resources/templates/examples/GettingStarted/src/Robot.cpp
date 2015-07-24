@@ -5,25 +5,20 @@ class Robot: public IterativeRobot
 
 	RobotDrive myRobot; // robot drive system
 	Joystick stick; // only joystick
-	LiveWindow *lw;
+	LiveWindow &lw;
 	int autoLoopCounter;
 
 public:
 	Robot() :
 		myRobot(0, 1),	// these must be initialized in the same order
 		stick(0),		// as they are declared above.
-		lw(NULL),
+		lw(LiveWindow::GetInstance()),
 		autoLoopCounter(0)
 	{
 		myRobot.SetExpiration(0.1);
 	}
 
 private:
-	void RobotInit()
-	{
-		lw = LiveWindow::GetInstance();
-	}
-
 	void AutonomousInit()
 	{
 		autoLoopCounter = 0;
@@ -52,8 +47,8 @@ private:
 
 	void TestPeriodic()
 	{
-		lw->Run();
+		lw.Run();
 	}
 };
 
-START_ROBOT_CLASS(Robot);
+START_ROBOT_CLASS(Robot)

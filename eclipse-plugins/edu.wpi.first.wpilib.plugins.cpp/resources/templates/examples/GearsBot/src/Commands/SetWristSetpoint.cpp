@@ -3,7 +3,7 @@
 
 SetWristSetpoint::SetWristSetpoint(double setpoint) : Command("SetWristSetpoint") {
 	this->setpoint = setpoint;
-	Requires(Robot::wrist);
+	Requires(Robot::wrist.get());
 }
 
 // Called just before this Command runs the first time

@@ -46,5 +46,5 @@ public:
 	}
 };
 
-START_ROBOT_CLASS(IntermediateVisionRobot);
+START_ROBOT_CLASS(IntermediateVisionRobot)
 

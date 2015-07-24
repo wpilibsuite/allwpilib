@@ -233,5 +233,5 @@ public:
 	}
 };
 
-START_ROBOT_CLASS(VisionColor2015Sample);
+START_ROBOT_CLASS(VisionColor2015Sample)
 

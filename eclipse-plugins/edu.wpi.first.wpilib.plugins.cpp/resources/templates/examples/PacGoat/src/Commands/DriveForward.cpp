@@ -3,7 +3,7 @@
 #include "Robot.h"
 
 void DriveForward::init(double dist, double maxSpeed) {
-	Requires(Robot::drivetrain);
+	Requires(Robot::drivetrain.get());
 	distance = dist;
 	driveForwardSpeed = maxSpeed;
 	error = 0;

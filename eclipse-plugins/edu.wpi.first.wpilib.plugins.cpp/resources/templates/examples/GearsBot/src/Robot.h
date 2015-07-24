@@ -10,6 +10,7 @@
 
 #include "WPILib.h"
 #include "Commands/Command.h"
+#include "Commands/Autonomous.h"
 
 #include "Subsystems/DriveTrain.h"
 #include "Subsystems/Elevator.h"
@@ -19,15 +20,15 @@
 
 class Robot: public IterativeRobot {
 public:
-	static DriveTrain* drivetrain;
-	static Elevator* elevator;
-	static Wrist* wrist;
-	static Claw* claw;
-	static OI* oi;
+	static std::shared_ptr<DriveTrain> drivetrain;
+	static std::shared_ptr<Elevator> elevator;
+	static std::shared_ptr<Wrist> wrist;
+	static std::shared_ptr<Claw> claw;
+	static std::unique_ptr<OI> oi;
 
 private:
-	Command *autonomousCommand;
-	LiveWindow *lw;
+	Autonomous autonomousCommand;
+	LiveWindow &lw = LiveWindow::GetInstance();
 
 	void RobotInit();
 	void AutonomousInit();

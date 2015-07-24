@@ -3,7 +3,7 @@
 #include "Robot.h"
 
 WaitForBall::WaitForBall() {
-	Requires(Robot::collector);
+	Requires(Robot::collector.get());
 }
 
 // Called just before this Command runs the first time

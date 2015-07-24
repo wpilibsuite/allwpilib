@@ -19,10 +19,10 @@ public:
 
 private:
 	// Subsystem devices
-	SpeedController* rollerMotor;
-	DigitalInput* ballDetector;
-	Solenoid* piston;
-	DigitalInput* openDetector;
+  std::shared_ptr<SpeedController> rollerMotor;
+  std::shared_ptr<DigitalInput> ballDetector;
+  std::shared_ptr<Solenoid> piston;
+  std::shared_ptr<DigitalInput> openDetector;
 
 public:
 	Collector();

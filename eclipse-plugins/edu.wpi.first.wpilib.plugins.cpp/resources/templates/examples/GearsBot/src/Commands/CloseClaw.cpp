@@ -2,7 +2,7 @@
 #include "Robot.h"
 
 CloseClaw::CloseClaw() : Command("CloseClaw") {
-	Requires(Robot::claw);
+	Requires(Robot::claw.get());
 }
 
 // Called just before this Command runs the first time

@@ -9,21 +9,21 @@
 #include "Commands/DriveForward.h"
 #include "Commands/SetCollectionSpeed.h"
 
-OI::OI() {
-	joystick = new Joystick(0);
+OI::OI()
+    : joystick(0),
+      L1(&joystick, 11),
+      L2(&joystick, 9),
+      R1(&joystick, 12),
+      R2(&joystick, 10),
+      sticks(&joystick, 2, 3) {
 
-	R1 = new JoystickButton(joystick, 12);
-	R1->WhenPressed(new LowGoal());
-	R2 = new JoystickButton(joystick, 10);
-	R2->WhenPressed(new Collect());
+	R1.WhenPressed(new LowGoal());
+	R2.WhenPressed(new Collect());
 
-	L1 = new JoystickButton(joystick, 11);
-	L1->WhenPressed(new SetPivotSetpoint(Pivot::SHOOT));
-	L2 = new JoystickButton(joystick, 9);
-	L2->WhenPressed(new SetPivotSetpoint(Pivot::SHOOT_NEAR));
+	L1.WhenPressed(new SetPivotSetpoint(Pivot::SHOOT));
+	L2.WhenPressed(new SetPivotSetpoint(Pivot::SHOOT_NEAR));
 
-	sticks = new DoubleButton(joystick, 2, 3);
-	sticks->WhenActive(new Shoot());
+	sticks.WhenActive(new Shoot());
 
 
 	// SmartDashboard Buttons
@@ -36,5 +36,5 @@ OI::OI() {
 
 
 Joystick* OI::GetJoystick() {
-	return joystick;
+	return &joystick;
 }

@@ -1,34 +1,30 @@
 
 #include "Robot.h"
-#include "Commands/Autonomous.h"
 
-DriveTrain* Robot::drivetrain = NULL;
-Elevator* Robot::elevator = NULL;
-Wrist* Robot::wrist = NULL;
-Claw* Robot::claw = NULL;
+std::shared_ptr<DriveTrain> Robot::drivetrain;
+std::shared_ptr<Elevator> Robot::elevator;
+std::shared_ptr<Wrist> Robot::wrist;
+std::shared_ptr<Claw> Robot::claw;
 
-OI* Robot::oi = NULL;
+std::unique_ptr<OI> Robot::oi;
 
 void Robot::RobotInit() {
-	drivetrain = new DriveTrain();
-	elevator = new Elevator();
-	wrist = new Wrist();
-	claw = new Claw();
+	drivetrain.reset(new DriveTrain());
+	elevator.reset(new Elevator());
+	wrist.reset(new Wrist());
+	claw.reset(new Claw());
 
-	oi = new OI();
+	oi.reset(new OI());
 
-	autonomousCommand = new Autonomous();
-	lw = LiveWindow::GetInstance();
-
-    // Show what command your subsystem is running on the SmartDashboard
-    SmartDashboard::PutData(drivetrain);
-    SmartDashboard::PutData(elevator);
-    SmartDashboard::PutData(wrist);
-    SmartDashboard::PutData(claw);
+	// Show what command your subsystem is running on the SmartDashboard
+	SmartDashboard::PutData(drivetrain.get());
+	SmartDashboard::PutData(elevator.get());
+	SmartDashboard::PutData(wrist.get());
+	SmartDashboard::PutData(claw.get());
 }
 
 void Robot::AutonomousInit() {
-	autonomousCommand->Start();
+	autonomousCommand.Start();
 	std::cout << "Starting Auto" << std::endl;
 }
 
@@ -41,7 +37,7 @@ void Robot::TeleopInit() {
 	// teleop starts running. If you want the autonomous to
 	// continue until interrupted by another command, remove
 	// this line or comment it out.
-	autonomousCommand->Cancel();
+	autonomousCommand.Cancel();
 	std::cout << "Starting Teleop" << std::endl;
 }
 
@@ -50,7 +46,7 @@ void Robot::TeleopPeriodic() {
 }
 
 void Robot::TestPeriodic() {
-	lw->Run();
+	lw.Run();
 }
 
-START_ROBOT_CLASS(Robot);
+START_ROBOT_CLASS(Robot)

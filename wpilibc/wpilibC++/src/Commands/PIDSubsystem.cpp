@@ -19,7 +19,7 @@
  */
 PIDSubsystem::PIDSubsystem(const std::string &name, double p, double i, double d)
     : Subsystem(name) {
-  m_controller = std::make_unique<PIDController>(p, i, d, this, this);
+  m_controller = std::make_shared<PIDController>(p, i, d, this, this);
 }
 
 /**
@@ -115,7 +115,9 @@ void PIDSubsystem::Disable() { m_controller->Disable(); }
  *
  * @return the {@link PIDController} used by this {@link PIDSubsystem}
  */
-PIDController *PIDSubsystem::GetPIDController() { return m_controller.get(); }
+std::shared_ptr<PIDController> PIDSubsystem::GetPIDController() {
+  return m_controller;
+}
 
 /**
  * Sets the setpoint to the given value.  If {@link PIDCommand#SetRange(double,

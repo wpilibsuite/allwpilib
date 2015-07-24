@@ -2,7 +2,7 @@
 #include "Robot.h"
 
 OpenClaw::OpenClaw() : Command("OpenClaw") {
-	Requires(Robot::claw);
+	Requires(Robot::claw.get());
 	SetTimeout(1);
 }
 

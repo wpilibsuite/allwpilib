@@ -2,7 +2,7 @@
 #include "Robot.h"
 
 TankDriveWithJoystick::TankDriveWithJoystick() : Command("TankDriveWithJoystick") {
-	Requires(Robot::drivetrain);
+	Requires(Robot::drivetrain.get());
 }
 
 // Called just before this Command runs the first time

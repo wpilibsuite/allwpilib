@@ -1,21 +1,21 @@
 #include "Shooter.h"
 
 Shooter::Shooter() :
-		Subsystem("Shooter")
+		Subsystem("Shooter"),
+		// Configure Devices
+		piston1(new DoubleSolenoid(3, 4)),
+		piston2(new DoubleSolenoid(5, 6)),
+		latchPiston(new Solenoid(1, 2)),
+		piston1ReedSwitchFront(new DigitalInput(9)),
+		piston1ReedSwitchBack(new DigitalInput(11)),
+		hotGoalSensor(new DigitalInput(7))
 {
-	// Configure Devices
-	hotGoalSensor = new DigitalInput(3);
-	piston1 = new DoubleSolenoid(3, 4);
-	piston2 = new DoubleSolenoid(5, 6);
-	latchPiston = new Solenoid(1, 2);
-	piston1ReedSwitchFront = new DigitalInput(9);
-	piston1ReedSwitchBack = new DigitalInput(11);
 
 	// Put everything to the LiveWindow for testing.
-	LiveWindow::GetInstance()->AddSensor("Shooter", "Hot Goal Sensor", hotGoalSensor);
-	LiveWindow::GetInstance()->AddSensor("Shooter", "Piston1 Reed Switch Front ", piston1ReedSwitchFront);
-	LiveWindow::GetInstance()->AddSensor("Shooter", "Piston1 Reed Switch Back ", piston1ReedSwitchBack);
-	LiveWindow::GetInstance()->AddActuator("Shooter", "Latch Piston", latchPiston);
+	LiveWindow::GetInstance().AddSensor("Shooter", "Hot Goal Sensor", hotGoalSensor);
+	LiveWindow::GetInstance().AddSensor("Shooter", "Piston1 Reed Switch Front ", piston1ReedSwitchFront);
+	LiveWindow::GetInstance().AddSensor("Shooter", "Piston1 Reed Switch Back ", piston1ReedSwitchBack);
+	LiveWindow::GetInstance().AddActuator("Shooter", "Latch Piston", latchPiston);
 }
 
 void Shooter::InitDefaultCommand()

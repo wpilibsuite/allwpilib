@@ -18,16 +18,16 @@ Wrist::Wrist() : PIDSubsystem("Wrist", kP_real, 0.0, 0.0) {
 	#endif
 
 	// Let's show everything on the LiveWindow
-    // TODO: LiveWindow::GetInstance()->AddActuator("Wrist", "Motor", (Victor) motor);
-    // TODO: LiveWindow::GetInstance()->AddSensor("Wrist", "Pot", (AnalogPotentiometer) pot);
-    LiveWindow::GetInstance()->AddActuator("Wrist", "PID", GetPIDController());
+    // TODO: LiveWindow::GetInstance().AddActuator("Wrist", "Motor", (Victor) motor);
+    // TODO: LiveWindow::GetInstance().AddSensor("Wrist", "Pot", (AnalogPotentiometer) pot);
+    LiveWindow::GetInstance().AddActuator("Wrist", "PID", GetPIDController());
 }
 
 void Wrist::Log() {
     // TODO: SmartDashboard::PutData("Wrist Angle", (AnalogPotentiometer) pot);
 }
 
-double Wrist::ReturnPIDInput() {
+double Wrist::ReturnPIDInput() const {
     return pot->Get();
 }
 

@@ -4,7 +4,7 @@
 
 WaitForPressure::WaitForPressure()
 {
-	Requires(Robot::pneumatics);
+	Requires(Robot::pneumatics.get());
 }
 
 // Called just before this Command runs the first time

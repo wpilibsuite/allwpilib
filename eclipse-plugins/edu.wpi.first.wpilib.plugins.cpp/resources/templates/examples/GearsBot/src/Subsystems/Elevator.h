@@ -29,7 +29,7 @@ public:
      * Use the potentiometer as the PID sensor. This method is automatically
      * called by the subsystem.
      */
-    double ReturnPIDInput();
+    double ReturnPIDInput() const;
 
 
     /**

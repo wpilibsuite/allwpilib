@@ -3,10 +3,10 @@
 #include "Commands/Scheduler.h"
 
 // Initialize a single static instance of all of your subsystems to NULL
-ExampleSubsystem* CommandBase::examplesubsystem = NULL;
-OI* CommandBase::oi = NULL;
+std::unique_ptr<ExampleSubsystem> CommandBase::examplesubsystem;
+std::unique_ptr<OI> CommandBase::oi;
 
-CommandBase::CommandBase(char const *name) :
+CommandBase::CommandBase(const std::string &name) :
 		Command(name)
 {
 }
@@ -21,7 +21,7 @@ void CommandBase::init()
 {
 	// Create a single static instance of all of your subsystems. The following
 	// line should be repeated for each subsystem in the project.
-	examplesubsystem = new ExampleSubsystem();
+	examplesubsystem.reset(new ExampleSubsystem());
 
-	oi = new OI();
+	oi.reset(new OI());
 }

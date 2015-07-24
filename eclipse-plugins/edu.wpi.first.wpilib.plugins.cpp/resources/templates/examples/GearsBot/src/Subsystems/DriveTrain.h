@@ -10,12 +10,10 @@
  */
 class DriveTrain : public Subsystem {
 private:
-	SpeedController *front_left_motor,  *back_left_motor,
-					*front_right_motor, *back_right_motor;
 	RobotDrive* drive;
-	Encoder *left_encoder, *right_encoder;
-	AnalogInput* rangefinder;
-	Gyro* gyro;
+  std::shared_ptr<Encoder> left_encoder, right_encoder;
+  std::shared_ptr<AnalogInput> rangefinder;
+  std::shared_ptr<Gyro> gyro;
 
 public:
 	DriveTrain();

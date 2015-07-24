@@ -11,6 +11,8 @@
 #include "WPILib.h"
 #include "Commands/Command.h"
 
+#include "Commands/DriveAndShootAutonomous.h"
+#include "Commands/DriveForward.h"
 #include "Subsystems/DriveTrain.h"
 #include "Subsystems/Pivot.h"
 #include "Subsystems/Collector.h"
@@ -20,17 +22,18 @@
 
 class Robot: public IterativeRobot {
 public:
-	static DriveTrain* drivetrain;
-	static Pivot* pivot;
-	static Collector* collector;
-	static Shooter* shooter;
-	static Pneumatics* pneumatics;
-	static OI* oi;
+	static std::shared_ptr<DriveTrain> drivetrain;
+	static std::shared_ptr<Pivot> pivot;
+	static std::shared_ptr<Collector> collector;
+	static std::shared_ptr<Shooter> shooter;
+	static std::shared_ptr<Pneumatics> pneumatics;
+	static std::unique_ptr<OI> oi;
 
 private:
-	Command *autonomousCommand;
-	LiveWindow *lw;
-	SendableChooser* autoChooser;
+	Command* autonomousCommand = nullptr;
+	std::unique_ptr<Command> driveAndShootAuto{new DriveAndShootAutonomous()},
+	                         driveForwardAuto{new DriveForward()};
+	SendableChooser autoChooser;
 
 	void RobotInit();
 	void AutonomousInit();
@@ -43,6 +46,5 @@ private:
 
 	void Log();
 };
-
 
 #endif /* ROBOT_H_ */

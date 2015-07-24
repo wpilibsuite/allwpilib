@@ -25,7 +25,7 @@ private:
 class DriveStraightPIDSource: public PIDSource {
 public:
 	virtual ~DriveStraightPIDSource();
-	double PIDGet();
+	double PIDGet() const;
 };
 
 class DriveStraightPIDOutput: public PIDOutput {

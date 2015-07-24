@@ -207,4 +207,4 @@ public:
 	}
 };
 
-START_ROBOT_CLASS(VisionRetro2015Sample);
+START_ROBOT_CLASS(VisionRetro2015Sample)

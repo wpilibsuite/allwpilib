@@ -12,11 +12,11 @@ class DriveTrain: public Subsystem
 {
 private:
 	// Subsystem devices
-	SpeedController *frontLeftCIM, *frontRightCIM;
-	SpeedController *backLeftCIM, *backRightCIM;
-	RobotDrive* drive;
-	Encoder *rightEncoder, *leftEncoder;
-	Gyro* gyro;
+	std::shared_ptr<SpeedController> frontLeftCIM, frontRightCIM;
+	std::shared_ptr<SpeedController> backLeftCIM, backRightCIM;
+	RobotDrive drive;
+	std::shared_ptr<Encoder> rightEncoder, leftEncoder;
+	std::shared_ptr<Gyro> gyro;
 
 public:
 	DriveTrain();
@@ -46,12 +46,12 @@ public:
 	/**
 	 * @return The encoder getting the distance and speed of left side of the drivetrain.
 	 */
-	Encoder* GetLeftEncoder();
+  std::shared_ptr<Encoder> GetLeftEncoder();
 
 	/**
 	 * @return The encoder getting the distance and speed of right side of the drivetrain.
 	 */
-	Encoder* GetRightEncoder();
+  std::shared_ptr<Encoder> GetRightEncoder();
 
 	/**
 	 * @return The current angle of the drivetrain.

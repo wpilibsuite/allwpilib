@@ -2,7 +2,7 @@
 #include "Robot.h"
 
 DriveStraight::DriveStraight(double distance) {
-	Requires(Robot::drivetrain);
+	Requires(Robot::drivetrain.get());
     pid = new PIDController(4, 0, 0, new DriveStraightPIDSource(),
     		                         new DriveStraightPIDOutput());
     pid->SetAbsoluteTolerance(0.01);
@@ -40,7 +40,7 @@ void DriveStraight::Interrupted() {
 
 
 DriveStraightPIDSource::~DriveStraightPIDSource() {}
-double DriveStraightPIDSource::PIDGet() {
+double DriveStraightPIDSource::PIDGet() const {
     return Robot::drivetrain->GetDistance();
 }
 

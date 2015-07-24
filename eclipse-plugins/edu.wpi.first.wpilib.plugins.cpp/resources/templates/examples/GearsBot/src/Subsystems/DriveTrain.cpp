@@ -1,16 +1,12 @@
 #include "DriveTrain.h"
 #include "Commands/TankDriveWithJoystick.h"
 
-DriveTrain::DriveTrain() : Subsystem("DriveTrain") {
-	front_left_motor = new Talon(1);
-	back_left_motor = new Talon(2);
-	front_right_motor = new Talon(3);
-	back_right_motor = new Talon(4);
-	drive = new RobotDrive(front_left_motor, back_left_motor,
-						   front_right_motor, back_right_motor);
-
-	left_encoder = new Encoder(1, 2);
-	right_encoder = new Encoder(3, 4);
+DriveTrain::DriveTrain()
+		: Subsystem("DriveTrain"), left_encoder(new Encoder(1, 2)),
+			right_encoder(new Encoder(3, 4)), rangefinder(new AnalogInput(6)),
+			gyro(new Gyro(1)) {
+	drive = new RobotDrive(new Talon(1), new Talon(2),
+						   new Talon(3), new Talon(4));
 
 	// Encoders may measure differently in the real world and in
 	// simulation. In this example the robot moves 0.042 barleycorns
@@ -26,18 +22,15 @@ DriveTrain::DriveTrain() : Subsystem("DriveTrain") {
 		right_encoder->SetDistancePerPulse((double) (4.0/12.0*M_PI) / 360.0);
 	#endif
 
-	rangefinder = new AnalogInput(6);
-	gyro = new Gyro(1);
-
 	// Let's show everything on the LiveWindow
-	// TODO: LiveWindow::GetInstance()->AddActuator("Drive Train", "Front_Left Motor", (Talon) front_left_motor);
-	// TODO: LiveWindow::GetInstance()->AddActuator("Drive Train", "Back Left Motor", (Talon) back_left_motor);
-	// TODO: LiveWindow::GetInstance()->AddActuator("Drive Train", "Front Right Motor", (Talon) front_right_motor);
-	// TODO: LiveWindow::GetInstance()->AddActuator("Drive Train", "Back Right Motor", (Talon) back_right_motor);
-	LiveWindow::GetInstance()->AddSensor("Drive Train", "Left Encoder", left_encoder);
-	LiveWindow::GetInstance()->AddSensor("Drive Train", "Right Encoder", right_encoder);
-	LiveWindow::GetInstance()->AddSensor("Drive Train", "Rangefinder", rangefinder);
-	LiveWindow::GetInstance()->AddSensor("Drive Train", "Gyro", gyro);
+	// TODO: LiveWindow::GetInstance().AddActuator("Drive Train", "Front_Left Motor", (Talon) front_left_motor);
+	// TODO: LiveWindow::GetInstance().AddActuator("Drive Train", "Back Left Motor", (Talon) back_left_motor);
+	// TODO: LiveWindow::GetInstance().AddActuator("Drive Train", "Front Right Motor", (Talon) front_right_motor);
+	// TODO: LiveWindow::GetInstance().AddActuator("Drive Train", "Back Right Motor", (Talon) back_right_motor);
+	LiveWindow::GetInstance().AddSensor("Drive Train", "Left Encoder", left_encoder);
+	LiveWindow::GetInstance().AddSensor("Drive Train", "Right Encoder", right_encoder);
+	LiveWindow::GetInstance().AddSensor("Drive Train", "Rangefinder", rangefinder);
+	LiveWindow::GetInstance().AddSensor("Drive Train", "Gyro", gyro);
 }
 
 /**

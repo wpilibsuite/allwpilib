@@ -3,7 +3,7 @@
 #include "Robot.h"
 
 DriveWithJoystick::DriveWithJoystick() {
-	Requires(Robot::drivetrain);
+	Requires(Robot::drivetrain.get());
 }
 
 // Called just before this Command runs the first time

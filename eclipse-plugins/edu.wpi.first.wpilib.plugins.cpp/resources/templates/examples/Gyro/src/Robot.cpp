@@ -26,22 +26,17 @@ class Robot: public SampleRobot {
 	 //gyro value of 360 is set to correspond to one full revolution
 	 const double voltsPerDegreePerSecond = .0128;
 
-	 RobotDrive *myRobot;
-	 Gyro *gyro;
-	 Joystick *joystick;
+	 RobotDrive myRobot;
+	 Gyro gyro;
+	 Joystick joystick;
 
 public:
 	Robot() :
-		SampleRobot()
-	{
-		//make objects for the drive train, gyro, and joystick
-		myRobot = new RobotDrive(new CANTalon(leftMotorChannel),
-				new CANTalon(leftRearMotorChannel),
-				new CANTalon(rightMotorChannel),
-				new CANTalon(rightRearMotorChannel));
-		gyro = new Gyro(gyroChannel);
-		joystick = new Joystick(joystickChannel);
-	}
+    // Create the drivetrain from 4 CAN Talon SRXs.
+		myRobot(new CANTalon(leftMotorChannel), new CANTalon(leftRearMotorChannel),
+						new CANTalon(rightMotorChannel), new CANTalon(rightRearMotorChannel)),
+    // Assign the gyro and joystick channels.
+		gyro(gyroChannel), joystick(joystickChannel) {}
 
 	/**
 	 * Runs during autonomous.
@@ -59,17 +54,17 @@ public:
 	void OperatorControl()
 	{
 		double turningValue;
-		gyro->SetSensitivity(voltsPerDegreePerSecond); //calibrates gyro values to equal degrees
+		gyro.SetSensitivity(voltsPerDegreePerSecond); //calibrates gyro values to equal degrees
 
 		while (IsOperatorControl() && IsEnabled())
 		{
-			turningValue = (angleSetpoint - gyro->GetAngle()) * pGain;
-			if (joystick->GetY() <= 0) {
+			turningValue = (angleSetpoint - gyro.GetAngle()) * pGain;
+			if (joystick.GetY() <= 0) {
 				//forwards
-				myRobot->Drive(joystick->GetY(), turningValue);
+				myRobot.Drive(joystick.GetY(), turningValue);
 			} else {
 				//backwards
-				myRobot->Drive(joystick->GetY(), -turningValue);
+				myRobot.Drive(joystick.GetY(), -turningValue);
 			}
 		}
 	}
@@ -83,4 +78,4 @@ public:
 	}
 };
 
-START_ROBOT_CLASS(Robot);
+START_ROBOT_CLASS(Robot)

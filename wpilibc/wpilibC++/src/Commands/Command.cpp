@@ -36,7 +36,7 @@ Command::Command(const std::string &name) : Command(name, -1.0) {}
  * @param timeout the time (in seconds) before this command "times out"
  * @see Command#isTimedOut() isTimedOut()
  */
-Command::Command(double timeout) : Command(nullptr, timeout) {}
+Command::Command(double timeout) : Command("", timeout) {}
 
 /**
  * Creates a new command with the given name and timeout.
@@ -45,8 +45,8 @@ Command::Command(double timeout) : Command(nullptr, timeout) {}
  * @see Command#isTimedOut() isTimedOut()
  */
 Command::Command(const std::string &name, double timeout) {
-  if (name.size() == 0) wpi_setWPIErrorWithContext(NullParameter, "name");
-  if (timeout < 0.0)
+  // We use -1.0 to indicate no timeout.
+  if (timeout < 0.0 && timeout != -1.0)
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
 
   m_timeout = timeout;

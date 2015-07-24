@@ -21,19 +21,14 @@ class Robot: public SampleRobot
 	    double motorSpeed;
 	    double currentPosition; //sensor voltage reading corresponding to current elevator position
 
-	    AnalogInput *potentiometer;
-	    Victor *elevatorMotor;
-	    Joystick *joystick;
+	    AnalogInput potentiometer;
+	    Victor elevatorMotor;
+	    Joystick joystick;
 
 public:
 	Robot() :
-			SampleRobot()
-	{
-		//make objects for the potentiometer, elevator motor controller, and joystick
-		potentiometer = new AnalogInput(potChannel);
-		elevatorMotor = new Victor(motorChannel);
-		joystick = new Joystick(joystickChannel);
-	}
+			potentiometer(potChannel), elevatorMotor(motorChannel),
+      joystick(joystickChannel) {}
 
 	/**
 	 * Runs during autonomous.
@@ -57,7 +52,7 @@ public:
 		currentSetpoint = setpoints[0]; //set to first setpoint
 
 		while (IsOperatorControl() && IsEnabled()) {
-			buttonState = joystick->GetRawButton(buttonNumber); //check if button is pressed
+			buttonState = joystick.GetRawButton(buttonNumber); //check if button is pressed
 
 			//if button has been pressed and released once
 			if (buttonState && !prevButtonState) {
@@ -66,9 +61,9 @@ public:
 			}
 			prevButtonState = buttonState; //record previous button state
 
-			currentPosition = potentiometer->GetAverageVoltage(); //get position value
+			currentPosition = potentiometer.GetAverageVoltage(); //get position value
 			motorSpeed = (currentPosition - currentSetpoint)*pGain; //convert position error to speed
-			elevatorMotor->Set(motorSpeed); //drive elevator motor
+			elevatorMotor.Set(motorSpeed); //drive elevator motor
 		}
 	}
 
@@ -81,4 +76,4 @@ public:
 	}
 };
 
-START_ROBOT_CLASS(Robot);
+START_ROBOT_CLASS(Robot)

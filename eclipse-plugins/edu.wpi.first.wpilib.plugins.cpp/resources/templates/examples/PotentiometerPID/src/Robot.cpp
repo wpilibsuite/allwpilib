@@ -22,25 +22,20 @@ class Robot: public SampleRobot {
 	//and dGain may cause dangerous, uncontrollable, or undesired behavior!
 	const double pGain = -5.0, iGain = -0.02, dGain = -2.0; //these may need to be positive for a non-inverted motor
 
-	PIDController *pidController;
-	AnalogInput *potentiometer;
-	Victor *elevatorMotor;
-	Joystick *joystick;
+	AnalogInput potentiometer;
+	Victor elevatorMotor;
+	Joystick joystick;
+	PIDController pidController;
 
 public:
 	Robot() :
-		SampleRobot()
-	{
 		//make objects for potentiometer, the elevator motor controller, and the joystick
-		potentiometer = new AnalogInput(potChannel);
-		elevatorMotor = new Victor(motorChannel);
-		joystick = new Joystick(joystickChannel);
-
+		potentiometer(potChannel), elevatorMotor(motorChannel), joystick(joystickChannel),
 		//potentiometer (AnalogInput) and elevatorMotor (Victor) can be used as a
-		//PIDSource and PIDOutput respectively
-		pidController = new PIDController(pGain, iGain, dGain, potentiometer,
-				elevatorMotor);
-	}
+		//PIDSource and PIDOutput respectively.
+		//The PIDController has to take a pointer to the PIDSource and PIDOutput, so
+		//you must call &potentiometer and &elevatorMotor to get their pointers.
+		pidController(pGain, iGain, dGain, &potentiometer, &elevatorMotor) {}
 
 	/**
 	 * Runs during autonomous.
@@ -54,20 +49,20 @@ public:
      *  The elevator setpoint is selected by a joystick button.
 	 */
 	void OperatorControl() {
-		pidController->SetInputRange(0, 5); //0 to 5V
-		pidController->SetSetpoint(setPoints[0]); //set to first setpoint
+		pidController.SetInputRange(0, 5); //0 to 5V
+		pidController.SetSetpoint(setPoints[0]); //set to first setpoint
 
 		int index = 0;
 		bool currentValue;
 		bool previousValue = false;
 
 		while (IsOperatorControl() && IsEnabled()) {
-			pidController->Enable(); //begin PID control
+			pidController.Enable(); //begin PID control
 
 			//when the button is pressed once, the selected elevator setpoint is incremented
-			currentValue = joystick->GetRawButton(buttonNumber);
+			currentValue = joystick.GetRawButton(buttonNumber);
 			if (currentValue && !previousValue) {
-				pidController->SetSetpoint(setPoints[index]);
+				pidController.SetSetpoint(setPoints[index]);
 				index = (index + 1) % (sizeof(setPoints)/8); //index of elevator setpoint wraps around
 			}
 			previousValue = currentValue;
@@ -82,4 +77,4 @@ public:
 	}
 };
 
-START_ROBOT_CLASS(Robot);
+START_ROBOT_CLASS(Robot)

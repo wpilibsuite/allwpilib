@@ -3,13 +3,17 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-DriveTrain::DriveTrain() :
-		Subsystem("DriveTrain") {
-	// Configure drive motors
-	frontLeftCIM = new Victor(1);
-	frontRightCIM = new Victor(2);
-	backLeftCIM = new Victor(3);
-	backRightCIM = new Victor(4);
+DriveTrain::DriveTrain()
+		: Subsystem("DriveTrain"),
+			// Configure drive motors
+			frontLeftCIM(new Victor(1)),
+			frontRightCIM(new Victor(2)),
+			backLeftCIM(new Victor(3)),
+			backRightCIM(new Victor(4)),
+			drive(frontRightCIM, backLeftCIM, frontRightCIM, backRightCIM),
+			rightEncoder(new Encoder(1, 2, true, Encoder::k4X)),
+			leftEncoder(new Encoder(3, 4, false, Encoder::k4X)),
+			gyro(new Gyro(0)) {
 	// XXX: LiveWindow::GetInstance()->AddActuator("DriveTrain", "Front Left CIM", (Victor) frontLeftCIM);
 	// XXX: LiveWindow::GetInstance()->AddActuator("DriveTrain", "Front Right CIM", (Victor) frontRightCIM);
 	// XXX: LiveWindow::GetInstance()->AddActuator("DriveTrain", "Back Left CIM", (Victor) backLeftCIM);
@@ -17,19 +21,16 @@ DriveTrain::DriveTrain() :
 
 	// Configure the RobotDrive to reflect the fact that all our motors are
 	// wired backwards and our drivers sensitivity preferences.
-	drive = new RobotDrive(frontLeftCIM, backLeftCIM, frontRightCIM, backRightCIM);
-	drive->SetSafetyEnabled(true);
-	drive->SetExpiration(0.1);
-	drive->SetSensitivity(0.5);
-	drive->SetMaxOutput(1.0);
-	drive->SetInvertedMotor(RobotDrive::kFrontLeftMotor, true);
-	drive->SetInvertedMotor(RobotDrive::kRearLeftMotor, true);
-	drive->SetInvertedMotor(RobotDrive::kFrontRightMotor, true);
-	drive->SetInvertedMotor(RobotDrive::kRearRightMotor, true);
+	drive.SetSafetyEnabled(false);
+	drive.SetExpiration(0.1);
+	drive.SetSensitivity(0.5);
+	drive.SetMaxOutput(1.0);
+	drive.SetInvertedMotor(RobotDrive::kFrontLeftMotor, true);
+	drive.SetInvertedMotor(RobotDrive::kRearLeftMotor, true);
+	drive.SetInvertedMotor(RobotDrive::kFrontRightMotor, true);
+	drive.SetInvertedMotor(RobotDrive::kRearRightMotor, true);
 
 	// Configure encoders
-	rightEncoder = new Encoder(1, 2, true, Encoder::k4X);
-	leftEncoder = new Encoder(3, 4, false, Encoder::k4X);
 	rightEncoder->SetPIDSourceParameter(PIDSource::kDistance);
 	leftEncoder->SetPIDSourceParameter(PIDSource::kDistance);
 
@@ -43,15 +44,14 @@ DriveTrain::DriveTrain() :
 		leftEncoder->SetDistancePerPulse((4.0/*in*/*M_PI)/(360.0*12.0/*in/ft*/));
 	#endif
 
-	LiveWindow::GetInstance()->AddSensor("DriveTrain", "Right Encoder", rightEncoder);
-	LiveWindow::GetInstance()->AddSensor("DriveTrain", "Left Encoder", leftEncoder);
+	LiveWindow::GetInstance().AddSensor("DriveTrain", "Right Encoder", rightEncoder);
+	LiveWindow::GetInstance().AddSensor("DriveTrain", "Left Encoder", leftEncoder);
 
 	// Configure gyro
-	gyro = new Gyro(2);
     #ifdef REAL
 		gyro->SetSensitivity(0.007); // TODO: Handle more gracefully?
     #endif
-	LiveWindow::GetInstance()->AddSensor("DriveTrain", "Gyro", gyro);
+	LiveWindow::GetInstance().AddSensor("DriveTrain", "Gyro", gyro);
 }
 
 void DriveTrain::InitDefaultCommand() {
@@ -59,22 +59,22 @@ void DriveTrain::InitDefaultCommand() {
 }
 
 void DriveTrain::TankDrive(Joystick* joy) {
-	drive->TankDrive(joy->GetY(), joy->GetRawAxis(4));
+	drive.TankDrive(joy->GetY(), joy->GetRawAxis(4));
 }
 
 void DriveTrain::TankDrive(double leftAxis, double rightAxis) {
-	drive->TankDrive(leftAxis, rightAxis);
+	drive.TankDrive(leftAxis, rightAxis);
 }
 
 void DriveTrain::Stop() {
-	drive->TankDrive(0.0, 0.0);
+	drive.TankDrive(0.0, 0.0);
 }
 
-Encoder* DriveTrain::GetLeftEncoder() {
+std::shared_ptr<Encoder> DriveTrain::GetLeftEncoder() {
 	return leftEncoder;
 }
 
-Encoder* DriveTrain::GetRightEncoder() {
+std::shared_ptr<Encoder> DriveTrain::GetRightEncoder() {
 	return rightEncoder;
 }
 

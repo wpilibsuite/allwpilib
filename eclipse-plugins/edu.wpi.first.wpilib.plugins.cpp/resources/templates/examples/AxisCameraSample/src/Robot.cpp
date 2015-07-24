@@ -9,7 +9,7 @@ class AxisCameraSample : public SampleRobot
 	IMAQdxSession session;
 	Image *frame;
 	IMAQdxError imaqError;
-	AxisCamera *camera;
+	std::unique_ptr<AxisCamera> camera;
 
 public:
 	void RobotInit() override {
@@ -18,7 +18,7 @@ public:
 
 		// open the camera at the IP address assigned. This is the IP address that the camera
 		// can be accessed through the web interface.
-		camera = new AxisCamera("10.1.91.103");
+		camera.reset(new AxisCamera("axis-camera.local"));
 	}
 
 	void OperatorControl() override {
@@ -33,5 +33,5 @@ public:
 	}
 };
 
-START_ROBOT_CLASS(AxisCameraSample);
+START_ROBOT_CLASS(AxisCameraSample)
 

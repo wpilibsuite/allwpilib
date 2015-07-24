@@ -4,7 +4,7 @@
 
 SetElevatorSetpoint::SetElevatorSetpoint(double setpoint) : Command("SetElevatorSetpoint") {
 	this->setpoint = setpoint;
-	Requires(Robot::elevator);
+	Requires(Robot::elevator.get());
 }
 
 // Called just before this Command runs the first time

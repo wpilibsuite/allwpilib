@@ -9,8 +9,8 @@
  * this system. Use IterativeRobot or Command-Based instead if you're new.
  */
 class Robot: public SampleRobot {
-	AnalogInput *ultrasonic; //ultrasonic sensor
-	RobotDrive *myRobot;
+	AnalogInput ultrasonic; //ultrasonic sensor
+	RobotDrive myRobot;
 
 public:
 	const int ultrasonicChannel = 3; //analog input pin
@@ -27,14 +27,9 @@ public:
 
 
 	Robot() :
-			SampleRobot() {
-		//make objects for the sensor and drive train
-		ultrasonic = new AnalogInput(ultrasonicChannel);
-		myRobot = new RobotDrive(new CANTalon(leftMotorChannel),
-				new CANTalon(leftRearMotorChannel),
-				new CANTalon(rightMotorChannel),
-				new CANTalon(rightRearMotorChannel));
-	}
+			ultrasonic(ultrasonicChannel),
+			myRobot(new CANTalon(leftMotorChannel), new CANTalon(leftRearMotorChannel),
+							new CANTalon(rightMotorChannel), new CANTalon(rightRearMotorChannel)) {}
 
 	/**
 	 * Runs during autonomous.
@@ -53,9 +48,9 @@ public:
 		double currentSpeed; //speed to set the drive train motors
 
 		while (IsOperatorControl() && IsEnabled()) {
-			currentDistance = ultrasonic->GetValue() * valueToInches; //sensor returns a value from 0-4095 that is scaled to inches
+			currentDistance = ultrasonic.GetValue() * valueToInches; //sensor returns a value from 0-4095 that is scaled to inches
 			currentSpeed = (holdDistance - currentDistance) * pGain; //convert distance error to a motor speed
-			myRobot->Drive(currentSpeed, 0); //drive robot
+			myRobot.Drive(currentSpeed, 0); //drive robot
 		}
 	}
 
@@ -67,4 +62,4 @@ public:
 	}
 };
 
-START_ROBOT_CLASS(Robot);
+START_ROBOT_CLASS(Robot)

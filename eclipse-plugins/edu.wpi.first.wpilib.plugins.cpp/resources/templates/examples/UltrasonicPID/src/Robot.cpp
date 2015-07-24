@@ -9,9 +9,9 @@
  * this system. Use IterativeRobot or Command-Based instead if you're new.
  */
 class Robot: public SampleRobot {
-	AnalogInput *ultrasonic; //ultrasonic sensor
-	RobotDrive *myRobot;
-	PIDController *pidController;
+	AnalogInput ultrasonic; //ultrasonic sensor
+  RobotDrive myRobot;
+	PIDController pidController;
 
 public:
 	const int ultrasonicChannel = 3; //analog input
@@ -36,32 +36,24 @@ public:
 	//internal class to write to myRobot (a RobotDrive object) using a PIDOutput
 	class MyPIDOutput: public PIDOutput {
 	public:
-		RobotDrive* rd;
-		MyPIDOutput(RobotDrive *r)
+    RobotDrive &rd;
+		MyPIDOutput(RobotDrive &r) : rd(r)
 		{
-			rd = r;
-			rd->SetSafetyEnabled(false);
+			rd.SetSafetyEnabled(false);
 		}
 		void PIDWrite(float output) {
-			rd->Drive(output, 0); //write to myRobot (RobotDrive) by reference
+			rd.Drive(output, 0); //write to myRobot (RobotDrive) by reference
 		}
 	};
 
 	Robot() :
-		SampleRobot() {
 		//make objects for sensor and drive train
-		ultrasonic = new AnalogInput(ultrasonicChannel);
-		myRobot = new RobotDrive(new CANTalon(leftMotorChannel),
-					new CANTalon(leftRearMotorChannel),
-					new CANTalon(rightMotorChannel),
-					new CANTalon(rightRearMotorChannel));
-
+		ultrasonic(ultrasonicChannel),
+		myRobot(new CANTalon(leftMotorChannel), new CANTalon(leftRearMotorChannel),
+						new CANTalon(rightMotorChannel), new CANTalon(rightRearMotorChannel)),
 		//ultrasonic (AnalogInput) can be used as a PIDSource without modification,
 		//PIDOutput is an instance of the internal class MyPIDOutput made earlier
-		pidController = new PIDController(pGain, iGain, dGain, ultrasonic,
-				new MyPIDOutput(myRobot));
-
-	}
+		pidController(pGain, iGain, dGain, &ultrasonic, new MyPIDOutput(myRobot)) {}
 
 	/**
 	 * Runs during autonomous.
@@ -76,14 +68,14 @@ public:
 	 * sensor.
 	 */
 	void OperatorControl() {
-		pidController->SetSetpoint(holdDistance * VoltsToInches); //set setpoint to 12 inches
+		pidController.SetSetpoint(holdDistance * VoltsToInches); //set setpoint to 12 inches
 
 		//set expected range to 0-24 inches; e.g. at 24 inches from object go full
 		//forward, at 0 inches from object go full backward.
-		pidController->SetInputRange(0, 24 * VoltsToInches);
+		pidController.SetInputRange(0, 24 * VoltsToInches);
 
 		while (IsOperatorControl() && IsEnabled()) {
-			pidController->Enable(); //begin PID control
+			pidController.Enable(); //begin PID control
 		}
 	}
 
@@ -96,4 +88,4 @@ public:
 	}
 };
 
-START_ROBOT_CLASS(Robot);
+START_ROBOT_CLASS(Robot)

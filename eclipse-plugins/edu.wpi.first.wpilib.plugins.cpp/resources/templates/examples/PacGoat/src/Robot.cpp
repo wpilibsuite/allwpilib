@@ -1,46 +1,40 @@
 
 #include "Robot.h"
-#include "Commands/DriveAndShootAutonomous.h"
-#include "Commands/DriveForward.h"
 
-DriveTrain* Robot::drivetrain = NULL;
-Pivot* Robot::pivot = NULL;
-Collector* Robot::collector = NULL;
-Shooter* Robot::shooter = NULL;
-Pneumatics* Robot::pneumatics = NULL;
+std::shared_ptr<DriveTrain> Robot::drivetrain;
+std::shared_ptr<Pivot> Robot::pivot;
+std::shared_ptr<Collector> Robot::collector;
+std::shared_ptr<Shooter> Robot::shooter;
+std::shared_ptr<Pneumatics> Robot::pneumatics;
 
-OI* Robot::oi = NULL;
+std::unique_ptr<OI> Robot::oi;
 
 void Robot::RobotInit() {
-	drivetrain = new DriveTrain();
-	pivot = new Pivot();
-	collector = new Collector();
-	shooter = new Shooter();
-	pneumatics = new Pneumatics();
+	drivetrain.reset(new DriveTrain());
+	pivot.reset(new Pivot());
+	collector.reset(new Collector());
+	shooter.reset(new Shooter());
+	pneumatics.reset(new Pneumatics());
 
-    // Show what command your subsystem is running on the SmartDashboard
-    SmartDashboard::PutData(drivetrain);
-    SmartDashboard::PutData(pivot);
-    SmartDashboard::PutData(collector);
-    SmartDashboard::PutData(shooter);
-    SmartDashboard::PutData(pneumatics);
+	oi.reset(new OI());
 
-	oi = new OI();
-
-	autonomousCommand = new DriveAndShootAutonomous();
-	lw = LiveWindow::GetInstance();
+	// Show what command your subsystem is running on the SmartDashboard
+	SmartDashboard::PutData(drivetrain.get());
+	SmartDashboard::PutData(pivot.get());
+	SmartDashboard::PutData(collector.get());
+	SmartDashboard::PutData(shooter.get());
+	SmartDashboard::PutData(pneumatics.get());
 
 	// instantiate the command used for the autonomous period
-	autoChooser = new SendableChooser();
-	autoChooser->AddDefault("Drive and Shoot", new DriveAndShootAutonomous());
-	autoChooser->AddObject("Drive Forward", new DriveForward());
-	SmartDashboard::PutData("Auto Mode", autoChooser);
+	autoChooser.AddDefault("Drive and Shoot", driveAndShootAuto.get());
+	autoChooser.AddObject("Drive Forward", driveForwardAuto.get());
+	SmartDashboard::PutData("Auto Mode", &autoChooser);
 
 	pneumatics->Start(); // Pressurize the pneumatics.
 }
 
 void Robot::AutonomousInit() {
-	autonomousCommand = (Command*) autoChooser->GetSelected();
+	autonomousCommand = (Command *)autoChooser.GetSelected();
 	autonomousCommand->Start();
 }
 
@@ -54,7 +48,7 @@ void Robot::TeleopInit() {
 	// teleop starts running. If you want the autonomous to
 	// continue until interrupted by another command, remove
 	// this line or comment it out.
-	if (autonomousCommand != NULL) {
+	if (autonomousCommand != nullptr) {
 		autonomousCommand->Cancel();
 	}
 	std::cout << "Starting Teleop" << std::endl;
@@ -66,7 +60,7 @@ void Robot::TeleopPeriodic() {
 }
 
 void Robot::TestPeriodic() {
-	lw->Run();
+  LiveWindow::GetInstance().Run();
 }
 
 void Robot::DisabledInit() {
@@ -87,4 +81,4 @@ void Robot::Log() {
 	SmartDashboard::PutNumber("Right Distance", drivetrain->GetRightEncoder()->GetDistance());
 }
 
-START_ROBOT_CLASS(Robot);
+START_ROBOT_CLASS(Robot)

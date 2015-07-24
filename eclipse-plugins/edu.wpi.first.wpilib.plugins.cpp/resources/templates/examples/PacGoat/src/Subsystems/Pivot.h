@@ -19,10 +19,10 @@ public:
 
 private:
 	// Subsystem devices
-	DigitalInput* upperLimitSwitch;
-	DigitalInput* lowerLimitSwitch;
-	Potentiometer* pot;
-	SpeedController* motor;
+  std::shared_ptr<DigitalInput> upperLimitSwitch;
+  std::shared_ptr<DigitalInput> lowerLimitSwitch;
+  std::shared_ptr<Potentiometer> pot;
+  std::shared_ptr<SpeedController> motor;
 
 public:
 	Pivot();
@@ -35,7 +35,7 @@ public:
 	/**
 	 * @return The angle read in by the potentiometer
 	 */
-	double ReturnPIDInput();
+	double ReturnPIDInput() const;
 
 	/**
 	 * Set the motor speed based off of the PID output

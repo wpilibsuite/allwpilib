@@ -1,14 +1,14 @@
 #include "Pneumatics.h"
 
 Pneumatics::Pneumatics() :
-		Subsystem("Pneumatics")
+		Subsystem("Pneumatics"),
+		pressureSensor(new AnalogInput(3))
 {
-	pressureSensor = new AnalogInput(3);
 	#ifdef REAL
 		compressor = new Compressor(uint8_t(1)); // TODO: (1, 14, 1, 8);
 	#endif
 
-	LiveWindow::GetInstance()->AddSensor("Pneumatics", "Pressure Sensor", pressureSensor);
+	LiveWindow::GetInstance().AddSensor("Pneumatics", "Pressure Sensor", pressureSensor);
 }
 
 /**

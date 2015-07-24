@@ -35,7 +35,7 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
   virtual double PIDGet() const;
 
  protected:
-  PIDController *GetPIDController() const;
+  std::shared_ptr<PIDController> GetPIDController() const;
   virtual void _Initialize();
   virtual void _Interrupted();
   virtual void _End();
@@ -48,7 +48,7 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
 
  private:
   /** The internal {@link PIDController} */
-  std::unique_ptr<PIDController> m_controller;
+  std::shared_ptr<PIDController> m_controller;
 
  public:
   virtual void InitTable(std::shared_ptr<ITable> table);

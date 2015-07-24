@@ -12,7 +12,7 @@
 class Pneumatics: public Subsystem
 {
 private:
-	AnalogInput* pressureSensor;
+  std::shared_ptr<AnalogInput> pressureSensor;
 	#ifdef REAL
 		Compressor* compressor;
 	#endif

@@ -15,12 +15,12 @@
 class CommandBase: public Command
 {
 public:
-	CommandBase(char const *name);
+	CommandBase(const std::string &name);
 	CommandBase();
 	static void init();
 	// Create a single static instance of all of your subsystems
-	static ExampleSubsystem *examplesubsystem;
-	static OI *oi;
+	static std::unique_ptr<ExampleSubsystem> examplesubsystem;
+	static std::unique_ptr<OI> oi;
 };
 
 #endif

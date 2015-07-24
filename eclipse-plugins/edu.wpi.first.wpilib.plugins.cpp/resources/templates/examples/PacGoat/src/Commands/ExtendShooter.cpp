@@ -3,7 +3,7 @@
 #include "Robot.h"
 
 ExtendShooter::ExtendShooter() {
-	Requires(Robot::shooter);
+	Requires(Robot::shooter.get());
 	SetTimeout(1);
 }
 

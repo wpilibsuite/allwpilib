@@ -25,5 +25,5 @@ public:
 	}
 };
 
-START_ROBOT_CLASS(QuickVisionRobot);
+START_ROBOT_CLASS(QuickVisionRobot)
 

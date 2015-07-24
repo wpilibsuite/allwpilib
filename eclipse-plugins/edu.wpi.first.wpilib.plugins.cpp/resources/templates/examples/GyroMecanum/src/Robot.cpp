@@ -9,9 +9,9 @@
  * this system. Use IterativeRobot or Command-Based instead if you're new.
  */
 class Robot: public SampleRobot {
-	Joystick *joystick;
-	RobotDrive *myRobot;
-	Gyro *gyro;
+	Joystick joystick;
+	RobotDrive myRobot;
+	Gyro gyro;
 
 	//channels for motors
 	const int leftMotorChannel = 1;
@@ -27,17 +27,14 @@ class Robot: public SampleRobot {
 
 public:
 	Robot() :
-			SampleRobot() {
-		//make objects for drive train, joystick, and gyro
-		joystick = new Joystick(0);
-		myRobot = new RobotDrive(new CANTalon(leftMotorChannel),
-				new CANTalon(leftRearMotorChannel),
-				new CANTalon(rightMotorChannel),
-				new CANTalon(rightRearMotorChannel));
-		myRobot->SetInvertedMotor(RobotDrive::kFrontLeftMotor, true);// invert the left side motors
-		myRobot->SetInvertedMotor(RobotDrive::kRearLeftMotor, true);// you may need to change or remove this to match your robot
-
-		gyro = new Gyro(gyroChannel);
+			joystick(0),
+			// Create the robot using CANTalons; change as appropriate for different
+			// motors (eg, Victor, Jaguar, Talon, CANJaguar, etc.).
+			myRobot(new CANTalon(leftMotorChannel), new CANTalon(leftRearMotorChannel),
+			        new CANTalon(rightMotorChannel), new CANTalon(rightRearMotorChannel)),
+			gyro(gyroChannel) {
+		myRobot.SetInvertedMotor(RobotDrive::kFrontLeftMotor, true);// invert the left side motors
+		myRobot.SetInvertedMotor(RobotDrive::kRearLeftMotor, true);// you may need to change or remove this to match your robot
 	}
 
 	/**
@@ -51,10 +48,10 @@ public:
 	 * Runs the motors with arcade steering.
 	 */
 	void OperatorControl() {
-		gyro->SetSensitivity(voltsPerDegreePerSecond); //calibrate gyro to have the value equal to degrees
+		gyro.SetSensitivity(voltsPerDegreePerSecond); //calibrate gyro to have the value equal to degrees
 		while (IsOperatorControl() && IsEnabled()) {
-			myRobot->MecanumDrive_Cartesian(joystick->GetX(), joystick->GetY(),
-					joystick->GetZ(), gyro->GetAngle());
+			myRobot.MecanumDrive_Cartesian(joystick.GetX(), joystick.GetY(),
+					joystick.GetZ(), gyro.GetAngle());
 			Wait(0.005);	// wait 5ms to avoid hogging CPU cycles
 		}
 	}
@@ -67,4 +64,4 @@ public:
 	}
 };
 
-START_ROBOT_CLASS(Robot);
+START_ROBOT_CLASS(Robot)

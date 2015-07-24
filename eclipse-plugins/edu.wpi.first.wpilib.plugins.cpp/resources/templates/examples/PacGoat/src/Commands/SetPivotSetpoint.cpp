@@ -4,7 +4,7 @@
 
 SetPivotSetpoint::SetPivotSetpoint(double setpoint) {
 	this->setpoint = setpoint;
-	Requires(Robot::pivot);
+	Requires(Robot::pivot.get());
 }
 
 // Called just before this Command runs the first time
