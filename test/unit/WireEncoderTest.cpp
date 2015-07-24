@@ -105,7 +105,7 @@ TEST_F(WireEncoderTest, Write32) {
   WireEncoder e(0x0300u);
   for(std::size_t i=0; i<off; ++i) e.Write8(0u);  // test across Reserve()
   e.Write32(5ul);
-  e.Write32(0x100000001ul);  // should be truncated (possibly by compiler)
+  e.Write32(1ul);
   e.Write32(0xabcdul);
   e.Write32(0x12345678ul);
   e.Write32(0ul);
