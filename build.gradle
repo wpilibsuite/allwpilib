@@ -2,13 +2,13 @@ apply plugin: 'cpp'
 
 model {
     components {
-        NetworkTables(NativeLibrarySpec) {
+        ntcore(NativeLibrarySpec) {
             targetPlatform 'arm'
             sources {
                 cpp {
                     source {
                         srcDirs = ["src"]
-                        includes = ["**/*.c"]
+                        includes = ["**/*.cpp"]
                     }
                     exportedHeaders {
                         srcDirs = ["include"]
