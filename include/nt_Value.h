@@ -37,6 +37,18 @@ class Value {
   unsigned long long last_change() const { return m_val.last_change; }
 
   /*
+   * Type Checkers
+   */
+  bool IsBoolean() const { return m_val.type == NT_BOOLEAN; }
+  bool IsDouble() const { return m_val.type == NT_DOUBLE; }
+  bool IsString() const { return m_val.type == NT_STRING; }
+  bool IsRaw() const { return m_val.type == NT_RAW; }
+  bool IsRpc() const { return m_val.type == NT_RPC; }
+  bool IsBooleanArray() const { return m_val.type == NT_BOOLEAN_ARRAY; }
+  bool IsDoubleArray() const { return m_val.type == NT_DOUBLE_ARRAY; }
+  bool IsStringArray() const { return m_val.type == NT_STRING_ARRAY; }
+
+  /*
    * Type-Safe Getters
    */
   bool GetBoolean() const {
