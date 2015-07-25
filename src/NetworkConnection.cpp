@@ -56,9 +56,9 @@ void NetworkConnection::ReadThreadMain() {
       if (m_stream) m_stream->close();
       break;
     }
-    m_incoming.push(msg);
+    m_incoming.emplace(std::move(msg));
   }
-  m_incoming.push(nullptr);  // notify anyone waiting that we disconnected
+  m_incoming.emplace(nullptr);  // notify anyone waiting that we disconnected
   m_active = false;
 }
 
