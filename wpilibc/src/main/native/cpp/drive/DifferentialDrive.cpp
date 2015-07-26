@@ -79,7 +79,7 @@ void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,
   m_rightMotor.Set(Limit(rightMotorOutput) * m_maxOutput *
                    m_rightSideInvertMultiplier);
 
-  m_safetyHelper.Feed();
+  Feed();
 }
 
 void DifferentialDrive::CurvatureDrive(double xSpeed, double zRotation,
@@ -152,7 +152,7 @@ void DifferentialDrive::CurvatureDrive(double xSpeed, double zRotation,
   m_rightMotor.Set(rightMotorOutput * m_maxOutput *
                    m_rightSideInvertMultiplier);
 
-  m_safetyHelper.Feed();
+  Feed();
 }
 
 void DifferentialDrive::TankDrive(double leftSpeed, double rightSpeed,
@@ -180,7 +180,7 @@ void DifferentialDrive::TankDrive(double leftSpeed, double rightSpeed,
   m_leftMotor.Set(leftSpeed * m_maxOutput);
   m_rightMotor.Set(rightSpeed * m_maxOutput * m_rightSideInvertMultiplier);
 
-  m_safetyHelper.Feed();
+  Feed();
 }
 
 void DifferentialDrive::SetQuickStopThreshold(double threshold) {
@@ -202,7 +202,7 @@ void DifferentialDrive::SetRightSideInverted(bool rightSideInverted) {
 void DifferentialDrive::StopMotor() {
   m_leftMotor.StopMotor();
   m_rightMotor.StopMotor();
-  m_safetyHelper.Feed();
+  Feed();
 }
 
 void DifferentialDrive::GetDescription(wpi::raw_ostream& desc) const {

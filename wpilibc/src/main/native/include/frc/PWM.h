@@ -10,8 +10,9 @@
 #include <stdint.h>
 
 #include <hal/Types.h>
+#include <wpi/raw_ostream.h>
 
-#include "frc/ErrorBase.h"
+#include "frc/MotorSafety.h"
 #include "frc/smartdashboard/SendableBase.h"
 
 namespace frc {
@@ -33,7 +34,7 @@ namespace frc {
  *   - 1 = minimum pulse width (currently .5ms)
  *   - 0 = disabled (i.e. PWM output is held low)
  */
-class PWM : public ErrorBase, public SendableBase {
+class PWM : public MotorSafety, public SendableBase {
  public:
   /**
    * Represents the amount to multiply the minimum servo-pulse pwm period by.
@@ -74,6 +75,10 @@ class PWM : public ErrorBase, public SendableBase {
 
   PWM(PWM&& rhs);
   PWM& operator=(PWM&& rhs);
+
+  // MotorSafety interface
+  void StopMotor() override;
+  void GetDescription(wpi::raw_ostream& desc) const override;
 
   /**
    * Set the PWM value directly to the hardware.

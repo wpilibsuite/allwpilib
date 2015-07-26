@@ -1127,7 +1127,7 @@ public class DriverStation {
 
       safetyCounter++;
       if (safetyCounter >= 4) {
-        MotorSafetyHelper.checkMotors();
+        MotorSafety.checkMotors();
         safetyCounter = 0;
       }
       if (m_userInDisabled) {

@@ -298,7 +298,7 @@ void RobotDrive::MecanumDrive_Cartesian(double x, double y, double rotation,
   m_rearLeftMotor->Set(wheelSpeeds[kRearLeftMotor] * m_maxOutput);
   m_rearRightMotor->Set(wheelSpeeds[kRearRightMotor] * m_maxOutput);
 
-  m_safetyHelper->Feed();
+  Feed();
 }
 
 void RobotDrive::MecanumDrive_Polar(double magnitude, double direction,
@@ -330,7 +330,7 @@ void RobotDrive::MecanumDrive_Polar(double magnitude, double direction,
   m_rearLeftMotor->Set(wheelSpeeds[kRearLeftMotor] * m_maxOutput);
   m_rearRightMotor->Set(wheelSpeeds[kRearRightMotor] * m_maxOutput);
 
-  m_safetyHelper->Feed();
+  Feed();
 }
 
 void RobotDrive::HolonomicDrive(double magnitude, double direction,
@@ -350,7 +350,7 @@ void RobotDrive::SetLeftRightMotorOutputs(double leftOutput,
     m_frontRightMotor->Set(-Limit(rightOutput) * m_maxOutput);
   m_rearRightMotor->Set(-Limit(rightOutput) * m_maxOutput);
 
-  m_safetyHelper->Feed();
+  Feed();
 }
 
 void RobotDrive::SetInvertedMotor(MotorType motor, bool isInverted) {
@@ -380,40 +380,19 @@ void RobotDrive::SetSensitivity(double sensitivity) {
 
 void RobotDrive::SetMaxOutput(double maxOutput) { m_maxOutput = maxOutput; }
 
-void RobotDrive::SetExpiration(double timeout) {
-  m_safetyHelper->SetExpiration(timeout);
+void RobotDrive::GetDescription(wpi::raw_ostream& desc) const {
+  desc << "RobotDrive";
 }
-
-double RobotDrive::GetExpiration() const {
-  return m_safetyHelper->GetExpiration();
-}
-
-bool RobotDrive::IsAlive() const { return m_safetyHelper->IsAlive(); }
 
 void RobotDrive::StopMotor() {
   if (m_frontLeftMotor != nullptr) m_frontLeftMotor->StopMotor();
   if (m_frontRightMotor != nullptr) m_frontRightMotor->StopMotor();
   if (m_rearLeftMotor != nullptr) m_rearLeftMotor->StopMotor();
   if (m_rearRightMotor != nullptr) m_rearRightMotor->StopMotor();
-  m_safetyHelper->Feed();
+  Feed();
 }
 
-bool RobotDrive::IsSafetyEnabled() const {
-  return m_safetyHelper->IsSafetyEnabled();
-}
-
-void RobotDrive::SetSafetyEnabled(bool enabled) {
-  m_safetyHelper->SetSafetyEnabled(enabled);
-}
-
-void RobotDrive::GetDescription(wpi::raw_ostream& desc) const {
-  desc << "RobotDrive";
-}
-
-void RobotDrive::InitRobotDrive() {
-  m_safetyHelper = std::make_unique<MotorSafetyHelper>(this);
-  m_safetyHelper->SetSafetyEnabled(true);
-}
+void RobotDrive::InitRobotDrive() { SetSafetyEnabled(true); }
 
 double RobotDrive::Limit(double number) {
   if (number > 1.0) {

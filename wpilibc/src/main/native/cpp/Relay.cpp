@@ -14,7 +14,6 @@
 #include <hal/Relay.h>
 #include <wpi/raw_ostream.h>
 
-#include "frc/MotorSafetyHelper.h"
 #include "frc/SensorUtil.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
@@ -77,9 +76,6 @@ Relay::Relay(int channel, Relay::Direction direction)
     }
   }
 
-  m_safetyHelper = std::make_unique<MotorSafetyHelper>(this);
-  m_safetyHelper->SetSafetyEnabled(false);
-
   SetName("Relay", m_channel);
 }
 
@@ -94,25 +90,21 @@ Relay::~Relay() {
 
 Relay::Relay(Relay&& rhs)
     : MotorSafety(std::move(rhs)),
-      ErrorBase(std::move(rhs)),
       SendableBase(std::move(rhs)),
       m_channel(std::move(rhs.m_channel)),
-      m_direction(std::move(rhs.m_direction)),
-      m_safetyHelper(std::move(rhs.m_safetyHelper)) {
+      m_direction(std::move(rhs.m_direction)) {
   std::swap(m_forwardHandle, rhs.m_forwardHandle);
   std::swap(m_reverseHandle, rhs.m_reverseHandle);
 }
 
 Relay& Relay::operator=(Relay&& rhs) {
   MotorSafety::operator=(std::move(rhs));
-  ErrorBase::operator=(std::move(rhs));
   SendableBase::operator=(std::move(rhs));
 
   m_channel = std::move(rhs.m_channel);
   m_direction = std::move(rhs.m_direction);
   std::swap(m_forwardHandle, rhs.m_forwardHandle);
   std::swap(m_reverseHandle, rhs.m_reverseHandle);
-  m_safetyHelper = std::move(rhs.m_safetyHelper);
 
   return *this;
 }
@@ -204,23 +196,7 @@ Relay::Value Relay::Get() const {
 
 int Relay::GetChannel() const { return m_channel; }
 
-void Relay::SetExpiration(double timeout) {
-  m_safetyHelper->SetExpiration(timeout);
-}
-
-double Relay::GetExpiration() const { return m_safetyHelper->GetExpiration(); }
-
-bool Relay::IsAlive() const { return m_safetyHelper->IsAlive(); }
-
 void Relay::StopMotor() { Set(kOff); }
-
-void Relay::SetSafetyEnabled(bool enabled) {
-  m_safetyHelper->SetSafetyEnabled(enabled);
-}
-
-bool Relay::IsSafetyEnabled() const {
-  return m_safetyHelper->IsSafetyEnabled();
-}
 
 void Relay::GetDescription(wpi::raw_ostream& desc) const {
   desc << "Relay " << GetChannel();

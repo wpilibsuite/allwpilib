@@ -5,58 +5,80 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "frc/MotorSafetyHelper.h"
+#include "frc/MotorSafety.h"
+
+#include <algorithm>
+#include <utility>
 
 #include <wpi/SmallPtrSet.h>
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
 #include "frc/DriverStation.h"
-#include "frc/MotorSafety.h"
-#include "frc/Timer.h"
 #include "frc/WPIErrors.h"
 
 using namespace frc;
 
-static wpi::SmallPtrSet<MotorSafetyHelper*, 32> helperList;
+static wpi::SmallPtrSet<MotorSafety*, 32> instanceList;
 static wpi::mutex listMutex;
 
-MotorSafetyHelper::MotorSafetyHelper(MotorSafety* safeObject)
-    : m_safeObject(safeObject) {
-  m_enabled = false;
-  m_expiration = DEFAULT_SAFETY_EXPIRATION;
-  m_stopTime = Timer::GetFPGATimestamp();
-
+MotorSafety::MotorSafety() {
   std::lock_guard<wpi::mutex> lock(listMutex);
-  helperList.insert(this);
+  instanceList.insert(this);
 }
 
-MotorSafetyHelper::~MotorSafetyHelper() {
+MotorSafety::~MotorSafety() {
   std::lock_guard<wpi::mutex> lock(listMutex);
-  helperList.erase(this);
+  instanceList.erase(this);
 }
 
-void MotorSafetyHelper::Feed() {
+MotorSafety::MotorSafety(MotorSafety&& rhs)
+    : ErrorBase(std::move(rhs)),
+      m_expiration(std::move(rhs.m_expiration)),
+      m_enabled(std::move(rhs.m_enabled)),
+      m_stopTime(std::move(rhs.m_stopTime)) {}
+
+MotorSafety& MotorSafety::operator=(MotorSafety&& rhs) {
+  ErrorBase::operator=(std::move(rhs));
+
+  m_expiration = std::move(rhs.m_expiration);
+  m_enabled = std::move(rhs.m_enabled);
+  m_stopTime = std::move(rhs.m_stopTime);
+
+  return *this;
+}
+
+void MotorSafety::Feed() {
   std::lock_guard<wpi::mutex> lock(m_thisMutex);
   m_stopTime = Timer::GetFPGATimestamp() + m_expiration;
 }
 
-void MotorSafetyHelper::SetExpiration(double expirationTime) {
+void MotorSafety::SetExpiration(double expirationTime) {
   std::lock_guard<wpi::mutex> lock(m_thisMutex);
   m_expiration = expirationTime;
 }
 
-double MotorSafetyHelper::GetExpiration() const {
+double MotorSafety::GetExpiration() const {
   std::lock_guard<wpi::mutex> lock(m_thisMutex);
   return m_expiration;
 }
 
-bool MotorSafetyHelper::IsAlive() const {
+bool MotorSafety::IsAlive() const {
   std::lock_guard<wpi::mutex> lock(m_thisMutex);
   return !m_enabled || m_stopTime > Timer::GetFPGATimestamp();
 }
 
-void MotorSafetyHelper::Check() {
+void MotorSafety::SetSafetyEnabled(bool enabled) {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_enabled = enabled;
+}
+
+bool MotorSafety::IsSafetyEnabled() const {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  return m_enabled;
+}
+
+void MotorSafety::Check() {
   bool enabled;
   double stopTime;
 
@@ -67,31 +89,24 @@ void MotorSafetyHelper::Check() {
   }
 
   DriverStation& ds = DriverStation::GetInstance();
-  if (!enabled || ds.IsDisabled() || ds.IsTest()) return;
+  if (!enabled || ds.IsDisabled() || ds.IsTest()) {
+    return;
+  }
 
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
   if (stopTime < Timer::GetFPGATimestamp()) {
     wpi::SmallString<128> buf;
     wpi::raw_svector_ostream desc(buf);
-    m_safeObject->GetDescription(desc);
+    GetDescription(desc);
     desc << "... Output not updated often enough.";
     wpi_setWPIErrorWithContext(Timeout, desc.str());
-    m_safeObject->StopMotor();
+    StopMotor();
   }
 }
 
-void MotorSafetyHelper::SetSafetyEnabled(bool enabled) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  m_enabled = enabled;
-}
-
-bool MotorSafetyHelper::IsSafetyEnabled() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  return m_enabled;
-}
-
-void MotorSafetyHelper::CheckMotors() {
+void MotorSafety::CheckMotors() {
   std::lock_guard<wpi::mutex> lock(listMutex);
-  for (auto elem : helperList) {
+  for (auto elem : instanceList) {
     elem->Check();
   }
 }

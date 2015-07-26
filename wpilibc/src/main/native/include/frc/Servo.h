@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "frc/SafePWM.h"
+#include "frc/PWM.h"
 #include "frc/SpeedController.h"
 
 namespace frc {
@@ -18,7 +18,7 @@ namespace frc {
  * The range parameters default to the appropriate values for the Hitec HS-322HD
  * servo provided in the FIRST Kit of Parts in 2008.
  */
-class Servo : public SafePWM {
+class Servo : public PWM {
  public:
   /**
    * @param channel The PWM channel to which the servo is attached. 0-9 are

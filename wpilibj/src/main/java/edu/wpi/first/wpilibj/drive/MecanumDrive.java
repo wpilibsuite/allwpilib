@@ -148,7 +148,7 @@ public class MecanumDrive extends RobotDriveBase {
     m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight.value] * m_maxOutput
         * m_rightSideInvertMultiplier);
 
-    m_safetyHelper.feed();
+    feed();
   }
 
   /**
@@ -197,7 +197,7 @@ public class MecanumDrive extends RobotDriveBase {
     m_frontRightMotor.stopMotor();
     m_rearLeftMotor.stopMotor();
     m_rearRightMotor.stopMotor();
-    m_safetyHelper.feed();
+    feed();
   }
 
   @Override

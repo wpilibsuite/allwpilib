@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 /**
  * Common base class for all PWM Speed Controllers.
  */
-public abstract class PWMSpeedController extends SafePWM implements SpeedController {
+public abstract class PWMSpeedController extends PWM implements SpeedController {
   private boolean m_isInverted;
 
   /**
@@ -62,6 +62,11 @@ public abstract class PWMSpeedController extends SafePWM implements SpeedControl
   @Override
   public boolean getInverted() {
     return m_isInverted;
+  }
+
+  @Override
+  public void disable() {
+    setDisabled();
   }
 
   /**

@@ -19,7 +19,7 @@
 #include <wpi/StringRef.h>
 
 #include "frc/AnalogInput.h"
-#include "frc/MotorSafetyHelper.h"
+#include "frc/MotorSafety.h"
 #include "frc/Timer.h"
 #include "frc/Utility.h"
 #include "frc/WPIErrors.h"
@@ -557,7 +557,7 @@ void DriverStation::Run() {
     if (IsDisabled()) safetyCounter = 0;
 
     if (++safetyCounter >= 4) {
-      MotorSafetyHelper::CheckMotors();
+      MotorSafety::CheckMotors();
       safetyCounter = 0;
     }
     if (m_userInDisabled) HAL_ObserveUserProgramDisabled();

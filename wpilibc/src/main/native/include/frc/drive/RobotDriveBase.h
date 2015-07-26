@@ -13,7 +13,6 @@
 #include <wpi/raw_ostream.h>
 
 #include "frc/MotorSafety.h"
-#include "frc/MotorSafetyHelper.h"
 #include "frc/smartdashboard/SendableBase.h"
 
 namespace frc {
@@ -72,12 +71,7 @@ class RobotDriveBase : public MotorSafety, public SendableBase {
    */
   void FeedWatchdog();
 
-  void SetExpiration(double timeout) override;
-  double GetExpiration() const override;
-  bool IsAlive() const override;
   void StopMotor() override = 0;
-  bool IsSafetyEnabled() const override;
-  void SetSafetyEnabled(bool enabled) override;
   void GetDescription(wpi::raw_ostream& desc) const override = 0;
 
  protected:
@@ -103,7 +97,6 @@ class RobotDriveBase : public MotorSafety, public SendableBase {
 
   double m_deadband = 0.02;
   double m_maxOutput = 1.0;
-  MotorSafetyHelper m_safetyHelper{this};
 };
 
 }  // namespace frc

@@ -18,31 +18,13 @@
 
 using namespace frc;
 
-RobotDriveBase::RobotDriveBase() { m_safetyHelper.SetSafetyEnabled(true); }
+RobotDriveBase::RobotDriveBase() { SetSafetyEnabled(true); }
 
 void RobotDriveBase::SetDeadband(double deadband) { m_deadband = deadband; }
 
 void RobotDriveBase::SetMaxOutput(double maxOutput) { m_maxOutput = maxOutput; }
 
-void RobotDriveBase::FeedWatchdog() { m_safetyHelper.Feed(); }
-
-void RobotDriveBase::SetExpiration(double timeout) {
-  m_safetyHelper.SetExpiration(timeout);
-}
-
-double RobotDriveBase::GetExpiration() const {
-  return m_safetyHelper.GetExpiration();
-}
-
-bool RobotDriveBase::IsAlive() const { return m_safetyHelper.IsAlive(); }
-
-bool RobotDriveBase::IsSafetyEnabled() const {
-  return m_safetyHelper.IsSafetyEnabled();
-}
-
-void RobotDriveBase::SetSafetyEnabled(bool enabled) {
-  m_safetyHelper.SetSafetyEnabled(enabled);
-}
+void RobotDriveBase::FeedWatchdog() { Feed(); }
 
 double RobotDriveBase::Limit(double value) {
   if (value > 1.0) {

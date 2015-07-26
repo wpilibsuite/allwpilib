@@ -14,7 +14,6 @@
 
 #include "frc/ErrorBase.h"
 #include "frc/MotorSafety.h"
-#include "frc/MotorSafetyHelper.h"
 
 namespace frc {
 
@@ -32,7 +31,7 @@ class GenericHID;
  * function (intended for hand created drive code, such as autonomous) or with
  * the Tank/Arcade functions intended to be used for Operator Control driving.
  */
-class RobotDrive : public MotorSafety, public ErrorBase {
+class RobotDrive : public MotorSafety {
  public:
   enum MotorType {
     kFrontLeftMotor = 0,
@@ -401,12 +400,7 @@ class RobotDrive : public MotorSafety, public ErrorBase {
    */
   void SetMaxOutput(double maxOutput);
 
-  void SetExpiration(double timeout) override;
-  double GetExpiration() const override;
-  bool IsAlive() const override;
   void StopMotor() override;
-  bool IsSafetyEnabled() const override;
-  void SetSafetyEnabled(bool enabled) override;
   void GetDescription(wpi::raw_ostream& desc) const override;
 
  protected:
@@ -444,7 +438,6 @@ class RobotDrive : public MotorSafety, public ErrorBase {
   std::shared_ptr<SpeedController> m_frontRightMotor;
   std::shared_ptr<SpeedController> m_rearLeftMotor;
   std::shared_ptr<SpeedController> m_rearRightMotor;
-  std::unique_ptr<MotorSafetyHelper> m_safetyHelper;
 
  private:
   int GetNumMotors() {

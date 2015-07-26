@@ -8,19 +8,21 @@
 package edu.wpi.first.wpilibj.drive;
 
 import edu.wpi.first.wpilibj.MotorSafety;
-import edu.wpi.first.wpilibj.MotorSafetyHelper;
-import edu.wpi.first.wpilibj.SendableBase;
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
  * Common base class for drive platforms.
  */
-public abstract class RobotDriveBase extends SendableBase implements MotorSafety {
+public abstract class RobotDriveBase extends MotorSafety implements Sendable, AutoCloseable {
   public static final double kDefaultDeadband = 0.02;
   public static final double kDefaultMaxOutput = 1.0;
 
   protected double m_deadband = kDefaultDeadband;
   protected double m_maxOutput = kDefaultMaxOutput;
-  protected MotorSafetyHelper m_safetyHelper = new MotorSafetyHelper(this);
+
+  private String m_name = "";
+  private String m_subsystem = "Ungrouped";
 
   /**
    * The location of a motor on the robot for the purpose of driving.
@@ -37,9 +39,69 @@ public abstract class RobotDriveBase extends SendableBase implements MotorSafety
     }
   }
 
+  /**
+   * RobotDriveBase constructor.
+   */
   public RobotDriveBase() {
-    m_safetyHelper.setSafetyEnabled(true);
+    LiveWindow.add(this);
+
+    setSafetyEnabled(true);
     setName("RobotDriveBase");
+  }
+
+  @Override
+  public void close() {
+    LiveWindow.remove(this);
+  }
+
+  @Override
+  public final synchronized String getName() {
+    return m_name;
+  }
+
+  @Override
+  public final synchronized void setName(String name) {
+    m_name = name;
+  }
+
+  /**
+   * Sets the name of the sensor with a channel number.
+   *
+   * @param moduleType A string that defines the module name in the label for the value
+   * @param channel    The channel number the device is plugged into
+   */
+  protected final void setName(String moduleType, int channel) {
+    setName(moduleType + "[" + channel + "]");
+  }
+
+  /**
+   * Sets the name of the sensor with a module and channel number.
+   *
+   * @param moduleType   A string that defines the module name in the label for the value
+   * @param moduleNumber The number of the particular module type
+   * @param channel      The channel number the device is plugged into (usually PWM)
+   */
+  protected final void setName(String moduleType, int moduleNumber, int channel) {
+    setName(moduleType + "[" + moduleNumber + "," + channel + "]");
+  }
+
+  @Override
+  public final synchronized String getSubsystem() {
+    return m_subsystem;
+  }
+
+  @Override
+  public final synchronized void setSubsystem(String subsystem) {
+    m_subsystem = subsystem;
+  }
+
+  /**
+   * Add a child component.
+   *
+   * @param child child component
+   */
+  protected final void addChild(Object child) {
+    LiveWindow.addChild(this, child);
   }
 
   /**
@@ -70,39 +132,14 @@ public abstract class RobotDriveBase extends SendableBase implements MotorSafety
   /**
    * Feed the motor safety object. Resets the timer that will stop the motors if it completes.
    *
-   * @see MotorSafetyHelper#feed()
+   * @see MotorSafety#feed()
    */
   public void feedWatchdog() {
-    m_safetyHelper.feed();
-  }
-
-  @Override
-  public void setExpiration(double timeout) {
-    m_safetyHelper.setExpiration(timeout);
-  }
-
-  @Override
-  public double getExpiration() {
-    return m_safetyHelper.getExpiration();
-  }
-
-  @Override
-  public boolean isAlive() {
-    return m_safetyHelper.isAlive();
+    feed();
   }
 
   @Override
   public abstract void stopMotor();
-
-  @Override
-  public boolean isSafetyEnabled() {
-    return m_safetyHelper.isSafetyEnabled();
-  }
-
-  @Override
-  public void setSafetyEnabled(boolean enabled) {
-    m_safetyHelper.setSafetyEnabled(enabled);
-  }
 
   @Override
   public abstract String getDescription();
