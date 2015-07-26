@@ -7,8 +7,9 @@
 
 #pragma once
 
+#include "ErrorBase.h"
 #include "I2C.h"
-#include "SensorBase.h"
+#include "SmartDashboard/SendableBase.h"
 #include "interfaces/Accelerometer.h"
 
 namespace frc {
@@ -20,7 +21,9 @@ namespace frc {
  * an I2C bus. This class assumes the default (not alternate) sensor address of
  * 0x1D (7-bit address).
  */
-class ADXL345_I2C : public SensorBase, public Accelerometer {
+class ADXL345_I2C : public ErrorBase,
+                    public SendableBase,
+                    public Accelerometer {
  public:
   enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
 

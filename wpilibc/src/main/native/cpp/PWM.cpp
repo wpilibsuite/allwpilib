@@ -11,7 +11,7 @@
 #include <HAL/PWM.h>
 #include <HAL/Ports.h>
 
-#include "SensorBase.h"
+#include "SensorUtil.h"
 #include "SmartDashboard/SendableBuilder.h"
 #include "Utility.h"
 #include "WPIErrors.h"
@@ -29,7 +29,7 @@ using namespace frc;
  *                MXP port
  */
 PWM::PWM(int channel) {
-  if (!SensorBase::CheckPWMChannel(channel)) {
+  if (!SensorUtil::CheckPWMChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
                                "PWM Channel " + wpi::Twine(channel));
     return;

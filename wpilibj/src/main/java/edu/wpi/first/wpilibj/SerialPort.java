@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj.hal.SerialPortJNI;
  * .com/pdf/manuals/370423a.pdf and the NI-VISA Programmer's Reference Manual here:
  * http://www.ni.com/pdf/manuals/370132c.pdf
  */
-public class SerialPort {
+public class SerialPort implements AutoCloseable {
   private byte m_port;
 
   public enum Port {
@@ -194,9 +194,7 @@ public class SerialPort {
     this(baudRate, port, 8, Parity.kNone, StopBits.kOne);
   }
 
-  /**
-   * Destructor.
-   */
+  @Override
   public void close() {
     SerialPortJNI.serialClose(m_port);
   }

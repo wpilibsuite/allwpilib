@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.hal.HAL;
  * removing digital inputs from a FPGA glitch filter. The filter lets the user configure the time
  * that an input must remain high or low before it is classified as high or low.
  */
-public class DigitalGlitchFilter extends SensorBase {
+public class DigitalGlitchFilter extends SendableBase {
   /**
    * Configures the Digital Glitch Filter to its default settings.
    */
@@ -40,9 +40,7 @@ public class DigitalGlitchFilter extends SensorBase {
     }
   }
 
-  /**
-   * Free the resources used by this object.
-   */
+  @Override
   public void close() {
     super.close();
     if (m_channelIndex >= 0) {
@@ -144,7 +142,7 @@ public class DigitalGlitchFilter extends SensorBase {
    * @param nanoseconds The number of nanoseconds.
    */
   public void setPeriodNanoSeconds(long nanoseconds) {
-    int fpgaCycles = (int) (nanoseconds * kSystemClockTicksPerMicrosecond / 4
+    int fpgaCycles = (int) (nanoseconds * SensorUtil.kSystemClockTicksPerMicrosecond / 4
         / 1000);
     setPeriodCycles(fpgaCycles);
   }
@@ -169,7 +167,7 @@ public class DigitalGlitchFilter extends SensorBase {
     int fpgaCycles = getPeriodCycles();
 
     return (long) fpgaCycles * 1000L
-        / (long) (kSystemClockTicksPerMicrosecond / 4);
+        / (long) (SensorUtil.kSystemClockTicksPerMicrosecond / 4);
   }
 
   @SuppressWarnings("PMD.UnusedFormalParameter")

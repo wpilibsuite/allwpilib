@@ -12,13 +12,14 @@
 #include <HAL/Types.h>
 
 #include "AnalogTriggerOutput.h"
-#include "SensorBase.h"
+#include "ErrorBase.h"
+#include "SmartDashboard/SendableBase.h"
 
 namespace frc {
 
 class AnalogInput;
 
-class AnalogTrigger : public SensorBase {
+class AnalogTrigger : public ErrorBase, public SendableBase {
   friend class AnalogTriggerOutput;
 
  public:

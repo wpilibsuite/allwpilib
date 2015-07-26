@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * center value - 999 to 2 = linear scaling from "center" to "full reverse" - 1 = minimum pulse
  * width (currently .5ms) - 0 = disabled (i.e. PWM output is held low)
  */
-public class PWM extends SendableBase implements Sendable {
+public class PWM extends SendableBase {
   /**
    * Represents the amount to multiply the minimum servo-pulse pwm period by.
    */
@@ -52,7 +52,7 @@ public class PWM extends SendableBase implements Sendable {
    * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP port
    */
   public PWM(final int channel) {
-    SensorBase.checkPWMChannel(channel);
+    SensorUtil.checkPWMChannel(channel);
     m_channel = channel;
 
     m_handle = PWMJNI.initializePWMPort(HAL.getPort((byte) channel));
@@ -66,9 +66,7 @@ public class PWM extends SendableBase implements Sendable {
   }
 
   /**
-   * Free the PWM channel.
-   *
-   * <p>Free the resource associated with the PWM channel and set the value to 0.
+   * Free the resource associated with the PWM channel and set the value to 0.
    */
   @Override
   public void close() {

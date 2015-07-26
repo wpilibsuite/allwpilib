@@ -186,7 +186,7 @@ void LiveWindow::AddActuator(const wpi::Twine& subsystem,
 
 /**
  * Meant for internal use in other WPILib classes.
- * @deprecated Use SensorBase::SetName() instead.
+ * @deprecated Use SendableBase::SetName() instead.
  */
 void LiveWindow::AddSensor(const wpi::Twine& type, int channel,
                            Sendable* component) {
@@ -197,7 +197,7 @@ void LiveWindow::AddSensor(const wpi::Twine& type, int channel,
 
 /**
  * Meant for internal use in other WPILib classes.
- * @deprecated Use SensorBase::SetName() instead.
+ * @deprecated Use SendableBase::SetName() instead.
  */
 void LiveWindow::AddActuator(const wpi::Twine& type, int channel,
                              Sendable* component) {
@@ -208,7 +208,7 @@ void LiveWindow::AddActuator(const wpi::Twine& type, int channel,
 
 /**
  * Meant for internal use in other WPILib classes.
- * @deprecated Use SensorBase::SetName() instead.
+ * @deprecated Use SendableBase::SetName() instead.
  */
 void LiveWindow::AddActuator(const wpi::Twine& type, int module, int channel,
                              Sendable* component) {

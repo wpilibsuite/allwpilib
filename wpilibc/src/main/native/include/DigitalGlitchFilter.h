@@ -14,7 +14,8 @@
 #include <wpi/mutex.h>
 
 #include "DigitalSource.h"
-#include "SensorBase.h"
+#include "ErrorBase.h"
+#include "SmartDashboard/SendableBase.h"
 
 namespace frc {
 
@@ -28,7 +29,7 @@ class Counter;
  * filter. The filter lets the user configure the time that an input must remain
  * high or low before it is classified as high or low.
  */
-class DigitalGlitchFilter : public SensorBase {
+class DigitalGlitchFilter : public ErrorBase, public SendableBase {
  public:
   DigitalGlitchFilter();
   ~DigitalGlitchFilter() override;

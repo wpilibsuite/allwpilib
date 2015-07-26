@@ -10,11 +10,12 @@
 #include <HAL/Interrupts.h>
 
 #include "AnalogTriggerType.h"
-#include "SensorBase.h"
+#include "ErrorBase.h"
+#include "SmartDashboard/SendableBase.h"
 
 namespace frc {
 
-class InterruptableSensorBase : public SensorBase {
+class InterruptableSensorBase : public ErrorBase, public SendableBase {
  public:
   enum WaitResult {
     kTimeout = 0x0,

@@ -74,7 +74,7 @@
 #include "SD540.h"
 #include "SPI.h"
 #include "SampleRobot.h"
-#include "SensorBase.h"
+#include "SensorUtil.h"
 #include "SerialPort.h"
 #include "Servo.h"
 #include "SmartDashboard/SendableChooser.h"

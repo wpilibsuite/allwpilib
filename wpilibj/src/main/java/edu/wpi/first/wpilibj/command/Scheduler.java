@@ -13,7 +13,6 @@ import java.util.Vector;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.HLUsageReporting;
-import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -30,7 +29,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  *
  * @see Command
  */
-public class Scheduler extends SendableBase implements Sendable {
+public class Scheduler extends SendableBase {
   /**
    * The Singleton Instance.
    */

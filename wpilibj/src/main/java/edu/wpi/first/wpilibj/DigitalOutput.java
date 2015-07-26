@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * Class to write digital outputs. This class will write digital outputs. Other devices that are
  * implemented elsewhere will automatically allocate digital inputs and outputs as required.
  */
-public class DigitalOutput extends SendableBase implements Sendable {
+public class DigitalOutput extends SendableBase {
   private static final int invalidPwmGenerator = 0;
   private int m_pwmGenerator = invalidPwmGenerator;
 
@@ -31,7 +31,7 @@ public class DigitalOutput extends SendableBase implements Sendable {
    *                the MXP
    */
   public DigitalOutput(int channel) {
-    SensorBase.checkDigitalChannel(channel);
+    SensorUtil.checkDigitalChannel(channel);
     m_channel = channel;
 
     m_handle = DIOJNI.initializeDIOPort(HAL.getPort((byte) channel), false);
@@ -40,13 +40,10 @@ public class DigitalOutput extends SendableBase implements Sendable {
     setName("DigitalOutput", channel);
   }
 
-  /**
-   * Free the resources associated with a digital output.
-   */
   @Override
   public void close() {
     super.close();
-    // disable the pwm only if we have allocated it
+    // Disable the pwm only if we have allocated it
     if (m_pwmGenerator != invalidPwmGenerator) {
       disablePWM();
     }
@@ -143,7 +140,7 @@ public class DigitalOutput extends SendableBase implements Sendable {
       return;
     }
     // Disable the output by routing to a dead bit.
-    DIOJNI.setDigitalPWMOutputChannel(m_pwmGenerator, SensorBase.kDigitalChannels);
+    DIOJNI.setDigitalPWMOutputChannel(m_pwmGenerator, SensorUtil.kDigitalChannels);
     DIOJNI.freeDigitalPWM(m_pwmGenerator);
     m_pwmGenerator = invalidPwmGenerator;
   }

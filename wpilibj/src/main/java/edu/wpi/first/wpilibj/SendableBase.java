@@ -40,9 +40,6 @@ public abstract class SendableBase implements Sendable, AutoCloseable {
     close();
   }
 
-  /**
-   * Free the resources used by this object.
-   */
   @Override
   public void close() {
     LiveWindow.remove(this);

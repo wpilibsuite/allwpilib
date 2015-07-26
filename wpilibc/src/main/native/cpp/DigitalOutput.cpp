@@ -13,7 +13,7 @@
 #include <HAL/HAL.h>
 #include <HAL/Ports.h>
 
-#include "SensorBase.h"
+#include "SensorUtil.h"
 #include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
@@ -29,7 +29,7 @@ using namespace frc;
  */
 DigitalOutput::DigitalOutput(int channel) {
   m_pwmGenerator = HAL_kInvalidHandle;
-  if (!SensorBase::CheckDigitalChannel(channel)) {
+  if (!SensorUtil::CheckDigitalChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
                                "Digital Channel " + wpi::Twine(channel));
     m_channel = std::numeric_limits<int>::max();
@@ -187,7 +187,7 @@ void DigitalOutput::DisablePWM() {
   int32_t status = 0;
 
   // Disable the output by routing to a dead bit.
-  HAL_SetDigitalPWMOutputChannel(m_pwmGenerator, SensorBase::kDigitalChannels,
+  HAL_SetDigitalPWMOutputChannel(m_pwmGenerator, SensorUtil::kDigitalChannels,
                                  &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 

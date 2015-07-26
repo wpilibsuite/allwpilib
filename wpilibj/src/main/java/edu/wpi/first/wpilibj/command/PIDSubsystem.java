@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
-import edu.wpi.first.wpilibj.Sendable;
 
 /**
  * This class is designed to handle the case where there is a {@link Subsystem} which uses a single
@@ -22,7 +21,7 @@ import edu.wpi.first.wpilibj.Sendable;
  * allows access to the internal {@link PIDController} in order to give total control to the
  * programmer.
  */
-public abstract class PIDSubsystem extends Subsystem implements Sendable {
+public abstract class PIDSubsystem extends Subsystem {
   /**
    * The internal {@link PIDController}.
    */

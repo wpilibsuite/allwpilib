@@ -10,8 +10,9 @@
 #include <memory>
 
 #include "AnalogInput.h"
+#include "ErrorBase.h"
 #include "PIDSource.h"
-#include "SensorBase.h"
+#include "SmartDashboard/SendableBase.h"
 
 namespace frc {
 
@@ -22,7 +23,9 @@ namespace frc {
  * sensors have multiple axis and can be treated as multiple devices. Each is
  * calibrated by finding the center value over a period of time.
  */
-class AnalogAccelerometer : public SensorBase, public PIDSource {
+class AnalogAccelerometer : public ErrorBase,
+                            public SendableBase,
+                            public PIDSource {
  public:
   explicit AnalogAccelerometer(int channel);
   explicit AnalogAccelerometer(AnalogInput* channel);

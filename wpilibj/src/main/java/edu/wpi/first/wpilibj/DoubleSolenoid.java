@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * <p>The DoubleSolenoid class is typically used for pneumatics solenoids that have two positions
  * controlled by two separate channels.
  */
-public class DoubleSolenoid extends SolenoidBase implements Sendable {
+public class DoubleSolenoid extends SolenoidBase {
   /**
    * Possible values for a DoubleSolenoid.
    */
@@ -40,7 +40,7 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable {
    * @param reverseChannel The reverse channel number on the PCM (0..7).
    */
   public DoubleSolenoid(final int forwardChannel, final int reverseChannel) {
-    this(SensorBase.getDefaultSolenoidModule(), forwardChannel, reverseChannel);
+    this(SensorUtil.getDefaultSolenoidModule(), forwardChannel, reverseChannel);
   }
 
   /**
@@ -54,9 +54,9 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable {
                         final int reverseChannel) {
     super(moduleNumber);
 
-    SensorBase.checkSolenoidModule(m_moduleNumber);
-    SensorBase.checkSolenoidChannel(forwardChannel);
-    SensorBase.checkSolenoidChannel(reverseChannel);
+    SensorUtil.checkSolenoidModule(m_moduleNumber);
+    SensorUtil.checkSolenoidChannel(forwardChannel);
+    SensorUtil.checkSolenoidChannel(reverseChannel);
 
     int portHandle = HAL.getPortWithModule((byte) m_moduleNumber, (byte) forwardChannel);
     m_forwardHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
@@ -82,9 +82,6 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable {
     setName("DoubleSolenoid", m_moduleNumber, forwardChannel);
   }
 
-  /**
-   * Destructor.
-   */
   @Override
   public synchronized void close() {
     super.close();

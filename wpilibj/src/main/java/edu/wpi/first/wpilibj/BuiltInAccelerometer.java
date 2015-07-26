@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  *
  * <p>This class allows access to the roboRIO's internal accelerometer.
  */
-public class BuiltInAccelerometer extends SensorBase implements Accelerometer, Sendable {
+public class BuiltInAccelerometer extends SendableBase implements Accelerometer {
   /**
    * Constructor.
    *

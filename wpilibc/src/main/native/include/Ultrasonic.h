@@ -13,8 +13,9 @@
 #include <vector>
 
 #include "Counter.h"
+#include "ErrorBase.h"
 #include "PIDSource.h"
-#include "SensorBase.h"
+#include "SmartDashboard/SendableBase.h"
 
 namespace frc {
 
@@ -33,7 +34,7 @@ class DigitalOutput;
  * received. The time that the line is high determines the round trip distance
  * (time of flight).
  */
-class Ultrasonic : public SensorBase, public PIDSource {
+class Ultrasonic : public ErrorBase, public SendableBase, public PIDSource {
  public:
   enum DistanceUnit { kInches = 0, kMilliMeters = 1 };
 

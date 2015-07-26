@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * corresponds to a position. The position is in whichever units you choose, by way of the scaling
  * and offset constants passed to the constructor.
  */
-public class AnalogPotentiometer extends SensorBase implements Potentiometer, Sendable {
+public class AnalogPotentiometer extends SendableBase implements Potentiometer {
   private AnalogInput m_analogInput;
   private boolean m_initAnalogInput;
   private double m_fullRange;
@@ -154,9 +154,6 @@ public class AnalogPotentiometer extends SensorBase implements Potentiometer, Se
     }
   }
 
-  /**
-   * Frees this resource.
-   */
   @Override
   public void close() {
     super.close();

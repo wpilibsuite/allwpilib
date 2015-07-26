@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.util.AllocationException;
 /**
  * Base for sensors to be used with interrupts.
  */
-public abstract class InterruptableSensorBase extends SensorBase {
+public abstract class InterruptableSensorBase extends SendableBase {
   @SuppressWarnings("JavadocMethod")
   public enum WaitResult {
     kTimeout(0x0), kRisingEdge(0x1), kFallingEdge(0x100), kBoth(0x101);
@@ -44,9 +44,6 @@ public abstract class InterruptableSensorBase extends SensorBase {
     m_interrupt = 0;
   }
 
-  /**
-   * Frees the resources for this output.
-   */
   @Override
   public void close() {
     super.close();

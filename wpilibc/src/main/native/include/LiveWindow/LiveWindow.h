@@ -49,11 +49,11 @@ class LiveWindow {
   void AddActuator(const wpi::Twine& subsystem, const wpi::Twine& name,
                    std::shared_ptr<Sendable> component);
 
-  WPI_DEPRECATED("use SensorBase::SetName() instead")
+  WPI_DEPRECATED("use SensorUtil::SetName() instead")
   void AddSensor(const wpi::Twine& type, int channel, Sendable* component);
-  WPI_DEPRECATED("use SensorBase::SetName() instead")
+  WPI_DEPRECATED("use SensorUtil::SetName() instead")
   void AddActuator(const wpi::Twine& type, int channel, Sendable* component);
-  WPI_DEPRECATED("use SensorBase::SetName() instead")
+  WPI_DEPRECATED("use SensorUtil::SetName() instead")
   void AddActuator(const wpi::Twine& type, int module, int channel,
                    Sendable* component);
 

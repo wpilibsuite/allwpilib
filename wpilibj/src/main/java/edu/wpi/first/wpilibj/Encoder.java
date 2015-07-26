@@ -28,7 +28,7 @@ import static java.util.Objects.requireNonNull;
  * <p>All encoders will immediately start counting - reset() them if you need them to be zeroed
  * before use.
  */
-public class Encoder extends SensorBase implements CounterBase, PIDSource, Sendable {
+public class Encoder extends SendableBase implements CounterBase, PIDSource {
   public enum IndexingType {
     kResetWhileHigh(0), kResetWhileLow(1), kResetOnFallingEdge(2), kResetOnRisingEdge(3);
 
@@ -290,9 +290,6 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, Senda
     return EncoderJNI.getEncoderEncodingScale(m_encoder);
   }
 
-  /**
-   * Free the resources used by this object.
-   */
   @Override
   public void close() {
     super.close();

@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 /**
  * Analog output class.
  */
-public class AnalogOutput extends SendableBase implements Sendable {
+public class AnalogOutput extends SendableBase {
   private int m_port;
   private int m_channel;
 
@@ -26,7 +26,7 @@ public class AnalogOutput extends SendableBase implements Sendable {
    * @param channel The channel number to represent.
    */
   public AnalogOutput(final int channel) {
-    SensorBase.checkAnalogOutputChannel(channel);
+    SensorUtil.checkAnalogOutputChannel(channel);
     m_channel = channel;
 
     final int portHandle = HAL.getPort((byte) channel);
@@ -36,9 +36,6 @@ public class AnalogOutput extends SendableBase implements Sendable {
     setName("AnalogOutput", channel);
   }
 
-  /**
-   * Channel destructor.
-   */
   @Override
   public void close() {
     super.close();

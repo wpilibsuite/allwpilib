@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
-import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
@@ -21,7 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * start and stop said {@link PIDController} when the {@link PIDCommand} is first initialized and
  * ended/interrupted. </p>
  */
-public abstract class PIDCommand extends Command implements Sendable {
+public abstract class PIDCommand extends Command {
   /**
    * The internal {@link PIDController}.
    */

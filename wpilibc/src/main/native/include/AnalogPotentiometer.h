@@ -10,7 +10,8 @@
 #include <memory>
 
 #include "AnalogInput.h"
-#include "SensorBase.h"
+#include "ErrorBase.h"
+#include "SmartDashboard/SendableBase.h"
 #include "interfaces/Potentiometer.h"
 
 namespace frc {
@@ -21,7 +22,9 @@ namespace frc {
  * units you choose, by way of the scaling and offset constants passed to the
  * constructor.
  */
-class AnalogPotentiometer : public SensorBase, public Potentiometer {
+class AnalogPotentiometer : public ErrorBase,
+                            public SendableBase,
+                            public Potentiometer {
  public:
   /**
    * AnalogPotentiometer constructor.

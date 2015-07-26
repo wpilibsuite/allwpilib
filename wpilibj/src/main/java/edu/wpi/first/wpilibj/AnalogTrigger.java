@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
 /**
  * Class for creating and configuring Analog Triggers.
  */
-public class AnalogTrigger extends SensorBase implements Sendable {
+public class AnalogTrigger extends SendableBase {
   /**
    * Exceptions dealing with improper operation of the Analog trigger.
    */
@@ -74,9 +74,6 @@ public class AnalogTrigger extends SensorBase implements Sendable {
     setName("AnalogTrigger", channel.getChannel());
   }
 
-  /**
-   * Release the resources used by this object.
-   */
   @Override
   public void close() {
     super.close();
