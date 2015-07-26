@@ -9,20 +9,20 @@
 
 #include <memory>
 #include <string>
-#include "tables/ITable.h"
+#include "tables/ITableBase.h"
 
-class Sendable {
+class Sendable : public virtual ITableBase {
  public:
   /**
    * Initializes a table for this sendable object.
    * @param subtable The table to put the values in.
    */
-  virtual void InitTable(std::shared_ptr<ITable> subtable) = 0;
+  virtual void InitTable(std::shared_ptr<ITable> subtable);
 
   /**
-   * @return the table that is currently associated with the sendable
+   * Update the table for this sendable object with the latest values.
    */
-  virtual std::shared_ptr<ITable> GetTable() const = 0;
+  virtual void UpdateTable() = 0;
 
   /**
    * @return the string representation of the named data type that will be used

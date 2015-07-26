@@ -68,15 +68,10 @@ class ADXL345_I2C : public Accelerometer, public LiveWindowSendable {
   virtual AllAxes GetAccelerations();
 
   virtual std::string GetSmartDashboardType() const override;
-  virtual void InitTable(std::shared_ptr<ITable> subtable) override;
   virtual void UpdateTable() override;
-  virtual std::shared_ptr<ITable> GetTable() const override;
   virtual void StartLiveWindowMode() override {}
   virtual void StopLiveWindowMode() override {}
 
  protected:
   I2C m_i2c;
-
- private:
-  std::shared_ptr<ITable> m_table;
 };

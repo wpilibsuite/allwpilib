@@ -63,7 +63,6 @@ CANTalon::CANTalon(int deviceNumber, int controlPeriodMs)
 }
 
 CANTalon::~CANTalon() {
-  if (m_table != nullptr) m_table->RemoveTableListener(this);
   if (m_hasBeenMoved) return;
   Disable();
 }
@@ -2049,38 +2048,34 @@ bool CANTalon::IsModePID(CANSpeedController::ControlMode mode) const {
 }
 
 void CANTalon::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutString("~TYPE~", "CANSpeedController");
-    m_table->PutString("Type", "CANTalon");
-    m_table->PutNumber("Mode", m_controlMode);
-    m_table->PutNumber("p", GetP());
-    m_table->PutNumber("i", GetI());
-    m_table->PutNumber("d", GetD());
-    m_table->PutNumber("f", GetF());
-    m_table->PutBoolean("Enabled", IsControlEnabled());
-    m_table->PutNumber("Value", Get());
+  auto table = GetTable();
+  if (table) {
+    table->PutString("~TYPE~", "CANSpeedController");
+    table->PutString("Type", "CANTalon");
+    table->PutNumber("Mode", m_controlMode);
+    table->PutNumber("p", GetP());
+    table->PutNumber("i", GetI());
+    table->PutNumber("d", GetD());
+    table->PutNumber("f", GetF());
+    table->PutBoolean("Enabled", IsControlEnabled());
+    table->PutNumber("Value", Get());
   }
 }
 
 void CANTalon::StartLiveWindowMode() {
-  if (m_table != nullptr) {
-    m_table->AddTableListener(this, true);
+  auto table = GetTable();
+  if (table) {
+    table->AddTableListener(this, true);
   }
 }
 
 void CANTalon::StopLiveWindowMode() {
-  if (m_table != nullptr) {
-    m_table->RemoveTableListener(this);
+  auto table = GetTable();
+  if (table) {
+    table->RemoveTableListener(this);
   }
 }
 
 std::string CANTalon::GetSmartDashboardType() const {
   return "CANSpeedController";
 }
-
-void CANTalon::InitTable(std::shared_ptr<ITable> subTable) {
-  m_table = subTable;
-  UpdateTable();
-}
-
-std::shared_ptr<ITable> CANTalon::GetTable() const { return m_table; }

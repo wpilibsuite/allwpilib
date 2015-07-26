@@ -53,19 +53,11 @@ std::string BuiltInAccelerometer::GetSmartDashboardType() const {
   return "3AxisAccelerometer";
 }
 
-void BuiltInAccelerometer::InitTable(std::shared_ptr<ITable> subtable) {
-  m_table = subtable;
-  UpdateTable();
-}
-
 void BuiltInAccelerometer::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("X", GetX());
-    m_table->PutNumber("Y", GetY());
-    m_table->PutNumber("Z", GetZ());
+  auto table = GetTable();
+  if (table) {
+    table->PutNumber("X", GetX());
+    table->PutNumber("Y", GetY());
+    table->PutNumber("Z", GetZ());
   }
-}
-
-std::shared_ptr<ITable> BuiltInAccelerometer::GetTable() const {
-  return m_table;
 }

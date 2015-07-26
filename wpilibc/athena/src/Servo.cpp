@@ -29,12 +29,6 @@ Servo::Servo(uint32_t channel) : SafePWM(channel) {
   //  printf("Done initializing servo %d\n", channel);
 }
 
-Servo::~Servo() {
-  if (m_table != nullptr) {
-    m_table->RemoveTableListener(this);
-  }
-}
-
 /**
  * Set the servo position.
  *
@@ -105,28 +99,24 @@ void Servo::ValueChanged(ITable* source, llvm::StringRef key,
 }
 
 void Servo::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Value", Get());
+  auto table = GetTable();
+  if (table) {
+    table->PutNumber("Value", Get());
   }
 }
 
 void Servo::StartLiveWindowMode() {
-  if (m_table != nullptr) {
-    m_table->AddTableListener("Value", this, true);
+  auto table = GetTable();
+  if (table) {
+    table->AddTableListener("Value", this, true);
   }
 }
 
 void Servo::StopLiveWindowMode() {
-  if (m_table != nullptr) {
-    m_table->RemoveTableListener(this);
+  auto table = GetTable();
+  if (table) {
+    table->RemoveTableListener(this);
   }
 }
 
 std::string Servo::GetSmartDashboardType() const { return "Servo"; }
-
-void Servo::InitTable(std::shared_ptr<ITable> subTable) {
-  m_table = subTable;
-  UpdateTable();
-}
-
-std::shared_ptr<ITable> Servo::GetTable() const { return m_table; }

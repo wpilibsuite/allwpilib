@@ -37,11 +37,7 @@ class Subsystem : public ErrorBase, public NamedSendable {
   bool m_initializedDefaultCommand = false;
 
  public:
-  virtual std::string GetName() const;
-  virtual void InitTable(std::shared_ptr<ITable> table);
-  virtual std::shared_ptr<ITable> GetTable() const;
-  virtual std::string GetSmartDashboardType() const;
-
- protected:
-  std::shared_ptr<ITable> m_table;
+  virtual std::string GetName() const override;
+  virtual void UpdateTable() override;
+  virtual std::string GetSmartDashboardType() const override;
 };

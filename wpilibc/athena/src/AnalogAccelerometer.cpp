@@ -113,8 +113,9 @@ void AnalogAccelerometer::SetZero(float zero) { m_zeroGVoltage = zero; }
 double AnalogAccelerometer::PIDGet() { return GetAcceleration(); }
 
 void AnalogAccelerometer::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Value", GetAcceleration());
+  auto table = GetTable();
+  if (table) {
+    table->PutNumber("Value", GetAcceleration());
   }
 }
 
@@ -124,13 +125,4 @@ void AnalogAccelerometer::StopLiveWindowMode() {}
 
 std::string AnalogAccelerometer::GetSmartDashboardType() const {
   return "Accelerometer";
-}
-
-void AnalogAccelerometer::InitTable(std::shared_ptr<ITable> subTable) {
-  m_table = subTable;
-  UpdateTable();
-}
-
-std::shared_ptr<ITable> AnalogAccelerometer::GetTable() const {
-  return m_table;
 }

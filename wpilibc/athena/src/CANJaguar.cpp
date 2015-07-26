@@ -221,8 +221,6 @@ CANJaguar::~CANJaguar() {
     FRC_NetworkCommunication_CANSessionMux_sendMessage(
         m_deviceNumber | LM_API_VCOMP_T_SET, nullptr, 0,
         CAN_SEND_PERIOD_STOP_REPEATING, &status);
-
-  if (m_table != nullptr) m_table->RemoveTableListener(this);
 }
 
 /**
@@ -2016,39 +2014,35 @@ bool CANJaguar::IsModePID(CANSpeedController::ControlMode mode) const {
 }
 
 void CANJaguar::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutString("~TYPE~", "CANSpeedController");
-    m_table->PutString("Type", "CANJaguar");
-    m_table->PutNumber("Mode", m_controlMode);
+  auto table = GetTable();
+  if (table) {
+    table->PutString("~TYPE~", "CANSpeedController");
+    table->PutString("Type", "CANJaguar");
+    table->PutNumber("Mode", m_controlMode);
     if (IsModePID(m_controlMode)) {
-      m_table->PutNumber("p", GetP());
-      m_table->PutNumber("i", GetI());
-      m_table->PutNumber("d", GetD());
+      table->PutNumber("p", GetP());
+      table->PutNumber("i", GetI());
+      table->PutNumber("d", GetD());
     }
-    m_table->PutBoolean("Enabled", m_controlEnabled);
-    m_table->PutNumber("Value", Get());
+    table->PutBoolean("Enabled", m_controlEnabled);
+    table->PutNumber("Value", Get());
   }
 }
 
 void CANJaguar::StartLiveWindowMode() {
-  if (m_table != nullptr) {
-    m_table->AddTableListener(this, true);
+  auto table = GetTable();
+  if (table) {
+    table->AddTableListener(this, true);
   }
 }
 
 void CANJaguar::StopLiveWindowMode() {
-  if (m_table != nullptr) {
-    m_table->RemoveTableListener(this);
+  auto table = GetTable();
+  if (table) {
+    table->RemoveTableListener(this);
   }
 }
 
 std::string CANJaguar::GetSmartDashboardType() const {
   return "CANSpeedController";
 }
-
-void CANJaguar::InitTable(std::shared_ptr<ITable> subTable) {
-  m_table = subTable;
-  UpdateTable();
-}
-
-std::shared_ptr<ITable> CANJaguar::GetTable() const { return m_table; }

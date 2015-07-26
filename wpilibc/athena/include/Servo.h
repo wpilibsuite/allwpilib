@@ -22,7 +22,7 @@
 class Servo : public SafePWM {
  public:
   explicit Servo(uint32_t channel);
-  virtual ~Servo();
+  virtual ~Servo() = default;
   void Set(float value);
   void SetOffline();
   float Get() const;
@@ -37,10 +37,6 @@ class Servo : public SafePWM {
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subTable) override;
-  std::shared_ptr<ITable> GetTable() const override;
-
-  std::shared_ptr<ITable> m_table;
 
  private:
   float GetServoAngleRange() const { return kMaxServoAngle - kMinServoAngle; }

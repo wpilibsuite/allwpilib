@@ -316,8 +316,9 @@ Ultrasonic::DistanceUnit Ultrasonic::GetDistanceUnits() const {
 }
 
 void Ultrasonic::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Value", GetRangeInches());
+  auto table = GetTable();
+  if (table) {
+    table->PutNumber("Value", GetRangeInches());
   }
 }
 
@@ -326,10 +327,3 @@ void Ultrasonic::StartLiveWindowMode() {}
 void Ultrasonic::StopLiveWindowMode() {}
 
 std::string Ultrasonic::GetSmartDashboardType() const { return "Ultrasonic"; }
-
-void Ultrasonic::InitTable(std::shared_ptr<ITable> subTable) {
-  m_table = subTable;
-  UpdateTable();
-}
-
-std::shared_ptr<ITable> Ultrasonic::GetTable() const { return m_table; }

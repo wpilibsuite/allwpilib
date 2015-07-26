@@ -71,14 +71,10 @@ class AnalogInput : public SensorBase,
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subTable) override;
-  std::shared_ptr<ITable> GetTable() const override;
 
  private:
   uint32_t m_channel;
   // TODO: Adjust HAL to avoid use of raw pointers.
   void* m_port;
   int64_t m_accumulatorOffset;
-
-  std::shared_ptr<ITable> m_table;
 };

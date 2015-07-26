@@ -33,8 +33,9 @@ uint32_t DigitalInput::Get() const { return m_impl->Get(); }
 uint32_t DigitalInput::GetChannel() const { return m_channel; }
 
 void DigitalInput::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutBoolean("Value", Get());
+  auto table = GetTable();
+  if (table) {
+    table->PutBoolean("Value", Get());
   }
 }
 
@@ -45,10 +46,3 @@ void DigitalInput::StopLiveWindowMode() {}
 std::string DigitalInput::GetSmartDashboardType() const {
   return "DigitalInput";
 }
-
-void DigitalInput::InitTable(std::shared_ptr<ITable> subTable) {
-  m_table = subTable;
-  UpdateTable();
-}
-
-std::shared_ptr<ITable> DigitalInput::GetTable() const { return m_table; }

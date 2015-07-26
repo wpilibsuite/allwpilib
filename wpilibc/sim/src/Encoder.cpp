@@ -29,7 +29,6 @@
  */
 void Encoder::InitEncoder(int channelA, int channelB, bool reverseDirection,
                           EncodingType encodingType) {
-  m_table = nullptr;
   this->channelA = channelA;
   this->channelB = channelB;
   m_encodingType = encodingType;
@@ -356,12 +355,15 @@ double Encoder::PIDGet() {
 }
 
 void Encoder::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Speed", GetRate());
-    m_table->PutNumber("Distance", GetDistance());
-    m_table->PutNumber("Distance per Tick", m_reverseDirection
-                                                ? -m_distancePerPulse
-                                                : m_distancePerPulse);
+  auto table = GetTable();
+  if (table) {
+    table->PutNumber("Speed", GetRate());
+    table->PutNumber("Distance", GetDistance());
+    if (m_reverseDirection) {
+      table->PutNumber("Distance per Tick", -m_distancePerPulse);
+    } else {
+      table->PutNumber("Distance per Tick", m_distancePerPulse);
+    }
   }
 }
 
@@ -375,10 +377,3 @@ std::string Encoder::GetSmartDashboardType() const {
   else
     return "Encoder";
 }
-
-void Encoder::InitTable(std::shared_ptr<ITable> subTable) {
-  m_table = subTable;
-  UpdateTable();
-}
-
-std::shared_ptr<ITable> Encoder::GetTable() const { return m_table; }

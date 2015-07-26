@@ -93,8 +93,9 @@ uint32_t DigitalInput::GetModuleForRouting() const { return 0; }
 bool DigitalInput::GetAnalogTriggerForRouting() const { return false; }
 
 void DigitalInput::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutBoolean("Value", Get());
+  auto table = GetTable();
+  if (table) {
+    table->PutBoolean("Value", Get());
   }
 }
 
@@ -105,10 +106,3 @@ void DigitalInput::StopLiveWindowMode() {}
 std::string DigitalInput::GetSmartDashboardType() const {
   return "DigitalInput";
 }
-
-void DigitalInput::InitTable(std::shared_ptr<ITable> subTable) {
-  m_table = subTable;
-  UpdateTable();
-}
-
-std::shared_ptr<ITable> DigitalInput::GetTable() const { return m_table; }

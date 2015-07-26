@@ -215,10 +215,11 @@ void PIDController::SetPID(double p, double i, double d) {
     m_D = d;
   }
 
-  if (m_table != nullptr) {
-    m_table->PutNumber("p", m_P);
-    m_table->PutNumber("i", m_I);
-    m_table->PutNumber("d", m_D);
+  auto table = GetTable();
+  if (table) {
+    table->PutNumber("p", m_P);
+    table->PutNumber("i", m_I);
+    table->PutNumber("d", m_D);
   }
 }
 
@@ -241,11 +242,12 @@ void PIDController::SetPID(double p, double i, double d, double f) {
     m_F = f;
   }
 
-  if (m_table != nullptr) {
-    m_table->PutNumber("p", m_P);
-    m_table->PutNumber("i", m_I);
-    m_table->PutNumber("d", m_D);
-    m_table->PutNumber("f", m_F);
+  auto table = GetTable();
+  if (table) {
+    table->PutNumber("p", m_P);
+    table->PutNumber("i", m_I);
+    table->PutNumber("d", m_D);
+    table->PutNumber("f", m_F);
   }
 }
 
@@ -370,8 +372,9 @@ void PIDController::SetSetpoint(float setpoint) {
     m_bufTotal = 0;
   }
 
-  if (m_table != nullptr) {
-    m_table->PutNumber("setpoint", m_setpoint);
+  auto table = GetTable();
+  if (table) {
+    table->PutNumber("setpoint", m_setpoint);
   }
 }
 
@@ -538,8 +541,9 @@ void PIDController::Enable() {
     m_enabled = true;
   }
 
-  if (m_table != nullptr) {
-    m_table->PutBoolean("enabled", true);
+  auto table = GetTable();
+  if (table) {
+    table->PutBoolean("enabled", true);
   }
 }
 
@@ -553,8 +557,9 @@ void PIDController::Disable() {
     m_enabled = false;
   }
 
-  if (m_table != nullptr) {
-    m_table->PutBoolean("enabled", false);
+  auto table = GetTable();
+  if (table) {
+    table->PutBoolean("enabled", false);
   }
 }
 
@@ -583,30 +588,29 @@ std::string PIDController::GetSmartDashboardType() const {
 }
 
 void PIDController::InitTable(std::shared_ptr<ITable> table) {
-  if (m_table != nullptr) m_table->RemoveTableListener(this);
-  m_table = table;
-  if (m_table != nullptr) {
-    m_table->PutNumber(kP, GetP());
-    m_table->PutNumber(kI, GetI());
-    m_table->PutNumber(kD, GetD());
-    m_table->PutNumber(kF, GetF());
-    m_table->PutNumber(kSetpoint, GetSetpoint());
-    m_table->PutBoolean(kEnabled, IsEnabled());
-    m_table->AddTableListener(this, false);
+  auto tempTable = GetTable();
+  if (tempTable) tempTable->RemoveTableListener(this);
+  tempTable = table;
+  if (tempTable) {
+    tempTable->PutNumber(kP, GetP());
+    tempTable->PutNumber(kI, GetI());
+    tempTable->PutNumber(kD, GetD());
+    tempTable->PutNumber(kF, GetF());
+    tempTable->PutNumber(kSetpoint, GetSetpoint());
+    tempTable->PutBoolean(kEnabled, IsEnabled());
+    tempTable->AddTableListener(this, false);
   }
+  GetTable() = std::move(tempTable);
 }
-
-std::shared_ptr<ITable> PIDController::GetTable() const { return m_table; }
 
 void PIDController::ValueChanged(ITable* source, llvm::StringRef key,
                                  std::shared_ptr<nt::Value> value, bool isNew) {
   if (key == kP || key == kI || key == kD || key == kF) {
-    if (m_P != m_table->GetNumber(kP, 0.0) ||
-        m_I != m_table->GetNumber(kI, 0.0) ||
-        m_D != m_table->GetNumber(kD, 0.0) ||
-        m_F != m_table->GetNumber(kF, 0.0)) {
-      SetPID(m_table->GetNumber(kP, 0.0), m_table->GetNumber(kI, 0.0),
-             m_table->GetNumber(kD, 0.0), m_table->GetNumber(kF, 0.0));
+    auto table = GetTable();
+    if (m_P != table->GetNumber(kP, 0.0) || m_I != table->GetNumber(kI, 0.0) ||
+        m_D != table->GetNumber(kD, 0.0) || m_F != table->GetNumber(kF, 0.0)) {
+      SetPID(table->GetNumber(kP, 0.0), table->GetNumber(kI, 0.0),
+             table->GetNumber(kD, 0.0), table->GetNumber(kF, 0.0));
     }
   } else if (key == kSetpoint && value->IsDouble() &&
              m_setpoint != value->GetDouble()) {

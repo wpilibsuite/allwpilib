@@ -63,7 +63,8 @@ Command::Command(const std::string& name, double timeout) {
 }
 
 Command::~Command() {
-  if (m_table != nullptr) m_table->RemoveTableListener(this);
+  auto table = GetTable();
+  if (table) table->RemoveTableListener(this);
 }
 
 /**
@@ -142,7 +143,9 @@ void Command::Removed() {
   m_initialized = false;
   m_canceled = false;
   m_running = false;
-  if (m_table != nullptr) m_table->PutBoolean(kRunning, false);
+
+  auto table = GetTable();
+  if (table) table->PutBoolean(kRunning, false);
 }
 
 /**
@@ -261,8 +264,9 @@ void Command::SetParent(CommandGroup* parent) {
   } else {
     LockChanges();
     m_parent = parent;
-    if (m_table != nullptr) {
-      m_table->PutBoolean(kIsParented, true);
+    auto table = GetTable();
+    if (table) {
+      table->PutBoolean(kIsParented, true);
     }
   }
 }
@@ -282,7 +286,8 @@ void Command::SetParent(CommandGroup* parent) {
 void Command::StartRunning() {
   m_running = true;
   m_startTime = -1;
-  if (m_table != nullptr) m_table->PutBoolean(kRunning, true);
+  auto table = GetTable();
+  if (table) table->PutBoolean(kRunning, true);
 }
 
 /**
@@ -393,17 +398,18 @@ std::string Command::GetName() const { return m_name; }
 std::string Command::GetSmartDashboardType() const { return "Command"; }
 
 void Command::InitTable(std::shared_ptr<ITable> table) {
-  if (m_table != nullptr) m_table->RemoveTableListener(this);
-  m_table = table;
-  if (m_table != nullptr) {
-    m_table->PutString(kName, GetName());
-    m_table->PutBoolean(kRunning, IsRunning());
-    m_table->PutBoolean(kIsParented, m_parent != nullptr);
-    m_table->AddTableListener(kRunning, this, false);
+  auto tempTable = GetTable();
+  if (tempTable) tempTable->RemoveTableListener(this);
+  tempTable = table;
+  if (tempTable) {
+    tempTable->PutString(kName, GetName());
+    tempTable->PutBoolean(kRunning, IsRunning());
+    tempTable->PutBoolean(kIsParented, m_parent != nullptr);
+    tempTable->AddTableListener(kRunning, this, false);
   }
 }
 
-std::shared_ptr<ITable> Command::GetTable() const { return m_table; }
+void Command::UpdateTable() {}
 
 void Command::ValueChanged(ITable* source, llvm::StringRef key,
                            std::shared_ptr<nt::Value> value, bool isNew) {

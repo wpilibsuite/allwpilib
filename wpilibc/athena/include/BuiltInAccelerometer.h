@@ -32,12 +32,7 @@ class BuiltInAccelerometer : public Accelerometer,
   virtual double GetZ() override;
 
   virtual std::string GetSmartDashboardType() const override;
-  virtual void InitTable(std::shared_ptr<ITable> subtable) override;
   virtual void UpdateTable() override;
-  virtual std::shared_ptr<ITable> GetTable() const override;
   virtual void StartLiveWindowMode() override {}
   virtual void StopLiveWindowMode() override {}
-
- private:
-  std::shared_ptr<ITable> m_table;
 };

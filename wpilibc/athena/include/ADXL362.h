@@ -49,9 +49,7 @@ class ADXL362 : public Accelerometer, public LiveWindowSendable {
   virtual AllAxes GetAccelerations();
 
   virtual std::string GetSmartDashboardType() const override;
-  virtual void InitTable(std::shared_ptr<ITable> subtable) override;
   virtual void UpdateTable() override;
-  virtual std::shared_ptr<ITable> GetTable() const override;
   virtual void StartLiveWindowMode() override {}
   virtual void StopLiveWindowMode() override {}
 

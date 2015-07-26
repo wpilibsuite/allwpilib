@@ -417,8 +417,9 @@ double AnalogInput::PIDGet() {
 }
 
 void AnalogInput::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Value", GetAverageVoltage());
+  auto table = GetTable();
+  if (table) {
+    table->PutNumber("Value", GetAverageVoltage());
   }
 }
 
@@ -429,10 +430,3 @@ void AnalogInput::StopLiveWindowMode() {}
 std::string AnalogInput::GetSmartDashboardType() const {
   return "Analog Input";
 }
-
-void AnalogInput::InitTable(std::shared_ptr<ITable> subTable) {
-  m_table = subTable;
-  UpdateTable();
-}
-
-std::shared_ptr<ITable> AnalogInput::GetTable() const { return m_table; }

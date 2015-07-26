@@ -29,12 +29,8 @@ class AnalogOutput : public SensorBase, public LiveWindowSendable {
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subTable) override;
-  std::shared_ptr<ITable> GetTable() const override;
 
  protected:
   uint32_t m_channel;
   void* m_port;
-
-  std::shared_ptr<ITable> m_table;
 };

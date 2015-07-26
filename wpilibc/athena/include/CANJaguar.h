@@ -244,10 +244,6 @@ class CANJaguar : public MotorSafety,
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subTable) override;
-  std::shared_ptr<ITable> GetTable() const override;
-
-  std::shared_ptr<ITable> m_table;
 
  private:
   void InitCANJaguar();

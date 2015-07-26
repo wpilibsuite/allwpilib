@@ -34,12 +34,10 @@ class SendableChooser : public Sendable {
   void AddDefault(const std::string& name, void* object);
   void* GetSelected();
 
-  virtual void InitTable(std::shared_ptr<ITable> subtable);
-  virtual std::shared_ptr<ITable> GetTable() const;
-  virtual std::string GetSmartDashboardType() const;
+  void InitTable(std::shared_ptr<ITable> subtable) override;
+  std::string GetSmartDashboardType() const override;
 
  private:
   std::string m_defaultChoice;
   std::map<std::string, void*> m_choices;
-  std::shared_ptr<ITable> m_table;
 };

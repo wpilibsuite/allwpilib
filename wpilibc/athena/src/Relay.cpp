@@ -87,7 +87,6 @@ Relay::~Relay() {
   if (m_direction == kBothDirections || m_direction == kReverseOnly) {
     relayChannels->Free(m_channel * 2 + 1);
   }
-  if (m_table != nullptr) m_table->RemoveTableListener(this);
 }
 
 /**
@@ -264,36 +263,32 @@ void Relay::ValueChanged(ITable* source, llvm::StringRef key,
 }
 
 void Relay::UpdateTable() {
-  if (m_table != nullptr) {
+  auto table = GetTable();
+  if (table) {
     if (Get() == kOn) {
-      m_table->PutString("Value", "On");
+      table->PutString("Value", "On");
     } else if (Get() == kForward) {
-      m_table->PutString("Value", "Forward");
+      table->PutString("Value", "Forward");
     } else if (Get() == kReverse) {
-      m_table->PutString("Value", "Reverse");
+      table->PutString("Value", "Reverse");
     } else {
-      m_table->PutString("Value", "Off");
+      table->PutString("Value", "Off");
     }
   }
 }
 
 void Relay::StartLiveWindowMode() {
-  if (m_table != nullptr) {
-    m_table->AddTableListener("Value", this, true);
+  auto table = GetTable();
+  if (table) {
+    table->AddTableListener("Value", this, true);
   }
 }
 
 void Relay::StopLiveWindowMode() {
-  if (m_table != nullptr) {
-    m_table->RemoveTableListener(this);
+  auto table = GetTable();
+  if (table) {
+    table->RemoveTableListener(this);
   }
 }
 
 std::string Relay::GetSmartDashboardType() const { return "Relay"; }
-
-void Relay::InitTable(std::shared_ptr<ITable> subTable) {
-  m_table = subTable;
-  UpdateTable();
-}
-
-std::shared_ptr<ITable> Relay::GetTable() const { return m_table; }

@@ -33,12 +33,8 @@ class Solenoid : public LiveWindowSendable, public ITableListener {
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subTable) override;
-  std::shared_ptr<ITable> GetTable() const override;
 
  private:
   SimContinuousOutput* m_impl;
   bool m_on;
-
-  std::shared_ptr<ITable> m_table;
 };

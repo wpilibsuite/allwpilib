@@ -63,12 +63,13 @@ void Subsystem::SetDefaultCommand(Command* command) {
 
     m_defaultCommand = command;
   }
-  if (m_table != nullptr) {
+  auto table = GetTable();
+  if (table) {
     if (m_defaultCommand != nullptr) {
-      m_table->PutBoolean("hasDefault", true);
-      m_table->PutString("default", m_defaultCommand->GetName());
+      table->PutBoolean("hasDefault", true);
+      table->PutString("default", m_defaultCommand->GetName());
     } else {
-      m_table->PutBoolean("hasDefault", false);
+      table->PutBoolean("hasDefault", false);
     }
   }
 }
@@ -113,12 +114,13 @@ Command* Subsystem::GetCurrentCommand() const { return m_currentCommand; }
  */
 void Subsystem::ConfirmCommand() {
   if (m_currentCommandChanged) {
-    if (m_table != nullptr) {
+    auto table = GetTable();
+    if (table) {
       if (m_currentCommand != nullptr) {
-        m_table->PutBoolean("hasCommand", true);
-        m_table->PutString("command", m_currentCommand->GetName());
+        table->PutBoolean("hasCommand", true);
+        table->PutString("command", m_currentCommand->GetName());
       } else {
-        m_table->PutBoolean("hasCommand", false);
+        table->PutBoolean("hasCommand", false);
       }
     }
     m_currentCommandChanged = false;
@@ -129,22 +131,20 @@ std::string Subsystem::GetName() const { return m_name; }
 
 std::string Subsystem::GetSmartDashboardType() const { return "Subsystem"; }
 
-void Subsystem::InitTable(std::shared_ptr<ITable> table) {
-  m_table = table;
-  if (m_table != nullptr) {
+void Subsystem::UpdateTable() {
+  auto table = GetTable();
+  if (table) {
     if (m_defaultCommand != nullptr) {
-      m_table->PutBoolean("hasDefault", true);
-      m_table->PutString("default", m_defaultCommand->GetName());
+      table->PutBoolean("hasDefault", true);
+      table->PutString("default", m_defaultCommand->GetName());
     } else {
-      m_table->PutBoolean("hasDefault", false);
+      table->PutBoolean("hasDefault", false);
     }
     if (m_currentCommand != nullptr) {
-      m_table->PutBoolean("hasCommand", true);
-      m_table->PutString("command", m_currentCommand->GetName());
+      table->PutBoolean("hasCommand", true);
+      table->PutString("command", m_currentCommand->GetName());
     } else {
-      m_table->PutBoolean("hasCommand", false);
+      table->PutBoolean("hasCommand", false);
     }
   }
 }
-
-std::shared_ptr<ITable> Subsystem::GetTable() const { return m_table; }

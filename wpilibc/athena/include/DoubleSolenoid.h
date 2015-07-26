@@ -41,14 +41,10 @@ class DoubleSolenoid : public SolenoidBase,
   void StartLiveWindowMode();
   void StopLiveWindowMode();
   std::string GetSmartDashboardType() const;
-  void InitTable(std::shared_ptr<ITable> subTable);
-  std::shared_ptr<ITable> GetTable() const;
 
  private:
   uint32_t m_forwardChannel;  ///< The forward channel on the module to control.
   uint32_t m_reverseChannel;  ///< The reverse channel on the module to control.
   uint8_t m_forwardMask;      ///< The mask for the forward channel.
   uint8_t m_reverseMask;      ///< The mask for the reverse channel.
-
-  std::shared_ptr<ITable> m_table;
 };
