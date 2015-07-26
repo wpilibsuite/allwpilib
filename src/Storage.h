@@ -97,6 +97,7 @@ class Storage {
   void EnableUpdates() { m_updates_enabled = true; }
   void DisableUpdates() { m_updates_enabled = false; }
   UpdateQueue& updates() { return m_updates; }
+  std::mutex& mutex() { return m_mutex; }
 
   // User functions
   std::shared_ptr<Value> GetEntryValue(StringRef name) const;
