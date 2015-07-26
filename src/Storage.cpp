@@ -29,13 +29,6 @@ std::shared_ptr<StorageEntry> Storage::FindEntry(StringRef name) const {
   return i == m_entries.end() ? nullptr : i->getValue();
 }
 
-std::shared_ptr<StorageEntry> Storage::GetEntry(StringRef name) {
-  std::lock_guard<std::mutex> lock(m_mutex);
-  auto& entry = m_entries[name];
-  if (!entry) entry = std::make_shared<StorageEntry>();
-  return entry;
-}
-
 std::shared_ptr<Value> Storage::GetEntryValue(StringRef name) const {
   auto entry = FindEntry(name);
   if (!entry) return nullptr;
@@ -45,7 +38,9 @@ std::shared_ptr<Value> Storage::GetEntryValue(StringRef name) const {
 bool Storage::SetEntryValue(StringRef name, std::shared_ptr<Value> value) {
   if (name.empty()) return true;
   if (!value) return true;
-  auto entry = GetEntry(name);
+  std::lock_guard<std::mutex> lock(m_mutex);
+  auto& entry = m_entries[name];
+  if (!entry) entry = std::make_shared<StorageEntry>();
   auto old_value = entry->value();
   if (old_value && old_value->type() != value->type())
     return false;  // error on type mismatch
@@ -61,7 +56,9 @@ bool Storage::SetEntryValue(StringRef name, std::shared_ptr<Value> value) {
 void Storage::SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value) {
   if (name.empty()) return;
   if (!value) return;
-  auto entry = GetEntry(name);
+  std::lock_guard<std::mutex> lock(m_mutex);
+  auto& entry = m_entries[name];
+  if (!entry) entry = std::make_shared<StorageEntry>();
   auto old_value = entry->value();
   entry->set_value(value);
   if (!old_value || *old_value != *value) {
@@ -75,8 +72,10 @@ void Storage::SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value) {
 
 void Storage::SetEntryFlags(StringRef name, unsigned int flags) {
   if (name.empty()) return;
-  auto entry = FindEntry(name);
-  if (!entry) return;
+  std::lock_guard<std::mutex> lock(m_mutex);
+  auto i = m_entries.find(name);
+  if (i == m_entries.end()) return;
+  auto entry = i->getValue();
   if (entry->flags() != flags) {
     entry->set_flags(flags);
     AddUpdate(entry, Update::kFlagsUpdate);  // put on update queue

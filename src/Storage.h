@@ -92,7 +92,6 @@ class Storage {
 
   // Finds, but does not create entry.  Returns nullptr if not found.
   std::shared_ptr<StorageEntry> FindEntry(StringRef name) const;
-  std::shared_ptr<StorageEntry> GetEntry(StringRef name);
 
   // Accessors required by Dispatcher.
   void EnableUpdates() { m_updates_enabled = true; }

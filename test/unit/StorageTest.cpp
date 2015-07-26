@@ -21,6 +21,11 @@ class StorageTest : public ::testing::Test {
   }
   Storage::EntriesMap& entries() { return storage.m_entries; }
   Storage::UpdateQueue& updates() { return storage.updates(); }
+  std::shared_ptr<StorageEntry> GetEntry(StringRef name) {
+    auto& entry = storage.m_entries[name];
+    if (!entry) entry = std::make_shared<StorageEntry>();
+    return entry;
+  }
   Storage storage;
 };
 
@@ -102,15 +107,15 @@ TEST_F(StorageTest, FindEntryNotExist) {
 }
 
 TEST_F(StorageTest, FindEntryExist) {
-  auto entry1 = storage.GetEntry("foo");
+  auto entry1 = GetEntry("foo");
   auto entry = storage.FindEntry("foo");
   ASSERT_TRUE(bool(entry));
   ASSERT_EQ(entry1, entry);
   ASSERT_FALSE(storage.FindEntry("bar"));
 }
 
-TEST_F(StorageTest, GetEntryNotExist) {
-  auto entry = storage.GetEntry("foo");
+TEST_F(StorageTest, StorageEntryInit) {
+  auto entry = GetEntry("foo");
   ASSERT_TRUE(bool(entry));
   ASSERT_EQ(1u, entries().size());
 
@@ -137,7 +142,7 @@ TEST_F(StorageTest, SetEntryTypeValueAssignNew) {
   // brand new entry
   auto value = Value::MakeBoolean(true);
   storage.SetEntryTypeValue("foo", value);
-  auto entry = storage.GetEntry("foo");
+  auto entry = GetEntry("foo");
   EXPECT_EQ(value, entry->value());
   ASSERT_EQ(1u, updates().size());
   auto update = updates().pop();
@@ -149,7 +154,7 @@ TEST_F(StorageTestPopulateOne, SetEntryTypeValueAssignTypeChange) {
   // update with different type results in assignment message
   auto value = Value::MakeDouble(0.0);
   storage.SetEntryTypeValue("foo", value);
-  auto entry = storage.GetEntry("foo");
+  auto entry = GetEntry("foo");
   EXPECT_EQ(value, entry->value());
   ASSERT_EQ(1u, updates().size());
   auto update = updates().pop();
@@ -162,7 +167,7 @@ TEST_F(StorageTestPopulateOne, SetEntryTypeValueEqualValue) {
   // message is issued (minimizing bandwidth usage)
   auto value = Value::MakeBoolean(true);
   storage.SetEntryTypeValue("foo", value);
-  auto entry = storage.GetEntry("foo");
+  auto entry = GetEntry("foo");
   EXPECT_EQ(value, entry->value());
   ASSERT_TRUE(updates().empty());
 }
@@ -171,7 +176,7 @@ TEST_F(StorageTestPopulateOne, SetEntryTypeValueDifferentValue) {
   // update with same type and different value results in value update message
   auto value = Value::MakeBoolean(false);
   storage.SetEntryTypeValue("foo", value);
-  auto entry = storage.GetEntry("foo");
+  auto entry = GetEntry("foo");
   EXPECT_EQ(value, entry->value());
   ASSERT_EQ(1u, updates().size());
   auto update = updates().pop();
@@ -196,7 +201,7 @@ TEST_F(StorageTest, SetEntryValueAssignNew) {
   // brand new entry
   auto value = Value::MakeBoolean(true);
   EXPECT_TRUE(storage.SetEntryValue("foo", value));
-  auto entry = storage.GetEntry("foo");
+  auto entry = GetEntry("foo");
   EXPECT_EQ(value, entry->value());
   ASSERT_EQ(1u, updates().size());
   auto update = updates().pop();
@@ -208,7 +213,7 @@ TEST_F(StorageTestPopulateOne, SetEntryValueAssignTypeChange) {
   // update with different type results in error and no message
   auto value = Value::MakeDouble(0.0);
   EXPECT_FALSE(storage.SetEntryValue("foo", value));
-  auto entry = storage.GetEntry("foo");
+  auto entry = GetEntry("foo");
   EXPECT_NE(value, entry->value());
   ASSERT_TRUE(updates().empty());
 }
@@ -218,7 +223,7 @@ TEST_F(StorageTestPopulateOne, SetEntryValueEqualValue) {
   // message is issued (minimizing bandwidth usage)
   auto value = Value::MakeBoolean(true);
   EXPECT_TRUE(storage.SetEntryValue("foo", value));
-  auto entry = storage.GetEntry("foo");
+  auto entry = GetEntry("foo");
   EXPECT_EQ(value, entry->value());
   ASSERT_TRUE(updates().empty());
 }
@@ -227,7 +232,7 @@ TEST_F(StorageTestPopulateOne, SetEntryValueDifferentValue) {
   // update with same type and different value results in value update message
   auto value = Value::MakeBoolean(false);
   EXPECT_TRUE(storage.SetEntryValue("foo", value));
-  auto entry = storage.GetEntry("foo");
+  auto entry = GetEntry("foo");
   EXPECT_EQ(value, entry->value());
   ASSERT_EQ(1u, updates().size());
   auto update = updates().pop();
@@ -259,7 +264,7 @@ TEST_F(StorageTestPopulateOne, SetEntryFlagsEqualValue) {
   // update with same value: no update message is issued (minimizing bandwidth
   // usage)
   storage.SetEntryFlags("foo", 0u);
-  auto entry = storage.GetEntry("foo");
+  auto entry = GetEntry("foo");
   EXPECT_EQ(0u, entry->flags());
   ASSERT_TRUE(updates().empty());
 }
@@ -267,7 +272,7 @@ TEST_F(StorageTestPopulateOne, SetEntryFlagsEqualValue) {
 TEST_F(StorageTestPopulateOne, SetEntryFlagsDifferentValue) {
   // update with different value results in flags update message
   storage.SetEntryFlags("foo", 1u);
-  auto entry = storage.GetEntry("foo");
+  auto entry = GetEntry("foo");
   EXPECT_EQ(1u, entry->flags());
   ASSERT_EQ(1u, updates().size());
   auto update = updates().pop();
@@ -298,7 +303,7 @@ TEST_F(StorageTest, DeleteEntryNotExist) {
 }
 
 TEST_F(StorageTestPopulateOne, DeleteEntryExist) {
-  auto entry = storage.GetEntry("foo");
+  auto entry = GetEntry("foo");
   storage.DeleteEntry("foo");
   ASSERT_TRUE(entries().empty());
   ASSERT_EQ(1u, updates().size());
@@ -472,7 +477,7 @@ TEST_F(StorageTest, LoadPersistentAssign) {
   std::istringstream iss(
       "[NetworkTables Storage 3.0]\nboolean \"foo\"=true\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
-  auto entry = storage.GetEntry("foo");
+  auto entry = GetEntry("foo");
   EXPECT_EQ(*Value::MakeBoolean(true), *entry->value());
   EXPECT_EQ(NT_PERSISTENT, entry->flags());
   ASSERT_EQ(1u, updates().size());
@@ -489,7 +494,7 @@ TEST_F(StorageTestPopulateOne, LoadPersistentUpdateFlags) {
   std::istringstream iss(
       "[NetworkTables Storage 3.0]\nboolean \"foo\"=true\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
-  auto entry = storage.GetEntry("foo");
+  auto entry = GetEntry("foo");
   EXPECT_EQ(*Value::MakeBoolean(true), *entry->value());
   EXPECT_EQ(NT_PERSISTENT, entry->flags());
   ASSERT_EQ(1u, updates().size());
@@ -503,13 +508,13 @@ TEST_F(StorageTestPopulateOne, LoadPersistentUpdateValue) {
   auto warn_func =
       [&](std::size_t line, const char* msg) { warn.Warn(line, msg); };
 
-  storage.GetEntry("foo")->set_flags(NT_PERSISTENT);
+  GetEntry("foo")->set_flags(NT_PERSISTENT);
   while (!updates().empty()) updates().pop();
 
   std::istringstream iss(
       "[NetworkTables Storage 3.0]\nboolean \"foo\"=false\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
-  auto entry = storage.GetEntry("foo");
+  auto entry = GetEntry("foo");
   EXPECT_EQ(*Value::MakeBoolean(false), *entry->value());
   EXPECT_EQ(NT_PERSISTENT, entry->flags());
   ASSERT_EQ(1u, updates().size());
@@ -526,7 +531,7 @@ TEST_F(StorageTestPopulateOne, LoadPersistentUpdateValueFlags) {
   std::istringstream iss(
       "[NetworkTables Storage 3.0]\nboolean \"foo\"=false\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
-  auto entry = storage.GetEntry("foo");
+  auto entry = GetEntry("foo");
   EXPECT_EQ(*Value::MakeBoolean(false), *entry->value());
   EXPECT_EQ(NT_PERSISTENT, entry->flags());
   ASSERT_EQ(2u, updates().size());
