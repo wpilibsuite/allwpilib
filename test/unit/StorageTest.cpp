@@ -23,7 +23,7 @@ class StorageTest : public ::testing::Test {
   Storage::UpdateQueue& updates() { return storage.updates(); }
   std::shared_ptr<StorageEntry> GetEntry(StringRef name) {
     auto& entry = storage.m_entries[name];
-    if (!entry) entry = std::make_shared<StorageEntry>();
+    if (!entry) entry = std::make_shared<StorageEntry>(name);
     return entry;
   }
   Storage storage;
@@ -121,6 +121,7 @@ TEST_F(StorageTest, StorageEntryInit) {
 
   EXPECT_FALSE(entry->value());
   EXPECT_EQ(0u, entry->flags());
+  EXPECT_EQ("foo", entry->name());
   EXPECT_EQ(0xffffu, entry->id());
   EXPECT_EQ(SequenceNumber(), entry->seq_num());
 }

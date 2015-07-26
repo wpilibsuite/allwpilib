@@ -27,7 +27,9 @@ class StorageTest;
 
 class StorageEntry {
  public:
-  StorageEntry() : m_id(0xffff) { m_flags = 0; }
+  StorageEntry(llvm::StringRef name) : m_name(name), m_id(0xffff) {
+    m_flags = 0;
+  }
 
   bool IsPersistent() const { return (m_flags & NT_PERSISTENT) != 0; }
 
@@ -51,6 +53,8 @@ class StorageEntry {
   unsigned int flags() const { return m_flags; }
   void set_flags(unsigned int flags) { m_flags = flags; }
 
+  StringRef name() const { return m_name; }
+
   unsigned int id() const { return m_id; }
   void set_id(unsigned int id) { m_id = id; }
 
@@ -68,6 +72,7 @@ class StorageEntry {
   std::atomic_uint m_flags;
 
   // Only accessed from the Dispatcher, so these are NOT mutex-protected.
+  std::string m_name;
   unsigned int m_id;
   SequenceNumber m_seq_num;
 };

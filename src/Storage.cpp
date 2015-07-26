@@ -40,7 +40,7 @@ bool Storage::SetEntryValue(StringRef name, std::shared_ptr<Value> value) {
   if (!value) return true;
   std::lock_guard<std::mutex> lock(m_mutex);
   auto& entry = m_entries[name];
-  if (!entry) entry = std::make_shared<StorageEntry>();
+  if (!entry) entry = std::make_shared<StorageEntry>(name);
   auto old_value = entry->value();
   if (old_value && old_value->type() != value->type())
     return false;  // error on type mismatch
@@ -58,7 +58,7 @@ void Storage::SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value) {
   if (!value) return;
   std::lock_guard<std::mutex> lock(m_mutex);
   auto& entry = m_entries[name];
-  if (!entry) entry = std::make_shared<StorageEntry>();
+  if (!entry) entry = std::make_shared<StorageEntry>(name);
   auto old_value = entry->value();
   entry->set_value(value);
   if (!old_value || *old_value != *value) {
@@ -551,7 +551,7 @@ next_line:
     std::lock_guard<std::mutex> lock(m_mutex);
     for (auto& i : entries) {
       auto& entry = m_entries[i.first];
-      if (!entry) entry = std::make_shared<StorageEntry>();
+      if (!entry) entry = std::make_shared<StorageEntry>(i.first);
       auto old_value = entry->value();
       entry->set_value(i.second);
       bool was_persist = entry->IsPersistent();
