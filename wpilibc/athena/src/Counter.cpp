@@ -618,8 +618,9 @@ void Counter::SetReverseDirection(bool reverseDirection) {
 }
 
 void Counter::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Value", Get());
+  auto table = GetTable();
+  if (table) {
+    table->PutNumber("Value", Get());
   }
 }
 
@@ -628,10 +629,3 @@ void Counter::StartLiveWindowMode() {}
 void Counter::StopLiveWindowMode() {}
 
 std::string Counter::GetSmartDashboardType() const { return "Counter"; }
-
-void Counter::InitTable(std::shared_ptr<ITable> subTable) {
-  m_table = subTable;
-  UpdateTable();
-}
-
-std::shared_ptr<ITable> Counter::GetTable() const { return m_table; }

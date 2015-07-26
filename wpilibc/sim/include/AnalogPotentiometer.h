@@ -69,8 +69,6 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
    */
   std::string GetSmartDashboardType() const override;
   void InitTable(std::shared_ptr<ITable> subtable) override;
-  void UpdateTable() override;
-  std::shared_ptr<ITable> GetTable() const override;
 
   /**
    * AnalogPotentiometers don't have to do anything special when entering the
@@ -87,7 +85,6 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
  private:
   double m_scale, m_offset;
   AnalogInput* m_analog_input;
-  std::shared_ptr<ITable> m_table;
   bool m_init_analog_input;
 
   /**

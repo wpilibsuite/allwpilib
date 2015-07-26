@@ -166,17 +166,11 @@ std::string ADXL362::GetSmartDashboardType() const {
   return "3AxisAccelerometer";
 }
 
-void ADXL362::InitTable(std::shared_ptr<ITable> subtable) {
-  m_table = subtable;
-  UpdateTable();
-}
-
 void ADXL362::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("X", GetX());
-    m_table->PutNumber("Y", GetY());
-    m_table->PutNumber("Z", GetZ());
+  auto table = GetTable();
+  if (table) {
+    table->PutNumber("X", GetX());
+    table->PutNumber("Y", GetY());
+    table->PutNumber("Z", GetZ());
   }
 }
-
-std::shared_ptr<ITable> ADXL362::GetTable() const { return m_table; }

@@ -68,8 +68,6 @@ PWM::~PWM() {
 
   HAL_FreePWMPort(m_handle, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-
-  if (m_table != nullptr) m_table->RemoveTableListener(this);
 }
 
 /**
@@ -317,30 +315,26 @@ void PWM::ValueChanged(ITable* source, llvm::StringRef key,
 }
 
 void PWM::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Value", GetSpeed());
+  auto table = GetTable();
+  if (table) {
+    table->PutNumber("Value", GetSpeed());
   }
 }
 
 void PWM::StartLiveWindowMode() {
   SetSpeed(0);
-  if (m_table != nullptr) {
-    m_table->AddTableListener("Value", this, true);
+  auto table = GetTable();
+  if (table) {
+    table->AddTableListener("Value", this, true);
   }
 }
 
 void PWM::StopLiveWindowMode() {
   SetSpeed(0);
-  if (m_table != nullptr) {
-    m_table->RemoveTableListener(this);
+  auto table = GetTable();
+  if (table) {
+    table->RemoveTableListener(this);
   }
 }
 
 std::string PWM::GetSmartDashboardType() const { return "Speed Controller"; }
-
-void PWM::InitTable(std::shared_ptr<ITable> subTable) {
-  m_table = subTable;
-  UpdateTable();
-}
-
-std::shared_ptr<ITable> PWM::GetTable() const { return m_table; }

@@ -38,13 +38,11 @@ class SendableChooser : public Sendable {
   void* GetSelected();
 
   void InitTable(std::shared_ptr<ITable> subtable) override;
-  std::shared_ptr<ITable> GetTable() const override;
   std::string GetSmartDashboardType() const override;
 
  private:
   std::string m_defaultChoice;
   std::map<std::string, void*> m_choices;
-  std::shared_ptr<ITable> m_table;
 };
 
 }  // namespace frc

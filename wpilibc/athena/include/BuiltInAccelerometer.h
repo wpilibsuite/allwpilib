@@ -35,14 +35,9 @@ class BuiltInAccelerometer : public Accelerometer,
   double GetZ() override;
 
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subtable) override;
   void UpdateTable() override;
-  std::shared_ptr<ITable> GetTable() const override;
   void StartLiveWindowMode() override {}
   void StopLiveWindowMode() override {}
-
- private:
-  std::shared_ptr<ITable> m_table;
 };
 
 }  // namespace frc

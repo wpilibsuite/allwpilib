@@ -39,10 +39,9 @@ class Scheduler : public ErrorBase, public NamedSendable {
   void ResetAll();
   void SetEnabled(bool enabled);
 
-  void UpdateTable();
-  std::string GetSmartDashboardType() const;
-  void InitTable(std::shared_ptr<ITable> subTable);
-  std::shared_ptr<ITable> GetTable() const;
+  void InitTable(std::shared_ptr<ITable> subtable) override;
+  void UpdateTable() override;
+  std::string GetSmartDashboardType() const override;
   std::string GetName() const;
   std::string GetType() const;
 

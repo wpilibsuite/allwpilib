@@ -158,13 +158,10 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
  public:
   std::string GetName() const override;
   void InitTable(std::shared_ptr<ITable> subtable) override;
-  std::shared_ptr<ITable> GetTable() const override;
+  void UpdateTable() override;
   std::string GetSmartDashboardType() const override;
   void ValueChanged(ITable* source, llvm::StringRef key,
                     std::shared_ptr<nt::Value> value, bool isNew) override;
-
- protected:
-  std::shared_ptr<ITable> m_table;
 };
 
 }  // namespace frc

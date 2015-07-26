@@ -85,8 +85,9 @@ double AnalogOutput::GetVoltage() const {
 }
 
 void AnalogOutput::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Value", GetVoltage());
+  auto table = GetTable();
+  if (table) {
+    table->PutNumber("Value", GetVoltage());
   }
 }
 
@@ -97,10 +98,3 @@ void AnalogOutput::StopLiveWindowMode() {}
 std::string AnalogOutput::GetSmartDashboardType() const {
   return "Analog Output";
 }
-
-void AnalogOutput::InitTable(std::shared_ptr<ITable> subTable) {
-  m_table = subTable;
-  UpdateTable();
-}
-
-std::shared_ptr<ITable> AnalogOutput::GetTable() const { return m_table; }

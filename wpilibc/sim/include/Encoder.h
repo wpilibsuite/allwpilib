@@ -72,8 +72,6 @@ class Encoder : public SensorBase,
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subTable) override;
-  std::shared_ptr<ITable> GetTable() const override;
 
   int FPGAEncoderIndex() const { return 0; }
 
@@ -96,8 +94,6 @@ class Encoder : public SensorBase,
   int m_encodingScale;          // 1x, 2x, or 4x, per the encodingType
   bool m_reverseDirection;
   SimEncoder* impl;
-
-  std::shared_ptr<ITable> m_table;
 };
 
 }  // namespace frc

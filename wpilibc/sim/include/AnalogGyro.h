@@ -48,8 +48,6 @@ class AnalogGyro : public GyroBase {
   void InitAnalogGyro(int channel);
 
   SimGyro* impl;
-
-  std::shared_ptr<ITable> m_table;
 };
 
 }  // namespace frc

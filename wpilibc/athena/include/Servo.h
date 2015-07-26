@@ -25,7 +25,7 @@ namespace frc {
 class Servo : public SafePWM {
  public:
   explicit Servo(int channel);
-  virtual ~Servo();
+  virtual ~Servo() = default;
   void Set(double value);
   void SetOffline();
   double Get() const;
@@ -40,10 +40,6 @@ class Servo : public SafePWM {
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subTable) override;
-  std::shared_ptr<ITable> GetTable() const override;
-
-  std::shared_ptr<ITable> m_table;
 
  private:
   double GetServoAngleRange() const { return kMaxServoAngle - kMinServoAngle; }

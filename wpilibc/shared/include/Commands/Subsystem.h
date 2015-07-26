@@ -41,12 +41,8 @@ class Subsystem : public ErrorBase, public NamedSendable {
 
  public:
   std::string GetName() const override;
-  void InitTable(std::shared_ptr<ITable> subtable) override;
-  std::shared_ptr<ITable> GetTable() const override;
+  void UpdateTable() override;
   std::string GetSmartDashboardType() const override;
-
- protected:
-  std::shared_ptr<ITable> m_table;
 };
 
 }  // namespace frc

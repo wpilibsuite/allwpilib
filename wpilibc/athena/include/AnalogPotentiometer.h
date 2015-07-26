@@ -71,9 +71,7 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
    * Live Window code, only does anything if live window is activated.
    */
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subtable) override;
   void UpdateTable() override;
-  std::shared_ptr<ITable> GetTable() const override;
 
   /**
    * AnalogPotentiometers don't have to do anything special when entering the
@@ -90,7 +88,6 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
  private:
   std::shared_ptr<AnalogInput> m_analog_input;
   double m_fullRange, m_offset;
-  std::shared_ptr<ITable> m_table;
 };
 
 }  // namespace frc

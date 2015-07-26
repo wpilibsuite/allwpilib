@@ -64,7 +64,6 @@ Solenoid::Solenoid(int moduleNumber, int channel)
  */
 Solenoid::~Solenoid() {
   HAL_FreeSolenoidPort(m_solenoidHandle);
-  if (m_table != nullptr) m_table->RemoveTableListener(this);
 }
 
 /**
@@ -114,30 +113,26 @@ void Solenoid::ValueChanged(ITable* source, llvm::StringRef key,
 }
 
 void Solenoid::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutBoolean("Value", Get());
+  auto table = GetTable();
+  if (table) {
+    table->PutBoolean("Value", Get());
   }
 }
 
 void Solenoid::StartLiveWindowMode() {
   Set(false);
-  if (m_table != nullptr) {
-    m_table->AddTableListener("Value", this, true);
+  auto table = GetTable();
+  if (table) {
+    table->AddTableListener("Value", this, true);
   }
 }
 
 void Solenoid::StopLiveWindowMode() {
   Set(false);
-  if (m_table != nullptr) {
-    m_table->RemoveTableListener(this);
+  auto table = GetTable();
+  if (table) {
+    table->RemoveTableListener(this);
   }
 }
 
 std::string Solenoid::GetSmartDashboardType() const { return "Solenoid"; }
-
-void Solenoid::InitTable(std::shared_ptr<ITable> subTable) {
-  m_table = subTable;
-  UpdateTable();
-}
-
-std::shared_ptr<ITable> Solenoid::GetTable() const { return m_table; }

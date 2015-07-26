@@ -40,13 +40,10 @@ class Solenoid : public SolenoidBase,
   void StartLiveWindowMode();
   void StopLiveWindowMode();
   std::string GetSmartDashboardType() const;
-  void InitTable(std::shared_ptr<ITable> subTable);
-  std::shared_ptr<ITable> GetTable() const;
 
  private:
   HAL_SolenoidHandle m_solenoidHandle = HAL_kInvalidHandle;
   int m_channel;  ///< The channel on the module to control.
-  std::shared_ptr<ITable> m_table;
 };
 
 }  // namespace frc

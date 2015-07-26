@@ -73,17 +73,12 @@ class ADXL345_SPI : public Accelerometer, public LiveWindowSendable {
   virtual AllAxes GetAccelerations();
 
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subtable) override;
   void UpdateTable() override;
-  std::shared_ptr<ITable> GetTable() const override;
   void StartLiveWindowMode() override {}
   void StopLiveWindowMode() override {}
 
  protected:
   SPI m_spi;
-
- private:
-  std::shared_ptr<ITable> m_table;
 };
 
 }  // namespace frc

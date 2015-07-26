@@ -494,14 +494,15 @@ int Encoder::GetFPGAIndex() const {
 }
 
 void Encoder::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Speed", GetRate());
-    m_table->PutNumber("Distance", GetDistance());
+  auto table = GetTable();
+  if (table) {
+    table->PutNumber("Speed", GetRate());
+    table->PutNumber("Distance", GetDistance());
     int32_t status = 0;
     double distancePerPulse =
         HAL_GetEncoderDistancePerPulse(m_encoder, &status);
     wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-    m_table->PutNumber("Distance per Tick", distancePerPulse);
+    table->PutNumber("Distance per Tick", distancePerPulse);
   }
 }
 
@@ -518,10 +519,3 @@ std::string Encoder::GetSmartDashboardType() const {
   else
     return "Encoder";
 }
-
-void Encoder::InitTable(std::shared_ptr<ITable> subTable) {
-  m_table = subTable;
-  UpdateTable();
-}
-
-std::shared_ptr<ITable> Encoder::GetTable() const { return m_table; }

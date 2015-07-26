@@ -34,6 +34,7 @@ namespace frc {
  *   - 1 = full "reverse"
  *   - 0 = disabled (i.e. PWM output is held low)
  */
+<<<<<<< 54092378e91d7686109957934bb49486c12ab1de
 class PWM : public SensorBase,
             public ITableListener,
             public LiveWindowSendable {
@@ -43,6 +44,27 @@ class PWM : public SensorBase,
     kPeriodMultiplier_2X = 2,
     kPeriodMultiplier_4X = 4
   };
+||||||| merged common ancestors
+class PWM : public SensorBase,
+            public ITableListener,
+            public LiveWindowSendable {
+ public:
+  enum PeriodMultiplier {
+    kPeriodMultiplier_1X = 1,
+    kPeriodMultiplier_2X = 2,
+    kPeriodMultiplier_4X = 4
+  };
+=======
+class PWM : public SensorBase,
+            public LiveWindowSendable,
+            public ITableListener {
+ public:
+  enum PeriodMultiplier {
+    kPeriodMultiplier_1X = 1,
+    kPeriodMultiplier_2X = 2,
+    kPeriodMultiplier_4X = 4
+  };
+>>>>>>> artf4163: Sendable base class now provides the interface for InitTable() and UpdateTable(). ITableBase now provides an ITable for both Sendable and ITableListener base classes. This commit depends on the addition of ITableBase in ntcore.
 
   explicit PWM(int channel);
   virtual ~PWM();
@@ -99,10 +121,6 @@ class PWM : public SensorBase,
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subTable) override;
-  std::shared_ptr<ITable> GetTable() const override;
-
-  std::shared_ptr<ITable> m_table;
 
  private:
   int m_channel;

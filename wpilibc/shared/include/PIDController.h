@@ -141,7 +141,6 @@ class PIDController : public LiveWindowSendable,
   std::unique_ptr<Notifier> m_controlLoop;
   Timer m_setpointTimer;
 
-  std::shared_ptr<ITable> GetTable() const override;
   std::string GetSmartDashboardType() const override;
   void ValueChanged(ITable* source, llvm::StringRef key,
                     std::shared_ptr<nt::Value> value, bool isNew) override;

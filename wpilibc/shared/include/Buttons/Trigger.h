@@ -44,11 +44,7 @@ class Trigger : public Sendable {
   void ToggleWhenActive(Command* command);
 
   void InitTable(std::shared_ptr<ITable> subtable) override;
-  std::shared_ptr<ITable> GetTable() const override;
   std::string GetSmartDashboardType() const override;
-
- protected:
-  std::shared_ptr<ITable> m_table;
 };
 
 }  // namespace frc

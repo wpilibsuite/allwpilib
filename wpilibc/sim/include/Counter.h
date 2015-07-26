@@ -84,8 +84,6 @@ class Counter : public SensorBase,
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subTable) override;
-  std::shared_ptr<ITable> GetTable() const override;
 
  protected:
   // What makes the counter count up.
@@ -93,12 +91,11 @@ class Counter : public SensorBase,
   // What makes the counter count down.
   // TODO: [Not Supported] DigitalSource *m_downSource;
   void* m_counter;  ///< The FPGA counter object.
+
  private:
   bool m_allocatedUpSource;    ///< Was the upSource allocated locally?
   bool m_allocatedDownSource;  ///< Was the downSource allocated locally?
   int m_index;                 ///< The index of this counter.
-
-  std::shared_ptr<ITable> m_table;
 };
 
 }  // namespace frc

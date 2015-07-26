@@ -89,8 +89,6 @@ class Encoder : public SensorBase,
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subTable) override;
-  std::shared_ptr<ITable> GetTable() const override;
 
   int GetFPGAIndex() const;
 
@@ -104,7 +102,6 @@ class Encoder : public SensorBase,
   std::unique_ptr<DigitalSource> m_indexSource = nullptr;
   HAL_EncoderHandle m_encoder = HAL_kInvalidHandle;
 
-  std::shared_ptr<ITable> m_table;
   friend class DigitalGlitchFilter;
 };
 

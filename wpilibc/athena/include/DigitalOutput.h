@@ -50,15 +50,11 @@ class DigitalOutput : public DigitalSource,
   void StartLiveWindowMode();
   void StopLiveWindowMode();
   std::string GetSmartDashboardType() const;
-  void InitTable(std::shared_ptr<ITable> subTable);
-  std::shared_ptr<ITable> GetTable() const;
 
  private:
   int m_channel;
   HAL_DigitalHandle m_handle;
   HAL_DigitalPWMHandle m_pwmGenerator;
-
-  std::shared_ptr<ITable> m_table;
 };
 
 }  // namespace frc

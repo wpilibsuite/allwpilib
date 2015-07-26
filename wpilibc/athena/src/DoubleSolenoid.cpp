@@ -95,7 +95,6 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
 DoubleSolenoid::~DoubleSolenoid() {
   HAL_FreeSolenoidPort(m_forwardHandle);
   HAL_FreeSolenoidPort(m_reverseHandle);
-  if (m_table != nullptr) m_table->RemoveTableListener(this);
 }
 
 /**
@@ -190,34 +189,36 @@ void DoubleSolenoid::ValueChanged(ITable* source, llvm::StringRef key,
 }
 
 void DoubleSolenoid::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutString(
-        "Value", (Get() == kForward ? "Forward"
-                                    : (Get() == kReverse ? "Reverse" : "Off")));
+  auto table = GetTable();
+  if (table) {
+    if (Get() == kForward) {
+      table->PutString("Value", "Forward");
+    } else {
+      if (Get() == kReverse) {
+        table->PutString("Value", "Reverse");
+      } else {
+        table->PutString("Value", "Off");
+      }
+    }
   }
 }
 
 void DoubleSolenoid::StartLiveWindowMode() {
   Set(kOff);
-  if (m_table != nullptr) {
-    m_table->AddTableListener("Value", this, true);
+  auto table = GetTable();
+  if (table) {
+    table->AddTableListener("Value", this, true);
   }
 }
 
 void DoubleSolenoid::StopLiveWindowMode() {
   Set(kOff);
-  if (m_table != nullptr) {
-    m_table->RemoveTableListener(this);
+  auto table = GetTable();
+  if (table) {
+    table->RemoveTableListener(this);
   }
 }
 
 std::string DoubleSolenoid::GetSmartDashboardType() const {
   return "Double Solenoid";
 }
-
-void DoubleSolenoid::InitTable(std::shared_ptr<ITable> subTable) {
-  m_table = subTable;
-  UpdateTable();
-}
-
-std::shared_ptr<ITable> DoubleSolenoid::GetTable() const { return m_table; }

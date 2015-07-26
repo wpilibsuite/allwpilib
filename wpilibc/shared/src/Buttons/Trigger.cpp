@@ -17,10 +17,13 @@ using namespace frc;
 bool Trigger::Grab() {
   if (Get()) {
     return true;
-  } else if (m_table != nullptr) {
-    return m_table->GetBoolean("pressed", false);
   } else {
-    return false;
+    auto table = GetTable();
+    if (m_table != nullptr) {
+      return m_table->GetBoolean("pressed", false);
+    } else {
+      return false;
+    }
   }
 }
 
@@ -52,10 +55,8 @@ void Trigger::ToggleWhenActive(Command* command) {
 std::string Trigger::GetSmartDashboardType() const { return "Button"; }
 
 void Trigger::InitTable(std::shared_ptr<ITable> subtable) {
-  m_table = subtable;
-  if (m_table != nullptr) {
-    m_table->PutBoolean("pressed", Get());
+  GetTable() = subtable;
+  if (subtable != nullptr) {
+    subtable->PutBoolean("pressed", Get());
   }
 }
-
-std::shared_ptr<ITable> Trigger::GetTable() const { return m_table; }

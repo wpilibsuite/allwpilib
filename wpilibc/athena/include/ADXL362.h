@@ -52,17 +52,13 @@ class ADXL362 : public Accelerometer, public LiveWindowSendable {
   virtual AllAxes GetAccelerations();
 
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subtable) override;
   void UpdateTable() override;
-  std::shared_ptr<ITable> GetTable() const override;
   void StartLiveWindowMode() override {}
   void StopLiveWindowMode() override {}
 
  private:
   SPI m_spi;
   double m_gsPerLSB = 0.001;
-
-  std::shared_ptr<ITable> m_table;
 };
 
 }  // namespace frc

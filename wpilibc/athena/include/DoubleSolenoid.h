@@ -44,8 +44,6 @@ class DoubleSolenoid : public SolenoidBase,
   void StartLiveWindowMode();
   void StopLiveWindowMode();
   std::string GetSmartDashboardType() const;
-  void InitTable(std::shared_ptr<ITable> subTable);
-  std::shared_ptr<ITable> GetTable() const;
 
  private:
   int m_forwardChannel;  ///< The forward channel on the module to control.
@@ -54,8 +52,6 @@ class DoubleSolenoid : public SolenoidBase,
   int m_reverseMask;     ///< The mask for the reverse channel.
   HAL_SolenoidHandle m_forwardHandle = HAL_kInvalidHandle;
   HAL_SolenoidHandle m_reverseHandle = HAL_kInvalidHandle;
-
-  std::shared_ptr<ITable> m_table;
 };
 
 }  // namespace frc

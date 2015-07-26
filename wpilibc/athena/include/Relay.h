@@ -14,7 +14,6 @@
 #include "LiveWindow/LiveWindowSendable.h"
 #include "MotorSafety.h"
 #include "SensorBase.h"
-#include "tables/ITable.h"
 #include "tables/ITableListener.h"
 
 namespace frc {
@@ -61,10 +60,6 @@ class Relay : public MotorSafety,
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subTable) override;
-  std::shared_ptr<ITable> GetTable() const override;
-
-  std::shared_ptr<ITable> m_table;
 
  private:
   int m_channel;

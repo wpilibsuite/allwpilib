@@ -50,7 +50,7 @@ void SendableChooser::AddDefault(const std::string& name, void* object) {
  * @return the option selected
  */
 void* SendableChooser::GetSelected() {
-  std::string selected = m_table->GetString(kSelected, m_defaultChoice);
+  std::string selected = GetTable()->GetString(kSelected, m_defaultChoice);
   if (selected == "")
     return nullptr;
   else
@@ -58,19 +58,16 @@ void* SendableChooser::GetSelected() {
 }
 
 void SendableChooser::InitTable(std::shared_ptr<ITable> subtable) {
-  std::vector<std::string> keys;
-  m_table = subtable;
-  if (m_table != nullptr) {
-    std::map<std::string, void*>::iterator iter;
-    for (iter = m_choices.begin(); iter != m_choices.end(); iter++) {
-      keys.push_back(iter->first);
+  if (subtable) {
+    std::vector<std::string> keys;
+    for (auto& choice : m_choices) {
+      keys.push_back(choice.first);
     }
-    m_table->PutValue(kOptions, nt::Value::MakeStringArray(std::move(keys)));
-    m_table->PutString(kDefault, m_defaultChoice);
+    subtable->PutValue(kOptions, nt::Value::MakeStringArray(std::move(keys)));
+    subtable->PutString(kDefault, m_defaultChoice);
   }
+  GetTable() = std::move(subtable);
 }
-
-std::shared_ptr<ITable> SendableChooser::GetTable() const { return m_table; }
 
 std::string SendableChooser::GetSmartDashboardType() const {
   return "String Chooser";

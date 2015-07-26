@@ -98,8 +98,6 @@ class Counter : public SensorBase,
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subTable) override;
-  std::shared_ptr<ITable> GetTable() const override;
 
  protected:
   // Makes the counter count up.
@@ -112,7 +110,6 @@ class Counter : public SensorBase,
  private:
   int m_index = 0;  ///< The index of this counter.
 
-  std::shared_ptr<ITable> m_table;
   friend class DigitalGlitchFilter;
 };
 

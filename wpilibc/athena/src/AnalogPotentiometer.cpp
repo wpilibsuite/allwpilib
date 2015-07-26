@@ -83,20 +83,9 @@ std::string AnalogPotentiometer::GetSmartDashboardType() const {
   return "Analog Input";
 }
 
-/**
- * Live Window code, only does anything if live window is activated.
- */
-void AnalogPotentiometer::InitTable(std::shared_ptr<ITable> subtable) {
-  m_table = subtable;
-  UpdateTable();
-}
-
 void AnalogPotentiometer::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Value", Get());
+  auto table = GetTable();
+  if (table) {
+    table->PutNumber("Value", Get());
   }
-}
-
-std::shared_ptr<ITable> AnalogPotentiometer::GetTable() const {
-  return m_table;
 }
