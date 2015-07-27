@@ -214,8 +214,10 @@ class InversionTestRunner {
   bool m_success = false;
 };
 
+//TODO: Fix roborio permissions to run as root.
+
 // Priority inversion test.
-TEST(MutexTest, PriorityInversionTest) {
+TEST(MutexTest, DISABLED_PriorityInversionTest) {
   InversionTestRunner<priority_mutex> runner;
   std::thread runner_thread(std::ref(runner));
   runner_thread.join();
@@ -223,7 +225,7 @@ TEST(MutexTest, PriorityInversionTest) {
 }
 
 // Verify that the non-priority inversion mutex doesn't pass the test.
-TEST(MutexTest, StdMutexPriorityInversionTest) {
+TEST(MutexTest, DISABLED_StdMutexPriorityInversionTest) {
   InversionTestRunner<std::mutex> runner;
   std::thread runner_thread(std::ref(runner));
   runner_thread.join();
@@ -240,7 +242,7 @@ TEST(MutexTest, TryLock) {
 }
 
 // Priority inversion test.
-TEST(MutexTest, ReentrantPriorityInversionTest) {
+TEST(MutexTest, DISABLED_ReentrantPriorityInversionTest) {
   InversionTestRunner<priority_recursive_mutex> runner;
   std::thread runner_thread(std::ref(runner));
   runner_thread.join();
