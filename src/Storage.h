@@ -87,21 +87,29 @@ class Storage {
   ~Storage();
 
   struct Update {
-    enum Kind { kAssign, kValueUpdate, kFlagsUpdate, kDelete, kDeleteAll };
-    Update(std::shared_ptr<StorageEntry> entry_, Kind kind_)
-        : entry(entry_), kind(kind_) {}
+    enum Kind {
+      kNone,
+      kAssign,
+      kValueUpdate,
+      kFlagsUpdate,
+      kValueFlagsUpdate,
+      kDelete,
+      kDeleteAll
+    };
+    Update() : flags(0), kind(kNone) {}
+
     std::shared_ptr<StorageEntry> entry;
+    std::shared_ptr<Value> value;
+    unsigned int flags;
     Kind kind;
   };
-  typedef ConcurrentQueue<Update> UpdateQueue;
+  typedef llvm::StringMap<Update> UpdateMap;
 
   // Finds, but does not create entry.  Returns nullptr if not found.
   std::shared_ptr<StorageEntry> FindEntry(StringRef name) const;
 
   // Accessors required by Dispatcher.
-  void EnableUpdates() { m_updates_enabled = true; }
-  void DisableUpdates() { m_updates_enabled = false; }
-  UpdateQueue& updates() { return m_updates; }
+  void GetUpdates(UpdateMap* updates, bool* delete_all);
   std::mutex& mutex() { return m_mutex; }
 
   // User functions
@@ -124,17 +132,14 @@ class Storage {
   Storage(const Storage&) = delete;
   Storage& operator=(const Storage&) = delete;
 
-  template <typename... Args>
-  void AddUpdate(Args&&... args) {
-    if (m_updates_enabled) m_updates.emplace(std::forward<Args>(args)...);
-  }
+  void AddUpdate(std::shared_ptr<StorageEntry> entry, Update::Kind kind);
 
   typedef llvm::StringMap<std::shared_ptr<StorageEntry>> EntriesMap;
 
   mutable std::mutex m_mutex;
   EntriesMap m_entries;
-  UpdateQueue m_updates;
-  std::atomic_bool m_updates_enabled;
+  UpdateMap m_updates;
+  bool m_updates_delete_all;
 
   ATOMIC_STATIC_DECL(Storage)
 };

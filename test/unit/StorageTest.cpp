@@ -16,24 +16,23 @@ namespace nt {
 
 class StorageTest : public ::testing::Test {
  public:
-  StorageTest() {
-    storage.EnableUpdates();
-  }
   Storage::EntriesMap& entries() { return storage.m_entries; }
-  Storage::UpdateQueue& updates() { return storage.updates(); }
+  void GetUpdates() { storage.GetUpdates(&updates, &delete_all); }
   std::shared_ptr<StorageEntry> GetEntry(StringRef name) {
     auto& entry = storage.m_entries[name];
     if (!entry) entry = std::make_shared<StorageEntry>(name);
     return entry;
   }
   Storage storage;
+  Storage::UpdateMap updates;
+  bool delete_all;
 };
 
 class StorageTestPopulateOne : public StorageTest {
  public:
   StorageTestPopulateOne() {
     storage.SetEntryTypeValue("foo", Value::MakeBoolean(true));
-    while (!updates().empty()) updates().pop();
+    GetUpdates();
   }
 };
 
@@ -44,7 +43,7 @@ class StorageTestPopulated : public StorageTest {
     storage.SetEntryTypeValue("foo2", Value::MakeDouble(0.0));
     storage.SetEntryTypeValue("bar", Value::MakeDouble(1.0));
     storage.SetEntryTypeValue("bar2", Value::MakeBoolean(false));
-    while (!updates().empty()) updates().pop();
+    GetUpdates();
   }
 };
 
@@ -87,7 +86,7 @@ class StorageTestPersistent : public StorageTest {
         Value::MakeStringArray(std::vector<std::string>{"hello", "world\n"}));
     storage.SetEntryTypeValue(StringRef("\0\3\5\n", 4),
                               Value::MakeBoolean(true));
-    while (!updates().empty()) updates().pop();
+    GetUpdates();
   }
 };
 
@@ -98,7 +97,9 @@ class MockLoadWarn {
 
 TEST_F(StorageTest, Construct) {
   ASSERT_TRUE(entries().empty());
-  ASSERT_TRUE(updates().empty());
+  GetUpdates();
+  ASSERT_TRUE(updates.empty());
+  ASSERT_FALSE(delete_all);
 }
 
 TEST_F(StorageTest, FindEntryNotExist) {
@@ -134,9 +135,9 @@ TEST_F(StorageTest, GetEntryValueNotExist) {
 TEST_F(StorageTest, GetEntryValueExist) {
   auto value = Value::MakeBoolean(true);
   storage.SetEntryTypeValue("foo", value);
-  ASSERT_EQ(1u, updates().size());
-  updates().pop();
-  ASSERT_EQ(value, storage.GetEntryValue("foo"));
+  GetUpdates();
+  EXPECT_EQ(1u, updates.size());
+  EXPECT_EQ(updates["foo"].value, storage.GetEntryValue("foo"));
 }
 
 TEST_F(StorageTest, SetEntryTypeValueAssignNew) {
@@ -145,8 +146,10 @@ TEST_F(StorageTest, SetEntryTypeValueAssignNew) {
   storage.SetEntryTypeValue("foo", value);
   auto entry = GetEntry("foo");
   EXPECT_EQ(value, entry->value());
-  ASSERT_EQ(1u, updates().size());
-  auto update = updates().pop();
+  GetUpdates();
+  EXPECT_EQ(1u, updates.size());
+  EXPECT_FALSE(delete_all);
+  auto& update = updates["foo"];
   EXPECT_EQ(entry, update.entry);
   EXPECT_EQ(Storage::Update::kAssign, update.kind);
 }
@@ -157,8 +160,10 @@ TEST_F(StorageTestPopulateOne, SetEntryTypeValueAssignTypeChange) {
   storage.SetEntryTypeValue("foo", value);
   auto entry = GetEntry("foo");
   EXPECT_EQ(value, entry->value());
-  ASSERT_EQ(1u, updates().size());
-  auto update = updates().pop();
+  GetUpdates();
+  EXPECT_EQ(1u, updates.size());
+  EXPECT_FALSE(delete_all);
+  auto& update = updates["foo"];
   EXPECT_EQ(entry, update.entry);
   EXPECT_EQ(Storage::Update::kAssign, update.kind);
 }
@@ -170,7 +175,9 @@ TEST_F(StorageTestPopulateOne, SetEntryTypeValueEqualValue) {
   storage.SetEntryTypeValue("foo", value);
   auto entry = GetEntry("foo");
   EXPECT_EQ(value, entry->value());
-  ASSERT_TRUE(updates().empty());
+  GetUpdates();
+  EXPECT_TRUE(updates.empty());
+  EXPECT_FALSE(delete_all);
 }
 
 TEST_F(StorageTestPopulateOne, SetEntryTypeValueDifferentValue) {
@@ -179,8 +186,10 @@ TEST_F(StorageTestPopulateOne, SetEntryTypeValueDifferentValue) {
   storage.SetEntryTypeValue("foo", value);
   auto entry = GetEntry("foo");
   EXPECT_EQ(value, entry->value());
-  ASSERT_EQ(1u, updates().size());
-  auto update = updates().pop();
+  GetUpdates();
+  EXPECT_EQ(1u, updates.size());
+  EXPECT_FALSE(delete_all);
+  auto& update = updates["foo"];
   EXPECT_EQ(entry, update.entry);
   EXPECT_EQ(Storage::Update::kValueUpdate, update.kind);
 }
@@ -189,13 +198,17 @@ TEST_F(StorageTest, SetEntryTypeValueEmptyName) {
   auto value = Value::MakeBoolean(true);
   storage.SetEntryTypeValue("", value);
   ASSERT_TRUE(entries().empty());
-  ASSERT_TRUE(updates().empty());
+  GetUpdates();
+  EXPECT_TRUE(updates.empty());
+  EXPECT_FALSE(delete_all);
 }
 
 TEST_F(StorageTest, SetEntryTypeValueEmptyValue) {
   storage.SetEntryTypeValue("foo", nullptr);
   ASSERT_TRUE(entries().empty());
-  ASSERT_TRUE(updates().empty());
+  GetUpdates();
+  EXPECT_TRUE(updates.empty());
+  EXPECT_FALSE(delete_all);
 }
 
 TEST_F(StorageTest, SetEntryValueAssignNew) {
@@ -204,8 +217,10 @@ TEST_F(StorageTest, SetEntryValueAssignNew) {
   EXPECT_TRUE(storage.SetEntryValue("foo", value));
   auto entry = GetEntry("foo");
   EXPECT_EQ(value, entry->value());
-  ASSERT_EQ(1u, updates().size());
-  auto update = updates().pop();
+  GetUpdates();
+  EXPECT_EQ(1u, updates.size());
+  EXPECT_FALSE(delete_all);
+  auto& update = updates["foo"];
   EXPECT_EQ(entry, update.entry);
   EXPECT_EQ(Storage::Update::kAssign, update.kind);
 }
@@ -216,7 +231,9 @@ TEST_F(StorageTestPopulateOne, SetEntryValueAssignTypeChange) {
   EXPECT_FALSE(storage.SetEntryValue("foo", value));
   auto entry = GetEntry("foo");
   EXPECT_NE(value, entry->value());
-  ASSERT_TRUE(updates().empty());
+  GetUpdates();
+  EXPECT_TRUE(updates.empty());
+  EXPECT_FALSE(delete_all);
 }
 
 TEST_F(StorageTestPopulateOne, SetEntryValueEqualValue) {
@@ -226,7 +243,9 @@ TEST_F(StorageTestPopulateOne, SetEntryValueEqualValue) {
   EXPECT_TRUE(storage.SetEntryValue("foo", value));
   auto entry = GetEntry("foo");
   EXPECT_EQ(value, entry->value());
-  ASSERT_TRUE(updates().empty());
+  GetUpdates();
+  EXPECT_TRUE(updates.empty());
+  EXPECT_FALSE(delete_all);
 }
 
 TEST_F(StorageTestPopulateOne, SetEntryValueDifferentValue) {
@@ -235,8 +254,10 @@ TEST_F(StorageTestPopulateOne, SetEntryValueDifferentValue) {
   EXPECT_TRUE(storage.SetEntryValue("foo", value));
   auto entry = GetEntry("foo");
   EXPECT_EQ(value, entry->value());
-  ASSERT_EQ(1u, updates().size());
-  auto update = updates().pop();
+  GetUpdates();
+  EXPECT_EQ(1u, updates.size());
+  EXPECT_FALSE(delete_all);
+  auto& update = updates["foo"];
   EXPECT_EQ(entry, update.entry);
   EXPECT_EQ(Storage::Update::kValueUpdate, update.kind);
 }
@@ -245,20 +266,26 @@ TEST_F(StorageTest, SetEntryValueEmptyName) {
   auto value = Value::MakeBoolean(true);
   EXPECT_TRUE(storage.SetEntryValue("", value));
   ASSERT_TRUE(entries().empty());
-  ASSERT_TRUE(updates().empty());
+  GetUpdates();
+  EXPECT_TRUE(updates.empty());
+  EXPECT_FALSE(delete_all);
 }
 
 TEST_F(StorageTest, SetEntryValueEmptyValue) {
   EXPECT_TRUE(storage.SetEntryValue("foo", nullptr));
   ASSERT_TRUE(entries().empty());
-  ASSERT_TRUE(updates().empty());
+  GetUpdates();
+  EXPECT_TRUE(updates.empty());
+  EXPECT_FALSE(delete_all);
 }
 
 TEST_F(StorageTest, SetEntryFlagsNew) {
   // flags setting doesn't create an entry
   storage.SetEntryFlags("foo", 0u);
   ASSERT_TRUE(entries().empty());
-  ASSERT_TRUE(updates().empty());
+  GetUpdates();
+  EXPECT_TRUE(updates.empty());
+  EXPECT_FALSE(delete_all);
 }
 
 TEST_F(StorageTestPopulateOne, SetEntryFlagsEqualValue) {
@@ -267,7 +294,9 @@ TEST_F(StorageTestPopulateOne, SetEntryFlagsEqualValue) {
   storage.SetEntryFlags("foo", 0u);
   auto entry = GetEntry("foo");
   EXPECT_EQ(0u, entry->flags());
-  ASSERT_TRUE(updates().empty());
+  GetUpdates();
+  EXPECT_TRUE(updates.empty());
+  EXPECT_FALSE(delete_all);
 }
 
 TEST_F(StorageTestPopulateOne, SetEntryFlagsDifferentValue) {
@@ -275,8 +304,9 @@ TEST_F(StorageTestPopulateOne, SetEntryFlagsDifferentValue) {
   storage.SetEntryFlags("foo", 1u);
   auto entry = GetEntry("foo");
   EXPECT_EQ(1u, entry->flags());
-  ASSERT_EQ(1u, updates().size());
-  auto update = updates().pop();
+  GetUpdates();
+  EXPECT_EQ(1u, updates.size());
+  auto& update = updates["foo"];
   EXPECT_EQ(entry, update.entry);
   EXPECT_EQ(Storage::Update::kFlagsUpdate, update.kind);
 }
@@ -284,47 +314,52 @@ TEST_F(StorageTestPopulateOne, SetEntryFlagsDifferentValue) {
 TEST_F(StorageTest, SetEntryFlagsEmptyName) {
   storage.SetEntryFlags("", 0u);
   ASSERT_TRUE(entries().empty());
-  ASSERT_TRUE(updates().empty());
+  GetUpdates();
+  EXPECT_TRUE(updates.empty());
 }
 
 TEST_F(StorageTest, GetEntryFlagsNotExist) {
   ASSERT_EQ(0u, storage.GetEntryFlags("foo"));
   ASSERT_TRUE(entries().empty());
+  GetUpdates();
+  EXPECT_TRUE(updates.empty());
 }
 
 TEST_F(StorageTestPopulateOne, GetEntryFlagsExist) {
   storage.SetEntryFlags("foo", 1u);
-  while (!updates().empty()) updates().pop();
+  GetUpdates();
   ASSERT_EQ(1u, storage.GetEntryFlags("foo"));
 }
 
 TEST_F(StorageTest, DeleteEntryNotExist) {
   storage.DeleteEntry("foo");
-  ASSERT_TRUE(updates().empty());
+  GetUpdates();
+  EXPECT_TRUE(updates.empty());
 }
 
 TEST_F(StorageTestPopulateOne, DeleteEntryExist) {
   auto entry = GetEntry("foo");
   storage.DeleteEntry("foo");
   ASSERT_TRUE(entries().empty());
-  ASSERT_EQ(1u, updates().size());
-  auto update = updates().pop();
+  GetUpdates();
+  EXPECT_EQ(1u, updates.size());
+  auto& update = updates["foo"];
   EXPECT_EQ(entry, update.entry);
   EXPECT_EQ(Storage::Update::kDelete, update.kind);
 }
 
 TEST_F(StorageTest, DeleteAllEntriesEmpty) {
   storage.DeleteAllEntries();
-  ASSERT_TRUE(updates().empty());
+  GetUpdates();
+  EXPECT_TRUE(updates.empty());
 }
 
 TEST_F(StorageTestPopulated, DeleteAllEntries) {
   storage.DeleteAllEntries();
   ASSERT_TRUE(entries().empty());
-  ASSERT_EQ(1u, updates().size());
-  auto update = updates().pop();
-  EXPECT_EQ(nullptr, update.entry);
-  EXPECT_EQ(Storage::Update::kDeleteAll, update.kind);
+  GetUpdates();
+  EXPECT_TRUE(updates.empty());
+  ASSERT_TRUE(delete_all);
 }
 
 TEST_F(StorageTestPopulated, GetEntryInfoAll) {
@@ -443,7 +478,8 @@ TEST_F(StorageTest, LoadPersistentBadHeader) {
   EXPECT_CALL(warn, Warn(1, "header line mismatch, ignoring rest of file"));
   EXPECT_FALSE(storage.LoadPersistent(iss2, warn_func));
   ASSERT_TRUE(entries().empty());
-  ASSERT_TRUE(updates().empty());
+  GetUpdates();
+  ASSERT_TRUE(updates.empty());
 }
 
 TEST_F(StorageTest, LoadPersistentCommentHeader) {
@@ -455,7 +491,8 @@ TEST_F(StorageTest, LoadPersistentCommentHeader) {
       "\n; comment\n# comment\n[NetworkTables Storage 3.0]\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
   ASSERT_TRUE(entries().empty());
-  ASSERT_TRUE(updates().empty());
+  GetUpdates();
+  ASSERT_TRUE(updates.empty());
 }
 
 TEST_F(StorageTest, LoadPersistentEmptyName) {
@@ -467,7 +504,8 @@ TEST_F(StorageTest, LoadPersistentEmptyName) {
       "[NetworkTables Storage 3.0]\nboolean \"\"=true\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
   ASSERT_TRUE(entries().empty());
-  ASSERT_TRUE(updates().empty());
+  GetUpdates();
+  ASSERT_TRUE(updates.empty());
 }
 
 TEST_F(StorageTest, LoadPersistentAssign) {
@@ -481,10 +519,13 @@ TEST_F(StorageTest, LoadPersistentAssign) {
   auto entry = GetEntry("foo");
   EXPECT_EQ(*Value::MakeBoolean(true), *entry->value());
   EXPECT_EQ(NT_PERSISTENT, entry->flags());
-  ASSERT_EQ(1u, updates().size());
-  auto update = updates().pop();
+  GetUpdates();
+  EXPECT_EQ(1u, updates.size());
+  auto& update = updates["foo"];
   EXPECT_EQ(entry, update.entry);
   EXPECT_EQ(Storage::Update::kAssign, update.kind);
+  EXPECT_EQ(entry->value(), update.value);
+  EXPECT_EQ(NT_PERSISTENT, update.flags);
 }
 
 TEST_F(StorageTestPopulateOne, LoadPersistentUpdateFlags) {
@@ -498,10 +539,12 @@ TEST_F(StorageTestPopulateOne, LoadPersistentUpdateFlags) {
   auto entry = GetEntry("foo");
   EXPECT_EQ(*Value::MakeBoolean(true), *entry->value());
   EXPECT_EQ(NT_PERSISTENT, entry->flags());
-  ASSERT_EQ(1u, updates().size());
-  auto update = updates().pop();
+  GetUpdates();
+  ASSERT_EQ(1u, updates.size());
+  auto& update = updates["foo"];
   EXPECT_EQ(entry, update.entry);
   EXPECT_EQ(Storage::Update::kFlagsUpdate, update.kind);
+  EXPECT_EQ(NT_PERSISTENT, update.flags);
 }
 
 TEST_F(StorageTestPopulateOne, LoadPersistentUpdateValue) {
@@ -510,7 +553,7 @@ TEST_F(StorageTestPopulateOne, LoadPersistentUpdateValue) {
       [&](std::size_t line, const char* msg) { warn.Warn(line, msg); };
 
   GetEntry("foo")->set_flags(NT_PERSISTENT);
-  while (!updates().empty()) updates().pop();
+  GetUpdates();
 
   std::istringstream iss(
       "[NetworkTables Storage 3.0]\nboolean \"foo\"=false\n");
@@ -518,10 +561,12 @@ TEST_F(StorageTestPopulateOne, LoadPersistentUpdateValue) {
   auto entry = GetEntry("foo");
   EXPECT_EQ(*Value::MakeBoolean(false), *entry->value());
   EXPECT_EQ(NT_PERSISTENT, entry->flags());
-  ASSERT_EQ(1u, updates().size());
-  auto update = updates().pop();
+  GetUpdates();
+  EXPECT_EQ(1u, updates.size());
+  auto& update = updates["foo"];
   EXPECT_EQ(entry, update.entry);
   EXPECT_EQ(Storage::Update::kValueUpdate, update.kind);
+  EXPECT_EQ(entry->value(), update.value);
 }
 
 TEST_F(StorageTestPopulateOne, LoadPersistentUpdateValueFlags) {
@@ -535,13 +580,13 @@ TEST_F(StorageTestPopulateOne, LoadPersistentUpdateValueFlags) {
   auto entry = GetEntry("foo");
   EXPECT_EQ(*Value::MakeBoolean(false), *entry->value());
   EXPECT_EQ(NT_PERSISTENT, entry->flags());
-  ASSERT_EQ(2u, updates().size());
-  auto update = updates().pop();
+  GetUpdates();
+  ASSERT_EQ(1u, updates.size());
+  auto& update = updates["foo"];
   EXPECT_EQ(entry, update.entry);
-  EXPECT_EQ(Storage::Update::kValueUpdate, update.kind);
-  update = updates().pop();
-  EXPECT_EQ(entry, update.entry);
-  EXPECT_EQ(Storage::Update::kFlagsUpdate, update.kind);
+  EXPECT_EQ(Storage::Update::kValueFlagsUpdate, update.kind);
+  EXPECT_EQ(entry->value(), update.value);
+  EXPECT_EQ(NT_PERSISTENT, update.flags);
 }
 
 TEST_F(StorageTest, LoadPersistent) {
@@ -575,7 +620,8 @@ TEST_F(StorageTest, LoadPersistent) {
   std::istringstream iss(in);
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
   ASSERT_EQ(21u, entries().size());
-  ASSERT_EQ(21u, updates().size());
+  GetUpdates();
+  EXPECT_EQ(21u, updates.size());
 
   EXPECT_EQ(*Value::MakeBoolean(true), *storage.GetEntryValue("boolean/true"));
   EXPECT_EQ(*Value::MakeBoolean(false),
@@ -629,7 +675,8 @@ TEST_F(StorageTest, LoadPersistentWarn) {
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
 
   ASSERT_TRUE(entries().empty());
-  ASSERT_TRUE(updates().empty());
+  GetUpdates();
+  ASSERT_TRUE(updates.empty());
 }
 
 }  // namespace nt

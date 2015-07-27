@@ -18,10 +18,73 @@ using namespace nt;
 ATOMIC_STATIC_INIT(Storage)
 
 Storage::Storage() {
-  m_updates_enabled = false;
+  m_updates_delete_all = false;
 }
 
 Storage::~Storage() {}
+
+void Storage::GetUpdates(UpdateMap* updates, bool* delete_all) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_updates.swap(*updates);
+  m_updates.clear();
+  *delete_all = m_updates_delete_all;
+  m_updates_delete_all = false;
+}
+
+// Must be called with mutex already held
+void Storage::AddUpdate(std::shared_ptr<StorageEntry> entry,
+                        Update::Kind kind) {
+  if (kind == Update::kDeleteAll) {
+    m_updates_delete_all = true;
+    m_updates.clear();
+    return;
+  }
+  auto& update = m_updates[entry->name()];
+  switch (kind) {
+    case Update::kAssign:
+      update.entry = entry;
+      update.value = entry->value();
+      update.flags = entry->flags();
+      update.kind = Update::kAssign;
+      break;
+    case Update::kValueUpdate:
+      if (update.kind == Update::kNone) {
+        update.entry = entry;
+        update.kind = Update::kValueUpdate;
+      } else if (update.kind == Update::kFlagsUpdate) {
+        // Merge value+flags updates as we can only have a single update
+        // entry.
+        update.kind = Update::kValueFlagsUpdate;
+      } else if (update.kind == Update::kDelete) {
+        // Change delete + update into assign
+        update.kind = Update::kAssign;
+        update.flags = entry->flags();
+      }
+      update.value = entry->value();
+      break;
+    case Update::kFlagsUpdate:
+      if (update.kind == Update::kNone) {
+        update.entry = entry;
+        update.kind = Update::kFlagsUpdate;
+      } else if (update.kind == Update::kValueUpdate) {
+        // Merge value+flags updates as we can only have a single update
+        // entry.
+        update.kind = Update::kValueFlagsUpdate;
+      } else if (update.kind == Update::kDelete) {
+        return;  // can't do a raw flags update
+      }
+      update.flags = entry->flags();
+      break;
+    case Update::kDelete:
+      update.kind = Update::kDelete;
+      update.entry = entry;
+      update.value = nullptr;  // release reference if any
+      break;
+    default:
+      assert(false && "unexpected update kind");
+      break;
+  }
+}
 
 std::shared_ptr<StorageEntry> Storage::FindEntry(StringRef name) const {
   std::lock_guard<std::mutex> lock(m_mutex);
