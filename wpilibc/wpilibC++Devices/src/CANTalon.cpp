@@ -1278,19 +1278,42 @@ void CANTalon::StopMotor() { Disable(); }
 
 void CANTalon::ValueChanged(ITable* source, llvm::StringRef key,
                             std::shared_ptr<nt::Value> value, bool isNew) {
-  if (!value->IsDouble()) return;
-  Set(value->GetDouble());
+  if(key == "Mode" && value->IsDouble()) SetControlMode(static_cast<CANSpeedController::ControlMode>(value->GetDouble()));
+  if(key == "p" && value->IsDouble()) SetP(value->GetDouble());
+  if(key == "i" && value->IsDouble()) SetI(value->GetDouble());
+  if(key == "d" && value->IsDouble()) SetD(value->GetDouble());
+  if(key == "f" && value->IsDouble()) SetF(value->GetDouble());
+  if(key == "Enabled" && value->IsBoolean()) {
+      if (value->GetBoolean()) {
+        Enable();
+      } else {
+        Disable();
+      }
+  }
+  if(key == "Value" && value->IsDouble()) Set(value->GetDouble());
+}
+
+bool CANTalon::IsModePID(CANSpeedController::ControlMode mode) const {
+  return mode == kCurrent || mode == kSpeed || mode == kPosition;
 }
 
 void CANTalon::UpdateTable() {
   if (m_table != nullptr) {
+    m_table->PutString("~TYPE~", "CANSpeedController");
+    m_table->PutString("Type", "CANTalon");
+    m_table->PutString("Mode", GetModeName(m_controlMode));
+    m_table->PutNumber("p", GetP());
+    m_table->PutNumber("i", GetI());
+    m_table->PutNumber("d", GetD());
+    m_table->PutNumber("f", GetF());
+    m_table->PutBoolean("Enabled", IsControlEnabled());
     m_table->PutNumber("Value", Get());
   }
 }
 
 void CANTalon::StartLiveWindowMode() {
   if (m_table != nullptr) {
-    m_table->AddTableListener("Value", this, true);
+    m_table->AddTableListener(this, true);
   }
 }
 
@@ -1301,7 +1324,7 @@ void CANTalon::StopLiveWindowMode() {
 }
 
 std::string CANTalon::GetSmartDashboardType() const {
-  return "Speed Controller";
+  return "CANSpeedController";
 }
 
 void CANTalon::InitTable(std::shared_ptr<ITable> subTable) {

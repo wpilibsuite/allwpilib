@@ -23,6 +23,22 @@ class CANSpeedController : public SpeedController {
     kFollower = 5  // Not supported in Jaguar.
   };
 
+  // Helper function for the ControlMode enum
+  std::string GetModeName(ControlMode mode) {
+    switch(mode) {
+      case kPercentVbus: return "PercentVbus";
+      case kCurrent: return "Current";
+      case kSpeed: return "Speed";
+      case kPosition: return "Position";
+      case kVoltage: return "Voltage";
+      case kFollower: return "Follower";
+      default: return "[unknown control mode]";
+    }
+  }
+
+  // Helper function for the ControlMode enum
+  virtual bool IsModePID(ControlMode mode) const = 0;
+
   enum Faults {
     kCurrentFault = 1,
     kTemperatureFault = 2,

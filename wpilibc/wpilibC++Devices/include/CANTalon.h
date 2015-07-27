@@ -80,6 +80,7 @@ class CANTalon : public MotorSafety,
   virtual double GetI() const override;
   virtual double GetD() const override;
   virtual double GetF() const;
+  virtual bool IsModePID(CANSpeedController::ControlMode mode) const override;
   virtual float GetBusVoltage() const override;
   virtual float GetOutputVoltage() const override;
   virtual float GetOutputCurrent() const override;

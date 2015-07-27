@@ -101,6 +101,7 @@ class CANJaguar : public MotorSafety,
   virtual double GetP() const override;
   virtual double GetI() const override;
   virtual double GetD() const override;
+  virtual bool IsModePID(CANSpeedController::ControlMode mode) const override;
   virtual float GetBusVoltage() const override;
   virtual float GetOutputVoltage() const override;
   virtual float GetOutputCurrent() const override;

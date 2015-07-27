@@ -6,22 +6,19 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.hal.SWIGTYPE_p_double;
 import edu.wpi.first.wpilibj.hal.SWIGTYPE_p_int;
-import edu.wpi.first.wpilibj.hal.SWIGTYPE_p_uint32_t;
 import edu.wpi.first.wpilibj.hal.SWIGTYPE_p_CTR_Code;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 
-public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface,
-    CANSpeedController, LiveWindowSendable {
+public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedController {
   private MotorSafetyHelper m_safetyHelper;
   private boolean isInverted = false;
   protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
-  public enum TalonControlMode {
-    PercentVbus(0), Follower(5), Voltage(4), Position(1), Speed(2), Current(3), Disabled(15);
+  public enum TalonControlMode implements CANSpeedController.ControlMode {
+    PercentVbus(0), Position(1), Speed(2), Current(3), Voltage(4), Follower(5), Disabled(15);
 
-    public int value;
+    public final int value;
 
     public static TalonControlMode valueOf(int value) {
       for (TalonControlMode mode : values()) {
@@ -35,6 +32,16 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
 
     private TalonControlMode(int value) {
       this.value = value;
+    }
+
+    @Override
+    public boolean isPID() {
+        return this == Current || this == Speed || this == Position;
+    }
+
+    @Override
+    public int getValue() {
+        return value;
     }
   }
 
@@ -544,6 +551,12 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
 
   public TalonControlMode getControlMode() {
     return m_controlMode;
+  }
+
+  public void setControlMode(int mode) {
+    TalonControlMode tcm = TalonControlMode.valueOf(mode);
+    if(tcm != null)
+      changeControlMode(tcm);
   }
 
   /**
@@ -1132,10 +1145,6 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   /*
    * Live Window code, only does anything if live window is activated.
    */
-  @Override
-  public String getSmartDashboardType() {
-    return "Speed Controller";
-  }
 
   private ITable m_table = null;
   private ITableListener m_table_listener = null;
@@ -1154,9 +1163,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
    */
   @Override
   public void updateTable() {
-    if (m_table != null) {
-      m_table.putNumber("Value", get());
-    }
+    CANSpeedController.super.updateTable();
   }
 
   /**
@@ -1173,13 +1180,8 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   @Override
   public void startLiveWindowMode() {
     set(0); // Stop for safety
-    m_table_listener = new ITableListener() {
-      @Override
-      public void valueChanged(ITable itable, String key, Object value, boolean bln) {
-        set(((Double) value).doubleValue());
-      }
-    };
-    m_table.addTableListener("Value", m_table_listener, true);
+    m_table_listener = createTableListener();
+    m_table.addTableListener(m_table_listener, true);
   }
 
   /**
@@ -1188,7 +1190,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
   @Override
   public void stopLiveWindowMode() {
     set(0); // Stop for safety
-    // TODO: Broken, should only remove the listener from "Value" only.
+    // TODO: See if this is still broken
     m_table.removeTableListener(m_table_listener);
   }
 

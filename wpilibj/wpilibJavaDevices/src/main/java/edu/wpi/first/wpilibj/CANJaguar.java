@@ -13,7 +13,6 @@ import java.nio.ByteOrder;
 import edu.wpi.first.wpilibj.can.CANExceptionFactory;
 import edu.wpi.first.wpilibj.can.CANJNI;
 import edu.wpi.first.wpilibj.can.CANMessageNotFoundException;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 import edu.wpi.first.wpilibj.util.AllocationException;
@@ -24,8 +23,7 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
  *$
  * @author Thomas Clark
  */
-public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeedController,
-    LiveWindowSendable {
+public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController {
 
   public static final int kMaxMessageDataSize = 8;
 
@@ -73,8 +71,19 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
   /**
    * Mode determines how the Jaguar is controlled, used internally.
    */
-  public enum ControlMode {
+  public enum JaguarControlMode implements CANSpeedController.ControlMode {
     PercentVbus, Current, Speed, Position, Voltage;
+
+    @Override
+    public boolean isPID() {
+        return this == Current || this == Speed || this == Position;
+    }
+
+    @Override
+    public int getValue() {
+        return ordinal();
+    }
+
   }
 
   public static final int kCurrentFault = 1;
@@ -191,7 +200,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
     }
 
     m_deviceNumber = (byte) deviceNumber;
-    m_controlMode = ControlMode.PercentVbus;
+    m_controlMode = JaguarControlMode.PercentVbus;
 
     m_safetyHelper = new MotorSafetyHelper(this);
 
@@ -503,7 +512,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
         m_maxOutputVoltageVerified = false;
         m_faultTimeVerified = false;
 
-        if (m_controlMode == ControlMode.PercentVbus || m_controlMode == ControlMode.Voltage) {
+        if (m_controlMode == JaguarControlMode.PercentVbus || m_controlMode == JaguarControlMode.Voltage) {
           m_voltageRampRateVerified = false;
         } else {
           m_pVerified = false;
@@ -545,7 +554,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
       try {
         getMessage(CANJNI.LM_API_STATUS_CMODE, CANJNI.CAN_MSGID_FULL_M, data);
 
-        ControlMode mode = ControlMode.values()[data[0]];
+        JaguarControlMode mode = JaguarControlMode.values()[data[0]];
 
         if (m_controlMode == mode) {
           m_controlModeVerified = true;
@@ -837,7 +846,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
     }
 
     if (!m_voltageRampRateVerified) {
-      if (m_controlMode == ControlMode.PercentVbus) {
+      if (m_controlMode == JaguarControlMode.PercentVbus) {
         try {
           getMessage(CANJNI.LM_API_VOLT_SET_RAMP, CANJNI.CAN_MSGID_FULL_M, data);
 
@@ -855,7 +864,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
           requestMessage(CANJNI.LM_API_VOLT_SET_RAMP);
         }
       }
-    } else if (m_controlMode == ControlMode.Voltage) {
+    } else if (m_controlMode == JaguarControlMode.Voltage) {
       try {
         getMessage(CANJNI.LM_API_VCOMP_COMP_RAMP, CANJNI.CAN_MSGID_FULL_M, data);
 
@@ -922,7 +931,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
   // PIDOutput interface
   @Override
   public void pidWrite(double output) {
-    if (m_controlMode == ControlMode.PercentVbus) {
+    if (m_controlMode == JaguarControlMode.PercentVbus) {
       set(output);
     } else {
       throw new IllegalStateException("PID only supported in PercentVbus mode");
@@ -1070,7 +1079,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    * @return The proportional gain.
    */
   public double getP() {
-    if (m_controlMode.equals(ControlMode.PercentVbus) || m_controlMode.equals(ControlMode.Voltage)) {
+    if (m_controlMode.equals(JaguarControlMode.PercentVbus) || m_controlMode.equals(JaguarControlMode.Voltage)) {
       throw new IllegalStateException("PID does not apply in Percent or Voltage control modes");
     }
     return m_p;
@@ -1082,7 +1091,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    * @return The integral gain.
    */
   public double getI() {
-    if (m_controlMode.equals(ControlMode.PercentVbus) || m_controlMode.equals(ControlMode.Voltage)) {
+    if (m_controlMode.equals(JaguarControlMode.PercentVbus) || m_controlMode.equals(JaguarControlMode.Voltage)) {
       throw new IllegalStateException("PID does not apply in Percent or Voltage control modes");
     }
     return m_i;
@@ -1094,7 +1103,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    * @return The derivative gain.
    */
   public double getD() {
-    if (m_controlMode.equals(ControlMode.PercentVbus) || m_controlMode.equals(ControlMode.Voltage)) {
+    if (m_controlMode.equals(JaguarControlMode.PercentVbus) || m_controlMode.equals(JaguarControlMode.Voltage)) {
       throw new IllegalStateException("PID does not apply in Percent or Voltage control modes");
     }
     return m_d;
@@ -1189,7 +1198,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    * {@link CANJaguar#enableControl(double)} to enable the device.
    */
   public void setPercentMode() {
-    changeControlMode(ControlMode.PercentVbus);
+    changeControlMode(JaguarControlMode.PercentVbus);
     setPositionReference(CANJNI.LM_REF_NONE);
     setSpeedReference(CANJNI.LM_REF_NONE);
   }
@@ -1204,7 +1213,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    * @param codesPerRev The counts per revolution on the encoder
    */
   public void setPercentMode(EncoderTag tag, int codesPerRev) {
-    changeControlMode(ControlMode.PercentVbus);
+    changeControlMode(JaguarControlMode.PercentVbus);
     setPositionReference(CANJNI.LM_REF_NONE);
     setSpeedReference(CANJNI.LM_REF_ENCODER);
     configEncoderCodesPerRev(codesPerRev);
@@ -1220,7 +1229,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    * @param codesPerRev The counts per revolution on the encoder
    */
   public void setPercentMode(QuadEncoderTag tag, int codesPerRev) {
-    changeControlMode(ControlMode.PercentVbus);
+    changeControlMode(JaguarControlMode.PercentVbus);
     setPositionReference(CANJNI.LM_REF_ENCODER);
     setSpeedReference(CANJNI.LM_REF_QUAD_ENCODER);
     configEncoderCodesPerRev(codesPerRev);
@@ -1235,7 +1244,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    * @param tag The constant {@link CANJaguar#kPotentiometer}
    */
   public void setPercentMode(PotentiometerTag tag) {
-    changeControlMode(ControlMode.PercentVbus);
+    changeControlMode(JaguarControlMode.PercentVbus);
     setPositionReference(CANJNI.LM_REF_POT);
     setSpeedReference(CANJNI.LM_REF_NONE);
     configPotentiometerTurns(1);
@@ -1251,7 +1260,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    * @param d The differential gain of the Jaguar's PID controller.
    */
   public void setCurrentMode(double p, double i, double d) {
-    changeControlMode(ControlMode.Current);
+    changeControlMode(JaguarControlMode.Current);
     setPositionReference(CANJNI.LM_REF_NONE);
     setSpeedReference(CANJNI.LM_REF_NONE);
     setPID(p, i, d);
@@ -1269,7 +1278,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    * @param d The differential gain of the Jaguar's PID controller.
    */
   public void setCurrentMode(EncoderTag tag, int codesPerRev, double p, double i, double d) {
-    changeControlMode(ControlMode.Current);
+    changeControlMode(JaguarControlMode.Current);
     setPositionReference(CANJNI.LM_REF_NONE);
     setSpeedReference(CANJNI.LM_REF_NONE);
     configEncoderCodesPerRev(codesPerRev);
@@ -1288,7 +1297,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    * @param d The differential gain of the Jaguar's PID controller.
    */
   public void setCurrentMode(QuadEncoderTag tag, int codesPerRev, double p, double i, double d) {
-    changeControlMode(ControlMode.Current);
+    changeControlMode(JaguarControlMode.Current);
     setPositionReference(CANJNI.LM_REF_ENCODER);
     setSpeedReference(CANJNI.LM_REF_QUAD_ENCODER);
     configEncoderCodesPerRev(codesPerRev);
@@ -1307,7 +1316,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    * @param d The differential gain of the Jaguar's PID controller.
    */
   public void setCurrentMode(PotentiometerTag tag, double p, double i, double d) {
-    changeControlMode(ControlMode.Current);
+    changeControlMode(JaguarControlMode.Current);
     setPositionReference(CANJNI.LM_REF_POT);
     setSpeedReference(CANJNI.LM_REF_NONE);
     configPotentiometerTurns(1);
@@ -1327,7 +1336,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    * @param d The differential gain of the Jaguar's PID controller.
    */
   public void setSpeedMode(EncoderTag tag, int codesPerRev, double p, double i, double d) {
-    changeControlMode(ControlMode.Speed);
+    changeControlMode(JaguarControlMode.Speed);
     setPositionReference(CANJNI.LM_REF_NONE);
     setSpeedReference(CANJNI.LM_REF_ENCODER);
     configEncoderCodesPerRev(codesPerRev);
@@ -1347,7 +1356,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    * @param d The differential gain of the Jaguar's PID controller.
    */
   public void setSpeedMode(QuadEncoderTag tag, int codesPerRev, double p, double i, double d) {
-    changeControlMode(ControlMode.Speed);
+    changeControlMode(JaguarControlMode.Speed);
     setPositionReference(CANJNI.LM_REF_ENCODER);
     setSpeedReference(CANJNI.LM_REF_QUAD_ENCODER);
     configEncoderCodesPerRev(codesPerRev);
@@ -1367,7 +1376,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    *
    */
   public void setPositionMode(QuadEncoderTag tag, int codesPerRev, double p, double i, double d) {
-    changeControlMode(ControlMode.Position);
+    changeControlMode(JaguarControlMode.Position);
     setPositionReference(CANJNI.LM_REF_ENCODER);
     configEncoderCodesPerRev(codesPerRev);
     setPID(p, i, d);
@@ -1384,7 +1393,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    * @param d The differential gain of the Jaguar's PID controller.
    */
   public void setPositionMode(PotentiometerTag tag, double p, double i, double d) {
-    changeControlMode(ControlMode.Position);
+    changeControlMode(JaguarControlMode.Position);
     setPositionReference(CANJNI.LM_REF_POT);
     configPotentiometerTurns(1);
     setPID(p, i, d);
@@ -1397,7 +1406,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    * {@link CANJaguar#enableControl(double)} to enable the device.
    */
   public void setVoltageMode() {
-    changeControlMode(ControlMode.Voltage);
+    changeControlMode(JaguarControlMode.Voltage);
     setPositionReference(CANJNI.LM_REF_NONE);
     setSpeedReference(CANJNI.LM_REF_NONE);
   }
@@ -1412,7 +1421,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    * @param codesPerRev The counts per revolution on the encoder
    */
   public void setVoltageMode(EncoderTag tag, int codesPerRev) {
-    changeControlMode(ControlMode.Voltage);
+    changeControlMode(JaguarControlMode.Voltage);
     setPositionReference(CANJNI.LM_REF_NONE);
     setSpeedReference(CANJNI.LM_REF_ENCODER);
     configEncoderCodesPerRev(codesPerRev);
@@ -1428,7 +1437,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    * @param codesPerRev The counts per revolution on the encoder
    */
   public void setVoltageMode(QuadEncoderTag tag, int codesPerRev) {
-    changeControlMode(ControlMode.Voltage);
+    changeControlMode(JaguarControlMode.Voltage);
     setPositionReference(CANJNI.LM_REF_ENCODER);
     setSpeedReference(CANJNI.LM_REF_QUAD_ENCODER);
     configEncoderCodesPerRev(codesPerRev);
@@ -1441,7 +1450,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    * @param tag The constant {@link CANJaguar#kPotentiometer}
    */
   public void setVoltageMode(PotentiometerTag tag) {
-    changeControlMode(ControlMode.Voltage);
+    changeControlMode(JaguarControlMode.Voltage);
     setPositionReference(CANJNI.LM_REF_POT);
     setSpeedReference(CANJNI.LM_REF_NONE);
     configPotentiometerTurns(1);
@@ -1475,7 +1484,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    * @see CANJaguar#setVoltageMode(EncoderTag, int)
    * @see CANJaguar#setVoltageMode(QuadEncoderTag, int)
    */
-  private void changeControlMode(ControlMode controlMode) {
+  private void changeControlMode(JaguarControlMode controlMode) {
     // Disable the previous mode
     disableControl();
 
@@ -1489,10 +1498,14 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    *
    * Ask the Jagaur what mode it is in.
    *
-   * @return ControlMode that the Jag is in.
+   * @return JaguarControlMode that the Jag is in.
    */
-  public ControlMode getControlMode() {
+  public JaguarControlMode getControlMode() {
     return m_controlMode;
+  }
+
+  public void setControlMode(int mode) {
+      changeControlMode(JaguarControlMode.values()[mode]);
   }
 
   /**
@@ -1829,7 +1842,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
   double m_value = 0.0f;
 
   // Parameters/configuration
-  ControlMode m_controlMode;
+  JaguarControlMode m_controlMode;
   int m_speedReference = CANJNI.LM_REF_NONE;
   int m_positionReference = CANJNI.LM_REF_NONE;
   double m_p = 0.0;
@@ -2268,10 +2281,6 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
   /*
    * Live Window code, only does anything if live window is activated.
    */
-  @Override
-  public String getSmartDashboardType() {
-    return "Speed Controller";
-  }
 
   private ITable m_table = null;
   private ITableListener m_table_listener = null;
@@ -2290,9 +2299,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
    */
   @Override
   public void updateTable() {
-    if (m_table != null) {
-      m_table.putNumber("Value", get());
-    }
+    CANSpeedController.super.updateTable();
   }
 
   /**
@@ -2309,13 +2316,8 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
   @Override
   public void startLiveWindowMode() {
     set(0); // Stop for safety
-    m_table_listener = new ITableListener() {
-      @Override
-      public void valueChanged(ITable itable, String key, Object value, boolean bln) {
-        set(((Double) value).doubleValue());
-      }
-    };
-    m_table.addTableListener("Value", m_table_listener, true);
+    m_table_listener = createTableListener();
+    m_table.addTableListener(m_table_listener, true);
   }
 
   /**
@@ -2324,7 +2326,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, PIDInterface, CANSpeed
   @Override
   public void stopLiveWindowMode() {
     set(0); // Stop for safety
-    // TODO: Broken, should only remove the listener from "Value" only.
+    // TODO: See if this is still broken
     m_table.removeTableListener(m_table_listener);
   }
 }

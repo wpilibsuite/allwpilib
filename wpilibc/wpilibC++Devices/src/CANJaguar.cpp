@@ -1938,29 +1938,6 @@ uint8_t CANJaguar::GetDeviceID() const { return m_deviceNumber; }
  */
 void CANJaguar::StopMotor() { DisableControl(); }
 
-void CANJaguar::ValueChanged(ITable* source, llvm::StringRef key,
-                             std::shared_ptr<nt::Value> value, bool isNew) {
-  if (value->type() == NT_DOUBLE) Set(value->GetDouble());
-}
-
-void CANJaguar::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Value", Get());
-  }
-}
-
-void CANJaguar::StartLiveWindowMode() {
-  if (m_table != nullptr) {
-    m_table->AddTableListener("Value", this, true);
-  }
-}
-
-void CANJaguar::StopLiveWindowMode() {
-  if (m_table != nullptr) {
-    m_table->RemoveTableListener(this);
-  }
-}
-
 /**
 * Common interface for inverting direction of a speed controller.
 * Only works in PercentVbus, speed, and Voltage modes.
@@ -1976,8 +1953,57 @@ void CANJaguar::SetInverted(bool isInverted) { m_isInverted = isInverted; }
  */
 bool CANJaguar::GetInverted() const { return m_isInverted; }
 
+void CANJaguar::ValueChanged(ITable* source, llvm::StringRef key,
+                             std::shared_ptr<nt::Value> value, bool isNew) {
+  if(key == "Mode" && value->IsDouble()) SetControlMode(static_cast<CANSpeedController::ControlMode>(value->GetDouble()));
+  if(IsModePID(m_controlMode) && value->IsDouble()) {
+    if(key == "p") SetP(value->GetDouble());
+    if(key == "i") SetI(value->GetDouble());
+    if(key == "d") SetD(value->GetDouble());
+  }
+  if(key == "Enabled" && value->IsBoolean()) {
+      if (value->GetBoolean()) {
+        EnableControl();
+      } else {
+        DisableControl();
+      }
+  }
+  if(key == "Value" && value->IsDouble()) Set(value->GetDouble());
+}
+
+bool CANJaguar::IsModePID(CANSpeedController::ControlMode mode) const {
+  return mode == kCurrent || mode == kSpeed || mode == kPosition;
+}
+
+void CANJaguar::UpdateTable() {
+  if (m_table != nullptr) {
+    m_table->PutString("~TYPE~", "CANSpeedController");
+    m_table->PutString("Type", "CANJaguar");
+    m_table->PutString("Mode", GetModeName(m_controlMode));
+    if (IsModePID(m_controlMode)) {
+        m_table->PutNumber("p", GetP());
+        m_table->PutNumber("i", GetI());
+        m_table->PutNumber("d", GetD());
+    }
+    m_table->PutBoolean("Enabled", m_controlEnabled);
+    m_table->PutNumber("Value", Get());
+  }
+}
+
+void CANJaguar::StartLiveWindowMode() {
+  if (m_table != nullptr) {
+    m_table->AddTableListener(this, true);
+  }
+}
+
+void CANJaguar::StopLiveWindowMode() {
+  if (m_table != nullptr) {
+    m_table->RemoveTableListener(this);
+  }
+}
+
 std::string CANJaguar::GetSmartDashboardType() const {
-  return "Speed Controller";
+  return "CANSpeedController";
 }
 
 void CANJaguar::InitTable(std::shared_ptr<ITable> subTable) {
