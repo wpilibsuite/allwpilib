@@ -21,6 +21,7 @@ static constexpr double kTiltSetpoint45 = 0.45;
 static constexpr double kTiltSetpoint90 = 0.68;
 static constexpr double kTiltTime = 1.0;
 static constexpr double kAccelerometerTolerance = 0.2;
+static constexpr double kSensitivity = 0.013;
 
 /**
  * A fixture for the camera with two servos and a gyro
@@ -36,7 +37,7 @@ class TiltPanCameraTest : public testing::Test {
     // The gyro object blocks for 5 seconds in the constructor, so only
     // construct it once for the whole test case
     m_gyro = new AnalogGyro(TestBench::kCameraGyroChannel);
-    m_gyro->SetSensitivity(0.013);
+    m_gyro->SetSensitivity(kSensitivity);
   }
 
   static void TearDownTestCase() { delete m_gyro; }
@@ -54,6 +55,10 @@ class TiltPanCameraTest : public testing::Test {
     m_gyro->Reset();
   }
 
+  void DefaultGyroAngle();
+  void GyroAngle();
+  void GyroCalibratedParameters();
+
   virtual void TearDown() override {
     delete m_tilt;
     delete m_pan;
@@ -66,7 +71,7 @@ AnalogGyro *TiltPanCameraTest::m_gyro = nullptr;
 /**
  * Test if the gyro angle defaults to 0 immediately after being reset.
  */
-TEST_F(TiltPanCameraTest, DefaultGyroAngle) {
+void TiltPanCameraTest::DefaultGyroAngle() {
   EXPECT_NEAR(0.0f, m_gyro->GetAngle(), 1.0f);
 }
 
@@ -76,10 +81,10 @@ TEST_F(TiltPanCameraTest, DefaultGyroAngle) {
  * was designed for so setAngle is significantly off. This has been calibrated
  * for the servo on the rig.
  */
-TEST_F(TiltPanCameraTest, GyroAngle) {
+void TiltPanCameraTest::GyroAngle() {
   // Make sure that the gyro doesn't get jerked when the servo goes to zero.
   m_pan->SetAngle(0.0);
-  Wait(0.25);
+  Wait(0.5);
   m_gyro->Reset();
 
   for (int i = 0; i < 600; i++) {
@@ -92,6 +97,51 @@ TEST_F(TiltPanCameraTest, GyroAngle) {
   EXPECT_NEAR(gyroAngle, kTestAngle, 10.0)
       << "Gyro measured " << gyroAngle << " degrees, servo should have turned "
       << kTestAngle << " degrees";
+}
+
+/**
+  * Gets calibrated parameters from previously calibrated gyro, allocates a new
+  * gyro with the given parameters for center and offset, and re-runs tests on
+  * the new gyro.
+  */
+void TiltPanCameraTest::GyroCalibratedParameters() {
+  uint32_t cCenter = m_gyro->GetCenter();
+  float cOffset = m_gyro->GetOffset();
+  delete m_gyro;
+  m_gyro = new AnalogGyro(TestBench::kCameraGyroChannel, cCenter, cOffset);
+  m_gyro->SetSensitivity(kSensitivity);
+
+  // Default gyro angle test
+  // Accumulator needs a small amount of time to reset before being tested
+  m_gyro->Reset();
+  Wait(.001);
+  EXPECT_NEAR(0.0f, m_gyro->GetAngle(), 1.0f);
+
+  // Gyro angle test
+  // Make sure that the gyro doesn't get jerked when the servo goes to zero.
+  m_pan->SetAngle(0.0);
+  Wait(0.5);
+  m_gyro->Reset();
+
+  for (int i = 0; i < 600; i++) {
+    m_pan->Set(i / 1000.0);
+    Wait(0.001);
+  }
+
+  double gyroAngle = m_gyro->GetAngle();
+
+  EXPECT_NEAR(gyroAngle, kTestAngle, 10.0)
+      << "Gyro measured " << gyroAngle << " degrees, servo should have turned "
+      << kTestAngle << " degrees";
+}
+
+/**
+ * Run all gyro tests in one function to make sure they are run in order.
+ */
+TEST_F(TiltPanCameraTest, TestAllGyroTests) {
+  DefaultGyroAngle();
+  GyroAngle();
+  GyroCalibratedParameters();
 }
 
 /**

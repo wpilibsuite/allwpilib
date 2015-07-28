@@ -221,7 +221,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
   public void initAccumulator() {
     if (!isAccumulatorChannel()) {
       throw new AllocationException("Accumulators are only available on slot " + kAccumulatorSlot
-          + " on channels " + kAccumulatorChannels[0] + "," + kAccumulatorChannels[1]);
+          + " on channels " + kAccumulatorChannels[0] + ", " + kAccumulatorChannels[1]);
     }
     m_accumulatorOffset = 0;
     AnalogJNI.initAccumulator(m_port);

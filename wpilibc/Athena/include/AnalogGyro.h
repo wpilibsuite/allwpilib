@@ -42,13 +42,18 @@ class AnalogGyro : public GyroBase {
       " with a channel number or passing a shared_ptr instead.")
   explicit AnalogGyro(AnalogInput *channel);
   explicit AnalogGyro(std::shared_ptr<AnalogInput> channel);
+  AnalogGyro(int32_t channel, uint32_t center, float offset);
+  AnalogGyro(std::shared_ptr<AnalogInput> channel, uint32_t center, float offset);
   virtual ~AnalogGyro() = default;
 
   float GetAngle() const override;
   double GetRate() const override;
+  virtual uint32_t GetCenter() const;
+  virtual float GetOffset() const;
   void SetSensitivity(float voltsPerDegreePerSecond);
   void SetDeadband(float volts);
   void Reset() override;
+  virtual void InitGyro();
   void Calibrate() override;
 
   std::string GetSmartDashboardType() const override;
