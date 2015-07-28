@@ -71,8 +71,8 @@
  */
 #ifndef CanTalonSRX_H_
 #define CanTalonSRX_H_
-#include "ctre.h"				//BIT Defines + Typedefs
-#include "CtreCanNode.h"
+#include "ctre/ctre.h"				//BIT Defines + Typedefs
+#include "ctre/CtreCanNode.h"
 #include <NetworkCommunication/CANSessionMux.h>	//CAN Comm
 #include <map>
 class CanTalonSRX : public CtreCanNode
