@@ -109,6 +109,9 @@ class Storage {
   std::shared_ptr<StorageEntry> FindEntry(StringRef name) const;
 
   // Accessors required by Dispatcher.
+  std::shared_ptr<StorageEntry> CreateEntry(StringRef name,
+                                            std::shared_ptr<Value> value,
+                                            unsigned int flags);
   void GetUpdates(UpdateMap* updates, bool* delete_all);
   std::mutex& mutex() { return m_mutex; }
 

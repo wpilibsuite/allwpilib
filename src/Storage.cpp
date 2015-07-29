@@ -23,6 +23,17 @@ Storage::Storage() {
 
 Storage::~Storage() {}
 
+std::shared_ptr<StorageEntry> Storage::CreateEntry(StringRef name,
+                                                   std::shared_ptr<Value> value,
+                                                   unsigned int flags) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  auto& entry = m_entries[name];
+  if (!entry) entry = std::make_shared<StorageEntry>(name);
+  entry->set_value(value);
+  entry->set_flags(flags);
+  return entry;
+}
+
 void Storage::GetUpdates(UpdateMap* updates, bool* delete_all) {
   std::lock_guard<std::mutex> lock(m_mutex);
   m_updates.swap(*updates);
