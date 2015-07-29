@@ -33,7 +33,7 @@ class StorageEntry {
 
   bool IsPersistent() const { return (m_flags & NT_PERSISTENT) != 0; }
 
-  std::shared_ptr<Value> value() {
+  std::shared_ptr<Value> value() const {
 #ifdef HAVE_SHARED_PTR_ATOMIC_LOAD
     return std::atomic_load(&m_value);
 #else
@@ -66,7 +66,7 @@ class StorageEntry {
   // atomic accesses. Unfortunately, atomic shared_ptr is not yet available
   // on most compilers, so we need an explicit mutex instead.
 #ifndef HAVE_SHARED_PTR_ATOMIC_LOAD
-  std::mutex m_value_mutex;
+  mutable std::mutex m_value_mutex;
 #endif
   std::shared_ptr<Value> m_value;
   std::atomic_uint m_flags;
