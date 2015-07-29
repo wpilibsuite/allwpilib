@@ -50,7 +50,7 @@ class Message {
 
   // Message data accessors.  Callers are responsible for knowing what data is
   // actually provided for a particular message.
-  const std::string& str() const { return m_str; }
+  llvm::StringRef str() const { return m_str; }
   std::shared_ptr<Value> value() const { return m_value; }
   unsigned int id() const { return m_id; }
   unsigned int flags() const { return m_flags; }
