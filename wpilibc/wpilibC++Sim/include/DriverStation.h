@@ -118,10 +118,10 @@ private:
     void joystickCallback5(const msgs::ConstJoystickPtr &msg);
 
 	uint8_t m_digitalOut = 0;
-	::std::condition_variable m_waitForDataCond;
-	::std::mutex m_waitForDataMutex;
-  mutable ::std::recursive_mutex m_stateMutex;
-	::std::recursive_mutex m_joystickMutex;
+	std::condition_variable m_waitForDataCond;
+	std::mutex m_waitForDataMutex;
+  mutable std::recursive_mutex m_stateMutex;
+	std::recursive_mutex m_joystickMutex;
 	double m_approxMatchTimeOffset = 0;
 	bool m_userInDisabled = false;
 	bool m_userInAutonomous = false;

@@ -20,7 +20,7 @@ class FakeEncoderTest : public testing::Test {
 
   Encoder *m_encoder;
   AnalogTrigger *m_indexAnalogTrigger;
-  ::std::shared_ptr<AnalogTriggerOutput> m_indexAnalogTriggerOutput;
+  std::shared_ptr<AnalogTriggerOutput> m_indexAnalogTriggerOutput;
 
   virtual void SetUp() override {
     m_outputA = new DigitalOutput(TestBench::kLoop2OutputChannel);

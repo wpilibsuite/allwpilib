@@ -62,7 +62,7 @@ inline void protobuf_AssignDescriptorsOnce() {
                  &protobuf_AssignDesc_msgs_2fdriver_2dstation_2eproto);
 }
 
-void protobuf_RegisterTypes(const ::std::string&) {
+void protobuf_RegisterTypes(const std::string&) {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     DriverStation_descriptor_, &DriverStation::default_instance());

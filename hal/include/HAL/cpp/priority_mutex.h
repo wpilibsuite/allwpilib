@@ -6,8 +6,8 @@
 #ifdef FRC_SIMULATOR
 // We do not want to use pthreads if in the simulator; however, in the
 // simulator, we do not care about priority inversion.
-typedef ::std::mutex priority_mutex;
-typedef ::std::recursive_mutex priority_recursive_mutex;
+typedef std::mutex priority_mutex;
+typedef std::recursive_mutex priority_recursive_mutex;
 #else // Covers rest of file.
 
 #include <pthread.h>

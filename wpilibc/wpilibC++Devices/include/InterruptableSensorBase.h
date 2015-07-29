@@ -48,5 +48,5 @@ class InterruptableSensorBase : public SensorBase {
   uint32_t m_interruptIndex;
   void AllocateInterrupts(bool watcher);
 
-  static ::std::unique_ptr<Resource> m_interrupts;
+  static std::unique_ptr<Resource> m_interrupts;
 };

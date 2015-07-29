@@ -37,7 +37,7 @@ class Counter : public SensorBase,
       "want to keep your own copy of the DigitalSource, use "
       "std::shared_ptr.")]]
   explicit Counter(DigitalSource *source);
-  explicit Counter(::std::shared_ptr<DigitalSource> source);
+  explicit Counter(std::shared_ptr<DigitalSource> source);
   [[deprecated(
       "Raw pointers are deprecated. Use pass-by-reference instead.")]]
   explicit Counter(AnalogTrigger *trigger);
@@ -46,8 +46,8 @@ class Counter : public SensorBase,
       "Raw pointers are deprecated; prefer to use shared_ptr instead.")]]
   Counter(EncodingType encodingType, DigitalSource *upSource,
           DigitalSource *downSource, bool inverted);
-  Counter(EncodingType encodingType, ::std::shared_ptr<DigitalSource> upSource,
-          ::std::shared_ptr<DigitalSource> downSource, bool inverted);
+  Counter(EncodingType encodingType, std::shared_ptr<DigitalSource> upSource,
+          std::shared_ptr<DigitalSource> downSource, bool inverted);
   virtual ~Counter();
 
   void SetUpSource(int32_t channel);
@@ -55,11 +55,11 @@ class Counter : public SensorBase,
       "Raw pointers are deprecated; prefer to call either SetUpSource(int) or "
       "SetUpSource(shared_ptr).")]]
   void SetUpSource(AnalogTrigger *analogTrigger, AnalogTriggerType triggerType);
-  void SetUpSource(::std::shared_ptr<AnalogTrigger> analogTrigger,
+  void SetUpSource(std::shared_ptr<AnalogTrigger> analogTrigger,
                    AnalogTriggerType triggerType);
   [[deprecated("Raw pointers are deprecated. Use std::shared_ptr instead.")]]
   void SetUpSource(DigitalSource *source);
-  void SetUpSource(::std::shared_ptr<DigitalSource> source);
+  void SetUpSource(std::shared_ptr<DigitalSource> source);
   [[deprecated("References are deprecated. Use std::shared_ptr instead.")]]
   void SetUpSource(DigitalSource &source);
   void SetUpSourceEdge(bool risingEdge, bool fallingEdge);
@@ -71,11 +71,11 @@ class Counter : public SensorBase,
       "or SetDownSource(shared_ptr).")]]
   void SetDownSource(AnalogTrigger *analogTrigger,
                      AnalogTriggerType triggerType);
-  void SetDownSource(::std::shared_ptr<AnalogTrigger> analogTrigger,
+  void SetDownSource(std::shared_ptr<AnalogTrigger> analogTrigger,
                      AnalogTriggerType triggerType);
   [[deprecated("Raw pointers are deprecated. Use std::shared_ptr instead.")]]
   void SetDownSource(DigitalSource *source);
-  void SetDownSource(::std::shared_ptr<DigitalSource> source);
+  void SetDownSource(std::shared_ptr<DigitalSource> source);
   [[deprecated("References are deprecated. Use std::shared_ptr instead.")]]
   void SetDownSource(DigitalSource &source);
   void SetDownSourceEdge(bool risingEdge, bool fallingEdge);
@@ -105,18 +105,18 @@ class Counter : public SensorBase,
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   virtual std::string GetSmartDashboardType() const override;
-  void InitTable(::std::shared_ptr<ITable> subTable) override;
-  ::std::shared_ptr<ITable> GetTable() const override;
+  void InitTable(std::shared_ptr<ITable> subTable) override;
+  std::shared_ptr<ITable> GetTable() const override;
 
  protected:
   // Makes the counter count up.
-  ::std::shared_ptr<DigitalSource> m_upSource;
+  std::shared_ptr<DigitalSource> m_upSource;
   // Makes the counter count down.
-  ::std::shared_ptr<DigitalSource> m_downSource;
+  std::shared_ptr<DigitalSource> m_downSource;
   // The FPGA counter object
   void *m_counter = nullptr;              ///< The FPGA counter object.
  private:
   uint32_t m_index = 0;            ///< The index of this counter.
 
-  ::std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table = nullptr;
 };

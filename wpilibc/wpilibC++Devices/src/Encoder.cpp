@@ -58,7 +58,7 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
     case k1X:
     case k2X: {
       m_encodingScale = encodingType == k1X ? 1 : 2;
-      m_counter = ::std::make_unique<Counter>(m_encodingType, m_aSource,
+      m_counter = std::make_unique<Counter>(m_encodingType, m_aSource,
                                               m_bSource, reverseDirection);
       m_index = m_counter->GetFPGAIndex();
       break;
@@ -98,8 +98,8 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
  */
 Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection,
                  EncodingType encodingType) {
-  m_aSource = ::std::make_shared<DigitalInput>(aChannel);
-  m_bSource = ::std::make_shared<DigitalInput>(bChannel);
+  m_aSource = std::make_shared<DigitalInput>(aChannel);
+  m_bSource = std::make_shared<DigitalInput>(bChannel);
   InitEncoder(reverseDirection, encodingType);
 }
 
@@ -139,8 +139,8 @@ Encoder::Encoder(DigitalSource *aSource, DigitalSource *bSource,
     InitEncoder(reverseDirection, encodingType);
 }
 
-Encoder::Encoder(::std::shared_ptr<DigitalSource> aSource,
-                 ::std::shared_ptr<DigitalSource> bSource,
+Encoder::Encoder(std::shared_ptr<DigitalSource> aSource,
+                 std::shared_ptr<DigitalSource> bSource,
                  bool reverseDirection, EncodingType encodingType)
     : m_aSource(aSource), m_bSource(bSource) {
   if (m_aSource == nullptr || m_bSource == nullptr)
@@ -573,9 +573,9 @@ std::string Encoder::GetSmartDashboardType() const {
     return "Encoder";
 }
 
-void Encoder::InitTable(::std::shared_ptr<ITable> subTable) {
+void Encoder::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-::std::shared_ptr<ITable> Encoder::GetTable() const { return m_table; }
+std::shared_ptr<ITable> Encoder::GetTable() const { return m_table; }

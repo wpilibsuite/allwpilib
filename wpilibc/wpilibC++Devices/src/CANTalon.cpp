@@ -1270,7 +1270,7 @@ bool CANTalon::GetInverted() const { return m_isInverted; }
 */
 void CANTalon::StopMotor() { Disable(); }
 
-void CANTalon::ValueChanged(::std::shared_ptr<ITable> source, const std::string& key,
+void CANTalon::ValueChanged(std::shared_ptr<ITable> source, const std::string& key,
                             EntryValue value, bool isNew) {
   Set(value.f);
 }
@@ -1297,9 +1297,9 @@ std::string CANTalon::GetSmartDashboardType() const {
   return "Speed Controller";
 }
 
-void CANTalon::InitTable(::std::shared_ptr<ITable> subTable) {
+void CANTalon::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-::std::shared_ptr<ITable> CANTalon::GetTable() const { return m_table; }
+std::shared_ptr<ITable> CANTalon::GetTable() const { return m_table; }

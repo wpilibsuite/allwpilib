@@ -27,7 +27,7 @@ void AnalogAccelerometer::InitAccelerometer() {
  * connected to
  */
 AnalogAccelerometer::AnalogAccelerometer(int32_t channel) {
-  m_analogInput = ::std::make_shared<AnalogInput>(channel);
+  m_analogInput = std::make_shared<AnalogInput>(channel);
   InitAccelerometer();
 }
 
@@ -61,7 +61,7 @@ AnalogAccelerometer::AnalogAccelerometer(AnalogInput *channel)
  * @param channel The existing AnalogInput object for the analog input the
  * accelerometer is connected to
  */
-AnalogAccelerometer::AnalogAccelerometer(::std::shared_ptr<AnalogInput> channel)
+AnalogAccelerometer::AnalogAccelerometer(std::shared_ptr<AnalogInput> channel)
     : m_analogInput(channel) {
   if (channel == nullptr) {
     wpi_setWPIError(NullParameter);
@@ -126,9 +126,9 @@ std::string AnalogAccelerometer::GetSmartDashboardType() const {
   return "Accelerometer";
 }
 
-void AnalogAccelerometer::InitTable(::std::shared_ptr<ITable> subTable) {
+void AnalogAccelerometer::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-::std::shared_ptr<ITable> AnalogAccelerometer::GetTable() const { return m_table; }
+std::shared_ptr<ITable> AnalogAccelerometer::GetTable() const { return m_table; }

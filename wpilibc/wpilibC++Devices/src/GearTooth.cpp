@@ -56,7 +56,7 @@ GearTooth::GearTooth(DigitalSource *source, bool directionSensitive)
  * @param directionSensitive True to enable the pulse length decoding in
  * hardware to specify count direction.
  */
-GearTooth::GearTooth(::std::shared_ptr<DigitalSource> source, bool directionSensitive)
+GearTooth::GearTooth(std::shared_ptr<DigitalSource> source, bool directionSensitive)
     : Counter(source) {
   EnableDirectionSensing(directionSensitive);
 }

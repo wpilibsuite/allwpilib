@@ -37,7 +37,7 @@ public:
 	void Free(uint32_t index);
 
 private:
-	::std::vector<bool> m_isAllocated;
+	std::vector<bool> m_isAllocated;
 	priority_recursive_mutex m_allocateLock;
 
 	static priority_recursive_mutex m_createLock;

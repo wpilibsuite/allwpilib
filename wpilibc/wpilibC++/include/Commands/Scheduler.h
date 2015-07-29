@@ -40,8 +40,8 @@ class Scheduler : public ErrorBase, public NamedSendable {
 
   void UpdateTable();
   std::string GetSmartDashboardType() const;
-  void InitTable(::std::shared_ptr<ITable> subTable);
-  ::std::shared_ptr<ITable> GetTable() const;
+  void InitTable(std::shared_ptr<ITable> subTable);
+  std::shared_ptr<ITable> GetTable() const;
   std::string GetName() const;
   std::string GetType() const;
 
@@ -65,7 +65,7 @@ class Scheduler : public ErrorBase, public NamedSendable {
   StringArray *commands = nullptr;
   NumberArray *ids = nullptr;
   NumberArray *toCancel = nullptr;
-  ::std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table = nullptr;
   bool m_runningCommandsChanged = false;
 };
 #endif

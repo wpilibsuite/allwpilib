@@ -48,8 +48,8 @@ public:
 	void StartLiveWindowMode() override;
 	void StopLiveWindowMode() override;
 	std::string GetSmartDashboardType() const override;
-	void InitTable(::std::shared_ptr<ITable> subTable) override;
-	::std::shared_ptr<ITable> GetTable() const override;
+	void InitTable(std::shared_ptr<ITable> subTable) override;
+	std::shared_ptr<ITable> GetTable() const override;
 
 private:
 	void InitGyro(int channel);
@@ -57,5 +57,5 @@ private:
 	SimGyro* impl;
 	PIDSourceParameter m_pidSource;
 
-	::std::shared_ptr<ITable> m_table = nullptr;
+	std::shared_ptr<ITable> m_table = nullptr;
 };

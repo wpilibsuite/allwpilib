@@ -48,12 +48,12 @@ const DriverStation_State DriverStation_State_State_MAX = DriverStation_State_TE
 const int DriverStation_State_State_ARRAYSIZE = DriverStation_State_State_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* DriverStation_State_descriptor();
-inline const ::std::string& DriverStation_State_Name(DriverStation_State value) {
+inline const std::string& DriverStation_State_Name(DriverStation_State value) {
   return ::google::protobuf::internal::NameOfEnum(
     DriverStation_State_descriptor(), value);
 }
 inline bool DriverStation_State_Parse(
-    const ::std::string& name, DriverStation_State* value) {
+    const std::string& name, DriverStation_State* value) {
   return ::google::protobuf::internal::ParseNamedEnum<DriverStation_State>(
     DriverStation_State_descriptor(), name, value);
 }
@@ -128,10 +128,10 @@ class DriverStation : public ::google::protobuf::Message {
   State_descriptor() {
     return DriverStation_State_descriptor();
   }
-  static inline const ::std::string& State_Name(State value) {
+  static inline const std::string& State_Name(State value) {
     return DriverStation_State_Name(value);
   }
-  static inline bool State_Parse(const ::std::string& name,
+  static inline bool State_Parse(const std::string& name,
       State* value) {
     return DriverStation_State_Parse(name, value);
   }

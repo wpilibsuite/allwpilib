@@ -75,7 +75,7 @@ bool wpi_assert_impl(bool conditionValue, const std::string &conditionText,
     }
 
     // Print to console and send to remote dashboard
-    ::std::cout << "\n\n>>>>" << error;
+    std::cout << "\n\n>>>>" << error;
 
     wpi_handleTracing();
   }

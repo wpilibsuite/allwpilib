@@ -122,7 +122,7 @@ std::string ADXL345_SPI::GetSmartDashboardType() const {
   return "3AxisAccelerometer";
 }
 
-void ADXL345_SPI::InitTable(::std::shared_ptr<ITable> subtable) {
+void ADXL345_SPI::InitTable(std::shared_ptr<ITable> subtable) {
   m_table = subtable;
   UpdateTable();
 }
@@ -135,4 +135,4 @@ void ADXL345_SPI::UpdateTable() {
   }
 }
 
-::std::shared_ptr<ITable> ADXL345_SPI::GetTable() const { return m_table; }
+std::shared_ptr<ITable> ADXL345_SPI::GetTable() const { return m_table; }

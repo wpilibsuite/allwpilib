@@ -17,7 +17,7 @@
 #include <sstream>
 
 // Allocate each direction separately.
-static ::std::unique_ptr<Resource> relayChannels;
+static std::unique_ptr<Resource> relayChannels;
 
 /**
  * Relay constructor given a channel.
@@ -189,7 +189,7 @@ Relay::Value Relay::Get() const {
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
-void Relay::ValueChanged(::std::shared_ptr<ITable> source, const std::string &key,
+void Relay::ValueChanged(std::shared_ptr<ITable> source, const std::string &key,
                          EntryValue value, bool isNew) {
   std::string *val = (std::string *)value.ptr;
   if (*val == "Off")
@@ -230,9 +230,9 @@ void Relay::StopLiveWindowMode() {
 
 std::string Relay::GetSmartDashboardType() const { return "Relay"; }
 
-void Relay::InitTable(::std::shared_ptr<ITable> subTable) {
+void Relay::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-::std::shared_ptr<ITable> Relay::GetTable() const { return m_table; }
+std::shared_ptr<ITable> Relay::GetTable() const { return m_table; }

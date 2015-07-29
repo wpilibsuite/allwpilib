@@ -99,7 +99,7 @@ bool Solenoid::IsBlackListed() const {
   return (value != 0);
 }
 
-void Solenoid::ValueChanged(::std::shared_ptr<ITable> source, const std::string& key,
+void Solenoid::ValueChanged(std::shared_ptr<ITable> source, const std::string& key,
                             EntryValue value, bool isNew) {
   Set(value.b);
 }
@@ -126,9 +126,9 @@ void Solenoid::StopLiveWindowMode() {
 
 std::string Solenoid::GetSmartDashboardType() const { return "Solenoid"; }
 
-void Solenoid::InitTable(::std::shared_ptr<ITable> subTable) {
+void Solenoid::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-::std::shared_ptr<ITable> Solenoid::GetTable() const { return m_table; }
+std::shared_ptr<ITable> Solenoid::GetTable() const { return m_table; }

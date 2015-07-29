@@ -156,14 +156,14 @@ class CANTalon : public MotorSafety,
   double GetSetpoint() const override;
 
   // LiveWindow stuff.
-  void ValueChanged(::std::shared_ptr<ITable> source, const std::string &key, EntryValue value,
+  void ValueChanged(std::shared_ptr<ITable> source, const std::string &key, EntryValue value,
                     bool isNew) override;
   void UpdateTable() override;
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(::std::shared_ptr<ITable> subTable) override;
-  ::std::shared_ptr<ITable> GetTable() const override;
+  void InitTable(std::shared_ptr<ITable> subTable) override;
+  std::shared_ptr<ITable> GetTable() const override;
 
   // SpeedController overrides
   virtual void SetInverted(bool isInverted) override;
@@ -202,6 +202,6 @@ class CANTalon : public MotorSafety,
   void ApplyControlMode(CANSpeedController::ControlMode mode);
 
   // LiveWindow stuff.
-  ::std::shared_ptr<ITable> m_table;
+  std::shared_ptr<ITable> m_table;
   bool m_isInverted;
 };

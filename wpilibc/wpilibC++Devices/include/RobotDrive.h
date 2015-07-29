@@ -48,18 +48,18 @@ class RobotDrive : public MotorSafety, public ErrorBase {
   RobotDrive(SpeedController *leftMotor, SpeedController *rightMotor);
   [[deprecated("References are deprecated; use shared_ptr instead.")]]
   RobotDrive(SpeedController &leftMotor, SpeedController &rightMotor);
-  RobotDrive(::std::shared_ptr<SpeedController> leftMotor,
-             ::std::shared_ptr<SpeedController> rightMotor);
+  RobotDrive(std::shared_ptr<SpeedController> leftMotor,
+             std::shared_ptr<SpeedController> rightMotor);
   [[deprecated("Raw pointers are deprecated; use shared_ptr instead.")]]
   RobotDrive(SpeedController *frontLeftMotor, SpeedController *rearLeftMotor,
              SpeedController *frontRightMotor, SpeedController *rearRightMotor);
   [[deprecated("References are deprecated; use shared_ptr instead.")]]
   RobotDrive(SpeedController &frontLeftMotor, SpeedController &rearLeftMotor,
              SpeedController &frontRightMotor, SpeedController &rearRightMotor);
-  RobotDrive(::std::shared_ptr<SpeedController> frontLeftMotor,
-             ::std::shared_ptr<SpeedController> rearLeftMotor,
-             ::std::shared_ptr<SpeedController> frontRightMotor,
-             ::std::shared_ptr<SpeedController> rearRightMotor);
+  RobotDrive(std::shared_ptr<SpeedController> frontLeftMotor,
+             std::shared_ptr<SpeedController> rearLeftMotor,
+             std::shared_ptr<SpeedController> frontRightMotor,
+             std::shared_ptr<SpeedController> rearRightMotor);
   virtual ~RobotDrive() = default;
 
   RobotDrive(const RobotDrive&) = delete;
@@ -114,10 +114,10 @@ class RobotDrive : public MotorSafety, public ErrorBase {
   static const int32_t kMaxNumberOfMotors = 4;
   float m_sensitivity = 0.5;
   double m_maxOutput = 1.0;
-  ::std::shared_ptr<SpeedController> m_frontLeftMotor = nullptr;
-  ::std::shared_ptr<SpeedController> m_frontRightMotor = nullptr;
-  ::std::shared_ptr<SpeedController> m_rearLeftMotor = nullptr;
-  ::std::shared_ptr<SpeedController> m_rearRightMotor = nullptr;
+  std::shared_ptr<SpeedController> m_frontLeftMotor = nullptr;
+  std::shared_ptr<SpeedController> m_frontRightMotor = nullptr;
+  std::shared_ptr<SpeedController> m_rearLeftMotor = nullptr;
+  std::shared_ptr<SpeedController> m_rearRightMotor = nullptr;
   std::unique_ptr<MotorSafetyHelper> m_safetyHelper;
   uint8_t m_syncGroup = 0;
 

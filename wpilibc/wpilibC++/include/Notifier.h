@@ -49,8 +49,8 @@ class Notifier : public ErrorBase {
                                     // handler call is in progress
 
 #ifdef FRC_SIMULATOR
-  static ::std::thread m_task;
-  static ::std::atomic<bool> m_stopped;
+  static std::thread m_task;
+  static std::atomic<bool> m_stopped;
 #endif
   static void Run();
 };

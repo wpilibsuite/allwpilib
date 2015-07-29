@@ -52,7 +52,7 @@ std::string BuiltInAccelerometer::GetSmartDashboardType() const {
   return "3AxisAccelerometer";
 }
 
-void BuiltInAccelerometer::InitTable(::std::shared_ptr<ITable> subtable) {
+void BuiltInAccelerometer::InitTable(std::shared_ptr<ITable> subtable) {
   m_table = subtable;
   UpdateTable();
 }
@@ -65,4 +65,4 @@ void BuiltInAccelerometer::UpdateTable() {
   }
 }
 
-::std::shared_ptr<ITable> BuiltInAccelerometer::GetTable() const { return m_table; }
+std::shared_ptr<ITable> BuiltInAccelerometer::GetTable() const { return m_table; }

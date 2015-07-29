@@ -95,7 +95,7 @@ float Servo::GetAngle() const {
   return (float)GetPosition() * GetServoAngleRange() + kMinServoAngle;
 }
 
-void Servo::ValueChanged(::std::shared_ptr<ITable> source, const std::string& key,
+void Servo::ValueChanged(std::shared_ptr<ITable> source, const std::string& key,
                          EntryValue value, bool isNew) {
   Set(value.f);
 }
@@ -120,9 +120,9 @@ void Servo::StopLiveWindowMode() {
 
 std::string Servo::GetSmartDashboardType() const { return "Servo"; }
 
-void Servo::InitTable(::std::shared_ptr<ITable> subTable) {
+void Servo::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-::std::shared_ptr<ITable> Servo::GetTable() const { return m_table; }
+std::shared_ptr<ITable> Servo::GetTable() const { return m_table; }

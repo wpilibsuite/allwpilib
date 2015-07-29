@@ -20,7 +20,7 @@ priority_recursive_mutex Resource::m_createLock;
  */
 Resource::Resource(uint32_t elements) {
   std::unique_lock<priority_recursive_mutex> sync(m_createLock);
-  m_isAllocated = ::std::vector<bool>(elements, false);
+  m_isAllocated = std::vector<bool>(elements, false);
 }
 
 /**
@@ -33,7 +33,7 @@ Resource::Resource(uint32_t elements) {
  *    track, that is, it will allocate resource numbers in the range
  *    [0 .. elements - 1].
  */
-/*static*/ void Resource::CreateResourceObject(::std::unique_ptr<Resource>& r,
+/*static*/ void Resource::CreateResourceObject(std::unique_ptr<Resource>& r,
                                                uint32_t elements) {
   std::unique_lock<priority_recursive_mutex> sync(m_createLock);
   if (!r) {

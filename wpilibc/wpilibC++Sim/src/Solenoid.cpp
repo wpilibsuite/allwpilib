@@ -54,7 +54,7 @@ bool Solenoid::Get() const
 }
 
 
-void Solenoid::ValueChanged(::std::shared_ptr<ITable> source, const std::string& key, EntryValue value, bool isNew) {
+void Solenoid::ValueChanged(std::shared_ptr<ITable> source, const std::string& key, EntryValue value, bool isNew) {
 	Set(value.b);
 }
 
@@ -82,11 +82,11 @@ std::string Solenoid::GetSmartDashboardType() const {
 	return "Solenoid";
 }
 
-void Solenoid::InitTable(::std::shared_ptr<ITable> subTable) {
+void Solenoid::InitTable(std::shared_ptr<ITable> subTable) {
 	m_table = subTable;
 	UpdateTable();
 }
 
-::std::shared_ptr<ITable> Solenoid::GetTable() const {
+std::shared_ptr<ITable> Solenoid::GetTable() const {
 	return m_table;
 }

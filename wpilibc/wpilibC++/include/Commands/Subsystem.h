@@ -39,12 +39,12 @@ class Subsystem : public ErrorBase, public NamedSendable {
 
  public:
   virtual std::string GetName() const;
-  virtual void InitTable(::std::shared_ptr<ITable> table);
-  virtual ::std::shared_ptr<ITable> GetTable() const;
+  virtual void InitTable(std::shared_ptr<ITable> table);
+  virtual std::shared_ptr<ITable> GetTable() const;
   virtual std::string GetSmartDashboardType() const;
 
  protected:
-  ::std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table = nullptr;
 };
 
 #endif

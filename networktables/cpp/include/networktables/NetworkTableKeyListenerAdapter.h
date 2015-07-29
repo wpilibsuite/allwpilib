@@ -28,7 +28,7 @@ public:
 	NetworkTableKeyListenerAdapter(std::string relativeKey, std::string fullKey, NetworkTable* targetSource, ITableListener* targetListener);
 	virtual ~NetworkTableKeyListenerAdapter();
     void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
-  void ValueChanged(::std::shared_ptr<ITable> source, const std::string& key,
+  void ValueChanged(std::shared_ptr<ITable> source, const std::string& key,
                     EntryValue value, bool isNew) {
     ValueChanged(source.get(), key, value, isNew);
   }

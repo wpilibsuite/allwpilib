@@ -23,7 +23,7 @@ const int32_t RobotDrive::kMaxNumberOfMotors;
 
 [[deprecated]]
 static auto make_shared_nodelete(SpeedController *ptr) {
-  return ::std::shared_ptr<SpeedController>(ptr, NullDeleter<SpeedController>());
+  return std::shared_ptr<SpeedController>(ptr, NullDeleter<SpeedController>());
 }
 
 /*
@@ -58,8 +58,8 @@ void RobotDrive::InitRobotDrive() {
  */
 RobotDrive::RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel) {
   InitRobotDrive();
-  m_rearLeftMotor = ::std::make_shared<Talon>(leftMotorChannel);
-  m_rearRightMotor = ::std::make_shared<Talon>(rightMotorChannel);
+  m_rearLeftMotor = std::make_shared<Talon>(leftMotorChannel);
+  m_rearRightMotor = std::make_shared<Talon>(rightMotorChannel);
   SetLeftRightMotorOutputs(0.0, 0.0);
 }
 
@@ -80,10 +80,10 @@ RobotDrive::RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel) {
 RobotDrive::RobotDrive(uint32_t frontLeftMotor, uint32_t rearLeftMotor,
                        uint32_t frontRightMotor, uint32_t rearRightMotor) {
   InitRobotDrive();
-  m_rearLeftMotor = ::std::make_shared<Talon>(rearLeftMotor);
-  m_rearRightMotor = ::std::make_shared<Talon>(rearRightMotor);
-  m_frontLeftMotor = ::std::make_shared<Talon>(frontLeftMotor);
-  m_frontRightMotor = ::std::make_shared<Talon>(frontRightMotor);
+  m_rearLeftMotor = std::make_shared<Talon>(rearLeftMotor);
+  m_rearRightMotor = std::make_shared<Talon>(rearRightMotor);
+  m_frontLeftMotor = std::make_shared<Talon>(frontLeftMotor);
+  m_frontRightMotor = std::make_shared<Talon>(frontRightMotor);
   SetLeftRightMotorOutputs(0.0, 0.0);
 }
 
@@ -120,8 +120,8 @@ RobotDrive::RobotDrive(SpeedController &leftMotor,
   m_rearRightMotor = make_shared_nodelete(&rightMotor);
 }
 
-RobotDrive::RobotDrive(::std::shared_ptr<SpeedController> leftMotor,
-                       ::std::shared_ptr<SpeedController> rightMotor) {
+RobotDrive::RobotDrive(std::shared_ptr<SpeedController> leftMotor,
+                       std::shared_ptr<SpeedController> rightMotor) {
   InitRobotDrive();
   if (leftMotor == nullptr || rightMotor == nullptr) {
     wpi_setWPIError(NullParameter);
@@ -174,10 +174,10 @@ RobotDrive::RobotDrive(SpeedController &frontLeftMotor,
   m_rearRightMotor = make_shared_nodelete(&rearRightMotor);
 }
 
-RobotDrive::RobotDrive(::std::shared_ptr<SpeedController> frontLeftMotor,
-                       ::std::shared_ptr<SpeedController> rearLeftMotor,
-                       ::std::shared_ptr<SpeedController> frontRightMotor,
-                       ::std::shared_ptr<SpeedController> rearRightMotor) {
+RobotDrive::RobotDrive(std::shared_ptr<SpeedController> frontLeftMotor,
+                       std::shared_ptr<SpeedController> rearLeftMotor,
+                       std::shared_ptr<SpeedController> frontRightMotor,
+                       std::shared_ptr<SpeedController> rearRightMotor) {
   InitRobotDrive();
   if (frontLeftMotor == nullptr || rearLeftMotor == nullptr ||
       frontRightMotor == nullptr || rearRightMotor == nullptr) {

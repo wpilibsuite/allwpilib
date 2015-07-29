@@ -355,11 +355,11 @@ std::string Encoder::GetSmartDashboardType() const {
 		return "Encoder";
 }
 
-void Encoder::InitTable(::std::shared_ptr<ITable> subTable) {
+void Encoder::InitTable(std::shared_ptr<ITable> subTable) {
 	m_table = subTable;
 	UpdateTable();
 }
 
-::std::shared_ptr<ITable> Encoder::GetTable() const {
+std::shared_ptr<ITable> Encoder::GetTable() const {
 	return m_table;
 }

@@ -44,7 +44,7 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
   explicit AnalogPotentiometer(AnalogInput *input, double fullRange = 1.0,
                                double offset = 0.0);
 
-  explicit AnalogPotentiometer(::std::shared_ptr<AnalogInput> input,
+  explicit AnalogPotentiometer(std::shared_ptr<AnalogInput> input,
                                double fullRange = 1.0, double offset = 0.0);
 
   virtual ~AnalogPotentiometer() = default;
@@ -67,9 +67,9 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
    * Live Window code, only does anything if live window is activated.
    */
   virtual std::string GetSmartDashboardType() const override;
-  virtual void InitTable(::std::shared_ptr<ITable> subtable) override;
+  virtual void InitTable(std::shared_ptr<ITable> subtable) override;
   virtual void UpdateTable() override;
-  virtual ::std::shared_ptr<ITable> GetTable() const override;
+  virtual std::shared_ptr<ITable> GetTable() const override;
 
   /**
    * AnalogPotentiometers don't have to do anything special when entering the
@@ -84,8 +84,8 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
   virtual void StopLiveWindowMode() override {}
 
  private:
-  ::std::shared_ptr<AnalogInput> m_analog_input;
+  std::shared_ptr<AnalogInput> m_analog_input;
   double m_fullRange, m_offset;
-  ::std::shared_ptr<ITable> m_table;
+  std::shared_ptr<ITable> m_table;
   bool m_init_analog_input;
 };

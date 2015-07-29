@@ -13,7 +13,7 @@ NetworkButton::NetworkButton(const std::string &tableName, const std::string &fi
       m_netTable(NetworkTable::GetTable(tableName)),
       m_field(field) {}
 
-NetworkButton::NetworkButton(::std::shared_ptr<ITable> table, const std::string &field)
+NetworkButton::NetworkButton(std::shared_ptr<ITable> table, const std::string &field)
     : m_netTable(table), m_field(field) {}
 
 bool NetworkButton::Get() {

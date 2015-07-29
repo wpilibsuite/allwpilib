@@ -52,11 +52,11 @@ void Trigger::ToggleWhenActive(Command *command) {
 
 std::string Trigger::GetSmartDashboardType() const { return "Button"; }
 
-void Trigger::InitTable(::std::shared_ptr<ITable> table) {
+void Trigger::InitTable(std::shared_ptr<ITable> table) {
   m_table = table;
   if (m_table != nullptr) {
     m_table->PutBoolean("pressed", Get());
   }
 }
 
-::std::shared_ptr<ITable> Trigger::GetTable() const { return m_table; }
+std::shared_ptr<ITable> Trigger::GetTable() const { return m_table; }

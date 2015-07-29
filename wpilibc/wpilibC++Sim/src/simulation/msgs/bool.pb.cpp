@@ -59,7 +59,7 @@ inline void protobuf_AssignDescriptorsOnce() {
                  &protobuf_AssignDesc_msgs_2fbool_2eproto);
 }
 
-void protobuf_RegisterTypes(const ::std::string&) {
+void protobuf_RegisterTypes(const std::string&) {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     Bool_descriptor_, &Bool::default_instance());

@@ -53,7 +53,7 @@ void *SendableChooser::GetSelected() {
     return m_choices[selected];
 }
 
-void SendableChooser::InitTable(::std::shared_ptr<ITable> subtable) {
+void SendableChooser::InitTable(std::shared_ptr<ITable> subtable) {
   StringArray keys;
   m_table = subtable;
   if (m_table != nullptr) {
@@ -66,7 +66,7 @@ void SendableChooser::InitTable(::std::shared_ptr<ITable> subtable) {
   }
 }
 
-::std::shared_ptr<ITable> SendableChooser::GetTable() const { return m_table; }
+std::shared_ptr<ITable> SendableChooser::GetTable() const { return m_table; }
 
 std::string SendableChooser::GetSmartDashboardType() const {
   return "String Chooser";
