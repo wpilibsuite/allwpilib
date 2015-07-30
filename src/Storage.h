@@ -60,6 +60,7 @@ class StorageEntry {
 
   SequenceNumber seq_num() const { return m_seq_num; }
   void set_seq_num(SequenceNumber seq_num) { m_seq_num = seq_num; }
+  SequenceNumber seq_num_inc() { return ++m_seq_num; }
 
  private:
   // These variables are accessed by both Dispatcher and user, so must use
@@ -109,9 +110,10 @@ class Storage {
   std::shared_ptr<StorageEntry> FindEntry(StringRef name) const;
 
   // Accessors required by Dispatcher.
-  std::shared_ptr<StorageEntry> CreateEntry(StringRef name,
-                                            std::shared_ptr<Value> value,
-                                            unsigned int flags);
+  std::shared_ptr<StorageEntry> DispatchCreateEntry(
+      StringRef name, std::shared_ptr<Value> value, unsigned int flags);
+  void DispatchDeleteEntry(StringRef name);
+  void DispatchDeleteAllEntries();
   void GetUpdates(UpdateMap* updates, bool* delete_all);
   std::mutex& mutex() { return m_mutex; }
 

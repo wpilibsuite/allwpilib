@@ -23,15 +23,28 @@ Storage::Storage() {
 
 Storage::~Storage() {}
 
-std::shared_ptr<StorageEntry> Storage::CreateEntry(StringRef name,
-                                                   std::shared_ptr<Value> value,
-                                                   unsigned int flags) {
+std::shared_ptr<StorageEntry> Storage::DispatchCreateEntry(
+    StringRef name, std::shared_ptr<Value> value, unsigned int flags) {
   std::lock_guard<std::mutex> lock(m_mutex);
   auto& entry = m_entries[name];
   if (!entry) entry = std::make_shared<StorageEntry>(name);
   entry->set_value(value);
   entry->set_flags(flags);
   return entry;
+}
+
+void Storage::DispatchDeleteEntry(StringRef name) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  auto i = m_entries.find(name);
+  if (i == m_entries.end()) return;
+  auto entry = i->getValue();
+  m_entries.erase(i);  // erase from map
+}
+
+void Storage::DispatchDeleteAllEntries() {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  if (m_entries.empty()) return;
+  m_entries.clear();
 }
 
 void Storage::GetUpdates(UpdateMap* updates, bool* delete_all) {
