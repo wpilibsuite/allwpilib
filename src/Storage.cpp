@@ -45,7 +45,6 @@ NT_Type Storage::GetEntryType(unsigned int id) const {
 
 void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
                               NetworkConnection* conn, unsigned int proto_rev) {
-  if (!m_queue_outgoing) return;  // sanity check
   std::unique_lock<std::mutex> lock(m_mutex);
   switch (msg->type()) {
     case Message::kKeepAlive:
@@ -81,10 +80,11 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
 
           // send the assignment to everyone (including the originator)
           lock.unlock();
-          m_queue_outgoing(
-              Message::EntryAssign(name, id, entry->seq_num().value(),
-                                   msg->value(), msg->flags()),
-              nullptr, nullptr);
+          if (m_queue_outgoing)
+            m_queue_outgoing(
+                Message::EntryAssign(name, id, entry->seq_num().value(),
+                                     msg->value(), msg->flags()),
+                nullptr, nullptr);
           return;
         }
         if (id >= m_idmap.size() || !m_idmap[id]) {
@@ -140,12 +140,11 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
       // broadcast to all other connections (note for client there won't
       // be any other connections, so don't bother)
       lock.unlock();
-      if (m_server) {
+      if (m_server && m_queue_outgoing)
         m_queue_outgoing(
             Message::EntryAssign(entry->name(), id, msg->seq_num_uid(),
                                  msg->value(), entry->flags()),
             nullptr, conn);
-      }
       break;
     }
     case Message::kEntryUpdate: {
@@ -170,7 +169,7 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
       // broadcast to all other connections (note for client there won't
       // be any other connections, so don't bother)
       lock.unlock();
-      if (m_server) m_queue_outgoing(msg, nullptr, conn);
+      if (m_server && m_queue_outgoing) m_queue_outgoing(msg, nullptr, conn);
       break;
     }
     case Message::kFlagsUpdate: {
@@ -190,7 +189,7 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
       // broadcast to all other connections (note for client there won't
       // be any other connections, so don't bother)
       lock.unlock();
-      if (m_server) m_queue_outgoing(msg, nullptr, conn);
+      if (m_server && m_queue_outgoing) m_queue_outgoing(msg, nullptr, conn);
       break;
     }
     case Message::kEntryDelete: {
@@ -211,7 +210,7 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
       // broadcast to all other connections (note for client there won't
       // be any other connections, so don't bother)
       lock.unlock();
-      if (m_server) m_queue_outgoing(msg, nullptr, conn);
+      if (m_server && m_queue_outgoing) m_queue_outgoing(msg, nullptr, conn);
       break;
     }
     case Message::kClearEntries: {
@@ -222,7 +221,7 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
       // broadcast to all other connections (note for client there won't
       // be any other connections, so don't bother)
       lock.unlock();
-      if (m_server) m_queue_outgoing(msg, nullptr, conn);
+      if (m_server && m_queue_outgoing) m_queue_outgoing(msg, nullptr, conn);
       break;
     }
     case Message::kExecuteRpc:
