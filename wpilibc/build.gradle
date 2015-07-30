@@ -78,8 +78,8 @@ model {
                 cpp {
                     def dir = 'wpilibC++IntegrationTests'
                     source {
-                        srcDir "${dir}/src"
-                        include '*.cpp'
+                        srcDirs = ["${dir}/src", "${dir}/src/command"]
+                        includes = ['*.cpp']
                     }
                     source {
                         srcDir "${dir}/src/gtest/src"
