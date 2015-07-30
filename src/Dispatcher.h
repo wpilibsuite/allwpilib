@@ -59,9 +59,8 @@ class Dispatcher {
 
   void ClientReconnect();
 
-  NT_Type GetEntryType(unsigned int id) const;
-
-  void AddConnection(std::unique_ptr<NetworkConnection> conn);
+  void QueueOutgoing(std::shared_ptr<Message> msg, NetworkConnection* only,
+                     NetworkConnection* except);
 
   bool m_server;
   std::thread m_dispatch_thread;
@@ -72,7 +71,14 @@ class Dispatcher {
 
   // Mutex for user-accessible items
   std::mutex m_user_mutex;
-  std::vector<std::unique_ptr<NetworkConnection>> m_connections;
+  struct Connection {
+    Connection() = default;
+    explicit Connection(std::unique_ptr<NetworkConnection> net_)
+        : net(std::move(net_)) {}
+    std::unique_ptr<NetworkConnection> net;
+    NetworkConnection::Outgoing outgoing;
+  };
+  std::vector<Connection> m_connections;
   std::string m_identity;
 
   std::atomic_bool m_active;  // set to false to terminate threads
@@ -88,11 +94,6 @@ class Dispatcher {
   std::mutex m_reconnect_mutex;
   std::condition_variable m_reconnect_cv;
   bool m_do_reconnect;
-
-  // Map from integer id to storage entry.  Id is 16-bit, so just use a vector.
-  typedef std::vector<std::shared_ptr<StorageEntry>> IdMap;
-  mutable std::mutex m_idmap_mutex;
-  IdMap m_idmap;
 
   ATOMIC_STATIC_DECL(Dispatcher)
 };

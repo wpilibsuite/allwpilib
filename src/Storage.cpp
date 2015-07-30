@@ -15,6 +15,8 @@
 
 using namespace nt;
 
+#define DEBUG(str) puts(str)
+
 ATOMIC_STATIC_INIT(Storage)
 
 Storage::Storage() {
@@ -23,28 +25,213 @@ Storage::Storage() {
 
 Storage::~Storage() {}
 
-std::shared_ptr<StorageEntry> Storage::DispatchCreateEntry(
-    StringRef name, std::shared_ptr<Value> value, unsigned int flags) {
+void Storage::SetOutgoing(QueueOutgoingFunc queue_outgoing, bool server) {
   std::lock_guard<std::mutex> lock(m_mutex);
-  auto& entry = m_entries[name];
-  if (!entry) entry = std::make_shared<StorageEntry>(name);
-  entry->set_value(value);
-  entry->set_flags(flags);
-  return entry;
+  m_queue_outgoing = queue_outgoing;
+  m_server = server;
 }
 
-void Storage::DispatchDeleteEntry(StringRef name) {
-  std::lock_guard<std::mutex> lock(m_mutex);
-  auto i = m_entries.find(name);
-  if (i == m_entries.end()) return;
-  auto entry = i->getValue();
-  m_entries.erase(i);  // erase from map
+void Storage::ClearOutgoing() {
+  m_queue_outgoing = nullptr;
 }
 
-void Storage::DispatchDeleteAllEntries() {
+NT_Type Storage::GetEntryType(unsigned int id) const {
   std::lock_guard<std::mutex> lock(m_mutex);
-  if (m_entries.empty()) return;
-  m_entries.clear();
+  if (id >= m_idmap.size()) return NT_UNASSIGNED;
+  auto value = m_idmap[id]->value();
+  if (!value) return NT_UNASSIGNED;
+  return value->type();
+}
+
+void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
+                              NetworkConnection* conn, unsigned int proto_rev) {
+  if (!m_queue_outgoing) return;  // sanity check
+  std::unique_lock<std::mutex> lock(m_mutex);
+  switch (msg->type()) {
+    case Message::kKeepAlive:
+      break;  // ignore
+    case Message::kClientHello:
+    case Message::kProtoUnsup:
+    case Message::kServerHelloDone:
+    case Message::kServerHello:
+    case Message::kClientHelloDone:
+      // shouldn't get these, but ignore if we do
+      break;
+    case Message::kEntryAssign: {
+      unsigned int id = msg->id();
+      StringRef name = msg->str();
+      std::shared_ptr<StorageEntry> entry;
+      if (m_server) {
+        // if we're a server, id=0xffff requests are requests for an id
+        // to be assigned, and we need to send the new assignment back to
+        // the sender as well as all other connections.
+        if (id == 0xffff) {
+          // see if it was already assigned; ignore if so.
+          if (m_entries.count(name) != 0) return;
+
+          // create it locally
+          id = m_idmap.size();
+          auto& new_entry = m_entries[name];
+          if (!new_entry) new_entry = std::make_shared<StorageEntry>(name);
+          entry = new_entry;
+          entry->set_value(msg->value());
+          entry->set_flags(msg->flags());
+          entry->set_id(id);
+          m_idmap.push_back(entry);
+
+          // send the assignment to everyone (including the originator)
+          lock.unlock();
+          m_queue_outgoing(
+              Message::EntryAssign(name, id, entry->seq_num().value(),
+                                   msg->value(), msg->flags()),
+              nullptr, nullptr);
+          return;
+        }
+        if (id >= m_idmap.size() || !m_idmap[id]) {
+          // ignore arbitrary entry assignments
+          // this can happen due to e.g. assignment to deleted entry
+          lock.unlock();
+          DEBUG("server: received assignment to unknown entry");
+          return;
+        }
+        entry = m_idmap[id];
+      } else {
+        // clients simply accept new assignments
+        if (id == 0xffff) {
+          lock.unlock();
+          DEBUG("client: received entry assignment request?");
+          return;
+        }
+        if (id >= m_idmap.size()) m_idmap.resize(id+1);
+        entry = m_idmap[id];
+        if (!entry) {
+          // create local
+          auto& new_entry = m_entries[name];
+          if (!new_entry) new_entry = std::make_shared<StorageEntry>(name);
+          entry = new_entry;
+          entry->set_value(msg->value());
+          entry->set_flags(msg->flags());
+          entry->set_id(id);
+          m_idmap[id] = entry;
+          return;
+        }
+      }
+
+      // common client and server handling
+
+      // already exists; ignore if sequence number not higher than local
+      SequenceNumber seq_num(msg->seq_num_uid());
+      if (seq_num <= entry->seq_num()) return;
+
+      // sanity check: name should match id
+      if (msg->str() != entry->name()) {
+        lock.unlock();
+        DEBUG("entry assignment for same id with different name?");
+        return;
+      }
+
+      // update local
+      entry->set_value(msg->value());
+      entry->set_seq_num(seq_num);
+
+      // don't update flags from a <3.0 remote (not part of message)
+      if (proto_rev >= 0x0300) entry->set_flags(msg->flags());
+
+      // broadcast to all other connections (note for client there won't
+      // be any other connections, so don't bother)
+      lock.unlock();
+      if (m_server) {
+        m_queue_outgoing(
+            Message::EntryAssign(entry->name(), id, msg->seq_num_uid(),
+                                 msg->value(), entry->flags()),
+            nullptr, conn);
+      }
+      break;
+    }
+    case Message::kEntryUpdate: {
+      unsigned int id = msg->id();
+      if (id >= m_idmap.size() || !m_idmap[id]) {
+        // ignore arbitrary entry updates;
+        // this can happen due to deleted entries
+        lock.unlock();
+        DEBUG("received update to unknown entry");
+        return;
+      }
+      auto& entry = m_idmap[id];
+
+      // ignore if sequence number not higher than local
+      SequenceNumber seq_num(msg->seq_num_uid());
+      if (seq_num <= entry->seq_num()) return;
+
+      // update local
+      entry->set_value(msg->value());
+      entry->set_seq_num(seq_num);
+
+      // broadcast to all other connections (note for client there won't
+      // be any other connections, so don't bother)
+      lock.unlock();
+      if (m_server) m_queue_outgoing(msg, nullptr, conn);
+      break;
+    }
+    case Message::kFlagsUpdate: {
+      unsigned int id = msg->id();
+      if (id >= m_idmap.size() || !m_idmap[id]) {
+        // ignore arbitrary entry updates;
+        // this can happen due to deleted entries
+        lock.unlock();
+        DEBUG("received flags update to unknown entry");
+        return;
+      }
+      auto& entry = m_idmap[id];
+
+      // update local
+      entry->set_flags(msg->flags());
+
+      // broadcast to all other connections (note for client there won't
+      // be any other connections, so don't bother)
+      lock.unlock();
+      if (m_server) m_queue_outgoing(msg, nullptr, conn);
+      break;
+    }
+    case Message::kEntryDelete: {
+      unsigned int id = msg->id();
+      if (id >= m_idmap.size() || !m_idmap[id]) {
+        // ignore arbitrary entry updates;
+        // this can happen due to deleted entries
+        lock.unlock();
+        DEBUG("received delete to unknown entry");
+        return;
+      }
+      auto& entry = m_idmap[id];
+
+      // update local
+      m_entries.erase(entry->name());  // erase from map
+      entry.reset();  // delete it from idmap too
+
+      // broadcast to all other connections (note for client there won't
+      // be any other connections, so don't bother)
+      lock.unlock();
+      if (m_server) m_queue_outgoing(msg, nullptr, conn);
+      break;
+    }
+    case Message::kClearEntries: {
+      // update local
+      m_entries.clear();
+      m_idmap.resize(0);
+
+      // broadcast to all other connections (note for client there won't
+      // be any other connections, so don't bother)
+      lock.unlock();
+      if (m_server) m_queue_outgoing(msg, nullptr, conn);
+      break;
+    }
+    case Message::kExecuteRpc:
+    case Message::kRpcResponse:
+      // TODO
+      break;
+    default:
+      break;
+  }
 }
 
 void Storage::GetUpdates(UpdateMap* updates, bool* delete_all) {

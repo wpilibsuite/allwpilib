@@ -16,13 +16,14 @@
 #include <mutex>
 
 #include "llvm/StringMap.h"
-#include "support/ConcurrentQueue.h"
 #include "atomic_static.h"
+#include "Message.h"
 #include "ntcore_cpp.h"
 #include "SequenceNumber.h"
 
 namespace nt {
 
+class NetworkConnection;
 class StorageTest;
 
 class StorageEntry {
@@ -106,14 +107,21 @@ class Storage {
   };
   typedef llvm::StringMap<Update> UpdateMap;
 
+  typedef std::function<void(std::shared_ptr<Message> msg,
+                             NetworkConnection* only,
+                             NetworkConnection* except)> QueueOutgoingFunc;
+  void SetOutgoing(QueueOutgoingFunc queue_outgoing, bool server);
+  void ClearOutgoing();
+
+  NT_Type GetEntryType(unsigned int id) const;
+
+  void ProcessIncoming(std::shared_ptr<Message> msg, NetworkConnection* conn,
+                       unsigned int proto_rev);
+
   // Finds, but does not create entry.  Returns nullptr if not found.
   std::shared_ptr<StorageEntry> FindEntry(StringRef name) const;
 
   // Accessors required by Dispatcher.
-  std::shared_ptr<StorageEntry> DispatchCreateEntry(
-      StringRef name, std::shared_ptr<Value> value, unsigned int flags);
-  void DispatchDeleteEntry(StringRef name);
-  void DispatchDeleteAllEntries();
   void GetUpdates(UpdateMap* updates, bool* delete_all);
   std::mutex& mutex() { return m_mutex; }
 
@@ -140,11 +148,16 @@ class Storage {
   void AddUpdate(std::shared_ptr<StorageEntry> entry, Update::Kind kind);
 
   typedef llvm::StringMap<std::shared_ptr<StorageEntry>> EntriesMap;
+  typedef std::vector<std::shared_ptr<StorageEntry>> IdMap;
 
   mutable std::mutex m_mutex;
   EntriesMap m_entries;
+  IdMap m_idmap;
   UpdateMap m_updates;
   bool m_updates_delete_all;
+
+  QueueOutgoingFunc m_queue_outgoing;
+  bool m_server;
 
   ATOMIC_STATIC_DECL(Storage)
 };

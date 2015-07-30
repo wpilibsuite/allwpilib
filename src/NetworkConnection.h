@@ -23,13 +23,15 @@ class NetworkConnection {
  public:
   enum State { kCreated, kInit, kHandshake, kActive, kDead };
 
-  typedef std::shared_ptr<Message> Incoming;
-  typedef ConcurrentQueue<Incoming> IncomingQueue;
+  typedef std::function<void(std::shared_ptr<Message> msg,
+                             NetworkConnection* conn, unsigned int proto_rev)>
+      ProcessIncomingFunc;
   typedef std::vector<std::shared_ptr<Message>> Outgoing;
   typedef ConcurrentQueue<Outgoing> OutgoingQueue;
 
   NetworkConnection(std::unique_ptr<TCPStream> stream,
-                    Message::GetEntryTypeFunc get_entry_type);
+                    Message::GetEntryTypeFunc get_entry_type,
+                    ProcessIncomingFunc process_incoming);
   ~NetworkConnection();
 
   void Start();
@@ -38,7 +40,6 @@ class NetworkConnection {
   bool active() const { return m_active; }
   TCPStream& stream() { return *m_stream; }
   OutgoingQueue& outgoing() { return m_outgoing; }
-  IncomingQueue& incoming() { return m_incoming; }
 
   unsigned int proto_rev() const { return m_proto_rev; }
   void set_proto_rev(unsigned int proto_rev) { m_proto_rev = proto_rev; }
@@ -58,8 +59,8 @@ class NetworkConnection {
 
   std::unique_ptr<TCPStream> m_stream;
   OutgoingQueue m_outgoing;
-  IncomingQueue m_incoming;
   Message::GetEntryTypeFunc m_get_entry_type;
+  ProcessIncomingFunc m_process_incoming;
   std::thread m_read_thread;
   std::thread m_write_thread;
   std::atomic_bool m_active;

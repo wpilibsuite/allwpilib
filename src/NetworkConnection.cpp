@@ -15,9 +15,11 @@
 using namespace nt;
 
 NetworkConnection::NetworkConnection(std::unique_ptr<TCPStream> stream,
-                                     Message::GetEntryTypeFunc get_entry_type)
+                                     Message::GetEntryTypeFunc get_entry_type,
+                                     ProcessIncomingFunc process_incoming)
     : m_stream(std::move(stream)),
-      m_get_entry_type(get_entry_type) {
+      m_get_entry_type(get_entry_type),
+      m_process_incoming(process_incoming) {
   m_active = false;
   m_proto_rev = 0x0300;
   m_state = static_cast<int>(kCreated);
@@ -29,8 +31,7 @@ void NetworkConnection::Start() {
   if (m_active) return;
   m_active = true;
   m_state = static_cast<int>(kInit);
-  // clear queues
-  while (!m_incoming.empty()) m_incoming.pop();
+  // clear queue
   while (!m_outgoing.empty()) m_outgoing.pop();
   // start threads
   m_write_thread = std::thread(&NetworkConnection::WriteThreadMain, this);
@@ -47,8 +48,7 @@ void NetworkConnection::Stop() {
   // wait for threads to terminate
   if (m_write_thread.joinable()) m_write_thread.join();
   if (m_read_thread.joinable()) m_read_thread.join();
-  // clear queues
-  while (!m_incoming.empty()) m_incoming.pop();
+  // clear queue
   while (!m_outgoing.empty()) m_outgoing.pop();
 }
 
@@ -77,9 +77,8 @@ void NetworkConnection::ReadThreadMain() {
       if (m_stream) m_stream->close();
       break;
     }
-    m_incoming.emplace(std::move(msg));
+    m_process_incoming(std::move(msg), this, m_proto_rev);
   }
-  m_incoming.emplace(nullptr);  // notify anyone waiting that we disconnected
   m_state = static_cast<int>(kDead);
   m_active = false;
 }
@@ -92,7 +91,9 @@ void NetworkConnection::WriteThreadMain() {
     if (msgs.empty()) break;
     encoder.set_proto_rev(m_proto_rev);
     encoder.Reset();
-    for (auto& msg : msgs) msg->Write(encoder);
+    for (auto& msg : msgs) {
+      if (msg) msg->Write(encoder);
+    }
     TCPStream::Error err;
     if (!m_stream) break;
     if (m_stream->send(encoder.data(), encoder.size(), &err) == 0) break;
