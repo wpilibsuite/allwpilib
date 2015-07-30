@@ -370,7 +370,7 @@ std::string Command::GetName() const {
 
 std::string Command::GetSmartDashboardType() const { return "Command"; }
 
-void Command::InitTable(::std::shared_ptr<ITable> table) {
+void Command::InitTable(std::shared_ptr<ITable> table) {
   if (m_table != nullptr) m_table->RemoveTableListener(this);
   m_table = table;
   if (m_table != nullptr) {
@@ -381,9 +381,9 @@ void Command::InitTable(::std::shared_ptr<ITable> table) {
   }
 }
 
-::std::shared_ptr<ITable> Command::GetTable() const { return m_table; }
+std::shared_ptr<ITable> Command::GetTable() const { return m_table; }
 
-void Command::ValueChanged(::std::shared_ptr<ITable> source, const std::string &key,
+void Command::ValueChanged(std::shared_ptr<ITable> source, const std::string &key,
                            EntryValue value, bool isNew) {
   if (value.b) {
     if (!IsRunning()) Start();

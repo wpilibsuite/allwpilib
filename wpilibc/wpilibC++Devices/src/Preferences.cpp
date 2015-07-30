@@ -513,7 +513,7 @@ static bool isKeyAcceptable(const std::string &value) {
   return true;
 }
 
-void Preferences::ValueChanged(::std::shared_ptr<ITable> table, const std::string &key,
+void Preferences::ValueChanged(std::shared_ptr<ITable> table, const std::string &key,
                                EntryValue value, bool isNew) {
   if (key == kSaveField) {
     if (table->GetBoolean(kSaveField, false)) Save();

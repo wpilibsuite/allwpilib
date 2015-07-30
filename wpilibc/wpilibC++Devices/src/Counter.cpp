@@ -67,7 +67,7 @@ Counter::Counter(DigitalSource *source) : Counter() {
  * @param source A pointer to the existing DigitalSource object. It will be
  * set as the Up Source.
  */
-Counter::Counter(::std::shared_ptr<DigitalSource> source) : Counter() {
+Counter::Counter(std::shared_ptr<DigitalSource> source) : Counter() {
   SetUpSource(source);
   ClearDownSource();
 }
@@ -126,9 +126,9 @@ Counter::Counter(const AnalogTrigger &trigger) : Counter() {
 Counter::Counter(EncodingType encodingType, DigitalSource *upSource,
                  DigitalSource *downSource, bool inverted)
     : Counter(encodingType,
-              ::std::shared_ptr<DigitalSource>(upSource,
+              std::shared_ptr<DigitalSource>(upSource,
                                                NullDeleter<DigitalSource>()),
-              ::std::shared_ptr<DigitalSource>(downSource,
+              std::shared_ptr<DigitalSource>(downSource,
                                                NullDeleter<DigitalSource>()),
               inverted) {}
 
@@ -141,8 +141,8 @@ Counter::Counter(EncodingType encodingType, DigitalSource *upSource,
  * @param inverted True to invert the output (reverse the direction)
  */
 Counter::Counter(EncodingType encodingType,
-                 ::std::shared_ptr<DigitalSource> upSource,
-                 ::std::shared_ptr<DigitalSource> downSource, bool inverted)
+                 std::shared_ptr<DigitalSource> upSource,
+                 std::shared_ptr<DigitalSource> downSource, bool inverted)
     : Counter(kExternalDirection) {
   if (encodingType != k1X && encodingType != k2X) {
     wpi_setWPIErrorWithContext(
@@ -185,7 +185,7 @@ Counter::~Counter() {
  */
 void Counter::SetUpSource(int32_t channel) {
   if (StatusIsFatal()) return;
-  SetUpSource(::std::make_shared<DigitalInput>(channel));
+  SetUpSource(std::make_shared<DigitalInput>(channel));
 }
 
 /**
@@ -198,7 +198,7 @@ void Counter::SetUpSource(int32_t channel) {
     "SetUpSource(shared_ptr).")]]
 void Counter::SetUpSource(AnalogTrigger *analogTrigger,
                           AnalogTriggerType triggerType) {
-  SetUpSource(::std::shared_ptr<AnalogTrigger>(analogTrigger,
+  SetUpSource(std::shared_ptr<AnalogTrigger>(analogTrigger,
                                                NullDeleter<AnalogTrigger>()),
               triggerType);
 }
@@ -208,7 +208,7 @@ void Counter::SetUpSource(AnalogTrigger *analogTrigger,
  * @param analogTrigger The analog trigger object that is used for the Up Source
  * @param triggerType The analog trigger output that will trigger the counter.
  */
-void Counter::SetUpSource(::std::shared_ptr<AnalogTrigger> analogTrigger,
+void Counter::SetUpSource(std::shared_ptr<AnalogTrigger> analogTrigger,
                           AnalogTriggerType triggerType) {
   if (StatusIsFatal()) return;
   SetUpSource(analogTrigger->CreateOutput(triggerType));
@@ -219,7 +219,7 @@ void Counter::SetUpSource(::std::shared_ptr<AnalogTrigger> analogTrigger,
  * Set the up counting DigitalSource.
  * @param source Pointer to the DigitalSource object to set as the up source
  */
-void Counter::SetUpSource(::std::shared_ptr<DigitalSource> source) {
+void Counter::SetUpSource(std::shared_ptr<DigitalSource> source) {
   if (StatusIsFatal()) return;
   m_upSource = source;
   if (m_upSource->StatusIsFatal()) {
@@ -235,7 +235,7 @@ void Counter::SetUpSource(::std::shared_ptr<DigitalSource> source) {
 [[deprecated("Raw pointers are deprecated. Use std::shared_ptr instead.")]]
 void Counter::SetUpSource(DigitalSource *source) {
   SetUpSource(
-      ::std::shared_ptr<DigitalSource>(source, NullDeleter<DigitalSource>()));
+      std::shared_ptr<DigitalSource>(source, NullDeleter<DigitalSource>()));
 }
 
 /**
@@ -246,7 +246,7 @@ void Counter::SetUpSource(DigitalSource *source) {
 [[deprecated("References are deprecated. Use std::shared_ptr instead.")]]
 void Counter::SetUpSource(DigitalSource &source) {
   SetUpSource(
-      ::std::shared_ptr<DigitalSource>(&source, NullDeleter<DigitalSource>()));
+      std::shared_ptr<DigitalSource>(&source, NullDeleter<DigitalSource>()));
 }
 
 /**
@@ -285,7 +285,7 @@ void Counter::ClearUpSource() {
  */
 void Counter::SetDownSource(int32_t channel) {
   if (StatusIsFatal()) return;
-  SetDownSource(::std::make_shared<DigitalInput>(channel));
+  SetDownSource(std::make_shared<DigitalInput>(channel));
 }
 
 /**
@@ -299,7 +299,7 @@ void Counter::SetDownSource(int32_t channel) {
     "SetUpSource(shared_ptr).")]]
 void Counter::SetDownSource(AnalogTrigger *analogTrigger,
                             AnalogTriggerType triggerType) {
-  SetDownSource(::std::shared_ptr<AnalogTrigger>(analogTrigger, NullDeleter<AnalogTrigger>()), triggerType);
+  SetDownSource(std::shared_ptr<AnalogTrigger>(analogTrigger, NullDeleter<AnalogTrigger>()), triggerType);
 }
 
 /**
@@ -308,7 +308,7 @@ void Counter::SetDownSource(AnalogTrigger *analogTrigger,
  * Source
  * @param triggerType The analog trigger output that will trigger the counter.
  */
-void Counter::SetDownSource(::std::shared_ptr<AnalogTrigger> analogTrigger,
+void Counter::SetDownSource(std::shared_ptr<AnalogTrigger> analogTrigger,
                             AnalogTriggerType triggerType) {
   if (StatusIsFatal()) return;
   SetDownSource(analogTrigger->CreateOutput(triggerType));
@@ -319,7 +319,7 @@ void Counter::SetDownSource(::std::shared_ptr<AnalogTrigger> analogTrigger,
  * Set the down counting DigitalSource.
  * @param source Pointer to the DigitalSource object to set as the down source
  */
-void Counter::SetDownSource(::std::shared_ptr<DigitalSource> source) {
+void Counter::SetDownSource(std::shared_ptr<DigitalSource> source) {
   if (StatusIsFatal()) return;
   m_downSource = source;
   if (m_downSource->StatusIsFatal()) {
@@ -334,7 +334,7 @@ void Counter::SetDownSource(::std::shared_ptr<DigitalSource> source) {
 
 [[deprecated("Raw pointers are deprecated. Use std::shared_ptr instead.")]]
 void Counter::SetDownSource(DigitalSource *source) {
-  SetDownSource(::std::shared_ptr<DigitalSource>(source, NullDeleter<DigitalSource>()));
+  SetDownSource(std::shared_ptr<DigitalSource>(source, NullDeleter<DigitalSource>()));
 }
 
 /**
@@ -344,7 +344,7 @@ void Counter::SetDownSource(DigitalSource *source) {
  */
 [[deprecated("References are deprecated. Use std::shared_ptr instead.")]]
 void Counter::SetDownSource(DigitalSource &source) {
-  SetDownSource(::std::shared_ptr<DigitalSource>(&source, NullDeleter<DigitalSource>()));
+  SetDownSource(std::shared_ptr<DigitalSource>(&source, NullDeleter<DigitalSource>()));
 }
 
 /**
@@ -600,9 +600,9 @@ void Counter::StopLiveWindowMode() {}
 
 std::string Counter::GetSmartDashboardType() const { return "Counter"; }
 
-void Counter::InitTable(::std::shared_ptr<ITable> subTable) {
+void Counter::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-::std::shared_ptr<ITable> Counter::GetTable() const { return m_table; }
+std::shared_ptr<ITable> Counter::GetTable() const { return m_table; }

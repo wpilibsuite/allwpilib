@@ -38,18 +38,18 @@ class DigitalOutput : public DigitalSource,
   virtual uint32_t GetModuleForRouting() const;
   virtual bool GetAnalogTriggerForRouting() const;
 
-  virtual void ValueChanged(::std::shared_ptr<ITable> source, const std::string &key,
+  virtual void ValueChanged(std::shared_ptr<ITable> source, const std::string &key,
                             EntryValue value, bool isNew);
   void UpdateTable();
   void StartLiveWindowMode();
   void StopLiveWindowMode();
   std::string GetSmartDashboardType() const;
-  void InitTable(::std::shared_ptr<ITable> subTable);
-  ::std::shared_ptr<ITable> GetTable() const;
+  void InitTable(std::shared_ptr<ITable> subTable);
+  std::shared_ptr<ITable> GetTable() const;
 
  private:
   uint32_t m_channel;
   void *m_pwmGenerator;
 
-  ::std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table = nullptr;
 };

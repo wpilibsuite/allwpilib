@@ -108,7 +108,7 @@ TEST_F(AnalogLoopTest, AsynchronusInterruptWorks) {
   trigger.SetLimitsVoltage(2.0f, 3.0f);
 
   // Given an interrupt handler that sets an int to 12345
-  ::std::shared_ptr<AnalogTriggerOutput> triggerOutput = trigger.CreateOutput(kState);
+  std::shared_ptr<AnalogTriggerOutput> triggerOutput = trigger.CreateOutput(kState);
   triggerOutput->RequestInterrupts(InterruptHandler, &param);
   triggerOutput->EnableInterrupts();
 

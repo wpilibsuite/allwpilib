@@ -2,15 +2,15 @@
 
 #include "Base.h"
 
-::std::shared_ptr<RobotStateInterface> RobotState::impl = nullptr;
+std::shared_ptr<RobotStateInterface> RobotState::impl = nullptr;
 
 void RobotState::SetImplementation(RobotStateInterface& i) {
-  impl = ::std::shared_ptr<RobotStateInterface>(
+  impl = std::shared_ptr<RobotStateInterface>(
       &i, NullDeleter<RobotStateInterface>());
 }
 
 void RobotState::SetImplementation(
-    ::std::shared_ptr<RobotStateInterface> i) {
+    std::shared_ptr<RobotStateInterface> i) {
   impl = i;
 }
 

@@ -176,14 +176,14 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
 
  public:
   virtual std::string GetName() const;
-  virtual void InitTable(::std::shared_ptr<ITable> table);
-  virtual ::std::shared_ptr<ITable> GetTable() const;
+  virtual void InitTable(std::shared_ptr<ITable> table);
+  virtual std::shared_ptr<ITable> GetTable() const;
   virtual std::string GetSmartDashboardType() const;
-  virtual void ValueChanged(::std::shared_ptr<ITable> source, const std::string &key,
+  virtual void ValueChanged(std::shared_ptr<ITable> source, const std::string &key,
                             EntryValue value, bool isNew);
 
  protected:
-  ::std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table = nullptr;
 };
 
 #endif

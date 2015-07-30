@@ -87,15 +87,15 @@ protected:
 	bool m_eliminateDeadband;
 	int32_t m_centerPwm;
 
-	void ValueChanged(::std::shared_ptr<ITable> source, const std::string& key, EntryValue value, bool isNew) override;
+	void ValueChanged(std::shared_ptr<ITable> source, const std::string& key, EntryValue value, bool isNew) override;
 	void UpdateTable() override;
 	void StartLiveWindowMode() override;
 	void StopLiveWindowMode() override;
 	std::string GetSmartDashboardType() const override;
-	void InitTable(::std::shared_ptr<ITable> subTable) override;
-	::std::shared_ptr<ITable> GetTable() const override;
+	void InitTable(std::shared_ptr<ITable> subTable) override;
+	std::shared_ptr<ITable> GetTable() const override;
 
-	::std::shared_ptr<ITable> m_table = nullptr;
+	std::shared_ptr<ITable> m_table = nullptr;
 
 private:
 	uint32_t m_channel;

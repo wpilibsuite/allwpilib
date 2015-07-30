@@ -34,7 +34,7 @@ class MotorSafetyHelper : public ErrorBase {
       m_syncMutex;            // protect accesses to the state for this object
   MotorSafety *m_safeObject;  // the object that is using the helper
   // List of all existing MotorSafetyHelper objects.
-  static ::std::set<MotorSafetyHelper*> m_helperList;
+  static std::set<MotorSafetyHelper*> m_helperList;
   static priority_recursive_mutex
       m_listMutex;  // protect accesses to the list of helpers
 };

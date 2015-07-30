@@ -75,7 +75,7 @@ void Gyro::InitGyro() {
                       can only be used on on-board Analog Inputs 0-1.
  */
 Gyro::Gyro(int32_t channel) {
-  m_analog = ::std::make_shared<AnalogInput>(channel);
+  m_analog = std::make_shared<AnalogInput>(channel);
   InitGyro();
 }
 
@@ -92,7 +92,7 @@ Gyro::Gyro(int32_t channel) {
     "Raw pointers are deprecated; consider calling the Gyro constructor with "
     "a channel number or passing a shared_ptr instead.")]]
 Gyro::Gyro(AnalogInput *channel)
-    : Gyro(::std::shared_ptr<AnalogInput>(channel,
+    : Gyro(std::shared_ptr<AnalogInput>(channel,
                                           NullDeleter<AnalogInput>())) {}
 
 /**
@@ -103,7 +103,7 @@ Gyro::Gyro(AnalogInput *channel)
  * @param channel A pointer to the AnalogInput object that the gyro is
  * connected to.
  */
-Gyro::Gyro(::std::shared_ptr<AnalogInput> channel) : m_analog(channel) {
+Gyro::Gyro(std::shared_ptr<AnalogInput> channel) : m_analog(channel) {
   if (channel == nullptr) {
     wpi_setWPIError(NullParameter);
   } else {
@@ -228,9 +228,9 @@ void Gyro::StopLiveWindowMode() {}
 
 std::string Gyro::GetSmartDashboardType() const { return "Gyro"; }
 
-void Gyro::InitTable(::std::shared_ptr<ITable> subTable) {
+void Gyro::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-::std::shared_ptr<ITable> Gyro::GetTable() const { return m_table; }
+std::shared_ptr<ITable> Gyro::GetTable() const { return m_table; }

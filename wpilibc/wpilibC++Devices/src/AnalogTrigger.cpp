@@ -151,9 +151,9 @@ bool AnalogTrigger::GetTriggerState() {
  * @param type An enum of the type of output object to create.
  * @return A pointer to a new AnalogTriggerOutput object.
  */
-::std::shared_ptr<AnalogTriggerOutput> AnalogTrigger::CreateOutput(
+std::shared_ptr<AnalogTriggerOutput> AnalogTrigger::CreateOutput(
     AnalogTriggerType type) const {
   if (StatusIsFatal()) return nullptr;
-  return ::std::shared_ptr<AnalogTriggerOutput>(
+  return std::shared_ptr<AnalogTriggerOutput>(
       new AnalogTriggerOutput(*this, type), NullDeleter<AnalogTriggerOutput>());
 }

@@ -59,7 +59,7 @@ inline void protobuf_AssignDescriptorsOnce() {
                  &protobuf_AssignDesc_msgs_2ffloat64_2eproto);
 }
 
-void protobuf_RegisterTypes(const ::std::string&) {
+void protobuf_RegisterTypes(const std::string&) {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     Float64_descriptor_, &Float64::default_instance());

@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <sstream>
 
-::std::set<MotorSafetyHelper*> MotorSafetyHelper::m_helperList;
+std::set<MotorSafetyHelper*> MotorSafetyHelper::m_helperList;
 priority_recursive_mutex MotorSafetyHelper::m_listMutex;
 
 /**

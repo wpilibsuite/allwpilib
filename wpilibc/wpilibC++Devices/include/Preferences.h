@@ -59,7 +59,7 @@ class Preferences : public ErrorBase, public ITableListener {
   bool ContainsKey(const char *key);
   void Remove(const char *key);
 
-  void ValueChanged(::std::shared_ptr<ITable> source, const std::string &key, EntryValue value,
+  void ValueChanged(std::shared_ptr<ITable> source, const std::string &key, EntryValue value,
                     bool isNew) override;
 
  protected:

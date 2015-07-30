@@ -18,12 +18,12 @@ class Sendable {
    * Initializes a table for this sendable object.
    * @param subtable The table to put the values in.
    */
-  virtual void InitTable(::std::shared_ptr<ITable> subtable) = 0;
+  virtual void InitTable(std::shared_ptr<ITable> subtable) = 0;
 
   /**
    * @return the table that is currently associated with the sendable
    */
-  virtual ::std::shared_ptr<ITable> GetTable() const = 0;
+  virtual std::shared_ptr<ITable> GetTable() const = 0;
 
   /**
    * @return the string representation of the named data type that will be used

@@ -13,7 +13,7 @@
 
 #include <sstream>
 
-static ::std::unique_ptr<Resource> inputs;
+static std::unique_ptr<Resource> inputs;
 
 const uint8_t AnalogInput::kAccumulatorModuleNumber;
 const uint32_t AnalogInput::kAccumulatorNumChannels;
@@ -413,9 +413,9 @@ std::string AnalogInput::GetSmartDashboardType() const {
   return "Analog Input";
 }
 
-void AnalogInput::InitTable(::std::shared_ptr<ITable> subTable) {
+void AnalogInput::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-::std::shared_ptr<ITable> AnalogInput::GetTable() const { return m_table; }
+std::shared_ptr<ITable> AnalogInput::GetTable() const { return m_table; }

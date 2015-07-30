@@ -11,8 +11,8 @@
 
 #include <sstream>
 
-::std::unique_ptr<Resource> SolenoidBase::m_allocated =
-    ::std::make_unique<Resource>(solenoid_kNumDO7_0Elements *
+std::unique_ptr<Resource> SolenoidBase::m_allocated =
+    std::make_unique<Resource>(solenoid_kNumDO7_0Elements *
                                  kSolenoidChannels);
 
 /**
@@ -155,7 +155,7 @@ bool DoubleSolenoid::IsRevSolenoidBlackListed() const {
   return (blackList & m_reverseMask) ? 1 : 0;
 }
 
-void DoubleSolenoid::ValueChanged(::std::shared_ptr<ITable> source, const std::string &key,
+void DoubleSolenoid::ValueChanged(std::shared_ptr<ITable> source, const std::string &key,
                                   EntryValue value, bool isNew) {
   Value lvalue = kOff;
   std::string *val = (std::string *)value.ptr;
@@ -192,9 +192,9 @@ std::string DoubleSolenoid::GetSmartDashboardType() const {
   return "Double Solenoid";
 }
 
-void DoubleSolenoid::InitTable(::std::shared_ptr<ITable> subTable) {
+void DoubleSolenoid::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-::std::shared_ptr<ITable> DoubleSolenoid::GetTable() const { return m_table; }
+std::shared_ptr<ITable> DoubleSolenoid::GetTable() const { return m_table; }

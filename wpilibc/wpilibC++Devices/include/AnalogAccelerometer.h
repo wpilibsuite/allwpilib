@@ -32,7 +32,7 @@ class AnalogAccelerometer : public SensorBase,
       "AnalogAccelerometer(int channel). If you want to keep your own copy of "
       "the AnalogInput, use std::shared_ptr.")]]
   explicit AnalogAccelerometer(AnalogInput *channel);
-  explicit AnalogAccelerometer(::std::shared_ptr<AnalogInput> channel);
+  explicit AnalogAccelerometer(std::shared_ptr<AnalogInput> channel);
   virtual ~AnalogAccelerometer() = default;
 
   float GetAcceleration() const;
@@ -44,16 +44,16 @@ class AnalogAccelerometer : public SensorBase,
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(::std::shared_ptr<ITable> subTable) override;
-  ::std::shared_ptr<ITable> GetTable() const override;
+  void InitTable(std::shared_ptr<ITable> subTable) override;
+  std::shared_ptr<ITable> GetTable() const override;
 
  private:
   void InitAccelerometer();
 
-  ::std::shared_ptr<AnalogInput> m_analogInput;
+  std::shared_ptr<AnalogInput> m_analogInput;
   float m_voltsPerG = 1.0;
   float m_zeroGVoltage = 2.5;
   bool m_allocatedChannel;
 
-  ::std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table = nullptr;
 };

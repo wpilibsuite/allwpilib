@@ -12,7 +12,7 @@
 Notifier *Notifier::timerQueueHead = nullptr;
 priority_recursive_mutex Notifier::queueMutex;
 int Notifier::refcount = 0;
-::std::atomic<bool> Notifier::m_stopped(false);
+std::atomic<bool> Notifier::m_stopped(false);
 
 /**
  * Create a Notifier for timer event notification.
@@ -35,7 +35,7 @@ Notifier::Notifier(TimerEventHandler handler, void *param)
 		// do the first time intialization of static variables
 		if (refcount == 0)
 		{
-			m_task = ::std::thread(Run);
+			m_task = std::thread(Run);
 		}
 		refcount++;
 	}

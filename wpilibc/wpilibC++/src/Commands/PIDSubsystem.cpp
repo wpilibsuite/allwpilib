@@ -211,7 +211,7 @@ void PIDSubsystem::PIDWrite(float output) { UsePIDOutput(output); }
 double PIDSubsystem::PIDGet() const { return ReturnPIDInput(); }
 
 std::string PIDSubsystem::GetSmartDashboardType() const { return "PIDCommand"; }
-void PIDSubsystem::InitTable(::std::shared_ptr<ITable> table) {
+void PIDSubsystem::InitTable(std::shared_ptr<ITable> table) {
   m_controller->InitTable(table);
   Subsystem::InitTable(table);
 }

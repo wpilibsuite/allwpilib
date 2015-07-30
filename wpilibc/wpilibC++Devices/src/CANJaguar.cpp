@@ -31,7 +31,7 @@ static const uint32_t kFullMessageIDMask =
 
 static const int32_t kReceiveStatusAttempts = 50;
 
-static ::std::unique_ptr<Resource> allocated;
+static std::unique_ptr<Resource> allocated;
 
 static int32_t sendMessageHelper(uint32_t messageID, const uint8_t *data,
                                  uint8_t dataSize, int32_t period) {
@@ -1935,7 +1935,7 @@ uint8_t CANJaguar::GetDeviceID() const { return m_deviceNumber; }
  */
 void CANJaguar::StopMotor() { DisableControl(); }
 
-void CANJaguar::ValueChanged(::std::shared_ptr<ITable> source, const std::string &key,
+void CANJaguar::ValueChanged(std::shared_ptr<ITable> source, const std::string &key,
                              EntryValue value, bool isNew) {
   Set(value.f);
 }
@@ -1977,9 +1977,9 @@ std::string CANJaguar::GetSmartDashboardType() const {
   return "Speed Controller";
 }
 
-void CANJaguar::InitTable(::std::shared_ptr<ITable> subTable) {
+void CANJaguar::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-::std::shared_ptr<ITable> CANJaguar::GetTable() const { return m_table; }
+std::shared_ptr<ITable> CANJaguar::GetTable() const { return m_table; }

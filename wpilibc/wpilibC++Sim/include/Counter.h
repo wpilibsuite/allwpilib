@@ -77,8 +77,8 @@ public:
 	void StartLiveWindowMode() override;
 	void StopLiveWindowMode() override;
 	virtual std::string GetSmartDashboardType() const override;
-	void InitTable(::std::shared_ptr<ITable> subTable) override;
-	::std::shared_ptr<ITable> GetTable() const override;
+	void InitTable(std::shared_ptr<ITable> subTable) override;
+	std::shared_ptr<ITable> GetTable() const override;
 protected:
 	// TODO: [Not Supported] DigitalSource *m_upSource;		///< What makes the counter count up.
 	// TODO: [Not Supported] DigitalSource *m_downSource;	///< What makes the counter count down.
@@ -89,5 +89,5 @@ private:
 	bool m_allocatedDownSource;	///< Was the downSource allocated locally?
 	uint32_t m_index;					///< The index of this counter.
 
-	::std::shared_ptr<ITable> m_table;
+	std::shared_ptr<ITable> m_table;
 };

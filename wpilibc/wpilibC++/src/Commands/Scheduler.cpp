@@ -258,7 +258,7 @@ std::string Scheduler::GetType() const { return "Scheduler"; }
 
 std::string Scheduler::GetSmartDashboardType() const { return "Scheduler"; }
 
-void Scheduler::InitTable(::std::shared_ptr<ITable> subTable) {
+void Scheduler::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   commands = new StringArray();
   ids = new NumberArray();
@@ -269,4 +269,4 @@ void Scheduler::InitTable(::std::shared_ptr<ITable> subTable) {
   m_table->PutValue("Cancel", *toCancel);
 }
 
-::std::shared_ptr<ITable> Scheduler::GetTable() const { return m_table; }
+std::shared_ptr<ITable> Scheduler::GetTable() const { return m_table; }

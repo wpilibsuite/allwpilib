@@ -27,7 +27,7 @@ void Wait(double seconds)
     double start = wpilib::internal::simTime;
 
     while ((wpilib::internal::simTime - start) < seconds) {
-      ::std::unique_lock<::std::mutex> lock(wpilib::internal::time_wait_mutex);
+      std::unique_lock<std::mutex> lock(wpilib::internal::time_wait_mutex);
       wpilib::internal::time_wait.wait(lock);
     }
 }

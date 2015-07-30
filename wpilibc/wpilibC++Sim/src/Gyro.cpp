@@ -125,11 +125,11 @@ std::string Gyro::GetSmartDashboardType() const {
 	return "Gyro";
 }
 
-void Gyro::InitTable(::std::shared_ptr<ITable> subTable) {
+void Gyro::InitTable(std::shared_ptr<ITable> subTable) {
 	m_table = subTable;
 	UpdateTable();
 }
 
-::std::shared_ptr<ITable> Gyro::GetTable() const {
+std::shared_ptr<ITable> Gyro::GetTable() const {
 	return m_table;
 }

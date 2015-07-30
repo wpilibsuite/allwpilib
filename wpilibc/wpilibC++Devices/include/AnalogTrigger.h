@@ -27,7 +27,7 @@ class AnalogTrigger : public SensorBase {
   uint32_t GetIndex() const;
   bool GetInWindow();
   bool GetTriggerState();
-  ::std::shared_ptr<AnalogTriggerOutput> CreateOutput(AnalogTriggerType type) const;
+  std::shared_ptr<AnalogTriggerOutput> CreateOutput(AnalogTriggerType type) const;
 
  private:
   uint8_t m_index;

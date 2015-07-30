@@ -38,11 +38,11 @@ class PowerDistributionPanel : public SensorBase, public LiveWindowSendable {
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(::std::shared_ptr<ITable> subTable) override;
-  ::std::shared_ptr<ITable> GetTable() const override;
+  void InitTable(std::shared_ptr<ITable> subTable) override;
+  std::shared_ptr<ITable> GetTable() const override;
 
  private:
-  ::std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table = nullptr;
   uint8_t m_module;
 };
 

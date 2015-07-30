@@ -126,7 +126,7 @@ std::string Subsystem::GetName() const { return m_name; }
 
 std::string Subsystem::GetSmartDashboardType() const { return "Subsystem"; }
 
-void Subsystem::InitTable(::std::shared_ptr<ITable> table) {
+void Subsystem::InitTable(std::shared_ptr<ITable> table) {
   m_table = table;
   if (m_table != nullptr) {
     if (m_defaultCommand != nullptr) {
@@ -144,4 +144,4 @@ void Subsystem::InitTable(::std::shared_ptr<ITable> table) {
   }
 }
 
-::std::shared_ptr<ITable> Subsystem::GetTable() const { return m_table; }
+std::shared_ptr<ITable> Subsystem::GetTable() const { return m_table; }

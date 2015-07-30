@@ -99,8 +99,8 @@ void Ultrasonic::Initialize() {
  */
 Ultrasonic::Ultrasonic(uint32_t pingChannel, uint32_t echoChannel,
                        DistanceUnit units)
-    : m_pingChannel(::std::make_shared<DigitalOutput>(pingChannel)),
-      m_echoChannel(::std::make_shared<DigitalInput>(echoChannel)),
+    : m_pingChannel(std::make_shared<DigitalOutput>(pingChannel)),
+      m_echoChannel(std::make_shared<DigitalInput>(echoChannel)),
       m_counter(m_echoChannel) {
   m_units = units;
   Initialize();
@@ -164,8 +164,8 @@ Ultrasonic::Ultrasonic(DigitalOutput &pingChannel, DigitalInput &echoChannel,
  * determine the range.
  * @param units The units returned in either kInches or kMilliMeters
  */
-Ultrasonic::Ultrasonic(::std::shared_ptr<DigitalOutput> pingChannel,
-                       ::std::shared_ptr<DigitalInput> echoChannel,
+Ultrasonic::Ultrasonic(std::shared_ptr<DigitalOutput> pingChannel,
+                       std::shared_ptr<DigitalInput> echoChannel,
                        DistanceUnit units)
     : m_pingChannel(pingChannel),
       m_echoChannel(echoChannel),
@@ -345,9 +345,9 @@ void Ultrasonic::StopLiveWindowMode() {}
 
 std::string Ultrasonic::GetSmartDashboardType() const { return "Ultrasonic"; }
 
-void Ultrasonic::InitTable(::std::shared_ptr<ITable> subTable) {
+void Ultrasonic::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-::std::shared_ptr<ITable> Ultrasonic::GetTable() const { return m_table; }
+std::shared_ptr<ITable> Ultrasonic::GetTable() const { return m_table; }

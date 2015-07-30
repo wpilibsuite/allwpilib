@@ -140,7 +140,7 @@ Relay::Value Relay::Get() const {
 	}
 }
 
-void Relay::ValueChanged(::std::shared_ptr<ITable> source, const std::string& key, EntryValue value, bool isNew) {
+void Relay::ValueChanged(std::shared_ptr<ITable> source, const std::string& key, EntryValue value, bool isNew) {
 	std::string *val = (std::string *) value.ptr;
 	if (*val == "Off") Set(kOff);
 	else if (*val == "Forward") Set(kForward);
@@ -180,11 +180,11 @@ std::string Relay::GetSmartDashboardType() const {
 	return "Relay";
 }
 
-void Relay::InitTable(::std::shared_ptr<ITable> subTable) {
+void Relay::InitTable(std::shared_ptr<ITable> subTable) {
 	m_table = subTable;
 	UpdateTable();
 }
 
-::std::shared_ptr<ITable> Relay::GetTable() const {
+std::shared_ptr<ITable> Relay::GetTable() const {
 	return m_table;
 }

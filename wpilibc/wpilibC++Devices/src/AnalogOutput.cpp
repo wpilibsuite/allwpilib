@@ -12,7 +12,7 @@
 
 #include <sstream>
 
-static ::std::unique_ptr<Resource> outputs;
+static std::unique_ptr<Resource> outputs;
 
 /**
  * Construct an analog output on the given channel.
@@ -91,9 +91,9 @@ std::string AnalogOutput::GetSmartDashboardType() const {
   return "Analog Output";
 }
 
-void AnalogOutput::InitTable(::std::shared_ptr<ITable> subTable) {
+void AnalogOutput::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-::std::shared_ptr<ITable> AnalogOutput::GetTable() const { return m_table; }
+std::shared_ptr<ITable> AnalogOutput::GetTable() const { return m_table; }

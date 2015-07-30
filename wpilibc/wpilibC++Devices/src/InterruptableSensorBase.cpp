@@ -9,8 +9,8 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 
-::std::unique_ptr<Resource> InterruptableSensorBase::m_interrupts =
-    ::std::make_unique<Resource>(interrupt_kNumSystems);
+std::unique_ptr<Resource> InterruptableSensorBase::m_interrupts =
+    std::make_unique<Resource>(interrupt_kNumSystems);
 
 InterruptableSensorBase::InterruptableSensorBase() {
 }

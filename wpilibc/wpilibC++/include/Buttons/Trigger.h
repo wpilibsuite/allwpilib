@@ -42,12 +42,12 @@ class Trigger : public Sendable {
   void CancelWhenActive(Command *command);
   void ToggleWhenActive(Command *command);
 
-  virtual void InitTable(::std::shared_ptr<ITable> table);
-  virtual ::std::shared_ptr<ITable> GetTable() const;
+  virtual void InitTable(std::shared_ptr<ITable> table);
+  virtual std::shared_ptr<ITable> GetTable() const;
   virtual std::string GetSmartDashboardType() const;
 
  protected:
-  ::std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table = nullptr;
 };
 
 #endif

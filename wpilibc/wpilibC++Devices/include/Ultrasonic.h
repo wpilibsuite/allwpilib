@@ -54,8 +54,8 @@ class Ultrasonic : public SensorBase,
   Ultrasonic(DigitalOutput &pingChannel, DigitalInput &echoChannel,
              DistanceUnit units = kInches);
 
-  Ultrasonic(::std::shared_ptr<DigitalOutput> pingChannel,
-             ::std::shared_ptr<DigitalInput> echoChannel,
+  Ultrasonic(std::shared_ptr<DigitalOutput> pingChannel,
+             std::shared_ptr<DigitalInput> echoChannel,
              DistanceUnit units = kInches);
   Ultrasonic(uint32_t pingChannel, uint32_t echoChannel,
              DistanceUnit units = kInches);
@@ -77,8 +77,8 @@ class Ultrasonic : public SensorBase,
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(::std::shared_ptr<ITable> subTable) override;
-  ::std::shared_ptr<ITable> GetTable() const override;
+  void InitTable(std::shared_ptr<ITable> subTable) override;
+  std::shared_ptr<ITable> GetTable() const override;
 
  private:
   void Initialize();
@@ -98,13 +98,13 @@ class Ultrasonic : public SensorBase,
   static std::atomic<bool> m_automaticEnabled; // automatic round robin mode
   static priority_mutex m_mutex;  // synchronize access to the list of sensors
 
-  ::std::shared_ptr<DigitalOutput> m_pingChannel;
-  ::std::shared_ptr<DigitalInput> m_echoChannel;
+  std::shared_ptr<DigitalOutput> m_pingChannel;
+  std::shared_ptr<DigitalInput> m_echoChannel;
   bool m_allocatedChannels;
   bool m_enabled;
   Counter m_counter;
   Ultrasonic *m_nextSensor;
   DistanceUnit m_units;
 
-  ::std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table = nullptr;
 };

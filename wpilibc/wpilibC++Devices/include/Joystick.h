@@ -108,8 +108,8 @@ class Joystick : public GenericHID, public ErrorBase {
  private:
   DriverStation &m_ds;
   uint32_t m_port;
-  ::std::vector<uint32_t> m_axes;
-  ::std::vector<uint32_t> m_buttons;
+  std::vector<uint32_t> m_axes;
+  std::vector<uint32_t> m_buttons;
   uint32_t m_outputs = 0;
   uint16_t m_leftRumble = 0;
   uint16_t m_rightRumble = 0;

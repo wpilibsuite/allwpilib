@@ -82,11 +82,11 @@ std::string AnalogInput::GetSmartDashboardType() const {
 	return "Analog Input";
 }
 
-void AnalogInput::InitTable(::std::shared_ptr<ITable> subTable) {
+void AnalogInput::InitTable(std::shared_ptr<ITable> subTable) {
 	m_table = subTable;
 	UpdateTable();
 }
 
-::std::shared_ptr<ITable> AnalogInput::GetTable() const {
+std::shared_ptr<ITable> AnalogInput::GetTable() const {
 	return m_table;
 }

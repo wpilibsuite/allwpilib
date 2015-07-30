@@ -12,7 +12,7 @@
  */
 AnalogPotentiometer::AnalogPotentiometer(int channel, double fullRange,
                                          double offset)
-    : m_analog_input(::std::make_unique<AnalogInput>(channel)),
+    : m_analog_input(std::make_unique<AnalogInput>(channel)),
       m_fullRange(fullRange),
       m_offset(offset) {}
 
@@ -45,7 +45,7 @@ AnalogPotentiometer::AnalogPotentiometer(AnalogInput *input, double fullRange,
  * @param offset The angular value (in desired units) representing the angular
  * output at 0V.
  */
-AnalogPotentiometer::AnalogPotentiometer(::std::shared_ptr<AnalogInput> input,
+AnalogPotentiometer::AnalogPotentiometer(std::shared_ptr<AnalogInput> input,
                                          double fullRange, double offset)
     : m_analog_input(input), m_fullRange(fullRange), m_offset(offset) {}
 
@@ -78,7 +78,7 @@ std::string AnalogPotentiometer::GetSmartDashboardType() const {
 /**
  * Live Window code, only does anything if live window is activated.
  */
-void AnalogPotentiometer::InitTable(::std::shared_ptr<ITable> subtable) {
+void AnalogPotentiometer::InitTable(std::shared_ptr<ITable> subtable) {
   m_table = subtable;
   UpdateTable();
 }
@@ -89,4 +89,4 @@ void AnalogPotentiometer::UpdateTable() {
   }
 }
 
-::std::shared_ptr<ITable> AnalogPotentiometer::GetTable() const { return m_table; }
+std::shared_ptr<ITable> AnalogPotentiometer::GetTable() const { return m_table; }

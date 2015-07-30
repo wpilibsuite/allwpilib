@@ -48,9 +48,9 @@ class Compressor : public SensorBase,
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(::std::shared_ptr<ITable> subTable) override;
-  ::std::shared_ptr<ITable> GetTable() const override;
-  void ValueChanged(::std::shared_ptr<ITable> source, const std::string &key, EntryValue value,
+  void InitTable(std::shared_ptr<ITable> subTable) override;
+  std::shared_ptr<ITable> GetTable() const override;
+  void ValueChanged(std::shared_ptr<ITable> source, const std::string &key, EntryValue value,
                     bool isNew) override;
 
  protected:
@@ -59,7 +59,7 @@ class Compressor : public SensorBase,
  private:
   void SetCompressor(bool on);
 
-  ::std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table = nullptr;
 };
 
 #endif /* Compressor_H_ */

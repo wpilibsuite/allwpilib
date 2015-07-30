@@ -37,11 +37,11 @@ class DigitalInput : public DigitalSource, public LiveWindowSendable {
   void StartLiveWindowMode();
   void StopLiveWindowMode();
   std::string GetSmartDashboardType() const;
-  void InitTable(::std::shared_ptr<ITable> subTable);
-  ::std::shared_ptr<ITable> GetTable() const;
+  void InitTable(std::shared_ptr<ITable> subTable);
+  std::shared_ptr<ITable> GetTable() const;
 
  private:
   uint32_t m_channel;
 
-  ::std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table = nullptr;
 };

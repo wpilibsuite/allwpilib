@@ -75,7 +75,7 @@ DoubleSolenoid::Value DoubleSolenoid::Get() const
 	return m_value;
 }
 
-void DoubleSolenoid::ValueChanged(::std::shared_ptr<ITable> source, const std::string& key, EntryValue value, bool isNew) {
+void DoubleSolenoid::ValueChanged(std::shared_ptr<ITable> source, const std::string& key, EntryValue value, bool isNew) {
 	Value lvalue = kOff;
 	std::string *val = (std::string *)value.ptr;
 	if (*val == "Forward")
@@ -109,11 +109,11 @@ std::string DoubleSolenoid::GetSmartDashboardType() const {
 	return "Double Solenoid";
 }
 
-void DoubleSolenoid::InitTable(::std::shared_ptr<ITable> subTable) {
+void DoubleSolenoid::InitTable(std::shared_ptr<ITable> subTable) {
 	m_table = subTable;
 	UpdateTable();
 }
 
-::std::shared_ptr<ITable> DoubleSolenoid::GetTable() const {
+std::shared_ptr<ITable> DoubleSolenoid::GetTable() const {
 	return m_table;
 }

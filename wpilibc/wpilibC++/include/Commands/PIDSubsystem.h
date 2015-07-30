@@ -68,7 +68,7 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
   std::unique_ptr<PIDController> m_controller;
 
  public:
-  virtual void InitTable(::std::shared_ptr<ITable> table);
+  virtual void InitTable(std::shared_ptr<ITable> table);
   virtual std::string GetSmartDashboardType() const;
 };
 

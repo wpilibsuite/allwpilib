@@ -30,16 +30,16 @@ class Solenoid : public SolenoidBase,
   virtual bool Get() const;
   bool IsBlackListed() const;
 
-  void ValueChanged(::std::shared_ptr<ITable> source, const std::string& key, EntryValue value,
+  void ValueChanged(std::shared_ptr<ITable> source, const std::string& key, EntryValue value,
                     bool isNew);
   void UpdateTable();
   void StartLiveWindowMode();
   void StopLiveWindowMode();
   std::string GetSmartDashboardType() const;
-  void InitTable(::std::shared_ptr<ITable> subTable);
-  ::std::shared_ptr<ITable> GetTable() const;
+  void InitTable(std::shared_ptr<ITable> subTable);
+  std::shared_ptr<ITable> GetTable() const;
 
  private:
   uint32_t m_channel;  ///< The channel on the module to control.
-  ::std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table = nullptr;
 };
