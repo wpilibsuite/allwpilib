@@ -11,6 +11,7 @@
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -53,19 +54,14 @@ class Dispatcher {
   void ServerThreadMain(const char* listen_address, unsigned int port);
   void ClientThreadMain(const char* server_name, unsigned int port);
 
+  bool ServerHandshake(NetworkConnection& conn,
+                       std::function<std::shared_ptr<Message>()> get_msg);
+
   void ClientReconnect();
 
   NT_Type GetEntryType(unsigned int id) const;
 
-  struct Connection {
-    enum State {
-    };
-    State state;
-    std::string remote_id;
-    std::unique_ptr<NetworkConnection> net;
-  };
-
-  void AddConnection(Connection&& conn);
+  void AddConnection(std::unique_ptr<NetworkConnection> conn);
 
   bool m_server;
   std::thread m_dispatch_thread;
@@ -76,7 +72,7 @@ class Dispatcher {
 
   // Mutex for user-accessible items
   std::mutex m_user_mutex;
-  std::vector<Connection> m_connections;
+  std::vector<std::unique_ptr<NetworkConnection>> m_connections;
   std::string m_identity;
 
   std::atomic_bool m_active;  // set to false to terminate threads
@@ -94,8 +90,9 @@ class Dispatcher {
   bool m_do_reconnect;
 
   // Map from integer id to storage entry.  Id is 16-bit, so just use a vector.
+  typedef std::vector<std::shared_ptr<StorageEntry>> IdMap;
   mutable std::mutex m_idmap_mutex;
-  std::vector<std::shared_ptr<StorageEntry>> m_idmap;
+  IdMap m_idmap;
 
   ATOMIC_STATIC_DECL(Dispatcher)
 };
