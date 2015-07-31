@@ -36,9 +36,9 @@ void Storage::ClearOutgoing() {
 NT_Type Storage::GetEntryType(unsigned int id) const {
   std::lock_guard<std::mutex> lock(m_mutex);
   if (id >= m_idmap.size()) return NT_UNASSIGNED;
-  auto value = m_idmap[id]->value;
-  if (!value) return NT_UNASSIGNED;
-  return value->type();
+  auto entry = m_idmap[id];
+  if (!entry || !entry->value) return NT_UNASSIGNED;
+  return entry->value->type();
 }
 
 void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
