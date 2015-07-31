@@ -25,9 +25,9 @@ class StorageTest : public ::testing::TestWithParam<bool> {
   Storage::EntriesMap& entries() { return storage.m_entries; }
   Storage::IdMap& idmap() { return storage.m_idmap; }
 
-  std::shared_ptr<StorageEntry> GetEntry(StringRef name) {
+  std::shared_ptr<Storage::Entry> GetEntry(StringRef name) {
     auto i = storage.m_entries.find(name);
-    return i == storage.m_entries.end() ? std::make_shared<StorageEntry>(name)
+    return i == storage.m_entries.end() ? std::make_shared<Storage::Entry>(name)
                                         : i->getValue();
   }
   struct OutgoingData {
@@ -118,11 +118,11 @@ TEST_P(StorageTest, Construct) {
 
 TEST_P(StorageTest, StorageEntryInit) {
   auto entry = GetEntry("foo");
-  EXPECT_FALSE(entry->value());
-  EXPECT_EQ(0u, entry->flags());
-  EXPECT_EQ("foo", entry->name());
-  EXPECT_EQ(0xffffu, entry->id());
-  EXPECT_EQ(SequenceNumber(), entry->seq_num());
+  EXPECT_FALSE(entry->value);
+  EXPECT_EQ(0u, entry->flags);
+  EXPECT_EQ("foo", entry->name);
+  EXPECT_EQ(0xffffu, entry->id);
+  EXPECT_EQ(SequenceNumber(), entry->seq_num);
 }
 
 TEST_P(StorageTest, GetEntryValueNotExist) {
@@ -143,10 +143,10 @@ TEST_P(StorageTest, SetEntryTypeValueAssignNew) {
   // brand new entry
   auto value = Value::MakeBoolean(true);
   storage.SetEntryTypeValue("foo", value);
-  EXPECT_EQ(value, GetEntry("foo")->value());
+  EXPECT_EQ(value, GetEntry("foo")->value);
   if (GetParam()) {
     ASSERT_EQ(1u, idmap().size());
-    EXPECT_EQ(value, idmap()[0]->value());
+    EXPECT_EQ(value, idmap()[0]->value);
   } else {
     EXPECT_TRUE(idmap().empty());
   }
@@ -170,7 +170,7 @@ TEST_P(StorageTestPopulateOne, SetEntryTypeValueAssignTypeChange) {
   // update with different type results in assignment message
   auto value = Value::MakeDouble(0.0);
   storage.SetEntryTypeValue("foo", value);
-  EXPECT_EQ(value, GetEntry("foo")->value());
+  EXPECT_EQ(value, GetEntry("foo")->value);
 
   ASSERT_EQ(1u, outgoing.size());
   EXPECT_FALSE(outgoing[0].only);
@@ -192,7 +192,7 @@ TEST_P(StorageTestPopulateOne, SetEntryTypeValueEqualValue) {
   // message is issued (minimizing bandwidth usage)
   auto value = Value::MakeBoolean(true);
   storage.SetEntryTypeValue("foo", value);
-  EXPECT_EQ(value, GetEntry("foo")->value());
+  EXPECT_EQ(value, GetEntry("foo")->value);
   EXPECT_TRUE(outgoing.empty());
 }
 
@@ -200,7 +200,7 @@ TEST_P(StorageTestPopulated, SetEntryTypeValueDifferentValue) {
   // update with same type and different value results in value update message
   auto value = Value::MakeDouble(1.0);
   storage.SetEntryTypeValue("foo2", value);
-  EXPECT_EQ(value, GetEntry("foo2")->value());
+  EXPECT_EQ(value, GetEntry("foo2")->value);
 
   if (GetParam()) {
     ASSERT_EQ(1u, outgoing.size());
@@ -214,7 +214,7 @@ TEST_P(StorageTestPopulated, SetEntryTypeValueDifferentValue) {
   } else {
     // shouldn't send an update id not assigned yet (happens on client only)
     EXPECT_TRUE(outgoing.empty());
-    EXPECT_EQ(2u, GetEntry("foo2")->seq_num().value());  // still should be incremented
+    EXPECT_EQ(2u, GetEntry("foo2")->seq_num.value());  // still should be incremented
   }
 }
 
@@ -237,7 +237,7 @@ TEST_P(StorageTest, SetEntryValueAssignNew) {
   // brand new entry
   auto value = Value::MakeBoolean(true);
   EXPECT_TRUE(storage.SetEntryValue("foo", value));
-  EXPECT_EQ(value, GetEntry("foo")->value());
+  EXPECT_EQ(value, GetEntry("foo")->value);
 
   ASSERT_EQ(1u, outgoing.size());
   EXPECT_FALSE(outgoing[0].only);
@@ -259,7 +259,7 @@ TEST_P(StorageTestPopulateOne, SetEntryValueAssignTypeChange) {
   auto value = Value::MakeDouble(0.0);
   EXPECT_FALSE(storage.SetEntryValue("foo", value));
   auto entry = GetEntry("foo");
-  EXPECT_NE(value, entry->value());
+  EXPECT_NE(value, entry->value);
   EXPECT_TRUE(outgoing.empty());
 }
 
@@ -269,7 +269,7 @@ TEST_P(StorageTestPopulateOne, SetEntryValueEqualValue) {
   auto value = Value::MakeBoolean(true);
   EXPECT_TRUE(storage.SetEntryValue("foo", value));
   auto entry = GetEntry("foo");
-  EXPECT_EQ(value, entry->value());
+  EXPECT_EQ(value, entry->value);
   EXPECT_TRUE(outgoing.empty());
 }
 
@@ -278,7 +278,7 @@ TEST_P(StorageTestPopulated, SetEntryValueDifferentValue) {
   auto value = Value::MakeDouble(1.0);
   EXPECT_TRUE(storage.SetEntryValue("foo2", value));
   auto entry = GetEntry("foo2");
-  EXPECT_EQ(value, entry->value());
+  EXPECT_EQ(value, entry->value);
 
   if (GetParam()) {
     ASSERT_EQ(1u, outgoing.size());
@@ -292,7 +292,7 @@ TEST_P(StorageTestPopulated, SetEntryValueDifferentValue) {
   } else {
     // shouldn't send an update id not assigned yet (happens on client only)
     EXPECT_TRUE(outgoing.empty());
-    EXPECT_EQ(2u, GetEntry("foo2")->seq_num().value());  // still should be incremented
+    EXPECT_EQ(2u, GetEntry("foo2")->seq_num.value());  // still should be incremented
   }
 }
 
@@ -324,14 +324,14 @@ TEST_P(StorageTestPopulateOne, SetEntryFlagsEqualValue) {
   // usage)
   storage.SetEntryFlags("foo", 0u);
   auto entry = GetEntry("foo");
-  EXPECT_EQ(0u, entry->flags());
+  EXPECT_EQ(0u, entry->flags);
   EXPECT_TRUE(outgoing.empty());
 }
 
 TEST_P(StorageTestPopulated, SetEntryFlagsDifferentValue) {
   // update with different value results in flags update message
   storage.SetEntryFlags("foo2", 1u);
-  EXPECT_EQ(1u, GetEntry("foo2")->flags());
+  EXPECT_EQ(1u, GetEntry("foo2")->flags);
 
   if (GetParam()) {
     ASSERT_EQ(1u, outgoing.size());
@@ -460,7 +460,7 @@ TEST_P(StorageTestPersistent, SavePersistentEmpty) {
 }
 
 TEST_P(StorageTestPersistent, SavePersistent) {
-  for (auto& i : entries()) i.getValue()->set_flags(NT_PERSISTENT);
+  for (auto& i : entries()) i.getValue()->flags = NT_PERSISTENT;
   std::ostringstream oss;
   storage.SavePersistent(oss);
   std::string out = oss.str();
@@ -566,8 +566,8 @@ TEST_P(StorageTest, LoadPersistentAssign) {
       "[NetworkTables Storage 3.0]\nboolean \"foo\"=true\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
   auto entry = GetEntry("foo");
-  EXPECT_EQ(*Value::MakeBoolean(true), *entry->value());
-  EXPECT_EQ(NT_PERSISTENT, entry->flags());
+  EXPECT_EQ(*Value::MakeBoolean(true), *entry->value);
+  EXPECT_EQ(NT_PERSISTENT, entry->flags);
 
   ASSERT_EQ(1u, outgoing.size());
   EXPECT_FALSE(outgoing[0].only);
@@ -593,8 +593,8 @@ TEST_P(StorageTestPopulated, LoadPersistentUpdateFlags) {
       "[NetworkTables Storage 3.0]\ndouble \"foo2\"=0.0\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
   auto entry = GetEntry("foo2");
-  EXPECT_EQ(*Value::MakeDouble(0.0), *entry->value());
-  EXPECT_EQ(NT_PERSISTENT, entry->flags());
+  EXPECT_EQ(*Value::MakeDouble(0.0), *entry->value);
+  EXPECT_EQ(NT_PERSISTENT, entry->flags);
 
   if (GetParam()) {
     ASSERT_EQ(1u, outgoing.size());
@@ -615,14 +615,14 @@ TEST_P(StorageTestPopulated, LoadPersistentUpdateValue) {
   auto warn_func =
       [&](std::size_t line, const char* msg) { warn.Warn(line, msg); };
 
-  GetEntry("foo2")->set_flags(NT_PERSISTENT);
+  GetEntry("foo2")->flags = NT_PERSISTENT;
 
   std::istringstream iss(
       "[NetworkTables Storage 3.0]\ndouble \"foo2\"=1.0\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
   auto entry = GetEntry("foo2");
-  EXPECT_EQ(*Value::MakeDouble(1.0), *entry->value());
-  EXPECT_EQ(NT_PERSISTENT, entry->flags());
+  EXPECT_EQ(*Value::MakeDouble(1.0), *entry->value);
+  EXPECT_EQ(NT_PERSISTENT, entry->flags);
 
   if (GetParam()) {
     ASSERT_EQ(1u, outgoing.size());
@@ -636,7 +636,7 @@ TEST_P(StorageTestPopulated, LoadPersistentUpdateValue) {
   } else {
     // shouldn't send an update id not assigned yet (happens on client only)
     EXPECT_TRUE(outgoing.empty());
-    EXPECT_EQ(2u, GetEntry("foo2")->seq_num().value());  // still should be incremented
+    EXPECT_EQ(2u, GetEntry("foo2")->seq_num.value());  // still should be incremented
   }
 }
 
@@ -649,8 +649,8 @@ TEST_P(StorageTestPopulated, LoadPersistentUpdateValueFlags) {
       "[NetworkTables Storage 3.0]\ndouble \"foo2\"=1.0\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
   auto entry = GetEntry("foo2");
-  EXPECT_EQ(*Value::MakeDouble(1.0), *entry->value());
-  EXPECT_EQ(NT_PERSISTENT, entry->flags());
+  EXPECT_EQ(*Value::MakeDouble(1.0), *entry->value);
+  EXPECT_EQ(NT_PERSISTENT, entry->flags);
 
   if (GetParam()) {
     ASSERT_EQ(2u, outgoing.size());
@@ -671,7 +671,7 @@ TEST_P(StorageTestPopulated, LoadPersistentUpdateValueFlags) {
   } else {
     // shouldn't send an update id not assigned yet (happens on client only)
     EXPECT_TRUE(outgoing.empty());
-    EXPECT_EQ(2u, GetEntry("foo2")->seq_num().value());  // still should be incremented
+    EXPECT_EQ(2u, GetEntry("foo2")->seq_num.value());  // still should be incremented
   }
 }
 

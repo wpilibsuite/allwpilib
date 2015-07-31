@@ -26,35 +26,6 @@ namespace nt {
 class NetworkConnection;
 class StorageTest;
 
-class StorageEntry {
- public:
-  StorageEntry(llvm::StringRef name) : m_name(name), m_flags(0), m_id(0xffff) {}
-
-  bool IsPersistent() const { return (m_flags & NT_PERSISTENT) != 0; }
-
-  std::shared_ptr<Value> value() const { return m_value; }
-  void set_value(std::shared_ptr<Value> value) { m_value = value; }
-
-  unsigned int flags() const { return m_flags; }
-  void set_flags(unsigned int flags) { m_flags = flags; }
-
-  StringRef name() const { return m_name; }
-
-  unsigned int id() const { return m_id; }
-  void set_id(unsigned int id) { m_id = id; }
-
-  SequenceNumber seq_num() const { return m_seq_num; }
-  void set_seq_num(SequenceNumber seq_num) { m_seq_num = seq_num; }
-  SequenceNumber seq_num_inc() { return ++m_seq_num; }
-
- private:
-  std::string m_name;
-  std::shared_ptr<Value> m_value;
-  unsigned int m_flags;
-  unsigned int m_id;
-  SequenceNumber m_seq_num;
-};
-
 class Storage {
   friend class StorageTest;
  public:
@@ -100,8 +71,19 @@ class Storage {
   Storage(const Storage&) = delete;
   Storage& operator=(const Storage&) = delete;
 
-  typedef llvm::StringMap<std::shared_ptr<StorageEntry>> EntriesMap;
-  typedef std::vector<std::shared_ptr<StorageEntry>> IdMap;
+  struct Entry {
+    Entry(llvm::StringRef name_) : name(name_), flags(0), id(0xffff) {}
+    bool IsPersistent() const { return (flags & NT_PERSISTENT) != 0; }
+
+    std::string name;
+    std::shared_ptr<Value> value;
+    unsigned int flags;
+    unsigned int id;
+    SequenceNumber seq_num;
+  };
+
+  typedef llvm::StringMap<std::shared_ptr<Entry>> EntriesMap;
+  typedef std::vector<std::shared_ptr<Entry>> IdMap;
 
   mutable std::mutex m_mutex;
   EntriesMap m_entries;
