@@ -28,28 +28,12 @@ class StorageTest;
 
 class StorageEntry {
  public:
-  StorageEntry(llvm::StringRef name) : m_name(name), m_id(0xffff) {
-    m_flags = 0;
-  }
+  StorageEntry(llvm::StringRef name) : m_name(name), m_flags(0), m_id(0xffff) {}
 
   bool IsPersistent() const { return (m_flags & NT_PERSISTENT) != 0; }
 
-  std::shared_ptr<Value> value() const {
-#ifdef HAVE_SHARED_PTR_ATOMIC_LOAD
-    return std::atomic_load(&m_value);
-#else
-    std::lock_guard<std::mutex> lock(m_value_mutex);
-    return m_value;
-#endif
-  }
-  void set_value(std::shared_ptr<Value> value) {
-#ifdef HAVE_SHARED_PTR_ATOMIC_LOAD
-    std::atomic_store(&m_value, value);
-#else
-    std::lock_guard<std::mutex> lock(m_value_mutex);
-    m_value = value;
-#endif
-  }
+  std::shared_ptr<Value> value() const { return m_value; }
+  void set_value(std::shared_ptr<Value> value) { m_value = value; }
 
   unsigned int flags() const { return m_flags; }
   void set_flags(unsigned int flags) { m_flags = flags; }
@@ -64,17 +48,9 @@ class StorageEntry {
   SequenceNumber seq_num_inc() { return ++m_seq_num; }
 
  private:
-  // These variables are accessed by both Dispatcher and user, so must use
-  // atomic accesses. Unfortunately, atomic shared_ptr is not yet available
-  // on most compilers, so we need an explicit mutex instead.
-#ifndef HAVE_SHARED_PTR_ATOMIC_LOAD
-  mutable std::mutex m_value_mutex;
-#endif
-  std::shared_ptr<Value> m_value;
-  std::atomic_uint m_flags;
-
-  // Only accessed from the Dispatcher, so these are NOT mutex-protected.
   std::string m_name;
+  std::shared_ptr<Value> m_value;
+  unsigned int m_flags;
   unsigned int m_id;
   SequenceNumber m_seq_num;
 };
@@ -88,25 +64,7 @@ class Storage {
   }
   ~Storage();
 
-  struct Update {
-    enum Kind {
-      kNone,
-      kAssign,
-      kValueUpdate,
-      kFlagsUpdate,
-      kValueFlagsUpdate,
-      kDelete,
-      kDeleteAll
-    };
-    Update() : flags(0), kind(kNone) {}
-
-    std::shared_ptr<StorageEntry> entry;
-    std::shared_ptr<Value> value;
-    unsigned int flags;
-    Kind kind;
-  };
-  typedef llvm::StringMap<Update> UpdateMap;
-
+  // Accessors required by Dispatcher.
   typedef std::function<void(std::shared_ptr<Message> msg,
                              NetworkConnection* only,
                              NetworkConnection* except)> QueueOutgoingFunc;
@@ -117,12 +75,9 @@ class Storage {
 
   void ProcessIncoming(std::shared_ptr<Message> msg, NetworkConnection* conn,
                        unsigned int proto_rev);
+  void SendAssignments(std::function<void(std::shared_ptr<Message>)> send_msg,
+                       bool reset_ids);
 
-  // Finds, but does not create entry.  Returns nullptr if not found.
-  std::shared_ptr<StorageEntry> FindEntry(StringRef name) const;
-
-  // Accessors required by Dispatcher.
-  void GetUpdates(UpdateMap* updates, bool* delete_all);
   std::mutex& mutex() { return m_mutex; }
 
   // User functions
@@ -145,16 +100,12 @@ class Storage {
   Storage(const Storage&) = delete;
   Storage& operator=(const Storage&) = delete;
 
-  void AddUpdate(std::shared_ptr<StorageEntry> entry, Update::Kind kind);
-
   typedef llvm::StringMap<std::shared_ptr<StorageEntry>> EntriesMap;
   typedef std::vector<std::shared_ptr<StorageEntry>> IdMap;
 
   mutable std::mutex m_mutex;
   EntriesMap m_entries;
   IdMap m_idmap;
-  UpdateMap m_updates;
-  bool m_updates_delete_all;
 
   QueueOutgoingFunc m_queue_outgoing;
   bool m_server;

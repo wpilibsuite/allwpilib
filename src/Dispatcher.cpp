@@ -116,8 +116,6 @@ void Dispatcher::Flush() {
 }
 
 void Dispatcher::DispatchThreadMain() {
-  Storage& storage = Storage::GetInstance();
-
   // local copy of active m_connections
   struct ConnectionRef {
     NetworkConnection* net;
@@ -157,20 +155,6 @@ void Dispatcher::DispatchThreadMain() {
           connections.back().net = conn.net.get();
           connections.back().outgoing.swap(conn.outgoing);
         }
-      }
-    }
-
-    // grab local storage updates
-    Storage::UpdateMap updates;
-    bool delete_all;
-    storage.GetUpdates(&updates, &delete_all);
-
-    // local entry updates
-    for (auto& update_entry : updates) {
-      auto update = update_entry.getValue();
-      switch (update.kind) {
-        default:
-          break;
       }
     }
 
