@@ -98,7 +98,7 @@ void NetworkConnection::ReadThreadMain() {
       if (m_stream) m_stream->close();
       break;
     }
-    m_process_incoming(std::move(msg), this, m_proto_rev);
+    m_process_incoming(std::move(msg), this);
   }
   DEBUG3("read thread died");
   m_state = static_cast<int>(kDead);

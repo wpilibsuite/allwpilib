@@ -180,8 +180,10 @@ void Dispatcher::QueueOutgoing(std::shared_ptr<Message> msg,
   for (auto& conn : m_connections) {
     if (conn.net.get() == except) continue;
     if (only && conn.net.get() != only) continue;
-    if (conn.net->state() != NetworkConnection::kDead)
-      conn.outgoing.push_back(msg);
+    auto state = conn.net->state();
+    if (state != NetworkConnection::kSynchronized &&
+        state != NetworkConnection::kActive) continue;
+    conn.outgoing.push_back(msg);
   }
 }
 
@@ -209,7 +211,7 @@ void Dispatcher::ServerThreadMain(const char* listen_address,
         std::move(stream),
         std::bind(&Dispatcher::ServerHandshake, this, _1, _2, _3),
         std::bind(&Storage::GetEntryType, &storage, _1),
-        std::bind(&Storage::ProcessIncoming, &storage, _1, _2, _3)));
+        std::bind(&Storage::ProcessIncoming, &storage, _1, _2)));
     auto conn = conn_unique.get();
     {
       std::lock_guard<std::mutex> lock(m_user_mutex);
@@ -237,7 +239,7 @@ void Dispatcher::ClientThreadMain(const char* server_name, unsigned int port) {
         std::move(stream),
         std::bind(&Dispatcher::ClientHandshake, this, _1, _2, _3),
         std::bind(&Storage::GetEntryType, &storage, _1),
-        std::bind(&Storage::ProcessIncoming, &storage, _1, _2, _3)));
+        std::bind(&Storage::ProcessIncoming, &storage, _1, _2)));
     auto conn = conn_unique.get();
     m_connections.resize(0);  // disconnect any current
     m_connections.emplace_back(std::move(conn_unique));
@@ -310,8 +312,8 @@ bool Dispatcher::ClientHandshake(
   // generate outgoing assignments
   NetworkConnection::Outgoing outgoing;
 
-  Storage::GetInstance().ApplyInitialAssignments(incoming, new_server,
-                                                 conn.proto_rev(), &outgoing);
+  Storage::GetInstance().ApplyInitialAssignments(conn, incoming, new_server,
+                                                 &outgoing);
 
   if (conn.proto_rev() >= 0x0300)
     outgoing.emplace_back(Message::ClientHelloDone());
@@ -361,7 +363,7 @@ bool Dispatcher::ServerHandshake(
   }
 
   // Get snapshot of initial assignments
-  Storage::GetInstance().GetInitialAssignments(&outgoing);
+  Storage::GetInstance().GetInitialAssignments(conn, &outgoing);
 
   // Finish with server hello done
   outgoing.emplace_back(Message::ServerHelloDone());
@@ -395,7 +397,7 @@ bool Dispatcher::ServerHandshake(
       msg = get_msg();
     }
     Storage& storage = Storage::GetInstance();
-    for (auto& msg : incoming) storage.ProcessIncoming(msg, &conn, proto_rev);
+    for (auto& msg : incoming) storage.ProcessIncoming(msg, &conn);
   }
 
   INFO("server: client CONNECTED: " << conn.stream().getPeerIP() << " port "

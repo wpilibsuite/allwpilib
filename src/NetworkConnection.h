@@ -21,7 +21,7 @@ namespace nt {
 
 class NetworkConnection {
  public:
-  enum State { kCreated, kInit, kHandshake, kActive, kDead };
+  enum State { kCreated, kInit, kHandshake, kSynchronized, kActive, kDead };
 
   typedef std::function<bool(
       NetworkConnection& conn,
@@ -29,8 +29,7 @@ class NetworkConnection {
       std::function<void(llvm::ArrayRef<std::shared_ptr<Message>>)> send_msgs)>
       HandshakeFunc;
   typedef std::function<void(std::shared_ptr<Message> msg,
-                             NetworkConnection* conn, unsigned int proto_rev)>
-      ProcessIncomingFunc;
+                             NetworkConnection* conn)> ProcessIncomingFunc;
   typedef std::vector<std::shared_ptr<Message>> Outgoing;
   typedef ConcurrentQueue<Outgoing> OutgoingQueue;
 

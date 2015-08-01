@@ -13,6 +13,7 @@
 #include "llvm/StringExtras.h"
 #include "Base64.h"
 #include "Log.h"
+#include "NetworkConnection.h"
 
 using namespace nt;
 
@@ -41,7 +42,7 @@ NT_Type Storage::GetEntryType(unsigned int id) const {
 }
 
 void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
-                              NetworkConnection* conn, unsigned int proto_rev) {
+                              NetworkConnection* conn) {
   std::unique_lock<std::mutex> lock(m_mutex);
   switch (msg->type()) {
     case Message::kKeepAlive:
@@ -148,7 +149,7 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
       entry->seq_num = seq_num;
 
       // don't update flags from a <3.0 remote (not part of message)
-      if (proto_rev >= 0x0300) entry->flags = msg->flags();
+      if (conn->proto_rev() >= 0x0300) entry->flags = msg->flags();
 
       // broadcast to all other connections (note for client there won't
       // be any other connections, so don't bother)
@@ -261,8 +262,9 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
 }
 
 void Storage::GetInitialAssignments(
-    std::vector<std::shared_ptr<Message>>* msgs) {
+    NetworkConnection& conn, std::vector<std::shared_ptr<Message>>* msgs) {
   std::lock_guard<std::mutex> lock(m_mutex);
+  conn.set_state(NetworkConnection::kSynchronized);
   for (auto& i : m_entries) {
     auto entry = i.getValue();
     msgs->emplace_back(Message::EntryAssign(i.getKey(), entry->id,
@@ -272,10 +274,12 @@ void Storage::GetInitialAssignments(
 }
 
 void Storage::ApplyInitialAssignments(
-    llvm::ArrayRef<std::shared_ptr<Message>> msgs, bool new_server,
-    unsigned int proto_rev, std::vector<std::shared_ptr<Message>>* out_msgs) {
+    NetworkConnection& conn, llvm::ArrayRef<std::shared_ptr<Message>> msgs,
+    bool new_server, std::vector<std::shared_ptr<Message>>* out_msgs) {
   std::unique_lock<std::mutex> lock(m_mutex);
   if (m_server) return;  // should not do this on server
+
+  conn.set_state(NetworkConnection::kSynchronized);
 
   std::vector<std::shared_ptr<Message>> update_msgs;
 
@@ -319,7 +323,7 @@ void Storage::ApplyInitialAssignments(
         entry->value = msg->value();
         entry->seq_num = seq_num;
         // don't update flags from a <3.0 remote (not part of message)
-        if (proto_rev >= 0x0300) entry->flags = msg->flags();
+        if (conn.proto_rev() >= 0x0300) entry->flags = msg->flags();
       }
     }
 
