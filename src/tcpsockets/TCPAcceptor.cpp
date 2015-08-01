@@ -29,6 +29,8 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
+#include "Log.h"
+
 TCPAcceptor::TCPAcceptor(int port, const char* address)
     : m_lsd(0),
       m_port(port),
@@ -63,13 +65,13 @@ int TCPAcceptor::start() {
 
   int result = bind(m_lsd, (struct sockaddr*)&address, sizeof(address));
   if (result != 0) {
-    perror("bind() failed");
+    ERROR("bind() failed: " << strerror(errno));
     return result;
   }
 
   result = listen(m_lsd, 5);
   if (result != 0) {
-    perror("listen() failed");
+    ERROR("listen() failed: " << strerror(errno));
     return result;
   }
   m_listening = true;
@@ -89,7 +91,7 @@ std::unique_ptr<TCPStream> TCPAcceptor::accept() {
   std::memset(&address, 0, sizeof(address));
   int sd = ::accept(m_lsd, (struct sockaddr*)&address, &len);
   if (sd < 0) {
-    if (!m_shutdown) perror("accept() failed");
+    if (!m_shutdown) ERROR("accept() failed: " << strerror(errno));
     return nullptr;
   }
   return std::unique_ptr<TCPStream>(new TCPStream(sd, &address));

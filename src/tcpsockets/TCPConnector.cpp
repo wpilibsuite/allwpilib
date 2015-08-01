@@ -31,6 +31,8 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
+#include "Log.h"
+
 static int ResolveHostName(const char* hostname, struct in_addr* addr) {
   struct addrinfo* res;
 
@@ -54,7 +56,7 @@ std::unique_ptr<TCPStream> TCPConnector::connect(const char* server, int port) {
   }
   int sd = socket(AF_INET, SOCK_STREAM, 0);
   if (::connect(sd, (struct sockaddr*)&address, sizeof(address)) != 0) {
-    perror("connect() failed");
+    DEBUG("connect() failed: " << strerror(errno));
     return nullptr;
   }
   return std::unique_ptr<TCPStream>(new TCPStream(sd, &address));
@@ -97,16 +99,15 @@ std::unique_ptr<TCPStream> TCPConnector::connect(const char* server, int port,
         len = sizeof(int);
         getsockopt(sd, SOL_SOCKET, SO_ERROR, (void*)(&valopt), &len);
         if (valopt) {
-          fprintf(stderr, "connect() error %d - %s\n", valopt,
-                  strerror(valopt));
+          DEBUG("connect() error " << valopt << " - " << strerror(valopt));
         }
         // connection established
         else
           result = 0;
       } else
-        fprintf(stderr, "connect() timed out\n");
+        DEBUG("connect() timed out");
     } else
-      fprintf(stderr, "connect() error %d - %s\n", errno, strerror(errno));
+      DEBUG("connect() error " << errno << " - " << strerror(errno));
   }
 
   // Return socket to blocking mode
