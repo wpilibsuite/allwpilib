@@ -46,8 +46,10 @@ class Storage {
 
   void ProcessIncoming(std::shared_ptr<Message> msg, NetworkConnection* conn,
                        unsigned int proto_rev);
-  void SendAssignments(std::function<void(std::shared_ptr<Message>)> send_msg,
-                       bool reset_ids);
+  void GetInitialAssignments(std::vector<std::shared_ptr<Message>>* msgs);
+  void ApplyInitialAssignments(llvm::ArrayRef<std::shared_ptr<Message>> msgs,
+                               bool new_server, unsigned int proto_rev,
+                               std::vector<std::shared_ptr<Message>>* out_msgs);
 
   std::mutex& mutex() { return m_mutex; }
 

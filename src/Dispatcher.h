@@ -54,10 +54,16 @@ class Dispatcher {
   void ServerThreadMain(const char* listen_address, unsigned int port);
   void ClientThreadMain(const char* server_name, unsigned int port);
 
-  bool ServerHandshake(NetworkConnection& conn,
-                       std::function<std::shared_ptr<Message>()> get_msg);
+  bool ClientHandshake(
+      NetworkConnection& conn,
+      std::function<std::shared_ptr<Message>()> get_msg,
+      std::function<void(llvm::ArrayRef<std::shared_ptr<Message>>)> send_msgs);
+  bool ServerHandshake(
+      NetworkConnection& conn,
+      std::function<std::shared_ptr<Message>()> get_msg,
+      std::function<void(llvm::ArrayRef<std::shared_ptr<Message>>)> send_msgs);
 
-  void ClientReconnect();
+  void ClientReconnect(unsigned int proto_rev = 0x0300);
 
   void QueueOutgoing(std::shared_ptr<Message> msg, NetworkConnection* only,
                      NetworkConnection* except);
@@ -93,6 +99,7 @@ class Dispatcher {
   // Condition variable for client reconnect
   std::mutex m_reconnect_mutex;
   std::condition_variable m_reconnect_cv;
+  unsigned int m_reconnect_proto_rev;
   bool m_do_reconnect;
 
   ATOMIC_STATIC_DECL(Dispatcher)

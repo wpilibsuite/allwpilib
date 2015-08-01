@@ -15,13 +15,20 @@
 
 using namespace nt;
 
-#define DEBUG(str) puts(str)
+inline void DEBUG(const char* str, ...) {
+  va_list args;
+  va_start(args, str);
+  vfprintf(stderr, str, args);
+  fputc('\n', stderr);
+  va_end(args);
+}
 
 ATOMIC_STATIC_INIT(Dispatcher)
 
 Dispatcher::Dispatcher()
     : m_server(false),
       m_do_flush(false),
+      m_reconnect_proto_rev(0x0300),
       m_do_reconnect(false) {
   m_active = false;
   m_update_rate = 100;
@@ -86,8 +93,6 @@ void Dispatcher::Stop() {
   // join threads
   if (m_dispatch_thread.joinable()) m_dispatch_thread.join();
   if (m_clientserver_thread.joinable()) m_clientserver_thread.join();
-
-  Storage::GetInstance().ClearOutgoing();
 }
 
 void Dispatcher::SetUpdateRate(double interval) {
@@ -199,6 +204,7 @@ void Dispatcher::ServerThreadMain(const char* listen_address,
     Storage& storage = Storage::GetInstance();
     std::unique_ptr<NetworkConnection> conn_unique(new NetworkConnection(
         std::move(stream),
+        std::bind(&Dispatcher::ServerHandshake, this, _1, _2, _3),
         std::bind(&Storage::GetEntryType, &storage, _1),
         std::bind(&Storage::ProcessIncoming, &storage, _1, _2, _3)));
     auto conn = conn_unique.get();
@@ -211,16 +217,8 @@ void Dispatcher::ServerThreadMain(const char* listen_address,
 }
 
 void Dispatcher::ClientThreadMain(const char* server_name, unsigned int port) {
-#if 0
   unsigned int proto_rev = 0x0300;
   while (m_active) {
-    // get identity
-    std::string self_id;
-    {
-      std::lock_guard<std::mutex> lock(m_user_mutex);
-      self_id = m_identity;
-    }
-
     // sleep between retries
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
@@ -230,91 +228,106 @@ void Dispatcher::ClientThreadMain(const char* server_name, unsigned int port) {
     if (!stream) continue;  // keep retrying
     DEBUG("client connected");
 
-    std::unique_ptr<NetworkConnection> conn(new NetworkConnection(
+    using namespace std::placeholders;
+    Storage& storage = Storage::GetInstance();
+    std::unique_ptr<NetworkConnection> conn_unique(new NetworkConnection(
         std::move(stream),
-        [this](unsigned int id) { return GetEntryType(id); }));
+        std::bind(&Dispatcher::ClientHandshake, this, _1, _2, _3),
+        std::bind(&Storage::GetEntryType, &storage, _1),
+        std::bind(&Storage::ProcessIncoming, &storage, _1, _2, _3)));
+    auto conn = conn_unique.get();
+    {
+      std::lock_guard<std::mutex> lock(m_user_mutex);
+      m_connections.resize(0);  // disconnect any current
+      m_connections.emplace_back(std::move(conn_unique));
+    }
     conn->set_proto_rev(proto_rev);
     conn->Start();
-
-    // send client hello
-    DEBUG("client: sending hello");
-    conn->outgoing().push(
-        NetworkConnection::Outgoing{Message::ClientHello(self_id)});
-
-    // wait for response
-    auto msg = conn->incoming().pop();
-    if (!msg) {
-      // disconnected, retry
-      DEBUG("client: server disconnected before first response");
-      proto_rev = 0x0300;
-      continue;
-    }
-
-    if (msg->Is(Message::kProtoUnsup)) {
-      // reconnect with lower protocol (if possible)
-      if (proto_rev <= 0x0200) {
-        // no more options, abort (but keep trying to connect)
-        proto_rev = 0x0300;
-        continue;
-      }
-      proto_rev = 0x0200;
-      continue;
-    }
-
-    if (proto_rev >= 0x0300) {
-      // should be server hello; if not, disconnect, but keep trying to connect
-      // TODO: do something with initial connection flag
-      if (!msg->Is(Message::kServerHello)) continue;
-      conn->set_remote_id(msg->str());
-      // get the next message (blocks)
-      msg = conn->incoming().pop();
-    }
-
-    // receive initial assignments
-    std::vector<std::shared_ptr<Message>> incoming;
-    for (;;) {
-      if (!msg) {
-        // disconnected, retry
-        DEBUG("client: server disconnected during initial entries");
-        proto_rev = 0x0300;
-        continue;
-      }
-      if (msg->Is(Message::kServerHelloDone)) break;
-      if (!msg->Is(Message::kEntryAssign)) {
-        // unexpected message
-        DEBUG("client: received message other than entry assignment during initial handshake");
-        proto_rev = 0x0300;
-        continue;
-      }
-      incoming.push_back(msg);
-      // get the next message (blocks)
-      msg = conn->incoming().pop();
-    }
-
-    // generate outgoing assignments
-    NetworkConnection::Outgoing outgoing;
-
-    if (proto_rev >= 0x0300)
-      outgoing.push_back(Message::ClientHelloDone());
-
-    if (!outgoing.empty())
-      conn->outgoing().push(std::move(outgoing));
-
-    // add to connections list (the dispatcher thread will handle from here)
-    AddConnection(std::move(conn));
 
     // block until told to reconnect
     std::unique_lock<std::mutex> lock(m_reconnect_mutex);
     m_reconnect_cv.wait(lock, [&] { return m_do_reconnect; });
+    proto_rev = m_reconnect_proto_rev;
     m_do_reconnect = false;
     lock.unlock();
   }
-#endif
+}
+
+bool Dispatcher::ClientHandshake(
+    NetworkConnection& conn,
+    std::function<std::shared_ptr<Message>()> get_msg,
+    std::function<void(llvm::ArrayRef<std::shared_ptr<Message>>)> send_msgs) {
+  // get identity
+  std::string self_id;
+  {
+    std::lock_guard<std::mutex> lock(m_user_mutex);
+    self_id = m_identity;
+  }
+
+  // send client hello
+  DEBUG("client: sending hello");
+  send_msgs(Message::ClientHello(self_id));
+
+  // wait for response
+  auto msg = get_msg();
+  if (!msg) {
+    // disconnected, retry
+    DEBUG("client: server disconnected before first response");
+    return false;
+  }
+
+  if (msg->Is(Message::kProtoUnsup)) {
+    if (msg->id() == 0x0200) ClientReconnect(0x0200);
+    return false;
+  }
+
+  bool new_server = true;
+  if (conn.proto_rev() >= 0x0300) {
+    // should be server hello; if not, disconnect.
+    if (!msg->Is(Message::kServerHello)) return false;
+    conn.set_remote_id(msg->str());
+    if ((msg->flags() & 1) != 0) new_server = false;
+    // get the next message
+    msg = get_msg();
+  }
+
+  // receive initial assignments
+  std::vector<std::shared_ptr<Message>> incoming;
+  for (;;) {
+    if (!msg) {
+      // disconnected, retry
+      DEBUG("client: server disconnected during initial entries");
+      return false;
+    }
+    if (msg->Is(Message::kServerHelloDone)) break;
+    if (!msg->Is(Message::kEntryAssign)) {
+      // unexpected message
+      DEBUG("client: received message (%d) other than entry assignment during initial handshake", msg->type());
+      return false;
+    }
+    incoming.emplace_back(std::move(msg));
+    // get the next message
+    msg = get_msg();
+  }
+
+  // generate outgoing assignments
+  NetworkConnection::Outgoing outgoing;
+
+  Storage::GetInstance().ApplyInitialAssignments(incoming, new_server,
+                                                 conn.proto_rev(), &outgoing);
+
+  if (conn.proto_rev() >= 0x0300)
+    outgoing.emplace_back(Message::ClientHelloDone());
+
+  if (!outgoing.empty()) send_msgs(outgoing);
+
+  return true;
 }
 
 bool Dispatcher::ServerHandshake(
     NetworkConnection& conn,
-    std::function<std::shared_ptr<Message>()> get_msg) {
+    std::function<std::shared_ptr<Message>()> get_msg,
+    std::function<void(llvm::ArrayRef<std::shared_ptr<Message>>)> send_msgs) {
   // Wait for the client to send us a hello.
   auto msg = get_msg();
   if (!msg) {
@@ -330,48 +343,34 @@ bool Dispatcher::ServerHandshake(
   unsigned int proto_rev = msg->id();
   if (proto_rev > 0x0300) {
     DEBUG("server: client requested proto > 0x0300");
-    conn.outgoing().push(NetworkConnection::Outgoing{Message::ProtoUnsup()});
+    send_msgs(Message::ProtoUnsup());
     return false;
   }
 
   if (proto_rev >= 0x0300) conn.set_remote_id(msg->str());
 
-  // Set the proto version to the client requested version.
+  // Set the proto version to the client requested version
   conn.set_proto_rev(proto_rev);
-#if 0
-  // We need to copy the ID map.  This is inefficient, but is necessary
-  // because we need to get a "snapshot" of the current server state.  The
-  // dispatch thread will create outgoing assignments as necessary as the idmap
-  // changes, but we don't want duplicate assignments or (worse) missing
-  // assignments by iterating one entry at a time.
-  IdMap id_map;
-  {
-    std::lock_guard<std::mutex> lock(m_idmap_mutex);
-    id_map = m_idmap;
-    conn.set_state(NetworkConnection::kHandshake);
-  }
-#endif
-  // send initial set of assignments
+
+  // Send initial set of assignments
   NetworkConnection::Outgoing outgoing;
 
-  // Server hello.  TODO: initial connection flag
+  // Start with server hello.  TODO: initial connection flag
   if (proto_rev >= 0x0300) {
     std::lock_guard<std::mutex> lock(m_user_mutex);
-    outgoing.push_back(Message::ServerHello(0u, m_identity));
+    outgoing.emplace_back(Message::ServerHello(0u, m_identity));
   }
-#if 0
-  Storage& storage = Storage::GetInstance();
-  {
-    // take storage mutex as we must have a snapshot of the current values.
-    std::lock_guard<std::mutex> lock(storage.mutex());
-    std::lock_guard<std::mutex> lock(m_idmap_mutex);
-    outgoing.push_back(Message::EntryAssign(
-  }
-#endif
-  outgoing.push_back(Message::ServerHelloDone());
 
-  conn.outgoing().push(std::move(outgoing));
-#if 0
+  // Get snapshot of initial assignments
+  Storage::GetInstance().GetInitialAssignments(&outgoing);
+
+  // Finish with server hello done
+  outgoing.emplace_back(Message::ServerHelloDone());
+
+  // Batch transmit
+  DEBUG("server: sending initial assignments");
+  send_msgs(outgoing);
+
   // In proto rev 3.0 and later, the handshake concludes with a client hello
   // done message, so we can batch the assigns before marking the connection
   // active.  In pre-3.0, we need to just immediately mark it active and hand
@@ -379,32 +378,35 @@ bool Dispatcher::ServerHandshake(
   if (proto_rev >= 0x0300) {
     // receive client initial assignments
     std::vector<std::shared_ptr<Message>> incoming;
+    msg = get_msg();
     for (;;) {
       if (!msg) {
         // disconnected, retry
-        DEBUG("disconnected waiting for initial entries");
+        DEBUG("server: disconnected waiting for initial entries");
         return false;
       }
       if (msg->Is(Message::kClientHelloDone)) break;
       if (!msg->Is(Message::kEntryAssign)) {
         // unexpected message
-        DEBUG("received message other than entry assignment during initial handshake");
+        DEBUG("server: received message (%d) other than entry assignment during initial handshake", msg->type());
         return false;
       }
       incoming.push_back(msg);
       // get the next message (blocks)
       msg = get_msg();
     }
+    Storage& storage = Storage::GetInstance();
+    for (auto& msg : incoming) storage.ProcessIncoming(msg, &conn, proto_rev);
   }
-#endif
-  conn.set_state(NetworkConnection::kActive);
+
   return true;
 }
 
-void Dispatcher::ClientReconnect() {
+void Dispatcher::ClientReconnect(unsigned int proto_rev) {
   if (m_server) return;
   {
     std::lock_guard<std::mutex> lock(m_reconnect_mutex);
+    m_reconnect_proto_rev = proto_rev;
     m_do_reconnect = true;
   }
   m_reconnect_cv.notify_one();

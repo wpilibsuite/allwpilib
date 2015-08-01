@@ -14,10 +14,20 @@
 
 using namespace nt;
 
+inline void DEBUG(const char* str, ...) {
+  va_list args;
+  va_start(args, str);
+  vfprintf(stderr, str, args);
+  fputc('\n', stderr);
+  va_end(args);
+}
+
 NetworkConnection::NetworkConnection(std::unique_ptr<TCPStream> stream,
+                                     HandshakeFunc handshake,
                                      Message::GetEntryTypeFunc get_entry_type,
                                      ProcessIncomingFunc process_incoming)
     : m_stream(std::move(stream)),
+      m_handshake(handshake),
       m_get_entry_type(get_entry_type),
       m_process_incoming(process_incoming) {
   m_active = false;
@@ -66,6 +76,24 @@ void NetworkConnection::ReadThreadMain() {
   raw_socket_istream is(*m_stream);
   WireDecoder decoder(is, m_proto_rev);
 
+  m_state = static_cast<int>(kHandshake);
+  if (!m_handshake(*this,
+                   [&] {
+                     decoder.set_proto_rev(m_proto_rev);
+                     auto msg = Message::Read(decoder, m_get_entry_type);
+                     if (!msg)
+                       DEBUG("error reading in handshake: %s", decoder.error());
+                     return msg;
+                   },
+                   [&](llvm::ArrayRef<std::shared_ptr<Message>> msgs) {
+                     m_outgoing.emplace(msgs);
+                   })) {
+    m_state = static_cast<int>(kDead);
+    m_active = false;
+    return;
+  }
+
+  m_state = static_cast<int>(kActive);
   while (m_active) {
     if (!m_stream)
       break;
@@ -88,15 +116,19 @@ void NetworkConnection::WriteThreadMain() {
 
   while (m_active) {
     auto msgs = m_outgoing.pop();
+    DEBUG("write thread woke up");
     if (msgs.empty()) break;
     encoder.set_proto_rev(m_proto_rev);
     encoder.Reset();
+    DEBUG("sending %d messages", msgs.size());
     for (auto& msg : msgs) {
       if (msg) msg->Write(encoder);
     }
     TCPStream::Error err;
     if (!m_stream) break;
+    if (encoder.size() == 0) continue;
     if (m_stream->send(encoder.data(), encoder.size(), &err) == 0) break;
+    DEBUG("sent %d bytes", encoder.size());
   }
   m_state = static_cast<int>(kDead);
   m_active = false;

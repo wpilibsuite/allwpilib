@@ -23,6 +23,11 @@ class NetworkConnection {
  public:
   enum State { kCreated, kInit, kHandshake, kActive, kDead };
 
+  typedef std::function<bool(
+      NetworkConnection& conn,
+      std::function<std::shared_ptr<Message>()> get_msg,
+      std::function<void(llvm::ArrayRef<std::shared_ptr<Message>>)> send_msgs)>
+      HandshakeFunc;
   typedef std::function<void(std::shared_ptr<Message> msg,
                              NetworkConnection* conn, unsigned int proto_rev)>
       ProcessIncomingFunc;
@@ -30,6 +35,7 @@ class NetworkConnection {
   typedef ConcurrentQueue<Outgoing> OutgoingQueue;
 
   NetworkConnection(std::unique_ptr<TCPStream> stream,
+                    HandshakeFunc handshake,
                     Message::GetEntryTypeFunc get_entry_type,
                     ProcessIncomingFunc process_incoming);
   ~NetworkConnection();
@@ -59,6 +65,7 @@ class NetworkConnection {
 
   std::unique_ptr<TCPStream> m_stream;
   OutgoingQueue m_outgoing;
+  HandshakeFunc m_handshake;
   Message::GetEntryTypeFunc m_get_entry_type;
   ProcessIncomingFunc m_process_incoming;
   std::thread m_read_thread;

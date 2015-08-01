@@ -261,21 +261,86 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
   }
 }
 
-void Storage::SendAssignments(
-    std::function<void(std::shared_ptr<Message>)> send_msg, bool reset_ids) {
-  std::vector<std::shared_ptr<Message>> msgs;
-  {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    for (auto& i : m_entries) {
-      auto entry = i.getValue();
-      msgs.emplace_back(Message::EntryAssign(i.getKey(), entry->id,
-                                             entry->seq_num.value(),
-                                             entry->value, entry->flags));
-      if (!m_server && reset_ids) entry->id = 0xffff;
-    }
-    if (!m_server && reset_ids) m_idmap.resize(0);
+void Storage::GetInitialAssignments(
+    std::vector<std::shared_ptr<Message>>* msgs) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  for (auto& i : m_entries) {
+    auto entry = i.getValue();
+    msgs->emplace_back(Message::EntryAssign(i.getKey(), entry->id,
+                                            entry->seq_num.value(),
+                                            entry->value, entry->flags));
   }
-  for (auto& msg : msgs) send_msg(std::move(msg));
+}
+
+void Storage::ApplyInitialAssignments(
+    llvm::ArrayRef<std::shared_ptr<Message>> msgs, bool new_server,
+    unsigned int proto_rev, std::vector<std::shared_ptr<Message>>* out_msgs) {
+  std::unique_lock<std::mutex> lock(m_mutex);
+  if (m_server) return;  // should not do this on server
+
+  std::vector<std::shared_ptr<Message>> update_msgs;
+
+  // clear existing id's
+  for (auto& i : m_entries) i.getValue()->id = 0xffff;
+
+  // clear existing idmap
+  m_idmap.resize(0);
+
+  // apply assignments
+  for (auto& msg : msgs) {
+    if (!msg->Is(Message::kEntryAssign)) {
+      DEBUG("client: received non-entry assignment request?");
+      continue;
+    }
+
+    unsigned int id = msg->id();
+    if (id == 0xffff) {
+      DEBUG("client: received entry assignment request?");
+      continue;
+    }
+
+    SequenceNumber seq_num(msg->seq_num_uid());
+    StringRef name = msg->str();
+
+    auto& entry = m_entries[name];
+    if (!entry) {
+      // doesn't currently exist
+      entry = std::make_shared<Entry>(name);
+      entry->value = msg->value();
+      entry->flags = msg->flags();
+      entry->seq_num = seq_num;
+    } else {
+      // if reconnect and sequence number not higher than local, then we
+      // don't update the local value and instead send it back to the server
+      // as an update message
+      if (!new_server && seq_num <= entry->seq_num) {
+        update_msgs.emplace_back(Message::EntryUpdate(
+            entry->id, entry->seq_num.value(), entry->value));
+      } else {
+        entry->value = msg->value();
+        entry->seq_num = seq_num;
+        // don't update flags from a <3.0 remote (not part of message)
+        if (proto_rev >= 0x0300) entry->flags = msg->flags();
+      }
+    }
+
+    // set id and save to idmap
+    entry->id = id;
+    if (id >= m_idmap.size()) m_idmap.resize(id+1);
+    m_idmap[id] = entry;
+  }
+
+  // generate assign messages for unassigned local entries
+  for (auto& i : m_entries) {
+    auto entry = i.getValue();
+    if (entry->id != 0xffff) continue;
+    out_msgs->emplace_back(Message::EntryAssign(entry->name, entry->id,
+                                                entry->seq_num.value(),
+                                                entry->value, entry->flags));
+  }
+  auto queue_outgoing = m_queue_outgoing;
+  lock.unlock();
+  for (auto& msg : update_msgs) queue_outgoing(msg, nullptr, nullptr);
 }
 
 std::shared_ptr<Value> Storage::GetEntryValue(StringRef name) const {
