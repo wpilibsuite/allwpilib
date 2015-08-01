@@ -14,6 +14,7 @@
 #include <iosfwd>
 #include <memory>
 #include <mutex>
+#include <vector>
 
 #include "llvm/StringMap.h"
 #include "atomic_static.h"
