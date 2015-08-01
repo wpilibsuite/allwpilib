@@ -52,7 +52,7 @@ class Logger {
 
 #define LOG(level, x)                                           \
   do {                                                          \
-    Logger& logger = Logger::GetInstance();                     \
+    nt::Logger& logger = nt::Logger::GetInstance();             \
     if (logger.min_level() <= level && logger.HasLogger()) {    \
       std::ostringstream oss;                                   \
       oss << x;                                                 \
