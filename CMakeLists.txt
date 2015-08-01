@@ -7,10 +7,9 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -Wformat=2 -Wall -Wextra -Werror -pedantic -Wno-unused-parameter")
 endif()
 
-file(GLOB_RECURSE SRC_TARGET_FILES src/*.cpp)
-#file(GLOB_RECURSE SRC_SHARE_FILES lib/share/*.cpp)
+file(GLOB_RECURSE SRC_FILES src/*.cpp)
 include_directories(include src)
-add_library(ntcore SHARED ${SRC_SHARE_FILES} ${SRC_TARGET_FILES})
+add_library(ntcore SHARED ${SRC_FILES})
 set_target_properties(ntcore PROPERTIES VERSION 1.0.0 SOVERSION 1)
 #target_link_libraries(ntcore)
 INSTALL(TARGETS ntcore
