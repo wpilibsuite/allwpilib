@@ -103,6 +103,7 @@ void NetworkConnection::ReadThreadMain() {
   DEBUG3("read thread died");
   m_state = static_cast<int>(kDead);
   m_active = false;
+  m_outgoing.push(Outgoing());  // also kill write thread
 }
 
 void NetworkConnection::WriteThreadMain() {
@@ -111,7 +112,7 @@ void NetworkConnection::WriteThreadMain() {
   while (m_active) {
     auto msgs = m_outgoing.pop();
     DEBUG4("write thread woke up");
-    if (msgs.empty()) break;
+    if (msgs.empty()) continue;
     encoder.set_proto_rev(m_proto_rev);
     encoder.Reset();
     DEBUG4("sending " << msgs.size() << " messages");
@@ -127,4 +128,5 @@ void NetworkConnection::WriteThreadMain() {
   DEBUG3("write thread died");
   m_state = static_cast<int>(kDead);
   m_active = false;
+  if (m_stream) m_stream->close();  // also kill read thread
 }
