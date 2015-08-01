@@ -16,7 +16,7 @@ namespace nt {
 
 class StorageTest : public ::testing::TestWithParam<bool> {
  public:
-  StorageTest() {
+  StorageTest() : tmp_entry("foobar") {
     using namespace std::placeholders;
     storage.SetOutgoing(
         std::bind(&StorageTest::QueueOutgoing, this, _1, _2, _3), GetParam());
@@ -25,10 +25,9 @@ class StorageTest : public ::testing::TestWithParam<bool> {
   Storage::EntriesMap& entries() { return storage.m_entries; }
   Storage::IdMap& idmap() { return storage.m_idmap; }
 
-  std::shared_ptr<Storage::Entry> GetEntry(StringRef name) {
+  Storage::Entry* GetEntry(StringRef name) {
     auto i = storage.m_entries.find(name);
-    return i == storage.m_entries.end() ? std::make_shared<Storage::Entry>(name)
-                                        : i->getValue();
+    return i == storage.m_entries.end() ? &tmp_entry : i->getValue().get();
   }
   struct OutgoingData {
     std::shared_ptr<Message> msg;
@@ -40,6 +39,7 @@ class StorageTest : public ::testing::TestWithParam<bool> {
     outgoing.emplace_back(OutgoingData{msg, only, except});
   }
   Storage storage;
+  Storage::Entry tmp_entry;
   std::vector<OutgoingData> outgoing;
   bool delete_all;
 };
@@ -120,7 +120,7 @@ TEST_P(StorageTest, StorageEntryInit) {
   auto entry = GetEntry("foo");
   EXPECT_FALSE(entry->value);
   EXPECT_EQ(0u, entry->flags);
-  EXPECT_EQ("foo", entry->name);
+  EXPECT_EQ("foobar", entry->name);  // since GetEntry uses the tmp_entry.
   EXPECT_EQ(0xffffu, entry->id);
   EXPECT_EQ(SequenceNumber(), entry->seq_num);
 }

@@ -36,7 +36,7 @@ void Storage::ClearOutgoing() {
 NT_Type Storage::GetEntryType(unsigned int id) const {
   std::lock_guard<std::mutex> lock(m_mutex);
   if (id >= m_idmap.size()) return NT_UNASSIGNED;
-  auto entry = m_idmap[id];
+  Entry* entry = m_idmap[id];
   if (!entry || !entry->value) return NT_UNASSIGNED;
   return entry->value->type();
 }
@@ -57,7 +57,7 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
     case Message::kEntryAssign: {
       unsigned int id = msg->id();
       StringRef name = msg->str();
-      std::shared_ptr<Entry> entry;
+      Entry* entry;
       bool may_need_update = false;
       if (m_server) {
         // if we're a server, id=0xffff requests are requests for an id
@@ -70,8 +70,8 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
           // create it locally
           id = m_idmap.size();
           auto& new_entry = m_entries[name];
-          if (!new_entry) new_entry = std::make_shared<Entry>(name);
-          entry = new_entry;
+          if (!new_entry) new_entry.reset(new Entry(name));
+          entry = new_entry.get();
           entry->value = msg->value();
           entry->flags = msg->flags();
           entry->id = id;
@@ -110,12 +110,12 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
           if (!new_entry) {
             // didn't exist at all (rather than just being a response to a
             // id assignment request)
-            new_entry = std::make_shared<Entry>(name);
+            new_entry.reset(new Entry(name));
             new_entry->value = msg->value();
             new_entry->flags = msg->flags();
           } else
             may_need_update = true;  // we may need to send an update message
-          entry = new_entry;
+          entry = new_entry.get();
           entry->id = id;
           m_idmap[id] = entry;
           return;
@@ -172,7 +172,7 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
         DEBUG("received update to unknown entry");
         return;
       }
-      auto& entry = m_idmap[id];
+      Entry* entry = m_idmap[id];
 
       // ignore if sequence number not higher than local
       SequenceNumber seq_num(msg->seq_num_uid());
@@ -200,7 +200,7 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
         DEBUG("received flags update to unknown entry");
         return;
       }
-      auto& entry = m_idmap[id];
+      Entry* entry = m_idmap[id];
 
       // update local
       entry->flags = msg->flags();
@@ -223,11 +223,11 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
         DEBUG("received delete to unknown entry");
         return;
       }
-      auto& entry = m_idmap[id];
+      Entry* entry = m_idmap[id];
 
       // update local
       m_entries.erase(entry->name);  // erase from map
-      entry.reset();  // delete it from idmap too
+      m_idmap[id] = nullptr;  // delete it from idmap too
 
       // broadcast to all other connections (note for client there won't
       // be any other connections, so don't bother)
@@ -266,7 +266,7 @@ void Storage::GetInitialAssignments(
   std::lock_guard<std::mutex> lock(m_mutex);
   conn.set_state(NetworkConnection::kSynchronized);
   for (auto& i : m_entries) {
-    auto entry = i.getValue();
+    Entry* entry = i.getValue().get();
     msgs->emplace_back(Message::EntryAssign(i.getKey(), entry->id,
                                             entry->seq_num.value(),
                                             entry->value, entry->flags));
@@ -308,7 +308,7 @@ void Storage::ApplyInitialAssignments(
     auto& entry = m_entries[name];
     if (!entry) {
       // doesn't currently exist
-      entry = std::make_shared<Entry>(name);
+      entry.reset(new Entry(name));
       entry->value = msg->value();
       entry->flags = msg->flags();
       entry->seq_num = seq_num;
@@ -330,12 +330,12 @@ void Storage::ApplyInitialAssignments(
     // set id and save to idmap
     entry->id = id;
     if (id >= m_idmap.size()) m_idmap.resize(id+1);
-    m_idmap[id] = entry;
+    m_idmap[id] = entry.get();
   }
 
   // generate assign messages for unassigned local entries
   for (auto& i : m_entries) {
-    auto entry = i.getValue();
+    Entry* entry = i.getValue().get();
     if (entry->id != 0xffff) continue;
     out_msgs->emplace_back(Message::EntryAssign(entry->name, entry->id,
                                                 entry->seq_num.value(),
@@ -357,8 +357,8 @@ bool Storage::SetEntryValue(StringRef name, std::shared_ptr<Value> value) {
   if (!value) return true;
   std::unique_lock<std::mutex> lock(m_mutex);
   auto& new_entry = m_entries[name];
-  if (!new_entry) new_entry = std::make_shared<Entry>(name);
-  auto entry = new_entry;
+  if (!new_entry) new_entry.reset(new Entry(name));
+  Entry* entry = new_entry.get();
   auto old_value = entry->value;
   if (old_value && old_value->type() != value->type())
     return false;  // error on type mismatch
@@ -396,8 +396,9 @@ void Storage::SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value) {
   if (name.empty()) return;
   if (!value) return;
   std::unique_lock<std::mutex> lock(m_mutex);
-  auto& entry = m_entries[name];
-  if (!entry) entry = std::make_shared<Entry>(name);
+  auto& new_entry = m_entries[name];
+  if (!new_entry) new_entry.reset(new Entry(name));
+  Entry* entry = new_entry.get();
   auto old_value = entry->value;
   entry->value = value;
   if (old_value && *old_value == *value) return;
@@ -435,7 +436,7 @@ void Storage::SetEntryFlags(StringRef name, unsigned int flags) {
   std::unique_lock<std::mutex> lock(m_mutex);
   auto i = m_entries.find(name);
   if (i == m_entries.end()) return;
-  auto entry = i->getValue();
+  Entry* entry = i->getValue().get();
   if (entry->flags == flags) return;
   entry->flags = flags;
 
@@ -460,10 +461,10 @@ void Storage::DeleteEntry(StringRef name) {
   std::unique_lock<std::mutex> lock(m_mutex);
   auto i = m_entries.find(name);
   if (i == m_entries.end()) return;
-  auto entry = i->getValue();
+  Entry* entry = i->getValue().get();
   unsigned int id = entry->id;
   m_entries.erase(i);  // erase from map
-  if (id < m_idmap.size()) m_idmap[id].reset(); 
+  if (id < m_idmap.size()) m_idmap[id] = nullptr; 
 
   if (!entry->value) return;
 
@@ -496,7 +497,7 @@ std::vector<EntryInfo> Storage::GetEntryInfo(StringRef prefix,
   std::vector<EntryInfo> infos;
   for (auto& i : m_entries) {
     if (!i.getKey().startswith(prefix)) continue;
-    auto entry = i.getValue();
+    Entry* entry = i.getValue().get();
     auto value = entry->value;
     if (!value) continue;
     if (types != 0 && (types & value->type()) == 0) continue;
@@ -549,7 +550,7 @@ void Storage::SavePersistent(std::ostream& os) const {
     std::lock_guard<std::mutex> lock(m_mutex);
     entries.reserve(m_entries.size());
     for (auto& i : m_entries) {
-      auto entry = i.getValue();
+      Entry* entry = i.getValue().get();
       // only write persistent-flagged values
       if (!entry->IsPersistent()) continue;
       entries.push_back(std::make_pair(i.getKey(), entry->value));
@@ -936,8 +937,9 @@ next_line:
     std::vector<std::shared_ptr<Message>> msgs;
     std::unique_lock<std::mutex> lock(m_mutex);
     for (auto& i : entries) {
-      auto& entry = m_entries[i.first];
-      if (!entry) entry = std::make_shared<Entry>(i.first);
+      auto& new_entry = m_entries[i.first];
+      if (!new_entry) new_entry.reset(new Entry(i.first));
+      Entry* entry = new_entry.get();
       auto old_value = entry->value;
       entry->value = i.second;
       bool was_persist = entry->IsPersistent();

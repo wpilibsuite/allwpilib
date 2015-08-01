@@ -85,8 +85,8 @@ class Storage {
     SequenceNumber seq_num;
   };
 
-  typedef llvm::StringMap<std::shared_ptr<Entry>> EntriesMap;
-  typedef std::vector<std::shared_ptr<Entry>> IdMap;
+  typedef llvm::StringMap<std::unique_ptr<Entry>> EntriesMap;
+  typedef std::vector<Entry*> IdMap;
 
   mutable std::mutex m_mutex;
   EntriesMap m_entries;
