@@ -10,9 +10,13 @@ endif()
 file(GLOB_RECURSE SRC_TARGET_FILES src/*.cpp)
 #file(GLOB_RECURSE SRC_SHARE_FILES lib/share/*.cpp)
 include_directories(include src)
-add_library(ntcore STATIC ${SRC_SHARE_FILES} ${SRC_TARGET_FILES})
-target_link_libraries(ntcore)
-INSTALL(TARGETS ntcore ARCHIVE DESTINATION lib COMPONENT lib)
+add_library(ntcore SHARED ${SRC_SHARE_FILES} ${SRC_TARGET_FILES})
+set_target_properties(ntcore PROPERTIES VERSION 1.0.0 SOVERSION 1)
+#target_link_libraries(ntcore)
+INSTALL(TARGETS ntcore
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib COMPONENT lib)
 INSTALL(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT headers)
 
 
