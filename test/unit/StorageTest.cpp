@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Storage.h"
+#include "StorageTest.h"
 
 #include <sstream>
 
@@ -14,37 +15,13 @@
 
 namespace nt {
 
-class StorageTest : public ::testing::TestWithParam<bool> {
+class StorageTestEmpty : public StorageTest,
+                         public ::testing::TestWithParam<bool> {
  public:
-  StorageTest() : tmp_entry("foobar") {
-    using namespace std::placeholders;
-    storage.SetOutgoing(
-        std::bind(&StorageTest::QueueOutgoing, this, _1, _2, _3), GetParam());
-  }
-
-  Storage::EntriesMap& entries() { return storage.m_entries; }
-  Storage::IdMap& idmap() { return storage.m_idmap; }
-
-  Storage::Entry* GetEntry(StringRef name) {
-    auto i = storage.m_entries.find(name);
-    return i == storage.m_entries.end() ? &tmp_entry : i->getValue().get();
-  }
-  struct OutgoingData {
-    std::shared_ptr<Message> msg;
-    NetworkConnection* only;
-    NetworkConnection* except;
-  };
-  void QueueOutgoing(std::shared_ptr<Message> msg, NetworkConnection* only,
-                     NetworkConnection* except) {
-    outgoing.emplace_back(OutgoingData{msg, only, except});
-  }
-  Storage storage;
-  Storage::Entry tmp_entry;
-  std::vector<OutgoingData> outgoing;
-  bool delete_all;
+  StorageTestEmpty() { HookOutgoing(GetParam()); }
 };
 
-class StorageTestPopulateOne : public StorageTest {
+class StorageTestPopulateOne : public StorageTestEmpty {
  public:
   StorageTestPopulateOne() {
     storage.SetEntryTypeValue("foo", Value::MakeBoolean(true));
@@ -52,7 +29,7 @@ class StorageTestPopulateOne : public StorageTest {
   }
 };
 
-class StorageTestPopulated : public StorageTest {
+class StorageTestPopulated : public StorageTestEmpty {
  public:
   StorageTestPopulated() {
     storage.SetEntryTypeValue("foo", Value::MakeBoolean(true));
@@ -63,7 +40,7 @@ class StorageTestPopulated : public StorageTest {
   }
 };
 
-class StorageTestPersistent : public StorageTest {
+class StorageTestPersistent : public StorageTestEmpty {
  public:
   StorageTestPersistent() {
     storage.SetEntryTypeValue("boolean/true", Value::MakeBoolean(true));
@@ -111,12 +88,12 @@ class MockLoadWarn {
   MOCK_METHOD2(Warn, void(std::size_t line, llvm::StringRef msg));
 };
 
-TEST_P(StorageTest, Construct) {
+TEST_P(StorageTestEmpty, Construct) {
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
 }
 
-TEST_P(StorageTest, StorageEntryInit) {
+TEST_P(StorageTestEmpty, StorageEntryInit) {
   auto entry = GetEntry("foo");
   EXPECT_FALSE(entry->value);
   EXPECT_EQ(0u, entry->flags);
@@ -125,21 +102,21 @@ TEST_P(StorageTest, StorageEntryInit) {
   EXPECT_EQ(SequenceNumber(), entry->seq_num);
 }
 
-TEST_P(StorageTest, GetEntryValueNotExist) {
+TEST_P(StorageTestEmpty, GetEntryValueNotExist) {
   EXPECT_FALSE(storage.GetEntryValue("foo"));
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
   EXPECT_TRUE(outgoing.empty());
 }
 
-TEST_P(StorageTest, GetEntryValueExist) {
+TEST_P(StorageTestEmpty, GetEntryValueExist) {
   auto value = Value::MakeBoolean(true);
   storage.SetEntryTypeValue("foo", value);
   outgoing.clear();
   EXPECT_EQ(value, storage.GetEntryValue("foo"));
 }
 
-TEST_P(StorageTest, SetEntryTypeValueAssignNew) {
+TEST_P(StorageTestEmpty, SetEntryTypeValueAssignNew) {
   // brand new entry
   auto value = Value::MakeBoolean(true);
   storage.SetEntryTypeValue("foo", value);
@@ -218,7 +195,7 @@ TEST_P(StorageTestPopulated, SetEntryTypeValueDifferentValue) {
   }
 }
 
-TEST_P(StorageTest, SetEntryTypeValueEmptyName) {
+TEST_P(StorageTestEmpty, SetEntryTypeValueEmptyName) {
   auto value = Value::MakeBoolean(true);
   storage.SetEntryTypeValue("", value);
   EXPECT_TRUE(entries().empty());
@@ -226,14 +203,14 @@ TEST_P(StorageTest, SetEntryTypeValueEmptyName) {
   EXPECT_TRUE(outgoing.empty());
 }
 
-TEST_P(StorageTest, SetEntryTypeValueEmptyValue) {
+TEST_P(StorageTestEmpty, SetEntryTypeValueEmptyValue) {
   storage.SetEntryTypeValue("foo", nullptr);
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
   EXPECT_TRUE(outgoing.empty());
 }
 
-TEST_P(StorageTest, SetEntryValueAssignNew) {
+TEST_P(StorageTestEmpty, SetEntryValueAssignNew) {
   // brand new entry
   auto value = Value::MakeBoolean(true);
   EXPECT_TRUE(storage.SetEntryValue("foo", value));
@@ -296,7 +273,7 @@ TEST_P(StorageTestPopulated, SetEntryValueDifferentValue) {
   }
 }
 
-TEST_P(StorageTest, SetEntryValueEmptyName) {
+TEST_P(StorageTestEmpty, SetEntryValueEmptyName) {
   auto value = Value::MakeBoolean(true);
   EXPECT_TRUE(storage.SetEntryValue("", value));
   EXPECT_TRUE(entries().empty());
@@ -304,14 +281,14 @@ TEST_P(StorageTest, SetEntryValueEmptyName) {
   EXPECT_TRUE(outgoing.empty());
 }
 
-TEST_P(StorageTest, SetEntryValueEmptyValue) {
+TEST_P(StorageTestEmpty, SetEntryValueEmptyValue) {
   EXPECT_TRUE(storage.SetEntryValue("foo", nullptr));
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
   EXPECT_TRUE(outgoing.empty());
 }
 
-TEST_P(StorageTest, SetEntryFlagsNew) {
+TEST_P(StorageTestEmpty, SetEntryFlagsNew) {
   // flags setting doesn't create an entry
   storage.SetEntryFlags("foo", 0u);
   EXPECT_TRUE(entries().empty());
@@ -347,14 +324,14 @@ TEST_P(StorageTestPopulated, SetEntryFlagsDifferentValue) {
   }
 }
 
-TEST_P(StorageTest, SetEntryFlagsEmptyName) {
+TEST_P(StorageTestEmpty, SetEntryFlagsEmptyName) {
   storage.SetEntryFlags("", 0u);
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
   EXPECT_TRUE(outgoing.empty());
 }
 
-TEST_P(StorageTest, GetEntryFlagsNotExist) {
+TEST_P(StorageTestEmpty, GetEntryFlagsNotExist) {
   EXPECT_EQ(0u, storage.GetEntryFlags("foo"));
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
@@ -368,7 +345,7 @@ TEST_P(StorageTestPopulateOne, GetEntryFlagsExist) {
   EXPECT_TRUE(outgoing.empty());
 }
 
-TEST_P(StorageTest, DeleteEntryNotExist) {
+TEST_P(StorageTestEmpty, DeleteEntryNotExist) {
   storage.DeleteEntry("foo");
   EXPECT_TRUE(outgoing.empty());
 }
@@ -394,7 +371,7 @@ TEST_P(StorageTestPopulated, DeleteEntryExist) {
   }
 }
 
-TEST_P(StorageTest, DeleteAllEntriesEmpty) {
+TEST_P(StorageTestEmpty, DeleteAllEntriesEmpty) {
   storage.DeleteAllEntries();
   EXPECT_TRUE(outgoing.empty());
 }
@@ -513,7 +490,7 @@ TEST_P(StorageTestPersistent, SavePersistent) {
   ASSERT_EQ("", line);
 }
 
-TEST_P(StorageTest, LoadPersistentBadHeader) {
+TEST_P(StorageTestEmpty, LoadPersistentBadHeader) {
   MockLoadWarn warn;
   auto warn_func =
       [&](std::size_t line, const char* msg) { warn.Warn(line, msg); };
@@ -530,7 +507,7 @@ TEST_P(StorageTest, LoadPersistentBadHeader) {
   EXPECT_TRUE(outgoing.empty());
 }
 
-TEST_P(StorageTest, LoadPersistentCommentHeader) {
+TEST_P(StorageTestEmpty, LoadPersistentCommentHeader) {
   MockLoadWarn warn;
   auto warn_func =
       [&](std::size_t line, const char* msg) { warn.Warn(line, msg); };
@@ -543,7 +520,7 @@ TEST_P(StorageTest, LoadPersistentCommentHeader) {
   EXPECT_TRUE(outgoing.empty());
 }
 
-TEST_P(StorageTest, LoadPersistentEmptyName) {
+TEST_P(StorageTestEmpty, LoadPersistentEmptyName) {
   MockLoadWarn warn;
   auto warn_func =
       [&](std::size_t line, const char* msg) { warn.Warn(line, msg); };
@@ -556,7 +533,7 @@ TEST_P(StorageTest, LoadPersistentEmptyName) {
   EXPECT_TRUE(outgoing.empty());
 }
 
-TEST_P(StorageTest, LoadPersistentAssign) {
+TEST_P(StorageTestEmpty, LoadPersistentAssign) {
   MockLoadWarn warn;
   auto warn_func =
       [&](std::size_t line, const char* msg) { warn.Warn(line, msg); };
@@ -674,7 +651,7 @@ TEST_P(StorageTestPopulated, LoadPersistentUpdateValueFlags) {
   }
 }
 
-TEST_P(StorageTest, LoadPersistent) {
+TEST_P(StorageTestEmpty, LoadPersistent) {
   MockLoadWarn warn;
   auto warn_func =
       [&](std::size_t line, const char* msg) { warn.Warn(line, msg); };
@@ -747,7 +724,7 @@ TEST_P(StorageTest, LoadPersistent) {
             *storage.GetEntryValue(StringRef("\0\3\5\n", 4)));
 }
 
-TEST_P(StorageTest, LoadPersistentWarn) {
+TEST_P(StorageTestEmpty, LoadPersistentWarn) {
   MockLoadWarn warn;
   auto warn_func =
       [&](std::size_t line, const char* msg) { warn.Warn(line, msg); };
@@ -763,7 +740,7 @@ TEST_P(StorageTest, LoadPersistentWarn) {
   EXPECT_TRUE(outgoing.empty());
 }
 
-INSTANTIATE_TEST_CASE_P(StorageTests, StorageTest, ::testing::Bool());
+INSTANTIATE_TEST_CASE_P(StorageTestsEmpty, StorageTestEmpty, ::testing::Bool());
 INSTANTIATE_TEST_CASE_P(StorageTestsPopulateOne, StorageTestPopulateOne,
                         ::testing::Bool());
 INSTANTIATE_TEST_CASE_P(StorageTestsPopulated, StorageTestPopulated,
