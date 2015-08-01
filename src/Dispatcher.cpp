@@ -199,7 +199,8 @@ void Dispatcher::ServerThreadMain(const char* listen_address,
       m_active = false;
       break;
     }
-    DEBUG("server got a connection");
+    DEBUG("server: client connection from " << stream->getPeerIP() << " port "
+                                            << stream->getPeerPort());
 
     // add to connections list
     using namespace std::placeholders;
@@ -317,6 +318,8 @@ bool Dispatcher::ClientHandshake(
 
   if (!outgoing.empty()) send_msgs(outgoing);
 
+  INFO("client: CONNECTED to server " << conn.stream().getPeerIP() << " port "
+                                      << conn.stream().getPeerPort());
   return true;
 }
 
@@ -395,6 +398,8 @@ bool Dispatcher::ServerHandshake(
     for (auto& msg : incoming) storage.ProcessIncoming(msg, &conn, proto_rev);
   }
 
+  INFO("server: client CONNECTED: " << conn.stream().getPeerIP() << " port "
+                                    << conn.stream().getPeerPort());
   return true;
 }
 
