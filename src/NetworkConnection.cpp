@@ -100,6 +100,7 @@ void NetworkConnection::ReadThreadMain() {
     }
     m_process_incoming(std::move(msg), this, m_proto_rev);
   }
+  DEBUG3("read thread died");
   m_state = static_cast<int>(kDead);
   m_active = false;
 }
@@ -123,6 +124,7 @@ void NetworkConnection::WriteThreadMain() {
     if (m_stream->send(encoder.data(), encoder.size(), &err) == 0) break;
     DEBUG4("sent " << encoder.size() << " bytes");
   }
+  DEBUG3("write thread died");
   m_state = static_cast<int>(kDead);
   m_active = false;
 }

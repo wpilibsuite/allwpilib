@@ -96,8 +96,7 @@ class Dispatcher {
   std::chrono::steady_clock::time_point m_last_flush;
   bool m_do_flush;
 
-  // Condition variable for client reconnect
-  std::mutex m_reconnect_mutex;
+  // Condition variable for client reconnect (uses user mutex)
   std::condition_variable m_reconnect_cv;
   unsigned int m_reconnect_proto_rev;
   bool m_do_reconnect;
