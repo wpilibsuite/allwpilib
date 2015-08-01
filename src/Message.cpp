@@ -44,6 +44,14 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
         return nullptr;
       }
       break;
+    case kServerHello:
+      if (decoder.proto_rev() < 0x0300u) {
+        decoder.set_error("received SERVER_HELLO_DONE in protocol < 3.0");
+        return nullptr;
+      }
+      if (!decoder.Read8(&msg->m_flags)) return nullptr;
+      if (!decoder.ReadString(&msg->m_str)) return nullptr;
+      break;
     case kClientHelloDone:
       if (decoder.proto_rev() < 0x0300u) {
         decoder.set_error("received CLIENT_HELLO_DONE in protocol < 3.0");
