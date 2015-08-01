@@ -28,6 +28,7 @@ class TCPAcceptor;
 namespace nt {
 
 class Dispatcher {
+  friend class DispatcherTest;
  public:
   static Dispatcher& GetInstance() {
     ATOMIC_STATIC(Dispatcher, instance);
@@ -48,7 +49,8 @@ class Dispatcher {
   Dispatcher& operator=(const Dispatcher&) = delete;
 
  private:
-  Dispatcher();
+  Dispatcher() : Dispatcher(Storage::GetInstance()) {}
+  Dispatcher(Storage& storage);
 
   void DispatchThreadMain();
   void ServerThreadMain(const char* listen_address, unsigned int port);
@@ -68,6 +70,7 @@ class Dispatcher {
   void QueueOutgoing(std::shared_ptr<Message> msg, NetworkConnection* only,
                      NetworkConnection* except);
 
+  Storage& m_storage;
   bool m_server;
   std::thread m_dispatch_thread;
   std::thread m_clientserver_thread;
