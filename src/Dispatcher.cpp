@@ -159,8 +159,10 @@ void Dispatcher::DispatchThreadMain() {
     // scan outgoing messages to remove unnecessary updates
 
     // send outgoing messages
-    for (auto& conn : connections)
-      conn.net->outgoing().emplace(std::move(conn.outgoing));
+    for (auto& conn : connections) {
+      if (!conn.outgoing.empty())
+        conn.net->outgoing().emplace(std::move(conn.outgoing));
+    }
   }
 }
 
