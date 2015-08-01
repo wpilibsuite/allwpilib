@@ -14,6 +14,7 @@
 #include <cassert>
 #include <cstring>
 #include <limits>
+#include <ostream>
 #include <string>
 #include <utility>
 
@@ -521,6 +522,11 @@ namespace llvm {
 
   inline std::string &operator+=(std::string &buffer, StringRef string) {
     return buffer.append(string.data(), string.size());
+  }
+
+  inline std::ostream &operator<<(std::ostream &os, StringRef string) {
+    os.write(string.data(), string.size());
+    return os;
   }
 
   /// @}
