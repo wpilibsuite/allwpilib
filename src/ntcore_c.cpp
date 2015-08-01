@@ -288,6 +288,10 @@ const char *NT_LoadPersistent(const char *filename,
  * Utility Functions
  */
 
+void NT_SetLogger(NT_LogFunc func, unsigned int min_level) {
+  nt::SetLogger(func, min_level);
+}
+
 void NT_DisposeValue(NT_Value *value) {
   switch (value->type) {
     case NT_UNASSIGNED:

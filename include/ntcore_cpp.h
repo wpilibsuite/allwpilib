@@ -220,6 +220,11 @@ const char* LoadPersistent(
 /* timestamp */
 unsigned long long Now();
 
+/* logging */
+typedef std::function<void(unsigned int level, const char* file,
+                           unsigned int line, const char* msg)> LogFunc;
+void SetLogger(LogFunc func, unsigned int min_level);
+
 }  // namespace nt
 
 #endif  /* NTCORE_CPP_H_ */

@@ -35,6 +35,19 @@ enum NT_EntryFlags {
   NT_PERSISTENT = 0x01
 };
 
+/** NetworkTables logging levels. */
+enum NT_LogLevel {
+  NT_LOG_CRITICAL = 50,
+  NT_LOG_ERROR = 40,
+  NT_LOG_WARNING = 30,
+  NT_LOG_INFO = 20,
+  NT_LOG_DEBUG = 10,
+  NT_LOG_DEBUG1 = 9,
+  NT_LOG_DEBUG2 = 8,
+  NT_LOG_DEBUG3 = 7,
+  NT_LOG_DEBUG4 = 6
+};
+
 /*
  * Structures
  */
@@ -308,6 +321,11 @@ void NT_DisposeConnectionInfoArray(struct NT_ConnectionInfo *arr, size_t count);
 
 /* timestamp */
 unsigned long long NT_Now(void);
+
+/* logging */
+typedef void (*NT_LogFunc)(unsigned int level, const char *file,
+                           unsigned int line, const char *msg);
+void NT_SetLogger(NT_LogFunc func, unsigned int min_level);
 
 #ifdef __cplusplus
 }

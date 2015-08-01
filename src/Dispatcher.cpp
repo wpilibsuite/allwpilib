@@ -12,16 +12,9 @@
 
 #include "tcpsockets/TCPAcceptor.h"
 #include "tcpsockets/TCPConnector.h"
+#include "Log.h"
 
 using namespace nt;
-
-inline void DEBUG(const char* str, ...) {
-  va_list args;
-  va_start(args, str);
-  vfprintf(stderr, str, args);
-  fputc('\n', stderr);
-  va_end(args);
-}
 
 ATOMIC_STATIC_INIT(Dispatcher)
 
@@ -302,7 +295,7 @@ bool Dispatcher::ClientHandshake(
     if (msg->Is(Message::kServerHelloDone)) break;
     if (!msg->Is(Message::kEntryAssign)) {
       // unexpected message
-      DEBUG("client: received message (%d) other than entry assignment during initial handshake", msg->type());
+      DEBUG("client: received message (" << msg->type() << ") other than entry assignment during initial handshake");
       return false;
     }
     incoming.emplace_back(std::move(msg));
@@ -388,7 +381,7 @@ bool Dispatcher::ServerHandshake(
       if (msg->Is(Message::kClientHelloDone)) break;
       if (!msg->Is(Message::kEntryAssign)) {
         // unexpected message
-        DEBUG("server: received message (%d) other than entry assignment during initial handshake", msg->type());
+        DEBUG("server: received message (" << msg->type() << ") other than entry assignment during initial handshake");
         return false;
       }
       incoming.push_back(msg);

@@ -13,6 +13,7 @@
 #include <fstream>
 
 #include "Dispatcher.h"
+#include "Log.h"
 #include "Storage.h"
 
 namespace nt {
@@ -171,6 +172,12 @@ const char* LoadPersistent(
   if (!is) return "could not open file";
   if (!storage.LoadPersistent(is, warn)) return "error reading file";
   return nullptr;
+}
+
+void SetLogger(LogFunc func, unsigned int min_level) {
+  Logger& logger = Logger::GetInstance();
+  logger.SetLogger(func);
+  logger.set_min_level(min_level);
 }
 
 }  // namespace nt

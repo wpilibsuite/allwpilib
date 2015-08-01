@@ -8,19 +8,12 @@
 #include "NetworkConnection.h"
 
 #include "tcpsockets/TCPStream.h"
+#include "Log.h"
 #include "raw_socket_istream.h"
 #include "WireDecoder.h"
 #include "WireEncoder.h"
 
 using namespace nt;
-
-inline void DEBUG(const char* str, ...) {
-  va_list args;
-  va_start(args, str);
-  vfprintf(stderr, str, args);
-  fputc('\n', stderr);
-  va_end(args);
-}
 
 NetworkConnection::NetworkConnection(std::unique_ptr<TCPStream> stream,
                                      HandshakeFunc handshake,
@@ -81,8 +74,8 @@ void NetworkConnection::ReadThreadMain() {
                    [&] {
                      decoder.set_proto_rev(m_proto_rev);
                      auto msg = Message::Read(decoder, m_get_entry_type);
-                     if (!msg)
-                       DEBUG("error reading in handshake: %s", decoder.error());
+                     if (!msg && decoder.error())
+                       DEBUG("error reading in handshake: " << decoder.error());
                      return msg;
                    },
                    [&](llvm::ArrayRef<std::shared_ptr<Message>> msgs) {
@@ -116,11 +109,11 @@ void NetworkConnection::WriteThreadMain() {
 
   while (m_active) {
     auto msgs = m_outgoing.pop();
-    DEBUG("write thread woke up");
+    DEBUG4("write thread woke up");
     if (msgs.empty()) break;
     encoder.set_proto_rev(m_proto_rev);
     encoder.Reset();
-    DEBUG("sending %d messages", msgs.size());
+    DEBUG4("sending " << msgs.size() << " messages");
     for (auto& msg : msgs) {
       if (msg) msg->Write(encoder);
     }
@@ -128,7 +121,7 @@ void NetworkConnection::WriteThreadMain() {
     if (!m_stream) break;
     if (encoder.size() == 0) continue;
     if (m_stream->send(encoder.data(), encoder.size(), &err) == 0) break;
-    DEBUG("sent %d bytes", encoder.size());
+    DEBUG4("sent " << encoder.size() << " bytes");
   }
   m_state = static_cast<int>(kDead);
   m_active = false;

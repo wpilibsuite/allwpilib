@@ -12,10 +12,9 @@
 
 #include "llvm/StringExtras.h"
 #include "Base64.h"
+#include "Log.h"
 
 using namespace nt;
-
-#define DEBUG(str) puts(str)
 
 ATOMIC_STATIC_INIT(Storage)
 
