@@ -108,7 +108,7 @@ class StorageTestPersistent : public StorageTest {
 
 class MockLoadWarn {
  public:
-  MOCK_METHOD2(Warn, void(std::size_t line, const char* msg));
+  MOCK_METHOD2(Warn, void(std::size_t line, llvm::StringRef msg));
 };
 
 TEST_P(StorageTest, Construct) {
@@ -374,7 +374,6 @@ TEST_P(StorageTest, DeleteEntryNotExist) {
 }
 
 TEST_P(StorageTestPopulated, DeleteEntryExist) {
-  auto entry = GetEntry("foo2");
   storage.DeleteEntry("foo2");
   EXPECT_TRUE(entries().count("foo2") == 0);
   if (GetParam()) {
@@ -520,11 +519,11 @@ TEST_P(StorageTest, LoadPersistentBadHeader) {
       [&](std::size_t line, const char* msg) { warn.Warn(line, msg); };
 
   std::istringstream iss("");
-  EXPECT_CALL(warn, Warn(1, "header line mismatch, ignoring rest of file"));
+  EXPECT_CALL(warn, Warn(1, llvm::StringRef("header line mismatch, ignoring rest of file")));
   EXPECT_FALSE(storage.LoadPersistent(iss, warn_func));
 
   std::istringstream iss2("[NetworkTables");
-  EXPECT_CALL(warn, Warn(1, "header line mismatch, ignoring rest of file"));
+  EXPECT_CALL(warn, Warn(1, llvm::StringRef("header line mismatch, ignoring rest of file")));
   EXPECT_FALSE(storage.LoadPersistent(iss2, warn_func));
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
@@ -756,7 +755,7 @@ TEST_P(StorageTest, LoadPersistentWarn) {
   std::istringstream iss(
       "[NetworkTables Storage 3.0]\nboolean \"foo\"=foo\n");
   EXPECT_CALL(warn,
-              Warn(2, "unrecognized boolean value, not 'true' or 'false'"));
+              Warn(2, llvm::StringRef("unrecognized boolean value, not 'true' or 'false'")));
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
 
   EXPECT_TRUE(entries().empty());
