@@ -23,21 +23,18 @@
 #include "NetworkConnection.h"
 #include "Storage.h"
 
-class TCPAcceptor;
+class NetworkAcceptor;
+class NetworkStream;
 
 namespace nt {
 
-class Dispatcher {
+class DispatcherBase {
   friend class DispatcherTest;
  public:
-  static Dispatcher& GetInstance() {
-    ATOMIC_STATIC(Dispatcher, instance);
-    return instance;
-  }
-  ~Dispatcher();
+  virtual ~DispatcherBase();
 
-  void StartServer(const char* listen_address, unsigned int port);
-  void StartClient(const char* server_name, unsigned int port);
+  void StartServer(std::unique_ptr<NetworkAcceptor> acceptor);
+  void StartClient(std::function<std::unique_ptr<NetworkStream>()> connect);
   void Stop();
   void SetUpdateRate(double interval);
   void SetIdentity(llvm::StringRef name);
@@ -45,16 +42,17 @@ class Dispatcher {
 
   bool active() const { return m_active; }
 
-  Dispatcher(const Dispatcher&) = delete;
-  Dispatcher& operator=(const Dispatcher&) = delete;
+  DispatcherBase(const DispatcherBase&) = delete;
+  DispatcherBase& operator=(const DispatcherBase&) = delete;
+
+ protected:
+  DispatcherBase(Storage& storage);
 
  private:
-  Dispatcher() : Dispatcher(Storage::GetInstance()) {}
-  Dispatcher(Storage& storage);
-
   void DispatchThreadMain();
-  void ServerThreadMain(const char* listen_address, unsigned int port);
-  void ClientThreadMain(const char* server_name, unsigned int port);
+  void ServerThreadMain();
+  void ClientThreadMain(
+      std::function<std::unique_ptr<NetworkStream>()> connect);
 
   bool ClientHandshake(
       NetworkConnection& conn,
@@ -76,7 +74,7 @@ class Dispatcher {
   std::thread m_clientserver_thread;
   std::thread m_notifier_thread;
 
-  std::unique_ptr<TCPAcceptor> m_server_acceptor;
+  std::unique_ptr<NetworkAcceptor> m_server_acceptor;
 
   // Mutex for user-accessible items
   std::mutex m_user_mutex;
@@ -103,9 +101,26 @@ class Dispatcher {
   std::condition_variable m_reconnect_cv;
   unsigned int m_reconnect_proto_rev;
   bool m_do_reconnect;
+};
+
+class Dispatcher : public DispatcherBase {
+  friend class DispatcherTest;
+ public:
+  static Dispatcher& GetInstance() {
+    ATOMIC_STATIC(Dispatcher, instance);
+    return instance;
+  }
+
+  void StartServer(const char* listen_address, unsigned int port);
+  void StartClient(const char* server_name, unsigned int port);
+
+ private:
+  Dispatcher() : Dispatcher(Storage::GetInstance()) {}
+  Dispatcher(Storage& storage) : DispatcherBase(storage) {}
 
   ATOMIC_STATIC_DECL(Dispatcher)
 };
+
 
 }  // namespace nt
 

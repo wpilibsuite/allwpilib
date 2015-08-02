@@ -31,6 +31,8 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
+#include "TCPStream.h"
+
 #include "Log.h"
 
 static int ResolveHostName(const char* hostname, struct in_addr* addr) {
@@ -45,7 +47,8 @@ static int ResolveHostName(const char* hostname, struct in_addr* addr) {
   return result;
 }
 
-std::unique_ptr<TCPStream> TCPConnector::connect(const char* server, int port) {
+std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
+                                                     int port, int timeout) {
   struct sockaddr_in address;
 
   std::memset(&address, 0, sizeof(address));
@@ -54,25 +57,14 @@ std::unique_ptr<TCPStream> TCPConnector::connect(const char* server, int port) {
   if (ResolveHostName(server, &(address.sin_addr)) != 0) {
     inet_pton(PF_INET, server, &(address.sin_addr));
   }
-  int sd = socket(AF_INET, SOCK_STREAM, 0);
-  if (::connect(sd, (struct sockaddr*)&address, sizeof(address)) != 0) {
-    DEBUG("connect() failed: " << strerror(errno));
-    return nullptr;
-  }
-  return std::unique_ptr<TCPStream>(new TCPStream(sd, &address));
-}
 
-std::unique_ptr<TCPStream> TCPConnector::connect(const char* server, int port,
-                                                 int timeout) {
-  if (timeout == 0) return connect(server, port);
-
-  struct sockaddr_in address;
-
-  std::memset(&address, 0, sizeof(address));
-  address.sin_family = AF_INET;
-  address.sin_port = htons(port);
-  if (ResolveHostName(server, &(address.sin_addr)) != 0) {
-    inet_pton(PF_INET, server, &(address.sin_addr));
+  if (timeout == 0) {
+    int sd = socket(AF_INET, SOCK_STREAM, 0);
+    if (::connect(sd, (struct sockaddr*)&address, sizeof(address)) != 0) {
+      DEBUG("connect() failed: " << strerror(errno));
+      return nullptr;
+    }
+    return std::unique_ptr<NetworkStream>(new TCPStream(sd, &address));
   }
 
   long arg;
@@ -117,5 +109,5 @@ std::unique_ptr<TCPStream> TCPConnector::connect(const char* server, int port,
 
   // Create stream object if connected
   if (result == -1) return nullptr;
-  return std::unique_ptr<TCPStream>(new TCPStream(sd, &address));
+  return std::unique_ptr<NetworkStream>(new TCPStream(sd, &address));
 }

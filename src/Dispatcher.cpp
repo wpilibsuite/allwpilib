@@ -18,7 +18,17 @@ using namespace nt;
 
 ATOMIC_STATIC_INIT(Dispatcher)
 
-Dispatcher::Dispatcher(Storage& storage)
+void Dispatcher::StartServer(const char* listen_address, unsigned int port) {
+  DispatcherBase::StartServer(std::unique_ptr<NetworkAcceptor>(
+      new TCPAcceptor(static_cast<int>(port), listen_address)));
+}
+
+void Dispatcher::StartClient(const char* server_name, unsigned int port) {
+  DispatcherBase::StartClient(std::bind(&TCPConnector::connect, server_name,
+                                        static_cast<int>(port), 1));
+}
+
+DispatcherBase::DispatcherBase(Storage& storage)
     : m_storage(storage),
       m_server(false),
       m_do_flush(false),
@@ -28,28 +38,29 @@ Dispatcher::Dispatcher(Storage& storage)
   m_update_rate = 100;
 }
 
-Dispatcher::~Dispatcher() {
+DispatcherBase::~DispatcherBase() {
   Stop();
 }
 
-void Dispatcher::StartServer(const char* listen_address, unsigned int port) {
+void DispatcherBase::StartServer(std::unique_ptr<NetworkAcceptor> acceptor) {
   {
     std::lock_guard<std::mutex> lock(m_user_mutex);
     if (m_active) return;
     m_active = true;
   }
   m_server = true;
+  m_server_acceptor = std::move(acceptor);
 
   using namespace std::placeholders;
   m_storage.SetOutgoing(std::bind(&Dispatcher::QueueOutgoing, this, _1, _2, _3),
                         m_server);
 
   m_dispatch_thread = std::thread(&Dispatcher::DispatchThreadMain, this);
-  m_clientserver_thread =
-      std::thread(&Dispatcher::ServerThreadMain, this, listen_address, port);
+  m_clientserver_thread = std::thread(&Dispatcher::ServerThreadMain, this);
 }
 
-void Dispatcher::StartClient(const char* server_name, unsigned int port) {
+void DispatcherBase::StartClient(
+    std::function<std::unique_ptr<NetworkStream>()> connect) {
   {
     std::lock_guard<std::mutex> lock(m_user_mutex);
     if (m_active) return;
@@ -63,10 +74,10 @@ void Dispatcher::StartClient(const char* server_name, unsigned int port) {
 
   m_dispatch_thread = std::thread(&Dispatcher::DispatchThreadMain, this);
   m_clientserver_thread =
-      std::thread(&Dispatcher::ClientThreadMain, this, server_name, port);
+      std::thread(&Dispatcher::ClientThreadMain, this, connect);
 }
 
-void Dispatcher::Stop() {
+void DispatcherBase::Stop() {
   m_active = false;
 
   // wake up dispatch thread with a flush
@@ -92,19 +103,19 @@ void Dispatcher::Stop() {
   conns.resize(0);
 }
 
-void Dispatcher::SetUpdateRate(double interval) {
+void DispatcherBase::SetUpdateRate(double interval) {
   // don't allow update rates faster than 100 ms
   if (interval < 0.1)
     interval = 0.1;
   m_update_rate = static_cast<unsigned int>(interval * 1000);
 }
 
-void Dispatcher::SetIdentity(llvm::StringRef name) {
+void DispatcherBase::SetIdentity(llvm::StringRef name) {
   std::lock_guard<std::mutex> lock(m_user_mutex);
   m_identity = name;
 }
 
-void Dispatcher::Flush() {
+void DispatcherBase::Flush() {
   auto now = std::chrono::steady_clock::now();
   {
     std::lock_guard<std::mutex> lock(m_flush_mutex);
@@ -117,7 +128,7 @@ void Dispatcher::Flush() {
   m_flush_cv.notify_one();
 }
 
-void Dispatcher::DispatchThreadMain() {
+void DispatcherBase::DispatchThreadMain() {
   // local copy of active m_connections
   struct ConnectionRef {
     NetworkConnection* net;
@@ -177,9 +188,9 @@ void Dispatcher::DispatchThreadMain() {
   }
 }
 
-void Dispatcher::QueueOutgoing(std::shared_ptr<Message> msg,
-                               NetworkConnection* only,
-                               NetworkConnection* except) {
+void DispatcherBase::QueueOutgoing(std::shared_ptr<Message> msg,
+                                   NetworkConnection* only,
+                                   NetworkConnection* except) {
   std::lock_guard<std::mutex> user_lock(m_user_mutex);
   for (auto& conn : m_connections) {
     if (conn.net.get() == except) continue;
@@ -191,10 +202,7 @@ void Dispatcher::QueueOutgoing(std::shared_ptr<Message> msg,
   }
 }
 
-void Dispatcher::ServerThreadMain(const char* listen_address,
-                                  unsigned int port) {
-  m_server_acceptor.reset(
-      new TCPAcceptor(static_cast<int>(port), listen_address));
+void DispatcherBase::ServerThreadMain() {
   if (m_server_acceptor->start() != 0) {
     m_active = false;
     return;
@@ -224,14 +232,15 @@ void Dispatcher::ServerThreadMain(const char* listen_address,
   }
 }
 
-void Dispatcher::ClientThreadMain(const char* server_name, unsigned int port) {
+void DispatcherBase::ClientThreadMain(
+    std::function<std::unique_ptr<NetworkStream>()> connect) {
   while (m_active) {
     // sleep between retries
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     // try to connect (with timeout)
     DEBUG("client trying to connect");
-    auto stream = TCPConnector::connect(server_name, static_cast<int>(port), 1);
+    auto stream = connect();
     if (!stream) continue;  // keep retrying
     DEBUG("client connected");
 
@@ -254,7 +263,7 @@ void Dispatcher::ClientThreadMain(const char* server_name, unsigned int port) {
   }
 }
 
-bool Dispatcher::ClientHandshake(
+bool DispatcherBase::ClientHandshake(
     NetworkConnection& conn,
     std::function<std::shared_ptr<Message>()> get_msg,
     std::function<void(llvm::ArrayRef<std::shared_ptr<Message>>)> send_msgs) {
@@ -326,7 +335,7 @@ bool Dispatcher::ClientHandshake(
   return true;
 }
 
-bool Dispatcher::ServerHandshake(
+bool DispatcherBase::ServerHandshake(
     NetworkConnection& conn,
     std::function<std::shared_ptr<Message>()> get_msg,
     std::function<void(llvm::ArrayRef<std::shared_ptr<Message>>)> send_msgs) {
@@ -405,7 +414,7 @@ bool Dispatcher::ServerHandshake(
   return true;
 }
 
-void Dispatcher::ClientReconnect(unsigned int proto_rev) {
+void DispatcherBase::ClientReconnect(unsigned int proto_rev) {
   if (m_server) return;
   {
     std::lock_guard<std::mutex> lock(m_user_mutex);

@@ -26,13 +26,12 @@
 
 #include <memory>
 
-#include "TCPStream.h"
+#include "NetworkStream.h"
 
 class TCPConnector {
  public:
-  static std::unique_ptr<TCPStream> connect(const char* server, int port);
-  static std::unique_ptr<TCPStream> connect(const char* server, int port,
-                                            int timeout);
+  static std::unique_ptr<NetworkStream> connect(const char* server, int port,
+                                                int timeout = 0);
 };
 
 #endif
