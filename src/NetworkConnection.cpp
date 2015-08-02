@@ -7,6 +7,7 @@
 
 #include "NetworkConnection.h"
 
+#include "support/timestamp.h"
 #include "tcpsockets/NetworkStream.h"
 #include "Log.h"
 #include "raw_socket_istream.h"
@@ -26,6 +27,7 @@ NetworkConnection::NetworkConnection(std::unique_ptr<NetworkStream> stream,
   m_active = false;
   m_proto_rev = 0x0300;
   m_state = static_cast<int>(kCreated);
+  m_last_update = 0;
 }
 
 NetworkConnection::~NetworkConnection() { Stop(); }
@@ -98,6 +100,7 @@ void NetworkConnection::ReadThreadMain() {
       if (m_stream) m_stream->close();
       break;
     }
+    m_last_update = Now();
     m_process_incoming(std::move(msg), this);
   }
   DEBUG3("read thread died");

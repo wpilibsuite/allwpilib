@@ -128,6 +128,23 @@ void DispatcherBase::Flush() {
   m_flush_cv.notify_one();
 }
 
+std::vector<ConnectionInfo> DispatcherBase::GetConnections() const {
+  std::vector<ConnectionInfo> conns;
+  if (!m_active) return conns;
+
+  std::lock_guard<std::mutex> lock(m_user_mutex);
+  for (auto& conn : m_connections) {
+    if (conn.net->state() != NetworkConnection::kActive) continue;
+    auto& stream = conn.net->stream();
+    conns.emplace_back(
+        ConnectionInfo{conn.net->remote_id(), stream.getPeerIP(),
+                       static_cast<unsigned int>(stream.getPeerPort()),
+                       conn.net->last_update(), conn.net->proto_rev()});
+  }
+
+  return conns;
+}
+
 void DispatcherBase::DispatchThreadMain() {
   // local copy of active m_connections
   struct ConnectionRef {

@@ -55,6 +55,8 @@ class NetworkConnection {
   std::string remote_id() const;
   void set_remote_id(StringRef remote_id);
 
+  unsigned long long last_update() const { return m_last_update; }
+
   NetworkConnection(const NetworkConnection&) = delete;
   NetworkConnection& operator=(const NetworkConnection&) = delete;
 
@@ -74,6 +76,7 @@ class NetworkConnection {
   std::atomic_int m_state;
   mutable std::mutex m_remote_id_mutex;
   std::string m_remote_id;
+  std::atomic_ullong m_last_update;
 };
 
 }  // namespace nt

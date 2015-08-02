@@ -39,6 +39,7 @@ class DispatcherBase {
   void SetUpdateRate(double interval);
   void SetIdentity(llvm::StringRef name);
   void Flush();
+  std::vector<ConnectionInfo> GetConnections() const;
 
   bool active() const { return m_active; }
 
@@ -77,7 +78,7 @@ class DispatcherBase {
   std::unique_ptr<NetworkAcceptor> m_server_acceptor;
 
   // Mutex for user-accessible items
-  std::mutex m_user_mutex;
+  mutable std::mutex m_user_mutex;
   struct Connection {
     Connection() = default;
     explicit Connection(std::unique_ptr<NetworkConnection> net_)

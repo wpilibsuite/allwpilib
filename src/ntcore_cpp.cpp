@@ -126,7 +126,7 @@ void SetUpdateRate(double interval) {
 }
 
 std::vector<ConnectionInfo> GetConnections() {
-  return std::vector<ConnectionInfo>();
+  return Dispatcher::GetInstance().GetConnections();
 }
 
 /*
