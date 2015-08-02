@@ -15,7 +15,7 @@
 #include "support/ConcurrentQueue.h"
 #include "Message.h"
 
-class TCPStream;
+class NetworkStream;
 
 namespace nt {
 
@@ -33,7 +33,7 @@ class NetworkConnection {
   typedef std::vector<std::shared_ptr<Message>> Outgoing;
   typedef ConcurrentQueue<Outgoing> OutgoingQueue;
 
-  NetworkConnection(std::unique_ptr<TCPStream> stream,
+  NetworkConnection(std::unique_ptr<NetworkStream> stream,
                     HandshakeFunc handshake,
                     Message::GetEntryTypeFunc get_entry_type,
                     ProcessIncomingFunc process_incoming);
@@ -43,7 +43,7 @@ class NetworkConnection {
   void Stop();
 
   bool active() const { return m_active; }
-  TCPStream& stream() { return *m_stream; }
+  NetworkStream& stream() { return *m_stream; }
   OutgoingQueue& outgoing() { return m_outgoing; }
 
   unsigned int proto_rev() const { return m_proto_rev; }
@@ -62,7 +62,7 @@ class NetworkConnection {
   void ReadThreadMain();
   void WriteThreadMain();
 
-  std::unique_ptr<TCPStream> m_stream;
+  std::unique_ptr<NetworkStream> m_stream;
   OutgoingQueue m_outgoing;
   HandshakeFunc m_handshake;
   Message::GetEntryTypeFunc m_get_entry_type;

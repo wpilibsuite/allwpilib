@@ -83,7 +83,7 @@ void TCPAcceptor::shutdown() {
   ::shutdown(m_lsd, SHUT_RDWR);
 }
 
-std::unique_ptr<TCPStream> TCPAcceptor::accept() {
+std::unique_ptr<NetworkStream> TCPAcceptor::accept() {
   if (!m_listening) return nullptr;
 
   struct sockaddr_in address;
@@ -94,5 +94,5 @@ std::unique_ptr<TCPStream> TCPAcceptor::accept() {
     if (!m_shutdown) ERROR("accept() failed: " << strerror(errno));
     return nullptr;
   }
-  return std::unique_ptr<TCPStream>(new TCPStream(sd, &address));
+  return std::unique_ptr<NetworkStream>(new TCPStream(sd, &address));
 }

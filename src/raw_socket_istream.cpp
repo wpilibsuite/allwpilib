@@ -16,7 +16,7 @@ bool raw_socket_istream::read(void* data, std::size_t len) {
   std::size_t pos = 0;
 
   while (pos < len) {
-    TCPStream::Error err;
+    NetworkStream::Error err;
     std::size_t count =
         m_stream.receive(&cdata[pos], len - pos, &err, m_timeout);
     if (count == 0) return false;

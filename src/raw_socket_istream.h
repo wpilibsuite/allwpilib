@@ -10,20 +10,20 @@
 
 #include "raw_istream.h"
 
-#include "tcpsockets/TCPStream.h"
+#include "tcpsockets/NetworkStream.h"
 
 namespace nt {
 
 class raw_socket_istream : public raw_istream {
  public:
-  raw_socket_istream(TCPStream& stream, int timeout = 0)
+  raw_socket_istream(NetworkStream& stream, int timeout = 0)
       : m_stream(stream), m_timeout(timeout) {}
   virtual ~raw_socket_istream();
   virtual bool read(void* data, std::size_t len);
   virtual void close();
 
  private:
-  TCPStream& m_stream;
+  NetworkStream& m_stream;
   int m_timeout;
 };
 

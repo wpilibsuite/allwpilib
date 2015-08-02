@@ -7,7 +7,7 @@
 
 #include "NetworkConnection.h"
 
-#include "tcpsockets/TCPStream.h"
+#include "tcpsockets/NetworkStream.h"
 #include "Log.h"
 #include "raw_socket_istream.h"
 #include "WireDecoder.h"
@@ -15,7 +15,7 @@
 
 using namespace nt;
 
-NetworkConnection::NetworkConnection(std::unique_ptr<TCPStream> stream,
+NetworkConnection::NetworkConnection(std::unique_ptr<NetworkStream> stream,
                                      HandshakeFunc handshake,
                                      Message::GetEntryTypeFunc get_entry_type,
                                      ProcessIncomingFunc process_incoming)
@@ -119,7 +119,7 @@ void NetworkConnection::WriteThreadMain() {
     for (auto& msg : msgs) {
       if (msg) msg->Write(encoder);
     }
-    TCPStream::Error err;
+    NetworkStream::Error err;
     if (!m_stream) break;
     if (encoder.size() == 0) continue;
     if (m_stream->send(encoder.data(), encoder.size(), &err) == 0) break;

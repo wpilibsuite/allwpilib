@@ -33,9 +33,9 @@
 #include <sys/socket.h>
 #endif
 
-#include "llvm/StringRef.h"
+#include "NetworkStream.h"
 
-class TCPStream {
+class TCPStream : public NetworkStream {
   int m_sd;
   std::string m_peerIP;
   int m_peerPort;
@@ -46,19 +46,13 @@ class TCPStream {
 
   ~TCPStream();
 
-  enum Error {
-    kConnectionClosed = 0,
-    kConnectionReset = -1,
-    kConnectionTimedOut = -2
-  };
-
-  std::size_t send(const char* buffer, std::size_t len, Error* err);
+  std::size_t send(const char* buffer, std::size_t len, Error* err) override;
   std::size_t receive(char* buffer, std::size_t len, Error* err,
-                      int timeout = 0);
-  void close();
+                      int timeout = 0) override;
+  void close() override;
 
-  llvm::StringRef getPeerIP() const { return m_peerIP; }
-  int getPeerPort() const { return m_peerPort; }
+  llvm::StringRef getPeerIP() const override;
+  int getPeerPort() const override;
 
   TCPStream(const TCPStream& stream) = delete;
   TCPStream& operator=(const TCPStream&) = delete;

@@ -27,9 +27,10 @@
 #include <memory>
 #include <string>
 
+#include "NetworkAcceptor.h"
 #include "TCPStream.h"
 
-class TCPAcceptor {
+class TCPAcceptor : public NetworkAcceptor {
   int m_lsd;
   int m_port;
   std::string m_address;
@@ -40,12 +41,9 @@ class TCPAcceptor {
   TCPAcceptor(int port, const char* address);
   ~TCPAcceptor();
 
-  int start();
-  void shutdown();
-  std::unique_ptr<TCPStream> accept();
-
- private:
-  TCPAcceptor() {}
+  int start() override;
+  void shutdown() override;
+  std::unique_ptr<NetworkStream> accept() override;
 };
 
 #endif

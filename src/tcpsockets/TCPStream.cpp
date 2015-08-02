@@ -79,6 +79,10 @@ void TCPStream::close() {
   m_sd = -1;
 }
 
+llvm::StringRef TCPStream::getPeerIP() const { return m_peerIP; }
+
+int TCPStream::getPeerPort() const { return m_peerPort; }
+
 bool TCPStream::WaitForReadEvent(int timeout) {
   fd_set sdset;
   struct timeval tv;
