@@ -67,13 +67,7 @@ void Dispatcher::StartClient(const char* server_name, unsigned int port) {
 }
 
 void Dispatcher::Stop() {
-  {
-    std::lock_guard<std::mutex> lock(m_user_mutex);
-    m_active = false;
-
-    // close all connections
-    for (auto& conn : m_connections) conn.net->Stop();
-  }
+  m_active = false;
 
   // wake up dispatch thread with a flush
   m_flush_cv.notify_one();
@@ -87,6 +81,15 @@ void Dispatcher::Stop() {
   // join threads
   if (m_dispatch_thread.joinable()) m_dispatch_thread.join();
   if (m_clientserver_thread.joinable()) m_clientserver_thread.join();
+
+  std::vector<Connection> conns;
+  {
+    std::lock_guard<std::mutex> lock(m_user_mutex);
+    conns.swap(m_connections);
+  }
+
+  // close all connections
+  conns.resize(0);
 }
 
 void Dispatcher::SetUpdateRate(double interval) {
@@ -247,7 +250,7 @@ void Dispatcher::ClientThreadMain(const char* server_name, unsigned int port) {
 
     // block until told to reconnect
     m_do_reconnect = false;
-    m_reconnect_cv.wait(lock, [&] { return m_do_reconnect; });
+    m_reconnect_cv.wait(lock, [&] { return !m_active || m_do_reconnect; });
   }
 }
 
