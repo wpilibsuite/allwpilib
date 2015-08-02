@@ -76,7 +76,7 @@ class Dispatcher {
   std::thread m_clientserver_thread;
   std::thread m_notifier_thread;
 
-  std::shared_ptr<TCPAcceptor> m_server_acceptor;
+  std::unique_ptr<TCPAcceptor> m_server_acceptor;
 
   // Mutex for user-accessible items
   std::mutex m_user_mutex;
