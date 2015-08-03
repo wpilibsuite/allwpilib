@@ -2,14 +2,9 @@
 
 ## Functionality
 
-* Dispatcher: Client handshake (synchronization)
-* Dispatcher: Server handshake
-* Dispatcher: Main dispatch loop
+* Dispatcher: Combine multiple updates
 * Automatic persistent saves
-* GetConnections
-* Notifiers
 * RPC
-* Logging callback global
 
 ## Unit Test Coverage
 
@@ -17,6 +12,9 @@
 * SequenceNumber class
 * NetworkCommunication class
 * Dispatcher class
+* Storage incoming processing
+* Notifiers
+* RPC
 * C++ API
 * C API
 * SavePersistent safe file handling (part of C++ API)
