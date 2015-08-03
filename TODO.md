@@ -2,7 +2,6 @@
 
 ## Functionality
 
-* Dispatcher: Combine multiple updates
 * Automatic persistent saves
 * RPC
 
