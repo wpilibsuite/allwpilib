@@ -137,10 +137,10 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
       if (seq_num < entry->seq_num) {
         if (may_need_update) {
           auto queue_outgoing = m_queue_outgoing;
-          auto msg = Message::EntryUpdate(entry->id, entry->seq_num.value(),
-                                          entry->value);
+          auto outmsg = Message::EntryUpdate(entry->id, entry->seq_num.value(),
+                                             entry->value);
           lock.unlock();
-          queue_outgoing(msg, nullptr, nullptr);
+          queue_outgoing(outmsg, nullptr, nullptr);
         }
         return;
       }
