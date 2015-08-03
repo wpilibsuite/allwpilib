@@ -110,6 +110,9 @@ void NetworkConnection::ReadThreadMain() {
       if (m_stream) m_stream->close();
       break;
     }
+    DEBUG4("received type=" << msg->type() << " with str=" << msg->str()
+                            << " id=" << msg->id()
+                            << " seq_num=" << msg->seq_num_uid());
     m_last_update = Now();
     m_process_incoming(std::move(msg), this);
   }
@@ -129,9 +132,14 @@ void NetworkConnection::WriteThreadMain() {
     if (msgs.empty()) continue;
     encoder.set_proto_rev(m_proto_rev);
     encoder.Reset();
-    DEBUG4("sending " << msgs.size() << " messages");
+    DEBUG3("sending " << msgs.size() << " messages");
     for (auto& msg : msgs) {
-      if (msg) msg->Write(encoder);
+      if (msg) {
+        DEBUG4("sending type=" << msg->type() << " with str=" << msg->str()
+                               << " id=" << msg->id()
+                               << " seq_num=" << msg->seq_num_uid());
+        msg->Write(encoder);
+      }
     }
     NetworkStream::Error err;
     if (!m_stream) break;
