@@ -14,6 +14,7 @@
 
 #include "Dispatcher.h"
 #include "Log.h"
+#include "Notifier.h"
 #include "Storage.h"
 
 namespace nt {
@@ -64,16 +65,27 @@ void Flush() {
 
 unsigned int AddEntryListener(StringRef prefix, EntryListenerCallback callback,
                               bool immediate_notify) {
-  return 0;
+  Notifier& notifier = Notifier::GetInstance();
+  unsigned int uid = notifier.AddEntryListener(prefix, callback);
+  notifier.Start();
+  if (immediate_notify) Storage::GetInstance().NotifyEntries(prefix);
+  return uid;
 }
 
-void RemoveEntryListener(unsigned int entry_listener_uid) {}
+void RemoveEntryListener(unsigned int entry_listener_uid) {
+  Notifier::GetInstance().RemoveEntryListener(entry_listener_uid);
+}
 
 unsigned int AddConnectionListener(ConnectionListenerCallback callback) {
-  return 0;
+  Notifier& notifier = Notifier::GetInstance();
+  unsigned int uid = notifier.AddConnectionListener(callback);
+  Notifier::GetInstance().Start();
+  return uid;
 }
 
-void RemoveConnectionListener(unsigned int conn_listener_uid) {}
+void RemoveConnectionListener(unsigned int conn_listener_uid) {
+  Notifier::GetInstance().RemoveConnectionListener(conn_listener_uid);
+}
 
 /*
  * Remote Procedure Call Functions

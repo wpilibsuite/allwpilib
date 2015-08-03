@@ -10,6 +10,7 @@
 #include "support/timestamp.h"
 #include "tcpsockets/NetworkStream.h"
 #include "Log.h"
+#include "Notifier.h"
 #include "raw_socket_istream.h"
 #include "WireDecoder.h"
 #include "WireEncoder.h"
@@ -17,10 +18,12 @@
 using namespace nt;
 
 NetworkConnection::NetworkConnection(std::unique_ptr<NetworkStream> stream,
+                                     Notifier& notifier,
                                      HandshakeFunc handshake,
                                      Message::GetEntryTypeFunc get_entry_type,
                                      ProcessIncomingFunc process_incoming)
     : m_stream(std::move(stream)),
+      m_notifier(notifier),
       m_handshake(handshake),
       m_get_entry_type(get_entry_type),
       m_process_incoming(process_incoming) {
@@ -57,6 +60,12 @@ void NetworkConnection::Stop() {
   while (!m_outgoing.empty()) m_outgoing.pop();
 }
 
+ConnectionInfo NetworkConnection::info() const {
+  return ConnectionInfo{remote_id(), m_stream->getPeerIP(),
+                        static_cast<unsigned int>(m_stream->getPeerPort()),
+                        m_last_update, m_proto_rev};
+}
+
 std::string NetworkConnection::remote_id() const {
   std::lock_guard<std::mutex> lock(m_remote_id_mutex);
   return m_remote_id;
@@ -89,6 +98,7 @@ void NetworkConnection::ReadThreadMain() {
   }
 
   m_state = static_cast<int>(kActive);
+  m_notifier.NotifyConnection(1, info());
   while (m_active) {
     if (!m_stream)
       break;
@@ -104,6 +114,7 @@ void NetworkConnection::ReadThreadMain() {
     m_process_incoming(std::move(msg), this);
   }
   DEBUG3("read thread died");
+  if (m_state != kDead) m_notifier.NotifyConnection(0, info());
   m_state = static_cast<int>(kDead);
   m_active = false;
   m_outgoing.push(Outgoing());  // also kill write thread
@@ -129,6 +140,7 @@ void NetworkConnection::WriteThreadMain() {
     DEBUG4("sent " << encoder.size() << " bytes");
   }
   DEBUG3("write thread died");
+  if (m_state != kDead) m_notifier.NotifyConnection(0, info());
   m_state = static_cast<int>(kDead);
   m_active = false;
   if (m_stream) m_stream->close();  // also kill read thread

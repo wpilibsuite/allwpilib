@@ -19,6 +19,7 @@
 #include "llvm/StringMap.h"
 #include "atomic_static.h"
 #include "Message.h"
+#include "Notifier.h"
 #include "ntcore_cpp.h"
 #include "SequenceNumber.h"
 
@@ -64,6 +65,7 @@ class Storage {
   void DeleteEntry(StringRef name);
   void DeleteAllEntries();
   std::vector<EntryInfo> GetEntryInfo(StringRef prefix, unsigned int types);
+  void NotifyEntries(StringRef prefix);
 
   void SavePersistent(std::ostream& os) const;
   bool LoadPersistent(
@@ -71,7 +73,8 @@ class Storage {
       std::function<void(std::size_t line, const char* msg)> warn);
 
  private:
-  Storage();
+  Storage() : Storage(Notifier::GetInstance()) {}
+  Storage(Notifier& notifier);
   Storage(const Storage&) = delete;
   Storage& operator=(const Storage&) = delete;
 
@@ -95,6 +98,7 @@ class Storage {
 
   QueueOutgoingFunc m_queue_outgoing;
   bool m_server;
+  Notifier& m_notifier;
 
   ATOMIC_STATIC_DECL(Storage)
 };

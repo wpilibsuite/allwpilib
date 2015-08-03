@@ -28,8 +28,9 @@ void Dispatcher::StartClient(const char* server_name, unsigned int port) {
                                         static_cast<int>(port), 1));
 }
 
-DispatcherBase::DispatcherBase(Storage& storage)
+DispatcherBase::DispatcherBase(Storage& storage, Notifier& notifier)
     : m_storage(storage),
+      m_notifier(notifier),
       m_server(false),
       m_do_flush(false),
       m_reconnect_proto_rev(0x0300),
@@ -135,11 +136,7 @@ std::vector<ConnectionInfo> DispatcherBase::GetConnections() const {
   std::lock_guard<std::mutex> lock(m_user_mutex);
   for (auto& conn : m_connections) {
     if (conn.net->state() != NetworkConnection::kActive) continue;
-    auto& stream = conn.net->stream();
-    conns.emplace_back(
-        ConnectionInfo{conn.net->remote_id(), stream.getPeerIP(),
-                       static_cast<unsigned int>(stream.getPeerPort()),
-                       conn.net->last_update(), conn.net->proto_rev()});
+    conns.emplace_back(conn.net->info());
   }
 
   return conns;
@@ -237,6 +234,7 @@ void DispatcherBase::ServerThreadMain() {
     using namespace std::placeholders;
     std::unique_ptr<NetworkConnection> conn_unique(new NetworkConnection(
         std::move(stream),
+        m_notifier,
         std::bind(&Dispatcher::ServerHandshake, this, _1, _2, _3),
         std::bind(&Storage::GetEntryType, &m_storage, _1),
         std::bind(&Storage::ProcessIncoming, &m_storage, _1, _2)));
@@ -265,6 +263,7 @@ void DispatcherBase::ClientThreadMain(
     using namespace std::placeholders;
     std::unique_ptr<NetworkConnection> conn_unique(new NetworkConnection(
         std::move(stream),
+        m_notifier,
         std::bind(&Dispatcher::ClientHandshake, this, _1, _2, _3),
         std::bind(&Storage::GetEntryType, &m_storage, _1),
         std::bind(&Storage::ProcessIncoming, &m_storage, _1, _2)));

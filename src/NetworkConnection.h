@@ -14,10 +14,13 @@
 
 #include "support/ConcurrentQueue.h"
 #include "Message.h"
+#include "ntcore_cpp.h"
 
 class NetworkStream;
 
 namespace nt {
+
+class Notifier;
 
 class NetworkConnection {
  public:
@@ -34,6 +37,7 @@ class NetworkConnection {
   typedef ConcurrentQueue<Outgoing> OutgoingQueue;
 
   NetworkConnection(std::unique_ptr<NetworkStream> stream,
+                    Notifier& notifier,
                     HandshakeFunc handshake,
                     Message::GetEntryTypeFunc get_entry_type,
                     ProcessIncomingFunc process_incoming);
@@ -41,6 +45,8 @@ class NetworkConnection {
 
   void Start();
   void Stop();
+
+  ConnectionInfo info() const;
 
   bool active() const { return m_active; }
   NetworkStream& stream() { return *m_stream; }
@@ -65,6 +71,7 @@ class NetworkConnection {
   void WriteThreadMain();
 
   std::unique_ptr<NetworkStream> m_stream;
+  Notifier& m_notifier;
   OutgoingQueue m_outgoing;
   HandshakeFunc m_handshake;
   Message::GetEntryTypeFunc m_get_entry_type;

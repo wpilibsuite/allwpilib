@@ -19,7 +19,7 @@ using namespace nt;
 
 ATOMIC_STATIC_INIT(Storage)
 
-Storage::Storage() {}
+Storage::Storage(Notifier& notifier) : m_notifier(notifier) {}
 
 Storage::~Storage() {}
 
@@ -77,6 +77,9 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
           entry->id = id;
           m_idmap.push_back(entry);
 
+          // notify
+          m_notifier.NotifyEntry(name, entry->value, true);
+
           // send the assignment to everyone (including the originator)
           if (m_queue_outgoing) {
             auto queue_outgoing = m_queue_outgoing;
@@ -113,12 +116,17 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
             new_entry.reset(new Entry(name));
             new_entry->value = msg->value();
             new_entry->flags = msg->flags();
-          } else
-            may_need_update = true;  // we may need to send an update message
+            new_entry->id = id;
+            m_idmap[id] = new_entry.get();
+
+            // notify
+            m_notifier.NotifyEntry(name, new_entry->value, true);
+            return;
+          }
+          may_need_update = true;  // we may need to send an update message
           entry = new_entry.get();
           entry->id = id;
           m_idmap[id] = entry;
-          return;
         }
       }
 
@@ -151,6 +159,9 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
       // don't update flags from a <3.0 remote (not part of message)
       if (conn->proto_rev() >= 0x0300) entry->flags = msg->flags();
 
+      // notify
+      m_notifier.NotifyEntry(name, entry->value, false);
+
       // broadcast to all other connections (note for client there won't
       // be any other connections, so don't bother)
       if (m_server && m_queue_outgoing) {
@@ -181,6 +192,9 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
       // update local
       entry->value = msg->value();
       entry->seq_num = seq_num;
+
+      // notify
+      m_notifier.NotifyEntry(entry->name, entry->value, false);
 
       // broadcast to all other connections (note for client there won't
       // be any other connections, so don't bother)
@@ -509,6 +523,14 @@ std::vector<EntryInfo> Storage::GetEntryInfo(StringRef prefix,
     infos.push_back(std::move(info));
   }
   return infos;
+}
+
+void Storage::NotifyEntries(StringRef prefix) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  for (auto& i : m_entries) {
+    if (!i.getKey().startswith(prefix)) continue;
+    m_notifier.NotifyEntry(i.getKey(), i.getValue()->value, false);
+  }
 }
 
 /* Escapes and writes a string, including start and end double quotes */

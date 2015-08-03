@@ -21,6 +21,7 @@
 
 #include "atomic_static.h"
 #include "NetworkConnection.h"
+#include "Notifier.h"
 #include "Storage.h"
 
 class NetworkAcceptor;
@@ -47,7 +48,7 @@ class DispatcherBase {
   DispatcherBase& operator=(const DispatcherBase&) = delete;
 
  protected:
-  DispatcherBase(Storage& storage);
+  DispatcherBase(Storage& storage, Notifier& notifier);
 
  private:
   void DispatchThreadMain();
@@ -70,6 +71,7 @@ class DispatcherBase {
                      NetworkConnection* except);
 
   Storage& m_storage;
+  Notifier& m_notifier;
   bool m_server;
   std::thread m_dispatch_thread;
   std::thread m_clientserver_thread;
@@ -116,8 +118,9 @@ class Dispatcher : public DispatcherBase {
   void StartClient(const char* server_name, unsigned int port);
 
  private:
-  Dispatcher() : Dispatcher(Storage::GetInstance()) {}
-  Dispatcher(Storage& storage) : DispatcherBase(storage) {}
+  Dispatcher() : Dispatcher(Storage::GetInstance(), Notifier::GetInstance()) {}
+  Dispatcher(Storage& storage, Notifier& notifier)
+      : DispatcherBase(storage, notifier) {}
 
   ATOMIC_STATIC_DECL(Dispatcher)
 };
