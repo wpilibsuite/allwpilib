@@ -85,6 +85,13 @@ class DispatcherBase {
     Connection() = default;
     explicit Connection(std::unique_ptr<NetworkConnection> net_)
         : net(std::move(net_)) {}
+    Connection(Connection&& rhs) {
+      net = std::move(rhs.net);
+      outgoing = std::move(rhs.outgoing);
+      last_update = std::move(rhs.last_update);
+    }
+    Connection(const Connection&) = delete;
+    Connection& operator=(const Connection&) = delete;
     void QueueOutgoing(std::shared_ptr<Message> msg);
 
     std::unique_ptr<NetworkConnection> net;

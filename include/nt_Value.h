@@ -11,6 +11,7 @@
 #include <cassert>
 #include <memory>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include "llvm/ArrayRef.h"
@@ -103,7 +104,7 @@ class Value {
     val->m_val.data.v_string.len = val->m_string.size();
     return val;
   }
-  template <typename T>
+  template <typename T, typename = std::enable_if_t<std::is_same<T, std::string>>>
   static std::shared_ptr<Value> MakeString(T&& value) {
     auto val = std::make_shared<Value>(NT_STRING, private_init());
     val->m_string = std::move(value);
@@ -118,7 +119,7 @@ class Value {
     val->m_val.data.v_raw.len = val->m_string.size();
     return val;
   }
-  template <typename T>
+  template <typename T, typename = std::enable_if_t<std::is_same<T, std::string>>>
   static std::shared_ptr<Value> MakeRaw(T&& value) {
     auto val = std::make_shared<Value>(NT_RAW, private_init());
     val->m_string = std::move(value);

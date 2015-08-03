@@ -92,7 +92,7 @@ void NetworkTable::AddTableListener(StringRef key,
 void NetworkTable::RemoveTableListener(ITableListener* listener) {
   auto matches_begin =
       std::remove_if(m_listeners.begin(), m_listeners.end(),
-                     [=](const auto& x) { return x.first == listener; });
+                     [=](const Listener& x) { return x.first == listener; });
 
   for (auto i = matches_begin; i != m_listeners.end(); ++i)
     nt::RemoveEntryListener(i->second);

@@ -10,7 +10,8 @@ class NetworkTable : public ITable {
   struct private_init {};
 
   std::string m_path;
-  std::vector<std::pair<ITableListener*, unsigned int>> m_listeners;
+  typedef std::pair<ITableListener*, unsigned int> Listener;
+  std::vector<Listener> m_listeners;
 
   static std::string s_ip_address;
   static bool s_client;

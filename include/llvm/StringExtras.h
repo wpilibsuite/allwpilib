@@ -15,6 +15,7 @@
 #define LLVM_ADT_STRINGEXTRAS_H
 
 #include "llvm/StringRef.h"
+#include <cstdint>
 #include <iterator>
 
 namespace llvm {

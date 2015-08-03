@@ -60,6 +60,7 @@ class Logger {
     }                                                           \
   } while (0)
 
+#undef ERROR
 #define ERROR(x) LOG(NT_LOG_ERROR, x)
 #define WARNING(x) LOG(NT_LOG_WARNING, x)
 #define INFO(x) LOG(NT_LOG_INFO, x)

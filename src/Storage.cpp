@@ -7,6 +7,7 @@
 
 #include "Storage.h"
 
+#include <cctype>
 #include <string>
 #include <tuple>
 
@@ -567,7 +568,8 @@ static void WriteString(std::ostream& os, llvm::StringRef str) {
 
 void Storage::SavePersistent(std::ostream& os) const {
   // copy values out of storage as quickly as possible so lock isn't held
-  std::vector<std::pair<std::string, std::shared_ptr<Value>>> entries;
+  typedef std::pair<std::string, std::shared_ptr<Value>> NewEntry;
+  std::vector<NewEntry> entries;
   {
     std::lock_guard<std::mutex> lock(m_mutex);
     entries.reserve(m_entries.size());
@@ -581,7 +583,7 @@ void Storage::SavePersistent(std::ostream& os) const {
 
   // sort in name order
   std::sort(entries.begin(), entries.end(),
-            [](const auto& a, const auto& b) { return a.first < b.first; });
+            [](const NewEntry& a, const NewEntry& b) { return a.first < b.first; });
 
   std::string base64_encoded;
 
