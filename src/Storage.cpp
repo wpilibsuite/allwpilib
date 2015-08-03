@@ -134,7 +134,7 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
 
       // already exists; ignore if sequence number not higher than local
       SequenceNumber seq_num(msg->seq_num_uid());
-      if (seq_num <= entry->seq_num) {
+      if (seq_num < entry->seq_num) {
         if (may_need_update) {
           auto queue_outgoing = m_queue_outgoing;
           auto msg = Message::EntryUpdate(entry->id, entry->seq_num.value(),
