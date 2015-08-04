@@ -7,16 +7,44 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -Wformat=2 -Wall -Wextra -Werror -pedantic -Wno-unused-parameter")
 endif()
 
+# This must be a macro(), as inside a function string() can only
+# update variables in the function scope.
+macro(fix_default_compiler_settings_)
+  if (MSVC)
+    # For MSVC, CMake sets certain flags to defaults we want to override.
+    # This replacement code is taken from sample in the CMake Wiki at
+    # http://www.cmake.org/Wiki/CMake_FAQ#Dynamic_Replace.
+    foreach (flag_var
+             CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+             CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+      if (NOT BUILD_SHARED_LIBS AND NOT gtest_force_shared_crt)
+        # When Google Test is built as a shared library, it should also use
+        # shared runtime libraries.  Otherwise, it may end up with multiple
+        # copies of runtime library data in different modules, resulting in
+        # hard-to-find crashes. When it is built as a static library, it is
+        # preferable to use CRT as static libraries, as we don't have to rely
+        # on CRT DLLs being available. CMake always defaults to using shared
+        # CRT libraries, so we override that default here.
+        string(REPLACE "/MD" "-MT" ${flag_var} "${${flag_var}}")
+      endif()
+    endforeach()
+  endif()
+endmacro()
+fix_default_compiler_settings_()
+
 file(GLOB_RECURSE SRC_FILES src/*.cpp)
 include_directories(include src)
 if (WIN32)
-  set(SRC_FILES ${SRC_FILES} ntcore.def)
+	add_library(ntcore SHARED ${SRC_FILES} ntcore.def)
+else()
+	add_library(ntcore SHARED ${SRC_FILES})
 endif()
-add_library(ntcore SHARED ${SRC_FILES})
 set_target_properties(ntcore PROPERTIES VERSION 1.0.0 SOVERSION 1)
 #target_link_libraries(ntcore)
 if (WIN32)
+	add_library(ntcore_static STATIC ${SRC_FILES})
 	target_link_libraries(ntcore ws2_32)
+	target_link_libraries(ntcore_static ws2_32)
 endif()
 INSTALL(TARGETS ntcore
     RUNTIME DESTINATION bin
@@ -53,6 +81,22 @@ add_dependencies(libgtest gmock)
 
 # Set gmock properties
 ExternalProject_Get_Property(gmock source_dir binary_dir)
+if (MSVC)
+foreach (CFG ${CMAKE_CONFIGURATION_TYPES})
+string(TOUPPER ${CFG} CFG_UC)
+set_target_properties(libgmock PROPERTIES
+	"IMPORTED_LOCATION_${CFG_UC}" "${binary_dir}/${CFG}/gmock.lib"
+    "IMPORTED_LINK_INTERFACE_LIBRARIES_${CFG_UC}" "${CMAKE_THREAD_LIBS_INIT}"
+)
+endforeach ()
+foreach (CFG ${CMAKE_CONFIGURATION_TYPES})
+string(TOUPPER ${CFG} CFG_UC)
+set_target_properties(libgtest PROPERTIES
+	"IMPORTED_LOCATION_${CFG_UC}" "${binary_dir}/gtest/${CFG}/gtest.lib"
+    "IMPORTED_LINK_INTERFACE_LIBRARIES_${CFG_UC}" "${CMAKE_THREAD_LIBS_INIT}"
+)
+endforeach ()
+else ()
 set_target_properties(libgmock PROPERTIES
     "IMPORTED_LOCATION" "${binary_dir}/libgmock.a"
     "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}"
@@ -63,6 +107,7 @@ set_target_properties(libgtest PROPERTIES
     "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}"
 #    "INTERFACE_INCLUDE_DIRECTORIES" "${source_dir}/include"
 )
+endif ()
 # I couldn't make it work with INTERFACE_INCLUDE_DIRECTORIES
 include_directories("${source_dir}/include")
 include_directories("${source_dir}/gtest/include")
