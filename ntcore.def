@@ -1,0 +1,36 @@
+LIBRARY NTCORE
+EXPORTS
+NT_GetEntryValue @1
+NT_SetEntryValue @2
+NT_SetEntryTypeValue @3
+NT_SetEntryFlags @4
+NT_GetEntryFlags @5
+NT_DeleteEntry @6
+NT_DeleteAllEntries @7
+NT_GetEntryInfo @8
+NT_Flush @9
+NT_AddEntryListener @10
+NT_RemoveEntryListener @11
+NT_AddConnectionListener @12
+NT_RemoveConnectionListener @13
+NT_CreateRpc @14
+NT_DeleteRpc @15
+NT_CallRpc @16
+NT_GetRpcResult @17
+NT_SetNetworkIdentity @18
+NT_StartServer @19
+NT_StopServer @20
+NT_StartClient @21
+NT_StopClient @22
+NT_SetUpdateRate @23
+NT_GetConnections @24
+NT_SavePersistent @25
+NT_LoadPersistent @26
+NT_DisposeValue @27
+NT_InitValue @28
+NT_DisposeString @29
+NT_InitString @30
+NT_DisposeConnectionInfoArray @31
+NT_Now @32
+NT_SetLogger @33
+
