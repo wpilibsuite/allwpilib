@@ -25,10 +25,15 @@
 
 #include <cstdio>
 #include <cstring>
+#ifdef _WIN32
+#include <WinSock2.h>
+#else
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#endif
 
+#include "llvm/SmallString.h"
 #include "Log.h"
 
 TCPAcceptor::TCPAcceptor(int port, const char* address)
@@ -36,13 +41,26 @@ TCPAcceptor::TCPAcceptor(int port, const char* address)
       m_port(port),
       m_address(address),
       m_listening(false),
-      m_shutdown(false) {}
+      m_shutdown(false) {
+#ifdef _WIN32
+  WSAData wsaData;
+  WORD wVersionRequested = MAKEWORD(2, 2);
+  WSAStartup(wVersionRequested, &wsaData);
+#endif
+}
 
 TCPAcceptor::~TCPAcceptor() {
   if (m_lsd > 0) {
     shutdown();
+#ifdef _WIN32
+    closesocket(m_lsd);
+#else
     close(m_lsd);
+#endif
   }
+#ifdef _WIN32
+  WSACleanup();
+#endif
 }
 
 int TCPAcceptor::start() {
@@ -53,15 +71,22 @@ int TCPAcceptor::start() {
 
   std::memset(&address, 0, sizeof(address));
   address.sin_family = PF_INET;
-  address.sin_port = htons(m_port);
   if (m_address.size() > 0) {
+#ifdef _WIN32
+    llvm::SmallString<128> addr_copy(m_address);
+    addr_copy.append('\0');
+    int size = sizeof(address);
+    WSAStringToAddress(addr_copy.data(), PF_INET, nullptr, (struct sockaddr*)&address, &size);
+#else
     inet_pton(PF_INET, m_address.c_str(), &(address.sin_addr));
+#endif
   } else {
     address.sin_addr.s_addr = INADDR_ANY;
   }
+  address.sin_port = htons(m_port);
 
   int optval = 1;
-  setsockopt(m_lsd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
+  setsockopt(m_lsd, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof optval);
 
   int result = bind(m_lsd, (struct sockaddr*)&address, sizeof(address));
   if (result != 0) {
@@ -80,14 +105,22 @@ int TCPAcceptor::start() {
 
 void TCPAcceptor::shutdown() {
   m_shutdown = true;
+#ifdef _WIN32
+  ::shutdown(m_lsd, SD_BOTH);
+#else
   ::shutdown(m_lsd, SHUT_RDWR);
+#endif
 }
 
 std::unique_ptr<NetworkStream> TCPAcceptor::accept() {
   if (!m_listening) return nullptr;
 
   struct sockaddr_in address;
+#ifdef _WIN32
+  int len = sizeof(address);
+#else
   socklen_t len = sizeof(address);
+#endif
   std::memset(&address, 0, sizeof(address));
   int sd = ::accept(m_lsd, (struct sockaddr*)&address, &len);
   if (sd < 0) {

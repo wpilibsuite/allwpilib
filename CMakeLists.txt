@@ -12,6 +12,9 @@ include_directories(include src)
 add_library(ntcore SHARED ${SRC_FILES})
 set_target_properties(ntcore PROPERTIES VERSION 1.0.0 SOVERSION 1)
 #target_link_libraries(ntcore)
+if (WIN32)
+	target_link_libraries(ntcore ws2_32)
+endif()
 INSTALL(TARGETS ntcore
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib

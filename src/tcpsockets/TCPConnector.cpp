@@ -27,12 +27,18 @@
 #include <fcntl.h>
 #include <cstdio>
 #include <cstring>
+#ifdef _WIN32
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#else
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#endif
 
 #include "TCPStream.h"
 
+#include "llvm/SmallString.h"
 #include "Log.h"
 
 static int ResolveHostName(const char* hostname, struct in_addr* addr) {
@@ -49,14 +55,32 @@ static int ResolveHostName(const char* hostname, struct in_addr* addr) {
 
 std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
                                                      int port, int timeout) {
+#ifdef _WIN32
+  struct WSAHelper {
+    WSAHelper() {
+      WSAData wsaData;
+      WORD wVersionRequested = MAKEWORD(2, 2);
+      WSAStartup(wVersionRequested, &wsaData);
+    }
+    ~WSAHelper() { WSACleanup(); }
+  };
+  static WSAHelper helper;
+#endif
   struct sockaddr_in address;
 
   std::memset(&address, 0, sizeof(address));
   address.sin_family = AF_INET;
-  address.sin_port = htons(port);
   if (ResolveHostName(server, &(address.sin_addr)) != 0) {
+#ifdef _WIN32
+    llvm::SmallString<128> addr_copy(server);
+    addr_copy.append('\0');
+    int size = sizeof(address);
+    WSAStringToAddress(addr_copy.data(), PF_INET, nullptr, (struct sockaddr*)&address, &size);
+#else
     inet_pton(PF_INET, server, &(address.sin_addr));
+#endif
   }
+  address.sin_port = htons(port);
 
   if (timeout == 0) {
     int sd = socket(AF_INET, SOCK_STREAM, 0);
@@ -74,9 +98,14 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
   int result = -1, valopt, sd = socket(AF_INET, SOCK_STREAM, 0);
 
   // Set socket to non-blocking
+#ifdef _WIN32
+  u_long mode = 1;
+  ioctlsocket(sd, FIONBIO, &mode);
+#else
   arg = fcntl(sd, F_GETFL, nullptr);
   arg |= O_NONBLOCK;
   fcntl(sd, F_SETFL, arg);
+#endif
 
   // Connect with time limit
   std::string message;
@@ -89,7 +118,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
       FD_SET(sd, &sdset);
       if (select(sd + 1, nullptr, &sdset, nullptr, &tv) > 0) {
         len = sizeof(int);
-        getsockopt(sd, SOL_SOCKET, SO_ERROR, (void*)(&valopt), &len);
+        getsockopt(sd, SOL_SOCKET, SO_ERROR, (char*)(&valopt), &len);
         if (valopt) {
           DEBUG("connect() error " << valopt << " - " << strerror(valopt));
         }
@@ -103,9 +132,14 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
   }
 
   // Return socket to blocking mode
+#ifdef _WIN32
+  mode = 0;
+  ioctlsocket(sd, FIONBIO, &mode);
+#else
   arg = fcntl(sd, F_GETFL, nullptr);
   arg &= (~O_NONBLOCK);
   fcntl(sd, F_SETFL, arg);
+#endif
 
   // Create stream object if connected
   if (result == -1) return nullptr;
