@@ -66,11 +66,11 @@ class Logger {
 #define INFO(x) LOG(NT_LOG_INFO, x)
 
 #ifdef NDEBUG
-#define DEBUG(x)
-#define DEBUG1(x)
-#define DEBUG2(x)
-#define DEBUG3(x)
-#define DEBUG4(x)
+#define DEBUG(x) do {} while (0)
+#define DEBUG1(x) do {} while (0)
+#define DEBUG2(x) do {} while (0)
+#define DEBUG3(x) do {} while (0)
+#define DEBUG4(x) do {} while (0)
 #else
 #define DEBUG(x) LOG(NT_LOG_DEBUG, x)
 #define DEBUG1(x) LOG(NT_LOG_DEBUG1, x)
