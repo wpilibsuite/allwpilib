@@ -51,8 +51,6 @@ DriverStation::DriverStation() {
   joysticks[5] = msgs::FRCJoystickPtr(new msgs::FRCJoystick());
   joysticksSub[5] = MainNode::Subscribe(
       "~/ds/joysticks/5", &DriverStation::joystickCallback5, this);
-
-  AddToSingletonList();
 }
 
 /**

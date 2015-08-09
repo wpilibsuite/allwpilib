@@ -25,8 +25,6 @@ class SensorBase : public ErrorBase {
   SensorBase(const SensorBase&) = delete;
   SensorBase& operator=(const SensorBase&) = delete;
 
-  static void DeleteSingletons();
-
   static uint32_t GetDefaultSolenoidModule() { return 0; }
 
   static bool CheckSolenoidModule(uint8_t moduleNumber);
@@ -49,13 +47,7 @@ class SensorBase : public ErrorBase {
   static const uint32_t kChassisSlots = 8;
 
  protected:
-  void AddToSingletonList();
-
   static void* m_digital_ports[kDigitalChannels];
   static void* m_relay_ports[kRelayChannels];
   static void* m_pwm_ports[kPwmChannels];
-
- private:
-  static SensorBase* m_singletonList;
-  SensorBase* m_nextSingleton = nullptr;
 };
