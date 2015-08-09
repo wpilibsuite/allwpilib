@@ -58,8 +58,6 @@ DriverStation::DriverStation() {
   // It will signal when new packet data is available.
   HALSetNewDataSem(&m_packetDataAvailableCond);
 
-  AddToSingletonList();
-
   m_task = Task("DriverStation", &DriverStation::Run, this);
 }
 
@@ -100,8 +98,8 @@ void DriverStation::Run() {
  * @return Pointer to the DS instance
  */
 DriverStation& DriverStation::GetInstance() {
-  static DriverStation* instance = new DriverStation();
-  return *instance;
+  static DriverStation instance;
+  return instance;
 }
 
 /**

@@ -18,20 +18,6 @@
 #include "Utility.h"
 #include "networktables/NetworkTable.h"
 
-RobotBase* RobotBase::m_instance = nullptr;
-
-void RobotBase::setInstance(RobotBase* robot) {
-  wpi_assert(m_instance == nullptr);
-  m_instance = robot;
-}
-
-RobotBase& RobotBase::getInstance() { return *m_instance; }
-
-void RobotBase::robotSetup(RobotBase* robot) {
-  printf("\n********** Robot program starting **********\n");
-  robot->StartCompetition();
-}
-
 /**
  * Constructor for a generic robot program.
  *
@@ -47,8 +33,6 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   RobotState::SetImplementation(DriverStation::GetInstance());
   HLUsageReporting::SetImplementation(new HardwareHLReporting());
 
-  RobotBase::setInstance(this);
-
   NetworkTable::SetNetworkIdentity("Robot");
   NetworkTable::SetPersistentFilename("/home/lvuser/networktables.ini");
 
@@ -59,18 +43,6 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
     fputs("2016 C++ Release 5", file);
     fclose(file);
   }
-}
-
-/**
- * Free the resources for a RobotBase class.
- * This includes deleting all classes that might have been allocated as
- * Singletons to they would never be deleted except here.
- */
-RobotBase::~RobotBase() {
-  SensorBase::DeleteSingletons();
-  delete m_task;
-  m_task = nullptr;
-  m_instance = nullptr;
 }
 
 /**
@@ -112,17 +84,3 @@ bool RobotBase::IsTest() const { return m_ds.IsTest(); }
  * function was called?
  */
 bool RobotBase::IsNewDataAvailable() const { return m_ds.IsNewControlData(); }
-
-/**
- * This class exists for the sole purpose of getting its destructor called when
- * the module unloads.
- * Before the module is done unloading, we need to delete the RobotBase derived
- * singleton.  This should delete the other remaining singletons that were
- * registered.  This should also stop all tasks that are using the Task class.
- */
-class RobotDeleter {
- public:
-  RobotDeleter() {}
-  ~RobotDeleter() { delete &RobotBase::getInstance(); }
-};
-static RobotDeleter g_robotDeleter;

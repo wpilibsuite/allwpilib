@@ -17,43 +17,11 @@ const uint32_t SensorBase::kPwmChannels;
 const uint32_t SensorBase::kRelayChannels;
 const uint32_t SensorBase::kPDPChannels;
 const uint32_t SensorBase::kChassisSlots;
-SensorBase* SensorBase::m_singletonList = nullptr;
 
 /**
  * Creates an instance of the sensor base and gets an FPGA handle
  */
 SensorBase::SensorBase() {}
-
-/**
- * Add sensor to the singleton list.
- *
- * Add this sensor to the list of singletons that need to be deleted when
- * the robot program exits. Each of the sensors on this list are singletons,
- * that is they aren't allocated directly with new, but instead are allocated
- * by the static GetInstance method. As a result, they are never deleted when
- * the program exits. Consequently these sensors may still be holding onto
- * resources and need to have their destructors called at the end of the
- * program.
- */
-void SensorBase::AddToSingletonList() {
-  m_nextSingleton = m_singletonList;
-  m_singletonList = this;
-}
-
-/**
- * Delete all the singleton classes on the list.
- *
- * All the classes that were allocated as singletons need to be deleted so
- * their resources can be freed.
- */
-void SensorBase::DeleteSingletons() {
-  for (SensorBase* next = m_singletonList; next != nullptr;) {
-    SensorBase* tmp = next;
-    next = next->m_nextSingleton;
-    delete tmp;
-  }
-  m_singletonList = nullptr;
-}
 
 /**
  * Check that the solenoid module number is valid.

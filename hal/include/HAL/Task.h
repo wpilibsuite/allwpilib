@@ -10,16 +10,6 @@
 #include <pthread.h>
 #include <stdint.h>
 
-#ifndef _FUNCPTR_DEFINED
-#define _FUNCPTR_DEFINED
-#ifdef __cplusplus
-typedef int (*FUNCPTR)(...);
-/* ptr to function returning int */
-#else
-typedef int (*FUNCPTR)(); /* ptr to function returning int */
-#endif /* __cplusplus */
-#endif /* _FUNCPTR_DEFINED */
-
 #ifndef _STATUS_DEFINED
 #define _STATUS_DEFINED
 typedef int STATUS;
@@ -32,7 +22,6 @@ typedef int STATUS;
 #define ERROR (-1)
 #endif /* ERROR */
 
-#define NULL_TASK NULL
 typedef pthread_t* TASK;
 
 extern "C" {
