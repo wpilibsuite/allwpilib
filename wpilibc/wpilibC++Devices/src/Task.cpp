@@ -79,9 +79,9 @@ int32_t Task::GetPriority() {
 
 /**
  * This routine changes a task's priority to a specified priority.
- * Priorities range from 0, the highest priority, to 255, the lowest priority.
- * Default task priority is 100.
- * @param priority The priority the task should run at.
+ * Priorities range from 1, the lowest priority, to 99, the highest priority.
+ * Default task priority is 60.
+ * @param priority The priority at which the internal thread should run.
  * @returns true on success.
  */
 bool Task::SetPriority(int32_t priority) {
