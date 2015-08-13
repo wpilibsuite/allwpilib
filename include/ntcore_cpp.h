@@ -50,12 +50,19 @@ struct ConnectionInfo {
 
 /** NetworkTables RPC Parameter Definition */
 struct RpcParamDef {
+  RpcParamDef() = default;
+  RpcParamDef(StringRef name_, std::shared_ptr<Value> def_value_)
+      : name(name_), def_value(def_value_) {}
+
   std::string name;
   std::shared_ptr<Value> def_value;
 };
 
 /** NetworkTables RPC Result Definition */
 struct RpcResultDef {
+  RpcResultDef() = default;
+  RpcResultDef(StringRef name_, NT_Type type_) : name(name_), type(type_) {}
+
   std::string name;
   NT_Type type;
 };
@@ -66,6 +73,14 @@ struct RpcDefinition {
   std::string name;
   std::vector<RpcParamDef> params;
   std::vector<RpcResultDef> results;
+};
+
+/** NetworkTables RPC Call Data */
+struct RpcCallInfo {
+  unsigned int rpc_id;
+  unsigned int call_uid;
+  std::string name;
+  std::string params;
 };
 
 /*
@@ -183,15 +198,24 @@ void RemoveConnectionListener(unsigned int conn_listener_uid);
  * Remote Procedure Call Functions
  */
 
-typedef std::function<std::vector<std::shared_ptr<Value>>(
-    unsigned int uid, StringRef name, ArrayRef<std::shared_ptr<Value>> params)>
+typedef std::function<std::string(StringRef name, StringRef params)>
     RpcCallback;
 
-unsigned int CreateRpc(StringRef name, const RpcDefinition& def,
-                       RpcCallback callback);
-void DeleteRpc(unsigned int rpc_uid);
-unsigned int CallRpc(StringRef name, ArrayRef<std::shared_ptr<Value>> params);
-std::vector<std::shared_ptr<Value>> GetRpcResult(unsigned int result_uid);
+void CreateRpc(StringRef name, StringRef def, RpcCallback callback);
+void CreatePolledRpc(StringRef name, StringRef def);
+
+bool PollRpc(bool blocking, RpcCallInfo* call_info);
+void PostRpcResponse(unsigned int rpc_id, unsigned int call_uid,
+                     StringRef result);
+
+unsigned int CallRpc(StringRef name, StringRef params);
+bool GetRpcResult(bool blocking, unsigned int call_uid, std::string* result);
+
+std::string PackRpcDefinition(const RpcDefinition& def);
+bool UnpackRpcDefinition(StringRef packed, RpcDefinition *def);
+std::string PackRpcValues(ArrayRef<std::shared_ptr<Value>> values);
+std::vector<std::shared_ptr<Value>> UnpackRpcValues(StringRef packed,
+                                                    ArrayRef<NT_Type> types);
 
 /*
  * Client/Server Functions

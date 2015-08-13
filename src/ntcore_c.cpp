@@ -37,6 +37,41 @@ static void ConvertToC(const ConnectionInfo& in, NT_ConnectionInfo* out) {
   out->protocol_version = in.protocol_version;
 }
 
+static void ConvertToC(const RpcParamDef& in, NT_RpcParamDef* out) {
+  ConvertToC(in.name, &out->name);
+  NT_InitValue(&out->def_value);
+  ConvertToC(*in.def_value, &out->def_value);
+}
+
+static void ConvertToC(const RpcResultDef& in, NT_RpcResultDef* out) {
+  ConvertToC(in.name, &out->name);
+  out->type = in.type;
+}
+
+static void ConvertToC(const RpcDefinition& in, NT_RpcDefinition* out) {
+  out->version = in.version;
+  ConvertToC(in.name, &out->name);
+
+  out->num_params = in.params.size();
+  out->params = static_cast<NT_RpcParamDef*>(
+      std::malloc(in.params.size() * sizeof(NT_RpcParamDef)));
+  for (size_t i = 0; i < in.params.size(); ++i)
+    ConvertToC(in.params[i], &out->params[i]);
+
+  out->num_results = in.results.size();
+  out->results = static_cast<NT_RpcResultDef*>(
+      std::malloc(in.results.size() * sizeof(NT_RpcResultDef)));
+  for (size_t i = 0; i < in.results.size(); ++i)
+    ConvertToC(in.results[i], &out->results[i]);
+}
+
+static void ConvertToC(const RpcCallInfo& in, NT_RpcCallInfo* out) {
+  out->rpc_id = in.rpc_id;
+  out->call_uid = in.call_uid;
+  ConvertToC(in.name, &out->name);
+  ConvertToC(in.params, &out->params);
+}
+
 static void DisposeConnectionInfo(NT_ConnectionInfo *info) {
   std::free(info->remote_id.str);
   std::free(info->remote_name);
@@ -164,72 +199,108 @@ void NT_RemoveConnectionListener(unsigned int conn_listener_uid) {
  * Remote Procedure Call Functions
  */
 
-unsigned int NT_CreateRpc(const char *name, size_t name_len,
-                          const NT_RpcDefinition *def, void *data,
-                          NT_RpcCallback callback) {
-  return nt::CreateRpc(
-      StringRef(name, name_len),
-      ConvertFromC(*def),
-      [=](unsigned int uid, StringRef name,
-          ArrayRef<std::shared_ptr<Value>> params)
-          -> std::vector<std::shared_ptr<Value>> {
-        // convert params to NT_Value* array
-        std::vector<const NT_Value*> params_c(params.size());
-        for (size_t i = 0; i < params.size(); ++i)
-          params_c[i] = &params[i]->value();
-
+void NT_CreateRpc(const char *name, size_t name_len, const char *def,
+                  size_t def_len, void *data, NT_RpcCallback callback) {
+  nt::CreateRpc(
+      StringRef(name, name_len), StringRef(def, def_len),
+      [=](StringRef name, StringRef params) -> std::string {
         size_t results_len;
-        NT_Value** results_c = callback(uid, data, name.data(), name.size(),
-                                        params_c.data(), params.size(),
-                                        &results_len);
-
-        // convert results to Value array
-        std::vector<std::shared_ptr<Value>> results;
-        results.reserve(results_len);
-        for (size_t i = 0; i < results_len; ++i)
-          results.push_back(ConvertFromC(*results_c[i]));
-
-        // dispose the C version
-        for (size_t i = 0; i < results_len; ++i) {
-          NT_DisposeValue(results_c[i]);
-          std::free(results_c[i]);
-        }
+        char* results_c = callback(data, name.data(), name.size(),
+                                   params.data(), params.size(), &results_len);
+        std::string results(results_c, results_len);
         std::free(results_c);
-
         return results;
       });
 }
 
-void NT_DeleteRpc(unsigned int rpc_uid) {
-  nt::DeleteRpc(rpc_uid);
+void NT_CreatePolledRpc(const char *name, size_t name_len, const char *def,
+                        size_t def_len) {
+  nt::CreatePolledRpc(StringRef(name, name_len), StringRef(def, def_len));
+}
+
+int NT_PollRpc(int blocking, NT_RpcCallInfo* call_info) {
+  RpcCallInfo call_info_cpp;
+  if (!nt::PollRpc(blocking, &call_info_cpp))
+    return 0;
+  ConvertToC(call_info_cpp, call_info);
+  return 1;
+}
+
+void NT_PostRpcResponse(unsigned int rpc_id, unsigned int call_uid,
+                        const char *result, size_t result_len) {
+  nt::PostRpcResponse(rpc_id, call_uid, StringRef(result, result_len));
 }
 
 unsigned int NT_CallRpc(const char *name, size_t name_len,
-                        const NT_Value **params, size_t params_len) {
-  // create input vector
-  std::vector<std::shared_ptr<Value>> params_v;
-  params_v.reserve(params_len);
-  for (size_t i = 0; i < params_len; ++i)
-    params_v.push_back(ConvertFromC(*params[i]));
-
-  // make the call
-  return nt::CallRpc(StringRef(name, name_len), params_v);
+                        const char *params, size_t params_len) {
+  return nt::CallRpc(StringRef(name, name_len), StringRef(params, params_len));
 }
 
-NT_Value **NT_GetRpcResult(unsigned int result_uid, size_t *results_len) {
-  auto results_v = nt::GetRpcResult(result_uid);
-  *results_len = results_v.size();
-  if (results_v.size() == 0) return nullptr;
+char *NT_GetRpcResult(int blocking, unsigned int call_uid, size_t *result_len) {
+  std::string result;
+  if (!nt::GetRpcResult(blocking, call_uid, &result)) return nullptr;
+
+  // convert result
+  *result_len = result.size();
+  char *result_cstr;
+  ConvertToC(result, &result_cstr);
+  return result_cstr;
+}
+
+char *NT_PackRpcDefinition(const NT_RpcDefinition *def, size_t *packed_len) {
+  auto packed = nt::PackRpcDefinition(ConvertFromC(*def));
+
+  // convert result
+  *packed_len = packed.size();
+  char *packed_cstr;
+  ConvertToC(packed, &packed_cstr);
+  return packed_cstr;
+}
+
+int NT_UnpackRpcDefinition(const char *packed, size_t packed_len,
+                           NT_RpcDefinition *def) {
+  nt::RpcDefinition def_v;
+  if (!nt::UnpackRpcDefinition(StringRef(packed, packed_len), &def_v))
+      return 0;
+
+  // convert result
+  ConvertToC(def_v, def);
+  return 1;
+}
+
+char *NT_PackRpcValues(const NT_Value **values, size_t values_len,
+                       size_t *packed_len) {
+  // create input vector
+  std::vector<std::shared_ptr<Value>> values_v;
+  values_v.reserve(values_len);
+  for (size_t i = 0; i < values_len; ++i)
+    values_v.push_back(ConvertFromC(*values[i]));
+
+  // make the call
+  auto packed = nt::PackRpcValues(values_v);
+
+  // convert result
+  *packed_len = packed.size();
+  char *packed_cstr;
+  ConvertToC(packed, &packed_cstr);
+  return packed_cstr;
+}
+
+NT_Value **NT_UnpackRpcValues(const char *packed, size_t packed_len,
+                              const NT_Type *types, size_t types_len) {
+  auto values_v = nt::UnpackRpcValues(StringRef(packed, packed_len),
+                                      ArrayRef<NT_Type>(types, types_len));
+  if (values_v.size() == 0) return nullptr;
 
   // create array and copy into it
-  NT_Value** results = static_cast<NT_Value**>(
-      std::malloc(results_v.size() * sizeof(NT_Value*)));
-  for (size_t i = 0; i < results_v.size(); ++i) {
-    results[i] = static_cast<NT_Value*>(std::malloc(sizeof(NT_Value)));
-    NT_InitValue(results[i]);
-    ConvertToC(*results_v[i], results[i]);
+  NT_Value** values = static_cast<NT_Value**>(
+      std::malloc(values_v.size() * sizeof(NT_Value*)));
+  for (size_t i = 0; i < values_v.size(); ++i) {
+    values[i] = static_cast<NT_Value*>(std::malloc(sizeof(NT_Value)));
+    NT_InitValue(values[i]);
+    ConvertToC(*values_v[i], values[i]);
   }
-  return results;
+  return values;
 }
 
 /*
@@ -341,4 +412,27 @@ void NT_InitString(NT_String *str) {
 void NT_DisposeConnectionInfoArray(NT_ConnectionInfo *arr, size_t count) {
   for (size_t i = 0; i < count; i++) DisposeConnectionInfo(&arr[i]);
   std::free(arr);
+}
+
+void NT_DisposeRpcDefinition(NT_RpcDefinition *def) {
+  NT_DisposeString(&def->name);
+
+  for (size_t i = 0; i < def->num_params; ++i) {
+    NT_DisposeString(&def->params[i].name);
+    NT_DisposeValue(&def->params[i].def_value);
+  }
+  std::free(def->params);
+  def->params = nullptr;
+  def->num_params = 0;
+
+  for (size_t i = 0; i < def->num_results; ++i)
+    NT_DisposeString(&def->results[i].name);
+  std::free(def->results);
+  def->results = nullptr;
+  def->num_results = 0;
+}
+
+void NT_DisposeRpcCallInfo(NT_RpcCallInfo *call_info) {
+  NT_DisposeString(&call_info->name);
+  NT_DisposeString(&call_info->params);
 }

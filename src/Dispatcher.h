@@ -81,24 +81,7 @@ class DispatcherBase {
 
   // Mutex for user-accessible items
   mutable std::mutex m_user_mutex;
-  struct Connection {
-    Connection() = default;
-    explicit Connection(std::unique_ptr<NetworkConnection> net_)
-        : net(std::move(net_)) {}
-    Connection(Connection&& rhs) {
-      net = std::move(rhs.net);
-      outgoing = std::move(rhs.outgoing);
-      last_update = std::move(rhs.last_update);
-    }
-    Connection(const Connection&) = delete;
-    Connection& operator=(const Connection&) = delete;
-    void QueueOutgoing(std::shared_ptr<Message> msg);
-
-    std::unique_ptr<NetworkConnection> net;
-    NetworkConnection::Outgoing outgoing;
-    std::vector<std::pair<std::size_t, std::size_t>> last_update;
-  };
-  std::vector<Connection> m_connections;
+  std::vector<std::shared_ptr<NetworkConnection>> m_connections;
   std::string m_identity;
 
   std::atomic_bool m_active;  // set to false to terminate threads

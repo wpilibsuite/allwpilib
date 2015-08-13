@@ -137,6 +137,14 @@ struct NT_RpcDefinition {
   NT_RpcResultDef *results;
 };
 
+/** NetworkTables RPC Call Data */
+struct NT_RpcCallInfo {
+  unsigned int rpc_id;
+  unsigned int call_uid;
+  struct NT_String name;
+  struct NT_String params;
+};
+
 /*
  * Table Functions
  */
@@ -268,18 +276,31 @@ void NT_RemoveConnectionListener(unsigned int conn_listener_uid);
  * Remote Procedure Call Functions
  */
 
-typedef NT_Value **(*NT_RpcCallback)(unsigned int uid, void *data,
-                                     const char *name, size_t name_len,
-                                     const struct NT_Value **params,
-                                     size_t params_len, size_t *results_len);
+typedef char *(*NT_RpcCallback)(void *data, const char *name, size_t name_len,
+                                const char *params, size_t params_len,
+                                size_t *results_len);
 
-unsigned int NT_CreateRpc(const char *name, size_t name_len,
-                          const struct NT_RpcDefinition *def, void *data,
-                          NT_RpcCallback callback);
-void NT_DeleteRpc(unsigned int rpc_uid);
-unsigned int NT_CallRpc(const char *name, size_t name_len,
-                        const struct NT_Value **params, size_t params_len);
-struct NT_Value **NT_GetRpcResult(unsigned int result_uid, size_t *results_len);
+void NT_CreateRpc(const char *name, size_t name_len, const char *def,
+                  size_t def_len, void *data, NT_RpcCallback callback);
+void NT_CreatePolledRpc(const char *name, size_t name_len, const char *def,
+                        size_t def_len);
+
+int NT_PollRpc(int blocking, struct NT_RpcCallInfo* call_info);
+void NT_PostRpcResponse(unsigned int rpc_id, unsigned int call_uid,
+                        const char *result, size_t result_len);
+
+unsigned int NT_CallRpc(const char *name, size_t name_len, const char *params,
+                        size_t params_len);
+char *NT_GetRpcResult(int blocking, unsigned int call_uid, size_t *result_len);
+
+char *NT_PackRpcDefinition(const struct NT_RpcDefinition *def,
+                           size_t *packed_len);
+int NT_UnpackRpcDefinition(const char *packed, size_t packed_len,
+                           struct NT_RpcDefinition *def);
+char *NT_PackRpcValues(const struct NT_Value **values, size_t values_len,
+                       size_t *packed_len);
+struct NT_Value **NT_UnpackRpcValues(const char *packed, size_t packed_len,
+                                     const NT_Type *types, size_t types_len);
 
 /*
  * Client/Server Functions
@@ -318,6 +339,10 @@ void NT_DisposeString(struct NT_String *str);
 void NT_InitString(struct NT_String *str);
 
 void NT_DisposeConnectionInfoArray(struct NT_ConnectionInfo *arr, size_t count);
+
+void NT_DisposeRpcDefinition(struct NT_RpcDefinition *def);
+
+void NT_DisposeRpcCallInfo(struct NT_RpcCallInfo *call_info);
 
 /* timestamp */
 unsigned long long NT_Now(void);

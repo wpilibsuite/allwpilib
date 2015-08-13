@@ -13,10 +13,6 @@ NT_AddEntryListener @10
 NT_RemoveEntryListener @11
 NT_AddConnectionListener @12
 NT_RemoveConnectionListener @13
-NT_CreateRpc @14
-NT_DeleteRpc @15
-NT_CallRpc @16
-NT_GetRpcResult @17
 NT_SetNetworkIdentity @18
 NT_StartServer @19
 NT_StopServer @20
@@ -33,4 +29,15 @@ NT_InitString @30
 NT_DisposeConnectionInfoArray @31
 NT_Now @32
 NT_SetLogger @33
-
+NT_CreateRpc @34
+NT_CreatePolledRpc @35
+NT_PollRpc @36
+NT_PostRpcRepsonse @37
+NT_CallRpc @38
+NT_GetRpcResult @39
+NT_PackRpcDefinition @40
+NT_UnpackRpcDefinition @41
+NT_PackRpcValues @42
+NT_UnpackRpcValues @43
+NT_DisposeRpcDefinition @44
+NT_DisposeRpcCallInfo @45

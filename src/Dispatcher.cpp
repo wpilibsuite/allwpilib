@@ -94,7 +94,7 @@ void DispatcherBase::Stop() {
   if (m_dispatch_thread.joinable()) m_dispatch_thread.join();
   if (m_clientserver_thread.joinable()) m_clientserver_thread.join();
 
-  std::vector<Connection> conns;
+  std::vector<std::shared_ptr<NetworkConnection>> conns;
   {
     std::lock_guard<std::mutex> lock(m_user_mutex);
     conns.swap(m_connections);
@@ -135,21 +135,14 @@ std::vector<ConnectionInfo> DispatcherBase::GetConnections() const {
 
   std::lock_guard<std::mutex> lock(m_user_mutex);
   for (auto& conn : m_connections) {
-    if (conn.net->state() != NetworkConnection::kActive) continue;
-    conns.emplace_back(conn.net->info());
+    if (conn->state() != NetworkConnection::kActive) continue;
+    conns.emplace_back(conn->info());
   }
 
   return conns;
 }
 
 void DispatcherBase::DispatchThreadMain() {
-  // local copy of active m_connections
-  struct ConnectionRef {
-    NetworkConnection* net;
-    NetworkConnection::Outgoing outgoing;
-  };
-  std::vector<ConnectionRef> connections;
-
   auto timeout_time = std::chrono::steady_clock::now();
   int count = 0;
   std::unique_lock<std::mutex> flush_lock(m_flush_mutex);
@@ -171,19 +164,15 @@ void DispatcherBase::DispatchThreadMain() {
       count = 0;
     }
 
-    // make a local copy of the connections list (so we don't hold the lock)
-    connections.resize(0);
     {
       std::lock_guard<std::mutex> user_lock(m_user_mutex);
       bool reconnect = false;
       for (auto& conn : m_connections) {
-        if (conn.net->state() == NetworkConnection::kActive) {
-          connections.push_back(ConnectionRef());
-          connections.back().net = conn.net.get();
-          connections.back().outgoing.swap(conn.outgoing);
-          conn.last_update.resize(0);  // clear "previous" updates
-        }
-        if (!m_server && conn.net->state() == NetworkConnection::kDead)
+        // post outgoing messages if connection is active
+        if (conn->state() == NetworkConnection::kActive) conn->PostOutgoing();
+
+        // if client, reconnect if connection died
+        if (!m_server && conn->state() == NetworkConnection::kDead)
           reconnect = true;
       }
       // reconnect if we disconnected (and a reconnect is not in progress)
@@ -192,105 +181,6 @@ void DispatcherBase::DispatchThreadMain() {
         m_reconnect_cv.notify_one();
       }
     }
-
-    // send outgoing messages
-    for (auto& conn : connections) {
-      if (!conn.outgoing.empty())
-        conn.net->outgoing().emplace(std::move(conn.outgoing));
-    }
-  }
-}
-
-void DispatcherBase::Connection::QueueOutgoing(std::shared_ptr<Message> msg) {
-  // Merge with previous.  One case we don't combine: delete/assign loop.
-  switch (msg->type()) {
-    case Message::kEntryAssign:
-    case Message::kEntryUpdate: {
-      // don't do this for unassigned id's
-      unsigned int id = msg->id();
-      if (id == 0xffff) {
-        outgoing.push_back(msg);
-        break;
-      }
-      if (id < last_update.size() && last_update[id].first != 0) {
-        // overwrite the previous one for this id
-        auto& oldmsg = outgoing[last_update[id].first - 1];
-        if (oldmsg && oldmsg->Is(Message::kEntryAssign) &&
-            msg->Is(Message::kEntryUpdate)) {
-          // need to update assignment with new seq_num and value
-          oldmsg = Message::EntryAssign(oldmsg->str(), id, msg->seq_num_uid(),
-                                        msg->value(), oldmsg->flags());
-        } else
-          oldmsg = msg;  // easy update
-      } else {
-        // new, but remember it
-        std::size_t pos = outgoing.size();
-        outgoing.push_back(msg);
-        if (id >= last_update.size()) last_update.resize(id + 1);
-        last_update[id].first = pos + 1;
-      }
-      break;
-    }
-    case Message::kEntryDelete: {
-      // don't do this for unassigned id's
-      unsigned int id = msg->id();
-      if (id == 0xffff) {
-        outgoing.push_back(msg);
-        break;
-      }
-
-      // clear previous updates
-      if (id < last_update.size()) {
-        if (last_update[id].first != 0) {
-          outgoing[last_update[id].first - 1].reset();
-          last_update[id].first = 0;
-        }
-        if (last_update[id].second != 0) {
-          outgoing[last_update[id].second - 1].reset();
-          last_update[id].second = 0;
-        }
-      }
-
-      // add deletion
-      outgoing.push_back(msg);
-      break;
-    }
-    case Message::kFlagsUpdate: {
-      // don't do this for unassigned id's
-      unsigned int id = msg->id();
-      if (id == 0xffff) {
-        outgoing.push_back(msg);
-        break;
-      }
-      if (id < last_update.size() && last_update[id].second != 0) {
-        // overwrite the previous one for this id
-        outgoing[last_update[id].second - 1] = msg;
-      } else {
-        // new, but remember it
-        std::size_t pos = outgoing.size();
-        outgoing.push_back(msg);
-        if (id >= last_update.size()) last_update.resize(id + 1);
-        last_update[id].second = pos + 1;
-      }
-      break;
-    }
-    case Message::kClearEntries: {
-      // knock out all previous assigns/updates!
-      for (auto& i : outgoing) {
-        if (!i) continue;
-        auto t = i->type();
-        if (t == Message::kEntryAssign || t == Message::kEntryUpdate ||
-            t == Message::kFlagsUpdate || t == Message::kEntryDelete ||
-            t == Message::kClearEntries)
-          i.reset();
-      }
-      last_update.resize(0);
-      outgoing.push_back(msg);
-      break;
-    }
-    default:
-      outgoing.push_back(msg);
-      break;
   }
 }
 
@@ -299,12 +189,12 @@ void DispatcherBase::QueueOutgoing(std::shared_ptr<Message> msg,
                                    NetworkConnection* except) {
   std::lock_guard<std::mutex> user_lock(m_user_mutex);
   for (auto& conn : m_connections) {
-    if (conn.net.get() == except) continue;
-    if (only && conn.net.get() != only) continue;
-    auto state = conn.net->state();
+    if (conn.get() == except) continue;
+    if (only && conn.get() != only) continue;
+    auto state = conn->state();
     if (state != NetworkConnection::kSynchronized &&
         state != NetworkConnection::kActive) continue;
-    conn.QueueOutgoing(msg);
+    conn->QueueOutgoing(msg);
   }
 }
 
@@ -324,18 +214,18 @@ void DispatcherBase::ServerThreadMain() {
 
     // add to connections list
     using namespace std::placeholders;
-    std::unique_ptr<NetworkConnection> conn_unique(new NetworkConnection(
-        std::move(stream),
-        m_notifier,
+    auto conn = std::make_shared<NetworkConnection>(
+        std::move(stream), m_notifier,
         std::bind(&Dispatcher::ServerHandshake, this, _1, _2, _3),
-        std::bind(&Storage::GetEntryType, &m_storage, _1),
-        std::bind(&Storage::ProcessIncoming, &m_storage, _1, _2)));
-    auto conn = conn_unique.get();
+        std::bind(&Storage::GetEntryType, &m_storage, _1));
+    conn->set_process_incoming(
+        std::bind(&Storage::ProcessIncoming, &m_storage, _1, _2,
+                  std::weak_ptr<NetworkConnection>(conn)));
     {
       std::lock_guard<std::mutex> lock(m_user_mutex);
-      m_connections.emplace_back(std::move(conn_unique));
+      m_connections.emplace_back(conn);
+      conn->Start();
     }
-    conn->Start();
   }
 }
 
@@ -353,15 +243,15 @@ void DispatcherBase::ClientThreadMain(
 
     std::unique_lock<std::mutex> lock(m_user_mutex);
     using namespace std::placeholders;
-    std::unique_ptr<NetworkConnection> conn_unique(new NetworkConnection(
-        std::move(stream),
-        m_notifier,
+    auto conn = std::make_shared<NetworkConnection>(
+        std::move(stream), m_notifier,
         std::bind(&Dispatcher::ClientHandshake, this, _1, _2, _3),
-        std::bind(&Storage::GetEntryType, &m_storage, _1),
-        std::bind(&Storage::ProcessIncoming, &m_storage, _1, _2)));
-    auto conn = conn_unique.get();
+        std::bind(&Storage::GetEntryType, &m_storage, _1));
+    conn->set_process_incoming(
+        std::bind(&Storage::ProcessIncoming, &m_storage, _1, _2,
+                  std::weak_ptr<NetworkConnection>(conn)));
     m_connections.resize(0);  // disconnect any current
-    m_connections.emplace_back(std::move(conn_unique));
+    m_connections.emplace_back(conn);
     conn->set_proto_rev(m_reconnect_proto_rev);
     conn->Start();
 
@@ -514,7 +404,8 @@ bool DispatcherBase::ServerHandshake(
       // get the next message (blocks)
       msg = get_msg();
     }
-    for (auto& msg : incoming) m_storage.ProcessIncoming(msg, &conn);
+    for (auto& msg : incoming)
+      m_storage.ProcessIncoming(msg, &conn, std::weak_ptr<NetworkConnection>());
   }
 
   INFO("server: client CONNECTED: " << conn.stream().getPeerIP() << " port "

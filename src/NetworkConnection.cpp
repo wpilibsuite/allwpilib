@@ -17,16 +17,17 @@
 
 using namespace nt;
 
+std::atomic_uint NetworkConnection::s_uid;
+
 NetworkConnection::NetworkConnection(std::unique_ptr<NetworkStream> stream,
                                      Notifier& notifier,
                                      HandshakeFunc handshake,
-                                     Message::GetEntryTypeFunc get_entry_type,
-                                     ProcessIncomingFunc process_incoming)
-    : m_stream(std::move(stream)),
+                                     Message::GetEntryTypeFunc get_entry_type)
+    : m_uid(s_uid.fetch_add(1)),
+      m_stream(std::move(stream)),
       m_notifier(notifier),
       m_handshake(handshake),
-      m_get_entry_type(get_entry_type),
-      m_process_incoming(process_incoming) {
+      m_get_entry_type(get_entry_type) {
   m_active = false;
   m_proto_rev = 0x0300;
   m_state = static_cast<int>(kCreated);
@@ -152,4 +153,107 @@ void NetworkConnection::WriteThreadMain() {
   m_state = static_cast<int>(kDead);
   m_active = false;
   if (m_stream) m_stream->close();  // also kill read thread
+}
+
+void NetworkConnection::QueueOutgoing(std::shared_ptr<Message> msg) {
+  std::lock_guard<std::mutex> lock(m_pending_mutex);
+
+  // Merge with previous.  One case we don't combine: delete/assign loop.
+  switch (msg->type()) {
+    case Message::kEntryAssign:
+    case Message::kEntryUpdate: {
+      // don't do this for unassigned id's
+      unsigned int id = msg->id();
+      if (id == 0xffff) {
+        m_pending_outgoing.push_back(msg);
+        break;
+      }
+      if (id < m_pending_update.size() && m_pending_update[id].first != 0) {
+        // overwrite the previous one for this id
+        auto& oldmsg = m_pending_outgoing[m_pending_update[id].first - 1];
+        if (oldmsg && oldmsg->Is(Message::kEntryAssign) &&
+            msg->Is(Message::kEntryUpdate)) {
+          // need to update assignment with new seq_num and value
+          oldmsg = Message::EntryAssign(oldmsg->str(), id, msg->seq_num_uid(),
+                                        msg->value(), oldmsg->flags());
+        } else
+          oldmsg = msg;  // easy update
+      } else {
+        // new, but remember it
+        std::size_t pos = m_pending_outgoing.size();
+        m_pending_outgoing.push_back(msg);
+        if (id >= m_pending_update.size()) m_pending_update.resize(id + 1);
+        m_pending_update[id].first = pos + 1;
+      }
+      break;
+    }
+    case Message::kEntryDelete: {
+      // don't do this for unassigned id's
+      unsigned int id = msg->id();
+      if (id == 0xffff) {
+        m_pending_outgoing.push_back(msg);
+        break;
+      }
+
+      // clear previous updates
+      if (id < m_pending_update.size()) {
+        if (m_pending_update[id].first != 0) {
+          m_pending_outgoing[m_pending_update[id].first - 1].reset();
+          m_pending_update[id].first = 0;
+        }
+        if (m_pending_update[id].second != 0) {
+          m_pending_outgoing[m_pending_update[id].second - 1].reset();
+          m_pending_update[id].second = 0;
+        }
+      }
+
+      // add deletion
+      m_pending_outgoing.push_back(msg);
+      break;
+    }
+    case Message::kFlagsUpdate: {
+      // don't do this for unassigned id's
+      unsigned int id = msg->id();
+      if (id == 0xffff) {
+        m_pending_outgoing.push_back(msg);
+        break;
+      }
+      if (id < m_pending_update.size() && m_pending_update[id].second != 0) {
+        // overwrite the previous one for this id
+        m_pending_outgoing[m_pending_update[id].second - 1] = msg;
+      } else {
+        // new, but remember it
+        std::size_t pos = m_pending_outgoing.size();
+        m_pending_outgoing.push_back(msg);
+        if (id >= m_pending_update.size()) m_pending_update.resize(id + 1);
+        m_pending_update[id].second = pos + 1;
+      }
+      break;
+    }
+    case Message::kClearEntries: {
+      // knock out all previous assigns/updates!
+      for (auto& i : m_pending_outgoing) {
+        if (!i) continue;
+        auto t = i->type();
+        if (t == Message::kEntryAssign || t == Message::kEntryUpdate ||
+            t == Message::kFlagsUpdate || t == Message::kEntryDelete ||
+            t == Message::kClearEntries)
+          i.reset();
+      }
+      m_pending_update.resize(0);
+      m_pending_outgoing.push_back(msg);
+      break;
+    }
+    default:
+      m_pending_outgoing.push_back(msg);
+      break;
+  }
+}
+
+void NetworkConnection::PostOutgoing() {
+  std::lock_guard<std::mutex> lock(m_pending_mutex);
+  if (m_pending_outgoing.empty()) return;
+  m_outgoing.emplace(std::move(m_pending_outgoing));
+  m_pending_outgoing.resize(0);
+  m_pending_update.resize(0);
 }

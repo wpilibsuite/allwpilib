@@ -16,11 +16,13 @@
 #include <mutex>
 #include <vector>
 
+#include "llvm/DenseMap.h"
 #include "llvm/StringMap.h"
 #include "atomic_static.h"
 #include "Message.h"
 #include "Notifier.h"
 #include "ntcore_cpp.h"
+#include "RpcServer.h"
 #include "SequenceNumber.h"
 
 namespace nt {
@@ -46,7 +48,8 @@ class Storage {
 
   NT_Type GetEntryType(unsigned int id) const;
 
-  void ProcessIncoming(std::shared_ptr<Message> msg, NetworkConnection* conn);
+  void ProcessIncoming(std::shared_ptr<Message> msg, NetworkConnection* conn,
+                       std::weak_ptr<NetworkConnection> conn_weak);
   void GetInitialAssignments(NetworkConnection& conn,
                              std::vector<std::shared_ptr<Message>>* msgs);
   void ApplyInitialAssignments(NetworkConnection& conn,
@@ -72,14 +75,23 @@ class Storage {
       std::istream& is,
       std::function<void(std::size_t line, const char* msg)> warn);
 
+  // RPC configuration needs to come through here as RPC definitions are
+  // actually special Storage value types.
+  void CreateRpc(StringRef name, StringRef def, RpcCallback callback);
+  void CreatePolledRpc(StringRef name, StringRef def);
+
+  unsigned int CallRpc(StringRef name, StringRef params);
+  bool GetRpcResult(bool blocking, unsigned int call_uid, std::string* result);
+
  private:
-  Storage() : Storage(Notifier::GetInstance()) {}
-  Storage(Notifier& notifier);
+  Storage() : Storage(Notifier::GetInstance(), RpcServer::GetInstance()) {}
+  Storage(Notifier& notifier, RpcServer& rpcserver);
   Storage(const Storage&) = delete;
   Storage& operator=(const Storage&) = delete;
 
   struct Entry {
-    Entry(llvm::StringRef name_) : name(name_), flags(0), id(0xffff) {}
+    Entry(llvm::StringRef name_)
+        : name(name_), flags(0), id(0xffff), rpc_call_uid(0) {}
     bool IsPersistent() const { return (flags & NT_PERSISTENT) != 0; }
 
     std::string name;
@@ -87,18 +99,26 @@ class Storage {
     unsigned int flags;
     unsigned int id;
     SequenceNumber seq_num;
+    RpcCallback rpc_callback;
+    unsigned int rpc_call_uid;
   };
 
   typedef llvm::StringMap<std::unique_ptr<Entry>> EntriesMap;
   typedef std::vector<Entry*> IdMap;
+  typedef llvm::DenseMap<std::pair<unsigned int, unsigned int>, std::string>
+      RpcResultMap;
 
   mutable std::mutex m_mutex;
   EntriesMap m_entries;
   IdMap m_idmap;
+  RpcResultMap m_rpc_results;
+  std::atomic_bool m_terminating;
+  std::condition_variable m_rpc_results_cond;
 
   QueueOutgoingFunc m_queue_outgoing;
-  bool m_server;
+  bool m_server = true;
   Notifier& m_notifier;
+  RpcServer& m_rpc_server;
 
   ATOMIC_STATIC_DECL(Storage)
 };

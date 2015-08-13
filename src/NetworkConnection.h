@@ -39,9 +39,13 @@ class NetworkConnection {
   NetworkConnection(std::unique_ptr<NetworkStream> stream,
                     Notifier& notifier,
                     HandshakeFunc handshake,
-                    Message::GetEntryTypeFunc get_entry_type,
-                    ProcessIncomingFunc process_incoming);
+                    Message::GetEntryTypeFunc get_entry_type);
   ~NetworkConnection();
+
+  // Set the input processor function.  This must be called before Start().
+  void set_process_incoming(ProcessIncomingFunc func) {
+    m_process_incoming = func;
+  }
 
   void Start();
   void Stop();
@@ -50,7 +54,11 @@ class NetworkConnection {
 
   bool active() const { return m_active; }
   NetworkStream& stream() { return *m_stream; }
-  OutgoingQueue& outgoing() { return m_outgoing; }
+
+  void QueueOutgoing(std::shared_ptr<Message> msg);
+  void PostOutgoing();
+
+  unsigned int uid() const { return m_uid; }
 
   unsigned int proto_rev() const { return m_proto_rev; }
   void set_proto_rev(unsigned int proto_rev) { m_proto_rev = proto_rev; }
@@ -70,6 +78,9 @@ class NetworkConnection {
   void ReadThreadMain();
   void WriteThreadMain();
 
+  static std::atomic_uint s_uid;
+
+  unsigned int m_uid;
   std::unique_ptr<NetworkStream> m_stream;
   Notifier& m_notifier;
   OutgoingQueue m_outgoing;
@@ -84,6 +95,10 @@ class NetworkConnection {
   mutable std::mutex m_remote_id_mutex;
   std::string m_remote_id;
   std::atomic_ullong m_last_update;
+
+  std::mutex m_pending_mutex;
+  Outgoing m_pending_outgoing;
+  std::vector<std::pair<std::size_t, std::size_t>> m_pending_update;
 };
 
 }  // namespace nt

@@ -15,7 +15,10 @@
 #include "Dispatcher.h"
 #include "Log.h"
 #include "Notifier.h"
+#include "RpcServer.h"
 #include "Storage.h"
+#include "WireDecoder.h"
+#include "WireEncoder.h"
 
 namespace nt {
 
@@ -91,20 +94,111 @@ void RemoveConnectionListener(unsigned int conn_listener_uid) {
  * Remote Procedure Call Functions
  */
 
-unsigned int CreateRpc(StringRef name, const RpcDefinition& def,
-                       RpcCallback callback) {
-  return 0;
+void CreateRpc(StringRef name, StringRef def, RpcCallback callback) {
+  Storage::GetInstance().CreateRpc(name, def, callback);
 }
 
-void DeleteRpc(unsigned int rpc_uid) {}
-
-unsigned int CallRpc(StringRef name,
-                     ArrayRef<std::shared_ptr<Value>> params) {
-  return 0;
+void CreatePolledRpc(StringRef name, StringRef def) {
+  Storage::GetInstance().CreatePolledRpc(name, def);
 }
 
-std::vector<std::shared_ptr<Value>> GetRpcResult(unsigned int result_uid) {
-  return std::vector<std::shared_ptr<Value>>();
+bool PollRpc(bool blocking, RpcCallInfo* call_info) {
+  return RpcServer::GetInstance().PollRpc(blocking, call_info);
+}
+
+void PostRpcResponse(unsigned int rpc_id, unsigned int call_uid,
+                     StringRef result) {
+  RpcServer::GetInstance().PostRpcResponse(rpc_id, call_uid, result);
+}
+
+unsigned int CallRpc(StringRef name, StringRef params) {
+  return Storage::GetInstance().CallRpc(name, params);
+}
+
+bool GetRpcResult(bool blocking, unsigned int call_uid, std::string* result) {
+  return Storage::GetInstance().GetRpcResult(blocking, call_uid, result);
+}
+
+std::string PackRpcDefinition(const RpcDefinition& def) {
+  WireEncoder enc(0x0300);
+  enc.Write8(def.version);
+  enc.WriteString(def.name);
+
+  // parameters
+  unsigned int params_size = def.params.size();
+  if (params_size > 0xff) params_size = 0xff;
+  enc.Write8(params_size);
+  for (std::size_t i = 0; i < params_size; ++i) {
+    enc.WriteType(def.params[i].def_value->type());
+    enc.WriteString(def.params[i].name);
+    enc.WriteValue(*def.params[i].def_value);
+  }
+
+  // results
+  unsigned int results_size = def.results.size();
+  if (results_size > 0xff) results_size = 0xff;
+  enc.Write8(results_size);
+  for (std::size_t i = 0; i < results_size; ++i) {
+    enc.WriteType(def.results[i].type);
+    enc.WriteString(def.results[i].name);
+  }
+
+  return enc.ToStringRef();
+}
+
+bool UnpackRpcDefinition(StringRef packed, RpcDefinition* def) {
+  raw_mem_istream is(packed.data(), packed.size());
+  WireDecoder dec(is, 0x0300);
+  if (!dec.Read8(&def->version)) return false;
+  if (!dec.ReadString(&def->name)) return false;
+
+  // parameters
+  unsigned int params_size;
+  if (!dec.Read8(&params_size)) return false;
+  def->params.resize(0);
+  def->params.reserve(params_size);
+  for (std::size_t i = 0; i < params_size; ++i) {
+    RpcParamDef pdef;
+    NT_Type type;
+    if (!dec.ReadType(&type)) return false;
+    if (!dec.ReadString(&pdef.name)) return false;
+    pdef.def_value = dec.ReadValue(type);
+    if (!pdef.def_value) return false;
+    def->params.emplace_back(std::move(pdef));
+  }
+
+  // results
+  unsigned int results_size;
+  if (!dec.Read8(&results_size)) return false;
+  def->results.resize(0);
+  def->results.reserve(results_size);
+  for (std::size_t i = 0; i < results_size; ++i) {
+    RpcResultDef rdef;
+    if (!dec.ReadType(&rdef.type)) return false;
+    if (!dec.ReadString(&rdef.name)) return false;
+    def->results.emplace_back(std::move(rdef));
+  }
+
+  return true;
+}
+
+std::string PackRpcValues(ArrayRef<std::shared_ptr<Value>> values) {
+  WireEncoder enc(0x0300);
+  for (auto& value : values) enc.WriteValue(*value);
+  return enc.ToStringRef();
+}
+
+std::vector<std::shared_ptr<Value>> UnpackRpcValues(StringRef packed,
+                                                    ArrayRef<NT_Type> types) {
+  raw_mem_istream is(packed.data(), packed.size());
+  WireDecoder dec(is, 0x0300);
+  std::vector<std::shared_ptr<Value>> vec;
+  for (auto type : types) {
+    auto item = dec.ReadValue(type);
+    if (!item) return std::vector<std::shared_ptr<Value>>();
+    vec.emplace_back(std::move(item));
+  }
+  return vec;
 }
 
 /*
