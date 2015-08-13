@@ -280,6 +280,13 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 		m_pidSource = pidSource;
 	}
 
+    /**
+     * {@inheritDoc}
+     */
+    public PIDSourceParameter getPIDSourceParameter() {
+      return m_pidSource;
+    }
+
 	/**
 	 * Implement the PIDSource interface.
 	 *

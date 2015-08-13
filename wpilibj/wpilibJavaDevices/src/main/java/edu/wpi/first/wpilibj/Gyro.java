@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.util.BoundaryException;
 
 /**
  * Use a rate gyro to return the robots heading relative to a starting position.
@@ -35,7 +34,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
   int m_center;
   boolean m_channelAllocated = false;
   AccumulatorResult result;
-  private PIDSourceParameter m_pidSource;
+  private PIDSourceType m_pidSource;
 
   /**
    * Initialize the gyro. Calibrate the gyro by running for a number of samples
@@ -73,7 +72,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 
     setDeadband(0.0);
 
-    setPIDSourceParameter(PIDSourceParameter.kAngle);
+    setPIDSourceType(PIDSourceType.kDisplacement);
 
     UsageReporting.report(tResourceType.kResourceType_Gyro, m_analog.getChannel());
     LiveWindow.addSensor("Gyro", m_analog.getChannel(), this);
@@ -199,27 +198,33 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 
   /**
    * Set which parameter of the gyro you are using as a process control
-   * variable. The Gyro class supports the rate and angle parameters
+   * variable. The Gyro class supports the rate and displacement parameters
    *
    * @param pidSource An enum to select the parameter.
    */
-  public void setPIDSourceParameter(PIDSourceParameter pidSource) {
-    BoundaryException.assertWithinBounds(pidSource.value, 1, 2);
+  public void setPIDSourceType(PIDSourceType pidSource) {
     m_pidSource = pidSource;
   }
 
   /**
+   * {@inheritDoc}
+   */
+  public PIDSourceType getPIDSourceType() {
+    return m_pidSource;
+  }
+
+  /**
    * Get the output of the gyro for use with PIDControllers. May be the angle or
-   * rate depending on the set PIDSourceParameter
+   * rate depending on the set PIDSourceType
    *
    * @return the output according to the gyro
    */
   @Override
   public double pidGet() {
-    switch (m_pidSource.value) {
-      case PIDSourceParameter.kRate_val:
+    switch (m_pidSource) {
+      case kRate:
         return getRate();
-      case PIDSourceParameter.kAngle_val:
+      case kDisplacement:
         return getAngle();
       default:
         return 0.0;

@@ -118,6 +118,13 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 		m_pidSource = pidSource;
 	}
 
+    /**
+     * {@inheritDoc}
+     */
+    public PIDSourceParameter getPIDSourceParameter() {
+      return m_pidSource;
+    }
+
 	/**
 	 * Get the angle of the gyro for use with PIDControllers
 	 *

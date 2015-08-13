@@ -167,7 +167,8 @@ public class MotorEncoderTest extends AbstractComsSetup {
 
 
   @Test
-  public void testPIDController() {
+  public void testPositionPIDController() {
+    me.getEncoder().setPIDSourceType(PIDSourceType.kDisplacement);
     PIDController pid = new PIDController(0.003, 0.001, 0, me.getEncoder(), me.getMotor());
     pid.setAbsoluteTolerance(50);
     pid.setOutputRange(-0.2, 0.2);
@@ -184,6 +185,26 @@ public class MotorEncoderTest extends AbstractComsSetup {
     pid.free();
   }
 
+  @Test
+  public void testVelocityPIDController() {
+    me.getEncoder().setPIDSourceType(PIDSourceType.kRate);
+    PIDController pid =
+        new PIDController(1e-5, 0.0, 3e-5, 8e-5, me.getEncoder(), me.getMotor());
+    pid.setAbsoluteTolerance(200);
+    pid.setToleranceBuffer(50);
+    pid.setOutputRange(-0.3, 0.3);
+    pid.setSetpoint(2000);
+
+    pid.enable();
+    Timer.delay(10.0);
+    pid.disable();
+
+    assertTrue(
+        "PID loop did not reach setpoint within 10 seconds. The error was: " + pid.getAvgError(),
+        pid.onTarget());
+
+    pid.free();
+  }
 
   /**
    * Checks to see if the encoders and counters are appropriately reset to zero

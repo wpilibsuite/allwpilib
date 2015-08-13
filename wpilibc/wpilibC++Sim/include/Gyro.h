@@ -38,10 +38,10 @@ public:
 	virtual ~Gyro() = default;
 	virtual float GetAngle() const;
 	virtual double GetRate() const;
-	void SetPIDSourceParameter(PIDSourceParameter pidSource);
 	virtual void Reset();
 
 	// PIDSource interface
+	void SetPIDSourceType(PIDSourceType pidSource) override;
 	double PIDGet() const override;
 
 	void UpdateTable() override;
@@ -55,7 +55,6 @@ private:
 	void InitGyro(int channel);
 
 	SimGyro* impl;
-	PIDSourceParameter m_pidSource;
 
 	std::shared_ptr<ITable> m_table = nullptr;
 };

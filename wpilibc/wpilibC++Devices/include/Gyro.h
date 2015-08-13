@@ -49,7 +49,6 @@ class Gyro : public SensorBase, public PIDSource, public LiveWindowSendable {
   virtual double GetRate() const;
   void SetSensitivity(float voltsPerDegreePerSecond);
   void SetDeadband(float volts);
-  void SetPIDSourceParameter(PIDSourceParameter pidSource);
   virtual void Reset();
   void InitGyro();
 
@@ -70,7 +69,6 @@ class Gyro : public SensorBase, public PIDSource, public LiveWindowSendable {
   float m_voltsPerDegreePerSecond;
   float m_offset;
   uint32_t m_center;
-  PIDSourceParameter m_pidSource;
 
   std::shared_ptr<ITable> m_table = nullptr;
 };

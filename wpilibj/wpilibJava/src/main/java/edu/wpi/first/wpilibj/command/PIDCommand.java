@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj.command;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PIDSource;
+import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 
@@ -37,6 +38,11 @@ public abstract class PIDCommand extends Command implements Sendable {
   };
   /** A source which calls {@link PIDCommand#returnPIDInput()} */
   private PIDSource source = new PIDSource() {
+    public void setPIDSourceType(PIDSourceType pidSource) {}
+
+    public PIDSourceType getPIDSourceType() {
+      return PIDSourceType.kDisplacement;
+    }
 
     public double pidGet() {
       return returnPIDInput();

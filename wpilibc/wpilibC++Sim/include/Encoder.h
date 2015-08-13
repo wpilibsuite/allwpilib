@@ -53,7 +53,7 @@ public:
 	void SetReverseDirection(bool reverseDirection);
 	void SetSamplesToAverage(int samplesToAverage);
 	int GetSamplesToAverage() const;
-	void SetPIDSourceParameter(PIDSourceParameter pidSource);
+	void SetPIDSourceType(PIDSourceType pidSource);
 	double PIDGet() const override;
 
 	void UpdateTable() override;
@@ -80,7 +80,6 @@ private:
 	double m_distancePerPulse;		// distance of travel for each encoder tick
 	EncodingType m_encodingType;	// Encoding type
 	int32_t m_encodingScale;		// 1x, 2x, or 4x, per the encodingType
-	PIDSourceParameter m_pidSource;	// Encoder parameter that sources a PID controller
 	bool m_reverseDirection;
 	SimEncoder* impl;
 

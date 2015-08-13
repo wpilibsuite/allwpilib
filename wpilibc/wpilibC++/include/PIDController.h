@@ -10,13 +10,16 @@
 #include "Controller.h"
 #include "LiveWindow/LiveWindow.h"
 #include "PIDInterface.h"
-#include "HAL/cpp/priority_mutex.h"
+#include "PIDSource.h"
 #include "Notifier.h"
+#include "HAL/cpp/priority_mutex.h"
 
 #include <memory>
 
+#include <atomic>
+#include <queue>
+
 class PIDOutput;
-class PIDSource;
 
 /**
  * Class implements a PID Control Loop.
@@ -53,10 +56,15 @@ class PIDController : public LiveWindowSendable,
   virtual double GetSetpoint() const override;
 
   virtual float GetError() const;
+  virtual float GetAvgError() const;
+
+  virtual void SetPIDSourceType(PIDSourceType pidSource);
+  virtual PIDSourceType GetPIDSourceType() const;
 
   virtual void SetTolerance(float percent);
   virtual void SetAbsoluteTolerance(float absValue);
   virtual void SetPercentTolerance(float percentValue);
+  virtual void SetToleranceBuffer(unsigned buf = 1);
   virtual bool OnTarget() const;
 
   virtual void Enable() override;
@@ -66,6 +74,13 @@ class PIDController : public LiveWindowSendable,
   virtual void Reset() override;
 
   virtual void InitTable(std::shared_ptr<ITable> table) override;
+
+ protected:
+  PIDSource *m_pidInput;
+  PIDOutput *m_pidOutput;
+
+  std::shared_ptr<ITable> m_table;
+  virtual void Calculate();
 
  private:
   float m_P;              // factor for "proportional" control
@@ -86,17 +101,20 @@ class PIDController : public LiveWindowSendable,
     kPercentTolerance,
     kNoTolerance
   } m_toleranceType = kNoTolerance;
-  float m_tolerance = 0.05;  // the percetage or absolute error that is considered on
-                      // target
+
+  // the percetage or absolute error that is considered on target.
+  float m_tolerance = 0.05;
   float m_setpoint = 0;
   float m_error;
   float m_result = 0;
   float m_period;
 
-  mutable priority_mutex m_mutex;
+  // Length of buffer for averaging for tolerances.
+  std::atomic<unsigned> m_bufLength{1};
+  std::queue<double> m_buf;
+  double m_bufTotal = 0;
 
-  PIDSource *m_pidInput;
-  PIDOutput *m_pidOutput;
+  mutable priority_mutex m_mutex;
 
   std::unique_ptr<Notifier> m_controlLoop;
 
@@ -111,8 +129,4 @@ class PIDController : public LiveWindowSendable,
   virtual void UpdateTable() override;
   virtual void StartLiveWindowMode() override;
   virtual void StopLiveWindowMode() override;
-
- protected:
-  std::shared_ptr<ITable> m_table = nullptr;
-  virtual void Calculate();
 };

@@ -476,27 +476,16 @@ int Encoder::GetSamplesToAverage() const {
 }
 
 /**
- * Set which parameter of the encoder you are using as a process control
- * variable.
- *
- * @param pidSource An enum to select the parameter.
- */
-void Encoder::SetPIDSourceParameter(PIDSourceParameter pidSource) {
-  if (StatusIsFatal()) return;
-  m_pidSource = pidSource;
-}
-
-/**
  * Implement the PIDSource interface.
  *
  * @return The current value of the selected source parameter.
  */
 double Encoder::PIDGet() const {
   if (StatusIsFatal()) return 0.0;
-  switch (m_pidSource) {
-    case kDistance:
+  switch (GetPIDSourceType()) {
+    case PIDSourceType::kDisplacement:
       return GetDistance();
-    case kRate:
+    case PIDSourceType::kRate:
       return GetRate();
     default:
       return 0.0;

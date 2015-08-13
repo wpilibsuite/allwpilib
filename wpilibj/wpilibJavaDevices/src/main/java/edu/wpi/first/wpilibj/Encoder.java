@@ -59,7 +59,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
   private boolean m_allocatedA;
   private boolean m_allocatedB;
   private boolean m_allocatedI;
-  private PIDSourceParameter m_pidSource;
+  private PIDSourceType m_pidSource;
 
   /**
    * Common initialization code for Encoders. This code allocates resources for
@@ -77,8 +77,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    *        exactly match the spec'd count or be double (2x) the spec'd count.
    */
   private void initEncoder(boolean reverseDirection) {
-    switch (m_encodingType.value) {
-      case EncodingType.k4X_val:
+    switch (m_encodingType) {
+      case k4X:
         m_encodingScale = 4;
         ByteBuffer status = ByteBuffer.allocateDirect(4);
         // set the byte order
@@ -97,15 +97,15 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
         m_counter = null;
         setMaxPeriod(.5);
         break;
-      case EncodingType.k2X_val:
-      case EncodingType.k1X_val:
+      case k2X:
+      case k1X:
         m_encodingScale = m_encodingType == EncodingType.k1X ? 1 : 2;
         m_counter = new Counter(m_encodingType, m_aSource, m_bSource, reverseDirection);
         m_index = m_counter.getFPGAIndex();
         break;
     }
     m_distancePerPulse = 1.0;
-    m_pidSource = PIDSourceParameter.kDistance;
+    m_pidSource = PIDSourceType.kDisplacement;
 
     UsageReporting.report(tResourceType.kResourceType_Encoder, m_index, m_encodingType.value);
     LiveWindow.addSensor("Encoder", m_aSource.getChannelForRouting(), this);
@@ -526,12 +526,12 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * pulses.
    */
   private double decodingScaleFactor() {
-    switch (m_encodingType.value) {
-      case EncodingType.k1X_val:
+    switch (m_encodingType) {
+      case k1X:
         return 1.0;
-      case EncodingType.k2X_val:
+      case k2X:
         return 0.5;
-      case EncodingType.k4X_val:
+      case k4X:
         return 0.25;
       default:
         // This is never reached, EncodingType enum limits values
@@ -611,8 +611,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @param samplesToAverage The number of samples to average from 1 to 127.
    */
   public void setSamplesToAverage(int samplesToAverage) {
-    switch (m_encodingType.value) {
-      case EncodingType.k4X_val:
+    switch (m_encodingType) {
+      case k4X:
         ByteBuffer status = ByteBuffer.allocateDirect(4);
         // set the byte order
         status.order(ByteOrder.LITTLE_ENDIAN);
@@ -622,8 +622,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
         }
         HALUtil.checkStatus(status.asIntBuffer());
         break;
-      case EncodingType.k1X_val:
-      case EncodingType.k2X_val:
+      case k1X:
+      case k2X:
         m_counter.setSamplesToAverage(samplesToAverage);
     }
   }
@@ -637,16 +637,16 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    *         127)
    */
   public int getSamplesToAverage() {
-    switch (m_encodingType.value) {
-      case EncodingType.k4X_val:
+    switch (m_encodingType) {
+      case k4X:
         ByteBuffer status = ByteBuffer.allocateDirect(4);
         // set the byte order
         status.order(ByteOrder.LITTLE_ENDIAN);
         int value = EncoderJNI.getEncoderSamplesToAverage(m_encoder, status.asIntBuffer());
         HALUtil.checkStatus(status.asIntBuffer());
         return value;
-      case EncodingType.k1X_val:
-      case EncodingType.k2X_val:
+      case k1X:
+      case k2X:
         return m_counter.getSamplesToAverage();
     }
     return 1;
@@ -658,9 +658,15 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    *
    * @param pidSource An enum to select the parameter.
    */
-  public void setPIDSourceParameter(PIDSourceParameter pidSource) {
-    BoundaryException.assertWithinBounds(pidSource.value, 0, 1);
+  public void setPIDSourceType(PIDSourceType pidSource) {
     m_pidSource = pidSource;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public PIDSourceType getPIDSourceType() {
+    return m_pidSource;
   }
 
   /**
@@ -669,10 +675,10 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @return The current value of the selected source parameter.
    */
   public double pidGet() {
-    switch (m_pidSource.value) {
-      case PIDSourceParameter.kDistance_val:
+    switch (m_pidSource) {
+      case kDisplacement:
         return getDistance();
-      case PIDSourceParameter.kRate_val:
+      case kRate:
         return getRate();
       default:
         return 0.0;
@@ -745,8 +751,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * Live Window code, only does anything if live window is activated.
    */
   public String getSmartDashboardType() {
-    switch (m_encodingType.value) {
-      case EncodingType.k4X_val:
+    switch (m_encodingType) {
+      case k4X:
         return "Quadrature Encoder";
       default:
         return "Encoder";

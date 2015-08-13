@@ -26,6 +26,7 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
   private double m_voltsPerG = 1.0;
   private double m_zeroGVoltage = 2.5;
   private boolean m_allocatedChannel;
+  protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
   /**
    * Common initialization
@@ -110,6 +111,20 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
    */
   public void setZero(double zero) {
     m_zeroGVoltage = zero;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void setPIDSourceType(PIDSourceType pidSource) {
+    m_pidSource = pidSource;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public PIDSourceType getPIDSourceType() {
+    return m_pidSource;
   }
 
   /**

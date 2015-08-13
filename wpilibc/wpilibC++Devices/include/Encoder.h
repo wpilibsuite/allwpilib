@@ -83,7 +83,6 @@ class Encoder : public SensorBase,
   void SetReverseDirection(bool reverseDirection);
   void SetSamplesToAverage(int samplesToAverage);
   int GetSamplesToAverage() const;
-  void SetPIDSourceParameter(PIDSourceParameter pidSource);
   double PIDGet() const override;
 
   void SetIndexSource(uint32_t channel, IndexingType type = kResetOnRisingEdge);
@@ -115,8 +114,6 @@ class Encoder : public SensorBase,
       nullptr;                     // Counter object for 1x and 2x encoding
   EncodingType m_encodingType;     // Encoding type
   int32_t m_encodingScale;         // 1x, 2x, or 4x, per the encodingType
-  PIDSourceParameter
-      m_pidSource = kDistance; // Encoder parameter that sources a PID controller
 
   std::shared_ptr<ITable> m_table = nullptr;
 };

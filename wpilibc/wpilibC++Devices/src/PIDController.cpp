@@ -127,20 +127,37 @@ void PIDController::Calculate() {
         }
       }
 
-      if (m_I != 0) {
-        double potentialIGain = (m_totalError + m_error) * m_I;
-        if (potentialIGain < m_maximumOutput) {
-          if (potentialIGain > m_minimumOutput)
-            m_totalError += m_error;
-          else
-            m_totalError = m_minimumOutput / m_I;
-        } else {
-          m_totalError = m_maximumOutput / m_I;
+      if (m_pidInput->GetPIDSourceType() == PIDSourceType::kRate) {
+        if (m_P != 0) {
+          double potentialPGain = (m_totalError + m_error) * m_P;
+          if (potentialPGain < m_maximumOutput) {
+            if (potentialPGain > m_minimumOutput)
+              m_totalError += m_error;
+            else
+              m_totalError = m_minimumOutput / m_P;
+          } else {
+            m_totalError = m_maximumOutput / m_P;
+          }
         }
-      }
 
-      m_result = m_P * m_error + m_I * m_totalError +
-                 m_D * (m_prevInput - input) + m_setpoint * m_F;
+        m_result = m_D * m_error + m_P * m_totalError + m_setpoint * m_F;
+      }
+      else {
+        if (m_I != 0) {
+          double potentialIGain = (m_totalError + m_error) * m_I;
+          if (potentialIGain < m_maximumOutput) {
+            if (potentialIGain > m_minimumOutput)
+              m_totalError += m_error;
+            else
+              m_totalError = m_minimumOutput / m_I;
+          } else {
+            m_totalError = m_maximumOutput / m_I;
+          }
+        }
+
+        m_result = m_P * m_error + m_I * m_totalError +
+                   m_D * (m_prevInput - input) + m_setpoint * m_F;
+      }
       m_prevInput = input;
 
       if (m_result > m_maximumOutput)
@@ -152,6 +169,15 @@ void PIDController::Calculate() {
       result = m_result;
 
       pidOutput->PIDWrite(result);
+
+      // Update the buffer.
+      m_buf.push(m_error);
+      m_bufTotal += m_error;
+      // Remove old elements when buffer is full.
+      if (m_buf.size() > m_bufLength) {
+        m_bufTotal -= m_buf.front();
+        m_buf.pop();
+      }
     }
   }
 }
@@ -293,6 +319,7 @@ void PIDController::SetOutputRange(float minimumOutput, float maximumOutput) {
 
 /**
  * Set the setpoint for the PIDController
+ * Clears the queue for GetAvgError().
  * @param setpoint the desired setpoint
  */
 void PIDController::SetSetpoint(float setpoint) {
@@ -308,6 +335,9 @@ void PIDController::SetSetpoint(float setpoint) {
     } else {
       m_setpoint = setpoint;
     }
+
+    // Clear m_buf.
+    m_buf = std::queue<double>();
   }
 
   if (m_table != nullptr) {
@@ -325,7 +355,7 @@ double PIDController::GetSetpoint() const {
 }
 
 /**
- * Retruns the current difference of the input from the setpoint
+ * Returns the current difference of the input from the setpoint
  * @return the current error
  */
 float PIDController::GetError() const {
@@ -335,6 +365,36 @@ float PIDController::GetError() const {
     pidInput = m_pidInput->PIDGet();
   }
   return GetSetpoint() - pidInput;
+}
+
+/**
+ * Sets what type of input the PID controller will use
+ */
+void PIDController::SetPIDSourceType(PIDSourceType pidSource) {
+  m_pidInput->SetPIDSourceType(pidSource);
+}
+/**
+ * Returns the type of input the PID controller is using
+ * @return the PID controller input type
+ */
+PIDSourceType PIDController::GetPIDSourceType() const {
+  return m_pidInput->GetPIDSourceType();
+}
+
+/**
+ * Returns the current average of the error over the past few iterations.
+ * You can specify the number of iterations to average with SetToleranceBuffer()
+ * (defaults to 1). This is the same value that is used for OnTarget().
+ * @return the average error
+ */
+float PIDController::GetAvgError() const {
+  float avgError = 0;
+  {
+    std::unique_lock<priority_mutex> sync(m_mutex);
+    // Don't divide by zero.
+    if (m_buf.size()) avgError = m_bufTotal / m_buf.size();
+  }
+  return avgError;
 }
 
 /*
@@ -377,6 +437,25 @@ void PIDController::SetAbsoluteTolerance(float absTolerance) {
 }
 
 /*
+ * Set the number of previous error samples to average for tolerancing. When
+ * determining whether a mechanism is on target, the user may want to use a
+ * rolling average of previous measurements instead of a precise position or
+ * velocity. This is useful for noisy sensors which return a few erroneous
+ * measurements when the mechanism is on target. However, the mechanism will
+ * not register as on target for at least the specified bufLength cycles.
+ * @param bufLength Number of previous cycles to average. Defaults to 1.
+ */
+void PIDController::SetToleranceBuffer(unsigned bufLength) {
+  m_bufLength = bufLength;
+
+  // Cut the buffer down to size if needed.
+  while (m_buf.size() > bufLength) {
+    m_bufTotal -= m_buf.front();
+    m_buf.pop();
+  }
+}
+
+/*
  * Return true if the error is within the percentage of the total input range,
  * determined by SetTolerance. This asssumes that the maximum and minimum input
  * were set using SetInput.
@@ -386,7 +465,7 @@ void PIDController::SetAbsoluteTolerance(float absTolerance) {
  * time.
  */
 bool PIDController::OnTarget() const {
-  double error = GetError();
+  double error = GetAvgError();
 
   std::unique_lock<priority_mutex> sync(m_mutex);
   switch (m_toleranceType) {

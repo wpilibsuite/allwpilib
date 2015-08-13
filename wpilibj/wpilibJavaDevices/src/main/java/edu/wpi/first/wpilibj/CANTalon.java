@@ -16,6 +16,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
     CANSpeedController, LiveWindowSendable {
   private MotorSafetyHelper m_safetyHelper;
   private boolean isInverted = false;
+  protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
   public enum TalonControlMode {
     PercentVbus(0), Follower(5), Voltage(4), Position(1), Speed(2), Current(3), Disabled(15);
@@ -121,6 +122,20 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, PIDInterface
     } else {
       throw new IllegalStateException("PID only supported in PercentVbus mode");
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void setPIDSourceType(PIDSourceType pidSource) {
+    m_pidSource = pidSource;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public PIDSourceType getPIDSourceType() {
+    return m_pidSource;
   }
 
   @Override

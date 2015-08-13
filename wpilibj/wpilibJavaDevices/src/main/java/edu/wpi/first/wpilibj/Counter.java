@@ -67,7 +67,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
   private boolean m_allocatedDownSource;
   private ByteBuffer m_counter; // /< The FPGA counter object.
   private int m_index; // /< The index of this counter.
-  private PIDSourceParameter m_pidSource;
+  private PIDSourceType m_pidSource;
   private double m_distancePerPulse; // distance of travel for each tick
 
   private void initCounter(final Mode mode) {
@@ -640,7 +640,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    *
    * @param pidSource An enum to select the parameter.
    */
-  public void setPIDSourceParameter(PIDSourceParameter pidSource) {
+  public void setPIDSourceType(PIDSourceType pidSource) {
     if (pidSource == null) {
       throw new NullPointerException("PID Source Parameter given was null");
     }
@@ -648,12 +648,19 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
     m_pidSource = pidSource;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  public PIDSourceType getPIDSourceType() {
+    return m_pidSource;
+  }
+
   @Override
   public double pidGet() {
-    switch (m_pidSource.value) {
-      case PIDSourceParameter.kDistance_val:
+    switch (m_pidSource) {
+      case kDisplacement:
         return getDistance();
-      case PIDSourceParameter.kRate_val:
+      case kRate:
         return getRate();
       default:
         return 0.0;

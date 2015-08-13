@@ -62,7 +62,7 @@ void Gyro::InitGyro() {
 
   SetDeadband(0.0f);
 
-  SetPIDSourceParameter(kAngle);
+  SetPIDSourceType(PIDSourceType::kDisplacement);
 
   HALReport(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel());
   LiveWindow::GetInstance().AddSensor("Gyro", m_analog->GetChannel(), this);
@@ -190,26 +190,16 @@ void Gyro::SetDeadband(float volts) {
 }
 
 /**
- * Sets the type of output to use with the WPILib PID class
- * The gyro supports using either rate or angle for PID calculations
- */
-void Gyro::SetPIDSourceParameter(PIDSourceParameter pidSource) {
-  if (pidSource == 0 || pidSource > 2)
-    wpi_setWPIErrorWithContext(ParameterOutOfRange, "Gyro pidSource");
-  m_pidSource = pidSource;
-}
-
-/**
  * Get the PIDOutput for the PIDSource base object. Can be set to return
- * angle or rate using SetPIDSourceParameter(). Defaults to angle.
+ * angle or rate using SetPIDSourceType(). Defaults to angle.
  *
  * @return The PIDOutput (angle or rate, defaults to angle)
  */
 double Gyro::PIDGet() const {
-  switch (m_pidSource) {
-    case kRate:
+  switch (GetPIDSourceType()) {
+    case PIDSourceType::kRate:
       return GetRate();
-    case kAngle:
+    case PIDSourceType::kDisplacement:
       return GetAngle();
     default:
       return 0;
