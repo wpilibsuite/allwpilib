@@ -16,6 +16,8 @@
 
 #include "llvm/iterator_range.h"
 #include "llvm/AlignOf.h"
+#include "llvm/Compiler.h"
+#include "llvm/MathExtras.h"
 #include "llvm/type_traits.h"
 #include <algorithm>
 #include <cassert>
@@ -26,73 +28,7 @@
 #include <iterator>
 #include <memory>
 
-//
-// From Support/Compiler.h
-//
-
-#ifndef __has_feature
-# define __has_feature(x) 0
-#endif
-
-#ifndef __has_attribute
-# define __has_attribute(x) 0
-#endif
-
-#ifndef __has_builtin
-# define __has_builtin(x) 0
-#endif
-
-/// \macro LLVM_GNUC_PREREQ
-/// \brief Extend the default __GNUC_PREREQ even if glibc's features.h isn't
-/// available.
-#ifndef LLVM_GNUC_PREREQ
-# if defined(__GNUC__) && defined(__GNUC_MINOR__) && defined(__GNUC_PATCHLEVEL__)
-#  define LLVM_GNUC_PREREQ(maj, min, patch) \
-    ((__GNUC__ << 20) + (__GNUC_MINOR__ << 10) + __GNUC_PATCHLEVEL__ >= \
-     ((maj) << 20) + ((min) << 10) + (patch))
-# elif defined(__GNUC__) && defined(__GNUC_MINOR__)
-#  define LLVM_GNUC_PREREQ(maj, min, patch) \
-    ((__GNUC__ << 20) + (__GNUC_MINOR__ << 10) >= ((maj) << 20) + ((min) << 10))
-# else
-#  define LLVM_GNUC_PREREQ(maj, min, patch) 0
-# endif
-#endif
-
-#ifndef LLVM_ATTRIBUTE_UNUSED_RESULT
-#if __has_attribute(warn_unused_result) || LLVM_GNUC_PREREQ(3, 4, 0)
-#define LLVM_ATTRIBUTE_UNUSED_RESULT __attribute__((__warn_unused_result__))
-#else
-#define LLVM_ATTRIBUTE_UNUSED_RESULT
-#endif
-#endif
-
-#ifndef LLVM_UNLIKELY
-#if __has_builtin(__builtin_expect) || LLVM_GNUC_PREREQ(4, 0, 0)
-#define LLVM_LIKELY(EXPR) __builtin_expect((bool)(EXPR), true)
-#define LLVM_UNLIKELY(EXPR) __builtin_expect((bool)(EXPR), false)
-#else
-#define LLVM_LIKELY(EXPR) (EXPR)
-#define LLVM_UNLIKELY(EXPR) (EXPR)
-#endif
-#endif
-
 namespace llvm {
-
-//
-// From Support/MathExtras.h
-//
-
-/// NextPowerOf2 - Returns the next power of two (in 64-bits)
-/// that is strictly greater than A.  Returns zero on overflow.
-inline uint64_t NextPowerOf2(uint64_t A) {
-  A |= (A >> 1);
-  A |= (A >> 2);
-  A |= (A >> 4);
-  A |= (A >> 8);
-  A |= (A >> 16);
-  A |= (A >> 32);
-  return A + 1;
-}
 
 /// This is all the non-templated stuff common to all SmallVectors.
 class SmallVectorBase {
