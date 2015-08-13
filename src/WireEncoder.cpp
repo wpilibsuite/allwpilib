@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "llvm/MathExtras.h"
 #include "leb128.h"
 
 using namespace nt;
@@ -30,7 +31,7 @@ WireEncoder::~WireEncoder() { std::free(m_start); }
 void WireEncoder::WriteDouble(double val) {
   Reserve(8);
   // The highest performance way to do this, albeit non-portable.
-  std::uint64_t v = reinterpret_cast<uint64_t&>(val);
+  std::uint64_t v = llvm::DoubleToBits(val);
   m_cur[7] = (char)(v & 0xff); v >>= 8;
   m_cur[6] = (char)(v & 0xff); v >>= 8;
   m_cur[5] = (char)(v & 0xff); v >>= 8;

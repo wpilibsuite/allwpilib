@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "llvm/MathExtras.h"
 #include "leb128.h"
 
 using namespace nt;
@@ -41,7 +42,7 @@ static double ReadDouble(const char*& buf) {
   val <<= 8;
   val |= (*((unsigned char*)buf)) & 0xff;
   ++buf;
-  return reinterpret_cast<double&>(val);
+  return llvm::BitsToDouble(val);
 }
 
 WireDecoder::WireDecoder(raw_istream& is, unsigned int proto_rev) : m_is(is) {
