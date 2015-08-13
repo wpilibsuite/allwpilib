@@ -94,11 +94,7 @@ class Message {
                                               unsigned int flags);
   static std::shared_ptr<Message> EntryDelete(unsigned int id);
   static std::shared_ptr<Message> ExecuteRpc(unsigned int id, unsigned int uid,
-                                             llvm::ArrayRef<Value> params);
-  static std::shared_ptr<Message> ExecuteRpc(unsigned int id, unsigned int uid,
                                              llvm::StringRef params);
-  static std::shared_ptr<Message> RpcResponse(unsigned int id, unsigned int uid,
-                                              llvm::ArrayRef<Value> results);
   static std::shared_ptr<Message> RpcResponse(unsigned int id, unsigned int uid,
                                               llvm::StringRef results);
 

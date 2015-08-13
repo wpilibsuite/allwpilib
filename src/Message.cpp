@@ -204,26 +204,12 @@ std::shared_ptr<Message> Message::EntryDelete(unsigned int id) {
 }
 
 std::shared_ptr<Message> Message::ExecuteRpc(unsigned int id, unsigned int uid,
-                                             llvm::ArrayRef<Value> params) {
-  WireEncoder enc(0x0300);
-  for (auto& param : params) enc.WriteValue(param);
-  return ExecuteRpc(id, uid, enc.ToStringRef());
-}
-
-std::shared_ptr<Message> Message::ExecuteRpc(unsigned int id, unsigned int uid,
                                              llvm::StringRef params) {
   auto msg = std::make_shared<Message>(kExecuteRpc, private_init());
   msg->m_str = params;
   msg->m_id = id;
   msg->m_seq_num_uid = uid;
   return msg;
-}
-
-std::shared_ptr<Message> Message::RpcResponse(
-    unsigned int id, unsigned int uid, llvm::ArrayRef<Value> results) {
-  WireEncoder enc(0x0300);
-  for (auto& result : results) enc.WriteValue(result);
-  return RpcResponse(id, uid, enc.ToStringRef());
 }
 
 std::shared_ptr<Message> Message::RpcResponse(unsigned int id, unsigned int uid,
