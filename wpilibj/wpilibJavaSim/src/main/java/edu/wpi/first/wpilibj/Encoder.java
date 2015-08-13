@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.simulation.SimEncoder;
 import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.util.BoundaryException;
 
 /**
  * Class to read quad encoders. Quadrature encoders are devices that count shaft
@@ -34,7 +33,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 	private boolean m_allocatedB;
 	private boolean m_allocatedI;
 	private boolean m_reverseDirection;
-	private PIDSourceParameter m_pidSource;
+	private PIDSourceType m_pidSource;
 	private SimEncoder impl;
 
 	/**
@@ -56,7 +55,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 	 */
 	private void initEncoder(int aChannel, int bChannel, boolean reverseDirection) {
 		m_distancePerPulse = 1.0;
-		m_pidSource = PIDSourceParameter.kDistance;
+		m_pidSource = PIDSourceType.kDisplacement;
 		m_encodingScale = m_encodingType == EncodingType.k4X ? 4
 			: m_encodingType == EncodingType.k2X ? 2
 			: 1;
@@ -275,15 +274,14 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 	 * @param pidSource
 	 *            An enum to select the parameter.
 	 */
-	public void setPIDSourceParameter(PIDSourceParameter pidSource) {
-		BoundaryException.assertWithinBounds(pidSource.value, 0, 1);
+	public void setPIDSourceType(PIDSourceType pidSource) {
 		m_pidSource = pidSource;
 	}
 
     /**
      * {@inheritDoc}
      */
-    public PIDSourceParameter getPIDSourceParameter() {
+    public PIDSourceType getPIDSourceType() {
       return m_pidSource;
     }
 
@@ -293,10 +291,10 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 	 * @return The current value of the selected source parameter.
 	 */
 	public double pidGet() {
-		switch (m_pidSource.value) {
-		case PIDSourceParameter.kDistance_val:
+		switch (m_pidSource) {
+		case kDisplacement:
 			return getDistance();
-		case PIDSourceParameter.kRate_val:
+		case kRate:
 			return getRate();
 		default:
 			return 0.0;
@@ -307,8 +305,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 	 * Live Window code, only does anything if live window is activated.
 	 */
 	public String getSmartDashboardType() {
-		switch (m_encodingType.value) {
-		case EncodingType.k4X_val:
+		switch (m_encodingType) {
+		case k4X:
 			return "Quadrature Encoder";
 		default:
 			return "Encoder";

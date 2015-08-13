@@ -31,7 +31,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
 
 	private SimFloatInput m_impl;
 	private int m_channel;
-  protected PIDSourceParameter m_pidSource = PIDSourceParameter.kDistance;
+  protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
 	/**
 	 * Construct an analog channel.
@@ -91,14 +91,14 @@ public class AnalogInput extends SensorBase implements PIDSource,
   /**
    * {@inheritDoc}
    */
-  public void setPIDSourceParameter(PIDSourceParameter pidSource) {
+  public void setPIDSourceType(PIDSourceType pidSource) {
     m_pidSource = pidSource;
   }
 
   /**
    * {@inheritDoc}
    */
-  public PIDSourceParameter getPIDSourceParameter() {
+  public PIDSourceType getPIDSourceType() {
     return m_pidSource;
   }
 

@@ -21,7 +21,7 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
     private double m_scale, m_offset;
     private AnalogInput m_analog_input;
     private boolean m_init_analog_input;
-  protected PIDSourceParameter m_pidSource = PIDSourceParameter.kDistance;
+  protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
     /**
      * Common initialization code called by all constructors.
@@ -138,14 +138,14 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
   /**
    * {@inheritDoc}
    */
-  public void setPIDSourceParameter(PIDSourceParameter pidSource) {
+  public void setPIDSourceType(PIDSourceType pidSource) {
     m_pidSource = pidSource;
   }
 
   /**
    * {@inheritDoc}
    */
-  public PIDSourceParameter getPIDSourceParameter() {
+  public PIDSourceType getPIDSourceType() {
     return m_pidSource;
   }
 
