@@ -8,7 +8,6 @@
 #include "ADXL345_SPI.h"
 #include "DigitalInput.h"
 #include "DigitalOutput.h"
-#include "SPI.h"
 #include "LiveWindow/LiveWindow.h"
 
 const uint8_t ADXL345_SPI::kPowerCtlRegister;
@@ -22,33 +21,25 @@ constexpr double ADXL345_SPI::kGsPerLSB;
  * @param port The SPI port the accelerometer is attached to
  * @param range The range (+ or -) that the accelerometer will measure.
  */
-ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::Range range) {
-  m_port = port;
-  Init(range);
-  LiveWindow::GetInstance().AddSensor("ADXL345_SPI", port, this);
-}
-
-/**
- * Internal common init function.
- */
-void ADXL345_SPI::Init(Range range) {
-  m_spi = std::make_unique<SPI>(m_port);
-  m_spi->SetClockRate(500000);
-  m_spi->SetMSBFirst();
-  m_spi->SetSampleDataOnFalling();
-  m_spi->SetClockActiveLow();
-  m_spi->SetChipSelectActiveHigh();
+ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::Range range) : SPI(port) {
+  SetClockRate(500000);
+  SetMSBFirst();
+  SetSampleDataOnFalling();
+  SetClockActiveLow();
+  SetChipSelectActiveHigh();
 
   uint8_t commands[2];
   // Turn on the measurements
   commands[0] = kPowerCtlRegister;
   commands[1] = kPowerCtl_Measure;
-  m_spi->Transaction(commands, commands, 2);
+  Transaction(commands, commands, 2);
 
   SetRange(range);
 
   HALReport(HALUsageReporting::kResourceType_ADXL345,
             HALUsageReporting::kADXL345_SPI);
+
+  LiveWindow::GetInstance().AddSensor("ADXL345_SPI", port, this);
 }
 
 /** {@inheritdoc} */
@@ -58,7 +49,7 @@ void ADXL345_SPI::SetRange(Range range) {
   // Specify the data format to read
   commands[0] = kDataFormatRegister;
   commands[1] = kDataFormat_FullRes | (uint8_t)(range & 0x03);
-  m_spi->Transaction(commands, commands, 2);
+  Transaction(commands, commands, 2);
 }
 
 /** {@inheritdoc} */
@@ -77,17 +68,14 @@ double ADXL345_SPI::GetZ() { return GetAcceleration(kAxis_Z); }
  * @return Acceleration of the ADXL345 in Gs.
  */
 double ADXL345_SPI::GetAcceleration(ADXL345_SPI::Axes axis) {
-  int16_t rawAccel = 0;
-  if (m_spi) {
-    uint8_t buffer[3];
-    uint8_t command[3] = {0, 0, 0};
-    command[0] =
-        (kAddress_Read | kAddress_MultiByte | kDataRegister) + (uint8_t)axis;
-    m_spi->Transaction(command, buffer, 3);
+  uint8_t buffer[3];
+  uint8_t command[3] = {0, 0, 0};
+  command[0] =
+      (kAddress_Read | kAddress_MultiByte | kDataRegister) + (uint8_t)axis;
+  Transaction(command, buffer, 3);
 
-    // Sensor is little endian... swap bytes
-    rawAccel = buffer[2] << 8 | buffer[1];
-  }
+  // Sensor is little endian... swap bytes
+  int16_t rawAccel = buffer[2] << 8 | buffer[1];
   return rawAccel * kGsPerLSB;
 }
 
@@ -101,20 +89,20 @@ ADXL345_SPI::AllAxes ADXL345_SPI::GetAccelerations() {
   AllAxes data = AllAxes();
   uint8_t dataBuffer[7] = {0, 0, 0, 0, 0, 0, 0};
   int16_t rawData[3];
-  if (m_spi) {
-    // Select the data address.
-    dataBuffer[0] = (kAddress_Read | kAddress_MultiByte | kDataRegister);
-    m_spi->Transaction(dataBuffer, dataBuffer, 7);
 
-    for (int32_t i = 0; i < 3; i++) {
-      // Sensor is little endian... swap bytes
-      rawData[i] = dataBuffer[i * 2 + 2] << 8 | dataBuffer[i * 2 + 1];
-    }
+  // Select the data address.
+  dataBuffer[0] = (kAddress_Read | kAddress_MultiByte | kDataRegister);
+  Transaction(dataBuffer, dataBuffer, 7);
 
-    data.XAxis = rawData[0] * kGsPerLSB;
-    data.YAxis = rawData[1] * kGsPerLSB;
-    data.ZAxis = rawData[2] * kGsPerLSB;
+  for (int32_t i = 0; i < 3; i++) {
+    // Sensor is little endian... swap bytes
+    rawData[i] = dataBuffer[i * 2 + 2] << 8 | dataBuffer[i * 2 + 1];
   }
+
+  data.XAxis = rawData[0] * kGsPerLSB;
+  data.YAxis = rawData[1] * kGsPerLSB;
+  data.ZAxis = rawData[2] * kGsPerLSB;
+
   return data;
 }
 

@@ -23,8 +23,6 @@ constexpr double ADXL345_I2C::kGsPerLSB;
  * @param range The range (+ or -) that the accelerometer will measure.
  */
 ADXL345_I2C::ADXL345_I2C(Port port, Range range) : I2C(port, kAddress) {
-  // m_i2c = new I2C((I2C::Port)port, kAddress);
-
   // Turn on the measurements
   Write(kPowerCtlRegister, kPowerCtl_Measure);
   // Specify the data format to read
@@ -57,10 +55,7 @@ double ADXL345_I2C::GetZ() { return GetAcceleration(kAxis_Z); }
  */
 double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis) {
   int16_t rawAccel = 0;
-  // if(m_i2c)
-  //{
   Read(kDataRegister + (uint8_t)axis, sizeof(rawAccel), (uint8_t *)&rawAccel);
-  //}
   return rawAccel * kGsPerLSB;
 }
 
@@ -73,14 +68,11 @@ double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis) {
 ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations() {
   AllAxes data = AllAxes();
   int16_t rawData[3];
-  // if (m_i2c)
-  //{
   Read(kDataRegister, sizeof(rawData), (uint8_t *)rawData);
 
   data.XAxis = rawData[0] * kGsPerLSB;
   data.YAxis = rawData[1] * kGsPerLSB;
   data.ZAxis = rawData[2] * kGsPerLSB;
-  //}
   return data;
 }
 
