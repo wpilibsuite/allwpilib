@@ -36,8 +36,10 @@ void Notifier::Stop() {
 void Notifier::ThreadMain() {
   std::unique_lock<std::mutex> lock(m_mutex);
   while (m_active) {
-    m_cond.wait(lock);
-    if (!m_active) continue;
+    while (m_entry_notifications.empty() && m_conn_notifications.empty()) {
+      m_cond.wait(lock);
+      if (!m_active) return;
+    }
 
     // Entry notifications
     while (!m_entry_notifications.empty()) {
