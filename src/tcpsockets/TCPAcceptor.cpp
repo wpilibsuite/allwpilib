@@ -34,7 +34,7 @@
 #endif
 
 #include "llvm/SmallString.h"
-#include "Log.h"
+#include "../Log.h"
 
 TCPAcceptor::TCPAcceptor(int port, const char* address)
     : m_lsd(0),

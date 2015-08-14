@@ -39,7 +39,7 @@
 #include "TCPStream.h"
 
 #include "llvm/SmallString.h"
-#include "Log.h"
+#include "../Log.h"
 
 static int ResolveHostName(const char* hostname, struct in_addr* addr) {
   struct addrinfo* res;
