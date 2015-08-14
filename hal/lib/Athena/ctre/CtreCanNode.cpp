@@ -1,6 +1,6 @@
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 
-#include "CtreCanNode.h"
+#include "ctre/CtreCanNode.h"
 #include "NetworkCommunication/CANSessionMux.h"
 #include <string.h> // memset
 #include <unistd.h> // usleep

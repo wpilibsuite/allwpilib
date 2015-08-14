@@ -1,7 +1,6 @@
 #ifndef PDP_H_
 #define PDP_H_
 #include "ctre.h"				//BIT Defines + Typedefs
-#include <NetworkCommunication/CANSessionMux.h>	//CAN Comm
 #include "CtreCanNode.h"
 class PDP : public CtreCanNode
 {
