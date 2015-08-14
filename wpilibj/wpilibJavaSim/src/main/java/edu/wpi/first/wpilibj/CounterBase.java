@@ -20,31 +20,28 @@ public interface CounterBase {
     /**
      * The number of edges for the counterbase to increment or decrement on
      */
-    public static class EncodingType {
+    public enum EncodingType {
+      /**
+       * Count only the rising edge
+       */
+      k1X(0),
+      /**
+       * Count both the rising and falling edge
+       */
+      k2X(1),
+      /**
+       * Count rising and falling on both channels
+       */
+      k4X(2);
 
-        /**
-         * The integer value representing this enumeration
-         */
-        public final int value;
-        static final int k1X_val = 0;
-        static final int k2X_val = 1;
-        static final int k4X_val = 2;
-        /**
-         * Count only the rising edge
-         */
-        public static final EncodingType k1X = new EncodingType(k1X_val);
-        /**
-         * Count both the rising and falling edge
-         */
-        public static final EncodingType k2X = new EncodingType(k2X_val);
-        /**
-         * Count rising and falling on both channels
-         */
-        public static final EncodingType k4X = new EncodingType(k4X_val);
+      /**
+       * The integer value representing this enumeration
+       */
+      public final int value;
 
-        private EncodingType(int value) {
-            this.value = value;
-        }
+      private EncodingType(int value) {
+        this.value = value;
+      }
     }
 
     /**

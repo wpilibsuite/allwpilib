@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.simulation.SimGyro;
 import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.util.BoundaryException;
 
 /**
  * Use a rate gyro to return the robots heading relative to a starting position.
@@ -23,7 +22,7 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
  */
 public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 
-	private PIDSourceParameter m_pidSource;
+	private PIDSourceType m_pidSource;
 	private SimGyro impl;
 
 	/**
@@ -38,7 +37,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 		impl = new SimGyro("simulator/analog/"+channel);
 
 		reset();
-		setPIDSourceParameter(PIDSourceParameter.kAngle);
+		setPIDSourceType(PIDSourceType.kDisplacement);
 
 		LiveWindow.addSensor("Gyro", channel, this);
 	}
@@ -113,15 +112,14 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 	 * @param pidSource
 	 *            An enum to select the parameter.
 	 */
-	public void setPIDSourceParameter(PIDSourceParameter pidSource) {
-		BoundaryException.assertWithinBounds(pidSource.value, 1, 2);
+	public void setPIDSourceType(PIDSourceType pidSource) {
 		m_pidSource = pidSource;
 	}
 
     /**
      * {@inheritDoc}
      */
-    public PIDSourceParameter getPIDSourceParameter() {
+    public PIDSourceType getPIDSourceType() {
       return m_pidSource;
     }
 
@@ -131,10 +129,10 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 	 * @return the current angle according to the gyro
 	 */
 	public double pidGet() {
-		switch (m_pidSource.value) {
-		case PIDSourceParameter.kRate_val:
+		switch (m_pidSource) {
+		case kRate:
 			return getRate();
-		case PIDSourceParameter.kAngle_val:
+		case kDisplacement:
 			return getAngle();
 		default:
 			return 0.0;
