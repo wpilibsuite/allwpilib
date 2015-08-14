@@ -43,6 +43,7 @@ Relay::Relay(uint32_t channel, Relay::Direction direction)
 Relay::~Relay()
 {
 	impl->Set(0);
+	if (m_table != nullptr) m_table->RemoveTableListener(this);
 }
 
 /**
@@ -140,11 +141,12 @@ Relay::Value Relay::Get() const {
 	}
 }
 
-void Relay::ValueChanged(std::shared_ptr<ITable> source, const std::string& key, EntryValue value, bool isNew) {
-	std::string *val = (std::string *) value.ptr;
-	if (*val == "Off") Set(kOff);
-	else if (*val == "Forward") Set(kForward);
-	else if (*val == "Reverse") Set(kReverse);
+void Relay::ValueChanged(ITable* source, llvm::StringRef key,
+                         std::shared_ptr<nt::Value> value, bool isNew) {
+  if (!value->IsString()) return;
+	if (value->GetString() == "Off") Set(kOff);
+	else if (value->GetString() == "Forward") Set(kForward);
+	else if (value->GetString() == "Reverse") Set(kReverse);
 }
 
 void Relay::UpdateTable() {

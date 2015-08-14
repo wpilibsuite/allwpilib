@@ -91,6 +91,7 @@ DoubleSolenoid::~DoubleSolenoid() {
     m_allocated->Free(m_moduleNumber * kSolenoidChannels + m_forwardChannel);
     m_allocated->Free(m_moduleNumber * kSolenoidChannels + m_reverseChannel);
   }
+  if (m_table != nullptr) m_table->RemoveTableListener(this);
 }
 
 /**
@@ -155,13 +156,14 @@ bool DoubleSolenoid::IsRevSolenoidBlackListed() const {
   return (blackList & m_reverseMask) ? 1 : 0;
 }
 
-void DoubleSolenoid::ValueChanged(std::shared_ptr<ITable> source, const std::string &key,
-                                  EntryValue value, bool isNew) {
+void DoubleSolenoid::ValueChanged(ITable* source, llvm::StringRef key,
+                                  std::shared_ptr<nt::Value> value,
+                                  bool isNew) {
+  if (!value->IsString()) return;
   Value lvalue = kOff;
-  std::string *val = (std::string *)value.ptr;
-  if (*val == "Forward")
+  if (value->GetString() == "Forward")
     lvalue = kForward;
-  else if (*val == "Reverse")
+  else if (value->GetString() == "Reverse")
     lvalue = kReverse;
   Set(lvalue);
 }

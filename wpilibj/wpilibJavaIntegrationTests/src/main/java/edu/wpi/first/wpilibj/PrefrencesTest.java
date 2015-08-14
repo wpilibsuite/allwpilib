@@ -44,8 +44,9 @@ public class PrefrencesTest extends AbstractComsSetup {
    */
   @Before
   public void setUp() throws Exception {
+    NetworkTable.shutdown();
     try {
-      File file = new File("/home/lvuser/wpilib-preferences.ini");
+      File file = new File("networktables.ini");
       file.mkdirs();
       if (file.exists()) {
         file.delete();
@@ -53,12 +54,13 @@ public class PrefrencesTest extends AbstractComsSetup {
       file.createNewFile();
       OutputStream output = new FileOutputStream(file);
       output
-          .write("checkedValueInt = 2\ncheckedValueDouble = .2\ncheckedValueFloat = 3.14\ncheckedValueLong = 172\ncheckedValueString =\"hello \nHow are you ?\"\ncheckedValueBoolean = false"
+          .write("[NetworkTables Storage 3.0]\ndouble \"/Preferences/checkedValueInt\"=2\ndouble \"/Preferences/checkedValueDouble\"=.2\ndouble \"/Preferences/checkedValueFloat\"=3.14\ndouble \"/Preferences/checkedValueLong\"=172\nstring \"/Preferences/checkedValueString\"=\"hello \\nHow are you ?\"\nboolean \"/Preferences/checkedValueBoolean\"=false\n"
               .getBytes());
 
     } catch (IOException e) {
       e.printStackTrace();
     }
+    NetworkTable.initialize();
 
     pref = Preferences.getInstance();
     prefTable = NetworkTable.getTable("Preferences");
@@ -114,7 +116,7 @@ public class PrefrencesTest extends AbstractComsSetup {
     String networkedNumber = "networkCheckedValue";
     int networkNumberValue = 100;
     pref.putInt(networkedNumber, networkNumberValue);
-    assertEquals((new Integer(networkNumberValue).toString()), prefTable.getString(networkedNumber));
+    assertEquals(networkNumberValue, (int)(prefTable.getNumber(networkedNumber)));
     pref.remove(networkedNumber);
   }
 

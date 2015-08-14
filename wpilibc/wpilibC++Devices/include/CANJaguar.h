@@ -14,7 +14,7 @@
 #include "HAL/cpp/Semaphore.hpp"
 #include "HAL/HAL.hpp"
 #include "LiveWindow/LiveWindowSendable.h"
-#include "tables/ITable.h"
+#include "tables/ITableListener.h"
 #include "NetworkCommunication/CANSessionMux.h"
 #include "CAN/can_proto.h"
 
@@ -232,8 +232,8 @@ class CANJaguar : public MotorSafety,
 
   std::unique_ptr<MotorSafetyHelper> m_safetyHelper;
 
-  void ValueChanged(std::shared_ptr<ITable> source, const std::string &key, EntryValue value,
-                    bool isNew) override;
+  void ValueChanged(ITable* source, llvm::StringRef key,
+                    std::shared_ptr<nt::Value> value, bool isNew) override;
   void UpdateTable() override;
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;

@@ -73,6 +73,10 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
   HALReport(HALUsageReporting::kResourceType_PIDController, instances);
 }
 
+PIDController::~PIDController() {
+  if (m_table != nullptr) m_table->RemoveTableListener(this);
+}
+
 /**
  * Call the Calculate method as a non-static method. This avoids having to
  * prepend
@@ -551,18 +555,22 @@ void PIDController::InitTable(std::shared_ptr<ITable> table) {
 
 std::shared_ptr<ITable> PIDController::GetTable() const { return m_table; }
 
-void PIDController::ValueChanged(std::shared_ptr<ITable> source, const std::string &key,
-                                 EntryValue value, bool isNew) {
+void PIDController::ValueChanged(ITable* source, llvm::StringRef key,
+                                 std::shared_ptr<nt::Value> value, bool isNew) {
   if (key == kP || key == kI || key == kD || key == kF) {
-    if (m_P != m_table->GetNumber(kP) || m_I != m_table->GetNumber(kI) ||
-        m_D != m_table->GetNumber(kD) || m_F != m_table->GetNumber(kF)) {
+    if (m_P != m_table->GetNumber(kP, 0.0) ||
+        m_I != m_table->GetNumber(kI, 0.0) ||
+        m_D != m_table->GetNumber(kD, 0.0) ||
+        m_F != m_table->GetNumber(kF, 0.0)) {
       SetPID(m_table->GetNumber(kP, 0.0), m_table->GetNumber(kI, 0.0),
              m_table->GetNumber(kD, 0.0), m_table->GetNumber(kF, 0.0));
     }
-  } else if (key == kSetpoint && m_setpoint != value.f) {
-    SetSetpoint(value.f);
-  } else if (key == kEnabled && m_enabled != value.b) {
-    if (value.b) {
+  } else if (key == kSetpoint && value->IsDouble() &&
+             m_setpoint != value->GetDouble()) {
+    SetSetpoint(value->GetDouble());
+  } else if (key == kEnabled && value->IsBoolean() &&
+             m_enabled != value->GetBoolean()) {
+    if (value->GetBoolean()) {
       Enable();
     } else {
       Disable();

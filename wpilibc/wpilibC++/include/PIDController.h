@@ -36,7 +36,7 @@ class PIDController : public LiveWindowSendable,
                 float period = 0.05);
   PIDController(float p, float i, float d, float f, PIDSource *source,
                 PIDOutput *output, float period = 0.05);
-  virtual ~PIDController() = default;
+  virtual ~PIDController();
 
   PIDController(const PIDController&) = delete;
   PIDController& operator=(const PIDController) = delete;
@@ -124,8 +124,9 @@ class PIDController : public LiveWindowSendable,
 
   virtual std::shared_ptr<ITable> GetTable() const override;
   virtual std::string GetSmartDashboardType() const override;
-  virtual void ValueChanged(std::shared_ptr<ITable> source, const std::string &key,
-                            EntryValue value, bool isNew) override;
+  virtual void ValueChanged(ITable *source, llvm::StringRef key,
+                            std::shared_ptr<nt::Value> value,
+                            bool isNew) override;
   virtual void UpdateTable() override;
   virtual void StartLiveWindowMode() override;
   virtual void StopLiveWindowMode() override;

@@ -17,7 +17,7 @@ std::shared_ptr<ITable> SmartDashboard::m_table = nullptr;
 std::map<std::shared_ptr<ITable> , Sendable *> SmartDashboard::m_tablesToData;
 
 void SmartDashboard::init() {
-  m_table.reset(NetworkTable::GetTable("SmartDashboard"));
+  m_table = NetworkTable::GetTable("SmartDashboard");
 
   HLUsageReporting::ReportSmartDashboard();
 }
@@ -30,7 +30,7 @@ void SmartDashboard::init() {
  * @param keyName the key
  * @param value the value
  */
-void SmartDashboard::PutData(std::string key, Sendable *data) {
+void SmartDashboard::PutData(llvm::StringRef key, Sendable *data) {
   if (data == nullptr) {
     wpi_setGlobalWPIErrorWithContext(NullParameter, "value");
     return;
@@ -62,11 +62,11 @@ void SmartDashboard::PutData(NamedSendable *value) {
  * @param keyName the key
  * @return the value
  */
-Sendable *SmartDashboard::GetData(std::string key) {
+Sendable *SmartDashboard::GetData(llvm::StringRef key) {
   std::shared_ptr<ITable> subtable(m_table->GetSubTable(key));
   Sendable *data = m_tablesToData[subtable];
   if (data == nullptr) {
-    wpi_setGlobalWPIErrorWithContext(SmartDashboardMissingKey, key.c_str());
+    wpi_setGlobalWPIErrorWithContext(SmartDashboardMissingKey, key);
     return nullptr;
   }
   return data;
@@ -81,7 +81,8 @@ Sendable *SmartDashboard::GetData(std::string key) {
  * @param keyName the key
  * @param value the value
  */
-void SmartDashboard::PutValue(std::string keyName, ComplexData &value) {
+void SmartDashboard::PutValue(llvm::StringRef keyName,
+                              std::shared_ptr<nt::Value> value) {
   m_table->PutValue(keyName, value);
 }
 
@@ -92,8 +93,8 @@ void SmartDashboard::PutValue(std::string keyName, ComplexData &value) {
  * @param keyName the key
  * @param value the object to retrieve the value into
  */
-void SmartDashboard::RetrieveValue(std::string keyName, ComplexData &value) {
-  m_table->RetrieveValue(keyName, value);
+std::shared_ptr<nt::Value> SmartDashboard::GetValue(llvm::StringRef keyName) {
+  return m_table->GetValue(keyName);
 }
 
 /**
@@ -104,18 +105,8 @@ void SmartDashboard::RetrieveValue(std::string keyName, ComplexData &value) {
  * @param keyName the key
  * @param value the value
  */
-void SmartDashboard::PutBoolean(std::string keyName, bool value) {
+void SmartDashboard::PutBoolean(llvm::StringRef keyName, bool value) {
   m_table->PutBoolean(keyName, value);
-}
-
-/**
- * Returns the value at the specified key. Throws an exception if the key is not
- * found in the table
- * @param keyName the key
- * @return the value
- */
-bool SmartDashboard::GetBoolean(std::string keyName) {
-  return m_table->GetBoolean(keyName);
 }
 
 /**
@@ -124,7 +115,7 @@ bool SmartDashboard::GetBoolean(std::string keyName) {
  * @param keyName the key
  * @return the value
  */
-bool SmartDashboard::GetBoolean(std::string keyName, bool defaultValue) {
+bool SmartDashboard::GetBoolean(llvm::StringRef keyName, bool defaultValue) {
   return m_table->GetBoolean(keyName, defaultValue);
 }
 
@@ -136,18 +127,8 @@ bool SmartDashboard::GetBoolean(std::string keyName, bool defaultValue) {
  * @param keyName the key
  * @param value the value
  */
-void SmartDashboard::PutNumber(std::string keyName, double value) {
+void SmartDashboard::PutNumber(llvm::StringRef keyName, double value) {
   m_table->PutNumber(keyName, value);
-}
-
-/**
- * Returns the value at the specified key. Throws an exception if the key is not
- * found in the table.
- * @param keyName the key
- * @return the value
- */
-double SmartDashboard::GetNumber(std::string keyName) {
-  return m_table->GetNumber(keyName);
 }
 
 /**
@@ -156,7 +137,7 @@ double SmartDashboard::GetNumber(std::string keyName) {
  * @param keyName the key
  * @return the value
  */
-double SmartDashboard::GetNumber(std::string keyName, double defaultValue) {
+double SmartDashboard::GetNumber(llvm::StringRef keyName, double defaultValue) {
   return m_table->GetNumber(keyName, defaultValue);
 }
 
@@ -168,35 +149,8 @@ double SmartDashboard::GetNumber(std::string keyName, double defaultValue) {
  * @param keyName the key
  * @param value the value
  */
-void SmartDashboard::PutString(std::string keyName, std::string value) {
+void SmartDashboard::PutString(llvm::StringRef keyName, llvm::StringRef value) {
   m_table->PutString(keyName, value);
-}
-
-/**
- * Returns the value at the specified key.
- * @param keyName the key
- * @param value the buffer to fill with the value
- * @param valueLen the size of the buffer pointed to by value
- * @return the length of the string
- */
-int SmartDashboard::GetString(std::string keyName, char *outBuffer,
-                              unsigned int bufferLen) {
-  std::string value = m_table->GetString(keyName);
-  unsigned int i;
-  for (i = 0; i < bufferLen - 1 && i < value.length(); ++i)
-    outBuffer[i] = (char)value.at(i);
-  outBuffer[i] = '\0';
-  return i;
-}
-
-/**
- * Returns the value at the specified key. Throws an exception if the key is not
- * found in the table
- * @param keyName the key
- * @return the value
- */
-std::string SmartDashboard::GetString(std::string keyName) {
-  return m_table->GetString(keyName);
 }
 
 /**
@@ -205,7 +159,7 @@ std::string SmartDashboard::GetString(std::string keyName) {
  * @param keyName the key
  * @return the value
  */
-std::string SmartDashboard::GetString(std::string keyName,
-                                      std::string defaultValue) {
+std::string SmartDashboard::GetString(llvm::StringRef keyName,
+                                      llvm::StringRef defaultValue) {
   return m_table->GetString(keyName, defaultValue);
 }

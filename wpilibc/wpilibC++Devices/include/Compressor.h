@@ -50,8 +50,8 @@ class Compressor : public SensorBase,
   std::string GetSmartDashboardType() const override;
   void InitTable(std::shared_ptr<ITable> subTable) override;
   std::shared_ptr<ITable> GetTable() const override;
-  void ValueChanged(std::shared_ptr<ITable> source, const std::string &key, EntryValue value,
-                    bool isNew) override;
+  void ValueChanged(ITable* source, llvm::StringRef key,
+                    std::shared_ptr<nt::Value> value, bool isNew) override;
 
  protected:
   void *m_pcm_pointer;

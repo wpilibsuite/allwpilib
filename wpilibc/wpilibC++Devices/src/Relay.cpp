@@ -81,6 +81,7 @@ Relay::~Relay() {
   if (m_direction == kBothDirections || m_direction == kReverseOnly) {
     relayChannels->Free(m_channel * 2 + 1);
   }
+  if (m_table != nullptr) m_table->RemoveTableListener(this);
 }
 
 /**
@@ -189,16 +190,16 @@ Relay::Value Relay::Get() const {
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
-void Relay::ValueChanged(std::shared_ptr<ITable> source, const std::string &key,
-                         EntryValue value, bool isNew) {
-  std::string *val = (std::string *)value.ptr;
-  if (*val == "Off")
+void Relay::ValueChanged(ITable* source, llvm::StringRef key,
+                         std::shared_ptr<nt::Value> value, bool isNew) {
+  if (!value->IsString()) return;
+  if (value->GetString() == "Off")
     Set(kOff);
-  else if (*val == "On")
+  else if (value->GetString() == "On")
     Set(kOn);
-  else if (*val == "Forward")
+  else if (value->GetString() == "Forward")
     Set(kForward);
-  else if (*val == "Reverse")
+  else if (value->GetString() == "Reverse")
     Set(kReverse);
 }
 

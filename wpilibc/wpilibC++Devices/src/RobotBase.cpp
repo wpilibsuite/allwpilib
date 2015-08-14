@@ -15,6 +15,7 @@
 #include "HLUsageReporting.h"
 #include "Internal/HardwareHLReporting.h"
 #include "Utility.h"
+#include "networktables/NetworkTable.h"
 #include <cstring>
 #include "HAL/HAL.hpp"
 #include <cstdio>
@@ -50,6 +51,8 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   HLUsageReporting::SetImplementation(new HardwareHLReporting());
 
   RobotBase::setInstance(this);
+
+  NetworkTable::SetNetworkIdentity("Robot");
 
   FILE *file = nullptr;
   file = fopen("/tmp/frc_versions/FRC_Lib_Version.ini", "w");

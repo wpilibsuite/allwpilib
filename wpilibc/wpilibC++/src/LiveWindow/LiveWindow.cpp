@@ -19,8 +19,8 @@ LiveWindow *LiveWindow::GetInstance() {
  * Allocate the necessary tables.
  */
 LiveWindow::LiveWindow() : m_scheduler(Scheduler::GetInstance()) {
-  m_liveWindowTable.reset(NetworkTable::GetTable("LiveWindow"));
-  m_statusTable.reset(m_liveWindowTable->GetSubTable("~STATUS~"));
+  m_liveWindowTable = NetworkTable::GetTable("LiveWindow");
+  m_statusTable = m_liveWindowTable->GetSubTable("~STATUS~");
 }
 
 /**

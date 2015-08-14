@@ -1,6 +1,6 @@
 #include "LiveWindow/LiveWindowStatusListener.h"
 #include "Commands/Scheduler.h"
 
-void LiveWindowStatusListener::ValueChanged(std::shared_ptr<ITable> source,
-                                            const std::string& key,
-                                            EntryValue value, bool isNew) {}
+void LiveWindowStatusListener::ValueChanged(ITable *source, llvm::StringRef key,
+                                            std::shared_ptr<nt::Value> value,
+                                            bool isNew) {}

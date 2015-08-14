@@ -8,9 +8,9 @@ package edu.wpi.first.wpilibj.smartdashboard;
 
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.networktables2.type.StringArray;
-import edu.wpi.first.wpilibj.networktables2.util.List;
 import edu.wpi.first.wpilibj.tables.ITable;
+
+import java.util.ArrayList;
 
 /**
  * The {@link SendableChooser} class is a useful tool for presenting a selection
@@ -44,8 +44,8 @@ public class SendableChooser implements Sendable {
   /**
    * A table linking strings to the objects the represent
    */
-  private StringArray choices = new StringArray();
-  private List values = new List();
+  private ArrayList<String> choices = new ArrayList<String>();
+  private ArrayList<Object> values = new ArrayList<Object>();
   private String defaultChoice = null;
   private Object defaultValue = null;
 
@@ -77,8 +77,9 @@ public class SendableChooser implements Sendable {
     // not found
     choices.add(name);
     values.add(object);
+
     if (table != null) {
-      table.putValue(OPTIONS, choices);
+      table.putStringArray(OPTIONS, choices.toArray(new String[0]));
     }
   }
 
@@ -131,7 +132,7 @@ public class SendableChooser implements Sendable {
   public void initTable(ITable table) {
     this.table = table;
     if (table != null) {
-      table.putValue(OPTIONS, choices);
+      table.putStringArray(OPTIONS, choices.toArray(new String[0]));
       if (defaultChoice != null) {
         table.putString(DEFAULT, defaultChoice);
       }

@@ -6,7 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "SmartDashboard/SendableChooser.h"
-#include "networktables2/type/StringArray.h"
 
 #include <stdio.h>
 
@@ -54,14 +53,14 @@ void *SendableChooser::GetSelected() {
 }
 
 void SendableChooser::InitTable(std::shared_ptr<ITable> subtable) {
-  StringArray keys;
+  std::vector<std::string> keys;
   m_table = subtable;
   if (m_table != nullptr) {
     std::map<std::string, void *>::iterator iter;
     for (iter = m_choices.begin(); iter != m_choices.end(); iter++) {
-      keys.add(iter->first);
+      keys.push_back(iter->first);
     }
-    m_table->PutValue(kOptions, keys);
+    m_table->PutValue(kOptions, nt::Value::MakeStringArray(std::move(keys)));
     m_table->PutString(kDefault, m_defaultChoice);
   }
 }

@@ -267,9 +267,10 @@ void Compressor::InitTable(std::shared_ptr<ITable> subTable) {
 
 std::shared_ptr<ITable> Compressor::GetTable() const { return m_table; }
 
-void Compressor::ValueChanged(std::shared_ptr<ITable> source, const std::string& key,
-                              EntryValue value, bool isNew) {
-  if (value.b)
+void Compressor::ValueChanged(ITable* source, llvm::StringRef key,
+                              std::shared_ptr<nt::Value> value, bool isNew) {
+  if (!value->IsBoolean()) return;
+  if (value->GetBoolean())
     Start();
   else
     Stop();

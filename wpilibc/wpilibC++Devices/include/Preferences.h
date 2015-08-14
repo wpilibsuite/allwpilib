@@ -23,72 +23,41 @@
  * <p>This class loads and saves from a file
  * inside the RoboRIO.  The user can not access the file directly, but may
  * modify values at specific
- * fields which will then be saved to the file when {@link Preferences#Save()
- * Save()} is called.</p>
+ * fields which will then be automatically periodically saved to the file
+ * by the NetworkTable server.</p>
  *
  * <p>This class is thread safe.</p>
  *
  * <p>This will also interact with {@link NetworkTable} by creating a table
- * called "Preferences" with all the
- * key-value pairs.  To save using {@link NetworkTable}, simply set the boolean
- * at position "~S A V E~" to true.
- * Also, if the value of any variable is " in the {@link NetworkTable}, then
- * that represents non-existence in the
- * {@link Preferences} table</p>
+ * called "Preferences" with all the key-value pairs.</p>
  */
-class Preferences : public ErrorBase, public ITableListener {
+class Preferences : public ErrorBase {
  public:
   static Preferences *GetInstance();
 
   std::vector<std::string> GetKeys();
-  std::string GetString(const char *key, const char *defaultValue = "");
-  int GetString(const char *key, char *value, int valueSize,
-                const char *defaultValue = "");
-  int GetInt(const char *key, int defaultValue = 0);
-  double GetDouble(const char *key, double defaultValue = 0.0);
-  float GetFloat(const char *key, float defaultValue = 0.0);
-  bool GetBoolean(const char *key, bool defaultValue = false);
-  int64_t GetLong(const char *key, int64_t defaultValue = 0);
-  void PutString(const char *key, const char *value);
-  void PutInt(const char *key, int value);
-  void PutDouble(const char *key, double value);
-  void PutFloat(const char *key, float value);
-  void PutBoolean(const char *key, bool value);
-  void PutLong(const char *key, int64_t value);
+  std::string GetString(llvm::StringRef key, llvm::StringRef defaultValue = "");
+  int GetInt(llvm::StringRef key, int defaultValue = 0);
+  double GetDouble(llvm::StringRef key, double defaultValue = 0.0);
+  float GetFloat(llvm::StringRef key, float defaultValue = 0.0);
+  bool GetBoolean(llvm::StringRef key, bool defaultValue = false);
+  int64_t GetLong(llvm::StringRef key, int64_t defaultValue = 0);
+  void PutString(llvm::StringRef key, llvm::StringRef value);
+  void PutInt(llvm::StringRef key, int value);
+  void PutDouble(llvm::StringRef key, double value);
+  void PutFloat(llvm::StringRef key, float value);
+  void PutBoolean(llvm::StringRef key, bool value);
+  void PutLong(llvm::StringRef key, int64_t value);
+  [[deprecated(
+      "Saving is now automatically performed by the NetworkTables server.")]]
   void Save();
-  bool ContainsKey(const char *key);
-  void Remove(const char *key);
-
-  void ValueChanged(std::shared_ptr<ITable> source, const std::string &key, EntryValue value,
-                    bool isNew) override;
+  bool ContainsKey(llvm::StringRef key);
+  void Remove(llvm::StringRef key);
 
  protected:
   Preferences();
   virtual ~Preferences() = default;
 
  private:
-  std::string Get(const char *key);
-  void Put(const char *key, std::string value);
-
-  void ReadTaskRun();
-  void WriteTaskRun();
-
-  /** The semaphore for accessing the file */
-  priority_recursive_mutex m_fileLock;
-  /** The semaphore for beginning reads and writes to the file */
-  Semaphore m_fileOpStarted{Semaphore::kEmpty};
-  /** The semaphore for reading from the table */
-  priority_recursive_mutex m_tableLock;
-  typedef std::map<std::string, std::string> StringMap;
-  /** The actual values (String->String) */
-  StringMap m_values;
-  /** The keys in the order they were read from the file */
-  std::vector<std::string> m_keys;
-  /** The comments that were in the file sorted by which key they appeared over
-   * (String->Comment) */
-  StringMap m_comments;
-  /** The comment at the end of the file */
-  std::string m_endComment;
-  Task m_readTask;
-  Task m_writeTask;
+  std::shared_ptr<ITable> m_table;
 };

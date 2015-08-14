@@ -30,8 +30,8 @@ class Solenoid : public SolenoidBase,
   virtual bool Get() const;
   bool IsBlackListed() const;
 
-  void ValueChanged(std::shared_ptr<ITable> source, const std::string& key, EntryValue value,
-                    bool isNew);
+  void ValueChanged(ITable* source, llvm::StringRef key,
+                    std::shared_ptr<nt::Value> value, bool isNew);
   void UpdateTable();
   void StartLiveWindowMode();
   void StopLiveWindowMode();

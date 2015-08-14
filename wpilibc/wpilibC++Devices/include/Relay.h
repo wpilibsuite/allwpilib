@@ -40,8 +40,8 @@ class Relay : public SensorBase,
   void Set(Value value);
   Value Get() const;
 
-  void ValueChanged(std::shared_ptr<ITable> source, const std::string& key, EntryValue value,
-                    bool isNew) override;
+  void ValueChanged(ITable* source, llvm::StringRef key,
+                    std::shared_ptr<nt::Value> value, bool isNew) override;
   void UpdateTable() override;
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;

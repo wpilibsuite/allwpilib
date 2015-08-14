@@ -59,6 +59,7 @@ public abstract class RobotBase {
     // TODO: See if the next line is necessary
     // Resource.RestartProgram();
 
+    NetworkTable.setNetworkIdentity("Robot");
     NetworkTable.setServerMode();// must be before b
     m_ds = DriverStation.getInstance();
     NetworkTable.getTable(""); // forces network tables to initialize

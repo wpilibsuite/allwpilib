@@ -4,8 +4,7 @@
  */
 package edu.wpi.first.tableviewer;
 
-import edu.wpi.first.wpilibj.networktables.NetworkTableProvider;
-import edu.wpi.first.wpilibj.networktables2.NetworkTableNode;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import javax.swing.event.TableModelEvent;
 
 /**
@@ -16,9 +15,9 @@ import javax.swing.event.TableModelEvent;
  */
 public class LeafNode extends AbstractTreeNode {
 
-    public LeafNode(NetworkTableNode node, String key, TableEntryData data) {
-        super(node, key, data);
-        table = new NetworkTableProvider(node).getTable(key.substring(0, key.lastIndexOf('/')));
+    public LeafNode(String key, TableEntryData data) {
+        super(key, data);
+        table = NetworkTable.getTable(key.substring(0, key.lastIndexOf('/')));
     }
 
     /**

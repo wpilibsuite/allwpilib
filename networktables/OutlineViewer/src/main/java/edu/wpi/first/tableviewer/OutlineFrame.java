@@ -6,7 +6,7 @@ package edu.wpi.first.tableviewer;
 
 import edu.wpi.first.tableviewer.TableEntryData.EntryType;
 import edu.wpi.first.tableviewer.dialog.AbstractAddDialog;
-import edu.wpi.first.wpilibj.networktables2.NetworkTableNode;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 import java.awt.BorderLayout;
@@ -29,18 +29,16 @@ public class OutlineFrame extends JFrame implements ITableListener {
 
     private final Outline outline;
     private final BranchNode rootBranch;
-    private final NetworkTableNode node;
     private final boolean showMetadata;
     private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 
-    public OutlineFrame(String title, NetworkTableNode node, boolean showMetadata) {
-        this.node = node;
+    public OutlineFrame(String title, boolean showMetadata) {
         this.showMetadata = showMetadata;
 
         setTitle(title);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        rootBranch = new BranchNode(node, "", "Root");
+        rootBranch = new BranchNode("", "Root");
         DefaultTreeModel outlineTreeModel = new DefaultTreeModel(rootBranch);
 
         OutlineModel outlineModel = DefaultOutlineModel.createOutlineModel(
@@ -99,7 +97,7 @@ public class OutlineFrame extends JFrame implements ITableListener {
         scrollPane.setViewportView(outline);
         add(scrollPane, BorderLayout.CENTER);
 
-        node.addTableListener(this, true);
+        NetworkTable.getTable("").addTableListener(this, true);
 
     }
 
@@ -125,7 +123,7 @@ public class OutlineFrame extends JFrame implements ITableListener {
             key += "/" + name;
             if (subTableNames.getLast() == name) { // leaf
                 if (currentNode == null) {
-                    currentNode = new LeafNode(node, key, new TableEntryData(name, value));
+                    currentNode = new LeafNode(key, new TableEntryData(name, value));
                     if (currentNode.data.isMetadata() && !showMetadata) {
                         // don't show metadata directly
                         // instead, show the value in the branch's "Type" field
@@ -140,7 +138,7 @@ public class OutlineFrame extends JFrame implements ITableListener {
                 }
 
             } else if (currentNode == null) {
-                currentNode = new BranchNode(node, key, name);
+                currentNode = new BranchNode(key, name);
                 parentNode.add(currentNode);
             }
         }

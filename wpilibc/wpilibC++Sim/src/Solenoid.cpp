@@ -32,6 +32,10 @@ Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel)
                                            this);
 }
 
+Solenoid::~Solenoid() {
+	if (m_table != nullptr) m_table->RemoveTableListener(this);
+}
+
 /**
  * Set the value of a solenoid.
  *
@@ -54,8 +58,10 @@ bool Solenoid::Get() const
 }
 
 
-void Solenoid::ValueChanged(std::shared_ptr<ITable> source, const std::string& key, EntryValue value, bool isNew) {
-	Set(value.b);
+void Solenoid::ValueChanged(ITable* source, llvm::StringRef key,
+                            std::shared_ptr<nt::Value> value, bool isNew) {
+  if (!value->IsBoolean()) return;
+	Set(value->GetBoolean());
 }
 
 void Solenoid::UpdateTable() {

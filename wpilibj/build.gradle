@@ -3,7 +3,7 @@ apply plugin: 'cpp'
 apply plugin: 'maven-publish'
 
 // We need this so we can get the networktables javadoc for the javadoc task
-evaluationDependsOn(':networktables:java')
+evaluationDependsOn(':networktables:ntcore')
 
 def jdkDownloadSite = 'http://www.oracle.com/technetwork/java/javase/downloads/jdk8-arm-downloads-2187472.html'
 def jdkFolder = 'jdk-linux-arm-vfp-sflt'
@@ -117,10 +117,10 @@ sourceSets {
 
 dependencies {
     compile sourceSets.shared.output
-    compile project(':networktables:java')
+    compile project(':networktables:ntcore')
     testCompile 'junit:junit:4.11'
-    sharedCompile project(':networktables:java')
-    integrationTestCompile project(':networktables:java')
+    sharedCompile project(':networktables:ntcore')
+    integrationTestCompile project(':networktables:ntcore')
     integrationTestCompile 'junit:junit:4.11'
     integrationTestCompile sourceSets.main.output
     integrationTestCompile sourceSets.shared.output
@@ -130,7 +130,7 @@ dependencies {
     simulationCompile sourceSets.main.output
     simulationCompile sourceSets.shared.output
     simulationCompile project(':simulation:JavaGazebo')
-    simulationCompile project(':networktables:java')
+    simulationCompile project(':networktables:ntcore')
 }
 
 task wpilibjJar(type: Jar) {
@@ -156,7 +156,7 @@ task wpilibjSources(type: Jar, dependsOn: classes) {
 }
 
 task javadoc(type: Javadoc, overwrite: true) {
-    def netTables = project(':networktables:java')
+    def netTables = project(':networktables:ntcore')
     source sourceSets.main.allJava, sourceSets.shared.allJava, netTables.sourceSets.main.allJava
     classpath = files([sourceSets.main.compileClasspath, sourceSets.shared.compileClasspath, netTables.sourceSets.main.compileClasspath])
 }

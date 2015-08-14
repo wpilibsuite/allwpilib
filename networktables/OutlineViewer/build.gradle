@@ -34,6 +34,6 @@ sourceSets {
 }
 
 dependencies {
-    compile project(":networktables:java")
+    compile project(":networktables:ntcore")
     compile 'uk.gov.nationalarchives.thirdparty.netbeans:org-netbeans-swing-outline:7.2'
 }

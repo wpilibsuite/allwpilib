@@ -43,6 +43,10 @@ DoubleSolenoid::DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel, ui
                                            forwardChannel, this);
 }
 
+DoubleSolenoid::~DoubleSolenoid() {
+	if (m_table != nullptr) m_table->RemoveTableListener(this);
+}
+
 /**
  * Set the value of a solenoid.
  *
@@ -75,12 +79,14 @@ DoubleSolenoid::Value DoubleSolenoid::Get() const
 	return m_value;
 }
 
-void DoubleSolenoid::ValueChanged(std::shared_ptr<ITable> source, const std::string& key, EntryValue value, bool isNew) {
-	Value lvalue = kOff;
-	std::string *val = (std::string *)value.ptr;
-	if (*val == "Forward")
+void DoubleSolenoid::ValueChanged(ITable *source, llvm::StringRef key,
+                                  std::shared_ptr<nt::Value> value,
+                                  bool isNew) {
+  if (!value->IsString()) return;
+  Value lvalue = kOff;
+	if (value->GetString() == "Forward")
 		lvalue = kForward;
-	else if (*val == "Reverse")
+	else if (value->GetString() == "Reverse")
 		lvalue = kReverse;
 	Set(lvalue);
 }

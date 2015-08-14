@@ -39,7 +39,7 @@ public:
 	};
 
 	explicit PWM(uint32_t channel);
-	virtual ~PWM() = default;
+	virtual ~PWM();
 	virtual void SetRaw(unsigned short value);
 	void SetPeriodMultiplier(PeriodMultiplier mult);
 	void EnableDeadbandElimination(bool eliminateDeadband);
@@ -87,7 +87,8 @@ protected:
 	bool m_eliminateDeadband;
 	int32_t m_centerPwm;
 
-	void ValueChanged(std::shared_ptr<ITable> source, const std::string& key, EntryValue value, bool isNew) override;
+	void ValueChanged(ITable* source, llvm::StringRef key,
+                    std::shared_ptr<nt::Value> value, bool isNew) override;
 	void UpdateTable() override;
 	void StartLiveWindowMode() override;
 	void StopLiveWindowMode() override;

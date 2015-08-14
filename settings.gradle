@@ -1,5 +1,4 @@
-include 'networktables:java',
-        'networktables:cpp',
+include 'networktables:ntcore',
         'networktables:OutlineViewer',
         'hal',
         'wpilibj',

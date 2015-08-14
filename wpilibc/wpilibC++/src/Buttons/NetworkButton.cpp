@@ -21,5 +21,5 @@ bool NetworkButton::Get() {
           return m_netTable->GetBoolean(m_field.c_str());
   else
           return false;*/
-  return m_netTable->GetBoolean(m_field);
+  return m_netTable->GetBoolean(m_field, false);
 }

@@ -30,7 +30,11 @@ Servo::Servo(uint32_t channel) : SafePWM(channel) {
   //	printf("Done initializing servo %d\n", channel);
 }
 
-Servo::~Servo() {}
+Servo::~Servo() {
+  if (m_table != nullptr) {
+    m_table->RemoveTableListener(this);
+  }
+}
 
 /**
  * Set the servo position.
@@ -95,9 +99,10 @@ float Servo::GetAngle() const {
   return (float)GetPosition() * GetServoAngleRange() + kMinServoAngle;
 }
 
-void Servo::ValueChanged(std::shared_ptr<ITable> source, const std::string& key,
-                         EntryValue value, bool isNew) {
-  Set(value.f);
+void Servo::ValueChanged(ITable* source, llvm::StringRef key,
+                         std::shared_ptr<nt::Value> value, bool isNew) {
+  if (!value->IsDouble()) return;
+  Set(value->GetDouble());
 }
 
 void Servo::UpdateTable() {

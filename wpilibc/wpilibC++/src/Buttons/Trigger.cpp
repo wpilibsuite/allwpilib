@@ -18,7 +18,7 @@ bool Trigger::Grab() {
     return true;
   else if (m_table != nullptr) {
     // if (m_table->isConnected())//TODO is connected on button?
-    return m_table->GetBoolean("pressed");
+    return m_table->GetBoolean("pressed", false);
     /*else
             return false;*/
   } else

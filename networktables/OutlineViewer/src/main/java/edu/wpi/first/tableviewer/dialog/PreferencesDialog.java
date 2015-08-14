@@ -2,12 +2,8 @@ package edu.wpi.first.tableviewer.dialog;
 
 
 import edu.wpi.first.tableviewer.OutlineFrame;
-import edu.wpi.first.wpilibj.networktables2.NetworkTableNode;
-import edu.wpi.first.wpilibj.networktables2.client.NetworkTableClient;
-import edu.wpi.first.wpilibj.networktables2.server.NetworkTableServer;
-import edu.wpi.first.wpilibj.networktables2.stream.IOStreamFactory;
-import edu.wpi.first.wpilibj.networktables2.stream.IOStreamProvider;
-import edu.wpi.first.wpilibj.networktables2.stream.SocketStreams;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.networktables.NetworkTablesJNI;
 import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
 
@@ -114,24 +110,28 @@ public class PreferencesDialog extends javax.swing.JDialog {
 
     private void startButtonPressed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonPressed
         try {
-            NetworkTableNode node;
+            NetworkTablesJNI.setLogger(new NetworkTablesJNI.LoggerFunction() {
+                public void apply(int level, String file, int line, String msg) {
+                  System.err.println(msg);
+                }
+            }, 0);
             if (evt.getSource() == clientButton) { // start client
                 String host = hostField.getText();
                 if (host.isEmpty()) {
                     return;
                 }
-                IOStreamFactory streamFactory = SocketStreams.newStreamFactory(host, 1735);
-                NetworkTableClient client = new NetworkTableClient(streamFactory);
-                client.reconnect();
-                node = client;
+                NetworkTable.setIPAddress(host);
+                NetworkTable.setClientMode();
+                NetworkTable.initialize();
                 prefs.put("host", host);
             } else { // start server
-                IOStreamProvider streamProvider = SocketStreams.newStreamProvider(1735);
-                node = new NetworkTableServer(streamProvider);
+                NetworkTable.setIPAddress("");
+                NetworkTable.setServerMode();
+                NetworkTable.initialize();
                 prefs.put("host", "");
             }
             prefs.putBoolean("metadata", metadataBox.isSelected());
-            new OutlineFrame("Network Table Viewer", node, metadataBox.isSelected()).setVisible(true);
+            new OutlineFrame("Network Table Viewer", metadataBox.isSelected()).setVisible(true);
             dispose();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e.getClass() + ": " + e.getMessage(), "Error creating table node", JOptionPane.ERROR_MESSAGE);

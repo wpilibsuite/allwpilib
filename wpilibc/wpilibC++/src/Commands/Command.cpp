@@ -60,10 +60,8 @@ Command::Command(const std::string &name, double timeout) {
   }
 }
 
-Command::~Command() {  // TODO deal with cleaning up all listeners
-  /*if (m_table != nullptr){
-          m_table->RemoveChangeListener(kRunning, this);
-  }*/
+Command::~Command() {
+  if (m_table != nullptr) m_table->RemoveTableListener(this);
 }
 
 /**
@@ -383,9 +381,10 @@ void Command::InitTable(std::shared_ptr<ITable> table) {
 
 std::shared_ptr<ITable> Command::GetTable() const { return m_table; }
 
-void Command::ValueChanged(std::shared_ptr<ITable> source, const std::string &key,
-                           EntryValue value, bool isNew) {
-  if (value.b) {
+void Command::ValueChanged(ITable* source, llvm::StringRef key,
+                           std::shared_ptr<nt::Value> value, bool isNew) {
+  if (!value->IsBoolean()) return;
+  if (value->GetBoolean()) {
     if (!IsRunning()) Start();
   } else {
     if (IsRunning()) Cancel();

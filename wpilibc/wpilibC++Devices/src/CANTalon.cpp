@@ -44,6 +44,7 @@ CANTalon::CANTalon(int deviceNumber, int controlPeriodMs)
 }
 
 CANTalon::~CANTalon() {
+  if (m_table != nullptr) m_table->RemoveTableListener(this);
   if (m_hasBeenMoved) return;
   Disable();
 }
@@ -1275,9 +1276,10 @@ bool CANTalon::GetInverted() const { return m_isInverted; }
 */
 void CANTalon::StopMotor() { Disable(); }
 
-void CANTalon::ValueChanged(std::shared_ptr<ITable> source, const std::string& key,
-                            EntryValue value, bool isNew) {
-  Set(value.f);
+void CANTalon::ValueChanged(ITable* source, llvm::StringRef key,
+                            std::shared_ptr<nt::Value> value, bool isNew) {
+  if (!value->IsDouble()) return;
+  Set(value->GetDouble());
 }
 
 void CANTalon::UpdateTable() {

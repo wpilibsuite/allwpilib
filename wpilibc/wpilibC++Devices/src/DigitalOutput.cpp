@@ -40,6 +40,7 @@ DigitalOutput::DigitalOutput(uint32_t channel) {
  * Free the resources associated with a digital output.
  */
 DigitalOutput::~DigitalOutput() {
+  if (m_table != nullptr) m_table->RemoveTableListener(this);
   if (StatusIsFatal()) return;
   // Disable the PWM in case it was running.
   DisablePWM();
@@ -196,9 +197,10 @@ uint32_t DigitalOutput::GetModuleForRouting() const { return 0; }
  */
 bool DigitalOutput::GetAnalogTriggerForRouting() const { return false; }
 
-void DigitalOutput::ValueChanged(std::shared_ptr<ITable> source, const std::string &key,
-                                 EntryValue value, bool isNew) {
-  Set(value.b);
+void DigitalOutput::ValueChanged(ITable* source, llvm::StringRef key,
+                                 std::shared_ptr<nt::Value> value, bool isNew) {
+  if (!value->IsBoolean()) return;
+  Set(value->GetBoolean());
 }
 
 void DigitalOutput::UpdateTable() {}

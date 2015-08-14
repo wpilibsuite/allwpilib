@@ -216,6 +216,8 @@ CANJaguar::~CANJaguar() {
     FRC_NetworkCommunication_CANSessionMux_sendMessage(
         m_deviceNumber | LM_API_VCOMP_T_SET, nullptr, 0,
         CAN_SEND_PERIOD_STOP_REPEATING, &status);
+
+  if (m_table != nullptr) m_table->RemoveTableListener(this);
 }
 
 /**
@@ -1935,9 +1937,9 @@ uint8_t CANJaguar::GetDeviceID() const { return m_deviceNumber; }
  */
 void CANJaguar::StopMotor() { DisableControl(); }
 
-void CANJaguar::ValueChanged(std::shared_ptr<ITable> source, const std::string &key,
-                             EntryValue value, bool isNew) {
-  Set(value.f);
+void CANJaguar::ValueChanged(ITable* source, llvm::StringRef key,
+                             std::shared_ptr<nt::Value> value, bool isNew) {
+  if (value->type() == NT_DOUBLE) Set(value->GetDouble());
 }
 
 void CANJaguar::UpdateTable() {

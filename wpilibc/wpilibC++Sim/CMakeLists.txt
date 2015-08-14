@@ -20,22 +20,12 @@ if (WIN32)
   add_definitions(-Dsnprintf=sprintf_s)
 endif()
 
-if (WIN32)
-  file(GLOB_RECURSE SRC_FILES src/*.cpp
-    ../../networktables/cpp/lib/share/*.cpp
-    ../../networktables/cpp/lib/WIN32/*.cpp)
-else()
-  file(GLOB_RECURSE SRC_FILES src/*.cpp
-    ../../networktables/cpp/lib/share/*.cpp
-    ../../networktables/cpp/lib/Athena/*.cpp)
-endif()
-
 file(GLOB_RECURSE COM_SRC_FILES ../wpilibC++/src/*.cpp)
 
 
 set (INCLUDE_FOLDERS include
   ../wpilibC++/include
-  ../../networktables/cpp/include
+  ../../networktables/ntcore/include
   ../../hal/include
   ${GZ_MSGS_INCLUDE_DIR}
   ${Boost_INCLUDE_DIR}
@@ -61,7 +51,7 @@ else()
   add_library(WPILibSim SHARED ${SRC_FILES} ${COM_SRC_FILES})
 endif()
 
-target_link_libraries(WPILibSim gz_msgs ${PTHREAD_LIBRARY} ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}  -fPIC) # NetworkTables
+target_link_libraries(WPILibSim gz_msgs ntcore ${PTHREAD_LIBRARY} ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}  -fPIC) # NetworkTables
 
 if (WIN32)
   set_target_properties(${project}  PROPERTIES LINK_FLAGS "/DEBUG")

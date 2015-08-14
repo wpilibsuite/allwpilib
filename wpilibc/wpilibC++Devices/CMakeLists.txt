@@ -4,7 +4,7 @@ project(WPILibC++Devices)
 file(GLOB_RECURSE SRC_FILES src/*.cpp)
 include_directories(include/ ${WPILIB_INCLUDES} ${HAL_API_INCLUDES} ${NWT_API_INCLUDES})
 add_library(wpilib_nonshared STATIC ${SRC_FILES} ${COM_SRC_FILES})
-target_link_libraries(wpilib_nonshared HALAthena NetworkTables ${NI_LIBS})
+target_link_libraries(wpilib_nonshared HALAthena ntcore ${NI_LIBS})
 INSTALL(TARGETS wpilib_nonshared ARCHIVE DESTINATION lib COMPONENT lib)
 INSTALL(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT headers)
 # lib/ c m gcc_s ld-linux

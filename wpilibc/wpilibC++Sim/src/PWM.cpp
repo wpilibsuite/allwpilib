@@ -43,6 +43,10 @@ PWM::PWM(uint32_t channel)
 	m_centerPwm = kPwmDisabled; // In simulation, the same thing.
 }
 
+PWM::~PWM() {
+	if (m_table != nullptr) m_table->RemoveTableListener(this);
+}
+
 /**
  * Optionally eliminate the deadband from a speed controller.
  * @param eliminateDeadband If true, set the motor curve on the Jaguar to eliminate
@@ -217,8 +221,10 @@ void PWM::SetPeriodMultiplier(PeriodMultiplier mult)
 }
 
 
-void PWM::ValueChanged(std::shared_ptr<ITable> source, const std::string& key, EntryValue value, bool isNew) {
-	SetSpeed(value.f);
+void PWM::ValueChanged(ITable* source, llvm::StringRef key,
+                       std::shared_ptr<nt::Value> value, bool isNew) {
+  if (!value->IsDouble()) return;
+  SetSpeed(value->GetDouble());
 }
 
 void PWM::UpdateTable() {

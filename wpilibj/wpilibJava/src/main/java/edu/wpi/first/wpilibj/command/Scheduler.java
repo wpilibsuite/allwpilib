@@ -13,8 +13,6 @@ import java.util.Vector;
 import edu.wpi.first.wpilibj.HLUsageReporting;
 import edu.wpi.first.wpilibj.NamedSendable;
 import edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler;
-import edu.wpi.first.wpilibj.networktables2.type.NumberArray;
-import edu.wpi.first.wpilibj.networktables2.type.StringArray;
 import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
@@ -318,49 +316,48 @@ public class Scheduler implements NamedSendable {
     return "Scheduler";
   }
 
-  private StringArray commands;
-  private NumberArray ids, toCancel;
-
   /**
    * {@inheritDoc}
    */
   public void initTable(ITable subtable) {
     m_table = subtable;
-    commands = new StringArray();
-    ids = new NumberArray();
-    toCancel = new NumberArray();
 
-    m_table.putValue("Names", commands);
-    m_table.putValue("Ids", ids);
-    m_table.putValue("Cancel", toCancel);
+    m_table.putStringArray("Names", new String[0]);
+    m_table.putNumberArray("Ids", new double[0]);
+    m_table.putNumberArray("Cancel", new double[0]);
   }
 
   private void updateTable() {
     if (m_table != null) {
       // Get the commands to cancel
-      m_table.retrieveValue("Cancel", toCancel);
-      if (toCancel.size() > 0) {
+      double[] toCancel = m_table.getNumberArray("Cancel", new double[0]);
+      if (toCancel.length > 0) {
         for (LinkedListElement e = firstCommand; e != null; e = e.getNext()) {
-          for (int i = 0; i < toCancel.size(); i++) {
-            if (e.getData().hashCode() == toCancel.get(i)) {
+          for (int i = 0; i < toCancel.length; i++) {
+            if (e.getData().hashCode() == toCancel[i]) {
               e.getData().cancel();
             }
           }
         }
-        toCancel.setSize(0);
-        m_table.putValue("Cancel", toCancel);
+        m_table.putNumberArray("Cancel", new double[0]);
       }
 
       if (m_runningCommandsChanged) {
-        commands.setSize(0);
-        ids.setSize(0);
         // Set the the running commands
+	int n = 0;
         for (LinkedListElement e = firstCommand; e != null; e = e.getNext()) {
-          commands.add(e.getData().getName());
-          ids.add(e.getData().hashCode());
+	  n++;
         }
-        m_table.putValue("Names", commands);
-        m_table.putValue("Ids", ids);
+        String[] commands = new String[n];
+        double[] ids = new double[n];
+	n = 0;
+        for (LinkedListElement e = firstCommand; e != null; e = e.getNext()) {
+          commands[n] = e.getData().getName();
+          ids[n] = e.getData().hashCode();
+	  n++;
+        }
+        m_table.putStringArray("Names", commands);
+        m_table.putNumberArray("Ids", ids);
       }
     }
   }

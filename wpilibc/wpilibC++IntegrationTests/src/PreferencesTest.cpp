@@ -11,25 +11,27 @@
 #include <cstdio>
 #include <fstream>
 
-static const char *kFileName = "/home/lvuser/wpilib-preferences.ini";
-static const double kSaveTime = 0.2;
+static const char *kFileName = "networktables.ini";
+static const double kSaveTime = 1.2;
 
 /**
- * If we write a new wpilib-preference.ini with some sample values, test that
+ * If we write a new networktables.ini with some sample values, test that
  * we get those same values back using the Preference class.
  */
 TEST(PreferencesTest, ReadPreferencesFromFile) {
+  NetworkTable::Shutdown();
   std::remove(kFileName);
   std::ofstream preferencesFile(kFileName);
-  preferencesFile << "[Preferences]" << std::endl;
-  preferencesFile << "testFileGetString=\"Hello, preferences file\""
+  preferencesFile << "[NetworkTables Storage 3.0]" << std::endl;
+  preferencesFile << "string \"/Preferences/testFileGetString\"=\"Hello, preferences file\""
                   << std::endl;
-  preferencesFile << "testFileGetInt=\"1\"" << std::endl;
-  preferencesFile << "testFileGetDouble=\"0.5\"" << std::endl;
-  preferencesFile << "testFileGetFloat=\"0.25\"" << std::endl;
-  preferencesFile << "testFileGetBoolean=\"true\"" << std::endl;
-  preferencesFile << "testFileGetLong=\"1000000000000000000\"" << std::endl;
+  preferencesFile << "double \"/Preferences/testFileGetInt\"=1" << std::endl;
+  preferencesFile << "double \"/Preferences/testFileGetDouble\"=0.5" << std::endl;
+  preferencesFile << "double \"/Preferences/testFileGetFloat\"=0.25" << std::endl;
+  preferencesFile << "boolean \"/Preferences/testFileGetBoolean\"=true" << std::endl;
+  preferencesFile << "double \"/Preferences/testFileGetLong\"=1000000000000000000" << std::endl;
   preferencesFile.close();
+  NetworkTable::Initialize();
 
   Preferences *preferences = Preferences::GetInstance();
   EXPECT_EQ("Hello, preferences file",
@@ -43,9 +45,13 @@ TEST(PreferencesTest, ReadPreferencesFromFile) {
 
 /**
  * If we set some values using the Preferences class, test that they show up
- * in wpilib-preferences.ini
+ * in networktables.ini
  */
 TEST(PreferencesTest, WritePreferencesToFile) {
+  NetworkTable::Shutdown();
+  NetworkTable::GlobalDeleteAll();
+  std::remove(kFileName);
+  NetworkTable::Initialize();
   Preferences *preferences = Preferences::GetInstance();
   preferences->PutString("testFilePutString", "Hello, preferences file");
   preferences->PutInt("testFilePutInt", 1);
@@ -58,10 +64,13 @@ TEST(PreferencesTest, WritePreferencesToFile) {
   Wait(kSaveTime);
 
   static char const *kExpectedFileContents[] = {
-      "[Preferences]", "testFileGetString=\"Hello, preferences file\"",
-      "testFileGetInt=\"1\"", "testFileGetDouble=\"0.5\"",
-      "testFileGetFloat=\"0.25\"", "testFileGetBoolean=\"true\"",
-      "testFileGetLong=\"1000000000000000000\""};
+      "[NetworkTables Storage 3.0]",
+      "boolean \"/Preferences/testFilePutBoolean\"=true",
+      "double \"/Preferences/testFilePutDouble\"=0.5",
+      "double \"/Preferences/testFilePutFloat\"=0.25",
+      "double \"/Preferences/testFilePutInt\"=1",
+      "double \"/Preferences/testFilePutLong\"=1e+18",
+      "string \"/Preferences/testFilePutString\"=\"Hello, preferences file\""};
 
   std::ifstream preferencesFile(kFileName);
   for (auto& kExpectedFileContent : kExpectedFileContents) {
@@ -72,6 +81,6 @@ TEST(PreferencesTest, WritePreferencesToFile) {
     std::getline(preferencesFile, line);
 
     ASSERT_EQ(kExpectedFileContent, line)
-        << "A line in wpilib-preferences.ini was not correct";
+        << "A line in networktables.ini was not correct";
   }
 }

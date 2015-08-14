@@ -10,6 +10,7 @@
 
 #include "ErrorBase.h"
 #include "SmartDashboard/NamedSendable.h"
+#include "tables/ITableListener.h"
 #include <set>
 #include <string>
 #include <memory>
@@ -179,8 +180,8 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
   virtual void InitTable(std::shared_ptr<ITable> table);
   virtual std::shared_ptr<ITable> GetTable() const;
   virtual std::string GetSmartDashboardType() const;
-  virtual void ValueChanged(std::shared_ptr<ITable> source, const std::string &key,
-                            EntryValue value, bool isNew);
+  virtual void ValueChanged(ITable* source, llvm::StringRef key,
+                            std::shared_ptr<nt::Value> value, bool isNew);
 
  protected:
   std::shared_ptr<ITable> m_table = nullptr;

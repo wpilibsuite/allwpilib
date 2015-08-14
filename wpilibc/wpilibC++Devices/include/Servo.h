@@ -30,8 +30,8 @@ class Servo : public SafePWM {
   static float GetMaxAngle() { return kMaxServoAngle; }
   static float GetMinAngle() { return kMinServoAngle; }
 
-  void ValueChanged(std::shared_ptr<ITable> source, const std::string& key,
-                    EntryValue value, bool isNew) override;
+  void ValueChanged(ITable* source, llvm::StringRef key,
+                    std::shared_ptr<nt::Value> value, bool isNew) override;
   void UpdateTable() override;
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;

@@ -12,13 +12,12 @@
 #include "ErrorBase.h"
 #include "SmartDashboard/NamedSendable.h"
 #include "networktables/NetworkTable.h"
-#include "networktables2/type/NumberArray.h"
-#include "networktables2/type/StringArray.h"
 #include "SmartDashboard/SmartDashboard.h"
 #include <list>
 #include <map>
 #include <memory>
 #include <set>
+#include <string>
 #include <vector>
 #include "HAL/cpp/priority_mutex.h"
 
@@ -62,9 +61,9 @@ class Scheduler : public ErrorBase, public NamedSendable {
   CommandSet m_commands;
   bool m_adding = false;
   bool m_enabled = true;
-  StringArray *commands = nullptr;
-  NumberArray *ids = nullptr;
-  NumberArray *toCancel = nullptr;
+  std::vector<std::string> commands;
+  std::vector<double> ids;
+  std::vector<double> toCancel;
   std::shared_ptr<ITable> m_table = nullptr;
   bool m_runningCommandsChanged = false;
 };

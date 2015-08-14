@@ -61,6 +61,7 @@ Solenoid::~Solenoid() {
   if (CheckSolenoidModule(m_moduleNumber)) {
     m_allocated->Free(m_moduleNumber * kSolenoidChannels + m_channel);
   }
+  if (m_table != nullptr) m_table->RemoveTableListener(this);
 }
 
 /**
@@ -99,9 +100,10 @@ bool Solenoid::IsBlackListed() const {
   return (value != 0);
 }
 
-void Solenoid::ValueChanged(std::shared_ptr<ITable> source, const std::string& key,
-                            EntryValue value, bool isNew) {
-  Set(value.b);
+void Solenoid::ValueChanged(ITable* source, llvm::StringRef key,
+                            std::shared_ptr<nt::Value> value, bool isNew) {
+  if (!value->IsBoolean()) return;
+  Set(value->GetBoolean());
 }
 
 void Solenoid::UpdateTable() {

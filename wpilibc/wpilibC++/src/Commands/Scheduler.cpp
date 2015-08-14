@@ -217,37 +217,41 @@ void Scheduler::UpdateTable() {
   CommandSet::iterator commandIter;
   if (m_table != nullptr) {
     // Get the list of possible commands to cancel
-    m_table->RetrieveValue("Cancel", *toCancel);
+    auto new_toCancel = m_table->GetValue("Cancel");
+    if (new_toCancel)
+      toCancel = new_toCancel->GetDoubleArray();
+    else
+      toCancel.resize(0);
     //		m_table->RetrieveValue("Ids", *ids);
 
     // cancel commands that have had the cancel buttons pressed
     // on the SmartDashboad
-    if (toCancel->size() > 0) {
+    if (!toCancel.empty()) {
       for (commandIter = m_commands.begin(); commandIter != m_commands.end();
            ++commandIter) {
-        for (unsigned i = 0; i < toCancel->size(); i++) {
+        for (unsigned i = 0; i < toCancel.size(); i++) {
           Command *c = *commandIter;
-          if (c->GetID() == toCancel->get(i)) {
+          if (c->GetID() == toCancel[i]) {
             c->Cancel();
           }
         }
       }
-      toCancel->setSize(0);
-      m_table->PutValue("Cancel", *toCancel);
+      toCancel.resize(0);
+      m_table->PutValue("Cancel", nt::Value::MakeDoubleArray(toCancel));
     }
 
     // Set the running commands
     if (m_runningCommandsChanged) {
-      commands->setSize(0);
-      ids->setSize(0);
+      commands.resize(0);
+      ids.resize(0);
       for (commandIter = m_commands.begin(); commandIter != m_commands.end();
            ++commandIter) {
         Command *c = *commandIter;
-        commands->add(c->GetName());
-        ids->add(c->GetID());
+        commands.push_back(c->GetName());
+        ids.push_back(c->GetID());
       }
-      m_table->PutValue("Names", *commands);
-      m_table->PutValue("Ids", *ids);
+      m_table->PutValue("Names", nt::Value::MakeStringArray(commands));
+      m_table->PutValue("Ids", nt::Value::MakeDoubleArray(ids));
     }
   }
 }
@@ -260,13 +264,10 @@ std::string Scheduler::GetSmartDashboardType() const { return "Scheduler"; }
 
 void Scheduler::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
-  commands = new StringArray();
-  ids = new NumberArray();
-  toCancel = new NumberArray();
 
-  m_table->PutValue("Names", *commands);
-  m_table->PutValue("Ids", *ids);
-  m_table->PutValue("Cancel", *toCancel);
+  m_table->PutValue("Names", nt::Value::MakeStringArray(commands));
+  m_table->PutValue("Ids", nt::Value::MakeDoubleArray(ids));
+  m_table->PutValue("Cancel", nt::Value::MakeDoubleArray(toCancel));
 }
 
 std::shared_ptr<ITable> Scheduler::GetTable() const { return m_table; }

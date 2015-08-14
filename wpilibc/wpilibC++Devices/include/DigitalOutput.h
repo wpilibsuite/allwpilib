@@ -38,8 +38,8 @@ class DigitalOutput : public DigitalSource,
   virtual uint32_t GetModuleForRouting() const;
   virtual bool GetAnalogTriggerForRouting() const;
 
-  virtual void ValueChanged(std::shared_ptr<ITable> source, const std::string &key,
-                            EntryValue value, bool isNew);
+  virtual void ValueChanged(ITable* source, llvm::StringRef key,
+                            std::shared_ptr<nt::Value> value, bool isNew);
   void UpdateTable();
   void StartLiveWindowMode();
   void StopLiveWindowMode();

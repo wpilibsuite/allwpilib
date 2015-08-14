@@ -65,6 +65,8 @@ PWM::~PWM() {
 
   freePWMChannel(m_pwm_ports[m_channel], &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
+
+  if (m_table != nullptr) m_table->RemoveTableListener(this);
 }
 
 /**
@@ -337,9 +339,10 @@ void PWM::SetZeroLatch() {
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
-void PWM::ValueChanged(std::shared_ptr<ITable> source, const std::string& key, EntryValue value,
-                       bool isNew) {
-  SetSpeed(value.f);
+void PWM::ValueChanged(ITable* source, llvm::StringRef key,
+                       std::shared_ptr<nt::Value> value, bool isNew) {
+  if (!value->IsDouble()) return;
+  SetSpeed(value->GetDouble());
 }
 
 void PWM::UpdateTable() {

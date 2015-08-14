@@ -19,25 +19,23 @@ class SmartDashboard : public SensorBase {
  public:
   static void init();
 
-  static void PutData(std::string key, Sendable *data);
+  static void PutData(llvm::StringRef key, Sendable *data);
   static void PutData(NamedSendable *value);
-  static Sendable *GetData(std::string keyName);
+  static Sendable *GetData(llvm::StringRef keyName);
 
-  static void PutBoolean(std::string keyName, bool value);
-  static bool GetBoolean(std::string keyName);
-  static bool GetBoolean(std::string keyName, bool defaultValue);
+  static void PutBoolean(llvm::StringRef keyName, bool value);
+  static bool GetBoolean(llvm::StringRef keyName, bool defaultValue);
 
-  static void PutNumber(std::string keyName, double value);
-  static double GetNumber(std::string keyName);
-  static double GetNumber(std::string keyName, double defaultValue);
+  static void PutNumber(llvm::StringRef keyName, double value);
+  static double GetNumber(llvm::StringRef keyName, double defaultValue);
 
-  static void PutString(std::string keyName, std::string value);
-  static int GetString(std::string keyName, char *value, unsigned int valueLen);
-  static std::string GetString(std::string keyName);
-  static std::string GetString(std::string keyName, std::string defaultValue);
+  static void PutString(llvm::StringRef keyName, llvm::StringRef value);
+  static std::string GetString(llvm::StringRef keyName,
+                               llvm::StringRef defaultValue);
 
-  static void PutValue(std::string keyName, ComplexData &value);
-  static void RetrieveValue(std::string keyName, ComplexData &value);
+  static void PutValue(llvm::StringRef keyName,
+                       std::shared_ptr<nt::Value> value);
+  static std::shared_ptr<nt::Value> GetValue(llvm::StringRef keyName);
 
  private:
   virtual ~SmartDashboard() = default;

@@ -18,7 +18,7 @@ def sim = 'wpilibC++Sim'
 // Ensure that both hal and networktables are evaluated, so that they have the binaries property. We need this to
 // properly copy their archives into the final zip
 evaluationDependsOn(':hal')
-evaluationDependsOn(':networktables:cpp')
+evaluationDependsOn(':networktables:ntcore')
 
 publishing {
     publications {
@@ -57,7 +57,7 @@ model {
                         includes = ['**/*.h']
                     }
                     lib project: ':hal', library: 'HALAthena', linkage: 'static'
-                    lib project: ':networktables:cpp', library: 'NetworkTables', linkage: 'static'
+                    lib project: ':networktables:ntcore', library: 'ntcore', linkage: 'static'
                 }
             }
         }
@@ -86,12 +86,12 @@ model {
                         include 'gtest-all.cc', 'gtest_main.cc'
                     }
                     exportedHeaders {
-                        srcDirs = ["${dir}/include", "${dir}/src/gtest", "${dir}/src/gtest/include", "${devices}/include", "${shared}/include", '../hal/include/HAL', '../networktables/cpp/include']
+                        srcDirs = ["${dir}/include", "${dir}/src/gtest", "${dir}/src/gtest/include", "${devices}/include", "${shared}/include", '../hal/include/HAL', '../networktables/ntcore/include']
                         include '**/*.h'
                     }
 
                     lib library: 'wpilib_nonshared', linkage: 'static'
-                    lib project: ':networktables:cpp', library: 'NetworkTables', linkage: 'static'
+                    lib project: ':networktables:ntcore', library: 'ntcore', linkage: 'static'
                     lib project: ':hal', library: 'HALAthena', linkage: 'static'
                 }
             }
@@ -104,7 +104,7 @@ doxygen {
     source file("${shared}/include")
     source file("${devices}/src")
     source file("${devices}/include")
-    def netTablesLoc = '../networktables/cpp'
+    def netTablesLoc = '../networktables/ntcore'
     source file("${netTablesLoc}/include")
     source file("${netTablesLoc}/lib/Athena")
     source file("${netTablesLoc}/lib/share")
@@ -139,7 +139,7 @@ task wpilibcZip(type: Zip) {
     }
 
     // Include the static library file and header files from the networktables project
-    def netTables = project(':networktables:cpp')
+    def netTables = project(':networktables:ntcore')
     netTables.binaries.withType(StaticLibraryBinarySpec) { spec ->
         spec.headerDirs.each {
             from(it) {
@@ -190,7 +190,7 @@ task wpilibcSimZip(type: Zip) {
     from "${sim}/include"
     from "${shared}/include"
     from "../build/simulation/gz_msgs/generated"
-    from '../networktables/cpp/include'
+    from '../networktables/ntcore/include'
     from '../hal/include'
 }
 
@@ -204,7 +204,7 @@ tasks.whenTaskAdded { task ->
 }
 
 // Add the networktables static library as a dependency
-project(':networktables:cpp').tasks.whenTaskAdded { task ->
+project(':networktables:ntcore').tasks.whenTaskAdded { task ->
     if (task.name == 'networkTablesStaticLibrary') {
         wpilibcZip.dependsOn task
     }

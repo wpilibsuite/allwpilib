@@ -4,12 +4,8 @@
  */
 package edu.wpi.first.tableviewer.dialog;
 
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.networktables2.type.ArrayData;
-import edu.wpi.first.wpilibj.networktables2.type.BooleanArray;
-import edu.wpi.first.wpilibj.networktables2.type.NumberArray;
-import edu.wpi.first.wpilibj.networktables2.type.StringArray;
 import edu.wpi.first.wpilibj.tables.ITable;
+import java.util.ArrayList;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
@@ -219,60 +215,78 @@ public class AddArrayDialog extends AbstractAddDialog {
     }
 
     /**
-     * Creates a new {@code ArrayData} object containing the values in the
-     * table, which will then be put into the {@link NetworkTable} associated
+     * Creates a new array object containing the values in the
+     * table, which will then be put into the Network Table associated
      * with this dialog.
      *
      * @param arrayType The type of array: Boolean, Number, or String.
-     * @return An {@link ArrayData} object containing the data in the table, or
+     * @return An array object containing the data in the table, or
      * null if an error is present in the table (such as an invalid double
      * value).
      */
-    private ArrayData createArrayData(String arrayType) {
-        ArrayData ad;
+    private Object createArrayData(String arrayType) {
+        int n = 0;
+        for (int i = 0; i < valueTable.getRowCount(); i++) {
+            Object data = valueTable.getValueAt(i, 0);
+            if (data != null) {
+                n++;
+            }
+        }
         switch (arrayType) {
             case "Boolean":
-                ad = new BooleanArray();
-                for (int i = 0; i < valueTable.getRowCount(); i++) {
-                    Object data = valueTable.getValueAt(i, 0);
-                    if (data != null) {
-                        ((BooleanArray) ad).add(data.toString().equalsIgnoreCase("true"));
-                    }
-                }
-                break;
-            case "Number":
-                ad = new NumberArray();
-                for (int i = 0; i < valueTable.getRowCount(); i++) {
-                    Object data = valueTable.getValueAt(i, 0);
-                    try {
+                {
+                    boolean[] arr = new boolean[n];
+                    n = 0;
+                    for (int i = 0; i < valueTable.getRowCount(); i++) {
+                        Object data = valueTable.getValueAt(i, 0);
                         if (data != null) {
-                            Double d = Double.parseDouble(data.toString());
-                            ((NumberArray) ad).add(d);
+                            arr[n] = data.toString().equalsIgnoreCase("true");
+                            n++;
                         }
-                    } catch (NumberFormatException e) {
-                        JOptionPane.showMessageDialog(
-                                this,
-                                "Invalid double value \"" + data + "\" in row " + (i + 1),
-                                "Invalid number",
-                                JOptionPane.ERROR_MESSAGE);
-                        return null;
                     }
+                    return arr;
                 }
-                break;
+
+            case "Number":
+                {
+                    double[] arr = new double[n];
+                    n = 0;
+                    for (int i = 0; i < valueTable.getRowCount(); i++) {
+                        Object data = valueTable.getValueAt(i, 0);
+                        try {
+                            if (data != null) {
+                                arr[n] = Double.parseDouble(data.toString());
+                                n++;
+                            }
+                        } catch (NumberFormatException e) {
+                            JOptionPane.showMessageDialog(
+                                    this,
+                                    "Invalid double value \"" + data + "\" in row " + (i + 1),
+                                    "Invalid number",
+                                    JOptionPane.ERROR_MESSAGE);
+                            return null;
+                        }
+                    }
+                    return arr;
+                }
 
             case "String":
-                ad = new StringArray();
-                for (int i = 0; i < valueTable.getRowCount(); i++) {
-                    Object data = valueTable.getValueAt(i, 0);
-                    if (data != null) {
-                        ((StringArray) ad).add(data.toString());
+                {
+                    String[] arr = new String[n];
+                    n = 0;
+                    for (int i = 0; i < valueTable.getRowCount(); i++) {
+                        Object data = valueTable.getValueAt(i, 0);
+                        if (data != null) {
+                            arr[n] = data.toString();
+                            n++;
+                        }
                     }
+                    return arr;
                 }
-                break;
+
             default:
                 throw new IllegalArgumentException(arrayType + " is not a valid array type");
         }
-        return ad;
     }
     // Variables declaration - do not modify
     private javax.swing.JButton addRowButton;

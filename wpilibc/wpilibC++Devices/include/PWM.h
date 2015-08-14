@@ -99,8 +99,8 @@ class PWM : public SensorBase,
   int32_t m_deadbandMinPwm;
   int32_t m_minPwm;
 
-  void ValueChanged(std::shared_ptr<ITable> source, const std::string& key, EntryValue value,
-                    bool isNew) override;
+  void ValueChanged(ITable* source, llvm::StringRef key,
+                    std::shared_ptr<nt::Value> value, bool isNew) override;
   void UpdateTable() override;
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
