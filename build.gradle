@@ -1,9 +1,97 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 apply plugin: 'cpp'
+apply plugin: 'visual-studio'
 
 model {
+    toolChains {
+        gcc(Gcc) {
+            target("arm"){
+                // We use a custom-built cross compiler with the prefix arm-frc-linux-gnueabi-<util name>
+                // If this ever changes, the prefix will need to be changed here
+                def compilerPrefix = 'arm-frc-linux-gnueabi-'
+                cppCompiler.executable = compilerPrefix + cppCompiler.executable
+                linker.executable = compilerPrefix + linker.executable
+                assembler.executable = compilerPrefix + assembler.executable
+                // Gradle auto-adds the -m32 argument to the linker and compiler. Our compiler only supports
+                // arm, and doesn't understand this flag, so it is removed from both
+                cppCompiler.withArguments { args ->
+                    args << '-std=c++1y' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
+                    args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-O0' << '-g3' << '-rdynamic'
+                    //TODO: When the compiler allows us to actually call deprecated functions from within
+                    // deprecated function, remove this line (this will cause calling deprecated functions
+                    // to be treated as a warning rather than an error).
+                    args << '-Wno-error=deprecated-declarations'
+                    args.remove('-m32')
+                }
+                linker.withArguments { args ->
+                    args << '-rdynamic'
+                    args.remove('-m32')
+                }
+                staticLibArchiver.executable = compilerPrefix + staticLibArchiver.executable
+            }
+            target('x86') {
+                cppCompiler.withArguments { args ->
+                    args << '-std=c++11' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
+                    args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-O0' << '-g3' << '-rdynamic'
+                    //TODO: When the compiler allows us to actually call deprecated functions from within
+                    // deprecated function, remove this line (this will cause calling deprecated functions
+                    // to be treated as a warning rather than an error).
+                    args << '-Wno-error=deprecated-declarations'
+                }
+                linker.withArguments { args ->
+                    args << '-rdynamic'
+                }
+            }
+            target('x64') {
+                cppCompiler.withArguments { args ->
+                    args << '-std=c++11' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
+                    args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-O0' << '-g3' << '-rdynamic'
+                    //TODO: When the compiler allows us to actually call deprecated functions from within
+                    // deprecated function, remove this line (this will cause calling deprecated functions
+                    // to be treated as a warning rather than an error).
+                    args << '-Wno-error=deprecated-declarations'
+                }
+                linker.withArguments { args ->
+                    args << '-rdynamic'
+                }
+            }
+        }
+        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+            visualCpp(VisualCpp) {
+                def vs14Dir = file('C:\\Program Files (x86)\\Microsoft Visual Studio 14.0')
+                // If vs2015 is installed, fall back to vs2013 for now, until Gradle pulls in the right
+                // includes for the win10 sdk.
+                if (vs14Dir.exists()) {
+                    installDir = file('C:\\Program Files (x86)\\Microsoft Visual Studio 12.0')
+                }
+                eachPlatform {
+                    cppCompiler.withArguments { args ->
+                        args << '/EHsc' << '/DNOMINMAX' << '/D_SCL_SECURE_NO_WARNINGS' << '/DEF:ntcore.def'
+                    }
+                }
+            }
+        }
+    }
+
+    platforms {
+        arm {
+            architecture "arm"
+            operatingSystem 'linux'
+        }
+        x86 {
+            architecture "x86"
+        }
+        x64 {
+            architecture "x86_64"
+        }
+    }
+
     components {
         ntcore(NativeLibrarySpec) {
             targetPlatform 'arm'
+            targetPlatform 'x86'
+            targetPlatform 'x64'
             sources {
                 cpp {
                     source {
