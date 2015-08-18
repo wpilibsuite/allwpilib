@@ -15,7 +15,7 @@
 
     <properties>
         <build-number>DEVELOPMENT</build-number>
-      	<simulation-zip>${project.build.directory}\simulation-zip</simulation-zip>
+        <simulation-zip>${project.build.directory}/simulation-zip</simulation-zip>
     </properties>
 
     <repositories>
