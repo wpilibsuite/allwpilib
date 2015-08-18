@@ -27,6 +27,7 @@
 #include <cstring>
 #ifdef _WIN32
 #include <WinSock2.h>
+#pragma comment(lib, "Ws2_32.lib")
 #else
 #include <arpa/inet.h>
 #include <netinet/in.h>
