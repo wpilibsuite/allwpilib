@@ -14,7 +14,7 @@
 #include "priority_mutex.h"
 
 class priority_condition_variable {
-  typedef pthread_cond_t* native_handle_type;
+  typedef std::condition_variable::native_handle_type native_handle_type;
   typedef std::chrono::system_clock clock_t;
 
  public:
@@ -99,7 +99,7 @@ class priority_condition_variable {
   struct Unlock {
     explicit Unlock(Lock& lk) : m_lock(lk) { lk.unlock(); }
 
-    ~Unlock() noexcept(false) {
+    ~Unlock() /*noexcept(false)*/ {
       if (std::uncaught_exception()) {
         try { m_lock.lock(); } catch(...) {}
       }

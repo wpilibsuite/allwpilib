@@ -46,7 +46,7 @@ protected:
     RobotBase(const RobotBase&) = delete;
     RobotBase& operator=(const RobotBase&) = delete;
 
-	DriverStation *m_ds;
+	DriverStation &m_ds;
 
 private:
 	static RobotBase *m_instance;

@@ -101,10 +101,8 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   HALJoystickPOVs m_joystickPOVs[kJoystickPorts];
   HALJoystickButtons m_joystickButtons[kJoystickPorts];
   HALJoystickDescriptor m_joystickDescriptor[kJoystickPorts];
-#ifndef FRC_SIMULATOR
   Task m_task;
   std::atomic<bool> m_isRunning{false};
-#endif
   mutable Semaphore m_newControlData{Semaphore::kEmpty};
   mutable priority_condition_variable m_packetDataAvailableCond;
   priority_mutex m_packetDataAvailableMutex;

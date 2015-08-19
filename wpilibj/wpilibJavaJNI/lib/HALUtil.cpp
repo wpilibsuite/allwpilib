@@ -10,8 +10,8 @@
 TLogLevel halUtilLogLevel = logWARNING;
 
 #define HALUTIL_LOG(level) \
-    if (level > halUtilLogLevel) ; \
-    else Log().Get(level)
+  if (level > halUtilLogLevel) ; \
+  else Log().Get(level)
 
 
 //
@@ -19,9 +19,9 @@ TLogLevel halUtilLogLevel = logWARNING;
 //
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
 {
-	// set our logging level
-	Log::ReportingLevel() = logDEBUG;
-	return JNI_VERSION_1_6;
+  // set our logging level
+  Log::ReportingLevel() = logDEBUG;
+  return JNI_VERSION_1_6;
 }
 
 /*
@@ -29,14 +29,14 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
  * Method:    initializeMutex
  * Signature: (I)Ljava/nio/ByteBuffer;
  */
-JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_initializeMutexNormal
+  JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_initializeMutexNormal
 (JNIEnv * env, jclass)
 {
-	HALUTIL_LOG(logDEBUG) << "Calling HALUtil initializeMutex";
-	MUTEX_ID* mutexPtr = (MUTEX_ID*)new unsigned char[sizeof(MUTEX_ID)];
-	*mutexPtr = initializeMutexNormal();
-	HALUTIL_LOG(logDEBUG) << "Mutex Ptr = " << *mutexPtr;
-	return env->NewDirectByteBuffer(mutexPtr, sizeof(MUTEX_ID));
+  HALUTIL_LOG(logDEBUG) << "Calling HALUtil initializeMutex";
+  MUTEX_ID mutexPtr = (MUTEX_ID)new unsigned char[sizeof(MUTEX_ID)];
+  mutexPtr = initializeMutexNormal();
+  HALUTIL_LOG(logDEBUG) << "Mutex Ptr = " << mutexPtr;
+  return env->NewDirectByteBuffer(mutexPtr, sizeof(MUTEX_ID));
 }
 
 /*
@@ -44,14 +44,14 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_initializeMutex
  * Method:    deleteMutex
  * Signature: (Ljava/nio/ByteBuffer;)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_deleteMutex
+  JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_deleteMutex
 (JNIEnv * env, jclass, jobject id )
 {
-	HALUTIL_LOG(logDEBUG) << "Calling HALUtil deleteMutex";
-	MUTEX_ID* javaId = (MUTEX_ID*)env->GetDirectBufferAddress(id);
-	HALUTIL_LOG(logDEBUG) << "Mutex Ptr = " << *javaId;
-	deleteMutex( *javaId );
-	delete[] javaId;
+  HALUTIL_LOG(logDEBUG) << "Calling HALUtil deleteMutex";
+  MUTEX_ID javaId = (MUTEX_ID)env->GetDirectBufferAddress(id);
+  HALUTIL_LOG(logDEBUG) << "Mutex Ptr = " << javaId;
+  deleteMutex( javaId );
+  delete[] javaId;
 }
 
 /*
@@ -59,15 +59,15 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_deleteMutex
  * Method:    takeMutex
  * Signature: (Ljava/nio/ByteBuffer;I)B
  */
-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_takeMutex
+  JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_takeMutex
 (JNIEnv * env, jclass, jobject id)
 {
-	//HALUTIL_LOG(logDEBUG) << "Calling HALUtil takeMutex";
-	MUTEX_ID* javaId = (MUTEX_ID*)env->GetDirectBufferAddress(id);
-	//HALUTIL_LOG(logDEBUG) << "Mutex Ptr = " << *javaId;
-	jbyte returnValue = takeMutex(*javaId);
-	//HALUTIL_LOG(logDEBUG) << "Take Result = " << (void*)returnValue;
-	return returnValue;
+  //HALUTIL_LOG(logDEBUG) << "Calling HALUtil takeMutex";
+  MUTEX_ID javaId = (MUTEX_ID)env->GetDirectBufferAddress(id);
+  //HALUTIL_LOG(logDEBUG) << "Mutex Ptr = " << *javaId;
+  takeMutex(javaId);
+  //HALUTIL_LOG(logDEBUG) << "Take Result = " << (void*)returnValue;
+  return 0;
 }
 
 /*
@@ -75,14 +75,14 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_takeMutex
  * Method:    initializeMultiWait
  * Signature: ()Ljava/nio/ByteBuffer;
  */
-JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_initializeMultiWait
+  JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_initializeMultiWait
 (JNIEnv * env, jclass)
 {
-	HALUTIL_LOG(logDEBUG) << "Calling HALUtil initializeMultiWait";
-	MULTIWAIT_ID* multiWaitPtr = (MULTIWAIT_ID*)new unsigned char[4];
-	*multiWaitPtr = initializeMultiWait();
-	HALUTIL_LOG(logDEBUG) << "MultiWait Ptr = " << *multiWaitPtr;
-	return env->NewDirectByteBuffer( multiWaitPtr, 4);
+  HALUTIL_LOG(logDEBUG) << "Calling HALUtil initializeMultiWait";
+  MULTIWAIT_ID multiWaitPtr = (MULTIWAIT_ID)new unsigned char[4];
+  multiWaitPtr = initializeMultiWait();
+  HALUTIL_LOG(logDEBUG) << "MultiWait Ptr = " << multiWaitPtr;
+  return env->NewDirectByteBuffer( multiWaitPtr, 4);
 }
 
 /*
@@ -90,13 +90,13 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_initializeMulti
  * Method:    deleteMultiWait
  * Signature: (Ljava/nio/ByteBuffer;)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_deleteMultiWait
+  JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_deleteMultiWait
 (JNIEnv * env, jclass, jobject id)
 {
-	HALUTIL_LOG(logDEBUG) << "Calling HALUtil deleteMultiWait";
-	MULTIWAIT_ID* javaId = (MULTIWAIT_ID*)env->GetDirectBufferAddress(id);
-	HALUTIL_LOG(logDEBUG) << "MultiWait Ptr = " << *javaId;
-	deleteMultiWait( *javaId );
+  HALUTIL_LOG(logDEBUG) << "Calling HALUtil deleteMultiWait";
+  MULTIWAIT_ID javaId = (MULTIWAIT_ID)env->GetDirectBufferAddress(id);
+  HALUTIL_LOG(logDEBUG) << "MultiWait Ptr = " << javaId;
+  deleteMultiWait( javaId );
 }
 
 /*
@@ -104,13 +104,13 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_deleteMultiWait
  * Method:    takeMultiWait
  * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/ByteBuffer;I)B
  */
-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_takeMultiWait
-  (JNIEnv * env, jclass, jobject multiWaitId, jobject mutexId, jint timeout)
+  JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_takeMultiWait
+(JNIEnv * env, jclass, jobject multiWaitId, jobject mutexId)
 {
- 	MULTIWAIT_ID* javaMultiWaitId = (MULTIWAIT_ID*)env->GetDirectBufferAddress(multiWaitId);
-	MUTEX_ID* javaMutexId = (MUTEX_ID*)env->GetDirectBufferAddress(mutexId);
-	jbyte returnValue = takeMultiWait(*javaMultiWaitId, *javaMutexId, (int32_t) timeout);
-	return returnValue;
+  MULTIWAIT_ID javaMultiWaitId = (MULTIWAIT_ID)env->GetDirectBufferAddress(multiWaitId);
+  MUTEX_ID javaMutexId = (MUTEX_ID)env->GetDirectBufferAddress(mutexId);
+  takeMultiWait(javaMultiWaitId, javaMutexId);
+  return 0;
 }
 
 /*
@@ -118,15 +118,15 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_takeMultiWait
  * Method:    getFPGAVersion
  * Signature: (Ljava/nio/IntBuffer;)S
  */
-JNIEXPORT jshort JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAVersion
-  (JNIEnv * env, jclass, jobject status)
+  JNIEXPORT jshort JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAVersion
+(JNIEnv * env, jclass, jobject status)
 {
-	HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGAVersion";
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	jshort returnValue = getFPGAVersion( statusPtr );
-	HALUTIL_LOG(logDEBUG) << "Status = " << *statusPtr;
-	HALUTIL_LOG(logDEBUG) << "FPGAVersion = " << returnValue;
-	return returnValue;
+  HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGAVersion";
+  jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+  jshort returnValue = getFPGAVersion( statusPtr );
+  HALUTIL_LOG(logDEBUG) << "Status = " << *statusPtr;
+  HALUTIL_LOG(logDEBUG) << "FPGAVersion = " << returnValue;
+  return returnValue;
 }
 
 /*
@@ -134,15 +134,15 @@ JNIEXPORT jshort JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAVersion
  * Method:    getFPGARevision
  * Signature: (Ljava/nio/IntBuffer;)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGARevision
-  (JNIEnv * env, jclass, jobject status)
+  JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGARevision
+(JNIEnv * env, jclass, jobject status)
 {
-	HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGARevision";
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	jint returnValue = getFPGARevision( statusPtr );
-	HALUTIL_LOG(logDEBUG) << "Status = " << *statusPtr;
-	HALUTIL_LOG(logDEBUG) << "FPGARevision = " << returnValue;
-	return returnValue;
+  HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGARevision";
+  jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+  jint returnValue = getFPGARevision( statusPtr );
+  HALUTIL_LOG(logDEBUG) << "Status = " << *statusPtr;
+  HALUTIL_LOG(logDEBUG) << "FPGARevision = " << returnValue;
+  return returnValue;
 }
 
 /*
@@ -150,15 +150,15 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGARevision
  * Method:    getFPGATime
  * Signature: (Ljava/nio/IntBuffer;)I
  */
-JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGATime
-  (JNIEnv * env, jclass, jobject status)
+  JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGATime
+(JNIEnv * env, jclass, jobject status)
 {
-	//HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGATime";
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	jlong returnValue = getFPGATime( statusPtr );
-	//HALUTIL_LOG(logDEBUG) << "Status = " << *statusPtr;
-	//HALUTIL_LOG(logDEBUG) << "FPGATime = " << returnValue;
-	return returnValue;
+  //HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGATime";
+  jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+  jlong returnValue = getFPGATime( statusPtr );
+  //HALUTIL_LOG(logDEBUG) << "Status = " << *statusPtr;
+  //HALUTIL_LOG(logDEBUG) << "FPGATime = " << returnValue;
+  return returnValue;
 
 }
 
@@ -167,15 +167,15 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGATime
  * Method:    getFPGAButton
  * Signature: (Ljava/nio/IntBuffer;)I
  */
-JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAButton
-  (JNIEnv * env, jclass, jobject status)
+  JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAButton
+(JNIEnv * env, jclass, jobject status)
 {
-	//HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGATime";
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	jboolean returnValue = getFPGAButton( statusPtr );
-	//HALUTIL_LOG(logDEBUG) << "Status = " << *statusPtr;
-	//HALUTIL_LOG(logDEBUG) << "FPGATime = " << returnValue;
-	return returnValue;
+  //HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGATime";
+  jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+  jboolean returnValue = getFPGAButton( statusPtr );
+  //HALUTIL_LOG(logDEBUG) << "Status = " << *statusPtr;
+  //HALUTIL_LOG(logDEBUG) << "FPGATime = " << returnValue;
+  return returnValue;
 
 }
 
@@ -184,12 +184,12 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAButton
  * Method:    getHALErrorMessage
  * Signature: (I)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrorMessage
-  (JNIEnv * paramEnv, jclass, jint paramId)
+  JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrorMessage
+(JNIEnv * paramEnv, jclass, jint paramId)
 {
-	const char * msg = getHALErrorMessage(paramId);
-	HALUTIL_LOG(logDEBUG) << "Calling HALUtil getHALErrorMessage id=" << paramId << " msg=" << msg;
-	return paramEnv->NewStringUTF(msg);
+  const char * msg = getHALErrorMessage(paramId);
+  HALUTIL_LOG(logDEBUG) << "Calling HALUtil getHALErrorMessage id=" << paramId << " msg=" << msg;
+  return paramEnv->NewStringUTF(msg);
 }
 
 /*
@@ -197,10 +197,10 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrorMess
  * Method:    getHALErrno
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrno
-  (JNIEnv *, jclass)
+  JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrno
+(JNIEnv *, jclass)
 {
-	return errno;
+  return errno;
 }
 
 /*
@@ -208,15 +208,15 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrno
  * Method:    getHALstrerror
  * Signature: (I)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALstrerror
-  (JNIEnv * env, jclass, jint errorCode)
+  JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALstrerror
+(JNIEnv * env, jclass, jint errorCode)
 {
-	const char * msg = strerror(errno);
-	HALUTIL_LOG(logDEBUG) << "Calling HALUtil getHALstrerror errorCode=" << errorCode << " msg=" << msg;
-	return env->NewStringUTF(msg);
+  const char * msg = strerror(errno);
+  HALUTIL_LOG(logDEBUG) << "Calling HALUtil getHALstrerror errorCode=" << errorCode << " msg=" << msg;
+  return env->NewStringUTF(msg);
 }
 
 JNIEXPORT jint JNICALL
-    Java_edu_wpi_first_wpilibj_hal_HALUtil_pointerSize(JNIEnv*, jclass) {
+Java_edu_wpi_first_wpilibj_hal_HALUtil_pointerSize(JNIEnv*, jclass) {
   return sizeof(void*);
 }

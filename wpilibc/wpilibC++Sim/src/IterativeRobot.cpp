@@ -164,7 +164,7 @@ void IterativeRobot::StartCompetition()
 			}
 		}
 		// wait for driver station data so the loop doesn't hog the CPU
-		m_ds->WaitForData();
+		m_ds.WaitForData();
 	}
 }
 

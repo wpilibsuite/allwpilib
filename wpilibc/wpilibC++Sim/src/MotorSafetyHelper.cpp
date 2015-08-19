@@ -91,9 +91,10 @@ bool MotorSafetyHelper::IsAlive() const {
  * its value is
  * updated again.
  */
-void MotorSafetyHelper::Check() {
-  DriverStation* ds = DriverStation::GetInstance();
-  if (!m_enabled || ds->IsDisabled() || ds->IsTest()) return;
+void MotorSafetyHelper::Check()
+{
+	DriverStation &ds = DriverStation::GetInstance();
+	if (!m_enabled || ds.IsDisabled() || ds.IsTest()) return;
 
   std::unique_lock<priority_recursive_mutex> sync(m_syncMutex);
   if (m_stopTime < Timer::GetFPGATimestamp()) {

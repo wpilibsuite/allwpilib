@@ -62,16 +62,16 @@ const char* getHALErrorMessage(int32_t code)
 			return NiFpga_Status_FifoTimeout_MESSAGE;
 		case NiFpga_Status_TransferAborted:
 			return NiFpga_Status_TransferAborted_MESSAGE;
-		case NiFpga_Status_MemoryFull: 
+		case NiFpga_Status_MemoryFull:
 			return NiFpga_Status_MemoryFull_MESSAGE;
 		case NiFpga_Status_SoftwareFault:
 			return NiFpga_Status_SoftwareFault_MESSAGE;
 		case NiFpga_Status_InvalidParameter:
 			return NiFpga_Status_InvalidParameter_MESSAGE;
 		case NiFpga_Status_ResourceNotFound:
-			return NiFpga_Status_ResourceNotFound_MESSAGE; 
+			return NiFpga_Status_ResourceNotFound_MESSAGE;
 		case NiFpga_Status_ResourceNotInitialized:
-			return NiFpga_Status_ResourceNotInitialized_MESSAGE; 
+			return NiFpga_Status_ResourceNotInitialized_MESSAGE;
 		case NiFpga_Status_HardwareFault:
 			return NiFpga_Status_HardwareFault_MESSAGE;
 		case NiFpga_Status_IrqTimeout:
@@ -186,107 +186,12 @@ int HALSetErrorData(const char *errors, int errorsLength, int wait_ms)
 	return setErrorData(errors, errorsLength, wait_ms);
 }
 
-int HALGetControlWord(HALControlWord *data)
-{
-	return FRC_NetworkCommunication_getControlWord((ControlWord_t*) data);
-}
-
-int HALGetAllianceStation(enum HALAllianceStationID *allianceStation)
-{
-	return FRC_NetworkCommunication_getAllianceStation((AllianceStationID_t*) allianceStation);
-}
-
-int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes *axes)
-{
-	return FRC_NetworkCommunication_getJoystickAxes(joystickNum, (JoystickAxes_t*) axes, kMaxJoystickAxes);
-}
-
-int HALGetJoystickPOVs(uint8_t joystickNum, HALJoystickPOVs *povs)
-{
-	return FRC_NetworkCommunication_getJoystickPOVs(joystickNum, (JoystickPOV_t*) povs, kMaxJoystickPOVs);
-}
-
-int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons)
-{
-	return FRC_NetworkCommunication_getJoystickButtons(joystickNum, &buttons->buttons, &buttons->count);
-}
-
-int HALGetJoystickDescriptor(uint8_t joystickNum, HALJoystickDescriptor *desc)
-{
-	return FRC_NetworkCommunication_getJoystickDesc(joystickNum, &desc->isXbox, &desc->type, (char *)(&desc->name), 
-		&desc->axisCount, (uint8_t *)&desc->axisTypes, &desc->buttonCount, &desc->povCount);
-}
-
-int HALGetJoystickIsXbox(uint8_t joystickNum)
-{
-	HALJoystickDescriptor joystickDesc;
-	if(HALGetJoystickDescriptor(joystickNum, &joystickDesc)<0)
-	{
-		return 0;
-	}else
-	{
-	return joystickDesc.isXbox;
-	}
-}
-
-int HALGetJoystickType(uint8_t joystickNum)
-{
-	HALJoystickDescriptor joystickDesc;
-	if(HALGetJoystickDescriptor(joystickNum, &joystickDesc)<0)
-	{
-		return -1;
-	} else
-	{
-	return joystickDesc.type;
-	}
-}
-
-const char* HALGetJoystickName(uint8_t joystickNum)
-{
-	HALJoystickDescriptor joystickDesc;
-	if(HALGetJoystickDescriptor(joystickNum, &joystickDesc)<0)
-	{
-		const char* retval = "";
-		return retval;
-	} else
-	{
-	const char* retval(joystickDesc.name);
-	return retval;
-	}
-}
-
-int HALGetJoystickAxisType(uint8_t joystickNum, int axis)
-{
-	HALJoystickDescriptor joystickDesc;
-	if(HALGetJoystickDescriptor(joystickNum, &joystickDesc)<0)
-	{
-		return -1;
-	} else
-	{
-	return joystickDesc.axisTypes[axis];
-	}
-}
-
-int HALSetJoystickOutputs(uint8_t joystickNum, uint32_t outputs, uint16_t leftRumble, uint16_t rightRumble)
-{
-	return FRC_NetworkCommunication_setJoystickOutputs(joystickNum, outputs, leftRumble, rightRumble);
-}
-
-int HALGetMatchTime(float *matchTime)
-{
-	return FRC_NetworkCommunication_getMatchTime(matchTime);
-}
-
-void HALSetNewDataSem(MULTIWAIT_ID sem)
-{
-	setNewDataSem(sem);
-}
 
 bool HALGetSystemActive(int32_t *status)
 {
 	return watchdog->readStatus_SystemActive(status);
 }
-	
+
 bool HALGetBrownedOut(int32_t *status)
 {
 	return !(watchdog->readStatus_PowerAlive(status));
@@ -358,31 +263,6 @@ int HALInitialize(int mode)
 	fs << pid << std::endl;
 	fs.close();
 	return 1;
-}
-
-void HALNetworkCommunicationObserveUserProgramStarting(void)
-{
-	FRC_NetworkCommunication_observeUserProgramStarting();
-}
-
-void HALNetworkCommunicationObserveUserProgramDisabled(void)
-{
-	FRC_NetworkCommunication_observeUserProgramDisabled();
-}
-
-void HALNetworkCommunicationObserveUserProgramAutonomous(void)
-{
-	FRC_NetworkCommunication_observeUserProgramAutonomous();
-}
-
-void HALNetworkCommunicationObserveUserProgramTeleop(void)
-{
-	FRC_NetworkCommunication_observeUserProgramTeleop();
-}
-
-void HALNetworkCommunicationObserveUserProgramTest(void)
-{
-	FRC_NetworkCommunication_observeUserProgramTest();
 }
 
 uint32_t HALReport(uint8_t resource, uint8_t instanceNumber, uint8_t context,

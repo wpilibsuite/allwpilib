@@ -124,33 +124,33 @@ void SampleRobot::StartCompetition()
 		{
 			if (IsDisabled())
 			{
-				m_ds->InDisabled(true);
+				m_ds.InDisabled(true);
 				Disabled();
-				m_ds->InDisabled(false);
-				while (IsDisabled()) sleep(1); //m_ds->WaitForData();
+				m_ds.InDisabled(false);
+				while (IsDisabled()) sleep(1); //m_ds.WaitForData();
 			}
 			else if (IsAutonomous())
 			{
-				m_ds->InAutonomous(true);
+				m_ds.InAutonomous(true);
 				Autonomous();
-				m_ds->InAutonomous(false);
-				while (IsAutonomous() && IsEnabled()) sleep(1); //m_ds->WaitForData();
+				m_ds.InAutonomous(false);
+				while (IsAutonomous() && IsEnabled()) sleep(1); //m_ds.WaitForData();
 			}
             else if (IsTest())
             {
             	lw.SetEnabled(true);
-            	m_ds->InTest(true);
-                Test();
-                m_ds->InTest(false);
-                while (IsTest() && IsEnabled()) sleep(1); //m_ds->WaitForData();
+              m_ds.InTest(true);
+              Test();
+              m_ds.InTest(false);
+                while (IsTest() && IsEnabled()) sleep(1); //m_ds.WaitForData();
                 lw.SetEnabled(false);
             }
 			else
 			{
-				m_ds->InOperatorControl(true);
+				m_ds.InOperatorControl(true);
 				OperatorControl();
-				m_ds->InOperatorControl(false);
-				while (IsOperatorControl() && IsEnabled()) sleep(1); //m_ds->WaitForData();
+				m_ds.InOperatorControl(false);
+				while (IsOperatorControl() && IsEnabled()) sleep(1); //m_ds.WaitForData();
 			}
 		}
 	}

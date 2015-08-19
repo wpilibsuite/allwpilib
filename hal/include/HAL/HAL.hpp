@@ -164,8 +164,8 @@ enum HALAllianceStationID {
 /* The maximum number of axes that will be stored in a single HALJoystickAxes
 	struct. This is used for allocating buffers, not bounds checking, since
 	there are usually less axes in practice. */
-static constexpr size_t kMaxJoystickAxes = 12;
-static constexpr size_t kMaxJoystickPOVs = 12;
+static const size_t kMaxJoystickAxes = 12;
+static const size_t kMaxJoystickPOVs = 12;
 
 struct HALJoystickAxes {
 	uint16_t count;
@@ -234,8 +234,8 @@ extern "C"
 	int HALSetJoystickOutputs(uint8_t joystickNum, uint32_t outputs, uint16_t leftRumble, uint16_t rightRumble);
 	int HALGetMatchTime(float *matchTime);
 
-	void HALSetNewDataSem(MULTIWAIT_ID sem);
-	
+	void HALSetNewDataSem(NATIVE_MULTIWAIT_ID sem);
+
 	bool HALGetSystemActive(int32_t *status);
 	bool HALGetBrownedOut(int32_t *status);
 

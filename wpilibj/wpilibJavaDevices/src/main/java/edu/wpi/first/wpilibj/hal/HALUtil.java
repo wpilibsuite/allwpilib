@@ -30,7 +30,7 @@ public class HALUtil extends JNIWrapper {
 
   public static native void deleteMultiWait(ByteBuffer sem);
 
-  public static native byte takeMultiWait(ByteBuffer sem, ByteBuffer m, int timeOut);
+  public static native byte takeMultiWait(ByteBuffer sem, ByteBuffer m);
 
   public static native short getFPGAVersion(IntBuffer status);
 

@@ -123,7 +123,7 @@ public class DriverStation implements RobotState.Interface {
   private void task() {
     int safetyCounter = 0;
     while (m_thread_keepalive) {
-      HALUtil.takeMultiWait(m_packetDataAvailableSem, m_packetDataAvailableMutex, 0);
+      HALUtil.takeMultiWait(m_packetDataAvailableSem, m_packetDataAvailableMutex);
       synchronized (this) {
         getData();
       }

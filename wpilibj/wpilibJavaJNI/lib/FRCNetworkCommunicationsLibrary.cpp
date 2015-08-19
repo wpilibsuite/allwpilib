@@ -399,9 +399,9 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCom
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_setNewDataSem
   (JNIEnv * env, jclass, jobject id )
 {
-	MULTIWAIT_ID* javaId = (MULTIWAIT_ID*)env->GetDirectBufferAddress(id);
-	NETCOMM_LOG(logDEBUG) << "Mutex Ptr = " << *javaId;
-	HALSetNewDataSem(*javaId);
+	MULTIWAIT_ID javaId = (MULTIWAIT_ID)env->GetDirectBufferAddress(id);
+	NETCOMM_LOG(logDEBUG) << "Mutex Ptr = " << javaId;
+	HALSetNewDataSem(javaId->native_handle());
 }
 
 /*
@@ -640,11 +640,11 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
 {
   const char * errorStr = env->GetStringUTFChars(error, NULL);
   jsize length = env->GetStringUTFLength(error);
-  
+
   NETCOMM_LOG(logDEBUG) << "Set Error: " << errorStr;
   NETCOMM_LOG(logDEBUG) << "Length: " << length;
   jint returnValue = HALSetErrorData(errorStr, (jint) length, 0);
   env->ReleaseStringUTFChars(error,errorStr);
   return returnValue;
 }
-  
+

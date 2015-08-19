@@ -166,8 +166,13 @@ subprojects {
             doLast {
                 binaries.all {
                     tasks.withType(CppCompile) {
-                        linker.args << '-L' + niLibraryPath
-                        linker.args.addAll(niLibraryArgs)
+                        // desktop version doesn't use all the NI libraries
+                        // so only do this for arm libraries
+                        String architecture = targetPlatform.architecture
+                        if (architecture.contains('arm')){
+                            linker.args << '-L' + niLibraryPath
+                            linker.args.addAll(niLibraryArgs)
+                        }
                     }
                 }
                 model {
