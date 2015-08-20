@@ -76,6 +76,10 @@ static void DisposeConnectionInfo(NT_ConnectionInfo *info) {
   std::free(info->remote_name);
 }
 
+static void DisposeEntryInfo(NT_EntryInfo *info) {
+  std::free(info->name.str);
+}
+
 static RpcParamDef ConvertFromC(const NT_RpcParamDef& in) {
   RpcParamDef out;
   out.name = ConvertFromC(in.name);
@@ -409,8 +413,19 @@ void NT_InitString(NT_String *str) {
   str->len = 0;
 }
 
+enum NT_Type NT_GetType(const char *name, size_t name_len) {
+  auto v = nt::GetEntryValue(StringRef(name, name_len));
+  if (!v) return NT_Type::NT_UNASSIGNED;
+  return v->type();
+}
+
 void NT_DisposeConnectionInfoArray(NT_ConnectionInfo *arr, size_t count) {
   for (size_t i = 0; i < count; i++) DisposeConnectionInfo(&arr[i]);
+  std::free(arr);
+}
+
+void NT_DisposeEntryInfoArray(NT_EntryInfo *arr, size_t count){
+  for (size_t i = 0; i < count; i++) DisposeEntryInfo(&arr[i]);
   std::free(arr);
 }
 
@@ -436,3 +451,328 @@ void NT_DisposeRpcCallInfo(NT_RpcCallInfo *call_info) {
   NT_DisposeString(&call_info->name);
   NT_DisposeString(&call_info->params);
 }
+
+/* Interop Utility Functions */
+
+/* Array and Struct Allocations */
+
+/* Allocates a char array of the specified size.*/
+char *NT_AllocateCharArray(size_t size)
+{
+  char *retVal = static_cast<char*>(
+    std::malloc(size * sizeof(char)));
+  return retVal;
+}
+
+/* Allocates an integer or boolean array of the specified size. */
+int *NT_AllocateBooleanArray(size_t size)
+{
+  int *retVal = static_cast<int*>(
+    std::malloc(size * sizeof(int)));
+  return retVal;
+}
+
+/* Allocates a double array of the specified size. */
+double *NT_AllocateDoubleArray(size_t size)
+{
+  double *retVal = static_cast<double*>(
+    std::malloc(size * sizeof(double)));
+  return retVal;
+}
+
+/* Allocates an NT_String array of the specified size. */
+struct NT_String *NT_AllocateNTStringArray(size_t size)
+{
+  NT_String *retVal = static_cast<NT_String*>(
+    std::malloc(size * sizeof(NT_String)));
+  return retVal;
+}
+
+/* Allocates */
+struct NT_String NT_AllocateNTString(size_t size)
+{
+  NT_String retVal;
+  retVal.len = size;
+  retVal.str = static_cast<char*>(
+    std::malloc(size * sizeof(char)));
+  return retVal;
+}
+
+void NT_FreeDoubleArray(double *v_double)
+{
+  std::free(v_double);
+}
+void NT_FreeBooleanArray(int *v_boolean)
+{
+  std::free(v_boolean);
+}
+void NT_FreeStringArray(struct NT_String *v_string, size_t arr_size)
+{
+  for (size_t i = 0; i < arr_size; i++)
+    std::free(v_string[i].str);
+  std::free(v_string);
+}
+
+int NT_SetEntryDouble(const char *name, size_t name_len, double v_double, int force)
+{
+  if (force != 0)
+  {
+    nt::SetEntryTypeValue(StringRef(name, name_len), Value::MakeDouble(v_double));
+    return 1;
+  }
+  else
+  {
+    return nt::SetEntryValue(StringRef(name, name_len), Value::MakeDouble(v_double));
+  }
+}
+
+int NT_SetEntryBoolean(const char *name, size_t name_len, int v_boolean, int force)
+{
+  if (force != 0)
+  {
+    nt::SetEntryTypeValue(StringRef(name, name_len), Value::MakeBoolean(v_boolean));
+    return 1;
+  }
+  else
+  {
+    return nt::SetEntryValue(StringRef(name, name_len), Value::MakeBoolean(v_boolean));
+  }
+}
+
+int NT_SetEntryString(const char *name, size_t name_len, struct NT_String v_string, int force)
+{
+  if (force != 0)
+  {
+    nt::SetEntryTypeValue(StringRef(name, name_len), Value::MakeString(StringRef(v_string.str, v_string.len)));
+    return 1;
+  }
+  else
+  {
+    return nt::SetEntryValue(StringRef(name, name_len), Value::MakeString(StringRef(v_string.str, v_string.len)));
+  }
+  
+}
+
+int NT_SetEntryRaw(const char *name, size_t name_len, struct NT_String v_raw, int force)
+{
+  if (force != 0)
+  {
+    nt::SetEntryTypeValue(StringRef(name, name_len), Value::MakeString(StringRef(v_raw.str, v_raw.len)));
+    return 1;
+  }
+  else
+  {
+    return nt::SetEntryValue(StringRef(name, name_len), Value::MakeString(StringRef(v_raw.str, v_raw.len)));
+  }
+  
+}
+
+int NT_SetEntryBooleanArray(const char *name, size_t name_len, const int *arr, size_t size, int force)
+{
+  if (force != 0)
+  {
+    nt::SetEntryTypeValue(StringRef(name, name_len), Value::MakeBooleanArray(llvm::makeArrayRef(arr, size)));
+    return 1;
+  }
+  else
+  {
+    return nt::SetEntryValue(StringRef(name, name_len), Value::MakeBooleanArray(llvm::makeArrayRef(arr, size)));
+  }
+}
+
+int NT_SetEntryDoubleArray(const char *name, size_t name_len, const double *arr, size_t size, int force)
+{
+  if (force != 0)
+  {
+    nt::SetEntryTypeValue(StringRef(name, name_len), Value::MakeDoubleArray(llvm::makeArrayRef(arr, size)));
+    return 1;
+  }
+  else
+  {
+    return nt::SetEntryValue(StringRef(name, name_len), Value::MakeDoubleArray(llvm::makeArrayRef(arr, size)));
+  }
+}
+
+int NT_SetEntryNTStringArray(const char *name, size_t name_len, const struct NT_String *arr, size_t size, int force)
+{
+  std::vector<std::string> v;
+  v.reserve(size);
+  for (size_t i = 0; i < size; ++i)
+    v.push_back(ConvertFromC(arr[i]));
+
+  if (force != 0)
+  {
+    nt::SetEntryTypeValue(StringRef(name, name_len), Value::MakeStringArray(std::move(v)));
+    return 1;
+  }
+  else
+  {
+    return nt::SetEntryValue(StringRef(name, name_len), Value::MakeStringArray(std::move(v)));
+  }
+
+}
+
+enum NT_Type NT_GetTypeFromValue(struct NT_Value *value)
+{
+  if (!value) return NT_Type::NT_UNASSIGNED;
+  return value->type;
+}
+
+int NT_GetEntryBooleanFromValue(struct NT_Value *value, unsigned long long *last_change, int *v_boolean)
+{
+  if (!value || value->type != NT_Type::NT_BOOLEAN)
+  {
+    return 0;
+  }
+  *v_boolean = value->data.v_boolean;
+  *last_change = value->last_change;
+  return 1;
+
+}
+
+int NT_GetEntryDoubleFromValue(struct NT_Value *value, unsigned long long *last_change, double *v_double)
+{
+  if (!value || value->type != NT_Type::NT_DOUBLE)
+  {
+    return 0;
+  }
+  *last_change = value->last_change;
+  *v_double = value->data.v_double;
+  return 1;
+}
+
+int NT_GetEntryStringFromValue(struct NT_Value *value, unsigned long long *last_change, struct NT_String *v_string)
+{
+  if (!value || value->type != NT_Type::NT_STRING)
+  {
+    return 0;
+  }
+  *last_change = value->last_change;
+  NT_DisposeString(v_string);
+  *v_string = value->data.v_string;
+  return 1;
+}
+
+int NT_GetEntryRawFromValue(struct NT_Value *value, unsigned long long *last_change, struct NT_String *v_raw)
+{
+  if (!value || value->type != NT_Type::NT_RAW)
+  {
+    return 0;
+  }
+  *last_change = value->last_change;
+  NT_DisposeString(v_raw);
+  *v_raw = value->data.v_raw;
+  return 1;
+}
+
+int *NT_GetEntryBooleanArrayFromValue(struct NT_Value *value, unsigned long long *last_change, size_t *arr_size)
+{
+  if (!value || value->type != NT_Type::NT_BOOLEAN_ARRAY) return nullptr;
+  *last_change = value->last_change;
+  *arr_size = value->data.arr_boolean.size;
+  return value->data.arr_boolean.arr;
+}
+
+double *NT_GetEntryDoubleArrayFromValue(struct NT_Value *value, unsigned long long *last_change, size_t *arr_size)
+{
+  if (!value || value->type != NT_Type::NT_DOUBLE_ARRAY) return nullptr;
+  *last_change = value->last_change;
+  *arr_size = value->data.arr_double.size;
+  return value->data.arr_double.arr;
+}
+
+NT_String *NT_GetEntryStringArrayFromValue(struct NT_Value *value, unsigned long long *last_change, size_t *arr_size)
+{
+  if (!value || value->type != NT_Type::NT_STRING_ARRAY) return nullptr;
+  *last_change = value->last_change;
+  *arr_size = value->data.arr_string.size;
+  return value->data.arr_string.arr;
+}
+
+int NT_GetEntryBoolean(const char* name, size_t name_len, unsigned long long *last_change, int *v_boolean)
+{
+  auto v = nt::GetEntryValue(StringRef(name, name_len));
+  if (!v || !v->IsBoolean())
+  {
+    return 0;
+  }
+  *v_boolean = v->GetBoolean();
+  *last_change = v->last_change();
+  return 1;
+}
+
+int NT_GetEntryDouble(const char* name, size_t name_len, unsigned long long *last_change, double *v_double)
+{
+  auto v = nt::GetEntryValue(StringRef(name, name_len));
+  if (!v || !v->IsDouble())
+  {
+    return 0;
+  }
+  *last_change = v->last_change();
+  *v_double = v->GetDouble();
+  return 1;
+}
+
+int NT_GetEntryString(const char *name, size_t name_len, unsigned long long *last_change, struct NT_String *v_string)
+{
+  auto v = nt::GetEntryValue(StringRef(name, name_len));
+  if (!v || !v->IsString()) {
+    return 0;
+  }
+  *last_change = v->last_change();
+  nt::ConvertToC(v->GetString(), v_string);
+  return 1;
+}
+
+int NT_GetEntryRaw(const char *name, size_t name_len, unsigned long long *last_change, struct NT_String *v_raw)
+{
+  auto v = nt::GetEntryValue(StringRef(name, name_len));
+  if (!v || !v->IsRaw())
+  {
+    return 0;
+  }
+  *last_change = v->last_change();
+  nt::ConvertToC(v->GetRaw(), v_raw);
+  return 1;
+}
+
+int *NT_GetEntryBooleanArray(const char* name, size_t name_len, unsigned long long *last_change, size_t *arr_size)
+{
+  auto v = nt::GetEntryValue(StringRef(name, name_len));
+  if (!v || !v->IsBooleanArray()) return nullptr;
+  *last_change = v->last_change();
+  auto vArr = v->GetBooleanArray();
+  int *arr = static_cast<int*>(std::malloc(vArr.size() * sizeof(int)));
+  *arr_size = vArr.size();
+  std::copy(vArr.begin(), vArr.end(), arr);
+  return arr;
+}
+
+double *NT_GetEntryDoubleArray(const char* name, size_t name_len, unsigned long long *last_change, size_t *arr_size)
+{
+  auto v = nt::GetEntryValue(StringRef(name, name_len));
+  if (!v || !v->IsDoubleArray()) return nullptr;
+  *last_change = v->last_change();
+  auto vArr = v->GetDoubleArray();
+  double *arr = static_cast<double*>(std::malloc(vArr.size() * sizeof(double)));
+  *arr_size = vArr.size();
+  std::copy(vArr.begin(), vArr.end(), arr);
+  return arr;
+}
+
+NT_String *NT_GetEntryStringArray(const char* name, size_t name_len, unsigned long long *last_change, size_t *arr_size)
+{
+  auto v = nt::GetEntryValue(StringRef(name, name_len));
+  if (!v || !v->IsStringArray()) return nullptr;
+  *last_change = v->last_change();
+  auto vArr = v->GetStringArray();
+  NT_String *arr =
+    static_cast<NT_String*>(std::malloc(vArr.size()*sizeof(NT_String)));
+  for (size_t i = 0; i < vArr.size(); ++i)
+  {
+    ConvertToC(vArr[i], &arr[i]);
+  }
+  *arr_size = vArr.size();
+  return arr;
+}
+

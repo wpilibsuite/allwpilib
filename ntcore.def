@@ -41,6 +41,38 @@ NT_PackRpcValues @42
 NT_UnpackRpcValues @43
 NT_DisposeRpcDefinition @44
 NT_DisposeRpcCallInfo @45
+NT_GetType @46
+NT_AllocateDoubleArray @47
+NT_AllocateBooleanArray @48
+NT_AllocateNTStringArray @49
+NT_AllocateNTString @50
+NT_FreeDoubleArray @51
+NT_FreeBooleanArray @52
+NT_FreeStringArray @53
+NT_GetTypeFromValue @54
+NT_GetEntryBooleanFromValue @55
+NT_GetEntryDoubleFromValue @56
+NT_GetEntryStringFromValue @57
+NT_GetEntryRawFromValue @58
+NT_GetEntryBooleanArrayFromValue @59
+NT_GetEntryDoubleArrayFromValue @60
+NT_GetEntryStringArrayFromValue @61
+NT_GetEntryBoolean @62
+NT_GetEntryDouble @63
+NT_GetEntryString @64
+NT_GetEntryRaw @65
+NT_GetEntryBooleanArray @66
+NT_GetEntryDoubleArray @67
+NT_GetEntryStringArray @68
+NT_SetEntryDouble @69
+NT_SetEntryBoolean @70
+NT_SetEntryString @71
+NT_SetEntryRaw @72
+NT_SetEntryBooleanArray @73
+NT_SetEntryDoubleArray @74
+NT_SetEntryNTStringArray @75
+NT_DisposeEntryInfoArray @76
+NT_AllocateCharArray @77
 
 ; JNI functions
 JNI_OnLoad
