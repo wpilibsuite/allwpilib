@@ -9,8 +9,6 @@
 
 using namespace nt;
 
-raw_socket_istream::~raw_socket_istream() {}
-
 bool raw_socket_istream::read(void* data, std::size_t len) {
   char* cdata = static_cast<char*>(data);
   std::size_t pos = 0;

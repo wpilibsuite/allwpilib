@@ -18,7 +18,7 @@ class raw_socket_istream : public raw_istream {
  public:
   raw_socket_istream(NetworkStream& stream, int timeout = 0)
       : m_stream(stream), m_timeout(timeout) {}
-  virtual ~raw_socket_istream();
+  virtual ~raw_socket_istream() = default;
   virtual bool read(void* data, std::size_t len);
   virtual void close();
 

@@ -13,11 +13,9 @@
 namespace nt {
 
 class raw_istream {
-  void anchor();
-
  public:
-  raw_istream() {}
-  virtual ~raw_istream() {}
+  raw_istream() = default;
+  virtual ~raw_istream() = default;
   virtual bool read(void* data, std::size_t len) = 0;
   virtual void close() = 0;
 
@@ -28,7 +26,7 @@ class raw_istream {
 class raw_mem_istream : public raw_istream {
  public:
   raw_mem_istream(const char* mem, std::size_t len) : m_cur(mem), m_left(len) {}
-  virtual ~raw_mem_istream() {}
+  virtual ~raw_mem_istream() = default;
   virtual bool read(void* data, std::size_t len);
   virtual void close() {}
 
