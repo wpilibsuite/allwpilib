@@ -34,7 +34,8 @@ class DispatcherBase {
  public:
   virtual ~DispatcherBase();
 
-  void StartServer(std::unique_ptr<NetworkAcceptor> acceptor);
+  void StartServer(StringRef persist_filename,
+                   std::unique_ptr<NetworkAcceptor> acceptor);
   void StartClient(std::function<std::unique_ptr<NetworkStream>()> connect);
   void Stop();
   void SetUpdateRate(double interval);
@@ -73,6 +74,7 @@ class DispatcherBase {
   Storage& m_storage;
   Notifier& m_notifier;
   bool m_server;
+  std::string m_persist_filename;
   std::thread m_dispatch_thread;
   std::thread m_clientserver_thread;
   std::thread m_notifier_thread;
@@ -107,7 +109,8 @@ class Dispatcher : public DispatcherBase {
     return instance;
   }
 
-  void StartServer(const char* listen_address, unsigned int port);
+  void StartServer(StringRef persist_filename, const char* listen_address,
+                   unsigned int port);
   void StartClient(const char* server_name, unsigned int port);
 
  private:

@@ -10,7 +10,6 @@
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
-#include <fstream>
 
 #include "Dispatcher.h"
 #include "Log.h"
@@ -211,8 +210,7 @@ void SetNetworkIdentity(StringRef name) {
 
 void StartServer(StringRef persist_filename, const char *listen_address,
                  unsigned int port) {
-  Dispatcher& dispatcher = Dispatcher::GetInstance();
-  dispatcher.StartServer(listen_address, port);
+  Dispatcher::GetInstance().StartServer(persist_filename, listen_address, port);
 }
 
 void StopServer() {
@@ -240,44 +238,13 @@ std::vector<ConnectionInfo> GetConnections() {
  */
 
 const char* SavePersistent(StringRef filename) {
-  const Storage& storage = Storage::GetInstance();
-
-  std::string fn = filename;
-  std::string tmp = filename;
-  tmp += ".tmp";
-  std::string bak = filename;
-  bak += ".bak";
-
-  // start by writing to temporary file
-  std::ofstream os(tmp);
-  if (!os) return "could not open file";
-  storage.SavePersistent(os);
-  os.flush();
-  if (!os) {
-    os.close();
-    std::remove(tmp.c_str());
-    return "error saving file";
-  }
-
-  // safely move to real file
-  std::remove(bak.c_str());
-  if (std::rename(fn.c_str(), bak.c_str()) != 0)
-    return "could not rename real file to backup";
-  if (std::rename(tmp.c_str(), fn.c_str()) != 0) {
-    std::rename(bak.c_str(), fn.c_str());  // attempt to restore backup
-    return "could not rename temp file to real file";
-  }
-  return nullptr;
+  return Storage::GetInstance().SavePersistent(filename, false);
 }
 
 const char* LoadPersistent(
     StringRef filename,
     std::function<void(size_t line, const char* msg)> warn) {
-  Storage& storage = Storage::GetInstance();
-  std::ifstream is(filename);
-  if (!is) return "could not open file";
-  if (!storage.LoadPersistent(is, warn)) return "error reading file";
-  return nullptr;
+  return Storage::GetInstance().LoadPersistent(filename, warn);
 }
 
 void SetLogger(LogFunc func, unsigned int min_level) {

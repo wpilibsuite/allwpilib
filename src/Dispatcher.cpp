@@ -18,9 +18,11 @@ using namespace nt;
 
 ATOMIC_STATIC_INIT(Dispatcher)
 
-void Dispatcher::StartServer(const char* listen_address, unsigned int port) {
-  DispatcherBase::StartServer(std::unique_ptr<NetworkAcceptor>(
-      new TCPAcceptor(static_cast<int>(port), listen_address)));
+void Dispatcher::StartServer(StringRef persist_filename,
+                             const char* listen_address, unsigned int port) {
+  DispatcherBase::StartServer(persist_filename,
+                              std::unique_ptr<NetworkAcceptor>(new TCPAcceptor(
+                                  static_cast<int>(port), listen_address)));
 }
 
 void Dispatcher::StartClient(const char* server_name, unsigned int port) {
@@ -43,14 +45,30 @@ DispatcherBase::~DispatcherBase() {
   Stop();
 }
 
-void DispatcherBase::StartServer(std::unique_ptr<NetworkAcceptor> acceptor) {
+void DispatcherBase::StartServer(StringRef persist_filename,
+                                 std::unique_ptr<NetworkAcceptor> acceptor) {
   {
     std::lock_guard<std::mutex> lock(m_user_mutex);
     if (m_active) return;
     m_active = true;
   }
   m_server = true;
+  m_persist_filename = persist_filename;
   m_server_acceptor = std::move(acceptor);
+
+  // Load persistent file.  Ignore errors, but pass along warnings.
+  if (!persist_filename.empty()) {
+    bool first = true;
+    m_storage.LoadPersistent(
+        persist_filename, [&](std::size_t line, const char* msg) {
+          if (first) {
+            first = false;
+            WARNING("When reading initial persistent values from '"
+                    << persist_filename << "':");
+          }
+          WARNING(persist_filename << ":" << line << ": " << msg);
+        });
+  }
 
   using namespace std::placeholders;
   m_storage.SetOutgoing(std::bind(&Dispatcher::QueueOutgoing, this, _1, _2, _3),
@@ -144,7 +162,12 @@ std::vector<ConnectionInfo> DispatcherBase::GetConnections() const {
 
 void DispatcherBase::DispatchThreadMain() {
   auto timeout_time = std::chrono::steady_clock::now();
+
+  static const auto save_delta_time = std::chrono::seconds(1);
+  auto next_save_time = timeout_time + save_delta_time;
+
   int count = 0;
+
   std::unique_lock<std::mutex> flush_lock(m_flush_mutex);
   while (m_active) {
     // handle loop taking too long
@@ -158,6 +181,15 @@ void DispatcherBase::DispatchThreadMain() {
                               [&] { return !m_active || m_do_flush; });
     m_do_flush = false;
     if (!m_active) break;  // in case we were woken up to terminate
+
+    // perform periodic persistent save
+    if (m_server && !m_persist_filename.empty() && start > next_save_time) {
+      next_save_time += save_delta_time;
+      // handle loop taking too long
+      if (start > next_save_time) next_save_time = start + save_delta_time;
+      const char* err = m_storage.SavePersistent(m_persist_filename, true);
+      if (err) WARNING("periodic persistent save: " << err);
+    }
 
     if (++count > 10) {
       DEBUG("dispatch running");
@@ -397,7 +429,9 @@ bool DispatcherBase::ServerHandshake(
       if (msg->Is(Message::kClientHelloDone)) break;
       if (!msg->Is(Message::kEntryAssign)) {
         // unexpected message
-        DEBUG("server: received message (" << msg->type() << ") other than entry assignment during initial handshake");
+        DEBUG("server: received message ("
+              << msg->type()
+              << ") other than entry assignment during initial handshake");
         return false;
       }
       incoming.push_back(msg);

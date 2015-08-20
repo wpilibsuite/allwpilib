@@ -10,6 +10,7 @@
 
 #include <atomic>
 #include <cstddef>
+#include <fstream>
 #include <functional>
 #include <iosfwd>
 #include <memory>
@@ -39,13 +40,19 @@ class Storage {
   }
   ~Storage();
 
-  // Accessors required by Dispatcher.
+  // Accessors required by Dispatcher.  A function pointer is used for
+  // generation of outgoing messages to break a dependency loop between
+  // Storage and Dispatcher; in operation this is always set to
+  // Dispatcher::QueueOutgoing.
   typedef std::function<void(std::shared_ptr<Message> msg,
                              NetworkConnection* only,
                              NetworkConnection* except)> QueueOutgoingFunc;
   void SetOutgoing(QueueOutgoingFunc queue_outgoing, bool server);
   void ClearOutgoing();
 
+  // Required for wire protocol 2.0 to get the entry type of an entry when
+  // receiving entry updates (because the length/type is not provided in the
+  // message itself).  Not used in wire protocol 3.0.
   NT_Type GetEntryType(unsigned int id) const;
 
   void ProcessIncoming(std::shared_ptr<Message> msg, NetworkConnection* conn,
@@ -57,9 +64,8 @@ class Storage {
                                bool new_server,
                                std::vector<std::shared_ptr<Message>>* out_msgs);
 
-  std::mutex& mutex() { return m_mutex; }
-
-  // User functions
+  // User functions.  These are the actual implementations of the corresponding
+  // user API functions in ntcore_cpp.
   std::shared_ptr<Value> GetEntryValue(StringRef name) const;
   bool SetEntryValue(StringRef name, std::shared_ptr<Value> value);
   void SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value);
@@ -70,7 +76,16 @@ class Storage {
   std::vector<EntryInfo> GetEntryInfo(StringRef prefix, unsigned int types);
   void NotifyEntries(StringRef prefix);
 
-  void SavePersistent(std::ostream& os) const;
+  // Filename-based save/load functions.  Used both by periodic saves and
+  // accessible directly via the user API.
+  const char* SavePersistent(StringRef filename, bool periodic) const;
+  const char* LoadPersistent(
+      StringRef filename,
+      std::function<void(std::size_t line, const char* msg)> warn);
+
+  // Stream-based save/load functions (exposed for testing purposes).  These
+  // implement the guts of the filename-based functions.
+  void SavePersistent(std::ostream& os, bool periodic) const;
   bool LoadPersistent(
       std::istream& is,
       std::function<void(std::size_t line, const char* msg)> warn);
@@ -89,17 +104,34 @@ class Storage {
   Storage(const Storage&) = delete;
   Storage& operator=(const Storage&) = delete;
 
+  // Data for each table entry.
   struct Entry {
     Entry(llvm::StringRef name_)
         : name(name_), flags(0), id(0xffff), rpc_call_uid(0) {}
     bool IsPersistent() const { return (flags & NT_PERSISTENT) != 0; }
 
+    // We redundantly store the name so that it's available when accessing the
+    // raw Entry* via the ID map.
     std::string name;
+
+    // The current value and flags.
     std::shared_ptr<Value> value;
     unsigned int flags;
+
+    // Unique ID for this entry as used in network messages.  The value is
+    // assigned by the server, so on the client this is 0xffff until an
+    // entry assignment is received back from the server.
     unsigned int id;
+
+    // Sequence number for update resolution.
     SequenceNumber seq_num;
+
+    // RPC callback function.  Null if either not an RPC or if the RPC is
+    // polled.
     RpcCallback rpc_callback;
+
+    // Last UID used when calling this RPC (primarily for client use).  This
+    // is incremented for each call.
     unsigned int rpc_call_uid;
   };
 
@@ -112,13 +144,25 @@ class Storage {
   EntriesMap m_entries;
   IdMap m_idmap;
   RpcResultMap m_rpc_results;
+  // If any persistent values have changed
+  mutable bool m_persistent_dirty = false;
+
+  // condition variable and termination flag for blocking on a RPC result
   std::atomic_bool m_terminating;
   std::condition_variable m_rpc_results_cond;
 
+  // configured by dispatcher at startup
   QueueOutgoingFunc m_queue_outgoing;
   bool m_server = true;
+
+  // references to singletons (we don't grab them directly for testing purposes)
   Notifier& m_notifier;
   RpcServer& m_rpc_server;
+
+  bool GetPersistentEntries(
+      bool periodic,
+      std::vector<std::pair<std::string, std::shared_ptr<Value>>>* entries)
+      const;
 
   ATOMIC_STATIC_DECL(Storage)
 };

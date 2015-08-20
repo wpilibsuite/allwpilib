@@ -85,6 +85,9 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
           entry->id = id;
           m_idmap.push_back(entry);
 
+          // update persistent dirty flag if it's persistent
+          if (entry->IsPersistent()) m_persistent_dirty = true;
+
           // notify
           m_notifier.NotifyEntry(name, entry->value, true);
 
@@ -160,12 +163,21 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
         return;
       }
 
+      // don't update flags from a <3.0 remote (not part of message)
+      if (conn->proto_rev() >= 0x0300) {
+        // update persistent dirty flag if persistent flag changed
+        if ((entry->flags & NT_PERSISTENT) != (msg->flags() & NT_PERSISTENT))
+          m_persistent_dirty = true;
+        entry->flags = msg->flags();
+      }
+
+      // update persistent dirty flag if the value changed and it's persistent
+      if (entry->IsPersistent() && *entry->value != *msg->value())
+        m_persistent_dirty = true;
+
       // update local
       entry->value = msg->value();
       entry->seq_num = seq_num;
-
-      // don't update flags from a <3.0 remote (not part of message)
-      if (conn->proto_rev() >= 0x0300) entry->flags = msg->flags();
 
       // notify
       m_notifier.NotifyEntry(name, entry->value, false);
@@ -201,6 +213,9 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
       entry->value = msg->value();
       entry->seq_num = seq_num;
 
+      // update persistent dirty flag if it's a persistent value
+      if (entry->IsPersistent()) m_persistent_dirty = true;
+
       // notify
       m_notifier.NotifyEntry(entry->name, entry->value, false);
 
@@ -223,6 +238,10 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
         return;
       }
       Entry* entry = m_idmap[id];
+
+      // update persistent dirty flag if persistent flag changed
+      if ((entry->flags & NT_PERSISTENT) != (msg->flags() & NT_PERSISTENT))
+        m_persistent_dirty = true;
 
       // update local
       entry->flags = msg->flags();
@@ -247,6 +266,9 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
       }
       Entry* entry = m_idmap[id];
 
+      // update persistent dirty flag if it's a persistent value
+      if (entry->IsPersistent()) m_persistent_dirty = true;
+
       // update local
       m_entries.erase(entry->name);  // erase from map
       m_idmap[id] = nullptr;  // delete it from idmap too
@@ -264,6 +286,9 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
       // update local
       m_entries.clear();
       m_idmap.resize(0);
+
+      // set persistent dirty flag
+      m_persistent_dirty = true;
 
       // broadcast to all other connections (note for client there won't
       // be any other connections, so don't bother)
@@ -419,6 +444,9 @@ bool Storage::SetEntryValue(StringRef name, std::shared_ptr<Value> value) {
     m_idmap.push_back(entry);
   }
 
+  // update persistent dirty flag if value changed and it's persistent
+  if (entry->IsPersistent() && *old_value != *value) m_persistent_dirty = true;
+
   // generate message
   if (!m_queue_outgoing) return true;
   auto queue_outgoing = m_queue_outgoing;
@@ -458,6 +486,9 @@ void Storage::SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value) {
     m_idmap.push_back(entry);
   }
 
+  // update persistent dirty flag if it's a persistent value
+  if (entry->IsPersistent()) m_persistent_dirty = true;
+
   // generate message
   if (!m_queue_outgoing) return;
   auto queue_outgoing = m_queue_outgoing;
@@ -486,6 +517,11 @@ void Storage::SetEntryFlags(StringRef name, unsigned int flags) {
   if (i == m_entries.end()) return;
   Entry* entry = i->getValue().get();
   if (entry->flags == flags) return;
+
+  // update persistent dirty flag if persistent flag changed
+  if ((entry->flags & NT_PERSISTENT) != (flags & NT_PERSISTENT))
+    m_persistent_dirty = true;
+
   entry->flags = flags;
 
   // generate message
@@ -512,6 +548,10 @@ void Storage::DeleteEntry(StringRef name) {
   Entry* entry = i->getValue().get();
   unsigned int id = entry->id;
   bool had_value = entry->value != nullptr;
+
+  // update persistent dirty flag if it's a persistent value
+  if (entry->IsPersistent()) m_persistent_dirty = true;
+
   m_entries.erase(i);  // erase from map
   if (id < m_idmap.size()) m_idmap[id] = nullptr; 
 
@@ -532,6 +572,9 @@ void Storage::DeleteAllEntries() {
   if (m_entries.empty()) return;
   m_entries.clear();
   m_idmap.resize(0);
+
+  // set persistent dirty flag
+  m_persistent_dirty = true;
 
   // generate message
   if (!m_queue_outgoing) return;
@@ -600,25 +643,37 @@ static void WriteString(std::ostream& os, llvm::StringRef str) {
   os << '"';
 }
 
-void Storage::SavePersistent(std::ostream& os) const {
+bool Storage::GetPersistentEntries(
+    bool periodic,
+    std::vector<std::pair<std::string, std::shared_ptr<Value>>>* entries)
+    const {
   // copy values out of storage as quickly as possible so lock isn't held
-  typedef std::pair<std::string, std::shared_ptr<Value>> NewEntry;
-  std::vector<NewEntry> entries;
   {
     std::lock_guard<std::mutex> lock(m_mutex);
-    entries.reserve(m_entries.size());
+    // for periodic, don't re-save unless something has changed
+    if (periodic && !m_persistent_dirty) return false;
+    m_persistent_dirty = false;
+    entries->reserve(m_entries.size());
     for (auto& i : m_entries) {
       Entry* entry = i.getValue().get();
       // only write persistent-flagged values
       if (!entry->IsPersistent()) continue;
-      entries.push_back(std::make_pair(i.getKey(), entry->value));
+      entries->emplace_back(i.getKey(), entry->value);
     }
   }
 
   // sort in name order
-  std::sort(entries.begin(), entries.end(),
-            [](const NewEntry& a, const NewEntry& b) { return a.first < b.first; });
+  std::sort(entries->begin(), entries->end(),
+            [](const std::pair<std::string, std::shared_ptr<Value>>& a,
+               const std::pair<std::string, std::shared_ptr<Value>>& b) {
+              return a.first < b.first;
+            });
+  return true;
+}
 
+static void SavePersistentImpl(
+    std::ostream& os,
+    llvm::ArrayRef<std::pair<std::string, std::shared_ptr<Value>>> entries) {
   std::string base64_encoded;
 
   // header
@@ -709,6 +764,56 @@ void Storage::SavePersistent(std::ostream& os) const {
     // eol
     os << '\n';
   }
+}
+
+void Storage::SavePersistent(std::ostream& os, bool periodic) const {
+  std::vector<std::pair<std::string, std::shared_ptr<Value>>> entries;
+  if (!GetPersistentEntries(periodic, &entries)) return;
+  SavePersistentImpl(os, entries);
+}
+
+const char* Storage::SavePersistent(StringRef filename, bool periodic) const {
+  std::string fn = filename;
+  std::string tmp = filename;
+  tmp += ".tmp";
+  std::string bak = filename;
+  bak += ".bak";
+
+  // Get entries before creating file
+  std::vector<std::pair<std::string, std::shared_ptr<Value>>> entries;
+  if (!GetPersistentEntries(periodic, &entries)) return nullptr;
+
+  const char* err = nullptr;
+
+  // start by writing to temporary file
+  std::ofstream os(tmp);
+  if (!os) {
+    err = "could not open file";
+    goto done;
+  }
+  DEBUG("saving persistent file '" << filename << "'");
+  SavePersistentImpl(os, entries);
+  os.flush();
+  if (!os) {
+    os.close();
+    std::remove(tmp.c_str());
+    err = "error saving file";
+    goto done;
+  }
+
+  // Safely move to real file.  We ignore any failures related to the backup.
+  std::remove(bak.c_str());
+  std::rename(fn.c_str(), bak.c_str());
+  if (std::rename(tmp.c_str(), fn.c_str()) != 0) {
+    std::rename(bak.c_str(), fn.c_str());  // attempt to restore backup
+    err = "could not rename temp file to real file";
+    goto done;
+  }
+
+done:
+  // try again if there was an error
+  if (err && periodic) m_persistent_dirty = true;
+  return err;
 }
 
 /* Extracts an escaped string token.  Does not unescape the string.
@@ -1036,6 +1141,15 @@ next_line:
   }
 
   return true;
+}
+
+const char* Storage::LoadPersistent(
+    StringRef filename,
+    std::function<void(std::size_t line, const char* msg)> warn) {
+  std::ifstream is(filename);
+  if (!is) return "could not open file";
+  if (!LoadPersistent(is, warn)) return "error reading file";
+  return nullptr;
 }
 
 void Storage::CreateRpc(StringRef name, StringRef def, RpcCallback callback) {
