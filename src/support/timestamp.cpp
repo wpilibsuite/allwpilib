@@ -6,13 +6,12 @@
 /*----------------------------------------------------------------------------*/
 #include "timestamp.h"
 
+#ifdef _WIN32
 #include <cassert>
 #include <exception>
-
-#ifdef _WIN32
 #include <windows.h>
 #else
-#include <time.h>
+#include <chrono>
 #endif
 
 // offset in microseconds
@@ -32,13 +31,10 @@ static unsigned long long zerotime() {
   tmpres -= deltaepoch;
   return tmpres;
 #else
-  timespec ts;
-
-  clock_gettime(CLOCK_REALTIME, &ts);
-
-  // in 100-ns intervals
-  return static_cast<unsigned long long>(ts.tv_sec) * 10000000ull +
-         static_cast<unsigned long long>(ts.tv_nsec) / 100u;
+  // 100-ns intervals
+  using namespace std::chrono;
+  return duration_cast<nanoseconds>(
+    high_resolution_clock::now().time_since_epoch()).count() / 100u;
 #endif
 }
 
@@ -50,48 +46,32 @@ static unsigned long long timestamp() {
   // but what matters is that timestamps are monotonic and consistent
   return static_cast<unsigned long long>(li.QuadPart);
 #else
-  timespec ts;
-
-  // cannot fail, parameters are correct and we checked earlier we can
-  // access the clock
-  clock_gettime(CLOCK_MONOTONIC, &ts);
-  // in ns
-  return static_cast<unsigned long long>(ts.tv_sec) * 1000000000ull +
-         static_cast<unsigned long long>(ts.tv_nsec);
+  // 100-ns intervals
+  using namespace std::chrono;
+  return duration_cast<nanoseconds>(
+    steady_clock::now().time_since_epoch()).count() / 100u;
 #endif
 }
 
-static unsigned long long update_frequency() {
 #ifdef _WIN32
+static unsigned long long update_frequency() {
   LARGE_INTEGER li;
   if (!QueryPerformanceFrequency(&li) || !li.QuadPart) {
     // log something
     std::terminate();
   }
   return static_cast<unsigned long long>(li.QuadPart);
-#else
-  timespec ts;
-
-  if (clock_getres(CLOCK_MONOTONIC, &ts) < 0) {
-    // log error
-    std::terminate();
-  }
-
-  assert(!ts.tv_sec);
-
-  // this is the precision of the clock, we want the number of updates per
-  // second, which is 1 / ts.tv_nsec * 1,000,000,000
-  static const unsigned long long billion = 1000000000ull;
-
-  return billion / static_cast<unsigned long long>(ts.tv_nsec);
-#endif
 }
+#endif
 
 static const unsigned long long zerotime_val = zerotime();
 static const unsigned long long offset_val = timestamp();
+#ifdef _WIN32
 static const unsigned long long frequency_val = update_frequency();
+#endif
 
 unsigned long long nt::Now() {
+#ifdef _WIN32
   assert(offset_val > 0u);
   assert(frequency_val > 0u);
   unsigned long long delta = timestamp() - offset_val;
@@ -99,6 +79,9 @@ unsigned long long nt::Now() {
   // delta by 10,000,000
   unsigned long long delta_in_us = delta * 10000000ull / frequency_val;
   return delta_in_us + zerotime_val;
+#else
+  return zerotime_val + timestamp() - offset_val;
+#endif
 }
 
 unsigned long long NT_Now() {
