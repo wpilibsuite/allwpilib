@@ -45,7 +45,7 @@ class Logger {
   Logger();
 
   LogFunc m_func;
-  unsigned int m_min_level;
+  unsigned int m_min_level = 100;
 
   ATOMIC_STATIC_DECL(Logger)
 };

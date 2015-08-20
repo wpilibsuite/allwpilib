@@ -11,6 +11,6 @@ using namespace nt;
 
 ATOMIC_STATIC_INIT(Logger)
 
-Logger::Logger() : m_min_level(100) {}
+Logger::Logger() {}
 
 Logger::~Logger() {}
