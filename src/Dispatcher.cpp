@@ -31,12 +31,7 @@ void Dispatcher::StartClient(const char* server_name, unsigned int port) {
 }
 
 DispatcherBase::DispatcherBase(Storage& storage, Notifier& notifier)
-    : m_storage(storage),
-      m_notifier(notifier),
-      m_server(false),
-      m_do_flush(false),
-      m_reconnect_proto_rev(0x0300),
-      m_do_reconnect(true) {
+    : m_storage(storage), m_notifier(notifier) {
   m_active = false;
   m_update_rate = 100;
 }

@@ -73,7 +73,7 @@ class DispatcherBase {
 
   Storage& m_storage;
   Notifier& m_notifier;
-  bool m_server;
+  bool m_server = false;
   std::string m_persist_filename;
   std::thread m_dispatch_thread;
   std::thread m_clientserver_thread;
@@ -93,12 +93,12 @@ class DispatcherBase {
   std::mutex m_flush_mutex;
   std::condition_variable m_flush_cv;
   std::chrono::steady_clock::time_point m_last_flush;
-  bool m_do_flush;
+  bool m_do_flush = false;
 
   // Condition variable for client reconnect (uses user mutex)
   std::condition_variable m_reconnect_cv;
-  unsigned int m_reconnect_proto_rev;
-  bool m_do_reconnect;
+  unsigned int m_reconnect_proto_rev = 0x0300;
+  bool m_do_reconnect = true;
 };
 
 class Dispatcher : public DispatcherBase {
