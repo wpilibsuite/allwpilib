@@ -2,8 +2,8 @@
 
 ## Functionality
 
-* Automatic persistent saves
-* RPC
+* Keepalives
+* Initial connection flag
 
 ## Unit Test Coverage
 
@@ -18,3 +18,4 @@
 * C API
 * SavePersistent safe file handling (part of C++ API)
 * More LoadPersistent warning cases
+* Automatic persistent saves
