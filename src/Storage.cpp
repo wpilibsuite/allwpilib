@@ -20,6 +20,9 @@ using namespace nt;
 
 ATOMIC_STATIC_INIT(Storage)
 
+Storage::Storage()
+    : Storage(Notifier::GetInstance(), RpcServer::GetInstance()) {}
+
 Storage::Storage(Notifier& notifier, RpcServer& rpc_server)
     : m_notifier(notifier), m_rpc_server(rpc_server) {
   m_terminating = false;

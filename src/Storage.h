@@ -99,7 +99,7 @@ class Storage {
   bool GetRpcResult(bool blocking, unsigned int call_uid, std::string* result);
 
  private:
-  Storage() : Storage(Notifier::GetInstance(), RpcServer::GetInstance()) {}
+  Storage();
   Storage(Notifier& notifier, RpcServer& rpcserver);
   Storage(const Storage&) = delete;
   Storage& operator=(const Storage&) = delete;

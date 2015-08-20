@@ -30,6 +30,9 @@ void Dispatcher::StartClient(const char* server_name, unsigned int port) {
                                         static_cast<int>(port), 1));
 }
 
+Dispatcher::Dispatcher()
+    : Dispatcher(Storage::GetInstance(), Notifier::GetInstance()) {}
+
 DispatcherBase::DispatcherBase(Storage& storage, Notifier& notifier)
     : m_storage(storage), m_notifier(notifier) {
   m_active = false;

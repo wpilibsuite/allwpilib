@@ -114,7 +114,7 @@ class Dispatcher : public DispatcherBase {
   void StartClient(const char* server_name, unsigned int port);
 
  private:
-  Dispatcher() : Dispatcher(Storage::GetInstance(), Notifier::GetInstance()) {}
+  Dispatcher();
   Dispatcher(Storage& storage, Notifier& notifier)
       : DispatcherBase(storage, notifier) {}
 
