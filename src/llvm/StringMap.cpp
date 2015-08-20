@@ -19,13 +19,13 @@ using namespace llvm;
 
 StringMapImpl::StringMapImpl(unsigned InitSize, unsigned itemSize) {
   ItemSize = itemSize;
-  
+
   // If a size is specified, initialize the table with that many buckets.
   if (InitSize) {
     init(InitSize);
     return;
   }
-  
+
   // Otherwise, initialize it with zero buckets to avoid the allocation.
   TheTable = nullptr;
   NumBuckets = 0;
@@ -39,7 +39,7 @@ void StringMapImpl::init(unsigned InitSize) {
   NumBuckets = InitSize ? InitSize : 16;
   NumItems = 0;
   NumTombstones = 0;
-  
+
   TheTable = (StringMapEntryBase **)calloc(NumBuckets+1,
                                            sizeof(StringMapEntryBase **) +
                                            sizeof(unsigned));
@@ -77,11 +77,11 @@ unsigned StringMapImpl::LookupBucketFor(StringRef Name) {
         HashTable[FirstTombstone] = FullHashValue;
         return FirstTombstone;
       }
-      
+
       HashTable[BucketNo] = FullHashValue;
       return BucketNo;
     }
-    
+
     if (BucketItem == getTombstoneVal()) {
       // Skip over tombstones.  However, remember the first one we see.
       if (FirstTombstone == -1) FirstTombstone = BucketNo;
@@ -90,7 +90,7 @@ unsigned StringMapImpl::LookupBucketFor(StringRef Name) {
       // case here is that we are only looking at the buckets (for item info
       // being non-null and for the full hash value) not at the items.  This
       // is important for cache locality.
-      
+
       // Do the comparison like this because Name isn't necessarily
       // null-terminated!
       char *ItemStr = (char*)BucketItem+ItemSize;
@@ -99,10 +99,10 @@ unsigned StringMapImpl::LookupBucketFor(StringRef Name) {
         return BucketNo;
       }
     }
-    
+
     // Okay, we didn't find the item.  Probe to the next bucket.
     BucketNo = (BucketNo+ProbeAmt) & (HTSize-1);
-    
+
     // Use quadratic probing, it has fewer clumping artifacts than linear
     // probing and has good cache behavior in the common case.
     ++ProbeAmt;
@@ -126,7 +126,7 @@ int StringMapImpl::FindKey(StringRef Key) const {
     // If we found an empty bucket, this key isn't in the table yet, return.
     if (!BucketItem)
       return -1;
-    
+
     if (BucketItem == getTombstoneVal()) {
       // Ignore tombstones.
     } else if (HashTable[BucketNo] == FullHashValue) {
@@ -134,7 +134,7 @@ int StringMapImpl::FindKey(StringRef Key) const {
       // case here is that we are only looking at the buckets (for item info
       // being non-null and for the full hash value) not at the items.  This
       // is important for cache locality.
-      
+
       // Do the comparison like this because NameStart isn't necessarily
       // null-terminated!
       char *ItemStr = (char*)BucketItem+ItemSize;
@@ -143,10 +143,10 @@ int StringMapImpl::FindKey(StringRef Key) const {
         return BucketNo;
       }
     }
-    
+
     // Okay, we didn't find the item.  Probe to the next bucket.
     BucketNo = (BucketNo+ProbeAmt) & (HTSize-1);
-    
+
     // Use quadratic probing, it has fewer clumping artifacts than linear
     // probing and has good cache behavior in the common case.
     ++ProbeAmt;
@@ -167,7 +167,7 @@ void StringMapImpl::RemoveKey(StringMapEntryBase *V) {
 StringMapEntryBase *StringMapImpl::RemoveKey(StringRef Key) {
   int Bucket = FindKey(Key);
   if (Bucket == -1) return nullptr;
-  
+
   StringMapEntryBase *Result = TheTable[Bucket];
   TheTable[Bucket] = getTombstoneVal();
   --NumItems;
@@ -220,13 +220,13 @@ unsigned StringMapImpl::RehashTable(unsigned BucketNo) {
           NewBucketNo = NewBucket;
         continue;
       }
-      
+
       // Otherwise probe for a spot.
       unsigned ProbeSize = 1;
       do {
         NewBucket = (NewBucket + ProbeSize++) & (NewSize-1);
       } while (NewTableArray[NewBucket]);
-      
+
       // Finally found a slot.  Fill it in.
       NewTableArray[NewBucket] = Bucket;
       NewHashArray[NewBucket] = FullHash;
@@ -234,9 +234,9 @@ unsigned StringMapImpl::RehashTable(unsigned BucketNo) {
         NewBucketNo = NewBucket;
     }
   }
-  
+
   free(TheTable);
-  
+
   TheTable = NewTableArray;
   NumBuckets = NewSize;
   NumTombstones = 0;
