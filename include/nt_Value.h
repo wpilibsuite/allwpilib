@@ -107,7 +107,8 @@ class Value {
 #ifdef _MSC_VER
   template <typename T, typename = std::enable_if_t<std::is_same<T, std::string>>>
 #else
-  template <typename T>
+  template <typename T,
+            typename std::enable_if<std::is_same<T, std::string>::value>::type>
 #endif
   static std::shared_ptr<Value> MakeString(T&& value) {
     auto val = std::make_shared<Value>(NT_STRING, private_init());
@@ -126,7 +127,8 @@ class Value {
 #ifdef _MSC_VER
   template <typename T, typename = std::enable_if_t<std::is_same<T, std::string>>>
 #else
-  template <typename T>
+  template <typename T,
+            typename std::enable_if<std::is_same<T, std::string>::value>::type>
 #endif
   static std::shared_ptr<Value> MakeRaw(T&& value) {
     auto val = std::make_shared<Value>(NT_RAW, private_init());
