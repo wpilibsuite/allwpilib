@@ -431,14 +431,14 @@ TEST_P(StorageTestPopulated, GetEntryInfoPrefixTypes) {
 
 TEST_P(StorageTestPersistent, SavePersistentEmpty) {
   std::ostringstream oss;
-  storage.SavePersistent(oss);
+  storage.SavePersistent(oss, false);
   ASSERT_EQ("[NetworkTables Storage 3.0]\n", oss.str());
 }
 
 TEST_P(StorageTestPersistent, SavePersistent) {
   for (auto& i : entries()) i.getValue()->flags = NT_PERSISTENT;
   std::ostringstream oss;
-  storage.SavePersistent(oss);
+  storage.SavePersistent(oss, false);
   std::string out = oss.str();
   //fputs(out.c_str(), stderr);
   llvm::StringRef line, rem = out;
