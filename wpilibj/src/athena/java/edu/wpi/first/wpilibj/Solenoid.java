@@ -35,6 +35,13 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
     checkSolenoidModule(m_moduleNumber);
     checkSolenoidChannel(m_channel);
 
+    try {
+      m_allocated.allocate(m_moduleNumber * kSolenoidChannels + m_channel);
+    } catch (CheckedAllocationException e) {
+      throw new AllocationException("Solenoid channel " + m_channel + " on module "
+        + m_moduleNumber + " is already allocated");
+    }
+
     long port = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
     m_solenoid_port = SolenoidJNI.initializeSolenoidPort(port);
 
@@ -69,8 +76,7 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
    * Destructor.
    */
   public synchronized void free() {
-    // m_allocated.free((m_moduleNumber - 1) * kSolenoidChannels + m_channel -
-    // 1);
+    m_allocated.free(m_moduleNumber * kSolenoidChannels + m_channel);
   }
 
   /**
