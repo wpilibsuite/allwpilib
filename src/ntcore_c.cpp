@@ -39,7 +39,6 @@ static void ConvertToC(const ConnectionInfo& in, NT_ConnectionInfo* out) {
 
 static void ConvertToC(const RpcParamDef& in, NT_RpcParamDef* out) {
   ConvertToC(in.name, &out->name);
-  NT_InitValue(&out->def_value);
   ConvertToC(*in.def_value, &out->def_value);
 }
 
@@ -297,7 +296,6 @@ NT_Value **NT_UnpackRpcValues(const char *packed, size_t packed_len,
       std::malloc(values_v.size() * sizeof(NT_Value*)));
   for (size_t i = 0; i < values_v.size(); ++i) {
     values[i] = static_cast<NT_Value*>(std::malloc(sizeof(NT_Value)));
-    NT_InitValue(values[i]);
     ConvertToC(*values_v[i], values[i]);
   }
   return values;

@@ -81,7 +81,7 @@ std::shared_ptr<Value> Value::MakeStringArray(
 }
 
 void nt::ConvertToC(const Value& in, NT_Value* out) {
-  NT_DisposeValue(out);
+  out->type = NT_UNASSIGNED;
   switch (in.type()) {
     case NT_UNASSIGNED:
       return;
@@ -92,15 +92,12 @@ void nt::ConvertToC(const Value& in, NT_Value* out) {
       out->data.v_double = in.GetDouble();
       break;
     case NT_STRING:
-      NT_InitString(&out->data.v_string);
       ConvertToC(in.GetString(), &out->data.v_string);
       break;
     case NT_RAW:
-      NT_InitString(&out->data.v_raw);
       ConvertToC(in.GetRaw(), &out->data.v_raw);
       break;
     case NT_RPC:
-      NT_InitString(&out->data.v_raw);
       ConvertToC(in.GetRpc(), &out->data.v_raw);
       break;
     case NT_BOOLEAN_ARRAY: {
@@ -123,10 +120,8 @@ void nt::ConvertToC(const Value& in, NT_Value* out) {
       auto v = in.GetStringArray();
       out->data.arr_string.arr =
           static_cast<NT_String*>(std::malloc(v.size()*sizeof(NT_String)));
-      for (size_t i=0; i<v.size(); ++i) {
-        NT_InitString(&out->data.arr_string.arr[i]);
+      for (size_t i = 0; i < v.size(); ++i)
         ConvertToC(v[i], &out->data.arr_string.arr[i]);
-      }
       out->data.arr_string.size = v.size();
       break;
     }
@@ -138,7 +133,6 @@ void nt::ConvertToC(const Value& in, NT_Value* out) {
 }
 
 void nt::ConvertToC(llvm::StringRef in, NT_String* out) {
-  NT_DisposeString(out);
   out->len = in.size();
   out->str = static_cast<char*>(std::malloc(in.size()+1));
   std::memcpy(out->str, in.data(), in.size());
