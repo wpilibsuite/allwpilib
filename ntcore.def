@@ -32,7 +32,7 @@ NT_SetLogger @33
 NT_CreateRpc @34
 NT_CreatePolledRpc @35
 NT_PollRpc @36
-NT_PostRpcRepsonse @37
+NT_PostRpcResponse @37
 NT_CallRpc @38
 NT_GetRpcResult @39
 NT_PackRpcDefinition @40

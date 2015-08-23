@@ -67,7 +67,10 @@ model {
                 }
                 eachPlatform {
                     cppCompiler.withArguments { args ->
-                        args << '/EHsc' << '/DNOMINMAX' << '/D_SCL_SECURE_NO_WARNINGS' << '/DEF:ntcore.def'
+                        args << '/EHsc' << '/DNOMINMAX' << '/D_SCL_SECURE_NO_WARNINGS'
+                    }
+                    linker.withArguments { args ->
+                        args << '/DEF:ntcore.def'
                     }
                 }
             }
@@ -100,10 +103,10 @@ model {
                     }
                     exportedHeaders {
                         srcDirs = ["include"]
+                        includes = ["**/*.h"]
                     }
                 }
             }
         }
     }
 }
-
