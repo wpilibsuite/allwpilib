@@ -1,0 +1,42 @@
+apply plugin: 'cpp'
+apply plugin: 'google-test'
+apply plugin: 'visual-studio'
+
+model {
+  components {
+    tests(NativeLibrarySpec) {
+      sources {
+        cpp {
+          source {
+            srcDirs = ["unit", "../src"]
+            includes = ["**/*.cpp"]
+          }
+          exportedHeaders {
+            srcDirs = ["../include", "../src", "../gmock/include", "../gmock/gtest/include"]
+            includes = ["**/*.h"]
+          }
+        }
+      }
+      binaries.all {
+        lib project: ':gmock', library: "gmock", linkage: "static"
+        if (toolChain in Gcc) {
+          cppCompiler.args '-std=c++1y', '-Wformat=2', '-Wall', '-Wextra', '-Werror', '-pedantic', '-Wno-unused-parameter'
+          linker.args '-pthread'
+        }
+        if (toolChain in VisualCpp) {
+          cppCompiler.args '/EHsc', '/DNOMINMAX', '/D_SCL_SECURE_NO_WARNINGS', '/D_WINSOCK_DEPRECATED_NO_WARNINGS'
+        }
+      }
+    }
+  }
+}
+binaries.withType(GoogleTestTestSuiteBinarySpec) {
+  lib project: ':gmock', library: "gmock", linkage: "static"
+  if (targetPlatform.operatingSystem.linux) {
+    cppCompiler.args '-pthread', '-std=c++1y'
+    linker.args '-pthread'
+  } else {
+    cppCompiler.args '/EHsc', '/DNOMINMAX', '/D_SCL_SECURE_NO_WARNINGS', '/D_WINSOCK_DEPRECATED_NO_WARNINGS'
+  }
+}
+

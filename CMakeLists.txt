@@ -94,57 +94,8 @@ INSTALL(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT headers)
 # We need thread support
 find_package(Threads REQUIRED)
 
-# Enable ExternalProject CMake module
-include(ExternalProject)
-
-# Download and install GoogleMock
-ExternalProject_Add(
-    gmock
-    URL https://googlemock.googlecode.com/files/gmock-1.7.0.zip
-    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gmock
-    # Disable install step
-    INSTALL_COMMAND ""
-    CMAKE_CACHE_ARGS -DCMAKE_TOOLCHAIN_FILE:string=${CMAKE_TOOLCHAIN_FILE}
-)
-
-# Create a libgmock target to be used as a dependency by test programs
-add_library(libgmock IMPORTED STATIC GLOBAL)
-add_dependencies(libgmock gmock)
-add_library(libgtest IMPORTED STATIC GLOBAL)
-add_dependencies(libgtest gmock)
-
-# Set gmock properties
-ExternalProject_Get_Property(gmock source_dir binary_dir)
-if (MSVC)
-foreach (CFG ${CMAKE_CONFIGURATION_TYPES})
-string(TOUPPER ${CFG} CFG_UC)
-set_target_properties(libgmock PROPERTIES
-	"IMPORTED_LOCATION_${CFG_UC}" "${binary_dir}/${CFG}/gmock.lib"
-    "IMPORTED_LINK_INTERFACE_LIBRARIES_${CFG_UC}" "${CMAKE_THREAD_LIBS_INIT}"
-)
-endforeach ()
-foreach (CFG ${CMAKE_CONFIGURATION_TYPES})
-string(TOUPPER ${CFG} CFG_UC)
-set_target_properties(libgtest PROPERTIES
-	"IMPORTED_LOCATION_${CFG_UC}" "${binary_dir}/gtest/${CFG}/gtest.lib"
-    "IMPORTED_LINK_INTERFACE_LIBRARIES_${CFG_UC}" "${CMAKE_THREAD_LIBS_INIT}"
-)
-endforeach ()
-else ()
-set_target_properties(libgmock PROPERTIES
-    "IMPORTED_LOCATION" "${binary_dir}/libgmock.a"
-    "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}"
-#    "INTERFACE_INCLUDE_DIRECTORIES" "${source_dir}/include"
-)
-set_target_properties(libgtest PROPERTIES
-    "IMPORTED_LOCATION" "${binary_dir}/gtest/libgtest.a"
-    "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}"
-#    "INTERFACE_INCLUDE_DIRECTORIES" "${source_dir}/include"
-)
-endif ()
-# I couldn't make it work with INTERFACE_INCLUDE_DIRECTORIES
-include_directories("${source_dir}/include")
-include_directories("${source_dir}/gtest/include")
-
+add_subdirectory(gmock)
+include_directories("gmock/include")
+include_directories("gmock/gtest/include")
 add_subdirectory(test)
 
