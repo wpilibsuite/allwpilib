@@ -7,7 +7,11 @@
 
 #include "SocketError.h"
 
+#ifdef _WIN32
 #include <windows.h>
+#else
+#include <string.h>
+#endif
 
 namespace tcpsockets {
 
