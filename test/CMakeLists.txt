@@ -1,1 +1,10 @@
 add_subdirectory(unit)
+
+add_executable(client client.cpp)
+target_link_libraries(client ntcore ${CMAKE_THREAD_LIBS_INIT})
+add_executable(server server.cpp)
+target_link_libraries(server ntcore ${CMAKE_THREAD_LIBS_INIT})
+add_executable(rpc_local rpc_local.cpp)
+target_link_libraries(rpc_local ntcore ${CMAKE_THREAD_LIBS_INIT})
+add_executable(rpc_speed rpc_speed.cpp)
+target_link_libraries(rpc_speed ntcore ${CMAKE_THREAD_LIBS_INIT})
