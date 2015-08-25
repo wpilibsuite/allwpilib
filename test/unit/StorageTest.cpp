@@ -457,7 +457,11 @@ TEST_P(StorageTestPersistent, SavePersistent) {
   std::tie(line, rem) = rem.split('\n');
   ASSERT_EQ("array boolean \"booleanarr/two\"=true,false", line);
   std::tie(line, rem) = rem.split('\n');
+#ifdef _MSC_VER
+  ASSERT_EQ("double \"double/big\"=1.3e+008", line);
+#else
   ASSERT_EQ("double \"double/big\"=1.3e+08", line);
+#endif
   std::tie(line, rem) = rem.split('\n');
   ASSERT_EQ("double \"double/neg\"=-1.5", line);
   std::tie(line, rem) = rem.split('\n');
