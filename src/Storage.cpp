@@ -803,6 +803,7 @@ const char* Storage::SavePersistent(StringRef filename, bool periodic) const {
     err = "error saving file";
     goto done;
   }
+  os.close();
 
   // Safely move to real file.  We ignore any failures related to the backup.
   std::remove(bak.c_str());
