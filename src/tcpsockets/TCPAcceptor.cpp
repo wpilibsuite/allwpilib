@@ -36,6 +36,9 @@
 
 #include "llvm/SmallString.h"
 #include "../Log.h"
+#include "SocketError.h"
+
+using namespace tcpsockets;
 
 TCPAcceptor::TCPAcceptor(int port, const char* address)
     : m_lsd(0),
@@ -75,7 +78,7 @@ int TCPAcceptor::start() {
   if (m_address.size() > 0) {
 #ifdef _WIN32
     llvm::SmallString<128> addr_copy(m_address);
-    addr_copy.append('\0');
+    addr_copy.push_back('\0');
     int size = sizeof(address);
     WSAStringToAddress(addr_copy.data(), PF_INET, nullptr, (struct sockaddr*)&address, &size);
 #else
@@ -91,13 +94,13 @@ int TCPAcceptor::start() {
 
   int result = bind(m_lsd, (struct sockaddr*)&address, sizeof(address));
   if (result != 0) {
-    ERROR("bind() failed: " << strerror(errno));
+    ERROR("bind() failed: " << SocketStrerror());
     return result;
   }
 
   result = listen(m_lsd, 5);
   if (result != 0) {
-    ERROR("listen() failed: " << strerror(errno));
+    ERROR("listen() failed: " << SocketStrerror());
     return result;
   }
   m_listening = true;
@@ -125,7 +128,7 @@ std::unique_ptr<NetworkStream> TCPAcceptor::accept() {
   std::memset(&address, 0, sizeof(address));
   int sd = ::accept(m_lsd, (struct sockaddr*)&address, &len);
   if (sd < 0) {
-    if (!m_shutdown) ERROR("accept() failed: " << strerror(errno));
+    if (!m_shutdown) ERROR("accept() failed: " << SocketStrerror());
     return nullptr;
   }
   return std::unique_ptr<NetworkStream>(new TCPStream(sd, &address));

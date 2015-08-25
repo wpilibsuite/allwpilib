@@ -40,6 +40,9 @@
 
 #include "llvm/SmallString.h"
 #include "../Log.h"
+#include "SocketError.h"
+
+using namespace tcpsockets;
 
 static int ResolveHostName(const char* hostname, struct in_addr* addr) {
   struct addrinfo* res;
@@ -73,7 +76,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
   if (ResolveHostName(server, &(address.sin_addr)) != 0) {
 #ifdef _WIN32
     llvm::SmallString<128> addr_copy(server);
-    addr_copy.append('\0');
+    addr_copy.push_back('\0');
     int size = sizeof(address);
     WSAStringToAddress(addr_copy.data(), PF_INET, nullptr, (struct sockaddr*)&address, &size);
 #else
@@ -85,7 +88,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
   if (timeout == 0) {
     int sd = socket(AF_INET, SOCK_STREAM, 0);
     if (::connect(sd, (struct sockaddr*)&address, sizeof(address)) != 0) {
-      DEBUG("connect() failed: " << strerror(errno));
+      DEBUG("connect() failed: " << SocketStrerror());
       return nullptr;
     }
     return std::unique_ptr<NetworkStream>(new TCPStream(sd, &address));
@@ -108,10 +111,14 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
 #endif
 
   // Connect with time limit
-  std::string message;
   if ((result = ::connect(sd, (struct sockaddr*)&address, sizeof(address))) <
       0) {
-    if (errno == EINPROGRESS) {
+    int my_errno = SocketErrno();
+#ifdef _WIN32
+    if (my_errno == WSAEWOULDBLOCK || my_errno == WSAEINPROGRESS) {
+#else
+    if (my_errno == EWOULDBLOCK || my_errno == EINPROGRESS) {
+#endif
       tv.tv_sec = timeout;
       tv.tv_usec = 0;
       FD_ZERO(&sdset);
@@ -120,7 +127,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
         len = sizeof(int);
         getsockopt(sd, SOL_SOCKET, SO_ERROR, (char*)(&valopt), &len);
         if (valopt) {
-          DEBUG("connect() error " << valopt << " - " << strerror(valopt));
+          DEBUG("select() error " << valopt << " - " << SocketStrerror(valopt));
         }
         // connection established
         else
@@ -128,7 +135,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
       } else
         DEBUG("connect() timed out");
     } else
-      DEBUG("connect() error " << errno << " - " << strerror(errno));
+      DEBUG("connect() error " << SocketErrno() << " - " << SocketStrerror());
   }
 
   // Return socket to blocking mode
