@@ -35,7 +35,8 @@ AnalogInput::AnalogInput(uint32_t channel) {
     return;
   }
 
-  if (inputs->Allocate(channel, buf.str()) == ~0ul) {
+  if (inputs->Allocate(channel, buf.str()) ==
+      std::numeric_limits<uint32_t>::max()) {
     CloneError(*inputs);
     return;
   }

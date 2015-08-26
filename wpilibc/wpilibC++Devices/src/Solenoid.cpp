@@ -43,7 +43,8 @@ Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel)
 
   buf << "Solenoid " << m_channel << " (Module: " << m_moduleNumber << ")";
   if (m_allocated->Allocate(m_moduleNumber * kSolenoidChannels + m_channel,
-                            buf.str()) == ~0ul) {
+                            buf.str()) ==
+      std::numeric_limits<uint32_t>::max()) {
     CloneError(*m_allocated);
     return;
   }

@@ -180,7 +180,8 @@ CANJaguar::CANJaguar(uint8_t deviceNumber)
   buf << "CANJaguar device number " << m_deviceNumber;
   Resource::CreateResourceObject(allocated, 63);
 
-  if (allocated->Allocate(m_deviceNumber - 1, buf.str()) == ~0ul) {
+  if (allocated->Allocate(m_deviceNumber - 1, buf.str()) ==
+      std::numeric_limits<uint32_t>::max()) {
     CloneError(*allocated);
     return;
   }

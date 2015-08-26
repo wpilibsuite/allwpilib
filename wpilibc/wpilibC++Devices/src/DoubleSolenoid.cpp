@@ -59,7 +59,7 @@ DoubleSolenoid::DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel,
       << ")";
   if (m_allocated->Allocate(
           m_moduleNumber * kSolenoidChannels + m_forwardChannel, buf.str()) ==
-      ~0ul) {
+      std::numeric_limits<uint32_t>::max()) {
     CloneError(*m_allocated);
     return;
   }
@@ -68,7 +68,7 @@ DoubleSolenoid::DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel,
       << ")";
   if (m_allocated->Allocate(
           m_moduleNumber * kSolenoidChannels + m_reverseChannel, buf.str()) ==
-      ~0ul) {
+      std::numeric_limits<uint32_t>::max()) {
     CloneError(*m_allocated);
     return;
   }

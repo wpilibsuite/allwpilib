@@ -40,7 +40,8 @@ Relay::Relay(uint32_t channel, Relay::Direction direction)
 
   if (m_direction == kBothDirections || m_direction == kForwardOnly) {
     buf << "Forward Relay " << m_channel;
-    if (relayChannels->Allocate(m_channel * 2, buf.str()) == ~0ul) {
+    if (relayChannels->Allocate(m_channel * 2, buf.str()) ==
+        std::numeric_limits<uint32_t>::max()) {
       CloneError(*relayChannels);
       return;
     }
@@ -49,7 +50,8 @@ Relay::Relay(uint32_t channel, Relay::Direction direction)
   }
   if (m_direction == kBothDirections || m_direction == kReverseOnly) {
     buf << "Reverse Relay " << m_channel;
-    if (relayChannels->Allocate(m_channel * 2 + 1, buf.str()) == ~0ul) {
+    if (relayChannels->Allocate(m_channel * 2 + 1, buf.str()) ==
+        std::numeric_limits<uint32_t>::max()) {
       CloneError(*relayChannels);
       return;
     }

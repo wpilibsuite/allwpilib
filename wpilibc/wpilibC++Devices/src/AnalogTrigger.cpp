@@ -111,7 +111,7 @@ void AnalogTrigger::SetFiltered(bool useFilteredValue) {
  * @return The index of the analog trigger.
  */
 uint32_t AnalogTrigger::GetIndex() const {
-  if (StatusIsFatal()) return ~0ul;
+  if (StatusIsFatal()) return std::numeric_limits<uint32_t>::max();
   return m_index;
 }
 

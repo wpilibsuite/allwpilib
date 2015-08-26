@@ -28,7 +28,7 @@ void InterruptableSensorBase::RequestInterrupts(
     InterruptHandlerFunction handler, void *param) {
   if (StatusIsFatal()) return;
   uint32_t index = m_interrupts->Allocate("Async Interrupt");
-  if (index == ~0ul) {
+  if (index == std::numeric_limits<uint32_t>::max()) {
     CloneError(*m_interrupts);
     return;
   }
@@ -55,7 +55,7 @@ void InterruptableSensorBase::RequestInterrupts(
 void InterruptableSensorBase::RequestInterrupts() {
   if (StatusIsFatal()) return;
   uint32_t index = m_interrupts->Allocate("Sync Interrupt");
-  if (index == ~0ul) {
+  if (index == std::numeric_limits<uint32_t>::max()) {
     CloneError(*m_interrupts);
     return;
   }

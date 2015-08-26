@@ -30,7 +30,8 @@ AnalogOutput::AnalogOutput(uint32_t channel) {
     return;
   }
 
-  if (outputs->Allocate(channel, buf.str()) == ~0ul) {
+  if (outputs->Allocate(channel, buf.str()) ==
+      std::numeric_limits<uint32_t>::max()) {
     CloneError(*outputs);
     return;
   }
