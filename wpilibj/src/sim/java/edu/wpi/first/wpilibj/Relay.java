@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj.tables.ITableListener;
  */
 public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable {
   private MotorSafetyHelper m_safetyHelper;
-
   /**
    * This class represents errors in trying to set relay values contradictory to the direction to
    * which the relay is set.
@@ -146,9 +145,7 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
    * @param channel The channel number for this relay.
    */
   public Relay(final int channel) {
-    m_channel = channel;
-    m_direction = Direction.kBoth;
-    initRelay();
+    this(channel, Direction.kBoth);
   }
 
   public void free() {

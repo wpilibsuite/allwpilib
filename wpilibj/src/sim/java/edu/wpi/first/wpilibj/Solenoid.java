@@ -26,23 +26,12 @@ public class Solenoid implements LiveWindowSendable {
   private SimSpeedController m_impl;
 
   /**
-   * Common function to implement constructor behavior.
-   */
-  private synchronized void initSolenoid(int slot, int channel) {
-    m_moduleNumber = slot;
-    m_channel = channel;
-    m_impl = new SimSpeedController("simulator/pneumatic/" + slot + "/" + channel);
-
-    LiveWindow.addActuator("Solenoid", m_moduleNumber, m_channel, this);
-  }
-
-  /**
    * Constructor.
    *
    * @param channel The channel on the module to control.
    */
   public Solenoid(final int channel) {
-    initSolenoid(1, channel);
+    this(1, channel);
   }
 
   /**
@@ -52,7 +41,11 @@ public class Solenoid implements LiveWindowSendable {
    * @param channel      The channel on the module to control.
    */
   public Solenoid(final int moduleNumber, final int channel) {
-    initSolenoid(moduleNumber, channel);
+    m_moduleNumber = moduleNumber;
+    m_channel = channel;
+    m_impl = new SimSpeedController("simulator/pneumatic/" + moduleNumber + "/" + channel);
+
+    LiveWindow.addActuator("Solenoid", m_moduleNumber, m_channel, this);
   }
 
   /**

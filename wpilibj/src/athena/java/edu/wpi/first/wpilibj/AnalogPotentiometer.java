@@ -20,24 +20,11 @@ import edu.wpi.first.wpilibj.tables.ITable;
  * @author Colby Skeggs (rail voltage)
  */
 public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
-  private double m_fullRange;
-  private double m_offset;
   private AnalogInput m_analogInput;
   private boolean m_initAnalogInput;
+  private double m_fullRange;
+  private double m_offset;
   protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
-
-  /**
-   * Common initialization code called by all constructors.
-   *
-   * @param input     The {@link AnalogInput} this potentiometer is plugged into.
-   * @param fullRange The scaling to multiply the voltage by to get a meaningful unit.
-   * @param offset    The offset to add to the scaled value for controlling the zero value
-   */
-  private void initPot(final AnalogInput input, double fullRange, double offset) {
-    m_fullRange = fullRange;
-    m_offset = offset;
-    m_analogInput = input;
-  }
 
   /**
    * AnalogPotentiometer constructor.
@@ -53,9 +40,8 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
    * @param offset    The offset to add to the scaled value for controlling the zero value
    */
   public AnalogPotentiometer(final int channel, double fullRange, double offset) {
-    AnalogInput input = new AnalogInput(channel);
+    this(new AnalogInput(channel), fullRange, offset);
     m_initAnalogInput = true;
-    initPot(input, fullRange, offset);
   }
 
   /**
@@ -72,8 +58,11 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
    * @param offset    The offset to add to the scaled value for controlling the zero value
    */
   public AnalogPotentiometer(final AnalogInput input, double fullRange, double offset) {
+    m_analogInput = input;
     m_initAnalogInput = false;
-    initPot(input, fullRange, offset);
+
+    m_fullRange = fullRange;
+    m_offset = offset;
   }
 
   /**

@@ -29,35 +29,12 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
   private long m_solenoidPort;
 
   /**
-   * Common function to implement constructor behavior.
-   */
-  private synchronized void initSolenoid() {
-    checkSolenoidModule(m_moduleNumber);
-    checkSolenoidChannel(m_channel);
-
-    try {
-      allocated.allocate(m_moduleNumber * kSolenoidChannels + m_channel);
-    } catch (CheckedAllocationException ex) {
-      throw new AllocationException("Solenoid channel " + m_channel + " on module "
-          + m_moduleNumber + " is already allocated");
-    }
-
-    long port = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
-    m_solenoidPort = SolenoidJNI.initializeSolenoidPort(port);
-
-    LiveWindow.addActuator("Solenoid", m_moduleNumber, m_channel, this);
-    UsageReporting.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber);
-  }
-
-  /**
    * Constructor using the default PCM ID (0)
    *
    * @param channel The channel on the PCM to control (0..7).
    */
   public Solenoid(final int channel) {
-    super(getDefaultSolenoidModule());
-    m_channel = channel;
-    initSolenoid();
+    this(getDefaultSolenoidModule(), channel);
   }
 
   /**
@@ -69,7 +46,22 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
   public Solenoid(final int moduleNumber, final int channel) {
     super(moduleNumber);
     m_channel = channel;
-    initSolenoid();
+
+    checkSolenoidModule(m_moduleNumber);
+    checkSolenoidChannel(m_channel);
+
+    try {
+      allocated.allocate(m_moduleNumber * kSolenoidChannels + m_channel);
+    } catch (CheckedAllocationException ex) {
+      throw new AllocationException("Solenoid channel " + m_channel + " on module "
+        + m_moduleNumber + " is already allocated");
+    }
+
+    long port = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
+    m_solenoidPort = SolenoidJNI.initializeSolenoidPort(port);
+
+    LiveWindow.addActuator("Solenoid", m_moduleNumber, m_channel, this);
+    UsageReporting.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber);
   }
 
   /**

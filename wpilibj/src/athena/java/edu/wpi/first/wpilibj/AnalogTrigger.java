@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Class for creating and configuring Analog Triggers.
  *
@@ -46,11 +48,11 @@ public class AnalogTrigger {
   protected int m_index;
 
   /**
-   * Initialize an analog trigger from a channel.
+   * Constructor for an analog trigger given a channel number.
    *
    * @param channel the port to use for the analog trigger
    */
-  protected void initTrigger(final int channel) {
+  public AnalogTrigger(final int channel) {
     final long portPointer = AnalogJNI.getPort((byte) channel);
     ByteBuffer index = ByteBuffer.allocateDirect(4);
     index.order(ByteOrder.LITTLE_ENDIAN);
@@ -63,26 +65,13 @@ public class AnalogTrigger {
   }
 
   /**
-   * Constructor for an analog trigger given a channel number.
-   *
-   * @param channel the port to use for the analog trigger 0-3 are on-board, 4-7 are on the MXP
-   *                port
-   */
-  public AnalogTrigger(final int channel) {
-    initTrigger(channel);
-  }
-
-  /**
    * Construct an analog trigger given an analog channel. This should be used in the case of sharing
    * an analog channel between the trigger and an analog input object.
    *
    * @param channel the AnalogInput to use for the analog trigger
    */
   public AnalogTrigger(AnalogInput channel) {
-    if (channel == null) {
-      throw new NullPointerException("The Analog Input given was null");
-    }
-    initTrigger(channel.getChannel());
+    this(requireNonNull(channel, "The Analog Input given was null").getChannel());
   }
 
   /**

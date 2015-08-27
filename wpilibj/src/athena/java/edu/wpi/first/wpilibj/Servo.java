@@ -28,20 +28,6 @@ public class Servo extends PWM {
   protected static final double kDefaultMinServoPWM = .6;
 
   /**
-   * Common initialization code called by all constructors.
-   *
-   * <p>InitServo() assigns defaults for the period multiplier for the servo PWM control signal, as
-   * well as the minimum and maximum PWM values supported by the servo.
-   */
-  private void initServo() {
-    setBounds(kDefaultMaxServoPWM, 0, 0, 0, kDefaultMinServoPWM);
-    setPeriodMultiplier(PeriodMultiplier.k4X);
-
-    LiveWindow.addActuator("Servo", getChannel(), this);
-    UsageReporting.report(tResourceType.kResourceType_Servo, getChannel());
-  }
-
-  /**
    * Constructor.<br>
    *
    * <p>By default {@value #kDefaultMaxServoPWM} ms is used as the maxPWM value<br> By default
@@ -52,7 +38,11 @@ public class Servo extends PWM {
    */
   public Servo(final int channel) {
     super(channel);
-    initServo();
+    setBounds(kDefaultMaxServoPWM, 0, 0, 0, kDefaultMinServoPWM);
+    setPeriodMultiplier(PeriodMultiplier.k4X);
+
+    LiveWindow.addActuator("Servo", getChannel(), this);
+    UsageReporting.report(tResourceType.kResourceType_Servo, getChannel());
   }
 
 

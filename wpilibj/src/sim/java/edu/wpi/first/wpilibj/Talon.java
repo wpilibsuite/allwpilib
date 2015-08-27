@@ -21,7 +21,7 @@ public class Talon implements SpeedController, PIDOutput, MotorSafety, LiveWindo
   private SimSpeedController m_impl;
 
   /**
-   * Common initialization code called by all constructors.
+   * Constructor.
    *
    * <p>Note that the Talon uses the following bounds for PWM values. These values should work
    * reasonably well for most controllers, but if users experience issues such as asymmetric
@@ -32,8 +32,10 @@ public class Talon implements SpeedController, PIDOutput, MotorSafety, LiveWindo
    * <p>- 2.037ms = full "forward" - 1.539ms = the "high end" of the deadband range - 1.513ms =
    * center of the deadband range (off) - 1.487ms = the "low end" of the deadband range - .989ms =
    * full "reverse"
+   *
+   * @param channel The PWM channel that the Talon is attached to.
    */
-  private void initTalon(final int channel) {
+  public Talon(final int channel) {
     this.m_channel = channel;
     m_impl = new SimSpeedController("simulator/pwm/" + channel);
 
@@ -42,15 +44,6 @@ public class Talon implements SpeedController, PIDOutput, MotorSafety, LiveWindo
     m_safetyHelper.setSafetyEnabled(false);
 
     LiveWindow.addActuator("Talon", channel, this);
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param channel The PWM channel that the Talon is attached to.
-   */
-  public Talon(final int channel) {
-    initTalon(channel);
   }
 
   /**

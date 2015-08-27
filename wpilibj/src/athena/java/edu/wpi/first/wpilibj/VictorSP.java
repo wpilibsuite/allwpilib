@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 public class VictorSP extends PWMSpeedController {
 
   /**
-   * Common initialization code called by all constructors.
+   * Constructor.
    *
    * <p>Note that the VictorSP uses the following bounds for PWM values. These values should work
    * reasonably well for most controllers, but if users experience issues such as asymmetric
@@ -28,8 +28,13 @@ public class VictorSP extends PWMSpeedController {
    * <p>- 2.004ms = full "forward" - 1.52ms = the "high end" of the deadband range - 1.50ms =
    * center of the deadband range (off) - 1.48ms = the "low end" of the deadband range - .997ms =
    * full "reverse"
+   *
+   * @param channel The PWM channel that the VictorSP is attached to. 0-9 are
+   *        on-board, 10-19 are on the MXP port
    */
-  protected void initVictorSP() {
+  public VictorSP(final int channel) {
+    super(channel);
+
     setBounds(2.004, 1.52, 1.50, 1.48, .997);
     setPeriodMultiplier(PeriodMultiplier.k1X);
     setRaw(m_centerPwm);
@@ -37,16 +42,5 @@ public class VictorSP extends PWMSpeedController {
 
     LiveWindow.addActuator("VictorSP", getChannel(), this);
     UsageReporting.report(tResourceType.kResourceType_VictorSP, getChannel());
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param channel The PWM channel that the VictorSP is attached to. 0-9 are on-board, 10-19 are on
-   *                the MXP port
-   */
-  public VictorSP(final int channel) {
-    super(channel);
-    initVictorSP();
   }
 }
