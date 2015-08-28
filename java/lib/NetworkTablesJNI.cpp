@@ -18,7 +18,7 @@ static jclass connectionInfoCls = nullptr;
 static jclass keyNotDefinedEx = nullptr;
 static jclass persistentEx = nullptr;
 
-jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   jvm = vm;
 
   JNIEnv *env;
@@ -67,7 +67,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
   return JNI_VERSION_1_6;
 }
 
-void JNI_OnUnload(JavaVM *vm, void *reserved) {
+JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
   JNIEnv *env;
   if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK)
     return;
@@ -557,6 +557,22 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 
 /*
  * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
+ * Method:    getValue
+ * Signature: (Ljava/lang/String;)Ljava/lang/Object;
+ */
+JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getValue__Ljava_lang_String_2
+  (JNIEnv *env, jclass, jstring key)
+{
+  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  if (!val || !val->IsBoolean()) {
+    ThrowTableKeyNotDefined(env, key);
+    return false;
+  }
+  return ToJavaObject(env, *val);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
  * Method:    getBoolean
  * Signature: (Ljava/lang/String;)Z
  */
@@ -665,6 +681,19 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkT
     return nullptr;
   }
   return ToJavaStringArray(env, val->GetStringArray());
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
+ * Method:    getValue
+ * Signature: (Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
+ */
+JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getValue__Ljava_lang_String_2Ljava_lang_Object_2
+  (JNIEnv *env, jclass, jstring key, jobject defaultValue)
+{
+  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  if (!val || !val->IsBoolean()) return defaultValue;
+  return ToJavaObject(env, *val);
 }
 
 /*
