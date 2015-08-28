@@ -34,6 +34,40 @@ fix_default_compiler_settings_()
 
 file(GLOB_RECURSE SRC_FILES src/*.cpp)
 include_directories(include src)
+
+# Java bindings
+if (NOT WITHOUT_JAVA)
+    find_package(Java)
+    find_package(JNI)
+    include(UseJava)
+    set(CMAKE_JAVA_COMPILE_FLAGS "-Xlint:unchecked")
+
+    include_directories(${JNI_INCLUDE_DIRS})
+    list(APPEND SRC_FILES java/lib/NetworkTablesJNI.cpp)
+
+    file(GLOB_RECURSE JAVA_SOURCES java/src/*.java)
+    set(CMAKE_JNI_TARGET true)
+    add_jar(networktables ${JAVA_SOURCES})
+
+    # Generate JNI headers
+    add_custom_command(
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/edu_wpi_first_wpilibj_networktables_NetworkTablesJNI.h"
+        DEPENDS networktables java/src/edu/wpi/first/wpilibj/networktables/NetworkTablesJNI.java
+        COMMAND "${Java_JAVAH_EXECUTABLE}"
+        -jni
+        -o "${CMAKE_CURRENT_BINARY_DIR}/edu_wpi_first_wpilibj_networktables_NetworkTablesJNI.h"
+        -classpath "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/networktables.dir/"
+        edu.wpi.first.wpilibj.networktables.NetworkTablesJNI
+        )
+    include_directories("${CMAKE_CURRENT_BINARY_DIR}")
+    set_source_files_properties(
+        java/lib/NetworkTablesJNI.cpp
+        OBJECT_DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/edu_wpi_first_wpilibj_networktables_NetworkTablesJNI.h"
+        )
+
+    #add_subdirectory(java/test)
+endif()
+
 if (WIN32)
 	add_library(ntcore SHARED ${SRC_FILES} ntcore.def)
 else()

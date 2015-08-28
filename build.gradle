@@ -1,7 +1,16 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 
+if (!project.hasProperty('skipJava')) {
+apply plugin: 'java'
+}
 apply plugin: 'cpp'
 apply plugin: 'visual-studio'
+
+def armjdkDownloadSite = 'http://www.oracle.com/technetwork/java/javase/downloads/jdk8-arm-downloads-2187472.html'
+def armjdkFolder = 'jdk-linux-arm-vfp-sflt'
+def armjdkVersion = 'jdk1.8.0_33'
+def armjdkLocation = System.getProperty("user.home") + File.separator + armjdkFolder + File.separator + armjdkVersion
+def generatedJNIHeaderLoc = 'build/include'
 
 model {
     toolChains {
@@ -38,9 +47,11 @@ model {
                     // deprecated function, remove this line (this will cause calling deprecated functions
                     // to be treated as a warning rather than an error).
                     args << '-Wno-error=deprecated-declarations'
+                    args << '-m32'
                 }
                 linker.withArguments { args ->
                     args << '-rdynamic'
+                    args << '-m32'
                 }
             }
             target('x64') {
@@ -95,14 +106,55 @@ model {
             targetPlatform 'arm'
             targetPlatform 'x86'
             targetPlatform 'x64'
+            binaries.all {
+                tasks.withType(CppCompile) {
+                    if (!project.hasProperty('skipJava')) {
+                        if (targetPlatform == platforms.arm) {
+                            dependsOn verifyArmJre
+
+                            // JDK is included for jni.h. We also need the arm-linux specific headers.
+                            // This does not need to change when compiling on Windows
+                            // The JNI headers are put into the build/include directory by the jniHeaders task
+                            cppCompiler.args '-I', "${armjdkLocation}/include"
+                            cppCompiler.args '-I', "${armjdkLocation}/include/linux"
+                        } else {
+                            def jdkLocation = org.gradle.internal.jvm.Jvm.current().javaHome
+                            cppCompiler.args '-I', "${jdkLocation}/include"
+
+                            if (targetPlatform.operatingSystem.macOsX) {
+                                cppCompiler.args '-I', "${jdkLocation}/include/darwin"
+                            } else if (targetPlatform.operatingSystem.linux) {
+                                cppCompiler.args '-I', "${jdkLocation}/include/linux"
+                            } else if (targetPlatform.operatingSystem.windows) {
+                                cppCompiler.args '-I', "${jdkLocation}/include/win32"
+                            } else if (targetPlatform.operatingSystem.freeBSD) {
+                                cppCompiler.args '-I', "${jdkLocation}/include/freebsd"
+                            }
+                        }
+
+                        jniHeadersNetworkTables.outputs.files.each { file ->
+                            cppCompiler.args '-I', file.getPath()
+                        }
+                        dependsOn jniHeadersNetworkTables
+                    }
+                }
+            }
             sources {
                 cpp {
                     source {
                         srcDirs = ["src"]
+                        if (!project.hasProperty('skipJava')) {
+                            srcDirs "java/lib"
+                        }
                         includes = ["**/*.cpp"]
                     }
                     exportedHeaders {
                         srcDirs = ["include"]
+                        if (!project.hasProperty('skipJava')) {
+                            jniHeadersNetworkTables.outputs.files.each { file ->
+                                srcDirs file.getPath()
+                            }
+                        }
                         includes = ["**/*.h"]
                     }
                 }
@@ -110,3 +162,97 @@ model {
         }
     }
 }
+
+if (!project.hasProperty('skipJava')) {
+
+compileJava {
+    options.compilerArgs << "-Xlint:unchecked"
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ["java/src"]
+        }
+    }
+}
+
+jar {
+    description = 'Generates NetworkTables jar, with the JNI shared libraries embedded'
+    dependsOn { armNtcoreSharedLibrary }
+    dependsOn { x64NtcoreSharedLibrary }
+    dependsOn { x86NtcoreSharedLibrary }
+    dependsOn { classes }
+    binaries.withType(SharedLibraryBinary) { binary ->
+        from(file(binary.sharedLibraryFile)) {
+            if (binary.targetPlatform == platforms.arm) {
+                into "Linux/arm"
+            } else if (binary.targetPlatform.operatingSystem.name == "Linux") {
+                if (binary.targetPlatform.architecture.name == "x86-64") {
+                    into "Linux/amd64"
+                } else {
+                    into "Linux/" + binary.targetPlatform.architecture.name
+                }
+            } else {
+                into binary.targetPlatform.operatingSystem.name + "/" + binary.targetPlatform.architecture.name
+            }
+        }
+    }
+}
+
+task networktablesJavaSource(type: Jar, dependsOn: classes) {
+    description = 'Generates the source jar for NetworkTables java'
+    group = 'WPILib'
+    classifier = 'classes'
+    from sourceSets.main.allJava
+}
+
+task networktablesJavadoc(type: Jar, dependsOn: javadoc) {
+    description = 'Generates the javadoc jar for NetworkTables java'
+    group = 'WPILib'
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+/**
+ * Generates the JNI headers
+ */
+task jniHeadersNetworkTables {
+    description = 'Generates JNI headers from edu.wpi.first.wpilibj.networktables.*'
+    group = 'WPILib'
+    def outputFolder = file(generatedJNIHeaderLoc)
+    inputs.files sourceSets.main.output
+    outputs.file outputFolder
+    doLast {
+        outputFolder.mkdirs()
+        exec {
+            executable org.gradle.internal.jvm.Jvm.current().getExecutable('javah')
+            args '-d', outputFolder
+            args '-classpath', sourceSets.main.output.classesDir
+            args 'edu.wpi.first.wpilibj.networktables.NetworkTablesJNI'
+        }
+    }
+}
+
+clean {
+    delete generatedJNIHeaderLoc
+}
+
+// Ensures that the ARM JNI headers have been downloaded and are in the correct location for generating the JNI build
+task verifyArmJre {
+    description = 'Verifies that the ARM JDK is downloaded in the user directory'
+    group = 'WPILib'
+    def outputFolder = new File(armjdkLocation)
+    outputs.file outputFolder
+    doLast {
+        if (!outputFolder.exists() && !outputFolder.isDirectory()) {
+            def errorMessage = 'The ARM JDK was not found. Please install the JDK in the following location:' +
+                    System.lineSeparator() + armjdkLocation +
+                    System.lineSeparator() + 'You can download the JDK here:' +
+                    System.lineSeparator() + armjdkDownloadSite
+            throw new GradleException(errorMessage)
+        }
+    }
+}
+
+}  // skipJava
