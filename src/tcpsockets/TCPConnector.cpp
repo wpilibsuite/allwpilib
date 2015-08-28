@@ -94,7 +94,6 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
     return std::unique_ptr<NetworkStream>(new TCPStream(sd, &address));
   }
 
-  long arg;
   fd_set sdset;
   struct timeval tv;
   socklen_t len;
@@ -105,6 +104,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
   u_long mode = 1;
   ioctlsocket(sd, FIONBIO, &mode);
 #else
+  long arg;
   arg = fcntl(sd, F_GETFL, nullptr);
   arg |= O_NONBLOCK;
   fcntl(sd, F_SETFL, arg);
