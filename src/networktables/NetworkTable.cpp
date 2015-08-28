@@ -46,8 +46,10 @@ void NetworkTable::SetIPAddress(StringRef address) {
 std::shared_ptr<NetworkTable> NetworkTable::GetTable(StringRef key) {
   if (!s_running) Initialize();
   llvm::SmallString<128> path;
-  path += PATH_SEPARATOR_CHAR;
-  path += key;
+  if (!key.empty()) {
+    path += PATH_SEPARATOR_CHAR;
+    path += key;
+  }
   return std::make_shared<NetworkTable>(path, private_init());
 }
 
