@@ -14,6 +14,7 @@
 #ifndef LLVM_ADT_DENSEMAPINFO_H
 #define LLVM_ADT_DENSEMAPINFO_H
 
+#include "llvm/PointerLikeTypeTraits.h"
 #include "llvm/type_traits.h"
 
 namespace llvm {
@@ -31,12 +32,12 @@ template<typename T>
 struct DenseMapInfo<T*> {
   static inline T* getEmptyKey() {
     uintptr_t Val = static_cast<uintptr_t>(-1);
-    Val <<= 2;
+    Val <<= PointerLikeTypeTraits<T*>::NumLowBitsAvailable;
     return reinterpret_cast<T*>(Val);
   }
   static inline T* getTombstoneKey() {
     uintptr_t Val = static_cast<uintptr_t>(-2);
-    Val <<= 2;
+    Val <<= PointerLikeTypeTraits<T*>::NumLowBitsAvailable;
     return reinterpret_cast<T*>(Val);
   }
   static unsigned getHashValue(const T *PtrVal) {
