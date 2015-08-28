@@ -339,7 +339,12 @@ void NT_DisposeString(struct NT_String *str);
 /* sets length to zero and pointer to null */
 void NT_InitString(struct NT_String *str);
 
+/* Gets the type for the specified key, or unassigned if non existent. */
+enum NT_Type NT_GetType(const char *name, size_t name_len);
+
 void NT_DisposeConnectionInfoArray(struct NT_ConnectionInfo *arr, size_t count);
+
+void NT_DisposeEntryInfoArray(struct NT_EntryInfo *arr, size_t count);
 
 void NT_DisposeRpcDefinition(struct NT_RpcDefinition *def);
 
@@ -352,6 +357,63 @@ unsigned long long NT_Now(void);
 typedef void (*NT_LogFunc)(unsigned int level, const char *file,
                            unsigned int line, const char *msg);
 void NT_SetLogger(NT_LogFunc func, unsigned int min_level);
+
+/*
+Interop Utility Functions
+*/
+
+/* Memory Allocators */
+char *NT_AllocateCharArray(size_t size);
+
+double *NT_AllocateDoubleArray(size_t size);
+
+int *NT_AllocateBooleanArray(size_t size);
+
+struct NT_String *NT_AllocateNTStringArray(size_t size);
+
+struct NT_String NT_AllocateNTString(size_t size);
+
+void NT_FreeDoubleArray(double *v_double);
+void NT_FreeBooleanArray(int *v_boolean);
+void NT_FreeStringArray(struct NT_String *v_string, size_t arr_size);
+
+enum NT_Type NT_GetTypeFromValue(struct NT_Value *value);
+
+int NT_GetEntryBooleanFromValue(struct NT_Value *value, unsigned long long *last_change, int *v_boolean);
+int NT_GetEntryDoubleFromValue(struct NT_Value *value, unsigned long long *last_change, double *v_double);
+int NT_GetEntryStringFromValue(struct NT_Value *value, unsigned long long *last_change, struct NT_String *v_string);
+int NT_GetEntryRawFromValue(struct NT_Value *value, unsigned long long *last_change, struct NT_String *v_raw);
+
+int *NT_GetEntryBooleanArrayFromValue(struct NT_Value *value, unsigned long long *last_change, size_t *arr_size);
+double *NT_GetEntryDoubleArrayFromValue(struct NT_Value *value, unsigned long long *last_change, size_t *arr_size);
+NT_String *NT_GetEntryStringArrayFromValue(struct NT_Value *value, unsigned long long *last_change, size_t *arr_size);
+
+
+int NT_GetEntryBoolean(const char* name, size_t name_len, unsigned long long *last_change, int *v_boolean);
+int NT_GetEntryDouble(const char* name, size_t name_len, unsigned long long *last_change, double *v_double);
+int NT_GetEntryString(const char *name, size_t name_len, unsigned long long *last_change, struct NT_String *v_string);
+int NT_GetEntryRaw(const char *name, size_t name_len, unsigned long long *last_change, struct NT_String *v_raw);
+
+int *NT_GetEntryBooleanArray(const char* name, size_t name_len, unsigned long long *last_change, size_t *arr_size);
+double *NT_GetEntryDoubleArray(const char* name, size_t name_len, unsigned long long *last_change, size_t *arr_size);
+NT_String *NT_GetEntryStringArray(const char* name, size_t name_len, unsigned long long *last_change, size_t *arr_size);
+
+/* Entry Value Setters */
+int NT_SetEntryDouble(const char *name, size_t name_len,
+  double v_double, int force);
+int NT_SetEntryBoolean(const char *name, size_t name_len,
+  int v_boolean, int force);
+int NT_SetEntryString(const char *name, size_t name_len,
+  struct NT_String v_string, int force);
+int NT_SetEntryRaw(const char *name, size_t name_len,
+  struct NT_String v_raw, int force);
+
+int NT_SetEntryBooleanArray(const char *name, size_t name_len,
+  const int *arr, size_t size, int force);
+int NT_SetEntryDoubleArray(const char *name, size_t name_len,
+  const double *arr, size_t size, int force);
+int NT_SetEntryNTStringArray(const char *name, size_t name_len,
+  const struct NT_String *arr, size_t size, int force);
 
 #ifdef __cplusplus
 }
