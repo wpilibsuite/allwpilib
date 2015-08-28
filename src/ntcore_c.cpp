@@ -225,7 +225,7 @@ void NT_CreatePolledRpc(const char *name, size_t name_len, const char *def,
 
 int NT_PollRpc(int blocking, NT_RpcCallInfo* call_info) {
   RpcCallInfo call_info_cpp;
-  if (!nt::PollRpc(blocking, &call_info_cpp))
+  if (!nt::PollRpc(blocking != 0, &call_info_cpp))
     return 0;
   ConvertToC(call_info_cpp, call_info);
   return 1;
@@ -243,7 +243,7 @@ unsigned int NT_CallRpc(const char *name, size_t name_len,
 
 char *NT_GetRpcResult(int blocking, unsigned int call_uid, size_t *result_len) {
   std::string result;
-  if (!nt::GetRpcResult(blocking, call_uid, &result)) return nullptr;
+  if (!nt::GetRpcResult(blocking != 0, call_uid, &result)) return nullptr;
 
   // convert result
   *result_len = result.size();
@@ -530,12 +530,12 @@ int NT_SetEntryBoolean(const char *name, size_t name_len, int v_boolean, int for
 {
   if (force != 0)
   {
-    nt::SetEntryTypeValue(StringRef(name, name_len), Value::MakeBoolean(v_boolean));
+    nt::SetEntryTypeValue(StringRef(name, name_len), Value::MakeBoolean(v_boolean != 0));
     return 1;
   }
   else
   {
-    return nt::SetEntryValue(StringRef(name, name_len), Value::MakeBoolean(v_boolean));
+    return nt::SetEntryValue(StringRef(name, name_len), Value::MakeBoolean(v_boolean != 0));
   }
 }
 

@@ -390,7 +390,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
   (JNIEnv *env, jclass, jstring key, jboolean value)
 {
   return nt::SetEntryValue(JavaStringRef(env, key),
-                           nt::Value::MakeBoolean(value));
+                           nt::Value::MakeBoolean(value != JNI_FALSE));
 }
 
 /*
@@ -477,7 +477,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_forcePutBoolean
   (JNIEnv *env, jclass, jstring key, jboolean value)
 {
-  nt::SetEntryTypeValue(JavaStringRef(env, key), nt::Value::MakeBoolean(value));
+  nt::SetEntryTypeValue(JavaStringRef(env, key), nt::Value::MakeBoolean(value != JNI_FALSE));
 }
 
 /*
@@ -902,7 +902,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 
         jvm->DetachCurrentThread();
       },
-      immediateNotify);
+      immediateNotify != JNI_FALSE);
 }
 
 /*
@@ -973,7 +973,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 
         jvm->DetachCurrentThread();
       },
-      immediateNotify);
+      immediateNotify != JNI_FALSE);
 }
 
 /*
