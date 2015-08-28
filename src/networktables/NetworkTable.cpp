@@ -67,10 +67,15 @@ void NetworkTable::AddTableListener(ITableListener* listener,
                                     bool immediateNotify) {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
+  std::size_t prefix_len = path.size();
   unsigned int id = nt::AddEntryListener(
       path,
       [=](unsigned int uid, StringRef name, std::shared_ptr<nt::Value> value,
-          bool is_new) { listener->ValueChanged(this, name, value, is_new); },
+          bool is_new) {
+        StringRef relative_key = name.substr(prefix_len);
+        if (relative_key.find(PATH_SEPARATOR_CHAR) != StringRef::npos) return;
+        listener->ValueChanged(this, relative_key, value, is_new);
+      },
       immediateNotify);
   m_listeners.emplace_back(listener, id);
 }
@@ -80,11 +85,15 @@ void NetworkTable::AddTableListener(StringRef key,
                                     bool immediateNotify) {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
+  std::size_t prefix_len = path.size();
   path += key;
   unsigned int id = nt::AddEntryListener(
       path,
       [=](unsigned int uid, StringRef name, std::shared_ptr<nt::Value> value,
-          bool is_new) { listener->ValueChanged(this, name, value, is_new); },
+          bool is_new) {
+        if (name != path) return;
+        listener->ValueChanged(this, name.substr(prefix_len), value, is_new);
+      },
       immediateNotify);
   m_listeners.emplace_back(listener, id);
 }
