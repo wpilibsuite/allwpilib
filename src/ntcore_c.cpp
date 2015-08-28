@@ -182,10 +182,10 @@ void NT_RemoveEntryListener(unsigned int entry_listener_uid) {
 unsigned int NT_AddConnectionListener(void *data,
                                       NT_ConnectionListenerCallback callback) {
   return nt::AddConnectionListener(
-      [=](unsigned int uid, int connected, const ConnectionInfo &conn) {
+      [=](unsigned int uid, bool connected, const ConnectionInfo &conn) {
         NT_ConnectionInfo conn_c;
         ConvertToC(conn, &conn_c);
-        callback(uid, data, connected, &conn_c);
+        callback(uid, data, connected ? 1 : 0, &conn_c);
         DisposeConnectionInfo(&conn_c);
       });
 }

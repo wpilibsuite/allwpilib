@@ -44,7 +44,7 @@ class Notifier {
   unsigned int AddConnectionListener(ConnectionListenerCallback callback);
   void RemoveConnectionListener(unsigned int conn_listener_uid);
 
-  void NotifyConnection(int connected, const ConnectionInfo& conn_info);
+  void NotifyConnection(bool connected, const ConnectionInfo& conn_info);
 
  private:
   Notifier();
@@ -70,10 +70,10 @@ class Notifier {
   std::queue<EntryNotification> m_entry_notifications;
 
   struct ConnectionNotification {
-    ConnectionNotification(int connected_, const ConnectionInfo& conn_info_)
+    ConnectionNotification(bool connected_, const ConnectionInfo& conn_info_)
         : connected(connected_), conn_info(conn_info_) {}
 
-    int connected;
+    bool connected;
     ConnectionInfo conn_info;
   };
   std::queue<ConnectionNotification> m_conn_notifications;

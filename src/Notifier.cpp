@@ -116,7 +116,7 @@ void Notifier::RemoveConnectionListener(unsigned int conn_listener_uid) {
     m_conn_listeners[conn_listener_uid] = nullptr;
 }
 
-void Notifier::NotifyConnection(int connected,
+void Notifier::NotifyConnection(bool connected,
                                 const ConnectionInfo& conn_info) {
   if (!m_active) return;
   std::unique_lock<std::mutex> lock(m_mutex);

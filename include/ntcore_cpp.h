@@ -184,7 +184,7 @@ typedef std::function<void(unsigned int uid, StringRef name,
                            std::shared_ptr<Value> value, bool is_new)>
     EntryListenerCallback;
 
-typedef std::function<void(unsigned int uid, int connected,
+typedef std::function<void(unsigned int uid, bool connected,
                            const ConnectionInfo& conn)>
     ConnectionListenerCallback;
 

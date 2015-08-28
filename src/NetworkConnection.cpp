@@ -99,7 +99,7 @@ void NetworkConnection::ReadThreadMain() {
   }
 
   m_state = static_cast<int>(kActive);
-  m_notifier.NotifyConnection(1, info());
+  m_notifier.NotifyConnection(true, info());
   while (m_active) {
     if (!m_stream)
       break;
@@ -118,7 +118,7 @@ void NetworkConnection::ReadThreadMain() {
     m_process_incoming(std::move(msg), this);
   }
   DEBUG3("read thread died");
-  if (m_state != kDead) m_notifier.NotifyConnection(0, info());
+  if (m_state != kDead) m_notifier.NotifyConnection(false, info());
   m_state = static_cast<int>(kDead);
   m_active = false;
   m_outgoing.push(Outgoing());  // also kill write thread
@@ -149,7 +149,7 @@ void NetworkConnection::WriteThreadMain() {
     DEBUG4("sent " << encoder.size() << " bytes");
   }
   DEBUG3("write thread died");
-  if (m_state != kDead) m_notifier.NotifyConnection(0, info());
+  if (m_state != kDead) m_notifier.NotifyConnection(false, info());
   m_state = static_cast<int>(kDead);
   m_active = false;
   if (m_stream) m_stream->close();  // also kill read thread
