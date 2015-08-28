@@ -65,6 +65,7 @@ void NetworkTable::AddTableListener(ITableListener* listener) {
 
 void NetworkTable::AddTableListener(ITableListener* listener,
                                     bool immediateNotify) {
+  std::lock_guard<std::mutex> lock(m_mutex);
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   std::size_t prefix_len = path.size();
@@ -83,6 +84,7 @@ void NetworkTable::AddTableListener(ITableListener* listener,
 void NetworkTable::AddTableListener(StringRef key,
                                     ITableListener* listener,
                                     bool immediateNotify) {
+  std::lock_guard<std::mutex> lock(m_mutex);
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   std::size_t prefix_len = path.size();
@@ -99,6 +101,7 @@ void NetworkTable::AddTableListener(StringRef key,
 }
 
 void NetworkTable::RemoveTableListener(ITableListener* listener) {
+  std::lock_guard<std::mutex> lock(m_mutex);
   auto matches_begin =
       std::remove_if(m_listeners.begin(), m_listeners.end(),
                      [=](const Listener& x) { return x.first == listener; });

@@ -1,6 +1,7 @@
 #ifndef _NETWORKTABLE_H_
 #define _NETWORKTABLE_H_
 
+#include <mutex>
 #include <vector>
 
 #include "tables/ITable.h"
@@ -10,6 +11,7 @@ class NetworkTable : public ITable {
   struct private_init {};
 
   std::string m_path;
+  std::mutex m_mutex;
   typedef std::pair<ITableListener*, unsigned int> Listener;
   std::vector<Listener> m_listeners;
 
