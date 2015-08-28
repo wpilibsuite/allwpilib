@@ -606,11 +606,12 @@ std::vector<EntryInfo> Storage::GetEntryInfo(StringRef prefix,
   return infos;
 }
 
-void Storage::NotifyEntries(StringRef prefix) {
+void Storage::NotifyEntries(StringRef prefix,
+                            EntryListenerCallback only) const {
   std::lock_guard<std::mutex> lock(m_mutex);
   for (auto& i : m_entries) {
     if (!i.getKey().startswith(prefix)) continue;
-    m_notifier.NotifyEntry(i.getKey(), i.getValue()->value, false);
+    m_notifier.NotifyEntry(i.getKey(), i.getValue()->value, false, only);
   }
 }
 

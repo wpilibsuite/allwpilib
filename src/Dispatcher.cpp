@@ -158,6 +158,15 @@ std::vector<ConnectionInfo> DispatcherBase::GetConnections() const {
   return conns;
 }
 
+void DispatcherBase::NotifyConnections(
+    ConnectionListenerCallback callback) const {
+  std::lock_guard<std::mutex> lock(m_user_mutex);
+  for (auto& conn : m_connections) {
+    if (conn->state() != NetworkConnection::kActive) continue;
+    m_notifier.NotifyConnection(true, conn->info(), callback);
+  }
+}
+
 void DispatcherBase::DispatchThreadMain() {
   auto timeout_time = std::chrono::steady_clock::now();
 

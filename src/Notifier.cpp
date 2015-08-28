@@ -49,6 +49,14 @@ void Notifier::ThreadMain() {
       if (!item.value) continue;
       StringRef name(item.name);
 
+      if (item.only) {
+        // Don't hold mutex during callback execution!
+        lock.unlock();
+        item.only(0, name, item.value, item.is_new);
+        lock.lock();
+        continue;
+      }
+
       // Use index because iterator might get invalidated.
       for (std::size_t i=0; i<m_entry_listeners.size(); ++i) {
         if (!m_entry_listeners[i].second) continue;  // removed
@@ -56,7 +64,7 @@ void Notifier::ThreadMain() {
         auto callback = m_entry_listeners[i].second;
         // Don't hold mutex during callback execution!
         lock.unlock();
-        callback(i, name, item.value, item.is_new);
+        callback(i+1, name, item.value, item.is_new);
         lock.lock();
       }
     }
@@ -66,13 +74,21 @@ void Notifier::ThreadMain() {
       auto item = std::move(m_conn_notifications.front());
       m_conn_notifications.pop();
 
+      if (item.only) {
+        // Don't hold mutex during callback execution!
+        lock.unlock();
+        item.only(0, item.connected, item.conn_info);
+        lock.lock();
+        continue;
+      }
+
       // Use index because iterator might get invalidated.
       for (std::size_t i=0; i<m_conn_listeners.size(); ++i) {
         if (!m_conn_listeners[i]) continue;  // removed
         auto callback = m_conn_listeners[i];
         // Don't hold mutex during callback execution!
         lock.unlock();
-        callback(i, item.connected, item.conn_info);
+        callback(i+1, item.connected, item.conn_info);
         lock.lock();
       }
     }
@@ -84,20 +100,21 @@ unsigned int Notifier::AddEntryListener(StringRef prefix,
   std::lock_guard<std::mutex> lock(m_mutex);
   unsigned int uid = m_entry_listeners.size();
   m_entry_listeners.emplace_back(prefix, callback);
-  return uid;
+  return uid + 1;
 }
 
 void Notifier::RemoveEntryListener(unsigned int entry_listener_uid) {
+  --entry_listener_uid;
   std::lock_guard<std::mutex> lock(m_mutex);
   if (entry_listener_uid < m_entry_listeners.size())
     m_entry_listeners[entry_listener_uid].second = nullptr;
 }
 
 void Notifier::NotifyEntry(StringRef name, std::shared_ptr<Value> value,
-                           bool is_new) {
+                           bool is_new, EntryListenerCallback only) {
   if (!m_active) return;
   std::unique_lock<std::mutex> lock(m_mutex);
-  m_entry_notifications.emplace(name, value, is_new);
+  m_entry_notifications.emplace(name, value, is_new, only);
   lock.unlock();
   m_cond.notify_one();
 }
@@ -107,20 +124,22 @@ unsigned int Notifier::AddConnectionListener(
   std::lock_guard<std::mutex> lock(m_mutex);
   unsigned int uid = m_entry_listeners.size();
   m_conn_listeners.emplace_back(callback);
-  return uid;
+  return uid + 1;
 }
 
 void Notifier::RemoveConnectionListener(unsigned int conn_listener_uid) {
+  --conn_listener_uid;
   std::lock_guard<std::mutex> lock(m_mutex);
   if (conn_listener_uid < m_conn_listeners.size())
     m_conn_listeners[conn_listener_uid] = nullptr;
 }
 
 void Notifier::NotifyConnection(bool connected,
-                                const ConnectionInfo& conn_info) {
+                                const ConnectionInfo& conn_info,
+                                ConnectionListenerCallback only) {
   if (!m_active) return;
   std::unique_lock<std::mutex> lock(m_mutex);
-  m_conn_notifications.emplace(connected, conn_info);
+  m_conn_notifications.emplace(connected, conn_info, only);
   lock.unlock();
   m_cond.notify_one();
 }

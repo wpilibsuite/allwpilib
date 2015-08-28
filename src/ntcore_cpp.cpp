@@ -70,7 +70,7 @@ unsigned int AddEntryListener(StringRef prefix, EntryListenerCallback callback,
   Notifier& notifier = Notifier::GetInstance();
   unsigned int uid = notifier.AddEntryListener(prefix, callback);
   notifier.Start();
-  if (immediate_notify) Storage::GetInstance().NotifyEntries(prefix);
+  if (immediate_notify) Storage::GetInstance().NotifyEntries(prefix, callback);
   return uid;
 }
 
@@ -78,10 +78,12 @@ void RemoveEntryListener(unsigned int entry_listener_uid) {
   Notifier::GetInstance().RemoveEntryListener(entry_listener_uid);
 }
 
-unsigned int AddConnectionListener(ConnectionListenerCallback callback) {
+unsigned int AddConnectionListener(ConnectionListenerCallback callback,
+                                   bool immediate_notify) {
   Notifier& notifier = Notifier::GetInstance();
   unsigned int uid = notifier.AddConnectionListener(callback);
   Notifier::GetInstance().Start();
+  if (immediate_notify) Dispatcher::GetInstance().NotifyConnections(callback);
   return uid;
 }
 

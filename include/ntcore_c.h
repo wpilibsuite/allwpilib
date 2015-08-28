@@ -269,7 +269,8 @@ unsigned int NT_AddEntryListener(const char *prefix, size_t prefix_len,
                                  int immediate_notify);
 void NT_RemoveEntryListener(unsigned int entry_listener_uid);
 unsigned int NT_AddConnectionListener(void *data,
-                                      NT_ConnectionListenerCallback callback);
+                                      NT_ConnectionListenerCallback callback,
+                                      int immediate_notify);
 void NT_RemoveConnectionListener(unsigned int conn_listener_uid);
 
 /*

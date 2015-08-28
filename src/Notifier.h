@@ -39,12 +39,14 @@ class Notifier {
                                 EntryListenerCallback callback);
   void RemoveEntryListener(unsigned int entry_listener_uid);
 
-  void NotifyEntry(StringRef name, std::shared_ptr<Value> value, bool is_new);
+  void NotifyEntry(StringRef name, std::shared_ptr<Value> value, bool is_new,
+                   EntryListenerCallback only = nullptr);
 
   unsigned int AddConnectionListener(ConnectionListenerCallback callback);
   void RemoveConnectionListener(unsigned int conn_listener_uid);
 
-  void NotifyConnection(bool connected, const ConnectionInfo& conn_info);
+  void NotifyConnection(bool connected, const ConnectionInfo& conn_info,
+                        ConnectionListenerCallback only = nullptr);
 
  private:
   Notifier();
@@ -60,21 +62,24 @@ class Notifier {
 
   struct EntryNotification {
     EntryNotification(StringRef name_, std::shared_ptr<Value> value_,
-                      bool is_new_)
-        : name(name_), value(value_), is_new(is_new_) {}
+                      bool is_new_, EntryListenerCallback only_)
+        : name(name_), value(value_), is_new(is_new_), only(only_) {}
 
     std::string name;
     std::shared_ptr<Value> value;
     bool is_new;
+    EntryListenerCallback only;
   };
   std::queue<EntryNotification> m_entry_notifications;
 
   struct ConnectionNotification {
-    ConnectionNotification(bool connected_, const ConnectionInfo& conn_info_)
-        : connected(connected_), conn_info(conn_info_) {}
+    ConnectionNotification(bool connected_, const ConnectionInfo& conn_info_,
+                           ConnectionListenerCallback only_)
+        : connected(connected_), conn_info(conn_info_), only(only_) {}
 
     bool connected;
     ConnectionInfo conn_info;
+    ConnectionListenerCallback only;
   };
   std::queue<ConnectionNotification> m_conn_notifications;
 

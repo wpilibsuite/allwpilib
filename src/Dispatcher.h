@@ -42,6 +42,7 @@ class DispatcherBase {
   void SetIdentity(llvm::StringRef name);
   void Flush();
   std::vector<ConnectionInfo> GetConnections() const;
+  void NotifyConnections(ConnectionListenerCallback callback) const;
 
   bool active() const { return m_active; }
 

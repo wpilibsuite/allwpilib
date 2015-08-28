@@ -74,7 +74,8 @@ class Storage {
   void DeleteEntry(StringRef name);
   void DeleteAllEntries();
   std::vector<EntryInfo> GetEntryInfo(StringRef prefix, unsigned int types);
-  void NotifyEntries(StringRef prefix);
+  void NotifyEntries(StringRef prefix,
+                     EntryListenerCallback only = nullptr) const;
 
   // Filename-based save/load functions.  Used both by periodic saves and
   // accessible directly via the user API.
