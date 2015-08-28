@@ -35,7 +35,11 @@ void NetworkTable::SetServerMode() { s_client = false; }
 
 void NetworkTable::SetTeam(int team) {
   char tmp[30];
-  sprintf(tmp, "%d.%d.%d.%d\n", 10, team / 100, team % 100, 2);
+#ifdef _MSC_VER
+  sprintf_s(tmp, "%d.%d.%d.%d\n", 10, team / 100, team % 100, 2);
+#else
+  std::snprintf(tmp, 30, "%d.%d.%d.%d\n", 10, team / 100, team % 100, 2);
+#endif
   SetIPAddress(tmp);
 }
 

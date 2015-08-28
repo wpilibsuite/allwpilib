@@ -65,7 +65,11 @@ std::size_t TCPStream::send(const char* buffer, std::size_t len, Error* err) {
   }
   if (!result) {
     char Buffer[128];
-    sprintf(Buffer, "Send() failed: WSA error=%d\n", WSAGetLastError());
+#ifdef _MSC_VER
+    sprintf_s(Buffer, "Send() failed: WSA error=%d\n", WSAGetLastError());
+#else
+    std::snprintf(Buffer, 128, "Send() failed: WSA error=%d\n", WSAGetLastError());
+#endif
     OutputDebugStringA(Buffer);
     *err = kConnectionReset;
     return 0;
