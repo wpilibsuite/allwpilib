@@ -89,6 +89,34 @@ public class NetworkTable implements ITable, IRemote {
     port = aport;
   }
 
+  public static boolean[] toNative(Boolean[] arr) {
+    boolean[] out = new boolean[arr.length];
+    for (int i = 0; i < arr.length; i++)
+      out[i] = arr[i];
+    return out;
+  }
+
+  public static double[] toNative(Double[] arr) {
+    double[] out = new double[arr.length];
+    for (int i = 0; i < arr.length; i++)
+      out[i] = arr[i];
+    return out;
+  }
+
+  public static Boolean[] fromNative(boolean[] arr) {
+    Boolean[] out = new Boolean[arr.length];
+    for (int i = 0; i < arr.length; i++)
+      out[i] = arr[i];
+    return out;
+  }
+
+  public static Double[] fromNative(double[] arr) {
+    Double[] out = new Double[arr.length];
+    for (int i = 0; i < arr.length; i++)
+      out[i] = arr[i];
+    return out;
+  }
+
   /**
    * Gets the table with the specified key. If the table does not exist, a new
    *table will be created.<br>
@@ -450,6 +478,20 @@ public class NetworkTable implements ITable, IRemote {
   }
 
   /**
+   * Maps the specified key to the specified value in this table. The key can
+   * not be null. The value can be retrieved by calling the get method with a
+   * key that is equal to the original key.
+   *
+   * @param key
+   *            the key
+   * @param value
+   *            the value
+   */
+  public void putBooleanArray(String key, Boolean[] value) {
+    putBooleanArray(key, toNative(value));
+  }
+
+  /**
    * Returns the key that the name maps to.
    *
    * @param key
@@ -477,6 +519,24 @@ public class NetworkTable implements ITable, IRemote {
   }
 
   /**
+   * Returns the key that the name maps to. If the key is null, it will return
+   * the default value
+   *
+   * @param key
+   *            the key name
+   * @param defaultValue
+   *            the default value if the key is null
+   * @return the key
+   */
+  public Boolean[] getBooleanArray(String key, Boolean[] defaultValue) {
+    try {
+      return fromNative(getBooleanArray(key));
+    } catch (TableKeyNotDefinedException e) {
+      return defaultValue;
+    }
+  }
+
+  /**
    * Maps the specified key to the specified value in this table. The key can
    * not be null. The value can be retrieved by calling the get method with a
    * key that is equal to the original key.
@@ -488,6 +548,20 @@ public class NetworkTable implements ITable, IRemote {
    */
   public void putNumberArray(String key, double[] value) {
     NetworkTablesJNI.putDoubleArray(path + PATH_SEPARATOR + key, value);
+  }
+
+  /**
+   * Maps the specified key to the specified value in this table. The key can
+   * not be null. The value can be retrieved by calling the get method with a
+   * key that is equal to the original key.
+   *
+   * @param key
+   *            the key
+   * @param value
+   *            the value
+   */
+  public void putNumberArray(String key, Double[] value) {
+    putNumberArray(key, toNative(value));
   }
 
   /**
@@ -515,6 +589,24 @@ public class NetworkTable implements ITable, IRemote {
    */
   public double[] getNumberArray(String key, double[] defaultValue) {
     return NetworkTablesJNI.getDoubleArray(path + PATH_SEPARATOR + key, defaultValue);
+  }
+
+  /**
+   * Returns the key that the name maps to. If the key is null, it will return
+   * the default value
+   *
+   * @param key
+   *            the key name
+   * @param defaultValue
+   *            the default value if the key is null
+   * @return the key
+   */
+  public Double[] getNumberArray(String key, Double[] defaultValue) {
+    try {
+      return fromNative(getNumberArray(key));
+    } catch (TableKeyNotDefinedException e) {
+      return defaultValue;
+    }
   }
 
   /**
@@ -579,6 +671,10 @@ public class NetworkTable implements ITable, IRemote {
       NetworkTablesJNI.putBooleanArray(path + PATH_SEPARATOR + key, (boolean[])value);
     else if (value instanceof double[])
       NetworkTablesJNI.putDoubleArray(path + PATH_SEPARATOR + key, (double[])value);
+    else if (value instanceof Boolean[])
+      NetworkTablesJNI.putBooleanArray(path + PATH_SEPARATOR + key, toNative((Boolean[])value));
+    else if (value instanceof Double[])
+      NetworkTablesJNI.putDoubleArray(path + PATH_SEPARATOR + key, toNative((Double[])value));
     else if (value instanceof String[])
       NetworkTablesJNI.putStringArray(path + PATH_SEPARATOR + key, (String[])value);
   }

@@ -119,6 +119,12 @@ public interface ITable {
    */
   public void putBooleanArray(String key, boolean[] value);
   /**
+   * Put a boolean array in the table
+   * @param key the key to be assigned to
+   * @param value the value that will be assigned
+   */
+  public void putBooleanArray(String key, Boolean[] value);
+  /**
    * @param key the key to look up
    * @return the value associated with the given key
    * @throws TableKeyNotDefinedException if there is no value associated with
@@ -132,6 +138,13 @@ public interface ITable {
    * if there is no value associated with the key
    */
   public boolean[] getBooleanArray(String key, boolean[] defaultValue);
+  /**
+   * @param key the key to look up
+   * @param defaultValue the value to be returned if no value is found
+   * @return the value associated with the given key or the given default value
+   * if there is no value associated with the key
+   */
+  public Boolean[] getBooleanArray(String key, Boolean[] defaultValue);
 
   /**
    * Put a number array in the table
@@ -139,6 +152,12 @@ public interface ITable {
    * @param value the value that will be assigned
    */
   public void putNumberArray(String key, double[] value);
+  /**
+   * Put a number array in the table
+   * @param key the key to be assigned to
+   * @param value the value that will be assigned
+   */
+  public void putNumberArray(String key, Double[] value);
   /**
    * @param key the key to look up
    * @return the value associated with the given key
@@ -153,6 +172,13 @@ public interface ITable {
    * if there is no value associated with the key
    */
   public double[] getNumberArray(String key, double[] defaultValue);
+  /**
+   * @param key the key to look up
+   * @param defaultValue the value to be returned if no value is found
+   * @return the value associated with the given key or the given default value
+   * if there is no value associated with the key
+   */
+  public Double[] getNumberArray(String key, Double[] defaultValue);
 
   /**
    * Put a string array in the table
