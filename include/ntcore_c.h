@@ -377,41 +377,63 @@ void NT_FreeStringArray(struct NT_String *v_string, size_t arr_size);
 
 enum NT_Type NT_GetTypeFromValue(const struct NT_Value *value);
 
-int NT_GetEntryBooleanFromValue(const struct NT_Value *value, unsigned long long *last_change, int *v_boolean);
-int NT_GetEntryDoubleFromValue(const struct NT_Value *value, unsigned long long *last_change, double *v_double);
-char *NT_GetEntryStringFromValue(const struct NT_Value *value, unsigned long long *last_change, size_t *str_len);
-char *NT_GetEntryRawFromValue(const struct NT_Value *value, unsigned long long *last_change, size_t *raw_len);
+int NT_GetEntryBooleanFromValue(const struct NT_Value *value,
+                                unsigned long long *last_change,
+                                int *v_boolean);
+int NT_GetEntryDoubleFromValue(const struct NT_Value *value,
+                               unsigned long long *last_change,
+                               double *v_double);
+char *NT_GetEntryStringFromValue(const struct NT_Value *value,
+                                 unsigned long long *last_change,
+                                 size_t *str_len);
+char *NT_GetEntryRawFromValue(const struct NT_Value *value,
+                              unsigned long long *last_change, size_t *raw_len);
 
-int *NT_GetEntryBooleanArrayFromValue(const struct NT_Value *value, unsigned long long *last_change, size_t *arr_size);
-double *NT_GetEntryDoubleArrayFromValue(const struct NT_Value *value, unsigned long long *last_change, size_t *arr_size);
-NT_String *NT_GetEntryStringArrayFromValue(const struct NT_Value *value, unsigned long long *last_change, size_t *arr_size);
+int *NT_GetEntryBooleanArrayFromValue(const struct NT_Value *value,
+                                      unsigned long long *last_change,
+                                      size_t *arr_size);
+double *NT_GetEntryDoubleArrayFromValue(const struct NT_Value *value,
+                                        unsigned long long *last_change,
+                                        size_t *arr_size);
+NT_String *NT_GetEntryStringArrayFromValue(const struct NT_Value *value,
+                                           unsigned long long *last_change,
+                                           size_t *arr_size);
 
+int NT_GetEntryBoolean(const char *name, size_t name_len,
+                       unsigned long long *last_change, int *v_boolean);
+int NT_GetEntryDouble(const char *name, size_t name_len,
+                      unsigned long long *last_change, double *v_double);
+char *NT_GetEntryString(const char *name, size_t name_len,
+                        unsigned long long *last_change, size_t *str_len);
+char *NT_GetEntryRaw(const char *name, size_t name_len,
+                     unsigned long long *last_change, size_t *raw_len);
 
-int NT_GetEntryBoolean(const char* name, size_t name_len, unsigned long long *last_change, int *v_boolean);
-int NT_GetEntryDouble(const char* name, size_t name_len, unsigned long long *last_change, double *v_double);
-char *NT_GetEntryString(const char *name, size_t name_len, unsigned long long *last_change, size_t *str_len);
-char *NT_GetEntryRaw(const char *name, size_t name_len, unsigned long long *last_change, size_t *raw_len);
-
-int *NT_GetEntryBooleanArray(const char* name, size_t name_len, unsigned long long *last_change, size_t *arr_size);
-double *NT_GetEntryDoubleArray(const char* name, size_t name_len, unsigned long long *last_change, size_t *arr_size);
-NT_String *NT_GetEntryStringArray(const char* name, size_t name_len, unsigned long long *last_change, size_t *arr_size);
+int *NT_GetEntryBooleanArray(const char *name, size_t name_len,
+                             unsigned long long *last_change, size_t *arr_size);
+double *NT_GetEntryDoubleArray(const char *name, size_t name_len,
+                               unsigned long long *last_change,
+                               size_t *arr_size);
+NT_String *NT_GetEntryStringArray(const char *name, size_t name_len,
+                                  unsigned long long *last_change,
+                                  size_t *arr_size);
 
 /* Entry Value Setters */
-int NT_SetEntryDouble(const char *name, size_t name_len,
-  double v_double, int force);
-int NT_SetEntryBoolean(const char *name, size_t name_len,
-  int v_boolean, int force);
-int NT_SetEntryString(const char *name, size_t name_len,
-  const char *str, size_t str_len, int force);
-int NT_SetEntryRaw(const char *name, size_t name_len,
-  const char *raw, size_t raw_len, int force);
+int NT_SetEntryDouble(const char *name, size_t name_len, double v_double,
+                      int force);
+int NT_SetEntryBoolean(const char *name, size_t name_len, int v_boolean,
+                       int force);
+int NT_SetEntryString(const char *name, size_t name_len, const char *str,
+                      size_t str_len, int force);
+int NT_SetEntryRaw(const char *name, size_t name_len, const char *raw,
+                   size_t raw_len, int force);
 
-int NT_SetEntryBooleanArray(const char *name, size_t name_len,
-  const int *arr, size_t size, int force);
-int NT_SetEntryDoubleArray(const char *name, size_t name_len,
-  const double *arr, size_t size, int force);
+int NT_SetEntryBooleanArray(const char *name, size_t name_len, const int *arr,
+                            size_t size, int force);
+int NT_SetEntryDoubleArray(const char *name, size_t name_len, const double *arr,
+                           size_t size, int force);
 int NT_SetEntryNTStringArray(const char *name, size_t name_len,
-  const struct NT_String *arr, size_t size, int force);
+                             const struct NT_String *arr, size_t size,
+                             int force);
 
 #ifdef __cplusplus
 }
