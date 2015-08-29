@@ -371,6 +371,7 @@ int *NT_AllocateBooleanArray(size_t size);
 
 struct NT_String *NT_AllocateStringArray(size_t size);
 
+void NT_FreeCharArray(char *v_char);
 void NT_FreeDoubleArray(double *v_double);
 void NT_FreeBooleanArray(int *v_boolean);
 void NT_FreeStringArray(struct NT_String *v_string, size_t arr_size);

@@ -72,6 +72,7 @@ NT_SetEntryDoubleArray @74
 NT_SetEntryStringArray @75
 NT_DisposeEntryInfoArray @76
 NT_AllocateCharArray @77
+NT_FreeCharArray @78
 
 ; JNI functions
 JNI_OnLoad
