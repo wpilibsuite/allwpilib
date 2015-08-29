@@ -45,6 +45,20 @@ public class NetworkTable implements ITable, IRemote {
   }
 
   /**
+   * shuts down network tables
+   */
+  public synchronized static void shutdown() {
+    if (!running)
+      throw new IllegalStateException(
+          "Network tables has not yet been initialized");
+    if (client)
+      NetworkTablesJNI.stopClient();
+    else
+      NetworkTablesJNI.stopServer();
+    running = false;
+  }
+
+  /**
    * set that network tables should be a server
    * This must be called before initalize or getTable
    */
