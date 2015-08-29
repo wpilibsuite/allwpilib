@@ -475,7 +475,7 @@ double *NT_AllocateDoubleArray(size_t size) {
 }
 
 /* Allocates an NT_String array of the specified size. */
-struct NT_String *NT_AllocateNTStringArray(size_t size) {
+struct NT_String *NT_AllocateStringArray(size_t size) {
   NT_String *retVal =
       static_cast<NT_String *>(std::malloc(size * sizeof(NT_String)));
   return retVal;
@@ -564,9 +564,9 @@ int NT_SetEntryDoubleArray(const char *name, size_t name_len, const double *arr,
   }
 }
 
-int NT_SetEntryNTStringArray(const char *name, size_t name_len,
-                             const struct NT_String *arr, size_t size,
-                             int force) {
+int NT_SetEntryStringArray(const char *name, size_t name_len,
+                           const struct NT_String *arr, size_t size,
+                           int force) {
   std::vector<std::string> v;
   v.reserve(size);
   for (size_t i = 0; i < size; ++i) v.push_back(ConvertFromC(arr[i]));
@@ -581,32 +581,29 @@ int NT_SetEntryNTStringArray(const char *name, size_t name_len,
   }
 }
 
-enum NT_Type NT_GetTypeFromValue(const struct NT_Value *value) {
+enum NT_Type NT_GetValueType(const struct NT_Value *value) {
   if (!value) return NT_Type::NT_UNASSIGNED;
   return value->type;
 }
 
-int NT_GetEntryBooleanFromValue(const struct NT_Value *value,
-                                unsigned long long *last_change,
-                                int *v_boolean) {
+int NT_GetValueBoolean(const struct NT_Value *value,
+                       unsigned long long *last_change, int *v_boolean) {
   if (!value || value->type != NT_Type::NT_BOOLEAN) return 0;
   *v_boolean = value->data.v_boolean;
   *last_change = value->last_change;
   return 1;
 }
 
-int NT_GetEntryDoubleFromValue(const struct NT_Value *value,
-                               unsigned long long *last_change,
-                               double *v_double) {
+int NT_GetValueDouble(const struct NT_Value *value,
+                      unsigned long long *last_change, double *v_double) {
   if (!value || value->type != NT_Type::NT_DOUBLE) return 0;
   *last_change = value->last_change;
   *v_double = value->data.v_double;
   return 1;
 }
 
-char *NT_GetEntryStringFromValue(const struct NT_Value *value,
-                                 unsigned long long *last_change,
-                                 size_t *str_len) {
+char *NT_GetValueString(const struct NT_Value *value,
+                        unsigned long long *last_change, size_t *str_len) {
   if (!value || value->type != NT_Type::NT_STRING) return nullptr;
   *last_change = value->last_change;
   *str_len = value->data.v_string.len;
@@ -615,9 +612,8 @@ char *NT_GetEntryStringFromValue(const struct NT_Value *value,
   return str;
 }
 
-char *NT_GetEntryRawFromValue(const struct NT_Value *value,
-                              unsigned long long *last_change,
-                              size_t *raw_len) {
+char *NT_GetValueRaw(const struct NT_Value *value,
+                     unsigned long long *last_change, size_t *raw_len) {
   if (!value || value->type != NT_Type::NT_RAW) return nullptr;
   *last_change = value->last_change;
   *raw_len = value->data.v_string.len;
@@ -626,9 +622,9 @@ char *NT_GetEntryRawFromValue(const struct NT_Value *value,
   return raw;
 }
 
-int *NT_GetEntryBooleanArrayFromValue(const struct NT_Value *value,
-                                      unsigned long long *last_change,
-                                      size_t *arr_size) {
+int *NT_GetValueBooleanArray(const struct NT_Value *value,
+                             unsigned long long *last_change,
+                             size_t *arr_size) {
   if (!value || value->type != NT_Type::NT_BOOLEAN_ARRAY) return nullptr;
   *last_change = value->last_change;
   *arr_size = value->data.arr_boolean.size;
@@ -638,9 +634,9 @@ int *NT_GetEntryBooleanArrayFromValue(const struct NT_Value *value,
   return arr;
 }
 
-double *NT_GetEntryDoubleArrayFromValue(const struct NT_Value *value,
-                                        unsigned long long *last_change,
-                                        size_t *arr_size) {
+double *NT_GetValueDoubleArray(const struct NT_Value *value,
+                               unsigned long long *last_change,
+                               size_t *arr_size) {
   if (!value || value->type != NT_Type::NT_DOUBLE_ARRAY) return nullptr;
   *last_change = value->last_change;
   *arr_size = value->data.arr_double.size;
@@ -651,9 +647,9 @@ double *NT_GetEntryDoubleArrayFromValue(const struct NT_Value *value,
   return arr;
 }
 
-NT_String *NT_GetEntryStringArrayFromValue(const struct NT_Value *value,
-                                           unsigned long long *last_change,
-                                           size_t *arr_size) {
+NT_String *NT_GetValueStringArray(const struct NT_Value *value,
+                                  unsigned long long *last_change,
+                                  size_t *arr_size) {
   if (!value || value->type != NT_Type::NT_STRING_ARRAY) return nullptr;
   *last_change = value->last_change;
   *arr_size = value->data.arr_string.size;
