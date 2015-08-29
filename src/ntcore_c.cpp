@@ -610,7 +610,9 @@ char *NT_GetEntryStringFromValue(const struct NT_Value *value,
   if (!value || value->type != NT_Type::NT_STRING) return nullptr;
   *last_change = value->last_change;
   *str_len = value->data.v_string.len;
-  return value->data.v_string.str;
+  char *str = (char*)std::malloc(value->data.v_string.len + 1);
+  std::memcpy(str, value->data.v_string.str, value->data.v_string.len + 1);
+  return str;
 }
 
 char *NT_GetEntryRawFromValue(const struct NT_Value *value,
@@ -619,7 +621,9 @@ char *NT_GetEntryRawFromValue(const struct NT_Value *value,
   if (!value || value->type != NT_Type::NT_RAW) return nullptr;
   *last_change = value->last_change;
   *raw_len = value->data.v_string.len;
-  return value->data.v_string.str;
+  char *raw = (char*)std::malloc(value->data.v_string.len + 1);
+  std::memcpy(raw, value->data.v_string.str, value->data.v_string.len + 1);
+  return raw;
 }
 
 int *NT_GetEntryBooleanArrayFromValue(const struct NT_Value *value,
@@ -628,7 +632,10 @@ int *NT_GetEntryBooleanArrayFromValue(const struct NT_Value *value,
   if (!value || value->type != NT_Type::NT_BOOLEAN_ARRAY) return nullptr;
   *last_change = value->last_change;
   *arr_size = value->data.arr_boolean.size;
-  return value->data.arr_boolean.arr;
+  int *arr = (int*)std::malloc(value->data.arr_boolean.size * sizeof(int));
+  std::memcpy(arr, value->data.arr_boolean.arr,
+              value->data.arr_boolean.size * sizeof(int));
+  return arr;
 }
 
 double *NT_GetEntryDoubleArrayFromValue(const struct NT_Value *value,
@@ -637,7 +644,11 @@ double *NT_GetEntryDoubleArrayFromValue(const struct NT_Value *value,
   if (!value || value->type != NT_Type::NT_DOUBLE_ARRAY) return nullptr;
   *last_change = value->last_change;
   *arr_size = value->data.arr_double.size;
-  return value->data.arr_double.arr;
+  double *arr =
+      (double *)std::malloc(value->data.arr_double.size * sizeof(double));
+  std::memcpy(arr, value->data.arr_double.arr,
+              value->data.arr_double.size * sizeof(double));
+  return arr;
 }
 
 NT_String *NT_GetEntryStringArrayFromValue(const struct NT_Value *value,
@@ -646,7 +657,15 @@ NT_String *NT_GetEntryStringArrayFromValue(const struct NT_Value *value,
   if (!value || value->type != NT_Type::NT_STRING_ARRAY) return nullptr;
   *last_change = value->last_change;
   *arr_size = value->data.arr_string.size;
-  return value->data.arr_string.arr;
+  NT_String *arr = static_cast<NT_String *>(
+      std::malloc(value->data.arr_string.size * sizeof(NT_String)));
+  for (size_t i = 0; i < value->data.arr_string.size; ++i) {
+    size_t len = value->data.arr_string.arr[i].len;
+    arr[i].len = len;
+    arr[i].str = (char*)std::malloc(len + 1);
+    std::memcpy(arr[i].str, value->data.arr_string.arr[i].str, len + 1);
+  }
+  return arr;
 }
 
 int NT_GetEntryBoolean(const char *name, size_t name_len,
