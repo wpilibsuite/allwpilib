@@ -488,16 +488,6 @@ struct NT_String *NT_AllocateNTStringArray(size_t size)
   return retVal;
 }
 
-/* Allocates */
-struct NT_String NT_AllocateNTString(size_t size)
-{
-  NT_String retVal;
-  retVal.len = size;
-  retVal.str = static_cast<char*>(
-    std::malloc(size * sizeof(char)));
-  return retVal;
-}
-
 void NT_FreeDoubleArray(double *v_double)
 {
   std::free(v_double);
@@ -539,30 +529,30 @@ int NT_SetEntryBoolean(const char *name, size_t name_len, int v_boolean, int for
   }
 }
 
-int NT_SetEntryString(const char *name, size_t name_len, struct NT_String v_string, int force)
+int NT_SetEntryString(const char *name, size_t name_len, const char *str, size_t str_len, int force)
 {
   if (force != 0)
   {
-    nt::SetEntryTypeValue(StringRef(name, name_len), Value::MakeString(StringRef(v_string.str, v_string.len)));
+    nt::SetEntryTypeValue(StringRef(name, name_len), Value::MakeString(StringRef(str, str_len)));
     return 1;
   }
   else
   {
-    return nt::SetEntryValue(StringRef(name, name_len), Value::MakeString(StringRef(v_string.str, v_string.len)));
+    return nt::SetEntryValue(StringRef(name, name_len), Value::MakeString(StringRef(str, str_len)));
   }
   
 }
 
-int NT_SetEntryRaw(const char *name, size_t name_len, struct NT_String v_raw, int force)
+int NT_SetEntryRaw(const char *name, size_t name_len, const char *raw, size_t raw_len, int force)
 {
   if (force != 0)
   {
-    nt::SetEntryTypeValue(StringRef(name, name_len), Value::MakeString(StringRef(v_raw.str, v_raw.len)));
+    nt::SetEntryTypeValue(StringRef(name, name_len), Value::MakeString(StringRef(raw, raw_len)));
     return 1;
   }
   else
   {
-    return nt::SetEntryValue(StringRef(name, name_len), Value::MakeString(StringRef(v_raw.str, v_raw.len)));
+    return nt::SetEntryValue(StringRef(name, name_len), Value::MakeString(StringRef(raw, raw_len)));
   }
   
 }
@@ -612,13 +602,13 @@ int NT_SetEntryNTStringArray(const char *name, size_t name_len, const struct NT_
 
 }
 
-enum NT_Type NT_GetTypeFromValue(struct NT_Value *value)
+enum NT_Type NT_GetTypeFromValue(const struct NT_Value *value)
 {
   if (!value) return NT_Type::NT_UNASSIGNED;
   return value->type;
 }
 
-int NT_GetEntryBooleanFromValue(struct NT_Value *value, unsigned long long *last_change, int *v_boolean)
+int NT_GetEntryBooleanFromValue(const struct NT_Value *value, unsigned long long *last_change, int *v_boolean)
 {
   if (!value || value->type != NT_Type::NT_BOOLEAN)
   {
@@ -630,7 +620,7 @@ int NT_GetEntryBooleanFromValue(struct NT_Value *value, unsigned long long *last
 
 }
 
-int NT_GetEntryDoubleFromValue(struct NT_Value *value, unsigned long long *last_change, double *v_double)
+int NT_GetEntryDoubleFromValue(const struct NT_Value *value, unsigned long long *last_change, double *v_double)
 {
   if (!value || value->type != NT_Type::NT_DOUBLE)
   {
@@ -641,31 +631,29 @@ int NT_GetEntryDoubleFromValue(struct NT_Value *value, unsigned long long *last_
   return 1;
 }
 
-int NT_GetEntryStringFromValue(struct NT_Value *value, unsigned long long *last_change, struct NT_String *v_string)
+char *NT_GetEntryStringFromValue(const struct NT_Value *value, unsigned long long *last_change, size_t *str_len)
 {
   if (!value || value->type != NT_Type::NT_STRING)
   {
-    return 0;
+    return nullptr;
   }
   *last_change = value->last_change;
-  NT_DisposeString(v_string);
-  *v_string = value->data.v_string;
-  return 1;
+  *str_len = value->data.v_string.len;
+  return value->data.v_string.str;
 }
 
-int NT_GetEntryRawFromValue(struct NT_Value *value, unsigned long long *last_change, struct NT_String *v_raw)
+char *NT_GetEntryRawFromValue(const struct NT_Value *value, unsigned long long *last_change, size_t *raw_len)
 {
   if (!value || value->type != NT_Type::NT_RAW)
   {
-    return 0;
+    return nullptr;
   }
   *last_change = value->last_change;
-  NT_DisposeString(v_raw);
-  *v_raw = value->data.v_raw;
-  return 1;
+  *raw_len = value->data.v_string.len;
+  return value->data.v_string.str;
 }
 
-int *NT_GetEntryBooleanArrayFromValue(struct NT_Value *value, unsigned long long *last_change, size_t *arr_size)
+int *NT_GetEntryBooleanArrayFromValue(const struct NT_Value *value, unsigned long long *last_change, size_t *arr_size)
 {
   if (!value || value->type != NT_Type::NT_BOOLEAN_ARRAY) return nullptr;
   *last_change = value->last_change;
@@ -673,7 +661,7 @@ int *NT_GetEntryBooleanArrayFromValue(struct NT_Value *value, unsigned long long
   return value->data.arr_boolean.arr;
 }
 
-double *NT_GetEntryDoubleArrayFromValue(struct NT_Value *value, unsigned long long *last_change, size_t *arr_size)
+double *NT_GetEntryDoubleArrayFromValue(const struct NT_Value *value, unsigned long long *last_change, size_t *arr_size)
 {
   if (!value || value->type != NT_Type::NT_DOUBLE_ARRAY) return nullptr;
   *last_change = value->last_change;
@@ -681,7 +669,7 @@ double *NT_GetEntryDoubleArrayFromValue(struct NT_Value *value, unsigned long lo
   return value->data.arr_double.arr;
 }
 
-NT_String *NT_GetEntryStringArrayFromValue(struct NT_Value *value, unsigned long long *last_change, size_t *arr_size)
+NT_String *NT_GetEntryStringArrayFromValue(const struct NT_Value *value, unsigned long long *last_change, size_t *arr_size)
 {
   if (!value || value->type != NT_Type::NT_STRING_ARRAY) return nullptr;
   *last_change = value->last_change;
@@ -713,27 +701,31 @@ int NT_GetEntryDouble(const char* name, size_t name_len, unsigned long long *las
   return 1;
 }
 
-int NT_GetEntryString(const char *name, size_t name_len, unsigned long long *last_change, struct NT_String *v_string)
+char *NT_GetEntryString(const char *name, size_t name_len, unsigned long long *last_change, size_t *str_len)
 {
   auto v = nt::GetEntryValue(StringRef(name, name_len));
   if (!v || !v->IsString()) {
-    return 0;
+    return nullptr;
   }
   *last_change = v->last_change();
-  nt::ConvertToC(v->GetString(), v_string);
-  return 1;
+  struct NT_String v_string;
+  nt::ConvertToC(v->GetString(), &v_string);
+  *str_len = v_string.len;
+  return v_string.str;
 }
 
-int NT_GetEntryRaw(const char *name, size_t name_len, unsigned long long *last_change, struct NT_String *v_raw)
+char *NT_GetEntryRaw(const char *name, size_t name_len, unsigned long long *last_change, size_t *raw_len)
 {
   auto v = nt::GetEntryValue(StringRef(name, name_len));
   if (!v || !v->IsRaw())
   {
-    return 0;
+    return nullptr;
   }
   *last_change = v->last_change();
-  nt::ConvertToC(v->GetRaw(), v_raw);
-  return 1;
+  struct NT_String v_raw;
+  nt::ConvertToC(v->GetRaw(), &v_raw);
+  *raw_len = v_raw.len;
+  return v_raw.str;
 }
 
 int *NT_GetEntryBooleanArray(const char* name, size_t name_len, unsigned long long *last_change, size_t *arr_size)
