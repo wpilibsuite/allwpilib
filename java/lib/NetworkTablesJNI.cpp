@@ -566,7 +566,7 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTables
   auto val = nt::GetEntryValue(JavaStringRef(env, key));
   if (!val || !val->IsBoolean()) {
     ThrowTableKeyNotDefined(env, key);
-    return false;
+    return nullptr;
   }
   return ToJavaObject(env, *val);
 }
