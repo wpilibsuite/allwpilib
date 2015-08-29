@@ -26,8 +26,11 @@ void Dispatcher::StartServer(StringRef persist_filename,
 }
 
 void Dispatcher::StartClient(const char* server_name, unsigned int port) {
-  DispatcherBase::StartClient(std::bind(&TCPConnector::connect, server_name,
-                                        static_cast<int>(port), 1));
+  std::string server_name_copy(server_name);
+  DispatcherBase::StartClient([=]() -> std::unique_ptr<NetworkStream> {
+    return TCPConnector::connect(server_name_copy.c_str(),
+                                 static_cast<int>(port), 1);
+  });
 }
 
 Dispatcher::Dispatcher()
