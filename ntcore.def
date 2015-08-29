@@ -45,7 +45,6 @@ NT_GetType @46
 NT_AllocateDoubleArray @47
 NT_AllocateBooleanArray @48
 NT_AllocateNTStringArray @49
-NT_AllocateNTString @50
 NT_FreeDoubleArray @51
 NT_FreeBooleanArray @52
 NT_FreeStringArray @53
