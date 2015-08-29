@@ -50,6 +50,16 @@ public interface ITable {
       throws IllegalArgumentException;
 
   /**
+   * Retrieve an array data type from the table.
+   * @param key the key to be assigned to
+   * @param externalValue the array data type to retreive into
+   * @throws TableKeyNotDefinedException if there is no value associated with
+   * the given key
+   * @deprecated Use get*Array functions instead.
+   */
+  public void retrieveValue(String key, Object externalValue) throws TableKeyNotDefinedException;
+
+  /**
    * Put a number in the table
    * @param key the key to be assigned to
    * @param value the value that will be assigned

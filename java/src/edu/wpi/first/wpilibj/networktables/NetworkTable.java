@@ -1,6 +1,7 @@
 package edu.wpi.first.wpilibj.networktables;
 
 import edu.wpi.first.wpilibj.tables.*;
+import edu.wpi.first.wpilibj.networktables2.type.*;
 import java.io.*;
 import java.util.*;
 
@@ -677,6 +678,24 @@ public class NetworkTable implements ITable, IRemote {
       NetworkTablesJNI.putDoubleArray(path + PATH_SEPARATOR + key, toNative((Double[])value));
     else if (value instanceof String[])
       NetworkTablesJNI.putStringArray(path + PATH_SEPARATOR + key, (String[])value);
+    else if (value instanceof BooleanArray)
+      NetworkTablesJNI.putBooleanArray(path + PATH_SEPARATOR + key, toNative((Boolean[])((ArrayData)value).getDataArray()));
+    else if (value instanceof NumberArray)
+      NetworkTablesJNI.putDoubleArray(path + PATH_SEPARATOR + key, toNative((Double[])((ArrayData)value).getDataArray()));
+    else if (value instanceof StringArray)
+      NetworkTablesJNI.putStringArray(path + PATH_SEPARATOR + key, (String[])((ArrayData)value).getDataArray());
+  }
+
+  public void retrieveValue(String key, Object externalData) throws TableKeyNotDefinedException {
+    Object value = getValue(key);
+    if (value instanceof boolean[] && externalData instanceof BooleanArray)
+      ((ArrayData)externalData).setDataArray(fromNative((boolean[])value));
+    else if (value instanceof double[] && externalData instanceof NumberArray)
+      ((ArrayData)externalData).setDataArray(fromNative((double[])value));
+    else if (value instanceof String[] && externalData instanceof StringArray)
+      ((ArrayData)externalData).setDataArray((String[])value);
+    else
+      throw new TableKeyNotDefinedException(key);
   }
 
   /**
