@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.Relay.Value;
  * @author jonathanleitschuh
  *
  */
-public abstract class RelayCrossConnectFxiture implements ITestFixture {
+public abstract class RelayCrossConnectFixture implements ITestFixture {
 
   private DigitalInput inputOne;
   private DigitalInput inputTwo;
@@ -94,7 +94,7 @@ public abstract class RelayCrossConnectFxiture implements ITestFixture {
       freed = true;
     } else {
       throw new RuntimeException("You attempted to free the "
-          + RelayCrossConnectFxiture.class.getSimpleName() + " multiple times");
+          + RelayCrossConnectFixture.class.getSimpleName() + " multiple times");
     }
     return true;
   }

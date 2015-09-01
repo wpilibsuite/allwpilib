@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture;
 import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
-import edu.wpi.first.wpilibj.fixtures.RelayCrossConnectFxiture;
+import edu.wpi.first.wpilibj.fixtures.RelayCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
 import edu.wpi.first.wpilibj.mockhardware.FakePotentiometerSource;
 
@@ -314,8 +314,8 @@ public final class TestBench {
     return analogIO;
   }
 
-  public static RelayCrossConnectFxiture getRelayCrossConnectFixture() {
-    RelayCrossConnectFxiture relay = new RelayCrossConnectFxiture() {
+  public static RelayCrossConnectFixture getRelayCrossConnectFixture() {
+    RelayCrossConnectFixture relay = new RelayCrossConnectFixture() {
 
       @Override
       protected Relay giveRelay() {
