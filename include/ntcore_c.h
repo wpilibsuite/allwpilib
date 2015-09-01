@@ -308,12 +308,52 @@ struct NT_Value **NT_UnpackRpcValues(const char *packed, size_t packed_len,
  */
 void NT_SetNetworkIdentity(const char *name, size_t name_len);
 
+/** Start Server
+* Starts a server using the specified filename, listening address, and port.
+*
+* @param persist_filename  the name of the persist file to use (UTF-8 string, null terminated)
+* @param listen_address    the address to listen on, or null to listen on any address. (UTF-8 string, null terminated)
+* @param port              port to communicate over.
+*/
 void NT_StartServer(const char *persist_filename, const char *listen_address,
                     unsigned int port);
+
+/** Stop Server
+ * Stops the server if it is running.
+*/
 void NT_StopServer(void);
+
+/** Starts Client
+ * Starts a client using the specified server and port
+ *
+ * @param server_name server name (UTF-8 string, null terminated)
+ * @param port        port to communicate over
+ *
+*/
 void NT_StartClient(const char *server_name, unsigned int port);
+
+/** Stop Client
+ * Stops the client if it is running.
+*/
 void NT_StopClient(void);
+
+/** Set Update Rate
+ * Sets the update rate of the table
+ *
+ * @param interval  the interval to update the table at (in seconds)
+ *
+*/
 void NT_SetUpdateRate(double interval);
+
+/** Get Connections
+ * Gets an array of all the connections in the table.
+ *
+ * @param count returns the number of elements in the array
+ * @return      an array containing all the connections.
+ *
+ * It is the caller's responsibility to free the array. The
+ * NT_DisposeConnectionInfoArray function is useful for this purpose.
+*/
 struct NT_ConnectionInfo *NT_GetConnections(size_t *count);
 
 /*
@@ -343,12 +383,38 @@ void NT_InitString(struct NT_String *str);
 /* Gets the type for the specified key, or unassigned if non existent. */
 enum NT_Type NT_GetType(const char *name, size_t name_len);
 
+/** Dispose Connection Info Array
+ * Disposes a connection info array
+ *
+ * @param arr   pointer to the array to dispose
+ * @param count number of elements in the array
+ *
+*/
 void NT_DisposeConnectionInfoArray(struct NT_ConnectionInfo *arr, size_t count);
 
+/** Dispose Entry Info Array
+ * Disposes an entry info array
+ *
+ * @param arr   pointer to the array to dispose
+ * @param count number of elements in the array
+ *
+*/
 void NT_DisposeEntryInfoArray(struct NT_EntryInfo *arr, size_t count);
 
+/** Dispose Rpc Definition
+ * Disposes a Rpc Definition structure
+ *
+ * @param def  pointer to the struct to dispose
+ *
+*/
 void NT_DisposeRpcDefinition(struct NT_RpcDefinition *def);
 
+/** Dispose Rpc Call Info
+ * Disposes a Rpc Call Info structure
+ *
+ * @param def  pointer to the struct to dispose
+ *
+*/
 void NT_DisposeRpcCallInfo(struct NT_RpcCallInfo *call_info);
 
 /* timestamp */
