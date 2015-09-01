@@ -67,7 +67,7 @@ void Ultrasonic::Initialize() {
   SetAutomaticMode(false);     // kill task when adding a new sensor
   // link this instance on the list
   {
-    std::unique_lock<priority_mutex> lock(m_mutex);
+    std::lock_guard<priority_mutex> lock(m_mutex);
     m_nextSensor = m_firstSensor;
     m_firstSensor = this;
   }
@@ -188,7 +188,7 @@ Ultrasonic::~Ultrasonic() {
   wpi_assert(m_firstSensor != nullptr);
 
   {
-    std::unique_lock<priority_mutex> lock(m_mutex);
+    std::lock_guard<priority_mutex> lock(m_mutex);
     if (this == m_firstSensor) {
       m_firstSensor = m_nextSensor;
       if (m_firstSensor == nullptr) {

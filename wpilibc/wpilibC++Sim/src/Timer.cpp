@@ -96,7 +96,7 @@ double Timer::Get() const
 	double result;
 	double currentTime = GetFPGATimestamp();
 
-	std::unique_lock<priority_mutex> sync(m_mutex);
+	std::lock_guard<priority_mutex> sync(m_mutex);
 	if(m_running)
 	{
 		// This math won't work if the timer rolled over (71 minutes after boot).
@@ -118,7 +118,7 @@ double Timer::Get() const
  */
 void Timer::Reset()
 {
-	std::unique_lock<priority_mutex> sync(m_mutex);
+	std::lock_guard<priority_mutex> sync(m_mutex);
 	m_accumulatedTime = 0;
 	m_startTime = GetFPGATimestamp();
 }
@@ -130,7 +130,7 @@ void Timer::Reset()
  */
 void Timer::Start()
 {
-	std::unique_lock<priority_mutex> sync(m_mutex);
+	std::lock_guard<priority_mutex> sync(m_mutex);
 	if (!m_running)
 	{
 		m_startTime = GetFPGATimestamp();
@@ -148,7 +148,7 @@ void Timer::Stop()
 {
 	double temp = Get();
 
-	std::unique_lock<priority_mutex> sync(m_mutex);
+	std::lock_guard<priority_mutex> sync(m_mutex);
 	if (m_running)
 	{
 		m_accumulatedTime = temp;
@@ -168,7 +168,7 @@ bool Timer::HasPeriodPassed(double period)
 {
 	if (Get() > period)
 	{
-		std::unique_lock<priority_mutex> sync(m_mutex);
+		std::lock_guard<priority_mutex> sync(m_mutex);
 		// Advance the start time by the period.
 		// Don't set it to the current time... we want to avoid drift.
 		m_startTime += period;

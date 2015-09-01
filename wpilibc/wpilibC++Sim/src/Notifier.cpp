@@ -32,7 +32,7 @@ Notifier::Notifier(TimerEventHandler handler, void *param)
 	m_nextEvent = nullptr;
 	m_queued = false;
 	{
-		std::unique_lock<priority_recursive_mutex> sync(queueMutex);
+		std::lock_guard<priority_recursive_mutex> sync(queueMutex);
 		// do the first time intialization of static variables
 		if (refcount == 0)
 		{
@@ -50,7 +50,7 @@ Notifier::Notifier(TimerEventHandler handler, void *param)
 Notifier::~Notifier()
 {
 	{
-		std::unique_lock<priority_recursive_mutex> sync(queueMutex);
+		std::lock_guard<priority_recursive_mutex> sync(queueMutex);
 		DeleteFromQueue();
 
 		// Delete the static variables when the last one is going away
@@ -63,7 +63,7 @@ Notifier::~Notifier()
 
 	// Acquire the semaphore; this makes certain that the handler is
 	// not being executed by the interrupt manager.
-	std::unique_lock<priority_mutex> lock(m_handlerMutex);
+	std::lock_guard<priority_mutex> lock(m_handlerMutex);
 }
 
 /**
@@ -89,7 +89,7 @@ void Notifier::ProcessQueue(uint32_t mask, void *params)
 	while (true)				// keep processing past events until no more
 	{
 		{
-			std::unique_lock<priority_recursive_mutex> sync(queueMutex);
+			std::lock_guard<priority_recursive_mutex> sync(queueMutex);
 			double currentTime = GetClock();
 			current = timerQueueHead;
 			if (current == nullptr || current->m_expirationTime > currentTime)
@@ -118,7 +118,7 @@ void Notifier::ProcessQueue(uint32_t mask, void *params)
 		current->m_handlerMutex.unlock();
 	}
 	// reschedule the first item in the queue
-	std::unique_lock<priority_recursive_mutex> sync(queueMutex);
+	std::lock_guard<priority_recursive_mutex> sync(queueMutex);
 	UpdateAlarm();
 }
 
@@ -209,7 +209,7 @@ void Notifier::DeleteFromQueue()
  */
 void Notifier::StartSingle(double delay)
 {
-	std::unique_lock<priority_recursive_mutex> sync(queueMutex);
+	std::lock_guard<priority_recursive_mutex> sync(queueMutex);
 	m_periodic = false;
 	m_period = delay;
 	DeleteFromQueue();
@@ -224,7 +224,7 @@ void Notifier::StartSingle(double delay)
  */
 void Notifier::StartPeriodic(double period)
 {
-	std::unique_lock<priority_recursive_mutex> sync(queueMutex);
+	std::lock_guard<priority_recursive_mutex> sync(queueMutex);
 	m_periodic = true;
 	m_period = period;
 	DeleteFromQueue();
@@ -241,11 +241,11 @@ void Notifier::StartPeriodic(double period)
 void Notifier::Stop()
 {
 	{
-		std::unique_lock<priority_recursive_mutex> sync(queueMutex);
+		std::lock_guard<priority_recursive_mutex> sync(queueMutex);
 		DeleteFromQueue();
 	}
 	// Wait for a currently executing handler to complete before returning from Stop()
-	std::unique_lock<priority_mutex> sync(m_handlerMutex);
+	std::lock_guard<priority_mutex> sync(m_handlerMutex);
 }
 
 void Notifier::Run() {

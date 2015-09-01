@@ -19,7 +19,7 @@ priority_recursive_mutex Resource::m_createLock;
  * have been allocated yet. The indicies of the resources are [0 .. elements - 1].
  */
 Resource::Resource(uint32_t elements) {
-  std::unique_lock<priority_recursive_mutex> sync(m_createLock);
+  std::lock_guard<priority_recursive_mutex> sync(m_createLock);
   m_isAllocated = std::vector<bool>(elements, false);
 }
 
@@ -35,7 +35,7 @@ Resource::Resource(uint32_t elements) {
  */
 /*static*/ void Resource::CreateResourceObject(Resource **r, uint32_t elements)
 {
-	std::unique_lock<priority_recursive_mutex> sync(m_createLock);
+	std::lock_guard<priority_recursive_mutex> sync(m_createLock);
 	if (*r == NULL)
 	{
 		*r = new Resource(elements);
@@ -49,7 +49,7 @@ Resource::Resource(uint32_t elements) {
  */
 uint32_t Resource::Allocate(const char *resourceDesc)
 {
-	std::unique_lock<priority_recursive_mutex> sync(m_allocateLock);
+	std::lock_guard<priority_recursive_mutex> sync(m_allocateLock);
 	for (uint32_t i=0; i < m_isAllocated.size(); i++)
 	{
 		if (!m_isAllocated[i])
@@ -69,7 +69,7 @@ uint32_t Resource::Allocate(const char *resourceDesc)
  */
 uint32_t Resource::Allocate(uint32_t index, const char *resourceDesc)
 {
-	std::unique_lock<priority_recursive_mutex> sync(m_allocateLock);
+	std::lock_guard<priority_recursive_mutex> sync(m_allocateLock);
 	if (index >= m_isAllocated.size())
 	{
 		// TODO: wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, resourceDesc);
@@ -92,7 +92,7 @@ uint32_t Resource::Allocate(uint32_t index, const char *resourceDesc)
  */
 void Resource::Free(uint32_t index)
 {
-	std::unique_lock<priority_recursive_mutex> sync(m_allocateLock);
+	std::lock_guard<priority_recursive_mutex> sync(m_allocateLock);
 	if (index == ~0ul) return;
 	if (index >= m_isAllocated.size())
 	{

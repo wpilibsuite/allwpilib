@@ -1,6 +1,6 @@
 #pragma once
 
-// Allows usage with std::unique_lock without including <mutex> separately
+// Allows usage with std::lock_guard without including <mutex> separately
 #include <mutex>
 
 #ifdef FRC_SIMULATOR

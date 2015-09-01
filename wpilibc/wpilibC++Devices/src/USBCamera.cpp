@@ -77,7 +77,7 @@ USBCamera::USBCamera(std::string name, bool useJpeg)
       m_useJpeg(useJpeg) {}
 
 void USBCamera::OpenCamera() {
-  std::unique_lock<priority_recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   for (unsigned int i = 0; i < 3; i++) {
     uInt32 id = 0;
     // Can't use SAFE_IMAQ_CALL here because we only error on the third time
@@ -97,7 +97,7 @@ void USBCamera::OpenCamera() {
 }
 
 void USBCamera::CloseCamera() {
-  std::unique_lock<priority_recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   if (!m_open) return;
   SAFE_IMAQ_CALL(IMAQdxCloseCamera, m_id);
   m_id = 0;
@@ -105,7 +105,7 @@ void USBCamera::CloseCamera() {
 }
 
 void USBCamera::StartCapture() {
-  std::unique_lock<priority_recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   if (!m_open || m_active) return;
   SAFE_IMAQ_CALL(IMAQdxConfigureGrab, m_id);
   SAFE_IMAQ_CALL(IMAQdxStartAcquisition, m_id);
@@ -113,7 +113,7 @@ void USBCamera::StartCapture() {
 }
 
 void USBCamera::StopCapture() {
-  std::unique_lock<priority_recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   if (!m_open || !m_active) return;
   SAFE_IMAQ_CALL(IMAQdxStopAcquisition, m_id);
   SAFE_IMAQ_CALL(IMAQdxUnconfigureAcquisition, m_id);
@@ -121,7 +121,7 @@ void USBCamera::StopCapture() {
 }
 
 void USBCamera::UpdateSettings() {
-  std::unique_lock<priority_recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   bool wasActive = m_active;
 
   if (wasActive) StopCapture();
@@ -215,7 +215,7 @@ void USBCamera::UpdateSettings() {
 }
 
 void USBCamera::SetFPS(double fps) {
-  std::unique_lock<priority_recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   if (m_fps != fps) {
     m_needSettingsUpdate = true;
     m_fps = fps;
@@ -223,7 +223,7 @@ void USBCamera::SetFPS(double fps) {
 }
 
 void USBCamera::SetSize(unsigned int width, unsigned int height) {
-  std::unique_lock<priority_recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   if (m_width != width || m_height != height) {
     m_needSettingsUpdate = true;
     m_width = width;
@@ -232,7 +232,7 @@ void USBCamera::SetSize(unsigned int width, unsigned int height) {
 }
 
 void USBCamera::SetBrightness(unsigned int brightness) {
-  std::unique_lock<priority_recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   if (m_brightness != brightness) {
     m_needSettingsUpdate = true;
     m_brightness = brightness;
@@ -240,12 +240,12 @@ void USBCamera::SetBrightness(unsigned int brightness) {
 }
 
 unsigned int USBCamera::GetBrightness() {
-  std::unique_lock<priority_recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   return m_brightness;
 }
 
 void USBCamera::SetWhiteBalanceAuto() {
-  std::unique_lock<priority_recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   m_whiteBalance = AUTO;
   m_whiteBalanceValue = 0;
   m_whiteBalanceValuePresent = false;
@@ -253,7 +253,7 @@ void USBCamera::SetWhiteBalanceAuto() {
 }
 
 void USBCamera::SetWhiteBalanceHoldCurrent() {
-  std::unique_lock<priority_recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   m_whiteBalance = MANUAL;
   m_whiteBalanceValue = 0;
   m_whiteBalanceValuePresent = false;
@@ -261,7 +261,7 @@ void USBCamera::SetWhiteBalanceHoldCurrent() {
 }
 
 void USBCamera::SetWhiteBalanceManual(unsigned int whiteBalance) {
-  std::unique_lock<priority_recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   m_whiteBalance = MANUAL;
   m_whiteBalanceValue = whiteBalance;
   m_whiteBalanceValuePresent = true;
@@ -269,7 +269,7 @@ void USBCamera::SetWhiteBalanceManual(unsigned int whiteBalance) {
 }
 
 void USBCamera::SetExposureAuto() {
-  std::unique_lock<priority_recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   m_exposure = AUTO;
   m_exposureValue = 0;
   m_exposureValuePresent = false;
@@ -277,7 +277,7 @@ void USBCamera::SetExposureAuto() {
 }
 
 void USBCamera::SetExposureHoldCurrent() {
-  std::unique_lock<priority_recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   m_exposure = MANUAL;
   m_exposureValue = 0;
   m_exposureValuePresent = false;
@@ -285,7 +285,7 @@ void USBCamera::SetExposureHoldCurrent() {
 }
 
 void USBCamera::SetExposureManual(unsigned int level) {
-  std::unique_lock<priority_recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   m_exposure = MANUAL;
   if (level > 100)
     m_exposureValue = 100;
@@ -296,7 +296,7 @@ void USBCamera::SetExposureManual(unsigned int level) {
 }
 
 void USBCamera::GetImage(Image* image) {
-  std::unique_lock<priority_recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   if (m_needSettingsUpdate || m_useJpeg) {
     m_needSettingsUpdate = false;
     m_useJpeg = false;
@@ -309,7 +309,7 @@ void USBCamera::GetImage(Image* image) {
 }
 
 unsigned int USBCamera::GetImageData(void* buffer, unsigned int bufferSize) {
-  std::unique_lock<priority_recursive_mutex> lock(m_mutex);
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   if (m_needSettingsUpdate || !m_useJpeg) {
     m_needSettingsUpdate = false;
     m_useJpeg = true;
