@@ -1,7 +1,6 @@
 #ifndef CtreCanNode_H_
 #define CtreCanNode_H_
 #include "ctre.h"				//BIT Defines + Typedefs
-#include <NetworkCommunication/CANSessionMux.h>	//CAN Comm
 #include <map>
 #include <string.h> // memcpy
 #include <sys/time.h>
