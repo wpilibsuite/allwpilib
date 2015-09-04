@@ -86,13 +86,10 @@ INSTALL(TARGETS ntcore
     ARCHIVE DESTINATION lib COMPONENT lib)
 INSTALL(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT headers)
 
-
-#
-#
-#
-
 # We need thread support
 find_package(Threads REQUIRED)
+
+enable_testing()
 
 add_subdirectory(gmock)
 include_directories("gmock/include")

@@ -1,6 +1,7 @@
 file(GLOB SRCS *.cpp)
 
 add_executable(testntcore ${SRCS})
+add_test(testntcore testntcore)
 
 if(MSVC)
 target_link_libraries(testntcore
