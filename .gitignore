@@ -33,3 +33,5 @@ build/
 *.vcxproj
 *.vcxproj.user
 *.sdf
+*.sublime-project
+*.sublime-workspace
