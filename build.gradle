@@ -13,246 +13,246 @@ def armjdkLocation = System.getProperty("user.home") + File.separator + armjdkFo
 def generatedJNIHeaderLoc = 'build/include'
 
 model {
-    toolChains {
-        gcc(Gcc) {
-            target("arm"){
-                // We use a custom-built cross compiler with the prefix arm-frc-linux-gnueabi-<util name>
-                // If this ever changes, the prefix will need to be changed here
-                def compilerPrefix = 'arm-frc-linux-gnueabi-'
-                cppCompiler.executable = compilerPrefix + cppCompiler.executable
-                linker.executable = compilerPrefix + linker.executable
-                assembler.executable = compilerPrefix + assembler.executable
-                // Gradle auto-adds the -m32 argument to the linker and compiler. Our compiler only supports
-                // arm, and doesn't understand this flag, so it is removed from both
-                cppCompiler.withArguments { args ->
-                    args << '-std=c++1y' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
-                    args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-O0' << '-g3' << '-rdynamic'
-                    //TODO: When the compiler allows us to actually call deprecated functions from within
-                    // deprecated function, remove this line (this will cause calling deprecated functions
-                    // to be treated as a warning rather than an error).
-                    args << '-Wno-error=deprecated-declarations'
-                    args.remove('-m32')
-                }
-                linker.withArguments { args ->
-                    args << '-rdynamic'
-                    args.remove('-m32')
-                }
-                staticLibArchiver.executable = compilerPrefix + staticLibArchiver.executable
-            }
-            target('x86') {
-                cppCompiler.withArguments { args ->
-                    args << '-std=c++11' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
-                    args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-O0' << '-g3' << '-rdynamic'
-                    //TODO: When the compiler allows us to actually call deprecated functions from within
-                    // deprecated function, remove this line (this will cause calling deprecated functions
-                    // to be treated as a warning rather than an error).
-                    args << '-Wno-error=deprecated-declarations'
-                    args << '-m32'
-                }
-                linker.withArguments { args ->
-                    args << '-rdynamic'
-                    args << '-m32'
-                }
-            }
-            target('x64') {
-                cppCompiler.withArguments { args ->
-                    args << '-std=c++11' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
-                    args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-O0' << '-g3' << '-rdynamic'
-                    //TODO: When the compiler allows us to actually call deprecated functions from within
-                    // deprecated function, remove this line (this will cause calling deprecated functions
-                    // to be treated as a warning rather than an error).
-                    args << '-Wno-error=deprecated-declarations'
-                }
-                linker.withArguments { args ->
-                    args << '-rdynamic'
-                }
-            }
+  toolChains {
+    gcc(Gcc) {
+      target("arm"){
+        // We use a custom-built cross compiler with the prefix arm-frc-linux-gnueabi-<util name>
+        // If this ever changes, the prefix will need to be changed here
+        def compilerPrefix = 'arm-frc-linux-gnueabi-'
+        cppCompiler.executable = compilerPrefix + cppCompiler.executable
+        linker.executable = compilerPrefix + linker.executable
+        assembler.executable = compilerPrefix + assembler.executable
+        // Gradle auto-adds the -m32 argument to the linker and compiler. Our compiler only supports
+        // arm, and doesn't understand this flag, so it is removed from both
+        cppCompiler.withArguments { args ->
+          args << '-std=c++1y' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
+          args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-O0' << '-g3' << '-rdynamic'
+          //TODO: When the compiler allows us to actually call deprecated functions from within
+          // deprecated function, remove this line (this will cause calling deprecated functions
+          // to be treated as a warning rather than an error).
+          args << '-Wno-error=deprecated-declarations'
+          args.remove('-m32')
         }
-        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-            visualCpp(VisualCpp) {
-                def vs14Dir = file('C:\\Program Files (x86)\\Microsoft Visual Studio 14.0')
-                // If vs2015 is installed, fall back to vs2013 for now, until Gradle pulls in the right
-                // includes for the win10 sdk.
-                if (vs14Dir.exists()) {
-                    installDir = file('C:\\Program Files (x86)\\Microsoft Visual Studio 12.0')
-                }
-                eachPlatform {
-                    cppCompiler.withArguments { args ->
-                        args << '/EHsc' << '/DNOMINMAX' << '/D_SCL_SECURE_NO_WARNINGS' << '/D_WINSOCK_DEPRECATED_NO_WARNINGS'
-                    }
-                    linker.withArguments { args ->
-                        args << '/DEF:ntcore.def'
-                    }
-                }
-            }
+        linker.withArguments { args ->
+          args << '-rdynamic'
+          args.remove('-m32')
         }
+        staticLibArchiver.executable = compilerPrefix + staticLibArchiver.executable
+      }
+      target('x86') {
+        cppCompiler.withArguments { args ->
+          args << '-std=c++11' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
+          args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-O0' << '-g3' << '-rdynamic'
+          //TODO: When the compiler allows us to actually call deprecated functions from within
+          // deprecated function, remove this line (this will cause calling deprecated functions
+          // to be treated as a warning rather than an error).
+          args << '-Wno-error=deprecated-declarations'
+          args << '-m32'
+        }
+        linker.withArguments { args ->
+          args << '-rdynamic'
+          args << '-m32'
+        }
+      }
+      target('x64') {
+        cppCompiler.withArguments { args ->
+          args << '-std=c++11' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
+          args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-O0' << '-g3' << '-rdynamic'
+          //TODO: When the compiler allows us to actually call deprecated functions from within
+          // deprecated function, remove this line (this will cause calling deprecated functions
+          // to be treated as a warning rather than an error).
+          args << '-Wno-error=deprecated-declarations'
+        }
+        linker.withArguments { args ->
+          args << '-rdynamic'
+        }
+      }
     }
-
-    platforms {
-        arm {
-            architecture "arm"
-            operatingSystem 'linux'
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+      visualCpp(VisualCpp) {
+        def vs14Dir = file('C:\\Program Files (x86)\\Microsoft Visual Studio 14.0')
+        // If vs2015 is installed, fall back to vs2013 for now, until Gradle pulls in the right
+        // includes for the win10 sdk.
+        if (vs14Dir.exists()) {
+          installDir = file('C:\\Program Files (x86)\\Microsoft Visual Studio 12.0')
         }
-        x86 {
-            architecture "x86"
+        eachPlatform {
+          cppCompiler.withArguments { args ->
+            args << '/EHsc' << '/DNOMINMAX' << '/D_SCL_SECURE_NO_WARNINGS' << '/D_WINSOCK_DEPRECATED_NO_WARNINGS'
+          }
+          linker.withArguments { args ->
+            args << '/DEF:ntcore.def'
+          }
         }
-        x64 {
-            architecture "x86_64"
-        }
+      }
     }
+  }
 
-    components {
-        ntcore(NativeLibrarySpec) {
-            targetPlatform 'arm'
-            targetPlatform 'x86'
-            targetPlatform 'x64'
-            binaries.all {
-                tasks.withType(CppCompile) {
-                    if (!project.hasProperty('skipJava')) {
-                        if (targetPlatform == platforms.arm) {
-                            dependsOn verifyArmJre
-
-                            // JDK is included for jni.h. We also need the arm-linux specific headers.
-                            // This does not need to change when compiling on Windows
-                            // The JNI headers are put into the build/include directory by the jniHeaders task
-                            cppCompiler.args '-I', "${armjdkLocation}/include"
-                            cppCompiler.args '-I', "${armjdkLocation}/include/linux"
-                        } else {
-                            def jdkLocation = org.gradle.internal.jvm.Jvm.current().javaHome
-                            cppCompiler.args '-I', "${jdkLocation}/include"
-
-                            if (targetPlatform.operatingSystem.macOsX) {
-                                cppCompiler.args '-I', "${jdkLocation}/include/darwin"
-                            } else if (targetPlatform.operatingSystem.linux) {
-                                cppCompiler.args '-I', "${jdkLocation}/include/linux"
-                            } else if (targetPlatform.operatingSystem.windows) {
-                                cppCompiler.args '-I', "${jdkLocation}/include/win32"
-                            } else if (targetPlatform.operatingSystem.freeBSD) {
-                                cppCompiler.args '-I', "${jdkLocation}/include/freebsd"
-                            }
-                        }
-
-                        jniHeadersNetworkTables.outputs.files.each { file ->
-                            cppCompiler.args '-I', file.getPath()
-                        }
-                        dependsOn jniHeadersNetworkTables
-                    }
-                }
-            }
-            sources {
-                cpp {
-                    source {
-                        srcDirs = ["src"]
-                        if (!project.hasProperty('skipJava')) {
-                            srcDirs "java/lib"
-                        }
-                        includes = ["**/*.cpp"]
-                    }
-                    exportedHeaders {
-                        srcDirs = ["include"]
-                        if (!project.hasProperty('skipJava')) {
-                            jniHeadersNetworkTables.outputs.files.each { file ->
-                                srcDirs file.getPath()
-                            }
-                        }
-                        includes = ["**/*.h"]
-                    }
-                }
-            }
-        }
+  platforms {
+    arm {
+      architecture "arm"
+      operatingSystem 'linux'
     }
+    x86 {
+      architecture "x86"
+    }
+    x64 {
+      architecture "x86_64"
+    }
+  }
+
+  components {
+    ntcore(NativeLibrarySpec) {
+      targetPlatform 'arm'
+      targetPlatform 'x86'
+      targetPlatform 'x64'
+      binaries.all {
+        tasks.withType(CppCompile) {
+          if (!project.hasProperty('skipJava')) {
+            if (targetPlatform == platforms.arm) {
+              dependsOn verifyArmJre
+
+              // JDK is included for jni.h. We also need the arm-linux specific headers.
+              // This does not need to change when compiling on Windows
+              // The JNI headers are put into the build/include directory by the jniHeaders task
+              cppCompiler.args '-I', "${armjdkLocation}/include"
+              cppCompiler.args '-I', "${armjdkLocation}/include/linux"
+            } else {
+              def jdkLocation = org.gradle.internal.jvm.Jvm.current().javaHome
+              cppCompiler.args '-I', "${jdkLocation}/include"
+
+              if (targetPlatform.operatingSystem.macOsX) {
+                cppCompiler.args '-I', "${jdkLocation}/include/darwin"
+              } else if (targetPlatform.operatingSystem.linux) {
+                cppCompiler.args '-I', "${jdkLocation}/include/linux"
+              } else if (targetPlatform.operatingSystem.windows) {
+                cppCompiler.args '-I', "${jdkLocation}/include/win32"
+              } else if (targetPlatform.operatingSystem.freeBSD) {
+                cppCompiler.args '-I', "${jdkLocation}/include/freebsd"
+              }
+            }
+
+            jniHeadersNetworkTables.outputs.files.each { file ->
+              cppCompiler.args '-I', file.getPath()
+            }
+            dependsOn jniHeadersNetworkTables
+          }
+        }
+      }
+      sources {
+        cpp {
+          source {
+            srcDirs = ["src"]
+            if (!project.hasProperty('skipJava')) {
+              srcDirs "java/lib"
+            }
+            includes = ["**/*.cpp"]
+          }
+          exportedHeaders {
+            srcDirs = ["include"]
+            if (!project.hasProperty('skipJava')) {
+              jniHeadersNetworkTables.outputs.files.each { file ->
+                srcDirs file.getPath()
+              }
+            }
+            includes = ["**/*.h"]
+          }
+        }
+      }
+    }
+  }
 }
 
 if (!project.hasProperty('skipJava')) {
 
 compileJava {
-    options.compilerArgs << "-Xlint:unchecked"
+  options.compilerArgs << "-Xlint:unchecked"
 }
 
 sourceSets {
-    main {
-        java {
-            srcDirs = ["java/src"]
-        }
+  main {
+    java {
+      srcDirs = ["java/src"]
     }
+  }
 }
 
 jar {
-    description = 'Generates NetworkTables jar, with the JNI shared libraries embedded'
-    dependsOn { armNtcoreSharedLibrary }
-    dependsOn { x64NtcoreSharedLibrary }
-    dependsOn { x86NtcoreSharedLibrary }
-    dependsOn { classes }
-    binaries.withType(SharedLibraryBinary) { binary ->
-        from(file(binary.sharedLibraryFile)) {
-            if (binary.targetPlatform == platforms.arm) {
-                into "Linux/arm"
-            } else if (binary.targetPlatform.operatingSystem.name == "Linux") {
-                if (binary.targetPlatform.architecture.name == "x86-64") {
-                    into "Linux/amd64"
-                } else {
-                    into "Linux/" + binary.targetPlatform.architecture.name
-                }
-            } else {
-                into binary.targetPlatform.operatingSystem.name + "/" + binary.targetPlatform.architecture.name
-            }
+  description = 'Generates NetworkTables jar, with the JNI shared libraries embedded'
+  dependsOn { armNtcoreSharedLibrary }
+  dependsOn { x64NtcoreSharedLibrary }
+  dependsOn { x86NtcoreSharedLibrary }
+  dependsOn { classes }
+  binaries.withType(SharedLibraryBinary) { binary ->
+    from(file(binary.sharedLibraryFile)) {
+      if (binary.targetPlatform == platforms.arm) {
+        into "Linux/arm"
+      } else if (binary.targetPlatform.operatingSystem.name == "Linux") {
+        if (binary.targetPlatform.architecture.name == "x86-64") {
+          into "Linux/amd64"
+        } else {
+          into "Linux/" + binary.targetPlatform.architecture.name
         }
+      } else {
+        into binary.targetPlatform.operatingSystem.name + "/" + binary.targetPlatform.architecture.name
+      }
     }
+  }
 }
 
 task networktablesJavaSource(type: Jar, dependsOn: classes) {
-    description = 'Generates the source jar for NetworkTables java'
-    group = 'WPILib'
-    classifier = 'classes'
-    from sourceSets.main.allJava
+  description = 'Generates the source jar for NetworkTables java'
+  group = 'WPILib'
+  classifier = 'classes'
+  from sourceSets.main.allJava
 }
 
 task networktablesJavadoc(type: Jar, dependsOn: javadoc) {
-    description = 'Generates the javadoc jar for NetworkTables java'
-    group = 'WPILib'
-    classifier = 'javadoc'
-    from javadoc.destinationDir
+  description = 'Generates the javadoc jar for NetworkTables java'
+  group = 'WPILib'
+  classifier = 'javadoc'
+  from javadoc.destinationDir
 }
 
 /**
  * Generates the JNI headers
  */
 task jniHeadersNetworkTables {
-    description = 'Generates JNI headers from edu.wpi.first.wpilibj.networktables.*'
-    group = 'WPILib'
-    def outputFolder = file(generatedJNIHeaderLoc)
-    inputs.files sourceSets.main.output
-    outputs.file outputFolder
-    doLast {
-        outputFolder.mkdirs()
-        exec {
-            executable org.gradle.internal.jvm.Jvm.current().getExecutable('javah')
-            args '-d', outputFolder
-            args '-classpath', sourceSets.main.output.classesDir
-            args 'edu.wpi.first.wpilibj.networktables.NetworkTablesJNI'
-        }
+  description = 'Generates JNI headers from edu.wpi.first.wpilibj.networktables.*'
+  group = 'WPILib'
+  def outputFolder = file(generatedJNIHeaderLoc)
+  inputs.files sourceSets.main.output
+  outputs.file outputFolder
+  doLast {
+    outputFolder.mkdirs()
+    exec {
+      executable org.gradle.internal.jvm.Jvm.current().getExecutable('javah')
+      args '-d', outputFolder
+      args '-classpath', sourceSets.main.output.classesDir
+      args 'edu.wpi.first.wpilibj.networktables.NetworkTablesJNI'
     }
+  }
 }
 
 clean {
-    delete generatedJNIHeaderLoc
+  delete generatedJNIHeaderLoc
 }
 
 // Ensures that the ARM JNI headers have been downloaded and are in the correct location for generating the JNI build
 task verifyArmJre {
-    description = 'Verifies that the ARM JDK is downloaded in the user directory'
-    group = 'WPILib'
-    def outputFolder = new File(armjdkLocation)
-    outputs.file outputFolder
-    doLast {
-        if (!outputFolder.exists() && !outputFolder.isDirectory()) {
-            def errorMessage = 'The ARM JDK was not found. Please install the JDK in the following location:' +
-                    System.lineSeparator() + armjdkLocation +
-                    System.lineSeparator() + 'You can download the JDK here:' +
-                    System.lineSeparator() + armjdkDownloadSite
-            throw new GradleException(errorMessage)
-        }
+  description = 'Verifies that the ARM JDK is downloaded in the user directory'
+  group = 'WPILib'
+  def outputFolder = new File(armjdkLocation)
+  outputs.file outputFolder
+  doLast {
+    if (!outputFolder.exists() && !outputFolder.isDirectory()) {
+      def errorMessage = 'The ARM JDK was not found. Please install the JDK in the following location:' +
+        System.lineSeparator() + armjdkLocation +
+        System.lineSeparator() + 'You can download the JDK here:' +
+        System.lineSeparator() + armjdkDownloadSite
+      throw new GradleException(errorMessage)
     }
+  }
 }
 
 }  // skipJava
