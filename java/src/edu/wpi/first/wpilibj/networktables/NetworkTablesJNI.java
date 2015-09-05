@@ -45,10 +45,7 @@ public class NetworkTablesJNI {
 
           System.load(jniLibrary.getAbsolutePath());
         } else {
-          if (osname.startsWith("Windows"))
-            System.loadLibrary("ntcore.dll");
-          else
-            System.loadLibrary("libntcore.so");
+          System.loadLibrary("ntcore");
         }
       } catch (IOException ex) {
         ex.printStackTrace();
