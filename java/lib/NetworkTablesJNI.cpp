@@ -10,7 +10,7 @@
 //
 
 // Used for callback.
-static JavaVM *jvm;
+static JavaVM *jvm = nullptr;
 static jclass booleanCls = nullptr;
 static jclass doubleCls = nullptr;
 static jclass stringCls = nullptr;
@@ -78,6 +78,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
   if (connectionInfoCls) env->DeleteGlobalRef(connectionInfoCls);
   if (keyNotDefinedEx) env->DeleteGlobalRef(keyNotDefinedEx);
   if (persistentEx) env->DeleteGlobalRef(persistentEx);
+  jvm = nullptr;
 }
 
 //
@@ -107,10 +108,12 @@ class JavaGlobal {
   JavaGlobal(JNIEnv *env, T obj)
       : m_obj(static_cast<T>(env->NewGlobalRef(obj))) {}
   ~JavaGlobal() {
+    if (!jvm) return;
     JNIEnv *env;
     if (jvm->AttachCurrentThread(reinterpret_cast<void **>(&env), nullptr) !=
         JNI_OK)
       return;
+    if (!env || !env->functions) return;
     env->DeleteGlobalRef(m_obj);
     jvm->DetachCurrentThread();
   }
@@ -130,10 +133,12 @@ class JavaWeakGlobal {
   JavaWeakGlobal(JNIEnv *env, T obj)
       : m_obj(static_cast<T>(env->NewWeakGlobalRef(obj))) {}
   ~JavaWeakGlobal() {
+    if (!jvm) return;
     JNIEnv *env;
     if (jvm->AttachCurrentThread(reinterpret_cast<void **>(&env), nullptr) !=
         JNI_OK)
       return;
+    if (!env || !env->functions) return;
     env->DeleteWeakGlobalRef(m_obj);
     jvm->DetachCurrentThread();
   }
@@ -870,10 +875,12 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
       [=](unsigned int uid, nt::StringRef name,
           std::shared_ptr<nt::Value> value, bool is_new) {
         // need to attach as we're coming from a separate thread here
+        if (!jvm) return;
         JNIEnv *env;
         if (jvm->AttachCurrentThread(reinterpret_cast<void **>(&env),
                                      nullptr) != JNI_OK)
           return;
+        if (!env || !env->functions) return;
 
         // get the handler
         auto handler = listener_global->obj(env);
@@ -941,10 +948,12 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
   return nt::AddConnectionListener(
       [=](unsigned int uid, bool connected, const nt::ConnectionInfo& conn) {
         // need to attach as we're coming from a separate thread here
+        if (!jvm) return;
         JNIEnv *env;
         if (jvm->AttachCurrentThread(reinterpret_cast<void **>(&env),
                                      nullptr) != JNI_OK)
           return;
+        if (!env || !env->functions) return;
 
         // get the handler
         auto handler = listener_global->obj(env);
@@ -1184,10 +1193,12 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
       [=](unsigned int level, const char *file, unsigned int line,
           const char *msg) {
         // need to attach as we're coming from a separate thread here
+        if (!jvm) return;
         JNIEnv *env;
         if (jvm->AttachCurrentThread(reinterpret_cast<void **>(&env),
                                      nullptr) != JNI_OK)
           return;
+        if (!env || !env->functions) return;
 
         // get the handler
         auto handler = func_global->obj();
