@@ -29,7 +29,7 @@ void Notifier::Start() {
 void Notifier::Stop() {
   m_active = false;
   // send notification so the thread terminates
-  NotifyEntry("", nullptr, false);
+  m_cond.notify_one();
   if (m_thread.joinable()) m_thread.join();
 }
 
