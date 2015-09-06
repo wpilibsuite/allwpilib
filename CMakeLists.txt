@@ -47,16 +47,16 @@ if (NOT WITHOUT_JAVA)
 
     file(GLOB_RECURSE JAVA_SOURCES java/src/*.java)
     set(CMAKE_JNI_TARGET true)
-    add_jar(networktables ${JAVA_SOURCES})
+    add_jar(ntcore_jar ${JAVA_SOURCES} OUTPUT_NAME ntcore)
 
     # Generate JNI headers
     add_custom_command(
         OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/edu_wpi_first_wpilibj_networktables_NetworkTablesJNI.h"
-        DEPENDS networktables java/src/edu/wpi/first/wpilibj/networktables/NetworkTablesJNI.java
+        DEPENDS ntcore_jar java/src/edu/wpi/first/wpilibj/networktables/NetworkTablesJNI.java
         COMMAND "${Java_JAVAH_EXECUTABLE}"
         -jni
         -o "${CMAKE_CURRENT_BINARY_DIR}/edu_wpi_first_wpilibj_networktables_NetworkTablesJNI.h"
-        -classpath "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/networktables.dir/"
+        -classpath "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/ntcore_jar.dir/"
         edu.wpi.first.wpilibj.networktables.NetworkTablesJNI
         )
     include_directories("${CMAKE_CURRENT_BINARY_DIR}")
