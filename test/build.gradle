@@ -1,8 +1,25 @@
+import org.apache.tools.ant.taskdefs.condition.Os
 apply plugin: 'cpp'
 apply plugin: 'google-test'
 apply plugin: 'visual-studio'
 
 model {
+  toolChains {
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+      visualCpp(VisualCpp) {
+        def vs14Dir = file('C:\\Program Files (x86)\\Microsoft Visual Studio 14.0')
+        // If vs2015 is installed, fall back to vs2013 for now, until Gradle pulls in the right
+        // includes for the win10 sdk.
+        if (vs14Dir.exists()) {
+          def vs12Dir = file('C:\\Program Files (x86)\\Microsoft Visual Studio 12.0')
+          if (!vs12Dir.exists()) {
+            throw new GradleException('Compilation with VS 2015 is not currently supported by Gradle. Please install VS 2013, or use the CMake build option.')
+          }
+          installDir = vs12Dir
+        }
+      }
+    }
+  }
   components {
     tests(NativeLibrarySpec) {
       sources {

@@ -12,6 +12,14 @@ def armjdkVersion = 'jdk1.8.0_33'
 def armjdkLocation = System.getProperty("user.home") + File.separator + armjdkFolder + File.separator + armjdkVersion
 def generatedJNIHeaderLoc = 'build/include'
 
+def platformSpecificIncludeFlag(loc, cppCompiler) {
+  if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+    cppCompiler.args "/I$loc"
+  } else {
+    cppCompiler.args '-I', loc
+  }
+}
+
 model {
   toolChains {
     gcc(Gcc) {
@@ -74,7 +82,11 @@ model {
         // If vs2015 is installed, fall back to vs2013 for now, until Gradle pulls in the right
         // includes for the win10 sdk.
         if (vs14Dir.exists()) {
-          installDir = file('C:\\Program Files (x86)\\Microsoft Visual Studio 12.0')
+          def vs12Dir = file('C:\\Program Files (x86)\\Microsoft Visual Studio 12.0')
+          if (!vs12Dir.exists()) {
+            throw new GradleException('Compilation with VS 2015 is not currently supported by Gradle. Please install VS 2013, or use the CMake build option.')
+          }
+          installDir = vs12Dir
         }
         eachPlatform {
           cppCompiler.withArguments { args ->
@@ -108,6 +120,8 @@ model {
       targetPlatform 'x64'
       binaries.all {
         tasks.withType(CppCompile) {
+
+
           if (!project.hasProperty('skipJava')) {
             if (targetPlatform == platforms.arm) {
               dependsOn verifyArmJre
@@ -115,25 +129,31 @@ model {
               // JDK is included for jni.h. We also need the arm-linux specific headers.
               // This does not need to change when compiling on Windows
               // The JNI headers are put into the build/include directory by the jniHeaders task
+              // There is also only the one cross compiler for the arm platform, so we directly set
+              // the include flags here without using the helper function
               cppCompiler.args '-I', "${armjdkLocation}/include"
               cppCompiler.args '-I', "${armjdkLocation}/include/linux"
             } else {
               def jdkLocation = org.gradle.internal.jvm.Jvm.current().javaHome
-              cppCompiler.args '-I', "${jdkLocation}/include"
+              platformSpecificIncludeFlag("${jdkLocation}/include", cppCompiler)
 
               if (targetPlatform.operatingSystem.macOsX) {
-                cppCompiler.args '-I', "${jdkLocation}/include/darwin"
+                platformSpecificIncludeFlag("${jdkLocation}/include/darwin", cppCompiler)
               } else if (targetPlatform.operatingSystem.linux) {
-                cppCompiler.args '-I', "${jdkLocation}/include/linux"
+                platformSpecificIncludeFlag("${jdkLocation}/include/linux", cppCompiler)
               } else if (targetPlatform.operatingSystem.windows) {
-                cppCompiler.args '-I', "${jdkLocation}/include/win32"
+                platformSpecificIncludeFlag("${jdkLocation}/include/win32", cppCompiler)
               } else if (targetPlatform.operatingSystem.freeBSD) {
-                cppCompiler.args '-I', "${jdkLocation}/include/freebsd"
+                platformSpecificIncludeFlag("${jdkLocation}/include/freebsd", cppCompiler)
               }
             }
 
             jniHeadersNetworkTables.outputs.files.each { file ->
-              cppCompiler.args '-I', file.getPath()
+              if (targetPlatform == platforms.arm) {
+                cppCompiler.args '-I', file.getPath()
+              } else {
+                platformSpecificIncludeFlag(file.getPath(), cppCompiler)
+              }
             }
             dependsOn jniHeadersNetworkTables
           }

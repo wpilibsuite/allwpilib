@@ -1,0 +1,5 @@
+[gerrit]
+host=usfirst.collab.net
+port=29418
+project=ntcore
+defaultbranch=master
