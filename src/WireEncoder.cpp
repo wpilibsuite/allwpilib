@@ -18,92 +18,70 @@
 using namespace nt;
 
 WireEncoder::WireEncoder(unsigned int proto_rev) {
-  // Start with a 1024-byte buffer.  Use malloc instead of new so we can
-  // realloc.
-  m_start = m_cur = static_cast<char*>(std::malloc(1024));
-  m_end = m_start + 1024;
   m_proto_rev = proto_rev;
   m_error = nullptr;
 }
 
-WireEncoder::~WireEncoder() { std::free(m_start); }
-
 void WireEncoder::WriteDouble(double val) {
-  Reserve(8);
   // The highest performance way to do this, albeit non-portable.
   std::uint64_t v = llvm::DoubleToBits(val);
-  m_cur[7] = (char)(v & 0xff); v >>= 8;
-  m_cur[6] = (char)(v & 0xff); v >>= 8;
-  m_cur[5] = (char)(v & 0xff); v >>= 8;
-  m_cur[4] = (char)(v & 0xff); v >>= 8;
-  m_cur[3] = (char)(v & 0xff); v >>= 8;
-  m_cur[2] = (char)(v & 0xff); v >>= 8;
-  m_cur[1] = (char)(v & 0xff); v >>= 8;
-  m_cur[0] = (char)(v & 0xff);
-  m_cur += 8;
-}
-
-void WireEncoder::ReserveSlow(std::size_t len) {
-  assert(m_end >= m_cur);
-  // should never happen due to checks in Reserve(), but check anyway
-  if (static_cast<std::size_t>(m_end - m_cur) >= len) return;
-
-  // Double current buffer size until we have enough space.  Since we're
-  // reserving space, it's likely more will be required soon in any case.
-  std::size_t pos = m_cur - m_start;
-  std::size_t newlen = (m_end - m_start) * 2;
-  while (newlen < (pos + len)) newlen *= 2;
-  m_start = static_cast<char*>(std::realloc(m_start, newlen));
-  m_cur = m_start + pos;
-  m_end = m_start + newlen;
+  m_data.append({
+    (char)((v >> 56) & 0xff),
+    (char)((v >> 48) & 0xff),
+    (char)((v >> 40) & 0xff),
+    (char)((v >> 32) & 0xff),
+    (char)((v >> 24) & 0xff),
+    (char)((v >> 16) & 0xff),
+    (char)((v >> 8) & 0xff),
+    (char)(v & 0xff)
+  });
 }
 
 void WireEncoder::WriteUleb128(unsigned long val) {
-  Reserve(SizeUleb128(val));
-  m_cur += nt::WriteUleb128(m_cur, val);
+  nt::WriteUleb128(m_data, val);
 }
 
 void WireEncoder::WriteType(NT_Type type) {
-  Reserve(1);
+  char ch;
   // Convert from enum to actual byte value.
   switch (type) {
     case NT_BOOLEAN:
-      *m_cur = 0x00;
+      ch = 0x00;
       break;
     case NT_DOUBLE:
-      *m_cur = 0x01;
+      ch = 0x01;
       break;
     case NT_STRING:
-      *m_cur = 0x02;
+      ch = 0x02;
       break;
     case NT_RAW:
       if (m_proto_rev < 0x0300u) {
         m_error = "raw type not supported in protocol < 3.0";
         return;
       }
-      *m_cur = 0x03;
+      ch = 0x03;
       break;
     case NT_BOOLEAN_ARRAY:
-      *m_cur = 0x10;
+      ch = 0x10;
       break;
     case NT_DOUBLE_ARRAY:
-      *m_cur = 0x11;
+      ch = 0x11;
       break;
     case NT_STRING_ARRAY:
-      *m_cur = 0x12;
+      ch = 0x12;
       break;
     case NT_RPC:
       if (m_proto_rev < 0x0300u) {
         m_error = "RPC type not supported in protocol < 3.0";
         return;
       }
-      *m_cur = 0x20;
+      ch = 0x20;
       break;
     default:
       m_error = "unrecognized type";
       return;
   }
-  ++m_cur;
+  m_data.push_back(ch);
 }
 
 std::size_t WireEncoder::GetValueSize(const Value& value) const {
@@ -175,7 +153,6 @@ void WireEncoder::WriteValue(const Value& value) {
       auto v = value.GetBooleanArray();
       std::size_t size = v.size();
       if (size > 0xff) size = 0xff; // size is only 1 byte, truncate
-      Reserve(1 + size);
       Write8(size);
 
       for (std::size_t i = 0; i < size; ++i)
@@ -186,7 +163,6 @@ void WireEncoder::WriteValue(const Value& value) {
       auto v = value.GetDoubleArray();
       std::size_t size = v.size();
       if (size > 0xff) size = 0xff; // size is only 1 byte, truncate
-      Reserve(1 + size * 8);
       Write8(size);
 
       for (std::size_t i = 0; i < size; ++i)
@@ -228,7 +204,5 @@ void WireEncoder::WriteString(llvm::StringRef str) {
     WriteUleb128(len);
 
   // contents
-  Reserve(len);
-  std::memcpy(m_cur, str.data(), len);
-  m_cur += len;
+  m_data.append(str.data(), str.data() + len);
 }

@@ -39,7 +39,7 @@ std::size_t SizeUleb128(unsigned long val) {
  * encodings refer to section "7.6 - Variable Length Data". Return
  * the number of bytes written.
  */
-std::size_t WriteUleb128(char* addr, unsigned long val) {
+std::size_t WriteUleb128(llvm::SmallVectorImpl<char>& dest, unsigned long val) {
   std::size_t count = 0;
 
   do {
@@ -49,8 +49,7 @@ std::size_t WriteUleb128(char* addr, unsigned long val) {
     if (val != 0)
       byte |= 0x80;  // mark this byte to show that more bytes will follow
 
-    *((unsigned char*)addr) = byte;
-    addr++;
+    dest.push_back(byte);
     count++;
   } while (val != 0);
 

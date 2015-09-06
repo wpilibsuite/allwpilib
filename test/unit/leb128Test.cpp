@@ -21,6 +21,7 @@
 #include <cstdint>
 #include <string>
 
+#include "llvm/SmallString.h"
 #include "llvm/StringRef.h"
 
 #include "raw_istream.h"
@@ -31,10 +32,10 @@ TEST(LEB128Test, WriteUleb128) {
 #define EXPECT_ULEB128_EQ(EXPECTED, VALUE, PAD) \
   do { \
     llvm::StringRef expected(EXPECTED, sizeof(EXPECTED)-1); \
-    char buf[32]; \
+    llvm::SmallString<32> buf; \
     std::size_t size = WriteUleb128(buf, VALUE); \
-    llvm::StringRef actual(buf, size); \
-    EXPECT_EQ(expected, actual); \
+    EXPECT_EQ(size, buf.size()); \
+    EXPECT_EQ(expected, buf.str()); \
   } while (0)
 
   // Write ULEB128

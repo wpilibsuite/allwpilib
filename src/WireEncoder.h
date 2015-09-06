@@ -11,6 +11,7 @@
 #include <cassert>
 #include <cstddef>
 
+#include "llvm/SmallVector.h"
 #include "llvm/StringRef.h"
 #include "nt_Value.h"
 
@@ -24,7 +25,6 @@ namespace nt {
 class WireEncoder {
  public:
   explicit WireEncoder(unsigned int proto_rev);
-  ~WireEncoder();
 
   /* Change the protocol revision (mostly affects value encoding). */
   void set_proto_rev(unsigned int proto_rev) { m_proto_rev = proto_rev; }
@@ -34,7 +34,7 @@ class WireEncoder {
 
   /* Clears buffer and error indicator. */
   void Reset() {
-    m_cur = m_start;
+    m_data.clear();
     m_error = nullptr;
   }
 
@@ -44,46 +44,29 @@ class WireEncoder {
   const char* error() const { return m_error; }
 
   /* Returns pointer to start of memory buffer with written data. */
-  const char* data() const { return m_start; }
+  const char* data() const { return m_data.data(); }
 
   /* Returns number of bytes written to memory buffer. */
-  std::size_t size() const { return m_cur - m_start; }
+  std::size_t size() const { return m_data.size(); }
 
   llvm::StringRef ToStringRef() const {
-    return llvm::StringRef(m_start, m_cur - m_start);
-  }
-
-  /* Ensures the buffer has sufficient space to write len bytes.  Reallocates
-   * the buffer if necessary.
-   */
-  void Reserve(std::size_t len) {
-    // assert(m_end > m_cur);
-    if (static_cast<size_t>(m_end - m_cur) < len)
-      ReserveSlow(len);  // Need to reallocate memory
+    return llvm::StringRef(m_data.data(), m_data.size());
   }
 
   /* Writes a single byte. */
-  void Write8(unsigned int val) {
-    Reserve(1);
-    *m_cur++ = (char)(val & 0xff);
-  }
+  void Write8(unsigned int val) { m_data.push_back((char)(val & 0xff)); }
 
   /* Writes a 16-bit word. */
   void Write16(unsigned int val) {
-    Reserve(2);
-    m_cur[1] = (char)(val & 0xff); val >>= 8;
-    m_cur[0] = (char)(val & 0xff);
-    m_cur += 2;
+    m_data.append({(char)((val >> 8) & 0xff), (char)(val & 0xff)});
   }
 
   /* Writes a 32-bit word. */
   void Write32(unsigned long val) {
-    Reserve(4);
-    m_cur[3] = (char)(val & 0xff); val >>= 8;
-    m_cur[2] = (char)(val & 0xff); val >>= 8;
-    m_cur[1] = (char)(val & 0xff); val >>= 8;
-    m_cur[0] = (char)(val & 0xff);
-    m_cur += 4;
+    m_data.append({(char)((val >> 24) & 0xff),
+                   (char)((val >> 16) & 0xff),
+                   (char)((val >> 8) & 0xff),
+                   (char)(val & 0xff)});
   }
 
   /* Writes a double. */
@@ -106,9 +89,6 @@ class WireEncoder {
    */
   std::size_t GetStringSize(llvm::StringRef str) const;
 
-  WireEncoder(const WireEncoder&) = delete;
-  WireEncoder& operator=(const WireEncoder&) = delete;
-
  protected:
   /* The protocol revision.  E.g. 0x0200 for version 2.0. */
   unsigned int m_proto_rev;
@@ -117,17 +97,7 @@ class WireEncoder {
   const char* m_error;
 
  private:
-  /* The slow path for Reserve() when we need to reallocate memory. */
-  void ReserveSlow(std::size_t len);
-
-  /* The start of the memory buffer. */
-  char* m_start;
-
-  /* Where to write the next byte. */
-  char* m_cur;
-
-  /* The end of the allocated buffer. */
-  char* m_end;
+  llvm::SmallVector<char, 256> m_data;
 };
 
 }  // namespace nt
