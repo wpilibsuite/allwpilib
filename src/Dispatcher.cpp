@@ -124,9 +124,11 @@ void DispatcherBase::Stop() {
 }
 
 void DispatcherBase::SetUpdateRate(double interval) {
-  // don't allow update rates faster than 100 ms
+  // don't allow update rates faster than 100 ms or slower than 1 second
   if (interval < 0.1)
     interval = 0.1;
+  else if (interval > 1.0)
+    interval = 1.0;
   m_update_rate = static_cast<unsigned int>(interval * 1000);
 }
 
