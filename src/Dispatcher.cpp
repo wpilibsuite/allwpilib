@@ -213,7 +213,9 @@ void DispatcherBase::DispatchThreadMain() {
       bool reconnect = false;
       for (auto& conn : m_connections) {
         // post outgoing messages if connection is active
-        if (conn->state() == NetworkConnection::kActive) conn->PostOutgoing();
+        // only send keep-alives on client
+        if (conn->state() == NetworkConnection::kActive)
+          conn->PostOutgoing(!m_server);
 
         // if client, reconnect if connection died
         if (!m_server && conn->state() == NetworkConnection::kDead)

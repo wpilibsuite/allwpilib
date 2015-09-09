@@ -2,7 +2,6 @@
 
 ## Functionality
 
-* Keepalives
 * Initial connection flag
 
 ## Unit Test Coverage
@@ -12,6 +11,7 @@
 * NetworkCommunication class
 * Dispatcher class
 * Storage incoming processing
+* Keepalives
 * Notifiers
 * RPC
 * C++ API

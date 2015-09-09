@@ -250,10 +250,18 @@ void NetworkConnection::QueueOutgoing(std::shared_ptr<Message> msg) {
   }
 }
 
-void NetworkConnection::PostOutgoing() {
+void NetworkConnection::PostOutgoing(bool keep_alive) {
   std::lock_guard<std::mutex> lock(m_pending_mutex);
-  if (m_pending_outgoing.empty()) return;
-  m_outgoing.emplace(std::move(m_pending_outgoing));
-  m_pending_outgoing.resize(0);
-  m_pending_update.resize(0);
+  auto now = std::chrono::steady_clock::now();
+  if (m_pending_outgoing.empty()) {
+    if (!keep_alive) return;
+    // send keep-alives once a second (if no other messages have been sent)
+    if ((now - m_last_post) < std::chrono::seconds(1)) return;
+    m_outgoing.emplace(Outgoing{Message::KeepAlive()});
+  } else {
+    m_outgoing.emplace(std::move(m_pending_outgoing));
+    m_pending_outgoing.resize(0);
+    m_pending_update.resize(0);
+  }
+  m_last_post = now;
 }

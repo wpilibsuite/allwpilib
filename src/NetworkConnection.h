@@ -9,6 +9,7 @@
 #define NT_NETWORKCONNECTION_H_
 
 #include <atomic>
+#include <chrono>
 #include <memory>
 #include <thread>
 
@@ -56,7 +57,7 @@ class NetworkConnection {
   NetworkStream& stream() { return *m_stream; }
 
   void QueueOutgoing(std::shared_ptr<Message> msg);
-  void PostOutgoing();
+  void PostOutgoing(bool keep_alive);
 
   unsigned int uid() const { return m_uid; }
 
@@ -95,6 +96,7 @@ class NetworkConnection {
   mutable std::mutex m_remote_id_mutex;
   std::string m_remote_id;
   std::atomic_ullong m_last_update;
+  std::chrono::steady_clock::time_point m_last_post;
 
   std::mutex m_pending_mutex;
   Outgoing m_pending_outgoing;
