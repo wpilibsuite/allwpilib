@@ -882,31 +882,24 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
           return;
         if (!env || !env->functions) return;
 
-        // get the handler
-        auto handler = listener_global->obj(env);
-        if (!handler) {
-          // can happen due to weak reference
-          jvm->DetachCurrentThread();
-          return;
+        {
+          // get the handler
+          auto handler = listener_global->obj(env);
+          if (!handler) goto done; // can happen due to weak reference
+
+          // convert the value into the appropriate Java type
+          jobject jobj = ToJavaObject(env, *value);
+          if (!jobj) goto done;
+
+          if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            goto done;
+          }
+          env->CallVoidMethod(handler, mid, (jint)uid, ToJavaString(env, name),
+                              jobj, (jboolean)(is_new ? 1 : 0));
+          if (env->ExceptionCheck()) env->ExceptionDescribe();
         }
-
-        // convert the value into the appropriate Java type
-        jobject jobj = ToJavaObject(env, *value);
-
-        if (!jobj) {
-          jvm->DetachCurrentThread();
-          return;
-        }
-
-        if (env->ExceptionCheck()) {
-          env->ExceptionDescribe();
-          jvm->DetachCurrentThread();
-          return;
-        }
-        env->CallVoidMethod(handler, mid, (jint)uid, ToJavaString(env, name),
-                            jobj, (jboolean)(is_new ? 1 : 0));
-        if (env->ExceptionCheck()) env->ExceptionDescribe();
-
+done:
         jvm->DetachCurrentThread();
       },
       immediateNotify != JNI_FALSE);
@@ -955,31 +948,24 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
           return;
         if (!env || !env->functions) return;
 
-        // get the handler
-        auto handler = listener_global->obj(env);
-        if (!handler) {
-          // can happen due to weak reference
-          jvm->DetachCurrentThread();
-          return;
+        {
+          // get the handler
+          auto handler = listener_global->obj(env);
+          if (!handler) goto done; // can happen due to weak reference
+
+          // convert into the appropriate Java type
+          jobject jobj = ToJavaObject(env, conn);
+          if (!jobj) goto done;
+
+          if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            goto done;
+          }
+          env->CallVoidMethod(handler, mid, (jint)uid,
+                              (jboolean)(connected ? 1 : 0), jobj);
+          if (env->ExceptionCheck()) env->ExceptionDescribe();
         }
-
-        // convert into the appropriate Java type
-        jobject jobj = ToJavaObject(env, conn);
-
-        if (!jobj) {
-          jvm->DetachCurrentThread();
-          return;
-        }
-
-        if (env->ExceptionCheck()) {
-          env->ExceptionDescribe();
-          jvm->DetachCurrentThread();
-          return;
-        }
-        env->CallVoidMethod(handler, mid, (jint)uid,
-                            (jboolean)(connected ? 1 : 0), jobj);
-        if (env->ExceptionCheck()) env->ExceptionDescribe();
-
+done:
         jvm->DetachCurrentThread();
       },
       immediateNotify != JNI_FALSE);
@@ -1200,18 +1186,16 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
           return;
         if (!env || !env->functions) return;
 
-        // get the handler
-        auto handler = func_global->obj();
-        if (!handler) {
-          // shouldn't happen, but ignore if it does
-          jvm->DetachCurrentThread();
-          return;
+        {
+          // get the handler
+          auto handler = func_global->obj();
+          if (!handler) goto done; // shouldn't happen, but ignore if it does
+
+          env->CallVoidMethod(handler, mid, (jint)level, ToJavaString(env, file),
+                              (jint)line, ToJavaString(env, msg));
+          if (env->ExceptionCheck()) env->ExceptionDescribe();
         }
-
-        env->CallVoidMethod(handler, mid, (jint)level, ToJavaString(env, file),
-                            (jint)line, ToJavaString(env, msg));
-        if (env->ExceptionCheck()) env->ExceptionDescribe();
-
+done:
         jvm->DetachCurrentThread();
       },
       minLevel);
