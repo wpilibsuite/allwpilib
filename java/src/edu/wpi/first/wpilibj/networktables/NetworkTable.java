@@ -23,7 +23,7 @@ public class NetworkTable implements ITable, IRemote {
   private static boolean client = false;
   private static boolean running = false;
   private static int port = DEFAULT_PORT;
-  private static String ipAddress = null;
+  private static String ipAddress = "";
   private static String persistentFilename = "networktables.ini";
 
   private synchronized static void checkInit() {
