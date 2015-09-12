@@ -353,6 +353,8 @@ bool DispatcherBase::ClientHandshake(
       DEBUG("client: server disconnected during initial entries");
       return false;
     }
+    DEBUG4("received init str=" << msg->str() << " id=" << msg->id()
+                                << " seq_num=" << msg->seq_num_uid());
     if (msg->Is(Message::kServerHelloDone)) break;
     if (!msg->Is(Message::kEntryAssign)) {
       // unexpected message
