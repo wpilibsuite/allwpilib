@@ -388,6 +388,8 @@ void Storage::ApplyInitialAssignments(
       entry->value = msg->value();
       entry->flags = msg->flags();
       entry->seq_num = seq_num;
+      // notify
+      m_notifier.NotifyEntry(name, entry->value, true);
     } else {
       // if reconnect and sequence number not higher than local, then we
       // don't update the local value and instead send it back to the server
@@ -400,6 +402,8 @@ void Storage::ApplyInitialAssignments(
         entry->seq_num = seq_num;
         // don't update flags from a <3.0 remote (not part of message)
         if (conn.proto_rev() >= 0x0300) entry->flags = msg->flags();
+        // notify
+        m_notifier.NotifyEntry(name, entry->value, false);
       }
     }
 
