@@ -29,6 +29,7 @@ Storage::Storage(Notifier& notifier, RpcServer& rpc_server)
 }
 
 Storage::~Storage() {
+  Logger::GetInstance().SetLogger(nullptr);
   m_terminating = true;
   m_rpc_results_cond.notify_all();
 }

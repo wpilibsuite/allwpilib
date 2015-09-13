@@ -19,6 +19,7 @@ RpcServer::RpcServer() {
 }
 
 RpcServer::~RpcServer() {
+  Logger::GetInstance().SetLogger(nullptr);
   Stop();
   m_terminating = true;
   m_poll_cond.notify_all();

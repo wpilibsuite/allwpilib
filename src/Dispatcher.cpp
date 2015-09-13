@@ -43,6 +43,7 @@ DispatcherBase::DispatcherBase(Storage& storage, Notifier& notifier)
 }
 
 DispatcherBase::~DispatcherBase() {
+  Logger::GetInstance().SetLogger(nullptr);
   Stop();
 }
 
