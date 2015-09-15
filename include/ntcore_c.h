@@ -273,6 +273,8 @@ unsigned int NT_AddConnectionListener(void *data,
                                       int immediate_notify);
 void NT_RemoveConnectionListener(unsigned int conn_listener_uid);
 
+int NT_NotifierDestroyed();
+
 /*
  * Remote Procedure Call Functions
  */

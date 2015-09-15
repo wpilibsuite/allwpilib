@@ -91,6 +91,8 @@ void RemoveConnectionListener(unsigned int conn_listener_uid) {
   Notifier::GetInstance().RemoveConnectionListener(conn_listener_uid);
 }
 
+bool NotifierDestroyed() { return Notifier::destroyed(); }
+
 /*
  * Remote Procedure Call Functions
  */

@@ -200,6 +200,8 @@ void NT_RemoveConnectionListener(unsigned int conn_listener_uid) {
   nt::RemoveConnectionListener(conn_listener_uid);
 }
 
+int NT_NotifierDestroyed() { return nt::NotifierDestroyed(); }
+
 /*
  * Remote Procedure Call Functions
  */

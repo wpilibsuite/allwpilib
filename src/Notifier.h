@@ -34,6 +34,7 @@ class Notifier {
   void Stop();
 
   bool active() const { return m_active; }
+  static bool destroyed() { return s_destroyed; }
 
   unsigned int AddEntryListener(StringRef prefix,
                                 EntryListenerCallback callback);
@@ -86,6 +87,7 @@ class Notifier {
   std::thread m_thread;
 
   ATOMIC_STATIC_DECL(Notifier)
+  static bool s_destroyed;
 };
 
 }  // namespace nt

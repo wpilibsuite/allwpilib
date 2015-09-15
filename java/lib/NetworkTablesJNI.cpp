@@ -108,7 +108,7 @@ class JavaGlobal {
   JavaGlobal(JNIEnv *env, T obj)
       : m_obj(static_cast<T>(env->NewGlobalRef(obj))) {}
   ~JavaGlobal() {
-    if (!jvm) return;
+    if (!jvm || nt::NotifierDestroyed()) return;
     JNIEnv *env;
     if (jvm->AttachCurrentThread(reinterpret_cast<void **>(&env), nullptr) !=
         JNI_OK)
@@ -133,7 +133,7 @@ class JavaWeakGlobal {
   JavaWeakGlobal(JNIEnv *env, T obj)
       : m_obj(static_cast<T>(env->NewWeakGlobalRef(obj))) {}
   ~JavaWeakGlobal() {
-    if (!jvm) return;
+    if (!jvm || nt::NotifierDestroyed()) return;
     JNIEnv *env;
     if (jvm->AttachCurrentThread(reinterpret_cast<void **>(&env), nullptr) !=
         JNI_OK)

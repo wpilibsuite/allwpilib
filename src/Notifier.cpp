@@ -10,12 +10,17 @@
 using namespace nt;
 
 ATOMIC_STATIC_INIT(Notifier)
+bool Notifier::s_destroyed = false;
 
 Notifier::Notifier() {
   m_active = false;
+  s_destroyed = false;
 }
 
-Notifier::~Notifier() { Stop(); }
+Notifier::~Notifier() {
+  s_destroyed = true;
+  Stop();
+}
 
 void Notifier::Start() {
   {

@@ -195,6 +195,8 @@ unsigned int AddConnectionListener(ConnectionListenerCallback callback,
                                    bool immediate_notify);
 void RemoveConnectionListener(unsigned int conn_listener_uid);
 
+bool NotifierDestroyed();
+
 /*
  * Remote Procedure Call Functions
  */
