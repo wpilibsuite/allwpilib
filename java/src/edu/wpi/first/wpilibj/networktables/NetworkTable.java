@@ -36,7 +36,8 @@ public class NetworkTable implements ITable, IRemote {
    * initializes network tables
    */
   public synchronized static void initialize() {
-    checkInit();
+    if (running)
+      shutdown();
     if (client)
       NetworkTablesJNI.startClient(ipAddress, port);
     else
@@ -49,8 +50,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   public synchronized static void shutdown() {
     if (!running)
-      throw new IllegalStateException(
-          "Network tables has not yet been initialized");
+      return;
     if (client)
       NetworkTablesJNI.stopClient();
     else
@@ -63,6 +63,8 @@ public class NetworkTable implements ITable, IRemote {
    * This must be called before initalize or getTable
    */
   public synchronized static void setServerMode() {
+    if (!client)
+      return;
     checkInit();
     client = false;
   }
@@ -72,6 +74,8 @@ public class NetworkTable implements ITable, IRemote {
    * This must be called before initalize or getTable
    */
   public synchronized static void setClientMode() {
+    if (client)
+      return;
     checkInit();
     client = true;
   }
@@ -91,6 +95,8 @@ public class NetworkTable implements ITable, IRemote {
    * mode
    */
   public synchronized static void setIPAddress(final String address) {
+    if (ipAddress == address)
+      return;
     checkInit();
     ipAddress = address;
   }
@@ -100,6 +106,8 @@ public class NetworkTable implements ITable, IRemote {
    * mode or listen to in server mode
    */
   public synchronized static void setPort(int aport) {
+    if (port == aport)
+      return;
     checkInit();
     port = aport;
   }
