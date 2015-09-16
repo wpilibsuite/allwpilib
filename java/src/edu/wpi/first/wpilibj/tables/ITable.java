@@ -31,6 +31,66 @@ public interface ITable {
   public ITable getSubTable(String key);
 
   /**
+   * Makes a key's value persistent through program restarts.
+   * The key cannot be null.
+   *
+   * @param key the key name
+   */
+  public void setPersistent(String key);
+
+  /**
+   * Stop making a key's value persistent through program restarts.
+   * The key cannot be null.
+   *
+   * @param key the key name
+   */
+  public void clearPersistent(String key);
+
+  /**
+   * Returns whether the value is persistent through program restarts.
+   * The key cannot be null.
+   *
+   * @param key the key name
+   * @return True if the value is persistent.
+   */
+  public boolean isPersistent(String key);
+
+  /**
+   * Sets flags on the specified key in this table. The key can
+   * not be null.
+   *
+   * @param key the key name
+   * @param flags the flags to set (bitmask)
+   */
+  public void setFlags(String key, int flags);
+
+  /**
+   * Clears flags on the specified key in this table. The key can
+   * not be null.
+   *
+   * @param key the key name
+   * @param flags the flags to clear (bitmask)
+   */
+  public void clearFlags(String key, int flags);
+
+  /**
+   * Returns the flags for the specified key.
+   *
+   * @param key
+   *            the key name
+   * @return the flags, or 0 if the key is not defined
+   */
+  public int getFlags(String key);
+
+  /**
+   * Deletes the specified key in this table. The key can
+   * not be null.
+   *
+   * @param key the key name
+   */
+  public void delete(String key);
+
+  /**
    * Gets the value associated with a key as an object
    * @param key the key of the value to look up
    * @return the value associated with the given key

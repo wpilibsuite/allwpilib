@@ -112,6 +112,15 @@ public class NetworkTable implements ITable, IRemote {
     port = aport;
   }
 
+  /**
+   * Sets the network identity.
+   * This is provided in the connection info on the remote end.
+   * @param name identity
+   */
+  public static void setNetworkIdentity(String name) {
+    NetworkTablesJNI.setNetworkIdentity(name);
+  }
+
   public static boolean[] toNative(Boolean[] arr) {
     boolean[] out = new boolean[arr.length];
     for (int i = 0; i < arr.length; i++)
@@ -164,6 +173,10 @@ public class NetworkTable implements ITable, IRemote {
     this.path = path;
   }
   public String toString() { return "NetworkTable: " + path; }
+
+  public static ConnectionInfo[] connections() {
+    return NetworkTablesJNI.getConnections();
+  }
 
   public boolean isConnected() {
     ConnectionInfo[] conns = NetworkTablesJNI.getConnections();
@@ -768,14 +781,56 @@ public class NetworkTable implements ITable, IRemote {
   public static final int PERSISTENT = 1;
 
   /**
+   * Makes a key's value persistent through program restarts.
+   * The key cannot be null.
+   *
+   * @param key the key name
+   */
+  public void setPersistent(String key) {
+    setFlags(key, PERSISTENT);
+  }
+
+  /**
+   * Stop making a key's value persistent through program restarts.
+   * The key cannot be null.
+   *
+   * @param key the key name
+   */
+  public void clearPersistent(String key) {
+    clearFlags(key, PERSISTENT);
+  }
+
+  /**
+   * Returns whether the value is persistent through program restarts.
+   * The key cannot be null.
+   *
+   * @param key the key name
+   * @return True if the value is persistent.
+   */
+  public boolean isPersistent(String key) {
+    return (getFlags(key) & PERSISTENT) != 0;
+  }
+
+  /**
    * Sets flags on the specified key in this table. The key can
    * not be null.
    *
    * @param key the key name
-   * @param flags the flags to set
+   * @param flags the flags to set (bitmask)
    */
   public void setFlags(String key, int flags) {
-    NetworkTablesJNI.setEntryFlags(path + PATH_SEPARATOR + key, flags);
+    NetworkTablesJNI.setEntryFlags(path + PATH_SEPARATOR + key, getFlags(key) | flags);
+  }
+
+  /**
+   * Clears flags on the specified key in this table. The key can
+   * not be null.
+   *
+   * @param key the key name
+   * @param flags the flags to clear (bitmask)
+   */
+  public void clearFlags(String key, int flags) {
+    NetworkTablesJNI.setEntryFlags(path + PATH_SEPARATOR + key, getFlags(key) & ~flags);
   }
 
   /**
@@ -787,6 +842,63 @@ public class NetworkTable implements ITable, IRemote {
    */
   public int getFlags(String key) {
     return NetworkTablesJNI.getEntryFlags(path + PATH_SEPARATOR + key);
+  }
+
+  /**
+   * Deletes the specified key in this table. The key can
+   * not be null.
+   *
+   * @param key the key name
+   */
+  public void delete(String key) {
+    NetworkTablesJNI.deleteEntry(path + PATH_SEPARATOR + key);
+  }
+
+  /**
+   * Deletes ALL keys in ALL subtables.  Use with caution!
+   */
+  public static void globalDeleteAll() {
+    NetworkTablesJNI.deleteAllEntries();
+  }
+
+  /**
+   * Flushes all updated values immediately to the network.
+   * Note: This is rate-limited to protect the network from flooding.
+   * This is primarily useful for synchronizing network updates with
+   * user code.
+   */
+  public static void flush() {
+    NetworkTablesJNI.flush();
+  }
+
+  /**
+   * Set the periodic update rate.
+   *
+   * @param interval update interval in seconds (range 0.1 to 1.0)
+   */
+  public static void setUpdateRate(double interval) {
+    NetworkTablesJNI.setUpdateRate(interval);
+  }
+
+  /**
+   * Saves persistent keys to a file.  The server does this automatically.
+   *
+   * @param filename file name
+   * @throws PersistentException if error saving file
+   */
+  public static void savePersistent(String filename) throws PersistentException {
+    NetworkTablesJNI.savePersistent(filename);
+  }
+
+  /**
+   * Loads persistent keys from a file.  The server does this automatically.
+   *
+   * @param filename file name
+   * @return List of warnings (errors result in an exception instead)
+   * @throws PersistentException if error reading file
+   */
+  public static String[] loadPersistent(String filename) throws PersistentException {
+    return NetworkTablesJNI.loadPersistent(filename);
   }
 
   /*

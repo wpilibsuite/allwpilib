@@ -48,7 +48,58 @@ class ITable {
    *
    * @param key the key to make persistent
    */
-  virtual void Persist(llvm::StringRef key) = 0;
+  virtual void SetPersistent(llvm::StringRef key) = 0;
+
+  /**
+   * Stop making a key's value persistent through program restarts.
+   * The key cannot be null.
+   *
+   * @param key the key name
+   */
+  virtual void ClearPersistent(llvm::StringRef key) = 0;
+
+  /**
+   * Returns whether the value is persistent through program restarts.
+   * The key cannot be null.
+   *
+   * @param key the key name
+   */
+  virtual bool IsPersistent(llvm::StringRef key) = 0;
+
+  /**
+   * Sets flags on the specified key in this table. The key can
+   * not be null.
+   *
+   * @param key the key name
+   * @param flags the flags to set (bitmask)
+   */
+  virtual void SetFlags(llvm::StringRef key, unsigned int flags) = 0;
+
+  /**
+   * Clears flags on the specified key in this table. The key can
+   * not be null.
+   *
+   * @param key the key name
+   * @param flags the flags to clear (bitmask)
+   */
+  virtual void ClearFlags(llvm::StringRef key, unsigned int flags) = 0;
+
+  /**
+   * Returns the flags for the specified key.
+   *
+   * @param key
+   *            the key name
+   * @return the flags, or 0 if the key is not defined
+   */
+  virtual unsigned int GetFlags(llvm::StringRef key) = 0;
+
+  /**
+   * Deletes the specified key in this table. The key can
+   * not be null.
+   *
+   * @param key the key name
+   */
+  virtual void Delete(llvm::StringRef key) = 0;
 
   /**
    * Gets the value associated with a key as an object
@@ -65,10 +116,11 @@ class ITable {
    *
    * @param key the key to be assigned to
    * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
    * @throws IllegalArgumentException when the value is not supported by the
    * table
    */
-  virtual void PutValue(llvm::StringRef key,
+  virtual bool PutValue(llvm::StringRef key,
                         std::shared_ptr<nt::Value> value) = 0;
 
   /**
@@ -76,8 +128,9 @@ class ITable {
    *
    * @param key the key to be assigned to
    * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
    */
-  virtual void PutNumber(llvm::StringRef key, double value) = 0;
+  virtual bool PutNumber(llvm::StringRef key, double value) = 0;
 
   /**
    * Gets the number associated with the given name.
@@ -94,8 +147,9 @@ class ITable {
    *
    * @param key the key to be assigned to
    * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
    */
-  virtual void PutString(llvm::StringRef key, llvm::StringRef value) = 0;
+  virtual bool PutString(llvm::StringRef key, llvm::StringRef value) = 0;
 
   /**
    * Gets the string associated with the given name.
@@ -113,8 +167,9 @@ class ITable {
    *
    * @param key the key to be assigned to
    * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
    */
-  virtual void PutBoolean(llvm::StringRef key, bool value) = 0;
+  virtual bool PutBoolean(llvm::StringRef key, bool value) = 0;
 
   /**
    * Gets the boolean associated with the given name.

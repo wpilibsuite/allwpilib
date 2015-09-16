@@ -1,6 +1,7 @@
 #ifndef _NETWORKTABLE_H_
 #define _NETWORKTABLE_H_
 
+#include <functional>
 #include <mutex>
 #include <vector>
 
@@ -54,11 +55,58 @@ class NetworkTable : public ITable {
    * @param team the team number
    */
   static void SetTeam(int team);
+
   /**
    * @param address the adress that network tables will connect to in client
    * mode
    */
   static void SetIPAddress(llvm::StringRef address);
+
+  /**
+   * Sets the network identity.
+   * This is provided in the connection info on the remote end.
+   * @param name identity
+   */
+  static void SetNetworkIdentity(llvm::StringRef name);
+
+  /**
+   * Deletes ALL keys in ALL subtables.  Use with caution!
+   */
+  static void GlobalDeleteAll();
+
+  /**
+   * Flushes all updated values immediately to the network.
+   * Note: This is rate-limited to protect the network from flooding.
+   * This is primarily useful for synchronizing network updates with
+   * user code.
+   */
+  static void Flush();
+
+  /**
+   * Set the periodic update rate.
+   *
+   * @param interval update interval in seconds (range 0.1 to 1.0)
+   */
+  static void SetUpdateRate(double interval);
+
+  /**
+   * Saves persistent keys to a file.  The server does this automatically.
+   *
+   * @param filename file name
+   * @return Error (or nullptr).
+   */
+  static const char* SavePersistent(llvm::StringRef filename);
+
+  /**
+   * Loads persistent keys from a file.  The server does this automatically.
+   *
+   * @param filename file name
+   * @param warn callback function called for warnings
+   * @return Error (or nullptr).
+   */
+  static const char* LoadPersistent(
+      llvm::StringRef filename,
+      std::function<void(size_t line, const char* msg)> warn);
 
   /**
    * Gets the table with the specified key. If the table does not exist, a new
@@ -103,7 +151,58 @@ class NetworkTable : public ITable {
    *
    * @param key the key to make persistent
    */
-  void Persist(llvm::StringRef key);
+  void SetPersistent(llvm::StringRef key);
+
+  /**
+   * Stop making a key's value persistent through program restarts.
+   * The key cannot be null.
+   *
+   * @param key the key name
+   */
+  void ClearPersistent(llvm::StringRef key);
+
+  /**
+   * Returns whether the value is persistent through program restarts.
+   * The key cannot be null.
+   *
+   * @param key the key name
+   */
+  bool IsPersistent(llvm::StringRef key);
+
+  /**
+   * Sets flags on the specified key in this table. The key can
+   * not be null.
+   *
+   * @param key the key name
+   * @param flags the flags to set (bitmask)
+   */
+  void SetFlags(llvm::StringRef key, unsigned int flags);
+
+  /**
+   * Clears flags on the specified key in this table. The key can
+   * not be null.
+   *
+   * @param key the key name
+   * @param flags the flags to clear (bitmask)
+   */
+  void ClearFlags(llvm::StringRef key, unsigned int flags);
+
+  /**
+   * Returns the flags for the specified key.
+   *
+   * @param key
+   *            the key name
+   * @return the flags, or 0 if the key is not defined
+   */
+  unsigned int GetFlags(llvm::StringRef key);
+
+  /**
+   * Deletes the specified key in this table. The key can
+   * not be null.
+   *
+   * @param key the key name
+   */
+  void Delete(llvm::StringRef key);
 
   /**
    * Maps the specified key to the specified value in this table. The key can
@@ -115,7 +214,7 @@ class NetworkTable : public ITable {
    * @param value
    *            the value
    */
-  void PutNumber(llvm::StringRef key, double value);
+  bool PutNumber(llvm::StringRef key, double value);
 
   /**
    * Returns the key that the name maps to. If the key is null, it will return
@@ -139,7 +238,7 @@ class NetworkTable : public ITable {
    * @param value
    *            the value
    */
-  void PutString(llvm::StringRef key, llvm::StringRef value);
+  bool PutString(llvm::StringRef key, llvm::StringRef value);
 
   /**
    * Returns the key that the name maps to. If the key is null, it will return
@@ -164,7 +263,7 @@ class NetworkTable : public ITable {
    * @param value
    *            the value
    */
-  void PutBoolean(llvm::StringRef key, bool value);
+  bool PutBoolean(llvm::StringRef key, bool value);
 
   /**
    * Returns the key that the name maps to. If the key is null, it will return
@@ -186,7 +285,7 @@ class NetworkTable : public ITable {
    * @param key the key name
    * @param value the value to be put
    */
-  void PutValue(llvm::StringRef key, std::shared_ptr<nt::Value> value);
+  bool PutValue(llvm::StringRef key, std::shared_ptr<nt::Value> value);
 
   /**
    * Returns the key that the name maps to.

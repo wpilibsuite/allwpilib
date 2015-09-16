@@ -14,6 +14,7 @@ bool NetworkTable::s_client = false;
 bool NetworkTable::s_running = false;
 
 void NetworkTable::Initialize() {
+  if (s_running) Shutdown();
   if (s_client)
     nt::StartClient(s_ip_address.c_str(), NT_DEFAULT_PORT);
   else
@@ -22,6 +23,7 @@ void NetworkTable::Initialize() {
 }
 
 void NetworkTable::Shutdown() {
+  if (!s_running) return;
   if (s_client)
     nt::StopClient();
   else
@@ -43,8 +45,28 @@ void NetworkTable::SetTeam(int team) {
   SetIPAddress(tmp);
 }
 
-void NetworkTable::SetIPAddress(StringRef address) {
-  s_ip_address = address;
+void NetworkTable::SetIPAddress(StringRef address) { s_ip_address = address; }
+
+void NetworkTable::SetNetworkIdentity(StringRef name) {
+  nt::SetNetworkIdentity(name);
+}
+
+void NetworkTable::GlobalDeleteAll() { nt::DeleteAllEntries(); }
+
+void NetworkTable::Flush() { nt::Flush(); }
+
+void NetworkTable::SetUpdateRate(double interval) {
+  nt::SetUpdateRate(interval);
+}
+
+const char* NetworkTable::SavePersistent(llvm::StringRef filename) {
+  return nt::SavePersistent(filename);
+}
+
+const char* NetworkTable::LoadPersistent(
+    llvm::StringRef filename,
+    std::function<void(size_t line, const char* msg)> warn) {
+  return nt::LoadPersistent(filename, warn);
 }
 
 std::shared_ptr<NetworkTable> NetworkTable::GetTable(StringRef key) {
@@ -139,18 +161,51 @@ bool NetworkTable::ContainsSubTable(StringRef key) const {
   return !nt::GetEntryInfo(path, 0).empty();
 }
 
-void NetworkTable::Persist(StringRef key) {
-  llvm::SmallString<128> path(m_path);
-  path += PATH_SEPARATOR_CHAR;
-  path += key;
-  nt::SetEntryFlags(path, NT_PERSISTENT);
+void NetworkTable::SetPersistent(StringRef key) {
+  SetFlags(key, NT_PERSISTENT);
 }
 
-void NetworkTable::PutNumber(StringRef key, double value) {
+void NetworkTable::ClearPersistent(StringRef key) {
+  ClearFlags(key, NT_PERSISTENT);
+}
+
+bool NetworkTable::IsPersistent(StringRef key) {
+  return (GetFlags(key) & NT_PERSISTENT) != 0;
+}
+
+void NetworkTable::SetFlags(StringRef key, unsigned int flags) {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   path += key;
-  nt::SetEntryValue(path, nt::Value::MakeDouble(value));
+  nt::SetEntryFlags(path, nt::GetEntryFlags(key) | flags);
+}
+
+void NetworkTable::ClearFlags(StringRef key, unsigned int flags) {
+  llvm::SmallString<128> path(m_path);
+  path += PATH_SEPARATOR_CHAR;
+  path += key;
+  nt::SetEntryFlags(path, nt::GetEntryFlags(path) & ~flags);
+}
+
+unsigned int NetworkTable::GetFlags(StringRef key) {
+  llvm::SmallString<128> path(m_path);
+  path += PATH_SEPARATOR_CHAR;
+  path += key;
+  return nt::GetEntryFlags(path);
+}
+
+void NetworkTable::Delete(StringRef key) {
+  llvm::SmallString<128> path(m_path);
+  path += PATH_SEPARATOR_CHAR;
+  path += key;
+  nt::DeleteEntry(path);
+}
+
+bool NetworkTable::PutNumber(StringRef key, double value) {
+  llvm::SmallString<128> path(m_path);
+  path += PATH_SEPARATOR_CHAR;
+  path += key;
+  return nt::SetEntryValue(path, nt::Value::MakeDouble(value));
 }
 
 double NetworkTable::GetNumber(StringRef key, double defaultValue) const {
@@ -163,11 +218,11 @@ double NetworkTable::GetNumber(StringRef key, double defaultValue) const {
   return value->GetDouble();
 }
 
-void NetworkTable::PutString(StringRef key, StringRef value) {
+bool NetworkTable::PutString(StringRef key, StringRef value) {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   path += key;
-  nt::SetEntryValue(path, nt::Value::MakeString(value));
+  return nt::SetEntryValue(path, nt::Value::MakeString(value));
 }
 
 std::string NetworkTable::GetString(StringRef key,
@@ -181,11 +236,11 @@ std::string NetworkTable::GetString(StringRef key,
   return value->GetString();
 }
 
-void NetworkTable::PutBoolean(StringRef key, bool value) {
+bool NetworkTable::PutBoolean(StringRef key, bool value) {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   path += key;
-  nt::SetEntryValue(path, nt::Value::MakeBoolean(value));
+  return nt::SetEntryValue(path, nt::Value::MakeBoolean(value));
 }
 
 bool NetworkTable::GetBoolean(StringRef key, bool defaultValue) const {
@@ -198,11 +253,11 @@ bool NetworkTable::GetBoolean(StringRef key, bool defaultValue) const {
   return value->GetBoolean();
 }
 
-void NetworkTable::PutValue(StringRef key, std::shared_ptr<nt::Value> value) {
+bool NetworkTable::PutValue(StringRef key, std::shared_ptr<nt::Value> value) {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   path += key;
-  nt::SetEntryValue(path, value);
+  return nt::SetEntryValue(path, value);
 }
 
 std::shared_ptr<nt::Value> NetworkTable::GetValue(StringRef key) const {
