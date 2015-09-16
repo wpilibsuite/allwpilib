@@ -43,10 +43,11 @@ public interface ITable {
    * Put a value in the table
    * @param key the key to be assigned to
    * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
    * @throws IllegalArgumentException when the value is not supported by the
    * table
    */
-  public void putValue(String key, Object value)
+  public boolean putValue(String key, Object value)
       throws IllegalArgumentException;
 
   /**
@@ -63,8 +64,9 @@ public interface ITable {
    * Put a number in the table
    * @param key the key to be assigned to
    * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
    */
-  public void putNumber(String key, double value);
+  public boolean putNumber(String key, double value);
   /**
    * @param key the key to look up
    * @return the value associated with the given key
@@ -84,8 +86,9 @@ public interface ITable {
    * Put a string in the table
    * @param key the key to be assigned to
    * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
    */
-  public void putString(String key, String value);
+  public boolean putString(String key, String value);
   /**
    * @param key the key to look up
    * @return the value associated with the given key
@@ -105,8 +108,9 @@ public interface ITable {
    * Put a boolean in the table
    * @param key the key to be assigned to
    * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
    */
-  public void putBoolean(String key, boolean value);
+  public boolean putBoolean(String key, boolean value);
   /**
    * @param key the key to look up
    * @return the value associated with the given key
@@ -126,14 +130,16 @@ public interface ITable {
    * Put a boolean array in the table
    * @param key the key to be assigned to
    * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
    */
-  public void putBooleanArray(String key, boolean[] value);
+  public boolean putBooleanArray(String key, boolean[] value);
   /**
    * Put a boolean array in the table
    * @param key the key to be assigned to
    * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
    */
-  public void putBooleanArray(String key, Boolean[] value);
+  public boolean putBooleanArray(String key, Boolean[] value);
   /**
    * @param key the key to look up
    * @return the value associated with the given key
@@ -160,14 +166,16 @@ public interface ITable {
    * Put a number array in the table
    * @param key the key to be assigned to
    * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
    */
-  public void putNumberArray(String key, double[] value);
+  public boolean putNumberArray(String key, double[] value);
   /**
    * Put a number array in the table
    * @param key the key to be assigned to
    * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
    */
-  public void putNumberArray(String key, Double[] value);
+  public boolean putNumberArray(String key, Double[] value);
   /**
    * @param key the key to look up
    * @return the value associated with the given key
@@ -194,8 +202,9 @@ public interface ITable {
    * Put a string array in the table
    * @param key the key to be assigned to
    * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
    */
-  public void putStringArray(String key, String[] value);
+  public boolean putStringArray(String key, String[] value);
   /**
    * @param key the key to look up
    * @return the value associated with the given key
@@ -246,19 +255,21 @@ public interface ITable {
   public void removeTableListener(ITableListener listener);
 
   /*
-   * Depricated Methods
+   * Deprecated Methods
    */
+
   /**
    * @deprecated
-  * Maps the specified key to the specified value in this table.
-  * The key can not be null.
-  * The value can be retrieved by calling the get method with a key that is
-  * equal to the original key.
-  * @param key the key
-  * @param value the value
-  * @throws IllegalArgumentException if key is null
-  */
-  public void putInt(String key, int value);
+   * Maps the specified key to the specified value in this table.
+   * The key can not be null.
+   * The value can be retrieved by calling the get method with a key that is
+   * equal to the original key.
+   * @param key the key
+   * @param value the value
+   * @return False if the table key already exists with a different type
+   * @throws IllegalArgumentException if key is null
+   */
+  public boolean putInt(String key, int value);
 
   /**
    * @deprecated
@@ -295,9 +306,10 @@ public interface ITable {
    * equal to the original key.
    * @param key the key
    * @param value the value
+   * @return False if the table key already exists with a different type
    * @throws IllegalArgumentException if key is null
    */
-  public void putDouble(String key, double value);
+  public boolean putDouble(String key, double value);
 
   /**
    * @deprecated

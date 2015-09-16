@@ -372,9 +372,10 @@ public class NetworkTable implements ITable, IRemote {
    *            the key
    * @param value
    *            the value
+   * @return False if the table key already exists with a different type
    */
-  public void putNumber(String key, double value) {
-    NetworkTablesJNI.putDouble(path + PATH_SEPARATOR + key, value);
+  public boolean putNumber(String key, double value) {
+    return NetworkTablesJNI.putDouble(path + PATH_SEPARATOR + key, value);
   }
 
   /**
@@ -413,9 +414,10 @@ public class NetworkTable implements ITable, IRemote {
    *            the key
    * @param value
    *            the value
+   * @return False if the table key already exists with a different type
    */
-  public void putString(String key, String value) {
-    NetworkTablesJNI.putString(path + PATH_SEPARATOR + key, value);
+  public boolean putString(String key, String value) {
+    return NetworkTablesJNI.putString(path + PATH_SEPARATOR + key, value);
   }
 
   /**
@@ -454,9 +456,10 @@ public class NetworkTable implements ITable, IRemote {
    *            the key
    * @param value
    *            the value
+   * @return False if the table key already exists with a different type
    */
-  public void putBoolean(String key, boolean value) {
-    NetworkTablesJNI.putBoolean(path + PATH_SEPARATOR + key, value);
+  public boolean putBoolean(String key, boolean value) {
+    return NetworkTablesJNI.putBoolean(path + PATH_SEPARATOR + key, value);
   }
 
   /**
@@ -495,9 +498,10 @@ public class NetworkTable implements ITable, IRemote {
    *            the key
    * @param value
    *            the value
+   * @return False if the table key already exists with a different type
    */
-  public void putBooleanArray(String key, boolean[] value) {
-    NetworkTablesJNI.putBooleanArray(path + PATH_SEPARATOR + key, value);
+  public boolean putBooleanArray(String key, boolean[] value) {
+    return NetworkTablesJNI.putBooleanArray(path + PATH_SEPARATOR + key, value);
   }
 
   /**
@@ -509,9 +513,10 @@ public class NetworkTable implements ITable, IRemote {
    *            the key
    * @param value
    *            the value
+   * @return False if the table key already exists with a different type
    */
-  public void putBooleanArray(String key, Boolean[] value) {
-    putBooleanArray(key, toNative(value));
+  public boolean putBooleanArray(String key, Boolean[] value) {
+    return putBooleanArray(key, toNative(value));
   }
 
   /**
@@ -568,9 +573,10 @@ public class NetworkTable implements ITable, IRemote {
    *            the key
    * @param value
    *            the value
+   * @return False if the table key already exists with a different type
    */
-  public void putNumberArray(String key, double[] value) {
-    NetworkTablesJNI.putDoubleArray(path + PATH_SEPARATOR + key, value);
+  public boolean putNumberArray(String key, double[] value) {
+    return NetworkTablesJNI.putDoubleArray(path + PATH_SEPARATOR + key, value);
   }
 
   /**
@@ -582,9 +588,10 @@ public class NetworkTable implements ITable, IRemote {
    *            the key
    * @param value
    *            the value
+   * @return False if the table key already exists with a different type
    */
-  public void putNumberArray(String key, Double[] value) {
-    putNumberArray(key, toNative(value));
+  public boolean putNumberArray(String key, Double[] value) {
+    return putNumberArray(key, toNative(value));
   }
 
   /**
@@ -641,9 +648,10 @@ public class NetworkTable implements ITable, IRemote {
    *            the key
    * @param value
    *            the value
+   * @return False if the table key already exists with a different type
    */
-  public void putStringArray(String key, String[] value) {
-    NetworkTablesJNI.putStringArray(path + PATH_SEPARATOR + key, value);
+  public boolean putStringArray(String key, String[] value) {
+    return NetworkTablesJNI.putStringArray(path + PATH_SEPARATOR + key, value);
   }
 
   /**
@@ -680,32 +688,37 @@ public class NetworkTable implements ITable, IRemote {
    *
    * @param key the key name
    * @param value the value to be put
+   * @return False if the table key already exists with a different type
+   * @throws IllegalArgumentException when the value is not supported by the
+   * table
    */
-  public void putValue(String key, Object value) {
+  public boolean putValue(String key, Object value) throws IllegalArgumentException {
     if (value instanceof Boolean)
-      NetworkTablesJNI.putBoolean(path + PATH_SEPARATOR + key, ((Boolean)value).booleanValue());
+      return NetworkTablesJNI.putBoolean(path + PATH_SEPARATOR + key, ((Boolean)value).booleanValue());
     else if (value instanceof Double)
-      NetworkTablesJNI.putDouble(path + PATH_SEPARATOR + key, ((Double)value).doubleValue());
+      return NetworkTablesJNI.putDouble(path + PATH_SEPARATOR + key, ((Double)value).doubleValue());
     else if (value instanceof String)
-      NetworkTablesJNI.putString(path + PATH_SEPARATOR + key, (String)value);
+      return NetworkTablesJNI.putString(path + PATH_SEPARATOR + key, (String)value);
     else if (value instanceof byte[])
-      NetworkTablesJNI.putRaw(path + PATH_SEPARATOR + key, (byte[])value);
+      return NetworkTablesJNI.putRaw(path + PATH_SEPARATOR + key, (byte[])value);
     else if (value instanceof boolean[])
-      NetworkTablesJNI.putBooleanArray(path + PATH_SEPARATOR + key, (boolean[])value);
+      return NetworkTablesJNI.putBooleanArray(path + PATH_SEPARATOR + key, (boolean[])value);
     else if (value instanceof double[])
-      NetworkTablesJNI.putDoubleArray(path + PATH_SEPARATOR + key, (double[])value);
+      return NetworkTablesJNI.putDoubleArray(path + PATH_SEPARATOR + key, (double[])value);
     else if (value instanceof Boolean[])
-      NetworkTablesJNI.putBooleanArray(path + PATH_SEPARATOR + key, toNative((Boolean[])value));
+      return NetworkTablesJNI.putBooleanArray(path + PATH_SEPARATOR + key, toNative((Boolean[])value));
     else if (value instanceof Double[])
-      NetworkTablesJNI.putDoubleArray(path + PATH_SEPARATOR + key, toNative((Double[])value));
+      return NetworkTablesJNI.putDoubleArray(path + PATH_SEPARATOR + key, toNative((Double[])value));
     else if (value instanceof String[])
-      NetworkTablesJNI.putStringArray(path + PATH_SEPARATOR + key, (String[])value);
+      return NetworkTablesJNI.putStringArray(path + PATH_SEPARATOR + key, (String[])value);
     else if (value instanceof BooleanArray)
-      NetworkTablesJNI.putBooleanArray(path + PATH_SEPARATOR + key, toNative((Boolean[])((ArrayData)value).getDataArray()));
+      return NetworkTablesJNI.putBooleanArray(path + PATH_SEPARATOR + key, toNative((Boolean[])((ArrayData)value).getDataArray()));
     else if (value instanceof NumberArray)
-      NetworkTablesJNI.putDoubleArray(path + PATH_SEPARATOR + key, toNative((Double[])((ArrayData)value).getDataArray()));
+      return NetworkTablesJNI.putDoubleArray(path + PATH_SEPARATOR + key, toNative((Double[])((ArrayData)value).getDataArray()));
     else if (value instanceof StringArray)
-      NetworkTablesJNI.putStringArray(path + PATH_SEPARATOR + key, (String[])((ArrayData)value).getDataArray());
+      return NetworkTablesJNI.putStringArray(path + PATH_SEPARATOR + key, (String[])((ArrayData)value).getDataArray());
+    else
+      throw new IllegalArgumentException(key);
   }
 
   public void retrieveValue(String key, Object externalData) throws TableKeyNotDefinedException {
@@ -779,17 +792,21 @@ public class NetworkTable implements ITable, IRemote {
   /*
    * Deprecated Methods
    */
+
   /**
    * @deprecated
-  * Maps the specified key to the specified value in this table.
-  * The key can not be null.
-  * The value can be retrieved by calling the get method with a key that is
-  * equal to the original key.
-  * @param key the key
-  * @param value the value
-  * @throws IllegalArgumentException if key is null
-  */
-  public void putInt(String key, int value) { putNumber(key, value); }
+   * Maps the specified key to the specified value in this table.
+   * The key can not be null.
+   * The value can be retrieved by calling the get method with a key that is
+   * equal to the original key.
+   * @param key the key
+   * @param value the value
+   * @return False if the table key already exists with a different type
+   * @throws IllegalArgumentException if key is null
+   */
+  public boolean putInt(String key, int value) {
+    return putNumber(key, value);
+  }
 
   /**
    * @deprecated
@@ -833,10 +850,11 @@ public class NetworkTable implements ITable, IRemote {
    * equal to the original key.
    * @param key the key
    * @param value the value
+   * @return False if the table key already exists with a different type
    * @throws IllegalArgumentException if key is null
    */
-  public void putDouble(String key, double value) {
-    putNumber(key, value);
+  public boolean putDouble(String key, double value) {
+    return putNumber(key, value);
   }
 
   /**
