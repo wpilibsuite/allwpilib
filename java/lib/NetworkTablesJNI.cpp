@@ -859,7 +859,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
   // the shared pointer to the weak global will keep it around until the
   // entry listener is destroyed
   auto listener_global =
-      std::make_shared<JavaWeakGlobal<jobject>>(envouter, listener);
+      std::make_shared<JavaGlobal<jobject>>(envouter, listener);
 
   // cls is a temporary here; cannot be used within callback functor
 	jclass cls = envouter->GetObjectClass(listener);
@@ -884,8 +884,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 
         {
           // get the handler
-          auto handler = listener_global->obj(env);
-          if (!handler) goto done; // can happen due to weak reference
+          auto handler = listener_global->obj();
 
           // convert the value into the appropriate Java type
           jobject jobj = ToJavaObject(env, *value);
@@ -927,7 +926,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
   // the shared pointer to the weak global will keep it around until the
   // entry listener is destroyed
   auto listener_global =
-      std::make_shared<JavaWeakGlobal<jobject>>(envouter, listener);
+      std::make_shared<JavaGlobal<jobject>>(envouter, listener);
 
   // cls is a temporary here; cannot be used within callback functor
 	jclass cls = envouter->GetObjectClass(listener);
@@ -950,8 +949,8 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 
         {
           // get the handler
-          auto handler = listener_global->obj(env);
-          if (!handler) goto done; // can happen due to weak reference
+          auto handler = listener_global->obj();
+          //if (!handler) goto done; // can happen due to weak reference
 
           // convert into the appropriate Java type
           jobject jobj = ToJavaObject(env, conn);
