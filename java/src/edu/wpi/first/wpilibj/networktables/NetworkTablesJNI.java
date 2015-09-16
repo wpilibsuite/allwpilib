@@ -98,7 +98,7 @@ public class NetworkTablesJNI {
   public static native void deleteEntry(String key);
   public static native void deleteAllEntries();
 
-  // public static native EntryInfo[] getEntryInfo(String prefix, int types);
+  public static native EntryInfo[] getEntries(String prefix, int types);
 
   public static native void flush();
 

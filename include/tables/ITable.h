@@ -44,6 +44,17 @@ class ITable {
   virtual std::shared_ptr<ITable> GetSubTable(llvm::StringRef key) const = 0;
 
   /**
+   * @param types bitmask of types; 0 is treated as a "don't care".
+   * @return keys currently in the table
+   */
+  virtual std::vector<std::string> GetKeys(int types = 0) const = 0;
+
+  /**
+   * @return subtables currently in the table
+   */
+  virtual std::vector<std::string> GetSubTables() const = 0;
+
+  /**
    * Makes a key's value persistent through program restarts.
    *
    * @param key the key to make persistent

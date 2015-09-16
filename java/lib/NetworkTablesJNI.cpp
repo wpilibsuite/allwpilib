@@ -15,6 +15,7 @@ static jclass booleanCls = nullptr;
 static jclass doubleCls = nullptr;
 static jclass stringCls = nullptr;
 static jclass connectionInfoCls = nullptr;
+static jclass entryInfoCls = nullptr;
 static jclass keyNotDefinedEx = nullptr;
 static jclass persistentEx = nullptr;
 
@@ -52,6 +53,12 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   if (!connectionInfoCls) return JNI_ERR;
   env->DeleteLocalRef(local);
 
+  local = env->FindClass("edu/wpi/first/wpilibj/networktables/EntryInfo");
+  if (!local) return JNI_ERR;
+  entryInfoCls = static_cast<jclass>(env->NewGlobalRef(local));
+  if (!entryInfoCls) return JNI_ERR;
+  env->DeleteLocalRef(local);
+
   local =
       env->FindClass("edu/wpi/first/wpilibj/networktables/NetworkTableKeyNotDefined");
   keyNotDefinedEx = static_cast<jclass>(env->NewGlobalRef(local));
@@ -76,6 +83,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
   if (doubleCls) env->DeleteGlobalRef(doubleCls);
   if (stringCls) env->DeleteGlobalRef(stringCls);
   if (connectionInfoCls) env->DeleteGlobalRef(connectionInfoCls);
+  if (entryInfoCls) env->DeleteGlobalRef(entryInfoCls);
   if (keyNotDefinedEx) env->DeleteGlobalRef(keyNotDefinedEx);
   if (persistentEx) env->DeleteGlobalRef(persistentEx);
   jvm = nullptr;
@@ -345,6 +353,14 @@ static jobject ToJavaObject(JNIEnv *env, const nt::ConnectionInfo &info) {
   return env->NewObject(connectionInfoCls, constructor, remote_id.obj(),
                         remote_name.obj(), (jint)info.remote_port,
                         (jlong)info.last_update, (jint)info.protocol_version);
+}
+
+static jobject ToJavaObject(JNIEnv *env, const nt::EntryInfo &info) {
+  static jmethodID constructor =
+      env->GetMethodID(entryInfoCls, "<init>", "(Ljava/lang/String;IIJ)V");
+  JavaLocal<jstring> name(env, ToJavaString(env, info.name));
+  return env->NewObject(entryInfoCls, constructor, name.obj(), (jint)info.type,
+                        (jint)info.flags, (jlong)info.last_change);
 }
 
 //
@@ -834,6 +850,24 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
   (JNIEnv *, jclass)
 {
   nt::DeleteAllEntries();
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
+ * Method:    getEntries
+ * Signature: (Ljava/lang/String;I)[Ledu/wpi/first/wpilibj/networktables/EntryInfo;
+ */
+JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getEntries
+  (JNIEnv *env, jclass, jstring prefix, jint types)
+{
+  auto arr = nt::GetEntryInfo(JavaStringRef(env, prefix), types);
+  jobjectArray jarr = env->NewObjectArray(arr.size(), entryInfoCls, nullptr);
+  if (!jarr) return nullptr;
+  for (size_t i = 0; i < arr.size(); ++i) {
+    JavaLocal<jobject> jelem(env, ToJavaObject(env, arr[i]));
+    env->SetObjectArrayElement(jarr, i, jelem);
+  }
+  return jarr;
 }
 
 /*

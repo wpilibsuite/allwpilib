@@ -147,6 +147,17 @@ class NetworkTable : public ITable {
   bool ContainsSubTable(llvm::StringRef key) const;
 
   /**
+   * @param types bitmask of types; 0 is treated as a "don't care".
+   * @return keys currently in the table
+   */
+  std::vector<std::string> GetKeys(int types = 0) const;
+
+  /**
+   * @return subtables currently in the table
+   */
+  std::vector<std::string> GetSubTables() const;
+
+  /**
    * Makes a key's value persistent through program restarts.
    *
    * @param key the key to make persistent

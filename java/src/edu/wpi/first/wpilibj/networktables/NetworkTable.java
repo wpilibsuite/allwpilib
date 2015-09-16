@@ -367,13 +367,47 @@ public class NetworkTable implements ITable, IRemote {
   }
 
   public boolean containsSubTable(String key) {
-    String subtablePrefix = path + key + PATH_SEPARATOR;
-    //List keys = node.getEntryStore().keys();
-    //for (int i = 0; i < keys.size(); ++i) {
-    //  if (((String)keys.get(i)).startsWith(subtablePrefix))
-    //    return true;
-    //}
-    return false;
+    EntryInfo[] entries = NetworkTablesJNI.getEntries(path + PATH_SEPARATOR + key + PATH_SEPARATOR, 0);
+    return entries.length != 0;
+  }
+
+  /**
+   * @param types bitmask of types; 0 is treated as a "don't care".
+   * @return keys currently in the table
+   */
+  public Set<String> getKeys(int types) {
+    Set<String> keys = new HashSet<String>();
+    int prefixLen = path.length() + 1;
+    for (EntryInfo entry : NetworkTablesJNI.getEntries(path + PATH_SEPARATOR, types)) {
+      String relativeKey = entry.name.substring(prefixLen);
+      if (relativeKey.indexOf(PATH_SEPARATOR) != -1)
+        continue;
+      keys.add(relativeKey);
+    }
+    return keys;
+  }
+
+  /**
+   * @return keys currently in the table
+   */
+  public Set<String> getKeys() {
+    return getKeys(0);
+  }
+
+  /**
+   * @return subtables currently in the table
+   */
+  public Set<String> getSubTables() {
+    Set<String> keys = new HashSet<String>();
+    int prefixLen = path.length() + 1;
+    for (EntryInfo entry : NetworkTablesJNI.getEntries(path + PATH_SEPARATOR, 0)) {
+      String relativeKey = entry.name.substring(prefixLen);
+      int endSubTable = relativeKey.indexOf(PATH_SEPARATOR);
+      if (endSubTable == -1)
+        continue;
+      keys.add(relativeKey.substring(0, endSubTable));
+    }
+    return keys;
   }
 
   /**

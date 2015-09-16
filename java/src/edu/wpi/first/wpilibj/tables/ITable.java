@@ -1,6 +1,7 @@
 package edu.wpi.first.wpilibj.tables;
 
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 
 /**
@@ -29,6 +30,22 @@ public interface ITable {
    * @return a sub table relative to this one
    */
   public ITable getSubTable(String key);
+
+  /**
+   * @param types bitmask of types; 0 is treated as a "don't care".
+   * @return keys currently in the table
+   */
+  public Set<String> getKeys(int types);
+
+  /**
+   * @return keys currently in the table
+   */
+  public Set<String> getKeys();
+
+  /**
+   * @return subtables currently in the table
+   */
+  public Set<String> getSubTables();
 
   /**
    * Makes a key's value persistent through program restarts.

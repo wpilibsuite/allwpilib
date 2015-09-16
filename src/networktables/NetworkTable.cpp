@@ -161,6 +161,32 @@ bool NetworkTable::ContainsSubTable(StringRef key) const {
   return !nt::GetEntryInfo(path, 0).empty();
 }
 
+std::vector<std::string> NetworkTable::GetKeys(int types) const {
+  std::vector<std::string> keys;
+  llvm::SmallString<128> path(m_path);
+  path += PATH_SEPARATOR_CHAR;
+  for (auto& entry : nt::GetEntryInfo(path, types)) {
+    auto relative_key = StringRef(entry.name).substr(path.size());
+    if (relative_key.find(PATH_SEPARATOR_CHAR) != StringRef::npos)
+      continue;
+    keys.push_back(relative_key);
+  }
+  return keys;
+}
+
+std::vector<std::string> NetworkTable::GetSubTables() const {
+  std::vector<std::string> keys;
+  llvm::SmallString<128> path(m_path);
+  path += PATH_SEPARATOR_CHAR;
+  for (auto& entry : nt::GetEntryInfo(path, 0)) {
+    auto relative_key = StringRef(entry.name).substr(path.size());
+    std::size_t end_subtable = relative_key.find(PATH_SEPARATOR_CHAR);
+    if (end_subtable == StringRef::npos) continue;
+    keys.push_back(relative_key.substr(0, end_subtable));
+  }
+  return keys;
+}
+
 void NetworkTable::SetPersistent(StringRef key) {
   SetFlags(key, NT_PERSISTENT);
 }
