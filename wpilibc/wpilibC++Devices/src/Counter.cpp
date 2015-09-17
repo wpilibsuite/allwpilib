@@ -50,7 +50,7 @@ DEPRECATED(
     "Raw pointers are deprecated; if you just want to construct a Counter with "
     "its own DigitalSource, then call the Counter(int channel). If you want to "
     "keep your own copy of the DigitalSource, use std::shared_ptr.")
-Counter::Counter(DigitalSource *source) : Counter() {
+Counter::Counter(DigitalSource *source) : Counter(kTwoPulse) {
   SetUpSource(source);
   ClearDownSource();
 }
@@ -67,7 +67,7 @@ Counter::Counter(DigitalSource *source) : Counter() {
  * @param source A pointer to the existing DigitalSource object. It will be
  * set as the Up Source.
  */
-Counter::Counter(std::shared_ptr<DigitalSource> source) : Counter() {
+Counter::Counter(std::shared_ptr<DigitalSource> source) : Counter(kTwoPulse) {
   SetUpSource(source);
   ClearDownSource();
 }
@@ -80,7 +80,7 @@ Counter::Counter(std::shared_ptr<DigitalSource> source) : Counter() {
  * @param channel The DIO channel to use as the up source. 0-9 are on-board,
  * 10-25 are on the MXP
  */
-Counter::Counter(int32_t channel) : Counter() {
+Counter::Counter(int32_t channel) : Counter(kTwoPulse) {
   SetUpSource(channel);
   ClearDownSource();
 }
@@ -95,7 +95,7 @@ Counter::Counter(int32_t channel) : Counter() {
  */
 DEPRECATED(
     "Raw pointers are deprecated. Use pass-by-reference instead.")
-Counter::Counter(AnalogTrigger *trigger) : Counter() {
+Counter::Counter(AnalogTrigger *trigger) : Counter(kTwoPulse) {
   SetUpSource(trigger->CreateOutput(kState));
   ClearDownSource();
 }
@@ -108,7 +108,7 @@ Counter::Counter(AnalogTrigger *trigger) : Counter() {
  * The counter will start counting immediately.
  * @param trigger The reference to the existing AnalogTrigger object.
  */
-Counter::Counter(const AnalogTrigger &trigger) : Counter() {
+Counter::Counter(const AnalogTrigger &trigger) : Counter(kTwoPulse) {
   SetUpSource(trigger.CreateOutput(kState));
   ClearDownSource();
 }
