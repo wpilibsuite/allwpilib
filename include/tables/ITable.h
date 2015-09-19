@@ -221,6 +221,12 @@ class ITable {
                                 bool immediateNotify) = 0;
 
   /**
+   * This will immediately notify the listener of all current sub tables
+   * @param listener the listener to add
+   */
+  virtual void AddSubTableListener(ITableListener* listener) = 0;
+
+  /**
    * Remove a listener from receiving table events
    *
    * @param listener the listener to be removed

@@ -139,6 +139,7 @@ class NetworkTable : public ITable {
   void AddTableListener(ITableListener* listener, bool immediateNotify);
   void AddTableListener(llvm::StringRef key, ITableListener* listener,
                         bool immediateNotify);
+  void AddSubTableListener(ITableListener* listener);
   void RemoveTableListener(ITableListener* listener);
 
   /**
