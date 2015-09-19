@@ -13,13 +13,14 @@ std::string NetworkTable::s_ip_address;
 std::string NetworkTable::s_persistent_filename = "networktables.ini";
 bool NetworkTable::s_client = false;
 bool NetworkTable::s_running = false;
+unsigned int NetworkTable::s_port = NT_DEFAULT_PORT;
 
 void NetworkTable::Initialize() {
   if (s_running) Shutdown();
   if (s_client)
-    nt::StartClient(s_ip_address.c_str(), NT_DEFAULT_PORT);
+    nt::StartClient(s_ip_address.c_str(), s_port);
   else
-    nt::StartServer(s_persistent_filename, "", NT_DEFAULT_PORT);
+    nt::StartServer(s_persistent_filename, "", s_port);
   s_running = true;
 }
 
@@ -47,6 +48,8 @@ void NetworkTable::SetTeam(int team) {
 }
 
 void NetworkTable::SetIPAddress(StringRef address) { s_ip_address = address; }
+
+void NetworkTable::SetPort(unsigned int port) { s_port = port; }
 
 void NetworkTable::SetPersistentFilename(StringRef filename) {
   s_persistent_filename = filename;

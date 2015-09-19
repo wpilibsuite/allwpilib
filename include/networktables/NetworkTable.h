@@ -20,6 +20,7 @@ class NetworkTable : public ITable {
   static std::string s_persistent_filename;
   static bool s_client;
   static bool s_running;
+  static unsigned int s_port;
 
  public:
   NetworkTable(llvm::StringRef path, const private_init&);
@@ -62,6 +63,12 @@ class NetworkTable : public ITable {
    * mode
    */
   static void SetIPAddress(llvm::StringRef address);
+
+  /**
+   * @param port the port number that network tables will connect to in client
+   * mode or listen to in server mode
+   */
+  static void SetPort(unsigned int port);
 
   /**
    * Sets the persistent filename.
