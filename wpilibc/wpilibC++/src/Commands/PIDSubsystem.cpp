@@ -34,7 +34,7 @@ PIDSubsystem::PIDSubsystem(const std::string &name, double p, double i, double d
 PIDSubsystem::PIDSubsystem(const std::string &name, double p, double i, double d,
                            double f)
     : Subsystem(name) {
-  m_controller = std::make_unique<PIDController>(p, i, d, f, this, this);
+  m_controller = std::make_shared<PIDController>(p, i, d, f, this, this);
 }
 
 /**
@@ -51,7 +51,7 @@ PIDSubsystem::PIDSubsystem(const std::string &name, double p, double i, double d
 PIDSubsystem::PIDSubsystem(const std::string &name, double p, double i, double d,
                            double f, double period)
     : Subsystem(name) {
-  m_controller = std::make_unique<PIDController>(p, i, d, f, this, this, period);
+  m_controller = std::make_shared<PIDController>(p, i, d, f, this, this, period);
 }
 
 /**
@@ -64,7 +64,7 @@ PIDSubsystem::PIDSubsystem(const std::string &name, double p, double i, double d
  */
 PIDSubsystem::PIDSubsystem(double p, double i, double d)
     : Subsystem("PIDSubsystem") {
-  m_controller = std::make_unique<PIDController>(p, i, d, this, this);
+  m_controller = std::make_shared<PIDController>(p, i, d, this, this);
 }
 
 /**
@@ -78,7 +78,7 @@ PIDSubsystem::PIDSubsystem(double p, double i, double d)
  */
 PIDSubsystem::PIDSubsystem(double p, double i, double d, double f)
     : Subsystem("PIDSubsystem") {
-  m_controller = std::make_unique<PIDController>(p, i, d, f, this, this);
+  m_controller = std::make_shared<PIDController>(p, i, d, f, this, this);
 }
 
 /**
@@ -96,7 +96,7 @@ PIDSubsystem::PIDSubsystem(double p, double i, double d, double f)
 PIDSubsystem::PIDSubsystem(double p, double i, double d, double f,
                            double period)
     : Subsystem("PIDSubsystem") {
-  m_controller = std::make_unique<PIDController>(p, i, d, f, this, this, period);
+  m_controller = std::make_shared<PIDController>(p, i, d, f, this, this, period);
 }
 
 /**
