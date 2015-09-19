@@ -10,6 +10,7 @@ using llvm::StringRef;
 
 const char NetworkTable::PATH_SEPARATOR_CHAR = '/';
 std::string NetworkTable::s_ip_address;
+std::string NetworkTable::s_persistent_filename = "networktables.ini";
 bool NetworkTable::s_client = false;
 bool NetworkTable::s_running = false;
 
@@ -18,7 +19,7 @@ void NetworkTable::Initialize() {
   if (s_client)
     nt::StartClient(s_ip_address.c_str(), NT_DEFAULT_PORT);
   else
-    nt::StartServer("networktables.ini", "", NT_DEFAULT_PORT);
+    nt::StartServer(s_persistent_filename, "", NT_DEFAULT_PORT);
   s_running = true;
 }
 
@@ -46,6 +47,10 @@ void NetworkTable::SetTeam(int team) {
 }
 
 void NetworkTable::SetIPAddress(StringRef address) { s_ip_address = address; }
+
+void NetworkTable::SetPersistentFilename(StringRef filename) {
+  s_persistent_filename = filename;
+}
 
 void NetworkTable::SetNetworkIdentity(StringRef name) {
   nt::SetNetworkIdentity(name);

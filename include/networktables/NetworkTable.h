@@ -17,6 +17,7 @@ class NetworkTable : public ITable {
   std::vector<Listener> m_listeners;
 
   static std::string s_ip_address;
+  static std::string s_persistent_filename;
   static bool s_client;
   static bool s_running;
 
@@ -61,6 +62,13 @@ class NetworkTable : public ITable {
    * mode
    */
   static void SetIPAddress(llvm::StringRef address);
+
+  /**
+   * Sets the persistent filename.
+   * @param filename the filename that the network tables server uses for
+   * automatic loading and saving of persistent values
+   */
+  static void SetPersistentFilename(llvm::StringRef filename);
 
   /**
    * Sets the network identity.

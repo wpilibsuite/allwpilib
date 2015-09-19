@@ -113,6 +113,18 @@ public class NetworkTable implements ITable, IRemote {
   }
 
   /**
+   * Sets the persistent filename.
+   * @param filename the filename that the network tables server uses for
+   * automatic loading and saving of persistent values
+   */
+  public synchronized static void setPersistentFilename(final String filename) {
+    if (persistentFilename == filename)
+      return;
+    checkInit();
+    persistentFilename = filename;
+  }
+
+  /**
    * Sets the network identity.
    * This is provided in the connection info on the remote end.
    * @param name identity
