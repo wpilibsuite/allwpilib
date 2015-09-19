@@ -41,7 +41,7 @@ public class NetworkTable implements ITable, IRemote {
     if (client)
       NetworkTablesJNI.startClient(ipAddress, port);
     else
-      NetworkTablesJNI.startServer(persistentFilename, ipAddress, port);
+      NetworkTablesJNI.startServer(persistentFilename, "", port);
     running = true;
   }
 
