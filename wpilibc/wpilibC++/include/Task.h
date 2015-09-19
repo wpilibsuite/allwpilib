@@ -15,9 +15,8 @@
 #include <string>
 
 /**
- * WPI task is a wrapper for the native Task object.
- * All WPILib tasks are managed by a static task manager for simplified cleanup.
- **/
+ * Wrapper class around std::thread that allows changing thread priority
+ */
 class Task : public ErrorBase {
  public:
   static const uint32_t kDefaultPriority = 60;
@@ -42,10 +41,6 @@ class Task : public ErrorBase {
 
   int32_t GetPriority();
 
-  /**
-   * @param priority The priority at which the internal thread should run.
-   *                 Must be within range 1 to 99 inclusive for pthreads.
-   */
   bool SetPriority(int32_t priority);
 
   std::string GetName() const;

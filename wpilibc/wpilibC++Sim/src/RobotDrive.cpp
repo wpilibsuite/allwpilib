@@ -180,16 +180,24 @@ RobotDrive::~RobotDrive()
 }
 
 /**
- * Drive the motors at "speed" and "curve".
+ * Drive the motors at "outputMagnitude" and "curve".
+ * Both outputMagnitude and curve are -1.0 to +1.0 values, where 0.0 represents
+ * stopped and not turning. curve < 0 will turn left and curve > 0 will turn
+ * right.
  *
- * The speed and curve are -1.0 to +1.0 values where 0.0 represents stopped and
- * not turning. The algorithm for adding in the direction attempts to provide a constant
- * turn radius for differing speeds.
+ * The algorithm for steering provides a constant turn radius for any normal
+ * speed range, both forward and backward. Increasing m_sensitivity causes
+ * sharper turns for fixed values of curve.
  *
  * This function will most likely be used in an autonomous routine.
  *
- * @param outputMagnitude The forward component of the output magnitude to send to the motors.
- * @param curve The rate of turn, constant for different forward speeds.
+ * @param outputMagnitude The speed setting for the outside wheel in a turn,
+ *        forward or backwards, +1 to -1.
+ * @param curve The rate of turn, constant for different forward speeds. Set
+ *        curve < 0 for left turn or curve > 0 for right turn.
+ * Set curve = e^(-r/w) to get a turn radius r for wheelbase w of your robot.
+ * Conversely, turn radius r = -ln(curve)*w for a given value of curve and
+ * wheelbase w.
  */
 void RobotDrive::Drive(float outputMagnitude, float curve)
 {
