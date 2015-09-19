@@ -6,10 +6,6 @@ apply plugin: 'java'
 apply plugin: 'cpp'
 apply plugin: 'visual-studio'
 
-def armjdkDownloadSite = 'http://www.oracle.com/technetwork/java/javase/downloads/jdk8-arm-downloads-2187472.html'
-def armjdkFolder = 'jdk-linux-arm-vfp-sflt'
-def armjdkVersion = 'jdk1.8.0_33'
-def armjdkLocation = System.getProperty("user.home") + File.separator + armjdkFolder + File.separator + armjdkVersion
 def generatedJNIHeaderLoc = 'build/include'
 
 def platformSpecificIncludeFlag(loc, cppCompiler) {
@@ -124,15 +120,17 @@ model {
 
           if (!project.hasProperty('skipJava')) {
             if (targetPlatform == platforms.arm) {
-              dependsOn verifyArmJre
-
-              // JDK is included for jni.h. We also need the arm-linux specific headers.
+              // ARM JDK is included for jni.h. We also need the arm-linux specific headers.
               // This does not need to change when compiling on Windows
               // The JNI headers are put into the build/include directory by the jniHeaders task
-              // There is also only the one cross compiler for the arm platform, so we directly set
-              // the include flags here without using the helper function
-              cppCompiler.args '-I', "${armjdkLocation}/include"
-              cppCompiler.args '-I', "${armjdkLocation}/include/linux"
+              sources {
+                arm(CppSourceSet) {
+                  source {
+                    includes "java/arm-linux"
+                    includes "java/arm-linux/linux"
+                  }
+                }
+              }
             } else {
               def jdkLocation = org.gradle.internal.jvm.Jvm.current().javaHome
               platformSpecificIncludeFlag("${jdkLocation}/include", cppCompiler)
@@ -256,23 +254,6 @@ task jniHeadersNetworkTables {
 
 clean {
   delete generatedJNIHeaderLoc
-}
-
-// Ensures that the ARM JNI headers have been downloaded and are in the correct location for generating the JNI build
-task verifyArmJre {
-  description = 'Verifies that the ARM JDK is downloaded in the user directory'
-  group = 'WPILib'
-  def outputFolder = new File(armjdkLocation)
-  outputs.file outputFolder
-  doLast {
-    if (!outputFolder.exists() && !outputFolder.isDirectory()) {
-      def errorMessage = 'The ARM JDK was not found. Please install the JDK in the following location:' +
-        System.lineSeparator() + armjdkLocation +
-        System.lineSeparator() + 'You can download the JDK here:' +
-        System.lineSeparator() + armjdkDownloadSite
-      throw new GradleException(errorMessage)
-    }
-  }
 }
 
 }  // skipJava
