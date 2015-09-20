@@ -15,7 +15,11 @@ public class NetworkTablesJNI {
     if (!libraryLoaded) {
       try {
         String osname = System.getProperty("os.name");
-        String resname = "/" + osname + "/" + System.getProperty("os.arch") + "/";
+        String resname;
+        if (osname.startsWith("Windows"))
+          resname = "/Windows/" + System.getProperty("os.arch") + "/";
+        else
+          resname = "/" + osname + "/" + System.getProperty("os.arch") + "/";
         System.out.println("platform: " + resname);
         if (osname.startsWith("Windows"))
           resname += "ntcore.dll";
