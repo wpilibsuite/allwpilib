@@ -1,32 +1,8 @@
 apply plugin: 'java'
-apply plugin: 'maven-publish'
 
 group = "edu.wpi.frc.wpilib"
 version = "2.0"
 archivesBaseName = 'NetworkTables'
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            from components.java
-            artifact (networktablesSource) {
-                classifier = 'sources'
-            }
-            artifact (networktablesJavadoc) {
-                classifier = 'javadoc'
-            }
-
-            groupId 'edu.wpi.first.wpilib.networktables.java'
-            artifactId 'NetworkTables'
-            version '0.1.0-SNAPSHOT'
-        }
-    }
-    repositories {
-        maven {
-            url "file://${System.properties['user.home']}/releases/maven"
-        }
-    }
-}
 
 sourceSets {
     main {

@@ -5,7 +5,8 @@
 package edu.wpi.first.tableviewer;
 
 import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.networktables.NetworkTableProvider;
+import edu.wpi.first.wpilibj.networktables2.NetworkTableNode;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import org.netbeans.swing.outline.Outline;
@@ -29,13 +30,13 @@ public abstract class AbstractTreeNode extends DefaultMutableTreeNode {
         AbstractTreeNode.outline = outline;
     }
 
-    public AbstractTreeNode(String key, TableEntryData data) {
+    public AbstractTreeNode(NetworkTableNode node, String key, TableEntryData data) {
         super(data);
         this.data = data;
         if (treeModel != null) {
             treeModel.reload(this);
         }
-        table = NetworkTable.getTable(key);
+        table = new NetworkTableProvider(node).getTable(key);
     }
 
     /**

@@ -69,7 +69,7 @@
                                 <artifactItem>
                                     <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
                                     <artifactId>NetworkTables</artifactId>
-                                    <version>0.1.0-SNAPSHOT</version>
+                                    <version>3.0.0-SNAPSHOT</version>
                                     <type>jar</type>
                                     <destFileName>NetworkTables.jar</destFileName>
                                     <outputDirectory>${java-zip}/lib</outputDirectory>

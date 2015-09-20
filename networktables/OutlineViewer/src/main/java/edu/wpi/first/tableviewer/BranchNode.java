@@ -8,6 +8,7 @@ import edu.wpi.first.tableviewer.dialog.AddArrayDialog;
 import edu.wpi.first.tableviewer.dialog.AddBooleanDialog;
 import edu.wpi.first.tableviewer.dialog.AddNumberDialog;
 import edu.wpi.first.tableviewer.dialog.AddStringDialog;
+import edu.wpi.first.wpilibj.networktables2.NetworkTableNode;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JMenuItem;
@@ -24,8 +25,8 @@ public class BranchNode extends AbstractTreeNode {
 
     private final String name;
 
-    public BranchNode(String key, String name) {
-        super(key, new TableEntryData(name, null));
+    public BranchNode(NetworkTableNode node, String key, String name) {
+        super(node, key, new TableEntryData(name, null));
         this.name = name;
     }
 
