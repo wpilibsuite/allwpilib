@@ -26,8 +26,8 @@ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
  * @author jonathanleitschuh
  *
  */
-public class PrefrencesTest extends AbstractComsSetup {
-  private static final Logger logger = Logger.getLogger(PrefrencesTest.class.getName());
+public class PreferencesTest extends AbstractComsSetup {
+  private static final Logger logger = Logger.getLogger(PreferencesTest.class.getName());
 
   private NetworkTable prefTable;
   private Preferences pref;
