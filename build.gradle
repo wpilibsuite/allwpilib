@@ -1,7 +1,8 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 
 if (!project.hasProperty('skipJava')) {
-apply plugin: 'java'
+  apply plugin: 'java'
+  apply plugin: 'maven-publish'
 }
 apply plugin: 'cpp'
 apply plugin: 'visual-studio'
@@ -183,83 +184,101 @@ model {
 
 if (!project.hasProperty('skipJava')) {
 
-compileJava {
-  options.compilerArgs << "-Xlint:unchecked"
-}
-
-sourceSets {
-  main {
-    java {
-      srcDirs = ["java/src"]
-    }
-  }
-}
-
-jar {
-  description = 'Generates NetworkTables jar, with the JNI shared libraries embedded'
-  dependsOn { armNtcoreSharedLibrary }
-  dependsOn { x64NtcoreSharedLibrary }
-  dependsOn { x86NtcoreSharedLibrary }
-  dependsOn { classes }
-  binaries.withType(SharedLibraryBinary) { binary ->
-    from(file(binary.sharedLibraryFile)) {
-      if (binary.targetPlatform == platforms.arm) {
-        into "Linux/arm"
-      } else if (binary.targetPlatform.operatingSystem.name == "Linux") {
-        if (binary.targetPlatform.architecture.name == "x86-64") {
-          into "Linux/amd64"
-        } else {
-          into "Linux/" + binary.targetPlatform.architecture.name
+  publishing {
+    publications {
+      java(MavenPublication) {
+        artifact jar
+        artifact (networktablesJavaSource) {
+          classifier = 'sources'
         }
-      } else if (binary.targetPlatform.operatingSystem.name.startsWith("Windows")) {
-        if (binary.targetPlatform.architecture.name == "x86-64") {
-          into "Windows/amd64"
-        } else {
-          into "Windows/" + binary.targetPlatform.architecture.name
+        artifact(networktablesJavadoc) {
+          classifier = 'javadoc'
         }
-      } else {
-        into binary.targetPlatform.operatingSystem.name + "/" + binary.targetPlatform.architecture.name
+
+        groupId 'edu.wpi.first.wpilib.networktables.java'
+        artifactId 'NetworkTables'
+        version '3.0.0-SNAPSHOT'
       }
     }
   }
-}
 
-task networktablesJavaSource(type: Jar, dependsOn: classes) {
-  description = 'Generates the source jar for NetworkTables java'
-  group = 'WPILib'
-  classifier = 'classes'
-  from sourceSets.main.allJava
-}
+  compileJava {
+    options.compilerArgs << "-Xlint:unchecked"
+  }
 
-task networktablesJavadoc(type: Jar, dependsOn: javadoc) {
-  description = 'Generates the javadoc jar for NetworkTables java'
-  group = 'WPILib'
-  classifier = 'javadoc'
-  from javadoc.destinationDir
-}
-
-/**
- * Generates the JNI headers
- */
-task jniHeadersNetworkTables {
-  description = 'Generates JNI headers from edu.wpi.first.wpilibj.networktables.*'
-  group = 'WPILib'
-  def outputFolder = file(generatedJNIHeaderLoc)
-  inputs.files sourceSets.main.output
-  outputs.file outputFolder
-  doLast {
-    outputFolder.mkdirs()
-    exec {
-      executable org.gradle.internal.jvm.Jvm.current().getExecutable('javah')
-      args '-d', outputFolder
-      args '-classpath', sourceSets.main.output.classesDir
-      args 'edu.wpi.first.wpilibj.networktables.NetworkTablesJNI'
+  sourceSets {
+    main {
+      java {
+        srcDirs = ["java/src"]
+      }
     }
   }
-}
 
-clean {
-  delete generatedJNIHeaderLoc
-}
+  jar {
+    description = 'Generates NetworkTables jar, with the JNI shared libraries embedded'
+    dependsOn { armNtcoreSharedLibrary }
+    dependsOn { x64NtcoreSharedLibrary }
+    dependsOn { x86NtcoreSharedLibrary }
+    dependsOn { classes }
+    binaries.withType(SharedLibraryBinary) { binary ->
+      from(file(binary.sharedLibraryFile)) {
+        if (binary.targetPlatform == platforms.arm) {
+          into "Linux/arm"
+        } else if (binary.targetPlatform.operatingSystem.name == "Linux") {
+          if (binary.targetPlatform.architecture.name == "x86-64") {
+            into "Linux/amd64"
+          } else {
+            into "Linux/" + binary.targetPlatform.architecture.name
+          }
+        } else if (binary.targetPlatform.operatingSystem.name.startsWith("Windows")) {
+          if (binary.targetPlatform.architecture.name == "x86-64") {
+            into "Windows/amd64"
+          } else {
+            into "Windows/" + binary.targetPlatform.architecture.name
+          }
+        } else {
+          into binary.targetPlatform.operatingSystem.name + "/" + binary.targetPlatform.architecture.name
+        }
+      }
+    }
+  }
+
+  task networktablesJavaSource(type: Jar, dependsOn: classes) {
+    description = 'Generates the source jar for NetworkTables java'
+    group = 'WPILib'
+    classifier = 'classes'
+    from sourceSets.main.allJava
+  }
+
+  task networktablesJavadoc(type: Jar, dependsOn: javadoc) {
+    description = 'Generates the javadoc jar for NetworkTables java'
+    group = 'WPILib'
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+  }
+
+  /**
+   * Generates the JNI headers
+   */
+  task jniHeadersNetworkTables {
+    description = 'Generates JNI headers from edu.wpi.first.wpilibj.networktables.*'
+    group = 'WPILib'
+    def outputFolder = file(generatedJNIHeaderLoc)
+    inputs.files sourceSets.main.output
+    outputs.file outputFolder
+    doLast {
+      outputFolder.mkdirs()
+      exec {
+        executable org.gradle.internal.jvm.Jvm.current().getExecutable('javah')
+        args '-d', outputFolder
+        args '-classpath', sourceSets.main.output.classesDir
+        args 'edu.wpi.first.wpilibj.networktables.NetworkTablesJNI'
+      }
+    }
+  }
+
+  clean {
+    delete generatedJNIHeaderLoc
+  }
 
 }  // skipJava
