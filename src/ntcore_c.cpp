@@ -169,14 +169,15 @@ void NT_Flush(void) { nt::Flush(); }
 unsigned int NT_AddEntryListener(const char *prefix, size_t prefix_len,
                                  void *data,
                                  NT_EntryListenerCallback callback,
-                                 int immediate_notify) {
+                                 int immediate_notify, int local_notify) {
   return nt::AddEntryListener(
       StringRef(prefix, prefix_len),
       [=](unsigned int uid, StringRef name, std::shared_ptr<Value> value,
           bool is_new) {
         callback(uid, data, name.data(), name.size(), &value->value(), is_new);
       },
-      immediate_notify != 0);
+      immediate_notify != 0,
+      local_notify != 0);
 }
 
 void NT_RemoveEntryListener(unsigned int entry_listener_uid) {

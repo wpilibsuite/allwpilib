@@ -888,7 +888,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
  */
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_addEntryListener
   (JNIEnv *envouter, jclass, jstring prefix, jobject listener,
-   jboolean immediateNotify)
+   jboolean immediateNotify, jboolean localNotify)
 {
   // the shared pointer to the weak global will keep it around until the
   // entry listener is destroyed
@@ -935,7 +935,8 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 done:
         jvm->DetachCurrentThread();
       },
-      immediateNotify != JNI_FALSE);
+      immediateNotify != JNI_FALSE,
+      localNotify != JNI_FALSE);
 }
 
 /*

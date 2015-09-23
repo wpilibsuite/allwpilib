@@ -14,6 +14,7 @@ bool Notifier::s_destroyed = false;
 
 Notifier::Notifier() {
   m_active = false;
+  m_local_notifiers = false;
   s_destroyed = false;
 }
 
@@ -64,9 +65,10 @@ void Notifier::ThreadMain() {
 
       // Use index because iterator might get invalidated.
       for (std::size_t i=0; i<m_entry_listeners.size(); ++i) {
-        if (!m_entry_listeners[i].second) continue;  // removed
-        if (!name.startswith(m_entry_listeners[i].first)) continue;
-        auto callback = m_entry_listeners[i].second;
+        if (!m_entry_listeners[i].callback) continue;  // removed
+        if (item.is_local && !m_entry_listeners[i].local_notify) continue;
+        if (!name.startswith(m_entry_listeners[i].prefix)) continue;
+        auto callback = m_entry_listeners[i].callback;
         // Don't hold mutex during callback execution!
         lock.unlock();
         callback(i+1, name, item.value, item.is_new);
@@ -101,10 +103,12 @@ void Notifier::ThreadMain() {
 }
 
 unsigned int Notifier::AddEntryListener(StringRef prefix,
-                                        EntryListenerCallback callback) {
+                                        EntryListenerCallback callback,
+                                        bool local_notify) {
   std::lock_guard<std::mutex> lock(m_mutex);
   unsigned int uid = m_entry_listeners.size();
-  m_entry_listeners.emplace_back(prefix, callback);
+  m_entry_listeners.emplace_back(prefix, callback, local_notify);
+  if (local_notify) m_local_notifiers = true;
   return uid + 1;
 }
 
@@ -112,14 +116,16 @@ void Notifier::RemoveEntryListener(unsigned int entry_listener_uid) {
   --entry_listener_uid;
   std::lock_guard<std::mutex> lock(m_mutex);
   if (entry_listener_uid < m_entry_listeners.size())
-    m_entry_listeners[entry_listener_uid].second = nullptr;
+    m_entry_listeners[entry_listener_uid].callback = nullptr;
 }
 
 void Notifier::NotifyEntry(StringRef name, std::shared_ptr<Value> value,
-                           bool is_new, EntryListenerCallback only) {
+                           bool is_new, bool is_local,
+                           EntryListenerCallback only) {
   if (!m_active) return;
+  if (is_local && !m_local_notifiers) return;  // optimization
   std::unique_lock<std::mutex> lock(m_mutex);
-  m_entry_notifications.emplace(name, value, is_new, only);
+  m_entry_notifications.emplace(name, value, is_new, is_local, only);
   lock.unlock();
   m_cond.notify_one();
 }

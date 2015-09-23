@@ -189,7 +189,7 @@ typedef std::function<void(unsigned int uid, bool connected,
     ConnectionListenerCallback;
 
 unsigned int AddEntryListener(StringRef prefix, EntryListenerCallback callback,
-                              bool immediate_notify);
+                              bool immediate_notify, bool local_notify);
 void RemoveEntryListener(unsigned int entry_listener_uid);
 unsigned int AddConnectionListener(ConnectionListenerCallback callback,
                                    bool immediate_notify);

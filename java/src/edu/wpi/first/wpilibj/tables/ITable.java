@@ -310,6 +310,16 @@ public interface ITable {
    */
   public void addTableListener(ITableListener listener,
                                boolean immediateNotify);
+  /**
+   * Add a listener for changes to the table
+   * @param listener the listener to add
+   * @param immediateNotify if true then this listener will be notified of all
+   * current entries (marked as new)
+   * @param localNotify if true then this listener will be notified of all
+   * local changes in addition to all remote changes
+   */
+  public void addTableListener(ITableListener listener, boolean immediateNotify,
+                               boolean localNotify);
 
   /**
    * Add a listener for changes to a specific key the table
@@ -321,10 +331,29 @@ public interface ITable {
   public void addTableListener(String key, ITableListener listener,
                                boolean immediateNotify);
   /**
+   * Add a listener for changes to a specific key the table
+   * @param key the key to listen for
+   * @param listener the listener to add
+   * @param immediateNotify if true then this listener will be notified of all
+   * current entries (marked as new)
+   * @param localNotify if true then this listener will be notified of all
+   * local changes in addition to all remote changes
+   */
+  public void addTableListener(String key, ITableListener listener,
+                               boolean immediateNotify, boolean localNotify);
+  /**
    * This will immediately notify the listener of all current sub tables
    * @param listener
    */
   public void addSubTableListener(final ITableListener listener);
+  /**
+   * This will immediately notify the listener of all current sub tables
+   * @param listener
+   * @param localNotify if true then this listener will be notified of all
+   * local changes in addition to all remote changes
+   */
+  public void addSubTableListener(final ITableListener listener,
+                                  boolean localNotify);
   /**
    * Remove a listener from receiving table events
    * @param listener the listener to be removed

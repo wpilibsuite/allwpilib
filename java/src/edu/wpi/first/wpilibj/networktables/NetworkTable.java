@@ -240,7 +240,12 @@ public class NetworkTable implements ITable, IRemote {
   }
 
   public void addTableListener(ITableListener listener) {
-    addTableListener(listener, false);
+    addTableListener(listener, false, false);
+  }
+
+  public void addTableListener(ITableListener listener,
+                               boolean immediateNotify) {
+    addTableListener(listener, immediateNotify, false);
   }
 
   private class TableListenerAdapter extends ListenerBase implements NetworkTablesJNI.EntryListenerFunction {
@@ -264,7 +269,8 @@ public class NetworkTable implements ITable, IRemote {
 
   private final Hashtable<ITableListener,List<ListenerBase>> listenerMap = new Hashtable<ITableListener,List<ListenerBase>>();
   public synchronized void addTableListener(ITableListener listener,
-                                            boolean immediateNotify) {
+                                            boolean immediateNotify,
+                                            boolean localNotify) {
     List<ListenerBase> adapters = listenerMap.get(listener);
     if (adapters == null) {
       adapters = new ArrayList<ListenerBase>();
@@ -272,8 +278,13 @@ public class NetworkTable implements ITable, IRemote {
     }
     TableListenerAdapter adapter =
         new TableListenerAdapter(path.length() + 1, this, listener);
-    adapter.uid = NetworkTablesJNI.addEntryListener(path + PATH_SEPARATOR, adapter, immediateNotify);
+    adapter.uid = NetworkTablesJNI.addEntryListener(path + PATH_SEPARATOR, adapter, immediateNotify, localNotify);
     adapters.add(adapter);
+  }
+
+  public void addTableListener(String key, ITableListener listener,
+                               boolean immediateNotify) {
+    addTableListener(key, listener, immediateNotify, false);
   }
 
   private class KeyListenerAdapter extends ListenerBase implements NetworkTablesJNI.EntryListenerFunction {
@@ -297,7 +308,8 @@ public class NetworkTable implements ITable, IRemote {
   }
 
   public synchronized void addTableListener(String key, ITableListener listener,
-                                            boolean immediateNotify) {
+                                            boolean immediateNotify,
+                                            boolean localNotify) {
     List<ListenerBase> adapters = listenerMap.get(listener);
     if (adapters == null) {
       adapters = new ArrayList<ListenerBase>();
@@ -306,8 +318,12 @@ public class NetworkTable implements ITable, IRemote {
     String fullKey = path + PATH_SEPARATOR + key;
     KeyListenerAdapter adapter =
         new KeyListenerAdapter(key, fullKey, this, listener);
-    adapter.uid = NetworkTablesJNI.addEntryListener(fullKey, adapter, immediateNotify);
+    adapter.uid = NetworkTablesJNI.addEntryListener(fullKey, adapter, immediateNotify, localNotify);
     adapters.add(adapter);
+  }
+
+  public void addSubTableListener(final ITableListener listener) {
+    addSubTableListener(listener, false);
   }
 
   private class SubListenerAdapter extends ListenerBase implements NetworkTablesJNI.EntryListenerFunction {
@@ -335,7 +351,8 @@ public class NetworkTable implements ITable, IRemote {
     }
   }
 
-  public synchronized void addSubTableListener(final ITableListener listener) {
+  public synchronized void addSubTableListener(final ITableListener listener,
+                                               boolean localNotify) {
     List<ListenerBase> adapters = listenerMap.get(listener);
     if (adapters == null) {
       adapters = new ArrayList<ListenerBase>();
@@ -343,7 +360,7 @@ public class NetworkTable implements ITable, IRemote {
     }
     SubListenerAdapter adapter =
         new SubListenerAdapter(path.length() + 1, this, listener);
-    adapter.uid = NetworkTablesJNI.addEntryListener(path + PATH_SEPARATOR, adapter, true);
+    adapter.uid = NetworkTablesJNI.addEntryListener(path + PATH_SEPARATOR, adapter, true, localNotify);
     adapters.add(adapter);
   }
 

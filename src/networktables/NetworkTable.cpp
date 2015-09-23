@@ -97,11 +97,16 @@ NetworkTable::~NetworkTable() {
 }
 
 void NetworkTable::AddTableListener(ITableListener* listener) {
-  AddTableListener(listener, false);
+  AddTableListener(listener, false, false);
 }
 
 void NetworkTable::AddTableListener(ITableListener* listener,
                                     bool immediateNotify) {
+  AddTableListener(listener, immediateNotify, false);
+}
+
+void NetworkTable::AddTableListener(ITableListener* listener,
+                                    bool immediateNotify, bool localNotify) {
   std::lock_guard<std::mutex> lock(m_mutex);
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
@@ -114,13 +119,18 @@ void NetworkTable::AddTableListener(ITableListener* listener,
         if (relative_key.find(PATH_SEPARATOR_CHAR) != StringRef::npos) return;
         listener->ValueChanged(this, relative_key, value, is_new);
       },
-      immediateNotify);
+      immediateNotify,
+      localNotify);
   m_listeners.emplace_back(listener, id);
 }
 
-void NetworkTable::AddTableListener(StringRef key,
-                                    ITableListener* listener,
+void NetworkTable::AddTableListener(StringRef key, ITableListener* listener,
                                     bool immediateNotify) {
+  AddTableListener(key, listener, immediateNotify, false);
+}
+
+void NetworkTable::AddTableListener(StringRef key, ITableListener* listener,
+                                    bool immediateNotify, bool localNotify) {
   std::lock_guard<std::mutex> lock(m_mutex);
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
@@ -133,11 +143,17 @@ void NetworkTable::AddTableListener(StringRef key,
         if (name != path) return;
         listener->ValueChanged(this, name.substr(prefix_len), value, is_new);
       },
-      immediateNotify);
+      immediateNotify,
+      localNotify);
   m_listeners.emplace_back(listener, id);
 }
 
 void NetworkTable::AddSubTableListener(ITableListener* listener) {
+  AddSubTableListener(listener, false);
+}
+
+void NetworkTable::AddSubTableListener(ITableListener* listener,
+                                       bool localNotify) {
   std::lock_guard<std::mutex> lock(m_mutex);
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
@@ -160,7 +176,8 @@ void NetworkTable::AddSubTableListener(ITableListener* listener) {
         notified_tables->insert(std::make_pair(sub_table_key, '\0'));
         listener->ValueChanged(this, sub_table_key, nullptr, true);
       },
-      true);
+      true,
+      localNotify);
   m_listeners.emplace_back(listener, id);
 }
 

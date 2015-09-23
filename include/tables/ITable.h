@@ -210,6 +210,18 @@ class ITable {
                                 bool immediateNotify) = 0;
 
   /**
+   * Add a listener for changes to the table
+   *
+   * @param listener the listener to add
+   * @param immediateNotify if true then this listener will be notified of all
+   * current entries (marked as new)
+   * @param localNotify if true then this listener will be notified of all
+   * local changes in addition to all remote changes
+   */
+  virtual void AddTableListener(ITableListener* listener, bool immediateNotify,
+                                bool localNotify) = 0;
+
+  /**
    * Add a listener for changes to a specific key the table
    *
    * @param key the key to listen for
@@ -221,10 +233,32 @@ class ITable {
                                 bool immediateNotify) = 0;
 
   /**
+   * Add a listener for changes to a specific key the table
+   *
+   * @param key the key to listen for
+   * @param listener the listener to add
+   * @param immediateNotify if true then this listener will be notified of all
+   * current entries (marked as new)
+   * @param localNotify if true then this listener will be notified of all
+   * local changes in addition to all remote changes
+   */
+  virtual void AddTableListener(llvm::StringRef key, ITableListener* listener,
+                                bool immediateNotify, bool localNotify) = 0;
+
+  /**
    * This will immediately notify the listener of all current sub tables
    * @param listener the listener to add
    */
   virtual void AddSubTableListener(ITableListener* listener) = 0;
+
+  /**
+   * This will immediately notify the listener of all current sub tables
+   * @param listener the listener to add
+   * @param localNotify if true then this listener will be notified of all
+   * local changes in addition to all remote changes
+   */
+  virtual void AddSubTableListener(ITableListener* listener,
+                                   bool localNotify) = 0;
 
   /**
    * Remove a listener from receiving table events

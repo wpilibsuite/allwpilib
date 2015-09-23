@@ -37,11 +37,12 @@ class Notifier {
   static bool destroyed() { return s_destroyed; }
 
   unsigned int AddEntryListener(StringRef prefix,
-                                EntryListenerCallback callback);
+                                EntryListenerCallback callback,
+                                bool local_notify);
   void RemoveEntryListener(unsigned int entry_listener_uid);
 
   void NotifyEntry(StringRef name, std::shared_ptr<Value> value, bool is_new,
-                   EntryListenerCallback only = nullptr);
+                   bool is_local, EntryListenerCallback only = nullptr);
 
   unsigned int AddConnectionListener(ConnectionListenerCallback callback);
   void RemoveConnectionListener(unsigned int conn_listener_uid);
@@ -55,20 +56,36 @@ class Notifier {
   void ThreadMain();
 
   std::atomic_bool m_active;
+  std::atomic_bool m_local_notifiers;
 
   std::mutex m_mutex;
   std::condition_variable m_cond;
-  std::vector<std::pair<std::string, EntryListenerCallback>> m_entry_listeners;
+
+  struct EntryListener {
+    EntryListener(StringRef prefix_, EntryListenerCallback callback_,
+                  bool local_notify_)
+        : prefix(prefix_), callback(callback_), local_notify(local_notify_) {}
+
+    std::string prefix;
+    EntryListenerCallback callback;
+    bool local_notify;
+  };
+  std::vector<EntryListener> m_entry_listeners;
   std::vector<ConnectionListenerCallback> m_conn_listeners;
 
   struct EntryNotification {
     EntryNotification(StringRef name_, std::shared_ptr<Value> value_,
-                      bool is_new_, EntryListenerCallback only_)
-        : name(name_), value(value_), is_new(is_new_), only(only_) {}
+                      bool is_new_, bool is_local_, EntryListenerCallback only_)
+        : name(name_),
+          value(value_),
+          is_new(is_new_),
+          is_local(is_local_),
+          only(only_) {}
 
     std::string name;
     std::shared_ptr<Value> value;
     bool is_new;
+    bool is_local;
     EntryListenerCallback only;
   };
   std::queue<EntryNotification> m_entry_notifications;

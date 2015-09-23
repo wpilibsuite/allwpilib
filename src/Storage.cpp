@@ -93,7 +93,7 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
           if (entry->IsPersistent()) m_persistent_dirty = true;
 
           // notify
-          m_notifier.NotifyEntry(name, entry->value, true);
+          m_notifier.NotifyEntry(name, entry->value, true, false);
 
           // send the assignment to everyone (including the originator)
           if (m_queue_outgoing) {
@@ -135,7 +135,7 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
             m_idmap[id] = new_entry.get();
 
             // notify
-            m_notifier.NotifyEntry(name, new_entry->value, true);
+            m_notifier.NotifyEntry(name, new_entry->value, true, false);
             return;
           }
           may_need_update = true;  // we may need to send an update message
@@ -184,7 +184,7 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
       entry->seq_num = seq_num;
 
       // notify
-      m_notifier.NotifyEntry(name, entry->value, false);
+      m_notifier.NotifyEntry(name, entry->value, false, false);
 
       // broadcast to all other connections (note for client there won't
       // be any other connections, so don't bother)
@@ -221,7 +221,7 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
       if (entry->IsPersistent()) m_persistent_dirty = true;
 
       // notify
-      m_notifier.NotifyEntry(entry->name, entry->value, false);
+      m_notifier.NotifyEntry(entry->name, entry->value, false, false);
 
       // broadcast to all other connections (note for client there won't
       // be any other connections, so don't bother)
@@ -390,7 +390,7 @@ void Storage::ApplyInitialAssignments(
       entry->flags = msg->flags();
       entry->seq_num = seq_num;
       // notify
-      m_notifier.NotifyEntry(name, entry->value, true);
+      m_notifier.NotifyEntry(name, entry->value, true, false);
     } else {
       // if reconnect and sequence number not higher than local, then we
       // don't update the local value and instead send it back to the server
@@ -404,7 +404,7 @@ void Storage::ApplyInitialAssignments(
         // don't update flags from a <3.0 remote (not part of message)
         if (conn.proto_rev() >= 0x0300) entry->flags = msg->flags();
         // notify
-        m_notifier.NotifyEntry(name, entry->value, false);
+        m_notifier.NotifyEntry(name, entry->value, false, false);
       }
     }
 
@@ -463,6 +463,7 @@ bool Storage::SetEntryValue(StringRef name, std::shared_ptr<Value> value) {
                                     value, entry->flags);
     lock.unlock();
     queue_outgoing(msg, nullptr, nullptr);
+    m_notifier.NotifyEntry(name, value, true, true);
   } else if (*old_value != *value) {
     ++entry->seq_num;
     // don't send an update if we don't have an assigned id yet
@@ -472,6 +473,7 @@ bool Storage::SetEntryValue(StringRef name, std::shared_ptr<Value> value) {
       lock.unlock();
       queue_outgoing(msg, nullptr, nullptr);
     }
+    m_notifier.NotifyEntry(name, value, false, true);
   }
   return true;
 }
@@ -506,6 +508,7 @@ void Storage::SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value) {
                                     value, entry->flags);
     lock.unlock();
     queue_outgoing(msg, nullptr, nullptr);
+    m_notifier.NotifyEntry(name, value, true, true);
   } else {
     ++entry->seq_num;
     // don't send an update if we don't have an assigned id yet
@@ -515,6 +518,7 @@ void Storage::SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value) {
       lock.unlock();
       queue_outgoing(msg, nullptr, nullptr);
     }
+    m_notifier.NotifyEntry(name, value, false, true);
   }
 }
 
@@ -616,7 +620,7 @@ void Storage::NotifyEntries(StringRef prefix,
   std::lock_guard<std::mutex> lock(m_mutex);
   for (auto& i : m_entries) {
     if (!i.getKey().startswith(prefix)) continue;
-    m_notifier.NotifyEntry(i.getKey(), i.getValue()->value, false, only);
+    m_notifier.NotifyEntry(i.getKey(), i.getValue()->value, false, false, only);
   }
 }
 

@@ -266,7 +266,7 @@ typedef void (*NT_ConnectionListenerCallback)(
 
 unsigned int NT_AddEntryListener(const char *prefix, size_t prefix_len,
                                  void *data, NT_EntryListenerCallback callback,
-                                 int immediate_notify);
+                                 int immediate_notify, int local_notify);
 void NT_RemoveEntryListener(unsigned int entry_listener_uid);
 unsigned int NT_AddConnectionListener(void *data,
                                       NT_ConnectionListenerCallback callback,

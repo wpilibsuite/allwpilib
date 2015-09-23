@@ -66,9 +66,9 @@ void Flush() {
  */
 
 unsigned int AddEntryListener(StringRef prefix, EntryListenerCallback callback,
-                              bool immediate_notify) {
+                              bool immediate_notify, bool local_notify) {
   Notifier& notifier = Notifier::GetInstance();
-  unsigned int uid = notifier.AddEntryListener(prefix, callback);
+  unsigned int uid = notifier.AddEntryListener(prefix, callback, local_notify);
   notifier.Start();
   if (immediate_notify) Storage::GetInstance().NotifyEntries(prefix, callback);
   return uid;
