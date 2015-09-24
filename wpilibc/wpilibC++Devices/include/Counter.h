@@ -31,19 +31,19 @@ class Counter : public SensorBase,
  public:
   explicit Counter(Mode mode = kTwoPulse);
   explicit Counter(int32_t channel);
-  [[deprecated(
+  DEPRECATED(
       "Raw pointers are deprecated; if you just want to construct a Counter "
       "with its own DigitalSource, then call the Counter(int channel). If you "
       "want to keep your own copy of the DigitalSource, use "
-      "std::shared_ptr.")]]
+      "std::shared_ptr.")
   explicit Counter(DigitalSource *source);
   explicit Counter(std::shared_ptr<DigitalSource> source);
-  [[deprecated(
-      "Raw pointers are deprecated. Use pass-by-reference instead.")]]
+  DEPRECATED(
+      "Raw pointers are deprecated. Use pass-by-reference instead.")
   explicit Counter(AnalogTrigger *trigger);
   explicit Counter(const AnalogTrigger &trigger);
-  [[deprecated(
-      "Raw pointers are deprecated; prefer to use shared_ptr instead.")]]
+  DEPRECATED(
+      "Raw pointers are deprecated; prefer to use shared_ptr instead.")
   Counter(EncodingType encodingType, DigitalSource *upSource,
           DigitalSource *downSource, bool inverted);
   Counter(EncodingType encodingType, std::shared_ptr<DigitalSource> upSource,
@@ -51,32 +51,32 @@ class Counter : public SensorBase,
   virtual ~Counter();
 
   void SetUpSource(int32_t channel);
-  [[deprecated(
+  DEPRECATED(
       "Raw pointers are deprecated; prefer to call either SetUpSource(int) or "
-      "SetUpSource(shared_ptr).")]]
+      "SetUpSource(shared_ptr).")
   void SetUpSource(AnalogTrigger *analogTrigger, AnalogTriggerType triggerType);
   void SetUpSource(std::shared_ptr<AnalogTrigger> analogTrigger,
                    AnalogTriggerType triggerType);
-  [[deprecated("Raw pointers are deprecated. Use std::shared_ptr instead.")]]
+  DEPRECATED("Raw pointers are deprecated. Use std::shared_ptr instead.")
   void SetUpSource(DigitalSource *source);
   void SetUpSource(std::shared_ptr<DigitalSource> source);
-  [[deprecated("References are deprecated. Use std::shared_ptr instead.")]]
+  DEPRECATED("References are deprecated. Use std::shared_ptr instead.")
   void SetUpSource(DigitalSource &source);
   void SetUpSourceEdge(bool risingEdge, bool fallingEdge);
   void ClearUpSource();
 
   void SetDownSource(int32_t channel);
-  [[deprecated(
+  DEPRECATED(
       "Raw pointers are deprecated; prefer to call either SetDownSource(int) "
-      "or SetDownSource(shared_ptr).")]]
+      "or SetDownSource(shared_ptr).")
   void SetDownSource(AnalogTrigger *analogTrigger,
                      AnalogTriggerType triggerType);
   void SetDownSource(std::shared_ptr<AnalogTrigger> analogTrigger,
                      AnalogTriggerType triggerType);
-  [[deprecated("Raw pointers are deprecated. Use std::shared_ptr instead.")]]
+  DEPRECATED("Raw pointers are deprecated. Use std::shared_ptr instead.")
   void SetDownSource(DigitalSource *source);
   void SetDownSource(std::shared_ptr<DigitalSource> source);
-  [[deprecated("References are deprecated. Use std::shared_ptr instead.")]]
+  DEPRECATED("References are deprecated. Use std::shared_ptr instead.")
   void SetDownSource(DigitalSource &source);
   void SetDownSourceEdge(bool risingEdge, bool fallingEdge);
   void ClearDownSource();

@@ -44,16 +44,16 @@ class RobotDrive : public MotorSafety, public ErrorBase {
   RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel);
   RobotDrive(uint32_t frontLeftMotorChannel, uint32_t rearLeftMotorChannel,
              uint32_t frontRightMotorChannel, uint32_t rearRightMotorChannel);
-  [[deprecated("Raw pointers are deprecated; use shared_ptr instead.")]]
+  DEPRECATED("Raw pointers are deprecated; use shared_ptr instead.")
   RobotDrive(SpeedController *leftMotor, SpeedController *rightMotor);
-  [[deprecated("References are deprecated; use shared_ptr instead.")]]
+  DEPRECATED("References are deprecated; use shared_ptr instead.")
   RobotDrive(SpeedController &leftMotor, SpeedController &rightMotor);
   RobotDrive(std::shared_ptr<SpeedController> leftMotor,
              std::shared_ptr<SpeedController> rightMotor);
-  [[deprecated("Raw pointers are deprecated; use shared_ptr instead.")]]
+  DEPRECATED("Raw pointers are deprecated; use shared_ptr instead.")
   RobotDrive(SpeedController *frontLeftMotor, SpeedController *rearLeftMotor,
              SpeedController *frontRightMotor, SpeedController *rearRightMotor);
-  [[deprecated("References are deprecated; use shared_ptr instead.")]]
+  DEPRECATED("References are deprecated; use shared_ptr instead.")
   RobotDrive(SpeedController &frontLeftMotor, SpeedController &rearLeftMotor,
              SpeedController &frontRightMotor, SpeedController &rearRightMotor);
   RobotDrive(std::shared_ptr<SpeedController> frontLeftMotor,

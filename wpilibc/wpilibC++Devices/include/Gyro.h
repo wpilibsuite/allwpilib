@@ -39,9 +39,9 @@ class Gyro : public SensorBase, public PIDSource, public LiveWindowSendable {
   static constexpr float kDefaultVoltsPerDegreePerSecond = 0.007;
 
   explicit Gyro(int32_t channel);
-  [[deprecated(
+  DEPRECATED(
       "Raw pointers are deprecated; consider calling the Gyro constructor with "
-      "a channel number or passing a shared_ptr instead.")]]
+      "a channel number or passing a shared_ptr instead.")
   explicit Gyro(AnalogInput *channel);
   explicit Gyro(std::shared_ptr<AnalogInput> channel);
   virtual ~Gyro() = default;

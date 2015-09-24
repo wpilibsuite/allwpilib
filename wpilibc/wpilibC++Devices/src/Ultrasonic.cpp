@@ -116,9 +116,9 @@ Ultrasonic::Ultrasonic(uint32_t pingChannel, uint32_t echoChannel,
  * determine the range.
  * @param units The units returned in either kInches or kMilliMeters
  */
-[[deprecated(
+DEPRECATED(
     "Raw pointers are deprecated; prefer either specifying the channel numbers "
-    "as integers or passing shared_ptrs.")]]
+    "as integers or passing shared_ptrs.")
 Ultrasonic::Ultrasonic(DigitalOutput *pingChannel, DigitalInput *echoChannel,
                        DistanceUnit units)
     : m_pingChannel(pingChannel, NullDeleter<DigitalOutput>()),
@@ -142,9 +142,9 @@ Ultrasonic::Ultrasonic(DigitalOutput *pingChannel, DigitalInput *echoChannel,
  * determine the range.
  * @param units The units returned in either kInches or kMilliMeters
  */
-[[deprecated(
+DEPRECATED(
     "References are deprecated; prefer either specifying the channel numbers "
-    "as integers or passing shared_ptrs.")]]
+    "as integers or passing shared_ptrs.")
 Ultrasonic::Ultrasonic(DigitalOutput &pingChannel, DigitalInput &echoChannel,
                        DistanceUnit units)
     : m_pingChannel(&pingChannel, NullDeleter<DigitalOutput>()),

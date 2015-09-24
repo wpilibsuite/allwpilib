@@ -52,16 +52,16 @@ class Encoder : public SensorBase,
   Encoder(std::shared_ptr<DigitalSource> aSource,
           std::shared_ptr<DigitalSource> bSource,
           bool reverseDirection = false, EncodingType encodingType = k4X);
-  [[deprecated(
+  DEPRECATED(
       "Raw pointers are deprecated; if you wish to construct your own copy of "
       "the DigitalSource and pass it to the constructor, use an "
-      "std::shared_ptr instead.")]]
+      "std::shared_ptr instead.")
   Encoder(DigitalSource *aSource, DigitalSource *bSource,
           bool reverseDirection = false, EncodingType encodingType = k4X);
-  [[deprecated(
+  DEPRECATED(
       "References are deprecated; if you wish to construct your own copy of "
       "the DigitalSource and pass it to the constructor, use an "
-      "std::shared_ptr instead.")]]
+      "std::shared_ptr instead.")
   Encoder(DigitalSource &aSource, DigitalSource &bSource,
           bool reverseDirection = false, EncodingType encodingType = k4X);
   virtual ~Encoder();
@@ -86,7 +86,7 @@ class Encoder : public SensorBase,
   double PIDGet() override;
 
   void SetIndexSource(uint32_t channel, IndexingType type = kResetOnRisingEdge);
-  [[deprecated("Raw pointers are deprecated; use references instead.")]]
+  DEPRECATED("Raw pointers are deprecated; use references instead.")
   void SetIndexSource(DigitalSource *source,
                       IndexingType type = kResetOnRisingEdge);
   void SetIndexSource(const DigitalSource &source,

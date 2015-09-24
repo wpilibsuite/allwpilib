@@ -42,15 +42,15 @@ class Ultrasonic : public SensorBase,
  public:
   enum DistanceUnit { kInches = 0, kMilliMeters = 1 };
 
-  [[deprecated(
+  DEPRECATED(
       "Raw pointers are deprecated; prefer either specifying the channel "
-      "numbers as integers or passing shared_ptrs.")]]
+      "numbers as integers or passing shared_ptrs.")
   Ultrasonic(DigitalOutput *pingChannel, DigitalInput *echoChannel,
              DistanceUnit units = kInches);
 
-  [[deprecated(
+  DEPRECATED(
       "References are deprecated; prefer either specifying the channel numbers "
-      "as integers or passing shared_ptrs.")]]
+      "as integers or passing shared_ptrs.")
   Ultrasonic(DigitalOutput &pingChannel, DigitalInput &echoChannel,
              DistanceUnit units = kInches);
 

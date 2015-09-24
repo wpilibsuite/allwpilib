@@ -26,11 +26,11 @@ class AnalogAccelerometer : public SensorBase,
                             public LiveWindowSendable {
  public:
   explicit AnalogAccelerometer(int32_t channel);
-  [[deprecated(
+  DEPRECATED(
       "Raw pointers are deprecated; if you just want to construct an "
       "AnalogAccelerometer with its own AnalogInput, then call the "
       "AnalogAccelerometer(int channel). If you want to keep your own copy of "
-      "the AnalogInput, use std::shared_ptr.")]]
+      "the AnalogInput, use std::shared_ptr.")
   explicit AnalogAccelerometer(AnalogInput *channel);
   explicit AnalogAccelerometer(std::shared_ptr<AnalogInput> channel);
   virtual ~AnalogAccelerometer() = default;

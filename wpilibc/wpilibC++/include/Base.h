@@ -26,17 +26,29 @@ ClassName(ClassName &&) = default
   #define noexcept throw()
 #endif
 
+// [[deprecated(msg)]] is a C++14 feature not supported by MSVC or GCC < 4.9.
+// We provide an equivalent warning implementation for those compilers here.
+#if defined(_MSC_VER)
+  #define DEPRECATED(msg) __declspec(deprecated(msg))
+#elif defined(__GNUC__)
+  #if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 8)
+    #define DEPRECATED(msg) [[deprecated(msg)]]
+  #else
+    #define DEPRECATED(msg) __attribute__((deprecated(msg)))
+  #endif
+#elif __cplusplus > 201103L
+  #define DEPRECATED(msg) [[deprecated(msg)]]
+#else
+  #define DEPRECATED(msg) /*nothing*/
+#endif
+
 // A struct to use as a deleter when a std::shared_ptr must wrap a raw pointer
 // that is being deleted by someone else.
 // This should only be called in deprecated functions; using it anywhere else
 // will throw warnings.
 template<class T>
 struct
-#if !defined(_MSC_VER)
-  [[deprecated]]
-#else
-  __declspec(deprecated)
-#endif
+DEPRECATED("wrapping raw pointer in std::shared_ptr")
 NullDeleter {
   void operator()(T *) const noexcept {};
 };
