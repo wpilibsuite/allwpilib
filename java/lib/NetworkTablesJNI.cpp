@@ -887,8 +887,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
  * Signature: (Ljava/lang/String;Ledu/wpi/first/wpilibj/networktables/NetworkTablesJNI/EntryListenerFunction;Z)I
  */
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_addEntryListener
-  (JNIEnv *envouter, jclass, jstring prefix, jobject listener,
-   jboolean immediateNotify, jboolean localNotify)
+  (JNIEnv *envouter, jclass, jstring prefix, jobject listener, jint flags)
 {
   // the shared pointer to the weak global will keep it around until the
   // entry listener is destroyed
@@ -901,13 +900,13 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 
   // method ids, on the other hand, are safe to retain
   jmethodID mid = envouter->GetMethodID(
-      cls, "apply", "(ILjava/lang/String;Ljava/lang/Object;Z)V");
+      cls, "apply", "(ILjava/lang/String;Ljava/lang/Object;I)V");
   if (!mid) return 0;
 
   return nt::AddEntryListener(
       JavaStringRef(envouter, prefix),
       [=](unsigned int uid, nt::StringRef name,
-          std::shared_ptr<nt::Value> value, bool is_new) {
+          std::shared_ptr<nt::Value> value, unsigned int flags_) {
         // need to attach as we're coming from a separate thread here
         if (!jvm) return;
         JNIEnv *env;
@@ -929,14 +928,13 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
             goto done;
           }
           env->CallVoidMethod(handler, mid, (jint)uid, ToJavaString(env, name),
-                              jobj, (jboolean)(is_new ? 1 : 0));
+                              jobj, (jint)(flags_));
           if (env->ExceptionCheck()) env->ExceptionDescribe();
         }
 done:
         jvm->DetachCurrentThread();
       },
-      immediateNotify != JNI_FALSE,
-      localNotify != JNI_FALSE);
+      flags);
 }
 
 /*

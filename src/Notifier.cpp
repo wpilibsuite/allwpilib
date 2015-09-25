@@ -58,7 +58,7 @@ void Notifier::ThreadMain() {
       if (item.only) {
         // Don't hold mutex during callback execution!
         lock.unlock();
-        item.only(0, name, item.value, item.is_new);
+        item.only(0, name, item.value, item.flags);
         lock.lock();
         continue;
       }
@@ -66,12 +66,29 @@ void Notifier::ThreadMain() {
       // Use index because iterator might get invalidated.
       for (std::size_t i=0; i<m_entry_listeners.size(); ++i) {
         if (!m_entry_listeners[i].callback) continue;  // removed
-        if (item.is_local && !m_entry_listeners[i].local_notify) continue;
+
+        // Flags must be within requested flag set for this listener.
+        // Because assign messages can result in both a value and flags update,
+        // we handle that case specially.
+        unsigned int listen_flags = m_entry_listeners[i].flags;
+        unsigned int flags = item.flags;
+        unsigned int assign_both = NT_NOTIFY_UPDATE | NT_NOTIFY_FLAGS;
+        if ((flags & assign_both) == assign_both) {
+          if ((listen_flags & assign_both) == 0) continue;
+          listen_flags &= ~assign_both;
+          flags &= ~assign_both;
+        }
+        if ((flags & ~listen_flags) != 0) continue;
+
+        // must match prefix
         if (!name.startswith(m_entry_listeners[i].prefix)) continue;
+
+        // make a copy of the callback so we can safely release the mutex
         auto callback = m_entry_listeners[i].callback;
+
         // Don't hold mutex during callback execution!
         lock.unlock();
-        callback(i+1, name, item.value, item.is_new);
+        callback(i+1, name, item.value, item.flags);
         lock.lock();
       }
     }
@@ -104,11 +121,11 @@ void Notifier::ThreadMain() {
 
 unsigned int Notifier::AddEntryListener(StringRef prefix,
                                         EntryListenerCallback callback,
-                                        bool local_notify) {
+                                        unsigned int flags) {
   std::lock_guard<std::mutex> lock(m_mutex);
   unsigned int uid = m_entry_listeners.size();
-  m_entry_listeners.emplace_back(prefix, callback, local_notify);
-  if (local_notify) m_local_notifiers = true;
+  m_entry_listeners.emplace_back(prefix, callback, flags);
+  if ((flags & NT_NOTIFY_LOCAL) != 0) m_local_notifiers = true;
   return uid + 1;
 }
 
@@ -120,12 +137,13 @@ void Notifier::RemoveEntryListener(unsigned int entry_listener_uid) {
 }
 
 void Notifier::NotifyEntry(StringRef name, std::shared_ptr<Value> value,
-                           bool is_new, bool is_local,
-                           EntryListenerCallback only) {
+                           unsigned int flags, EntryListenerCallback only) {
   if (!m_active) return;
-  if (is_local && !m_local_notifiers) return;  // optimization
+  // optimization: don't generate needless local queue entries if we have
+  // no local listeners (as this is a common case on the server side)
+  if ((flags & NT_NOTIFY_LOCAL) != 0 && !m_local_notifiers) return;
   std::unique_lock<std::mutex> lock(m_mutex);
-  m_entry_notifications.emplace(name, value, is_new, is_local, only);
+  m_entry_notifications.emplace(name, value, flags, only);
   lock.unlock();
   m_cond.notify_one();
 }

@@ -97,16 +97,18 @@ NetworkTable::~NetworkTable() {
 }
 
 void NetworkTable::AddTableListener(ITableListener* listener) {
-  AddTableListener(listener, false, false);
+  AddTableListenerEx(listener, NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
 }
 
 void NetworkTable::AddTableListener(ITableListener* listener,
                                     bool immediateNotify) {
-  AddTableListener(listener, immediateNotify, false);
+  unsigned int flags = NT_NOTIFY_NEW | NT_NOTIFY_UPDATE;
+  if (immediateNotify) flags |= NT_NOTIFY_IMMEDIATE;
+  AddTableListenerEx(listener, flags);
 }
 
-void NetworkTable::AddTableListener(ITableListener* listener,
-                                    bool immediateNotify, bool localNotify) {
+void NetworkTable::AddTableListenerEx(ITableListener* listener,
+                                      unsigned int flags) {
   std::lock_guard<std::mutex> lock(m_mutex);
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
@@ -114,23 +116,24 @@ void NetworkTable::AddTableListener(ITableListener* listener,
   unsigned int id = nt::AddEntryListener(
       path,
       [=](unsigned int uid, StringRef name, std::shared_ptr<nt::Value> value,
-          bool is_new) {
+          unsigned int flags_) {
         StringRef relative_key = name.substr(prefix_len);
         if (relative_key.find(PATH_SEPARATOR_CHAR) != StringRef::npos) return;
-        listener->ValueChanged(this, relative_key, value, is_new);
+        listener->ValueChangedEx(this, relative_key, value, flags_);
       },
-      immediateNotify,
-      localNotify);
+      flags);
   m_listeners.emplace_back(listener, id);
 }
 
 void NetworkTable::AddTableListener(StringRef key, ITableListener* listener,
                                     bool immediateNotify) {
-  AddTableListener(key, listener, immediateNotify, false);
+  unsigned int flags = NT_NOTIFY_NEW | NT_NOTIFY_UPDATE;
+  if (immediateNotify) flags |= NT_NOTIFY_IMMEDIATE;
+  AddTableListenerEx(key, listener, flags);
 }
 
-void NetworkTable::AddTableListener(StringRef key, ITableListener* listener,
-                                    bool immediateNotify, bool localNotify) {
+void NetworkTable::AddTableListenerEx(StringRef key, ITableListener* listener,
+                                      unsigned int flags) {
   std::lock_guard<std::mutex> lock(m_mutex);
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
@@ -139,12 +142,11 @@ void NetworkTable::AddTableListener(StringRef key, ITableListener* listener,
   unsigned int id = nt::AddEntryListener(
       path,
       [=](unsigned int uid, StringRef name, std::shared_ptr<nt::Value> value,
-          bool is_new) {
+          unsigned int flags_) {
         if (name != path) return;
-        listener->ValueChanged(this, name.substr(prefix_len), value, is_new);
+        listener->ValueChangedEx(this, name.substr(prefix_len), value, flags_);
       },
-      immediateNotify,
-      localNotify);
+      flags);
   m_listeners.emplace_back(listener, id);
 }
 
@@ -163,10 +165,12 @@ void NetworkTable::AddSubTableListener(ITableListener* listener,
   // a shared_ptr to it.
   auto notified_tables = std::make_shared<llvm::StringMap<char>>();
 
+  unsigned int flags = NT_NOTIFY_NEW | NT_NOTIFY_IMMEDIATE;
+  if (localNotify) flags |= NT_NOTIFY_LOCAL;
   unsigned int id = nt::AddEntryListener(
       path,
       [=](unsigned int uid, StringRef name, std::shared_ptr<nt::Value> value,
-          bool is_new) mutable {
+          unsigned int flags_) mutable {
         StringRef relative_key = name.substr(prefix_len);
         auto end_sub_table = relative_key.find(PATH_SEPARATOR_CHAR);
         if (end_sub_table == StringRef::npos) return;
@@ -174,10 +178,9 @@ void NetworkTable::AddSubTableListener(ITableListener* listener,
         if (notified_tables->find(sub_table_key) == notified_tables->end())
           return;
         notified_tables->insert(std::make_pair(sub_table_key, '\0'));
-        listener->ValueChanged(this, sub_table_key, nullptr, true);
+        listener->ValueChangedEx(this, sub_table_key, nullptr, flags_);
       },
-      true,
-      localNotify);
+      flags);
   m_listeners.emplace_back(listener, id);
 }
 

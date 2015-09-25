@@ -137,12 +137,11 @@ class NetworkTable : public ITable {
 
   void AddTableListener(ITableListener* listener);
   void AddTableListener(ITableListener* listener, bool immediateNotify);
-  void AddTableListener(ITableListener* listener, bool immediateNotify,
-                        bool localNotify);
+  void AddTableListenerEx(ITableListener* listener, unsigned int flags);
   void AddTableListener(llvm::StringRef key, ITableListener* listener,
                         bool immediateNotify);
-  void AddTableListener(llvm::StringRef key, ITableListener* listener,
-                        bool immediateNotify, bool localNotify);
+  void AddTableListenerEx(llvm::StringRef key, ITableListener* listener,
+                          unsigned int flags);
   void AddSubTableListener(ITableListener* listener);
   void AddSubTableListener(ITableListener* listener, bool localNotify);
   void RemoveTableListener(ITableListener* listener);

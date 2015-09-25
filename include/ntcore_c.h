@@ -48,6 +48,17 @@ enum NT_LogLevel {
   NT_LOG_DEBUG4 = 6
 };
 
+/** NetworkTables notififier kinds. */
+enum NT_NotifyKind {
+  NT_NOTIFY_NONE = 0,
+  NT_NOTIFY_IMMEDIATE = 0x01, /* initial listener addition */
+  NT_NOTIFY_LOCAL = 0x02,     /* changed locally */
+  NT_NOTIFY_NEW = 0x04,       /* newly created entry */
+  NT_NOTIFY_DELETE = 0x08,    /* deleted */
+  NT_NOTIFY_UPDATE = 0x10,    /* value changed */
+  NT_NOTIFY_FLAGS = 0x20      /* flags changed */
+};
+
 /*
  * Structures
  */
@@ -258,7 +269,7 @@ void NT_Flush(void);
 
 typedef void (*NT_EntryListenerCallback)(
     unsigned int uid, void *data, const char *name, size_t name_len,
-    const struct NT_Value *value, int is_new);
+    const struct NT_Value *value, unsigned int flags);
 
 typedef void (*NT_ConnectionListenerCallback)(
     unsigned int uid, void *data, int connected,
@@ -266,7 +277,7 @@ typedef void (*NT_ConnectionListenerCallback)(
 
 unsigned int NT_AddEntryListener(const char *prefix, size_t prefix_len,
                                  void *data, NT_EntryListenerCallback callback,
-                                 int immediate_notify, int local_notify);
+                                 unsigned int flags);
 void NT_RemoveEntryListener(unsigned int entry_listener_uid);
 unsigned int NT_AddConnectionListener(void *data,
                                       NT_ConnectionListenerCallback callback,

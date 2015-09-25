@@ -181,15 +181,15 @@ void Flush();
  */
 
 typedef std::function<void(unsigned int uid, StringRef name,
-                           std::shared_ptr<Value> value, bool is_new)>
-    EntryListenerCallback;
+                           std::shared_ptr<Value> value,
+                           unsigned int flags)> EntryListenerCallback;
 
 typedef std::function<void(unsigned int uid, bool connected,
                            const ConnectionInfo& conn)>
     ConnectionListenerCallback;
 
 unsigned int AddEntryListener(StringRef prefix, EntryListenerCallback callback,
-                              bool immediate_notify, bool local_notify);
+                              unsigned int flags);
 void RemoveEntryListener(unsigned int entry_listener_uid);
 unsigned int AddConnectionListener(ConnectionListenerCallback callback,
                                    bool immediate_notify);

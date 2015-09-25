@@ -107,9 +107,9 @@ public class NetworkTablesJNI {
   public static native void flush();
 
   public interface EntryListenerFunction {
-    void apply(int uid, String key, Object value, boolean isNew);
+    void apply(int uid, String key, Object value, int flags);
   }
-  public static native int addEntryListener(String prefix, EntryListenerFunction listener, boolean immediateNotify, boolean localNotify);
+  public static native int addEntryListener(String prefix, EntryListenerFunction listener, int flags);
   public static native void removeEntryListener(int entryListenerUid);
 
   public interface ConnectionListenerFunction {

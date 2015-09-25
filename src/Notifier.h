@@ -34,15 +34,16 @@ class Notifier {
   void Stop();
 
   bool active() const { return m_active; }
+  bool local_notifiers() const { return m_local_notifiers; }
   static bool destroyed() { return s_destroyed; }
 
   unsigned int AddEntryListener(StringRef prefix,
                                 EntryListenerCallback callback,
-                                bool local_notify);
+                                unsigned int flags);
   void RemoveEntryListener(unsigned int entry_listener_uid);
 
-  void NotifyEntry(StringRef name, std::shared_ptr<Value> value, bool is_new,
-                   bool is_local, EntryListenerCallback only = nullptr);
+  void NotifyEntry(StringRef name, std::shared_ptr<Value> value,
+                   unsigned int flags, EntryListenerCallback only = nullptr);
 
   unsigned int AddConnectionListener(ConnectionListenerCallback callback);
   void RemoveConnectionListener(unsigned int conn_listener_uid);
@@ -63,29 +64,27 @@ class Notifier {
 
   struct EntryListener {
     EntryListener(StringRef prefix_, EntryListenerCallback callback_,
-                  bool local_notify_)
-        : prefix(prefix_), callback(callback_), local_notify(local_notify_) {}
+                  unsigned int flags_)
+        : prefix(prefix_), callback(callback_), flags(flags_) {}
 
     std::string prefix;
     EntryListenerCallback callback;
-    bool local_notify;
+    unsigned int flags;
   };
   std::vector<EntryListener> m_entry_listeners;
   std::vector<ConnectionListenerCallback> m_conn_listeners;
 
   struct EntryNotification {
     EntryNotification(StringRef name_, std::shared_ptr<Value> value_,
-                      bool is_new_, bool is_local_, EntryListenerCallback only_)
+                      unsigned int flags_, EntryListenerCallback only_)
         : name(name_),
           value(value_),
-          is_new(is_new_),
-          is_local(is_local_),
+          flags(flags_),
           only(only_) {}
 
     std::string name;
     std::shared_ptr<Value> value;
-    bool is_new;
-    bool is_local;
+    unsigned int flags;
     EntryListenerCallback only;
   };
   std::queue<EntryNotification> m_entry_notifications;

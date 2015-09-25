@@ -297,6 +297,14 @@ public interface ITable {
    */
   public String[] getStringArray(String key, String[] defaultValue);
 
+  /** Notifier flag values. */
+  public static final int NOTIFY_IMMEDIATE = 0x01;
+  public static final int NOTIFY_LOCAL = 0x02;
+  public static final int NOTIFY_NEW = 0x04;
+  public static final int NOTIFY_DELETE = 0x08;
+  public static final int NOTIFY_UPDATE = 0x10;
+  public static final int NOTIFY_FLAGS = 0x20;
+
   /**
    * Add a listener for changes to the table
    * @param listener the listener to add
@@ -313,13 +321,9 @@ public interface ITable {
   /**
    * Add a listener for changes to the table
    * @param listener the listener to add
-   * @param immediateNotify if true then this listener will be notified of all
-   * current entries (marked as new)
-   * @param localNotify if true then this listener will be notified of all
-   * local changes in addition to all remote changes
+   * @param flags bitmask specifying desired notifications
    */
-  public void addTableListener(ITableListener listener, boolean immediateNotify,
-                               boolean localNotify);
+  public void addTableListenerEx(ITableListener listener, int flags);
 
   /**
    * Add a listener for changes to a specific key the table
@@ -334,13 +338,10 @@ public interface ITable {
    * Add a listener for changes to a specific key the table
    * @param key the key to listen for
    * @param listener the listener to add
-   * @param immediateNotify if true then this listener will be notified of all
-   * current entries (marked as new)
-   * @param localNotify if true then this listener will be notified of all
-   * local changes in addition to all remote changes
+   * @param flags bitmask specifying desired notifications
    */
-  public void addTableListener(String key, ITableListener listener,
-                               boolean immediateNotify, boolean localNotify);
+  public void addTableListenerEx(String key, ITableListener listener,
+                                 int flags);
   /**
    * This will immediately notify the listener of all current sub tables
    * @param listener

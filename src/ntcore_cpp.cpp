@@ -66,11 +66,12 @@ void Flush() {
  */
 
 unsigned int AddEntryListener(StringRef prefix, EntryListenerCallback callback,
-                              bool immediate_notify, bool local_notify) {
+                              unsigned int flags) {
   Notifier& notifier = Notifier::GetInstance();
-  unsigned int uid = notifier.AddEntryListener(prefix, callback, local_notify);
+  unsigned int uid = notifier.AddEntryListener(prefix, callback, flags);
   notifier.Start();
-  if (immediate_notify) Storage::GetInstance().NotifyEntries(prefix, callback);
+  if ((flags & NT_NOTIFY_IMMEDIATE) != 0)
+    Storage::GetInstance().NotifyEntries(prefix, callback);
   return uid;
 }
 
