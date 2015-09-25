@@ -86,7 +86,7 @@
                                 <artifactItem>
                                     <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
                                     <artifactId>NetworkTables</artifactId>
-                                    <version>0.1.0-SNAPSHOT</version>
+                                    <version>3.0.0-SNAPSHOT</version>
                                     <classifier>sources</classifier>
                                     <outputDirectory>${java-zip}/lib</outputDirectory>
                                     <destFileName>NetworkTables-sources.jar</destFileName>
@@ -142,7 +142,7 @@
                                 <artifactItem>
                                     <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
                                     <artifactId>NetworkTables</artifactId>
-                                    <version>0.1.0-SNAPSHOT</version>
+                                    <version>3.0.0-SNAPSHOT</version>
                                 </artifactItem>
 
                                 <artifactItem>
@@ -309,7 +309,7 @@
         <dependency>
             <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
             <artifactId>NetworkTables</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>3.0.0-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -347,7 +347,7 @@
         <dependency>
             <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
             <artifactId>NetworkTables</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>3.0.0-SNAPSHOT</version>
             <classifier>sources</classifier>
         </dependency>
         <!--<dependency>-->
