@@ -1,0 +1,161 @@
+apply plugin: 'cpp'
+
+def jniDir = 'src/athena/cpp'
+def generatedJNIHeaderLoc = "$buildDir/include"
+
+sourceSets {
+    athena
+}
+
+dependencies {
+    athenaCompile sourceSets.shared.output
+    athenaCompile "edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:arm${getClassifier()}"
+    athenaRuntime "edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:arm${getClassifier()}"
+}
+
+// Configuration for the HAL bindings
+model {
+    components {
+        wpilibJavaJNI(NativeLibrarySpec) {
+            targetPlatform 'arm'
+            binaries.all {
+                tasks.withType(CppCompile) {
+                    dependsOn jniHeaders
+                    dependsOn addNiLibraryLinks
+                }
+            }
+            sources {
+                cpp {
+                    source {
+                        srcDirs = ["$jniDir/lib"]
+                        includes = ['**/*.cpp']
+                    }
+                    exportedHeaders {
+                        // JDK is included for jni.h. We also need the arm-linux specific headers. This does not need to change
+                        // when compiling on Windows
+                        // The JNI headers are put into the build/include directory by the jniHeaders task on wpilibJavaDevices
+                        srcDirs = ["$jniDir/include", "$jniDir/include/linux"]
+                        jniHeaders.outputs.files.each { file ->
+                            srcDirs file.getPath()
+                        }
+                    }
+                    lib project: ':hal', library: 'HALAthena', linkage: 'static'
+                }
+            }
+        }
+    }
+}
+
+// Maven publishing configuration
+publishing {
+    publications {
+        wpilibj(MavenPublication) {
+            artifact jar {
+                // Trim the beginning '-' off the classifier
+                if (useExtension) {
+                    classifier = project.getClassifier()[1..-1]
+                }
+            }
+            artifact(wpilibjSources) {
+                classifier "sources${project.getClassifier()}"
+            }
+            artifact(wpilibjJavadoc) {
+                classifier "javadoc${project.getClassifier()}"
+            }
+
+            groupId 'edu.wpi.first.wpilibj'
+            artifactId 'wpilibJavaFinal'
+            version '0.1.0-SNAPSHOT'
+        }
+    }
+
+    setupWpilibRepo(it)
+}
+
+jar {
+    dependsOn { classes }
+    def addClasspath = { classpath ->
+        classpath.files.findAll { it.exists() }.each {
+            if (file(it).directory) {
+                from it
+            } else {
+                from zipTree(it.path)
+            }
+        }
+    }
+
+    addClasspath sourceSets.shared.runtimeClasspath
+    addClasspath sourceSets.athena.runtimeClasspath
+
+    binaries.withType(SharedLibraryBinarySpec) {
+        from(file(it.sharedLibraryFile)) {
+            into 'linux-arm'
+        }
+    }
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name == 'wpilibJavaJNISharedLibrary') {
+        jar.dependsOn task
+    }
+}
+
+task wpilibjSources(type: Jar, dependsOn: classes) {
+    description = 'Creates the sources jar for the maven publishing routine'
+    group = 'WPILib'
+    classifier = 'sources'
+    from sourceSets.athena.allJava
+    from sourceSets.shared.allJava
+}
+
+task javadoc(type: Javadoc, overwrite: true) {
+    source sourceSets.athena.allJava, sourceSets.shared.allJava
+    classpath = files([sourceSets.athena.compileClasspath, sourceSets.shared.compileClasspath])
+}
+
+task wpilibjJavadoc(type: Jar, dependsOn: javadoc) {
+    description = 'Creates the javadoc jar for the maven publishing routine'
+    group = 'WPILib'
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task jniHeaders {
+    description = 'Generates JNI headers from edu.wpi.first.wpilibj.hal.*'
+    group = 'WPILib'
+    def outputFolder = file(generatedJNIHeaderLoc)
+    inputs.files sourceSets.athena.output
+    outputs.file outputFolder
+    doLast {
+        outputFolder.mkdirs()
+        exec {
+            executable org.gradle.internal.jvm.Jvm.current().getExecutable('javah')
+            args '-d', outputFolder
+            args '-classpath', sourceSets.athena.output.classesDir
+            args 'edu.wpi.first.wpilibj.can.CANJNI'
+            args 'edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary'
+            args 'edu.wpi.first.wpilibj.hal.HALUtil'
+            args 'edu.wpi.first.wpilibj.hal.JNIWrapper'
+            args 'edu.wpi.first.wpilibj.hal.AccelerometerJNI'
+            args 'edu.wpi.first.wpilibj.hal.AnalogJNI'
+            args 'edu.wpi.first.wpilibj.hal.CounterJNI'
+            args 'edu.wpi.first.wpilibj.hal.DIOJNI'
+            args 'edu.wpi.first.wpilibj.hal.EncoderJNI'
+            args 'edu.wpi.first.wpilibj.hal.I2CJNI'
+            args 'edu.wpi.first.wpilibj.hal.InterruptJNI'
+            args 'edu.wpi.first.wpilibj.hal.NotifierJNI'
+            args 'edu.wpi.first.wpilibj.hal.PWMJNI'
+            args 'edu.wpi.first.wpilibj.hal.RelayJNI'
+            args 'edu.wpi.first.wpilibj.hal.SPIJNI'
+            args 'edu.wpi.first.wpilibj.hal.SolenoidJNI'
+            args 'edu.wpi.first.wpilibj.hal.CompressorJNI'
+            args 'edu.wpi.first.wpilibj.hal.PDPJNI'
+            args 'edu.wpi.first.wpilibj.hal.PowerJNI'
+            args 'edu.wpi.first.wpilibj.hal.SerialPortJNI'
+        }
+    }
+}
+
+clean {
+    delete generatedJNIHeaderLoc
+}

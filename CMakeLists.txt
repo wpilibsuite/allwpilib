@@ -39,7 +39,6 @@ if(WIN32)
   # get rid of min max macros on windows
   add_definitions(-DNOMINMAX)
 
-  # aww yea
   add_definitions(-DWIN32_LEAN_AND_MEAN)
 
   SET(CMAKE_FIND_LIBRARY_PREFIXES "")
@@ -55,6 +54,6 @@ endif()
 
 include_directories("build")
 add_subdirectory(simulation/gz_msgs)
-add_subdirectory(wpilibc/wpilibC++Sim)
+add_subdirectory(wpilibc/simulation)
 add_subdirectory(simulation/frc_gazebo_plugins)
-add_subdirectory(networktables/ntcore)
+add_subdirectory(ntcore)

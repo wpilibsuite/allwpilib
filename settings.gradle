@@ -1,10 +1,7 @@
-include 'networktables:ntcore',
-        'networktables:java',
-        'networktables:OutlineViewer',
-        'hal',
-        'wpilibj',
+include 'hal',
         'wpilibc',
+        'wpilibcIntegrationTests',
+        'wpilibj',
+        'wpilibjIntegrationTests',
         'simulation:JavaGazebo',
-        'simulation:SimDS',
-        'jenkins',
-        'driver-station'
+        'simulation:SimDS'

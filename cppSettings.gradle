@@ -1,0 +1,179 @@
+// This regex matches either a Windows or Unix style file separator, then the lib part of the library,
+// then the name of the library itself, and finally the .so extension at the end. The name of the library
+// is in the libName capture group, which is extracted and used for the linker flags
+def libPattern = /.*((\\/|\\).*)+lib(?<libName>.+).so$/
+def niLibraryArgs = []
+def niLibraryPath = file('ni-libraries').path
+
+// The NI Library tree includes all non-wpi libraries, which is everything that doesn't have libwpi in the name
+def niLibraryTree = fileTree(niLibraryPath)
+niLibraryTree.include '*.so'
+niLibraryTree.exclude '*wpi*.so'
+
+// This adds all linker flags to the list of ni library linker flags
+niLibraryTree.each { lib ->
+    def nameMatcher = (lib.path =~ libPattern)
+    if (nameMatcher[0].size() > 1) {
+        def name = nameMatcher.group('libName')
+        niLibraryArgs << '-l' + name
+    }
+}
+
+def ntDependency =
+    project.dependencies.create("edu.wpi.first.wpilib.networktables.cpp:NetworkTables:3.0.0-SNAPSHOT:arm${getClassifier()}@zip")
+def config = project.configurations.detachedConfiguration(ntDependency)
+config.setTransitive(false)
+def netTables = config.files[0].canonicalFile
+
+def netTablesUnzipLocation = "$buildDir/networktables"
+
+// Create a task that will unzip the networktables files into a temporary build directory
+task unzipNetworkTables(type: Copy) {
+    description = 'Unzips the networktables maven dependency so that the include files and libraries can be used'
+    group = 'WPILib'
+    from zipTree(netTables)
+    into netTablesUnzipLocation
+}
+
+task clean(type: Delete) {
+    description = "Deletes the build directory"
+    group = "Build"
+    delete buildDir
+}
+
+subprojects {
+    plugins.withType(CppPlugin).whenPluginAdded {
+        // This defines a project property that projects depending on network tables can use to setup that dependency.
+        ext.defineNetworkTablesProperties = {
+            ext.netTables = netTablesUnzipLocation
+            ext.netTablesInclude = "$netTablesUnzipLocation/include"
+            ext.netLibLocation = "$netTablesUnzipLocation/Linux/arm"
+            ext.netSharedLib = "$netLibLocation/libntcore.so"
+            ext.netStaticLib = "$netLibLocation/libntcore.a"
+
+            task addNetworkTablesLibraryLinks() {
+                description = 'Adds the linker flags for the networktables libraries retreived from maven'
+                group = 'WPILib'
+                dependsOn project(':').unzipNetworkTables
+                doLast {
+                    binaries.all {
+                        tasks.withType(CppCompile) {
+                            // desktop version doesn't use all the NI libraries
+                            // so only do this for arm libraries
+                            String architecture = targetPlatform.architecture
+                            if (architecture.contains('arm')){
+                                linker.args netStaticLib
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        model {
+            buildTypes {
+                debug
+            }
+            // Adds a custom toolchain for our compiler prefix and options
+            toolChains {
+                gcc(Gcc) {
+                    target('arm') {
+                        // We use a custom-built cross compiler with the prefix arm-frc-linux-gnueabi-<util name>
+                        // If this ever changes, the prefix will need to be changed here
+                        def compilerPrefix = 'arm-frc-linux-gnueabi-'
+                        cppCompiler.executable = compilerPrefix + cppCompiler.executable
+                        linker.executable = compilerPrefix + linker.executable
+                        assembler.executable = compilerPrefix + assembler.executable
+                        // Gradle auto-adds the -m32 argument to the linker and compiler. Our compiler only supports
+                        // arm, and doesn't understand this flag, so it is removed from both
+                        cppCompiler.withArguments { args ->
+                            args << '-std=c++1y' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
+                            args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-O0' << '-g3' << '-rdynamic'
+                            //TODO: When the compiler allows us to actually call deprecated functions from within
+                            // deprecated function, remove this line (this will cause calling deprecated functions
+                            // to be treated as a warning rather than an error).
+                            args << '-Wno-error=deprecated-declarations'
+                            args.remove('-m32')
+                        }
+                        linker.withArguments { args ->
+                            args << '-rdynamic'
+                            args.remove('-m32')
+                        }
+                        staticLibArchiver.executable = compilerPrefix + staticLibArchiver.executable
+                    }
+                }
+                // Workaround for OS X. Macs for some reason want to use Xcode's gcc
+                // (which just wraps Clang), so we have to explicitly make it so
+                // that trying to compile with Clang will call gcc instead
+                macGcc(Clang) {
+                    target('arm') {
+                        // We use a custom-built cross compiler with the prefix arm-frc-linux-gnueabi-<util name>
+                        // If this ever changes, the prefix will need to be changed here
+                        def compilerPrefix = 'arm-frc-linux-gnueabi-'
+                        cppCompiler.executable = compilerPrefix + 'g++'
+                        linker.executable = compilerPrefix + 'g++'
+                        assembler.executable = compilerPrefix + 'gcc'
+                        // Gradle auto-adds the -m32 argument to the linker and compiler. Our compiler only supports
+                        // arm, and doesn't understand this flag, so it is removed from both
+                        cppCompiler.withArguments { args ->
+                            args << '-std=c++1y' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
+                            args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-O0' << '-g3' << '-rdynamic'
+                            //TODO: When the compiler allows us to actually call deprecated functions from within
+                            // deprecated function, remove this line (this will cause calling deprecated functions
+                            // to be treated as a warning rather than an error).
+                            args << '-Wno-error=deprecated-declarations'
+                            args.remove('-m32')
+                        }
+                        linker.withArguments { args ->
+                            args << '-rdynamic'
+                            args.remove('-m32')
+                        }
+                        staticLibArchiver.executable = compilerPrefix + 'ar'
+                    }
+                }
+            }
+
+            // The only platform is arm linux
+            platforms {
+                arm {
+                    architecture 'arm'
+                    operatingSystem 'linux'
+                }
+            }
+        }
+
+        // This task adds the appropriate linker flags for the NI libraries
+        task addNiLibraryLinks() {
+            description = 'Adds the linker flags for the NI libraries in the ni-library folders'
+            group = 'WPILib'
+            doLast {
+                binaries.all {
+                    tasks.withType(CppCompile) {
+                        // desktop version doesn't use all the NI libraries
+                        // so only do this for arm libraries
+                        String architecture = targetPlatform.architecture
+                        if (architecture.contains('arm')){
+                            linker.args << '-L' + niLibraryPath
+                            linker.args.addAll(niLibraryArgs)
+                        }
+                    }
+                }
+                model {
+                    repositories {
+                        libs(PrebuiltLibraries) { libs ->
+                            // Loops through all .so files (except files matching *libwpi*.so) in ../ni-libraries
+                            // and includes them for linking
+                            niLibraryTree.each { niLib ->
+                                libs.create(niLib) {
+                                    binaries.withType(SharedLibraryBinary) {
+                                        sharedLibraryFile = file(niLib.path)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,2 +1,0 @@
-env LD_LIBRARY_PATH=/usr/local/frc/rpath-lib/ /usr/local/frc/bin/netconsole-host /usr/local/frc/JRE/bin/java -jar /home/lvuser/FRCUserProgram.jar
-

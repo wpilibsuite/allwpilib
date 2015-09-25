@@ -1,227 +1,53 @@
-import org.apache.tools.ant.taskdefs.condition.Os
+def enableSimulation = hasProperty('enableSimulation')
 
-// This regex matches either a Windows or Unix style file separator, then the lib part of the library,
-// then the name of the library itself, and finally the .so extension at the end. The name of the library
-// is in the libName capture group, which is extracted and used for the linker flags
-def libPattern = /.*((\\/|\\).*)+lib(?<libName>.+).so$/
-def niLibraryArgs = []
-def wpiLibraryArgs = []
-def niLibraryPath = file('ni-libraries').path
+def repoBaseUrl = 'http://first.wpi.edu/FRC/roborio/maven'
+def publishUrl = "${System.getProperty('user.home')}/releases/maven/"
 
-// The NI Library tree includes all non-wpi libraries, which is everything that doesn't have libwpi in the name
-def niLibraryTree = fileTree(niLibraryPath)
-niLibraryTree.include '*.so'
-niLibraryTree.exclude '*libwpi*.so'
-
-// This adds all linker flags to the list of ni library linker flags
-niLibraryTree.each { lib ->
-    def nameMatcher = (lib.path =~ libPattern)
-    if (nameMatcher[0].size() > 1) {
-        def name = nameMatcher.group('libName')
-        niLibraryArgs << '-l' + name
-    }
+// If we have the repo property, we want to delete the cached version of the networktables
+// dependency and redownload it from the given repo
+if (!hasProperty('repo')) {
+    ext.repo = 'development'
 }
 
-// The WPI libraries are libraries in the ni-libraries folder that have libwpi in their names
-def wpiLibraryTree = fileTree(niLibraryPath)
-wpiLibraryTree.include '*libwpi*.so'
+allprojects {
+    ext.enableSimulation = enableSimulation
+    ext.repo = repo
+    ext.useExtension = 'release' != repo
 
-// This adds all linker flags to the list of wpi library linker flags
-wpiLibraryTree.each { lib ->
-    def nameMatcher = (lib.path =~ libPattern)
-    if (nameMatcher[0].size() > 1) {
-        def name = nameMatcher[0][1]
-        wpiLibraryArgs << '-l' + name
+    repositories {
+        mavenCentral()
+        maven {
+            url publishUrl
+        }
+        mavenLocal()
+        maven {
+            url repoBaseUrl
+        }
     }
-}
 
-// Shells out to maven for generates the eclipse plugins.
-// TODO: Get gradle to build this natively, rather than relying on maven. A plugin exists to do this, called Wuff, but this needs more investigation
-// https://github.com/akhikhl/wuff
-task eclipsePlugins(type: Exec) {
-    description = 'Executes the maven build of the eclipse plugins'
-    group = 'WPILib'
-    workingDir 'eclipse-plugins'
-    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-        executable 'mvn.cmd'
-    } else {
-        executable 'mvn'
+    ext.getClassifier = {
+        return useExtension ? "-$repo" : ''
     }
-    args 'package'
-}
-
-// Rather than a normal clean, which executes whenever the clean task is run, this must be manually invoked. This
-// is because the maven processes is very verbose and takes a long time, checking all of the eclipse repositories
-task cleanEclipsePlugins(type: Exec) {
-    description = 'Cleans the maven build of the eclipse plugins'
-    group = 'WPILib'
-    workingDir 'eclipse-plugins'
-    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-        executable 'mvn.cmd'
-    } else {
-        executable 'mvn'
-    }
-    args 'clean'
 }
 
 subprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
 
     ext.armBuild = true
 
     // Disables doclint in java 8.
     if (JavaVersion.current().isJava8Compatible()) {
-        allprojects {
-            tasks.withType(Javadoc) {
-                options.addStringOption('Xdoclint:none', '-quiet')
-            }
+        tasks.withType(Javadoc) {
+            options.addStringOption('Xdoclint:none', '-quiet')
         }
     }
 
-    // Make sure that all maven publishing routines are run before the maven process starts
-    plugins.withType(MavenPublishPlugin).whenPluginAdded {
-        eclipsePlugins.dependsOn publishToMavenLocal
-    }
-
-    plugins.withType(CppPlugin).whenPluginAdded {
-        model {
-            buildTypes {
-                debug
-            }
-            // Adds a custom toolchain for our compiler prefix and options
-            toolChains {
-                gcc(Gcc) {
-                    target('arm') {
-                        // We use a custom-built cross compiler with the prefix arm-frc-linux-gnueabi-<util name>
-                        // If this ever changes, the prefix will need to be changed here
-                        def compilerPrefix = 'arm-frc-linux-gnueabi-'
-                        cppCompiler.executable = compilerPrefix + cppCompiler.executable
-                        linker.executable = compilerPrefix + linker.executable
-                        assembler.executable = compilerPrefix + assembler.executable
-                        // Gradle auto-adds the -m32 argument to the linker and compiler. Our compiler only supports
-                        // arm, and doesn't understand this flag, so it is removed from both
-                        cppCompiler.withArguments { args ->
-                            args << '-std=c++1y' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
-                            args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-O0' << '-g3' << '-rdynamic'
-                            //TODO: When the compiler allows us to actually call deprecated functions from within
-                            // deprecated function, remove this line (this will cause calling deprecated functions
-                            // to be treated as a warning rather than an error).
-                            args << '-Wno-error=deprecated-declarations'
-                            args.remove('-m32')
-                        }
-                        linker.withArguments { args ->
-                            args << '-rdynamic'
-                            args.remove('-m32')
-                        }
-                        staticLibArchiver.executable = compilerPrefix + staticLibArchiver.executable
-                    }
-                }
-                // Workaround for OS X. Macs for some reason want to use Xcode's gcc
-                // (which just wraps Clang), so we have to explicitly make it so
-                // that trying to compile with Clang will call gcc instead
-                macGcc(Clang) {
-                    target('arm') {
-                        // We use a custom-built cross compiler with the prefix arm-frc-linux-gnueabi-<util name>
-                        // If this ever changes, the prefix will need to be changed here
-                        def compilerPrefix = 'arm-frc-linux-gnueabi-'
-                        cppCompiler.executable = compilerPrefix + 'g++'
-                        linker.executable = compilerPrefix + 'g++'
-                        assembler.executable = compilerPrefix + 'gcc'
-                        // Gradle auto-adds the -m32 argument to the linker and compiler. Our compiler only supports
-                        // arm, and doesn't understand this flag, so it is removed from both
-                        cppCompiler.withArguments { args ->
-                            args << '-std=c++1y' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
-                            args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-O0' << '-g3' << '-rdynamic'
-                            //TODO: When the compiler allows us to actually call deprecated functions from within
-                            // deprecated function, remove this line (this will cause calling deprecated functions
-                            // to be treated as a warning rather than an error).
-                            args << '-Wno-error=deprecated-declarations'
-                            args.remove('-m32')
-                        }
-                        linker.withArguments { args ->
-                            args << '-rdynamic'
-                            args.remove('-m32')
-                        }
-                        staticLibArchiver.executable = compilerPrefix + 'ar'
-                    }
-                }
-            }
-
-            // The only platform is arm linux
-            platforms {
-                arm {
-                    architecture 'arm'
-                    operatingSystem 'linux'
-                }
-            }
+    ext.setupWpilibRepo = { publishing ->
+        publishing.repositories.maven {
+            url = "${System.getProperty('user.home')}/releases/maven/"
         }
-
-        // This task adds the appropriate linker flags for the NI libraries
-        task addNiLibraryLinks() {
-            description = 'Adds the linker flags for the NI libraries in the ni-library folders'
-            group = 'WPILib'
-            doLast {
-                binaries.all {
-                    tasks.withType(CppCompile) {
-                        // desktop version doesn't use all the NI libraries
-                        // so only do this for arm libraries
-                        String architecture = targetPlatform.architecture
-                        if (architecture.contains('arm')){
-                            linker.args << '-L' + niLibraryPath
-                            linker.args.addAll(niLibraryArgs)
-                        }
-                    }
-                }
-                model {
-                    repositories {
-                        libs(PrebuiltLibraries) { libs ->
-                            // Loops through all .so files (except files matching *libwpi*.so) in ../ni-libraries
-                            // and includes them for linking
-                            niLibraryTree.each { niLib ->
-                                libs.create(niLib) {
-                                    binaries.withType(SharedLibraryBinary) {
-                                        sharedLibraryFile = file(niLib.path)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // This task adds the appropriate linker flags for the WPI libraries
-        task addWpiLibraryLinks() {
-            description = 'Adds the linker flags for the WPI libraries in the ni-library folders'
-            group = 'WPILib'
-            doLast {
-                binaries.all {
-                    linker.args.addAll(wpiLibraryArgs)
-                }
-                model {
-                    repositories {
-                        libs(PrebuiltLibraries) { libs ->
-                            // Loops through all libwpi*.so files in ../ni-libraries and includes them for linking
-                            wpiLibraryTree.each { niLib ->
-                                libs.create(niLib) {
-                                    binaries.withType(SharedLibraryBinary) {
-                                        sharedLibraryFile = file(niLib.path)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // Whenever we add the WPI library links, we'll also need the ni libraries, so set up that dependency
-        addWpiLibraryLinks.dependsOn addNiLibraryLinks
     }
 }
 
+apply from: 'cppSettings.gradle'

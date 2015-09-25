@@ -1,0 +1,47 @@
+apply plugin: 'cpp'
+
+defineNetworkTablesProperties()
+
+ext.shared = "${project(':wpilibc').projectDir.getAbsolutePath()}/shared"
+ext.athena = "${project(':wpilibc').projectDir.getAbsolutePath()}/Athena"
+ext.hal = project(':hal').projectDir.getAbsolutePath()
+
+model {
+    components {
+        FRCUserProgram(NativeExecutableSpec) {
+            targetPlatform 'arm'
+            binaries.all {
+                tasks.withType(CppCompile) {
+                    dependsOn addNiLibraryLinks
+                    dependsOn addNetworkTablesLibraryLinks
+                }
+
+                cppCompiler.args '-pthread', '-Wno-unused-variable'
+                linker.args '-pthread', '-Wno-unused-variable', '-Wl,-rpath,/opt/GenICam_v2_3/bin/Linux_armv7-a'
+            }
+            sources {
+                cpp {
+                    def dir = 'wpilibC++IntegrationTests'
+                    source {
+                        srcDir 'src'
+                        include '**/*.cpp'
+                    }
+                    source {
+                        srcDir 'gtest/src'
+                        include 'gtest-all.cc', 'gtest_main.cc'
+                    }
+                    exportedHeaders {
+                        srcDirs = ['include', 'gtest', 'gtest/include',
+                                   "${project.athena}/include", "${project.shared}/include",
+                                   "${project.hal}/include/HAL", netTablesInclude]
+                        include '**/*.h'
+                    }
+
+                    lib project: ':wpilibc', library: 'wpilib_nonshared', linkage: 'static'
+                    lib project: ':hal', library: 'HALAthena', linkage: 'static'
+                }
+            }
+        }
+
+    }
+}

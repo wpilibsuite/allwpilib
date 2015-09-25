@@ -1,2 +1,0 @@
-env LD_LIBRARY_PATH=/usr/local/frc/rpath-lib/ /usr/local/frc/bin/netconsole-host /usr/local/frc/JRE/bin/java -XX:+UsePerfData -agentlib:jdwp=transport=dt_socket,address=8348,server=y,suspend=y -jar /home/lvuser/FRCUserProgram.jar
-

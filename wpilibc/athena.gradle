@@ -1,0 +1,120 @@
+defineNetworkTablesProperties()
+
+model {
+    components {
+        wpilib_nonshared(NativeLibrarySpec) {
+            targetPlatform 'arm'
+            binaries.all {
+                tasks.withType(CppCompile) {
+                    dependsOn addNiLibraryLinks
+                    dependsOn addNetworkTablesLibraryLinks
+                }
+            }
+            sources {
+                cpp {
+                    source {
+                        srcDirs = ["${project.shared}/src", "${project.athena}/src"]
+                        includes = ['**/*.cpp']
+                    }
+                    exportedHeaders {
+                        srcDirs = ["${project.shared}/include", "${project.athena}/include", netTablesInclude]
+                        includes = ['**/*.h']
+                    }
+                    lib project: ':hal', library: 'HALAthena', linkage: 'static'
+                }
+            }
+        }
+    }
+}
+
+task wpilibcZip(type: Zip) {
+    description = 'Zips all of the libraries for wpilibc'
+    group = 'WPILib'
+    baseName = 'wpilibc'
+    destinationDir = project.buildDir
+
+    // Include the static library file and header files from this project
+    binaries.withType(StaticLibraryBinarySpec) { spec ->
+        spec.headerDirs.each {
+            from(it) {
+                into 'include'
+            }
+        }
+        from(spec.staticLibraryFile) {
+            into 'lib'
+        }
+    }
+
+    // Include the static library file and shared library object from hal project
+    def hal = project(':hal')
+    hal.binaries.withType(StaticLibraryBinarySpec) { spec ->
+        spec.headerDirs.each {
+            from(it) {
+                into 'include'
+                // We don't want to include any of the .cpp files that are in some of the header directories
+                exclude '**/*.cpp'
+            }
+        }
+        from(spec.staticLibraryFile) {
+            into 'lib'
+        }
+    }
+    hal.binaries.withType(SharedLibraryBinarySpec) { spec ->
+        from(spec.sharedLibraryFile) {
+            into 'lib'
+        }
+    }
+
+    // Include the ntcore static and shared libraries
+    from(netSharedLib) {
+        into 'lib'
+    }
+    from(netStaticLib) {
+        into 'lib'
+    }
+
+    // We rename the libHALAthena.so object to libHALAthena_shared.so, and the same for libntcore.so
+    rename('(libHALAthena)(.so)', '$1_shared$2')
+    rename('(libntcore)(.so)', '$1_shared$2')
+
+    // Finally, include all of the shared library objects from the ni directory
+    from(project.file('../ni-libraries')) {
+        into 'lib'
+        exclude 'genlinks'
+    }
+}
+
+// Add the dependency on the wpilib_nonsharedStaticLibrary task to the wpilibc task. Because of the gradle lifecycle,
+// this cannot be done purely with dependsOn in the task, as the static library task doesn't exist yet. Same goes for
+// the networkTablesStaticLibrary task and the two HAL tasks below
+tasks.whenTaskAdded { task ->
+    if (task.name == 'wpilib_nonsharedStaticLibrary') {
+        wpilibcZip.dependsOn task
+    }
+}
+
+
+// Add the hal static and shared libraries as a dependency
+project(':hal').tasks.whenTaskAdded { task ->
+    if (task.name == 'hALAthenaStaticLibrary' || task.name == 'hALAthenaSharedLibrary') {
+        wpilibcZip.dependsOn task
+    }
+}
+
+publishing {
+    publications {
+        wpilibc(MavenPublication) {
+            artifact wpilibcZip {
+                // Trim the leading '-' off the classifier if we are using one
+                if (useExtension) {
+                    classifier = project.getClassifier()[1..-1]
+                }
+            }
+            groupId 'edu.wpi.first.wpilib.cmake'
+            artifactId 'cpp-root'
+            version '1.0.0'
+        }
+    }
+
+    setupWpilibRepo(it)
+}

@@ -10,6 +10,7 @@ publishing {
             version '0.1.0-SNAPSHOT'
         }
     }
+    setupWpilibRepo(it)
 }
 
 dependencies {

@@ -21,11 +21,7 @@ DEFAULT_DESTINATION_TEST_RESULTS_DIR=${DEFAULT_DESTINATION_DIR}/testResults
 # C++ test variables
 DEFAULT_CPP_TEST_NAME=FRCUserProgram
 DEFAULT_CPP_TEST_ARGS="--gtest_color=yes"
-if [ "$GRADLE" ]; then
-    DEFAULT_LOCAL_CPP_TEST_FILE=../wpilibc/build/binaries/fRCUserProgramExecutable/FRCUserProgram
-else
-    DEFAULT_LOCAL_CPP_TEST_FILE=../cmake/target/cmake/wpilibc/wpilibC++IntegrationTests/FRCUserProgram
-fi
+DEFAULT_LOCAL_CPP_TEST_FILE=../wpilibcIntegrationTests/build/binaries/fRCUserProgramExecutable/FRCUserProgram
 
 CPP_REPORT=cppreport.xml
 DEFAULT_LOCAL_CPP_TEST_RESULT=${DEFAULT_LOCAL_TEST_RESULTS_DIR}/${CPP_REPORT}
@@ -35,11 +31,7 @@ DEFAULT_DESTINATION_CPP_TEST_RESULTS=${DEFAULT_DESTINATION_TEST_RESULTS_DIR}/${C
 DEFAULT_JAVA_TEST_NAME=FRCUserProgram.jar
 DEFAULT_JAVA_TEST_ARGS=""
 
-if [ "$GRADLE" ]; then
-    DEFAULT_LOCAL_JAVA_TEST_FILE=../wpilibj/build/libs/wpilibJavaIntegrationTests-0.1.0-SNAPSHOT.jar
-else
-    DEFAULT_LOCAL_JAVA_TEST_FILE=../wpilibj/wpilibJavaIntegrationTests/target/wpilibJavaIntegrationTests-0.1.0-SNAPSHOT.jar
-fi
+DEFAULT_LOCAL_JAVA_TEST_FILE=../wpilibjIntegrationTests/build/libs/wpilibjIntegrationTests-all.jar
 
 JAVA_REPORT=javareport.xml
 DEFAULT_LOCAL_JAVA_TEST_RESULT=${DEFAULT_LOCAL_TEST_RESULTS_DIR}/${JAVA_REPORT}
