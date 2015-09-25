@@ -1,0 +1,50 @@
+import org.gradle.internal.os.OperatingSystem
+
+apply plugin: 'maven-publish'
+
+publishing {
+    publications {
+        if (!project.hasProperty('skipJava')) {
+            java(MavenPublication) {
+                artifact jar {
+                    // If we're building the regular ntcore for arm, it has no classifier. Otherwise, classify
+                    // the platform this jar is built for.
+                    classifier = buildPlatform
+                }
+                artifact (networktablesJavaSource) {
+                    classifier = 'sources'
+                }
+                artifact(networktablesJavadoc) {
+                    classifier = 'javadoc'
+                }
+
+                groupId 'edu.wpi.first.wpilib.networktables.java'
+                artifactId 'NetworkTables'
+                version '3.0.0-SNAPSHOT'
+            }
+        }
+        cpp(MavenPublication) {
+            artifact ntcoreZip {
+                classifier = buildPlatform
+            }
+
+            groupId 'edu.wpi.first.wpilib.networktables.cpp'
+            artifactId 'NetworkTables'
+            version '3.0.0-SNAPSHOT'
+        }
+    }
+
+    // If we want to publish to a specific repository on Jenkins, we specify it on the command line. The valid
+    // repository names are:
+    //     release
+    //     stable
+    //     beta
+    //     development
+    if (project.hasProperty('repo')) {
+        repositories {
+            maven {
+                url "${System.getProperty('user.home')}/releases/maven/$repo"
+            }
+        }
+    }
+}
