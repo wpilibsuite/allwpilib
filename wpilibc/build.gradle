@@ -197,10 +197,10 @@ task wpilibcSimZip(type: Zip) {
 // Add the dependency on the wpilib_nonsharedStaticLibrary task to the wpilibc task. Because of the gradle lifecycle,
 // this cannot be done purely with dependsOn in the task, as the static library task doesn't exist yet. Same goes for
 // the networkTablesStaticLibrary task and the two HAL tasks below
-tasks.findAll {
-  it.name == 'wpilib_nonsharedStaticLibrary'
-}.each {
-  wpilibcZip.dependsOn it
+tasks.whenTaskAdded { task ->
+    if (task.name == 'wpilib_nonsharedStaticLibrary') {
+        wpilibcZip.dependsOn task
+    }
 }
 
 // Add the networktables static library as a dependency
@@ -212,10 +212,10 @@ project(':networktables:ntcore').tasks.findAll {
 
 
 // Add the hal static and shared libraries as a dependency
-project(':hal').tasks.findAll {
-  it.name == 'hALAthenaStaticLibrary' || it.name == 'hALAthenaSharedLibrary'
-}.each {
-  wpilibcZip.dependsOn it
+project(':hal').tasks.whenTaskAdded { task ->
+    if (task.name == 'hALAthenaStaticLibrary' || task.name == 'hALAthenaSharedLibrary') {
+        wpilibcZip.dependsOn task
+    }
 }
 
 // If doxygen exists on the command line, then add the doxygen task as dependency of the wpilibcZip task
