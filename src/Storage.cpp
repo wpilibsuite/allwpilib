@@ -142,6 +142,16 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
           entry = new_entry.get();
           entry->id = id;
           m_idmap[id] = entry;
+
+          // if the received flags don't match what we sent, we most likely
+          // updated flags locally in the interim; send flags update message.
+          if (msg->flags() != entry->flags) {
+            auto queue_outgoing = m_queue_outgoing;
+            auto outmsg = Message::FlagsUpdate(id, entry->flags);
+            lock.unlock();
+            queue_outgoing(outmsg, nullptr, nullptr);
+            lock.lock();
+          }
         }
       }
 
@@ -168,7 +178,8 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
       }
 
       // don't update flags from a <3.0 remote (not part of message)
-      if (conn->proto_rev() >= 0x0300) {
+      // don't update flags if this is a server response to a client id request
+      if (!may_need_update && conn->proto_rev() >= 0x0300) {
         // update persistent dirty flag if persistent flag changed
         if ((entry->flags & NT_PERSISTENT) != (msg->flags() & NT_PERSISTENT))
           m_persistent_dirty = true;
