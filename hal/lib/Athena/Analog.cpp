@@ -6,8 +6,8 @@
 #include "HAL/HAL.hpp"
 #include "ChipObject.h"
 #include "HAL/cpp/Resource.hpp"
-#include "NetworkCommunication/AICalibration.h"
-#include "NetworkCommunication/LoadOut.h"
+#include "FRC_NetworkCommunication/AICalibration.h"
+#include "FRC_NetworkCommunication/LoadOut.h"
 
 static const long kTimebase = 40000000; ///< 40 MHz clock
 static const long kDefaultOversampleBits = 0;

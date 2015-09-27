@@ -4,7 +4,7 @@
 #include "HAL/Port.h"
 #include "HAL/Errors.hpp"
 #include "ChipObject.h"
-#include "NetworkCommunication/LoadOut.h"
+#include "FRC_NetworkCommunication/LoadOut.h"
 #include "ctre/PCM.h"
 
 static const int NUM_MODULE_NUMBERS = 63;

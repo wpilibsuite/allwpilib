@@ -1,6 +1,6 @@
 //This file must compile on ALL PLATFORMS. Be very careful what you put in here.
 #include "HAL/HAL.hpp"
-#include "NetworkCommunication/FRCComm.h"
+#include "FRC_NetworkCommunication/FRCComm.h"
 
 int HALGetControlWord(HALControlWord *data)
 {

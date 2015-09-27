@@ -49,6 +49,7 @@ model {
                     dependsOn jniHeaders
                     dependsOn addNiLibraryLinks
                 }
+		linker.args '-Wl,-rpath,/opt/GenICam_v2_3/bin/Linux_armv7-a,-rpath,/usr/local/frc/rpath-lib'
             }
             sources {
                 cpp {

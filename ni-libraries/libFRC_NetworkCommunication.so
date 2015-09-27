@@ -1,2 +1,2 @@
 OUTPUT_FORMAT(elf32-littlearm)
-GROUP ( libFRC_NetworkCommunication.so.1 )
+GROUP ( libFRC_NetworkCommunication.so.16 )

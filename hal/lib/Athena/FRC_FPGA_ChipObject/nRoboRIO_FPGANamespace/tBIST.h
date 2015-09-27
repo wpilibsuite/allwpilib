@@ -1,14 +1,14 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2015_1_0_A_BIST_h__
-#define __nFRC_2015_1_0_A_BIST_h__
+#ifndef __nFRC_2016_16_0_0_BIST_h__
+#define __nFRC_2016_16_0_0_BIST_h__
 
 #include "tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2015_1_0_A
+namespace nFRC_2016_16_0_0
 {
 
 class tBIST
@@ -87,4 +87,4 @@ private:
 }
 }
 
-#endif // __nFRC_2015_1_0_A_BIST_h__
+#endif // __nFRC_2016_16_0_0_BIST_h__

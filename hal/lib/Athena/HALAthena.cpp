@@ -5,10 +5,10 @@
 #include "ctre/ctre.h"
 #include "visa/visa.h"
 #include "ChipObject.h"
-#include "NetworkCommunication/FRCComm.h"
-#include "NetworkCommunication/UsageReporting.h"
-#include "NetworkCommunication/LoadOut.h"
-#include "NetworkCommunication/CANSessionMux.h"
+#include "FRC_NetworkCommunication/FRCComm.h"
+#include "FRC_NetworkCommunication/UsageReporting.h"
+#include "FRC_NetworkCommunication/LoadOut.h"
+#include "FRC_NetworkCommunication/CANSessionMux.h"
 #include <fstream>
 #include <iostream>
 #include <unistd.h>

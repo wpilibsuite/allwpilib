@@ -20,7 +20,7 @@
 
   <target name="get-target-ip">
     <property name="ant.enable.asserts" value="true"/>
-    <property name="target" value="roboRIO-${team-number}.local" />
+    <property name="target" value="roboRIO-${team-number}-FRC.local" />
 	<echo>Trying Target: ${target}</echo>
 	 <if>
 		<isreachable host="${target}" timeout="5"/>

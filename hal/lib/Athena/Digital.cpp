@@ -6,7 +6,7 @@
 #include "ChipObject.h"
 #include "HAL/cpp/Resource.hpp"
 #include "HAL/cpp/priority_mutex.h"
-#include "NetworkCommunication/LoadOut.h"
+#include "FRC_NetworkCommunication/LoadOut.h"
 #include <stdio.h>
 #include <math.h>
 #include <mutex>

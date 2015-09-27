@@ -5,7 +5,7 @@
 #include "edu_wpi_first_wpilibj_can_CANJNI.h"
 
 #include "HAL/CAN.hpp"
-#include "NetworkCommunication/CANSessionMux.h"
+#include "FRC_NetworkCommunication/CANSessionMux.h"
 
 // set the logging level
 //TLogLevel canJNILogLevel = logDEBUG;

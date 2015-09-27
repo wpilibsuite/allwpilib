@@ -72,7 +72,7 @@ model {
                 linker.args '-pthread'
                 cppCompiler.args '-Wno-unused-variable'
                 linker.args '-Wno-unused-variable'
-                linker.args '-Wl,-rpath,/opt/GenICam_v2_3/bin/Linux_armv7-a'
+                linker.args '-Wl,-rpath,/opt/GenICam_v2_3/bin/Linux_armv7-a,-rpath,/usr/local/frc/rpath-lib'
             }
             sources {
                 cpp {

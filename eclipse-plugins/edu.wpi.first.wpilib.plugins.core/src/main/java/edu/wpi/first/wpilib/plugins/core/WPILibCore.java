@@ -125,7 +125,7 @@ public class WPILibCore extends AbstractUIPlugin {
 			return target;
 		else {
 			int teamNumber = getTeamNumber(project);
-			return "roborio-" + teamNumber + ".local";
+			return "roborio-" + teamNumber + "-FRC.local";
 		}
 	}
 

@@ -1,7 +1,7 @@
 /*
- * FPGA Interface C API 14.0 header file.
+ * FPGA Interface C API 15.0 header file.
  *
- * Copyright (c) 2014,
+ * Copyright (c) 2015,
  * National Instruments Corporation.
  * All rights reserved.
  */
@@ -432,6 +432,13 @@ static const NiFpga_Status NiFpga_Status_GatedClockHandshakingViolation = -61216
 static const NiFpga_Status NiFpga_Status_ElementsNotPermissibleToBeAcquired = -61219;
 
 /**
+ * The operation could not be performed because the FPGA is in configuration or
+ * discovery mode. Wait for configuration or discovery to complete and retry
+ * your operation.
+ */
+static const NiFpga_Status NiFpga_Status_FpgaBusyConfiguration = -61252;
+
+/**
  * An unexpected internal error occurred.
  */
 static const NiFpga_Status NiFpga_Status_InternalError = -61499;
@@ -514,10 +521,12 @@ static const NiFpga_Status NiFpga_Status_BitfileReadError = -63101;
 static const NiFpga_Status NiFpga_Status_SignatureMismatch = -63106;
 
 /**
- * The bitfile you are trying to use is not compatible with the version of
- * NI-RIO installed on the target and/or the host. Determine which versions of
- * NI-RIO and LabVIEW were used to make the bitfile, update the software on the
- * target and host to that version or later, and try again.
+ * The bitfile you are trying to use is incompatible with the version
+ * of NI-RIO installed on the target and/or host. Update the version
+ * of NI-RIO on the target and/or host to the same version (or later)
+ * used to compile the bitfile. Alternatively, recompile the bitfile
+ * with the same version of NI-RIO that is currently installed on the
+ * target and/or host.
  */
 static const NiFpga_Status NiFpga_Status_IncompatibleBitfile = -63107;
 
@@ -558,7 +567,7 @@ static const NiFpga_Status NiFpga_Status_OutOfHandles = -63198;
  */
 static NiFpga_Inline NiFpga_Bool NiFpga_IsError(const NiFpga_Status status)
 {
-   return status < NiFpga_Status_Success;
+   return status < NiFpga_Status_Success ? NiFpga_True : NiFpga_False;
 }
 
 /**
@@ -569,7 +578,7 @@ static NiFpga_Inline NiFpga_Bool NiFpga_IsError(const NiFpga_Status status)
  */
 static NiFpga_Inline NiFpga_Bool NiFpga_IsNotError(const NiFpga_Status status)
 {
-   return status >= NiFpga_Status_Success;
+   return status >= NiFpga_Status_Success ? NiFpga_True : NiFpga_False;
 }
 
 /**

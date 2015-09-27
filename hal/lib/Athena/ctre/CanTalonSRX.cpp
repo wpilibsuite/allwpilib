@@ -70,7 +70,7 @@
  * @link https://docs.google.com/spreadsheets/d/1OU_ZV7fZLGYUQ-Uhc8sVAmUmWTlT8XBFYK8lfjg_tac/edit#gid=1766046967
  */
 #include "HAL/CanTalonSRX.h"
-#include "NetworkCommunication/CANSessionMux.h"	//CAN Comm
+#include "FRC_NetworkCommunication/CANSessionMux.h"	//CAN Comm
 #include <string.h> // memset
 #include <unistd.h> // usleep
 

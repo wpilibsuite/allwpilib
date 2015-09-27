@@ -18,7 +18,7 @@ public class RSEUtils {
 		// The ip address based on the team number
         //String hostName = "10."+(teamNumber/100)+"."+(teamNumber%100)+".2";
         //String connectionName = hostName; //"Team "+teamNumber;
-		String hostName = "roboRIO-" + teamNumber + ".local";
+		String hostName = "roboRIO-" + teamNumber + "-FRC.local";
 		String connectionName = hostName;
    
         // get the singleton RSE registry

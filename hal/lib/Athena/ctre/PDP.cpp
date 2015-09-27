@@ -1,5 +1,5 @@
 #include "ctre/PDP.h"
-#include "NetworkCommunication/CANSessionMux.h"	//CAN Comm
+#include "FRC_NetworkCommunication/CANSessionMux.h"	//CAN Comm
 #include <string.h> // memset
 #include <unistd.h> // usleep
 

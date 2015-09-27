@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(WPILibC++IntegrationTests)
 
-SET(CMAKE_EXE_LINKER_FLAGS "-Wl,-rpath,/opt/GenICam_v2_3/bin/Linux_armv7-a")
+SET(CMAKE_EXE_LINKER_FLAGS "-Wl,-rpath,/opt/GenICam_v2_3/bin/Linux_armv7-a,-rpath,/usr/local/frc/rpath-lib")
 
 file(GLOB_RECURSE SRC_FILES src/*.cpp src/gtest/src/gtest-all.cc src/gtest/src/gtest_main.cc)
 include_directories(include/ src/gtest/ src/gtest/include/ ../wpilibC++Devices/include/ ${WPILIB_INCLUDES} ${HAL_API_INCLUDES} ${NWT_API_INCLUDES})

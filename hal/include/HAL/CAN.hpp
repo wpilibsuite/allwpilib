@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#include "NetworkCommunication/CANSessionMux.h"
+#include "FRC_NetworkCommunication/CANSessionMux.h"
 
 void canTxSend(uint32_t arbID, uint8_t length, int32_t period = CAN_SEND_PERIOD_NO_REPEAT);
 

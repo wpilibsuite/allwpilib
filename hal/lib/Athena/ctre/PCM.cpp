@@ -1,7 +1,7 @@
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 
 #include "ctre/PCM.h"
-#include "NetworkCommunication/CANSessionMux.h"
+#include "FRC_NetworkCommunication/CANSessionMux.h"
 #include <string.h> // memset
 #include <unistd.h> // usleep
 /* This can be a constant, as long as nobody needs to updatie solenoids within
