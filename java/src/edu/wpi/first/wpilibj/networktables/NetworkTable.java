@@ -95,7 +95,7 @@ public class NetworkTable implements ITable, IRemote {
    * mode
    */
   public synchronized static void setIPAddress(final String address) {
-    if (ipAddress == address)
+    if (ipAddress.equals(address))
       return;
     checkInit();
     ipAddress = address;
@@ -118,7 +118,7 @@ public class NetworkTable implements ITable, IRemote {
    * automatic loading and saving of persistent values
    */
   public synchronized static void setPersistentFilename(final String filename) {
-    if (persistentFilename == filename)
+    if (persistentFilename.equals(filename))
       return;
     checkInit();
     persistentFilename = filename;
