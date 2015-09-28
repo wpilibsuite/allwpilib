@@ -1,0 +1,198 @@
+= Network Tables Alloy Model
+
+Alloy (http://alloy.mit.edu/alloy/) is a formal logic tool that can analyze
+first-order logic expressions. Under the proposed sequence number -based
+protocol, assuming that all nodes start from the same state, Alloy is unable to
+find a way where two nodes with the same sequence number have different state
+when activity ceases.
+
+The model used is included below. Although Alloy cannot test all cases, since
+such an exhaustive search is intractable, it provides a high level of
+confidence in the proposed protocol.
+
+----
+--- Models a distributed, centralized hash table system called NetworkTables
+--- System state is protected by sequence numbers; the server's value for a certain sequence number always wins
+--- Paul Malmsten, 2012 pmalmsten@gmail.com
+
+open util/ordering[Time] as TO
+open util/natural as natural
+
+sig Time {}
+sig State {}
+
+--- Define nodes and server
+sig Node {
+    state: State -> Time,
+    sequenceNumber: Natural -> Time
+}
+
+--- Only one server
+one sig Server extends Node {
+}
+
+--- Define possible events
+abstract sig Event {
+    pre,post: Time,
+    receiver: one Node
+}
+
+// For all events, event.post is the time directly following event.pre
+fact {
+    all e:Event {
+        e.post = e.pre.next
+    }
+}
+
+// Represents that state has changed on a node
+sig StateChangeEvent extends Event {
+}
+
+// Represents that state has been transferred from one node to another
+sig StateTransferEvent extends Event {
+    sender: one Node
+}
+
+fact {
+    --- Every node must assume at most one state
+    all t:Time, n:Node | #n.state.t = 1
+
+    --- Every node must assume one sequence number
+    all t:Time, n:Node | #n.sequenceNumber.t = 1
+
+    --- Sequence numbers may only increment
+    all t:Time - last, n:Node | let t' = t.next | natural/gte[n.sequenceNumber.t', n.sequenceNumber.t]
+}
+
+
+fact stateChangedImpliesAStateTransfer {
+    all sce:StateChangeEvent {
+        // A StateChange on a client causes a transfer to the Server if its sequence number is greater than the server's
+        sce.receiver in Node - Server and natural/gt[sce.receiver.sequenceNumber.(sce.post), Server.sequenceNumber.(sce.post)]
+         implies
+            some ste:StateTransferEvent {
+                ste.pre = sce.post and ste.sender = sce.receiver and ste.receiver = Server
+            }
+    }
+
+    all sce:StateChangeEvent {
+        // A StateChange on the server causes a transfer to all clients
+        sce.receiver = Server implies
+            all n:Node - Server {
+                some ste:StateTransferEvent {
+                     ste.pre = sce.post and ste.sender = Server and ste.receiver = n
+                }
+            }
+    }
+
+    all sce:StateTransferEvent {
+        // A StateTransfer to the server causes a transfer to all clients
+        sce.receiver = Server implies
+            all n:Node - Server {
+                some ste:StateTransferEvent {
+                     ste.pre = sce.post and ste.sender = Server and ste.receiver = n
+                }
+            }
+    }
+}
+
+fact stateTransferEventsMoveState {
+    all ste:StateTransferEvent {
+        ste.sender = Server and not ste.receiver = Server or ste.receiver = Server and not ste.sender = Server
+
+        // Nodes can only post to the server if their sequence number is greater than the servers
+        ste.receiver = Server implies natural/gt[ste.sender.sequenceNumber.(ste.pre), ste.receiver.sequenceNumber.(ste.pre)]
+
+        // Server can only post to clients if its sequence number is greater than or equal to the client
+        ste.sender = Server implies natural/gte[ste.sender.sequenceNumber.(ste.pre), ste.receiver.sequenceNumber.(ste.pre)]
+
+        // Actual transfer
+        (ste.receiver.state.(ste.post) = ste.sender.state.(ste.pre) and
+          ste.receiver.sequenceNumber.(ste.post) = ste.sender.sequenceNumber.(ste.pre))
+    }
+}
+
+
+fact noEventsPendingAtEnd {
+    no e:Event {
+        e.pre = last
+    }
+}
+
+fact noDuplicateEvents {
+    all e,e2:Event {
+        // Two different events with the same receiver imply they occurred at different times
+        e.receiver = e2.receiver and e != e2 implies e.pre != e2.pre
+    }
+}
+
+fact noStateTransfersToSelf {
+    all ste:StateTransferEvent {
+        ste.sender != ste.receiver
+    }
+}
+
+fact noDuplicateStateTransferEvents {
+    all ste,ste2:StateTransferEvent {
+        // Two state transfer events with the same nodes imply that they occurred at different times
+        ste.sender = ste2.sender and ste.receiver = ste2.receiver and ste != ste2 implies ste.pre != ste2.pre
+    }
+}
+
+--- Trace (time invariant)
+fact trace {
+    all t:Time - last | let t' = t.next {
+        all n:Node {
+                // A node in (pre.t).receiver means it is being pointed to by some event that will happen over the next time step
+                n in (pre.t).receiver implies n.state.t' != n.state.t and n.sequenceNumber.t' != n.sequenceNumber.t    // A node which receives some sort of event at time t causes it to change state
+                                                       else n.state.t' = n.state.t and n.sequenceNumber.t' = n.sequenceNumber.t     // Otherwise, it does not change state
+        }
+    }
+}
+
+--- Things we might like to be true, but are not always true
+
+pred atLeastOneEvent {
+    #Event >= 1
+}
+
+pred allNodesStartAtSameStateAndSequenceNumber {
+    all n,n2:Node {
+        n.state.first = n2.state.first and n.sequenceNumber.first = n2.sequenceNumber.first
+    }
+}
+
+pred noStateChangeEventsAtEnd {
+    no e:StateChangeEvent {
+        e.post = last
+    }
+}
+
+--- Demonstration (Alloy will try to satisfy this)
+
+pred show {
+    atLeastOneEvent
+}
+run show
+
+--- Assertions (Alloy will try to break these)
+
+assert allNodesConsistentAtEnd {
+    allNodesStartAtSameStateAndSequenceNumber implies
+        all n,n2:Node {
+            // At the end of a sequence (last) all nodes with the same sequence number have the same state
+            n.sequenceNumber.last = n2.sequenceNumber.last implies n.state.last = n2.state.last
+        }
+}
+check allNodesConsistentAtEnd for 3 Event, 10 Node, 3 State, 5 Time, 5 Natural
+check allNodesConsistentAtEnd for 8 Event, 2 Node, 5 State, 9 Time, 9 Natural
+
+assert serverHasHighestSeqNumAtEnd {
+    allNodesStartAtSameStateAndSequenceNumber implies
+        all n:Node - Server{
+            // At the end of a sequence (last) all nodes with the same sequence number have the same state
+            natural/gte[Server.sequenceNumber.last, n.sequenceNumber.last]
+        }
+}
+check serverHasHighestSeqNumAtEnd for 3 Event, 10 Node, 3 State, 5 Time, 5 Natural
+----

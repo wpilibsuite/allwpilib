@@ -1,0 +1,454 @@
+= Network Tables Protocol Specification, Version 2.0
+Protocol Revision 2.0 (0x0200), 1/8/2013
+:toc:
+:toc-placement: preamble
+:sectanchors:
+
+This document defines a network protocol for a key-value store that may be read
+from and written to by multiple remote clients. A central server, most often
+running on a FIRST FRC robot controller, is responsible for providing
+information consistency and for facilitating communication between clients.
+
+Information consistency is guaranteed through the use of a sequence number
+associated with each key-value pair. An update of a key-value pair increments
+the associated sequence number, and this update information is shared with all
+participating clients. The central server only applies and redistributes
+updates which have a larger sequence number than its own, which guarantees that
+a client must have received a server's most recent state before it can replace
+it with a new value.
+
+This is a backwards-incompatible rework of the Network Tables network protocol
+originally introduced for the 2012 FIRST Robotics Competition. Note that this
+revision of the Network Tables protocol no longer includes the concept of
+sub-tables. We suggest that instead of representing sub-tables as first-class
+data types in the network protocol, it would be easy for an implementation to
+provide a similar API abstraction by adding prefixes to keys. For example, we
+suggest using Unix-style path strings to define sub-table hierarchies. The
+prefix ensures that sub-table namespaces do not collide in a global hashtable
+without requiring an explicit sub-table representation.
+
+In addition, the explicit concept of grouping multiple updates such that they
+are all visible at the same time to user code on a remote device was discarded.
+Instead, array types for all common elements are provided. By using an array
+data type, users may achieve the same level of atomicity for common operations
+(e.g. sending a cartesian coordinate pair) without requiring the complexity of
+arbitrarily grouped updates.
+
+This document conforms to <<rfc2119>> - Key words for use in RFCs to Indicate
+Requirement Levels.
+
+[[references]]
+== References
+
+[[rfc1982,RFC 1982]]
+* RFC 1982, Serial Number Arithmetic, http://tools.ietf.org/html/rfc1982
+
+[[rfc2119,RFC 2119]]
+* RFC 2119, Key words for use in RFCs to Indicate Requirement Levels,
+http://tools.ietf.org/html/rfc2119
+
+[[definitions]]
+== Definitions
+
+[[def-client]]
+Client:: An implementation of this protocol running in client configuration.
+Any number of Clients may exist for a given Network.
+
+[[def-entry]]
+Entry:: A data value identified by a string name.
+
+[[def-entry-id]]
+Entry ID:: An unsigned 2-byte ID by which the Server and Clients refer to an
+Entry across the network instead of using the full string key for the Entry.
+Entry IDs range from 0x0000 to 0xFFFE (0xFFFF is reserved for an Entry
+Assignment issued by a Client).
+
+[[def-server]]
+Server:: An implementation of this protocol running in server configuration.
+One and only one Server must exist for a given Network.
+
+[[def-network]]
+Network:: One or more Client nodes connected to a Server.
+
+[[def-user-code]]
+User Code:: User-supplied code which may interact with a Client or Server. User
+Code should be executed on the same computer as the Client or Server instance
+it interacts with.
+
+[[def-sequence-number]]
+Sequence Number:: An unsigned number which allows the Server to resolve update
+conflicts between Clients and/or the Server. Sequence numbers may overflow.
+Sequential arithmetic comparisons, which must be used with Sequence Numbers,
+are defined by RFC 1982.
+
+[[def-protocol-revision]]
+Protocol Revision:: A 16-bit unsigned integer which indicates the version of
+the network tables protocol that a client wishes to use. The protocol revision
+assigned to this version of the network tables specification is listed at the
+top of this document. This number is listed in dot-decimal notation as well as
+its equivalent hexadecimal value.
+
+== Transport Layer
+
+Conventional implementations of this protocol should use TCP for reliable
+communication; the Server should listen on TCP port 1735 for incoming
+connections.
+
+== Example Exchanges
+
+[[exchange-connect]]
+=== Client Connects to the Server
+
+Directly after client establishes a connection with the Server, the following
+procedure must be followed:
+
+. The Client sends a <<msg-client-hello>> message to the Server
+
+. The Server sends one <<msg-assign>> for every field it currently recognizes.
+
+. The Server sends a <<msg-server-hello-complete>> message.
+
+. For all Entries the Client recognizes that the Server did not identify with a
+Entry Assignment, the client follows the <<exchange-client-creates-entry>>
+protocol.
+
+In the event that the Server does not support the protocol revision that the
+Client has requested in a Client Hello message, the Server must instead issue a
+<<msg-protocol-unsupported>> message to the joining client and close the
+connection.
+
+[[exchange-client-creates-entry]]
+=== Client Creates an Entry
+
+When User Code on a Client assigns a value to an Entry that the Server has not
+yet issued a Entry Assignment for, the following procedure must be followed:
+
+. The Client sends an <<msg-assign>> with an Entry ID of 0xFFFF.
+
+. The Server issues an <<msg-assign>> to all Clients (including the sender) for
+the new field containing a real Entry ID and Sequence Number for the new field.
+
+In the event that User Code on the Client updates the value of the
+to-be-announced field again before the expected Entry Assignment is received,
+then the Client must save the new value and take no other action (the most
+recent value of the field should be issued when the Entry Assignment arrives,
+if it differs from the value contained in the received Entry Assignment).
+
+In the event that the Client receives a Entry Assignment from the Server for
+the Entry that it intended to issue an Entry Assignment for, before it issued
+its own Entry Assignment, the procedure may end early.
+
+In the event that the Server receives a duplicate Entry Assignment from a
+Client (likely due to the client having not yet received the Server's Entry
+Assignment), the Server should ignore the duplicate Entry Assignment.
+
+[[exchange-client-updates-entry]]
+=== Client Updates an Entry
+
+When User Code on a Client updates the value of an Entry, the Client must send
+an <<msg-update>> message to the Server. The Sequence Number included in the
+Entry Update message must be the most recently received Sequence Number for the
+Entry to be updated incremented by one.
+
+.Example:
+
+. Client receives Entry Assignment message for Entry "a" with integer value 1,
+Entry ID of 0, and Sequence Number 1.
+
+. User Code on Client updates value of Entry "a" to 16 (arbitrary).
+
+. Client sends Entry Update message to Server for Entry 0 with a Sequence
+Number of 2 and a value of 16.
+
+When the Server receives an Entry Update message, it first checks the Sequence
+Number in the message against the Server's value for the Sequence Number
+associated with the Entry to be updated. If the received Sequence Number is
+strictly greater than (aside: see definition of "greater than" under the
+definition of Sequence Number) the Server's Sequence Number for the Entry to be
+updated, the Server must apply the new value for the indicated Entry and repeat
+the Entry Update message to all other connected Clients.
+
+If the received Sequence Number is less than or equal (see definition of "less
+than or equal" in RFC 1982) to the Server's Sequence Number for the Entry to be
+updated, this implies that the Client which issued the Entry Update message has
+not yet received one or more Entry Update message(s) that the Server recently
+sent to it; therefore, the Server must ignore the received Entry Update
+message. In the event that comparison between two Sequence Numbers is undefined
+(see RFC 1982), then the Server must always win (it ignores the Entry Update
+message under consideration).
+
+[[update-rate]]
+NOTE: If User Code modifies the value of an Entry too quickly, 1) users may not
+see every value appear on remote machines, and 2) the consistency protection
+offered by the Entry's Sequence Number may be lost (by overflowing before
+remote devices hear recent values). It is recommended that implementations
+detect when user code updates an Entry more frequently than once every 5
+milliseconds and print a warning message to the user (and/or offer some other
+means of informing User Code of this condition).
+
+[[exchange-server-creates-entry]]
+=== Server Creates an Entry
+
+When User Code on the Server assigns a value to a Entry which does not exist,
+the Server must issue an <<msg-assign>> message to all connected clients.
+
+[[exchange-server-updates-entry]]
+=== Server Updates an Entry
+
+When User Code on the Server updates the value of an Entry, the Server must
+apply the new value to the Entry immediately, increment the associated Entry's
+Sequence Number, and issue a <<msg-update>> message containing the new value
+and Sequence Number of the associated Entry to all connected Clients.
+
+NOTE: See <<update-rate,Note>> under <<exchange-client-updates-entry>>.
+
+[[exchange-keep-alive]]
+=== Keep Alive
+
+To maintain a connection and prove a socket is still open, a Client or Server
+may issue <<msg-keep-alive>> messages. Clients and the Server should ignore
+incoming Keep Alive messages.
+
+The intent is that by writing a Keep Alive to a socket, a Client forces its
+network layer (TCP) to reevaluate the state of the network connection as it
+attempts to deliver the Keep Alive message. In the event that a connection is
+no longer usable, a Client's network layer should inform the Client that it is
+no longer usable within a few attempts to send a Keep Alive message.
+
+To provide timely connection status information, Clients should send a Keep
+Alive message to the Server after every 1 second period of connection
+inactivity (i.e. no information is being sent to the Server). Clients should
+not send Keep Alive messages more frequently than once every 100 milliseconds.
+
+Since the Server does not require as timely information about the status of a
+connection, it is not required to send Keep Alive messages during a period of
+inactivity.
+
+[[bandwidth]]
+== Bandwidth and Latency Considerations
+
+To reduce unnecessary bandwidth usage, implementations of this protocol should:
+
+* Send an Entry Update if and only if the value of an Entry is changed to a
+value that is different from its prior value.
+
+* Buffer messages and transmit them in groups, when possible, to reduce
+transport protocol overhead.
+
+* Only send the most recent value of an Entry. When User Code updates the value
+of an Entry more than once before the new value is transmitted, only the latest
+value of the Entry should be sent.
+
+It is important to note that these behaviors will increase the latency between
+when a Client or Server updates the value of an Entry and when all Clients
+reflect the new value. The exact behavior of this buffering is left to
+implementations to determine, although the chosen scheme should reflect the
+needs of User Code. Implementations may include a method by which User Code can
+specify the maximum tolerable send latency.
+
+[[entry-types]]
+== Entry Types
+
+Entry Type must assume one the following values:
+
+[cols="1,3"]
+|===
+|Numeric Value |Type
+
+|0x00
+|Boolean
+
+|0x01
+|Double
+
+|0x02
+|String
+
+|0x10
+|Boolean Array
+
+|0x11
+|Double Array
+
+|0x12
+|String Array
+|===
+
+[[entry-values]]
+== Entry Values
+
+Entry Value must assume the following structure as indicated by Entry Type:
+
+[cols="1,3"]
+|===
+|Entry Type |Entry Value Format
+
+|[[entry-value-boolean]]Boolean
+|1 byte, unsigned; True = 0x01, False = 0x00
+
+|[[entry-value-double]]Double
+|8 bytes, IEEE 754 floating-point "double format" bit layout; (big endian)
+
+|[[entry-value-string]]String
+|2 byte, unsigned length prefix (big endian) of the number of raw bytes to
+follow, followed by the string encoded in UTF-8
+
+|[[entry-value-boolean-array]]Boolean Array
+|1 byte, unsigned, number of elements within the array to follow
+
+N bytes - The raw bytes representing each Boolean element contained within the
+array, beginning with the item at index 0 within the array.
+
+|[[entry-value-double-array]]Double Array
+|1 byte, unsigned, number of elements within the array to follow
+
+N bytes - The raw bytes representing each Double element contained within the
+array, beginning with the item at index 0 within the array.
+
+|[[entry-value-string-array]]String Array
+|1 byte, unsigned, number of elements within the array to follow
+
+N bytes - The raw bytes representing each String element contained within the
+array, beginning with the item at index 0 within the array.
+|===
+
+== Message Structures
+
+All messages are of the following format:
+
+[cols="1,3"]
+|===
+|Field Name |Field Type
+
+|Message Type
+|1 byte, unsigned
+
+|Message Data
+|N bytes (length determined by Message Type)
+|===
+
+[[msg-keep-alive]]
+=== Keep Alive
+
+Indicates that the remote party is checking the status of a network connection.
+
+[cols="1,3"]
+|===
+|Field Name |Field Type
+
+|0x00 - Keep Alive
+|1 byte, unsigned; Message Type
+|===
+
+[[msg-client-hello]]
+=== Client Hello
+
+A Client issues a Client Hello message when first establishing a connection.
+The Client Protocol Revision field specifies the Network Table protocol
+revision that the Client would like to use.
+
+[cols="1,3"]
+|===
+|Field Name |Field Type
+
+|0x01 - Client Hello
+|1 byte, unsigned; Message Type
+
+|Client Protocol Revision
+|2 bytes, Unsigned 16-bit integer (big-endian).
+
+See <<def-protocol-revision,Protocol Revision>>
+|===
+
+[[msg-protocol-unsupported]]
+=== Protocol Version Unsupported
+
+A Server issues a Protocol Version Unsupported message to a Client to inform it
+that the requested protocol revision is not supported. It also includes the
+most recent protocol revision which it supports, such that a Client may
+reconnect under a prior protocol revision if able.
+
+[cols="1,3"]
+|===
+|Field Name |Field Type
+
+|0x02 - Protocol Version Unsupported
+|1 byte, unsigned; Message Type
+
+|Server Supported Protocol Revision
+|2 bytes, Unsigned 16-bit integer (big-endian).
+
+See <<def-protocol-revision,Protocol Revision>>
+|===
+
+[[msg-server-hello-complete]]
+=== Server Hello Complete
+
+A Server issues a Server Hello Complete message when it has finished informing
+a newly-connected client of all of the fields it currently recognizes.
+Following the receipt of this message, a Client should inform the Server of
+any/all additional fields that it recognizes that the Server did not announce.
+
+[cols="1,3"]
+|===
+|Field Name |Field Type
+
+|0x03 - Server Hello Complete
+|1 byte, unsigned; Message Type
+|===
+
+[[msg-assign]]
+=== Entry Assignment
+
+A Entry Assignment message informs the remote party of a new Entry. An Entry
+Assignment's value field must be the most recent value of the field being
+assigned at the time that the Entry Assignment is sent.
+
+[cols="1,3"]
+|===
+|Field Name |Field Type
+
+|0x10 - Entry Assignment
+|1 byte, unsigned; Message Type
+
+|Entry Name
+|<<entry-value-string,String>>
+
+|Entry Type
+|1 byte, unsigned; see <<entry-types,Entry Types>>
+
+|Entry ID
+|2 bytes, unsigned
+
+|Entry Sequence Number
+|2 bytes, unsigned
+
+|Entry Value
+|N bytes, length depends on Entry Type
+|===
+
+If the Entry ID is 0xFFFF, then this assignment represents a request from a
+Client to the Server. In this event, the Entry ID field and the Entry Sequence
+Number field must not be stored or relied upon as they otherwise would be.
+
+[[msg-update]]
+=== Entry Update
+
+An Entry Update message informs a remote party of a new value for an Entry.
+
+[cols="1,3"]
+|===
+|Field Name |Field Type
+
+|0x11 - Entry Update
+|1 byte, unsigned; Message Type
+
+|Entry ID
+|2 bytes, unsigned
+
+|Entry Sequence Number
+|2 bytes, unsigned
+
+|Entry Value
+|N bytes, length dependent on value type
+|===
