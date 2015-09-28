@@ -146,9 +146,8 @@ void NT_DeleteEntry(const char *name, unsigned int name_len) {
 
 void NT_DeleteAllEntries(void) { nt::DeleteAllEntries(); }
 
-struct NT_EntryInfo *NT_GetEntryInfo(const char *prefix,
-                                     unsigned int prefix_len, int types,
-                                     unsigned int *count) {
+struct NT_EntryInfo *NT_GetEntryInfo(const char *prefix, size_t prefix_len,
+                                     unsigned int types, size_t *count) {
   auto info_v = nt::GetEntryInfo(StringRef(prefix, prefix_len), types);
   *count = info_v.size();
   if (info_v.size() == 0) return nullptr;
