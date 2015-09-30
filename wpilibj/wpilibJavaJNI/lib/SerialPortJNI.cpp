@@ -24,6 +24,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialInitia
 	SERIALJNI_LOG(logDEBUG) << "Calling Serial Initialize";
 	SERIALJNI_LOG(logDEBUG) << "Port = " << (jint) port;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	serialInitializePort(port, statusPtr);
 	SERIALJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -39,6 +40,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialSetBau
 	SERIALJNI_LOG(logDEBUG) << "Setting Serial Baud Rate";
 	SERIALJNI_LOG(logDEBUG) << "Baud: " << rate;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	serialSetBaudRate(port, rate, statusPtr);
 	SERIALJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -54,6 +56,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialSetDat
 	SERIALJNI_LOG(logDEBUG) << "Setting Serial Data Bits";
 	SERIALJNI_LOG(logDEBUG) << "Data Bits: " << bits;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	serialSetDataBits(port, bits, statusPtr);
 	SERIALJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -69,6 +72,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialSetPar
 	SERIALJNI_LOG(logDEBUG) << "Setting Serial Parity";
 	SERIALJNI_LOG(logDEBUG) << "Parity: " << parity;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	serialSetParity(port, parity, statusPtr);
 	SERIALJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -84,6 +88,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialSetSto
 	SERIALJNI_LOG(logDEBUG) << "Setting Serial Stop Bits";
 	SERIALJNI_LOG(logDEBUG) << "Stop Bits: " << bits;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	serialSetStopBits(port, bits, statusPtr);
 	SERIALJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -99,6 +104,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialSetWri
 	SERIALJNI_LOG(logDEBUG) << "Setting Serial Write Mode";
 	SERIALJNI_LOG(logDEBUG) << "Write mode: " << mode;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	serialSetWriteMode(port, mode, statusPtr);
 	SERIALJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -114,6 +120,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialSetFlo
 	SERIALJNI_LOG(logDEBUG) << "Setting Serial Flow Control";
 	SERIALJNI_LOG(logDEBUG) << "Flow Control: " << flow;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	serialSetFlowControl(port, flow, statusPtr);
 	SERIALJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -129,6 +136,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialSetTim
 	SERIALJNI_LOG(logDEBUG) << "Setting Serial Timeout";
 	SERIALJNI_LOG(logDEBUG) << "Timeout: " << timeout;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	serialSetTimeout(port, timeout, statusPtr);
 	SERIALJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -144,6 +152,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialEnable
 	SERIALJNI_LOG(logDEBUG) << "Setting Serial Enable Termination";
 	SERIALJNI_LOG(logDEBUG) << "Terminator: " << terminator;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	serialEnableTermination(port, terminator, statusPtr);
 	SERIALJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -158,6 +167,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialDisabl
 {
 	SERIALJNI_LOG(logDEBUG) << "Setting Serial Disable termination";
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	serialDisableTermination(port, statusPtr);
 	SERIALJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -173,6 +183,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialSetRea
 	SERIALJNI_LOG(logDEBUG) << "Setting Serial Read Buffer Size";
 	SERIALJNI_LOG(logDEBUG) << "Size: " << size;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	serialSetReadBufferSize(port, size, statusPtr);
 	SERIALJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -188,6 +199,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialSetWri
 	SERIALJNI_LOG(logDEBUG) << "Setting Serial Write Buffer Size";
 	SERIALJNI_LOG(logDEBUG) << "Size: " << size;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	serialSetWriteBufferSize(port, size, statusPtr);
 	SERIALJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -202,6 +214,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialGetByt
 {
 	SERIALJNI_LOG(logDEBUG) << "Serial Get Bytes Received";
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	jint retVal = serialGetBytesReceived(port, statusPtr);
 	SERIALJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	return retVal;
@@ -219,6 +232,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialRead
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	jbyte * dataReceivedPtr = NULL;
 	dataReceivedPtr = (jbyte*)env->GetDirectBufferAddress(dataReceived);
+	*statusPtr = 0;
 	jint retVal = serialRead(port, (char*)dataReceivedPtr, size, statusPtr);
 	SERIALJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
 	SERIALJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
@@ -239,6 +253,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialWrite
 	if(dataToSend != 0){
 		dataToSendPtr = (jbyte*)env->GetDirectBufferAddress(dataToSend);
 	}
+	*statusPtr = 0;
 	jint retVal = serialWrite(port, (const char*)dataToSendPtr, size, statusPtr);
 	SERIALJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
 	SERIALJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
@@ -255,6 +270,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialFlush
 {
 	SERIALJNI_LOG(logDEBUG) << "Serial Flush";
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	serialFlush(port, statusPtr);
 	SERIALJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -269,6 +285,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialClear
 {
   	SERIALJNI_LOG(logDEBUG) << "Serial Clear";
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	serialClear(port, statusPtr);
 	SERIALJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -283,6 +300,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialClose
 {
 	SERIALJNI_LOG(logDEBUG) << "Serial Close";
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	serialClose(port, statusPtr);
 	SERIALJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }

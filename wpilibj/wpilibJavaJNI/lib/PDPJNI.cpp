@@ -22,6 +22,7 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTemperatur
 {
 	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
 	
+	*status_ptr = 0;
 	return getPDPTemperature(status_ptr, module);
 }
 
@@ -35,6 +36,7 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPVoltage
 {
 	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
 	
+	*status_ptr = 0;
 	return getPDPVoltage(status_ptr, module);
 }
 
@@ -48,6 +50,7 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPChannelCur
 {
 	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
 	
+	*status_ptr = 0;
 	return getPDPChannelCurrent(channel, status_ptr, module);
 }
 
@@ -61,6 +64,7 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalCurre
 {
 	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
 	
+	*status_ptr = 0;
 	return getPDPTotalCurrent(status_ptr, module);
 }
 
@@ -74,6 +78,7 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalPower
 {
 	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
 	
+	*status_ptr = 0;
 	return getPDPTotalPower(status_ptr, module);
 }
 
@@ -87,6 +92,7 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalEnerg
 {
 	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
 	
+	*status_ptr = 0;
 	return getPDPTotalEnergy(status_ptr, module);
 }
 
@@ -101,6 +107,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_resetPDPTotalEnergy
 {
 	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
 	
+	*status_ptr = 0;
 	resetPDPTotalEnergy(status_ptr, module);
 }
 
@@ -114,5 +121,6 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_clearPDPStickyFault
 {
 	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
 	
+	*status_ptr = 0;
 	clearPDPStickyFaults(status_ptr, module);
 }

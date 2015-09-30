@@ -88,6 +88,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNoti
 	NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI initializeNotifierJVM";
 	jint * statusPtr = GetStatusPtr(env, status);
 	NOTIFIERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	jint rs = env->GetJavaVM(&jvm);
 	assert (rs == JNI_OK);
 }
@@ -119,6 +120,7 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeN
   func_global = env->NewGlobalRef(func);
   mid_global = mid;
 
+	*statusPtr = 0;
 	void *notifierPtr = initializeNotifier(notifierHandler, statusPtr);
 
 	NOTIFIERJNI_LOG(logDEBUG) << "Notifier Ptr = " << notifierPtr;
@@ -142,6 +144,7 @@ JNIEXPORT void JNICALL
   jint *statusPtr = GetStatusPtr(env, status);
 	NOTIFIERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
 
+  *statusPtr = 0;
   cleanNotifier(ptr, statusPtr);
 	NOTIFIERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -164,6 +167,7 @@ JNIEXPORT void JNICALL
 	NOTIFIERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
   NOTIFIERJNI_LOG(logDEBUG) << "triggerTime Ptr = " << &triggerTime;
 
+  *statusPtr = 0;
   updateNotifierAlarm(ptr, (uint32_t)triggerTime, statusPtr);
 	NOTIFIERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }

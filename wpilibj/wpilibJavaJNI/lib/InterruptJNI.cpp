@@ -26,6 +26,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_initializeInt
 	INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI initializeInterruptJVM";
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	INTERRUPTJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	jint rs = env->GetJavaVM(&jvm);
 	assert (rs == JNI_OK);
 }
@@ -46,6 +47,7 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_initialize
 	INTERRUPTJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
 
 	void** interruptPtr = (void**)new unsigned char[4];
+	*statusPtr = 0;
 	*interruptPtr = (void**) initializeInterrupts(interruptIndex, watcher, statusPtr);
 
 	INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << *interruptPtr;
@@ -69,6 +71,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_cleanInterrup
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	INTERRUPTJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
 
+	*statusPtr = 0;
 	cleanInterrupts(*javaId, statusPtr);
 
 	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
@@ -88,6 +91,7 @@ JNIEXPORT int JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_waitForInterru
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	INTERRUPTJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
 
+	*statusPtr = 0;
 	int result = waitForInterrupt(*javaId, timeout, ignorePrevious, statusPtr);
 
 	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
@@ -109,6 +113,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_enableInterru
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	INTERRUPTJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
 
+	*statusPtr = 0;
 	enableInterrupts(*javaId, statusPtr);
 
 	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
@@ -128,6 +133,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_disableInterr
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	INTERRUPTJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
 
+	*statusPtr = 0;
 	disableInterrupts(*javaId, statusPtr);
 
 	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
@@ -147,6 +153,7 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readRising
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	INTERRUPTJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
 
+	*statusPtr = 0;
 	jdouble timeStamp = readRisingTimestamp(*javaId, statusPtr);
 
 	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
@@ -167,6 +174,7 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readFallin
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	INTERRUPTJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
 
+	*statusPtr = 0;
 	jdouble timeStamp = readFallingTimestamp(*javaId, statusPtr);
 
 	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
@@ -190,6 +198,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_requestInterr
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	INTERRUPTJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
 
+	*statusPtr = 0;
 	requestInterrupts(*javaId, (uint8_t) routing_module, (uint32_t) routing_pin, routing_analog_trigger, statusPtr);
 
 	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
@@ -292,6 +301,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_attachInterru
 	INTERRUPTJNI_LOG(logDEBUG) << "InterruptHandlerParam->mid = " << interruptHandlerParam->mid;
 	INTERRUPTJNI_LOG(logDEBUG) << "InterruptHandlerParam->param = " << interruptHandlerParam->param;
 
+	*statusPtr = 0;
 	attachInterruptHandler(*javaId, interruptHandler, interruptHandlerParam, statusPtr);
 
 	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
@@ -314,6 +324,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_setInterruptU
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	INTERRUPTJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
 
+	*statusPtr = 0;
 	setInterruptUpSourceEdge(*javaId, risingEdge, fallingEdge, statusPtr);
 
 	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << *statusPtr;

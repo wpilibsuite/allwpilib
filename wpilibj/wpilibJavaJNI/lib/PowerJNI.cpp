@@ -11,6 +11,7 @@ JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getVinVoltage
   (JNIEnv * env, jclass, jobject status)
 {
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	return getVinVoltage(statusPtr);
 }
 
@@ -23,6 +24,7 @@ JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getVinCurrent
   (JNIEnv * env, jclass, jobject status)
 {
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	return getVinCurrent(statusPtr);
 }
 
@@ -35,6 +37,7 @@ JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserVoltage6
   (JNIEnv * env, jclass, jobject status)
 {
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	return getUserVoltage6V(statusPtr);
 }
 
@@ -47,6 +50,7 @@ JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrent6
   (JNIEnv * env, jclass, jobject status)
 {
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	return getUserCurrent6V(statusPtr);
 }
 
@@ -59,6 +63,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserActive
   (JNIEnv * env, jclass, jobject status)
 {
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	return getUserActive6V(statusPtr);
 }
 
@@ -71,6 +76,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrentFau
   (JNIEnv * env, jclass, jobject status)
 {
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	return getUserCurrentFaults6V(statusPtr);
 }
 
@@ -83,6 +89,7 @@ JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserVoltage5
   (JNIEnv * env, jclass, jobject status)
 {
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	return getUserVoltage5V(statusPtr);
 }
 
@@ -95,6 +102,7 @@ JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrent5
   (JNIEnv * env, jclass, jobject status)
 {
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	return getUserCurrent5V(statusPtr);
 }
 
@@ -107,6 +115,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserActive
   (JNIEnv * env, jclass, jobject status)
 {
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	return getUserActive5V(statusPtr);
 }
 
@@ -119,6 +128,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrentFau
   (JNIEnv * env, jclass, jobject status)
 {
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	return getUserCurrentFaults5V(statusPtr);
 }
 
@@ -131,6 +141,7 @@ JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserVoltage3
   (JNIEnv * env, jclass, jobject status)
 {
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	return getUserVoltage3V3(statusPtr);
 }
 
@@ -143,6 +154,7 @@ JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrent3
   (JNIEnv * env, jclass, jobject status)
 {
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	return getUserCurrent3V3(statusPtr);
 }
 
@@ -155,6 +167,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserActive
   (JNIEnv * env, jclass, jobject status)
 {
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	return getUserActive3V3(statusPtr);
 }
 
@@ -167,6 +180,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrentFau
   (JNIEnv * env, jclass, jobject status)
 {
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	return getUserCurrentFaults3V3(statusPtr);
 }
 

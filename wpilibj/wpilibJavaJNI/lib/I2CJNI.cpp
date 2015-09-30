@@ -24,6 +24,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CInitialize
 	I2CJNI_LOG(logDEBUG) << "Calling I2CJNI i2CInititalize";
 	I2CJNI_LOG(logDEBUG) << "Port: " << (jint) value;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	i2CInitialize(value, statusPtr);
 	I2CJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }

@@ -27,6 +27,7 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_initializeDigita
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	DIOJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
 	void** dioPtr = (void**)new unsigned char[4];
+	*statusPtr = 0;
 	*dioPtr = initializeDigitalPort(*javaId, statusPtr);
 	DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	DIOJNI_LOG(logDEBUG) << "DIO Ptr = " << *dioPtr;
@@ -46,6 +47,7 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_allocateDIO
 	DIOJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	DIOJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
     jbyte returnValue = allocateDIO(*javaId, value, statusPtr);
 	DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	DIOJNI_LOG(logDEBUG) << "allocateDIOResult = " << (jint)returnValue;
@@ -65,6 +67,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_freeDIO
 	DIOJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	DIOJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	freeDIO(*javaId, statusPtr);
 	DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -83,6 +86,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_setDIO
 	//DIOJNI_LOG(logDEBUG) << "Value = " << value;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	//DIOJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setDIO(*javaId, value, statusPtr);
 	//DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -100,6 +104,7 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_getDIO
 	//DIOJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	//DIOJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	jbyte returnValue = getDIO(*javaId, statusPtr);
 	//DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	//DIOJNI_LOG(logDEBUG) << "getDIOResult = " << (jint)returnValue;
@@ -120,6 +125,7 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_getDIODirection
 	//DIOJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	//DIOJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	jbyte returnValue = getDIODirection(*javaId, statusPtr);
 	//DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	DIOJNI_LOG(logDEBUG) << "getDIODirectionResult = " << (jbyte)returnValue;
@@ -140,6 +146,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_pulse
 	//DIOJNI_LOG(logDEBUG) << "Value = " << value;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	//DIOJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	pulse(*javaId, value, statusPtr);
 	DIOJNI_LOG(logDEBUG) << "Did it work? Status = " << *statusPtr;
 }
@@ -157,6 +164,7 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_isPulsing
 	//DIOJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	//DIOJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	jbyte returnValue = isPulsing(*javaId, statusPtr);
 	//DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	DIOJNI_LOG(logDEBUG) << "isPulsingResult = " << (jbyte)returnValue;
@@ -175,6 +183,7 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_isAnyPulsing
 {
 	DIOJNI_LOG(logDEBUG) << "Calling DIOJNI isAnyPulsing (RR upd)";
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	jbyte returnValue = isAnyPulsing( statusPtr );
 	//DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	DIOJNI_LOG(logDEBUG) << "isAnyPulsingResult = " << (jbyte)returnValue;
@@ -191,6 +200,7 @@ JNIEXPORT jshort JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_getLoopTiming
 {
 	DIOJNI_LOG(logDEBUG) << "Calling DIOJNI getLoopTimeing";
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	jshort returnValue = getLoopTiming( statusPtr );
 	DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	DIOJNI_LOG(logDEBUG) << "LoopTiming = " << returnValue;

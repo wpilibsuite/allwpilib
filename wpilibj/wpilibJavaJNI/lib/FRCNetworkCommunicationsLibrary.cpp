@@ -615,6 +615,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCo
   (JNIEnv * env, jclass, jobject status)
 {
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	return HALGetSystemActive((int32_t*)statusPtr);
 }
 
@@ -627,6 +628,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCo
   (JNIEnv * env, jclass, jobject status)
 {
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	return HALGetBrownedOut((int32_t*)statusPtr);
 }
 

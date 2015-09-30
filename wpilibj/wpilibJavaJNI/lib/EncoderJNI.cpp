@@ -34,6 +34,7 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_initializeEn
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
 	void** encoderPtr = (void**)new unsigned char[4];
+	*statusPtr = 0;
 	*encoderPtr = initializeEncoder(port_a_module, port_a_pin, port_a_analog_trigger,
 							  port_b_module, port_b_pin, port_b_analog_trigger,
 							  reverseDirection, indexPtr, statusPtr);
@@ -57,6 +58,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_freeEncoder
 	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	freeEncoder(*javaId, statusPtr);
 	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -74,6 +76,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_resetEncoder
 	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	resetEncoder(*javaId, statusPtr);
 	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -91,6 +94,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoder
 	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	jint returnValue = getEncoder(*javaId, statusPtr);
 	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	ENCODERJNI_LOG(logDEBUG) << "getEncoderResult = " <<  returnValue;
@@ -110,6 +114,7 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderPe
 	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	double returnValue = getEncoderPeriod(*javaId, statusPtr);
 	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	ENCODERJNI_LOG(logDEBUG) << "getEncoderPeriodResult = " <<  returnValue;
@@ -129,6 +134,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_setEncoderMaxPe
 	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setEncoderMaxPeriod(*javaId, value, statusPtr);
 	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -146,6 +152,7 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderStop
 	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	jbyte returnValue = getEncoderStopped(*javaId, statusPtr);
 	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	ENCODERJNI_LOG(logDEBUG) << "getEncoderStoppedResult = " <<  returnValue;
@@ -165,6 +172,7 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderDire
 	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	jbyte returnValue = getEncoderDirection(*javaId, statusPtr);
 	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	ENCODERJNI_LOG(logDEBUG) << "getEncoderDirectionResult = " <<  returnValue;
@@ -184,6 +192,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_setEncoderRever
 	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setEncoderReverseDirection(*javaId, value, statusPtr);
 	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -201,6 +210,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_setEncoderSampl
 	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setEncoderSamplesToAverage(*javaId, value, statusPtr);
 	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -218,6 +228,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderSampl
 	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	jint returnValue = getEncoderSamplesToAverage(*javaId, statusPtr);
 	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	ENCODERJNI_LOG(logDEBUG) << "getEncoderSamplesToAverageResult = " <<  returnValue;
@@ -241,6 +252,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_setEncoderIndex
 	ENCODERJNI_LOG(logDEBUG) << "Active High = " << (activeHigh?"true":"false");
 	ENCODERJNI_LOG(logDEBUG) << "Edge Sensitive = " << (edgeSensitive?"true":"false");
 	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setEncoderIndexSource(*javaId, pin, analogTrigger, activeHigh, edgeSensitive, statusPtr);
 	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }

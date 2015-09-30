@@ -27,6 +27,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_RelayJNI_setRelayForward
 	RELAYJNI_LOG(logDEBUG) << "Flag = " << (jint)value;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	RELAYJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setRelayForward(*javaId, value, statusPtr);
 	RELAYJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -45,6 +46,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_RelayJNI_setRelayReverse
 	RELAYJNI_LOG(logDEBUG) << "Flag = " << (jint)value;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	RELAYJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setRelayReverse(*javaId, value, statusPtr);
 	RELAYJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -62,6 +64,7 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_RelayJNI_getRelayForward
 	RELAYJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	RELAYJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	jbyte returnValue = getRelayForward(*javaId, statusPtr);
 	RELAYJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	RELAYJNI_LOG(logDEBUG) << "getRelayForwardResult = " << (jint)returnValue;
@@ -81,6 +84,7 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_RelayJNI_getRelayReverse
 	RELAYJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	RELAYJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	jbyte returnValue = getRelayReverse(*javaId, statusPtr);
 	RELAYJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	RELAYJNI_LOG(logDEBUG) << "getRelayReverseResult = " << (jint)returnValue;

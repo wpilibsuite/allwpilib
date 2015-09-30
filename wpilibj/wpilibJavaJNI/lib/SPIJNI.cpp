@@ -25,6 +25,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiInitialize
 	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiInitialize";
 	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	spiInitialize(port, statusPtr);
 	SPIJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -149,6 +150,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectAct
 	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetCSActiveHigh";
 	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	spiSetChipSelectActiveHigh(port, statusPtr);
 	SPIJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -164,6 +166,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectAct
 	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetCSActiveLow";
 	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	spiSetChipSelectActiveLow(port, statusPtr);
 	SPIJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }

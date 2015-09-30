@@ -123,6 +123,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
 {
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGAVersion";
   jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+  *statusPtr = 0;
   jshort returnValue = getFPGAVersion( statusPtr );
   HALUTIL_LOG(logDEBUG) << "Status = " << *statusPtr;
   HALUTIL_LOG(logDEBUG) << "FPGAVersion = " << returnValue;
@@ -139,6 +140,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
 {
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGARevision";
   jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+  *statusPtr = 0;
   jint returnValue = getFPGARevision( statusPtr );
   HALUTIL_LOG(logDEBUG) << "Status = " << *statusPtr;
   HALUTIL_LOG(logDEBUG) << "FPGARevision = " << returnValue;
@@ -155,6 +157,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
 {
   //HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGATime";
   jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+  *statusPtr = 0;
   jlong returnValue = getFPGATime( statusPtr );
   //HALUTIL_LOG(logDEBUG) << "Status = " << *statusPtr;
   //HALUTIL_LOG(logDEBUG) << "FPGATime = " << returnValue;
@@ -172,6 +175,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
 {
   //HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGATime";
   jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+  *statusPtr = 0;
   jboolean returnValue = getFPGAButton( statusPtr );
   //HALUTIL_LOG(logDEBUG) << "Status = " << *statusPtr;
   //HALUTIL_LOG(logDEBUG) << "FPGATime = " << returnValue;

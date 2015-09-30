@@ -27,6 +27,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_allocatePWMChan
 	PWMJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
     jbyte returnValue = allocatePWMChannel(*javaId, statusPtr);
 	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	PWMJNI_LOG(logDEBUG) << "allocatePWMChannelResult = " << (jint)returnValue;
@@ -46,6 +47,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_freePWMChannel
 	PWMJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	freePWMChannel(*javaId, statusPtr);
 	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 
@@ -63,6 +65,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWM
 	PWMJNI_LOG(logDEBUG) << "DigitalPort Ptr = " << *javaId;
 	PWMJNI_LOG(logDEBUG) << "PWM Value = " << value;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	setPWM( *javaId, value, statusPtr );
 	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -78,6 +81,7 @@ JNIEXPORT jshort JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWM
 	void ** javaId = (void**)env->GetDirectBufferAddress(id);
 	PWMJNI_LOG(logDEBUG) << "PWM Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	jshort returnValue = getPWM( *javaId, statusPtr );
 	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	PWMJNI_LOG(logDEBUG) << "Value = " << returnValue;
@@ -95,6 +99,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_latchPWMZero
   	void ** javaId = (void**)env->GetDirectBufferAddress(id);
 	PWMJNI_LOG(logDEBUG) << "PWM Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	latchPWMZero( *javaId, statusPtr );
 	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -111,6 +116,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMPeriodScale
 	PWMJNI_LOG(logDEBUG) << "DigitalPort Ptr = " << *javaId;
 	PWMJNI_LOG(logDEBUG) << "PeriodScale Value = " << value;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	*statusPtr = 0;
 	setPWMPeriodScale( *javaId, value, statusPtr );
 	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -127,6 +133,7 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_allocatePWM
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
 	void** pwmPtr = (void**)new unsigned char[4];
+	*statusPtr = 0;
 	*pwmPtr =  allocatePWM(statusPtr);
 	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	PWMJNI_LOG(logDEBUG) << "PWM Ptr = " << *pwmPtr;
@@ -147,6 +154,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_freePWM
 	PWMJNI_LOG(logDEBUG) << "PWM Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	freePWM(*javaId, statusPtr);
 	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -163,6 +171,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMRate
 	PWMJNI_LOG(logDEBUG) << "Rate= " << value;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setPWMRate(value, statusPtr);
 	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -181,6 +190,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMDutyCycle
 	PWMJNI_LOG(logDEBUG) << "DutyCycle= " << value;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setPWMDutyCycle(*javaId, value, statusPtr);
 	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -199,6 +209,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMOutputChannel
 	PWMJNI_LOG(logDEBUG) << "Pin= " << value;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setPWMOutputChannel(*javaId, (uint32_t) value, statusPtr);
 	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }

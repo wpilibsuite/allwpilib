@@ -28,6 +28,7 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_initializeCo
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
 	void** counterPtr = (void**)new unsigned char[4];
+	*statusPtr = 0;
 	*counterPtr = initializeCounter((Mode)mode, (uint32_t*)indexPtr, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Index = " << *indexPtr;
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
@@ -48,6 +49,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_freeCounter
 	COUNTERJNI_LOG(logDEBUG) << "Counter Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	freeCounter(*javaId, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -66,6 +68,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterAvera
 	COUNTERJNI_LOG(logDEBUG) << "AverageSize = " << value;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setCounterAverageSize(*javaId, value, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -85,6 +88,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpSou
 	COUNTERJNI_LOG(logDEBUG) << "AnalogTrigger = " << (jint)analogTrigger;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setCounterUpSource(*javaId, pin, analogTrigger, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -104,6 +108,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpSou
 	COUNTERJNI_LOG(logDEBUG) << "Fall = " << (jint)valueFall;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setCounterUpSourceEdge(*javaId, valueRise, valueFall, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -121,6 +126,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_clearCounterUpS
 	COUNTERJNI_LOG(logDEBUG) << "Counter Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	clearCounterUpSource(*javaId, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -140,6 +146,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterDownS
 	COUNTERJNI_LOG(logDEBUG) << "AnalogTrigger = " << (jint)analogTrigger;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setCounterDownSource(*javaId, pin, analogTrigger, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -159,6 +166,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterDownS
 	COUNTERJNI_LOG(logDEBUG) << "Fall = " << (jint)valueFall;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setCounterDownSourceEdge(*javaId, valueRise, valueFall, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -176,6 +184,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_clearCounterDow
 	COUNTERJNI_LOG(logDEBUG) << "Counter Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	clearCounterDownSource(*javaId, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -193,6 +202,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpDow
 	COUNTERJNI_LOG(logDEBUG) << "Counter Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setCounterUpDownMode(*javaId, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -210,6 +220,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterExter
 	COUNTERJNI_LOG(logDEBUG) << "Counter Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setCounterExternalDirectionMode(*javaId, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -228,6 +239,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterSemiP
 	COUNTERJNI_LOG(logDEBUG) << "SemiPeriodMode = " << (jint)value;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setCounterSemiPeriodMode(*javaId, value, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -246,6 +258,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterPulse
 	COUNTERJNI_LOG(logDEBUG) << "PulseLengthMode = " << value;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setCounterPulseLengthMode(*javaId, value, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -263,6 +276,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_getCounterSampl
 	COUNTERJNI_LOG(logDEBUG) << "Counter Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	jint returnValue = getCounterSamplesToAverage(*javaId, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	COUNTERJNI_LOG(logDEBUG) << "getCounterSamplesToAverageResult = " << returnValue;
@@ -283,6 +297,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterSampl
 	COUNTERJNI_LOG(logDEBUG) << "SamplesToAverage = " << value;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setCounterSamplesToAverage(*javaId, value, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -300,6 +315,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_resetCounter
 	COUNTERJNI_LOG(logDEBUG) << "Counter Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	resetCounter(*javaId, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -317,6 +333,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_getCounter
 	//COUNTERJNI_LOG(logDEBUG) << "Counter Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	//COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	jint returnValue = getCounter(*javaId, statusPtr);
 	//COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	//COUNTERJNI_LOG(logDEBUG) << "getCounterResult = " << returnValue;
@@ -336,6 +353,7 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_getCounterPe
 	COUNTERJNI_LOG(logDEBUG) << "Counter Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	jdouble returnValue = getCounterPeriod(*javaId, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	COUNTERJNI_LOG(logDEBUG) << "getCounterPeriodResult = " << returnValue;
@@ -356,6 +374,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterMaxPe
 	COUNTERJNI_LOG(logDEBUG) << "MaxPeriod = " << value;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setCounterMaxPeriod(*javaId, value, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -374,6 +393,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpdat
 	COUNTERJNI_LOG(logDEBUG) << "UpdateWhenEmpty = " << (jint)value;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setCounterUpdateWhenEmpty(*javaId, value, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }
@@ -391,6 +411,7 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_getCounterStop
 	COUNTERJNI_LOG(logDEBUG) << "Counter Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	jbyte returnValue = getCounterStopped(*javaId, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	COUNTERJNI_LOG(logDEBUG) << "getCounterStoppedResult = " << (jint)returnValue;
@@ -410,6 +431,7 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_getCounterDire
 	COUNTERJNI_LOG(logDEBUG) << "Counter Ptr = " << *javaId;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	jbyte returnValue = getCounterDirection(*javaId, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 	COUNTERJNI_LOG(logDEBUG) << "getCounterDirectionResult = " << (jint)returnValue;
@@ -430,6 +452,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterRever
 	COUNTERJNI_LOG(logDEBUG) << "ReverseDirection = " << (jint)value;
 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	*statusPtr = 0;
 	setCounterReverseDirection(*javaId, value, statusPtr);
 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
 }

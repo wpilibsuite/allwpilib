@@ -52,6 +52,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetworkCommunica
 
     CANJNI_LOG(logDEBUG) << "Period: " << periodMs;
 
+    *statusPtr = 0;
     FRC_NetworkCommunication_CANSessionMux_sendMessage(messageID, dataBuffer, dataSize, periodMs, statusPtr);
 
     CANJNI_LOG(logDEBUG) << "Status: " << *statusPtr;
@@ -75,6 +76,7 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetworkCommun
 
     uint8_t dataSize = 0;
 
+    *statusPtr = 0;
     FRC_NetworkCommunication_CANSessionMux_receiveMessage(messageIDPtr, messageIDMask, buffer, &dataSize, timeStampPtr, statusPtr);
 
     CANJNI_LOG(logDEBUG) << "Message ID " << std::hex << *messageIDPtr;
