@@ -10,11 +10,11 @@
 # so that test results are not commited to the repo
 DEFAULT_LOCAL_TEST_RESULTS_DIR=../test-reports
 
-ROBOT_ADDRESS=lvuser@roboRIO-190-FRC.local
+ROBOT_ADDRESS=admin@roboRIO-190-FRC.local
 ADMIN_ROBOT_ADDRESS=admin@roboRIO-190-FRC.local
 DEFAULT_LOCAL_RUN_TEST_SCRIPT="run-tests-on-robot.sh"
 
-DEFAULT_DESTINATION_DIR=/home/lvuser
+DEFAULT_DESTINATION_DIR=/home/admin
 DEFAULT_TEST_SCP_DIR=${DEFAULT_DESTINATION_DIR}/deployedTests
 DEFAULT_DESTINATION_TEST_RESULTS_DIR=${DEFAULT_DESTINATION_DIR}/testResults
 
