@@ -212,7 +212,7 @@ int HALInitialize(int mode)
 	nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
 			nLoadOut::kTargetClass_RoboRIO;
 
-	int32_t status;
+	int32_t status = 0;
 	global = tGlobal::create(&status);
 	watchdog = tSysWatchdog::create(&status);
 
