@@ -60,4 +60,13 @@ class Preferences : public ErrorBase {
 
  private:
   std::shared_ptr<ITable> m_table;
+  class Listener : public ITableListener {
+   public:
+    void ValueChanged(ITable* source, llvm::StringRef key,
+                      std::shared_ptr<nt::Value> value, bool isNew) override;
+    void ValueChangedEx(ITable* source, llvm::StringRef key,
+                        std::shared_ptr<nt::Value> value,
+                        unsigned int flags) override;
+  };
+  Listener m_listener;
 };

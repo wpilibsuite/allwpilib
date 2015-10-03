@@ -16,7 +16,17 @@
 /** The Preferences table name */
 static const char *kTableName = "Preferences";
 
+void Preferences::Listener::ValueChanged(ITable* source, llvm::StringRef key,
+                                         std::shared_ptr<nt::Value> value,
+                                         bool isNew) {}
+void Preferences::Listener::ValueChangedEx(ITable* source, llvm::StringRef key,
+                                           std::shared_ptr<nt::Value> value,
+                                           unsigned int flags) {
+  source->SetPersistent(key);
+}
+
 Preferences::Preferences() : m_table(NetworkTable::GetTable(kTableName)) {
+  m_table->AddTableListenerEx(&m_listener, NT_NOTIFY_NEW | NT_NOTIFY_IMMEDIATE);
   HALReport(HALUsageReporting::kResourceType_Preferences, 0);
 }
 
