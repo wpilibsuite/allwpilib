@@ -1,7 +1,7 @@
 package edu.wpi.first.wpilibj.networktables2.type;
 
 /**
- * @deprecated Use ArrayList<String> instead.
+ * @deprecated Use {@literal ArrayList<String>} instead.
  */
 public class StringArray extends ArrayData {
   public String get(int index) {

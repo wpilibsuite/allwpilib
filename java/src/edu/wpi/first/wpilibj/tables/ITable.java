@@ -344,12 +344,12 @@ public interface ITable {
                                  int flags);
   /**
    * This will immediately notify the listener of all current sub tables
-   * @param listener
+   * @param listener the listener to notify
    */
   public void addSubTableListener(final ITableListener listener);
   /**
    * This will immediately notify the listener of all current sub tables
-   * @param listener
+   * @param listener the listener to notify
    * @param localNotify if true then this listener will be notified of all
    * local changes in addition to all remote changes
    */
@@ -397,7 +397,7 @@ public interface ITable {
    * @param key the key
    * @param defaultValue the value returned if the key is undefined
    * @return the value
-   * @throws NetworkTableKeyNotDefined if there is no value mapped to by the key
+   * @throws TableKeyNotDefinedException if there is no value mapped to by the key
    * @throws IllegalArgumentException if the value mapped to by the key is not
    * an int
    * @throws IllegalArgumentException if the key is null
@@ -423,7 +423,7 @@ public interface ITable {
    * Returns the value at the specified key.
    * @param key the key
    * @return the value
-   * @throws NoSuchEleNetworkTableKeyNotDefinedmentException if there is no
+   * @throws TableKeyNotDefinedException if there is no
    * value mapped to by the key
    * @throws IllegalArgumentException if the value mapped to by the key is not a
    * double
@@ -437,7 +437,7 @@ public interface ITable {
    * @param key the key
    * @param defaultValue the value returned if the key is undefined
    * @return the value
-   * @throws NoSuchEleNetworkTableKeyNotDefinedmentException if there is no
+   * @throws TableKeyNotDefinedException if there is no
    * value mapped to by the key
    * @throws IllegalArgumentException if the value mapped to by the key is not a
    * double
