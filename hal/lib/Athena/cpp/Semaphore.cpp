@@ -11,7 +11,7 @@ Semaphore::Semaphore(uint32_t count) {
 }
 
 void Semaphore::give() {
-  std::unique_lock<priority_mutex> lock(m_mutex);
+  std::lock_guard<priority_mutex> lock(m_mutex);
   ++m_count;
   m_condition.notify_one();
 }
@@ -23,7 +23,7 @@ void Semaphore::take() {
 }
 
 bool Semaphore::tryTake() {
-  std::unique_lock<priority_mutex> lock(m_mutex);
+  std::lock_guard<priority_mutex> lock(m_mutex);
   if (m_count) {
     --m_count;
     return true;

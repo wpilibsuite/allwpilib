@@ -41,7 +41,7 @@ bool analogSystemInitialized = false;
  * Initialize the analog System.
  */
 void initializeAnalog(int32_t *status) {
-  std::unique_lock<priority_recursive_mutex> sync(analogRegisterWindowMutex);
+  std::lock_guard<priority_recursive_mutex> sync(analogRegisterWindowMutex);
   if (analogSystemInitialized) return;
   analogInputSystem = tAI::create(status);
   analogOutputSystem = tAO::create(status);
@@ -265,7 +265,7 @@ int16_t getAnalogValue(void* analog_port_pointer, int32_t *status) {
   readSelect.Averaged = false;
 
   {
-    std::unique_lock<priority_recursive_mutex> sync(analogRegisterWindowMutex);
+    std::lock_guard<priority_recursive_mutex> sync(analogRegisterWindowMutex);
     analogInputSystem->writeReadSelect(readSelect, status);
     analogInputSystem->strobeLatchOutput(status);
     value = (int16_t) analogInputSystem->readOutput(status);
@@ -296,7 +296,7 @@ int32_t getAnalogAverageValue(void* analog_port_pointer, int32_t *status) {
   readSelect.Averaged = true;
 
   {
-    std::unique_lock<priority_recursive_mutex> sync(analogRegisterWindowMutex);
+    std::lock_guard<priority_recursive_mutex> sync(analogRegisterWindowMutex);
     analogInputSystem->writeReadSelect(readSelect, status);
     analogInputSystem->strobeLatchOutput(status);
     value = (int32_t) analogInputSystem->readOutput(status);

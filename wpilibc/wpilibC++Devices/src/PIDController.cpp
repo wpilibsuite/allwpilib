@@ -103,7 +103,7 @@ void PIDController::Calculate() {
   PIDOutput *pidOutput;
 
   {
-    std::unique_lock<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_mutex> sync(m_mutex);
     pidInput = m_pidInput;
     pidOutput = m_pidOutput;
     enabled = m_enabled;
@@ -114,74 +114,72 @@ void PIDController::Calculate() {
   if (pidOutput == nullptr) return;
 
   if (enabled) {
-    {
-      std::unique_lock<priority_mutex> sync(m_mutex);
-      float input = pidInput->PIDGet();
-      float result;
-      PIDOutput *pidOutput;
+    std::lock_guard<priority_mutex> sync(m_mutex);
+    float input = pidInput->PIDGet();
+    float result;
+    PIDOutput *pidOutput;
 
-      m_error = m_setpoint - input;
-      if (m_continuous) {
-        if (fabs(m_error) > (m_maximumInput - m_minimumInput) / 2) {
-          if (m_error > 0) {
-            m_error = m_error - m_maximumInput + m_minimumInput;
-          } else {
-            m_error = m_error + m_maximumInput - m_minimumInput;
-          }
+    m_error = m_setpoint - input;
+    if (m_continuous) {
+      if (fabs(m_error) > (m_maximumInput - m_minimumInput) / 2) {
+        if (m_error > 0) {
+          m_error = m_error - m_maximumInput + m_minimumInput;
+        } else {
+          m_error = m_error + m_maximumInput - m_minimumInput;
+        }
+      }
+    }
+
+    if (m_pidInput->GetPIDSourceType() == PIDSourceType::kRate) {
+      if (m_P != 0) {
+        double potentialPGain = (m_totalError + m_error) * m_P;
+        if (potentialPGain < m_maximumOutput) {
+          if (potentialPGain > m_minimumOutput)
+            m_totalError += m_error;
+          else
+            m_totalError = m_minimumOutput / m_P;
+        } else {
+          m_totalError = m_maximumOutput / m_P;
         }
       }
 
-      if (m_pidInput->GetPIDSourceType() == PIDSourceType::kRate) {
-        if (m_P != 0) {
-          double potentialPGain = (m_totalError + m_error) * m_P;
-          if (potentialPGain < m_maximumOutput) {
-            if (potentialPGain > m_minimumOutput)
-              m_totalError += m_error;
-            else
-              m_totalError = m_minimumOutput / m_P;
-          } else {
-            m_totalError = m_maximumOutput / m_P;
-          }
+      m_result = m_D * m_error + m_P * m_totalError + m_setpoint * m_F;
+    }
+    else {
+      if (m_I != 0) {
+        double potentialIGain = (m_totalError + m_error) * m_I;
+        if (potentialIGain < m_maximumOutput) {
+          if (potentialIGain > m_minimumOutput)
+            m_totalError += m_error;
+          else
+            m_totalError = m_minimumOutput / m_I;
+        } else {
+          m_totalError = m_maximumOutput / m_I;
         }
-
-        m_result = m_D * m_error + m_P * m_totalError + m_setpoint * m_F;
       }
-      else {
-        if (m_I != 0) {
-          double potentialIGain = (m_totalError + m_error) * m_I;
-          if (potentialIGain < m_maximumOutput) {
-            if (potentialIGain > m_minimumOutput)
-              m_totalError += m_error;
-            else
-              m_totalError = m_minimumOutput / m_I;
-          } else {
-            m_totalError = m_maximumOutput / m_I;
-          }
-        }
 
-        m_result = m_P * m_error + m_I * m_totalError +
-                   m_D * (m_prevInput - input) + m_setpoint * m_F;
-      }
-      m_prevInput = input;
+      m_result = m_P * m_error + m_I * m_totalError +
+                 m_D * (m_prevInput - input) + m_setpoint * m_F;
+    }
+    m_prevInput = input;
 
-      if (m_result > m_maximumOutput)
-        m_result = m_maximumOutput;
-      else if (m_result < m_minimumOutput)
-        m_result = m_minimumOutput;
+    if (m_result > m_maximumOutput)
+      m_result = m_maximumOutput;
+    else if (m_result < m_minimumOutput)
+      m_result = m_minimumOutput;
 
-      pidOutput = m_pidOutput;
-      result = m_result;
+    pidOutput = m_pidOutput;
+    result = m_result;
 
-      pidOutput->PIDWrite(result);
+    pidOutput->PIDWrite(result);
 
-      // Update the buffer.
-      m_buf.push(m_error);
-      m_bufTotal += m_error;
-      // Remove old elements when buffer is full.
-      if (m_buf.size() > m_bufLength) {
-        m_bufTotal -= m_buf.front();
-        m_buf.pop();
-      }
+    // Update the buffer.
+    m_buf.push(m_error);
+    m_bufTotal += m_error;
+    // Remove old elements when buffer is full.
+    if (m_buf.size() > m_bufLength) {
+      m_bufTotal -= m_buf.front();
+      m_buf.pop();
     }
   }
 }
@@ -195,7 +193,7 @@ void PIDController::Calculate() {
  */
 void PIDController::SetPID(double p, double i, double d) {
   {
-    std::unique_lock<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_mutex> sync(m_mutex);
     m_P = p;
     m_I = i;
     m_D = d;
@@ -218,7 +216,7 @@ void PIDController::SetPID(double p, double i, double d) {
  */
 void PIDController::SetPID(double p, double i, double d, double f) {
   {
-    std::unique_lock<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_mutex> sync(m_mutex);
     m_P = p;
     m_I = i;
     m_D = d;
@@ -238,7 +236,7 @@ void PIDController::SetPID(double p, double i, double d, double f) {
  * @return proportional coefficient
  */
 double PIDController::GetP() const {
-  std::unique_lock<priority_mutex> sync(m_mutex);
+  std::lock_guard<priority_mutex> sync(m_mutex);
   return m_P;
 }
 
@@ -247,7 +245,7 @@ double PIDController::GetP() const {
  * @return integral coefficient
  */
 double PIDController::GetI() const {
-  std::unique_lock<priority_mutex> sync(m_mutex);
+  std::lock_guard<priority_mutex> sync(m_mutex);
   return m_I;
 }
 
@@ -256,7 +254,7 @@ double PIDController::GetI() const {
  * @return differential coefficient
  */
 double PIDController::GetD() const {
-  std::unique_lock<priority_mutex> sync(m_mutex);
+  std::lock_guard<priority_mutex> sync(m_mutex);
   return m_D;
 }
 
@@ -265,7 +263,7 @@ double PIDController::GetD() const {
  * @return Feed forward coefficient
  */
 double PIDController::GetF() const {
-  std::unique_lock<priority_mutex> sync(m_mutex);
+  std::lock_guard<priority_mutex> sync(m_mutex);
   return m_F;
 }
 
@@ -275,7 +273,7 @@ double PIDController::GetF() const {
  * @return the latest calculated output
  */
 float PIDController::Get() const {
-  std::unique_lock<priority_mutex> sync(m_mutex);
+  std::lock_guard<priority_mutex> sync(m_mutex);
   return m_result;
 }
 
@@ -287,7 +285,7 @@ float PIDController::Get() const {
  * @param continuous Set to true turns on continuous, false turns off continuous
  */
 void PIDController::SetContinuous(bool continuous) {
-  std::unique_lock<priority_mutex> sync(m_mutex);
+  std::lock_guard<priority_mutex> sync(m_mutex);
   m_continuous = continuous;
 }
 
@@ -299,7 +297,7 @@ void PIDController::SetContinuous(bool continuous) {
  */
 void PIDController::SetInputRange(float minimumInput, float maximumInput) {
   {
-    std::unique_lock<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_mutex> sync(m_mutex);
     m_minimumInput = minimumInput;
     m_maximumInput = maximumInput;
   }
@@ -315,7 +313,7 @@ void PIDController::SetInputRange(float minimumInput, float maximumInput) {
  */
 void PIDController::SetOutputRange(float minimumOutput, float maximumOutput) {
   {
-    std::unique_lock<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_mutex> sync(m_mutex);
     m_minimumOutput = minimumOutput;
     m_maximumOutput = maximumOutput;
   }
@@ -328,7 +326,7 @@ void PIDController::SetOutputRange(float minimumOutput, float maximumOutput) {
  */
 void PIDController::SetSetpoint(float setpoint) {
   {
-    std::unique_lock<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_mutex> sync(m_mutex);
     if (m_maximumInput > m_minimumInput) {
       if (setpoint > m_maximumInput)
         m_setpoint = m_maximumInput;
@@ -354,7 +352,7 @@ void PIDController::SetSetpoint(float setpoint) {
  * @return the current setpoint
  */
 double PIDController::GetSetpoint() const {
-  std::unique_lock<priority_mutex> sync(m_mutex);
+  std::lock_guard<priority_mutex> sync(m_mutex);
   return m_setpoint;
 }
 
@@ -365,7 +363,7 @@ double PIDController::GetSetpoint() const {
 float PIDController::GetError() const {
   double pidInput;
   {
-    std::unique_lock<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_mutex> sync(m_mutex);
     pidInput = m_pidInput->PIDGet();
   }
   return GetSetpoint() - pidInput;
@@ -394,7 +392,7 @@ PIDSourceType PIDController::GetPIDSourceType() const {
 float PIDController::GetAvgError() const {
   float avgError = 0;
   {
-    std::unique_lock<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_mutex> sync(m_mutex);
     // Don't divide by zero.
     if (m_buf.size()) avgError = m_bufTotal / m_buf.size();
   }
@@ -408,7 +406,7 @@ float PIDController::GetAvgError() const {
  */
 void PIDController::SetTolerance(float percent) {
   {
-    std::unique_lock<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_mutex> sync(m_mutex);
     m_toleranceType = kPercentTolerance;
     m_tolerance = percent;
   }
@@ -421,7 +419,7 @@ void PIDController::SetTolerance(float percent) {
  */
 void PIDController::SetPercentTolerance(float percent) {
   {
-    std::unique_lock<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_mutex> sync(m_mutex);
     m_toleranceType = kPercentTolerance;
     m_tolerance = percent;
   }
@@ -434,7 +432,7 @@ void PIDController::SetPercentTolerance(float percent) {
  */
 void PIDController::SetAbsoluteTolerance(float absTolerance) {
   {
-    std::unique_lock<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_mutex> sync(m_mutex);
     m_toleranceType = kAbsoluteTolerance;
     m_tolerance = absTolerance;
   }
@@ -471,7 +469,7 @@ void PIDController::SetToleranceBuffer(unsigned bufLength) {
 bool PIDController::OnTarget() const {
   double error = GetAvgError();
 
-  std::unique_lock<priority_mutex> sync(m_mutex);
+  std::lock_guard<priority_mutex> sync(m_mutex);
   switch (m_toleranceType) {
     case kPercentTolerance:
       return fabs(error) < m_tolerance / 100 * (m_maximumInput - m_minimumInput);
@@ -491,7 +489,7 @@ bool PIDController::OnTarget() const {
  */
 void PIDController::Enable() {
   {
-    std::unique_lock<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_mutex> sync(m_mutex);
     m_enabled = true;
   }
 
@@ -505,7 +503,7 @@ void PIDController::Enable() {
  */
 void PIDController::Disable() {
   {
-    std::unique_lock<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_mutex> sync(m_mutex);
     m_pidOutput->PIDWrite(0);
     m_enabled = false;
   }
@@ -519,7 +517,7 @@ void PIDController::Disable() {
  * Return true if PIDController is enabled.
  */
 bool PIDController::IsEnabled() const {
-  std::unique_lock<priority_mutex> sync(m_mutex);
+  std::lock_guard<priority_mutex> sync(m_mutex);
   return m_enabled;
 }
 
@@ -529,7 +527,7 @@ bool PIDController::IsEnabled() const {
 void PIDController::Reset() {
   Disable();
 
-  std::unique_lock<priority_mutex> sync(m_mutex);
+  std::lock_guard<priority_mutex> sync(m_mutex);
   m_prevInput = 0;
   m_totalError = 0;
   m_result = 0;

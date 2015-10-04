@@ -24,7 +24,7 @@ class Notification {
   }
   // Sets the condition to true, and wakes all waiting threads.
   void Notify() {
-    std::unique_lock<priority_mutex> lock(m_mutex);
+    std::lock_guard<priority_mutex> lock(m_mutex);
     m_set = true;
     m_condition.notify_all();
   }
