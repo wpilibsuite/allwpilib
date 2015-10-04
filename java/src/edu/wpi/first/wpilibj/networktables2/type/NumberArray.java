@@ -1,7 +1,7 @@
 package edu.wpi.first.wpilibj.networktables2.type;
 
 /**
- * @deprecated Use ArrayList<Double> instead.
+ * @deprecated Use {@literal ArrayList<Double>} instead.
  */
 public class NumberArray extends ArrayData {
   public double get(int index) {

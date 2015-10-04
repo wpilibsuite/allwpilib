@@ -102,7 +102,7 @@ public class NetworkTable implements ITable, IRemote {
   }
 
   /**
-   * @param port the port number that network tables will connect to in client
+   * @param aport the port number that network tables will connect to in client
    * mode or listen to in server mode
    */
   public synchronized static void setPort(int aport) {
@@ -1045,7 +1045,7 @@ public class NetworkTable implements ITable, IRemote {
    * Returns the value at the specified key.
    * @param key the key
    * @return the value
-   * @throws NoSuchEleNetworkTableKeyNotDefinedmentException if there is no
+   * @throws TableKeyNotDefinedException if there is no
    * value mapped to by the key
    * @throws IllegalArgumentException if the value mapped to by the key is not a
    * double
@@ -1061,7 +1061,7 @@ public class NetworkTable implements ITable, IRemote {
    * @param key the key
    * @param defaultValue the value returned if the key is undefined
    * @return the value
-   * @throws NoSuchEleNetworkTableKeyNotDefinedmentException if there is no
+   * @throws TableKeyNotDefinedException if there is no
    * value mapped to by the key
    * @throws IllegalArgumentException if the value mapped to by the key is not a
    * double
