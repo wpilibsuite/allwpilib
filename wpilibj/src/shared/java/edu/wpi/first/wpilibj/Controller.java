@@ -19,7 +19,7 @@ interface Controller {
 
   /**
    * Stops the control loop from running until explicitly re-enabled by calling
-   * {@link enable()}.
+   * {@link #enable()}.
    */
   public void disable();
 }

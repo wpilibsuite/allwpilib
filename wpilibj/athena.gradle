@@ -111,6 +111,9 @@ task wpilibjSources(type: Jar, dependsOn: classes) {
 task javadoc(type: Javadoc, overwrite: true) {
     source sourceSets.athena.allJava, sourceSets.shared.allJava
     classpath = files([sourceSets.athena.compileClasspath, sourceSets.shared.compileClasspath])
+    javadoc.options.links("http://docs.oracle.com/javase/8/docs/api/")
+    options.addStringOption "tag", "pre:a:Pre-Condition"
+//    options.addStringOption('Xdoclint:accessibility,syntax,reference,html', '-quiet')
 }
 
 task wpilibjJavadoc(type: Jar, dependsOn: javadoc) {

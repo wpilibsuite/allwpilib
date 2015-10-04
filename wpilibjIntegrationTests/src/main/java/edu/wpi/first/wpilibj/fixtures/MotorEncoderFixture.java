@@ -51,7 +51,7 @@ public abstract class MotorEncoderFixture<T extends SpeedController> implements 
    * Constructor should only be called from outside this class if the Speed
    * controller is not also an implementation of PWM interface
    *$
-   * @return
+   * @return SpeedController
    */
   abstract protected T giveSpeedController();
 
@@ -59,7 +59,7 @@ public abstract class MotorEncoderFixture<T extends SpeedController> implements 
    * Where the implementer of this class should pass one of the digital inputs<br>
    * CONSTRUCTOR SHOULD NOT BE CALLED FROM OUTSIDE THIS CLASS!
    *$
-   * @return
+   * @return DigitalInput
    */
   abstract protected DigitalInput giveDigitalInputA();
 

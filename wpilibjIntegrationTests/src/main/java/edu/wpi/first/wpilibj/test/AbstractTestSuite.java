@@ -38,6 +38,8 @@ public abstract class AbstractTestSuite {
    *$
    * @return the list of classes listed in the
    *         <code>@SuiteClasses({TestClass1.class, ...})</code> annotation.
+   * @throws RuntimeException If the <code>@SuiteClasses</code> annotation is
+   *         missing.
    */
   protected List<Class<?>> getAnnotatedTestClasses() {
     SuiteClasses annotation = getClass().getAnnotation(SuiteClasses.class);
@@ -52,11 +54,6 @@ public abstract class AbstractTestSuite {
     return classes;
   }
 
-  /**
-   *$
-   * @param check
-   * @return
-   */
   private boolean areAnySuperClassesOfTypeAbstractTestSuite(Class<?> check) {
     while (check != null) {
       if (check.equals(AbstractTestSuite.class)) {
@@ -88,10 +85,6 @@ public abstract class AbstractTestSuite {
     }
   }
 
-  /**
-   * @param regex
-   * @return
-   */
   protected List<ClassMethodPair> getMethodMatching(final String regex) {
     List<ClassMethodPair> classMethodPairs = new Vector<ClassMethodPair>();
     // Get all of the test classes
@@ -160,7 +153,7 @@ public abstract class AbstractTestSuite {
 
   /**
    * Retrieves all of the classes listed in the
-   * <code>@SuiteClasses<code> annotation that match the given regex text.
+   * <code>@SuiteClasses</code> annotation that match the given regex text.
    *$
    * @param regex the text pattern to retrieve.
    * @param runningList the running list of classes to prevent recursion
@@ -178,7 +171,7 @@ public abstract class AbstractTestSuite {
 
   /**
    * Retrieves all of the classes listed in the
-   * <code>@SuiteClasses<code> annotation that match the given regex text.
+   * <code>@SuiteClasses</code> annotation that match the given regex text.
    *$
    * @param regex the text pattern to retrieve.
    * @return The list of classes matching the regex pattern
@@ -252,10 +245,10 @@ public abstract class AbstractTestSuite {
 
   /**
    * Retrieves all of the classes listed in the
-   * <code>@SuiteClasses<code> annotation.
+   * <code>@SuiteClasses</code> annotation.
    *$
-   * @return
-   * @throws InitializationError If the <code>@SuiteClasses<code> annotation is
+   * @return List of SuiteClasses
+   * @throws RuntimeException If the <code>@SuiteClasses</code> annotation is
    *         missing.
    */
   public List<Class<?>> getAllClasses() {
@@ -264,10 +257,10 @@ public abstract class AbstractTestSuite {
 
   /**
    * Gets the name of all of the classes listed within the
-   * <code>@SuiteClasses<code> annotation.
+   * <code>@SuiteClasses</code> annotation.
    *$
    * @return the list of classes.
-   * @throws InitializationError If the <code>@SuiteClasses<code> annotation is
+   * @throws RuntimeException If the <code>@SuiteClasses</code> annotation is
    *         missing.
    */
   public List<String> getAllClassName() {

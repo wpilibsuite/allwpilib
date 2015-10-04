@@ -144,7 +144,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
   }
 
   /**
-   * Tests to see if you set the speed to something not <= 1.0 if the code
+   * Tests to see if you set the speed to something not {@literal <=} 1.0 if the code
    * appropriately throttles the value
    */
   @Test
@@ -155,7 +155,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
   }
 
   /**
-   * Tests to see if you set the speed to something not >= -1.0 if the code
+   * Tests to see if you set the speed to something not {@literal >=} -1.0 if the code
    * appropriately throttles the value
    */
   @Test

@@ -450,7 +450,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     return CanTalonJNI.intp_value(valuep);
   }
   /**
-   * @param which feedback sensor to check it if is connected.
+   * @param feedbackDevice which feedback sensor to check it if is connected.
    * @return status of caller's specified sensor type.
    */
   public FeedbackDeviceStatus isSensorPresent(FeedbackDevice feedbackDevice) {

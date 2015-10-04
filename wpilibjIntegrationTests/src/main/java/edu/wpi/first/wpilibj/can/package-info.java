@@ -3,7 +3,7 @@
  * modes and with each supported positional input. Different setup parameters
  * are provided in each Test class. All test classes that want to take advantage
  * of the default test setup frameworks in place should extend
- * {@link AbstractCANTest}
+ * {@link edu.wpi.first.wpilibj.can.AbstractCANTest AbstractCANTest}
  *$
  */
 package edu.wpi.first.wpilibj.can;

@@ -422,7 +422,7 @@ public class Joystick extends GenericHID {
   /**
    * Get the value of isXbox for the current joystick.
    *$
-   * @param value A boolean that is true if the controller is an xbox
+   * @return A boolean that is true if the controller is an xbox
    *        controller.
    */
   public boolean getIsXbox() {
@@ -432,7 +432,7 @@ public class Joystick extends GenericHID {
   /**
    * Get the HID type of the current joystick.
    *$
-   * @param value The HID type value of the current joystick.
+   * @return The HID type value of the current joystick.
    */
   public int getType() {
     return m_ds.getJoystickType(m_port);
@@ -441,7 +441,7 @@ public class Joystick extends GenericHID {
   /**
    * Get the name of the current joystick.
    *$
-   * @param value The name of the current joystick.
+   * @return The name of the current joystick.
    */
   public String getName() {
     return m_ds.getJoystickName(m_port);

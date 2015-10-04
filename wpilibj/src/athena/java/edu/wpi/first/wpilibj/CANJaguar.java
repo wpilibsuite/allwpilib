@@ -1157,7 +1157,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController {
   /**
    * Return whether the controller is enabled.
    *
-   * @returns true if enabled.
+   * @return true if enabled.
    */
   public boolean isEnabled() {
     return m_controlEnabled;

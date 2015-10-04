@@ -176,7 +176,7 @@ public abstract class SensorBase { // TODO: Refactor
    * Verify that the PDP module number is within limits. module numbers are
    * 0-based.
    *$
-   * @param channel The module number to check.
+   * @param module The module number to check.
    */
   protected static void checkPDPModule(final int module) {
     if (module < 0 || module > kPDPModules) {

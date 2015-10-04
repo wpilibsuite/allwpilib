@@ -70,7 +70,7 @@ public abstract class AnalogCrossConnectFixture implements ITestFixture {
   }
 
   /**
-   * @return
+   * @return Analog Output
    */
   final public AnalogOutput getOutput() {
     initialize();

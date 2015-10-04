@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
- * @file FakeCounterSource.java Simulates an encoder for testing purposes
+ * Simulates an encoder for testing purposes
  * @author Ryan O'Meara
  */
 public class FakeCounterSource {

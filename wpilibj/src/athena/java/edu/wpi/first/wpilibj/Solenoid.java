@@ -108,7 +108,7 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
    * Check if solenoid is blacklisted. If a solenoid is shorted, it is added to
    * the blacklist and disabled until power cycle, or until faults are cleared.
    *
-   * @see clearAllPCMStickyFaults()
+   * @see #clearAllPCMStickyFaults()
    *
    * @return If solenoid is disabled due to short.
    */

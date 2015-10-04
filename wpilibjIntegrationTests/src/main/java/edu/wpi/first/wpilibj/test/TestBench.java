@@ -340,7 +340,7 @@ public final class TestBench {
    * Return a single Collection containing all of the DIOCrossConnectFixtures in
    * all two pair combinations
    *$
-   * @return
+   * @return pairs of DIOCrossConnectFixtures
    */
   public Collection<Integer[]> getDIOCrossConnectCollection() {
     Collection<Integer[]> pairs = new ArrayList<Integer[]>();

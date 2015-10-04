@@ -202,8 +202,10 @@ public class SPI extends SensorBase {
    *        and initiates a transfer. If false, this function assumes that data
    *        is already in the receive FIFO from a previous write.
    *
-   * @param received The buffer to be filled with the received data. Must be
+   * @param dataReceived The buffer to be filled with the received data. Must be
    *        created using ByteBuffer.allocateDirect().
+   *
+   * @param size The length of the transaction, in bytes
    */
   public int read(boolean initiate, ByteBuffer dataReceived, int size) {
     if (!dataReceived.isDirect())

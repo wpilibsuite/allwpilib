@@ -64,7 +64,7 @@ public class FakePotentiometerSource {
   /**
    * Returns the currently set angle
    *$
-   * @return
+   * @return the current angle
    */
   public double getAngle() {
     double voltage = output.getVoltage();

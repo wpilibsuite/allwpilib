@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
- * @file FakeEncoderSource.java Emulates a quadrature encoder
+ * Emulates a quadrature encoder
  * @author Ryan O'Meara
  */
 public class FakeEncoderSource {

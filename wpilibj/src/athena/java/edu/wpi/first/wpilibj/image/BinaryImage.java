@@ -128,7 +128,6 @@ public class BinaryImage extends MonoImage {
    *        Vision Concepts manual.
    * @param erosions the number of erosions to perform
    * @return a BinaryImage after applying the filter
-   * @throws NIVisionException
    */
   public BinaryImage removeSmallObjects(boolean connectivity8, int erosions)
       throws NIVisionException {
@@ -150,7 +149,6 @@ public class BinaryImage extends MonoImage {
    *        Vision Concepts manual.
    * @param erosions the number of erosions to perform
    * @return a BinaryImage after applying the filter
-   * @throws NIVisionException
    */
   public BinaryImage removeLargeObjects(boolean connectivity8, int erosions)
       throws NIVisionException {

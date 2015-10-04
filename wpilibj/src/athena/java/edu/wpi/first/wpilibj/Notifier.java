@@ -88,7 +88,7 @@ public class Notifier {
   /**
    * Create a Notifier for timer event notification.
    *$
-   * @param handler The handler is called at the notification time which is set
+   * @param run The handler that is called at the notification time which is set
    *        using StartSingle or StartPeriodic.
    */
   public Notifier(Runnable run) {
