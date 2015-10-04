@@ -11,6 +11,8 @@ import java.util.Vector;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.wpilibj.tables.ITableListener;
 import edu.wpi.first.wpilibj.tables.TableKeyNotDefinedException;
 
 /**
@@ -48,6 +50,20 @@ public class Preferences {
    * The network table
    */
   private NetworkTable table;
+  /**
+   * Listener to set all Preferences values to persistent (for backwards
+   * compatibility with old dashboards).
+   */
+  private final ITableListener listener = new ITableListener() {
+    @Override
+    public void valueChanged(ITable table, String key, Object value, boolean isNew) {
+      // unused
+    }
+    @Override
+    public void valueChangedEx(ITable table, String key, Object value, int flags) {
+      table.setPersistent(key);
+    }
+  };
 
   /**
    * Returns the preferences instance.
@@ -66,6 +82,7 @@ public class Preferences {
    */
   private Preferences() {
     table = NetworkTable.getTable(TABLE_NAME);
+    table.addTableListenerEx(listener, ITable.NOTIFY_NEW | ITable.NOTIFY_IMMEDIATE);
     UsageReporting.report(tResourceType.kResourceType_Preferences, 0);
   }
 
