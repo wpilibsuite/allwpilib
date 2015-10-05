@@ -22,6 +22,7 @@
 					<folderInfo id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.exe.debug.379433867" name="Cross GCC" nonInternalBuilderId="cdt.managedbuild.builder.gnu.cross" superClass="cdt.managedbuild.toolchain.gnu.cross.exe.debug">
 							<option id="cdt.managedbuild.option.gnu.cross.prefix.541714056" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" value="arm-frc-linux-gnueabi-" valueType="string"/>
+							<option id="cdt.managedbuild.option.gnu.cross.path.1246856819" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path" value="/usr/local/bin" valueType="string"/>
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.864368257" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
 							<builder autoBuildTarget="all" buildPath="${workspace_loc:/$project}/Debug" cleanBuildTarget="clean" id="org.eclipse.cdt.build.core.internal.builder.1308552451" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="org.eclipse.cdt.build.core.internal.builder"/>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.1261239456" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
