@@ -226,7 +226,7 @@
 		<prop name="Items" value="system"/>
 	</post>
 	<loadfile srcFile="sysProps.xml" encoding="UTF-16LE" property="roboRIOSysValues"/>
-	<propertyregex property="roboRIOImage" input="${roboRIOSysValues}" regexp="FRC_roboRIO_2015_v([0-9]+)" select="\1" defaultValue="ImageRegExFail"/>
+	<propertyregex property="roboRIOImage" input="${roboRIOSysValues}" regexp="FRC_roboRIO_2016_v([0-9]+)" select="\1" defaultValue="ImageRegExFail"/>
 	<assert message="roboRIO Image does not match plugin, allowed image version: ${roboRIOAllowedImages}">
 		<bool>
 			<contains string="${roboRIOAllowedImages}" substring="${roboRIOImage}"/>
