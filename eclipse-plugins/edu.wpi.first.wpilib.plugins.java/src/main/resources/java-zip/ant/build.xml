@@ -113,6 +113,7 @@
                trust="true"
                failonerror="false"
                command="killall -q netconsole-host || :"/>
+      <scp file="${wpilib.ant.dir}/netconsole-host" todir="admin@${target}:/usr/local/frc/bin" password="${password}" trust="true"/>
 
       <scp file="${wpilib.ant.dir}/robotCommand" todir="${username}@${target}:${command.dir}" password="${password}" trust="true"/>
 
