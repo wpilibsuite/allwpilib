@@ -496,6 +496,14 @@ bool Storage::SetEntryValue(StringRef name, std::shared_ptr<Value> value) {
   // update persistent dirty flag if value changed and it's persistent
   if (entry->IsPersistent() && *old_value != *value) m_persistent_dirty = true;
 
+  // notify (for local listeners)
+  if (m_notifier.local_notifiers()) {
+    if (!old_value)
+      m_notifier.NotifyEntry(name, value, NT_NOTIFY_NEW | NT_NOTIFY_LOCAL);
+    else if (*old_value != *value)
+      m_notifier.NotifyEntry(name, value, NT_NOTIFY_UPDATE | NT_NOTIFY_LOCAL);
+  }
+
   // generate message
   if (!m_queue_outgoing) return true;
   auto queue_outgoing = m_queue_outgoing;
@@ -504,7 +512,6 @@ bool Storage::SetEntryValue(StringRef name, std::shared_ptr<Value> value) {
                                     value, entry->flags);
     lock.unlock();
     queue_outgoing(msg, nullptr, nullptr);
-    m_notifier.NotifyEntry(name, value, NT_NOTIFY_NEW | NT_NOTIFY_LOCAL);
   } else if (*old_value != *value) {
     ++entry->seq_num;
     // don't send an update if we don't have an assigned id yet
@@ -514,7 +521,6 @@ bool Storage::SetEntryValue(StringRef name, std::shared_ptr<Value> value) {
       lock.unlock();
       queue_outgoing(msg, nullptr, nullptr);
     }
-    m_notifier.NotifyEntry(name, value, NT_NOTIFY_UPDATE | NT_NOTIFY_LOCAL);
   }
   return true;
 }
@@ -540,6 +546,14 @@ void Storage::SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value) {
   // update persistent dirty flag if it's a persistent value
   if (entry->IsPersistent()) m_persistent_dirty = true;
 
+  // notify (for local listeners)
+  if (m_notifier.local_notifiers()) {
+    if (!old_value)
+      m_notifier.NotifyEntry(name, value, NT_NOTIFY_NEW | NT_NOTIFY_LOCAL);
+    else
+      m_notifier.NotifyEntry(name, value, NT_NOTIFY_UPDATE | NT_NOTIFY_LOCAL);
+  }
+
   // generate message
   if (!m_queue_outgoing) return;
   auto queue_outgoing = m_queue_outgoing;
@@ -549,7 +563,6 @@ void Storage::SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value) {
                                     value, entry->flags);
     lock.unlock();
     queue_outgoing(msg, nullptr, nullptr);
-    m_notifier.NotifyEntry(name, value, NT_NOTIFY_NEW | NT_NOTIFY_LOCAL);
   } else {
     ++entry->seq_num;
     // don't send an update if we don't have an assigned id yet
@@ -559,7 +572,6 @@ void Storage::SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value) {
       lock.unlock();
       queue_outgoing(msg, nullptr, nullptr);
     }
-    m_notifier.NotifyEntry(name, value, NT_NOTIFY_UPDATE | NT_NOTIFY_LOCAL);
   }
 }
 
@@ -577,6 +589,9 @@ void Storage::SetEntryFlags(StringRef name, unsigned int flags) {
 
   entry->flags = flags;
 
+  // notify
+  m_notifier.NotifyEntry(name, entry->value, NT_NOTIFY_FLAGS | NT_NOTIFY_LOCAL);
+
   // generate message
   if (!m_queue_outgoing) return;
   auto queue_outgoing = m_queue_outgoing;
@@ -586,9 +601,6 @@ void Storage::SetEntryFlags(StringRef name, unsigned int flags) {
     lock.unlock();
     queue_outgoing(Message::FlagsUpdate(id, flags), nullptr, nullptr);
   }
-
-  // notify
-  m_notifier.NotifyEntry(name, entry->value, NT_NOTIFY_FLAGS | NT_NOTIFY_LOCAL);
 }
 
 unsigned int Storage::GetEntryFlags(StringRef name) const {
@@ -612,6 +624,10 @@ void Storage::DeleteEntry(StringRef name) {
 
   if (!entry->value) return;
 
+  // notify
+  m_notifier.NotifyEntry(name, entry->value,
+                         NT_NOTIFY_DELETE | NT_NOTIFY_LOCAL);
+
   // if it had a value, generate message
   // don't send an update if we don't have an assigned id yet
   if (id != 0xffff) {
@@ -620,10 +636,6 @@ void Storage::DeleteEntry(StringRef name) {
     lock.unlock();
     queue_outgoing(Message::EntryDelete(id), nullptr, nullptr);
   }
-
-  // notify
-  m_notifier.NotifyEntry(name, entry->value,
-                         NT_NOTIFY_DELETE | NT_NOTIFY_LOCAL);
 }
 
 void Storage::DeleteAllEntries() {
@@ -636,18 +648,18 @@ void Storage::DeleteAllEntries() {
   // set persistent dirty flag
   m_persistent_dirty = true;
 
-  // generate message
-  if (!m_queue_outgoing) return;
-  auto queue_outgoing = m_queue_outgoing;
-  lock.unlock();
-  queue_outgoing(Message::ClearEntries(), nullptr, nullptr);
-
   // notify
   if (m_notifier.local_notifiers()) {
     for (auto& entry : map)
       m_notifier.NotifyEntry(entry.getKey(), entry.getValue()->value,
                              NT_NOTIFY_DELETE | NT_NOTIFY_LOCAL);
   }
+
+  // generate message
+  if (!m_queue_outgoing) return;
+  auto queue_outgoing = m_queue_outgoing;
+  lock.unlock();
+  queue_outgoing(Message::ClearEntries(), nullptr, nullptr);
 }
 
 std::vector<EntryInfo> Storage::GetEntryInfo(StringRef prefix,
@@ -1183,6 +1195,18 @@ next_line:
         unsigned int id = m_idmap.size();
         entry->id = id;
         m_idmap.push_back(entry);
+      }
+
+      // notify (for local listeners)
+      if (m_notifier.local_notifiers()) {
+        if (!old_value)
+          m_notifier.NotifyEntry(i.first, i.second,
+                                 NT_NOTIFY_NEW | NT_NOTIFY_LOCAL);
+        else if (*old_value != *i.second) {
+          unsigned int notify_flags = NT_NOTIFY_UPDATE | NT_NOTIFY_LOCAL;
+          if (!was_persist) notify_flags |= NT_NOTIFY_FLAGS;
+          m_notifier.NotifyEntry(i.first, i.second, notify_flags);
+        }
       }
 
       if (!m_queue_outgoing) continue;  // shortcut
