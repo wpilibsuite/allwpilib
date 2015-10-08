@@ -20,7 +20,7 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
   PIDCommand(const std::string &name, double p, double i, double d);
   PIDCommand(const std::string &name, double p, double i, double d, double period);
   PIDCommand(const std::string &name, double p, double i, double d, double f,
-             double perioid);
+             double period);
   PIDCommand(double p, double i, double d);
   PIDCommand(double p, double i, double d, double period);
   PIDCommand(double p, double i, double d, double f, double period);

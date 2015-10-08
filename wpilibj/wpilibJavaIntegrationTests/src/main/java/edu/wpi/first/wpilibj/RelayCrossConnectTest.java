@@ -21,7 +21,7 @@ import org.junit.Test;
 import edu.wpi.first.wpilibj.Relay.Direction;
 import edu.wpi.first.wpilibj.Relay.InvalidValueException;
 import edu.wpi.first.wpilibj.Relay.Value;
-import edu.wpi.first.wpilibj.fixtures.RelayCrossConnectFxiture;
+import edu.wpi.first.wpilibj.fixtures.RelayCrossConnectFixture;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
@@ -33,7 +33,7 @@ import edu.wpi.first.wpilibj.test.TestBench;
 public class RelayCrossConnectTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(RelayCrossConnectTest.class.getName());
   private static final NetworkTable table = NetworkTable.getTable("_RELAY_CROSS_CONNECT_TEST_");
-  private RelayCrossConnectFxiture relayFixture;
+  private RelayCrossConnectFixture relayFixture;
 
 
   /**
