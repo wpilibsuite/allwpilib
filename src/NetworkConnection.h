@@ -101,6 +101,13 @@ class NetworkConnection {
   std::mutex m_pending_mutex;
   Outgoing m_pending_outgoing;
   std::vector<std::pair<std::size_t, std::size_t>> m_pending_update;
+
+  // Condition variables for shutdown
+  std::mutex m_shutdown_mutex;
+  std::condition_variable m_read_shutdown_cv;
+  std::condition_variable m_write_shutdown_cv;
+  bool m_read_shutdown = false;
+  bool m_write_shutdown = false;
 };
 
 }  // namespace nt

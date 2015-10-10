@@ -31,6 +31,10 @@ void RpcServer::Start() {
     if (m_active) return;
     m_active = true;
   }
+  {
+    std::lock_guard<std::mutex> lock(m_shutdown_mutex);
+    m_shutdown = false;
+  }
   m_thread = std::thread(&RpcServer::ThreadMain, this);
 }
 
@@ -39,7 +43,15 @@ void RpcServer::Stop() {
   if (m_thread.joinable()) {
     // send notification so the thread terminates
     m_call_cond.notify_one();
-    m_thread.join();
+    // join with timeout
+    std::unique_lock<std::mutex> lock(m_shutdown_mutex);
+    auto timeout_time =
+        std::chrono::steady_clock::now() + std::chrono::seconds(1);
+    if (m_shutdown_cv.wait_until(lock, timeout_time,
+                                 [&] { return m_shutdown; }))
+      m_thread.join();
+    else
+      m_thread.detach();  // timed out, detach it
   }
 }
 
@@ -97,10 +109,11 @@ void RpcServer::ThreadMain() {
   while (m_active) {
     while (m_call_queue.empty()) {
       m_call_cond.wait(lock);
-      if (!m_active) return;
+      if (!m_active) goto done;
     }
 
     while (!m_call_queue.empty()) {
+      if (!m_active) goto done;
       auto item = std::move(m_call_queue.front());
       m_call_queue.pop();
 
@@ -116,5 +129,13 @@ void RpcServer::ThreadMain() {
                                               item.msg->seq_num_uid(), result));
       lock.lock();
     }
+  }
+
+done:
+  // use condition variable to signal thread shutdown
+  {
+    std::lock_guard<std::mutex> lock(m_shutdown_mutex);
+    m_shutdown = true;
+    m_shutdown_cv.notify_one();
   }
 }

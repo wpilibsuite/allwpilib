@@ -42,6 +42,12 @@ void NetworkConnection::Start() {
   m_state = static_cast<int>(kInit);
   // clear queue
   while (!m_outgoing.empty()) m_outgoing.pop();
+  // reset shutdown flags
+  {
+    std::lock_guard<std::mutex> lock(m_shutdown_mutex);
+    m_read_shutdown = false;
+    m_write_shutdown = false;
+  }
   // start threads
   m_write_thread = std::thread(&NetworkConnection::WriteThreadMain, this);
   m_read_thread = std::thread(&NetworkConnection::ReadThreadMain, this);
@@ -54,9 +60,27 @@ void NetworkConnection::Stop() {
   if (m_stream) m_stream->close();
   // send an empty outgoing message set so the write thread terminates
   m_outgoing.push(Outgoing());
-  // wait for threads to terminate
-  if (m_write_thread.joinable()) m_write_thread.join();
-  if (m_read_thread.joinable()) m_read_thread.join();
+  // wait for threads to terminate, with timeout
+  if (m_write_thread.joinable()) {
+    std::unique_lock<std::mutex> lock(m_shutdown_mutex);
+    auto timeout_time =
+        std::chrono::steady_clock::now() + std::chrono::milliseconds(200);
+    if (m_write_shutdown_cv.wait_until(lock, timeout_time,
+                                       [&] { return m_write_shutdown; }))
+      m_write_thread.join();
+    else
+      m_write_thread.detach();  // timed out, detach it
+  }
+  if (m_read_thread.joinable()) {
+    std::unique_lock<std::mutex> lock(m_shutdown_mutex);
+    auto timeout_time =
+        std::chrono::steady_clock::now() + std::chrono::milliseconds(200);
+    if (m_read_shutdown_cv.wait_until(lock, timeout_time,
+                                      [&] { return m_read_shutdown; }))
+      m_read_thread.join();
+    else
+      m_read_thread.detach();  // timed out, detach it
+  }
   // clear queue
   while (!m_outgoing.empty()) m_outgoing.pop();
 }
@@ -95,7 +119,7 @@ void NetworkConnection::ReadThreadMain() {
                    })) {
     m_state = static_cast<int>(kDead);
     m_active = false;
-    return;
+    goto done;
   }
 
   m_state = static_cast<int>(kActive);
@@ -122,6 +146,14 @@ void NetworkConnection::ReadThreadMain() {
   m_state = static_cast<int>(kDead);
   m_active = false;
   m_outgoing.push(Outgoing());  // also kill write thread
+
+done:
+  // use condition variable to signal thread shutdown
+  {
+    std::lock_guard<std::mutex> lock(m_shutdown_mutex);
+    m_read_shutdown = true;
+    m_read_shutdown_cv.notify_one();
+  }
 }
 
 void NetworkConnection::WriteThreadMain() {
@@ -153,6 +185,13 @@ void NetworkConnection::WriteThreadMain() {
   m_state = static_cast<int>(kDead);
   m_active = false;
   if (m_stream) m_stream->close();  // also kill read thread
+
+  // use condition variable to signal thread shutdown
+  {
+    std::lock_guard<std::mutex> lock(m_shutdown_mutex);
+    m_write_shutdown = true;
+    m_write_shutdown_cv.notify_one();
+  }
 }
 
 void NetworkConnection::QueueOutgoing(std::shared_ptr<Message> msg) {

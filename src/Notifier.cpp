@@ -29,6 +29,10 @@ void Notifier::Start() {
     if (m_active) return;
     m_active = true;
   }
+  {
+    std::lock_guard<std::mutex> lock(m_shutdown_mutex);
+    m_shutdown = false;
+  }
   m_thread = std::thread(&Notifier::ThreadMain, this);
 }
 
@@ -36,7 +40,17 @@ void Notifier::Stop() {
   m_active = false;
   // send notification so the thread terminates
   m_cond.notify_one();
-  if (m_thread.joinable()) m_thread.join();
+  if (m_thread.joinable()) {
+    // join with timeout
+    std::unique_lock<std::mutex> lock(m_shutdown_mutex);
+    auto timeout_time =
+        std::chrono::steady_clock::now() + std::chrono::seconds(1);
+    if (m_shutdown_cv.wait_until(lock, timeout_time,
+                                 [&] { return m_shutdown; }))
+      m_thread.join();
+    else
+      m_thread.detach();  // timed out, detach it
+  }
 }
 
 void Notifier::ThreadMain() {
@@ -44,11 +58,12 @@ void Notifier::ThreadMain() {
   while (m_active) {
     while (m_entry_notifications.empty() && m_conn_notifications.empty()) {
       m_cond.wait(lock);
-      if (!m_active) return;
+      if (!m_active) goto done;
     }
 
     // Entry notifications
     while (!m_entry_notifications.empty()) {
+      if (!m_active) goto done;
       auto item = std::move(m_entry_notifications.front());
       m_entry_notifications.pop();
 
@@ -95,6 +110,7 @@ void Notifier::ThreadMain() {
 
     // Connection notifications
     while (!m_conn_notifications.empty()) {
+      if (!m_active) goto done;
       auto item = std::move(m_conn_notifications.front());
       m_conn_notifications.pop();
 
@@ -116,6 +132,14 @@ void Notifier::ThreadMain() {
         lock.lock();
       }
     }
+  }
+
+done:
+  // use condition variable to signal thread shutdown
+  {
+    std::lock_guard<std::mutex> lock(m_shutdown_mutex);
+    m_shutdown = true;
+    m_shutdown_cv.notify_one();
   }
 }
 

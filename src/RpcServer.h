@@ -79,6 +79,9 @@ class RpcServer {
       m_response_map;
 
   std::thread m_thread;
+  std::mutex m_shutdown_mutex;
+  std::condition_variable m_shutdown_cv;
+  bool m_shutdown = false;
 
   ATOMIC_STATIC_DECL(RpcServer)
 };
