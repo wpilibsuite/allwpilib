@@ -78,7 +78,6 @@ class DispatcherBase {
   std::string m_persist_filename;
   std::thread m_dispatch_thread;
   std::thread m_clientserver_thread;
-  std::thread m_notifier_thread;
 
   std::unique_ptr<NetworkAcceptor> m_server_acceptor;
 
