@@ -1293,6 +1293,18 @@ SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1
 }
 
 
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1kStatusFrame_1PulseWidthMeas_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  int result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (int)CanTalonSRX::kStatusFrame_PulseWidthMeas;
+  jresult = (jint)result;
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1eProfileParamSlot0_1P_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   CanTalonSRX::_param_t result;
@@ -2073,6 +2085,240 @@ SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1
 }
 
 
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1eStatus1FrameRate_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::eStatus1FrameRate;
+  jresult = (jint)result;
+  return jresult;
+}
+
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1eStatus2FrameRate_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::eStatus2FrameRate;
+  jresult = (jint)result;
+  return jresult;
+}
+
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1eStatus3FrameRate_1get(JNIEnv *jenv, jclass jcls) {
+
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::eStatus3FrameRate;
+  jresult = (jint)result;
+  return jresult;
+}
+
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1eStatus4FrameRate_1get(JNIEnv *jenv, jclass jcls) {
+
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::eStatus4FrameRate;
+  jresult = (jint)result;
+  return jresult;
+}
+
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1eStatus6FrameRate_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::eStatus6FrameRate;
+  jresult = (jint)result;
+  return jresult;
+}
+
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1eStatus7FrameRate_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::eStatus7FrameRate;
+  jresult = (jint)result;
+  return jresult;
+}
+
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1eClearPositionOnIdx_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::eClearPositionOnIdx;
+  jresult = (jint)result;
+  return jresult;
+}
+
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1ePeakPosOutput_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::ePeakPosOutput;
+  jresult = (jint)result;
+  return jresult;
+}
+
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1eNominalPosOutput_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::eNominalPosOutput;
+  jresult = (jint)result;
+  return jresult;
+}
+
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1ePeakNegOutput_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::ePeakNegOutput;
+  jresult = (jint)result;
+  return jresult;
+}
+
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1eNominalNegOutput_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::eNominalNegOutput;
+  jresult = (jint)result;
+  return jresult;
+}
+
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1eQuadIdxPolarity_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::eQuadIdxPolarity;
+  jresult = (jint)result;
+  return jresult;
+}
+
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1eStatus8FrameRate_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::eStatus8FrameRate;
+  jresult = (jint)result;
+  return jresult;
+}
+
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1eAllowPosOverflow_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::eAllowPosOverflow;
+  jresult = (jint)result;
+  return jresult;
+}
+
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1eProfileParamSlot0_1AllowableClosedLoopErr_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::eProfileParamSlot0_AllowableClosedLoopErr;
+  jresult = (jint)result;
+  return jresult;
+}
+
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1eNumberPotTurns_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::eNumberPotTurns;
+  jresult = (jint)result;
+  return jresult;
+}
+
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1eNumberEncoderCPR_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::eNumberEncoderCPR;
+  jresult = (jint)result;
+  return jresult;
+}
+
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1ePwdPosition_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::ePwdPosition;
+  jresult = (jint)result;
+  return jresult;
+}
+
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1eAinPosition_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::eAinPosition;
+  jresult = (jint)result;
+  return jresult;
+}
+
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1eProfileParamVcompRate_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::eProfileParamVcompRate;
+  jresult = (jint)result;
+  return jresult;
+}
+
+SWIGEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1eProfileParamSlot1_1AllowableClosedLoopErr_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  CanTalonSRX::_param_t result;
+
+  (void)jenv;
+  (void)jcls;
+  result = (CanTalonSRX::_param_t)CanTalonSRX::eProfileParamSlot1_AllowableClosedLoopErr;
+  jresult = (jint)result;
+  return jresult;
+}
+
+
 SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetParam(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jdouble jarg3) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
@@ -2491,6 +2737,25 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_
   return jresult;
 }
 
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1GetVoltageCompensationRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  jlong jresult = 0 ;
+  CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
+  double *arg2 = 0 ;
+  CTR_Code result;
+
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(CanTalonSRX **)&jarg1;
+  arg2 = *(double **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "double & reference is null");
+    return 0;
+  }
+  result = (arg1)->GetVoltageCompensationRate(*arg2);
+  *(CTR_Code **)&jresult = new CTR_Code((const CTR_Code &)result);
+  return jresult;
+}
 
 SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1GetForwardSoftLimit(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   jlong jresult = 0 ;
@@ -3523,6 +3788,23 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_
 }
 
 
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetVoltageCompensationRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) {
+  jlong jresult = 0 ;
+  CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
+  double arg2 ;
+  CTR_Code result;
+
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(CanTalonSRX **)&jarg1;
+  arg2 = (double)jarg2;
+  result = (arg1)->SetVoltageCompensationRate(arg2);
+  *(CTR_Code **)&jresult = new CTR_Code((const CTR_Code &)result);
+  return jresult;
+}
+
+
 SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1SetRevFeedbackSensor(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
   CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
@@ -3535,6 +3817,111 @@ SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_
   arg1 = *(CanTalonSRX **)&jarg1;
   arg2 = (int)jarg2;
   result = (arg1)->SetRevFeedbackSensor(arg2);
+  *(CTR_Code **)&jresult = new CTR_Code((const CTR_Code &)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1GetPulseWidthPosition(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  jlong jresult = 0 ;
+  CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
+  int *arg2 = 0 ;
+  CTR_Code result;
+
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(CanTalonSRX **)&jarg1;
+  arg2 = *(int **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
+    return 0;
+  }
+  result = (arg1)->GetPulseWidthPosition(*arg2);
+  *(CTR_Code **)&jresult = new CTR_Code((const CTR_Code &)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1GetPulseWidthVelocity(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  jlong jresult = 0 ;
+  CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
+  int *arg2 = 0 ;
+  CTR_Code result;
+
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(CanTalonSRX **)&jarg1;
+  arg2 = *(int **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
+    return 0;
+  }
+  result = (arg1)->GetPulseWidthVelocity(*arg2);
+  *(CTR_Code **)&jresult = new CTR_Code((const CTR_Code &)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1GetPulseWidthRiseToFallUs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  jlong jresult = 0 ;
+  CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
+  int *arg2 = 0 ;
+  CTR_Code result;
+
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(CanTalonSRX **)&jarg1;
+  arg2 = *(int **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
+    return 0;
+  }
+  result = (arg1)->GetPulseWidthRiseToFallUs(*arg2);
+  *(CTR_Code **)&jresult = new CTR_Code((const CTR_Code &)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1GetPulseWidthRiseToRiseUs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  jlong jresult = 0 ;
+  CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
+  int *arg2 = 0 ;
+  CTR_Code result;
+
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(CanTalonSRX **)&jarg1;
+  arg2 = *(int **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
+    return 0;
+  }
+  result = (arg1)->GetPulseWidthRiseToRiseUs(*arg2);
+  *(CTR_Code **)&jresult = new CTR_Code((const CTR_Code &)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_CanTalonSRX_1IsPulseWidthSensorPresent(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  jlong jresult = 0 ;
+  CanTalonSRX *arg1 = (CanTalonSRX *) 0 ;
+  int *arg2 = 0 ;
+  CTR_Code result;
+
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(CanTalonSRX **)&jarg1;
+  arg2 = *(int **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
+    return 0;
+  }
+  result = (arg1)->IsPulseWidthSensorPresent(*arg2);
   *(CTR_Code **)&jresult = new CTR_Code((const CTR_Code &)result);
   return jresult;
 }

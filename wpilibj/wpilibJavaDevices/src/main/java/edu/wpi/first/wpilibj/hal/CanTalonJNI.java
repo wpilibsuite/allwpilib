@@ -153,6 +153,8 @@ public class CanTalonJNI {
 
   public final static native int CanTalonSRX_kStatusFrame_AnalogTempVbat_get();
 
+  public final static native int CanTalonSRX_kStatusFrame_PulseWidthMeas_get();
+
   public final static native int CanTalonSRX_eProfileParamSlot0_P_get();
 
   public final static native int CanTalonSRX_eProfileParamSlot0_I_get();
@@ -283,6 +285,48 @@ public class CanTalonJNI {
 
   public final static native int CanTalonSRX_ePidIaccum_get();
 
+  public final static native int CanTalonSRX_eStatus1FrameRate_get();
+
+  public final static native int CanTalonSRX_eStatus2FrameRate_get();
+
+  public final static native int CanTalonSRX_eStatus3FrameRate_get();
+
+  public final static native int CanTalonSRX_eStatus4FrameRate_get();
+
+  public final static native int CanTalonSRX_eStatus6FrameRate_get();
+
+  public final static native int CanTalonSRX_eStatus7FrameRate_get();
+
+  public final static native int CanTalonSRX_eClearPositionOnIdx_get();
+
+  public final static native int CanTalonSRX_ePeakPosOutput_get();
+
+  public final static native int CanTalonSRX_eNominalPosOutput_get();
+
+  public final static native int CanTalonSRX_ePeakNegOutput_get();
+
+  public final static native int CanTalonSRX_eNominalNegOutput_get();
+
+  public final static native int CanTalonSRX_eQuadIdxPolarity_get();
+
+  public final static native int CanTalonSRX_eStatus8FrameRate_get();
+
+  public final static native int CanTalonSRX_eAllowPosOverflow_get();
+
+  public final static native int CanTalonSRX_eProfileParamSlot0_AllowableClosedLoopErr_get();
+
+  public final static native int CanTalonSRX_eNumberPotTurns_get();
+
+  public final static native int CanTalonSRX_eNumberEncoderCPR_get();
+
+  public final static native int CanTalonSRX_ePwdPosition_get();
+
+  public final static native int CanTalonSRX_eAinPosition_get();
+
+  public final static native int CanTalonSRX_eProfileParamVcompRate_get();
+
+  public final static native int CanTalonSRX_eProfileParamSlot1_AllowableClosedLoopErr_get();
+
   public final static native long CanTalonSRX_SetParam(long jarg1, CanTalonSRX jarg1_, int jarg2,
       double jarg3);
 
@@ -344,6 +388,9 @@ public class CanTalonJNI {
 
   public final static native long CanTalonSRX_GetCloseLoopRampRate(long jarg1, CanTalonSRX jarg1_,
       long jarg2, long jarg3);
+
+  public final static native long CanTalonSRX_GetVoltageCompensationRate(long jarg1,
+      CanTalonSRX jarg1_, long jarg2);
 
   public final static native long CanTalonSRX_GetForwardSoftLimit(long jarg1, CanTalonSRX jarg1_,
       long jarg2);
@@ -489,8 +536,21 @@ public class CanTalonJNI {
   public final static native long CanTalonSRX_SetRampThrottle(long jarg1, CanTalonSRX jarg1_,
       int jarg2);
 
+  public final static native long CanTalonSRX_SetVoltageCompensationRate(long jarg1, CanTalonSRX jarg1_,
+      double jarg2);
+
   public final static native long CanTalonSRX_SetRevFeedbackSensor(long jarg1, CanTalonSRX jarg1_,
       int jarg2);
+
+  public final static native long CanTalonSRX_GetPulseWidthPosition(long jarg1, CanTalonSRX jarg1_, long jarg2);
+
+  public final static native long CanTalonSRX_GetPulseWidthVelocity(long jarg1, CanTalonSRX jarg1_, long jarg2);
+
+  public final static native long CanTalonSRX_GetPulseWidthRiseToFallUs(long jarg1, CanTalonSRX jarg1_, long jarg2);
+
+  public final static native long CanTalonSRX_GetPulseWidthRiseToRiseUs(long jarg1, CanTalonSRX jarg1_, long jarg2);
+
+  public final static native long CanTalonSRX_IsPulseWidthSensorPresent(long jarg1, CanTalonSRX jarg1_, long jarg2);
 
   public final static native long CanTalonSRX_SWIGUpcast(long jarg1);
 }

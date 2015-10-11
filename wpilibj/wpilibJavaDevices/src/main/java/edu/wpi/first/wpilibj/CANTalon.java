@@ -14,6 +14,21 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   private MotorSafetyHelper m_safetyHelper;
   private boolean isInverted = false;
   protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
+  /**
+   * Number of adc engineering units per 0 to 3.3V sweep.
+   * This is necessary for scaling Analog Position in rotations/RPM.
+   */
+  private final int kNativeAdcUnitsPerRotation = 1024;
+  /**
+   * Number of pulse width engineering units per full rotation.
+   * This is necessary for scaling Pulse Width Decoded Position in rotations/RPM.
+   */
+  private final double kNativePwdUnitsPerRotation = 4096.0;
+  /**
+   * Number of minutes per 100ms unit.  Useful for scaling velocities
+   * measured by Talon's 100ms timebase to rotations per minute.
+   */
+  private final double kMinutesPer100msUnit = 1.0/600.0;
 
   public enum TalonControlMode implements CANSpeedController.ControlMode {
     PercentVbus(0), Position(1), Speed(2), Current(3), Voltage(4), Follower(5), Disabled(15);
@@ -44,9 +59,8 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
         return value;
     }
   }
-
   public enum FeedbackDevice {
-    QuadEncoder(0), AnalogPot(2), AnalogEncoder(3), EncRising(4), EncFalling(5);
+    QuadEncoder(0), AnalogPot(2), AnalogEncoder(3), EncRising(4), EncFalling(5), CtreMagEncoder_Relative(6), CtreMagEncoder_Absolute(7), PulseWidth(8);
 
     public int value;
 
@@ -64,9 +78,27 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
       this.value = value;
     }
   }
+  /**
+   * Depending on the sensor type, Talon can determine if sensor is plugged in ot not.
+   */
+  public enum FeedbackDeviceStatus {
+    FeedbackStatusUnknown(0), FeedbackStatusPresent(1), FeedbackStatusNotPresent(2);
+    public int value;
+    public static FeedbackDeviceStatus valueOf(int value) {
+      for (FeedbackDeviceStatus mode : values()) {
+        if (mode.value == value) {
+          return mode;
+        }
+      }
+      return null;
+    }
+    private FeedbackDeviceStatus(int value) {
+      this.value = value;
+    }
+  }
   /** enumerated types for frame rate ms */
   public enum StatusFrameRate {
-    General(0), Feedback(1), QuadEncoder(2), AnalogTempVbat(3);
+    General(0), Feedback(1), QuadEncoder(2), AnalogTempVbat(3), PulseWidth(4);
     public int value;
 
     public static StatusFrameRate valueOf(int value) {
@@ -95,6 +127,27 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   int m_profile;
 
   double m_setPoint;
+  /**
+   * Encoder CPR, counts per rotations, also called codes per revoluion.
+   * Default value of zero means the API behaves as it did during the 2015 season, each position
+   * unit is a single pulse and there are four pulses per count (4X).
+   * Caller can use configEncoderCodesPerRev to set the quadrature encoder CPR.
+   */
+  int m_codesPerRev;
+  /**
+   * Number of turns per rotation.  For example, a 10-turn pot spins ten full rotations from
+   * a wiper voltage of zero to 3.3 volts.  Therefore knowing the
+   * number of turns a full voltage sweep represents is necessary for calculating rotations
+   * and velocity.
+   * A default value of zero means the API behaves as it did during the 2015 season, there are 1024
+   * position units from zero to 3.3V.
+   */
+  int m_numPotTurns;
+  /**
+   * Although the Talon handles feedback selection, caching the feedback selection is helpful at the API level
+   * for scaling into rotations and RPM.
+   */
+  FeedbackDevice m_feedbackDevice;
 
   public CANTalon(int deviceNumber) {
     m_deviceNumber = deviceNumber;
@@ -103,6 +156,9 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     m_controlEnabled = true;
     m_profile = 0;
     m_setPoint = 0;
+    m_codesPerRev = 0;
+    m_numPotTurns = 0;
+    m_feedbackDevice = FeedbackDevice.QuadEncoder;
     setProfile(m_profile);
     applyControlMode(TalonControlMode.PercentVbus);
   }
@@ -118,6 +174,9 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     m_controlEnabled = true;
     m_profile = 0;
     m_setPoint = 0;
+    m_codesPerRev = 0;
+    m_numPotTurns = 0;
+    m_feedbackDevice = FeedbackDevice.QuadEncoder;
     setProfile(m_profile);
     applyControlMode(TalonControlMode.PercentVbus);
   }
@@ -171,7 +230,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     /* feed safety helper since caller just updated our output */
     m_safetyHelper.feed();
     if (m_controlEnabled) {
-      m_setPoint = outputValue;
+      m_setPoint = outputValue; /* cache set point for getSetpoint() */
       switch (m_controlMode) {
         case PercentVbus:
           m_impl.Set(isInverted ? -outputValue : outputValue);
@@ -185,10 +244,14 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
           m_impl.SetDemand(volts);
           break;
         case Speed:
-          m_impl.SetDemand((int) (isInverted ? -outputValue : outputValue));
+          m_impl.SetDemand(ScaleVelocityToNativeUnits(m_feedbackDevice,(isInverted ? -outputValue : outputValue)));
           break;
         case Position:
-          m_impl.SetDemand((int) outputValue);
+          m_impl.SetDemand(ScaleRotationsToNativeUnits(m_feedbackDevice,outputValue));
+          break;
+        case Current:
+          double milliamperes = (isInverted ? -outputValue : outputValue) * 1000.0; /* mA*/
+          m_impl.SetDemand((int)milliamperes);
           break;
         default:
           break;
@@ -303,24 +366,31 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
    * @return The current sensor value of the Talon.
    */
   public double get() {
+    double retval = 0;
     long valuep = CanTalonJNI.new_intp();
     SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
     switch (m_controlMode) {
       case Voltage:
-        return getOutputVoltage();
+        retval = getOutputVoltage();
+        break;
       case Current:
-        return getOutputCurrent();
+        retval = getOutputCurrent();
+        break;
       case Speed:
         m_impl.GetSensorVelocity(swigp);
-        return (double) CanTalonJNI.intp_value(valuep);
+        retval = ScaleNativeUnitsToRpm(m_feedbackDevice,CanTalonJNI.intp_value(valuep));
+        break;
       case Position:
         m_impl.GetSensorPosition(swigp);
-        return (double) CanTalonJNI.intp_value(valuep);
+        retval = ScaleNativeUnitsToRotations(m_feedbackDevice,CanTalonJNI.intp_value(valuep));
+        break;
       case PercentVbus:
       default:
         m_impl.GetAppliedThrottle(swigp);
-        return (double) CanTalonJNI.intp_value(valuep) / 1023.0;
+        retval = (double) CanTalonJNI.intp_value(valuep) / 1023.0;
+        break;
     }
+    return retval;
   }
 
   /**
@@ -336,6 +406,10 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     return CanTalonJNI.intp_value(valuep);
   }
 
+  public void setEncPosition(int newPosition) {
+    setParameter(CanTalonSRX.param_t.eEncPosition, newPosition);
+  }
+
   /**
    * Get the current encoder velocity, regardless of whether it is the current
    * feedback device.
@@ -348,7 +422,68 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     m_impl.GetEncVel(swigp);
     return CanTalonJNI.intp_value(valuep);
   }
-
+  public int getPulseWidthPosition() {
+    long valuep = CanTalonJNI.new_intp();
+    SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
+    m_impl.GetPulseWidthPosition(swigp);
+    return CanTalonJNI.intp_value(valuep);
+  }
+  public void setPulseWidthPosition(int newPosition) {
+    setParameter(CanTalonSRX.param_t.ePwdPosition, newPosition);
+  }
+  public int getPulseWidthVelocity() {
+    long valuep = CanTalonJNI.new_intp();
+    SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
+    m_impl.GetPulseWidthVelocity(swigp);
+    return CanTalonJNI.intp_value(valuep);
+  }
+  public int getPulseWidthRiseToFallUs() {
+    long valuep = CanTalonJNI.new_intp();
+    SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
+    m_impl.GetPulseWidthRiseToFallUs(swigp);
+    return CanTalonJNI.intp_value(valuep);
+  }
+  public int getPulseWidthRiseToRiseUs() {
+    long valuep = CanTalonJNI.new_intp();
+    SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
+    m_impl.GetPulseWidthRiseToRiseUs(swigp);
+    return CanTalonJNI.intp_value(valuep);
+  }
+  /**
+   * @param which feedback sensor to check it if is connected.
+   * @return status of caller's specified sensor type.
+   */
+  public FeedbackDeviceStatus isSensorPresent(FeedbackDevice feedbackDevice) {
+    FeedbackDeviceStatus retval = FeedbackDeviceStatus.FeedbackStatusUnknown;
+    /* detecting sensor health depends on which sensor caller cares about */
+    switch(feedbackDevice){
+      case QuadEncoder:
+      case AnalogPot:
+      case AnalogEncoder:
+      case EncRising:
+      case EncFalling:
+        /* no real good way to tell if these sensor
+          are actually present so return status unknown. */
+        break;
+      case PulseWidth:
+      case CtreMagEncoder_Relative:
+      case CtreMagEncoder_Absolute:
+        /* all of these require pulse width signal to be present. */
+        long valuep = CanTalonJNI.new_intp();
+        SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
+        SWIGTYPE_p_CTR_Code status = m_impl.IsPulseWidthSensorPresent(swigp);
+        /* TODO: add a check for CanTalonJNI.CTR_Codep_value(status) */
+        if( CanTalonJNI.intp_value(valuep) == 0 ){
+          /* Talon not getting a signal */
+          retval = FeedbackDeviceStatus.FeedbackStatusNotPresent;
+        }else{
+          /* getting good signal */
+          retval = FeedbackDeviceStatus.FeedbackStatusPresent;
+        }
+        break;
+    }
+    return retval;
+  }
   /**
    * Get the number of of rising edges seen on the index pin.
    *
@@ -391,6 +526,9 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     return CanTalonJNI.intp_value(valuep);
   }
 
+  public void setAnalogPosition(int newPosition){
+    setParameter(CanTalonSRX.param_t.eAinPosition, (double)newPosition);
+  }
   /**
    * Get the current analog in position, regardless of whether it is the current
    * feedback device.
@@ -436,9 +574,24 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
    */
   public int getClosedLoopError() {
     long valuep = CanTalonJNI.new_intp();
+    /* retrieve the closed loop error in native units */
     SWIGTYPE_p_int swigp = new SWIGTYPE_p_int(valuep, true);
     m_impl.GetCloseLoopErr(swigp);
     return CanTalonJNI.intp_value(valuep);
+  }
+  /**
+   * Set the allowable closed loop error.
+   * @param allowableCloseLoopError allowable closed loop error for selected profile.
+   * 			mA for Curent closed loop.
+   * 			Talon Native Units for position and velocity.
+   */
+  public void setAllowableClosedLoopErr(int allowableCloseLoopError)
+  {
+    if(m_profile == 0){
+	  setParameter(CanTalonSRX.param_t.eProfileParamSlot0_AllowableClosedLoopErr, (double)allowableCloseLoopError);
+    }else{
+	  setParameter(CanTalonSRX.param_t.eProfileParamSlot1_AllowableClosedLoopErr, (double)allowableCloseLoopError);
+    }
   }
 
   // Returns true if limit switch is closed. false if open.
@@ -465,6 +618,32 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     return (CanTalonJNI.intp_value(valuep) == 0) ? false : true;
   }
 
+  /**
+   * Configure how many codes per revolution are generated by your encoder.
+   *
+   * @param codesPerRev The number of counts per revolution.
+   */
+  public void configEncoderCodesPerRev(int codesPerRev) {
+    /* first save the scalar so that all getters/setter work as the user expects */
+    m_codesPerRev = codesPerRev;
+    /* next send the scalar to the Talon over CAN.  This is so that the Talon can report
+      it to whoever needs it, like the webdash.  Don't bother checking the return,
+      this is only for instrumentation and is not necessary for Talon functionality. */
+    setParameter(CanTalonSRX.param_t.eNumberEncoderCPR, m_codesPerRev);
+  }
+  /**
+   * Configure the number of turns on the potentiometer.
+   *
+   * @param turns The number of turns of the potentiometer.
+   */
+  public void configPotentiometerTurns(int turns) {
+    /* first save the scalar so that all getters/setter work as the user expects */
+    m_numPotTurns = turns;
+    /* next send the scalar to the Talon over CAN.  This is so that the Talon can report
+      it to whoever needs it, like the webdash.  Don't bother checking the return,
+      this is only for instrumentation and is not necessary for Talon functionality. */
+    setParameter(CanTalonSRX.param_t.eNumberPotTurns, m_numPotTurns);
+  }
   /**
    * Returns temperature of Talon, in degrees Celsius.
    */
@@ -521,11 +700,12 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   public double getPosition() {
     long positionp = CanTalonJNI.new_intp();
     m_impl.GetSensorPosition(new SWIGTYPE_p_int(positionp, true));
-    return CanTalonJNI.intp_value(positionp);
+    return ScaleNativeUnitsToRotations(m_feedbackDevice,CanTalonJNI.intp_value(positionp));
   }
 
   public void setPosition(double pos) {
-    m_impl.SetSensorPosition((int) pos);
+    int nativePos = ScaleRotationsToNativeUnits(m_feedbackDevice,pos);
+    m_impl.SetSensorPosition(nativePos);
   }
 
   /**
@@ -546,7 +726,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   public double getSpeed() {
     long speedp = CanTalonJNI.new_intp();
     m_impl.GetSensorVelocity(new SWIGTYPE_p_int(speedp, true));
-    return CanTalonJNI.intp_value(speedp);
+    return ScaleNativeUnitsToRpm(m_feedbackDevice,CanTalonJNI.intp_value(speedp));
   }
 
   public TalonControlMode getControlMode() {
@@ -586,6 +766,9 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   }
 
   public void setFeedbackDevice(FeedbackDevice device) {
+    /* save the selection so that future setters/getters know which scalars to apply */
+    m_feedbackDevice = device;
+    /* pass feedback to actual CAN frame */
     m_impl.SetFeedbackDeviceSelect(device.value);
   }
 
@@ -864,6 +1047,9 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     m_impl.SetRampThrottle(rate);
   }
 
+  public void setVoltageCompensationRampRate(double rampRate) {
+    m_impl.SetVoltageCompensationRate(rampRate / 1000);
+  }
   /**
    * Clear the accumulator for I gain.
    */
@@ -948,8 +1134,9 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     SWIGTYPE_p_CTR_Code status = m_impl.SetParam(CanTalonSRX.param_t.ePidIaccum, 0);
   }
 
-  public void setForwardSoftLimit(int forwardLimit) {
-    m_impl.SetForwardSoftLimit(forwardLimit);
+  public void setForwardSoftLimit(double forwardLimit) {
+    int nativeLimitPos = ScaleRotationsToNativeUnits(m_feedbackDevice,forwardLimit);
+    m_impl.SetForwardSoftLimit(nativeLimitPos);
   }
 
   public int getForwardSoftLimit() {
@@ -968,8 +1155,9 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     return (CanTalonJNI.intp_value(valuep) == 0) ? false : true;
   }
 
-  public void setReverseSoftLimit(int reverseLimit) {
-    m_impl.SetReverseSoftLimit(reverseLimit);
+  public void setReverseSoftLimit(double reverseLimit) {
+    int nativeLimitPos = ScaleRotationsToNativeUnits(m_feedbackDevice,reverseLimit);
+    m_impl.SetReverseSoftLimit(nativeLimitPos);
   }
 
   public int getReverseSoftLimit() {
@@ -987,7 +1175,70 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     m_impl.GetReverseSoftEnable(new SWIGTYPE_p_int(valuep, true));
     return (CanTalonJNI.intp_value(valuep) == 0) ? false : true;
   }
+  /**
+   * Configure the maximum voltage that the Jaguar will ever output.
+   *
+   * This can be used to limit the maximum output voltage in all modes so that
+   * motors which cannot withstand full bus voltage can be used safely.
+   *
+   * @param voltage The maximum voltage output by the Jaguar.
+   */
+  public void configMaxOutputVoltage(double voltage) {
+    /* config peak throttle when in closed-loop mode in the fwd and rev direction. */
+  	configPeakOutputVoltage(voltage, -voltage);
+  }
 
+  public void configPeakOutputVoltage(double forwardVoltage,double reverseVoltage) {
+    /* bounds checking */
+    if(forwardVoltage > 12)
+  	  forwardVoltage = 12;
+    else if(forwardVoltage < 0)
+      forwardVoltage = 0;
+    if(reverseVoltage > 0)
+  	  reverseVoltage = 0;
+    else if(reverseVoltage < -12)
+      reverseVoltage = -12;
+    /* config calls */
+    setParameter(CanTalonSRX.param_t.ePeakPosOutput,1023*forwardVoltage/12.0);
+    setParameter(CanTalonSRX.param_t.ePeakNegOutput,1023*reverseVoltage/12.0);
+  }
+  public void configNominalOutputVoltage(double forwardVoltage,double reverseVoltage) {
+    /* bounds checking */
+    if(forwardVoltage > 12)
+  	  forwardVoltage = 12;
+    else if(forwardVoltage < 0)
+      forwardVoltage = 0;
+    if(reverseVoltage > 0)
+  	  reverseVoltage = 0;
+    else if(reverseVoltage < -12)
+      reverseVoltage = -12;
+    /* config calls */
+    setParameter(CanTalonSRX.param_t.eNominalPosOutput,1023*forwardVoltage/12.0);
+    setParameter(CanTalonSRX.param_t.eNominalNegOutput,1023*reverseVoltage/12.0);
+  }
+  /**
+   * General set frame.  Since the parameter is a general integral type, this can
+   * be used for testing future features.
+   */
+  public void setParameter(CanTalonSRX.param_t paramEnum, double value){
+    SWIGTYPE_p_CTR_Code status = m_impl.SetParam(paramEnum,value);
+    /* TODO: error report to driver station */
+  }
+  /**
+   * General get frame.  Since the parameter is a general integral type, this can
+   * be used for testing future features.
+   */
+  public double getParameter(CanTalonSRX.param_t paramEnum) {
+	/* transmit a request for this param */
+    m_impl.RequestParam(paramEnum);
+    /* Briefly wait for new values from the Talon. */
+    Timer.delay(kDelayForSolicitedSignals);
+	/* poll out latest response value */
+    long pp = CanTalonJNI.new_doublep();
+    SWIGTYPE_p_CTR_Code status = m_impl.GetParamResponse(paramEnum, new SWIGTYPE_p_double(pp, true));
+	/* pass latest value back to caller */
+    return CanTalonJNI.doublep_value(pp);
+  }
   public void clearStickyFaults() {
     m_impl.ClearStickyFaults();
   }
@@ -1110,8 +1361,186 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     m_impl.GetStckyFault_RevSoftLim(new SWIGTYPE_p_int(valuep, true));
     return CanTalonJNI.intp_value(valuep);
   }
+  /**
+   * @return Number of native units per rotation if scaling info is available.
+   *  			Zero if scaling information is not available.
+   */
+  double GetNativeUnitsPerRotationScalar(FeedbackDevice devToLookup)
+  {
+	  double retval = 0;
+	  boolean scalingAvail = false;
+	  switch(devToLookup){
+		  case QuadEncoder:
+		  {	/* When caller wants to lookup Quadrature, the QEI may be in 1x if the selected feedback is edge counter.
+			 * Additionally if the quadrature source is the CTRE Mag encoder, then the CPR is known.
+			 * This is nice in that the calling app does not require knowing the CPR at all.
+			 * So do both checks here.
+			 */
+			 int qeiPulsePerCount = 4; /* default to 4x */
+			 switch(m_feedbackDevice){
+				case CtreMagEncoder_Relative:
+				case CtreMagEncoder_Absolute:
+					/* we assume the quadrature signal comes from the MagEnc,
+						of which we know the CPR already */
+					retval = kNativePwdUnitsPerRotation;
+					scalingAvail = true;
+					break;
+				case EncRising: /* Talon's QEI is setup for 1x, so perform 1x math */
+				case EncFalling:
+					qeiPulsePerCount = 1;
+					break;
+				case QuadEncoder: /* Talon's QEI is 4x */
+				default: /* pulse width and everything else, assume its regular quad use. */
+					break;
+			}
+			if(scalingAvail){
+				/* already deduced the scalar above, we're done. */
+			}else{
+				/* we couldn't deduce the scalar just based on the selection */
+			  if(0 == m_codesPerRev){
+				  /* caller has never set the CPR.  Most likely caller
+					  is just using engineering units so fall to the
+					  bottom of this func.*/
+			  }else{
+				  /* Talon expects PPR units */
+				  retval = 4 * m_codesPerRev;
+				  scalingAvail = true;
+			  }
+			}
+		  }	break;
+		  case EncRising:
+		  case EncFalling:
+			  if(0 == m_codesPerRev){
+				  /* caller has never set the CPR.  Most likely caller
+					  is just using engineering units so fall to the
+					  bottom of this func.*/
+			  }else{
+  				  /* Talon expects PPR units */
+				  retval = 1 * m_codesPerRev;
+  				  scalingAvail = true;
+			  }
+			  break;
+		  case AnalogPot:
+		  case AnalogEncoder:
+			  if(0 == m_numPotTurns){
+				  /* caller has never set the CPR.  Most likely caller
+  					is just using engineering units so fall to the
+  					bottom of this func.*/
+			  }else {
+				  retval = (double)kNativeAdcUnitsPerRotation / m_numPotTurns;
+			  	  scalingAvail = true;
+  			  }
+			  break;
+		  case CtreMagEncoder_Relative:
+		  case CtreMagEncoder_Absolute:
+		  case PulseWidth:
+			  retval = kNativePwdUnitsPerRotation;
+			  scalingAvail = true;
+			  break;
+	  }
+	  /* if scaling info is not available give caller zero */
+	  if(false == scalingAvail)
+		return 0;
+	  return retval;
+  }
+  /**
+   * @param fullRotations 	double precision value representing number of rotations of selected feedback sensor.
+   *							If user has never called the config routine for the selected sensor, then the caller
+   *							is likely passing rotations in engineering units already, in which case it is returned
+   *							as is.
+   *							@see configPotentiometerTurns
+   *							@see configEncoderCodesPerRev
+   * @return fullRotations in native engineering units of the Talon SRX firmware.
+   */
+  int ScaleRotationsToNativeUnits(FeedbackDevice devToLookup, double fullRotations)
+  {
+	  /* first assume we don't have config info, prep the default return */
+	  int retval = (int)fullRotations;
+	  /* retrieve scaling info */
+	  double scalar = GetNativeUnitsPerRotationScalar(devToLookup);
+	  /* apply scalar if its available */
+	  if(scalar > 0)
+		  retval = (int)(fullRotations*scalar);
+	  return retval;
+  }
+  /**
+   * @param rpm 	double precision value representing number of rotations per minute of selected feedback sensor.
+   *							If user has never called the config routine for the selected sensor, then the caller
+   *							is likely passing rotations in engineering units already, in which case it is returned
+   *							as is.
+   *							@see configPotentiometerTurns
+   *							@see configEncoderCodesPerRev
+   * @return sensor velocity in native engineering units of the Talon SRX firmware.
+   */
+  int ScaleVelocityToNativeUnits(FeedbackDevice devToLookup, double rpm)
+  {
+	  /* first assume we don't have config info, prep the default return */
+	  int retval = (int)rpm;
+  	  /* retrieve scaling info */
+	  double scalar = GetNativeUnitsPerRotationScalar(devToLookup);
+	  /* apply scalar if its available */
+	  if(scalar > 0)
+  		retval = (int)(rpm * kMinutesPer100msUnit * scalar);
+	  return retval;
+  }
+  /**
+   * @param nativePos 	integral position of the feedback sensor in native Talon SRX units.
+   *							If user has never called the config routine for the selected sensor, then the return
+   *							will be in TALON SRX units as well to match the behavior in the 2015 season.
+   *							@see configPotentiometerTurns
+   *							@see configEncoderCodesPerRev
+   * @return double precision number of rotations, unless config was never performed.
+   */
+  double ScaleNativeUnitsToRotations(FeedbackDevice devToLookup, int nativePos)
+  {
+	  /* first assume we don't have config info, prep the default return */
+	  double retval = (double)nativePos;
+	  /* retrieve scaling info */
+	  double scalar = GetNativeUnitsPerRotationScalar(devToLookup);
+	  /* apply scalar if its available */
+	  if(scalar > 0)
+		  retval = ((double)nativePos) / scalar;
+	  return retval;
+  }
+  /**
+   * @param nativeVel 	integral velocity of the feedback sensor in native Talon SRX units.
+   *							If user has never called the config routine for the selected sensor, then the return
+   *							will be in TALON SRX units as well to match the behavior in the 2015 season.
+   *							@see configPotentiometerTurns
+   *							@see configEncoderCodesPerRev
+   * @return double precision of sensor velocity in RPM, unless config was never performed.
+   */
+  double ScaleNativeUnitsToRpm(FeedbackDevice devToLookup, long nativeVel)
+  {
+    /* first assume we don't have config info, prep the default return */
+	double retval = (double)nativeVel;
+	/* retrieve scaling info */
+	double scalar = GetNativeUnitsPerRotationScalar(devToLookup);
+	/* apply scalar if its available */
+	if(scalar > 0)
+  	  retval = (double)(nativeVel) / (scalar*kMinutesPer100msUnit);
+  	return retval;
+  }
 
-
+  /**
+   * Enables Talon SRX to automatically zero the Sensor Position whenever an
+   * edge is detected on the index signal. 
+   * @param enable 		boolean input, pass true to enable feature or false to disable.
+   * @param risingEdge 	boolean input, pass true to clear the position on rising edge,
+   *					pass false to clear the position on falling edge.
+   */
+  public void enableZeroSensorPositionOnIndex(boolean enable, boolean risingEdge) {
+    if(enable){
+	  /* enable the feature, update the edge polarity first to ensure
+		it is correct before the feature is enabled. */
+	  setParameter(CanTalonSRX.param_t.eQuadIdxPolarity,risingEdge	? 1 : 0);
+	  setParameter(CanTalonSRX.param_t.eClearPositionOnIdx,1);
+	}else{
+	  /* disable the feature first, then update the edge polarity. */
+	  setParameter(CanTalonSRX.param_t.eClearPositionOnIdx,0);
+	  setParameter(CanTalonSRX.param_t.eQuadIdxPolarity,risingEdge	? 1 : 0);
+	}
+  }
   @Override
   public void setExpiration(double timeout) {
     m_safetyHelper.setExpiration(timeout);

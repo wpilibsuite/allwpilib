@@ -20,6 +20,13 @@
  * they will only need to set them in a periodic fashion as a function of what motion the application is attempting.
  * If this API is used, be mindful of the CAN utilization reported in the driver station.
  *
+ * If calling application has used the config routines to configure the selected feedback sensor, then all positions are measured in
+ * floating point precision rotations.  All sensor velocities are specified in floating point precision RPM.
+ *	@see ConfigPotentiometerTurns
+ *	@see ConfigEncoderCodesPerRev
+ * HOWEVER, if calling application has not called the config routine for selected feedback sensor, then all getters/setters for
+ * position/velocity use the native engineering units of the Talon SRX firm (just like in 2015).  Signals explained below.
+ *
  * Encoder position is measured in encoder edges.  Every edge is counted (similar to roboRIO 4X mode).
  * Analog position is 10 bits, meaning 1024 ticks per rotation (0V => 3.3V).
  * Use SetFeedbackDeviceSelect to select which sensor type you need.  Once you do that you can use GetSensorPosition()
@@ -81,6 +88,7 @@
 #define STATUS_5  		0x02041500
 #define STATUS_6  		0x02041540
 #define STATUS_7  		0x02041580
+#define STATUS_8  		0x020415C0
 
 #define CONTROL_1 			0x02040000
 #define CONTROL_2 			0x02040040
@@ -94,6 +102,7 @@
 #define GET_STATUS5() CtreCanNode::recMsg<TALON_Status_5_Startup_OneShot_t	> rx = GetRx<TALON_Status_5_Startup_OneShot_t>(STATUS_5	  | GetDeviceNumber(), EXPECTED_RESPONSE_TIMEOUT_MS)
 #define GET_STATUS6() CtreCanNode::recMsg<TALON_Status_6_Eol_t				> rx = GetRx<TALON_Status_6_Eol_t>(STATUS_6				  | GetDeviceNumber(), EXPECTED_RESPONSE_TIMEOUT_MS)
 #define GET_STATUS7() CtreCanNode::recMsg<TALON_Status_7_Debug_200ms_t		> rx = GetRx<TALON_Status_7_Debug_200ms_t>(STATUS_7		  | GetDeviceNumber(), EXPECTED_RESPONSE_TIMEOUT_MS)
+#define GET_STATUS8() CtreCanNode::recMsg<TALON_Status_8_PulseWid_100ms_t	> rx = GetRx<TALON_Status_8_PulseWid_100ms_t>(STATUS_8	  | GetDeviceNumber(), EXPECTED_RESPONSE_TIMEOUT_MS)
 
 #define PARAM_REQUEST 		0x02041800
 #define PARAM_RESPONSE 		0x02041840
@@ -102,8 +111,11 @@
 const int kParamArbIdValue = 	PARAM_RESPONSE;
 const int kParamArbIdMask = 	0xFFFFFFFF;
 
-const double FLOAT_TO_FXP = (double)0x400000;
-const double FXP_TO_FLOAT = 0.0000002384185791015625;
+const double FLOAT_TO_FXP_10_22 = (double)0x400000;
+const double FXP_TO_FLOAT_10_22 = 0.0000002384185791015625;
+
+const double FLOAT_TO_FXP_0_8 = (double)0x100;
+const double FXP_TO_FLOAT_0_8 = 0.00390625;
 
 /* encoder/decoders */
 /** control */
@@ -127,6 +139,7 @@ typedef struct _TALON_Control_2_Rates_OneShot_t {
 	unsigned Status2Ms:8;
 	unsigned Status3Ms:8;
 	unsigned Status4Ms:8;
+	unsigned StatusPulWidMs:8;	// TALON_Status_8_PulseWid_100ms_t
 } TALON_Control_2_Rates_OneShot_t ;
 typedef struct _TALON_Control_3_ClearFlags_OneShot_t {
 	unsigned ZeroFeedbackSensor:1;
@@ -170,7 +183,9 @@ typedef struct _TALON_Status_2_Feedback_20ms_t {
 	unsigned StckyFault_UnderVoltage:1;
 	unsigned StckyFault_OverTemp:1;
 	unsigned Current_l2:2;
-	unsigned reserved:6;
+	unsigned reserved2:4;
+	unsigned VelDiv4:1;
+	unsigned PosDiv8:1;
 	unsigned ProfileSlotSelect:1;
 	unsigned BrakeIsEnabled:1;
 } TALON_Status_2_Feedback_20ms_t ;
@@ -182,7 +197,9 @@ typedef struct _TALON_Status_3_Enc_100ms_t {
 	unsigned EncVelL:8;
 	unsigned EncIndexRiseEventsH:8;
 	unsigned EncIndexRiseEventsL:8;
-	unsigned reserved:5;
+	unsigned reserved:3;
+	unsigned VelDiv4:1;
+	unsigned PosDiv8:1;
 	unsigned QuadIdxpin:1;
 	unsigned QuadBpin:1;
 	unsigned QuadApin:1;
@@ -195,7 +212,9 @@ typedef struct _TALON_Status_4_AinTempVbat_100ms_t {
 	unsigned AnalogInVelL:8;
 	unsigned Temp:8;
 	unsigned BatteryV:8;
-	unsigned reserved:8;
+	unsigned reserved:6;
+	unsigned VelDiv4:1;
+	unsigned PosDiv8:1;
 } TALON_Status_4_AinTempVbat_100ms_t ;
 typedef struct _TALON_Status_5_Startup_OneShot_t {
 	unsigned ResetCountH:8;
@@ -228,6 +247,18 @@ typedef struct _TALON_Status_7_Debug_200ms_t {
 	unsigned TokenizationSucceses_h8:8;
 	unsigned TokenizationSucceses_l8:8;
 } TALON_Status_7_Debug_200ms_t ;
+typedef struct _TALON_Status_8_PulseWid_100ms_t {
+	unsigned PulseWidPositionH:8;
+	unsigned PulseWidPositionM:8;
+	unsigned PulseWidPositionL:8;
+	unsigned reserved:6;
+	unsigned VelDiv4:1;
+	unsigned PosDiv8:1;
+	unsigned PeriodUsM8:8;
+	unsigned PeriodUsL8:8;
+	unsigned PulseWidVelH:8;
+	unsigned PulseWidVelL:8;
+} TALON_Status_8_PulseWid_100ms_t ;
 typedef struct _TALON_Param_Request_t {
 	unsigned ParamEnum:8;
 } TALON_Param_Request_t ;
@@ -238,7 +269,6 @@ typedef struct _TALON_Param_Response_t {
 	unsigned ParamValueMH:8;
 	unsigned ParamValueH:8;
 } TALON_Param_Response_t ;
-
 
 CanTalonSRX::CanTalonSRX(int deviceNumber,int controlPeriodMs): CtreCanNode(deviceNumber), _can_h(0), _can_stat(0)
 {
@@ -255,11 +285,6 @@ CanTalonSRX::CanTalonSRX(int deviceNumber,int controlPeriodMs): CtreCanNode(devi
 	RegisterRx(STATUS_6 | (UINT8)deviceNumber );
 	RegisterRx(STATUS_7 | (UINT8)deviceNumber );
 	RegisterTx(CONTROL_1 | (UINT8)deviceNumber, (UINT8)controlPeriodMs);
-	/* default our frame rate table to what firmware defaults to. */
-	_statusRateMs[0] = 10;	/* 	TALON_Status_1_General_10ms_t 		*/
-	_statusRateMs[1] = 20;	/* 	TALON_Status_2_Feedback_20ms_t 		*/
-	_statusRateMs[2] = 100;	/* 	TALON_Status_3_Enc_100ms_t 			*/
-	_statusRateMs[3] = 100;	/* 	TALON_Status_4_AinTempVbat_100ms_t 	*/
 	/* the only default param that is nonzero is limit switch.
 	 * Default to using the flash settings. */
 	SetOverrideLimitSwitchEn(kLimitSwitchOverride_UseDefaultsFromFlash);
@@ -268,8 +293,14 @@ CanTalonSRX::CanTalonSRX(int deviceNumber,int controlPeriodMs): CtreCanNode(devi
  */
 CanTalonSRX::~CanTalonSRX()
 {
-  if (m_hasBeenMoved) return;
-  RegisterTx(CONTROL_1 | (UINT8)GetDeviceNumber(), 0);
+	if (m_hasBeenMoved){
+		/* Another CANTalonSRX still exists, so
+		 don't un-register the periodic control frame */
+	}else{
+		/* un-register the control frame so Talon is disabled */
+		RegisterTx(CONTROL_1 | (UINT8)GetDeviceNumber(), 0);
+	}
+	/* free the stream we used for SetParam/GetParamResponse */
 	if(_can_h){
 		FRC_NetworkCommunication_CANSessionMux_closeStreamSession(_can_h);
 		_can_h = 0;
@@ -408,14 +439,36 @@ CTR_Code CanTalonSRX::SetParam(param_t paramEnum, double value)
 			uint32_t urawbits;
 			value = std::min(value,1023.0); /* bounds check doubles that are outside u10.22 */
 			value = std::max(value,0.0);
-			urawbits = value * FLOAT_TO_FXP; /* perform unsign arithmetic */
+			urawbits = value * FLOAT_TO_FXP_10_22; /* perform unsign arithmetic */
 			rawbits = urawbits; /* copy bits over.  SetParamRaw just stuffs into CAN frame with no sense of signedness */
 		}	break;
 		case eProfileParamSlot1_F:	/* signed 10.22 fixed pt value */
 		case eProfileParamSlot0_F:
 			value = std::min(value, 512.0); /* bounds check doubles that are outside s10.22 */
 			value = std::max(value,-512.0);
-			rawbits = value * FLOAT_TO_FXP;
+			rawbits = value * FLOAT_TO_FXP_10_22;
+			break;
+		case eProfileParamVcompRate: /* unsigned 0.8 fixed pt value volts per ms */
+			/* within [0,1) volts per ms.
+				Slowest ramp is 1/256 VperMilliSec or 3.072 seconds from 0-to-12V.
+				Fastest ramp is 255/256 VperMilliSec or 12.1ms from 0-to-12V.
+				*/
+			if(value <= 0){
+				/* negative or zero (disable), send raw value of zero */
+				rawbits = 0;
+			}else{
+				/* nonzero ramping */
+				rawbits = value * FLOAT_TO_FXP_0_8;
+				/* since whole part is cleared, cap to just under whole unit */
+				if(rawbits > (FLOAT_TO_FXP_0_8-1) )
+					rawbits = (FLOAT_TO_FXP_0_8-1);
+				/* since ramping is nonzero, cap to smallest ramp rate possible */
+				if(rawbits == 0){
+					/* caller is providing a nonzero ramp rate that's too small
+						to serialize, so cap to smallest possible */
+					rawbits = 1;
+				}
+			}
 			break;
 		default: /* everything else is integral */
 			rawbits = (int32_t)value;
@@ -439,7 +492,10 @@ CTR_Code CanTalonSRX::GetParamResponse(param_t paramEnum, double & value)
 		case eCurrent:
 		case eTemp:
 		case eBatteryV:
-			value = ((double)rawbits) * FXP_TO_FLOAT;
+			value = ((double)rawbits) * FXP_TO_FLOAT_10_22;
+			break;
+		case eProfileParamVcompRate:
+			value = ((double)rawbits) * FXP_TO_FLOAT_0_8;
 			break;
 		default: /* everything else is integral */
 			value = (double)rawbits;
@@ -494,6 +550,10 @@ CTR_Code CanTalonSRX::SetCloseLoopRampRate(unsigned slotIdx,int closeLoopRampRat
 		return SetParam(eProfileParamSlot0_CloseLoopRampRate, closeLoopRampRate);
 	return SetParam(eProfileParamSlot1_CloseLoopRampRate, closeLoopRampRate);
 }
+CTR_Code CanTalonSRX::SetVoltageCompensationRate(double voltagePerMs)
+{
+	return SetParam(eProfileParamVcompRate, voltagePerMs);
+}
 CTR_Code CanTalonSRX::GetPgain(unsigned slotIdx,double & gain)
 {
 	if(slotIdx == 0)
@@ -530,7 +590,10 @@ CTR_Code CanTalonSRX::GetCloseLoopRampRate(unsigned slotIdx,int & closeLoopRampR
 		return GetParamResponseInt32(eProfileParamSlot0_CloseLoopRampRate, closeLoopRampRate);
 	return GetParamResponseInt32(eProfileParamSlot1_CloseLoopRampRate, closeLoopRampRate);
 }
-
+CTR_Code CanTalonSRX::GetVoltageCompensationRate(double & voltagePerMs)
+{
+	return GetParamResponse(eProfileParamVcompRate, voltagePerMs);
+}
 CTR_Code CanTalonSRX::SetSensorPosition(int pos)
 {
 	return SetParam(eSensorPosition, pos);
@@ -572,39 +635,42 @@ CTR_Code CanTalonSRX::GetReverseSoftEnable(int & enable)
  */
 CTR_Code CanTalonSRX::SetStatusFrameRate(unsigned frameEnum, unsigned periodMs)
 {
-	int32_t status = 0;
+	CTR_Code retval = CTR_OKAY;
+	int32_t paramEnum = 0;
 	/* bounds check the period */
 	if(periodMs < 1)
 		periodMs = 1;
 	else if (periodMs > 255)
 		periodMs = 255;
-  uint8_t period = (uint8_t)periodMs;
-	/* tweak just the status messsage rate the caller cares about */
+	uint8_t period = (uint8_t)periodMs;
+	/* lookup the correct param enum based on what frame to rate-change */
 	switch(frameEnum){
 		case kStatusFrame_General:
-			_statusRateMs[0] = period;
+			paramEnum = eStatus1FrameRate;
 			break;
 		case kStatusFrame_Feedback:
-			_statusRateMs[1] = period;
+			paramEnum = eStatus2FrameRate;
 			break;
 		case kStatusFrame_Encoder:
-			_statusRateMs[2] = period;
+			paramEnum = eStatus3FrameRate;
 			break;
 		case kStatusFrame_AnalogTempVbat:
-			_statusRateMs[3] = period;
+			paramEnum = eStatus4FrameRate;
+			break;
+		case kStatusFrame_PulseWidthMeas:
+			paramEnum = eStatus8FrameRate;
+			break;
+		default:
+			/* caller's request is not support, return an error code */
+			retval = CTR_InvalidParamValue;
 			break;
 	}
-	/* build our request frame */
-	TALON_Control_2_Rates_OneShot_t frame;
-	memset(&frame,0,sizeof(frame));
-	frame.Status1Ms = _statusRateMs[0];
-	frame.Status2Ms = _statusRateMs[1];
-	frame.Status3Ms = _statusRateMs[2];
-	frame.Status4Ms = _statusRateMs[3];
-	FRC_NetworkCommunication_CANSessionMux_sendMessage(CONTROL_2 | GetDeviceNumber(), (const uint8_t*)&frame, sizeof(frame), 0, &status);
-	if(status)
-		return CTR_TxFailed;
-	return CTR_OKAY;
+	/* if lookup was succesful, send set-request out */
+	if(retval == CTR_OKAY){
+		/* paramEnum is updated, sent it out */
+		retval = SetParamRaw(paramEnum, period);
+	}
+	return retval;
 }
 /**
  * Clear all sticky faults in TALON.
@@ -772,6 +838,8 @@ CTR_Code CanTalonSRX::GetSensorPosition(int &param)
 	raw |= rx->SensorPositionL;
 	raw <<= (32-24); /* sign extend */
 	raw >>= (32-24); /* sign extend */
+	if(rx->PosDiv8)
+		raw *= 8;
 	param = (int)raw;
 	return rx.err;
 }
@@ -784,6 +852,8 @@ CTR_Code CanTalonSRX::GetSensorVelocity(int &param)
 	raw |= rx->SensorVelocityL;
 	raw <<= (32-16); /* sign extend */
 	raw >>= (32-16); /* sign extend */
+	if(rx->VelDiv4)
+		raw *= 4;
 	param = (int)raw;
 	return rx.err;
 }
@@ -814,6 +884,8 @@ CTR_Code CanTalonSRX::GetEncPosition(int &param)
 	raw |= rx->EncPositionL;
 	raw <<= (32-24); /* sign extend */
 	raw >>= (32-24); /* sign extend */
+	if(rx->PosDiv8)
+		raw *= 8;
 	param = (int)raw;
 	return rx.err;
 }
@@ -826,6 +898,8 @@ CTR_Code CanTalonSRX::GetEncVel(int &param)
 	raw |= rx->EncVelL;
 	raw <<= (32-16); /* sign extend */
 	raw >>= (32-16); /* sign extend */
+	if(rx->VelDiv4)
+		raw *= 4;
 	param = (int)raw;
 	return rx.err;
 }
@@ -868,6 +942,8 @@ CTR_Code CanTalonSRX::GetAnalogInWithOv(int &param)
 	raw |= rx->AnalogInWithOvL;
 	raw <<= (32-24); /* sign extend */
 	raw >>= (32-24); /* sign extend */
+	if(rx->PosDiv8)
+		raw *= 8;
 	param = (int)raw;
 	return rx.err;
 }
@@ -880,6 +956,8 @@ CTR_Code CanTalonSRX::GetAnalogInVel(int &param)
 	raw |= rx->AnalogInVelL;
 	raw <<= (32-16); /* sign extend */
 	raw >>= (32-16); /* sign extend */
+	if(rx->VelDiv4)
+		raw *= 4;
 	param = (int)raw;
 	return rx.err;
 }
@@ -1017,6 +1095,82 @@ CTR_Code CanTalonSRX::SetRevFeedbackSensor(int param)
 	toFill->RevFeedbackSensor = param ? 1 : 0;
 	FlushTx(toFill);
 	return CTR_OKAY;
+}
+CTR_Code CanTalonSRX::GetPulseWidthPosition(int &param)
+{
+	GET_STATUS8();
+	int32_t raw = 0;
+	raw |= rx->PulseWidPositionH;
+	raw <<= 8;
+	raw |= rx->PulseWidPositionM;
+	raw <<= 8;
+	raw |= rx->PulseWidPositionL;
+	raw <<= (32-24); /* sign extend */
+	raw >>= (32-24); /* sign extend */
+	if(rx->PosDiv8)
+		raw *= 8;
+	param = (int)raw;
+	return rx.err;
+}
+CTR_Code CanTalonSRX::GetPulseWidthVelocity(int &param)
+{
+	GET_STATUS8();
+	int32_t raw = 0;
+	raw |= rx->PulseWidVelH;
+	raw <<= 8;
+	raw |= rx->PulseWidVelL;
+	raw <<= (32-16); /* sign extend */
+	raw >>= (32-16); /* sign extend */
+	if(rx->VelDiv4)
+		raw *= 4;
+	param = (int)raw;
+	return rx.err;
+}
+/**
+ * @param param [out]	Rise to rise timeperiod in microseconds.
+ */
+CTR_Code CanTalonSRX::GetPulseWidthRiseToRiseUs(int &param)
+{
+	GET_STATUS8();
+	uint32_t raw = 0;
+	raw |= rx->PeriodUsM8;
+	raw <<= 8;
+	raw |= rx->PeriodUsL8;
+	param = (int)raw;
+	return rx.err;
+}
+/**
+ * @param param [out]	Rise to fall time period in microseconds.
+ */
+CTR_Code CanTalonSRX::GetPulseWidthRiseToFallUs(int &param)
+{
+	int temp = 0;
+	int periodUs = 0;
+	/* first grab our 12.12 position */
+	CTR_Code retval1 = GetPulseWidthPosition(temp);
+	/* mask off number of turns */
+	temp &= 0xFFF;
+	/* next grab the waveform period. This value
+	 * will be zero if we stop getting pulses **/
+	CTR_Code retval2 = GetPulseWidthRiseToRiseUs(periodUs);
+	/* now we have 0.12 position that is scaled to the waveform period.
+		Use fixed pt multiply to scale our 0.16 period into us.*/
+	param = (temp * periodUs) / BIT12;
+	/* pass the worst error code to caller.
+		Assume largest value is the most pressing error code.*/
+	return (CTR_Code)std::max((int)retval1, (int)retval2);
+}
+CTR_Code CanTalonSRX::IsPulseWidthSensorPresent(int &param)
+{
+	int periodUs = 0;
+	CTR_Code retval = GetPulseWidthRiseToRiseUs(periodUs);
+	/* if a nonzero period is present, we are getting good pules.
+		Otherwise the sensor is not present. */
+	if(periodUs != 0)
+		param = 1;
+	else
+		param = 0;
+	return retval;
 }
 //------------------ C interface --------------------------------------------//
 extern "C" {
