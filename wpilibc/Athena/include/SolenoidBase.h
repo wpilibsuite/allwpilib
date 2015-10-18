@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "Resource.h"
-#include "SensorBase.h"
 #include "HAL/HAL.hpp"
 #include "HAL/Port.h"
+#include "Resource.h"
+#include "SensorBase.h"
 
 #include <memory>
 
@@ -35,6 +35,6 @@ class SolenoidBase : public SensorBase {
   const static int m_maxPorts = 8;
   static void* m_ports[m_maxModules][m_maxPorts];
   uint32_t m_moduleNumber;  ///< Slot number where the module is plugged into
-                            ///the chassis.
+                            /// the chassis.
   static std::unique_ptr<Resource> m_allocated;
 };

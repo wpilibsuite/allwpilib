@@ -11,11 +11,9 @@
 
 /**
  * Note that the SD540 uses the following bounds for PWM values. These values
- * should work reasonably well for
- * most controllers, but if users experience issues such as asymmetric behavior
- * around
- * the deadband or inability to saturate the controller in either direction,
- * calibration is recommended.
+ * should work reasonably well for most controllers, but if users experience
+ * issues such as asymmetric behavior around the deadband or inability to
+ * saturate the controller in either direction, calibration is recommended.
  * The calibration procedure can be found in the SD540 User Manual available
  * from Mindsensors.
  *
@@ -27,9 +25,10 @@
  */
 
 /**
- * Constructor for a SD540
+ * Constructor for a SD540.
+ *
  * @param channel The PWM channel that the SD540 is attached to. 0-9 are
- * on-board, 10-19 are on the MXP port
+ *                on-board, 10-19 are on the MXP port
  */
 SD540::SD540(uint32_t channel) : PWMSpeedController(channel) {
   SetBounds(2.05, 1.55, 1.50, 1.44, .94);
@@ -40,4 +39,3 @@ SD540::SD540(uint32_t channel) : PWMSpeedController(channel) {
   HALReport(HALUsageReporting::kResourceType_MindsensorsSD540, GetChannel());
   LiveWindow::GetInstance()->AddActuator("SD540", GetChannel(), this);
 }
-

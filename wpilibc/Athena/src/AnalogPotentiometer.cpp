@@ -10,12 +10,13 @@
 
 /**
  * Construct an Analog Potentiometer object from a channel number.
- * @param channel The channel number on the roboRIO to represent. 0-3 are
- * on-board 4-7 are on the MXP port.
+ *
+ * @param channel   The channel number on the roboRIO to represent. 0-3 are
+ *                  on-board 4-7 are on the MXP port.
  * @param fullRange The angular value (in desired units) representing the full
- * 0-5V range of the input.
- * @param offset The angular value (in desired units) representing the angular
- * output at 0V.
+ *                  0-5V range of the input.
+ * @param offset    The angular value (in desired units) representing the
+ *                  angular output at 0V.
  */
 AnalogPotentiometer::AnalogPotentiometer(int channel, double fullRange,
                                          double offset)
@@ -26,13 +27,14 @@ AnalogPotentiometer::AnalogPotentiometer(int channel, double fullRange,
 /**
  * Construct an Analog Potentiometer object from an existing Analog Input
  * pointer.
- * @param channel The existing Analog Input pointer
+ *
+ * @param channel   The existing Analog Input pointer
  * @param fullRange The angular value (in desired units) representing the full
- * 0-5V range of the input.
- * @param offset The angular value (in desired units) representing the angular
- * output at 0V.
+ *                  0-5V range of the input.
+ * @param offset    The angular value (in desired units) representing the
+ *                  angular output at 0V.
  */
-AnalogPotentiometer::AnalogPotentiometer(AnalogInput *input, double fullRange,
+AnalogPotentiometer::AnalogPotentiometer(AnalogInput* input, double fullRange,
                                          double offset)
     : m_analog_input(input, NullDeleter<AnalogInput>()),
       m_fullRange(fullRange),
@@ -41,11 +43,12 @@ AnalogPotentiometer::AnalogPotentiometer(AnalogInput *input, double fullRange,
 /**
  * Construct an Analog Potentiometer object from an existing Analog Input
  * pointer.
- * @param channel The existing Analog Input pointer
+ *
+ * @param channel   The existing Analog Input pointer
  * @param fullRange The angular value (in desired units) representing the full
- * 0-5V range of the input.
- * @param offset The angular value (in desired units) representing the angular
- * output at 0V.
+ *                  0-5V range of the input.
+ * @param offset    The angular value (in desired units) representing the
+ *                  angular output at 0V.
  */
 AnalogPotentiometer::AnalogPotentiometer(std::shared_ptr<AnalogInput> input,
                                          double fullRange, double offset)
@@ -55,7 +58,7 @@ AnalogPotentiometer::AnalogPotentiometer(std::shared_ptr<AnalogInput> input,
  * Get the current reading of the potentiometer.
  *
  * @return The current position of the potentiometer (in the units used for
- * fullRaneg and offset).
+ *         fullRange and offset).
  */
 double AnalogPotentiometer::Get() const {
   return (m_analog_input->GetVoltage() / ControllerPower::GetVoltage5V()) *
@@ -91,4 +94,6 @@ void AnalogPotentiometer::UpdateTable() {
   }
 }
 
-std::shared_ptr<ITable> AnalogPotentiometer::GetTable() const { return m_table; }
+std::shared_ptr<ITable> AnalogPotentiometer::GetTable() const {
+  return m_table;
+}

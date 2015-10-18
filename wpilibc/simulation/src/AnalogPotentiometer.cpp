@@ -10,29 +10,33 @@
 /**
  * Common initialization code called by all constructors.
  */
-void AnalogPotentiometer::initPot(AnalogInput *input, double scale, double offset) {
-    m_scale = scale;
-    m_offset = offset;
-    m_analog_input = input;
+void AnalogPotentiometer::initPot(AnalogInput* input, double scale,
+                                  double offset) {
+  m_scale = scale;
+  m_offset = offset;
+  m_analog_input = input;
 }
 
-AnalogPotentiometer::AnalogPotentiometer(int channel, double scale, double offset) {
-    m_init_analog_input = true;
-    initPot(new AnalogInput(channel), scale, offset);
+AnalogPotentiometer::AnalogPotentiometer(int channel, double scale,
+                                         double offset) {
+  m_init_analog_input = true;
+  initPot(new AnalogInput(channel), scale, offset);
 }
 
-AnalogPotentiometer::AnalogPotentiometer(AnalogInput *input, double scale, double offset) {
-    m_init_analog_input = false;
-    initPot(input, scale, offset);
+AnalogPotentiometer::AnalogPotentiometer(AnalogInput* input, double scale,
+                                         double offset) {
+  m_init_analog_input = false;
+  initPot(input, scale, offset);
 }
 
-AnalogPotentiometer::AnalogPotentiometer(AnalogInput &input, double scale, double offset) {
-    m_init_analog_input = false;
-    initPot(&input, scale, offset);
+AnalogPotentiometer::AnalogPotentiometer(AnalogInput& input, double scale,
+                                         double offset) {
+  m_init_analog_input = false;
+  initPot(&input, scale, offset);
 }
 
 AnalogPotentiometer::~AnalogPotentiometer() {
-  if(m_init_analog_input){
+  if (m_init_analog_input) {
     delete m_analog_input;
     m_init_analog_input = false;
   }
@@ -44,7 +48,7 @@ AnalogPotentiometer::~AnalogPotentiometer() {
  * @return The current position of the potentiometer.
  */
 double AnalogPotentiometer::Get() const {
-    return m_analog_input->GetVoltage() * m_scale + m_offset;
+  return m_analog_input->GetVoltage() * m_scale + m_offset;
 }
 
 /**
@@ -52,32 +56,29 @@ double AnalogPotentiometer::Get() const {
  *
  * @return The current reading.
  */
-double AnalogPotentiometer::PIDGet() {
-    return Get();
-}
-
+double AnalogPotentiometer::PIDGet() { return Get(); }
 
 /**
  * @return the Smart Dashboard Type
  */
 std::string AnalogPotentiometer::GetSmartDashboardType() const {
-    return "Analog Input";
+  return "Analog Input";
 }
 
 /**
  * Live Window code, only does anything if live window is activated.
  */
 void AnalogPotentiometer::InitTable(std::shared_ptr<ITable> subtable) {
-    m_table = subtable;
-    UpdateTable();
+  m_table = subtable;
+  UpdateTable();
 }
 
 void AnalogPotentiometer::UpdateTable() {
-    if (m_table != nullptr) {
-        m_table->PutNumber("Value", Get());
-    }
+  if (m_table != nullptr) {
+    m_table->PutNumber("Value", Get());
+  }
 }
 
 std::shared_ptr<ITable> AnalogPotentiometer::GetTable() const {
-    return m_table;
+  return m_table;
 }

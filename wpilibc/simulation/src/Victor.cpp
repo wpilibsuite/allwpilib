@@ -13,8 +13,7 @@
 /**
  * @param channel The PWM channel that the Victor is attached to.
  */
-Victor::Victor(uint32_t channel) : SafePWM(channel)
-{
+Victor::Victor(uint32_t channel) : SafePWM(channel) {
   /* Note that the Victor uses the following bounds for PWM values. These values
    * were determined empirically and optimized for the Victor 888. These values
    * should work reasonably well for Victor 884 controllers as well but if users
@@ -43,38 +42,26 @@ Victor::Victor(uint32_t channel) : SafePWM(channel)
  * The PWM value is set using a range of -1.0 to 1.0, appropriately
  * scaling the value for the FPGA.
  *
- * @param speed The speed value between -1.0 and 1.0 to set.
+ * @param speed     The speed value between -1.0 and 1.0 to set.
  * @param syncGroup Unused interface.
  */
-void Victor::Set(float speed, uint8_t syncGroup)
-{
-	SetSpeed(speed);
-}
+void Victor::Set(float speed, uint8_t syncGroup) { SetSpeed(speed); }
 
 /**
  * Get the recently set value of the PWM.
  *
  * @return The most recently set value for the PWM between -1.0 and 1.0.
  */
-float Victor::Get() const
-{
-	return GetSpeed();
-}
+float Victor::Get() const { return GetSpeed(); }
 
 /**
  * Common interface for disabling a motor.
  */
-void Victor::Disable()
-{
-	SetRaw(kPwmDisabled);
-}
+void Victor::Disable() { SetRaw(kPwmDisabled); }
 
 /**
  * Write out the PID value as seen in the PIDOutput base object.
  *
  * @param output Write out the PWM value as was found in the PIDController
  */
-void Victor::PIDWrite(float output)
-{
-	Set(output);
-}
+void Victor::PIDWrite(float output) { Set(output); }

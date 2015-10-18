@@ -47,8 +47,8 @@ using namespace gazebo;
  *
  * \todo Signal should probably be made a tri-state message.
  */
-class PneumaticPiston: public ModelPlugin {
-public:
+class PneumaticPiston : public ModelPlugin {
+ public:
   PneumaticPiston();
   ~PneumaticPiston();
 
@@ -56,9 +56,9 @@ public:
   void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
 
   /// \brief Updat the force the piston applies on the joint.
-  void Update(const common::UpdateInfo &info);
+  void Update(const common::UpdateInfo& info);
 
-private:
+ private:
   /// \brief Topic to read control signal from.
   std::string topic;
 
@@ -72,11 +72,11 @@ private:
   physics::JointPtr joint;
 
   /// \brief Callback for receiving msgs and updating the torque.
-  void Callback(const msgs::ConstFloat64Ptr &msg);
+  void Callback(const msgs::ConstFloat64Ptr& msg);
 
-
-  physics::ModelPtr model;         ///< \brief The model that this is attached to.
-  event::ConnectionPtr updateConn; ///< \brief Pointer to the world update function.
-  transport::NodePtr node;         ///< \brief The node we're advertising on.
-  transport::SubscriberPtr sub;    ///< \brief Subscriber handle.
+  physics::ModelPtr model;  ///< \brief The model that this is attached to.
+  event::ConnectionPtr
+      updateConn;           ///< \brief Pointer to the world update function.
+  transport::NodePtr node;  ///< \brief The node we're advertising on.
+  transport::SubscriberPtr sub;  ///< \brief Subscriber handle.
 };

@@ -10,8 +10,8 @@
 #include <Talon.h>
 #include <Timer.h>
 #include <Victor.h>
-#include "gtest/gtest.h"
 #include "TestBench.h"
+#include "gtest/gtest.h"
 
 static const double kMotorDelay = 2.5;
 
@@ -19,12 +19,12 @@ static const double kMaxPeriod = 2.0;
 
 class CounterTest : public testing::Test {
  protected:
-  Counter *m_talonCounter;
-  Counter *m_victorCounter;
-  Counter *m_jaguarCounter;
-  Talon *m_talon;
-  Victor *m_victor;
-  Jaguar *m_jaguar;
+  Counter* m_talonCounter;
+  Counter* m_victorCounter;
+  Counter* m_jaguarCounter;
+  Talon* m_talon;
+  Victor* m_victor;
+  Jaguar* m_jaguar;
 
   virtual void SetUp() override {
     m_talonCounter = new Counter(TestBench::kTalonEncoderChannelA);

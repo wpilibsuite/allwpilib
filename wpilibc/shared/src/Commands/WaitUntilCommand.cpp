@@ -10,6 +10,7 @@
 
 /**
  * A {@link WaitCommand} will wait until a certain match time before finishing.
+ *
  * This will wait until the game clock reaches some value, then continue to the
  * next command.
  * @see CommandGroup
@@ -19,7 +20,7 @@ WaitUntilCommand::WaitUntilCommand(double time)
   m_time = time;
 }
 
-WaitUntilCommand::WaitUntilCommand(const std::string &name, double time)
+WaitUntilCommand::WaitUntilCommand(const std::string& name, double time)
     : Command(name, time) {
   m_time = time;
 }

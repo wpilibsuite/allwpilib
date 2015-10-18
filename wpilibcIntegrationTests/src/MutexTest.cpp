@@ -8,10 +8,10 @@
 #include "HAL/cpp/priority_mutex.h"
 #include "TestBench.h"
 
-#include "gtest/gtest.h"
 #include <atomic>
 #include <condition_variable>
 #include <thread>
+#include "gtest/gtest.h"
 
 namespace wpilib {
 namespace testing {
@@ -67,7 +67,7 @@ void SetThreadRealtimePriorityOrDie(int priority) {
 template <typename MutexType>
 class LowPriorityThread {
  public:
-  LowPriorityThread(MutexType *mutex)
+  LowPriorityThread(MutexType* mutex)
       : m_mutex(mutex), m_hold_mutex(1), m_success(0) {}
 
   void operator()() {
@@ -75,7 +75,8 @@ class LowPriorityThread {
     SetThreadRealtimePriorityOrDie(20);
     m_mutex->lock();
     m_started.Notify();
-    while (m_hold_mutex.test_and_set()) {}
+    while (m_hold_mutex.test_and_set()) {
+    }
     m_mutex->unlock();
     m_success.store(1);
   }
@@ -86,7 +87,7 @@ class LowPriorityThread {
 
  private:
   // priority_mutex to grab and release.
-  MutexType *m_mutex;
+  MutexType* m_mutex;
   Notification m_started;
   // Atomic type used to signal when the thread should unlock the mutex.
   // Using a mutex to protect something could cause other issues, and a delay
@@ -134,7 +135,7 @@ class BusyWaitingThread {
 template <typename MutexType>
 class HighPriorityThread {
  public:
-  HighPriorityThread(MutexType *mutex) : m_mutex(mutex), m_success(0) {}
+  HighPriorityThread(MutexType* mutex) : m_mutex(mutex), m_success(0) {}
 
   void operator()() {
     SetProcessorAffinity(0);
@@ -149,7 +150,7 @@ class HighPriorityThread {
 
  private:
   Notification m_started;
-  MutexType *m_mutex;
+  MutexType* m_mutex;
   std::atomic<int> m_success;
 };
 
@@ -220,7 +221,7 @@ class InversionTestRunner {
   bool m_success = false;
 };
 
-//TODO: Fix roborio permissions to run as root.
+// TODO: Fix roborio permissions to run as root.
 
 // Priority inversion test.
 TEST(MutexTest, DISABLED_PriorityInversionTest) {

@@ -17,7 +17,7 @@ constexpr float Servo::kDefaultMinServoPWM;
 
 /**
  * @param channel The PWM channel to which the servo is attached. 0-9 are
- * on-board, 10-19 are on the MXP port
+ *                on-board, 10-19 are on the MXP port
  */
 Servo::Servo(uint32_t channel) : SafePWM(channel) {
   // Set minimum and maximum PWM values supported by the servo
@@ -26,7 +26,7 @@ Servo::Servo(uint32_t channel) : SafePWM(channel) {
   // Assign defaults for period multiplier for the servo PWM control signal
   SetPeriodMultiplier(kPeriodMultiplier_4X);
 
-  //	printf("Done initializing servo %d\n", channel);
+  //  printf("Done initializing servo %d\n", channel);
 }
 
 Servo::~Servo() {
@@ -69,11 +69,10 @@ float Servo::Get() const { return GetPosition(); }
  * assumption, need to test).
  *
  * Servo angles that are out of the supported range of the servo simply
- * "saturate" in that direction
- * In other words, if the servo has a range of (X degrees to Y degrees) than
- * angles of less than X
- * result in an angle of X being set and angles of more than Y degrees result in
- * an angle of Y being set.
+ * "saturate" in that direction. In other words, if the servo has a range of
+ * (X degrees to Y degrees) than angles of less than X result in an angle of
+ * X being set and angles of more than Y degrees result in an angle of Y being
+ * set.
  *
  * @param degrees The angle in degrees to set the servo.
  */
@@ -92,6 +91,7 @@ void Servo::SetAngle(float degrees) {
  *
  * Assume that the servo angle is linear with respect to the PWM value (big
  * assumption, need to test).
+ *
  * @return The angle in degrees to which the servo is set.
  */
 float Servo::GetAngle() const {

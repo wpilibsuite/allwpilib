@@ -20,18 +20,17 @@ priority_recursive_mutex MotorSafetyHelper::m_listMutex;
 
 /**
  * The constructor for a MotorSafetyHelper object.
+ *
  * The helper object is constructed for every object that wants to implement the
- * Motor
- * Safety protocol. The helper object has the code to actually do the timing and
- * call the
- * motors Stop() method when the timeout expires. The motor object is expected
- * to call the
- * Feed() method whenever the motors value is updated.
+ * Motor Safety protocol. The helper object has the code to actually do the
+ * timing and call the motors Stop() method when the timeout expires. The motor
+ * object is expected to call the Feed() method whenever the motors value is
+ * updated.
+ *
  * @param safeObject a pointer to the motor object implementing MotorSafety.
- * This is used
- * to call the Stop() method on the motor.
+ *                   This is used to call the Stop() method on the motor.
  */
-MotorSafetyHelper::MotorSafetyHelper(MotorSafety *safeObject)
+MotorSafetyHelper::MotorSafetyHelper(MotorSafety* safeObject)
     : m_safeObject(safeObject) {
   m_enabled = false;
   m_expiration = DEFAULT_SAFETY_EXPIRATION;
@@ -86,20 +85,18 @@ bool MotorSafetyHelper::IsAlive() const {
 /**
  * Check if this motor has exceeded its timeout.
  * This method is called periodically to determine if this motor has exceeded
- * its timeout
- * value. If it has, the stop method is called, and the motor is shut down until
- * its value is
- * updated again.
+ * its timeout value. If it has, the stop method is called, and the motor is
+ * shut down until its value is updated again.
  */
 void MotorSafetyHelper::Check() {
-  DriverStation &ds = DriverStation::GetInstance();
+  DriverStation& ds = DriverStation::GetInstance();
   if (!m_enabled || ds.IsDisabled() || ds.IsTest()) return;
 
   std::lock_guard<priority_recursive_mutex> sync(m_syncMutex);
   if (m_stopTime < Timer::GetFPGATimestamp()) {
     std::ostringstream desc;
     m_safeObject->GetDescription(desc);
-    desc <<  "... Output not updated often enough.";
+    desc << "... Output not updated often enough.";
     wpi_setWPIErrorWithContext(Timeout, desc.str().c_str());
     m_safeObject->StopMotor();
   }
@@ -128,8 +125,7 @@ bool MotorSafetyHelper::IsSafetyEnabled() const {
 /**
  * Check the motors to see if any have timed out.
  * This static  method is called periodically to poll all the motors and stop
- * any that have
- * timed out.
+ * any that have timed out.
  */
 void MotorSafetyHelper::CheckMotors() {
   std::lock_guard<priority_recursive_mutex> sync(m_listMutex);

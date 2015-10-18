@@ -6,9 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "PowerDistributionPanel.h"
-#include "WPIErrors.h"
 #include "HAL/PDP.hpp"
 #include "LiveWindow/LiveWindow.h"
+#include "WPIErrors.h"
 
 #include <sstream>
 
@@ -23,7 +23,8 @@ PowerDistributionPanel::PowerDistributionPanel(uint8_t module)
 }
 
 /**
- * Query the input voltage of the PDP
+ * Query the input voltage of the PDP.
+ *
  * @return The voltage of the PDP in volts
  */
 double PowerDistributionPanel::GetVoltage() const {
@@ -39,7 +40,8 @@ double PowerDistributionPanel::GetVoltage() const {
 }
 
 /**
- * Query the temperature of the PDP
+ * Query the temperature of the PDP.
+ *
  * @return The temperature of the PDP in degrees Celsius
  */
 double PowerDistributionPanel::GetTemperature() const {
@@ -55,7 +57,8 @@ double PowerDistributionPanel::GetTemperature() const {
 }
 
 /**
- * Query the current of a single channel of the PDP
+ * Query the current of a single channel of the PDP.
+ *
  * @return The current of one of the PDP channels (channels 0-15) in Amperes
  */
 double PowerDistributionPanel::GetCurrent(uint8_t channel) const {
@@ -77,7 +80,8 @@ double PowerDistributionPanel::GetCurrent(uint8_t channel) const {
 }
 
 /**
- * Query the total current of all monitored PDP channels (0-15)
+ * Query the total current of all monitored PDP channels (0-15).
+ *
  * @return The the total current drawn from the PDP channels in Amperes
  */
 double PowerDistributionPanel::GetTotalCurrent() const {
@@ -93,7 +97,8 @@ double PowerDistributionPanel::GetTotalCurrent() const {
 }
 
 /**
- * Query the total power drawn from the monitored PDP channels
+ * Query the total power drawn from the monitored PDP channels.
+ *
  * @return The the total power drawn from the PDP channels in Watts
  */
 double PowerDistributionPanel::GetTotalPower() const {
@@ -109,7 +114,8 @@ double PowerDistributionPanel::GetTotalPower() const {
 }
 
 /**
- * Query the total energy drawn from the monitored PDP channels
+ * Query the total energy drawn from the monitored PDP channels.
+ *
  * @return The the total energy drawn from the PDP channels in Joules
  */
 double PowerDistributionPanel::GetTotalEnergy() const {
@@ -125,7 +131,8 @@ double PowerDistributionPanel::GetTotalEnergy() const {
 }
 
 /**
- * Reset the total energy drawn from the PDP
+ * Reset the total energy drawn from the PDP.
+ *
  * @see PowerDistributionPanel#GetTotalEnergy
  */
 void PowerDistributionPanel::ResetTotalEnergy() {
@@ -139,7 +146,7 @@ void PowerDistributionPanel::ResetTotalEnergy() {
 }
 
 /**
- * Remove all of the fault flags on the PDP
+ * Remove all of the fault flags on the PDP.
  */
 void PowerDistributionPanel::ClearStickyFaults() {
   int32_t status = 0;
@@ -187,4 +194,6 @@ void PowerDistributionPanel::InitTable(std::shared_ptr<ITable> subTable) {
   UpdateTable();
 }
 
-std::shared_ptr<ITable> PowerDistributionPanel::GetTable() const { return m_table; }
+std::shared_ptr<ITable> PowerDistributionPanel::GetTable() const {
+  return m_table;
+}

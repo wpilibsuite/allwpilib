@@ -16,8 +16,8 @@
 /**
  * Class to write to digital outputs.
  * Write values to the digital output channels. Other devices implemented
- * elsewhere will allocate
- * channels automatically so for those devices it shouldn't be done here.
+ * elsewhere will allocate channels automatically so for those devices it
+ * shouldn't be done here.
  */
 class DigitalOutput : public DigitalSource,
                       public ITableListener,
@@ -50,7 +50,7 @@ class DigitalOutput : public DigitalSource,
 
  private:
   uint32_t m_channel;
-  void *m_pwmGenerator;
+  void* m_pwmGenerator;
 
   std::shared_ptr<ITable> m_table;
 };

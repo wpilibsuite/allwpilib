@@ -9,7 +9,8 @@
 
 #include <stdint.h>
 
-/** GenericHID Interface
+/**
+ * GenericHID Interface.
  */
 class GenericHID {
  public:

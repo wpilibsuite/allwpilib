@@ -10,19 +10,19 @@
 #include <DigitalOutput.h>
 #include <Encoder.h>
 #include <Timer.h>
-#include "gtest/gtest.h"
 #include "TestBench.h"
+#include "gtest/gtest.h"
 
 static const double kDelayTime = 0.001;
 
 class FakeEncoderTest : public testing::Test {
  protected:
-  DigitalOutput *m_outputA;
-  DigitalOutput *m_outputB;
-  AnalogOutput *m_indexOutput;
+  DigitalOutput* m_outputA;
+  DigitalOutput* m_outputB;
+  AnalogOutput* m_indexOutput;
 
-  Encoder *m_encoder;
-  AnalogTrigger *m_indexAnalogTrigger;
+  Encoder* m_encoder;
+  AnalogTrigger* m_indexAnalogTrigger;
   std::shared_ptr<AnalogTriggerOutput> m_indexAnalogTriggerOutput;
 
   virtual void SetUp() override {

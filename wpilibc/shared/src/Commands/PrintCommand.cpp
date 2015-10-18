@@ -6,12 +6,12 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Commands/PrintCommand.h"
-#include "stdio.h"
 #include <sstream>
+#include "stdio.h"
 
-PrintCommand::PrintCommand(const std::string &message)
-    : Command(((std::stringstream &)(std::stringstream("Print \"") << message
-                                                                   << "\""))
+PrintCommand::PrintCommand(const std::string& message)
+    : Command(((std::stringstream&)(std::stringstream("Print \"") << message
+                                                                  << "\""))
                   .str()
                   .c_str()) {
   m_message = message;

@@ -10,8 +10,8 @@
 #include "Buttons/Button.h"
 #include "Commands/Command.h"
 
-HeldButtonScheduler::HeldButtonScheduler(bool last, Trigger *button,
-                                         Command *orders)
+HeldButtonScheduler::HeldButtonScheduler(bool last, Trigger* button,
+                                         Command* orders)
     : ButtonScheduler(last, button, orders) {}
 
 void HeldButtonScheduler::Execute() {

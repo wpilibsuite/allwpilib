@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include "interfaces/Accelerometer.h"
-#include "SensorBase.h"
 #include "LiveWindow/LiveWindowSendable.h"
+#include "SensorBase.h"
+#include "interfaces/Accelerometer.h"
 
 #include <memory>
 

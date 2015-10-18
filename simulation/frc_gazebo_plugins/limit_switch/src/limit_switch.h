@@ -11,12 +11,12 @@
 
 #include "switch.h"
 
-#include "internal_limit_switch.h"
 #include "external_limit_switch.h"
+#include "internal_limit_switch.h"
 
+#include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/transport.hh>
-#include <gazebo/gazebo.hh>
 
 using namespace gazebo;
 
@@ -66,8 +66,8 @@ using namespace gazebo;
  * External
  * - `sensor`: Name of the contact sensor that this limit switch uses.
  */
-class LimitSwitch: public ModelPlugin {
-public:
+class LimitSwitch : public ModelPlugin {
+ public:
   LimitSwitch();
   ~LimitSwitch();
 
@@ -75,18 +75,18 @@ public:
   void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
 
   /// \brief Sends out the limit switch reading each timestep.
-  void Update(const common::UpdateInfo &info);
+  void Update(const common::UpdateInfo& info);
 
-private:
+ private:
   /// \brief Publish the limit switch value on this topic.
   std::string topic;
 
   /// \brief LimitSwitch object, currently internal or external.
   Switch* ls;
 
-
-  physics::ModelPtr model;         ///< \brief The model that this is attached to.
-  event::ConnectionPtr updateConn; ///< \brief Pointer to the world update function.
-  transport::NodePtr node;         ///< \brief The node we're advertising on.
-  transport::PublisherPtr pub;     ///< \brief Publisher handle.
+  physics::ModelPtr model;  ///< \brief The model that this is attached to.
+  event::ConnectionPtr
+      updateConn;           ///< \brief Pointer to the world update function.
+  transport::NodePtr node;  ///< \brief The node we're advertising on.
+  transport::PublisherPtr pub;  ///< \brief Publisher handle.
 };

@@ -6,17 +6,17 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Resource.h"
-#include "WPIErrors.h"
 #include "ErrorBase.h"
+#include "WPIErrors.h"
 
 priority_recursive_mutex Resource::m_createLock;
 
 /**
  * Allocate storage for a new instance of Resource.
+ *
  * Allocate a bool array of values that will get initialized to indicate that no
- * resources
- * have been allocated yet. The indicies of the resources are [0 .. elements -
- * 1].
+ * resources have been allocated yet. The indicies of the resources are [0 ..
+ * elements - 1].
  */
 Resource::Resource(uint32_t elements) {
   std::lock_guard<priority_recursive_mutex> sync(m_createLock);
@@ -26,12 +26,13 @@ Resource::Resource(uint32_t elements) {
 /**
  * Factory method to create a Resource allocation-tracker *if* needed.
  *
- * @param r -- address of the caller's Resource pointer. If *r == nullptr, this
- *    will construct a Resource and make *r point to it. If *r != nullptr, i.e.
- *    the caller already has a Resource instance, this won't do anything.
- * @param elements -- the number of elements for this Resource allocator to
- *    track, that is, it will allocate resource numbers in the range
- *    [0 .. elements - 1].
+ * @param r        address of the caller's Resource pointer. If *r == nullptr,
+ *                 this will construct a Resource and make *r point to it. If
+ *                 *r != nullptr, i.e. the caller already has a Resource
+ *                 instance, this won't do anything.
+ * @param elements the number of elements for this Resource allocator to
+ *                 track, that is, it will allocate resource numbers in the
+ *                 range [0 .. elements - 1].
  */
 /*static*/ void Resource::CreateResourceObject(std::unique_ptr<Resource>& r,
                                                uint32_t elements) {
@@ -43,11 +44,12 @@ Resource::Resource(uint32_t elements) {
 
 /**
  * Allocate a resource.
+ *
  * When a resource is requested, mark it allocated. In this case, a free
- * resource value
- * within the range is located and returned after it is marked allocated.
+ * resource value within the range is located and returned after it is marked
+ * allocated.
  */
-uint32_t Resource::Allocate(const std::string &resourceDesc) {
+uint32_t Resource::Allocate(const std::string& resourceDesc) {
   std::lock_guard<priority_recursive_mutex> sync(m_allocateLock);
   for (uint32_t i = 0; i < m_isAllocated.size(); i++) {
     if (!m_isAllocated[i]) {
@@ -61,11 +63,11 @@ uint32_t Resource::Allocate(const std::string &resourceDesc) {
 
 /**
  * Allocate a specific resource value.
+ *
  * The user requests a specific resource value, i.e. channel number and it is
- * verified
- * unallocated, then returned.
+ * verified unallocated, then returned.
  */
-uint32_t Resource::Allocate(uint32_t index, const std::string &resourceDesc) {
+uint32_t Resource::Allocate(uint32_t index, const std::string& resourceDesc) {
   std::lock_guard<priority_recursive_mutex> sync(m_allocateLock);
   if (index >= m_isAllocated.size()) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, resourceDesc);
@@ -81,10 +83,10 @@ uint32_t Resource::Allocate(uint32_t index, const std::string &resourceDesc) {
 
 /**
  * Free an allocated resource.
+ *
  * After a resource is no longer needed, for example a destructor is called for
- * a channel assignment
- * class, Free will release the resource value so it can be reused somewhere
- * else in the program.
+ * a channel assignment class, Free will release the resource value so it can
+ * be reused somewhere else in the program.
  */
 void Resource::Free(uint32_t index) {
   std::unique_lock<priority_recursive_mutex> sync(m_allocateLock);

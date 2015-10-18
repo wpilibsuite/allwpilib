@@ -9,13 +9,13 @@
 
 #include "WPIErrors.h"
 
-#include <cstring>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
-#include <netdb.h>
 #include <Timer.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <cstring>
 #include <iostream>
 #include <sstream>
 
@@ -40,10 +40,11 @@ static const std::string kRotationStrings[] = {
 };
 
 /**
- * AxisCamera constructor
+ * AxisCamera constructor.
+ *
  * @param cameraHost The host to find the camera at, typically an IP address
  */
-AxisCamera::AxisCamera(std::string const &cameraHost)
+AxisCamera::AxisCamera(std::string const& cameraHost)
     : m_cameraHost(cameraHost) {
   m_captureThread = std::thread(&AxisCamera::Capture, this);
 }
@@ -56,17 +57,19 @@ AxisCamera::~AxisCamera() {
 /*
  * Return true if the latest image from the camera has not been retrieved by
  * calling GetImage() yet.
+ *
  * @return true if the image has not been retrieved yet.
  */
 bool AxisCamera::IsFreshImage() const { return m_freshImage; }
 
 /**
  * Get an image from the camera and store it in the provided image.
+ *
  * @param image The imaq image to store the result in. This must be an HSL or
- * RGB image.
+ *        RGB image.
  * @return 1 upon success, zero on a failure
  */
-int AxisCamera::GetImage(Image *image) {
+int AxisCamera::GetImage(Image* image) {
   if (m_imageData.size() == 0) {
     return 0;
   }
@@ -82,11 +85,12 @@ int AxisCamera::GetImage(Image *image) {
 
 /**
  * Get an image from the camera and store it in the provided image.
+ *
  * @param image The image to store the result in. This must be an HSL or RGB
- * image
+ *        image
  * @return 1 upon success, zero on a failure
  */
-int AxisCamera::GetImage(ColorImage *image) {
+int AxisCamera::GetImage(ColorImage* image) {
   return GetImage(image->GetImaqImage());
 }
 
@@ -96,9 +100,10 @@ int AxisCamera::GetImage(ColorImage *image) {
  *
  * The returned pointer is owned by the caller and is their responsibility to
  * delete.
+ *
  * @return a pointer to an HSLImage object
  */
-HSLImage *AxisCamera::GetImage() {
+HSLImage* AxisCamera::GetImage() {
   auto image = new HSLImage();
   GetImage(image);
   return image;
@@ -106,17 +111,19 @@ HSLImage *AxisCamera::GetImage() {
 
 /**
  * Copy an image into an existing buffer.
+ *
  * This copies an image into an existing buffer rather than creating a new image
  * in memory. That way a new image is only allocated when the image being copied
- * is
- * larger than the destination.
+ * is larger than the destination.
+ *
  * This method is called by the PCVideoServer class.
+ *
  * @param imageData The destination image.
- * @param numBytes The size of the destination image.
+ * @param numBytes  The size of the destination image.
  * @return 0 if failed (no source image or no memory), 1 if success.
  */
-int AxisCamera::CopyJPEG(char **destImage, unsigned int &destImageSize,
-                         unsigned int &destImageBufferSize) {
+int AxisCamera::CopyJPEG(char** destImage, unsigned int& destImageSize,
+                         unsigned int& destImageBufferSize) {
   std::lock_guard<priority_mutex> lock(m_imageDataMutex);
   if (destImage == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "destImage must not be nullptr");
@@ -146,6 +153,7 @@ int AxisCamera::CopyJPEG(char **destImage, unsigned int &destImageSize,
 
 /**
  * Request a change in the brightness of the camera images.
+ *
  * @param brightness valid values 0 .. 100
  */
 void AxisCamera::WriteBrightness(int brightness) {
@@ -173,6 +181,7 @@ int AxisCamera::GetBrightness() {
 
 /**
  * Request a change in the white balance on the camera.
+ *
  * @param whiteBalance Valid values from the <code>WhiteBalance</code> enum.
  */
 void AxisCamera::WriteWhiteBalance(AxisCamera::WhiteBalance whiteBalance) {
@@ -194,6 +203,7 @@ AxisCamera::WhiteBalance AxisCamera::GetWhiteBalance() {
 
 /**
  * Request a change in the color level of the camera images.
+ *
  * @param colorLevel valid values are 0 .. 100
  */
 void AxisCamera::WriteColorLevel(int colorLevel) {
@@ -221,6 +231,7 @@ int AxisCamera::GetColorLevel() {
 
 /**
  * Request a change in the camera's exposure mode.
+ *
  * @param exposureControl A mode to write in the <code>Exposure</code> enum.
  */
 void AxisCamera::WriteExposureControl(
@@ -243,10 +254,11 @@ AxisCamera::ExposureControl AxisCamera::GetExposureControl() {
 
 /**
  * Request a change in the exposure priority of the camera.
+ *
  * @param exposurePriority Valid values are 0, 50, 100.
- * 0 = Prioritize image quality
- * 50 = None
- * 100 = Prioritize frame rate
+ *                         0 = Prioritize image quality
+ *                         50 = None
+ *                         100 = Prioritize frame rate
  */
 void AxisCamera::WriteExposurePriority(int exposurePriority) {
   if (exposurePriority != 0 && exposurePriority != 50 &&
@@ -275,8 +287,9 @@ int AxisCamera::GetExposurePriority() {
 /**
  * Write the maximum frames per second that the camera should send
  * Write 0 to send as many as possible.
+ *
  * @param maxFPS The number of frames the camera should send in a second,
- * exposure permitting.
+ *               exposure permitting.
  */
 void AxisCamera::WriteMaxFPS(int maxFPS) {
   std::lock_guard<priority_mutex> lock(m_parametersMutex);
@@ -298,6 +311,7 @@ int AxisCamera::GetMaxFPS() {
 
 /**
  * Write resolution value to camera.
+ *
  * @param resolution The camera resolution value to write to the camera.
  */
 void AxisCamera::WriteResolution(AxisCamera::Resolution resolution) {
@@ -312,7 +326,7 @@ void AxisCamera::WriteResolution(AxisCamera::Resolution resolution) {
 
 /**
  * @return The configured resolution of the camera (not necessarily the same
- * resolution as the most recent image, if it was changed recently.)
+ *         resolution as the most recent image, if it was changed recently.)
  */
 AxisCamera::Resolution AxisCamera::GetResolution() {
   std::lock_guard<priority_mutex> lock(m_parametersMutex);
@@ -321,10 +335,12 @@ AxisCamera::Resolution AxisCamera::GetResolution() {
 
 /**
  * Write the rotation value to the camera.
+ *
  * If you mount your camera upside down, use this to adjust the image for you.
+ *
  * @param rotation The angle to rotate the camera
- * (<code>AxisCamera::Rotation::k0</code>
- * or <code>AxisCamera::Rotation::k180</code>)
+ *                 (<code>AxisCamera::Rotation::k0</code>
+ *                 or <code>AxisCamera::Rotation::k180</code>)
  */
 void AxisCamera::WriteRotation(AxisCamera::Rotation rotation) {
   std::lock_guard<priority_mutex> lock(m_parametersMutex);
@@ -346,6 +362,7 @@ AxisCamera::Rotation AxisCamera::GetRotation() {
 
 /**
  * Write the compression value to the camera.
+ *
  * @param compression Values between 0 and 100.
  */
 void AxisCamera::WriteCompression(int compression) {
@@ -404,7 +421,7 @@ void AxisCamera::Capture() {
  * This function actually reads the images from the camera.
  */
 void AxisCamera::ReadImagesFromCamera() {
-  char *imgBuffer = nullptr;
+  char* imgBuffer = nullptr;
   int imgBufferLength = 0;
 
   // TODO: these recv calls must be non-blocking. Otherwise if the camera
@@ -415,7 +432,7 @@ void AxisCamera::ReadImagesFromCamera() {
   while (!m_done) {
     char initialReadBuffer[kMaxPacketSize] = "";
     char intermediateBuffer[1];
-    char *trailingPtr = initialReadBuffer;
+    char* trailingPtr = initialReadBuffer;
     int trailingCounter = 0;
     while (counter) {
       // TODO: fix me... this cannot be the most efficient way to approach this,
@@ -438,7 +455,7 @@ void AxisCamera::ReadImagesFromCamera() {
       }
     }
     counter = 1;
-    char *contentLength = strstr(initialReadBuffer, "Content-Length: ");
+    char* contentLength = strstr(initialReadBuffer, "Content-Length: ");
     if (contentLength == nullptr) {
       wpi_setWPIErrorWithContext(IncompatibleMode,
                                  "No content-length token found in packet");
@@ -496,7 +513,7 @@ void AxisCamera::ReadImagesFromCamera() {
  * completely successfully.
  *
  * @return <code>true</code> if the stream should be restarted due to a
- * parameter changing.
+ *         parameter changing.
  */
 bool AxisCamera::WriteParameters() {
   if (m_parametersDirty) {
@@ -543,21 +560,23 @@ bool AxisCamera::WriteParameters() {
 }
 
 /**
- * Create a socket connected to camera
+ * Create a socket connected to camera.
+ *
  * Used to create a connection to the camera for both capturing images and
  * setting parameters.
+ *
  * @param requestString The initial request string to send upon successful
- * connection.
- * @param setError If true, rais an error if there's a problem creating the
- * connection.
- * This is only enabled after several unsucessful connections, so a single one
- * doesn't
- * cause an error message to be printed if it immediately recovers.
+ *                      connection.
+ * @param setError      If true, rais an error if there's a problem creating the
+ *                      connection. This is only enabled after several
+ *                      unsucessful connections, so a single one doesn't cause
+ *                      an error message to be printed if it immediately
+ *                      recovers.
  * @return -1 if failed, socket handle if successful.
  */
-int AxisCamera::CreateCameraSocket(std::string const &requestString,
+int AxisCamera::CreateCameraSocket(std::string const& requestString,
                                    bool setError) {
-  struct addrinfo *address = nullptr;
+  struct addrinfo* address = nullptr;
   int camSocket;
 
   /* create socket */

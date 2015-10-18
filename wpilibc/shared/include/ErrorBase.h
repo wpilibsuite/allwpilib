@@ -53,8 +53,7 @@
 #define wpi_setGlobalWPIErrorWithContext(error, context)                   \
   ErrorBase::SetGlobalWPIError((wpi_error_s_##error), (context), __FILE__, \
                                __FUNCTION__, __LINE__)
-#define wpi_setGlobalWPIError(error) \
-  wpi_setGlobalWPIErrorWithContext(error, "")
+#define wpi_setGlobalWPIError(error) wpi_setGlobalWPIErrorWithContext(error, "")
 
 /**
  * Base class for most objects.

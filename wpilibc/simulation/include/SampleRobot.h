@@ -9,19 +9,18 @@
 
 #include "RobotBase.h"
 
-class SampleRobot : public RobotBase
-{
-public:
-	SampleRobot();
-	virtual ~SampleRobot() = default;
-	virtual void RobotInit();
-	virtual void Disabled();
-	virtual void Autonomous();
-	virtual void OperatorControl();
-	virtual void Test();
-	virtual void RobotMain();
-	void StartCompetition();
+class SampleRobot : public RobotBase {
+ public:
+  SampleRobot();
+  virtual ~SampleRobot() = default;
+  virtual void RobotInit();
+  virtual void Disabled();
+  virtual void Autonomous();
+  virtual void OperatorControl();
+  virtual void Test();
+  virtual void RobotMain();
+  void StartCompetition();
 
-private:
-	bool m_robotMainOverridden;
+ private:
+  bool m_robotMainOverridden;
 };

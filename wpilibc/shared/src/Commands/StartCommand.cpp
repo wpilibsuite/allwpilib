@@ -7,7 +7,7 @@
 
 #include "Commands/StartCommand.h"
 
-StartCommand::StartCommand(Command *commandToStart) : Command("StartCommand") {
+StartCommand::StartCommand(Command* commandToStart) : Command("StartCommand") {
   m_commandToFork = commandToStart;
 }
 

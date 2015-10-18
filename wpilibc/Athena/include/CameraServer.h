@@ -7,17 +7,17 @@
 
 #pragma once
 
-#include "USBCamera.h"
 #include "ErrorBase.h"
-#include "nivision.h"
 #include "NIIMAQdx.h"
+#include "USBCamera.h"
+#include "nivision.h"
 
-#include "HAL/cpp/priority_mutex.h"
-#include <thread>
-#include <memory>
 #include <condition_variable>
+#include <memory>
+#include <thread>
 #include <tuple>
 #include <vector>
+#include "HAL/cpp/priority_mutex.h"
 
 class CameraServer : public ErrorBase {
  private:

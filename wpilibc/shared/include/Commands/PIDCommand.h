@@ -10,16 +10,17 @@
 
 #include "Commands/Command.h"
 #include "PIDController.h"
-#include "PIDSource.h"
 #include "PIDOutput.h"
+#include "PIDSource.h"
 
 #include <memory>
 
 class PIDCommand : public Command, public PIDOutput, public PIDSource {
  public:
-  PIDCommand(const std::string &name, double p, double i, double d);
-  PIDCommand(const std::string &name, double p, double i, double d, double period);
-  PIDCommand(const std::string &name, double p, double i, double d, double f,
+  PIDCommand(const std::string& name, double p, double i, double d);
+  PIDCommand(const std::string& name, double p, double i, double d,
+             double period);
+  PIDCommand(const std::string& name, double p, double i, double d, double f,
              double period);
   PIDCommand(double p, double i, double d);
   PIDCommand(double p, double i, double d, double period);

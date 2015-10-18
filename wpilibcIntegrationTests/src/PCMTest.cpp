@@ -12,8 +12,8 @@
 #include <DoubleSolenoid.h>
 #include <Solenoid.h>
 #include <Timer.h>
-#include "gtest/gtest.h"
 #include "TestBench.h"
+#include "gtest/gtest.h"
 
 /* The PCM switches the compressor up to a couple seconds after the pressure
         switch changes. */
@@ -29,11 +29,11 @@ static const double kCompressorOffVoltage = 1.68;
 
 class PCMTest : public testing::Test {
  protected:
-  Compressor *m_compressor;
+  Compressor* m_compressor;
 
-  DigitalOutput *m_fakePressureSwitch;
-  AnalogInput *m_fakeCompressor;
-  DoubleSolenoid *m_doubleSolenoid;
+  DigitalOutput* m_fakePressureSwitch;
+  AnalogInput* m_fakeCompressor;
+  DoubleSolenoid* m_doubleSolenoid;
   DigitalInput *m_fakeSolenoid1, *m_fakeSolenoid2;
 
   virtual void SetUp() override {
@@ -138,17 +138,20 @@ TEST_F(PCMTest, DoubleSolenoid) {
   Wait(kSolenoidDelayTime);
   EXPECT_TRUE(m_fakeSolenoid1->Get()) << "Solenoid #1 did not turn off";
   EXPECT_TRUE(m_fakeSolenoid2->Get()) << "Solenoid #2 did not turn off";
-  EXPECT_TRUE(solenoid.Get() == DoubleSolenoid::kOff) << "Solenoid does not read off";
+  EXPECT_TRUE(solenoid.Get() == DoubleSolenoid::kOff)
+      << "Solenoid does not read off";
 
   solenoid.Set(DoubleSolenoid::kForward);
   Wait(kSolenoidDelayTime);
   EXPECT_FALSE(m_fakeSolenoid1->Get()) << "Solenoid #1 did not turn on";
   EXPECT_TRUE(m_fakeSolenoid2->Get()) << "Solenoid #2 did not turn off";
-  EXPECT_TRUE(solenoid.Get() == DoubleSolenoid::kForward) << "Solenoid does not read forward";
+  EXPECT_TRUE(solenoid.Get() == DoubleSolenoid::kForward)
+      << "Solenoid does not read forward";
 
   solenoid.Set(DoubleSolenoid::kReverse);
   Wait(kSolenoidDelayTime);
   EXPECT_TRUE(m_fakeSolenoid1->Get()) << "Solenoid #1 did not turn off";
   EXPECT_FALSE(m_fakeSolenoid2->Get()) << "Solenoid #2 did not turn on";
-  EXPECT_TRUE(solenoid.Get() == DoubleSolenoid::kReverse) << "Solenoid does not read reverse";
+  EXPECT_TRUE(solenoid.Get() == DoubleSolenoid::kReverse)
+      << "Solenoid does not read reverse";
 }

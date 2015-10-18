@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "SensorBase.h"
-#include "PIDSource.h"
-#include "interfaces/Gyro.h"
 #include "LiveWindow/LiveWindowSendable.h"
+#include "PIDSource.h"
+#include "SensorBase.h"
+#include "interfaces/Gyro.h"
 
 #include <memory>
 
@@ -18,7 +18,10 @@
  * GyroBase is the common base class for Gyro implementations such as
  * AnalogGyro.
  */
-class GyroBase : public Gyro, public SensorBase, public PIDSource, public LiveWindowSendable {
+class GyroBase : public Gyro,
+                 public SensorBase,
+                 public PIDSource,
+                 public LiveWindowSendable {
  public:
   virtual ~GyroBase() = default;
 

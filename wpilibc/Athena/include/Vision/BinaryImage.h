@@ -14,8 +14,8 @@
  */
 #include "Vision/VisionAPI.h"
 
-#include <vector>
 #include <algorithm>
+#include <vector>
 
 class BinaryImage : public MonoImage {
  public:
@@ -23,20 +23,20 @@ class BinaryImage : public MonoImage {
   int GetNumberParticles();
   ParticleAnalysisReport GetParticleAnalysisReport(int particleNumber);
   void GetParticleAnalysisReport(int particleNumber,
-                                 ParticleAnalysisReport *par);
-  std::vector<ParticleAnalysisReport> *GetOrderedParticleAnalysisReports();
-  BinaryImage *RemoveSmallObjects(bool connectivity8, int erosions);
-  BinaryImage *RemoveLargeObjects(bool connectivity8, int erosions);
-  BinaryImage *ConvexHull(bool connectivity8);
-  BinaryImage *ParticleFilter(ParticleFilterCriteria2 *criteria,
+                                 ParticleAnalysisReport* par);
+  std::vector<ParticleAnalysisReport>* GetOrderedParticleAnalysisReports();
+  BinaryImage* RemoveSmallObjects(bool connectivity8, int erosions);
+  BinaryImage* RemoveLargeObjects(bool connectivity8, int erosions);
+  BinaryImage* ConvexHull(bool connectivity8);
+  BinaryImage* ParticleFilter(ParticleFilterCriteria2* criteria,
                               int criteriaCount);
-  virtual void Write(const char *fileName);
+  virtual void Write(const char* fileName);
 
  private:
   bool ParticleMeasurement(int particleNumber, MeasurementType whatToMeasure,
-                           int *result);
+                           int* result);
   bool ParticleMeasurement(int particleNumber, MeasurementType whatToMeasure,
-                           double *result);
+                           double* result);
   static double NormalizeFromRange(double position, int range);
   static bool CompareParticleSizes(ParticleAnalysisReport particle1,
                                    ParticleAnalysisReport particle2);

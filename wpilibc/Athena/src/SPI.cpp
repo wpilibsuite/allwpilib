@@ -7,8 +7,8 @@
 
 #include "SPI.h"
 
-#include "WPIErrors.h"
 #include "HAL/Digital.hpp"
+#include "WPIErrors.h"
 
 #include <string.h>
 
@@ -39,7 +39,7 @@ SPI::~SPI() { spiClose(m_port); }
  * The default value is 500,000Hz.
  * The maximum value is 4,000,000Hz.
  *
- * @param hz	The clock rate in Hertz.
+ * @param hz The clock rate in Hertz.
  */
 void SPI::SetClockRate(double hz) { spiSetSpeed(m_port, hz); }
 
@@ -142,11 +142,10 @@ int32_t SPI::Write(uint8_t* data, uint8_t size) {
  * If the receive FIFO is empty, there is no active transfer, and initiate
  * is false, errors.
  *
- * @param initiate	If true, this function pushes "0" into the
- * 				    transmit buffer and initiates a transfer.
- * 				    If false, this function assumes that data is
- * 				    already in the receive FIFO from a previous
- * write.
+ * @param initiate If true, this function pushes "0" into the transmit buffer
+ *                 and initiates a transfer. If false, this function assumes
+ *                 that data is already in the receive FIFO from a previous
+ *                 write.
  */
 int32_t SPI::Read(bool initiate, uint8_t* dataReceived, uint8_t size) {
   int32_t retVal = 0;
@@ -162,9 +161,9 @@ int32_t SPI::Read(bool initiate, uint8_t* dataReceived, uint8_t size) {
 /**
  * Perform a simultaneous read/write transaction with the device
  *
- * @param dataToSend The data to be written out to the device
+ * @param dataToSend   The data to be written out to the device
  * @param dataReceived Buffer to receive data from the device
- * @param size The length of the transaction, in bytes
+ * @param size         The length of the transaction, in bytes
  */
 int32_t SPI::Transaction(uint8_t* dataToSend, uint8_t* dataReceived,
                          uint8_t size) {
@@ -176,16 +175,16 @@ int32_t SPI::Transaction(uint8_t* dataToSend, uint8_t* dataReceived,
 /**
  * Initialize the accumulator.
  *
- * @param period Time between reads
- * @param cmd SPI command to send to request data
- * @param xfer_size SPI transfer size, in bytes
+ * @param period     Time between reads
+ * @param cmd        SPI command to send to request data
+ * @param xfer_size  SPI transfer size, in bytes
  * @param valid_mask Mask to apply to received data for validity checking
  * @param valid_data After valid_mask is applied, required matching value for
  *                   validity checking
  * @param data_shift Bit shift to apply to received data to get actual data
  *                   value
- * @param data_size Size (in bits) of data field
- * @param is_signed Is data field signed?
+ * @param data_size  Size (in bits) of data field
+ * @param is_signed  Is data field signed?
  * @param big_endian Is device big endian?
  */
 void SPI::InitAccumulator(double period, uint32_t cmd, uint8_t xfer_size,
@@ -220,9 +219,10 @@ void SPI::ResetAccumulator() {
 /**
  * Set the center value of the accumulator.
  *
- * The center value is subtracted from each value before it is added to the accumulator. This
- * is used for the center value of devices like gyros and accelerometers to make integration work
- * and to take the device offset into account when integrating.
+ * The center value is subtracted from each value before it is added to the
+ * accumulator. This is used for the center value of devices like gyros and
+ * accelerometers to make integration work and to take the device offset into
+ * account when integrating.
  */
 void SPI::SetAccumulatorCenter(int32_t center) {
   int32_t status = 0;
@@ -264,7 +264,8 @@ int64_t SPI::GetAccumulatorValue() const {
 /**
  * Read the number of accumulated values.
  *
- * Read the count of the accumulated values since the accumulator was last Reset().
+ * Read the count of the accumulated values since the accumulator was last
+ * Reset().
  *
  * @return The number of times samples from the channel were accumulated.
  */
@@ -296,7 +297,7 @@ double SPI::GetAccumulatorAverage() const {
  * @param value Pointer to the 64-bit accumulated output.
  * @param count Pointer to the number of accumulation cycles.
  */
-void SPI::GetAccumulatorOutput(int64_t &value, uint32_t &count) const {
+void SPI::GetAccumulatorOutput(int64_t& value, uint32_t& count) const {
   int32_t status = 0;
   spiGetAccumulatorOutput(m_port, &value, &count, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));

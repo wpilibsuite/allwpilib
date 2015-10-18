@@ -6,10 +6,10 @@
 /*----------------------------------------------------------------------------*/
 
 #include "AnalogOutput.h"
+#include "HAL/Port.h"
+#include "LiveWindow/LiveWindow.h"
 #include "Resource.h"
 #include "WPIErrors.h"
-#include "LiveWindow/LiveWindow.h"
-#include "HAL/Port.h"
 
 #include <limits>
 #include <sstream>
@@ -18,8 +18,10 @@ static std::unique_ptr<Resource> outputs;
 
 /**
  * Construct an analog output on the given channel.
+ *
  * All analog outputs are located on the MXP port.
- * @param The channel number on the roboRIO to represent.
+ *
+ * @param channel The channel number on the roboRIO to represent.
  */
 AnalogOutput::AnalogOutput(uint32_t channel) {
   Resource::CreateResourceObject(outputs, kAnalogOutputs);
@@ -55,7 +57,9 @@ AnalogOutput::AnalogOutput(uint32_t channel) {
 }
 
 /**
- * Destructor. Frees analog output resource
+ * Destructor.
+ *
+ * Frees analog output resource.
  */
 AnalogOutput::~AnalogOutput() {
   freeAnalogOutputPort(m_port);
@@ -63,7 +67,7 @@ AnalogOutput::~AnalogOutput() {
 }
 
 /**
- * Set the value of the analog output
+ * Set the value of the analog output.
  *
  * @param voltage The output value in Volts, from 0.0 to +5.0
  */

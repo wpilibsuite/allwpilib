@@ -11,12 +11,12 @@
 #include <Talon.h>
 #include <Timer.h>
 #include <Victor.h>
-#include "gtest/gtest.h"
 #include "TestBench.h"
+#include "gtest/gtest.h"
 
 enum MotorEncoderTestType { TEST_VICTOR, TEST_JAGUAR, TEST_TALON };
 
-std::ostream &operator<<(std::ostream &os, MotorEncoderTestType const &type) {
+std::ostream& operator<<(std::ostream& os, MotorEncoderTestType const& type) {
   switch (type) {
     case TEST_VICTOR:
       os << "Victor";
@@ -41,8 +41,8 @@ static constexpr double kMotorTime = 0.5;
  */
 class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
  protected:
-  SpeedController *m_speedController;
-  Encoder *m_encoder;
+  SpeedController* m_speedController;
+  Encoder* m_encoder;
 
   virtual void SetUp() override {
     switch (GetParam()) {
@@ -145,7 +145,9 @@ TEST_P(MotorEncoderTest, PositionPIDController) {
 
   RecordProperty("PIDError", pid.GetError());
 
-  EXPECT_TRUE(pid.OnTarget()) << "PID loop did not converge within 10 seconds. Goal was: "<<goal<<" Error was: "<<pid.GetError();
+  EXPECT_TRUE(pid.OnTarget())
+      << "PID loop did not converge within 10 seconds. Goal was: " << goal
+      << " Error was: " << pid.GetError();
 }
 
 /**
@@ -167,7 +169,9 @@ TEST_P(MotorEncoderTest, VelocityPIDController) {
   pid.Disable();
   RecordProperty("PIDError", pid.GetError());
 
-  EXPECT_TRUE(pid.OnTarget()) << "PID loop did not converge within 10 seconds. Goal was: " << 600 << " Error was: " << pid.GetError();
+  EXPECT_TRUE(pid.OnTarget())
+      << "PID loop did not converge within 10 seconds. Goal was: " << 600
+      << " Error was: " << pid.GetError();
 }
 
 /**

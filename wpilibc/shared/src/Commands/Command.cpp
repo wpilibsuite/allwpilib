@@ -6,12 +6,12 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Commands/Command.h"
+#include <typeinfo>
 #include "Commands/CommandGroup.h"
 #include "Commands/Scheduler.h"
 #include "RobotState.h"
 #include "Timer.h"
 #include "WPIErrors.h"
-#include <typeinfo>
 
 static const std::string kName = "name";
 static const std::string kRunning = "running";
@@ -27,12 +27,14 @@ Command::Command() : Command("", -1.0) {}
 
 /**
  * Creates a new command with the given name and no timeout.
+ *
  * @param name the name for this command
  */
-Command::Command(const std::string &name) : Command(name, -1.0) {}
+Command::Command(const std::string& name) : Command(name, -1.0) {}
 
 /**
  * Creates a new command with the given timeout and a default name.
+ *
  * @param timeout the time (in seconds) before this command "times out"
  * @see Command#isTimedOut() isTimedOut()
  */
@@ -40,11 +42,12 @@ Command::Command(double timeout) : Command("", timeout) {}
 
 /**
  * Creates a new command with the given name and timeout.
- * @param name the name of the command
+ *
+ * @param name    the name of the command
  * @param timeout the time (in seconds) before this command "times out"
  * @see Command#isTimedOut() isTimedOut()
  */
-Command::Command(const std::string &name, double timeout) {
+Command::Command(const std::string& name, double timeout) {
   // We use -1.0 to indicate no timeout.
   if (timeout < 0.0 && timeout != -1.0)
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
@@ -54,8 +57,7 @@ Command::Command(const std::string &name, double timeout) {
   // If name contains an empty string
   if (name.length() == 0) {
     m_name = std::string("Command_") + std::string(typeid(*this).name());
-  }
-  else {
+  } else {
     m_name = name;
   }
 }
@@ -65,14 +67,17 @@ Command::~Command() {
 }
 
 /**
- * Get the ID (sequence number) for this command
+ * Get the ID (sequence number) for this command.
+ *
  * The ID is a unique sequence number that is incremented for each command.
+ *
  * @return the ID of this command
  */
 int Command::GetID() const { return m_commandID; }
 
 /**
  * Sets the timeout of this command.
+ *
  * @param timeout the timeout (in seconds)
  * @see Command#isTimedOut() isTimedOut()
  */
@@ -85,7 +90,9 @@ void Command::SetTimeout(double timeout) {
 
 /**
  * Returns the time since this command was initialized (in seconds).
+ *
  * This function will work even if there is no specified timeout.
+ *
  * @return the time since this command was initialized (in seconds).
  */
 double Command::TimeSinceInitialized() const {
@@ -98,6 +105,7 @@ double Command::TimeSinceInitialized() const {
 /**
  * This method specifies that the given {@link Subsystem} is used by this
  * command.
+ *
  * This method is crucial to the functioning of the Command System in general.
  *
  * <p>Note that the recommended way to call this method is in the
@@ -106,7 +114,7 @@ double Command::TimeSinceInitialized() const {
  * @param subsystem the {@link Subsystem} required
  * @see Subsystem
  */
-void Command::Requires(Subsystem *subsystem) {
+void Command::Requires(Subsystem* subsystem) {
   if (!AssertUnlocked("Can not add new requirement to command")) return;
 
   if (subsystem != nullptr)
@@ -117,8 +125,9 @@ void Command::Requires(Subsystem *subsystem) {
 
 /**
  * Called when the command has been removed.
- * This will call {@link Command#interrupted() interrupted()} or {@link
- * Command#end() end()}.
+ *
+ * This will call {@link Command#interrupted() interrupted()} or
+ * {@link Command#end() end()}.
  */
 void Command::Removed() {
   if (m_initialized) {
@@ -138,10 +147,10 @@ void Command::Removed() {
 
 /**
  * Starts up the command.  Gets the command ready to start.
+ *
  * <p>Note that the command will eventually start, however it will not
- * necessarily
- * do so immediately, and may in fact be canceled before initialize is even
- * called.</p>
+ * necessarily do so immediately, and may in fact be canceled before initialize
+ * is even called.</p>
  */
 void Command::Start() {
   LockChanges();
@@ -155,6 +164,7 @@ void Command::Start() {
 
 /**
  * The run method is used internally to actually run the commands.
+ *
  * @return whether or not the command should stay within the {@link Scheduler}.
  */
 bool Command::Run() {
@@ -184,18 +194,19 @@ void Command::_End() {}
 
 /**
  * Called to indicate that the timer should start.
+ *
  * This is called right before {@link Command#initialize() initialize()} is,
- * inside the
- * {@link Command#run() run()} method.
+ * inside the {@link Command#run() run()} method.
  */
 void Command::StartTiming() { m_startTime = Timer::GetFPGATimestamp(); }
 
 /**
- * Returns whether or not the {@link Command#timeSinceInitialized()
- * timeSinceInitialized()}
- * method returns a number which is greater than or equal to the timeout for the
- * command.
+ * Returns whether or not the
+ * {@link Command#timeSinceInitialized() timeSinceInitialized()} method returns
+ * a number which is greater than or equal to the timeout for the command.
+ *
  * If there is no timeout, this will always return false.
+ *
  * @return whether the time has expired
  */
 bool Command::IsTimedOut() const {
@@ -204,28 +215,31 @@ bool Command::IsTimedOut() const {
 
 /**
  * Returns the requirements (as an std::set of {@link Subsystem Subsystems}
- * pointers) of this command
+ * pointers) of this command.
+ *
  * @return the requirements (as an std::set of {@link Subsystem Subsystems}
- * pointers) of this command
+ *         pointers) of this command
  */
 Command::SubsystemSet Command::GetRequirements() const {
   return m_requirements;
 }
 
 /**
- * Prevents further changes from being made
+ * Prevents further changes from being made.
  */
 void Command::LockChanges() { m_locked = true; }
 
 /**
  * If changes are locked, then this will generate a CommandIllegalUse error.
+ *
  * @param message the message to report on error (it is appended by a default
- * message)
+ *                message)
  * @return true if assert passed, false if assert failed
  */
-bool Command::AssertUnlocked(const std::string &message) {
+bool Command::AssertUnlocked(const std::string& message) {
   if (m_locked) {
-    std::string buf = message + " after being started or being added to a command group";
+    std::string buf =
+        message + " after being started or being added to a command group";
     wpi_setWPIErrorWithContext(CommandIllegalUse, buf);
     return false;
   }
@@ -234,9 +248,10 @@ bool Command::AssertUnlocked(const std::string &message) {
 
 /**
  * Sets the parent of this command.  No actual change is made to the group.
+ *
  * @param parent the parent
  */
-void Command::SetParent(CommandGroup *parent) {
+void Command::SetParent(CommandGroup* parent) {
   if (parent == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "parent");
   } else if (m_parent != nullptr) {
@@ -254,6 +269,7 @@ void Command::SetParent(CommandGroup *parent) {
 
 /**
  * This is used internally to mark that the command has been started.
+ *
  * The lifecycle of a command is:
  *
  * startRunning() is called.
@@ -261,8 +277,7 @@ void Command::SetParent(CommandGroup *parent) {
  * removed() is called
  *
  * It is very important that startRunning and removed be called in order or some
- * assumptions
- * of the code will be broken.
+ * assumptions of the code will be broken.
  */
 void Command::StartRunning() {
   m_running = true;
@@ -272,22 +287,24 @@ void Command::StartRunning() {
 
 /**
  * Returns whether or not the command is running.
+ *
  * This may return true even if the command has just been canceled, as it may
  * not have yet called {@link Command#interrupted()}.
+ *
  * @return whether or not the command is running
  */
 bool Command::IsRunning() const { return m_running; }
 
 /**
  * This will cancel the current command.
+ *
  * <p>This will cancel the current command eventually.  It can be called
- * multiple times.
- * And it can be called when the command is not running.  If the command is
- * running though,
- * then the command will be marked as canceled and eventually removed.</p>
- * <p>A command can not be canceled
- * if it is a part of a command group, you must cancel the command group
- * instead.</p>
+ * multiple times. And it can be called when the command is not running.  If
+ * the command is running though, then the command will be marked as canceled
+ * and eventually removed.</p>
+ *
+ * <p>A command can not be canceled if it is a part of a command group, you
+ * must cancel the command group instead.</p>
  */
 void Command::Cancel() {
   if (m_parent != nullptr)
@@ -300,8 +317,9 @@ void Command::Cancel() {
 
 /**
  * This works like cancel(), except that it doesn't throw an exception if it is
- * a part
- * of a command group.  Should only be called by the parent command group.
+ * a part of a command group.
+ *
+ * Should only be called by the parent command group.
  */
 void Command::_Cancel() {
   if (IsRunning()) m_canceled = true;
@@ -309,18 +327,21 @@ void Command::_Cancel() {
 
 /**
  * Returns whether or not this has been canceled.
+ *
  * @return whether or not this has been canceled
  */
 bool Command::IsCanceled() const { return m_canceled; }
 
 /**
  * Returns whether or not this command can be interrupted.
+ *
  * @return whether or not this command can be interrupted
  */
 bool Command::IsInterruptible() const { return m_interruptible; }
 
 /**
  * Sets whether or not this command can be interrupted.
+ *
  * @param interruptible whether or not this command can be interrupted
  */
 void Command::SetInterruptible(bool interruptible) {
@@ -329,20 +350,23 @@ void Command::SetInterruptible(bool interruptible) {
 
 /**
  * Checks if the command requires the given {@link Subsystem}.
+ *
  * @param system the system
  * @return whether or not the subsystem is required (false if given nullptr)
  */
-bool Command::DoesRequire(Subsystem *system) const {
+bool Command::DoesRequire(Subsystem* system) const {
   return m_requirements.count(system) > 0;
 }
 
 /**
  * Returns the {@link CommandGroup} that this command is a part of.
+ *
  * Will return null if this {@link Command} is not in a group.
+ *
  * @return the {@link CommandGroup} that this command is a part of (or null if
- * not in group)
+ *         not in group)
  */
-CommandGroup *Command::GetGroup() const { return m_parent; }
+CommandGroup* Command::GetGroup() const { return m_parent; }
 
 /**
  * Sets whether or not this {@link Command} should run when the robot is
@@ -350,6 +374,7 @@ CommandGroup *Command::GetGroup() const { return m_parent; }
  *
  * <p>By default a command will not run when the robot is disabled, and will in
  * fact be canceled.</p>
+ *
  * @param run whether or not this command should run when the robot is disabled
  */
 void Command::SetRunWhenDisabled(bool run) { m_runWhenDisabled = run; }
@@ -357,14 +382,13 @@ void Command::SetRunWhenDisabled(bool run) { m_runWhenDisabled = run; }
 /**
  * Returns whether or not this {@link Command} will run when the robot is
  * disabled, or if it will cancel itself.
+ *
  * @return whether or not this {@link Command} will run when the robot is
- * disabled, or if it will cancel itself
+ *         disabled, or if it will cancel itself
  */
 bool Command::WillRunWhenDisabled() const { return m_runWhenDisabled; }
 
-std::string Command::GetName() const {
-  return m_name;
-}
+std::string Command::GetName() const { return m_name; }
 
 std::string Command::GetSmartDashboardType() const { return "Command"; }
 

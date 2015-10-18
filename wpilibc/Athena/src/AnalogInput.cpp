@@ -6,11 +6,11 @@
 /*----------------------------------------------------------------------------*/
 
 #include "AnalogInput.h"
+#include "HAL/Port.h"
+#include "LiveWindow/LiveWindow.h"
 #include "Resource.h"
 #include "Timer.h"
 #include "WPIErrors.h"
-#include "LiveWindow/LiveWindow.h"
-#include "HAL/Port.h"
 
 #include <sstream>
 
@@ -24,7 +24,7 @@ const uint32_t AnalogInput::kAccumulatorChannels[] = {0, 1};
  * Construct an analog input.
  *
  * @param channel The channel number on the roboRIO to represent. 0-3 are
- * on-board 4-7 are on the MXP port.
+ *                on-board 4-7 are on the MXP port.
  */
 AnalogInput::AnalogInput(uint32_t channel) {
   std::stringstream buf;
@@ -64,10 +64,11 @@ AnalogInput::~AnalogInput() {
 
 /**
  * Get a sample straight from this channel.
+ *
  * The sample is a 12-bit value representing the 0V to 5V range of the A/D
- * converter in the module.
- * The units are in A/D converter codes.  Use GetVoltage() to get the analog
- * value in calibrated units.
+ * converter in the module.  The units are in A/D converter codes.  Use
+ * GetVoltage() to get the analog value in calibrated units.
+ *
  * @return A sample straight from this channel.
  */
 int16_t AnalogInput::GetValue() const {
@@ -81,6 +82,7 @@ int16_t AnalogInput::GetValue() const {
 /**
  * Get a sample from the output of the oversample and average engine for this
  * channel.
+ *
  * The sample is 12-bit + the bits configured in SetOversampleBits().
  * The value configured in SetAverageBits() will cause this value to be averaged
  * 2**bits number of samples.
@@ -88,6 +90,7 @@ int16_t AnalogInput::GetValue() const {
  * 2**(OversampleBits + AverageBits) samples
  * have been acquired from the module on this channel.
  * Use GetAverageVoltage() to get the analog value in calibrated units.
+ *
  * @return A sample from the oversample and average engine for this channel.
  */
 int32_t AnalogInput::GetAverageValue() const {
@@ -100,8 +103,10 @@ int32_t AnalogInput::GetAverageValue() const {
 
 /**
  * Get a scaled sample straight from this channel.
+ *
  * The value is scaled to units of Volts using the calibrated scaling data from
  * GetLSBWeight() and GetOffset().
+ *
  * @return A scaled sample straight from this channel.
  */
 float AnalogInput::GetVoltage() const {
@@ -115,12 +120,14 @@ float AnalogInput::GetVoltage() const {
 /**
  * Get a scaled sample from the output of the oversample and average engine for
  * this channel.
+ *
  * The value is scaled to units of Volts using the calibrated scaling data from
  * GetLSBWeight() and GetOffset().
  * Using oversampling will cause this value to be higher resolution, but it will
  * update more slowly.
  * Using averaging will cause this value to be more stable, but it will update
  * more slowly.
+ *
  * @return A scaled sample from the output of the oversample and average engine
  * for this channel.
  */
@@ -164,6 +171,7 @@ int32_t AnalogInput::GetOffset() const {
 
 /**
  * Get the channel number.
+ *
  * @return The channel number.
  */
 uint32_t AnalogInput::GetChannel() const {
@@ -173,6 +181,7 @@ uint32_t AnalogInput::GetChannel() const {
 
 /**
  * Set the number of averaging bits.
+ *
  * This sets the number of averaging bits. The actual number of averaged samples
  * is 2^bits.
  * Use averaging to improve the stability of your measurement at the expense of
@@ -190,9 +199,9 @@ void AnalogInput::SetAverageBits(uint32_t bits) {
 
 /**
  * Get the number of averaging bits previously configured.
+ *
  * This gets the number of averaging bits from the FPGA. The actual number of
- * averaged samples is 2^bits.
- * The averaging is done automatically in the FPGA.
+ * averaged samples is 2^bits. The averaging is done automatically in the FPGA.
  *
  * @return Number of bits of averaging previously configured.
  */
@@ -205,11 +214,11 @@ uint32_t AnalogInput::GetAverageBits() const {
 
 /**
  * Set the number of oversample bits.
+ *
  * This sets the number of oversample bits. The actual number of oversampled
- * values is 2^bits.
- * Use oversampling to improve the resolution of your measurements at the
- * expense of sampling rate.
- * The oversampling is done automatically in the FPGA.
+ * values is 2^bits. Use oversampling to improve the resolution of your
+ * measurements at the expense of sampling rate. The oversampling is done
+ * automatically in the FPGA.
  *
  * @param bits Number of bits of oversampling.
  */
@@ -222,9 +231,10 @@ void AnalogInput::SetOversampleBits(uint32_t bits) {
 
 /**
  * Get the number of oversample bits previously configured.
+ *
  * This gets the number of oversample bits from the FPGA. The actual number of
- * oversampled values is
- * 2^bits. The oversampling is done automatically in the FPGA.
+ * oversampled values is 2^bits. The oversampling is done automatically in the
+ * FPGA.
  *
  * @return Number of bits of oversampling previously configured.
  */
@@ -264,8 +274,9 @@ void AnalogInput::InitAccumulator() {
  * Set an initial value for the accumulator.
  *
  * This will be added to all values returned to the user.
+ *
  * @param initialValue The value that the accumulator should start from when
- * reset.
+ *                     reset.
  */
 void AnalogInput::SetAccumulatorInitialValue(int64_t initialValue) {
   if (StatusIsFatal()) return;
@@ -295,14 +306,12 @@ void AnalogInput::ResetAccumulator() {
  * Set the center value of the accumulator.
  *
  * The center value is subtracted from each A/D value before it is added to the
- * accumulator. This
- * is used for the center value of devices like gyros and accelerometers to
- * take the device offset into account when integrating.
+ * accumulator. This is used for the center value of devices like gyros and
+ * accelerometers to take the device offset into account when integrating.
  *
  * This center value is based on the output of the oversampled and averaged
- * source from the accumulator
- * channel. Because of this, any non-zero oversample bits will affect the size
- * of the value for this field.
+ * source from the accumulator channel. Because of this, any non-zero
+ * oversample bits will affect the size of the value for this field.
  */
 void AnalogInput::SetAccumulatorCenter(int32_t center) {
   if (StatusIsFatal()) return;
@@ -313,7 +322,6 @@ void AnalogInput::SetAccumulatorCenter(int32_t center) {
 
 /**
  * Set the accumulator's deadband.
- * @param
  */
 void AnalogInput::SetAccumulatorDeadband(int32_t deadband) {
   if (StatusIsFatal()) return;
@@ -363,7 +371,7 @@ uint32_t AnalogInput::GetAccumulatorCount() const {
  * @param value Reference to the 64-bit accumulated output.
  * @param count Reference to the number of accumulation cycles.
  */
-void AnalogInput::GetAccumulatorOutput(int64_t &value, uint32_t &count) const {
+void AnalogInput::GetAccumulatorOutput(int64_t& value, uint32_t& count) const {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   getAccumulatorOutput(m_port, &value, &count, &status);
@@ -373,8 +381,10 @@ void AnalogInput::GetAccumulatorOutput(int64_t &value, uint32_t &count) const {
 
 /**
  * Set the sample rate per channel for all analog channels.
+ *
  * The maximum rate is 500kS/s divided by the number of channels in use.
  * This is 62500 samples/s per channel.
+ *
  * @param samplesPerSecond The number of samples per second.
  */
 void AnalogInput::SetSampleRate(float samplesPerSecond) {

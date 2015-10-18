@@ -18,8 +18,8 @@ constexpr double ADXL345_SPI::kGsPerLSB;
 /**
  * Constructor.
  *
- * @param port The SPI port the accelerometer is attached to
- * @param range The range (+ or -) that the accelerometer will measure.
+ * @param port  The SPI port the accelerometer is attached to
+ * @param range The range (+ or -) that the accelerometer will measure
  */
 ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::Range range) : SPI(port) {
   SetClockRate(500000);
@@ -79,7 +79,7 @@ double ADXL345_SPI::GetAcceleration(ADXL345_SPI::Axes axis) {
  * Get the acceleration of all axes in Gs.
  *
  * @return An object containing the acceleration measured on each axis of the
- * ADXL345 in Gs.
+ *         ADXL345 in Gs.
  */
 ADXL345_SPI::AllAxes ADXL345_SPI::GetAccelerations() {
   AllAxes data = AllAxes();

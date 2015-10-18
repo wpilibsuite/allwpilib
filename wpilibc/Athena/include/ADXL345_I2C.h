@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "interfaces/Accelerometer.h"
+#include <memory>
 #include "I2C.h"
 #include "LiveWindow/LiveWindowSendable.h"
-#include <memory>
+#include "interfaces/Accelerometer.h"
 
 /**
  * ADXL345 Accelerometer on I2C.
@@ -52,7 +52,8 @@ class ADXL345_I2C : public Accelerometer,
   };
 
  public:
-  explicit ADXL345_I2C(Port port, Range range = kRange_2G, int deviceAddress = kAddress);
+  explicit ADXL345_I2C(Port port, Range range = kRange_2G,
+                       int deviceAddress = kAddress);
   virtual ~ADXL345_I2C() = default;
 
   ADXL345_I2C(const ADXL345_I2C&) = delete;

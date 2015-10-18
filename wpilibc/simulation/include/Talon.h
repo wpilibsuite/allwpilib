@@ -7,21 +7,20 @@
 
 #pragma once
 
+#include "PIDOutput.h"
 #include "SafePWM.h"
 #include "SpeedController.h"
-#include "PIDOutput.h"
 
 /**
- * CTRE Talon Speed Controller
+ * CTRE Talon Speed Controller.
  */
-class Talon : public SafePWM, public SpeedController
-{
-public:
-	explicit Talon(uint32_t channel);
-	virtual ~Talon() = default;
-	virtual void Set(float value, uint8_t syncGroup = 0);
-	virtual float Get() const;
-	virtual void Disable();
+class Talon : public SafePWM, public SpeedController {
+ public:
+  explicit Talon(uint32_t channel);
+  virtual ~Talon() = default;
+  virtual void Set(float value, uint8_t syncGroup = 0);
+  virtual float Get() const;
+  virtual void Disable();
 
-	virtual void PIDWrite(float output) override;
+  virtual void PIDWrite(float output) override;
 };

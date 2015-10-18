@@ -12,20 +12,21 @@
 #include "WPIErrors.h"
 
 /**
- * Creates a subsystem with the given name
+ * Creates a subsystem with the given name.
+ *
  * @param name the name of the subsystem
  */
-Subsystem::Subsystem(const std::string &name) {
+Subsystem::Subsystem(const std::string& name) {
   m_name = name;
   Scheduler::GetInstance()->RegisterSubsystem(this);
 }
 /**
- * Initialize the default command for this subsystem
+ * Initialize the default command for this subsystem.
+ *
  * This is meant to be the place to call SetDefaultCommand in a subsystem and
- * will be called
- * on all the subsystems by the CommandBase method before the program starts
- * running by using
- * the list of all registered Subsystems inside the Scheduler.
+ * will be called on all the subsystems by the CommandBase method before the
+ * program starts running by using the list of all registered Subsystems inside
+ * the Scheduler.
  *
  * This should be overridden by a Subsystem that has a default Command
  */
@@ -36,12 +37,11 @@ void Subsystem::InitDefaultCommand() {}
  * then there will be no default command for the subsystem.
  *
  * <p><b>WARNING:</b> This should <b>NOT</b> be called in a constructor if the
- * subsystem is a
- * singleton.</p>
+ * subsystem is a singleton.</p>
  *
  * @param command the default command (or null if there should be none)
  */
-void Subsystem::SetDefaultCommand(Command *command) {
+void Subsystem::SetDefaultCommand(Command* command) {
   if (command == nullptr) {
     m_defaultCommand = nullptr;
   } else {
@@ -75,9 +75,10 @@ void Subsystem::SetDefaultCommand(Command *command) {
 
 /**
  * Returns the default command (or null if there is none).
+ *
  * @return the default command
  */
-Command *Subsystem::GetDefaultCommand() {
+Command* Subsystem::GetDefaultCommand() {
   if (!m_initializedDefaultCommand) {
     m_initializedDefaultCommand = true;
     InitDefaultCommand();
@@ -86,27 +87,29 @@ Command *Subsystem::GetDefaultCommand() {
 }
 
 /**
- * Sets the current command
+ * Sets the current command.
+ *
  * @param command the new current command
  */
-void Subsystem::SetCurrentCommand(Command *command) {
+void Subsystem::SetCurrentCommand(Command* command) {
   m_currentCommand = command;
   m_currentCommandChanged = true;
 }
 
 /**
  * Returns the command which currently claims this subsystem.
+ *
  * @return the command which currently claims this subsystem
  */
-Command *Subsystem::GetCurrentCommand() const { return m_currentCommand; }
+Command* Subsystem::GetCurrentCommand() const { return m_currentCommand; }
 
 /**
  * Call this to alert Subsystem that the current command is actually the
  * command.
+ *
  * Sometimes, the {@link Subsystem} is told that it has no command while the
- * {@link Scheduler}
- * is going through the loop, only to be soon after given a new one.  This will
- * avoid that situation.
+ * {@link Scheduler} is going through the loop, only to be soon after given a
+ * new one.  This will avoid that situation.
  */
 void Subsystem::ConfirmCommand() {
   if (m_currentCommandChanged) {

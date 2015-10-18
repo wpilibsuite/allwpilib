@@ -7,23 +7,21 @@
 
 #pragma once
 
-#include "Counter.h"
 #include <memory>
+#include "Counter.h"
 
 /**
  * Alias for counter class.
  * Implement the gear tooth sensor supplied by FIRST. Currently there is no
- * reverse sensing on
- * the gear tooth sensor, but in future versions we might implement the
- * necessary timing in the
- * FPGA to sense direction.
+ * reverse sensing on the gear tooth sensor, but in future versions we might
+ * implement the necessary timing in the FPGA to sense direction.
  */
 class GearTooth : public Counter {
  public:
   /// 55 uSec for threshold
   static constexpr double kGearToothThreshold = 55e-6;
   GearTooth(uint32_t channel, bool directionSensitive = false);
-  GearTooth(DigitalSource *source, bool directionSensitive = false);
+  GearTooth(DigitalSource* source, bool directionSensitive = false);
   GearTooth(std::shared_ptr<DigitalSource> source,
             bool directionSensitive = false);
   virtual ~GearTooth() = default;

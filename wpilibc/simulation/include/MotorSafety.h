@@ -11,14 +11,13 @@
 
 #include <sstream>
 
-class MotorSafety
-{
-public:
-	virtual void SetExpiration(float timeout) = 0;
-	virtual float GetExpiration() const = 0;
-	virtual bool IsAlive() const = 0;
-	virtual void StopMotor() = 0;
-	virtual void SetSafetyEnabled(bool enabled) = 0;
-	virtual bool IsSafetyEnabled() const = 0;
-	virtual void GetDescription(std::ostringstream& desc) const = 0;
+class MotorSafety {
+ public:
+  virtual void SetExpiration(float timeout) = 0;
+  virtual float GetExpiration() const = 0;
+  virtual bool IsAlive() const = 0;
+  virtual void StopMotor() = 0;
+  virtual void SetSafetyEnabled(bool enabled) = 0;
+  virtual bool IsSafetyEnabled() const = 0;
+  virtual void GetDescription(std::ostringstream& desc) const = 0;
 };

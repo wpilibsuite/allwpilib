@@ -10,8 +10,8 @@
 #include <DigitalOutput.h>
 #include <InterruptableSensorBase.h>
 #include <Timer.h>
-#include "gtest/gtest.h"
 #include "TestBench.h"
+#include "gtest/gtest.h"
 
 static const double kCounterTime = 0.001;
 
@@ -26,8 +26,8 @@ static const double kSynchronousInterruptTimeTolerance = 0.01;
  */
 class DIOLoopTest : public testing::Test {
  protected:
-  DigitalInput *m_input;
-  DigitalOutput *m_output;
+  DigitalInput* m_input;
+  DigitalOutput* m_output;
 
   virtual void SetUp() override {
     m_input = new DigitalInput(TestBench::kLoop1InputChannel);
@@ -70,15 +70,16 @@ TEST_F(DIOLoopTest, DIOPWM) {
   EXPECT_FALSE(m_input->Get()) << "The digital output was turned off, but "
                                << "the digital input is on.";
 
-  //Set frequency to 2.0 Hz
+  // Set frequency to 2.0 Hz
   m_output->SetPWMRate(2.0);
-  //Enable PWM, but leave it off
+  // Enable PWM, but leave it off
   m_output->EnablePWM(0.0);
   Wait(0.5);
   m_output->UpdateDutyCycle(0.5);
   m_input->RequestInterrupts();
   m_input->SetUpSourceEdge(false, true);
-  InterruptableSensorBase::WaitResult result = m_input->WaitForInterrupt(3.0, true);
+  InterruptableSensorBase::WaitResult result =
+      m_input->WaitForInterrupt(3.0, true);
 
   Wait(0.5);
   bool firstCycle = m_input->Get();
@@ -101,7 +102,7 @@ TEST_F(DIOLoopTest, DIOPWM) {
   bool secondAfterStop = m_input->Get();
 
   EXPECT_EQ(InterruptableSensorBase::WaitResult::kFallingEdge, result)
-                                  << "WaitForInterrupt was not falling.";
+      << "WaitForInterrupt was not falling.";
 
   EXPECT_FALSE(firstCycle) << "Input not low after first delay";
   EXPECT_TRUE(secondCycle) << "Input not high after second delay";
@@ -136,8 +137,8 @@ TEST_F(DIOLoopTest, FakeCounter) {
   EXPECT_EQ(100, counter.Get()) << "Counter did not count up to 100.";
 }
 
-static void InterruptHandler(uint32_t interruptAssertedMask, void *param) {
-  *(int *)param = 12345;
+static void InterruptHandler(uint32_t interruptAssertedMask, void* param) {
+  *(int*)param = 12345;
 }
 
 TEST_F(DIOLoopTest, AsynchronousInterruptWorks) {
@@ -157,8 +158,8 @@ TEST_F(DIOLoopTest, AsynchronousInterruptWorks) {
   EXPECT_EQ(12345, param) << "The interrupt did not run.";
 }
 
-static void *InterruptTriggerer(void *data) {
-  DigitalOutput *output = static_cast<DigitalOutput *>(data);
+static void* InterruptTriggerer(void* data) {
+  DigitalOutput* output = static_cast<DigitalOutput*>(data);
   output->Set(false);
   Wait(kSynchronousInterruptTime);
   output->Set(true);
@@ -171,7 +172,8 @@ TEST_F(DIOLoopTest, SynchronousInterruptWorks) {
 
   // If we have another thread trigger the interrupt in a few seconds
   pthread_t interruptTriggererLoop;
-  pthread_create(&interruptTriggererLoop, nullptr, InterruptTriggerer, m_output);
+  pthread_create(&interruptTriggererLoop, nullptr, InterruptTriggerer,
+                 m_output);
 
   // Then this thread should pause and resume after that number of seconds
   Timer timer;

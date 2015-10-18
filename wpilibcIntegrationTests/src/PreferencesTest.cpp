@@ -7,11 +7,11 @@
 
 #include <Preferences.h>
 #include <Timer.h>
-#include "gtest/gtest.h"
 #include <cstdio>
 #include <fstream>
+#include "gtest/gtest.h"
 
-static const char *kFileName = "networktables.ini";
+static const char* kFileName = "networktables.ini";
 static const double kSaveTime = 1.2;
 
 /**
@@ -23,17 +23,23 @@ TEST(PreferencesTest, ReadPreferencesFromFile) {
   std::remove(kFileName);
   std::ofstream preferencesFile(kFileName);
   preferencesFile << "[NetworkTables Storage 3.0]" << std::endl;
-  preferencesFile << "string \"/Preferences/testFileGetString\"=\"Hello, preferences file\""
-                  << std::endl;
+  preferencesFile
+      << "string \"/Preferences/testFileGetString\"=\"Hello, preferences file\""
+      << std::endl;
   preferencesFile << "double \"/Preferences/testFileGetInt\"=1" << std::endl;
-  preferencesFile << "double \"/Preferences/testFileGetDouble\"=0.5" << std::endl;
-  preferencesFile << "double \"/Preferences/testFileGetFloat\"=0.25" << std::endl;
-  preferencesFile << "boolean \"/Preferences/testFileGetBoolean\"=true" << std::endl;
-  preferencesFile << "double \"/Preferences/testFileGetLong\"=1000000000000000000" << std::endl;
+  preferencesFile << "double \"/Preferences/testFileGetDouble\"=0.5"
+                  << std::endl;
+  preferencesFile << "double \"/Preferences/testFileGetFloat\"=0.25"
+                  << std::endl;
+  preferencesFile << "boolean \"/Preferences/testFileGetBoolean\"=true"
+                  << std::endl;
+  preferencesFile
+      << "double \"/Preferences/testFileGetLong\"=1000000000000000000"
+      << std::endl;
   preferencesFile.close();
   NetworkTable::Initialize();
 
-  Preferences *preferences = Preferences::GetInstance();
+  Preferences* preferences = Preferences::GetInstance();
   EXPECT_EQ("Hello, preferences file",
             preferences->GetString("testFileGetString"));
   EXPECT_EQ(1, preferences->GetInt("testFileGetInt"));
@@ -52,7 +58,7 @@ TEST(PreferencesTest, WritePreferencesToFile) {
   NetworkTable::GlobalDeleteAll();
   std::remove(kFileName);
   NetworkTable::Initialize();
-  Preferences *preferences = Preferences::GetInstance();
+  Preferences* preferences = Preferences::GetInstance();
   preferences->PutString("testFilePutString", "Hello, preferences file");
   preferences->PutInt("testFilePutInt", 1);
   preferences->PutDouble("testFilePutDouble", 0.5);
@@ -63,7 +69,7 @@ TEST(PreferencesTest, WritePreferencesToFile) {
 
   Wait(kSaveTime);
 
-  static char const *kExpectedFileContents[] = {
+  static char const* kExpectedFileContents[] = {
       "[NetworkTables Storage 3.0]",
       "boolean \"/Preferences/testFilePutBoolean\"=true",
       "double \"/Preferences/testFilePutDouble\"=0.5",

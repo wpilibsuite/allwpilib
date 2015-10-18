@@ -11,18 +11,17 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
-#include "GenericHID.h"
 #include "ErrorBase.h"
+#include "GenericHID.h"
 
 class DriverStation;
 
 /**
  * Handle input from standard Joysticks connected to the Driver Station.
  * This class handles standard input that comes from the Driver Station. Each
- * time a value is requested
- * the most recent value is returned. There is a single class instance for each
- * joystick and the mapping
- * of ports to hardware buttons depends on the code in the driver station.
+ * time a value is requested the most recent value is returned. There is a
+ * single class instance for each joystick and the mapping of ports to hardware
+ * buttons depends on the code in the driver station.
  */
 class Joystick : public GenericHID, public ErrorBase {
  public:
@@ -86,7 +85,7 @@ class Joystick : public GenericHID, public ErrorBase {
   virtual bool GetRawButton(uint32_t button) const override;
   virtual int GetPOV(uint32_t pov = 0) const override;
   bool GetButton(ButtonType button) const;
-  static Joystick *GetStickForPort(uint32_t port);
+  static Joystick* GetStickForPort(uint32_t port);
 
   virtual float GetMagnitude() const;
   virtual float GetDirectionRadians() const;
@@ -106,7 +105,7 @@ class Joystick : public GenericHID, public ErrorBase {
   void SetOutputs(uint32_t value);
 
  private:
-  DriverStation &m_ds;
+  DriverStation& m_ds;
   uint32_t m_port;
   std::vector<uint32_t> m_axes;
   std::vector<uint32_t> m_buttons;

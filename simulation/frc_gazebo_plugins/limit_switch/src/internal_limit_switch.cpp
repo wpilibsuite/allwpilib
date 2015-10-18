@@ -7,7 +7,8 @@
 
 #include "internal_limit_switch.h"
 
-InternalLimitSwitch::InternalLimitSwitch(physics::ModelPtr model, sdf::ElementPtr sdf) {
+InternalLimitSwitch::InternalLimitSwitch(physics::ModelPtr model,
+                                         sdf::ElementPtr sdf) {
   joint = model->GetJoint(sdf->Get<std::string>("joint"));
   min = sdf->Get<double>("min");
   max = sdf->Get<double>("max");
@@ -18,8 +19,9 @@ InternalLimitSwitch::InternalLimitSwitch(physics::ModelPtr model, sdf::ElementPt
     radians = true;
   }
 
-  gzmsg << "\tinternal limit switch: " << " type=" << joint->GetName()
-        << " range=[" << min << "," << max << "] radians=" << radians << std::endl;
+  gzmsg << "\tinternal limit switch: "
+        << " type=" << joint->GetName() << " range=[" << min << "," << max
+        << "] radians=" << radians << std::endl;
 }
 
 InternalLimitSwitch::~InternalLimitSwitch() {}

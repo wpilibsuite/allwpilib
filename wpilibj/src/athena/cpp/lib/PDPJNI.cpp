@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "edu_wpi_first_wpilibj_hal_PDPJNI.h"
 #include "HAL/PDP.hpp"
 #include "HALUtil.h"
+#include "edu_wpi_first_wpilibj_hal_PDPJNI.h"
 
 extern "C" {
 
@@ -16,22 +16,21 @@ extern "C" {
  * Method:    getPDPTemperature
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_initializePDP
-  (JNIEnv *, jclass, jint module)
-{
-	initializePDP(module);
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_initializePDP(
+    JNIEnv *, jclass, jint module) {
+  initializePDP(module);
 }
-  
+
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PDPJNI
  * Method:    getPDPTemperature
  * Signature: (I)D
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTemperature
-  (JNIEnv *env, jclass, jint module)
-{
-	int32_t status = 0;
-	double temperature = getPDPTemperature(module, &status);
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTemperature(
+    JNIEnv *env, jclass, jint module) {
+  int32_t status = 0;
+  double temperature = getPDPTemperature(module, &status);
   CheckStatus(env, status, false);
   return temperature;
 }
@@ -41,11 +40,10 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTemperatur
  * Method:    getPDPVoltage
  * Signature: (I)D
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPVoltage
-  (JNIEnv *env, jclass, jint module)
-{
-	int32_t status = 0;
-	double voltage = getPDPVoltage(module, &status);
+JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPVoltage(
+    JNIEnv *env, jclass, jint module) {
+  int32_t status = 0;
+  double voltage = getPDPVoltage(module, &status);
   CheckStatus(env, status, false);
   return voltage;
 }
@@ -55,11 +53,11 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPVoltage
  * Method:    getPDPChannelCurrent
  * Signature: (BI)D
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPChannelCurrent
-  (JNIEnv *env, jclass, jbyte channel, jint module)
-{
-	int32_t status = 0;
-	double current = getPDPChannelCurrent(module, channel, &status);
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPChannelCurrent(
+    JNIEnv *env, jclass, jbyte channel, jint module) {
+  int32_t status = 0;
+  double current = getPDPChannelCurrent(module, channel, &status);
   CheckStatus(env, status, false);
   return current;
 }
@@ -69,11 +67,11 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPChannelCur
  * Method:    getPDPTotalCurrent
  * Signature: (I)D
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalCurrent
-  (JNIEnv *env, jclass, jint module)
-{
-	int32_t status = 0;
-	double current = getPDPTotalCurrent(module, &status);
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalCurrent(
+    JNIEnv *env, jclass, jint module) {
+  int32_t status = 0;
+  double current = getPDPTotalCurrent(module, &status);
   CheckStatus(env, status, false);
   return current;
 }
@@ -83,11 +81,11 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalCurre
  * Method:    getPDPTotalPower
  * Signature: (I)D
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalPower
-  (JNIEnv *env, jclass, jint module)
-{
-	int32_t status = 0;
-	double power = getPDPTotalPower(module, &status);
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalPower(
+    JNIEnv *env, jclass, jint module) {
+  int32_t status = 0;
+  double power = getPDPTotalPower(module, &status);
   CheckStatus(env, status, false);
   return power;
 }
@@ -97,26 +95,25 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalPower
  * Method:    resetPDPTotalEnergy
  * Signature: (I)D
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalEnergy
-  (JNIEnv *env, jclass, jint module)
-{
-	int32_t status = 0;
-	double energy = getPDPTotalEnergy(module, &status);
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalEnergy(
+    JNIEnv *env, jclass, jint module) {
+  int32_t status = 0;
+  double energy = getPDPTotalEnergy(module, &status);
   CheckStatus(env, status, false);
   return energy;
 }
-
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PDPJNI
  * Method:    resetPDPTotalEnergy
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_resetPDPTotalEnergy
-  (JNIEnv *env, jclass, jint module)
-{
-	int32_t status = 0;
-	resetPDPTotalEnergy(module, &status);
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_PDPJNI_resetPDPTotalEnergy(
+    JNIEnv *env, jclass, jint module) {
+  int32_t status = 0;
+  resetPDPTotalEnergy(module, &status);
   CheckStatus(env, status, false);
 }
 
@@ -125,11 +122,11 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_resetPDPTotalEnergy
  * Method:    clearStickyFaults
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_clearPDPStickyFaults
-  (JNIEnv *env, jclass, jint module)
-{
-	int32_t status = 0;
-	clearPDPStickyFaults(module, &status);
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_PDPJNI_clearPDPStickyFaults(
+    JNIEnv *env, jclass, jint module) {
+  int32_t status = 0;
+  clearPDPStickyFaults(module, &status);
   CheckStatus(env, status, false);
 }
 

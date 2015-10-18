@@ -12,20 +12,18 @@
 std::unique_ptr<Resource> InterruptableSensorBase::m_interrupts =
     std::make_unique<Resource>(interrupt_kNumSystems);
 
-InterruptableSensorBase::InterruptableSensorBase() {
-}
+InterruptableSensorBase::InterruptableSensorBase() {}
 
 /**
-* Request one of the 8 interrupts asynchronously on this digital input.
-* Request interrupts in asynchronous mode where the user's interrupt handler
-* will be
-* called when the interrupt fires. Users that want control over the thread
-* priority
-* should use the synchronous method with their own spawned thread.
-* The default is interrupt on rising edges only.
-*/
+ * Request one of the 8 interrupts asynchronously on this digital input.
+ *
+ * Request interrupts in asynchronous mode where the user's interrupt handler
+ * will be called when the interrupt fires. Users that want control over the
+ * thread priority should use the synchronous method with their own spawned
+ * thread. The default is interrupt on rising edges only.
+ */
 void InterruptableSensorBase::RequestInterrupts(
-    InterruptHandlerFunction handler, void *param) {
+    InterruptHandlerFunction handler, void* param) {
   if (StatusIsFatal()) return;
   uint32_t index = m_interrupts->Allocate("Async Interrupt");
   if (index == std::numeric_limits<uint32_t>::max()) {
@@ -46,12 +44,12 @@ void InterruptableSensorBase::RequestInterrupts(
 }
 
 /**
-* Request one of the 8 interrupts synchronously on this digital input.
-* Request interrupts in synchronous mode where the user program will have to
-* explicitly
-* wait for the interrupt to occur using WaitForInterrupt.
-* The default is interrupt on rising edges only.
-*/
+ * Request one of the 8 interrupts synchronously on this digital input.
+ *
+ * Request interrupts in synchronous mode where the user program will have to
+ * explicitly wait for the interrupt to occur using WaitForInterrupt.
+ * The default is interrupt on rising edges only.
+ */
 void InterruptableSensorBase::RequestInterrupts() {
   if (StatusIsFatal()) return;
   uint32_t index = m_interrupts->Allocate("Sync Interrupt");
@@ -80,6 +78,7 @@ void InterruptableSensorBase::AllocateInterrupts(bool watcher) {
 
 /**
  * Cancel interrupts on this device.
+ *
  * This deallocates all the chipobject structures and disables any interrupts.
  */
 void InterruptableSensorBase::CancelInterrupts() {
@@ -93,14 +92,15 @@ void InterruptableSensorBase::CancelInterrupts() {
 }
 
 /**
- * In synchronous mode, wait for the defined interrupt to occur. You should
- * <b>NOT</b> attempt to read the
- * sensor from another thread while waiting for an interrupt. This is not
- * threadsafe, and can cause
- * memory corruption
- * @param timeout Timeout in seconds
+ * In synchronous mode, wait for the defined interrupt to occur.
+ *
+ * You should <b>NOT</b> attempt to read the sensor from another thread while
+ * waiting for an interrupt. This is not threadsafe, and can cause memory
+ * corruption
+ *
+ * @param timeout        Timeout in seconds
  * @param ignorePrevious If true, ignore interrupts that happened before
- * WaitForInterrupt was called.
+ *                       WaitForInterrupt was called.
  * @return What interrupts fired
  */
 InterruptableSensorBase::WaitResult InterruptableSensorBase::WaitForInterrupt(
@@ -118,9 +118,10 @@ InterruptableSensorBase::WaitResult InterruptableSensorBase::WaitForInterrupt(
 
 /**
  * Enable interrupts to occur on this input.
+ *
  * Interrupts are disabled when the RequestInterrupt call is made. This gives
- * time to do the
- * setup of the other options before starting to field interrupts.
+ * time to do the setup of the other options before starting to field
+ * interrupts.
  */
 void InterruptableSensorBase::EnableInterrupts() {
   if (StatusIsFatal()) return;
@@ -143,9 +144,11 @@ void InterruptableSensorBase::DisableInterrupts() {
 
 /**
  * Return the timestamp for the rising interrupt that occurred most recently.
+ *
  * This is in the same time domain as GetClock().
  * The rising-edge interrupt should be enabled with
  * {@link #DigitalInput.SetUpSourceEdge}
+ *
  * @return Timestamp in seconds since boot.
  */
 double InterruptableSensorBase::ReadRisingTimestamp() {
@@ -159,9 +162,11 @@ double InterruptableSensorBase::ReadRisingTimestamp() {
 
 /**
  * Return the timestamp for the falling interrupt that occurred most recently.
+ *
  * This is in the same time domain as GetClock().
  * The falling-edge interrupt should be enabled with
  * {@link #DigitalInput.SetUpSourceEdge}
+ *
  * @return Timestamp in seconds since boot.
 */
 double InterruptableSensorBase::ReadFallingTimestamp() {
@@ -176,10 +181,8 @@ double InterruptableSensorBase::ReadFallingTimestamp() {
 /**
  * Set which edge to trigger interrupts on
  *
- * @param risingEdge
- *            true to interrupt on rising edge
- * @param fallingEdge
- *            true to interrupt on falling edge
+ * @param risingEdge  true to interrupt on rising edge
+ * @param fallingEdge true to interrupt on falling edge
  */
 void InterruptableSensorBase::SetUpSourceEdge(bool risingEdge,
                                               bool fallingEdge) {

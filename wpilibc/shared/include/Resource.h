@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "ErrorBase.h"
 #include <stdint.h>
 #include <memory>
 #include <vector>
+#include "ErrorBase.h"
 
 #include "HAL/cpp/priority_mutex.h"
 
@@ -30,10 +30,11 @@ class Resource : public ErrorBase {
   Resource(const Resource&) = delete;
   Resource& operator=(const Resource&) = delete;
 
-  static void CreateResourceObject(std::unique_ptr<Resource>& r, uint32_t elements);
+  static void CreateResourceObject(std::unique_ptr<Resource>& r,
+                                   uint32_t elements);
   explicit Resource(uint32_t size);
-  uint32_t Allocate(const std::string &resourceDesc);
-  uint32_t Allocate(uint32_t index, const std::string &resourceDesc);
+  uint32_t Allocate(const std::string& resourceDesc);
+  uint32_t Allocate(uint32_t index, const std::string& resourceDesc);
   void Free(uint32_t index);
 
  private:

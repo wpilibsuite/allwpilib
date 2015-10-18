@@ -10,8 +10,8 @@
 
 #include "Commands/Subsystem.h"
 #include "PIDController.h"
-#include "PIDSource.h"
 #include "PIDOutput.h"
+#include "PIDSource.h"
 
 #include <memory>
 
@@ -21,17 +21,15 @@
  * an elevator which attempts to stay at a constant height).
  *
  * <p>It provides some convenience methods to run an internal {@link
- * PIDController}.
- * It also allows access to the internal {@link PIDController} in order to give
- * total control
- * to the programmer.</p>
+ * PIDController}. It also allows access to the internal {@link PIDController}
+ * in order to give total control to the programmer.</p>
  *
  */
 class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
  public:
-  PIDSubsystem(const std::string &name, double p, double i, double d);
-  PIDSubsystem(const std::string &name, double p, double i, double d, double f);
-  PIDSubsystem(const std::string &name, double p, double i, double d, double f,
+  PIDSubsystem(const std::string& name, double p, double i, double d);
+  PIDSubsystem(const std::string& name, double p, double i, double d, double f);
+  PIDSubsystem(const std::string& name, double p, double i, double d, double f,
                double period);
   PIDSubsystem(double p, double i, double d);
   PIDSubsystem(double p, double i, double d, double f);

@@ -60,13 +60,13 @@ class SPI : public SensorBase {
   int64_t GetAccumulatorValue() const;
   uint32_t GetAccumulatorCount() const;
   double GetAccumulatorAverage() const;
-  void GetAccumulatorOutput(int64_t &value, uint32_t &count) const;
+  void GetAccumulatorOutput(int64_t& value, uint32_t& count) const;
 
  protected:
   uint8_t m_port;
-  bool m_msbFirst = false; // default little-endian
-  bool m_sampleOnTrailing = false; // default data updated on falling edge
-  bool m_clk_idle_high = false; // default clock active high
+  bool m_msbFirst = false;          // default little-endian
+  bool m_sampleOnTrailing = false;  // default data updated on falling edge
+  bool m_clk_idle_high = false;     // default clock active high
 
  private:
   void Init();

@@ -26,16 +26,16 @@ class I2C : SensorBase {
   I2C(const I2C&) = delete;
   I2C& operator=(const I2C&) = delete;
 
-  bool Transaction(uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived,
+  bool Transaction(uint8_t* dataToSend, uint8_t sendSize, uint8_t* dataReceived,
                    uint8_t receiveSize);
   bool AddressOnly();
   bool Write(uint8_t registerAddress, uint8_t data);
-  bool WriteBulk(uint8_t *data, uint8_t count);
-  bool Read(uint8_t registerAddress, uint8_t count, uint8_t *data);
-  bool ReadOnly(uint8_t count, uint8_t *buffer);
+  bool WriteBulk(uint8_t* data, uint8_t count);
+  bool Read(uint8_t registerAddress, uint8_t count, uint8_t* data);
+  bool ReadOnly(uint8_t count, uint8_t* buffer);
   void Broadcast(uint8_t registerAddress, uint8_t data);
   bool VerifySensor(uint8_t registerAddress, uint8_t count,
-                    const uint8_t *expected);
+                    const uint8_t* expected);
 
  private:
   Port m_port;

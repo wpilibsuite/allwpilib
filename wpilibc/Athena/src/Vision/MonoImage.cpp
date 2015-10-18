@@ -14,18 +14,20 @@ MonoImage::MonoImage() : ImageBase(IMAQ_IMAGE_U8) {}
 
 /**
  * Look for ellipses in an image.
+ *
  * Given some input parameters, look for any number of ellipses in an image.
- * @param ellipseDescriptor Ellipse descriptor
- * @param curveOptions Curve options
+ *
+ * @param ellipseDescriptor     Ellipse descriptor
+ * @param curveOptions          Curve options
  * @param shapeDetectionOptions Shape detection options
- * @param roi Region of Interest
+ * @param roi                   Region of Interest
  * @returns a vector of EllipseMatch structures (0 length vector on no match)
  */
-vector<EllipseMatch> *MonoImage::DetectEllipses(
-    EllipseDescriptor *ellipseDescriptor, CurveOptions *curveOptions,
-    ShapeDetectionOptions *shapeDetectionOptions, ROI *roi) {
+vector<EllipseMatch>* MonoImage::DetectEllipses(
+    EllipseDescriptor* ellipseDescriptor, CurveOptions* curveOptions,
+    ShapeDetectionOptions* shapeDetectionOptions, ROI* roi) {
   int numberOfMatches;
-  EllipseMatch *e =
+  EllipseMatch* e =
       imaqDetectEllipses(m_imaqImage, ellipseDescriptor, curveOptions,
                          shapeDetectionOptions, roi, &numberOfMatches);
   auto ellipses = new vector<EllipseMatch>;
@@ -39,9 +41,9 @@ vector<EllipseMatch> *MonoImage::DetectEllipses(
   return ellipses;
 }
 
-vector<EllipseMatch> *MonoImage::DetectEllipses(
-    EllipseDescriptor *ellipseDescriptor) {
-  vector<EllipseMatch> *ellipses =
+vector<EllipseMatch>* MonoImage::DetectEllipses(
+    EllipseDescriptor* ellipseDescriptor) {
+  vector<EllipseMatch>* ellipses =
       DetectEllipses(ellipseDescriptor, nullptr, nullptr, nullptr);
   return ellipses;
 }

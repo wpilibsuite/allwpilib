@@ -10,8 +10,8 @@
 #include <AnalogTrigger.h>
 #include <Counter.h>
 #include <Timer.h>
-#include "gtest/gtest.h"
 #include "TestBench.h"
+#include "gtest/gtest.h"
 
 static const double kDelayTime = 0.01;
 
@@ -20,8 +20,8 @@ static const double kDelayTime = 0.01;
  */
 class AnalogLoopTest : public testing::Test {
  protected:
-  AnalogInput *m_input;
-  AnalogOutput *m_output;
+  AnalogInput* m_input;
+  AnalogOutput* m_output;
 
   virtual void SetUp() override {
     m_input = new AnalogInput(TestBench::kFakeAnalogOutputChannel);
@@ -102,8 +102,8 @@ TEST_F(AnalogLoopTest, AnalogTriggerCounterWorks) {
       << "Analog trigger counter did not count 50 ticks";
 }
 
-static void InterruptHandler(uint32_t interruptAssertedMask, void *param) {
-  *(int *)param = 12345;
+static void InterruptHandler(uint32_t interruptAssertedMask, void* param) {
+  *(int*)param = 12345;
 }
 
 TEST_F(AnalogLoopTest, AsynchronusInterruptWorks) {
@@ -112,7 +112,8 @@ TEST_F(AnalogLoopTest, AsynchronusInterruptWorks) {
   trigger.SetLimitsVoltage(2.0f, 3.0f);
 
   // Given an interrupt handler that sets an int to 12345
-  std::shared_ptr<AnalogTriggerOutput> triggerOutput = trigger.CreateOutput(kState);
+  std::shared_ptr<AnalogTriggerOutput> triggerOutput =
+      trigger.CreateOutput(kState);
   triggerOutput->RequestInterrupts(InterruptHandler, &param);
   triggerOutput->EnableInterrupts();
 

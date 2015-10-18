@@ -14,54 +14,41 @@
  *
  * @param channel The digital channel (1..14).
  */
-DigitalInput::DigitalInput(uint32_t channel)
-{
-	char buf[64];
-	m_channel = channel;
-	int n = sprintf(buf, "dio/%d", channel);
-	m_impl = new SimDigitalInput(buf);
+DigitalInput::DigitalInput(uint32_t channel) {
+  char buf[64];
+  m_channel = channel;
+  int n = sprintf(buf, "dio/%d", channel);
+  m_impl = new SimDigitalInput(buf);
 }
 
-/*
+/**
  * Get the value from a digital input channel.
  * Retrieve the value of a single digital input channel from the FPGA.
  */
-uint32_t DigitalInput::Get() const
-{
-	return m_impl->Get();
-}
+uint32_t DigitalInput::Get() const { return m_impl->Get(); }
 
 /**
  * @return The GPIO channel number that this object represents.
  */
-uint32_t DigitalInput::GetChannel() const
-{
-	return m_channel;
-}
+uint32_t DigitalInput::GetChannel() const { return m_channel; }
 
 void DigitalInput::UpdateTable() {
-	if (m_table != nullptr) {
-		m_table->PutBoolean("Value", Get());
-	}
+  if (m_table != nullptr) {
+    m_table->PutBoolean("Value", Get());
+  }
 }
 
-void DigitalInput::StartLiveWindowMode() {
+void DigitalInput::StartLiveWindowMode() {}
 
-}
-
-void DigitalInput::StopLiveWindowMode() {
-
-}
+void DigitalInput::StopLiveWindowMode() {}
 
 std::string DigitalInput::GetSmartDashboardType() const {
-	return "DigitalInput";
+  return "DigitalInput";
 }
 
 void DigitalInput::InitTable(std::shared_ptr<ITable> subTable) {
-	m_table = subTable;
-	UpdateTable();
+  m_table = subTable;
+  UpdateTable();
 }
 
-std::shared_ptr<ITable> DigitalInput::GetTable() const {
-	return m_table;
-}
+std::shared_ptr<ITable> DigitalInput::GetTable() const { return m_table; }

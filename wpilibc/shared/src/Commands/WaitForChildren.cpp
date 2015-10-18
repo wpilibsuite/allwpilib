@@ -11,7 +11,7 @@
 WaitForChildren::WaitForChildren(double timeout)
     : Command("WaitForChildren", timeout) {}
 
-WaitForChildren::WaitForChildren(const std::string &name, double timeout)
+WaitForChildren::WaitForChildren(const std::string& name, double timeout)
     : Command(name, timeout) {}
 
 void WaitForChildren::Initialize() {}

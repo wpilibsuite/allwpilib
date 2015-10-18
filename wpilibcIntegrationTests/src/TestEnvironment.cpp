@@ -42,5 +42,5 @@ class TestEnvironment : public testing::Environment {
   virtual void TearDown() override {}
 };
 
-testing::Environment *const environment =
+testing::Environment* const environment =
     testing::AddGlobalTestEnvironment(new TestEnvironment);

@@ -22,8 +22,8 @@ class CANSpeedController : public SpeedController {
     kSpeed = 2,
     kPosition = 3,
     kVoltage = 4,
-    kFollower = 5, // Not supported in Jaguar.
-    kMotionProfile = 6, // Not supported in Jaguar.
+    kFollower = 5,       // Not supported in Jaguar.
+    kMotionProfile = 6,  // Not supported in Jaguar.
   };
 
   // Helper function for the ControlMode enum
@@ -97,6 +97,6 @@ class CANSpeedController : public SpeedController {
   virtual void ConfigMaxOutputVoltage(double voltage) = 0;
   virtual void ConfigFaultTime(float faultTime) = 0;
   // Hold off on interface until we figure out ControlMode enums.
-  //	virtual void SetControlMode(ControlMode mode) = 0;
-  //	virtual ControlMode GetControlMode() const = 0;
+  // virtual void SetControlMode(ControlMode mode) = 0;
+  // virtual ControlMode GetControlMode() const = 0;
 };

@@ -7,10 +7,10 @@
 
 #include "SensorBase.h"
 
-#include "NetworkCommunication/LoadOut.h"
-#include "WPIErrors.h"
 #include "HAL/HAL.hpp"
 #include "HAL/Port.h"
+#include "NetworkCommunication/LoadOut.h"
+#include "WPIErrors.h"
 
 const uint32_t SensorBase::kDigitalChannels;
 const uint32_t SensorBase::kAnalogInputs;
@@ -60,6 +60,7 @@ SensorBase::SensorBase() {
 
 /**
  * Add sensor to the singleton list.
+ *
  * Add this sensor to the list of singletons that need to be deleted when
  * the robot program exits. Each of the sensors on this list are singletons,
  * that is they aren't allocated directly with new, but instead are allocated
@@ -75,6 +76,7 @@ void SensorBase::AddToSingletonList() {
 
 /**
  * Delete all the singleton classes on the list.
+ *
  * All the classes that were allocated as singletons need to be deleted so
  * their resources can be freed.
  */
@@ -99,9 +101,9 @@ bool SensorBase::CheckSolenoidModule(uint8_t moduleNumber) {
 
 /**
  * Check that the digital channel number is valid.
+ *
  * Verify that the channel number is one of the legal channel numbers. Channel
- * numbers are
- * 1-based.
+ * numbers are 1-based.
  *
  * @return Digital channel is valid
  */
@@ -112,9 +114,9 @@ bool SensorBase::CheckDigitalChannel(uint32_t channel) {
 
 /**
  * Check that the digital channel number is valid.
+ *
  * Verify that the channel number is one of the legal channel numbers. Channel
- * numbers are
- * 1-based.
+ * numbers are 1-based.
  *
  * @return Relay channel is valid
  */
@@ -125,9 +127,9 @@ bool SensorBase::CheckRelayChannel(uint32_t channel) {
 
 /**
  * Check that the digital channel number is valid.
+ *
  * Verify that the channel number is one of the legal channel numbers. Channel
- * numbers are
- * 1-based.
+ * numbers are 1-based.
  *
  * @return PWM channel is valid
  */
@@ -138,9 +140,9 @@ bool SensorBase::CheckPWMChannel(uint32_t channel) {
 
 /**
  * Check that the analog input number is value.
+ *
  * Verify that the analog input number is one of the legal channel numbers.
- * Channel numbers
- * are 0-based.
+ * Channel numbers are 0-based.
  *
  * @return Analog channel is valid
  */
@@ -151,9 +153,9 @@ bool SensorBase::CheckAnalogInput(uint32_t channel) {
 
 /**
  * Check that the analog output number is valid.
+ *
  * Verify that the analog output number is one of the legal channel numbers.
- * Channel numbers
- * are 0-based.
+ * Channel numbers are 0-based.
  *
  * @return Analog channel is valid
  */

@@ -13,8 +13,7 @@
 /**
  * @param channel The PWM channel that the Talon is attached to.
  */
-Talon::Talon(uint32_t channel) : SafePWM(channel)
-{
+Talon::Talon(uint32_t channel) : SafePWM(channel) {
   /* Note that the Talon uses the following bounds for PWM values. These values
    * should work reasonably well for most controllers, but if users experience
    * issues such as asymmetric behavior around the deadband or inability to
@@ -41,38 +40,26 @@ Talon::Talon(uint32_t channel) : SafePWM(channel)
  * The PWM value is set using a range of -1.0 to 1.0, appropriately
  * scaling the value for the FPGA.
  *
- * @param speed The speed value between -1.0 and 1.0 to set.
+ * @param speed     The speed value between -1.0 and 1.0 to set.
  * @param syncGroup Unused interface.
  */
-void Talon::Set(float speed, uint8_t syncGroup)
-{
-	SetSpeed(speed);
-}
+void Talon::Set(float speed, uint8_t syncGroup) { SetSpeed(speed); }
 
 /**
  * Get the recently set value of the PWM.
  *
  * @return The most recently set value for the PWM between -1.0 and 1.0.
  */
-float Talon::Get() const
-{
-	return GetSpeed();
-}
+float Talon::Get() const { return GetSpeed(); }
 
 /**
  * Common interface for disabling a motor.
  */
-void Talon::Disable()
-{
-	SetRaw(kPwmDisabled);
-}
+void Talon::Disable() { SetRaw(kPwmDisabled); }
 
 /**
  * Write out the PID value as seen in the PIDOutput base object.
  *
  * @param output Write out the PWM value as was found in the PIDController
  */
-void Talon::PIDWrite(float output)
-{
-	Set(output);
-}
+void Talon::PIDWrite(float output) { Set(output); }

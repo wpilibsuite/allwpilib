@@ -8,11 +8,11 @@
 #include "CANJaguar.h"
 #include "Timer.h"
 #define tNIRIO_i32 int
+#include <cassert>
+#include <cstdio>
+#include "LiveWindow/LiveWindow.h"
 #include "NetworkCommunication/CANSessionMux.h"
 #include "WPIErrors.h"
-#include <cstdio>
-#include <cassert>
-#include "LiveWindow/LiveWindow.h"
 
 /* we are on ARM-LE now, not Freescale so no need to swap */
 #define swap16(x) (x)
@@ -33,7 +33,7 @@ static const int32_t kReceiveStatusAttempts = 50;
 
 static std::unique_ptr<Resource> allocated;
 
-static int32_t sendMessageHelper(uint32_t messageID, const uint8_t *data,
+static int32_t sendMessageHelper(uint32_t messageID, const uint8_t* data,
                                  uint8_t dataSize, int32_t period) {
   static const uint32_t kTrustedMessages[] = {
       LM_API_VOLT_T_EN,  LM_API_VOLT_T_SET,  LM_API_SPD_T_EN, LM_API_SPD_T_SET,
@@ -151,8 +151,9 @@ void CANJaguar::InitCANJaguar() {
 }
 
 /**
- * Constructor for the CANJaguar device.<br>
- * By default the device is configured in Percent mode.
+ * Constructor for the CANJaguar device.
+ *
+ * <p>By default the device is configured in Percent mode.
  * The control mode can be changed by calling one of the control modes listed
  * below.
  *
@@ -174,8 +175,7 @@ void CANJaguar::InitCANJaguar() {
  * @see CANJaguar#SetVoltageMode(EncoderTag, int)
  * @see CANJaguar#SetVoltageMode(QuadEncoderTag, int)
  */
-CANJaguar::CANJaguar(uint8_t deviceNumber)
-    : m_deviceNumber(deviceNumber) {
+CANJaguar::CANJaguar(uint8_t deviceNumber) : m_deviceNumber(deviceNumber) {
   std::stringstream buf;
   buf << "CANJaguar device number " << m_deviceNumber;
   Resource::CreateResourceObject(allocated, 63);
@@ -229,17 +229,17 @@ uint8_t CANJaguar::getDeviceNumber() const { return m_deviceNumber; }
 /**
  * Sets the output set-point value.
  *
- * The scale and the units depend on the mode the Jaguar is in.<br>
- * In percentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWM
- * Jaguar).<br>
- * In voltage Mode, the outputValue is in volts. <br>
- * In current Mode, the outputValue is in amps. <br>
- * In speed Mode, the outputValue is in rotations/minute.<br>
- * In position Mode, the outputValue is in rotations.
+ * The scale and the units depend on the mode the Jaguar is in.
+ * <p>In percentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWM
+ * Jaguar).
+ * <p>In voltage Mode, the outputValue is in volts.
+ * <p>In current Mode, the outputValue is in amps.
+ * <p>In speed Mode, the outputValue is in rotations/minute.
+ * <p>In position Mode, the outputValue is in rotations.
  *
  * @param outputValue The set-point to sent to the motor controller.
- * @param syncGroup The update group to add this Set() to, pending
- * UpdateSyncGroup().  If 0, update immediately.
+ * @param syncGroup   The update group to add this Set() to, pending
+ *                    UpdateSyncGroup().  If 0, update immediately.
  */
 void CANJaguar::Set(float outputValue, uint8_t syncGroup) {
   uint32_t messageID;
@@ -303,13 +303,13 @@ void CANJaguar::Set(float outputValue, uint8_t syncGroup) {
 /**
  * Get the recently set outputValue setpoint.
  *
- * The scale and the units depend on the mode the Jaguar is in.<br>
- * In percentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWM
- * Jaguar).<br>
- * In voltage Mode, the outputValue is in volts.<br>
- * In current Mode, the outputValue is in amps.<br>
- * In speed Mode, the outputValue is in rotations/minute.<br>
- * In position Mode, the outputValue is in rotations.<br>
+ * The scale and the units depend on the mode the Jaguar is in.
+ * <p>In percentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWM
+ * Jaguar).
+ * <p>In voltage Mode, the outputValue is in volts.
+ * <p>In current Mode, the outputValue is in amps.
+ * <p>In speed Mode, the outputValue is in rotations/minute.
+ * <p>In position Mode, the outputValue is in rotations.
  *
  * @return The most recently set outputValue setpoint.
  */
@@ -328,7 +328,7 @@ void CANJaguar::Disable() { DisableControl(); }
  * @deprecated Call Set instead.
  *
  * @param output Write out the PercentVbus value as was computed by the
- * PIDController
+ *               PIDController
  */
 void CANJaguar::PIDWrite(float output) {
   if (m_controlMode == kPercentVbus) {
@@ -339,59 +339,59 @@ void CANJaguar::PIDWrite(float output) {
   }
 }
 
-uint8_t CANJaguar::packPercentage(uint8_t *buffer, double value) {
+uint8_t CANJaguar::packPercentage(uint8_t* buffer, double value) {
   int16_t intValue = (int16_t)(value * 32767.0);
-  *((int16_t *)buffer) = swap16(intValue);
+  *((int16_t*)buffer) = swap16(intValue);
   return sizeof(int16_t);
 }
 
-uint8_t CANJaguar::packFXP8_8(uint8_t *buffer, double value) {
+uint8_t CANJaguar::packFXP8_8(uint8_t* buffer, double value) {
   int16_t intValue = (int16_t)(value * 256.0);
-  *((int16_t *)buffer) = swap16(intValue);
+  *((int16_t*)buffer) = swap16(intValue);
   return sizeof(int16_t);
 }
 
-uint8_t CANJaguar::packFXP16_16(uint8_t *buffer, double value) {
+uint8_t CANJaguar::packFXP16_16(uint8_t* buffer, double value) {
   int32_t intValue = (int32_t)(value * 65536.0);
-  *((int32_t *)buffer) = swap32(intValue);
+  *((int32_t*)buffer) = swap32(intValue);
   return sizeof(int32_t);
 }
 
-uint8_t CANJaguar::packint16_t(uint8_t *buffer, int16_t value) {
-  *((int16_t *)buffer) = swap16(value);
+uint8_t CANJaguar::packint16_t(uint8_t* buffer, int16_t value) {
+  *((int16_t*)buffer) = swap16(value);
   return sizeof(int16_t);
 }
 
-uint8_t CANJaguar::packint32_t(uint8_t *buffer, int32_t value) {
-  *((int32_t *)buffer) = swap32(value);
+uint8_t CANJaguar::packint32_t(uint8_t* buffer, int32_t value) {
+  *((int32_t*)buffer) = swap32(value);
   return sizeof(int32_t);
 }
 
-double CANJaguar::unpackPercentage(uint8_t *buffer) const {
-  int16_t value = *((int16_t *)buffer);
+double CANJaguar::unpackPercentage(uint8_t* buffer) const {
+  int16_t value = *((int16_t*)buffer);
   value = swap16(value);
   return value / 32767.0;
 }
 
-double CANJaguar::unpackFXP8_8(uint8_t *buffer) const {
-  int16_t value = *((int16_t *)buffer);
+double CANJaguar::unpackFXP8_8(uint8_t* buffer) const {
+  int16_t value = *((int16_t*)buffer);
   value = swap16(value);
   return value / 256.0;
 }
 
-double CANJaguar::unpackFXP16_16(uint8_t *buffer) const {
-  int32_t value = *((int32_t *)buffer);
+double CANJaguar::unpackFXP16_16(uint8_t* buffer) const {
+  int32_t value = *((int32_t*)buffer);
   value = swap32(value);
   return value / 65536.0;
 }
 
-int16_t CANJaguar::unpackint16_t(uint8_t *buffer) const {
-  int16_t value = *((int16_t *)buffer);
+int16_t CANJaguar::unpackint16_t(uint8_t* buffer) const {
+  int16_t value = *((int16_t*)buffer);
   return swap16(value);
 }
 
-int32_t CANJaguar::unpackint32_t(uint8_t *buffer) const {
-  int32_t value = *((int32_t *)buffer);
+int32_t CANJaguar::unpackint32_t(uint8_t* buffer) const {
+  int32_t value = *((int32_t*)buffer);
   return swap32(value);
 }
 
@@ -399,13 +399,13 @@ int32_t CANJaguar::unpackint32_t(uint8_t *buffer) const {
  * Send a message to the Jaguar.
  *
  * @param messageID The messageID to be used on the CAN bus (device number is
- * added internally)
- * @param data The up to 8 bytes of data to be sent with the message
- * @param dataSize Specify how much of the data in "data" to send
- * @param periodic If positive, tell Network Communications to send the message
- * 	every "period" milliseconds.
+ *                  added internally)
+ * @param data      The up to 8 bytes of data to be sent with the message
+ * @param dataSize  Specify how much of the data in "data" to send
+ * @param periodic  If positive, tell Network Communications to send the
+ *                  message every "period" milliseconds.
  */
-void CANJaguar::sendMessage(uint32_t messageID, const uint8_t *data,
+void CANJaguar::sendMessage(uint32_t messageID, const uint8_t* data,
                             uint8_t dataSize, int32_t period) {
   int32_t localStatus =
       sendMessageHelper(messageID | m_deviceNumber, data, dataSize, period);
@@ -419,8 +419,8 @@ void CANJaguar::sendMessage(uint32_t messageID, const uint8_t *data,
  * Request a message from the Jaguar, but don't wait for it to arrive.
  *
  * @param messageID The message to request
- * @param periodic If positive, tell Network Communications to send the message
- * 	every "period" milliseconds.
+ * @param periodic  If positive, tell Network Communications to send the
+ *                  message every "period" milliseconds.
  */
 void CANJaguar::requestMessage(uint32_t messageID, int32_t period) {
   sendMessageHelper(messageID | m_deviceNumber, nullptr, 0, period);
@@ -432,15 +432,15 @@ void CANJaguar::requestMessage(uint32_t messageID, int32_t period) {
  * Jaguar always generates a message with the same message ID when replying.
  *
  * @param messageID The messageID to read from the CAN bus (device number is
- * added internally)
- * @param data The up to 8 bytes of data that was received with the message
- * @param dataSize Indicates how much data was received
+ *                  added internally)
+ * @param data      The up to 8 bytes of data that was received with the message
+ * @param dataSize  Indicates how much data was received
  *
  * @return true if the message was found.  Otherwise, no new message is
- * available.
+ *         available.
  */
 bool CANJaguar::getMessage(uint32_t messageID, uint32_t messageMask,
-                           uint8_t *data, uint8_t *dataSize) const {
+                           uint8_t* data, uint8_t* dataSize) const {
   uint32_t targetedMessageID = messageID | m_deviceNumber;
   int32_t status = 0;
   uint32_t timeStamp;
@@ -955,7 +955,7 @@ void CANJaguar::SetSpeedReference(uint8_t reference) {
  * Get the reference source device for speed controller mode.
  *
  * @return A speed reference indicating the currently selected reference device
- * for speed controller mode.
+ *         for speed controller mode.
  */
 uint8_t CANJaguar::GetSpeedReference() const { return m_speedReference; }
 
@@ -1164,7 +1164,7 @@ double CANJaguar::GetD() const {
  * encoder state.
  *
  * @param encoderInitialPosition Encoder position to set if position with
- * encoder reference.  Ignored otherwise.
+ *                               encoder reference.  Ignored otherwise.
  */
 void CANJaguar::EnableControl(double encoderInitialPosition) {
   uint8_t dataBuffer[8];
@@ -1232,9 +1232,10 @@ void CANJaguar::DisableControl() {
 
 /**
  * Enable controlling the motor voltage as a percentage of the bus voltage
- * without any position or speed feedback.<br>
- * After calling this you must call {@link CANJaguar#EnableControl()} or {@link
- * CANJaguar#EnableControl(double)} to enable the device.
+ * without any position or speed feedback.
+ *
+ * <p>After calling this you must call {@link CANJaguar#EnableControl()} or
+ * {@link CANJaguar#EnableControl(double)} to enable the device.
  */
 void CANJaguar::SetPercentMode() {
   SetControlMode(kPercentVbus);
@@ -1244,11 +1245,12 @@ void CANJaguar::SetPercentMode() {
 
 /**
  * Enable controlling the motor voltage as a percentage of the bus voltage,
- * and enable speed sensing from a non-quadrature encoder.<br>
- * After calling this you must call {@link CANJaguar#EnableControl()} or {@link
- * CANJaguar#EnableControl(double)} to enable the device.
+ * and enable speed sensing from a non-quadrature encoder.
  *
- * @param tag The constant CANJaguar::Encoder
+ * <p>After calling this you must call {@link CANJaguar#EnableControl()} or
+ * {@link CANJaguar#EnableControl(double)} to enable the device.
+ *
+ * @param tag         The constant CANJaguar::Encoder
  * @param codesPerRev The counts per revolution on the encoder
  */
 void CANJaguar::SetPercentMode(CANJaguar::EncoderStruct, uint16_t codesPerRev) {
@@ -1260,11 +1262,12 @@ void CANJaguar::SetPercentMode(CANJaguar::EncoderStruct, uint16_t codesPerRev) {
 
 /**
  * Enable controlling the motor voltage as a percentage of the bus voltage,
- * and enable speed sensing from a non-quadrature encoder.<br>
- * After calling this you must call {@link CANJaguar#EnableControl()} or {@link
- * CANJaguar#EnableControl(double)} to enable the device.
+ * and enable speed sensing from a non-quadrature encoder.
  *
- * @param tag The constant CANJaguar::QuadEncoder
+ * <p>After calling this you must call {@link CANJaguar#EnableControl()} or
+ * {@link CANJaguar#EnableControl(double)} to enable the device.
+ *
+ * @param tag         The constant CANJaguar::QuadEncoder
  * @param codesPerRev The counts per revolution on the encoder
  */
 void CANJaguar::SetPercentMode(CANJaguar::QuadEncoderStruct,
@@ -1276,13 +1279,14 @@ void CANJaguar::SetPercentMode(CANJaguar::QuadEncoderStruct,
 }
 
 /**
-* Enable controlling the motor voltage as a percentage of the bus voltage,
-* and enable position sensing from a potentiometer and no speed feedback.<br>
-* After calling this you must call {@link CANJaguar#EnableControl()} or {@link
-* CANJaguar#EnableControl(double)} to enable the device.
-*
-* @param potentiometer The constant CANJaguar::Potentiometer
-*/
+ * Enable controlling the motor voltage as a percentage of the bus voltage,
+ * and enable position sensing from a potentiometer and no speed feedback.
+ *
+ * <p>After calling this you must call {@link CANJaguar#EnableControl()} or
+ * {@link CANJaguar#EnableControl(double)} to enable the device.
+ *
+ * @param potentiometer The constant CANJaguar::Potentiometer
+ */
 void CANJaguar::SetPercentMode(CANJaguar::PotentiometerStruct) {
   SetControlMode(kPercentVbus);
   SetPositionReference(LM_REF_POT);
@@ -1291,9 +1295,10 @@ void CANJaguar::SetPercentMode(CANJaguar::PotentiometerStruct) {
 }
 
 /**
- * Enable controlling the motor current with a PID loop.<br>
- * After calling this you must call {@link CANJaguar#EnableControl()} or {@link
- * CANJaguar#EnableControl(double)} to enable the device.
+ * Enable controlling the motor current with a PID loop.
+ *
+ * <p>After calling this you must call {@link CANJaguar#EnableControl()} or
+ * {@link CANJaguar#EnableControl(double)} to enable the device.
  *
  * @param p The proportional gain of the Jaguar's PID controller.
  * @param i The integral gain of the Jaguar's PID controller.
@@ -1307,16 +1312,17 @@ void CANJaguar::SetCurrentMode(double p, double i, double d) {
 }
 
 /**
-* Enable controlling the motor current with a PID loop, and enable speed
-* sensing from a non-quadrature encoder.<br>
-* After calling this you must call {@link CANJaguar#EnableControl()} or {@link
-* CANJaguar#EnableControl(double)} to enable the device.
-*
-* @param encoder The constant CANJaguar::Encoder
-* @param p The proportional gain of the Jaguar's PID controller.
-* @param i The integral gain of the Jaguar's PID controller.
-* @param d The differential gain of the Jaguar's PID controller.
-*/
+ * Enable controlling the motor current with a PID loop, and enable speed
+ * sensing from a non-quadrature encoder.
+ *
+ * <p>After calling this you must call {@link CANJaguar#EnableControl()} or
+ * {@link CANJaguar#EnableControl(double)} to enable the device.
+ *
+ * @param encoder The constant CANJaguar::Encoder
+ * @param p       The proportional gain of the Jaguar's PID controller.
+ * @param i       The integral gain of the Jaguar's PID controller.
+ * @param d       The differential gain of the Jaguar's PID controller.
+ */
 void CANJaguar::SetCurrentMode(CANJaguar::EncoderStruct, uint16_t codesPerRev,
                                double p, double i, double d) {
   SetControlMode(kCurrent);
@@ -1327,16 +1333,17 @@ void CANJaguar::SetCurrentMode(CANJaguar::EncoderStruct, uint16_t codesPerRev,
 }
 
 /**
-* Enable controlling the motor current with a PID loop, and enable speed and
-* position sensing from a quadrature encoder.<br>
-* After calling this you must call {@link CANJaguar#EnableControl()} or {@link
-* CANJaguar#EnableControl(double)} to enable the device.
-*
-* @param endoer The constant CANJaguar::QuadEncoder
-* @param p The proportional gain of the Jaguar's PID controller.
-* @param i The integral gain of the Jaguar's PID controller.
-* @param d The differential gain of the Jaguar's PID controller.
-*/
+ * Enable controlling the motor current with a PID loop, and enable speed and
+ * position sensing from a quadrature encoder.
+ *
+ * <p>After calling this you must call {@link CANJaguar#EnableControl()} or
+ * {@link CANJaguar#EnableControl(double)} to enable the device.
+ *
+ * @param encoder The constant CANJaguar::QuadEncoder
+ * @param p       The proportional gain of the Jaguar's PID controller.
+ * @param i       The integral gain of the Jaguar's PID controller.
+ * @param d       The differential gain of the Jaguar's PID controller.
+ */
 void CANJaguar::SetCurrentMode(CANJaguar::QuadEncoderStruct,
                                uint16_t codesPerRev, double p, double i,
                                double d) {
@@ -1348,16 +1355,17 @@ void CANJaguar::SetCurrentMode(CANJaguar::QuadEncoderStruct,
 }
 
 /**
-* Enable controlling the motor current with a PID loop, and enable position
-* sensing from a potentiometer.<br>
-* After calling this you must call {@link CANJaguar#EnableControl()} or {@link
-* CANJaguar#EnableControl(double)} to enable the device.
-*
-* @param potentiometer The constant CANJaguar::Potentiometer
-* @param p The proportional gain of the Jaguar's PID controller.
-* @param i The integral gain of the Jaguar's PID controller.
-* @param d The differential gain of the Jaguar's PID controller.
-*/
+ * Enable controlling the motor current with a PID loop, and enable position
+ * sensing from a potentiometer.
+ *
+ * <p>After calling this you must call {@link CANJaguar#EnableControl()} or
+ * {@link CANJaguar#EnableControl(double)} to enable the device.
+ *
+ * @param potentiometer The constant CANJaguar::Potentiometer
+ * @param p             The proportional gain of the Jaguar's PID controller.
+ * @param i             The integral gain of the Jaguar's PID controller.
+ * @param d             The differential gain of the Jaguar's PID controller.
+ */
 void CANJaguar::SetCurrentMode(CANJaguar::PotentiometerStruct, double p,
                                double i, double d) {
   SetControlMode(kCurrent);
@@ -1369,15 +1377,16 @@ void CANJaguar::SetCurrentMode(CANJaguar::PotentiometerStruct, double p,
 
 /**
  * Enable controlling the speed with a feedback loop from a non-quadrature
- * encoder.<br>
- * After calling this you must call {@link CANJaguar#EnableControl()} or {@link
- * CANJaguar#EnableControl(double)} to enable the device.
+ * encoder.
  *
- * @param encoder The constant CANJaguar::Encoder
+ * <p>After calling this you must call {@link CANJaguar#EnableControl()} or
+ * {@link CANJaguar#EnableControl(double)} to enable the device.
+ *
+ * @param encoder     The constant CANJaguar::Encoder
  * @param codesPerRev The counts per revolution on the encoder.
- * @param p The proportional gain of the Jaguar's PID controller.
- * @param i The integral gain of the Jaguar's PID controller.
- * @param d The differential gain of the Jaguar's PID controller.
+ * @param p           The proportional gain of the Jaguar's PID controller.
+ * @param i           The integral gain of the Jaguar's PID controller.
+ * @param d           The differential gain of the Jaguar's PID controller.
  */
 void CANJaguar::SetSpeedMode(CANJaguar::EncoderStruct, uint16_t codesPerRev,
                              double p, double i, double d) {
@@ -1389,17 +1398,18 @@ void CANJaguar::SetSpeedMode(CANJaguar::EncoderStruct, uint16_t codesPerRev,
 }
 
 /**
-* Enable controlling the speed with a feedback loop from a quadrature
-* encoder.<br>
-* After calling this you must call {@link CANJaguar#EnableControl()} or {@link
-* CANJaguar#EnableControl(double)} to enable the device.
-*
-* @param encoder The constant CANJaguar::QuadEncoder
-* @param codesPerRev The counts per revolution on the encoder.
-* @param p The proportional gain of the Jaguar's PID controller.
-* @param i The integral gain of the Jaguar's PID controller.
-* @param d The differential gain of the Jaguar's PID controller.
-*/
+ * Enable controlling the speed with a feedback loop from a quadrature
+ * encoder.
+ *
+ * <p>After calling this you must call {@link CANJaguar#EnableControl()} or
+ * {@link CANJaguar#EnableControl(double)} to enable the device.
+ *
+ * @param encoder     The constant CANJaguar::QuadEncoder
+ * @param codesPerRev The counts per revolution on the encoder.
+ * @param p           The proportional gain of the Jaguar's PID controller.
+ * @param i           The integral gain of the Jaguar's PID controller.
+ * @param d           The differential gain of the Jaguar's PID controller.
+ */
 void CANJaguar::SetSpeedMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev,
                              double p, double i, double d) {
   SetControlMode(kSpeed);
@@ -1410,16 +1420,16 @@ void CANJaguar::SetSpeedMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev,
 }
 
 /**
- * Enable controlling the position with a feedback loop using an encoder.<br>
- * After calling this you must call {@link CANJaguar#EnableControl()} or {@link
- * CANJaguar#EnableControl(double)} to enable the device.
+ * Enable controlling the position with a feedback loop using an encoder.
  *
- * @param encoder The constant CANJaguar::QuadEncoder
+ * <p>After calling this you must call {@link CANJaguar#EnableControl()} or
+ * {@link CANJaguar#EnableControl(double)} to enable the device.
+ *
+ * @param encoder     The constant CANJaguar::QuadEncoder
  * @param codesPerRev The counts per revolution on the encoder.
- * @param p The proportional gain of the Jaguar's PID controller.
- * @param i The integral gain of the Jaguar's PID controller.
- * @param d The differential gain of the Jaguar's PID controller.
- *
+ * @param p           The proportional gain of the Jaguar's PID controller.
+ * @param i           The integral gain of the Jaguar's PID controller.
+ * @param d           The differential gain of the Jaguar's PID controller.
  */
 void CANJaguar::SetPositionMode(CANJaguar::QuadEncoderStruct,
                                 uint16_t codesPerRev, double p, double i,
@@ -1431,14 +1441,16 @@ void CANJaguar::SetPositionMode(CANJaguar::QuadEncoderStruct,
 }
 
 /**
-* Enable controlling the position with a feedback loop using a
-* potentiometer.<br>
-* After calling this you must call {@link CANJaguar#EnableControl()} or {@link
-* CANJaguar#EnableControl(double)} to enable the device.
-* @param p The proportional gain of the Jaguar's PID controller.
-* @param i The integral gain of the Jaguar's PID controller.
-* @param d The differential gain of the Jaguar's PID controller.
-*/
+ * Enable controlling the position with a feedback loop using a
+ * potentiometer.
+ *
+ * <p>After calling this you must call {@link CANJaguar#EnableControl()} or
+ * {@link CANJaguar#EnableControl(double)} to enable the device.
+ *
+ * @param p The proportional gain of the Jaguar's PID controller.
+ * @param i The integral gain of the Jaguar's PID controller.
+ * @param d The differential gain of the Jaguar's PID controller.
+ */
 void CANJaguar::SetPositionMode(CANJaguar::PotentiometerStruct, double p,
                                 double i, double d) {
   SetControlMode(kPosition);
@@ -1448,11 +1460,12 @@ void CANJaguar::SetPositionMode(CANJaguar::PotentiometerStruct, double p,
 }
 
 /**
-* Enable controlling the motor voltage without any position or speed
-* feedback.<br>
-* After calling this you must call {@link CANJaguar#EnableControl()} or {@link
-* CANJaguar#EnableControl(double)} to enable the device.
-*/
+ * Enable controlling the motor voltage without any position or speed
+ * feedback.
+ *
+ * <p>After calling this you must call {@link CANJaguar#EnableControl()} or
+ * {@link CANJaguar#EnableControl(double)} to enable the device.
+ */
 void CANJaguar::SetVoltageMode() {
   SetControlMode(kVoltage);
   SetPositionReference(LM_REF_NONE);
@@ -1460,14 +1473,15 @@ void CANJaguar::SetVoltageMode() {
 }
 
 /**
-* Enable controlling the motor voltage with speed feedback from a
-* non-quadrature encoder and no position feedback.<br>
-* After calling this you must call {@link CANJaguar#EnableControl()} or {@link
-* CANJaguar#EnableControl(double)} to enable the device.
-*
-* @param encoder The constant CANJaguar::Encoder
-* @param codesPerRev The counts per revolution on the encoder
-*/
+ * Enable controlling the motor voltage with speed feedback from a
+ * non-quadrature encoder and no position feedback.
+ *
+ * <p>After calling this you must call {@link CANJaguar#EnableControl()} or
+ * {@link CANJaguar#EnableControl(double)} to enable the device.
+ *
+ * @param encoder     The constant CANJaguar::Encoder
+ * @param codesPerRev The counts per revolution on the encoder
+ */
 void CANJaguar::SetVoltageMode(CANJaguar::EncoderStruct, uint16_t codesPerRev) {
   SetControlMode(kVoltage);
   SetPositionReference(LM_REF_NONE);
@@ -1476,14 +1490,15 @@ void CANJaguar::SetVoltageMode(CANJaguar::EncoderStruct, uint16_t codesPerRev) {
 }
 
 /**
-* Enable controlling the motor voltage with position and speed feedback from a
-* quadrature encoder.<br>
-* After calling this you must call {@link CANJaguar#EnableControl()} or {@link
-* CANJaguar#EnableControl(double)} to enable the device.
-*
-* @param encoder The constant CANJaguar::QuadEncoder
-* @param codesPerRev The counts per revolution on the encoder
-*/
+ * Enable controlling the motor voltage with position and speed feedback from a
+ * quadrature encoder.
+ *
+ * <p>After calling this you must call {@link CANJaguar#EnableControl()} or
+ * {@link CANJaguar#EnableControl(double)} to enable the device.
+ *
+ * @param encoder     The constant CANJaguar::QuadEncoder
+ * @param codesPerRev The counts per revolution on the encoder
+ */
 void CANJaguar::SetVoltageMode(CANJaguar::QuadEncoderStruct,
                                uint16_t codesPerRev) {
   SetControlMode(kVoltage);
@@ -1493,13 +1508,14 @@ void CANJaguar::SetVoltageMode(CANJaguar::QuadEncoderStruct,
 }
 
 /**
-* Enable controlling the motor voltage with position feedback from a
-* potentiometer and no speed feedback.<br>
-* After calling this you must call {@link CANJaguar#EnableControl()} or {@link
-* CANJaguar#EnableControl(double)} to enable the device.
-*
-* @param potentiometer The constant CANJaguar::Potentiometer
-*/
+ * Enable controlling the motor voltage with position feedback from a
+ * potentiometer and no speed feedback.
+ *
+ * <p>After calling this you must call {@link CANJaguar#EnableControl()} or
+ * {@link CANJaguar#EnableControl(double)} to enable the device.
+ *
+ * @param potentiometer The constant CANJaguar::Potentiometer
+ */
 void CANJaguar::SetVoltageMode(CANJaguar::PotentiometerStruct) {
   SetControlMode(kVoltage);
   SetPositionReference(LM_REF_POT);
@@ -1510,6 +1526,7 @@ void CANJaguar::SetVoltageMode(CANJaguar::PotentiometerStruct) {
 /**
  * Used internally. In order to set the control mode see the methods listed
  * below.
+ *
  * Change the control mode of this Jaguar object.
  *
  * After changing modes, configure any PID constants or other settings needed
@@ -1665,12 +1682,11 @@ uint16_t CANJaguar::GetFaults() const {
  * Set the maximum voltage change rate.
  *
  * When in PercentVbus or Voltage output mode, the rate at which the voltage
- * changes can
- * be limited to reduce current spikes.  Set this to 0.0 to disable rate
- * limiting.
+ * changes can be limited to reduce current spikes.  Set this to 0.0 to disable
+ * rate limiting.
  *
- * @param rampRate The maximum rate of voltage change in Percent Voltage mode in
- * V/s.
+ * @param rampRate The maximum rate of voltage change in Percent Voltage mode
+ *                 in V/s.
  */
 void CANJaguar::SetVoltageRampRate(double rampRate) {
   uint8_t dataBuffer[8];
@@ -1721,7 +1737,7 @@ uint8_t CANJaguar::GetHardwareVersion() const { return m_hardwareVersion; }
  * This allows you to override the jumper configuration for brake or coast.
  *
  * @param mode Select to use the jumper setting or to override it to coast or
- * brake.
+ *             brake.
  */
 void CANJaguar::ConfigNeutralMode(NeutralMode mode) {
   uint8_t dataBuffer[8];
@@ -1773,16 +1789,13 @@ void CANJaguar::ConfigPotentiometerTurns(uint16_t turns) {
  * Configure Soft Position Limits when in Position Controller mode.
  *
  * When controlling position, you can add additional limits on top of the limit
- switch inputs
- * that are based on the position feedback.  If the position limit is reached or
- the
- * switch is opened, that direction will be disabled.
+ * switch inputs that are based on the position feedback.  If the position
+ * limit is reached or the switch is opened, that direction will be disabled.
  *
-
  * @param forwardLimitPosition The position that if exceeded will disable the
- forward direction.
+ *                             forward direction.
  * @param reverseLimitPosition The position that if exceeded will disable the
- reverse direction.
+ *                             reverse direction.
  */
 void CANJaguar::ConfigSoftPositionLimits(double forwardLimitPosition,
                                          double reverseLimitPosition) {
@@ -1817,10 +1830,10 @@ void CANJaguar::ConfigLimitMode(LimitMode mode) {
 }
 
 /**
-* Set the position that if exceeded will disable the forward direction.
-*
-* Use ConfigSoftPositionLimits to set this and the limit mode automatically.
-*/
+ * Set the position that if exceeded will disable the forward direction.
+ *
+ * Use ConfigSoftPositionLimits to set this and the limit mode automatically.
+ */
 void CANJaguar::ConfigForwardLimit(double forwardLimitPosition) {
   uint8_t dataBuffer[8];
   uint8_t dataSize;
@@ -1834,10 +1847,10 @@ void CANJaguar::ConfigForwardLimit(double forwardLimitPosition) {
 }
 
 /**
-* Set the position that if exceeded will disable the reverse direction.
-*
-* Use ConfigSoftPositionLimits to set this and the limit mode automatically.
-*/
+ * Set the position that if exceeded will disable the reverse direction.
+ *
+ * Use ConfigSoftPositionLimits to set this and the limit mode automatically.
+ */
 void CANJaguar::ConfigReverseLimit(double reverseLimitPosition) {
   uint8_t dataBuffer[8];
   uint8_t dataSize;
@@ -1940,15 +1953,15 @@ uint8_t CANJaguar::GetDeviceID() const { return m_deviceNumber; }
  *
  * @deprecated Call DisableControl instead.
  */
-void CANJaguar::StopMotor() {
-	m_stopped = true;
-}
+void CANJaguar::StopMotor() { m_stopped = true; }
 
 /**
-* Common interface for inverting direction of a speed controller.
-* Only works in PercentVbus, speed, and Voltage modes.
-* @param isInverted The state of inversion, true is inverted
-*/
+ * Common interface for inverting direction of a speed controller.
+ *
+ * Only works in PercentVbus, speed, and Voltage modes.
+ *
+ * @param isInverted The state of inversion, true is inverted
+ */
 void CANJaguar::SetInverted(bool isInverted) { m_isInverted = isInverted; }
 
 /**
@@ -1961,20 +1974,22 @@ bool CANJaguar::GetInverted() const { return m_isInverted; }
 
 void CANJaguar::ValueChanged(ITable* source, llvm::StringRef key,
                              std::shared_ptr<nt::Value> value, bool isNew) {
-  if(key == "Mode" && value->IsDouble()) SetControlMode(static_cast<CANSpeedController::ControlMode>(value->GetDouble()));
-  if(IsModePID(m_controlMode) && value->IsDouble()) {
-    if(key == "p") SetP(value->GetDouble());
-    if(key == "i") SetI(value->GetDouble());
-    if(key == "d") SetD(value->GetDouble());
+  if (key == "Mode" && value->IsDouble())
+    SetControlMode(
+        static_cast<CANSpeedController::ControlMode>(value->GetDouble()));
+  if (IsModePID(m_controlMode) && value->IsDouble()) {
+    if (key == "p") SetP(value->GetDouble());
+    if (key == "i") SetI(value->GetDouble());
+    if (key == "d") SetD(value->GetDouble());
   }
-  if(key == "Enabled" && value->IsBoolean()) {
-      if (value->GetBoolean()) {
-        EnableControl();
-      } else {
-        DisableControl();
-      }
+  if (key == "Enabled" && value->IsBoolean()) {
+    if (value->GetBoolean()) {
+      EnableControl();
+    } else {
+      DisableControl();
+    }
   }
-  if(key == "Value" && value->IsDouble()) Set(value->GetDouble());
+  if (key == "Value" && value->IsDouble()) Set(value->GetDouble());
 }
 
 bool CANJaguar::IsModePID(CANSpeedController::ControlMode mode) const {
@@ -1987,9 +2002,9 @@ void CANJaguar::UpdateTable() {
     m_table->PutString("Type", "CANJaguar");
     m_table->PutNumber("Mode", m_controlMode);
     if (IsModePID(m_controlMode)) {
-        m_table->PutNumber("p", GetP());
-        m_table->PutNumber("i", GetI());
-        m_table->PutNumber("d", GetD());
+      m_table->PutNumber("p", GetP());
+      m_table->PutNumber("i", GetI());
+      m_table->PutNumber("d", GetD());
     }
     m_table->PutBoolean("Enabled", m_controlEnabled);
     m_table->PutNumber("Value", Get());

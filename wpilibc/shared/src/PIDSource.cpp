@@ -16,6 +16,4 @@ void PIDSource::SetPIDSourceType(PIDSourceType pidSource) {
   m_pidSource = pidSource;
 }
 
-PIDSourceType PIDSource::GetPIDSourceType() const {
-  return m_pidSource;
-}
+PIDSourceType PIDSource::GetPIDSourceType() const { return m_pidSource; }

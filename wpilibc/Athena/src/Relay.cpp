@@ -7,11 +7,11 @@
 
 #include "Relay.h"
 
+#include "HAL/HAL.hpp"
+#include "LiveWindow/LiveWindow.h"
 #include "MotorSafetyHelper.h"
 #include "Resource.h"
 #include "WPIErrors.h"
-#include "LiveWindow/LiveWindow.h"
-#include "HAL/HAL.hpp"
 
 #include <sstream>
 
@@ -23,7 +23,8 @@ static std::unique_ptr<Resource> relayChannels;
  *
  * This code initializes the relay and reserves all resources that need to be
  * locked. Initially the relay is set to both lines at 0v.
- * @param channel The channel number (0-3).
+ *
+ * @param channel   The channel number (0-3).
  * @param direction The direction that the Relay object will control.
  */
 Relay::Relay(uint32_t channel, Relay::Direction direction)
@@ -71,6 +72,7 @@ Relay::Relay(uint32_t channel, Relay::Direction direction)
 
 /**
  * Free the resource associated with a relay.
+ *
  * The relay channels are set to free and the relay output is turned off.
  */
 Relay::~Relay() {
@@ -95,13 +97,11 @@ Relay::~Relay() {
  * object.
  *
  * When set to kBothDirections, the relay can be any of the four states:
- * 	 0v-0v, 0v-12v, 12v-0v, 12v-12v
+ * 0v-0v, 0v-12v, 12v-0v, 12v-12v
  *
  * When set to kForwardOnly or kReverseOnly, you can specify the constant for
- * the
- * 	 direction or you can simply specify kOff and kOn.  Using only kOff and
- * kOn is
- * 	 recommended.
+ * the direction or you can simply specify kOff and kOn.  Using only kOff and
+ * kOn is recommended.
  *
  * @param value The state to set the relay.
  */
@@ -194,9 +194,7 @@ Relay::Value Relay::Get() const {
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
-uint32_t Relay::GetChannel() const {
-  return m_channel;
-}
+uint32_t Relay::GetChannel() const { return m_channel; }
 
 /**
  * Set the expiration time for the Relay object
@@ -214,21 +212,25 @@ float Relay::GetExpiration() const { return m_safetyHelper->GetExpiration(); }
 
 /**
  * Check if the relay object is currently alive or stopped due to a timeout.
- * @returns a bool value that is true if the motor has NOT timed out and should
- * still be running.
+ *
+ * @return a bool value that is true if the motor has NOT timed out and should
+ *         still be running.
  */
 bool Relay::IsAlive() const { return m_safetyHelper->IsAlive(); }
 
 /**
  * Stop the motor associated with this PWM object.
+ *
  * This is called by the MotorSafetyHelper object when it has a timeout for this
  * relay and needs to stop it from running.
  */
 void Relay::StopMotor() { Set(kOff); }
 
 /**
- * Enable/disable motor safety for this device
+ * Enable/disable motor safety for this device.
+ *
  * Turn on and off the motor safety option for this relay object.
+ *
  * @param enabled True if motor safety is enforced for this object
  */
 void Relay::SetSafetyEnabled(bool enabled) {
@@ -236,7 +238,8 @@ void Relay::SetSafetyEnabled(bool enabled) {
 }
 
 /**
- * Check if motor safety is enabled for this object
+ * Check if motor safety is enabled for this object.
+ *
  * @returns True if motor safety is enforced for this object
  */
 bool Relay::IsSafetyEnabled() const {
@@ -250,10 +253,14 @@ void Relay::GetDescription(std::ostringstream& desc) const {
 void Relay::ValueChanged(ITable* source, llvm::StringRef key,
                          std::shared_ptr<nt::Value> value, bool isNew) {
   if (!value->IsString()) return;
-  if (value->GetString() == "Off") Set(kOff);
-  else if (value->GetString() == "Forward") Set(kForward);
-  else if (value->GetString() == "Reverse") Set(kReverse);
-  else if (value->GetString() == "On") Set(kOn);
+  if (value->GetString() == "Off")
+    Set(kOff);
+  else if (value->GetString() == "Forward")
+    Set(kForward);
+  else if (value->GetString() == "Reverse")
+    Set(kReverse);
+  else if (value->GetString() == "On")
+    Set(kOn);
 }
 
 void Relay::UpdateTable() {

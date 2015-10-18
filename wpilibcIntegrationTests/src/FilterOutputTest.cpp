@@ -5,17 +5,17 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <cmath>
 #include <functional>
 #include <memory>
 #include <random>
 #include <thread>
-#include <cmath>
 
 #include <Filters/LinearDigitalFilter.h>
 
-#include "gtest/gtest.h"
-#include "TestBench.h"
 #include "Base.h"
+#include "TestBench.h"
+#include "gtest/gtest.h"
 
 enum FilterOutputTestType { TEST_SINGLE_POLE_IIR, TEST_HIGH_PASS, TEST_MOVAVG };
 
@@ -37,9 +37,7 @@ std::ostream& operator<<(std::ostream& os, const FilterOutputTestType& type) {
 
 class DataWrapper : public PIDSource {
  public:
-  DataWrapper(double (*dataFunc)(double)) {
-    m_dataFunc = dataFunc;
-  }
+  DataWrapper(double (*dataFunc)(double)) { m_dataFunc = dataFunc; }
 
   virtual void SetPIDSourceType(PIDSourceType pidSource) {}
 
@@ -48,9 +46,7 @@ class DataWrapper : public PIDSource {
     return m_dataFunc(m_count);
   }
 
-  void Reset() {
-    m_count = -TestBench::kFilterStep;
-  }
+  void Reset() { m_count = -TestBench::kFilterStep; }
 
  private:
   std::function<double(double)> m_dataFunc;
@@ -77,24 +73,26 @@ class FilterOutputTest : public testing::TestWithParam<FilterOutputTestType> {
 
     switch (GetParam()) {
       case TEST_SINGLE_POLE_IIR: {
-        m_filter = std::make_unique<LinearDigitalFilter>(LinearDigitalFilter::SinglePoleIIR(m_data,
-                                                                                            TestBench::kSinglePoleIIRTimeConstant,
-                                                                                            TestBench::kFilterStep));
+        m_filter = std::make_unique<LinearDigitalFilter>(
+            LinearDigitalFilter::SinglePoleIIR(
+                m_data, TestBench::kSinglePoleIIRTimeConstant,
+                TestBench::kFilterStep));
         m_expectedOutput = TestBench::kSinglePoleIIRExpectedOutput;
         break;
       }
 
       case TEST_HIGH_PASS: {
-        m_filter = std::make_unique<LinearDigitalFilter>(LinearDigitalFilter::HighPass(m_data,
-                                                                                       TestBench::kHighPassTimeConstant,
-                                                                                       TestBench::kFilterStep));
+        m_filter =
+            std::make_unique<LinearDigitalFilter>(LinearDigitalFilter::HighPass(
+                m_data, TestBench::kHighPassTimeConstant,
+                TestBench::kFilterStep));
         m_expectedOutput = TestBench::kHighPassExpectedOutput;
         break;
       }
 
       case TEST_MOVAVG: {
-        m_filter = std::make_unique<LinearDigitalFilter>(LinearDigitalFilter::MovingAverage(m_data,
-                                                                                            TestBench::kMovAvgTaps));
+        m_filter = std::make_unique<LinearDigitalFilter>(
+            LinearDigitalFilter::MovingAverage(m_data, TestBench::kMovAvgTaps));
         m_expectedOutput = TestBench::kMovAvgExpectedOutput;
         break;
       }
@@ -109,7 +107,8 @@ TEST_P(FilterOutputTest, FilterOutput) {
   m_data->Reset();
 
   double filterOutput = 0.0;
-  for (double t = 0.0; t < TestBench::kFilterTime; t += TestBench::kFilterStep) {
+  for (double t = 0.0; t < TestBench::kFilterTime;
+       t += TestBench::kFilterStep) {
     filterOutput = m_filter->PIDGet();
   }
 

@@ -13,15 +13,15 @@ class Command;
 
 class ButtonScheduler {
  public:
-  ButtonScheduler(bool last, Trigger *button, Command *orders);
+  ButtonScheduler(bool last, Trigger* button, Command* orders);
   virtual ~ButtonScheduler() = default;
   virtual void Execute() = 0;
   void Start();
 
  protected:
   bool m_pressedLast;
-  Trigger *m_button;
-  Command *m_command;
+  Trigger* m_button;
+  Command* m_command;
 };
 
 #endif

@@ -7,7 +7,7 @@
 
 #include "SafeThread.h"
 
-//using namespace nt;
+// using namespace nt;
 
 void detail::SafeThreadOwnerBase::Start(SafeThread* thr) {
   SafeThread* curthr = nullptr;

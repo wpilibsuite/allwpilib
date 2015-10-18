@@ -5,20 +5,20 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "Relay.h"
 #include <DigitalInput.h>
 #include <Relay.h>
 #include <Timer.h>
-#include "gtest/gtest.h"
 #include "TestBench.h"
-#include "Relay.h"
+#include "gtest/gtest.h"
 
 static const double kDelayTime = 0.01;
 
 class RelayTest : public testing::Test {
  protected:
-  Relay *m_relay;
-  DigitalInput *m_forward;
-  DigitalInput *m_reverse;
+  Relay* m_relay;
+  DigitalInput* m_forward;
+  DigitalInput* m_reverse;
 
   virtual void SetUp() override {
     m_relay = new Relay(TestBench::kRelayChannel);

@@ -8,8 +8,8 @@
 #ifndef __SMART_DASHBOARD_DATA__
 #define __SMART_DASHBOARD_DATA__
 
-#include <string>
 #include <memory>
+#include <string>
 #include "tables/ITable.h"
 
 class Sendable {
@@ -27,7 +27,7 @@ class Sendable {
 
   /**
    * @return the string representation of the named data type that will be used
-   * by the smart dashboard for this sendable
+   *         by the smart dashboard for this sendable
    */
   virtual std::string GetSmartDashboardType() const = 0;
 };

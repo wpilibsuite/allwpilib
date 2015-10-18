@@ -32,7 +32,7 @@ class CommandTest : public testing::Test {
    */
   void TeardownScheduler() { Scheduler::GetInstance()->ResetAll(); }
 
-  void AssertCommandState(MockCommand &command, int initialize, int execute,
+  void AssertCommandState(MockCommand& command, int initialize, int execute,
                           int isFinished, int end, int interrupted) {
     EXPECT_EQ(initialize, command.GetInitializeCount());
     EXPECT_EQ(execute, command.GetExecuteCount());
@@ -44,10 +44,10 @@ class CommandTest : public testing::Test {
 
 class ASubsystem : public Subsystem {
  private:
-  Command *m_command = nullptr;
+  Command* m_command = nullptr;
 
  public:
-  ASubsystem(const std::string &name) : Subsystem(name) {}
+  ASubsystem(const std::string& name) : Subsystem(name) {}
 
   virtual void InitDefaultCommand() override {
     if (m_command != nullptr) {
@@ -55,7 +55,7 @@ class ASubsystem : public Subsystem {
     }
   }
 
-  void Init(Command *command) { m_command = command; }
+  void Init(Command* command) { m_command = command; }
 };
 
 // CommandParallelGroupTest ported from CommandParallelGroupTest.java

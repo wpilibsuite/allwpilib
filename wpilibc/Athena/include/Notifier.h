@@ -20,8 +20,7 @@ class Notifier : public ErrorBase {
 
   template <typename Callable, typename Arg, typename... Args>
   Notifier(Callable&& f, Arg&& arg, Args&&... args)
-      : Notifier(std::bind(std::forward<Callable>(f),
-                           std::forward<Arg>(arg),
+      : Notifier(std::bind(std::forward<Callable>(f), std::forward<Arg>(arg),
                            std::forward<Args>(args)...)) {}
 
   virtual ~Notifier();
@@ -37,12 +36,12 @@ class Notifier : public ErrorBase {
   // update the HAL alarm
   void UpdateAlarm();
   // HAL callback
-  static void Notify(uint64_t currentTimeInt, void *param);
+  static void Notify(uint64_t currentTimeInt, void* param);
 
   // held while updating process information
   priority_mutex m_processMutex;
   // HAL handle
-  void *m_notifier;
+  void* m_notifier;
   // address of the handler
   TimerEventHandler m_handler;
   // the absolute expiration time

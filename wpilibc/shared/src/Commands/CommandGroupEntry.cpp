@@ -9,7 +9,7 @@
 
 #include "Commands/Command.h"
 
-CommandGroupEntry::CommandGroupEntry(Command *command, Sequence state,
+CommandGroupEntry::CommandGroupEntry(Command* command, Sequence state,
                                      double timeout)
     : m_timeout(timeout), m_command(command), m_state(state) {}
 

@@ -7,41 +7,40 @@
 
 #include "RobotBase.h"
 
+#include <cstdio>
+#include <cstring>
 #include "DriverStation.h"
-#include "RobotState.h"
+#include "HAL/HAL.hpp"
 #include "HLUsageReporting.h"
 #include "Internal/HardwareHLReporting.h"
+#include "RobotState.h"
 #include "Utility.h"
 #include "networktables/NetworkTable.h"
-#include <cstring>
-#include "HAL/HAL.hpp"
-#include <cstdio>
 
-RobotBase *RobotBase::m_instance = nullptr;
+RobotBase* RobotBase::m_instance = nullptr;
 
-void RobotBase::setInstance(RobotBase *robot) {
+void RobotBase::setInstance(RobotBase* robot) {
   wpi_assert(m_instance == nullptr);
   m_instance = robot;
 }
 
-RobotBase &RobotBase::getInstance() { return *m_instance; }
+RobotBase& RobotBase::getInstance() { return *m_instance; }
 
-void RobotBase::robotSetup(RobotBase *robot) {
+void RobotBase::robotSetup(RobotBase* robot) {
   printf("\n********** Robot program starting **********\n");
   robot->StartCompetition();
 }
 
 /**
  * Constructor for a generic robot program.
+ *
  * User code should be placed in the constructor that runs before the Autonomous
- * or Operator
- * Control period starts. The constructor will run to completion before
- * Autonomous is entered.
+ * or Operator Control period starts. The constructor will run to completion
+ * before Autonomous is entered.
  *
  * This must be used to ensure that the communications code starts. In the
- * future it would be
- * nice to put this code into it's own task that loads on boot so ensure that it
- * runs.
+ * future it would be nice to put this code into it's own task that loads on
+ * boot so ensure that it runs.
  */
 RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   RobotState::SetImplementation(DriverStation::GetInstance());
@@ -52,7 +51,7 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   NetworkTable::SetNetworkIdentity("Robot");
   NetworkTable::SetPersistentFilename("/home/lvuser/networktables.ini");
 
-  FILE *file = nullptr;
+  FILE* file = nullptr;
   file = fopen("/tmp/frc_versions/FRC_Lib_Version.ini", "w");
 
   if (file != nullptr) {
@@ -64,8 +63,7 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
 /**
  * Free the resources for a RobotBase class.
  * This includes deleting all classes that might have been allocated as
- * Singletons to they
- * would never be deleted except here.
+ * Singletons to they would never be deleted except here.
  */
 RobotBase::~RobotBase() {
   SensorBase::DeleteSingletons();
@@ -118,10 +116,8 @@ bool RobotBase::IsNewDataAvailable() const { return m_ds.IsNewControlData(); }
  * This class exists for the sole purpose of getting its destructor called when
  * the module unloads.
  * Before the module is done unloading, we need to delete the RobotBase derived
- * singleton.  This should delete
- * the other remaining singletons that were registered.  This should also stop
- * all tasks that are using
- * the Task class.
+ * singleton.  This should delete the other remaining singletons that were
+ * registered.  This should also stop all tasks that are using the Task class.
  */
 class RobotDeleter {
  public:

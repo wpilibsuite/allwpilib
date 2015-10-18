@@ -13,14 +13,15 @@
 
 /**
  * Create an instance of a counter where no sources are selected.
+ *
  * They all must be selected by calling functions to specify the upsource and
- * the downsource
- * independently.
+ * the downsource independently.
  *
  * This creates a ChipObject counter and initializes status variables
  * appropriately.
  *
  * The counter will start counting immediately.
+ *
  * @param mode The counter mode
  */
 Counter::Counter(Mode mode) {
@@ -36,16 +37,16 @@ Counter::Counter(Mode mode) {
 /**
  * Create an instance of a counter from a Digital Source (such as a Digital
  * Input).
+ *
  * This is used if an existing digital input is to be shared by multiple other
- * objects such
- * as encoders or if the Digital Source is not a Digital Input channel (such as
- * an Analog Trigger).
+ * objects such as encoders or if the Digital Source is not a Digital Input
+ * channel (such as an Analog Trigger).
  *
  * The counter will start counting immediately.
  * @param source A pointer to the existing DigitalSource object. It will be set
- * as the Up Source.
+ *               as the Up Source.
  */
-Counter::Counter(DigitalSource *source) : Counter(kTwoPulse) {
+Counter::Counter(DigitalSource* source) : Counter(kTwoPulse) {
   SetUpSource(source);
   ClearDownSource();
 }
@@ -53,14 +54,15 @@ Counter::Counter(DigitalSource *source) : Counter(kTwoPulse) {
 /**
  * Create an instance of a counter from a Digital Source (such as a Digital
  * Input).
+ *
  * This is used if an existing digital input is to be shared by multiple other
- * objects such
- * as encoders or if the Digital Source is not a Digital Input channel (such as
- * an Analog Trigger).
+ * objects such as encoders or if the Digital Source is not a Digital Input
+ * channel (such as an Analog Trigger).
  *
  * The counter will start counting immediately.
+ *
  * @param source A pointer to the existing DigitalSource object. It will be
- * set as the Up Source.
+ *               set as the Up Source.
  */
 Counter::Counter(std::shared_ptr<DigitalSource> source) : Counter(kTwoPulse) {
   SetUpSource(source);
@@ -69,11 +71,13 @@ Counter::Counter(std::shared_ptr<DigitalSource> source) : Counter(kTwoPulse) {
 
 /**
  * Create an instance of a Counter object.
+ *
  * Create an up-Counter instance given a channel.
  *
  * The counter will start counting immediately.
+ *
  * @param channel The DIO channel to use as the up source. 0-9 are on-board,
- * 10-25 are on the MXP
+ *                10-25 are on the MXP
  */
 Counter::Counter(int32_t channel) : Counter(kTwoPulse) {
   SetUpSource(channel);
@@ -82,55 +86,64 @@ Counter::Counter(int32_t channel) : Counter(kTwoPulse) {
 
 /**
  * Create an instance of a Counter object.
+ *
  * Create an instance of a simple up-Counter given an analog trigger.
  * Use the trigger state output from the analog trigger.
  *
  * The counter will start counting immediately.
+ *
  * @param trigger The pointer to the existing AnalogTrigger object.
  */
 DEPRECATED("Use pass-by-reference instead.")
-Counter::Counter(AnalogTrigger *trigger) : Counter(kTwoPulse) {
+Counter::Counter(AnalogTrigger* trigger) : Counter(kTwoPulse) {
   SetUpSource(trigger->CreateOutput(kState));
   ClearDownSource();
 }
 
 /**
  * Create an instance of a Counter object.
+ *
  * Create an instance of a simple up-Counter given an analog trigger.
  * Use the trigger state output from the analog trigger.
  *
  * The counter will start counting immediately.
+ *
  * @param trigger The reference to the existing AnalogTrigger object.
  */
-Counter::Counter(const AnalogTrigger &trigger) : Counter(kTwoPulse) {
+Counter::Counter(const AnalogTrigger& trigger) : Counter(kTwoPulse) {
   SetUpSource(trigger.CreateOutput(kState));
   ClearDownSource();
 }
 
 /**
  * Create an instance of a Counter object.
- * Creates a full up-down counter given two Digital Sources
+ *
+ * Creates a full up-down counter given two Digital Sources.
+ *
  * @param encodingType The quadrature decoding mode (1x or 2x)
- * @param upSource The pointer to the DigitalSource to set as the up source
- * @param downSource The pointer to the DigitalSource to set as the down source
- * @param inverted True to invert the output (reverse the direction)
+ * @param upSource     The pointer to the DigitalSource to set as the up source
+ * @param downSource   The pointer to the DigitalSource to set as the down
+ *                     source
+ * @param inverted     True to invert the output (reverse the direction)
  */
-Counter::Counter(EncodingType encodingType, DigitalSource *upSource,
-                 DigitalSource *downSource, bool inverted)
-    : Counter(encodingType,
-              std::shared_ptr<DigitalSource>(upSource,
-                                               NullDeleter<DigitalSource>()),
+Counter::Counter(EncodingType encodingType, DigitalSource* upSource,
+                 DigitalSource* downSource, bool inverted)
+    : Counter(encodingType, std::shared_ptr<DigitalSource>(
+                                upSource, NullDeleter<DigitalSource>()),
               std::shared_ptr<DigitalSource>(downSource,
-                                               NullDeleter<DigitalSource>()),
+                                             NullDeleter<DigitalSource>()),
               inverted) {}
 
 /**
  * Create an instance of a Counter object.
- * Creates a full up-down counter given two Digital Sources
+ *
+ * Creates a full up-down counter given two Digital Sources.
+ *
  * @param encodingType The quadrature decoding mode (1x or 2x)
- * @param upSource The pointer to the DigitalSource to set as the up source
- * @param downSource The pointer to the DigitalSource to set as the down source
- * @param inverted True to invert the output (reverse the direction)
+ * @param upSource     The pointer to the DigitalSource to set as the up source
+ * @param downSource   The pointer to the DigitalSource to set as the down
+ *                     source
+ * @param inverted     True to invert the output (reverse the direction)
  */
 Counter::Counter(EncodingType encodingType,
                  std::shared_ptr<DigitalSource> upSource,
@@ -172,8 +185,9 @@ Counter::~Counter() {
 
 /**
  * Set the upsource for the counter as a digital input channel.
+ *
  * @param channel The DIO channel to use as the up source. 0-9 are on-board,
- * 10-25 are on the MXP
+ *                10-25 are on the MXP
  */
 void Counter::SetUpSource(int32_t channel) {
   if (StatusIsFatal()) return;
@@ -182,20 +196,22 @@ void Counter::SetUpSource(int32_t channel) {
 
 /**
  * Set the up counting source to be an analog trigger.
+ *
  * @param analogTrigger The analog trigger object that is used for the Up Source
- * @param triggerType The analog trigger output that will trigger the counter.
+ * @param triggerType   The analog trigger output that will trigger the counter.
  */
-void Counter::SetUpSource(AnalogTrigger *analogTrigger,
+void Counter::SetUpSource(AnalogTrigger* analogTrigger,
                           AnalogTriggerType triggerType) {
   SetUpSource(std::shared_ptr<AnalogTrigger>(analogTrigger,
-                                               NullDeleter<AnalogTrigger>()),
+                                             NullDeleter<AnalogTrigger>()),
               triggerType);
 }
 
 /**
  * Set the up counting source to be an analog trigger.
+ *
  * @param analogTrigger The analog trigger object that is used for the Up Source
- * @param triggerType The analog trigger output that will trigger the counter.
+ * @param triggerType   The analog trigger output that will trigger the counter.
  */
 void Counter::SetUpSource(std::shared_ptr<AnalogTrigger> analogTrigger,
                           AnalogTriggerType triggerType) {
@@ -205,7 +221,9 @@ void Counter::SetUpSource(std::shared_ptr<AnalogTrigger> analogTrigger,
 
 /**
  * Set the source object that causes the counter to count up.
+ *
  * Set the up counting DigitalSource.
+ *
  * @param source Pointer to the DigitalSource object to set as the up source
  */
 void Counter::SetUpSource(std::shared_ptr<DigitalSource> source) {
@@ -221,25 +239,29 @@ void Counter::SetUpSource(std::shared_ptr<DigitalSource> source) {
   }
 }
 
-void Counter::SetUpSource(DigitalSource *source) {
+void Counter::SetUpSource(DigitalSource* source) {
   SetUpSource(
       std::shared_ptr<DigitalSource>(source, NullDeleter<DigitalSource>()));
 }
 
 /**
  * Set the source object that causes the counter to count up.
+ *
  * Set the up counting DigitalSource.
+ *
  * @param source Reference to the DigitalSource object to set as the up source
  */
-void Counter::SetUpSource(DigitalSource &source) {
+void Counter::SetUpSource(DigitalSource& source) {
   SetUpSource(
       std::shared_ptr<DigitalSource>(&source, NullDeleter<DigitalSource>()));
 }
 
 /**
  * Set the edge sensitivity on an up counting source.
+ *
  * Set the up source to either detect rising edges or falling edges or both.
- * @param risingEdge True to trigger on rising edges
+ *
+ * @param risingEdge  True to trigger on rising edges
  * @param fallingEdge True to trigger on falling edges
  */
 void Counter::SetUpSourceEdge(bool risingEdge, bool fallingEdge) {
@@ -267,8 +289,9 @@ void Counter::ClearUpSource() {
 
 /**
  * Set the down counting source to be a digital input channel.
+ *
  * @param channel The DIO channel to use as the up source. 0-9 are on-board,
- * 10-25 are on the MXP
+ *                10-25 are on the MXP
  */
 void Counter::SetDownSource(int32_t channel) {
   if (StatusIsFatal()) return;
@@ -277,20 +300,24 @@ void Counter::SetDownSource(int32_t channel) {
 
 /**
  * Set the down counting source to be an analog trigger.
+ *
  * @param analogTrigger The analog trigger object that is used for the Down
- * Source
- * @param triggerType The analog trigger output that will trigger the counter.
+ *                      Source
+ * @param triggerType   The analog trigger output that will trigger the counter.
  */
-void Counter::SetDownSource(AnalogTrigger *analogTrigger,
+void Counter::SetDownSource(AnalogTrigger* analogTrigger,
                             AnalogTriggerType triggerType) {
-  SetDownSource(std::shared_ptr<AnalogTrigger>(analogTrigger, NullDeleter<AnalogTrigger>()), triggerType);
+  SetDownSource(std::shared_ptr<AnalogTrigger>(analogTrigger,
+                                               NullDeleter<AnalogTrigger>()),
+                triggerType);
 }
 
 /**
  * Set the down counting source to be an analog trigger.
+ *
  * @param analogTrigger The analog trigger object that is used for the Down
- * Source
- * @param triggerType The analog trigger output that will trigger the counter.
+ *                      Source
+ * @param triggerType   The analog trigger output that will trigger the counter.
  */
 void Counter::SetDownSource(std::shared_ptr<AnalogTrigger> analogTrigger,
                             AnalogTriggerType triggerType) {
@@ -300,7 +327,9 @@ void Counter::SetDownSource(std::shared_ptr<AnalogTrigger> analogTrigger,
 
 /**
  * Set the source object that causes the counter to count down.
+ *
  * Set the down counting DigitalSource.
+ *
  * @param source Pointer to the DigitalSource object to set as the down source
  */
 void Counter::SetDownSource(std::shared_ptr<DigitalSource> source) {
@@ -316,23 +345,29 @@ void Counter::SetDownSource(std::shared_ptr<DigitalSource> source) {
   }
 }
 
-void Counter::SetDownSource(DigitalSource *source) {
-  SetDownSource(std::shared_ptr<DigitalSource>(source, NullDeleter<DigitalSource>()));
+void Counter::SetDownSource(DigitalSource* source) {
+  SetDownSource(
+      std::shared_ptr<DigitalSource>(source, NullDeleter<DigitalSource>()));
 }
 
 /**
  * Set the source object that causes the counter to count down.
+ *
  * Set the down counting DigitalSource.
+ *
  * @param source Reference to the DigitalSource object to set as the down source
  */
-void Counter::SetDownSource(DigitalSource &source) {
-  SetDownSource(std::shared_ptr<DigitalSource>(&source, NullDeleter<DigitalSource>()));
+void Counter::SetDownSource(DigitalSource& source) {
+  SetDownSource(
+      std::shared_ptr<DigitalSource>(&source, NullDeleter<DigitalSource>()));
 }
 
 /**
  * Set the edge sensitivity on a down counting source.
+ *
  * Set the down source to either detect rising edges or falling edges.
- * @param risingEdge True to trigger on rising edges
+ *
+ * @param risingEdge  True to trigger on rising edges
  * @param fallingEdge True to trigger on falling edges
  */
 void Counter::SetDownSourceEdge(bool risingEdge, bool fallingEdge) {
@@ -360,6 +395,7 @@ void Counter::ClearDownSource() {
 
 /**
  * Set standard up / down counting mode on this counter.
+ *
  * Up and down counts are sourced independently from two inputs.
  */
 void Counter::SetUpDownCounterMode() {
@@ -371,6 +407,7 @@ void Counter::SetUpDownCounterMode() {
 
 /**
  * Set external direction mode on this counter.
+ *
  * Counts are sourced on the Up counter input.
  * The Down counter input represents the direction to count.
  */
@@ -383,6 +420,7 @@ void Counter::SetExternalDirectionMode() {
 
 /**
  * Set Semi-period mode on this counter.
+ *
  * Counts up on both rising and falling edges.
  */
 void Counter::SetSemiPeriodMode(bool highSemiPeriod) {
@@ -395,9 +433,11 @@ void Counter::SetSemiPeriodMode(bool highSemiPeriod) {
 /**
  * Configure the counter to count in up or down based on the length of the input
  * pulse.
+ *
  * This mode is most useful for direction sensitive gear tooth sensors.
+ *
  * @param threshold The pulse length beyond which the counter counts the
- * opposite direction.  Units are seconds.
+ *                  opposite direction.  Units are seconds.
  */
 void Counter::SetPulseLengthMode(float threshold) {
   if (StatusIsFatal()) return;
@@ -408,10 +448,12 @@ void Counter::SetPulseLengthMode(float threshold) {
 
 /**
  * Get the Samples to Average which specifies the number of samples of the timer
- * to
- * average when calculating the period. Perform averaging to account for
- * mechanical imperfections or as oversampling to increase resolution.
- * @return SamplesToAverage The number of samples being averaged (from 1 to 127)
+ * to average when calculating the period.
+ *
+ * Perform averaging to account for mechanical imperfections or as oversampling
+ * to increase resolution.
+ *
+ * @return The number of samples being averaged (from 1 to 127)
  */
 int Counter::GetSamplesToAverage() const {
   int32_t status = 0;
@@ -422,9 +464,9 @@ int Counter::GetSamplesToAverage() const {
 
 /**
  * Set the Samples to Average which specifies the number of samples of the timer
- * to
- * average when calculating the period. Perform averaging to account for
+ * to average when calculating the period. Perform averaging to account for
  * mechanical imperfections or as oversampling to increase resolution.
+ *
  * @param samplesToAverage The number of samples to average from 1 to 127.
  */
 void Counter::SetSamplesToAverage(int samplesToAverage) {
@@ -440,9 +482,9 @@ void Counter::SetSamplesToAverage(int samplesToAverage) {
 
 /**
  * Read the current counter value.
+ *
  * Read the value at this instant. It may still be running, so it reflects the
- * current value. Next
- * time it is read, it might have a different value.
+ * current value. Next time it is read, it might have a different value.
  */
 int32_t Counter::Get() const {
   if (StatusIsFatal()) return 0;
@@ -454,9 +496,9 @@ int32_t Counter::Get() const {
 
 /**
  * Reset the Counter to zero.
+ *
  * Set the counter value to zero. This doesn't effect the running state of the
- * counter, just sets
- * the current value to zero.
+ * counter, just sets the current value to zero.
  */
 void Counter::Reset() {
   if (StatusIsFatal()) return;
@@ -467,9 +509,10 @@ void Counter::Reset() {
 
 /**
  * Get the Period of the most recent count.
+ *
  * Returns the time interval of the most recent count. This can be used for
- * velocity calculations
- * to determine shaft speed.
+ * velocity calculations to determine shaft speed.
+ *
  * @returns The period between the last two pulses in units of seconds.
  */
 double Counter::GetPeriod() const {
@@ -482,12 +525,13 @@ double Counter::GetPeriod() const {
 
 /**
  * Set the maximum period where the device is still considered "moving".
+ *
  * Sets the maximum period where the device is considered moving. This value is
- * used to determine
- * the "stopped" state of the counter using the GetStopped method.
+ * used to determine the "stopped" state of the counter using the GetStopped
+ * method.
+ *
  * @param maxPeriod The maximum period where the counted device is considered
- * moving in
- * seconds.
+ *                  moving in seconds.
  */
 void Counter::SetMaxPeriod(double maxPeriod) {
   if (StatusIsFatal()) return;
@@ -499,23 +543,18 @@ void Counter::SetMaxPeriod(double maxPeriod) {
 /**
  * Select whether you want to continue updating the event timer output when
  * there are no samples captured.
+ *
  * The output of the event timer has a buffer of periods that are averaged and
- * posted to
- * a register on the FPGA.  When the timer detects that the event source has
- * stopped
- * (based on the MaxPeriod) the buffer of samples to be averaged is emptied.  If
- * you
- * enable the update when empty, you will be notified of the stopped source and
- * the event
- * time will report 0 samples.  If you disable update when empty, the most
- * recent average
- * will remain on the output until a new sample is acquired.  You will never see
- * 0 samples
+ * posted to a register on the FPGA.  When the timer detects that the event
+ * source has stopped (based on the MaxPeriod) the buffer of samples to be
+ * averaged is emptied.  If you enable the update when empty, you will be
+ * notified of the stopped source and the event time will report 0 samples.
+ * If you disable update when empty, the most recent average will remain on
+ * the output until a new sample is acquired.  You will never see 0 samples
  * output (except when there have been no events since an FPGA reset) and you
- * will likely not
- * see the stopped bit become true (since it is updated at the end of an average
- * and there are
- * no samples to average).
+ * will likely not see the stopped bit become true (since it is updated at the
+ * end of an average and there are no samples to average).
+ *
  * @param enabled True to enable update when empty
  */
 void Counter::SetUpdateWhenEmpty(bool enabled) {
@@ -527,14 +566,13 @@ void Counter::SetUpdateWhenEmpty(bool enabled) {
 
 /**
  * Determine if the clock is stopped.
+ *
  * Determine if the clocked input is stopped based on the MaxPeriod value set
- * using the
- * SetMaxPeriod method. If the clock exceeds the MaxPeriod, then the device (and
- * counter) are
- * assumed to be stopped and it returns true.
+ * using the SetMaxPeriod method. If the clock exceeds the MaxPeriod, then the
+ * device (and counter) are assumed to be stopped and it returns true.
+ *
  * @return Returns true if the most recent counter period exceeds the MaxPeriod
- * value set by
- * SetMaxPeriod.
+ *         value set by SetMaxPeriod.
  */
 bool Counter::GetStopped() const {
   if (StatusIsFatal()) return false;
@@ -546,6 +584,7 @@ bool Counter::GetStopped() const {
 
 /**
  * The last direction the counter value changed.
+ *
  * @return The last direction the counter value changed.
  */
 bool Counter::GetDirection() const {
@@ -558,9 +597,10 @@ bool Counter::GetDirection() const {
 
 /**
  * Set the Counter to return reversed sensing on the direction.
+ *
  * This allows counters to change the direction they are counting in the case of
- * 1X and 2X
- * quadrature encoding only. Any other counter mode isn't supported.
+ * 1X and 2X quadrature encoding only. Any other counter mode isn't supported.
+ *
  * @param reverseDirection true if the value counted should be negated.
  */
 void Counter::SetReverseDirection(bool reverseDirection) {

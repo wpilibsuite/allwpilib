@@ -6,14 +6,14 @@
 /*----------------------------------------------------------------------------*/
 
 #include "I2C.h"
-#include "HAL/HAL.hpp"
 #include "HAL/Digital.hpp"
+#include "HAL/HAL.hpp"
 #include "WPIErrors.h"
 
 /**
  * Constructor.
  *
- * @param port The I2C port to which the device is connected.
+ * @param port          The I2C port to which the device is connected.
  * @param deviceAddress The address of the device on the I2C bus.
  */
 I2C::I2C(Port port, uint8_t deviceAddress)
@@ -36,14 +36,14 @@ I2C::~I2C() { i2CClose(m_port); }
  * This is a lower-level interface to the I2C hardware giving you more control
  * over each transaction.
  *
- * @param dataToSend Buffer of data to send as part of the transaction.
- * @param sendSize Number of bytes to send as part of the transaction.
+ * @param dataToSend   Buffer of data to send as part of the transaction.
+ * @param sendSize     Number of bytes to send as part of the transaction.
  * @param dataReceived Buffer to read data into.
- * @param receiveSize Number of bytes to read from the device.
+ * @param receiveSize  Number of bytes to read from the device.
  * @return Transfer Aborted... false for success, true for aborted.
  */
-bool I2C::Transaction(uint8_t *dataToSend, uint8_t sendSize,
-                      uint8_t *dataReceived, uint8_t receiveSize) {
+bool I2C::Transaction(uint8_t* dataToSend, uint8_t sendSize,
+                      uint8_t* dataReceived, uint8_t receiveSize) {
   int32_t status = 0;
   status = i2CTransaction(m_port, m_deviceAddress, dataToSend, sendSize,
                           dataReceived, receiveSize);
@@ -59,9 +59,7 @@ bool I2C::Transaction(uint8_t *dataToSend, uint8_t sendSize,
  *
  * @return Transfer Aborted... false for success, true for aborted.
  */
-bool I2C::AddressOnly() {
-  return Transaction(nullptr, 0, nullptr, 0);
-}
+bool I2C::AddressOnly() { return Transaction(nullptr, 0, nullptr, 0); }
 
 /**
  * Execute a write transaction with the device.
@@ -70,8 +68,8 @@ bool I2C::AddressOnly() {
  *   transaction is complete.
  *
  * @param registerAddress The address of the register on the device to be
- * written.
- * @param data The byte to write to the register on the device.
+ *                        written.
+ * @param data            The byte to write to the register on the device.
  * @return Transfer Aborted... false for success, true for aborted.
  */
 bool I2C::Write(uint8_t registerAddress, uint8_t data) {
@@ -89,11 +87,11 @@ bool I2C::Write(uint8_t registerAddress, uint8_t data) {
  * Write multiple bytes to a device and wait until the
  *   transaction is complete.
  *
- * @param data The data to write to the register on the device.
+ * @param data  The data to write to the register on the device.
  * @param count The number of bytes to be written.
  * @return Transfer Aborted... false for success, true for aborted.
  */
-bool I2C::WriteBulk(uint8_t *data, uint8_t count) {
+bool I2C::WriteBulk(uint8_t* data, uint8_t count) {
   int32_t status = 0;
   status = i2CWrite(m_port, m_deviceAddress, data, count);
   return status < count;
@@ -104,15 +102,15 @@ bool I2C::WriteBulk(uint8_t *data, uint8_t count) {
  *
  * Read bytes from a device.
  * Most I2C devices will auto-increment the register pointer internally allowing
- *   you to read consecutive registers on a device in a single transaction.
+ * you to read consecutive registers on a device in a single transaction.
  *
  * @param registerAddress The register to read first in the transaction.
- * @param count The number of bytes to read in the transaction.
- * @param buffer A pointer to the array of bytes to store the data read from the
- * device.
+ * @param count           The number of bytes to read in the transaction.
+ * @param buffer          A pointer to the array of bytes to store the data
+ *                        read from the device.
  * @return Transfer Aborted... false for success, true for aborted.
  */
-bool I2C::Read(uint8_t registerAddress, uint8_t count, uint8_t *buffer) {
+bool I2C::Read(uint8_t registerAddress, uint8_t count, uint8_t* buffer) {
   if (count < 1) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "count");
     return true;
@@ -130,14 +128,12 @@ bool I2C::Read(uint8_t registerAddress, uint8_t count, uint8_t *buffer) {
  * Read bytes from a device. This method does not write any data to prompt the
  * device.
  *
- * @param buffer
- *            A pointer to the array of bytes to store the data read from
- *            the device.
- * @param count
-              The number of bytes to read in the transaction.
+ * @param buffer A pointer to the array of bytes to store the data read from
+ *               the device.
+ * @param count  The number of bytes to read in the transaction.
  * @return Transfer Aborted... false for success, true for aborted.
  */
-bool I2C::ReadOnly(uint8_t count, uint8_t *buffer) {
+bool I2C::ReadOnly(uint8_t count, uint8_t* buffer) {
   if (count < 1) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "count");
     return true;
@@ -157,27 +153,28 @@ bool I2C::ReadOnly(uint8_t count, uint8_t *buffer) {
  * This is not currently implemented!
  *
  * @param registerAddress The register to write on all devices on the bus.
- * @param data The value to write to the devices.
+ * @param data            The value to write to the devices.
  */
-[[gnu::warning("I2C::Broadcast() is not implemented.")]]
-void I2C::Broadcast(uint8_t registerAddress, uint8_t data) {}
+[[gnu::warning("I2C::Broadcast() is not implemented.")]] void I2C::Broadcast(
+    uint8_t registerAddress, uint8_t data) {}
 
 /**
  * Verify that a device's registers contain expected values.
  *
  * Most devices will have a set of registers that contain a known value that
- *   can be used to identify them.  This allows an I2C device driver to easily
- *   verify that the device contains the expected value.
+ * can be used to identify them.  This allows an I2C device driver to easily
+ * verify that the device contains the expected value.
  *
  * @pre The device must support and be configured to use register
  * auto-increment.
  *
  * @param registerAddress The base register to start reading from the device.
- * @param count The size of the field to be verified.
- * @param expected A buffer containing the values expected from the device.
+ * @param count           The size of the field to be verified.
+ * @param expected        A buffer containing the values expected from the
+ *                        device.
  */
 bool I2C::VerifySensor(uint8_t registerAddress, uint8_t count,
-                       const uint8_t *expected) {
+                       const uint8_t* expected) {
   // TODO: Make use of all 7 read bytes
   uint8_t deviceData[4];
   for (uint8_t i = 0, curRegisterAddress = registerAddress; i < count;

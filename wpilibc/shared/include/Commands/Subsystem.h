@@ -8,10 +8,10 @@
 #ifndef __SUBSYSTEM_H__
 #define __SUBSYSTEM_H__
 
+#include <memory>
+#include <string>
 #include "ErrorBase.h"
 #include "SmartDashboard/NamedSendable.h"
-#include <string>
-#include <memory>
 
 class Command;
 
@@ -19,21 +19,21 @@ class Subsystem : public ErrorBase, public NamedSendable {
   friend class Scheduler;
 
  public:
-  Subsystem(const std::string &name);
+  Subsystem(const std::string& name);
   virtual ~Subsystem() = default;
 
-  void SetDefaultCommand(Command *command);
-  Command *GetDefaultCommand();
-  void SetCurrentCommand(Command *command);
-  Command *GetCurrentCommand() const;
+  void SetDefaultCommand(Command* command);
+  Command* GetDefaultCommand();
+  void SetCurrentCommand(Command* command);
+  Command* GetCurrentCommand() const;
   virtual void InitDefaultCommand();
 
  private:
   void ConfirmCommand();
 
-  Command *m_currentCommand = nullptr;
+  Command* m_currentCommand = nullptr;
   bool m_currentCommandChanged = true;
-  Command *m_defaultCommand = nullptr;
+  Command* m_defaultCommand = nullptr;
   std::string m_name;
   bool m_initializedDefaultCommand = false;
 

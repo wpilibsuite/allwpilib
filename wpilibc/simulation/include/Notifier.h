@@ -23,8 +23,7 @@ class Notifier : public ErrorBase {
 
   template <typename Callable, typename Arg, typename... Args>
   Notifier(Callable&& f, Arg&& arg, Args&&... args)
-      : Notifier(std::bind(std::forward<Callable>(f),
-                           std::forward<Arg>(arg),
+      : Notifier(std::bind(std::forward<Callable>(f), std::forward<Arg>(arg),
                            std::forward<Args>(args)...)) {}
   virtual ~Notifier();
 
@@ -39,11 +38,11 @@ class Notifier : public ErrorBase {
   static std::list<Notifier*> timerQueue;
   static priority_recursive_mutex queueMutex;
   static priority_mutex halMutex;
-  static void *m_notifier;
+  static void* m_notifier;
   static std::atomic<int> refcount;
 
   // Process the timer queue on a timer event
-  static void ProcessQueue(uint32_t mask, void *params);
+  static void ProcessQueue(uint32_t mask, void* params);
 
   // Update the FPGA alarm since the queue has changed
   static void UpdateAlarm();

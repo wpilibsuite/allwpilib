@@ -9,14 +9,13 @@
 #include "simulation/MainNode.h"
 
 SimFloatInput::SimFloatInput(std::string topic) {
-    sub = MainNode::Subscribe("~/simulator/"+topic, &SimFloatInput::callback, this);
-	std::cout << "Initialized ~/simulator/"+topic << std::endl;
+  sub = MainNode::Subscribe("~/simulator/" + topic, &SimFloatInput::callback,
+                            this);
+  std::cout << "Initialized ~/simulator/" + topic << std::endl;
 }
 
-double SimFloatInput::Get() {
-	return value;
-}
+double SimFloatInput::Get() { return value; }
 
-void SimFloatInput::callback(const msgs::ConstFloat64Ptr &msg) {
+void SimFloatInput::callback(const msgs::ConstFloat64Ptr& msg) {
   value = msg->data();
 }

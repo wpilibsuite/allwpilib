@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "HAL/HAL.hpp"
 #include "AnalogTriggerOutput.h"
+#include "HAL/HAL.hpp"
 #include "SensorBase.h"
 
 class AnalogInput;
@@ -18,7 +18,7 @@ class AnalogTrigger : public SensorBase {
 
  public:
   explicit AnalogTrigger(int32_t channel);
-  explicit AnalogTrigger(AnalogInput *channel);
+  explicit AnalogTrigger(AnalogInput* channel);
   virtual ~AnalogTrigger();
 
   void SetLimitsVoltage(float lower, float upper);
@@ -28,9 +28,10 @@ class AnalogTrigger : public SensorBase {
   uint32_t GetIndex() const;
   bool GetInWindow();
   bool GetTriggerState();
-  std::shared_ptr<AnalogTriggerOutput> CreateOutput(AnalogTriggerType type) const;
+  std::shared_ptr<AnalogTriggerOutput> CreateOutput(
+      AnalogTriggerType type) const;
 
  private:
   uint8_t m_index;
-  void *m_trigger;
+  void* m_trigger;
 };

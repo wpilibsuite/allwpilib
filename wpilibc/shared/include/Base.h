@@ -11,55 +11,54 @@
 // (currently) only actually using the move constructors in non-MSVC situations
 // (ie, wpilibC++Devices), we can just ignore it in MSVC.
 #if !defined(_MSC_VER)
-#define DEFAULT_MOVE_CONSTRUCTOR(ClassName)     \
-ClassName(ClassName &&) = default
+#define DEFAULT_MOVE_CONSTRUCTOR(ClassName) ClassName(ClassName&&) = default
 #else
 #define DEFAULT_MOVE_CONSTRUCTOR(ClassName)
 #endif
 
 #if (__cplusplus < 201103L)
-	#if !defined(_MSC_VER)
-		#define nullptr NULL
-	#endif
-	#define constexpr const
+#if !defined(_MSC_VER)
+#define nullptr NULL
+#endif
+#define constexpr const
 #endif
 
 #if defined(_MSC_VER)
-  #define noexcept throw()
+#define noexcept throw()
 #endif
 
 // [[deprecated(msg)]] is a C++14 feature not supported by MSVC or GCC < 4.9.
 // We provide an equivalent warning implementation for those compilers here.
 #if defined(_MSC_VER)
-  #define DEPRECATED(msg) __declspec(deprecated(msg))
+#define DEPRECATED(msg) __declspec(deprecated(msg))
 #elif defined(__GNUC__)
-  #if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 8)
-    #define DEPRECATED(msg) [[deprecated(msg)]]
-  #else
-    #define DEPRECATED(msg) __attribute__((deprecated(msg)))
-  #endif
-#elif __cplusplus > 201103L
-  #define DEPRECATED(msg) [[deprecated(msg)]]
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 8)
+#define DEPRECATED(msg) [[deprecated(msg)]]
 #else
-  #define DEPRECATED(msg) /*nothing*/
+#define DEPRECATED(msg) __attribute__((deprecated(msg)))
+#endif
+#elif __cplusplus > 201103L
+#define DEPRECATED(msg) [[deprecated(msg)]]
+#else
+#define DEPRECATED(msg) /*nothing*/
 #endif
 
 // Provide std::decay_t when using GCC < 4.9
 #if defined(__GNUC__)
-  #if __GNUC__ == 4 && __GNUC_MINOR__ < 9
-    #include <type_traits>
-    namespace std {
-    template <class T> using decay_t = typename decay<T>::type;
-    }
-  #endif
+#if __GNUC__ == 4 && __GNUC_MINOR__ < 9
+#include <type_traits>
+namespace std {
+template <class T>
+using decay_t = typename decay<T>::type;
+}
+#endif
 #endif
 
 // A struct to use as a deleter when a std::shared_ptr must wrap a raw pointer
 // that is being deleted by someone else.
-template<class T>
-struct
-NullDeleter {
-  void operator()(T *) const noexcept {};
+template <class T>
+struct NullDeleter {
+  void operator()(T*) const noexcept {};
 };
 
 #include <atomic>
@@ -101,7 +100,7 @@ struct _Unique_if<T[N]> {
 };
 
 template <class T, class... Args>
-typename _Unique_if<T>::_Single_object make_unique(Args &&... args) {
+typename _Unique_if<T>::_Single_object make_unique(Args&&... args) {
   return unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
@@ -112,6 +111,6 @@ typename _Unique_if<T>::_Unknown_bound make_unique(size_t n) {
 }
 
 template <class T, class... Args>
-typename _Unique_if<T>::_Known_bound make_unique(Args &&...) = delete;
+typename _Unique_if<T>::_Known_bound make_unique(Args&&...) = delete;
 }  // namespace std
 #endif

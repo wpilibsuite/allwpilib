@@ -22,10 +22,10 @@ void GearTooth::EnableDirectionSensing(bool directionSensitive) {
 /**
  * Construct a GearTooth sensor given a channel.
  *
- * @param channel The DIO channel that the sensor is connected to. 0-9 are
- * on-board, 10-25 are on the MXP.
+ * @param channel            The DIO channel that the sensor is connected to.
+ *                           0-9 are on-board, 10-25 are on the MXP.
  * @param directionSensitive True to enable the pulse length decoding in
- * hardware to specify count direction.
+ *                           hardware to specify count direction.
  */
 GearTooth::GearTooth(uint32_t channel, bool directionSensitive)
     : Counter(channel) {
@@ -35,28 +35,31 @@ GearTooth::GearTooth(uint32_t channel, bool directionSensitive)
 
 /**
  * Construct a GearTooth sensor given a digital input.
+ *
  * This should be used when sharing digital inputs.
  *
- * @param source A pointer to the existing DigitalSource object (such as a
- * DigitalInput)
+ * @param source             A pointer to the existing DigitalSource object
+ *                           (such as a DigitalInput)
  * @param directionSensitive True to enable the pulse length decoding in
- * hardware to specify count direction.
+ *                           hardware to specify count direction.
  */
-GearTooth::GearTooth(DigitalSource *source, bool directionSensitive)
+GearTooth::GearTooth(DigitalSource* source, bool directionSensitive)
     : Counter(source) {
   EnableDirectionSensing(directionSensitive);
 }
 
 /**
  * Construct a GearTooth sensor given a digital input.
+ *
  * This should be used when sharing digital inputs.
  *
- * @param source A reference to the existing DigitalSource object (such as a
- * DigitalInput)
+ * @param source             A reference to the existing DigitalSource object
+ *                           (such as a DigitalInput)
  * @param directionSensitive True to enable the pulse length decoding in
- * hardware to specify count direction.
+ *                           hardware to specify count direction.
  */
-GearTooth::GearTooth(std::shared_ptr<DigitalSource> source, bool directionSensitive)
+GearTooth::GearTooth(std::shared_ptr<DigitalSource> source,
+                     bool directionSensitive)
     : Counter(source) {
   EnableDirectionSensing(directionSensitive);
 }

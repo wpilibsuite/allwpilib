@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include "ErrorBase.h"
-#include "HAL/Task.hpp"
 #include <iostream>
 #include <string>
 #include <thread>
+#include "ErrorBase.h"
+#include "HAL/Task.hpp"
 
 /**
  * Wrapper class around std::thread that allows changing thread priority

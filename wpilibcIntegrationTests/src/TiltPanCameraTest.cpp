@@ -9,8 +9,8 @@
 #include <AnalogGyro.h>
 #include <Servo.h>
 #include <Timer.h>
-#include "gtest/gtest.h"
 #include "TestBench.h"
+#include "gtest/gtest.h"
 
 static constexpr double kServoResetTime = 2.0;
 
@@ -29,9 +29,9 @@ static constexpr double kSensitivity = 0.013;
  */
 class TiltPanCameraTest : public testing::Test {
  protected:
-  static AnalogGyro *m_gyro;
+  static AnalogGyro* m_gyro;
   Servo *m_tilt, *m_pan;
-  Accelerometer *m_spiAccel;
+  Accelerometer* m_spiAccel;
 
   static void SetUpTestCase() {
     // The gyro object blocks for 5 seconds in the constructor, so only
@@ -66,7 +66,7 @@ class TiltPanCameraTest : public testing::Test {
   }
 };
 
-AnalogGyro *TiltPanCameraTest::m_gyro = nullptr;
+AnalogGyro* TiltPanCameraTest::m_gyro = nullptr;
 
 /**
  * Test if the gyro angle defaults to 0 immediately after being reset.

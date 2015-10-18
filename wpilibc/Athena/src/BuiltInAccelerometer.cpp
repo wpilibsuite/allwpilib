@@ -7,11 +7,12 @@
 
 #include "BuiltInAccelerometer.h"
 #include "HAL/HAL.hpp"
-#include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
+#include "WPIErrors.h"
 
 /**
  * Constructor.
+ *
  * @param range The range the accelerometer will measure
  */
 BuiltInAccelerometer::BuiltInAccelerometer(Range range) {
@@ -65,4 +66,6 @@ void BuiltInAccelerometer::UpdateTable() {
   }
 }
 
-std::shared_ptr<ITable> BuiltInAccelerometer::GetTable() const { return m_table; }
+std::shared_ptr<ITable> BuiltInAccelerometer::GetTable() const {
+  return m_table;
+}

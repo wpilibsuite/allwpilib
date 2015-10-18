@@ -9,12 +9,12 @@
 
 #include "Utility.h"
 
-#include <regex>
 #include <chrono>
-#include <thread>
-#include <memory>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
+#include <memory>
+#include <regex>
+#include <thread>
 
 // This macro expands the given imaq function to ensure that it is called and
 // properly checked for an error, calling the wpi_setImaqErrorWithContext
@@ -80,8 +80,7 @@ unsigned int USBCamera::GetJpegSize(void* buffer, unsigned int buffSize) {
 }
 
 USBCamera::USBCamera(std::string name, bool useJpeg)
-    : m_name(name),
-      m_useJpeg(useJpeg) {}
+    : m_name(name), m_useJpeg(useJpeg) {}
 
 void USBCamera::OpenCamera() {
   std::lock_guard<priority_recursive_mutex> lock(m_mutex);
@@ -137,9 +136,11 @@ void USBCamera::UpdateSettings() {
 
   uInt32 count = 0;
   uInt32 currentMode = 0;
-  SAFE_IMAQ_CALL(IMAQdxEnumerateVideoModes, m_id, nullptr, &count, &currentMode);
+  SAFE_IMAQ_CALL(IMAQdxEnumerateVideoModes, m_id, nullptr, &count,
+                 &currentMode);
   auto modes = std::make_unique<IMAQdxVideoMode[]>(count);
-  SAFE_IMAQ_CALL(IMAQdxEnumerateVideoModes, m_id, modes.get(), &count, &currentMode);
+  SAFE_IMAQ_CALL(IMAQdxEnumerateVideoModes, m_id, modes.get(), &count,
+                 &currentMode);
 
   // Groups are:
   //   0 - width

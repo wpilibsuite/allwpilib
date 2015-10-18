@@ -8,10 +8,10 @@
 #include "HAL/Task.hpp"
 
 #ifndef OK
-#define OK             0
+#define OK 0
 #endif /* OK */
 #ifndef ERROR
-#define ERROR          (-1)
+#define ERROR (-1)
 #endif /* ERROR */
 
 #include <signal.h>
@@ -20,9 +20,9 @@ extern "C" {
 
 STATUS verifyTaskID(TASK task) {
   if (task != nullptr && pthread_kill(*task, 0) == 0) {
-	return OK;
+    return OK;
   } else {
-	return ERROR;
+    return ERROR;
   }
 }
 
@@ -35,12 +35,10 @@ STATUS setTaskPriority(TASK task, int priority) {
     param.sched_priority = priority;
     if (pthread_setschedparam(*task, SCHED_FIFO, &param) == 0) {
       return OK;
-    }
-    else {
+    } else {
       return ERROR;
     }
-  }
-  else {
+  } else {
     return ERROR;
   }
 }
@@ -50,11 +48,10 @@ STATUS getTaskPriority(TASK task, int* priority) {
   struct sched_param param;
 
   if (verifyTaskID(task) == OK &&
-    pthread_getschedparam(*task, &policy, &param) == 0) {
+      pthread_getschedparam(*task, &policy, &param) == 0) {
     *priority = param.sched_priority;
     return OK;
-  }
-  else {
+  } else {
     return ERROR;
   }
 }
