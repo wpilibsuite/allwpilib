@@ -61,12 +61,6 @@ public class IterativeRobot extends RobotBase {
     m_testInitialized = false;
   }
 
-  @Override
-  protected void prestart() {
-    // Don't immediately say that the robot's ready to be enabled.
-    // See below.
-  }
-
   /**
    * Provide an alternate "main loop" via startCompetition().
    *
@@ -76,10 +70,7 @@ public class IterativeRobot extends RobotBase {
 
     robotInit();
 
-    // We call this now (not in prestart like default) so that the robot
-    // won't enable until the initialization has finished. This is useful
-    // because otherwise it's sometimes possible to enable the robot
-    // before the code is ready.
+    // Tell the DS that the robot is ready to be enabled
     FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
 
     // loop forever, calling the appropriate mode-dependent function
@@ -171,7 +162,12 @@ public class IterativeRobot extends RobotBase {
    *
    * Users should override this method for default Robot-wide initialization
    * which will be called when the robot is first powered on. It will be called
-   * exactly 1 time.
+   * exactly one time.
+   *
+   * Warning: the Driver Station "Robot Code" light and FMS "Robot Ready"
+   * indicators will be off until RobotInit() exits. Code in RobotInit() that
+   * waits for enable will cause the robot to never indicate that the code is
+   * ready, causing the robot to be bypassed in a match.
    */
   public void robotInit() {
     System.out.println("Default IterativeRobot.robotInit() method... Overload me!");

@@ -70,8 +70,6 @@ class IterativeRobot : public RobotBase {
   virtual void TestPeriodic();
 
  protected:
-  virtual void Prestart();
-
   virtual ~IterativeRobot() = default;
   IterativeRobot() = default;
 

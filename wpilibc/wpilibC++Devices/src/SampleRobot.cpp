@@ -19,9 +19,14 @@ SampleRobot::SampleRobot() : m_robotMainOverridden(true) {}
 /**
  * Robot-wide initialization code should go here.
  *
- * Programmers should override this method for default Robot-wide initialization
- * which will
- * be called each time the robot enters the disabled state.
+ * Users should override this method for default Robot-wide initialization which
+ * will be called when the robot is first powered on. It will be called exactly
+ * one time.
+ *
+ * Warning: the Driver Station "Robot Code" light and FMS "Robot Ready"
+ * indicators will be off until RobotInit() exits. Code in RobotInit() that
+ * waits for enable will cause the robot to never indicate that the code is
+ * ready, causing the robot to be bypassed in a match.
  */
 void SampleRobot::RobotInit() {
   printf("Default %s() method... Override me!\n", __FUNCTION__);
@@ -111,12 +116,16 @@ void SampleRobot::StartCompetition() {
       ->GetSubTable("~STATUS~")
       ->PutBoolean("LW Enabled", false);
 
+  RobotInit();
+
+  // Tell the DS that the robot is ready to be enabled
+  HALNetworkCommunicationObserveUserProgramStarting();
+
   RobotMain();
 
   if (!m_robotMainOverridden) {
     // first and one-time initialization
     lw->SetEnabled(false);
-    RobotInit();
 
     while (true) {
       if (IsDisabled()) {

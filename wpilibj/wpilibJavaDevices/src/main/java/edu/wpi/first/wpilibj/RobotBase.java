@@ -148,18 +148,6 @@ public abstract class RobotBase {
    */
   public abstract void startCompetition();
 
-  /**
-   * This hook is called right before startCompetition(). By default, tell the
-   * DS that the robot is now ready to be enabled. If you don't want for the
-   * robot to be enabled yet, you can override this method to do nothing. If you
-   * do so, you will need to call FRCNetworkCommunicationsLibrary.
-   * FRCNetworkCommunicationOvserveUserProgramStarting() from your code when you
-   * are ready for the robot to be enabled.
-   */
-  protected void prestart() {
-    FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
-  }
-
   public static boolean getBooleanProperty(String name, boolean defaultValue) {
     String propVal = System.getProperty(name);
     if (propVal == null) {
@@ -213,7 +201,6 @@ public abstract class RobotBase {
     RobotBase robot;
     try {
       robot = (RobotBase) Class.forName(robotName).newInstance();
-      robot.prestart();
     } catch (Throwable t) {
       DriverStation.reportError("ERROR Unhandled exception instantiating robot " + robotName + " "
           + t.toString() + " at " + Arrays.toString(t.getStackTrace()), false);
