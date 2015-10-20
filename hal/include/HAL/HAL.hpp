@@ -211,6 +211,7 @@ extern "C"
 
 	void* getPort(uint8_t pin);
 	void* getPortWithModule(uint8_t module, uint8_t pin);
+	void freePort(void* port);
 	const char* getHALErrorMessage(int32_t code);
 
 	uint16_t getFPGAVersion(int32_t *status);

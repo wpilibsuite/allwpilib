@@ -150,6 +150,11 @@ void* initializeDigitalPort(void* port_pointer, int32_t *status) {
   return digital_port;
 }
 
+void freeDigitalPort(void* digital_port_pointer) {
+  DigitalPort* port = (DigitalPort*) digital_port_pointer;
+  delete port;
+}
+
 bool checkPWMChannel(void* digital_port_pointer) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   return port->port.pin < kPwmPins;
@@ -487,6 +492,7 @@ bool allocatePWMChannel(void* digital_port_pointer, int32_t *status) {
 
 void freePWMChannel(void* digital_port_pointer, int32_t *status) {
     DigitalPort* port = (DigitalPort*) digital_port_pointer;
+    if (!port) return;
     if (!verifyPWMChannel(port, status)) { return; }
 
     PWMChannels->Free(port->port.pin);
@@ -505,6 +511,7 @@ void freePWMChannel(void* digital_port_pointer, int32_t *status) {
  */
 void freeDIO(void* digital_port_pointer, int32_t *status) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
+  if (!port) return;
   DIOChannels->Free(port->port.pin);
 }
 
@@ -666,13 +673,10 @@ void* initializeCounter(Mode mode, uint32_t *index, int32_t *status) {
 }
 
 void freeCounter(void* counter_pointer, int32_t *status) {
-  if (counter_pointer != NULL) {
-	  Counter* counter = (Counter*) counter_pointer;
-	  delete counter->counter;
-	  counters->Free(counter->index);
-  } else {
-	  *status = NULL_PARAMETER;
-  }
+	Counter* counter = (Counter*) counter_pointer;
+	if (!counter) return;
+	delete counter->counter;
+	counters->Free(counter->index);
 }
 
 void setCounterAverageSize(void* counter_pointer, int32_t size, int32_t *status) {
@@ -1004,6 +1008,7 @@ void* initializeEncoder(uint8_t port_a_module, uint32_t port_a_pin, bool port_a_
 
 void freeEncoder(void* encoder_pointer, int32_t *status) {
   Encoder* encoder = (Encoder*) encoder_pointer;
+  if (!encoder) return;
   quadEncoders->Free(encoder->index);
   delete encoder->encoder;
 }

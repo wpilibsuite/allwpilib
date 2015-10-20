@@ -35,6 +35,17 @@ public abstract class SolenoidBase extends SensorBase {
   }
 
   /**
+   * Free the resources associated with by the solenoid base.
+   */
+  @Override
+  public void free() {
+    for (int i = 0; i < m_ports.length; i++) {
+      SolenoidJNI.freeSolenoidPort(m_ports[i]);
+      m_ports[i] = 0;
+    }
+  }
+
+  /**
    * Set the value of a solenoid.
    *
    * @param value The value you want to set on the module.

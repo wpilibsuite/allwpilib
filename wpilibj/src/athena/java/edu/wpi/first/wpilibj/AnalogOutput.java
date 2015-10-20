@@ -52,6 +52,8 @@ public class AnalogOutput extends SensorBase implements LiveWindowSendable {
    * Channel destructor.
    */
   public void free() {
+    AnalogJNI.freeAnalogOutputPort(m_port);
+    m_port = 0;
     channels.free(m_channel);
     m_channel = 0;
   }

@@ -50,7 +50,10 @@ AnalogOutput::AnalogOutput(uint32_t channel) {
 /**
  * Destructor. Frees analog output resource
  */
-AnalogOutput::~AnalogOutput() { outputs->Free(m_channel); }
+AnalogOutput::~AnalogOutput() {
+  freeAnalogOutputPort(m_port);
+  outputs->Free(m_channel);
+}
 
 /**
  * Set the value of the analog output

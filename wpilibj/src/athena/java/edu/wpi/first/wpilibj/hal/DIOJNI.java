@@ -3,6 +3,8 @@ package edu.wpi.first.wpilibj.hal;
 public class DIOJNI extends JNIWrapper {
   public static native long initializeDigitalPort(long port_pointer);
 
+  public static native void freeDigitalPort(long port_pointer);
+
   public static native boolean allocateDIO(long digital_port_pointer, boolean input);
 
   public static native void freeDIO(long digital_port_pointer);

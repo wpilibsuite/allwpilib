@@ -71,6 +71,13 @@ void* initializeAnalogInputPort(void* port_pointer, int32_t *status) {
   return analog_port;
 }
 
+void freeAnalogInputPort(void* analog_port_pointer) {
+  AnalogPort* port = (AnalogPort*) analog_port_pointer;
+  if (!port) return;
+  delete port->accumulator;
+  delete port;
+}
+
 /**
  * Initialize the analog output port using the given port object.
  */
@@ -81,7 +88,15 @@ void* initializeAnalogOutputPort(void* port_pointer, int32_t *status) {
   // Initialize port structure
   AnalogPort* analog_port = new AnalogPort();
   analog_port->port = *port;
+  analog_port->accumulator = NULL;
   return analog_port;
+}
+
+void freeAnalogOutputPort(void* analog_port_pointer) {
+  AnalogPort* port = (AnalogPort*) analog_port_pointer;
+  if (!port) return;
+  delete port->accumulator;
+  delete port;
 }
 
 
@@ -594,8 +609,10 @@ void* initializeAnalogTrigger(void* port_pointer, uint32_t *index, int32_t *stat
 
 void cleanAnalogTrigger(void* analog_trigger_pointer, int32_t *status) {
   AnalogTrigger* trigger = (AnalogTrigger*) analog_trigger_pointer;
+  if (!trigger) return;
   triggers->Free(trigger->index);
   delete trigger->trigger;
+  freeAnalogInputPort(trigger->port);
   delete trigger;
 }
 

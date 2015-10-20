@@ -77,6 +77,8 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
    * Channel destructor.
    */
   public void free() {
+    AnalogJNI.freeAnalogInputPort(m_port);
+    m_port = 0;
     channels.free(m_channel);
     m_channel = 0;
     m_accumulatorOffset = 0;

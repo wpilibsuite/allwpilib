@@ -33,6 +33,11 @@ void* initializeSolenoidPort(void *port_pointer, int32_t *status) {
 	return solenoid_port;
 }
 
+void freeSolenoidPort(void* solenoid_port_pointer) {
+	solenoid_port_t* port = (solenoid_port_t*) solenoid_port_pointer;
+	delete port;
+}
+
 bool checkSolenoidModule(uint8_t module) {
 	return module < NUM_MODULE_NUMBERS;
 }

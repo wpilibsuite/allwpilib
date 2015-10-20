@@ -100,6 +100,7 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
   public synchronized void free() {
     m_allocated.free(m_moduleNumber * kSolenoidChannels + m_forwardChannel);
     m_allocated.free(m_moduleNumber * kSolenoidChannels + m_reverseChannel);
+    super.free();
   }
 
   /**

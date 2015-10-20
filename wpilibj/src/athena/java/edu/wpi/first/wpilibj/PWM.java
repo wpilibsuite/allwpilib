@@ -140,9 +140,12 @@ public class PWM extends SensorBase implements LiveWindowSendable {
    * Free the resource associated with the PWM channel and set the value to 0.
    */
   public void free() {
+    if (m_port == 0) return;
     PWMJNI.setPWM(m_port, (short) 0);
     PWMJNI.freePWMChannel(m_port);
     PWMJNI.freeDIO(m_port);
+    DIOJNI.freeDigitalPort(m_port);
+    m_port = 0;
   }
 
   /**
