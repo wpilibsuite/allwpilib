@@ -5,6 +5,7 @@
 extern "C"
 {
 	void* initializeSolenoidPort(void* port_pointer, int32_t *status);
+	void freeSolenoidPort(void* solenoid_port_pointer);
 	bool checkSolenoidModule(uint8_t module);
 
 	bool getSolenoid(void* solenoid_port_pointer, int32_t *status);

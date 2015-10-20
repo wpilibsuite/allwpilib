@@ -55,7 +55,11 @@ AnalogInput::AnalogInput(uint32_t channel) {
 /**
  * Channel destructor.
  */
-AnalogInput::~AnalogInput() { inputs->Free(m_channel); }
+AnalogInput::~AnalogInput() 
+  { 
+    freeAnalogInputPort(m_port);
+    inputs->Free(m_channel);
+  }
 
 /**
  * Get a sample straight from this channel.

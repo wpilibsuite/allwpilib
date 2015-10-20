@@ -33,6 +33,17 @@ public abstract class SolenoidBase extends SensorBase {
       m_ports[i] = SolenoidJNI.initializeSolenoidPort(port);
     }
   }
+  
+  /**
+   * Free the resources associated with by the solenoid base.
+   */
+  @Override
+  public void free() {
+    for (int i = 0; i < m_ports.length; i++) {
+	  SolenoidJNI.freeSolenoidPort(m_ports[i]);
+	  m_ports[i] = 0;
+	}
+  } 
 
   /**
    * Set the value of a solenoid.

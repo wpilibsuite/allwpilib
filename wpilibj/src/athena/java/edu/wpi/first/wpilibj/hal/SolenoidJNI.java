@@ -2,6 +2,8 @@ package edu.wpi.first.wpilibj.hal;
 
 public class SolenoidJNI extends JNIWrapper {
   public static native long initializeSolenoidPort(long portPointer);
+  
+  public static native void freeSolenoidPort(long port_pointer);
 
   public static native long getPortWithModule(byte module, byte channel);
 

@@ -16,6 +16,7 @@ priority_recursive_mutex& spiGetSemaphore(uint8_t port);
 extern "C"
 {
 	void* initializeDigitalPort(void* port_pointer, int32_t *status);
+	void freeDigitalPort(void* digital_port_pointer);
 	bool checkPWMChannel(void* digital_port_pointer);
 	bool checkRelayChannel(void* digital_port_pointer);
 

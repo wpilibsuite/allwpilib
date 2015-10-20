@@ -33,8 +33,12 @@ public class AnalogJNI extends JNIWrapper {
   };
 
   public static native long initializeAnalogInputPort(long port_pointer);
+  
+  public static native void freeAnalogInputPort(long port_pointer);
 
   public static native long initializeAnalogOutputPort(long port_pointer);
+  
+  public static native void freeAnalogOutputPort(long port_pointer);
 
   public static native boolean checkAnalogModule(byte module);
 

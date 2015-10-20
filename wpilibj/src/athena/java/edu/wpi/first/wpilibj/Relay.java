@@ -178,6 +178,9 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
     RelayJNI.setRelayReverse(m_port, false);
 
     DIOJNI.freeDIO(m_port);
+	
+	DIOJNI.freeDigitalPort(m_port);
+	m_port = 0;
   }
 
   /**

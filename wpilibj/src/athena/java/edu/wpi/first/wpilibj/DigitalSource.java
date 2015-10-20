@@ -47,6 +47,8 @@ public abstract class DigitalSource extends InterruptableSensorBase {
   public void free() {
     channels.free(m_channel);
     DIOJNI.freeDIO(m_port);
+	DIOJNI.freeDigitalPort(m_port);
+	m_port = 0;
     m_channel = 0;
   }
 

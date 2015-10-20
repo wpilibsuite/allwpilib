@@ -43,6 +43,20 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_initializeSol
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Method:    freeSolenoidPort
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_freeSolenoidPort
+  (JNIEnv *env, jclass, jlong id)
+{
+	SOLENOIDJNI_LOG(logDEBUG) << "Calling SolenoidJNI initializeSolenoidPort";
+
+	SOLENOIDJNI_LOG(logDEBUG) << "Port Ptr = " << (void*)id;
+	freeSolenoidPort((void*)id);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
  * Method:    getPortWithModule
  * Signature: (BB)J
  */

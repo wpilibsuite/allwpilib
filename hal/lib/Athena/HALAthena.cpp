@@ -41,6 +41,12 @@ void* getPortWithModule(uint8_t module, uint8_t pin)
 	return port;
 }
 
+void freePort(void* port_pointer)
+{
+	Port* port = (Port*) port_pointer;
+	delete port;
+}
+
 const char* getHALErrorMessage(int32_t code)
 {
 	switch(code) {
