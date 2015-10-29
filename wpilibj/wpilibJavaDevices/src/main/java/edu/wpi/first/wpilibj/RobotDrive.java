@@ -175,6 +175,7 @@ public class RobotDrive implements MotorSafety {
     m_frontRightMotor = frontRightMotor;
     m_rearRightMotor = rearRightMotor;
     m_sensitivity = kDefaultSensitivity;
+    m_maxOutput = kDefaultMaxOutput;
     m_allocatedSpeedControllers = false;
     setupMotorSafety();
     drive(0, 0);
