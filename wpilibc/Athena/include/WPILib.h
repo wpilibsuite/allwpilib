@@ -50,6 +50,7 @@
 #include "DriverStation.h"
 #include "Encoder.h"
 #include "ErrorBase.h"
+#include "Filters/LinearDigitalFilter.h"
 #include "GearTooth.h"
 #include "GenericHID.h"
 #include "interfaces/Accelerometer.h"
