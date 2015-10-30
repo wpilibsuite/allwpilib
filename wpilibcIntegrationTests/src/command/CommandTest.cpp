@@ -320,7 +320,7 @@ TEST_F(CommandTest,
 class ModifiedMockCommand : public MockCommand {
  public:
   ModifiedMockCommand() : MockCommand() { SetTimeout(2.0); }
-  bool IsFinished() override {
+  bool IsFinished() const override {
     return MockCommand::IsFinished() || IsTimedOut();
   }
 };

@@ -13,7 +13,7 @@ class MockCommand : public Command {
  private:
   int m_initializeCount;
   int m_executeCount;
-  int m_isFinishedCount;
+  mutable int m_isFinishedCount;
   bool m_hasFinished;
   int m_endCount;
   int m_interruptedCount;
@@ -21,7 +21,7 @@ class MockCommand : public Command {
  protected:
   virtual void Initialize();
   virtual void Execute();
-  virtual bool IsFinished();
+  virtual bool IsFinished() const;
   virtual void End();
   virtual void Interrupted();
 
@@ -32,7 +32,7 @@ class MockCommand : public Command {
 
   int GetExecuteCount() { return m_executeCount; }
   int GetIsFinishedCount() { return m_isFinishedCount; }
-  bool IsHasFinished() { return m_hasFinished; }
+  bool IsHasFinished() const { return m_hasFinished; }
   void SetHasFinished(bool hasFinished) { m_hasFinished = hasFinished; }
   int GetEndCount() { return m_endCount; }
   bool HasEnd();

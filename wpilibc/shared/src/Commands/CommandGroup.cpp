@@ -272,7 +272,7 @@ void CommandGroup::End() {}
 // Can be overwritten by teams
 void CommandGroup::Interrupted() {}
 
-bool CommandGroup::IsFinished() {
+bool CommandGroup::IsFinished() const {
   return (unsigned)m_currentCommandIndex >= m_commands.size() &&
          m_children.empty();
 }
