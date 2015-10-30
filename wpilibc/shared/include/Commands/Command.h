@@ -98,7 +98,7 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
    * @return whether this command is finished.
    * @see Command#isTimedOut() isTimedOut()
    */
-  virtual bool IsFinished() = 0;
+  virtual bool IsFinished() const = 0;
   /**
    * Called when the command ended peacefully.  This is where you may want
    * to wrap up loose ends, like shutting off a motor that was being used

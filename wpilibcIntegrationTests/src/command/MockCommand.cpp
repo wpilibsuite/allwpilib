@@ -20,7 +20,7 @@ void MockCommand::Initialize() { ++m_initializeCount; }
 
 void MockCommand::Execute() { ++m_executeCount; }
 
-bool MockCommand::IsFinished() {
+bool MockCommand::IsFinished() const {
   ++m_isFinishedCount;
   return IsHasFinished();
 }
