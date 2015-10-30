@@ -253,22 +253,27 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
     m_automaticEnabled = enabling;
 
     if (enabling) {
-      // enabling automatic mode.
-      // Clear all the counters so no data is valid
+      /* Clear all the counters so no data is valid. No synchronization is
+       * needed because the background task is stopped.
+       */
       for (Ultrasonic u = m_firstSensor; u != null; u = u.m_nextSensor) {
         u.m_counter.reset();
       }
+
       // Start round robin task
       m_task.start();
     } else {
-      // disabling automatic mode. Wait for background task to stop
-      // running.
-      while (m_task.isAlive()) {
-        Timer.delay(.15); // just a little longer than the ping time for
-        // round-robin to stop
+      // Wait for background task to stop running
+      try {
+        m_task.join();
+      } catch (InterruptedException e) {
+        e.printStackTrace();
       }
-      // clear all the counters (data now invalid) since automatic mode is
-      // stopped
+
+      /* Clear all the counters (data now invalid) since automatic mode is
+       * disabled. No synchronization is needed because the background task is
+       * stopped.
+       */
       for (Ultrasonic u = m_firstSensor; u != null; u = u.m_nextSensor) {
         u.m_counter.reset();
       }

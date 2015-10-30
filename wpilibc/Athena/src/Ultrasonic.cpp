@@ -15,18 +15,16 @@
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 
-constexpr double
-    Ultrasonic::kPingTime;  ///< Time (sec) for the ping trigger pulse.
-const uint32_t Ultrasonic::kPriority;  ///< Priority that the ultrasonic round
-                                       ///robin task runs.
-constexpr double
-    Ultrasonic::kMaxUltrasonicTime;  ///< Max time (ms) between readings.
+// Time (sec) for the ping trigger pulse.
+constexpr double Ultrasonic::kPingTime;
+// Priority that the ultrasonic round robin task runs.
+const uint32_t Ultrasonic::kPriority;
+// Max time (ms) between readings.
+constexpr double Ultrasonic::kMaxUltrasonicTime;
 constexpr double Ultrasonic::kSpeedOfSoundInchesPerSec;
-Ultrasonic *Ultrasonic::m_firstSensor =
-    nullptr;  // head of the ultrasonic sensor list
 Task Ultrasonic::m_task;
-std::atomic<bool> Ultrasonic::m_automaticEnabled{false}; // automatic round robin mode
-priority_mutex Ultrasonic::m_mutex;
+// automatic round robin mode
+std::atomic<bool> Ultrasonic::m_automaticEnabled{false};
 
 /**
  * Background task that goes through the list of ultrasonic sensors and pings
@@ -34,20 +32,21 @@ priority_mutex Ultrasonic::m_mutex;
  * is configured to read the timing of the returned echo pulse.
  *
  * DANGER WILL ROBINSON, DANGER WILL ROBINSON:
- * This code runs as a task and assumes that none of the ultrasonic sensors will
- * change while it's
- * running. If one does, then this will certainly break. Make sure to disable
- * automatic mode before changing
- * anything with the sensors!!
+ * This code runs as a task and assumes that none of the ultrasonic sensors
+ * will change while it's running. Make sure to disable automatic mode before
+ * touching the list.
  */
 void Ultrasonic::UltrasonicChecker() {
-  Ultrasonic *u = nullptr;
   while (m_automaticEnabled) {
-    if (u == nullptr) u = m_firstSensor;
-    if (u == nullptr) return;
-    if (u->IsEnabled()) u->m_pingChannel->Pulse(kPingTime);  // do the ping
-    u = u->m_nextSensor;
-    Wait(0.1);  // wait for ping to return
+    for (auto& sensor : m_sensors) {
+      if (!m_automaticEnabled) break;
+
+      if (sensor->IsEnabled()) {
+        sensor->m_pingChannel->Pulse(kPingTime); // do the ping
+      }
+
+      Wait(0.1); // wait for ping to return
+    }
   }
 }
 
@@ -65,11 +64,7 @@ void Ultrasonic::Initialize() {
   bool originalMode = m_automaticEnabled;
   SetAutomaticMode(false);     // kill task when adding a new sensor
   // link this instance on the list
-  {
-    std::lock_guard<priority_mutex> lock(m_mutex);
-    m_nextSensor = m_firstSensor;
-    m_firstSensor = this;
-  }
+  m_sensors.insert(this);
 
   m_counter.SetMaxPeriod(1.0);
   m_counter.SetSemiPeriodMode(true);
@@ -122,7 +117,6 @@ Ultrasonic::Ultrasonic(DigitalOutput *pingChannel, DigitalInput *echoChannel,
       m_counter(m_echoChannel) {
   if (pingChannel == nullptr || echoChannel == nullptr) {
     wpi_setWPIError(NullParameter);
-    m_nextSensor = nullptr;
     m_units = units;
     return;
   }
@@ -180,26 +174,13 @@ Ultrasonic::Ultrasonic(std::shared_ptr<DigitalOutput> pingChannel,
 Ultrasonic::~Ultrasonic() {
   bool wasAutomaticMode = m_automaticEnabled;
   SetAutomaticMode(false);
-  wpi_assert(m_firstSensor != nullptr);
 
-  {
-    std::lock_guard<priority_mutex> lock(m_mutex);
-    if (this == m_firstSensor) {
-      m_firstSensor = m_nextSensor;
-      if (m_firstSensor == nullptr) {
-        SetAutomaticMode(false);
-      }
-    } else {
-      wpi_assert(m_firstSensor->m_nextSensor != nullptr);
-      for (Ultrasonic *s = m_firstSensor; s != nullptr; s = s->m_nextSensor) {
-        if (this == s->m_nextSensor) {
-          s->m_nextSensor = s->m_nextSensor->m_nextSensor;
-          break;
-        }
-      }
-    }
+  // No synchronization needed because the background task is stopped.
+  m_sensors.erase(this);
+
+  if (!m_sensors.empty() && wasAutomaticMode) {
+    SetAutomaticMode(true);
   }
-  if (m_firstSensor != nullptr && wasAutomaticMode) SetAutomaticMode(true);
 }
 
 /**
@@ -218,15 +199,15 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
   if (enabling == m_automaticEnabled) return;  // ignore the case of no change
 
   m_automaticEnabled = enabling;
+
   if (enabling) {
-    // enabling automatic mode.
-    // Clear all the counters so no data is valid
-    for (Ultrasonic *u = m_firstSensor; u != nullptr; u = u->m_nextSensor) {
-      u->m_counter.Reset();
+    /* Clear all the counters so no data is valid. No synchronization is needed
+     * because the background task is stopped.
+     */
+    for (auto& sensor : m_sensors) {
+      sensor->m_counter.Reset();
     }
-    // Start round robin task
-    wpi_assert(m_task.Verify() ==
-               false);  // should be false since was previously disabled
+
     m_task = Task("UltrasonicChecker", &Ultrasonic::UltrasonicChecker);
 
     // TODO: Currently, lvuser does not have permissions to set task priorities.
@@ -234,27 +215,25 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
     // Ultrasonic::SetAutomicMode().
     //m_task.SetPriority(kPriority);
   } else {
-    // disabling automatic mode. Wait for background task to stop running.
-    while (m_task.Verify())
-      Wait(0.15);  // just a little longer than the ping time for round-robin to
-                   // stop
-
-    // clear all the counters (data now invalid) since automatic mode is stopped
-    for (Ultrasonic *u = m_firstSensor; u != nullptr; u = u->m_nextSensor) {
-      u->m_counter.Reset();
-    }
-    m_automaticEnabled = false;
+    // Wait for background task to stop running
     m_task.join();
+
+    /* Clear all the counters (data now invalid) since automatic mode is
+     * disabled. No synchronization is needed because the background task is
+     * stopped.
+     */
+    for (auto& sensor : m_sensors) {
+      sensor->m_counter.Reset();
+    }
   }
 }
 
 /**
  * Single ping to ultrasonic sensor.
  * Send out a single ping to the ultrasonic sensor. This only works if automatic
- * (round robin)
- * mode is disabled. A single ping is sent out, and the counter should count the
- * semi-period
- * when it comes in. The counter is reset to make the current value invalid.
+ * (round robin) mode is disabled. A single ping is sent out, and the counter
+ * should count the semi-period when it comes in. The counter is reset to make
+ * the current value invalid.
  */
 void Ultrasonic::Ping() {
   wpi_assert(!m_automaticEnabled);
@@ -275,9 +254,8 @@ bool Ultrasonic::IsRangeValid() const { return m_counter.Get() > 1; }
 /**
  * Get the range in inches from the ultrasonic sensor.
  * @return double Range in inches of the target returned from the ultrasonic
- * sensor. If there is
- * no valid value yet, i.e. at least one measurement hasn't completed, then
- * return 0.
+ * sensor. If there is no valid value yet, i.e. at least one measurement hasn't
+ * completed, then return 0.
  */
 double Ultrasonic::GetRangeInches() const {
   if (IsRangeValid())
@@ -291,7 +269,7 @@ double Ultrasonic::GetRangeInches() const {
  * @return double Range in millimeters of the target returned by the ultrasonic
  * sensor.
  * If there is no valid value yet, i.e. at least one measurement hasn't
- * complted, then return 0.
+ * completed, then return 0.
  */
 double Ultrasonic::GetRangeMM() const { return GetRangeInches() * 25.4; }
 
