@@ -7,6 +7,7 @@
 
 #include <atomic>
 #include <functional>
+#include <list>
 #include <thread>
 
 #include "ErrorBase.h"
@@ -23,7 +24,6 @@ class Notifier : public ErrorBase {
       : Notifier(std::bind(std::forward<Callable>(f),
                            std::forward<Arg>(arg),
                            std::forward<Args>(args)...)) {}
-
   virtual ~Notifier();
 
   Notifier(const Notifier&) = delete;
@@ -34,36 +34,36 @@ class Notifier : public ErrorBase {
   void Stop();
 
  private:
-  static Notifier *timerQueueHead;
+  static std::list<Notifier*> timerQueue;
   static priority_recursive_mutex queueMutex;
   static priority_mutex halMutex;
   static void *m_notifier;
   static std::atomic<int> refcount;
 
-  // process the timer queue on a timer event
+  // Process the timer queue on a timer event
   static void ProcessQueue(uint32_t mask, void *params);
-  // update the FPGA alarm since the queue has changed
+
+  // Update the FPGA alarm since the queue has changed
   static void UpdateAlarm();
-  // insert this Notifier in the timer queue
+
+  // Insert the Notifier in the timer queue
   void InsertInQueue(bool reschedule);
-  // delete this Notifier from the timer queue
+
+  // Delete this Notifier from the timer queue
   void DeleteFromQueue();
 
-  // address of the handler
+  // Address of the handler
   TimerEventHandler m_handler;
-  // the relative time (either periodic or single)
+  // The relative time (either periodic or single)
   double m_period = 0;
-  // absolute expiration time for the current event
+  // Absolute expiration time for the current event
   double m_expirationTime = 0;
-  // next Nofifier event
-  Notifier *m_nextEvent = nullptr;
-  // true if this is a periodic event
+  // True if this is a periodic event
   bool m_periodic = false;
-  // indicates if this entry is queued
+  // Indicates if this entry is queued
   bool m_queued = false;
-  // held by interrupt manager task while handler call is in progress
+  // Held by interrupt manager task while handler call is in progress
   priority_mutex m_handlerMutex;
-
   static std::thread m_task;
   static std::atomic<bool> m_stopped;
   static void Run();
