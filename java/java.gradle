@@ -96,14 +96,17 @@ ext.setupJniIncludes = { binaries ->
                 def jdkLocation = org.gradle.internal.jvm.Jvm.current().javaHome
                 platformSpecificIncludeFlag("${jdkLocation}/include", cppCompiler)
 
-                if (targetPlatform.operatingSystem.macOsX) {
-                    platformSpecificIncludeFlag("${jdkLocation}/include/darwin", cppCompiler)
-                } else if (targetPlatform.operatingSystem.linux) {
+                if (targetPlatform.operatingSystem.linux) {
                     platformSpecificIncludeFlag("${jdkLocation}/include/linux", cppCompiler)
                 } else if (targetPlatform.operatingSystem.windows) {
                     platformSpecificIncludeFlag("${jdkLocation}/include/win32", cppCompiler)
                 } else if (targetPlatform.operatingSystem.freeBSD) {
                     platformSpecificIncludeFlag("${jdkLocation}/include/freebsd", cppCompiler)
+                } else if (file("$jdkLocation/include/darwin").exists()) {
+                    // TODO: As of Gradle 2.8, targetPlatform.operatingSystem.macOsX returns false
+                    // on El Capitan. We therefore manually test for the darwin folder and include it
+                    // if it exists
+                    platformSpecificIncludeFlag("${jdkLocation}/include/darwin", cppCompiler)
                 }
             }
 

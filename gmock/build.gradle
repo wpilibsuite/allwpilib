@@ -20,11 +20,9 @@ model {
     platforms {
         x86 {
             architecture 'x86'
-            operatingSystem OperatingSystem.current().getFamilyName()
         }
         x64 {
             architecture 'x86_64'
-            operatingSystem OperatingSystem.current().getFamilyName()
         }
     }
     components {
@@ -47,7 +45,8 @@ model {
                 if (toolChain in VisualCpp) {
                     cppCompiler.args '-D_UNICODE', '-DUNICODE', '-DWIN32',  '-D_WIN32', '-DSTRICT', '-DWIN32_LEAN_AND_MEAN', '-D_HAS_EXCEPTIONS=1'
                 } else {
-                    cppCompiler.args '-Wall', '-Wshadow', '-fexceptions', '-Wextra', '-Wno-unused-parameter', '-Wno-missing-field-initializers', '-lpthreads', '-fPIC'
+                    cppCompiler.args '-Wall', '-Wshadow', '-fexceptions', '-Wextra', '-Wno-unused-parameter', '-Wno-missing-field-initializers', '-fPIC'
+                    linker.args '-pthread'
                 }
             }
         }

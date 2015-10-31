@@ -65,11 +65,9 @@ model {
         } else {
             x86 {
                 architecture 'x86'
-                operatingSystem project.buildPlatform
             }
             x64 {
                 architecture 'x86_64'
-                operatingSystem project.buildPlatform
             }
         }
     }

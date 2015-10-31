@@ -4,7 +4,7 @@ model {
             target('x86') {
                 cppCompiler.withArguments { args ->
                     args << '-std=c++11' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic-errors'
-                    args << '-Wno-unused-parameter' << '-fPIC' << '-m32'
+                    args << '-Wno-unused-parameter' << '-fPIC' << '-m32' << '-Wno-missing-field-initializers'
                 }
                 linker.withArguments { args ->
                     args << '-m32'
@@ -13,7 +13,7 @@ model {
             target('x64') {
                 cppCompiler.withArguments { args ->
                     args << '-std=c++11' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic-errors'
-                    args << '-Wno-unused-parameter' << '-fPIC'
+                    args << '-Wno-unused-parameter' << '-fPIC' << '-Wno-missing-field-initializers'
                 }
             }
         }
@@ -32,26 +32,21 @@ ext.releaseSetup = { releaseTask ->
     binaries.withType(SharedLibraryBinarySpec) { binary ->
         if (!project.hasProperty('debug')) {
             def library = binary.sharedLibraryFile.absolutePath
-            def debugLibrary = binary.sharedLibraryFile.absolutePath + ".debug"
-            if (project.tasks.findByName("firstObjcopy${binary.name}") == null) {
-                def firstObjcopy = project.tasks.create("firstObjcopy${binary.name}", Exec) { task ->
-                    task.commandLine 'objcopy', '--only-keep-debug', library, debugLibrary
+            if (project.tasks.findByName("strip${binary.name}") == null) {
+                def dsymutil = project.tasks.create("dsymutil${binary.name}", Exec) { task ->
+                    task.commandLine 'dsymutil', library
                 }
                 def strip = project.tasks.create("strip${binary.name}", Exec) { task ->
-                    task.commandLine 'strip', '-g', library
+                    task.commandLine 'strip', '-S', library
                 }
-                def secondObjcopy = project.tasks.create("secondObjcopy${binary.name}", Exec) { task ->
-                    task.commandLine 'objcopy', "--add-gnu-debuglink=$debugLibrary", library
-                }
-                secondObjcopy.dependsOn strip
-                strip.dependsOn firstObjcopy
+                strip.dependsOn dsymutil
                 binary.tasks.whenObjectAdded { task ->
                     if (task.name.contains('link')) {
-                        firstObjcopy.dependsOn task
+                        dsymutil.dependsOn task
                     }
                 }
             }
-            releaseTask.dependsOn project.tasks.getByName("secondObjcopy${binary.name}")
+            releaseTask.dependsOn project.tasks.getByName("strip${binary.name}")
         }
     }
 }
