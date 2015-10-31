@@ -1,284 +1,164 @@
-import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.internal.os.OperatingSystem
 
-if (!project.hasProperty('skipJava')) {
-  apply plugin: 'java'
-  apply plugin: 'maven-publish'
-}
 apply plugin: 'cpp'
 apply plugin: 'visual-studio'
 
-def generatedJNIHeaderLoc = 'build/include'
+// Find the target platform. The main wpilib build will set the target platform as a project property. You can also manually build for
+// arm by using ./gradlew build -PbuildPlatform=arm
+allprojects {
+    if (!project.hasProperty('armBuild')) {
+        ext.buildPlatform = OperatingSystem.current().getFamilyName()
+    } else {
+        ext.buildPlatform = 'arm'
+    }
+}
 
-def platformSpecificIncludeFlag(loc, cppCompiler) {
-  if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-    cppCompiler.args "/I$loc"
-  } else {
-    cppCompiler.args '-I', loc
-  }
+ext.getPlatformPath = { binary ->
+    if (binary.targetPlatform.architecture.arm) {
+        return 'Linux/arm'
+    } else if (binary.targetPlatform.operatingSystem.linux) {
+        if (binary.targetPlatform.architecture.amd64) {
+            return 'Linux/amd64'
+        } else {
+            return 'Linux/' + binary.targetPlatform.architecture.name
+        }
+    } else if (binary.targetPlatform.operatingSystem.windows) {
+        if (binary.targetPlatform.architecture.amd64) {
+            return 'Windows/amd64'
+        } else {
+            return 'Windows/' + binary.targetPlatform.architecture.name
+        }
+    } else {
+        return binary.targetPlatform.operatingSystem.name + '/' + binary.targetPlatform.architecture.name
+    }
+}
+
+// Apply the correct toolchain settings for the target platform
+if (buildPlatform == 'arm') {
+    apply from: 'toolchains/arm.gradle'
+} else if (OperatingSystem.current().isLinux()) {
+    apply from: 'toolchains/linux.gradle'
+} else if (OperatingSystem.current().isMacOsX()) {
+    apply from: 'toolchains/mac.gradle'
+} else if (OperatingSystem.current().isWindows()) {
+    apply from: 'toolchains/windows.gradle'
+} else {
+    throw new GradleException("ntcore does not support building on ${OperatingSystem.current().getFamilyName()}.")
+}
+
+// We only build and run the tests when building for the native platform. If we just build arm, there's not much point.
+if (buildPlatform != 'arm') {
+    apply from: 'test/tests.gradle'
+}
+
+if (!hasProperty('skipJava')) {
+    apply from: 'java/java.gradle'
 }
 
 model {
-  toolChains {
-    gcc(Gcc) {
-      target("arm"){
-        // We use a custom-built cross compiler with the prefix arm-frc-linux-gnueabi-<util name>
-        // If this ever changes, the prefix will need to be changed here
-        def compilerPrefix = 'arm-frc-linux-gnueabi-'
-        cppCompiler.executable = compilerPrefix + cppCompiler.executable
-        linker.executable = compilerPrefix + linker.executable
-        assembler.executable = compilerPrefix + assembler.executable
-        // Gradle auto-adds the -m32 argument to the linker and compiler. Our compiler only supports
-        // arm, and doesn't understand this flag, so it is removed from both
-        cppCompiler.withArguments { args ->
-          args << '-std=c++1y' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
-          args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-O0' << '-g3' << '-rdynamic'
-          //TODO: When the compiler allows us to actually call deprecated functions from within
-          // deprecated function, remove this line (this will cause calling deprecated functions
-          // to be treated as a warning rather than an error).
-          args << '-Wno-error=deprecated-declarations'
-          args.remove('-m32')
+    platforms {
+        if (project.buildPlatform == 'arm') {
+            arm {
+                architecture 'arm'
+                operatingSystem 'linux'
+            }
+        } else {
+            x86 {
+                architecture 'x86'
+                operatingSystem project.buildPlatform
+            }
+            x64 {
+                architecture 'x86_64'
+                operatingSystem project.buildPlatform
+            }
         }
-        linker.withArguments { args ->
-          args << '-rdynamic'
-          args.remove('-m32')
-        }
-        staticLibArchiver.executable = compilerPrefix + staticLibArchiver.executable
-      }
-      target('x86') {
-        cppCompiler.withArguments { args ->
-          args << '-std=c++11' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
-          args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-O0' << '-g3' << '-rdynamic'
-          //TODO: When the compiler allows us to actually call deprecated functions from within
-          // deprecated function, remove this line (this will cause calling deprecated functions
-          // to be treated as a warning rather than an error).
-          args << '-Wno-error=deprecated-declarations'
-          args << '-m32'
-        }
-        linker.withArguments { args ->
-          args << '-rdynamic'
-          args << '-m32'
-        }
-      }
-      target('x64') {
-        cppCompiler.withArguments { args ->
-          args << '-std=c++11' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
-          args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-O0' << '-g3' << '-rdynamic'
-          //TODO: When the compiler allows us to actually call deprecated functions from within
-          // deprecated function, remove this line (this will cause calling deprecated functions
-          // to be treated as a warning rather than an error).
-          args << '-Wno-error=deprecated-declarations'
-        }
-        linker.withArguments { args ->
-          args << '-rdynamic'
-        }
-      }
     }
-    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-      visualCpp(VisualCpp) {
-        def vs14Dir = file('C:\\Program Files (x86)\\Microsoft Visual Studio 14.0')
-        // If vs2015 is installed, fall back to vs2013 for now, until Gradle pulls in the right
-        // includes for the win10 sdk.
-        if (vs14Dir.exists()) {
-          def vs12Dir = file('C:\\Program Files (x86)\\Microsoft Visual Studio 12.0')
-          if (!vs12Dir.exists()) {
-            throw new GradleException('Compilation with VS 2015 is not currently supported by Gradle. Please install VS 2013, or use the CMake build option.')
-          }
-          installDir = vs12Dir
-        }
-        eachPlatform {
-          cppCompiler.withArguments { args ->
-            args << '/EHsc' << '/DNOMINMAX' << '/D_SCL_SECURE_NO_WARNINGS' << '/D_WINSOCK_DEPRECATED_NO_WARNINGS'
-          }
-          linker.withArguments { args ->
-            args << '/DEF:ntcore.def'
-          }
-        }
-      }
-    }
-  }
 
-  platforms {
-    arm {
-      architecture "arm"
-      operatingSystem 'linux'
-    }
-    x86 {
-      architecture "x86"
-    }
-    x64 {
-      architecture "x86_64"
-    }
-  }
-
-  components {
-    ntcore(NativeLibrarySpec) {
-      targetPlatform 'arm'
-      targetPlatform 'x86'
-      targetPlatform 'x64'
-      binaries.all {
-        tasks.withType(CppCompile) {
-
-
-          if (!project.hasProperty('skipJava')) {
-            if (targetPlatform == platforms.arm) {
-              // ARM JDK is included for jni.h. We also need the arm-linux specific headers.
-              // This does not need to change when compiling on Windows
-              // The JNI headers are put into the build/include directory by the jniHeaders task
-              sources {
-                arm(CppSourceSet) {
-                  source {
-                    includes "java/arm-linux"
-                    includes "java/arm-linux/linux"
-                  }
+    components {
+        ntcore(NativeLibrarySpec) {
+            if (project.buildPlatform == 'arm') {
+                targetPlatform 'arm'
+                binaries.all {
+                    if (project.hasProperty('debug')) {
+                        setupDebugDefines(cppCompiler, linker)
+                    } else {
+                        setupReleaseDefines(cppCompiler, linker)
+                    }
                 }
-              }
             } else {
-              def jdkLocation = org.gradle.internal.jvm.Jvm.current().javaHome
-              platformSpecificIncludeFlag("${jdkLocation}/include", cppCompiler)
-
-              if (targetPlatform.operatingSystem.macOsX) {
-                platformSpecificIncludeFlag("${jdkLocation}/include/darwin", cppCompiler)
-              } else if (targetPlatform.operatingSystem.linux) {
-                platformSpecificIncludeFlag("${jdkLocation}/include/linux", cppCompiler)
-              } else if (targetPlatform.operatingSystem.windows) {
-                platformSpecificIncludeFlag("${jdkLocation}/include/win32", cppCompiler)
-              } else if (targetPlatform.operatingSystem.freeBSD) {
-                platformSpecificIncludeFlag("${jdkLocation}/include/freebsd", cppCompiler)
-              }
+                targetPlatform 'x86'
+                targetPlatform 'x64'
+                binaries.all {
+                    if (project.hasProperty('debug')) {
+                        setupDebugDefines(cppCompiler, linker)
+                    } else {
+                        setupReleaseDefines(cppCompiler, linker)
+                    }
+                }
             }
 
-            jniHeadersNetworkTables.outputs.files.each { file ->
-              if (targetPlatform == platforms.arm) {
-                cppCompiler.args '-I', file.getPath()
-              } else {
-                platformSpecificIncludeFlag(file.getPath(), cppCompiler)
-              }
-            }
-            dependsOn jniHeadersNetworkTables
-          }
-        }
-      }
-      sources {
-        cpp {
-          source {
-            srcDirs = ["src"]
             if (!project.hasProperty('skipJava')) {
-              srcDirs "java/lib"
+                setupJniIncludes(binaries)
             }
-            includes = ["**/*.cpp"]
-          }
-          exportedHeaders {
-            srcDirs = ["include"]
-            if (!project.hasProperty('skipJava')) {
-              jniHeadersNetworkTables.outputs.files.each { file ->
-                srcDirs file.getPath()
-              }
+
+            sources {
+                cpp {
+                    source {
+                        srcDirs = ['src']
+                        if (!project.hasProperty('skipJava')) {
+                            srcDirs "java/lib"
+                        }
+                        includes = ['**/*.cpp']
+                    }
+                    exportedHeaders {
+                        srcDirs = ['include']
+                        if (!project.hasProperty('skipJava')) {
+                            jniHeadersNetworkTables.outputs.files.each { file ->
+                                srcDirs file.getPath()
+                            }
+                        }
+                        includes = ['**/*.h']
+                    }
+                }
             }
-            includes = ["**/*.h"]
-          }
         }
-      }
     }
-  }
 }
 
-if (!project.hasProperty('skipJava')) {
-
-  publishing {
-    publications {
-      java(MavenPublication) {
-        artifact jar
-        artifact (networktablesJavaSource) {
-          classifier = 'sources'
-        }
-        artifact(networktablesJavadoc) {
-          classifier = 'javadoc'
-        }
-
-        groupId 'edu.wpi.first.wpilib.networktables.java'
-        artifactId 'NetworkTables'
-        version '3.0.0-SNAPSHOT'
-      }
-    }
-  }
-
-  compileJava {
-    options.compilerArgs << "-Xlint:unchecked"
-  }
-
-  sourceSets {
-    main {
-      java {
-        srcDirs = ["java/src"]
-      }
-    }
-  }
-
-  jar {
-    description = 'Generates NetworkTables jar, with the JNI shared libraries embedded'
-    dependsOn { armNtcoreSharedLibrary }
-    dependsOn { x64NtcoreSharedLibrary }
-    dependsOn { x86NtcoreSharedLibrary }
-    dependsOn { classes }
-    binaries.withType(SharedLibraryBinary) { binary ->
-      from(file(binary.sharedLibraryFile)) {
-        if (binary.targetPlatform == platforms.arm) {
-          into "Linux/arm"
-        } else if (binary.targetPlatform.operatingSystem.name == "Linux") {
-          if (binary.targetPlatform.architecture.name == "x86-64") {
-            into "Linux/amd64"
-          } else {
-            into "Linux/" + binary.targetPlatform.architecture.name
-          }
-        } else if (binary.targetPlatform.operatingSystem.name.startsWith("Windows")) {
-          if (binary.targetPlatform.architecture.name == "x86-64") {
-            into "Windows/amd64"
-          } else {
-            into "Windows/" + binary.targetPlatform.architecture.name
-          }
-        } else {
-          into binary.targetPlatform.operatingSystem.name + "/" + binary.targetPlatform.architecture.name
-        }
-      }
-    }
-  }
-
-  task networktablesJavaSource(type: Jar, dependsOn: classes) {
-    description = 'Generates the source jar for NetworkTables java'
+task ntcoreZip(type: Zip) {
+    description = 'Creates platform-specific zip of the desktop ntcore libraries.'
     group = 'WPILib'
-    classifier = 'classes'
-    from sourceSets.main.allJava
-  }
+    destinationDir = project.buildDir
 
-  task networktablesJavadoc(type: Jar, dependsOn: javadoc) {
-    description = 'Generates the javadoc jar for NetworkTables java'
-    group = 'WPILib'
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-  }
-
-  /**
-   * Generates the JNI headers
-   */
-  task jniHeadersNetworkTables {
-    description = 'Generates JNI headers from edu.wpi.first.wpilibj.networktables.*'
-    group = 'WPILib'
-    def outputFolder = file(generatedJNIHeaderLoc)
-    inputs.files sourceSets.main.output
-    outputs.file outputFolder
-    doLast {
-      outputFolder.mkdirs()
-      exec {
-        executable org.gradle.internal.jvm.Jvm.current().getExecutable('javah')
-        args '-d', outputFolder
-        args '-classpath', sourceSets.main.output.classesDir
-        args 'edu.wpi.first.wpilibj.networktables.NetworkTablesJNI'
-      }
+    from(file('include')) {
+        into 'include'
     }
-  }
 
-  clean {
-    delete generatedJNIHeaderLoc
-  }
+    binaries.withType(StaticLibraryBinarySpec) { binary ->
+        from(binary.staticLibraryFile) {
+            into getPlatformPath(binary)
+        }
+    }
 
-}  // skipJava
+    binaries.withType(SharedLibraryBinarySpec) { binary ->
+        from(binary.sharedLibraryFile) {
+            into getPlatformPath(binary)
+        }
+    }
+}
+
+releaseSetup(ntcoreZip)
+
+if (!hasProperty('skipJava')) {
+    jar.dependsOn ntcoreZip
+}
+
+tasks.whenTaskAdded { task ->
+    def name = task.name.toLowerCase()
+    if (name.contains("ntcoresharedlibrary") || name.contains("ntcorestaticlibrary") ||
+        name.contains("ntcoretest")) {
+        ntcoreZip.dependsOn task
+    }
+}
+
+apply from: 'publish.gradle'

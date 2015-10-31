@@ -1,0 +1,57 @@
+model {
+    toolChains {
+        clang(Clang) {
+            target('x86') {
+                cppCompiler.withArguments { args ->
+                    args << '-std=c++11' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic-errors'
+                    args << '-Wno-unused-parameter' << '-fPIC' << '-m32'
+                }
+                linker.withArguments { args ->
+                    args << '-m32'
+                }
+            }
+            target('x64') {
+                cppCompiler.withArguments { args ->
+                    args << '-std=c++11' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic-errors'
+                    args << '-Wno-unused-parameter' << '-fPIC'
+                }
+            }
+        }
+    }
+}
+
+ext.setupReleaseDefines = { cppCompiler, linker ->
+    cppCompiler.args '-O2'
+}
+
+ext.setupDebugDefines = { cppCompiler, linker ->
+    cppCompiler.args '-g', '-O0'
+}
+
+ext.releaseSetup = { releaseTask ->
+    binaries.withType(SharedLibraryBinarySpec) { binary ->
+        if (!project.hasProperty('debug')) {
+            def library = binary.sharedLibraryFile.absolutePath
+            def debugLibrary = binary.sharedLibraryFile.absolutePath + ".debug"
+            if (project.tasks.findByName("firstObjcopy${binary.name}") == null) {
+                def firstObjcopy = project.tasks.create("firstObjcopy${binary.name}", Exec) { task ->
+                    task.commandLine 'objcopy', '--only-keep-debug', library, debugLibrary
+                }
+                def strip = project.tasks.create("strip${binary.name}", Exec) { task ->
+                    task.commandLine 'strip', '-g', library
+                }
+                def secondObjcopy = project.tasks.create("secondObjcopy${binary.name}", Exec) { task ->
+                    task.commandLine 'objcopy', "--add-gnu-debuglink=$debugLibrary", library
+                }
+                secondObjcopy.dependsOn strip
+                strip.dependsOn firstObjcopy
+                binary.tasks.whenObjectAdded { task ->
+                    if (task.name.contains('link')) {
+                        firstObjcopy.dependsOn task
+                    }
+                }
+            }
+            releaseTask.dependsOn project.tasks.getByName("secondObjcopy${binary.name}")
+        }
+    }
+}

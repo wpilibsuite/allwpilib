@@ -1,45 +1,55 @@
-import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.internal.os.OperatingSystem
+
 apply plugin: 'cpp'
 apply plugin: 'visual-studio'
 
+// Apply the correct toolchain settings for the target platform
+if (buildPlatform == 'arm') {
+    apply from: '../toolchains/arm.gradle'
+} else if (OperatingSystem.current().isLinux()) {
+    apply from: '../toolchains/linux.gradle'
+} else if (OperatingSystem.current().isMacOsX()) {
+    apply from: '../toolchains/mac.gradle'
+} else if (OperatingSystem.current().isWindows()) {
+    apply from: '../toolchains/windows.gradle'
+} else {
+    throw new GradleException("ntcore does not support building on ${OperatingSystem.current().getFamilyName()}.")
+}
+
 model {
-  toolChains {
-    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-      visualCpp(VisualCpp) {
-        def vs14Dir = file('C:\\Program Files (x86)\\Microsoft Visual Studio 14.0')
-        // If vs2015 is installed, fall back to vs2013 for now, until Gradle pulls in the right
-        // includes for the win10 sdk.
-        if (vs14Dir.exists()) {
-          def vs12Dir = file('C:\\Program Files (x86)\\Microsoft Visual Studio 12.0')
-          if (!vs12Dir.exists()) {
-            throw new GradleException('Compilation with VS 2015 is not currently supported by Gradle. Please install VS 2013, or use the CMake build option.')
-          }
-          installDir = vs12Dir
+    platforms {
+        x86 {
+            architecture 'x86'
+            operatingSystem OperatingSystem.current().getFamilyName()
         }
-      }
+        x64 {
+            architecture 'x86_64'
+            operatingSystem OperatingSystem.current().getFamilyName()
+        }
     }
-  }
-  components {
-    gmock(NativeLibrarySpec) {
-      sources {
-        cpp {
-          source {
-            srcDirs = ['src', 'gtest/src']
-            includes = ['*-all.cc']
-          }
-          exportedHeaders {
-            srcDirs = ['include', 'gtest/include', '.', 'gtest']
-            includes = ['**/*.h', '**/*.cc']
-          }
+    components {
+        gmock(NativeLibrarySpec) {
+            targetPlatform 'x86'
+            targetPlatform 'x64'
+            sources {
+                cpp {
+                    source {
+                        srcDirs = ['src', 'gtest/src']
+                        includes = ['*-all.cc']
+                    }
+                    exportedHeaders {
+                        srcDirs = ['include', 'gtest/include', '.', 'gtest']
+                        includes = ['**/*.h', '**/*.cc']
+                    }
+                }
+            }
+            binaries.all {
+                if (toolChain in VisualCpp) {
+                    cppCompiler.args '-D_UNICODE', '-DUNICODE', '-DWIN32',  '-D_WIN32', '-DSTRICT', '-DWIN32_LEAN_AND_MEAN', '-D_HAS_EXCEPTIONS=1'
+                } else {
+                    cppCompiler.args '-Wall', '-Wshadow', '-fexceptions', '-Wextra', '-Wno-unused-parameter', '-Wno-missing-field-initializers', '-lpthreads', '-fPIC'
+                }
+            }
         }
-      }
-      binaries.all {
-        if (toolChain in VisualCpp) {
-          cppCompiler.args '-D_UNICODE', '-DUNICODE', '-DWIN32',  '-D_WIN32', '-DSTRICT', '-DWIN32_LEAN_AND_MEAN', '-D_HAS_EXCEPTIONS=1'
-        } else {
-          cppCompiler.args '-Wall', '-Wshadow', '-fexceptions', '-Wextra', '-Wno-unused-parameter', '-Wno-missing-field-initializers', '-lpthreads', '-fPIC'
-        }
-      }
     }
-  }
 }
