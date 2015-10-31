@@ -129,6 +129,7 @@ task ntcoreZip(type: Zip) {
     description = 'Creates platform-specific zip of the desktop ntcore libraries.'
     group = 'WPILib'
     destinationDir = project.buildDir
+    baseName = 'ntcore'
 
     from(file('include')) {
         into 'include'

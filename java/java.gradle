@@ -14,6 +14,7 @@ sourceSets {
 
 jar {
     description = 'Generates NetworkTables jar, with the JNI shared libraries embedded'
+    baseName = 'ntcore'
 
     if (buildPlatform == 'arm') {
         dependsOn { ntcoreSharedLibrary }
