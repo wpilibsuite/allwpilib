@@ -4,149 +4,137 @@
 
 #include "edu_wpi_first_wpilibj_hal_SolenoidJNI.h"
 
+#include "HALUtil.h"
+
 TLogLevel solenoidJNILogLevel = logERROR;
 
 #define SOLENOIDJNI_LOG(level) \
     if (level > solenoidJNILogLevel) ; \
     else Log().Get(level)
 
-typedef void *VoidPointer;
+extern "C" {
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
  * Method:    initializeSolenoidPort
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+ * Signature: (J)J
  */
-JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_initializeSolenoidPort
-  (JNIEnv *env, jclass, jobject port_pointer, jobject status)
+JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_initializeSolenoidPort
+  (JNIEnv *env, jclass, jlong port_pointer)
 {
 	SOLENOIDJNI_LOG(logDEBUG) << "Calling SolenoidJNI initializeSolenoidPort";
 	
-	VoidPointer *port_pointer_pointer = (VoidPointer *)env->GetDirectBufferAddress(port_pointer);
-	SOLENOIDJNI_LOG(logDEBUG) << "Port Ptr = " << *port_pointer_pointer;
-	char *aschars = (char *)(*port_pointer_pointer);
+	SOLENOIDJNI_LOG(logDEBUG) << "Port Ptr = " << (void*)port_pointer;
+	char *aschars = (char *)port_pointer;
 	SOLENOIDJNI_LOG(logDEBUG) << '\t' << (int)aschars[0] << '\t' << (int)aschars[1] << std::endl;
 	
-	jint *status_pointer = (jint*)env->GetDirectBufferAddress(status);
-	SOLENOIDJNI_LOG(logDEBUG) << "Status Ptr = " << status_pointer;
+	int32_t status = 0;
+	void* solenoid_port_pointer = initializeSolenoidPort((void*)port_pointer, &status);
 	
-	VoidPointer *solenoid_port_pointer = new VoidPointer;
-	*status_pointer = 0;
-	*solenoid_port_pointer = initializeSolenoidPort(*port_pointer_pointer, status_pointer);
+	SOLENOIDJNI_LOG(logDEBUG) << "Status = " << status;
+	SOLENOIDJNI_LOG(logDEBUG) << "Solenoid Port Pointer = " << solenoid_port_pointer;
 	
-	SOLENOIDJNI_LOG(logDEBUG) << "Status = " << *status_pointer;
-	SOLENOIDJNI_LOG(logDEBUG) << "Solenoid Port Pointer = " << *solenoid_port_pointer;
-	
-	int *asints = (int *)(*solenoid_port_pointer);
+	int *asints = (int *)solenoid_port_pointer;
 	SOLENOIDJNI_LOG(logDEBUG) << '\t' << asints[0] << '\t' << asints[1] << std::endl;
-	
-	return env->NewDirectByteBuffer(solenoid_port_pointer, 4);
+
+	CheckStatus(env, status);
+	return (jlong)solenoid_port_pointer;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
  * Method:    getPortWithModule
- * Signature: (BB)Ljava/nio/ByteBuffer;
+ * Signature: (BB)J
  */
-JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPortWithModule
+JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPortWithModule
   (JNIEnv *env, jclass, jbyte module, jbyte channel)
 {
-	VoidPointer *port_pointer = new VoidPointer;
-	*port_pointer = getPortWithModule(module, channel);
+	void* port_pointer = getPortWithModule(module, channel);
 	
-	return env->NewDirectByteBuffer(port_pointer, 4);
+	return (jlong)port_pointer;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
  * Method:    setSolenoid
- * Signature: (Ljava/nio/ByteBuffer;BLjava/nio/IntBuffer;)V
+ * Signature: (JZ)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_setSolenoid
-  (JNIEnv *env, jclass, jobject solenoid_port, jbyte value, jobject status)
+  (JNIEnv *env, jclass, jlong solenoid_port, jboolean value)
 {
 	SOLENOIDJNI_LOG(logDEBUG) << "Calling SolenoidJNI SetSolenoid";
 	
-	VoidPointer *solenoid_port_pointer = (VoidPointer *)env->GetDirectBufferAddress(solenoid_port);
-	SOLENOIDJNI_LOG(logDEBUG) << "Solenoid Port Pointer = " << *solenoid_port_pointer;
+	SOLENOIDJNI_LOG(logDEBUG) << "Solenoid Port Pointer = " << (void*)solenoid_port;
 	
-	jint *status_pointer = (jint*)env->GetDirectBufferAddress(status);
-	SOLENOIDJNI_LOG(logDEBUG) << "Status Ptr = " << status_pointer;
-	
-	*status_pointer = 0;
-	setSolenoid(*solenoid_port_pointer, value, status_pointer);
+	int32_t status = 0;
+	setSolenoid((void*)solenoid_port, value, &status);
+	CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
  * Method:    getSolenoid
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)B
+ * Signature: (J)Z
  */
-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getSolenoid
-  (JNIEnv *env, jclass, jobject solenoid_port, jobject status)
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getSolenoid
+  (JNIEnv *env, jclass, jlong solenoid_port)
 {
-	
-	VoidPointer *solenoid_port_pointer = (VoidPointer *)env->GetDirectBufferAddress(solenoid_port);
-	jint *status_pointer = (jint*)env->GetDirectBufferAddress(status);
-	
-	*status_pointer = 0;
-	return getSolenoid(*solenoid_port_pointer, status_pointer);
+	int32_t status = 0;
+	jboolean val = getSolenoid((void*)solenoid_port, &status);
+	CheckStatus(env, status);
+	return val;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
  * Method:    getPCMSolenoidBlackList
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)B
+ * Signature: (J)I
  */
-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidBlackList
-  (JNIEnv *env, jclass, jobject solenoid_port, jobject status)
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidBlackList
+  (JNIEnv *env, jclass, jlong solenoid_port)
 {
-	
-	VoidPointer *solenoid_port_pointer = (VoidPointer *)env->GetDirectBufferAddress(solenoid_port);
-	jint *status_pointer = (jint*)env->GetDirectBufferAddress(status);
-	
-	*status_pointer = 0;
-	return getPCMSolenoidBlackList(*solenoid_port_pointer, status_pointer);
+	int32_t status = 0;
+	jint val = getPCMSolenoidBlackList((void*)solenoid_port, &status);
+	CheckStatus(env, status);
+	return val;
 }
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
  * Method:    getPCMSolenoidVoltageStickyFault
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)Z
+ * Signature: (J)Z
  */
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidVoltageStickyFault
-  (JNIEnv *env, jclass, jobject solenoid_port, jobject status)
+  (JNIEnv *env, jclass, jlong solenoid_port)
 {
-	VoidPointer *solenoid_port_pointer = (VoidPointer *)env->GetDirectBufferAddress(solenoid_port);
-	jint *status_pointer = (jint *)env->GetDirectBufferAddress(status);
-	
-	*status_pointer = 0;
-	return getPCMSolenoidVoltageStickyFault(*solenoid_port_pointer, status_pointer);
+	int32_t status = 0;
+	bool val = getPCMSolenoidVoltageStickyFault((void*)solenoid_port, &status);
+	CheckStatus(env, status);
+	return val;
 }
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
  * Method:    getPCMSolenoidVoltageFault
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)Z
+ * Signature: (J)Z
  */
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidVoltageFault
-  (JNIEnv *env, jclass, jobject solenoid_port, jobject status)
+  (JNIEnv *env, jclass, jlong solenoid_port)
 {
-	VoidPointer *solenoid_port_pointer = (VoidPointer *)env->GetDirectBufferAddress(solenoid_port);
-	jint *status_pointer = (jint *)env->GetDirectBufferAddress(status);
-	
-	*status_pointer = 0;
-	return getPCMSolenoidVoltageFault(*solenoid_port_pointer, status_pointer);
+	int32_t status = 0;
+	bool val = getPCMSolenoidVoltageFault((void*)solenoid_port, &status);
+	CheckStatus(env, status);
+	return val;
 }
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
  * Method:    clearAllPCMStickyFaults
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+ * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_clearAllPCMStickyFaults
-  (JNIEnv *env, jclass, jobject solenoid_port, jobject status)
+  (JNIEnv *env, jclass, jlong solenoid_port)
 {
-	VoidPointer *solenoid_port_pointer = (VoidPointer *)env->GetDirectBufferAddress(solenoid_port);
-	jint *status_pointer = (jint *)env->GetDirectBufferAddress(status);
-	
-	*status_pointer = 0;
-	clearAllPCMStickyFaults_sol(*solenoid_port_pointer, status_pointer);
+	int32_t status = 0;
+	clearAllPCMStickyFaults_sol((void*)solenoid_port, &status);
+	CheckStatus(env, status);
 }
+
+}  // extern "C"

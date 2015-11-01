@@ -10,7 +10,6 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import edu.wpi.first.wpilibj.can.CANExceptionFactory;
 import edu.wpi.first.wpilibj.can.CANJNI;
 import edu.wpi.first.wpilibj.can.CANMessageNotFoundException;
 import edu.wpi.first.wpilibj.tables.ITable;
@@ -275,10 +274,6 @@ public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController {
     allocated.free(m_deviceNumber - 1);
     m_safetyHelper = null;
 
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    status.asIntBuffer().put(0, 0);
-
     int messageID;
 
     // Disable periodic setpoints
@@ -308,7 +303,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController {
     }
 
     CANJNI.FRCNetworkCommunicationCANSessionMuxSendMessage(messageID, null,
-        CANJNI.CAN_SEND_PERIOD_STOP_REPEATING, status.asIntBuffer());
+        CANJNI.CAN_SEND_PERIOD_STOP_REPEATING);
 
     configMaxOutputVoltage(kApproxBusVoltage);
   }
@@ -1904,10 +1899,6 @@ public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController {
             CANJNI.LM_API_POS_T_EN, CANJNI.LM_API_POS_T_SET, CANJNI.LM_API_ICTRL_T_EN,
             CANJNI.LM_API_ICTRL_T_SET};
 
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    status.asIntBuffer().put(0, 0);
-
     for (byte i = 0; i < kTrustedMessages.length; i++) {
       if ((kFullMessageIDMask & messageID) == kTrustedMessages[i]) {
         // Make sure the data will still fit after adjusting for the token.
@@ -1923,12 +1914,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController {
           trustedBuffer.put(j + 2, data[j]);
         }
 
-        CANJNI.FRCNetworkCommunicationCANSessionMuxSendMessage(messageID, trustedBuffer, period,
-            status.asIntBuffer());
-        int statusCode = status.asIntBuffer().get(0);
-        if (statusCode < 0) {
-          CANExceptionFactory.checkStatus(statusCode, messageID);
-        }
+        CANJNI.FRCNetworkCommunicationCANSessionMuxSendMessage(messageID, trustedBuffer, period);
 
         return;
       }
@@ -1945,13 +1931,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController {
       buffer = null;
     }
 
-    CANJNI.FRCNetworkCommunicationCANSessionMuxSendMessage(messageID, buffer, period,
-        status.asIntBuffer());
-
-    int statusCode = status.asIntBuffer().get(0);
-    if (statusCode < 0) {
-      CANExceptionFactory.checkStatus(statusCode, messageID);
-    }
+    CANJNI.FRCNetworkCommunicationCANSessionMuxSendMessage(messageID, buffer, period);
   }
 
   /**
@@ -2022,24 +2002,15 @@ public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController {
 
     ByteBuffer timeStamp = ByteBuffer.allocateDirect(4);
 
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    status.asIntBuffer().put(0, 0);
-
     // Get the data.
     ByteBuffer dataBuffer =
         CANJNI.FRCNetworkCommunicationCANSessionMuxReceiveMessage(targetedMessageID.asIntBuffer(),
-            messageMask, timeStamp, status.asIntBuffer());
+            messageMask, timeStamp);
 
     if (data != null) {
       for (int i = 0; i < dataBuffer.capacity(); i++) {
         data[i] = dataBuffer.get(i);
       }
-    }
-
-    int statusCode = status.asIntBuffer().get(0);
-    if (statusCode < 0) {
-      CANExceptionFactory.checkStatus(statusCode, messageID);
     }
   }
 

@@ -6,17 +6,9 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
-import java.nio.ByteBuffer;
-
-// import com.sun.jna.Pointer;
-
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
-import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
@@ -28,7 +20,7 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
  */
 public class AnalogOutput extends SensorBase implements LiveWindowSendable {
   private static Resource channels = new Resource(kAnalogOutputChannels);
-  private ByteBuffer m_port;
+  private long m_port;
   private int m_channel;
 
   /**
@@ -39,7 +31,7 @@ public class AnalogOutput extends SensorBase implements LiveWindowSendable {
   public AnalogOutput(final int channel) {
     m_channel = channel;
 
-    if (AnalogJNI.checkAnalogOutputChannel(channel) == 0) {
+    if (!AnalogJNI.checkAnalogOutputChannel(channel)) {
       throw new AllocationException("Analog output channel " + m_channel
           + " cannot be allocated. Channel is not present.");
     }
@@ -49,12 +41,8 @@ public class AnalogOutput extends SensorBase implements LiveWindowSendable {
       throw new AllocationException("Analog output channel " + m_channel + " is already allocated");
     }
 
-    ByteBuffer port_pointer = AnalogJNI.getPort((byte) channel);
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    m_port = AnalogJNI.initializeAnalogOutputPort(port_pointer, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    long port_pointer = AnalogJNI.getPort((byte) channel);
+    m_port = AnalogJNI.initializeAnalogOutputPort(port_pointer);
 
     LiveWindow.addSensor("AnalogOutput", channel, this);
     UsageReporting.report(tResourceType.kResourceType_AnalogOutput, channel);
@@ -69,23 +57,11 @@ public class AnalogOutput extends SensorBase implements LiveWindowSendable {
   }
 
   public void setVoltage(double voltage) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    AnalogJNI.setAnalogOutput(m_port, voltage, status.asIntBuffer());
-
-    HALUtil.checkStatus(status.asIntBuffer());
+    AnalogJNI.setAnalogOutput(m_port, voltage);
   }
 
   public double getVoltage() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    double voltage = AnalogJNI.getAnalogOutput(m_port, status.asIntBuffer());
-
-    HALUtil.checkStatus(status.asIntBuffer());
-
-    return voltage;
+    return AnalogJNI.getAnalogOutput(m_port);
   }
 
   /*

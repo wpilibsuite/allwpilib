@@ -1,11 +1,7 @@
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 import edu.wpi.first.wpilibj.SensorBase;
 import edu.wpi.first.wpilibj.hal.CompressorJNI;
-import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 
@@ -22,7 +18,7 @@ import edu.wpi.first.wpilibj.tables.ITable;
  * closed loop control, thereby stopping the compressor from operating.
  */
 public class Compressor extends SensorBase implements LiveWindowSendable {
-  private ByteBuffer m_pcm;
+  private long m_pcm;
 
   /**
    * Create an instance of the Compressor
@@ -76,13 +72,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    * @return true if the compressor is on
    */
   public boolean enabled() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    boolean on = CompressorJNI.getCompressor(m_pcm, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-
-    return on;
+    return CompressorJNI.getCompressor(m_pcm);
   }
 
   /**
@@ -92,13 +82,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    *         plugged into the PCM
    */
   public boolean getPressureSwitchValue() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    boolean on = CompressorJNI.getPressureSwitch(m_pcm, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-
-    return on;
+    return CompressorJNI.getPressureSwitch(m_pcm);
   }
 
   /**
@@ -107,13 +91,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    * @return current consumed in amps for the compressor motor
    */
   public float getCompressorCurrent() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    float current = CompressorJNI.getCompressorCurrent(m_pcm, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-
-    return current;
+    return CompressorJNI.getCompressorCurrent(m_pcm);
   }
 
   /**
@@ -123,11 +101,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    *        otherwise normal operation of the compressor is disabled.
    */
   public void setClosedLoopControl(boolean on) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    CompressorJNI.setClosedLoopControl(m_pcm, on, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    CompressorJNI.setClosedLoopControl(m_pcm, on);
   }
 
   /**
@@ -137,13 +111,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    *         return false.
    */
   public boolean getClosedLoopControl() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    boolean on = CompressorJNI.getClosedLoopControl(m_pcm, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-
-    return on;
+    return CompressorJNI.getClosedLoopControl(m_pcm);
   }
 
   /**
@@ -151,13 +119,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    *         compressor current being too high.
    */
   public boolean getCompressorCurrentTooHighFault() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    boolean retval = CompressorJNI.getCompressorCurrentTooHighFault(m_pcm, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-
-    return retval;
+    return CompressorJNI.getCompressorCurrentTooHighFault(m_pcm);
   }
 
   /**
@@ -165,14 +127,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    *         to compressor current being too high.
    */
   public boolean getCompressorCurrentTooHighStickyFault() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    boolean retval =
-        CompressorJNI.getCompressorCurrentTooHighStickyFault(m_pcm, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-
-    return retval;
+    return CompressorJNI.getCompressorCurrentTooHighStickyFault(m_pcm);
   }
 
   /**
@@ -180,13 +135,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    *         shorted.
    */
   public boolean getCompressorShortedStickyFault() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    boolean retval = CompressorJNI.getCompressorShortedStickyFault(m_pcm, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-
-    return retval;
+    return CompressorJNI.getCompressorShortedStickyFault(m_pcm);
   }
 
   /**
@@ -194,13 +143,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    *         shorted.
    */
   public boolean getCompressorShortedFault() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    boolean retval = CompressorJNI.getCompressorShortedFault(m_pcm, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-
-    return retval;
+    return CompressorJNI.getCompressorShortedFault(m_pcm);
   }
 
   /**
@@ -208,14 +151,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    *         wired, i.e. compressor is not drawing enough current.
    */
   public boolean getCompressorNotConnectedStickyFault() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    boolean retval =
-        CompressorJNI.getCompressorNotConnectedStickyFault(m_pcm, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-
-    return retval;
+    return CompressorJNI.getCompressorNotConnectedStickyFault(m_pcm);
   }
 
   /**
@@ -223,13 +159,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    *         wired, i.e. compressor is not drawing enough current.
    */
   public boolean getCompressorNotConnectedFault() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    boolean retval = CompressorJNI.getCompressorNotConnectedFault(m_pcm, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-
-    return retval;
+    return CompressorJNI.getCompressorNotConnectedFault(m_pcm);
   }
 
   /**
@@ -243,11 +173,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    * If no sticky faults are set then this call will have no effect.
    */
   public void clearAllPCMStickyFaults() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    CompressorJNI.clearAllPCMStickyFaults(m_pcm, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    CompressorJNI.clearAllPCMStickyFaults(m_pcm);
   }
 
   @Override

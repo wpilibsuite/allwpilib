@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInst
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.EncoderJNI;
-import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
@@ -49,7 +48,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * The index source
    */
   protected DigitalSource m_indexSource = null; // Index on some encoders
-  private ByteBuffer m_encoder;
+  private long m_encoder;
   private int m_index;
   private double m_distancePerPulse; // distance of travel for each encoder
   // tick
@@ -80,19 +79,15 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
     switch (m_encodingType) {
       case k4X:
         m_encodingScale = 4;
-        ByteBuffer status = ByteBuffer.allocateDirect(4);
-        // set the byte order
-        status.order(ByteOrder.LITTLE_ENDIAN);
         ByteBuffer index = ByteBuffer.allocateDirect(4);
         // set the byte order
         index.order(ByteOrder.LITTLE_ENDIAN);
         m_encoder =
             EncoderJNI.initializeEncoder((byte) m_aSource.getModuleForRouting(), m_aSource
-                .getChannelForRouting(), (byte) (m_aSource.getAnalogTriggerForRouting() ? 1 : 0),
+                .getChannelForRouting(), m_aSource.getAnalogTriggerForRouting(),
                 (byte) m_bSource.getModuleForRouting(), m_bSource.getChannelForRouting(),
-                (byte) (m_bSource.getAnalogTriggerForRouting() ? 1 : 0),
-                (byte) (reverseDirection ? 1 : 0), index.asIntBuffer(), status.asIntBuffer());
-        HALUtil.checkStatus(status.asIntBuffer());
+                m_bSource.getAnalogTriggerForRouting(),
+                reverseDirection, index.asIntBuffer());
         m_index = index.asIntBuffer().get(0);
         m_counter = null;
         setMaxPeriod(.5);
@@ -378,11 +373,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
       m_counter.free();
       m_counter = null;
     } else {
-      ByteBuffer status = ByteBuffer.allocateDirect(4);
-      // set the byte order
-      status.order(ByteOrder.LITTLE_ENDIAN);
-      EncoderJNI.freeEncoder(m_encoder, status.asIntBuffer());
-      HALUtil.checkStatus(status.asIntBuffer());
+      EncoderJNI.freeEncoder(m_encoder);
     }
   }
 
@@ -397,11 +388,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
     if (m_counter != null) {
       value = m_counter.get();
     } else {
-      ByteBuffer status = ByteBuffer.allocateDirect(4);
-      // set the byte order
-      status.order(ByteOrder.LITTLE_ENDIAN);
-      value = EncoderJNI.getEncoder(m_encoder, status.asIntBuffer());
-      HALUtil.checkStatus(status.asIntBuffer());
+      value = EncoderJNI.getEncoder(m_encoder);
     }
     return value;
   }
@@ -425,11 +412,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
     if (m_counter != null) {
       m_counter.reset();
     } else {
-      ByteBuffer status = ByteBuffer.allocateDirect(4);
-      // set the byte order
-      status.order(ByteOrder.LITTLE_ENDIAN);
-      EncoderJNI.resetEncoder(m_encoder, status.asIntBuffer());
-      HALUtil.checkStatus(status.asIntBuffer());
+      EncoderJNI.resetEncoder(m_encoder);
     }
   }
 
@@ -449,11 +432,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
     if (m_counter != null) {
       measuredPeriod = m_counter.getPeriod() / decodingScaleFactor();
     } else {
-      ByteBuffer status = ByteBuffer.allocateDirect(4);
-      // set the byte order
-      status.order(ByteOrder.LITTLE_ENDIAN);
-      measuredPeriod = EncoderJNI.getEncoderPeriod(m_encoder, status.asIntBuffer());
-      HALUtil.checkStatus(status.asIntBuffer());
+      measuredPeriod = EncoderJNI.getEncoderPeriod(m_encoder);
     }
     return measuredPeriod;
   }
@@ -474,11 +453,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
     if (m_counter != null) {
       m_counter.setMaxPeriod(maxPeriod * decodingScaleFactor());
     } else {
-      ByteBuffer status = ByteBuffer.allocateDirect(4);
-      // set the byte order
-      status.order(ByteOrder.LITTLE_ENDIAN);
-      EncoderJNI.setEncoderMaxPeriod(m_encoder, maxPeriod, status.asIntBuffer());
-      HALUtil.checkStatus(status.asIntBuffer());
+      EncoderJNI.setEncoderMaxPeriod(m_encoder, maxPeriod);
     }
   }
 
@@ -494,12 +469,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
     if (m_counter != null) {
       return m_counter.getStopped();
     } else {
-      ByteBuffer status = ByteBuffer.allocateDirect(4);
-      // set the byte order
-      status.order(ByteOrder.LITTLE_ENDIAN);
-      boolean value = EncoderJNI.getEncoderStopped(m_encoder, status.asIntBuffer()) != 0;
-      HALUtil.checkStatus(status.asIntBuffer());
-      return value;
+      return EncoderJNI.getEncoderStopped(m_encoder);
     }
   }
 
@@ -512,12 +482,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
     if (m_counter != null) {
       return m_counter.getDirection();
     } else {
-      ByteBuffer status = ByteBuffer.allocateDirect(4);
-      // set the byte order
-      status.order(ByteOrder.LITTLE_ENDIAN);
-      boolean value = EncoderJNI.getEncoderDirection(m_encoder, status.asIntBuffer()) != 0;
-      HALUtil.checkStatus(status.asIntBuffer());
-      return value;
+      return EncoderJNI.getEncoderDirection(m_encoder);
     }
   }
 
@@ -613,18 +578,12 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
   public void setSamplesToAverage(int samplesToAverage) {
     switch (m_encodingType) {
       case k4X:
-        ByteBuffer status = ByteBuffer.allocateDirect(4);
-        // set the byte order
-        status.order(ByteOrder.LITTLE_ENDIAN);
-        EncoderJNI.setEncoderSamplesToAverage(m_encoder, samplesToAverage, status.asIntBuffer());
-        if (status.duplicate().get() == HALUtil.PARAMETER_OUT_OF_RANGE) {
-          throw new BoundaryException(BoundaryException.getMessage(samplesToAverage, 1, 127));
-        }
-        HALUtil.checkStatus(status.asIntBuffer());
+        EncoderJNI.setEncoderSamplesToAverage(m_encoder, samplesToAverage);
         break;
       case k1X:
       case k2X:
         m_counter.setSamplesToAverage(samplesToAverage);
+	break;
     }
   }
 
@@ -639,12 +598,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
   public int getSamplesToAverage() {
     switch (m_encodingType) {
       case k4X:
-        ByteBuffer status = ByteBuffer.allocateDirect(4);
-        // set the byte order
-        status.order(ByteOrder.LITTLE_ENDIAN);
-        int value = EncoderJNI.getEncoderSamplesToAverage(m_encoder, status.asIntBuffer());
-        HALUtil.checkStatus(status.asIntBuffer());
-        return value;
+        return EncoderJNI.getEncoderSamplesToAverage(m_encoder);
       case k1X:
       case k2X:
         return m_counter.getSamplesToAverage();
@@ -693,17 +647,12 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @param type The state that will cause the encoder to reset
    */
   public void setIndexSource(int channel, IndexingType type) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
     boolean activeHigh =
         (type == IndexingType.kResetWhileHigh) || (type == IndexingType.kResetOnRisingEdge);
     boolean edgeSensitive =
         (type == IndexingType.kResetOnFallingEdge) || (type == IndexingType.kResetOnRisingEdge);
 
-    EncoderJNI.setEncoderIndexSource(m_encoder, channel, false, activeHigh, edgeSensitive,
-        status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    EncoderJNI.setEncoderIndexSource(m_encoder, channel, false, activeHigh, edgeSensitive);
   }
 
   /**
@@ -724,17 +673,13 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @param type The state that will cause the encoder to reset
    */
   public void setIndexSource(DigitalSource source, IndexingType type) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
     boolean activeHigh =
         (type == IndexingType.kResetWhileHigh) || (type == IndexingType.kResetOnRisingEdge);
     boolean edgeSensitive =
         (type == IndexingType.kResetOnFallingEdge) || (type == IndexingType.kResetOnRisingEdge);
 
     EncoderJNI.setEncoderIndexSource(m_encoder, source.getChannelForRouting(),
-        source.getAnalogTriggerForRouting(), activeHigh, edgeSensitive, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+        source.getAnalogTriggerForRouting(), activeHigh, edgeSensitive);
   }
 
   /**

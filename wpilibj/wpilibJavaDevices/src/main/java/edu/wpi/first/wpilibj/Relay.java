@@ -7,13 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.DIOJNI;
-import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.hal.RelayJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
@@ -112,7 +108,7 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
   }
 
   private final int m_channel;
-  private ByteBuffer m_port;
+  private long m_port;
 
   private Direction m_direction;
   private static Resource relayChannels = new Resource(kRelayChannels * 2);
@@ -137,11 +133,7 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
       throw new AllocationException("Relay channel " + m_channel + " is already allocated");
     }
 
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    m_port = DIOJNI.initializeDigitalPort(DIOJNI.getPort((byte) m_channel), status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    m_port = DIOJNI.initializeDigitalPort(DIOJNI.getPort((byte) m_channel));
 
     m_safetyHelper = new MotorSafetyHelper(this);
     m_safetyHelper.setSafetyEnabled(false);
@@ -182,16 +174,10 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
       relayChannels.free(m_channel * 2 + 1);
     }
 
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
+    RelayJNI.setRelayForward(m_port, false);
+    RelayJNI.setRelayReverse(m_port, false);
 
-    RelayJNI.setRelayForward(m_port, (byte) 0, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    RelayJNI.setRelayReverse(m_port, (byte) 0, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-
-    DIOJNI.freeDIO(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    DIOJNI.freeDIO(m_port);
   }
 
   /**
@@ -210,51 +196,46 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
    * @param value The state to set the relay.
    */
   public void set(Value value) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
     switch (value) {
       case kOff:
         if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
-          RelayJNI.setRelayForward(m_port, (byte) 0, status.asIntBuffer());
+          RelayJNI.setRelayForward(m_port, false);
         }
         if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
-          RelayJNI.setRelayReverse(m_port, (byte) 0, status.asIntBuffer());
+          RelayJNI.setRelayReverse(m_port, false);
         }
         break;
       case kOn:
         if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
-          RelayJNI.setRelayForward(m_port, (byte) 1, status.asIntBuffer());
+          RelayJNI.setRelayForward(m_port, true);
         }
         if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
-          RelayJNI.setRelayReverse(m_port, (byte) 1, status.asIntBuffer());
+          RelayJNI.setRelayReverse(m_port, true);
         }
         break;
       case kForward:
         if (m_direction == Direction.kReverse)
           throw new InvalidValueException("A relay configured for reverse cannot be set to forward");
         if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
-          RelayJNI.setRelayForward(m_port, (byte) 1, status.asIntBuffer());
+          RelayJNI.setRelayForward(m_port, true);
         }
         if (m_direction == Direction.kBoth) {
-          RelayJNI.setRelayReverse(m_port, (byte) 0, status.asIntBuffer());
+          RelayJNI.setRelayReverse(m_port, false);
         }
         break;
       case kReverse:
         if (m_direction == Direction.kForward)
           throw new InvalidValueException("A relay configured for forward cannot be set to reverse");
         if (m_direction == Direction.kBoth) {
-          RelayJNI.setRelayForward(m_port, (byte) 0, status.asIntBuffer());
+          RelayJNI.setRelayForward(m_port, false);
         }
         if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
-          RelayJNI.setRelayReverse(m_port, (byte) 1, status.asIntBuffer());
+          RelayJNI.setRelayReverse(m_port, true);
         }
         break;
       default:
         // Cannot hit this, limited by Value enum
     }
-
-    HALUtil.checkStatus(status.asIntBuffer());
   }
 
   /**
@@ -268,11 +249,8 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
    * @return The current state of the relay as a Relay::Value
    */
   public Value get() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    if (RelayJNI.getRelayForward(m_port, status.asIntBuffer()) != 0) {
-      if (RelayJNI.getRelayReverse(m_port, status.asIntBuffer()) != 0) {
+    if (RelayJNI.getRelayForward(m_port)) {
+      if (RelayJNI.getRelayReverse(m_port)) {
         return Value.kOn;
       } else {
         if (m_direction == Direction.kForward) {
@@ -282,7 +260,7 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
         }
       }
     } else {
-      if (RelayJNI.getRelayReverse(m_port, status.asIntBuffer()) != 0) {
+      if (RelayJNI.getRelayReverse(m_port)) {
         if (m_direction == Direction.kReverse) {
           return Value.kOn;
         } else {

@@ -4,6 +4,7 @@
 
 #include "edu_wpi_first_wpilibj_hal_InterruptJNI.h"
 #include "HAL/Interrupts.hpp"
+#include "HALUtil.h"
 
 TLogLevel interruptJNILogLevel = logERROR;
 
@@ -11,197 +12,165 @@ TLogLevel interruptJNILogLevel = logERROR;
 	if (level > interruptJNILogLevel) ; \
 	else Log().Get(level)
 
-//Used for callback when an interrupt is fired.
-static JavaVM *jvm;
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_InterruptJNI
- * Method:    initializeInterruptJVM
- * Signature: (Ljava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_initializeInterruptJVM
-  (JNIEnv * env, jclass, jobject status)
-{
-	//This method should be called once to setup the JVM
-	INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI initializeInterruptJVM";
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	INTERRUPTJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	*statusPtr = 0;
-	jint rs = env->GetJavaVM(&jvm);
-	assert (rs == JNI_OK);
-}
-
+extern "C" {
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_InterruptJNI
  * Method:    initializeInterrupts
- * Signature: (IBLjava/nio/IntBuffer;)Ljava/nio/ByteBuffer;
+ * Signature: (IZ)J
  */
-JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_initializeInterrupts
-  (JNIEnv * env, jclass, jint interruptIndex, jbyte watcher, jobject status)
+JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_initializeInterrupts
+  (JNIEnv * env, jclass, jint interruptIndex, jboolean watcher)
 {
 	INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI initializeInterrupts";
 	INTERRUPTJNI_LOG(logDEBUG) << "interruptIndex = " << interruptIndex;
 	INTERRUPTJNI_LOG(logDEBUG) << "watcher = " << (bool) watcher;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	INTERRUPTJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
 
-	void** interruptPtr = (void**)new unsigned char[4];
-	*statusPtr = 0;
-	*interruptPtr = (void**) initializeInterrupts(interruptIndex, watcher, statusPtr);
+	int32_t status = 0;
+	void* interrupt = initializeInterrupts(interruptIndex, watcher, &status);
 
-	INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << *interruptPtr;
-	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << interrupt;
+	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
 
-	return env->NewDirectByteBuffer(interruptPtr, 4);
+	CheckStatus(env, status);
+	return (jlong)interrupt;
 }
 
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_InterruptJNI
  * Method:    cleanInterrupts
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+ * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_cleanInterrupts
-  (JNIEnv * env, jclass, jobject interrupt_pointer, jobject status)
+  (JNIEnv * env, jclass, jlong interrupt_pointer)
 {
 	INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI cleanInterrupts";
-	void ** javaId = (void**)env->GetDirectBufferAddress(interrupt_pointer);
-	INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	INTERRUPTJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << (void*)interrupt_pointer;
 
-	*statusPtr = 0;
-	cleanInterrupts(*javaId, statusPtr);
+	int32_t status = 0;
+	cleanInterrupts((void*)interrupt_pointer, &status);
 
-	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
+
+	CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_InterruptJNI
  * Method:    waitForInterrupt
- * Signature: (Ljava/nio/ByteBuffer;DLjava/nio/IntBuffer;)V
+ * Signature: (JD)V
  */
 JNIEXPORT int JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_waitForInterrupt
-  (JNIEnv * env, jclass, jobject interrupt_pointer, jdouble timeout, jboolean ignorePrevious, jobject status)
+  (JNIEnv * env, jclass, jlong interrupt_pointer, jdouble timeout, jboolean ignorePrevious)
 {
 	INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI waitForInterrupt";
-	void ** javaId = (void**)env->GetDirectBufferAddress(interrupt_pointer);
-	INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	INTERRUPTJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << (void*)interrupt_pointer;
 
-	*statusPtr = 0;
-	int result = waitForInterrupt(*javaId, timeout, ignorePrevious, statusPtr);
+	int32_t status = 0;
+	int result = waitForInterrupt((void*)interrupt_pointer, timeout, ignorePrevious, &status);
 
-	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
 
+	CheckStatus(env, status);
 	return result;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_InterruptJNI
  * Method:    enableInterrupts
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+ * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_enableInterrupts
-  (JNIEnv * env, jclass, jobject interrupt_pointer, jobject status)
+  (JNIEnv * env, jclass, jlong interrupt_pointer)
 {
 	INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI enableInterrupts";
-	void ** javaId = (void**)env->GetDirectBufferAddress(interrupt_pointer);
-	INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	INTERRUPTJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << (void*)interrupt_pointer;
 
-	*statusPtr = 0;
-	enableInterrupts(*javaId, statusPtr);
+	int32_t status = 0;
+	enableInterrupts((void*)interrupt_pointer, &status);
 
-	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
+
+	CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_InterruptJNI
  * Method:    disableInterrupts
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+ * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_disableInterrupts
-  (JNIEnv * env, jclass, jobject interrupt_pointer, jobject status)
+  (JNIEnv * env, jclass, jlong interrupt_pointer)
 {
 	INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI disableInterrupts";
-	void ** javaId = (void**)env->GetDirectBufferAddress(interrupt_pointer);
-	INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	INTERRUPTJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << (void*)interrupt_pointer;
 
-	*statusPtr = 0;
-	disableInterrupts(*javaId, statusPtr);
+	int32_t status = 0;
+	disableInterrupts((void*)interrupt_pointer, &status);
 
-	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
+
+	CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_InterruptJNI
  * Method:    readRisingTimestamp
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)D
+ * Signature: (J)D
  */
 JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readRisingTimestamp
-  (JNIEnv * env, jclass, jobject interrupt_pointer, jobject status)
+  (JNIEnv * env, jclass, jlong interrupt_pointer)
 {
 	INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI readRisingTimestamp";
-	void ** javaId = (void**)env->GetDirectBufferAddress(interrupt_pointer);
-	INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	INTERRUPTJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << (void*)interrupt_pointer;
 
-	*statusPtr = 0;
-	jdouble timeStamp = readRisingTimestamp(*javaId, statusPtr);
+	int32_t status = 0;
+	jdouble timeStamp = readRisingTimestamp((void*)interrupt_pointer, &status);
 
-	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
 	return timeStamp;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_InterruptJNI
  * Method:    readFallingTimestamp
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)D
+ * Signature: (J)D
  */
 JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readFallingTimestamp
-  (JNIEnv * env, jclass, jobject interrupt_pointer, jobject status)
+  (JNIEnv * env, jclass, jlong interrupt_pointer)
 {
 	INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI readFallingTimestamp";
-	void ** javaId = (void**)env->GetDirectBufferAddress(interrupt_pointer);
-	INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	INTERRUPTJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << (void*)interrupt_pointer;
 
-	*statusPtr = 0;
-	jdouble timeStamp = readFallingTimestamp(*javaId, statusPtr);
+	int32_t status = 0;
+	jdouble timeStamp = readFallingTimestamp((void*)interrupt_pointer, &status);
 
-	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
 	return timeStamp;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_InterruptJNI
  * Method:    requestInterrupts
- * Signature: (Ljava/nio/ByteBuffer;BIBLjava/nio/IntBuffer;)V
+ * Signature: (JBIZ)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_requestInterrupts
-  (JNIEnv * env, jclass, jobject interrupt_pointer, jbyte routing_module, jint routing_pin, jbyte routing_analog_trigger, jobject status)
+  (JNIEnv * env, jclass, jlong interrupt_pointer, jbyte routing_module, jint routing_pin, jboolean routing_analog_trigger)
 {
 	INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI requestInterrupts";
-	void ** javaId = (void**)env->GetDirectBufferAddress(interrupt_pointer);
-	INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << *javaId;
+	INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << (void*)interrupt_pointer;
 	INTERRUPTJNI_LOG(logDEBUG) << "routing module = " << (jint) routing_module;
 	INTERRUPTJNI_LOG(logDEBUG) << "routing pin = " << routing_pin;
 	INTERRUPTJNI_LOG(logDEBUG) << "routing analog trigger = " << (jint) routing_analog_trigger;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	INTERRUPTJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
 
-	*statusPtr = 0;
-	requestInterrupts(*javaId, (uint8_t) routing_module, (uint32_t) routing_pin, routing_analog_trigger, statusPtr);
+	int32_t status = 0;
+	requestInterrupts((void*)interrupt_pointer, (uint8_t) routing_module, (uint32_t) routing_pin, routing_analog_trigger, &status);
 
-	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
 }
 
 
@@ -260,17 +229,13 @@ void interruptHandler(uint32_t mask, void *data) {
 /*
  * Class:     edu_wpi_first_wpilibj_hal_InterruptJNI
  * Method:    attachInterruptHandler
- * Signature: (Ljava/nio/ByteBuffer;Ledu/wpi/first/wpilibj/hal/InterruptJNI/InterruptHandlerFunction;Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+ * Signature: (JLedu/wpi/first/wpilibj/hal/InterruptJNI/InterruptHandlerFunction;Ljava/nio/ByteBuffer;)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_attachInterruptHandler
-  (JNIEnv * env, jclass, jobject interrupt_pointer, jobject handler, jobject param, jobject status)
+  (JNIEnv * env, jclass, jlong interrupt_pointer, jobject handler, jobject param)
 {
 	INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI attachInterruptHandler";
-	void ** javaId = (void**)env->GetDirectBufferAddress(interrupt_pointer);
-	INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << *javaId;
-
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	INTERRUPTJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << (void*)interrupt_pointer;
 
 	//Store the interrupt callback paramaters
 	InterruptHandlerParam *interruptHandlerParam = new InterruptHandlerParam();
@@ -301,31 +266,31 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_attachInterru
 	INTERRUPTJNI_LOG(logDEBUG) << "InterruptHandlerParam->mid = " << interruptHandlerParam->mid;
 	INTERRUPTJNI_LOG(logDEBUG) << "InterruptHandlerParam->param = " << interruptHandlerParam->param;
 
-	*statusPtr = 0;
-	attachInterruptHandler(*javaId, interruptHandler, interruptHandlerParam, statusPtr);
+	int32_t status = 0;
+	attachInterruptHandler((void*)interrupt_pointer, interruptHandler, interruptHandlerParam, &status);
 
-	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_InterruptJNI
  * Method:    setInterruptUpSourceEdge
- * Signature: (Ljava/nio/ByteBuffer;BBLjava/nio/IntBuffer;)V
+ * Signature: (JZZ)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_setInterruptUpSourceEdge
-  (JNIEnv * env, jclass, jobject interrupt_pointer, jbyte risingEdge, jbyte fallingEdge, jobject status)
+  (JNIEnv * env, jclass, jlong interrupt_pointer, jboolean risingEdge, jboolean fallingEdge)
 {
 	INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI setInterruptUpSourceEdge";
-	void ** javaId = (void**)env->GetDirectBufferAddress(interrupt_pointer);
-	INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << *javaId;
+	INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << (void*)interrupt_pointer;
 	INTERRUPTJNI_LOG(logDEBUG) << "Rising Edge = " << (bool) risingEdge;
 	INTERRUPTJNI_LOG(logDEBUG) << "Falling Edge = " << (bool) fallingEdge;
 
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	INTERRUPTJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+	int32_t status = 0;
+	setInterruptUpSourceEdge((void*)interrupt_pointer, risingEdge, fallingEdge, &status);
 
-	*statusPtr = 0;
-	setInterruptUpSourceEdge(*javaId, risingEdge, fallingEdge, statusPtr);
-
-	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
 }
+
+}  // extern "C"

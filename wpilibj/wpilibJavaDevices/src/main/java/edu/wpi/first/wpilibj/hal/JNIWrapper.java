@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
-import java.nio.ByteBuffer;
 
 //
 // base class for all JNI wrappers
@@ -49,7 +48,7 @@ public class JNIWrapper {
     }
   }
 
-  public static native ByteBuffer getPortWithModule(byte module, byte pin);
+  public static native long getPortWithModule(byte module, byte pin);
 
-  public static native ByteBuffer getPort(byte pin);
+  public static native long getPort(byte pin);
 }

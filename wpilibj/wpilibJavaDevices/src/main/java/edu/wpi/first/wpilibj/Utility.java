@@ -7,14 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
-import java.lang.StackTraceElement;
-
-import edu.wpi.first.wpilibj.hal.HALLibrary;
 import edu.wpi.first.wpilibj.hal.HALUtil;
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
 
 /**
  * Contains global utility functions
@@ -29,12 +22,7 @@ public class Utility {
    * @return FPGA Version number.
    */
   int getFPGAVersion() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    int value = HALUtil.getFPGAVersion(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return value;
+    return HALUtil.getFPGAVersion();
   }
 
   /**
@@ -45,12 +33,7 @@ public class Utility {
    * @return FPGA Revision number.
    */
   long getFPGARevision() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    int value = HALUtil.getFPGARevision(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return (long) value;
+    return (long) HALUtil.getFPGARevision();
   }
 
   /**
@@ -59,13 +42,7 @@ public class Utility {
    * @return The current time in microseconds according to the FPGA.
    */
   public static long getFPGATime() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    long value = HALUtil.getFPGATime(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return value;
+    return HALUtil.getFPGATime();
   }
 
   /**
@@ -74,12 +51,6 @@ public class Utility {
    * @return true if the button is currently pressed down
    */
   public static boolean getUserButton() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    boolean value = HALUtil.getFPGAButton(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return value;
+    return HALUtil.getFPGAButton();
   }
 }

@@ -2,6 +2,8 @@
 #include "edu_wpi_first_wpilibj_hal_AccelerometerJNI.h"
 #include "HAL/Accelerometer.hpp"
 
+extern "C" {
+
 /*
  * Class:     edu_wpi_first_wpilibj_hal_AccelerometerJNI
  * Method:    setAccelerometerActive
@@ -56,3 +58,5 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAcc
 {
 	return getAccelerometerZ();
 }
+
+}  // extern "C"

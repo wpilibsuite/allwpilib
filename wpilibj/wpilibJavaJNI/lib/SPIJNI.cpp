@@ -5,7 +5,7 @@
 #include "edu_wpi_first_wpilibj_hal_SPIJNI.h"
 
 #include "HAL/Digital.hpp"
-
+#include "HALUtil.h"
 
 // set the logging level
 TLogLevel spiJNILogLevel = logWARNING;
@@ -14,20 +14,22 @@ TLogLevel spiJNILogLevel = logWARNING;
     if (level > spiJNILogLevel) ; \
     else Log().Get(level)
 
+extern "C" {
+
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
  * Method:    spiInitialize
- * Signature: (BLjava/nio/IntBuffer;)V
+ * Signature: (B)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiInitialize
-  (JNIEnv * env, jclass, jbyte port, jobject status)
+  (JNIEnv * env, jclass, jbyte port)
 {
 	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiInitialize";
 	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	*statusPtr = 0;
-	spiInitialize(port, statusPtr);
-	SPIJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	int32_t status = 0;
+	spiInitialize(port, &status);
+	SPIJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
 }
 
 /*
@@ -40,16 +42,15 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiTransaction
 {
 	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiTransaction";
 	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
-	jbyte * dataToSendPtr = NULL;
-	jbyte * dataReceivedPtr = NULL;
-	if(dataToSend != 0){
-		dataToSendPtr = (jbyte*)env->GetDirectBufferAddress(dataToSend);
+	uint8_t* dataToSendPtr = nullptr;
+	if (dataToSend != 0) {
+		dataToSendPtr = (uint8_t*)env->GetDirectBufferAddress(dataToSend);
 	}
-	dataReceivedPtr = (jbyte*)env->GetDirectBufferAddress(dataReceived);
+	uint8_t* dataReceivedPtr = (uint8_t*)env->GetDirectBufferAddress(dataReceived);
 	SPIJNI_LOG(logDEBUG) << "Size = " << (jint)size;
-	SPIJNI_LOG(logDEBUG) << "DataToSendPtr = " << (jint*)dataToSendPtr;
-	SPIJNI_LOG(logDEBUG) << "DataReceivedPtr = " << (jint*) dataReceivedPtr;
-	jbyte retVal = spiTransaction(port, (uint8_t*)dataToSendPtr, (uint8_t*)dataReceivedPtr, size);
+	SPIJNI_LOG(logDEBUG) << "DataToSendPtr = " << dataToSendPtr;
+	SPIJNI_LOG(logDEBUG) << "DataReceivedPtr = " << dataReceivedPtr;
+	jint retVal = spiTransaction(port, dataToSendPtr, dataReceivedPtr, size);
 	SPIJNI_LOG(logDEBUG) << "ReturnValue = " << (jint)retVal;
 	return retVal;
 }
@@ -64,13 +65,13 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiWrite
 {
 	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiWrite";
 	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
-	jbyte * dataToSendPtr = NULL;
-	if(dataToSend != 0){
-		dataToSendPtr = (jbyte*)env->GetDirectBufferAddress(dataToSend);
+	uint8_t* dataToSendPtr = nullptr;
+	if (dataToSend != 0) {
+		dataToSendPtr = (uint8_t*)env->GetDirectBufferAddress(dataToSend);
 	}
 	SPIJNI_LOG(logDEBUG) << "Size = " << (jint)size;
-	SPIJNI_LOG(logDEBUG) << "DataToSendPtr = " << (jint*)dataToSendPtr;
-	jbyte retVal = spiWrite(port, (uint8_t*)dataToSendPtr, size);
+	SPIJNI_LOG(logDEBUG) << "DataToSendPtr = " << dataToSendPtr;
+	jint retVal = spiWrite(port, dataToSendPtr, size);
 	SPIJNI_LOG(logDEBUG) << "ReturnValue = " << (jint)retVal;
 	return retVal;
 }
@@ -86,11 +87,10 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiRead
 {
 	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiRead";
 	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
-	jbyte * dataReceivedPtr = NULL;
-	dataReceivedPtr = (jbyte*)env->GetDirectBufferAddress(dataReceived);
+	uint8_t* dataReceivedPtr = (uint8_t*)env->GetDirectBufferAddress(dataReceived);
 	SPIJNI_LOG(logDEBUG) << "Size = " << (jint)size;
-	SPIJNI_LOG(logDEBUG) << "DataReceivedPtr = " << (jint*) dataReceivedPtr;
-	jbyte retVal = spiRead(port, (uint8_t*)dataReceivedPtr, size);
+	SPIJNI_LOG(logDEBUG) << "DataReceivedPtr = " << dataReceivedPtr;
+	jint retVal = spiRead(port, (uint8_t*)dataReceivedPtr, size);
 	SPIJNI_LOG(logDEBUG) << "ReturnValue = " << (jint)retVal;
 	return retVal;
 }
@@ -142,32 +142,33 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetOpts
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
  * Method:    spiSetChipSelectActiveHigh
- * Signature: (BLjava/nio/IntBuffer;)V
+ * Signature: (B)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectActiveHigh
-  (JNIEnv * env, jclass, jbyte port, jobject status)
+  (JNIEnv * env, jclass, jbyte port)
 {
 	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetCSActiveHigh";
 	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	*statusPtr = 0;
-	spiSetChipSelectActiveHigh(port, statusPtr);
-	SPIJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	int32_t status = 0;
+	spiSetChipSelectActiveHigh(port, &status);
+	SPIJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
  * Method:    spiSetChipSelectActiveLow
- * Signature: (BLjava/nio/IntBuffer;)V
+ * Signature: (B)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectActiveLow
-  (JNIEnv * env, jclass, jbyte port, jobject status)
+  (JNIEnv * env, jclass, jbyte port)
 {
 	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetCSActiveLow";
 	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	*statusPtr = 0;
-	spiSetChipSelectActiveLow(port, statusPtr);
-	SPIJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	int32_t status = 0;
+	spiSetChipSelectActiveLow(port, &status);
+	SPIJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
 }
 
+}  // extern "C"

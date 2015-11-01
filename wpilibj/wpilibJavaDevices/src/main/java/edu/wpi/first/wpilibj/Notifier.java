@@ -1,12 +1,9 @@
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.lang.Runtime;
 
-import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.hal.NotifierJNI;
 import edu.wpi.first.wpilibj.Utility;
 
@@ -58,7 +55,7 @@ public class Notifier {
   static private Notifier timerQueueHead = null;
   // The C pointer to the notifier object. We don't use it directly, it is just
   // passed to the JNI bindings.
-  private static ByteBuffer m_notifier;
+  private static long m_notifier;
   // The lock for the queue information (namely, timerQueueHead and the
   // m_nextEvent members).
   private static ReentrantLock queueLock = new ReentrantLock();
@@ -89,17 +86,6 @@ public class Notifier {
   private ReentrantLock m_handlerLock = new ReentrantLock();
 
   /**
-   * This is done to store the JVM variable in the InterruptJNI This is done
-   * because the HAL must have access to the JVM variable in order to attach the
-   * newly spawned thread when an interrupt is fired.
-   */
-  static {
-    ByteBuffer status = pointer();
-    NotifierJNI.initializeNotifierJVM(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-  }
-
-  /**
    * Create a Notifier for timer event notification.
    *$
    * @param handler The handler is called at the notification time which is set
@@ -120,9 +106,7 @@ public class Notifier {
 
     // If this was the last instance of a Notifier, clean up after ourselves.
     if ((--refcount) == 0) {
-      ByteBuffer status = pointer();
-      NotifierJNI.cleanNotifier(m_notifier, status.asIntBuffer());
-      HALUtil.checkStatus(status.asIntBuffer());
+      NotifierJNI.cleanNotifier(m_notifier);
     }
 
     queueLock.unlock();
@@ -140,10 +124,7 @@ public class Notifier {
    */
   static protected void updateAlarm() {
     if (timerQueueHead != null) {
-      ByteBuffer status = pointer();
-      NotifierJNI.updateNotifierAlarm(m_notifier, (int) (timerQueueHead.m_expirationTime * 1e6),
-          status.asIntBuffer());
-      HALUtil.checkStatus(status.asIntBuffer());
+      NotifierJNI.updateNotifierAlarm(m_notifier, (int) (timerQueueHead.m_expirationTime * 1e6));
     }
   }
 
@@ -271,17 +252,7 @@ public class Notifier {
 
   // First time init.
   protected static void init() {
-    ByteBuffer status = pointer();
     m_processQueue = new ProcessQueue();
-    m_notifier = NotifierJNI.initializeNotifier(m_processQueue, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-  }
-
-  // Returns a ByteBuffer with the appropriate length and endianness to pass to
-  // the JNI bindings.
-  protected static ByteBuffer pointer() {
-    ByteBuffer buf = ByteBuffer.allocateDirect(HALUtil.pointerSize());
-    buf.order(ByteOrder.LITTLE_ENDIAN);
-    return buf;
+    m_notifier = NotifierJNI.initializeNotifier(m_processQueue);
   }
 }

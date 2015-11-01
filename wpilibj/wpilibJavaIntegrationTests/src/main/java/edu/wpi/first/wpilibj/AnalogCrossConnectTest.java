@@ -196,6 +196,7 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
   @Override
   void setInterruptHigh() {
     analogIO.getOutput().setVoltage(4.0);
+    Timer.delay(kDelayTime);
   }
 
   /*
@@ -206,5 +207,6 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
   @Override
   void setInterruptLow() {
     analogIO.getOutput().setVoltage(1.0);
+    Timer.delay(kDelayTime);
   }
 }

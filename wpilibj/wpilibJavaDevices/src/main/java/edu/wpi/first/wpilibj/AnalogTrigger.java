@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
-import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
 import java.nio.ByteBuffer;
@@ -46,7 +45,7 @@ public class AnalogTrigger {
   /**
    * Where the analog trigger is attached
    */
-  protected ByteBuffer m_port;
+  protected long m_port;
   protected int m_index;
 
   /**
@@ -55,15 +54,12 @@ public class AnalogTrigger {
    * @param channel the port to use for the analog trigger
    */
   protected void initTrigger(final int channel) {
-    ByteBuffer port_pointer = AnalogJNI.getPort((byte) channel);
+    long port_pointer = AnalogJNI.getPort((byte) channel);
     ByteBuffer index = ByteBuffer.allocateDirect(4);
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
     index.order(ByteOrder.LITTLE_ENDIAN);
-    status.order(ByteOrder.LITTLE_ENDIAN);
 
     m_port =
-        AnalogJNI.initializeAnalogTrigger(port_pointer, index.asIntBuffer(), status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+        AnalogJNI.initializeAnalogTrigger(port_pointer, index.asIntBuffer());
     m_index = index.asIntBuffer().get(0);
 
     UsageReporting.report(tResourceType.kResourceType_AnalogTrigger, channel);
@@ -97,11 +93,8 @@ public class AnalogTrigger {
    * Release the resources used by this object
    */
   public void free() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    AnalogJNI.cleanAnalogTrigger(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    m_port = null;
+    AnalogJNI.cleanAnalogTrigger(m_port);
+    m_port = 0;
   }
 
   /**
@@ -116,10 +109,7 @@ public class AnalogTrigger {
     if (lower > upper) {
       throw new BoundaryException("Lower bound is greater than upper");
     }
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    AnalogJNI.setAnalogTriggerLimitsRaw(m_port, lower, upper, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    AnalogJNI.setAnalogTriggerLimitsRaw(m_port, lower, upper);
   }
 
   /**
@@ -133,11 +123,7 @@ public class AnalogTrigger {
     if (lower > upper) {
       throw new BoundaryException("Lower bound is greater than upper bound");
     }
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    AnalogJNI.setAnalogTriggerLimitsVoltage(m_port, (float) lower, (float) upper,
-        status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    AnalogJNI.setAnalogTriggerLimitsVoltage(m_port, lower, upper);
   }
 
   /**
@@ -148,11 +134,7 @@ public class AnalogTrigger {
    * @param useAveragedValue true to use an averaged value, false otherwise
    */
   public void setAveraged(boolean useAveragedValue) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    AnalogJNI.setAnalogTriggerAveraged(m_port, (byte) (useAveragedValue ? 1 : 0),
-        status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    AnalogJNI.setAnalogTriggerAveraged(m_port, useAveragedValue);
   }
 
   /**
@@ -164,11 +146,7 @@ public class AnalogTrigger {
    * @param useFilteredValue true to use a filterd value, false otherwise
    */
   public void setFiltered(boolean useFilteredValue) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    AnalogJNI.setAnalogTriggerFiltered(m_port, (byte) (useFilteredValue ? 1 : 0),
-        status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    AnalogJNI.setAnalogTriggerFiltered(m_port, useFilteredValue);
   }
 
   /**
@@ -188,11 +166,7 @@ public class AnalogTrigger {
    * @return The InWindow output of the analog trigger.
    */
   public boolean getInWindow() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    byte value = AnalogJNI.getAnalogTriggerInWindow(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return value != 0;
+    return AnalogJNI.getAnalogTriggerInWindow(m_port);
   }
 
   /**
@@ -203,11 +177,7 @@ public class AnalogTrigger {
    * @return The TriggerState output of the analog trigger.
    */
   public boolean getTriggerState() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    byte value = AnalogJNI.getAnalogTriggerTriggerState(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return value != 0;
+    return AnalogJNI.getAnalogTriggerTriggerState(m_port);
   }
 
   /**

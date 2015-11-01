@@ -7,9 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 import edu.wpi.first.wpilibj.hal.PDPJNI;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -43,12 +40,7 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
    * @return The voltage of the PDP in volts
    */
   public double getVoltage() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    double voltage = PDPJNI.getPDPVoltage(status.asIntBuffer(), m_module);
-
-    return voltage;
+    return PDPJNI.getPDPVoltage(m_module);
   }
 
   /**
@@ -57,12 +49,7 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
    * @return The temperature of the PDP in degrees Celsius
    */
   public double getTemperature() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    double temperature = PDPJNI.getPDPTemperature(status.asIntBuffer(), m_module);
-
-    return temperature;
+    return PDPJNI.getPDPTemperature(m_module);
   }
 
   /**
@@ -71,10 +58,7 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
    * @return The current of one of the PDP channels (channels 0-15) in Amperes
    */
   public double getCurrent(int channel) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    double current = PDPJNI.getPDPChannelCurrent((byte) channel, status.asIntBuffer(), m_module);
+    double current = PDPJNI.getPDPChannelCurrent((byte) channel, m_module);
 
     checkPDPChannel(channel);
 
@@ -87,12 +71,7 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
    * @return The current of all the channels in Amperes
    */
   public double getTotalCurrent() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    double current = PDPJNI.getPDPTotalCurrent(status.asIntBuffer(), m_module);
-
-    return current;
+    return PDPJNI.getPDPTotalCurrent(m_module);
   }
 
   /**
@@ -101,13 +80,7 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
    * @return the total power in Watts
    */
   public double getTotalPower() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    double power = PDPJNI.getPDPTotalPower(status.asIntBuffer(), m_module);
-
-    return power;
-
+    return PDPJNI.getPDPTotalPower(m_module);
   }
 
   /**
@@ -116,32 +89,21 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
    * @return the total energy in Joules
    */
   public double getTotalEnergy() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    double energy = PDPJNI.getPDPTotalEnergy(status.asIntBuffer(), m_module);
-
-    return energy;
+    return PDPJNI.getPDPTotalEnergy(m_module);
   }
 
   /**
    * Reset the total energy to 0
    */
   public void resetTotalEnergy() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    PDPJNI.resetPDPTotalEnergy(status.asIntBuffer(), m_module);
+    PDPJNI.resetPDPTotalEnergy(m_module);
   }
 
   /**
    * Clear all PDP sticky faults
    */
   public void clearStickyFaults() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    PDPJNI.clearPDPStickyFaults(status.asIntBuffer(), m_module);
+    PDPJNI.clearPDPStickyFaults(m_module);
   }
 
   public String getSmartDashboardType() {

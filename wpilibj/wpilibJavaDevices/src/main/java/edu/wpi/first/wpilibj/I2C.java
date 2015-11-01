@@ -7,13 +7,11 @@
 package edu.wpi.first.wpilibj;
 
 import java.nio.ByteOrder;
-import java.nio.IntBuffer;
 import java.nio.ByteBuffer;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.HALLibrary;
-import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.hal.I2CJNI;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
@@ -48,14 +46,10 @@ public class I2C extends SensorBase {
    * @param deviceAddress The address of the device on the I2C bus.
    */
   public I2C(Port port, int deviceAddress) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
     m_port = port;
     m_deviceAddress = deviceAddress;
 
-    I2CJNI.i2CInitialize((byte) m_port.getValue(), status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    I2CJNI.i2CInitialize((byte) m_port.getValue());
 
     UsageReporting.report(tResourceType.kResourceType_I2C, deviceAddress);
   }

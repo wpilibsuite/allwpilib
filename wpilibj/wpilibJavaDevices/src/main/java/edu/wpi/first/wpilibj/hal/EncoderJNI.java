@@ -1,36 +1,34 @@
 package edu.wpi.first.wpilibj.hal;
 
 import java.nio.IntBuffer;
-import java.nio.ByteBuffer;
 
 public class EncoderJNI extends JNIWrapper {
-  public static native ByteBuffer initializeEncoder(byte port_a_module, int port_a_pin,
-      byte port_a_analog_trigger, byte port_b_module, int port_b_pin, byte port_b_analog_trigger,
-      byte reverseDirection, IntBuffer index, IntBuffer status);
+  public static native long initializeEncoder(byte port_a_module, int port_a_pin,
+      boolean port_a_analog_trigger, byte port_b_module, int port_b_pin, boolean port_b_analog_trigger,
+      boolean reverseDirection, IntBuffer index);
 
-  public static native void freeEncoder(ByteBuffer encoder_pointer, IntBuffer status);
+  public static native void freeEncoder(long encoder_pointer);
 
-  public static native void resetEncoder(ByteBuffer encoder_pointer, IntBuffer status);
+  public static native void resetEncoder(long encoder_pointer);
 
-  public static native int getEncoder(ByteBuffer encoder_pointer, IntBuffer status);
+  public static native int getEncoder(long encoder_pointer);
 
-  public static native double getEncoderPeriod(ByteBuffer encoder_pointer, IntBuffer status);
+  public static native double getEncoderPeriod(long encoder_pointer);
 
-  public static native void setEncoderMaxPeriod(ByteBuffer encoder_pointer, double maxPeriod,
-      IntBuffer status);
+  public static native void setEncoderMaxPeriod(long encoder_pointer, double maxPeriod);
 
-  public static native byte getEncoderStopped(ByteBuffer encoder_pointer, IntBuffer status);
+  public static native boolean getEncoderStopped(long encoder_pointer);
 
-  public static native byte getEncoderDirection(ByteBuffer encoder_pointer, IntBuffer status);
+  public static native boolean getEncoderDirection(long encoder_pointer);
 
-  public static native void setEncoderReverseDirection(ByteBuffer encoder_pointer,
-      byte reverseDirection, IntBuffer status);
+  public static native void setEncoderReverseDirection(long encoder_pointer,
+      boolean reverseDirection);
 
-  public static native void setEncoderSamplesToAverage(ByteBuffer encoder_pointer,
-      int samplesToAverage, IntBuffer status);
+  public static native void setEncoderSamplesToAverage(long encoder_pointer,
+      int samplesToAverage);
 
-  public static native int getEncoderSamplesToAverage(ByteBuffer encoder_pointer, IntBuffer status);
+  public static native int getEncoderSamplesToAverage(long encoder_pointer);
 
-  public static native void setEncoderIndexSource(ByteBuffer digital_port, int pin,
-      boolean analogTrigger, boolean activeHigh, boolean edgeSensitive, IntBuffer status);
+  public static native void setEncoderIndexSource(long digital_port, int pin,
+      boolean analogTrigger, boolean activeHigh, boolean edgeSensitive);
 }

@@ -8,14 +8,11 @@ package edu.wpi.first.wpilibj;
 
 import java.io.UnsupportedEncodingException;
 
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
 import java.nio.ByteBuffer;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.HALLibrary;
-import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.hal.SerialPortJNI;
 
 /**
@@ -191,20 +188,13 @@ public class SerialPort {
    */
   public SerialPort(final int baudRate, Port port, final int dataBits, Parity parity,
       StopBits stopBits) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
     m_port = (byte) port.getValue();
 
-    SerialPortJNI.serialInitializePort(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    SerialPortJNI.serialSetBaudRate(m_port, baudRate, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    SerialPortJNI.serialSetDataBits(m_port, (byte) dataBits, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    SerialPortJNI.serialSetParity(m_port, (byte) parity.value, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    SerialPortJNI.serialSetStopBits(m_port, (byte) stopBits.value, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    SerialPortJNI.serialInitializePort(m_port);
+    SerialPortJNI.serialSetBaudRate(m_port, baudRate);
+    SerialPortJNI.serialSetDataBits(m_port, (byte) dataBits);
+    SerialPortJNI.serialSetParity(m_port, (byte) parity.value);
+    SerialPortJNI.serialSetStopBits(m_port, (byte) stopBits.value);
 
     // Set the default read buffer size to 1 to return bytes immediately
     setReadBufferSize(1);
@@ -258,10 +248,7 @@ public class SerialPort {
    * Destructor.
    */
   public void free() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    SerialPortJNI.serialClose(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    SerialPortJNI.serialClose(m_port);
   }
 
   /**
@@ -272,10 +259,7 @@ public class SerialPort {
    * @param flowControl the FlowControl value to use
    */
   public void setFlowControl(FlowControl flowControl) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    SerialPortJNI.serialSetFlowControl(m_port, (byte) flowControl.value, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    SerialPortJNI.serialSetFlowControl(m_port, (byte) flowControl.value);
   }
 
   /**
@@ -288,10 +272,7 @@ public class SerialPort {
    * @param terminator The character to use for termination.
    */
   public void enableTermination(char terminator) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    SerialPortJNI.serialEnableTermination(m_port, terminator, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    SerialPortJNI.serialEnableTermination(m_port, terminator);
   }
 
   /**
@@ -311,10 +292,7 @@ public class SerialPort {
    * Disable termination behavior.
    */
   public void disableTermination() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    SerialPortJNI.serialDisableTermination(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    SerialPortJNI.serialDisableTermination(m_port);
   }
 
   /**
@@ -323,12 +301,7 @@ public class SerialPort {
    * @return The number of bytes available to read.
    */
   public int getBytesReceived() {
-    int retVal = 0;
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    retVal = SerialPortJNI.serialGetBytesRecieved(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return retVal;
+    return SerialPortJNI.serialGetBytesRecieved(m_port);
   }
 
   /**
@@ -363,11 +336,8 @@ public class SerialPort {
    * @return An array of the read bytes
    */
   public byte[] read(final int count) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
     ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(count);
-    int gotten = SerialPortJNI.serialRead(m_port, dataReceivedBuffer, count, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    int gotten = SerialPortJNI.serialRead(m_port, dataReceivedBuffer, count);
     byte[] retVal = new byte[gotten];
     dataReceivedBuffer.get(retVal);
     return retVal;
@@ -381,13 +351,9 @@ public class SerialPort {
    * @return The number of bytes actually written into the port.
    */
   public int write(byte[] buffer, int count) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
     ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(count);
     dataToSendBuffer.put(buffer, 0, count);
-    int retVal = SerialPortJNI.serialWrite(m_port, dataToSendBuffer, count, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return retVal;
+    return SerialPortJNI.serialWrite(m_port, dataToSendBuffer, count);
   }
 
   /**
@@ -410,10 +376,7 @@ public class SerialPort {
    * @param timeout The number of seconds to to wait for I/O.
    */
   public void setTimeout(double timeout) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    SerialPortJNI.serialSetTimeout(m_port, (float) timeout, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    SerialPortJNI.serialSetTimeout(m_port, (float) timeout);
   }
 
   /**
@@ -429,10 +392,7 @@ public class SerialPort {
    * @param size The read buffer size.
    */
   public void setReadBufferSize(int size) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    SerialPortJNI.serialSetReadBufferSize(m_port, size, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    SerialPortJNI.serialSetReadBufferSize(m_port, size);
   }
 
   /**
@@ -444,10 +404,7 @@ public class SerialPort {
    * @param size The write buffer size.
    */
   public void setWriteBufferSize(int size) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    SerialPortJNI.serialSetWriteBufferSize(m_port, size, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    SerialPortJNI.serialSetWriteBufferSize(m_port, size);
   }
 
   /**
@@ -462,10 +419,7 @@ public class SerialPort {
    * @param mode The write buffer mode.
    */
   public void setWriteBufferMode(WriteBufferMode mode) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    SerialPortJNI.serialSetWriteMode(m_port, (byte) mode.value, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    SerialPortJNI.serialSetWriteMode(m_port, (byte) mode.value);
   }
 
   /**
@@ -475,10 +429,7 @@ public class SerialPort {
    * flush before the buffer is full.
    */
   public void flush() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    SerialPortJNI.serialFlush(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    SerialPortJNI.serialFlush(m_port);
   }
 
   /**
@@ -487,9 +438,6 @@ public class SerialPort {
    * Empty the transmit and receive buffers in the device and formatted I/O.
    */
   public void reset() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    SerialPortJNI.serialClear(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    SerialPortJNI.serialClear(m_port);
   }
 }

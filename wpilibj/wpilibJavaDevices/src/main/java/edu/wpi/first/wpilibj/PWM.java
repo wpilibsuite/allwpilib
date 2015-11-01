@@ -7,9 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteOrder;
-import java.nio.ByteBuffer;
-
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.PWMJNI;
@@ -19,7 +16,6 @@ import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 import edu.wpi.first.wpilibj.util.AllocationException;
 import edu.wpi.first.wpilibj.util.CheckedAllocationException;
-import edu.wpi.first.wpilibj.hal.HALUtil;
 
 /**
  * Class implements the PWM generation in the FPGA.
@@ -67,7 +63,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
   }
 
   private int m_channel;
-  private ByteBuffer m_port;
+  private long m_port;
   /**
    * kDefaultPwmPeriod is in ms
    *
@@ -116,19 +112,13 @@ public class PWM extends SensorBase implements LiveWindowSendable {
     checkPWMChannel(channel);
     m_channel = channel;
 
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
+    m_port = DIOJNI.initializeDigitalPort(DIOJNI.getPort((byte) m_channel));
 
-    m_port = DIOJNI.initializeDigitalPort(DIOJNI.getPort((byte) m_channel), status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-
-    if (!PWMJNI.allocatePWMChannel(m_port, status.asIntBuffer())) {
+    if (!PWMJNI.allocatePWMChannel(m_port)) {
       throw new AllocationException("PWM channel " + channel + " is already allocated");
     }
-    HALUtil.checkStatus(status.asIntBuffer());
 
-    PWMJNI.setPWM(m_port, (short) 0, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    PWMJNI.setPWM(m_port, (short) 0);
 
     m_eliminateDeadband = false;
 
@@ -150,17 +140,9 @@ public class PWM extends SensorBase implements LiveWindowSendable {
    * Free the resource associated with the PWM channel and set the value to 0.
    */
   public void free() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    PWMJNI.setPWM(m_port, (short) 0, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-
-    PWMJNI.freePWMChannel(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-
-    PWMJNI.freeDIO(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    PWMJNI.setPWM(m_port, (short) 0);
+    PWMJNI.freePWMChannel(m_port);
+    PWMJNI.freeDIO(m_port);
   }
 
   /**
@@ -209,11 +191,8 @@ public class PWM extends SensorBase implements LiveWindowSendable {
    */
   protected void setBounds(double max, double deadbandMax, double center, double deadbandMin,
       double min) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
     double loopTime =
-        DIOJNI.getLoopTiming(status.asIntBuffer()) / (kSystemClockTicksPerMicrosecond * 1e3);
+        DIOJNI.getLoopTiming() / (kSystemClockTicksPerMicrosecond * 1e3);
 
     m_maxPwm = (int) ((max - kDefaultPwmCenter) / loopTime + kDefaultPwmStepsDown - 1);
     m_deadbandMaxPwm =
@@ -352,11 +331,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
    * @param value Raw PWM value. Range 0 - 255.
    */
   public void setRaw(int value) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    PWMJNI.setPWM(m_port, (short) value, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    PWMJNI.setPWM(m_port, (short) value);
   }
 
   /**
@@ -367,13 +342,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
    * @return Raw PWM control value. Range: 0 - 255.
    */
   public int getRaw() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    int value = PWMJNI.getPWM(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-
-    return value;
+    return PWMJNI.getPWM(m_port);
   }
 
   /**
@@ -382,36 +351,26 @@ public class PWM extends SensorBase implements LiveWindowSendable {
    * @param mult The period multiplier to apply to this channel
    */
   public void setPeriodMultiplier(PeriodMultiplier mult) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
     switch (mult.value) {
       case PeriodMultiplier.k4X_val:
         // Squelch 3 out of 4 outputs
-        PWMJNI.setPWMPeriodScale(m_port, 3, status.asIntBuffer());
+        PWMJNI.setPWMPeriodScale(m_port, 3);
         break;
       case PeriodMultiplier.k2X_val:
         // Squelch 1 out of 2 outputs
-        PWMJNI.setPWMPeriodScale(m_port, 1, status.asIntBuffer());
+        PWMJNI.setPWMPeriodScale(m_port, 1);
         break;
       case PeriodMultiplier.k1X_val:
         // Don't squelch any outputs
-        PWMJNI.setPWMPeriodScale(m_port, 0, status.asIntBuffer());
+        PWMJNI.setPWMPeriodScale(m_port, 0);
         break;
       default:
         // Cannot hit this, limited by PeriodMultiplier enum
     }
-
-    HALUtil.checkStatus(status.asIntBuffer());
   }
 
   protected void setZeroLatch() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    PWMJNI.latchPWMZero(m_port, status.asIntBuffer());
-
-    HALUtil.checkStatus(status.asIntBuffer());
+    PWMJNI.latchPWMZero(m_port);
   }
 
   private int getMaxPositivePwm() {

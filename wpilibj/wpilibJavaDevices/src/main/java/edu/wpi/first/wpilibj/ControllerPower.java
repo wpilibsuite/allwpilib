@@ -7,11 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
-
-import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.hal.PowerJNI;
 
 public class ControllerPower {
@@ -21,11 +16,7 @@ public class ControllerPower {
    * @return The controller input voltage value in Volts
    */
   public static double getInputVoltage() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    double retVal = PowerJNI.getVinVoltage(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return retVal;
+    return PowerJNI.getVinVoltage();
   }
 
   /**
@@ -34,11 +25,7 @@ public class ControllerPower {
    * @return The controller input current value in Amps
    */
   public static double getInputCurrent() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    double retVal = PowerJNI.getVinCurrent(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return retVal;
+    return PowerJNI.getVinCurrent();
   }
 
   /**
@@ -47,11 +34,7 @@ public class ControllerPower {
    * @return The controller 3.3V rail voltage value in Volts
    */
   public static double getVoltage3V3() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    double retVal = PowerJNI.getUserVoltage3V3(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return retVal;
+    return PowerJNI.getUserVoltage3V3();
   }
 
   /**
@@ -60,11 +43,7 @@ public class ControllerPower {
    * @return The controller 3.3V rail output current value in Volts
    */
   public static double getCurrent3V3() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    double retVal = PowerJNI.getUserCurrent3V3(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return retVal;
+    return PowerJNI.getUserCurrent3V3();
   }
 
   /**
@@ -75,11 +54,7 @@ public class ControllerPower {
    * @return The controller 3.3V rail enabled value
    */
   public static boolean getEnabled3V3() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    boolean retVal = PowerJNI.getUserActive3V3(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return retVal;
+    return PowerJNI.getUserActive3V3();
   }
 
   /**
@@ -89,11 +64,7 @@ public class ControllerPower {
    * @return The number of faults
    */
   public static int getFaultCount3V3() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    int retVal = PowerJNI.getUserCurrentFaults3V3(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return retVal;
+    return PowerJNI.getUserCurrentFaults3V3();
   }
 
   /**
@@ -102,11 +73,7 @@ public class ControllerPower {
    * @return The controller 5V rail voltage value in Volts
    */
   public static double getVoltage5V() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    double retVal = PowerJNI.getUserVoltage5V(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return retVal;
+    return PowerJNI.getUserVoltage5V();
   }
 
   /**
@@ -115,11 +82,7 @@ public class ControllerPower {
    * @return The controller 5V rail output current value in Amps
    */
   public static double getCurrent5V() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    double retVal = PowerJNI.getUserCurrent5V(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return retVal;
+    return PowerJNI.getUserCurrent5V();
   }
 
   /**
@@ -130,11 +93,7 @@ public class ControllerPower {
    * @return The controller 5V rail enabled value
    */
   public static boolean getEnabled5V() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    boolean retVal = PowerJNI.getUserActive5V(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return retVal;
+    return PowerJNI.getUserActive5V();
   }
 
   /**
@@ -144,11 +103,7 @@ public class ControllerPower {
    * @return The number of faults
    */
   public static int getFaultCount5V() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    int retVal = PowerJNI.getUserCurrentFaults5V(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return retVal;
+    return PowerJNI.getUserCurrentFaults5V();
   }
 
   /**
@@ -157,11 +112,7 @@ public class ControllerPower {
    * @return The controller 6V rail voltage value in Volts
    */
   public static double getVoltage6V() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    double retVal = PowerJNI.getUserVoltage6V(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return retVal;
+    return PowerJNI.getUserVoltage6V();
   }
 
   /**
@@ -170,11 +121,7 @@ public class ControllerPower {
    * @return The controller 6V rail output current value in Amps
    */
   public static double getCurrent6V() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    double retVal = PowerJNI.getUserCurrent6V(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return retVal;
+    return PowerJNI.getUserCurrent6V();
   }
 
   /**
@@ -185,11 +132,7 @@ public class ControllerPower {
    * @return The controller 6V rail enabled value
    */
   public static boolean getEnabled6V() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    boolean retVal = PowerJNI.getUserActive6V(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return retVal;
+    return PowerJNI.getUserActive6V();
   }
 
   /**
@@ -199,10 +142,6 @@ public class ControllerPower {
    * @return The number of faults
    */
   public static int getFaultCount6V() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    int retVal = PowerJNI.getUserCurrentFaults6V(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return retVal;
+    return PowerJNI.getUserCurrentFaults6V();
   }
 }

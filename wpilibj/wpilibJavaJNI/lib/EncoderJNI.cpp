@@ -5,6 +5,8 @@
 #include "edu_wpi_first_wpilibj_hal_EncoderJNI.h"
 
 #include "HAL/Digital.hpp"
+#include "HAL/Errors.hpp"
+#include "HALUtil.h"
 
 // set the logging level
 TLogLevel encoderJNILogLevel = logWARNING;
@@ -13,13 +15,15 @@ TLogLevel encoderJNILogLevel = logWARNING;
     if (level > encoderJNILogLevel) ; \
     else Log().Get(level)
 
+extern "C" {
+
 /*
  * Class:     edu_wpi_first_wpilibj_hal_EncoderJNI
  * Method:    initializeEncoder
- * Signature: (BIBBIBBLjava/nio/IntBuffer;Ljava/nio/IntBuffer;)Ljava/nio/ByteBuffer;
+ * Signature: (BIZBIZZLjava/nio/IntBuffer;)J
  */
-JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_initializeEncoder
-  (JNIEnv * env, jclass, jbyte port_a_module, jint port_a_pin, jbyte port_a_analog_trigger, jbyte port_b_module, jint port_b_pin, jbyte port_b_analog_trigger, jbyte reverseDirection, jobject index, jobject status)
+JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_initializeEncoder
+  (JNIEnv * env, jclass, jbyte port_a_module, jint port_a_pin, jboolean port_a_analog_trigger, jbyte port_b_module, jint port_b_pin, jboolean port_b_analog_trigger, jboolean reverseDirection, jobject index)
 {
 	ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI initializeEncoder";
 	ENCODERJNI_LOG(logDEBUG) << "Module A = " << (jint)port_a_module;
@@ -31,228 +35,210 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_initializeEn
 	ENCODERJNI_LOG(logDEBUG) << "Reverse direction = " << (jint)reverseDirection;
 	jint * indexPtr = (jint*)env->GetDirectBufferAddress(index);
 	ENCODERJNI_LOG(logDEBUG) << "Index Ptr = " << indexPtr;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	void** encoderPtr = (void**)new unsigned char[4];
-	*statusPtr = 0;
-	*encoderPtr = initializeEncoder(port_a_module, port_a_pin, port_a_analog_trigger,
+	int32_t status = 0;
+	void* encoder = initializeEncoder(port_a_module, port_a_pin, port_a_analog_trigger,
 							  port_b_module, port_b_pin, port_b_analog_trigger,
-							  reverseDirection, indexPtr, statusPtr);
+							  reverseDirection, indexPtr, &status);
 
 	ENCODERJNI_LOG(logDEBUG) << "Index = " << *indexPtr;
-	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
-	ENCODERJNI_LOG(logDEBUG) << "ENCODER Ptr = " << *encoderPtr;
-	return env->NewDirectByteBuffer( encoderPtr, 4);
+	ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
+	ENCODERJNI_LOG(logDEBUG) << "ENCODER Ptr = " << encoder;
+	CheckStatus(env, status);
+	return (jlong)encoder;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_EncoderJNI
  * Method:    freeEncoder
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+ * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_freeEncoder
-  (JNIEnv * env, jclass, jobject id, jobject status)
+  (JNIEnv * env, jclass, jlong id)
 {
 	ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI freeEncoder";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	*statusPtr = 0;
-	freeEncoder(*javaId, statusPtr);
-	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << (void*)id;
+	int32_t status = 0;
+	freeEncoder((void*)id, &status);
+	ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_EncoderJNI
  * Method:    resetEncoder
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+ * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_resetEncoder
-  (JNIEnv * env, jclass, jobject id, jobject status)
+  (JNIEnv * env, jclass, jlong id)
 {
 	ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI resetEncoder";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	*statusPtr = 0;
-	resetEncoder(*javaId, statusPtr);
-	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << (void*)id;
+	int32_t status = 0;
+	resetEncoder((void*)id, &status);
+	ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_EncoderJNI
  * Method:    getEncoder
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)I
+ * Signature: (J)I
  */
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoder
-  (JNIEnv * env, jclass, jobject id, jobject status)
+  (JNIEnv * env, jclass, jlong id)
 {
 	ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI getEncoder";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	*statusPtr = 0;
-	jint returnValue = getEncoder(*javaId, statusPtr);
-	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << (void*)id;
+	int32_t status = 0;
+	jint returnValue = getEncoder((void*)id, &status);
+	ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
 	ENCODERJNI_LOG(logDEBUG) << "getEncoderResult = " <<  returnValue;
+	CheckStatus(env, status);
 	return returnValue;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_EncoderJNI
  * Method:    getEncoderPeriod
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)D
+ * Signature: (J)D
  */
 JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderPeriod
-  (JNIEnv * env, jclass, jobject id, jobject status)
+  (JNIEnv * env, jclass, jlong id)
 {
 	ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI getEncoderPeriod";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	*statusPtr = 0;
-	double returnValue = getEncoderPeriod(*javaId, statusPtr);
-	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << (void*)id;
+	int32_t status = 0;
+	double returnValue = getEncoderPeriod((void*)id, &status);
+	ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
 	ENCODERJNI_LOG(logDEBUG) << "getEncoderPeriodResult = " <<  returnValue;
+	CheckStatus(env, status);
 	return returnValue;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_EncoderJNI
  * Method:    setEncoderMaxPeriod
- * Signature: (Ljava/nio/ByteBuffer;DLjava/nio/IntBuffer;)V
+ * Signature: (JD)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_setEncoderMaxPeriod
-  (JNIEnv * env, jclass, jobject id, jdouble value, jobject status)
+  (JNIEnv * env, jclass, jlong id, jdouble value)
 {
 	ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI setEncoderMaxPeriod";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	*statusPtr = 0;
-	setEncoderMaxPeriod(*javaId, value, statusPtr);
-	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << (void*)id;
+	int32_t status = 0;
+	setEncoderMaxPeriod((void*)id, value, &status);
+	ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_EncoderJNI
  * Method:    getEncoderStopped
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)B
+ * Signature: (J)Z
  */
-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderStopped
-  (JNIEnv * env, jclass, jobject id, jobject status)
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderStopped
+  (JNIEnv * env, jclass, jlong id)
 {
 	ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI getEncoderStopped";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	*statusPtr = 0;
-	jbyte returnValue = getEncoderStopped(*javaId, statusPtr);
-	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << (void*)id;
+	int32_t status = 0;
+	jboolean returnValue = getEncoderStopped((void*)id, &status);
+	ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
 	ENCODERJNI_LOG(logDEBUG) << "getEncoderStoppedResult = " <<  returnValue;
+	CheckStatus(env, status);
 	return returnValue;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_EncoderJNI
  * Method:    getEncoderDirection
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)B
+ * Signature: (J)Z
  */
-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderDirection
-  (JNIEnv * env, jclass, jobject id, jobject status)
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderDirection
+  (JNIEnv * env, jclass, jlong id)
 {
 	ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI getEncoderDirection";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	*statusPtr = 0;
-	jbyte returnValue = getEncoderDirection(*javaId, statusPtr);
-	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << (void*)id;
+	int32_t status = 0;
+	jboolean returnValue = getEncoderDirection((void*)id, &status);
+	ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
 	ENCODERJNI_LOG(logDEBUG) << "getEncoderDirectionResult = " <<  returnValue;
+	CheckStatus(env, status);
 	return returnValue;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_EncoderJNI
  * Method:    setEncoderReverseDirection
- * Signature: (Ljava/nio/ByteBuffer;BLjava/nio/IntBuffer;)V
+ * Signature: (JZ)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_setEncoderReverseDirection
-  (JNIEnv * env, jclass, jobject id, jbyte value, jobject status)
+  (JNIEnv * env, jclass, jlong id, jboolean value)
 {
 	ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI setEncoderReverseDirection";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	*statusPtr = 0;
-	setEncoderReverseDirection(*javaId, value, statusPtr);
-	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << (void*)id;
+	int32_t status = 0;
+	setEncoderReverseDirection((void*)id, value, &status);
+	ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_EncoderJNI
  * Method:    setEncoderSamplesToAverage
- * Signature: (Ljava/nio/ByteBuffer;ILjava/nio/IntBuffer;)V
+ * Signature: (JI)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_setEncoderSamplesToAverage
-  (JNIEnv * env, jclass, jobject id, jint value, jobject status)
+  (JNIEnv * env, jclass, jlong id, jint value)
 {
 	ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI setEncoderSamplesToAverage";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	*statusPtr = 0;
-	setEncoderSamplesToAverage(*javaId, value, statusPtr);
-	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << (void*)id;
+	int32_t status = 0;
+	setEncoderSamplesToAverage((void*)id, value, &status);
+	ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
+	if (status == PARAMETER_OUT_OF_RANGE) {
+		ThrowBoundaryException(env, value, 1, 127);
+		return;
+	}
+	CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_EncoderJNI
  * Method:    getEncoderSamplesToAverage
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)I
+ * Signature: (J)I
  */
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderSamplesToAverage
-  (JNIEnv * env, jclass, jobject id, jobject status)
+  (JNIEnv * env, jclass, jlong id)
 {
 	ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI getEncoderSamplesToAverage";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	*statusPtr = 0;
-	jint returnValue = getEncoderSamplesToAverage(*javaId, statusPtr);
-	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << (void*)id;
+	int32_t status = 0;
+	jint returnValue = getEncoderSamplesToAverage((void*)id, &status);
+	ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
 	ENCODERJNI_LOG(logDEBUG) << "getEncoderSamplesToAverageResult = " <<  returnValue;
+	CheckStatus(env, status);
 	return returnValue;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_EncoderJNI
  * Method:    setEncoderIndexSource
- * Signature: (Ljava/nio/ByteBuffer;IZZZLjava/nio/IntBuffer;)V
+ * Signature: (JIZZZ)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_setEncoderIndexSource
-  (JNIEnv * env, jclass, jobject id, jint pin, jboolean analogTrigger, jboolean activeHigh, jboolean edgeSensitive, jobject status)
+  (JNIEnv * env, jclass, jlong id, jint pin, jboolean analogTrigger, jboolean activeHigh, jboolean edgeSensitive)
 {
 	ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI setEncoderIndexSource";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+	ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << (void*)id;
 	ENCODERJNI_LOG(logDEBUG) << "Pin = " << pin;
 	ENCODERJNI_LOG(logDEBUG) << "Analog Trigger = " << (analogTrigger?"true":"false");
 	ENCODERJNI_LOG(logDEBUG) << "Active High = " << (activeHigh?"true":"false");
 	ENCODERJNI_LOG(logDEBUG) << "Edge Sensitive = " << (edgeSensitive?"true":"false");
-	ENCODERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	*statusPtr = 0;
-	setEncoderIndexSource(*javaId, pin, analogTrigger, activeHigh, edgeSensitive, statusPtr);
-	ENCODERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	int32_t status = 0;
+	setEncoderIndexSource((void*)id, pin, analogTrigger, activeHigh, edgeSensitive, &status);
+	ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
 }
+
+}  // extern "C"

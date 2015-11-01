@@ -1,10 +1,13 @@
 #include "edu_wpi_first_wpilibj_hal_PDPJNI.h"
 #include "HAL/PDP.hpp"
+#include "HALUtil.h"
+
+extern "C" {
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PDPJNI
  * Method:    getPDPTemperature
- * Signature: (Ljava/nio/IntBuffer;)D
+ * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_initializePDP
   (JNIEnv *, jclass, jint module)
@@ -15,112 +18,112 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_initializePDP
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PDPJNI
  * Method:    getPDPTemperature
- * Signature: (Ljava/nio/IntBuffer;)D
+ * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTemperature
-  (JNIEnv *env, jclass, jobject status, jint module)
+  (JNIEnv *env, jclass, jint module)
 {
-	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
-	
-	*status_ptr = 0;
-	return getPDPTemperature(status_ptr, module);
+	int32_t status = 0;
+	double temperature = getPDPTemperature(&status, module);
+  CheckStatus(env, status, false);
+  return temperature;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PDPJNI
  * Method:    getPDPVoltage
- * Signature: (Ljava/nio/IntBuffer;)D
+ * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPVoltage
-  (JNIEnv *env, jclass, jobject status, jint module)
+  (JNIEnv *env, jclass, jint module)
 {
-	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
-	
-	*status_ptr = 0;
-	return getPDPVoltage(status_ptr, module);
+	int32_t status = 0;
+	double voltage = getPDPVoltage(&status, module);
+  CheckStatus(env, status, false);
+  return voltage;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PDPJNI
  * Method:    getPDPChannelCurrent
- * Signature: (BLjava/nio/IntBuffer;)D
+ * Signature: (BI)D
  */
 JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPChannelCurrent
-  (JNIEnv *env, jclass, jbyte channel, jobject status, jint module)
+  (JNIEnv *env, jclass, jbyte channel, jint module)
 {
-	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
-	
-	*status_ptr = 0;
-	return getPDPChannelCurrent(channel, status_ptr, module);
+	int32_t status = 0;
+	double current = getPDPChannelCurrent(channel, &status, module);
+  CheckStatus(env, status, false);
+  return current;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PDPJNI
  * Method:    getPDPTotalCurrent
- * Signature: (BLjava/nio/IntBuffer;)D
+ * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalCurrent
-  (JNIEnv *env, jclass, jobject status, jint module)
+  (JNIEnv *env, jclass, jint module)
 {
-	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
-	
-	*status_ptr = 0;
-	return getPDPTotalCurrent(status_ptr, module);
+	int32_t status = 0;
+	double current = getPDPTotalCurrent(&status, module);
+  CheckStatus(env, status, false);
+  return current;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PDPJNI
  * Method:    getPDPTotalPower
- * Signature: (BLjava/nio/IntBuffer;)D
+ * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalPower
-  (JNIEnv *env, jclass, jobject status, jint module)
+  (JNIEnv *env, jclass, jint module)
 {
-	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
-	
-	*status_ptr = 0;
-	return getPDPTotalPower(status_ptr, module);
+	int32_t status = 0;
+	double power = getPDPTotalPower(&status, module);
+  CheckStatus(env, status, false);
+  return power;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PDPJNI
  * Method:    resetPDPTotalEnergy
- * Signature: (BLjava/nio/IntBuffer;)D
+ * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalEnergy
-  (JNIEnv *env, jclass, jobject status, jint module)
+  (JNIEnv *env, jclass, jint module)
 {
-	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
-	
-	*status_ptr = 0;
-	return getPDPTotalEnergy(status_ptr, module);
+	int32_t status = 0;
+	double energy = getPDPTotalEnergy(&status, module);
+  CheckStatus(env, status, false);
+  return energy;
 }
 
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PDPJNI
  * Method:    resetPDPTotalEnergy
- * Signature: (BLjava/nio/IntBuffer;)D
+ * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_resetPDPTotalEnergy
-  (JNIEnv *env, jclass, jobject status, jint module)
+  (JNIEnv *env, jclass, jint module)
 {
-	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
-	
-	*status_ptr = 0;
-	resetPDPTotalEnergy(status_ptr, module);
+	int32_t status = 0;
+	resetPDPTotalEnergy(&status, module);
+  CheckStatus(env, status, false);
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PDPJNI
  * Method:    clearStickyFaults
- * Signature: (BLjava/nio/IntBuffer;)D
+ * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_clearPDPStickyFaults
-  (JNIEnv *env, jclass, jobject status, jint module)
+  (JNIEnv *env, jclass, jint module)
 {
-	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
-	
-	*status_ptr = 0;
-	clearPDPStickyFaults(status_ptr, module);
+	int32_t status = 0;
+	clearPDPStickyFaults(&status, module);
+  CheckStatus(env, status, false);
 }
+
+}  // extern "C"

@@ -16,7 +16,6 @@ import java.nio.ByteBuffer;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
-import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
@@ -42,7 +41,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
 
   private static final int kAccumulatorSlot = 1;
   private static Resource channels = new Resource(kAnalogInputChannels);
-  private ByteBuffer m_port;
+  private long m_port;
   private int m_channel;
   private static final int[] kAccumulatorChannels = {0, 1};
   private long m_accumulatorOffset;
@@ -57,7 +56,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
   public AnalogInput(final int channel) {
     m_channel = channel;
 
-    if (AnalogJNI.checkAnalogInputChannel(channel) == 0) {
+    if (!AnalogJNI.checkAnalogInputChannel(channel)) {
       throw new AllocationException("Analog input channel " + m_channel
           + " cannot be allocated. Channel is not present.");
     }
@@ -67,12 +66,8 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
       throw new AllocationException("Analog input channel " + m_channel + " is already allocated");
     }
 
-    ByteBuffer port_pointer = AnalogJNI.getPort((byte) channel);
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    m_port = AnalogJNI.initializeAnalogInputPort(port_pointer, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    long port_pointer = AnalogJNI.getPort((byte) channel);
+    m_port = AnalogJNI.initializeAnalogInputPort(port_pointer);
 
     LiveWindow.addSensor("AnalogInput", channel, this);
     UsageReporting.report(tResourceType.kResourceType_AnalogChannel, channel);
@@ -96,12 +91,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
    * @return A sample straight from this channel.
    */
   public int getValue() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    int value = AnalogJNI.getAnalogValue(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return value;
+    return AnalogJNI.getAnalogValue(m_port);
   }
 
   /**
@@ -116,12 +106,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
    * @return A sample from the oversample and average engine for this channel.
    */
   public int getAverageValue() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    int value = AnalogJNI.getAnalogAverageValue(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return value;
+    return AnalogJNI.getAnalogAverageValue(m_port);
   }
 
   /**
@@ -132,12 +117,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
    * @return A scaled sample straight from this channel.
    */
   public double getVoltage() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    double value = AnalogJNI.getAnalogVoltage(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return value;
+    return AnalogJNI.getAnalogVoltage(m_port);
   }
 
   /**
@@ -152,12 +132,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
    *         engine for this channel.
    */
   public double getAverageVoltage() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    double value = AnalogJNI.getAnalogAverageVoltage(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return value;
+    return AnalogJNI.getAnalogAverageVoltage(m_port);
   }
 
   /**
@@ -170,12 +145,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
    * @return Least significant bit weight.
    */
   public long getLSBWeight() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    long value = AnalogJNI.getAnalogLSBWeight(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return value;
+    return AnalogJNI.getAnalogLSBWeight(m_port);
   }
 
   /**
@@ -187,12 +157,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
    * @return Offset constant.
    */
   public int getOffset() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    int value = AnalogJNI.getAnalogOffset(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return value;
+    return AnalogJNI.getAnalogOffset(m_port);
   }
 
   /**
@@ -212,11 +177,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
    * @param bits The number of averaging bits.
    */
   public void setAverageBits(final int bits) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    AnalogJNI.setAnalogAverageBits(m_port, bits, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    AnalogJNI.setAnalogAverageBits(m_port, bits);
   }
 
   /**
@@ -227,12 +188,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
    * @return The number of averaging bits.
    */
   public int getAverageBits() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    int value = AnalogJNI.getAnalogAverageBits(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return value;
+    return AnalogJNI.getAnalogAverageBits(m_port);
   }
 
   /**
@@ -243,11 +199,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
    * @param bits The number of oversample bits.
    */
   public void setOversampleBits(final int bits) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    AnalogJNI.setAnalogOversampleBits(m_port, bits, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    AnalogJNI.setAnalogOversampleBits(m_port, bits);
   }
 
   /**
@@ -258,12 +210,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
    * @return The number of oversample bits.
    */
   public int getOversampleBits() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    int value = AnalogJNI.getAnalogOversampleBits(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return value;
+    return AnalogJNI.getAnalogOversampleBits(m_port);
   }
 
   /**
@@ -275,11 +222,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
           + " on channels " + kAccumulatorChannels[0] + "," + kAccumulatorChannels[1]);
     }
     m_accumulatorOffset = 0;
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    AnalogJNI.initAccumulator(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    AnalogJNI.initAccumulator(m_port);
   }
 
   /**
@@ -298,11 +241,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
    * Resets the accumulator to the initial value.
    */
   public void resetAccumulator() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    AnalogJNI.resetAccumulator(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    AnalogJNI.resetAccumulator(m_port);
 
     // Wait until the next sample, so the next call to getAccumulator*()
     // won't have old values.
@@ -325,11 +264,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
    * bits will affect the size of the value for this field.
    */
   public void setAccumulatorCenter(int center) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    AnalogJNI.setAccumulatorCenter(m_port, center, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    AnalogJNI.setAccumulatorCenter(m_port, center);
   }
 
   /**
@@ -338,11 +273,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
    * @param deadband The deadband size in ADC codes (12-bit value)
    */
   public void setAccumulatorDeadband(int deadband) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    AnalogJNI.setAccumulatorDeadband(m_port, deadband, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    AnalogJNI.setAccumulatorDeadband(m_port, deadband);
   }
 
   /**
@@ -354,12 +285,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
    * @return The 64-bit value accumulated since the last Reset().
    */
   public long getAccumulatorValue() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    long value = AnalogJNI.getAccumulatorValue(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return value + m_accumulatorOffset;
+    return AnalogJNI.getAccumulatorValue(m_port) + m_accumulatorOffset;
   }
 
   /**
@@ -371,12 +297,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
    * @return The number of times samples from the channel were accumulated.
    */
   public long getAccumulatorCount() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    long value = AnalogJNI.getAccumulatorCount(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return value;
+    return AnalogJNI.getAccumulatorCount(m_port);
   }
 
   /**
@@ -400,14 +321,9 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
     ByteBuffer count = ByteBuffer.allocateDirect(4);
     // set the byte order
     count.order(ByteOrder.LITTLE_ENDIAN);
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    AnalogJNI.getAccumulatorOutput(m_port, value.asLongBuffer(), count.asIntBuffer(),
-        status.asIntBuffer());
+    AnalogJNI.getAccumulatorOutput(m_port, value.asLongBuffer(), count.asIntBuffer());
     result.value = value.asLongBuffer().get(0) + m_accumulatorOffset;
     result.count = count.asIntBuffer().get(0);
-    HALUtil.checkStatus(status.asIntBuffer());
   }
 
   /**
@@ -434,12 +350,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
    * @param samplesPerSecond The number of samples per second.
    */
   public static void setGlobalSampleRate(final double samplesPerSecond) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    AnalogJNI.setAnalogSampleRate((float) samplesPerSecond, status.asIntBuffer());
-
-    HALUtil.checkStatus(status.asIntBuffer());
+    AnalogJNI.setAnalogSampleRate((float) samplesPerSecond);
   }
 
   /**
@@ -451,14 +362,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
    * @return Sample rate.
    */
   public static double getGlobalSampleRate() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    double value = AnalogJNI.getAnalogSampleRate(status.asIntBuffer());
-
-    HALUtil.checkStatus(status.asIntBuffer());
-
-    return value;
+    return AnalogJNI.getAnalogSampleRate();
   }
 
   /**

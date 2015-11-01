@@ -159,7 +159,7 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
             lessThan((interruptTriggerTime + range) / 1e6)));
   }
 
-  @Test(timeout = 1000)
+  @Test(timeout = 2000)
   public void testMultipleInterruptsTriggering() throws Exception {
     // Given
     final InterruptCounter counter = new InterruptCounter();
@@ -219,7 +219,7 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
   }
 
 
-  @Test(timeout = 2000)
+  @Test(timeout = 4000)
   public void testDisableStopsInterruptFiring() {
     final InterruptCounter counter = new InterruptCounter();
     TestInterruptHandlerFunction function = new TestInterruptHandlerFunction(counter);

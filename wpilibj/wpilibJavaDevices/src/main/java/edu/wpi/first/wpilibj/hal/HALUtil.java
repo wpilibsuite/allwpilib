@@ -1,9 +1,5 @@
 package edu.wpi.first.wpilibj.hal;
 
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import edu.wpi.first.wpilibj.DriverStation;
-
 public class HALUtil extends JNIWrapper {
   public static final int NULL_PARAMETER = -1005;
   public static final int SAMPLE_RATE_TOO_HIGH = 1001;
@@ -17,28 +13,28 @@ public class HALUtil extends JNIWrapper {
   // public static final int SEMAPHORE_WAIT_FOREVER = -1;
   // public static final int SEMAPHORE_Q_PRIORITY = 0x01;
 
-  public static native ByteBuffer initializeMutexNormal();
+  public static native long initializeMutexNormal();
 
-  public static native void deleteMutex(ByteBuffer sem);
+  public static native void deleteMutex(long sem);
 
-  public static native byte takeMutex(ByteBuffer sem);
+  public static native void takeMutex(long sem);
 
-  // public static native ByteBuffer initializeSemaphore(int initialValue);
-  // public static native void deleteSemaphore(ByteBuffer sem);
-  // public static native byte takeSemaphore(ByteBuffer sem, int timeout);
-  public static native ByteBuffer initializeMultiWait();
+  // public static native long initializeSemaphore(int initialValue);
+  // public static native void deleteSemaphore(long sem);
+  // public static native byte takeSemaphore(long sem, int timeout);
+  public static native long initializeMultiWait();
 
-  public static native void deleteMultiWait(ByteBuffer sem);
+  public static native void deleteMultiWait(long sem);
 
-  public static native byte takeMultiWait(ByteBuffer sem, ByteBuffer m);
+  public static native void takeMultiWait(long sem, long m);
 
-  public static native short getFPGAVersion(IntBuffer status);
+  public static native short getFPGAVersion();
 
-  public static native int getFPGARevision(IntBuffer status);
+  public static native int getFPGARevision();
 
-  public static native long getFPGATime(IntBuffer status);
+  public static native long getFPGATime();
 
-  public static native boolean getFPGAButton(IntBuffer status);
+  public static native boolean getFPGAButton();
 
   public static native String getHALErrorMessage(int code);
 
@@ -49,17 +45,4 @@ public class HALUtil extends JNIWrapper {
   public static String getHALstrerror() {
     return getHALstrerror(getHALErrno());
   }
-
-  public static void checkStatus(IntBuffer status) {
-    int s = status.get(0);
-    if (s < 0) {
-      String message = getHALErrorMessage(s);
-      throw new RuntimeException(" Code: " + s + ". " + message);
-    } else if (s > 0) {
-      String message = getHALErrorMessage(s);
-      DriverStation.reportError(message, true);
-    }
-  }
-
-  public static native int pointerSize();
 }

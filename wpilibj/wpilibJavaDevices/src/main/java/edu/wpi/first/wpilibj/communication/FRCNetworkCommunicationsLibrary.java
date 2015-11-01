@@ -855,7 +855,7 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
    * <i>native declaration :
    * src\main\include\NetworkCommunication\FRCComm.h:147</i>
    */
-  public static native void setNewDataSem(ByteBuffer mutexId);
+  public static native void setNewDataSem(long mutexId);
 
   /**
    * Original signature : <code>void setResyncSem(pthread_mutex_t*)</code><br>
@@ -971,9 +971,9 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 
   public static native float HALGetMatchTime();
 
-  public static native boolean HALGetSystemActive(IntBuffer status);
+  public static native boolean HALGetSystemActive();
 
-  public static native boolean HALGetBrownedOut(IntBuffer status);
+  public static native boolean HALGetBrownedOut();
 
   public static native int HALSetErrorData(String error);
 }

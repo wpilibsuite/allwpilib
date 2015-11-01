@@ -7,11 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 import edu.wpi.first.wpilibj.hal.DIOJNI;
-import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.util.AllocationException;
 import edu.wpi.first.wpilibj.util.CheckedAllocationException;
 
@@ -25,7 +21,7 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
 public abstract class DigitalSource extends InterruptableSensorBase {
 
   protected static Resource channels = new Resource(kDigitalChannels);
-  protected ByteBuffer m_port;
+  protected long m_port;
   protected int m_channel;
 
   protected void initDigitalPort(int channel, boolean input) {
@@ -42,24 +38,15 @@ public abstract class DigitalSource extends InterruptableSensorBase {
       throw new AllocationException("Digital input " + m_channel + " is already allocated");
     }
 
-    ByteBuffer port_pointer = DIOJNI.getPort((byte) channel);
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    m_port = DIOJNI.initializeDigitalPort(port_pointer, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    DIOJNI.allocateDIO(m_port, (byte) (input ? 1 : 0), status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    long port_pointer = DIOJNI.getPort((byte) channel);
+    m_port = DIOJNI.initializeDigitalPort(port_pointer);
+    DIOJNI.allocateDIO(m_port, input);
   }
 
   @Override
   public void free() {
     channels.free(m_channel);
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    DIOJNI.freeDIO(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    DIOJNI.freeDIO(m_port);
     m_channel = 0;
   }
 

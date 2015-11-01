@@ -1,7 +1,6 @@
 package edu.wpi.first.wpilibj.hal;
 
 import java.nio.IntBuffer;
-import java.nio.ByteBuffer;
 import java.nio.LongBuffer;
 
 public class AnalogJNI extends JNIWrapper {
@@ -33,95 +32,82 @@ public class AnalogJNI extends JNIWrapper {
     public static final int kFallingPulse = 3;
   };
 
-  public static native ByteBuffer initializeAnalogInputPort(ByteBuffer port_pointer,
-      IntBuffer status);
+  public static native long initializeAnalogInputPort(long port_pointer);
 
-  public static native ByteBuffer initializeAnalogOutputPort(ByteBuffer port_pointer,
-      IntBuffer status);
+  public static native long initializeAnalogOutputPort(long port_pointer);
 
-  public static native byte checkAnalogModule(byte module);
+  public static native boolean checkAnalogModule(byte module);
 
-  public static native byte checkAnalogInputChannel(int pin);
+  public static native boolean checkAnalogInputChannel(int pin);
 
-  public static native byte checkAnalogOutputChannel(int pin);
+  public static native boolean checkAnalogOutputChannel(int pin);
 
-  public static native void setAnalogOutput(ByteBuffer port_pointer, double voltage,
-      IntBuffer status);
+  public static native void setAnalogOutput(long port_pointer, double voltage);
 
-  public static native double getAnalogOutput(ByteBuffer port_pointer, IntBuffer status);
+  public static native double getAnalogOutput(long port_pointer);
 
-  public static native void setAnalogSampleRate(double samplesPerSecond, IntBuffer status);
+  public static native void setAnalogSampleRate(double samplesPerSecond);
 
-  public static native double getAnalogSampleRate(IntBuffer status);
+  public static native double getAnalogSampleRate();
 
-  public static native void setAnalogAverageBits(ByteBuffer analog_port_pointer, int bits,
-      IntBuffer status);
+  public static native void setAnalogAverageBits(long analog_port_pointer, int bits);
 
-  public static native int getAnalogAverageBits(ByteBuffer analog_port_pointer, IntBuffer status);
+  public static native int getAnalogAverageBits(long analog_port_pointer);
 
-  public static native void setAnalogOversampleBits(ByteBuffer analog_port_pointer, int bits,
-      IntBuffer status);
+  public static native void setAnalogOversampleBits(long analog_port_pointer, int bits);
 
-  public static native int getAnalogOversampleBits(ByteBuffer analog_port_pointer, IntBuffer status);
+  public static native int getAnalogOversampleBits(long analog_port_pointer);
 
-  public static native short getAnalogValue(ByteBuffer analog_port_pointer, IntBuffer status);
+  public static native short getAnalogValue(long analog_port_pointer);
 
-  public static native int getAnalogAverageValue(ByteBuffer analog_port_pointer, IntBuffer status);
+  public static native int getAnalogAverageValue(long analog_port_pointer);
 
-  public static native int getAnalogVoltsToValue(ByteBuffer analog_port_pointer, double voltage,
-      IntBuffer status);
+  public static native int getAnalogVoltsToValue(long analog_port_pointer, double voltage);
 
-  public static native double getAnalogVoltage(ByteBuffer analog_port_pointer, IntBuffer status);
+  public static native double getAnalogVoltage(long analog_port_pointer);
 
-  public static native double getAnalogAverageVoltage(ByteBuffer analog_port_pointer,
-      IntBuffer status);
+  public static native double getAnalogAverageVoltage(long analog_port_pointer);
 
-  public static native int getAnalogLSBWeight(ByteBuffer analog_port_pointer, IntBuffer status);
+  public static native int getAnalogLSBWeight(long analog_port_pointer);
 
-  public static native int getAnalogOffset(ByteBuffer analog_port_pointer, IntBuffer status);
+  public static native int getAnalogOffset(long analog_port_pointer);
 
-  public static native byte isAccumulatorChannel(ByteBuffer analog_port_pointer, IntBuffer status);
+  public static native boolean isAccumulatorChannel(long analog_port_pointer);
 
-  public static native void initAccumulator(ByteBuffer analog_port_pointer, IntBuffer status);
+  public static native void initAccumulator(long analog_port_pointer);
 
-  public static native void resetAccumulator(ByteBuffer analog_port_pointer, IntBuffer status);
+  public static native void resetAccumulator(long analog_port_pointer);
 
-  public static native void setAccumulatorCenter(ByteBuffer analog_port_pointer, int center,
-      IntBuffer status);
+  public static native void setAccumulatorCenter(long analog_port_pointer, int center);
 
-  public static native void setAccumulatorDeadband(ByteBuffer analog_port_pointer, int deadband,
-      IntBuffer status);
+  public static native void setAccumulatorDeadband(long analog_port_pointer, int deadband);
 
-  public static native long getAccumulatorValue(ByteBuffer analog_port_pointer, IntBuffer status);
+  public static native long getAccumulatorValue(long analog_port_pointer);
 
-  public static native int getAccumulatorCount(ByteBuffer analog_port_pointer, IntBuffer status);
+  public static native int getAccumulatorCount(long analog_port_pointer);
 
-  public static native void getAccumulatorOutput(ByteBuffer analog_port_pointer, LongBuffer value,
-      IntBuffer count, IntBuffer status);
+  public static native void getAccumulatorOutput(long analog_port_pointer, LongBuffer value,
+      IntBuffer count);
 
-  public static native ByteBuffer initializeAnalogTrigger(ByteBuffer port_pointer, IntBuffer index,
-      IntBuffer status);
+  public static native long initializeAnalogTrigger(long port_pointer, IntBuffer index);
 
-  public static native void cleanAnalogTrigger(ByteBuffer analog_trigger_pointer, IntBuffer status);
+  public static native void cleanAnalogTrigger(long analog_trigger_pointer);
 
-  public static native void setAnalogTriggerLimitsRaw(ByteBuffer analog_trigger_pointer, int lower,
-      int upper, IntBuffer status);
+  public static native void setAnalogTriggerLimitsRaw(long analog_trigger_pointer, int lower,
+      int upper);
 
-  public static native void setAnalogTriggerLimitsVoltage(ByteBuffer analog_trigger_pointer,
-      double lower, double upper, IntBuffer status);
+  public static native void setAnalogTriggerLimitsVoltage(long analog_trigger_pointer,
+      double lower, double upper);
 
-  public static native void setAnalogTriggerAveraged(ByteBuffer analog_trigger_pointer,
-      byte useAveragedValue, IntBuffer status);
+  public static native void setAnalogTriggerAveraged(long analog_trigger_pointer,
+      boolean useAveragedValue);
 
-  public static native void setAnalogTriggerFiltered(ByteBuffer analog_trigger_pointer,
-      byte useFilteredValue, IntBuffer status);
+  public static native void setAnalogTriggerFiltered(long analog_trigger_pointer,
+      boolean useFilteredValue);
 
-  public static native byte getAnalogTriggerInWindow(ByteBuffer analog_trigger_pointer,
-      IntBuffer status);
+  public static native boolean getAnalogTriggerInWindow(long analog_trigger_pointer);
 
-  public static native byte getAnalogTriggerTriggerState(ByteBuffer analog_trigger_pointer,
-      IntBuffer status);
+  public static native boolean getAnalogTriggerTriggerState(long analog_trigger_pointer);
 
-  public static native byte getAnalogTriggerOutput(ByteBuffer analog_trigger_pointer, int type,
-      IntBuffer status);
+  public static native boolean getAnalogTriggerOutput(long analog_trigger_pointer, int type);
 }

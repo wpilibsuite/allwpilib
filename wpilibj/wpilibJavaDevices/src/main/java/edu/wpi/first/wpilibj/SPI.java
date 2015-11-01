@@ -1,13 +1,10 @@
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
 import java.nio.ByteBuffer;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.HALLibrary;
-import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.hal.SPIJNI;
 
 /**
@@ -45,14 +42,10 @@ public class SPI extends SensorBase {
    * @param port the physical SPI port
    */
   public SPI(Port port) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
     m_port = (byte) port.getValue();
     devices++;
 
-    SPIJNI.spiInitialize(m_port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    SPIJNI.spiInitialize(m_port);
 
     UsageReporting.report(tResourceType.kResourceType_SPI, devices);
   }
@@ -132,24 +125,14 @@ public class SPI extends SensorBase {
    * Configure the chip select line to be active high.
    */
   public final void setChipSelectActiveHigh() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    SPIJNI.spiSetChipSelectActiveHigh(m_port, status.asIntBuffer());
-
-    HALUtil.checkStatus(status.asIntBuffer());
+    SPIJNI.spiSetChipSelectActiveHigh(m_port);
   }
 
   /**
    * Configure the chip select line to be active low.
    */
   public final void setChipSelectActiveLow() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    SPIJNI.spiSetChipSelectActiveLow(m_port, status.asIntBuffer());
-
-    HALUtil.checkStatus(status.asIntBuffer());
+    SPIJNI.spiSetChipSelectActiveLow(m_port);
   }
 
   /**

@@ -5,6 +5,7 @@
 #include "edu_wpi_first_wpilibj_hal_DIOJNI.h"
 
 #include "HAL/Digital.hpp"
+#include "HALUtil.h"
 
 // set the logging level
 TLogLevel dioJNILogLevel = logWARNING;
@@ -13,101 +14,92 @@ TLogLevel dioJNILogLevel = logWARNING;
     if (level > dioJNILogLevel) ; \
     else Log().Get(level)
 
+extern "C" {
+
 /*
  * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
  * Method:    initializeDigitalPort
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)Ljava/nio/ByteBuffer;
+ * Signature: (J)J;
  */
-JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_initializeDigitalPort
-  (JNIEnv * env, jclass, jobject id, jobject status)
+JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_initializeDigitalPort
+  (JNIEnv * env, jclass, jlong id)
 {
 	DIOJNI_LOG(logDEBUG) << "Calling DIOJNI initializeDigitalPort";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	DIOJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	DIOJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	void** dioPtr = (void**)new unsigned char[4];
-	*statusPtr = 0;
-	*dioPtr = initializeDigitalPort(*javaId, statusPtr);
-	DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
-	DIOJNI_LOG(logDEBUG) << "DIO Ptr = " << *dioPtr;
-	return env->NewDirectByteBuffer( dioPtr, 4);
+	DIOJNI_LOG(logDEBUG) << "Port Ptr = " << (void*)id;
+	int32_t status = 0;
+	void* dio = initializeDigitalPort((void*)id, &status);
+	DIOJNI_LOG(logDEBUG) << "Status = " << status;
+	DIOJNI_LOG(logDEBUG) << "DIO Ptr = " << dio;
+	CheckStatus(env, status);
+	return (jlong)dio;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
  * Method:    allocateDIO
- * Signature: (Ljava/nio/ByteBuffer;BLjava/nio/IntBuffer;)B
+ * Signature: (JZ)Z
  */
-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_allocateDIO
-  (JNIEnv * env, jclass, jobject id, jbyte value, jobject status)
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_allocateDIO
+  (JNIEnv * env, jclass, jlong id, jboolean value)
 {
 	DIOJNI_LOG(logDEBUG) << "Calling DIOJNI allocateDIO";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	DIOJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	DIOJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	*statusPtr = 0;
-    jbyte returnValue = allocateDIO(*javaId, value, statusPtr);
-	DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	DIOJNI_LOG(logDEBUG) << "Port Ptr = " << (void*)id;
+	int32_t status = 0;
+	jboolean returnValue = allocateDIO((void*)id, value, &status);
+	DIOJNI_LOG(logDEBUG) << "Status = " << status;
 	DIOJNI_LOG(logDEBUG) << "allocateDIOResult = " << (jint)returnValue;
-    return returnValue;
+	CheckStatus(env, status);
+	return returnValue;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
  * Method:    freeDIO
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+ * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_freeDIO
-  (JNIEnv * env, jclass, jobject id, jobject status)
+  (JNIEnv * env, jclass, jlong id)
 {
 	DIOJNI_LOG(logDEBUG) << "Calling DIOJNI freeDIO";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	DIOJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	DIOJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	*statusPtr = 0;
-	freeDIO(*javaId, statusPtr);
-	DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	DIOJNI_LOG(logDEBUG) << "Port Ptr = " << (void*)id;
+	int32_t status = 0;
+	freeDIO((void*)id, &status);
+	DIOJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
  * Method:    setDIO
- * Signature: (Ljava/nio/ByteBuffer;SLjava/nio/IntBuffer;)V
+ * Signature: (JS)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_setDIO
-  (JNIEnv *env, jclass, jobject id, jshort value, jobject status)
+  (JNIEnv *env, jclass, jlong id, jshort value)
 {
 	//DIOJNI_LOG(logDEBUG) << "Calling DIOJNI setDIO";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	//DIOJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
+	//DIOJNI_LOG(logDEBUG) << "Port Ptr = " << (void*)id;
 	//DIOJNI_LOG(logDEBUG) << "Value = " << value;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	//DIOJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	*statusPtr = 0;
-	setDIO(*javaId, value, statusPtr);
-	//DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	int32_t status = 0;
+	setDIO((void*)id, value, &status);
+	//DIOJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
  * Method:    getDIO
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)B
+ * Signature: (J)Z
  */
-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_getDIO
-  (JNIEnv * env, jclass, jobject id, jobject status)
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_getDIO
+  (JNIEnv * env, jclass, jlong id)
 {
 	//DIOJNI_LOG(logDEBUG) << "Calling DIOJNI getDIO";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	//DIOJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	//DIOJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	*statusPtr = 0;
-	jbyte returnValue = getDIO(*javaId, statusPtr);
-	//DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	//DIOJNI_LOG(logDEBUG) << "Port Ptr = " << (void*)id;
+	int32_t status = 0;
+	jboolean returnValue = getDIO((void*)id, &status);
+	//DIOJNI_LOG(logDEBUG) << "Status = " << status;
 	//DIOJNI_LOG(logDEBUG) << "getDIOResult = " << (jint)returnValue;
+	CheckStatus(env, status);
 	return returnValue;
 
 }
@@ -115,59 +107,53 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_getDIO
 /*
  * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
  * Method:    getDIODirection
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)B
+ * Signature: (J)Z
  */
-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_getDIODirection
-  (JNIEnv *env, jclass, jobject id, jobject status)
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_getDIODirection
+  (JNIEnv *env, jclass, jlong id)
 {
 	DIOJNI_LOG(logDEBUG) << "Calling DIOJNI getDIODirection (RR upd)";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	//DIOJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	//DIOJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	*statusPtr = 0;
-	jbyte returnValue = getDIODirection(*javaId, statusPtr);
-	//DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
-	DIOJNI_LOG(logDEBUG) << "getDIODirectionResult = " << (jbyte)returnValue;
+	//DIOJNI_LOG(logDEBUG) << "Port Ptr = " << (void*)id;
+	int32_t status = 0;
+	jboolean returnValue = getDIODirection((void*)id, &status);
+	//DIOJNI_LOG(logDEBUG) << "Status = " << status;
+	DIOJNI_LOG(logDEBUG) << "getDIODirectionResult = " << (jint)returnValue;
+	CheckStatus(env, status);
 	return returnValue;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
  * Method:    pulse
- * Signature: (Ljava/nio/ByteBuffer;DLjava/nio/IntBuffer;)V
+ * Signature: (JD)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_pulse
-  (JNIEnv *env, jclass, jobject id, jdouble value, jobject status)
+  (JNIEnv *env, jclass, jlong id, jdouble value)
 {
 	DIOJNI_LOG(logDEBUG) << "Calling DIOJNI pulse (RR upd)";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	//DIOJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
+	//DIOJNI_LOG(logDEBUG) << "Port Ptr = " << (void*)id;
 	//DIOJNI_LOG(logDEBUG) << "Value = " << value;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	//DIOJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	*statusPtr = 0;
-	pulse(*javaId, value, statusPtr);
-	DIOJNI_LOG(logDEBUG) << "Did it work? Status = " << *statusPtr;
+	int32_t status = 0;
+	pulse((void*)id, value, &status);
+	DIOJNI_LOG(logDEBUG) << "Did it work? Status = " << status;
+	CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
  * Method:    isPulsing
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)B
+ * Signature: (J)Z
  */
-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_isPulsing
-  (JNIEnv *env, jclass, jobject id, jobject status)
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_isPulsing
+  (JNIEnv *env, jclass, jlong id)
 {
 	DIOJNI_LOG(logDEBUG) << "Calling DIOJNI isPulsing (RR upd)";
-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
-	//DIOJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	//DIOJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	*statusPtr = 0;
-	jbyte returnValue = isPulsing(*javaId, statusPtr);
-	//DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
-	DIOJNI_LOG(logDEBUG) << "isPulsingResult = " << (jbyte)returnValue;
+	//DIOJNI_LOG(logDEBUG) << "Port Ptr = " << (void*)id;
+	int32_t status = 0;
+	jboolean returnValue = isPulsing((void*)id, &status);
+	//DIOJNI_LOG(logDEBUG) << "Status = " << status;
+	DIOJNI_LOG(logDEBUG) << "isPulsingResult = " << (jint)returnValue;
+	CheckStatus(env, status);
 	return returnValue;
 
 
@@ -176,34 +162,36 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_isPulsing
 /*
  * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
  * Method:    isAnyPulsing
- * Signature: (Ljava/nio/IntBuffer;)B
+ * Signature: ()Z
  */
-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_isAnyPulsing
-  (JNIEnv *env, jclass, jobject status)
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_isAnyPulsing
+  (JNIEnv *env, jclass)
 {
 	DIOJNI_LOG(logDEBUG) << "Calling DIOJNI isAnyPulsing (RR upd)";
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	*statusPtr = 0;
-	jbyte returnValue = isAnyPulsing( statusPtr );
-	//DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
-	DIOJNI_LOG(logDEBUG) << "isAnyPulsingResult = " << (jbyte)returnValue;
+	int32_t status = 0;
+	jboolean returnValue = isAnyPulsing( &status );
+	//DIOJNI_LOG(logDEBUG) << "Status = " << status;
+	DIOJNI_LOG(logDEBUG) << "isAnyPulsingResult = " << (jint)returnValue;
+	CheckStatus(env, status);
 	return returnValue;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
  * Method:    getLoopTiming
- * Signature: (Ljava/nio/IntBuffer;)S
+ * Signature: ()S
  */
 JNIEXPORT jshort JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_getLoopTiming
-  (JNIEnv * env, jclass, jobject status)
+  (JNIEnv * env, jclass)
 {
 	DIOJNI_LOG(logDEBUG) << "Calling DIOJNI getLoopTimeing";
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	*statusPtr = 0;
-	jshort returnValue = getLoopTiming( statusPtr );
-	DIOJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	int32_t status = 0;
+	jshort returnValue = getLoopTiming( &status );
+	DIOJNI_LOG(logDEBUG) << "Status = " << status;
 	DIOJNI_LOG(logDEBUG) << "LoopTiming = " << returnValue;
+	CheckStatus(env, status);
 	return returnValue;
 
 }
+
+}  // extern "C"

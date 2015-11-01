@@ -7,12 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
-import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.hal.SolenoidJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
@@ -30,7 +26,7 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
 public class Solenoid extends SolenoidBase implements LiveWindowSendable {
 
   private int m_channel; // /< The channel to control.
-  private ByteBuffer m_solenoid_port;
+  private long m_solenoid_port;
 
   /**
    * Common function to implement constructor behavior.
@@ -39,12 +35,8 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
     checkSolenoidModule(m_moduleNumber);
     checkSolenoidChannel(m_channel);
 
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-
-    ByteBuffer port = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
-    m_solenoid_port = SolenoidJNI.initializeSolenoidPort(port, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    long port = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
+    m_solenoid_port = SolenoidJNI.initializeSolenoidPort(port);
 
     LiveWindow.addActuator("Solenoid", m_moduleNumber, m_channel, this);
     UsageReporting.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber);

@@ -7,10 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.IntBuffer;
-import java.nio.ByteBuffer;
-
-import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.hal.SolenoidJNI;
 
 /**
@@ -19,7 +15,7 @@ import edu.wpi.first.wpilibj.hal.SolenoidJNI;
  */
 public abstract class SolenoidBase extends SensorBase {
 
-  private ByteBuffer[] m_ports;
+  private long[] m_ports;
   protected int m_moduleNumber; // /< The number of the solenoid module being
                                 // used.
   protected Resource m_allocated = new Resource(63 * SensorBase.kSolenoidChannels);
@@ -31,12 +27,10 @@ public abstract class SolenoidBase extends SensorBase {
    */
   public SolenoidBase(final int moduleNumber) {
     m_moduleNumber = moduleNumber;
-    m_ports = new ByteBuffer[SensorBase.kSolenoidChannels];
+    m_ports = new long[SensorBase.kSolenoidChannels];
     for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
-      ByteBuffer port = SolenoidJNI.getPortWithModule((byte) moduleNumber, (byte) i);
-      IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
-      m_ports[i] = SolenoidJNI.initializeSolenoidPort(port, status);
-      HALUtil.checkStatus(status);
+      long port = SolenoidJNI.getPortWithModule((byte) moduleNumber, (byte) i);
+      m_ports[i] = SolenoidJNI.initializeSolenoidPort(port);
     }
   }
 
@@ -47,13 +41,11 @@ public abstract class SolenoidBase extends SensorBase {
    * @param mask The channels you want to be affected.
    */
   protected synchronized void set(int value, int mask) {
-    IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
     for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
       int local_mask = 1 << i;
       if ((mask & local_mask) != 0)
-        SolenoidJNI.setSolenoid(m_ports[i], (byte) (value & local_mask), status);
+        SolenoidJNI.setSolenoid(m_ports[i], (value & local_mask) != 0);
     }
-    HALUtil.checkStatus(status);
   }
 
   /**
@@ -63,11 +55,9 @@ public abstract class SolenoidBase extends SensorBase {
    */
   public byte getAll() {
     byte value = 0;
-    IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
     for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
-      value |= SolenoidJNI.getSolenoid(m_ports[i], status) << i;
+      value |= (SolenoidJNI.getSolenoid(m_ports[i]) ? 1 : 0) << i;
     }
-    HALUtil.checkStatus(status);
     return value;
   }
 
@@ -82,12 +72,7 @@ public abstract class SolenoidBase extends SensorBase {
    * @return The solenoid blacklist of all 8 solenoids on the module.
    */
   public byte getPCMSolenoidBlackList() {
-    IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
-
-    byte retval = SolenoidJNI.getPCMSolenoidBlackList(m_ports[0], status);
-    HALUtil.checkStatus(status);
-
-    return retval;
+    return (byte)SolenoidJNI.getPCMSolenoidBlackList(m_ports[0]);
   }
 
   /**
@@ -95,12 +80,7 @@ public abstract class SolenoidBase extends SensorBase {
    *         voltage rail is too low, most likely a solenoid channel is shorted.
    */
   public boolean getPCMSolenoidVoltageStickyFault() {
-    IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
-
-    boolean retval = SolenoidJNI.getPCMSolenoidVoltageStickyFault(m_ports[0], status);
-    HALUtil.checkStatus(status);
-
-    return retval;
+    return SolenoidJNI.getPCMSolenoidVoltageStickyFault(m_ports[0]);
   }
 
   /**
@@ -108,12 +88,7 @@ public abstract class SolenoidBase extends SensorBase {
    *         voltage rail is too low, most likely a solenoid channel is shorted.
    */
   public boolean getPCMSolenoidVoltageFault() {
-    IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
-
-    boolean retval = SolenoidJNI.getPCMSolenoidVoltageFault(m_ports[0], status);
-    HALUtil.checkStatus(status);
-
-    return retval;
+    return SolenoidJNI.getPCMSolenoidVoltageFault(m_ports[0]);
   }
 
   /**
@@ -127,9 +102,6 @@ public abstract class SolenoidBase extends SensorBase {
    * If no sticky faults are set then this call will have no effect.
    */
   public void clearAllPCMStickyFaults() {
-    IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
-
-    SolenoidJNI.clearAllPCMStickyFaults(m_ports[0], status);
-    HALUtil.checkStatus(status);
+    SolenoidJNI.clearAllPCMStickyFaults(m_ports[0]);
   }
 }

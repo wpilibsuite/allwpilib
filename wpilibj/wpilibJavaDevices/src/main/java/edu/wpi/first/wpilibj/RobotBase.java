@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tReso
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.internal.HardwareHLUsageReporting;
 import edu.wpi.first.wpilibj.internal.HardwareTimer;
+import edu.wpi.first.wpilibj.networktables.NetworkTablesJNI;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.Utility;
 
@@ -44,6 +45,12 @@ public abstract class RobotBase {
 
   protected final DriverStation m_ds;
 
+  private static class MyLogger implements NetworkTablesJNI.LoggerFunction {
+    public void apply(int level, String file, int line, String msg) {
+      System.err.println(msg);
+    }
+  }
+
   /**
    * Constructor for a generic robot program. User code should be placed in the
    * constructor that runs before the Autonomous or Operator Control period
@@ -59,6 +66,7 @@ public abstract class RobotBase {
     // TODO: See if the next line is necessary
     // Resource.RestartProgram();
 
+    NetworkTablesJNI.setLogger(new MyLogger(), 0);
     NetworkTable.setNetworkIdentity("Robot");
     NetworkTable.setServerMode();// must be before b
     m_ds = DriverStation.getInstance();
@@ -194,21 +202,21 @@ public abstract class RobotBase {
 
     UsageReporting.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
 
-    String robotName = "";
-    Enumeration<URL> resources = null;
-    try {
-      resources = RobotBase.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    while (resources != null && resources.hasMoreElements()) {
-      try {
-        Manifest manifest = new Manifest(resources.nextElement().openStream());
-        robotName = manifest.getMainAttributes().getValue("Robot-Class");
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
+    String robotName = "MyRobot";
+    //Enumeration<URL> resources = null;
+    //try {
+    //  resources = RobotBase.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
+    //} catch (IOException e) {
+    //  e.printStackTrace();
+    //}
+    //while (resources != null && resources.hasMoreElements()) {
+    //  try {
+    //    Manifest manifest = new Manifest(resources.nextElement().openStream());
+    //    robotName = manifest.getMainAttributes().getValue("Robot-Class");
+    //  } catch (IOException e) {
+    //    e.printStackTrace();
+    //  }
+    //}
 
     RobotBase robot;
     try {

@@ -10,7 +10,6 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
-import edu.wpi.first.wpilibj.hal.HALUtil;
 
 import java.nio.IntBuffer;
 
@@ -99,10 +98,7 @@ public class AnalogTriggerOutput extends DigitalSource {
    * @return The state of the analog trigger output.
    */
   public boolean get() {
-    IntBuffer status = IntBuffer.allocate(1);
-    byte value = AnalogJNI.getAnalogTriggerOutput(m_trigger.m_port, m_outputType.value, status);
-    HALUtil.checkStatus(status);
-    return value != 0;
+    return AnalogJNI.getAnalogTriggerOutput(m_trigger.m_port, m_outputType.value);
   }
 
   @Override

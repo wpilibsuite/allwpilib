@@ -6,9 +6,7 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
-import java.nio.IntBuffer;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
 import edu.wpi.first.wpilibj.communication.HALControlWord;
@@ -76,8 +74,8 @@ public class DriverStation implements RobotState.Interface {
   private boolean m_userInTeleop = false;
   private boolean m_userInTest = false;
   private boolean m_newControlData;
-  private final ByteBuffer m_packetDataAvailableMutex;
-  private final ByteBuffer m_packetDataAvailableSem;
+  private final long m_packetDataAvailableMutex;
+  private final long m_packetDataAvailableSem;
 
   /**
    * Gets an instance of the DriverStation
@@ -197,11 +195,7 @@ public class DriverStation implements RobotState.Interface {
    * @return The battery voltage in Volts.
    */
   public double getBatteryVoltage() {
-    IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
-    float voltage = PowerJNI.getVinVoltage(status);
-    HALUtil.checkStatus(status);
-
-    return voltage;
+    return PowerJNI.getVinVoltage();
   }
 
   /**
@@ -485,11 +479,7 @@ public class DriverStation implements RobotState.Interface {
    * @return True if the FPGA outputs are enabled.
    */
   public boolean isSysActive() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    boolean retVal = FRCNetworkCommunicationsLibrary.HALGetSystemActive(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return retVal;
+    return FRCNetworkCommunicationsLibrary.HALGetSystemActive();
   }
 
   /**
@@ -498,11 +488,7 @@ public class DriverStation implements RobotState.Interface {
    * @return True if the system is browned out
    */
   public boolean isBrownedOut() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    boolean retVal = FRCNetworkCommunicationsLibrary.HALGetBrownedOut(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return retVal;
+    return FRCNetworkCommunicationsLibrary.HALGetBrownedOut();
   }
 
   /**

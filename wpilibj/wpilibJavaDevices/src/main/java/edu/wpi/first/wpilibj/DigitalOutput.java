@@ -7,17 +7,12 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.DIOJNI;
-import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.hal.PWMJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
-// import com.sun.jna.Pointer;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 
 /**
@@ -27,7 +22,7 @@ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tReso
  */
 public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
 
-  private ByteBuffer m_pwmGenerator;
+  private long m_pwmGenerator;
 
   /**
    * Create an instance of a digital output. Create an instance of a digital
@@ -48,7 +43,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
   @Override
   public void free() {
     // disable the pwm only if we have allocated it
-    if (m_pwmGenerator != null) {
+    if (m_pwmGenerator != 0) {
       disablePWM();
     }
     super.free();
@@ -60,11 +55,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    * @param value true is on, off is false
    */
   public void set(boolean value) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    DIOJNI.setDIO(m_port, (short) (value ? 1 : 0), status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    DIOJNI.setDIO(m_port, (short) (value ? 1 : 0));
   }
 
   /**
@@ -82,11 +73,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    * @param pulseLength The length of the pulse.
    */
   public void pulse(final int channel, final float pulseLength) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    DIOJNI.pulse(m_port, pulseLength, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    DIOJNI.pulse(m_port, pulseLength);
   }
 
   /**
@@ -99,15 +86,11 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    */
   @Deprecated
   public void pulse(final int channel, final int pulseLength) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
     float convertedPulse =
-        (float) (pulseLength / 1.0e9 * (DIOJNI.getLoopTiming(status.asIntBuffer()) * 25));
+        (float) (pulseLength / 1.0e9 * (DIOJNI.getLoopTiming() * 25));
     System.err
         .println("You should use the float version of pulse for portability.  This is deprecated");
-    DIOJNI.pulse(m_port, convertedPulse, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    DIOJNI.pulse(m_port, convertedPulse);
   }
 
   /**
@@ -117,12 +100,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    * @return true if pulsing
    */
   public boolean isPulsing() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    boolean value = DIOJNI.isPulsing(m_port, status.asIntBuffer()) != 0;
-    HALUtil.checkStatus(status.asIntBuffer());
-    return value;
+    return DIOJNI.isPulsing(m_port);
   }
 
   /**
@@ -136,11 +114,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    * @param rate The frequency to output all digital output PWM signals.
    */
   public void setPWMRate(double rate) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    PWMJNI.setPWMRate(rate, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    PWMJNI.setPWMRate(rate);
   }
 
   /**
@@ -157,16 +131,11 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    * @param initialDutyCycle The duty-cycle to start generating. [0..1]
    */
   public void enablePWM(double initialDutyCycle) {
-    if (m_pwmGenerator != null)
+    if (m_pwmGenerator != 0)
       return;
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    m_pwmGenerator = PWMJNI.allocatePWM(status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    PWMJNI.setPWMDutyCycle(m_pwmGenerator, initialDutyCycle, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    PWMJNI.setPWMOutputChannel(m_pwmGenerator, m_channel, status.asIntBuffer());
+    m_pwmGenerator = PWMJNI.allocatePWM();
+    PWMJNI.setPWMDutyCycle(m_pwmGenerator, initialDutyCycle);
+    PWMJNI.setPWMOutputChannel(m_pwmGenerator, m_channel);
   }
 
   /**
@@ -175,16 +144,12 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    * Free up one of the 6 DO PWM generator resources that were in use.
    */
   public void disablePWM() {
-    if (m_pwmGenerator == null)
+    if (m_pwmGenerator == 0)
       return;
     // Disable the output by routing to a dead bit.
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    PWMJNI.setPWMOutputChannel(m_pwmGenerator, kDigitalChannels, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    PWMJNI.freePWM(m_pwmGenerator, status.asIntBuffer());
-    m_pwmGenerator = null;
+    PWMJNI.setPWMOutputChannel(m_pwmGenerator, kDigitalChannels);
+    PWMJNI.freePWM(m_pwmGenerator);
+    m_pwmGenerator = 0;
   }
 
   /**
@@ -196,13 +161,9 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    * @param dutyCycle The duty-cycle to change to. [0..1]
    */
   public void updateDutyCycle(double dutyCycle) {
-    if (m_pwmGenerator == null)
+    if (m_pwmGenerator == 0)
       return;
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    PWMJNI.setPWMDutyCycle(m_pwmGenerator, dutyCycle, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    PWMJNI.setPWMDutyCycle(m_pwmGenerator, dutyCycle);
   }
 
   /*

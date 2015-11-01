@@ -6,6 +6,7 @@
 #include "HAL/HAL.hpp"
 //#include "NetworkCommunication/FRCComm.h"
 //#include "NetworkCommunication/UsageReporting.h"
+#include "HALUtil.h"
 
 // set the logging level
 TLogLevel netCommLogLevel = logWARNING;
@@ -14,7 +15,7 @@ TLogLevel netCommLogLevel = logWARNING;
     if (level > netCommLogLevel) ; \
     else Log().Get(level)
 
-
+extern "C" {
 
 /*
  * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
@@ -394,14 +395,13 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCom
 /*
  * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
  * Method:    setNewDataSem
- * Signature: ([B)V
+ * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_setNewDataSem
-  (JNIEnv * env, jclass, jobject id )
+  (JNIEnv * env, jclass, jlong id )
 {
-	MULTIWAIT_ID javaId = (MULTIWAIT_ID)env->GetDirectBufferAddress(id);
-	NETCOMM_LOG(logDEBUG) << "Mutex Ptr = " << javaId;
-	HALSetNewDataSem(javaId->native_handle());
+	NETCOMM_LOG(logDEBUG) << "Mutex Ptr = " << (void*)id;
+	HALSetNewDataSem(((MULTIWAIT_ID)id)->native_handle());
 }
 
 /*
@@ -609,27 +609,29 @@ JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkComm
 /*
  * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
  * Method:    HALGetSystemActive
- * Signature: (Ljava/nio/IntBuffer;)Z
+ * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetSystemActive
-  (JNIEnv * env, jclass, jobject status)
+  (JNIEnv * env, jclass)
 {
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	*statusPtr = 0;
-	return HALGetSystemActive((int32_t*)statusPtr);
+	int32_t status = 0;
+	bool val = HALGetSystemActive(&status);
+	CheckStatus(env, status);
+	return val;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
  * Method:    HALGetBrownedOut
- * Signature: (Ljava/nio/IntBuffer;)Z
+ * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetBrownedOut
-  (JNIEnv * env, jclass, jobject status)
+  (JNIEnv * env, jclass)
 {
-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
-	*statusPtr = 0;
-	return HALGetBrownedOut((int32_t*)statusPtr);
+	int32_t status = 0;
+	bool val = HALGetBrownedOut(&status);
+	CheckStatus(env, status);
+	return val;
 }
 
 /*
@@ -650,3 +652,4 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
   return returnValue;
 }
 
+}  // extern "C"

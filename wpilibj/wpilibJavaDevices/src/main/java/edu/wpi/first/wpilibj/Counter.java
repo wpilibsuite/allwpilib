@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.CounterJNI;
-import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.util.BoundaryException;
@@ -65,20 +64,16 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
   private DigitalSource m_downSource; // /< What makes the counter count down.
   private boolean m_allocatedUpSource;
   private boolean m_allocatedDownSource;
-  private ByteBuffer m_counter; // /< The FPGA counter object.
+  private long m_counter; // /< The FPGA counter object.
   private int m_index; // /< The index of this counter.
   private PIDSourceType m_pidSource;
   private double m_distancePerPulse; // distance of travel for each tick
 
   private void initCounter(final Mode mode) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    status.order(ByteOrder.LITTLE_ENDIAN);
     ByteBuffer index = ByteBuffer.allocateDirect(4);
     // set the byte order
     index.order(ByteOrder.LITTLE_ENDIAN);
-    m_counter = CounterJNI.initializeCounter(mode.value, index.asIntBuffer(), status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    m_counter = CounterJNI.initializeCounter(mode.value, index.asIntBuffer());
     m_index = index.asIntBuffer().get(0);
 
     m_allocatedUpSource = false;
@@ -161,16 +156,14 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
     if (encodingType == null)
       throw new NullPointerException("Encoding type given was null");
 
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
     if (encodingType == EncodingType.k1X) {
       setUpSourceEdge(true, false);
-      CounterJNI.setCounterAverageSize(m_counter, 1, status.asIntBuffer());
+      CounterJNI.setCounterAverageSize(m_counter, 1);
     } else {
       setUpSourceEdge(true, true);
-      CounterJNI.setCounterAverageSize(m_counter, 2, status.asIntBuffer());
+      CounterJNI.setCounterAverageSize(m_counter, 2);
     }
 
-    HALUtil.checkStatus(status.asIntBuffer());
     setDownSourceEdge(inverted, true);
   }
 
@@ -198,14 +191,11 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
     clearUpSource();
     clearDownSource();
 
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    CounterJNI.freeCounter(m_counter, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    CounterJNI.freeCounter(m_counter);
 
     m_upSource = null;
     m_downSource = null;
-    m_counter = null;
+    m_counter = 0;
   }
 
   /**
@@ -238,11 +228,8 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
       m_allocatedUpSource = false;
     }
     m_upSource = source;
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
     CounterJNI.setCounterUpSource(m_counter, source.getChannelForRouting(),
-        (byte) (source.getAnalogTriggerForRouting() ? 1 : 0), status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+        source.getAnalogTriggerForRouting());
   }
 
   /**
@@ -273,11 +260,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
   public void setUpSourceEdge(boolean risingEdge, boolean fallingEdge) {
     if (m_upSource == null)
       throw new RuntimeException("Up Source must be set before setting the edge!");
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    CounterJNI.setCounterUpSourceEdge(m_counter, (byte) (risingEdge ? 1 : 0),
-        (byte) (fallingEdge ? 1 : 0), status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    CounterJNI.setCounterUpSourceEdge(m_counter, risingEdge, fallingEdge);
   }
 
   /**
@@ -290,10 +273,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
     }
     m_upSource = null;
 
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    CounterJNI.clearCounterUpSource(m_counter, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    CounterJNI.clearCounterUpSource(m_counter);
   }
 
   /**
@@ -322,15 +302,8 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
       m_downSource.free();
       m_allocatedDownSource = false;
     }
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
     CounterJNI.setCounterDownSource(m_counter, source.getChannelForRouting(),
-        (byte) (source.getAnalogTriggerForRouting() ? 1 : 0), status.asIntBuffer());
-    if (status.asIntBuffer().get(0) == HALUtil.PARAMETER_OUT_OF_RANGE) {
-      throw new IllegalArgumentException(
-          "Counter only supports DownSource in TwoPulse and ExternalDirection modes.");
-    }
-    HALUtil.checkStatus(status.asIntBuffer());
+        source.getAnalogTriggerForRouting());
     m_downSource = source;
   }
 
@@ -363,11 +336,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
   public void setDownSourceEdge(boolean risingEdge, boolean fallingEdge) {
     if (m_downSource == null)
       throw new RuntimeException(" Down Source must be set before setting the edge!");
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    CounterJNI.setCounterDownSourceEdge(m_counter, (byte) (risingEdge ? 1 : 0),
-        (byte) (fallingEdge ? 1 : 0), status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    CounterJNI.setCounterDownSourceEdge(m_counter, risingEdge, fallingEdge);
   }
 
   /**
@@ -380,10 +349,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
     }
     m_downSource = null;
 
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    CounterJNI.clearCounterDownSource(m_counter, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    CounterJNI.clearCounterDownSource(m_counter);
   }
 
   /**
@@ -391,10 +357,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    * are sourced independently from two inputs.
    */
   public void setUpDownCounterMode() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    CounterJNI.setCounterUpDownMode(m_counter, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    CounterJNI.setCounterUpDownMode(m_counter);
   }
 
   /**
@@ -402,10 +365,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    * counter input. The Down counter input represents the direction to count.
    */
   public void setExternalDirectionMode() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    CounterJNI.setCounterExternalDirectionMode(m_counter, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    CounterJNI.setCounterExternalDirectionMode(m_counter);
   }
 
   /**
@@ -415,11 +375,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    * @param highSemiPeriod true to count up on both rising and falling
    */
   public void setSemiPeriodMode(boolean highSemiPeriod) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    CounterJNI.setCounterSemiPeriodMode(m_counter, (byte) (highSemiPeriod ? 1 : 0),
-        status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    CounterJNI.setCounterSemiPeriodMode(m_counter, highSemiPeriod);
   }
 
   /**
@@ -431,10 +387,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    *        opposite direction. Units are seconds.
    */
   public void setPulseLengthMode(double threshold) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    CounterJNI.setCounterPulseLengthMode(m_counter, threshold, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    CounterJNI.setCounterPulseLengthMode(m_counter, threshold);
   }
 
   /**
@@ -444,11 +397,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    */
   @Override
   public int get() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    int value = CounterJNI.getCounter(m_counter, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return value;
+    return CounterJNI.getCounter(m_counter);
   }
 
   /**
@@ -468,10 +417,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    */
   @Override
   public void reset() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    CounterJNI.resetCounter(m_counter, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    CounterJNI.resetCounter(m_counter);
   }
 
   /**
@@ -485,10 +431,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    */
   @Override
   public void setMaxPeriod(double maxPeriod) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    CounterJNI.setCounterMaxPeriod(m_counter, maxPeriod, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    CounterJNI.setCounterMaxPeriod(m_counter, maxPeriod);
   }
 
   /**
@@ -508,10 +451,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    * @param enabled true to continue updating
    */
   public void setUpdateWhenEmpty(boolean enabled) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    CounterJNI.setCounterUpdateWhenEmpty(m_counter, (byte) (enabled ? 1 : 0), status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    CounterJNI.setCounterUpdateWhenEmpty(m_counter, enabled);
   }
 
   /**
@@ -525,11 +465,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    */
   @Override
   public boolean getStopped() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    boolean value = CounterJNI.getCounterStopped(m_counter, status.asIntBuffer()) != 0;
-    HALUtil.checkStatus(status.asIntBuffer());
-    return value;
+    return CounterJNI.getCounterStopped(m_counter);
   }
 
   /**
@@ -539,11 +475,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    */
   @Override
   public boolean getDirection() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    boolean value = CounterJNI.getCounterDirection(m_counter, status.asIntBuffer()) != 0;
-    HALUtil.checkStatus(status.asIntBuffer());
-    return value;
+    return CounterJNI.getCounterDirection(m_counter);
   }
 
   /**
@@ -554,11 +486,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    * @param reverseDirection true if the value counted should be negated.
    */
   public void setReverseDirection(boolean reverseDirection) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    CounterJNI.setCounterReverseDirection(m_counter, (byte) (reverseDirection ? 1 : 0),
-        status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
+    CounterJNI.setCounterReverseDirection(m_counter, reverseDirection);
   }
 
   /**
@@ -570,11 +498,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    */
   @Override
   public double getPeriod() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    double value = CounterJNI.getCounterPeriod(m_counter, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return value;
+    return CounterJNI.getCounterPeriod(m_counter);
   }
 
   /**
@@ -596,13 +520,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    * @param samplesToAverage The number of samples to average from 1 to 127.
    */
   public void setSamplesToAverage(int samplesToAverage) {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    CounterJNI.setCounterSamplesToAverage(m_counter, samplesToAverage, status.asIntBuffer());
-    if (status.asIntBuffer().get(0) == HALUtil.PARAMETER_OUT_OF_RANGE) {
-      throw new BoundaryException(BoundaryException.getMessage(samplesToAverage, 1, 127));
-    }
-    HALUtil.checkStatus(status.asIntBuffer());
+    CounterJNI.setCounterSamplesToAverage(m_counter, samplesToAverage);
   }
 
   /**
@@ -614,11 +532,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    *         127)
    */
   public int getSamplesToAverage() {
-    ByteBuffer status = ByteBuffer.allocateDirect(4);
-    status.order(ByteOrder.LITTLE_ENDIAN);
-    int value = CounterJNI.getCounterSamplesToAverage(m_counter, status.asIntBuffer());
-    HALUtil.checkStatus(status.asIntBuffer());
-    return value;
+    return CounterJNI.getCounterSamplesToAverage(m_counter);
   }
 
   /**

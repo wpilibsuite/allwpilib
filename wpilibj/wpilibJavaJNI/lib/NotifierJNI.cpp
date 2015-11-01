@@ -5,6 +5,7 @@
 #include "Log.hpp"
 #include "edu_wpi_first_wpilibj_hal_NotifierJNI.h"
 #include "HAL/Notifier.hpp"
+#include "HALUtil.h"
 
 // set the logging level
 TLogLevel notifierJNILogLevel = logWARNING;
@@ -12,29 +13,6 @@ TLogLevel notifierJNILogLevel = logWARNING;
 #define NOTIFIERJNI_LOG(level) \
     if (level > notifierJNILogLevel) ; \
     else Log().Get(level)
-
-// The jvm object is necessary in order to attach new threads (ie,
-// notifierHandler), to the JVM.
-static JavaVM *jvm;
-
-static const int kPtrSize = sizeof(void*);
-
-// Utility functions which convert back and forth between pointers and Java
-// ByteBuffers.
-
-jint* GetStatusPtr(JNIEnv *env, jobject status) {
-  return (jint*)env->GetDirectBufferAddress(status);
-}
-
-jobject PtrToByteBuf(JNIEnv *env, void *ptr) {
-  // Stores a pointer into a byte buffer of the appropriate length.
-  return env->NewDirectByteBuffer(ptr, kPtrSize);
-}
-
-void *ByteBufToPtr(JNIEnv *env, jobject bytebuf) {
-  void * ptr = (void*)env->GetDirectBufferAddress(bytebuf);
-  return ptr;
-}
 
 // These two are used to pass information to the notifierHandler without using
 // up function parameters.
@@ -48,7 +26,7 @@ void notifierHandler(uint32_t mask, void* param) {
   jobject handler_obj = func_global;
   jmethodID mid = mid_global;
 
-	NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI interruptHandler";
+	NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI notifierHandler";
 
 	//Because this is a callback in a new thread we must attach it to the JVM.
 	JNIEnv *env;
@@ -73,37 +51,20 @@ void notifierHandler(uint32_t mask, void* param) {
     rs = jvm->DetachCurrentThread();
     assert (rs == JNI_OK);
   }
-	NOTIFIERJNI_LOG(logDEBUG) << "Leaving NOTIFIERJNI interruptHandler";
+	NOTIFIERJNI_LOG(logDEBUG) << "Leaving NOTIFIERJNI notifierHandler";
 }
 
-/*
- * Class:     edu_wpi_first_wpilibj_hal_NotifierJNI
- * Method:    initializeNotifierJVM
- * Signature: (Ljava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNotifierJVM
-  (JNIEnv *env, jclass, jobject status)
-{
-	//This method should be called once to setup the JVM
-	NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI initializeNotifierJVM";
-	jint * statusPtr = GetStatusPtr(env, status);
-	NOTIFIERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-	*statusPtr = 0;
-	jint rs = env->GetJavaVM(&jvm);
-	assert (rs == JNI_OK);
-}
+extern "C" {
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_NotifierJNI
  * Method:    initializeNotifier
- * Signature: (Ljava/lang/Runnable;Ljava/nio/IntBuffer;)Ljava/lang/ByteBuffer;
+ * Signature: (Ljava/lang/Runnable;)J
  */
-JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNotifier
-  (JNIEnv *env, jclass, jobject func, jobject status)
+JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNotifier
+  (JNIEnv *env, jclass, jobject func)
 {
 	NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI initializeNotifier";
-	jint * statusPtr = GetStatusPtr(env, status);
-	NOTIFIERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
 
   jclass cls = env->GetObjectClass(func);
   jmethodID mid = env->GetMethodID(cls, "run", "()V");
@@ -120,54 +81,52 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeN
   func_global = env->NewGlobalRef(func);
   mid_global = mid;
 
-	*statusPtr = 0;
-	void *notifierPtr = initializeNotifier(notifierHandler, statusPtr);
+	int32_t status = 0;
+	void *notifierPtr = initializeNotifier(notifierHandler, &status);
 
 	NOTIFIERJNI_LOG(logDEBUG) << "Notifier Ptr = " << notifierPtr;
-	NOTIFIERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+	NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;
 
-	return PtrToByteBuf(env, notifierPtr);
+	CheckStatus(env, status);
+	return (jlong)notifierPtr;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_NotifierJNI
  * Method:    cleanNotifier
- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+ * Signature: (J)V
  */
-JNIEXPORT void JNICALL
-    Java_edu_wpi_first_wpilibj_hal_NotifierJNI_cleanNotifier(JNIEnv *env, jclass, jobject notifierPtr, jobject status) {
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_cleanNotifier
+  (JNIEnv *env, jclass, jlong notifierPtr)
+{
 	NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI cleanNotifier";
 
-  void *ptr = ByteBufToPtr(env, notifierPtr);
-	NOTIFIERJNI_LOG(logDEBUG) << "Notifier Ptr = " << ptr;
+	NOTIFIERJNI_LOG(logDEBUG) << "Notifier Ptr = " << (void*)notifierPtr;
 
-  jint *statusPtr = GetStatusPtr(env, status);
-	NOTIFIERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
-
-  *statusPtr = 0;
-  cleanNotifier(ptr, statusPtr);
-	NOTIFIERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+  int32_t status = 0;
+  cleanNotifier((void*)notifierPtr, &status);
+	NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_NotifierJNI
  * Method:    updateNotifierAlarm
- * Signature: (Ljava/nio/ByteBuffer;ILjava/nio/IntBuffer;)V
+ * Signature: (JI)V
  */
-JNIEXPORT void JNICALL
-    Java_edu_wpi_first_wpilibj_hal_NotifierJNI_updateNotifierAlarm(
-        JNIEnv *env, jclass cls, jobject notifierPtr, jint triggerTime,
-        jobject status) {
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_updateNotifierAlarm
+  (JNIEnv *env, jclass cls, jlong notifierPtr, jint triggerTime)
+{
 	NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI updateNotifierAlarm";
 
-  void *ptr = ByteBufToPtr(env, notifierPtr);
-	NOTIFIERJNI_LOG(logDEBUG) << "Notifier Ptr = " << ptr;
+	NOTIFIERJNI_LOG(logDEBUG) << "Notifier Ptr = " << (void*)notifierPtr;
 
-  jint *statusPtr = GetStatusPtr(env, status);
-	NOTIFIERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
   NOTIFIERJNI_LOG(logDEBUG) << "triggerTime Ptr = " << &triggerTime;
 
-  *statusPtr = 0;
-  updateNotifierAlarm(ptr, (uint32_t)triggerTime, statusPtr);
-	NOTIFIERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+  int32_t status = 0;
+  updateNotifierAlarm((void*)notifierPtr, (uint32_t)triggerTime, &status);
+	NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
 }
+
+}  // extern "C"

@@ -12,8 +12,7 @@ package edu.wpi.first.wpilibj.hal;
 // import com.sun.jna.PointerType;
 // import com.sun.jna.ptr.IntByReference;
 // import com.sun.jna.ptr.LongByReference;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
+// import java.nio.IntBuffer;
 
 /**
  * JNA Wrapper for library <b>HAL</b><br>
@@ -282,7 +281,7 @@ public class HALLibrary /* implements Library */{
    * <i>native declaration :
    * AthenaJava\target\native\include\HAL\Semaphore.h:385</i>
    */
-  public static native ByteBuffer initializeMutex(int flags);
+  public static native long initializeMutex(int flags);
 
   /**
    * Original signature : <code>void deleteMutex(MUTEX_ID)</code><br>
@@ -300,7 +299,7 @@ public class HALLibrary /* implements Library */{
    * <i>native declaration :
    * AthenaJava\target\native\include\HAL\Semaphore.h:387</i>
    */
-  public static native void deleteMutex(ByteBuffer sem);
+  public static native void deleteMutex(long sem);
 
   /**
    * Original signature : <code>int8_t takeMutex(MUTEX_ID, int32_t)</code><br>
@@ -318,7 +317,7 @@ public class HALLibrary /* implements Library */{
    * <i>native declaration :
    * AthenaJava\target\native\include\HAL\Semaphore.h:389</i>
    */
-  public static native byte takeMutex(ByteBuffer sem, int timeout);
+  public static native byte takeMutex(long sem, int timeout);
 
   /**
    * Original signature : <code>int8_t giveMutex(MUTEX_ID)</code><br>
