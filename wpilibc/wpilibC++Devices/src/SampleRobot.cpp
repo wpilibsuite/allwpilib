@@ -104,7 +104,7 @@ void SampleRobot::StartCompetition() {
   LiveWindow *lw = LiveWindow::GetInstance();
 
   HALReport(HALUsageReporting::kResourceType_Framework,
-            HALUsageReporting::kFramework_Simple);
+            HALUsageReporting::kFramework_Sample);
 
   SmartDashboard::init();
   NetworkTable::GetTable("LiveWindow")
