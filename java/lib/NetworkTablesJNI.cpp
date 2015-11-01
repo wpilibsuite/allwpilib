@@ -19,6 +19,8 @@ static jclass entryInfoCls = nullptr;
 static jclass keyNotDefinedEx = nullptr;
 static jclass persistentEx = nullptr;
 
+extern "C" {
+
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   jvm = vm;
 
@@ -88,6 +90,8 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
   if (persistentEx) env->DeleteGlobalRef(persistentEx);
   jvm = nullptr;
 }
+
+}  // extern "C"
 
 //
 // Helper class to automatically clean up a local reference
@@ -375,6 +379,8 @@ static void ThrowTableKeyNotDefined(JNIEnv *env, jstring key) {
   jobject exception = env->NewObject(keyNotDefinedEx, constructor, key);
   env->Throw(static_cast<jthrowable>(exception));
 }
+
+extern "C" {
 
 /*
  * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
@@ -1232,3 +1238,5 @@ done:
       },
       minLevel);
 }
+
+}  // extern "C"
