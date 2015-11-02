@@ -306,7 +306,16 @@ void DispatcherBase::ServerThreadMain() {
                   std::weak_ptr<NetworkConnection>(conn)));
     {
       std::lock_guard<std::mutex> lock(m_user_mutex);
-      m_connections.emplace_back(conn);
+      // reuse dead connection slots
+      bool placed = false;
+      for (auto& c : m_connections) {
+        if (c->state() == NetworkConnection::kDead) {
+          c = conn;
+          placed = true;
+          break;
+        }
+      }
+      if (!placed) m_connections.emplace_back(conn);
       conn->Start();
     }
   }
