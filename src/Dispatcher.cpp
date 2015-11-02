@@ -232,14 +232,15 @@ void DispatcherBase::DispatchThreadMain() {
       if (err) WARNING("periodic persistent save: " << err);
     }
 
-    if (++count > 10) {
-      DEBUG("dispatch running");
-      count = 0;
-    }
-
     {
       std::lock_guard<std::mutex> user_lock(m_user_mutex);
       bool reconnect = false;
+
+      if (++count > 10) {
+        DEBUG("dispatch running " << m_connections.size() << " connections");
+        count = 0;
+      }
+
       for (auto& conn : m_connections) {
         // post outgoing messages if connection is active
         // only send keep-alives on client
@@ -458,6 +459,7 @@ bool DispatcherBase::ServerHandshake(
   if (proto_rev >= 0x0300) conn.set_remote_id(msg->str());
 
   // Set the proto version to the client requested version
+  DEBUG("server: client protocol " << proto_rev);
   conn.set_proto_rev(proto_rev);
 
   // Send initial set of assignments

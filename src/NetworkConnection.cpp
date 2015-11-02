@@ -54,6 +54,7 @@ void NetworkConnection::Start() {
 }
 
 void NetworkConnection::Stop() {
+  DEBUG2("NetworkConnection stopping (" << this << ")");
   m_state = static_cast<int>(kDead);
   m_active = false;
   // closing the stream so the read thread terminates
@@ -131,6 +132,7 @@ void NetworkConnection::ReadThreadMain() {
     decoder.Reset();
     auto msg = Message::Read(decoder, m_get_entry_type);
     if (!msg) {
+      INFO("read error: " << decoder.error());
       // terminate connection on bad message
       if (m_stream) m_stream->close();
       break;
@@ -141,7 +143,7 @@ void NetworkConnection::ReadThreadMain() {
     m_last_update = Now();
     m_process_incoming(std::move(msg), this);
   }
-  DEBUG3("read thread died");
+  DEBUG3("read thread died (" << this << ")");
   if (m_state != kDead) m_notifier.NotifyConnection(false, info());
   m_state = static_cast<int>(kDead);
   m_active = false;
@@ -180,7 +182,7 @@ void NetworkConnection::WriteThreadMain() {
     if (m_stream->send(encoder.data(), encoder.size(), &err) == 0) break;
     DEBUG4("sent " << encoder.size() << " bytes");
   }
-  DEBUG3("write thread died");
+  DEBUG3("write thread died (" << this << ")");
   if (m_state != kDead) m_notifier.NotifyConnection(false, info());
   m_state = static_cast<int>(kDead);
   m_active = false;

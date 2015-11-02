@@ -7,6 +7,7 @@
 
 #include "Message.h"
 
+#include "Log.h"
 #include "WireDecoder.h"
 #include "WireEncoder.h"
 
@@ -79,8 +80,10 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
         unsigned int itype;
         if (!decoder.Read8(&itype)) return nullptr;
         type = static_cast<NT_Type>(itype);
-      } else
+      } else {
         type = get_entry_type(msg->m_id);
+        DEBUG4("update message data type: " << type);
+      }
       msg->m_value = decoder.ReadValue(type);
       if (!msg->m_value) return nullptr;
       break;
@@ -146,6 +149,7 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
     }
     default:
       decoder.set_error("unrecognized message type");
+      INFO("unrecognized message type: " << msg_type);
       return nullptr;
   }
   return msg;
