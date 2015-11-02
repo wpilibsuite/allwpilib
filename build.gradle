@@ -133,6 +133,14 @@ task ntcoreZip(type: Zip) {
         into 'include'
     }
 
+    if (!hasProperty('skipJava')) {
+        jniHeadersNetworkTables.outputs.each {
+            from(it) {
+                into 'include'
+            }
+        }
+    }
+
     binaries.withType(StaticLibraryBinarySpec) { binary ->
         from(binary.staticLibraryFile) {
             into getPlatformPath(binary)
