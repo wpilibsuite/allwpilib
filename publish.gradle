@@ -28,6 +28,10 @@ publishing {
                 classifier = buildPlatform
             }
 
+            artifact ntcoreSourceZip {
+                classifier = 'sources'
+            }
+
             groupId 'edu.wpi.first.wpilib.networktables.cpp'
             artifactId 'NetworkTables'
             version '3.0.0-SNAPSHOT'

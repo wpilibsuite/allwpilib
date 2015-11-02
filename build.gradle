@@ -154,6 +154,34 @@ task ntcoreZip(type: Zip) {
     }
 }
 
+task ntcoreSourceZip(type: Zip) {
+    description = 'Creates a sources-zip of the ntcore source files'
+    group = 'WPILib'
+    destinationDir = project.buildDir
+    baseName = 'ntcore'
+    classifier = 'sources'
+
+    from ('src') {
+        into 'src'
+    }
+
+    from('include') {
+        into 'include'
+    }
+
+    if (!hasProperty('java')) {
+        from('java/lib') {
+            into 'src'
+        }
+
+        jniHeadersNetworkTables.outputs.each {
+            from(it) {
+                into 'include'
+            }
+        }
+    }
+}
+
 releaseSetup(ntcoreZip)
 
 if (!hasProperty('skipJava')) {
