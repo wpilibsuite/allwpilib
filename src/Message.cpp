@@ -77,13 +77,11 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
       if (!decoder.Read16(&msg->m_seq_num_uid)) return nullptr;  // seq num
       NT_Type type;
       if (decoder.proto_rev() >= 0x0300u) {
-        unsigned int itype;
-        if (!decoder.Read8(&itype)) return nullptr;
-        type = static_cast<NT_Type>(itype);
+        if (!decoder.ReadType(&type)) return nullptr;
       } else {
         type = get_entry_type(msg->m_id);
-        DEBUG4("update message data type: " << type);
       }
+      DEBUG4("update message data type: " << type);
       msg->m_value = decoder.ReadValue(type);
       if (!msg->m_value) return nullptr;
       break;
@@ -266,7 +264,7 @@ void Message::Write(WireEncoder& encoder) const {
       encoder.Write8(kEntryUpdate);
       encoder.Write16(m_id);
       encoder.Write16(m_seq_num_uid);
-      if (encoder.proto_rev() >= 0x0300u) encoder.Write8(m_value->type());
+      if (encoder.proto_rev() >= 0x0300u) encoder.WriteType(m_value->type());
       encoder.WriteValue(*m_value);
       break;
     case kFlagsUpdate:
