@@ -137,13 +137,13 @@ void NetworkConnection::ReadThreadMain() {
       if (m_stream) m_stream->close();
       break;
     }
-    DEBUG4("received type=" << msg->type() << " with str=" << msg->str()
+    DEBUG3("received type=" << msg->type() << " with str=" << msg->str()
                             << " id=" << msg->id()
                             << " seq_num=" << msg->seq_num_uid());
     m_last_update = Now();
     m_process_incoming(std::move(msg), this);
   }
-  DEBUG3("read thread died (" << this << ")");
+  DEBUG2("read thread died (" << this << ")");
   if (m_state != kDead) m_notifier.NotifyConnection(false, info());
   m_state = static_cast<int>(kDead);
   m_active = false;
@@ -170,7 +170,7 @@ void NetworkConnection::WriteThreadMain() {
     DEBUG3("sending " << msgs.size() << " messages");
     for (auto& msg : msgs) {
       if (msg) {
-        DEBUG4("sending type=" << msg->type() << " with str=" << msg->str()
+        DEBUG3("sending type=" << msg->type() << " with str=" << msg->str()
                                << " id=" << msg->id()
                                << " seq_num=" << msg->seq_num_uid());
         msg->Write(encoder);
@@ -182,7 +182,7 @@ void NetworkConnection::WriteThreadMain() {
     if (m_stream->send(encoder.data(), encoder.size(), &err) == 0) break;
     DEBUG4("sent " << encoder.size() << " bytes");
   }
-  DEBUG3("write thread died (" << this << ")");
+  DEBUG2("write thread died (" << this << ")");
   if (m_state != kDead) m_notifier.NotifyConnection(false, info());
   m_state = static_cast<int>(kDead);
   m_active = false;
