@@ -109,7 +109,7 @@ model {
                         includes = ['**/*.cpp']
                     }
                     exportedHeaders {
-                        srcDirs = ['include']
+                        srcDirs = ['include', 'src']
                         if (!project.hasProperty('skipJava')) {
                             jniHeadersNetworkTables.outputs.files.each { file ->
                                 srcDirs file.getPath()
