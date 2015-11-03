@@ -12,6 +12,7 @@
 
 #include "nt_Value.h"
 #include "leb128.h"
+//#include "Log.h"
 #include "raw_istream.h"
 
 namespace nt {
@@ -51,7 +52,22 @@ class WireDecoder {
   bool Read(const char** buf, std::size_t len) {
     if (len > m_allocated) Realloc(len);
     *buf = m_buf;
-    return m_is.read(m_buf, len);
+    bool rv = m_is.read(m_buf, len);
+#if 0
+    nt::Logger& logger = nt::Logger::GetInstance();
+    if (logger.min_level() <= NT_LOG_DEBUG4 && logger.HasLogger()) {
+      std::ostringstream oss;
+      oss << "read " << len << " bytes:" << std::hex;
+      if (!rv)
+        oss << "error";
+      else {
+        for (std::size_t i=0; i < len; ++i)
+          oss << ' ' << (unsigned int)((*buf)[i]);
+      }
+      logger.Log(NT_LOG_DEBUG4, __FILE__, __LINE__, oss.str().c_str());
+    }
+#endif
+    return rv;
   }
 
   /* Reads a single byte. */
