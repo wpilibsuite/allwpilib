@@ -57,7 +57,8 @@ std::thread::native_handle_type Task::native_handle() {
 
 /**
  * Verifies a task still exists.
- * @returns true on success.
+ *
+ * @return true on success.
  */
 bool Task::Verify() {
   TASK id = (TASK)m_thread.native_handle();
@@ -66,7 +67,8 @@ bool Task::Verify() {
 
 /**
  * Gets the priority of a task.
- * @returns task priority or 0 if an error occured
+ *
+ * @return task priority or 0 if an error occured
  */
 int32_t Task::GetPriority() {
   int priority;
@@ -81,8 +83,9 @@ int32_t Task::GetPriority() {
  * This routine changes a task's priority to a specified priority.
  * Priorities range from 1, the lowest priority, to 99, the highest priority.
  * Default task priority is 60.
+ *
  * @param priority The priority at which the internal thread should run.
- * @returns true on success.
+ * @return true on success.
  */
 bool Task::SetPriority(int32_t priority) {
   auto id = m_thread.native_handle();
@@ -91,7 +94,8 @@ bool Task::SetPriority(int32_t priority) {
 
 /**
  * Returns the name of the task.
- * @returns The name of the task (0 length if not allocated).
+ *
+ * @return The name of the task.
  */
 std::string Task::GetName() const { return m_taskName; }
 

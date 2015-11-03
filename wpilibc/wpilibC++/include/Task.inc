@@ -3,11 +3,10 @@
 
 /**
  * Create and launch a task.
+ *
  * @param name The name of the task. "FRC_" will be prepended to the task name.
  * @param function The address of the function to run as the new task.
  * @param args A parameter pack of arguments to pass to the function.
- * @param priority The VxWorks priority for the task.
- * @param stackSize The size of the stack for the task
  */
 template <class Function, class... Args>
 Task::Task(const std::string& name, Function&& function, Args&&... args) {
