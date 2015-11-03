@@ -425,7 +425,7 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
      * <i>native declaration :
      * src\main\include\NetworkCommunication\UsageReporting.h:72</i>
      */
-    public static final int kFramework_Simple = 2;
+    public static final int kFramework_Sample = 2;
     /**
      * <i>native declaration :
      * src\main\include\NetworkCommunication\UsageReporting.h:74</i>

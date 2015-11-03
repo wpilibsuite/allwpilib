@@ -114,7 +114,7 @@ public class SampleRobot extends RobotBase {
    * wait for the robot to be enabled again.
    */
   public void startCompetition() {
-    UsageReporting.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Simple);
+    UsageReporting.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Sample);
 
     robotMain();
     if (!m_robotMainOverridden) {
