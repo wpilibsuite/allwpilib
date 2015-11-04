@@ -1,1 +1,1 @@
-/usr/local/frc/bin/netconsole-host /home/lvuser/FRCUserProgram 2>&1 | /usr/local/frc/bin/FRC_ConsoleTee | tee /var/local/natinst/log/FRC_UserProgram.log
+/usr/local/frc/bin/netconsole-host /home/lvuser/FRCUserProgram
