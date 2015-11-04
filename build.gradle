@@ -72,6 +72,8 @@ subprojects {
         mavenLocal()
     }
 
+    ext.armBuild = true
+
     // Disables doclint in java 8.
     if (JavaVersion.current().isJava8Compatible()) {
         allprojects {
