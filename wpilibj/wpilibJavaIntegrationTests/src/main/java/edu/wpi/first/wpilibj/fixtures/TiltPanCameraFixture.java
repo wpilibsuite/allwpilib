@@ -8,7 +8,7 @@ package edu.wpi.first.wpilibj.fixtures;
 
 import java.util.logging.Logger;
 
-import edu.wpi.first.wpilibj.Gyro;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
 

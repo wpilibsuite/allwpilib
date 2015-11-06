@@ -11,7 +11,7 @@
 class Robot: public SampleRobot {
 	Joystick joystick;
 	RobotDrive myRobot;
-	Gyro gyro;
+	AnalogGyro gyro;
 
 	//channels for motors
 	const int leftMotorChannel = 1;

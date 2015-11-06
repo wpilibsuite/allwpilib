@@ -3,9 +3,9 @@ package $package.subsystems;
 import $package.Robot;
 import $package.commands.DriveWithJoystick;
 
+import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PIDSource.PIDSourceParameter;
 import edu.wpi.first.wpilibj.RobotDrive;
@@ -24,7 +24,7 @@ public class DriveTrain extends Subsystem {
 	private SpeedController backLeftCIM, backRightCIM;
 	private RobotDrive drive;
 	private Encoder rightEncoder, leftEncoder;
-	private Gyro gyro;
+	private AnalogGyro gyro;
 
 	public DriveTrain() {
 		// Configure drive motors
@@ -67,7 +67,7 @@ public class DriveTrain extends Subsystem {
 		LiveWindow.addSensor("DriveTrain", "Left Encoder", leftEncoder);
 
 		// Configure gyro
-		gyro = new Gyro(2);
+		gyro = new AnalogGyro(2);
 		if (Robot.isReal()) {
 			gyro.setSensitivity(0.007); // TODO: Handle more gracefully?
 		}

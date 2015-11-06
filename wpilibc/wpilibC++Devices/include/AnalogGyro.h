@@ -6,11 +6,7 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-#include "SensorBase.h"
-#include "PIDSource.h"
-#include "LiveWindow/LiveWindowSendable.h"
-
-#include <memory>
+#include "GyroBase.h"
 
 class AnalogInput;
 
@@ -29,8 +25,10 @@ class AnalogInput;
  * with a channel that is assigned one of the Analog accumulators from the FPGA.
  * See
  * AnalogInput for the current accumulator assignments.
+ *
+ * This class is for gyro sensors that connect to an analog input.
  */
-class Gyro : public SensorBase, public PIDSource, public LiveWindowSendable {
+class AnalogGyro : public GyroBase {
  public:
   static const uint32_t kOversampleBits = 10;
   static const uint32_t kAverageBits = 0;
@@ -38,29 +36,22 @@ class Gyro : public SensorBase, public PIDSource, public LiveWindowSendable {
   static constexpr float kCalibrationSampleTime = 5.0;
   static constexpr float kDefaultVoltsPerDegreePerSecond = 0.007;
 
-  explicit Gyro(int32_t channel);
+  explicit AnalogGyro(int32_t channel);
   DEPRECATED(
-      "Raw pointers are deprecated; consider calling the Gyro constructor with "
-      "a channel number or passing a shared_ptr instead.")
-  explicit Gyro(AnalogInput *channel);
-  explicit Gyro(std::shared_ptr<AnalogInput> channel);
-  virtual ~Gyro() = default;
-  virtual float GetAngle() const;
-  virtual double GetRate() const;
+      "Raw pointers are deprecated; consider calling the AnalogGyro constructor"
+      " with a channel number or passing a shared_ptr instead.")
+  explicit AnalogGyro(AnalogInput *channel);
+  explicit AnalogGyro(std::shared_ptr<AnalogInput> channel);
+  virtual ~AnalogGyro() = default;
+
+  float GetAngle() const override;
+  double GetRate() const override;
   void SetSensitivity(float voltsPerDegreePerSecond);
   void SetDeadband(float volts);
-  virtual void Reset();
-  void InitGyro();
+  void Reset() override;
+  void InitGyro() override;
 
-  // PIDSource interface
-  double PIDGet() override;
-
-  void UpdateTable() override;
-  void StartLiveWindowMode() override;
-  void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subTable) override;
-  std::shared_ptr<ITable> GetTable() const override;
 
  protected:
   std::shared_ptr<AnalogInput> m_analog;
@@ -69,6 +60,4 @@ class Gyro : public SensorBase, public PIDSource, public LiveWindowSendable {
   float m_voltsPerDegreePerSecond;
   float m_offset;
   uint32_t m_center;
-
-  std::shared_ptr<ITable> m_table = nullptr;
 };

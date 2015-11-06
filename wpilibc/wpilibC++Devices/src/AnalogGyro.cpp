@@ -5,18 +5,18 @@
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
-#include "Gyro.h"
+#include "AnalogGyro.h"
 #include "AnalogInput.h"
 //#include "NetworkCommunication/UsageReporting.h"
 #include "Timer.h"
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 #include <climits>
-const uint32_t Gyro::kOversampleBits;
-const uint32_t Gyro::kAverageBits;
-constexpr float Gyro::kSamplesPerSecond;
-constexpr float Gyro::kCalibrationSampleTime;
-constexpr float Gyro::kDefaultVoltsPerDegreePerSecond;
+const uint32_t AnalogGyro::kOversampleBits;
+const uint32_t AnalogGyro::kAverageBits;
+constexpr float AnalogGyro::kSamplesPerSecond;
+constexpr float AnalogGyro::kCalibrationSampleTime;
+constexpr float AnalogGyro::kDefaultVoltsPerDegreePerSecond;
 
 /**
  * Initialize the gyro.
@@ -30,7 +30,7 @@ constexpr float Gyro::kDefaultVoltsPerDegreePerSecond;
  * it's sitting at
  * rest before the competition starts.
  */
-void Gyro::InitGyro() {
+void AnalogGyro::InitGyro() {
   if (!m_analog->IsAccumulatorChannel()) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange,
                                " channel (must be accumulator channel)");
@@ -74,7 +74,7 @@ void Gyro::InitGyro() {
  * @param channel The analog channel the gyro is connected to. Gyros
                       can only be used on on-board Analog Inputs 0-1.
  */
-Gyro::Gyro(int32_t channel) {
+AnalogGyro::AnalogGyro(int32_t channel) {
   m_analog = std::make_shared<AnalogInput>(channel);
   InitGyro();
 }
@@ -91,9 +91,9 @@ Gyro::Gyro(int32_t channel) {
 DEPRECATED(
     "Raw pointers are deprecated; consider calling the Gyro constructor with "
     "a channel number or passing a shared_ptr instead.")
-Gyro::Gyro(AnalogInput *channel)
-    : Gyro(std::shared_ptr<AnalogInput>(channel,
-                                          NullDeleter<AnalogInput>())) {}
+AnalogGyro::AnalogGyro(AnalogInput *channel)
+    : AnalogGyro(
+          std::shared_ptr<AnalogInput>(channel, NullDeleter<AnalogInput>())) {}
 
 /**
  * Gyro constructor with a precreated AnalogInput object.
@@ -103,7 +103,8 @@ Gyro::Gyro(AnalogInput *channel)
  * @param channel A pointer to the AnalogInput object that the gyro is
  * connected to.
  */
-Gyro::Gyro(std::shared_ptr<AnalogInput> channel) : m_analog(channel) {
+AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel)
+    : m_analog(channel) {
   if (channel == nullptr) {
     wpi_setWPIError(NullParameter);
   } else {
@@ -117,7 +118,7 @@ Gyro::Gyro(std::shared_ptr<AnalogInput> channel) : m_analog(channel) {
  * significant
  * drift in the gyro and it needs to be recalibrated after it has been running.
  */
-void Gyro::Reset() { m_analog->ResetAccumulator(); }
+void AnalogGyro::Reset() { m_analog->ResetAccumulator(); }
 
 /**
  * Return the actual angle in degrees that the robot is currently facing.
@@ -134,7 +135,7 @@ void Gyro::Reset() { m_analog->ResetAccumulator(); }
  * integration
  * of the returned rate from the gyro.
  */
-float Gyro::GetAngle() const {
+float AnalogGyro::GetAngle() const {
   int64_t rawValue;
   uint32_t count;
   m_analog->GetAccumulatorOutput(rawValue, count);
@@ -155,7 +156,7 @@ float Gyro::GetAngle() const {
  *
  * @return the current rate in degrees per second
  */
-double Gyro::GetRate() const {
+double AnalogGyro::GetRate() const {
   return (m_analog->GetAverageValue() - ((double)m_center + m_offset)) * 1e-9 *
          m_analog->GetLSBWeight() /
          ((1 << m_analog->GetOversampleBits()) * m_voltsPerDegreePerSecond);
@@ -171,7 +172,7 @@ double Gyro::GetRate() const {
  *
  * @param voltsPerDegreePerSecond The sensitivity in Volts/degree/second
  */
-void Gyro::SetSensitivity(float voltsPerDegreePerSecond) {
+void AnalogGyro::SetSensitivity(float voltsPerDegreePerSecond) {
   m_voltsPerDegreePerSecond = voltsPerDegreePerSecond;
 }
 
@@ -183,44 +184,10 @@ void Gyro::SetSensitivity(float voltsPerDegreePerSecond) {
  *
  * @param volts The size of the deadband in volts
  */
-void Gyro::SetDeadband(float volts) {
+void AnalogGyro::SetDeadband(float volts) {
   int32_t deadband = volts * 1e9 / m_analog->GetLSBWeight() *
                      (1 << m_analog->GetOversampleBits());
   m_analog->SetAccumulatorDeadband(deadband);
 }
 
-/**
- * Get the PIDOutput for the PIDSource base object. Can be set to return
- * angle or rate using SetPIDSourceType(). Defaults to angle.
- *
- * @return The PIDOutput (angle or rate, defaults to angle)
- */
-double Gyro::PIDGet() {
-  switch (GetPIDSourceType()) {
-    case PIDSourceType::kRate:
-      return GetRate();
-    case PIDSourceType::kDisplacement:
-      return GetAngle();
-    default:
-      return 0;
-  }
-}
-
-void Gyro::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Value", GetAngle());
-  }
-}
-
-void Gyro::StartLiveWindowMode() {}
-
-void Gyro::StopLiveWindowMode() {}
-
-std::string Gyro::GetSmartDashboardType() const { return "Gyro"; }
-
-void Gyro::InitTable(std::shared_ptr<ITable> subTable) {
-  m_table = subTable;
-  UpdateTable();
-}
-
-std::shared_ptr<ITable> Gyro::GetTable() const { return m_table; }
+std::string AnalogGyro::GetSmartDashboardType() const { return "AnalogGyro"; }

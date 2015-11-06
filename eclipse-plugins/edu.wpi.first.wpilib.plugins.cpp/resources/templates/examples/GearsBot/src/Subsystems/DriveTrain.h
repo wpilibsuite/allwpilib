@@ -13,7 +13,7 @@ private:
 	RobotDrive* drive;
   std::shared_ptr<Encoder> left_encoder, right_encoder;
   std::shared_ptr<AnalogInput> rangefinder;
-  std::shared_ptr<Gyro> gyro;
+  std::shared_ptr<AnalogGyro> gyro;
 
 public:
 	DriveTrain();

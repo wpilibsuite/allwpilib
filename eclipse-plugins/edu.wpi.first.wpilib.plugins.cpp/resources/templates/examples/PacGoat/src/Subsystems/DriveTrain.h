@@ -16,7 +16,7 @@ private:
 	std::shared_ptr<SpeedController> backLeftCIM, backRightCIM;
 	RobotDrive drive;
 	std::shared_ptr<Encoder> rightEncoder, leftEncoder;
-	std::shared_ptr<Gyro> gyro;
+	std::shared_ptr<AnalogGyro> gyro;
 
 public:
 	DriveTrain();

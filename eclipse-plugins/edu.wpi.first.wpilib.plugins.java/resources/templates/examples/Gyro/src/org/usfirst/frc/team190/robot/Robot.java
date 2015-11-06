@@ -1,8 +1,8 @@
 
 package $package;
 
+import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Joystick;
@@ -35,7 +35,7 @@ public class Robot extends SampleRobot {
     final double voltsPerDegreePerSecond = .0128; 
       	
     RobotDrive myRobot;
-    Gyro gyro;
+    AnalogGyro gyro;
     Joystick joystick;
 
     public Robot()
@@ -44,7 +44,7 @@ public class Robot extends SampleRobot {
 	myRobot = new RobotDrive(new CANTalon(leftMotorChannel), new CANTalon(
 		leftRearMotorChannel), new CANTalon(rightMotorChannel),
 		new CANTalon(rightRearMotorChannel));
-	gyro = new Gyro(gyroChannel);
+	gyro = new AnalogGyro(gyroChannel);
 	joystick = new Joystick(joystickChannel);
     }
 

@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include <ADXL345_SPI.h>
-#include <Gyro.h>
+#include <AnalogGyro.h>
 #include <Servo.h>
 #include <Timer.h>
 #include "gtest/gtest.h"
@@ -28,14 +28,14 @@ static constexpr double kAccelerometerTolerance = 0.2;
  */
 class TiltPanCameraTest : public testing::Test {
  protected:
-  static Gyro *m_gyro;
+  static AnalogGyro *m_gyro;
   Servo *m_tilt, *m_pan;
   Accelerometer *m_spiAccel;
 
   static void SetUpTestCase() {
     // The gyro object blocks for 5 seconds in the constructor, so only
     // construct it once for the whole test case
-    m_gyro = new Gyro(TestBench::kCameraGyroChannel);
+    m_gyro = new AnalogGyro(TestBench::kCameraGyroChannel);
     m_gyro->SetSensitivity(0.013);
   }
 
@@ -61,7 +61,7 @@ class TiltPanCameraTest : public testing::Test {
   }
 };
 
-Gyro *TiltPanCameraTest::m_gyro = nullptr;
+AnalogGyro *TiltPanCameraTest::m_gyro = nullptr;
 
 /**
  * Test if the gyro angle defaults to 0 immediately after being reset.

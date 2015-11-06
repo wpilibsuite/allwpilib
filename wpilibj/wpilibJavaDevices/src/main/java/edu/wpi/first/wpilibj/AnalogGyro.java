@@ -8,6 +8,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
@@ -20,8 +21,10 @@ import edu.wpi.first.wpilibj.tables.ITable;
  * short calibration routine where it samples the gyro while at rest to
  * determine the default offset. This is subtracted from each sample to
  * determine the heading.
+ *
+ * This class is for gyro sensors that connect to an analog input.
  */
-public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowSendable {
 
   static final int kOversampleBits = 10;
   static final int kAverageBits = 0;
@@ -37,12 +40,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
   private PIDSourceType m_pidSource;
 
   /**
-   * Initialize the gyro. Calibrate the gyro by running for a number of samples
-   * and computing the center value. Then use the center value as the
-   * Accumulator center value for subsequent measurements. It's important to
-   * make sure that the robot is not moving while the centering calculations are
-   * in progress, this is typically done when the robot is first turned on while
-   * it's sitting at rest before the competition starts.
+   * {@inheritDoc}
    */
   public void initGyro() {
     result = new AccumulatorResult();
@@ -75,7 +73,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
     setPIDSourceType(PIDSourceType.kDisplacement);
 
     UsageReporting.report(tResourceType.kResourceType_Gyro, m_analog.getChannel());
-    LiveWindow.addSensor("Gyro", m_analog.getChannel(), this);
+    LiveWindow.addSensor("AnalogGyro", m_analog.getChannel(), this);
   }
 
   /**
@@ -84,7 +82,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
    * @param channel The analog channel the gyro is connected to. Gyros can only
    *        be used on on-board channels 0-1.
    */
-  public Gyro(int channel) {
+  public AnalogGyro(int channel) {
     this(new AnalogInput(channel));
     m_channelAllocated = true;
   }
@@ -96,7 +94,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
    * @param channel The AnalogInput object that the gyro is connected to. Gyros
    *        can only be used on on-board channels 0-1.
    */
-  public Gyro(AnalogInput channel) {
+  public AnalogGyro(AnalogInput channel) {
     m_analog = channel;
     if (m_analog == null) {
       throw new NullPointerException("AnalogInput supplied to Gyro constructor is null");
@@ -105,9 +103,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
   }
 
   /**
-   * Reset the gyro. Resets the gyro to a heading of zero. This can be used if
-   * there is significant drift in the gyro and it needs to be recalibrated
-   * after it has been running.
+   * {@inheritDoc}
    */
   public void reset() {
     if (m_analog != null) {
@@ -127,16 +123,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
   }
 
   /**
-   * Return the actual angle in degrees that the robot is currently facing.
-   *
-   * The angle is based on the current accumulator value corrected by the
-   * oversampling rate, the gyro type and the A/D calibration values. The angle
-   * is continuous, that is it will continue from 360 to 361 degrees. This
-   * allows algorithms that wouldn't want to see a discontinuity in the gyro
-   * output as it sweeps past from 360 to 0 on the second time around.
-   *
-   * @return the current heading of the robot in degrees. This heading is based
-   *         on integration of the returned rate from the gyro.
+   * {@inheritDoc}
    */
   public double getAngle() {
     if (m_analog == null) {
@@ -155,11 +142,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
   }
 
   /**
-   * Return the rate of rotation of the gyro
-   *
-   * The rate is based on the most recent reading of the gyro analog value
-   *
-   * @return the current rate in degrees per second
+   * {@inheritDoc}
    */
   public double getRate() {
     if (m_analog == null) {
@@ -196,87 +179,11 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
     m_analog.setAccumulatorDeadband(deadband);
   }
 
-  /**
-   * Set which parameter of the gyro you are using as a process control
-   * variable. The Gyro class supports the rate and displacement parameters
-   *
-   * @param pidSource An enum to select the parameter.
-   */
-  public void setPIDSourceType(PIDSourceType pidSource) {
-    m_pidSource = pidSource;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public PIDSourceType getPIDSourceType() {
-    return m_pidSource;
-  }
-
-  /**
-   * Get the output of the gyro for use with PIDControllers. May be the angle or
-   * rate depending on the set PIDSourceType
-   *
-   * @return the output according to the gyro
-   */
-  @Override
-  public double pidGet() {
-    switch (m_pidSource) {
-      case kRate:
-        return getRate();
-      case kDisplacement:
-        return getAngle();
-      default:
-        return 0.0;
-    }
-  }
-
   /*
    * Live Window code, only does anything if live window is activated.
    */
   @Override
   public String getSmartDashboardType() {
-    return "Gyro";
+    return "AnalogGyro";
   }
-
-  private ITable m_table;
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void initTable(ITable subtable) {
-    m_table = subtable;
-    updateTable();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public ITable getTable() {
-    return m_table;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void updateTable() {
-    if (m_table != null) {
-      m_table.putNumber("Value", getAngle());
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void startLiveWindowMode() {}
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void stopLiveWindowMode() {}
 }

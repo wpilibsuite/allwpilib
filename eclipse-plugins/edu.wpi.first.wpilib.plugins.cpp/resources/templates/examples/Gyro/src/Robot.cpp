@@ -27,7 +27,7 @@ class Robot: public SampleRobot {
 	 const double voltsPerDegreePerSecond = .0128;
 
 	 RobotDrive myRobot;
-	 Gyro gyro;
+	 AnalogGyro gyro;
 	 Joystick joystick;
 
 public:

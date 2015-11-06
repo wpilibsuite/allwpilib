@@ -1,8 +1,8 @@
 
 package $package;
 
+import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Joystick;
@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.RobotDrive.MotorType;
 public class Robot extends SampleRobot {
     RobotDrive myRobot;
     Joystick joystick;
-    Gyro gyro;
+    AnalogGyro gyro;
     
     //channels for motors
     final int leftMotorChannel = 1;
@@ -42,7 +42,7 @@ public class Robot extends SampleRobot {
 	myRobot.setInvertedMotor(MotorType.kRearLeft, true); // you may need to change or remove this to match your robot
 	    	
         joystick = new Joystick(0);
-        gyro = new Gyro(gyroChannel);
+        gyro = new AnalogGyro(gyroChannel);
     }
 
     /**

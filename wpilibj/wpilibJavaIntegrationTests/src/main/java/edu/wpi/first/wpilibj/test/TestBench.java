@@ -12,12 +12,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.AnalogOutput;
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
-import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Servo;
@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.fixtures.RelayCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.mockhardware.FakePotentiometerSource;
 
 /**
@@ -253,7 +254,7 @@ public final class TestBench {
     TiltPanCameraFixture tpcam = new TiltPanCameraFixture() {
       @Override
       protected Gyro giveGyro() {
-        Gyro gyro = new Gyro(kGyroChannel);
+        AnalogGyro gyro = new AnalogGyro(kGyroChannel);
         gyro.setSensitivity(kGyroSensitivity);
         return gyro;
       }

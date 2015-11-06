@@ -4,7 +4,7 @@
 DriveTrain::DriveTrain()
 		: Subsystem("DriveTrain"), left_encoder(new Encoder(1, 2)),
 			right_encoder(new Encoder(3, 4)), rangefinder(new AnalogInput(6)),
-			gyro(new Gyro(1)) {
+			gyro(new AnalogGyro(1)) {
 	drive = new RobotDrive(new Talon(1), new Talon(2),
 						   new Talon(3), new Talon(4));
 
