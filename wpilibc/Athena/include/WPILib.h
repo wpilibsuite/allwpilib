@@ -14,6 +14,7 @@
 #include "ADXL345_I2C.h"
 #include "ADXL345_SPI.h"
 #include "ADXL362.h"
+#include "ADXRS450_Gyro.h"
 #include "AnalogAccelerometer.h"
 #include "AnalogGyro.h"
 #include "AnalogInput.h"
