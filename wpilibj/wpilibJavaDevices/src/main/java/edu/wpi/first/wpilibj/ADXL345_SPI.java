@@ -155,14 +155,13 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
    * @return Acceleration of the ADXL345 in Gs.
    */
   public double getAcceleration(ADXL345_SPI.Axes axis) {
-    byte[] transferBuffer = new byte[3];
-    transferBuffer[0] = (byte) ((kAddress_Read | kAddress_MultiByte | kDataRegister) + axis.value);
+    ByteBuffer transferBuffer = ByteBuffer.allocateDirect(3);
+    transferBuffer.put(0, (byte) ((kAddress_Read | kAddress_MultiByte | kDataRegister) + axis.value));
     m_spi.transaction(transferBuffer, transferBuffer, 3);
-    ByteBuffer rawAccel = ByteBuffer.wrap(transferBuffer, 1, 2);
     // Sensor is little endian
-    rawAccel.order(ByteOrder.LITTLE_ENDIAN);
+    transferBuffer.order(ByteOrder.LITTLE_ENDIAN);
 
-    return rawAccel.getShort() * kGsPerLSB;
+    return transferBuffer.getShort(1) * kGsPerLSB;
   }
 
   /**
@@ -173,18 +172,17 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
    */
   public ADXL345_SPI.AllAxes getAccelerations() {
     ADXL345_SPI.AllAxes data = new ADXL345_SPI.AllAxes();
-    byte dataBuffer[] = new byte[7];
     if (m_spi != null) {
+      ByteBuffer dataBuffer = ByteBuffer.allocateDirect(7);
       // Select the data address.
-      dataBuffer[0] = (byte) (kAddress_Read | kAddress_MultiByte | kDataRegister);
+      dataBuffer.put(0, (byte) (kAddress_Read | kAddress_MultiByte | kDataRegister));
       m_spi.transaction(dataBuffer, dataBuffer, 7);
-      ByteBuffer rawData = ByteBuffer.wrap(dataBuffer, 1, 6);
       // Sensor is little endian... swap bytes
-      rawData.order(ByteOrder.LITTLE_ENDIAN);
+      dataBuffer.order(ByteOrder.LITTLE_ENDIAN);
 
-      data.XAxis = rawData.getShort() * kGsPerLSB;
-      data.YAxis = rawData.getShort() * kGsPerLSB;
-      data.ZAxis = rawData.getShort() * kGsPerLSB;
+      data.XAxis = dataBuffer.getShort(1) * kGsPerLSB;
+      data.YAxis = dataBuffer.getShort(3) * kGsPerLSB;
+      data.ZAxis = dataBuffer.getShort(5) * kGsPerLSB;
     }
     return data;
   }

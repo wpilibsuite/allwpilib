@@ -6,6 +6,9 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
+import java.nio.ByteOrder;
+import java.nio.ByteBuffer;
+
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
@@ -121,17 +124,12 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
    * @return Acceleration of the ADXL345 in Gs.
    */
   public double getAcceleration(Axes axis) {
-    byte[] rawAccel = new byte[2];
-    m_i2c.read(kDataRegister + axis.value, rawAccel.length, rawAccel);
+    ByteBuffer rawAccel = ByteBuffer.allocateDirect(2);
+    m_i2c.read(kDataRegister + axis.value, 2, rawAccel);
 
     // Sensor is little endian... swap bytes
-    return accelFromBytes(rawAccel[0], rawAccel[1]);
-  }
-
-  private double accelFromBytes(byte first, byte second) {
-    short tempLow = (short) (first & 0xff);
-    short tempHigh = (short) ((second << 8) & 0xff00);
-    return (tempLow | tempHigh) * kGsPerLSB;
+    rawAccel.order(ByteOrder.LITTLE_ENDIAN);
+    return rawAccel.getShort(0) * kGsPerLSB;
   }
 
   /**
@@ -142,13 +140,14 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
    */
   public AllAxes getAccelerations() {
     AllAxes data = new AllAxes();
-    byte[] rawData = new byte[6];
-    m_i2c.read(kDataRegister, rawData.length, rawData);
+    ByteBuffer rawData = ByteBuffer.allocateDirect(6);
+    m_i2c.read(kDataRegister, 6, rawData);
 
     // Sensor is little endian... swap bytes
-    data.XAxis = accelFromBytes(rawData[0], rawData[1]);
-    data.YAxis = accelFromBytes(rawData[2], rawData[3]);
-    data.ZAxis = accelFromBytes(rawData[4], rawData[5]);
+    rawData.order(ByteOrder.LITTLE_ENDIAN);
+    data.XAxis = rawData.getShort(0) * kGsPerLSB;
+    data.YAxis = rawData.getShort(2) * kGsPerLSB;
+    data.ZAxis = rawData.getShort(4) * kGsPerLSB;
     return data;
   }
 

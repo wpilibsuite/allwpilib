@@ -143,11 +143,27 @@ public class SPI extends SensorBase {
    * MISO input during the transfer into the receive FIFO.
    */
   public int write(byte[] dataToSend, int size) {
-    int retVal = 0;
     ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(size);
     dataToSendBuffer.put(dataToSend);
-    retVal = SPIJNI.spiWrite(m_port, dataToSendBuffer, (byte) size);
-    return retVal;
+    return SPIJNI.spiWrite(m_port, dataToSendBuffer, (byte) size);
+  }
+
+  /**
+   * Write data to the slave device. Blocks until there is space in the output
+   * FIFO.
+   *
+   * If not running in output only mode, also saves the data received on the
+   * MISO input during the transfer into the receive FIFO.
+   *
+   * @param dataToSend The buffer containing the data to send. Must be created
+   *        using ByteBuffer.allocateDirect().
+   */
+  public int write(ByteBuffer dataToSend, int size) {
+    if (!dataToSend.isDirect())
+      throw new IllegalArgumentException("must be a direct buffer");
+    if (dataToSend.capacity() < size)
+      throw new IllegalArgumentException("buffer is too small, must be at least " + size);
+    return SPIJNI.spiWrite(m_port, dataToSend, (byte) size);
   }
 
   /**
@@ -175,6 +191,33 @@ public class SPI extends SensorBase {
   }
 
   /**
+   * Read a word from the receive FIFO.
+   *
+   * Waits for the current transfer to complete if the receive FIFO is empty.
+   *
+   * If the receive FIFO is empty, there is no active transfer, and initiate is
+   * false, errors.
+   *
+   * @param initiate If true, this function pushes "0" into the transmit buffer
+   *        and initiates a transfer. If false, this function assumes that data
+   *        is already in the receive FIFO from a previous write.
+   *
+   * @param received The buffer to be filled with the received data. Must be
+   *        created using ByteBuffer.allocateDirect().
+   */
+  public int read(boolean initiate, ByteBuffer dataReceived, int size) {
+    if (!dataReceived.isDirect())
+      throw new IllegalArgumentException("must be a direct buffer");
+    if (dataReceived.capacity() < size)
+      throw new IllegalArgumentException("buffer is too small, must be at least " + size);
+    if (initiate) {
+      ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(size);
+      return SPIJNI.spiTransaction(m_port, dataToSendBuffer, dataReceived, (byte) size);
+    }
+    return SPIJNI.spiRead(m_port, dataReceived, (byte) size);
+  }
+
+  /**
    * Perform a simultaneous read/write transaction with the device
    *
    * @param dataToSend The data to be written out to the device
@@ -182,12 +225,32 @@ public class SPI extends SensorBase {
    * @param size The length of the transaction, in bytes
    */
   public int transaction(byte[] dataToSend, byte[] dataReceived, int size) {
-    int retVal = 0;
     ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(size);
     dataToSendBuffer.put(dataToSend);
     ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(size);
-    retVal = SPIJNI.spiTransaction(m_port, dataToSendBuffer, dataReceivedBuffer, (byte) size);
+    int retVal = SPIJNI.spiTransaction(m_port, dataToSendBuffer, dataReceivedBuffer, (byte) size);
     dataReceivedBuffer.get(dataReceived);
     return retVal;
+  }
+
+  /**
+   * Perform a simultaneous read/write transaction with the device
+   *
+   * @param dataToSend The data to be written out to the device. Must be
+   *        created using ByteBuffer.allocateDirect().
+   * @param dataReceived Buffer to receive data from the device. Must be
+   *        created using ByteBuffer.allocateDirect().
+   * @param size The length of the transaction, in bytes
+   */
+  public int transaction(ByteBuffer dataToSend, ByteBuffer dataReceived, int size) {
+    if (!dataToSend.isDirect())
+      throw new IllegalArgumentException("dataToSend must be a direct buffer");
+    if (dataToSend.capacity() < size)
+      throw new IllegalArgumentException("dataToSend is too small, must be at least " + size);
+    if (!dataReceived.isDirect())
+      throw new IllegalArgumentException("dataReceived must be a direct buffer");
+    if (dataReceived.capacity() < size)
+      throw new IllegalArgumentException("dataReceived is too small, must be at least " + size);
+    return SPIJNI.spiTransaction(m_port, dataToSend, dataReceived, (byte) size);
   }
 }
