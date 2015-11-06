@@ -29,7 +29,7 @@ PowerDistributionPanel::PowerDistributionPanel(uint8_t module)
 double PowerDistributionPanel::GetVoltage() const {
   int32_t status = 0;
 
-  double voltage = getPDPVoltage(&status, m_module);
+  double voltage = getPDPVoltage(m_module, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -45,7 +45,7 @@ double PowerDistributionPanel::GetVoltage() const {
 double PowerDistributionPanel::GetTemperature() const {
   int32_t status = 0;
 
-  double temperature = getPDPTemperature(&status, m_module);
+  double temperature = getPDPTemperature(m_module, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -67,7 +67,7 @@ double PowerDistributionPanel::GetCurrent(uint8_t channel) const {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
   }
 
-  double current = getPDPChannelCurrent(channel, &status, m_module);
+  double current = getPDPChannelCurrent(m_module, channel, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -83,7 +83,7 @@ double PowerDistributionPanel::GetCurrent(uint8_t channel) const {
 double PowerDistributionPanel::GetTotalCurrent() const {
   int32_t status = 0;
 
-  double current = getPDPTotalCurrent(&status, m_module);
+  double current = getPDPTotalCurrent(m_module, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -99,7 +99,7 @@ double PowerDistributionPanel::GetTotalCurrent() const {
 double PowerDistributionPanel::GetTotalPower() const {
   int32_t status = 0;
 
-  double power = getPDPTotalPower(&status, m_module);
+  double power = getPDPTotalPower(m_module, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -115,7 +115,7 @@ double PowerDistributionPanel::GetTotalPower() const {
 double PowerDistributionPanel::GetTotalEnergy() const {
   int32_t status = 0;
 
-  double energy = getPDPTotalEnergy(&status, m_module);
+  double energy = getPDPTotalEnergy(m_module, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -131,7 +131,7 @@ double PowerDistributionPanel::GetTotalEnergy() const {
 void PowerDistributionPanel::ResetTotalEnergy() {
   int32_t status = 0;
 
-  resetPDPTotalEnergy(&status, m_module);
+  resetPDPTotalEnergy(m_module, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -144,7 +144,7 @@ void PowerDistributionPanel::ResetTotalEnergy() {
 void PowerDistributionPanel::ClearStickyFaults() {
   int32_t status = 0;
 
-  clearPDPStickyFaults(&status, m_module);
+  clearPDPStickyFaults(m_module, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
