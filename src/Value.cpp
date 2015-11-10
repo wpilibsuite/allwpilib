@@ -58,6 +58,7 @@ std::shared_ptr<Value> Value::MakeStringArray(
   val->m_string_array = value;
   // point NT_Value to the contents in the vector.
   val->m_val.data.arr_string.arr = new NT_String[value.size()];
+  val->m_val.data.arr_string.size = val->m_string_array.size();
   for (std::size_t i=0; i<value.size(); ++i) {
     val->m_val.data.arr_string.arr[i].str = const_cast<char*>(value[i].c_str());
     val->m_val.data.arr_string.arr[i].len = value[i].size();
@@ -72,6 +73,7 @@ std::shared_ptr<Value> Value::MakeStringArray(
   value.clear();
   // point NT_Value to the contents in the vector.
   val->m_val.data.arr_string.arr = new NT_String[val->m_string_array.size()];
+  val->m_val.data.arr_string.size = val->m_string_array.size();
   for (std::size_t i=0; i<val->m_string_array.size(); ++i) {
     val->m_val.data.arr_string.arr[i].str =
         const_cast<char*>(val->m_string_array[i].c_str());
