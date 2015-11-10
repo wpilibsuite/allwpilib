@@ -110,6 +110,8 @@ static RpcDefinition ConvertFromC(const NT_RpcDefinition& in) {
   return out;
 }
 
+extern "C" {
+
 /*
  * Table Functions
  */
@@ -748,3 +750,5 @@ NT_String *NT_GetEntryStringArray(const char *name, size_t name_len,
   *arr_size = vArr.size();
   return arr;
 }
+
+}  // extern "C"
