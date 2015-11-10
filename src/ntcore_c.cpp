@@ -114,7 +114,7 @@ static RpcDefinition ConvertFromC(const NT_RpcDefinition& in) {
  * Table Functions
  */
 
-void NT_GetEntryValue(const char *name, unsigned int name_len,
+void NT_GetEntryValue(const char *name, size_t name_len,
                       struct NT_Value *value) {
   NT_InitValue(value);
   auto v = nt::GetEntryValue(StringRef(name, name_len));
@@ -122,12 +122,12 @@ void NT_GetEntryValue(const char *name, unsigned int name_len,
   ConvertToC(*v, value);
 }
 
-int NT_SetEntryValue(const char *name, unsigned int name_len,
+int NT_SetEntryValue(const char *name, size_t name_len,
                      const struct NT_Value *value) {
   return nt::SetEntryValue(StringRef(name, name_len), ConvertFromC(*value));
 }
 
-void NT_SetEntryTypeValue(const char *name, unsigned int name_len,
+void NT_SetEntryTypeValue(const char *name, size_t name_len,
                           const struct NT_Value *value) {
   nt::SetEntryTypeValue(StringRef(name, name_len), ConvertFromC(*value));
 }
@@ -140,7 +140,7 @@ unsigned int NT_GetEntryFlags(const char *name, size_t name_len) {
   return nt::GetEntryFlags(StringRef(name, name_len));
 }
 
-void NT_DeleteEntry(const char *name, unsigned int name_len) {
+void NT_DeleteEntry(const char *name, size_t name_len) {
   nt::DeleteEntry(StringRef(name, name_len));
 }
 
