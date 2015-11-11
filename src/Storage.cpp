@@ -1371,6 +1371,7 @@ bool Storage::GetRpcResult(bool blocking, unsigned int call_uid,
     if (i == m_rpc_results.end()) {
       if (!blocking || m_terminating) return false;
       m_rpc_results_cond.wait(lock);
+      if (m_terminating) return false;
       continue;
     }
     result->swap(i->getSecond());
