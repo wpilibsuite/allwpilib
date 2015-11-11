@@ -532,11 +532,11 @@ int NT_SetEntryRaw(const char *name, size_t name_len, const char *raw,
                    size_t raw_len, int force) {
   if (force != 0) {
     nt::SetEntryTypeValue(StringRef(name, name_len),
-                          Value::MakeString(StringRef(raw, raw_len)));
+                          Value::MakeRaw(StringRef(raw, raw_len)));
     return 1;
   } else {
     return nt::SetEntryValue(StringRef(name, name_len),
-                             Value::MakeString(StringRef(raw, raw_len)));
+                             Value::MakeRaw(StringRef(raw, raw_len)));
   }
 }
 
