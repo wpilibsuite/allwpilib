@@ -74,6 +74,8 @@ NT_DisposeEntryInfoArray @76
 NT_AllocateCharArray @77
 NT_FreeCharArray @78
 NT_NotifierDestroyed @79
+NT_StopRpcServer @80
+NT_StopNotifier @81
 
 ; JNI functions
 JNI_OnLoad

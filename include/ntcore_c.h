@@ -350,6 +350,16 @@ void NT_StartClient(const char *server_name, unsigned int port);
 */
 void NT_StopClient(void);
 
+/** Stop Rpc Server
+ * Stops the Rpc server if it is running.
+*/
+void NT_StopRpcServer(void);
+
+/** Stop Notifier
+ * Stops the Notifier (Entry and Connection Listener) thread if it is running.
+*/
+void NT_StopNotifier(void);
+
 /** Set Update Rate
  * Sets the update rate of the table
  *

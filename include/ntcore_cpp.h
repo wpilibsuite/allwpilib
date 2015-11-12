@@ -229,6 +229,8 @@ void StartServer(StringRef persist_filename, const char* listen_address,
 void StopServer();
 void StartClient(const char* server_name, unsigned int port);
 void StopClient();
+void StopRpcServer();
+void StopNotifier();
 void SetUpdateRate(double interval);
 std::vector<ConnectionInfo> GetConnections();
 
