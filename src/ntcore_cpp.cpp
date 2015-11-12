@@ -230,6 +230,14 @@ void StopClient() {
   Dispatcher::GetInstance().Stop();
 }
 
+void StopRpcServer() {
+  RpcServer::GetInstance().Stop();
+}
+
+void StopNotifier() {
+  Notifier::GetInstance().Stop();
+}
+
 void SetUpdateRate(double interval) {
   Dispatcher::GetInstance().SetUpdateRate(interval);
 }

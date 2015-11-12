@@ -333,6 +333,14 @@ void NT_StopClient(void) {
   nt::StopClient();
 }
 
+void NT_StopRpcServer(void) {
+  nt::StopRpcServer();
+}
+
+void NT_StopNotifier(void) {
+  nt::StopNotifier();
+}
+
 void NT_SetUpdateRate(double interval) {
   nt::SetUpdateRate(interval);
 }
