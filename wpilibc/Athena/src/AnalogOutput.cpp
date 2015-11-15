@@ -9,7 +9,9 @@
 #include "Resource.h"
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
+#include "HAL/Port.h"
 
+#include <limits>
 #include <sstream>
 
 static std::unique_ptr<Resource> outputs;
@@ -27,21 +29,26 @@ AnalogOutput::AnalogOutput(uint32_t channel) {
 
   if (!checkAnalogOutputChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
+    m_channel = std::numeric_limits<uint32_t>::max();
+    m_port = nullptr;
     return;
   }
 
   if (outputs->Allocate(channel, buf.str()) ==
       std::numeric_limits<uint32_t>::max()) {
     CloneError(*outputs);
+    m_channel = std::numeric_limits<uint32_t>::max();
+    m_port = nullptr;
     return;
   }
 
   m_channel = channel;
 
-  void *port = getPort(m_channel);
+  void* port = getPort(m_channel);
   int32_t status = 0;
   m_port = initializeAnalogOutputPort(port, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  freePort(port);
 
   LiveWindow::GetInstance()->AddActuator("AnalogOutput", m_channel, this);
   HALReport(HALUsageReporting::kResourceType_AnalogOutput, m_channel);

@@ -45,7 +45,7 @@ class InterruptableSensorBase : public SensorBase {
 
  protected:
   void *m_interrupt = nullptr;
-  uint32_t m_interruptIndex;
+  uint32_t m_interruptIndex = std::numeric_limits<uint32_t>::max();
   void AllocateInterrupts(bool watcher);
 
   static std::unique_ptr<Resource> m_interrupts;

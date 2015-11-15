@@ -11,6 +11,7 @@
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 
+#include <limits>
 #include <sstream>
 
 /**
@@ -25,6 +26,7 @@ DigitalInput::DigitalInput(uint32_t channel) {
   if (!CheckDigitalChannel(channel)) {
     buf << "Digital Channel " << channel;
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
+    m_channel = std::numeric_limits<uint32_t>::max();
     return;
   }
   m_channel = channel;

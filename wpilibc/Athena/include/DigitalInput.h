@@ -10,6 +10,7 @@
 #include "LiveWindow/LiveWindowSendable.h"
 
 #include <memory>
+#include <cstdint>
 
 /**
  * Class to read a digital input.

@@ -136,11 +136,7 @@ void LiveWindow::AddSensor(std::string type, int channel,
                            LiveWindowSendable *component) {
   std::ostringstream oss;
   oss << type << "[" << channel << "]";
-  std::string types(oss.str());
-  auto cc = new char[types.size() + 1];
-  types.copy(cc, types.size());
-  cc[types.size()] = '\0';
-  AddSensor("Ungrouped", cc, component);
+  AddSensor("Ungrouped", oss.str(), component);
   std::shared_ptr<LiveWindowSendable> component_stl(
       component, NullDeleter<LiveWindowSendable>());
   if (std::find(m_sensors.begin(), m_sensors.end(), component_stl) ==
@@ -155,12 +151,8 @@ void LiveWindow::AddActuator(std::string type, int channel,
                              LiveWindowSendable *component) {
   std::ostringstream oss;
   oss << type << "[" << channel << "]";
-  std::string types(oss.str());
-  auto cc = new char[types.size() + 1];
-  types.copy(cc, types.size());
-  cc[types.size()] = '\0';
-  AddActuator("Ungrouped", cc, std::shared_ptr<LiveWindowSendable>(
-                                   component, [](LiveWindowSendable *) {}));
+  AddActuator("Ungrouped", oss.str(), std::shared_ptr<LiveWindowSendable>(
+                                      component, [](LiveWindowSendable *) {}));
 }
 
 /**
@@ -170,12 +162,8 @@ void LiveWindow::AddActuator(std::string type, int module, int channel,
                              LiveWindowSendable *component) {
   std::ostringstream oss;
   oss << type << "[" << module << "," << channel << "]";
-  std::string types(oss.str());
-  auto cc = new char[types.size() + 1];
-  types.copy(cc, types.size());
-  cc[types.size()] = '\0';
-  AddActuator("Ungrouped", cc, std::shared_ptr<LiveWindowSendable>(
-                                   component, [](LiveWindowSendable *) {}));
+  AddActuator("Ungrouped", oss.str(), std::shared_ptr<LiveWindowSendable>(
+                                      component, [](LiveWindowSendable *) {}));
 }
 
 /**

@@ -69,6 +69,7 @@ void dprintf(const char *tempString, ...) /* Variable argument list */
   for (index = 0; index < tempStringLen; index++) {
     if (tempString[index] == ' ') {
       printf("ERROR in dprintf: malformed calling sequence (%s)\n", tempString);
+      va_end(args);
       return;
     }
     if (tempString[index] == '\\' || tempString[index] == '/')
@@ -292,6 +293,7 @@ int processFile(char *inputFile, char *outputString, int lineNumber) {
   FILE *infile;
   const int stringSize = 80;  // max size of one line in file
   char inputStr[stringSize];
+  inputStr[0] = '\0';
   int lineCount = 0;
 
   if (lineNumber < 0) return (-1);
@@ -323,14 +325,10 @@ int processFile(char *inputFile, char *outputString, int lineNumber) {
   if (lineNumber == 0) return (lineCount);
   // check for input out of range
   if (lineNumber > lineCount) return (-1);
-  // return the line selected
-  if (lineCount) {
-    stripString(inputStr);
-    strcpy(outputString, inputStr);
-    return (lineCount);
-  } else {
-    return (-1);
-  }
+  // return the line selected; lineCount guaranteed to be greater than zero
+  stripString(inputStr);
+  strcpy(outputString, inputStr);
+  return (lineCount);
 }
 
 /** Ignore empty string

@@ -11,6 +11,7 @@
 #include "SensorBase.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include <memory>
+#include <cstdint>
 
 /**
  * MXP analog output class.

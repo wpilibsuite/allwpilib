@@ -22,7 +22,7 @@ class CommandGroupEntry {
   CommandGroupEntry(Command *command, Sequence state, double timeout = -1.0);
   bool IsTimedOut() const;
 
-  double m_timeout;
+  double m_timeout = -1.0;
   Command *m_command = nullptr;
   Sequence m_state = kSequence_InSequence;
 };

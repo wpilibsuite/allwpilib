@@ -11,7 +11,7 @@
 struct LiveWindowComponent {
   std::string subsystem;
   std::string name;
-  bool isSensor;
+  bool isSensor = false;
 
   LiveWindowComponent() = default;
   LiveWindowComponent(std::string subsystem, std::string name, bool isSensor) {

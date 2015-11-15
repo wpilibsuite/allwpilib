@@ -10,6 +10,7 @@
 #include "Timer.h"
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
+#include "HAL/Port.h"
 
 #include <sstream>
 
@@ -43,10 +44,11 @@ AnalogInput::AnalogInput(uint32_t channel) {
 
   m_channel = channel;
 
-  void *port = getPort(channel);
+  void* port = getPort(channel);
   int32_t status = 0;
   m_port = initializeAnalogInputPort(port, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  freePort(port);
 
   LiveWindow::GetInstance()->AddSensor("AnalogInput", channel, this);
   HALReport(HALUsageReporting::kResourceType_AnalogChannel, channel);

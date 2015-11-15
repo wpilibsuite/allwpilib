@@ -9,6 +9,7 @@
 #include "Resource.h"
 #include "WPIErrors.h"
 
+#include <limits>
 #include <sstream>
 
 /**
@@ -21,13 +22,14 @@
 DigitalOutput::DigitalOutput(uint32_t channel) {
   std::stringstream buf;
 
+  m_pwmGenerator = (void *)std::numeric_limits<uint32_t>::max();
   if (!CheckDigitalChannel(channel)) {
     buf << "Digital Channel " << channel;
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
+    m_channel = std::numeric_limits<uint32_t>::max();
     return;
   }
   m_channel = channel;
-  m_pwmGenerator = (void *)std::numeric_limits<uint32_t>::max();
 
   int32_t status = 0;
   allocateDIO(m_digital_ports[channel], false, &status);

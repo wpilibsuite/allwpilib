@@ -1,6 +1,7 @@
 //This file must compile on ALL PLATFORMS. Be very careful what you put in here.
 #include "HAL/HAL.hpp"
 #include "FRC_NetworkCommunication/FRCComm.h"
+#include <cstring>
 
 int HALGetControlWord(HALControlWord *data)
 {
@@ -62,17 +63,20 @@ int HALGetJoystickType(uint8_t joystickNum)
 	}
 }
 
-const char* HALGetJoystickName(uint8_t joystickNum)
+char* HALGetJoystickName(uint8_t joystickNum)
 {
 	HALJoystickDescriptor joystickDesc;
 	if(HALGetJoystickDescriptor(joystickNum, &joystickDesc)<0)
 	{
-		const char* retval = "";
-		return retval;
+		char* name = (char*)std::malloc(1);
+		name[0] = '\0';
+		return name;
 	} else
 	{
-	const char* retval(joystickDesc.name);
-	return retval;
+		size_t len = std::strlen(joystickDesc.name);
+		char* name = (char*)std::malloc(len+1);
+		std::strcpy(name, joystickDesc.name);
+		return name;
 	}
 }
 

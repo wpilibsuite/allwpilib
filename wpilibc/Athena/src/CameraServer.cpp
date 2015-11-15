@@ -149,7 +149,10 @@ unsigned int CameraServer::GetQuality() {
 void CameraServer::Serve() {
   int sock = socket(AF_INET, SOCK_STREAM, 0);
 
-  if (sock == -1) wpi_setErrnoError();
+  if (sock == -1) {
+    wpi_setErrnoError();
+    return;
+  }
 
   int reuseAddr = 1;
   if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &reuseAddr,

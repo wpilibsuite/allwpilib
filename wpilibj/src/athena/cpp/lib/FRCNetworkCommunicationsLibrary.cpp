@@ -390,7 +390,10 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCom
   (JNIEnv * env, jclass, jbyte port)
   {
 	NETCOMM_LOG(logDEBUG) << "Calling HALGetJoystickName";
-	return env->NewStringUTF(HALGetJoystickName(port));
+	char* joystickName = HALGetJoystickName(port);
+	jstring str = env->NewStringUTF(joystickName);
+	std::free(joystickName);
+	return str;
   }
 
 /*

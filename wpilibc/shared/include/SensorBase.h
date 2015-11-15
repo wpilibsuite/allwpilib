@@ -56,5 +56,5 @@ class SensorBase : public ErrorBase {
 
  private:
   static SensorBase* m_singletonList;
-  SensorBase* m_nextSingleton;
+  SensorBase* m_nextSingleton = nullptr;
 };

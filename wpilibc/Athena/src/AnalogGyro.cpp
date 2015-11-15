@@ -88,7 +88,10 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel)
  * significant
  * drift in the gyro and it needs to be recalibrated after it has been running.
  */
-void AnalogGyro::Reset() { m_analog->ResetAccumulator(); }
+void AnalogGyro::Reset() {
+  if (StatusIsFatal()) return;
+  m_analog->ResetAccumulator();
+}
 
 /**
  * {@inheritDoc}
@@ -127,6 +130,8 @@ void AnalogGyro::Calibrate() {
  * of the returned rate from the gyro.
  */
 float AnalogGyro::GetAngle() const {
+  if (StatusIsFatal()) return 0.f;
+
   int64_t rawValue;
   uint32_t count;
   m_analog->GetAccumulatorOutput(rawValue, count);
@@ -148,6 +153,8 @@ float AnalogGyro::GetAngle() const {
  * @return the current rate in degrees per second
  */
 double AnalogGyro::GetRate() const {
+  if (StatusIsFatal()) return 0.0;
+
   return (m_analog->GetAverageValue() - ((double)m_center + m_offset)) * 1e-9 *
          m_analog->GetLSBWeight() /
          ((1 << m_analog->GetOversampleBits()) * m_voltsPerDegreePerSecond);
@@ -176,6 +183,8 @@ void AnalogGyro::SetSensitivity(float voltsPerDegreePerSecond) {
  * @param volts The size of the deadband in volts
  */
 void AnalogGyro::SetDeadband(float volts) {
+  if (StatusIsFatal()) return;
+
   int32_t deadband = volts * 1e9 / m_analog->GetLSBWeight() *
                      (1 << m_analog->GetOversampleBits());
   m_analog->SetAccumulatorDeadband(deadband);

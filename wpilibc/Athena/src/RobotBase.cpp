@@ -56,8 +56,10 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   FILE *file = nullptr;
   file = fopen("/tmp/frc_versions/FRC_Lib_Version.ini", "w");
 
-  fputs("2016 C++ Beta2.0", file);
-  if (file != nullptr) fclose(file);
+  if (file != nullptr) {
+    fputs("2016 C++ Beta2.0", file);
+    fclose(file);
+  }
 }
 
 /**

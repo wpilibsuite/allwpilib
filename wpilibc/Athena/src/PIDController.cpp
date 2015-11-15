@@ -107,7 +107,6 @@ void PIDController::Calculate() {
     pidInput = m_pidInput;
     pidOutput = m_pidOutput;
     enabled = m_enabled;
-    pidInput = m_pidInput;
   }
 
   if (pidInput == nullptr) return;

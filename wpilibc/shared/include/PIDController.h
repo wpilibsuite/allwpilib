@@ -93,7 +93,6 @@ class PIDController : public LiveWindowSendable,
   float m_minimumInput = 0;   // minimum input - limit setpoint to this
   bool m_continuous = false;      // do the endpoints wrap around? eg. Absolute encoder
   bool m_enabled = false;  // is the pid controller enabled
-  bool m_destruct;    // should the calculate thread stop running
   float m_prevInput = 0;  // the prior sensor input (used to compute velocity)
   double m_totalError = 0;  // the sum of the errors for use in the integral calc
   enum {
@@ -105,7 +104,7 @@ class PIDController : public LiveWindowSendable,
   // the percetage or absolute error that is considered on target.
   float m_tolerance = 0.05;
   float m_setpoint = 0;
-  float m_error;
+  float m_error = 0;
   float m_result = 0;
   float m_period;
 

@@ -70,6 +70,7 @@ int frcDispose(const char* functionName, ...) /* Variable argument list */
     }
     disposalPtr = va_arg(disposalPtrList, void*);
   }
+  va_end(disposalPtrList);
   return returnValue;
 }
 

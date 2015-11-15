@@ -101,8 +101,7 @@ class Ultrasonic : public SensorBase,
 
   std::shared_ptr<DigitalOutput> m_pingChannel;
   std::shared_ptr<DigitalInput> m_echoChannel;
-  bool m_allocatedChannels;
-  bool m_enabled;
+  bool m_enabled = false;
   Counter m_counter;
   Ultrasonic *m_nextSensor;
   DistanceUnit m_units;

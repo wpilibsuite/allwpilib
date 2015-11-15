@@ -177,7 +177,7 @@ class CANJaguar : public MotorSafety,
   float m_value = 0.0f;
 
   // Parameters/configuration
-  ControlMode m_controlMode;
+  ControlMode m_controlMode = kPercentVbus;
   uint8_t m_speedReference = LM_REF_NONE;
   uint8_t m_positionReference = LM_REF_NONE;
   double m_p = 0.0;
@@ -227,7 +227,7 @@ class CANJaguar : public MotorSafety,
   mutable std::atomic<bool> m_receivedStatusMessage1{false};
   mutable std::atomic<bool> m_receivedStatusMessage2{false};
 
-  bool m_controlEnabled;
+  bool m_controlEnabled = false;
 
   void verify();
 

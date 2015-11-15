@@ -273,7 +273,9 @@ uint32_t getAnalogOversampleBits(void* analog_port_pointer, int32_t *status) {
 int16_t getAnalogValue(void* analog_port_pointer, int32_t *status) {
   AnalogPort* port = (AnalogPort*) analog_port_pointer;
   int16_t value;
-  checkAnalogInputChannel(port->port.pin);
+  if (!checkAnalogInputChannel(port->port.pin)) {
+    return 0;
+  }
 
   tAI::tReadSelect readSelect;
   readSelect.Channel = port->port.pin;
@@ -304,7 +306,9 @@ int16_t getAnalogValue(void* analog_port_pointer, int32_t *status) {
 int32_t getAnalogAverageValue(void* analog_port_pointer, int32_t *status) {
   AnalogPort* port = (AnalogPort*) analog_port_pointer;
   int32_t value;
-  checkAnalogInputChannel(port->port.pin);
+  if (!checkAnalogInputChannel(port->port.pin)) {
+    return 0;
+  }
 
   tAI::tReadSelect readSelect;
   readSelect.Channel = port->port.pin;

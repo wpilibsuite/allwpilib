@@ -209,7 +209,7 @@ CTR_Code PCM::FireOneShotSolenoid(UINT8 idx)
 CTR_Code PCM::SetOneShotDurationMs(UINT8 idx,uint32_t durMs)
 {
 	/* sanity check caller's param */
-	if(idx > 8)
+	if(idx > 7)
 		return CTR_InvalidParamValue;
 	/* get latest tx frame */
 	CtreCanNode::txTask<PcmControlSetOneShotDur_t> toFill = GetTx<PcmControlSetOneShotDur_t>(CONTROL_3 | GetDeviceNumber());

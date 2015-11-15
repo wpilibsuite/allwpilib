@@ -126,6 +126,8 @@ Ultrasonic::Ultrasonic(DigitalOutput *pingChannel, DigitalInput *echoChannel,
       m_counter(m_echoChannel) {
   if (pingChannel == nullptr || echoChannel == nullptr) {
     wpi_setWPIError(NullParameter);
+    m_nextSensor = nullptr;
+    m_units = units;
     return;
   }
   m_units = units;

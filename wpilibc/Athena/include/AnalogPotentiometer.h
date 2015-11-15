@@ -87,5 +87,4 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
   std::shared_ptr<AnalogInput> m_analog_input;
   double m_fullRange, m_offset;
   std::shared_ptr<ITable> m_table;
-  bool m_init_analog_input;
 };

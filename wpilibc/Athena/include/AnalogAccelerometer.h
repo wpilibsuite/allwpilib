@@ -53,7 +53,6 @@ class AnalogAccelerometer : public SensorBase,
   std::shared_ptr<AnalogInput> m_analogInput;
   float m_voltsPerG = 1.0;
   float m_zeroGVoltage = 2.5;
-  bool m_allocatedChannel;
 
   std::shared_ptr<ITable> m_table;
 };

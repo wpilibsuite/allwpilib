@@ -49,9 +49,9 @@ class SPI : public SensorBase {
 
  protected:
   uint8_t m_port;
-  bool m_msbFirst;
-  bool m_sampleOnTrailing;
-  bool m_clk_idle_high;
+  bool m_msbFirst = false; // default little-endian
+  bool m_sampleOnTrailing = false; // default data updated on falling edge
+  bool m_clk_idle_high = false; // default clock active high
 
  private:
   void Init();

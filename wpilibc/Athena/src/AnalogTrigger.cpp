@@ -11,6 +11,8 @@
 //#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
 #include "WPIErrors.h"
+#include "HAL/Port.h"
+
 #include <memory>
 
 /**
@@ -20,11 +22,12 @@
  * on-board 4-7 are on the MXP port.
  */
 AnalogTrigger::AnalogTrigger(int32_t channel) {
-  void *port = getPort(channel);
+  void* port = getPort(channel);
   int32_t status = 0;
   uint32_t index = 0;
   m_trigger = initializeAnalogTrigger(port, &index, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  freePort(port);
   m_index = index;
 
   HALReport(HALUsageReporting::kResourceType_AnalogTrigger, channel);

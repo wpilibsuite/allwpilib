@@ -117,8 +117,10 @@ HSLImage *AxisCamera::GetImage() {
 int AxisCamera::CopyJPEG(char **destImage, unsigned int &destImageSize,
                          unsigned int &destImageBufferSize) {
   std::lock_guard<priority_mutex> lock(m_imageDataMutex);
-  if (destImage == nullptr)
+  if (destImage == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "destImage must not be nullptr");
+    return 0;
+  }
 
   if (m_imageData.size() == 0) return 0;  // if no source image
 
@@ -440,6 +442,7 @@ void AxisCamera::ReadImagesFromCamera() {
       wpi_setWPIErrorWithContext(IncompatibleMode,
                                  "No content-length token found in packet");
       close(m_cameraSocket);
+      if (imgBuffer) delete[] imgBuffer;
       return;
     }
     contentLength = contentLength + 16;    // skip past "content length"
@@ -564,8 +567,10 @@ int AxisCamera::CreateCameraSocket(std::string const &requestString,
   }
 
   if (getaddrinfo(m_cameraHost.c_str(), "80", nullptr, &address) == -1) {
-    if (setError)
+    if (setError) {
       wpi_setErrnoErrorWithContext("Failed to create the camera socket");
+      close(camSocket);
+    }
     return -1;
   }
 
@@ -573,9 +578,12 @@ int AxisCamera::CreateCameraSocket(std::string const &requestString,
   if (connect(camSocket, address->ai_addr, address->ai_addrlen) == -1) {
     if (setError)
       wpi_setErrnoErrorWithContext("Failed to connect to the camera");
+    freeaddrinfo(address);
     close(camSocket);
     return -1;
   }
+
+  freeaddrinfo(address);
 
   int sent = send(camSocket, requestString.c_str(), requestString.size(), 0);
   if (sent == -1) {

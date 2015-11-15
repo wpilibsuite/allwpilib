@@ -126,11 +126,11 @@ void initializeDigital(int32_t *status) {
   // Ensure that PWM output values are set to OFF
   for (uint32_t pwm_index = 0; pwm_index < kPwmPins; pwm_index++) {
     // Initialize port structure
-    DigitalPort* digital_port = new DigitalPort();
-    digital_port->port.pin = pwm_index;
+    DigitalPort digital_port;
+    digital_port.port.pin = pwm_index;
 
-    setPWM(digital_port, kPwmDisabled, status);
-    setPWMPeriodScale(digital_port, 3, status); // Set all to 4x by default.
+    setPWM(&digital_port, kPwmDisabled, status);
+    setPWMPeriodScale(&digital_port, 3, status); // Set all to 4x by default.
   }
 
   digitalSystemsInitialized = true;

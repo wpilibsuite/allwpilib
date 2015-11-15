@@ -230,7 +230,7 @@ extern "C"
 	int HALGetJoystickDescriptor(uint8_t joystickNum, HALJoystickDescriptor *desc);
 	int HALGetJoystickIsXbox(uint8_t joystickNum);
 	int HALGetJoystickType(uint8_t joystickNum);
-	const char* HALGetJoystickName(uint8_t joystickNum);
+	char* HALGetJoystickName(uint8_t joystickNum);
 	int HALGetJoystickAxisType(uint8_t joystickNum, uint8_t axis);
 	int HALSetJoystickOutputs(uint8_t joystickNum, uint32_t outputs, uint16_t leftRumble, uint16_t rightRumble);
 	int HALGetMatchTime(float *matchTime);
