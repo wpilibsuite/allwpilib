@@ -31,9 +31,16 @@ public:
      *
      * @Return	-	CTR_Code	-	Error code (if any)
      * @Param 	-	idx		- 	ID of solenoid (0-7) to return if solenoid is on.
-     * @Param	-	status	-	OK if solenoid enabled, false otherwise
+     * @Param	-	status	-	true if solenoid enabled, false otherwise
      */
     CTR_Code 	GetSolenoid(UINT8 idx, bool &status);
+
+    /* Get state of all solenoids
+     *
+     * @Return	-	CTR_Code	-	Error code (if any)
+     * @Param	-	status	-	bitfield of solenoid states
+     */
+    CTR_Code 	GetAllSolenoids(UINT8 &status);
 
     /* Get pressure switch state
      * @Return	-	CTR_Code	-	Error code (if any)
@@ -188,6 +195,7 @@ extern "C" {
 	CTR_Code c_SetClosedLoopControl(void * handle,INT8 param);
 	CTR_Code c_ClearStickyFaults(void * handle,INT8 param);
 	CTR_Code c_GetSolenoid(void * handle,UINT8 idx,INT8 * status);
+	CTR_Code c_GetAllSolenoids(void * handle,UINT8 * status);
 	CTR_Code c_GetPressure(void * handle,INT8 * status);
 	CTR_Code c_GetCompressor(void * handle,INT8 * status);
 	CTR_Code c_GetClosedLoopControl(void * handle,INT8 * status);

@@ -101,6 +101,20 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getSolenoi
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Method:    getAllSolenoids
+ * Signature: (J)Z
+ */
+JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getAllSolenoids
+  (JNIEnv *env, jclass, jlong solenoid_port)
+{
+	int32_t status = 0;
+	jbyte val = getAllSolenoids((void*)solenoid_port, &status);
+	CheckStatus(env, status);
+	return val;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
  * Method:    getPCMSolenoidBlackList
  * Signature: (J)I
  */

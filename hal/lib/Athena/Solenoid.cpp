@@ -51,6 +51,15 @@ bool getSolenoid(void* solenoid_port_pointer, int32_t *status) {
 	return value;
 }
 
+uint8_t getAllSolenoids(void* solenoid_port_pointer, int32_t *status) {
+	solenoid_port_t* port = (solenoid_port_t*) solenoid_port_pointer;
+	uint8_t value;
+
+	*status = port->module->GetAllSolenoids(value);
+
+	return value;
+}
+
 void setSolenoid(void* solenoid_port_pointer, bool value, int32_t *status) {
 	solenoid_port_t* port = (solenoid_port_t*) solenoid_port_pointer;
 

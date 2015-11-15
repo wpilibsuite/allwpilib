@@ -4,7 +4,7 @@
 #include "FRC_NetworkCommunication/CANSessionMux.h"
 #include <string.h> // memset
 #include <unistd.h> // usleep
-/* This can be a constant, as long as nobody needs to updatie solenoids within
+/* This can be a constant, as long as nobody needs to update solenoids within
     1/50 of a second. */
 static const INT32 kCANPeriod = 20;
 
@@ -238,6 +238,17 @@ CTR_Code PCM::GetSolenoid(UINT8 idx, bool &status)
 	return rx.err;
 }
 
+/* Get solenoid state for all solenoids on the PCM
+ *
+ * @Return	-	Bitfield of solenoid states
+ */
+CTR_Code PCM::GetAllSolenoids(UINT8 &status)
+{
+	GET_PCM_STATUS();
+	status = rx->SolenoidBits;
+	return rx.err;
+}
+
 /* Get pressure switch state
  *
  * @Return	-	True/False	-	True if pressure adequate, false if low
@@ -466,6 +477,9 @@ extern "C" {
 		CTR_Code retval = ((PCM*) handle)->GetSolenoid(idx, bstatus);
 		*status = bstatus;
 		return retval;
+	}
+	CTR_Code c_GetAllSolenoids(void * handle, UINT8 * status) {
+		return ((PCM*) handle)->GetAllSolenoids(*status);
 	}
 	CTR_Code c_GetPressure(void * handle, INT8 * status) {
 		bool bstatus;

@@ -65,11 +65,7 @@ public abstract class SolenoidBase extends SensorBase {
    * @return The current value of all 8 solenoids on this module.
    */
   public byte getAll() {
-    byte value = 0;
-    for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
-      value |= (SolenoidJNI.getSolenoid(m_ports[i]) ? 1 : 0) << i;
-    }
-    return value;
+    return SolenoidJNI.getAllSolenoids(m_ports[0]);
   }
 
   /**

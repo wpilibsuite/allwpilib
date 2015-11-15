@@ -48,9 +48,8 @@ void SolenoidBase::Set(uint8_t value, uint8_t mask, int module) {
 uint8_t SolenoidBase::GetAll(int module) const {
   uint8_t value = 0;
   int32_t status = 0;
-  for (int i = 0; i < m_maxPorts; i++) {
-    value |= getSolenoid(m_ports[module][i], &status) << i;
-  }
+  value = getAllSolenoids(m_ports[module][0], &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
   return value;
 }
 /**

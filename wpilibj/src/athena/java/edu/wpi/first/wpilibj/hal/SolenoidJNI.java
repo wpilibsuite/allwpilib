@@ -11,6 +11,8 @@ public class SolenoidJNI extends JNIWrapper {
 
   public static native boolean getSolenoid(long port);
 
+  public static native byte getAllSolenoids(long port);
+
   public static native int getPCMSolenoidBlackList(long pcm_pointer);
 
   public static native boolean getPCMSolenoidVoltageStickyFault(long pcm_pointer);
