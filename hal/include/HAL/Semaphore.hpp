@@ -20,5 +20,7 @@ extern "C"
 	void deleteMultiWait(MULTIWAIT_ID sem);
 	void takeMultiWait(MULTIWAIT_ID sem, MUTEX_ID m);
 	void giveMultiWait(MULTIWAIT_ID sem);
+	
+	NATIVE_MULTIWAIT_ID getNativeHandle(MULTIWAIT_ID sem);
 }
 

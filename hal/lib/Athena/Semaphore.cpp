@@ -40,3 +40,5 @@ void takeMultiWait(MULTIWAIT_ID cond, MUTEX_ID m) {
 }
 
 void giveMultiWait(MULTIWAIT_ID cond) { cond->notify_all(); }
+
+NATIVE_MULTIWAIT_ID getNativeHandle(MULTIWAIT_ID cond) { return cond->native_handle(); }
