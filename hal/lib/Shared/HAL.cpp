@@ -7,9 +7,9 @@ int HALGetControlWord(HALControlWord *data)
 	return FRC_NetworkCommunication_getControlWord((ControlWord_t*) data);
 }
 
-void HALSetNewDataSem(NATIVE_MULTIWAIT_ID sem)
+void HALSetNewDataSem(MULTIWAIT_ID sem)
 {
-	setNewDataSem(sem);
+	setNewDataSem(sem->native_handle());
 }
 
 int HALGetAllianceStation(enum HALAllianceStationID *allianceStation)

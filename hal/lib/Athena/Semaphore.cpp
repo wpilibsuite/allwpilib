@@ -9,7 +9,7 @@ TLogLevel semaphoreLogLevel = logDEBUG;
     if (level > semaphoreLogLevel) ; \
     else Log().Get(level)
 
-MUTEX_ID initializeMutexNormal() { return new std::mutex; }
+MUTEX_ID initializeMutexNormal() { return new priority_mutex; }
 
 void deleteMutex(MUTEX_ID sem) { delete sem; }
 
@@ -30,12 +30,12 @@ bool tryTakeMutex(MUTEX_ID mutex) { return mutex->try_lock(); }
  */
 void giveMutex(MUTEX_ID mutex) { mutex->unlock(); }
 
-MULTIWAIT_ID initializeMultiWait() { return new std::condition_variable; }
+MULTIWAIT_ID initializeMultiWait() { return new priority_condition_variable; }
 
 void deleteMultiWait(MULTIWAIT_ID cond) { delete cond; }
 
 void takeMultiWait(MULTIWAIT_ID cond, MUTEX_ID m) {
-  std::unique_lock<std::mutex> lock(*m);
+  std::unique_lock<priority_mutex> lock(*m);
   cond->wait(lock);
 }
 

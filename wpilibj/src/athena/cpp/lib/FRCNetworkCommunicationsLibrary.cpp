@@ -402,7 +402,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
   (JNIEnv * env, jclass, jlong id )
 {
 	NETCOMM_LOG(logDEBUG) << "Mutex Ptr = " << (void*)id;
-	HALSetNewDataSem(((MULTIWAIT_ID)id)->native_handle());
+	HALSetNewDataSem((MULTIWAIT_ID)id);
 }
 
 /*

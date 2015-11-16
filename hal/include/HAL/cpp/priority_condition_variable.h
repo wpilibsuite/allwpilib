@@ -14,10 +14,11 @@
 #include "priority_mutex.h"
 
 class priority_condition_variable {
-  typedef std::condition_variable::native_handle_type native_handle_type;
   typedef std::chrono::system_clock clock_t;
 
  public:
+  typedef std::condition_variable::native_handle_type native_handle_type;
+
   priority_condition_variable() : m_mutex(std::make_shared<std::mutex>()) {}
   ~priority_condition_variable() = default;
 

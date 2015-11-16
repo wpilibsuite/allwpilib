@@ -235,7 +235,7 @@ extern "C"
 	int HALSetJoystickOutputs(uint8_t joystickNum, uint32_t outputs, uint16_t leftRumble, uint16_t rightRumble);
 	int HALGetMatchTime(float *matchTime);
 
-	void HALSetNewDataSem(NATIVE_MULTIWAIT_ID sem);
+	void HALSetNewDataSem(MULTIWAIT_ID sem);
 
 	bool HALGetSystemActive(int32_t *status);
 	bool HALGetBrownedOut(int32_t *status);
