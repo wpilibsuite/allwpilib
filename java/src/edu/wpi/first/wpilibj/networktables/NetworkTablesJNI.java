@@ -23,6 +23,8 @@ public class NetworkTablesJNI {
         System.out.println("platform: " + resname);
         if (osname.startsWith("Windows"))
           resname += "ntcore.dll";
+        else if (osname.startsWith("Mac"))
+          resname += "libntcore.dylib";
         else
           resname += "libntcore.so";
         InputStream is = NetworkTablesJNI.class.getResourceAsStream(resname);
@@ -30,6 +32,8 @@ public class NetworkTablesJNI {
           // create temporary file
           if (System.getProperty("os.name").startsWith("Windows"))
             jniLibrary = File.createTempFile("NetworkTablesJNI", ".dll");
+          else if (System.getProperty("os.name").startsWith("Mac"))
+            jniLibrary = File.createTempFile("libNetworkTablesJNI", ".dylib");
           else
             jniLibrary = File.createTempFile("libNetworkTablesJNI", ".so");
           // flag for delete on exit

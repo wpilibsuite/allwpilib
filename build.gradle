@@ -28,6 +28,12 @@ ext.getPlatformPath = { binary ->
         } else {
             return 'Windows/' + binary.targetPlatform.architecture.name
         }
+    } else if (binary.targetPlatform.operatingSystem.macOsX) {
+        if (binary.targetPlatform.architecture.amd64) {
+            return 'Mac OS X/x86_64'
+        } else {
+            return 'Mac OS X/' + binary.targetPlatform.architecture.name
+        }
     } else {
         return binary.targetPlatform.operatingSystem.name + '/' + binary.targetPlatform.architecture.name
     }
