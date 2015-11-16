@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
  * Class for getting voltage, current, temperature, power and energy from the
- * CAN PDP. The PDP must be at CAN Address 0.
+ * CAN PDP.
  *$
  * @author Thomas Clark
  */
