@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.Timer;
@@ -41,9 +42,13 @@ public class SampleRobot extends RobotBase {
    * Robot-wide initialization code should go here.
    *
    * Users should override this method for default Robot-wide initialization
-   * which will be called when the robot is first powered on.
+   * which will be called when the robot is first powered on. It will be called
+   * exactly one time.
    *
-   * Called exactly 1 time when the competition starts.
+   * Warning: the Driver Station "Robot Code" light and FMS "Robot Ready"
+   * indicators will be off until RobotInit() exits. Code in RobotInit() that
+   * waits for enable will cause the robot to never indicate that the code is
+   * ready, causing the robot to be bypassed in a match.
    */
   protected void robotInit() {
     System.out.println("Default robotInit() method running, consider providing your own");
@@ -116,11 +121,15 @@ public class SampleRobot extends RobotBase {
   public void startCompetition() {
     UsageReporting.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Sample);
 
+    robotInit();
+
+    // Tell the DS that the robot is ready to be enabled
+    FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
+
     robotMain();
     if (!m_robotMainOverridden) {
       // first and one-time initialization
       LiveWindow.setEnabled(false);
-      robotInit();
 
       while (true) {
         if (isDisabled()) {

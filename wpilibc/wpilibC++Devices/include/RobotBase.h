@@ -62,8 +62,6 @@ class RobotBase {
   RobotBase(const RobotBase&) = delete;
   RobotBase& operator=(const RobotBase&) = delete;
 
-  virtual void Prestart();
-
   Task *m_task = nullptr;
   DriverStation &m_ds;
 

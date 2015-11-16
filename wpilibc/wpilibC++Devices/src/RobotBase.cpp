@@ -30,7 +30,6 @@ void RobotBase::setInstance(RobotBase *robot) {
 RobotBase &RobotBase::getInstance() { return *m_instance; }
 
 void RobotBase::robotSetup(RobotBase *robot) {
-  robot->Prestart();
   robot->StartCompetition();
 }
 
@@ -106,19 +105,6 @@ bool RobotBase::IsOperatorControl() const { return m_ds.IsOperatorControl(); }
  * field controls.
  */
 bool RobotBase::IsTest() const { return m_ds.IsTest(); }
-
-/**
- * This hook is called right before startCompetition(). By default, tell the DS
- * that the robot is now ready to
- * be enabled. If you don't want for the robot to be enabled yet, you can
- * override this method to do nothing.
- * If you do so, you will need to call
- * HALNetworkCommunicationObserveUserProgramStarting() from your code when
- * you are ready for the robot to be enabled.
- */
-void RobotBase::Prestart() {
-  HALNetworkCommunicationObserveUserProgramStarting();
-}
 
 /**
  * Indicates if new data is available from the driver station.

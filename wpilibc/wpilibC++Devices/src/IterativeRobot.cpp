@@ -16,11 +16,6 @@
 
 constexpr double IterativeRobot::kDefaultPeriod;
 
-void IterativeRobot::Prestart() {
-  // Don't immediately say that the robot's ready to be enabled.
-  // See below.
-}
-
 /**
  * Provide an alternate "main loop" via StartCompetition().
  *
@@ -39,10 +34,7 @@ void IterativeRobot::StartCompetition() {
       ->PutBoolean("LW Enabled", false);
   RobotInit();
 
-  // We call this now (not in Prestart like default) so that the robot
-  // won't enable until the initialization has finished. This is useful
-  // because otherwise it's sometimes possible to enable the robot
-  // before the code is ready.
+  // Tell the DS that the robot is ready to be enabled
   HALNetworkCommunicationObserveUserProgramStarting();
 
   // loop forever, calling the appropriate mode-dependent function
@@ -116,9 +108,13 @@ void IterativeRobot::StartCompetition() {
  * Robot-wide initialization code should go here.
  *
  * Users should override this method for default Robot-wide initialization which
- * will
- * be called when the robot is first powered on.  It will be called exactly 1
- * time.
+ * will be called when the robot is first powered on. It will be called exactly
+ * one time.
+ *
+ * Warning: the Driver Station "Robot Code" light and FMS "Robot Ready"
+ * indicators will be off until RobotInit() exits. Code in RobotInit() that
+ * waits for enable will cause the robot to never indicate that the code is
+ * ready, causing the robot to be bypassed in a match.
  */
 void IterativeRobot::RobotInit() {
   printf("Default %s() method... Overload me!\n", __FUNCTION__);
