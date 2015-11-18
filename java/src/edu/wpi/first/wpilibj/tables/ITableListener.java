@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj.tables;
  * @author Mitchell
  *
  */
+@FunctionalInterface
 public interface ITableListener {
     /**
      * Called when a key-value pair is changed in a {@link ITable}
