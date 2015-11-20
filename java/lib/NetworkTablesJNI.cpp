@@ -206,6 +206,21 @@ class JavaByteRef {
   size_t m_size;
 };
 
+class JavaByteRefBB {
+ public:
+  JavaByteRefBB(JNIEnv *env, jobject bb, int len)
+      : m_env(env), m_elements(env->GetDirectBufferAddress(bb)), m_size(len) {}
+
+  operator nt::StringRef() const {
+    return nt::StringRef(reinterpret_cast<char *>(m_elements), m_size);
+  }
+
+ private:
+  JNIEnv *m_env;
+  void *m_elements;
+  size_t m_size;
+};
+
 std::shared_ptr<nt::Value> FromJavaRaw(JNIEnv *env, jbyteArray jarr) {
   size_t len = env->GetArrayLength(jarr);
   jbyte *elements =
@@ -214,6 +229,14 @@ std::shared_ptr<nt::Value> FromJavaRaw(JNIEnv *env, jbyteArray jarr) {
   auto rv = nt::Value::MakeRaw(
       nt::StringRef(reinterpret_cast<char *>(elements), len));
   env->ReleasePrimitiveArrayCritical(jarr, elements, JNI_ABORT);
+  return rv;
+}
+
+std::shared_ptr<nt::Value> FromJavaRawBB(JNIEnv *env, jobject jbb, int len) {
+  void* elements = env->GetDirectBufferAddress(jbb);
+  if (!elements) return nullptr;
+  auto rv = nt::Value::MakeRaw(
+      nt::StringRef(reinterpret_cast<char *>(elements), len));
   return rv;
 }
 
@@ -449,10 +472,23 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
  * Method:    putRaw
  * Signature: (Ljava/lang/String;[B)Z
  */
-JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_putRaw
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_putRaw__Ljava_lang_String_2_3B
   (JNIEnv *env, jclass, jstring key, jbyteArray value)
 {
   auto v = FromJavaRaw(env, value);
+  if (!v) return false;
+  return nt::SetEntryValue(JavaStringRef(env, key), v);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
+ * Method:    putRaw
+ * Signature: (Ljava/lang/String;Ljava/nio/ByteBuffer;I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_putRaw__Ljava_lang_String_2Ljava_nio_ByteBuffer_2I
+  (JNIEnv *env, jclass, jstring key, jobject value, jint len)
+{
+  auto v = FromJavaRawBB(env, value, len);
   if (!v) return false;
   return nt::SetEntryValue(JavaStringRef(env, key), v);
 }
@@ -535,10 +571,23 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
  * Method:    forcePutRaw
  * Signature: (Ljava/lang/String;[B)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_forcePutRaw
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_forcePutRaw__Ljava_lang_String_2_3B
   (JNIEnv *env, jclass, jstring key, jbyteArray value)
 {
   auto v = FromJavaRaw(env, value);
+  if (!v) return;
+  nt::SetEntryTypeValue(JavaStringRef(env, key), v);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
+ * Method:    forcePutRaw
+ * Signature: (Ljava/lang/String;Ljava/nio/ByteBuffer;I)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_forcePutRaw__Ljava_lang_String_2Ljava_nio_ByteBuffer_2I
+  (JNIEnv *env, jclass, jstring key, jobject value, jint len)
+{
+  auto v = FromJavaRawBB(env, value, len);
   if (!v) return;
   nt::SetEntryTypeValue(JavaStringRef(env, key), v);
 }
@@ -1054,10 +1103,22 @@ JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTab
  * Method:    callRpc
  * Signature: (Ljava/lang/String;[B)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_callRpc
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_callRpc__Ljava_lang_String_2_3B
   (JNIEnv *env, jclass, jstring key, jbyteArray params)
 {
   return nt::CallRpc(JavaStringRef(env, key), JavaByteRef(env, params));
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
+ * Method:    callRpc
+ * Signature: (Ljava/lang/String;Ljava/nio/ByteBuffer;I)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_callRpc__Ljava_lang_String_2Ljava_nio_ByteBuffer_2I
+  (JNIEnv *env, jclass, jstring key, jobject params, jint params_len)
+{
+  return nt::CallRpc(JavaStringRef(env, key),
+                     JavaByteRefBB(env, params, params_len));
 }
 
 /*

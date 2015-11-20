@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 public class NetworkTablesJNI {
   static boolean libraryLoaded = false;
@@ -70,6 +71,7 @@ public class NetworkTablesJNI {
   public static native boolean putDouble(String key, double value);
   public static native boolean putString(String key, String value);
   public static native boolean putRaw(String key, byte[] value);
+  public static native boolean putRaw(String key, ByteBuffer value, int len);
   public static native boolean putBooleanArray(String key, boolean[] value);
   public static native boolean putDoubleArray(String key, double[] value);
   public static native boolean putStringArray(String key, String[] value);
@@ -78,6 +80,7 @@ public class NetworkTablesJNI {
   public static native void forcePutDouble(String key, double value);
   public static native void forcePutString(String key, String value);
   public static native void forcePutRaw(String key, byte[] value);
+  public static native void forcePutRaw(String key, ByteBuffer value, int len);
   public static native void forcePutBooleanArray(String key, boolean[] value);
   public static native void forcePutDoubleArray(String key, double[] value);
   public static native void forcePutStringArray(String key, String[] value);
@@ -123,9 +126,11 @@ public class NetworkTablesJNI {
   public static native void removeConnectionListener(int connListenerUid);
 
   // public static native void createRpc(String key, byte[] def, IRpc rpc);
+  // public static native void createRpc(String key, ByteBuffer def, int def_len, IRpc rpc);
   public static native byte[] getRpc(String key) throws TableKeyNotDefinedException;
   public static native byte[] getRpc(String key, byte[] defaultValue);
   public static native int callRpc(String key, byte[] params);
+  public static native int callRpc(String key, ByteBuffer params, int params_len);
   // public static native byte[] getRpcResultBlocking(int callUid);
   // public static native byte[] getRpcResultNonblocking(int callUid) throws RpcNoResponseException;
 

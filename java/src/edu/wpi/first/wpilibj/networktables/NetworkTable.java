@@ -3,6 +3,7 @@ package edu.wpi.first.wpilibj.networktables;
 import edu.wpi.first.wpilibj.tables.*;
 import edu.wpi.first.wpilibj.networktables2.type.*;
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.util.*;
 
 /**
@@ -763,6 +764,69 @@ public class NetworkTable implements ITable, IRemote {
    */
   public String[] getStringArray(String key, String[] defaultValue) {
     return NetworkTablesJNI.getStringArray(path + PATH_SEPARATOR + key, defaultValue);
+  }
+
+  /**
+   * Maps the specified key to the specified value in this table. The key can
+   * not be null. The value can be retrieved by calling the get method with a
+   * key that is equal to the original key.
+   *
+   * @param key
+   *            the key
+   * @param value
+   *            the value
+   * @return False if the table key already exists with a different type
+   */
+  public boolean putRaw(String key, byte[] value) {
+    return NetworkTablesJNI.putRaw(path + PATH_SEPARATOR + key, value);
+  }
+
+  /**
+   * Maps the specified key to the specified value in this table. The key can
+   * not be null. The value can be retrieved by calling the get method with a
+   * key that is equal to the original key.
+   *
+   * @param key
+   *            the key
+   * @param value
+   *            the value
+   * @param len
+   *            the length of the value
+   * @return False if the table key already exists with a different type
+   */
+  public boolean putRaw(String key, ByteBuffer value, int len) {
+    if (!value.isDirect())
+      throw new IllegalArgumentException("must be a direct buffer");
+    if (value.capacity() < len)
+      throw new IllegalArgumentException("buffer is too small, must be at least " + len);
+    return NetworkTablesJNI.putRaw(path + PATH_SEPARATOR + key, value, len);
+  }
+
+  /**
+   * Returns the key that the name maps to.
+   *
+   * @param key
+   *            the key name
+   * @return the key
+   * @throws TableKeyNotDefinedException
+   *             if the specified key is null
+   */
+  public byte[] getRaw(String key) throws TableKeyNotDefinedException {
+    return NetworkTablesJNI.getRaw(path + PATH_SEPARATOR + key);
+  }
+
+  /**
+   * Returns the key that the name maps to. If the key is null, it will return
+   * the default value
+   *
+   * @param key
+   *            the key name
+   * @param defaultValue
+   *            the default value if the key is null
+   * @return the key
+   */
+  public byte[] getRaw(String key, byte[] defaultValue) {
+    return NetworkTablesJNI.getRaw(path + PATH_SEPARATOR + key, defaultValue);
   }
 
   /**

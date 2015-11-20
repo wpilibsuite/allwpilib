@@ -1,5 +1,6 @@
 package edu.wpi.first.wpilibj.tables;
 
+import java.nio.ByteBuffer;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -296,6 +297,36 @@ public interface ITable {
    * if there is no value associated with the key
    */
   public String[] getStringArray(String key, String[] defaultValue);
+
+  /**
+   * Put a raw value (byte array) in the table
+   * @param key the key to be assigned to
+   * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
+   */
+  public boolean putRaw(String key, byte[] value);
+  /**
+   * Put a raw value (bytes from a byte buffer) in the table
+   * @param key the key to be assigned to
+   * @param value the value that will be assigned
+   * @param len the length of the value
+   * @return False if the table key already exists with a different type
+   */
+  public boolean putRaw(String key, ByteBuffer value, int len);
+  /**
+   * @param key the key to look up
+   * @return the value associated with the given key
+   * @throws TableKeyNotDefinedException if there is no value associated with
+   * the given key
+   */
+  public byte[] getRaw(String key) throws TableKeyNotDefinedException;
+  /**
+   * @param key the key to look up
+   * @param defaultValue the value to be returned if no value is found
+   * @return the value associated with the given key or the given default value
+   * if there is no value associated with the key
+   */
+  public byte[] getRaw(String key, byte[] defaultValue);
 
   /** Notifier flag values. */
   public static final int NOTIFY_IMMEDIATE = 0x01;
