@@ -60,7 +60,7 @@ public class NetworkTable implements ITable, IRemote {
 
   /**
    * set that network tables should be a server
-   * This must be called before initalize or getTable
+   * This must be called before initialize or getTable
    */
   public synchronized static void setServerMode() {
     if (!client)
@@ -71,7 +71,7 @@ public class NetworkTable implements ITable, IRemote {
 
   /**
    * set that network tables should be a client
-   * This must be called before initalize or getTable
+   * This must be called before initialize or getTable
    */
   public synchronized static void setClientMode() {
     if (client)
@@ -81,13 +81,13 @@ public class NetworkTable implements ITable, IRemote {
   }
 
   /**
-   * set the team the robot is configured for (this will set the ip address that
+   * set the team the robot is configured for (this will set the mdns address that
    * network tables will connect to in client mode)
-   * This must be called before initalize or getTable
+   * This must be called before initialize or getTable
    * @param team the team number
    */
   public synchronized static void setTeam(int team) {
-    setIPAddress("10." + (team / 100) + "." + (team % 100) + ".2");
+    setIPAddress("roboRIO-" + team + "-FRC.local");
   }
 
   /**
