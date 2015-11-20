@@ -41,9 +41,9 @@ void NetworkTable::SetServerMode() { s_client = false; }
 void NetworkTable::SetTeam(int team) {
   char tmp[30];
 #ifdef _MSC_VER
-  sprintf_s(tmp, "%d.%d.%d.%d\n", 10, team / 100, team % 100, 2);
+  sprintf_s(tmp, "roboRIO-%d-FRC.local\n", team);
 #else
-  std::snprintf(tmp, 30, "%d.%d.%d.%d\n", 10, team / 100, team % 100, 2);
+  std::snprintf(tmp, 30, "roboRIO-%d-FRC.local\n",team);
 #endif
   SetIPAddress(tmp);
 }

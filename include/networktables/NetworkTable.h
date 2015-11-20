@@ -40,20 +40,20 @@ class NetworkTable : public ITable {
 
   /**
    * set that network tables should be a client
-   * This must be called before initalize or GetTable
+   * This must be called before initialize or GetTable
    */
   static void SetClientMode();
 
   /**
    * set that network tables should be a server
-   * This must be called before initalize or GetTable
+   * This must be called before initialize or GetTable
    */
   static void SetServerMode();
 
   /**
-   * set the team the robot is configured for (this will set the ip address that
+   * set the team the robot is configured for (this will set the mdns address that
    * network tables will connect to in client mode)
-   * This must be called before initalize or GetTable
+   * This must be called before initialize or GetTable
    * @param team the team number
    */
   static void SetTeam(int team);
