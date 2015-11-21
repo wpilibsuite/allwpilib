@@ -15,6 +15,7 @@ sourceSets {
 jar {
     description = 'Generates NetworkTables jar, with the JNI shared libraries embedded'
     baseName = 'ntcore'
+    classifier = "$buildPlatform${useExtension ? '-' + repo : ''}"
 
     if (buildPlatform == 'arm') {
         dependsOn { ntcoreSharedLibrary }
@@ -34,16 +35,21 @@ jar {
 task networktablesJavaSource(type: Jar, dependsOn: classes) {
     description = 'Generates the source jar for NetworkTables java'
     group = 'WPILib'
-    classifier = 'source'
+    baseName = 'ntcore'
+    classifier = "sources${useExtension ? '-' + repo : ''}"
     from sourceSets.main.allJava
 }
 
 task networktablesJavadoc(type: Jar, dependsOn: javadoc) {
     description = 'Generates the javadoc jar for NetworkTables java'
     group = 'WPILib'
-    classifier = 'javadoc'
+    baseName = 'ntcore'
+    classifier = "javadoc${useExtension ? '-' + repo : ''}"
     from javadoc.destinationDir
 }
+
+build.dependsOn networktablesJavaSource
+build.dependsOn networktablesJavadoc
 
 /**
  * Generates the JNI headers
@@ -96,7 +102,9 @@ ext.setupJniIncludes = { binaries ->
                 def jdkLocation = org.gradle.internal.jvm.Jvm.current().javaHome
                 platformSpecificIncludeFlag("${jdkLocation}/include", cppCompiler)
 
-                if (targetPlatform.operatingSystem.linux) {
+                if (targetPlatform.operatingSystem.macOsX) {
+                    platformSpecificIncludeFlag("${jdkLocation}/include/darwin", cppCompiler)
+                } else if (targetPlatform.operatingSystem.linux) {
                     platformSpecificIncludeFlag("${jdkLocation}/include/linux", cppCompiler)
                 } else if (targetPlatform.operatingSystem.windows) {
                     platformSpecificIncludeFlag("${jdkLocation}/include/win32", cppCompiler)

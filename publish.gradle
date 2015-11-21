@@ -2,21 +2,15 @@ import org.gradle.internal.os.OperatingSystem
 
 apply plugin: 'maven-publish'
 
+// We classify the different artifacts by whether they are sources, and what development
+// stage they are in. Release gets no classifier; stable, beta, and development get classifiers.
 publishing {
     publications {
         if (!project.hasProperty('skipJava')) {
             java(MavenPublication) {
-                artifact jar {
-                    // If we're building the regular ntcore for arm, it has no classifier. Otherwise, classify
-                    // the platform this jar is built for.
-                    classifier = buildPlatform
-                }
-                artifact (networktablesJavaSource) {
-                    classifier = 'sources'
-                }
-                artifact(networktablesJavadoc) {
-                    classifier = 'javadoc'
-                }
+                artifact jar
+                artifact networktablesJavaSource
+                artifact networktablesJavadoc
 
                 groupId 'edu.wpi.first.wpilib.networktables.java'
                 artifactId 'NetworkTables'
@@ -24,13 +18,8 @@ publishing {
             }
         }
         cpp(MavenPublication) {
-            artifact ntcoreZip {
-                classifier = buildPlatform
-            }
-
-            artifact ntcoreSourceZip {
-                classifier = 'sources'
-            }
+            artifact ntcoreZip
+            artifact ntcoreSourceZip
 
             groupId 'edu.wpi.first.wpilib.networktables.cpp'
             artifactId 'NetworkTables'
@@ -38,17 +27,9 @@ publishing {
         }
     }
 
-    // If we want to publish to a specific repository on Jenkins, we specify it on the command line. The valid
-    // repository names are:
-    //     release
-    //     stable
-    //     beta
-    //     development
-    if (project.hasProperty('repo')) {
-        repositories {
-            maven {
-                url "${System.getProperty('user.home')}/releases/maven/$repo"
-            }
+    repositories {
+        maven {
+            url "${System.getProperty('user.home')}/releases/maven/"
         }
     }
 }

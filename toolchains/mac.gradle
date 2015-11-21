@@ -4,7 +4,8 @@ model {
             target('x86') {
                 cppCompiler.withArguments { args ->
                     args << '-std=c++11' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic-errors'
-                    args << '-Wno-unused-parameter' << '-fPIC' << '-m32' << '-Wno-missing-field-initializers'
+                    args << '-fPIC' << '-m32'
+                    args << '-Wno-unused-parameter' << '-Wno-missing-field-initializers' << '-Wno-unused-private-field'
                 }
                 linker.withArguments { args ->
                     args << '-m32'
@@ -13,7 +14,8 @@ model {
             target('x64') {
                 cppCompiler.withArguments { args ->
                     args << '-std=c++11' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic-errors'
-                    args << '-Wno-unused-parameter' << '-fPIC' << '-Wno-missing-field-initializers'
+                    args << '-fPIC'
+                    args << '-Wno-missing-field-initializers' << '-Wno-unused-private-field' << '-Wno-unused-parameter'
                 }
             }
         }

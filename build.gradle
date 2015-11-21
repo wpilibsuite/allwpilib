@@ -13,6 +13,12 @@ allprojects {
     }
 }
 
+if (!project.hasProperty('repo')) {
+    ext.repo = 'development'
+}
+
+ext.useExtension = repo != 'release'
+
 ext.getPlatformPath = { binary ->
     if (binary.targetPlatform.architecture.arm) {
         return 'Linux/arm'
@@ -134,6 +140,7 @@ task ntcoreZip(type: Zip) {
     group = 'WPILib'
     destinationDir = project.buildDir
     baseName = 'ntcore'
+    classifier = "$buildPlatform${useExtension ? '-' + repo : ''}"
 
     from(file('include')) {
         into 'include'
@@ -165,7 +172,7 @@ task ntcoreSourceZip(type: Zip) {
     group = 'WPILib'
     destinationDir = project.buildDir
     baseName = 'ntcore'
-    classifier = 'sources'
+    classifier = "sources${useExtension ? '-' + repo : ''}"
 
     from ('src') {
         into 'src'
@@ -187,6 +194,8 @@ task ntcoreSourceZip(type: Zip) {
         }
     }
 }
+
+build.dependsOn ntcoreSourceZip
 
 releaseSetup(ntcoreZip)
 
