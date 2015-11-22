@@ -1,6 +1,8 @@
 package edu.wpi.first.wpilibj.hal;
 
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
 
 public class SPIJNI extends JNIWrapper {
   public static native void spiInitialize(byte port);
@@ -22,4 +24,27 @@ public class SPIJNI extends JNIWrapper {
   public static native void spiSetChipSelectActiveHigh(byte port);
 
   public static native void spiSetChipSelectActiveLow(byte port);
+
+  public static native void spiInitAccumulator(byte port, int period, int cmd,
+      byte xferSize, int validMask, int validValue, byte dataShift,
+      byte dataSize, boolean isSigned, boolean bigEndian);
+
+  public static native void spiFreeAccumulator(byte port);
+
+  public static native void spiResetAccumulator(byte port);
+
+  public static native void spiSetAccumulatorCenter(byte port, int center);
+
+  public static native void spiSetAccumulatorDeadband(byte port, int deadband);
+
+  public static native int spiGetAccumulatorLastValue(byte port);
+
+  public static native long spiGetAccumulatorValue(byte port);
+
+  public static native int spiGetAccumulatorCount(byte port);
+
+  public static native double spiGetAccumulatorAverage(byte port);
+
+  public static native void spiGetAccumulatorOutput(byte port, LongBuffer value,
+      IntBuffer count);
 }

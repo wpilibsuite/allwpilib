@@ -171,4 +171,191 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectAct
 	CheckStatus(env, status);
 }
 
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Method:    spiInitAccumulator
+ * Signature: (BIIBIIBBZZ)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiInitAccumulator
+  (JNIEnv *env, jclass, jbyte port, jint period, jint cmd, jbyte xferSize, jint validMask, jint validValue, jbyte dataShift, jbyte dataSize, jboolean isSigned, jboolean bigEndian)
+{
+	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiInitAccumulator";
+	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
+	SPIJNI_LOG(logDEBUG) << "Period = " << period;
+	SPIJNI_LOG(logDEBUG) << "Cmd = " << cmd;
+	SPIJNI_LOG(logDEBUG) << "XferSize = " << (jint) xferSize;
+	SPIJNI_LOG(logDEBUG) << "ValidMask = " << validMask;
+	SPIJNI_LOG(logDEBUG) << "ValidValue = " << validValue;
+	SPIJNI_LOG(logDEBUG) << "DataShift = " << (jint) dataShift;
+	SPIJNI_LOG(logDEBUG) << "DataSize = " << (jint) dataSize;
+	SPIJNI_LOG(logDEBUG) << "IsSigned = " << (jint) isSigned;
+	SPIJNI_LOG(logDEBUG) << "BigEndian = " << (jint) bigEndian;
+	int32_t status = 0;
+	spiInitAccumulator(port, period, cmd, xferSize, validMask, validValue,
+		dataShift, dataSize, isSigned, bigEndian, &status);
+	SPIJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Method:    spiFreeAccumulator
+ * Signature: (B)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiFreeAccumulator
+  (JNIEnv *env, jclass, jbyte port)
+{
+	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiFreeAccumulator";
+	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
+	int32_t status = 0;
+	spiFreeAccumulator(port, &status);
+	SPIJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Method:    spiResetAccumulator
+ * Signature: (B)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiResetAccumulator
+  (JNIEnv *env, jclass, jbyte port)
+{
+	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiResetAccumulator";
+	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
+	int32_t status = 0;
+	spiResetAccumulator(port, &status);
+	SPIJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Method:    spiSetAccumulatorCenter
+ * Signature: (BI)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetAccumulatorCenter
+  (JNIEnv *env, jclass, jbyte port, jint center)
+{
+	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetAccumulatorCenter";
+	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
+	SPIJNI_LOG(logDEBUG) << "Center = " << center;
+	int32_t status = 0;
+	spiSetAccumulatorCenter(port, center, &status);
+	SPIJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Method:    spiSetAccumulatorDeadband
+ * Signature: (BI)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetAccumulatorDeadband
+  (JNIEnv *env, jclass, jbyte port, jint deadband)
+{
+	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetAccumulatorDeadband";
+	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
+	SPIJNI_LOG(logDEBUG) << "Deadband = " << deadband;
+	int32_t status = 0;
+	spiSetAccumulatorDeadband(port, deadband, &status);
+	SPIJNI_LOG(logDEBUG) << "Status = " << status;
+	CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Method:    spiGetAccumulatorLastValue
+ * Signature: (B)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorLastValue
+  (JNIEnv *env, jclass, jbyte port)
+{
+	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiGetAccumulatorLastValue";
+	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
+	int32_t status = 0;
+	jint retVal = spiGetAccumulatorLastValue(port, &status);
+	SPIJNI_LOG(logDEBUG) << "Status = " << status;
+	SPIJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
+	CheckStatus(env, status);
+	return retVal;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Method:    spiGetAccumulatorValue
+ * Signature: (B)J
+ */
+JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorValue
+  (JNIEnv *env, jclass, jbyte port)
+{
+	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiGetAccumulatorValue";
+	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
+	int32_t status = 0;
+	jlong retVal = spiGetAccumulatorValue(port, &status);
+	SPIJNI_LOG(logDEBUG) << "Status = " << status;
+	SPIJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
+	CheckStatus(env, status);
+	return retVal;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Method:    spiGetAccumulatorCount
+ * Signature: (B)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorCount
+  (JNIEnv *env, jclass, jbyte port)
+{
+	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiGetAccumulatorCount";
+	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
+	int32_t status = 0;
+	jint retVal = spiGetAccumulatorCount(port, &status);
+	SPIJNI_LOG(logDEBUG) << "Status = " << status;
+	SPIJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
+	CheckStatus(env, status);
+	return retVal;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Method:    spiGetAccumulatorAverage
+ * Signature: (B)D
+ */
+JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorAverage
+  (JNIEnv *env, jclass, jbyte port)
+{
+	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiGetAccumulatorAverage";
+	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
+	int32_t status = 0;
+	jdouble retVal = spiGetAccumulatorAverage(port, &status);
+	SPIJNI_LOG(logDEBUG) << "Status = " << status;
+	SPIJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
+	CheckStatus(env, status);
+	return retVal;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Method:    spiGetAccumulatorOutput
+ * Signature: (BLjava/nio/LongBuffer;Ljava/nio/IntBuffer;)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorOutput
+  (JNIEnv *env, jclass, jbyte port, jobject value, jobject count)
+{
+	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiGetAccumulatorOutput";
+	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
+	int32_t status = 0;
+
+	jlong * valuePtr = (jlong*)env->GetDirectBufferAddress(value);
+	uint32_t * countPtr = (uint32_t*)env->GetDirectBufferAddress(count);
+
+	spiGetAccumulatorOutput(port, valuePtr, countPtr, &status);
+
+	SPIJNI_LOG(logDEBUG) << "Status = " << status;
+	SPIJNI_LOG(logDEBUG) << "Value = " << *valuePtr;
+	SPIJNI_LOG(logDEBUG) << "Count = " << *countPtr;
+	CheckStatus(env, status);
+}
+
 }  // extern "C"

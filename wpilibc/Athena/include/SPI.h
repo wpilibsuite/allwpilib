@@ -47,6 +47,20 @@ class SPI : public SensorBase {
   virtual int32_t Transaction(uint8_t* dataToSend, uint8_t* dataReceived,
                               uint8_t size);
 
+  void InitAccumulator(double period, uint32_t cmd, uint8_t xfer_size,
+                       uint32_t valid_mask, uint32_t valid_value,
+                       uint8_t data_shift, uint8_t data_size, bool is_signed,
+                       bool big_endian);
+  void FreeAccumulator();
+  void ResetAccumulator();
+  void SetAccumulatorCenter(int32_t center);
+  void SetAccumulatorDeadband(int32_t deadband);
+  int32_t GetAccumulatorLastValue() const;
+  int64_t GetAccumulatorValue() const;
+  uint32_t GetAccumulatorCount() const;
+  double GetAccumulatorAverage() const;
+  void GetAccumulatorOutput(int64_t &value, uint32_t &count) const;
+
  protected:
   uint8_t m_port;
   bool m_msbFirst = false; // default little-endian

@@ -86,6 +86,31 @@ priority_recursive_mutex spiOnboardSemaphore;
 priority_recursive_mutex spiMXPSemaphore;
 tSPI *spiSystem;
 
+struct SPIAccumulator {
+	void* notifier = nullptr;
+	uint32_t triggerTime;
+	uint32_t period;
+
+	int64_t value = 0;
+	uint32_t count = 0;
+	int32_t last_value = 0;
+
+	int32_t center = 0;
+	int32_t deadband = 0;
+
+	uint8_t cmd[4];		// command to send (up to 4 bytes)
+	uint32_t valid_mask;
+	uint32_t valid_value;
+	int32_t data_max;	// one more than max data value
+	int32_t data_msb_mask;	// data field MSB mask (for signed)
+	uint8_t data_shift;	// data field shift right amount, in bits
+	uint8_t xfer_size;	// SPI transfer size, in bytes (up to 4)
+	uint8_t port;
+	bool is_signed;		// is data field signed?
+	bool big_endian;	// is response big endian?
+};
+SPIAccumulator* spiAccumulators[5] = {nullptr, nullptr, nullptr, nullptr, nullptr};
+
 /**
  * Initialize the digital system.
  */
@@ -1341,6 +1366,10 @@ int32_t spiRead(uint8_t port, uint8_t *buffer, uint8_t count)
  */
 void spiClose(uint8_t port) {
 	std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
+	if (spiAccumulators[port]) {
+		int32_t status = 0;
+		spiFreeAccumulator(port, &status);
+	}
 	spilib_close(spiGetHandle(port));
 	spiSetHandle(port, 0);
 	return;
@@ -1468,6 +1497,251 @@ priority_recursive_mutex& spiGetSemaphore(uint8_t port) {
 		return spiOnboardSemaphore;
 	else
 		return spiMXPSemaphore;
+}
+
+static void spiAccumulatorProcess(uint32_t currentTime, void *param) {
+	SPIAccumulator* accum = (SPIAccumulator*)param;
+
+	// perform SPI transaction
+	uint8_t resp_b[4];
+	std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(accum->port));
+	spilib_writeread(spiGetHandle(accum->port), (const char*) accum->cmd, (char*) resp_b, (int32_t) accum->xfer_size);
+
+	// convert from bytes
+	uint32_t resp = 0;
+	if (accum->big_endian) {
+		for (int i=0; i < accum->xfer_size; ++i) {
+			resp <<= 8;
+			resp |= resp_b[i] & 0xff;
+		}
+	} else {
+		for (int i = accum->xfer_size - 1; i >= 0; --i) {
+			resp <<= 8;
+			resp |= resp_b[i] & 0xff;
+		}
+	}
+
+        // process response
+	if ((resp & accum->valid_mask) == accum->valid_value) {
+		// valid sensor data; extract data field
+		int32_t data = (int32_t)(resp >> accum->data_shift);
+		data &= accum->data_max - 1;
+		// 2s complement conversion if signed MSB is set
+		if (accum->is_signed && (data & accum->data_msb_mask) != 0)
+			data -= accum->data_max;
+		// center offset
+		data -= accum->center;
+		// only accumulate if outside deadband
+		if (data < -accum->deadband || data > accum->deadband)
+			accum->value += data;
+		++accum->count;
+		accum->last_value = data;
+	} else {
+		// no data from the sensor; just clear the last value
+		accum->last_value = 0;
+	}
+
+	// reschedule timer
+	accum->triggerTime += accum->period;
+	// handle timer slip
+	if (accum->triggerTime < currentTime)
+		accum->triggerTime = currentTime + accum->period;
+	int32_t status = 0;
+	updateNotifierAlarm(accum->notifier, accum->triggerTime, &status);
+}
+
+/**
+ * Initialize a SPI accumulator.
+ *
+ * @param port SPI port
+ * @param period Time between reads, in us
+ * @param cmd SPI command to send to request data
+ * @param xfer_size SPI transfer size, in bytes
+ * @param valid_mask Mask to apply to received data for validity checking
+ * @param valid_data After valid_mask is applied, required matching value for
+ *                   validity checking
+ * @param data_shift Bit shift to apply to received data to get actual data
+ *                   value
+ * @param data_size Size (in bits) of data field
+ * @param is_signed Is data field signed?
+ * @param big_endian Is device big endian?
+ */
+void spiInitAccumulator(uint8_t port, uint32_t period, uint32_t cmd,
+		uint8_t xfer_size, uint32_t valid_mask, uint32_t valid_value,
+		uint8_t data_shift, uint8_t data_size, bool is_signed,
+		bool big_endian, int32_t *status) {
+	std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
+	if (port > 4) return;
+	if (!spiAccumulators[port])
+		spiAccumulators[port] = new SPIAccumulator();
+	SPIAccumulator* accum = spiAccumulators[port];
+	if (big_endian) {
+		for (int i = xfer_size - 1; i >= 0; --i) {
+			accum->cmd[i] = cmd & 0xff;
+			cmd >>= 8;
+		}
+	} else {
+		accum->cmd[0] = cmd & 0xff; cmd >>= 8;
+		accum->cmd[1] = cmd & 0xff; cmd >>= 8;
+		accum->cmd[2] = cmd & 0xff; cmd >>= 8;
+		accum->cmd[3] = cmd & 0xff;
+	}
+	accum->period = period;
+	accum->xfer_size = xfer_size;
+	accum->valid_mask = valid_mask;
+	accum->valid_value = valid_value;
+	accum->data_shift = data_shift;
+	accum->data_max = (1 << data_size);
+	accum->data_msb_mask = (1 << (data_size - 1));
+	accum->is_signed = is_signed;
+	accum->big_endian = big_endian;
+	if (!accum->notifier) {
+		accum->notifier = initializeNotifier(spiAccumulatorProcess, accum, status);
+		accum->triggerTime = getFPGATime(status) + period;
+		if (*status != 0) return;
+		updateNotifierAlarm(accum->notifier, accum->triggerTime, status);
+	}
+}
+
+/**
+ * Frees a SPI accumulator.
+ */
+void spiFreeAccumulator(uint8_t port, int32_t *status) {
+	std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
+	SPIAccumulator* accum = spiAccumulators[port];
+	if (!accum) {
+		*status = NULL_PARAMETER;
+		return;
+	}
+	cleanNotifier(accum->notifier, status);
+	delete accum;
+	spiAccumulators[port] = nullptr;
+}
+
+/**
+ * Resets the accumulator to zero.
+ */
+void spiResetAccumulator(uint8_t port, int32_t *status) {
+	std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
+	SPIAccumulator* accum = spiAccumulators[port];
+	if (!accum) {
+		*status = NULL_PARAMETER;
+		return;
+	}
+	accum->value = 0;
+	accum->count = 0;
+	accum->last_value = 0;
+}
+
+/**
+ * Set the center value of the accumulator.
+ *
+ * The center value is subtracted from each value before it is added to the accumulator. This
+ * is used for the center value of devices like gyros and accelerometers to make integration work
+ * and to take the device offset into account when integrating.
+ */
+void spiSetAccumulatorCenter(uint8_t port, int32_t center, int32_t *status) {
+	std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
+	SPIAccumulator* accum = spiAccumulators[port];
+	if (!accum) {
+		*status = NULL_PARAMETER;
+		return;
+	}
+	accum->center = center;
+}
+
+/**
+ * Set the accumulator's deadband.
+ */
+void spiSetAccumulatorDeadband(uint8_t port, int32_t deadband, int32_t *status) {
+	std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
+	SPIAccumulator* accum = spiAccumulators[port];
+	if (!accum) {
+		*status = NULL_PARAMETER;
+		return;
+	}
+	accum->deadband = deadband;
+}
+
+/**
+ * Read the last value read by the accumulator engine.
+ */
+int32_t spiGetAccumulatorLastValue(uint8_t port, int32_t *status) {
+	std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
+	SPIAccumulator* accum = spiAccumulators[port];
+	if (!accum) {
+		*status = NULL_PARAMETER;
+		return 0;
+	}
+	return accum->last_value;
+}
+
+/**
+ * Read the accumulated value.
+ *
+ * @return The 64-bit value accumulated since the last Reset().
+ */
+int64_t spiGetAccumulatorValue(uint8_t port, int32_t *status) {
+	std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
+	SPIAccumulator* accum = spiAccumulators[port];
+	if (!accum) {
+		*status = NULL_PARAMETER;
+		return 0;
+	}
+	return accum->value;
+}
+
+/**
+ * Read the number of accumulated values.
+ *
+ * Read the count of the accumulated values since the accumulator was last Reset().
+ *
+ * @return The number of times samples from the channel were accumulated.
+ */
+uint32_t spiGetAccumulatorCount(uint8_t port, int32_t *status) {
+	std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
+	SPIAccumulator* accum = spiAccumulators[port];
+	if (!accum) {
+		*status = NULL_PARAMETER;
+		return 0;
+	}
+	return accum->count;
+}
+
+/**
+ * Read the average of the accumulated value.
+ *
+ * @return The accumulated average value (value / count).
+ */
+double spiGetAccumulatorAverage(uint8_t port, int32_t *status) {
+	int64_t value;
+	uint32_t count;
+	spiGetAccumulatorOutput(port, &value, &count, status);
+	if (count == 0) return 0.0;
+	return ((double)value) / count;
+}
+
+/**
+ * Read the accumulated value and the number of accumulated values atomically.
+ *
+ * This function reads the value and count atomically.
+ * This can be used for averaging.
+ *
+ * @param value Pointer to the 64-bit accumulated output.
+ * @param count Pointer to the number of accumulation cycles.
+ */
+void spiGetAccumulatorOutput(uint8_t port, int64_t *value, uint32_t *count,
+		int32_t *status) {
+	std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
+	SPIAccumulator* accum = spiAccumulators[port];
+	if (!accum) {
+		*status = NULL_PARAMETER;
+		*value = 0;
+		*count = 0;
+		return;
+	}
+	*value = accum->value;
+	*count = accum->count;
 }
 
 /*

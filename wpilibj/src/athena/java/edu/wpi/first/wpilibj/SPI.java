@@ -1,6 +1,9 @@
 package edu.wpi.first.wpilibj;
 
+import java.nio.ByteOrder;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
@@ -254,5 +257,120 @@ public class SPI extends SensorBase {
     if (dataReceived.capacity() < size)
       throw new IllegalArgumentException("dataReceived is too small, must be at least " + size);
     return SPIJNI.spiTransaction(m_port, dataToSend, dataReceived, (byte) size);
+  }
+
+  /**
+   * Initialize the accumulator.
+   *
+   * @param period Time between reads
+   * @param cmd SPI command to send to request data
+   * @param xfer_size SPI transfer size, in bytes
+   * @param valid_mask Mask to apply to received data for validity checking
+   * @param valid_data After valid_mask is applied, required matching value for
+   *                   validity checking
+   * @param data_shift Bit shift to apply to received data to get actual data
+   *                   value
+   * @param data_size Size (in bits) of data field
+   * @param is_signed Is data field signed?
+   * @param big_endian Is device big endian?
+   */
+  public void initAccumulator(double period, int cmd, int xfer_size,
+                              int valid_mask, int valid_value,
+                              int data_shift, int data_size,
+                              boolean is_signed, boolean big_endian) {
+    SPIJNI.spiInitAccumulator(m_port, (int)(period * 1.0e6), cmd,
+        (byte)xfer_size, valid_mask, valid_value, (byte)data_shift,
+        (byte)data_size, is_signed, big_endian);
+  }
+
+  /**
+   * Frees the accumulator.
+   */
+  public void freeAccumulator() {
+    SPIJNI.spiFreeAccumulator(m_port);
+  }
+
+  /**
+   * Resets the accumulator to zero.
+   */
+  public void resetAccumulator() {
+    SPIJNI.spiResetAccumulator(m_port);
+  }
+
+  /**
+   * Set the center value of the accumulator.
+   *
+   * The center value is subtracted from each value before it is added to the accumulator. This
+   * is used for the center value of devices like gyros and accelerometers to make integration work
+   * and to take the device offset into account when integrating.
+   */
+  public void setAccumulatorCenter(int center) {
+    SPIJNI.spiSetAccumulatorCenter(m_port, center);
+  }
+
+  /**
+   * Set the accumulator's deadband.
+   */
+  public void setAccumulatorDeadband(int deadband) {
+    SPIJNI.spiSetAccumulatorDeadband(m_port, deadband);
+  }
+
+  /**
+   * Read the last value read by the accumulator engine.
+   */
+  public int getAccumulatorLastValue() {
+    return SPIJNI.spiGetAccumulatorLastValue(m_port);
+  }
+
+  /**
+   * Read the accumulated value.
+   *
+   * @return The 64-bit value accumulated since the last Reset().
+   */
+  public long getAccumulatorValue() {
+    return SPIJNI.spiGetAccumulatorValue(m_port);
+  }
+
+  /**
+   * Read the number of accumulated values.
+   *
+   * Read the count of the accumulated values since the accumulator was last Reset().
+   *
+   * @return The number of times samples from the channel were accumulated.
+   */
+  public int getAccumulatorCount() {
+    return SPIJNI.spiGetAccumulatorCount(m_port);
+  }
+
+  /**
+   * Read the average of the accumulated value.
+   *
+   * @return The accumulated average value (value / count).
+   */
+  public double getAccumulatorAverage() {
+    return SPIJNI.spiGetAccumulatorAverage(m_port);
+  }
+
+  /**
+   * Read the accumulated value and the number of accumulated values atomically.
+   *
+   * This function reads the value and count atomically.
+   * This can be used for averaging.
+   *
+   * @param result AccumulatorResult object to store the results in.
+   */
+  public void getAccumulatorOutput(AccumulatorResult result) {
+    if (result == null) {
+      throw new IllegalArgumentException("Null parameter `result'");
+    }
+    ByteBuffer value = ByteBuffer.allocateDirect(8);
+    // set the byte order
+    value.order(ByteOrder.LITTLE_ENDIAN);
+    ByteBuffer count = ByteBuffer.allocateDirect(4);
+    // set the byte order
+    count.order(ByteOrder.LITTLE_ENDIAN);
+    SPIJNI.spiGetAccumulatorOutput(m_port, value.asLongBuffer(), count.asIntBuffer());
+    result.value = value.asLongBuffer().get(0);
+    result.count = count.asIntBuffer().get(0);
   }
 }
