@@ -39,18 +39,19 @@ void ErrorBase::ClearError() const { m_error.Clear(); }
  * @param function Function of the error source
  * @param lineNumber Line number of the error source
  */
-void ErrorBase::SetErrnoError(const std::string& contextMessage,
-                              const std::string& filename,
-                              const std::string& function,
+void ErrorBase::SetErrnoError(llvm::StringRef contextMessage,
+                              llvm::StringRef filename,
+                              llvm::StringRef function,
                               uint32_t lineNumber) const {
   std::string err;
   int errNo = errno;
   if (errNo == 0) {
-    err = "OK: " + contextMessage;
+    err = "OK: ";
+    err += contextMessage;
   } else {
     char buf[256];
-    snprintf(buf, 256, "%s (0x%08X): %s", strerror(errNo), errNo,
-             contextMessage.c_str());
+    snprintf(buf, 256, "%s (0x%08X): %.*s", strerror(errNo), errNo,
+             contextMessage.size(), contextMessage.data());
     err = buf;
   }
 
@@ -74,9 +75,8 @@ void ErrorBase::SetErrnoError(const std::string& contextMessage,
  * @param function Function of the error source
  * @param lineNumber Line number of the error source
  */
-void ErrorBase::SetImaqError(int success, const std::string& contextMessage,
-                             const std::string& filename,
-                             const std::string& function,
+void ErrorBase::SetImaqError(int success, llvm::StringRef contextMessage,
+                             llvm::StringRef filename, llvm::StringRef function,
                              uint32_t lineNumber) const {
   //  If there was an error
   if (success <= 0) {
@@ -103,9 +103,8 @@ void ErrorBase::SetImaqError(int success, const std::string& contextMessage,
  * @param function Function of the error source
  * @param lineNumber Line number of the error source
  */
-void ErrorBase::SetError(Error::Code code, const std::string& contextMessage,
-                         const std::string& filename,
-                         const std::string& function,
+void ErrorBase::SetError(Error::Code code, llvm::StringRef contextMessage,
+                         llvm::StringRef filename, llvm::StringRef function,
                          uint32_t lineNumber) const {
   //  If there was an error
   if (code != 0) {
@@ -129,12 +128,11 @@ void ErrorBase::SetError(Error::Code code, const std::string& contextMessage,
  * @param function Function of the error source
  * @param lineNumber Line number of the error source
  */
-void ErrorBase::SetWPIError(const std::string& errorMessage, Error::Code code,
-                            const std::string& contextMessage,
-                            const std::string& filename,
-                            const std::string& function,
+void ErrorBase::SetWPIError(llvm::StringRef errorMessage, Error::Code code,
+                            llvm::StringRef contextMessage,
+                            llvm::StringRef filename, llvm::StringRef function,
                             uint32_t lineNumber) const {
-  std::string err = errorMessage + ": " + contextMessage;
+  std::string err = errorMessage.str() + ": " + contextMessage.str();
 
   //  Set the current error information for this object.
   m_error.Set(code, err, filename, function, lineNumber, this);
@@ -157,11 +155,9 @@ void ErrorBase::CloneError(const ErrorBase& rhs) const {
 */
 bool ErrorBase::StatusIsFatal() const { return m_error.GetCode() < 0; }
 
-void ErrorBase::SetGlobalError(Error::Code code,
-                               const std::string& contextMessage,
-                               const std::string& filename,
-                               const std::string& function,
-                               uint32_t lineNumber) {
+void ErrorBase::SetGlobalError(Error::Code code, llvm::StringRef contextMessage,
+                               llvm::StringRef filename,
+                               llvm::StringRef function, uint32_t lineNumber) {
   //  If there was an error
   if (code != 0) {
     std::lock_guard<priority_mutex> mutex(_globalErrorMutex);
@@ -172,12 +168,12 @@ void ErrorBase::SetGlobalError(Error::Code code,
   }
 }
 
-void ErrorBase::SetGlobalWPIError(const std::string& errorMessage,
-                                  const std::string& contextMessage,
-                                  const std::string& filename,
-                                  const std::string& function,
+void ErrorBase::SetGlobalWPIError(llvm::StringRef errorMessage,
+                                  llvm::StringRef contextMessage,
+                                  llvm::StringRef filename,
+                                  llvm::StringRef function,
                                   uint32_t lineNumber) {
-  std::string err = errorMessage + ": " + contextMessage;
+  std::string err = errorMessage.str() + ": " + contextMessage.str();
 
   std::lock_guard<priority_mutex> mutex(_globalErrorMutex);
   if (_globalError.GetCode() != 0) {

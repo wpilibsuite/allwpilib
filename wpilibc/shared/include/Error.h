@@ -16,6 +16,7 @@
 
 #include <string>
 #include <stdint.h>
+#include "llvm/StringRef.h"
 
 //  Forward declarations
 class ErrorBase;
@@ -41,8 +42,8 @@ class Error {
   const ErrorBase* GetOriginatingObject() const;
   double GetTimestamp() const;
   void Clear();
-  void Set(Code code, const std::string& contextMessage,
-           const std::string& filename, const std::string& function,
+  void Set(Code code, llvm::StringRef contextMessage,
+           llvm::StringRef filename, llvm::StringRef function,
            uint32_t lineNumber, const ErrorBase* originatingObject);
 
  private:

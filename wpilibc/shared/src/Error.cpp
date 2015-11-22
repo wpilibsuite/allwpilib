@@ -43,8 +43,8 @@ const ErrorBase* Error::GetOriginatingObject() const {
 
 double Error::GetTimestamp() const { return m_timestamp; }
 
-void Error::Set(Code code, const std::string& contextMessage,
-                const std::string& filename, const std::string& function,
+void Error::Set(Code code, llvm::StringRef contextMessage,
+                llvm::StringRef filename, llvm::StringRef function,
                 uint32_t lineNumber, const ErrorBase* originatingObject) {
   bool report = true;
 
