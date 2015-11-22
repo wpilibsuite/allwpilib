@@ -15,7 +15,7 @@ Notifier *Notifier::timerQueueHead = nullptr;
 priority_recursive_mutex Notifier::queueMutex;
 priority_mutex Notifier::halMutex;
 void *Notifier::m_notifier = nullptr;
-std::atomic<int> Notifier::refcount = ATOMIC_VAR_INIT(0);
+std::atomic<int> Notifier::refcount{0};
 
 /**
  * Create a Notifier for timer event notification.

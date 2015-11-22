@@ -21,7 +21,7 @@ struct Notifier {
 };
 static Notifier *notifiers = nullptr;
 static std::atomic_flag notifierAtexitRegistered = ATOMIC_FLAG_INIT;
-static std::atomic_int notifierRefCount = ATOMIC_VAR_INIT(0);
+static std::atomic_int notifierRefCount{0};
 
 static void alarmCallback(uint32_t, void*)
 {
