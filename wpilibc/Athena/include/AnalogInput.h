@@ -82,5 +82,5 @@ class AnalogInput : public SensorBase,
   void *m_port;
   int64_t m_accumulatorOffset;
 
-  std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table;
 };

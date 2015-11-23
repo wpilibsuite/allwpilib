@@ -36,5 +36,5 @@ private:
 	bool m_lastValue;
 	SimDigitalInput *m_impl;
 
-	std::shared_ptr<ITable> m_table = nullptr;
+	std::shared_ptr<ITable> m_table;
 };

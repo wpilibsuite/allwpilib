@@ -62,7 +62,7 @@ class Relay : public MotorSafety,
   void InitTable(std::shared_ptr<ITable> subTable) override;
   std::shared_ptr<ITable> GetTable() const override;
 
-  std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table;
 
  private:
   uint32_t m_channel;

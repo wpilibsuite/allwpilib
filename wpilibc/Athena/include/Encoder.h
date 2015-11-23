@@ -115,5 +115,5 @@ class Encoder : public SensorBase,
   EncodingType m_encodingType;     // Encoding type
   int32_t m_encodingScale;         // 1x, 2x, or 4x, per the encodingType
 
-  std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table;
 };

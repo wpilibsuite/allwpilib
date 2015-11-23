@@ -41,5 +41,5 @@ class Solenoid : public SolenoidBase,
 
  private:
   uint32_t m_channel;  ///< The channel on the module to control.
-  std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table;
 };

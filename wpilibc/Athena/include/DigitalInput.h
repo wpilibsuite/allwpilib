@@ -43,5 +43,5 @@ class DigitalInput : public DigitalSource, public LiveWindowSendable {
  private:
   uint32_t m_channel;
 
-  std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table;
 };

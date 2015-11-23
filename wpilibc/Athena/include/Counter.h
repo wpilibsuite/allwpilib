@@ -118,5 +118,5 @@ class Counter : public SensorBase,
  private:
   uint32_t m_index = 0;            ///< The index of this counter.
 
-  std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table;
 };

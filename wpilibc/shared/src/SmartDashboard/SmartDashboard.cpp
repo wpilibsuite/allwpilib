@@ -13,7 +13,7 @@
 #include "networktables/NetworkTable.h"
 #include "HLUsageReporting.h"
 
-std::shared_ptr<ITable> SmartDashboard::m_table = nullptr;
+std::shared_ptr<ITable> SmartDashboard::m_table;
 std::map<std::shared_ptr<ITable> , Sendable *> SmartDashboard::m_tablesToData;
 
 void SmartDashboard::init() {

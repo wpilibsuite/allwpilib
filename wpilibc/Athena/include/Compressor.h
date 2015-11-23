@@ -59,7 +59,7 @@ class Compressor : public SensorBase,
  private:
   void SetCompressor(bool on);
 
-  std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table;
 };
 
 #endif /* Compressor_H_ */

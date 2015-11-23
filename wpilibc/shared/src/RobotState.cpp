@@ -2,7 +2,7 @@
 
 #include "Base.h"
 
-std::shared_ptr<RobotStateInterface> RobotState::impl = nullptr;
+std::shared_ptr<RobotStateInterface> RobotState::impl;
 
 void RobotState::SetImplementation(RobotStateInterface& i) {
   impl = std::shared_ptr<RobotStateInterface>(

@@ -51,5 +51,5 @@ class DigitalOutput : public DigitalSource,
   uint32_t m_channel;
   void *m_pwmGenerator;
 
-  std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table;
 };

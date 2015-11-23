@@ -37,5 +37,5 @@ class BuiltInAccelerometer : public Accelerometer,
   virtual void StopLiveWindowMode() override {}
 
  private:
-  std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table;
 };

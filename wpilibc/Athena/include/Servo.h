@@ -39,7 +39,7 @@ class Servo : public SafePWM {
   void InitTable(std::shared_ptr<ITable> subTable) override;
   std::shared_ptr<ITable> GetTable() const override;
 
-  std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table;
 
  private:
   float GetServoAngleRange() const { return kMaxServoAngle - kMinServoAngle; }

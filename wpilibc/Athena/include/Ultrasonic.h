@@ -107,5 +107,5 @@ class Ultrasonic : public SensorBase,
   Ultrasonic *m_nextSensor;
   DistanceUnit m_units;
 
-  std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table;
 };

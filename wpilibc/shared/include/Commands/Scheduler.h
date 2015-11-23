@@ -64,7 +64,7 @@ class Scheduler : public ErrorBase, public NamedSendable {
   std::vector<std::string> commands;
   std::vector<double> ids;
   std::vector<double> toCancel;
-  std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table;
   bool m_runningCommandsChanged = false;
 };
 #endif

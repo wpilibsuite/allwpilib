@@ -51,5 +51,5 @@ private:
 	SimFloatInput* m_impl;
 	int64_t m_accumulatorOffset;
 
-	std::shared_ptr<ITable> m_table = nullptr;
+	std::shared_ptr<ITable> m_table;
 };

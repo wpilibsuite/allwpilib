@@ -47,7 +47,7 @@ class Trigger : public Sendable {
   virtual std::string GetSmartDashboardType() const;
 
  protected:
-  std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table;
 };
 
 #endif

@@ -55,5 +55,5 @@ class AnalogAccelerometer : public SensorBase,
   float m_zeroGVoltage = 2.5;
   bool m_allocatedChannel;
 
-  std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table;
 };

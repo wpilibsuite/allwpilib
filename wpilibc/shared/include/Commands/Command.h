@@ -184,7 +184,7 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
                             std::shared_ptr<nt::Value> value, bool isNew);
 
  protected:
-  std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table;
 };
 
 #endif

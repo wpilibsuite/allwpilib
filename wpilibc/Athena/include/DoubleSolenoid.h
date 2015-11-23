@@ -49,5 +49,5 @@ class DoubleSolenoid : public SolenoidBase,
   uint8_t m_forwardMask;      ///< The mask for the forward channel.
   uint8_t m_reverseMask;      ///< The mask for the reverse channel.
 
-  std::shared_ptr<ITable> m_table = nullptr;
+  std::shared_ptr<ITable> m_table;
 };
