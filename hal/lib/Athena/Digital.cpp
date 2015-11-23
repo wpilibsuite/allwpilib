@@ -649,6 +649,97 @@ bool isAnyPulsing(int32_t *status) {
   return pulseRegister.Headers != 0 && pulseRegister.MXP != 0;
 }
 
+/**
+ * Write the filter index from the FPGA.
+ * Set the filter index used to filter out short pulses.
+ *
+ * @param digital_port_pointer The digital I/O channel
+ * @param filter_index The filter index.  Must be in the range 0 - 3,
+ * where 0 means "none" and 1 - 3 means filter # filter_index - 1.
+ */
+void setFilterSelect(void* digital_port_pointer, int filter_index,
+                     int32_t* status) {
+  DigitalPort* port = (DigitalPort*)digital_port_pointer;
+
+  std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
+  if (port->port.pin < kNumHeaders) {
+    digitalSystem->writeFilterSelectHdr(port->port.pin, filter_index, status);
+  }
+  else {
+    digitalSystem->writeFilterSelectMXP(remapMXPChannel(port->port.pin),
+                                        filter_index, status);
+  }
+}
+
+/**
+ * Read the filter index from the FPGA.
+ * Get the filter index used to filter out short pulses.
+ *
+ * @param digital_port_pointer The digital I/O channel
+ * @return filter_index The filter index.  Must be in the range 0 - 3,
+ * where 0 means "none" and 1 - 3 means filter # filter_index - 1.
+ */
+int getFilterSelect(void* digital_port_pointer, int32_t* status) {
+  DigitalPort* port = (DigitalPort*)digital_port_pointer;
+
+  std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
+  if (port->port.pin < kNumHeaders) {
+    return digitalSystem->readFilterSelectHdr(port->port.pin, status);
+  }
+  else {
+    return digitalSystem->readFilterSelectMXP(remapMXPChannel(port->port.pin),
+                                              status);
+  }
+}
+
+/**
+ * Set the filter period for the specified filter index.
+ *
+ * Set the filter period in FPGA cycles.  Even though there are 2 different
+ * filter index domains (MXP vs HDR), ignore that distinction for now since it
+ * compilicates the interface.  That can be changed later.
+ *
+ * @param filter_index The filter index, 0 - 2.
+ * @param value The number of cycles that the signal must not transition to be
+ * counted as a transition.
+ */
+void setFilterPeriod(int filter_index, uint32_t value, int32_t* status) {
+  std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
+  digitalSystem->writeFilterPeriodHdr(filter_index, value, status);
+  if (*status == 0) {
+    digitalSystem->writeFilterPeriodMXP(filter_index, value, status);
+  }
+}
+
+/**
+ * Get the filter period for the specified filter index.
+ *
+ * Get the filter period in FPGA cycles.  Even though there are 2 different
+ * filter index domains (MXP vs HDR), ignore that distinction for now since it
+ * compilicates the interface.  Set status to NiFpga_Status_SoftwareFault if the
+ * filter values miss-match.
+ *
+ * @param filter_index The filter index, 0 - 2.
+ * @param value The number of cycles that the signal must not transition to be
+ * counted as a transition.
+ */
+uint32_t getFilterPeriod(int filter_index, int32_t* status) {
+  uint32_t hdr_period = 0;
+  uint32_t mxp_period = 0;
+  {
+    std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
+    hdr_period = digitalSystem->readFilterPeriodHdr(filter_index, status);
+    if (*status == 0) {
+      mxp_period = digitalSystem->readFilterPeriodMXP(filter_index, status);
+    }
+  }
+  if (hdr_period != mxp_period) {
+    *status = NiFpga_Status_SoftwareFault;
+    return -1;
+  }
+  return hdr_period;
+}
+
 struct counter_t {
   tCounter* counter;
   uint32_t index;

@@ -14,6 +14,8 @@
 
 #include <memory>
 
+class DigitalGlitchFilter;
+
 /**
  * Class for counting the number of ticks on a digital input channel.
  * This is a general purpose class for counting repetitive events. It can return
@@ -119,4 +121,5 @@ class Counter : public SensorBase,
   uint32_t m_index = 0;            ///< The index of this counter.
 
   std::shared_ptr<ITable> m_table;
+  friend class DigitalGlitchFilter;
 };

@@ -46,6 +46,13 @@ extern "C"
 	bool isPulsing(void* digital_port_pointer, int32_t *status);
 	bool isAnyPulsing(int32_t *status);
 
+	void setFilterSelect(void* digital_port_pointer, int filter_index,
+                         int32_t* status);
+	int getFilterSelect(void* digital_port_pointer, int32_t* status);
+
+	void setFilterPeriod(int filter_index, uint32_t value, int32_t* status);
+	uint32_t getFilterPeriod(int filter_index, int32_t* status);
+
 	void* initializeCounter(Mode mode, uint32_t *index, int32_t *status);
 	void freeCounter(void* counter_pointer, int32_t *status);
 	void setCounterAverageSize(void* counter_pointer, int32_t size, int32_t *status);

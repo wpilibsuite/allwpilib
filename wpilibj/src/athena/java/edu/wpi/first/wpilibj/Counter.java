@@ -60,8 +60,8 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
     }
   }
 
-  private DigitalSource m_upSource; // /< What makes the counter count up.
-  private DigitalSource m_downSource; // /< What makes the counter count down.
+  protected DigitalSource m_upSource; // /< What makes the counter count up.
+  protected DigitalSource m_downSource; // /< What makes the counter count down.
   private boolean m_allocatedUpSource;
   private boolean m_allocatedDownSource;
   private long m_counter; // /< The FPGA counter object.

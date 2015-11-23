@@ -16,6 +16,7 @@
 #include <memory>
 
 class DigitalSource;
+class DigitalGlitchFilter;
 
 /**
  * Class to read quad encoders.
@@ -116,4 +117,5 @@ class Encoder : public SensorBase,
   int32_t m_encodingScale;         // 1x, 2x, or 4x, per the encodingType
 
   std::shared_ptr<ITable> m_table;
+  friend class DigitalGlitchFilter;
 };

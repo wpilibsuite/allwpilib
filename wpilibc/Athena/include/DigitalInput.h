@@ -12,6 +12,8 @@
 #include <memory>
 #include <cstdint>
 
+class DigitalGlitchFilter;
+
 /**
  * Class to read a digital input.
  * This class will read digital inputs and return the current value on the
@@ -45,4 +47,5 @@ class DigitalInput : public DigitalSource, public LiveWindowSendable {
   uint32_t m_channel;
 
   std::shared_ptr<ITable> m_table;
+  friend class DigitalGlitchFilter;
 };

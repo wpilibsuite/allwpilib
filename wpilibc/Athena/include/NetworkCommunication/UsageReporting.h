@@ -68,6 +68,7 @@ typedef enum {
   kResourceType_VictorSP,
   kResourceType_TalonSRX,
   kResourceType_CANTalonSRX,
+  kResourceType_DigitalGlitchFilter,
 } tResourceType;
 
 typedef enum {
