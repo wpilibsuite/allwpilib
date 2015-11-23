@@ -96,7 +96,6 @@ extern "C"
 	int32_t spiRead(uint8_t port, uint8_t *buffer, uint8_t count);
 	void spiClose(uint8_t port);
 	void spiSetSpeed(uint8_t port, uint32_t speed);
-	void spiSetBitsPerWord(uint8_t port, uint8_t bpw);
 	void spiSetOpts(uint8_t port, int msb_first, int sample_on_trailing, int clk_idle_high);
 	void spiSetChipSelectActiveHigh(uint8_t port, int32_t *status);
 	void spiSetChipSelectActiveLow(uint8_t port, int32_t *status);
