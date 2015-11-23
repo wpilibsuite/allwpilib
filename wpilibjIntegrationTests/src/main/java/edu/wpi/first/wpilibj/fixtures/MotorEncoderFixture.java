@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.test.TestBench;
 
 /**
  * Represents a physically connected Motor and Encoder to allow for unit tests
- * on these difrent pairs<br>
+ * on these different pairs<br>
  * Designed to allow the user to easily setup and tear down the fixture to allow
  * for reuse. This class should be explicitly instantiated in the TestBed class
  * to allow any test to access this fixture. This allows tests to be mailable so
@@ -171,7 +171,7 @@ public abstract class MotorEncoderFixture<T extends SpeedController> implements 
 
   /**
    * Safely tears down the MotorEncoder Fixture in a way that makes sure that
-   * even if an object fails to initialize the reset of the fixture can still be
+   * even if an object fails to initialize the rest of the fixture can still be
    * torn down and the resources deallocated
    */
   @Override

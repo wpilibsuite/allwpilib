@@ -29,7 +29,7 @@ If you also want simulation to be build, add -PmakeSim. This requires gazebo_tra
 ```
 
 C++ simulation tasks (including plugins, gz_msgs, and wpilibcSim) all depend on gazebo_transport. In order for this to build you must have installed gazebo. See [The Gazebo website](https://gazebosim.org/) for installation instructions.
-If you prefer to use Cmake directly, the you can still do so.
+If you prefer to use CMake directly, the you can still do so.
 The common cmake tasks are wpilibcSim, frc_gazebo_plugins, and gz_msgs
 
 ```bash
@@ -62,7 +62,7 @@ The following maven targets a published by this task:
 - org.gazebosim:JavaGazebo:0.1.0-SNAPSHOT - Gazebo protocol for Java.
 
 ## Structure and Organization
-The main wpilib code you're probably looking for is in wpilibj and wpilibc. Those directories are split into shared, sim, and athena. Athena contains the wpilib code meant to run on your RoboRIO. Sim is wpilib code meant to run on your computer with gazebo, and shared is code shared between the two. Shared code must be platform-independant, since it will be compiled with both the ARM cross-compiler and whatever desktop compiler you are using (g++, msvc, ect... ).
+The main wpilib code you're probably looking for is in wpilibj and wpilibc. Those directories are split into shared, sim, and athena. Athena contains the wpilib code meant to run on your RoboRIO. Sim is wpilib code meant to run on your computer with gazebo, and shared is code shared between the two. Shared code must be platform-independent, since it will be compiled with both the ARM cross-compiler and whatever desktop compiler you are using (g++, msvc, etc...).
 
 The Simulation directory contains extra simulation tools and libraries, such as gz_msgs and JavaGazebo. See sub-directories for more information.
 

@@ -218,11 +218,11 @@ public final class TestBench {
      * (non-Javadoc)
      *$
      * @see
-     * edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture#givePoweCycleRelay
+     * edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture#givePowerCycleRelay
      * ()
      */
     @Override
-    protected Relay givePoweCycleRelay() {
+    protected Relay givePowerCycleRelay() {
       return new Relay(kCANRelayPowerCycler);
     }
 

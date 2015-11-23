@@ -36,7 +36,7 @@ public abstract class CANMotorEncoderFixture extends MotorEncoderFixture<CANJagu
 
   protected abstract DigitalOutput giveFakeReverseLimit();
 
-  protected abstract Relay givePoweCycleRelay();
+  protected abstract Relay givePowerCycleRelay();
 
   public CANMotorEncoderFixture() {}
 
@@ -45,7 +45,7 @@ public abstract class CANMotorEncoderFixture extends MotorEncoderFixture<CANJagu
       if (!initialized) {
         initialized = true;// This ensures it is only initialized once
 
-        powerCycler = givePoweCycleRelay();
+        powerCycler = givePowerCycleRelay();
         powerCycler.setDirection(Direction.kForward);
         logger.fine("Turning on the power!");
         powerCycler.set(Value.kForward);

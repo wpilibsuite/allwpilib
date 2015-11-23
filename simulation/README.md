@@ -1,6 +1,6 @@
 ## Simulation Directory
 
-Observe the following directory structure
+Observe the following directory structure:
 
 .
 |-- frc_gazebo_plugins (contains Gazebo Plugins)
@@ -21,7 +21,7 @@ Observe the following directory structure
 The gazbeo plugins are currently built with CMake.
 Eventually they will be built with gradle.
 
-All of this is delivered to students via a zip file
+All of this is delivered to students via a zip file.
 
 ## Building
-see the top level building.md
+See the top level README.md.
