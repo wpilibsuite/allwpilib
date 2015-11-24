@@ -1,5 +1,4 @@
 apply plugin: 'google-test'
-task check() {}
 
 model {
     testSuites {
@@ -10,32 +9,26 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs = ['test/unit']
+                        srcDirs = ['../test/unit']
                         includes = ['**/*.cpp']
                     }
                     exportedHeaders {
-                        srcDirs = ['include', 'src', 'gmock/include', 'gmock/gtest/include']
+                        srcDirs = ['../include', '../src', '../gmock/include', '../gmock/gtest/include']
                         includes = ['**/*.h']
                     }
                 }
             }
             binaries.all {
-                if (project.hasProperty('wpilib')) {
-                    lib project: ':ntcore:gmock', library: "gmock", linkage: "static"
-                } else {
-                    lib project: ':gmock', library: "gmock", linkage: "static"
-                }
+                lib project: ':gmock', library: 'gmock', linkage: 'static'
+                lib library: 'ntcore', linkage: 'static'
             }
         }
     }
 }
 
 binaries.withType(GoogleTestTestSuiteBinarySpec) {
-    if (project.hasProperty('wpilib')) {
-        lib project: ':ntcore:gmock', library: "gmock", linkage: "static"
-    } else {
-        lib project: ':gmock', library: "gmock", linkage: "static"
-    }
+    lib project: ':gmock', library: "gmock", linkage: "static"
+    lib library: 'ntcore', linkage: 'static'
     if (targetPlatform.operatingSystem.windows) {
         cppCompiler.args '/EHsc', '/DNOMINMAX', '/D_SCL_SECURE_NO_WARNINGS', '/D_WINSOCK_DEPRECATED_NO_WARNINGS'
     } else {

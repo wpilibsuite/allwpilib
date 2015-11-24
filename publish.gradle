@@ -2,15 +2,24 @@ import org.gradle.internal.os.OperatingSystem
 
 apply plugin: 'maven-publish'
 
-// We classify the different artifacts by whether they are sources, and what development
-// stage they are in. Release gets no classifier; stable, beta, and development get classifiers.
+// We change what repo we publish to depending on whether this is a development, beta, stable, or full
+// release. This is set up in the main gradle file.
 publishing {
     publications {
+        def nat = project('native')
+        def arm = project('arm')
         if (!project.hasProperty('skipJava')) {
             java(MavenPublication) {
-                artifact jar
-                artifact networktablesJavaSource
-                artifact networktablesJavadoc
+                artifact nat.jar
+                artifact arm.jar
+                artifact nat.networktablesJavaSource
+                artifact nat.networktablesJavadoc
+
+                if (project.hasProperty('makeDesktop')) {
+                    artifact nat.jar, {
+                        classifier = 'desktop'
+                    }
+                }
 
                 groupId 'edu.wpi.first.wpilib.networktables.java'
                 artifactId 'NetworkTables'
@@ -18,8 +27,9 @@ publishing {
             }
         }
         cpp(MavenPublication) {
-            artifact ntcoreZip
-            artifact ntcoreSourceZip
+            artifact nat.ntcoreZip
+            artifact arm.ntcoreZip
+            artifact nat.ntcoreSourceZip
 
             groupId 'edu.wpi.first.wpilib.networktables.cpp'
             artifactId 'NetworkTables'
@@ -29,7 +39,7 @@ publishing {
 
     repositories {
         maven {
-            url "${System.getProperty('user.home')}/releases/maven/"
+            url "${System.getProperty('user.home')}/releases/maven/${project.repo}"
         }
     }
 }

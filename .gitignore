@@ -35,3 +35,6 @@ build/
 *.sdf
 *.sublime-project
 *.sublime-workspace
+
+native/
+arm/

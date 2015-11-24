@@ -1,2 +1,1 @@
-if (!hasProperty('armBuild'))
-    include 'gmock'
+include 'arm', 'native', 'gmock'

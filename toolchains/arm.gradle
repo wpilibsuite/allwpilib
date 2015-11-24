@@ -26,6 +26,34 @@ model {
                 staticLibArchiver.executable = compilerPrefix + staticLibArchiver.executable
             }
         }
+        // Workaround for OS X. Macs for some reason want to use Xcode's gcc
+        // (which just wraps Clang), so we have to explicitly make it so
+        // that trying to compile with Clang will call gcc instead
+        macGcc(Clang) {
+            target('arm') {
+                // We use a custom-built cross compiler with the prefix arm-frc-linux-gnueabi-<util name>
+                // If this ever changes, the prefix will need to be changed here
+                cppCompiler.executable = compilerPrefix + 'g++'
+                linker.executable = compilerPrefix + 'g++'
+                assembler.executable = compilerPrefix + 'gcc'
+                // Gradle auto-adds the -m32 argument to the linker and compiler. Our compiler only supports
+                // arm, and doesn't understand this flag, so it is removed from both
+                cppCompiler.withArguments { args ->
+                    args << '-std=c++1y' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
+                    args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-O0' << '-g3' << '-rdynamic'
+                    //TODO: When the compiler allows us to actually call deprecated functions from within
+                    // deprecated function, remove this line (this will cause calling deprecated functions
+                    // to be treated as a warning rather than an error).
+                    args << '-Wno-error=deprecated-declarations'
+                    args.remove('-m32')
+                }
+                linker.withArguments { args ->
+                    args << '-rdynamic'
+                    args.remove('-m32')
+                }
+                staticLibArchiver.executable = compilerPrefix + 'ar'
+            }
+        }
     }
 }
 

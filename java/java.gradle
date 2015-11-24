@@ -2,12 +2,12 @@ import org.gradle.internal.os.OperatingSystem
 
 apply plugin: 'java'
 
-def generatedJNIHeaderLoc = 'build/include'
+def generatedJNIHeaderLoc = '../build/include'
 
 sourceSets {
     main {
         java {
-            srcDirs = ['java/src']
+            srcDirs = ['../java/src']
         }
     }
 }
@@ -15,14 +15,7 @@ sourceSets {
 jar {
     description = 'Generates NetworkTables jar, with the JNI shared libraries embedded'
     baseName = 'ntcore'
-    classifier = "$buildPlatform${useExtension ? '-' + repo : ''}"
-
-    if (buildPlatform == 'arm') {
-        dependsOn { ntcoreSharedLibrary }
-    } else {
-        dependsOn { x64NtcoreSharedLibrary }
-        dependsOn { x86NtcoreSharedLibrary }
-    }
+    classifier = "$buildPlatform"
 
     dependsOn { classes }
     binaries.withType(SharedLibraryBinary) { binary ->
@@ -32,11 +25,20 @@ jar {
     }
 }
 
+project.tasks.whenTaskAdded { task-> 
+    if (isArm) {
+        if (task.name == 'ntcoreSharedLibrary') jar.dependsOn task
+    } else {
+        if (task.name == 'x64NtcoreSharedLibrary' || task.name == 'x86NtcoreSharedLibrary') 
+            jar.dependsOn task
+    }
+}
+
 task networktablesJavaSource(type: Jar, dependsOn: classes) {
     description = 'Generates the source jar for NetworkTables java'
     group = 'WPILib'
     baseName = 'ntcore'
-    classifier = "sources${useExtension ? '-' + repo : ''}"
+    classifier = "sources"
     from sourceSets.main.allJava
 }
 
@@ -44,7 +46,7 @@ task networktablesJavadoc(type: Jar, dependsOn: javadoc) {
     description = 'Generates the javadoc jar for NetworkTables java'
     group = 'WPILib'
     baseName = 'ntcore'
-    classifier = "javadoc${useExtension ? '-' + repo : ''}"
+    classifier = "javadoc"
     from javadoc.destinationDir
 }
 
@@ -96,8 +98,8 @@ ext.setupJniIncludes = { binaries ->
     binaries.all {
         tasks.withType(CppCompile) {
             if (buildPlatform == 'arm') {
-                cppCompiler.args '-I', file('java/arm-linux').absolutePath
-                cppCompiler.args '-I', file('java/arm-linux/linux').absolutePath
+                cppCompiler.args '-I', file('../java/arm-linux').absolutePath
+                cppCompiler.args '-I', file('../java/arm-linux/linux').absolutePath
             } else {
                 def jdkLocation = org.gradle.internal.jvm.Jvm.current().javaHome
                 platformSpecificIncludeFlag("${jdkLocation}/include", cppCompiler)

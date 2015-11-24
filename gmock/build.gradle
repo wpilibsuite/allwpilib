@@ -4,9 +4,7 @@ apply plugin: 'cpp'
 apply plugin: 'visual-studio'
 
 // Apply the correct toolchain settings for the target platform
-if (buildPlatform == 'arm') {
-    apply from: '../toolchains/arm.gradle'
-} else if (OperatingSystem.current().isLinux()) {
+if (OperatingSystem.current().isLinux()) {
     apply from: '../toolchains/linux.gradle'
 } else if (OperatingSystem.current().isMacOsX()) {
     apply from: '../toolchains/mac.gradle'
