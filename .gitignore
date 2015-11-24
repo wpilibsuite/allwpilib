@@ -1,29 +1,17 @@
 # WPIlib Specific
 
-wpilibc/build/
-hal/build/
-networktables/cpp/build/
-build/
-networktables/OutlineViewer/nbproject/private
-dist/
-bin/
-.project
-.classpath
-**/dependency-reduced-pom.xml
-wpilibj/wpilibJavaJNI/nivision/*.c
-wpilibj/wpilibJavaJNI/nivision/*.cpp
-wpilibj/wpilibJavaJNI/nivision/*.s
-wpilibj/wpilibJavaJNI/nivision/*_arm.ini
-wpilibj/wpilibJavaJNI/nivision/*.java
-wpilibj/wpilibJavaJNI/nivision/nivision_funcs.txt
-wpilibj/wpilibJavaJNI/nivision/imaqdx_funcs.txt
+dependency-reduced-pom.xml
+/wpilibj/src/athena/cpp/nivision/*.c
+/wpilibj/src/athena/cpp/nivision/*.cpp
+/wpilibj/src/athena/cpp/nivision/*.s
+/wpilibj/src/athena/cpp/nivision/*_arm.ini
+/wpilibj/src/athena/cpp/nivision/*.java
+/wpilibj/src/athena/cpp/nivision/nivision_funcs.txt
+/wpilibj/src/athena/cpp/nivision/imaqdx_funcs.txt
 doxygen.log
 
 # Created by the jenkins test script
 test-reports
-
-# Added by the users of vagrant
-jdk-7u45-linux-arm-vfp-sflt.gz
 
 # IntelliJ
 *.iml
