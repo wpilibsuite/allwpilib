@@ -13,8 +13,9 @@
 
 Notifier *Notifier::timerQueueHead = nullptr;
 priority_recursive_mutex Notifier::queueMutex;
+priority_mutex Notifier::halMutex;
 void *Notifier::m_notifier = nullptr;
-int Notifier::refcount = 0;
+std::atomic<int> Notifier::refcount{0};
 
 /**
  * Create a Notifier for timer event notification.
@@ -26,15 +27,15 @@ Notifier::Notifier(TimerEventHandler handler, void *param) {
     wpi_setWPIErrorWithContext(NullParameter, "handler must not be nullptr");
   m_handler = handler;
   m_param = param;
-  {
-    std::lock_guard<priority_recursive_mutex> sync(queueMutex);
-    // do the first time intialization of static variables
-    if (refcount == 0) {
-      int32_t status = 0;
-      m_notifier = initializeNotifier(ProcessQueue, &status);
-      wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  // do the first time intialization of static variables
+  if (refcount.fetch_add(1) == 0) {
+    int32_t status = 0;
+    {
+      std::lock_guard<priority_mutex> sync(halMutex);
+      if (!m_notifier)
+        m_notifier = initializeNotifier(ProcessQueue, &status);
     }
-    refcount++;
+    wpi_setErrorWithContext(status, getHALErrorMessage(status));
   }
 }
 
@@ -47,13 +48,19 @@ Notifier::~Notifier() {
   {
     std::lock_guard<priority_recursive_mutex> sync(queueMutex);
     DeleteFromQueue();
+  }
 
-    // Delete the static variables when the last one is going away
-    if (!(--refcount)) {
-      int32_t status = 0;
-      cleanNotifier(m_notifier, &status);
-      wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  // Delete the static variables when the last one is going away
+  if (refcount.fetch_sub(1) == 1) {
+    int32_t status = 0;
+    {
+      std::lock_guard<priority_mutex> sync(halMutex);
+      if (m_notifier) {
+        cleanNotifier(m_notifier, &status);
+        m_notifier = nullptr;
+      }
     }
+    wpi_setErrorWithContext(status, getHALErrorMessage(status));
   }
 
   // Acquire the mutex; this makes certain that the handler is
@@ -73,9 +80,19 @@ Notifier::~Notifier() {
 void Notifier::UpdateAlarm() {
   if (timerQueueHead != nullptr) {
     int32_t status = 0;
-    updateNotifierAlarm(m_notifier,
-                        (uint32_t)(timerQueueHead->m_expirationTime * 1e6),
-                        &status);
+    // This locking is necessary in order to avoid two things:
+    //  1) Race condition issues with calling cleanNotifer() and
+    //     updateNotifierAlarm() at the same time.
+    //  2) Avoid deadlock by making it so that this won't block waiting
+    //     for the mutex to unlock.
+    // Checking refcount as well is unnecessary, but will not hurt.
+    if (halMutex.try_lock() && refcount != 0) {
+      if (m_notifier)
+        updateNotifierAlarm(m_notifier,
+                            (uint32_t)(timerQueueHead->m_expirationTime * 1e6),
+                            &status);
+      halMutex.unlock();
+    }
     wpi_setStaticErrorWithContext(timerQueueHead, status,
                                   getHALErrorMessage(status));
   }
