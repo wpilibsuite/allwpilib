@@ -1,11 +1,7 @@
 publishing {
     publications {
         wpilibcSim(MavenPublication) {
-            artifact wpilibcSimZip {
-                if (useExtension) {
-                    classifier = project.getClassifier()[1..-1]
-                }
-            }
+            artifact wpilibcSimZip
             groupId 'edu.wpi.first.wpilibc.simulation'
             artifactId 'WPILibCSim'
             version '0.1.0'

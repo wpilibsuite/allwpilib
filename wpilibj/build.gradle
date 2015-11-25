@@ -6,8 +6,8 @@ sourceSets {
 }
 
 dependencies {
-    sharedCompile "edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:arm${getClassifier()}"
-    sharedRuntime "edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:arm${getClassifier()}"
+    sharedCompile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:arm'
+    sharedRuntime 'edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:arm'
 }
 
 apply from: 'athena.gradle'

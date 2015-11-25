@@ -19,7 +19,7 @@ dependencies {
     compile wpilibj.sourceSets.shared.output
     compile wpilibj.sourceSets.athena.output
     compile files(wpilibj.jar.archivePath)
-    compile "edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:arm${getClassifier()}"
+    compile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:arm'
     compile 'junit:junit:4.11'
     compile 'com.googlecode.junit-toolbox:junit-toolbox:2.0'
     compile 'org.apache.ant:ant:1.9.4'

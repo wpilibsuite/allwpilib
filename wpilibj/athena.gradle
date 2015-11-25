@@ -9,8 +9,8 @@ sourceSets {
 
 dependencies {
     athenaCompile sourceSets.shared.output
-    athenaCompile "edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:arm${getClassifier()}"
-    athenaRuntime "edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:arm${getClassifier()}"
+    athenaCompile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:arm'
+    athenaRuntime 'edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:arm'
 }
 
 // Configuration for the HAL bindings
@@ -50,17 +50,12 @@ model {
 publishing {
     publications {
         wpilibj(MavenPublication) {
-            artifact jar {
-                // Trim the beginning '-' off the classifier
-                if (useExtension) {
-                    classifier = project.getClassifier()[1..-1]
-                }
-            }
+            artifact jar
             artifact(wpilibjSources) {
-                classifier "sources${project.getClassifier()}"
+                classifier "sources"
             }
             artifact(wpilibjJavadoc) {
-                classifier "javadoc${project.getClassifier()}"
+                classifier "javadoc"
             }
 
             groupId 'edu.wpi.first.wpilibj'

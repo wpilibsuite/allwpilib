@@ -5,7 +5,7 @@ sourceSets {
 dependencies {
     simCompile sourceSets.shared.output
     simCompile project(':simulation:JavaGazebo')
-    simCompile "edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:arm${getClassifier()}"
+    simCompile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:arm'
 }
 
 task wpilibjSimJar(type: Jar, dependsOn: simClasses) {
@@ -42,16 +42,12 @@ task wpilibjSimJavadocJar(type: Jar, dependsOn: wpilibjSimJavadoc) {
 publishing {
     publications {
         wpilibjSim(MavenPublication) {
-            artifact wpilibjSimJar {
-                if (useExtension) {
-                    classifier = project.getClassifier()[1..-1]
-                }
-            }
+            artifact wpilibjSimJar
             artifact(wpilibjSimSources) {
-                classifier = "sources${project.getClassifier()}"
+                classifier = "sources"
             }
             artifact(wpilibjSimJavadocJar) {
-                classifier "javadoc${project.getClassifier()}"
+                classifier "javadoc"
             }
 
             groupId 'edu.wpi.first.wpilibj'

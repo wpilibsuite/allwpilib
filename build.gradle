@@ -1,18 +1,15 @@
 def enableSimulation = hasProperty('enableSimulation')
 
-def repoBaseUrl = 'http://first.wpi.edu/FRC/roborio/maven'
-def publishUrl = "${System.getProperty('user.home')}/releases/maven/"
-
-// If we have the repo property, we want to delete the cached version of the networktables
-// dependency and redownload it from the given repo
 if (!hasProperty('repo')) {
     ext.repo = 'development'
 }
 
+def repoBaseUrl = "http://first.wpi.edu/FRC/roborio/maven/${repo}"
+def publishUrl = "${System.getProperty('user.home')}/releases/maven/${repo}"
+
 allprojects {
     ext.enableSimulation = enableSimulation
     ext.repo = repo
-    ext.useExtension = 'release' != repo
 
     repositories {
         mavenCentral()
@@ -23,10 +20,6 @@ allprojects {
         maven {
             url repoBaseUrl
         }
-    }
-
-    ext.getClassifier = {
-        return useExtension ? "-$repo" : ''
     }
 }
 
@@ -45,7 +38,7 @@ subprojects {
 
     ext.setupWpilibRepo = { publishing ->
         publishing.repositories.maven {
-            url = "${System.getProperty('user.home')}/releases/maven/"
+            url = "${System.getProperty('user.home')}/releases/maven/${repo}"
         }
     }
 }

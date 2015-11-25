@@ -104,12 +104,7 @@ project(':hal').tasks.whenTaskAdded { task ->
 publishing {
     publications {
         wpilibc(MavenPublication) {
-            artifact wpilibcZip {
-                // Trim the leading '-' off the classifier if we are using one
-                if (useExtension) {
-                    classifier = project.getClassifier()[1..-1]
-                }
-            }
+            artifact wpilibcZip
             groupId 'edu.wpi.first.wpilib.cmake'
             artifactId 'cpp-root'
             version '1.0.0'

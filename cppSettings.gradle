@@ -20,7 +20,7 @@ niLibraryTree.each { lib ->
 }
 
 def ntDependency =
-    project.dependencies.create("edu.wpi.first.wpilib.networktables.cpp:NetworkTables:3.0.0-SNAPSHOT:arm${getClassifier()}@zip")
+    project.dependencies.create("edu.wpi.first.wpilib.networktables.cpp:NetworkTables:3.0.0-SNAPSHOT:arm@zip")
 def config = project.configurations.detachedConfiguration(ntDependency)
 config.setTransitive(false)
 def netTables = config.files[0].canonicalFile
