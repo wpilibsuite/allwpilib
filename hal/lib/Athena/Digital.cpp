@@ -150,6 +150,12 @@ void* initializeDigitalPort(void* port_pointer, int32_t *status) {
   return digital_port;
 }
 
+void freeDigitalPort(void* digital_port_pointer)
+{
+  DigitalPort* port = (DigitalPort*) digital_port_pointer;
+  delete port;
+}
+
 bool checkPWMChannel(void* digital_port_pointer) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   return port->port.pin < kPwmPins;

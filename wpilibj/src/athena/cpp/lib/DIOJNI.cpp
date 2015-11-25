@@ -35,6 +35,19 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_initializeDigitalP
 }
 
 /*
+* Class:     edu_wpi_first_wpilibj_hal_DIOJNI
+* Method:    freeDigitalPort
+* Signature: (J)V;
+*/
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_freeDigitalPort
+(JNIEnv * env, jclass, jlong id)
+{
+ DIOJNI_LOG(logDEBUG) << "Calling DIOJNI freeDigitalPort";
+ DIOJNI_LOG(logDEBUG) << "Port Ptr = " << (void*)id;
+ freeDigitalPort((void*)id);
+}
+
+/*
  * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
  * Method:    allocateDIO
  * Signature: (JZ)Z

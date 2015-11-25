@@ -35,6 +35,18 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalo
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Method:    freeAnalogInputPort
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_freeAnalogInputPort
+  (JNIEnv * env, jclass, jlong id)
+{
+	ANALOGJNI_LOG(logDEBUG) << "Port Ptr = " << (void*)id;
+	freeAnalogInputPort((void*)id);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
  * Method:    initializeAnalogOutputPort
  * Signature: (J)J
  */
@@ -48,6 +60,18 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalo
 	ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << analog;
 	CheckStatus(env, status);
 	return (jlong)analog;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Method:    freeAnalogOutputPort
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_freeAnalogOutputPort
+  (JNIEnv * env, jclass, jlong id)
+{
+	ANALOGJNI_LOG(logDEBUG) << "Port Ptr = " << (void*)id;
+	freeAnalogOutputPort((void*)id);
 }
 
 /*

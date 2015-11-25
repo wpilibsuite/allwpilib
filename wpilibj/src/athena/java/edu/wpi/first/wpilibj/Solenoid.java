@@ -70,7 +70,10 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
    */
   public synchronized void free() {
     // m_allocated.free((m_moduleNumber - 1) * kSolenoidChannels + m_channel -
-    // 1);
+    // 1); 
+	SolenoidJNI.freeSolenoidPort(m_solenoid_port);
+	m_solenoid_port = 0;
+	super.free();
   }
 
   /**

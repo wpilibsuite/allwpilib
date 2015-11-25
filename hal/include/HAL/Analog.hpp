@@ -14,12 +14,14 @@ extern "C"
 {
 	// Analog output functions
 	void* initializeAnalogOutputPort(void* port_pointer, int32_t *status);
+	void freeAnalogOutputPort(void* analog_port_pointer);
 	void setAnalogOutput(void* analog_port_pointer, double voltage, int32_t *status);
 	double getAnalogOutput(void* analog_port_pointer, int32_t *status);
 	bool checkAnalogOutputChannel(uint32_t pin);
 
 	// Analog input functions
 	void* initializeAnalogInputPort(void* port_pointer, int32_t *status);
+	void freeAnalogInputPort(void* analog_port_pointer);
 	bool checkAnalogModule(uint8_t module);
 	bool checkAnalogInputChannel(uint32_t pin);
 

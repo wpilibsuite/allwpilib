@@ -143,6 +143,8 @@ public class PWM extends SensorBase implements LiveWindowSendable {
     PWMJNI.setPWM(m_port, (short) 0);
     PWMJNI.freePWMChannel(m_port);
     PWMJNI.freeDIO(m_port);
+	DIOJNI.freeDigitalPort(m_port);
+	m_port = 0;
   }
 
   /**
