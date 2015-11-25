@@ -4,13 +4,13 @@
 
 extern "C"
 {
-	void initializePDP(int module);
-	double getPDPTemperature(int32_t *status, uint8_t module);
-	double getPDPVoltage(int32_t *status, uint8_t module);
-	double getPDPChannelCurrent(uint8_t channel, int32_t *status, uint8_t module);
-	double getPDPTotalCurrent(int32_t *status, uint8_t module);
-	double getPDPTotalPower(int32_t *status, uint8_t module);
-	double getPDPTotalEnergy(int32_t *status, uint8_t module);
-	void resetPDPTotalEnergy(int32_t *status, uint8_t module);
-	void clearPDPStickyFaults(int32_t *status, uint8_t module);
+	void initializePDP(uint8_t module);
+	double getPDPTemperature(uint8_t module, int32_t *status);
+	double getPDPVoltage(uint8_t module, int32_t *status);
+	double getPDPChannelCurrent(uint8_t module, uint8_t channel, int32_t *status);
+	double getPDPTotalCurrent(uint8_t module, int32_t *status);
+	double getPDPTotalPower(uint8_t module, int32_t *status);
+	double getPDPTotalEnergy(uint8_t module, int32_t *status);
+	void resetPDPTotalEnergy(uint8_t module, int32_t *status);
+	void clearPDPStickyFaults(uint8_t module, int32_t *status);
 }

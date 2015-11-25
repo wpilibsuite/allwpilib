@@ -6,13 +6,13 @@ static const int NUM_MODULE_NUMBERS = 63;
 
 static PDP *pdp[NUM_MODULE_NUMBERS] = { NULL };
 
-void initializePDP(int module) {
+void initializePDP(uint8_t module) {
 	if(!pdp[module]) {
 		pdp[module] = new PDP(module);
 	}
 }
 
-double getPDPTemperature(int32_t *status, uint8_t module) {
+double getPDPTemperature(uint8_t module, int32_t *status) {
 	double temperature;
 
 	*status = pdp[module]->GetTemperature(temperature);
@@ -20,7 +20,7 @@ double getPDPTemperature(int32_t *status, uint8_t module) {
 	return temperature;
 }
 
-double getPDPVoltage(int32_t *status, uint8_t module) {
+double getPDPVoltage(uint8_t module, int32_t *status) {
 	double voltage;
 
 	*status = pdp[module]->GetVoltage(voltage);
@@ -28,7 +28,7 @@ double getPDPVoltage(int32_t *status, uint8_t module) {
 	return voltage;
 }
 
-double getPDPChannelCurrent(uint8_t channel, int32_t *status, uint8_t module) {
+double getPDPChannelCurrent(uint8_t module, uint8_t channel, int32_t *status) {
 	double current;
 
 	*status = pdp[module]->GetChannelCurrent(channel, current);
@@ -36,7 +36,7 @@ double getPDPChannelCurrent(uint8_t channel, int32_t *status, uint8_t module) {
 	return current;
 }
 
-double getPDPTotalCurrent(int32_t *status, uint8_t module) {
+double getPDPTotalCurrent(uint8_t module, int32_t *status) {
 	double current;
 
 	*status = pdp[module]->GetTotalCurrent(current);
@@ -44,7 +44,7 @@ double getPDPTotalCurrent(int32_t *status, uint8_t module) {
 	return current;
 }
 
-double getPDPTotalPower(int32_t *status, uint8_t module) {
+double getPDPTotalPower(uint8_t module, int32_t *status) {
 	double power;
 
 	*status = pdp[module]->GetTotalPower(power);
@@ -52,7 +52,7 @@ double getPDPTotalPower(int32_t *status, uint8_t module) {
 	return power;
 }
 
-double getPDPTotalEnergy(int32_t *status, uint8_t module) {
+double getPDPTotalEnergy(uint8_t module, int32_t *status) {
 	double energy;
 
 	*status = pdp[module]->GetTotalEnergy(energy);
@@ -60,11 +60,11 @@ double getPDPTotalEnergy(int32_t *status, uint8_t module) {
 	return energy;
 }
 
-void resetPDPTotalEnergy(int32_t *status, uint8_t module) {
+void resetPDPTotalEnergy(uint8_t module, int32_t *status) {
 	*status = pdp[module]->ResetEnergy();
 }
 
-void clearPDPStickyFaults(int32_t *status, uint8_t module) {
+void clearPDPStickyFaults(uint8_t module, int32_t *status) {
 	*status = pdp[module]->ClearStickyFaults();
 }
 
