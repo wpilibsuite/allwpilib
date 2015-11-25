@@ -16,8 +16,6 @@ public class SPIJNI extends JNIWrapper {
 
   public static native void spiSetSpeed(byte port, int speed);
 
-  public static native void spiSetBitsPerWord(byte port, byte bpw);
-
   public static native void spiSetOpts(byte port, int msb_first, int sample_on_trailing,
       int clk_idle_high);
 
