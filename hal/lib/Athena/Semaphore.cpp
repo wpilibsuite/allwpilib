@@ -9,6 +9,8 @@ TLogLevel semaphoreLogLevel = logDEBUG;
     if (level > semaphoreLogLevel) ; \
     else Log().Get(level)
 
+extern "C" {
+
 MUTEX_ID initializeMutexNormal() { return new priority_mutex; }
 
 void deleteMutex(MUTEX_ID sem) { delete sem; }
@@ -40,3 +42,5 @@ void takeMultiWait(MULTIWAIT_ID cond, MUTEX_ID m) {
 }
 
 void giveMultiWait(MULTIWAIT_ID cond) { cond->notify_all(); }
+
+}  // extern "C"

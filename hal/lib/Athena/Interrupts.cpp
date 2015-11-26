@@ -9,6 +9,8 @@ struct Interrupt // FIXME: why is this internal?
 	tInterruptManager *manager;
 };
 
+extern "C" {
+
 void* initializeInterrupts(uint32_t interruptIndex, bool watcher, int32_t *status)
 {
 	Interrupt* anInterrupt = new Interrupt();
@@ -121,3 +123,5 @@ void setInterruptUpSourceEdge(void* interrupt_pointer, bool risingEdge, bool fal
 	anInterrupt->anInterrupt->writeConfig_RisingEdge(risingEdge, status);
 	anInterrupt->anInterrupt->writeConfig_FallingEdge(fallingEdge, status);
 }
+
+}  // extern "C"

@@ -3,13 +3,15 @@
 #include <iostream>
 
 static const int NUM_MODULE_NUMBERS = 63;
-extern PCM *modules[NUM_MODULE_NUMBERS];
+extern PCM *PCM_modules[NUM_MODULE_NUMBERS];
 extern void initializePCM(int module);
+
+extern "C" {
 
 void *initializeCompressor(uint8_t module) {
 	initializePCM(module);
 	
-	return modules[module];
+	return PCM_modules[module];
 }
 
 bool checkCompressorModule(uint8_t module) {
@@ -114,3 +116,5 @@ void clearAllPCMStickyFaults(void *pcm_pointer, int32_t *status) {
 	
 	*status = module->ClearStickyFaults();
 }
+
+}  // extern "C"

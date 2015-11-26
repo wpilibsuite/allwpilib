@@ -4,6 +4,8 @@
 const int32_t HAL_NO_WAIT = 0;
 const int32_t HAL_WAIT_FOREVER = -1;
 
+extern "C" {
+
 void delayTicks(int32_t ticks)
 {
 	struct timespec test, remaining;
@@ -42,3 +44,5 @@ void delaySeconds(double s)
 		test = remaining;
 	}
 }
+
+}  // extern "C"

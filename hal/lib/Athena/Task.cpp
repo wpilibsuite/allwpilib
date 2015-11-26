@@ -9,6 +9,8 @@
 
 #include <signal.h>
 
+extern "C" {
+
 STATUS verifyTaskID(TASK task) {
   if (task != nullptr && pthread_kill(*task, 0) == 0) {
 	return OK;
@@ -49,3 +51,5 @@ STATUS getTaskPriority(TASK task, int* priority) {
     return ERROR;
   }
 }
+
+}  // extern "C"

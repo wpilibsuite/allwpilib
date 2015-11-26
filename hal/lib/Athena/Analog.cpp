@@ -24,18 +24,20 @@ struct AnalogPort {
   tAccumulator *accumulator;
 };
 
-bool analogSampleRateSet = false;
-priority_recursive_mutex analogRegisterWindowMutex;
-tAI* analogInputSystem = NULL;
-tAO* analogOutputSystem = NULL;
-uint32_t analogNumChannelsToActivate = 0;
+static bool analogSampleRateSet = false;
+static priority_recursive_mutex analogRegisterWindowMutex;
+static tAI* analogInputSystem = NULL;
+static tAO* analogOutputSystem = NULL;
+static uint32_t analogNumChannelsToActivate = 0;
+
+extern "C" {
 
 // Utility methods defined below.
-uint32_t getAnalogNumActiveChannels(int32_t *status);
-uint32_t getAnalogNumChannelsToActivate(int32_t *status);
-void setAnalogNumChannelsToActivate(uint32_t channels);
+static uint32_t getAnalogNumActiveChannels(int32_t *status);
+static uint32_t getAnalogNumChannelsToActivate(int32_t *status);
+static void setAnalogNumChannelsToActivate(uint32_t channels);
 
-bool analogSystemInitialized = false;
+static bool analogSystemInitialized = false;
 
 /**
  * Initialize the analog System.
@@ -424,7 +426,7 @@ int32_t getAnalogOffset(void* analog_port_pointer, int32_t *status) {
  *
  * @return Active channels.
  */
-uint32_t getAnalogNumActiveChannels(int32_t *status) {
+static uint32_t getAnalogNumActiveChannels(int32_t *status) {
   uint32_t scanSize = analogInputSystem->readConfig_ScanSize(status);
   if (scanSize == 0)
     return 8;
@@ -442,7 +444,7 @@ uint32_t getAnalogNumActiveChannels(int32_t *status) {
  *
  * @return Value to write to the active channels field.
  */
-uint32_t getAnalogNumChannelsToActivate(int32_t *status) {
+static uint32_t getAnalogNumChannelsToActivate(int32_t *status) {
   if(analogNumChannelsToActivate == 0) return getAnalogNumActiveChannels(status);
   return analogNumChannelsToActivate;
 }
@@ -455,7 +457,7 @@ uint32_t getAnalogNumChannelsToActivate(int32_t *status) {
  *
  * @param channels Number of active channels.
  */
-void setAnalogNumChannelsToActivate(uint32_t channels) {
+static void setAnalogNumChannelsToActivate(uint32_t channels) {
   analogNumChannelsToActivate = channels;
 }
 
@@ -744,3 +746,5 @@ int32_t getAnalogVoltsToValueIntHack(void* analog_port_pointer, int voltage, int
 void setAnalogTriggerLimitsVoltageIntHack(void* analog_trigger_pointer, int lower, int upper, int32_t *status) {
   setAnalogTriggerLimitsVoltage(analog_trigger_pointer, intToFloat(lower), intToFloat(upper), status);
 }
+
+}  // extern "C"

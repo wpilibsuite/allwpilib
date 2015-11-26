@@ -171,6 +171,8 @@ static double unpackAxis(int16_t raw) {
 	}
 }
 
+extern "C" {
+
 /**
  * Set the accelerometer to active or standby mode.  It must be in standby
  * mode to change any configuration.
@@ -232,3 +234,5 @@ double getAccelerometerZ() {
 	int raw = (readRegister(kReg_OutZMSB) << 4) | (readRegister(kReg_OutZLSB) >> 4);
 	return unpackAxis(raw);
 }
+
+}  // extern "C"

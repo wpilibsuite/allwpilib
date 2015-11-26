@@ -2,8 +2,10 @@
 #include "visa/visa.h"
 
 
-uint32_t m_resourceManagerHandle;
-uint32_t m_portHandle[2];
+static uint32_t m_resourceManagerHandle;
+static uint32_t m_portHandle[2];
+
+extern "C" {
 
 void serialInitializePort(uint8_t port, int32_t *status) {
 	char const * portName;
@@ -144,5 +146,5 @@ void serialClose(uint8_t port, int32_t *status) {
 	if(*status > 0)
 		*status = 0;
 }
-	
-	
+
+}  // extern "C"

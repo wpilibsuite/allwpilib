@@ -29,6 +29,8 @@ static uint32_t timeEpoch = 0;
 static uint32_t prevFPGATime = 0;
 static void* rolloverNotifier = nullptr;
 
+extern "C" {
+
 void* getPort(uint8_t pin)
 {
 	Port* port = new Port();
@@ -366,3 +368,5 @@ void imaqGetLastError()
 void niTimestamp64()
 {
 }
+
+}  // extern "C"
