@@ -76,7 +76,7 @@ const char* HALGetJoystickName(uint8_t joystickNum)
 	}
 }
 
-int HALGetJoystickAxisType(uint8_t joystickNum, int axis)
+int HALGetJoystickAxisType(uint8_t joystickNum, uint8_t axis)
 {
 	HALJoystickDescriptor joystickDesc;
 	if(HALGetJoystickDescriptor(joystickNum, &joystickDesc)<0)
