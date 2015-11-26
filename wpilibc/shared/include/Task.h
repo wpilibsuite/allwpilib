@@ -12,8 +12,6 @@
 #include <string>
 #include <thread>
 
-#include <string>
-
 /**
  * Wrapper class around std::thread that allows changing thread priority
  */

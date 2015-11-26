@@ -15,7 +15,8 @@ Task::Task(const std::string& name, Function&& function, Args&&... args) {
 
   std::cout << "[HAL] Starting task " << m_taskName << "..." << std::endl;
 
-  m_thread = std::thread(function, args...);
+  m_thread = std::thread(std::forward<std::decay_t<Function>>(function),
+                         std::forward<Args>(args)...);
   //TODO: lvuser does not currently have permissions to set the priority.
   //SetPriority(kDefaultPriority);
 
