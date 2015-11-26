@@ -84,7 +84,7 @@ TEST_F(PCMTest, DISABLED_PressureSwitch) {
 /**
  * Test if the correct solenoids turn on and off when they should
  */
-TEST_F(PCMTest, DISABLED_Solenoid) {
+TEST_F(PCMTest, Solenoid) {
   Reset();
   Solenoid solenoid1(TestBench::kSolenoidChannel1);
   Solenoid solenoid2(TestBench::kSolenoidChannel2);
@@ -95,6 +95,8 @@ TEST_F(PCMTest, DISABLED_Solenoid) {
   Wait(kSolenoidDelayTime);
   EXPECT_TRUE(m_fakeSolenoid1->Get()) << "Solenoid #1 did not turn off";
   EXPECT_TRUE(m_fakeSolenoid2->Get()) << "Solenoid #2 did not turn off";
+  EXPECT_FALSE(solenoid1.Get()) << "Solenoid #1 did not read off";
+  EXPECT_FALSE(solenoid2.Get()) << "Solenoid #2 did not read off";
 
   // Turn one solenoid on and one off
   solenoid1.Set(true);
@@ -102,6 +104,8 @@ TEST_F(PCMTest, DISABLED_Solenoid) {
   Wait(kSolenoidDelayTime);
   EXPECT_FALSE(m_fakeSolenoid1->Get()) << "Solenoid #1 did not turn on";
   EXPECT_TRUE(m_fakeSolenoid2->Get()) << "Solenoid #2 did not turn off";
+  EXPECT_TRUE(solenoid1.Get()) << "Solenoid #1 did not read on";
+  EXPECT_FALSE(solenoid2.Get()) << "Solenoid #2 did not read off";
 
   // Turn one solenoid on and one off
   solenoid1.Set(false);
@@ -109,6 +113,8 @@ TEST_F(PCMTest, DISABLED_Solenoid) {
   Wait(kSolenoidDelayTime);
   EXPECT_TRUE(m_fakeSolenoid1->Get()) << "Solenoid #1 did not turn off";
   EXPECT_FALSE(m_fakeSolenoid2->Get()) << "Solenoid #2 did not turn on";
+  EXPECT_FALSE(solenoid1.Get()) << "Solenoid #1 did not read off";
+  EXPECT_TRUE(solenoid2.Get()) << "Solenoid #2 did not read on";
 
   // Turn both on
   solenoid1.Set(true);
@@ -116,13 +122,15 @@ TEST_F(PCMTest, DISABLED_Solenoid) {
   Wait(kSolenoidDelayTime);
   EXPECT_FALSE(m_fakeSolenoid1->Get()) << "Solenoid #1 did not turn on";
   EXPECT_FALSE(m_fakeSolenoid2->Get()) << "Solenoid #2 did not turn on";
+  EXPECT_TRUE(solenoid1.Get()) << "Solenoid #1 did not read on";
+  EXPECT_TRUE(solenoid2.Get()) << "Solenoid #2 did not read on";
 }
 
 /**
  * Test if the correct solenoids turn on and off when they should when used
  * with the DoubleSolenoid class.
  */
-TEST_F(PCMTest, DISABLED_DoubleSolenoid) {
+TEST_F(PCMTest, DoubleSolenoid) {
   DoubleSolenoid solenoid(TestBench::kSolenoidChannel1,
                           TestBench::kSolenoidChannel2);
 
@@ -130,14 +138,17 @@ TEST_F(PCMTest, DISABLED_DoubleSolenoid) {
   Wait(kSolenoidDelayTime);
   EXPECT_TRUE(m_fakeSolenoid1->Get()) << "Solenoid #1 did not turn off";
   EXPECT_TRUE(m_fakeSolenoid2->Get()) << "Solenoid #2 did not turn off";
+  EXPECT_TRUE(solenoid.Get() == DoubleSolenoid::kOff) << "Solenoid does not read off";
 
   solenoid.Set(DoubleSolenoid::kForward);
   Wait(kSolenoidDelayTime);
   EXPECT_FALSE(m_fakeSolenoid1->Get()) << "Solenoid #1 did not turn on";
   EXPECT_TRUE(m_fakeSolenoid2->Get()) << "Solenoid #2 did not turn off";
+  EXPECT_TRUE(solenoid.Get() == DoubleSolenoid::kForward) << "Solenoid does not read forward";
 
   solenoid.Set(DoubleSolenoid::kReverse);
   Wait(kSolenoidDelayTime);
   EXPECT_TRUE(m_fakeSolenoid1->Get()) << "Solenoid #1 did not turn off";
   EXPECT_FALSE(m_fakeSolenoid2->Get()) << "Solenoid #2 did not turn on";
+  EXPECT_TRUE(solenoid.Get() == DoubleSolenoid::kReverse) << "Solenoid does not read reverse";
 }
