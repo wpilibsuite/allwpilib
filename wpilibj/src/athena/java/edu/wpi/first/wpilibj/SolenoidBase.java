@@ -18,7 +18,7 @@ public abstract class SolenoidBase extends SensorBase {
   private long[] m_ports;
   protected int m_moduleNumber; // /< The number of the solenoid module being
                                 // used.
-  protected Resource m_allocated = new Resource(63 * SensorBase.kSolenoidChannels);
+  protected static Resource m_allocated = new Resource(63 * SensorBase.kSolenoidChannels);
 
   /**
    * Constructor.
