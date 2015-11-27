@@ -411,6 +411,11 @@ extern "C" {
 	CTR_Code c_TalonSRX_SetProfileSlotSelect(void *handle, int param);
 	CTR_Code c_TalonSRX_SetRampThrottle(void *handle, int param);
 	CTR_Code c_TalonSRX_SetRevFeedbackSensor(void *handle, int param);
+	CTR_Code c_TalonSRX_GetPulseWidthPosition(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetPulseWidthVelocity(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetPulseWidthRiseToFallUs(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetPulseWidthRiseToRiseUs(void *handle, int *param);
+	CTR_Code c_TalonSRX_IsPulseWidthSensorPresent(void *handle, int *param);
 }
 #endif
 

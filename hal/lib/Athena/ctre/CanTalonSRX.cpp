@@ -1394,4 +1394,24 @@ CTR_Code c_TalonSRX_SetRevFeedbackSensor(void *handle, int param)
 {
 	return ((CanTalonSRX*)handle)->SetRevFeedbackSensor(param);
 }
+CTR_Code c_TalonSRX_GetPulseWidthPosition(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetPulseWidthPosition(*param);
+}
+CTR_Code c_TalonSRX_GetPulseWidthVelocity(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetPulseWidthVelocity(*param);
+}
+CTR_Code c_TalonSRX_GetPulseWidthRiseToFallUs(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetPulseWidthRiseToFallUs(*param);
+}
+CTR_Code c_TalonSRX_GetPulseWidthRiseToRiseUs(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetPulseWidthRiseToRiseUs(*param);
+}
+CTR_Code c_TalonSRX_IsPulseWidthSensorPresent(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->IsPulseWidthSensorPresent(*param);
+}
 }
