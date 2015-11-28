@@ -115,8 +115,8 @@ void NetworkTable::AddTableListenerEx(ITableListener* listener,
   std::size_t prefix_len = path.size();
   unsigned int id = nt::AddEntryListener(
       path,
-      [=](unsigned int uid, StringRef name, std::shared_ptr<nt::Value> value,
-          unsigned int flags_) {
+      [=](unsigned int /*uid*/, StringRef name,
+          std::shared_ptr<nt::Value> value, unsigned int flags_) {
         StringRef relative_key = name.substr(prefix_len);
         if (relative_key.find(PATH_SEPARATOR_CHAR) != StringRef::npos) return;
         listener->ValueChangedEx(this, relative_key, value, flags_);
@@ -141,7 +141,7 @@ void NetworkTable::AddTableListenerEx(StringRef key, ITableListener* listener,
   path += key;
   unsigned int id = nt::AddEntryListener(
       path,
-      [=](unsigned int uid, StringRef name, std::shared_ptr<nt::Value> value,
+      [=](unsigned int /*uid*/, StringRef name, std::shared_ptr<nt::Value> value,
           unsigned int flags_) {
         if (name != path) return;
         listener->ValueChangedEx(this, name.substr(prefix_len), value, flags_);
@@ -169,8 +169,8 @@ void NetworkTable::AddSubTableListener(ITableListener* listener,
   if (localNotify) flags |= NT_NOTIFY_LOCAL;
   unsigned int id = nt::AddEntryListener(
       path,
-      [=](unsigned int uid, StringRef name, std::shared_ptr<nt::Value> value,
-          unsigned int flags_) mutable {
+      [=](unsigned int /*uid*/, StringRef name,
+          std::shared_ptr<nt::Value> /*value*/, unsigned int flags_) mutable {
         StringRef relative_key = name.substr(prefix_len);
         auto end_sub_table = relative_key.find(PATH_SEPARATOR_CHAR);
         if (end_sub_table == StringRef::npos) return;

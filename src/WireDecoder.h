@@ -74,7 +74,7 @@ class WireDecoder {
   bool Read8(unsigned int* val) {
     const char* buf;
     if (!Read(&buf, 1)) return false;
-    *val = (*((unsigned char*)buf)) & 0xff;
+    *val = (*reinterpret_cast<const unsigned char*>(buf)) & 0xff;
     return true;
   }
 
@@ -82,10 +82,10 @@ class WireDecoder {
   bool Read16(unsigned int* val) {
     const char* buf;
     if (!Read(&buf, 2)) return false;
-    unsigned int v = (*((unsigned char*)buf)) & 0xff;
+    unsigned int v = (*reinterpret_cast<const unsigned char*>(buf)) & 0xff;
     ++buf;
     v <<= 8;
-    v |= (*((unsigned char*)buf)) & 0xff;
+    v |= (*reinterpret_cast<const unsigned char*>(buf)) & 0xff;
     *val = v;
     return true;
   }
@@ -94,16 +94,16 @@ class WireDecoder {
   bool Read32(unsigned long* val) {
     const char* buf;
     if (!Read(&buf, 4)) return false;
-    unsigned int v = (*((unsigned char*)buf)) & 0xff;
+    unsigned int v = (*reinterpret_cast<const unsigned char*>(buf)) & 0xff;
     ++buf;
     v <<= 8;
-    v |= (*((unsigned char*)buf)) & 0xff;
+    v |= (*reinterpret_cast<const unsigned char*>(buf)) & 0xff;
     ++buf;
     v <<= 8;
-    v |= (*((unsigned char*)buf)) & 0xff;
+    v |= (*reinterpret_cast<const unsigned char*>(buf)) & 0xff;
     ++buf;
     v <<= 8;
-    v |= (*((unsigned char*)buf)) & 0xff;
+    v |= (*reinterpret_cast<const unsigned char*>(buf)) & 0xff;
     *val = v;
     return true;
   }

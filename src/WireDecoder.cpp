@@ -19,28 +19,28 @@ using namespace nt;
 
 static double ReadDouble(const char*& buf) {
   // Fast but non-portable!
-  std::uint64_t val = (*((unsigned char*)buf)) & 0xff;
+  std::uint64_t val = (*reinterpret_cast<const unsigned char*>(buf)) & 0xff;
   ++buf;
   val <<= 8;
-  val |= (*((unsigned char*)buf)) & 0xff;
+  val |= (*reinterpret_cast<const unsigned char*>(buf)) & 0xff;
   ++buf;
   val <<= 8;
-  val |= (*((unsigned char*)buf)) & 0xff;
+  val |= (*reinterpret_cast<const unsigned char*>(buf)) & 0xff;
   ++buf;
   val <<= 8;
-  val |= (*((unsigned char*)buf)) & 0xff;
+  val |= (*reinterpret_cast<const unsigned char*>(buf)) & 0xff;
   ++buf;
   val <<= 8;
-  val |= (*((unsigned char*)buf)) & 0xff;
+  val |= (*reinterpret_cast<const unsigned char*>(buf)) & 0xff;
   ++buf;
   val <<= 8;
-  val |= (*((unsigned char*)buf)) & 0xff;
+  val |= (*reinterpret_cast<const unsigned char*>(buf)) & 0xff;
   ++buf;
   val <<= 8;
-  val |= (*((unsigned char*)buf)) & 0xff;
+  val |= (*reinterpret_cast<const unsigned char*>(buf)) & 0xff;
   ++buf;
   val <<= 8;
-  val |= (*((unsigned char*)buf)) & 0xff;
+  val |= (*reinterpret_cast<const unsigned char*>(buf)) & 0xff;
   ++buf;
   return llvm::BitsToDouble(val);
 }

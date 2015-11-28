@@ -72,7 +72,7 @@ std::size_t ReadUleb128(const char* addr, unsigned long* ret) {
   std::size_t count = 0;
 
   while (1) {
-    unsigned char byte = *((unsigned char*)addr);
+    unsigned char byte = *reinterpret_cast<const unsigned char*>(addr);
     addr++;
     count++;
 
