@@ -13,35 +13,47 @@
 #include "llvm/StringRef.h"
 
 #define wpi_setErrnoErrorWithContext(context) \
-  (this->SetErrnoError((context), __FILE__, __FUNCTION__, __LINE__))
-#define wpi_setErrnoError() (wpi_setErrnoErrorWithContext(""))
-#define wpi_setImaqErrorWithContext(code, context) \
-  (this->SetImaqError((code), (context), __FILE__, __FUNCTION__, __LINE__))
-#define wpi_setErrorWithContext(code, context) \
-  (this->SetError((code), (context), __FILE__, __FUNCTION__, __LINE__))
-#define wpi_setError(code) (wpi_setErrorWithContext(code, ""))
-#define wpi_setStaticErrorWithContext(object, code, context) \
-  (object->SetError((code), (context), __FILE__, __FUNCTION__, __LINE__))
+  this->SetErrnoError((context), __FILE__, __FUNCTION__, __LINE__)
+#define wpi_setErrnoError() wpi_setErrnoErrorWithContext("")
+#define wpi_setImaqErrorWithContext(code, context)                             \
+  do {                                                                         \
+    if ((code) != 0)                                                           \
+      this->SetImaqError((code), (context), __FILE__, __FUNCTION__, __LINE__); \
+  } while (0)
+#define wpi_setErrorWithContext(code, context)                             \
+  do {                                                                     \
+    if ((code) != 0)                                                       \
+      this->SetError((code), (context), __FILE__, __FUNCTION__, __LINE__); \
+  } while (0)
+#define wpi_setError(code) wpi_setErrorWithContext(code, "")
+#define wpi_setStaticErrorWithContext(object, code, context)                 \
+  do {                                                                       \
+    if ((code) != 0)                                                         \
+      object->SetError((code), (context), __FILE__, __FUNCTION__, __LINE__); \
+  } while (0)
 #define wpi_setStaticError(object, code) \
-  (wpi_setStaticErrorWithContext(object, code, ""))
-#define wpi_setGlobalErrorWithContext(code, context)                    \
-  (ErrorBase::SetGlobalError((code), (context), __FILE__, __FUNCTION__, \
-                             __LINE__))
-#define wpi_setGlobalError(code) (wpi_setGlobalErrorWithContext(code, ""))
-#define wpi_setWPIErrorWithContext(error, context)                     \
-  (this->SetWPIError((wpi_error_s_##error), (wpi_error_value_##error), \
-                     (context), __FILE__, __FUNCTION__, __LINE__))
+  wpi_setStaticErrorWithContext(object, code, "")
+#define wpi_setGlobalErrorWithContext(code, context)                       \
+  do {                                                                     \
+    if ((code) != 0)                                                       \
+      ErrorBase::SetGlobalError((code), (context), __FILE__, __FUNCTION__, \
+                                __LINE__);                                 \
+  } while (0)
+#define wpi_setGlobalError(code) wpi_setGlobalErrorWithContext(code, "")
+#define wpi_setWPIErrorWithContext(error, context)                    \
+  this->SetWPIError((wpi_error_s_##error), (wpi_error_value_##error), \
+                    (context), __FILE__, __FUNCTION__, __LINE__)
 #define wpi_setWPIError(error) (wpi_setWPIErrorWithContext(error, ""))
-#define wpi_setStaticWPIErrorWithContext(object, error, context)   \
-  (object->SetWPIError((wpi_error_s_##error), (context), __FILE__, \
-                       __FUNCTION__, __LINE__))
+#define wpi_setStaticWPIErrorWithContext(object, error, context)  \
+  object->SetWPIError((wpi_error_s_##error), (context), __FILE__, \
+                      __FUNCTION__, __LINE__)
 #define wpi_setStaticWPIError(object, error) \
-  (wpi_setStaticWPIErrorWithContext(object, error, ""))
-#define wpi_setGlobalWPIErrorWithContext(error, context)                    \
-  (ErrorBase::SetGlobalWPIError((wpi_error_s_##error), (context), __FILE__, \
-                                __FUNCTION__, __LINE__))
+  wpi_setStaticWPIErrorWithContext(object, error, "")
+#define wpi_setGlobalWPIErrorWithContext(error, context)                   \
+  ErrorBase::SetGlobalWPIError((wpi_error_s_##error), (context), __FILE__, \
+                               __FUNCTION__, __LINE__)
 #define wpi_setGlobalWPIError(error) \
-  (wpi_setGlobalWPIErrorWithContext(error, ""))
+  wpi_setGlobalWPIErrorWithContext(error, "")
 
 /**
  * Base class for most objects.
