@@ -28,8 +28,9 @@ class Notifier : public ErrorBase {
  private:
   static Notifier *timerQueueHead;
   static priority_recursive_mutex queueMutex;
+  static priority_mutex halMutex;
   static void *m_notifier;
-  static int refcount;
+  static std::atomic<int> refcount;
 
   static void ProcessQueue(
       uint32_t mask, void *params);  // process the timer queue on a timer event
