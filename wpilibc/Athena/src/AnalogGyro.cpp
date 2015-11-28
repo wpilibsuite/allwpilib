@@ -19,65 +19,13 @@ constexpr float AnalogGyro::kCalibrationSampleTime;
 constexpr float AnalogGyro::kDefaultVoltsPerDegreePerSecond;
 
 /**
- * Initialize the gyro.
- * Calibrate the gyro by running for a number of samples and computing the
- * center value.
- * Then use the center value as the Accumulator center value for subsequent
- * measurements.
- * It's important to make sure that the robot is not moving while the centering
- * calculations are
- * in progress, this is typically done when the robot is first turned on while
- * it's sitting at
- * rest before the competition starts.
- */
-void AnalogGyro::InitGyro() {
-  if (!m_analog->IsAccumulatorChannel()) {
-    wpi_setWPIErrorWithContext(ParameterOutOfRange,
-                               " channel (must be accumulator channel)");
-    m_analog = nullptr;
-    return;
-  }
-
-  m_voltsPerDegreePerSecond = kDefaultVoltsPerDegreePerSecond;
-  m_analog->SetAverageBits(kAverageBits);
-  m_analog->SetOversampleBits(kOversampleBits);
-  float sampleRate =
-      kSamplesPerSecond * (1 << (kAverageBits + kOversampleBits));
-  m_analog->SetSampleRate(sampleRate);
-  Wait(1.0);
-
-  m_analog->InitAccumulator();
-
-  Wait(kCalibrationSampleTime);
-
-  int64_t value;
-  uint32_t count;
-  m_analog->GetAccumulatorOutput(value, count);
-
-  m_center = (uint32_t)((float)value / (float)count + .5);
-
-  m_offset = ((float)value / (float)count) - (float)m_center;
-  m_analog->SetAccumulatorCenter(m_center);
-  m_analog->ResetAccumulator();
-
-  SetDeadband(0.0f);
-
-  SetPIDSourceType(PIDSourceType::kDisplacement);
-
-  HALReport(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel());
-  LiveWindow::GetInstance()->AddSensor("Gyro", m_analog->GetChannel(), this);
-}
-
-/**
  * Gyro constructor using the Analog Input channel number.
  *
  * @param channel The analog channel the gyro is connected to. Gyros
                       can only be used on on-board Analog Inputs 0-1.
  */
-AnalogGyro::AnalogGyro(int32_t channel) {
-  m_analog = std::make_shared<AnalogInput>(channel);
-  InitGyro();
-}
+AnalogGyro::AnalogGyro(int32_t channel) :
+    AnalogGyro(std::make_shared<AnalogInput>(channel)) {}
 
 /**
  * Gyro constructor with a precreated AnalogInput object.
@@ -108,7 +56,29 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel)
   if (channel == nullptr) {
     wpi_setWPIError(NullParameter);
   } else {
-    InitGyro();
+    if (!m_analog->IsAccumulatorChannel()) {
+      wpi_setWPIErrorWithContext(ParameterOutOfRange,
+                                 " channel (must be accumulator channel)");
+      m_analog = nullptr;
+      return;
+    }
+
+    m_voltsPerDegreePerSecond = kDefaultVoltsPerDegreePerSecond;
+    m_analog->SetAverageBits(kAverageBits);
+    m_analog->SetOversampleBits(kOversampleBits);
+    float sampleRate =
+        kSamplesPerSecond * (1 << (kAverageBits + kOversampleBits));
+    m_analog->SetSampleRate(sampleRate);
+    Wait(0.1);
+
+    SetDeadband(0.0f);
+
+    SetPIDSourceType(PIDSourceType::kDisplacement);
+
+    HALReport(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel());
+    LiveWindow::GetInstance()->AddSensor("Gyro", m_analog->GetChannel(), this);
+
+    Calibrate();
   }
 }
 
@@ -119,6 +89,27 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel)
  * drift in the gyro and it needs to be recalibrated after it has been running.
  */
 void AnalogGyro::Reset() { m_analog->ResetAccumulator(); }
+
+/**
+ * {@inheritDoc}
+ */
+void AnalogGyro::Calibrate() {
+  if (StatusIsFatal()) return;
+
+  m_analog->InitAccumulator();
+
+  Wait(kCalibrationSampleTime);
+
+  int64_t value;
+  uint32_t count;
+  m_analog->GetAccumulatorOutput(value, count);
+
+  m_center = (uint32_t)((float)value / (float)count + .5);
+
+  m_offset = ((float)value / (float)count) - (float)m_center;
+  m_analog->SetAccumulatorCenter(m_center);
+  m_analog->ResetAccumulator();
+}
 
 /**
  * Return the actual angle in degrees that the robot is currently facing.

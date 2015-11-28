@@ -10,14 +10,14 @@ package edu.wpi.first.wpilibj.interfaces;
  */
 public interface Gyro {
   /**
-   * Initialize the gyro. Calibrate the gyro by running for a number of samples
-   * and computing the center value. Then use the center value as the
-   * Accumulator center value for subsequent measurements. It's important to
-   * make sure that the robot is not moving while the centering calculations are
-   * in progress, this is typically done when the robot is first turned on while
-   * it's sitting at rest before the competition starts.
+   * Calibrate the gyro by running for a number of samples and computing the
+   * center value. Then use the center value as the Accumulator center value for
+   * subsequent measurements. It's important to make sure that the robot is not
+   * moving while the centering calculations are in progress, this is typically
+   * done when the robot is first turned on while it's sitting at rest before
+   * the competition starts.
    */
-  public void initGyro();
+  public void calibrate();
 
   /**
    * Reset the gyro. Resets the gyro to a heading of zero. This can be used if

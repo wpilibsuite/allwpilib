@@ -49,7 +49,7 @@ class AnalogGyro : public GyroBase {
   void SetSensitivity(float voltsPerDegreePerSecond);
   void SetDeadband(float volts);
   void Reset() override;
-  void InitGyro() override;
+  void Calibrate() override;
 
   std::string GetSmartDashboardType() const override;
 

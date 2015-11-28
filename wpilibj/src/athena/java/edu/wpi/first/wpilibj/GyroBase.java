@@ -21,7 +21,7 @@ public abstract class GyroBase extends SensorBase implements Gyro, PIDSource, Li
   /**
    * {@inheritDoc}
    */
-  public abstract void initGyro();
+  public abstract void calibrate();
 
   /**
    * {@inheritDoc}
