@@ -15,7 +15,6 @@ set (INCLUDE_FOLDERS include
   ${Boost_INCLUDE_DIR}
   ${GAZEBO_INCLUDE_DIRS})
 
-message("inc=${INCLUDE_FOLDERS}")
 
 include_directories(${INCLUDE_FOLDERS})
 

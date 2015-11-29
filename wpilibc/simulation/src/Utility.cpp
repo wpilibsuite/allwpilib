@@ -16,7 +16,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#if defined(UNIX)
+#if not defined(_WIN32)
 	#include <execinfo.h>
 	#include <cxxabi.h>
 #endif
@@ -58,29 +58,27 @@ static void wpi_handleTracing()
  * This allows breakpoints to be set on an assert.
  * The users don't call this, but instead use the wpi_assert macros in Utility.h.
  */
-bool wpi_assert_impl(bool conditionValue, const std::string &conditionText,
-                     const std::string &message, const std::string &fileName,
-                     uint32_t lineNumber, const std::string &funcName) {
+bool wpi_assert_impl(bool conditionValue, const char *conditionText,
+                     const char *message, const char *fileName,
+                     uint32_t lineNumber, const char *funcName) {
   if (!conditionValue) {
-    // Error string buffer
-    std::stringstream error;
+    std::stringstream errorStream;
 
-    // If an error message was specified, include it
-    // Build error string
-    if (message.size()) {
-      error << "Assertion failed: \"" << message << "\", \"" << conditionText
-            << "\" failed in " << funcName + "() in " << fileName << " at line "
-            << lineNumber;
+    errorStream << "Assertion \"" << conditionText << "\" ";
+    errorStream << "on line " << lineNumber << " ";
+    errorStream << "of " << basename(fileName) << " ";
+
+    if (message[0] != '\0') {
+      errorStream << "failed: " << message << std::endl;
     } else {
-      error << "Assertion failed: \"" << conditionText << "\" in " << funcName
-            << "() in " << fileName << " at line " << lineNumber;
+      errorStream << "failed." << std::endl;
     }
 
     // Print to console and send to remote dashboard
-    std::cout << "\n\n>>>>" << error.str();
-
+    std::cout << "\n\n>>>>" << errorStream.str();
     wpi_handleTracing();
   }
+
   return conditionValue;
 }
 
@@ -167,7 +165,7 @@ uint32_t GetFPGATime()
 }
 
 //TODO: implement symbol demangling and backtrace on windows
-#if defined(UNIX)
+#if not defined(_WIN32)
 
 /**
  * Demangle a C++ symbol, used for printing stack traces.

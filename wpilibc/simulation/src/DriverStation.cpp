@@ -1,227 +1,81 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008. All Rights Reserved.
- */
+/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
 #include "DriverStation.h"
-#include "AnalogInput.h"
 #include "Timer.h"
-#include "NetworkCommunication/FRCComm.h"
-#include "MotorSafetyHelper.h"
+#include "simulation/MainNode.h"
+//#include "MotorSafetyHelper.h"
 #include "Utility.h"
 #include "WPIErrors.h"
 #include <string.h>
 #include "Log.hpp"
+#include "boost/mem_fn.hpp"
 
 // set the logging level
 TLogLevel dsLogLevel = logDEBUG;
-const double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
 
 #define DS_LOG(level) \
-  if (level > dsLogLevel) ; \
-  else Log().Get(level)
+    if (level > dsLogLevel) ; \
+    else Log().Get(level)
 
+const uint32_t DriverStation::kBatteryChannel;
 const uint32_t DriverStation::kJoystickPorts;
+const uint32_t DriverStation::kJoystickAxes;
+const float DriverStation::kUpdatePeriod = 0.02;
+uint8_t DriverStation::m_updateNumber = 0;
 
 /**
- * DriverStation constructor.
+ * DriverStation contructor.
  *
  * This is only called once the first time GetInstance() is called
  */
 DriverStation::DriverStation() {
-  // All joysticks should default to having zero axes, povs and buttons, so
-  // uninitialized memory doesn't get sent to speed controllers.
-  for (unsigned int i = 0; i < kJoystickPorts; i++) {
-    m_joystickAxes[i].count = 0;
-    m_joystickPOVs[i].count = 0;
-    m_joystickButtons[i].count = 0;
-    m_joystickDescriptor[i].isXbox = 0;
-    m_joystickDescriptor[i].type = -1;
-    m_joystickDescriptor[i].name[0] = '\0';
-  }
-  // Register that semaphore with the network communications task.
-  // It will signal when new packet data is available.
-  HALSetNewDataSem(&m_packetDataAvailableCond);
+	state = msgs::DriverStationPtr(new msgs::DriverStation());
+	stateSub = MainNode::Subscribe("~/ds/state",
+		                   &DriverStation::stateCallback, this);
+	// TODO: for loop + boost bind
+	joysticks[0] = msgs::FRCJoystickPtr(new msgs::FRCJoystick());
+	joysticksSub[0] =  MainNode::Subscribe("~/ds/joysticks/0",
+		                           &DriverStation::joystickCallback0, this);
+	joysticks[1] = msgs::FRCJoystickPtr(new msgs::FRCJoystick());
+	joysticksSub[1] =  MainNode::Subscribe("~/ds/joysticks/1",
+		                           &DriverStation::joystickCallback1, this);
+	joysticks[2] = msgs::FRCJoystickPtr(new msgs::FRCJoystick());
+	joysticksSub[2] =  MainNode::Subscribe("~/ds/joysticks/2",
+		                           &DriverStation::joystickCallback2, this);
+	joysticks[3] = msgs::FRCJoystickPtr(new msgs::FRCJoystick());
+	joysticksSub[3] =  MainNode::Subscribe("~/ds/joysticks/5",
+	                                   &DriverStation::joystickCallback3, this);
+	joysticks[4] = msgs::FRCJoystickPtr(new msgs::FRCJoystick());
+	joysticksSub[4] =  MainNode::Subscribe("~/ds/joysticks/4",
+	                                   &DriverStation::joystickCallback4, this);
+	joysticks[5] = msgs::FRCJoystickPtr(new msgs::FRCJoystick());
+	joysticksSub[5] =  MainNode::Subscribe("~/ds/joysticks/5",
+	                                   &DriverStation::joystickCallback5, this);
 
-  AddToSingletonList();
-
-}
-
-void DriverStation::Run() {
-  int period = 0;
-  while (true) {
-    {
-      std::unique_lock<priority_mutex> lock(m_packetDataAvailableMutex);
-      m_packetDataAvailableCond.wait(lock);
-    }
-    GetData();
-    m_waitForDataCond.notify_all();
-
-    if (++period >= 4) {
-      MotorSafetyHelper::CheckMotors();
-      period = 0;
-    }
-    if (m_userInDisabled) HALNetworkCommunicationObserveUserProgramDisabled();
-    if (m_userInAutonomous) HALNetworkCommunicationObserveUserProgramAutonomous();
-    if (m_userInTeleop) HALNetworkCommunicationObserveUserProgramTeleop();
-    if (m_userInTest) HALNetworkCommunicationObserveUserProgramTest();
-  }
+	AddToSingletonList();
 }
 
 /**
- * Return a reference to the singleton DriverStation.
- * @return Pointer to the DS instance
+ * Return a pointer to the singleton DriverStation.
  */
-DriverStation &DriverStation::GetInstance() {
-  static DriverStation instance;
-  return instance;
+DriverStation& DriverStation::GetInstance()
+{
+	static DriverStation instance;
+	return instance;
 }
 
 /**
- * Copy data from the DS task for the user.
- * If no new data exists, it will just be returned, otherwise
- * the data will be copied from the DS polling loop.
- */
-void DriverStation::GetData() {
-  // Get the status of all of the joysticks
-  for (uint8_t stick = 0; stick < kJoystickPorts; stick++) {
-    HALGetJoystickAxes(stick, &m_joystickAxes[stick]);
-    HALGetJoystickPOVs(stick, &m_joystickPOVs[stick]);
-    HALGetJoystickButtons(stick, &m_joystickButtons[stick]);
-    HALGetJoystickDescriptor(stick, &m_joystickDescriptor[stick]);
-  }
-  m_newControlData.give();
-}
-
-/**
- * Read the battery voltage.
+ * Read the battery voltage. Hardcoded to 12 volts for Simulation.
  *
- * @return The battery voltage in Volts.
+ * @return The battery voltage.
  */
-float DriverStation::GetBatteryVoltage() const {
-  int32_t status = 0;
-  float voltage = getVinVoltage(&status);
-  wpi_setErrorWithContext(status, "getVinVoltage");
-
-  return voltage;
-}
-
-/**
- * Reports errors related to unplugged joysticks
- * Throttles the errors so that they don't overwhelm the DS
- */
-void DriverStation::ReportJoystickUnpluggedError(std::string message) {
-  double currentTime = Timer::GetFPGATimestamp();
-  if (currentTime > m_nextMessageTime) {
-    ReportError(message);
-    m_nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;
-  }
-}
-
-/**
- * Returns the number of axes on a given joystick port
- *
- * @param stick The joystick port number
- * @return The number of axes on the indicated joystick
- */
-int DriverStation::GetStickAxisCount(uint32_t stick) const {
-  if (stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
-    return 0;
-  }
-  HALJoystickAxes joystickAxes;
-  HALGetJoystickAxes(stick, &joystickAxes);
-  return joystickAxes.count;
-}
-
-/**
- * Returns the name of the joystick at the given port
- *
- * @param stick The joystick port number
- * @return The name of the joystick at the given port
- */
-std::string DriverStation::GetJoystickName(uint32_t stick) const {
-  if (stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
-  }
-  std::string retVal(m_joystickDescriptor[0].name);
-  return retVal;
-}
-
-/**
- * Returns the type of joystick at a given port
- *
- * @param stick The joystick port number
- * @return The HID type of joystick at the given port
- */
-int DriverStation::GetJoystickType(uint32_t stick) const {
-  if (stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
-    return -1;
-  }
-  return (int)m_joystickDescriptor[stick].type;
-}
-
-/**
- * Returns a boolean indicating if the controller is an xbox controller.
- *
- * @param stick The joystick port number
- * @return A boolean that is true if the controller is an xbox controller.
- */
-bool DriverStation::GetJoystickIsXbox(uint32_t stick) const {
-  if (stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
-    return false;
-  }
-  return (bool)m_joystickDescriptor[stick].isXbox;
-}
-
-/**
- * Returns the types of Axes on a given joystick port
- *
- * @param stick The joystick port number and the target axis
- * @return What type of axis the axis is reporting to be
- */
-int DriverStation::GetJoystickAxisType(uint32_t stick, uint8_t axis) const {
-  if (stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
-    return -1;
-  }
-  return m_joystickDescriptor[stick].axisTypes[axis];
-}
-
-/**
- * Returns the number of POVs on a given joystick port
- *
- * @param stick The joystick port number
- * @return The number of POVs on the indicated joystick
- */
-int DriverStation::GetStickPOVCount(uint32_t stick) const {
-  if (stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
-    return 0;
-  }
-  HALJoystickPOVs joystickPOVs;
-  HALGetJoystickPOVs(stick, &joystickPOVs);
-  return joystickPOVs.count;
-}
-
-/**
- * Returns the number of buttons on a given joystick port
- *
- * @param stick The joystick port number
- * @return The number of buttons on the indicated joystick
- */
-int DriverStation::GetStickButtonCount(uint32_t stick) const {
-  if (stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
-    return 0;
-  }
-  HALJoystickButtons joystickButtons;
-  HALGetJoystickButtons(stick, &joystickButtons);
-  return joystickButtons.count;
+float DriverStation::GetBatteryVoltage() const
+{
+	return 12.0; // 12 volts all the time!
 }
 
 /**
@@ -232,287 +86,285 @@ int DriverStation::GetStickButtonCount(uint32_t stick) const {
  * @param axis The analog axis value to read from the joystick.
  * @return The value of the axis on the joystick.
  */
-float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis) {
-  if (stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
-    return 0;
-  }
+float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
+{
+	if (axis < 0 || axis > (kJoystickAxes - 1))
+	{
+		wpi_setWPIError(BadJoystickAxis);
+		return 0.0;
+	}
+	if (stick < 0 || stick > 5)
+	{
+		wpi_setWPIError(BadJoystickIndex);
+		return 0.0;
+	}
 
-  if (axis >= m_joystickAxes[stick].count) {
-    if (axis >= kMaxJoystickAxes) {
-      wpi_setWPIError(BadJoystickAxis);
-    }
-    else {
-      ReportJoystickUnpluggedError(
-          "WARNING: Joystick Axis missing, check if all controllers are "
-          "plugged in\n");
-    }
-    return 0.0f;
-  }
-
-  int8_t value = m_joystickAxes[stick].axes[axis];
-
-  if (value < 0) {
-    return value / 128.0f;
-  } else {
-    return value / 127.0f;
-  }
+	std::unique_lock<std::recursive_mutex> lock(m_joystickMutex);
+	if (joysticks[stick] == nullptr || axis >= joysticks[stick]->axes().size())
+	{
+		return 0.0;
+	}
+	return joysticks[stick]->axes(axis);
 }
 
 /**
- * Get the state of a POV on the joystick.
+ * The state of a specific button (1 - 12) on the joystick.
+ * This method only works in simulation, but is more efficient than GetStickButtons.
  *
- * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
+ * @param stick The joystick to read.
+ * @param button The button number to check.
+ * @return If the button is pressed.
  */
-int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
-  if (stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
-    return -1;
-  }
+bool DriverStation::GetStickButton(uint32_t stick, uint32_t button)
+{
+    if (stick < 0 || stick >= 6)
+	{
+		wpi_setWPIErrorWithContext(ParameterOutOfRange, "stick must be between 0 and 5");
+		return false;
+	}
 
-  if (pov >= m_joystickPOVs[stick].count) {
-    if (pov >= kMaxJoystickPOVs) {
-      wpi_setWPIError(BadJoystickAxis);
-    }
-    else {
-      ReportJoystickUnpluggedError(
-          "WARNING: Joystick POV missing, check if all controllers are plugged "
-          "in\n");
-    }
-    return -1;
-  }
-
-  return m_joystickPOVs[stick].povs[pov];
+	std::unique_lock<std::recursive_mutex> lock(m_joystickMutex);
+	if (joysticks[stick] == nullptr || button >= joysticks[stick]->buttons().size())
+	{
+		return false;
+	}
+	return joysticks[stick]->buttons(button-1);
 }
 
 /**
  * The state of the buttons on the joystick.
+ * 12 buttons (4 msb are unused) from the joystick.
  *
  * @param stick The joystick to read.
  * @return The state of the buttons on the joystick.
  */
-uint32_t DriverStation::GetStickButtons(uint32_t stick) const {
-  if (stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
-    return 0;
-  }
+short DriverStation::GetStickButtons(uint32_t stick)
+{
+    if (stick < 0 || stick >= 6)
+	{
+		wpi_setWPIErrorWithContext(ParameterOutOfRange, "stick must be between 0 and 5");
+		return false;
+	}
+	short btns = 0, btnid;
 
-  return m_joystickButtons[stick].buttons;
+	std::unique_lock<std::recursive_mutex> lock(m_joystickMutex);
+	msgs::FRCJoystickPtr joy = joysticks[stick];
+	for (btnid = 0; btnid < joy->buttons().size() && btnid < 12; btnid++)
+	{
+		if (joysticks[stick]->buttons(btnid))
+		{
+			btns |= (1 << btnid);
+		}
+	}
+	return btns;
 }
 
+// 5V divided by 10 bits
+#define kDSAnalogInScaling ((float)(5.0 / 1023.0))
+
 /**
- * The state of one joystick button. Button indexes begin at 1.
+ * Get an analog voltage from the Driver Station.
+ * The analog values are returned as voltage values for the Driver Station analog inputs.
+ * These inputs are typically used for advanced operator interfaces consisting of potentiometers
+ * or resistor networks representing values on a rotary switch.
  *
- * @param stick The joystick to read.
- * @param button The button index, beginning at 1.
- * @return The state of the joystick button.
+ * @param channel The analog input channel on the driver station to read from. Valid range is 1 - 4.
+ * @return The analog voltage on the input.
  */
-bool DriverStation::GetStickButton(uint32_t stick, uint8_t button) {
-  if (stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
-    return false;
-  }
-
-  if (button > m_joystickButtons[stick].count) {
-    ReportJoystickUnpluggedError(
-        "WARNING: Joystick Button missing, check if all controllers are "
-        "plugged in\n");
-    return false;
-  }
-  if (button == 0) {
-    ReportJoystickUnpluggedError(
-        "ERROR: Button indexes begin at 1 in WPILib for C++ and Java");
-    return false;
-  }
-  return ((0x1 << (button - 1)) & m_joystickButtons[stick].buttons) != 0;
+float DriverStation::GetAnalogIn(uint32_t channel)
+{
+	wpi_setWPIErrorWithContext(UnsupportedInSimulation, "GetAnalogIn");
+	return 0.0;
 }
 
 /**
- * Check if the DS has enabled the robot
- * @return True if the robot is enabled and the DS is connected
+ * Get values from the digital inputs on the Driver Station.
+ * Return digital values from the Drivers Station. These values are typically used for buttons
+ * and switches on advanced operator interfaces.
+ * @param channel The digital input to get. Valid range is 1 - 8.
  */
-bool DriverStation::IsEnabled() const {
-  HALControlWord controlWord;
-  memset(&controlWord, 0, sizeof(controlWord));
-  HALGetControlWord(&controlWord);
-  return controlWord.enabled && controlWord.dsAttached;
+bool DriverStation::GetDigitalIn(uint32_t channel)
+{
+	wpi_setWPIErrorWithContext(UnsupportedInSimulation, "GetDigitalIn");
+	return false;
 }
 
 /**
- * Check if the robot is disabled
- * @return True if the robot is explicitly disabled or the DS is not connected
+ * Set a value for the digital outputs on the Driver Station.
+ *
+ * Control digital outputs on the Drivers Station. These values are typically used for
+ * giving feedback on a custom operator station such as LEDs.
+ *
+ * @param channel The digital output to set. Valid range is 1 - 8.
+ * @param value The state to set the digital output.
  */
-bool DriverStation::IsDisabled() const {
-  HALControlWord controlWord;
-  memset(&controlWord, 0, sizeof(controlWord));
-  HALGetControlWord(&controlWord);
-  return !(controlWord.enabled && controlWord.dsAttached);
+void DriverStation::SetDigitalOut(uint32_t channel, bool value)
+{
+    wpi_setWPIErrorWithContext(UnsupportedInSimulation, "SetDigitalOut");
 }
 
 /**
- * Check if the DS is commanding autonomous mode
- * @return True if the robot is being commanded to be in autonomous mode
+ * Get a value that was set for the digital outputs on the Driver Station.
+ * @param channel The digital ouput to monitor. Valid range is 1 through 8.
+ * @return A digital value being output on the Drivers Station.
  */
-bool DriverStation::IsAutonomous() const {
-  HALControlWord controlWord;
-  memset(&controlWord, 0, sizeof(controlWord));
-  HALGetControlWord(&controlWord);
-  return controlWord.autonomous;
+bool DriverStation::GetDigitalOut(uint32_t channel)
+{
+	wpi_setWPIErrorWithContext(UnsupportedInSimulation, "GetDigitalOut");
+	return false;
 }
 
-/**
- * Check if the DS is commanding teleop mode
- * @return True if the robot is being commanded to be in teleop mode
- */
-bool DriverStation::IsOperatorControl() const {
-  HALControlWord controlWord;
-  memset(&controlWord, 0, sizeof(controlWord));
-  HALGetControlWord(&controlWord);
-  return !(controlWord.autonomous || controlWord.test);
+bool DriverStation::IsEnabled() const
+{
+	std::unique_lock<std::recursive_mutex> lock(m_stateMutex);
+    return state != nullptr ? state->enabled() : false;
 }
 
-/**
- * Check if the DS is commanding test mode
- * @return True if the robot is being commanded to be in test mode
- */
-bool DriverStation::IsTest() const {
-  HALControlWord controlWord;
-  HALGetControlWord(&controlWord);
-  return controlWord.test;
+bool DriverStation::IsDisabled() const
+{
+    return !IsEnabled();
 }
 
-/**
- * Check if the DS is attached
- * @return True if the DS is connected to the robot
- */
-bool DriverStation::IsDSAttached() const {
-  HALControlWord controlWord;
-  memset(&controlWord, 0, sizeof(controlWord));
-  HALGetControlWord(&controlWord);
-  return controlWord.dsAttached;
+bool DriverStation::IsAutonomous() const
+{
+	std::unique_lock<std::recursive_mutex> lock(m_stateMutex);
+    return state != nullptr ?
+      state->state() == msgs::DriverStation_State_AUTO : false;
 }
 
-/**
- * @return always true in simulation
- */
-bool DriverStation::IsSysActive() const {
-  return true;
+bool DriverStation::IsOperatorControl() const
+{
+    return !(IsAutonomous() || IsTest());
 }
 
-/**
- * @return always false in simulation
- */
-bool DriverStation::IsSysBrownedOut() const {
-  return false;
-}
-
-/**
- * Has a new control packet from the driver station arrived since the last time
- * this function was called?
- * Warning: If you call this function from more than one place at the same time,
- * you will not get the get the intended behaviour.
- * @return True if the control data has been updated since the last call.
- */
-bool DriverStation::IsNewControlData() const {
-  return m_newControlData.tryTake() == false;
+bool DriverStation::IsTest() const
+{
+	std::unique_lock<std::recursive_mutex> lock(m_stateMutex);
+    return state != nullptr ?
+      state->state() == msgs::DriverStation_State_TEST : false;
 }
 
 /**
  * Is the driver station attached to a Field Management System?
- * @return True if the robot is competing on a field being controlled by a Field
- * Management System
+ * Note: This does not work with the Blue DS.
+ * @return True if the robot is competing on a field being controlled by a Field Management System
  */
-bool DriverStation::IsFMSAttached() const {
-  HALControlWord controlWord;
-  HALGetControlWord(&controlWord);
-  return controlWord.fmsAttached;
+bool DriverStation::IsFMSAttached() const
+{
+    return false; // No FMS in simulation
 }
 
 /**
  * Return the alliance that the driver station says it is on.
  * This could return kRed or kBlue
- * @return The Alliance enum (kRed, kBlue or kInvalid)
+ * @return The Alliance enum
  */
-DriverStation::Alliance DriverStation::GetAlliance() const {
-  HALAllianceStationID allianceStationID;
-  HALGetAllianceStation(&allianceStationID);
-  switch (allianceStationID) {
-    case kHALAllianceStationID_red1:
-    case kHALAllianceStationID_red2:
-    case kHALAllianceStationID_red3:
-      return kRed;
-    case kHALAllianceStationID_blue1:
-    case kHALAllianceStationID_blue2:
-    case kHALAllianceStationID_blue3:
-      return kBlue;
-    default:
-      return kInvalid;
-  }
+DriverStation::Alliance DriverStation::GetAlliance() const
+{
+	// if (m_controlData->dsID_Alliance == 'R') return kRed;
+	// if (m_controlData->dsID_Alliance == 'B') return kBlue;
+	// wpi_assert(false);
+    return kInvalid; // TODO: Support alliance colors
 }
 
 /**
  * Return the driver station location on the field
  * This could return 1, 2, or 3
- * @return The location of the driver station (1-3, 0 for invalid)
+ * @return The location of the driver station
  */
-uint32_t DriverStation::GetLocation() const {
-  HALAllianceStationID allianceStationID;
-  HALGetAllianceStation(&allianceStationID);
-  switch (allianceStationID) {
-    case kHALAllianceStationID_red1:
-    case kHALAllianceStationID_blue1:
-      return 1;
-    case kHALAllianceStationID_red2:
-    case kHALAllianceStationID_blue2:
-      return 2;
-    case kHALAllianceStationID_red3:
-    case kHALAllianceStationID_blue3:
-      return 3;
-    default:
-      return 0;
-  }
+uint32_t DriverStation::GetLocation() const
+{
+    return -1; // TODO: Support locations
 }
 
 /**
  * Wait until a new packet comes from the driver station
  * This blocks on a semaphore, so the waiting is efficient.
- * This is a good way to delay processing until there is new driver station data
- * to act on
+ * This is a good way to delay processing until there is new driver station data to act on
  */
-void DriverStation::WaitForData() {
-  std::unique_lock<priority_mutex> lock(m_waitForDataMutex);
-  m_waitForDataCond.wait(lock);
+void DriverStation::WaitForData()
+{
+	std::unique_lock<std::mutex> lock(m_waitForDataMutex);
+	m_waitForDataCond.wait(lock);
 }
 
 /**
  * Return the approximate match time
- * The FMS does not send an official match time to the robots, but does send an
- * approximate match time.
- * The value will count down the time remaining in the current period (auto or
- * teleop).
- * Warning: This is not an official time (so it cannot be used to dispute ref
- * calls or guarantee that a function
- * will trigger before the match ends)
- * The Practice Match function of the DS approximates the behaviour seen on the
- * field.
- * @return Time remaining in current match period (auto or teleop)
+ * The FMS does not currently send the official match time to the robots
+ * This returns the time since the enable signal sent from the Driver Station
+ * At the beginning of autonomous, the time is reset to 0.0 seconds
+ * At the beginning of teleop, the time is reset to +15.0 seconds
+ * If the robot is disabled, this returns 0.0 seconds
+ * Warning: This is not an official time (so it cannot be used to argue with referees)
+ * @return Match time in seconds since the beginning of autonomous
  */
-double DriverStation::GetMatchTime() const {
-  float matchTime;
-  HALGetMatchTime(&matchTime);
-  return (double)matchTime;
+double DriverStation::GetMatchTime() const
+{
+	if (m_approxMatchTimeOffset < 0.0)
+		return 0.0;
+	return Timer::GetFPGATimestamp() - m_approxMatchTimeOffset;
 }
 
 /**
  * Report an error to the DriverStation messages window.
  * The error is also printed to the program console.
  */
-void DriverStation::ReportError(std::string error) {
-  std::cout << error << std::endl;
+void DriverStation::ReportError(std::string error)
+{
+	std::cout << error << std::endl;
+}
 
-  HALControlWord controlWord;
-  HALGetControlWord(&controlWord);
-  if (controlWord.dsAttached) {
-    HALSetErrorData(error.c_str(), error.size(), 0);
-  }
+/**
+ * Return the team number that the Driver Station is configured for
+ * @return The team number
+ */
+uint16_t DriverStation::GetTeamNumber() const
+{
+    return 348;
+}
+
+void DriverStation::stateCallback(const msgs::ConstDriverStationPtr &msg)
+{
+    {
+  		std::unique_lock<std::recursive_mutex> lock(m_stateMutex);
+    	*state = *msg;
+  	}
+    m_waitForDataCond.notify_all();
+}
+
+void DriverStation::joystickCallback(const msgs::ConstFRCJoystickPtr &msg,
+                                     int i)
+{
+	std::unique_lock<std::recursive_mutex> lock(m_joystickMutex);
+    *(joysticks[i]) = *msg;
+}
+
+void DriverStation::joystickCallback0(const msgs::ConstFRCJoystickPtr &msg)
+{
+    joystickCallback(msg, 0);
+}
+
+void DriverStation::joystickCallback1(const msgs::ConstFRCJoystickPtr &msg)
+{
+    joystickCallback(msg, 1);
+}
+
+void DriverStation::joystickCallback2(const msgs::ConstFRCJoystickPtr &msg)
+{
+    joystickCallback(msg, 2);
+}
+
+void DriverStation::joystickCallback3(const msgs::ConstFRCJoystickPtr &msg)
+{
+    joystickCallback(msg, 3);
+}
+
+void DriverStation::joystickCallback4(const msgs::ConstFRCJoystickPtr &msg)
+{
+    joystickCallback(msg, 4);
+}
+
+void DriverStation::joystickCallback5(const msgs::ConstFRCJoystickPtr &msg)
+{
+    joystickCallback(msg, 5);
 }

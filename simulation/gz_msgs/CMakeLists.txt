@@ -62,3 +62,4 @@ else()
 endif()
 
 target_link_libraries(${PROJECT_NAME} ${PROTOBUF_LIBRARIES})
+set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "${ENV_HOME}/wpilib/simulation/lib")

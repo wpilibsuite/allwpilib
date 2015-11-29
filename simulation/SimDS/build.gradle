@@ -52,3 +52,5 @@ task simDsJavadoc(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
+
+build.dependsOn shadowJar

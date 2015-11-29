@@ -47,6 +47,7 @@ protected:
     RobotBase& operator=(const RobotBase&) = delete;
 
 	DriverStation &m_ds;
+  transport::SubscriberPtr time_sub;
 
 private:
 	static RobotBase *m_instance;

@@ -34,7 +34,7 @@ RobotBase &RobotBase::getInstance()
 RobotBase::RobotBase() : m_ds(DriverStation::GetInstance())
 {
 	RobotState::SetImplementation(DriverStation::GetInstance());
-	transport::SubscriberPtr time_pub = MainNode::Subscribe("time", &wpilib::internal::time_callback);
+	time_sub = MainNode::Subscribe("~/time", &wpilib::internal::time_callback);
 }
 
 /**

@@ -39,10 +39,16 @@ public:
 	transport::NodePtr main;
 private:
 	MainNode() {
-		gazebo::client::setup();
-		main = transport::NodePtr(new transport::Node());
-		main->Init("frc");
-		gazebo::transport::run();
+		bool success = gazebo::client::setup();
+
+    if (success){
+  		main = transport::NodePtr(new transport::Node());
+  		main->Init("frc");
+   		gazebo::transport::run();
+    }
+    else {
+      std::cout << "An error has occured setting up gazebo_client!" << std::endl;
+    }
 	}
 };
 

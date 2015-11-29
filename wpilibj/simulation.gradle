@@ -5,10 +5,25 @@ sourceSets {
 dependencies {
     simCompile sourceSets.shared.output
     simCompile project(':simulation:JavaGazebo')
-    simCompile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:arm'
+    simCompile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:desktop'
+    simRuntime "edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:desktop"
 }
 
 task wpilibjSimJar(type: Jar, dependsOn: simClasses) {
+
+    def addClasspath = { classpath ->
+        classpath.files.findAll { it.exists() }.each {
+            if (file(it).directory) {
+                from it
+            } else {
+                from zipTree(it.path)
+            }
+        }
+    }
+
+    addClasspath sourceSets.shared.runtimeClasspath
+    addClasspath sourceSets.sim.runtimeClasspath
+
     description = 'Creates the WPILibJSimulation Jar'
     group = 'WPILib'
     from sourceSets.sim.output.classesDir
@@ -56,3 +71,5 @@ publishing {
         }
     }
 }
+
+build.dependsOn wpilibjSimJar
