@@ -45,9 +45,18 @@
 using namespace tcpsockets;
 
 static int ResolveHostName(const char* hostname, struct in_addr* addr) {
+  struct addrinfo hints;
   struct addrinfo* res;
 
-  int result = getaddrinfo(hostname, nullptr, nullptr, &res);
+  hints.ai_flags = 0;
+  hints.ai_family = AF_INET;
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_protocol = 0;
+  hints.ai_addrlen = 0;
+  hints.ai_addr = nullptr;
+  hints.ai_canonname = nullptr;
+  hints.ai_next = nullptr;
+  int result = getaddrinfo(hostname, nullptr, &hints, &res);
   if (result == 0) {
     std::memcpy(addr, &((struct sockaddr_in*)res->ai_addr)->sin_addr,
                 sizeof(struct in_addr));
@@ -78,7 +87,10 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
     llvm::SmallString<128> addr_copy(server);
     addr_copy.push_back('\0');
     int size = sizeof(address);
-    WSAStringToAddress(addr_copy.data(), PF_INET, nullptr, (struct sockaddr*)&address, &size);
+    if (WSAStringToAddress(addr_copy.data(), PF_INET, nullptr, (struct sockaddr*)&address, &size) != 0) {
+      ERROR("could not resolve " << server << " address");
+      return nullptr;
+    }
 #else
     inet_pton(PF_INET, server, &(address.sin_addr));
 #endif
