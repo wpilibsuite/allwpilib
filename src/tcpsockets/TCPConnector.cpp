@@ -100,7 +100,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
   if (timeout == 0) {
     int sd = socket(AF_INET, SOCK_STREAM, 0);
     if (::connect(sd, (struct sockaddr*)&address, sizeof(address)) != 0) {
-      DEBUG("connect() to " << server << " port " << port << " failed: " << SocketStrerror());
+      ERROR("connect() to " << server << " port " << port << " failed: " << SocketStrerror());
       return nullptr;
     }
     return std::unique_ptr<NetworkStream>(new TCPStream(sd, &address));
@@ -139,15 +139,15 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
         len = sizeof(int);
         getsockopt(sd, SOL_SOCKET, SO_ERROR, (char*)(&valopt), &len);
         if (valopt) {
-          DEBUG("select() to " << server << " port " << port << " error " << valopt << " - " << SocketStrerror(valopt));
+          ERROR("select() to " << server << " port " << port << " error " << valopt << " - " << SocketStrerror(valopt));
         }
         // connection established
         else
           result = 0;
       } else
-        DEBUG("connect() timed out");
+        INFO("connect() to " << server << " port " << port << " timed out");
     } else
-      DEBUG("connect() to " << server << " port " << port << " error " << SocketErrno() << " - " << SocketStrerror());
+      ERROR("connect() to " << server << " port " << port << " error " << SocketErrno() << " - " << SocketStrerror());
   }
 
   // Return socket to blocking mode
