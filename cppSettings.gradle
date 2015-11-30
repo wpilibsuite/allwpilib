@@ -19,11 +19,20 @@ niLibraryTree.each { lib ->
     }
 }
 
-def ntDependency =
+def armNtDependency =
     project.dependencies.create("edu.wpi.first.wpilib.networktables.cpp:NetworkTables:3.0.0-SNAPSHOT:arm@zip")
-def config = project.configurations.detachedConfiguration(ntDependency)
-config.setTransitive(false)
-def netTables = config.files[0].canonicalFile
+def armConfig = project.configurations.detachedConfiguration(armNtDependency)
+armConfig.setTransitive(false)
+def armNetTables = armConfig.files[0].canonicalFile
+
+def desktopNetTables
+if (project.hasProperty('makeSim')){
+    def desktopNtDependency =
+        project.dependencies.create("edu.wpi.first.wpilib.networktables.cpp:NetworkTables:3.0.0-SNAPSHOT:desktop@zip")
+    def desktopConfig = project.configurations.detachedConfiguration(desktopNtDependency)
+    desktopConfig.setTransitive(false)
+    desktopNetTables = desktopConfig.files[0].canonicalFile
+}
 
 def netTablesUnzipLocation = "$buildDir/networktables"
 
@@ -31,7 +40,10 @@ def netTablesUnzipLocation = "$buildDir/networktables"
 task unzipNetworkTables(type: Copy) {
     description = 'Unzips the networktables maven dependency so that the include files and libraries can be used'
     group = 'WPILib'
-    from zipTree(netTables)
+    if (project.hasProperty('makeSim')){
+        from zipTree(desktopNetTables)
+    }
+    from zipTree(armNetTables)
     into netTablesUnzipLocation
 }
 
@@ -47,9 +59,12 @@ subprojects {
         ext.defineNetworkTablesProperties = {
             ext.netTables = netTablesUnzipLocation
             ext.netTablesInclude = "$netTablesUnzipLocation/include"
-            ext.netLibLocation = "$netTablesUnzipLocation/Linux/arm"
-            ext.netSharedLib = "$netLibLocation/libntcore.so"
-            ext.netStaticLib = "$netLibLocation/libntcore.a"
+            ext.netLibArmLocation = "$netTablesUnzipLocation/Linux/arm"
+            if (project.hasProperty('makeSim')){
+              ext.netLibDesktopLocation = "$netTablesUnzipLocation/Linux/amd64"
+            }
+            ext.netSharedLib = "$netLibArmLocation/libntcore.so"
+            ext.netStaticLib = "$netLibArmLocation/libntcore.a"
 
             task addNetworkTablesLibraryLinks() {
                 description = 'Adds the linker flags for the networktables libraries retreived from maven'

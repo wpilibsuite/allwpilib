@@ -33,3 +33,6 @@ foreach(PLUGIN ${PLUGINS})
   install(TARGETS ${PLUGIN} DESTINATION $ENV{HOME}/wpilib/simulation/plugins)
 
 endforeach()
+
+# create a dummy target the depends on all the plugins
+add_custom_target(${PROJECT_NAME} DEPENDS ${PLUGINS})

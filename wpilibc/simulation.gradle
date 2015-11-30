@@ -1,23 +1,54 @@
-publishing {
-    publications {
-        wpilibcSim(MavenPublication) {
-            artifact wpilibcSimZip
-            groupId 'edu.wpi.first.wpilibc.simulation'
-            artifactId 'WPILibCSim'
-            version '0.1.0'
-        }
-    }
-}
+import org.apache.tools.ant.taskdefs.condition.Os
 
-task wpilibcSimZip(type: Zip) {
-    description 'Creates the include zip file for wpilibc'
-    group 'WPILib'
-    baseName 'WPILibCSim'
-    destinationDir = project.buildDir
-    into 'sim/include'
-    from "${simulation}/include"
-    from "${shared}/include"
-    from '../build/simulation/gz_msgs/generated'
-    from netTablesInclude
-    from '../hal/include'
+if (project.hasProperty('makeSim')){
+  //cmake wrapper tasks
+  task setupCmake(type: Exec) {
+    workingDir '..'
+    commandLine 'mkdir', '-p', 'build'
+  }
+
+  task cmake(type: Exec, dependsOn: setupCmake) {
+    workingDir '../build'
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+      commandLine '../configure.bat', "-DNTCORE_INCLUDE_DIR=$netTablesInclude","-DNTCORE_LIBDIR=$netLibDesktopLocation"
+    }
+    else {
+      commandLine 'cmake', '..', "-DNTCORE_INCLUDE_DIR=$netTablesInclude","-DNTCORE_LIBDIR=$netLibDesktopLocation"
+    }
+  }
+
+  task frc_gazebo_plugins(type: Exec, dependsOn: cmake) {
+    workingDir '../build'
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+      comanndLine 'nmake', 'frc_gazebo_plugins'
+    }
+    else {
+      commandLine 'make', 'frc_gazebo_plugins'
+    }
+  }
+
+  task gz_msgs(type: Exec, dependsOn: cmake) {
+      workingDir '../build'
+      if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+          commandLine 'nmake', 'gz_msgs'
+      }
+      else {
+          commandLine 'make', 'gz_msgs'
+      }
+  }
+
+  task wpilibcSim(type: Exec, dependsOn: ['cmake', ':unzipNetworkTables']) {
+    workingDir '../build'
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+      commandLine 'nmake', 'wpilibcSim'
+    }
+    else {
+      commandLine 'make', 'wpilibcSim'
+    }
+  }
+
+  task allcsim(dependsOn: [wpilibcSim, gz_msgs, frc_gazebo_plugins]){
+  }
+
+  build.dependsOn allcsim
 }

@@ -43,7 +43,7 @@ DriverStation::DriverStation() {
   }
   // Register that semaphore with the network communications task.
   // It will signal when new packet data is available.
-  HALSetNewDataSem(m_packetDataAvailableCond.native_handle());
+  HALSetNewDataSem(&m_packetDataAvailableCond);
 
   AddToSingletonList();
 

@@ -22,6 +22,25 @@ To build a specific subproject, such as wpilibc, you must access the subproject 
 ./gradlew :wpilibc:build
 ```
 
+If you also want simulation to be build, add -PmakeSim. This requires gazebo_transport. We have tested on 14.04 and 15.05, but any correct install of gazebo should work, even on windows if you build from source. Correct means cmake needs to be able to find gazebo-config.cmake, which you get for free with ubuntu installs.
+
+```bash
+./gradlew build -PmakeSim
+```
+
+Note that java sim libraries build either way, because they don't depend on gazebo, only on JavaGazebo. C++ simulation tasks (including plugins, gz_msgs, and wpilibcSim) all depend on gazebo_transport. In order for this to build you must have installed gazebo. See [The Gazebo website](https://gazebosim.org/) for installation instructions.
+If you prefer to use Cmake directly, the you can still do so.
+The common cmake tasks are wpilibcSim, frc_gazebo_plugins, and gz_msgs
+
+```bash
+mkdir build
+cd build
+cmake ..
+make
+```
+
+
+
 The gradlew wrapper only exists in the root of the main project, so be sure to run all commands from there. All of the subprojects have build tasks that can be run. Gradle automatically determines and rebuilds dependencies, so if you make a change to the HAL and then run `:wpilibc:build`, the HAL will be rebuilt, then wpilibc.
 
 There are a few tasks other than `build` available. To see them, run the meta-task `tasks`. This will print a list of all available tasks, with a description of each task.
