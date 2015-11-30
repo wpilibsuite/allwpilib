@@ -11,7 +11,7 @@
 
 Notifier *Notifier::timerQueueHead = nullptr;
 priority_recursive_mutex Notifier::queueMutex;
-int Notifier::refcount = 0;
+std::atomic<int> Notifier::refcount{0};
 std::thread Notifier::m_task;
 std::atomic<bool> Notifier::m_stopped(false);
 
@@ -34,11 +34,9 @@ Notifier::Notifier(TimerEventHandler handler, void *param)
 	{
 		std::lock_guard<priority_recursive_mutex> sync(queueMutex);
 		// do the first time intialization of static variables
-		if (refcount == 0)
-		{
+		if (refcount.fetch_add(1) == 0) {
 			m_task = std::thread(Run);
 		}
-		refcount++;
 	}
 }
 
@@ -54,7 +52,7 @@ Notifier::~Notifier()
 		DeleteFromQueue();
 
 		// Delete the static variables when the last one is going away
-		if (!(--refcount))
+		if (refcount.fetch_sub(1) == 1)
 		{
       m_stopped = true;
 			m_task.join();
