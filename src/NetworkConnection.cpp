@@ -132,7 +132,7 @@ void NetworkConnection::ReadThreadMain() {
     decoder.Reset();
     auto msg = Message::Read(decoder, m_get_entry_type);
     if (!msg) {
-      INFO("read error: " << decoder.error());
+      if (decoder.error()) INFO("read error: " << decoder.error());
       // terminate connection on bad message
       if (m_stream) m_stream->close();
       break;
