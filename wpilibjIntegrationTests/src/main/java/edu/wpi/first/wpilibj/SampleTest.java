@@ -18,8 +18,7 @@ import org.junit.Test;
 import edu.wpi.first.wpilibj.fixtures.SampleFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
-import edu.wpi.first.wpilibj.hal.CanTalonSRX;
-import edu.wpi.first.wpilibj.hal.SWIGTYPE_p_UINT8;
+import edu.wpi.first.wpilibj.CANTalon;
 
 /**
  * Sample test for a sample PID controller. This demonstrates the general
@@ -63,10 +62,10 @@ public class SampleTest extends AbstractComsSetup {
    */
   @Test
   public void test() {
-    CanTalonSRX cantalon = new CanTalonSRX();
-    cantalon.Set(0.5);
+    CANTalon cantalon = new CANTalon(0);
+    cantalon.set(0.5);
     Timer.delay(0.5);
-    cantalon.Set(0.0);
+    cantalon.set(0.0);
     assertTrue(true);
   }
 

@@ -18,9 +18,7 @@ import org.junit.Test;
 import edu.wpi.first.wpilibj.fixtures.SampleFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
-import edu.wpi.first.wpilibj.hal.CanTalonSRX;
 import edu.wpi.first.wpilibj.hal.CanTalonJNI;
-import edu.wpi.first.wpilibj.hal.SWIGTYPE_p_double;
 
 /**
  * Basic test (borrowed straight from SampleTest) for running the CAN TalonSRX.

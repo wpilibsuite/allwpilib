@@ -136,6 +136,7 @@ task jniHeaders {
             args 'edu.wpi.first.wpilibj.hal.JNIWrapper'
             args 'edu.wpi.first.wpilibj.hal.AccelerometerJNI'
             args 'edu.wpi.first.wpilibj.hal.AnalogJNI'
+            args 'edu.wpi.first.wpilibj.hal.CanTalonJNI'
             args 'edu.wpi.first.wpilibj.hal.CounterJNI'
             args 'edu.wpi.first.wpilibj.hal.DigitalGlitchFilterJNI'
             args 'edu.wpi.first.wpilibj.hal.DIOJNI'
