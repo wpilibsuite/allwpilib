@@ -1,5 +1,9 @@
-#ifndef GLOBAL_H
-#define GLOBAL_H
+/**
+ * @file ctre.h
+ * Common header for all CTRE HAL modules.
+ */
+#ifndef CTRE_H
+#define CTRE_H
 
 //Bit Defines
 #define BIT0 0x01
@@ -45,6 +49,9 @@ typedef enum {
 		CTR_UnexpectedArbId,	//!< Specified CAN Id is invalid.
 		CTR_TxFailed,			//!< Could not transmit the CAN frame.
 		CTR_SigNotUpdated,		//!< Have not received an value response for signal.
+		CTR_BufferFull,			//!< Caller attempted to insert data into a buffer that is full.
 }CTR_Code;
 
-#endif
+#include "ctre_frames.h"
+
+#endif /* CTRE_H */

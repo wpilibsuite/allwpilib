@@ -37,16 +37,20 @@ public class CanTalonSRX extends CtreCanNode {
     super.delete();
   }
 
+  public CanTalonSRX(int deviceNumber, int controlPeriodMs, int enablePeriodMs) {
+    this(CanTalonJNI.new_CanTalonSRX__SWIG_0(deviceNumber, controlPeriodMs, enablePeriodMs), true);
+  }
+
   public CanTalonSRX(int deviceNumber, int controlPeriodMs) {
-    this(CanTalonJNI.new_CanTalonSRX__SWIG_0(deviceNumber, controlPeriodMs), true);
+    this(CanTalonJNI.new_CanTalonSRX__SWIG_1(deviceNumber, controlPeriodMs), true);
   }
 
   public CanTalonSRX(int deviceNumber) {
-    this(CanTalonJNI.new_CanTalonSRX__SWIG_1(deviceNumber), true);
+    this(CanTalonJNI.new_CanTalonSRX__SWIG_2(deviceNumber), true);
   }
 
   public CanTalonSRX() {
-    this(CanTalonJNI.new_CanTalonSRX__SWIG_2(), true);
+    this(CanTalonJNI.new_CanTalonSRX__SWIG_3(), true);
   }
 
   public void Set(double value) {
@@ -104,8 +108,8 @@ public class CanTalonSRX extends CtreCanNode {
         slotIdx, closeLoopRampRate), true);
   }
 
-  public SWIGTYPE_p_CTR_Code SetVoltageCompensationRate(double vpers) {
-    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetVoltageCompensationRate(swigCPtr, this,vpers), true);
+  public SWIGTYPE_p_CTR_Code SetVoltageCompensationRate(double voltagePerMs) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_SetVoltageCompensationRate(swigCPtr, this, voltagePerMs), true);
   }
 
   public SWIGTYPE_p_CTR_Code SetSensorPosition(int pos) {
@@ -162,9 +166,9 @@ public class CanTalonSRX extends CtreCanNode {
         slotIdx, SWIGTYPE_p_int.getCPtr(closeLoopRampRate)), true);
   }
 
-  public SWIGTYPE_p_CTR_Code GetVoltageCompensationRate(SWIGTYPE_p_double vpers) {
+  public SWIGTYPE_p_CTR_Code GetVoltageCompensationRate(SWIGTYPE_p_double voltagePerMs) {
     return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetVoltageCompensationRate(swigCPtr, this,
-        SWIGTYPE_p_double.getCPtr(vpers)), true);
+        SWIGTYPE_p_double.getCPtr(voltagePerMs)), true);
   }
 
   public SWIGTYPE_p_CTR_Code GetForwardSoftLimit(SWIGTYPE_p_int forwardLimit) {
@@ -196,6 +200,34 @@ public class CanTalonSRX extends CtreCanNode {
     return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_ClearStickyFaults(swigCPtr, this), true);
   }
 
+
+  public void ChangeMotionControlFramePeriod(int periodMs) {
+    CanTalonJNI.CanTalonSRX_ChangeMotionControlFramePeriod(swigCPtr, this, periodMs);
+  }
+
+  public void ClearMotionProfileTrajectories() {
+    CanTalonJNI.CanTalonSRX_ClearMotionProfileTrajectories(swigCPtr, this);
+  }
+
+  public int GetMotionProfileTopLevelBufferCount() {
+    return CanTalonJNI.CanTalonSRX_GetMotionProfileTopLevelBufferCount(swigCPtr, this);
+  }
+
+  public boolean IsMotionProfileTopLevelBufferFull() {
+    return CanTalonJNI.CanTalonSRX_IsMotionProfileTopLevelBufferFull(swigCPtr, this);
+  }
+
+  public SWIGTYPE_p_CTR_Code PushMotionProfileTrajectory(int targPos, int targVel, int profileSlotSelect, int timeDurMs, int velOnly, int isLastPoint, int zeroPos) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_PushMotionProfileTrajectory(swigCPtr, this, targPos, targVel, profileSlotSelect, timeDurMs, velOnly, isLastPoint, zeroPos), true);
+  }
+
+  public void ProcessMotionProfileBuffer() {
+    CanTalonJNI.CanTalonSRX_ProcessMotionProfileBuffer(swigCPtr, this);
+  }
+
+  public SWIGTYPE_p_CTR_Code GetMotionProfileStatus(SWIGTYPE_p_uint32_t flags, SWIGTYPE_p_uint32_t profileSlotSelect, SWIGTYPE_p_int32_t targPos, SWIGTYPE_p_int32_t targVel, SWIGTYPE_p_uint32_t topBufferRemaining, SWIGTYPE_p_uint32_t topBufferCnt, SWIGTYPE_p_uint32_t btmBufferCnt, SWIGTYPE_p_uint32_t outputEnable) {
+    return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetMotionProfileStatus(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(flags), SWIGTYPE_p_uint32_t.getCPtr(profileSlotSelect), SWIGTYPE_p_int32_t.getCPtr(targPos), SWIGTYPE_p_int32_t.getCPtr(targVel), SWIGTYPE_p_uint32_t.getCPtr(topBufferRemaining), SWIGTYPE_p_uint32_t.getCPtr(topBufferCnt), SWIGTYPE_p_uint32_t.getCPtr(btmBufferCnt), SWIGTYPE_p_uint32_t.getCPtr(outputEnable)), true);
+  }
   public SWIGTYPE_p_CTR_Code GetFault_OverTemp(SWIGTYPE_p_int param) {
     return new SWIGTYPE_p_CTR_Code(CanTalonJNI.CanTalonSRX_GetFault_OverTemp(swigCPtr, this,
         SWIGTYPE_p_int.getCPtr(param)), true);
@@ -448,6 +480,8 @@ public class CanTalonSRX extends CtreCanNode {
 
   public final static int kDefaultControlPeriodMs = CanTalonJNI
       .CanTalonSRX_kDefaultControlPeriodMs_get();
+  public final static int kDefaultEnablePeriodMs = CanTalonJNI.CanTalonSRX_kDefaultEnablePeriodMs_get();
+  public final static int kDefaultControl6PeriodMs = CanTalonJNI.CanTalonSRX_kDefaultControl6PeriodMs_get();
   public final static int kMode_DutyCycle = CanTalonJNI.CanTalonSRX_kMode_DutyCycle_get();
   public final static int kMode_PositionCloseLoop = CanTalonJNI
       .CanTalonSRX_kMode_PositionCloseLoop_get();
@@ -457,6 +491,7 @@ public class CanTalonSRX extends CtreCanNode {
       .CanTalonSRX_kMode_CurrentCloseLoop_get();
   public final static int kMode_VoltCompen = CanTalonJNI.CanTalonSRX_kMode_VoltCompen_get();
   public final static int kMode_SlaveFollower = CanTalonJNI.CanTalonSRX_kMode_SlaveFollower_get();
+  public final static int kMode_MotionProfile = CanTalonJNI.CanTalonSRX_kMode_MotionProfile_get();
   public final static int kMode_NoDrive = CanTalonJNI.CanTalonSRX_kMode_NoDrive_get();
   public final static int kLimitSwitchOverride_UseDefaultsFromFlash = CanTalonJNI
       .CanTalonSRX_kLimitSwitchOverride_UseDefaultsFromFlash_get();
@@ -499,6 +534,15 @@ public class CanTalonSRX extends CtreCanNode {
   public final static int kStatusFrame_PulseWidthMeas = CanTalonJNI
       .CanTalonSRX_kStatusFrame_PulseWidthMeas_get();
 
+  public final static int kStatusFrame_MotionProfile = CanTalonJNI.CanTalonSRX_kStatusFrame_MotionProfile_get();
+  public final static int kMotionProfileFlag_ActTraj_IsValid = CanTalonJNI.CanTalonSRX_kMotionProfileFlag_ActTraj_IsValid_get();
+  public final static int kMotionProfileFlag_HasUnderrun = CanTalonJNI.CanTalonSRX_kMotionProfileFlag_HasUnderrun_get();
+  public final static int kMotionProfileFlag_IsUnderrun = CanTalonJNI.CanTalonSRX_kMotionProfileFlag_IsUnderrun_get();
+  public final static int kMotionProfileFlag_ActTraj_IsLast = CanTalonJNI.CanTalonSRX_kMotionProfileFlag_ActTraj_IsLast_get();
+  public final static int kMotionProfileFlag_ActTraj_VelOnly = CanTalonJNI.CanTalonSRX_kMotionProfileFlag_ActTraj_VelOnly_get();
+  public final static int kMotionProf_Disabled = CanTalonJNI.CanTalonSRX_kMotionProf_Disabled_get();
+  public final static int kMotionProf_Enable = CanTalonJNI.CanTalonSRX_kMotionProf_Enable_get();
+  public final static int kMotionProf_Hold = CanTalonJNI.CanTalonSRX_kMotionProf_Hold_get();
   public final static class param_t {
     public final static CanTalonSRX.param_t eProfileParamSlot0_P = new CanTalonSRX.param_t(
         "eProfileParamSlot0_P", CanTalonJNI.CanTalonSRX_eProfileParamSlot0_P_get());
@@ -683,6 +727,11 @@ public class CanTalonSRX extends CtreCanNode {
         CanTalonJNI.CanTalonSRX_eProfileParamVcompRate_get());
     public final static CanTalonSRX.param_t eProfileParamSlot1_AllowableClosedLoopErr = new CanTalonSRX.param_t("eProfileParamSlot1_AllowableClosedLoopErr",
         CanTalonJNI.CanTalonSRX_eProfileParamSlot1_AllowableClosedLoopErr_get());
+    public final static CanTalonSRX.param_t eStatus9FrameRate = new CanTalonSRX.param_t("eStatus9FrameRate",
+CanTalonJNI.CanTalonSRX_eStatus9FrameRate_get());
+    public final static CanTalonSRX.param_t eMotionProfileHasUnderrunErr = new CanTalonSRX.param_t("eMotionProfileHasUnderrunErr", CanTalonJNI.CanTalonSRX_eMotionProfileHasUnderrunErr_get());
+    public final static CanTalonSRX.param_t eReserved120 = new CanTalonSRX.param_t("eReserved120", CanTalonJNI.CanTalonSRX_eReserved120_get());
+    public final static CanTalonSRX.param_t eLegacyControlMode = new CanTalonSRX.param_t("eLegacyControlMode", CanTalonJNI.CanTalonSRX_eLegacyControlMode_get());
 
     public final int swigValue() {
       return swigValue;
@@ -736,7 +785,15 @@ public class CanTalonSRX extends CtreCanNode {
         eLimitSwitchClosedFor, eLimitSwitchClosedRev, eSensorPosition, eSensorVelocity, eCurrent,
         eBrakeIsEnabled, eEncPosition, eEncVel, eEncIndexRiseEvents, eQuadApin, eQuadBpin,
         eQuadIdxpin, eAnalogInWithOv, eAnalogInVel, eTemp, eBatteryV, eResetCount, eResetFlags,
-        eFirmVers, eSettingsChanged, eQuadFilterEn, ePidIaccum};
+        eFirmVers, eSettingsChanged, eQuadFilterEn, ePidIaccum,
+        eStatus1FrameRate, eStatus2FrameRate, eStatus3FrameRate,
+        eStatus4FrameRate, eStatus6FrameRate, eStatus7FrameRate,
+        eClearPositionOnIdx, ePeakPosOutput, eNominalPosOutput,
+        ePeakNegOutput, eNominalNegOutput, eQuadIdxPolarity,
+        eStatus8FrameRate, eAllowPosOverflow, eProfileParamSlot0_AllowableClosedLoopErr,
+        eNumberPotTurns, eNumberEncoderCPR, ePwdPosition, eAinPosition, eProfileParamVcompRate,
+        eProfileParamSlot1_AllowableClosedLoopErr, eStatus9FrameRate, eMotionProfileHasUnderrunErr,
+        eReserved120, eLegacyControlMode };
     private static int swigNext = 0;
     private final int swigValue;
     private final String swigName;

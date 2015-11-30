@@ -89,11 +89,17 @@ public class CanTalonJNI {
 
   public final static native int CanTalonSRX_kDefaultControlPeriodMs_get();
 
-  public final static native long new_CanTalonSRX__SWIG_0(int jarg1, int jarg2);
+  public final static native int CanTalonSRX_kDefaultEnablePeriodMs_get();
 
-  public final static native long new_CanTalonSRX__SWIG_1(int jarg1);
+  public final static native int CanTalonSRX_kDefaultControl6PeriodMs_get();
 
-  public final static native long new_CanTalonSRX__SWIG_2();
+  public final static native long new_CanTalonSRX__SWIG_0(int jarg1, int jarg2, int jarg3);
+
+  public final static native long new_CanTalonSRX__SWIG_1(int jarg1, int jarg2);
+
+  public final static native long new_CanTalonSRX__SWIG_2(int jarg1);
+
+  public final static native long new_CanTalonSRX__SWIG_3();
 
   public final static native void delete_CanTalonSRX(long jarg1);
 
@@ -110,6 +116,8 @@ public class CanTalonJNI {
   public final static native int CanTalonSRX_kMode_VoltCompen_get();
 
   public final static native int CanTalonSRX_kMode_SlaveFollower_get();
+
+  public final static native int CanTalonSRX_kMode_MotionProfile_get();
 
   public final static native int CanTalonSRX_kMode_NoDrive_get();
 
@@ -154,6 +162,24 @@ public class CanTalonJNI {
   public final static native int CanTalonSRX_kStatusFrame_AnalogTempVbat_get();
 
   public final static native int CanTalonSRX_kStatusFrame_PulseWidthMeas_get();
+
+  public final static native int CanTalonSRX_kStatusFrame_MotionProfile_get();
+
+  public final static native int CanTalonSRX_kMotionProfileFlag_ActTraj_IsValid_get();
+
+  public final static native int CanTalonSRX_kMotionProfileFlag_HasUnderrun_get();
+
+  public final static native int CanTalonSRX_kMotionProfileFlag_IsUnderrun_get();
+
+  public final static native int CanTalonSRX_kMotionProfileFlag_ActTraj_IsLast_get();
+
+  public final static native int CanTalonSRX_kMotionProfileFlag_ActTraj_VelOnly_get();
+
+  public final static native int CanTalonSRX_kMotionProf_Disabled_get();
+
+  public final static native int CanTalonSRX_kMotionProf_Enable_get();
+
+  public final static native int CanTalonSRX_kMotionProf_Hold_get();
 
   public final static native int CanTalonSRX_eProfileParamSlot0_P_get();
 
@@ -327,6 +353,14 @@ public class CanTalonJNI {
 
   public final static native int CanTalonSRX_eProfileParamSlot1_AllowableClosedLoopErr_get();
 
+  public final static native int CanTalonSRX_eStatus9FrameRate_get();
+
+  public final static native int CanTalonSRX_eMotionProfileHasUnderrunErr_get();
+
+  public final static native int CanTalonSRX_eReserved120_get();
+
+  public final static native int CanTalonSRX_eLegacyControlMode_get();
+
   public final static native long CanTalonSRX_SetParam(long jarg1, CanTalonSRX jarg1_, int jarg2,
       double jarg3);
 
@@ -408,6 +442,20 @@ public class CanTalonJNI {
       long jarg2, long jarg3);
 
   public final static native long CanTalonSRX_ClearStickyFaults(long jarg1, CanTalonSRX jarg1_);
+
+  public final static native void CanTalonSRX_ChangeMotionControlFramePeriod(long jarg1, CanTalonSRX jarg1_, int jarg2);
+
+  public final static native void CanTalonSRX_ClearMotionProfileTrajectories(long jarg1, CanTalonSRX jarg1_);
+
+  public final static native int CanTalonSRX_GetMotionProfileTopLevelBufferCount(long jarg1, CanTalonSRX jarg1_);
+
+  public final static native boolean CanTalonSRX_IsMotionProfileTopLevelBufferFull(long jarg1, CanTalonSRX jarg1_);
+
+  public final static native long CanTalonSRX_PushMotionProfileTrajectory(long jarg1, CanTalonSRX jarg1_, int jarg2, int jarg3, int jarg4, int jarg5, int jarg6, int jarg7, int jarg8);
+
+  public final static native void CanTalonSRX_ProcessMotionProfileBuffer(long jarg1, CanTalonSRX jarg1_);
+
+  public final static native long CanTalonSRX_GetMotionProfileStatus(long jarg1, CanTalonSRX jarg1_, long jarg2, long jarg3, long jarg4, long jarg5, long jarg6, long jarg7, long jarg8, long jarg9);
 
   public final static native long CanTalonSRX_GetFault_OverTemp(long jarg1, CanTalonSRX jarg1_,
       long jarg2);

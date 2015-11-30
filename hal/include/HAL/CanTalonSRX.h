@@ -71,11 +71,13 @@
  */
 #ifndef CanTalonSRX_H_
 #define CanTalonSRX_H_
-#include "ctre/ctre.h"				//BIT Defines + Typedefs
+#include "ctre/ctre.h"				//BIT Defines + Typedefs, TALON_Control_6_MotProfAddTrajPoint_t
 #include "ctre/CtreCanNode.h"
 #include <FRC_NetworkCommunication/CANSessionMux.h>	//CAN Comm
 #include <map>
 #include <atomic>
+#include <deque>
+#include <mutex>
 class CanTalonSRX : public CtreCanNode
 {
 private:
@@ -101,6 +103,133 @@ private:
 	void OpenSessionIfNeedBe();
 	void ProcessStreamMessages();
 	/**
+	 * Called in various places to double check we are using the best control frame.
+	 * If the Talon firmware is too old, use control 1 framing, which does not allow setting
+	 * control signals until robot is enabled.  If Talon firmware can suport control5, use that
+	 * since that frame can be transmitted during robot-disable.  If calling application
+	 * uses setParam to set the signal eLegacyControlMode, caller can force using control1
+	 * if needed for some reason.
+	 */
+	void UpdateControlId();
+	/**
+	 * @return true if Talon is reporting that it supports control5, and therefore
+	 * 				RIO can send control5 to update control params (even when disabled).
+	 */
+	bool IsControl5Supported();
+	/**
+	 * Get a copy of the control frame to send.
+	 * @param [out] pointer to eight byte array to fill.
+	 */
+	void GetControlFrameCopy(uint8_t * toFill);
+	/**
+	 * @return the tx task that transmits Control6 (motion profile control).
+	 *			If it's not scheduled, then schedule it.  This is part
+	 * 			of making the lazy-framing that only peforms MotionProf framing when needed
+	 *			 to save bandwidth.
+	 */
+	CtreCanNode::txTask<TALON_Control_6_MotProfAddTrajPoint_t> GetControl6();
+	/**
+	 * Caller is either pushing a new motion profile point, or is
+	 * calling the Process buffer routine.  In either case check our
+	 * flow control to see if we need to start sending control6.
+	 */
+	void ReactToMotionProfileCall();
+	/**
+	 * Update the NextPt signals inside the control frame given the next pt to send.
+	 * @param control pointer to the CAN frame payload containing control6.  Only the signals that serialize
+	 * 			the next trajectory point are updated from the contents of newPt.
+	 * @param newPt point to the next trajectory that needs to be inserted into Talon RAM.
+	 */
+	void CopyTrajPtIntoControl(TALON_Control_6_MotProfAddTrajPoint_t * control, const TALON_Control_6_MotProfAddTrajPoint_t * newPt);
+	//---------------------- General Control framing  ---------------------------//
+	/**
+	 * Frame period for control1 or control5, depending on which one we are using.
+	 */
+	int _controlPeriodMs = kDefaultControlPeriodMs;
+	/**
+	 * Frame Period of the motion profile control6 frame.
+	 */
+	int _control6PeriodMs = kDefaultControl6PeriodMs;
+	/**
+	 * When using control5, we still need to send a frame to enable robot.  This controls the period.
+	 * This only is used when we are in the control5 state. @see ControlFrameSelControl5
+	 */
+	int _enablePeriodMs = kDefaultEnablePeriodMs;
+	/**
+	 * ArbID to use for control frame.  Should be either CONTROL_1 or CONTROL_5.
+	 */
+    uint32_t _controlFrameArbId;
+	/**
+	 * Boolean flag to signal calling applications intent to allow using control5
+	 * assuming Talon firmware supports it.  This can be cleared to force control1 framing.
+	 */
+    bool _useControl5ifSupported = true;
+	//---------------------- Buffering Motion Profile ---------------------------//
+	/**
+	 * Top level Buffer for motion profile trajectory buffering.
+	 * Basically this buffers up the eight byte CAN frame payloads that are handshaked into
+	 * the Talon RAM.
+	 * TODO: Should this be moved into a separate header, and if so where logically should it reside?
+	 * TODO: Add compression so that multiple CAN frames can be compressed into one exchange.
+	 */
+	 class TrajectoryBuffer {
+		public:
+			void Clear()
+			{
+				_motProfTopBuffer.clear();
+			}
+			/**
+			 * push caller's uncompressed simple trajectory point.
+			 */
+			void Push(TALON_Control_6_MotProfAddTrajPoint_huff0_t & pt)
+			{
+				_motProfTopBuffer.push_back(pt);
+			}
+			/**
+			 * Get the next trajectory point CAN frame to send.
+			 * Underlying layer may compress the next few points together
+			 * into one control_6 frame.
+			 */
+			TALON_Control_6_MotProfAddTrajPoint_t * Front()
+			{
+				/* TODO : peek ahead and use compression strategies */
+				_lastFront = _motProfTopBuffer.front();
+				return (TALON_Control_6_MotProfAddTrajPoint_t*)&_lastFront;
+			}
+			void Pop()
+			{
+				/* TODO : pop multiple points if last front'd point was compressed. */
+				_motProfTopBuffer.pop_front();
+			}
+			unsigned int GetNumTrajectories()
+			{
+				return _motProfTopBuffer.size();
+			}
+			bool IsEmpty()
+			{
+				return _motProfTopBuffer.empty();
+			}
+		private:
+			std::deque<TALON_Control_6_MotProfAddTrajPoint_huff0_t> _motProfTopBuffer;
+			TALON_Control_6_MotProfAddTrajPoint_huff0_t _lastFront;
+	};
+	TrajectoryBuffer _motProfTopBuffer;
+	/**
+	 * To keep buffers from getting out of control, place a cap on the top level buffer.  Calling application
+	 * can stream addition points as they are fed to Talon.
+	 * Approx memory footprint is this capacity X 8 bytes.
+	 */
+	static const int kMotionProfileTopBufferCapacity = 2048;
+	/**
+	 * Flow control for streaming trajectories.
+	 */
+	int32_t _motProfFlowControl = -1;
+	/**
+	 * Since we may need the MP pts to be emptied into Talon in the background
+	 * make sure the buffering is thread-safe.
+	 */
+	std::mutex _mutMotProf;
+	/**
 	 * Send a one shot frame to set an arbitrary signal.
 	 * Most signals are in the control frame so avoid using this API unless you have to.
 	 * Use this api for...
@@ -115,7 +244,9 @@ private:
 	CTR_Code GetParamResponseRaw(uint32_t paramEnum, int32_t & rawBits);
 public:
 	static const int kDefaultControlPeriodMs = 10; //!< default control update rate is 10ms.
-	CanTalonSRX(int deviceNumber = 0,int controlPeriodMs = kDefaultControlPeriodMs);
+	static const int kDefaultEnablePeriodMs = 50;  //!< default enable update rate is 50ms (when using the new control5 frame).
+	static const int kDefaultControl6PeriodMs = 10; //!< Default update rate for motion profile control 6.  This only takes effect when calling uses MP functions.
+	CanTalonSRX(int deviceNumber = 0,int controlPeriodMs = kDefaultControlPeriodMs,int enablePeriodMs = kDefaultEnablePeriodMs);
 	~CanTalonSRX();
 	void Set(double value);
 	/* mode select enumerations */
@@ -125,6 +256,7 @@ public:
 	static const int kMode_CurrentCloseLoop = 3; //!< Current close loop - not done.
 	static const int kMode_VoltCompen = 4; //!< Voltage Compensation Mode - not done.  Demand is fixed pt target 8.8 volts.
 	static const int kMode_SlaveFollower = 5; //!< Demand is the 6 bit Device ID of the 'master' TALON SRX.
+	static const int kMode_MotionProfile = 6; //!< Demand is '0' (Disabled), '1' (Enabled), or '2' (Hold).
 	static const int kMode_NoDrive = 15; //!< Zero the output (honors brake/coast) regardless of demand.  Might be useful if we need to change modes but can't atomically change all the signals we want in between.
 	/* limit switch enumerations */
 	static const int kLimitSwitchOverride_UseDefaultsFromFlash = 1;
@@ -152,6 +284,17 @@ public:
     static const int kStatusFrame_Encoder = 2;
     static const int kStatusFrame_AnalogTempVbat = 3;
     static const int kStatusFrame_PulseWidthMeas = 4;
+    static const int kStatusFrame_MotionProfile = 5;
+    /* Motion Profile status bits */
+	static const int kMotionProfileFlag_ActTraj_IsValid = 0x1;
+	static const int kMotionProfileFlag_HasUnderrun     = 0x2;
+	static const int kMotionProfileFlag_IsUnderrun      = 0x4;
+	static const int kMotionProfileFlag_ActTraj_IsLast  = 0x8;
+	static const int kMotionProfileFlag_ActTraj_VelOnly = 0x10;
+	/* Motion Profile Set Output */
+	static const int kMotionProf_Disabled = 0; //!< Motor output is neutral, Motion Profile Executer is not running.
+	static const int kMotionProf_Enable = 1;   //!< Motor output is updated from Motion Profile Executer, MPE will process the buffered points.
+	static const int kMotionProf_Hold = 2;     //!< Motor output is updated from Motion Profile Executer, MPE will stay processing current trajectory point.
 	/**
 	 * Signal enumeration for generic signal access.
 	 * Although every signal is enumerated, only use this for traffic that must be solicited.
@@ -247,6 +390,10 @@ public:
 		eAinPosition=115,
 		eProfileParamVcompRate=116,
 		eProfileParamSlot1_AllowableClosedLoopErr=117,
+		eStatus9FrameRate=118, // TALON_Status_9_MotProfBuffer_100ms_t
+		eMotionProfileHasUnderrunErr = 119,
+		eReserved120 = 120,
+		eLegacyControlMode = 121,
 	}param_t;
     /*---------------------setters and getters that use the solicated param request/response-------------*//**
      * Send a one shot frame to set an arbitrary signal.
@@ -300,6 +447,85 @@ public:
 	 * Clear all sticky faults in TALON.
 	 */
 	CTR_Code ClearStickyFaults();
+	/**
+	 * Calling application can opt to speed up the handshaking between the robot API and the Talon to increase the
+	 * download rate of the Talon's Motion Profile.  Ideally the period should be no more than half the period
+	 * of a trajectory point.
+	 */
+	void ChangeMotionControlFramePeriod(uint32_t periodMs);
+	/**
+	 * Clear the buffered motion profile in both Talon RAM (bottom), and in the API (top).
+	 */
+	void ClearMotionProfileTrajectories();
+	/**
+	 * Retrieve just the buffer count for the api-level (top) buffer.
+	 * This routine performs no CAN or data structure lookups, so its fast and ideal
+	 * if caller needs to quickly poll the progress of trajectory points being emptied
+	 * into Talon's RAM. Otherwise just use GetMotionProfileStatus.
+	 * @return number of trajectory points in the top buffer.
+	 */
+	uint32_t GetMotionProfileTopLevelBufferCount();
+	/**
+	 * Retrieve just the buffer full for the api-level (top) buffer.
+	 * This routine performs no CAN or data structure lookups, so its fast and ideal
+	 * if caller needs to quickly poll. Otherwise just use GetMotionProfileStatus.
+	 * @return number of trajectory points in the top buffer.
+	 */
+	bool IsMotionProfileTopLevelBufferFull();
+	/**
+	 * Push another trajectory point into the top level buffer (which is emptied into
+	 * the Talon's bottom buffer as room allows).
+	 * @param targPos servo position in native Talon units (sensor units).
+	 * @param targVel velocity to feed-forward in native Talon units (sensor units per 100ms).
+	 * @param profileSlotSelect  which slot to pull PIDF gains from.  Currently supports 0 or 1.
+	 * @param timeDurMs time in milliseconds of how long to apply this point.
+	 * @param velOnly  set to nonzero to signal Talon that only the feed-foward velocity should be
+	 *                 used, i.e. do not perform PID on position.  This is equivalent to setting
+	 *                 PID gains to zero, but much more efficient and synchronized to MP.
+	 * @param isLastPoint  set to nonzero to signal Talon to keep processing this trajectory point,
+	 *                     instead of jumping to the next one when timeDurMs expires.  Otherwise
+	 *                     MP executer will eventuall see an empty buffer after the last point expires,
+	 *                     causing it to assert the IsUnderRun flag.  However this may be desired
+	 *                     if calling application nevers wants to terminate the MP.
+	 * @param zeroPos  set to nonzero to signal Talon to "zero" the selected position sensor before executing
+	 *                 this trajectory point.  Typically the first point should have this set only thus allowing
+	 *                 the remainder of the MP positions to be relative to zero.
+	 * @return CTR_OKAY if trajectory point push ok. CTR_BufferFull if buffer is full due to kMotionProfileTopBufferCapacity.
+	 */
+	CTR_Code PushMotionProfileTrajectory(int targPos, int targVel, int profileSlotSelect, int timeDurMs, int velOnly, int isLastPoint, int zeroPos);
+	/**
+	 * This must be called periodically to funnel the trajectory points from the API's top level buffer to
+	 * the Talon's bottom level buffer.  Recommendation is to call this twice as fast as the executation rate of the motion profile.
+	 * So if MP is running with 20ms trajectory points, try calling this routine every 10ms.  All motion profile functions are thread-safe
+	 * through the use of a mutex, so there is no harm in having the caller utilize threading.
+	 */
+	void ProcessMotionProfileBuffer();
+	/**
+	 * Retrieve all status information.
+	 * Since this all comes from one CAN frame, its ideal to have one routine to retrieve the frame once and decode everything.
+	 * @param [out] flags bitfield for status bools. Starting with least significant bit: IsValid, HasUnderrun, IsUnderrun, IsLast, VelOnly.
+	 *
+	 *              IsValid set when MP executer is processing a trajectory point, and that point's status is instrumented with
+	 *                           IsLast, VelOnly, targPos, targVel.  However if MP executor is not processing a trajectory point,
+	 *                           then this flag is false, and the instrumented signals will be zero.
+	 *              HasUnderrun is set anytime the MP executer is ready to pop another trajectory point from the Talon's RAM, but the buffer
+	 *                          is empty.  It can only be cleared by using SetParam(eMotionProfileHasUnderrunErr,0);
+	 *              IsUnderrun is set when the MP executer is ready for another point, but the buffer is empty, and cleared when the MP executer
+	 *                         does not need another point.  HasUnderrun shadows this registor when this register gets set, however HasUnderrun
+	 *                         stays asserted until application has process it, and IsUnderrun auto-clears when the condition is resolved.
+	 *              IsLast is set/cleared based on the MP executer's current trajectory point's IsLast value.  This assumes
+	 *                          IsLast was set when PushMotionProfileTrajectory was used to insert the currently processed trajectory point.
+	 *              VelOnly is set/cleared based on the MP executer's current trajectory point's VelOnly value.
+	 *
+	 * @param [out] profileSlotSelect The currently processed trajectory point's selected slot.  This can differ in the currently selected slot used for Position and Velocity servo modes.
+	 * @param [out] targPos The currently processed trajectory point's position in native units.  This param is zero if IsValid is zero.
+	 * @param [out] targVel The currently processed trajectory point's velocity in native units.  This param is zero if IsValid is zero.
+	 * @param [out] topBufferRem The remaining number of points in the top level buffer.
+	 * @param [out] topBufferCnt The number of points in the top level buffer to be sent to Talon.
+	 * @param [out] btmBufferCnt The number of points in the bottom level buffer inside Talon.
+	 * @return CTR error code
+	 */
+	CTR_Code GetMotionProfileStatus(uint32_t &flags, uint32_t &profileSlotSelect, int32_t &targPos, int32_t &targVel, uint32_t & topBufferRemaining, uint32_t &topBufferCnt, uint32_t &btmBufferCnt, uint32_t &outputEnable);
     /*------------------------ auto generated.  This API is optimal since it uses the fire-and-forget CAN interface ----------------------*/
     /*------------------------ These signals should cover the majority of all use cases. ----------------------------------*/
 	CTR_Code GetFault_OverTemp(int &param);
@@ -339,6 +565,11 @@ public:
 	CTR_Code GetResetCount(int &param);
 	CTR_Code GetResetFlags(int &param);
 	CTR_Code GetFirmVers(int &param);
+	CTR_Code GetPulseWidthPosition(int &param);
+	CTR_Code GetPulseWidthVelocity(int &param);
+	CTR_Code GetPulseWidthRiseToFallUs(int &param);
+	CTR_Code GetPulseWidthRiseToRiseUs(int &param);
+	CTR_Code IsPulseWidthSensorPresent(int &param);
 	CTR_Code SetDemand(int param);
 	CTR_Code SetOverrideLimitSwitchEn(int param);
 	CTR_Code SetFeedbackDeviceSelect(int param);
@@ -349,11 +580,6 @@ public:
 	CTR_Code SetProfileSlotSelect(int param);
 	CTR_Code SetRampThrottle(int param);
 	CTR_Code SetRevFeedbackSensor(int param);
-	CTR_Code GetPulseWidthPosition(int &param);
-	CTR_Code GetPulseWidthVelocity(int &param);
-	CTR_Code GetPulseWidthRiseToFallUs(int &param);
-	CTR_Code GetPulseWidthRiseToRiseUs(int &param);
-	CTR_Code IsPulseWidthSensorPresent(int &param);
 };
 extern "C" {
 	void *c_TalonSRX_Create(int deviceNumber, int controlPeriodMs);
@@ -401,6 +627,11 @@ extern "C" {
 	CTR_Code c_TalonSRX_GetResetCount(void *handle, int *param);
 	CTR_Code c_TalonSRX_GetResetFlags(void *handle, int *param);
 	CTR_Code c_TalonSRX_GetFirmVers(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetPulseWidthPosition(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetPulseWidthVelocity(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetPulseWidthRiseToFallUs(void *handle, int *param);
+	CTR_Code c_TalonSRX_GetPulseWidthRiseToRiseUs(void *handle, int *param);
+	CTR_Code c_TalonSRX_IsPulseWidthSensorPresent(void *handle, int *param);
 	CTR_Code c_TalonSRX_SetDemand(void *handle, int param);
 	CTR_Code c_TalonSRX_SetOverrideLimitSwitchEn(void *handle, int param);
 	CTR_Code c_TalonSRX_SetFeedbackDeviceSelect(void *handle, int param);
@@ -411,11 +642,6 @@ extern "C" {
 	CTR_Code c_TalonSRX_SetProfileSlotSelect(void *handle, int param);
 	CTR_Code c_TalonSRX_SetRampThrottle(void *handle, int param);
 	CTR_Code c_TalonSRX_SetRevFeedbackSensor(void *handle, int param);
-	CTR_Code c_TalonSRX_GetPulseWidthPosition(void *handle, int *param);
-	CTR_Code c_TalonSRX_GetPulseWidthVelocity(void *handle, int *param);
-	CTR_Code c_TalonSRX_GetPulseWidthRiseToFallUs(void *handle, int *param);
-	CTR_Code c_TalonSRX_GetPulseWidthRiseToRiseUs(void *handle, int *param);
-	CTR_Code c_TalonSRX_IsPulseWidthSensorPresent(void *handle, int *param);
 }
 #endif
 

@@ -89,10 +89,13 @@
 #define STATUS_6  		0x02041540
 #define STATUS_7  		0x02041580
 #define STATUS_8  		0x020415C0
+#define STATUS_9  		0x02041600
 
 #define CONTROL_1 			0x02040000
 #define CONTROL_2 			0x02040040
 #define CONTROL_3 			0x02040080
+#define CONTROL_5 			0x02040100
+#define CONTROL_6 			0x02040140
 
 #define EXPECTED_RESPONSE_TIMEOUT_MS	(200)
 #define GET_STATUS1() CtreCanNode::recMsg<TALON_Status_1_General_10ms_t		> rx = GetRx<TALON_Status_1_General_10ms_t>(STATUS_1	  | GetDeviceNumber(), EXPECTED_RESPONSE_TIMEOUT_MS)
@@ -103,6 +106,7 @@
 #define GET_STATUS6() CtreCanNode::recMsg<TALON_Status_6_Eol_t				> rx = GetRx<TALON_Status_6_Eol_t>(STATUS_6				  | GetDeviceNumber(), EXPECTED_RESPONSE_TIMEOUT_MS)
 #define GET_STATUS7() CtreCanNode::recMsg<TALON_Status_7_Debug_200ms_t		> rx = GetRx<TALON_Status_7_Debug_200ms_t>(STATUS_7		  | GetDeviceNumber(), EXPECTED_RESPONSE_TIMEOUT_MS)
 #define GET_STATUS8() CtreCanNode::recMsg<TALON_Status_8_PulseWid_100ms_t	> rx = GetRx<TALON_Status_8_PulseWid_100ms_t>(STATUS_8	  | GetDeviceNumber(), EXPECTED_RESPONSE_TIMEOUT_MS)
+#define GET_STATUS9() CtreCanNode::recMsg<TALON_Status_9_MotProfBuffer_100ms_t	> rx = GetRx<TALON_Status_9_MotProfBuffer_100ms_t>(STATUS_9	  | GetDeviceNumber(), EXPECTED_RESPONSE_TIMEOUT_MS)
 
 #define PARAM_REQUEST 		0x02041800
 #define PARAM_RESPONSE 		0x02041840
@@ -117,166 +121,22 @@ const double FXP_TO_FLOAT_10_22 = 0.0000002384185791015625;
 const double FLOAT_TO_FXP_0_8 = (double)0x100;
 const double FXP_TO_FLOAT_0_8 = 0.00390625;
 
-/* encoder/decoders */
-/** control */
-typedef struct _TALON_Control_1_General_10ms_t {
-	unsigned TokenH:8;
-	unsigned TokenL:8;
-	unsigned DemandH:8;
-	unsigned DemandM:8;
-	unsigned DemandL:8;
-	unsigned ProfileSlotSelect:1;
-	unsigned FeedbackDeviceSelect:4;
-	unsigned OverrideLimitSwitchEn:3;
-	unsigned RevFeedbackSensor:1;
-	unsigned RevMotDuringCloseLoopEn:1;
-	unsigned OverrideBrakeType:2;
-	unsigned ModeSelect:4;
-	unsigned RampThrottle:8;
-} TALON_Control_1_General_10ms_t ;
-typedef struct _TALON_Control_2_Rates_OneShot_t {
-	unsigned Status1Ms:8;
-	unsigned Status2Ms:8;
-	unsigned Status3Ms:8;
-	unsigned Status4Ms:8;
-	unsigned StatusPulWidMs:8;	// TALON_Status_8_PulseWid_100ms_t
-} TALON_Control_2_Rates_OneShot_t ;
-typedef struct _TALON_Control_3_ClearFlags_OneShot_t {
-	unsigned ZeroFeedbackSensor:1;
-	unsigned ClearStickyFaults:1;
-} TALON_Control_3_ClearFlags_OneShot_t ;
 
-/** status */
-typedef struct _TALON_Status_1_General_10ms_t {
-	unsigned CloseLoopErrH:8;
-	unsigned CloseLoopErrM:8;
-	unsigned CloseLoopErrL:8;
-	unsigned AppliedThrottle_h3:3;
-	unsigned Fault_RevSoftLim:1;
-	unsigned Fault_ForSoftLim:1;
-	unsigned TokLocked:1;
-	unsigned LimitSwitchClosedRev:1;
-	unsigned LimitSwitchClosedFor:1;
-	unsigned AppliedThrottle_l8:8;
-	unsigned ModeSelect_h1:1;
-	unsigned FeedbackDeviceSelect:4;
-	unsigned LimitSwitchEn:3;
-	unsigned Fault_HardwareFailure:1;
-	unsigned Fault_RevLim:1;
-	unsigned Fault_ForLim:1;
-	unsigned Fault_UnderVoltage:1;
-	unsigned Fault_OverTemp:1;
-	unsigned ModeSelect_b3:3;
-	unsigned TokenSeed:8;
-} TALON_Status_1_General_10ms_t ;
-typedef struct _TALON_Status_2_Feedback_20ms_t {
-	unsigned SensorPositionH:8;
-	unsigned SensorPositionM:8;
-	unsigned SensorPositionL:8;
-	unsigned SensorVelocityH:8;
-	unsigned SensorVelocityL:8;
-	unsigned Current_h8:8;
-	unsigned StckyFault_RevSoftLim:1;
-	unsigned StckyFault_ForSoftLim:1;
-	unsigned StckyFault_RevLim:1;
-	unsigned StckyFault_ForLim:1;
-	unsigned StckyFault_UnderVoltage:1;
-	unsigned StckyFault_OverTemp:1;
-	unsigned Current_l2:2;
-	unsigned reserved2:4;
-	unsigned VelDiv4:1;
-	unsigned PosDiv8:1;
-	unsigned ProfileSlotSelect:1;
-	unsigned BrakeIsEnabled:1;
-} TALON_Status_2_Feedback_20ms_t ;
-typedef struct _TALON_Status_3_Enc_100ms_t {
-	unsigned EncPositionH:8;
-	unsigned EncPositionM:8;
-	unsigned EncPositionL:8;
-	unsigned EncVelH:8;
-	unsigned EncVelL:8;
-	unsigned EncIndexRiseEventsH:8;
-	unsigned EncIndexRiseEventsL:8;
-	unsigned reserved:3;
-	unsigned VelDiv4:1;
-	unsigned PosDiv8:1;
-	unsigned QuadIdxpin:1;
-	unsigned QuadBpin:1;
-	unsigned QuadApin:1;
-} TALON_Status_3_Enc_100ms_t ;
-typedef struct _TALON_Status_4_AinTempVbat_100ms_t {
-	unsigned AnalogInWithOvH:8;
-	unsigned AnalogInWithOvM:8;
-	unsigned AnalogInWithOvL:8;
-	unsigned AnalogInVelH:8;
-	unsigned AnalogInVelL:8;
-	unsigned Temp:8;
-	unsigned BatteryV:8;
-	unsigned reserved:6;
-	unsigned VelDiv4:1;
-	unsigned PosDiv8:1;
-} TALON_Status_4_AinTempVbat_100ms_t ;
-typedef struct _TALON_Status_5_Startup_OneShot_t {
-	unsigned ResetCountH:8;
-	unsigned ResetCountL:8;
-	unsigned ResetFlagsH:8;
-	unsigned ResetFlagsL:8;
-	unsigned FirmVersH:8;
-	unsigned FirmVersL:8;
-} TALON_Status_5_Startup_OneShot_t ;
-typedef struct _TALON_Status_6_Eol_t {
-	unsigned currentAdcUncal_h2:2;
-	unsigned reserved1:5;
-	unsigned SpiCsPin_GadgeteerPin6:1;
-	unsigned currentAdcUncal_l8:8;
-	unsigned tempAdcUncal_h2:2;
-	unsigned reserved2:6;
-	unsigned tempAdcUncal_l8:8;
-	unsigned vbatAdcUncal_h2:2;
-	unsigned reserved3:6;
-	unsigned vbatAdcUncal_l8:8;
-	unsigned analogAdcUncal_h2:2;
-	unsigned reserved4:6;
-	unsigned analogAdcUncal_l8:8;
-} TALON_Status_6_Eol_t ;
-typedef struct _TALON_Status_7_Debug_200ms_t {
-	unsigned TokenizationFails_h8:8;
-	unsigned TokenizationFails_l8:8;
-	unsigned LastFailedToken_h8:8;
-	unsigned LastFailedToken_l8:8;
-	unsigned TokenizationSucceses_h8:8;
-	unsigned TokenizationSucceses_l8:8;
-} TALON_Status_7_Debug_200ms_t ;
-typedef struct _TALON_Status_8_PulseWid_100ms_t {
-	unsigned PulseWidPositionH:8;
-	unsigned PulseWidPositionM:8;
-	unsigned PulseWidPositionL:8;
-	unsigned reserved:6;
-	unsigned VelDiv4:1;
-	unsigned PosDiv8:1;
-	unsigned PeriodUsM8:8;
-	unsigned PeriodUsL8:8;
-	unsigned PulseWidVelH:8;
-	unsigned PulseWidVelL:8;
-} TALON_Status_8_PulseWid_100ms_t ;
-typedef struct _TALON_Param_Request_t {
-	unsigned ParamEnum:8;
-} TALON_Param_Request_t ;
-typedef struct _TALON_Param_Response_t {
-	unsigned ParamEnum:8;
-	unsigned ParamValueL:8;
-	unsigned ParamValueML:8;
-	unsigned ParamValueMH:8;
-	unsigned ParamValueH:8;
-} TALON_Param_Response_t ;
-
-CanTalonSRX::CanTalonSRX(int deviceNumber,int controlPeriodMs): CtreCanNode(deviceNumber), _can_h(0), _can_stat(0)
+CanTalonSRX::CanTalonSRX(int deviceNumber,int controlPeriodMs,int enablePeriodMs): CtreCanNode(deviceNumber), _can_h(0), _can_stat(0)
 {
+	_controlPeriodMs = controlPeriodMs;
+	_enablePeriodMs = enablePeriodMs;
+	
 	/* bound period to be within [1 ms,95 ms] */
-	if(controlPeriodMs < 1)
-		controlPeriodMs = 1;
-	else if(controlPeriodMs > 95)
-		controlPeriodMs = 95;
+	if(_controlPeriodMs < 1)
+		_controlPeriodMs = 1;
+	else if(_controlPeriodMs > 95)
+		_controlPeriodMs = 95;
+	if(_enablePeriodMs < 1)
+		_enablePeriodMs = 1;
+	else if(_enablePeriodMs > 95)
+		_enablePeriodMs = 95;
+
 	RegisterRx(STATUS_1 | (UINT8)deviceNumber );
 	RegisterRx(STATUS_2 | (UINT8)deviceNumber );
 	RegisterRx(STATUS_3 | (UINT8)deviceNumber );
@@ -284,10 +144,14 @@ CanTalonSRX::CanTalonSRX(int deviceNumber,int controlPeriodMs): CtreCanNode(devi
 	RegisterRx(STATUS_5 | (UINT8)deviceNumber );
 	RegisterRx(STATUS_6 | (UINT8)deviceNumber );
 	RegisterRx(STATUS_7 | (UINT8)deviceNumber );
-	RegisterTx(CONTROL_1 | (UINT8)deviceNumber, (UINT8)controlPeriodMs);
+	/* use the legacy command frame until we have evidence we can use the new frame. */
+	RegisterTx(CONTROL_1 | (UINT8)deviceNumber, (UINT8)_controlPeriodMs);
+	_controlFrameArbId = CONTROL_1;
 	/* the only default param that is nonzero is limit switch.
 	 * Default to using the flash settings. */
 	SetOverrideLimitSwitchEn(kLimitSwitchOverride_UseDefaultsFromFlash);
+	/* Check if we can upgrade the control framing */
+	UpdateControlId();
 }
 /* CanTalonSRX D'tor
  */
@@ -299,11 +163,88 @@ CanTalonSRX::~CanTalonSRX()
 	}else{
 		/* un-register the control frame so Talon is disabled */
 		RegisterTx(CONTROL_1 | (UINT8)GetDeviceNumber(), 0);
+		RegisterTx(CONTROL_5 | (UINT8)GetDeviceNumber(), 0);
 	}
 	/* free the stream we used for SetParam/GetParamResponse */
 	if(_can_h){
 		FRC_NetworkCommunication_CANSessionMux_closeStreamSession(_can_h);
 		_can_h = 0;
+	}
+}
+/**
+ * @return true if Talon is reporting that it supports control5, and therefore
+ * 				RIO can send control5 to update control params (even when disabled).
+ */
+bool CanTalonSRX::IsControl5Supported()
+{
+	/* only bother to poll status2 if we are looking for cmd5allowed */
+	GET_STATUS2();
+	if(rx.err != CTR_OKAY){
+		/* haven't received it */
+		return false;
+	}else if(0 == rx->Cmd5Allowed){
+		/* firmware doesn't support it */
+		return false;
+	}
+	/* we can use control5, this gives application the ability to set control params prior to Talon-enable */
+	return true;
+}
+/**
+ * Get a copy of the control frame to send.
+ * @param [out] pointer to eight byte array to fill.
+ */
+void CanTalonSRX::GetControlFrameCopy(uint8_t * toFill)
+{
+	/* get the copy of the control frame in control1 */
+	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> task = GetTx<TALON_Control_1_General_10ms_t>(_controlFrameArbId | GetDeviceNumber());
+	/* control1's payload will move to 5, but update the new sigs in control5 */
+	if(task.IsEmpty())
+		memset(toFill, 0, 8);
+	else
+		memcpy(toFill, task.toSend, 8);
+	/* zero first two bytes - these are reserved. */
+	toFill[0] = 0;
+	toFill[1] = 0;
+}
+/**
+ * Called in various places to double check we are using the best control frame.
+ * If the Talon firmware is too old, use control 1 framing, which does not allow setting
+ * control signals until robot is enabled.  If Talon firmware can suport control5, use that
+ * since that frame can be transmitted during robot-disable.  If calling application
+ * uses setParam to set the signal eLegacyControlMode, caller can force using control1
+ * if needed for some reason.
+ */
+void CanTalonSRX::UpdateControlId()
+{
+	uint8_t work[8];
+	uint32_t frameToUse;
+	/* deduce if we should change IDs.  If firm supports the new frame, and calling app isn't forcing legacy mode
+	 * use control5.*/
+	if(_useControl5ifSupported && IsControl5Supported()){
+		frameToUse = CONTROL_5;
+	}else{
+		frameToUse = CONTROL_1;
+	}
+	/* is there anything to do */
+	if(frameToUse == _controlFrameArbId){
+		/* nothing to do, we are using the best frame. */
+	}else if(frameToUse == CONTROL_5){
+		/* get a copy of the control frame */
+		GetControlFrameCopy(work);
+		/* Change control1's DLC to 2.  Passing nullptr means all payload bytes are zero. */
+		RegisterTx(CONTROL_1 | GetDeviceNumber(), _enablePeriodMs, 2, nullptr);
+		/* reregister the control frame using the new ID */
+		RegisterTx(frameToUse | GetDeviceNumber(), _controlPeriodMs, 8, work);
+		/* save the correct frame ArbID */
+		_controlFrameArbId = frameToUse;
+	}else if(frameToUse == CONTROL_1) {
+		GetControlFrameCopy(work);
+		/* stop sending control 5 */
+		UnregisterTx(CONTROL_5 | GetDeviceNumber());
+		/* reregister the control frame using the new ID */
+		RegisterTx(frameToUse | GetDeviceNumber(), _controlPeriodMs, 8, work);
+		/* save the correct frame ArbID */
+		_controlFrameArbId = frameToUse;
 	}
 }
 void CanTalonSRX::OpenSessionIfNeedBe()
@@ -385,6 +326,21 @@ CTR_Code CanTalonSRX::SetParamRaw(unsigned paramEnum, int rawBits)
 	frame.ParamValueL = rawBits;
 	int32_t status = 0;
 	FRC_NetworkCommunication_CANSessionMux_sendMessage(PARAM_SET | GetDeviceNumber(), (const uint8_t*)&frame, 5, 0, &status);
+	/* small hook here if we want the API itself to react to set commands */
+	switch(paramEnum){
+		case eLegacyControlMode:
+			if(rawBits != 0){
+				/* caller wants to force legacy framing */
+				_useControl5ifSupported = false;
+			}else {
+				/* caller wants to let the API decide */
+				_useControl5ifSupported = true;
+			}
+			/* recheck IDs now that flag has changed */
+			UpdateControlId();
+			break;
+	}
+	/* for now have a general failure if we can't transmit */
 	if(status)
 		return CTR_TxFailed;
 	return CTR_OKAY;
@@ -660,6 +616,9 @@ CTR_Code CanTalonSRX::SetStatusFrameRate(unsigned frameEnum, unsigned periodMs)
 		case kStatusFrame_PulseWidthMeas:
 			paramEnum = eStatus8FrameRate;
 			break;
+		case kStatusFrame_MotionProfile:
+			paramEnum = eStatus9FrameRate;
+			break;
 		default:
 			/* caller's request is not support, return an error code */
 			retval = CTR_InvalidParamValue;
@@ -686,6 +645,286 @@ CTR_Code CanTalonSRX::ClearStickyFaults()
 	if(status)
 		return CTR_TxFailed;
 	return CTR_OKAY;
+}
+/**
+ * @return the tx task that transmits Control6 (motion profile control).
+ *			If it's not scheduled, then schedule it.  This is part
+ * 			of firing the MotionProf framing only when needed
+ *			 to save bandwidth.
+ */
+CtreCanNode::txTask<TALON_Control_6_MotProfAddTrajPoint_t> CanTalonSRX::GetControl6()
+{
+	CtreCanNode::txTask<TALON_Control_6_MotProfAddTrajPoint_t> control6 = GetTx<TALON_Control_6_MotProfAddTrajPoint_t>(CONTROL_6 | GetDeviceNumber());
+	if (control6.IsEmpty()){
+		/* control6 never started, arm it now */
+		RegisterTx(CONTROL_6 | GetDeviceNumber(), _control6PeriodMs);
+		control6 = GetTx<TALON_Control_6_MotProfAddTrajPoint_t>(CONTROL_6 | GetDeviceNumber());
+		control6->Idx = 0;
+		_motProfFlowControl = 0;
+		FlushTx(control6);
+	}
+	return control6;
+}
+/**
+ * Calling application can opt to speed up the handshaking between the robot API and the Talon to increase the
+ * download rate of the Talon's Motion Profile.  Ideally the period should be no more than half the period
+ * of a trajectory point.
+ */
+void CanTalonSRX::ChangeMotionControlFramePeriod(uint32_t periodMs)
+{
+    std::unique_lock<std::mutex> lock(_mutMotProf);
+	/* if message is already registered, it will get updated.
+	 * Otherwise it will error if it hasn't been setup yet, but that's ok
+	 * because the _control6PeriodMs will be used later.
+	 * @see GetControl6
+	 * */
+	_control6PeriodMs = periodMs;
+	ChangeTxPeriod(CONTROL_6 | GetDeviceNumber(), _control6PeriodMs);
+}
+/**
+ * Clear the buffered motion profile in both Talon RAM (bottom), and in the API (top).
+ */
+void CanTalonSRX::ClearMotionProfileTrajectories()
+{
+    std::unique_lock<std::mutex> lock(_mutMotProf);
+	/* clear the top buffer */
+	_motProfTopBuffer.Clear();
+	/* send signal to clear bottom buffer */
+	auto toFill = CanTalonSRX::GetControl6();
+	toFill->Idx = 0;
+	_motProfFlowControl = 0; /* match the transmitted flow control */
+	FlushTx(toFill);
+}
+/**
+ * Retrieve just the buffer count for the api-level (top) buffer.
+ * This routine performs no CAN or data structure lookups, so its fast and ideal
+ * if caller needs to quickly poll the progress of trajectory points being emptied
+ * into Talon's RAM. Otherwise just use GetMotionProfileStatus.
+ * @return number of trajectory points in the top buffer.
+ */
+uint32_t CanTalonSRX::GetMotionProfileTopLevelBufferCount()
+{
+    std::unique_lock<std::mutex> lock(_mutMotProf);
+    uint32_t retval = (uint32_t)_motProfTopBuffer.GetNumTrajectories();
+    return retval;
+}
+/**
+ * Retrieve just the buffer full for the api-level (top) buffer.
+ * This routine performs no CAN or data structure lookups, so its fast and ideal
+ * if caller needs to quickly poll. Otherwise just use GetMotionProfileStatus.
+ * @return number of trajectory points in the top buffer.
+ */
+bool CanTalonSRX::IsMotionProfileTopLevelBufferFull()
+{
+    std::unique_lock<std::mutex> lock(_mutMotProf);
+	if(_motProfTopBuffer.GetNumTrajectories() >= kMotionProfileTopBufferCapacity)
+		return true;
+    return false;
+}
+/**
+ * Push another trajectory point into the top level buffer (which is emptied into
+ * the Talon's bottom buffer as room allows).
+ * @param targPos servo position in native Talon units (sensor units).
+ * @param targVel velocity to feed-forward in native Talon units (sensor units per 100ms).
+ * @param profileSlotSelect  which slot to pull PIDF gains from.  Currently supports 0 or 1.
+ * @param timeDurMs time in milliseconds of how long to apply this point.
+ * @param velOnly  set to nonzero to signal Talon that only the feed-foward velocity should be
+ *                 used, i.e. do not perform PID on position.  This is equivalent to setting
+ *                 PID gains to zero, but much more efficient and synchronized to MP.
+ * @param isLastPoint  set to nonzero to signal Talon to keep processing this trajectory point,
+ *                     instead of jumping to the next one when timeDurMs expires.  Otherwise
+ *                     MP executer will eventuall see an empty buffer after the last point expires,
+ *                     causing it to assert the IsUnderRun flag.  However this may be desired
+ *                     if calling application nevers wants to terminate the MP.
+ * @param zeroPos  set to nonzero to signal Talon to "zero" the selected position sensor before executing
+ *                 this trajectory point.  Typically the first point should have this set only thus allowing
+ *                 the remainder of the MP positions to be relative to zero.
+ * @return CTR_OKAY if trajectory point push ok. CTR_BufferFull if buffer is full due to kMotionProfileTopBufferCapacity.
+ */
+CTR_Code CanTalonSRX::PushMotionProfileTrajectory(int targPos, int targVel, int profileSlotSelect, int timeDurMs, int velOnly, int isLastPoint, int zeroPos)
+{
+	ReactToMotionProfileCall();
+	/* create our trajectory point */
+	TALON_Control_6_MotProfAddTrajPoint_huff0_t traj;
+	memset((void*)&traj,0,sizeof(traj));
+	traj.NextPt_ZeroPosition = zeroPos ? 1 : 0;
+	traj.NextPt_VelOnly = velOnly ? 1 : 0;
+	traj.NextPt_IsLast = isLastPoint ? 1 : 0;
+	traj.NextPt_ProfileSlotSelect = (profileSlotSelect>0) ? 1 : 0;
+	if(timeDurMs < 0 )
+		timeDurMs = 0;
+	else if(timeDurMs > 255)
+		timeDurMs = 255;
+	traj.NextPt_DurationMs = timeDurMs;
+	traj.NextPt_VelocityH = targVel >> 0x08;
+	traj.NextPt_VelocityL = targVel & 0xFF;
+	traj.NextPt_PositionH = targPos >> 0x10;
+	traj.NextPt_PositionM = targPos >> 0x08;
+	traj.NextPt_PositionL = targPos & 0xFF;
+
+    std::unique_lock<std::mutex> lock(_mutMotProf);
+	if(_motProfTopBuffer.GetNumTrajectories() >= kMotionProfileTopBufferCapacity)
+		return CTR_BufferFull;
+	_motProfTopBuffer.Push(traj);
+	return CTR_OKAY;
+}
+/**
+ * Increment our flow control to manage streaming to the Talon.
+ * f(x) = {	 1,   x = 15,
+ *          x+1,  x < 15
+ *        }
+ */
+#define MotionProf_IncrementSync(idx) ((idx >= 15) ? 1 : 0)  + ((idx+1) & 0xF)
+/**
+ * Update the NextPt signals inside the control frame given the next pt to send.
+ * @param control pointer to the CAN frame payload containing control6.  Only the signals that serialize
+ * 			the next trajectory point are updated from the contents of newPt.
+ * @param newPt point to the next trajectory that needs to be inserted into Talon RAM.
+ */
+void CanTalonSRX::CopyTrajPtIntoControl(TALON_Control_6_MotProfAddTrajPoint_t * control, const TALON_Control_6_MotProfAddTrajPoint_t * newPt)
+{
+	/* Bring over the common signals in the first two bytes */
+	control->NextPt_ProfileSlotSelect = newPt->NextPt_ProfileSlotSelect;
+	control->NextPt_ZeroPosition= newPt->NextPt_ZeroPosition;
+	control->NextPt_VelOnly = newPt->NextPt_VelOnly;
+	control->NextPt_IsLast = newPt->NextPt_IsLast;
+	control->huffCode = newPt->huffCode;
+	/* the last six bytes are entirely for hold NextPt's values. */
+	uint8_t * dest = (uint8_t *)control;
+	const uint8_t * src = (const uint8_t *)newPt;
+	dest[2] = src[2];
+	dest[3] = src[3];
+	dest[4] = src[4];
+	dest[5] = src[5];
+	dest[6] = src[6];
+	dest[7] = src[7];
+}
+/**
+ * Caller is either pushing a new motion profile point, or is
+ * calling the Process buffer routine.  In either case check our
+ * flow control to see if we need to start sending control6.
+ */
+void CanTalonSRX::ReactToMotionProfileCall()
+{
+	if(_motProfFlowControl < 0){
+		/* we have not yet armed the periodic frame.  We do this lazilly to
+		 * save bus utilization since most Talons on the bus probably are not MP'ing.
+		 */
+		ClearMotionProfileTrajectories(); /* this moves flow control so only fires once if ever */
+	}
+}
+/**
+ * This must be called periodically to funnel the trajectory points from the API's top level buffer to
+ * the Talon's bottom level buffer.  Recommendation is to call this twice as fast as the executation rate of the motion profile.
+ * So if MP is running with 20ms trajectory points, try calling this routine every 10ms.  All motion profile functions are thread-safe
+ * through the use of a mutex, so there is no harm in having the caller utilize threading.
+ */
+void CanTalonSRX::ProcessMotionProfileBuffer()
+{
+	ReactToMotionProfileCall();
+	/* get the latest status frame */
+	GET_STATUS9();
+	/* lock */
+    std::unique_lock<std::mutex> lock(_mutMotProf);
+    /* calc what we expect to receive */
+	if(_motProfFlowControl == rx->NextID){
+		/* Talon has completed the last req */
+		if(_motProfTopBuffer.IsEmpty()){
+			/* nothing to do */
+		}else{
+			/* get the latest control frame */
+			auto toFill = GetControl6();
+			TALON_Control_6_MotProfAddTrajPoint_t * front = _motProfTopBuffer.Front();
+			CopyTrajPtIntoControl(toFill.toSend, front);
+			_motProfTopBuffer.Pop();
+			_motProfFlowControl = MotionProf_IncrementSync(_motProfFlowControl);
+			toFill->Idx =  _motProfFlowControl;
+			FlushTx(toFill);
+		}
+	}else {
+		/* still waiting on Talon */
+	}
+}
+/**
+ * Retrieve all status information.
+ * Since this all comes from one CAN frame, its ideal to have one routine to retrieve the frame once and decode everything.
+ * @param [out] flags bitfield for status bools. Starting with least significant bit: IsValid, HasUnderrun, IsUnderrun, IsLast, VelOnly.
+ *
+ *              IsValid set when MP executer is processing a trajectory point, and that point's status is instrumented with
+ *                           IsLast, VelOnly, targPos, targVel.  However if MP executor is not processing a trajectory point,
+ *                           then this flag is false, and the instrumented signals will be zero.
+ *              HasUnderrun is set anytime the MP executer is ready to pop another trajectory point from the Talon's RAM, but the buffer
+ *                          is empty.  It can only be cleared by using SetParam(eMotionProfileHasUnderrunErr,0);
+ *              IsUnderrun is set when the MP executer is ready for another point, but the buffer is empty, and cleared when the MP executer
+ *                         does not need another point.  HasUnderrun shadows this registor when this register gets set, however HasUnderrun
+ *                         stays asserted until application has process it, and IsUnderrun auto-clears when the condition is resolved.
+ *              IsLast is set/cleared based on the MP executer's current trajectory point's IsLast value.  This assumes
+ *                          IsLast was set when PushMotionProfileTrajectory was used to insert the currently processed trajectory point.
+ *              VelOnly is set/cleared based on the MP executer's current trajectory point's VelOnly value.
+ *
+ * @param [out] profileSlotSelect The currently processed trajectory point's selected slot.  This can differ in the currently selected slot used for Position and Velocity servo modes.
+ * @param [out] targPos The currently processed trajectory point's position in native units.  This param is zero if IsValid is zero.
+ * @param [out] targVel The currently processed trajectory point's velocity in native units.  This param is zero if IsValid is zero.
+ * @param [out] topBufferRem The remaining number of points in the top level buffer.
+ * @param [out] topBufferCnt The number of points in the top level buffer to be sent to Talon.
+ * @param [out] btmBufferCnt The number of points in the bottom level buffer inside Talon.
+ * @param [out] outputEnable zero if motion profile output is disabled, one if enabled, two if executer is in hold state.
+ * @return CTR error code
+ */
+CTR_Code CanTalonSRX::GetMotionProfileStatus(	uint32_t &flags, uint32_t &profileSlotSelect, int32_t &targPos, int32_t &targVel,
+												uint32_t & topBufferRem, uint32_t &topBufferCnt, uint32_t &btmBufferCnt, uint32_t &outputEnable )
+{
+	/* get the latest status frame */
+	GET_STATUS9();
+
+	/* clear signals in case we never received an update, caller should check return */
+	flags = 0;
+	profileSlotSelect = 0;
+	targPos = 0;
+	targVel = 0;
+	btmBufferCnt = 0;
+
+	/* these signals are always available */
+	topBufferCnt = _motProfTopBuffer.GetNumTrajectories();
+	topBufferRem = kMotionProfileTopBufferCapacity - _motProfTopBuffer.GetNumTrajectories();
+
+	/* TODO: make enums or make a better method prototype */
+	if(rx->ActTraj_IsValid)
+		flags |= kMotionProfileFlag_ActTraj_IsValid;
+	if(rx->HasUnderrun)
+		flags |= kMotionProfileFlag_HasUnderrun;
+	if(rx->IsUnderrun)
+		flags |= kMotionProfileFlag_IsUnderrun;
+	if(rx->ActTraj_IsLast)
+		flags |= kMotionProfileFlag_ActTraj_IsLast;
+	if(rx->ActTraj_VelOnly)
+		flags |= kMotionProfileFlag_ActTraj_VelOnly;
+
+	btmBufferCnt = rx->Count;
+
+	targPos = rx->ActTraj_PositionH;
+	targPos <<= 8;
+	targPos |= rx->ActTraj_PositionM;
+	targPos <<= 8;
+	targPos |= rx->ActTraj_PositionL;
+
+	targVel = rx->ActTraj_VelocityH;
+	targVel <<= 8;
+	targVel |= rx->ActTraj_VelocityL;
+
+	profileSlotSelect = rx->ActTraj_ProfileSlotSelect;
+
+	switch(rx->OutputType){
+		case kMotionProf_Disabled:
+		case kMotionProf_Enable:
+		case kMotionProf_Hold:
+			outputEnable = rx->OutputType;
+			break;
+		default: /* do now allow invalid values for sake of user-facing enum types */
+			outputEnable = kMotionProf_Disabled;
+			break;
+	}
+	return rx.err;
 }
 /*------------------------ auto generated.  This API is optimal since it uses the fire-and-forget CAN interface ----------------------*/
 /*------------------------ These signals should cover the majority of all use cases. ----------------------------------*/
@@ -1005,97 +1244,6 @@ CTR_Code CanTalonSRX::GetFirmVers(int &param)
 	param = (int)raw;
 	return rx.err;
 }
-CTR_Code CanTalonSRX::SetDemand(int param)
-{
-	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(CONTROL_1 | GetDeviceNumber());
-	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
-	toFill->DemandH = param>>16;
-	toFill->DemandM = param>>8;
-	toFill->DemandL = param>>0;
-	FlushTx(toFill);
-	return CTR_OKAY;
-}
-CTR_Code CanTalonSRX::SetOverrideLimitSwitchEn(int param)
-{
-	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(CONTROL_1 | GetDeviceNumber());
-	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
-	toFill->OverrideLimitSwitchEn = param;
-	FlushTx(toFill);
-	return CTR_OKAY;
-}
-CTR_Code CanTalonSRX::SetFeedbackDeviceSelect(int param)
-{
-	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(CONTROL_1 | GetDeviceNumber());
-	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
-	toFill->FeedbackDeviceSelect = param;
-	FlushTx(toFill);
-	return CTR_OKAY;
-}
-CTR_Code CanTalonSRX::SetRevMotDuringCloseLoopEn(int param)
-{
-	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(CONTROL_1 | GetDeviceNumber());
-	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
-	toFill->RevMotDuringCloseLoopEn = param;
-	FlushTx(toFill);
-	return CTR_OKAY;
-}
-CTR_Code CanTalonSRX::SetOverrideBrakeType(int param)
-{
-	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(CONTROL_1 | GetDeviceNumber());
-	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
-	toFill->OverrideBrakeType = param;
-	FlushTx(toFill);
-	return CTR_OKAY;
-}
-CTR_Code CanTalonSRX::SetModeSelect(int param)
-{
-	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(CONTROL_1 | GetDeviceNumber());
-	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
-	toFill->ModeSelect = param;
-	FlushTx(toFill);
-	return CTR_OKAY;
-}
-/**
- * @param modeSelect selects which mode.
- * @param demand setpt or throttle or masterId to follow.
- * @return error code, 0 iff successful.
- * This function has the advantage of atomically setting mode and demand.
- */
-CTR_Code CanTalonSRX::SetModeSelect(int modeSelect,int demand)
-{
-	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(CONTROL_1 | GetDeviceNumber());
-	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
-	toFill->ModeSelect = modeSelect;
-	toFill->DemandH = demand>>16;
-	toFill->DemandM = demand>>8;
-	toFill->DemandL = demand>>0;
-	FlushTx(toFill);
-	return CTR_OKAY;
-}
-CTR_Code CanTalonSRX::SetProfileSlotSelect(int param)
-{
-	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(CONTROL_1 | GetDeviceNumber());
-	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
-	toFill->ProfileSlotSelect = param;
-	FlushTx(toFill);
-	return CTR_OKAY;
-}
-CTR_Code CanTalonSRX::SetRampThrottle(int param)
-{
-	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(CONTROL_1 | GetDeviceNumber());
-	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
-	toFill->RampThrottle = param;
-	FlushTx(toFill);
-	return CTR_OKAY;
-}
-CTR_Code CanTalonSRX::SetRevFeedbackSensor(int param)
-{
-	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(CONTROL_1 | GetDeviceNumber());
-	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
-	toFill->RevFeedbackSensor = param ? 1 : 0;
-	FlushTx(toFill);
-	return CTR_OKAY;
-}
 CTR_Code CanTalonSRX::GetPulseWidthPosition(int &param)
 {
 	GET_STATUS8();
@@ -1171,6 +1319,97 @@ CTR_Code CanTalonSRX::IsPulseWidthSensorPresent(int &param)
 	else
 		param = 0;
 	return retval;
+}
+CTR_Code CanTalonSRX::SetDemand(int param)
+{
+	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(_controlFrameArbId | GetDeviceNumber());
+	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
+	toFill->DemandH = param>>16;
+	toFill->DemandM = param>>8;
+	toFill->DemandL = param>>0;
+	FlushTx(toFill);
+	return CTR_OKAY;
+}
+CTR_Code CanTalonSRX::SetOverrideLimitSwitchEn(int param)
+{
+	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(_controlFrameArbId | GetDeviceNumber());
+	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
+	toFill->OverrideLimitSwitchEn = param;
+	FlushTx(toFill);
+	return CTR_OKAY;
+}
+CTR_Code CanTalonSRX::SetFeedbackDeviceSelect(int param)
+{
+	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(_controlFrameArbId | GetDeviceNumber());
+	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
+	toFill->FeedbackDeviceSelect = param;
+	FlushTx(toFill);
+	return CTR_OKAY;
+}
+CTR_Code CanTalonSRX::SetRevMotDuringCloseLoopEn(int param)
+{
+	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(_controlFrameArbId | GetDeviceNumber());
+	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
+	toFill->RevMotDuringCloseLoopEn = param;
+	FlushTx(toFill);
+	return CTR_OKAY;
+}
+CTR_Code CanTalonSRX::SetOverrideBrakeType(int param)
+{
+	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(_controlFrameArbId | GetDeviceNumber());
+	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
+	toFill->OverrideBrakeType = param;
+	FlushTx(toFill);
+	return CTR_OKAY;
+}
+CTR_Code CanTalonSRX::SetModeSelect(int param)
+{
+	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(_controlFrameArbId | GetDeviceNumber());
+	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
+	toFill->ModeSelect = param;
+	FlushTx(toFill);
+	return CTR_OKAY;
+}
+/**
+ * @param modeSelect selects which mode.
+ * @param demand setpt or throttle or masterId to follow.
+ * @return error code, 0 iff successful.
+ * This function has the advantage of atomically setting mode and demand.
+ */
+CTR_Code CanTalonSRX::SetModeSelect(int modeSelect,int demand)
+{
+	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(_controlFrameArbId | GetDeviceNumber());
+	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
+	toFill->ModeSelect = modeSelect;
+	toFill->DemandH = demand>>16;
+	toFill->DemandM = demand>>8;
+	toFill->DemandL = demand>>0;
+	FlushTx(toFill);
+	return CTR_OKAY;
+}
+CTR_Code CanTalonSRX::SetProfileSlotSelect(int param)
+{
+	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(_controlFrameArbId | GetDeviceNumber());
+	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
+	toFill->ProfileSlotSelect = param;
+	FlushTx(toFill);
+	return CTR_OKAY;
+}
+CTR_Code CanTalonSRX::SetRampThrottle(int param)
+{
+	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(_controlFrameArbId | GetDeviceNumber());
+	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
+	toFill->RampThrottle = param;
+	FlushTx(toFill);
+	return CTR_OKAY;
+}
+CTR_Code CanTalonSRX::SetRevFeedbackSensor(int param)
+{
+	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(_controlFrameArbId | GetDeviceNumber());
+	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
+	toFill->RevFeedbackSensor = param ? 1 : 0;
+	FlushTx(toFill);
+	return CTR_OKAY;
 }
 //------------------ C interface --------------------------------------------//
 extern "C" {
@@ -1354,6 +1593,26 @@ CTR_Code c_TalonSRX_GetFirmVers(void *handle, int *param)
 {
 	return ((CanTalonSRX*)handle)->GetFirmVers(*param);
 }
+CTR_Code c_TalonSRX_GetPulseWidthPosition(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetPulseWidthPosition(*param);
+}
+CTR_Code c_TalonSRX_GetPulseWidthVelocity(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetPulseWidthVelocity(*param);
+}
+CTR_Code c_TalonSRX_GetPulseWidthRiseToFallUs(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetPulseWidthRiseToFallUs(*param);
+}
+CTR_Code c_TalonSRX_GetPulseWidthRiseToRiseUs(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->GetPulseWidthRiseToRiseUs(*param);
+}
+CTR_Code c_TalonSRX_IsPulseWidthSensorPresent(void *handle, int *param)
+{
+	return ((CanTalonSRX*)handle)->IsPulseWidthSensorPresent(*param);
+}
 CTR_Code c_TalonSRX_SetDemand(void *handle, int param)
 {
 	return ((CanTalonSRX*)handle)->SetDemand(param);
@@ -1393,25 +1652,5 @@ CTR_Code c_TalonSRX_SetRampThrottle(void *handle, int param)
 CTR_Code c_TalonSRX_SetRevFeedbackSensor(void *handle, int param)
 {
 	return ((CanTalonSRX*)handle)->SetRevFeedbackSensor(param);
-}
-CTR_Code c_TalonSRX_GetPulseWidthPosition(void *handle, int *param)
-{
-	return ((CanTalonSRX*)handle)->GetPulseWidthPosition(*param);
-}
-CTR_Code c_TalonSRX_GetPulseWidthVelocity(void *handle, int *param)
-{
-	return ((CanTalonSRX*)handle)->GetPulseWidthVelocity(*param);
-}
-CTR_Code c_TalonSRX_GetPulseWidthRiseToFallUs(void *handle, int *param)
-{
-	return ((CanTalonSRX*)handle)->GetPulseWidthRiseToFallUs(*param);
-}
-CTR_Code c_TalonSRX_GetPulseWidthRiseToRiseUs(void *handle, int *param)
-{
-	return ((CanTalonSRX*)handle)->GetPulseWidthRiseToRiseUs(*param);
-}
-CTR_Code c_TalonSRX_IsPulseWidthSensorPresent(void *handle, int *param)
-{
-	return ((CanTalonSRX*)handle)->IsPulseWidthSensorPresent(*param);
 }
 }

@@ -18,19 +18,56 @@ void CtreCanNode::RegisterRx(uint32_t arbId)
 {
 	/* no need to do anything, we just use new API to poll last received message */
 }
-void CtreCanNode::RegisterTx(uint32_t arbId, uint32_t periodMs)
+/**
+ * Schedule a CAN Frame for periodic transmit.
+ * @param arbId 	CAN Frame Arbitration ID.  Set BIT31 for 11bit ids, otherwise we use 29bit ids.
+ * @param periodMs	Period to transmit CAN frame.  Pass 0 for one-shot, which also disables that ArbID's preceding periodic transmit.
+ * @param dlc 		Number of bytes to transmit (0 to 8).
+ * @param initialFrame	Ptr to the frame data to schedule for transmitting.  Passing null will result
+ *						in defaulting to zero data value.
+ */
+void CtreCanNode::RegisterTx(uint32_t arbId, uint32_t periodMs, uint32_t dlc, const uint8_t * initialFrame)
 {
 	int32_t status = 0;
-
+	if(dlc > 8)
+		dlc = 8;
 	txJob_t job = {0};
 	job.arbId = arbId;
 	job.periodMs = periodMs;
+	job.dlc = dlc;
+	if(initialFrame){
+		/* caller wants to specify original data */
+		memcpy(job.toSend, initialFrame, dlc);
+	}
 	_txJobs[arbId] = job;
 	FRC_NetworkCommunication_CANSessionMux_sendMessage(	job.arbId,
 														job.toSend,
-														8,
+														job.dlc,
 														job.periodMs,
 														&status);
+}
+/**
+ * Schedule a CAN Frame for periodic transmit.  Assume eight byte DLC and zero value for initial transmission.
+ * @param arbId 	CAN Frame Arbitration ID.  Set BIT31 for 11bit ids, otherwise we use 29bit ids.
+ * @param periodMs	Period to transmit CAN frame.  Pass 0 for one-shot, which also disables that ArbID's preceding periodic transmit.
+ */
+void CtreCanNode::RegisterTx(uint32_t arbId, uint32_t periodMs)
+{
+	RegisterTx(arbId,periodMs, 8, 0);
+}
+/**
+ * Remove a CAN frame Arbid to stop transmission.
+ * @param arbId 	CAN Frame Arbitration ID.  Set BIT31 for 11bit ids, otherwise we use 29bit ids.
+ */
+void CtreCanNode::UnregisterTx(uint32_t arbId)
+{
+	/* set period to zero */
+	ChangeTxPeriod(arbId, 0);
+	/* look and remove */
+	txJobs_t::iterator iter = _txJobs.find(arbId);
+	if(iter != _txJobs.end()) {
+		_txJobs.erase(iter);
+	}
 }
 timespec diff(const timespec & start, const timespec & end)
 {
@@ -94,8 +131,34 @@ void CtreCanNode::FlushTx(uint32_t arbId)
 	if(iter != _txJobs.end())
 		FRC_NetworkCommunication_CANSessionMux_sendMessage(	iter->second.arbId,
 															iter->second.toSend,
-															8,
+															iter->second.dlc,
 															iter->second.periodMs,
 															&status);
+}
+/**
+ * Change the transmit period of an already scheduled CAN frame.
+ * This keeps the frame payload contents the same without caller having to perform
+ * a read-modify-write.
+ * @param arbId 	CAN Frame Arbitration ID.  Set BIT31 for 11bit ids, otherwise we use 29bit ids.
+ * @param periodMs	Period to transmit CAN frame.  Pass 0 for one-shot, which also disables that ArbID's preceding periodic transmit.
+ * @return true if scheduled job was found and updated, false if there was no preceding job for the specified arbID.
+ */
+bool CtreCanNode::ChangeTxPeriod(uint32_t arbId, uint32_t periodMs)
+{
+	int32_t status = 0;
+	/* lookup the data bytes and period for this message */
+	txJobs_t::iterator iter = _txJobs.find(arbId);
+	if(iter != _txJobs.end()) {
+		/* modify th periodMs */
+		iter->second.periodMs = periodMs;
+		/* reinsert into scheduler with the same data bytes, only the period changed. */
+		FRC_NetworkCommunication_CANSessionMux_sendMessage(	iter->second.arbId,
+															iter->second.toSend,
+															iter->second.dlc,
+															iter->second.periodMs,
+															&status);
+		return true;
+	}
+	return false;
 }
 
