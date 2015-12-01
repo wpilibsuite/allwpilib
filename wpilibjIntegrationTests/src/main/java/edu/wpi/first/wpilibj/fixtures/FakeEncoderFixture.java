@@ -41,7 +41,7 @@ public class FakeEncoderFixture implements ITestFixture {
     this.m_dio2 = dio2;
     m_allocated = false;
     m_source = new FakeEncoderSource(dio1.getOutput(), dio2.getOutput());
-    m_encoder = new Encoder(dio1.getInput(), dio2.getOutput());
+    m_encoder = new Encoder(dio1.getInput(), dio2.getInput());
   }
 
   /**
@@ -67,7 +67,7 @@ public class FakeEncoderFixture implements ITestFixture {
     m_encoderPort[0] = inputA;
     m_encoderPort[1] = inputB;
     m_source = new FakeEncoderSource(m_dio1.getOutput(), m_dio2.getOutput());
-    m_encoder = new Encoder(m_dio1.getInput(), m_dio2.getOutput());
+    m_encoder = new Encoder(m_dio1.getInput(), m_dio2.getInput());
   }
 
   public FakeEncoderSource getFakeEncoderSource() {
