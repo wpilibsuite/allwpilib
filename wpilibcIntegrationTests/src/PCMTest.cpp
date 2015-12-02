@@ -63,7 +63,7 @@ class PCMTest : public testing::Test {
 /**
  * Test if the compressor turns on and off when the pressure switch is toggled
  */
-TEST_F(PCMTest, DISABLED_PressureSwitch) {
+TEST_F(PCMTest, PressureSwitch) {
   Reset();
 
   m_compressor->SetClosedLoopControl(true);
