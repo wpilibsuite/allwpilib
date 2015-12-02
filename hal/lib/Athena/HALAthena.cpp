@@ -9,6 +9,7 @@
 #include "FRC_NetworkCommunication/UsageReporting.h"
 #include "FRC_NetworkCommunication/LoadOut.h"
 #include "FRC_NetworkCommunication/CANSessionMux.h"
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <unistd.h>
@@ -19,8 +20,8 @@ const uint32_t dio_kNumSystems = tDIO::kNumSystems;
 const uint32_t interrupt_kNumSystems = tInterrupt::kNumSystems;
 const uint32_t kSystemClockTicksPerMicrosecond = 40;
 
-static tGlobal *global;
-static tSysWatchdog *watchdog;
+static tGlobal *global = nullptr;
+static tSysWatchdog *watchdog = nullptr;
 
 void* getPort(uint8_t pin)
 {
@@ -152,6 +153,10 @@ const char* getHALErrorMessage(int32_t code)
  */
 uint16_t getFPGAVersion(int32_t *status)
 {
+	if (!global) {
+		*status = NiFpga_Status_ResourceNotInitialized;
+		return 0;
+	}
 	return global->readVersion(status);
 }
 
@@ -165,6 +170,10 @@ uint16_t getFPGAVersion(int32_t *status)
  */
 uint32_t getFPGARevision(int32_t *status)
 {
+	if (!global) {
+		*status = NiFpga_Status_ResourceNotInitialized;
+		return 0;
+	}
 	return global->readRevision(status);
 }
 
@@ -175,6 +184,10 @@ uint32_t getFPGARevision(int32_t *status)
  */
 uint32_t getFPGATime(int32_t *status)
 {
+	if (!global) {
+		*status = NiFpga_Status_ResourceNotInitialized;
+		return 0;
+	}
 	return global->readLocalTime(status);
 }
 
@@ -184,6 +197,10 @@ uint32_t getFPGATime(int32_t *status)
  */
 bool getFPGAButton(int32_t *status)
 {
+	if (!global) {
+		*status = NiFpga_Status_ResourceNotInitialized;
+		return false;
+	}
 	return global->readUserButton(status);
 }
 
@@ -195,12 +212,25 @@ int HALSetErrorData(const char *errors, int errorsLength, int wait_ms)
 
 bool HALGetSystemActive(int32_t *status)
 {
+	if (!watchdog) {
+		*status = NiFpga_Status_ResourceNotInitialized;
+		return false;
+	}
 	return watchdog->readStatus_SystemActive(status);
 }
 
 bool HALGetBrownedOut(int32_t *status)
 {
+	if (!watchdog) {
+		*status = NiFpga_Status_ResourceNotInitialized;
+		return false;
+	}
 	return !(watchdog->readStatus_PowerAlive(status));
+}
+
+static void HALCleanupAtExit() {
+	global = nullptr;
+	watchdog = nullptr;
 }
 
 /**
@@ -221,6 +251,8 @@ int HALInitialize(int mode)
 	int32_t status = 0;
 	global = tGlobal::create(&status);
 	watchdog = tSysWatchdog::create(&status);
+
+	std::atexit(HALCleanupAtExit);
 
 	// Kill any previous robot programs
 	std::fstream fs;
