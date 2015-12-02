@@ -62,6 +62,7 @@ DigitalInput::~DigitalInput() {
  * Retrieve the value of a single digital input channel from the FPGA.
  */
 bool DigitalInput::Get() const {
+  if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value = getDIO(m_digital_ports[m_channel], &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
