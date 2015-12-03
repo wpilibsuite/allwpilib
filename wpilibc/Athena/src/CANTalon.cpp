@@ -1852,7 +1852,7 @@ void CANTalon::UpdateTable() {
   if (m_table != nullptr) {
     m_table->PutString("~TYPE~", "CANSpeedController");
     m_table->PutString("Type", "CANTalon");
-    m_table->PutString("Mode", GetModeName(m_controlMode));
+    m_table->PutNumber("Mode", m_controlMode);
     m_table->PutNumber("p", GetP());
     m_table->PutNumber("i", GetI());
     m_table->PutNumber("d", GetD());
