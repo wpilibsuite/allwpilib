@@ -88,8 +88,8 @@ void DriverStation::Run() {
  * @return Pointer to the DS instance
  */
 DriverStation &DriverStation::GetInstance() {
-  static DriverStation instance;
-  return instance;
+  static DriverStation *instance = new DriverStation();
+  return *instance;
 }
 
 /**
