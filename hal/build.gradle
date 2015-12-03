@@ -23,24 +23,25 @@ model {
                 }
             }
         }
-        HALDesktop(NativeLibrarySpec) {
-            binaries.all {
-                if (toolChain in Gcc){
-                    cppCompiler.args "-std=c++1y"
-                }
-            }
 
-            sources {
-                cpp {
-                    source {
-                        srcDirs = ["lib/Desktop", "lib/Shared"]
-                        includes = ["**/*.cpp"]
-                    }
-                    exportedHeaders {
-                        srcDirs = ["include", "lib/Desktop", "lib/Shared"]
-                    }
-                }
-            }
-        }
+//        HALDesktop(NativeLibrarySpec) {
+//            binaries.all {
+//                if (toolChain in Gcc){
+//                    cppCompiler.args "-std=c++1y"
+//                }
+//            }
+//
+//            sources {
+//                cpp {
+//                    source {
+//                        srcDirs = ["lib/Desktop", "lib/Shared"]
+//                        includes = ["**/*.cpp"]
+//                    }
+//                    exportedHeaders {
+//                        srcDirs = ["include", "lib/Desktop", "lib/Shared"]
+//                    }
+//                }
+//            }
+//        }
     }
 }
