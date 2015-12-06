@@ -14,6 +14,10 @@
  #include <cstring>
 #endif
 
+#ifdef __APPLE__
+ #include <libgen.h>
+#endif
+
 using namespace nt;
 
 ATOMIC_STATIC_INIT(Logger)
@@ -40,6 +44,13 @@ static void def_log_func(unsigned int level, const char* file,
   _splitpath_s(file, nullptr, 0, nullptr, 0, fname, 60, ext, 10);
   std::fprintf(stderr, "NT: %s: %s (%s%s:%d)\n", levelmsg, msg, fname, ext,
                line);
+#elif __APPLE__
+  int len = strlen(msg) + 1;
+  char* basestr = new char[len + 1];
+  strncpy(basestr, file, len);
+  std::fprintf(stderr, "NT: %s: %s (%s:%d)\n", levelmsg, msg, basename(basestr),
+               line);
+  delete[] basestr;
 #else
   std::fprintf(stderr, "NT: %s: %s (%s:%d)\n", levelmsg, msg, basename(file),
                line);
