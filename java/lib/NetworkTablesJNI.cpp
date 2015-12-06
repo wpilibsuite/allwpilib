@@ -640,7 +640,7 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTables
   (JNIEnv *env, jclass, jstring key)
 {
   auto val = nt::GetEntryValue(JavaStringRef(env, key));
-  if (!val || !val->IsBoolean()) {
+  if (!val) {
     ThrowTableKeyNotDefined(env, key);
     return nullptr;
   }
@@ -768,7 +768,7 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTables
   (JNIEnv *env, jclass, jstring key, jobject defaultValue)
 {
   auto val = nt::GetEntryValue(JavaStringRef(env, key));
-  if (!val || !val->IsBoolean()) return defaultValue;
+  if (!val) return defaultValue;
   return ToJavaObject(env, *val);
 }
 
