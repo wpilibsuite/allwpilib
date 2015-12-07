@@ -1,5 +1,12 @@
-#ifndef _NETWORKTABLE_H_
-#define _NETWORKTABLE_H_
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#ifndef NETWORKTABLE_H_
+#define NETWORKTABLE_H_
 
 #include <functional>
 #include <mutex>
@@ -7,6 +14,9 @@
 
 #include "tables/ITable.h"
 
+/**
+ * A network table that knows its subtable path.
+ */
 class NetworkTable : public ITable {
  private:
   struct private_init {};
@@ -51,8 +61,8 @@ class NetworkTable : public ITable {
   static void SetServerMode();
 
   /**
-   * set the team the robot is configured for (this will set the mdns address that
-   * network tables will connect to in client mode)
+   * set the team the robot is configured for (this will set the mdns address
+   * that network tables will connect to in client mode)
    * This must be called before initialize or GetTable
    * @param team the team number
    */
@@ -154,35 +164,43 @@ class NetworkTable : public ITable {
    *            the key name
    * @return the networktable to be returned
    */
-  std::shared_ptr<ITable> GetSubTable(llvm::StringRef key) const;
+  std::shared_ptr<ITable> GetSubTable(llvm::StringRef key) const override;
 
   /**
-   * Checks the table and tells if it contains the specified key
+   * Determines whether the given key is in this table.
    *
-   * @param key
-   *            the key to be checked
+   * @param key the key to search for
+   * @return true if the table as a value assigned to the given key
    */
-  bool ContainsKey(llvm::StringRef key) const;
+  bool ContainsKey(llvm::StringRef key) const override;
 
-  bool ContainsSubTable(llvm::StringRef key) const;
+  /**
+   * Determines whether there exists a non-empty subtable for this key
+   * in this table.
+   *
+   * @param key the key to search for
+   * @return true if there is a subtable with the key which contains at least
+   * one key/subtable of its own
+   */
+  bool ContainsSubTable(llvm::StringRef key) const override;
 
   /**
    * @param types bitmask of types; 0 is treated as a "don't care".
    * @return keys currently in the table
    */
-  std::vector<std::string> GetKeys(int types = 0) const;
+  std::vector<std::string> GetKeys(int types = 0) const override;
 
   /**
    * @return subtables currently in the table
    */
-  std::vector<std::string> GetSubTables() const;
+  std::vector<std::string> GetSubTables() const override;
 
   /**
    * Makes a key's value persistent through program restarts.
    *
    * @param key the key to make persistent
    */
-  void SetPersistent(llvm::StringRef key);
+  void SetPersistent(llvm::StringRef key) override;
 
   /**
    * Stop making a key's value persistent through program restarts.
@@ -190,7 +208,7 @@ class NetworkTable : public ITable {
    *
    * @param key the key name
    */
-  void ClearPersistent(llvm::StringRef key);
+  void ClearPersistent(llvm::StringRef key) override;
 
   /**
    * Returns whether the value is persistent through program restarts.
@@ -198,7 +216,7 @@ class NetworkTable : public ITable {
    *
    * @param key the key name
    */
-  bool IsPersistent(llvm::StringRef key);
+  bool IsPersistent(llvm::StringRef key) const override;
 
   /**
    * Sets flags on the specified key in this table. The key can
@@ -207,7 +225,7 @@ class NetworkTable : public ITable {
    * @param key the key name
    * @param flags the flags to set (bitmask)
    */
-  void SetFlags(llvm::StringRef key, unsigned int flags);
+  void SetFlags(llvm::StringRef key, unsigned int flags) override;
 
   /**
    * Clears flags on the specified key in this table. The key can
@@ -216,118 +234,144 @@ class NetworkTable : public ITable {
    * @param key the key name
    * @param flags the flags to clear (bitmask)
    */
-  void ClearFlags(llvm::StringRef key, unsigned int flags);
+  void ClearFlags(llvm::StringRef key, unsigned int flags) override;
 
   /**
    * Returns the flags for the specified key.
    *
-   * @param key
-   *            the key name
+   * @param key the key name
    * @return the flags, or 0 if the key is not defined
    */
-  unsigned int GetFlags(llvm::StringRef key);
+  unsigned int GetFlags(llvm::StringRef key) const override;
 
   /**
-   * Deletes the specified key in this table. The key can
-   * not be null.
+   * Deletes the specified key in this table.
    *
    * @param key the key name
    */
-  void Delete(llvm::StringRef key);
+  void Delete(llvm::StringRef key) override;
 
   /**
-   * Maps the specified key to the specified value in this table. The key can
-   * not be null. The value can be retrieved by calling the get method with a
-   * key that is equal to the original key.
+   * Put a number in the table
    *
-   * @param key
-   *            the key
-   * @param value
-   *            the value
+   * @param key the key to be assigned to
+   * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
    */
-  bool PutNumber(llvm::StringRef key, double value);
+  bool PutNumber(llvm::StringRef key, double value) override;
 
   /**
-   * Returns the key that the name maps to. If the key is null, it will return
-   * the default value
+   * Gets the number associated with the given name.
    *
-   * @param key
-   *            the key name
-   * @param defaultValue
-   *            the default value if the key is null
-   * @return the key
+   * @param key the key to look up
+   * @return the value associated with the given key
+   * @throws TableKeyNotDefinedException if there is no value associated with
+   * the given key
+   * @deprecated This exception-raising method has been replaced by the
+   * default-taking method.
    */
-  double GetNumber(llvm::StringRef key, double defaultValue) const;
+  NT_DEPRECATED("Raises an exception if key not found; "
+                "use GetNumber(StringRef key, double defaultValue) instead")
+  virtual double GetNumber(llvm::StringRef key) const override;
 
   /**
-   * Maps the specified key to the specified value in this table. The key can
-   * not be null. The value can be retrieved by calling the get method with a
-   * key that is equal to the original key.
+   * Gets the number associated with the given name.
    *
-   * @param key
-   *            the key
-   * @param value
-   *            the value
+   * @param key the key to look up
+   * @param defaultValue the value to be returned if no value is found
+   * @return the value associated with the given key or the given default value
+   * if there is no value associated with the key
    */
-  bool PutString(llvm::StringRef key, llvm::StringRef value);
+  virtual double GetNumber(llvm::StringRef key,
+                           double defaultValue) const override;
 
   /**
-   * Returns the key that the name maps to. If the key is null, it will return
-   * the default value
+   * Put a string in the table
    *
-   * @param key
-   *            the key name
-   * @param defaultValue
-   *            the default value if the key is null
-   * @return the key
+   * @param key the key to be assigned to
+   * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
    */
-  std::string GetString(llvm::StringRef key,
-                        llvm::StringRef defaultValue) const;
+  virtual bool PutString(llvm::StringRef key, llvm::StringRef value) override;
 
   /**
-   * Maps the specified key to the specified value in this table. The key can
-   * not be null. The value can be retrieved by calling the get method with a
-   * key that is equal to the original key.
+   * Gets the string associated with the given name.
    *
-   * @param key
-   *            the key
-   * @param value
-   *            the value
+   * @param key the key to look up
+   * @return the value associated with the given key
+   * @throws TableKeyNotDefinedException if there is no value associated with
+   * the given key
+   * @deprecated This exception-raising method has been replaced by the
+   * default-taking method.
    */
-  bool PutBoolean(llvm::StringRef key, bool value);
+  NT_DEPRECATED("Raises an exception if key not found; "
+                "use GetString(StringRef key, StringRef defaultValue) instead")
+  virtual std::string GetString(llvm::StringRef key) const override;
 
   /**
-   * Returns the key that the name maps to. If the key is null, it will return
-   * the default value
+   * Gets the string associated with the given name. If the key does not
+   * exist or is of different type, it will return the default value.
    *
-   * @param key
-   *            the key name
-   * @param defaultValue
-   *            the default value if the key is null
-   * @return the key
+   * @param key the key to look up
+   * @param defaultValue the value to be returned if no value is found
+   * @return the value associated with the given key or the given default value
+   * if there is no value associated with the key
    */
-  bool GetBoolean(llvm::StringRef key, bool defaultValue) const;
+  virtual std::string GetString(llvm::StringRef key,
+                                llvm::StringRef defaultValue) const override;
 
   /**
-   * Maps the specified key to the specified value in this table. The key can
-   * not be null. The value can be retrieved by calling the get method with a
-   * key that is equal to the original key.
+   * Put a boolean in the table
    *
-   * @param key the key name
-   * @param value the value to be put
+   * @param key the key to be assigned to
+   * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
    */
-  bool PutValue(llvm::StringRef key, std::shared_ptr<nt::Value> value);
+  virtual bool PutBoolean(llvm::StringRef key, bool value) override;
 
   /**
-   * Returns the key that the name maps to.
-   * NOTE: If the value is a double, it will return a Double object,
-   * not a primitive.  To get the primitive, use GetDouble
+   * Gets the boolean associated with the given name.
    *
-   * @param key
-   *            the key name
-   * @return the key, or nullptr if the key is not defined
+   * @param key the key to look up
+   * @return the value associated with the given key
+   * @throws TableKeyNotDefinedException if there is no value associated with
+   * the given key
+   * @deprecated This exception-raising method has been replaced by the
+   * default-taking method.
    */
-  std::shared_ptr<nt::Value> GetValue(llvm::StringRef key) const;
+  NT_DEPRECATED("Raises an exception if key not found; "
+                "use GetBoolean(StringRef key, bool defaultValue) instead")
+  virtual bool GetBoolean(llvm::StringRef key) const override;
+
+  /**
+   * Gets the boolean associated with the given name. If the key does not
+   * exist or is of different type, it will return the default value.
+   *
+   * @param key the key to look up
+   * @param defaultValue the value to be returned if no value is found
+   * @return the value associated with the given key or the given default value
+   * if there is no value associated with the key
+   */
+  virtual bool GetBoolean(llvm::StringRef key,
+                          bool defaultValue) const override;
+
+  /**
+   * Put a value in the table
+   *
+   * @param key the key to be assigned to
+   * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
+   */
+  bool PutValue(llvm::StringRef key, std::shared_ptr<nt::Value> value) override;
+
+  /**
+   * Gets the value associated with a key as an object
+   *
+   * @param key the key of the value to look up
+   * @return the value associated with the given key, or nullptr if the key
+   * does not exist
+   */
+  std::shared_ptr<nt::Value> GetValue(llvm::StringRef key) const override;
 };
 
-#endif
+#endif  // NETWORKTABLE_H_

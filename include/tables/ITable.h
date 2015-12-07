@@ -1,9 +1,9 @@
-/*
- * ITable.h
- *
- *  Created on: Sep 19, 2012
- *      Author: Mitchell Wills
- */
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
 
 #ifndef ITABLE_H_
 #define ITABLE_H_
@@ -13,8 +13,33 @@
 #include "llvm/StringRef.h"
 #include "nt_Value.h"
 
+// [[deprecated(msg)]] is a C++14 feature not supported by MSVC or GCC < 4.9.
+// We provide an equivalent warning implementation for those compilers here.
+#ifndef NT_DEPRECATED
+  #if defined(_MSC_VER)
+    #define NT_DEPRECATED(msg) __declspec(deprecated(msg))
+  #elif defined(__GNUC__)
+    #if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 8)
+      #if __cplusplus > 201103L
+        #define NT_DEPRECATED(msg) [[deprecated(msg)]]
+      #else
+        #define NT_DEPRECATED(msg) [[gnu::deprecated(msg)]]
+      #endif
+    #else
+      #define NT_DEPRECATED(msg) __attribute__((deprecated(msg)))
+    #endif
+  #elif __cplusplus > 201103L
+    #define NT_DEPRECATED(msg) [[deprecated(msg)]]
+  #else
+    #define NT_DEPRECATED(msg) /*nothing*/
+  #endif
+#endif
+
 class ITableListener;
 
+/**
+ * A table whose values can be read and written to
+ */
 class ITable {
  public:
   /**
@@ -75,7 +100,7 @@ class ITable {
    *
    * @param key the key name
    */
-  virtual bool IsPersistent(llvm::StringRef key) = 0;
+  virtual bool IsPersistent(llvm::StringRef key) const = 0;
 
   /**
    * Sets flags on the specified key in this table. The key can
@@ -98,15 +123,13 @@ class ITable {
   /**
    * Returns the flags for the specified key.
    *
-   * @param key
-   *            the key name
+   * @param key the key name
    * @return the flags, or 0 if the key is not defined
    */
-  virtual unsigned int GetFlags(llvm::StringRef key) = 0;
+  virtual unsigned int GetFlags(llvm::StringRef key) const = 0;
 
   /**
-   * Deletes the specified key in this table. The key can
-   * not be null.
+   * Deletes the specified key in this table.
    *
    * @param key the key name
    */
@@ -116,9 +139,8 @@ class ITable {
    * Gets the value associated with a key as an object
    *
    * @param key the key of the value to look up
-   * @return the value associated with the given key
-   * @throws TableKeyNotDefinedException if there is no value associated with
-   * the given key
+   * @return the value associated with the given key, or nullptr if the key
+   * does not exist
    */
   virtual std::shared_ptr<nt::Value> GetValue(llvm::StringRef key) const = 0;
 
@@ -128,8 +150,6 @@ class ITable {
    * @param key the key to be assigned to
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
-   * @throws IllegalArgumentException when the value is not supported by the
-   * table
    */
   virtual bool PutValue(llvm::StringRef key,
                         std::shared_ptr<nt::Value> value) = 0;
@@ -142,6 +162,20 @@ class ITable {
    * @return False if the table key already exists with a different type
    */
   virtual bool PutNumber(llvm::StringRef key, double value) = 0;
+
+  /**
+   * Gets the number associated with the given name.
+   *
+   * @param key the key to look up
+   * @return the value associated with the given key
+   * @throws TableKeyNotDefinedException if there is no value associated with
+   * the given key
+   * @deprecated This exception-raising method has been replaced by the
+   * default-taking method.
+   */
+  NT_DEPRECATED("Raises an exception if key not found; "
+                "use GetNumber(StringRef key, double defaultValue) instead")
+  virtual double GetNumber(llvm::StringRef key) const = 0;
 
   /**
    * Gets the number associated with the given name.
@@ -166,6 +200,21 @@ class ITable {
    * Gets the string associated with the given name.
    *
    * @param key the key to look up
+   * @return the value associated with the given key
+   * @throws TableKeyNotDefinedException if there is no value associated with
+   * the given key
+   * @deprecated This exception-raising method has been replaced by the
+   * default-taking method.
+   */
+  NT_DEPRECATED("Raises an exception if key not found; "
+                "use GetString(StringRef key, StringRef defaultValue) instead")
+  virtual std::string GetString(llvm::StringRef key) const = 0;
+
+  /**
+   * Gets the string associated with the given name. If the key does not
+   * exist or is of different type, it will return the default value.
+   *
+   * @param key the key to look up
    * @param defaultValue the value to be returned if no value is found
    * @return the value associated with the given key or the given default value
    * if there is no value associated with the key
@@ -184,6 +233,21 @@ class ITable {
 
   /**
    * Gets the boolean associated with the given name.
+   *
+   * @param key the key to look up
+   * @return the value associated with the given key
+   * @throws TableKeyNotDefinedException if there is no value associated with
+   * the given key
+   * @deprecated This exception-raising method has been replaced by the
+   * default-taking method.
+   */
+  NT_DEPRECATED("Raises an exception if key not found; "
+                "use GetBoolean(StringRef key, bool defaultValue) instead")
+  virtual bool GetBoolean(llvm::StringRef key) const = 0;
+
+  /**
+   * Gets the boolean associated with the given name. If the key does not
+   * exist or is of different type, it will return the default value.
    *
    * @param key the key to look up
    * @param defaultValue the value to be returned if no value is found
@@ -266,4 +330,4 @@ class ITable {
   virtual void RemoveTableListener(ITableListener* listener) = 0;
 };
 
-#endif /* ITABLE_H_ */
+#endif  // ITABLE_H_

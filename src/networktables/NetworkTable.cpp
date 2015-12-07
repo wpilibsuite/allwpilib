@@ -5,6 +5,7 @@
 #include "llvm/SmallString.h"
 #include "llvm/StringMap.h"
 #include "tables/ITableListener.h"
+#include "tables/TableKeyNotDefinedException.h"
 #include "ntcore.h"
 
 using llvm::StringRef;
@@ -251,7 +252,7 @@ void NetworkTable::ClearPersistent(StringRef key) {
   ClearFlags(key, NT_PERSISTENT);
 }
 
-bool NetworkTable::IsPersistent(StringRef key) {
+bool NetworkTable::IsPersistent(StringRef key) const {
   return (GetFlags(key) & NT_PERSISTENT) != 0;
 }
 
@@ -269,7 +270,7 @@ void NetworkTable::ClearFlags(StringRef key, unsigned int flags) {
   nt::SetEntryFlags(path, nt::GetEntryFlags(path) & ~flags);
 }
 
-unsigned int NetworkTable::GetFlags(StringRef key) {
+unsigned int NetworkTable::GetFlags(StringRef key) const {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   path += key;
@@ -290,6 +291,16 @@ bool NetworkTable::PutNumber(StringRef key, double value) {
   return nt::SetEntryValue(path, nt::Value::MakeDouble(value));
 }
 
+double NetworkTable::GetNumber(StringRef key) const {
+  llvm::SmallString<128> path(m_path);
+  path += PATH_SEPARATOR_CHAR;
+  path += key;
+  auto value = nt::GetEntryValue(path);
+  if (!value || value->type() != NT_DOUBLE)
+    throw TableKeyNotDefinedException(path);
+  return value->GetDouble();
+}
+
 double NetworkTable::GetNumber(StringRef key, double defaultValue) const {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
@@ -305,6 +316,16 @@ bool NetworkTable::PutString(StringRef key, StringRef value) {
   path += PATH_SEPARATOR_CHAR;
   path += key;
   return nt::SetEntryValue(path, nt::Value::MakeString(value));
+}
+
+std::string NetworkTable::GetString(StringRef key) const {
+  llvm::SmallString<128> path(m_path);
+  path += PATH_SEPARATOR_CHAR;
+  path += key;
+  auto value = nt::GetEntryValue(path);
+  if (!value || value->type() != NT_STRING)
+    throw TableKeyNotDefinedException(path);
+  return value->GetString();
 }
 
 std::string NetworkTable::GetString(StringRef key,
@@ -323,6 +344,16 @@ bool NetworkTable::PutBoolean(StringRef key, bool value) {
   path += PATH_SEPARATOR_CHAR;
   path += key;
   return nt::SetEntryValue(path, nt::Value::MakeBoolean(value));
+}
+
+bool NetworkTable::GetBoolean(StringRef key) const {
+  llvm::SmallString<128> path(m_path);
+  path += PATH_SEPARATOR_CHAR;
+  path += key;
+  auto value = nt::GetEntryValue(path);
+  if (!value || value->type() != NT_BOOLEAN)
+    throw TableKeyNotDefinedException(path);
+  return value->GetBoolean();
 }
 
 bool NetworkTable::GetBoolean(StringRef key, bool defaultValue) const {

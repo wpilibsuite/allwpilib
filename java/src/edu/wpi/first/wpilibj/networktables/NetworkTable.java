@@ -8,7 +8,6 @@ import java.util.*;
 
 /**
  * A network table that knows its subtable path.
- * 
  */
 public class NetworkTable implements ITable, IRemote {
   /**
@@ -240,10 +239,18 @@ public class NetworkTable implements ITable, IRemote {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public void addTableListener(ITableListener listener) {
     addTableListenerEx(listener, NOTIFY_NEW | NOTIFY_UPDATE);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public void addTableListener(ITableListener listener,
                                boolean immediateNotify) {
     int flags = NOTIFY_NEW | NOTIFY_UPDATE;
@@ -285,6 +292,10 @@ public class NetworkTable implements ITable, IRemote {
     adapters.add(adapter);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public void addTableListener(String key, ITableListener listener,
                                boolean immediateNotify) {
     int flags = NOTIFY_NEW | NOTIFY_UPDATE;
@@ -313,6 +324,10 @@ public class NetworkTable implements ITable, IRemote {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public synchronized void addTableListenerEx(String key,
                                               ITableListener listener,
                                               int flags) {
@@ -328,6 +343,10 @@ public class NetworkTable implements ITable, IRemote {
     adapters.add(adapter);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public void addSubTableListener(final ITableListener listener) {
     addSubTableListener(listener, false);
   }
@@ -357,6 +376,10 @@ public class NetworkTable implements ITable, IRemote {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public synchronized void addSubTableListener(final ITableListener listener,
                                                boolean localNotify) {
     List<ListenerBase> adapters = listenerMap.get(listener);
@@ -373,6 +396,10 @@ public class NetworkTable implements ITable, IRemote {
     adapters.add(adapter);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public synchronized void removeTableListener(ITableListener listener) {
     List<ListenerBase> adapters = listenerMap.get(listener);
     if (adapters != null) {
@@ -383,23 +410,17 @@ public class NetworkTable implements ITable, IRemote {
   }
 
   /**
-   * Returns the table at the specified key. If there is no table at the
-   * specified key, it will create a new table
-   *
-   * @param key
-   *            the key name
-   * @return the networktable to be returned
+   * {@inheritDoc}
    */
+  @Override
   public ITable getSubTable(String key) {
     return new NetworkTable(path + PATH_SEPARATOR + key);
   }
 
   /**
-   * Checks the table and tells if it contains the specified key
-   *
-   * @param key
-   *            the key to be checked
+   * {@inheritDoc}
    */
+  @Override
   public boolean containsKey(String key) {
     return NetworkTablesJNI.containsKey(path + PATH_SEPARATOR + key);
   }
@@ -426,15 +447,17 @@ public class NetworkTable implements ITable, IRemote {
   }
 
   /**
-   * @return keys currently in the table
+   * {@inheritDoc}
    */
+  @Override
   public Set<String> getKeys() {
     return getKeys(0);
   }
 
   /**
-   * @return subtables currently in the table
+   * {@inheritDoc}
    */
+  @Override
   public Set<String> getSubTables() {
     Set<String> keys = new HashSet<String>();
     int prefixLen = path.length() + 1;
@@ -449,198 +472,125 @@ public class NetworkTable implements ITable, IRemote {
   }
 
   /**
-   * Maps the specified key to the specified value in this table. The key can
-   * not be null. The value can be retrieved by calling the get method with a
-   * key that is equal to the original key.
-   *
-   * @param key
-   *            the key
-   * @param value
-   *            the value
-   * @return False if the table key already exists with a different type
+   * {@inheritDoc}
    */
+  @Override
   public boolean putNumber(String key, double value) {
     return NetworkTablesJNI.putDouble(path + PATH_SEPARATOR + key, value);
   }
 
   /**
-   * Returns the key that the name maps to.
-   *
-   * @param key
-   *            the key name
-   * @return the key
-   * @throws TableKeyNotDefinedException
-   *             if the specified key is null
+   * {@inheritDoc}
+   * @deprecated This exception-raising method has been replaced by the
+   * default-taking method {@link #getNumber(String, double)}.
    */
+  @Override
+  @Deprecated
   public double getNumber(String key) throws TableKeyNotDefinedException {
     return NetworkTablesJNI.getDouble(path + PATH_SEPARATOR + key);
   }
 
   /**
-   * Returns the key that the name maps to. If the key is null, it will return
-   * the default value
-   *
-   * @param key
-   *            the key name
-   * @param defaultValue
-   *            the default value if the key is null
-   * @return the key
+   * {@inheritDoc}
    */
+  @Override
   public double getNumber(String key, double defaultValue) {
     return NetworkTablesJNI.getDouble(path + PATH_SEPARATOR + key, defaultValue);
   }
 
   /**
-   * Maps the specified key to the specified value in this table. The key can
-   * not be null. The value can be retrieved by calling the get method with a
-   * key that is equal to the original key.
-   *
-   * @param key
-   *            the key
-   * @param value
-   *            the value
-   * @return False if the table key already exists with a different type
+   * {@inheritDoc}
    */
+  @Override
   public boolean putString(String key, String value) {
     return NetworkTablesJNI.putString(path + PATH_SEPARATOR + key, value);
   }
 
   /**
-   * Returns the key that the name maps to.
-   *
-   * @param key
-   *            the key name
-   * @return the key
-   * @throws TableKeyNotDefinedException
-   *             if the specified key is null
+   * {@inheritDoc}
+   * @deprecated This exception-raising method has been replaced by the
+   * default-taking method {@link #getString(String, String)}.
    */
+  @Override
+  @Deprecated
   public String getString(String key) throws TableKeyNotDefinedException {
     return NetworkTablesJNI.getString(path + PATH_SEPARATOR + key);
   }
 
   /**
-   * Returns the key that the name maps to. If the key is null, it will return
-   * the default value
-   *
-   * @param key
-   *            the key name
-   * @param defaultValue
-   *            the default value if the key is null
-   * @return the key
+   * {@inheritDoc}
    */
+  @Override
   public String getString(String key, String defaultValue) {
     return NetworkTablesJNI.getString(path + PATH_SEPARATOR + key, defaultValue);
   }
 
   /**
-   * Maps the specified key to the specified value in this table. The key can
-   * not be null. The value can be retrieved by calling the get method with a
-   * key that is equal to the original key.
-   *
-   * @param key
-   *            the key
-   * @param value
-   *            the value
-   * @return False if the table key already exists with a different type
+   * {@inheritDoc}
    */
+  @Override
   public boolean putBoolean(String key, boolean value) {
     return NetworkTablesJNI.putBoolean(path + PATH_SEPARATOR + key, value);
   }
 
   /**
-   * Returns the key that the name maps to.
-   *
-   * @param key
-   *            the key name
-   * @return the key
-   * @throws TableKeyNotDefinedException
-   *             if the specified key is null
+   * {@inheritDoc}
+   * @deprecated This exception-raising method has been replaced by the
+   * default-taking method {@link #getBoolean(String, boolean)}.
    */
+  @Override
+  @Deprecated
   public boolean getBoolean(String key) throws TableKeyNotDefinedException {
     return NetworkTablesJNI.getBoolean(path + PATH_SEPARATOR + key);
   }
 
   /**
-   * Returns the key that the name maps to. If the key is null, it will return
-   * the default value
-   *
-   * @param key
-   *            the key name
-   * @param defaultValue
-   *            the default value if the key is null
-   * @return the key
+   * {@inheritDoc}
    */
+  @Override
   public boolean getBoolean(String key, boolean defaultValue) {
     return NetworkTablesJNI.getBoolean(path + PATH_SEPARATOR + key, defaultValue);
   }
 
   /**
-   * Maps the specified key to the specified value in this table. The key can
-   * not be null. The value can be retrieved by calling the get method with a
-   * key that is equal to the original key.
-   *
-   * @param key
-   *            the key
-   * @param value
-   *            the value
-   * @return False if the table key already exists with a different type
+   * {@inheritDoc}
    */
+  @Override
   public boolean putBooleanArray(String key, boolean[] value) {
     return NetworkTablesJNI.putBooleanArray(path + PATH_SEPARATOR + key, value);
   }
 
   /**
-   * Maps the specified key to the specified value in this table. The key can
-   * not be null. The value can be retrieved by calling the get method with a
-   * key that is equal to the original key.
-   *
-   * @param key
-   *            the key
-   * @param value
-   *            the value
-   * @return False if the table key already exists with a different type
+   * {@inheritDoc}
    */
+  @Override
   public boolean putBooleanArray(String key, Boolean[] value) {
     return putBooleanArray(key, toNative(value));
   }
 
   /**
-   * Returns the key that the name maps to.
-   *
-   * @param key
-   *            the key name
-   * @return the key
-   * @throws TableKeyNotDefinedException
-   *             if the specified key is null
+   * {@inheritDoc}
+   * @deprecated This exception-raising method has been replaced by the
+   * default-taking method {@link #getBooleanArray(String, boolean[])}.
    */
+  @Override
+  @Deprecated
   public boolean[] getBooleanArray(String key) throws TableKeyNotDefinedException {
     return NetworkTablesJNI.getBooleanArray(path + PATH_SEPARATOR + key);
   }
 
   /**
-   * Returns the key that the name maps to. If the key is null, it will return
-   * the default value
-   *
-   * @param key
-   *            the key name
-   * @param defaultValue
-   *            the default value if the key is null
-   * @return the key
+   * {@inheritDoc}
    */
+  @Override
   public boolean[] getBooleanArray(String key, boolean[] defaultValue) {
     return NetworkTablesJNI.getBooleanArray(path + PATH_SEPARATOR + key, defaultValue);
   }
 
   /**
-   * Returns the key that the name maps to. If the key is null, it will return
-   * the default value
-   *
-   * @param key
-   *            the key name
-   * @param defaultValue
-   *            the default value if the key is null
-   * @return the key
+   * {@inheritDoc}
    */
+  @Override
   public Boolean[] getBooleanArray(String key, Boolean[] defaultValue) {
     try {
       return fromNative(getBooleanArray(key));
@@ -650,72 +600,44 @@ public class NetworkTable implements ITable, IRemote {
   }
 
   /**
-   * Maps the specified key to the specified value in this table. The key can
-   * not be null. The value can be retrieved by calling the get method with a
-   * key that is equal to the original key.
-   *
-   * @param key
-   *            the key
-   * @param value
-   *            the value
-   * @return False if the table key already exists with a different type
+   * {@inheritDoc}
    */
+  @Override
   public boolean putNumberArray(String key, double[] value) {
     return NetworkTablesJNI.putDoubleArray(path + PATH_SEPARATOR + key, value);
   }
 
   /**
-   * Maps the specified key to the specified value in this table. The key can
-   * not be null. The value can be retrieved by calling the get method with a
-   * key that is equal to the original key.
-   *
-   * @param key
-   *            the key
-   * @param value
-   *            the value
-   * @return False if the table key already exists with a different type
+   * {@inheritDoc}
    */
+  @Override
   public boolean putNumberArray(String key, Double[] value) {
     return putNumberArray(key, toNative(value));
   }
 
   /**
-   * Returns the key that the name maps to.
-   *
-   * @param key
-   *            the key name
-   * @return the key
-   * @throws TableKeyNotDefinedException
-   *             if the specified key is null
+   * {@inheritDoc}
+   * @deprecated This exception-raising method has been replaced by the
+   * default-taking method {@link #getNumberArray(String, double[])}.
    */
+  @Override
+  @Deprecated
   public double[] getNumberArray(String key) throws TableKeyNotDefinedException {
     return NetworkTablesJNI.getDoubleArray(path + PATH_SEPARATOR + key);
   }
 
   /**
-   * Returns the key that the name maps to. If the key is null, it will return
-   * the default value
-   *
-   * @param key
-   *            the key name
-   * @param defaultValue
-   *            the default value if the key is null
-   * @return the key
+   * {@inheritDoc}
    */
+  @Override
   public double[] getNumberArray(String key, double[] defaultValue) {
     return NetworkTablesJNI.getDoubleArray(path + PATH_SEPARATOR + key, defaultValue);
   }
 
   /**
-   * Returns the key that the name maps to. If the key is null, it will return
-   * the default value
-   *
-   * @param key
-   *            the key name
-   * @param defaultValue
-   *            the default value if the key is null
-   * @return the key
+   * {@inheritDoc}
    */
+  @Override
   public Double[] getNumberArray(String key, Double[] defaultValue) {
     try {
       return fromNative(getNumberArray(key));
@@ -725,75 +647,44 @@ public class NetworkTable implements ITable, IRemote {
   }
 
   /**
-   * Maps the specified key to the specified value in this table. The key can
-   * not be null. The value can be retrieved by calling the get method with a
-   * key that is equal to the original key.
-   *
-   * @param key
-   *            the key
-   * @param value
-   *            the value
-   * @return False if the table key already exists with a different type
+   * {@inheritDoc}
    */
+  @Override
   public boolean putStringArray(String key, String[] value) {
     return NetworkTablesJNI.putStringArray(path + PATH_SEPARATOR + key, value);
   }
 
   /**
-   * Returns the key that the name maps to.
-   *
-   * @param key
-   *            the key name
-   * @return the key
-   * @throws TableKeyNotDefinedException
-   *             if the specified key is null
+   * {@inheritDoc}
+   * @deprecated This exception-raising method has been replaced by the
+   * default-taking method {@link #getStringArray(String, String[])}.
    */
+  @Override
+  @Deprecated
   public String[] getStringArray(String key) throws TableKeyNotDefinedException {
     return NetworkTablesJNI.getStringArray(path + PATH_SEPARATOR + key);
   }
 
   /**
-   * Returns the key that the name maps to. If the key is null, it will return
-   * the default value
-   *
-   * @param key
-   *            the key name
-   * @param defaultValue
-   *            the default value if the key is null
-   * @return the key
+   * {@inheritDoc}
    */
+  @Override
   public String[] getStringArray(String key, String[] defaultValue) {
     return NetworkTablesJNI.getStringArray(path + PATH_SEPARATOR + key, defaultValue);
   }
 
   /**
-   * Maps the specified key to the specified value in this table. The key can
-   * not be null. The value can be retrieved by calling the get method with a
-   * key that is equal to the original key.
-   *
-   * @param key
-   *            the key
-   * @param value
-   *            the value
-   * @return False if the table key already exists with a different type
+   * {@inheritDoc}
    */
+  @Override
   public boolean putRaw(String key, byte[] value) {
     return NetworkTablesJNI.putRaw(path + PATH_SEPARATOR + key, value);
   }
 
   /**
-   * Maps the specified key to the specified value in this table. The key can
-   * not be null. The value can be retrieved by calling the get method with a
-   * key that is equal to the original key.
-   *
-   * @param key
-   *            the key
-   * @param value
-   *            the value
-   * @param len
-   *            the length of the value
-   * @return False if the table key already exists with a different type
+   * {@inheritDoc}
    */
+  @Override
   public boolean putRaw(String key, ByteBuffer value, int len) {
     if (!value.isDirect())
       throw new IllegalArgumentException("must be a direct buffer");
@@ -803,43 +694,28 @@ public class NetworkTable implements ITable, IRemote {
   }
 
   /**
-   * Returns the key that the name maps to.
-   *
-   * @param key
-   *            the key name
-   * @return the key
-   * @throws TableKeyNotDefinedException
-   *             if the specified key is null
+   * {@inheritDoc}
+   * @deprecated This exception-raising method has been replaced by the
+   * default-taking method {@link #getRaw(String, byte[])}.
    */
+  @Override
+  @Deprecated
   public byte[] getRaw(String key) throws TableKeyNotDefinedException {
     return NetworkTablesJNI.getRaw(path + PATH_SEPARATOR + key);
   }
 
   /**
-   * Returns the key that the name maps to. If the key is null, it will return
-   * the default value
-   *
-   * @param key
-   *            the key name
-   * @param defaultValue
-   *            the default value if the key is null
-   * @return the key
+   * {@inheritDoc}
    */
+  @Override
   public byte[] getRaw(String key, byte[] defaultValue) {
     return NetworkTablesJNI.getRaw(path + PATH_SEPARATOR + key, defaultValue);
   }
 
   /**
-   * Maps the specified key to the specified value in this table. The key can
-   * not be null. The value can be retrieved by calling the get method with a
-   * key that is equal to the original key.
-   *
-   * @param key the key name
-   * @param value the value to be put
-   * @return False if the table key already exists with a different type
-   * @throws IllegalArgumentException when the value is not supported by the
-   * table
+   * {@inheritDoc}
    */
+  @Override
   public boolean putValue(String key, Object value) throws IllegalArgumentException {
     if (value instanceof Boolean)
       return NetworkTablesJNI.putBoolean(path + PATH_SEPARATOR + key, ((Boolean)value).booleanValue());
@@ -869,6 +745,12 @@ public class NetworkTable implements ITable, IRemote {
       throw new IllegalArgumentException(key);
   }
 
+  /**
+   * {@inheritDoc}
+   * @deprecated Use get*Array functions instead.
+   */
+  @Override
+  @Deprecated
   public void retrieveValue(String key, Object externalData) throws TableKeyNotDefinedException {
     Object value = getValue(key);
     if (value instanceof boolean[] && externalData instanceof BooleanArray)
@@ -882,32 +764,20 @@ public class NetworkTable implements ITable, IRemote {
   }
 
   /**
-   * Returns the key that the name maps to.
-   * NOTE: If the value is a double, it will return a Double object,
-   * not a primitive.  To get the primitive, use getDouble
-   *
-   * @param key
-   *            the key name
-   * @return the key
-   * @throws TableKeyNotDefinedException
-   *             if the specified key is null
+   * {@inheritDoc}
+   * @deprecated This exception-raising method has been replaced by the
+   * default-taking method {@link #getValue(String, Object)}.
    */
+  @Override
+  @Deprecated
   public Object getValue(String key) throws TableKeyNotDefinedException {
     return NetworkTablesJNI.getValue(path + PATH_SEPARATOR + key);
   }
 
   /**
-   * Returns the key that the name maps to. If the key is null, it will return
-   * the default value
-   * NOTE: If the value is a double, it will return a Double object,
-   * not a primitive.  To get the primitive, use getDouble
-   *
-   * @param key
-   *            the key name
-   * @param defaultValue
-   *            the default value if the key is null
-   * @return the key
+   * {@inheritDoc}
    */
+  @Override
   public Object getValue(String key, Object defaultValue) {
     return NetworkTablesJNI.getValue(path + PATH_SEPARATOR + key, defaultValue);
   }
@@ -916,75 +786,57 @@ public class NetworkTable implements ITable, IRemote {
   public static final int PERSISTENT = 1;
 
   /**
-   * Makes a key's value persistent through program restarts.
-   * The key cannot be null.
-   *
-   * @param key the key name
+   * {@inheritDoc}
    */
+  @Override
   public void setPersistent(String key) {
     setFlags(key, PERSISTENT);
   }
 
   /**
-   * Stop making a key's value persistent through program restarts.
-   * The key cannot be null.
-   *
-   * @param key the key name
+   * {@inheritDoc}
    */
+  @Override
   public void clearPersistent(String key) {
     clearFlags(key, PERSISTENT);
   }
 
   /**
-   * Returns whether the value is persistent through program restarts.
-   * The key cannot be null.
-   *
-   * @param key the key name
-   * @return True if the value is persistent.
+   * {@inheritDoc}
    */
+  @Override
   public boolean isPersistent(String key) {
     return (getFlags(key) & PERSISTENT) != 0;
   }
 
   /**
-   * Sets flags on the specified key in this table. The key can
-   * not be null.
-   *
-   * @param key the key name
-   * @param flags the flags to set (bitmask)
+   * {@inheritDoc}
    */
+  @Override
   public void setFlags(String key, int flags) {
     NetworkTablesJNI.setEntryFlags(path + PATH_SEPARATOR + key, getFlags(key) | flags);
   }
 
   /**
-   * Clears flags on the specified key in this table. The key can
-   * not be null.
-   *
-   * @param key the key name
-   * @param flags the flags to clear (bitmask)
+   * {@inheritDoc}
    */
+  @Override
   public void clearFlags(String key, int flags) {
     NetworkTablesJNI.setEntryFlags(path + PATH_SEPARATOR + key, getFlags(key) & ~flags);
   }
 
   /**
-   * Returns the flags for the specified key.
-   *
-   * @param key
-   *            the key name
-   * @return the flags, or 0 if the key is not defined
+   * {@inheritDoc}
    */
+  @Override
   public int getFlags(String key) {
     return NetworkTablesJNI.getEntryFlags(path + PATH_SEPARATOR + key);
   }
 
   /**
-   * Deletes the specified key in this table. The key can
-   * not be null.
-   *
-   * @param key the key name
+   * {@inheritDoc}
    */
+  @Override
   public void delete(String key) {
     NetworkTablesJNI.deleteEntry(path + PATH_SEPARATOR + key);
   }
@@ -1041,46 +893,31 @@ public class NetworkTable implements ITable, IRemote {
    */
 
   /**
-   * @deprecated
-   * Maps the specified key to the specified value in this table.
-   * The key can not be null.
-   * The value can be retrieved by calling the get method with a key that is
-   * equal to the original key.
-   * @param key the key
-   * @param value the value
-   * @return False if the table key already exists with a different type
-   * @throws IllegalArgumentException if key is null
+   * {@inheritDoc}
+   * @deprecated Use {@link #putNumber(String, double)} instead.
    */
+  @Override
+  @Deprecated
   public boolean putInt(String key, int value) {
     return putNumber(key, value);
   }
 
   /**
-   * @deprecated
-   * Returns the value at the specified key.
-   * @param key the key
-   * @return the value
-   * @throws TableKeyNotDefinedException if there is no value mapped to by the
-   * key
-   * @throws IllegalArgumentException if the value mapped to by the key is not
-   * an int
-   * @throws IllegalArgumentException if the key is null
+   * {@inheritDoc}
+   * @deprecated Use {@link #getNumber(String, double)} instead.
    */
+  @Override
+  @Deprecated
   public int getInt(String key) throws TableKeyNotDefinedException {
     return (int)getNumber(key);
   }
 
   /**
-   * @deprecated
-   * Returns the value at the specified key.
-   * @param key the key
-   * @param defaultValue the value returned if the key is undefined
-   * @return the value
-   * @throws NetworkTableKeyNotDefined if there is no value mapped to by the key
-   * @throws IllegalArgumentException if the value mapped to by the key is not
-   * an int
-   * @throws IllegalArgumentException if the key is null
+   * {@inheritDoc}
+   * @deprecated Use {@link #getNumber(String, double)} instead.
    */
+  @Override
+  @Deprecated
   public int getInt(String key, int defaultValue) throws TableKeyNotDefinedException {
     try {
       return (int)getNumber(key);
@@ -1090,47 +927,31 @@ public class NetworkTable implements ITable, IRemote {
   }
 
   /**
-   * @deprecated
-   * Maps the specified key to the specified value in this table.
-   * The key can not be null.
-   * The value can be retrieved by calling the get method with a key that is
-   * equal to the original key.
-   * @param key the key
-   * @param value the value
-   * @return False if the table key already exists with a different type
-   * @throws IllegalArgumentException if key is null
+   * {@inheritDoc}
+   * @deprecated Use {@link #putNumber(String, double)} instead.
    */
+  @Override
+  @Deprecated
   public boolean putDouble(String key, double value) {
     return putNumber(key, value);
   }
 
   /**
-   * @deprecated
-   * Returns the value at the specified key.
-   * @param key the key
-   * @return the value
-   * @throws TableKeyNotDefinedException if there is no
-   * value mapped to by the key
-   * @throws IllegalArgumentException if the value mapped to by the key is not a
-   * double
-   * @throws IllegalArgumentException if the key is null
+   * {@inheritDoc}
+   * @deprecated Use {@link #getNumber(String, double)} instead.
    */
+  @Override
+  @Deprecated
   public double getDouble(String key) throws TableKeyNotDefinedException {
     return getNumber(key);
   }
 
   /**
-   * @deprecated
-   * Returns the value at the specified key.
-   * @param key the key
-   * @param defaultValue the value returned if the key is undefined
-   * @return the value
-   * @throws TableKeyNotDefinedException if there is no
-   * value mapped to by the key
-   * @throws IllegalArgumentException if the value mapped to by the key is not a
-   * double
-   * @throws IllegalArgumentException if the key is null
+   * {@inheritDoc}
+   * @deprecated Use {@link #getNumber(String, double)} instead.
    */
+  @Override
+  @Deprecated
   public double getDouble(String key, double defaultValue) {
     return getNumber(key, defaultValue);
   }
