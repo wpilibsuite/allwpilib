@@ -145,16 +145,18 @@ class NetworkTable : public ITable {
    */
   static std::shared_ptr<NetworkTable> GetTable(llvm::StringRef key);
 
-  void AddTableListener(ITableListener* listener);
-  void AddTableListener(ITableListener* listener, bool immediateNotify);
-  void AddTableListenerEx(ITableListener* listener, unsigned int flags);
+  void AddTableListener(ITableListener* listener) override;
+  void AddTableListener(ITableListener* listener,
+                        bool immediateNotify) override;
+  void AddTableListenerEx(ITableListener* listener,
+                          unsigned int flags) override;
   void AddTableListener(llvm::StringRef key, ITableListener* listener,
-                        bool immediateNotify);
+                        bool immediateNotify) override;
   void AddTableListenerEx(llvm::StringRef key, ITableListener* listener,
-                          unsigned int flags);
-  void AddSubTableListener(ITableListener* listener);
-  void AddSubTableListener(ITableListener* listener, bool localNotify);
-  void RemoveTableListener(ITableListener* listener);
+                          unsigned int flags) override;
+  void AddSubTableListener(ITableListener* listener) override;
+  void AddSubTableListener(ITableListener* listener, bool localNotify) override;
+  void RemoveTableListener(ITableListener* listener) override;
 
   /**
    * Returns the table at the specified key. If there is no table at the
