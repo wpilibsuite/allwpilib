@@ -12,8 +12,8 @@ TableKeyNotDefinedException::TableKeyNotDefinedException(llvm::StringRef key)
   msg += key;
 }
 
-const char* TableKeyNotDefinedException::what() const noexcept {
+const char* TableKeyNotDefinedException::what() const NT_NOEXCEPT {
   return msg.c_str();
 }
 
-TableKeyNotDefinedException::~TableKeyNotDefinedException() noexcept {}
+TableKeyNotDefinedException::~TableKeyNotDefinedException() NT_NOEXCEPT {}

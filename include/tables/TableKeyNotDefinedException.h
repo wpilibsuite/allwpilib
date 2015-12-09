@@ -11,6 +11,12 @@
 #include <exception>
 #include "llvm/StringRef.h"
 
+#if defined(_MSC_VER)
+  #define NT_NOEXCEPT throw()
+#else
+  #define NT_NOEXCEPT noexcept
+#endif
+
 /**
  * An exception thrown when the lookup a a key-value fails in a {@link ITable}
  */
@@ -20,8 +26,8 @@ class TableKeyNotDefinedException : public std::exception {
    * @param key the key that was not defined in the table
    */
   TableKeyNotDefinedException(llvm::StringRef key);
-  ~TableKeyNotDefinedException() noexcept;
-  const char* what() const noexcept override;
+  ~TableKeyNotDefinedException() NT_NOEXCEPT;
+  const char* what() const NT_NOEXCEPT override;
 
  private:
   std::string msg;
