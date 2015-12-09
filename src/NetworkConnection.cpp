@@ -32,6 +32,9 @@ NetworkConnection::NetworkConnection(std::unique_ptr<NetworkStream> stream,
   m_proto_rev = 0x0300;
   m_state = static_cast<int>(kCreated);
   m_last_update = 0;
+
+  // turn off Nagle algorithm; we bundle packets for transmission
+  m_stream->setNoDelay();
 }
 
 NetworkConnection::~NetworkConnection() { Stop(); }

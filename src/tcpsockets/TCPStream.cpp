@@ -27,6 +27,7 @@
 #include <WinSock2.h>
 #else
 #include <arpa/inet.h>
+#include <netinet/tcp.h>
 #include <unistd.h>
 #endif
 
@@ -135,6 +136,11 @@ void TCPStream::close() {
 llvm::StringRef TCPStream::getPeerIP() const { return m_peerIP; }
 
 int TCPStream::getPeerPort() const { return m_peerPort; }
+
+void TCPStream::setNoDelay() {
+  int optval = 1;
+  setsockopt(m_sd, IPPROTO_TCP, TCP_NODELAY, (char*)&optval, sizeof optval);
+}
 
 bool TCPStream::WaitForReadEvent(int timeout) {
   fd_set sdset;

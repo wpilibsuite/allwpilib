@@ -30,6 +30,7 @@ class NetworkStream {
 
   virtual llvm::StringRef getPeerIP() const = 0;
   virtual int getPeerPort() const = 0;
+  virtual void setNoDelay() = 0;
 
   NetworkStream(const NetworkStream&) = delete;
   NetworkStream& operator=(const NetworkStream&) = delete;

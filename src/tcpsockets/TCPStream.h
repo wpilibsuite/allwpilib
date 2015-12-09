@@ -53,6 +53,7 @@ class TCPStream : public NetworkStream {
 
   llvm::StringRef getPeerIP() const override;
   int getPeerPort() const override;
+  void setNoDelay() override;
 
   TCPStream(const TCPStream& stream) = delete;
   TCPStream& operator=(const TCPStream&) = delete;
