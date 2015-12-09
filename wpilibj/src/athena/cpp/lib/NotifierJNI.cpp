@@ -22,7 +22,7 @@ static jmethodID mid_global;
 
 // The arguments are unused by the HAL Notifier; they just satisfy a particular
 // function signature.
-void notifierHandler(uint32_t mask, void* param) {
+void notifierHandler(uint32_t currentTimeInt, void* param) {
   jobject handler_obj = func_global;
   jmethodID mid = mid_global;
 
@@ -82,7 +82,7 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNot
   mid_global = mid;
 
 	int32_t status = 0;
-	void *notifierPtr = initializeNotifier(notifierHandler, &status);
+	void *notifierPtr = initializeNotifier(notifierHandler, nullptr, &status);
 
 	NOTIFIERJNI_LOG(logDEBUG) << "Notifier Ptr = " << notifierPtr;
 	NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;

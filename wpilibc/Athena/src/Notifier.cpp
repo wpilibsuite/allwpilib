@@ -15,7 +15,7 @@ Notifier *Notifier::timerQueueHead = nullptr;
 priority_recursive_mutex Notifier::queueMutex;
 priority_mutex Notifier::halMutex;
 void *Notifier::m_notifier = nullptr;
-std::atomic<int> Notifier::refcount{0};
+std::atomic<int> Notifier::refcount = ATOMIC_VAR_INIT(0);
 
 /**
  * Create a Notifier for timer event notification.
@@ -33,7 +33,7 @@ Notifier::Notifier(TimerEventHandler handler, void *param) {
     {
       std::lock_guard<priority_mutex> sync(halMutex);
       if (!m_notifier)
-        m_notifier = initializeNotifier(ProcessQueue, &status);
+        m_notifier = initializeNotifier(ProcessQueue, nullptr, &status);
     }
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
   }
@@ -105,13 +105,13 @@ void Notifier::UpdateAlarm() {
  * as its scheduled time is after the current time. Then the item is removed or
  * rescheduled (repetitive events) in the queue.
  */
-void Notifier::ProcessQueue(uint32_t mask, void *params) {
+void Notifier::ProcessQueue(uint32_t currentTimeInt, void *params) {
   Notifier *current;
   while (true)  // keep processing past events until no more
   {
     {
       std::lock_guard<priority_recursive_mutex> sync(queueMutex);
-      double currentTime = GetClock();
+      double currentTime = currentTimeInt * 1.0e-6;
       current = timerQueueHead;
       if (current == nullptr || current->m_expirationTime > currentTime) {
         break;  // no more timer events to process
