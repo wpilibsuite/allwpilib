@@ -21,7 +21,7 @@ class TableKeyNotDefinedException : public std::exception {
    */
   TableKeyNotDefinedException(llvm::StringRef key);
   ~TableKeyNotDefinedException() noexcept;
-  const char* what();
+  const char* what() const noexcept override;
 
  private:
   std::string msg;
