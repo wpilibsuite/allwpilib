@@ -40,6 +40,27 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
   private PIDSourceType m_pidSource;
 
   /**
+   * Initialize the gyro. Calibration is handled by calibrate().
+   */
+  public void initGyro() {
+    result = new AccumulatorResult();
+
+    m_voltsPerDegreePerSecond = kDefaultVoltsPerDegreePerSecond;
+    m_analog.setAverageBits(kAverageBits);
+    m_analog.setOversampleBits(kOversampleBits);
+    double sampleRate = kSamplesPerSecond * (1 << (kAverageBits + kOversampleBits));
+    AnalogInput.setGlobalSampleRate(sampleRate);
+    Timer.delay(0.1);
+
+    setDeadband(0.0);
+
+    setPIDSourceType(PIDSourceType.kDisplacement);
+
+    UsageReporting.report(tResourceType.kResourceType_Gyro, m_analog.getChannel());
+    LiveWindow.addSensor("AnalogGyro", m_analog.getChannel(), this);
+  }
+
+  /**
    * {@inheritDoc}
    */
   public void calibrate() {
@@ -81,23 +102,43 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
     if (m_analog == null) {
       throw new NullPointerException("AnalogInput supplied to Gyro constructor is null");
     }
-    result = new AccumulatorResult();
-
-    m_voltsPerDegreePerSecond = kDefaultVoltsPerDegreePerSecond;
-    m_analog.setAverageBits(kAverageBits);
-    m_analog.setOversampleBits(kOversampleBits);
-    double sampleRate = kSamplesPerSecond * (1 << (kAverageBits + kOversampleBits));
-    AnalogInput.setGlobalSampleRate(sampleRate);
-    Timer.delay(0.1);
-
-    setDeadband(0.0);
-
-    setPIDSourceType(PIDSourceType.kDisplacement);
-
-    UsageReporting.report(tResourceType.kResourceType_Gyro, m_analog.getChannel());
-    LiveWindow.addSensor("AnalogGyro", m_analog.getChannel(), this);
-
+    initGyro();
     calibrate();
+  }
+
+  /**
+   * Gyro constructor using the channel number along with parameters for
+   * presetting the center and offset values. Bypasses calibration.
+   * @param channel The analog channel the gyro is connected to. Gyros can only
+   *        be used on on-board channels 0-1.
+   * @param center Preset uncalibrated value to use as the accumulator center value.
+   * @param offset Preset uncalibrated value to use as the gyro offset.
+   */
+  public AnalogGyro(int channel, int center, double offset) {
+    this(new AnalogInput(channel), center, offset);
+    m_channelAllocated = true;
+  }
+
+  /**
+   * Gyro constructor with a precreated analog channel object along with
+   * parameters for presetting the center and offset values. Bypasses
+   * calibration.
+   * @param channel The analog channel the gyro is connected to. Gyros can only
+   *        be used on on-board channels 0-1.
+   * @param center Preset uncalibrated value to use as the accumulator center value.
+   * @param offset Preset uncalibrated value to use as the gyro offset.
+   */
+  public AnalogGyro(AnalogInput channel, int center, double offset) {
+    m_analog = channel;
+    if (m_analog == null) {
+      throw new NullPointerException("AnalogInput supplied to Gyro constructor is null");
+    }
+    initGyro();
+    m_offset = offset;
+    m_center = center;
+
+    m_analog.setAccumulatorCenter(m_center);
+    m_analog.resetAccumulator();
   }
 
   /**
@@ -149,6 +190,26 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
       return (m_analog.getAverageValue() - (m_center + m_offset)) * 1e-9 * m_analog.getLSBWeight()
           / ((1 << m_analog.getOversampleBits()) * m_voltsPerDegreePerSecond);
     }
+  }
+
+  /**
+   * Return the gyro offset value set during calibration to
+   * use as a future preset
+   *
+   * @return the current offset value
+   */
+  public double getOffset() {
+    return m_offset;
+  }
+
+  /**
+   * Return the gyro center value set during calibration to
+   * use as a future preset
+   *
+   * @return the current center value
+   */
+  public int getCenter() {
+    return m_center;
   }
 
   /**

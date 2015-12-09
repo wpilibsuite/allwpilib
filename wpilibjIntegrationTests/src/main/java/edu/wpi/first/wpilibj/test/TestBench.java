@@ -253,8 +253,15 @@ public final class TestBench {
   public TiltPanCameraFixture getTiltPanCam() {
     TiltPanCameraFixture tpcam = new TiltPanCameraFixture() {
       @Override
-      protected Gyro giveGyro() {
+      protected AnalogGyro giveGyro() {
         AnalogGyro gyro = new AnalogGyro(kGyroChannel);
+        gyro.setSensitivity(kGyroSensitivity);
+        return gyro;
+      }
+
+      @Override
+      protected AnalogGyro giveGyroParam(int center, double offset) {
+        AnalogGyro gyro = new AnalogGyro(kGyroChannel, center, offset);
         gyro.setSensitivity(kGyroSensitivity);
         return gyro;
       }

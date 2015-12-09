@@ -8,7 +8,7 @@ package edu.wpi.first.wpilibj.fixtures;
 
 import java.util.logging.Logger;
 
-import edu.wpi.first.wpilibj.interfaces.Gyro;
+import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -23,13 +23,16 @@ public abstract class TiltPanCameraFixture implements ITestFixture {
   public static final Logger logger = Logger.getLogger(TiltPanCameraFixture.class.getName());
 
   public static final double RESET_TIME = 2.0;
-  private Gyro gyro;
+  private AnalogGyro gyro;
+  private AnalogGyro gyroParam;
   private Servo tilt;
   private Servo pan;
   private boolean initialized = false;
 
 
-  protected abstract Gyro giveGyro();
+  protected abstract AnalogGyro giveGyro();
+
+  protected abstract AnalogGyro giveGyroParam(int center, double offset);
 
   protected abstract Servo giveTilt();
 
@@ -73,8 +76,22 @@ public abstract class TiltPanCameraFixture implements ITestFixture {
     return pan;
   }
 
-  public Gyro getGyro() {
+  public AnalogGyro getGyro() {
     return gyro;
+  }
+
+  public AnalogGyro getGyroParam() {
+    return gyroParam;
+  }
+
+  // Do not call unless all other instances of Gyro have been deallocated
+  public void setupGyroParam(int center, double offset) {
+    gyroParam = giveGyroParam(center, offset);
+    gyroParam.reset();
+  }
+  public void freeGyro() {
+    gyro.free();
+    gyro = null;
   }
 
   @Override
@@ -83,8 +100,8 @@ public abstract class TiltPanCameraFixture implements ITestFixture {
     tilt = null;
     pan.free();
     pan = null;
-    gyro.free();
-    gyro = null;
+    gyroParam.free();
+    gyroParam = null;
     return true;
   }
 

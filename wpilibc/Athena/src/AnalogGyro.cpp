@@ -56,29 +56,46 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel)
   if (channel == nullptr) {
     wpi_setWPIError(NullParameter);
   } else {
-    if (!m_analog->IsAccumulatorChannel()) {
-      wpi_setWPIErrorWithContext(ParameterOutOfRange,
-                                 " channel (must be accumulator channel)");
-      m_analog = nullptr;
-      return;
-    }
-
-    m_voltsPerDegreePerSecond = kDefaultVoltsPerDegreePerSecond;
-    m_analog->SetAverageBits(kAverageBits);
-    m_analog->SetOversampleBits(kOversampleBits);
-    float sampleRate =
-        kSamplesPerSecond * (1 << (kAverageBits + kOversampleBits));
-    m_analog->SetSampleRate(sampleRate);
-    Wait(0.1);
-
-    SetDeadband(0.0f);
-
-    SetPIDSourceType(PIDSourceType::kDisplacement);
-
-    HALReport(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel());
-    LiveWindow::GetInstance()->AddSensor("Gyro", m_analog->GetChannel(), this);
-
+    InitGyro();
     Calibrate();
+  }
+}
+
+/**
+ * Gyro constructor using the Analog Input channel number with parameters for
+ * presetting the center and offset values. Bypasses calibration.
+ *
+ * @param channel The analog channel the gyro is connected to. Gyros
+ *        can only be used on on-board Analog Inputs 0-1.
+ * @param center Preset uncalibrated value to use as the accumulator center value.
+ * @param offset Preset uncalibrated value to use as the gyro offset.
+ */
+AnalogGyro::AnalogGyro(int32_t channel, uint32_t center, float offset) {
+  m_analog = std::make_shared<AnalogInput>(channel);
+  InitGyro();
+  m_center = center;
+  m_offset = offset;
+  m_analog->SetAccumulatorCenter(m_center);
+  m_analog->ResetAccumulator();
+}
+
+/**
+ * Gyro constructor with a precreated AnalogInput object and calibrated parameters.
+ * Use this constructor when the analog channel needs to be shared.
+ * This object will not clean up the AnalogInput object when using this
+ * constructor
+ * @param channel A pointer to the AnalogInput object that the gyro is
+ * connected to.
+ */
+AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel, uint32_t center, float offset) : m_analog(channel) {
+  if (channel == nullptr) {
+    wpi_setWPIError(NullParameter);
+  } else {
+    InitGyro();
+    m_center = center;
+    m_offset = offset;
+    m_analog->SetAccumulatorCenter(m_center);
+    m_analog->ResetAccumulator();
   }
 }
 
@@ -91,6 +108,35 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel)
 void AnalogGyro::Reset() {
   if (StatusIsFatal()) return;
   m_analog->ResetAccumulator();
+}
+
+/**
+ * Initialize the gyro.  Calibration is handled by Calibrate().
+ */
+void AnalogGyro::InitGyro() {
+  if (StatusIsFatal()) return;
+
+  if (!m_analog->IsAccumulatorChannel()) {
+    wpi_setWPIErrorWithContext(ParameterOutOfRange,
+                               " channel (must be accumulator channel)");
+    m_analog = nullptr;
+    return;
+  }
+
+  m_voltsPerDegreePerSecond = kDefaultVoltsPerDegreePerSecond;
+  m_analog->SetAverageBits(kAverageBits);
+  m_analog->SetOversampleBits(kOversampleBits);
+  float sampleRate =
+      kSamplesPerSecond * (1 << (kAverageBits + kOversampleBits));
+  m_analog->SetSampleRate(sampleRate);
+  Wait(0.1);
+
+  SetDeadband(0.0f);
+
+  SetPIDSourceType(PIDSourceType::kDisplacement);
+
+  HALReport(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel());
+  LiveWindow::GetInstance()->AddSensor("Gyro", m_analog->GetChannel(), this);
 }
 
 /**
@@ -158,6 +204,26 @@ double AnalogGyro::GetRate() const {
   return (m_analog->GetAverageValue() - ((double)m_center + m_offset)) * 1e-9 *
          m_analog->GetLSBWeight() /
          ((1 << m_analog->GetOversampleBits()) * m_voltsPerDegreePerSecond);
+}
+
+/**
+ * Return the gyro offset value. If run after calibration,
+ * the offset value can be used as a preset later.
+ *
+ * @return the current offset value
+ */
+float AnalogGyro::GetOffset() const {
+  return m_offset;
+}
+
+/**
+ * Return the gyro center value. If run after calibration,
+ * the center value can be used as a preset later.
+ *
+ * @return the current center value
+ */
+uint32_t AnalogGyro::GetCenter() const {
+  return m_center;
 }
 
 /**
