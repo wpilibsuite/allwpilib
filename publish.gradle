@@ -31,6 +31,12 @@ publishing {
             artifact arm.ntcoreZip
             artifact nat.ntcoreSourceZip
 
+            if (project.hasProperty('makeDesktop')) {
+                artifact nat.ntcoreZip, {
+                    classifier = 'desktop'
+                }
+            }
+
             groupId 'edu.wpi.first.wpilib.networktables.cpp'
             artifactId 'NetworkTables'
             version '3.0.0-SNAPSHOT'
