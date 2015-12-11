@@ -36,9 +36,6 @@ AnalogGyro::AnalogGyro(int32_t channel) :
  * @param channel A pointer to the AnalogInput object that the gyro is connected
  * to.
  */
-DEPRECATED(
-    "Raw pointers are deprecated; consider calling the Gyro constructor with "
-    "a channel number or passing a shared_ptr instead.")
 AnalogGyro::AnalogGyro(AnalogInput *channel)
     : AnalogGyro(
           std::shared_ptr<AnalogInput>(channel, NullDeleter<AnalogInput>())) {}

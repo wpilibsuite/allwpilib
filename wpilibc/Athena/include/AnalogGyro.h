@@ -37,9 +37,6 @@ class AnalogGyro : public GyroBase {
   static constexpr float kDefaultVoltsPerDegreePerSecond = 0.007;
 
   explicit AnalogGyro(int32_t channel);
-  DEPRECATED(
-      "Raw pointers are deprecated; consider calling the AnalogGyro constructor"
-      " with a channel number or passing a shared_ptr instead.")
   explicit AnalogGyro(AnalogInput *channel);
   explicit AnalogGyro(std::shared_ptr<AnalogInput> channel);
   AnalogGyro(int32_t channel, uint32_t center, float offset);

@@ -54,11 +54,8 @@ ClassName(ClassName &&) = default
 
 // A struct to use as a deleter when a std::shared_ptr must wrap a raw pointer
 // that is being deleted by someone else.
-// This should only be called in deprecated functions; using it anywhere else
-// will throw warnings.
 template<class T>
 struct
-DEPRECATED("wrapping raw pointer in std::shared_ptr")
 NullDeleter {
   void operator()(T *) const noexcept {};
 };

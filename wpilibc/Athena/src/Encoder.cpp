@@ -125,10 +125,6 @@ Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection,
  * match the spec'd count
  * or be double (2x) the spec'd count.
  */
-DEPRECATED(
-    "Raw pointers are deprecated; if you wish to construct your own copy of "
-    "the DigitalSource and pass it to the constructor, use an std::shared_ptr "
-    "instead.")
 Encoder::Encoder(DigitalSource *aSource, DigitalSource *bSource,
                  bool reverseDirection, EncodingType encodingType)
     : m_aSource(aSource, NullDeleter<DigitalSource>()),
@@ -174,10 +170,6 @@ Encoder::Encoder(std::shared_ptr<DigitalSource> aSource,
  * match the spec'd count
  * or be double (2x) the spec'd count.
  */
-DEPRECATED(
-    "References are deprecated; if you wish to construct your own copy of "
-    "the DigitalSource and pass it to the constructor, use an std::shared_ptr "
-    "instead.")
 Encoder::Encoder(DigitalSource &aSource, DigitalSource &bSource,
                  bool reverseDirection, EncodingType encodingType)
     : m_aSource(&aSource, NullDeleter<DigitalSource>()),
@@ -517,7 +509,7 @@ void Encoder::SetIndexSource(uint32_t channel, Encoder::IndexingType type) {
  * @param channel A digital source to set as the encoder index
  * @param type The state that will cause the encoder to reset
  */
-DEPRECATED("Raw pointers are dperecated; use references instead.")
+DEPRECATED("Use pass-by-reference instead.")
 void Encoder::SetIndexSource(DigitalSource *source,
                              Encoder::IndexingType type) {
   SetIndexSource(*source, type);

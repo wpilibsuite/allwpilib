@@ -21,7 +21,6 @@
 
 const int32_t RobotDrive::kMaxNumberOfMotors;
 
-DEPRECATED("making shared pointer from raw pointer")
 static auto make_shared_nodelete(SpeedController *ptr) {
   return std::shared_ptr<SpeedController>(ptr, NullDeleter<SpeedController>());
 }
@@ -98,7 +97,6 @@ RobotDrive::RobotDrive(uint32_t frontLeftMotor, uint32_t rearLeftMotor,
  * @param leftMotor The left SpeedController object used to drive the robot.
  * @param rightMotor the right SpeedController object used to drive the robot.
  */
-DEPRECATED("Raw pointers are deprecated; use shared_ptr instead.")
 RobotDrive::RobotDrive(SpeedController *leftMotor,
                        SpeedController *rightMotor) {
   InitRobotDrive();
@@ -112,7 +110,6 @@ RobotDrive::RobotDrive(SpeedController *leftMotor,
 }
 
 //TODO: Change to rvalue references & move syntax.
-DEPRECATED("References are deprecated; use shared_ptr instead.")
 RobotDrive::RobotDrive(SpeedController &leftMotor,
                        SpeedController &rightMotor) {
   InitRobotDrive();
@@ -145,7 +142,6 @@ RobotDrive::RobotDrive(std::shared_ptr<SpeedController> leftMotor,
  * @param frontRightMotor The front right SpeedController object used to drive
  * the robot.
  */
-DEPRECATED("Raw pointers are deprecated; use shared_ptr instead.")
 RobotDrive::RobotDrive(SpeedController *frontLeftMotor,
                        SpeedController *rearLeftMotor,
                        SpeedController *frontRightMotor,
@@ -162,7 +158,6 @@ RobotDrive::RobotDrive(SpeedController *frontLeftMotor,
   m_rearRightMotor = make_shared_nodelete(rearRightMotor);
 }
 
-DEPRECATED("References are deprecated; use shared_ptr instead.")
 RobotDrive::RobotDrive(SpeedController &frontLeftMotor,
                        SpeedController &rearLeftMotor,
                        SpeedController &frontRightMotor,

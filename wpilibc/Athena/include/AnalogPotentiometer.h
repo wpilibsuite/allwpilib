@@ -36,11 +36,6 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
   explicit AnalogPotentiometer(int channel, double fullRange = 1.0,
                                double offset = 0.0);
 
-  DEPRECATED(
-      "Raw pointers are deprecated; if you just want to construct an "
-      "AnalogPotentiometer with its own AnalogInput, then call the "
-      "AnalogPotentiometer(int channel). If you want to keep your own copy of "
-      "the AnalogInput, use std::shared_ptr.")
   explicit AnalogPotentiometer(AnalogInput *input, double fullRange = 1.0,
                                double offset = 0.0);
 
