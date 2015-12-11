@@ -8,11 +8,11 @@
 #include <AnalogOutput.h>
 #include <AnalogPotentiometer.h>
 #include <Timer.h>
+#include <ControllerPower.h>
 #include "TestBench.h"
 #include "gtest/gtest.h"
 
 static const double kScale = 270.0;
-static const double kVoltage = 3.33;
 static const double kAngle = 180.0;
 
 class AnalogPotentiometerTest : public testing::Test {
@@ -40,7 +40,7 @@ TEST_F(AnalogPotentiometerTest, TestInitialSettings) {
 }
 
 TEST_F(AnalogPotentiometerTest, TestRangeValues) {
-  m_fakePot->SetVoltage(kVoltage);
+  m_fakePot->SetVoltage(kAngle / kScale * ControllerPower::GetVoltage5V());
   Wait(0.1);
   EXPECT_NEAR(kAngle, m_pot->Get(), 2.0)
       << "The potentiometer did not measure the correct angle.";
