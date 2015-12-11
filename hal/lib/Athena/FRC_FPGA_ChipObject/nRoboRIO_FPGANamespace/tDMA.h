@@ -1,14 +1,14 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2016_16_0_0_DMA_h__
-#define __nFRC_2016_16_0_0_DMA_h__
+#ifndef __nFRC_2016_16_1_0_DMA_h__
+#define __nFRC_2016_16_1_0_DMA_h__
 
 #include "tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2016_16_0_0
+namespace nFRC_2016_16_1_0
 {
 
 class tDMA
@@ -46,13 +46,17 @@ public:
          unsigned Enable_Counters_High : 1;
          unsigned Enable_CounterTimers_Low : 1;
          unsigned Enable_CounterTimers_High : 1;
-         unsigned Enable_Encoders : 1;
-         unsigned Enable_EncoderTimers : 1;
+         unsigned Enable_Encoders_Low : 1;
+         unsigned Enable_Encoders_High : 1;
+         unsigned Enable_EncoderTimers_Low : 1;
+         unsigned Enable_EncoderTimers_High : 1;
          unsigned ExternalClock : 1;
 #else
          unsigned ExternalClock : 1;
-         unsigned Enable_EncoderTimers : 1;
-         unsigned Enable_Encoders : 1;
+         unsigned Enable_EncoderTimers_High : 1;
+         unsigned Enable_EncoderTimers_Low : 1;
+         unsigned Enable_Encoders_High : 1;
+         unsigned Enable_Encoders_Low : 1;
          unsigned Enable_CounterTimers_High : 1;
          unsigned Enable_CounterTimers_Low : 1;
          unsigned Enable_Counters_High : 1;
@@ -73,7 +77,7 @@ public:
 #endif
       };
       struct{
-         unsigned value : 20;
+         unsigned value : 22;
       };
    } tConfig;
    typedef
@@ -130,8 +134,10 @@ public:
    virtual void writeConfig_Enable_Counters_High(bool value, tRioStatusCode *status) = 0;
    virtual void writeConfig_Enable_CounterTimers_Low(bool value, tRioStatusCode *status) = 0;
    virtual void writeConfig_Enable_CounterTimers_High(bool value, tRioStatusCode *status) = 0;
-   virtual void writeConfig_Enable_Encoders(bool value, tRioStatusCode *status) = 0;
-   virtual void writeConfig_Enable_EncoderTimers(bool value, tRioStatusCode *status) = 0;
+   virtual void writeConfig_Enable_Encoders_Low(bool value, tRioStatusCode *status) = 0;
+   virtual void writeConfig_Enable_Encoders_High(bool value, tRioStatusCode *status) = 0;
+   virtual void writeConfig_Enable_EncoderTimers_Low(bool value, tRioStatusCode *status) = 0;
+   virtual void writeConfig_Enable_EncoderTimers_High(bool value, tRioStatusCode *status) = 0;
    virtual void writeConfig_ExternalClock(bool value, tRioStatusCode *status) = 0;
    virtual tConfig readConfig(tRioStatusCode *status) = 0;
    virtual bool readConfig_Pause(tRioStatusCode *status) = 0;
@@ -151,30 +157,33 @@ public:
    virtual bool readConfig_Enable_Counters_High(tRioStatusCode *status) = 0;
    virtual bool readConfig_Enable_CounterTimers_Low(tRioStatusCode *status) = 0;
    virtual bool readConfig_Enable_CounterTimers_High(tRioStatusCode *status) = 0;
-   virtual bool readConfig_Enable_Encoders(tRioStatusCode *status) = 0;
-   virtual bool readConfig_Enable_EncoderTimers(tRioStatusCode *status) = 0;
+   virtual bool readConfig_Enable_Encoders_Low(tRioStatusCode *status) = 0;
+   virtual bool readConfig_Enable_Encoders_High(tRioStatusCode *status) = 0;
+   virtual bool readConfig_Enable_EncoderTimers_Low(tRioStatusCode *status) = 0;
+   virtual bool readConfig_Enable_EncoderTimers_High(tRioStatusCode *status) = 0;
    virtual bool readConfig_ExternalClock(tRioStatusCode *status) = 0;
+
+
 
 
    typedef enum
    {
+      kNumExternalTriggersRegisters = 2,
       kNumExternalTriggersElements = 4,
    } tExternalTriggers_IfaceConstants;
 
-   virtual void writeExternalTriggers(unsigned char bitfield_index, tExternalTriggers value, tRioStatusCode *status) = 0;
-   virtual void writeExternalTriggers_ExternalClockSource_Channel(unsigned char bitfield_index, unsigned char value, tRioStatusCode *status) = 0;
-   virtual void writeExternalTriggers_ExternalClockSource_Module(unsigned char bitfield_index, unsigned char value, tRioStatusCode *status) = 0;
-   virtual void writeExternalTriggers_ExternalClockSource_AnalogTrigger(unsigned char bitfield_index, bool value, tRioStatusCode *status) = 0;
-   virtual void writeExternalTriggers_RisingEdge(unsigned char bitfield_index, bool value, tRioStatusCode *status) = 0;
-   virtual void writeExternalTriggers_FallingEdge(unsigned char bitfield_index, bool value, tRioStatusCode *status) = 0;
-   virtual tExternalTriggers readExternalTriggers(unsigned char bitfield_index, tRioStatusCode *status) = 0;
-   virtual unsigned char readExternalTriggers_ExternalClockSource_Channel(unsigned char bitfield_index, tRioStatusCode *status) = 0;
-   virtual unsigned char readExternalTriggers_ExternalClockSource_Module(unsigned char bitfield_index, tRioStatusCode *status) = 0;
-   virtual bool readExternalTriggers_ExternalClockSource_AnalogTrigger(unsigned char bitfield_index, tRioStatusCode *status) = 0;
-   virtual bool readExternalTriggers_RisingEdge(unsigned char bitfield_index, tRioStatusCode *status) = 0;
-   virtual bool readExternalTriggers_FallingEdge(unsigned char bitfield_index, tRioStatusCode *status) = 0;
-
-
+   virtual void writeExternalTriggers(unsigned char reg_index, unsigned char bitfield_index, tExternalTriggers value, tRioStatusCode *status) = 0;
+   virtual void writeExternalTriggers_ExternalClockSource_Channel(unsigned char reg_index, unsigned char bitfield_index, unsigned char value, tRioStatusCode *status) = 0;
+   virtual void writeExternalTriggers_ExternalClockSource_Module(unsigned char reg_index, unsigned char bitfield_index, unsigned char value, tRioStatusCode *status) = 0;
+   virtual void writeExternalTriggers_ExternalClockSource_AnalogTrigger(unsigned char reg_index, unsigned char bitfield_index, bool value, tRioStatusCode *status) = 0;
+   virtual void writeExternalTriggers_RisingEdge(unsigned char reg_index, unsigned char bitfield_index, bool value, tRioStatusCode *status) = 0;
+   virtual void writeExternalTriggers_FallingEdge(unsigned char reg_index, unsigned char bitfield_index, bool value, tRioStatusCode *status) = 0;
+   virtual tExternalTriggers readExternalTriggers(unsigned char reg_index, unsigned char bitfield_index, tRioStatusCode *status) = 0;
+   virtual unsigned char readExternalTriggers_ExternalClockSource_Channel(unsigned char reg_index, unsigned char bitfield_index, tRioStatusCode *status) = 0;
+   virtual unsigned char readExternalTriggers_ExternalClockSource_Module(unsigned char reg_index, unsigned char bitfield_index, tRioStatusCode *status) = 0;
+   virtual bool readExternalTriggers_ExternalClockSource_AnalogTrigger(unsigned char reg_index, unsigned char bitfield_index, tRioStatusCode *status) = 0;
+   virtual bool readExternalTriggers_RisingEdge(unsigned char reg_index, unsigned char bitfield_index, tRioStatusCode *status) = 0;
+   virtual bool readExternalTriggers_FallingEdge(unsigned char reg_index, unsigned char bitfield_index, tRioStatusCode *status) = 0;
 
 
 private:
@@ -185,4 +194,4 @@ private:
 }
 }
 
-#endif // __nFRC_2016_16_0_0_DMA_h__
+#endif // __nFRC_2016_16_1_0_DMA_h__

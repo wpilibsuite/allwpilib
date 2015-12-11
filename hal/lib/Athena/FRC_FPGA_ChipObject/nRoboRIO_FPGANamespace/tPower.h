@@ -1,14 +1,14 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2016_16_0_0_Power_h__
-#define __nFRC_2016_16_0_0_Power_h__
+#ifndef __nFRC_2016_16_1_0_Power_h__
+#define __nFRC_2016_16_1_0_Power_h__
 
 #include "tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2016_16_0_0
+namespace nFRC_2016_16_1_0
 {
 
 class tPower
@@ -46,19 +46,21 @@ public:
    union{
       struct{
 #ifdef __vxworks
-         unsigned OverCurrentFaultCount3V3 : 10;
-         unsigned OverCurrentFaultCount5V : 10;
-         unsigned OverCurrentFaultCount6V : 10;
+         unsigned OverCurrentFaultCount3V3 : 8;
+         unsigned OverCurrentFaultCount5V : 8;
+         unsigned OverCurrentFaultCount6V : 8;
+         unsigned UnderVoltageFaultCount5V : 8;
 #else
-         unsigned OverCurrentFaultCount6V : 10;
-         unsigned OverCurrentFaultCount5V : 10;
-         unsigned OverCurrentFaultCount3V3 : 10;
+         unsigned UnderVoltageFaultCount5V : 8;
+         unsigned OverCurrentFaultCount6V : 8;
+         unsigned OverCurrentFaultCount5V : 8;
+         unsigned OverCurrentFaultCount3V3 : 8;
 #endif
       };
       struct{
-         unsigned value : 30;
+         unsigned value : 32;
       };
-   } tOverCurrentFaultCounts;
+   } tFaultCounts;
    typedef
    union{
       struct{
@@ -126,16 +128,6 @@ public:
 
    typedef enum
    {
-   } tOverCurrentFaultCounts_IfaceConstants;
-
-   virtual tOverCurrentFaultCounts readOverCurrentFaultCounts(tRioStatusCode *status) = 0;
-   virtual unsigned short readOverCurrentFaultCounts_OverCurrentFaultCount3V3(tRioStatusCode *status) = 0;
-   virtual unsigned short readOverCurrentFaultCounts_OverCurrentFaultCount5V(tRioStatusCode *status) = 0;
-   virtual unsigned short readOverCurrentFaultCounts_OverCurrentFaultCount6V(tRioStatusCode *status) = 0;
-
-
-   typedef enum
-   {
    } tIntegratedIO_IfaceConstants;
 
    virtual unsigned short readIntegratedIO(tRioStatusCode *status) = 0;
@@ -185,6 +177,17 @@ public:
 
    typedef enum
    {
+   } tFaultCounts_IfaceConstants;
+
+   virtual tFaultCounts readFaultCounts(tRioStatusCode *status) = 0;
+   virtual unsigned char readFaultCounts_OverCurrentFaultCount3V3(tRioStatusCode *status) = 0;
+   virtual unsigned char readFaultCounts_OverCurrentFaultCount5V(tRioStatusCode *status) = 0;
+   virtual unsigned char readFaultCounts_OverCurrentFaultCount6V(tRioStatusCode *status) = 0;
+   virtual unsigned char readFaultCounts_UnderVoltageFaultCount5V(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
    } tVinCurrent_IfaceConstants;
 
    virtual unsigned short readVinCurrent(tRioStatusCode *status) = 0;
@@ -214,4 +217,4 @@ private:
 }
 }
 
-#endif // __nFRC_2016_16_0_0_Power_h__
+#endif // __nFRC_2016_16_1_0_Power_h__

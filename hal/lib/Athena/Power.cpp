@@ -54,7 +54,7 @@ bool getUserActive6V(int32_t *status) {
  */
 int getUserCurrentFaults6V(int32_t *status) {
 	initializePower(status);
-	return (int)power->readOverCurrentFaultCounts_OverCurrentFaultCount6V(status);
+	return (int)power->readFaultCounts_OverCurrentFaultCount6V(status);
 }
 
 /**
@@ -86,7 +86,7 @@ bool getUserActive5V(int32_t *status) {
  */
 int getUserCurrentFaults5V(int32_t *status) {
 	initializePower(status);
-	return (int)power->readOverCurrentFaultCounts_OverCurrentFaultCount5V(status);
+	return (int)power->readFaultCounts_OverCurrentFaultCount5V(status);
 }
 
 unsigned char getUserStatus5V(int32_t *status) {
@@ -123,5 +123,5 @@ bool getUserActive3V3(int32_t *status) {
  */
 int getUserCurrentFaults3V3(int32_t *status) {
 	initializePower(status);
-	return (int)power->readOverCurrentFaultCounts_OverCurrentFaultCount3V3(status);
+	return (int)power->readFaultCounts_OverCurrentFaultCount3V3(status);
 }

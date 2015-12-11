@@ -73,7 +73,10 @@ namespace nUsageReporting
         kResourceType_VictorSP,
         kResourceType_TalonSRX,
         kResourceType_CANTalonSRX,
-        kResourceType_DigitalGlitchFilter,
+        kResourceType_ADXL362,
+        kResourceType_ADXRS450,
+        kResourceType_RevSPARK,
+        kResourceType_MindsensorsSD540,
     } tResourceType;
 
     typedef enum
@@ -88,6 +91,7 @@ namespace nUsageReporting
 
         kFramework_Iterative = 1,
         kFramework_Simple = 2,
+        kFramework_CommandControl = 3,
 
         kRobotDrive_ArcadeStandard = 1,
         kRobotDrive_ArcadeButtonSpin = 2,

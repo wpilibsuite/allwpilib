@@ -3,23 +3,26 @@
 
 #define MAX_STRING_LEN 64
 
+#define SUPPORT_UNIQUE_ID	(1) /* depends entirely on old vs new build */
+#define USE_NTH_ORDER		(0) /* zero to user deviceId */
+#define SUPPORT_MOTOR_CONTROLLER_PROFILE	(1)
 namespace CANDeviceInterface1
 {
 
 struct PIDSlot
 {
-   // Proportional gain
-   float pGain;
-   // Integral gain
-   float iGain;
-   // Differential gain
-   float dGain;
-   // Feed-forward gain
-   float fGain;
-   // Integral zone
-   float iZone;
-   // Closed-loop ramp rate
-   float clRampRate;
+	// Proportional gain
+	float pGain;
+	// Integral gain
+	float iGain;
+	// Differential gain
+	float dGain;
+	// Feed-forward gain
+	float fGain;
+	// Integral zone
+	float iZone;
+	// Closed-loop ramp rate
+	float clRampRate;
 };
 
 struct DeviceDescriptor
@@ -27,9 +30,11 @@ struct DeviceDescriptor
    // The full device ID, including the device number, manufacturer, and device type.
    // The mask of a message the device supports is 0x1FFF003F.
    unsigned int deviceID;
+#if SUPPORT_UNIQUE_ID != 0
    // This is the ID that uniquely identifies the device node in the UI.
    // The purpose of this is to be able to track the device across renames or deviceID changes.
    unsigned int uniqueID;
+#endif
    // An dynamically assigned ID that will make setting deviceIDs robust,
    //  Never again will you need to isolate a CAN node just to fix it's ID.
    unsigned int dynamicID;
@@ -54,23 +59,28 @@ struct DeviceDescriptor
    char softwareStatus[MAX_STRING_LEN];
    // Is the LED currently on?
    bool led;
-   // Reserved fields for use by CTRE.  Not touched by frccansae
+	// Reserved fields for future use by CTRE.  Not touched by frccansae
    unsigned int dynFlags;
    unsigned int flags; 		/* bitfield */
    unsigned int ptrToString;
-   // Motor controller properties (ignored if SupportsMotorControllerProperties is false or unset for this model)
-   unsigned int brakeMode; // 0=Coast, 1=Brake
-   unsigned int limitSwitchFwdMode; // 0=disabled, 1=Normally Closed, 2=Normally Open
-   unsigned int limitSwitchRevMode; // 0=disabled, 1=Normally Closed, 2=Normally Open
-   // Limit-switch soft limits
-   bool bFwdSoftLimitEnable;
-   bool bRevSoftLimitEnable;
-   float softLimitFwd;
-   float softLimitRev;
-   // PID constants for slot 0
-   struct PIDSlot slot0;
-   // PID constants for slot 1
-   struct PIDSlot slot1;
+   //unsigned int reserved0;
+   //unsigned int reserved1;
+   //unsigned int reserved2;
+#if SUPPORT_MOTOR_CONTROLLER_PROFILE != 0
+	// Motor controller properties (ignored if SupportsMotorControllerProperties is false or unset for this model)
+	unsigned int brakeMode; // 0=Coast, 1=Brake
+	unsigned int limitSwitchFwdMode; // 0=disabled, 1=Normally Closed, 2=Normally Open
+	unsigned int limitSwitchRevMode; // 0=disabled, 1=Normally Closed, 2=Normally Open
+	// Limit-switch soft limits
+	bool bFwdSoftLimitEnable;
+	bool bRevSoftLimitEnable;
+	float softLimitFwd;
+	float softLimitRev;
+	// PID constants for slot 0
+	struct PIDSlot slot0;
+	// PID constants for slot 1
+	struct PIDSlot slot1;
+#endif
 };
 
 #define kLimitSwitchMode_Disabled		(0)
@@ -88,7 +98,7 @@ int getNumberOfDevices();
 // populated before returning.  The numDescriptors input describes how many
 // elements were allocated to prevent memory corruption.  The number of devices
 // populated should be returned from this function as well.
-int getListOfDevices(struct DeviceDescriptor *devices, int numDescriptors);
+int getListOfDevices(DeviceDescriptor *devices, int numDescriptors);
 
 // When the user requests to update the firmware of a device a thread will be
 // spawned and this function is called from that thread.  This function should
@@ -97,13 +107,13 @@ int getListOfDevices(struct DeviceDescriptor *devices, int numDescriptors);
 // error message string can be filled with a NULL-terminated message to show the
 // user if there was a problem updating firmware.  The error message is only
 // displayed if a non-zero value is returned from this function.
-int updateFirmware(const struct DeviceDescriptor *device, const unsigned char *imageContents, unsigned int imageSize, char *errorMessage, int errorMessageMaxSize);
+int updateFirmware(const DeviceDescriptor *device, const unsigned char *imageContents, unsigned int imageSize, char *errorMessage, int errorMessageMaxSize);
 
 // This function is called periodically from the UI thread while the firmware
 // update is in progress.  The percentComplete parameter should the filled in
 // with the current progress of the firmware update process to update a progress
 // bar in the UI.
-void checkUpdateProgress(const struct DeviceDescriptor *device, int *percentComplete);
+void checkUpdateProgress(const DeviceDescriptor *device, int *percentComplete);
 
 // This is called when the user selects a new ID to assign on the bus and
 // chooses to save.  The newDeviceID is really just the device number. The
@@ -114,13 +124,13 @@ int assignBroadcastDeviceID(unsigned int newDeviceID);
 // also change in the descriptor and will be updated in the UI immediately.
 // Be sure to modify the descriptor first since the refresh from the UI is
 // asynchronous.
-int assignDeviceID(struct DeviceDescriptor *device, unsigned int newDeviceID);
+int assignDeviceID(DeviceDescriptor *device, unsigned int newDeviceID);
 
 // This entry-point will get called when the user chooses to change the value
 // of the device's LED.  This will allow the user to identify devices which
 // support dynamic addresses or are otherwise unknown.  If this function returns
 // a non-zero value, the UI will report an error.
-int saveLightLed(const struct DeviceDescriptor *device, bool newLEDStatus);
+int saveLightLed(const DeviceDescriptor *device, bool newLEDStatus);
 
 // This entry-point will get called when the user chooses to change the alias
 // of the device with the device specified.  If this function returns a non-
@@ -128,18 +138,18 @@ int saveLightLed(const struct DeviceDescriptor *device, bool newLEDStatus);
 // updated with the new name that was selected. If a different name is saved
 // to the descriptor than the user specified, this will require a manual
 // refresh by the user.  This is reported as CAR #505139
-int saveDeviceName(struct DeviceDescriptor *device, const char *newName);
+int saveDeviceName(DeviceDescriptor *device, const char *newName);
 
 // This entry-point will get called when the user changes any of the motor
 // controller specific properties. If this function returns a non-zero value,
 // the UI will report an error.  The device descriptor may be updated with
 // coerced values.
-int saveMotorParameters(struct DeviceDescriptor *device);
+int saveMotorParameters(DeviceDescriptor *device);
 
 // Run some sort of self-test functionality on the device.  This can be anything
 // and the results will be displayed to the user.  A non-zero return value
 // indicates an error.
-int selfTest(const struct DeviceDescriptor *device, char *detailedResults, int detailedResultsMaxSize);
+int selfTest(const DeviceDescriptor *device, char *detailedResults, int detailedResultsMaxSize);
 
 } /* CANDeviceInterface */
 
