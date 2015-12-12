@@ -218,8 +218,8 @@ void DispatcherBase::DispatchThreadMain() {
 
     // wait for periodic or when flushed
     timeout_time += std::chrono::milliseconds(m_update_rate);
-    m_reconnect_cv.wait_until(flush_lock, timeout_time,
-                              [&] { return !m_active || m_do_flush; });
+    m_flush_cv.wait_until(flush_lock, timeout_time,
+                          [&] { return !m_active || m_do_flush; });
     m_do_flush = false;
     if (!m_active) break;  // in case we were woken up to terminate
 
