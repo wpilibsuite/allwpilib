@@ -19,70 +19,6 @@ extern "C" {
 
 /*
  * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
- * Method:    FRC_NetworkCommunication_nAICalibration_getLSBWeight
- * Signature: (IILjava/lang/Integer;)I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetworkCommunicationAICalibrationGetLSBWeight
-  (JNIEnv *, jclass, jint, jint, jobject)
-{
-	assert(false);
-	return 0;
-}
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
- * Method:    FRC_NetworkCommunication_nAICalibration_getOffset
- * Signature: (IILjava/lang/Integer;)I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetworkCommunicationAICalibrationGetOffset
-  (JNIEnv *, jclass, jint, jint, jobject)
-{
-	assert(false);
-	return 0;
-}
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
- * Method:    getTargetClass
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_getTargetClass
-  (JNIEnv *, jclass)
-{
-	assert(false);
-	return 0;
-}
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
- * Method:    FRC_NetworkCommunication_nLoadOut_getModulePresence
- * Signature: (IB)I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetworkCommunicationLoadOutGetModulePresence
-  (JNIEnv *, jclass, jint, jbyte)
-{
-	assert(false);
-	return 0;
-}
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
- * Method:    FRC_NetworkCommunication_nLoadOut_getTargetClass
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetworkCommunicationLoadOutGetTargetClass
-  (JNIEnv *, jclass)
-{
-	assert(false);
-}
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
- * Method:    report
- * Signature: (IBBLjava/lang/String;)I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_report
-  (JNIEnv *, jclass, jint, jbyte, jbyte, jstring)
-{
-	assert(false);
-}
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
  * Method:    FRC_NetworkCommunication_nUsageReporting_report
  * Signature: (BBBLjava/lang/String;)I
  */
@@ -94,106 +30,6 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
 	jint returnValue = HALReport(paramResource, paramInstanceNumber, paramContext, featureStr);
 	paramEnv->ReleaseStringUTFChars(paramFeature,featureStr);
 	return returnValue;
-}
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
- * Method:    getFPGAHardwareVersion
- * Signature: (Ljava/nio/ShortBuffer;Ljava/nio/IntBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_getFPGAHardwareVersion
-  (JNIEnv *, jclass, jobject, jobject)
-{
-	assert(false);
-}
-
-//
-// field ids
-//
-bool initializeComplete = false;
-jclass dataClass;
-jfieldID packetIndexFieldID;
-jfieldID controlFieldID;
-jfieldID dsDigitalInFieldID;
-jfieldID teamIDFieldID;
-jfieldID dsID_AllianceFieldID;
-jfieldID dsID_PositionFieldID;
-jfieldID stick0AxesFieldID;
-jfieldID stick0ButtonsFieldID;
-jfieldID stick1AxesFieldID;
-jfieldID stick1ButtonsFieldID;
-jfieldID stick2AxesFieldID;
-jfieldID stick2ButtonsFieldID;
-jfieldID stick3AxesFieldID;
-jfieldID stick3ButtonsFieldID;
-jfieldID analog1FieldID;
-jfieldID analog2FieldID;
-jfieldID analog3FieldID;
-jfieldID analog4FieldID;
-jfieldID cRIOChecksumFieldID;
-jfieldID FPGAChecksum0FieldID;
-jfieldID FPGAChecksum1FieldID;
-jfieldID FPGAChecksum2FieldID;
-jfieldID FPGAChecksum3FieldID;
-jfieldID versionDataFieldID;
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
- * Method:    setErrorData
- * Signature: (Ljava/lang/String;II)I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_setErrorData
-  (JNIEnv *, jclass, jstring, jint, jint)
-{
-	assert(false);
-}
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
- * Method:    overrideIOConfig
- * Signature: (Ljava/lang/String;I)I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_overrideIOConfig
-  (JNIEnv *, jclass, jstring, jint)
-{
-	assert(false);
-}
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
- * Method:    signalResyncActionDone
- * Signature: ()V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_signalResyncActionDone
-  (JNIEnv *, jclass)
-{
-	assert(false);
-}
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
- * Method:    setNewDataOccurRef
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_setNewDataOccurRef
-  (JNIEnv *, jclass, jint)
-{
-	assert(false);
-}
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
- * Method:    setResyncOccurRef
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_setResyncOccurRef
-  (JNIEnv *, jclass, jint)
-{
-	assert(false);
-}
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
- * Method:    FRC_NetworkCommunication_getVersionString
- * Signature: (Ljava/nio/ByteBuffer;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetworkCommunicationGetVersionString
-  (JNIEnv *, jclass, jobject)
-{
-	assert(false);
 }
 /*
  * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
@@ -398,6 +234,18 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCom
 
 /*
  * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
+ * Method:    HALGetJoystickAxisType
+ * Signature: (BB)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickAxisType
+  (JNIEnv *, jclass, jbyte joystickNum, jbyte axis)
+{
+	NETCOMM_LOG(logDEBUG) << "Calling HALGetJoystickAxisType";
+	return HALGetJoystickAxisType(joystickNum, axis);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
  * Method:    setNewDataSem
  * Signature: (J)V
  */
@@ -406,194 +254,6 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
 {
 	NETCOMM_LOG(logDEBUG) << "Mutex Ptr = " << (void*)id;
 	HALSetNewDataSem((MULTIWAIT_ID)id);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
- * Method:    JNIValueParameterTest
- * Signature: (ZBCSIJFD)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueParameterTest
-  (JNIEnv *, jclass, jboolean booleanParam, jbyte byteParam, jchar charParam, jshort shortParam, jint intParam, jlong longParam, jfloat floatParam, jdouble doubleParam)
-{
-	NETCOMM_LOG(logDEBUG) << "Boolean: " << booleanParam;
-	NETCOMM_LOG(logDEBUG) << "Byte   : " << byteParam;
-	NETCOMM_LOG(logDEBUG) << "Char   : " << charParam;
-	NETCOMM_LOG(logDEBUG) << "Short  : " << shortParam;
-	NETCOMM_LOG(logDEBUG) << "Int    : " << intParam;
-	NETCOMM_LOG(logDEBUG) << "Long   : " << longParam;
-	NETCOMM_LOG(logDEBUG) << "Float  : " << floatParam;
-	NETCOMM_LOG(logDEBUG) << "Double : " << doubleParam;
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
- * Method:    JNIValueReturnBooleanTest
- * Signature: (Z)Z
- */
-JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnBooleanTest
-  (JNIEnv *, jclass, jboolean booleanParam )
-{
-	NETCOMM_LOG(logDEBUG) << "Boolean: " << booleanParam;
-	return !booleanParam;
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
- * Method:    JNIValueReturnByteTest
- * Signature: (B)B
- */
-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnByteTest
-  (JNIEnv *, jclass, jbyte byteParam)
-{
-	NETCOMM_LOG(logDEBUG) << "Byte: " << byteParam;
-	return byteParam+1;
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
- * Method:    JNIValueReturnCharTest
- * Signature: (C)C
- */
-JNIEXPORT jchar JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnCharTest
-  (JNIEnv *, jclass, jchar charParam)
-{
-	NETCOMM_LOG(logDEBUG) << "Char: " << charParam;
-	return charParam+1;
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
- * Method:    JNIValueReturnShortTest
- * Signature: (S)S
- */
-JNIEXPORT jshort JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnShortTest
-  (JNIEnv *, jclass, jshort shortParam)
-{
-	NETCOMM_LOG(logDEBUG) << "Short: " << shortParam;
-	return shortParam+1;
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
- * Method:    JNIValueReturnIntTest
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnIntTest
-  (JNIEnv *, jclass, jint intParam)
-{
-	NETCOMM_LOG(logDEBUG) << "Int: " << intParam;
-	return intParam+1;
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
- * Method:    JNIValueReturnLongTest
- * Signature: (J)J
- */
-JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnLongTest
-  (JNIEnv *, jclass, jlong longParam)
-{
-	NETCOMM_LOG(logDEBUG) << "Long: " << longParam;
-	return longParam+1;
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
- * Method:    JNIValueReturnFloatTest
- * Signature: (F)F
- */
-JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnFloatTest
-  (JNIEnv *, jclass, jfloat floatParam)
-{
-	NETCOMM_LOG(logDEBUG) << "Float: " << floatParam;
-	return floatParam/100.0f;
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
- * Method:    JNIValueReturnDoubleTest
- * Signature: (D)D
- */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnDoubleTest
-  (JNIEnv *, jclass, jdouble doubleParam)
-{
-	NETCOMM_LOG(logDEBUG) << "Double: " << doubleParam;
-	return doubleParam * 100.0;
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
- * Method:    JNIObjectReturnString
- * Signature: (Ljava/lang/String;)Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIObjectReturnStringTest
-  (JNIEnv * env, jclass, jstring stringParam)
-{
-	const char * stringParamLocal = env->GetStringUTFChars(stringParam, NULL);
-	NETCOMM_LOG(logDEBUG) << "String: " << stringParamLocal;
-	env->ReleaseStringUTFChars(stringParam,stringParamLocal);
-
-	char returnStringLocal[] = "this is the return string";
-
-	return env->NewStringUTF(returnStringLocal);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
- * Method:    JNIObjectReturnByteBufferTest
- * Signature: (Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;
- */
-JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIObjectReturnByteBufferTest
-  (JNIEnv * env, jclass, jobject byteArrayIn )
-{
-	jbyte * byteArray = (jbyte*)env->GetDirectBufferAddress(byteArrayIn);
-	NETCOMM_LOG(logDEBUG) << "Ptr: " << (long)byteArray;
-	jlong byteArrayLength = env->GetDirectBufferCapacity(byteArrayIn);
-	NETCOMM_LOG(logDEBUG) << "Capacity: " << byteArrayLength;
-	NETCOMM_LOG(logDEBUG) << "Byte0: " << (short)byteArray[0];
-	NETCOMM_LOG(logDEBUG) << "Byte1: " << (short)byteArray[1];
-	NETCOMM_LOG(logDEBUG) << "Byte2: " << (short)byteArray[2];
-	NETCOMM_LOG(logDEBUG) << "Byte3: " << (short)byteArray[3];
-
-	jbyte * returnByteArray = new jbyte[4];
-	returnByteArray[0] = byteArray[0];
-	returnByteArray[1] = byteArray[1];
-	returnByteArray[2] = byteArray[2];
-	returnByteArray[3] = byteArray[3];
-
-	return env->NewDirectByteBuffer(returnByteArray, 4);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
- * Method:    JNIObjectAndParamReturnIntBufferTest
- * Signature: (Ljava/nio/IntBuffer;)Ljava/nio/ByteBuffer;
- */
-JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIObjectAndParamReturnIntBufferTest
-  (JNIEnv * env, jclass, jobject intArrayIn)
-{
-	jint * intArray = (jint*)env->GetDirectBufferAddress(intArrayIn);
-	jbyte * byteArray = (jbyte*)env->GetDirectBufferAddress(intArrayIn);
-	NETCOMM_LOG(logDEBUG) << "Ptr: " << (long)intArray;
-	jlong byteArrayLength = env->GetDirectBufferCapacity(intArrayIn);
-	NETCOMM_LOG(logDEBUG) << "Capacity: " << byteArrayLength;
-	NETCOMM_LOG(logDEBUG) << "Int0: " << intArray[0];
-	NETCOMM_LOG(logDEBUG) << "Byte0: " << (short)byteArray[0];
-	NETCOMM_LOG(logDEBUG) << "Byte1: " << (short)byteArray[1];
-	NETCOMM_LOG(logDEBUG) << "Byte2: " << (short)byteArray[2];
-	NETCOMM_LOG(logDEBUG) << "Byte3: " << (short)byteArray[3];
-
-	// increment the param
-	intArray[0]++;
-
-	jbyte * returnByteArray = new jbyte[4];
-	returnByteArray[0] = byteArray[0];
-	returnByteArray[1] = byteArray[1];
-	returnByteArray[2] = byteArray[2];
-	returnByteArray[3] = byteArray[3];
-
-	return env->NewDirectByteBuffer(returnByteArray, 4);
 }
 
 /*
