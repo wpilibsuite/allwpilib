@@ -38,8 +38,7 @@ Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel)
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
     return;
   }
-  Resource::CreateResourceObject(m_allocated, kSolenoidChannels * 63);
-
+  Resource::CreateResourceObject(m_allocated, m_maxModules * m_maxPorts);
   buf << "Solenoid " << m_channel << " (Module: " << m_moduleNumber << ")";
   if (m_allocated->Allocate(m_moduleNumber * kSolenoidChannels + m_channel,
                             buf.str()) ==

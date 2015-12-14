@@ -10,10 +10,6 @@
 
 #include <sstream>
 
-std::unique_ptr<Resource> SolenoidBase::m_allocated =
-    std::make_unique<Resource>(solenoid_kNumDO7_0Elements *
-                                 kSolenoidChannels);
-
 /**
  * Constructor.
  * Uses the default PCM ID of 0
@@ -52,7 +48,7 @@ DoubleSolenoid::DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel,
     return;
   }
   Resource::CreateResourceObject(
-      m_allocated, solenoid_kNumDO7_0Elements * kSolenoidChannels);
+      m_allocated, m_maxModules * m_maxPorts);
 
   buf << "Solenoid " << m_forwardChannel << " (Module: " << m_moduleNumber
       << ")";
