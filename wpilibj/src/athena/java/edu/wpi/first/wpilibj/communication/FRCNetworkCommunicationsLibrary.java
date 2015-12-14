@@ -383,7 +383,22 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
      * <i>native declaration :
      * src\main\include\NetworkCommunication\UsageReporting.h:63</i>
      */
-    public static final int kResourceType_DigitalGlitchFilter = 53;
+    public static final int kResourceType_ADXL362 = 53;
+    /**
+     * <i>native declaration :
+     * src\main\include\NetworkCommunication\UsageReporting.h:64</i>
+     */
+    public static final int kResourceType_ADXRS450 = 54;
+    /**
+     * <i>native declaration :
+     * src\main\include\NetworkCommunication\UsageReporting.h:65</i>
+     */
+    public static final int kResourceType_RevSPARK = 55;
+    /**
+     * <i>native declaration :
+     * src\main\include\NetworkCommunication\UsageReporting.h:66</i>
+     */
+    public static final int kResourceType_DigitalGlitchFilter = 56;
   };
   /**
    * <i>native declaration :
@@ -431,6 +446,11 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
      * src\main\include\NetworkCommunication\UsageReporting.h:72</i>
      */
     public static final int kFramework_Sample = 2;
+    /**
+     * <i>native declaration :
+     * src\main\include\NetworkCommunication\UsageReporting.h:73</i>
+     */
+    public static final int kFramework_CommandControl = 3;
     /**
      * <i>native declaration :
      * src\main\include\NetworkCommunication\UsageReporting.h:74</i>

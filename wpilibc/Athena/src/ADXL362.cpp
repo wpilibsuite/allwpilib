@@ -68,7 +68,7 @@ ADXL362::ADXL362(SPI::Port port, Range range) : m_spi(port) {
   commands[2] = kPowerCtl_Measure | kPowerCtl_UltraLowNoise;
   m_spi.Write(commands, 3);
 
-  //HALReport(HALUsageReporting::kResourceType_ADXL362, 0);
+  HALReport(HALUsageReporting::kResourceType_ADXL362, port);
 
   LiveWindow::GetInstance()->AddSensor("ADXL362", port, this);
 }

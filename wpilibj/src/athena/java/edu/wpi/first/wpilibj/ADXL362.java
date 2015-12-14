@@ -108,7 +108,7 @@ public class ADXL362 extends SensorBase implements Accelerometer, LiveWindowSend
     transferBuffer.put(2, (byte) (kPowerCtl_Measure | kPowerCtl_UltraLowNoise));
     m_spi.write(transferBuffer, 3);
 
-    //UsageReporting.report(tResourceType.kResourceType_ADXL362, 0);
+    UsageReporting.report(tResourceType.kResourceType_ADXL362, port.getValue());
     LiveWindow.addSensor("ADXL362", port.getValue(), this);
   }
 

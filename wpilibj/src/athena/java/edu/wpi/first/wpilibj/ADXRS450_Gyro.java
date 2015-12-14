@@ -78,7 +78,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
 
     calibrate();
 
-    //UsageReporting.report(tResourceType.kResourceType_ADXRS450, port.getValue());
+    UsageReporting.report(tResourceType.kResourceType_ADXRS450, port.getValue());
     LiveWindow.addSensor("ADXRS450_Gyro", port.getValue(), this);
   }
 

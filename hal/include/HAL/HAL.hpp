@@ -92,9 +92,12 @@ namespace HALUsageReporting
 		kResourceType_HiTechnicCompass,
 		kResourceType_SRF08,
 		kResourceType_AnalogOutput,
-        kResourceType_VictorSP,
-        kResourceType_TalonSRX,
-        kResourceType_CANTalonSRX,
+		kResourceType_VictorSP,
+		kResourceType_TalonSRX,
+		kResourceType_CANTalonSRX,
+		kResourceType_ADXL362,
+		kResourceType_ADXRS450,
+		kResourceType_RevSPARK,
 		kResourceType_DigitalGlitchFilter,
 	};
 
@@ -110,6 +113,7 @@ namespace HALUsageReporting
 
 		kFramework_Iterative = 1,
 		kFramework_Sample = 2,
+		kFramework_CommandControl = 3,
 
 		kRobotDrive_ArcadeStandard = 1,
 		kRobotDrive_ArcadeButtonSpin = 2,
