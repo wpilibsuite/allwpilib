@@ -77,6 +77,7 @@ namespace nUsageReporting
         kResourceType_ADXRS450,
         kResourceType_RevSPARK,
         kResourceType_MindsensorsSD540,
+        kResourceType_DigitalGlitchFilter,
     } tResourceType;
 
     typedef enum

@@ -7,7 +7,6 @@
 
 #include "SerialPort.h"
 
-//#include "NetworkCommunication/UsageReporting.h"
 #include "HAL/HAL.hpp"
 #include <stdarg.h>
 

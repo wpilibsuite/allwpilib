@@ -7,7 +7,6 @@
 
 #include "Encoder.h"
 #include "DigitalInput.h"
-//#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"

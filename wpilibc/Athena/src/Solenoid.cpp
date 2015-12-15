@@ -6,7 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Solenoid.h"
-//#include "NetworkCommunication/UsageReporting.h"
 #include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
 

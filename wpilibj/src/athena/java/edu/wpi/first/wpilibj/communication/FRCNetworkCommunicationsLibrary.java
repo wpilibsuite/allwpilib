@@ -398,7 +398,12 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
      * <i>native declaration :
      * src\main\include\NetworkCommunication\UsageReporting.h:66</i>
      */
-    public static final int kResourceType_DigitalGlitchFilter = 56;
+    public static final int kResourceType_MindsensorsSD540 = 56;
+    /**
+     * <i>native declaration :
+     * src\main\include\NetworkCommunication\UsageReporting.h:67</i>
+     */
+    public static final int kResourceType_DigitalGlitchFilter = 57;
   };
   /**
    * <i>native declaration :

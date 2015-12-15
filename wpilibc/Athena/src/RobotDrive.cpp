@@ -11,7 +11,6 @@
 #include "GenericHID.h"
 #include "Joystick.h"
 #include "Talon.h"
-//#include "NetworkCommunication/UsageReporting.h"
 #include "Utility.h"
 #include "WPIErrors.h"
 #include <math.h>

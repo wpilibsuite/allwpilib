@@ -8,9 +8,6 @@
 #include "RobotBase.h"
 
 #include "DriverStation.h"
-//#include "NetworkCommunication/FRCComm.h"
-//#include "NetworkCommunication/symModuleLink.h"
-//#include "NetworkCommunication/UsageReporting.h"
 #include "RobotState.h"
 #include "HLUsageReporting.h"
 #include "Internal/HardwareHLReporting.h"

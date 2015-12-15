@@ -5,7 +5,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "DigitalOutput.h"
-//#include "NetworkCommunication/UsageReporting.h"
 #include "Resource.h"
 #include "WPIErrors.h"
 

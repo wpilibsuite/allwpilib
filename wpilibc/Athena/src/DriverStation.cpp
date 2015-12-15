@@ -9,7 +9,6 @@
 #include "AnalogInput.h"
 #include "Timer.h"
 #include "NetworkCommunication/FRCComm.h"
-#include "NetworkCommunication/UsageReporting.h"
 #include "MotorSafetyHelper.h"
 #include "Utility.h"
 #include "WPIErrors.h"

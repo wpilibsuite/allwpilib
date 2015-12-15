@@ -8,7 +8,6 @@
 #include "Timer.h"
 #define tNIRIO_i32 int
 #include "NetworkCommunication/CANSessionMux.h"
-//#include "NetworkCommunication/UsageReporting.h"
 #include "WPIErrors.h"
 #include <cstdio>
 #include <cassert>

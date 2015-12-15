@@ -98,6 +98,7 @@ namespace HALUsageReporting
 		kResourceType_ADXL362,
 		kResourceType_ADXRS450,
 		kResourceType_RevSPARK,
+		kResourceType_MindsensorsSD540,
 		kResourceType_DigitalGlitchFilter,
 	};
 
