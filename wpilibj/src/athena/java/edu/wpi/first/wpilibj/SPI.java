@@ -7,7 +7,6 @@ import java.nio.LongBuffer;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
-import edu.wpi.first.wpilibj.hal.HALLibrary;
 import edu.wpi.first.wpilibj.hal.SPIJNI;
 
 /**

@@ -28,9 +28,7 @@ public abstract class DigitalSource extends InterruptableSensorBase {
 
     m_channel = channel;
 
-    checkDigitalChannel(m_channel); // XXX: Replace with
-    // HALLibrary.checkDigitalChannel when
-    // implemented
+    checkDigitalChannel(m_channel);
 
     try {
       channels.allocate(m_channel);

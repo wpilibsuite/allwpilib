@@ -82,10 +82,6 @@ public abstract class SensorBase { // TODO: Refactor
    * @param moduleNumber The solenoid module module number to check.
    */
   protected static void checkSolenoidModule(final int moduleNumber) {
-    // if(HALLibrary.checkSolenoidModule((byte) (moduleNumber - 1)) != 0) {
-    // System.err.println("Solenoid module " + moduleNumber +
-    // " is not present.");
-    // }
   }
 
   /**
