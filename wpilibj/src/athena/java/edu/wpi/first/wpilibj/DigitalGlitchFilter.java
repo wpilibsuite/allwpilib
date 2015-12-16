@@ -13,6 +13,9 @@ import edu.wpi.first.wpilibj.DigitalSource;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Counter;
 
+import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+import edu.wpi.first.wpilibj.communication.UsageReporting;
+
 import edu.wpi.first.wpilibj.hal.DigitalGlitchFilterJNI;
 
 /**
@@ -31,6 +34,8 @@ public class DigitalGlitchFilter extends SensorBase {
       if (i != m_filterAllocated.length) {
         m_channelIndex = i;
         m_filterAllocated[i] = true;
+        UsageReporting.report(tResourceType.kResourceType_DigitalFilter,
+                              m_channelIndex, 0);
       }
     }
   }

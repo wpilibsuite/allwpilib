@@ -99,7 +99,7 @@ namespace HALUsageReporting
 		kResourceType_ADXRS450,
 		kResourceType_RevSPARK,
 		kResourceType_MindsensorsSD540,
-		kResourceType_DigitalGlitchFilter,
+		kResourceType_DigitalFilter,
 	};
 
 	enum tInstances
