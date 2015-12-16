@@ -11,7 +11,6 @@ import java.nio.ByteBuffer;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
-import edu.wpi.first.wpilibj.hal.HALLibrary;
 import edu.wpi.first.wpilibj.hal.I2CJNI;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
