@@ -1010,6 +1010,7 @@ void CANJaguar::SetP(double p) {
     case kPercentVbus:
     case kVoltage:
     case kFollower:
+    case kMotionProfile:
       wpi_setWPIErrorWithContext(
           IncompatibleMode,
           "PID constants only apply in Speed, Position, and Current mode");
@@ -1045,6 +1046,7 @@ void CANJaguar::SetI(double i) {
     case kPercentVbus:
     case kVoltage:
     case kFollower:
+    case kMotionProfile:
       wpi_setWPIErrorWithContext(
           IncompatibleMode,
           "PID constants only apply in Speed, Position, and Current mode");
@@ -1080,6 +1082,7 @@ void CANJaguar::SetD(double d) {
     case kPercentVbus:
     case kVoltage:
     case kFollower:
+    case kMotionProfile:
       wpi_setWPIErrorWithContext(
           IncompatibleMode,
           "PID constants only apply in Speed, Position, and Current mode");
@@ -1516,7 +1519,7 @@ void CANJaguar::SetControlMode(ControlMode controlMode) {
   // Disable the previous mode
   DisableControl();
 
-  if (controlMode == kFollower)
+  if ((controlMode == kFollower) || (controlMode == kMotionProfile))
     wpi_setWPIErrorWithContext(IncompatibleMode,
                                "The Jaguar only supports Current, Voltage, "
                                "Position, Speed, and Percent (Throttle) "

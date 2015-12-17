@@ -156,6 +156,9 @@ void CANTalon::Set(float value, uint8_t syncGroup) {
         double milliamperes = (m_isInverted ? -value : value) * 1000.0; /* mA*/
         status = m_impl->SetDemand(milliamperes);
       } break;
+      case CANSpeedController::kMotionProfile: {
+        status = m_impl->SetDemand((int)value);
+      } break;
       default:
         wpi_setWPIErrorWithContext(
             IncompatibleMode,
@@ -1430,6 +1433,9 @@ void CANTalon::ApplyControlMode(CANSpeedController::ControlMode mode) {
     case kFollower:
       m_sendMode = kFollowerMode;
       break;
+    case kMotionProfile:
+      m_sendMode = kMotionProfileMode;
+      break;
   }
   // Keep the talon disabled until Set() is called.
   CTR_Code status = m_impl->SetModeSelect((int)kDisabled);
@@ -1667,6 +1673,136 @@ void CANTalon::EnableZeroSensorPositionOnIndex(bool enable, bool risingEdge)
     ConfigSetParameter(CanTalonSRX::eClearPositionOnIdx,0);
     ConfigSetParameter(CanTalonSRX::eQuadIdxPolarity,risingEdge  ? 1 : 0);
   }
+}
+
+/**
+ * Calling application can opt to speed up the handshaking between the robot API and the Talon to increase the
+ * download rate of the Talon's Motion Profile.  Ideally the period should be no more than half the period
+ * of a trajectory point.
+ */
+void CANTalon::ChangeMotionControlFramePeriod(int periodMs)
+{
+  m_impl->ChangeMotionControlFramePeriod(periodMs);
+}
+
+/**
+ * Clear the buffered motion profile in both Talon RAM (bottom), and in the API (top).
+ * Be sure to check GetMotionProfileStatus() to know when the buffer is actually cleared.
+ */
+void CANTalon::ClearMotionProfileTrajectories()
+{
+  m_impl->ClearMotionProfileTrajectories();
+}
+
+/**
+ * Retrieve just the buffer count for the api-level (top) buffer.
+ * This routine performs no CAN or data structure lookups, so its fast and ideal
+ * if caller needs to quickly poll the progress of trajectory points being emptied
+ * into Talon's RAM. Otherwise just use GetMotionProfileStatus.
+ * @return number of trajectory points in the top buffer.
+ */
+int CANTalon::GetMotionProfileTopLevelBufferCount()
+{
+  return m_impl->GetMotionProfileTopLevelBufferCount();
+}
+
+/**
+ * Push another trajectory point into the top level buffer (which is emptied into
+ * the Talon's bottom buffer as room allows).
+ * @param trajPt the trajectory point to insert into buffer.
+ * @return true  if trajectory point push ok. CTR_BufferFull if buffer is full
+ * due to kMotionProfileTopBufferCapacity.
+ */
+bool CANTalon::PushMotionProfileTrajectory(const TrajectoryPoint & trajPt)
+{
+  /* convert positiona and velocity to native units */
+  int32_t targPos  = ScaleRotationsToNativeUnits(m_feedbackDevice, trajPt.position);
+  int32_t targVel = ScaleVelocityToNativeUnits(m_feedbackDevice, trajPt.velocity);
+  /* bounds check signals that require it */
+  uint32_t profileSlotSelect = (trajPt.profileSlotSelect) ? 1 : 0;
+  uint8_t timeDurMs = (trajPt.timeDurMs >= 255) ? 255 : trajPt.timeDurMs; /* cap time to 255ms */
+  /* send it to the top level buffer */
+  CTR_Code status = m_impl->PushMotionProfileTrajectory(targPos, targVel, profileSlotSelect, timeDurMs, trajPt.velocityOnly, trajPt.isLastPoint, trajPt.zeroPos);
+  return (status == CTR_OKAY) ? true : false;
+}
+/**
+ * @return true if api-level (top) buffer is full.
+ */
+bool CANTalon::IsMotionProfileTopLevelBufferFull()
+{
+  return m_impl->IsMotionProfileTopLevelBufferFull();
+}
+
+/**
+ * This must be called periodically to funnel the trajectory points from the API's top level buffer to
+ * the Talon's bottom level buffer.  Recommendation is to call this twice as fast as the executation rate of the motion profile.
+ * So if MP is running with 20ms trajectory points, try calling this routine every 10ms.  All motion profile functions are thread-safe
+ * through the use of a mutex, so there is no harm in having the caller utilize threading.
+ */
+void CANTalon::ProcessMotionProfileBuffer()
+{
+  m_impl->ProcessMotionProfileBuffer();
+}
+
+/**
+ * Retrieve all status information.
+ * Since this all comes from one CAN frame, its ideal to have one routine to retrieve the frame once and decode everything.
+ * @param [out] motionProfileStatus contains all progress information on the currently running MP.
+ */
+void CANTalon::GetMotionProfileStatus(MotionProfileStatus & motionProfileStatus)
+{
+  uint32_t flags;
+  uint32_t profileSlotSelect;
+  int32_t targPos, targVel;
+  uint32_t topBufferRem, topBufferCnt, btmBufferCnt;
+  uint32_t outputEnable;
+  /* retrieve all motion profile signals from status frame */
+  CTR_Code status = m_impl->GetMotionProfileStatus(flags, profileSlotSelect, targPos, targVel, topBufferRem, topBufferCnt, btmBufferCnt, outputEnable);
+  /* completely update the caller's structure */
+  motionProfileStatus.topBufferRem = topBufferRem;
+  motionProfileStatus.topBufferCnt = topBufferCnt;
+  motionProfileStatus.btmBufferCnt = btmBufferCnt;
+  motionProfileStatus.hasUnderrun =              (flags & CanTalonSRX::kMotionProfileFlag_HasUnderrun)     ? true :false;
+  motionProfileStatus.isUnderrun  =              (flags & CanTalonSRX::kMotionProfileFlag_IsUnderrun)      ? true :false;
+  motionProfileStatus.activePointValid =         (flags & CanTalonSRX::kMotionProfileFlag_ActTraj_IsValid) ? true :false;
+  motionProfileStatus.activePoint.isLastPoint =  (flags & CanTalonSRX::kMotionProfileFlag_ActTraj_IsLast)  ? true :false;
+  motionProfileStatus.activePoint.velocityOnly = (flags & CanTalonSRX::kMotionProfileFlag_ActTraj_VelOnly) ? true :false;
+  motionProfileStatus.activePoint.position = ScaleNativeUnitsToRotations(m_feedbackDevice, targPos);
+  motionProfileStatus.activePoint.velocity = ScaleNativeUnitsToRpm(m_feedbackDevice, targVel);
+  motionProfileStatus.activePoint.profileSlotSelect = profileSlotSelect;
+  switch(outputEnable){
+    case CanTalonSRX::kMotionProf_Disabled:
+      motionProfileStatus.outputEnable = SetValueMotionProfileDisable;
+    break;
+    case CanTalonSRX::kMotionProf_Enable:
+      motionProfileStatus.outputEnable = SetValueMotionProfileEnable;
+      break;
+    case CanTalonSRX::kMotionProf_Hold:
+      motionProfileStatus.outputEnable = SetValueMotionProfileHold;
+      break;
+    default:
+      motionProfileStatus.outputEnable = SetValueMotionProfileDisable;
+      break;
+  }
+  motionProfileStatus.activePoint.zeroPos = false; /* this signal is only used sending pts to Talon */
+  motionProfileStatus.activePoint.timeDurMs = 0;   /* this signal is only used sending pts to Talon */
+
+  if (status != CTR_OKAY) {
+    wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  }
+}
+/**
+ * Clear the hasUnderrun flag in Talon's Motion Profile Executer when MPE is ready for another point,
+ * but the low level buffer is empty.
+ *
+ * Once the Motion Profile Executer sets the hasUnderrun flag, it stays set until
+ * Robot Application clears it with this routine, which ensures Robot Application
+ * gets a chance to instrument or react.  Caller could also check the isUnderrun flag
+ * which automatically clears when fault condition is removed.
+ */
+void CANTalon::ClearMotionProfileHasUnderrun()
+{
+  ConfigSetParameter(CanTalonSRX::eMotionProfileHasUnderrunErr, 0);
 }
 /**
 * Common interface for inverting direction of a speed controller.

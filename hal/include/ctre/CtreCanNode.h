@@ -52,10 +52,26 @@ protected:
 	};
 	UINT8 _deviceNumber;
 	void RegisterRx(uint32_t arbId);
+	/**
+	 * Schedule a CAN Frame for periodic transmit.  Assume eight byte DLC and zero value for initial transmission.
+	 * @param arbId 	CAN Frame Arbitration ID.  Set BIT31 for 11bit ids, otherwise we use 29bit ids.
+	 * @param periodMs	Period to transmit CAN frame.  Pass 0 for one-shot, which also disables that ArbID's preceding periodic transmit.
+	 */
 	void RegisterTx(uint32_t arbId, uint32_t periodMs);
+	/**
+	 * Schedule a CAN Frame for periodic transmit.
+	 * @param arbId 	CAN Frame Arbitration ID.  Set BIT31 for 11bit ids, otherwise we use 29bit ids.
+	 * @param periodMs	Period to transmit CAN frame.  Pass 0 for one-shot, which also disables that ArbID's preceding periodic transmit.
+	 * @param dlc 		Number of bytes to transmit (0 to 8).
+	 * @param initialFrame	Ptr to the frame data to schedule for transmitting.  Passing null will result
+	 *						in defaulting to zero data value.
+	 */
+	void RegisterTx(uint32_t arbId, uint32_t periodMs, uint32_t dlc, const uint8_t * initialFrame);
+	void UnregisterTx(uint32_t arbId);
 
 	CTR_Code GetRx(uint32_t arbId,uint8_t * dataBytes,uint32_t timeoutMs);
 	void FlushTx(uint32_t arbId);
+	bool ChangeTxPeriod(uint32_t arbId, uint32_t periodMs);
 
 	template<typename T> txTask<T> GetTx(uint32_t arbId)
 	{
@@ -86,6 +102,7 @@ private:
 			uint32_t arbId;
 			uint8_t toSend[8];
 			uint32_t periodMs;
+			uint8_t dlc;
 	};
 
 	class rxEvent_t{
