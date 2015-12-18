@@ -11,11 +11,16 @@ import java.lang.Runtime;
  */
 public class NotifierJNI extends JNIWrapper {
   /**
-   * Initializes the notifier to call the run() function of a Runnable.
-   *
-   * Should be called after initializeNotifierJVM().
+   * Callback function
    */
-  public static native long initializeNotifier(Runnable func);
+  public interface NotifierJNIHandlerFunction {
+    void apply(int curTime);
+  }
+
+  /**
+   * Initializes the notifier.
+   */
+  public static native long initializeNotifier(NotifierJNIHandlerFunction func);
 
   /**
    * Deletes the notifier object when we are done with it.
@@ -26,4 +31,9 @@ public class NotifierJNI extends JNIWrapper {
    * Sets the notifier to call the callback in another triggerTime microseconds.
    */
   public static native void updateNotifierAlarm(long notifierPtr, int triggerTime);
+
+  /**
+   * Tells the notifier to stop calling the callback.
+   */
+  public static native void stopNotifierAlarm(long notifierPtr);
 }
