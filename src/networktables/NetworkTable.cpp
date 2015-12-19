@@ -207,7 +207,7 @@ bool NetworkTable::ContainsKey(StringRef key) const {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   path += key;
-  return !nt::GetEntryValue(path);
+  return nt::GetEntryValue(path) ? true : false;
 }
 
 bool NetworkTable::ContainsSubTable(StringRef key) const {
