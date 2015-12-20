@@ -89,10 +89,11 @@ INSTALL(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT headers)
 # We need thread support
 find_package(Threads REQUIRED)
 
-enable_testing()
+if (NOT WITHOUT_TESTS)
+    enable_testing()
 
-add_subdirectory(gmock)
-include_directories("gmock/include")
-include_directories("gmock/gtest/include")
-add_subdirectory(test)
-
+    add_subdirectory(gmock)
+    include_directories("gmock/include")
+    include_directories("gmock/gtest/include")
+    add_subdirectory(test)
+endif()
