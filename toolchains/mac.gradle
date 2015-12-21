@@ -48,7 +48,7 @@ ext.releaseSetup = { releaseTasks ->
                     }
                 }
             }
-            releaseTasks.each { it.dependsOn project.tasks.getByName("strip${binary.name}")
+            releaseTasks.each { it.dependsOn project.tasks.getByName("strip${binary.name}") }
         }
     }
 }
