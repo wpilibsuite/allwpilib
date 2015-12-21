@@ -65,6 +65,14 @@ void Flush() {
  * Callback Creation Functions
  */
 
+void SetListenerOnStart(std::function<void()> on_start) {
+  Notifier::GetInstance().SetOnStart(on_start);
+}
+
+void SetListenerOnExit(std::function<void()> on_exit) {
+  Notifier::GetInstance().SetOnExit(on_exit);
+}
+
 unsigned int AddEntryListener(StringRef prefix, EntryListenerCallback callback,
                               unsigned int flags) {
   Notifier& notifier = Notifier::GetInstance();

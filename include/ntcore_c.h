@@ -267,6 +267,9 @@ void NT_Flush(void);
  * Callback Creation Functions
  */
 
+void NT_SetListenerOnStart(void (*on_start)(void *data), void *data);
+void NT_SetListenerOnExit(void (*on_exit)(void *data), void *data);
+
 typedef void (*NT_EntryListenerCallback)(
     unsigned int uid, void *data, const char *name, size_t name_len,
     const struct NT_Value *value, unsigned int flags);

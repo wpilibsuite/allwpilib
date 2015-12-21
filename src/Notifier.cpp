@@ -54,6 +54,8 @@ void Notifier::Stop() {
 }
 
 void Notifier::ThreadMain() {
+  if (m_on_start) m_on_start();
+
   std::unique_lock<std::mutex> lock(m_mutex);
   while (m_active) {
     while (m_entry_notifications.empty() && m_conn_notifications.empty()) {
@@ -135,6 +137,8 @@ void Notifier::ThreadMain() {
   }
 
 done:
+  if (m_on_exit) m_on_exit();
+
   // use condition variable to signal thread shutdown
   {
     std::lock_guard<std::mutex> lock(m_shutdown_mutex);

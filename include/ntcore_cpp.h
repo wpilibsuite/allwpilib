@@ -180,6 +180,9 @@ void Flush();
  * Callback Creation Functions
  */
 
+void SetListenerOnStart(std::function<void()> on_start);
+void SetListenerOnExit(std::function<void()> on_exit);
+
 typedef std::function<void(unsigned int uid, StringRef name,
                            std::shared_ptr<Value> value,
                            unsigned int flags)> EntryListenerCallback;

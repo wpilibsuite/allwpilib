@@ -167,6 +167,14 @@ void NT_Flush(void) { nt::Flush(); }
  * Callback Creation Functions
  */
 
+void NT_SetListenerOnStart(void (*on_start)(void *data), void *data) {
+  nt::SetListenerOnStart([=]() { on_start(data); });
+}
+
+void NT_SetListenerOnExit(void (*on_exit)(void *data), void *data) {
+  nt::SetListenerOnExit([=]() { on_exit(data); });
+}
+
 unsigned int NT_AddEntryListener(const char *prefix, size_t prefix_len,
                                  void *data,
                                  NT_EntryListenerCallback callback,

@@ -37,6 +37,9 @@ class Notifier {
   bool local_notifiers() const { return m_local_notifiers; }
   static bool destroyed() { return s_destroyed; }
 
+  void SetOnStart(std::function<void()> on_start) { m_on_start = on_start; }
+  void SetOnExit(std::function<void()> on_exit) { m_on_exit = on_exit; }
+
   unsigned int AddEntryListener(StringRef prefix,
                                 EntryListenerCallback callback,
                                 unsigned int flags);
@@ -104,6 +107,9 @@ class Notifier {
   std::mutex m_shutdown_mutex;
   std::condition_variable m_shutdown_cv;
   bool m_shutdown = false;
+
+  std::function<void()> m_on_start;
+  std::function<void()> m_on_exit;
 
   ATOMIC_STATIC_DECL(Notifier)
   static bool s_destroyed;
