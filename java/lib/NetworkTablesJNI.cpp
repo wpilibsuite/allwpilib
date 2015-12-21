@@ -237,14 +237,13 @@ class JavaByteRef {
 class JavaByteRefBB {
  public:
   JavaByteRefBB(JNIEnv *env, jobject bb, int len)
-      : m_env(env), m_elements(env->GetDirectBufferAddress(bb)), m_size(len) {}
+      : m_elements(env->GetDirectBufferAddress(bb)), m_size(len) {}
 
   operator nt::StringRef() const {
     return nt::StringRef(reinterpret_cast<char *>(m_elements), m_size);
   }
 
  private:
-  JNIEnv *m_env;
   void *m_elements;
   size_t m_size;
 };
