@@ -30,7 +30,7 @@ ext.setupDebugDefines = { cppCompiler, linker ->
     cppCompiler.args '-g', '-O0'
 }
 
-ext.releaseSetup = { releaseTask ->
+ext.releaseSetup = { releaseTasks ->
     binaries.withType(SharedLibraryBinarySpec) { binary ->
         if (!project.hasProperty('debug')) {
             def library = binary.sharedLibraryFile.absolutePath
@@ -48,7 +48,7 @@ ext.releaseSetup = { releaseTask ->
                     }
                 }
             }
-            releaseTask.dependsOn project.tasks.getByName("strip${binary.name}")
+            releaseTasks.each { it.dependsOn project.tasks.getByName("strip${binary.name}")
         }
     }
 }

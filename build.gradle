@@ -144,7 +144,13 @@ def ntcoreZipTask = { project ->
 
     project.build.dependsOn project.ntcoreZip
 
-    project.releaseSetup(project.ntcoreZip)
+    def releaseTasks = [project.ntcoreZip]
+
+    if (includeJava) {
+        releaseTasks.add(project.jar)
+    }
+
+    project.releaseSetup(releaseTasks)
 
     project.tasks.whenTaskAdded { task ->
         def name = task.name.toLowerCase()
