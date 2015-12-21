@@ -1323,6 +1323,8 @@ class LoggerThreadJNI {
   ATOMIC_STATIC_DECL(LoggerThreadJNI)
 };
 
+ATOMIC_STATIC_INIT(LoggerThreadJNI)
+
 LoggerThreadJNI::LoggerThreadJNI() {
   m_active = false;
 }
