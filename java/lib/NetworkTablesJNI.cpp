@@ -1288,6 +1288,7 @@ class LoggerThreadJNI {
     ATOMIC_STATIC(LoggerThreadJNI, instance);
     return instance;
   }
+  LoggerThreadJNI();
   ~LoggerThreadJNI();
   void SetFunc(JNIEnv* env, jobject func, jmethodID mid);
   void Start();
@@ -1302,7 +1303,7 @@ class LoggerThreadJNI {
   std::thread m_thread;
   std::mutex m_mutex;
   std::condition_variable m_cond;
-  std::atomic_bool m_active{false};
+  std::atomic_bool m_active;
   struct LogMessage {
     LogMessage(unsigned int level_, const char* file_, unsigned int line_,
                const char* msg_)
@@ -1321,6 +1322,10 @@ class LoggerThreadJNI {
 
   ATOMIC_STATIC_DECL(LoggerThreadJNI)
 };
+
+LoggerThreadJNI::LoggerThreadJNI() {
+  m_active = false;
+}
 
 LoggerThreadJNI::~LoggerThreadJNI() {
   Stop();
