@@ -219,7 +219,9 @@ project(':native') {
         throw new GradleException("ntcore does not support building on ${OperatingSystem.current().getFamilyName()}.")
     }
 
-    apply from: '../test/tests.gradle'
+    if (!project.hasProperty("withoutTests")) {
+        apply from: '../test/tests.gradle'
+    }
 
     if (includeJava) {
         apply from: '../java/java.gradle'

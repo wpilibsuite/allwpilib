@@ -26,6 +26,9 @@ To build just the Native or ARM version, you must access the approriate subproje
 
 The native version of ntcore will run tests on build. The arm version will not, as the current platform likely does not allow running of an ARM binary.
 
+## Testing
+By default, tests will be built for the x86 and x64 versions of ntcore, and will be run during any execution of the `build` or `publish` tasks. To skip building and running the tests, use the `-PwithoutTests` command line flag when running Gradle.
+
 ## Publishing
 To use ntcore in downstream projects as a Maven-style dependency, use the `publish` command. This will publish four artifacts, where platform_name is your current platform (windows, mac, linux):
 
