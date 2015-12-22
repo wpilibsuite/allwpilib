@@ -161,37 +161,6 @@ def ntcoreZipTask = { project ->
     }
 }
 
-def ntcoreSourceZipTask = { project ->
-    project.ext.ntcoreSourceZip = project.tasks.create("${project.isArm ? 'arm' : 'native'}NtcoreSourceZip", Zip) {
-        description = 'Creates a sources-zip of the ntcore source files'
-        group = 'WPILib'
-        destinationDir = project.buildDir
-        baseName = 'ntcore'
-        classifier = "sources"
-
-        from ('src') {
-            into 'src'
-        }
-
-        from('include') {
-            into 'include'
-        }
-
-        if (includeJava) {
-            from('java/lib') {
-                into 'src'
-            }
-
-            project.jniHeadersNetworkTables.outputs.each {
-                from(it) {
-                    into 'include'
-                }
-            }
-        }
-    }
-
-    project.build.dependsOn project.ntcoreSourceZip
-}
 project(':arm') {
     apply plugin: 'cpp'
 
@@ -205,7 +174,6 @@ project(':arm') {
 
     setupModel(project, true)
     ntcoreZipTask(project)
-    ntcoreSourceZipTask(project)
 }
 
 project(':native') {
@@ -235,7 +203,34 @@ project(':native') {
 
     setupModel(project, false)
     ntcoreZipTask(project)
-    ntcoreSourceZipTask(project)
+}
+
+task ntcoreSourceZip(type: Zip) {
+    description = 'Creates a sources-zip of the ntcore source files'
+    group = 'WPILib'
+    destinationDir = project.buildDir
+    baseName = 'ntcore'
+    classifier = "sources"
+
+    from ('src') {
+        into 'src'
+    }
+
+    from('include') {
+        into 'include'
+    }
+
+    if (includeJava) {
+        from('java/lib') {
+            into 'src'
+        }
+
+        project(':native').jniHeadersNetworkTables.outputs.each {
+            from(it) {
+                into 'include'
+            }
+        }
+    }
 }
 
 apply from: 'publish.gradle'
