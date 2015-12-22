@@ -24,6 +24,7 @@
 #ifndef TCPSOCKETS_TCPACCEPTOR_H_
 #define TCPSOCKETS_TCPACCEPTOR_H_
 
+#include <atomic>
 #include <memory>
 #include <string>
 
@@ -35,7 +36,7 @@ class TCPAcceptor : public NetworkAcceptor {
   int m_port;
   std::string m_address;
   bool m_listening;
-  bool m_shutdown;
+  std::atomic_bool m_shutdown;
 
  public:
   TCPAcceptor(int port, const char* address);

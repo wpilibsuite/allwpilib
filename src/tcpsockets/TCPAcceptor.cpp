@@ -32,6 +32,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <fcntl.h>
 #endif
 
 #include "llvm/SmallString.h"
@@ -44,8 +45,8 @@ TCPAcceptor::TCPAcceptor(int port, const char* address)
     : m_lsd(0),
       m_port(port),
       m_address(address),
-      m_listening(false),
-      m_shutdown(false) {
+      m_listening(false) {
+  m_shutdown = false;
 #ifdef _WIN32
   WSAData wsaData;
   WORD wVersionRequested = MAKEWORD(2, 2);
@@ -111,13 +112,51 @@ void TCPAcceptor::shutdown() {
   m_shutdown = true;
 #ifdef _WIN32
   ::shutdown(m_lsd, SD_BOTH);
+
+  // this is ugly, but the easiest way to do this
+  // force wakeup of accept() with a non-blocking connect to ourselves
+  struct sockaddr_in address;
+
+  std::memset(&address, 0, sizeof(address));
+  address.sin_family = PF_INET;
+  llvm::SmallString<128> addr_copy;
+  if (m_address.size() > 0)
+    addr_copy = m_address;
+  else
+    addr_copy = "127.0.0.1";
+  addr_copy.push_back('\0');
+  int size = sizeof(address);
+  if (WSAStringToAddress(addr_copy.data(), PF_INET, nullptr,
+                         (struct sockaddr*)&address, &size) != 0)
+    return;
+  address.sin_port = htons(m_port);
+
+  fd_set sdset;
+  struct timeval tv;
+  int result = -1, valopt, sd = socket(AF_INET, SOCK_STREAM, 0);
+
+  // Set socket to non-blocking
+  u_long mode = 1;
+  ioctlsocket(sd, FIONBIO, &mode);
+
+  // Try to connect
+  ::connect(sd, (struct sockaddr*)&address, sizeof(address));
+
+  // Close
+  ::closesocket(sd);
+
 #else
   ::shutdown(m_lsd, SHUT_RDWR);
+  int nullfd = ::open("/dev/null", O_RDONLY);
+  if (nullfd >= 0) {
+    ::dup2(nullfd, m_lsd);
+    ::close(nullfd);
+  }
 #endif
 }
 
 std::unique_ptr<NetworkStream> TCPAcceptor::accept() {
-  if (!m_listening) return nullptr;
+  if (!m_listening || m_shutdown) return nullptr;
 
   struct sockaddr_in address;
 #ifdef _WIN32
@@ -129,6 +168,14 @@ std::unique_ptr<NetworkStream> TCPAcceptor::accept() {
   int sd = ::accept(m_lsd, (struct sockaddr*)&address, &len);
   if (sd < 0) {
     if (!m_shutdown) ERROR("accept() failed: " << SocketStrerror());
+    return nullptr;
+  }
+  if (m_shutdown) {
+#ifdef _WIN32
+    closesocket(sd);
+#else
+    close(sd);
+#endif
     return nullptr;
   }
   return std::unique_ptr<NetworkStream>(new TCPStream(sd, &address));

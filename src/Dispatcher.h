@@ -99,13 +99,6 @@ class DispatcherBase {
   std::condition_variable m_reconnect_cv;
   unsigned int m_reconnect_proto_rev = 0x0300;
   bool m_do_reconnect = true;
-
-  // Condition variables for shutdown
-  std::mutex m_shutdown_mutex;
-  std::condition_variable m_dispatch_shutdown_cv;
-  std::condition_variable m_clientserver_shutdown_cv;
-  bool m_dispatch_shutdown = false;
-  bool m_clientserver_shutdown = false;
 };
 
 class Dispatcher : public DispatcherBase {

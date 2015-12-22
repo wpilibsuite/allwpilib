@@ -54,11 +54,6 @@ void DispatcherBase::StartServer(StringRef persist_filename,
     if (m_active) return;
     m_active = true;
   }
-  {
-    std::lock_guard<std::mutex> lock(m_shutdown_mutex);
-    m_dispatch_shutdown = false;
-    m_clientserver_shutdown = false;
-  }
   m_server = true;
   m_persist_filename = persist_filename;
   m_server_acceptor = std::move(acceptor);
@@ -92,11 +87,6 @@ void DispatcherBase::StartClient(
     if (m_active) return;
     m_active = true;
   }
-  {
-    std::lock_guard<std::mutex> lock(m_shutdown_mutex);
-    m_dispatch_shutdown = false;
-    m_clientserver_shutdown = false;
-  }
   m_server = false;
 
   using namespace std::placeholders;
@@ -121,26 +111,8 @@ void DispatcherBase::Stop() {
   if (m_server_acceptor) m_server_acceptor->shutdown();
 
   // join threads, with timeout
-  if (m_dispatch_thread.joinable()) {
-    std::unique_lock<std::mutex> lock(m_shutdown_mutex);
-    auto timeout_time =
-        std::chrono::steady_clock::now() + std::chrono::seconds(1);
-    if (m_dispatch_shutdown_cv.wait_until(lock, timeout_time,
-                                          [&] { return m_dispatch_shutdown; }))
-      m_dispatch_thread.join();
-    else
-      m_dispatch_thread.detach();  // timed out, detach it
-  }
-  if (m_clientserver_thread.joinable()) {
-    std::unique_lock<std::mutex> lock(m_shutdown_mutex);
-    auto timeout_time =
-        std::chrono::steady_clock::now() + std::chrono::seconds(1);
-    if (m_clientserver_shutdown_cv.wait_until(
-            lock, timeout_time, [&] { return m_clientserver_shutdown; }))
-      m_clientserver_thread.join();
-    else
-      m_clientserver_thread.detach();  // timed out, detach it
-  }
+  if (m_dispatch_thread.joinable()) m_dispatch_thread.join();
+  if (m_clientserver_thread.joinable()) m_clientserver_thread.join();
 
   std::vector<std::shared_ptr<NetworkConnection>> conns;
   {
@@ -258,13 +230,6 @@ void DispatcherBase::DispatchThreadMain() {
       }
     }
   }
-
-  // use condition variable to signal thread shutdown
-  {
-    std::lock_guard<std::mutex> lock(m_shutdown_mutex);
-    m_dispatch_shutdown = true;
-    m_dispatch_shutdown_cv.notify_one();
-  }
 }
 
 void DispatcherBase::QueueOutgoing(std::shared_ptr<Message> msg,
@@ -284,14 +249,15 @@ void DispatcherBase::QueueOutgoing(std::shared_ptr<Message> msg,
 void DispatcherBase::ServerThreadMain() {
   if (m_server_acceptor->start() != 0) {
     m_active = false;
-    goto done;
+    return;
   }
   while (m_active) {
     auto stream = m_server_acceptor->accept();
     if (!stream) {
       m_active = false;
-      break;
+      return;
     }
+    if (!m_active) return;
     DEBUG("server: client connection from " << stream->getPeerIP() << " port "
                                             << stream->getPeerPort());
 
@@ -318,14 +284,6 @@ void DispatcherBase::ServerThreadMain() {
       if (!placed) m_connections.emplace_back(conn);
       conn->Start();
     }
-  }
-
-done:
-  // use condition variable to signal thread shutdown
-  {
-    std::lock_guard<std::mutex> lock(m_shutdown_mutex);
-    m_clientserver_shutdown = true;
-    m_clientserver_shutdown_cv.notify_one();
   }
 }
 
@@ -358,13 +316,6 @@ void DispatcherBase::ClientThreadMain(
     // block until told to reconnect
     m_do_reconnect = false;
     m_reconnect_cv.wait(lock, [&] { return !m_active || m_do_reconnect; });
-  }
-
-  // use condition variable to signal thread shutdown
-  {
-    std::lock_guard<std::mutex> lock(m_shutdown_mutex);
-    m_clientserver_shutdown = true;
-    m_clientserver_shutdown_cv.notify_one();
   }
 }
 
