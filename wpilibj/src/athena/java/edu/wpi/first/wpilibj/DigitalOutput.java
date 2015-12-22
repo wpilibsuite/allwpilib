@@ -22,7 +22,9 @@ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tReso
  */
 public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
 
-  private long m_pwmGenerator;
+  private static final long invalidPwmGenerator = 0xffffffff;
+
+  private long m_pwmGenerator = invalidPwmGenerator;
 
   /**
    * Create an instance of a digital output. Create an instance of a digital
@@ -43,7 +45,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
   @Override
   public void free() {
     // disable the pwm only if we have allocated it
-    if (m_pwmGenerator != 0) {
+    if (m_pwmGenerator != invalidPwmGenerator) {
       disablePWM();
     }
     super.free();
@@ -131,7 +133,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    * @param initialDutyCycle The duty-cycle to start generating. [0..1]
    */
   public void enablePWM(double initialDutyCycle) {
-    if (m_pwmGenerator != 0)
+    if (m_pwmGenerator != invalidPwmGenerator)
       return;
     m_pwmGenerator = PWMJNI.allocatePWM();
     PWMJNI.setPWMDutyCycle(m_pwmGenerator, initialDutyCycle);
@@ -144,7 +146,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    * Free up one of the 6 DO PWM generator resources that were in use.
    */
   public void disablePWM() {
-    if (m_pwmGenerator == 0)
+    if (m_pwmGenerator == invalidPwmGenerator)
       return;
     // Disable the output by routing to a dead bit.
     PWMJNI.setPWMOutputChannel(m_pwmGenerator, kDigitalChannels);
@@ -161,7 +163,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    * @param dutyCycle The duty-cycle to change to. [0..1]
    */
   public void updateDutyCycle(double dutyCycle) {
-    if (m_pwmGenerator == 0)
+    if (m_pwmGenerator == invalidPwmGenerator)
       return;
     PWMJNI.setPWMDutyCycle(m_pwmGenerator, dutyCycle);
   }

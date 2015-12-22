@@ -107,6 +107,54 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
     assertFalse("DIO Not Low after .05s delay", dio.getInput().get());
   }
 
+  /**
+   * Tests to see if the DIO PWM functionality works.
+   */
+  @Test
+  public void testDIOPWM() {
+    dio.getOutput().set(false);
+    assertFalse("DIO Not Low after no delay", dio.getInput().get());
+    //Set frequency to 2.0 Hz
+    dio.getOutput().setPWMRate(2.0);
+    //Enable PWM, but leave it off.
+    dio.getOutput().enablePWM(0.0);
+    Timer.delay(0.5);
+    dio.getOutput().updateDutyCycle(0.5);
+    dio.getInput().requestInterrupts();
+    dio.getInput().setUpSourceEdge(false, true);
+    //TODO: Add return value from WaitForInterrupt
+    dio.getInput().waitForInterrupt(3.0, true);
+    Timer.delay(0.5);
+    boolean firstCycle = dio.getInput().get();
+    Timer.delay(0.5);
+    boolean secondCycle = dio.getInput().get();
+    Timer.delay(0.5);
+    boolean thirdCycle = dio.getInput().get();
+    Timer.delay(0.5);
+    boolean forthCycle = dio.getInput().get();
+    Timer.delay(0.5);
+    boolean fifthCycle = dio.getInput().get();
+    Timer.delay(0.5);
+    boolean sixthCycle = dio.getInput().get();
+    Timer.delay(0.5);
+    boolean seventhCycle = dio.getInput().get();
+    dio.getOutput().disablePWM();
+    Timer.delay(0.5);
+    boolean firstAfterStop = dio.getInput().get();
+    Timer.delay(0.5);
+    boolean secondAfterStop = dio.getInput().get();
+
+    assertFalse("DIO Not Low after first delay", firstCycle);
+    assertTrue("DIO Not High after second delay", secondCycle);
+    assertFalse("DIO Not Low after third delay", thirdCycle);
+    assertTrue("DIO Not High after forth delay", forthCycle);
+    assertFalse("DIO Not Low after fifth delay", fifthCycle);
+    assertTrue("DIO Not High after sixth delay", sixthCycle);
+    assertFalse("DIO Not Low after seventh delay", seventhCycle);
+    assertFalse("DIO Not Low after stopping first read", firstAfterStop);
+    assertFalse("DIO Not Low after stopping second read", secondAfterStop);
+  }
+
   /*
    * (non-Javadoc)
    *$

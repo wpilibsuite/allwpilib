@@ -8,6 +8,7 @@
 #include <Counter.h>
 #include <DigitalInput.h>
 #include <DigitalOutput.h>
+#include <InterruptableSensorBase.h>
 #include <Timer.h>
 #include "gtest/gtest.h"
 #include "TestBench.h"
@@ -57,6 +58,60 @@ TEST_F(DIOLoopTest, Loop) {
   Wait(kDelayTime);
   EXPECT_TRUE(m_input->Get()) << "The digital output was turned on, but "
                               << "the digital input is off.";
+}
+/**
+ * Tests to see if the DIO PWM functionality works.
+ */
+TEST_F(DIOLoopTest, DIOPWM) {
+  Reset();
+
+  m_output->Set(false);
+  Wait(kDelayTime);
+  EXPECT_FALSE(m_input->Get()) << "The digital output was turned off, but "
+                               << "the digital input is on.";
+
+  //Set frequency to 2.0 Hz
+  m_output->SetPWMRate(2.0);
+  //Enable PWM, but leave it off
+  m_output->EnablePWM(0.0);
+  Wait(0.5);
+  m_output->UpdateDutyCycle(0.5);
+  m_input->RequestInterrupts();
+  m_input->SetUpSourceEdge(false, true);
+  InterruptableSensorBase::WaitResult result = m_input->WaitForInterrupt(3.0, true);
+
+  Wait(0.5);
+  bool firstCycle = m_input->Get();
+  Wait(0.5);
+  bool secondCycle = m_input->Get();
+  Wait(0.5);
+  bool thirdCycle = m_input->Get();
+  Wait(0.5);
+  bool forthCycle = m_input->Get();
+  Wait(0.5);
+  bool fifthCycle = m_input->Get();
+  Wait(0.5);
+  bool sixthCycle = m_input->Get();
+  Wait(0.5);
+  bool seventhCycle = m_input->Get();
+  m_output->DisablePWM();
+  Wait(0.5);
+  bool firstAfterStop = m_input->Get();
+  Wait(0.5);
+  bool secondAfterStop = m_input->Get();
+
+  EXPECT_EQ(InterruptableSensorBase::WaitResult::kFallingEdge, result)
+                                  << "WaitForInterrupt was not falling.";
+
+  EXPECT_FALSE(firstCycle) << "Input not low after first delay";
+  EXPECT_TRUE(secondCycle) << "Input not high after second delay";
+  EXPECT_FALSE(thirdCycle) << "Input not low after third delay";
+  EXPECT_TRUE(forthCycle) << "Input not high after forth delay";
+  EXPECT_FALSE(fifthCycle) << "Input not low after fifth delay";
+  EXPECT_TRUE(sixthCycle) << "Input not high after sixth delay";
+  EXPECT_FALSE(seventhCycle) << "Input not low after seventh delay";
+  EXPECT_FALSE(firstAfterStop) << "Input not low after stopping first read";
+  EXPECT_FALSE(secondAfterStop) << "Input not low after stopping second read";
 }
 
 /**
