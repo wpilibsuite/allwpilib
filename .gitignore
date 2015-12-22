@@ -175,3 +175,6 @@ __pycache__
 
 #catkin stuff
 package.xml
+
+# Doxygen stuff
+NO
