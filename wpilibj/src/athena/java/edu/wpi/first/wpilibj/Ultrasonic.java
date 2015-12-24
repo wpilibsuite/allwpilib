@@ -339,7 +339,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
    */
   public void setPIDSourceType(PIDSourceType pidSource) {
     if (!pidSource.equals(PIDSourceType.kDisplacement)) {
-      throw new IllegalArgumentException("Only displacement PID is allowed for potentiometers.");
+      throw new IllegalArgumentException("Only displacement PID is allowed for ultrasonics.");
     }
     m_pidSource = pidSource;
   }
