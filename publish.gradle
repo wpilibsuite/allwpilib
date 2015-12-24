@@ -29,7 +29,7 @@ publishing {
         cpp(MavenPublication) {
             artifact nat.ntcoreZip
             artifact arm.ntcoreZip
-            artifact nat.ntcoreSourceZip
+            artifact ntcoreSourceZip
 
             if (project.hasProperty('makeDesktop')) {
                 artifact nat.ntcoreZip, {
