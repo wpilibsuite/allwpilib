@@ -233,4 +233,9 @@ task ntcoreSourceZip(type: Zip) {
     }
 }
 
+// Empty task for build so that ntcoreSourceZip will be build when running ./gradlew build
+task build
+
+build.dependsOn ntcoreSourceZip
+
 apply from: 'publish.gradle'
