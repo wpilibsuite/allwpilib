@@ -62,4 +62,10 @@ else()
 endif()
 
 target_link_libraries(${PROJECT_NAME} ${PROTOBUF_LIBRARIES})
-set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "${ENV_HOME}/wpilib/simulation/lib")
+set_target_properties(${PROJECT_NAME}
+  PROPERTIES
+  INSTALL_RPATH "${ENV_HOME}/wpilib/simulation/lib"
+  LIBRARY_OUTPUT_DIRECTORY ${SIMULATION_INSTALL_DIR}/lib)
+
+file(COPY "${GZ_MSGS_INCLUDE_DIR}/simulation"
+  DESTINATION "${CMAKE_BINARY_DIR}/install/simulation/include")

@@ -12,8 +12,6 @@ set (PLUGINS
 	rangefinder
 	servo)
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/plugins)
-
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
 foreach(PLUGIN ${PLUGINS})
@@ -29,8 +27,9 @@ foreach(PLUGIN ${PLUGINS})
 	endif()
 
 	target_link_libraries(${PLUGIN} gz_msgs ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
-
-  install(TARGETS ${PLUGIN} DESTINATION $ENV{HOME}/wpilib/simulation/plugins)
+  set_target_properties(${PLUGIN}
+    PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY ${SIMULATION_INSTALL_DIR}/plugins)
 
 endforeach()
 

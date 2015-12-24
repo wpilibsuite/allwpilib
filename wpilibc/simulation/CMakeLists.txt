@@ -15,7 +15,6 @@ set (INCLUDE_FOLDERS include
   ${Boost_INCLUDE_DIR}
   ${GAZEBO_INCLUDE_DIRS})
 
-
 include_directories(${INCLUDE_FOLDERS})
 
 link_directories(${NTCORE_LIBDIR})
@@ -23,3 +22,7 @@ link_directories(${NTCORE_LIBDIR})
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${COM_SRC_FILES})
 
 target_link_libraries(${PROJECT_NAME} gz_msgs ntcore)
+
+set_target_properties(${PROJECT_NAME}
+  PROPERTIES
+  LIBRARY_OUTPUT_DIRECTORY ${SIMULATION_INSTALL_DIR}/lib)

@@ -22,4 +22,8 @@ ext.checkDoxygen = {
 }
 
 apply from: 'athena.gradle'
-apply from: 'simulation.gradle'
+
+if (hasProperty('makeSim')){
+    apply from: 'simulation.gradle'
+}
+

@@ -53,4 +53,12 @@ task simDsJavadoc(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
+//we need to move the simulation jars to the install directory
+task copyJars(type: Copy) {
+    description = 'copy SimDS-all.jar to make simulation zip'
+    group = 'WPILib Simulation'
+    from shadowJar.archivePath
+    into "$simulationInstallDir/jar"
+}
+
 build.dependsOn shadowJar

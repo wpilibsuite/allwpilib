@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=FRCSim
+Keywords=frcsim,gazebo
+Exec=/usr/bin/frcsim
+Icon=gazebo
+Type=Application
+StartupNotify=true
+Terminal=false
+Categories=Development;IDE;Java;Education;Science

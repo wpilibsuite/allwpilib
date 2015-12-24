@@ -7,6 +7,8 @@ if (!hasProperty('repo')) {
 def repoBaseUrl = "http://first.wpi.edu/FRC/roborio/maven/${repo}"
 def publishUrl = "${System.getProperty('user.home')}/releases/maven/${repo}"
 
+ext.simulationInstallDir = "$rootDir/build/install/simulation"
+
 allprojects {
     ext.enableSimulation = enableSimulation
     ext.repo = repo

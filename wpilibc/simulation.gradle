@@ -1,33 +1,46 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 
-if (project.hasProperty('makeSim')){
   //cmake wrapper tasks
-  task setupCmake(type: Exec) {
+task setupCmake(type: Exec) {
+    description = 'create build directory for cmake to use'
+    group = 'WPILib Simulation'
     workingDir '..'
     commandLine 'mkdir', '-p', 'build'
-  }
+}
 
-  task cmake(type: Exec, dependsOn: setupCmake) {
+task cmake(type: Exec, dependsOn: setupCmake) {
+    description = 'run cmake in the build directory to generate makefiles'
+    group = 'WPILib Simulation'
     workingDir '../build'
     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-      commandLine '../configure.bat', "-DNTCORE_INCLUDE_DIR=$netTablesInclude","-DNTCORE_LIBDIR=$netLibDesktopLocation"
+        commandLine '../configure.bat',
+            "-DNTCORE_INCLUDE_DIR=$netTablesInclude",
+            "-DNTCORE_LIBDIR=$netLibDesktopLocation",
+            "-DSIMULATION_INSTALL_DIR=$simulationInstallDir"
     }
     else {
-      commandLine 'cmake', '..', "-DNTCORE_INCLUDE_DIR=$netTablesInclude","-DNTCORE_LIBDIR=$netLibDesktopLocation"
+        commandLine 'cmake', '..',
+            "-DNTCORE_INCLUDE_DIR=$netTablesInclude",
+            "-DNTCORE_LIBDIR=$netLibDesktopLocation",
+            "-DSIMULATION_INSTALL_DIR=$simulationInstallDir"
     }
-  }
+}
 
-  task frc_gazebo_plugins(type: Exec, dependsOn: cmake) {
+task frc_gazebo_plugins(type: Exec, dependsOn: cmake) {
+    description = 'build Gazebo plugins with cmake'
+    group = 'WPILib Simulation'
     workingDir '../build'
     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-      comanndLine 'nmake', 'frc_gazebo_plugins'
+        commandLine 'nmake', 'frc_gazebo_plugins'
     }
     else {
-      commandLine 'make', 'frc_gazebo_plugins'
+        commandLine 'make', 'frc_gazebo_plugins'
     }
-  }
+}
 
-  task gz_msgs(type: Exec, dependsOn: cmake) {
+task gz_msgs(type: Exec, dependsOn: cmake) {
+    description = 'build gz_msgs library with cmake'
+    group = 'WPILib Simulation'
       workingDir '../build'
       if (Os.isFamily(Os.FAMILY_WINDOWS)) {
           commandLine 'nmake', 'gz_msgs'
@@ -35,20 +48,49 @@ if (project.hasProperty('makeSim')){
       else {
           commandLine 'make', 'gz_msgs'
       }
-  }
+}
 
-  task wpilibcSim(type: Exec, dependsOn: ['cmake', ':unzipNetworkTables']) {
+task wpilibcSim(type: Exec, dependsOn: ['cmake', ':unzipNetworkTables']) {
+    description = 'build WPILib C++ for simulation with cmake'
+    group = 'WPILib Simulation'
     workingDir '../build'
     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-      commandLine 'nmake', 'wpilibcSim'
+        commandLine 'nmake', 'wpilibcSim'
     }
     else {
-      commandLine 'make', 'wpilibcSim'
+        commandLine 'make', 'wpilibcSim'
     }
-  }
-
-  task allcsim(dependsOn: [wpilibcSim, gz_msgs, frc_gazebo_plugins]){
-  }
-
-  build.dependsOn allcsim
 }
+
+task allcsim(dependsOn: [wpilibcSim, gz_msgs, frc_gazebo_plugins]){
+    description = 'wrapper task to build all c++ simulation tasks'
+    group = 'WPILib Simulation'
+}
+
+task wpilibcSimCopy(type: Copy) {
+    description = 'copy headers and ntcore library to make simulation zip'
+    group = 'WPILib Simulation'
+    into "$simulationInstallDir"
+
+    from ("$netTablesInclude"){
+        into "include"
+    }
+
+    from ("../hal/include"){
+        into "include"
+    }
+
+    from ("simulation/include"){
+        into "include"
+    }
+
+    from ("shared/include"){
+        into "include"
+    }
+
+    from ("$netLibDesktopLocation/libntcore.so") {
+        into "lib"
+    }
+}
+
+build.dependsOn allcsim

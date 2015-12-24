@@ -51,7 +51,6 @@ else ()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++1y -DFRC_SIMULATOR -Wno-unused-parameter -pthread -fPIC -fpermissive")
 endif()
 
-
 include_directories("build")
 add_subdirectory(simulation/gz_msgs)
 add_subdirectory(wpilibc/simulation)

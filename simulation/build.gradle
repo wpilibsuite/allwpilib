@@ -1,0 +1,35 @@
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+publishing {
+    publications {
+        simulation(MavenPublication) {
+            artifact zip
+            groupId 'simulation'
+            artifactId 'simulation'
+            version '1.0.0'
+        }
+    }
+
+    setupWpilibRepo(it)
+}
+
+task copy_resources(type: Copy) {
+    description = 'copy gz_msgs and install_resources to make simulation zip'
+    group = 'WPILib Simulation'
+    into ('gz_msgs') {
+        from 'gz_msgs'
+    }
+    into "$simulationInstallDir"
+    from 'install_resources'
+}
+
+task zip(type: Zip, dependsOn: [copy_resources,
+        ':wpilibc:wpilibcSimCopy',
+        ':simulation:SimDS:copyJars',
+        ':wpilibj:copyJars']) {
+    description = 'zip of all the resources for simulation'
+    group = 'WPILib Simulation'
+    baseName = 'simulation-trusty'
+    from "$simulationInstallDir"
+}

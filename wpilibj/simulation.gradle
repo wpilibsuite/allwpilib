@@ -10,7 +10,8 @@ dependencies {
 }
 
 task wpilibjSimJar(type: Jar, dependsOn: simClasses) {
-
+    description = 'Creates the WPILibJSimulation Jar'
+    group = 'WPILib Simulation'
     def addClasspath = { classpath ->
         classpath.files.findAll { it.exists() }.each {
             if (file(it).directory) {
@@ -24,8 +25,6 @@ task wpilibjSimJar(type: Jar, dependsOn: simClasses) {
     addClasspath sourceSets.shared.runtimeClasspath
     addClasspath sourceSets.sim.runtimeClasspath
 
-    description = 'Creates the WPILibJSimulation Jar'
-    group = 'WPILib'
     from sourceSets.sim.output.classesDir
     from sourceSets.shared.output.classesDir
     baseName 'wpilibjSimulation'
@@ -70,6 +69,14 @@ publishing {
             version '0.1.0-SNAPSHOT'
         }
     }
+}
+
+//we need to move the simulation jars to the install directory
+task copyJars(type: Copy) {
+    description = 'copy wpilibj simulation jar to make simulation zip'
+    group = 'WPILib Simulation'
+    from wpilibjSimJar.archivePath
+    into "$simulationInstallDir/jar"
 }
 
 build.dependsOn wpilibjSimJar
