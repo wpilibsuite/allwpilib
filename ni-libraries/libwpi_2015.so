@@ -1,3 +1,3 @@
 /* GNU ld script */
 OUTPUT_FORMAT(elf32-littlearm)
-GROUP ( AS_NEEDED ( -lwpilib_nonshared -lHALAthena -lntcore -lFRC_NetworkCommunication -li2c -lni_emb -lNiFpgaLv -lNiFpga -lnirio_emb_can -lNiRioSrv -lni_rtlog -lRoboRIO_FRC_ChipObject -lspi -lvisa -ldl -lpthread -lrt -lGCBase_gcc-4.4-arm_v2_3 -lGenApi_gcc-4.4-arm_v2_3 -lLog_gcc-4.4-arm_v2_3 -lMathParser_gcc-4.4-arm_v2_3 -llog4cpp_gcc-4.4-arm_v2_3 -lniimaqdx -lnivision -lnivissvc ) )
+GROUP ( AS_NEEDED ( -lwpilib_nonshared -lHALAthena -lntcore -lFRC_NetworkCommunication -li2c -lni_emb -lNiFpgaLv -lNiFpga -lnirio_emb_can -lNiRioSrv -lni_rtlog -lRoboRIO_FRC_ChipObject -lspi -lvisa -ldl -lpthread -lrt -lGCBase_gcc-4.4-arm_v2_3 -lGenApi_gcc-4.4-arm_v2_3 -lLog_gcc-4.4-arm_v2_3 -lMathParser_gcc-4.4-arm_v2_3 -llog4cpp_gcc-4.4-arm_v2_3 -lniimaqdx -lnivision -lnivissvc -lnipalu) )
