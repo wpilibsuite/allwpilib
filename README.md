@@ -28,17 +28,16 @@ If you also want simulation to be build, add -PmakeSim. This requires gazebo_tra
 ./gradlew build -PmakeSim
 ```
 
-Note that java sim libraries build either way, because they don't depend on gazebo, only on JavaGazebo. C++ simulation tasks (including plugins, gz_msgs, and wpilibcSim) all depend on gazebo_transport. In order for this to build you must have installed gazebo. See [The Gazebo website](https://gazebosim.org/) for installation instructions.
+C++ simulation tasks (including plugins, gz_msgs, and wpilibcSim) all depend on gazebo_transport. In order for this to build you must have installed gazebo. See [The Gazebo website](https://gazebosim.org/) for installation instructions.
 If you prefer to use Cmake directly, the you can still do so.
 The common cmake tasks are wpilibcSim, frc_gazebo_plugins, and gz_msgs
 
 ```bash
-mkdir build
+mkdir build #run this in the root of allwpilib
 cd build
 cmake ..
 make
 ```
-
 
 
 The gradlew wrapper only exists in the root of the main project, so be sure to run all commands from there. All of the subprojects have build tasks that can be run. Gradle automatically determines and rebuilds dependencies, so if you make a change to the HAL and then run `:wpilibc:build`, the HAL will be rebuilt, then wpilibc.
@@ -61,3 +60,12 @@ The following maven targets a published by this task:
 - edu.wpi.first.wpilibj:wpilibJavaSim:0.1.0-SNAPSHOT - Simulation Java
 - edu.wpi.first.wpilibj.simulation:SimDS:0.1.0-SNAPSHOT - The driverstation for controlling simulation.
 - org.gazebosim:JavaGazebo:0.1.0-SNAPSHOT - Gazebo protocol for Java.
+
+## Structure and Organization
+The main wpilib code you're probably looking for is in wpilibj and wpilibc. Those directories are split into shared, sim, and athena. Athena contains the wpilib code meant to run on your RoboRIO. Sim is wpilib code meant to run on your computer with gazebo, and shared is code shared between the two. Shared code must be platform-independant, since it will be compiled with both the ARM cross-compiler and whatever desktop compiler you are using (g++, msvc, ect... ).
+
+The Simulation directory contains extra simulation tools and libraries, such as gz_msgs and JavaGazebo. See sub-directories for more information.
+
+The integration test directories for C++ and Java contain test code that runs on our test-system. When you submit code for review, it is tested by those programs. If you add new functionality you should make sure to write tests for it so we don't break it in the future.
+
+The hal directory contains more C++ code meant to run on the RoboRIO. HAL is an acronym for "Hardware Abstraction Layer", and it interfaces with the NI Libraries. The NI Libraries contain the low-level code for controlling devices on your robot. The NI Libraries are found in the ni-libraries folder.

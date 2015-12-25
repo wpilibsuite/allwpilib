@@ -14,16 +14,14 @@ Observe the following directory structure
 |   |-- rangefinder
 |   |-- servo
 |
-|-- frcsim.bat (launches gazebo with model/plugin paths on windows)
-|-- frcsim.sh (launches gazebo with model/plugin paths on linux/mac)
-|-- install.sh (convenient linux script to install Eclipse, Eclipse Plugins, and Gazebo)
+|-- frcsim (launches gazebo with model/plugin paths on linux)
 |-- JavaGazebo (java library used by java simulation. Equivelant of the C++ gazebo_transport)
 |-- SimDS (linux driverstation)
 
 The gazbeo plugins are currently built with CMake.
 Eventually they will be built with gradle.
 
-All of this is delivered to students via the eclipse plugins
+All of this is delivered to students via a zip file
 
 ## Building
 see the top level building.md
