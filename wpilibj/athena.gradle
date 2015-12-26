@@ -2,6 +2,7 @@ apply plugin: 'cpp'
 
 def jniDir = 'src/athena/cpp'
 def generatedJNIHeaderLoc = "$buildDir/include"
+def ntSourceDir = "$buildDir/ntSources"
 
 sourceSets {
     athena
@@ -103,8 +104,23 @@ task wpilibjSources(type: Jar, dependsOn: classes) {
     from sourceSets.shared.allJava
 }
 
+def ntSourcesDependency =
+    project.dependencies.create('edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:sources@jar')
+def ntSourcesConfig = project.configurations.detachedConfiguration(ntSourcesDependency)
+ntSourcesDependency.setTransitive(false)
+def ntSources = ntSourcesConfig.singleFile
+
+task unzipJavaNtSources(type: Copy) {
+    description = 'Unzips the java networktables sources for doc creation'
+    group = 'WPILib'
+    from zipTree(ntSources)
+    exclude 'META-INF/*'
+    into ntSourceDir
+}
+
 task javadoc(type: Javadoc, overwrite: true) {
-    source sourceSets.athena.allJava, sourceSets.shared.allJava
+    dependsOn unzipJavaNtSources
+    source sourceSets.athena.allJava, sourceSets.shared.allJava, unzipJavaNtSources.outputs.files
     classpath = files([sourceSets.athena.compileClasspath, sourceSets.shared.compileClasspath])
     javadoc.options.links("http://docs.oracle.com/javase/8/docs/api/")
     options.addStringOption "tag", "pre:a:Pre-Condition"
@@ -158,4 +174,5 @@ task jniHeaders {
 
 clean {
     delete generatedJNIHeaderLoc
+    delete ntSourceDir
 }

@@ -1,5 +1,7 @@
 defineNetworkTablesProperties()
 
+def ntSourceDir = "$buildDir/ntSources"
+
 model {
     components {
         wpilib_nonshared(NativeLibrarySpec) {
@@ -93,7 +95,6 @@ tasks.whenTaskAdded { task ->
     }
 }
 
-
 // Add the hal static and shared libraries as a dependency
 project(':hal').tasks.whenTaskAdded { task ->
     if (task.name == 'hALAthenaStaticLibrary' || task.name == 'hALAthenaSharedLibrary') {
@@ -101,10 +102,72 @@ project(':hal').tasks.whenTaskAdded { task ->
     }
 }
 
+if (checkDoxygen()) {
+
+    def ntSourcesDependency = project.dependencies.create('edu.wpi.first.wpilib.networktables.cpp:NetworkTables:3.0.0-SNAPSHOT:sources@zip')
+    def ntSourcesConfig = project.configurations.detachedConfiguration(ntSourcesDependency)
+    ntSourcesDependency.setTransitive(false)
+    def ntSources = ntSourcesConfig.singleFile
+
+    task unzipCppNtSources(type: Copy) {
+        description = 'Unzips the C++ networktables sources for doc creation'
+        group = 'WPILib'
+        from zipTree(ntSources)
+        exclude 'META-INF/*'
+        into ntSourceDir
+    }
+
+    doxygen {
+        def halLocation = '../hal'
+        source file("${project.shared}/src")
+        source file("${project.shared}/include")
+        source file("${project.athena}/src")
+        source file("${project.athena}/include")
+        source file("$ntSourceDir/src")
+        source file("$ntSourceDir/include")
+        source file("$halLocation/shared")
+        source file("$halLocation/Athena")
+        source file("$halLocation/include")
+        // template file('cpp.doxy')
+        exclude 'pcre.h'
+        exclude 'nivision.h'
+        project_name 'WPILibC++'
+        javadoc_autobrief true
+        recursive true
+        quiet true
+        warnings false
+        warn_if_doc_error false
+        warn_no_paramdoc false
+        warn_format false
+        warn_logfile false
+        warn_if_undocumented false
+        generate_latex false
+        html_timestamp true
+        generate_treeview true
+        outputDir file("$buildDir/docs")
+    }
+
+    doxygen.dependsOn unzipCppNtSources
+
+    task doxygenZip(type: Zip) {
+        description = 'Generates doxygen zip file for publishing'
+        group = 'WPILib'
+        dependsOn doxygen
+        from doxygen.outputDir
+    }
+}
+
 publishing {
     publications {
         wpilibc(MavenPublication) {
             artifact wpilibcZip
+
+            if (checkDoxygen()) {
+                artifact (doxygenZip) {
+                    classifier = 'doxygen'
+                }
+            }
+
             groupId 'edu.wpi.first.wpilib.cmake'
             artifactId 'cpp-root'
             version '1.0.0'
@@ -112,4 +175,8 @@ publishing {
     }
 
     setupWpilibRepo(it)
+}
+
+clean {
+    ntSourceDir
 }
