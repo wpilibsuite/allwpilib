@@ -8,16 +8,11 @@
 #ifndef NT_NOTIFIER_H_
 #define NT_NOTIFIER_H_
 
-#include <atomic>
-#include <condition_variable>
-#include <mutex>
-#include <queue>
-#include <thread>
-#include <utility>
-#include <vector>
+#include <functional>
 
 #include "atomic_static.h"
 #include "ntcore_cpp.h"
+#include "SafeThread.h"
 
 namespace nt {
 
@@ -33,7 +28,6 @@ class Notifier {
   void Start();
   void Stop();
 
-  bool active() const { return m_active; }
   bool local_notifiers() const { return m_local_notifiers; }
   static bool destroyed() { return s_destroyed; }
 
@@ -57,56 +51,10 @@ class Notifier {
  private:
   Notifier();
 
-  void ThreadMain();
+  class Thread;
+  SafeThreadOwner<Thread> m_owner;
 
-  std::atomic_bool m_active;
   std::atomic_bool m_local_notifiers;
-
-  std::mutex m_mutex;
-  std::condition_variable m_cond;
-
-  struct EntryListener {
-    EntryListener(StringRef prefix_, EntryListenerCallback callback_,
-                  unsigned int flags_)
-        : prefix(prefix_), callback(callback_), flags(flags_) {}
-
-    std::string prefix;
-    EntryListenerCallback callback;
-    unsigned int flags;
-  };
-  std::vector<EntryListener> m_entry_listeners;
-  std::vector<ConnectionListenerCallback> m_conn_listeners;
-
-  struct EntryNotification {
-    EntryNotification(StringRef name_, std::shared_ptr<Value> value_,
-                      unsigned int flags_, EntryListenerCallback only_)
-        : name(name_),
-          value(value_),
-          flags(flags_),
-          only(only_) {}
-
-    std::string name;
-    std::shared_ptr<Value> value;
-    unsigned int flags;
-    EntryListenerCallback only;
-  };
-  std::queue<EntryNotification> m_entry_notifications;
-
-  struct ConnectionNotification {
-    ConnectionNotification(bool connected_, const ConnectionInfo& conn_info_,
-                           ConnectionListenerCallback only_)
-        : connected(connected_), conn_info(conn_info_), only(only_) {}
-
-    bool connected;
-    ConnectionInfo conn_info;
-    ConnectionListenerCallback only;
-  };
-  std::queue<ConnectionNotification> m_conn_notifications;
-
-  std::thread m_thread;
-  std::mutex m_shutdown_mutex;
-  std::condition_variable m_shutdown_cv;
-  bool m_shutdown = false;
 
   std::function<void()> m_on_start;
   std::function<void()> m_on_exit;

@@ -7,70 +7,57 @@
 
 #include "RpcServer.h"
 
+#include <queue>
+
 #include "Log.h"
 
 using namespace nt;
 
 ATOMIC_STATIC_INIT(RpcServer)
 
+class RpcServer::Thread : public SafeThread {
+ public:
+  Thread(std::function<void()> on_start, std::function<void()> on_exit)
+      : m_on_start(on_start), m_on_exit(on_exit) {}
+
+  void Main();
+
+  std::queue<RpcCall> m_call_queue;
+
+  std::function<void()> m_on_start;
+  std::function<void()> m_on_exit;
+};
+
 RpcServer::RpcServer() {
-  m_active = false;
   m_terminating = false;
 }
 
 RpcServer::~RpcServer() {
   Logger::GetInstance().SetLogger(nullptr);
-  Stop();
   m_terminating = true;
   m_poll_cond.notify_all();
 }
 
 void RpcServer::Start() {
-  {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if (m_active) return;
-    m_active = true;
-  }
-  {
-    std::lock_guard<std::mutex> lock(m_shutdown_mutex);
-    m_shutdown = false;
-  }
-  m_thread = std::thread(&RpcServer::ThreadMain, this);
+  auto thr = m_owner.GetThread();
+  if (!thr) m_owner.Start(new Thread(m_on_start, m_on_exit));
 }
 
-void RpcServer::Stop() {
-  m_active = false;
-  if (m_thread.joinable()) {
-    // send notification so the thread terminates
-    m_call_cond.notify_one();
-    // join with timeout
-    std::unique_lock<std::mutex> lock(m_shutdown_mutex);
-    auto timeout_time =
-        std::chrono::steady_clock::now() + std::chrono::seconds(1);
-    if (m_shutdown_cv.wait_until(lock, timeout_time,
-                                 [&] { return m_shutdown; }))
-      m_thread.join();
-    else
-      m_thread.detach();  // timed out, detach it
-  }
-}
+void RpcServer::Stop() { m_owner.Stop(); }
 
 void RpcServer::ProcessRpc(StringRef name, std::shared_ptr<Message> msg,
                            RpcCallback func, unsigned int conn_id,
                            SendMsgFunc send_response) {
-  std::unique_lock<std::mutex> lock(m_mutex);
-
-  if (func)
-    m_call_queue.emplace(name, msg, func, conn_id, send_response);
-  else
+  if (func) {
+    auto thr = m_owner.GetThread();
+    if (!thr) return;
+    thr->m_call_queue.emplace(name, msg, func, conn_id, send_response);
+    thr->m_cond.notify_one();
+  } else {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_poll_queue.emplace(name, msg, func, conn_id, send_response);
-
-  lock.unlock();
-
-  if (func)
-    m_call_cond.notify_one();
-  else
     m_poll_cond.notify_one();
+  }
 }
 
 bool RpcServer::PollRpc(bool blocking, RpcCallInfo* call_info) {
@@ -103,12 +90,14 @@ void RpcServer::PostRpcResponse(unsigned int rpc_id, unsigned int call_uid,
   m_response_map.erase(i);
 }
 
-void RpcServer::ThreadMain() {
+void RpcServer::Thread::Main() {
+  if (m_on_start) m_on_start();
+
   std::unique_lock<std::mutex> lock(m_mutex);
   std::string tmp;
   while (m_active) {
     while (m_call_queue.empty()) {
-      m_call_cond.wait(lock);
+      m_cond.wait(lock);
       if (!m_active) goto done;
     }
 
@@ -132,10 +121,5 @@ void RpcServer::ThreadMain() {
   }
 
 done:
-  // use condition variable to signal thread shutdown
-  {
-    std::lock_guard<std::mutex> lock(m_shutdown_mutex);
-    m_shutdown = true;
-    m_shutdown_cv.notify_one();
-  }
+  if (m_on_exit) m_on_exit();
 }

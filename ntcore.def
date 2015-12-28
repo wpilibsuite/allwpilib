@@ -76,6 +76,10 @@ NT_FreeCharArray @78
 NT_NotifierDestroyed @79
 NT_StopRpcServer @80
 NT_StopNotifier @81
+NT_SetListenerOnStart @82
+NT_SetListenerOnExit @83
+NT_SetRpcServerOnStart @84
+NT_SetRpcServerOnExit @85
 
 ; JNI functions
 JNI_OnLoad

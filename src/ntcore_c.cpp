@@ -215,6 +215,14 @@ int NT_NotifierDestroyed() { return nt::NotifierDestroyed(); }
  * Remote Procedure Call Functions
  */
 
+void NT_SetRpcServerOnStart(void (*on_start)(void *data), void *data) {
+  nt::SetRpcServerOnStart([=]() { on_start(data); });
+}
+
+void NT_SetRpcServerOnExit(void (*on_exit)(void *data), void *data) {
+  nt::SetRpcServerOnExit([=]() { on_exit(data); });
+}
+
 void NT_CreateRpc(const char *name, size_t name_len, const char *def,
                   size_t def_len, void *data, NT_RpcCallback callback) {
   nt::CreateRpc(

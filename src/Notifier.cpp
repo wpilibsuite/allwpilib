@@ -7,53 +7,75 @@
 
 #include "Notifier.h"
 
+#include <queue>
+#include <vector>
+
 using namespace nt;
 
 ATOMIC_STATIC_INIT(Notifier)
 bool Notifier::s_destroyed = false;
 
+class Notifier::Thread : public SafeThread {
+ public:
+  Thread(std::function<void()> on_start, std::function<void()> on_exit)
+      : m_on_start(on_start), m_on_exit(on_exit) {}
+
+  void Main();
+
+  struct EntryListener {
+    EntryListener(StringRef prefix_, EntryListenerCallback callback_,
+                  unsigned int flags_)
+        : prefix(prefix_), callback(callback_), flags(flags_) {}
+
+    std::string prefix;
+    EntryListenerCallback callback;
+    unsigned int flags;
+  };
+  std::vector<EntryListener> m_entry_listeners;
+  std::vector<ConnectionListenerCallback> m_conn_listeners;
+
+  struct EntryNotification {
+    EntryNotification(StringRef name_, std::shared_ptr<Value> value_,
+                      unsigned int flags_, EntryListenerCallback only_)
+        : name(name_),
+          value(value_),
+          flags(flags_),
+          only(only_) {}
+
+    std::string name;
+    std::shared_ptr<Value> value;
+    unsigned int flags;
+    EntryListenerCallback only;
+  };
+  std::queue<EntryNotification> m_entry_notifications;
+
+  struct ConnectionNotification {
+    ConnectionNotification(bool connected_, const ConnectionInfo& conn_info_,
+                           ConnectionListenerCallback only_)
+        : connected(connected_), conn_info(conn_info_), only(only_) {}
+
+    bool connected;
+    ConnectionInfo conn_info;
+    ConnectionListenerCallback only;
+  };
+  std::queue<ConnectionNotification> m_conn_notifications;
+
+  std::function<void()> m_on_start;
+  std::function<void()> m_on_exit;
+};
+
 Notifier::Notifier() {
-  m_active = false;
   m_local_notifiers = false;
   s_destroyed = false;
 }
 
-Notifier::~Notifier() {
-  s_destroyed = true;
-  Stop();
-}
+Notifier::~Notifier() { s_destroyed = true; }
 
-void Notifier::Start() {
-  {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if (m_active) return;
-    m_active = true;
-  }
-  {
-    std::lock_guard<std::mutex> lock(m_shutdown_mutex);
-    m_shutdown = false;
-  }
-  m_thread = std::thread(&Notifier::ThreadMain, this);
-}
+void Notifier::Start() { m_owner.Start(new Thread(m_on_start, m_on_exit)); }
 
-void Notifier::Stop() {
-  m_active = false;
-  // send notification so the thread terminates
-  m_cond.notify_one();
-  if (m_thread.joinable()) {
-    // join with timeout
-    std::unique_lock<std::mutex> lock(m_shutdown_mutex);
-    auto timeout_time =
-        std::chrono::steady_clock::now() + std::chrono::seconds(1);
-    if (m_shutdown_cv.wait_until(lock, timeout_time,
-                                 [&] { return m_shutdown; }))
-      m_thread.join();
-    else
-      m_thread.detach();  // timed out, detach it
-  }
-}
+void Notifier::Stop() { m_owner.Stop(); }
 
-void Notifier::ThreadMain() {
+void Notifier::Thread::Main() {
   if (m_on_start) m_on_start();
 
   std::unique_lock<std::mutex> lock(m_mutex);
@@ -138,65 +160,66 @@ void Notifier::ThreadMain() {
 
 done:
   if (m_on_exit) m_on_exit();
-
-  // use condition variable to signal thread shutdown
-  {
-    std::lock_guard<std::mutex> lock(m_shutdown_mutex);
-    m_shutdown = true;
-    m_shutdown_cv.notify_one();
-  }
 }
 
 unsigned int Notifier::AddEntryListener(StringRef prefix,
                                         EntryListenerCallback callback,
                                         unsigned int flags) {
-  std::lock_guard<std::mutex> lock(m_mutex);
-  unsigned int uid = m_entry_listeners.size();
-  m_entry_listeners.emplace_back(prefix, callback, flags);
+  auto thr = m_owner.GetThread();
+  if (!thr) {
+    Start();
+    thr = m_owner.GetThread();
+  }
+  unsigned int uid = thr->m_entry_listeners.size();
+  thr->m_entry_listeners.emplace_back(prefix, callback, flags);
   if ((flags & NT_NOTIFY_LOCAL) != 0) m_local_notifiers = true;
   return uid + 1;
 }
 
 void Notifier::RemoveEntryListener(unsigned int entry_listener_uid) {
+  auto thr = m_owner.GetThread();
+  if (!thr) return;
   --entry_listener_uid;
-  std::lock_guard<std::mutex> lock(m_mutex);
-  if (entry_listener_uid < m_entry_listeners.size())
-    m_entry_listeners[entry_listener_uid].callback = nullptr;
+  if (entry_listener_uid < thr->m_entry_listeners.size())
+    thr->m_entry_listeners[entry_listener_uid].callback = nullptr;
 }
 
 void Notifier::NotifyEntry(StringRef name, std::shared_ptr<Value> value,
                            unsigned int flags, EntryListenerCallback only) {
-  if (!m_active) return;
   // optimization: don't generate needless local queue entries if we have
   // no local listeners (as this is a common case on the server side)
   if ((flags & NT_NOTIFY_LOCAL) != 0 && !m_local_notifiers) return;
-  std::unique_lock<std::mutex> lock(m_mutex);
-  m_entry_notifications.emplace(name, value, flags, only);
-  lock.unlock();
-  m_cond.notify_one();
+  auto thr = m_owner.GetThread();
+  if (!thr) return;
+  thr->m_entry_notifications.emplace(name, value, flags, only);
+  thr->m_cond.notify_one();
 }
 
 unsigned int Notifier::AddConnectionListener(
     ConnectionListenerCallback callback) {
-  std::lock_guard<std::mutex> lock(m_mutex);
-  unsigned int uid = m_entry_listeners.size();
-  m_conn_listeners.emplace_back(callback);
+  auto thr = m_owner.GetThread();
+  if (!thr) {
+    Start();
+    thr = m_owner.GetThread();
+  }
+  unsigned int uid = thr->m_entry_listeners.size();
+  thr->m_conn_listeners.emplace_back(callback);
   return uid + 1;
 }
 
 void Notifier::RemoveConnectionListener(unsigned int conn_listener_uid) {
+  auto thr = m_owner.GetThread();
+  if (!thr) return;
   --conn_listener_uid;
-  std::lock_guard<std::mutex> lock(m_mutex);
-  if (conn_listener_uid < m_conn_listeners.size())
-    m_conn_listeners[conn_listener_uid] = nullptr;
+  if (conn_listener_uid < thr->m_conn_listeners.size())
+    thr->m_conn_listeners[conn_listener_uid] = nullptr;
 }
 
 void Notifier::NotifyConnection(bool connected,
                                 const ConnectionInfo& conn_info,
                                 ConnectionListenerCallback only) {
-  if (!m_active) return;
-  std::unique_lock<std::mutex> lock(m_mutex);
-  m_conn_notifications.emplace(connected, conn_info, only);
-  lock.unlock();
-  m_cond.notify_one();
+  auto thr = m_owner.GetThread();
+  if (!thr) return;
+  thr->m_conn_notifications.emplace(connected, conn_info, only);
+  thr->m_cond.notify_one();
 }

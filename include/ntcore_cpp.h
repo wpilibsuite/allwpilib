@@ -204,6 +204,9 @@ bool NotifierDestroyed();
  * Remote Procedure Call Functions
  */
 
+void SetRpcServerOnStart(std::function<void()> on_start);
+void SetRpcServerOnExit(std::function<void()> on_exit);
+
 typedef std::function<std::string(StringRef name, StringRef params)>
     RpcCallback;
 

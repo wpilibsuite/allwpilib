@@ -1262,7 +1262,7 @@ void Storage::CreateRpc(StringRef name, StringRef def, RpcCallback callback) {
   entry->rpc_callback = callback;
 
   // start the RPC server
-  if (!m_rpc_server.active()) m_rpc_server.Start();
+  m_rpc_server.Start();
 
   if (old_value && *old_value == *value) return;
 

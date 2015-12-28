@@ -75,9 +75,8 @@ void SetListenerOnExit(std::function<void()> on_exit) {
 
 unsigned int AddEntryListener(StringRef prefix, EntryListenerCallback callback,
                               unsigned int flags) {
-  Notifier& notifier = Notifier::GetInstance();
-  unsigned int uid = notifier.AddEntryListener(prefix, callback, flags);
-  notifier.Start();
+  unsigned int uid =
+      Notifier::GetInstance().AddEntryListener(prefix, callback, flags);
   if ((flags & NT_NOTIFY_IMMEDIATE) != 0)
     Storage::GetInstance().NotifyEntries(prefix, callback);
   return uid;
@@ -89,9 +88,7 @@ void RemoveEntryListener(unsigned int entry_listener_uid) {
 
 unsigned int AddConnectionListener(ConnectionListenerCallback callback,
                                    bool immediate_notify) {
-  Notifier& notifier = Notifier::GetInstance();
-  unsigned int uid = notifier.AddConnectionListener(callback);
-  Notifier::GetInstance().Start();
+  unsigned int uid = Notifier::GetInstance().AddConnectionListener(callback);
   if (immediate_notify) Dispatcher::GetInstance().NotifyConnections(callback);
   return uid;
 }
@@ -105,6 +102,14 @@ bool NotifierDestroyed() { return Notifier::destroyed(); }
 /*
  * Remote Procedure Call Functions
  */
+
+void SetRpcServerOnStart(std::function<void()> on_start) {
+  RpcServer::GetInstance().SetOnStart(on_start);
+}
+
+void SetRpcServerOnExit(std::function<void()> on_exit) {
+  RpcServer::GetInstance().SetOnExit(on_exit);
+}
 
 void CreateRpc(StringRef name, StringRef def, RpcCallback callback) {
   Storage::GetInstance().CreateRpc(name, def, callback);

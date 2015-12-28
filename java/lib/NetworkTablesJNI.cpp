@@ -10,6 +10,7 @@
 #include "edu_wpi_first_wpilibj_networktables_NetworkTablesJNI.h"
 #include "ntcore.h"
 #include "atomic_static.h"
+#include "SafeThread.h"
 
 //
 // Globals and load/unload
@@ -30,8 +31,12 @@ static JNIEnv *listenerEnv = nullptr;
 static void ListenerOnStart() {
   if (!jvm) return;
   JNIEnv *env;
-  if (jvm->AttachCurrentThread(reinterpret_cast<void **>(&env),
-                               nullptr) != JNI_OK)
+  JavaVMAttachArgs args;
+  args.version = JNI_VERSION_1_2;
+  args.name = const_cast<char*>("NTListener");
+  args.group = nullptr;
+  if (jvm->AttachCurrentThreadAsDaemon(reinterpret_cast<void **>(&env),
+                                       &args) != JNI_OK)
     return;
   if (!env || !env->functions) return;
   listenerEnv = env;
@@ -1281,28 +1286,10 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJN
 // Instead, this class attaches just once.  When a hardware notification
 // occurs, a condition variable wakes up this thread and this thread actually
 // makes the call into Java.
-class LoggerThreadJNI {
+class LoggerThreadJNI : public nt::SafeThread {
  public:
-  static LoggerThreadJNI& GetInstance() {
-    ATOMIC_STATIC(LoggerThreadJNI, instance);
-    return instance;
-  }
-  LoggerThreadJNI();
-  ~LoggerThreadJNI();
-  void SetFunc(JNIEnv* env, jobject func, jmethodID mid);
-  void Start();
-  void Stop();
+  void Main();
 
-  void Log(unsigned int level, const char* file, unsigned int line,
-           const char* msg);
-
- private:
-  void ThreadMain();
-
-  std::thread m_thread;
-  std::mutex m_mutex;
-  std::condition_variable m_cond;
-  std::atomic_bool m_active;
   struct LogMessage {
     LogMessage(unsigned int level_, const char* file_, unsigned int line_,
                const char* msg_)
@@ -1313,84 +1300,56 @@ class LoggerThreadJNI {
     std::string msg;
   };
   std::queue<LogMessage> m_queue;
-  std::mutex m_shutdown_mutex;
-  std::condition_variable m_shutdown_cv;
-  bool m_shutdown = false;
   jobject m_func = nullptr;
   jmethodID m_mid;
-
-  ATOMIC_STATIC_DECL(LoggerThreadJNI)
 };
 
-ATOMIC_STATIC_INIT(LoggerThreadJNI)
+class LoggerJNI : public nt::SafeThreadOwner<LoggerThreadJNI> {
+ public:
+  static LoggerJNI& GetInstance() {
+    ATOMIC_STATIC(LoggerJNI, instance);
+    return instance;
+  }
+  void SetFunc(JNIEnv* env, jobject func, jmethodID mid);
+  void Log(unsigned int level, const char* file, unsigned int line,
+           const char* msg);
 
-LoggerThreadJNI::LoggerThreadJNI() {
-  m_active = false;
-}
+ private:
+  ATOMIC_STATIC_DECL(LoggerJNI)
+};
 
-LoggerThreadJNI::~LoggerThreadJNI() {
-  Stop();
-}
+ATOMIC_STATIC_INIT(LoggerJNI)
 
-void LoggerThreadJNI::SetFunc(JNIEnv* env, jobject func, jmethodID mid) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+void LoggerJNI::SetFunc(JNIEnv* env, jobject func, jmethodID mid) {
+  auto thr = GetThread();
+  if (!thr) return;
   // free global reference
-  if (m_func) env->DeleteGlobalRef(m_func);
+  if (thr->m_func) env->DeleteGlobalRef(thr->m_func);
   // create global reference
-  m_func = env->NewGlobalRef(func);
-  m_mid = mid;
+  thr->m_func = env->NewGlobalRef(func);
+  thr->m_mid = mid;
 }
 
-void LoggerThreadJNI::Start() {
-  {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if (m_active) return;
-    m_active = true;
-  }
-  {
-    std::lock_guard<std::mutex> lock(m_shutdown_mutex);
-    m_shutdown = false;
-  }
-  m_thread = std::thread(&LoggerThreadJNI::ThreadMain, this);
+void LoggerJNI::Log(unsigned int level, const char *file, unsigned int line,
+                    const char *msg) {
+  auto thr = GetThread();
+  if (!thr) return;
+  thr->m_queue.emplace(level, file, line, msg);
+  thr->m_cond.notify_one();
 }
 
-void LoggerThreadJNI::Stop() {
-  {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if (!m_active) return;
-    m_active = false;
-  }
-  m_cond.notify_one();  // wake up thread
-
-  // join threads, with timeout
-  if (m_thread.joinable()) {
-    std::unique_lock<std::mutex> lock(m_shutdown_mutex);
-    auto timeout_time =
-        std::chrono::steady_clock::now() + std::chrono::seconds(1);
-    if (m_shutdown_cv.wait_until(lock, timeout_time,
-                                 [&] { return m_shutdown; }))
-      m_thread.join();
-    else
-      m_thread.detach();  // timed out, detach it
-  }
-}
-
-void LoggerThreadJNI::Log(unsigned int level, const char *file,
-                          unsigned int line, const char *msg) {
-  std::lock_guard<std::mutex> lock(m_mutex);
-  if (!m_active) return;
-  m_queue.emplace(level, file, line, msg);
-  m_cond.notify_one();
-}
-
-void LoggerThreadJNI::ThreadMain() {
+void LoggerThreadJNI::Main() {
   JNIEnv *env;
-  jint rs = jvm->AttachCurrentThread((void**)&env, NULL);
+  JavaVMAttachArgs args;
+  args.version = JNI_VERSION_1_2;
+  args.name = const_cast<char*>("NTLogger");
+  args.group = nullptr;
+  jint rs = jvm->AttachCurrentThreadAsDaemon((void**)&env, &args);
   if (rs != JNI_OK) return;
 
   std::unique_lock<std::mutex> lock(m_mutex);
   while (m_active) {
-    m_cond.wait(lock, [&] { return !m_active || !m_queue.empty(); });
+    m_cond.wait(lock, [&] { return !(m_active && m_queue.empty()); });
     if (!m_active) break;
     while (!m_queue.empty()) {
       if (!m_active) break;
@@ -1399,25 +1358,21 @@ void LoggerThreadJNI::ThreadMain() {
       auto func = m_func;
       auto mid = m_mid;
       lock.unlock();  // don't hold mutex during callback execution
-      env->CallVoidMethod(func, mid, (jint)item.level,
-                          ToJavaString(env, item.file), (jint)item.line,
-                          ToJavaString(env, item.msg));
-      if (env->ExceptionCheck()) {
-        env->ExceptionDescribe();
-        env->ExceptionClear();
+      {
+        JavaLocal<jstring> file(env, ToJavaString(env, item.file));
+        JavaLocal<jstring> msg(env, ToJavaString(env, item.msg));
+        env->CallVoidMethod(func, mid, (jint)item.level, file.obj(),
+                            (jint)item.line, msg.obj());
+        if (env->ExceptionCheck()) {
+          env->ExceptionDescribe();
+          env->ExceptionClear();
+        }
       }
       lock.lock();
     }
   }
 
   if (jvm) jvm->DetachCurrentThread();
-
-  // use condition variable to signal thread shutdown
-  {
-    std::lock_guard<std::mutex> lock(m_shutdown_mutex);
-    m_shutdown = true;
-    m_shutdown_cv.notify_one();
-  }
 }
 
 extern "C" {
@@ -1439,14 +1394,14 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
       cls, "apply", "(ILjava/lang/String;ILjava/lang/String;)V");
   if (!mid) return;
 
-  auto& thread = LoggerThreadJNI::GetInstance();
-  thread.SetFunc(env, func, mid);
-  thread.Start();
+  auto& logger = LoggerJNI::GetInstance();
+  logger.Start();
+  logger.SetFunc(env, func, mid);
 
   nt::SetLogger(
       [](unsigned int level, const char *file, unsigned int line,
          const char *msg) {
-        LoggerThreadJNI::GetInstance().Log(level, file, line, msg);
+        LoggerJNI::GetInstance().Log(level, file, line, msg);
       },
       minLevel);
 }

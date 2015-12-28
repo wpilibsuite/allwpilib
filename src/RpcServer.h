@@ -12,14 +12,13 @@
 #include <condition_variable>
 #include <mutex>
 #include <queue>
-#include <thread>
 #include <utility>
-#include <vector>
 
 #include "llvm/DenseMap.h"
 #include "atomic_static.h"
 #include "Message.h"
 #include "ntcore_cpp.h"
+#include "SafeThread.h"
 
 namespace nt {
 
@@ -37,7 +36,8 @@ class RpcServer {
   void Start();
   void Stop();
 
-  bool active() const { return m_active; }
+  void SetOnStart(std::function<void()> on_start) { m_on_start = on_start; }
+  void SetOnExit(std::function<void()> on_exit) { m_on_exit = on_exit; }
 
   void ProcessRpc(StringRef name, std::shared_ptr<Message> msg,
                   RpcCallback func, unsigned int conn_id,
@@ -50,13 +50,8 @@ class RpcServer {
  private:
   RpcServer();
 
-  void ThreadMain();
-
-  std::atomic_bool m_active;
-  std::atomic_bool m_terminating;
-
-  std::mutex m_mutex;
-  std::condition_variable m_call_cond, m_poll_cond;
+  class Thread;
+  SafeThreadOwner<Thread> m_owner;
 
   struct RpcCall {
     RpcCall(StringRef name_, std::shared_ptr<Message> msg_, RpcCallback func_,
@@ -73,15 +68,19 @@ class RpcServer {
     unsigned int conn_id;
     SendMsgFunc send_response;
   };
-  std::queue<RpcCall> m_call_queue, m_poll_queue;
 
+  std::mutex m_mutex;
+
+  std::queue<RpcCall> m_poll_queue;
   llvm::DenseMap<std::pair<unsigned int, unsigned int>, SendMsgFunc>
       m_response_map;
 
-  std::thread m_thread;
-  std::mutex m_shutdown_mutex;
-  std::condition_variable m_shutdown_cv;
-  bool m_shutdown = false;
+  std::condition_variable m_poll_cond;
+
+  std::atomic_bool m_terminating;
+
+  std::function<void()> m_on_start;
+  std::function<void()> m_on_exit;
 
   ATOMIC_STATIC_DECL(RpcServer)
 };

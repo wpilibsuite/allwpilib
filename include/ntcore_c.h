@@ -293,6 +293,9 @@ int NT_NotifierDestroyed();
  * Remote Procedure Call Functions
  */
 
+void NT_SetRpcServerOnStart(void (*on_start)(void *data), void *data);
+void NT_SetRpcServerOnExit(void (*on_exit)(void *data), void *data);
+
 typedef char *(*NT_RpcCallback)(void *data, const char *name, size_t name_len,
                                 const char *params, size_t params_len,
                                 size_t *results_len);
