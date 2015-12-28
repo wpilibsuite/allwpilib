@@ -121,7 +121,7 @@ function install-eclipse {
   fi
 
   tar -xf /tmp/eclipse.tar.gz -C /opt
-  ln -s /opt/eclipse/eclipse /usr/bin/eclipse
+  ln -fs /opt/eclipse/eclipse /usr/bin/eclipse
 }
 
 function install-desktops {
@@ -143,7 +143,7 @@ function install-toolchain {
   add-apt-repository ppa:openjdk-r/ppa -y
   add-apt-repository ppa:ubuntu-toolchain-r/test -y
   apt-get update
-  apt-get install libprotoc-dev libprotobuf-dev protobuf-compiler g++-4.9 openjdk-8-jdk -y
+  apt-get install cmake libprotoc-dev libprotobuf-dev protobuf-compiler g++-4.9 openjdk-8-jdk -y
   ln -fs /usr/bin/g++-4.9 /usr/bin/g++
 }
 
@@ -154,7 +154,9 @@ function install-models {
     install-fail
   fi
 
-  unzip /tmp/models.zip -d ~/wpilib/simulation
+  unzip /tmp/models.zip -d /tmp
+  mv /tmp/frcsim-gazebo-models/models ~/wpilib/simulation/models
+  mv /tmp/frcsim-gazebo-models/worlds ~/wpilib/simulation/worlds
 }
 
 function install-frcsim {
@@ -195,6 +197,8 @@ function install-frcsim {
   install-eclipse
   install-desktops
   install-models
+
+  sudo chown -R $USER:$USER ~/wpilib
 
   # Done
   echo "Installation Finished!!"

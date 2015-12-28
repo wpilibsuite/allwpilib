@@ -67,7 +67,7 @@ task allcsim(dependsOn: [wpilibcSim, gz_msgs, frc_gazebo_plugins]){
     group = 'WPILib Simulation'
 }
 
-task wpilibcSimCopy(type: Copy) {
+task wpilibcSimCopy(type: Copy, dependsOn: allcsim) {
     description = 'copy headers and ntcore library to make simulation zip'
     group = 'WPILib Simulation'
     into "$simulationInstallDir"

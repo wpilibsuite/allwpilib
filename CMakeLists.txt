@@ -5,27 +5,9 @@ include(CheckCXXCompilerFlag)
 include (FindPkgConfig)
 include(GNUInstallDirs)
 
-#copied from GazeboUtils.cmake
-macro (APPEND_TO_CACHED_STRING _string _cacheDesc)
-  FOREACH (newItem ${ARGN})
-    SET (${_string} "${${_string}} ${newItem}" CACHE INTERNAL ${_cacheDesc} FORCE)
-  ENDFOREACH (newItem ${ARGN})
-endmacro (APPEND_TO_CACHED_STRING)
-
 #check for depenedencies
 find_package(gazebo REQUIRED)
 find_package(Boost COMPONENTS system filesystem REQUIRED)
-find_package(Protobuf REQUIRED)
-
-if (NOT PROTOBUF_FOUND)
-	MESSAGE ("Missing: Google Protobuf (libprotobuf-dev)")
-endif()
-if (NOT PROTOBUF_PROTOC_EXECUTABLE)
-	MESSAGE ( "Missing: Google Protobuf Compiler (protobuf-compiler)")
-endif()
-if (NOT PROTOBUF_PROTOC_LIBRARY)
-	MESSAGE ("Missing: Google Protobuf Compiler Library (libprotoc-dev)")
-endif()
 
 #on windows we produce .dlls with no prefix
 if(WIN32)

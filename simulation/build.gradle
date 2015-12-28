@@ -5,7 +5,7 @@ publishing {
     publications {
         simulation(MavenPublication) {
             artifact zip
-            groupId 'simulation'
+            groupId 'edu.wpi.first.wpilib.simulation'
             artifactId 'simulation'
             version '1.0.0'
         }
