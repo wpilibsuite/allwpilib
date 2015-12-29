@@ -20,12 +20,11 @@ std::atomic<bool> Notifier::m_stopped(false);
  * @param handler The handler is called at the notification time which is set
  * using StartSingle or StartPeriodic.
  */
-Notifier::Notifier(TimerEventHandler handler, void *param)
+Notifier::Notifier(TimerEventHandler handler)
 {
 	if (handler == nullptr)
 		wpi_setWPIErrorWithContext(NullParameter, "handler must not be nullptr");
 	m_handler = handler;
-	m_param = param;
 	m_periodic = false;
 	m_expirationTime = 0;
 	m_period = 0;
@@ -112,7 +111,7 @@ void Notifier::ProcessQueue(uint32_t mask, void *params)
 			current->m_handlerMutex.lock();
 		}
 
-		current->m_handler(current->m_param);	// call the event handler
+		current->m_handler();	// call the event handler
 		current->m_handlerMutex.unlock();
 	}
 	// reschedule the first item in the queue

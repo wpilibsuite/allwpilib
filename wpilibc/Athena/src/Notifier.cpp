@@ -16,11 +16,10 @@
  * @param handler The handler is called at the notification time which is set
  * using StartSingle or StartPeriodic.
  */
-Notifier::Notifier(TimerEventHandler handler, void *param) {
+Notifier::Notifier(TimerEventHandler handler) {
   if (handler == nullptr)
     wpi_setWPIErrorWithContext(NullParameter, "handler must not be nullptr");
   m_handler = handler;
-  m_param = param;
   int32_t status = 0;
   m_notifier = initializeNotifier(&Notifier::Notify, this, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -62,12 +61,11 @@ void Notifier::Notify(uint32_t currentTimeInt, void *param) {
   }
 
   auto handler = notifier->m_handler;
-  auto hparam = notifier->m_param;
 
   notifier->m_handlerMutex.lock();
   notifier->m_processMutex.unlock();
 
-  if (handler) handler(hparam);
+  if (handler) handler();
   notifier->m_handlerMutex.unlock();
 }
 

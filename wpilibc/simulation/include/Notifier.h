@@ -5,16 +5,25 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
+#include <atomic>
+#include <functional>
+#include <thread>
+
 #include "ErrorBase.h"
 #include "HAL/cpp/priority_mutex.h"
-#include <thread>
-#include <atomic>
 
-typedef void (*TimerEventHandler)(void *param);
+typedef std::function<void()> TimerEventHandler;
 
 class Notifier : public ErrorBase {
  public:
-  Notifier(TimerEventHandler handler, void *param = nullptr);
+  explicit Notifier(TimerEventHandler handler);
+
+  template <typename Callable, typename Arg, typename... Args>
+  Notifier(Callable&& f, Arg&& arg, Args&&... args)
+      : Notifier(std::bind(std::forward<Callable>(f),
+                           std::forward<Arg>(arg),
+                           std::forward<Args>(args)...)) {}
+
   virtual ~Notifier();
 
   Notifier(const Notifier&) = delete;
@@ -42,8 +51,6 @@ class Notifier : public ErrorBase {
 
   // address of the handler
   TimerEventHandler m_handler;
-  // a parameter to pass to the handler
-  void *m_param;
   // the relative time (either periodic or single)
   double m_period = 0;
   // absolute expiration time for the current event
