@@ -71,7 +71,10 @@ Notifier::Notifier() {
 
 Notifier::~Notifier() { s_destroyed = true; }
 
-void Notifier::Start() { m_owner.Start(new Thread(m_on_start, m_on_exit)); }
+void Notifier::Start() {
+  auto thr = m_owner.GetThread();
+  if (!thr) m_owner.Start(new Thread(m_on_start, m_on_exit));
+}
 
 void Notifier::Stop() { m_owner.Stop(); }
 
@@ -165,11 +168,8 @@ done:
 unsigned int Notifier::AddEntryListener(StringRef prefix,
                                         EntryListenerCallback callback,
                                         unsigned int flags) {
+  Start();
   auto thr = m_owner.GetThread();
-  if (!thr) {
-    Start();
-    thr = m_owner.GetThread();
-  }
   unsigned int uid = thr->m_entry_listeners.size();
   thr->m_entry_listeners.emplace_back(prefix, callback, flags);
   if ((flags & NT_NOTIFY_LOCAL) != 0) m_local_notifiers = true;
@@ -197,11 +197,8 @@ void Notifier::NotifyEntry(StringRef name, std::shared_ptr<Value> value,
 
 unsigned int Notifier::AddConnectionListener(
     ConnectionListenerCallback callback) {
+  Start();
   auto thr = m_owner.GetThread();
-  if (!thr) {
-    Start();
-    thr = m_owner.GetThread();
-  }
   unsigned int uid = thr->m_entry_listeners.size();
   thr->m_conn_listeners.emplace_back(callback);
   return uid + 1;
