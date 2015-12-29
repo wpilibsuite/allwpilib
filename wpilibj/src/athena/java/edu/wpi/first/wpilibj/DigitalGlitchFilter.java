@@ -45,6 +45,7 @@ public class DigitalGlitchFilter extends SensorBase {
       synchronized(m_mutex) {
         m_filterAllocated[m_channelIndex] = false;
       }
+      m_channelIndex = -1;
     }
   }
 
