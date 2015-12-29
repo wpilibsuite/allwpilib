@@ -1,5 +1,24 @@
-cmake_minimum_required(VERSION 2.8)
+Cmake_minimum_required(VERSION 2.8)
 project(gz_msgs)
+
+#copied from GazeboUtils.cmake
+macro (APPEND_TO_CACHED_STRING _string _cacheDesc)
+  FOREACH (newItem ${ARGN})
+    SET (${_string} "${${_string}} ${newItem}" CACHE INTERNAL ${_cacheDesc} FORCE)
+  ENDFOREACH (newItem ${ARGN})
+endmacro (APPEND_TO_CACHED_STRING)
+
+find_package(Protobuf REQUIRED)
+
+if (NOT PROTOBUF_FOUND)
+	MESSAGE ("Missing: Google Protobuf (libprotobuf-dev)")
+endif()
+if (NOT PROTOBUF_PROTOC_EXECUTABLE)
+	MESSAGE ( "Missing: Google Protobuf Compiler (protobuf-compiler)")
+endif()
+if (NOT PROTOBUF_PROTOC_LIBRARY)
+	MESSAGE ("Missing: Google Protobuf Compiler Library (libprotoc-dev)")
+endif()
 
 #list all proto files used
 get_filename_component(PROTO_DIR src/main/proto ABSOLUTE)
@@ -62,10 +81,9 @@ else()
 endif()
 
 target_link_libraries(${PROJECT_NAME} ${PROTOBUF_LIBRARIES})
-set_target_properties(${PROJECT_NAME}
-  PROPERTIES
-  INSTALL_RPATH "${ENV_HOME}/wpilib/simulation/lib"
-  LIBRARY_OUTPUT_DIRECTORY ${SIMULATION_INSTALL_DIR}/lib)
+set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "$ENV{HOME}/wpilib/simulation/lib")
 
-file(COPY "${GZ_MSGS_INCLUDE_DIR}/simulation"
-  DESTINATION "${CMAKE_BINARY_DIR}/install/simulation/include")
+install(TARGETS ${PROJECT_NAME}
+  DESTINATION "$ENV{HOME}/wpilib/simulation/lib")
+install(DIRECTORY "${GZ_MSGS_INCLUDE_DIR}/simulation"
+  DESTINATION "$ENV{HOME}/wpilib/simulation/include")
