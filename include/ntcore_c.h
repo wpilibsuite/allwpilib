@@ -328,18 +328,20 @@ struct NT_Value **NT_UnpackRpcValues(const char *packed, size_t packed_len,
 void NT_SetNetworkIdentity(const char *name, size_t name_len);
 
 /** Start Server
-* Starts a server using the specified filename, listening address, and port.
-*
-* @param persist_filename  the name of the persist file to use (UTF-8 string, null terminated)
-* @param listen_address    the address to listen on, or null to listen on any address. (UTF-8 string, null terminated)
-* @param port              port to communicate over.
-*/
+ * Starts a server using the specified filename, listening address, and port.
+ *
+ * @param persist_filename  the name of the persist file to use (UTF-8 string,
+ *                          null terminated)
+ * @param listen_address    the address to listen on, or null to listen on any
+ *                          address. (UTF-8 string, null terminated)
+ * @param port              port to communicate over.
+ */
 void NT_StartServer(const char *persist_filename, const char *listen_address,
                     unsigned int port);
 
 /** Stop Server
  * Stops the server if it is running.
-*/
+ */
 void NT_StopServer(void);
 
 /** Starts Client
@@ -348,22 +350,22 @@ void NT_StopServer(void);
  * @param server_name server name (UTF-8 string, null terminated)
  * @param port        port to communicate over
  *
-*/
+ */
 void NT_StartClient(const char *server_name, unsigned int port);
 
 /** Stop Client
  * Stops the client if it is running.
-*/
+ */
 void NT_StopClient(void);
 
 /** Stop Rpc Server
  * Stops the Rpc server if it is running.
-*/
+ */
 void NT_StopRpcServer(void);
 
 /** Stop Notifier
  * Stops the Notifier (Entry and Connection Listener) thread if it is running.
-*/
+ */
 void NT_StopNotifier(void);
 
 /** Set Update Rate
@@ -371,7 +373,7 @@ void NT_StopNotifier(void);
  *
  * @param interval  the interval to update the table at (in seconds)
  *
-*/
+ */
 void NT_SetUpdateRate(double interval);
 
 /** Get Connections
@@ -382,7 +384,7 @@ void NT_SetUpdateRate(double interval);
  *
  * It is the caller's responsibility to free the array. The
  * NT_DisposeConnectionInfoArray function is useful for this purpose.
-*/
+ */
 struct NT_ConnectionInfo *NT_GetConnections(size_t *count);
 
 /*
@@ -418,7 +420,7 @@ enum NT_Type NT_GetType(const char *name, size_t name_len);
  * @param arr   pointer to the array to dispose
  * @param count number of elements in the array
  *
-*/
+ */
 void NT_DisposeConnectionInfoArray(struct NT_ConnectionInfo *arr, size_t count);
 
 /** Dispose Entry Info Array
@@ -427,7 +429,7 @@ void NT_DisposeConnectionInfoArray(struct NT_ConnectionInfo *arr, size_t count);
  * @param arr   pointer to the array to dispose
  * @param count number of elements in the array
  *
-*/
+ */
 void NT_DisposeEntryInfoArray(struct NT_EntryInfo *arr, size_t count);
 
 /** Dispose Rpc Definition
@@ -435,7 +437,7 @@ void NT_DisposeEntryInfoArray(struct NT_EntryInfo *arr, size_t count);
  *
  * @param def  pointer to the struct to dispose
  *
-*/
+ */
 void NT_DisposeRpcDefinition(struct NT_RpcDefinition *def);
 
 /** Dispose Rpc Call Info
@@ -443,7 +445,7 @@ void NT_DisposeRpcDefinition(struct NT_RpcDefinition *def);
  *
  * @param def  pointer to the struct to dispose
  *
-*/
+ */
 void NT_DisposeRpcCallInfo(struct NT_RpcCallInfo *call_info);
 
 /* timestamp */
@@ -455,8 +457,8 @@ typedef void (*NT_LogFunc)(unsigned int level, const char *file,
 void NT_SetLogger(NT_LogFunc func, unsigned int min_level);
 
 /*
-Interop Utility Functions
-*/
+ * Interop Utility Functions
+ */
 
 /* Memory Allocators */
 
@@ -470,7 +472,7 @@ Interop Utility Functions
  *
  * After use, the array should be freed using the NT_FreeCharArray()
  * function.
-*/
+ */
 char *NT_AllocateCharArray(size_t size);
 
 /** Allocate Boolean Array
@@ -483,7 +485,7 @@ char *NT_AllocateCharArray(size_t size);
  *
  * After use, the array should be freed using the NT_FreeBooleanArray()
  * function.
-*/
+ */
 int *NT_AllocateBooleanArray(size_t size);
 
 /** Allocate Double Array
@@ -496,7 +498,7 @@ int *NT_AllocateBooleanArray(size_t size);
  *
  * After use, the array should be freed using the NT_FreeDoubleArray()
  * function.
-*/
+ */
 double *NT_AllocateDoubleArray(size_t size);
 
 /** Allocate NT_String Array
@@ -509,28 +511,28 @@ double *NT_AllocateDoubleArray(size_t size);
  *
  * After use, the array should be freed using the NT_FreeStringArray()
  * function.
-*/
+ */
 struct NT_String *NT_AllocateStringArray(size_t size);
 
 /** Free Char Array
  * Frees an array of chars.
  *
  * @param v_boolean  pointer to the char array to free
-*/
+ */
 void NT_FreeCharArray(char *v_char);
 
 /** Free Double Array
  * Frees an array of doubles.
  *
  * @param v_boolean  pointer to the double array to free
-*/
+ */
 void NT_FreeDoubleArray(double *v_double);
 
 /** Free Boolean Array
  * Frees an array of booleans.
  *
  * @param v_boolean  pointer to the boolean array to free
-*/
+ */
 void NT_FreeBooleanArray(int *v_boolean);
 
 /** Free String Array
@@ -542,7 +544,7 @@ void NT_FreeBooleanArray(int *v_boolean);
  * Note that the individual NT_Strings in the array should NOT be
  * freed before calling this. This function will free all the strings
  * individually.
-*/
+ */
 void NT_FreeStringArray(struct NT_String *v_string, size_t arr_size);
 
 /** Get Value Type
@@ -551,42 +553,36 @@ void NT_FreeStringArray(struct NT_String *v_string, size_t arr_size);
  *
  * @param value  The NT_Value struct to get the type from.
  * @return       The type of the value, or unassigned if null.
- *
-*/
+ */
 enum NT_Type NT_GetValueType(const struct NT_Value *value);
 
 /** Get Value Boolean
  * Returns the boolean from the NT_Value.
- * If the NT_Value is null, or is assigned to a
- * different type, returns 0.
+ * If the NT_Value is null, or is assigned to a different type, returns 0.
  *
  * @param value       NT_Value struct to get the boolean from
  * @param last_change returns time in ms since the last change in the value
  * @param v_boolean   returns the boolean assigned to the name
  * @return            1 if successful, or 0 if value is null or not a boolean
- *
-*/
+ */
 int NT_GetValueBoolean(const struct NT_Value *value,
                        unsigned long long *last_change, int *v_boolean);
 
 /** Get Value Double
  * Returns the double from the NT_Value.
- * If the NT_Value is null, or is assigned to a
- * different type, returns 0.
+ * If the NT_Value is null, or is assigned to a different type, returns 0.
  *
  * @param value       NT_Value struct to get the double from
  * @param last_change returns time in ms since the last change in the value
  * @param v_double    returns the boolean assigned to the name
  * @return            1 if successful, or 0 if value is null or not a double
- *
-*/
+ */
 int NT_GetValueDouble(const struct NT_Value *value,
                       unsigned long long *last_change, double *v_double);
 
 /** Get Value String
  * Returns a copy of the string from the NT_Value.
- * If the NT_Value is null, or is assigned to a
- * different type, returns 0.
+ * If the NT_Value is null, or is assigned to a different type, returns 0.
  *
  * @param value       NT_Value struct to get the string from
  * @param last_change returns time in ms since the last change in the value
@@ -594,17 +590,16 @@ int NT_GetValueDouble(const struct NT_Value *value,
  * @return            pointer to the string (UTF-8), or null if error
  *
  * It is the caller's responsibility to free the string once its no longer
- * needed. The NT_FreeCharArray() function is useful for this purpose. The returned
- * string is a copy of the string in the value, and must be freed seperately.
- *
-*/
+ * needed. The NT_FreeCharArray() function is useful for this purpose. The
+ * returned string is a copy of the string in the value, and must be freed
+ * separately.
+ */
 char *NT_GetValueString(const struct NT_Value *value,
                         unsigned long long *last_change, size_t *str_len);
 
 /** Get Value Raw
  * Returns a copy of the raw value from the NT_Value.
- * If the NT_Value is null, or is assigned to a
- * different type, returns null.
+ * If the NT_Value is null, or is assigned to a different type, returns null.
  *
  * @param value       NT_Value struct to get the string from
  * @param last_change returns time in ms since the last change in the value
@@ -612,17 +607,16 @@ char *NT_GetValueString(const struct NT_Value *value,
  * @return            pointer to the raw value (UTF-8), or null if error
  *
  * It is the caller's responsibility to free the raw value once its no longer
- * needed. The NT_FreeCharArray() function is useful for this purpose. The returned
- * string is a copy of the string in the value, and must be freed seperately.
- *
-*/
+ * needed. The NT_FreeCharArray() function is useful for this purpose. The
+ * returned string is a copy of the string in the value, and must be freed
+ * separately.
+ */
 char *NT_GetValueRaw(const struct NT_Value *value,
                      unsigned long long *last_change, size_t *raw_len);
 
 /** Get Value Boolean Array
  * Returns a copy of the boolean array from the NT_Value.
- * If the NT_Value is null, or is assigned to a
- * different type, returns null.
+ * If the NT_Value is null, or is assigned to a different type, returns null.
  *
  * @param value       NT_Value struct to get the boolean array from
  * @param last_change returns time in ms since the last change in the value
@@ -632,16 +626,14 @@ char *NT_GetValueRaw(const struct NT_Value *value,
  * It is the caller's responsibility to free the array once its no longer
  * needed. The NT_FreeBooleanArray() function is useful for this purpose.
  * The returned array is a copy of the array in the value, and must be
- * freed seperately.
- *
-*/
+ * freed separately.
+ */
 int *NT_GetValueBooleanArray(const struct NT_Value *value,
                              unsigned long long *last_change, size_t *arr_size);
 
 /** Get Value Double Array
  * Returns a copy of the double array from the NT_Value.
- * If the NT_Value is null, or is assigned to a
- * different type, returns null.
+ * If the NT_Value is null, or is assigned to a different type, returns null.
  *
  * @param value       NT_Value struct to get the double array from
  * @param last_change returns time in ms since the last change in the value
@@ -651,17 +643,15 @@ int *NT_GetValueBooleanArray(const struct NT_Value *value,
  * It is the caller's responsibility to free the array once its no longer
  * needed. The NT_FreeDoubleArray() function is useful for this purpose.
  * The returned array is a copy of the array in the value, and must be
- * freed seperately.
- *
-*/
+ * freed separately.
+ */
 double *NT_GetValueDoubleArray(const struct NT_Value *value,
                                unsigned long long *last_change,
                                size_t *arr_size);
 
 /** Get Value String Array
  * Returns a copy of the NT_String array from the NT_Value.
- * If the NT_Value is null, or is assigned to a
- * different type, returns null.
+ * If the NT_Value is null, or is assigned to a different type, returns null.
  *
  * @param value       NT_Value struct to get the NT_String array from
  * @param last_change returns time in ms since the last change in the value
@@ -672,10 +662,9 @@ double *NT_GetValueDoubleArray(const struct NT_Value *value,
  * needed. The NT_FreeStringArray() function is useful for this purpose.
  * The returned array is a copy of the array in the value, and must be
  * freed seperately. Note that the individual NT_Strings should not be freed, 
- * but the entire array should be freed at once. The NT_FreeStringArray() function 
- * will free all the NT_Strings.
- *
-*/
+ * but the entire array should be freed at once. The NT_FreeStringArray()
+ * function will free all the NT_Strings.
+ */
 NT_String *NT_GetValueStringArray(const struct NT_Value *value,
                                   unsigned long long *last_change,
                                   size_t *arr_size);
@@ -689,9 +678,9 @@ NT_String *NT_GetValueStringArray(const struct NT_Value *value,
  * @param name_len    length of name in bytes
  * @param last_change returns time in ms since the last change in the value
  * @param v_boolean   returns the boolean assigned to the name
- * @return            1 if successful, or 0 if value is unassigned or not a boolean
- *
-*/
+ * @return            1 if successful, or 0 if value is unassigned or not a
+ *                    boolean
+ */
 int NT_GetEntryBoolean(const char *name, size_t name_len,
                        unsigned long long *last_change, int *v_boolean);
 
@@ -704,9 +693,9 @@ int NT_GetEntryBoolean(const char *name, size_t name_len,
  * @param name_len    length of name in bytes
  * @param last_change returns time in ms since the last change in the value
  * @param v_double    returns the double assigned to the name
- * @return            1 if successful, or 0 if value is unassigned or not a double
- *
-*/
+ * @return            1 if successful, or 0 if value is unassigned or not a
+ *                    double
+ */
 int NT_GetEntryDouble(const char *name, size_t name_len,
                       unsigned long long *last_change, double *v_double);
 
@@ -723,8 +712,7 @@ int NT_GetEntryDouble(const char *name, size_t name_len,
  *
  * It is the caller's responsibility to free the string once its no longer
  * needed. The NT_FreeCharArray() function is useful for this purpose.
- *
-*/
+ */
 char *NT_GetEntryString(const char *name, size_t name_len,
                         unsigned long long *last_change, size_t *str_len);
 
@@ -741,8 +729,7 @@ char *NT_GetEntryString(const char *name, size_t name_len,
  *
  * It is the caller's responsibility to free the raw value once its no longer
  * needed. The NT_FreeCharArray() function is useful for this purpose.
- *
-*/
+ */
 char *NT_GetEntryRaw(const char *name, size_t name_len,
                      unsigned long long *last_change, size_t *raw_len);
 
@@ -759,8 +746,7 @@ char *NT_GetEntryRaw(const char *name, size_t name_len,
  *
  * It is the caller's responsibility to free the array once its no longer
  * needed. The NT_FreeBooleanArray() function is useful for this purpose.
- *
-*/
+ */
 int *NT_GetEntryBooleanArray(const char *name, size_t name_len,
                              unsigned long long *last_change, size_t *arr_size);
 
@@ -777,8 +763,7 @@ int *NT_GetEntryBooleanArray(const char *name, size_t name_len,
  *
  * It is the caller's responsibility to free the array once its no longer
  * needed. The NT_FreeDoubleArray() function is useful for this purpose.
- *
-*/
+ */
 double *NT_GetEntryDoubleArray(const char *name, size_t name_len,
                                unsigned long long *last_change,
                                size_t *arr_size);
@@ -799,8 +784,7 @@ double *NT_GetEntryDoubleArray(const char *name, size_t name_len,
  * that the individual NT_Strings should not be freed, but the entire array
  * should be freed at once. The NT_FreeStringArray() function will free all the
  * NT_Strings.
- *
-*/
+ */
 NT_String *NT_GetEntryStringArray(const char *name, size_t name_len,
                                   unsigned long long *last_change,
                                   size_t *arr_size);
@@ -808,36 +792,34 @@ NT_String *NT_GetEntryStringArray(const char *name, size_t name_len,
 /* Entry Value Setters */
 
 /** Set Entry Boolean
- * Sets an entry boolean. If the entry name is not currently assigned to a boolean,
- * returns error unless the force parameter is set.
+ * Sets an entry boolean. If the entry name is not currently assigned to a
+ * boolean, returns error unless the force parameter is set.
  *
  * @param name      entry name (UTF-8 string)
  * @param name_len  length of name in bytes
  * @param v_boolean boolean value to set
  * @param force     1 to force the entry to get overwritten, otherwise 0
  * @return          0 on error (type mismatch), 1 on success
- *
-*/
+ */
 int NT_SetEntryBoolean(const char *name, size_t name_len, int v_boolean,
-  int force);
+                       int force);
 
 /** Set Entry Double
- * Sets an entry double. If the entry name is not currently assigned to a double,
- * returns error unless the force parameter is set.
+ * Sets an entry double. If the entry name is not currently assigned to a
+ * double, returns error unless the force parameter is set.
  *
  * @param name      entry name (UTF-8 string)
  * @param name_len  length of name in bytes
  * @param v_double  double value to set
  * @param force     1 to force the entry to get overwritten, otherwise 0
  * @return          0 on error (type mismatch), 1 on success
- *
-*/
+ */
 int NT_SetEntryDouble(const char *name, size_t name_len, double v_double,
                       int force);
 
 /** Set Entry String
- * Sets an entry string. If the entry name is not currently assigned to a string,
- * returns error unless the force parameter is set.
+ * Sets an entry string. If the entry name is not currently assigned to a
+ * string, returns error unless the force parameter is set.
  *
  * @param name      entry name (UTF-8 string)
  * @param name_len  length of name in bytes
@@ -845,8 +827,7 @@ int NT_SetEntryDouble(const char *name, size_t name_len, double v_double,
  * @param str_len   length of string to write in bytes
  * @param force     1 to force the entry to get overwritten, otherwise 0
  * @return          0 on error (type mismatch), 1 on success
- *
-*/
+ */
 int NT_SetEntryString(const char *name, size_t name_len, const char *str,
                       size_t str_len, int force);
 
@@ -860,14 +841,13 @@ int NT_SetEntryString(const char *name, size_t name_len, const char *str,
  * @param raw_len   length of raw string to write in bytes
  * @param force     1 to force the entry to get overwritten, otherwise 0
  * @return          0 on error (type mismatch), 1 on success
- *
-*/
+ */
 int NT_SetEntryRaw(const char *name, size_t name_len, const char *raw,
                    size_t raw_len, int force);
 
 /** Set Entry Boolean Array
- * Sets an entry boolean array. If the entry name is not currently assigned to a boolean
- * array, returns error unless the force parameter is set.
+ * Sets an entry boolean array. If the entry name is not currently assigned to
+ * a boolean array, returns error unless the force parameter is set.
  *
  * @param name      entry name (UTF-8 string)
  * @param name_len  length of name in bytes
@@ -875,14 +855,13 @@ int NT_SetEntryRaw(const char *name, size_t name_len, const char *raw,
  * @param size      number of elements in the array
  * @param force     1 to force the entry to get overwritten, otherwise 0
  * @return          0 on error (type mismatch), 1 on success
- *
-*/
+ */
 int NT_SetEntryBooleanArray(const char *name, size_t name_len, const int *arr,
                             size_t size, int force);
 
 /** Set Entry Double Array
- * Sets an entry double array. If the entry name is not currently assigned to a double
- * array, returns error unless the force parameter is set.
+ * Sets an entry double array. If the entry name is not currently assigned to
+ * a double array, returns error unless the force parameter is set.
  *
  * @param name      entry name (UTF-8 string)
  * @param name_len  length of name in bytes
@@ -890,14 +869,13 @@ int NT_SetEntryBooleanArray(const char *name, size_t name_len, const int *arr,
  * @param size      number of elements in the array
  * @param force     1 to force the entry to get overwritten, otherwise 0
  * @return          0 on error (type mismatch), 1 on success
- *
-*/
+ */
 int NT_SetEntryDoubleArray(const char *name, size_t name_len, const double *arr,
                            size_t size, int force);
 
 /** Set Entry String Array
- * Sets an entry string array. If the entry name is not currently assigned to a string
- * array, returns error unless the force parameter is set.
+ * Sets an entry string array. If the entry name is not currently assigned to
+ * a string array, returns error unless the force parameter is set.
  *
  * @param name      entry name (UTF-8 string)
  * @param name_len  length of name in bytes
@@ -905,7 +883,6 @@ int NT_SetEntryDoubleArray(const char *name, size_t name_len, const double *arr,
  * @param size      number of elements in the array
  * @param force     1 to force the entry to get overwritten, otherwise 0
  * @return          0 on error (type mismatch), 1 on success
- *
  */
 int NT_SetEntryStringArray(const char *name, size_t name_len,
                            const struct NT_String *arr, size_t size, int force);
