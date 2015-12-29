@@ -7,6 +7,8 @@ if (!hasProperty('repo')) {
     }
 }
 
+ext.buildArm = !project.hasProperty('skipArm')
+
 if (hasProperty('makeDesktop')) {
     println 'Making desktop classifier jar. NOTE: This desktop version should only be used for local testing.' +
             'It will only support the current platform, and will override fetching the latest development version from' +
@@ -161,19 +163,21 @@ def ntcoreZipTask = { project ->
     }
 }
 
-project(':arm') {
-    apply plugin: 'cpp'
+if (buildArm) {
+    project(':arm') {
+        apply plugin: 'cpp'
 
-    ext.buildPlatform = 'arm'
-    ext.isArm = true
+        ext.buildPlatform = 'arm'
+        ext.isArm = true
 
-    apply from: '../toolchains/arm.gradle'
-    if (includeJava) {
-        apply from: '../java/java.gradle'
+        apply from: '../toolchains/arm.gradle'
+        if (includeJava) {
+            apply from: '../java/java.gradle'
+        }
+
+        setupModel(project, true)
+        ntcoreZipTask(project)
     }
-
-    setupModel(project, true)
-    ntcoreZipTask(project)
 }
 
 project(':native') {

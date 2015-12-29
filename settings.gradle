@@ -1,1 +1,5 @@
-include 'arm', 'native', 'gmock'
+include 'native', 'gmock'
+
+if (!hasProperty('skipArm')) {
+    include 'arm'
+}
