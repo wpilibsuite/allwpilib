@@ -7,13 +7,14 @@ apply plugin: 'maven-publish'
 publishing {
     publications {
         def nat = project('native')
-        def arm = project('arm')
         if (!project.hasProperty('skipJava')) {
             java(MavenPublication) {
                 artifact nat.jar
-                artifact arm.jar
                 artifact nat.networktablesJavaSource
                 artifact nat.networktablesJavadoc
+                if (project.buildArm) {
+                    artifact project('arm').jar
+                }
 
                 if (project.hasProperty('makeDesktop')) {
                     artifact nat.jar, {
@@ -28,8 +29,10 @@ publishing {
         }
         cpp(MavenPublication) {
             artifact nat.ntcoreZip
-            artifact arm.ntcoreZip
             artifact ntcoreSourceZip
+            if (project.buildArm) {
+                artifact project(':arm').ntcoreZip
+            }
 
             if (project.hasProperty('makeDesktop')) {
                 artifact nat.ntcoreZip, {

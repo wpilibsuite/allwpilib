@@ -24,6 +24,12 @@ To build just the Native or ARM version, you must access the approriate subproje
 ./gradlew :native:build # Builds just the native version of ntcore
 ```
 
+If you do not have the arm toolchain installed on your computer, you will run into build issues. To disable the arm platform entirely, run with the flag `-PskipArm`, and it will be entirely skipped.
+
+```bash
+./gradlew build -PskipArm # Builds native, disables the arm project
+```
+
 The native version of ntcore will run tests on build. The arm version will not, as the current platform likely does not allow running of an ARM binary.
 
 ## Testing
