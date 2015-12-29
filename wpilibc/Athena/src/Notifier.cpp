@@ -11,12 +11,6 @@
 #include "WPIErrors.h"
 #include "HAL/HAL.hpp"
 
-Notifier *Notifier::timerQueueHead = nullptr;
-priority_recursive_mutex Notifier::queueMutex;
-priority_mutex Notifier::halMutex;
-void *Notifier::m_notifier = nullptr;
-std::atomic<int> Notifier::refcount{0};
-
 /**
  * Create a Notifier for timer event notification.
  * @param handler The handler is called at the notification time which is set
@@ -27,41 +21,18 @@ Notifier::Notifier(TimerEventHandler handler, void *param) {
     wpi_setWPIErrorWithContext(NullParameter, "handler must not be nullptr");
   m_handler = handler;
   m_param = param;
-  // do the first time intialization of static variables
-  if (refcount.fetch_add(1) == 0) {
-    int32_t status = 0;
-    {
-      std::lock_guard<priority_mutex> sync(halMutex);
-      if (!m_notifier)
-        m_notifier = initializeNotifier(ProcessQueue, nullptr, &status);
-    }
-    wpi_setErrorWithContext(status, getHALErrorMessage(status));
-  }
+  int32_t status = 0;
+  m_notifier = initializeNotifier(&Notifier::Notify, this, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
  * Free the resources for a timer event.
- * All resources will be freed and the timer event will be removed from the
- * queue if necessary.
  */
 Notifier::~Notifier() {
-  {
-    std::lock_guard<priority_recursive_mutex> sync(queueMutex);
-    DeleteFromQueue();
-  }
-
-  // Delete the static variables when the last one is going away
-  if (refcount.fetch_sub(1) == 1) {
-    int32_t status = 0;
-    {
-      std::lock_guard<priority_mutex> sync(halMutex);
-      if (m_notifier) {
-        cleanNotifier(m_notifier, &status);
-        m_notifier = nullptr;
-      }
-    }
-    wpi_setErrorWithContext(status, getHALErrorMessage(status));
-  }
+  int32_t status = 0;
+  cleanNotifier(m_notifier, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
   // Acquire the mutex; this makes certain that the handler is
   // not being executed by the interrupt manager.
@@ -69,149 +40,35 @@ Notifier::~Notifier() {
 }
 
 /**
- * Update the alarm hardware to reflect the current first element in the queue.
- * Compute the time the next alarm should occur based on the current time and
- * the
- * period for the first element in the timer queue.
- * WARNING: this method does not do synchronization! It must be called from
- * somewhere
- * that is taking care of synchronizing access to the queue.
+ * Update the HAL alarm time.
  */
 void Notifier::UpdateAlarm() {
-  if (timerQueueHead != nullptr) {
-    int32_t status = 0;
-    // This locking is necessary in order to avoid two things:
-    //  1) Race condition issues with calling cleanNotifer() and
-    //     updateNotifierAlarm() at the same time.
-    //  2) Avoid deadlock by making it so that this won't block waiting
-    //     for the mutex to unlock.
-    // Checking refcount as well is unnecessary, but will not hurt.
-    if (halMutex.try_lock() && refcount != 0) {
-      if (m_notifier)
-        updateNotifierAlarm(m_notifier,
-                            (uint32_t)(timerQueueHead->m_expirationTime * 1e6),
-                            &status);
-      halMutex.unlock();
-    }
-    wpi_setStaticErrorWithContext(timerQueueHead, status,
-                                  getHALErrorMessage(status));
-  }
+  int32_t status = 0;
+  updateNotifierAlarm(m_notifier, (uint32_t)(m_expirationTime * 1e6), &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
- * ProcessQueue is called whenever there is a timer interrupt.
- * We need to wake up and process the current top item in the timer queue as
- * long
- * as its scheduled time is after the current time. Then the item is removed or
- * rescheduled (repetitive events) in the queue.
+ * Notify is called by the HAL layer.  We simply need to pass it through to
+ * the user handler.
  */
-void Notifier::ProcessQueue(uint32_t currentTimeInt, void *params) {
-  Notifier *current;
-  while (true)  // keep processing past events until no more
-  {
-    {
-      std::lock_guard<priority_recursive_mutex> sync(queueMutex);
-      double currentTime = currentTimeInt * 1.0e-6;
-      current = timerQueueHead;
-      if (current == nullptr || current->m_expirationTime > currentTime) {
-        break;  // no more timer events to process
-      }
-      // need to process this entry
-      timerQueueHead = current->m_nextEvent;
-      if (current->m_periodic) {
-        // if periodic, requeue the event
-        // compute when to put into queue
-        current->InsertInQueue(true);
-      } else {
-        // not periodic; removed from queue
-        current->m_queued = false;
-      }
-      // Take handler mutex while holding queue mutex to make sure
-      //  the handler will execute to completion in case we are being deleted.
-      current->m_handlerMutex.lock();
-    }
+void Notifier::Notify(uint32_t currentTimeInt, void *param) {
+  Notifier* notifier = static_cast<Notifier*>(param);
 
-    current->m_handler(current->m_param);  // call the event handler
-    current->m_handlerMutex.unlock();
+  notifier->m_processMutex.lock();
+  if (notifier->m_periodic) {
+    notifier->m_expirationTime += notifier->m_period;
+    notifier->UpdateAlarm();
   }
-  // reschedule the first item in the queue
-  std::lock_guard<priority_recursive_mutex> sync(queueMutex);
-  UpdateAlarm();
-}
 
-/**
- * Insert this Notifier into the timer queue in right place.
- * WARNING: this method does not do synchronization! It must be called from
- * somewhere
- * that is taking care of synchronizing access to the queue.
- * @param reschedule If false, the scheduled alarm is based on the current time
- * and UpdateAlarm
- * method is called which will enable the alarm if necessary.
- * If true, update the time by adding the period (no drift) when rescheduled
- * periodic from ProcessQueue.
- * This ensures that the public methods only update the queue after finishing
- * inserting.
- */
-void Notifier::InsertInQueue(bool reschedule) {
-  if (reschedule) {
-    m_expirationTime += m_period;
-  } else {
-    m_expirationTime = GetClock() + m_period;
-  }
-  if (m_expirationTime > Timer::kRolloverTime) {
-    m_expirationTime -= Timer::kRolloverTime;
-  }
-  if (timerQueueHead == nullptr ||
-      timerQueueHead->m_expirationTime >= this->m_expirationTime) {
-    // the queue is empty or greater than the new entry
-    // the new entry becomes the first element
-    this->m_nextEvent = timerQueueHead;
-    timerQueueHead = this;
-    if (!reschedule) {
-      // since the first element changed, update alarm, unless we already plan
-      // to
-      UpdateAlarm();
-    }
-  } else {
-    for (Notifier **npp = &(timerQueueHead->m_nextEvent);;
-         npp = &(*npp)->m_nextEvent) {
-      Notifier *n = *npp;
-      if (n == nullptr || n->m_expirationTime > this->m_expirationTime) {
-        *npp = this;
-        this->m_nextEvent = n;
-        break;
-      }
-    }
-  }
-  m_queued = true;
-}
+  auto handler = notifier->m_handler;
+  auto hparam = notifier->m_param;
 
-/**
- * Delete this Notifier from the timer queue.
- * WARNING: this method does not do synchronization! It must be called from
- * somewhere
- * that is taking care of synchronizing access to the queue.
- * Remove this Notifier from the timer queue and adjust the next interrupt time
- * to reflect
- * the current top of the queue.
- */
-void Notifier::DeleteFromQueue() {
-  if (m_queued) {
-    m_queued = false;
-    wpi_assert(timerQueueHead != nullptr);
-    if (timerQueueHead == this) {
-      // remove the first item in the list - update the alarm
-      timerQueueHead = this->m_nextEvent;
-      UpdateAlarm();
-    } else {
-      for (Notifier *n = timerQueueHead; n != nullptr; n = n->m_nextEvent) {
-        if (n->m_nextEvent == this) {
-          // this element is the next element from *n from the queue
-          n->m_nextEvent = this->m_nextEvent;  // point around this one
-        }
-      }
-    }
-  }
+  notifier->m_handlerMutex.lock();
+  notifier->m_processMutex.unlock();
+
+  if (handler) handler(hparam);
+  notifier->m_handlerMutex.unlock();
 }
 
 /**
@@ -220,11 +77,11 @@ void Notifier::DeleteFromQueue() {
  * @param delay Seconds to wait before the handler is called.
  */
 void Notifier::StartSingle(double delay) {
-  std::lock_guard<priority_recursive_mutex> sync(queueMutex);
+  std::lock_guard<priority_mutex> sync(m_processMutex);
   m_periodic = false;
   m_period = delay;
-  DeleteFromQueue();
-  InsertInQueue(false);
+  m_expirationTime = GetClock() + m_period;
+  UpdateAlarm();
 }
 
 /**
@@ -236,11 +93,11 @@ void Notifier::StartSingle(double delay) {
  * the call to this method.
  */
 void Notifier::StartPeriodic(double period) {
-  std::lock_guard<priority_recursive_mutex> sync(queueMutex);
+  std::lock_guard<priority_mutex> sync(m_processMutex);
   m_periodic = true;
   m_period = period;
-  DeleteFromQueue();
-  InsertInQueue(false);
+  m_expirationTime = GetClock() + m_period;
+  UpdateAlarm();
 }
 
 /**
@@ -253,10 +110,10 @@ void Notifier::StartPeriodic(double period) {
  * block until the handler call is complete.
  */
 void Notifier::Stop() {
-  {
-    std::lock_guard<priority_recursive_mutex> sync(queueMutex);
-    DeleteFromQueue();
-  }
+  int32_t status = 0;
+  stopNotifierAlarm(m_notifier, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+
   // Wait for a currently executing handler to complete before returning from
   // Stop()
   std::lock_guard<priority_mutex> sync(m_handlerMutex);
