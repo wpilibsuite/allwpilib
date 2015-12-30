@@ -1,1 +1,1 @@
-java -Djava.library.path=/home/peter/wpilib/simulation/jar -jar /home/peter/wpilib/simulation/jar/SimDS-all.jar
+java -Djava.library.path=~/wpilib/simulation/jar -jar ~/wpilib/simulation/jar/SimDS-all.jar
