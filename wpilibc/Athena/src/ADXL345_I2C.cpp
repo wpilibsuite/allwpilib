@@ -17,12 +17,13 @@ const uint8_t ADXL345_I2C::kDataRegister;
 constexpr double ADXL345_I2C::kGsPerLSB;
 
 /**
- * Constructor.
+ * Constructs the ADXL345 Accelerometer over I2C.
  *
  * @param port The I2C port the accelerometer is attached to
  * @param range The range (+ or -) that the accelerometer will measure.
+ * @param deviceAddress the I2C address of the accelerometer (0x1D or 0x53)
  */
-ADXL345_I2C::ADXL345_I2C(Port port, Range range) : I2C(port, kAddress) {
+ADXL345_I2C::ADXL345_I2C(Port port, Range range, int deviceAddress) : I2C(port, deviceAddress) {
   // Turn on the measurements
   Write(kPowerCtlRegister, kPowerCtl_Measure);
   // Specify the data format to read

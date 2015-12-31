@@ -58,13 +58,24 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
   private I2C m_i2c;
 
   /**
-   * Constructor.
+   * Constructs the ADXL345 Accelerometer with I2C address 0x1D.
    *$
    * @param port The I2C port the accelerometer is attached to
    * @param range The range (+ or -) that the accelerometer will measure.
    */
   public ADXL345_I2C(I2C.Port port, Range range) {
-    m_i2c = new I2C(port, kAddress);
+    this(port, range, kAddress);
+  }
+
+  /**
+   * Constructs the ADXL345 Accelerometer over I2C.
+   *$
+   * @param port The I2C port the accelerometer is attached to
+   * @param range The range (+ or -) that the accelerometer will measure.
+   * @param the I2C address of the accelerometer (0x1D or 0x53)
+   */
+  public ADXL345_I2C(I2C.Port port, Range range, int deviceAddress) {
+    m_i2c = new I2C(port, deviceAddress);
 
     // Turn on the measurements
     m_i2c.write(kPowerCtlRegister, kPowerCtl_Measure);
