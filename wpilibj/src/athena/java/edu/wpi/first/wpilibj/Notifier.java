@@ -48,7 +48,7 @@ public class Notifier {
      * Update the alarm hardware to reflect the next alarm.
      */
     private void updateAlarm() {
-      NotifierJNI.updateNotifierAlarm(m_notifier, (int) (m_expirationTime * 1e6));
+      NotifierJNI.updateNotifierAlarm(m_notifier, (long) (m_expirationTime * 1e6));
     }
 
     /**
@@ -56,7 +56,7 @@ public class Notifier {
      * calling of the user handler.
      */
     @Override
-    public void apply(int time) {
+    public void apply(long time) {
       m_processLock.lock();
       if (m_periodic) {
         m_expirationTime += m_period;

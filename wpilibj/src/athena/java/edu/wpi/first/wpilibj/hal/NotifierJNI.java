@@ -14,7 +14,7 @@ public class NotifierJNI extends JNIWrapper {
    * Callback function
    */
   public interface NotifierJNIHandlerFunction {
-    void apply(int curTime);
+    void apply(long curTime);
   }
 
   /**
@@ -30,7 +30,7 @@ public class NotifierJNI extends JNIWrapper {
   /**
    * Sets the notifier to call the callback in another triggerTime microseconds.
    */
-  public static native void updateNotifierAlarm(long notifierPtr, int triggerTime);
+  public static native void updateNotifierAlarm(long notifierPtr, long triggerTime);
 
   /**
    * Tells the notifier to stop calling the callback.

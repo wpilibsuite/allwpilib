@@ -38,14 +38,14 @@ class NotifierThreadJNI : public SafeThread {
   bool m_notify = false;
   jobject m_func = nullptr;
   jmethodID m_mid;
-  uint32_t m_currentTime;
+  uint64_t m_currentTime;
 };
 
 class NotifierJNI : public SafeThreadOwner<NotifierThreadJNI> {
  public:
   void SetFunc(JNIEnv* env, jobject func, jmethodID mid);
 
-  void Notify(uint32_t currentTime) {
+  void Notify(uint64_t currentTime) {
     auto thr = GetThread();
     if (!thr) return;
     thr->m_currentTime = currentTime;
@@ -81,9 +81,9 @@ void NotifierThreadJNI::Main() {
     if (!m_func) continue;
     jobject func = m_func;
     jmethodID mid = m_mid;
-    uint32_t currentTime = m_currentTime;
+    uint64_t currentTime = m_currentTime;
     lock.unlock();  // don't hold mutex during callback execution
-    env->CallVoidMethod(func, mid, (jint)currentTime);
+    env->CallVoidMethod(func, mid, (jlong)currentTime);
     if (env->ExceptionCheck()) {
       env->ExceptionDescribe();
       env->ExceptionClear();
@@ -97,7 +97,7 @@ void NotifierThreadJNI::Main() {
   jvm->DetachCurrentThread();
 }
 
-void notifierHandler(uint32_t currentTimeInt, void* param) {
+void notifierHandler(uint64_t currentTimeInt, void* param) {
   ((NotifierJNI*)param)->Notify(currentTimeInt);
 }
 
@@ -119,7 +119,7 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNot
     assert(false);
     return 0;
   }
-  jmethodID mid = env->GetMethodID(cls, "apply", "(I)V");
+  jmethodID mid = env->GetMethodID(cls, "apply", "(J)V");
   if (mid == 0) {
     NOTIFIERJNI_LOG(logERROR) << "Error getting java method ID";
     assert(false);
@@ -169,10 +169,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_cleanNotifier
 /*
  * Class:     edu_wpi_first_wpilibj_hal_NotifierJNI
  * Method:    updateNotifierAlarm
- * Signature: (JI)V
+ * Signature: (JJ)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_updateNotifierAlarm
-  (JNIEnv *env, jclass cls, jlong notifierPtr, jint triggerTime)
+  (JNIEnv *env, jclass cls, jlong notifierPtr, jlong triggerTime)
 {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI updateNotifierAlarm";
 
@@ -181,7 +181,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_updateNotifier
   NOTIFIERJNI_LOG(logDEBUG) << "triggerTime = " << triggerTime;
 
   int32_t status = 0;
-  updateNotifierAlarm((void*)notifierPtr, (uint32_t)triggerTime, &status);
+  updateNotifierAlarm((void*)notifierPtr, (uint64_t)triggerTime, &status);
   NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }

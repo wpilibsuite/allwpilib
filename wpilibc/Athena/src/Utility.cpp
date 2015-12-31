@@ -156,9 +156,9 @@ uint32_t GetFPGARevision() {
  * @return The current time in microseconds according to the FPGA (since FPGA
  * reset).
  */
-uint32_t GetFPGATime() {
+uint64_t GetFPGATime() {
   int32_t status = 0;
-  uint32_t time = getFPGATime(&status);
+  uint64_t time = getFPGATime(&status);
   wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
   return time;
 }

@@ -43,7 +43,7 @@ Notifier::~Notifier() {
  */
 void Notifier::UpdateAlarm() {
   int32_t status = 0;
-  updateNotifierAlarm(m_notifier, (uint32_t)(m_expirationTime * 1e6), &status);
+  updateNotifierAlarm(m_notifier, (uint64_t)(m_expirationTime * 1e6), &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
@@ -51,7 +51,7 @@ void Notifier::UpdateAlarm() {
  * Notify is called by the HAL layer.  We simply need to pass it through to
  * the user handler.
  */
-void Notifier::Notify(uint32_t currentTimeInt, void *param) {
+void Notifier::Notify(uint64_t currentTimeInt, void *param) {
   Notifier* notifier = static_cast<Notifier*>(param);
 
   notifier->m_processMutex.lock();

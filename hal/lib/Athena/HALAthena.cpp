@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <mutex>
 #include <unistd.h>
 #include <sys/prctl.h>
 #include <signal.h> // linux for kill
@@ -22,6 +23,11 @@ const uint32_t kSystemClockTicksPerMicrosecond = 40;
 
 static tGlobal *global = nullptr;
 static tSysWatchdog *watchdog = nullptr;
+
+static priority_mutex timeMutex;
+static uint32_t timeEpoch = 0;
+static uint32_t prevFPGATime = 0;
+static void* rolloverNotifier = nullptr;
 
 void* getPort(uint8_t pin)
 {
@@ -184,13 +190,19 @@ uint32_t getFPGARevision(int32_t *status)
  *
  * @return The current time in microseconds according to the FPGA (since FPGA reset).
  */
-uint32_t getFPGATime(int32_t *status)
+uint64_t getFPGATime(int32_t *status)
 {
 	if (!global) {
 		*status = NiFpga_Status_ResourceNotInitialized;
 		return 0;
 	}
-	return global->readLocalTime(status);
+	std::lock_guard<priority_mutex> lock(timeMutex);
+	uint32_t fpgaTime = global->readLocalTime(status);
+	if (*status != 0) return 0;
+	// check for rollover
+	if (fpgaTime < prevFPGATime) ++timeEpoch;
+	prevFPGATime = fpgaTime;
+	return (((uint64_t)timeEpoch) << 32) | ((uint64_t)fpgaTime);
 }
 
 /**
@@ -235,6 +247,12 @@ static void HALCleanupAtExit() {
 	watchdog = nullptr;
 }
 
+static void timerRollover(uint64_t currentTime, void*) {
+	// reschedule timer for next rollover
+	int32_t status = 0;
+	updateNotifierAlarm(rolloverNotifier, currentTime + 0x80000000ULL, &status);
+}
+
 /**
  * Call this to start up HAL. This is required for robot programs.
  */
@@ -255,6 +273,14 @@ int HALInitialize(int mode)
 	watchdog = tSysWatchdog::create(&status);
 
 	std::atexit(HALCleanupAtExit);
+
+	if (!rolloverNotifier)
+		rolloverNotifier = initializeNotifier(timerRollover, nullptr, &status);
+	if (status == 0) {
+		uint64_t curTime = getFPGATime(&status);
+		if (status == 0)
+			updateNotifierAlarm(rolloverNotifier, curTime + 0x80000000ULL, &status);
+	}
 
 	// Kill any previous robot programs
 	std::fstream fs;
@@ -302,6 +328,7 @@ int HALInitialize(int mode)
 	pid = getpid();
 	fs << pid << std::endl;
 	fs.close();
+
 	return 1;
 }
 

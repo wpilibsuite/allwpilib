@@ -35,7 +35,7 @@ class Notifier : public ErrorBase {
   // update the HAL alarm
   void UpdateAlarm();
   // HAL callback
-  static void Notify(uint32_t currentTimeInt, void *param);
+  static void Notify(uint64_t currentTimeInt, void *param);
 
   // held while updating process information
   priority_mutex m_processMutex;

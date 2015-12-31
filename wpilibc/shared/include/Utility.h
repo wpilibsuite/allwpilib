@@ -46,6 +46,6 @@ void wpi_suspendOnAssertEnabled(bool enabled);
 
 uint16_t GetFPGAVersion();
 uint32_t GetFPGARevision();
-uint32_t GetFPGATime();
+uint64_t GetFPGATime();
 bool GetUserButton();
 std::string GetStackTrace(uint32_t offset);

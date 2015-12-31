@@ -88,7 +88,7 @@ tSPI *spiSystem;
 
 struct SPIAccumulator {
 	void* notifier = nullptr;
-	uint32_t triggerTime;
+	uint64_t triggerTime;
 	uint32_t period;
 
 	int64_t value = 0;
@@ -1499,7 +1499,7 @@ priority_recursive_mutex& spiGetSemaphore(uint8_t port) {
 		return spiMXPSemaphore;
 }
 
-static void spiAccumulatorProcess(uint32_t currentTime, void *param) {
+static void spiAccumulatorProcess(uint64_t currentTime, void *param) {
 	SPIAccumulator* accum = (SPIAccumulator*)param;
 
 	// perform SPI transaction

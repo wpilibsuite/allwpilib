@@ -222,7 +222,7 @@ extern "C"
 
 	uint16_t getFPGAVersion(int32_t *status);
 	uint32_t getFPGARevision(int32_t *status);
-	uint32_t getFPGATime(int32_t *status);
+	uint64_t getFPGATime(int32_t *status);
 
 	bool getFPGAButton(int32_t *status);
 
