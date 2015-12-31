@@ -7,9 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.DIOJNI;
-import edu.wpi.first.wpilibj.hal.AnalogJNI;
-
 /**
  * Base class for all sensors. Stores most recent status information as well as
  * containing utility functions for checking channels and error processing.

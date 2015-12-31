@@ -6,21 +6,23 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.simulation.SimGyro;
+import edu.wpi.first.wpilibj.GyroBase;
 import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
  * Use a rate gyro to return the robots heading relative to a starting position.
- * The Gyro class tracks the robots heading based on the starting position. As
+ * The AnalogGyro class tracks the robots heading based on the starting position. As
  * the robot rotates the new heading is computed by integrating the rate of
  * rotation returned by the sensor. When the class is instantiated, it does a
  * short calibration routine where it samples the gyro while at rest to
  * determine the default offset. This is subtracted from each sample to
  * determine the heading.
  */
-public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowSendable {
 
 	private PIDSourceType m_pidSource;
 	private SimGyro impl;
@@ -39,28 +41,36 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 		reset();
 		setPIDSourceType(PIDSourceType.kDisplacement);
 
-		LiveWindow.addSensor("Gyro", channel, this);
+		LiveWindow.addSensor("AnalogGyro", channel, this);
 	}
 
 	/**
-	 * Gyro constructor with only a channel.
+	 * AnalogGyro constructor with only a channel.
 	 *
 	 * @param channel
 	 *            The analog channel the gyro is connected to.
 	 */
-	public Gyro(int channel) {
+	public AnalogGyro(int channel) {
 		initGyro(channel);
 	}
 
 	/**
-	 * Gyro constructor with a precreated analog channel object. Use this
+	 * {@inherit_doc}
+	 */
+	public void calibrate(){
+		reset();
+	}
+
+
+	/**
+	 * AnalogGyro constructor with a precreated analog channel object. Use this
 	 * constructor when the analog channel needs to be shared. There is no
 	 * reference counting when an AnalogChannel is passed to the gyro.
 	 *
 	 * @param channel
 	 *            The AnalogChannel object that the gyro is connected to.
 	 */
-	// Not Supported: public Gyro(AnalogChannel channel) {
+	// Not Supported: public AnalogGyro(AnalogChannel channel) {
 
 	/**
 	 * Reset the gyro. Resets the gyro to a heading of zero. This can be used if
@@ -107,7 +117,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 
 	/**
 	 * Set which parameter of the encoder you are using as a process control
-	 * variable. The Gyro class supports the rate and angle parameters
+	 * variable. The AnalogGyro class supports the rate and angle parameters
 	 *
 	 * @param pidSource
 	 *            An enum to select the parameter.
@@ -143,7 +153,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
 	 * Live Window code, only does anything if live window is activated.
 	 */
 	public String getSmartDashboardType() {
-		return "Gyro";
+		return "AnalogGyro";
 	}
 
 	private ITable m_table;
