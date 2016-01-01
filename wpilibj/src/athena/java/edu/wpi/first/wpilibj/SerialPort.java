@@ -321,7 +321,7 @@ public class SerialPort {
   public String readString(int count) {
     byte[] out = read(count);
     try {
-      return new String(out, 0, count, "US-ASCII");
+      return new String(out, 0, out.length, "US-ASCII");
     } catch (UnsupportedEncodingException ex) {
       ex.printStackTrace();
       return new String();
