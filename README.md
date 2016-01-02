@@ -69,3 +69,5 @@ The Simulation directory contains extra simulation tools and libraries, such as 
 The integration test directories for C++ and Java contain test code that runs on our test-system. When you submit code for review, it is tested by those programs. If you add new functionality you should make sure to write tests for it so we don't break it in the future.
 
 The hal directory contains more C++ code meant to run on the RoboRIO. HAL is an acronym for "Hardware Abstraction Layer", and it interfaces with the NI Libraries. The NI Libraries contain the low-level code for controlling devices on your robot. The NI Libraries are found in the ni-libraries folder.
+
+The styleguide directory contains the styleguide for C++ and Java code. Anything submitted to the wpilib project needs to follow the code style guides outlined in there.

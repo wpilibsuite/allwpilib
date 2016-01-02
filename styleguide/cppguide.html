@@ -1,0 +1,2470 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>WPILib C++ Style Guide</title>
+<link rel="stylesheet" type="text/css" href="include/styleguide.css">
+<script language="javascript" src="include/styleguide.js"></script>
+</head>
+<body onload="initStyleGuide();">
+<div id="content">
+<h1>WPILib C++ Style Guide (Based on the <a href=http://google-styleguide.googlecode.com/svn/trunk/cppguide.html>Google C++ Style Guide</a>)</h1>
+<div class="horizontal_toc" id="tocDiv"></div>
+
+<div class="main_body">
+
+<h2 class="ignoreLink" id="Background">Background</h2>
+
+<p><strong>This guide is a work in progress.</strong>
+We are currently working on getting this guide updated to
+a point where it is useful for WPILib developers to use.</p>
+
+<p>C++ is one of the two main languages (Java being the other)
+used in WPILib; in order to maintain consistency and keep the
+maintenance of the code manageable, we use this style guide.</p>
+
+<p>There are two main overarching purposes to this guide. The first
+is to act as a normal C++ style guide (both in terms fo formatting
+and programming practices) for C++ developers of WPILib.
+The other purpose is to help Java programmers who may
+know a moderate amount of C++ but may not be fully
+up to date with things like C++11 and so may not even
+realize that certain C++ features exist.</p>
+
+<p>This style guide is a heavily modified version of the
+<a href=http://google-styleguide.googlecode.com/svn/trunk/cppguide.html>
+Google C++ Style Guide</a>. The Google Style Guide has
+a lot of good points and is a good read, but in order
+to cut the style guide down to a more readable size and to
+focus mroe on WPILib-specific information, we have
+altetered the original style guide in several ways.</p>
+
+<p>One way in which we <em>haven't</em> done much to
+alter the original style guide is to keep the vast
+majority of the formatting/naming/etc. related
+information intact. This is both so that we
+do not have to write up our own standards and so
+that existing tools such as clang-format and
+the Google eclipse format configuration files
+can work out of the box. All of these things
+should be relatively non-controversial and do not
+require much discussion.</p>
+
+<p>Where we deviate more from the original guide is
+in the style of the code itself. At the moment (ie,
+when we first created this modified version), we
+deleted all of the sections of the original guide
+which mandate particular programming practices
+such as forbidding exceptions, multiple inheritance,
+etc. However, as time goes on, we gradually add in more
+information along this lines, either by copying
+directly from Google's Style Guide or by writing
+our own decisions and best practices, some of which
+may be very WPILib-specific.</p>
+
+<p>As the original guide makes very clear, consistency
+is extremely important to keeping the code base
+manageable, and so we encourage that, wherever
+reasonable, that you keep everything consistent
+with whatever the standard style is.</p>
+
+<p>Along with just C++ style, it is also important
+to keep in mind that WPILib consists of both a C++
+and Java half. In order to keep things consistent
+and easier for users, we ask that, in general,
+Java and C++ be kept as consistent with one another
+as reasonable. This includes everything from using
+two spaces for indentation in both language to
+keeping the inheritance structure essentially the
+same in both. Although the two do not have to be
+precisely the same, it does mean that if there is
+something that you are doing which will be imposssible
+to reproduce in some way in Java, then you may
+want to reconsider.</p>
+
+<p>One final thing to remember is that High School
+students with relatively little experience programming
+are the main user for this code, and throwing the full
+brunt of C++ at a student just learning how to program
+is likely not the best of ideas. As such, any
+user-facing APIs should minimize the use of any
+more complicated C++ features. As always,
+use your judgement and ask others in cases where
+there is something which may violate anything
+in this guide.</p>
+
+<h2 id="Programming_Guidelines">Programming Guidelines</h2>
+<p>C++ is a large, complicated language, and in order
+to ensure that we stay consistent and maintain certain
+best practices, we have certain rules. For the most part
+these are common sense rules and in some cases exist
+solely to point out features of C++ that someone more
+familiar with Java may not realize even exist.</p>
+
+<h3 id="Pointers">Pointers</h3>
+<p>In general, we strongly discourage the use of
+raw pointers in C++ code; instead, references or
+STL pointers should be used where appropriate.
+There are two exceptions to this rule:</p>
+<ul>
+  <li>When interfacing with lower-level C code or
+  with any libraries which force you to use raw pointers.</li>
+  <li>In order to keep user interfaces consistent,
+  we may keep around deprecated functions which
+  take raw pointers. Any user-facing functions
+  which take raw pointers should be deprecated
+  using the
+  <a href=https://en.wikipedia.org/wiki/C%2B%2B14#The_attribute_.5B.5Bdeprecated.5D.5D><code>[[deprecated]]</code></a>
+  attribute and replaced with either references
+  or STL pointers.</li>
+</ul>
+<p>As of C++11, the following are options in the
+place of raw pointers:</p>
+<ul>
+  <li><code>std::unique_ptr</code> Should be used
+  when you still need to use a pointer, but you
+  only need one entity to own the pointer. The
+  <code>std::unique_ptr</code> will automatically
+  be deleted when there are no more references to
+  it.</li>
+  <li><code>std::shared_ptr</code> Should be used
+  when you still need to use a pointer and you
+  need many references to the object. When
+  there are zero remaining references to the
+  object, it will be deleted. Use <code>std::weak_ptr</code>
+  where necessary to avoid circular dependencies
+  or other potential issues.</li>
+  <li>L-value references (the traditional sort
+  of reference that has been around since before C++11)
+  should be used when you want to pass around a
+  reference to an object and want to guarantee
+  that it won't be null. Use const references
+  if you want to avoid copying a large object
+  but don't want to modify it.</li>
+  <li>R-value references were introduced in C++11
+  and allow for the use of <code>std::move</code>.
+  R-value references should be used where it makes
+  sense that a parameter to a function is having
+  its ownership passed from one place to another.
+  In general, R-value references are not inherently
+  bad, but they do introduce additional complexity
+  that may confuse people who are not familiar
+  with them.</li>
+</ul>
+
+<h3 id="Deprecation">Deprecation</h3>
+<p>When updating APIs, make liberal use of the
+<code>[[deprecated]]</code> attribute (although if
+it is reasonable to simply remove any old interfaces
+then do so) to indicate that users should no longer
+use the function. Currently, this will cause warnings
+in user code and errors in the WPILib build.</p>
+
+<pre>
+[[deprecated("This is a deprecated function; this text will be displayed when"
+             " the compiler throws a warning.")]]
+void foo() {}
+class [[deprecated("This is a deprecated class.")]] Foo {};
+int bar [[deprecated("This is a deprecated variable.")]];
+</pre>
+
+<p>See <a href=http://josephmansfield.uk/articles/marking-deprecated-c++14.html>
+here</a> for more information on deprecation.</p>
+
+<h2 id="Header_Files">Header Files</h2>
+
+<p>In general, every <code>.cc</code> file should have an
+associated <code>.h</code> file. There are some common
+exceptions, such as  unittests and
+small <code>.cpp</code> files containing just a
+<code>main()</code> function.</p>
+
+<p>Correct use of header files can make a huge difference to
+the readability, size and performance of your code.</p>
+
+<p>The following rules will guide you through the various
+pitfalls of using header files.</p>
+
+<a id="The_-inl.h_Files"></a>
+<h3 id="Self_contained_Headers">Self-contained Headers</h3>
+
+<div class="summary">
+<p>Header files should be self-contained and end in <code>.h</code>. Files that
+are meant for textual inclusion, but are not headers, should end in
+<code>.inc</code>. Separate <code>-inl.h</code> headers are disallowed.</p>
+</div>
+
+<div class="stylebody">
+<p>All header files should be self-contained. In other
+words, users and refactoring tools should not have to adhere to special
+conditions in order to include the header. Specifically, a
+header should have <a href="#The__define_Guard">header guards</a>,
+should include all other headers it needs, and should not require any
+particular symbols to be defined.</p>
+
+<p>There are rare cases where a file is not meant to be self-contained, but
+instead is meant to be textually included at a specific point in the code.
+Examples are files that need to be included multiple times or
+platform-specific extensions that essentially are part of other headers. Such
+files should use the file extension <code>.inc</code>.</p>
+
+<p>If a template or inline function is declared in a <code>.h</code> file,
+define it in that same file. The definitions of these constructs must
+be included into every <code>.cc</code> file that uses them, or the
+program may fail to link in some build configurations. Do not move these
+definitions to separate <code>-inl.h</code> files.</p>
+
+<p>As an exception, a function template that is explicitly
+instantiated for all relevant sets of template arguments, or
+that is a private member of a class, may
+be defined in the only <code>.cc</code> file that
+instantiates the template.</p>
+
+</div>
+
+<h3 id="The__define_Guard">The #define Guard</h3>
+
+<div class="summary">
+<p>All header files should have <code>#define</code> guards to
+prevent multiple inclusion. The format of the symbol name
+should be
+<code><i>&lt;PROJECT&gt;</i>_<i>&lt;PATH&gt;</i>_<i>&lt;FILE&gt;</i>_H_</code>.</p>
+</div>
+
+<div class="stylebody">
+
+
+
+<p>To guarantee uniqueness, they should
+be based on the full path in a project's source tree. For
+example, the file <code>foo/src/bar/baz.h</code> in
+project <code>foo</code> should have the following
+guard:</p>
+
+<pre>#ifndef FOO_BAR_BAZ_H_
+#define FOO_BAR_BAZ_H_
+
+...
+
+#endif  // FOO_BAR_BAZ_H_
+</pre>
+
+
+
+
+</div>
+
+<h3 id="Forward_Declarations">Forward Declarations</h3>
+
+<div class="summary">
+<p>You may forward declare ordinary classes in order to avoid
+unnecessary <code>#include</code>s.</p>
+</div>
+
+<div class="stylebody">
+
+<div class="definition">
+<p>A "forward declaration" is a declaration of a class,
+function, or template without an associated definition.
+<code>#include</code> lines can often be replaced with
+forward declarations of whatever symbols are actually
+used by the client code.</p>
+</div>
+
+<div class="pros">
+<ul>
+  <li>Unnecessary <code>#include</code>s force the
+  compiler to open more files and process more
+  input.</li>
+
+  <li>They can also force your code to be recompiled more
+  often, due to changes in the header.</li>
+</ul>
+</div>
+
+<div class="cons">
+<ul>
+  <li>It can be difficult to determine the correct form
+  of a forward declaration in the presence of features
+  like templates, typedefs, default parameters, and using
+  declarations.</li>
+
+  <li>It can be difficult to determine whether a forward
+  declaration or a full <code>#include</code> is needed
+  for a given piece of code, particularly when implicit
+  conversion operations are involved. In extreme cases,
+  replacing an <code>#include</code> with a forward
+  declaration can silently change the meaning of
+  code.</li>
+
+  <li>Forward declaring multiple symbols from a header
+  can be more verbose than simply
+  <code>#include</code>ing the header.</li>
+
+  <li>Forward declarations of functions and templates can
+  prevent the header owners from making
+  otherwise-compatible changes to their APIs; for
+  example, widening a parameter type, or adding a
+  template parameter with a default value.</li>
+  <li>Forward declaring symbols from namespace
+  <code>std::</code> usually yields undefined
+  behavior.</li>
+
+  <li>Structuring code to enable forward declarations
+  (e.g. using pointer members instead of object members)
+  can make the code slower and more complex.</li>
+
+  <li>The practical efficiency benefits of forward
+  declarations are unproven.</li>
+</ul>
+</div>
+
+<div class="decision">
+<ul>
+  <li>When using a function declared in a header file,
+  always <code>#include</code> that header.</li>
+
+  <li>When using a class template, prefer to
+  <code>#include</code> its header file.</li>
+
+  <li>When using an ordinary class, relying on a forward
+  declaration is OK, but be wary of situations where a
+  forward declaration may be insufficient or incorrect;
+  when in doubt, just <code>#include</code> the
+  appropriate header.</li>
+
+  <li>Do not replace data members with pointers just to
+  avoid an <code>#include</code>.</li>
+</ul>
+
+<p>Please see <a href="#Names_and_Order_of_Includes">Names and Order
+of Includes</a> for rules about when to #include a header.</p>
+</div>
+
+</div>
+
+<h3 id="Inline_Functions">Inline Functions</h3>
+
+<div class="summary">
+<p>Define functions inline only when they are small, say, 10
+lines or less.</p>
+</div>
+
+<div class="stylebody">
+
+<div class="definition">
+<p>You can declare functions in a way that allows the compiler to expand
+them inline rather than calling them through the usual
+function call mechanism.</p>
+</div>
+
+<div class="pros">
+<p>Inlining a function can generate more efficient object
+code, as long as the inlined function is small. Feel free
+to inline accessors and mutators, and other short,
+performance-critical functions.</p>
+</div>
+
+<div class="cons">
+<p>Overuse of inlining can actually make programs slower.
+Depending on a function's size, inlining it can cause the
+code size to increase or decrease. Inlining a very small
+accessor function will usually decrease code size while
+inlining a very large function can dramatically increase
+code size. On modern processors smaller code usually runs
+faster due to better use of the instruction cache.</p>
+</div>
+
+<div class="decision">
+<p>A decent rule of thumb is to not inline a function if
+it is more than 10 lines long. Beware of destructors,
+which are often longer than they appear because of
+implicit member- and base-destructor calls!</p>
+
+<p>Another useful rule of thumb: it's typically not cost
+effective to inline functions with loops or switch
+statements (unless, in the common case, the loop or
+switch statement is never executed).</p>
+
+<p>It is important to know that functions are not always
+inlined even if they are declared as such; for example,
+virtual and recursive functions are not normally inlined.
+Usually recursive functions should not be inline. The
+main reason for making a virtual function inline is to
+place its definition in the class, either for convenience
+or to document its behavior, e.g., for accessors and
+mutators.</p>
+</div>
+
+</div>
+
+<h3 id="Function_Parameter_Ordering">Function Parameter Ordering</h3>
+
+<div class="summary">
+<p>When defining a function, parameter order is: inputs, then
+outputs.</p>
+</div>
+
+<div class="stylebody">
+<p>Parameters to C/C++ functions are either input to the
+function, output from the function, or both. Input
+parameters are usually values or <code>const</code>
+references, while output and input/output parameters will
+be non-<code>const</code> pointers. When ordering
+function parameters, put all input-only parameters before
+any output parameters. In particular, do not add new
+parameters to the end of the function just because they
+are new; place new input-only parameters before the
+output parameters.</p>
+
+<p>This is not a hard-and-fast rule. Parameters that are
+both input and output (often classes/structs) muddy the
+waters, and, as always, consistency with related
+functions may require you to bend the rule.</p>
+
+</div>
+
+<h3 id="Names_and_Order_of_Includes">Names and Order of Includes</h3>
+
+<div class="summary">
+<p>Use standard order for readability and to avoid hidden
+dependencies: Related header, C library, C++ library,  other libraries'
+<code>.h</code>, your project's <code>.h</code>.</p>
+</div>
+
+<div class="stylebody">
+<p>
+All of a project's header files should be
+listed as descendants of the project's source
+directory without use of UNIX directory shortcuts
+<code>.</code> (the current directory) or <code>..</code>
+(the parent directory). For example,
+
+<code>google-awesome-project/src/base/logging.h</code>
+should be included as:</p>
+
+<pre>#include "base/logging.h"
+</pre>
+
+<p>In <code><var>dir/foo</var>.cc</code> or
+<code><var>dir/foo_test</var>.cc</code>, whose main
+purpose is to implement or test the stuff in
+<code><var>dir2/foo2</var>.h</code>, order your includes
+as follows:</p>
+
+<ol>
+  <li><code><var>dir2/foo2</var>.h</code>.</li>
+
+  <li>C system files.</li>
+
+  <li>C++ system files.</li>
+
+  <li>Other libraries' <code>.h</code>
+  files.</li>
+
+  <li>
+  Your project's <code>.h</code>
+  files.</li>
+</ol>
+
+<p>With the preferred ordering, if
+<code><var>dir2/foo2</var>.h</code> omits any necessary
+includes, the build of <code><var>dir/foo</var>.cc</code>
+or <code><var>dir/foo</var>_test.cc</code> will break.
+Thus, this rule ensures that build breaks show up first
+for the people working on these files, not for innocent
+people in other packages.</p>
+
+<p><code><var>dir/foo</var>.cc</code> and
+<code><var>dir2/foo2</var>.h</code> are usually in the same
+directory (e.g. <code>base/basictypes_test.cc</code> and
+<code>base/basictypes.h</code>), but may sometimes be in different
+directories too.</p>
+
+
+
+<p>Within each section the includes should be ordered
+alphabetically. Note that older code might not conform to
+this rule and should be fixed when convenient.</p>
+
+<p>You should include all the headers that define the symbols you rely
+upon (except in cases of <a href="#Forward_Declarations">forward
+declaration</a>). If you rely on symbols from <code>bar.h</code>,
+don't count on the fact that you included <code>foo.h</code> which
+(currently) includes <code>bar.h</code>: include <code>bar.h</code>
+yourself, unless <code>foo.h</code> explicitly demonstrates its intent
+to provide you the symbols of <code>bar.h</code>.  However, any
+includes present in the related header do not need to be included
+again in the related <code>cc</code> (i.e., <code>foo.cc</code> can
+rely on <code>foo.h</code>'s includes).</p>
+
+<p>For example, the includes in
+
+<code>google-awesome-project/src/foo/internal/fooserver.cc</code>
+might look like this:</p>
+
+
+<pre>#include "foo/server/fooserver.h"
+
+#include &lt;sys/types.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;hash_map&gt;
+#include &lt;vector&gt;
+
+#include "base/basictypes.h"
+#include "base/commandlineflags.h"
+#include "foo/server/bar.h"
+</pre>
+
+<p class="exception">Sometimes, system-specific code needs
+conditional includes. Such code can put conditional
+includes after other includes. Of course, keep your
+system-specific code small and localized. Example:</p>
+
+<pre>#include "foo/public/fooserver.h"
+
+#include "base/port.h"  // For LANG_CXX11.
+
+#ifdef LANG_CXX11
+#include &lt;initializer_list&gt;
+#endif  // LANG_CXX11
+</pre>
+
+</div>
+
+<h2 id="Naming">Naming</h2>
+
+<p>The most important consistency rules are those that govern
+naming. The style of a name immediately informs us what sort of
+thing the named entity is: a type, a variable, a function, a
+constant, a macro, etc., without requiring us to search for the
+declaration of that entity. The pattern-matching engine in our
+brains relies a great deal on these naming rules.
+</p>
+
+<p>Naming rules are pretty arbitrary, but
+ we feel that
+consistency is more important than individual preferences in this
+area, so regardless of whether you find them sensible or not,
+the rules are the rules.</p>
+
+<h3 id="General_Naming_Rules">General Naming Rules</h3>
+
+<div class="summary">
+<p>Function names, variable names, and filenames should be
+descriptive; eschew abbreviation.</p>
+</div>
+
+<div class="stylebody">
+<p>Give as descriptive a name as possible, within reason.
+Do not worry about saving horizontal space as it is far
+more important to make your code immediately
+understandable by a new reader. Do not use abbreviations
+that are ambiguous or unfamiliar to readers outside your
+project, and do not abbreviate by deleting letters within
+a word.</p>
+
+<pre>int price_count_reader;    // No abbreviation.
+int num_errors;            // "num" is a widespread convention.
+int num_dns_connections;   // Most people know what "DNS" stands for.
+</pre>
+
+<pre class="badcode">int n;                     // Meaningless.
+int nerr;                  // Ambiguous abbreviation.
+int n_comp_conns;          // Ambiguous abbreviation.
+int wgc_connections;       // Only your group knows what this stands for.
+int pc_reader;             // Lots of things can be abbreviated "pc".
+int cstmr_id;              // Deletes internal letters.
+</pre>
+
+</div>
+
+<h3 id="File_Names">File Names</h3>
+
+<div class="summary">
+<p>Filenames should be all lowercase and can include
+underscores (<code>_</code>) or dashes (<code>-</code>).
+Follow the convention that your
+
+project uses. If there is no consistent
+local pattern to follow, prefer "_".</p>
+</div>
+
+<div class="stylebody">
+
+<p>Examples of acceptable file names:</p>
+
+<ul>
+  <li><code>my_useful_class.cc</code></li>
+  <li><code>my-useful-class.cc</code></li>
+  <li><code>myusefulclass.cc</code></li>
+  <li><code>myusefulclass_test.cc // _unittest and _regtest are deprecated.</code></li>
+</ul>
+
+<p>C++ files should end in <code>.cc</code> and header files should end in
+<code>.h</code>. Files that rely on being textually included at specific points
+should end in <code>.inc</code> (see also the section on
+<a href="#Self_contained_Headers">self-contained headers</a>).</p>
+
+<p>Do not use filenames that already exist in
+<code>/usr/include</code>, such as <code>db.h</code>.</p>
+
+<p>In general, make your filenames very specific. For
+example, use <code>http_server_logs.h</code> rather than
+<code>logs.h</code>. A very common case is to have a pair
+of files called, e.g., <code>foo_bar.h</code> and
+<code>foo_bar.cc</code>, defining a class called
+<code>FooBar</code>.</p>
+
+<p>Inline functions must be in a <code>.h</code> file. If
+your inline functions are very short, they should go
+directly into your <code>.h</code> file. </p>
+
+</div>
+
+<h3 id="Type_Names">Type Names</h3>
+
+<div class="summary">
+<p>Type names start with a capital letter and have a capital
+letter for each new word, with no underscores:
+<code>MyExcitingClass</code>, <code>MyExcitingEnum</code>.</p>
+</div>
+
+<div class="stylebody">
+
+<p>The names of all types &#8212; classes, structs, typedefs,
+and enums &#8212; have the same naming convention. Type names
+should start with a capital letter and have a capital letter
+for each new word. No underscores. For example:</p>
+
+<pre>// classes and structs
+class UrlTable { ...
+class UrlTableTester { ...
+struct UrlTableProperties { ...
+
+// typedefs
+typedef hash_map&lt;UrlTableProperties *, string&gt; PropertiesMap;
+
+// enums
+enum UrlTableErrors { ...
+</pre>
+
+</div>
+
+<h3 id="Variable_Names">Variable Names</h3>
+
+<div class="summary">
+<p>The names of variables and data members are all lowercase, with
+underscores between words. Data members of classes (but not structs)
+additionally are prefixed with "m_". For instance:
+<code>a_local_variable</code>, <code>a_struct_data_member</code>,
+<code>m_a_class_data_member</code>.</p>
+</div>
+
+<div class="stylebody">
+
+<h4 class="stylepoint_subsection">Common Variable names</h4>
+
+<p>For example:</p>
+
+<pre>string table_name;  // OK - uses underscore.
+string tablename;   // OK - all lowercase.
+</pre>
+
+<pre class="badcode">string tableName;   // Bad - mixed case.
+</pre>
+
+<h4 class="stylepoint_subsection">Class Data Members</h4>
+
+<p>Data members of classes, both static and non-static, are
+named like ordinary nonmember variables, but prefixed with a
+"m_".</p>
+
+<pre>class TableInfo {
+  ...
+ private:
+  string m_table_name;  // OK - m_ at beginning.
+  string m_tablename;   // OK.
+  static Pool&lt;TableInfo&gt;* m_pool;  // OK.
+};
+</pre>
+
+<h4 class="stylepoint_subsection">Struct Data Members</h4>
+
+<p>Data members of structs, both static and non-static,
+are named like ordinary nonmember variables. They do not have
+the preceding "m_" that data members in classes have.</p>
+
+<pre>struct UrlTableProperties {
+  string name;
+  int num_entries;
+  static Pool&lt;UrlTableProperties&gt;* pool;
+};
+</pre>
+
+
+<p>See <a href="#Structs_vs._Classes">Structs vs.
+Classes</a> for a discussion of when to use a struct
+versus a class.</p>
+
+<h4 class="stylepoint_subsection">Global Variables</h4>
+
+<p>There are no special requirements for global
+variables, which should be rare in any case, but if you
+use one, consider prefixing it with <code>g_</code> or
+some other marker to easily distinguish it from local
+variables.</p>
+
+</div>
+
+<h3 id="Constant_Names">Constant Names</h3>
+
+<div class="summary">
+<p>Use a <code>k</code> followed by mixed case, e.g.,
+<code>kDaysInAWeek</code>, for constants defined globally or within a class.</p>
+</div>
+
+<div class="stylebody">
+
+<p>As a convenience to the reader, compile-time constants of global or class scope
+follow a different naming convention from other variables.
+Use a <code>k</code> followed by words with uppercase first letters:</p>
+
+<pre>const int kDaysInAWeek = 7;
+</pre>
+
+<p>This convention may optionally be used for compile-time constants of local scope;
+otherwise the usual variable naming rules apply.
+
+</p></div>
+
+<h3 id="Function_Names">Function Names</h3>
+
+<div class="summary">
+<p>Regular functions have mixed case; accessors and mutators
+match the name of the variable:
+<code>MyExcitingFunction()</code>,
+<code>MyExcitingMethod()</code>,
+<code>my_exciting_member_variable()</code>,
+<code>set_my_exciting_member_variable()</code>.</p>
+</div>
+
+<div class="stylebody">
+
+<h4 class="stylepoint_subsection">Regular Functions</h4>
+
+<p>Functions should start with a capital letter and have
+a capital letter for each new word. No underscores.</p>
+
+<p>If your function crashes upon an error, you should
+append OrDie to the function name. This only applies to
+functions which could be used by production code and to
+errors that are reasonably likely to occur during normal
+operation.</p>
+
+            <pre>AddTableEntry()
+DeleteUrl()
+OpenFileOrDie()
+</pre>
+
+<h4 class="stylepoint_subsection">Accessors and Mutators</h4>
+
+<p>Accessors and mutators (get and set functions) should
+match the name of the variable they are getting and
+setting. This shows an excerpt of a class whose instance
+variable is <code>num_entries_</code>.</p>
+
+<pre>class MyClass {
+ public:
+  ...
+  int num_entries() const { return num_entries_; }
+  void set_num_entries(int num_entries) { num_entries_ = num_entries; }
+
+ private:
+  int num_entries_;
+};
+</pre>
+
+<p>You may also use lowercase letters for other very
+short inlined functions. For example if a function were
+so cheap you would not cache the value if you were
+calling it in a loop, then lowercase naming would be
+acceptable.</p>
+
+</div>
+
+<h3 id="Namespace_Names">Namespace Names</h3>
+
+<div class="summary">
+
+
+<p>Namespace names are all lower-case,
+and based on project names and possibly their directory
+structure: <code>google_awesome_project</code>.</p>
+</div>
+
+<div class="stylebody">
+
+<p>See <a href="#Namespaces">Namespaces</a> for a
+discussion of namespaces and how to name them.</p>
+
+</div>
+
+<h3 id="Enumerator_Names">Enumerator Names</h3>
+
+<div class="summary">
+<p>Enumerators should be named <i>either</i> like
+<a href="#Constant_Names">constants</a> or like
+<a href="#Macro_Names">macros</a>: either <code>kEnumName</code> or
+<code>ENUM_NAME</code>.</p>
+</div>
+
+<div class="stylebody">
+
+<p>Preferably, the individual enumerators should be named
+like <a href="#Constant_Names">constants</a>. However, it
+is also acceptable to name them like
+<a href="Macro_Names">macros</a>.  The enumeration name,
+<code>UrlTableErrors</code> (and
+<code>AlternateUrlTableErrors</code>), is a type, and
+therefore mixed case.</p>
+
+<pre>enum UrlTableErrors {
+  kOK = 0,
+  kErrorOutOfMemory,
+  kErrorMalformedInput,
+};
+enum AlternateUrlTableErrors {
+  OK = 0,
+  OUT_OF_MEMORY = 1,
+  MALFORMED_INPUT = 2,
+};
+</pre>
+
+<p>Until January 2009, the style was to name enum values
+like <a href="#Macro_Names">macros</a>. This caused
+problems with name collisions between enum values and
+macros. Hence, the change to prefer constant-style naming
+was put in place. New code should prefer constant-style
+naming if possible. However, there is no reason to change
+old code to use constant-style names, unless the old
+names are actually causing a compile-time problem.</p>
+
+
+
+</div>
+
+<h3 id="Macro_Names">Macro Names</h3>
+
+<div class="summary">
+<p>You're not really going to <a href="#Preprocessor_Macros">
+define a macro</a>, are you? If you do, they're like this:
+<code>MY_MACRO_THAT_SCARES_SMALL_CHILDREN</code>.</p>
+</div>
+
+<div class="stylebody">
+
+<p>Please see the <a href="#Preprocessor_Macros">description
+of macros</a>; in general macros should <em>not</em> be used.
+However, if they are absolutely needed, then they should be
+named with all capitals and underscores.</p>
+
+<pre>#define ROUND(x) ...
+#define PI_ROUNDED 3.0
+</pre>
+
+</div>
+
+<h3 id="Exceptions_to_Naming_Rules">Exceptions to Naming Rules</h3>
+
+<div class="summary">
+<p>If you are naming something that is analogous to an
+existing C or C++ entity then you can follow the existing
+naming convention scheme.</p>
+</div>
+
+<div class="stylebody">
+
+<dl>
+  <dt><code>bigopen()</code></dt>
+  <dd>function name, follows form of <code>open()</code></dd>
+
+  <dt><code>uint</code></dt>
+  <dd><code>typedef</code></dd>
+
+  <dt><code>bigpos</code></dt>
+  <dd><code>struct</code> or <code>class</code>, follows
+  form of <code>pos</code></dd>
+
+  <dt><code>sparse_hash_map</code></dt>
+  <dd>STL-like entity; follows STL naming conventions</dd>
+
+  <dt><code>LONGLONG_MAX</code></dt>
+  <dd>a constant, as in <code>INT_MAX</code></dd>
+</dl>
+
+</div>
+
+<h2 id="Comments">Comments</h2>
+
+<p>Though a pain to write, comments are absolutely vital to
+keeping our code readable. The following rules describe what
+you should comment and where. But remember: while comments are
+very important, the best code is self-documenting. Giving
+sensible names to types and variables is much better than using
+obscure names that you must then explain through comments.</p>
+
+<p>When writing your comments, write for your audience: the
+next
+contributor who will need to
+understand your code. Be generous &#8212; the next
+one may be you!</p>
+
+<h3 id="Comment_Style">Comment Style</h3>
+
+<div class="summary">
+<p>Use either the <code>//</code> or <code>/* */</code>
+syntax, as long as you are consistent.</p>
+</div>
+
+<div class="stylebody">
+
+<p>You can use either the <code>//</code> or the <code>/*
+*/</code> syntax; however, <code>//</code> is
+<em>much</em> more common. Be consistent with how you
+comment and what style you use where.</p>
+
+</div>
+
+<h3 id="File_Comments">File Comments</h3>
+
+<div class="summary">
+<p> Start each file with license
+boilerplate, followed by a description of its
+contents.</p>
+</div>
+
+<div class="stylebody">
+
+<h4 class="stylepoint_subsection">Legal Notice and Author
+Line</h4>
+
+
+
+<p>Every file should contain license
+boilerplate. Choose the appropriate boilerplate for the
+license used by the project (for example, Apache 2.0,
+BSD, LGPL, GPL).</p>
+
+<p>If you make significant changes to a file with an
+author line, consider deleting the author line.</p>
+
+<h4 class="stylepoint_subsection">File Contents</h4>
+
+<p>Every file should have a comment at the top describing
+its contents.</p>
+
+<p>Generally a <code>.h</code> file will describe the
+classes that are declared in the file with an overview of
+what they are for and how they are used. A
+<code>.cc</code> file should contain more information
+about implementation details or discussions of tricky
+algorithms. If you feel the implementation details or a
+discussion of the algorithms would be useful for someone
+reading the <code>.h</code>, feel free to put it there
+instead, but mention in the <code>.cc</code> that the
+documentation is in the <code>.h</code> file.</p>
+
+<p>Do not duplicate comments in both the <code>.h</code>
+and the <code>.cc</code>. Duplicated comments
+diverge.</p>
+
+</div>
+
+<h3 id="Class_Comments">Class Comments</h3>
+
+<div class="summary">
+<p>Every class definition should have an accompanying comment
+that describes what it is for and how it should be used.</p>
+</div>
+
+<div class="stylebody">
+
+<pre>// Iterates over the contents of a GargantuanTable.  Sample usage:
+//    GargantuanTableIterator* iter = table-&gt;NewIterator();
+//    for (iter-&gt;Seek("foo"); !iter-&gt;done(); iter-&gt;Next()) {
+//      process(iter-&gt;key(), iter-&gt;value());
+//    }
+//    delete iter;
+class GargantuanTableIterator {
+  ...
+};
+</pre>
+
+<p>If you have already described a class in detail in the
+comments at the top of your file feel free to simply
+state "See comment at top of file for a complete
+description", but be sure to have some sort of
+comment.</p>
+
+<p>Document the synchronization assumptions the class
+makes, if any. If an instance of the class can be
+accessed by multiple threads, take extra care to document
+the rules and invariants surrounding multithreaded
+use.</p>
+
+</div>
+
+<h3 id="Function_Comments">Function Comments</h3>
+
+<div class="summary">
+<p>Declaration comments describe use of the function; comments
+at the definition of a function describe operation.</p>
+</div>
+
+<div class="stylebody">
+
+<h4 class="stylepoint_subsection">Function Declarations</h4>
+
+<p>Every function declaration should have comments
+immediately preceding it that describe what the function
+does and how to use it. These comments should be
+descriptive ("Opens the file") rather than imperative
+("Open the file"); the comment describes the function, it
+does not tell the function what to do. In general, these
+comments do not describe how the function performs its
+task. Instead, that should be left to comments in the
+function definition.</p>
+
+<p>Types of things to mention in comments at the function
+declaration:</p>
+
+<ul>
+  <li>What the inputs and outputs are.</li>
+
+  <li>For class member functions: whether the object
+  remembers reference arguments beyond the duration of
+  the method call, and whether it will free them or
+  not.</li>
+
+  <li>If the function allocates memory that the caller
+  must free.</li>
+
+  <li>Whether any of the arguments can be a null
+  pointer.</li>
+
+  <li>If there are any performance implications of how a
+  function is used.</li>
+
+  <li>If the function is re-entrant. What are its
+  synchronization assumptions?</li>
+ </ul>
+
+<p>Here is an example:</p>
+
+<pre>// Returns an iterator for this table.  It is the client's
+// responsibility to delete the iterator when it is done with it,
+// and it must not use the iterator once the GargantuanTable object
+// on which the iterator was created has been deleted.
+//
+// The iterator is initially positioned at the beginning of the table.
+//
+// This method is equivalent to:
+//    Iterator* iter = table-&gt;NewIterator();
+//    iter-&gt;Seek("");
+//    return iter;
+// If you are going to immediately seek to another place in the
+// returned iterator, it will be faster to use NewIterator()
+// and avoid the extra seek.
+Iterator* GetIterator() const;
+</pre>
+
+<p>However, do not be unnecessarily verbose or state the
+completely obvious. Notice below that it is not necessary
+ to say "returns false otherwise" because this is
+implied.</p>
+
+<pre>// Returns true if the table cannot hold any more entries.
+bool IsTableFull();
+</pre>
+
+<p>When commenting constructors and destructors, remember
+that the person reading your code knows what constructors
+and destructors are for, so comments that just say
+something like "destroys this object" are not useful.
+Document what constructors do with their arguments (for
+example, if they take ownership of pointers), and what
+cleanup the destructor does. If this is trivial, just
+skip the comment. It is quite common for destructors not
+to have a header comment.</p>
+
+<h4 class="stylepoint_subsection">Function Definitions</h4>
+
+<p>If there is anything tricky about how a function does
+its job, the function definition should have an
+explanatory comment. For example, in the definition
+comment you might describe any coding tricks you use,
+give an overview of the steps you go through, or explain
+why you chose to implement the function in the way you
+did rather than using a viable alternative. For instance,
+you might mention why it must acquire a lock for the
+first half of the function but why it is not needed for
+the second half.</p>
+
+<p>Note you should <em>not</em> just repeat the comments
+given with the function declaration, in the
+<code>.h</code> file or wherever. It's okay to
+recapitulate briefly what the function does, but the
+focus of the comments should be on how it does it.</p>
+
+</div>
+
+<h3 id="Variable_Comments">Variable Comments</h3>
+
+<div class="summary">
+<p>In general the actual name of the variable should be
+descriptive enough to give a good idea of what the variable
+is used for. In certain cases, more comments are required.</p>
+</div>
+
+<div class="stylebody">
+
+<h4 class="stylepoint_subsection">Class Data Members</h4>
+
+<p>Each class data member (also called an instance
+variable or member variable) should have a comment
+describing what it is used for. If the variable can take
+sentinel values with special meanings, such as a null
+pointer or -1, document this. For example:</p>
+
+
+<pre>private:
+ // Keeps track of the total number of entries in the table.
+ // Used to ensure we do not go over the limit. -1 means
+ // that we don't yet know how many entries the table has.
+ int num_total_entries_;
+</pre>
+
+<h4 class="stylepoint_subsection">Global Variables</h4>
+
+<p>As with data members, all global variables should have
+a comment describing what they are and what they are used
+for. For example:</p>
+
+<pre>// The total number of tests cases that we run through in this regression test.
+const int kNumTestCases = 6;
+</pre>
+
+</div>
+
+<h3 id="Implementation_Comments">Implementation Comments</h3>
+
+<div class="summary">
+<p>In your implementation you should have comments in tricky,
+non-obvious, interesting, or important parts of your code.</p>
+</div>
+
+<div class="stylebody">
+
+<h4 class="stylepoint_subsection">Explanatory Comments</h4>
+
+<p>Tricky or complicated code blocks should have comments
+before them. Example:</p>
+
+<pre>// Divide result by two, taking into account that x
+// contains the carry from the add.
+for (int i = 0; i &lt; result-&gt;size(); i++) {
+  x = (x &lt;&lt; 8) + (*result)[i];
+  (*result)[i] = x &gt;&gt; 1;
+  x &amp;= 1;
+}
+</pre>
+
+<h4 class="stylepoint_subsection">Line Comments</h4>
+
+<p>Also, lines that are non-obvious should get a comment
+at the end of the line. These end-of-line comments should
+be separated from the code by 2 spaces. Example:</p>
+
+<pre>// If we have enough memory, mmap the data portion too.
+mmap_budget = max&lt;int64&gt;(0, mmap_budget - index_-&gt;length());
+if (mmap_budget &gt;= data_size_ &amp;&amp; !MmapData(mmap_chunk_bytes, mlock))
+  return;  // Error already logged.
+</pre>
+
+<p>Note that there are both comments that describe what
+the code is doing, and comments that mention that an
+error has already been logged when the function
+returns.</p>
+
+<p>If you have several comments on subsequent lines, it
+can often be more readable to line them up:</p>
+
+<pre>DoSomething();                  // Comment here so the comments line up.
+DoSomethingElseThatIsLonger();  // Two spaces between the code and the comment.
+{ // One space before comment when opening a new scope is allowed,
+  // thus the comment lines up with the following comments and code.
+  DoSomethingElse();  // Two spaces before line comments normally.
+}
+vector&lt;string&gt; list{// Comments in braced lists describe the next element ..
+                    "First item",
+                    // .. and should be aligned appropriately.
+                    "Second item"};
+DoSomething(); /* For trailing block comments, one space is fine. */
+</pre>
+
+<h4 class="stylepoint_subsection">nullptr/NULL, true/false, 1, 2, 3...</h4>
+
+<p>When you pass in a null pointer, boolean, or literal
+integer values to functions, you should consider adding a
+comment about what they are, or make your code
+self-documenting by using constants. For example,
+compare:</p>
+
+<pre class="badcode">bool success = CalculateSomething(interesting_value,
+                                  10,
+                                  false,
+                                  NULL);  // What are these arguments??
+</pre>
+
+<p>versus:</p>
+
+<pre>bool success = CalculateSomething(interesting_value,
+                                  10,     // Default base value.
+                                  false,  // Not the first time we're calling this.
+                                  NULL);  // No callback.
+</pre>
+
+<p>Or alternatively, constants or self-describing variables:</p>
+
+<pre>const int kDefaultBaseValue = 10;
+const bool kFirstTimeCalling = false;
+Callback *null_callback = NULL;
+bool success = CalculateSomething(interesting_value,
+                                  kDefaultBaseValue,
+                                  kFirstTimeCalling,
+                                  null_callback);
+</pre>
+
+<h4 class="stylepoint_subsection">Don'ts</h4>
+
+<p>Note that you should <em>never</em> describe the code
+itself. Assume that the person reading the code knows C++
+better than you do, even though he or she does not know
+what you are trying to do:</p>
+
+<pre class="badcode">// Now go through the b array and make sure that if i occurs,
+// the next element is i+1.
+...        // Geez.  What a useless comment.
+</pre>
+
+</div>
+
+<h3 id="Punctuation,_Spelling_and_Grammar">Punctuation, Spelling and Grammar</h3>
+
+<div class="summary">
+<p>Pay attention to punctuation, spelling, and grammar; it is
+easier to read well-written comments than badly written
+ones.</p>
+</div>
+
+<div class="stylebody">
+
+<p>Comments should be as readable as narrative text, with
+proper capitalization and punctuation. In many cases,
+complete sentences are more readable than sentence
+fragments. Shorter comments, such as comments at the end
+of a line of code, can sometimes be less formal, but you
+should be consistent with your style.</p>
+
+<p>Although it can be frustrating to have a code reviewer
+point out that you are using a comma when you should be
+using a semicolon, it is very important that source code
+maintain a high level of clarity and readability. Proper
+punctuation, spelling, and grammar help with that
+goal.</p>
+
+</div>
+
+<h3 id="TODO_Comments">TODO Comments</h3>
+
+<div class="summary">
+<p>Use <code>TODO</code> comments for code that is temporary,
+a short-term solution, or good-enough but not perfect.</p>
+</div>
+
+<div class="stylebody">
+
+<p><code>TODO</code>s should include the string
+<code>TODO</code> in all caps, followed by the
+
+name, e-mail address, or other
+identifier of the person
+ with the best context
+about the problem referenced by the <code>TODO</code>. The
+main purpose is to have a consistent <code>TODO</code> that
+can be searched to find out how to get more details upon
+request. A <code>TODO</code> is not a commitment that the
+person referenced will fix the problem. Thus when you create
+a <code>TODO</code>, it is almost always your
+
+name
+that is given.</p>
+
+
+
+<div>
+<pre>// TODO(kl@gmail.com): Use a "*" here for concatenation operator.
+// TODO(Zeke) change this to use relations.
+</pre>
+</div>
+
+<p>If your <code>TODO</code> is of the form "At a future
+date do something" make sure that you either include a
+very specific date ("Fix by November 2005") or a very
+specific event ("Remove this code when all clients can
+handle XML responses.").</p>
+
+</div>
+
+<h3 id="Deprecation_Comments">Deprecation Comments</h3>
+
+<div class="summary">
+<p>Mark deprecated interface points with <code>DEPRECATED</code>
+comments.</p>
+</div>
+
+<div class="stylebody">
+
+<p>You can mark an interface as deprecated by writing a
+comment containing the word <code>DEPRECATED</code> in
+all caps. The comment goes either before the declaration
+of the interface or on the same line as the
+declaration.</p>
+
+
+
+<p>After the word
+<code>DEPRECATED</code>, write your name, e-mail address,
+or other identifier in parentheses.</p>
+
+<p>A deprecation comment must include simple, clear
+directions for people to fix their callsites. In C++, you
+can implement a deprecated function as an inline function
+that calls the new interface point.</p>
+
+<p>Marking an interface point <code>DEPRECATED</code>
+will not magically cause any callsites to change. If you
+want people to actually stop using the deprecated
+facility, you will have to fix the callsites yourself or
+recruit a crew to help you.</p>
+
+<p>New code should not contain calls to deprecated
+interface points. Use the new interface point instead. If
+you cannot understand the directions, find the person who
+created the deprecation and ask them for help using the
+new interface point.</p>
+
+
+
+</div>
+
+<h2 id="Formatting">Formatting</h2>
+
+<p>Coding style and formatting are pretty arbitrary, but a
+
+project is much easier to follow
+if everyone uses the same style. Individuals may not agree with every
+aspect of the formatting rules, and some of the rules may take
+some getting used to, but it is important that all
+
+project contributors follow the
+style rules so that
+they can all read and understand
+everyone's code easily.</p>
+
+
+
+<p>To help you format code correctly, we've
+created a
+<a href="http://google-styleguide.googlecode.com/svn/trunk/google-c-style.el">
+settings file for emacs</a>.</p>
+
+<h3 id="Line_Length">Line Length</h3>
+
+<div class="summary">
+<p>Each line of text in your code should be at most 80
+characters long.</p>
+</div>
+
+<div class="stylebody">
+
+
+
+ <p>We recognize that this rule is
+controversial, but so much existing code already adheres
+to it, and we feel that consistency is important.</p>
+
+<div class="pros">
+<p>Those who favor  this rule
+argue that it is rude to force them to resize
+their windows and there is no need for anything longer.
+Some folks are used to having several code windows
+side-by-side, and thus don't have room to widen their
+windows in any case. People set up their work environment
+assuming a particular maximum window width, and 80
+columns has been the traditional standard. Why change
+it?</p>
+</div>
+
+<div class="cons">
+<p>Proponents of change argue that a wider line can make
+code more readable. The 80-column limit is an hidebound
+throwback to 1960s mainframes;  modern equipment has wide screens that
+can easily show longer lines.</p>
+</div>
+
+<div class="decision">
+<p> 80 characters is the maximum.</p>
+
+<p class="exception">If a comment line contains an example
+command or a literal URL longer than 80 characters, that
+line may be longer than 80 characters for ease of cut and
+paste.</p>
+
+<p class="exception">A raw-string literal may have content
+that exceeds 80 characters.  Except for test code, such literals
+should appear near top of a file.</p>
+
+<p class="exception">An <code>#include</code> statement with a
+long path may exceed 80 columns.</p>
+
+<p class="exception">You needn't be concerned about
+<a href="#The__define_Guard">header guards</a> that exceed
+the maximum length. </p>
+</div>
+
+</div>
+
+<h3 id="Non-ASCII_Characters">Non-ASCII Characters</h3>
+
+<div class="summary">
+<p>Non-ASCII characters should be rare, and must use UTF-8
+formatting.</p>
+</div>
+
+<div class="stylebody">
+
+<p>You shouldn't hard-code user-facing text in source,
+even English, so use of non-ASCII characters should be
+rare. However, in certain cases it is appropriate to
+include such words in your code. For example, if your
+code parses data files from foreign sources, it may be
+appropriate to hard-code the non-ASCII string(s) used in
+those data files as delimiters. More commonly, unittest
+code (which does not  need to be localized) might
+contain non-ASCII strings. In such cases, you should use
+UTF-8, since that is  an encoding
+understood by most tools able to handle more than just
+ASCII.</p>
+
+<p>Hex encoding is also OK, and encouraged where it
+enhances readability &#8212; for example,
+<code>"\xEF\xBB\xBF"</code>, or, even more simply,
+<code>u8"\uFEFF"</code>, is the Unicode zero-width
+no-break space character, which would be invisible if
+included in the source as straight UTF-8.</p>
+
+<p>Use the <code>u8</code> prefix
+to guarantee that a string literal containing
+<code>\uXXXX</code> escape sequences is encoded as UTF-8.
+Do not use it for strings containing non-ASCII characters
+encoded as UTF-8, because that will produce incorrect
+output if the compiler does not interpret the source file
+as UTF-8. </p>
+
+<p>You shouldn't use the C++11 <code>char16_t</code> and
+<code>char32_t</code> character types, since they're for
+non-UTF-8 text. For similar reasons you also shouldn't
+use <code>wchar_t</code> (unless you're writing code that
+interacts with the Windows API, which uses
+<code>wchar_t</code> extensively).</p>
+
+</div>
+
+<h3 id="Spaces_vs._Tabs">Spaces vs. Tabs</h3>
+
+<div class="summary">
+<p>Use only spaces, and indent 2 spaces at a time.</p>
+</div>
+
+<div class="stylebody">
+
+<p>We use spaces for indentation. Do not use tabs in your
+code. You should set your editor to emit spaces when you
+hit the tab key.</p>
+
+</div>
+
+<h3 id="Function_Declarations_and_Definitions">Function Declarations and Definitions</h3>
+
+<div class="summary">
+<p>Return type on the same line as function name, parameters
+on the same line if they fit. Wrap parameter lists which do
+not fit on a single line as you would wrap arguments in a
+function call.</p>
+</div>
+
+<div class="stylebody">
+
+<p>Functions look like this:</p>
+
+
+<pre>ReturnType ClassName::FunctionName(Type par_name1, Type par_name2) {
+  DoSomething();
+  ...
+}
+</pre>
+
+<p>If you have too much text to fit on one line:</p>
+
+<pre>ReturnType ClassName::ReallyLongFunctionName(Type par_name1, Type par_name2,
+                                             Type par_name3) {
+  DoSomething();
+  ...
+}
+</pre>
+
+<p>or if you cannot fit even the first parameter:</p>
+
+<pre>ReturnType LongClassName::ReallyReallyReallyLongFunctionName(
+    Type par_name1,  // 4 space indent
+    Type par_name2,
+    Type par_name3) {
+  DoSomething();  // 2 space indent
+  ...
+}
+</pre>
+
+<p>Some points to note:</p>
+
+<ul>
+  <li>If you cannot fit the return type and the function
+  name on a single line, break between them.</li>
+
+  <li>If you break after the return type of a function
+  declaration or definition, do not indent.</li>
+
+  <li>The open parenthesis is always on the same line as
+  the function name.</li>
+
+  <li>There is never a space between the function name
+  and the open parenthesis.</li>
+
+  <li>There is never a space between the parentheses and
+  the parameters.</li>
+
+  <li>The open curly brace is always at the end of the
+  same line as the last parameter.</li>
+
+  <li>The close curly brace is either on the last line by
+  itself or (if other style rules permit) on the same
+  line as the open curly brace.</li>
+
+  <li>There should be a space between the close
+  parenthesis and the open curly brace.</li>
+
+  <li>All parameters should be named, with identical
+  names in the declaration and implementation.</li>
+
+  <li>All parameters should be aligned if possible.</li>
+
+  <li>Default indentation is 2 spaces.</li>
+
+  <li>Wrapped parameters have a 4 space indent.</li>
+</ul>
+
+<p>If some parameters are unused, comment out the
+variable name in the function definition:</p>
+
+<pre>// Always have named parameters in interfaces.
+class Shape {
+ public:
+  virtual void Rotate(double radians) = 0;
+};
+
+// Always have named parameters in the declaration.
+class Circle : public Shape {
+ public:
+  virtual void Rotate(double radians);
+};
+
+// Comment out unused named parameters in definitions.
+void Circle::Rotate(double /*radians*/) {}
+</pre>
+
+<pre class="badcode">// Bad - if someone wants to implement later, it's not clear what the
+// variable means.
+void Circle::Rotate(double) {}
+</pre>
+
+</div>
+
+<h3 id="Formatting_Lambda_Expressions">Lambda Expressions</h3>
+
+<div class="summary">
+<p>Format parameters and bodies as for any other function, and capture
+lists like other comma-separated lists.</p>
+</div>
+
+<div class="stylebody">
+<p>For by-reference captures, do not leave a space between the
+ampersand (&amp;) and the variable name.</p>
+<pre>int x = 0;
+auto add_to_x = [&amp;x](int n) { x += n; };
+</pre>
+<p>Short lambdas may be written inline as function arguments.</p>
+<pre>std::set&lt;int&gt; blacklist = {7, 8, 9};
+std::vector&lt;int&gt; digits = {3, 9, 1, 8, 4, 7, 1};
+digits.erase(std::remove_if(digits.begin(), digits.end(), [&amp;blacklist](int i) {
+               return blacklist.find(i) != blacklist.end();
+             }),
+             digits.end());
+</pre>
+
+</div>
+
+<h3 id="Function_Calls">Function Calls</h3>
+
+<div class="summary">
+<p>Either write the call all on a single line, wrap the
+arguments at the parenthesis, or start the arguments on a new
+line indented by four spaces and continue at that 4 space
+indent. In the absence of other considerations, use the
+minimum number of lines, including placing multiple arguments
+on each line where appropriate.</p>
+</div>
+
+<div class="stylebody">
+
+<p>Function calls have the following format:</p>
+<pre>bool retval = DoSomething(argument1, argument2, argument3);
+</pre>
+
+<p>If the arguments do not all fit on one line, they
+should be broken up onto multiple lines, with each
+subsequent line aligned with the first argument. Do not
+add spaces after the open paren or before the close
+paren:</p>
+<pre>bool retval = DoSomething(averyveryveryverylongargument1,
+                          argument2, argument3);
+</pre>
+
+<p>Arguments may optionally all be placed on subsequent
+lines with a four space indent:</p>
+<pre>if (...) {
+  ...
+  ...
+  if (...) {
+    DoSomething(
+        argument1, argument2,  // 4 space indent
+        argument3, argument4);
+  }
+</pre>
+
+<p>Put multiple arguments on a single line to reduce the
+number of lines necessary for calling a function unless
+there is a specific readability problem. Some find that
+formatting with strictly one argument on each line is
+more readable and simplifies editing of the arguments.
+However, we prioritize for the reader over the ease of
+editing arguments, and most readability problems are
+better addressed with the following techniques.</p>
+
+<p>If having multiple arguments in a single line decreases
+readability due to the complexity or confusing nature of the
+expressions that make up some arguments, try creating
+variables that capture those arguments in a descriptive name:</p>
+<pre>int my_heuristic = scores[x] * y + bases[x];
+bool retval = DoSomething(my_heuristic, x, y, z);
+</pre>
+
+<p>Or put the confusing argument on its own line with
+an explanatory comment:</p>
+<pre>bool retval = DoSomething(scores[x] * y + bases[x],  // Score heuristic.
+                          x, y, z);
+</pre>
+
+<p>If there is still a case where one argument is
+significantly more readable on its own line, then put it on
+its own line. The decision should be specific to the argument
+which is made more readable rather than a general policy.</p>
+
+<p>Sometimes arguments form a structure that is important
+for readability. In those cases, feel free to format the
+arguments according to that structure:</p>
+<pre>// Transform the widget by a 3x3 matrix.
+my_widget.Transform(x1, x2, x3,
+                    y1, y2, y3,
+                    z1, z2, z3);
+</pre>
+
+</div>
+
+<h3 id="Braced_Initializer_List_Format">Braced Initializer List Format</h3>
+
+<div class="summary">
+<p>Format a <a href="#Braced_Initializer_List">braced initializer list</a>
+exactly like you would format a function call in its place.</p>
+</div>
+
+<div class="stylebody">
+
+<p>If the braced list follows a name (e.g. a type or
+variable name), format as if the <code>{}</code> were the
+parentheses of a function call with that name. If there
+is no name, assume a zero-length name.</p>
+
+<pre>// Examples of braced init list on a single line.
+return {foo, bar};
+functioncall({foo, bar});
+pair&lt;int, int&gt; p{foo, bar};
+
+// When you have to wrap.
+SomeFunction(
+    {"assume a zero-length name before {"},
+    some_other_function_parameter);
+SomeType variable{
+    some, other, values,
+    {"assume a zero-length name before {"},
+    SomeOtherType{
+        "Very long string requiring the surrounding breaks.",
+        some, other values},
+    SomeOtherType{"Slightly shorter string",
+                  some, other, values}};
+SomeType variable{
+    "This is too long to fit all in one line"};
+MyType m = {  // Here, you could also break before {.
+    superlongvariablename1,
+    superlongvariablename2,
+    {short, interior, list},
+    {interiorwrappinglist,
+     interiorwrappinglist2}};
+</pre>
+
+</div>
+
+<h3 id="Conditionals">Conditionals</h3>
+
+<div class="summary">
+<p>Prefer no spaces inside parentheses. The <code>if</code>
+and <code>else</code> keywords belong on separate lines.</p>
+</div>
+
+<div class="stylebody">
+
+<p>There are two acceptable formats for a basic
+conditional statement. One includes spaces between the
+parentheses and the condition, and one does not.</p>
+
+<p>The most common form is without spaces. Either is
+fine, but <em>be consistent</em>. If you are modifying a
+file, use the format that is already present. If you are
+writing new code, use the format that the other files in
+that directory or project use. If in doubt and you have
+no personal preference, do not add the spaces.</p>
+
+<pre>if (condition) {  // no spaces inside parentheses
+  ...  // 2 space indent.
+} else if (...) {  // The else goes on the same line as the closing brace.
+  ...
+} else {
+  ...
+}
+</pre>
+
+<p>If you prefer you may add spaces inside the
+parentheses:</p>
+
+<pre>if ( condition ) {  // spaces inside parentheses - rare
+  ...  // 2 space indent.
+} else {  // The else goes on the same line as the closing brace.
+  ...
+}
+</pre>
+
+<p>Note that in all cases you must have a space between
+the <code>if</code> and the open parenthesis. You must
+also have a space between the close parenthesis and the
+curly brace, if you're using one.</p>
+
+<pre class="badcode">if(condition) {   // Bad - space missing after IF.
+if (condition){   // Bad - space missing before {.
+if(condition){    // Doubly bad.
+</pre>
+
+<pre>if (condition) {  // Good - proper space after IF and before {.
+</pre>
+
+<p>Short conditional statements may be written on one
+line if this enhances readability. You may use this only
+when the line is brief and the statement does not use the
+<code>else</code> clause.</p>
+
+<pre>if (x == kFoo) return new Foo();
+if (x == kBar) return new Bar();
+</pre>
+
+<p>This is not allowed when the if statement has an
+<code>else</code>:</p>
+
+<pre class="badcode">// Not allowed - IF statement on one line when there is an ELSE clause
+if (x) DoThis();
+else DoThat();
+</pre>
+
+<p>In general, curly braces are not required for
+single-line statements, but they are allowed if you like
+them; conditional or loop statements with complex
+conditions or statements may be more readable with curly
+braces. Some
+projects require that an
+<code>if</code> must always always have an accompanying
+brace.</p>
+
+<pre>if (condition)
+  DoSomething();  // 2 space indent.
+
+if (condition) {
+  DoSomething();  // 2 space indent.
+}
+</pre>
+
+<p>However, if one part of an
+<code>if</code>-<code>else</code> statement uses curly
+braces, the other part must too:</p>
+
+<pre class="badcode">// Not allowed - curly on IF but not ELSE
+if (condition) {
+  foo;
+} else
+  bar;
+
+// Not allowed - curly on ELSE but not IF
+if (condition)
+  foo;
+else {
+  bar;
+}
+</pre>
+
+<pre>// Curly braces around both IF and ELSE required because
+// one of the clauses used braces.
+if (condition) {
+  foo;
+} else {
+  bar;
+}
+</pre>
+
+</div>
+
+<h3 id="Loops_and_Switch_Statements">Loops and Switch Statements</h3>
+
+<div class="summary">
+<p>Switch statements may use braces for blocks. Annotate
+non-trivial fall-through between cases.
+Braces are optional for single-statement loops.
+Empty loop bodies should use <code>{}</code> or <code>continue</code>.</p>
+</div>
+
+<div class="stylebody">
+
+<p><code>case</code> blocks in <code>switch</code>
+statements can have curly braces or not, depending on
+your preference. If you do include curly braces they
+should be placed as shown below.</p>
+
+<p>If not conditional on an enumerated value, switch
+statements should always have a <code>default</code> case
+(in the case of an enumerated value, the compiler will
+warn you if any values are not handled). If the default
+case should never execute, simply
+<code>assert</code>:</p>
+
+
+
+<div>
+<pre>switch (var) {
+  case 0: {  // 2 space indent
+    ...      // 4 space indent
+    break;
+  }
+  case 1: {
+    ...
+    break;
+  }
+  default: {
+    assert(false);
+  }
+}
+</pre>
+</div>
+
+
+
+
+
+<p> Braces are optional for single-statement loops.</p>
+
+<pre>for (int i = 0; i &lt; kSomeNumber; ++i)
+  printf("I love you\n");
+
+for (int i = 0; i &lt; kSomeNumber; ++i) {
+  printf("I take it back\n");
+}
+</pre>
+
+
+<p>Empty loop bodies should use <code>{}</code> or
+<code>continue</code>, but not a single semicolon.</p>
+
+<pre>while (condition) {
+  // Repeat test until it returns false.
+}
+for (int i = 0; i &lt; kSomeNumber; ++i) {}  // Good - empty body.
+while (condition) continue;  // Good - continue indicates no logic.
+</pre>
+
+<pre class="badcode">while (condition);  // Bad - looks like part of do/while loop.
+</pre>
+
+</div>
+
+<h3 id="Pointer_and_Reference_Expressions">Pointer and Reference Expressions</h3>
+
+<div class="summary">
+<p>No spaces around period or arrow. Pointer operators do not
+have trailing spaces.</p>
+</div>
+
+<div class="stylebody">
+
+<p>The following are examples of correctly-formatted
+pointer and reference expressions:</p>
+
+<pre>x = *p;
+p = &amp;x;
+x = r.y;
+x = r-&gt;y;
+</pre>
+
+<p>Note that:</p>
+
+<ul>
+  <li>There are no spaces around the period or arrow when
+  accessing a member.</li>
+
+   <li>Pointer operators have no space after the
+   <code>*</code> or <code>&amp;</code>.</li>
+</ul>
+
+<p>When declaring a pointer variable or argument, you may
+place the asterisk adjacent to either the type or to the
+variable name:</p>
+
+<pre>// These are fine, space preceding.
+char *c;
+const string &amp;str;
+
+// These are fine, space following.
+char* c;    // but remember to do "char* c, *d, *e, ...;"!
+const string&amp; str;
+</pre>
+
+<pre class="badcode">char * c;  // Bad - spaces on both sides of *
+const string &amp; str;  // Bad - spaces on both sides of &amp;
+</pre>
+
+<p>You should do this consistently within a single
+file,
+so, when modifying an existing file, use the style in
+that file.</p>
+
+</div>
+
+<h3 id="Boolean_Expressions">Boolean Expressions</h3>
+
+<div class="summary">
+<p>When you have a boolean expression that is longer than the
+<a href="#Line_Length">standard line length</a>, be
+consistent in how you break up the lines.</p>
+</div>
+
+<div class="stylebody">
+
+<p>In this example, the logical AND operator is always at
+the end of the lines:</p>
+
+<pre>if (this_one_thing &gt; this_other_thing &amp;&amp;
+    a_third_thing == a_fourth_thing &amp;&amp;
+    yet_another &amp;&amp; last_one) {
+  ...
+}
+</pre>
+
+<p>Note that when the code wraps in this example, both of
+the <code>&amp;&amp;</code> logical AND operators are at
+the end of the line. This is more common in Google code,
+though wrapping all operators at the beginning of the
+line is also allowed. Feel free to insert extra
+parentheses judiciously because they can be very helpful
+in increasing readability when used
+appropriately. Also note that you should always use
+the punctuation operators, such as
+<code>&amp;&amp;</code> and <code>~</code>, rather than
+the word operators, such as <code>and</code> and
+<code>compl</code>.</p>
+
+</div>
+
+<h3 id="Return_Values">Return Values</h3>
+
+<div class="summary">
+<p>Do not needlessly surround the <code>return</code>
+expression with parentheses.</p>
+</div>
+
+<div class="stylebody">
+
+<p>Use parentheses in <code>return expr;</code> only
+where you would use them in <code>x = expr;</code>.</p>
+
+<pre>return result;                  // No parentheses in the simple case.
+// Parentheses OK to make a complex expression more readable.
+return (some_long_condition &amp;&amp;
+        another_condition);
+</pre>
+
+<pre class="badcode">return (value);                // You wouldn't write var = (value);
+return(result);                // return is not a function!
+</pre>
+
+</div>
+
+
+
+<h3 id="Variable_and_Array_Initialization">Variable and Array Initialization</h3>
+
+<div class="summary">
+<p>Your choice of <code>=</code>, <code>()</code>, or
+<code>{}</code>.</p>
+</div>
+
+<div class="stylebody">
+
+<p>You may choose between <code>=</code>,
+<code>()</code>, and <code>{}</code>; the following are
+all correct:</p>
+
+<pre>int x = 3;
+int x(3);
+int x{3};
+string name = "Some Name";
+string name("Some Name");
+string name{"Some Name"};
+</pre>
+
+<p>Be careful when using a braced initialization list <code>{...}</code>
+on a type with an <code>std::initializer_list</code> constructor.
+A nonempty <i>braced-init-list</i> prefers the
+<code>std::initializer_list</code> constructor whenever
+possible. Note that empty braces <code>{}</code> are special, and
+will call a default constructor if available. To force the
+non-<code>std::initializer_list</code> constructor, use parentheses
+instead of braces.</p>
+
+<pre>vector&lt;int&gt; v(100, 1);  // A vector of 100 1s.
+vector&lt;int&gt; v{100, 1};  // A vector of 100, 1.
+</pre>
+
+<p>Also, the brace form prevents narrowing of integral
+types. This can prevent some types of programming
+errors.</p>
+
+<pre>int pi(3.14);  // OK -- pi == 3.
+int pi{3.14};  // Compile error: narrowing conversion.
+</pre>
+
+</div>
+
+<h3 id="Preprocessor_Directives">Preprocessor Directives</h3>
+
+<div class="summary">
+<p>The hash mark that starts a preprocessor directive should
+always be at the beginning of the line.</p>
+</div>
+
+<div class="stylebody">
+
+<p>Even when preprocessor directives are within the body
+of indented code, the directives should start at the
+beginning of the line.</p>
+
+<pre>// Good - directives at beginning of line
+  if (lopsided_score) {
+#if DISASTER_PENDING      // Correct -- Starts at beginning of line
+    DropEverything();
+# if NOTIFY               // OK but not required -- Spaces after #
+    NotifyClient();
+# endif
+#endif
+    BackToNormal();
+  }
+</pre>
+
+<pre class="badcode">// Bad - indented directives
+  if (lopsided_score) {
+    #if DISASTER_PENDING  // Wrong!  The "#if" should be at beginning of line
+    DropEverything();
+    #endif                // Wrong!  Do not indent "#endif"
+    BackToNormal();
+  }
+</pre>
+
+</div>
+
+<h3 id="Class_Format">Class Format</h3>
+
+<div class="summary">
+<p>Sections in <code>public</code>, <code>protected</code> and
+<code>private</code> order, each indented one space.</p>
+</div>
+
+<div class="stylebody">
+
+<p>The basic format for a class declaration (lacking the
+comments, see <a href="#Class_Comments">Class
+Comments</a> for a discussion of what comments are
+needed) is:</p>
+
+<pre>class MyClass : public OtherClass {
+ public:      // Note the 1 space indent!
+  MyClass();  // Regular 2 space indent.
+  explicit MyClass(int var);
+  ~MyClass() {}
+
+  void SomeFunction();
+  void SomeFunctionThatDoesNothing() {
+  }
+
+  void set_some_var(int var) { some_var_ = var; }
+  int some_var() const { return some_var_; }
+
+ private:
+  bool SomeInternalFunction();
+
+  int some_var_;
+  int some_other_var_;
+};
+</pre>
+
+<p>Things to note:</p>
+
+<ul>
+  <li>Any base class name should be on the same line as
+  the subclass name, subject to the 80-column limit.</li>
+
+  <li>The <code>public:</code>, <code>protected:</code>,
+  and <code>private:</code> keywords should be indented
+  one space.</li>
+
+  <li>Except for the first instance, these keywords
+  should be preceded by a blank line. This rule is
+  optional in small classes.</li>
+
+  <li>Do not leave a blank line after these
+  keywords.</li>
+
+  <li>The <code>public</code> section should be first,
+  followed by the <code>protected</code> and finally the
+  <code>private</code> section.</li>
+
+  <li>See <a href="#Declaration_Order">Declaration
+  Order</a> for rules on ordering declarations within
+  each of these sections.</li>
+</ul>
+
+</div>
+
+<h3 id="Constructor_Initializer_Lists">Constructor Initializer Lists</h3>
+
+<div class="summary">
+<p>Constructor initializer lists can be all on one line or
+with subsequent lines indented four spaces.</p>
+</div>
+
+<div class="stylebody">
+
+<p>There are two acceptable formats for initializer
+lists:</p>
+
+<pre>// When it all fits on one line:
+MyClass::MyClass(int var) : some_var_(var), some_other_var_(var + 1) {}
+</pre>
+
+<p>or</p>
+
+<pre>// When it requires multiple lines, indent 4 spaces, putting the colon on
+// the first initializer line:
+MyClass::MyClass(int var)
+    : some_var_(var),             // 4 space indent
+      some_other_var_(var + 1) {  // lined up
+  ...
+  DoSomething();
+  ...
+}
+</pre>
+
+</div>
+
+<h3 id="Namespace_Formatting">Namespace Formatting</h3>
+
+<div class="summary">
+<p>The contents of namespaces are not indented.</p>
+</div>
+
+<div class="stylebody">
+
+<p><a href="#Namespaces">Namespaces</a> do not add an
+extra level of indentation. For example, use:</p>
+
+<pre>namespace {
+
+void foo() {  // Correct.  No extra indentation within namespace.
+  ...
+}
+
+}  // namespace
+</pre>
+
+<p>Do not indent within a namespace:</p>
+
+<pre class="badcode">namespace {
+
+  // Wrong.  Indented when it should not be.
+  void foo() {
+    ...
+  }
+
+}  // namespace
+</pre>
+
+<p>When declaring nested namespaces, put each namespace
+on its own line.</p>
+
+<pre>namespace foo {
+namespace bar {
+</pre>
+
+</div>
+
+<h3 id="Horizontal_Whitespace">Horizontal Whitespace</h3>
+
+<div class="summary">
+<p>Use of horizontal whitespace depends on location. Never put
+trailing whitespace at the end of a line.</p>
+</div>
+
+<div class="stylebody">
+
+<h4 class="stylepoint_subsection">General</h4>
+
+<pre>void f(bool b) {  // Open braces should always have a space before them.
+  ...
+int i = 0;  // Semicolons usually have no space before them.
+// Spaces inside braces for braced-init-list are optional.  If you use them,
+// put them on both sides!
+int x[] = { 0 };
+int x[] = {0};
+
+// Spaces around the colon in inheritance and initializer lists.
+class Foo : public Bar {
+ public:
+  // For inline function implementations, put spaces between the braces
+  // and the implementation itself.
+  Foo(int b) : Bar(), baz_(b) {}  // No spaces inside empty braces.
+  void Reset() { baz_ = 0; }  // Spaces separating braces from implementation.
+  ...
+</pre>
+
+<p>Adding trailing whitespace can cause extra work for
+others editing the same file, when they merge, as can
+removing existing trailing whitespace. So: Don't
+introduce trailing whitespace. Remove it if you're
+already changing that line, or do it in a separate
+clean-up
+operation (preferably when no-one
+else is working on the file).</p>
+
+<h4 class="stylepoint_subsection">Loops and Conditionals</h4>
+
+<pre>if (b) {          // Space after the keyword in conditions and loops.
+} else {          // Spaces around else.
+}
+while (test) {}   // There is usually no space inside parentheses.
+switch (i) {
+for (int i = 0; i &lt; 5; ++i) {
+// Loops and conditions may have spaces inside parentheses, but this
+// is rare.  Be consistent.
+switch ( i ) {
+if ( test ) {
+for ( int i = 0; i &lt; 5; ++i ) {
+// For loops always have a space after the semicolon.  They may have a space
+// before the semicolon, but this is rare.
+for ( ; i &lt; 5 ; ++i) {
+  ...
+
+// Range-based for loops always have a space before and after the colon.
+for (auto x : counts) {
+  ...
+}
+switch (i) {
+  case 1:         // No space before colon in a switch case.
+    ...
+  case 2: break;  // Use a space after a colon if there's code after it.
+</pre>
+
+<h4 class="stylepoint_subsection">Operators</h4>
+
+<pre>// Assignment operators always have spaces around them.
+x = 0;
+
+// Other binary operators usually have spaces around them, but it's
+// OK to remove spaces around factors.  Parentheses should have no
+// internal padding.
+v = w * x + y / z;
+v = w*x + y/z;
+v = w * (x + z);
+
+// No spaces separating unary operators and their arguments.
+x = -5;
+++x;
+if (x &amp;&amp; !y)
+  ...
+</pre>
+
+<h4 class="stylepoint_subsection">Templates and Casts</h4>
+
+<pre>// No spaces inside the angle brackets (&lt; and &gt;), before
+// &lt;, or between &gt;( in a cast
+vector&lt;string&gt; x;
+y = static_cast&lt;char*&gt;(x);
+
+// Spaces between type and pointer are OK, but be consistent.
+vector&lt;char *&gt; x;
+set&lt;list&lt;string&gt;&gt; x;        // Permitted in C++11 code.
+set&lt;list&lt;string&gt; &gt; x;       // C++03 required a space in &gt; &gt;.
+
+// You may optionally use symmetric spacing in &lt; &lt;.
+set&lt; list&lt;string&gt; &gt; x;
+</pre>
+
+</div>
+
+<h3 id="Vertical_Whitespace">Vertical Whitespace</h3>
+
+<div class="summary">
+<p>Minimize use of vertical whitespace.</p>
+</div>
+
+<div class="stylebody">
+
+<p>This is more a principle than a rule: don't use blank
+lines when you don't have to. In particular, don't put
+more than one or two blank lines between functions,
+resist starting functions with a blank line, don't end
+functions with a blank line, and be discriminating with
+your use of blank lines inside functions.</p>
+
+<p>The basic principle is: The more code that fits on one
+screen, the easier it is to follow and understand the
+control flow of the program. Of course, readability can
+suffer from code being too dense as well as too spread
+out, so use your judgement. But in general, minimize use
+of vertical whitespace.</p>
+
+<p>Some rules of thumb to help when blank lines may be
+useful:</p>
+
+<ul>
+  <li>Blank lines at the beginning or end of a function
+  very rarely help readability.</li>
+
+  <li>Blank lines inside a chain of if-else blocks may
+  well help readability.</li>
+</ul>
+
+</div>
+
+<h2 id="Exceptions_to_the_Rules">Exceptions to the Rules</h2>
+
+<p>The coding conventions described above are mandatory.
+However, like all good rules, these sometimes have exceptions,
+which we discuss here.</p>
+
+
+
+<div>
+<h3 id="Existing_Non-conformant_Code">Existing Non-conformant Code</h3>
+
+<div class="summary">
+<p>You may diverge from the rules when dealing with code that
+does not conform to this style guide.</p>
+</div>
+
+<div class="stylebody">
+
+<p>If you find yourself modifying code that was written
+to specifications other than those presented by this
+guide, you may have to diverge from these rules in order
+to stay consistent with the local conventions in that
+code. If you are in doubt about how to do this, ask the
+original author or the person currently responsible for
+the code. Remember that <em>consistency</em> includes
+local consistency, too.</p>
+
+</div>
+</div>
+
+
+<h2 class="ignoreLink">Parting Words</h2>
+
+<p>Use common sense and <em>BE CONSISTENT</em>.</p>
+
+<p>If you are editing code, take a few minutes to look at the
+code around you and determine its style. If they use spaces
+around their <code>if</code> clauses, you should, too. If their
+comments have little boxes of stars around them, make your
+comments have little boxes of stars around them too.</p>
+
+<p>The point of having style guidelines is to have a common
+vocabulary of coding so people can concentrate on what you are
+saying, rather than on how you are saying it. We present global
+style rules here so people know the vocabulary. But local style
+is also important. If code you add to a file looks drastically
+different from the existing code around it, the discontinuity
+throws readers out of their rhythm when they go to read it. Try
+to avoid this.</p>
+
+
+
+<p>OK, enough writing about writing code; the code itself is much
+more interesting. Have fun!</p>
+
+<hr>
+
+<p style="text-align:right; font-style:italic;">Revision 4.45</p>
+
+</div>
+</body></html>
