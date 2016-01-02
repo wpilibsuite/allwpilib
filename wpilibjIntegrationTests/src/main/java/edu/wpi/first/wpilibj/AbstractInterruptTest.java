@@ -218,6 +218,62 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
         synchronousDelay, interruptRunTime, .1);
   }
 
+  @Test(timeout = (long) (synchronousTimeout * 1e3))
+  public void testSynchronousInterruptsWaitResultTimeout() {
+    // Given
+    getInterruptable().requestInterrupts();
+
+    //Don't fire interrupt. Expect it to timeout.
+    InterruptableSensorBase.WaitResult result = getInterruptable().waitForInterrupt(synchronousTimeout / 2);
+
+    assertEquals("The interrupt did not time out correctly.", result, InterruptableSensorBase.WaitResult.kTimeout);
+  }
+
+  @Test(timeout = (long) (synchronousTimeout * 1e3))
+  public void testSynchronousInterruptsWaitResultRisingEdge() {
+    // Given
+    getInterruptable().requestInterrupts();
+
+    final double synchronousDelay = synchronousTimeout / 2.;
+    Runnable r = new Runnable() {
+      @Override
+      public void run() {
+        Timer.delay(synchronousDelay);
+        setInterruptLow();
+        setInterruptHigh();
+      }
+    };
+
+    new Thread(r).start();
+    // Delay for twice as long as the timeout so the test should fail first
+    InterruptableSensorBase.WaitResult result = getInterruptable().waitForInterrupt(synchronousTimeout * 2);
+
+    assertEquals("The interrupt did not fire on the rising edge.", result, InterruptableSensorBase.WaitResult.kRisingEdge);
+  }
+
+  @Test(timeout = (long) (synchronousTimeout * 1e3))
+  public void testSynchronousInterruptsWaitResultFallingEdge() {
+    // Given
+    getInterruptable().requestInterrupts();
+    getInterruptable().setUpSourceEdge(false, true);
+
+    final double synchronousDelay = synchronousTimeout / 2.;
+    Runnable r = new Runnable() {
+      @Override
+      public void run() {
+        Timer.delay(synchronousDelay);
+        setInterruptHigh();
+        setInterruptLow();
+      }
+    };
+
+    new Thread(r).start();
+    // Delay for twice as long as the timeout so the test should fail first
+    InterruptableSensorBase.WaitResult result = getInterruptable().waitForInterrupt(synchronousTimeout * 2);
+
+    assertEquals("The interrupt did not fire on the falling edge.", result, InterruptableSensorBase.WaitResult.kFallingEdge);
+  }
+
 
   @Test(timeout = 4000)
   public void testDisableStopsInterruptFiring() {

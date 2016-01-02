@@ -15,6 +15,27 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
  * Base for sensors to be used with interrupts
  */
 public abstract class InterruptableSensorBase extends SensorBase {
+
+  public static enum WaitResult {
+    kTimeout(0x0), kRisingEdge(0x1), kFallingEdge(0x100), kBoth(0x101);
+
+    public final int value;
+
+    public static WaitResult valueOf(int value) {
+      for (WaitResult mode : values()) {
+        if (mode.value == value) {
+          return mode;
+        }
+      }
+      return null;
+    }
+
+
+    private WaitResult(int value) {
+      this.value = value;
+    }
+  }
+
   /**
    * The interrupt resource
    */
@@ -141,21 +162,25 @@ public abstract class InterruptableSensorBase extends SensorBase {
    * @param timeout Timeout in seconds
    * @param ignorePrevious If true, ignore interrupts that happened before
    *        waitForInterrupt was called.
+   * @return Result of the wait.
    */
-  public void waitForInterrupt(double timeout, boolean ignorePrevious) {
+  public WaitResult waitForInterrupt(double timeout, boolean ignorePrevious) {
     if (m_interrupt == 0) {
       throw new IllegalStateException("The interrupt is not allocated.");
     }
-    InterruptJNI.waitForInterrupt(m_interrupt, timeout, ignorePrevious);
+    int result = InterruptJNI.waitForInterrupt(m_interrupt, timeout, ignorePrevious);
+
+    return WaitResult.valueOf(result);
   }
 
   /**
    * In synchronous mode, wait for the defined interrupt to occur.
    *
    * @param timeout Timeout in seconds
+   * @return Result of the wait.
    */
-  public void waitForInterrupt(double timeout) {
-    waitForInterrupt(timeout, true);
+  public WaitResult waitForInterrupt(double timeout) {
+    return waitForInterrupt(timeout, true);
   }
 
   /**
