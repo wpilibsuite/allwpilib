@@ -59,9 +59,9 @@ static void cleanupNotifierAtExit() {
 	notifierManager = nullptr;
 }
 
-void* initializeNotifier(void (*ProcessQueue)(uint32_t, void*), void *param, int32_t *status)
+void* initializeNotifier(void (*process)(uint32_t, void*), void *param, int32_t *status)
 {
-	if (!ProcessQueue) {
+	if (!process) {
 		*status = NULL_PARAMETER;
 		return nullptr;
 	}
@@ -85,7 +85,7 @@ void* initializeNotifier(void (*ProcessQueue)(uint32_t, void*), void *param, int
 	notifier->next = notifiers;
 	if (notifier->next) notifier->next->prev = notifier;
 	notifier->param = param;
-	notifier->process = ProcessQueue;
+	notifier->process = process;
 	notifiers = notifier;
 	return notifier;
 }
@@ -119,6 +119,11 @@ void cleanNotifier(void* notifier_pointer, int32_t *status)
 	}
 }
 
+void* getNotifierParam(void* notifier_pointer, int32_t *status)
+{
+	return ((Notifier*)notifier_pointer)->param;
+}
+
 void updateNotifierAlarm(void* notifier_pointer, uint32_t triggerTime, int32_t *status)
 {
 	std::lock_guard<priority_recursive_mutex> sync(notifierMutex);
@@ -140,4 +145,11 @@ void updateNotifierAlarm(void* notifier_pointer, uint32_t triggerTime, int32_t *
 	if (!wasActive) notifierAlarm->writeEnable(true, status);
 
 	notifierInterruptMutex.unlock();
+}
+
+void stopNotifierAlarm(void* notifier_pointer, int32_t *status)
+{
+	std::lock_guard<priority_recursive_mutex> sync(notifierMutex);
+	Notifier* notifier = (Notifier*)notifier_pointer;
+	notifier->triggerTime = UINT32_MAX;
 }

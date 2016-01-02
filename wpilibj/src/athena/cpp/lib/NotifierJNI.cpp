@@ -1,11 +1,16 @@
 #include <jni.h>
 #include <assert.h>
+#include <atomic>
+#include <condition_variable>
 #include <functional>
+#include <mutex>
+#include <thread>
 #include <stdio.h>
 #include "Log.hpp"
 #include "edu_wpi_first_wpilibj_hal_NotifierJNI.h"
 #include "HAL/Notifier.hpp"
 #include "HALUtil.h"
+#include "SafeThread.h"
 
 // set the logging level
 TLogLevel notifierJNILogLevel = logWARNING;
@@ -14,44 +19,86 @@ TLogLevel notifierJNILogLevel = logWARNING;
     if (level > notifierJNILogLevel) ; \
     else Log().Get(level)
 
-// These two are used to pass information to the notifierHandler without using
-// up function parameters.
-// See below for more information.
-static jobject func_global;
-static jmethodID mid_global;
+// Thread where callbacks are actually performed.
+//
+// JNI's AttachCurrentThread() creates a Java Thread object on every
+// invocation, which is both time inefficient and causes issues with Eclipse
+// (which tries to keep a thread list up-to-date and thus gets swamped).
+//
+// Instead, this class attaches just once.  When a hardware notification
+// occurs, a condition variable wakes up this thread and this thread actually
+// makes the call into Java.
+//
+// We don't want to use a FIFO here. If the user code takes too long to
+// process, we will just ignore the redundant wakeup.
+class NotifierThreadJNI : public SafeThread {
+ public:
+  void Main();
 
-// The arguments are unused by the HAL Notifier; they just satisfy a particular
-// function signature.
+  bool m_notify = false;
+  jobject m_func = nullptr;
+  jmethodID m_mid;
+  uint32_t m_currentTime;
+};
+
+class NotifierJNI : public SafeThreadOwner<NotifierThreadJNI> {
+ public:
+  void SetFunc(JNIEnv* env, jobject func, jmethodID mid);
+
+  void Notify(uint32_t currentTime) {
+    auto thr = GetThread();
+    if (!thr) return;
+    thr->m_currentTime = currentTime;
+    thr->m_notify = true;
+    thr->m_cond.notify_one();
+  }
+};
+
+void NotifierJNI::SetFunc(JNIEnv* env, jobject func, jmethodID mid) {
+  auto thr = GetThread();
+  if (!thr) return;
+  // free global reference
+  if (thr->m_func) env->DeleteGlobalRef(thr->m_func);
+  // create global reference
+  thr->m_func = env->NewGlobalRef(func);
+  thr->m_mid = mid;
+}
+
+void NotifierThreadJNI::Main() {
+  JNIEnv *env;
+  JavaVMAttachArgs args;
+  args.version = JNI_VERSION_1_2;
+  args.name = const_cast<char*>("Notifier");
+  args.group = nullptr;
+  jint rs = jvm->AttachCurrentThreadAsDaemon((void**)&env, &args);
+  if (rs != JNI_OK) return;
+
+  std::unique_lock<std::mutex> lock(m_mutex);
+  while (m_active) {
+    m_cond.wait(lock, [&] { return !m_active || m_notify; });
+    if (!m_active) break;
+    m_notify = false;
+    if (!m_func) continue;
+    jobject func = m_func;
+    jmethodID mid = m_mid;
+    uint32_t currentTime = m_currentTime;
+    lock.unlock();  // don't hold mutex during callback execution
+    env->CallVoidMethod(func, mid, (jint)currentTime);
+    if (env->ExceptionCheck()) {
+      env->ExceptionDescribe();
+      env->ExceptionClear();
+    }
+    lock.lock();
+  }
+
+  // free global reference
+  if (m_func) env->DeleteGlobalRef(m_func);
+
+  jvm->DetachCurrentThread();
+}
+
 void notifierHandler(uint32_t currentTimeInt, void* param) {
-  jobject handler_obj = func_global;
-  jmethodID mid = mid_global;
-
-	NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI notifierHandler";
-
-	//Because this is a callback in a new thread we must attach it to the JVM.
-	JNIEnv *env;
-  jint rs;
-  // Check to see if we are already part of a JVM thread or if we need to attach
-  // ourselves.
-  int getEnvStat = jvm->GetEnv((void **)&env, JNI_VERSION_1_8);
-  if (getEnvStat == JNI_EDETACHED) {
-    rs = jvm->AttachCurrentThread((void**)&env, NULL);
-    assert (rs == JNI_OK);
-  }
-	NOTIFIERJNI_LOG(logDEBUG) << "Attached to thread. Object is: " << handler_obj;
-
-  // Actuall call the user function.
-	env->CallVoidMethod(handler_obj, mid);
-	if (env->ExceptionCheck()) {
-		env->ExceptionDescribe();
-	}
-
-  // Only detach if we needed to attach oursleves in the first place.
-  if (getEnvStat == JNI_EDETACHED) {
-    rs = jvm->DetachCurrentThread();
-    assert (rs == JNI_OK);
-  }
-	NOTIFIERJNI_LOG(logDEBUG) << "Leaving NOTIFIERJNI notifierHandler";
+  ((NotifierJNI*)param)->Notify(currentTimeInt);
 }
 
 extern "C" {
@@ -64,31 +111,38 @@ extern "C" {
 JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNotifier
   (JNIEnv *env, jclass, jobject func)
 {
-	NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI initializeNotifier";
+  NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI initializeNotifier";
 
   jclass cls = env->GetObjectClass(func);
-  jmethodID mid = env->GetMethodID(cls, "run", "()V");
+  if (cls == 0) {
+    NOTIFIERJNI_LOG(logERROR) << "Error getting java class";
+    assert(false);
+    return 0;
+  }
+  jmethodID mid = env->GetMethodID(cls, "apply", "(I)V");
+  if (mid == 0) {
+    NOTIFIERJNI_LOG(logERROR) << "Error getting java method ID";
+    assert(false);
+    return 0;
+  }
 
-  // In order to pass the user's Runnable to the notifierHandler, we have to use
-  // something other than the function arguments (because the function arguments
-  // are dictated by the callback format). As such, we instead use a couple of
-  // global variables to pass around the object reference.
-  // This is not ideal, but the only other option that came to mind was to use
-  // lambda function captures, but, unfortunately, it turns out that using
-  // captures in a lambda changes the function signature such that it can no
-  // long be used as a standared C-style function pointer.
-  // Need to set as global ref to avoid seg faults when referring to it later.
-  func_global = env->NewGlobalRef(func);
-  mid_global = mid;
+  // each notifier runs in its own thread; this is so if one takes too long
+  // to execute, it doesn't keep the others from running
+  NotifierJNI* notify = new NotifierJNI;
+  notify->Start();
+  notify->SetFunc(env, func, mid);
+  int32_t status = 0;
+  void *notifierPtr = initializeNotifier(notifierHandler, notify, &status);
 
-	int32_t status = 0;
-	void *notifierPtr = initializeNotifier(notifierHandler, nullptr, &status);
+  NOTIFIERJNI_LOG(logDEBUG) << "Notifier Ptr = " << notifierPtr;
+  NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;
 
-	NOTIFIERJNI_LOG(logDEBUG) << "Notifier Ptr = " << notifierPtr;
-	NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;
+  if (!notifierPtr || !CheckStatus(env, status)) {
+    // something went wrong in HAL, clean up
+    delete notify;
+  }
 
-	CheckStatus(env, status);
-	return (jlong)notifierPtr;
+  return (jlong)notifierPtr;
 }
 
 /*
@@ -99,14 +153,17 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNot
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_cleanNotifier
   (JNIEnv *env, jclass, jlong notifierPtr)
 {
-	NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI cleanNotifier";
+  NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI cleanNotifier";
 
-	NOTIFIERJNI_LOG(logDEBUG) << "Notifier Ptr = " << (void*)notifierPtr;
+  NOTIFIERJNI_LOG(logDEBUG) << "Notifier Ptr = " << (void *)notifierPtr;
 
   int32_t status = 0;
+  NotifierJNI* notify =
+      (NotifierJNI*)getNotifierParam((void*)notifierPtr, &status);
   cleanNotifier((void*)notifierPtr, &status);
-	NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;
-	CheckStatus(env, status);
+  NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;
+  CheckStatus(env, status);
+  delete notify;
 }
 
 /*
@@ -117,16 +174,34 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_cleanNotifier
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_updateNotifierAlarm
   (JNIEnv *env, jclass cls, jlong notifierPtr, jint triggerTime)
 {
-	NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI updateNotifierAlarm";
+  NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI updateNotifierAlarm";
 
-	NOTIFIERJNI_LOG(logDEBUG) << "Notifier Ptr = " << (void*)notifierPtr;
+  NOTIFIERJNI_LOG(logDEBUG) << "Notifier Ptr = " << (void *)notifierPtr;
 
-  NOTIFIERJNI_LOG(logDEBUG) << "triggerTime Ptr = " << &triggerTime;
+  NOTIFIERJNI_LOG(logDEBUG) << "triggerTime = " << triggerTime;
 
   int32_t status = 0;
   updateNotifierAlarm((void*)notifierPtr, (uint32_t)triggerTime, &status);
-	NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;
-	CheckStatus(env, status);
+  NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_NotifierJNI
+ * Method:    stopNotifierAlarm
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_stopNotifierAlarm
+  (JNIEnv *env, jclass cls, jlong notifierPtr)
+{
+  NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI stopNotifierAlarm";
+
+  NOTIFIERJNI_LOG(logDEBUG) << "Notifier Ptr = " << (void *)notifierPtr;
+
+  int32_t status = 0;
+  stopNotifierAlarm((void*)notifierPtr, &status);
+  NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;
+  CheckStatus(env, status);
 }
 
 }  // extern "C"

@@ -4,8 +4,9 @@
 
 extern "C"
 {
-	void* initializeNotifier(void (*ProcessQueue)(uint32_t, void*), void* param, int32_t *status);
+	void* initializeNotifier(void (*process)(uint32_t, void*), void* param, int32_t *status);
 	void cleanNotifier(void* notifier_pointer, int32_t *status);
-
+	void* getNotifierParam(void* notifier_pointer, int32_t *status);
 	void updateNotifierAlarm(void* notifier_pointer, uint32_t triggerTime, int32_t *status);
+	void stopNotifierAlarm(void* notifier_pointer, int32_t *status);
 }
