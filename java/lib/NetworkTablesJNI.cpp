@@ -155,12 +155,18 @@ class JavaGlobal {
   ~JavaGlobal() {
     if (!jvm || nt::NotifierDestroyed()) return;
     JNIEnv *env;
-    if (jvm->AttachCurrentThread(reinterpret_cast<void **>(&env), nullptr) !=
-        JNI_OK)
-      return;
+    bool attached = false;
+    // don't attach and de-attach if already attached to a thread.
+    if (jvm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) ==
+        JNI_EDETACHED) {
+      if (jvm->AttachCurrentThread(reinterpret_cast<void **>(&env), nullptr) !=
+          JNI_OK)
+        return;
+      attached = true;
+    }
     if (!env || !env->functions) return;
     env->DeleteGlobalRef(m_obj);
-    jvm->DetachCurrentThread();
+    if (attached) jvm->DetachCurrentThread();
   }
   operator T() { return m_obj; }
   T obj() { return m_obj; }
@@ -180,12 +186,18 @@ class JavaWeakGlobal {
   ~JavaWeakGlobal() {
     if (!jvm || nt::NotifierDestroyed()) return;
     JNIEnv *env;
-    if (jvm->AttachCurrentThread(reinterpret_cast<void **>(&env), nullptr) !=
-        JNI_OK)
-      return;
+    bool attached = false;
+    // don't attach and de-attach if already attached to a thread.
+    if (jvm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) ==
+        JNI_EDETACHED) {
+      if (jvm->AttachCurrentThread(reinterpret_cast<void **>(&env), nullptr) !=
+          JNI_OK)
+        return;
+      attached = true;
+    }
     if (!env || !env->functions) return;
     env->DeleteWeakGlobalRef(m_obj);
-    jvm->DetachCurrentThread();
+    if (attached) jvm->DetachCurrentThread();
   }
   JavaLocal<T> obj(JNIEnv *env) {
     return JavaLocal<T>(env, env->NewLocalRef(m_obj));
@@ -1001,16 +1013,17 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
         auto handler = listener_global->obj();
 
         // convert the value into the appropriate Java type
-        jobject jobj = ToJavaObject(env, *value);
-        if (!jobj) return;
-
+        JavaLocal<jobject> jobj(env, ToJavaObject(env, *value));
         if (env->ExceptionCheck()) {
           env->ExceptionDescribe();
           env->ExceptionClear();
           return;
         }
-        env->CallVoidMethod(handler, mid, (jint)uid, ToJavaString(env, name),
-                            jobj, (jint)(flags_));
+        if (!jobj) return;
+
+        JavaLocal<jstring> jname(env, ToJavaString(env, name));
+        env->CallVoidMethod(handler, mid, (jint)uid, jname.obj(), jobj.obj(),
+                            (jint)(flags_));
         if (env->ExceptionCheck()) {
           env->ExceptionDescribe();
           env->ExceptionClear();
@@ -1062,16 +1075,16 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
         //if (!handler) goto done; // can happen due to weak reference
 
         // convert into the appropriate Java type
-        jobject jobj = ToJavaObject(env, conn);
-        if (!jobj) return;
-
+        JavaLocal<jobject> jobj(env, ToJavaObject(env, conn));
         if (env->ExceptionCheck()) {
           env->ExceptionDescribe();
           env->ExceptionClear();
           return;
         }
+        if (!jobj) return;
+
         env->CallVoidMethod(handler, mid, (jint)uid,
-                            (jboolean)(connected ? 1 : 0), jobj);
+                            (jboolean)(connected ? 1 : 0), jobj.obj());
         if (env->ExceptionCheck()) {
           env->ExceptionDescribe();
           env->ExceptionClear();
