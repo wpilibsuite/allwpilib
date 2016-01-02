@@ -55,7 +55,7 @@ PIDController::PIDController(float Kp, float Ki, float Kd, float Kf,
 void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
                                PIDSource *source, PIDOutput *output,
                                float period) {
-  m_controlLoop = std::make_unique<Notifier>(PIDController::CallCalculate, this);
+  m_controlLoop = std::make_unique<Notifier>(&PIDController::Calculate, this);
 
   m_P = Kp;
   m_I = Ki;
@@ -78,24 +78,8 @@ PIDController::~PIDController() {
 }
 
 /**
- * Call the Calculate method as a non-static method. This avoids having to
- * prepend
- * all local variables in that method with the class pointer. This way the
- * "this"
- * pointer will be set up and class variables can be called more easily.
- * This method is static and called by the Notifier class.
- * @param controller the address of the PID controller object to use in the
- * background loop
- */
-void PIDController::CallCalculate(void *controller) {
-  PIDController *control = (PIDController *)controller;
-  control->Calculate();
-}
-
-/**
  * Read the input, calculate the output accordingly, and write to the output.
- * This should only be called by the Notifier indirectly through CallCalculate
- * and is created during initialization.
+ * This should only be called by the Notifier.
  */
 void PIDController::Calculate() {
   bool enabled;

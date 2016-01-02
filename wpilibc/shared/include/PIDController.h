@@ -119,7 +119,6 @@ class PIDController : public LiveWindowSendable,
 
   void Initialize(float p, float i, float d, float f, PIDSource *source,
                   PIDOutput *output, float period = 0.05);
-  static void CallCalculate(void *controller);
 
   virtual std::shared_ptr<ITable> GetTable() const override;
   virtual std::string GetSmartDashboardType() const override;
