@@ -24,8 +24,6 @@
 *.exe
 *.out
 *.app
-build/
-.gradle/
 
 .vs/
 *.def
@@ -36,5 +34,12 @@ build/
 *.sublime-project
 *.sublime-workspace
 
-native/
-arm/
+# Compiled Java files
+*.class
+
+# Build directories
+/.gradle
+/build*
+/native
+/arm
+/gmock/build
