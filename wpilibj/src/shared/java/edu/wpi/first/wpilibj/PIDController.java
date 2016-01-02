@@ -40,7 +40,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
                                      // integral calc
   private Tolerance m_tolerance; // the tolerance object used to check if on
                                  // target
-  private int m_bufLength = 0;
+  private int m_bufLength = 1;
   private LinkedList<Double> m_buf;
   private double m_bufTotal = 0.0;
   private double m_setpoint = 0.0;
