@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedController {
   private MotorSafetyHelper m_safetyHelper;
@@ -316,6 +317,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     m_feedbackDevice = FeedbackDevice.QuadEncoder;
     setProfile(m_profile);
     applyControlMode(TalonControlMode.PercentVbus);
+    LiveWindow.addActuator("CANTalon", m_deviceNumber, this);
   }
   /**
    * Constructor for the CANTalon device.
@@ -336,6 +338,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     m_feedbackDevice = FeedbackDevice.QuadEncoder;
     setProfile(m_profile);
     applyControlMode(TalonControlMode.PercentVbus);
+    LiveWindow.addActuator("CANTalon", m_deviceNumber, this);
   }
   /**
    * Constructor for the CANTalon device.
@@ -359,6 +362,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     m_feedbackDevice = FeedbackDevice.QuadEncoder;
     setProfile(m_profile);
     applyControlMode(TalonControlMode.PercentVbus);
+    LiveWindow.addActuator("CANTalon", m_deviceNumber, this);
   }
 
   @Override
