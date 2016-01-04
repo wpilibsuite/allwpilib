@@ -9,6 +9,8 @@ static void initializePower(int32_t *status) {
 	}
 }
 
+extern "C" {
+
 /**
  * Get the roboRIO input voltage
  */
@@ -125,3 +127,5 @@ int getUserCurrentFaults3V3(int32_t *status) {
 	initializePower(status);
 	return (int)power->readFaultCounts_OverCurrentFaultCount3V3(status);
 }
+
+}  // extern "C"

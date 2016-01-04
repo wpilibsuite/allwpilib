@@ -59,6 +59,8 @@ static void cleanupNotifierAtExit() {
 	notifierManager = nullptr;
 }
 
+extern "C" {
+
 void* initializeNotifier(void (*process)(uint64_t, void*), void *param, int32_t *status)
 {
 	if (!process) {
@@ -154,3 +156,5 @@ void stopNotifierAlarm(void* notifier_pointer, int32_t *status)
 	Notifier* notifier = (Notifier*)notifier_pointer;
 	notifier->triggerTime = UINT64_MAX;
 }
+
+}  // extern "C"

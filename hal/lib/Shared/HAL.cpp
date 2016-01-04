@@ -3,6 +3,8 @@
 #include "FRC_NetworkCommunication/FRCComm.h"
 #include <cstring>
 
+extern "C" {
+
 int HALGetControlWord(HALControlWord *data)
 {
 	return FRC_NetworkCommunication_getControlWord((ControlWord_t*) data);
@@ -126,3 +128,5 @@ void HALNetworkCommunicationObserveUserProgramTest(void)
 {
 	FRC_NetworkCommunication_observeUserProgramTest();
 }
+
+}  // extern "C"

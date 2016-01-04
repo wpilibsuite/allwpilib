@@ -6,6 +6,8 @@ static const int NUM_MODULE_NUMBERS = 63;
 
 static PDP *pdp[NUM_MODULE_NUMBERS] = { NULL };
 
+extern "C" {
+
 void initializePDP(uint8_t module) {
 	if(!pdp[module]) {
 		pdp[module] = new PDP(module);
@@ -68,4 +70,4 @@ void clearPDPStickyFaults(uint8_t module, int32_t *status) {
 	*status = pdp[module]->ClearStickyFaults();
 }
 
-
+}  // extern "C"
