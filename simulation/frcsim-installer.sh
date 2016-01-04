@@ -81,29 +81,49 @@ function check-environment {
     fi
     apt-get install unzip -y
   fi
+
+  # Make sure that app-apt-repository is installed
+  if ! which add-apt-repository >/dev/null; then
+    echo "*** You don't appear to have all apt commands installed." 1>&2
+    echo "*** Install? (y/n)" 1>&2
+    read CONT
+    if [ "$CONT" != "y" -a "$CONT" != "Y" ]; then
+      install-fail
+    fi
+    apt-get install software-properties-common -y
+  fi
 }
 
 function remove-frcsim {
-  check-environment
-
   echo "*** Remove Gazebo package entry too? (y/n)" 1>&2
   read CONT
   if [ "$CONT" == "y" -o "$CONT" == "Y" ]; then
   rm -f /etc/apt/sources.list.d/gazebo-latest.list
   fi
 
-  apt-get update
-  apt-get remove --auto-remove gazebo6 g++-4.9 openjdk-8-jdk
+  apt-get remove --auto-remove libgazebo6-dev gazebo6 g++-4.9 openjdk-8-jdk
   rm -rf /opt/eclipse
   rm -f /usr/share/applications/frcsim.desktop /usr/share/applications/eclipse.desktop /usr/share/applications/sim_ds.desktop
   rm -f /usr/bin/frcism /usr/bin/sim_ds /usr/bin/eclipse
   rm -rf ~/wpilib/simulation
+
+  add-apt-repository --remove ppa:openjdk-r/ppa -y
+  add-apt-repository --remove ppa:ubuntu-toolchain-r/test -y
 }
 
 function install-eclipse-plugins {
-  if ! (wget -O /tmp/simulation.zip http://first.wpi.edu/FRC/roborio/maven/development/simulation/simulation/1.0.0/simulation-1.0.0.zip)
+  #valid URLs can have promotion status of any of the following
+  # - development (used for most recent merge into wpilib)
+  # - beta
+  # - release
+  # - stable
+
+  #this file is published to maven repo by simulation/build.gradle
+  if ! (wget -O /tmp/simulation.zip http://first.wpi.edu/FRC/roborio/maven/$PROMOTION_STATUS/edu/wpi/first/wpilib/simulation/simulation/1.0.0/simulation-1.0.0.zip)
   then
     echo "***could not download wpilib simulation plugins, wrong URL probably***"
+    echo "promotion status = $PROMOTION_STATUS"
+    echo "url = http://first.wpi.edu/FRC/roborio/maven/$PROMOTION_STATUS/edu/wpi/first/wpilib/simulation/simulation/1.0.0/simulation-1.0.0.zip"
     install-fail
   fi
 
@@ -125,29 +145,65 @@ function install-eclipse {
 }
 
 function install-desktops {
+  # desktop files allow ubuntu (unity) users to "search" for their programs in the sidebar
   mv ~/wpilib/simulation/eclipse.desktop /usr/share/applications/eclipse.desktop
   mv ~/wpilib/simulation/frcsim.desktop /usr/share/applications/frcsim.desktop
   mv ~/wpilib/simulation/sim_ds.desktop /usr/share/applications/sim_ds.desktop
+  mkdir -p /usr/share/icons/sim_ds
+  mv ~/wpilib/simulation/sim_ds_logo.png /usr/share/icons/sim_ds/sim_ds_logo.png
 }
 
 function install-gz_msgs {
+  # gz_msgs is built on the end-user system
+  # that way the versions of protobuf will match whatever the default for that platform is
   cd ~/wpilib/simulation/gz_msgs
   mkdir build
   cd build
   cmake ..
   make
   make install
+  chmod u+x ~/wpilib/simulation/lib/libgz_msgs.so
 }
 
 function install-toolchain {
-  add-apt-repository ppa:openjdk-r/ppa -y
-  add-apt-repository ppa:ubuntu-toolchain-r/test -y
-  apt-get update
+  # older version of ubuntu like 14.04 don't have the versions of g++ and java we need
+  # we can add some very reliable PPAs to get them however
+  if [[ "`lsb_release -rs`" == "14.04" ]]
+  then
+    echo "*** You're using `lsb_release -r`, you will need additional repositories***"
+    echo "*** Install? (y/n)" 1>&2
+    read CONT
+    if [ "$CONT" != "y" -a "$CONT" != "Y" ]; then
+      install-fail
+    fi
+    add-apt-repository ppa:openjdk-r/ppa -y
+    add-apt-repository ppa:ubuntu-toolchain-r/test -y
+  fi
+  if [[ "`lsb_release -rs`" == "15.04" ]]
+  then
+    echo "*** You're using `lsb_release -r`, you will need additional repositories***"
+    echo "*** Install? (y/n)" 1>&2
+    read CONT
+    if [ "$CONT" != "y" -a "$CONT" != "Y" ]; then
+      install-fail
+    fi
+    add-apt-repository ppa:openjdk-r/ppa -y
+  fi
+
+  # Update and install dependencies
+  if ! apt-get update
+  then
+    echo "*** Could not resynchronize package index files." 1>&2
+    echo "*** Are you running another update or install?" 1>&2
+    install-fail
+  fi
+
   apt-get install cmake libprotoc-dev libprotobuf-dev protobuf-compiler g++-4.9 openjdk-8-jdk -y
   ln -fs /usr/bin/g++-4.9 /usr/bin/g++
 }
 
 function install-models {
+  # this zip file is made by hand. A better option to add models is to use the gazebo repository
   if ! (wget -O /tmp/models.zip https://usfirst.collab.net/sf/frs/do/downloadFile/projects.wpilib/frs.simulation.frcsim_gazebo_models/frs1160?)
   then
     echo "*** failed to download models. Check your internet connection! ***"
@@ -177,14 +233,9 @@ function install-frcsim {
     install-fail
   fi
 
-  # Update and install dependencies
-  if ! apt-get update
-  then
-    echo "*** Could not resynchronize package index files." 1>&2
-    echo "*** Are you running another update or install?" 1>&2
-    install-fail
-  fi
-  if ! apt-get install -y gazebo6
+  install-toolchain
+
+  if ! apt-get install -y libgazebo6-dev gazebo6
   then
     echo "*** Could not install frcsim packages. See above output for details." 1>&2
     echo "*** Are you running another update or install?" 1>&2
@@ -192,37 +243,63 @@ function install-frcsim {
   fi
 
   install-eclipse-plugins
-  install-toolchain
   install-gz_msgs
   install-eclipse
   install-desktops
   install-models
 
-  sudo chown -R $USER:$USER ~/wpilib
+  change-ownership
 
   # Done
   echo "Installation Finished!!"
 }
 
-if [ "$1" == "ROOT" ]
+function install-fail {
+  echo "***INSTALLATION UNSUCCESSFUL***"
+  echo "***Check the output about for anything that looks like errors***"
+  echo "Please comment on the following to tutorial if you're unable to resolve your problem:"
+  echo "https://wpilib.screenstepslive.com/s/4485/m/23353/l/478421-installing-frcsim-with-a-script-ubuntu"
+  exit 1
+}
+
+function change-ownership {
+  chown -R $NON_SUDO_USER:$NON_SUDO_USER ~/wpilib
+}
+
+if [ "$1" == "INSTALL-ROOT" ]
 then
+
+  if [ -z "$2" ]
+  then
+    echo "*** Could not set user ~/wpilib ownership to empty user***"
+    install-fail
+  else
+    NON_SUDO_USER="$2"
+  fi
+
+  if [ -z "$3" ]
+  then
+    PROMOTION_STATUS="release"
+  else
+    PROMOTION_STATUS="$3"
+  fi
+
   install-frcsim
-elif [ "$1" == "INSTALLER" ]
+
+elif [ "$1" == "INSTALL" ]
 then
-  SUDO_ASKPASS=/usr/bin/ssh-askpass sudo bash -c "$0 ROOT"
+  NON_SUDO_USER="$USER"
+  PROMOTION_STATUS="$2"
+  SUDO_ASKPASS=/usr/bin/ssh-askpass sudo bash -c "$0 INSTALL-ROOT $NON_SUDO_USER $PROMOTION_STATUS"
 elif [ "$1" == "REMOVE-ROOT" ]
 then
   remove-frcsim
 elif [ "$1" == "REMOVE" ]
 then
-  SUDO_ASKPASS=/usr/bin/ssh-askpass sudo bash -c "$0 REMOVE-ROOT"
+  NON_SUDO_USER="$USER"
+  SUDO_ASKPASS=/usr/bin/ssh-askpass sudo bash -c "$0 REMOVE-ROOT $NON_SUDO_USER $PROMOTION_STATUS"
 else
-  if [ -z "$1" ]
-  then
-    echo "***This script requires an argument!***"
-    echo "***Run ./frcsim_installer.sh INSTALLER to install***"
-    echo "***Other options are REMOVE, or any of the functions in the script"
-  else
-    $@
-  fi
+  echo "***This script requires an argument!***"
+  echo "***Run ./frcsim_installer.sh INSTALL to install***"
+  echo "***The other option is REMOVE"
 fi

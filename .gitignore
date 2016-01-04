@@ -178,3 +178,6 @@ package.xml
 
 # Doxygen stuff
 NO
+
+# Simulation folder stuff
+!simulation/install_resources/*
