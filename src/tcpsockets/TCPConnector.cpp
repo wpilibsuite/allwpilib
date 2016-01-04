@@ -35,6 +35,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/select.h>
+#include <unistd.h>
 #endif
 
 #include "TCPStream.h"
@@ -100,8 +101,17 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
 
   if (timeout == 0) {
     int sd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sd < 0) {
+      ERROR("could not create socket");
+      return nullptr;
+    }
     if (::connect(sd, (struct sockaddr*)&address, sizeof(address)) != 0) {
       ERROR("connect() to " << server << " port " << port << " failed: " << SocketStrerror());
+#ifdef _WIN32
+      closesocket(sd);
+#else
+      ::close(sd);
+#endif
       return nullptr;
     }
     return std::unique_ptr<NetworkStream>(new TCPStream(sd, &address));
@@ -111,6 +121,10 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
   struct timeval tv;
   socklen_t len;
   int result = -1, valopt, sd = socket(AF_INET, SOCK_STREAM, 0);
+  if (sd < 0) {
+    ERROR("could not create socket");
+    return nullptr;
+  }
 
   // Set socket to non-blocking
 #ifdef _WIN32
@@ -161,7 +175,14 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
   fcntl(sd, F_SETFL, arg);
 #endif
 
-  // Create stream object if connected
-  if (result == -1) return nullptr;
+  // Create stream object if connected, close if not.
+  if (result == -1) {
+#ifdef _WIN32
+      closesocket(sd);
+#else
+      ::close(sd);
+#endif
+    return nullptr;
+  }
   return std::unique_ptr<NetworkStream>(new TCPStream(sd, &address));
 }
