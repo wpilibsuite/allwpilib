@@ -8,6 +8,8 @@
 #include "WPIErrors.h"
 #include <unistd.h>  // usleep
 #include <sstream>
+#include "LiveWindow/LiveWindow.h"
+
 /**
  * Number of adc engineering units per 0 to 3.3V sweep.
  * This is necessary for scaling Analog Position in rotations/RPM.
@@ -35,6 +37,7 @@ CANTalon::CANTalon(int deviceNumber)
   ApplyControlMode(m_controlMode);
   m_impl->SetProfileSlotSelect(m_profile);
   m_isInverted = false;
+  LiveWindow::GetInstance()->AddActuator("CANTalon", m_deviceNumber, this);
 }
 /**
  * Constructor for the CANTalon device.
@@ -48,6 +51,7 @@ CANTalon::CANTalon(int deviceNumber, int controlPeriodMs)
       m_safetyHelper(new MotorSafetyHelper(this)) {
   ApplyControlMode(m_controlMode);
   m_impl->SetProfileSlotSelect(m_profile);
+  LiveWindow::GetInstance()->AddActuator("CANTalon", m_deviceNumber, this);
 }
 
 CANTalon::~CANTalon() {
