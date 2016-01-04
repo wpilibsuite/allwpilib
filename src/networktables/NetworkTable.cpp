@@ -44,7 +44,8 @@ void NetworkTable::SetTeam(int team) {
 #ifdef _MSC_VER
   sprintf_s(tmp, "roboRIO-%d-FRC.local\n", team);
 #else
-  std::snprintf(tmp, 30, "roboRIO-%d-FRC.local\n",team);
+  using namespace std;
+  snprintf(tmp, 30, "roboRIO-%d-FRC.local\n",team);
 #endif
   SetIPAddress(tmp);
 }

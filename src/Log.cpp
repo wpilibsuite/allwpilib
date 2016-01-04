@@ -18,6 +18,10 @@
  #include <libgen.h>
 #endif
 
+#ifdef __ANDROID__
+ #include <libgen.h>
+#endif
+
 using namespace nt;
 
 ATOMIC_STATIC_INIT(Logger)
