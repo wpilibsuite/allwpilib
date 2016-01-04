@@ -218,6 +218,9 @@ class ITable {
    * @param defaultValue the value to be returned if no value is found
    * @return the value associated with the given key or the given default value
    * if there is no value associated with the key
+   *
+   * @note This makes a copy of the string.  If the overhead of this is a
+   *       concern, use GetValue() instead.
    */
   virtual std::string GetString(llvm::StringRef key,
                                 llvm::StringRef defaultValue) const = 0;
@@ -255,6 +258,105 @@ class ITable {
    * if there is no value associated with the key
    */
   virtual bool GetBoolean(llvm::StringRef key, bool defaultValue) const = 0;
+
+  /**
+   * Put a boolean array in the table
+   * @param key the key to be assigned to
+   * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
+   *
+   * @note The array must be of int's rather than of bool's because
+   *       std::vector<bool> is special-cased in C++.  0 is false, any
+   *       non-zero value is true.
+   */
+  virtual bool PutBooleanArray(llvm::StringRef key,
+                               llvm::ArrayRef<int> value) = 0;
+
+  /**
+   * Returns the boolean array the key maps to. If the key does not exist or is
+   * of different type, it will return the default value.
+   * @param key the key to look up
+   * @param defaultValue the value to be returned if no value is found
+   * @return the value associated with the given key or the given default value
+   * if there is no value associated with the key
+   *
+   * @note This makes a copy of the array.  If the overhead of this is a
+   *       concern, use GetValue() instead.
+   *
+   * @note The returned array is std::vector<int> instead of std::vector<bool>
+   *       because std::vector<bool> is special-cased in C++.  0 is false, any
+   *       non-zero value is true.
+   */
+  virtual std::vector<int> GetBooleanArray(
+      llvm::StringRef key, llvm::ArrayRef<int> defaultValue) const = 0;
+
+  /**
+   * Put a number array in the table
+   * @param key the key to be assigned to
+   * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
+   */
+  virtual bool PutNumberArray(llvm::StringRef key,
+                              llvm::ArrayRef<double> value) = 0;
+
+  /**
+   * Returns the number array the key maps to. If the key does not exist or is
+   * of different type, it will return the default value.
+   * @param key the key to look up
+   * @param defaultValue the value to be returned if no value is found
+   * @return the value associated with the given key or the given default value
+   * if there is no value associated with the key
+   *
+   * @note This makes a copy of the array.  If the overhead of this is a
+   *       concern, use GetValue() instead.
+   */
+  virtual std::vector<double> GetNumberArray(
+      llvm::StringRef key, llvm::ArrayRef<double> defaultValue) const = 0;
+
+  /**
+   * Put a string array in the table
+   * @param key the key to be assigned to
+   * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
+   */
+  virtual bool PutStringArray(llvm::StringRef key,
+                              llvm::ArrayRef<std::string> value) = 0;
+
+  /**
+   * Returns the string array the key maps to. If the key does not exist or is
+   * of different type, it will return the default value.
+   * @param key the key to look up
+   * @param defaultValue the value to be returned if no value is found
+   * @return the value associated with the given key or the given default value
+   * if there is no value associated with the key
+   *
+   * @note This makes a copy of the array.  If the overhead of this is a
+   *       concern, use GetValue() instead.
+   */
+  virtual std::vector<std::string> GetStringArray(
+      llvm::StringRef key, llvm::ArrayRef<std::string> defaultValue) const = 0;
+
+  /**
+   * Put a raw value (byte array) in the table
+   * @param key the key to be assigned to
+   * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
+   */
+  virtual bool PutRaw(llvm::StringRef key, llvm::StringRef value) = 0;
+
+  /**
+   * Returns the raw value (byte array) the key maps to. If the key does not
+   * exist or is of different type, it will return the default value.
+   * @param key the key to look up
+   * @param defaultValue the value to be returned if no value is found
+   * @return the value associated with the given key or the given default value
+   * if there is no value associated with the key
+   *
+   * @note This makes a copy of the raw contents.  If the overhead of this is a
+   *       concern, use GetValue() instead.
+   */
+  virtual std::string GetRaw(llvm::StringRef key,
+                             llvm::StringRef defaultValue) const = 0;
 
   /**
    * Add a listener for changes to the table

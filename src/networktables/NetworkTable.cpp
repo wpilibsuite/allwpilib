@@ -366,6 +366,81 @@ bool NetworkTable::GetBoolean(StringRef key, bool defaultValue) const {
   return value->GetBoolean();
 }
 
+bool NetworkTable::PutBooleanArray(llvm::StringRef key,
+                                   llvm::ArrayRef<int> value) {
+  llvm::SmallString<128> path(m_path);
+  path += PATH_SEPARATOR_CHAR;
+  path += key;
+  return nt::SetEntryValue(path, nt::Value::MakeBooleanArray(value));
+}
+
+std::vector<int> NetworkTable::GetBooleanArray(
+    llvm::StringRef key, llvm::ArrayRef<int> defaultValue) const {
+  llvm::SmallString<128> path(m_path);
+  path += PATH_SEPARATOR_CHAR;
+  path += key;
+  auto value = nt::GetEntryValue(path);
+  if (!value || value->type() != NT_BOOLEAN_ARRAY)
+    return defaultValue;
+  return value->GetBooleanArray();
+}
+
+bool NetworkTable::PutNumberArray(llvm::StringRef key,
+                                  llvm::ArrayRef<double> value) {
+  llvm::SmallString<128> path(m_path);
+  path += PATH_SEPARATOR_CHAR;
+  path += key;
+  return nt::SetEntryValue(path, nt::Value::MakeDoubleArray(value));
+}
+
+std::vector<double> NetworkTable::GetNumberArray(
+    llvm::StringRef key, llvm::ArrayRef<double> defaultValue) const {
+  llvm::SmallString<128> path(m_path);
+  path += PATH_SEPARATOR_CHAR;
+  path += key;
+  auto value = nt::GetEntryValue(path);
+  if (!value || value->type() != NT_DOUBLE_ARRAY)
+    return defaultValue;
+  return value->GetDoubleArray();
+}
+
+bool NetworkTable::PutStringArray(llvm::StringRef key,
+                                  llvm::ArrayRef<std::string> value) {
+  llvm::SmallString<128> path(m_path);
+  path += PATH_SEPARATOR_CHAR;
+  path += key;
+  return nt::SetEntryValue(path, nt::Value::MakeStringArray(value));
+}
+
+std::vector<std::string> NetworkTable::GetStringArray(
+    llvm::StringRef key, llvm::ArrayRef<std::string> defaultValue) const {
+  llvm::SmallString<128> path(m_path);
+  path += PATH_SEPARATOR_CHAR;
+  path += key;
+  auto value = nt::GetEntryValue(path);
+  if (!value || value->type() != NT_STRING_ARRAY)
+    return defaultValue;
+  return value->GetStringArray();
+}
+
+bool NetworkTable::PutRaw(llvm::StringRef key, llvm::StringRef value) {
+  llvm::SmallString<128> path(m_path);
+  path += PATH_SEPARATOR_CHAR;
+  path += key;
+  return nt::SetEntryValue(path, nt::Value::MakeRaw(value));
+}
+
+std::string NetworkTable::GetRaw(llvm::StringRef key,
+                                 llvm::StringRef defaultValue) const {
+  llvm::SmallString<128> path(m_path);
+  path += PATH_SEPARATOR_CHAR;
+  path += key;
+  auto value = nt::GetEntryValue(path);
+  if (!value || value->type() != NT_RAW)
+    return defaultValue;
+  return value->GetRaw();
+}
+
 bool NetworkTable::PutValue(StringRef key, std::shared_ptr<nt::Value> value) {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;

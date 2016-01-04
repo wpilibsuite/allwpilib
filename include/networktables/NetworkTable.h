@@ -135,9 +135,9 @@ class NetworkTable : public ITable {
 
   /**
    * Gets the table with the specified key. If the table does not exist, a new
-   *table will be created.<br>
+   * table will be created.<br>
    * This will automatically initialize network tables if it has not been
-   *already
+   * already.
    *
    * @param key
    *            the key name
@@ -356,6 +356,106 @@ class NetworkTable : public ITable {
    */
   virtual bool GetBoolean(llvm::StringRef key,
                           bool defaultValue) const override;
+
+  /**
+   * Put a boolean array in the table
+   * @param key the key to be assigned to
+   * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
+   *
+   * @note The array must be of int's rather than of bool's because
+   *       std::vector<bool> is special-cased in C++.  0 is false, any
+   *       non-zero value is true.
+   */
+  virtual bool PutBooleanArray(llvm::StringRef key,
+                               llvm::ArrayRef<int> value) override;
+
+  /**
+   * Returns the boolean array the key maps to. If the key does not exist or is
+   * of different type, it will return the default value.
+   * @param key the key to look up
+   * @param defaultValue the value to be returned if no value is found
+   * @return the value associated with the given key or the given default value
+   * if there is no value associated with the key
+   *
+   * @note This makes a copy of the array.  If the overhead of this is a
+   *       concern, use GetValue() instead.
+   *
+   * @note The returned array is std::vector<int> instead of std::vector<bool>
+   *       because std::vector<bool> is special-cased in C++.  0 is false, any
+   *       non-zero value is true.
+   */
+  virtual std::vector<int> GetBooleanArray(
+      llvm::StringRef key, llvm::ArrayRef<int> defaultValue) const override;
+
+  /**
+   * Put a number array in the table
+   * @param key the key to be assigned to
+   * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
+   */
+  virtual bool PutNumberArray(llvm::StringRef key,
+                              llvm::ArrayRef<double> value) override;
+
+  /**
+   * Returns the number array the key maps to. If the key does not exist or is
+   * of different type, it will return the default value.
+   * @param key the key to look up
+   * @param defaultValue the value to be returned if no value is found
+   * @return the value associated with the given key or the given default value
+   * if there is no value associated with the key
+   *
+   * @note This makes a copy of the array.  If the overhead of this is a
+   *       concern, use GetValue() instead.
+   */
+  virtual std::vector<double> GetNumberArray(
+      llvm::StringRef key, llvm::ArrayRef<double> defaultValue) const override;
+
+  /**
+   * Put a string array in the table
+   * @param key the key to be assigned to
+   * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
+   */
+  virtual bool PutStringArray(llvm::StringRef key,
+                              llvm::ArrayRef<std::string> value) override;
+
+  /**
+   * Returns the string array the key maps to. If the key does not exist or is
+   * of different type, it will return the default value.
+   * @param key the key to look up
+   * @param defaultValue the value to be returned if no value is found
+   * @return the value associated with the given key or the given default value
+   * if there is no value associated with the key
+   *
+   * @note This makes a copy of the array.  If the overhead of this is a
+   *       concern, use GetValue() instead.
+   */
+  virtual std::vector<std::string> GetStringArray(
+      llvm::StringRef key,
+      llvm::ArrayRef<std::string> defaultValue) const override;
+
+  /**
+   * Put a raw value (byte array) in the table
+   * @param key the key to be assigned to
+   * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
+   */
+  virtual bool PutRaw(llvm::StringRef key, llvm::StringRef value) override;
+
+  /**
+   * Returns the raw value (byte array) the key maps to. If the key does not
+   * exist or is of different type, it will return the default value.
+   * @param key the key to look up
+   * @param defaultValue the value to be returned if no value is found
+   * @return the value associated with the given key or the given default value
+   * if there is no value associated with the key
+   *
+   * @note This makes a copy of the raw contents.  If the overhead of this is a
+   *       concern, use GetValue() instead.
+   */
+  virtual std::string GetRaw(llvm::StringRef key,
+                             llvm::StringRef defaultValue) const override;
 
   /**
    * Put a value in the table
