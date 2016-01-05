@@ -72,6 +72,10 @@ int TCPAcceptor::start() {
   if (m_listening) return 0;
 
   m_lsd = socket(PF_INET, SOCK_STREAM, 0);
+  if (m_lsd < 0) {
+    ERROR("could not create socket");
+    return -1;
+  }
   struct sockaddr_in address;
 
   std::memset(&address, 0, sizeof(address));
@@ -134,6 +138,7 @@ void TCPAcceptor::shutdown() {
   fd_set sdset;
   struct timeval tv;
   int result = -1, valopt, sd = socket(AF_INET, SOCK_STREAM, 0);
+  if (sd < 0) return;
 
   // Set socket to non-blocking
   u_long mode = 1;
