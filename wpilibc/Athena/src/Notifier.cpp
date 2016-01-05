@@ -33,8 +33,9 @@ Notifier::~Notifier() {
   cleanNotifier(m_notifier, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
-  // Acquire the mutex; this makes certain that the handler is
-  // not being executed by the interrupt manager.
+  /* Acquire the mutex; this makes certain that the handler is not being
+   * executed by the interrupt manager.
+   */
   std::lock_guard<priority_mutex> lock(m_handlerMutex);
 }
 
@@ -85,8 +86,8 @@ void Notifier::StartSingle(double delay) {
 /**
  * Register for periodic event notification.
  * A timer event is queued for periodic event notification. Each time the
- * interrupt
- * occurs, the event will be immediately requeued for the same time interval.
+ * interrupt occurs, the event will be immediately requeued for the same time
+ * interval.
  * @param period Period in seconds to call the handler starting one period after
  * the call to this method.
  */
@@ -101,11 +102,9 @@ void Notifier::StartPeriodic(double period) {
 /**
  * Stop timer events from occuring.
  * Stop any repeating timer events from occuring. This will also remove any
- * single
- * notification events from the queue.
+ * single notification events from the queue.
  * If a timer-based call to the registered handler is in progress, this function
- * will
- * block until the handler call is complete.
+ * will block until the handler call is complete.
  */
 void Notifier::Stop() {
   int32_t status = 0;
