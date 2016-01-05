@@ -32,6 +32,41 @@ If you do not have the arm toolchain installed on your computer, you will run in
 
 The native version of ntcore will run tests on build. The arm version will not, as the current platform likely does not allow running of an ARM binary.
 
+
+### Custom Cross Compilers
+By default, the ARM version of ntcore uses the FRC cross compiler, which has the prefix `arm-frc-linux-gnueabi-`. If you want to cross compile with a different ARM toolchain, you can specify the `-PcompilerPrefix=prefix-string` flag. For example, to compile with `arm-linux-gnueabi-gcc`, you would run:
+
+```bash
+./gradlew :arm:build -PcompilerPrefix=arm-linux-gnueabi-
+```
+
+Keeping the full prefix is important: if you do not specify this correctly, Gradle will likely fail with an error that looks like this:
+
+```Shell
+ntcore master* $ ./gradlew :arm:build -PcompilerPrefix=doesnotexist
+Defining custom 'check' task when using the standard Gradle lifecycle plugins has been deprecated and is scheduled to be removed in Gradle 3.0
+:arm:compileJava UP-TO-DATE
+:arm:processResources UP-TO-DATE
+:arm:classes UP-TO-DATE
+:arm:jniHeadersNetworkTables UP-TO-DATE
+:arm:compileNtcoreSharedLibraryNtcoreCpp FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':arm:compileNtcoreSharedLibraryNtcoreCpp'.
+> No tool chain is available to build for platform 'arm':
+    - Tool chain 'gcc' (GNU GCC): Could not find C compiler 'gcc' in system path.
+    - Tool chain 'macGcc' (Clang): Could not find C compiler 'clang' in system path.
+
+* Try:
+Run with --stacktrace option to get the stack trace. Run with --info or --debug option to get more log output.
+
+BUILD FAILED
+
+Total time: 2.441 secs
+```
+
 ## Testing
 By default, tests will be built for the x86 and x64 versions of ntcore, and will be run during any execution of the `build` or `publish` tasks. To skip building and running the tests, use the `-PwithoutTests` command line flag when running Gradle.
 

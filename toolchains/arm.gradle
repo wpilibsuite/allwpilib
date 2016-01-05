@@ -1,4 +1,4 @@
-def compilerPrefix = 'arm-frc-linux-gnueabi-'
+def compilerPrefix = project.hasProperty('compilerPrefix') ? project.compilerPrefix : 'arm-frc-linux-gnueabi-'
 model {
     toolChains {
         gcc(Gcc) {
