@@ -14,6 +14,7 @@
 #include "PIDSource.h"
 #include "Notifier.h"
 #include "HAL/cpp/priority_mutex.h"
+#include "Timer.h"
 
 #include <memory>
 
@@ -55,6 +56,7 @@ class PIDController : public LiveWindowSendable,
 
   virtual void SetSetpoint(float setpoint) override;
   virtual double GetSetpoint() const override;
+  double GetDeltaSetpoint() const;
 
   virtual float GetError() const;
   virtual float GetAvgError() const;
@@ -82,6 +84,7 @@ class PIDController : public LiveWindowSendable,
 
   std::shared_ptr<ITable> m_table;
   virtual void Calculate();
+  virtual double CalculateFeedForward();
 
  private:
   float m_P;              // factor for "proportional" control
@@ -94,7 +97,7 @@ class PIDController : public LiveWindowSendable,
   float m_minimumInput = 0;   // minimum input - limit setpoint to this
   bool m_continuous = false;      // do the endpoints wrap around? eg. Absolute encoder
   bool m_enabled = false;  // is the pid controller enabled
-  float m_prevInput = 0;  // the prior sensor input (used to compute velocity)
+  float m_prevError = 0;  // the prior error (used to compute velocity)
   double m_totalError = 0;  // the sum of the errors for use in the integral calc
   enum {
     kAbsoluteTolerance,
@@ -105,6 +108,7 @@ class PIDController : public LiveWindowSendable,
   // the percetage or absolute error that is considered on target.
   float m_tolerance = 0.05;
   float m_setpoint = 0;
+  float m_prevSetpoint = 0;
   float m_error = 0;
   float m_result = 0;
   float m_period;
@@ -114,9 +118,10 @@ class PIDController : public LiveWindowSendable,
   std::queue<double> m_buf;
   double m_bufTotal = 0;
 
-  mutable priority_mutex m_mutex;
+  mutable priority_recursive_mutex m_mutex;
 
   std::unique_ptr<Notifier> m_controlLoop;
+  Timer m_setpointTimer;
 
   void Initialize(float p, float i, float d, float f, PIDSource *source,
                   PIDOutput *output, float period = 0.05);

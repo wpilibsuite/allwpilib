@@ -8,6 +8,7 @@ package edu.wpi.first.wpilibj;
 import java.util.TimerTask;
 import java.util.LinkedList;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
@@ -34,7 +35,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   private boolean m_continuous = false; // do the endpoints wrap around? eg.
                                         // Absolute encoder
   private boolean m_enabled = false; // is the pid controller enabled
-  private double m_prevInput = 0.0; // the prior sensor input (used to compute
+  private double m_prevError = 0.0; // the prior error (used to compute
                                     // velocity)
   private double m_totalError = 0.0; // the sum of the errors for use in the
                                      // integral calc
@@ -44,12 +45,14 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   private LinkedList<Double> m_buf;
   private double m_bufTotal = 0.0;
   private double m_setpoint = 0.0;
+  private double m_prevSetpoint = 0.0;
   private double m_error = 0.0;
   private double m_result = 0.0;
   private double m_period = kDefaultPeriod;
   protected PIDSource m_pidInput;
   protected PIDOutput m_pidOutput;
   java.util.Timer m_controlLoop;
+  Timer m_setpointTimer;
   private boolean m_freed = false;
   private boolean m_usingPercentTolerance;
 
@@ -141,7 +144,8 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     }
 
     m_controlLoop = new java.util.Timer();
-
+    m_setpointTimer = new Timer();
+    m_setpointTimer.start();
 
     m_P = Kp;
     m_I = Ki;
@@ -275,7 +279,8 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
               m_totalError = m_maximumOutput / m_P;
             }
 
-            m_result = m_P * m_totalError + m_D * m_error + m_setpoint * m_F;
+            m_result = m_P * m_totalError + m_D * m_error +
+                       calculateFeedForward();
           }
         }
         else {
@@ -292,10 +297,10 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
             }
           }
 
-          m_result =
-              m_P * m_error + m_I * m_totalError + m_D * (m_prevInput - input) + m_setpoint * m_F;
+          m_result = m_P * m_error + m_I * m_totalError +
+                     m_D * (m_error - m_prevError) + calculateFeedForward();
         }
-        m_prevInput = input;
+        m_prevError = m_error;
 
         if (m_result > m_maximumOutput) {
           m_result = m_maximumOutput;
@@ -315,6 +320,33 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
       }
 
       pidOutput.pidWrite(result);
+    }
+  }
+
+  /**
+   * Calculate the feed forward term
+   *
+   * Both of the provided feed forward calculations are velocity feed forwards.
+   * If a different feed forward calculation is desired, the user can override
+   * this function and provide his or her own. This function  does no
+   * synchronization because the PIDController class only calls it in
+   * synchronized code, so be careful if calling it oneself.
+   *
+   * If a velocity PID controller is being used, the F term should be set to 1
+   * over the maximum setpoint for the output. If a position PID controller is
+   * being used, the F term should be set to 1 over the maximum speed for the
+   * output measured in setpoint units per this controller's update period (see
+   * the default period in this class's constructor).
+   */
+  protected double calculateFeedForward() {
+    if (m_pidInput.getPIDSourceType().equals(PIDSourceType.kRate)) {
+      return m_F * getSetpoint();
+    }
+    else {
+      double temp = m_F * getDeltaSetpoint();
+      m_prevSetpoint = m_setpoint;
+      m_setpointTimer.reset();
+      return temp;
     }
   }
 
@@ -492,6 +524,15 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   }
 
   /**
+   * Returns the change in setpoint over time of the PIDController
+   *$
+   * @return the change in setpoint over time
+   */
+  public synchronized double getDeltaSetpoint() {
+    return (m_setpoint - m_prevSetpoint) / m_setpointTimer.get();
+  }
+
+  /**
    * Returns the current difference of the input from the setpoint
    *$
    * @return the current error
@@ -658,7 +699,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    */
   public synchronized void reset() {
     disable();
-    m_prevInput = 0;
+    m_prevError = 0;
     m_totalError = 0;
     m_result = 0;
   }

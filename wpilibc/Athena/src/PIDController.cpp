@@ -67,6 +67,7 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
   m_period = period;
 
   m_controlLoop->StartPeriodic(m_period);
+  m_setpointTimer.Start();
 
   static int32_t instances = 0;
   instances++;
@@ -87,7 +88,7 @@ void PIDController::Calculate() {
   PIDOutput *pidOutput;
 
   {
-    std::lock_guard<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_recursive_mutex> sync(m_mutex);
     pidInput = m_pidInput;
     pidOutput = m_pidOutput;
     enabled = m_enabled;
@@ -97,7 +98,7 @@ void PIDController::Calculate() {
   if (pidOutput == nullptr) return;
 
   if (enabled) {
-    std::lock_guard<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_recursive_mutex> sync(m_mutex);
     float input = pidInput->PIDGet();
     float result;
     PIDOutput *pidOutput;
@@ -126,7 +127,7 @@ void PIDController::Calculate() {
         }
       }
 
-      m_result = m_D * m_error + m_P * m_totalError + m_setpoint * m_F;
+      m_result = m_D * m_error + m_P * m_totalError + CalculateFeedForward();
     }
     else {
       if (m_I != 0) {
@@ -142,9 +143,9 @@ void PIDController::Calculate() {
       }
 
       m_result = m_P * m_error + m_I * m_totalError +
-                 m_D * (m_prevInput - input) + m_setpoint * m_F;
+                 m_D * (m_error - m_prevError) + CalculateFeedForward();
     }
-    m_prevInput = input;
+    m_prevError = m_error;
 
     if (m_result > m_maximumOutput)
       m_result = m_maximumOutput;
@@ -168,6 +169,33 @@ void PIDController::Calculate() {
 }
 
 /**
+ * Calculate the feed forward term
+ *
+ * Both of the provided feed forward calculations are velocity feed forwards.
+ * If a different feed forward calculation is desired, the user can override
+ * this function and provide his or her own. This function  does no
+ * synchronization because the PIDController class only calls it in synchronized
+ * code, so be careful if calling it oneself.
+ *
+ * If a velocity PID controller is being used, the F term should be set to 1
+ * over the maximum setpoint for the output. If a position PID controller is
+ * being used, the F term should be set to 1 over the maximum speed for the
+ * output measured in setpoint units per this controller's update period (see
+ * the default period in this class's constructor).
+ */
+double PIDController::CalculateFeedForward() {
+  if (m_pidInput->GetPIDSourceType() == PIDSourceType::kRate) {
+    return m_F * GetSetpoint();
+  }
+  else {
+    double temp = m_F * GetDeltaSetpoint();
+    m_prevSetpoint = m_setpoint;
+    m_setpointTimer.Reset();
+    return temp;
+  }
+}
+
+/**
  * Set the PID Controller gain parameters.
  * Set the proportional, integral, and differential coefficients.
  * @param p Proportional coefficient
@@ -176,7 +204,7 @@ void PIDController::Calculate() {
  */
 void PIDController::SetPID(double p, double i, double d) {
   {
-    std::lock_guard<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_recursive_mutex> sync(m_mutex);
     m_P = p;
     m_I = i;
     m_D = d;
@@ -199,7 +227,7 @@ void PIDController::SetPID(double p, double i, double d) {
  */
 void PIDController::SetPID(double p, double i, double d, double f) {
   {
-    std::lock_guard<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_recursive_mutex> sync(m_mutex);
     m_P = p;
     m_I = i;
     m_D = d;
@@ -219,7 +247,7 @@ void PIDController::SetPID(double p, double i, double d, double f) {
  * @return proportional coefficient
  */
 double PIDController::GetP() const {
-  std::lock_guard<priority_mutex> sync(m_mutex);
+  std::lock_guard<priority_recursive_mutex> sync(m_mutex);
   return m_P;
 }
 
@@ -228,7 +256,7 @@ double PIDController::GetP() const {
  * @return integral coefficient
  */
 double PIDController::GetI() const {
-  std::lock_guard<priority_mutex> sync(m_mutex);
+  std::lock_guard<priority_recursive_mutex> sync(m_mutex);
   return m_I;
 }
 
@@ -237,7 +265,7 @@ double PIDController::GetI() const {
  * @return differential coefficient
  */
 double PIDController::GetD() const {
-  std::lock_guard<priority_mutex> sync(m_mutex);
+  std::lock_guard<priority_recursive_mutex> sync(m_mutex);
   return m_D;
 }
 
@@ -246,7 +274,7 @@ double PIDController::GetD() const {
  * @return Feed forward coefficient
  */
 double PIDController::GetF() const {
-  std::lock_guard<priority_mutex> sync(m_mutex);
+  std::lock_guard<priority_recursive_mutex> sync(m_mutex);
   return m_F;
 }
 
@@ -256,7 +284,7 @@ double PIDController::GetF() const {
  * @return the latest calculated output
  */
 float PIDController::Get() const {
-  std::lock_guard<priority_mutex> sync(m_mutex);
+  std::lock_guard<priority_recursive_mutex> sync(m_mutex);
   return m_result;
 }
 
@@ -268,7 +296,7 @@ float PIDController::Get() const {
  * @param continuous Set to true turns on continuous, false turns off continuous
  */
 void PIDController::SetContinuous(bool continuous) {
-  std::lock_guard<priority_mutex> sync(m_mutex);
+  std::lock_guard<priority_recursive_mutex> sync(m_mutex);
   m_continuous = continuous;
 }
 
@@ -280,7 +308,7 @@ void PIDController::SetContinuous(bool continuous) {
  */
 void PIDController::SetInputRange(float minimumInput, float maximumInput) {
   {
-    std::lock_guard<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_recursive_mutex> sync(m_mutex);
     m_minimumInput = minimumInput;
     m_maximumInput = maximumInput;
   }
@@ -296,7 +324,7 @@ void PIDController::SetInputRange(float minimumInput, float maximumInput) {
  */
 void PIDController::SetOutputRange(float minimumOutput, float maximumOutput) {
   {
-    std::lock_guard<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_recursive_mutex> sync(m_mutex);
     m_minimumOutput = minimumOutput;
     m_maximumOutput = maximumOutput;
   }
@@ -309,7 +337,8 @@ void PIDController::SetOutputRange(float minimumOutput, float maximumOutput) {
  */
 void PIDController::SetSetpoint(float setpoint) {
   {
-    std::lock_guard<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_recursive_mutex> sync(m_mutex);
+
     if (m_maximumInput > m_minimumInput) {
       if (setpoint > m_maximumInput)
         m_setpoint = m_maximumInput;
@@ -335,8 +364,17 @@ void PIDController::SetSetpoint(float setpoint) {
  * @return the current setpoint
  */
 double PIDController::GetSetpoint() const {
-  std::lock_guard<priority_mutex> sync(m_mutex);
+  std::lock_guard<priority_recursive_mutex> sync(m_mutex);
   return m_setpoint;
+}
+
+/**
+ * Returns the change in setpoint over time of the PIDController
+ * @return the change in setpoint over time
+ */
+double PIDController::GetDeltaSetpoint() const {
+  std::lock_guard<priority_recursive_mutex> sync(m_mutex);
+  return (m_setpoint - m_prevSetpoint) / m_setpointTimer.Get();
 }
 
 /**
@@ -346,7 +384,7 @@ double PIDController::GetSetpoint() const {
 float PIDController::GetError() const {
   double pidInput;
   {
-    std::lock_guard<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_recursive_mutex> sync(m_mutex);
     pidInput = m_pidInput->PIDGet();
   }
   return GetSetpoint() - pidInput;
@@ -375,7 +413,7 @@ PIDSourceType PIDController::GetPIDSourceType() const {
 float PIDController::GetAvgError() const {
   float avgError = 0;
   {
-    std::lock_guard<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_recursive_mutex> sync(m_mutex);
     // Don't divide by zero.
     if (m_buf.size()) avgError = m_bufTotal / m_buf.size();
   }
@@ -389,7 +427,7 @@ float PIDController::GetAvgError() const {
  */
 void PIDController::SetTolerance(float percent) {
   {
-    std::lock_guard<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_recursive_mutex> sync(m_mutex);
     m_toleranceType = kPercentTolerance;
     m_tolerance = percent;
   }
@@ -402,7 +440,7 @@ void PIDController::SetTolerance(float percent) {
  */
 void PIDController::SetPercentTolerance(float percent) {
   {
-    std::lock_guard<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_recursive_mutex> sync(m_mutex);
     m_toleranceType = kPercentTolerance;
     m_tolerance = percent;
   }
@@ -415,7 +453,7 @@ void PIDController::SetPercentTolerance(float percent) {
  */
 void PIDController::SetAbsoluteTolerance(float absTolerance) {
   {
-    std::lock_guard<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_recursive_mutex> sync(m_mutex);
     m_toleranceType = kAbsoluteTolerance;
     m_tolerance = absTolerance;
   }
@@ -452,7 +490,7 @@ void PIDController::SetToleranceBuffer(unsigned bufLength) {
 bool PIDController::OnTarget() const {
   double error = GetAvgError();
 
-  std::lock_guard<priority_mutex> sync(m_mutex);
+  std::lock_guard<priority_recursive_mutex> sync(m_mutex);
   switch (m_toleranceType) {
     case kPercentTolerance:
       return fabs(error) < m_tolerance / 100 * (m_maximumInput - m_minimumInput);
@@ -472,7 +510,7 @@ bool PIDController::OnTarget() const {
  */
 void PIDController::Enable() {
   {
-    std::lock_guard<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_recursive_mutex> sync(m_mutex);
     m_enabled = true;
   }
 
@@ -486,7 +524,7 @@ void PIDController::Enable() {
  */
 void PIDController::Disable() {
   {
-    std::lock_guard<priority_mutex> sync(m_mutex);
+    std::lock_guard<priority_recursive_mutex> sync(m_mutex);
     m_pidOutput->PIDWrite(0);
     m_enabled = false;
   }
@@ -500,7 +538,7 @@ void PIDController::Disable() {
  * Return true if PIDController is enabled.
  */
 bool PIDController::IsEnabled() const {
-  std::lock_guard<priority_mutex> sync(m_mutex);
+  std::lock_guard<priority_recursive_mutex> sync(m_mutex);
   return m_enabled;
 }
 
@@ -510,8 +548,8 @@ bool PIDController::IsEnabled() const {
 void PIDController::Reset() {
   Disable();
 
-  std::lock_guard<priority_mutex> sync(m_mutex);
-  m_prevInput = 0;
+  std::lock_guard<priority_recursive_mutex> sync(m_mutex);
+  m_prevError = 0;
   m_totalError = 0;
   m_result = 0;
 }
