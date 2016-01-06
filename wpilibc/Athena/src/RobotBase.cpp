@@ -49,6 +49,7 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   RobotBase::setInstance(this);
 
   NetworkTable::SetNetworkIdentity("Robot");
+  NetworkTable::SetPersistentFilename("/home/lvuser/networktables.ini");
 
   FILE *file = nullptr;
   file = fopen("/tmp/frc_versions/FRC_Lib_Version.ini", "w");
