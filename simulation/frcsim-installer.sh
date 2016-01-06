@@ -129,8 +129,9 @@ function install-eclipse-plugins {
 
   mkdir -p ~/wpilib/simulation
   unzip /tmp/simulation.zip -d ~/wpilib/simulation
-  ln -fs ~/wpilib/simulation/frcsim /usr/bin/frcsim
-  ln -fs ~/wpilib/simulation/sim_ds /usr/bin/sim_ds
+  rm -f /usr/bin/frcsim /usr/bin/sim_ds
+  ln -s ~/wpilib/simulation/frcsim /usr/bin/frcsim
+  ln -s ~/wpilib/simulation/sim_ds /usr/bin/sim_ds
 }
 
 function install-eclipse {
@@ -141,7 +142,8 @@ function install-eclipse {
   fi
 
   tar -xf /tmp/eclipse.tar.gz -C /opt
-  ln -fs /opt/eclipse/eclipse /usr/bin/eclipse
+  rm -f /usr/bin/eclipse
+  ln -s /opt/eclipse/eclipse /usr/bin/eclipse
 }
 
 function install-desktops {
@@ -199,7 +201,8 @@ function install-toolchain {
   fi
 
   apt-get install cmake libprotoc-dev libprotobuf-dev protobuf-compiler g++-4.9 openjdk-8-jdk -y
-  ln -fs /usr/bin/g++-4.9 /usr/bin/g++
+  rm -f /usr/bin/g++
+  ln -s /usr/bin/g++-4.9 /usr/bin/g++
 }
 
 function install-models {
