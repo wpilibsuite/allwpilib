@@ -86,7 +86,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
 
     @Override
     public boolean onTarget() {
-      return (Math.abs(getAvgError()) < percentage / 100 * (m_maximumInput - m_minimumInput));
+      return isAvgErrorValid() && (Math.abs(getAvgError()) < percentage / 100 * (m_maximumInput - m_minimumInput));
     }
   }
 
@@ -99,7 +99,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
 
     @Override
     public boolean onTarget() {
-      return Math.abs(getAvgError()) < value;
+      return isAvgErrorValid() && Math.abs(getAvgError()) < value;
     }
   }
 
@@ -573,6 +573,16 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     // Don't divide by zero.
     if (m_buf.size() != 0) avgError = m_bufTotal / m_buf.size();
     return avgError;
+  }
+
+  /**
+   * Returns whether or not any values have been collected. If no values
+   * have been collected, getAvgError is 0, which is invalid.
+   *
+   * @return True if {@link #getAvgError()} is currently valid.
+   */
+  private synchronized boolean isAvgErrorValid() {
+    return m_buf.size() != 0;
   }
 
   /**

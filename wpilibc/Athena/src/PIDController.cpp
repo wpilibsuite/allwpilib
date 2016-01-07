@@ -486,8 +486,10 @@ void PIDController::SetToleranceBuffer(unsigned bufLength) {
  * setpoint.
  * Ideally it should be based on being within the tolerance for some period of
  * time.
+ * This will return false until at least one input value has been computed.
  */
 bool PIDController::OnTarget() const {
+  if (m_buf.size() == 0) return false;
   double error = GetAvgError();
 
   std::lock_guard<priority_recursive_mutex> sync(m_mutex);
