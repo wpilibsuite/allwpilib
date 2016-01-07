@@ -163,8 +163,4 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
     if (m_spi == null) return 0.0;
     return m_spi.getAccumulatorLastValue() * kDegreePerSecondPerLSB;
   }
-
-  public String getSmartDashboardType() {
-    return "ADXRS450_Gyro";
-  }
 }

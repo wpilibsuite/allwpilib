@@ -132,7 +132,7 @@ void AnalogGyro::InitGyro() {
   SetPIDSourceType(PIDSourceType::kDisplacement);
 
   HALReport(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel());
-  LiveWindow::GetInstance()->AddSensor("Gyro", m_analog->GetChannel(), this);
+  LiveWindow::GetInstance()->AddSensor("AnalogGyro", m_analog->GetChannel(), this);
 }
 
 /**
@@ -251,5 +251,3 @@ void AnalogGyro::SetDeadband(float volts) {
                      (1 << m_analog->GetOversampleBits());
   m_analog->SetAccumulatorDeadband(deadband);
 }
-
-std::string AnalogGyro::GetSmartDashboardType() const { return "AnalogGyro"; }

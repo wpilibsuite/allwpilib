@@ -238,12 +238,4 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
         (int) (volts * 1e9 / m_analog.getLSBWeight() * (1 << m_analog.getOversampleBits()));
     m_analog.setAccumulatorDeadband(deadband);
   }
-
-  /*
-   * Live Window code, only does anything if live window is activated.
-   */
-  @Override
-  public String getSmartDashboardType() {
-    return "AnalogGyro";
-  }
 }

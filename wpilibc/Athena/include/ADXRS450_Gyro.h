@@ -36,8 +36,6 @@ class ADXRS450_Gyro : public GyroBase {
   void Reset() override;
   void Calibrate() override;
 
-  std::string GetSmartDashboardType() const override;
-
  private:
   SPI m_spi;
 

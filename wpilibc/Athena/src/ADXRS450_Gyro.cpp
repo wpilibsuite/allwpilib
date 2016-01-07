@@ -151,7 +151,3 @@ float ADXRS450_Gyro::GetAngle() const {
 double ADXRS450_Gyro::GetRate() const {
   return (double)m_spi.GetAccumulatorLastValue() * kDegreePerSecondPerLSB;
 }
-
-std::string ADXRS450_Gyro::GetSmartDashboardType() const {
-  return "ADXRS450_Gyro";
-}

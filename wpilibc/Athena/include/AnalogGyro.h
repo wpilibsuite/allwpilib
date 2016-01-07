@@ -54,8 +54,6 @@ class AnalogGyro : public GyroBase {
   virtual void InitGyro();
   void Calibrate() override;
 
-  std::string GetSmartDashboardType() const override;
-
  protected:
   std::shared_ptr<AnalogInput> m_analog;
 
