@@ -469,6 +469,7 @@ void PIDController::SetAbsoluteTolerance(float absTolerance) {
  * @param bufLength Number of previous cycles to average. Defaults to 1.
  */
 void PIDController::SetToleranceBuffer(unsigned bufLength) {
+  std::lock_guard<priority_recursive_mutex> sync(m_mutex);
   m_bufLength = bufLength;
 
   // Cut the buffer down to size if needed.
@@ -489,10 +490,9 @@ void PIDController::SetToleranceBuffer(unsigned bufLength) {
  * This will return false until at least one input value has been computed.
  */
 bool PIDController::OnTarget() const {
+  std::lock_guard<priority_recursive_mutex> sync(m_mutex);
   if (m_buf.size() == 0) return false;
   double error = GetAvgError();
-
-  std::lock_guard<priority_recursive_mutex> sync(m_mutex);
   switch (m_toleranceType) {
     case kPercentTolerance:
       return fabs(error) < m_tolerance / 100 * (m_maximumInput - m_minimumInput);
