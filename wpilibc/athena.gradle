@@ -129,7 +129,6 @@ if (checkDoxygen()) {
         source file("$halLocation/Athena")
         source file("$halLocation/include")
         // template file('cpp.doxy')
-        exclude 'pcre.h'
         exclude 'nivision.h'
         project_name 'WPILibC++'
         javadoc_autobrief true
