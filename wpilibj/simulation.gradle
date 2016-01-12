@@ -42,6 +42,7 @@ task wpilibjSimJavadoc(type: Javadoc) {
     description = 'Generates javadoc for the simulation components'
     group = 'WPILib'
     source sourceSets.sim.allJava, sourceSets.shared.allJava
+    destinationDir = file("$buildDir/docs/java-simulation")
     classpath = files([sourceSets.sim.compileClasspath, sourceSets.shared.compileClasspath])
 }
 
@@ -56,12 +57,14 @@ task wpilibjSimJavadocJar(type: Jar, dependsOn: wpilibjSimJavadoc) {
 publishing {
     publications {
         wpilibjSim(MavenPublication) {
-            artifact wpilibjSimJar
+            artifact wpilibjSimJar {
+                classifier = 'simulation'
+            }
             artifact(wpilibjSimSources) {
-                classifier = "sources"
+                classifier = 'sources-simulation'
             }
             artifact(wpilibjSimJavadocJar) {
-                classifier "javadoc"
+                classifier 'javadoc-simulation'
             }
 
             groupId 'edu.wpi.first.wpilibj'
