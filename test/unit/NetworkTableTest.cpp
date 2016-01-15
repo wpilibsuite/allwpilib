@@ -18,3 +18,10 @@ TEST_F(NetworkTableTest, ContainsKey) {
   ASSERT_TRUE(nt->ContainsKey("testkey"));
 }
 
+TEST_F(NetworkTableTest, LeadingSlash) {
+  auto nt = NetworkTable::GetTable("leadingslash");
+  auto nt2 = NetworkTable::GetTable("/leadingslash");
+  ASSERT_FALSE(nt->ContainsKey("testkey"));
+  nt2->PutNumber("testkey", 5);
+  ASSERT_TRUE(nt->ContainsKey("testkey"));
+}

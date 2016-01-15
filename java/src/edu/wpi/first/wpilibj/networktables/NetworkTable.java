@@ -174,7 +174,7 @@ public class NetworkTable implements ITable, IRemote {
   public synchronized static NetworkTable getTable(String key) {
     if (!running)
       initialize();
-    if (key.isEmpty())
+    if (key.isEmpty() || key.charAt(0) == PATH_SEPARATOR)
       return new NetworkTable(key);
     return new NetworkTable(PATH_SEPARATOR + key);
   }

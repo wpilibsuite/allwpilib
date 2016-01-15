@@ -82,12 +82,14 @@ const char* NetworkTable::LoadPersistent(
 
 std::shared_ptr<NetworkTable> NetworkTable::GetTable(StringRef key) {
   if (!s_running) Initialize();
-  llvm::SmallString<128> path;
-  if (!key.empty()) {
+  if (key.empty() || key[0] == PATH_SEPARATOR_CHAR) {
+    return std::make_shared<NetworkTable>(key, private_init());
+  } else {
+    llvm::SmallString<128> path;
     path += PATH_SEPARATOR_CHAR;
     path += key;
+    return std::make_shared<NetworkTable>(path, private_init());
   }
-  return std::make_shared<NetworkTable>(path, private_init());
 }
 
 NetworkTable::NetworkTable(StringRef path, const private_init&)
