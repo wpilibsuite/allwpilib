@@ -159,7 +159,7 @@ std::string DriverStation::GetJoystickName(uint32_t stick) const {
   if (stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
   }
-  std::string retVal(m_joystickDescriptor[0].name);
+  std::string retVal(m_joystickDescriptor[stick].name);
   return retVal;
 }
 
