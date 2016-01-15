@@ -34,17 +34,32 @@ int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons)
 {
 	return FRC_NetworkCommunication_getJoystickButtons(joystickNum, &buttons->buttons, &buttons->count);
 }
-
+/**
+ * Retrieve the Joystick Descriptor for particular slot
+ * @param desc [out] descriptor (data transfer object) to fill in.  desc is filled in regardless of success.
+ *                              In other words, if descriptor is not available, desc is filled in with default
+ *                              values matching the init-values in Java and C++ Driverstation for when caller
+ *                              requests a too-large joystick index.
+ *
+ * @return error code reported from Network Comm back-end.  Zero is good, nonzero is bad.
+ */
 int HALGetJoystickDescriptor(uint8_t joystickNum, HALJoystickDescriptor *desc)
 {
 	desc->isXbox = 0;
 	desc->type = -1;
 	desc->name[0] = '\0';
-	desc->axisCount = 0;
+	desc->axisCount = kMaxJoystickAxes; /* set to the desc->axisTypes's capacity */
 	desc->buttonCount = 0;
 	desc->povCount = 0;
-	return FRC_NetworkCommunication_getJoystickDesc(joystickNum, &desc->isXbox, &desc->type, (char *)(&desc->name),
+	int retval = FRC_NetworkCommunication_getJoystickDesc(joystickNum, &desc->isXbox, &desc->type, (char *)(&desc->name),
 		&desc->axisCount, (uint8_t *)&desc->axisTypes, &desc->buttonCount, &desc->povCount);
+	/* check the return, if there is an error and the RIOimage predates FRC2017, then axisCount needs to be cleared */
+	if(retval != 0)
+	{
+		/* set count to zero so downstream code doesn't decode invalid axisTypes. */
+		desc->axisCount = 0;
+	}
+	return retval;
 }
 
 int HALGetJoystickIsXbox(uint8_t joystickNum)
