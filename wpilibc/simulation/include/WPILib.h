@@ -47,7 +47,7 @@
 #include "Counter.h"
 #include "DigitalInput.h"
 #include "Encoder.h"
-#include "Gyro.h"
+#include "AnalogGyro.h"
 #include "GenericHID.h"
 #include "Joystick.h"
 #include "PIDController.h"
