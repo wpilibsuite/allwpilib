@@ -53,29 +53,8 @@ task wpilibjSimJavadocJar(type: Jar, dependsOn: wpilibjSimJavadoc) {
     from wpilibjSimJavadoc.destinationDir
 }
 
-// Maven publishing configuration
-publishing {
-    publications {
-        wpilibjSim(MavenPublication) {
-            artifact wpilibjSimJar {
-                classifier = 'simulation'
-            }
-            artifact(wpilibjSimSources) {
-                classifier = 'sources-simulation'
-            }
-            artifact(wpilibjSimJavadocJar) {
-                classifier 'javadoc-simulation'
-            }
-
-            groupId 'edu.wpi.first.wpilibj'
-            artifactId 'wpilibJavaSim'
-            version '0.1.0-SNAPSHOT'
-        }
-    }
-}
-
 //we need to move the simulation jars to the install directory
-task copyJars(type: Copy) {
+task copyJars(type: Copy, dependsOn: wpilibjSimJar) {
     description = 'copy wpilibj simulation jar to make simulation zip'
     group = 'WPILib Simulation'
     from wpilibjSimJar.archivePath
