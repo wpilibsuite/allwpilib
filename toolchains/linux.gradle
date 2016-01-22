@@ -8,11 +8,11 @@ model {
                     //TODO: When the compiler allows us to actually call deprecated functions from within
                     // deprecated function, remove this line (this will cause calling deprecated functions
                     // to be treated as a warning rather than an error).
-                    args << '-Wno-error=deprecated-declarations'
+                    args << '-Wno-error=deprecated-declarations' << '-pthread'
                     args << '-m32'
                 }
                 linker.withArguments { args ->
-                    args << '-rdynamic'
+                    args << '-rdynamic' << '-pthread'
                     args << '-m32'
                 }
             }
@@ -23,10 +23,10 @@ model {
                     //TODO: When the compiler allows us to actually call deprecated functions from within
                     // deprecated function, remove this line (this will cause calling deprecated functions
                     // to be treated as a warning rather than an error).
-                    args << '-Wno-error=deprecated-declarations'
+                    args << '-Wno-error=deprecated-declarations' << '-pthread'
                 }
                 linker.withArguments { args ->
-                    args << '-rdynamic'
+                    args << '-rdynamic' << '-pthread'
                 }
             }
         }
