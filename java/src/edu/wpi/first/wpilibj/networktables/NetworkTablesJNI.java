@@ -51,8 +51,11 @@ public class NetworkTablesJNI {
             os.close();
             is.close();
           }
-
-          System.load(jniLibrary.getAbsolutePath());
+          try {
+            System.load(jniLibrary.getAbsolutePath());
+          } catch (UnsatisfiedLinkError e) {
+            System.loadLibrary("ntcore");
+          }
         } else {
           System.loadLibrary("ntcore");
         }
