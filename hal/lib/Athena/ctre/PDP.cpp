@@ -11,10 +11,10 @@
 #define CONTROL_1		0x08041C00	/* PDP_Control_ClearStats */
 
 #define EXPECTED_RESPONSE_TIMEOUT_MS	(50)
-#define GET_STATUS1()		CtreCanNode::recMsg<PdpStatus1_t> rx = GetRx<PdpStatus1_t>(STATUS_1,EXPECTED_RESPONSE_TIMEOUT_MS)
-#define GET_STATUS2()		CtreCanNode::recMsg<PdpStatus2_t> rx = GetRx<PdpStatus2_t>(STATUS_2,EXPECTED_RESPONSE_TIMEOUT_MS)
-#define GET_STATUS3()		CtreCanNode::recMsg<PdpStatus3_t> rx = GetRx<PdpStatus3_t>(STATUS_3,EXPECTED_RESPONSE_TIMEOUT_MS)
-#define GET_STATUS_ENERGY()	CtreCanNode::recMsg<PDP_Status_Energy_t> rx = GetRx<PDP_Status_Energy_t>(STATUS_ENERGY,EXPECTED_RESPONSE_TIMEOUT_MS)
+#define GET_STATUS1()		CtreCanNode::recMsg<PdpStatus1_t> rx = GetRx<PdpStatus1_t>(STATUS_1|GetDeviceNumber(),EXPECTED_RESPONSE_TIMEOUT_MS)
+#define GET_STATUS2()		CtreCanNode::recMsg<PdpStatus2_t> rx = GetRx<PdpStatus2_t>(STATUS_2|GetDeviceNumber(),EXPECTED_RESPONSE_TIMEOUT_MS)
+#define GET_STATUS3()		CtreCanNode::recMsg<PdpStatus3_t> rx = GetRx<PdpStatus3_t>(STATUS_3|GetDeviceNumber(),EXPECTED_RESPONSE_TIMEOUT_MS)
+#define GET_STATUS_ENERGY()	CtreCanNode::recMsg<PDP_Status_Energy_t> rx = GetRx<PDP_Status_Energy_t>(STATUS_ENERGY|GetDeviceNumber(),EXPECTED_RESPONSE_TIMEOUT_MS)
 
 /* encoder/decoders */
 typedef struct _PdpStatus1_t{
