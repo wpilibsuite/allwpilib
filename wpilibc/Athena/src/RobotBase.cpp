@@ -27,6 +27,7 @@ void RobotBase::setInstance(RobotBase *robot) {
 RobotBase &RobotBase::getInstance() { return *m_instance; }
 
 void RobotBase::robotSetup(RobotBase *robot) {
+  printf("\n********** Robot program starting **********\n");
   robot->StartCompetition();
 }
 
@@ -55,7 +56,7 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   file = fopen("/tmp/frc_versions/FRC_Lib_Version.ini", "w");
 
   if (file != nullptr) {
-    fputs("2016 C++ Beta5.0", file);
+    fputs("2016 C++ Release 3", file);
     fclose(file);
   }
 }

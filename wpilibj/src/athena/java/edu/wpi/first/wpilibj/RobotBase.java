@@ -223,7 +223,7 @@ public abstract class RobotBase {
 
       output = new FileOutputStream(file);
 
-      output.write("2016 Java Beta5.0".getBytes());
+      output.write("2016 Java Release 3".getBytes());
 
     } catch (IOException ex) {
       ex.printStackTrace();
@@ -238,6 +238,7 @@ public abstract class RobotBase {
 
     boolean errorOnExit = false;
     try {
+      System.out.println("********** Robot program starting **********");
       robot.startCompetition();
     } catch (Throwable t) {
       DriverStation.reportError(
