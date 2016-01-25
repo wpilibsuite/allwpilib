@@ -29,4 +29,8 @@ public class SolenoidJNI extends JNIWrapper {
   public static native boolean getPCMSolenoidVoltageFault(int module);
 
   public static native void clearAllPCMStickyFaults(int module);
+
+  public static native void setOneShotDuration(int portHandle, long durationMS);
+
+  public static native void fireOneShot(int portHandle);
 }
