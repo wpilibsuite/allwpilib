@@ -94,7 +94,7 @@ protected:
 
 	static const int32_t kMaxNumberOfMotors = 4;
 
-	int32_t m_invertedMotors[kMaxNumberOfMotors];
+	int32_t m_invertedMotors[kMaxNumberOfMotors] = {1,1,1,1};
 	float m_sensitivity = 0.5;
 	double m_maxOutput = 1.0;
 	bool m_deleteSpeedControllers;

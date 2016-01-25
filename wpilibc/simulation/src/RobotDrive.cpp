@@ -52,11 +52,6 @@ RobotDrive::RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel)
 	InitRobotDrive();
 	m_rearLeftMotor = std::make_shared<Talon>(leftMotorChannel);
 	m_rearRightMotor = std::make_shared<Talon>(rightMotorChannel);
-
-	for (int32_t i=0; i < kMaxNumberOfMotors; i++)
-	{
-		m_invertedMotors[i] = 1;
-	}
 	SetLeftRightMotorOutputs(0.0, 0.0);
 	m_deleteSpeedControllers = true;
 }
@@ -79,10 +74,6 @@ RobotDrive::RobotDrive(uint32_t frontLeftMotor, uint32_t rearLeftMotor,
 	m_rearRightMotor = std::make_shared<Talon>(rearRightMotor);
 	m_frontLeftMotor = std::make_shared<Talon>(frontLeftMotor);
 	m_frontRightMotor = std::make_shared<Talon>(frontRightMotor);
-	for (int32_t i=0; i < kMaxNumberOfMotors; i++)
-	{
-		m_invertedMotors[i] = 1;
-	}
 	SetLeftRightMotorOutputs(0.0, 0.0);
 	m_deleteSpeedControllers = true;
 }
