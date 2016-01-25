@@ -98,6 +98,30 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
     return value != 0;
   }
 
+  /**
+   * Set the pulse duration in the PCM. This is used in conjunction with
+   * the startPulse method to allow the PCM to control the timing of a pulse.
+   * The timing can be controlled in 0.01 second increments.
+   *
+   * @param durationSeconds The duration of the pulse, from 0.01 to 2.55 seconds.
+   *
+   * @see #startPulse()
+   */
+  public void setPulseDuration(double durationSeconds) {
+    long durationMS = (long) (durationSeconds * 1000);
+    SolenoidJNI.setOneShotDuration(m_solenoidHandle, durationMS);
+  }
+
+  /**
+   * Trigger the PCM to generate a pulse of the duration set in
+   * setPulseDuration.
+   *
+   * @see #setPulseDuration()
+   */
+  public void startPulse() {
+    SolenoidJNI.fireOneShot(m_solenoidHandle);
+  }
+
   /*
    * Live Window code, only does anything if live window is activated.
    */

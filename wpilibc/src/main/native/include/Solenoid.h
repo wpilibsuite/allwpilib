@@ -32,6 +32,8 @@ class Solenoid : public SolenoidBase, public LiveWindowSendable {
   virtual void Set(bool on);
   virtual bool Get() const;
   bool IsBlackListed() const;
+  void SetPulseDuration(double durationSeconds);
+  void StartPulse() const;
 
   void UpdateTable();
   void StartLiveWindowMode();

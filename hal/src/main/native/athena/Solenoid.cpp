@@ -154,4 +154,25 @@ void HAL_ClearAllPCMStickyFaults(int32_t module, int32_t* status) {
   *status = PCM_modules[module]->ClearStickyFaults();
 }
 
+void HAL_SetOneShotDuration(HAL_SolenoidHandle solenoidPortHandle,
+                            int32_t durMS, int32_t* status) {
+  auto port = solenoidHandles.Get(solenoidPortHandle);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  *status =
+      PCM_modules[port->module]->SetOneShotDurationMs(port->channel, durMS);
+}
+
+void HAL_FireOneShot(HAL_SolenoidHandle solenoidPortHandle, int32_t* status) {
+  auto port = solenoidHandles.Get(solenoidPortHandle);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  *status = PCM_modules[port->module]->FireOneShotSolenoid(port->channel);
+}
 }  // extern "C"

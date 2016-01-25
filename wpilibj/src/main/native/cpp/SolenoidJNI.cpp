@@ -187,4 +187,40 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_clearAllPCMStickyFaults(
   CheckStatus(env, status);
 }
 
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Method:    setOneShotDuration
+ * Signature: (IJ)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_setOneShotDuration
+  (JNIEnv *env, jclass, jint solenoid_port, jlong durationMS)
+{
+  SOLENOIDJNI_LOG(logDEBUG) << "Calling SolenoidJNI SetOneShotDuration";
+
+  SOLENOIDJNI_LOG(logDEBUG) << "Solenoid Port Handle = "
+                            << (HAL_SolenoidHandle)solenoid_port;
+  SOLENOIDJNI_LOG(logDEBUG) << "Duration (MS) = " << durationMS;
+
+  int32_t status = 0;
+  HAL_SetOneShotDuration((HAL_SolenoidHandle)solenoid_port, durationMS, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Method:    fireOneShot
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_fireOneShot
+  (JNIEnv *env, jclass, jint solenoid_port)
+{
+  SOLENOIDJNI_LOG(logDEBUG) << "Calling SolenoidJNI fireOneShot";
+
+  SOLENOIDJNI_LOG(logDEBUG) << "Solenoid Port Handle = "
+                            << (HAL_SolenoidHandle)solenoid_port;
+
+  int32_t status = 0;
+  HAL_FireOneShot((HAL_SolenoidHandle)solenoid_port, &status);
+  CheckStatus(env, status);
+}
 }  // extern "C"

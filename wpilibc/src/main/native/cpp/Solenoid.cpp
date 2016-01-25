@@ -111,6 +111,36 @@ bool Solenoid::IsBlackListed() const {
   return (value != 0);
 }
 
+/**
+ * Set the pulse duration in the PCM. This is used in conjunction with
+ * the startPulse method to allow the PCM to control the timing of a pulse.
+ * The timing can be controlled in 0.01 second increments.
+ *
+ * @param durationSeconds The duration of the pulse, from 0.01 to 2.55 seconds.
+ *
+ * @see startPulse()
+ */
+void Solenoid::SetPulseDuration(double durationSeconds) {
+  int32_t durationMS = durationSeconds * 1000;
+  if (StatusIsFatal()) return;
+  int32_t status = 0;
+  HAL_SetOneShotDuration(m_solenoidHandle, durationMS, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+}
+
+/**
+ * Trigger the PCM to generate a pulse of the duration set in
+ * setPulseDuration.
+ *
+ * @see setPulseDuration()
+ */
+void Solenoid::StartPulse() const {
+  if (StatusIsFatal()) return;
+  int32_t status = 0;
+  HAL_FireOneShot(m_solenoidHandle, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+}
+
 void Solenoid::UpdateTable() {
   if (m_valueEntry) m_valueEntry.SetBoolean(Get());
 }
