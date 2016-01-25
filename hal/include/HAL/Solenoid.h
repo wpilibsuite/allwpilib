@@ -28,6 +28,8 @@ int32_t HAL_GetPCMSolenoidBlackList(int32_t module, int32_t* status);
 HAL_Bool HAL_GetPCMSolenoidVoltageStickyFault(int32_t module, int32_t* status);
 HAL_Bool HAL_GetPCMSolenoidVoltageFault(int32_t module, int32_t* status);
 void HAL_ClearAllPCMStickyFaults(int32_t module, int32_t* status);
+void HAL_setOneShotDuration(HAL_SolenoidHandle solenoidPortHandle, int32_t durMS, int32_t *status);
+void HAL_fireOneShot(HAL_SolenoidHandle solenoidPortHandle, int32_t *status);
 #ifdef __cplusplus
 }
 #endif
