@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __PID_COMMAND_H__
-#define __PID_COMMAND_H__
+#pragma once
 
 #include "Commands/Command.h"
 #include "PIDController.h"
@@ -56,4 +55,3 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
   virtual std::string GetSmartDashboardType() const;
 };
 
-#endif

@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __INTERNAL_BUTTON_H__
-#define __INTERNAL_BUTTON_H__
+#pragma once
 
 #include "Buttons/Button.h"
 
@@ -26,4 +25,3 @@ class InternalButton : public Button {
   bool m_inverted = false;
 };
 
-#endif

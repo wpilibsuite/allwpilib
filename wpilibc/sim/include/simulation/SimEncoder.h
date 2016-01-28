@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef _SIM_ENCODER_H
-#define _SIM_ENCODER_H
+#pragma once
 
 #include <gazebo/common/Time.hh>
 #include <gazebo/transport/transport.hh>
@@ -34,4 +33,3 @@ class SimEncoder {
   void velocityCallback(const msgs::ConstFloat64Ptr& msg);
 };
 
-#endif

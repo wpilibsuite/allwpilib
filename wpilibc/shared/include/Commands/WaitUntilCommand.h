@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __WAIT_UNTIL_COMMAND_H__
-#define __WAIT_UNTIL_COMMAND_H__
+#pragma once
 
 #include "Commands/Command.h"
 
@@ -27,4 +26,3 @@ class WaitUntilCommand : public Command {
   double m_time;
 };
 
-#endif

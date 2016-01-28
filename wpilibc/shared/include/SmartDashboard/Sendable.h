@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __SMART_DASHBOARD_DATA__
-#define __SMART_DASHBOARD_DATA__
+#pragma once
 
 #include <memory>
 #include <string>
@@ -32,4 +31,3 @@ class Sendable {
   virtual std::string GetSmartDashboardType() const = 0;
 };
 
-#endif

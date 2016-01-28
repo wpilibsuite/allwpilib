@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __COMMAND_H__
-#define __COMMAND_H__
+#pragma once
 
 #include <memory>
 #include <set>
@@ -179,4 +178,3 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
   std::shared_ptr<ITable> m_table;
 };
 
-#endif

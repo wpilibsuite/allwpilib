@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __CONTROLLER_POWER_H__
-#define __CONTROLLER_POWER_H__
+#pragma once
 
 class ControllerPower {
  public:
@@ -25,4 +24,4 @@ class ControllerPower {
   static bool GetEnabled6V();
   static int GetFaultCount6V();
 };
-#endif
+

@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef _SIM_GYRO_H
-#define _SIM_GYRO_H
+#pragma once
 
 #include <gazebo/transport/transport.hh>
 #include "simulation/gz_msgs/msgs.h"
@@ -31,4 +30,3 @@ class SimGyro {
   void velocityCallback(const msgs::ConstFloat64Ptr& msg);
 };
 
-#endif

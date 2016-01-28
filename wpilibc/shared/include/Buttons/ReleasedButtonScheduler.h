@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __RELEASED_BUTTON_SCHEDULER_H__
-#define __RELEASED_BUTTON_SCHEDULER_H__
+#pragma once
 
 #include "Buttons/ButtonScheduler.h"
 
@@ -20,4 +19,3 @@ class ReleasedButtonScheduler : public ButtonScheduler {
   virtual void Execute();
 };
 
-#endif

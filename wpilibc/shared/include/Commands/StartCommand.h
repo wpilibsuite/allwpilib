@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __START_COMMAND_H__
-#define __START_COMMAND_H__
+#pragma once
 
 #include "Commands/Command.h"
 
@@ -26,4 +25,3 @@ class StartCommand : public Command {
   Command* m_commandToFork;
 };
 
-#endif

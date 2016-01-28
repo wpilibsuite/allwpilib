@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __PRINT_COMMAND_H__
-#define __PRINT_COMMAND_H__
+#pragma once
 
 #include <string>
 #include "Commands/Command.h"
@@ -27,4 +26,3 @@ class PrintCommand : public Command {
   std::string m_message;
 };
 
-#endif

@@ -6,8 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 #pragma once
-#ifndef __WPILIB_POWER_DISTRIBUTION_PANEL_H__
-#define __WPILIB_POWER_DISTRIBUTION_PANEL_H__
 
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
@@ -45,4 +43,3 @@ class PowerDistributionPanel : public SensorBase, public LiveWindowSendable {
   uint8_t m_module;
 };
 
-#endif /* __WPILIB_POWER_DISTRIBUTION_PANEL_H__ */

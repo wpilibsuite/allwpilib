@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __BUTTON_H__
-#define __BUTTON_H__
+#pragma once
 
 #include "Buttons/Trigger.h"
 #include "Commands/Command.h"
@@ -34,4 +33,3 @@ class Button : public Trigger {
   virtual void ToggleWhenPressed(Command* command);
 };
 
-#endif

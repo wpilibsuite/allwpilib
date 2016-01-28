@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __WAIT_FOR_CHILDREN_H__
-#define __WAIT_FOR_CHILDREN_H__
+#pragma once
 
 #include "Commands/Command.h"
 
@@ -23,5 +22,3 @@ class WaitForChildren : public Command {
   virtual void End();
   virtual void Interrupted();
 };
-
-#endif

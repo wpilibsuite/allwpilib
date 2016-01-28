@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef _SIM_SPEED_CONTROLLER_H
-#define _SIM_SPEED_CONTROLLER_H
+#pragma once
 
 #ifdef _WIN32
 // Ensure that Winsock2.h is included before Windows.h, which can get
@@ -43,4 +42,3 @@ class SimContinuousOutput {
   float Get();
 };
 
-#endif

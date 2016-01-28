@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __TRIGGER_H__
-#define __TRIGGER_H__
+#pragma once
 
 #include <memory>
 #include "SmartDashboard/Sendable.h"
@@ -50,4 +49,3 @@ class Trigger : public Sendable {
   std::shared_ptr<ITable> m_table;
 };
 
-#endif

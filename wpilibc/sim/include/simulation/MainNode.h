@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef _SIM_MAIN_NODE_H
-#define _SIM_MAIN_NODE_H
+#pragma once
 
 #include <gazebo/gazebo_client.hh>
 #include <gazebo/transport/transport.hh>
@@ -60,4 +59,3 @@ class MainNode {
   }
 };
 
-#endif

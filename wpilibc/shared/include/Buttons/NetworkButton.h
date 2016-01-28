@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __NETWORK_BUTTON_H__
-#define __NETWORK_BUTTON_H__
+#pragma once
 
 #include <memory>
 #include <string>
@@ -25,4 +24,3 @@ class NetworkButton : public Button {
   std::string m_field;
 };
 
-#endif

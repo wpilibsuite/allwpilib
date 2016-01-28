@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __WAIT_COMMAND_H__
-#define __WAIT_COMMAND_H__
+#pragma once
 
 #include "Commands/Command.h"
 
@@ -24,4 +23,3 @@ class WaitCommand : public Command {
   virtual void Interrupted();
 };
 
-#endif

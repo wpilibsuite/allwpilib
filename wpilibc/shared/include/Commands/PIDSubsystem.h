@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __PID_SUBSYSTEM_H__
-#define __PID_SUBSYSTEM_H__
+#pragma once
 
 #include "Commands/Subsystem.h"
 #include "PIDController.h"
@@ -71,4 +70,3 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
   virtual std::string GetSmartDashboardType() const;
 };
 
-#endif
