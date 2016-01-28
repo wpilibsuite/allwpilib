@@ -18,9 +18,9 @@ import java.util.logging.Logger;
  */
 public class CANJaguarInversionTest extends AbstractCANTest {
   private static final Logger logger = Logger.getLogger(CANJaguarInversionTest.class.getName());
-  private static final double motorVoltage = 5.0;
-  private static final double motorPercent = 0.5;
-  private static final double motorSpeed = 100;
+  private static final double motorVoltage = 2.0;
+  private static final double motorPercent = 0.1;
+  private static final double motorSpeed = 10;
   private static final double delayTime = 0.75;
   private static final double speedModeDelayTime = 2.0;
 

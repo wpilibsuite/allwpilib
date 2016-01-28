@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 @RunWith(Parameterized.class)
 public class MotorInvertingTest extends AbstractComsSetup {
   static MotorEncoderFixture<?> fixture = null;
-  private static final double motorspeed = 0.35;
+  private static final double motorspeed = 0.2;
   private static final double delaytime = 0.3;
 
 

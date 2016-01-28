@@ -84,7 +84,7 @@ TEST_P(MotorEncoderTest, Increment) {
   Reset();
 
   /* Drive the speed controller briefly to move the encoder */
-  m_speedController->Set(1.0);
+  m_speedController->Set(0.2f);
   Wait(kMotorTime);
   m_speedController->Set(0.0);
 
@@ -100,7 +100,7 @@ TEST_P(MotorEncoderTest, Decrement) {
   Reset();
 
   /* Drive the speed controller briefly to move the encoder */
-  m_speedController->Set(-1.0f);
+  m_speedController->Set(-0.2f);
   Wait(kMotorTime);
   m_speedController->Set(0.0f);
 
@@ -131,12 +131,12 @@ TEST_P(MotorEncoderTest, ClampSpeed) {
  */
 TEST_P(MotorEncoderTest, PositionPIDController) {
   Reset();
-
+  double goal = 1000;
   m_encoder->SetPIDSourceType(PIDSourceType::kDisplacement);
   PIDController pid(0.001f, 0.0005f, 0.0f, m_encoder, m_speedController);
-  pid.SetAbsoluteTolerance(20.0f);
-  pid.SetOutputRange(-0.3f, 0.3f);
-  pid.SetSetpoint(2500);
+  pid.SetAbsoluteTolerance(50.0f);
+  pid.SetOutputRange(-0.2f, 0.2f);
+  pid.SetSetpoint(goal);
 
   /* 10 seconds should be plenty time to get to the setpoint */
   pid.Enable();
@@ -145,7 +145,7 @@ TEST_P(MotorEncoderTest, PositionPIDController) {
 
   RecordProperty("PIDError", pid.GetError());
 
-  EXPECT_TRUE(pid.OnTarget()) << "PID loop did not converge within 10 seconds.";
+  EXPECT_TRUE(pid.OnTarget()) << "PID loop did not converge within 10 seconds. Goal was: "<<goal<<" Error was: "<<pid.GetError();
 }
 
 /**
@@ -156,20 +156,18 @@ TEST_P(MotorEncoderTest, VelocityPIDController) {
 
   m_encoder->SetPIDSourceType(PIDSourceType::kRate);
   PIDController pid(1e-5, 0.0f, 3e-5, 8e-5, m_encoder, m_speedController);
-  pid.SetAbsoluteTolerance(50.0f);
-  pid.SetToleranceBuffer(10);
+  pid.SetAbsoluteTolerance(200.0f);
+  pid.SetToleranceBuffer(50);
   pid.SetOutputRange(-0.3f, 0.3f);
-  pid.SetSetpoint(2000);
+  pid.SetSetpoint(600);
 
   /* 10 seconds should be plenty time to get to the setpoint */
   pid.Enable();
   Wait(10.0);
-
-  RecordProperty("PIDError", pid.GetAvgError());
-
-  EXPECT_TRUE(pid.OnTarget()) << "PID loop did not converge within 10 seconds. Goal was: " << 2000 << " Error was: " << pid.GetError();
-
   pid.Disable();
+  RecordProperty("PIDError", pid.GetError());
+
+  EXPECT_TRUE(pid.OnTarget()) << "PID loop did not converge within 10 seconds. Goal was: " << 600 << " Error was: " << pid.GetError();
 }
 
 /**

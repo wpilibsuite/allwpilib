@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj.test.AbstractTestSuite;
     DIOCrossConnectTest.class, EncoderTest.class, FilterNoiseTest.class,
     FilterOutputTest.class, GyroTest.class, MotorEncoderTest.class,
     MotorInvertingTest.class, PCMTest.class, PDPTest.class, PIDTest.class,
-    PreferencesTest.class, RelayCrossConnectTest.class, SampleTest.class,
-    TimerTest.class})
+    PIDToleranceTest.class, PreferencesTest.class, RelayCrossConnectTest.class, 
+    SampleTest.class, TimerTest.class})
 public class WpiLibJTestSuite extends AbstractTestSuite {
 }
