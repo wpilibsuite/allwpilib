@@ -22,7 +22,6 @@ BuiltInAccelerometer::BuiltInAccelerometer(Range range) {
   LiveWindow::GetInstance()->AddSensor((std::string) "BuiltInAccel", 0, this);
 }
 
-/** {@inheritdoc} */
 void BuiltInAccelerometer::SetRange(Range range) {
   if (range == kRange_16G) {
     wpi_setWPIErrorWithContext(

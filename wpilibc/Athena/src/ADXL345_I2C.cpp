@@ -34,18 +34,14 @@ ADXL345_I2C::ADXL345_I2C(Port port, Range range, int deviceAddress) : I2C(port, 
   LiveWindow::GetInstance()->AddSensor("ADXL345_I2C", port, this);
 }
 
-/** {@inheritdoc} */
 void ADXL345_I2C::SetRange(Range range) {
   Write(kDataFormatRegister, kDataFormat_FullRes | (uint8_t)range);
 }
 
-/** {@inheritdoc} */
 double ADXL345_I2C::GetX() { return GetAcceleration(kAxis_X); }
 
-/** {@inheritdoc} */
 double ADXL345_I2C::GetY() { return GetAcceleration(kAxis_Y); }
 
-/** {@inheritdoc} */
 double ADXL345_I2C::GetZ() { return GetAcceleration(kAxis_Z); }
 
 /**

@@ -42,7 +42,6 @@ ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::Range range) : SPI(port) {
   LiveWindow::GetInstance()->AddSensor("ADXL345_SPI", port, this);
 }
 
-/** {@inheritdoc} */
 void ADXL345_SPI::SetRange(Range range) {
   uint8_t commands[2];
 
@@ -52,13 +51,10 @@ void ADXL345_SPI::SetRange(Range range) {
   Transaction(commands, commands, 2);
 }
 
-/** {@inheritdoc} */
 double ADXL345_SPI::GetX() { return GetAcceleration(kAxis_X); }
 
-/** {@inheritdoc} */
 double ADXL345_SPI::GetY() { return GetAcceleration(kAxis_Y); }
 
-/** {@inheritdoc} */
 double ADXL345_SPI::GetZ() { return GetAcceleration(kAxis_Z); }
 
 /**

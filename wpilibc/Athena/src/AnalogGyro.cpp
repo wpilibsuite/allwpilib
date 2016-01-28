@@ -135,9 +135,6 @@ void AnalogGyro::InitGyro() {
   LiveWindow::GetInstance()->AddSensor("AnalogGyro", m_analog->GetChannel(), this);
 }
 
-/**
- * {@inheritDoc}
- */
 void AnalogGyro::Calibrate() {
   if (StatusIsFatal()) return;
 

@@ -130,6 +130,7 @@ if (checkDoxygen()) {
         source file("$halLocation/include")
         // template file('cpp.doxy')
         exclude 'nivision.h'
+        extension_mapping 'inc=C++'
         project_name 'WPILibC++'
         javadoc_autobrief true
         recursive true

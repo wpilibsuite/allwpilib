@@ -73,7 +73,6 @@ ADXL362::ADXL362(SPI::Port port, Range range) : m_spi(port) {
   LiveWindow::GetInstance()->AddSensor("ADXL362", port, this);
 }
 
-/** {@inheritdoc} */
 void ADXL362::SetRange(Range range) {
   if (m_gsPerLSB == 0.0) return;
 
@@ -99,13 +98,10 @@ void ADXL362::SetRange(Range range) {
   m_spi.Write(commands, 3);
 }
 
-/** {@inheritdoc} */
 double ADXL362::GetX() { return GetAcceleration(kAxis_X); }
 
-/** {@inheritdoc} */
 double ADXL362::GetY() { return GetAcceleration(kAxis_Y); }
 
-/** {@inheritdoc} */
 double ADXL362::GetZ() { return GetAcceleration(kAxis_Z); }
 
 /**

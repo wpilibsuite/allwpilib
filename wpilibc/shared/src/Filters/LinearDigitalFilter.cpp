@@ -115,9 +115,6 @@ LinearDigitalFilter LinearDigitalFilter::MovingAverage(std::shared_ptr<PIDSource
   return LinearDigitalFilter(std::move(source), gains, {});
 }
 
-/**
- * {@inheritDoc}
- */
 double LinearDigitalFilter::Get() const {
   double retVal = 0.0;
 
@@ -132,9 +129,6 @@ double LinearDigitalFilter::Get() const {
   return retVal;
 }
 
-/**
- * {@inheritDoc}
- */
 void LinearDigitalFilter::Reset() {
   m_inputs.Reset();
   m_outputs.Reset();
