@@ -68,7 +68,7 @@ public final class TestBench {
   /* PowerDistributionPanel channels */
   public static final int kJaguarPDPChannel = 6;
   public static final int kVictorPDPChannel = 8;
-  public static final int kTalonPDPChannel = 11;
+  public static final int kTalonPDPChannel = 10;
   public static final int kCANJaguarPDPChannel = 5;
 
   /* CAN ASSOICATED CHANNELS */

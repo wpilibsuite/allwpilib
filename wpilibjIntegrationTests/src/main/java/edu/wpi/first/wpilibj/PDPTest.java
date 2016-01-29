@@ -65,9 +65,7 @@ public class PDPTest extends AbstractComsSetup {
   public static Collection<Object[]> generateData() {
     // logger.fine("Loading the MotorList");
     return Arrays.asList(new Object[][] {
-        {TestBench.getInstance().getTalonPair(), new Double(0.0)},
-        {TestBench.getInstance().getVictorPair(), new Double(0.0)},
-        {TestBench.getInstance().getJaguarPair(), new Double(0.0)}});
+        {TestBench.getInstance().getTalonPair(), new Double(0.0)}});
   }
 
   @After
@@ -97,7 +95,7 @@ public class PDPTest extends AbstractComsSetup {
 
     /* Set the motor to full forward */
     me.getMotor().set(1.0);
-    Timer.delay(0.25);
+    Timer.delay(2);
 
     /* The current should now be greater than the low current */
     assertThat("The driven current is not greater than the resting current.",
