@@ -32,4 +32,3 @@ class Button : public Trigger {
   virtual void CancelWhenPressed(Command* command);
   virtual void ToggleWhenPressed(Command* command);
 };
-

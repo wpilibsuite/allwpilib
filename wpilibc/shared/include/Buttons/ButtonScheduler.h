@@ -22,4 +22,3 @@ class ButtonScheduler {
   Trigger* m_button;
   Command* m_command;
 };
-

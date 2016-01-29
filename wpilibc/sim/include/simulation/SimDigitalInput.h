@@ -26,4 +26,3 @@ class SimDigitalInput {
   transport::SubscriberPtr sub;
   void callback(const msgs::ConstBoolPtr& msg);
 };
-

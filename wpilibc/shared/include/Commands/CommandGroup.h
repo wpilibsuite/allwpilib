@@ -68,4 +68,3 @@ class CommandGroup : public Command {
   /** The current command, -1 signifies that none have been run */
   int m_currentCommandIndex = -1;
 };
-

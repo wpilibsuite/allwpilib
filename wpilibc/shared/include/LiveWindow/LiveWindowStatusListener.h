@@ -15,4 +15,3 @@ class LiveWindowStatusListener : public ITableListener {
   virtual void ValueChanged(ITable* source, llvm::StringRef key,
                             std::shared_ptr<nt::Value> value, bool isNew);
 };
-

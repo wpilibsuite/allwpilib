@@ -48,4 +48,3 @@ class SmartDashboard : public SensorBase {
    */
   static std::map<std::shared_ptr<ITable>, Sendable*> m_tablesToData;
 };
-

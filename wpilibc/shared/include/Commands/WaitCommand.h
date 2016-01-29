@@ -22,4 +22,3 @@ class WaitCommand : public Command {
   virtual void End();
   virtual void Interrupted();
 };
-

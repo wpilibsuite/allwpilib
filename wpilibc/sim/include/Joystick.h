@@ -76,4 +76,3 @@ class Joystick : public GenericHID, public ErrorBase {
   std::unique_ptr<uint32_t[]> m_axes;
   std::unique_ptr<uint32_t[]> m_buttons;
 };
-

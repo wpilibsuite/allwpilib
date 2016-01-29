@@ -24,4 +24,3 @@ class StartCommand : public Command {
  private:
   Command* m_commandToFork;
 };
-

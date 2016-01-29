@@ -42,4 +42,3 @@ class PowerDistributionPanel : public SensorBase, public LiveWindowSendable {
   std::shared_ptr<ITable> m_table;
   uint8_t m_module;
 };
-

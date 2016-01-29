@@ -24,4 +24,3 @@ class ControllerPower {
   static bool GetEnabled6V();
   static int GetFaultCount6V();
 };
-

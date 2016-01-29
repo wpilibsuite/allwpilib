@@ -26,4 +26,3 @@ class SimFloatInput {
   transport::SubscriberPtr sub;
   void callback(const msgs::ConstFloat64Ptr& msg);
 };
-

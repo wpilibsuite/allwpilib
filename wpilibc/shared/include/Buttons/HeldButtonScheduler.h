@@ -18,4 +18,3 @@ class HeldButtonScheduler : public ButtonScheduler {
   virtual ~HeldButtonScheduler() = default;
   virtual void Execute();
 };
-

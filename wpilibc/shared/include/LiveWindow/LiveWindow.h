@@ -81,4 +81,3 @@ class LiveWindow {
   bool m_enabled = false;
   bool m_firstTime = true;
 };
-

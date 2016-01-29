@@ -48,4 +48,3 @@ class Trigger : public Sendable {
  protected:
   std::shared_ptr<ITable> m_table;
 };
-

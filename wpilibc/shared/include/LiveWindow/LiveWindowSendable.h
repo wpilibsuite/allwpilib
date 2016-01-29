@@ -34,4 +34,3 @@ class LiveWindowSendable : public Sendable {
    */
   virtual void StopLiveWindowMode() = 0;
 };
-

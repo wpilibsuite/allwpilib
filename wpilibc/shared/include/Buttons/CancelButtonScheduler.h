@@ -21,4 +21,3 @@ class CancelButtonScheduler : public ButtonScheduler {
  private:
   bool pressedLast;
 };
-

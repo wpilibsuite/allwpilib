@@ -177,4 +177,3 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
  protected:
   std::shared_ptr<ITable> m_table;
 };
-

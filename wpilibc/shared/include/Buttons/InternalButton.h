@@ -24,4 +24,3 @@ class InternalButton : public Button {
   bool m_pressed = false;
   bool m_inverted = false;
 };
-

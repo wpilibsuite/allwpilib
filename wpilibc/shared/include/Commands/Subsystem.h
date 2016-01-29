@@ -45,4 +45,3 @@ class Subsystem : public ErrorBase, public NamedSendable {
  protected:
   std::shared_ptr<ITable> m_table;
 };
-

@@ -30,4 +30,3 @@ class Sendable {
    */
   virtual std::string GetSmartDashboardType() const = 0;
 };
-

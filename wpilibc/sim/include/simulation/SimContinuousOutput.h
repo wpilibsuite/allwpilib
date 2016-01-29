@@ -41,4 +41,3 @@ class SimContinuousOutput {
    */
   float Get();
 };
-

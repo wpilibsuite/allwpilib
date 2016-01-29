@@ -21,4 +21,3 @@ class ToggleButtonScheduler : public ButtonScheduler {
  private:
   bool pressedLast;
 };
-

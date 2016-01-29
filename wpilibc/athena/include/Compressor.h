@@ -61,4 +61,3 @@ class Compressor : public SensorBase,
 
   std::shared_ptr<ITable> m_table;
 };
-

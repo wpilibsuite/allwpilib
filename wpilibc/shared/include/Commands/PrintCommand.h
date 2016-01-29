@@ -25,4 +25,3 @@ class PrintCommand : public Command {
  private:
   std::string m_message;
 };
-

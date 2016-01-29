@@ -66,4 +66,3 @@ class Scheduler : public ErrorBase, public NamedSendable {
   std::shared_ptr<ITable> m_table;
   bool m_runningCommandsChanged = false;
 };
-

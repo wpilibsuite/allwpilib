@@ -54,4 +54,3 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
   virtual void InitTable(std::shared_ptr<ITable> table);
   virtual std::string GetSmartDashboardType() const;
 };
-

@@ -43,4 +43,3 @@ class SendableChooser : public Sendable {
   std::map<std::string, void*> m_choices;
   std::shared_ptr<ITable> m_table;
 };
-

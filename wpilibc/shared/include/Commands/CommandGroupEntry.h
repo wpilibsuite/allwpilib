@@ -25,4 +25,3 @@ class CommandGroupEntry {
   Command* m_command = nullptr;
   Sequence m_state = kSequence_InSequence;
 };
-

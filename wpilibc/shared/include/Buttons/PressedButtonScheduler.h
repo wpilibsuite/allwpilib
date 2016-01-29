@@ -18,4 +18,3 @@ class PressedButtonScheduler : public ButtonScheduler {
   virtual ~PressedButtonScheduler() = default;
   virtual void Execute();
 };
-

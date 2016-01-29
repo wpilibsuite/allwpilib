@@ -25,4 +25,3 @@ class WaitUntilCommand : public Command {
  private:
   double m_time;
 };
-

@@ -21,4 +21,3 @@ class JoystickButton : public Button {
   GenericHID* m_joystick;
   int m_buttonNumber;
 };
-

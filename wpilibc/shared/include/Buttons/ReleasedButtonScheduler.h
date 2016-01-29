@@ -18,4 +18,3 @@ class ReleasedButtonScheduler : public ButtonScheduler {
   virtual ~ReleasedButtonScheduler() = default;
   virtual void Execute();
 };
-

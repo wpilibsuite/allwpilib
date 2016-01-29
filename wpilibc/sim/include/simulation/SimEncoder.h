@@ -32,4 +32,3 @@ class SimEncoder {
   void positionCallback(const msgs::ConstFloat64Ptr& msg);
   void velocityCallback(const msgs::ConstFloat64Ptr& msg);
 };
-

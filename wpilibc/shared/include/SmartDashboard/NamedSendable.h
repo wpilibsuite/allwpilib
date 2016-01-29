@@ -23,4 +23,3 @@ class NamedSendable : public Sendable {
    */
   virtual std::string GetName() const = 0;
 };
-

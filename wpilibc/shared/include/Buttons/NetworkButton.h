@@ -23,4 +23,3 @@ class NetworkButton : public Button {
   std::shared_ptr<ITable> m_netTable;
   std::string m_field;
 };
-
