@@ -37,7 +37,7 @@ public class CANPercentQuadEncoderModeTest extends AbstractCANTest {
   private static final Logger logger = Logger.getLogger(CANPercentQuadEncoderModeTest.class
       .getName());
   private static final double kStoppedValue = 0;
-  private static final double kRunningValue = 1;
+  private static final double kRunningValue = 0.3;
 
   /*
    * (non-Javadoc)

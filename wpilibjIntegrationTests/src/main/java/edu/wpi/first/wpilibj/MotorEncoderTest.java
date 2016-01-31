@@ -60,7 +60,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
   @Before
   public void setUp() {
     double initialSpeed = me.getMotor().get();
-    assertTrue(me.getType() + " Did not start with an initial speeed of 0 instead got: "
+    assertTrue(me.getType() + " Did not start with an initial speed of 0 instead got: "
         + initialSpeed, Math.abs(initialSpeed) < 0.001);
     me.setup();
 
@@ -101,7 +101,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
   public void testIncrement() {
     int startValue = me.getEncoder().get();
 
-    me.getMotor().set(.75);
+    me.getMotor().set(.2);
     Timer.delay(MOTOR_RUNTIME);
     int currentValue = me.getEncoder().get();
     assertTrue(me.getType() + " Encoder not incremented: start: " + startValue + "; current: "
@@ -117,7 +117,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
   public void testDecrement() {
     int startValue = me.getEncoder().get();
 
-    me.getMotor().set(-.75);
+    me.getMotor().set(-.2);
     Timer.delay(MOTOR_RUNTIME);
     int currentValue = me.getEncoder().get();
     assertTrue(me.getType() + " Encoder not decremented: start: " + startValue + "; current: "
@@ -170,18 +170,18 @@ public class MotorEncoderTest extends AbstractComsSetup {
   @Test
   public void testPositionPIDController() {
     me.getEncoder().setPIDSourceType(PIDSourceType.kDisplacement);
-    PIDController pid = new PIDController(0.003, 0.001, 0, me.getEncoder(), me.getMotor());
-    pid.setAbsoluteTolerance(50);
+    PIDController pid = new PIDController(0.001, 0.0005, 0, me.getEncoder(), me.getMotor());
+    pid.setAbsoluteTolerance(50.0);
     pid.setOutputRange(-0.2, 0.2);
-    pid.setSetpoint(2500);
+    pid.setSetpoint(1000);
 
     pid.enable();
     Timer.delay(10.0);
     pid.disable();
 
     assertTrue(
-        "PID loop did not reach setpoint within 10 seconds. The error was: " + pid.getError(),
-        pid.onTarget());
+        "PID loop did not reach setpoint within 10 seconds. The average error was: " + pid.getAvgError() + 
+        "The current error was" + pid.getError(), pid.onTarget());
 
     pid.free();
   }
@@ -194,7 +194,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
     pid.setAbsoluteTolerance(200);
     pid.setToleranceBuffer(50);
     pid.setOutputRange(-0.3, 0.3);
-    pid.setSetpoint(2000);
+    pid.setSetpoint(600);
 
     pid.enable();
     Timer.delay(10.0);

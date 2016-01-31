@@ -46,7 +46,7 @@ public class PIDTest extends AbstractComsSetup {
   private NetworkTable table;
 
   private static final double absoluteTolerance = 50;
-  private static final double outputRange = 0.3;
+  private static final double outputRange = 0.25;
 
   private PIDController controller = null;
   private static MotorEncoderFixture me = null;
@@ -181,7 +181,7 @@ public class PIDTest extends AbstractComsSetup {
   public void testRotateToTarget() {
     setupAbsoluteTolerance();
     setupOutputRange();
-    double setpoint = 2500.0;
+    double setpoint = 1000.0;
     assertEquals(pidData() + "did not start at 0", 0, controller.get(), 0);
     controller.setSetpoint(setpoint);
     assertEquals(pidData() + "did not have an error of " + setpoint, setpoint,

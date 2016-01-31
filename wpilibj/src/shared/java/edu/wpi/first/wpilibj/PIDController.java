@@ -6,7 +6,8 @@
 package edu.wpi.first.wpilibj;
 
 import java.util.TimerTask;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
@@ -42,7 +43,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   private Tolerance m_tolerance; // the tolerance object used to check if on
                                  // target
   private int m_bufLength = 1;
-  private LinkedList<Double> m_buf;
+  private Queue<Double> m_buf;
   private double m_bufTotal = 0.0;
   private double m_setpoint = 0.0;
   private double m_prevSetpoint = 0.0;
@@ -162,7 +163,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     HLUsageReporting.reportPIDController(instances);
     m_tolerance = new NullTolerance();
 
-    m_buf = new LinkedList<Double>();
+    m_buf = new ArrayDeque<Double>(m_bufLength+1);
   }
 
   /**
@@ -311,11 +312,11 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
         result = m_result;
 
         // Update the buffer.
-        m_buf.push(m_error);
+        m_buf.add(m_error);
         m_bufTotal += m_error;
         // Remove old elements when the buffer is full.
         if (m_buf.size() > m_bufLength) {
-          m_bufTotal -= m_buf.pop();
+          m_bufTotal -= m_buf.remove();
         }
       }
 
@@ -646,7 +647,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
 
     // Cut the existing buffer down to size if needed.
     while (m_buf.size() > bufLength) {
-      m_bufTotal -= m_buf.pop();
+      m_bufTotal -= m_buf.remove();
     }
   }
 

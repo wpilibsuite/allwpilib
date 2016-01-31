@@ -14,7 +14,7 @@
 #include "TestBench.h"
 
 enum MotorInvertingTestType { TEST_VICTOR, TEST_JAGUAR, TEST_TALON };
-static const double motorSpeed = 0.25;
+static const double motorSpeed = 0.15;
 static const double delayTime = 0.5;
 std::ostream &operator<<(std::ostream &os, MotorInvertingTestType const &type) {
   switch (type) {

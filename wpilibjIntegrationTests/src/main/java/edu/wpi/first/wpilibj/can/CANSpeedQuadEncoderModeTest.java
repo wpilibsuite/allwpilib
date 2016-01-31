@@ -31,7 +31,7 @@ public class CANSpeedQuadEncoderModeTest extends AbstractCANTest {
   /** The stopped value in rev/min */
   private static final double kStoppedValue = 0;
   /** The running value in rev/min */
-  private static final double kRunningValue = 200;
+  private static final double kRunningValue = 50;
 
   @Override
   protected Logger getClassLogger() {
