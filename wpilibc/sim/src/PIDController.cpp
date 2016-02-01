@@ -6,7 +6,10 @@
 /*----------------------------------------------------------------------------*/
 
 #include "PIDController.h"
-#include <math.h>
+
+#include <cmath>
+#include <limits>
+
 #include "Notifier.h"
 #include "PIDOutput.h"
 #include "PIDSource.h"
@@ -63,6 +66,13 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
   m_D = Kd;
   m_F = Kf;
 
+  // Save original source
+  m_origSource = std::shared_ptr<PIDSource>(source, NullDeleter<PIDSource>());
+
+  // Create LinearDigitalFilter with original source as its source argument
+  m_filter = LinearDigitalFilter::MovingAverage(m_origSource, 1);
+  m_pidInput = &m_filter;
+
   m_maximumOutput = 1.0;
   m_minimumOutput = -1.0;
 
@@ -79,7 +89,6 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
 
   m_result = 0;
 
-  m_pidInput = source;
   m_pidOutput = output;
   m_period = period;
 
@@ -122,7 +131,7 @@ void PIDController::Calculate() {
       std::lock_guard<priority_recursive_mutex> sync(m_mutex);
       m_error = m_setpoint - input;
       if (m_continuous) {
-        if (fabs(m_error) > (m_maximumInput - m_minimumInput) / 2) {
+        if (std::fabs(m_error) > (m_maximumInput - m_minimumInput) / 2) {
           if (m_error > 0) {
             m_error = m_error - m_maximumInput + m_minimumInput;
           } else {
@@ -401,12 +410,8 @@ double PIDController::GetDeltaSetpoint() const {
  * @return the current error
  */
 float PIDController::GetError() const {
-  double pidInput;
-  {
-    std::lock_guard<priority_recursive_mutex> lock(m_mutex);
-    pidInput = m_pidInput->PIDGet();
-  }
-  return GetSetpoint() - pidInput;
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
+  return m_error;
 }
 
 /**
@@ -423,24 +428,6 @@ void PIDController::SetPIDSourceType(PIDSourceType pidSource) {
  */
 PIDSourceType PIDController::GetPIDSourceType() const {
   return m_pidInput->GetPIDSourceType();
-}
-
-/**
- * Returns the current average of the error over the past few iterations.
- *
- * You can specify the number of iterations to average with SetToleranceBuffer()
- * (defaults to 1). This is the same value that is used for OnTarget().
- *
- * @return the average error
- */
-float PIDController::GetAvgError() const {
-  float avgError = 0;
-  {
-    std::lock_guard<priority_recursive_mutex> sync(m_mutex);
-    // Don't divide by zero.
-    if (m_buf.size()) avgError = m_bufTotal / m_buf.size();
-  }
-  return avgError;
 }
 
 /**
@@ -491,13 +478,10 @@ void PIDController::SetPercentTolerance(float percent) {
  */
 void PIDController::SetToleranceBuffer(unsigned bufLength) {
   std::lock_guard<priority_recursive_mutex> lock(m_mutex);
-  m_bufLength = bufLength;
 
-  // Cut the buffer down to size if needed.
-  while (m_buf.size() > bufLength) {
-    m_bufTotal -= m_buf.front();
-    m_buf.pop();
-  }
+  // Create LinearDigitalFilter with original source as its source argument
+  m_filter = LinearDigitalFilter::MovingAverage(m_origSource, bufLength);
+  m_pidInput = &m_filter;
 }
 
 /**
@@ -511,15 +495,14 @@ void PIDController::SetToleranceBuffer(unsigned bufLength) {
  */
 bool PIDController::OnTarget() const {
   std::lock_guard<priority_recursive_mutex> sync(m_mutex);
-  if (m_buf.size() == 0) return false;
-  double error = GetError();
+
   switch (m_toleranceType) {
     case kPercentTolerance:
-      return fabs(error) <
+      return std::fabs(m_error) <
              m_tolerance / 100 * (m_maximumInput - m_minimumInput);
       break;
     case kAbsoluteTolerance:
-      return fabs(error) < m_tolerance;
+      return std::fabs(m_error) < m_tolerance;
       break;
     case kNoTolerance:  // TODO: this case needs an error
       return false;

@@ -94,5 +94,4 @@ public class CircularBufferTest {
     // Leaving only one element with value == 4
     assertEquals(4.0, queue.get(0), 0.00005);
   }
-
 }

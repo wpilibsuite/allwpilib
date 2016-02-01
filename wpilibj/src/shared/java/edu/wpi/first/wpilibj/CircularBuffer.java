@@ -12,7 +12,11 @@ package edu.wpi.first.wpilibj;
  */
 public class CircularBuffer {
   private double[] m_data;
+
+  // Index of element at front of buffer
   private int m_front = 0;
+
+  // Number of elements used in buffer
   private int m_length = 0;
 
   @SuppressWarnings("JavadocMethod")
@@ -91,7 +95,9 @@ public class CircularBuffer {
     return m_data[(m_front + m_length) % m_data.length];
   }
 
-  @SuppressWarnings("JavadocMethod")
+  /**
+   * Sets internal buffer contents to zero.
+   */
   public void reset() {
     for (double i : m_data) {
       i = 0.0;
@@ -101,7 +107,7 @@ public class CircularBuffer {
   }
 
   /**
-   * @return element at index starting from front of buffer.
+   * @return Element at index starting from front of buffer.
    */
   public double get(int index) {
     return m_data[(m_front + index) % m_data.length];

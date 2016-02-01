@@ -185,8 +185,8 @@ public class MotorEncoderTest extends AbstractComsSetup {
     pid.disable();
 
     assertTrue(
-        "PID loop did not reach setpoint within 10 seconds. The average error was: " + pid
-            .getAvgError() + "The current error was" + pid.getError(), pid.onTarget());
+        "PID loop did not reach setpoint within 10 seconds. The current error was: " + pid
+            .getError(), pid.onTarget());
 
     pid.free();
   }
@@ -206,7 +206,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
     pid.disable();
 
     assertTrue(
-        "PID loop did not reach setpoint within 10 seconds. The error was: " + pid.getAvgError(),
+        "PID loop did not reach setpoint within 10 seconds. The error was: " + pid.getError(),
         pid.onTarget());
 
     pid.free();
