@@ -9,6 +9,7 @@
 
 #include "Base.h"
 #include "Controller.h"
+#include "Filters/LinearDigitalFilter.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "LiveWindow/LiveWindow.h"
 #include "Notifier.h"
@@ -16,10 +17,8 @@
 #include "PIDSource.h"
 #include "Timer.h"
 
-#include <memory>
-
 #include <atomic>
-#include <queue>
+#include <memory>
 
 class PIDOutput;
 
@@ -58,7 +57,6 @@ class PIDController : public LiveWindowSendable,
   double GetDeltaSetpoint() const;
 
   virtual float GetError() const;
-  virtual float GetAvgError() const;
 
   virtual void SetPIDSourceType(PIDSourceType pidSource);
   virtual PIDSourceType GetPIDSourceType() const;
@@ -121,13 +119,12 @@ class PIDController : public LiveWindowSendable,
   float m_setpoint = 0;
   float m_prevSetpoint = 0;
   float m_error = 0;
+  float m_input = 0;
   float m_result = 0;
   float m_period;
 
-  // Length of buffer for averaging for tolerances.
-  std::atomic<unsigned> m_bufLength{1};
-  std::queue<double> m_buf;
-  double m_bufTotal = 0;
+  std::shared_ptr<PIDSource> m_origSource;
+  LinearDigitalFilter m_filter{nullptr, {}, {}};
 
   mutable priority_recursive_mutex m_mutex;
 

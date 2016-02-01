@@ -6,10 +6,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
 import java.util.TimerTask;
 
+import edu.wpi.first.wpilibj.filters.LinearDigitalFilter;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
@@ -46,14 +45,16 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   private double m_totalError = 0.0;
   // the tolerance object used to check if on target
   private Tolerance m_tolerance;
-  private int m_bufLength = 1;
-  private Queue<Double> m_buf;
-  private double m_bufTotal = 0.0;
   private double m_setpoint = 0.0;
   private double m_prevSetpoint = 0.0;
   private double m_error = 0.0;
+  private double m_input = 0.0;
   private double m_result = 0.0;
   private double m_period = kDefaultPeriod;
+
+  PIDSource m_origSource;
+  LinearDigitalFilter m_filter;
+
   protected PIDSource m_pidInput;
   protected PIDOutput m_pidOutput;
   java.util.Timer m_controlLoop;
@@ -90,8 +91,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
 
     @Override
     public boolean onTarget() {
-      return isAvgErrorValid() && (Math.abs(getAvgError()) < m_percentage / 100 * (m_maximumInput
-          - m_minimumInput));
+      return Math.abs(getError()) < m_percentage / 100 * (m_maximumInput - m_minimumInput);
     }
   }
 
@@ -104,7 +104,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
 
     @Override
     public boolean onTarget() {
-      return isAvgErrorValid() && Math.abs(getAvgError()) < m_value;
+      return Math.abs(getError()) < m_value;
     }
   }
 
@@ -157,7 +157,13 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     m_D = Kd;
     m_F = Kf;
 
-    m_pidInput = source;
+    // Save original source
+    m_origSource = source;
+
+    // Create LinearDigitalFilter with original source as its source argument
+    m_filter = LinearDigitalFilter.movingAverage(m_origSource, 1);
+    m_pidInput = m_filter;
+
     m_pidOutput = output;
     m_period = period;
 
@@ -166,8 +172,6 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     instances++;
     HLUsageReporting.reportPIDController(instances);
     m_tolerance = new NullTolerance();
-
-    m_buf = new ArrayDeque<Double>(m_bufLength + 1);
   }
 
   /**
@@ -253,14 +257,13 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     }
 
     if (enabled) {
-      double input;
       double result;
       final PIDOutput pidOutput;
       synchronized (this) {
-        input = pidInput.pidGet();
+        m_input = pidInput.pidGet();
       }
       synchronized (this) {
-        m_error = m_setpoint - input;
+        m_error = m_setpoint - m_input;
         if (m_continuous) {
           if (Math.abs(m_error) > (m_maximumInput - m_minimumInput) / 2) {
             if (m_error > 0) {
@@ -313,14 +316,6 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
         }
         pidOutput = m_pidOutput;
         result = m_result;
-
-        // Update the buffer.
-        m_buf.add(m_error);
-        m_bufTotal += m_error;
-        // Remove old elements when the buffer is full.
-        if (m_buf.size() > m_bufLength) {
-          m_bufTotal -= m_buf.remove();
-        }
       }
 
       pidOutput.pidWrite(result);
@@ -492,7 +487,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   }
 
   /**
-   * Set the setpoint for the PIDController Clears the queue for GetAvgError().
+   * Set the setpoint for the PIDController.
    *
    * @param setpoint the desired setpoint
    */
@@ -509,8 +504,8 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
       m_setpoint = setpoint;
     }
 
-    m_buf.clear();
-    m_bufTotal = 0;
+    // Clear buf
+    m_filter.reset();
 
     if (m_table != null) {
       m_table.putNumber("setpoint", m_setpoint);
@@ -541,8 +536,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    * @return the current error
    */
   public synchronized double getError() {
-    // return m_error;
-    return getSetpoint() - m_pidInput.pidGet();
+    return getSetpoint() - m_input;
   }
 
   /**
@@ -564,34 +558,8 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   }
 
   /**
-   * Returns the current difference of the error over the past few iterations. You can specify the
-   * number of iterations to average with setToleranceBuffer() (defaults to 1). getAvgError() is
-   * used for the onTarget() function.
-   *
-   * @return the current average of the error
-   */
-  public synchronized double getAvgError() {
-    double avgError = 0;
-    // Don't divide by zero.
-    if (m_buf.size() != 0) {
-      avgError = m_bufTotal / m_buf.size();
-    }
-    return avgError;
-  }
-
-  /**
-   * Returns whether or not any values have been collected. If no values have been collected,
-   * getAvgError is 0, which is invalid.
-   *
-   * @return True if {@link #getAvgError()} is currently valid.
-   */
-  private synchronized boolean isAvgErrorValid() {
-    return m_buf.size() != 0;
-  }
-
-  /**
-   * Set the percentage error which is considered tolerable for use with OnTarget. (Input of 15.0 =
-   * 15 percent).
+   * Set the percentage error which is considered tolerable for use with
+   * OnTarget. (Input of 15.0 = 15 percent)
    *
    * @param percent error which is tolerable
    * @deprecated Use {@link #setPercentTolerance} or {@link #setAbsoluteTolerance} instead.
@@ -643,12 +611,8 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    * @param bufLength Number of previous cycles to average.
    */
   public synchronized void setToleranceBuffer(int bufLength) {
-    m_bufLength = bufLength;
-
-    // Cut the existing buffer down to size if needed.
-    while (m_buf.size() > bufLength) {
-      m_bufTotal -= m_buf.remove();
-    }
+    m_filter = LinearDigitalFilter.movingAverage(m_origSource, bufLength);
+    m_pidInput = m_filter;
   }
 
   /**
