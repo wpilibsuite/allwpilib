@@ -131,4 +131,26 @@ public class CANTalonTest extends AbstractComsSetup {
     }
   }
 
+  //Test Get Fault methods (artf4814)
+  @Test
+  public void testGetFaults() {
+    CANTalon talon = new CANTalon(0);
+    talon.clearStickyFaults();
+
+    assertTrue(talon.getFaultOverTemp()==0);
+    assertTrue(talon.getFaultUnderVoltage()==0);
+    assertTrue(talon.getFaultForLim()==0);
+    assertTrue(talon.getFaultRevLim()==0);
+    assertTrue(talon.getFaultHardwareFailure()==0);
+    assertTrue(talon.getFaultForSoftLim()==0);
+    assertTrue(talon.getFaultRevSoftLim()==0);
+
+    assertTrue(talon.getStickyFaultOverTemp()==0);
+//    assertTrue(talon.getStickyFaultUnderVoltage()==0);
+    assertTrue(talon.getStickyFaultForLim()==0);
+    assertTrue(talon.getStickyFaultRevLim()==0);
+    assertTrue(talon.getStickyFaultForSoftLim()==0);
+    assertTrue(talon.getStickyFaultRevSoftLim()==0);
+  }
+
 }
