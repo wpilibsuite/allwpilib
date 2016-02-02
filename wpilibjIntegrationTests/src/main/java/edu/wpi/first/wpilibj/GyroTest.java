@@ -46,14 +46,14 @@ public class GyroTest extends AbstractComsSetup {
 
   @Test
   public void testAllGyroTests() {
-    testInitial();
-    testGyroAngle();
-    testDeviationOverTime();
+    testInitial(tpcam.getGyro());
+    testDeviationOverTime(tpcam.getGyro());
+    testGyroAngle(tpcam.getGyro());
     testGyroAngleCalibratedParameters();
   }
 
-  public void testInitial() {
-    double angle = tpcam.getGyro().getAngle();
+  public void testInitial(AnalogGyro gyro) {
+    double angle = gyro.getAngle();
     assertEquals(errorMessage(angle, 0), 0, angle, .5);
   }
 
@@ -63,7 +63,7 @@ public class GyroTest extends AbstractComsSetup {
    * for so setAngle is significantly off. This has been calibrated for the
    * servo on the rig.
    */
-  public void testGyroAngle() {
+  public void testGyroAngle(AnalogGyro gyro) {
     // Set angle
     for (int i = 0; i < 5; i++) {
       tpcam.getPan().set(0);
@@ -72,7 +72,7 @@ public class GyroTest extends AbstractComsSetup {
 
     Timer.delay(0.5);
     // Reset for setup
-    tpcam.getGyro().reset();
+    gyro.reset();
     Timer.delay(0.5);
 
     // Perform test
@@ -82,7 +82,7 @@ public class GyroTest extends AbstractComsSetup {
     }
     Timer.delay(1.2);
 
-    double angle = tpcam.getGyro().getAngle();
+    double angle = gyro.getAngle();
 
     double difference = TEST_ANGLE - angle;
 
@@ -91,15 +91,15 @@ public class GyroTest extends AbstractComsSetup {
     assertEquals(errorMessage(diff, TEST_ANGLE), TEST_ANGLE, angle, 10);
   }
 
-  public void testDeviationOverTime() {
+  public void testDeviationOverTime(AnalogGyro gyro) {
     // Make sure that the test isn't influenced by any previous motions.
     Timer.delay(0.5);
-    tpcam.getGyro().reset();
+    gyro.reset();
     Timer.delay(0.25);
-    double angle = tpcam.getGyro().getAngle();
+    double angle = gyro.getAngle();
     assertEquals(errorMessage(angle, 0), 0, angle, .5);
     Timer.delay(5);
-    angle = tpcam.getGyro().getAngle();
+    angle = gyro.getAngle();
     assertEquals("After 5 seconds " + errorMessage(angle, 0), 0, angle, 1);
   }
 
@@ -113,34 +113,11 @@ public class GyroTest extends AbstractComsSetup {
     int cCenter = tpcam.getGyro().getCenter();
     tpcam.freeGyro();
     tpcam.setupGyroParam(cCenter, cOffset);
-
+    Timer.delay(TiltPanCameraFixture.RESET_TIME);
     // Repeat tests
-    // Set angle
-    for (int i = 0; i < 5; i++) {
-      tpcam.getPan().set(0);
-      Timer.delay(.1);
-    }
-
-    Timer.delay(0.5);
-
-    // Reset for setup
-    tpcam.getGyroParam().reset();
-    Timer.delay(0.5);
-
-    // Perform test
-    for (int i = 0; i < 53; i++) {
-      tpcam.getPan().set(i / 100.0);
-      Timer.delay(0.05);
-    }
-    Timer.delay(1.2);
-
-    double angle = tpcam.getGyroParam().getAngle();
-
-    double difference = TEST_ANGLE - angle;
-
-    double diff = Math.abs(difference);
-
-    assertEquals(errorMessage(diff, TEST_ANGLE), TEST_ANGLE, angle, 10);
+    testInitial(tpcam.getGyroParam());
+    testDeviationOverTime(tpcam.getGyroParam());
+    testGyroAngle(tpcam.getGyroParam());
   }
 
   private String errorMessage(double difference, double target) {
