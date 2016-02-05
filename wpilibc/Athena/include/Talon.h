@@ -7,26 +7,13 @@
 
 #pragma once
 
-#include "SafePWM.h"
-#include "SpeedController.h"
-#include "PIDOutput.h"
+#include "PWMSpeedController.h"
 
 /**
  * Cross the Road Electronics (CTRE) Talon and Talon SR Speed Controller
  */
-class Talon : public SafePWM, public SpeedController {
+class Talon : public PWMSpeedController {
  public:
   explicit Talon(uint32_t channel);
   virtual ~Talon() = default;
-  virtual void Set(float value, uint8_t syncGroup = 0) override;
-  virtual float Get() const override;
-  virtual void Disable() override;
-
-  virtual void PIDWrite(float output) override;
-  virtual void SetInverted(bool isInverted) override;
-  virtual bool GetInverted() const override;
-  virtual void StopMotor() override;
-
- private:
-  bool m_isInverted = false;
 };

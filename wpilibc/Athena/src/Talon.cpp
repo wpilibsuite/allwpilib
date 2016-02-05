@@ -14,7 +14,7 @@
  * @param channel The PWM channel number that the Talon is attached to. 0-9 are
  * on-board, 10-19 are on the MXP port
  */
-Talon::Talon(uint32_t channel) : SafePWM(channel) {
+Talon::Talon(uint32_t channel) : PWMSpeedController(channel) {
   /* Note that the Talon uses the following bounds for PWM values. These values
    * should work reasonably well for most controllers, but if users experience
    * issues such as asymmetric behavior around the deadband or inability to
@@ -36,54 +36,3 @@ Talon::Talon(uint32_t channel) : SafePWM(channel) {
   HALReport(HALUsageReporting::kResourceType_Talon, GetChannel());
   LiveWindow::GetInstance()->AddActuator("Talon", GetChannel(), this);
 }
-
-/**
- * Set the PWM value.
- *
- * The PWM value is set using a range of -1.0 to 1.0, appropriately
- * scaling the value for the FPGA.
- *
- * @param speed The speed value between -1.0 and 1.0 to set.
- * @param syncGroup Unused interface.
- */
-void Talon::Set(float speed, uint8_t syncGroup) {
-  SetSpeed(m_isInverted ? -speed : speed);
-}
-
-/**
- * Get the recently set value of the PWM.
- *
- * @return The most recently set value for the PWM between -1.0 and 1.0.
- */
-float Talon::Get() const { return GetSpeed(); }
-
-/**
- * Common interface for disabling a motor.
- */
-void Talon::Disable() { SetRaw(kPwmDisabled); }
-
-/**
-* common interface for inverting direction of a speed controller
-* @param isInverted The state of inversion true is inverted
-*/
-void Talon::SetInverted(bool isInverted) { m_isInverted = isInverted; }
-
-/**
- * Common interface for the inverting direction of a speed controller.
- *
- * @return isInverted The state of inversion, true is inverted.
- *
- */
-bool Talon::GetInverted() const { return m_isInverted; }
-
-/**
- * Write out the PID value as seen in the PIDOutput base object.
- *
- * @param output Write out the PWM value as was found in the PIDController
- */
-void Talon::PIDWrite(float output) { Set(output); }
-
-/**
- * Common interface to stop the motor until Set is called again.
- */
-void Talon::StopMotor() { this->SafePWM::StopMotor(); }

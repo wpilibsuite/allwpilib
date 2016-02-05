@@ -31,7 +31,7 @@
  * @param channel The PWM channel that the VictorSP is attached to. 0-9 are
  * on-board, 10-19 are on the MXP port
  */
-VictorSP::VictorSP(uint32_t channel) : SafePWM(channel) {
+VictorSP::VictorSP(uint32_t channel) : PWMSpeedController(channel) {
   SetBounds(2.004, 1.52, 1.50, 1.48, .997);
   SetPeriodMultiplier(kPeriodMultiplier_1X);
   SetRaw(m_centerPwm);
@@ -40,54 +40,3 @@ VictorSP::VictorSP(uint32_t channel) : SafePWM(channel) {
   HALReport(HALUsageReporting::kResourceType_VictorSP, GetChannel());
   LiveWindow::GetInstance()->AddActuator("VictorSP", GetChannel(), this);
 }
-
-/**
- * Set the PWM value.
- *
- * The PWM value is set using a range of -1.0 to 1.0, appropriately
- * scaling the value for the FPGA.
- *
- * @param speed The speed value between -1.0 and 1.0 to set.
- * @param syncGroup Unused interface.
- */
-void VictorSP::Set(float speed, uint8_t syncGroup) {
-  SetSpeed(m_isInverted ? -speed : speed);
-}
-
-/**
- * Get the recently set value of the PWM.
- *
- * @return The most recently set value for the PWM between -1.0 and 1.0.
- */
-float VictorSP::Get() const { return GetSpeed(); }
-
-/**
- * Common interface for inverting direction of a speed controller.
- * @param isInverted The state of inversion, true is inverted.
- */
-void VictorSP::SetInverted(bool isInverted) { m_isInverted = isInverted; }
-
-/**
- * Common interface for the inverting direction of a speed controller.
- *
- * @return isInverted The state of inversion, true is inverted.
- *
- */
-bool VictorSP::GetInverted() const { return m_isInverted; }
-
-/**
- * Common interface for disabling a motor.
- */
-void VictorSP::Disable() { SetRaw(kPwmDisabled); }
-
-/**
- * Write out the PID value as seen in the PIDOutput base object.
- *
- * @param output Write out the PWM value as was found in the PIDController
- */
-void VictorSP::PIDWrite(float output) { Set(output); }
-
-/**
- * Common interface to stop the motor until Set is called again.
- */
-void VictorSP::StopMotor() { this->SafePWM::StopMotor(); }

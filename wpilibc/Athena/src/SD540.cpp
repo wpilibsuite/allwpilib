@@ -31,7 +31,7 @@
  * @param channel The PWM channel that the SD540 is attached to. 0-9 are
  * on-board, 10-19 are on the MXP port
  */
-SD540::SD540(uint32_t channel) : SafePWM(channel) {
+SD540::SD540(uint32_t channel) : PWMSpeedController(channel) {
   SetBounds(2.05, 1.55, 1.50, 1.44, .94);
   SetPeriodMultiplier(kPeriodMultiplier_1X);
   SetRaw(m_centerPwm);
@@ -41,53 +41,3 @@ SD540::SD540(uint32_t channel) : SafePWM(channel) {
   LiveWindow::GetInstance()->AddActuator("SD540", GetChannel(), this);
 }
 
-/**
- * Set the PWM value.
- *
- * The PWM value is set using a range of -1.0 to 1.0, appropriately
- * scaling the value for the FPGA.
- *
- * @param speed The speed value between -1.0 and 1.0 to set.
- * @param syncGroup Unused interface.
- */
-void SD540::Set(float speed, uint8_t syncGroup) {
-  SetSpeed(m_isInverted ? -speed : speed);
-}
-
-/**
- * Get the recently set value of the PWM.
- *
- * @return The most recently set value for the PWM between -1.0 and 1.0.
- */
-float SD540::Get() const { return GetSpeed(); }
-
-/**
- * Common interface for inverting direction of a speed controller.
- * @param isInverted The state of inversion, true is inverted.
- */
-void SD540::SetInverted(bool isInverted) { m_isInverted = isInverted; }
-
-/**
- * Common interface for the inverting direction of a speed controller.
- *
- * @return isInverted The state of inversion, true is inverted.
- *
- */
-bool SD540::GetInverted() const { return m_isInverted; }
-
-/**
- * Common interface for disabling a motor.
- */
-void SD540::Disable() { SetRaw(kPwmDisabled); }
-
-/**
- * Write out the PID value as seen in the PIDOutput base object.
- *
- * @param output Write out the PWM value as was found in the PIDController
- */
-void SD540::PIDWrite(float output) { Set(output); }
-
-/**
- * Common interface to stop the motor until Set is called again.
- */
-void SD540::StopMotor() { this->SafePWM::StopMotor(); }

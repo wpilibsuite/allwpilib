@@ -14,7 +14,7 @@
  * @param channel The PWM channel that the TalonSRX is attached to. 0-9 are
  * on-board, 10-19 are on the MXP port
  */
-TalonSRX::TalonSRX(uint32_t channel) : SafePWM(channel) {
+TalonSRX::TalonSRX(uint32_t channel) : PWMSpeedController(channel) {
   /* Note that the TalonSRX uses the following bounds for PWM values. These
    * values should work reasonably well for most controllers, but if users
    * experience issues such as asymmetric behavior around the deadband or
@@ -35,52 +35,3 @@ TalonSRX::TalonSRX(uint32_t channel) : SafePWM(channel) {
   HALReport(HALUsageReporting::kResourceType_TalonSRX, GetChannel());
   LiveWindow::GetInstance()->AddActuator("TalonSRX", GetChannel(), this);
 }
-
-/**
- * Set the PWM value.
- *
- * The PWM value is set using a range of -1.0 to 1.0, appropriately
- * scaling the value for the FPGA.
- *
- * @param speed The speed value between -1.0 and 1.0 to set.
- * @param syncGroup Unused interface.
- */
-void TalonSRX::Set(float speed, uint8_t syncGroup) { SetSpeed(speed); }
-
-/**
- * Get the recently set value of the PWM.
- *
- * @return The most recently set value for the PWM between -1.0 and 1.0.
- */
-float TalonSRX::Get() const { return GetSpeed(); }
-
-/**
- * Common interface for disabling a motor.
- */
-void TalonSRX::Disable() { SetRaw(kPwmDisabled); }
-
-/**
-* Common interface for inverting direction of a speed controller.
-* @param isInverted The state of inversion, true is inverted.
-*/
-void TalonSRX::SetInverted(bool isInverted) { m_isInverted = isInverted; }
-
-/**
- * Common interface for the inverting direction of a speed controller.
- *
- * @return isInverted The state of inversion, true is inverted.
- *
- */
-bool TalonSRX::GetInverted() const { return m_isInverted; }
-
-/**
- * Write out the PID value as seen in the PIDOutput base object.
- *
- * @param output Write out the PWM value as was found in the PIDController
- */
-void TalonSRX::PIDWrite(float output) { Set(output); }
-
-/**
- * Common interface to stop the motor until Set is called again.
- */
-void TalonSRX::StopMotor() { this->SafePWM::StopMotor(); }
