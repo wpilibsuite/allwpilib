@@ -212,6 +212,18 @@ public class DriverStation implements RobotState.Interface {
   }
 
   /**
+   * Reports errors related to unplugged joysticks Throttles the errors so that
+   * they don't overwhelm the DS
+   */
+  private void reportJoystickUnpluggedWarning(String message) {
+    double currentTime = Timer.getFPGATimestamp();
+    if (currentTime > m_nextMessageTime) {
+      reportWarning(message, false);
+      m_nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;
+    }
+  }
+
+  /**
    * Get the value of the axis on a joystick. This depends on the mapping of the
    * joystick connected to the specified port.
    *
@@ -229,8 +241,8 @@ public class DriverStation implements RobotState.Interface {
     }
 
     if (axis >= m_joystickAxes[stick].length) {
-      reportJoystickUnpluggedError("WARNING: Joystick axis " + axis + " on port " + stick
-          + " not available, check if controller is plugged in\n");
+      reportJoystickUnpluggedWarning("Joystick axis " + axis + " on port " + stick
+          + " not available, check if controller is plugged in");
       return 0.0;
     }
 
@@ -273,8 +285,8 @@ public class DriverStation implements RobotState.Interface {
     }
 
     if (pov >= m_joystickPOVs[stick].length) {
-      reportJoystickUnpluggedError("WARNING: Joystick POV " + pov + " on port " + stick
-          + " not available, check if controller is plugged in\n");
+      reportJoystickUnpluggedWarning("Joystick POV " + pov + " on port " + stick
+          + " not available, check if controller is plugged in");
       return -1;
     }
 
@@ -324,12 +336,12 @@ public class DriverStation implements RobotState.Interface {
 
 
     if (button > m_joystickButtons[stick].count) {
-      reportJoystickUnpluggedError("WARNING: Joystick Button " + button + " on port " + stick
-          + " not available, check if controller is plugged in\n");
+      reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
+          + " not available, check if controller is plugged in");
       return false;
     }
     if (button <= 0) {
-      reportJoystickUnpluggedError("ERROR: Button indexes begin at 1 in WPILib for C++ and Java\n");
+      reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java");
       return false;
     }
     return ((0x1 << (button - 1)) & m_joystickButtons[stick].buttons) != 0;
@@ -365,8 +377,8 @@ public class DriverStation implements RobotState.Interface {
     // TODO: Remove this when calling for descriptor on empty stick no longer
     // crashes
     if (1 > m_joystickButtons[stick].count && 1 > m_joystickAxes[stick].length) {
-      reportJoystickUnpluggedError("WARNING: Joystick on port " + stick
-          + " not available, check if controller is plugged in\n");
+      reportJoystickUnpluggedWarning("Joystick on port " + stick
+          + " not available, check if controller is plugged in");
       return false;
     }
     boolean retVal = false;
@@ -390,8 +402,8 @@ public class DriverStation implements RobotState.Interface {
     // TODO: Remove this when calling for descriptor on empty stick no longer
     // crashes
     if (1 > m_joystickButtons[stick].count && 1 > m_joystickAxes[stick].length) {
-      reportJoystickUnpluggedError("WARNING: Joystick on port " + stick
-          + " not available, check if controller is plugged in\n");
+      reportJoystickUnpluggedWarning("Joystick on port " + stick
+          + " not available, check if controller is plugged in");
       return -1;
     }
     return FRCNetworkCommunicationsLibrary.HALGetJoystickType((byte) stick);
@@ -411,8 +423,8 @@ public class DriverStation implements RobotState.Interface {
     // TODO: Remove this when calling for descriptor on empty stick no longer
     // crashes
     if (1 > m_joystickButtons[stick].count && 1 > m_joystickAxes[stick].length) {
-      reportJoystickUnpluggedError("WARNING: Joystick on port " + stick
-          + " not available, check if controller is plugged in\n");
+      reportJoystickUnpluggedWarning("Joystick on port " + stick
+          + " not available, check if controller is plugged in");
       return "";
     }
     return FRCNetworkCommunicationsLibrary.HALGetJoystickName((byte) stick);
@@ -600,19 +612,39 @@ public class DriverStation implements RobotState.Interface {
    * @param printTrace If true, append stack trace to error string
    */
   public static void reportError(String error, boolean printTrace) {
-    String errorString = error;
-    if (printTrace) {
-      errorString += " at ";
-      StackTraceElement[] traces = Thread.currentThread().getStackTrace();
-      for (int i = 2; i < traces.length; i++) {
-        errorString += traces[i].toString() + "\n";
+    reportErrorImpl(true, 1, error, printTrace);
+  }
+
+  /**
+   * Report warning to Driver Station. Also prints error to System.err Optionally
+   * appends Stack trace to warning message
+   *$
+   * @param printTrace If true, append stack trace to warning string
+   */
+  public static void reportWarning(String error, boolean printTrace) {
+    reportErrorImpl(false, 1, error, printTrace);
+  }
+
+  private static void reportErrorImpl(boolean is_error, int code, String error, boolean printTrace) {
+    StackTraceElement[] traces = Thread.currentThread().getStackTrace();
+    String locString;
+    if (traces.length > 3)
+      locString = traces[3].toString();
+    else
+      locString = new String();
+    boolean haveLoc = false;
+    String traceString = new String();
+    traceString = " at ";
+    for (int i = 3; i < traces.length; i++) {
+      String loc = traces[i].toString();
+      traceString += loc + "\n";
+      // get first user function
+      if (!haveLoc && !loc.startsWith("edu.wpi.first.wpilibj")) {
+        locString = loc;
+        haveLoc = true;
       }
     }
-    System.err.println(errorString);
-    HALControlWord controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
-    if (controlWord.getDSAttached()) {
-      FRCNetworkCommunicationsLibrary.HALSetErrorData(errorString);
-    }
+    FRCNetworkCommunicationsLibrary.HALSendError(is_error, code, false, error, locString, printTrace ? traceString : "", true);
   }
 
   /**

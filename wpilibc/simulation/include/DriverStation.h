@@ -42,6 +42,8 @@ public:
 	virtual ~DriverStation() = default;
 	static DriverStation &GetInstance();
 	static void ReportError(std::string error);
+	static void ReportWarning(std::string error);
+	static void ReportError(bool is_error, int32_t code, const std::string& error, const std::string& location, const std::string& stack);
 
 	static const uint32_t kBatteryChannel = 7;
 	static const uint32_t kJoystickPorts = 4;

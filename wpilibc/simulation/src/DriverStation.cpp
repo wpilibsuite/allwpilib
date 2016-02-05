@@ -316,6 +316,31 @@ void DriverStation::ReportError(std::string error)
 }
 
 /**
+ * Report a warning to the DriverStation messages window.
+ * The warning is also printed to the program console.
+ */
+void DriverStation::ReportWarning(std::string error)
+{
+	std::cout << error << std::endl;
+}
+
+/**
+ * Report an error to the DriverStation messages window.
+ * The error is also printed to the program console.
+ */
+void DriverStation::ReportError(bool is_error, int32_t code,
+                                const std::string& error,
+                                const std::string& location,
+                                const std::string& stack)
+{
+	if (!location.empty())
+		std::cout << (is_error ? "Error" : "Warning") << " at " << location << ": ";
+	std::cout << error << std::endl;
+	if (!stack.empty())
+		std::cout << stack << std::endl;
+}
+
+/**
  * Return the team number that the Driver Station is configured for
  * @return The team number
  */

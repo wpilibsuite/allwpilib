@@ -14,6 +14,7 @@
 #include "HAL/HAL.hpp"
 #include "errno.h"
 #include <string.h>
+#include <cstring>
 #include <string>
 
 // set the logging level
@@ -42,7 +43,7 @@ static jclass canMessageNotAllowedExCls = nullptr;
 static jclass canNotInitializedExCls = nullptr;
 static jclass uncleanStatusExCls = nullptr;
 
-static void GetStackTrace(JNIEnv *env, std::string& res) {
+static void GetStackTrace(JNIEnv *env, std::string& res, std::string& func) {
   // create a throwable
   static jmethodID constructorId = nullptr;
   if (!constructorId)
@@ -72,6 +73,7 @@ static void GetStackTrace(JNIEnv *env, std::string& res) {
     toStringId = env->GetMethodID(stackTraceElementCls, "toString",
                                   "()Ljava/lang/String;");
 
+  bool haveLoc = false;
   for (jsize i = 0; i < stackTraceLength; i++) {
     // add the result of toString method of each element in the result
     jobject curStackTraceElement = env->GetObjectArrayElement(stackTrace, i);
@@ -91,6 +93,16 @@ static void GetStackTrace(JNIEnv *env, std::string& res) {
     const char *tmp = env->GetStringUTFChars(stackElementString, nullptr);
     res += tmp;
     res += '\n';
+
+    // func is caller of immediate caller (if there was one)
+    // or, if we see it, the first user function
+    if (i == 1)
+      func = tmp;
+    else if (i > 1 && !haveLoc &&
+             std::strncmp(tmp, "edu.wpi.first.wpilibj", 21) != 0) {
+      func = tmp;
+      haveLoc = true;
+    }
     env->ReleaseStringUTFChars(stackElementString, tmp);
 
     env->DeleteLocalRef(curStackTraceElement);
@@ -110,14 +122,10 @@ void ReportError(JNIEnv *env, int32_t status, bool do_throw) {
     env->ThrowNew(runtimeExCls, buf);
     delete[] buf;
   } else {
-    std::string fullmsg = message;
-    fullmsg += " at ";
-    GetStackTrace(env, fullmsg);
-    fprintf(stderr, "%s\n", fullmsg.c_str());
-    HALControlWord controlWord;
-    HALGetControlWord(&controlWord);
-    if (controlWord.dsAttached)
-      HALSetErrorData(fullmsg.c_str(), fullmsg.size(), 0);
+    std::string stack = " at ";
+    std::string func;
+    GetStackTrace(env, stack, func);
+    HALSendError(1, status, 0, message, func.c_str(), stack.c_str(), 1);
   }
 }
 

@@ -29,11 +29,13 @@ bool wpi_assert_impl(bool conditionValue, const char *conditionText,
                      const char *message, const char *fileName,
                      uint32_t lineNumber, const char *funcName) {
   if (!conditionValue) {
+    std::stringstream locStream;
+    locStream << funcName << " [";
+    locStream << basename(fileName) << ":" << lineNumber << "]";
+
     std::stringstream errorStream;
 
     errorStream << "Assertion \"" << conditionText << "\" ";
-    errorStream << "on line " << lineNumber << " ";
-    errorStream << "of " << basename(fileName) << " ";
 
     if (message[0] != '\0') {
       errorStream << "failed: " << message << std::endl;
@@ -41,13 +43,12 @@ bool wpi_assert_impl(bool conditionValue, const char *conditionText,
       errorStream << "failed." << std::endl;
     }
 
-    errorStream << GetStackTrace(2);
-
+    std::string stack = GetStackTrace(2);
+    std::string location = locStream.str();
     std::string error = errorStream.str();
 
     // Print the error and send it to the DriverStation
-    std::cout << error << std::endl;
-    HALSetErrorData(error.c_str(), error.size(), 100);
+    HALSendError(1, 1, 0, error.c_str(), location.c_str(), stack.c_str(), 1);
   }
 
   return conditionValue;
@@ -65,12 +66,14 @@ void wpi_assertEqual_common_impl(const char *valueA, const char *valueB,
                                  const char *fileName,
                                  uint32_t lineNumber,
                                  const char *funcName) {
+  std::stringstream locStream;
+  locStream << funcName << " [";
+  locStream << basename(fileName) << ":" << lineNumber << "]";
+
   std::stringstream errorStream;
 
   errorStream << "Assertion \"" << valueA << " " << equalityType << " "
               << valueB << "\" ";
-  errorStream << "on line " << lineNumber << " ";
-  errorStream << "of " << basename(fileName) << " ";
 
   if (message[0] != '\0') {
     errorStream << "failed: " << message << std::endl;
@@ -78,13 +81,12 @@ void wpi_assertEqual_common_impl(const char *valueA, const char *valueB,
     errorStream << "failed." << std::endl;
   }
 
-  errorStream << GetStackTrace(3);
-
+  std::string trace = GetStackTrace(3);
+  std::string location = locStream.str();
   std::string error = errorStream.str();
 
   // Print the error and send it to the DriverStation
-  std::cout << error << std::endl;
-  HALSetErrorData(error.c_str(), error.size(), 100);
+  HALSendError(1, 1, 0, error.c_str(), location.c_str(), trace.c_str(), 1);
 }
 
 /**

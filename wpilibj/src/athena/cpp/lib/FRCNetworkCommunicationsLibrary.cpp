@@ -323,4 +323,26 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
   return returnValue;
 }
 
+/*
+ * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
+ * Method:    HALSendError
+ * Signature: (ZIZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALSendError
+  (JNIEnv * env, jclass, jboolean isError, jint errorCode, jboolean isLVCode, jstring details, jstring location, jstring callStack, jboolean printMsg)
+{
+  const char * detailsStr = env->GetStringUTFChars(details, NULL);
+  const char * locationStr = env->GetStringUTFChars(location, NULL);
+  const char * callStackStr = env->GetStringUTFChars(callStack, NULL);
+
+  NETCOMM_LOG(logDEBUG) << "Send Error: " << detailsStr;
+  NETCOMM_LOG(logDEBUG) << "Location: " << locationStr;
+  NETCOMM_LOG(logDEBUG) << "Call Stack: " << callStackStr;
+  jint returnValue = HALSendError(isError, errorCode, isLVCode, detailsStr, locationStr, callStackStr, printMsg);
+  env->ReleaseStringUTFChars(details,detailsStr);
+  env->ReleaseStringUTFChars(location,locationStr);
+  env->ReleaseStringUTFChars(callStack,callStackStr);
+  return returnValue;
+}
+
 }  // extern "C"

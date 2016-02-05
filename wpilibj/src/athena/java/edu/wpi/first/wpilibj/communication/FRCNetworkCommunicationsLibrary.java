@@ -233,4 +233,6 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
   public static native boolean HALGetBrownedOut();
 
   public static native int HALSetErrorData(String error);
+
+  public static native int HALSendError(boolean isError, int errorCode, boolean isLVCode, String details, String location, String callStack, boolean printMsg);
 }

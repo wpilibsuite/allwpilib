@@ -134,6 +134,18 @@ void DriverStation::ReportJoystickUnpluggedError(std::string message) {
 }
 
 /**
+ * Reports errors related to unplugged joysticks
+ * Throttles the errors so that they don't overwhelm the DS
+ */
+void DriverStation::ReportJoystickUnpluggedWarning(std::string message) {
+  double currentTime = Timer::GetFPGATimestamp();
+  if (currentTime > m_nextMessageTime) {
+    ReportWarning(message);
+    m_nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;
+  }
+}
+
+/**
  * Returns the number of axes on a given joystick port
  *
  * @param stick The joystick port number
@@ -255,9 +267,8 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis) {
     if (axis >= kMaxJoystickAxes)
       wpi_setWPIError(BadJoystickAxis);
     else
-      ReportJoystickUnpluggedError(
-          "WARNING: Joystick Axis missing, check if all controllers are "
-          "plugged in\n");
+      ReportJoystickUnpluggedWarning(
+          "Joystick Axis missing, check if all controllers are plugged in");
     return 0.0f;
   }
 
@@ -285,9 +296,8 @@ int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
     if (pov >= kMaxJoystickPOVs)
       wpi_setWPIError(BadJoystickAxis);
     else
-      ReportJoystickUnpluggedError(
-          "WARNING: Joystick POV missing, check if all controllers are plugged "
-          "in\n");
+      ReportJoystickUnpluggedWarning(
+          "Joystick POV missing, check if all controllers are plugged in");
     return -1;
   }
 
@@ -323,14 +333,13 @@ bool DriverStation::GetStickButton(uint32_t stick, uint8_t button) {
   }
 
   if (button > m_joystickButtons[stick].count) {
-    ReportJoystickUnpluggedError(
-        "WARNING: Joystick Button missing, check if all controllers are "
-        "plugged in\n");
+    ReportJoystickUnpluggedWarning(
+        "Joystick Button missing, check if all controllers are plugged in");
     return false;
   }
   if (button == 0) {
     ReportJoystickUnpluggedError(
-        "ERROR: Button indexes begin at 1 in WPILib for C++ and Java");
+        "Button indexes begin at 1 in WPILib for C++ and Java");
     return false;
   }
   return ((0x1 << (button - 1)) & m_joystickButtons[stick].buttons) != 0;
@@ -527,11 +536,25 @@ double DriverStation::GetMatchTime() const {
  * The error is also printed to the program console.
  */
 void DriverStation::ReportError(std::string error) {
-  std::cout << error << std::endl;
+  HALSendError(1, 1, 0, error.c_str(), "", "", 1);
+}
 
-  HALControlWord controlWord;
-  HALGetControlWord(&controlWord);
-  if (controlWord.dsAttached) {
-    HALSetErrorData(error.c_str(), error.size(), 0);
-  }
+/**
+ * Report a warning to the DriverStation messages window.
+ * The warning is also printed to the program console.
+ */
+void DriverStation::ReportWarning(std::string error) {
+  HALSendError(0, 1, 0, error.c_str(), "", "", 1);
+}
+
+/**
+ * Report an error to the DriverStation messages window.
+ * The error is also printed to the program console.
+ */
+void DriverStation::ReportError(bool is_error, int32_t code,
+                                const std::string &error,
+                                const std::string &location,
+                                const std::string &stack) {
+  HALSendError(is_error, code, 0, error.c_str(), location.c_str(),
+               stack.c_str(), 1);
 }
