@@ -125,6 +125,7 @@ void cleanNotifier(void* notifier_pointer, int32_t *status)
 			delete notifierManager;
 			notifierManager = nullptr;
 		}
+		closestTrigger = UINT64_MAX;
 	}
 }
 
