@@ -363,7 +363,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_ProcessMotionP
 {
   return ((CanTalonSRX*)handle)->ProcessMotionProfileBuffer();
 }
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetFault_OverTemp
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetFault_1OverTemp
   (JNIEnv * env, jclass, jlong handle)
 {
   int retval;
@@ -371,7 +371,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetFault_OverT
   CheckCTRStatus(env, status);
   return retval;
 }
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetFault_UnderVoltage
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetFault_1UnderVoltage
   (JNIEnv * env, jclass, jlong handle)
 {
   int retval;
@@ -379,7 +379,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetFault_Under
   CheckCTRStatus(env, status);
   return retval;
 }
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetFault_ForLim
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetFault_1ForLim
   (JNIEnv * env, jclass, jlong handle)
 {
   int retval;
@@ -387,7 +387,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetFault_ForLi
   CheckCTRStatus(env, status);
   return retval;
 }
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetFault_RevLim
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetFault_1RevLim
   (JNIEnv * env, jclass, jlong handle)
 {
   int retval;
@@ -395,7 +395,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetFault_RevLi
   CheckCTRStatus(env, status);
   return retval;
 }
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetFault_HardwareFailure
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetFault_1HardwareFailure
   (JNIEnv * env, jclass, jlong handle)
 {
   int retval;
@@ -403,7 +403,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetFault_Hardw
   CheckCTRStatus(env, status);
   return retval;
 }
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetFault_ForSoftLim
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetFault_1ForSoftLim
   (JNIEnv * env, jclass, jlong handle)
 {
   int retval;
@@ -411,7 +411,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetFault_ForSo
   CheckCTRStatus(env, status);
   return retval;
 }
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetFault_RevSoftLim
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetFault_1RevSoftLim
   (JNIEnv * env, jclass, jlong handle)
 {
   int retval;
@@ -419,7 +419,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetFault_RevSo
   CheckCTRStatus(env, status);
   return retval;
 }
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetStckyFault_OverTemp
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetStckyFault_1OverTemp
   (JNIEnv * env, jclass, jlong handle)
 {
   int retval;
@@ -427,7 +427,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetStckyFault_
   CheckCTRStatus(env, status);
   return retval;
 }
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetStckyFault_UnderVoltage
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetStckyFault_1UnderVoltage
   (JNIEnv * env, jclass, jlong handle)
 {
   int retval;
@@ -435,7 +435,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetStckyFault_
   CheckCTRStatus(env, status);
   return retval;
 }
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetStckyFault_ForLim
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetStckyFault_1ForLim
   (JNIEnv * env, jclass, jlong handle)
 {
   int retval;
@@ -443,7 +443,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetStckyFault_
   CheckCTRStatus(env, status);
   return retval;
 }
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetStckyFault_RevLim
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetStckyFault_1RevLim
   (JNIEnv * env, jclass, jlong handle)
 {
   int retval;
@@ -451,7 +451,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetStckyFault_
   CheckCTRStatus(env, status);
   return retval;
 }
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetStckyFault_ForSoftLim
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetStckyFault_1ForSoftLim
   (JNIEnv * env, jclass, jlong handle)
 {
   int retval;
@@ -459,7 +459,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetStckyFault_
   CheckCTRStatus(env, status);
   return retval;
 }
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetStckyFault_RevSoftLim
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetStckyFault_1RevSoftLim
   (JNIEnv * env, jclass, jlong handle)
 {
   int retval;
@@ -683,7 +683,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetPulseWidthR
   CheckCTRStatus(env, status);
   return retval;
 }
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetActTraj_IsValid
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetActTraj_1IsValid
   (JNIEnv * env, jclass, jlong handle)
 {
   int retval;
@@ -691,7 +691,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetActTraj_IsV
   CheckCTRStatus(env, status);
   return retval;
 }
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetActTraj_ProfileSlotSelect
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetActTraj_1ProfileSlotSelect
   (JNIEnv * env, jclass, jlong handle)
 {
   int retval;
@@ -699,7 +699,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetActTraj_Pro
   CheckCTRStatus(env, status);
   return retval;
 }
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetActTraj_VelOnly
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetActTraj_1VelOnly
   (JNIEnv * env, jclass, jlong handle)
 {
   int retval;
@@ -707,7 +707,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetActTraj_Vel
   CheckCTRStatus(env, status);
   return retval;
 }
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetActTraj_IsLast
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetActTraj_1IsLast
   (JNIEnv * env, jclass, jlong handle)
 {
   int retval;
@@ -763,7 +763,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetCount
   CheckCTRStatus(env, status);
   return retval;
 }
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetActTraj_Velocity
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetActTraj_1Velocity
   (JNIEnv * env, jclass, jlong handle)
 {
   int retval;
@@ -771,7 +771,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetActTraj_Vel
   CheckCTRStatus(env, status);
   return retval;
 }
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetActTraj_Position
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CanTalonJNI_GetActTraj_1Position
   (JNIEnv * env, jclass, jlong handle)
 {
   int retval;

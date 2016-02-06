@@ -68,3 +68,9 @@ TEST(CANTalonTest, DISABLED_PositionModeWorks) {
   talon.Disable();
   EXPECT_NEAR(talon.Get(), 500, 1000);
 }
+
+TEST(CANTalonTest, GetFaults) {
+  CANTalon talon(deviceId);
+  EXPECT_EQ(talon.GetFaults(),0);
+  EXPECT_EQ(talon.GetStickyFaults(),0);
+}
