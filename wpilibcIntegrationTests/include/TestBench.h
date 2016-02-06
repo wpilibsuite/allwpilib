@@ -58,7 +58,7 @@ class TestBench {
   /* PDP channels */
   static const uint32_t kJaguarPDPChannel = 6;
   static const uint32_t kVictorPDPChannel = 8;
-  static const uint32_t kTalonPDPChannel = 11;
+  static const uint32_t kTalonPDPChannel = 10;
 
   /* PCM channels */
   static const int32_t kSolenoidChannel1 = 0;
