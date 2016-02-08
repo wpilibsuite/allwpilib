@@ -100,7 +100,7 @@ public class GyroTest extends AbstractComsSetup {
     assertEquals(errorMessage(angle, 0), 0, angle, .5);
     Timer.delay(5);
     angle = gyro.getAngle();
-    assertEquals("After 5 seconds " + errorMessage(angle, 0), 0, angle, 1);
+    assertEquals("After 5 seconds " + errorMessage(angle, 0), 0, angle, 2.0);
   }
 
   /**
