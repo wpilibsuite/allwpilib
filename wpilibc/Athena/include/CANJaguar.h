@@ -230,6 +230,7 @@ class CANJaguar : public MotorSafety,
   mutable std::atomic<bool> m_receivedStatusMessage2{false};
 
   bool m_controlEnabled = false;
+  bool m_stopped = false;
 
   void verify();
 

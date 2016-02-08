@@ -437,6 +437,7 @@ class CANTalon : public MotorSafety,
                   // actually test this.
 
   bool m_controlEnabled = true;
+  bool m_stopped = false;
   ControlMode m_controlMode = kPercentVbus;
   TalonControlMode m_sendMode;
 
