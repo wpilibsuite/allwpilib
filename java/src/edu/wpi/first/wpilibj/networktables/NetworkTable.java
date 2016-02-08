@@ -214,9 +214,9 @@ public class NetworkTable implements ITable, IRemote {
 
     public void apply(int uid, boolean connected, ConnectionInfo conn) {
       if (connected)
-        targetListener.connected(targetSource);
+        targetListener.connectedEx(targetSource, conn);
       else
-        targetListener.disconnected(targetSource);
+        targetListener.disconnectedEx(targetSource, conn);
     }
   }
 
