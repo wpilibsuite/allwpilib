@@ -199,7 +199,7 @@ unsigned int Notifier::AddConnectionListener(
     ConnectionListenerCallback callback) {
   Start();
   auto thr = m_owner.GetThread();
-  unsigned int uid = thr->m_entry_listeners.size();
+  unsigned int uid = thr->m_conn_listeners.size();
   thr->m_conn_listeners.emplace_back(callback);
   return uid + 1;
 }
