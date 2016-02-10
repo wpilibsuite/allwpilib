@@ -92,7 +92,7 @@ public class MotorSafetyHelper {
     if (!m_enabled || RobotState.isDisabled() || RobotState.isTest())
       return;
     if (m_stopTime < Timer.getFPGATimestamp()) {
-      System.err.println(m_safeObject.getDescription() + "... Output not updated often enough.");
+      DriverStation.reportError(m_safeObject.getDescription() + "... Output not updated often enough.", false);
 
       m_safeObject.stopMotor();
     }

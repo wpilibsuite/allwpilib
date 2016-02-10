@@ -86,3 +86,8 @@ void Spark::Disable() { SetRaw(kPwmDisabled); }
  * @param output Write out the PWM value as was found in the PIDController
  */
 void Spark::PIDWrite(float output) { Set(output); }
+
+/**
+ * Common interface to stop the motor until Set is called again.
+ */
+void Spark::StopMotor() { this->SafePWM::StopMotor(); }

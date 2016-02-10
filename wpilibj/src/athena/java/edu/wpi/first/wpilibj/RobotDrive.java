@@ -794,16 +794,16 @@ public class RobotDrive implements MotorSafety {
 
   public void stopMotor() {
     if (m_frontLeftMotor != null) {
-      m_frontLeftMotor.set(0.0);
+      m_frontLeftMotor.stopMotor();
     }
     if (m_frontRightMotor != null) {
-      m_frontRightMotor.set(0.0);
+      m_frontRightMotor.stopMotor();
     }
     if (m_rearLeftMotor != null) {
-      m_rearLeftMotor.set(0.0);
+      m_rearLeftMotor.stopMotor();
     }
     if (m_rearRightMotor != null) {
-      m_rearRightMotor.set(0.0);
+      m_rearRightMotor.stopMotor();
     }
     if (m_safetyHelper != null)
       m_safetyHelper.feed();

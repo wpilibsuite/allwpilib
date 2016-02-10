@@ -86,3 +86,8 @@ void VictorSP::Disable() { SetRaw(kPwmDisabled); }
  * @param output Write out the PWM value as was found in the PIDController
  */
 void VictorSP::PIDWrite(float output) { Set(output); }
+
+/**
+ * Common interface to stop the motor until Set is called again.
+ */
+void VictorSP::StopMotor() { this->SafePWM::StopMotor(); }

@@ -48,4 +48,9 @@ class SpeedController : public PIDOutput {
    * @return isInverted The state of inversion, true is inverted.
    */
   virtual bool GetInverted() const = 0;
+
+  /**
+   * Common interface to stop the motor until Set is called again.
+   */
+  virtual void StopMotor() = 0;
 };

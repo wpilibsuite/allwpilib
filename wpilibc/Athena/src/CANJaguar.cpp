@@ -247,10 +247,10 @@ void CANJaguar::Set(float outputValue, uint8_t syncGroup) {
   uint8_t dataSize;
 
   if (m_safetyHelper) m_safetyHelper->Feed();
-  
+
   if (m_stopped) {
     EnableControl();
-	m_stopped = false;
+    m_stopped = false;
   }
 
   if (m_controlEnabled) {

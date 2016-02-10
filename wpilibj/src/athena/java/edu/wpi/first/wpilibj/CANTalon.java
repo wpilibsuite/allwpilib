@@ -424,11 +424,10 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   public void set(double outputValue) {
     /* feed safety helper since caller just updated our output */
     m_safetyHelper.feed();
-	if(m_stopped)
-	{
-		enableControl();
-		m_stopped = false;
-	}
+    if(m_stopped) {
+      enableControl();
+      m_stopped = false;
+    }
     if (m_controlEnabled) {
       m_setPoint = outputValue; /* cache set point for getSetpoint() */
       switch (m_controlMode) {
@@ -1218,10 +1217,9 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
    * @deprecated Use disableControl instead.
    */
   @Override
-  @Deprecated
   public void stopMotor() {
     disableControl();
-	m_stopped = true;
+    m_stopped = true;
   }
 
   @Override

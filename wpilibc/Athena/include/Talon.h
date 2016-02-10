@@ -25,6 +25,7 @@ class Talon : public SafePWM, public SpeedController {
   virtual void PIDWrite(float output) override;
   virtual void SetInverted(bool isInverted) override;
   virtual bool GetInverted() const override;
+  virtual void StopMotor() override;
 
  private:
   bool m_isInverted = false;

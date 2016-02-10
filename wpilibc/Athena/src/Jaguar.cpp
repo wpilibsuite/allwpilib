@@ -77,3 +77,8 @@ bool Jaguar::GetInverted() const { return m_isInverted; }
  * @param output Write out the PWM value as was found in the PIDController
  */
 void Jaguar::PIDWrite(float output) { Set(output); }
+
+/**
+ * Common interface to stop the motor until Set is called again.
+ */
+void Jaguar::StopMotor() { this->SafePWM::StopMotor(); }

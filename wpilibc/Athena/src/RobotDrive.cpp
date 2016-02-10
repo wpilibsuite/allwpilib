@@ -745,9 +745,9 @@ void RobotDrive::GetDescription(std::ostringstream& desc) const {
 }
 
 void RobotDrive::StopMotor() {
-  if (m_frontLeftMotor != nullptr) m_frontLeftMotor->Disable();
-  if (m_frontRightMotor != nullptr) m_frontRightMotor->Disable();
-  if (m_rearLeftMotor != nullptr) m_rearLeftMotor->Disable();
-  if (m_rearRightMotor != nullptr) m_rearRightMotor->Disable();
+  if (m_frontLeftMotor != nullptr) m_frontLeftMotor->StopMotor();
+  if (m_frontRightMotor != nullptr) m_frontRightMotor->StopMotor();
+  if (m_rearLeftMotor != nullptr) m_rearLeftMotor->StopMotor();
+  if (m_rearRightMotor != nullptr) m_rearRightMotor->StopMotor();
   m_safetyHelper->Feed();
 }

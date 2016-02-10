@@ -375,15 +375,14 @@ public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController {
     byte[] data = new byte[8];
     byte dataSize;
 
-	if (m_safetyHelper != null)
-        m_safetyHelper.feed();
-	
-	if (m_stopped)
-	{
-		enableControl();
-		m_stopped = false;
-	}
-	
+    if (m_safetyHelper != null)
+      m_safetyHelper.feed();
+
+    if (m_stopped) {
+      enableControl();
+      m_stopped = false;
+    }
+
     if (m_controlEnabled) {
       switch (m_controlMode) {
         case PercentVbus:
@@ -2251,10 +2250,9 @@ public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController {
    * @deprecated Use disableControl instead.
    */
   @Override
-  @Deprecated
   public void stopMotor() {
     disableControl();
-	m_stopped = true;
+    m_stopped = true;
   }
 
   /*

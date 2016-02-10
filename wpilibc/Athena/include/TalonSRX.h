@@ -22,6 +22,7 @@ class TalonSRX : public SafePWM, public SpeedController {
   virtual void Set(float value, uint8_t syncGroup = 0) override;
   virtual float Get() const override;
   virtual void Disable() override;
+  virtual void StopMotor() override;
 
   virtual void PIDWrite(float output) override;
   virtual void SetInverted(bool isInverted) override;
