@@ -134,6 +134,12 @@ float CANTalon::Get() const {
 void CANTalon::Set(float value, uint8_t syncGroup) {
   /* feed safety helper since caller just updated our output */
   m_safetyHelper->Feed();
+  
+  if (m_stopped) {
+    EnableControl();
+	m_stopped = false;
+  }
+  
   if (m_controlEnabled) {
     m_setPoint = value;  /* cache set point for GetSetpoint() */
     CTR_Code status = CTR_OKAY;
@@ -1825,12 +1831,15 @@ void CANTalon::SetInverted(bool isInverted) { m_isInverted = isInverted; }
 bool CANTalon::GetInverted() const { return m_isInverted; }
 
 /**
- * Common interface for stopping the motor
+ * Common interface for stopping the motor until the next Set() call
  * Part of the MotorSafety interface
  *
  * @deprecated Call Disable instead.
 */
-void CANTalon::StopMotor() { Disable(); }
+void CANTalon::StopMotor() { 
+	Disable();
+	m_stopped = true;
+}
 
 void CANTalon::ValueChanged(ITable* source, llvm::StringRef key,
                             std::shared_ptr<nt::Value> value, bool isNew) {

@@ -375,6 +375,15 @@ public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController {
     byte[] data = new byte[8];
     byte dataSize;
 
+	if (m_safetyHelper != null)
+        m_safetyHelper.feed();
+	
+	if (m_stopped)
+	{
+		enableControl();
+		m_stopped = false;
+	}
+	
     if (m_controlEnabled) {
       switch (m_controlMode) {
         case PercentVbus:
@@ -412,9 +421,6 @@ public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController {
       }
 
       sendMessage(messageID, data, dataSize, kSendMessagePeriod);
-
-      if (m_safetyHelper != null)
-        m_safetyHelper.feed();
     }
 
     m_value = outputValue;
@@ -1890,6 +1896,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController {
   static final int kReceiveStatusAttempts = 50;
 
   boolean m_controlEnabled = true;
+  boolean m_stopped = false;
 
   static void sendMessageHelper(int messageID, byte[] data, int dataSize, int period)
       throws CANMessageNotFoundException {
@@ -2247,6 +2254,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController {
   @Deprecated
   public void stopMotor() {
     disableControl();
+	m_stopped = true;
   }
 
   /*

@@ -246,8 +246,11 @@ void CANJaguar::Set(float outputValue, uint8_t syncGroup) {
   uint8_t dataBuffer[8];
   uint8_t dataSize;
 
-  if (m_safetyHelper && !m_safetyHelper->IsAlive() && m_controlEnabled) {
+  if (m_safetyHelper) m_safetyHelper->Feed();
+  
+  if (m_stopped) {
     EnableControl();
+	m_stopped = false;
   }
 
   if (m_controlEnabled) {
@@ -290,8 +293,6 @@ void CANJaguar::Set(float outputValue, uint8_t syncGroup) {
     }
 
     sendMessage(messageID, dataBuffer, dataSize, kSendMessagePeriod);
-
-    if (m_safetyHelper) m_safetyHelper->Feed();
   }
 
   m_value = outputValue;
@@ -1934,12 +1935,14 @@ void CANJaguar::GetDescription(std::ostringstream& desc) const {
 uint8_t CANJaguar::GetDeviceID() const { return m_deviceNumber; }
 
 /**
- * Common interface for stopping the motor
+ * Common interface for stopping the motor until the next Set() command
  * Part of the MotorSafety interface
  *
  * @deprecated Call DisableControl instead.
  */
-void CANJaguar::StopMotor() { DisableControl(); }
+void CANJaguar::StopMotor() {
+	m_stopped = true;
+}
 
 /**
 * Common interface for inverting direction of a speed controller.
