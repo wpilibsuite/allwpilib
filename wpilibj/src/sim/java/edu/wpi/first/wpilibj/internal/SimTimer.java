@@ -23,7 +23,7 @@ import gazebo.msgs.GzFloat64.Float64;
  */
 public class SimTimer implements Timer.StaticInterface {
 
-    private long m_startTime;
+    private double m_startTime;
     private double m_accumulatedTime;
     private boolean m_running;
     private static double simTime;
@@ -100,8 +100,8 @@ public class SimTimer implements Timer.StaticInterface {
 	     * @deprecated Use getFPGATimestamp instead.
 	     * @return Robot running time in milliseconds.
 	     */
-	    private long getMsClock() {
-	        return (long) (simTime * 1e3);
+	    private double getMsClock() {
+	        return (simTime * 1e3);
 	    }
 
 	    /**
