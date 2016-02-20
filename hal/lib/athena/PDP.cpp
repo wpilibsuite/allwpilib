@@ -6,8 +6,8 @@
 /*----------------------------------------------------------------------------*/
 
 #include "HAL/PDP.h"
+
 #include "ctre/PDP.h"
-// static PDP pdp;
 
 static const int NUM_MODULE_NUMBERS = 63;
 

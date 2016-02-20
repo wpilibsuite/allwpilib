@@ -8,10 +8,11 @@
 #pragma once
 
 #include <stdlib.h>
+
 #include <memory>
 #include <sstream>
+
 #include "ErrorBase.h"
-#include "HAL/HAL.h"
 #include "MotorSafety.h"
 #include "MotorSafetyHelper.h"
 

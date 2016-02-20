@@ -8,6 +8,7 @@
 #include "ControllerPower.h"
 
 #include <stdint.h>
+
 #include "ErrorBase.h"
 #include "HAL/HAL.h"
 #include "HAL/Power.h"

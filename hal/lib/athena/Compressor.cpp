@@ -6,7 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "HAL/Compressor.h"
+
 #include <iostream>
+
 #include "ctre/PCM.h"
 
 static const int NUM_MODULE_NUMBERS = 63;

@@ -8,9 +8,11 @@
 #ifndef JOYSTICK_H_
 #define JOYSTICK_H_
 
-#include <cstdint>
+#include <stdint.h>
+
 #include <memory>
 #include <vector>
+
 #include "ErrorBase.h"
 #include "GenericHID.h"
 

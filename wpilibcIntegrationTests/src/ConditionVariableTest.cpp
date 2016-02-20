@@ -5,17 +5,17 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "TestBench.h"
-
-#include "HAL/cpp/priority_condition_variable.h"
-#include "HAL/cpp/priority_mutex.h"
-
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <mutex>
 #include <thread>
+
 #include "gtest/gtest.h"
+
+#include "HAL/cpp/priority_condition_variable.h"
+#include "HAL/cpp/priority_mutex.h"
+#include "TestBench.h"
 
 namespace wpilib {
 namespace testing {

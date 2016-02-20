@@ -3,6 +3,8 @@
  */
 
 #include "Compressor.h"
+
+#include "HAL/HAL.h"
 #include "WPIErrors.h"
 
 /**

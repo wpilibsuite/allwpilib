@@ -6,11 +6,12 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Relay.h"
-#include <DigitalInput.h>
-#include <Relay.h>
-#include <Timer.h>
-#include "TestBench.h"
+
 #include "gtest/gtest.h"
+
+#include "DigitalInput.h"
+#include "TestBench.h"
+#include "Timer.h"
 
 static const double kDelayTime = 0.01;
 

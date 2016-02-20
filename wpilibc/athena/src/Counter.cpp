@@ -6,8 +6,10 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Counter.h"
+
 #include "AnalogTrigger.h"
 #include "DigitalInput.h"
+#include "HAL/HAL.h"
 #include "Resource.h"
 #include "WPIErrors.h"
 

@@ -7,9 +7,9 @@
 
 #include "Error.h"
 
-#include <stdint.h>
-#include <cstdlib>
-#include <cstring>
+#include <stdlib.h>
+#include <string.h>
+
 #include <iostream>
 #include <sstream>
 

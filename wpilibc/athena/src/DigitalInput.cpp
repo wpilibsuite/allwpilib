@@ -6,12 +6,14 @@
 /*----------------------------------------------------------------------------*/
 
 #include "DigitalInput.h"
-#include "LiveWindow/LiveWindow.h"
-#include "Resource.h"
-#include "WPIErrors.h"
 
 #include <limits>
 #include <sstream>
+
+#include "HAL/HAL.h"
+#include "LiveWindow/LiveWindow.h"
+#include "Resource.h"
+#include "WPIErrors.h"
 
 /**
  * Create an instance of a Digital Input class.

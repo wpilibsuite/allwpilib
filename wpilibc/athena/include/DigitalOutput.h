@@ -7,11 +7,11 @@
 
 #pragma once
 
+#include <memory>
+
 #include "DigitalSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITableListener.h"
-
-#include <memory>
 
 /**
  * Class to write to digital outputs.

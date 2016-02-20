@@ -9,9 +9,9 @@
 
 #include <string>
 #include <thread>
-#include "HAL/cpp/priority_mutex.h"
 
 #include "ErrorBase.h"
+#include "HAL/cpp/priority_mutex.h"
 #include "Vision/ColorImage.h"
 #include "Vision/HSLImage.h"
 #include "nivision.h"

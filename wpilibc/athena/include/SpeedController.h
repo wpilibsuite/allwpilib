@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "HAL/HAL.h"
 #include "PIDOutput.h"
 
 /**

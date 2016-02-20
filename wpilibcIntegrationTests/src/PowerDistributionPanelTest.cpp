@@ -5,13 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <Jaguar.h>
-#include <PowerDistributionPanel.h>
-#include <Talon.h>
-#include <Timer.h>
-#include <Victor.h>
-#include "TestBench.h"
+#include "PowerDistributionPanel.h"
+
 #include "gtest/gtest.h"
+
+#include "Jaguar.h"
+#include "Talon.h"
+#include "TestBench.h"
+#include "Timer.h"
+#include "Victor.h"
 
 static const double kMotorTime = 0.25;
 

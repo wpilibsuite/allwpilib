@@ -7,10 +7,10 @@
 
 #pragma once
 
+#include <set>
+
 #include "ErrorBase.h"
 #include "HAL/cpp/priority_mutex.h"
-
-#include <set>
 
 class MotorSafety;
 

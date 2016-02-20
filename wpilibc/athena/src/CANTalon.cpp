@@ -6,8 +6,12 @@
 /*----------------------------------------------------------------------------*/
 
 #include "CANTalon.h"
+
 #include <unistd.h>  // usleep
+
 #include <sstream>
+
+#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
 

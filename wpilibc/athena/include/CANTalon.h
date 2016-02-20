@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "CANSpeedController.h"
 #include "HAL/CanTalonSRX.h"
 #include "LiveWindow/LiveWindowSendable.h"
@@ -16,8 +18,6 @@
 #include "PIDSource.h"
 #include "SafePWM.h"
 #include "tables/ITable.h"
-
-#include <memory>
 
 /**
  * CTRE Talon SRX Speed Controller with CAN Control

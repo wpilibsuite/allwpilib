@@ -7,6 +7,7 @@
 
 #include "Victor.h"
 
+#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 
 /**

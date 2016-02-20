@@ -6,10 +6,11 @@
 /*----------------------------------------------------------------------------*/
 
 #include "SPI.h"
-#include "HAL/HAL.h"
-#include "WPIErrors.h"
 
 #include <string.h>
+
+#include "HAL/HAL.h"
+#include "WPIErrors.h"
 
 /**
  * Constructor

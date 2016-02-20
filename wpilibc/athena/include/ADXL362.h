@@ -7,12 +7,12 @@
 
 #pragma once
 
+#include <memory>
+
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SPI.h"
 #include "SensorBase.h"
 #include "interfaces/Accelerometer.h"
-
-#include <memory>
 
 class DigitalInput;
 class DigitalOutput;

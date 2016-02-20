@@ -5,12 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "DigitalGlitchFilter.h"
+
 #include <algorithm>
 #include <array>
 
 #include "Counter.h"
-#include "DigitalGlitchFilter.h"
 #include "Encoder.h"
+#include "HAL/HAL.h"
 #include "Resource.h"
 #include "Utility.h"
 #include "WPIErrors.h"

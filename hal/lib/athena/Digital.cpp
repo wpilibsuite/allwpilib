@@ -5,22 +5,23 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <math.h>
+#include <stdio.h>
+
+#include <mutex>
+
+#include "ChipObject.h"
+#include "FRC_NetworkCommunication/LoadOut.h"
 #include "HAL/Counter.h"
 #include "HAL/DIO.h"
 #include "HAL/Encoder.h"
+#include "HAL/HAL.h"
 #include "HAL/I2C.h"
 #include "HAL/PWM.h"
+#include "HAL/Port.h"
 #include "HAL/Relay.h"
 #include "HAL/SPI.h"
 #include "HAL/SPIAccumulator.h"
-
-#include <math.h>
-#include <stdio.h>
-#include <mutex>
-#include "ChipObject.h"
-#include "FRC_NetworkCommunication/LoadOut.h"
-#include "HAL/HAL.h"
-#include "HAL/Port.h"
 #include "HAL/cpp/Resource.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "i2clib/i2c-lib.h"

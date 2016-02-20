@@ -6,11 +6,15 @@
 /*----------------------------------------------------------------------------*/
 
 #include "AnalogGyro.h"
-#include <climits>
+
+#include <limits.h>
+
 #include "AnalogInput.h"
+#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 #include "WPIErrors.h"
+
 const uint32_t AnalogGyro::kOversampleBits;
 const uint32_t AnalogGyro::kAverageBits;
 constexpr float AnalogGyro::kSamplesPerSecond;

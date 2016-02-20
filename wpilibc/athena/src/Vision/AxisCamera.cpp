@@ -7,17 +7,18 @@
 
 #include "Vision/AxisCamera.h"
 
-#include "WPIErrors.h"
-
-#include <Timer.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <cstring>
+
 #include <iostream>
 #include <sstream>
+
+#include "Timer.h"
+#include "WPIErrors.h"
 
 static const unsigned int kMaxPacketSize = 1536;
 static const unsigned int kImageBufferAllocationIncrement = 1000;

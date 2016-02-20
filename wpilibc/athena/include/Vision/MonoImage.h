@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include "ImageBase.h"
-
 #include <vector>
+
+#include "ImageBase.h"
 
 class MonoImage : public ImageBase {
  public:

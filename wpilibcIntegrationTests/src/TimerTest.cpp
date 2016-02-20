@@ -5,9 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <Timer.h>
-#include "TestBench.h"
+#include "Timer.h"
+
 #include "gtest/gtest.h"
+
+#include "TestBench.h"
 
 static const double kWaitTime = 0.5;
 

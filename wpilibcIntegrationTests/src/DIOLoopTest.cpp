@@ -5,13 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <Counter.h>
-#include <DigitalInput.h>
-#include <DigitalOutput.h>
-#include <InterruptableSensorBase.h>
-#include <Timer.h>
-#include "TestBench.h"
+#include "DigitalInput.h"
+#include "DigitalOutput.h"
+
 #include "gtest/gtest.h"
+
+#include "Counter.h"
+#include "InterruptableSensorBase.h"
+#include "TestBench.h"
+#include "Timer.h"
 
 static const double kCounterTime = 0.001;
 

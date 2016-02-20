@@ -7,10 +7,10 @@
 
 #pragma once
 
+#include <memory>
+
 #include "SafePWM.h"
 #include "SpeedController.h"
-
-#include <memory>
 
 /**
  * Standard hobby style servo.

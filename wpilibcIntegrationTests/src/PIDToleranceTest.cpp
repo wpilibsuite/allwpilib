@@ -5,12 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <Timer.h>
+#include "gtest/gtest.h"
+
 #include "PIDController.h"
 #include "PIDOutput.h"
 #include "PIDSource.h"
 #include "TestBench.h"
-#include "gtest/gtest.h"
+#include "Timer.h"
 
 class PIDToleranceTest : public testing::Test {
  protected:

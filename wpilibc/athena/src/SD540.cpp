@@ -7,6 +7,7 @@
 
 #include "SD540.h"
 
+#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 
 /**

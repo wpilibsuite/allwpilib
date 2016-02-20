@@ -9,6 +9,7 @@
 
 #include <math.h>
 #include "GenericHID.h"
+#include "HAL/HAL.h"
 #include "Joystick.h"
 #include "Talon.h"
 #include "Utility.h"

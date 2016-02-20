@@ -5,9 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <CircularBuffer.h>
-#include <array>
+#include "CircularBuffer.h"
+
 #include "gtest/gtest.h"
+
+#include <array>
 
 static const std::array<double, 10> values = {
     751.848, 766.366, 342.657, 234.252, 716.126,

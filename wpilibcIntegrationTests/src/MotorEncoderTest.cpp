@@ -5,14 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <Encoder.h>
-#include <Jaguar.h>
-#include <PIDController.h>
-#include <Talon.h>
-#include <Timer.h>
-#include <Victor.h>
-#include "TestBench.h"
 #include "gtest/gtest.h"
+
+#include "Encoder.h"
+#include "Jaguar.h"
+#include "PIDController.h"
+#include "Talon.h"
+#include "TestBench.h"
+#include "Timer.h"
+#include "Victor.h"
 
 enum MotorEncoderTestType { TEST_VICTOR, TEST_JAGUAR, TEST_TALON };
 

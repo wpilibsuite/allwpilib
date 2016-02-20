@@ -8,6 +8,7 @@
 #pragma once
 
 #include "DigitalSource.h"
+#include "HAL/AnalogTrigger.h"
 
 class AnalogTrigger;
 

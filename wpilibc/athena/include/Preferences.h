@@ -10,6 +10,7 @@
 #include <map>
 #include <string>
 #include <vector>
+
 #include "ErrorBase.h"
 #include "HAL/cpp/Semaphore.h"
 #include "Task.h"

@@ -5,9 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <BuiltInAccelerometer.h>
-#include <Timer.h>
+#include "BuiltInAccelerometer.h"
+
 #include "gtest/gtest.h"
+
+#include "Timer.h"
 
 static constexpr double kAccelerationTolerance = 0.1;
 /**

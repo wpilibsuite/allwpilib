@@ -6,9 +6,12 @@
 /*----------------------------------------------------------------------------*/
 
 #include "HAL/Notifier.h"
+
+#include <stdlib.h>
+
 #include <atomic>
-#include <cstdlib>
 #include <mutex>
+
 #include "ChipObject.h"
 #include "HAL/HAL.h"
 #include "HAL/cpp/priority_mutex.h"

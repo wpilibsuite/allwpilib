@@ -6,13 +6,15 @@
 /*----------------------------------------------------------------------------*/
 
 #include "ErrorBase.h"
-#define WPI_ERRORS_DEFINE_STRINGS
-#include "WPIErrors.h"
 
 #include <errno.h>
-#include <cstdio>
-#include <cstring>
+#include <stdio.h>
+#include <string.h>
+
 #include <sstream>
+
+#define WPI_ERRORS_DEFINE_STRINGS
+#include "WPIErrors.h"
 
 priority_mutex ErrorBase::_globalErrorMutex;
 Error ErrorBase::_globalError;

@@ -7,10 +7,10 @@
 
 #pragma once
 
+#include <errno.h>
 #include <stdint.h>
 
 #include <iostream>
-#include "errno.h"
 
 extern "C" {
 typedef void (*InterruptHandlerFunction)(uint32_t interruptAssertedMask,

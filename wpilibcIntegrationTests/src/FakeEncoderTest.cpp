@@ -5,13 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <AnalogOutput.h>
-#include <AnalogTrigger.h>
-#include <DigitalOutput.h>
-#include <Encoder.h>
-#include <Timer.h>
-#include "TestBench.h"
+#include "Encoder.h"
+
 #include "gtest/gtest.h"
+
+#include "AnalogOutput.h"
+#include "AnalogTrigger.h"
+#include "DigitalOutput.h"
+#include "TestBench.h"
+#include "Timer.h"
 
 static const double kDelayTime = 0.001;
 

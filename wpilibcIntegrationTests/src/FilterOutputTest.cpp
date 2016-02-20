@@ -5,17 +5,18 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <cmath>
+#include "Filters/LinearDigitalFilter.h"
+
+#include <math.h>
 #include <functional>
 #include <memory>
 #include <random>
 #include <thread>
 
-#include <Filters/LinearDigitalFilter.h>
+#include "gtest/gtest.h"
 
 #include "Base.h"
 #include "TestBench.h"
-#include "gtest/gtest.h"
 
 enum FilterOutputTestType { TEST_SINGLE_POLE_IIR, TEST_HIGH_PASS, TEST_MOVAVG };
 

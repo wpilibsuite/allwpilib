@@ -7,11 +7,16 @@
 
 #pragma once
 
+#include <atomic>
+#include <memory>
+#include <sstream>
+#include <utility>
+
 #include "CAN/can_proto.h"
 #include "CANSpeedController.h"
 #include "ErrorBase.h"
-#include "HAL/HAL.h"
 #include "HAL/cpp/Semaphore.h"
+#include "HAL/cpp/priority_mutex.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "MotorSafety.h"
 #include "MotorSafetyHelper.h"
@@ -19,12 +24,6 @@
 #include "PIDOutput.h"
 #include "Resource.h"
 #include "tables/ITableListener.h"
-
-#include <atomic>
-#include <memory>
-#include <sstream>
-#include <utility>
-#include "HAL/cpp/priority_mutex.h"
 
 /**
  * Luminary Micro / Vex Robotics Jaguar Speed Control

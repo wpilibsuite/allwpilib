@@ -6,13 +6,17 @@
 /*----------------------------------------------------------------------------*/
 
 #include "CANJaguar.h"
-#include "Timer.h"
-#define tNIRIO_i32 int
-#include <cassert>
-#include <cstdio>
+
+#include <assert.h>
+#include <stdio.h>
+
+#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 #include "NetworkCommunication/CANSessionMux.h"
+#include "Timer.h"
 #include "WPIErrors.h"
+
+#define tNIRIO_i32 int
 
 /* we are on ARM-LE now, not Freescale so no need to swap */
 #define swap16(x) (x)

@@ -9,8 +9,7 @@
 
 #include <atomic>
 #include <condition_variable>
-#include <memory>
-#include "HAL/HAL.h"
+
 #include "HAL/cpp/Semaphore.h"
 #include "HAL/cpp/priority_condition_variable.h"
 #include "HAL/cpp/priority_mutex.h"

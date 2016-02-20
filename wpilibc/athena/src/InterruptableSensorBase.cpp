@@ -6,6 +6,8 @@
 /*----------------------------------------------------------------------------*/
 
 #include "InterruptableSensorBase.h"
+
+#include "HAL/HAL.h"
 #include "Utility.h"
 #include "WPIErrors.h"
 
