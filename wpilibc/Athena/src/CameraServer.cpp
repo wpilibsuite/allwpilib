@@ -189,15 +189,25 @@ void CameraServer::Serve() {
     }
 
     Request req;
-    if (read(conn, &req, sizeof(req)) == -1) {
+    char reqBuf[sizeof(req)];
+    size_t reqPos = 0;
+
+    while (reqPos < sizeof(req)) {
+      ssize_t sizeRead = read(conn, &reqBuf[reqPos], sizeof(req) - reqPos);
+      if (sizeRead < 0) break;
+      reqPos += sizeRead;
+    }
+
+    if (reqPos < sizeof(req)) {
       wpi_setErrnoError();
       close(conn);
       continue;
-    } else {
-      req.fps = ntohl(req.fps);
-      req.compression = ntohl(req.compression);
-      req.size = ntohl(req.size);
     }
+
+    memcpy(&req, reqBuf, sizeof(req));
+    req.fps = ntohl(req.fps);
+    req.compression = ntohl(req.compression);
+    req.size = ntohl(req.size);
 
     // TODO: Support the SW Compression. The rest of the code below will work as
     // though this
