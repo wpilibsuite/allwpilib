@@ -35,7 +35,7 @@ public abstract class AbstractCANTest extends AbstractComsSetup {
   public static final double kLimitSettlingTime = 20.0; // timeout in seconds
   public static final double kStartupTime = 0.50;
   public static final double kEncoderPositionTolerance = .75;
-  public static final double kPotentiometerPositionTolerance = 10.0 / 360.0; // +/-10
+  public static final double kPotentiometerPositionTolerance = 0.2; // +/-10
                                                                              // degrees
   public static final double kCurrentTolerance = 0.1;
 

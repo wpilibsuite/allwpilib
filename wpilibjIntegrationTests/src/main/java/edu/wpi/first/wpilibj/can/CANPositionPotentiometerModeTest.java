@@ -139,7 +139,6 @@ public class CANPositionPotentiometerModeTest extends AbstractCANTest {
         new RunnableAssert("Waiting for potentiometer position to be correct") {
           @Override
           public void run() throws Exception {
-            getME().getMotor().set(0);
             assertEquals(
                 "CAN Jaguar should have returned the potentiometer position set by the analog output",
                 getME().getFakePot().getVoltage(), getME().getMotor().getPosition() * 3,
