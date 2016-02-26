@@ -89,7 +89,7 @@ public class PCMTest extends AbstractComsSetup {
    */
   @Test
   public void testPressureSwitch() throws Exception {
-    double range = 0.1;
+    double range = 0.5;
     reset();
     compressor.setClosedLoopControl(true);
 

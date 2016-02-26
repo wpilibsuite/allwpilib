@@ -71,13 +71,13 @@ TEST_F(PCMTest, PressureSwitch) {
   // Turn on the compressor
   m_fakePressureSwitch->Set(true);
   Wait(kCompressorDelayTime);
-  EXPECT_NEAR(kCompressorOnVoltage, m_fakeCompressor->GetVoltage(), 0.1)
+  EXPECT_NEAR(kCompressorOnVoltage, m_fakeCompressor->GetVoltage(), 0.5)
       << "Compressor did not turn on when the pressure switch turned on.";
 
   // Turn off the compressor
   m_fakePressureSwitch->Set(false);
   Wait(kCompressorDelayTime);
-  EXPECT_NEAR(kCompressorOffVoltage, m_fakeCompressor->GetVoltage(), 0.1)
+  EXPECT_NEAR(kCompressorOffVoltage, m_fakeCompressor->GetVoltage(), 0.5)
       << "Compressor did not turn off when the pressure switch turned off.";
 }
 
