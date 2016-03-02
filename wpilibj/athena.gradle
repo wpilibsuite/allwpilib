@@ -70,18 +70,20 @@ publishing {
 
 jar {
     dependsOn { classes }
-    def addClasspath = { classpath ->
-        classpath.files.findAll { it.exists() }.each {
-            if (file(it).directory) {
-                from it
-            } else {
-                from zipTree(it.path)
+
+    doFirst {
+        def addClasspath = { classpath ->
+            classpath.files.findAll { it.exists() }.each {
+                if (file(it).directory) {
+                    from it
+                } else {
+                    from zipTree(it.path)
+                }
             }
         }
+        addClasspath sourceSets.athena.runtimeClasspath
+        addClasspath sourceSets.shared.runtimeClasspath
     }
-
-    addClasspath sourceSets.shared.runtimeClasspath
-    addClasspath sourceSets.athena.runtimeClasspath
 
     binaries.withType(SharedLibraryBinarySpec) {
         from(file(it.sharedLibraryFile)) {
