@@ -69,7 +69,7 @@ ADXRS450_Gyro::ADXRS450_Gyro(SPI::Port port) : m_spi(port) {
     return;
   }
 
-  m_spi.InitAccumulator(kSamplePeriod, 0x20000000u, 4, 0x0c000000u, 0x04000000u,
+  m_spi.InitAccumulator(kSamplePeriod, 0x20000000u, 4, 0x0c00000eu, 0x04000000u,
                         10u, 16u, true, true);
 
   Calibrate();
