@@ -67,6 +67,7 @@ void Gyro::Callback(const msgs::ConstStringPtr& msg) {
   std::string command = msg->data();
   if (command == "reset") {
     zero = GetAngle();
+    gzmsg << "resetting gyro on port " << topic << std::endl;
   } else {
     gzerr << "WARNING: Gyro got unknown command '" << command << "'."
           << std::endl;
@@ -75,9 +76,9 @@ void Gyro::Callback(const msgs::ConstStringPtr& msg) {
 
 double Gyro::GetAngle() {
   if (radians) {
-    return link->GetWorldCoGPose().rot.GetAsEuler()[axis];
+    return link->GetRelativePose().rot.GetAsEuler()[axis];
   } else {
-    return link->GetWorldCoGPose().rot.GetAsEuler()[axis] * (180.0 / M_PI);
+    return link->GetRelativePose().rot.GetAsEuler()[axis] * (180.0 / M_PI);
   }
 }
 
