@@ -206,7 +206,10 @@ bool Joystick::GetRawButton(uint32_t button) const {
 }
 
 /**
- * Get the state of a POV on the joystick.
+ * Get the angle in degrees of a POV on the joystick.
+ *
+ * The POV angles start at 0 in the up direction, and increase
+ * clockwise (eg right is 90, upper-left is 315).
  *
  * @param pov The index of the POV to read (starting at 0)
  * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
