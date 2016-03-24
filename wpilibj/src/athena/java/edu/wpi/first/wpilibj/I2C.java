@@ -73,7 +73,7 @@ public class I2C extends SensorBase {
    */
   public synchronized boolean transaction(byte[] dataToSend, int sendSize, byte[] dataReceived,
       int receiveSize) {
-    boolean aborted = true;
+    int status = -1;
 
     ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(sendSize);
     if (sendSize > 0 && dataToSend != null) {
@@ -81,13 +81,13 @@ public class I2C extends SensorBase {
     }
     ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(receiveSize);
 
-    aborted =
+    status =
         I2CJNI.i2CTransaction((byte) m_port.getValue(), (byte) m_deviceAddress, dataToSendBuffer,
-            (byte) sendSize, dataReceivedBuffer, (byte) receiveSize) != 0;
+            (byte) sendSize, dataReceivedBuffer, (byte) receiveSize);
     if (receiveSize > 0 && dataReceived != null) {
       dataReceivedBuffer.get(dataReceived);
     }
-    return aborted;
+    return status < receiveSize;
   }
 
   /**
@@ -117,7 +117,7 @@ public class I2C extends SensorBase {
     if (dataReceived.capacity() < receiveSize)
       throw new IllegalArgumentException("dataReceived is too small, must be at least " + receiveSize);
 
-    return I2CJNI.i2CTransaction((byte) m_port.getValue(), (byte) m_deviceAddress, dataToSend, (byte) sendSize, dataReceived, (byte) receiveSize) != 0;
+    return I2CJNI.i2CTransaction((byte) m_port.getValue(), (byte) m_deviceAddress, dataToSend, (byte) sendSize, dataReceived, (byte) receiveSize) < receiveSize;
   }
 
   /**
@@ -151,7 +151,7 @@ public class I2C extends SensorBase {
     dataToSendBuffer.put(buffer);
 
     return I2CJNI.i2CWrite((byte) m_port.getValue(), (byte) m_deviceAddress, dataToSendBuffer,
-        (byte) buffer.length) < 0;
+        (byte) buffer.length) < buffer.length;
   }
 
   /**
@@ -167,7 +167,7 @@ public class I2C extends SensorBase {
     dataToSendBuffer.put(data);
 
     return I2CJNI.i2CWrite((byte) m_port.getValue(), (byte) m_deviceAddress, dataToSendBuffer,
-        (byte) data.length) < 0;
+        (byte) data.length) < data.length;
   }
 
   /**
@@ -186,7 +186,7 @@ public class I2C extends SensorBase {
       throw new IllegalArgumentException("buffer is too small, must be at least " + size);
 
     return I2CJNI.i2CWrite((byte) m_port.getValue(), (byte) m_deviceAddress, data,
-        (byte) size) < 0;
+        (byte) size) < size;
   }
 
   /**
@@ -274,7 +274,7 @@ public class I2C extends SensorBase {
         I2CJNI.i2CRead((byte) m_port.getValue(), (byte) m_deviceAddress, dataReceivedBuffer,
             (byte) count);
     dataReceivedBuffer.get(buffer);
-    return retVal < 0;
+    return retVal < count;
   }
 
   /**
@@ -300,7 +300,7 @@ public class I2C extends SensorBase {
       throw new IllegalArgumentException("buffer is too small, must be at least " + count);
 
     return I2CJNI.i2CRead((byte) m_port.getValue(), (byte) m_deviceAddress, buffer,
-            (byte) count) < 0;
+            (byte) count) < count;
   }
 
   /**

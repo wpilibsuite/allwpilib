@@ -1793,7 +1793,7 @@ void i2CInitialize(uint8_t port, int32_t *status) {
  * @param sendSize Number of bytes to send as part of the transaction.
  * @param dataReceived Buffer to read data into.
  * @param receiveSize Number of bytes to read from the device.
- * @return Transfer Aborted... false for success, true for aborted.
+ * @return The number of bytes read (>= 0) or -1 on transfer abort.
  */
 int32_t i2CTransaction(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived, uint8_t receiveSize)
 {
@@ -1819,7 +1819,7 @@ int32_t i2CTransaction(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend,
  *
  * @param registerAddress The address of the register on the device to be written.
  * @param data The byte to write to the register on the device.
- * @return Transfer Aborted... false for success, true for aborted.
+ * @return The number of bytes written (>= 0) or -1 on transfer abort.
  */
 int32_t i2CWrite(uint8_t port, uint8_t deviceAddress, uint8_t* dataToSend, uint8_t sendSize)
 {
@@ -1846,7 +1846,7 @@ int32_t i2CWrite(uint8_t port, uint8_t deviceAddress, uint8_t* dataToSend, uint8
  * @param registerAddress The register to read first in the transaction.
  * @param count The number of bytes to read in the transaction.
  * @param buffer A pointer to the array of bytes to store the data read from the device.
- * @return Transfer Aborted... false for success, true for aborted.
+ * @return The number of bytes read (>= 0) or -1 on transfer abort.
  */
 int32_t i2CRead(uint8_t port, uint8_t deviceAddress, uint8_t *buffer, uint8_t count)
 {
