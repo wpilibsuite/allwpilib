@@ -23,7 +23,7 @@ public class NetworkTable implements ITable, IRemote {
   private static boolean client = false;
   private static boolean running = false;
   private static int port = DEFAULT_PORT;
-  private static String ipAddress = "";
+  private static String[] ipAddresses = new String[0];
   private static String persistentFilename = "networktables.ini";
 
   private synchronized static void checkInit() {
@@ -38,9 +38,12 @@ public class NetworkTable implements ITable, IRemote {
   public synchronized static void initialize() {
     if (running)
       shutdown();
-    if (client)
-      NetworkTablesJNI.startClient(ipAddress, port);
-    else
+    if (client) {
+      int[] ports = new int[ipAddresses.length];
+      for (int i=0; i<ipAddresses.length; i++)
+        ports[i] = port;
+      NetworkTablesJNI.startClient(ipAddresses, ports);
+    } else
       NetworkTablesJNI.startServer(persistentFilename, "", port);
     running = true;
   }
@@ -95,10 +98,31 @@ public class NetworkTable implements ITable, IRemote {
    * mode
    */
   public synchronized static void setIPAddress(final String address) {
-    if (ipAddress.equals(address))
+    if (ipAddresses.length == 1 && ipAddresses[0].equals(address))
       return;
     checkInit();
-    ipAddress = address;
+    ipAddresses = new String[1];
+    ipAddresses[0] = address;
+  }
+
+  /**
+   * @param addresses the adresses that network tables will connect to in
+   * client mode (in round robin order)
+   */
+  public synchronized static void setIPAddress(final String[] addresses) {
+    if (ipAddresses.length == addresses.length) {
+      boolean match = true;
+      for (int i=0; i<addresses.length; i++) {
+        if (!ipAddresses[i].equals(addresses[i])) {
+          match = false;
+          break;
+        }
+      }
+      if (match)
+        return;
+    }
+    checkInit();
+    ipAddresses = addresses;
   }
 
   /**

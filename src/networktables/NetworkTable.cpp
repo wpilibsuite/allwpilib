@@ -11,7 +11,7 @@
 using llvm::StringRef;
 
 const char NetworkTable::PATH_SEPARATOR_CHAR = '/';
-std::string NetworkTable::s_ip_address;
+std::vector<std::string> NetworkTable::s_ip_addresses;
 std::string NetworkTable::s_persistent_filename = "networktables.ini";
 bool NetworkTable::s_client = false;
 bool NetworkTable::s_running = false;
@@ -19,9 +19,13 @@ unsigned int NetworkTable::s_port = NT_DEFAULT_PORT;
 
 void NetworkTable::Initialize() {
   if (s_running) Shutdown();
-  if (s_client)
-    nt::StartClient(s_ip_address.c_str(), s_port);
-  else
+  if (s_client) {
+    std::vector<std::pair<StringRef, unsigned int>> servers;
+    servers.reserve(s_ip_addresses.size());
+    for (const auto& ip_address : s_ip_addresses)
+      servers.emplace_back(std::make_pair(ip_address, s_port));
+    nt::StartClient(servers);
+  } else
     nt::StartServer(s_persistent_filename, "", s_port);
   s_running = true;
 }
@@ -50,7 +54,14 @@ void NetworkTable::SetTeam(int team) {
   SetIPAddress(tmp);
 }
 
-void NetworkTable::SetIPAddress(StringRef address) { s_ip_address = address; }
+void NetworkTable::SetIPAddress(StringRef address) {
+  s_ip_addresses.clear();
+  s_ip_addresses.emplace_back(address);
+}
+
+void NetworkTable::SetIPAddress(llvm::ArrayRef<std::string> addresses) {
+  s_ip_addresses = addresses;
+}
 
 void NetworkTable::SetPort(unsigned int port) { s_port = port; }
 

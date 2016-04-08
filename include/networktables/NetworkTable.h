@@ -26,7 +26,7 @@ class NetworkTable : public ITable {
   typedef std::pair<ITableListener*, unsigned int> Listener;
   std::vector<Listener> m_listeners;
 
-  static std::string s_ip_address;
+  static std::vector<std::string> s_ip_addresses;
   static std::string s_persistent_filename;
   static bool s_client;
   static bool s_running;
@@ -73,6 +73,12 @@ class NetworkTable : public ITable {
    * mode
    */
   static void SetIPAddress(llvm::StringRef address);
+
+  /**
+   * @param addresses the addresses that network tables will connect to in
+   * client mode (in round robin order)
+   */
+  static void SetIPAddress(llvm::ArrayRef<std::string> addresses);
 
   /**
    * @param port the port number that network tables will connect to in client

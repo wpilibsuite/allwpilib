@@ -345,6 +345,15 @@ void NT_StartClient(const char *server_name, unsigned int port) {
   nt::StartClient(server_name, port);
 }
 
+void NT_StartClientMulti(size_t count, const char **server_names,
+                         const unsigned int *ports) {
+  std::vector<std::pair<StringRef, unsigned int>> servers;
+  servers.reserve(count);
+  for (size_t i=0; i<count; ++i)
+    servers.emplace_back(std::make_pair(server_names[i], ports[i]));
+  nt::StartClient(servers);
+}
+
 void NT_StopClient(void) {
   nt::StopClient();
 }

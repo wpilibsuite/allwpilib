@@ -239,6 +239,10 @@ void StartClient(const char *server_name, unsigned int port) {
   Dispatcher::GetInstance().StartClient(server_name, port);
 }
 
+void StartClient(ArrayRef<std::pair<StringRef, unsigned int>> servers) {
+  Dispatcher::GetInstance().StartClient(servers);
+}
+
 void StopClient() {
   Dispatcher::GetInstance().Stop();
 }

@@ -353,6 +353,19 @@ void NT_StopServer(void);
  */
 void NT_StartClient(const char *server_name, unsigned int port);
 
+/** Starts Client
+ * Starts a client using the specified (server, port) combinations.  The
+ * client will attempt to connect to each server in round robin fashion.
+ *
+ * @param count        length of the server_names and ports arrays
+ * @param server_names array of server names (each a UTF-8 string, null
+ *                     terminated)
+ * @param ports        array of ports to communicate over (one for each server)
+ *
+ */
+void NT_StartClientMulti(size_t count, const char **server_names,
+                         const unsigned int *ports);
+
 /** Stop Client
  * Stops the client if it is running.
  */

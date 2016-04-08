@@ -234,6 +234,7 @@ void StartServer(StringRef persist_filename, const char* listen_address,
                  unsigned int port);
 void StopServer();
 void StartClient(const char* server_name, unsigned int port);
+void StartClient(ArrayRef<std::pair<StringRef, unsigned int>> servers);
 void StopClient();
 void StopRpcServer();
 void StopNotifier();

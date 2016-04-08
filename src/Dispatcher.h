@@ -32,11 +32,14 @@ namespace nt {
 class DispatcherBase {
   friend class DispatcherTest;
  public:
+  typedef std::function<std::unique_ptr<NetworkStream>()> Connector;
+
   virtual ~DispatcherBase();
 
   void StartServer(StringRef persist_filename,
                    std::unique_ptr<NetworkAcceptor> acceptor);
-  void StartClient(std::function<std::unique_ptr<NetworkStream>()> connect);
+  void StartClient(Connector connector);
+  void StartClient(std::vector<Connector>&& connectors);
   void Stop();
   void SetUpdateRate(double interval);
   void SetIdentity(llvm::StringRef name);
@@ -55,8 +58,7 @@ class DispatcherBase {
  private:
   void DispatchThreadMain();
   void ServerThreadMain();
-  void ClientThreadMain(
-      std::function<std::unique_ptr<NetworkStream>()> connect);
+  void ClientThreadMain();
 
   bool ClientHandshake(
       NetworkConnection& conn,
@@ -80,6 +82,7 @@ class DispatcherBase {
   std::thread m_clientserver_thread;
 
   std::unique_ptr<NetworkAcceptor> m_server_acceptor;
+  std::vector<Connector> m_client_connectors;
 
   // Mutex for user-accessible items
   mutable std::mutex m_user_mutex;
@@ -112,6 +115,7 @@ class Dispatcher : public DispatcherBase {
   void StartServer(StringRef persist_filename, const char* listen_address,
                    unsigned int port);
   void StartClient(const char* server_name, unsigned int port);
+  void StartClient(ArrayRef<std::pair<StringRef, unsigned int>> servers);
 
  private:
   Dispatcher();

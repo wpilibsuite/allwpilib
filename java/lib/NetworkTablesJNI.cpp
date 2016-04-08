@@ -25,6 +25,7 @@ static jclass connectionInfoCls = nullptr;
 static jclass entryInfoCls = nullptr;
 static jclass keyNotDefinedEx = nullptr;
 static jclass persistentEx = nullptr;
+static jclass illegalArgEx = nullptr;
 // Thread-attached environment for listener callbacks.
 static JNIEnv *listenerEnv = nullptr;
 
@@ -102,6 +103,12 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   if (!persistentEx) return JNI_ERR;
   env->DeleteLocalRef(local);
 
+  local = env->FindClass("java/lang/IllegalArgumentException");
+  if (!local) return JNI_ERR;
+  illegalArgEx = static_cast<jclass>(env->NewGlobalRef(local));
+  if (!illegalArgEx) return JNI_ERR;
+  env->DeleteLocalRef(local);
+
   // Initial configuration of listener start/exit
   nt::SetListenerOnStart(ListenerOnStart);
   nt::SetListenerOnExit(ListenerOnExit);
@@ -121,6 +128,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
   if (entryInfoCls) env->DeleteGlobalRef(entryInfoCls);
   if (keyNotDefinedEx) env->DeleteGlobalRef(keyNotDefinedEx);
   if (persistentEx) env->DeleteGlobalRef(persistentEx);
+  if (illegalArgEx) env->DeleteGlobalRef(illegalArgEx);
   jvm = nullptr;
 }
 
@@ -1196,10 +1204,46 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
  * Method:    startClient
  * Signature: (Ljava/lang/String;I)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_startClient
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_startClient__Ljava_lang_String_2I
   (JNIEnv *env, jclass, jstring serverName, jint port)
 {
   nt::StartClient(JavaStringRef(env, serverName).c_str(), port);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
+ * Method:    startClient
+ * Signature: ([Ljava/lang/String;[I)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_startClient___3Ljava_lang_String_2_3I
+  (JNIEnv *env, jclass, jobjectArray serverNames, jintArray ports)
+{
+  int len = env->GetArrayLength(serverNames);
+  if (len != env->GetArrayLength(ports)) {
+    env->ThrowNew(illegalArgEx,
+                  "serverNames and ports arrays must be the same size");
+    return;
+  }
+  jint* portInts = env->GetIntArrayElements(ports, nullptr);
+  if (!portInts) return;
+
+  std::vector<std::string> names;
+  std::vector<std::pair<nt::StringRef, unsigned int>> servers;
+  names.reserve(len);
+  servers.reserve(len);
+  for (int i = 0; i < len; ++i) {
+    JavaLocal<jstring> elem(
+        env, static_cast<jstring>(env->GetObjectArrayElement(serverNames, i)));
+    if (!elem) {
+      env->ThrowNew(illegalArgEx, "null string in serverNames");
+      return;
+    }
+    names.emplace_back(JavaStringRef(env, elem).str());
+    servers.emplace_back(std::make_pair(nt::StringRef(names.back()),
+                                        portInts[i]));
+  }
+  env->ReleaseIntArrayElements(ports, portInts, JNI_ABORT);
+  nt::StartClient(servers);
 }
 
 /*
