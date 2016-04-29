@@ -66,7 +66,7 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
     public double ZAxis;
   }
 
-  private I2C m_i2c;
+  protected I2C m_i2c;
 
   /**
    * Constructs the ADXL345 Accelerometer with I2C address 0x1D.

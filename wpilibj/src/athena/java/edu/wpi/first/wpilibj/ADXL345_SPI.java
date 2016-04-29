@@ -69,7 +69,7 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
     public double ZAxis;
   }
 
-  private SPI m_spi;
+  protected SPI m_spi;
 
   /**
    * Constructor.

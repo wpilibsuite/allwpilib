@@ -22,18 +22,19 @@ constexpr double ADXL345_SPI::kGsPerLSB;
  * @param port  The SPI port the accelerometer is attached to
  * @param range The range (+ or -) that the accelerometer will measure
  */
-ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::Range range) : SPI(port) {
-  SetClockRate(500000);
-  SetMSBFirst();
-  SetSampleDataOnFalling();
-  SetClockActiveLow();
-  SetChipSelectActiveHigh();
+ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::Range range)
+    : m_spi(port) {
+  m_spi.SetClockRate(500000);
+  m_spi.SetMSBFirst();
+  m_spi.SetSampleDataOnFalling();
+  m_spi.SetClockActiveLow();
+  m_spi.SetChipSelectActiveHigh();
 
   uint8_t commands[2];
   // Turn on the measurements
   commands[0] = kPowerCtlRegister;
   commands[1] = kPowerCtl_Measure;
-  Transaction(commands, commands, 2);
+  m_spi.Transaction(commands, commands, 2);
 
   SetRange(range);
 
@@ -49,7 +50,7 @@ void ADXL345_SPI::SetRange(Range range) {
   // Specify the data format to read
   commands[0] = kDataFormatRegister;
   commands[1] = kDataFormat_FullRes | (uint8_t)(range & 0x03);
-  Transaction(commands, commands, 2);
+  m_spi.Transaction(commands, commands, 2);
 }
 
 double ADXL345_SPI::GetX() { return GetAcceleration(kAxis_X); }
@@ -69,7 +70,7 @@ double ADXL345_SPI::GetAcceleration(ADXL345_SPI::Axes axis) {
   uint8_t command[3] = {0, 0, 0};
   command[0] =
       (kAddress_Read | kAddress_MultiByte | kDataRegister) + (uint8_t)axis;
-  Transaction(command, buffer, 3);
+  m_spi.Transaction(command, buffer, 3);
 
   // Sensor is little endian... swap bytes
   int16_t rawAccel = buffer[2] << 8 | buffer[1];
@@ -89,7 +90,7 @@ ADXL345_SPI::AllAxes ADXL345_SPI::GetAccelerations() {
 
   // Select the data address.
   dataBuffer[0] = (kAddress_Read | kAddress_MultiByte | kDataRegister);
-  Transaction(dataBuffer, dataBuffer, 7);
+  m_spi.Transaction(dataBuffer, dataBuffer, 7);
 
   for (int32_t i = 0; i < 3; i++) {
     // Sensor is little endian... swap bytes

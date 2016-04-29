@@ -24,9 +24,7 @@ class DigitalOutput;
  * via SPI.
  * This class assumes the sensor is wired in 4-wire SPI mode.
  */
-class ADXL345_SPI : public Accelerometer,
-                    protected SPI,
-                    public LiveWindowSendable {
+class ADXL345_SPI : public Accelerometer, public LiveWindowSendable {
  protected:
   static const uint8_t kPowerCtlRegister = 0x2D;
   static const uint8_t kDataFormatRegister = 0x31;
@@ -77,6 +75,9 @@ class ADXL345_SPI : public Accelerometer,
   virtual std::shared_ptr<ITable> GetTable() const override;
   virtual void StartLiveWindowMode() override {}
   virtual void StopLiveWindowMode() override {}
+
+ protected:
+  SPI m_spi;
 
  private:
   std::shared_ptr<ITable> m_table;
