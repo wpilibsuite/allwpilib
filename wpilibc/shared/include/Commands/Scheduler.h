@@ -26,7 +26,7 @@ class Subsystem;
 
 class Scheduler : public ErrorBase, public NamedSendable {
  public:
-  static Scheduler* GetInstance();
+  static Scheduler& GetInstance();
 
   void AddCommand(Command* command);
   void AddButton(ButtonScheduler* button);

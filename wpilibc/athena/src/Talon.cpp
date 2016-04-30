@@ -35,5 +35,5 @@ Talon::Talon(uint32_t channel) : PWMSpeedController(channel) {
   SetZeroLatch();
 
   HALReport(HALUsageReporting::kResourceType_Talon, GetChannel());
-  LiveWindow::GetInstance()->AddActuator("Talon", GetChannel(), this);
+  LiveWindow::GetInstance().AddActuator("Talon", GetChannel(), this);
 }

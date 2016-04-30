@@ -16,9 +16,9 @@
  * This is a singleton to guarantee that there is only a single instance
  * regardless of how many times GetInstance is called.
  */
-LiveWindow* LiveWindow::GetInstance() {
+LiveWindow& LiveWindow::GetInstance() {
   static LiveWindow instance;
-  return &instance;
+  return instance;
 }
 
 /**
@@ -43,8 +43,8 @@ void LiveWindow::SetEnabled(bool enabled) {
       InitializeLiveWindowComponents();
       m_firstTime = false;
     }
-    m_scheduler->SetEnabled(false);
-    m_scheduler->RemoveAll();
+    m_scheduler.SetEnabled(false);
+    m_scheduler.RemoveAll();
     for (auto& elem : m_components) {
       elem.first->StartLiveWindowMode();
     }
@@ -52,7 +52,7 @@ void LiveWindow::SetEnabled(bool enabled) {
     for (auto& elem : m_components) {
       elem.first->StopLiveWindowMode();
     }
-    m_scheduler->SetEnabled(true);
+    m_scheduler.SetEnabled(true);
   }
   m_enabled = enabled;
   m_statusTable->PutBoolean("LW Enabled", m_enabled);

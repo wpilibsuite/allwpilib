@@ -28,8 +28,8 @@ Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel) {
   int n = sprintf(buffer, "pneumatic/%d/%d", moduleNumber, channel);
   m_impl = new SimContinuousOutput(buffer);
 
-  LiveWindow::GetInstance()->AddActuator("Solenoid", moduleNumber, channel,
-                                         this);
+  LiveWindow::GetInstance().AddActuator("Solenoid", moduleNumber, channel,
+                                        this);
 }
 
 Solenoid::~Solenoid() {

@@ -70,7 +70,7 @@ ADXL362::ADXL362(SPI::Port port, Range range) : m_spi(port) {
 
   HALReport(HALUsageReporting::kResourceType_ADXL362, port);
 
-  LiveWindow::GetInstance()->AddSensor("ADXL362", port, this);
+  LiveWindow::GetInstance().AddSensor("ADXL362", port, this);
 }
 
 void ADXL362::SetRange(Range range) {

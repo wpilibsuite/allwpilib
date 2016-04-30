@@ -38,7 +38,7 @@ Relay::Relay(uint32_t channel, Relay::Direction direction)
                                         // (targetting the different halves of a
                                         // relay) to be combined to control one
                                         // motor.
-  LiveWindow::GetInstance()->AddActuator("Relay", 1, m_channel, this);
+  LiveWindow::GetInstance().AddActuator("Relay", 1, m_channel, this);
   go_pos = go_neg = false;
 }
 

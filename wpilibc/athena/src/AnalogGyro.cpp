@@ -144,8 +144,8 @@ void AnalogGyro::InitGyro() {
   SetPIDSourceType(PIDSourceType::kDisplacement);
 
   HALReport(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel());
-  LiveWindow::GetInstance()->AddSensor("AnalogGyro", m_analog->GetChannel(),
-                                       this);
+  LiveWindow::GetInstance().AddSensor("AnalogGyro", m_analog->GetChannel(),
+                                      this);
 }
 
 void AnalogGyro::Calibrate() {

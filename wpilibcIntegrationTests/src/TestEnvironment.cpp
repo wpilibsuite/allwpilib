@@ -30,7 +30,7 @@ class TestEnvironment : public testing::Environment {
             station returns that the robot is enabled, to ensure that tests
             will be able to run on the hardware. */
     HALNetworkCommunicationObserveUserProgramStarting();
-    LiveWindow::GetInstance()->SetEnabled(false);
+    LiveWindow::GetInstance().SetEnabled(false);
 
     std::cout << "Waiting for enable" << std::endl;
 

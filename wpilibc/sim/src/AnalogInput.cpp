@@ -20,7 +20,7 @@ AnalogInput::AnalogInput(uint32_t channel) {
   int n = sprintf(buffer, "analog/%d", channel);
   m_impl = new SimFloatInput(buffer);
 
-  LiveWindow::GetInstance()->AddSensor("AnalogInput", channel, this);
+  LiveWindow::GetInstance().AddSensor("AnalogInput", channel, this);
 }
 
 /**

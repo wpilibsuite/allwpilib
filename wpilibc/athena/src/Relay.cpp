@@ -67,7 +67,7 @@ Relay::Relay(uint32_t channel, Relay::Direction direction)
   m_safetyHelper = std::make_unique<MotorSafetyHelper>(this);
   m_safetyHelper->SetSafetyEnabled(false);
 
-  LiveWindow::GetInstance()->AddActuator("Relay", 1, m_channel, this);
+  LiveWindow::GetInstance().AddActuator("Relay", 1, m_channel, this);
 }
 
 /**

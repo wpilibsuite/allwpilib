@@ -39,14 +39,14 @@ TEST(PreferencesTest, ReadPreferencesFromFile) {
   preferencesFile.close();
   NetworkTable::Initialize();
 
-  Preferences* preferences = Preferences::GetInstance();
+  Preferences& preferences = Preferences::GetInstance();
   EXPECT_EQ("Hello, preferences file",
-            preferences->GetString("testFileGetString"));
-  EXPECT_EQ(1, preferences->GetInt("testFileGetInt"));
-  EXPECT_FLOAT_EQ(0.5, preferences->GetDouble("testFileGetDouble"));
-  EXPECT_FLOAT_EQ(0.25f, preferences->GetFloat("testFileGetFloat"));
-  EXPECT_TRUE(preferences->GetBoolean("testFileGetBoolean"));
-  EXPECT_EQ(1000000000000000000ll, preferences->GetLong("testFileGetLong"));
+            preferences.GetString("testFileGetString"));
+  EXPECT_EQ(1, preferences.GetInt("testFileGetInt"));
+  EXPECT_FLOAT_EQ(0.5, preferences.GetDouble("testFileGetDouble"));
+  EXPECT_FLOAT_EQ(0.25f, preferences.GetFloat("testFileGetFloat"));
+  EXPECT_TRUE(preferences.GetBoolean("testFileGetBoolean"));
+  EXPECT_EQ(1000000000000000000ll, preferences.GetLong("testFileGetLong"));
 }
 
 /**
@@ -58,14 +58,14 @@ TEST(PreferencesTest, WritePreferencesToFile) {
   NetworkTable::GlobalDeleteAll();
   std::remove(kFileName);
   NetworkTable::Initialize();
-  Preferences* preferences = Preferences::GetInstance();
-  preferences->PutString("testFilePutString", "Hello, preferences file");
-  preferences->PutInt("testFilePutInt", 1);
-  preferences->PutDouble("testFilePutDouble", 0.5);
-  preferences->PutFloat("testFilePutFloat", 0.25f);
-  preferences->PutBoolean("testFilePutBoolean", true);
-  preferences->PutLong("testFilePutLong", 1000000000000000000ll);
-  preferences->Save();
+  Preferences& preferences = Preferences::GetInstance();
+  preferences.PutString("testFilePutString", "Hello, preferences file");
+  preferences.PutInt("testFilePutInt", 1);
+  preferences.PutDouble("testFilePutDouble", 0.5);
+  preferences.PutFloat("testFilePutFloat", 0.25f);
+  preferences.PutBoolean("testFilePutBoolean", true);
+  preferences.PutLong("testFilePutLong", 1000000000000000000ll);
+  preferences.Save();
 
   Wait(kSaveTime);
 

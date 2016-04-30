@@ -32,7 +32,7 @@
  */
 class Preferences : public ErrorBase {
  public:
-  static Preferences* GetInstance();
+  static Preferences& GetInstance();
 
   std::vector<std::string> GetKeys();
   std::string GetString(llvm::StringRef key, llvm::StringRef defaultValue = "");

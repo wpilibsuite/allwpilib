@@ -99,7 +99,7 @@ void SampleRobot::RobotMain() { m_robotMainOverridden = false; }
  * robot to be enabled again.
  */
 void SampleRobot::StartCompetition() {
-  LiveWindow* lw = LiveWindow::GetInstance();
+  LiveWindow& lw = LiveWindow::GetInstance();
 
   HALReport(HALUsageReporting::kResourceType_Framework,
             HALUsageReporting::kFramework_Sample);
@@ -118,7 +118,7 @@ void SampleRobot::StartCompetition() {
 
   if (!m_robotMainOverridden) {
     // first and one-time initialization
-    lw->SetEnabled(false);
+    lw.SetEnabled(false);
 
     while (true) {
       if (IsDisabled()) {
@@ -132,12 +132,12 @@ void SampleRobot::StartCompetition() {
         m_ds.InAutonomous(false);
         while (IsAutonomous() && IsEnabled()) m_ds.WaitForData();
       } else if (IsTest()) {
-        lw->SetEnabled(true);
+        lw.SetEnabled(true);
         m_ds.InTest(true);
         Test();
         m_ds.InTest(false);
         while (IsTest() && IsEnabled()) m_ds.WaitForData();
-        lw->SetEnabled(false);
+        lw.SetEnabled(false);
       } else {
         m_ds.InOperatorControl(true);
         OperatorControl();

@@ -50,7 +50,7 @@ AnalogInput::AnalogInput(uint32_t channel) {
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
   freePort(port);
 
-  LiveWindow::GetInstance()->AddSensor("AnalogInput", channel, this);
+  LiveWindow::GetInstance().AddSensor("AnalogInput", channel, this);
   HALReport(HALUsageReporting::kResourceType_AnalogChannel, channel);
 }
 

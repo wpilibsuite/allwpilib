@@ -35,7 +35,7 @@ DigitalInput::DigitalInput(uint32_t channel) {
   allocateDIO(m_digital_ports[channel], true, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
-  LiveWindow::GetInstance()->AddSensor("DigitalInput", channel, this);
+  LiveWindow::GetInstance().AddSensor("DigitalInput", channel, this);
   HALReport(HALUsageReporting::kResourceType_DigitalInput, channel);
 }
 

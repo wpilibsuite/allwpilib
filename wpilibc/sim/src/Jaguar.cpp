@@ -26,7 +26,7 @@ Jaguar::Jaguar(uint32_t channel) : SafePWM(channel) {
   SetPeriodMultiplier(kPeriodMultiplier_1X);
   SetRaw(m_centerPwm);
 
-  LiveWindow::GetInstance()->AddActuator("Jaguar", GetChannel(), this);
+  LiveWindow::GetInstance().AddActuator("Jaguar", GetChannel(), this);
 }
 
 /**

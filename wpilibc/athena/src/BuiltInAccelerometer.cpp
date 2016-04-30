@@ -20,7 +20,7 @@ BuiltInAccelerometer::BuiltInAccelerometer(Range range) {
 
   HALReport(HALUsageReporting::kResourceType_Accelerometer, 0, 0,
             "Built-in accelerometer");
-  LiveWindow::GetInstance()->AddSensor((std::string) "BuiltInAccel", 0, this);
+  LiveWindow::GetInstance().AddSensor((std::string) "BuiltInAccel", 0, this);
 }
 
 void BuiltInAccelerometer::SetRange(Range range) {
