@@ -41,7 +41,7 @@ void Encoder::InitEncoder(int32_t channelA, int32_t channelB,
   int32_t index = 0;
   m_distancePerPulse = 1.0;
 
-  LiveWindow::GetInstance()->AddSensor("Encoder", channelA, this);
+  LiveWindow::GetInstance().AddSensor("Encoder", channelA, this);
 
   if (channelB < channelA) {  // Swap ports
     int channel = channelB;

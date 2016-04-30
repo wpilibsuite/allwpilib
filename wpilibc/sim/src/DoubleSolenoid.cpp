@@ -40,8 +40,7 @@ DoubleSolenoid::DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel,
                        forwardChannel, moduleNumber, reverseChannel);
   m_impl = new SimContinuousOutput(buffer);
 
-  LiveWindow::GetInstance()->AddActuator("DoubleSolenoid", moduleNumber,
-                                         forwardChannel, this);
+  LiveWindow::GetInstance().AddActuator("DoubleSolenoid", moduleNumber, this);
 }
 
 DoubleSolenoid::~DoubleSolenoid() {

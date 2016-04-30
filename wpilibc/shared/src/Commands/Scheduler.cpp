@@ -22,9 +22,9 @@ Scheduler::Scheduler() { HLUsageReporting::ReportScheduler(); }
  *
  * @return the {@link Scheduler}
  */
-Scheduler* Scheduler::GetInstance() {
+Scheduler& Scheduler::GetInstance() {
   static Scheduler instance;
-  return &instance;
+  return instance;
 }
 
 void Scheduler::SetEnabled(bool enabled) { m_enabled = enabled; }

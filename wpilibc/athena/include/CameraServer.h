@@ -57,7 +57,7 @@ class CameraServer : public ErrorBase {
   };
 
  public:
-  static CameraServer* GetInstance();
+  static CameraServer& GetInstance();
   void SetImage(Image const* image);
 
   void StartAutomaticCapture(

@@ -36,7 +36,7 @@ void AnalogGyro::InitAnalogGyro(int channel) {
   int n = std::sprintf(buffer, "analog/%d", channel);
   impl = new SimGyro(buffer);
 
-  LiveWindow::GetInstance()->AddSensor("AnalogGyro", channel, this);
+  LiveWindow::GetInstance().AddSensor("AnalogGyro", channel, this);
 }
 
 /**

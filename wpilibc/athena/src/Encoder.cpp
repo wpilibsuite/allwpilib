@@ -41,8 +41,8 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
 
   HALReport(HALUsageReporting::kResourceType_Encoder, GetFPGAIndex(),
             encodingType);
-  LiveWindow::GetInstance()->AddSensor("Encoder",
-                                       m_aSource->GetChannelForRouting(), this);
+  LiveWindow::GetInstance().AddSensor("Encoder",
+                                      m_aSource->GetChannelForRouting(), this);
 }
 
 /**

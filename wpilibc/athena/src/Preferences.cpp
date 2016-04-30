@@ -34,9 +34,9 @@ Preferences::Preferences() : m_table(NetworkTable::GetTable(kTableName)) {
  *
  * @return pointer to the {@link Preferences}
  */
-Preferences* Preferences::GetInstance() {
+Preferences& Preferences::GetInstance() {
   static Preferences instance;
-  return &instance;
+  return instance;
 }
 
 /**

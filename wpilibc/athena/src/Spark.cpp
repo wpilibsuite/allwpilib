@@ -38,5 +38,5 @@ Spark::Spark(uint32_t channel) : PWMSpeedController(channel) {
   SetZeroLatch();
 
   HALReport(HALUsageReporting::kResourceType_RevSPARK, GetChannel());
-  LiveWindow::GetInstance()->AddActuator("Spark", GetChannel(), this);
+  LiveWindow::GetInstance().AddActuator("Spark", GetChannel(), this);
 }

@@ -80,8 +80,8 @@ DoubleSolenoid::DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel,
             m_moduleNumber);
   HALReport(HALUsageReporting::kResourceType_Solenoid, m_reverseChannel,
             m_moduleNumber);
-  LiveWindow::GetInstance()->AddActuator("DoubleSolenoid", m_moduleNumber,
-                                         m_forwardChannel, this);
+  LiveWindow::GetInstance().AddActuator("DoubleSolenoid", m_moduleNumber,
+                                        m_forwardChannel, this);
 }
 
 /**

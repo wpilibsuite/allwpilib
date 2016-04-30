@@ -49,8 +49,8 @@ Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel)
     return;
   }
 
-  LiveWindow::GetInstance()->AddActuator("Solenoid", m_moduleNumber, m_channel,
-                                         this);
+  LiveWindow::GetInstance().AddActuator("Solenoid", m_moduleNumber, m_channel,
+                                        this);
   HALReport(HALUsageReporting::kResourceType_Solenoid, m_channel,
             m_moduleNumber);
 }

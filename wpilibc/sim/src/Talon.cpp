@@ -30,7 +30,7 @@ Talon::Talon(uint32_t channel) : SafePWM(channel) {
   SetPeriodMultiplier(kPeriodMultiplier_2X);
   SetRaw(m_centerPwm);
 
-  LiveWindow::GetInstance()->AddActuator("Talon", GetChannel(), this);
+  LiveWindow::GetInstance().AddActuator("Talon", GetChannel(), this);
 }
 
 /**
