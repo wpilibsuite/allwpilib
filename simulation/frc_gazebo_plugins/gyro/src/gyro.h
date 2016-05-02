@@ -44,9 +44,6 @@ typedef enum { Roll /*X*/, Pitch /*Y*/, Yaw /*Z*/ } ROTATION;
  */
 class Gyro : public ModelPlugin {
  public:
-  Gyro();
-  ~Gyro();
-
   /// \brief Load the gyro and configures it according to the sdf.
   void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
 

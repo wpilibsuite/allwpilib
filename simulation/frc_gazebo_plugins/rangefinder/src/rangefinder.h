@@ -32,9 +32,6 @@ using namespace gazebo;
  */
 class Rangefinder : public ModelPlugin {
  public:
-  Rangefinder();
-  ~Rangefinder();
-
   /// \brief Load the rangefinder and configures it according to the sdf.
   void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
 

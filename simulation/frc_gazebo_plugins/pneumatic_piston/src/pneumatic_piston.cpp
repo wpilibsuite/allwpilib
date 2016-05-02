@@ -18,10 +18,6 @@
 
 GZ_REGISTER_MODEL_PLUGIN(PneumaticPiston)
 
-PneumaticPiston::PneumaticPiston() {}
-
-PneumaticPiston::~PneumaticPiston() {}
-
 void PneumaticPiston::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   this->model = model;
   signal = 0;

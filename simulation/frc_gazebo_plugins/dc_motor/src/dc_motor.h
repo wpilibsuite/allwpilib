@@ -37,9 +37,6 @@ using namespace gazebo;
  */
 class DCMotor : public ModelPlugin {
  public:
-  DCMotor();
-  ~DCMotor();
-
   /// \brief Load the dc motor and configures it according to the sdf.
   void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
 

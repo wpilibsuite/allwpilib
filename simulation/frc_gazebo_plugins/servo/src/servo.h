@@ -34,9 +34,6 @@ using namespace gazebo;
  */
 class Servo : public ModelPlugin {
  public:
-  Servo();
-  ~Servo();
-
   /// \brief load the servo and configure it according to the sdf
   void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
 

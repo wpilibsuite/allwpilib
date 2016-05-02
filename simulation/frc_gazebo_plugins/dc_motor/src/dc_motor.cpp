@@ -9,10 +9,6 @@
 
 GZ_REGISTER_MODEL_PLUGIN(DCMotor)
 
-DCMotor::DCMotor() {}
-
-DCMotor::~DCMotor() {}
-
 void DCMotor::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   this->model = model;
   signal = 0;

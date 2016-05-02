@@ -34,9 +34,6 @@ using namespace gazebo;
  */
 class Potentiometer : public ModelPlugin {
  public:
-  Potentiometer();
-  ~Potentiometer();
-
   /// \brief Load the potentiometer and configures it according to the sdf.
   void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
 

@@ -68,9 +68,6 @@ using namespace gazebo;
  */
 class LimitSwitch : public ModelPlugin {
  public:
-  LimitSwitch();
-  ~LimitSwitch();
-
   /// \brief Load the limit switch and configures it according to the sdf.
   void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
 
