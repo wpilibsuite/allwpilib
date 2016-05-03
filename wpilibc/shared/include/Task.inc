@@ -24,8 +24,7 @@ Task::Task(const std::string& name, Function&& function, Args&&... args) {
 
   m_thread = std::thread(std::forward<std::decay_t<Function>>(function),
                          std::forward<Args>(args)...);
-  // TODO: lvuser does not currently have permissions to set the priority.
-  // SetPriority(kDefaultPriority);
+  SetPriority(kDefaultPriority);
 
   static std::atomic<int32_t> instances{0};
   instances++;
