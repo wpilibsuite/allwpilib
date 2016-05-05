@@ -471,7 +471,7 @@ bool DriverStation::IsSysActive() const {
  *
  * @return True if the system is browned out
  */
-bool DriverStation::IsSysBrownedOut() const {
+bool DriverStation::IsBrownedOut() const {
   int32_t status = 0;
   bool retVal = HALGetBrownedOut(&status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
