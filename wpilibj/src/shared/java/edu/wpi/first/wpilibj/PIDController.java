@@ -510,6 +510,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     }
 
     m_buf.clear();
+    m_bufTotal = 0;
 
     if (table != null)
       table.putNumber("setpoint", m_setpoint);

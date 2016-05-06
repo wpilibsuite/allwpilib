@@ -352,6 +352,7 @@ void PIDController::SetSetpoint(float setpoint) {
 
     // Clear m_buf.
     m_buf = std::queue<double>();
+    m_bufTotal = 0;
   }
 
   if (m_table != nullptr) {
