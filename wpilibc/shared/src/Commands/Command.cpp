@@ -304,6 +304,13 @@ void Command::SetParent(CommandGroup* parent) {
 }
 
 /**
+ * Clears list of subsystem requirements. This is only used by
+ * {@link ConditionalCommand} so cancelling the chosen command works properly in
+ * {@link CommandGroup}.
+ */
+void Command::ClearRequirements() { m_requirements.clear(); }
+
+/**
  * This is used internally to mark that the command has been started.
  *
  * The lifecycle of a command is:
