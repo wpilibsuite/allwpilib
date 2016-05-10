@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.test.AbstractTestSuite;
 @RunWith(Suite.class)
 @SuiteClasses({ButtonTest.class, CommandParallelGroupTest.class, CommandScheduleTest.class,
     CommandSequentialGroupTest.class, CommandSupersedeTest.class, CommandTimeoutTest.class,
-    DefaultCommandTest.class})
+    ConditionalCommandTest.class, DefaultCommandTest.class})
 public class CommandTestSuite extends AbstractTestSuite {
 
 }
