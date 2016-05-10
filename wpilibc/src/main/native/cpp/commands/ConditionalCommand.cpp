@@ -7,6 +7,8 @@
 
 #include "frc/commands/ConditionalCommand.h"
 
+#include <wpi/raw_ostream.h>
+
 #include "frc/commands/Scheduler.h"
 
 using namespace frc;
@@ -22,20 +24,34 @@ static void RequireAll(Command& command, Command* onTrue, Command* onFalse) {
   }
 }
 
-ConditionalCommand::ConditionalCommand(Command* onTrue, Command* onFalse) {
+ConditionalCommand::ConditionalCommand(Command* onTrue, Command* onFalse,
+                                       std::function<bool()> condition) {
   m_onTrue = onTrue;
   m_onFalse = onFalse;
+  m_condition = condition;
 
   RequireAll(*this, onTrue, onFalse);
 }
 
 ConditionalCommand::ConditionalCommand(const wpi::Twine& name, Command* onTrue,
-                                       Command* onFalse)
+                                       Command* onFalse,
+                                       std::function<bool()> condition)
     : Command(name) {
   m_onTrue = onTrue;
   m_onFalse = onFalse;
+  m_condition = condition;
 
   RequireAll(*this, onTrue, onFalse);
+}
+
+bool ConditionalCommand::Condition() {
+  if (m_condition == nullptr) {
+    wpi::errs() << "Error: either override Condition() or pass a predicate to "
+                   "the constructor\n";
+    return true;
+  } else {
+    return m_condition();
+  }
 }
 
 void ConditionalCommand::_Initialize() {

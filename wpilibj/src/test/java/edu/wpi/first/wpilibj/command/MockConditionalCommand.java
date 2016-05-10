@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj.command;
 
+import java.util.function.BooleanSupplier;
+
 public class MockConditionalCommand extends ConditionalCommand {
   private boolean m_condition;
   private int m_initializeCount;
@@ -15,8 +17,9 @@ public class MockConditionalCommand extends ConditionalCommand {
   private int m_endCount;
   private int m_interruptedCount;
 
-  public MockConditionalCommand(MockCommand onTrue, MockCommand onFalse) {
-    super(onTrue, onFalse);
+  public MockConditionalCommand(MockCommand onTrue, MockCommand onFalse,
+      BooleanSupplier condition) {
+    super(onTrue, onFalse, condition);
   }
 
   @Override

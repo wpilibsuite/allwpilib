@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj.command;
 
 import java.util.Enumeration;
+import java.util.function.BooleanSupplier;
 
 /**
  * A {@link ConditionalCommand} is a {@link Command} that starts one of two commands.
@@ -31,7 +32,7 @@ import java.util.Enumeration;
  * @see Command
  * @see Scheduler
  */
-public abstract class ConditionalCommand extends Command {
+public class ConditionalCommand extends Command {
   /**
    * The Command to execute if {@link ConditionalCommand#condition()} returns true.
    */
@@ -62,6 +63,11 @@ public abstract class ConditionalCommand extends Command {
   }
 
   /**
+   * The condition to use to determine which Command should be run.
+   */
+  private BooleanSupplier m_condition;
+
+  /**
    * Creates a new ConditionalCommand with given onTrue and onFalse Commands.
    *
    * <p>Users of this constructor should also override condition().
@@ -85,6 +91,19 @@ public abstract class ConditionalCommand extends Command {
     m_onFalse = onFalse;
 
     requireAll();
+  }
+
+  /**
+   * Creates a new ConditionalCommand with given onTrue and onFalse Commands and condition.
+   *
+   * @param onTrue The Command to execute if {@link ConditionalCommand#condition()} returns true
+   * @param onFalse The Command to execute if {@link ConditionalCommand#condition()} returns false
+   * @param condition a BooleanSupplier that returns true if onTrue should be run
+   */
+  public ConditionalCommand(Command onTrue, Command onFalse, BooleanSupplier condition) {
+    this.m_onTrue = onTrue;
+    this.m_onFalse = onFalse;
+    this.m_condition = condition;
   }
 
   /**
@@ -117,11 +136,33 @@ public abstract class ConditionalCommand extends Command {
   }
 
   /**
+   * Creates a new ConditionalCommand with given name, onTrue and onFalse Commands, and condition.
+   *
+   * @param name the name for this command group
+   * @param onTrue The Command to execute if {@link ConditionalCommand#condition()} returns true
+   * @param onFalse The Command to execute if {@link ConditionalCommand#condition()} returns false
+   * @param condition a BooleanSupplier that returns true if onTrue should be run
+   */
+  public ConditionalCommand(String name, Command onTrue, Command onFalse,
+                            BooleanSupplier condition) {
+    super(name);
+    this.m_onTrue = onTrue;
+    this.m_onFalse = onFalse;
+    this.m_condition = condition;
+  }
+
+  /**
    * The Condition to test to determine which Command to run.
    *
    * @return true if m_onTrue should be run or false if m_onFalse should be run.
    */
-  protected abstract boolean condition();
+  protected boolean condition() {
+    if (m_condition == null) {
+      throw new IllegalArgumentException(
+          "Either override condition() or pass a predicate to the constructor");
+    }
+    return m_condition.getAsBoolean();
+  }
 
   /**
    * Calls {@link ConditionalCommand#condition()} and runs the proper command.

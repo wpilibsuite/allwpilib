@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include <functional>
+#include <string>
+
 #include <wpi/Twine.h>
 
 #include "frc/commands/Command.h"
@@ -37,20 +40,24 @@ class ConditionalCommand : public Command {
   /**
    * Creates a new ConditionalCommand with given onTrue and onFalse Commands.
    *
-   * @param onTrue  The Command to execute if Condition() returns true
-   * @param onFalse The Command to execute if Condition() returns false
+   * @param onTrue    The Command to execute if Condition() returns true
+   * @param onFalse   The Command to execute if Condition() returns false
+   * @param condition A pointer to a parameterless function that returns a bool
    */
-  explicit ConditionalCommand(Command* onTrue, Command* onFalse = nullptr);
+  explicit ConditionalCommand(Command* onTrue, Command* onFalse = nullptr,
+                              std::function<bool()> condition = nullptr);
 
   /**
    * Creates a new ConditionalCommand with given onTrue and onFalse Commands.
    *
-   * @param name    The name for this command group
-   * @param onTrue  The Command to execute if Condition() returns true
-   * @param onFalse The Command to execute if Condition() returns false
+   * @param name      The name for this command group
+   * @param onTrue    The Command to execute if Condition() returns true
+   * @param onFalse   The Command to execute if Condition() returns false
+   * @param condition A pointer to a parameterless function that returns a bool
    */
   ConditionalCommand(const wpi::Twine& name, Command* onTrue,
-                     Command* onFalse = nullptr);
+                     Command* onFalse = nullptr,
+                     std::function<bool()> condition = nullptr);
 
   virtual ~ConditionalCommand() = default;
 
@@ -63,7 +70,7 @@ class ConditionalCommand : public Command {
    *
    * @return true if m_onTrue should be run or false if m_onFalse should be run.
    */
-  virtual bool Condition() = 0;
+  virtual bool Condition();
 
   void _Initialize() override;
   void _Cancel() override;
@@ -79,6 +86,11 @@ class ConditionalCommand : public Command {
 
   // Stores command chosen by condition
   Command* m_chosenCommand = nullptr;
+
+  /**
+   * The condition to use to determine which Command should be run
+   */
+  std::function<bool()> m_condition;
 };
 
 }  // namespace frc

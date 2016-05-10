@@ -24,10 +24,11 @@ class ConditionalCommandTest extends AbstractCommandTest {
   @BeforeEach
   void initCommands() {
     m_subsys = new MockSubsystem();
+    m_condition = Boolean.FALSE;
     m_onTrue = new MockCommand(m_subsys);
     m_onFalse = new MockCommand(m_subsys);
-    m_command = new MockConditionalCommand(m_onTrue, m_onFalse);
-    m_commandNull = new MockConditionalCommand(m_onTrue, null);
+    m_command = new MockConditionalCommand(m_onTrue, m_onFalse, () -> m_condition);
+    m_commandNull = new MockConditionalCommand(m_onTrue, null, () -> m_condition);
   }
 
   protected void assertConditionalCommandState(MockConditionalCommand command, int initialize,
