@@ -1,5 +1,7 @@
 # ntcore
 
+[![Build Status](https://travis-ci.org/wpilibsuite/ntcore.svg?branch=master)](https://travis-ci.org/wpilibsuite/ntcore)
+
 ntcore is the reimplementation of the NetworkTables protocol for both Java and C++, communicating with the former by way of a JNI interface. ntcore implements v3 of the NetworkTables spec.
 
 ## Build Requirements
