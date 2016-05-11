@@ -1,6 +1,12 @@
-sudo: required
-dist: trusty
 language: java
+
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+    - os: osx
+      env: WPILIB_FLAGS=-PskipArm
 
 addons:
   apt:
@@ -9,12 +15,13 @@ addons:
       - lib32stdc++6
 
 before_install:
-  - sudo add-apt-repository ppa:wpilib/toolchain -y
-  - sudo apt-get update -q
-  - sudo apt-get install frc-toolchain -y
+  - .travis-scripts/install.sh
+
+install:
+  - ./gradlew assemble $WPILIB_FLAGS
 
 script:
-  - ./gradlew build
+  - ./gradlew build $WPILIB_FLAGS
 
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
