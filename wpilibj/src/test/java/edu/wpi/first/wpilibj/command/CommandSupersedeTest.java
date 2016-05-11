@@ -11,8 +11,6 @@ import org.junit.Test;
 
 import java.util.logging.Logger;
 
-import edu.wpi.first.wpilibj.mocks.MockCommand;
-
 /**
  * Ported from the old CrioTest Classes.
  *
@@ -22,9 +20,6 @@ import edu.wpi.first.wpilibj.mocks.MockCommand;
 public class CommandSupersedeTest extends AbstractCommandTest {
   private static final Logger logger = Logger.getLogger(CommandSupersedeTest.class.getName());
 
-  protected Logger getClassLogger() {
-    return logger;
-  }
 
   /**
    * Testing one command superseding another because of dependencies.

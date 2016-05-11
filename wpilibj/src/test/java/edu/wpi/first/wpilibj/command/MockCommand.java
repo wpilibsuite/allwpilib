@@ -5,9 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.mocks;
-
-import edu.wpi.first.wpilibj.command.Command;
+package edu.wpi.first.wpilibj.command;
 
 /**
  * A class to simulate a simple command The command keeps track of how many times each method was

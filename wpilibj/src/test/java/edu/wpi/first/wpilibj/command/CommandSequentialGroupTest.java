@@ -11,8 +11,6 @@ import org.junit.Test;
 
 import java.util.logging.Logger;
 
-import edu.wpi.first.wpilibj.mocks.MockCommand;
-
 /**
  * Ported from the old CrioTest Classes.
  *
@@ -20,11 +18,7 @@ import edu.wpi.first.wpilibj.mocks.MockCommand;
  * @author Jonathan Leitschuh
  */
 public class CommandSequentialGroupTest extends AbstractCommandTest {
-  private static final Logger logger = Logger.getLogger(CommandSequentialGroupTest.class.getName());
-
-  protected Logger getClassLogger() {
-    return logger;
-  }
+  private static Logger logger = Logger.getLogger(CommandSequentialGroupTest.class.getName());
 
   /**
    * Simple Command Group With 3 commands that all depend on a subsystem. Some commands have a

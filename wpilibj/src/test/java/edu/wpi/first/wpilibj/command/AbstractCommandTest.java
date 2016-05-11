@@ -9,8 +9,7 @@ package edu.wpi.first.wpilibj.command;
 
 import org.junit.Before;
 
-import edu.wpi.first.wpilibj.mocks.MockCommand;
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+import edu.wpi.first.wpilibj.UnitTestUtility;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -20,10 +19,11 @@ import static org.junit.Assert.fail;
  *
  * @author jonathanleitschuh
  */
-public abstract class AbstractCommandTest extends AbstractComsSetup {
+public abstract class AbstractCommandTest {
 
   @Before
   public void commandSetup() {
+    UnitTestUtility.setupMockBase();
     Scheduler.getInstance().removeAll();
     Scheduler.getInstance().enable();
   }

@@ -9,10 +9,6 @@ package edu.wpi.first.wpilibj.command;
 
 import org.junit.Test;
 
-import java.util.logging.Logger;
-
-import edu.wpi.first.wpilibj.mocks.MockCommand;
-
 /**
  * Ported from the old CrioTest Classes.
  *
@@ -20,11 +16,6 @@ import edu.wpi.first.wpilibj.mocks.MockCommand;
  * @author Jonathan Leitschuh
  */
 public class CommandParallelGroupTest extends AbstractCommandTest {
-  private static final Logger logger = Logger.getLogger(CommandParallelGroupTest.class.getName());
-
-  protected Logger getClassLogger() {
-    return logger;
-  }
 
   /**
    * Simple Parallel Command Group With 2 commands one command terminates first.

@@ -7,22 +7,23 @@
 
 package edu.wpi.first.wpilibj;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.logging.Logger;
-
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
 import static org.junit.Assert.assertEquals;
 
-public class CircularBufferTest extends AbstractComsSetup {
-  private static final Logger logger = Logger.getLogger(CircularBufferTest.class.getName());
+public class CircularBufferTest {
   private double[] m_values = {751.848, 766.366, 342.657, 234.252, 716.126,
       132.344, 445.697, 22.727, 421.125, 799.913};
   private double[] m_pushFrontOut = {799.913, 421.125, 22.727, 445.697, 132.344,
       716.126, 234.252, 342.657};
   private double[] m_pushBackOut = {342.657, 234.252, 716.126, 132.344, 445.697,
       22.727, 421.125, 799.913};
+
+  @BeforeClass
+  public static void before() {
+    UnitTestUtility.setupMockBase();
+  }
 
   @Test
   public void pushFrontTest() {
@@ -94,8 +95,4 @@ public class CircularBufferTest extends AbstractComsSetup {
     assertEquals(4.0, queue.get(0), 0.00005);
   }
 
-  @Override
-  protected Logger getClassLogger() {
-    return logger;
-  }
 }

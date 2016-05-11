@@ -9,21 +9,13 @@ package edu.wpi.first.wpilibj.command;
 
 import org.junit.Test;
 
-import java.util.logging.Logger;
-
-import edu.wpi.first.wpilibj.mocks.MockCommand;
-
 /**
  * Test a {@link Command} that times out.
  *
  * @author jonathanleitschuh
+ *
  */
 public class CommandTimeoutTest extends AbstractCommandTest {
-  private static final Logger logger = Logger.getLogger(CommandTimeoutTest.class.getName());
-
-  protected Logger getClassLogger() {
-    return logger;
-  }
 
   /**
    * Command 2 second Timeout Test.

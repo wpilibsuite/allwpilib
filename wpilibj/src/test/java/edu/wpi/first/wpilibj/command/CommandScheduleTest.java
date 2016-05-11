@@ -9,10 +9,6 @@ package edu.wpi.first.wpilibj.command;
 
 import org.junit.Test;
 
-import java.util.logging.Logger;
-
-import edu.wpi.first.wpilibj.mocks.MockCommand;
-
 /**
  * Ported from the old CrioTest Classes.
  *
@@ -20,11 +16,6 @@ import edu.wpi.first.wpilibj.mocks.MockCommand;
  * @author Jonathan Leitschuh
  */
 public class CommandScheduleTest extends AbstractCommandTest {
-  private static final Logger logger = Logger.getLogger(CommandScheduleTest.class.getName());
-
-  protected Logger getClassLogger() {
-    return logger;
-  }
 
   /**
    * Simple scheduling of a command and making sure the command is run and successfully terminates.
