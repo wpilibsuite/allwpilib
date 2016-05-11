@@ -1,0 +1,16 @@
+sudo: required
+dist: trusty
+language: java
+
+before_install:
+     - sudo add-apt-repository ppa:wpilib/toolchain -y
+     - sudo apt-get update -q
+     - sudo apt-get install frc-toolchain -y
+
+
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
