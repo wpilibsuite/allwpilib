@@ -3,9 +3,9 @@ dist: trusty
 language: java
 
 before_install:
-     - sudo add-apt-repository ppa:wpilib/toolchain -y
-     - sudo apt-get update -q
-     - sudo apt-get install frc-toolchain -y
+  - sudo add-apt-repository ppa:wpilib/toolchain -y
+  - sudo apt-get update -q
+  - sudo apt-get install frc-toolchain -y
 
 
 before_cache:
