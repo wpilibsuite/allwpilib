@@ -2,6 +2,11 @@ sudo: required
 dist: trusty
 language: java
 
+addons:
+  apt:
+    packages:
+      - g++-multilib
+      - lib32stdc++6
 
 before_install:
   - sudo add-apt-repository ppa:wpilib/toolchain -y
