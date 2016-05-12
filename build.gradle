@@ -45,3 +45,7 @@ subprojects {
 }
 
 apply from: 'cppSettings.gradle'
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.13'
+}

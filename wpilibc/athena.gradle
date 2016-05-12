@@ -36,34 +36,42 @@ task wpilibcZip(type: Zip) {
     destinationDir = project.buildDir
 
     // Include the static library file and header files from this project
-    binaries.withType(StaticLibraryBinarySpec) { spec ->
-        spec.headerDirs.each {
-            from(it) {
-                into 'include'
+    model {
+        binaries {
+            withType(StaticLibraryBinarySpec) { spec ->
+                spec.headerDirs.each {
+                    from(it) {
+                        into 'include'
+                    }
+                }
+                from(spec.staticLibraryFile) {
+                    into 'lib'
+                }
             }
-        }
-        from(spec.staticLibraryFile) {
-            into 'lib'
         }
     }
 
     // Include the static library file and shared library object from hal project
     def hal = project(':hal')
-    hal.binaries.withType(StaticLibraryBinarySpec) { spec ->
-        spec.headerDirs.each {
-            from(it) {
-                into 'include'
-                // We don't want to include any of the .cpp files that are in some of the header directories
-                exclude '**/*.cpp'
+    hal.model{
+        binaries{
+            withType(StaticLibraryBinarySpec) { spec ->
+                spec.headerDirs.each {
+                    from(it) {
+                        into 'include'
+                        // We don't want to include any of the .cpp files that are in some of the header directories
+                        exclude '**/*.cpp'
+                    }
+                }
+                from(spec.staticLibraryFile) {
+                    into 'lib'
+                }
             }
-        }
-        from(spec.staticLibraryFile) {
-            into 'lib'
-        }
-    }
-    hal.binaries.withType(SharedLibraryBinarySpec) { spec ->
-        from(spec.sharedLibraryFile) {
-            into 'lib'
+            withType(SharedLibraryBinarySpec) { spec ->
+                from(spec.sharedLibraryFile) {
+                    into 'lib'
+                }
+            }
         }
     }
 

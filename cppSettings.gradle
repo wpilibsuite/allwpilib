@@ -60,8 +60,8 @@ subprojects {
             ext.netTables = netTablesUnzipLocation
             ext.netTablesInclude = "$netTablesUnzipLocation/include"
             ext.netLibArmLocation = "$netTablesUnzipLocation/Linux/arm"
-            if (project.hasProperty('makeSim')){
-              ext.netLibDesktopLocation = "$netTablesUnzipLocation/Linux/amd64"
+            if (project.hasProperty('makeSim')) {
+                ext.netLibDesktopLocation = "$netTablesUnzipLocation/Linux/amd64"
             }
             ext.netSharedLib = "$netLibArmLocation/libntcore.so"
             ext.netStaticLib = "$netLibArmLocation/libntcore.a"
@@ -71,13 +71,15 @@ subprojects {
                 group = 'WPILib'
                 dependsOn project(':').unzipNetworkTables
                 doLast {
-                    binaries.all {
-                        tasks.withType(CppCompile) {
-                            // desktop version doesn't use all the NI libraries
-                            // so only do this for arm libraries
-                            String architecture = targetPlatform.architecture
-                            if (architecture.contains('arm')){
-                                linker.args netStaticLib
+                    model {
+                        binaries.all {
+                            tasks.withType(CppCompile) {
+                                // desktop version doesn't use all the NI libraries
+                                // so only do this for arm libraries
+                                String architecture = targetPlatform.architecture
+                                if (architecture.contains('arm')) {
+                                    linker.args netStaticLib
+                                }
                             }
                         }
                     }
@@ -162,14 +164,16 @@ subprojects {
             description = 'Adds the linker flags for the NI libraries in the ni-library folders'
             group = 'WPILib'
             doLast {
-                binaries.all {
-                    tasks.withType(CppCompile) {
-                        // desktop version doesn't use all the NI libraries
-                        // so only do this for arm libraries
-                        String architecture = targetPlatform.architecture
-                        if (architecture.contains('arm')){
-                            linker.args << '-L' + niLibraryPath
-                            linker.args.addAll(niLibraryArgs)
+                model{
+                    binaries.all {
+                        tasks.withType(CppCompile) {
+                            // desktop version doesn't use all the NI libraries
+                            // so only do this for arm libraries
+                            String architecture = targetPlatform.architecture
+                            if (architecture.contains('arm')){
+                                linker.args << '-L' + niLibraryPath
+                                linker.args.addAll(niLibraryArgs)
+                            }
                         }
                     }
                 }
