@@ -1,5 +1,16 @@
 import org.gradle.internal.os.OperatingSystem
 
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.8'
+    }
+}
+
 // Determine what repo to publish to. Default is development. Valid options are development, beta, stable, and release
 if (!hasProperty('repo')) {
     allprojects {

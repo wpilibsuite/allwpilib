@@ -3,6 +3,7 @@ package edu.wpi.first.wpilibj.networktables2.type;
 /**
  * @deprecated Use ArrayList instead.
  */
+@Deprecated
 public class ArrayData {
   private Object[] data = new Object[0];
 

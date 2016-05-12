@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.tables.TableKeyNotDefinedException;
  * @author Mitchell
  *
  */
+@Deprecated
 public class NetworkTableKeyNotDefined extends TableKeyNotDefinedException {
 
 	/**

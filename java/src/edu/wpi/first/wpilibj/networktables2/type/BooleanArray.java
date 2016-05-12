@@ -3,6 +3,7 @@ package edu.wpi.first.wpilibj.networktables2.type;
 /**
  * @deprecated Use {@literal ArrayList<Boolean>} instead.
  */
+@Deprecated
 public class BooleanArray extends ArrayData {
   public boolean get(int index) {
     return ((Boolean)getAsObject(index)).booleanValue();

@@ -1,6 +1,15 @@
 import org.gradle.internal.os.OperatingSystem
 
 apply plugin: 'java'
+apply plugin: 'net.ltgt.errorprone'
+
+repositories {
+    mavenCentral()
+}
+
+configurations.errorprone {
+    resolutionStrategy.force 'com.google.errorprone:error_prone_core:2.0.9'
+}
 
 def generatedJNIHeaderLoc = '../build/include'
 
