@@ -1255,6 +1255,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
    * @deprecated Use disableControl instead.
    */
   @Override
+  @Deprecated
   public void stopMotor() {
     disableControl();
     m_stopped = true;

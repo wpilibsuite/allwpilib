@@ -273,6 +273,7 @@ public class Preferences {
    *
    * @deprecated backwards compatibility shim
    */
+  @Deprecated
   public void save() {
   }
 }

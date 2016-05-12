@@ -66,6 +66,7 @@ public class Victor implements SpeedController, PIDOutput, MotorSafety, LiveWind
    *                  update immediately.
    * @deprecated For compatibility with CANJaguar.
    */
+  @Deprecated
   public void set(double speed, byte syncGroup) {
     m_impl.set(speed, syncGroup);
   }

@@ -188,6 +188,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @return Period in seconds of the most recent pulse.
    * @deprecated Use getRate() in favor of this method.  This returns unscale
    */
+  @Deprecated
   public double getPeriod() {
     throw new UnsupportedOperationException("Simulation doesn't currently support this method.");
   }

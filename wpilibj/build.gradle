@@ -1,5 +1,10 @@
 apply plugin: 'java'
 apply plugin: 'maven-publish'
+apply plugin: 'net.ltgt.errorprone'
+
+configurations.errorprone {
+    resolutionStrategy.force 'com.google.errorprone:error_prone_core:2.0.9'
+}
 
 sourceSets {
     shared

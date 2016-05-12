@@ -54,6 +54,7 @@ public class Jaguar implements SpeedController, PIDOutput, MotorSafety, LiveWind
    * The PWM value is set using a range of -1.0 to 1.0, appropriately scaling the value for the
    * FPGA.
    */
+  @Deprecated
   public void set(double speed, byte syncGroup) {
     impl.set(speed, syncGroup);
   }

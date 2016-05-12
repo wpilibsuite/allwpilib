@@ -1,6 +1,11 @@
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'net.ltgt.errorprone'
+
+configurations.errorprone {
+    resolutionStrategy.force 'com.google.errorprone:error_prone_core:2.0.9'
+}
 
 evaluationDependsOn(':wpilibj')
 

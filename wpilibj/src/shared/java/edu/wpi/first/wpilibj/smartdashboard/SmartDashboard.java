@@ -224,6 +224,7 @@ public class SmartDashboard {
    * @throws IllegalArgumentException if key is null
    * @deprecated Use {@link #putNumber(java.lang.String, double) putNumber method} instead
    */
+  @Deprecated
   public static void putInt(String key, int value) {
     table.putNumber(key, value);
   }
@@ -238,6 +239,7 @@ public class SmartDashboard {
    * @throws IllegalArgumentException    if the key is null
    * @deprecated Use {@link #getNumber(java.lang.String) getNumber} instead
    */
+  @Deprecated
   public static int getInt(String key) throws TableKeyNotDefinedException {
     return (int) table.getNumber(key);
   }
@@ -253,6 +255,7 @@ public class SmartDashboard {
    * @throws IllegalArgumentException    if the key is null
    * @deprecated Use {@link #getNumber(java.lang.String, double) getNumber} instead
    */
+  @Deprecated
   public static int getInt(String key, int defaultValue) throws TableKeyNotDefinedException {
     try {
       return (int) table.getNumber(key);
@@ -272,6 +275,7 @@ public class SmartDashboard {
    * @throws IllegalArgumentException if key is null
    * @deprecated Use{@link #putNumber(java.lang.String, double) putNumber} instead
    */
+  @Deprecated
   public static void putDouble(String key, double value) {
     table.putNumber(key, value);
   }
@@ -286,6 +290,7 @@ public class SmartDashboard {
    * @throws IllegalArgumentException    if the key is null
    * @deprecated Use {@link #getNumber(java.lang.String) getNumber} instead
    */
+  @Deprecated
   public static double getDouble(String key) throws TableKeyNotDefinedException {
     return table.getNumber(key);
   }
@@ -300,6 +305,7 @@ public class SmartDashboard {
    * @throws IllegalArgumentException if the key is null
    * @deprecated Use {@link #getNumber(java.lang.String, double) getNumber} instead.
    */
+  @Deprecated
   public static double getDouble(String key, double defaultValue) {
     return table.getNumber(key, defaultValue);
   }
