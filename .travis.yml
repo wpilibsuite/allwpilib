@@ -4,7 +4,7 @@ language: java
 
 before_install:
   - sudo add-apt-repository ppa:wpilib/toolchain -y
-  - sudo apt-get update -q
+  - sudo apt-get update -q || true
   - sudo apt-get install frc-toolchain -y
 
 
