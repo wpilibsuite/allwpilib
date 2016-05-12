@@ -3,9 +3,11 @@ dist: trusty
 language: java
 
 before_install:
+  - sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
+  - wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
   - sudo add-apt-repository ppa:wpilib/toolchain -y
   - sudo apt-get update -q || true
-  - sudo apt-get install frc-toolchain -y
+  - sudo apt-get install frc-toolchain libgazebo6-dev protobuf-compiler libprotobuf-dev -y
 
 
 before_cache:
@@ -14,6 +16,9 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
+
+script:
+ - ./gradlew build -PmakeSim
 
 notifications:
   slack:
