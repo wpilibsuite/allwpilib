@@ -22,7 +22,7 @@ model {
             binaries.all {
                 tasks.withType(CppCompile) {
                     dependsOn jniHeaders
-                    dependsOn addNiLibraryLinks
+                    addNiLibraryLinks(linker, targetPlatform)
                 }
             }
             sources {
@@ -85,9 +85,13 @@ jar {
         addClasspath sourceSets.shared.runtimeClasspath
     }
 
-    binaries.withType(SharedLibraryBinarySpec) {
-        from(file(it.sharedLibraryFile)) {
-            into 'linux-arm'
+    model {
+        binaries {
+            withType(SharedLibraryBinarySpec) {
+                from(file(it.sharedLibraryFile)) {
+                    into 'linux-arm'
+                }
+            }
         }
     }
 }

@@ -21,7 +21,7 @@ DEFAULT_DESTINATION_TEST_RESULTS_DIR=${DEFAULT_DESTINATION_DIR}/testResults
 # C++ test variables
 DEFAULT_CPP_TEST_NAME=FRCUserProgram
 DEFAULT_CPP_TEST_ARGS="--gtest_color=yes"
-DEFAULT_LOCAL_CPP_TEST_FILE=../wpilibcIntegrationTests/build/binaries/fRCUserProgramExecutable/FRCUserProgram
+DEFAULT_LOCAL_CPP_TEST_FILE=../wpilibcIntegrationTests/build/exe/fRCUserProgram/FRCUserProgram
 
 CPP_REPORT=cppreport.xml
 DEFAULT_LOCAL_CPP_TEST_RESULT=${DEFAULT_LOCAL_TEST_RESULTS_DIR}/${CPP_REPORT}

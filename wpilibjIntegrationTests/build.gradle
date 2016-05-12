@@ -14,42 +14,22 @@ mainClassName = 'edu.wpi.first.wpilibj.test.AntJunitLanucher'
 buildscript {
     repositories { jcenter() }
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.1'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
     }
 }
 
 def wpilibj = project(':wpilibj')
 
 dependencies {
-    compile wpilibj.sourceSets.shared.output
-    compile wpilibj.sourceSets.athena.output
-    compile files(wpilibj.jar.archivePath)
+    compile wpilibj
+    compile files(wpilibj.sourceSets.test.output.classesDir)
     compile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:arm'
     compile 'junit:junit:4.11'
     compile 'com.googlecode.junit-toolbox:junit-toolbox:2.0'
     compile 'org.apache.ant:ant:1.9.4'
     compile 'org.apache.ant:ant-junit:1.9.4'
-    compile files(wpilibj.sourceSets.test.output.classesDir)
 }
 
 compileJava.dependsOn tasks.getByPath(':wpilibj:testClasses')
 
 build.dependsOn shadowJar
-
-jar {
-    wpilibj.binaries.withType(SharedLibraryBinarySpec) {
-        from(file(it.sharedLibraryFile)) {
-            into 'linux-arm'
-        }
-    }
-
-    dependsOn wpilibj.jar
-}
-
-shadowJar {
-    wpilibj.binaries.withType(SharedLibraryBinarySpec) {
-        from(file(it.sharedLibraryFile)) {
-            into 'linux-arm'
-        }
-    }
-}

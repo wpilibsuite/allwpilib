@@ -12,8 +12,8 @@ model {
             targetPlatform 'arm'
             binaries.all {
                 tasks.withType(CppCompile) {
-                    dependsOn addNiLibraryLinks
-                    dependsOn addNetworkTablesLibraryLinks
+                    addNiLibraryLinks(linker, targetPlatform)
+                    addNetworkTablesLibraryLinks(it, linker, targetPlatform)
                 }
 
                 cppCompiler.args '-pthread', '-Wno-unused-variable'
