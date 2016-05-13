@@ -149,6 +149,7 @@ public class DriverStation implements RobotState.Interface {
       try {
         m_dataSem.wait(timeout);
       } catch (InterruptedException ex) {
+        Thread.currentThread().interrupt();
       }
     }
   }
