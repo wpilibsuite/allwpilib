@@ -13,37 +13,54 @@ import java.util.logging.Logger;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 
+/**
+ * Connects a digital input to a digital output.
+ *
+ * @author Jonathan Leitschuh
+ */
 public class DIOCrossConnectFixture implements ITestFixture {
 
   private static final Logger logger = Logger.getLogger(DIOCrossConnectFixture.class.getName());
 
-  private final DigitalInput input;
-  private final DigitalOutput output;
+  private final DigitalInput m_input;
+  private final DigitalOutput m_output;
   private boolean m_allocated;
 
+  /**
+   * Constructs using two pre-allocated digital objects.
+   *
+   * @param input  The input
+   * @param output The output.
+   */
   public DIOCrossConnectFixture(DigitalInput input, DigitalOutput output) {
     assert input != null;
     assert output != null;
-    this.input = input;
-    this.output = output;
+    m_input = input;
+    m_output = output;
     m_allocated = false;
   }
 
+  /**
+   * Constructs a {@link DIOCrossConnectFixture} using the ports of the digital objects.
+   *
+   * @param input  The port of the {@link DigitalInput}
+   * @param output The port of the {@link DigitalOutput}
+   */
   public DIOCrossConnectFixture(Integer input, Integer output) {
     assert input != null;
     assert output != null;
     assert !input.equals(output);
-    this.input = new DigitalInput(input);
-    this.output = new DigitalOutput(output);
+    m_input = new DigitalInput(input);
+    m_output = new DigitalOutput(output);
     m_allocated = true;
   }
 
   public DigitalInput getInput() {
-    return input;
+    return m_input;
   }
 
   public DigitalOutput getOutput() {
-    return output;
+    return m_output;
   }
 
   @Override
@@ -54,11 +71,11 @@ public class DIOCrossConnectFixture implements ITestFixture {
   @Override
   public boolean reset() {
     try {
-      input.cancelInterrupts();
-    } catch (IllegalStateException e) {
+      m_input.cancelInterrupts();
+    } catch (IllegalStateException ex) {
       // This will happen if the interrupt has not been allocated for this test.
     }
-    output.set(false);
+    m_output.set(false);
     return true;
   }
 
@@ -66,8 +83,8 @@ public class DIOCrossConnectFixture implements ITestFixture {
   public boolean teardown() {
     logger.log(Level.FINE, "Begining teardown");
     if (m_allocated) {
-      input.free();
-      output.free();
+      m_input.free();
+      m_output.free();
       m_allocated = false;
     }
     return true;

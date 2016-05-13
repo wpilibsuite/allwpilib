@@ -7,25 +7,28 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.logging.Logger;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
 
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Tests that the {@link TiltPanCameraFixture}.
+ */
 public class GyroTest extends AbstractComsSetup {
 
   private static final Logger logger = Logger.getLogger(GyroTest.class.getName());
 
   public static final double TEST_ANGLE = 90.0;
 
-  private TiltPanCameraFixture tpcam;
+  private TiltPanCameraFixture m_tpcam;
 
   @Override
   protected Logger getClassLogger() {
@@ -35,20 +38,20 @@ public class GyroTest extends AbstractComsSetup {
   @Before
   public void setUp() throws Exception {
     logger.fine("Setup: TiltPan camera");
-    tpcam = TestBench.getInstance().getTiltPanCam();
-    tpcam.setup();
+    m_tpcam = TestBench.getInstance().getTiltPanCam();
+    m_tpcam.setup();
   }
 
   @After
   public void tearDown() throws Exception {
-    tpcam.teardown();
+    m_tpcam.teardown();
   }
 
   @Test
   public void testAllGyroTests() {
-    testInitial(tpcam.getGyro());
-    testDeviationOverTime(tpcam.getGyro());
-    testGyroAngle(tpcam.getGyro());
+    testInitial(m_tpcam.getGyro());
+    testDeviationOverTime(m_tpcam.getGyro());
+    testGyroAngle(m_tpcam.getGyro());
     testGyroAngleCalibratedParameters();
   }
 
@@ -58,15 +61,14 @@ public class GyroTest extends AbstractComsSetup {
   }
 
   /**
-   * Test to see if the Servo and the gyroscope is turning 90 degrees Note servo
-   * on TestBench is not the same type of servo that servo class was designed
-   * for so setAngle is significantly off. This has been calibrated for the
-   * servo on the rig.
+   * Test to see if the Servo and the gyroscope is turning 90 degrees Note servo on TestBench is not
+   * the same type of servo that servo class was designed for so setAngle is significantly off. This
+   * has been calibrated for the servo on the rig.
    */
   public void testGyroAngle(AnalogGyro gyro) {
     // Set angle
     for (int i = 0; i < 5; i++) {
-      tpcam.getPan().set(0);
+      m_tpcam.getPan().set(0);
       Timer.delay(.1);
     }
 
@@ -77,7 +79,7 @@ public class GyroTest extends AbstractComsSetup {
 
     // Perform test
     for (int i = 0; i < 53; i++) {
-      tpcam.getPan().set(i / 100.0);
+      m_tpcam.getPan().set(i / 100.0);
       Timer.delay(0.05);
     }
     Timer.delay(1.2);
@@ -91,7 +93,8 @@ public class GyroTest extends AbstractComsSetup {
     assertEquals(errorMessage(diff, TEST_ANGLE), TEST_ANGLE, angle, 10);
   }
 
-  public void testDeviationOverTime(AnalogGyro gyro) {
+
+  protected void testDeviationOverTime(AnalogGyro gyro) {
     // Make sure that the test isn't influenced by any previous motions.
     Timer.delay(0.5);
     gyro.reset();
@@ -104,20 +107,20 @@ public class GyroTest extends AbstractComsSetup {
   }
 
   /**
-   *  Gets calibrated parameters from already calibrated gyro, allocates a
-   *  new gyro with the center and offset parameters, and re-runs the test.
+   * Gets calibrated parameters from already calibrated gyro, allocates a new gyro with the center
+   * and offset parameters, and re-runs the test.
    */
   public void testGyroAngleCalibratedParameters() {
     // Get calibrated parameters to make new Gyro with parameters
-    double cOffset = tpcam.getGyro().getOffset();
-    int cCenter = tpcam.getGyro().getCenter();
-    tpcam.freeGyro();
-    tpcam.setupGyroParam(cCenter, cOffset);
+    final double calibratedOffset = m_tpcam.getGyro().getOffset();
+    final int calibratedCenter = m_tpcam.getGyro().getCenter();
+    m_tpcam.freeGyro();
+    m_tpcam.setupGyroParam(calibratedCenter, calibratedOffset);
     Timer.delay(TiltPanCameraFixture.RESET_TIME);
     // Repeat tests
-    testInitial(tpcam.getGyroParam());
-    testDeviationOverTime(tpcam.getGyroParam());
-    testGyroAngle(tpcam.getGyroParam());
+    testInitial(m_tpcam.getGyroParam());
+    testDeviationOverTime(m_tpcam.getGyroParam());
+    testGyroAngle(m_tpcam.getGyroParam());
   }
 
   private String errorMessage(double difference, double target) {

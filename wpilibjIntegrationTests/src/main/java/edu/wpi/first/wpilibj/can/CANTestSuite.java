@@ -14,8 +14,9 @@ import org.junit.runners.Suite.SuiteClasses;
 import edu.wpi.first.wpilibj.test.AbstractTestSuite;
 
 /**
- * @author jonathanleitschuh
+ * All of the tests to cover the CAN Motor Controllers.
  *
+ * @author jonathanleitschuh
  */
 @RunWith(Suite.class)
 @SuiteClasses({CANCurrentQuadEncoderModeTest.class, CANDefaultTest.class,

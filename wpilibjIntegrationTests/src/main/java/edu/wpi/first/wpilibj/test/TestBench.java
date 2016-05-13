@@ -34,23 +34,21 @@ import edu.wpi.first.wpilibj.fixtures.FilterOutputFixture;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.fixtures.RelayCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.mockhardware.FakePotentiometerSource;
 
 /**
- * This class provides access to all of the elements on the test bench, for use
- * in fixtures. This class is a singleton, you should use {@link #getInstance()}
- * to obtain a reference to the {@code TestBench}.
+ * This class provides access to all of the elements on the test bench, for use in fixtures. This
+ * class is a singleton, you should use {@link #getInstance()} to obtain a reference to the {@code
+ * TestBench}.
  *
- * TODO: This needs to be updated to the most recent test bench setup.
+ * <p>TODO: This needs to be updated to the most recent test bench setup.
  *
  * @author Fredric Silberberg
  */
 public final class TestBench {
 
   /**
-   * The time that it takes to have a motor go from rotating at full speed to
-   * completely stopped
+   * The time that it takes to have a motor go from rotating at full speed to completely stopped.
    */
   public static final double MOTOR_STOP_TIME = 0.25;
 
@@ -95,18 +93,21 @@ public final class TestBench {
   public static final int kMovAvgTaps = 6;
   public static final double kMovAvgExpectedOutput = -10.191644;
 
-  /** The Singleton instance of the Test Bench */
+  /**
+   * The Singleton instance of the Test Bench.
+   */
   private static TestBench instance = null;
 
   /**
-   * The single constructor for the TestBench. This method is private in order
-   * to prevent multiple TestBench objects from being allocated
+   * The single constructor for the TestBench. This method is private in order to prevent multiple
+   * TestBench objects from being allocated.
    */
-  protected TestBench() {}
+  protected TestBench() {
+  }
 
   /**
-   * Constructs a new set of objects representing a connected set of Talon
-   * controlled Motors and an encoder
+   * Constructs a new set of objects representing a connected set of Talon controlled Motors and an
+   * encoder.
    *
    * @return a freshly allocated Talon, Encoder pair
    */
@@ -137,8 +138,8 @@ public final class TestBench {
   }
 
   /**
-   * Constructs a new set of objects representing a connected set of Victor
-   * controlled Motors and an encoder
+   * Constructs a new set of objects representing a connected set of Victor controlled Motors and an
+   * encoder.
    *
    * @return a freshly allocated Victor, Encoder pair
    */
@@ -169,8 +170,8 @@ public final class TestBench {
   }
 
   /**
-   * Constructs a new set of objects representing a connected set of Jaguar
-   * controlled Motors and an encoder
+   * Constructs a new set of objects representing a connected set of Jaguar controlled Motors and an
+   * encoder.
    *
    * @return a freshly allocated Jaguar, Encoder pair
    */
@@ -249,10 +250,9 @@ public final class TestBench {
   }
 
   /**
-   * Constructs a new set of objects representing a connected set of CANJaguar
-   * controlled Motors and an encoder<br>
-   * Note: The CANJaguar is not freshly allocated because the CANJaguar lacks a
-   * free() method
+   * Constructs a new set of objects representing a connected set of CANJaguar controlled Motors and
+   * an encoder<br> Note: The CANJaguar is not freshly allocated because the CANJaguar lacks a
+   * free() method.
    *
    * @return an existing CANJaguar and a freshly allocated Encoder
    */
@@ -302,20 +302,18 @@ public final class TestBench {
   }
 
   /**
-   * Gets two lists of possible DIO pairs for the two pairs
-   *$
-   * @return
+   * Gets two lists of possible DIO pairs for the two pairs.
    */
   private List<List<Integer[]>> getDIOCrossConnect() {
     List<List<Integer[]>> pairs = new ArrayList<List<Integer[]>>();
     List<Integer[]> setA =
-        Arrays.asList(new Integer[][] {
+        Arrays.asList(new Integer[][]{
             {new Integer(DIOCrossConnectA1), new Integer(DIOCrossConnectA2)},
             {new Integer(DIOCrossConnectA2), new Integer(DIOCrossConnectA1)}});
     pairs.add(setA);
 
     List<Integer[]> setB =
-        Arrays.asList(new Integer[][] {
+        Arrays.asList(new Integer[][]{
             {new Integer(DIOCrossConnectB1), new Integer(DIOCrossConnectB2)},
             {new Integer(DIOCrossConnectB2), new Integer(DIOCrossConnectB1)}});
     pairs.add(setB);
@@ -323,6 +321,7 @@ public final class TestBench {
     return pairs;
   }
 
+  @SuppressWarnings("JavadocMethod")
   public static AnalogCrossConnectFixture getAnalogCrossConnectFixture() {
     AnalogCrossConnectFixture analogIO = new AnalogCrossConnectFixture() {
       @Override
@@ -338,6 +337,7 @@ public final class TestBench {
     return analogIO;
   }
 
+  @SuppressWarnings("JavadocMethod")
   public static RelayCrossConnectFixture getRelayCrossConnectFixture() {
     RelayCrossConnectFixture relay = new RelayCrossConnectFixture() {
 
@@ -360,9 +360,9 @@ public final class TestBench {
   }
 
   /**
-   * Return a single Collection containing all of the DIOCrossConnectFixtures in
-   * all two pair combinations
-   *$
+   * Return a single Collection containing all of the DIOCrossConnectFixtures in all two pair
+   * combinations.
+   *
    * @return pairs of DIOCrossConnectFixtures
    */
   public Collection<Integer[]> getDIOCrossConnectCollection() {
@@ -374,19 +374,16 @@ public final class TestBench {
   }
 
   /**
-   * Gets an array of pairs for the encoder to use using two different lists
-   *$
-   * @param listA
-   * @param listB
+   * Gets an array of pairs for the encoder to use using two different lists.
+   *
    * @param flip whether this encoder needs to be flipped
    * @return A list of different inputs to use for the tests
    */
   private Collection<Integer[]> getPairArray(List<Integer[]> listA, List<Integer[]> listB,
-      boolean flip) {
+                                             boolean flip) {
     Collection<Integer[]> encoderPortPairs = new ArrayList<Integer[]>();
     for (Integer[] portPairsA : listA) {
-      ArrayList<Integer[]> construtorInput = new ArrayList<Integer[]>();
-      Integer inputs[] = new Integer[5];
+      Integer[] inputs = new Integer[5];
       inputs[0] = portPairsA[0]; // InputA
       inputs[1] = portPairsA[1]; // InputB
 
@@ -396,6 +393,7 @@ public final class TestBench {
         inputs[4] = flip ? 0 : 1; // The flip bit
       }
 
+      ArrayList<Integer[]> construtorInput = new ArrayList<Integer[]>();
       construtorInput.add(inputs);
 
       inputs = inputs.clone();
@@ -411,8 +409,8 @@ public final class TestBench {
   }
 
   /**
-   * Constructs the list of inputs to be used for the encoder test
-   *$
+   * Constructs the list of inputs to be used for the encoder test.
+   *
    * @return A collection of different input pairs to use for the encoder
    */
   public Collection<Integer[]> getEncoderDIOCrossConnectCollection() {
@@ -427,8 +425,7 @@ public final class TestBench {
   }
 
   /**
-   * Constructs a new set of objects representing a single-pole IIR filter with
-   * a noisy data source
+   * Constructs a new set of objects representing a single-pole IIR filter with a noisy data source.
    *
    * @return a single-pole IIR filter with a noisy data source
    */
@@ -437,15 +434,15 @@ public final class TestBench {
       @Override
       protected LinearDigitalFilter giveFilter(PIDSource source) {
         return LinearDigitalFilter.singlePoleIIR(source,
-                                                 kSinglePoleIIRTimeConstant,
-                                                 kFilterStep);
+            kSinglePoleIIRTimeConstant,
+            kFilterStep);
       }
     };
   }
 
   /**
-   * Constructs a new set of objects representing a moving average filter with a
-   * noisy data source using a linear digital filter
+   * Constructs a new set of objects representing a moving average filter with a noisy data source
+   * using a linear digital filter.
    *
    * @return a moving average filter with a noisy data source
    */
@@ -459,8 +456,8 @@ public final class TestBench {
   }
 
   /**
-   * Constructs a new set of objects representing a single-pole IIR filter with
-   * a repeatable data source
+   * Constructs a new set of objects representing a single-pole IIR filter with a repeatable data
+   * source.
    *
    * @return a single-pole IIR filter with a repeatable data source
    */
@@ -469,15 +466,14 @@ public final class TestBench {
       @Override
       protected LinearDigitalFilter giveFilter(PIDSource source) {
         return LinearDigitalFilter.singlePoleIIR(source,
-                                                 kSinglePoleIIRTimeConstant,
-                                                 kFilterStep);
+            kSinglePoleIIRTimeConstant,
+            kFilterStep);
       }
     };
   }
 
   /**
-   * Constructs a new set of objects representing a high-pass filter with a
-   * repeatable data source
+   * Constructs a new set of objects representing a high-pass filter with a repeatable data source.
    *
    * @return a high-pass filter with a repeatable data source
    */
@@ -486,14 +482,14 @@ public final class TestBench {
       @Override
       protected LinearDigitalFilter giveFilter(PIDSource source) {
         return LinearDigitalFilter.highPass(source, kHighPassTimeConstant,
-                                            kFilterStep);
+            kFilterStep);
       }
     };
   }
 
   /**
-   * Constructs a new set of objects representing a moving average filter with a
-   * repeatable data source using a linear digital filter
+   * Constructs a new set of objects representing a moving average filter with a repeatable data
+   * source using a linear digital filter.
    *
    * @return a moving average filter with a repeatable data source
    */
@@ -507,9 +503,8 @@ public final class TestBench {
   }
 
   /**
-   * Gets the singleton of the TestBench. If the TestBench is not already
-   * allocated in constructs an new instance of it. Otherwise it returns the
-   * existing instance.
+   * Gets the singleton of the TestBench. If the TestBench is not already allocated in constructs an
+   * new instance of it. Otherwise it returns the existing instance.
    *
    * @return The Singleton instance of the TestBench
    */
@@ -521,10 +516,10 @@ public final class TestBench {
   }
 
   /**
-   * Provides access to the output stream for the test system. This should be
-   * used instead of System.out This is gives us a way to implement changes to
-   * where the output text of this test system is sent.
-   *$
+   * Provides access to the output stream for the test system. This should be used instead of
+   * System.out This is gives us a way to implement changes to where the output text of this test
+   * system is sent.
+   *
    * @return The test bench global print stream.
    */
   public static PrintStream out() {
@@ -532,10 +527,10 @@ public final class TestBench {
   }
 
   /**
-   * Provides access to the error stream for the test system. This should be
-   * used instead of System.err This is gives us a way to implement changes to
-   * where the output text of this test system is sent.
-   *$
+   * Provides access to the error stream for the test system. This should be used instead of
+   * System.err This is gives us a way to implement changes to where the output text of this test
+   * system is sent.
+   *
    * @return The test bench global print stream.
    */
   public static PrintStream err() {

@@ -11,45 +11,46 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.AnalogOutput;
 
 /**
- * @author jonathanleitschuh
+ * A fixture that connects an {@link AnalogInput} and an {@link AnalogOutput}.
  *
+ * @author jonathanleitschuh
  */
 public abstract class AnalogCrossConnectFixture implements ITestFixture {
-  private boolean initialized = false;
+  private boolean m_initialized = false;
 
-  private AnalogInput input;
-  private AnalogOutput output;
+  private AnalogInput m_input;
+  private AnalogOutput m_output;
 
-  abstract protected AnalogInput giveAnalogInput();
+  protected abstract AnalogInput giveAnalogInput();
 
-  abstract protected AnalogOutput giveAnalogOutput();
+  protected abstract AnalogOutput giveAnalogOutput();
 
 
   private void initialize() {
     synchronized (this) {
-      if (!initialized) {
-        input = giveAnalogInput();
-        output = giveAnalogOutput();
-        initialized = true;
+      if (!m_initialized) {
+        m_input = giveAnalogInput();
+        m_output = giveAnalogOutput();
+        m_initialized = true;
       }
     }
   }
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#setup()
    */
   @Override
   public boolean setup() {
     initialize();
-    output.setVoltage(0);
+    m_output.setVoltage(0);
     return true;
   }
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#reset()
    */
   @Override
@@ -60,27 +61,27 @@ public abstract class AnalogCrossConnectFixture implements ITestFixture {
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#teardown()
    */
   @Override
   public boolean teardown() {
-    input.free();
-    output.free();
+    m_input.free();
+    m_output.free();
     return true;
   }
 
   /**
-   * @return Analog Output
+   * Analog Output.
    */
-  final public AnalogOutput getOutput() {
+  public final AnalogOutput getOutput() {
     initialize();
-    return output;
+    return m_output;
   }
 
-  final public AnalogInput getInput() {
+  public final AnalogInput getInput() {
     initialize();
-    return input;
+    return m_input;
   }
 
 

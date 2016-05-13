@@ -12,6 +12,6 @@ dependencies {
 
 apply from: 'athena.gradle'
 
-if (project.hasProperty('makeSim')){
-  apply from: 'simulation.gradle'
+if (project.hasProperty('makeSim')) {
+    apply from: 'simulation.gradle'
 }

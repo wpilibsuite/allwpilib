@@ -8,22 +8,22 @@
 package edu.wpi.first.wpilibj.communication;
 
 /**
- * A wrapper for the HALControlWord bitfield
+ * A wrapper for the HALControlWord bitfield.
  */
 public class HALControlWord {
-  private boolean m_enabled;
-  private boolean m_autonomous;
-  private boolean m_test;
-  private boolean m_eStop;
-  private boolean m_fmsAttached;
-  private boolean m_dsAttached;
+  private final boolean m_enabled;
+  private final boolean m_autonomous;
+  private final boolean m_test;
+  private final boolean m_emergencyStop;
+  private final boolean m_fmsAttached;
+  private final boolean m_dsAttached;
 
-  protected HALControlWord(boolean enabled, boolean autonomous, boolean test, boolean eStop,
-      boolean fmsAttached, boolean dsAttached) {
+  protected HALControlWord(boolean enabled, boolean autonomous, boolean test, boolean emergencyStop,
+                           boolean fmsAttached, boolean dsAttached) {
     m_enabled = enabled;
     m_autonomous = autonomous;
     m_test = test;
-    m_eStop = eStop;
+    m_emergencyStop = emergencyStop;
     m_fmsAttached = fmsAttached;
     m_dsAttached = dsAttached;
   }
@@ -41,7 +41,7 @@ public class HALControlWord {
   }
 
   public boolean getEStop() {
-    return m_eStop;
+    return m_emergencyStop;
   }
 
   public boolean getFMSAttached() {

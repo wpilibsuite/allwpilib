@@ -18,18 +18,19 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.mockhardware.FakePotentiometerSource;
 
 /**
- * @author jonathanleitschuh
+ * A fixture that wraps a {@link CANJaguar}.
  *
+ * @author jonathanleitschuh
  */
 public abstract class CANMotorEncoderFixture extends MotorEncoderFixture<CANJaguar> implements
     ITestFixture {
   private static final Logger logger = Logger.getLogger(CANMotorEncoderFixture.class.getName());
   public static final double RELAY_POWER_UP_TIME = .75;
-  private FakePotentiometerSource potSource;
-  private DigitalOutput forwardLimit;
-  private DigitalOutput reverseLimit;
-  private Relay powerCycler;
-  private boolean initialized = false;
+  private FakePotentiometerSource m_potSource;
+  private DigitalOutput m_forwardLimit;
+  private DigitalOutput m_reverseLimit;
+  private Relay m_powerCycler;
+  private boolean m_initialized = false;
 
   protected abstract FakePotentiometerSource giveFakePotentiometerSource();
 
@@ -39,24 +40,25 @@ public abstract class CANMotorEncoderFixture extends MotorEncoderFixture<CANJagu
 
   protected abstract Relay givePowerCycleRelay();
 
-  public CANMotorEncoderFixture() {}
+  public CANMotorEncoderFixture() {
+  }
 
   private void initialize() {
     synchronized (this) {
-      if (!initialized) {
-        initialized = true;// This ensures it is only initialized once
+      if (!m_initialized) {
+        m_initialized = true;// This ensures it is only initialized once
 
-        powerCycler = givePowerCycleRelay();
-        powerCycler.setDirection(Direction.kForward);
+        m_powerCycler = givePowerCycleRelay();
+        m_powerCycler.setDirection(Direction.kForward);
         logger.fine("Turning on the power!");
-        powerCycler.set(Value.kForward);
-        forwardLimit = giveFakeForwardLimit();
-        reverseLimit = giveFakeReverseLimit();
-        forwardLimit.set(false);
-        reverseLimit.set(false);
-        potSource = giveFakePotentiometerSource();
+        m_powerCycler.set(Value.kForward);
+        m_forwardLimit = giveFakeForwardLimit();
+        m_reverseLimit = giveFakeReverseLimit();
+        m_forwardLimit.set(false);
+        m_reverseLimit.set(false);
+        m_potSource = giveFakePotentiometerSource();
         Timer.delay(RELAY_POWER_UP_TIME); // Delay so the relay has time to boot
-                                          // up
+        // up
       }
     }
   }
@@ -71,34 +73,37 @@ public abstract class CANMotorEncoderFixture extends MotorEncoderFixture<CANJagu
   @Override
   public boolean reset() {
     initialize();
-    potSource.reset();
-    forwardLimit.set(false);
-    reverseLimit.set(false);
+    m_potSource.reset();
+    m_forwardLimit.set(false);
+    m_reverseLimit.set(false);
     getMotor().setPercentMode(); // Get the Jaguar into a mode where setting the
-                                 // speed means stop
+    // speed means stop
     return super.reset();
   }
 
   @Override
   public boolean teardown() {
     boolean wasNull = false;
-    if (potSource != null) {
-      potSource.free();
-      potSource = null;
-    } else
+    if (m_potSource != null) {
+      m_potSource.free();
+      m_potSource = null;
+    } else {
       wasNull = true;
-    if (forwardLimit != null) {
-      forwardLimit.set(false);
-      forwardLimit.free();
-      forwardLimit = null;
-    } else
+    }
+    if (m_forwardLimit != null) {
+      m_forwardLimit.set(false);
+      m_forwardLimit.free();
+      m_forwardLimit = null;
+    } else {
       wasNull = true;
-    if (reverseLimit != null) {
-      reverseLimit.set(false);
-      reverseLimit.free();
-      reverseLimit = null;
-    } else
+    }
+    if (m_reverseLimit != null) {
+      m_reverseLimit.set(false);
+      m_reverseLimit.free();
+      m_reverseLimit = null;
+    } else {
       wasNull = true;
+    }
     boolean superTornDown = false;
     try {
       superTornDown = super.teardown();
@@ -107,14 +112,16 @@ public abstract class CANMotorEncoderFixture extends MotorEncoderFixture<CANJagu
         if (getMotor() != null) {
           getMotor().disableControl();
           getMotor().free();
-        } else
+        } else {
           wasNull = true;
+        }
       } finally {
-        if (powerCycler != null) {
-          powerCycler.free();
-          powerCycler = null;
-        } else
+        if (m_powerCycler != null) {
+          m_powerCycler.free();
+          m_powerCycler = null;
+        } else {
           wasNull = true;
+        }
       }
     }
     if (wasNull) {
@@ -126,19 +133,22 @@ public abstract class CANMotorEncoderFixture extends MotorEncoderFixture<CANJagu
 
   public FakePotentiometerSource getFakePot() {
     initialize();
-    return potSource;
+    return m_potSource;
   }
 
   public DigitalOutput getForwardLimit() {
     initialize();
-    return forwardLimit;
+    return m_forwardLimit;
   }
 
   public DigitalOutput getReverseLimit() {
     initialize();
-    return reverseLimit;
+    return m_reverseLimit;
   }
 
+  /**
+   * Prints the current status of the fixture.
+   */
   public String printStatus() {
     StringBuilder status = new StringBuilder("CAN Motor Encoder Status: ");
     if (getMotor() != null) {
@@ -152,13 +162,13 @@ public abstract class CANMotorEncoderFixture extends MotorEncoderFixture<CANJagu
     } else {
       status.append("\t" + "CANJaguar Motor = null" + "\n");
     }
-    if (forwardLimit != null) {
-      status.append("\tForward Limit Output = " + forwardLimit + "\n");
+    if (m_forwardLimit != null) {
+      status.append("\tForward Limit Output = " + m_forwardLimit + "\n");
     } else {
       status.append("\tForward Limit Output = null" + "\n");
     }
-    if (reverseLimit != null) {
-      status.append("\tReverse Limit Output = " + reverseLimit + "\n");
+    if (m_reverseLimit != null) {
+      status.append("\tReverse Limit Output = " + m_reverseLimit + "\n");
     } else {
       status.append("\tReverse Limit Output = null" + "\n");
     }
@@ -166,6 +176,11 @@ public abstract class CANMotorEncoderFixture extends MotorEncoderFixture<CANJagu
     return status.toString();
   }
 
+  /**
+   * Browns out the fixture for a specific ammount of time.
+   *
+   * @param seconds The number of seconds to brown out for.
+   */
   public void brownOut(double seconds) {
     initialize();
     powerOff();
@@ -175,12 +190,12 @@ public abstract class CANMotorEncoderFixture extends MotorEncoderFixture<CANJagu
 
   public void powerOff() {
     initialize();
-    powerCycler.set(Value.kOff);
+    m_powerCycler.set(Value.kOff);
   }
 
   public void powerOn() {
     initialize();
-    powerCycler.set(Value.kForward);
+    m_powerCycler.set(Value.kForward);
   }
 
 }

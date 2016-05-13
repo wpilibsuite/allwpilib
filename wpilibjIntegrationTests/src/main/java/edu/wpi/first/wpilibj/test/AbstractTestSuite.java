@@ -7,6 +7,11 @@
 
 package edu.wpi.first.wpilibj.test;
 
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.Request;
+import org.junit.runners.Suite.SuiteClasses;
+
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Vector;
@@ -14,33 +19,23 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.Request;
-import org.junit.runners.Suite.SuiteClasses;
-import org.junit.runners.model.InitializationError;
-
 /**
- * Allows tests suites and tests to be run selectively from the command line
- * using a regex text pattern.
- *$
- * @author jonathanleitschuh
+ * Allows tests suites and tests to be run selectively from the command line using a regex text
+ * pattern.
  *
+ * @author jonathanleitschuh
  */
 public abstract class AbstractTestSuite {
   private static final Logger logger = Logger.getLogger(AbstractTestSuite.class.getName());
 
   /**
-   * Gets all of the classes listed within the SuiteClasses annotation. To use
-   * it, annotate a class with <code>@RunWith(Suite.class)</code> and
-   * <code>@SuiteClasses({TestClass1.class, ...})</code>. When you run this
-   * class, it will run all the tests in all the suite classes. When loading the
-   * tests using regex the test list will be generated from this annotation.
-   *$
-   * @return the list of classes listed in the
-   *         <code>@SuiteClasses({TestClass1.class, ...})</code> annotation.
-   * @throws RuntimeException If the <code>@SuiteClasses</code> annotation is
-   *         missing.
+   * Gets all of the classes listed within the SuiteClasses annotation. To use it, annotate a class
+   * with <code>@RunWith(Suite.class)</code> and <code>@SuiteClasses({TestClass1.class,
+   * ...})</code>. When you run this class, it will run all the tests in all the suite classes. When
+   * loading the tests using regex the test list will be generated from this annotation.
+   *
+   * @return the list of classes listed in the <code>@SuiteClasses({TestClass1.class, ...})</code>.
+   * @throws RuntimeException If the <code>@SuiteClasses</code> annotation is missing.
    */
   protected List<Class<?>> getAnnotatedTestClasses() {
     SuiteClasses annotation = getClass().getAnnotation(SuiteClasses.class);
@@ -66,23 +61,22 @@ public abstract class AbstractTestSuite {
   }
 
   /**
-   * Stores a method name and method class pair. Used when searching for methods
-   * matching a given regex text.
-   *$
-   * @author jonathanleitschuh
+   * Stores a method name and method class pair. Used when searching for methods matching a given
+   * regex text.
    *
+   * @author jonathanleitschuh
    */
   protected class ClassMethodPair {
-    public final Class<?> methodClass;
-    public final String methodName;
+    public final Class<?> m_methodClass;
+    public final String m_methodName;
 
-    public ClassMethodPair(Class<?> klass, Method m) {
-      this.methodClass = klass;
-      this.methodName = m.getName();
+    public ClassMethodPair(Class<?> klass, Method method) {
+      m_methodClass = klass;
+      m_methodName = method.getName();
     }
 
     public Request getMethodRunRequest() {
-      return Request.method(methodClass, methodName);
+      return Request.method(m_methodClass, m_methodName);
     }
   }
 
@@ -105,9 +99,9 @@ public abstract class AbstractTestSuite {
 
 
   /**
-   * Gets all of the test classes listed in this suite. Does not include any of
-   * the test suites. All of these classes contain tests.
-   *$
+   * Gets all of the test classes listed in this suite. Does not include any of the test suites. All
+   * of these classes contain tests.
+   *
    * @param runningList the running list of classes to prevent recursion.
    * @return The list of base test classes.
    */
@@ -117,21 +111,20 @@ public abstract class AbstractTestSuite {
       if (areAnySuperClassesOfTypeAbstractTestSuite(c)) {
         // Create a new instance of this class so that we can retrieve its data
         try {
-          AbstractTestSuite suite = null;
-          Object o = c.newInstance();
-          suite = (AbstractTestSuite) c.newInstance();
+          AbstractTestSuite suite = (AbstractTestSuite) c.newInstance();
           // Add the tests from this suite that match the regex to the list of
           // tests to run
           runningList = suite.getAllContainedBaseTests(runningList);
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException ex) {
           // This shouldn't happen unless the constructor is changed in some
           // way.
-          logger.log(Level.SEVERE, "Test suites can not take paramaters in their constructors.", e);
+          logger.log(Level.SEVERE, "Test suites can not take paramaters in their constructors.",
+              ex);
         }
       } else if (c.getAnnotation(SuiteClasses.class) != null) {
         logger.log(Level.SEVERE,
-            String.format("class '%s' must extend %s to be searchable using regex.", c.getName()),
-            AbstractTestSuite.class.getName());
+            String.format("class '%s' must extend %s to be searchable using regex.",
+                c.getName(), AbstractTestSuite.class.getName()));
       } else { // This is a class containing tests
         // so add it to the list
         runningList.add(c);
@@ -141,9 +134,9 @@ public abstract class AbstractTestSuite {
   }
 
   /**
-   * Gets all of the test classes listed in this suite. Does not include any of
-   * the test suites. All of these classes contain tests.
-   *$
+   * Gets all of the test classes listed in this suite. Does not include any of the test suites. All
+   * of these classes contain tests.
+   *
    * @return The list of base test classes.
    */
   public List<Class<?>> getAllContainedBaseTests() {
@@ -153,10 +146,10 @@ public abstract class AbstractTestSuite {
 
 
   /**
-   * Retrieves all of the classes listed in the
-   * <code>@SuiteClasses</code> annotation that match the given regex text.
-   *$
-   * @param regex the text pattern to retrieve.
+   * Retrieves all of the classes listed in the <code>@SuiteClasses</code> annotation that match the
+   * given regex text.
+   *
+   * @param regex       the text pattern to retrieve.
    * @param runningList the running list of classes to prevent recursion
    * @return The list of classes matching the regex pattern
    */
@@ -171,9 +164,9 @@ public abstract class AbstractTestSuite {
   }
 
   /**
-   * Retrieves all of the classes listed in the
-   * <code>@SuiteClasses</code> annotation that match the given regex text.
-   *$
+   * Retrieves all of the classes listed in the <code>@SuiteClasses</code> annotation that match the
+   * given regex text.
+   *
    * @param regex the text pattern to retrieve.
    * @return The list of classes matching the regex pattern
    */
@@ -183,15 +176,15 @@ public abstract class AbstractTestSuite {
   }
 
   /**
-   * Searches through all of the suites and tests and loads only the test or
-   * test suites matching the regex text. This method also prevents a single
-   * test from being loaded multiple times by loading the suite first then
-   * loading tests from all non loaded suites.
-   *$
+   * Searches through all of the suites and tests and loads only the test or test suites matching
+   * the regex text. This method also prevents a single test from being loaded multiple times by
+   * loading the suite first then loading tests from all non loaded suites.
+   *
    * @param regex the regex text to search for
    * @return the list of suite and/or test classes matching the regex.
    */
-  private List<Class<?>> getSuiteOrTestMatchingRegex(final String regex, List<Class<?>> runningList) {
+  private List<Class<?>> getSuiteOrTestMatchingRegex(final String regex, List<Class<?>>
+      runningList) {
     // Get any test suites matching the regex using the superclass methods
     runningList = getAllClassMatching(regex, runningList);
 
@@ -206,22 +199,22 @@ public abstract class AbstractTestSuite {
       // Prevents recursively adding tests/suites that have already been added
       if (!runningList.contains(c)) {
         try {
-          AbstractTestSuite suite = null;
+          final AbstractTestSuite suite;
           // Check the class to make sure that it is not a test class
           if (areAnySuperClassesOfTypeAbstractTestSuite(c)) {
             // Create a new instance of this class so that we can retrieve its
             // data.
-            Object o = c.newInstance();
             suite = (AbstractTestSuite) c.newInstance();
             // Add the tests from this suite that match the regex to the list of
             // tests to run
             runningList = suite.getSuiteOrTestMatchingRegex(regex, runningList);
           }
 
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException ex) {
           // This shouldn't happen unless the constructor is changed in some
           // way.
-          logger.log(Level.SEVERE, "Test suites can not take paramaters in their constructors.", e);
+          logger.log(Level.SEVERE, "Test suites can not take paramaters in their constructors.",
+              ex);
         }
       }
     }
@@ -229,11 +222,10 @@ public abstract class AbstractTestSuite {
   }
 
   /**
-   * Searches through all of the suites and tests and loads only the test or
-   * test suites matching the regex text. This method also prevents a single
-   * test from being loaded multiple times by loading the suite first then
-   * loading tests from all non loaded suites.
-   *$
+   * Searches through all of the suites and tests and loads only the test or test suites matching
+   * the regex text. This method also prevents a single test from being loaded multiple times by
+   * loading the suite first then loading tests from all non loaded suites.
+   *
    * @param regex the regex text to search for
    * @return the list of suite and/or test classes matching the regex.
    */
@@ -243,26 +235,21 @@ public abstract class AbstractTestSuite {
   }
 
 
-
   /**
-   * Retrieves all of the classes listed in the
-   * <code>@SuiteClasses</code> annotation.
-   *$
+   * Retrieves all of the classes listed in the <code>@SuiteClasses</code> annotation.
+   *
    * @return List of SuiteClasses
-   * @throws RuntimeException If the <code>@SuiteClasses</code> annotation is
-   *         missing.
+   * @throws RuntimeException If the <code>@SuiteClasses</code> annotation is missing.
    */
   public List<Class<?>> getAllClasses() {
     return getAnnotatedTestClasses();
   }
 
   /**
-   * Gets the name of all of the classes listed within the
-   * <code>@SuiteClasses</code> annotation.
-   *$
+   * Gets the name of all of the classes listed within the <code>@SuiteClasses</code> annotation.
+   *
    * @return the list of classes.
-   * @throws RuntimeException If the <code>@SuiteClasses</code> annotation is
-   *         missing.
+   * @throws RuntimeException If the <code>@SuiteClasses</code> annotation is missing.
    */
   public List<String> getAllClassName() {
     List<String> classNames = new Vector<String>();

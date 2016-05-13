@@ -17,6 +17,7 @@ public class CANExceptionFactory {
   static final int ERR_CANSessionMux_NotAllowed = -44088;
   static final int ERR_CANSessionMux_NotInitialized = -44089;
 
+  @SuppressWarnings("JavadocMethod")
   public static void checkStatus(int status, int messageID) throws CANInvalidBufferException,
       CANMessageNotAllowedException, CANNotInitializedException, UncleanStatusException {
     switch (status) {
@@ -36,7 +37,8 @@ public class CANExceptionFactory {
       case NIRioStatus.kRIOStatusResourceNotInitialized:
         throw new CANNotInitializedException();
       default:
-        throw new UncleanStatusException("Fatal status code detected:  " + Integer.toString(status));
+        throw new UncleanStatusException("Fatal status code detected:  " + Integer.toString(
+            status));
     }
   }
 }

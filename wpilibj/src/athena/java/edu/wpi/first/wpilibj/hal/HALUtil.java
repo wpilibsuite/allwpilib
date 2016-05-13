@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj.hal;
 
+@SuppressWarnings("AbbreviationAsWordInName")
 public class HALUtil extends JNIWrapper {
   public static final int NULL_PARAMETER = -1005;
   public static final int SAMPLE_RATE_TOO_HIGH = 1001;
@@ -33,7 +34,7 @@ public class HALUtil extends JNIWrapper {
 
   public static native void deleteMultiWait(long sem);
 
-  public static native void takeMultiWait(long sem, long m);
+  public static native void takeMultiWait(long sem, long ms);
 
   public static native short getFPGAVersion();
 

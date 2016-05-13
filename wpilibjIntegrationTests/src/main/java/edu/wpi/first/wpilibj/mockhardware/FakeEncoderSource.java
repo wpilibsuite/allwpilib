@@ -11,20 +11,22 @@ import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
- * Emulates a quadrature encoder
+ * Emulates a quadrature encoder.
+ *
  * @author Ryan O'Meara
  */
 public class FakeEncoderSource {
 
   private Thread m_task;
   private int m_count;
-  private int m_mSec;
+  private int m_milliSec;
   private boolean m_forward;
-  private DigitalOutput m_outputA, m_outputB;
-  private final boolean allocatedOutputs;
+  private final DigitalOutput m_outputA;
+  private final DigitalOutput m_outputB;
+  private final boolean m_allocatedOutputs;
 
   /**
-   * Thread object that allows emulation of a quadrature encoder
+   * Thread object that allows emulation of a quadrature encoder.
    */
   private class QuadEncoderThread extends Thread {
 
@@ -36,7 +38,8 @@ public class FakeEncoderSource {
 
     public void run() {
 
-      DigitalOutput lead, lag;
+      final DigitalOutput lead;
+      final DigitalOutput lag;
 
       m_encoder.m_outputA.set(false);
       m_encoder.m_outputB.set(false);
@@ -52,46 +55,62 @@ public class FakeEncoderSource {
       try {
         for (int i = 0; i < m_encoder.m_count; i++) {
           lead.set(true);
-          Thread.sleep(m_encoder.m_mSec);
+          Thread.sleep(m_encoder.m_milliSec);
           lag.set(true);
-          Thread.sleep(m_encoder.m_mSec);
+          Thread.sleep(m_encoder.m_milliSec);
           lead.set(false);
-          Thread.sleep(m_encoder.m_mSec);
+          Thread.sleep(m_encoder.m_milliSec);
           lag.set(false);
-          Thread.sleep(m_encoder.m_mSec);
+          Thread.sleep(m_encoder.m_milliSec);
         }
-      } catch (InterruptedException e) {
+      } catch (InterruptedException ex) {
+        Thread.currentThread().interrupt();
       }
     }
   }
 
+  /**
+   * Creates an encoder source using two ports.
+   *
+   * @param portA The A port
+   * @param portB The B port
+   */
   public FakeEncoderSource(int portA, int portB) {
     m_outputA = new DigitalOutput(portA);
     m_outputB = new DigitalOutput(portB);
-    allocatedOutputs = true;
+    m_allocatedOutputs = true;
     initQuadEncoder();
   }
 
-  public FakeEncoderSource(DigitalOutput iA, DigitalOutput iB) {
-    m_outputA = iA;
-    m_outputB = iB;
-    allocatedOutputs = false;
+  /**
+   * Creates the fake encoder using two digital outputs.
+   *
+   * @param outputA The A digital output
+   * @param outputB The B digital output
+   */
+  public FakeEncoderSource(DigitalOutput outputA, DigitalOutput outputB) {
+    m_outputA = outputA;
+    m_outputB = outputB;
+    m_allocatedOutputs = false;
     initQuadEncoder();
   }
 
+  /**
+   * Frees the resource.
+   */
   public void free() {
     m_task = null;
-    if (allocatedOutputs) {
+    if (m_allocatedOutputs) {
       m_outputA.free();
       m_outputB.free();
     }
   }
 
   /**
-   * Common initialization code
+   * Common initialization code.
    */
   private final void initQuadEncoder() {
-    m_mSec = 1;
+    m_milliSec = 1;
     m_forward = true;
     m_task = new QuadEncoderThread(this);
     m_outputA.set(false);
@@ -99,26 +118,27 @@ public class FakeEncoderSource {
   }
 
   /**
-   * Starts the thread
+   * Starts the thread.
    */
   public void start() {
     m_task.start();
   }
 
   /**
-   * Waits for thread to end
+   * Waits for thread to end.
    */
   public void complete() {
     try {
       m_task.join();
-    } catch (InterruptedException e) {
+    } catch (InterruptedException ex) {
+      Thread.currentThread().interrupt();
     }
     m_task = new QuadEncoderThread(this);
     Timer.delay(.01);
   }
 
   /**
-   * Runs and waits for thread to end before returning
+   * Runs and waits for thread to end before returning.
    */
   public void execute() {
     start();
@@ -126,17 +146,17 @@ public class FakeEncoderSource {
   }
 
   /**
-   * Rate of pulses to send
-   *$
-   * @param mSec Pulse Rate
+   * Rate of pulses to send.
+   *
+   * @param milliSec Pulse Rate
    */
-  public void setRate(int mSec) {
-    m_mSec = mSec;
+  public void setRate(int milliSec) {
+    m_milliSec = milliSec;
   }
 
   /**
-   * Set the number of pulses to simulate
-   *$
+   * Set the number of pulses to simulate.
+   *
    * @param count Pulse count
    */
   public void setCount(int count) {
@@ -144,8 +164,8 @@ public class FakeEncoderSource {
   }
 
   /**
-   * Set which direction the encoder simulates motion in
-   *$
+   * Set which direction the encoder simulates motion in.
+   *
    * @param isForward Whether to simulate forward motion
    */
   public void setForward(boolean isForward) {
@@ -153,8 +173,8 @@ public class FakeEncoderSource {
   }
 
   /**
-   * Accesses whether the encoder is simulating forward motion
-   *$
+   * Accesses whether the encoder is simulating forward motion.
+   *
    * @return Whether the simulated motion is in the forward direction
    */
   public boolean isForward() {

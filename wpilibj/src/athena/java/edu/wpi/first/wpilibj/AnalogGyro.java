@@ -12,39 +12,35 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
- * Use a rate gyro to return the robots heading relative to a starting position.
- * The Gyro class tracks the robots heading based on the starting position. As
- * the robot rotates the new heading is computed by integrating the rate of
- * rotation returned by the sensor. When the class is instantiated, it does a
- * short calibration routine where it samples the gyro while at rest to
- * determine the default offset. This is subtracted from each sample to
- * determine the heading.
+ * Use a rate gyro to return the robots heading relative to a starting position. The Gyro class
+ * tracks the robots heading based on the starting position. As the robot rotates the new heading is
+ * computed by integrating the rate of rotation returned by the sensor. When the class is
+ * instantiated, it does a short calibration routine where it samples the gyro while at rest to
+ * determine the default offset. This is subtracted from each sample to determine the heading.
  *
- * This class is for gyro sensors that connect to an analog input.
+ * <p>This class is for gyro sensors that connect to an analog input.
  */
 public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowSendable {
 
-  static final int kOversampleBits = 10;
-  static final int kAverageBits = 0;
-  static final double kSamplesPerSecond = 50.0;
-  static final double kCalibrationSampleTime = 5.0;
-  static final double kDefaultVoltsPerDegreePerSecond = 0.007;
+  private static final int kOversampleBits = 10;
+  private static final int kAverageBits = 0;
+  private static final double kSamplesPerSecond = 50.0;
+  private static final double kCalibrationSampleTime = 5.0;
+  private static final double kDefaultVoltsPerDegreePerSecond = 0.007;
   protected AnalogInput m_analog;
-  double m_voltsPerDegreePerSecond;
-  double m_offset;
-  int m_center;
-  boolean m_channelAllocated = false;
-  AccumulatorResult result;
-  private PIDSourceType m_pidSource;
+  private double m_voltsPerDegreePerSecond;
+  private double m_offset;
+  private int m_center;
+  private boolean m_channelAllocated = false;
+  private AccumulatorResult m_result;
 
   /**
    * Initialize the gyro. Calibration is handled by calibrate().
    */
   public void initGyro() {
-    result = new AccumulatorResult();
+    m_result = new AccumulatorResult();
 
     m_voltsPerDegreePerSecond = kDefaultVoltsPerDegreePerSecond;
     m_analog.setAverageBits(kAverageBits);
@@ -61,20 +57,18 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
     LiveWindow.addSensor("AnalogGyro", m_analog.getChannel(), this);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public void calibrate() {
     m_analog.initAccumulator();
     m_analog.resetAccumulator();
 
     Timer.delay(kCalibrationSampleTime);
 
-    m_analog.getAccumulatorOutput(result);
+    m_analog.getAccumulatorOutput(m_result);
 
-    m_center = (int) ((double) result.value / (double) result.count + .5);
+    m_center = (int) ((double) m_result.value / (double) m_result.count + .5);
 
-    m_offset = ((double) result.value / (double) result.count) - m_center;
+    m_offset = ((double) m_result.value / (double) m_result.count) - m_center;
 
     m_analog.setAccumulatorCenter(m_center);
     m_analog.resetAccumulator();
@@ -83,8 +77,8 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
   /**
    * Gyro constructor using the channel number
    *
-   * @param channel The analog channel the gyro is connected to. Gyros can only
-   *        be used on on-board channels 0-1.
+   * @param channel The analog channel the gyro is connected to. Gyros can only be used on on-board
+   *                channels 0-1.
    */
   public AnalogGyro(int channel) {
     this(new AnalogInput(channel));
@@ -92,11 +86,11 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
   }
 
   /**
-   * Gyro constructor with a precreated analog channel object. Use this
-   * constructor when the analog channel needs to be shared.
+   * Gyro constructor with a precreated analog channel object. Use this constructor when the analog
+   * channel needs to be shared.
    *
-   * @param channel The AnalogInput object that the gyro is connected to. Gyros
-   *        can only be used on on-board channels 0-1.
+   * @param channel The AnalogInput object that the gyro is connected to. Gyros can only be used on
+   *                on-board channels 0-1.
    */
   public AnalogGyro(AnalogInput channel) {
     m_analog = channel;
@@ -108,12 +102,13 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
   }
 
   /**
-   * Gyro constructor using the channel number along with parameters for
-   * presetting the center and offset values. Bypasses calibration.
-   * @param channel The analog channel the gyro is connected to. Gyros can only
-   *        be used on on-board channels 0-1.
-   * @param center Preset uncalibrated value to use as the accumulator center value.
-   * @param offset Preset uncalibrated value to use as the gyro offset.
+   * Gyro constructor using the channel number along with parameters for presetting the center and
+   * offset values. Bypasses calibration.
+   *
+   * @param channel The analog channel the gyro is connected to. Gyros can only be used on on-board
+   *                channels 0-1.
+   * @param center  Preset uncalibrated value to use as the accumulator center value.
+   * @param offset  Preset uncalibrated value to use as the gyro offset.
    */
   public AnalogGyro(int channel, int center, double offset) {
     this(new AnalogInput(channel), center, offset);
@@ -121,13 +116,13 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
   }
 
   /**
-   * Gyro constructor with a precreated analog channel object along with
-   * parameters for presetting the center and offset values. Bypasses
-   * calibration.
-   * @param channel The analog channel the gyro is connected to. Gyros can only
-   *        be used on on-board channels 0-1.
-   * @param center Preset uncalibrated value to use as the accumulator center value.
-   * @param offset Preset uncalibrated value to use as the gyro offset.
+   * Gyro constructor with a precreated analog channel object along with parameters for presetting
+   * the center and offset values. Bypasses calibration.
+   *
+   * @param channel The analog channel the gyro is connected to. Gyros can only be used on on-board
+   *                channels 0-1.
+   * @param center  Preset uncalibrated value to use as the accumulator center value.
+   * @param offset  Preset uncalibrated value to use as the gyro offset.
    */
   public AnalogGyro(AnalogInput channel, int center, double offset) {
     m_analog = channel;
@@ -142,9 +137,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
     m_analog.resetAccumulator();
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public void reset() {
     if (m_analog != null) {
       m_analog.resetAccumulator();
@@ -162,16 +155,14 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
     m_analog = null;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public synchronized double getAngle() {
     if (m_analog == null) {
       return 0.0;
     } else {
-      m_analog.getAccumulatorOutput(result);
+      m_analog.getAccumulatorOutput(m_result);
 
-      long value = result.value - (long) (result.count * m_offset);
+      long value = m_result.value - (long) (m_result.count * m_offset);
 
       double scaledValue =
           value * 1e-9 * m_analog.getLSBWeight() * (1 << m_analog.getAverageBits())
@@ -181,9 +172,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public double getRate() {
     if (m_analog == null) {
       return 0.0;
@@ -194,8 +183,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
   }
 
   /**
-   * Return the gyro offset value set during calibration to
-   * use as a future preset
+   * Return the gyro offset value set during calibration to use as a future preset.
    *
    * @return the current offset value
    */
@@ -204,8 +192,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
   }
 
   /**
-   * Return the gyro center value set during calibration to
-   * use as a future preset
+   * Return the gyro center value set during calibration to use as a future preset.
    *
    * @return the current center value
    */
@@ -214,10 +201,9 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
   }
 
   /**
-   * Set the gyro sensitivity. This takes the number of volts/degree/second
-   * sensitivity of the gyro and uses it in subsequent calculations to allow the
-   * code to work with multiple gyros. This value is typically found in the gyro
-   * datasheet.
+   * Set the gyro sensitivity. This takes the number of volts/degree/second sensitivity of the gyro
+   * and uses it in subsequent calculations to allow the code to work with multiple gyros. This
+   * value is typically found in the gyro datasheet.
    *
    * @param voltsPerDegreePerSecond The sensitivity in Volts/degree/second.
    */
@@ -226,10 +212,9 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
   }
 
   /**
-   * Set the size of the neutral zone. Any voltage from the gyro less than this
-   * amount from the center is considered stationary. Setting a deadband will
-   * decrease the amount of drift when the gyro isn't rotating, but will make it
-   * less accurate.
+   * Set the size of the neutral zone. Any voltage from the gyro less than this amount from the
+   * center is considered stationary. Setting a deadband will decrease the amount of drift when the
+   * gyro isn't rotating, but will make it less accurate.
    *
    * @param volts The size of the deadband in volts
    */

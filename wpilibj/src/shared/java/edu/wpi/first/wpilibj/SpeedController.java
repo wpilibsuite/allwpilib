@@ -22,9 +22,9 @@ public interface SpeedController extends PIDOutput {
   /**
    * Common interface for setting the speed of a speed controller.
    *
-   * @param speed The speed to set. Value should be between -1.0 and 1.0.
-   * @param syncGroup The update group to add this Set() to, pending
-   *        UpdateSyncGroup(). If 0, update immediately.
+   * @param speed     The speed to set. Value should be between -1.0 and 1.0.
+   * @param syncGroup The update group to add this Set() to, pending UpdateSyncGroup(). If 0, update
+   *                  immediately.
    */
   void set(double speed, byte syncGroup);
 
@@ -43,22 +43,20 @@ public interface SpeedController extends PIDOutput {
   void setInverted(boolean isInverted);
 
   /**
-   * Common interface for returning if a speed controller is in the inverted
-   * state or not.
-   *$
-   * @return isInverted The state of the inversion true is inverted.
+   * Common interface for returning if a speed controller is in the inverted state or not.
    *
+   * @return isInverted The state of the inversion true is inverted.
    */
   boolean getInverted();
 
   /**
-   * Disable the speed controller
+   * Disable the speed controller.
    */
   void disable();
 
   /**
-   * Stops motor movement. Motor can be moved again by calling set without having
-   * to re-enable the motor.
+   * Stops motor movement. Motor can be moved again by calling set without having to re-enable the
+   * motor.
    */
   void stopMotor();
 }

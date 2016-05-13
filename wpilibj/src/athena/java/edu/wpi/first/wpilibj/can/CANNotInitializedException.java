@@ -8,9 +8,8 @@
 package edu.wpi.first.wpilibj.can;
 
 /**
- * Exception indicating that the CAN driver layer has not been initialized. This
- * happens when an entry-point is called before a CAN driver plugin has been
- * installed.
+ * Exception indicating that the CAN driver layer has not been initialized. This happens when an
+ * entry-point is called before a CAN driver plugin has been installed.
  */
 public class CANNotInitializedException extends RuntimeException {
   public CANNotInitializedException() {

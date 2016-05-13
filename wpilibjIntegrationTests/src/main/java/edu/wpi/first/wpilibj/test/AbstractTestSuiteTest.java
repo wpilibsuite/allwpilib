@@ -7,13 +7,6 @@
 
 package edu.wpi.first.wpilibj.test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
-
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -22,11 +15,20 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.junit.runners.model.InitializationError;
 
+import java.util.List;
+
 import edu.wpi.first.wpilibj.test.AbstractTestSuite.ClassMethodPair;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
+
 /**
- * @author jonathanleitschuh
+ * Yes, this is the test system testing itself. Functionally, this is making sure that all tests get
+ * run correctly when you use parametrized arguments.
  *
+ * @author jonathanleitschuh
  */
 public class AbstractTestSuiteTest {
 
@@ -37,20 +39,17 @@ public class AbstractTestSuiteTest {
   class TestForAbstractTestSuite extends AbstractTestSuite {
   }
 
-  TestForAbstractTestSuite testSuite;
+  TestForAbstractTestSuite m_testSuite;
 
-  /**
-   * @throws java.lang.Exception
-   */
   @Before
   public void setUp() throws Exception {
-    testSuite = new TestForAbstractTestSuite();
+    m_testSuite = new TestForAbstractTestSuite();
   }
 
   @Test
   public void testGetTestsMatchingAll() throws InitializationError {
     // when
-    List<Class<?>> collectedTests = testSuite.getAllClassMatching(".*");
+    List<Class<?>> collectedTests = m_testSuite.getAllClassMatching(".*");
     // then
     assertEquals(7, collectedTests.size());
   }
@@ -58,7 +57,7 @@ public class AbstractTestSuiteTest {
   @Test
   public void testGetTestsMatchingSample() throws InitializationError {
     // when
-    List<Class<?>> collectedTests = testSuite.getAllClassMatching(".*Sample.*");
+    List<Class<?>> collectedTests = m_testSuite.getAllClassMatching(".*Sample.*");
     // then
     assertEquals(4, collectedTests.size());
   }
@@ -66,7 +65,7 @@ public class AbstractTestSuiteTest {
   @Test
   public void testGetTestsMatchingUnusual() throws InitializationError {
     // when
-    List<Class<?>> collectedTests = testSuite.getAllClassMatching(".*Unusual.*");
+    List<Class<?>> collectedTests = m_testSuite.getAllClassMatching(".*Unusual.*");
     // then
     assertEquals(1, collectedTests.size());
     assertEquals(UnusualTest.class, collectedTests.get(0));
@@ -75,7 +74,7 @@ public class AbstractTestSuiteTest {
   @Test
   public void testGetTestsFromSuiteMatchingAll() throws InitializationError {
     // when
-    List<Class<?>> collectedTests = testSuite.getSuiteOrTestMatchingRegex(".*");
+    List<Class<?>> collectedTests = m_testSuite.getSuiteOrTestMatchingRegex(".*");
     // then
     assertEquals(7, collectedTests.size());
   }
@@ -83,58 +82,61 @@ public class AbstractTestSuiteTest {
   @Test
   public void testGetTestsFromSuiteMatchingTest() throws InitializationError {
     // when
-    List<Class<?>> collectedTests = testSuite.getSuiteOrTestMatchingRegex(".*Test.*");
+    List<Class<?>> collectedTests = m_testSuite.getSuiteOrTestMatchingRegex(".*Test.*");
     // then
     assertEquals(7, collectedTests.size());
-    assertThat(collectedTests, hasItems(new Class<?>[] {FirstSubSuiteTest.class,
-        SecondSubSuiteTest.class, UnusualTest.class}));
+    assertThat(collectedTests, hasItems(FirstSubSuiteTest.class,
+        SecondSubSuiteTest.class, UnusualTest.class));
     assertThat(collectedTests,
-        not(hasItems(new Class<?>[] {ExampleSubSuite.class, EmptySuite.class})));
+        not(hasItems(new Class<?>[]{ExampleSubSuite.class, EmptySuite.class})));
   }
 
   @Test
   public void testGetMethodFromTest() {
     // when
-    List<ClassMethodPair> pairs = testSuite.getMethodMatching(".*Method.*");
+    List<ClassMethodPair> pairs = m_testSuite.getMethodMatching(".*Method.*");
     // then
     assertEquals(1, pairs.size());
-    assertEquals(FirstSubSuiteTest.class, pairs.get(0).methodClass);
-    assertEquals(FirstSubSuiteTest.METHODNAME, pairs.get(0).methodName);
+    assertEquals(FirstSubSuiteTest.class, pairs.get(0).m_methodClass);
+    assertEquals(FirstSubSuiteTest.METHODNAME, pairs.get(0).m_methodName);
 
   }
 
 }
 
-
+@SuppressWarnings("OneTopLevelClass")
 class FirstSampleTest {
 }
 
-
+@SuppressWarnings("OneTopLevelClass")
 class SecondSampleTest {
 }
 
-
+@SuppressWarnings("OneTopLevelClass")
 class ThirdSampleTest {
 }
 
-
+@SuppressWarnings("OneTopLevelClass")
 class FourthSampleTest {
 }
 
-
+@SuppressWarnings("OneTopLevelClass")
 class UnusualTest {
 } // This is a member of both suites
 
 
 @Ignore("Prevents ANT from trying to run these as tests")
+@SuppressWarnings("OneTopLevelClass")
 class FirstSubSuiteTest {
   public static final String METHODNAME = "aTestMethod";
 
   @Test
-  public void aTestMethod() {}
+  @SuppressWarnings("MethodName")
+  public void aTestMethod() {
+  }
 }
 
-
+@SuppressWarnings("OneTopLevelClass")
 class SecondSubSuiteTest {
 }
 
@@ -142,6 +144,7 @@ class SecondSubSuiteTest {
 @RunWith(Suite.class)
 @SuiteClasses({FirstSubSuiteTest.class, SecondSubSuiteTest.class, UnusualTest.class})
 @Ignore("Prevents ANT from trying to run these as tests")
+@SuppressWarnings("OneTopLevelClass")
 class ExampleSubSuite extends AbstractTestSuite {
 }
 
@@ -149,5 +152,6 @@ class ExampleSubSuite extends AbstractTestSuite {
 @Ignore("Prevents ANT from trying to run these as tests")
 @RunWith(Suite.class)
 @SuiteClasses({})
+@SuppressWarnings("OneTopLevelClass")
 class EmptySuite extends AbstractTestSuite {
 }

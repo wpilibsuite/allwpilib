@@ -7,13 +7,13 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 import java.util.logging.Logger;
 
-import org.junit.Test;
-
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+
+import static org.junit.Assert.assertEquals;
 
 
 public class TimerTest extends AbstractComsSetup {

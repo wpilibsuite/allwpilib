@@ -20,13 +20,13 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
 /**
  * Solenoid class for running high voltage Digital Output.
  *
- * The Solenoid class is typically used for pneumatics solenoids, but could be
- * used for any device within the current spec of the PCM.
+ * <p>The Solenoid class is typically used for pneumatics solenoids, but could be used for any
+ * device within the current spec of the PCM.
  */
 public class Solenoid extends SolenoidBase implements LiveWindowSendable {
 
-  private int m_channel; // /< The channel to control.
-  private long m_solenoid_port;
+  private final int m_channel; // /< The channel to control.
+  private long m_solenoidPort;
 
   /**
    * Common function to implement constructor behavior.
@@ -36,14 +36,14 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
     checkSolenoidChannel(m_channel);
 
     try {
-      m_allocated.allocate(m_moduleNumber * kSolenoidChannels + m_channel);
-    } catch (CheckedAllocationException e) {
+      allocated.allocate(m_moduleNumber * kSolenoidChannels + m_channel);
+    } catch (CheckedAllocationException ex) {
       throw new AllocationException("Solenoid channel " + m_channel + " on module "
-        + m_moduleNumber + " is already allocated");
+          + m_moduleNumber + " is already allocated");
     }
 
     long port = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
-    m_solenoid_port = SolenoidJNI.initializeSolenoidPort(port);
+    m_solenoidPort = SolenoidJNI.initializeSolenoidPort(port);
 
     LiveWindow.addActuator("Solenoid", m_moduleNumber, m_channel, this);
     UsageReporting.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber);
@@ -56,7 +56,7 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
    */
   public Solenoid(final int channel) {
     super(getDefaultSolenoidModule());
-    m_channel = channel;
+    this.m_channel = channel;
     initSolenoid();
   }
 
@@ -64,11 +64,11 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
    * Constructor.
    *
    * @param moduleNumber The CAN ID of the PCM the solenoid is attached to.
-   * @param channel The channel on the PCM to control (0..7).
+   * @param channel      The channel on the PCM to control (0..7).
    */
   public Solenoid(final int moduleNumber, final int channel) {
     super(moduleNumber);
-    m_channel = channel;
+    this.m_channel = channel;
     initSolenoid();
   }
 
@@ -76,9 +76,9 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
    * Destructor.
    */
   public synchronized void free() {
-    m_allocated.free(m_moduleNumber * kSolenoidChannels + m_channel);
-    SolenoidJNI.freeSolenoidPort(m_solenoid_port);
-    m_solenoid_port = 0;
+    allocated.free(m_moduleNumber * kSolenoidChannels + m_channel);
+    SolenoidJNI.freeSolenoidPort(m_solenoidPort);
+    m_solenoidPort = 0;
     super.free();
   }
 
@@ -105,12 +105,11 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
   }
 
   /**
-   * Check if solenoid is blacklisted. If a solenoid is shorted, it is added to
-   * the blacklist and disabled until power cycle, or until faults are cleared.
-   *
-   * @see #clearAllPCMStickyFaults()
+   * Check if solenoid is blacklisted. If a solenoid is shorted, it is added to the blacklist and
+   * disabled until power cycle, or until faults are cleared.
    *
    * @return If solenoid is disabled due to short.
+   * @see #clearAllPCMStickyFaults()
    */
   public boolean isBlackListed() {
     int value = getPCMSolenoidBlackList() & (1 << m_channel);
@@ -125,26 +124,20 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
   }
 
   private ITable m_table;
-  private ITableListener m_table_listener;
+  private ITableListener m_tableListener;
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public void initTable(ITable subtable) {
     m_table = subtable;
     updateTable();
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public ITable getTable() {
     return m_table;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public void updateTable() {
     if (m_table != null) {
       m_table.putBoolean("Value", get());
@@ -152,25 +145,17 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
   }
 
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public void startLiveWindowMode() {
     set(false); // Stop for safety
-    m_table_listener = new ITableListener() {
-      public void valueChanged(ITable itable, String key, Object value, boolean bln) {
-        set(((Boolean) value).booleanValue());
-      }
-    };
-    m_table.addTableListener("Value", m_table_listener, true);
+    m_tableListener = (itable, key, value, bln) -> set((Boolean) value);
+    m_table.addTableListener("Value", m_tableListener, true);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public void stopLiveWindowMode() {
     set(false); // Stop for safety
     // TODO: Broken, should only remove the listener from "Value" only.
-    m_table.removeTableListener(m_table_listener);
+    m_table.removeTableListener(m_tableListener);
   }
 }

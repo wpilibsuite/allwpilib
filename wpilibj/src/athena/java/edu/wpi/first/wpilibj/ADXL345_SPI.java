@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteOrder;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
@@ -19,10 +19,12 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
+ * ADXL345 SPI Accelerometer.
  *
  * @author dtjones
  * @author mwills
  */
+@SuppressWarnings({"TypeName"})
 public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindowSendable {
   private static final int kPowerCtlRegister = 0x2D;
   private static final int kDataFormatRegister = 0x31;
@@ -43,21 +45,23 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
   private static final int kDataFormat_FullRes = 0x08;
   private static final int kDataFormat_Justify = 0x04;
 
-  public static enum Axes {
+  public enum Axes {
     kX((byte) 0x00),
     kY((byte) 0x02),
     kZ((byte) 0x04);
 
     /**
-     * The integer value representing this enumeration
+     * The integer value representing this enumeration.
      */
+    @SuppressWarnings("MemberName")
     public final byte value;
 
-    private Axes(byte value) {
+    Axes(byte value) {
       this.value = value;
     }
   }
 
+  @SuppressWarnings("MemberName")
   public static class AllAxes {
 
     public double XAxis;
@@ -70,7 +74,7 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
   /**
    * Constructor.
    *
-   * @param port The SPI port that the accelerometer is connected to
+   * @param port  The SPI port that the accelerometer is connected to
    * @param range The range (+ or -) that the accelerometer will measure.
    */
   public ADXL345_SPI(SPI.Port port, Range range) {
@@ -84,7 +88,7 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
   }
 
   /**
-   * Set SPI bus parameters, bring device out of sleep and set format
+   * Set SPI bus parameters, bring device out of sleep and set format.
    *
    * @param range The range (+ or -) that the accelerometer will measure.
    */
@@ -106,10 +110,9 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
     UsageReporting.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_SPI);
   }
 
-  /** {inheritdoc} */
   @Override
   public void setRange(Range range) {
-    byte value = 0;
+    final byte value;
 
     switch (range) {
       case k2G:
@@ -124,26 +127,25 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
       case k16G:
         value = 3;
         break;
+      default:
+        throw new IllegalArgumentException(range + " unsupported");
     }
 
     // Specify the data format to read
-    byte[] commands = new byte[] {kDataFormatRegister, (byte) (kDataFormat_FullRes | value)};
+    byte[] commands = new byte[]{kDataFormatRegister, (byte) (kDataFormat_FullRes | value)};
     m_spi.write(commands, commands.length);
   }
 
-  /** {@inheritDoc} */
   @Override
   public double getX() {
     return getAcceleration(Axes.kX);
   }
 
-  /** {@inheritDoc} */
   @Override
   public double getY() {
     return getAcceleration(Axes.kY);
   }
 
-  /** {@inheritDoc} */
   @Override
   public double getZ() {
     return getAcceleration(Axes.kZ);
@@ -157,7 +159,8 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
    */
   public double getAcceleration(ADXL345_SPI.Axes axis) {
     ByteBuffer transferBuffer = ByteBuffer.allocateDirect(3);
-    transferBuffer.put(0, (byte) ((kAddress_Read | kAddress_MultiByte | kDataRegister) + axis.value));
+    transferBuffer.put(0,
+        (byte) ((kAddress_Read | kAddress_MultiByte | kDataRegister) + axis.value));
     m_spi.transaction(transferBuffer, transferBuffer, 3);
     // Sensor is little endian
     transferBuffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -168,8 +171,7 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
   /**
    * Get the acceleration of all axes in Gs.
    *
-   * @return An object containing the acceleration measured on each axis of the
-   *         ADXL345 in Gs.
+   * @return An object containing the acceleration measured on each axis of the ADXL345 in Gs.
    */
   public ADXL345_SPI.AllAxes getAccelerations() {
     ADXL345_SPI.AllAxes data = new ADXL345_SPI.AllAxes();
@@ -188,19 +190,20 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
     return data;
   }
 
+  @Override
   public String getSmartDashboardType() {
     return "3AxisAccelerometer";
   }
 
   private ITable m_table;
 
-  /** {@inheritDoc} */
+  @Override
   public void initTable(ITable subtable) {
     m_table = subtable;
     updateTable();
   }
 
-  /** {@inheritDoc} */
+  @Override
   public void updateTable() {
     if (m_table != null) {
       m_table.putNumber("X", getX());
@@ -209,12 +212,16 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
     }
   }
 
-  /** {@inheritDoc} */
+  @Override
   public ITable getTable() {
     return m_table;
   }
 
-  public void startLiveWindowMode() {}
+  @Override
+  public void startLiveWindowMode() {
+  }
 
-  public void stopLiveWindowMode() {}
+  @Override
+  public void stopLiveWindowMode() {
+  }
 }

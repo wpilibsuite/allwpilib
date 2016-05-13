@@ -8,7 +8,9 @@
 package edu.wpi.first.wpilibj.command;
 
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 import java.util.Vector;
 
 import edu.wpi.first.wpilibj.HLUsageReporting;
@@ -17,18 +19,14 @@ import edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler;
 import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
- * The {@link Scheduler} is a singleton which holds the top-level running
- * commands. It is in charge of both calling the command's {@link Command#run()
- * run()} method and to make sure that there are no two commands with
- * conflicting requirements running.
+ * The {@link Scheduler} is a singleton which holds the top-level running commands. It is in charge
+ * of both calling the command's {@link Command#run() run()} method and to make sure that there are
+ * no two commands with conflicting requirements running.
  *
- * <p>
- * It is fine if teams wish to take control of the {@link Scheduler} themselves,
- * all that needs to be done is to call {@link Scheduler#getInstance()
- * Scheduler.getInstance()}.{@link Scheduler#run() run()} often to have
- * {@link Command Commands} function correctly. However, this is already done
- * for you if you use the CommandBased Robot template.
- * </p>
+ * <p> It is fine if teams wish to take control of the {@link Scheduler} themselves, all that needs
+ * to be done is to call {@link Scheduler#getInstance() Scheduler.getInstance()}.{@link
+ * Scheduler#run() run()} often to have {@link Command Commands} function correctly. However, this
+ * is already done for you if you use the CommandBased Robot template. </p>
  *
  * @author Joe Grinstead
  * @see Command
@@ -36,7 +34,7 @@ import edu.wpi.first.wpilibj.tables.ITable;
 public class Scheduler implements NamedSendable {
 
   /**
-   * The Singleton Instance
+   * The Singleton Instance.
    */
   private static Scheduler instance;
 
@@ -45,45 +43,44 @@ public class Scheduler implements NamedSendable {
    *
    * @return the {@link Scheduler}
    */
-  public synchronized static Scheduler getInstance() {
+  public static synchronized Scheduler getInstance() {
     return instance == null ? instance = new Scheduler() : instance;
   }
 
   /**
-   * A hashtable of active {@link Command Commands} to their
-   * {@link LinkedListElement}
+   * A hashtable of active {@link Command Commands} to their {@link LinkedListElement}.
    */
-  private Hashtable commandTable = new Hashtable();
+  private Hashtable m_commandTable = new Hashtable();
   /**
-   * The {@link Set} of all {@link Subsystem Subsystems}
+   * The {@link Set} of all {@link Subsystem Subsystems}.
    */
-  private Set subsystems = new Set();
+  private Set<Subsystem> m_subsystems = new HashSet<>();
   /**
-   * The first {@link Command} in the list
+   * The first {@link Command} in the list.
    */
-  private LinkedListElement firstCommand;
+  private LinkedListElement m_firstCommand;
   /**
-   * The last {@link Command} in the list
+   * The last {@link Command} in the list.
    */
-  private LinkedListElement lastCommand;
+  private LinkedListElement m_lastCommand;
   /**
-   * Whether or not we are currently adding a command
+   * Whether or not we are currently adding a command.
    */
-  private boolean adding = false;
+  private boolean m_adding = false;
   /**
-   * Whether or not we are currently disabled
+   * Whether or not we are currently disabled.
    */
-  private boolean disabled = false;
+  private boolean m_disabled = false;
   /**
-   * A list of all {@link Command Commands} which need to be added
+   * A list of all {@link Command Commands} which need to be added.
    */
-  private Vector additions = new Vector();
+  private Vector m_additions = new Vector();
   private ITable m_table;
   /**
-   * A list of all {@link edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler
-   * Buttons}. It is created lazily.
+   * A list of all {@link edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler Buttons}. It is
+   * created lazily.
    */
-  private Vector buttons;
+  private Vector m_buttons;
   private boolean m_runningCommandsChanged;
 
   /**
@@ -94,59 +91,55 @@ public class Scheduler implements NamedSendable {
   }
 
   /**
-   * Adds the command to the {@link Scheduler}. This will not add the
-   * {@link Command} immediately, but will instead wait for the proper time in
-   * the {@link Scheduler#run()} loop before doing so. The command returns
-   * immediately and does nothing if given null.
+   * Adds the command to the {@link Scheduler}. This will not add the {@link Command} immediately,
+   * but will instead wait for the proper time in the {@link Scheduler#run()} loop before doing so.
+   * The command returns immediately and does nothing if given null.
    *
-   * <p>
-   * Adding a {@link Command} to the {@link Scheduler} involves the
-   * {@link Scheduler} removing any {@link Command} which has shared
-   * requirements.
-   * </p>
+   * <p> Adding a {@link Command} to the {@link Scheduler} involves the {@link Scheduler} removing
+   * any {@link Command} which has shared requirements. </p>
    *
    * @param command the command to add
    */
   public void add(Command command) {
     if (command != null) {
-      additions.addElement(command);
+      m_additions.addElement(command);
     }
   }
 
   /**
-   * Adds a button to the {@link Scheduler}. The {@link Scheduler} will poll the
-   * button during its {@link Scheduler#run()}.
+   * Adds a button to the {@link Scheduler}. The {@link Scheduler} will poll the button during its
+   * {@link Scheduler#run()}.
    *
    * @param button the button to add
    */
   public void addButton(ButtonScheduler button) {
-    if (buttons == null) {
-      buttons = new Vector();
+    if (m_buttons == null) {
+      m_buttons = new Vector();
     }
-    buttons.addElement(button);
+    m_buttons.addElement(button);
   }
 
   /**
-   * Adds a command immediately to the {@link Scheduler}. This should only be
-   * called in the {@link Scheduler#run()} loop. Any command with conflicting
-   * requirements will be removed, unless it is uninterruptable. Giving
-   * <code>null</code> does nothing.
+   * Adds a command immediately to the {@link Scheduler}. This should only be called in the {@link
+   * Scheduler#run()} loop. Any command with conflicting requirements will be removed, unless it is
+   * uninterruptable. Giving <code>null</code> does nothing.
    *
    * @param command the {@link Command} to add
    */
+  @SuppressWarnings("MethodName")
   private void _add(Command command) {
     if (command == null) {
       return;
     }
 
     // Check to make sure no adding during adding
-    if (adding) {
+    if (m_adding) {
       System.err.println("WARNING: Can not start command from cancel method.  Ignoring:" + command);
       return;
     }
 
     // Only add if not already in
-    if (!commandTable.containsKey(command)) {
+    if (!m_commandTable.containsKey(command)) {
 
       // Check that the requirements can be had
       Enumeration requirements = command.getRequirements();
@@ -158,7 +151,7 @@ public class Scheduler implements NamedSendable {
       }
 
       // Give it the requirements
-      adding = true;
+      m_adding = true;
       requirements = command.getRequirements();
       while (requirements.hasMoreElements()) {
         Subsystem lock = (Subsystem) requirements.nextElement();
@@ -168,18 +161,18 @@ public class Scheduler implements NamedSendable {
         }
         lock.setCurrentCommand(command);
       }
-      adding = false;
+      m_adding = false;
 
       // Add it to the list
       LinkedListElement element = new LinkedListElement();
       element.setData(command);
-      if (firstCommand == null) {
-        firstCommand = lastCommand = element;
+      if (m_firstCommand == null) {
+        m_firstCommand = m_lastCommand = element;
       } else {
-        lastCommand.add(element);
-        lastCommand = element;
+        m_lastCommand.add(element);
+        m_lastCommand = element;
       }
-      commandTable.put(command, element);
+      m_commandTable.put(command, element);
 
       m_runningCommandsChanged = true;
 
@@ -188,51 +181,45 @@ public class Scheduler implements NamedSendable {
   }
 
   /**
-   * Runs a single iteration of the loop. This method should be called often in
-   * order to have a functioning {@link Command} system. The loop has five
-   * stages:
+   * Runs a single iteration of the loop. This method should be called often in order to have a
+   * functioning {@link Command} system. The loop has five stages:
    *
-   * <ol>
-   * <li>Poll the Buttons</li>
-   * <li>Execute/Remove the Commands</li>
-   * <li>Send values to SmartDashboard</li>
-   * <li>Add Commands</li>
-   * <li>Add Defaults</li>
-   * </ol>
+   * <ol> <li>Poll the Buttons</li> <li>Execute/Remove the Commands</li> <li>Send values to
+   * SmartDashboard</li> <li>Add Commands</li> <li>Add Defaults</li> </ol>
    */
   public void run() {
 
     m_runningCommandsChanged = false;
 
-    if (disabled) {
+    if (m_disabled) {
       return;
-    } // Don't run when disabled
+    } // Don't run when m_disabled
 
     // Get button input (going backwards preserves button priority)
-    if (buttons != null) {
-      for (int i = buttons.size() - 1; i >= 0; i--) {
-        ((ButtonScheduler) buttons.elementAt(i)).execute();
+    if (m_buttons != null) {
+      for (int i = m_buttons.size() - 1; i >= 0; i--) {
+        ((ButtonScheduler) m_buttons.elementAt(i)).execute();
       }
     }
     // Loop through the commands
-    LinkedListElement e = firstCommand;
-    while (e != null) {
-      Command c = e.getData();
-      e = e.getNext();
-      if (!c.run()) {
-        remove(c);
+    LinkedListElement element = m_firstCommand;
+    while (element != null) {
+      Command command = element.getData();
+      element = element.getNext();
+      if (!command.run()) {
+        remove(command);
         m_runningCommandsChanged = true;
       }
     }
 
     // Add the new things
-    for (int i = 0; i < additions.size(); i++) {
-      _add((Command) additions.elementAt(i));
+    for (int i = 0; i < m_additions.size(); i++) {
+      _add((Command) m_additions.elementAt(i));
     }
-    additions.removeAllElements();
+    m_additions.removeAllElements();
 
     // Add in the defaults
-    Enumeration locks = subsystems.getElements();
+    Enumeration locks = new Vector<>(m_subsystems).elements();
     while (locks.hasMoreElements()) {
       Subsystem lock = (Subsystem) locks.nextElement();
       if (lock.getCurrentCommand() == null) {
@@ -245,15 +232,15 @@ public class Scheduler implements NamedSendable {
   }
 
   /**
-   * Registers a {@link Subsystem} to this {@link Scheduler}, so that the
-   * {@link Scheduler} might know if a default {@link Command} needs to be run.
-   * All {@link Subsystem Subsystems} should call this.
+   * Registers a {@link Subsystem} to this {@link Scheduler}, so that the {@link Scheduler} might
+   * know if a default {@link Command} needs to be run. All {@link Subsystem Subsystems} should call
+   * this.
    *
    * @param system the system
    */
   void registerSubsystem(Subsystem system) {
     if (system != null) {
-      subsystems.add(system);
+      m_subsystems.add(system);
     }
   }
 
@@ -263,19 +250,19 @@ public class Scheduler implements NamedSendable {
    * @param command the command to remove
    */
   void remove(Command command) {
-    if (command == null || !commandTable.containsKey(command)) {
+    if (command == null || !m_commandTable.containsKey(command)) {
       return;
     }
-    LinkedListElement e = (LinkedListElement) commandTable.get(command);
-    commandTable.remove(command);
+    LinkedListElement element = (LinkedListElement) m_commandTable.get(command);
+    m_commandTable.remove(command);
 
-    if (e.equals(lastCommand)) {
-      lastCommand = e.getPrevious();
+    if (element.equals(m_lastCommand)) {
+      m_lastCommand = element.getPrevious();
     }
-    if (e.equals(firstCommand)) {
-      firstCommand = e.getNext();
+    if (element.equals(m_firstCommand)) {
+      m_firstCommand = element.getNext();
     }
-    e.remove();
+    element.remove();
 
     Enumeration requirements = command.getRequirements();
     while (requirements.hasMoreElements()) {
@@ -286,12 +273,12 @@ public class Scheduler implements NamedSendable {
   }
 
   /**
-   * Removes all commands
+   * Removes all commands.
    */
   public void removeAll() {
     // TODO: Confirm that this works with "uninteruptible" commands
-    while (firstCommand != null) {
-      remove(firstCommand.getData());
+    while (m_firstCommand != null) {
+      remove(m_firstCommand.getData());
     }
   }
 
@@ -299,16 +286,17 @@ public class Scheduler implements NamedSendable {
    * Disable the command scheduler.
    */
   public void disable() {
-    disabled = true;
+    m_disabled = true;
   }
 
   /**
    * Enable the command scheduler.
    */
   public void enable() {
-    disabled = false;
+    m_disabled = false;
   }
 
+  @Override
   public String getName() {
     return "Scheduler";
   }
@@ -317,9 +305,7 @@ public class Scheduler implements NamedSendable {
     return "Scheduler";
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public void initTable(ITable subtable) {
     m_table = subtable;
 
@@ -333,7 +319,7 @@ public class Scheduler implements NamedSendable {
       // Get the commands to cancel
       double[] toCancel = m_table.getNumberArray("Cancel", new double[0]);
       if (toCancel.length > 0) {
-        for (LinkedListElement e = firstCommand; e != null; e = e.getNext()) {
+        for (LinkedListElement e = m_firstCommand; e != null; e = e.getNext()) {
           for (int i = 0; i < toCancel.length; i++) {
             if (e.getData().hashCode() == toCancel[i]) {
               e.getData().cancel();
@@ -345,17 +331,17 @@ public class Scheduler implements NamedSendable {
 
       if (m_runningCommandsChanged) {
         // Set the the running commands
-	int n = 0;
-        for (LinkedListElement e = firstCommand; e != null; e = e.getNext()) {
-	  n++;
+        int number = 0;
+        for (LinkedListElement e = m_firstCommand; e != null; e = e.getNext()) {
+          number++;
         }
-        String[] commands = new String[n];
-        double[] ids = new double[n];
-	n = 0;
-        for (LinkedListElement e = firstCommand; e != null; e = e.getNext()) {
-          commands[n] = e.getData().getName();
-          ids[n] = e.getData().hashCode();
-	  n++;
+        String[] commands = new String[number];
+        double[] ids = new double[number];
+        number = 0;
+        for (LinkedListElement e = m_firstCommand; e != null; e = e.getNext()) {
+          commands[number] = e.getData().getName();
+          ids[number] = e.getData().hashCode();
+          number++;
         }
         m_table.putStringArray("Names", commands);
         m_table.putNumberArray("Ids", ids);
@@ -363,13 +349,12 @@ public class Scheduler implements NamedSendable {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public ITable getTable() {
     return m_table;
   }
 
+  @Override
   public String getSmartDashboardType() {
     return "Scheduler";
   }

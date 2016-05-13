@@ -14,8 +14,9 @@ import org.junit.runners.Suite.SuiteClasses;
 import edu.wpi.first.wpilibj.test.AbstractTestSuite;
 
 /**
- * @author jonathanleitschuh
+ * All tests pertaining to {@link SmartDashboard}.
  *
+ * @author jonathanleitschuh
  */
 @RunWith(Suite.class)
 @SuiteClasses({SmartDashboardTest.class})

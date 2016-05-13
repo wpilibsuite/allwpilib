@@ -7,38 +7,41 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.CanTalonJNI;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.CanTalonJNI;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedController {
   private MotorSafetyHelper m_safetyHelper;
-  private boolean isInverted = false;
+  private boolean m_isInverted = false;
   protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
   /**
-   * Number of adc engineering units per 0 to 3.3V sweep.
-   * This is necessary for scaling Analog Position in rotations/RPM.
+   * Number of adc engineering units per 0 to 3.3V sweep. This is necessary for scaling Analog
+   * Position in rotations/RPM.
    */
-  private final int kNativeAdcUnitsPerRotation = 1024;
+  private static final int kNativeAdcUnitsPerRotation = 1024;
   /**
-   * Number of pulse width engineering units per full rotation.
-   * This is necessary for scaling Pulse Width Decoded Position in rotations/RPM.
+   * Number of pulse width engineering units per full rotation. This is necessary for scaling Pulse
+   * Width Decoded Position in rotations/RPM.
    */
-  private final double kNativePwdUnitsPerRotation = 4096.0;
+  private static final double kNativePwdUnitsPerRotation = 4096.0;
   /**
-   * Number of minutes per 100ms unit.  Useful for scaling velocities
-   * measured by Talon's 100ms timebase to rotations per minute.
+   * Number of minutes per 100ms unit.  Useful for scaling velocities measured by Talon's 100ms
+   * timebase to rotations per minute.
    */
-  private final double kMinutesPer100msUnit = 1.0/600.0;
+  private static final double kMinutesPer100msUnit = 1.0 / 600.0;
 
   public enum TalonControlMode implements CANSpeedController.ControlMode {
-    PercentVbus(0), Position(1), Speed(2), Current(3), Voltage(4), Follower(5), MotionProfile(6), Disabled(15);
+    PercentVbus(0), Position(1), Speed(2), Current(3), Voltage(4), Follower(5), MotionProfile(6),
+    Disabled(15);
 
+    @SuppressWarnings("MemberName")
     public final int value;
 
+    @SuppressWarnings("JavadocMethod")
     public static TalonControlMode valueOf(int value) {
       for (TalonControlMode mode : values()) {
         if (mode.value == value) {
@@ -49,25 +52,29 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
       return null;
     }
 
-    private TalonControlMode(int value) {
+    TalonControlMode(int value) {
       this.value = value;
     }
 
     @Override
     public boolean isPID() {
-        return this == Current || this == Speed || this == Position;
+      return this == Current || this == Speed || this == Position;
     }
 
     @Override
     public int getValue() {
-        return value;
+      return value;
     }
   }
-  public enum FeedbackDevice {
-    QuadEncoder(0), AnalogPot(2), AnalogEncoder(3), EncRising(4), EncFalling(5), CtreMagEncoder_Relative(6), CtreMagEncoder_Absolute(7), PulseWidth(8);
 
+  public enum FeedbackDevice {
+    QuadEncoder(0), AnalogPot(2), AnalogEncoder(3), EncRising(4), EncFalling(5),
+    CtreMagEncoder_Relative(6), CtreMagEncoder_Absolute(7), PulseWidth(8);
+
+    @SuppressWarnings("MemberName")
     public int value;
 
+    @SuppressWarnings("JavadocMethod")
     public static FeedbackDevice valueOf(int value) {
       for (FeedbackDevice mode : values()) {
         if (mode.value == value) {
@@ -78,16 +85,21 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
       return null;
     }
 
-    private FeedbackDevice(int value) {
+    FeedbackDevice(int value) {
       this.value = value;
     }
   }
+
   /**
    * Depending on the sensor type, Talon can determine if sensor is plugged in ot not.
    */
   public enum FeedbackDeviceStatus {
     FeedbackStatusUnknown(0), FeedbackStatusPresent(1), FeedbackStatusNotPresent(2);
+
+    @SuppressWarnings("MemberName")
     public int value;
+
+    @SuppressWarnings("JavadocMethod")
     public static FeedbackDeviceStatus valueOf(int value) {
       for (FeedbackDeviceStatus mode : values()) {
         if (mode.value == value) {
@@ -96,15 +108,22 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
       }
       return null;
     }
-    private FeedbackDeviceStatus(int value) {
+
+    FeedbackDeviceStatus(int value) {
       this.value = value;
     }
   }
-  /** enumerated types for frame rate ms */
+
+  /**
+   * Enumerated types for frame rate ms.
+   */
   public enum StatusFrameRate {
     General(0), Feedback(1), QuadEncoder(2), AnalogTempVbat(3), PulseWidth(4);
+
+    @SuppressWarnings("MemberName")
     public int value;
 
+    @SuppressWarnings("JavadocMethod")
     public static StatusFrameRate valueOf(int value) {
       for (StatusFrameRate mode : values()) {
         if (mode.value == value) {
@@ -114,51 +133,43 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
       return null;
     }
 
-    private StatusFrameRate(int value) {
+    StatusFrameRate(int value) {
       this.value = value;
     }
   }
+
   /**
-   * Enumerated types for Motion Control Set Values.
-   * When in Motion Profile control mode, these constants are paseed
-   * into set() to manipulate the motion profile executer.
-   * When changing modes, be sure to read the value back using getMotionProfileStatus()
-   * to ensure changes in output take effect before performing buffering actions.
-   * Disable will signal Talon to put motor output into neutral drive.
-   *   Talon will stop processing motion profile points.  This means the buffer is
-   *   effectively disconnected from the executer, allowing the robot to gracefully
-   *   clear and push new traj points.  isUnderrun will get cleared.
-   *   The active trajectory is also cleared.
-   * Enable will signal Talon to pop a trajectory point from it's buffer and process it.
-   *   If the active trajectory is empty, Talon will shift in the next point.
-   *   If the active traj is empty, and so is the buffer, the motor drive is neutral and
-   *   isUnderrun is set.  When active traj times out, and buffer has at least one point,
-   *   Talon shifts in next one, and isUnderrun is cleared.  When active traj times out,
-   *   and buffer is empty, Talon keeps processing active traj and sets IsUnderrun.
-   * Hold will signal Talon keep processing the active trajectory indefinitely.
-   *   If the active traj is cleared, Talon will neutral motor drive.  Otherwise
-   *    Talon will keep processing the active traj but it will not shift in
-   *    points from the buffer.  This means the buffer is  effectively disconnected
-   *    from the executer, allowing the robot to gracefully clear and push
-   *    new traj points.
-   *    isUnderrun is set if active traj is empty, otherwise it is cleared.
-   *    isLast signal is also cleared.
+   * Enumerated types for Motion Control Set Values. When in Motion Profile control mode, these
+   * constants are paseed into set() to manipulate the motion profile executer. When changing modes,
+   * be sure to read the value back using getMotionProfileStatus() to ensure changes in output take
+   * effect before performing buffering actions. Disable will signal Talon to put motor output into
+   * neutral drive. Talon will stop processing motion profile points.  This means the buffer is
+   * effectively disconnected from the executer, allowing the robot to gracefully clear and push new
+   * traj points.  isUnderrun will get cleared. The active trajectory is also cleared. Enable will
+   * signal Talon to pop a trajectory point from it's buffer and process it. If the active
+   * trajectory is empty, Talon will shift in the next point. If the active traj is empty, and so is
+   * the buffer, the motor drive is neutral and isUnderrun is set.  When active traj times out, and
+   * buffer has at least one point, Talon shifts in next one, and isUnderrun is cleared.  When
+   * active traj times out, and buffer is empty, Talon keeps processing active traj and sets
+   * IsUnderrun. Hold will signal Talon keep processing the active trajectory indefinitely. If the
+   * active traj is cleared, Talon will neutral motor drive. Otherwise Talon will keep processing
+   * the active traj but it will not shift in points from the buffer.  This means the buffer is
+   * effectively disconnected from the executer, allowing the robot to gracefully clear and push new
+   * traj points. isUnderrun is set if active traj is empty, otherwise it is cleared. isLast signal
+   * is also cleared.
    *
-   * Typical workflow:
-   *   set(Disable),
-   *   Confirm Disable takes effect,
-   *   clear buffer and push buffer points,
-   *   set(Enable) when enough points have been pushed to ensure no underruns,
-   *   wait for MP to finish or decide abort,
-   *   If MP finished gracefully set(Hold) to hold position servo and disconnect buffer,
-   *   If MP is being aborted set(Disable) to neutral the motor and disconnect buffer,
-   *   Confirm mode takes effect,
-   *   clear buffer and push buffer points, and rinse-repeat.
+   * <p>Typical workflow: set(Disable), Confirm Disable takes effect, clear buffer and push buffer
+   * points, set(Enable) when enough points have been pushed to ensure no underruns, wait for MP to
+   * finish or decide abort, If MP finished gracefully set(Hold) to hold position servo and
+   * disconnect buffer, If MP is being aborted set(Disable) to neutral the motor and disconnect
+   * buffer, Confirm mode takes effect, clear buffer and push buffer points, and rinse-repeat.
    */
   public enum SetValueMotionProfile {
     Disable(0), Enable(1), Hold(2);
+    @SuppressWarnings("MemberName")
     public int value;
 
+    @SuppressWarnings("JavadocMethod")
     public static SetValueMotionProfile valueOf(int value) {
       for (SetValueMotionProfile mode : values()) {
         if (mode.value == value) {
@@ -168,74 +179,70 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
       return null;
     }
 
-    private SetValueMotionProfile(int value) {
+    SetValueMotionProfile(int value) {
       this.value = value;
     }
   }
+
   /**
-   * Motion Profile Trajectory Point
-   * This is simply a data transer object.
+   * Motion Profile Trajectory Point This is simply a data transer object.
    */
+  @SuppressWarnings("MemberName")
   public static class TrajectoryPoint {
     public double position; //!< The position to servo to.
     public double velocity; //!< The velocity to feed-forward.
     /**
-     * Time in milliseconds to process this point.
-     * Value should be between 1ms and 255ms.  If value is zero
-     * then Talon will default to 1ms.  If value exceeds 255ms API will cap it.
+     * Time in milliseconds to process this point. Value should be between 1ms and 255ms.  If value
+     * is zero then Talon will default to 1ms.  If value exceeds 255ms API will cap it.
      */
     public int timeDurMs;
     /**
-     * Which slot to get PIDF gains.
-     * PID is used for position servo.
-     * F is used as the Kv constant for velocity feed-forward.
-     * Typically this is hardcoded to the a particular slot, but you are free
-     * gain schedule if need be.
+     * Which slot to get PIDF gains. PID is used for position servo. F is used as the Kv constant
+     * for velocity feed-forward. Typically this is hardcoded to the a particular slot, but you are
+     * free gain schedule if need be.
      */
     public int profileSlotSelect;
     /**
-     * Set to true to only perform the velocity feed-forward and not perform
-     * position servo.  This is useful when learning how the position servo
-     * changes the motor response.  The same could be accomplish by clearing the
-     * PID gains, however this is synchronous the streaming, and doesn't require restoing
-     * gains when finished.
+     * Set to true to only perform the velocity feed-forward and not perform position servo. This is
+     * useful when learning how the position servo changes the motor response.  The same could be
+     * accomplish by clearing the PID gains, however this is synchronous the streaming, and doesn't
+     * require restoing gains when finished.
      *
-     * Additionaly setting this basically gives you direct control of the motor output
-     * since motor output = targetVelocity X Kv, where Kv is our Fgain.
-     * This means you can also scheduling straight-throttle curves without relying on
-     * a sensor.
+     * <p>Additionaly setting this basically gives you direct control of the motor output since
+     * motor output = targetVelocity X Kv, where Kv is our Fgain. This means you can also scheduling
+     * straight-throttle curves without relying on a sensor.
      */
     public boolean velocityOnly;
     /**
-     * Set to true to signal Talon that this is the final point, so do not
-     * attempt to pop another trajectory point from out of the Talon buffer.
-     * Instead continue processing this way point.  Typically the velocity
-     * member variable should be zero so that the motor doesn't spin indefinitely.
+     * Set to true to signal Talon that this is the final point, so do not attempt to pop another
+     * trajectory point from out of the Talon buffer. Instead continue processing this way point.
+     * Typically the velocity member variable should be zero so that the motor doesn't spin
+     * indefinitely.
      */
     public boolean isLastPoint;
-   /**
-     * Set to true to signal Talon to zero the selected sensor.
-     * When generating MPs, one simple method is to make the first target position zero,
-     * and the final target position the target distance from the current position.
-     * Then when you fire the MP, the current position gets set to zero.
-     * If this is the intent, you can set zeroPos on the first trajectory point.
+    /**
+     * Set to true to signal Talon to zero the selected sensor. When generating MPs, one simple
+     * method is to make the first target position zero, and the final target position the target
+     * distance from the current position. Then when you fire the MP, the current position gets set
+     * to zero. If this is the intent, you can set zeroPos on the first trajectory point.
      *
-     * Otherwise you can leave this false for all points, and offset the positions
-     * of all trajectory points so they are correct.
+     * <p>Otherwise you can leave this false for all points, and offset the positions of all
+     * trajectory points so they are correct.
      */
     public boolean zeroPos;
   }
+
   /**
-   * Motion Profile Status
-   * This is simply a data transer object.
+   * Motion Profile Status This is simply a data transer object.
    */
+  @SuppressWarnings("MemberName")
   public static class MotionProfileStatus {
     /**
      * The available empty slots in the trajectory buffer.
      *
-     * The robot API holds a "top buffer" of trajectory points, so your applicaion
-     * can dump several points at once.  The API will then stream them into the Talon's
-     * low-level buffer, allowing the Talon to act on them.
+     * <p>The robot API holds a "top buffer" of trajectory points, so your applicaion can dump
+     * several points at once.  The API will then stream them into the Talon's low-level buffer,
+     * allowing the Talon to act on them.
      */
     public int topBufferRem;
     /**
@@ -247,21 +254,20 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
      */
     public int btmBufferCnt;
     /**
-     * Set if isUnderrun ever gets set.
-     * Only is cleared by clearMotionProfileHasUnderrun() to ensure
+     * Set if isUnderrun ever gets set. Only is cleared by clearMotionProfileHasUnderrun() to ensure
      * robot logic can react or instrument it.
+     *
      * @see clearMotionProfileHasUnderrun()
      */
     public boolean hasUnderrun;
     /**
-     * This is set if Talon needs to shift a point from its buffer into
-     * the active trajectory point however the buffer is empty. This gets cleared
-     * automatically when is resolved.
+     * This is set if Talon needs to shift a point from its buffer into the active trajectory point
+     * however the buffer is empty. This gets cleared automatically when is resolved.
      */
     public boolean isUnderrun;
     /**
-     * True if the active trajectory point has not empty, false otherwise.
-     * The members in activePoint are only valid if this signal is set.
+     * True if the active trajectory point has not empty, false otherwise. The members in
+     * activePoint are only valid if this signal is set.
      */
     public boolean activePointValid;
     /**
@@ -269,9 +275,9 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
      */
     public TrajectoryPoint activePoint = new TrajectoryPoint();
     /**
-     * The current output mode of the motion profile executer (disabled, enabled, or hold).
-     * When changing the set() value in MP mode, it's important to check this signal to
-     * confirm the change takes effect before interacting with the top buffer.
+     * The current output mode of the motion profile executer (disabled, enabled, or hold). When
+     * changing the set() value in MP mode, it's important to check this signal to confirm the
+     * change takes effect before interacting with the top buffer.
      */
     public SetValueMotionProfile outputEnable;
   }
@@ -282,35 +288,36 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   private double m_minimumInput;
   private double m_maximumInput;
 
-  int m_deviceNumber;
-  boolean m_controlEnabled;
-  boolean m_stopped = false;
-  int m_profile;
+  private int m_deviceNumber;
+  private boolean m_controlEnabled;
+  private boolean m_stopped = false;
+  private int m_profile;
 
   double m_setPoint;
   /**
-   * Encoder CPR, counts per rotations, also called codes per revoluion.
-   * Default value of zero means the API behaves as it did during the 2015 season, each position
-   * unit is a single pulse and there are four pulses per count (4X).
-   * Caller can use configEncoderCodesPerRev to set the quadrature encoder CPR.
+   * Encoder CPR, counts per rotations, also called codes per revoluion. Default value of zero means
+   * the API behaves as it did during the 2015 season, each position unit is a single pulse and
+   * there are four pulses per count (4X). Caller can use configEncoderCodesPerRev to set the
+   * quadrature encoder CPR.
    */
   int m_codesPerRev;
   /**
-   * Number of turns per rotation.  For example, a 10-turn pot spins ten full rotations from
-   * a wiper voltage of zero to 3.3 volts.  Therefore knowing the
-   * number of turns a full voltage sweep represents is necessary for calculating rotations
-   * and velocity.
-   * A default value of zero means the API behaves as it did during the 2015 season, there are 1024
-   * position units from zero to 3.3V.
+   * Number of turns per rotation.  For example, a 10-turn pot spins ten full rotations from a wiper
+   * voltage of zero to 3.3 volts.  Therefore knowing the number of turns a full voltage sweep
+   * represents is necessary for calculating rotations and velocity. A default value of zero means
+   * the API behaves as it did during the 2015 season, there are 1024 position units from zero to
+   * 3.3V.
    */
   int m_numPotTurns;
   /**
-   * Although the Talon handles feedback selection, caching the feedback selection is helpful at the API level
-   * for scaling into rotations and RPM.
+   * Although the Talon handles feedback selection, caching the feedback selection is helpful at the
+   * API level for scaling into rotations and RPM.
    */
   FeedbackDevice m_feedbackDevice;
+
   /**
    * Constructor for the CANTalon device.
+   *
    * @param deviceNumber The CAN ID of the Talon SRX
    */
   public CANTalon(int deviceNumber) {
@@ -327,11 +334,13 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     applyControlMode(TalonControlMode.PercentVbus);
     LiveWindow.addActuator("CANTalon", m_deviceNumber, this);
   }
+
   /**
    * Constructor for the CANTalon device.
-   * @param deviceNumber The CAN ID of the Talon SRX
-   * @param controlPeriodMs The period in ms to send the CAN control frame.
-   *                        Period is bounded to [1ms,95ms].
+   *
+   * @param deviceNumber    The CAN ID of the Talon SRX
+   * @param controlPeriodMs The period in ms to send the CAN control frame. Period is bounded to
+   *                        [1ms,95ms].
    */
   public CANTalon(int deviceNumber, int controlPeriodMs) {
     m_deviceNumber = deviceNumber;
@@ -348,15 +357,17 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     applyControlMode(TalonControlMode.PercentVbus);
     LiveWindow.addActuator("CANTalon", m_deviceNumber, this);
   }
+
   /**
    * Constructor for the CANTalon device.
-   * @param deviceNumber The CAN ID of the Talon SRX
-   * @param controlPeriodMs The period in ms to send the CAN control frame.
-   *                        Period is bounded to [1ms,95ms].
-   * @param enablePeriodMs The period in ms to send the enable control frame.
-   *                        Period is bounded to [1ms,95ms]. This typically is not
-   *                        required to specify, however this could be used to minimize the
-   *                        time between robot-enable and talon-motor-drive.
+   *
+   * @param deviceNumber    The CAN ID of the Talon SRX
+   * @param controlPeriodMs The period in ms to send the CAN control frame. Period is bounded to
+   *                        [1ms,95ms].
+   * @param enablePeriodMs  The period in ms to send the enable control frame. Period is bounded to
+   *                        [1ms,95ms]. This typically is not required to specify, however this
+   *                        could be used to minimize the time between robot-enable and
+   *                        talon-motor-drive.
    */
   public CANTalon(int deviceNumber, int controlPeriodMs, int enablePeriodMs) {
     m_deviceNumber = deviceNumber;
@@ -382,16 +393,12 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public void setPIDSourceType(PIDSourceType pidSource) {
     m_pidSource = pidSource;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public PIDSourceType getPIDSourceType() {
     return m_pidSource;
   }
@@ -401,6 +408,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     return getPosition();
   }
 
+  @SuppressWarnings("JavadocMethod")
   public void delete() {
     disable();
     if (m_handle != 0) {
@@ -410,21 +418,31 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   }
 
   /**
+   * Sets the output of the Talon.
+   *
+   * @param outputValue                See set().
+   * @param thisValueDoesNotDoAnything corresponds to syncGroup from Jaguar; not relevant here.
+   */
+  @Override
+  public void set(double outputValue, byte thisValueDoesNotDoAnything) {
+    set(outputValue);
+  }
+
+  /**
    * Sets the appropriate output on the talon, depending on the mode.
    *
-   * In PercentVbus, the output is between -1.0 and 1.0, with 0.0 as stopped. In
-   * Follower mode, the output is the integer device ID of the talon to
-   * duplicate. In Voltage mode, outputValue is in volts. In Current mode,
-   * outputValue is in amperes. In Speed mode, outputValue is in position change
-   * / 10ms. In Position mode, outputValue is in encoder ticks or an analog
-   * value, depending on the sensor.
+   * <p>In PercentVbus, the output is between -1.0 and 1.0, with 0.0 as stopped. In Follower mode,
+   * the output is the integer device ID of the talon to duplicate. In Voltage mode, outputValue is
+   * in volts. In Current mode, outputValue is in amperes. In Speed mode, outputValue is in position
+   * change / 10ms. In Position mode, outputValue is in encoder ticks or an analog value, depending
+   * on the sensor.
    *
    * @param outputValue The setpoint value, as described above.
    */
   public void set(double outputValue) {
     /* feed safety helper since caller just updated our output */
     m_safetyHelper.feed();
-    if(m_stopped) {
+    if (m_stopped) {
       enableControl();
       m_stopped = false;
     }
@@ -432,25 +450,27 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
       m_setPoint = outputValue; /* cache set point for getSetpoint() */
       switch (m_controlMode) {
         case PercentVbus:
-          CanTalonJNI.Set(m_handle, isInverted ? -outputValue : outputValue);
+          CanTalonJNI.Set(m_handle, m_isInverted ? -outputValue : outputValue);
           break;
         case Follower:
           CanTalonJNI.SetDemand(m_handle, (int) outputValue);
           break;
         case Voltage:
           // Voltage is an 8.8 fixed point number.
-          int volts = (int) ((isInverted ? -outputValue : outputValue) * 256);
+          int volts = (int) ((m_isInverted ? -outputValue : outputValue) * 256);
           CanTalonJNI.SetDemand(m_handle, volts);
           break;
         case Speed:
-          CanTalonJNI.SetDemand(m_handle, ScaleVelocityToNativeUnits(m_feedbackDevice,(isInverted ? -outputValue : outputValue)));
+          CanTalonJNI.SetDemand(m_handle, scaleVelocityToNativeUnits(m_feedbackDevice,
+              (m_isInverted ? -outputValue : outputValue)));
           break;
         case Position:
-          CanTalonJNI.SetDemand(m_handle, ScaleRotationsToNativeUnits(m_feedbackDevice,outputValue));
+          CanTalonJNI.SetDemand(m_handle, scaleRotationsToNativeUnits(m_feedbackDevice,
+              outputValue));
           break;
         case Current:
-          double milliamperes = (isInverted ? -outputValue : outputValue) * 1000.0; /* mA*/
-          CanTalonJNI.SetDemand(m_handle, (int)milliamperes);
+          double milliamperes = (m_isInverted ? -outputValue : outputValue) * 1000.0; /* mA*/
+          CanTalonJNI.SetDemand(m_handle, (int) milliamperes);
           break;
         case MotionProfile:
           CanTalonJNI.SetDemand(m_handle, (int) outputValue);
@@ -463,45 +483,31 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   }
 
   /**
-   * Inverts the direction of the motor's rotation. Only works in PercentVbus
-   * mode.
+   * Inverts the direction of the motor's rotation. Only works in PercentVbus mode.
    *
    * @param isInverted The state of inversion, true is inverted.
    */
   @Override
   public void setInverted(boolean isInverted) {
-    this.isInverted = isInverted;
+    this.m_isInverted = isInverted;
   }
 
   /**
    * Common interface for the inverting direction of a speed controller.
    *
    * @return isInverted The state of inversion, true is inverted.
-   *
    */
   @Override
   public boolean getInverted() {
-    return this.isInverted;
-  }
-
-  /**
-   * Sets the output of the Talon.
-   *
-   * @param outputValue See set().
-   * @param thisValueDoesNotDoAnything corresponds to syncGroup from Jaguar; not
-   *        relevant here.
-   */
-  @Override
-  public void set(double outputValue, byte thisValueDoesNotDoAnything) {
-    set(outputValue);
+    return this.m_isInverted;
   }
 
   /**
    * Resets the accumulated integral error and disables the controller.
    *
-   * The only difference between this and {@link PIDController#reset} is that
-   * the PIDController also resets the previous error for the D term, but the
-   * difference should have minimal effect as it will only last one cycle.
+   * <p>The only difference between this and {@link PIDController#reset} is that the PIDController
+   * also resets the previous error for the D term, but the difference should have minimal effect as
+   * it will only last one cycle.
    */
   public void reset() {
     disable();
@@ -535,12 +541,10 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   }
 
   /**
-   * Flips the sign (multiplies by negative one) the sensor values going into
-   * the talon.
+   * Flips the sign (multiplies by negative one) the sensor values going into the talon.
    *
-   * This only affects position and velocity closed loop control. Allows for
-   * situations where you may have a sensor flipped and going in the wrong
-   * direction.
+   * <p>This only affects position and velocity closed loop control. Allows for situations where you
+   * may have a sensor flipped and going in the wrong direction.
    *
    * @param flip True if sensor input should be flipped; False if not.
    */
@@ -549,8 +553,8 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   }
 
   /**
-   * Flips the sign (multiplies by negative one) the throttle values going into
-   * the motor on the talon in closed loop modes.
+   * Flips the sign (multiplies by negative one) the throttle values going into the motor on the
+   * talon in closed loop modes.
    *
    * @param flip True if motor output should be flipped; False if not.
    */
@@ -561,9 +565,9 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   /**
    * Gets the current status of the Talon (usually a sensor value).
    *
-   * In Current mode: returns output current. In Speed mode: returns current
-   * speed. In Position mode: returns current sensor position. In PercentVbus
-   * and Follower modes: returns current applied throttle.
+   * <p>In Current mode: returns output current. In Speed mode: returns current speed. In Position
+   * mode: returns current sensor position. In PercentVbus and Follower modes: returns current
+   * applied throttle.
    *
    * @return The current sensor value of the Talon.
    */
@@ -574,9 +578,10 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
       case Current:
         return getOutputCurrent();
       case Speed:
-        return ScaleNativeUnitsToRpm(m_feedbackDevice,CanTalonJNI.GetSensorVelocity(m_handle));
+        return scaleNativeUnitsToRpm(m_feedbackDevice, CanTalonJNI.GetSensorVelocity(m_handle));
       case Position:
-        return ScaleNativeUnitsToRotations(m_feedbackDevice,CanTalonJNI.GetSensorPosition(m_handle));
+        return scaleNativeUnitsToRotations(m_feedbackDevice, CanTalonJNI.GetSensorPosition(
+            m_handle));
       case PercentVbus:
       default:
         return (double) CanTalonJNI.GetAppliedThrottle(m_handle) / 1023.0;
@@ -584,8 +589,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   }
 
   /**
-   * Get the current encoder position, regardless of whether it is the current
-   * feedback device.
+   * Get the current encoder position, regardless of whether it is the current feedback device.
    *
    * @return The current position of the encoder.
    */
@@ -598,29 +602,34 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   }
 
   /**
-   * Get the current encoder velocity, regardless of whether it is the current
-   * feedback device.
+   * Get the current encoder velocity, regardless of whether it is the current feedback device.
    *
    * @return The current speed of the encoder.
    */
   public int getEncVelocity() {
     return CanTalonJNI.GetEncVel(m_handle);
   }
+
   public int getPulseWidthPosition() {
     return CanTalonJNI.GetPulseWidthPosition(m_handle);
   }
+
   public void setPulseWidthPosition(int newPosition) {
     setParameter(CanTalonJNI.param_t.ePwdPosition, newPosition);
   }
+
   public int getPulseWidthVelocity() {
     return CanTalonJNI.GetPulseWidthVelocity(m_handle);
   }
+
   public int getPulseWidthRiseToFallUs() {
     return CanTalonJNI.GetPulseWidthRiseToFallUs(m_handle);
   }
+
   public int getPulseWidthRiseToRiseUs() {
     return CanTalonJNI.GetPulseWidthRiseToRiseUs(m_handle);
   }
+
   /**
    * @param feedbackDevice which feedback sensor to check it if is connected.
    * @return status of caller's specified sensor type.
@@ -628,7 +637,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   public FeedbackDeviceStatus isSensorPresent(FeedbackDevice feedbackDevice) {
     FeedbackDeviceStatus retval = FeedbackDeviceStatus.FeedbackStatusUnknown;
     /* detecting sensor health depends on which sensor caller cares about */
-    switch(feedbackDevice){
+    switch (feedbackDevice) {
       case QuadEncoder:
       case AnalogPot:
       case AnalogEncoder:
@@ -641,17 +650,20 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
       case CtreMagEncoder_Relative:
       case CtreMagEncoder_Absolute:
         /* all of these require pulse width signal to be present. */
-        if( CanTalonJNI.IsPulseWidthSensorPresent(m_handle) == 0 ){
+        if (CanTalonJNI.IsPulseWidthSensorPresent(m_handle) == 0) {
           /* Talon not getting a signal */
           retval = FeedbackDeviceStatus.FeedbackStatusNotPresent;
-        }else{
+        } else {
           /* getting good signal */
           retval = FeedbackDeviceStatus.FeedbackStatusPresent;
         }
         break;
+      default:
+        break;
     }
     return retval;
   }
+
   /**
    * Get the number of of rising edges seen on the index pin.
    *
@@ -682,25 +694,25 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     return CanTalonJNI.GetQuadIdxpin(m_handle);
   }
 
-  public void setAnalogPosition(int newPosition){
-    setParameter(CanTalonJNI.param_t.eAinPosition, (double)newPosition);
+  public void setAnalogPosition(int newPosition) {
+    setParameter(CanTalonJNI.param_t.eAinPosition, (double) newPosition);
   }
+
   /**
-   * Get the current analog in position, regardless of whether it is the current
-   * feedback device.
+   * Get the current analog in position, regardless of whether it is the current feedback device.
    *
-   * @return The 24bit analog position. The bottom ten bits is the ADC (0 -
-   *         1023) on the analog pin of the Talon. The upper 14 bits tracks the
-   *         overflows and underflows (continuous sensor).
+   * <p>The bottom ten bits is the ADC (0 - 1023) on the analog pin of the Talon. The upper 14 bits
+   * tracks the overflows and underflows (continuous sensor).
+   *
+   * @return The 24bit analog position.
    */
   public int getAnalogInPosition() {
     return CanTalonJNI.GetAnalogInWithOv(m_handle);
   }
 
   /**
-   * Get the current analog in position, regardless of whether it is the current
-   * feedback device.
-   *$
+   * Get the current analog in position, regardless of whether it is the current feedback device.
+   *
    * @return The ADC (0 - 1023) on analog pin of the Talon.
    */
   public int getAnalogInRaw() {
@@ -708,8 +720,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   }
 
   /**
-   * Get the current encoder velocity, regardless of whether it is the current
-   * feedback device.
+   * Get the current encoder velocity, regardless of whether it is the current feedback device.
    *
    * @return The current speed of the analog in device.
    */
@@ -726,34 +737,36 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     /* retrieve the closed loop error in native units */
     return CanTalonJNI.GetCloseLoopErr(m_handle);
   }
+
   /**
    * Set the allowable closed loop error.
-   * @param allowableCloseLoopError allowable closed loop error for selected profile.
-   *             mA for Curent closed loop.
-   *             Talon Native Units for position and velocity.
+   *
+   * @param allowableCloseLoopError allowable closed loop error for selected profile. mA for Curent
+   *                                closed loop. Talon Native Units for position and velocity.
    */
-  public void setAllowableClosedLoopErr(int allowableCloseLoopError)
-  {
-    if(m_profile == 0){
-      setParameter(CanTalonJNI.param_t.eProfileParamSlot0_AllowableClosedLoopErr, (double)allowableCloseLoopError);
-    }else{
-      setParameter(CanTalonJNI.param_t.eProfileParamSlot1_AllowableClosedLoopErr, (double)allowableCloseLoopError);
+  public void setAllowableClosedLoopErr(int allowableCloseLoopError) {
+    if (m_profile == 0) {
+      setParameter(CanTalonJNI.param_t.eProfileParamSlot0_AllowableClosedLoopErr, (double)
+          allowableCloseLoopError);
+    } else {
+      setParameter(CanTalonJNI.param_t.eProfileParamSlot1_AllowableClosedLoopErr, (double)
+          allowableCloseLoopError);
     }
   }
 
   // Returns true if limit switch is closed. false if open.
   public boolean isFwdLimitSwitchClosed() {
-    return (CanTalonJNI.GetLimitSwitchClosedFor(m_handle) == 0) ? true : false;
+    return (CanTalonJNI.GetLimitSwitchClosedFor(m_handle) == 0);
   }
 
   // Returns true if limit switch is closed. false if open.
   public boolean isRevLimitSwitchClosed() {
-    return (CanTalonJNI.GetLimitSwitchClosedRev(m_handle) == 0) ? true : false;
+    return (CanTalonJNI.GetLimitSwitchClosedRev(m_handle) == 0);
   }
 
   // Returns true if break is enabled during neutral. false if coast.
   public boolean getBrakeEnableDuringNeutral() {
-    return (CanTalonJNI.GetBrakeIsEnabled(m_handle) == 0) ? false : true;
+    return CanTalonJNI.GetBrakeIsEnabled(m_handle) != 0;
   }
 
   /**
@@ -769,6 +782,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
       this is only for instrumentation and is not necessary for Talon functionality. */
     setParameter(CanTalonJNI.param_t.eNumberEncoderCPR, m_codesPerRev);
   }
+
   /**
    * Configure the number of turns on the potentiometer.
    *
@@ -782,6 +796,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
       this is only for instrumentation and is not necessary for Talon functionality. */
     setParameter(CanTalonJNI.param_t.eNumberPotTurns, m_numPotTurns);
   }
+
   /**
    * Returns temperature of Talon, in degrees Celsius.
    */
@@ -811,63 +826,60 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   }
 
   /**
-   * TODO documentation (see CANJaguar.java)
+   * When using analog sensors, 0 units corresponds to 0V, 1023 units corresponds to 3.3V When using
+   * an analog encoder (wrapping around 1023 to 0 is possible) the units are still 3.3V per 1023
+   * units. When using quadrature, each unit is a quadrature edge (4X) mode.
    *
-   * @return The position of the sensor currently providing feedback. When using
-   *         analog sensors, 0 units corresponds to 0V, 1023 units corresponds
-   *         to 3.3V When using an analog encoder (wrapping around 1023 to 0 is
-   *         possible) the units are still 3.3V per 1023 units. When using
-   *         quadrature, each unit is a quadrature edge (4X) mode.
+   * @return The position of the sensor currently providing feedback.
    */
   public double getPosition() {
-    return ScaleNativeUnitsToRotations(m_feedbackDevice,CanTalonJNI.GetSensorPosition(m_handle));
+    return scaleNativeUnitsToRotations(m_feedbackDevice, CanTalonJNI.GetSensorPosition(m_handle));
   }
 
   public void setPosition(double pos) {
-    int nativePos = ScaleRotationsToNativeUnits(m_feedbackDevice,pos);
+    int nativePos = scaleRotationsToNativeUnits(m_feedbackDevice, pos);
     CanTalonJNI.SetSensorPosition(m_handle, nativePos);
   }
 
   /**
-   * TODO documentation (see CANJaguar.java)
+   * The speed units will be in the sensor's native ticks per 100ms.
+   *
+   * <p>For analog sensors, 3.3V corresponds to 1023 units. So a speed of 200 equates to ~0.645 dV
+   * per 100ms or 6.451 dV per second. If this is an analog encoder, that likely means 1.9548
+   * rotations per sec. For quadrature encoders, each unit corresponds a quadrature edge (4X). So a
+   * 250 count encoder will produce 1000 edge events per rotation. An example speed of 200 would
+   * then equate to 20% of a rotation per 100ms, or 10 rotations per second.
    *
    * @return The speed of the sensor currently providing feedback.
-   *
-   *         The speed units will be in the sensor's native ticks per 100ms.
-   *
-   *         For analog sensors, 3.3V corresponds to 1023 units. So a speed of
-   *         200 equates to ~0.645 dV per 100ms or 6.451 dV per second. If this
-   *         is an analog encoder, that likely means 1.9548 rotations per sec.
-   *         For quadrature encoders, each unit corresponds a quadrature edge
-   *         (4X). So a 250 count encoder will produce 1000 edge events per
-   *         rotation. An example speed of 200 would then equate to 20% of a
-   *         rotation per 100ms, or 10 rotations per second.
    */
   public double getSpeed() {
-    return ScaleNativeUnitsToRpm(m_feedbackDevice,CanTalonJNI.GetSensorVelocity(m_handle));
+    return scaleNativeUnitsToRpm(m_feedbackDevice, CanTalonJNI.GetSensorVelocity(m_handle));
   }
 
   public TalonControlMode getControlMode() {
     return m_controlMode;
   }
 
+  @SuppressWarnings("JavadocMethod")
   public void setControlMode(int mode) {
     TalonControlMode tcm = TalonControlMode.valueOf(mode);
-    if(tcm != null)
+    if (tcm != null) {
       changeControlMode(tcm);
+    }
   }
 
   /**
-   * Fixup the m_controlMode so set() serializes the correct demand value. Also
-   * fills the modeSelecet in the control frame to disabled.
-   *$
+   * Fixup the m_controlMode so set() serializes the correct demand value. Also fills the
+   * modeSelecet in the control frame to disabled.
+   *
    * @param controlMode Control mode to ultimately enter once user calls set().
    * @see #set
    */
   private void applyControlMode(TalonControlMode controlMode) {
     m_controlMode = controlMode;
-    if (controlMode == TalonControlMode.Disabled)
+    if (controlMode == TalonControlMode.Disabled) {
       m_controlEnabled = false;
+    }
     // Disable until set() is called.
     CanTalonJNI.SetModeSelect(m_handle, TalonControlMode.Disabled.value);
 
@@ -875,6 +887,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
         controlMode.value);
   }
 
+  @SuppressWarnings("JavadocMethod")
   public void changeControlMode(TalonControlMode controlMode) {
     if (m_controlMode == controlMode) {
       /* we already are in this mode, don't perform disable workaround */
@@ -883,6 +896,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     }
   }
 
+  @SuppressWarnings("JavadocMethod")
   public void setFeedbackDevice(FeedbackDevice device) {
     /* save the selection so that future setters/getters know which scalars to apply */
     m_feedbackDevice = device;
@@ -925,10 +939,11 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     // }
 
     // Update the information that we have.
-    if (m_profile == 0)
+    if (m_profile == 0) {
       CanTalonJNI.RequestParam(m_handle, CanTalonJNI.param_t.eProfileParamSlot0_P.value);
-    else
+    } else {
       CanTalonJNI.RequestParam(m_handle, CanTalonJNI.param_t.eProfileParamSlot1_P.value);
+    }
 
     // Briefly wait for new values from the Talon.
     Timer.delay(kDelayForSolicitedSignals);
@@ -936,6 +951,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     return CanTalonJNI.GetPgain(m_handle, m_profile);
   }
 
+  @SuppressWarnings("JavadocMethod")
   public double getI() {
     // if(!(m_controlMode.equals(ControlMode.Position) ||
     // m_controlMode.equals(ControlMode.Speed))) {
@@ -944,10 +960,11 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     // }
 
     // Update the information that we have.
-    if (m_profile == 0)
+    if (m_profile == 0) {
       CanTalonJNI.RequestParam(m_handle, CanTalonJNI.param_t.eProfileParamSlot0_I.value);
-    else
+    } else {
       CanTalonJNI.RequestParam(m_handle, CanTalonJNI.param_t.eProfileParamSlot1_I.value);
+    }
 
     // Briefly wait for new values from the Talon.
     Timer.delay(kDelayForSolicitedSignals);
@@ -955,6 +972,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     return CanTalonJNI.GetIgain(m_handle, m_profile);
   }
 
+  @SuppressWarnings("JavadocMethod")
   public double getD() {
     // if(!(m_controlMode.equals(ControlMode.Position) ||
     // m_controlMode.equals(ControlMode.Speed))) {
@@ -963,10 +981,11 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     // }
 
     // Update the information that we have.
-    if (m_profile == 0)
+    if (m_profile == 0) {
       CanTalonJNI.RequestParam(m_handle, CanTalonJNI.param_t.eProfileParamSlot0_D.value);
-    else
+    } else {
       CanTalonJNI.RequestParam(m_handle, CanTalonJNI.param_t.eProfileParamSlot1_D.value);
+    }
 
     // Briefly wait for new values from the Talon.
     Timer.delay(kDelayForSolicitedSignals);
@@ -974,6 +993,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     return CanTalonJNI.GetDgain(m_handle, m_profile);
   }
 
+  @SuppressWarnings("JavadocMethod")
   public double getF() {
     // if(!(m_controlMode.equals(ControlMode.Position) ||
     // m_controlMode.equals(ControlMode.Speed))) {
@@ -982,10 +1002,11 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     // }
 
     // Update the information that we have.
-    if (m_profile == 0)
+    if (m_profile == 0) {
       CanTalonJNI.RequestParam(m_handle, CanTalonJNI.param_t.eProfileParamSlot0_F.value);
-    else
+    } else {
       CanTalonJNI.RequestParam(m_handle, CanTalonJNI.param_t.eProfileParamSlot1_F.value);
+    }
 
     // Briefly wait for new values from the Talon.
     Timer.delay(kDelayForSolicitedSignals);
@@ -993,6 +1014,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     return CanTalonJNI.GetFgain(m_handle, m_profile);
   }
 
+  @SuppressWarnings("JavadocMethod")
   public double getIZone() {
     // if(!(m_controlMode.equals(ControlMode.Position) ||
     // m_controlMode.equals(ControlMode.Speed))) {
@@ -1001,10 +1023,11 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     // }
 
     // Update the information that we have.
-    if (m_profile == 0)
+    if (m_profile == 0) {
       CanTalonJNI.RequestParam(m_handle, CanTalonJNI.param_t.eProfileParamSlot0_IZone.value);
-    else
+    } else {
       CanTalonJNI.RequestParam(m_handle, CanTalonJNI.param_t.eProfileParamSlot1_IZone.value);
+    }
 
     // Briefly wait for new values from the Talon.
     Timer.delay(kDelayForSolicitedSignals);
@@ -1015,8 +1038,8 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   /**
    * Get the closed loop ramp rate for the current profile.
    *
-   * Limits the rate at which the throttle will change. Only affects position
-   * and speed closed loop modes.
+   * <p>Limits the rate at which the throttle will change. Only affects position and speed closed
+   * loop modes.
    *
    * @return rampRate Maximum change in voltage, in volts / sec.
    * @see #setProfile For selecting a certain profile.
@@ -1029,10 +1052,13 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     // }
 
     // Update the information that we have.
-    if (m_profile == 0)
-      CanTalonJNI.RequestParam(m_handle, CanTalonJNI.param_t.eProfileParamSlot0_CloseLoopRampRate.value);
-    else
-      CanTalonJNI.RequestParam(m_handle, CanTalonJNI.param_t.eProfileParamSlot1_CloseLoopRampRate.value);
+    if (m_profile == 0) {
+      CanTalonJNI.RequestParam(m_handle, CanTalonJNI.param_t.eProfileParamSlot0_CloseLoopRampRate
+          .value);
+    } else {
+      CanTalonJNI.RequestParam(m_handle, CanTalonJNI.param_t.eProfileParamSlot1_CloseLoopRampRate
+          .value);
+    }
 
     // Briefly wait for new values from the Talon.
     Timer.delay(kDelayForSolicitedSignals);
@@ -1042,8 +1068,11 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   }
 
   /**
+   * Firmware version running on the Talon.
+   *
    * @return The version of the firmware running on the Talon
    */
+  @SuppressWarnings("MethodName")
   public long GetFirmwareVersion() {
 
     // Update the information that we have.
@@ -1055,6 +1084,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     return CanTalonJNI.GetParamResponseInt32(m_handle, CanTalonJNI.param_t.eFirmVers.value);
   }
 
+  @SuppressWarnings({"MethodName", "JavadocMethod"})
   public long GetIaccum() {
 
     // Update the information that we have.
@@ -1072,6 +1102,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
    * @param p Proportional constant for the currently selected PID profile.
    * @see #setProfile For selecting a certain profile.
    */
+  @SuppressWarnings("ParameterName")
   public void setP(double p) {
     CanTalonJNI.SetPgain(m_handle, m_profile, p);
   }
@@ -1082,6 +1113,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
    * @param i Integration constant for the currently selected PID profile.
    * @see #setProfile For selecting a certain profile.
    */
+  @SuppressWarnings("ParameterName")
   public void setI(double i) {
     CanTalonJNI.SetIgain(m_handle, m_profile, i);
   }
@@ -1092,6 +1124,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
    * @param d Derivative constant for the currently selected PID profile.
    * @see #setProfile For selecting a certain profile.
    */
+  @SuppressWarnings("ParameterName")
   public void setD(double d) {
     CanTalonJNI.SetDgain(m_handle, m_profile, d);
   }
@@ -1102,6 +1135,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
    * @param f Feedforward constant for the currently selected PID profile.
    * @see #setProfile For selecting a certain profile.
    */
+  @SuppressWarnings("ParameterName")
   public void setF(double f) {
     CanTalonJNI.SetFgain(m_handle, m_profile, f);
   }
@@ -1109,10 +1143,9 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   /**
    * Set the integration zone of the current Closed Loop profile.
    *
-   * Whenever the error is larger than the izone value, the accumulated
-   * integration error is cleared so that high errors aren't racked up when at
-   * high errors. An izone value of 0 means no difference from a standard PIDF
-   * loop.
+   * <p>Whenever the error is larger than the izone value, the accumulated integration error is
+   * cleared so that high errors aren't racked up when at high errors. An izone value of 0 means no
+   * difference from a standard PIDF loop.
    *
    * @param izone Width of the integration zone.
    * @see #setProfile For selecting a certain profile.
@@ -1124,8 +1157,8 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   /**
    * Set the closed loop ramp rate for the current profile.
    *
-   * Limits the rate at which the throttle will change. Only affects position
-   * and speed closed loop modes.
+   * <p>Limits the rate at which the throttle will change. Only affects position and speed closed
+   * loop modes.
    *
    * @param rampRate Maximum change in voltage, in volts / sec.
    * @see #setProfile For selecting a certain profile.
@@ -1139,7 +1172,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   /**
    * Set the voltage ramp rate for the current profile.
    *
-   * Limits the rate at which the throttle will change. Affects all modes.
+   * <p>Limits the rate at which the throttle will change. Affects all modes.
    *
    * @param rampRate Maximum change in voltage, in volts / sec.
    */
@@ -1152,9 +1185,11 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   public void setVoltageCompensationRampRate(double rampRate) {
     CanTalonJNI.SetVoltageCompensationRate(m_handle, rampRate / 1000);
   }
+
   /**
    * Clear the accumulator for I gain.
    */
+  @SuppressWarnings("MethodName")
   public void ClearIaccum() {
     CanTalonJNI.SetParam(m_handle, CanTalonJNI.param_t.ePidIaccum.value, 0);
   }
@@ -1162,23 +1197,24 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   /**
    * Sets control values for closed loop control.
    *
-   * @param p Proportional constant.
-   * @param i Integration constant.
-   * @param d Differential constant.
-   * @param f Feedforward constant.
-   * @param izone Integration zone -- prevents accumulation of integration error
-   *        with large errors. Setting this to zero will ignore any izone stuff.
-   * @param closeLoopRampRate Closed loop ramp rate. Maximum change in voltage,
-   *        in volts / sec.
-   * @param profile which profile to set the pid constants for. You can have two
-   *        profiles, with values of 0 or 1, allowing you to keep a second set
-   *        of values on hand in the talon. In order to switch profiles without
-   *        recalling setPID, you must call setProfile().
+   * @param p                 Proportional constant.
+   * @param i                 Integration constant.
+   * @param d                 Differential constant.
+   * @param f                 Feedforward constant.
+   * @param izone             Integration zone -- prevents accumulation of integration error with
+   *                          large errors. Setting this to zero will ignore any izone stuff.
+   * @param closeLoopRampRate Closed loop ramp rate. Maximum change in voltage, in volts / sec.
+   * @param profile           which profile to set the pid constants for. You can have two profiles,
+   *                          with values of 0 or 1, allowing you to keep a second set of values on
+   *                          hand in the talon. In order to switch profiles without recalling
+   *                          setPID, you must call setProfile().
    */
+  @SuppressWarnings("ParameterName")
   public void setPID(double p, double i, double d, double f, int izone, double closeLoopRampRate,
-      int profile) {
-    if (profile != 0 && profile != 1)
+                     int profile) {
+    if (profile != 0 && profile != 1) {
       throw new IllegalArgumentException("Talon PID profile must be 0 or 1.");
+    }
     m_profile = profile;
     setProfile(profile);
     setP(p);
@@ -1189,6 +1225,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     setCloseLoopRampRate(closeLoopRampRate);
   }
 
+  @SuppressWarnings("ParameterName")
   public void setPID(double p, double i, double d) {
     setPID(p, i, d, 0, 0, 0, m_profile);
   }
@@ -1201,12 +1238,13 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   }
 
   /**
-   * Select which closed loop profile to use, and uses whatever PIDF gains and
-   * the such that are already there.
+   * Select which closed loop profile to use, and uses whatever PIDF gains and the such that are
+   * already there.
    */
   public void setProfile(int profile) {
-    if (profile != 0 && profile != 1)
+    if (profile != 0 && profile != 1) {
       throw new IllegalArgumentException("Talon PID profile must be 0 or 1.");
+    }
     m_profile = profile;
     CanTalonJNI.SetProfileSlotSelect(m_handle, m_profile);
   }
@@ -1237,7 +1275,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   }
 
   public void setForwardSoftLimit(double forwardLimit) {
-    int nativeLimitPos = ScaleRotationsToNativeUnits(m_feedbackDevice,forwardLimit);
+    int nativeLimitPos = scaleRotationsToNativeUnits(m_feedbackDevice, forwardLimit);
     CanTalonJNI.SetForwardSoftLimit(m_handle, nativeLimitPos);
   }
 
@@ -1250,11 +1288,11 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   }
 
   public boolean isForwardSoftLimitEnabled() {
-    return (CanTalonJNI.GetForwardSoftEnable(m_handle) == 0) ? false : true;
+    return CanTalonJNI.GetForwardSoftEnable(m_handle) != 0;
   }
 
   public void setReverseSoftLimit(double reverseLimit) {
-    int nativeLimitPos = ScaleRotationsToNativeUnits(m_feedbackDevice,reverseLimit);
+    int nativeLimitPos = scaleRotationsToNativeUnits(m_feedbackDevice, reverseLimit);
     CanTalonJNI.SetReverseSoftLimit(m_handle, nativeLimitPos);
   }
 
@@ -1267,13 +1305,14 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   }
 
   public boolean isReverseSoftLimitEnabled() {
-    return (CanTalonJNI.GetReverseSoftEnable(m_handle) == 0) ? false : true;
+    return CanTalonJNI.GetReverseSoftEnable(m_handle) != 0;
   }
+
   /**
    * Configure the maximum voltage that the Jaguar will ever output.
    *
-   * This can be used to limit the maximum output voltage in all modes so that
-   * motors which cannot withstand full bus voltage can be used safely.
+   * <p>This can be used to limit the maximum output voltage in all modes so that motors which
+   * cannot withstand full bus voltage can be used safely.
    *
    * @param voltage The maximum voltage output by the Jaguar.
    */
@@ -1282,44 +1321,53 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     configPeakOutputVoltage(voltage, -voltage);
   }
 
-  public void configPeakOutputVoltage(double forwardVoltage,double reverseVoltage) {
+  @SuppressWarnings("JavadocMethod")
+  public void configPeakOutputVoltage(double forwardVoltage, double reverseVoltage) {
     /* bounds checking */
-    if(forwardVoltage > 12)
+    if (forwardVoltage > 12) {
       forwardVoltage = 12;
-    else if(forwardVoltage < 0)
+    } else if (forwardVoltage < 0) {
       forwardVoltage = 0;
-    if(reverseVoltage > 0)
+    }
+    if (reverseVoltage > 0) {
       reverseVoltage = 0;
-    else if(reverseVoltage < -12)
+    } else if (reverseVoltage < -12) {
       reverseVoltage = -12;
+    }
     /* config calls */
-    setParameter(CanTalonJNI.param_t.ePeakPosOutput,1023*forwardVoltage/12.0);
-    setParameter(CanTalonJNI.param_t.ePeakNegOutput,1023*reverseVoltage/12.0);
+    setParameter(CanTalonJNI.param_t.ePeakPosOutput, 1023 * forwardVoltage / 12.0);
+    setParameter(CanTalonJNI.param_t.ePeakNegOutput, 1023 * reverseVoltage / 12.0);
   }
-  public void configNominalOutputVoltage(double forwardVoltage,double reverseVoltage) {
+
+  @SuppressWarnings("JavadocMethod")
+  public void configNominalOutputVoltage(double forwardVoltage, double reverseVoltage) {
     /* bounds checking */
-    if(forwardVoltage > 12)
+    if (forwardVoltage > 12) {
       forwardVoltage = 12;
-    else if(forwardVoltage < 0)
+    } else if (forwardVoltage < 0) {
       forwardVoltage = 0;
-    if(reverseVoltage > 0)
+    }
+    if (reverseVoltage > 0) {
       reverseVoltage = 0;
-    else if(reverseVoltage < -12)
+    } else if (reverseVoltage < -12) {
       reverseVoltage = -12;
+    }
     /* config calls */
-    setParameter(CanTalonJNI.param_t.eNominalPosOutput,1023*forwardVoltage/12.0);
-    setParameter(CanTalonJNI.param_t.eNominalNegOutput,1023*reverseVoltage/12.0);
+    setParameter(CanTalonJNI.param_t.eNominalPosOutput, 1023 * forwardVoltage / 12.0);
+    setParameter(CanTalonJNI.param_t.eNominalNegOutput, 1023 * reverseVoltage / 12.0);
   }
+
   /**
-   * General set frame.  Since the parameter is a general integral type, this can
-   * be used for testing future features.
+   * General set frame.  Since the parameter is a general integral type, this can be used for
+   * testing future features.
    */
-  public void setParameter(CanTalonJNI.param_t paramEnum, double value){
-    CanTalonJNI.SetParam(m_handle,paramEnum.value,value);
+  public void setParameter(CanTalonJNI.param_t paramEnum, double value) {
+    CanTalonJNI.SetParam(m_handle, paramEnum.value, value);
   }
+
   /**
-   * General get frame.  Since the parameter is a general integral type, this can
-   * be used for testing future features.
+   * General get frame.  Since the parameter is a general integral type, this can be used for
+   * testing future features.
    */
   public double getParameter(CanTalonJNI.param_t paramEnum) {
     /* transmit a request for this param */
@@ -1329,6 +1377,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     /* poll out latest response value */
     return CanTalonJNI.GetParamResponse(m_handle, paramEnum.value);
   }
+
   public void clearStickyFaults() {
     CanTalonJNI.ClearStickyFaults(m_handle);
   }
@@ -1339,33 +1388,35 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   }
 
   /**
-   * Configure the fwd limit switch to be normally open or normally closed.
-   * Talon will disable momentarilly if the Talon's current setting is
-   * dissimilar to the caller's requested setting.
+   * Configure the fwd limit switch to be normally open or normally closed. Talon will disable
+   * momentarilly if the Talon's current setting is dissimilar to the caller's requested setting.
    *
-   * Since Talon saves setting to flash this should only affect a given Talon
-   * initially during robot install.
+   * <p>Since Talon saves setting to flash this should only affect a given Talon initially during
+   * robot install.
    *
    * @param normallyOpen true for normally open. false for normally closed.
    */
+  @SuppressWarnings("MethodName")
   public void ConfigFwdLimitSwitchNormallyOpen(boolean normallyOpen) {
-    CanTalonJNI.SetParam(m_handle, CanTalonJNI.param_t.eOnBoot_LimitSwitch_Forward_NormallyClosed.value,
-            normallyOpen ? 0 : 1);
+    CanTalonJNI.SetParam(m_handle, CanTalonJNI.param_t.eOnBoot_LimitSwitch_Forward_NormallyClosed
+            .value,
+        normallyOpen ? 0 : 1);
   }
 
   /**
-   * Configure the rev limit switch to be normally open or normally closed.
-   * Talon will disable momentarilly if the Talon's current setting is
-   * dissimilar to the caller's requested setting.
+   * Configure the rev limit switch to be normally open or normally closed. Talon will disable
+   * momentarilly if the Talon's current setting is dissimilar to the caller's requested setting.
    *
-   * Since Talon saves setting to flash this should only affect a given Talon
-   * initially during robot install.
+   * <p>Since Talon saves setting to flash this should only affect a given Talon initially during
+   * robot install.
    *
    * @param normallyOpen true for normally open. false for normally closed.
    */
+  @SuppressWarnings("MethodName")
   public void ConfigRevLimitSwitchNormallyOpen(boolean normallyOpen) {
-    CanTalonJNI.SetParam(m_handle, CanTalonJNI.param_t.eOnBoot_LimitSwitch_Reverse_NormallyClosed.value,
-            normallyOpen ? 0 : 1);
+    CanTalonJNI.SetParam(m_handle, CanTalonJNI.param_t.eOnBoot_LimitSwitch_Reverse_NormallyClosed
+            .value,
+        normallyOpen ? 0 : 1);
   }
 
   public void enableBrakeMode(boolean brake) {
@@ -1423,23 +1474,26 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   public int getStickyFaultRevSoftLim() {
     return CanTalonJNI.GetStckyFault_RevSoftLim(m_handle);
   }
+
   /**
-   * @return Number of native units per rotation if scaling info is available.
-   *              Zero if scaling information is not available.
+   * Number of native units per rotation if scaling info is available. Zero if scaling information
+   * is not available.
+   *
+   * @return Number of native units per rotation.
    */
-  double GetNativeUnitsPerRotationScalar(FeedbackDevice devToLookup)
-  {
+  private double getNativeUnitsPerRotationScalar(FeedbackDevice devToLookup) {
     double retval = 0;
     boolean scalingAvail = false;
-    switch(devToLookup){
-      case QuadEncoder:
-      { /* When caller wants to lookup Quadrature, the QEI may be in 1x if the selected feedback is edge counter.
+    switch (devToLookup) {
+      case QuadEncoder: {
+        /* When caller wants to lookup Quadrature, the QEI may be in 1x if the selected feedback
+         * is edge counter.
          * Additionally if the quadrature source is the CTRE Mag encoder, then the CPR is known.
          * This is nice in that the calling app does not require knowing the CPR at all.
          * So do both checks here.
          */
         int qeiPulsePerCount = 4; /* default to 4x */
-        switch(m_feedbackDevice){
+        switch (m_feedbackDevice) {
           case CtreMagEncoder_Relative:
           case CtreMagEncoder_Absolute:
             /* we assume the quadrature signal comes from the MagEnc,
@@ -1454,239 +1508,257 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
           case QuadEncoder: /* Talon's QEI is 4x */
           default: /* pulse width and everything else, assume its regular quad use. */
             break;
-      }
-      if(scalingAvail){
-        /* already deduced the scalar above, we're done. */
-      }else{
-        /* we couldn't deduce the scalar just based on the selection */
-        if(0 == m_codesPerRev){
-          /* caller has never set the CPR.  Most likely caller
-              is just using engineering units so fall to the
-              bottom of this func.*/
-        }else{
-          /* Talon expects PPR units */
-          retval = 4 * m_codesPerRev;
-          scalingAvail = true;
+        }
+        if (scalingAvail) {
+          /* already deduced the scalar above, we're done. */
+        } else {
+          /* we couldn't deduce the scalar just based on the selection */
+          if (0 == m_codesPerRev) {
+          /*
+           * caller has never set the CPR.  Most likely caller is just using engineering units so
+           * fall to the bottom of this func.
+           */
+          } else {
+            /* Talon expects PPR units */
+            retval = 4 * m_codesPerRev;
+            scalingAvail = true;
+          }
         }
       }
-    }    break;
-    case EncRising:
-    case EncFalling:
-      if(0 == m_codesPerRev){
-        /* caller has never set the CPR.  Most likely caller
-            is just using engineering units so fall to the
-            bottom of this func.*/
-      }else{
-        /* Talon expects PPR units */
-        retval = 1 * m_codesPerRev;
+      break;
+      case EncRising:
+      case EncFalling:
+        if (0 == m_codesPerRev) {
+          /*
+           * caller has never set the CPR.  Most likely caller
+           * is just using engineering units so fall to the
+           * bottom of this func.
+           */
+        } else {
+          /* Talon expects PPR units */
+          retval = 1 * m_codesPerRev;
+          scalingAvail = true;
+        }
+        break;
+      case AnalogPot:
+      case AnalogEncoder:
+        if (0 == m_numPotTurns) {
+          /*
+           * caller has never set the CPR.  Most likely caller
+           * is just using engineering units so fall to the
+           * bottom of this func.
+           */
+        } else {
+          retval = (double) kNativeAdcUnitsPerRotation / m_numPotTurns;
+          scalingAvail = true;
+        }
+        break;
+      case CtreMagEncoder_Relative:
+      case CtreMagEncoder_Absolute:
+      case PulseWidth:
+        retval = kNativePwdUnitsPerRotation;
         scalingAvail = true;
-      }
-      break;
-    case AnalogPot:
-    case AnalogEncoder:
-      if(0 == m_numPotTurns){
-        /* caller has never set the CPR.  Most likely caller
-            is just using engineering units so fall to the
-            bottom of this func.*/
-      }else {
-        retval = (double)kNativeAdcUnitsPerRotation / m_numPotTurns;
-        scalingAvail = true;
-      }
-      break;
-    case CtreMagEncoder_Relative:
-    case CtreMagEncoder_Absolute:
-    case PulseWidth:
-      retval = kNativePwdUnitsPerRotation;
-      scalingAvail = true;
-      break;
+        break;
+      default:
+        break;
     }
     /* if scaling info is not available give caller zero */
-    if(false == scalingAvail)
+    if (false == scalingAvail) {
       return 0;
+    }
     return retval;
   }
+
   /**
-   * @param fullRotations     double precision value representing number of rotations of selected feedback sensor.
-   *                            If user has never called the config routine for the selected sensor, then the caller
-   *                            is likely passing rotations in engineering units already, in which case it is returned
-   *                            as is.
-   *                            @see configPotentiometerTurns
-   *                            @see configEncoderCodesPerRev
+   * @param fullRotations double precision value representing number of rotations of selected
+   *                      feedback sensor. If user has never called the config routine for the
+   *                      selected sensor, then the caller is likely passing rotations in
+   *                      engineering units already, in which case it is returned as is.
    * @return fullRotations in native engineering units of the Talon SRX firmware.
+   * @see configPotentiometerTurns
+   * @see configEncoderCodesPerRev
    */
-  int ScaleRotationsToNativeUnits(FeedbackDevice devToLookup, double fullRotations)
-  {
+  private int scaleRotationsToNativeUnits(FeedbackDevice devToLookup, double fullRotations) {
     /* first assume we don't have config info, prep the default return */
-    int retval = (int)fullRotations;
+    int retval = (int) fullRotations;
     /* retrieve scaling info */
-    double scalar = GetNativeUnitsPerRotationScalar(devToLookup);
+    double scalar = getNativeUnitsPerRotationScalar(devToLookup);
     /* apply scalar if its available */
-    if(scalar > 0)
-      retval = (int)(fullRotations*scalar);
+    if (scalar > 0) {
+      retval = (int) (fullRotations * scalar);
+    }
     return retval;
   }
+
   /**
-   * @param rpm     double precision value representing number of rotations per minute of selected feedback sensor.
-   *                            If user has never called the config routine for the selected sensor, then the caller
-   *                            is likely passing rotations in engineering units already, in which case it is returned
-   *                            as is.
-   *                            @see configPotentiometerTurns
-   *                            @see configEncoderCodesPerRev
+   * @param rpm double precision value representing number of rotations per minute of selected
+   *            feedback sensor. If user has never called the config routine for the selected
+   *            sensor, then the caller is likely passing rotations in engineering units already, in
+   *            which case it is returned as is.
    * @return sensor velocity in native engineering units of the Talon SRX firmware.
+   * @see configPotentiometerTurns
+   * @see configEncoderCodesPerRev
    */
-  int ScaleVelocityToNativeUnits(FeedbackDevice devToLookup, double rpm)
-  {
+  private int scaleVelocityToNativeUnits(FeedbackDevice devToLookup, double rpm) {
     /* first assume we don't have config info, prep the default return */
-    int retval = (int)rpm;
+    int retval = (int) rpm;
     /* retrieve scaling info */
-    double scalar = GetNativeUnitsPerRotationScalar(devToLookup);
+    double scalar = getNativeUnitsPerRotationScalar(devToLookup);
     /* apply scalar if its available */
-    if(scalar > 0)
-      retval = (int)(rpm * kMinutesPer100msUnit * scalar);
+    if (scalar > 0) {
+      retval = (int) (rpm * kMinutesPer100msUnit * scalar);
+    }
     return retval;
   }
+
   /**
-   * @param nativePos     integral position of the feedback sensor in native Talon SRX units.
-   *                            If user has never called the config routine for the selected sensor, then the return
-   *                            will be in TALON SRX units as well to match the behavior in the 2015 season.
-   *                            @see configPotentiometerTurns
-   *                            @see configEncoderCodesPerRev
+   * @param nativePos integral position of the feedback sensor in native Talon SRX units. If user
+   *                  has never called the config routine for the selected sensor, then the return
+   *                  will be in TALON SRX units as well to match the behavior in the 2015 season.
    * @return double precision number of rotations, unless config was never performed.
+   * @see configPotentiometerTurns
+   * @see configEncoderCodesPerRev
    */
-  double ScaleNativeUnitsToRotations(FeedbackDevice devToLookup, int nativePos)
-  {
+  private double scaleNativeUnitsToRotations(FeedbackDevice devToLookup, int nativePos) {
     /* first assume we don't have config info, prep the default return */
-    double retval = (double)nativePos;
+    double retval = (double) nativePos;
     /* retrieve scaling info */
-    double scalar = GetNativeUnitsPerRotationScalar(devToLookup);
+    double scalar = getNativeUnitsPerRotationScalar(devToLookup);
     /* apply scalar if its available */
-    if(scalar > 0)
-      retval = ((double)nativePos) / scalar;
+    if (scalar > 0) {
+      retval = ((double) nativePos) / scalar;
+    }
     return retval;
   }
+
   /**
-   * @param nativeVel     integral velocity of the feedback sensor in native Talon SRX units.
-   *                            If user has never called the config routine for the selected sensor, then the return
-   *                            will be in TALON SRX units as well to match the behavior in the 2015 season.
-   *                            @see configPotentiometerTurns
-   *                            @see configEncoderCodesPerRev
+   * @param nativeVel integral velocity of the feedback sensor in native Talon SRX units. If user
+   *                  has never called the config routine for the selected sensor, then the return
+   *                  will be in TALON SRX units as well to match the behavior in the 2015 season.
    * @return double precision of sensor velocity in RPM, unless config was never performed.
+   * @see configPotentiometerTurns
+   * @see configEncoderCodesPerRev
    */
-  double ScaleNativeUnitsToRpm(FeedbackDevice devToLookup, long nativeVel)
-  {
+  private double scaleNativeUnitsToRpm(FeedbackDevice devToLookup, long nativeVel) {
     /* first assume we don't have config info, prep the default return */
-    double retval = (double)nativeVel;
+    double retval = (double) nativeVel;
     /* retrieve scaling info */
-    double scalar = GetNativeUnitsPerRotationScalar(devToLookup);
+    double scalar = getNativeUnitsPerRotationScalar(devToLookup);
     /* apply scalar if its available */
-    if(scalar > 0)
-      retval = (double)(nativeVel) / (scalar*kMinutesPer100msUnit);
+    if (scalar > 0) {
+      retval = (double) (nativeVel) / (scalar * kMinutesPer100msUnit);
+    }
     return retval;
   }
+
   /**
-   * Enables Talon SRX to automatically zero the Sensor Position whenever an
-   * edge is detected on the index signal.
-   * @param enable         boolean input, pass true to enable feature or false to disable.
-   * @param risingEdge     boolean input, pass true to clear the position on rising edge,
-   *                    pass false to clear the position on falling edge.
+   * Enables Talon SRX to automatically zero the Sensor Position whenever an edge is detected on the
+   * index signal.
+   *
+   * @param enable     boolean input, pass true to enable feature or false to disable.
+   * @param risingEdge boolean input, pass true to clear the position on rising edge, pass false to
+   *                   clear the position on falling edge.
    */
   public void enableZeroSensorPositionOnIndex(boolean enable, boolean risingEdge) {
-    if(enable){
+    if (enable) {
       /* enable the feature, update the edge polarity first to ensure
         it is correct before the feature is enabled. */
-      setParameter(CanTalonJNI.param_t.eQuadIdxPolarity,risingEdge ? 1 : 0);
-      setParameter(CanTalonJNI.param_t.eClearPositionOnIdx,1);
-    }else{
+      setParameter(CanTalonJNI.param_t.eQuadIdxPolarity, risingEdge ? 1 : 0);
+      setParameter(CanTalonJNI.param_t.eClearPositionOnIdx, 1);
+    } else {
       /* disable the feature first, then update the edge polarity. */
-      setParameter(CanTalonJNI.param_t.eClearPositionOnIdx,0);
-      setParameter(CanTalonJNI.param_t.eQuadIdxPolarity,risingEdge ? 1 : 0);
+      setParameter(CanTalonJNI.param_t.eClearPositionOnIdx, 0);
+      setParameter(CanTalonJNI.param_t.eQuadIdxPolarity, risingEdge ? 1 : 0);
     }
   }
+
   /**
-   * Calling application can opt to speed up the handshaking between the robot API and the Talon to increase the
-   * download rate of the Talon's Motion Profile.  Ideally the period should be no more than half the period
-   * of a trajectory point.
+   * Calling application can opt to speed up the handshaking between the robot API and the Talon to
+   * increase the download rate of the Talon's Motion Profile.  Ideally the period should be no more
+   * than half the period of a trajectory point.
    */
   public void changeMotionControlFramePeriod(int periodMs) {
     CanTalonJNI.ChangeMotionControlFramePeriod(m_handle, periodMs);
   }
 
   /**
-   * Clear the buffered motion profile in both Talon RAM (bottom), and in the API (top).
-   * Be sure to check getMotionProfileStatus() to know when the buffer is actually cleared.
+   * Clear the buffered motion profile in both Talon RAM (bottom), and in the API (top). Be sure to
+   * check getMotionProfileStatus() to know when the buffer is actually cleared.
    */
   public void clearMotionProfileTrajectories() {
     CanTalonJNI.ClearMotionProfileTrajectories(m_handle);
   }
+
   /**
-   * Retrieve just the buffer count for the api-level (top) buffer.
-   * This routine performs no CAN or data structure lookups, so its fast and ideal
-   * if caller needs to quickly poll the progress of trajectory points being emptied
-   * into Talon's RAM. Otherwise just use GetMotionProfileStatus.
+   * Retrieve just the buffer count for the api-level (top) buffer. This routine performs no CAN or
+   * data structure lookups, so its fast and ideal if caller needs to quickly poll the progress of
+   * trajectory points being emptied into Talon's RAM. Otherwise just use GetMotionProfileStatus.
+   *
    * @return number of trajectory points in the top buffer.
    */
   public int getMotionProfileTopLevelBufferCount() {
     return CanTalonJNI.GetMotionProfileTopLevelBufferCount(m_handle);
   }
+
   /**
-   * Push another trajectory point into the top level buffer (which is emptied into
-   * the Talon's bottom buffer as room allows).
-   * @param targPos servo position in native Talon units (sensor units).
-   * @param targVel velocity to feed-forward in native Talon units (sensor units per 100ms).
-   * @param profileSlotSelect  which slot to pull PIDF gains from.  Currently supports 0 or 1.
-   * @param timeDurMs time in milliseconds of how long to apply this point.
-   * @param velOnly  set to nonzero to signal Talon that only the feed-foward velocity should be
-   *                 used, i.e. do not perform PID on position.  This is equivalent to setting
-   *                 PID gains to zero, but much more efficient and synchronized to MP.
-   * @param isLastPoint  set to nonzero to signal Talon to keep processing this trajectory point,
-   *                     instead of jumping to the next one when timeDurMs expires.  Otherwise
-   *                     MP executer will eventuall see an empty buffer after the last point expires,
-   *                     causing it to assert the IsUnderRun flag.  However this may be desired
-   *                     if calling application nevers wants to terminate the MP.
-   * @param zeroPos  set to nonzero to signal Talon to "zero" the selected position sensor before executing
-   *                 this trajectory point.  Typically the first point should have this set only thus allowing
-   *                 the remainder of the MP positions to be relative to zero.
-   * @return CTR_OKAY if trajectory point push ok. CTR_BufferFull if buffer is full due to kMotionProfileTopBufferCapacity.
+   * Push another trajectory point into the top level buffer (which is emptied into the Talon's
+   * bottom buffer as room allows).
+   *
+   * <p>Will return CTR_OKAY if trajectory point push ok. CTR_BufferFull if buffer is full due to
+   * kMotionProfileTopBufferCapacity.
+   *
+   * @param trajPt {@link TrajectoryPoint}
+   * @return CTR_OKAY or CTR_BufferFull.
    */
   public boolean pushMotionProfileTrajectory(TrajectoryPoint trajPt) {
     /* check if there is room */
-    if(isMotionProfileTopLevelBufferFull())
+    if (isMotionProfileTopLevelBufferFull()) {
       return false;
+    }
     /* convert position and velocity to native units */
-    int targPos  = ScaleRotationsToNativeUnits(m_feedbackDevice, trajPt.position);
-    int targVel = ScaleVelocityToNativeUnits(m_feedbackDevice, trajPt.velocity);
+    int targPos = scaleRotationsToNativeUnits(m_feedbackDevice, trajPt.position);
+    int targVel = scaleVelocityToNativeUnits(m_feedbackDevice, trajPt.velocity);
     /* bounds check signals that require it */
     int profileSlotSelect = (trajPt.profileSlotSelect > 0) ? 1 : 0;
     int timeDurMs = trajPt.timeDurMs;
     /* cap time to [0ms, 255ms], 0 and 1 are both interpreted as 1ms. */
-    if(timeDurMs > 255)
+    if (timeDurMs > 255) {
       timeDurMs = 255;
-    if(timeDurMs < 0)
+    }
+    if (timeDurMs < 0) {
       timeDurMs = 0;
+    }
     /* send it to the top level buffer */
-    CanTalonJNI.PushMotionProfileTrajectory(m_handle, targPos, targVel, profileSlotSelect, timeDurMs, trajPt.velocityOnly ? 1 : 0, trajPt.isLastPoint ? 1 : 0, trajPt.zeroPos ? 1 : 0);
+    CanTalonJNI.PushMotionProfileTrajectory(m_handle, targPos, targVel, profileSlotSelect,
+        timeDurMs, trajPt.velocityOnly ? 1 : 0, trajPt.isLastPoint ? 1 : 0, trajPt.zeroPos ? 1 : 0);
     return true;
   }
+
   /**
    * @return true if api-level (top) buffer is full.
    */
   public boolean isMotionProfileTopLevelBufferFull() {
     return CanTalonJNI.IsMotionProfileTopLevelBufferFull(m_handle);
   }
+
   /**
-   * This must be called periodically to funnel the trajectory points from the API's top level buffer to
-   * the Talon's bottom level buffer.  Recommendation is to call this twice as fast as the executation rate of the motion profile.
-   * So if MP is running with 20ms trajectory points, try calling this routine every 10ms.  All motion profile functions are thread-safe
-   * through the use of a mutex, so there is no harm in having the caller utilize threading.
+   * This must be called periodically to funnel the trajectory points from the API's top level
+   * buffer to the Talon's bottom level buffer.  Recommendation is to call this twice as fast as the
+   * executation rate of the motion profile. So if MP is running with 20ms trajectory points, try
+   * calling this routine every 10ms.  All motion profile functions are thread-safe through the use
+   * of a mutex, so there is no harm in having the caller utilize threading.
    */
   public void processMotionProfileBuffer() {
     CanTalonJNI.ProcessMotionProfileBuffer(m_handle);
   }
+
   /**
-   * Retrieve all Motion Profile status information.
-   * Since this all comes from one CAN frame, its ideal to have one routine to retrieve the frame once and decode everything.
-   * @param [out] motionProfileStatus contains all progress information on the currently running MP.  Caller should
-   *              must instantiate the motionProfileStatus object first then pass into this routine to be filled.
+   * Retrieve all Motion Profile status information. Since this all comes from one CAN frame, its
+   * ideal to have one routine to retrieve the frame once and decode everything.
+   *
+   * @param motionProfileStatus [out] contains all progress information on the currently running MP.
+   *                            Caller should must instantiate the motionProfileStatus object first
+   *                            then pass into this routine to be filled.
    */
   public void getMotionProfileStatus(MotionProfileStatus motionProfileStatus) {
     CanTalonJNI.GetMotionProfileStatus(m_handle, this, motionProfileStatus);
@@ -1695,35 +1767,44 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   /**
    * Internal method to set the contents.
    */
-  protected void setMotionProfileStatusFromJNI(MotionProfileStatus motionProfileStatus, int flags, int profileSlotSelect, int targPos, int targVel, int topBufferRem, int topBufferCnt, int btmBufferCnt, int outputEnable) {
+  protected void setMotionProfileStatusFromJNI(MotionProfileStatus motionProfileStatus,
+                                               int flags, int profileSlotSelect, int targPos,
+                                               int targVel, int topBufferRem, int topBufferCnt,
+                                               int btmBufferCnt, int outputEnable) {
     motionProfileStatus.topBufferRem = topBufferRem;
     motionProfileStatus.topBufferCnt = topBufferCnt;
     motionProfileStatus.btmBufferCnt = btmBufferCnt;
-    motionProfileStatus.hasUnderrun =              ((flags & CanTalonJNI.kMotionProfileFlag_HasUnderrun)>0)     ? true :false;
-    motionProfileStatus.isUnderrun  =              ((flags & CanTalonJNI.kMotionProfileFlag_IsUnderrun)>0)      ? true :false;
-    motionProfileStatus.activePointValid =         ((flags & CanTalonJNI.kMotionProfileFlag_ActTraj_IsValid)>0) ? true :false;
-    motionProfileStatus.activePoint.isLastPoint =  ((flags & CanTalonJNI.kMotionProfileFlag_ActTraj_IsLast)>0)  ? true :false;
-    motionProfileStatus.activePoint.velocityOnly = ((flags & CanTalonJNI.kMotionProfileFlag_ActTraj_VelOnly)>0) ? true :false;
-    motionProfileStatus.activePoint.position = ScaleNativeUnitsToRotations(m_feedbackDevice, targPos);
-    motionProfileStatus.activePoint.velocity = ScaleNativeUnitsToRpm(m_feedbackDevice, targVel);
+    motionProfileStatus.hasUnderrun = ((flags & CanTalonJNI.kMotionProfileFlag_HasUnderrun) > 0);
+    motionProfileStatus.isUnderrun = ((flags & CanTalonJNI.kMotionProfileFlag_IsUnderrun) > 0);
+    motionProfileStatus.activePointValid =
+        ((flags & CanTalonJNI.kMotionProfileFlag_ActTraj_IsValid) > 0);
+    motionProfileStatus.activePoint.isLastPoint =
+        ((flags & CanTalonJNI.kMotionProfileFlag_ActTraj_IsLast) > 0);
+    motionProfileStatus.activePoint.velocityOnly =
+        ((flags & CanTalonJNI.kMotionProfileFlag_ActTraj_VelOnly) > 0);
+    motionProfileStatus.activePoint.position =
+        scaleNativeUnitsToRotations(m_feedbackDevice, targPos);
+    motionProfileStatus.activePoint.velocity = scaleNativeUnitsToRpm(m_feedbackDevice, targVel);
     motionProfileStatus.activePoint.profileSlotSelect = profileSlotSelect;
     motionProfileStatus.outputEnable = SetValueMotionProfile.valueOf(outputEnable);
-    motionProfileStatus.activePoint.zeroPos = false; // this signal is only used sending pts to Talon
-    motionProfileStatus.activePoint.timeDurMs = 0;   // this signal is only used sending pts to Talon
+    motionProfileStatus.activePoint.zeroPos = false; // this signal is only used sending pts to
+    // Talon
+    motionProfileStatus.activePoint.timeDurMs = 0;   // this signal is only used sending pts to
   }
 
   /**
-   * Clear the hasUnderrun flag in Talon's Motion Profile Executer when MPE is ready for another point,
-   * but the low level buffer is empty.
+   * Clear the hasUnderrun flag in Talon's Motion Profile Executer when MPE is ready for another
+   * point, but the low level buffer is empty.
    *
-   * Once the Motion Profile Executer sets the hasUnderrun flag, it stays set until
-   * Robot Application clears it with this routine, which ensures Robot Application
-   * gets a chance to instrument or react.  Caller could also check the isUnderrun flag
-   * which automatically clears when fault condition is removed.
+   * <p>Once the Motion Profile Executer sets the hasUnderrun flag, it stays set until Robot
+   * Application clears it with this routine, which ensures Robot Application gets a chance to
+   * instrument or react.  Caller could also check the isUnderrun flag which automatically clears
+   * when fault condition is removed.
    */
   public void clearMotionProfileHasUnderrun() {
     setParameter(CanTalonJNI.param_t.eMotionProfileHasUnderrunErr, 0);
   }
+
   @Override
   public void setExpiration(double timeout) {
     m_safetyHelper.setExpiration(timeout);
@@ -1759,51 +1840,36 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
    */
 
   private ITable m_table = null;
-  private ITableListener m_table_listener = null;
+  private ITableListener m_tableListener = null;
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void initTable(ITable subtable) {
     m_table = subtable;
     updateTable();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void updateTable() {
     CANSpeedController.super.updateTable();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public ITable getTable() {
     return m_table;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void startLiveWindowMode() {
     set(0); // Stop for safety
-    m_table_listener = createTableListener();
-    m_table.addTableListener(m_table_listener, true);
+    m_tableListener = createTableListener();
+    m_table.addTableListener(m_tableListener, true);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void stopLiveWindowMode() {
     set(0); // Stop for safety
     // TODO: See if this is still broken
-    m_table.removeTableListener(m_table_listener);
+    m_table.removeTableListener(m_tableListener);
   }
 
 }

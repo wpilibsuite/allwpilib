@@ -11,8 +11,8 @@ import edu.wpi.first.wpilibj.hal.PowerJNI;
 
 public class ControllerPower {
   /**
-   * Get the input voltage to the robot controller
-   *$
+   * Get the input voltage to the robot controller.
+   *
    * @return The controller input voltage value in Volts
    */
   public static double getInputVoltage() {
@@ -20,8 +20,8 @@ public class ControllerPower {
   }
 
   /**
-   * Get the input current to the robot controller
-   *$
+   * Get the input current to the robot controller.
+   *
    * @return The controller input current value in Amps
    */
   public static double getInputCurrent() {
@@ -29,8 +29,8 @@ public class ControllerPower {
   }
 
   /**
-   * Get the voltage of the 3.3V rail
-   *$
+   * Get the voltage of the 3.3V rail.
+   *
    * @return The controller 3.3V rail voltage value in Volts
    */
   public static double getVoltage3V3() {
@@ -38,8 +38,8 @@ public class ControllerPower {
   }
 
   /**
-   * Get the current output of the 3.3V rail
-   *$
+   * Get the current output of the 3.3V rail.
+   *
    * @return The controller 3.3V rail output current value in Volts
    */
   public static double getCurrent3V3() {
@@ -47,10 +47,9 @@ public class ControllerPower {
   }
 
   /**
-   * Get the enabled state of the 3.3V rail. The rail may be disabled due to a
-   * controller brownout, a short circuit on the rail, or controller
-   * over-voltage
-   *$
+   * Get the enabled state of the 3.3V rail. The rail may be disabled due to a controller brownout,
+   * a short circuit on the rail, or controller over-voltage.
+   *
    * @return The controller 3.3V rail enabled value
    */
   public static boolean getEnabled3V3() {
@@ -58,9 +57,8 @@ public class ControllerPower {
   }
 
   /**
-   * Get the count of the total current faults on the 3.3V rail since the
-   * controller has booted
-   *$
+   * Get the count of the total current faults on the 3.3V rail since the controller has booted.
+   *
    * @return The number of faults
    */
   public static int getFaultCount3V3() {
@@ -68,8 +66,8 @@ public class ControllerPower {
   }
 
   /**
-   * Get the voltage of the 5V rail
-   *$
+   * Get the voltage of the 5V rail.
+   *
    * @return The controller 5V rail voltage value in Volts
    */
   public static double getVoltage5V() {
@@ -77,8 +75,8 @@ public class ControllerPower {
   }
 
   /**
-   * Get the current output of the 5V rail
-   *$
+   * Get the current output of the 5V rail.
+   *
    * @return The controller 5V rail output current value in Amps
    */
   public static double getCurrent5V() {
@@ -86,10 +84,9 @@ public class ControllerPower {
   }
 
   /**
-   * Get the enabled state of the 5V rail. The rail may be disabled due to a
-   * controller brownout, a short circuit on the rail, or controller
-   * over-voltage
-   *$
+   * Get the enabled state of the 5V rail. The rail may be disabled due to a controller brownout, a
+   * short circuit on the rail, or controller over-voltage.
+   *
    * @return The controller 5V rail enabled value
    */
   public static boolean getEnabled5V() {
@@ -97,9 +94,8 @@ public class ControllerPower {
   }
 
   /**
-   * Get the count of the total current faults on the 5V rail since the
-   * controller has booted
-   *$
+   * Get the count of the total current faults on the 5V rail since the controller has booted.
+   *
    * @return The number of faults
    */
   public static int getFaultCount5V() {
@@ -107,8 +103,8 @@ public class ControllerPower {
   }
 
   /**
-   * Get the voltage of the 6V rail
-   *$
+   * Get the voltage of the 6V rail.
+   *
    * @return The controller 6V rail voltage value in Volts
    */
   public static double getVoltage6V() {
@@ -116,8 +112,8 @@ public class ControllerPower {
   }
 
   /**
-   * Get the current output of the 6V rail
-   *$
+   * Get the current output of the 6V rail.
+   *
    * @return The controller 6V rail output current value in Amps
    */
   public static double getCurrent6V() {
@@ -125,10 +121,9 @@ public class ControllerPower {
   }
 
   /**
-   * Get the enabled state of the 6V rail. The rail may be disabled due to a
-   * controller brownout, a short circuit on the rail, or controller
-   * over-voltage
-   *$
+   * Get the enabled state of the 6V rail. The rail may be disabled due to a controller brownout, a
+   * short circuit on the rail, or controller over-voltage.
+   *
    * @return The controller 6V rail enabled value
    */
   public static boolean getEnabled6V() {
@@ -136,9 +131,8 @@ public class ControllerPower {
   }
 
   /**
-   * Get the count of the total current faults on the 6V rail since the
-   * controller has booted
-   *$
+   * Get the count of the total current faults on the 6V rail since the controller has booted.
+   *
    * @return The number of faults
    */
   public static int getFaultCount6V() {

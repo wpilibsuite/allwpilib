@@ -10,76 +10,86 @@ package edu.wpi.first.wpilibj.mockhardware;
 import edu.wpi.first.wpilibj.AnalogOutput;
 
 /**
- * @author jonathanleitschuh
+ * A fake source to provide output to a {@link edu.wpi.first.wpilibj.interfaces.Potentiometer}.
  *
+ * @author jonathanleitschuh
  */
 public class FakePotentiometerSource {
-  private AnalogOutput output;
-  private boolean m_init_output;
-  private double potMaxAngle;
-  private double potMaxVoltage = 5.0;
-  private final double defaultPotMaxAngle;
+  private AnalogOutput m_output;
+  private boolean m_initOutput;
+  private double m_potMaxAngle;
+  private double m_potMaxVoltage = 5.0;
+  private final double m_defaultPotMaxAngle;
 
+  /**
+   * Constructs the fake source.
+   *
+   * @param output             The analog port to output the signal on
+   * @param defaultPotMaxAngle The default maximum angle the pot supports.
+   */
   public FakePotentiometerSource(AnalogOutput output, double defaultPotMaxAngle) {
-    this.defaultPotMaxAngle = defaultPotMaxAngle;
-    potMaxAngle = defaultPotMaxAngle;
-    this.output = output;
-    m_init_output = false;
+    this.m_defaultPotMaxAngle = defaultPotMaxAngle;
+    m_potMaxAngle = defaultPotMaxAngle;
+    this.m_output = output;
+    m_initOutput = false;
   }
 
   public FakePotentiometerSource(int port, double defaultPotMaxAngle) {
     this(new AnalogOutput(port), defaultPotMaxAngle);
-    m_init_output = true;
+    m_initOutput = true;
   }
 
   /**
-   * Sets the maximum voltage output. If not the default is 5.0V
-   *$
+   * Sets the maximum voltage output. If not the default is 5.0V.
+   *
    * @param voltage The voltage that indicates that the pot is at the max value.
    */
   public void setMaxVoltage(double voltage) {
-    potMaxVoltage = voltage;
+    m_potMaxVoltage = voltage;
   }
 
   public void setRange(double range) {
-    potMaxAngle = range;
+    m_potMaxAngle = range;
   }
 
   public void reset() {
-    potMaxAngle = defaultPotMaxAngle;
-    output.setVoltage(0.0);
+    m_potMaxAngle = m_defaultPotMaxAngle;
+    m_output.setVoltage(0.0);
   }
 
   public void setAngle(double angle) {
-    output.setVoltage((potMaxVoltage / potMaxAngle) * angle);
+    m_output.setVoltage((m_potMaxVoltage / m_potMaxAngle) * angle);
   }
 
   public void setVoltage(double voltage) {
-    output.setVoltage(voltage);
+    m_output.setVoltage(voltage);
   }
 
   public double getVoltage() {
-    return output.getVoltage();
+    return m_output.getVoltage();
   }
 
   /**
-   * Returns the currently set angle
-   *$
+   * Returns the currently set angle.
+   *
    * @return the current angle
    */
   public double getAngle() {
-    double voltage = output.getVoltage();
+    double voltage = m_output.getVoltage();
     if (voltage == 0) { // Removes divide by zero error
       return 0;
     }
-    return voltage * (potMaxAngle / potMaxVoltage);
+    return voltage * (m_potMaxAngle / m_potMaxVoltage);
   }
 
+  /**
+   * Frees the resouce.
+   */
   public void free() {
-    if (m_init_output) {
-      output.free();
-      output = null;
-      m_init_output = false;
+    if (m_initOutput) {
+      m_output.free();
+      m_output = null;
+      m_initOutput = false;
     }
   }
 }

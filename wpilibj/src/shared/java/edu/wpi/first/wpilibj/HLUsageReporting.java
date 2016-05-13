@@ -14,11 +14,13 @@ import edu.wpi.first.wpilibj.util.BaseSystemNotInitializedException;
  *
  * @author alex
  */
+@SuppressWarnings("JavadocMethod")
 public class HLUsageReporting {
   private static Interface impl;
 
-  public static void SetImplementation(Interface i) {
-    impl = i;
+  @SuppressWarnings("MethodName")
+  public static void SetImplementation(Interface implementation) {
+    impl = implementation;
   }
 
   public static void reportScheduler() {
@@ -54,10 +56,13 @@ public class HLUsageReporting {
   }
 
   public static class Null implements Interface {
-    public void reportScheduler() {}
+    public void reportScheduler() {
+    }
 
-    public void reportPIDController(int num) {}
+    public void reportPIDController(int num) {
+    }
 
-    public void reportSmartDashboard() {}
+    public void reportSmartDashboard() {
+    }
   }
 }

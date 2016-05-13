@@ -7,24 +7,21 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.logging.Logger;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.networktables.NetworkTableKeyNotDefined;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
+import static org.junit.Assert.assertEquals;
+
 /**
- * @author jonathanleitschuh
+ * Test that covers {@link SmartDashboard}.
  *
+ * @author jonathanleitschuh
  */
 public class SmartDashboardTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(SmartDashboardTest.class.getName());
@@ -33,30 +30,6 @@ public class SmartDashboardTest extends AbstractComsSetup {
   protected Logger getClassLogger() {
     return logger;
   }
-
-  /**
-   * @throws java.lang.Exception
-   */
-  @BeforeClass
-  public static void setUpBeforeClass() throws Exception {}
-
-  /**
-   * @throws java.lang.Exception
-   */
-  @AfterClass
-  public static void tearDownAfterClass() throws Exception {}
-
-  /**
-   * @throws java.lang.Exception
-   */
-  @Before
-  public void setUp() throws Exception {}
-
-  /**
-   * @throws java.lang.Exception
-   */
-  @After
-  public void tearDown() throws Exception {}
 
   @Test(expected = NetworkTableKeyNotDefined.class)
   public void testGetBadValue() {
@@ -94,11 +67,11 @@ public class SmartDashboardTest extends AbstractComsSetup {
   public void testReplaceString() {
     String key = "testReplaceString";
     String valueOld = "oldValue";
-    String valueNew = "newValue";
     SmartDashboard.putString(key, valueOld);
     assertEquals(valueOld, SmartDashboard.getString(key));
     assertEquals(valueOld, table.getString(key));
 
+    String valueNew = "newValue";
     SmartDashboard.putString(key, valueNew);
     assertEquals(valueNew, SmartDashboard.getString(key));
     assertEquals(valueNew, table.getString(key));

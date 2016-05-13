@@ -10,29 +10,30 @@ package edu.wpi.first.wpilibj.hal;
 public class InterruptJNI extends JNIWrapper {
   public interface InterruptJNIHandlerFunction {
     void apply(int interruptAssertedMask, Object param);
-  };
+  }
 
   public static native long initializeInterrupts(int interruptIndex, boolean watcher);
 
-  public static native void cleanInterrupts(long interrupt_pointer);
+  public static native void cleanInterrupts(long interruptPointer);
 
-  public static native int waitForInterrupt(long interrupt_pointer, double timeout,
-      boolean ignorePrevious);
+  public static native int waitForInterrupt(long interruptPointer, double timeout,
+                                            boolean ignorePrevious);
 
-  public static native void enableInterrupts(long interrupt_pointer);
+  public static native void enableInterrupts(long interruptPointer);
 
-  public static native void disableInterrupts(long interrupt_pointer);
+  public static native void disableInterrupts(long interruptPointer);
 
-  public static native double readRisingTimestamp(long interrupt_pointer);
+  public static native double readRisingTimestamp(long interruptPointer);
 
-  public static native double readFallingTimestamp(long interrupt_pointer);
+  public static native double readFallingTimestamp(long interruptPointer);
 
-  public static native void requestInterrupts(long interrupt_pointer, byte routing_module,
-      int routing_pin, boolean routing_analog_trigger);
+  public static native void requestInterrupts(long interruptPointer, byte routingModule,
+                                              int routingPin, boolean routingAnalogTrigger);
 
-  public static native void attachInterruptHandler(long interrupt_pointer,
-      InterruptJNIHandlerFunction handler, Object param);
+  public static native void attachInterruptHandler(long interruptPointer,
+                                                   InterruptJNIHandlerFunction handler,
+                                                   Object param);
 
-  public static native void setInterruptUpSourceEdge(long interrupt_pointer, boolean risingEdge,
-      boolean fallingEdge);
+  public static native void setInterruptUpSourceEdge(long interruptPointer, boolean risingEdge,
+                                                     boolean fallingEdge);
 }

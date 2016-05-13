@@ -7,16 +7,6 @@
 
 package edu.wpi.first.wpilibj.test;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Vector;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
-
 import junit.framework.JUnit4TestAdapter;
 import junit.runner.Version;
 
@@ -27,16 +17,24 @@ import org.junit.runner.notification.Failure;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
+
 import edu.wpi.first.wpilibj.WpiLibJTestSuite;
 import edu.wpi.first.wpilibj.can.CANTestSuite;
 import edu.wpi.first.wpilibj.command.CommandTestSuite;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTestSuite;
 
 /**
- * The WPILibJ Integeration Test Suite collects all of the tests to be run by
- * junit. In order for a test to be run, it must be added the list of suite
- * classes below. The tests will be run in the order they are listed in the
- * suite classes annotation.
+ * The WPILibJ Integeration Test Suite collects all of the tests to be run by junit. In order for a
+ * test to be run, it must be added the list of suite classes below. The tests will be run in the
+ * order they are listed in the suite classes annotation.
  */
 @RunWith(Suite.class)
 // These are listed on separate lines to prevent merge conflicts
@@ -47,17 +45,19 @@ public class TestSuite extends AbstractTestSuite {
     // Sets up the logging output
     final InputStream inputStream = TestSuite.class.getResourceAsStream("/logging.properties");
     try {
-      if (inputStream == null)
+      if (inputStream == null) {
         throw new NullPointerException("./logging.properties was not loaded");
+      }
       LogManager.getLogManager().readConfiguration(inputStream);
       Logger.getAnonymousLogger().info("Loaded");
-    } catch (final IOException | NullPointerException e) {
+    } catch (final IOException | NullPointerException ex) {
       Logger.getAnonymousLogger().severe("Could not load default logging.properties file");
-      Logger.getAnonymousLogger().severe(e.getMessage());
+      Logger.getAnonymousLogger().severe(ex.getMessage());
     }
 
     TestBench.out().println("Starting Tests");
   }
+
   private static final Logger WPILIBJ_ROOT_LOGGER = Logger.getLogger("edu.wpi.first.wpilibj");
   private static final Logger WPILIBJ_COMMAND_ROOT_LOGGER = Logger
       .getLogger("edu.wpi.first.wpilibj.command");
@@ -72,6 +72,9 @@ public class TestSuite extends AbstractTestSuite {
 
   private static TestSuite instance = null;
 
+  /**
+   * Get the singleton instance of the test suite.
+   */
   public static TestSuite getInstance() {
     if (instance == null) {
       instance = new TestSuite();
@@ -80,13 +83,13 @@ public class TestSuite extends AbstractTestSuite {
   }
 
   /**
-   * This has to be public so that the JUnit4
+   * This has to be public so that the JUnit4.
    */
-  public TestSuite() {}
+  public TestSuite() {
+  }
 
   /**
-   * Displays a help message for the user when they use the --help flag at
-   * runtime.
+   * Displays a help message for the user when they use the --help flag at runtime.
    */
   protected static void displayHelp() {
     StringBuilder helpMessage = new StringBuilder("Test Parameters help: \n");
@@ -104,7 +107,8 @@ public class TestSuite extends AbstractTestSuite {
         + QUICK_TEST_FLAG + " or " + CLASS_NAME_FILTER
         + " and run them the given number of times.\n");
     helpMessage
-        .append("[NOTE] All regex uses the syntax defined by java.util.regex.Pattern. This documentation can be found at "
+        .append("[NOTE] All regex uses the syntax defined by java.util.regex.Pattern. This "
+            + "documentation can be found at "
             + "http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html\n");
     helpMessage.append("\n");
     helpMessage.append("\n");
@@ -113,8 +117,8 @@ public class TestSuite extends AbstractTestSuite {
   }
 
   /**
-   * Lets the user know that they used the TestSuite improperly and gives
-   * details about how to use it correctly in the future.
+   * Lets the user know that they used the TestSuite improperly and gives details about how to use
+   * it correctly in the future.
    */
   protected static void displayInvalidUsage(String message, String... args) {
     StringBuilder invalidMessage = new StringBuilder("Invalid Usage: " + message + "\n");
@@ -133,16 +137,16 @@ public class TestSuite extends AbstractTestSuite {
 
   /**
    * Prints the loaded tests before they are run.
-   *$
+   *
    * @param classes the classes that were loaded.
    */
   protected static void printLoadedTests(final Class<?>... classes) {
     StringBuilder loadedTestsMessage = new StringBuilder("The following tests were loaded:\n");
-    Package p = null;
+    Package packagE = null;
     for (Class<?> c : classes) {
-      if (c.getPackage().equals(p)) {
-        p = c.getPackage();
-        loadedTestsMessage.append(p.getName() + "\n");
+      if (c.getPackage().equals(packagE)) {
+        packagE = c.getPackage();
+        loadedTestsMessage.append(packagE.getName() + "\n");
       }
       loadedTestsMessage.append("\t" + c.getSimpleName() + "\n");
     }
@@ -151,16 +155,15 @@ public class TestSuite extends AbstractTestSuite {
 
 
   /**
-   * Parses the arguments passed at runtime and runs the appropriate tests based
-   * upon these arguments
-   *$
+   * Parses the arguments passed at runtime and runs the appropriate tests based upon these
+   * arguments
+   *
    * @param args the args passed into the program at runtime
-   * @return the restults of the tests that have run. If no tests were run then
-   *         null is returned.
+   * @return the restults of the tests that have run. If no tests were run then null is returned.
    */
   protected static Result parseArgsRunAndGetResult(final String[] args) {
     if (args.length == 0) { // If there are no args passed at runtime then just
-                            // run all of the tests.
+      // run all of the tests.
       printLoadedTests(TestSuite.class);
       return JUnitCore.runClasses(TestSuite.class);
     }
@@ -171,7 +174,6 @@ public class TestSuite extends AbstractTestSuite {
     // The class filter was passed
     boolean classFilter = false;
     String classRegex = "";
-    boolean repeatFilter = false;
     int repeatCount = 1;
 
     for (String s : args) {
@@ -180,20 +182,18 @@ public class TestSuite extends AbstractTestSuite {
         methodRegex = new String(s).replace(METHOD_NAME_FILTER, "");
       }
       if (Pattern.matches(METHOD_REPEAT_FILTER + ".*", s)) {
-        repeatFilter = true;
         try {
           repeatCount = Integer.parseInt(new String(s).replace(METHOD_REPEAT_FILTER, ""));
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ex) {
           displayInvalidUsage("The argument passed to the repeat rule was not a valid integer.",
               args);
         }
       }
       if (Pattern.matches(CLASS_NAME_FILTER + ".*", s)) {
         classFilter = true;
-        classRegex = new String(s).replace(CLASS_NAME_FILTER, "");
+        classRegex = s.replace(CLASS_NAME_FILTER, "");
       }
     }
-
 
 
     ArrayList<String> argsParsed = new ArrayList<String>(Arrays.asList(args));
@@ -214,46 +214,46 @@ public class TestSuite extends AbstractTestSuite {
      */
     class MultipleResult extends Result {
       private static final long serialVersionUID = 1L;
-      private final List<Failure> failures = new Vector<Failure>();
-      private int runCount = 0;
-      private int ignoreCount = 0;
-      private long runTime = 0;
+      private final List<Failure> m_failures = new ArrayList<>();
+      private int m_runCount = 0;
+      private int m_ignoreCount = 0;
+      private long m_runTime = 0;
 
       @Override
       public int getRunCount() {
-        return runCount;
+        return m_runCount;
       }
 
       @Override
       public int getFailureCount() {
-        return failures.size();
+        return m_failures.size();
       }
 
       @Override
       public long getRunTime() {
-        return runTime;
+        return m_runTime;
       }
 
       @Override
       public List<Failure> getFailures() {
-        return failures;
+        return m_failures;
       }
 
       @Override
       public int getIgnoreCount() {
-        return ignoreCount;
+        return m_ignoreCount;
       }
 
       /**
-       * Adds the given result's data to this result
+       * Adds the given result's data to this result.
        *$
-       * @param r the result to add to this result
+       * @param result the result to add to this result
        */
-      void addResult(Result r) {
-        failures.addAll(r.getFailures());
-        runCount += r.getRunCount();
-        ignoreCount += r.getIgnoreCount();
-        runTime += r.getRunTime();
+      void addResult(Result result) {
+        m_failures.addAll(result.getFailures());
+        m_runCount += result.getRunCount();
+        m_ignoreCount += result.getIgnoreCount();
+        m_runTime += result.getRunTime();
       }
     }
 
@@ -261,19 +261,20 @@ public class TestSuite extends AbstractTestSuite {
     if (methodFilter) {
       List<ClassMethodPair> pairs = (new TestSuite()).getMethodMatching(methodRegex);
       if (pairs.size() == 0) {
-        displayInvalidUsage("None of the arguments passed to the method name filter matched.", args);
+        displayInvalidUsage("None of the arguments passed to the method name filter matched.",
+            args);
         return null;
       }
       // Print out the list of tests before we run them
       TestBench.out().println("Running the following tests:");
       Class<?> classListing = null;
       for (ClassMethodPair p : pairs) {
-        if (!p.methodClass.equals(classListing)) {
+        if (!p.m_methodClass.equals(classListing)) {
           // Only display the class name every time it changes
-          classListing = p.methodClass;
+          classListing = p.m_methodClass;
           TestBench.out().println(classListing);
         }
-        TestBench.out().println("\t" + p.methodName);
+        TestBench.out().println("\t" + p.m_methodName);
       }
 
 
@@ -353,9 +354,9 @@ public class TestSuite extends AbstractTestSuite {
   }
 
   /**
-   * This is used by ant to get the Junit tests. This is required because the
-   * tests try to load using a JUnit 3 framework. JUnit4 uses annotations to
-   * load tests. This method allows JUnit3 to load JUnit4 tests.
+   * This is used by ant to get the Junit tests. This is required because the tests try to load
+   * using a JUnit 3 framework. JUnit4 uses annotations to load tests. This method allows JUnit3 to
+   * load JUnit4 tests.
    */
   public static junit.framework.Test suite() {
     return new JUnit4TestAdapter(TestSuite.class);
@@ -363,8 +364,8 @@ public class TestSuite extends AbstractTestSuite {
 
 
   /**
-   * The method called at runtime
-   *$
+   * The method called at runtime.
+   *
    * @param args The test suites to run
    */
   public static void main(String[] args) {

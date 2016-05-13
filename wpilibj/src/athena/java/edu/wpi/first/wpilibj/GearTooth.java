@@ -12,10 +12,9 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
- * Alias for counter class. Implement the gear tooth sensor supplied by FIRST.
- * Currently there is no reverse sensing on the gear tooth sensor, but in future
- * versions we might implement the necessary timing in the FPGA to sense
- * direction.
+ * Alias for counter class. Implement the gear tooth sensor supplied by FIRST. Currently there is no
+ * reverse sensing on the gear tooth sensor, but in future versions we might implement the necessary
+ * timing in the FPGA to sense direction.
  */
 public class GearTooth extends Counter {
 
@@ -33,7 +32,7 @@ public class GearTooth extends Counter {
   /**
    * Construct a GearTooth sensor given a channel.
    *
-   * No direction sensing is assumed.
+   * <p>No direction sensing is assumed.
    *
    * @param channel The GPIO channel that the sensor is connected to.
    */
@@ -44,10 +43,10 @@ public class GearTooth extends Counter {
   /**
    * Construct a GearTooth sensor given a channel.
    *
-   * @param channel The DIO channel that the sensor is connected to. 0-9 are
-   *        on-board, 10-25 are on the MXP port
-   * @param directionSensitive True to enable the pulse length decoding in
-   *        hardware to specify count direction.
+   * @param channel            The DIO channel that the sensor is connected to. 0-9 are on-board,
+   *                           10-25 are on the MXP port
+   * @param directionSensitive True to enable the pulse length decoding in hardware to specify count
+   *                           direction.
    */
   public GearTooth(final int channel, boolean directionSensitive) {
     super(channel);
@@ -61,12 +60,12 @@ public class GearTooth extends Counter {
   }
 
   /**
-   * Construct a GearTooth sensor given a digital input. This should be used
-   * when sharing digital inputs.
+   * Construct a GearTooth sensor given a digital input. This should be used when sharing digital
+   * inputs.
    *
-   * @param source An existing DigitalSource object (such as a DigitalInput)
-   * @param directionSensitive True to enable the pulse length decoding in
-   *        hardware to specify count direction.
+   * @param source             An existing DigitalSource object (such as a DigitalInput)
+   * @param directionSensitive True to enable the pulse length decoding in hardware to specify count
+   *                           direction.
    */
   public GearTooth(DigitalSource source, boolean directionSensitive) {
     super(source);
@@ -74,13 +73,12 @@ public class GearTooth extends Counter {
   }
 
   /**
-   * Construct a GearTooth sensor given a digital input. This should be used
-   * when sharing digial inputs.
+   * Construct a GearTooth sensor given a digital input. This should be used when sharing digial
+   * inputs.
    *
-   * No direction sensing is assumed.
+   * <p>No direction sensing is assumed.
    *
-   * @param source An object that fully descibes the input that the sensor is
-   *        connected to.
+   * @param source An object that fully descibes the input that the sensor is connected to.
    */
   public GearTooth(DigitalSource source) {
     this(source, false);

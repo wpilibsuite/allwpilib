@@ -7,27 +7,29 @@
 
 package edu.wpi.first.wpilibj;
 
+@SuppressWarnings("SummaryJavadoc")
 public interface PIDInterface extends Controller {
 
-  public void setPID(double p, double i, double d);
+  @SuppressWarnings("ParameterName")
+  void setPID(double p, double i, double d);
 
-  public double getP();
+  double getP();
 
-  public double getI();
+  double getI();
 
-  public double getD();
+  double getD();
 
-  public void setSetpoint(double setpoint);
+  void setSetpoint(double setpoint);
 
-  public double getSetpoint();
+  double getSetpoint();
 
-  public double getError();
+  double getError();
 
-  public void enable();
+  void enable();
 
-  public void disable();
+  void disable();
 
-  public boolean isEnabled();
+  boolean isEnabled();
 
-  public void reset();
+  void reset();
 }

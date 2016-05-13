@@ -7,104 +7,85 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-
-import edu.wpi.first.wpilibj.hal.HALUtil;
-import edu.wpi.first.wpilibj.hal.PowerJNI;
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
- * Class for reading analog potentiometers. Analog potentiometers read in an
- * analog voltage that corresponds to a position. The position is in whichever
- * units you choose, by way of the scaling and offset constants passed to the
- * constructor.
+ * Class for reading analog potentiometers. Analog potentiometers read in an analog voltage that
+ * corresponds to a position. The position is in whichever units you choose, by way of the scaling
+ * and offset constants passed to the constructor.
  *
  * @author Alex Henning
  * @author Colby Skeggs (rail voltage)
  */
 public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
-  private double m_fullRange, m_offset;
-  private AnalogInput m_analog_input;
-  private boolean m_init_analog_input;
+  private double m_fullRange;
+  private double m_offset;
+  private AnalogInput m_analogInput;
+  private boolean m_initAnalogInput;
   protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
   /**
    * Common initialization code called by all constructors.
-   *$
-   * @param input The {@link AnalogInput} this potentiometer is plugged into.
-   * @param fullRange The scaling to multiply the voltage by to get a meaningful
-   *        unit.
-   * @param offset The offset to add to the scaled value for controlling the
-   *        zero value
+   *
+   * @param input     The {@link AnalogInput} this potentiometer is plugged into.
+   * @param fullRange The scaling to multiply the voltage by to get a meaningful unit.
+   * @param offset    The offset to add to the scaled value for controlling the zero value
    */
   private void initPot(final AnalogInput input, double fullRange, double offset) {
     this.m_fullRange = fullRange;
     this.m_offset = offset;
-    m_analog_input = input;
+    m_analogInput = input;
   }
 
   /**
    * AnalogPotentiometer constructor.
    *
-   * Use the fullRange and offset values so that the output produces meaningful
-   * values. I.E: you have a 270 degree potentiometer and you want the output to
-   * be degrees with the halfway point as 0 degrees. The fullRange value is
-   * 270.0(degrees) and the offset is -135.0 since the halfway point after
-   * scaling is 135 degrees.
-   *$
-   * This will calculate the result from the fullRange times the fraction of the
-   * supply voltage, plus the offset.
+   * <p>Use the fullRange and offset values so that the output produces meaningful values. I.E: you
+   * have a 270 degree potentiometer and you want the output to be degrees with the halfway point as
+   * 0 degrees. The fullRange value is 270.0(degrees) and the offset is -135.0 since the halfway
+   * point after scaling is 135 degrees. This will calculate the result from the fullRange times
+   * the fraction of the supply voltage, plus the offset.
    *
-   * @param channel The analog channel this potentiometer is plugged into.
-   * @param fullRange The scaling to multiply the fraction by to get a
-   *        meaningful unit.
-   * @param offset The offset to add to the scaled value for controlling the
-   *        zero value
+   * @param channel   The analog channel this potentiometer is plugged into.
+   * @param fullRange The scaling to multiply the fraction by to get a meaningful unit.
+   * @param offset    The offset to add to the scaled value for controlling the zero value
    */
   public AnalogPotentiometer(final int channel, double fullRange, double offset) {
     AnalogInput input = new AnalogInput(channel);
-    m_init_analog_input = true;
+    m_initAnalogInput = true;
     initPot(input, fullRange, offset);
   }
 
   /**
    * AnalogPotentiometer constructor.
    *
-   * Use the fullRange and offset values so that the output produces meaningful
-   * values. I.E: you have a 270 degree potentiometer and you want the output to
-   * be degrees with the halfway point as 0 degrees. The fullRange value is
-   * 270.0(degrees) and the offset is -135.0 since the halfway point after
-   * scaling is 135 degrees.
-   *$
-   * This will calculate the result from the fullRange times the fraction of the
-   * supply voltage, plus the offset.
+   * <p>Use the fullRange and offset values so that the output produces meaningful values. I.E: you
+   * have a 270 degree potentiometer and you want the output to be degrees with the halfway point as
+   * 0 degrees. The fullRange value is 270.0(degrees) and the offset is -135.0 since the halfway
+   * point after scaling is 135 degrees. This will calculate the result from the fullRange times
+   * the fraction of the supply voltage, plus the offset.
    *
-   * @param input The {@link AnalogInput} this potentiometer is plugged into.
-   * @param fullRange The scaling to multiply the fraction by to get a
-   *        meaningful unit.
-   * @param offset The offset to add to the scaled value for controlling the
-   *        zero value
+   * @param input     The {@link AnalogInput} this potentiometer is plugged into.
+   * @param fullRange The scaling to multiply the fraction by to get a meaningful unit.
+   * @param offset    The offset to add to the scaled value for controlling the zero value
    */
   public AnalogPotentiometer(final AnalogInput input, double fullRange, double offset) {
-    m_init_analog_input = false;
+    m_initAnalogInput = false;
     initPot(input, fullRange, offset);
   }
 
   /**
    * AnalogPotentiometer constructor.
    *
-   * Use the fullRange and offset values so that the output produces meaningful
-   * values. I.E: you have a 270 degree potentiometer and you want the output to
-   * be degrees with the halfway point as 0 degrees. The fullRange value is
-   * 270.0(degrees) and the offset is -135.0 since the halfway point after
-   * scaling is 135 degrees.
+   * <p>Use the fullRange and offset values so that the output produces meaningful values. I.E: you
+   * have a 270 degree potentiometer and you want the output to be degrees with the halfway point as
+   * 0 degrees. The fullRange value is 270.0(degrees) and the offset is -135.0 since the halfway
+   * point after scaling is 135 degrees.
    *
    * @param channel The analog channel this potentiometer is plugged into.
-   * @param scale The scaling to multiply the voltage by to get a meaningful
-   *        unit.
+   * @param scale   The scaling to multiply the voltage by to get a meaningful unit.
    */
   public AnalogPotentiometer(final int channel, double scale) {
     this(channel, scale, 0);
@@ -113,15 +94,13 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
   /**
    * AnalogPotentiometer constructor.
    *
-   * Use the fullRange and offset values so that the output produces meaningful
-   * values. I.E: you have a 270 degree potentiometer and you want the output to
-   * be degrees with the halfway point as 0 degrees. The fullRange value is
-   * 270.0(degrees) and the offset is -135.0 since the halfway point after
-   * scaling is 135 degrees.
+   * <p>Use the fullRange and offset values so that the output produces meaningful values. I.E: you
+   * have a 270 degree potentiometer and you want the output to be degrees with the halfway point as
+   * 0 degrees. The fullRange value is 270.0(degrees) and the offset is -135.0 since the halfway
+   * point after scaling is 135 degrees.
    *
    * @param input The {@link AnalogInput} this potentiometer is plugged into.
-   * @param scale The scaling to multiply the voltage by to get a meaningful
-   *        unit.
+   * @param scale The scaling to multiply the voltage by to get a meaningful unit.
    */
   public AnalogPotentiometer(final AnalogInput input, double scale) {
     this(input, scale, 0);
@@ -150,13 +129,12 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
    *
    * @return The current position of the potentiometer.
    */
+  @Override
   public double get() {
-    return (m_analog_input.getVoltage() / ControllerPower.getVoltage5V()) * m_fullRange + m_offset;
+    return (m_analogInput.getVoltage() / ControllerPower.getVoltage5V()) * m_fullRange + m_offset;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public void setPIDSourceType(PIDSourceType pidSource) {
     if (!pidSource.equals(PIDSourceType.kDisplacement)) {
       throw new IllegalArgumentException("Only displacement PID is allowed for potentiometers.");
@@ -164,9 +142,7 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
     m_pidSource = pidSource;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public PIDSourceType getPIDSourceType() {
     return m_pidSource;
   }
@@ -176,6 +152,7 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
    *
    * @return The current reading.
    */
+  @Override
   public double pidGet() {
     return get();
   }
@@ -184,53 +161,53 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
   /**
    * Live Window code, only does anything if live window is activated.
    */
+  @Override
   public String getSmartDashboardType() {
     return "Analog Input";
   }
 
   private ITable m_table;
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public void initTable(ITable subtable) {
     m_table = subtable;
     updateTable();
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public void updateTable() {
     if (m_table != null) {
       m_table.putNumber("Value", get());
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public ITable getTable() {
     return m_table;
   }
 
+  /**
+   * Frees this resource.
+   */
   public void free() {
-    if (m_init_analog_input) {
-      m_analog_input.free();
-      m_analog_input = null;
-      m_init_analog_input = false;
+    if (m_initAnalogInput) {
+      m_analogInput.free();
+      m_analogInput = null;
+      m_initAnalogInput = false;
     }
   }
 
   /**
-   * Analog Channels don't have to do anything special when entering the
-   * LiveWindow. {@inheritDoc}
+   * Analog Channels don't have to do anything special when entering the LiveWindow. {@inheritDoc}
    */
-  public void startLiveWindowMode() {}
+  @Override
+  public void startLiveWindowMode() {
+  }
 
   /**
-   * Analog Channels don't have to do anything special when exiting the
-   * LiveWindow. {@inheritDoc}
+   * Analog Channels don't have to do anything special when exiting the LiveWindow. {@inheritDoc}
    */
-  public void stopLiveWindowMode() {}
+  @Override
+  public void stopLiveWindowMode() {
+  }
 }

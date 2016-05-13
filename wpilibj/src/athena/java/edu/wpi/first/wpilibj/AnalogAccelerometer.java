@@ -15,10 +15,9 @@ import edu.wpi.first.wpilibj.tables.ITable;
 
 
 /**
- * Handle operation of an analog accelerometer. The accelerometer reads
- * acceleration directly through the sensor. Many sensors have multiple axis and
- * can be treated as multiple devices. Each is calibrated by finding the center
- * value over a period of time.
+ * Handle operation of an analog accelerometer. The accelerometer reads acceleration directly
+ * through the sensor. Many sensors have multiple axis and can be treated as multiple devices. Each
+ * is calibrated by finding the center value over a period of time.
  */
 public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWindowSendable {
 
@@ -29,7 +28,7 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
   protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
   /**
-   * Common initialization
+   * Common initialization.
    */
   private void initAccelerometer() {
     UsageReporting.report(tResourceType.kResourceType_Accelerometer, m_analogChannel.getChannel());
@@ -39,10 +38,9 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
   /**
    * Create a new instance of an accelerometer.
    *
-   * The constructor allocates desired analog channel.
-   *$
-   * @param channel The channel number for the analog input the accelerometer is
-   *        connected to
+   * <p>The constructor allocates desired analog channel.
+   *
+   * @param channel The channel number for the analog input the accelerometer is connected to
    */
   public AnalogAccelerometer(final int channel) {
     m_allocatedChannel = true;
@@ -51,18 +49,18 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
   }
 
   /**
-   * Create a new instance of Accelerometer from an existing AnalogChannel. Make
-   * a new instance of accelerometer given an AnalogChannel. This is
-   * particularly useful if the port is going to be read as an analog channel as
-   * well as through the Accelerometer class.
-   *$
-   * @param channel The existing AnalogInput object for the analog input the
-   *        accelerometer is connected to
+   * Create a new instance of Accelerometer from an existing AnalogChannel. Make a new instance of
+   * accelerometer given an AnalogChannel. This is particularly useful if the port is going to be
+   * read as an analog channel as well as through the Accelerometer class.
+   *
+   * @param channel The existing AnalogInput object for the analog input the accelerometer is
+   *                connected to
    */
   public AnalogAccelerometer(AnalogInput channel) {
     m_allocatedChannel = false;
-    if (channel == null)
+    if (channel == null) {
       throw new NullPointerException("Analog Channel given was null");
+    }
     m_analogChannel = channel;
     initAccelerometer();
   }
@@ -70,6 +68,7 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
   /**
    * Delete the analog components used for the accelerometer.
    */
+  @Override
   public void free() {
     if (m_analogChannel != null && m_allocatedChannel) {
       m_analogChannel.free();
@@ -80,7 +79,7 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
   /**
    * Return the acceleration in Gs.
    *
-   * The acceleration is returned units of Gs.
+   * <p>The acceleration is returned units of Gs.
    *
    * @return The current acceleration of the sensor in Gs.
    */
@@ -91,9 +90,8 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
   /**
    * Set the accelerometer sensitivity.
    *
-   * This sets the sensitivity of the accelerometer used for calculating the
-   * acceleration. The sensitivity varies by accelerometer model. There are
-   * constants defined for various models.
+   * <p>This sets the sensitivity of the accelerometer used for calculating the acceleration. The
+   * sensitivity varies by accelerometer model. There are constants defined for various models.
    *
    * @param sensitivity The sensitivity of accelerometer in Volts per G.
    */
@@ -104,8 +102,8 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
   /**
    * Set the voltage that corresponds to 0 G.
    *
-   * The zero G voltage varies by accelerometer model. There are constants
-   * defined for various models.
+   * <p>The zero G voltage varies by accelerometer model. There are constants defined for various
+   * models.
    *
    * @param zero The zero G voltage.
    */
@@ -113,16 +111,12 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
     m_zeroGVoltage = zero;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public void setPIDSourceType(PIDSourceType pidSource) {
     m_pidSource = pidSource;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public PIDSourceType getPIDSourceType() {
     return m_pidSource;
   }
@@ -132,10 +126,12 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
    *
    * @return The current acceleration in Gs.
    */
+  @Override
   public double pidGet() {
     return getAcceleration();
   }
 
+  @Override
   public String getSmartDashboardType() {
     return "Accelerometer";
   }
@@ -145,24 +141,18 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
    */
   private ITable m_table;
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public void initTable(ITable subtable) {
     m_table = subtable;
     updateTable();
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public ITable getTable() {
     return m_table;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public void updateTable() {
     if (m_table != null) {
       m_table.putNumber("Value", getAcceleration());
@@ -170,14 +160,16 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
   }
 
   /**
-   * Analog Channels don't have to do anything special when entering the
-   * LiveWindow. {@inheritDoc}
+   * Analog Channels don't have to do anything special when entering the LiveWindow. {@inheritDoc}
    */
-  public void startLiveWindowMode() {}
+  @Override
+  public void startLiveWindowMode() {
+  }
 
   /**
-   * Analog Channels don't have to do anything special when exiting the
-   * LiveWindow. {@inheritDoc}
+   * Analog Channels don't have to do anything special when exiting the LiveWindow. {@inheritDoc}
    */
-  public void stopLiveWindowMode() {}
+  @Override
+  public void stopLiveWindowMode() {
+  }
 }

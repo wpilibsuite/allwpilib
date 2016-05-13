@@ -15,62 +15,58 @@ import edu.wpi.first.wpilibj.tables.ITable;
 /**
  * This class provides an easy way to link commands to inputs.
  *
- * It is very easy to link a button to a command. For instance, you could link
- * the trigger button of a joystick to a "score" command.
+ * <p>It is very easy to link a button to a command. For instance, you could link the trigger
+ * button of a joystick to a "score" command.
  *
- * It is encouraged that teams write a subclass of Trigger if they want to have
- * something unusual (for instance, if they want to react to the user holding a
- * button while the robot is reading a certain sensor input). For this, they
- * only have to write the {@link Trigger#get()} method to get the full
- * functionality of the Trigger class.
+ * <p>It is encouraged that teams write a subclass of Trigger if they want to have something unusual
+ * (for instance, if they want to react to the user holding a button while the robot is reading a
+ * certain sensor input). For this, they only have to write the {@link Trigger#get()} method to get
+ * the full functionality of the Trigger class.
  *
  * @author Joe Grinstead
  */
 public abstract class Trigger implements Sendable {
 
   /**
-   * Returns whether or not the trigger is active
+   * Returns whether or not the trigger is active.
    *
-   * This method will be called repeatedly a command is linked to the Trigger.
+   * <p>This method will be called repeatedly a command is linked to the Trigger.
    *
    * @return whether or not the trigger condition is active.
    */
   public abstract boolean get();
 
   /**
-   * Returns whether get() return true or the internal table for SmartDashboard
-   * use is pressed.
-   *$
-   * @return whether get() return true or the internal table for SmartDashboard
-   *         use is pressed
+   * Returns whether get() return true or the internal table for SmartDashboard use is pressed.
+   *
+   * @return whether get() return true or the internal table for SmartDashboard use is pressed.
    */
   private boolean grab() {
+    // FIXME make is connected work?
     return get()
-        || (table != null /* && table.isConnected() */&& table.getBoolean("pressed", false));// FIXME
-                                                                                             // make
-                                                                                             // is
-                                                                                             // connected
-                                                                                             // work?
+        || (m_table != null /* && table.isConnected() */ && m_table.getBoolean("pressed", false));
+
   }
 
   /**
    * Starts the given command whenever the trigger just becomes active.
-   *$
+   *
    * @param command the command to start
    */
   public void whenActive(final Command command) {
     new ButtonScheduler() {
 
-      boolean pressedLast = grab();
+      private boolean m_pressedLast = grab();
 
+      @Override
       public void execute() {
         if (grab()) {
-          if (!pressedLast) {
-            pressedLast = true;
+          if (!m_pressedLast) {
+            m_pressedLast = true;
             command.start();
           }
         } else {
-          pressedLast = false;
+          m_pressedLast = false;
         }
       }
     }.start();
@@ -79,23 +75,24 @@ public abstract class Trigger implements Sendable {
   /**
    * Constantly starts the given command while the button is held.
    *
-   * {@link Command#start()} will be called repeatedly while the trigger is
-   * active, and will be canceled when the trigger becomes inactive.
+   * {@link Command#start()} will be called repeatedly while the trigger is active, and will be
+   * canceled when the trigger becomes inactive.
    *
    * @param command the command to start
    */
   public void whileActive(final Command command) {
     new ButtonScheduler() {
 
-      boolean pressedLast = grab();
+      private boolean m_pressedLast = grab();
 
+      @Override
       public void execute() {
         if (grab()) {
-          pressedLast = true;
+          m_pressedLast = true;
           command.start();
         } else {
-          if (pressedLast) {
-            pressedLast = false;
+          if (m_pressedLast) {
+            m_pressedLast = false;
             command.cancel();
           }
         }
@@ -104,21 +101,22 @@ public abstract class Trigger implements Sendable {
   }
 
   /**
-   * Starts the command when the trigger becomes inactive
-   *$
+   * Starts the command when the trigger becomes inactive.
+   *
    * @param command the command to start
    */
   public void whenInactive(final Command command) {
     new ButtonScheduler() {
 
-      boolean pressedLast = grab();
+      private boolean m_pressedLast = grab();
 
+      @Override
       public void execute() {
         if (grab()) {
-          pressedLast = true;
+          m_pressedLast = true;
         } else {
-          if (pressedLast) {
-            pressedLast = false;
+          if (m_pressedLast) {
+            m_pressedLast = false;
             command.start();
           }
         }
@@ -127,19 +125,20 @@ public abstract class Trigger implements Sendable {
   }
 
   /**
-   * Toggles a command when the trigger becomes active
-   *$
+   * Toggles a command when the trigger becomes active.
+   *
    * @param command the command to toggle
    */
   public void toggleWhenActive(final Command command) {
     new ButtonScheduler() {
 
-      boolean pressedLast = grab();
+      private boolean m_pressedLast = grab();
 
+      @Override
       public void execute() {
         if (grab()) {
-          if (!pressedLast) {
-            pressedLast = true;
+          if (!m_pressedLast) {
+            m_pressedLast = true;
             if (command.isRunning()) {
               command.cancel();
             } else {
@@ -147,38 +146,39 @@ public abstract class Trigger implements Sendable {
             }
           }
         } else {
-          pressedLast = false;
+          m_pressedLast = false;
         }
       }
     }.start();
   }
 
   /**
-   * Cancels a command when the trigger becomes active
-   *$
+   * Cancels a command when the trigger becomes active.
+   *
    * @param command the command to cancel
    */
   public void cancelWhenActive(final Command command) {
     new ButtonScheduler() {
 
-      boolean pressedLast = grab();
+      private boolean m_pressedLast = grab();
 
+      @Override
       public void execute() {
         if (grab()) {
-          if (!pressedLast) {
-            pressedLast = true;
+          if (!m_pressedLast) {
+            m_pressedLast = true;
             command.cancel();
           }
         } else {
-          pressedLast = false;
+          m_pressedLast = false;
         }
       }
     }.start();
   }
 
   /**
-   * An internal class of {@link Trigger}. The user should ignore this, it is
-   * only public to interface between packages.
+   * An internal class of {@link Trigger}. The user should ignore this, it is only public to
+   * interface between packages.
    */
   public abstract class ButtonScheduler {
     public abstract void execute();
@@ -189,26 +189,26 @@ public abstract class Trigger implements Sendable {
   }
 
   /**
-   * These methods continue to return the "Button" SmartDashboard type until we
-   * decided to create a Trigger widget type for the dashboard.
+   * These methods continue to return the "Button" SmartDashboard type until we decided to create a
+   * Trigger widget type for the dashboard.
    */
+  @Override
   public String getSmartDashboardType() {
     return "Button";
   }
 
-  private ITable table;
+  private ITable m_table;
 
+  @Override
   public void initTable(ITable table) {
-    this.table = table;
+    m_table = table;
     if (table != null) {
       table.putBoolean("pressed", get());
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public ITable getTable() {
-    return table;
+    return m_table;
   }
 }

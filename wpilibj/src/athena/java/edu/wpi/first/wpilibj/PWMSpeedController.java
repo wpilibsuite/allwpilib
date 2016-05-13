@@ -11,13 +11,13 @@ package edu.wpi.first.wpilibj;
  * Common base class for all PWM Speed Controllers.
  */
 public abstract class PWMSpeedController extends SafePWM implements SpeedController {
-  private boolean isInverted = false;
+  private boolean m_isInverted = false;
 
   /**
    * Constructor.
    *
-   * @param channel The PWM channel that the controller is attached to. 0-9 are
-   *        on-board, 10-19 are on the MXP port
+   * @param channel The PWM channel that the controller is attached to. 0-9 are on-board, 10-19 are
+   *                on the MXP port
    */
   protected PWMSpeedController(int channel) {
     super(channel);
@@ -26,53 +26,54 @@ public abstract class PWMSpeedController extends SafePWM implements SpeedControl
   /**
    * Set the PWM value.
    *
+   * <p>The PWM value is set using a range of -1.0 to 1.0, appropriately scaling the value for the
+   * FPGA.
+   *
+   * @param speed     The speed to set. Value should be between -1.0 and 1.0.
+   * @param syncGroup The update group to add this Set() to, pending UpdateSyncGroup(). If 0, update
+   *                  immediately.
    * @deprecated For compatibility with CANJaguar
    *
-   *             The PWM value is set using a range of -1.0 to 1.0,
-   *             appropriately scaling the value for the FPGA.
-   *
-   * @param speed The speed to set. Value should be between -1.0 and 1.0.
-   * @param syncGroup The update group to add this Set() to, pending
-   *        UpdateSyncGroup(). If 0, update immediately.
    */
   @Deprecated
+  @Override
   public void set(double speed, byte syncGroup) {
-    setSpeed(isInverted ? -speed : speed);
+    setSpeed(m_isInverted ? -speed : speed);
     Feed();
   }
 
   /**
    * Set the PWM value.
    *
-   * The PWM value is set using a range of -1.0 to 1.0, appropriately scaling
-   * the value for the FPGA.
+   * <p>The PWM value is set using a range of -1.0 to 1.0, appropriately scaling the value for the
+   * FPGA.
    *
    * @param speed The speed value between -1.0 and 1.0 to set.
    */
+  @Override
   public void set(double speed) {
-    setSpeed(isInverted ? -speed : speed);
+    setSpeed(m_isInverted ? -speed : speed);
     Feed();
   }
 
   /**
-   * Common interface for inverting direction of a speed controller
+   * Common interface for inverting direction of a speed controller.
    *
    * @param isInverted The state of inversion true is inverted
    */
   @Override
   public void setInverted(boolean isInverted) {
-    this.isInverted = isInverted;
+    m_isInverted = isInverted;
   }
 
   /**
    * Common interface for the inverting direction of a speed controller.
    *
    * @return isInverted The state of inversion, true is inverted.
-   *
    */
   @Override
   public boolean getInverted() {
-    return this.isInverted;
+    return m_isInverted;
   }
 
   /**
@@ -80,6 +81,7 @@ public abstract class PWMSpeedController extends SafePWM implements SpeedControl
    *
    * @return The most recently set value for the PWM between -1.0 and 1.0.
    */
+  @Override
   public double get() {
     return getSpeed();
   }
@@ -89,6 +91,7 @@ public abstract class PWMSpeedController extends SafePWM implements SpeedControl
    *
    * @param output Write out the PWM value as was found in the PIDController
    */
+  @Override
   public void pidWrite(double output) {
     set(output);
   }

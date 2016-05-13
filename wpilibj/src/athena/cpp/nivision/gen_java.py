@@ -1,8 +1,9 @@
 from __future__ import print_function
+
 import codecs
-import sys
 import os
-import re
+import sys
+
 try:
     import configparser
 except ImportError:
@@ -12,31 +13,33 @@ from nivision_parse import *
 
 # base, cast-out-pre, cast-out-post, cast-in-pre, cast-in-post
 java_accessor_map = {
-        "B": ("", "", "", "", ""),
-        "C": ("Char", "", "", "", ""),
-        "S": ("Short", "", "", "", ""),
-        "I": ("Int", "", "", "", ""),
-        "J": ("Long", "", "", "", ""),
-        "F": ("Float", "", "", "", ""),
-        "D": ("Double", "", "", "", ""),
-        "Z": ("Boolean", "", "", "", ""),
-        "X": ("", "(short)(", " & 0xff)", "(byte)(", " & 0xff)"),
-        "Y": ("Short", "(int)(", " & 0xffff)", "(short)(", " & 0xffff)"),
-        }
+    "B": ("", "", "", "", ""),
+    "C": ("Char", "", "", "", ""),
+    "S": ("Short", "", "", "", ""),
+    "I": ("Int", "", "", "", ""),
+    "J": ("Long", "", "", "", ""),
+    "F": ("Float", "", "", "", ""),
+    "D": ("Double", "", "", "", ""),
+    "Z": ("Boolean", "", "", "", ""),
+    "X": ("", "(short)(", " & 0xff)", "(byte)(", " & 0xff)"),
+    "Y": ("Short", "(int)(", " & 0xffff)", "(short)(", " & 0xffff)"),
+}
 
 java_size_map = {
-        "B": 1,
-        "C": 2,
-        "S": 2,
-        "I": 4,
-        "J": 8,
-        "F": 4,
-        "D": 8,
-        "Z": 1,
-        }
+    "B": 1,
+    "C": 2,
+    "S": 2,
+    "I": 4,
+    "J": 8,
+    "F": 4,
+    "D": 8,
+    "Z": 1,
+}
+
 
 class JavaType:
-    def __init__(self, j_type, jn_type, jni_type, jni_sig, is_enum=False, is_struct=False, is_opaque=False, string_array=False, array_size=None):
+    def __init__(self, j_type, jn_type, jni_type, jni_sig, is_enum=False, is_struct=False,
+                 is_opaque=False, string_array=False, array_size=None):
         self.j_type = j_type
         self.jn_type = jn_type
         self.jni_type = jni_type
@@ -56,52 +59,57 @@ class JavaType:
 
     def __repr__(self):
         return "JavaType(%s, %s, %s, %s, is_enum=%s, is_struct=%s, is_opaque=%s, string_array=%s, array_size=%s)" % (
-                self.j_type, self.jn_type, self.jni_type, self.jni_sig,
-                self.is_enum, self.is_struct,
-                self.is_opaque, self.string_array, self.array_size)
+            self.j_type, self.jn_type, self.jni_type, self.jni_sig,
+            self.is_enum, self.is_struct,
+            self.is_opaque, self.string_array, self.array_size)
+
 
 java_types_map = {
-        ("void", None): JavaType("void", "void", "void", None),
-        ("env", None): JavaType("", "", "JNIEnv*", None),
-        ("cls", None): JavaType("", "", "jclass", None),
-        ("int", None): JavaType("int", "int", "jint", "I"),
-        ("char", None): JavaType("byte", "byte", "jbyte", "B"),
-        ("wchar_t", None): JavaType("char", "char", "jchar", "C"),
-        ("unsigned char", None): JavaType("short", "short", "jshort", "X"),
-        ("short", None): JavaType("short", "short", "jshort", "S"),
-        ("unsigned short", None): JavaType("int", "int", "jint", "Y"),
-        ("unsigned", None): JavaType("int", "int", "jint", "I"),
-        ("unsigned int", None): JavaType("int", "int", "jint", "I"),
-        ("uInt32", None): JavaType("int", "int", "jint", "I"),
-        ("IMAQdxSession", None): JavaType("int", "int", "jint", "I"),
-        ("bool32", None): JavaType("int", "int", "jint", "I"),
-        ("long", None): JavaType("long", "long", "jlong", "J"),
-        ("unsigned long", None): JavaType("long", "long", "jlong", "J"),
-        ("__int64", None): JavaType("long", "long", "jlong", "J"),
-        ("long long", None): JavaType("long", "long", "jlong", "J"),
-        ("unsigned __int64", None): JavaType("long", "long", "jlong", "J"),
-        ("__uint64", None): JavaType("long", "long", "jlong", "J"),
-        ("unsigned long long", None): JavaType("long", "long", "jlong", "J"),
-        ("float", None): JavaType("float", "float", "jfloat", "F"),
-        ("double", None): JavaType("double", "double", "jdouble", "D"),
-        ("long double", None): JavaType("double", "double", "jdouble", "D"),
-        ("unsigned char*", None): JavaType("String", "String", "jstring", "Ljava/lang/String;"),
-        ("char*", None): JavaType("String", "String", "jstring", "Ljava/lang/String;"),
-        ("void*", None): JavaType("RawData", "long", "jlong", "J", is_opaque=True),
-        #("size_t", None): JavaType("long", "long", "jlong", "J"),
-        ("String255", None): JavaType("String", "String", "jstring", "Ljava/lang/String;", string_array=True, array_size="256"),
-        ("String255", ""): JavaType("String[]", "String[]", "jstringArray", "[Ljava/lang/String;", string_array=True, array_size="256"),
-        ("char*", ""): JavaType("String[]", "String[]", "jstringArray", "[Ljava/lang/String;"),
-        ("char", ""): JavaType("String", "String", "jstring", "Ljava/lang/String;", string_array=True, array_size=""),
-        ("unsigned char", ""): JavaType("byte[]", "byte[]", "jbyteArray", "[B"),
-        ("short", ""): JavaType("short[]", "short[]", "jshortArray", "[S"),
-        ("int", ""): JavaType("int[]", "int[]", "jintArray", "[I"),
-        ("unsigned int", ""): JavaType("int[]", "int[]", "jintArray", "[I"),
-        ("uInt32", ""): JavaType("int[]", "int[]", "jintArray", "[I"),
-        ("long", ""): JavaType("long[]", "long[]", "jlongArray", "[J"),
-        ("float", ""): JavaType("float[]", "float[]", "jfloatArray", "[F"),
-        ("double", ""): JavaType("double[]", "double[]", "jdoubleArray", "[D"),
-        }
+    ("void", None): JavaType("void", "void", "void", None),
+    ("env", None): JavaType("", "", "JNIEnv*", None),
+    ("cls", None): JavaType("", "", "jclass", None),
+    ("int", None): JavaType("int", "int", "jint", "I"),
+    ("char", None): JavaType("byte", "byte", "jbyte", "B"),
+    ("wchar_t", None): JavaType("char", "char", "jchar", "C"),
+    ("unsigned char", None): JavaType("short", "short", "jshort", "X"),
+    ("short", None): JavaType("short", "short", "jshort", "S"),
+    ("unsigned short", None): JavaType("int", "int", "jint", "Y"),
+    ("unsigned", None): JavaType("int", "int", "jint", "I"),
+    ("unsigned int", None): JavaType("int", "int", "jint", "I"),
+    ("uInt32", None): JavaType("int", "int", "jint", "I"),
+    ("IMAQdxSession", None): JavaType("int", "int", "jint", "I"),
+    ("bool32", None): JavaType("int", "int", "jint", "I"),
+    ("long", None): JavaType("long", "long", "jlong", "J"),
+    ("unsigned long", None): JavaType("long", "long", "jlong", "J"),
+    ("__int64", None): JavaType("long", "long", "jlong", "J"),
+    ("long long", None): JavaType("long", "long", "jlong", "J"),
+    ("unsigned __int64", None): JavaType("long", "long", "jlong", "J"),
+    ("__uint64", None): JavaType("long", "long", "jlong", "J"),
+    ("unsigned long long", None): JavaType("long", "long", "jlong", "J"),
+    ("float", None): JavaType("float", "float", "jfloat", "F"),
+    ("double", None): JavaType("double", "double", "jdouble", "D"),
+    ("long double", None): JavaType("double", "double", "jdouble", "D"),
+    ("unsigned char*", None): JavaType("String", "String", "jstring", "Ljava/lang/String;"),
+    ("char*", None): JavaType("String", "String", "jstring", "Ljava/lang/String;"),
+    ("void*", None): JavaType("RawData", "long", "jlong", "J", is_opaque=True),
+    # ("size_t", None): JavaType("long", "long", "jlong", "J"),
+    ("String255", None): JavaType("String", "String", "jstring", "Ljava/lang/String;",
+                                  string_array=True, array_size="256"),
+    ("String255", ""): JavaType("String[]", "String[]", "jstringArray", "[Ljava/lang/String;",
+                                string_array=True, array_size="256"),
+    ("char*", ""): JavaType("String[]", "String[]", "jstringArray", "[Ljava/lang/String;"),
+    ("char", ""): JavaType("String", "String", "jstring", "Ljava/lang/String;", string_array=True,
+                           array_size=""),
+    ("unsigned char", ""): JavaType("byte[]", "byte[]", "jbyteArray", "[B"),
+    ("short", ""): JavaType("short[]", "short[]", "jshortArray", "[S"),
+    ("int", ""): JavaType("int[]", "int[]", "jintArray", "[I"),
+    ("unsigned int", ""): JavaType("int[]", "int[]", "jintArray", "[I"),
+    ("uInt32", ""): JavaType("int[]", "int[]", "jintArray", "[I"),
+    ("long", ""): JavaType("long[]", "long[]", "jlongArray", "[J"),
+    ("float", ""): JavaType("float[]", "float[]", "jfloatArray", "[F"),
+    ("double", ""): JavaType("double[]", "double[]", "jdoubleArray", "[D"),
+}
+
 
 def c_to_jtype(name, arr):
     jtype = java_types_map.get((name, arr), None)
@@ -112,7 +120,7 @@ def c_to_jtype(name, arr):
     if arr is not None and arr != "":
         jtype = c_to_jtype(name, "").copy()
         jtype.array_size = arr
-        java_types_map[(name, arr)] = jtype # cache
+        java_types_map[(name, arr)] = jtype  # cache
         return jtype
 
     # Opaque structures
@@ -121,8 +129,8 @@ def c_to_jtype(name, arr):
             jtype = JavaType(name, "long", "jlong", "J", is_opaque=True)
         else:
             # FIXME
-            jtype = JavaType(name+"[]", "long[]", "jlongArray", "[J", is_opaque=True)
-        java_types_map[(name, arr)] = jtype # cache
+            jtype = JavaType(name + "[]", "long[]", "jlongArray", "[J", is_opaque=True)
+        java_types_map[(name, arr)] = jtype  # cache
         return jtype
 
     # Enums
@@ -131,8 +139,8 @@ def c_to_jtype(name, arr):
             jtype = JavaType(name, "int", "jint", "I", is_enum=True)
         else:
             # FIXME
-            jtype = JavaType(name+"[]", "int[]", "jintArray", "[I", is_enum=True)
-        java_types_map[(name, arr)] = jtype # cache
+            jtype = JavaType(name + "[]", "int[]", "jintArray", "[I", is_enum=True)
+        java_types_map[(name, arr)] = jtype  # cache
         return jtype
 
     # handle pointers as void* (FIXME)
@@ -146,9 +154,10 @@ def c_to_jtype(name, arr):
         jtype = JavaType(name, "long", "jlong", "J", is_struct=True)
     else:
         # FIXME
-        jtype = JavaType(name+"[]", "long[]", "jlongArray", "[J", is_struct=True)
+        jtype = JavaType(name + "[]", "long[]", "jlongArray", "[J", is_struct=True)
     java_types_map[(name, arr)] = jtype
     return jtype
+
 
 class JavaEmitData:
     def __init__(self):
@@ -161,22 +170,23 @@ class JavaEmitData:
         self.toArg = ""
 
     def addConstruct(self, s):
-        self.construct.extend(s.split('\n')[1 if s[0]=='\n' else 0:])
+        self.construct.extend(s.split('\n')[1 if s[0] == '\n' else 0:])
 
     def addBackingRead(self, s):
-        self.backingRead.extend(s.split('\n')[1 if s[0]=='\n' else 0:])
+        self.backingRead.extend(s.split('\n')[1 if s[0] == '\n' else 0:])
 
     def addRead(self, s):
-        self.read.extend(s.split('\n')[1 if s[0]=='\n' else 0:])
+        self.read.extend(s.split('\n')[1 if s[0] == '\n' else 0:])
 
     def addWriteBuf(self, s):
         self.writeBufs.append(s)
 
     def addWrite(self, s):
-        self.write.extend(s.split('\n')[1 if s[0]=='\n' else 0:])
+        self.write.extend(s.split('\n')[1 if s[0] == '\n' else 0:])
 
     def addBackingWrite(self, s):
-        self.backingWrite.extend(s.split('\n')[1 if s[0]=='\n' else 0:])
+        self.backingWrite.extend(s.split('\n')[1 if s[0] == '\n' else 0:])
+
 
 class JavaEmitArrayData(JavaEmitData):
     def __init__(self):
@@ -184,6 +194,7 @@ class JavaEmitArrayData(JavaEmitData):
         self.addConstruct("{fname} = new {ftype_one}[0];")
         self.addBackingRead("int {size_fname} = {backing}.get{jaccessor}({size_foffset});")
         self.addBackingWrite("{backing}.put{jaccessor}({size_foffset}, {fname}.length);")
+
 
 # sized array of null-terminated strings
 strzArrayEmitSized = JavaEmitArrayData()
@@ -435,8 +446,10 @@ structEmit.toArg = "{fname}.getAddress()"
 
 # java type
 jtypeEmit = JavaEmitData()
-jtypeEmit.addBackingRead("{fname} = {jaccessor_cast_out_pre}{backing}.get{jaccessor}({foffset}){jaccessor_cast_out_post};")
-jtypeEmit.addBackingWrite("{backing}.put{jaccessor}({foffset}, {jaccessor_cast_in_pre}{fname}{jaccessor_cast_in_post});")
+jtypeEmit.addBackingRead(
+    "{fname} = {jaccessor_cast_out_pre}{backing}.get{jaccessor}({foffset}){jaccessor_cast_out_post};")
+jtypeEmit.addBackingWrite(
+    "{backing}.put{jaccessor}({foffset}, {jaccessor_cast_in_pre}{fname}{jaccessor_cast_in_post});")
 
 # string - array of characters
 strSizedEmit = JavaEmitData()
@@ -493,8 +506,10 @@ if ({fname} != null) {{
     {fname}_buf = ByteBuffer.allocateDirect({fname}_bytes.length+1);
     putBytes({fname}_buf, {fname}_bytes, 0, {fname}_bytes.length).put({fname}_bytes.length, (byte)0);
 }}""")
-strzEmit.addBackingWrite("putPointer({backing}, {foffset}, {fname} == null ? 0 : getByteBufferAddress({fname}_buf));")
+strzEmit.addBackingWrite(
+    "putPointer({backing}, {foffset}, {fname} == null ? 0 : getByteBufferAddress({fname}_buf));")
 strzEmit.toArg = "{fname} == null ? 0 : getByteBufferAddress({fname}_buf)"
+
 
 class JavaStructEmitHelper:
     def __init__(self, emit, name, fields, sized_members=None):
@@ -503,19 +518,21 @@ class JavaStructEmitHelper:
         self.fields = fields
 
         self.exclude_members = set(self.config_get("exclude_members", "").split(','))
-        self.exclude_members |= set(x.split(':')[0] for x in self.config_get("uniontype", "").split(','))
+        self.exclude_members |= set(
+            x.split(':')[0] for x in self.config_get("uniontype", "").split(','))
         self.union_members = {}
         for v in self.config_get("uniontype", "").split(','):
             if not v:
                 continue
             vl = v.split(':')
-            self.union_members[vl[0]] = (vl[1], [tuple(y.strip() for y in x.split('=')) for x in vl[2:]])
+            self.union_members[vl[0]] = (
+                vl[1], [tuple(y.strip() for y in x.split('=')) for x in vl[2:]])
 
         if sized_members is not None:
             self.sized_members = sized_members
         else:
             self.sized_members = dict(tuple(y.strip() for y in x.split(':')) for x in
-                    self.config_get("arraysize", "").split(',') if x)
+                                      self.config_get("arraysize", "").split(',') if x)
         self.size_members = dict((x, None) for x in self.sized_members.values())
 
         # get type of each sized member
@@ -532,7 +549,8 @@ class JavaStructEmitHelper:
     def config_struct_get(self, option):
         return self.emit.config_struct.get(self.name, option)
 
-    def get_field_java_code(self, fname, ftype, arr, foffset, jfielddefs_private, backing="backing"):
+    def get_field_java_code(self, fname, ftype, arr, foffset, jfielddefs_private,
+                            backing="backing"):
         """Returns dict of fielddef, init, read, write, type
         """
         if ftype.startswith("const"):
@@ -546,9 +564,9 @@ class JavaStructEmitHelper:
             size_jtype = c_to_jtype(self.size_members[size_fname], None)
             size_foffset = self.config_struct_get(size_fname)
         else:
-            size_fname=""
-            size_jtype=None
-            size_foffset=None
+            size_fname = ""
+            size_jtype = None
+            size_foffset = None
 
         is_pointer = False
         if ftype[-1] == '*' and ftype[:-1] in opaque_structs:
@@ -658,7 +676,7 @@ for (int i=0, off={foffset}; i<%s; i++, off += {struct_sz})
                      ftype=jtype.j_type,
                      ftype_one=jtype.j_type[:-2],
                      foffset=foffset,
-                     size_fname=fname+"_"+size_fname,
+                     size_fname=fname + "_" + size_fname,
                      size_foffset=size_foffset,
                      pointer_sz=self.emit.config_struct.get("_platform_", "pointer"),
                      struct_sz=struct_sz,
@@ -705,10 +723,10 @@ for (int i=0, off={foffset}; i<%s; i++, off += {struct_sz})
         # standard struct fields
         for fname, ftype, arr, comment in self.fields:
             if fname in self.size_members or fname in self.exclude_members:
-                continue # don't emit
+                continue  # don't emit
 
             if ":" in fname:
-                continue # TODO: bit field
+                continue  # TODO: bit field
             foffset = self.config_struct_get(fname)
             field = self.get_field_java_code(fname, ftype, arr, foffset, jfielddefs_private)
 
@@ -756,7 +774,8 @@ for (int i=0, off={foffset}; i<%s; i++, off += {struct_sz})
                 # find the rest of the info from the union fields
                 ftype, arr, comment = ufieldmap[fname]
 
-                field = self.get_field_java_code(fname, ftype, arr, foffset, jfielddefs_union_private)
+                field = self.get_field_java_code(fname, ftype, arr, foffset,
+                                                 jfielddefs_union_private)
 
                 fielddef = field["fielddef"]
                 read = field["backing_read"]
@@ -832,15 +851,15 @@ for (int i=0, off={foffset}; i<%s; i++, off += {struct_sz})
             return {size};
         }}
     }}"""
-        return "".join([p1,p2,p3]).format(
-                name=self.name,
-                jfielddefs="\n        ".join(jfielddefs),
-                jread="\n            ".join(jread),
-                jwrite="\n            ".join(jwrite),
-                jconstruct="\n            ".join(jconstruct),
-                jcargs=", ".join(jcargs),
-                jcinit="\n            ".join(jcinit),
-                size=self.config_struct_get("_SIZE_"))
+        return "".join([p1, p2, p3]).format(
+            name=self.name,
+            jfielddefs="\n        ".join(jfielddefs),
+            jread="\n            ".join(jread),
+            jwrite="\n            ".join(jwrite),
+            jconstruct="\n            ".join(jconstruct),
+            jcargs=", ".join(jcargs),
+            jcinit="\n            ".join(jcinit),
+            size=self.config_struct_get("_SIZE_"))
 
 
 class JavaEmitter:
@@ -1278,7 +1297,9 @@ static const char* getErrorText(int err) {{
         {errs}
         default: return "Unknown error";
     }}
-}}""".format(errs="\n        ".join('case %s: return "%s";' % (x, self.errors[x]) for x in sorted(self.errors))), file=self.outc)
+}}""".format(errs="\n        ".join(
+            'case %s: return "%s";' % (x, self.errors[x]) for x in sorted(self.errors))),
+            file=self.outc)
 
     def config_get(self, section, option, fallback):
         try:
@@ -1357,7 +1378,7 @@ static const char* getErrorText(int err) {{
             name = name[5:]
 
         code = "    public static final {type} {name} = {value};" \
-                .format(type=type, name=name, value=clean)
+            .format(type=type, name=name, value=clean)
         if after_struct:
             define_after_struct.append((name, code))
             return
@@ -1428,7 +1449,9 @@ static const char* getErrorText(int err) {{
         private {name}(int value) {{
             this.value = value;
         }}
-        public static {name} fromValue(int val) {{""".format(name=name, values="\n        ".join(valuestrs)), file=self.out)
+        public static {name} fromValue(int val) {{""".format(name=name,
+                                                             values="\n        ".join(valuestrs)),
+              file=self.out)
         if need_search:
             print("""            for ({name} v : values()) {{
                 if (v.value == val)
@@ -1503,7 +1526,8 @@ static const char* getErrorText(int err) {{
         dxEnumerateVideoModesResult rv = new dxEnumerateVideoModesResult(rv_buf, videoModeArray_buf);
         return rv;
     }}
-    private static native void _IMAQdxEnumerateVideoModes(int id, long videoModeArray, long count, long currentMode);""".format(struct_sz=self.config_struct.get("IMAQdxEnumItem", "_SIZE_")), file=self.out)
+    private static native void _IMAQdxEnumerateVideoModes(int id, long videoModeArray, long count, long currentMode);""".format(
+                struct_sz=self.config_struct.get("IMAQdxEnumItem", "_SIZE_")), file=self.out)
             print("""
 JNIEXPORT void JNICALL Java_{package}_{classname}__1IMAQdxEnumerateVideoModes(JNIEnv* env, jclass , jint id, jlong videoModeArray, jlong count, jlong currentMode)
 {{
@@ -1519,7 +1543,8 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1IMAQdxEnumerateVideoModes(JN
         int buffer_size = buffer.capacity();
         return _IMAQdxGetImageData(id, buffer_addr, buffer_size, mode.getValue(), desiredBufferNumber);
     }}
-    private static native int _IMAQdxGetImageData(int id, long buffer, int bufferSize, int mode, int desiredBufferNumber);""".format(), file=self.out)
+    private static native int _IMAQdxGetImageData(int id, long buffer, int bufferSize, int mode, int desiredBufferNumber);""".format(),
+                  file=self.out)
             print("""
 JNIEXPORT jint JNICALL Java_{package}_{classname}__1IMAQdxGetImageData(JNIEnv* env, jclass , jint id, jlong buffer, jint bufferSize, jint mode, jint desiredBufferNumber)
 {{
@@ -1543,7 +1568,8 @@ JNIEXPORT jint JNICALL Java_{package}_{classname}__1IMAQdxGetImageData(JNIEnv* e
         putBytes(fileName_buf, fileName_bytes, 0, fileName_bytes.length).put(fileName_bytes.length, (byte)0);
         _imaqReadFile(image.getAddress(), getByteBufferAddress(fileName_buf), 0, 0);
     }}
-    private static native void _imaqReadFile(long image, long fileName, long colorTable, long numColors);""".format(), file=self.out)
+    private static native void _imaqReadFile(long image, long fileName, long colorTable, long numColors);""".format(),
+                  file=self.out)
             print("""
 JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqReadFile(JNIEnv* env, jclass , jlong image, jlong fileName, jlong colorTable, jlong numColors)
 {{
@@ -1592,16 +1618,19 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqReadFile(JNIEnv* env, jc
                 rettype = c_to_jtype(restype, None)
 
         # TODO: defaults
-        #defaults = dict((y.strip() for y in x.split(':')) for x in
+        # defaults = dict((y.strip() for y in x.split(':')) for x in
         #        self.config_get(name, "defaults", "").split(',') if x)
 
         sized_params = dict(tuple(y.strip() for y in x.split(':')) for x in
-                self.config_get(name, "arraysize", "").split(',') if x)
+                            self.config_get(name, "arraysize", "").split(',') if x)
         size_params = set(sized_params.values())
 
-        inparams = [x.strip() for x in self.config_get(name, "inparams", "").split(',') if x.strip()]
-        outparams = [x.strip() for x in self.config_get(name, "outparams", "").split(',') if x.strip()]
-        nullokparams = [x.strip() for x in self.config_get(name, "nullok", "").split(',') if x.strip()]
+        inparams = [x.strip() for x in self.config_get(name, "inparams", "").split(',') if
+                    x.strip()]
+        outparams = [x.strip() for x in self.config_get(name, "outparams", "").split(',') if
+                     x.strip()]
+        nullokparams = [x.strip() for x in self.config_get(name, "nullok", "").split(',') if
+                        x.strip()]
         # guess additional output parameters
         for pname, ptype, arr in params:
             if (pname not in inparams
@@ -1616,7 +1645,7 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqReadFile(JNIEnv* env, jc
         retarraysize = self.config_get(name, "retarraysize", "").strip()
         if retarraysize:
             size_params.add(retarraysize)
-            #rettype = c_to_jtype(restype, "")
+            # rettype = c_to_jtype(restype, "")
             if retarraysize not in outparams:
                 outparams.append(retarraysize)
 
@@ -1644,7 +1673,7 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqReadFile(JNIEnv* env, jc
 
         jfielddefs_private = []
         for fname, ftype, arr, comment in helper.fields:
-            #print(fname, ftype, arr)
+            # print(fname, ftype, arr)
             is_outparam = (fname in outparams)
             is_nullok = (fname in nullokparams) and not is_outparam
 
@@ -1653,7 +1682,8 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqReadFile(JNIEnv* env, jc
                     ftype = ftype[:-1]
                 elif arr is None:
                     raise ValueError("outparam %s is not a pointer or array", fname)
-            field = helper.get_field_java_code(fname, ftype, arr, 0, jfielddefs_private, backing="%s_buf" % fname)
+            field = helper.get_field_java_code(fname, ftype, arr, 0, jfielddefs_private,
+                                               backing="%s_buf" % fname)
             paramtypes[fname] = (ftype, arr, field["type"])
             if is_outparam:
                 jn_funcargs.append((fname, jtype_ptr))
@@ -1685,7 +1715,9 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqReadFile(JNIEnv* env, jc
                 if arr:
                     raise NotImplementedError("sized array")
                 else:
-                    jinit.append("{size_jtype} {size_fname} = {fname}.length;".format(size_jtype=field["size_jtype"].j_type, size_fname=field["size_fname"], fname=fname))
+                    jinit.append("{size_jtype} {size_fname} = {fname}.length;".format(
+                        size_jtype=field["size_jtype"].j_type, size_fname=field["size_fname"],
+                        fname=fname))
                     jinit.extend("%s = null;" % x for x in write_bufs)
                     jinit.extend(write)
                     jn_passedargs[fname] = to_arg
@@ -1703,9 +1735,13 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqReadFile(JNIEnv* env, jc
                 jn_passedargs[fname] = fname
             elif jtype.jni_sig == "Ljava/lang/String;":
                 if jtype.string_array:
-                    jinit.append("ByteBuffer {fname}_buf = ByteBuffer.allocateDirect({array_size}).order(ByteOrder.nativeOrder());".format(fname=fname, array_size=256))
+                    jinit.append(
+                        "ByteBuffer {fname}_buf = ByteBuffer.allocateDirect({array_size}).order(ByteOrder.nativeOrder());".format(
+                            fname=fname, array_size=256))
                     jinit.extend(field["backing_write"])
-                    jn_passedargs[fname] = "{fname} == null ? 0 : getByteBufferAddress({fname}_buf)".format(fname=fname)
+                    jn_passedargs[
+                        fname] = "{fname} == null ? 0 : getByteBufferAddress({fname}_buf)".format(
+                        fname=fname)
                 else:
                     jinit.extend("%s = null;" % x for x in write_bufs)
                     jinit.extend(write)
@@ -1716,7 +1752,7 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqReadFile(JNIEnv* env, jc
         jrettype = rettype.j_type
 
         outstruct_name = None
-        #print(name, jrettype, outparams, retarraysize, retsize)
+        # print(name, jrettype, outparams, retarraysize, retsize)
         if outparams or retarraysize or retsize:
             # create a return structure
             outstruct_fields = []
@@ -1738,7 +1774,9 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqReadFile(JNIEnv* env, jc
             outstruct_name = name[4:] + "Result"
 
             # create a return buffer (TODO: optimize size)
-            jinit.append("ByteBuffer rv_buf = ByteBuffer.allocateDirect(%s).order(ByteOrder.nativeOrder());" % "+".join(outstruct_size))
+            jinit.append(
+                "ByteBuffer rv_buf = ByteBuffer.allocateDirect(%s).order(ByteOrder.nativeOrder());" % "+".join(
+                    outstruct_size))
             jinit.append("long rv_addr = getByteBufferAddress(rv_buf);")
 
             jconstruct_args = [("rv_buf", "ByteBuffer")]
@@ -1760,17 +1798,20 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqReadFile(JNIEnv* env, jc
             jfielddefs_private = []
             off = 0
             for fname, ftype, arr, comment in helper.fields:
-                field = helper.get_field_java_code(fname, ftype, arr, off, jfielddefs_private, backing="rv_buf")
+                field = helper.get_field_java_code(fname, ftype, arr, off, jfielddefs_private,
+                                                   backing="rv_buf")
                 if fname == retarraysize:
-                    jconstruct.append(field["fielddef"].replace("public ", "").replace(fname, "array_%s" % fname))
-                    jconstruct.extend(x.replace(fname, "array_%s" % fname) for x in field["backing_read"])
+                    jconstruct.append(
+                        field["fielddef"].replace("public ", "").replace(fname, "array_%s" % fname))
+                    jconstruct.extend(
+                        x.replace(fname, "array_%s" % fname) for x in field["backing_read"])
                     jn_passedargs[fname] = "rv_addr+%d" % off
                     off += 8
                     continue
                 jfielddefs.append(field["fielddef"])
 
                 if fname == "array":
-                    #jconstruct.extend(field["backing_read"])
+                    # jconstruct.extend(field["backing_read"])
                     jconstruct.extend(field["read"])
                 elif fname != "val":
                     jn_passedargs[fname] = "rv_addr+%d" % off
@@ -1788,24 +1829,29 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqReadFile(JNIEnv* env, jc
                 jfini.extend(jconstruct)
                 jretc = "return %s;" % outparams[0]
                 jrettype = paramtypes[outparams[0]][2].j_type
-                #rettype = paramtypes[outparams[0]][2]
+                # rettype = paramtypes[outparams[0]][2]
             elif len(outparams) == 1 and retsize:
                 jfini.extend(x.replace("public ", "") for x in jfielddefs)
                 jfini.extend(jconstruct)
-                jfini.append("val = new {type}(jn_rv, {owned}, {size});".format(type=rettype.j_type, owned="true" if retowned else "false", size=retsize))
+                jfini.append("val = new {type}(jn_rv, {owned}, {size});".format(type=rettype.j_type,
+                                                                                owned="true" if retowned else "false",
+                                                                                size=retsize))
                 jretc = "return val;"
             else:
                 defined.add(outstruct_name)
-                jfini.append("{struct_name} rv = new {struct_name}({args});".format(struct_name=outstruct_name, args=", ".join(x[0] for x in jconstruct_args)))
+                jfini.append("{struct_name} rv = new {struct_name}({args});".format(
+                    struct_name=outstruct_name, args=", ".join(x[0] for x in jconstruct_args)))
                 if retsize:
-                    jfini.append("rv.val = new {type}(jn_rv, {owned}, rv.{size});".format(type=rettype.j_type, owned="true" if retowned else "false", size=retsize))
+                    jfini.append("rv.val = new {type}(jn_rv, {owned}, rv.{size});".format(
+                        type=rettype.j_type, owned="true" if retowned else "false", size=retsize))
                 elif not retarraysize and functype != "STDFUNC":
-                    jfini.append("rv.val = new {type}(jn_rv, {owned});".format(type=rettype.j_type, owned="true" if retowned else "false"))
+                    jfini.append("rv.val = new {type}(jn_rv, {owned});".format(type=rettype.j_type,
+                                                                               owned="true" if retowned else "false"))
 
                 jrettype = outstruct_name
                 if retarraysize:
                     rettype = c_to_jtype(outstruct_name, None)
-                #else:
+                # else:
                 #    rettype = java_types_map[("void", None)]
 
                 print("""
@@ -1814,9 +1860,9 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqReadFile(JNIEnv* env, jc
         private {struct_name}({jconstruct_args}) {{
             {jconstruct}
         }}""".format(struct_name=outstruct_name,
-                 jfielddefs="\n        ".join(jfielddefs),
-                 jconstruct_args=", ".join("%s %s" % (x[1], x[0]) for x in jconstruct_args),
-                 jconstruct="\n            ".join(jconstruct)),
+                     jfielddefs="\n        ".join(jfielddefs),
+                     jconstruct_args=", ".join("%s %s" % (x[1], x[0]) for x in jconstruct_args),
+                     jconstruct="\n            ".join(jconstruct)),
                       file=self.out)
                 if retarraysize:
                     print("""
@@ -1834,15 +1880,16 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqReadFile(JNIEnv* env, jc
             if rettype.is_enum:
                 jretc = "return {type}.fromValue(jn_rv);".format(type=rettype.j_type)
             elif rettype.is_struct or rettype.is_opaque:
-                jretc = "return new {type}(jn_rv, {owned});".format(type=rettype.j_type, owned="true" if retowned else "false")
+                jretc = "return new {type}(jn_rv, {owned});".format(type=rettype.j_type,
+                                                                    owned="true" if retowned else "false")
             else:
                 jretc = "return jn_rv;"
 
         #
         # Java function
         #
-        #assert name.startswith("imaq")
-        #name = name[4].lower() + name[5:]
+        # assert name.startswith("imaq")
+        # name = name[4].lower() + name[5:]
 
         print("""
     public static {rettype} {name}({args}) {{
@@ -1855,17 +1902,19 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqReadFile(JNIEnv* env, jc
                  init="\n        ".join(jinit),
                  fini="\n        ".join(jfini),
                  rv="%s jn_rv = " % rettype.jn_type if rettype.jn_type != "void" else "",
-                 retcode="\n        "+jretc if jretc else "",
-                 passedargs=", ".join(jn_passedargs[x[0]] if x[0] in jn_passedargs else "UNKNOWN" for x in jn_funcargs)),
-                file=self.out)
+                 retcode="\n        " + jretc if jretc else "",
+                 passedargs=", ".join(
+                     jn_passedargs[x[0]] if x[0] in jn_passedargs else "UNKNOWN" for x in
+                     jn_funcargs)),
+              file=self.out)
 
         #
         # Native Java function
         #
         print("""    private static native {rettype} _{name}({args});""".format(
-              rettype=rettype.jn_type, name=name,
-              args=", ".join("%s %s" % (x[1].jn_type, x[0]) for x in jn_funcargs)),
-              file=self.out)
+            rettype=rettype.jn_type, name=name,
+            args=", ".join("%s %s" % (x[1].jn_type, x[0]) for x in jn_funcargs)),
+            file=self.out)
 
         #
         # C function
@@ -1897,8 +1946,8 @@ JNIEXPORT void JNICALL Java_{package}_{classname}__1imaqReadFile(JNIEnv* env, jc
                 cargs.append("(%s)%s" % (ptype, pname))
 
         callcfunc = "{restype} rv = {name}({args});".format(name=name,
-                restype=restype,
-                args=", ".join(cargs))
+                                                            restype=restype,
+                                                            args=", ".join(cargs))
 
         print("""
 JNIEXPORT {rettype} JNICALL Java_{package}_{classname}__1{name}({args})
@@ -1930,6 +1979,7 @@ JNIEXPORT {rettype} JNICALL Java_{package}_{classname}__1{name}({args})
     def union(self, name, fields):
         self.unions[name] = fields
 
+
 def generate(srcdir, outdir, inputs):
     emit = None
 
@@ -1940,7 +1990,7 @@ def generate(srcdir, outdir, inputs):
         config = configparser.ConfigParser()
         config.read(configpath)
         block_comment_exclude = set(x.strip() for x in
-                config.get("Block Comment", "exclude").splitlines())
+                                    config.get("Block Comment", "exclude").splitlines())
 
         library_funcs = set()
         with open(funcs_path) as ff:
@@ -1965,17 +2015,18 @@ def generate(srcdir, outdir, inputs):
 
     emit.finish()
 
+
 if __name__ == "__main__":
-    if len(sys.argv) < 5 or ((len(sys.argv)-1) % 4) != 0:
+    if len(sys.argv) < 5 or ((len(sys.argv) - 1) % 4) != 0:
         print("Usage: gen_wrap.py <header.h config_struct.ini config.ini funcs.txt>...")
         exit(0)
 
     inputs = []
     for i in range(1, len(sys.argv), 4):
         fname = sys.argv[i]
-        config_struct_name = sys.argv[i+1]
-        configname = sys.argv[i+2]
-        funcs_name = sys.argv[i+3]
+        config_struct_name = sys.argv[i + 1]
+        configname = sys.argv[i + 2]
+        funcs_name = sys.argv[i + 3]
         inputs.append((fname, config_struct_name, configname, funcs_name))
 
     generate("", "", inputs)

@@ -7,34 +7,33 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 import java.util.logging.Logger;
 
-import org.junit.Test;
-
-import edu.wpi.first.wpilibj.CircularBuffer;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+
+import static org.junit.Assert.assertEquals;
 
 public class CircularBufferTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(CircularBufferTest.class.getName());
-  private double[] values = {751.848, 766.366, 342.657, 234.252, 716.126,
-                             132.344, 445.697, 22.727, 421.125, 799.913};
-  private double[] pushFrontOut = {799.913, 421.125, 22.727, 445.697, 132.344,
-                              716.126, 234.252, 342.657};
-  private double[] pushBackOut = {342.657, 234.252, 716.126, 132.344, 445.697,
-                                  22.727, 421.125, 799.913};
+  private double[] m_values = {751.848, 766.366, 342.657, 234.252, 716.126,
+      132.344, 445.697, 22.727, 421.125, 799.913};
+  private double[] m_pushFrontOut = {799.913, 421.125, 22.727, 445.697, 132.344,
+      716.126, 234.252, 342.657};
+  private double[] m_pushBackOut = {342.657, 234.252, 716.126, 132.344, 445.697,
+      22.727, 421.125, 799.913};
 
   @Test
   public void pushFrontTest() {
     CircularBuffer queue = new CircularBuffer(8);
 
-    for (double value : values) {
+    for (double value : m_values) {
       queue.pushFront(value);
     }
 
-    for (int i = 0; i < pushFrontOut.length; i++) {
-      assertEquals(pushFrontOut[i], queue.get(i), 0.00005);
+    for (int i = 0; i < m_pushFrontOut.length; i++) {
+      assertEquals(m_pushFrontOut[i], queue.get(i), 0.00005);
     }
   }
 
@@ -42,12 +41,12 @@ public class CircularBufferTest extends AbstractComsSetup {
   public void pushBackTest() {
     CircularBuffer queue = new CircularBuffer(8);
 
-    for (double value : values) {
+    for (double value : m_values) {
       queue.pushBack(value);
     }
 
-    for (int i = 0; i < pushBackOut.length; i++) {
-      assertEquals(pushBackOut[i], queue.get(i), 0.00005);
+    for (int i = 0; i < m_pushBackOut.length; i++) {
+      assertEquals(m_pushBackOut[i], queue.get(i), 0.00005);
     }
   }
 

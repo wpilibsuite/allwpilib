@@ -7,10 +7,6 @@
 
 package edu.wpi.first.wpilibj.vision;
 
-import edu.wpi.first.wpilibj.image.ColorImage;
-import edu.wpi.first.wpilibj.image.HSLImage;
-import edu.wpi.first.wpilibj.image.NIVisionException;
-
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -18,16 +14,21 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.image.ColorImage;
+import edu.wpi.first.wpilibj.image.HSLImage;
+import edu.wpi.first.wpilibj.image.NIVisionException;
+
 import static com.ni.vision.NIVision.Image;
 import static com.ni.vision.NIVision.Priv_ReadJPEGString_C;
-import static edu.wpi.first.wpilibj.Timer.delay;
 
 /**
- * Axis M1011 network camera
+ * Axis M1011 network camera.
  */
 public class AxisCamera {
   public enum WhiteBalance {
-    kAutomatic, kHold, kFixedOutdoor1, kFixedOutdoor2, kFixedIndoor, kFixedFluorescent1, kFixedFluorescent2,
+    kAutomatic, kHold, kFixedOutdoor1, kFixedOutdoor2, kFixedIndoor, kFixedFluorescent1,
+    kFixedFluorescent2,
   }
 
   public enum ExposureControl {
@@ -53,7 +54,7 @@ public class AxisCamera {
 
   private static final String[] kRotationStrings = {"0", "180",};
 
-  private final static int kImageBufferAllocationIncrement = 1000;
+  private static final int kImageBufferAllocationIncrement = 1000;
 
   private String m_cameraHost;
   private Socket m_cameraSocket;
@@ -78,19 +79,50 @@ public class AxisCamera {
   private boolean m_done = false;
 
   /**
-   * AxisCamera constructor
+   * AxisCamera constructor.
    *
    * @param cameraHost The host to find the camera at, typically an IP address
    */
   public AxisCamera(String cameraHost) {
     m_cameraHost = cameraHost;
-    m_captureThread.start();
+
+    /*
+    Thread spawned by AxisCamera constructor to receive images from cam.
+    */
+    final Thread captureThread = new Thread(() -> {
+      int consecutiveErrors = 0;
+
+      // Loop on trying to setup the camera connection. This happens in a
+      // background
+      // thread so it shouldn't effect the operation of user programs.
+      while (!m_done) {
+        String requestString =
+            "GET /mjpg/video.mjpg HTTP/1.1\n" + "User-Agent: HTTPStreamClient\n"
+                + "Connection: Keep-Alive\n" + "Cache-Control: no-cache\n"
+                + "Authorization: Basic RlJDOkZSQw==\n\n";
+
+        try {
+          m_cameraSocket = AxisCamera.this.createCameraSocket(requestString);
+          AxisCamera.this.readImagesFromCamera();
+          consecutiveErrors = 0;
+        } catch (IOException ex) {
+          consecutiveErrors++;
+
+          if (consecutiveErrors > 5) {
+            ex.printStackTrace();
+          }
+        }
+
+        Timer.delay(0.5);
+      }
+    });
+    captureThread.start();
   }
 
   /**
-   * Return true if the latest image from the camera has not been retrieved by
-   * calling GetImage() yet.
-   *$
+   * Return true if the latest image from the camera has not been retrieved by calling GetImage()
+   * yet.
+   *
    * @return true if the image has not been retrieved yet.
    */
   public boolean isFreshImage() {
@@ -100,8 +132,7 @@ public class AxisCamera {
   /**
    * Get an image from the camera and store it in the provided image.
    *
-   * @param image The imaq image to store the result in. This must be an HSL or
-   *        RGB image.
+   * @param image The imaq image to store the result in. This must be an HSL or RGB image.
    * @return <code>true</code> upon success, <code>false</code> on a failure
    */
   public boolean getImage(Image image) {
@@ -121,8 +152,7 @@ public class AxisCamera {
   /**
    * Get an image from the camera and store it in the provided image.
    *
-   * @param image The image to store the result in. This must be an HSL or RGB
-   *        image
+   * @param image The image to store the result in. This must be an HSL or RGB image
    * @return true upon success, false on a failure
    */
   public boolean getImage(ColorImage image) {
@@ -130,8 +160,7 @@ public class AxisCamera {
   }
 
   /**
-   * Instantiate a new image object and fill it with the latest image from the
-   * camera.
+   * Instantiate a new image object and fill it with the latest image from the camera.
    *
    * @return a pointer to an HSLImage object
    */
@@ -160,6 +189,8 @@ public class AxisCamera {
   }
 
   /**
+   * The brightness.
+   *
    * @return The configured brightness of the camera images
    */
   public int getBrightness() {
@@ -183,6 +214,8 @@ public class AxisCamera {
   }
 
   /**
+   * The white balance.
+   *
    * @return The configured white balances of the camera images
    */
   public WhiteBalance getWhiteBalance() {
@@ -210,6 +243,8 @@ public class AxisCamera {
   }
 
   /**
+   * The current color level.
+   *
    * @return The configured color level of the camera images
    */
   public int getColorLevel() {
@@ -233,6 +268,8 @@ public class AxisCamera {
   }
 
   /**
+   * The current exposure control.
+   *
    * @return The configured exposure control mode of the camera
    */
   public ExposureControl getExposureControl() {
@@ -244,8 +281,8 @@ public class AxisCamera {
   /**
    * Request a change in the exposure priority of the camera.
    *
-   * @param exposurePriority Valid values are 0, 50, 100. 0 = Prioritize image
-   *        quality 50 = None 100 = Prioritize frame rate
+   * @param exposurePriority Valid values are 0, 50, 100. 0 = Prioritize image quality 50 = None 100
+   *                         = Prioritize frame rate
    */
   public void writeExposurePriority(int exposurePriority) {
     if (exposurePriority != 0 && exposurePriority != 50 && exposurePriority != 100) {
@@ -261,6 +298,8 @@ public class AxisCamera {
   }
 
   /**
+   * Gets the exposure priority.
+   *
    * @return The configured exposure priority of the camera
    */
   public int getExposurePriority() {
@@ -270,11 +309,10 @@ public class AxisCamera {
   }
 
   /**
-   * Write the maximum frames per second that the camera should send Write 0 to
-   * send as many as possible.
+   * Write the maximum frames per second that the camera should send Write 0 to send as many as
+   * possible.
    *
-   * @param maxFPS The number of frames the camera should send in a second,
-   *        exposure permitting.
+   * @param maxFPS The number of frames the camera should send in a second, exposure permitting.
    */
   public void writeMaxFPS(int maxFPS) {
     synchronized (m_parametersLock) {
@@ -287,6 +325,8 @@ public class AxisCamera {
   }
 
   /**
+   * The max frames per second of the camera.
+   *
    * @return The configured maximum FPS of the camera
    */
   public int getMaxFPS() {
@@ -311,8 +351,10 @@ public class AxisCamera {
   }
 
   /**
-   * @return The configured resolution of the camera (not necessarily the same
-   *         resolution as the most recent image, if it was changed recently.)
+   * Gets the configured resolution (not necessarily the same resolution as the most recent
+   * image, if it was changed recently).
+   *
+   * @return The configured resolution of the camera.
    */
   public Resolution getResolution() {
     synchronized (m_parametersLock) {
@@ -340,7 +382,9 @@ public class AxisCamera {
   }
 
   /**
-   * @return The configured compression level of the camera images
+   * Gets the configured compression level of the camera images.
+   *
+   * @return The configured compression level of the camera images.
    */
   public int getCompression() {
     synchronized (m_parametersLock) {
@@ -349,8 +393,8 @@ public class AxisCamera {
   }
 
   /**
-   * Write the rotation value to the camera. If you mount your camera upside
-   * down, use this to adjust the image for you.
+   * Write the motation value to the camera. If you mount your camera upside down, use this to
+   * adjust the image for you.
    *
    * @param rotation A value from the {@link Rotation} enum
    */
@@ -365,6 +409,8 @@ public class AxisCamera {
   }
 
   /**
+   * Gets the configured rotation mode of the camera.
+   *
    * @return The configured rotation mode of the camera
    */
   public Rotation getRotation() {
@@ -372,40 +418,6 @@ public class AxisCamera {
       return m_rotation;
     }
   }
-
-  /**
-   * Thread spawned by AxisCamera constructor to receive images from cam
-   */
-  private Thread m_captureThread = new Thread(new Runnable() {
-    @Override
-    public void run() {
-      int consecutiveErrors = 0;
-
-      // Loop on trying to setup the camera connection. This happens in a
-      // background
-      // thread so it shouldn't effect the operation of user programs.
-      while (!m_done) {
-        String requestString =
-            "GET /mjpg/video.mjpg HTTP/1.1\n" + "User-Agent: HTTPStreamClient\n"
-                + "Connection: Keep-Alive\n" + "Cache-Control: no-cache\n"
-                + "Authorization: Basic RlJDOkZSQw==\n\n";
-
-        try {
-          m_cameraSocket = AxisCamera.this.createCameraSocket(requestString);
-          AxisCamera.this.readImagesFromCamera();
-          consecutiveErrors = 0;
-        } catch (IOException e) {
-          consecutiveErrors++;
-
-          if (consecutiveErrors > 5) {
-            e.printStackTrace();
-          }
-        }
-
-        delay(0.5);
-      }
-    }
-  });
 
   /**
    * This function actually reads the images from the camera.
@@ -453,16 +465,14 @@ public class AxisCamera {
   }
 
   /**
-   * Send a request to the camera to set all of the parameters. This is called
-   * in the capture thread between each frame. This strategy avoids making lots
-   * of redundant HTTP requests, accounts for failed initial requests, and
-   * avoids blocking calls in the main thread unless necessary.
-   * <p>
-   * This method does nothing if no parameters have been modified since it last
-   * completely successfully.
+   * Send a request to the camera to set all of the parameters. This is called in the capture thread
+   * between each frame. This strategy avoids making lots of redundant HTTP requests, accounts for
+   * failed initial requests, and avoids blocking calls in the main thread unless necessary.
    *
-   * @return <code>true</code> if the stream should be restarted due to a
-   *         parameter changing.
+   * <p>This method does nothing if no parameters have been modified since it last completely
+   * successfully.
+   *
+   * @return <code>true</code> if the stream should be restarted due to a parameter changing.
    */
   private boolean writeParameters() {
     if (m_parametersDirty) {
@@ -501,7 +511,7 @@ public class AxisCamera {
         } else {
           return false;
         }
-      } catch (IOException | NullPointerException e) {
+      } catch (IOException | NullPointerException ex) {
         return false;
       }
 
@@ -511,11 +521,10 @@ public class AxisCamera {
   }
 
   /**
-   * Create a socket connected to camera Used to create a connection for reading
-   * images and setting parameters
+   * Create a socket connected to camera Used to create a connection for reading images and setting
+   * parameters
    *
-   * @param requestString The initial request string to send upon successful
-   *        connection.
+   * @param requestString The initial request string to send upon successful connection.
    * @return The created socket
    */
   private Socket createCameraSocket(String requestString) throws IOException {

@@ -7,22 +7,27 @@
 
 package edu.wpi.first.wpilibj.can;
 
-import edu.wpi.first.wpilibj.CANJaguar;
-import edu.wpi.first.wpilibj.Timer;
 import org.junit.Test;
-import static org.junit.Assert.assertTrue;
+
 import java.util.logging.Logger;
 
+import edu.wpi.first.wpilibj.CANJaguar;
+import edu.wpi.first.wpilibj.Timer;
+
+import static org.junit.Assert.assertTrue;
+
 /**
- * Created by Patrick Murphy on 3/30/15.
+ * Tests the CAN Jaguar inverted.
+ *
+ * <p>Created by Patrick Murphy on 3/30/15.
  */
 public class CANJaguarInversionTest extends AbstractCANTest {
   private static final Logger logger = Logger.getLogger(CANJaguarInversionTest.class.getName());
-  private static final double motorVoltage = 2.0;
-  private static final double motorPercent = 0.1;
-  private static final double motorSpeed = 10;
-  private static final double delayTime = 0.75;
-  private static final double speedModeDelayTime = 2.0;
+  private static final double m_motorVoltage = 2.0;
+  private static final double m_motorPercent = 0.1;
+  private static final double m_motorSpeed = 10;
+  private static final double m_delayTime = 0.75;
+  private static final double m_speedModeDelayTime = 2.0;
 
   @Override
   protected Logger getClassLogger() {
@@ -32,54 +37,52 @@ public class CANJaguarInversionTest extends AbstractCANTest {
   @Test
   public void testInvertingVoltageMode() {
     getME().getMotor().setVoltageMode(CANJaguar.kQuadEncoder, 360);
-    InversionTest(motorVoltage, delayTime);
+    inversionTest(m_motorVoltage, m_delayTime);
   }
 
   @Test
   public void testInvertingPercentMode() {
     getME().getMotor().setPercentMode(CANJaguar.kQuadEncoder, 360);
-    InversionTest(motorPercent, delayTime);
+    inversionTest(m_motorPercent, m_delayTime);
   }
 
   @Test
   public void testInvertingSpeedMode() {
     getME().getMotor().setSpeedMode(CANJaguar.kQuadEncoder, 360, 0.1, 0.003, 0.01);
-    InversionTest(motorSpeed, speedModeDelayTime);
+    inversionTest(m_motorSpeed, m_speedModeDelayTime);
   }
 
   /**
-   * Runs an inversion test To use set the jaguar to the proper
-   * mode(PercentVbus, voltage, speed)
-   *$
-   * @param setpoint the speed/voltage/percent to set the motor to
-   * @param delayTime the amount of time to delay between starting a motor and
-   *        checking the encoder
+   * Runs an inversion test To use set the jaguar to the proper mode(PercentVbus, voltage, speed).
+   *
+   * @param setPoint  the speed/voltage/percent to set the motor to
+   * @param delayTime the amount of time to delay between starting a motor and checking the encoder
    */
-  private void InversionTest(double setpoint, double delayTime) {
-    CANJaguar jag = this.getME().getMotor();
+  private void inversionTest(double setPoint, double delayTime) {
+    final CANJaguar jag = this.getME().getMotor();
     jag.enableControl();
     jag.setInverted(false);
-    jag.set(setpoint);
+    jag.set(setPoint);
     Timer.delay(delayTime);
-    double initialSpeed = jag.getSpeed();
+    final double initialSpeed = jag.getSpeed();
     jag.set(0.0);
     jag.setInverted(true);
-    jag.set(setpoint);
+    jag.set(setPoint);
     Timer.delay(delayTime);
     jag.set(0.0);
-    double finalSpeed = jag.getSpeed();
+    final double finalSpeed = jag.getSpeed();
     assertTrue("Inverting with Positive value does not invert direction",
         Math.signum(initialSpeed) != Math.signum(finalSpeed));
-    jag.set(-setpoint);
+    jag.set(-setPoint);
     Timer.delay(delayTime);
-    initialSpeed = jag.getSpeed();
+    final double newInitialSpeed = jag.getSpeed();
     jag.set(0.0);
     jag.setInverted(false);
-    jag.set(-setpoint);
+    jag.set(-setPoint);
     Timer.delay(delayTime);
-    finalSpeed = jag.getSpeed();
+    final double newFinalSpeed = jag.getSpeed();
     jag.set(0.0);
     assertTrue("Inverting with Negative value does not invert direction",
-        Math.signum(initialSpeed) != Math.signum(finalSpeed));
+        Math.signum(newInitialSpeed) != Math.signum(newFinalSpeed));
   }
 }

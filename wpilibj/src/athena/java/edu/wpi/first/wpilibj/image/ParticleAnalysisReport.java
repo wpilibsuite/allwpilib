@@ -11,7 +11,7 @@ import com.ni.vision.NIVision;
 
 /**
  * Class to store commonly used information about a particle.
- *$
+ *
  * @author dtjones
  */
 public class ParticleAnalysisReport {
@@ -19,45 +19,72 @@ public class ParticleAnalysisReport {
   /**
    * The height of the image in pixels.
    */
+  @SuppressWarnings("membername")
   public final int imageHeight;
   /**
    * The width of the image in pixels.
    */
+  @SuppressWarnings("membername")
   public final int imageWidth;
   /**
-   * X-coordinate of the point representing the average position of the total
-   * particle mass, assuming every point in the particle has a constant density
+   * X-coordinate of the point representing the average position of the total particle mass,
+   * assuming every point in the particle has a constant density.
    */
+  @SuppressWarnings("membername")
   public final int center_mass_x; // MeasurementType: IMAQ_MT_CENTER_OF_MASS_X
   /**
-   * Y-coordinate of the point representing the average position of the total
-   * particle mass, assuming every point in the particle has a constant density
+   * Y-coordinate of the point representing the average position of the total particle mass,
+   * assuming every point in the particle has a constant density.
    */
+  @SuppressWarnings("membername")
   public final int center_mass_y; // MeasurementType: IMAQ_MT_CENTER_OF_MASS_Y
   /**
    * Center of mass x value normalized to -1.0 to +1.0 range.
    */
+  @SuppressWarnings("membername")
   public final double center_mass_x_normalized;
   /**
    * Center of mass y value normalized to -1.0 to +1.0 range.
    */
+  @SuppressWarnings("membername")
   public final double center_mass_y_normalized;
-  /** Area of the particle */
+  /**
+   * Area of the particle.
+   */
+  @SuppressWarnings("membername")
   public final double particleArea; // MeasurementType: IMAQ_MT_AREA
-  /** Bounding Rectangle */
+  /**
+   * Bounding Rectangle.
+   */
+  @SuppressWarnings("membername")
   public final int boundingRectLeft; // left/top/width/height
-  /** Bounding Rectangle */
+  /**
+   * Bounding Rectangle.
+   */
+  @SuppressWarnings("membername")
   public final int boundingRectTop;
-  /** Bounding Rectangle */
+  /**
+   * Bounding Rectangle.
+   */
+  @SuppressWarnings("membername")
   public final int boundingRectWidth;
-  /** Bounding Rectangle */
+  /**
+   * Bounding Rectangle.
+   */
+  @SuppressWarnings("membername")
   public final int boundingRectHeight;
-  /** Percentage of the particle Area covering the Image Area. */
+  /**
+   * Percentage of the particle Area covering the Image Area.
+   */
+  @SuppressWarnings("membername")
   public final double particleToImagePercent; // MeasurementType:
-                                              // IMAQ_MT_AREA_BY_IMAGE_AREA
-  /** Percentage of the particle Area in relation to its Particle and Holes Area */
+  // IMAQ_MT_AREA_BY_IMAGE_AREA
+  /**
+   * Percentage of the particle Area in relation to its Particle and Holes Area.
+   */
+  @SuppressWarnings("membername")
   public final double particleQuality; // MeasurementType:
-                                       // IMAQ_MT_AREA_BY_PARTICLE_AND_HOLES_AREA
+  // IMAQ_MT_AREA_BY_PARTICLE_AND_HOLES_AREA
 
   ParticleAnalysisReport(BinaryImage image, int index) throws NIVisionException {
     imageHeight = image.getHeight();
@@ -99,7 +126,7 @@ public class ParticleAnalysisReport {
 
   /**
    * Get string representation of the particle analysis report.
-   *$
+   *
    * @return A string representation of the particle analysis report.
    */
   public String toString() {

@@ -14,9 +14,10 @@ import org.junit.runners.Suite.SuiteClasses;
 import edu.wpi.first.wpilibj.test.AbstractTestSuite;
 
 /**
- * @author Jonathan Leitschuh Holds all of the tests in the root wpilibj
- *         directory Please list alphabetically so that it is easy to determine
- *         if a test is missing from the list
+ * Holds all of the tests in the root wpilibj directory. Please list alphabetically so that it is
+ * easy to determine if a test is missing from the list.
+ *
+ * @author Jonathan Leitschuh
  */
 @RunWith(Suite.class)
 @SuiteClasses({AnalogCrossConnectTest.class, AnalogPotentiometerTest.class,
@@ -25,7 +26,7 @@ import edu.wpi.first.wpilibj.test.AbstractTestSuite;
     DIOCrossConnectTest.class, EncoderTest.class, FilterNoiseTest.class,
     FilterOutputTest.class, GyroTest.class, MotorEncoderTest.class,
     MotorInvertingTest.class, PCMTest.class, PDPTest.class, PIDTest.class,
-    PIDToleranceTest.class, PreferencesTest.class, RelayCrossConnectTest.class, 
+    PIDToleranceTest.class, PreferencesTest.class, RelayCrossConnectTest.class,
     SampleTest.class, TimerTest.class})
 public class WpiLibJTestSuite extends AbstractTestSuite {
 }

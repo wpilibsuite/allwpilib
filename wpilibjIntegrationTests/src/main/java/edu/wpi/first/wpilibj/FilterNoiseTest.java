@@ -7,12 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.logging.Logger;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -21,9 +15,15 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.logging.Logger;
+
 import edu.wpi.first.wpilibj.fixtures.FilterNoiseFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
+
+import static org.junit.Assert.assertTrue;
 
 
 @RunWith(Parameterized.class)
@@ -37,18 +37,24 @@ public class FilterNoiseTest extends AbstractComsSetup {
     return logger;
   }
 
+  /**
+   * Constructs the FilterNoiseTest.
+   *
+   * @param mef The fixture under test.
+   */
   public FilterNoiseTest(FilterNoiseFixture<?> mef) {
     logger.fine("Constructor with: " + mef.getType());
-    if (me != null && !me.equals(mef))
+    if (me != null && !me.equals(mef)) {
       me.teardown();
+    }
     me = mef;
   }
 
   @Parameters(name = "{index}: {0}")
   public static Collection<FilterNoiseFixture<?>[]> generateData() {
-    return Arrays.asList(new FilterNoiseFixture<?>[][] {
-                         {TestBench.getInstance().getSinglePoleIIRNoiseFixture()},
-                         {TestBench.getInstance().getMovAvgNoiseFixture()}});
+    return Arrays.asList(new FilterNoiseFixture<?>[][]{
+        {TestBench.getInstance().getSinglePoleIIRNoiseFixture()},
+        {TestBench.getInstance().getMovAvgNoiseFixture()}});
   }
 
   @Before
@@ -69,11 +75,10 @@ public class FilterNoiseTest extends AbstractComsSetup {
   }
 
   /**
-   * Test if the filter reduces the noise produced by a signal generator
+   * Test if the filter reduces the noise produced by a signal generator.
    */
   @Test
   public void testNoiseReduce() {
-    double theoryData = 0.0;
     double noiseGenError = 0.0;
     double filterError = 0.0;
 
@@ -81,11 +86,12 @@ public class FilterNoiseTest extends AbstractComsSetup {
 
     noise.reset();
     for (double t = 0; t < TestBench.kFilterTime; t += TestBench.kFilterStep) {
-      theoryData = noise.getData(t);
+      final double theoryData = noise.getData(t);
       filterError += Math.abs(me.getFilter().pidGet() - theoryData);
       noiseGenError += Math.abs(noise.get() - theoryData);
     }
 
-    assertTrue(me.getType() + " should have reduced noise accumulation from " + noiseGenError + " but failed. The filter error was " + filterError, noiseGenError > filterError);
+    assertTrue(me.getType() + " should have reduced noise accumulation from " + noiseGenError
+        + " but failed. The filter error was " + filterError, noiseGenError > filterError);
   }
 }

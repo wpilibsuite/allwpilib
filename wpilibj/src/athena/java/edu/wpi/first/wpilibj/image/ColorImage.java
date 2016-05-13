@@ -25,7 +25,7 @@ public abstract class ColorImage extends ImageBase {
   }
 
   private BinaryImage threshold(NIVision.ColorMode colorMode, int low1, int high1, int low2,
-      int high2, int low3, int high3) throws NIVisionException {
+                                int high2, int low3, int high3) throws NIVisionException {
     BinaryImage res = new BinaryImage();
     NIVision.Range range1 = new NIVision.Range(low1, high1);
     NIVision.Range range2 = new NIVision.Range(low2, high2);
@@ -39,73 +39,69 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Return a mask of the areas of the image that fall within the given ranges
-   * for color values
+   * Return a mask of the areas of the image that fall within the given ranges for color values
    *
-   * @param redLow The lower red limit.
-   * @param redHigh The upper red limit.
-   * @param greenLow The lower green limit.
+   * @param redLow    The lower red limit.
+   * @param redHigh   The upper red limit.
+   * @param greenLow  The lower green limit.
    * @param greenHigh The upper green limit.
-   * @param blueLow The lower blue limit.
-   * @param blueHigh The upper blue limit.
+   * @param blueLow   The lower blue limit.
+   * @param blueHigh  The upper blue limit.
    * @return A BinaryImage masking the areas which match the given thresholds.
    */
   public BinaryImage thresholdRGB(int redLow, int redHigh, int greenLow, int greenHigh,
-      int blueLow, int blueHigh) throws NIVisionException {
+                                  int blueLow, int blueHigh) throws NIVisionException {
     return threshold(NIVision.ColorMode.RGB, redLow, redHigh, greenLow, greenHigh, blueLow,
         blueHigh);
   }
 
   /**
-   * Return a mask of the areas of the image that fall within the given ranges
-   * for color values
+   * Return a mask of the areas of the image that fall within the given ranges for color values
    *
-   * @param hueLow The lower hue limit.
-   * @param hueHigh The upper hue limit.
-   * @param saturationLow The lower saturation limit.
+   * @param hueLow         The lower hue limit.
+   * @param hueHigh        The upper hue limit.
+   * @param saturationLow  The lower saturation limit.
    * @param saturationHigh The upper saturation limit.
-   * @param luminenceLow The lower luminence limit.
-   * @param luminenceHigh The upper luminence limit.
+   * @param luminenceLow   The lower luminence limit.
+   * @param luminenceHigh  The upper luminence limit.
    * @return A BinaryImage masking the areas which match the given thresholds.
    */
   public BinaryImage thresholdHSL(int hueLow, int hueHigh, int saturationLow, int saturationHigh,
-      int luminenceLow, int luminenceHigh) throws NIVisionException {
+                                  int luminenceLow, int luminenceHigh) throws NIVisionException {
     return threshold(NIVision.ColorMode.HSL, hueLow, hueHigh, saturationLow, saturationHigh,
         luminenceLow, luminenceHigh);
   }
 
   /**
-   * Return a mask of the areas of the image that fall within the given ranges
-   * for color values
+   * Return a mask of the areas of the image that fall within the given ranges for color values
    *
-   * @param hueLow The lower hue limit.
-   * @param hueHigh The upper hue limit.
-   * @param saturationLow The lower saturation limit.
+   * @param hueLow         The lower hue limit.
+   * @param hueHigh        The upper hue limit.
+   * @param saturationLow  The lower saturation limit.
    * @param saturationHigh The upper saturation limit.
-   * @param valueHigh The lower value limit.
-   * @param valueLow The upper value limit.
+   * @param valueHigh      The lower value limit.
+   * @param valueLow       The upper value limit.
    * @return A BinaryImage masking the areas which match the given thresholds.
    */
   public BinaryImage thresholdHSV(int hueLow, int hueHigh, int saturationLow, int saturationHigh,
-      int valueLow, int valueHigh) throws NIVisionException {
+                                  int valueLow, int valueHigh) throws NIVisionException {
     return threshold(NIVision.ColorMode.HSV, hueLow, hueHigh, saturationLow, saturationHigh,
         valueLow, valueHigh);
   }
 
   /**
-   * Return a mask of the areas of the image that fall within the given ranges
-   * for color values
+   * Return a mask of the areas of the image that fall within the given ranges for color values
    *
-   * @param hueLow The lower hue limit.
-   * @param hueHigh The upper hue limit.
-   * @param saturationLow The lower saturation limit.
+   * @param hueLow         The lower hue limit.
+   * @param hueHigh        The upper hue limit.
+   * @param saturationLow  The lower saturation limit.
    * @param saturationHigh The upper saturation limit.
-   * @param intansityLow The lower intensity limit.
-   * @param intensityHigh The upper intensity limit.
+   * @param intansityLow   The lower intensity limit.
+   * @param intensityHigh  The upper intensity limit.
    * @return A BinaryImage masking the areas which match the given thresholds.
    */
   public BinaryImage thresholdHSI(int hueLow, int hueHigh, int saturationLow, int saturationHigh,
-      int intansityLow, int intensityHigh) throws NIVisionException {
+                                  int intansityLow, int intensityHigh) throws NIVisionException {
     return threshold(NIVision.ColorMode.HSI, hueLow, hueHigh, saturationLow, saturationHigh,
         intansityLow, intensityHigh);
   }
@@ -141,8 +137,7 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Get the green color plane from the image when represented in RGB color
-   * space.
+   * Get the green color plane from the image when represented in RGB color space.
    *
    * @return The green color plane from the image.
    */
@@ -151,8 +146,7 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Get the blue color plane from the image when represented in RGB color
-   * space.
+   * Get the blue color plane from the image when represented in RGB color space.
    *
    * @return The blue color plane from the image.
    */
@@ -188,8 +182,7 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Get the saturation color plane from the image when represented in HSL color
-   * space.
+   * Get the saturation color plane from the image when represented in HSL color space.
    *
    * @return The saturation color plane from the image.
    */
@@ -198,8 +191,7 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Get the saturation color plane from the image when represented in HSV color
-   * space.
+   * Get the saturation color plane from the image when represented in HSV color space.
    *
    * @return The saturation color plane from the image.
    */
@@ -208,8 +200,7 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Get the saturation color plane from the image when represented in HSI color
-   * space.
+   * Get the saturation color plane from the image when represented in HSI color space.
    *
    * @return The saturation color plane from the image.
    */
@@ -218,8 +209,7 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Get the luminance color plane from the image when represented in HSL color
-   * space.
+   * Get the luminance color plane from the image when represented in HSL color space.
    *
    * @return The luminance color plane from the image.
    */
@@ -228,8 +218,7 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Get the value color plane from the image when represented in HSV color
-   * space.
+   * Get the value color plane from the image when represented in HSV color space.
    *
    * @return The value color plane from the image.
    */
@@ -238,8 +227,7 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Get the intensity color plane from the image when represented in HSI color
-   * space.
+   * Get the intensity color plane from the image when represented in HSI color space.
    *
    * @return The intensity color plane from the image.
    */
@@ -266,9 +254,9 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Set the red color plane from the image when represented in RGB color space.
-   * This does not create a new image, but modifies this one instead. Create a
-   * copy before hand if you need to continue using the original.
+   * Set the red color plane from the image when represented in RGB color space. This does not
+   * create a new image, but modifies this one instead. Create a copy before hand if you need to
+   * continue using the original.
    *
    * @param plane The MonoImage representing the new color plane.
    * @return The resulting image.
@@ -278,9 +266,9 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Set the green color plane from the image when represented in RGB color
-   * space. This does not create a new image, but modifies this one instead.
-   * Create a copy before hand if you need to continue using the original.
+   * Set the green color plane from the image when represented in RGB color space. This does not
+   * create a new image, but modifies this one instead. Create a copy before hand if you need to
+   * continue using the original.
    *
    * @param plane The MonoImage representing the new color plane.
    * @return The resulting image.
@@ -290,9 +278,9 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Set the blue color plane from the image when represented in RGB color
-   * space. This does not create a new image, but modifies this one instead.
-   * Create a copy before hand if you need to continue using the original.
+   * Set the blue color plane from the image when represented in RGB color space. This does not
+   * create a new image, but modifies this one instead. Create a copy before hand if you need to
+   * continue using the original.
    *
    * @param plane The MonoImage representing the new color plane.
    * @return The resulting image.
@@ -302,9 +290,9 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Set the hue color plane from the image when represented in HSL color space.
-   * This does not create a new image, but modifies this one instead. Create a
-   * copy before hand if you need to continue using the original.
+   * Set the hue color plane from the image when represented in HSL color space. This does not
+   * create a new image, but modifies this one instead. Create a copy before hand if you need to
+   * continue using the original.
    *
    * @param plane The MonoImage representing the new color plane.
    * @return The resulting image.
@@ -314,9 +302,9 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Set the hue color plane from the image when represented in HSV color space.
-   * This does not create a new image, but modifies this one instead. Create a
-   * copy before hand if you need to continue using the original.
+   * Set the hue color plane from the image when represented in HSV color space. This does not
+   * create a new image, but modifies this one instead. Create a copy before hand if you need to
+   * continue using the original.
    *
    * @param plane The MonoImage representing the new color plane.
    * @return The resulting image.
@@ -326,9 +314,9 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Set the hue color plane from the image when represented in HSI color space.
-   * This does not create a new image, but modifies this one instead. Create a
-   * copy before hand if you need to continue using the original.
+   * Set the hue color plane from the image when represented in HSI color space. This does not
+   * create a new image, but modifies this one instead. Create a copy before hand if you need to
+   * continue using the original.
    *
    * @param plane The MonoImage representing the new color plane.
    * @return The resulting image.
@@ -338,9 +326,9 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Set the saturation color plane from the image when represented in HSL color
-   * space. This does not create a new image, but modifies this one instead.
-   * Create a copy before hand if you need to continue using the original.
+   * Set the saturation color plane from the image when represented in HSL color space. This does
+   * not create a new image, but modifies this one instead. Create a copy before hand if you need to
+   * continue using the original.
    *
    * @param plane The MonoImage representing the new color plane.
    * @return The resulting image.
@@ -350,9 +338,9 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Set the saturation color plane from the image when represented in HSV color
-   * space. This does not create a new image, but modifies this one instead.
-   * Create a copy before hand if you need to continue using the original.
+   * Set the saturation color plane from the image when represented in HSV color space. This does
+   * not create a new image, but modifies this one instead. Create a copy before hand if you need to
+   * continue using the original.
    *
    * @param plane The MonoImage representing the new color plane.
    * @return The resulting image.
@@ -362,9 +350,9 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Set the saturation color plane from the image when represented in HSI color
-   * space. This does not create a new image, but modifies this one instead.
-   * Create a copy before hand if you need to continue using the original.
+   * Set the saturation color plane from the image when represented in HSI color space. This does
+   * not create a new image, but modifies this one instead. Create a copy before hand if you need to
+   * continue using the original.
    *
    * @param plane The MonoImage representing the new color plane.
    * @return The resulting image.
@@ -374,9 +362,9 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Set the luminance color plane from the image when represented in HSL color
-   * space. This does not create a new image, but modifies this one instead.
-   * Create a copy before hand if you need to continue using the original.
+   * Set the luminance color plane from the image when represented in HSL color space. This does not
+   * create a new image, but modifies this one instead. Create a copy before hand if you need to
+   * continue using the original.
    *
    * @param plane The MonoImage representing the new color plane.
    * @return The resulting image.
@@ -386,9 +374,9 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Set the value color plane from the image when represented in HSV color
-   * space. This does not create a new image, but modifies this one instead.
-   * Create a copy before hand if you need to continue using the original.
+   * Set the value color plane from the image when represented in HSV color space. This does not
+   * create a new image, but modifies this one instead. Create a copy before hand if you need to
+   * continue using the original.
    *
    * @param plane The MonoImage representing the new color plane.
    * @return The resulting image.
@@ -398,9 +386,9 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Set the intensity color plane from the image when represented in HSI color
-   * space. This does not create a new image, but modifies this one instead.
-   * Create a copy before hand if you need to continue using the original.
+   * Set the intensity color plane from the image when represented in HSI color space. This does not
+   * create a new image, but modifies this one instead. Create a copy before hand if you need to
+   * continue using the original.
    *
    * @param plane The MonoImage representing the new color plane.
    * @return The resulting image.
@@ -410,10 +398,10 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Calculates the histogram of each plane of a color image and redistributes
-   * pixel values across the desired range while maintaining pixel value
-   * groupings. This does not create a new image, but modifies this one instead.
-   * Create a copy before hand if you need to continue using the original.
+   * Calculates the histogram of each plane of a color image and redistributes pixel values across
+   * the desired range while maintaining pixel value groupings. This does not create a new image,
+   * but modifies this one instead. Create a copy before hand if you need to continue using the
+   * original.
    *
    * @return The modified image.
    */
@@ -423,11 +411,10 @@ public abstract class ColorImage extends ImageBase {
   }
 
   /**
-   * Calculates the histogram of each plane of a color image and redistributes
-   * pixel values across the desired range while maintaining pixel value
-   * groupings for the Luminance plane only. This does not create a new image,
-   * but modifies this one instead. Create a copy before hand if you need to
-   * continue using the original.
+   * Calculates the histogram of each plane of a color image and redistributes pixel values across
+   * the desired range while maintaining pixel value groupings for the Luminance plane only. This
+   * does not create a new image, but modifies this one instead. Create a copy before hand if you
+   * need to continue using the original.
    *
    * @return The modified image.
    */

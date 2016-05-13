@@ -7,8 +7,6 @@
 
 package edu.wpi.first.wpilibj.test;
 
-import java.io.File;
-
 import org.apache.tools.ant.BuildLogger;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
@@ -16,15 +14,21 @@ import org.apache.tools.ant.taskdefs.optional.junit.FormatterElement;
 import org.apache.tools.ant.taskdefs.optional.junit.JUnitTask;
 import org.apache.tools.ant.taskdefs.optional.junit.JUnitTest;
 
+import java.io.File;
+
 /**
- * Provides an entry point for tests to run with ANT. This allows ant to output
- * JUnit XML test results for Jenkins.
- *$
- * @author jonathanleitschuh
+ * Provides an entry point for tests to run with ANT. This allows ant to output JUnit XML test
+ * results for Jenkins.
  *
+ * @author jonathanleitschuh
  */
 public class AntJunitLanucher {
 
+  /**
+   * Main entry point for jenkins
+   *
+   * @param args Arguments passed to java.
+   */
   public static void main(String... args) {
     if (args.length == 0) {
       String path =
@@ -35,7 +39,6 @@ public class AntJunitLanucher {
       try {
         // Create the file to store the test output
         new File(pathToReports).mkdirs();
-        JUnitTask task = new JUnitTask();
 
         project.setProperty("java.io.tmpdir", pathToReports);
 
@@ -46,6 +49,8 @@ public class AntJunitLanucher {
         formatToScreen.setType(typeScreen);
         formatToScreen.setUseFile(false);
         formatToScreen.setOutput(System.out);
+
+        JUnitTask task = new JUnitTask();
         task.addFormatter(formatToScreen);
 
         // add a build listener to the project
@@ -73,8 +78,8 @@ public class AntJunitLanucher {
 
         TestBench.out().println("Beginning Test Execution With ANT");
         task.execute();
-      } catch (Exception e) {
-        e.printStackTrace();
+      } catch (Exception ex) {
+        ex.printStackTrace();
       }
     } else {
       TestBench.out().println(

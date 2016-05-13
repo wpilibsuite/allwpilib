@@ -7,27 +7,24 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertTrue;
-
-import java.util.logging.Logger;
-
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.logging.Logger;
+
 import edu.wpi.first.wpilibj.fixtures.SampleFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
-import edu.wpi.first.wpilibj.CANTalon;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Sample test for a sample PID controller. This demonstrates the general
- * pattern of how to create a test and use testing fixtures and categories.
- *$
- * All tests must extend from {@link AbstractComsSetup} in order to ensure that
- * Network Communications are set up before the tests are run.
- *$
+ * Sample test for a sample PID controller. This demonstrates the general pattern of how to create a
+ * test and use testing fixtures and categories. All tests must extend from {@link
+ * AbstractComsSetup} in order to ensure that Network Communications are set up before the tests are
+ * run.
+ *
  * @author Fredric Silberberg
  */
 public class SampleTest extends AbstractComsSetup {
@@ -58,8 +55,8 @@ public class SampleTest extends AbstractComsSetup {
   }
 
   /**
-   * This is just a sample test that asserts true. Any traditional junit code
-   * can be used, these are ordinary junit tests!
+   * This is just a sample test that asserts true. Any traditional junit code can be used, these are
+   * ordinary junit tests!
    */
   @Test
   public void test() {
