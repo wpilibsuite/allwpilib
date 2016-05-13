@@ -345,7 +345,7 @@ void PIDController::SetSetpoint(float setpoint) {
         setpoint = m_minimumInput;
     }
     if(!(m_setpoint==setpoint)){
-    	m_setpoint = setpoint
+    	m_setpoint = setpoint;
         // Clear m_buf.
         m_buf = std::queue<double>();
         m_bufTotal = 0;
