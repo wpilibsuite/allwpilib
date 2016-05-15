@@ -80,7 +80,7 @@ task wpilibcSimCopy(type: Copy, dependsOn: allcsim) {
         into "include"
     }
 
-    from ("simulation/include"){
+    from ("sim/include"){
         into "include"
     }
 

@@ -35,5 +35,5 @@ endif()
 
 include_directories("build")
 add_subdirectory(simulation/gz_msgs)
-add_subdirectory(wpilibc/simulation)
+add_subdirectory(wpilibc/sim)
 add_subdirectory(simulation/frc_gazebo_plugins)
