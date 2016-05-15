@@ -499,19 +499,16 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   public synchronized void setSetpoint(double setpoint) {
     if (m_maximumInput > m_minimumInput) {
       if (setpoint > m_maximumInput) {
-        m_setpoint = m_maximumInput;
+        setpoint = m_maximumInput;
       } else if (setpoint < m_minimumInput) {
-        m_setpoint = m_minimumInput;
-      } else {
-        m_setpoint = setpoint;
-      }
-    } else {
-      m_setpoint = setpoint;
-    }
-
+        setpoint = m_minimumInput;
+      } 
+    } 
+    if(!(m_setpoint==setpoint)){
+    m_setpoint = setpoint;
     m_buf.clear();
     m_bufTotal = 0;
-
+    }
     if (table != null)
       table.putNumber("setpoint", m_setpoint);
   }
