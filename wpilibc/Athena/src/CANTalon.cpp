@@ -37,7 +37,6 @@ CANTalon::CANTalon(int deviceNumber)
       m_safetyHelper(new MotorSafetyHelper(this)) {
   ApplyControlMode(m_controlMode);
   m_impl->SetProfileSlotSelect(m_profile);
-  m_isInverted = false;
   LiveWindow::GetInstance()->AddActuator("CANTalon", m_deviceNumber, this);
 }
 /**
