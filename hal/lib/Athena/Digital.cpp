@@ -59,6 +59,15 @@ struct DigitalPort {
   uint32_t PWMGeneratorID;
 };
 
+struct PWMPort {
+  Port port;
+  int32_t maxPwm;
+  int32_t deadbandMaxPwm;
+  int32_t centerPwm;
+  int32_t deadbandMinPwm;
+  int32_t minPwm;
+};
+
 // Create a mutex to protect changes to the digital output values
 static priority_recursive_mutex digitalDIOMutex;
 // Create a mutex to protect changes to the relay values
@@ -187,8 +196,8 @@ void freeDigitalPort(void* digital_port_pointer) {
   delete port;
 }
 
-bool checkPWMChannel(void* digital_port_pointer) {
-  DigitalPort* port = (DigitalPort*) digital_port_pointer;
+bool checkPWMChannel(void* pwm_port_pointer) {
+  PWMPort* port = (PWMPort*) pwm_port_pointer;
   return port->port.pin < kPwmPins;
 }
 
@@ -204,7 +213,7 @@ bool checkRelayChannel(void* digital_port_pointer) {
  *
  * @return true if the port passed validation.
  */
-static bool verifyPWMChannel(DigitalPort *port, int32_t *status) {
+static bool verifyPWMChannel(PWMPort *port, int32_t *status) {
   if (port == NULL) {
     *status = NULL_PARAMETER;
     return false;
@@ -252,14 +261,62 @@ uint32_t remapMXPPWMChannel(uint32_t pin) {
 }
 
 /**
+ * Create a new instance of a pwm port.
+ */
+void* initializePWMPort(void* port_pointer, int32_t *status) {
+  initializeDigital(status);
+  Port* port = (Port*) port_pointer;
+
+  // Initialize port structure
+  PWMPort* pwm_port = new PWMPort();
+  pwm_port->port = *port;
+
+  return pwm_port;
+}
+
+void freePWMPort(void* pwm_port_pointer) {
+  PWMPort* port = (PWMPort*) pwm_port_pointer;
+  delete port;
+}
+
+void setPWMBoundsDouble(void* pwm_port_pointer, double max, double deadbandMax,
+                        double center, double deadbandMin, double min,
+                        int32_t *status) {
+  PWMPort* port = (PWMPort*) pwm_port_pointer;
+  double loopTime =
+      getLoopTiming(status) / (kSystemClockTicksPerMicrosecond * 1e3);
+      
+  if (*status != 0) return;
+  
+  port->maxPwm = (int32_t)((max - kDefaultPwmCenter) / loopTime +
+                       kDefaultPwmStepsDown - 1);
+  port->deadbandMaxPwm = (int32_t)((deadbandMax - kDefaultPwmCenter) / loopTime +
+                               kDefaultPwmStepsDown - 1);
+  port->centerPwm = (int32_t)((center - kDefaultPwmCenter) / loopTime +
+                          kDefaultPwmStepsDown - 1);
+  port->deadbandMinPwm = (int32_t)((deadbandMin - kDefaultPwmCenter) / loopTime +
+                               kDefaultPwmStepsDown - 1);
+  port->minPwm = (int32_t)((min - kDefaultPwmCenter) / loopTime +
+                       kDefaultPwmStepsDown - 1);
+}
+void setPWMBounds(void* pwm_port_pointer, int32_t *max, int32_t *deadbandMax,
+                  int32_t *center, int32_t *deadbandMin, int32_t *min) {
+  port->maxPwm = max;
+  port->deadbandMaxPwm = deadbandMax;
+  port->centerPwm = center;
+  port->deadbandMinPwm = deadbandMin;
+  port->minPwm = min;
+}
+
+/**
  * Set a PWM channel to the desired value. The values range from 0 to 255 and the period is controlled
  * by the PWM Period and MinHigh registers.
  *
  * @param channel The PWM channel to set.
  * @param value The PWM value to set.
  */
-void setPWM(void* digital_port_pointer, unsigned short value, int32_t *status) {
-  DigitalPort* port = (DigitalPort*) digital_port_pointer;
+void setPWM(void* pwm_port_pointer, unsigned short value, int32_t *status) {
+  PWMPort* port = (PWMPort*) pwm_port_pointer;
   if (!verifyPWMChannel(port, status)) { return; }
 
   if(port->port.pin < tPWM::kNumHdrRegisters) {
@@ -275,8 +332,8 @@ void setPWM(void* digital_port_pointer, unsigned short value, int32_t *status) {
  * @param channel The PWM channel to read from.
  * @return The raw PWM value.
  */
-unsigned short getPWM(void* digital_port_pointer, int32_t *status) {
-  DigitalPort* port = (DigitalPort*) digital_port_pointer;
+unsigned short getPWM(void* pwm_port_pointer, int32_t *status) {
+  PWMPort* port = (PWMPort*) pwm_port_pointer;
   if (!verifyPWMChannel(port, status)) { return 0; }
 
   if(port->port.pin < tPWM::kNumHdrRegisters) {
@@ -286,8 +343,8 @@ unsigned short getPWM(void* digital_port_pointer, int32_t *status) {
   }
 }
 
-void latchPWMZero(void* digital_port_pointer, int32_t *status) {
-	DigitalPort* port = (DigitalPort*) digital_port_pointer;
+void latchPWMZero(void* pwm_port_pointer, int32_t *status) {
+	PWMPort* port = (PWMPort*) pwm_port_pointer;
 	if (!verifyPWMChannel(port, status)) { return; }
 
 	pwmSystem->writeZeroLatch(port->port.pin, true, status);
@@ -300,8 +357,8 @@ void latchPWMZero(void* digital_port_pointer, int32_t *status) {
  * @param channel The PWM channel to configure.
  * @param squelchMask The 2-bit mask of outputs to squelch.
  */
-void setPWMPeriodScale(void* digital_port_pointer, uint32_t squelchMask, int32_t *status) {
-  DigitalPort* port = (DigitalPort*) digital_port_pointer;
+void setPWMPeriodScale(void* pwm_port_pointer, uint32_t squelchMask, int32_t *status) {
+  PWMPort* port = (PWMPort*) pwm_port_pointer;
   if (!verifyPWMChannel(port, status)) { return; }
 
   if(port->port.pin < tPWM::kNumPeriodScaleHdrElements) {
@@ -501,8 +558,8 @@ bool allocateDIO(void* digital_port_pointer, bool input, int32_t *status) {
   return true;
 }
 
-bool allocatePWMChannel(void* digital_port_pointer, int32_t *status) {
-	DigitalPort* port = (DigitalPort*) digital_port_pointer;
+bool allocatePWMChannel(void* pwm_port_pointer, int32_t *status) {
+	PWMPort* port = (PWMPort*) pwm_port_pointer;
 	if (!verifyPWMChannel(port, status)) { return false; }
 
 	char buf[64];
@@ -522,8 +579,8 @@ bool allocatePWMChannel(void* digital_port_pointer, int32_t *status) {
 	return true;
 }
 
-void freePWMChannel(void* digital_port_pointer, int32_t *status) {
-    DigitalPort* port = (DigitalPort*) digital_port_pointer;
+void freePWMChannel(void* pwm_port_pointer, int32_t *status) {
+    PWMPort* port = (PWMPort*) pwm_port_pointer;
     if (!port) return;
     if (!verifyPWMChannel(port, status)) { return; }
 
