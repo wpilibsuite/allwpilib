@@ -51,6 +51,10 @@ Changes should be submitted as a Pull Request against the master branch of WPILi
 
 When you first submit changes, Travis-CI will attempt to run `./gradlew check` on your change. If this fails, you will need to fix any issues that it sees. Once Travis passes, we will begin the review process in more earnest. One or more WPILib team members will review your change. This will be a back-and-forth process with the WPILib team and the greater community. Once we are satisfied that your change is ready, we will allow our Jenkins instance to test it. This will run the full gamut of checks, including integration tests on actual hardware. Once all tests have passed and the team is satisfied, we will merge your change into the WPILib repository.
 
+### New Features
+
+For new features being added to WPILib, we ask that before you start significant work on the feature, please submit a design document pull request to design-docs folder in this repository. This will allow the WPILib developers and community to review feature additions, determine whether the change is appropriate for WPILib, and whether there are changes that need to be made to the feature before it will be accepted. Additionally, this will help keep track of new changes and the decisions behind them for posterity.
+
 ## Licensing
 
 By contributing to WPILib, you agree that your code will be distributed with WPILib, and licensed under the license for the WPILib project. You should not contribute code that you do not have permission to relicense in this manner. This includes code that is licensed under the GPL that you do not have permission to relicense, as WPILib is not released under a copyleft license. Our license is the 3-clause BSD license, which you can find [here](license.txt).
