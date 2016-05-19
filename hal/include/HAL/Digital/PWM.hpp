@@ -16,11 +16,9 @@ extern "C"
                     int32_t center, int32_t deadbandMin, int32_t min);
   void setPWMEliminateDeadband(void* pwm_port_pointer, bool eliminateDeadband);
   bool getPWMEliminateDeadband(void* pwm_port_pointer);
-	void setPWMPosition(void* pwm_port_pointer, float value, int32_t *status);
-  void setPWMSpeed(void* pwm_port_pointer, float value, int32_t *status);
+  void setPWM(void* pwm_port_pointer, float value, int32_t *status);
   void setPWMRaw(void* pwm_port_pointer, unsigned short value, int32_t *status);
-  float getPWMPosition(void* pwm_port_pointer, int32_t *status);
-  float getPWMSpeed(void* pwm_port_pointer, int32_t *status);
+  float getPWM(void* pwm_port_pointer, int32_t *status);
   unsigned short getPWMRaw(void* pwm_port_pointer, int32_t *status);
 	bool allocatePWMChannel(void* pwm_port_pointer, int32_t *status);
 	void freePWMChannel(void* pwm_port_pointer, int32_t *status);

@@ -6,7 +6,8 @@
 
 static_assert(sizeof(uint32_t) <= sizeof(void *), "This file shoves uint32_ts into pointers.");
 
-
+extern "C"
+{
 int getMaxPositivePwm(PWMPort *port) {
     return port->maxPwm;
   }
@@ -148,54 +149,7 @@ bool getPWMEliminateDeadband(void* pwm_port_pointer) {
  * @param channel The PWM channel to set.
  * @param value The PWM value to set.
  */
-void setPWMPosition(void* pwm_port_pointer, float value, int32_t *status) {
-  PWMPort* port = (PWMPort*) pwm_port_pointer;
-  if (!verifyPWMChannel(port, status)) { return; }
-  
-  unsigned short rawValue = (unsigned short) 
-    ((value * (double) getFullRangeScaleFactor(port)) + getMinNegativePwm(port));
-
-  if(port->port.pin < tPWM::kNumHdrRegisters) {
-    pwmSystem->writeHdr(port->port.pin, rawValue, status);
-  } else {
-    pwmSystem->writeMXP(port->port.pin - tPWM::kNumHdrRegisters, rawValue, status);
-  }
-}
-
-/**
- * Get a value from a PWM channel. The values range from 0 to 255.
- *
- * @param channel The PWM channel to read from.
- * @return The raw PWM value.
- */
-float getPWMPosition(void* pwm_port_pointer, int32_t *status) {
-  PWMPort* port = (PWMPort*) pwm_port_pointer;
-  if (!verifyPWMChannel(port, status)) { return 0; }
-  
-  int value = 0;
-
-  if(port->port.pin < tPWM::kNumHdrRegisters) {
-    value = pwmSystem->readHdr(port->port.pin, status);
-  } else {
-    value = pwmSystem->readMXP(port->port.pin - tPWM::kNumHdrRegisters, status);
-  }
-  if (value < getMinNegativePwm(port)) {
-    return 0.0;
-  } else if (value > getMaxPositivePwm(port)) {
-    return 1.0;
-  } else {
-    return (double) (value - getMinNegativePwm(port)) / (double) getFullRangeScaleFactor(port);
-  }
-}
-
-/**
- * Set a PWM channel to the desired value. The values range from 0 to 255 and the period is controlled
- * by the PWM Period and MinHigh registers.
- *
- * @param channel The PWM channel to set.
- * @param value The PWM value to set.
- */
-void setPWMSpeed(void* pwm_port_pointer, float value, int32_t *status) {
+void setPWM(void* pwm_port_pointer, float value, int32_t *status) {
   PWMPort* port = (PWMPort*) pwm_port_pointer;
   if (!verifyPWMChannel(port, status)) { return; }
   
@@ -231,7 +185,7 @@ void setPWMSpeed(void* pwm_port_pointer, float value, int32_t *status) {
  * @param channel The PWM channel to read from.
  * @return The raw PWM value.
  */
-float getPWMSpeed(void* pwm_port_pointer, int32_t *status) {
+float getPWM(void* pwm_port_pointer, int32_t *status) {
   PWMPort* port = (PWMPort*) pwm_port_pointer;
   if (!verifyPWMChannel(port, status)) { return 0; }
   
@@ -243,14 +197,18 @@ float getPWMSpeed(void* pwm_port_pointer, int32_t *status) {
     value = pwmSystem->readMXP(port->port.pin - tPWM::kNumHdrRegisters, status);
   }
   
-  if (value > getMaxPositivePwm(port)) {
+  if (value == kPwmDisabled) {
+    return 0.0;
+  } else if (value > getMaxPositivePwm(port)) {
     return 1.0;
   } else if (value < getMinNegativePwm(port)) {
     return -1.0;
   } else if (value > getMinPositivePwm(port)) {
-    return (double) (value - getMinPositivePwm(port)) / (double) getPositiveScaleFactor(port);
+    return (float)(value - getMinPositivePwm(port)) /
+           (float)getPositiveScaleFactor(port);
   } else if (value < getMaxNegativePwm(port)) {
-    return (double) (value - getMaxNegativePwm(port)) / (double) getNegativeScaleFactor(port);
+    return (float)(value - getMaxNegativePwm(port)) /
+           (float)getNegativeScaleFactor(port);
   } else {
     return 0.0;
   }
@@ -351,3 +309,4 @@ void freePWMChannel(void* pwm_port_pointer, int32_t *status) {
         digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToUnset, status);
     }
 }
+} // extern "C"

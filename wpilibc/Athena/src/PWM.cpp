@@ -79,6 +79,7 @@ PWM::~PWM() {
 void PWM::EnableDeadbandElimination(bool eliminateDeadband) {
   if (StatusIsFatal()) return;
   m_eliminateDeadband = eliminateDeadband;
+  setPWMEliminateDeadband(m_pwm_ports[m_channel], eliminateDeadband);
 }
 
 /**
@@ -100,6 +101,8 @@ void PWM::SetBounds(int32_t max, int32_t deadbandMax, int32_t center,
   m_centerPwm = center;
   m_deadbandMinPwm = deadbandMin;
   m_minPwm = min;
+  setPWMBounds(m_pwm_ports[m_channel], max, deadbandMax, center, 
+               deadbandMin, min);
 }
 
 /**
@@ -133,6 +136,10 @@ void PWM::SetBounds(double max, double deadbandMax, double center,
                                kDefaultPwmStepsDown - 1);
   m_minPwm = (int32_t)((min - kDefaultPwmCenter) / loopTime +
                        kDefaultPwmStepsDown - 1);
+  status = 0;
+  setPWMBoundsDouble(m_pwm_ports[m_channel], max, deadbandMax, center, 
+                     deadbandMin, min, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
@@ -147,31 +154,20 @@ void PWM::SetBounds(double max, double deadbandMax, double center,
  */
 void PWM::SetPosition(float pos) {
   if (StatusIsFatal()) return;
-  int32_t status = 0;
-  setPWMPosition(m_pwm_ports[m_channel], pos, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
   
-  SetPWMPosition()
+  // clamp between 0 and 1.
   if (pos < 0.0) {
     pos = 0.0;
   } else if (pos > 1.0) {
     pos = 1.0;
   }
-
-  // note, need to perform the multiplication below as floating point before
-  // converting to int
-  unsigned short rawValue =
-      (int32_t)((pos * (float)GetFullRangeScaleFactor()) + GetMinNegativePwm());
-  //	printf("MinNegPWM: %d FullRangeScaleFactor: %d Raw value: %5d   Input
-  //value: %4.4f\n", GetMinNegativePwm(), GetFullRangeScaleFactor(), rawValue,
-  //pos);
-
-  //	wpi_assert((rawValue >= GetMinNegativePwm()) && (rawValue <=
-  //GetMaxPositivePwm()));
-  wpi_assert(rawValue != kPwmDisabled);
-
-  // send the computed pwm value to the FPGA
-  SetRaw((unsigned short)rawValue);
+  // scale to -1 to 1
+  pos = pos * 2;
+  pos = pos - 1;
+  
+  int32_t status = 0;
+  setPWM(m_pwm_ports[m_channel], pos, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
@@ -186,15 +182,17 @@ void PWM::SetPosition(float pos) {
  */
 float PWM::GetPosition() const {
   if (StatusIsFatal()) return 0.0;
-  int32_t value = GetRaw();
-  if (value < GetMinNegativePwm()) {
-    return 0.0;
-  } else if (value > GetMaxPositivePwm()) {
-    return 1.0;
-  } else {
-    return (float)(value - GetMinNegativePwm()) /
-           (float)GetFullRangeScaleFactor();
-  }
+  int32_t status = 0;
+  float value = getPWM(m_pwm_ports[m_channel], &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  if (StatusIsFatal()) return 0.0;
+  
+  // value returned is scaled -1 to 1.
+  // scale from 0 to -1 instead.
+  value = value + 1;
+  value = value / 2.0f;
+  
+  return value;
 }
 
 /**
@@ -218,26 +216,10 @@ void PWM::SetSpeed(float speed) {
   } else if (speed > 1.0) {
     speed = 1.0;
   }
-
-  // calculate the desired output pwm value by scaling the speed appropriately
-  int32_t rawValue;
-  if (speed == 0.0) {
-    rawValue = GetCenterPwm();
-  } else if (speed > 0.0) {
-    rawValue = (int32_t)(speed * ((float)GetPositiveScaleFactor()) +
-                         ((float)GetMinPositivePwm()) + 0.5);
-  } else {
-    rawValue = (int32_t)(speed * ((float)GetNegativeScaleFactor()) +
-                         ((float)GetMaxNegativePwm()) + 0.5);
-  }
-
-  // the above should result in a pwm_value in the valid range
-  wpi_assert((rawValue >= GetMinNegativePwm()) &&
-             (rawValue <= GetMaxPositivePwm()));
-  wpi_assert(rawValue != kPwmDisabled);
-
-  // send the computed pwm value to the FPGA
-  SetRaw(rawValue);
+  
+  int32_t status = 0;
+  setPWM(m_pwm_ports[m_channel], speed, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
@@ -254,22 +236,10 @@ void PWM::SetSpeed(float speed) {
  */
 float PWM::GetSpeed() const {
   if (StatusIsFatal()) return 0.0;
-  int32_t value = GetRaw();
-  if (value == PWM::kPwmDisabled) {
-    return 0.0;
-  } else if (value > GetMaxPositivePwm()) {
-    return 1.0;
-  } else if (value < GetMinNegativePwm()) {
-    return -1.0;
-  } else if (value > GetMinPositivePwm()) {
-    return (float)(value - GetMinPositivePwm()) /
-           (float)GetPositiveScaleFactor();
-  } else if (value < GetMaxNegativePwm()) {
-    return (float)(value - GetMaxNegativePwm()) /
-           (float)GetNegativeScaleFactor();
-  } else {
-    return 0.0;
-  }
+  int32_t status = 0;
+  float value = getPWM(m_pwm_ports[m_channel], &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  return value;
 }
 
 /**
@@ -283,7 +253,7 @@ void PWM::SetRaw(unsigned short value) {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;
-  setPWM(m_pwm_ports[m_channel], value, &status);
+  setPWMRaw(m_pwm_ports[m_channel], value, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
@@ -298,7 +268,7 @@ unsigned short PWM::GetRaw() const {
   if (StatusIsFatal()) return 0;
 
   int32_t status = 0;
-  unsigned short value = getPWM(m_pwm_ports[m_channel], &status);
+  unsigned short value = getPWMRaw(m_pwm_ports[m_channel], &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
   return value;
