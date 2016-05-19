@@ -43,7 +43,7 @@ PWM::PWM(uint32_t channel) {
 
   m_channel = channel;
 
-  setPWM(m_pwm_ports[m_channel], kPwmDisabled, &status);
+  setPWMRaw(m_pwm_ports[m_channel], kPwmDisabled, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
   m_eliminateDeadband = false;
@@ -59,7 +59,7 @@ PWM::PWM(uint32_t channel) {
 PWM::~PWM() {
   int32_t status = 0;
 
-  setPWM(m_pwm_ports[m_channel], kPwmDisabled, &status);
+  setPWMRaw(m_pwm_ports[m_channel], kPwmDisabled, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
   freePWMChannel(m_pwm_ports[m_channel], &status);
@@ -147,6 +147,11 @@ void PWM::SetBounds(double max, double deadbandMax, double center,
  */
 void PWM::SetPosition(float pos) {
   if (StatusIsFatal()) return;
+  int32_t status = 0;
+  setPWMPosition(m_pwm_ports[m_channel], pos, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  
+  SetPWMPosition()
   if (pos < 0.0) {
     pos = 0.0;
   } else if (pos > 1.0) {

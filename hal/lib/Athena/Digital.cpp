@@ -7,6 +7,9 @@
 
 #include "HAL/Digital.hpp"
 
+#include "DigitalInternal.hpp"
+#include "HAL/Digital/PWM.hpp"
+
 #include "HAL/Port.h"
 #include "HAL/HAL.hpp"
 #include "ChipObject.h"
@@ -21,68 +24,29 @@
 
 static_assert(sizeof(uint32_t) <= sizeof(void *), "This file shoves uint32_ts into pointers.");
 
-static const uint32_t kExpectedLoopTiming = 40;
-static const uint32_t kDigitalPins = 26;
-static const uint32_t kPwmPins = 20;
-static const uint32_t kRelayPins = 8;
-static const uint32_t kNumHeaders = 10; // Number of non-MXP pins
 
-/**
- * kDefaultPwmPeriod is in ms
- *
- * - 20ms periods (50 Hz) are the "safest" setting in that this works for all devices
- * - 20ms periods seem to be desirable for Vex Motors
- * - 20ms periods are the specified period for HS-322HD servos, but work reliably down
- *      to 10.0 ms; starting at about 8.5ms, the servo sometimes hums and get hot;
- *      by 5.0ms the hum is nearly continuous
- * - 10ms periods work well for Victor 884
- * - 5ms periods allows higher update rates for Luminary Micro Jaguar speed controllers.
- *      Due to the shipping firmware on the Jaguar, we can't run the update period less
- *      than 5.05 ms.
- *
- * kDefaultPwmPeriod is the 1x period (5.05 ms).  In hardware, the period scaling is implemented as an
- * output squelch to get longer periods for old devices.
- */
-static const float kDefaultPwmPeriod = 5.05;
-/**
- * kDefaultPwmCenter is the PWM range center in ms
- */
-static const float kDefaultPwmCenter = 1.5;
-/**
- * kDefaultPWMStepsDown is the number of PWM steps below the centerpoint
- */
-static const int32_t kDefaultPwmStepsDown = 1000;
-static const int32_t kPwmDisabled = 0;
 
 struct DigitalPort {
   Port port;
   uint32_t PWMGeneratorID;
 };
 
-struct PWMPort {
-  Port port;
-  int32_t maxPwm;
-  int32_t deadbandMaxPwm;
-  int32_t centerPwm;
-  int32_t deadbandMinPwm;
-  int32_t minPwm;
-};
 
 // Create a mutex to protect changes to the digital output values
-static priority_recursive_mutex digitalDIOMutex;
+priority_recursive_mutex digitalDIOMutex;
 // Create a mutex to protect changes to the relay values
-static priority_recursive_mutex digitalRelayMutex;
+priority_recursive_mutex digitalRelayMutex;
 // Create a mutex to protect changes to the DO PWM config
-static priority_recursive_mutex digitalPwmMutex;
-static priority_recursive_mutex digitalI2COnBoardMutex;
-static priority_recursive_mutex digitalI2CMXPMutex;
+priority_recursive_mutex digitalPwmMutex;
+priority_recursive_mutex digitalI2COnBoardMutex;
+priority_recursive_mutex digitalI2CMXPMutex;
 
-static tDIO* digitalSystem = NULL;
-static tRelay* relaySystem = NULL;
-static tPWM* pwmSystem = NULL;
-static hal::Resource *DIOChannels = NULL;
-static hal::Resource *DO_PWMGenerators = NULL;
-static hal::Resource *PWMChannels = NULL;
+tDIO* digitalSystem = NULL;
+tRelay* relaySystem = NULL;
+tPWM* pwmSystem = NULL;
+hal::Resource *DIOChannels = NULL;
+hal::Resource *DO_PWMGenerators = NULL;
+hal::Resource *PWMChannels = NULL;
 
 static bool digitalSystemsInitialized = false;
 
@@ -167,10 +131,10 @@ void initializeDigital(int32_t *status) {
   // Ensure that PWM output values are set to OFF
   for (uint32_t pwm_index = 0; pwm_index < kPwmPins; pwm_index++) {
     // Initialize port structure
-    DigitalPort digital_port;
+    PWMPort digital_port;
     digital_port.port.pin = pwm_index;
 
-    setPWM(&digital_port, kPwmDisabled, status);
+    setPWMRaw(&digital_port, kPwmDisabled, status);
     setPWMPeriodScale(&digital_port, 3, status); // Set all to 4x by default.
   }
 
@@ -196,34 +160,12 @@ void freeDigitalPort(void* digital_port_pointer) {
   delete port;
 }
 
-bool checkPWMChannel(void* pwm_port_pointer) {
-  PWMPort* port = (PWMPort*) pwm_port_pointer;
-  return port->port.pin < kPwmPins;
-}
-
 bool checkRelayChannel(void* digital_port_pointer) {
   DigitalPort* port = (DigitalPort*) digital_port_pointer;
   return port->port.pin < kRelayPins;
 }
 
-/**
- * Check a port to make sure that it is not NULL and is a valid PWM port.
- *
- * Sets the status to contain the appropriate error.
- *
- * @return true if the port passed validation.
- */
-static bool verifyPWMChannel(PWMPort *port, int32_t *status) {
-  if (port == NULL) {
-    *status = NULL_PARAMETER;
-    return false;
-  } else if (!checkPWMChannel(port)) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    return false;
-  } else {
-    return true;
-  }
-}
+
 
 /**
  * Check a port to make sure that it is not NULL and is a valid Relay port.
@@ -250,122 +192,6 @@ static bool verifyRelayChannel(DigitalPort *port, int32_t *status) {
  */
 uint32_t remapMXPChannel(uint32_t pin) {
     return pin - 10;
-}
-
-uint32_t remapMXPPWMChannel(uint32_t pin) {
-	if(pin < 14) {
-		return pin - 10;	//first block of 4 pwms (MXP 0-3)
-	} else {
-		return pin - 6;	//block of PWMs after SPI
-	}
-}
-
-/**
- * Create a new instance of a pwm port.
- */
-void* initializePWMPort(void* port_pointer, int32_t *status) {
-  initializeDigital(status);
-  Port* port = (Port*) port_pointer;
-
-  // Initialize port structure
-  PWMPort* pwm_port = new PWMPort();
-  pwm_port->port = *port;
-
-  return pwm_port;
-}
-
-void freePWMPort(void* pwm_port_pointer) {
-  PWMPort* port = (PWMPort*) pwm_port_pointer;
-  delete port;
-}
-
-void setPWMBoundsDouble(void* pwm_port_pointer, double max, double deadbandMax,
-                        double center, double deadbandMin, double min,
-                        int32_t *status) {
-  PWMPort* port = (PWMPort*) pwm_port_pointer;
-  double loopTime =
-      getLoopTiming(status) / (kSystemClockTicksPerMicrosecond * 1e3);
-      
-  if (*status != 0) return;
-  
-  port->maxPwm = (int32_t)((max - kDefaultPwmCenter) / loopTime +
-                       kDefaultPwmStepsDown - 1);
-  port->deadbandMaxPwm = (int32_t)((deadbandMax - kDefaultPwmCenter) / loopTime +
-                               kDefaultPwmStepsDown - 1);
-  port->centerPwm = (int32_t)((center - kDefaultPwmCenter) / loopTime +
-                          kDefaultPwmStepsDown - 1);
-  port->deadbandMinPwm = (int32_t)((deadbandMin - kDefaultPwmCenter) / loopTime +
-                               kDefaultPwmStepsDown - 1);
-  port->minPwm = (int32_t)((min - kDefaultPwmCenter) / loopTime +
-                       kDefaultPwmStepsDown - 1);
-}
-void setPWMBounds(void* pwm_port_pointer, int32_t *max, int32_t *deadbandMax,
-                  int32_t *center, int32_t *deadbandMin, int32_t *min) {
-  port->maxPwm = max;
-  port->deadbandMaxPwm = deadbandMax;
-  port->centerPwm = center;
-  port->deadbandMinPwm = deadbandMin;
-  port->minPwm = min;
-}
-
-/**
- * Set a PWM channel to the desired value. The values range from 0 to 255 and the period is controlled
- * by the PWM Period and MinHigh registers.
- *
- * @param channel The PWM channel to set.
- * @param value The PWM value to set.
- */
-void setPWM(void* pwm_port_pointer, unsigned short value, int32_t *status) {
-  PWMPort* port = (PWMPort*) pwm_port_pointer;
-  if (!verifyPWMChannel(port, status)) { return; }
-
-  if(port->port.pin < tPWM::kNumHdrRegisters) {
-    pwmSystem->writeHdr(port->port.pin, value, status);
-  } else {
-    pwmSystem->writeMXP(port->port.pin - tPWM::kNumHdrRegisters, value, status);
-  }
-}
-
-/**
- * Get a value from a PWM channel. The values range from 0 to 255.
- *
- * @param channel The PWM channel to read from.
- * @return The raw PWM value.
- */
-unsigned short getPWM(void* pwm_port_pointer, int32_t *status) {
-  PWMPort* port = (PWMPort*) pwm_port_pointer;
-  if (!verifyPWMChannel(port, status)) { return 0; }
-
-  if(port->port.pin < tPWM::kNumHdrRegisters) {
-    return pwmSystem->readHdr(port->port.pin, status);
-  } else {
-    return pwmSystem->readMXP(port->port.pin - tPWM::kNumHdrRegisters, status);
-  }
-}
-
-void latchPWMZero(void* pwm_port_pointer, int32_t *status) {
-	PWMPort* port = (PWMPort*) pwm_port_pointer;
-	if (!verifyPWMChannel(port, status)) { return; }
-
-	pwmSystem->writeZeroLatch(port->port.pin, true, status);
-	pwmSystem->writeZeroLatch(port->port.pin, false, status);
-}
-
-/**
- * Set how how often the PWM signal is squelched, thus scaling the period.
- *
- * @param channel The PWM channel to configure.
- * @param squelchMask The 2-bit mask of outputs to squelch.
- */
-void setPWMPeriodScale(void* pwm_port_pointer, uint32_t squelchMask, int32_t *status) {
-  PWMPort* port = (PWMPort*) pwm_port_pointer;
-  if (!verifyPWMChannel(port, status)) { return; }
-
-  if(port->port.pin < tPWM::kNumPeriodScaleHdrElements) {
-    pwmSystem->writePeriodScaleHdr(port->port.pin, squelchMask, status);
-  } else {
-    pwmSystem->writePeriodScaleMXP(port->port.pin - tPWM::kNumPeriodScaleHdrElements, squelchMask, status);
-  }
 }
 
 /**
@@ -556,41 +382,6 @@ bool allocateDIO(void* digital_port_pointer, bool input, int32_t *status) {
     digitalSystem->writeOutputEnable(outputEnable, status);
   }
   return true;
-}
-
-bool allocatePWMChannel(void* pwm_port_pointer, int32_t *status) {
-	PWMPort* port = (PWMPort*) pwm_port_pointer;
-	if (!verifyPWMChannel(port, status)) { return false; }
-
-	char buf[64];
-	snprintf(buf, 64, "PWM %d", port->port.pin);
-	if (PWMChannels->Allocate(port->port.pin, buf) == ~0ul) {
-		*status = RESOURCE_IS_ALLOCATED;
-		return false;
-    }
-
-	if (port->port.pin > tPWM::kNumHdrRegisters-1) {
-		snprintf(buf, 64, "PWM %d and DIO %d", port->port.pin, remapMXPPWMChannel(port->port.pin) + 10);
-		if (DIOChannels->Allocate(remapMXPPWMChannel(port->port.pin) + 10, buf) == ~0ul) return false;
-		uint32_t bitToSet = 1 << remapMXPPWMChannel(port->port.pin);
-		short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
-		digitalSystem->writeEnableMXPSpecialFunction(specialFunctions | bitToSet, status);
-	}
-	return true;
-}
-
-void freePWMChannel(void* pwm_port_pointer, int32_t *status) {
-    PWMPort* port = (PWMPort*) pwm_port_pointer;
-    if (!port) return;
-    if (!verifyPWMChannel(port, status)) { return; }
-
-    PWMChannels->Free(port->port.pin);
-    if(port->port.pin > tPWM::kNumHdrRegisters-1) {
-        DIOChannels->Free(remapMXPPWMChannel(port->port.pin) + 10);
-        uint32_t bitToUnset = 1 << remapMXPPWMChannel(port->port.pin);
-        short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
-        digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToUnset, status);
-    }
 }
 
 /**

@@ -17,22 +17,9 @@ extern "C"
 {
 	void* initializeDigitalPort(void* port_pointer, int32_t *status);
 	void freeDigitalPort(void* digital_port_pointer);
-	bool checkPWMChannel(void* digital_port_pointer);
+	
 	bool checkRelayChannel(void* digital_port_pointer);
-
-  void* initializePWMPort(void* port_pointer, int32_t *status);
-  void freePWMPort(void* pwm_port_pointer);
-  void setPWMBoundsDouble(void* pwm_port_pointer, double max, double deadbandMax, 
-                          double center, double deadbandMinPwm, double minPwm,
-                          int32_t *status);
-  void setPWMBounds(void* pwm_port_pointer, int32_t *max, int32_t *deadbandMax,
-                    int32_t *center, int32_t *deadbandMin, int32_t *min);
-	void setPWM(void* pwm_port_pointer, unsigned short value, int32_t *status);
-	bool allocatePWMChannel(void* pwm_port_pointer, int32_t *status);
-	void freePWMChannel(void* pwm_port_pointer, int32_t *status);
-	unsigned short getPWM(void* pwm_port_pointer, int32_t *status);
-	void latchPWMZero(void* pwm_port_pointer, int32_t *status);
-	void setPWMPeriodScale(void* pwm_port_pointer, uint32_t squelchMask, int32_t *status);
+  
 	void* allocatePWM(int32_t *status);
 	void freePWM(void* pwmGenerator, int32_t *status);
 	void setPWMRate(double rate, int32_t *status);

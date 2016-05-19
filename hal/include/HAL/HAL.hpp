@@ -12,6 +12,7 @@
 #include "Analog.hpp"
 #include "Compressor.hpp"
 #include "Digital.hpp"
+#include "Digital/PWM.hpp"
 #include "Solenoid.hpp"
 #include "Notifier.hpp"
 #include "Interrupts.hpp"
