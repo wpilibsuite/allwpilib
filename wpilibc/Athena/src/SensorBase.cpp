@@ -51,7 +51,7 @@ SensorBase::SensorBase() {
     for (uint32_t i = 0; i < kPwmChannels; i++) {
       void* port = getPort(i);
       int32_t status = 0;
-      m_pwm_ports[i] = initializeDigitalPort(port, &status);
+      m_pwm_ports[i] = initializePWMPort(port, &status);
       wpi_setErrorWithContext(status, getHALErrorMessage(status));
       freePort(port);
     }
