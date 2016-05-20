@@ -7,15 +7,16 @@
 
 package edu.wpi.first.wpilibj.fixtures;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.mockhardware.FakeEncoderSource;
 
 /**
- * @author jonathanleitschuh
+ * An encoder that uses two {@link DIOCrossConnectFixture DIOCrossConnectFixtures} to test the
+ * {@link Encoder}.
  *
+ * @author jonathanleitschuh
  */
 public class FakeEncoderFixture implements ITestFixture {
   private static final Logger logger = Logger.getLogger(FakeEncoderFixture.class.getName());
@@ -25,33 +26,25 @@ public class FakeEncoderFixture implements ITestFixture {
   private boolean m_allocated;
 
   private final FakeEncoderSource m_source;
-  private int m_sourcePort[] = new int[2];
+  private int[] m_sourcePort = new int[2];
   private final Encoder m_encoder;
-  private int m_encoderPort[] = new int[2];
+  private int[] m_encoderPort = new int[2];
 
   /**
-   * Constructs a FakeEncoderFixture from two DIOCrossConnectFixture
-   *$
-   * @param dio1
-   * @param dio2
+   * Constructs a FakeEncoderFixture from two DIOCrossConnectFixture.
    */
   public FakeEncoderFixture(DIOCrossConnectFixture dio1, DIOCrossConnectFixture dio2) {
     assert dio1 != null;
     assert dio2 != null;
-    this.m_dio1 = dio1;
-    this.m_dio2 = dio2;
+    m_dio1 = dio1;
+    m_dio2 = dio2;
     m_allocated = false;
     m_source = new FakeEncoderSource(dio1.getOutput(), dio2.getOutput());
     m_encoder = new Encoder(dio1.getInput(), dio2.getInput());
   }
 
   /**
-   * Construcst a FakeEncoderFixture from a set of Digital I/O ports
-   *$
-   * @param inputA
-   * @param outputA
-   * @param inputB
-   * @param outputB
+   * Construcst a FakeEncoderFixture from a set of Digital I/O ports.
    */
   public FakeEncoderFixture(int inputA, int outputA, int inputB, int outputB) {
     assert outputA != outputB;
@@ -60,8 +53,8 @@ public class FakeEncoderFixture implements ITestFixture {
     assert outputB != inputA;
     assert outputB != inputB;
     assert inputA != inputB;
-    this.m_dio1 = new DIOCrossConnectFixture(inputA, outputA);
-    this.m_dio2 = new DIOCrossConnectFixture(inputB, outputB);
+    m_dio1 = new DIOCrossConnectFixture(inputA, outputA);
+    m_dio2 = new DIOCrossConnectFixture(inputB, outputB);
     m_allocated = true;
     m_sourcePort[0] = outputA;
     m_sourcePort[1] = outputB;
@@ -81,7 +74,7 @@ public class FakeEncoderFixture implements ITestFixture {
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#setup()
    */
   @Override
@@ -91,7 +84,7 @@ public class FakeEncoderFixture implements ITestFixture {
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#reset()
    */
   @Override
@@ -104,7 +97,7 @@ public class FakeEncoderFixture implements ITestFixture {
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#teardown()
    */
   @Override

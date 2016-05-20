@@ -8,9 +8,9 @@
 package edu.wpi.first.wpilibj.hal;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.FileOutputStream;
 
 //
 // base class for all JNI wrappers
@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 public class JNIWrapper {
   static boolean libraryLoaded = false;
   static File jniLibrary = null;
+
   static {
     try {
       if (!libraryLoaded) {
@@ -62,5 +63,5 @@ public class JNIWrapper {
 
   public static native long getPort(byte pin);
 
-  public static native void freePort(long port_pointer);
+  public static native void freePort(long portPointer);
 }

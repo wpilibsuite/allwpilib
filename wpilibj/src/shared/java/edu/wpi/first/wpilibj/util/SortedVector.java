@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj.util;
 import java.util.Vector;
 
 /**
+ * A vector that is sorted.
  *
  * @author dtjones
  */
@@ -18,34 +19,36 @@ public class SortedVector extends Vector {
   /**
    * Interface used to determine the order to place sorted objects.
    */
-  public static interface Comparator {
+  public interface Comparator {
 
     /**
      * Compare the given two objects.
-     *$
+     *
+     * <p>Should return -1, 0, or 1 if the first object is less than, equal to, or greater than the
+     * second, respectively.
+     *
      * @param object1 First object to compare
      * @param object2 Second object to compare
-     * @return -1, 0, or 1 if the first object is less than, equal to, or
-     *         greater than the second, respectively
+     * @return -1, 0, or 1.
      */
-    public int compare(Object object1, Object object2);
+    int compare(Object object1, Object object2);
   }
 
-  Comparator comparator;
+  private final Comparator m_comparator;
 
   /**
    * Create a new sorted vector and use the given comparator to determine order.
-   *$
-   * @param comparator The comparator to use to determine what order to place
-   *        the elements in this vector.
+   *
+   * @param comparator The comparator to use to determine what order to place the elements in this
+   *                   vector.
    */
   public SortedVector(Comparator comparator) {
-    this.comparator = comparator;
+    m_comparator = comparator;
   }
 
   /**
    * Adds an element in the Vector, sorted from greatest to least.
-   *$
+   *
    * @param element The element to add to the Vector
    */
   public void addElement(Object element) {
@@ -53,7 +56,7 @@ public class SortedVector extends Vector {
     int lowBound = 0;
     while (highBound - lowBound > 0) {
       int index = (highBound + lowBound) / 2;
-      int result = comparator.compare(element, elementAt(index));
+      int result = m_comparator.compare(element, elementAt(index));
       if (result < 0) {
         lowBound = index + 1;
       } else if (result > 0) {

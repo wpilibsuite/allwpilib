@@ -8,18 +8,19 @@
 package edu.wpi.first.wpilibj;
 
 /**
- * A description for the type of output value to provide to a PIDController
+ * A description for the type of output value to provide to a PIDController.
  */
 public enum PIDSourceType {
   kDisplacement(0),
   kRate(1);
 
   /**
-   * The integer value representing this enumeration
+   * The integer value representing this enumeration.
    */
+  @SuppressWarnings("MemberName")
   public final int value;
 
-  private PIDSourceType(int value) {
+  PIDSourceType(int value) {
     this.value = value;
   }
 }

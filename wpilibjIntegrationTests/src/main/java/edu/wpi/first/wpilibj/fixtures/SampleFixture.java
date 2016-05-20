@@ -9,17 +9,13 @@ package edu.wpi.first.wpilibj.fixtures;
 
 
 /**
- * This is an example of how to use the {@link ITestFixture} interface to create
- * test fixtures for a test.
- *$
+ * This is an example of how to use the {@link ITestFixture} interface to create test fixtures for a
+ * test.
+ *
  * @author Fredric Silberberg
- *$
  */
 public class SampleFixture implements ITestFixture {
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean setup() {
     /*
@@ -42,9 +38,6 @@ public class SampleFixture implements ITestFixture {
     return false;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean teardown() {
     /*

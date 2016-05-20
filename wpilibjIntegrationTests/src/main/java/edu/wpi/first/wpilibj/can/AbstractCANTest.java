@@ -18,12 +18,10 @@ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
 
 /**
- * Provides a base implementation for CAN Tests that forces a test of a
- * particular mode to provide tests of a certain type. This also allows for a
- * standardized base setup for each test.
- *$
- * @author jonathanleitschuh
+ * Provides a base implementation for CAN Tests that forces a test of a particular mode to provide
+ * tests of a certain type. This also allows for a standardized base setup for each test.
  *
+ * @author jonathanleitschuh
  */
 public abstract class AbstractCANTest extends AbstractComsSetup {
   public static final double kMotorStopTime = 2;
@@ -36,27 +34,26 @@ public abstract class AbstractCANTest extends AbstractComsSetup {
   public static final double kStartupTime = 0.50;
   public static final double kEncoderPositionTolerance = .75;
   public static final double kPotentiometerPositionTolerance = 10.0 / 360.0; // +/-10
-                                                                             // degrees
+  // degrees
   public static final double kCurrentTolerance = 0.1;
 
 
   /**
-   * Stores the status value for the previous test. This is set immediately
-   * after a failure or success and before the me is torn down.
+   * Stores the status value for the previous test. This is set immediately after a failure or
+   * success and before the me is torn down.
    */
-  private String status = "";
+  private String m_status = "";
 
   /**
-   * Extends the default test watcher in order to provide more information about
-   * a tests failure at runtime.
-   *$
-   * @author jonathanleitschuh
+   * Extends the default test watcher in order to provide more information about a tests failure at
+   * runtime.
    *
+   * @author jonathanleitschuh
    */
   public class CANTestWatcher extends DefaultTestWatcher {
     @Override
-    protected void failed(Throwable e, Description description) {
-      super.failed(e, description, status);
+    protected void failed(Throwable exception, Description description) {
+      super.failed(exception, description, m_status);
     }
   }
 
@@ -65,27 +62,29 @@ public abstract class AbstractCANTest extends AbstractComsSetup {
     return new CANTestWatcher();
   }
 
-  /** The Fixture under test */
-  private CANMotorEncoderFixture me;
+  /**
+   * The Fixture under test.
+   */
+  private CANMotorEncoderFixture m_me;
 
   /**
-   * Retrieves the CANMotorEncoderFixture
-   *$
+   * Retrieves the CANMotorEncoderFixture.
+   *
    * @return the CANMotorEncoderFixture for this test.
    */
   public CANMotorEncoderFixture getME() {
-    return me;
+    return m_me;
   }
 
   /**
-   * This runs BEFORE the setup of the inherited class
+   * This runs BEFORE the setup of the inherited class.
    */
   @Before
   public final void preSetup() {
-    status = "";
-    me = TestBench.getInstance().getCanJaguarPair();
-    me.setup();
-    me.getMotor().setSafetyEnabled(false);
+    m_status = "";
+    m_me = TestBench.getInstance().getCanJaguarPair();
+    m_me.setup();
+    m_me.getMotor().setSafetyEnabled(false);
   }
 
   @After
@@ -93,11 +92,11 @@ public abstract class AbstractCANTest extends AbstractComsSetup {
     try {
       // Stores the status data before tearing it down.
       // If the test fails unexpectedly then this could cause an exception.
-      status = me.printStatus();
+      m_status = m_me.printStatus();
     } finally {
-      me.teardown();
+      m_me.teardown();
     }
-    me = null;
+    m_me = null;
   }
 
   protected void setCANJaguar(double seconds, double value) {

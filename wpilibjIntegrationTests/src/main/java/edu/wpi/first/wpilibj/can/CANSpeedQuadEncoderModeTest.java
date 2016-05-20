@@ -7,30 +7,35 @@
 
 package edu.wpi.first.wpilibj.can;
 
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.logging.Logger;
+
+import edu.wpi.first.wpilibj.CANJaguar;
+import edu.wpi.first.wpilibj.Timer;
+
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-import java.util.logging.Logger;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import edu.wpi.first.wpilibj.CANJaguar;
-import edu.wpi.first.wpilibj.Timer;
-
 /**
- * @author jonathanleitschuh
+ * Tests the CAN Speed controllers in quad mode.
  *
+ * @author jonathanleitschuh
  */
 public class CANSpeedQuadEncoderModeTest extends AbstractCANTest {
   private static final Logger logger = Logger.getLogger(CANPercentQuadEncoderModeTest.class
       .getName());
-  /** The stopped value in rev/min */
+  /**
+   * The stopped value in rev/min.
+   */
   private static final double kStoppedValue = 0;
-  /** The running value in rev/min */
+  /**
+   * The running value in rev/min.
+   */
   private static final double kRunningValue = 50;
 
   @Override
@@ -49,14 +54,14 @@ public class CANSpeedQuadEncoderModeTest extends AbstractCANTest {
 
   @Test
   public void testDefaultSpeed() {
-    assertEquals("CAN Jaguar did not start with an initial speed of zero", 0.0f, getME().getMotor()
+    assertEquals("CAN Jaguar did not start with an initial speed of zero", 0.0f, getME()
+        .getMotor()
         .getSpeed(), 0.3f);
   }
 
 
   /**
-   * Test if we can drive the motor forward in Speed mode and get a position
-   * back
+   * Test if we can drive the motor forward in Speed mode and get a position back.
    */
   @Test
   public void testRotateForwardSpeed() {
@@ -70,8 +75,7 @@ public class CANSpeedQuadEncoderModeTest extends AbstractCANTest {
   }
 
   /**
-   * Test if we can drive the motor backwards in Speed mode and get a position
-   * back
+   * Test if we can drive the motor backwards in Speed mode and get a position back.
    */
   @Test
   public void testRotateReverseSpeed() {
@@ -80,7 +84,8 @@ public class CANSpeedQuadEncoderModeTest extends AbstractCANTest {
     setCANJaguar(2 * kMotorTime, speed);
     assertEquals("The motor did not reach the required speed in speed mode", speed, getME()
         .getMotor().getSpeed(), kEncoderSpeedTolerance);
-    assertThat("The motor did not move in reverse in speed mode", getME().getMotor().getPosition(),
+    assertThat("The motor did not move in reverse in speed mode", getME().getMotor()
+        .getPosition(),
         is(lessThan(initialPosition)));
   }
 

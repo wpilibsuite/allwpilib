@@ -9,48 +9,50 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.util.BaseSystemNotInitializedException;
 
+@SuppressWarnings("JavadocMethod")
 public class RobotState {
-  private static Interface impl;
+  private static Interface m_impl;
 
-  public static void SetImplementation(Interface i) {
-    impl = i;
+  @SuppressWarnings("MethodName")
+  public static void SetImplementation(Interface implementation) {
+    m_impl = implementation;
   }
 
   public static boolean isDisabled() {
-    if (impl != null) {
-      return impl.isDisabled();
+    if (m_impl != null) {
+      return m_impl.isDisabled();
     } else {
       throw new BaseSystemNotInitializedException(Interface.class, RobotState.class);
     }
   }
 
   public static boolean isEnabled() {
-    if (impl != null) {
-      return impl.isEnabled();
+    if (m_impl != null) {
+      return m_impl.isEnabled();
     } else {
       throw new BaseSystemNotInitializedException(Interface.class, RobotState.class);
     }
   }
 
   public static boolean isOperatorControl() {
-    if (impl != null) {
-      return impl.isOperatorControl();
+    if (m_impl != null) {
+      return m_impl.isOperatorControl();
     } else {
       throw new BaseSystemNotInitializedException(Interface.class, RobotState.class);
     }
   }
 
   public static boolean isAutonomous() {
-    if (impl != null) {
-      return impl.isAutonomous();
+    if (m_impl != null) {
+      return m_impl.isAutonomous();
     } else {
       throw new BaseSystemNotInitializedException(Interface.class, RobotState.class);
     }
   }
 
   public static boolean isTest() {
-    if (impl != null) {
-      return impl.isTest();
+    if (m_impl != null) {
+      return m_impl.isTest();
     } else {
       throw new BaseSystemNotInitializedException(Interface.class, RobotState.class);
     }

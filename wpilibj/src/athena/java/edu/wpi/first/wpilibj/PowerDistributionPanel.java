@@ -8,35 +8,34 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.hal.PDPJNI;
-import edu.wpi.first.wpilibj.hal.HALUtil;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
- * Class for getting voltage, current, temperature, power and energy from the
- * CAN PDP.
- *$
+ * Class for getting voltage, current, temperature, power and energy from the CAN PDP.
+ *
  * @author Thomas Clark
  */
 public class PowerDistributionPanel extends SensorBase implements LiveWindowSendable {
 
-  int m_module;
+  private final int m_module;
 
+  @SuppressWarnings("JavadocMethod")
   public PowerDistributionPanel(int module) {
     m_module = module;
-    checkPDPModule(m_module);
-    PDPJNI.initializePDP(m_module);
+    checkPDPModule(module);
+    PDPJNI.initializePDP(module);
   }
 
+  @SuppressWarnings("JavadocMethod")
   public PowerDistributionPanel() {
     this(0);
   }
 
 
   /**
-   * Query the input voltage of the PDP
-   *$
+   * Query the input voltage of the PDP.
+   *
    * @return The voltage of the PDP in volts
    */
   public double getVoltage() {
@@ -44,8 +43,8 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
   }
 
   /**
-   * Query the temperature of the PDP
-   *$
+   * Query the temperature of the PDP.
+   *
    * @return The temperature of the PDP in degrees Celsius
    */
   public double getTemperature() {
@@ -53,8 +52,8 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
   }
 
   /**
-   * Query the current of a single channel of the PDP
-   *$
+   * Query the current of a single channel of the PDP.
+   *
    * @return The current of one of the PDP channels (channels 0-15) in Amperes
    */
   public double getCurrent(int channel) {
@@ -66,8 +65,8 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
   }
 
   /**
-   * Query the current of all monitored PDP channels (0-15)
-   *$
+   * Query the current of all monitored PDP channels (0-15).
+   *
    * @return The current of all the channels in Amperes
    */
   public double getTotalCurrent() {
@@ -75,8 +74,8 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
   }
 
   /**
-   * Query the total power drawn from the monitored PDP channels
-   *$
+   * Query the total power drawn from the monitored PDP channels.
+   *
    * @return the total power in Watts
    */
   public double getTotalPower() {
@@ -84,8 +83,8 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
   }
 
   /**
-   * Query the total energy drawn from the monitored PDP channels
-   *$
+   * Query the total energy drawn from the monitored PDP channels.
+   *
    * @return the total energy in Joules
    */
   public double getTotalEnergy() {
@@ -93,19 +92,20 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
   }
 
   /**
-   * Reset the total energy to 0
+   * Reset the total energy to 0.
    */
   public void resetTotalEnergy() {
     PDPJNI.resetPDPTotalEnergy(m_module);
   }
 
   /**
-   * Clear all PDP sticky faults
+   * Clear all PDP sticky faults.
    */
   public void clearStickyFaults() {
     PDPJNI.clearPDPStickyFaults(m_module);
   }
 
+  @Override
   public String getSmartDashboardType() {
     return "PowerDistributionPanel";
   }
@@ -115,24 +115,18 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
    */
   private ITable m_table;
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public void initTable(ITable subtable) {
     m_table = subtable;
     updateTable();
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public ITable getTable() {
     return m_table;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public void updateTable() {
     if (m_table != null) {
       m_table.putNumber("Chan0", getCurrent(0));
@@ -157,15 +151,17 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
   }
 
   /**
-   * PDP doesn't have to do anything special when entering the LiveWindow.
-   * {@inheritDoc}
+   * PDP doesn't have to do anything special when entering the LiveWindow. {@inheritDoc}
    */
-  public void startLiveWindowMode() {}
+  @Override
+  public void startLiveWindowMode() {
+  }
 
   /**
-   * PDP doesn't have to do anything special when exiting the LiveWindow.
-   * {@inheritDoc}
+   * PDP doesn't have to do anything special when exiting the LiveWindow. {@inheritDoc}
    */
-  public void stopLiveWindowMode() {}
+  @Override
+  public void stopLiveWindowMode() {
+  }
 
 }

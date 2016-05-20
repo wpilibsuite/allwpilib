@@ -7,12 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Collection;
-import java.util.logging.Logger;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Test;
@@ -20,12 +14,18 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import java.util.Collection;
+import java.util.logging.Logger;
+
 import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
 import edu.wpi.first.wpilibj.test.TestBench;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 /**
- * Tests to see if the Digital ports are working properly
- *$
+ * Tests to see if the Digital ports are working properly.
+ *
  * @author jonathanleitschuh
  */
 @RunWith(Parameterized.class)
@@ -40,14 +40,12 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
   }
 
   /**
-   * Default constructor for the DIOCrossConnectTest This test is parameterized
-   * in order to allow it to be tested using a variety of different input/output
-   * pairs without duplicate code.<br>
-   * This class takes Integer port values instead of DigitalClasses because it
-   * would force them to be instantiated at the same time which could (untested)
-   * cause port binding errors.
-   *$
-   * @param input The port for the input wire
+   * Default constructor for the DIOCrossConnectTest This test is parameterized in order to allow it
+   * to be tested using a variety of different input/output pairs without duplicate code.<br> This
+   * class takes Integer port values instead of DigitalClasses because it would force them to be
+   * instantiated at the same time which could (untested) cause port binding errors.
+   *
+   * @param input  The port for the input wire
    * @param output The port for the output wire
    */
   public DIOCrossConnectTest(Integer input, Integer output) {
@@ -58,12 +56,10 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
   }
 
 
-
   /**
-   * Test data generator. This method is called the the JUnit parameterized test
-   * runner and returns a Collection of Arrays. For each Array in the
-   * Collection, each array element corresponds to a parameter in the
-   * constructor.
+   * Test data generator. This method is called the the JUnit parameterized test runner and returns
+   * a Collection of Arrays. For each Array in the Collection, each array element corresponds to a
+   * parameter in the constructor.
    */
   @Parameters(name = "{index}: Input Port: {0} Output Port: {1}")
   public static Collection<Integer[]> generateData() {
@@ -87,7 +83,7 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
   }
 
   /**
-   * Tests to see if the DIO can create and recognize a high value
+   * Tests to see if the DIO can create and recognize a high value.
    */
   @Test
   public void testSetHigh() {
@@ -98,7 +94,7 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
   }
 
   /**
-   * Tests to see if the DIO can create and recognize a low value
+   * Tests to see if the DIO can create and recognize a low value.
    */
   @Test
   public void testSetLow() {
@@ -112,7 +108,7 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
    * Tests to see if the DIO PWM functionality works.
    */
   @Test
-  public void testDIOPWM() {
+  public void testDIOpulseWidthModulation() {
     dio.getOutput().set(false);
     assertFalse("DIO Not Low after no delay", dio.getInput().get());
     //Set frequency to 2.0 Hz
@@ -126,24 +122,24 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
     //TODO: Add return value from WaitForInterrupt
     dio.getInput().waitForInterrupt(3.0, true);
     Timer.delay(0.5);
-    boolean firstCycle = dio.getInput().get();
+    final boolean firstCycle = dio.getInput().get();
     Timer.delay(0.5);
-    boolean secondCycle = dio.getInput().get();
+    final boolean secondCycle = dio.getInput().get();
     Timer.delay(0.5);
-    boolean thirdCycle = dio.getInput().get();
+    final boolean thirdCycle = dio.getInput().get();
     Timer.delay(0.5);
-    boolean forthCycle = dio.getInput().get();
+    final boolean forthCycle = dio.getInput().get();
     Timer.delay(0.5);
-    boolean fifthCycle = dio.getInput().get();
+    final boolean fifthCycle = dio.getInput().get();
     Timer.delay(0.5);
-    boolean sixthCycle = dio.getInput().get();
+    final boolean sixthCycle = dio.getInput().get();
     Timer.delay(0.5);
-    boolean seventhCycle = dio.getInput().get();
+    final boolean seventhCycle = dio.getInput().get();
     dio.getOutput().disablePWM();
     Timer.delay(0.5);
-    boolean firstAfterStop = dio.getInput().get();
+    final boolean firstAfterStop = dio.getInput().get();
     Timer.delay(0.5);
-    boolean secondAfterStop = dio.getInput().get();
+    final boolean secondAfterStop = dio.getInput().get();
 
     assertFalse("DIO Not Low after first delay", firstCycle);
     assertTrue("DIO Not High after second delay", secondCycle);
@@ -158,7 +154,7 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see
    * edu.wpi.first.wpilibj.AbstractInterruptTest#giveInterruptableSensorBase()
    */
@@ -169,7 +165,7 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see
    * edu.wpi.first.wpilibj.AbstractInterruptTest#freeInterruptableSensorBase()
    */
@@ -180,7 +176,7 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see edu.wpi.first.wpilibj.AbstractInterruptTest#setInterruptHigh()
    */
   @Override
@@ -190,7 +186,7 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see edu.wpi.first.wpilibj.AbstractInterruptTest#setInterruptLow()
    */
   @Override

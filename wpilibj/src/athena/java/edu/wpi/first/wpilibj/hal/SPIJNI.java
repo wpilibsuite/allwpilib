@@ -11,11 +11,12 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 
+@SuppressWarnings("AbbreviationAsWordInName")
 public class SPIJNI extends JNIWrapper {
   public static native void spiInitialize(byte port);
 
   public static native int spiTransaction(byte port, ByteBuffer dataToSend,
-      ByteBuffer dataReceived, byte size);
+                                          ByteBuffer dataReceived, byte size);
 
   public static native int spiWrite(byte port, ByteBuffer dataToSend, byte sendSize);
 
@@ -25,16 +26,16 @@ public class SPIJNI extends JNIWrapper {
 
   public static native void spiSetSpeed(byte port, int speed);
 
-  public static native void spiSetOpts(byte port, int msb_first, int sample_on_trailing,
-      int clk_idle_high);
+  public static native void spiSetOpts(byte port, int msbFirst, int sampleOnTrailing,
+                                       int clkIdleHigh);
 
   public static native void spiSetChipSelectActiveHigh(byte port);
 
   public static native void spiSetChipSelectActiveLow(byte port);
 
-  public static native void spiInitAccumulator(byte port, int period, int cmd,
-      byte xferSize, int validMask, int validValue, byte dataShift,
-      byte dataSize, boolean isSigned, boolean bigEndian);
+  public static native void spiInitAccumulator(byte port, int period, int cmd, byte xferSize,
+                                               int validMask, int validValue, byte dataShift,
+                                               byte dataSize, boolean isSigned, boolean bigEndian);
 
   public static native void spiFreeAccumulator(byte port);
 
@@ -53,5 +54,5 @@ public class SPIJNI extends JNIWrapper {
   public static native double spiGetAccumulatorAverage(byte port);
 
   public static native void spiGetAccumulatorOutput(byte port, LongBuffer value,
-      IntBuffer count);
+                                                    IntBuffer count);
 }

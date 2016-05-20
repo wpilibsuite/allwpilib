@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteOrder;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
@@ -19,9 +19,11 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
+ * ADXL345 I2C Accelerometer.
  *
  * @author dtjones
  */
+@SuppressWarnings("TypeName")
 public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindowSendable {
 
   private static final byte kAddress = 0x1D;
@@ -29,26 +31,34 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
   private static final byte kDataFormatRegister = 0x31;
   private static final byte kDataRegister = 0x32;
   private static final double kGsPerLSB = 0.00390625;
-  private static final byte kPowerCtl_Link = 0x20, kPowerCtl_AutoSleep = 0x10,
-      kPowerCtl_Measure = 0x08, kPowerCtl_Sleep = 0x04;
-  private static final byte kDataFormat_SelfTest = (byte) 0x80, kDataFormat_SPI = 0x40,
-      kDataFormat_IntInvert = 0x20, kDataFormat_FullRes = 0x08, kDataFormat_Justify = 0x04;
+  private static final byte kPowerCtl_Link = 0x20;
+  private static final byte kPowerCtl_AutoSleep = 0x10;
+  private static final byte kPowerCtl_Measure = 0x08;
+  private static final byte kPowerCtl_Sleep = 0x04;
 
-  public static enum Axes {
+  private static final byte kDataFormat_SelfTest = (byte) 0x80;
+  private static final byte kDataFormat_SPI = 0x40;
+  private static final byte kDataFormat_IntInvert = 0x20;
+  private static final byte kDataFormat_FullRes = 0x08;
+  private static final byte kDataFormat_Justify = 0x04;
+
+  public enum Axes {
     kX((byte) 0x00),
     kY((byte) 0x02),
     kZ((byte) 0x04);
 
     /**
-     * The integer value representing this enumeration
+     * The integer value representing this enumeration.
      */
+    @SuppressWarnings("MemberName")
     public final byte value;
 
-    private Axes(byte value) {
+    Axes(byte value) {
       this.value = value;
     }
   }
 
+  @SuppressWarnings("MemberName")
   public static class AllAxes {
 
     public double XAxis;
@@ -60,8 +70,8 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
 
   /**
    * Constructs the ADXL345 Accelerometer with I2C address 0x1D.
-   *$
-   * @param port The I2C port the accelerometer is attached to
+   *
+   * @param port  The I2C port the accelerometer is attached to
    * @param range The range (+ or -) that the accelerometer will measure.
    */
   public ADXL345_I2C(I2C.Port port, Range range) {
@@ -70,10 +80,10 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
 
   /**
    * Constructs the ADXL345 Accelerometer over I2C.
-   *$
-   * @param port The I2C port the accelerometer is attached to
-   * @param range The range (+ or -) that the accelerometer will measure.
-   * @param the I2C address of the accelerometer (0x1D or 0x53)
+   *
+   * @param port          The I2C port the accelerometer is attached to
+   * @param range         The range (+ or -) that the accelerometer will measure.
+   * @param deviceAddress I2C address of the accelerometer (0x1D or 0x53)
    */
   public ADXL345_I2C(I2C.Port port, Range range, int deviceAddress) {
     m_i2c = new I2C(port, deviceAddress);
@@ -87,10 +97,10 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
     LiveWindow.addSensor("ADXL345_I2C", port.getValue(), this);
   }
 
-  /** {inheritdoc} */
+
   @Override
   public void setRange(Range range) {
-    byte value = 0;
+    final byte value;
 
     switch (range) {
       case k2G:
@@ -105,25 +115,24 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
       case k16G:
         value = 3;
         break;
+      default:
+        throw new IllegalArgumentException(range + " unsupported range type");
     }
 
     // Specify the data format to read
     m_i2c.write(kDataFormatRegister, kDataFormat_FullRes | value);
   }
 
-  /** {@inheritDoc} */
   @Override
   public double getX() {
     return getAcceleration(Axes.kX);
   }
 
-  /** {@inheritDoc} */
   @Override
   public double getY() {
     return getAcceleration(Axes.kY);
   }
 
-  /** {@inheritDoc} */
   @Override
   public double getZ() {
     return getAcceleration(Axes.kZ);
@@ -147,8 +156,7 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
   /**
    * Get the acceleration of all axes in Gs.
    *
-   * @return An object containing the acceleration measured on each axis of the
-   *         ADXL345 in Gs.
+   * @return An object containing the acceleration measured on each axis of the ADXL345 in Gs.
    */
   public AllAxes getAccelerations() {
     AllAxes data = new AllAxes();
@@ -163,19 +171,20 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
     return data;
   }
 
+  @Override
   public String getSmartDashboardType() {
     return "3AxisAccelerometer";
   }
 
   private ITable m_table;
 
-  /** {@inheritDoc} */
+  @Override
   public void initTable(ITable subtable) {
     m_table = subtable;
     updateTable();
   }
 
-  /** {@inheritDoc} */
+  @Override
   public void updateTable() {
     if (m_table != null) {
       m_table.putNumber("X", getX());
@@ -184,12 +193,16 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
     }
   }
 
-  /** {@inheritDoc} */
+  @Override
   public ITable getTable() {
     return m_table;
   }
 
-  public void startLiveWindowMode() {}
+  @Override
+  public void startLiveWindowMode() {
+  }
 
-  public void stopLiveWindowMode() {}
+  @Override
+  public void stopLiveWindowMode() {
+  }
 }

@@ -7,12 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.logging.Logger;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -21,16 +15,22 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.logging.Logger;
+
 import edu.wpi.first.wpilibj.fixtures.FilterOutputFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
+
+import static org.junit.Assert.assertEquals;
 
 
 @RunWith(Parameterized.class)
 public class FilterOutputTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(FilterOutputTest.class.getName());
 
-  private double expectedOutput;
+  private double m_expectedOutput;
 
   private static FilterOutputFixture<?> me = null;
 
@@ -39,20 +39,26 @@ public class FilterOutputTest extends AbstractComsSetup {
     return logger;
   }
 
+  /**
+   * Constructs a filter output test.
+   *
+   * @param mef The fixture under test.
+   */
   public FilterOutputTest(FilterOutputFixture<?> mef) {
     logger.fine("Constructor with: " + mef.getType());
-    if (me != null && !me.equals(mef))
+    if (me != null && !me.equals(mef)) {
       me.teardown();
+    }
     me = mef;
-    expectedOutput = me.getExpectedOutput();
+    m_expectedOutput = me.getExpectedOutput();
   }
 
   @Parameters(name = "{index}: {0}")
   public static Collection<FilterOutputFixture<?>[]> generateData() {
-    return Arrays.asList(new FilterOutputFixture<?>[][] {
-                         {TestBench.getInstance().getSinglePoleIIROutputFixture()},
-                         {TestBench.getInstance().getHighPassOutputFixture()},
-                         {TestBench.getInstance().getMovAvgOutputFixture()}});
+    return Arrays.asList(new FilterOutputFixture<?>[][]{
+        {TestBench.getInstance().getSinglePoleIIROutputFixture()},
+        {TestBench.getInstance().getHighPassOutputFixture()},
+        {TestBench.getInstance().getMovAvgOutputFixture()}});
   }
 
   @Before
@@ -73,7 +79,7 @@ public class FilterOutputTest extends AbstractComsSetup {
   }
 
   /**
-   * Test if the filter produces consistent output for a given data set
+   * Test if the filter produces consistent output for a given data set.
    */
   @Test
   public void testOutput() {
@@ -84,6 +90,6 @@ public class FilterOutputTest extends AbstractComsSetup {
       filterOutput = me.getFilter().pidGet();
     }
 
-    assertEquals(me.getType() + " output was incorrect.", expectedOutput, filterOutput, 0.00005);
+    assertEquals(me.getType() + " output was incorrect.", m_expectedOutput, filterOutput, 0.00005);
   }
 }

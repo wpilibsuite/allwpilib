@@ -7,14 +7,14 @@
 
 package edu.wpi.first.wpilibj.test;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runners.model.MultipleFailureException;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -23,16 +23,18 @@ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
- * This class serves as a superclass for all tests that involve the hardware on
- * the roboRIO. It uses an {@link BeforeClass} statement to initialize network
- * communications. Any test that needs to use the hardware <b>MUST</b> extend
- * from this class, to ensure that all of the hardware will be able to run.
- *$
+ * This class serves as a superclass for all tests that involve the hardware on the roboRIO. It uses
+ * an {@link BeforeClass} statement to initialize network communications. Any test that needs to use
+ * the hardware <b>MUST</b> extend from this class, to ensure that all of the hardware will be able
+ * to run.
+ *
  * @author Fredric Silberberg
  * @author Jonathan Leitschuh
  */
 public abstract class AbstractComsSetup {
-  /** Stores whether network coms have been initialized */
+  /**
+   * Stores whether network coms have been initialized.
+   */
   private static boolean initialized = false;
 
   /**
@@ -40,7 +42,6 @@ public abstract class AbstractComsSetup {
    * station. After starting network coms, it will loop until the driver station
    * returns that the robot is enabled, to ensure that tests will be able to run
    * on the hardware.
-   *$
    */
   static {
     if (!initialized) {
@@ -52,15 +53,15 @@ public abstract class AbstractComsSetup {
       TestBench.out().println("Started coms");
 
       // Wait until the robot is enabled before starting the tests
-      int i = 0;
+      int enableCounter = 0;
       while (!DriverStation.getInstance().isEnabled()) {
         try {
           Thread.sleep(100);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
+        } catch (InterruptedException ex) {
+          ex.printStackTrace();
         }
         // Prints the message on one line overwriting itself each time
-        TestBench.out().print("\rWaiting for enable: " + i++);
+        TestBench.out().print("\rWaiting for enable: " + enableCounter++);
       }
       TestBench.out().println();
 
@@ -74,8 +75,7 @@ public abstract class AbstractComsSetup {
   protected abstract Logger getClassLogger();
 
   /**
-   * This causes a stack trace to be printed as the test is running as well as
-   * at the end
+   * This causes a stack trace to be printed as the test is running as well as at the end.
    */
   @Rule
   public final TestWatcher getTestWatcher() {
@@ -83,8 +83,8 @@ public abstract class AbstractComsSetup {
   }
 
   /**
-   * Given as a way to provide a custom test watcher for a test or set of tests
-   *$
+   * Given as a way to provide a custom test watcher for a test or set of tests.
+   *
    * @return the test watcher to use
    */
   protected TestWatcher getOverridenTestWatcher() {
@@ -93,68 +93,69 @@ public abstract class AbstractComsSetup {
 
   protected class DefaultTestWatcher extends TestWatcher {
     /**
-     * Allows a failure to supply a custom status message to be displayed along
-     * with the stack trace.
+     * Allows a failure to supply a custom status message to be displayed along with the stack
+     * trace.
      */
-    protected void failed(Throwable e, Description description, String status) {
+    protected void failed(Throwable throwable, Description description, String status) {
       TestBench.out().println();
       // Instance of is the best way I know to retrieve this data.
-      if (e instanceof MultipleFailureException) {
+      if (throwable instanceof MultipleFailureException) {
         /*
          * MultipleFailureExceptions hold multiple exceptions in one exception.
          * In order to properly display these stack traces we have to cast the
          * throwable and work with the list of thrown exceptions stored within
          * it.
          */
-        int i = 1; // Running exception count
-        int failureCount = ((MultipleFailureException) e).getFailures().size();
-        for (Throwable singleThrown : ((MultipleFailureException) e).getFailures()) {
+        int exceptionCount = 1; // Running exception count
+        int failureCount = ((MultipleFailureException) throwable).getFailures().size();
+        for (Throwable singleThrown : ((MultipleFailureException) throwable).getFailures()) {
           getClassLogger().logp(
               Level.SEVERE,
               description.getClassName(),
               description.getMethodName(),
-              (i++) + "/" + failureCount + " " + description.getDisplayName() + " failed "
-                  + singleThrown.getMessage() + "\n" + status, singleThrown);
+              (exceptionCount++) + "/" + failureCount + " " + description.getDisplayName() + " "
+                  + "failed " + singleThrown.getMessage() + "\n" + status, singleThrown);
         }
 
       } else {
         getClassLogger().logp(Level.SEVERE, description.getClassName(),
             description.getMethodName(),
-            description.getDisplayName() + " failed " + e.getMessage() + "\n" + status, e);
+            description.getDisplayName() + " failed " + throwable.getMessage() + "\n" + status,
+            throwable);
       }
-      super.failed(e, description);
+      super.failed(throwable, description);
     }
 
     /*
      * (non-Javadoc)
-     *$
+     *
      * @see org.junit.rules.TestWatcher#failed(java.lang.Throwable,
      * org.junit.runner.Description)
      */
     @Override
-    protected void failed(Throwable e, Description description) {
-      failed(e, description, "");
+    protected void failed(Throwable exception, Description description) {
+      failed(exception, description, "");
     }
 
 
     /*
      * (non-Javadoc)
-     *$
+     *
      * @see org.junit.rules.TestWatcher#starting(org.junit.runner.Description)
      */
     @Override
     protected void starting(Description description) {
       TestBench.out().println();
       // Wait until the robot is enabled before starting the next tests
-      int i = 0;
+      int enableCounter = 0;
       while (!DriverStation.getInstance().isEnabled()) {
         try {
           Thread.sleep(100);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
+        } catch (InterruptedException ex) {
+          ex.printStackTrace();
         }
         // Prints the message on one line overwriting itself each time
-        TestBench.out().print("\rWaiting for enable: " + i++);
+        TestBench.out().print("\rWaiting for enable: " + enableCounter++);
       }
       getClassLogger().logp(Level.INFO, description.getClassName(), description.getMethodName(),
           "Starting");
@@ -167,12 +168,12 @@ public abstract class AbstractComsSetup {
       super.succeeded(description);
     }
 
-  };
+  }
 
   /**
    * Logs a simple message without the logger formatting associated with it.
-   *$
-   * @param level The level to log the message at
+   *
+   * @param level   The level to log the message at
    * @param message The message to log
    */
   protected void simpleLog(Level level, String message) {
@@ -182,50 +183,50 @@ public abstract class AbstractComsSetup {
   }
 
   /**
-   * Provided as a replacement to lambda functions to allow for repeatable
-   * checks to see if a correct state is reached
-   *$
-   * @author Jonathan Leitschuh
+   * Provided as a replacement to lambda functions to allow for repeatable checks to see if a
+   * correct state is reached.
    *
+   * @author Jonathan Leitschuh
    */
   public abstract class BooleanCheck {
-    public BooleanCheck() {}
+    public BooleanCheck() {
+    }
 
     /**
-     * Runs the enclosed code and evaluates it to determine what state it should
-     * return.
-     *$
+     * Runs the enclosed code and evaluates it to determine what state it should return.
+     *
      * @return true if the code provided within the method returns true
      */
-    abstract public boolean getAsBoolean();
-  };
+    public abstract boolean getAsBoolean();
+  }
 
   /**
    * Delays until either the correct state is reached or we reach the timeout.
-   *$
-   * @param level The level to log the message at.
-   * @param timeout How long the delay should run before it should timeout and
-   *        allow the test to continue
-   * @param message The message to accompany the delay. The message will display
-   *        'message' took 'timeout' seconds if it passed.
-   * @param correctState A method to determine if the test has reached a state
-   *        where it is valid to continue
+   *
+   * @param level        The level to log the message at.
+   * @param timeout      How long the delay should run before it should timeout and allow the test
+   *                     to continue
+   * @param message      The message to accompany the delay. The message will display 'message' took
+   *                     'timeout' seconds if it passed.
+   * @param correctState A method to determine if the test has reached a state where it is valid to
+   *                     continue
    * @return a double representing how long the delay took to run in seconds.
    */
   public double delayTillInCorrectStateWithMessage(Level level, double timeout, String message,
-      BooleanCheck correctState) {
-    int i = 0;
+                                                   BooleanCheck correctState) {
+    int timeoutIndex;
     // As long as we are not in the correct state and the timeout has not been
     // reached then continue to run this loop
-    for (i = 0; i < (timeout * 100) && !correctState.getAsBoolean(); i++) {
+    for (timeoutIndex = 0; timeoutIndex < (timeout * 100) && !correctState.getAsBoolean();
+         timeoutIndex++) {
       Timer.delay(.01);
     }
     if (correctState.getAsBoolean()) {
-      simpleLog(level, message + " took " + (i * .01) + " seconds");
+      simpleLog(level, message + " took " + (timeoutIndex * .01) + " seconds");
     } else {
-      simpleLog(level, message + " timed out after " + (i * .01) + " seconds");
+      simpleLog(level, message + " timed out after " + (timeoutIndex * .01) + " seconds");
     }
-    return i * .01;
+    return timeoutIndex * .01;
   }
 
 }

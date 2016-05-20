@@ -38,12 +38,12 @@ public class AnalogOutput extends SensorBase implements LiveWindowSendable {
     }
     try {
       channels.allocate(channel);
-    } catch (CheckedAllocationException e) {
+    } catch (CheckedAllocationException ex) {
       throw new AllocationException("Analog output channel " + m_channel + " is already allocated");
     }
 
-    long port_pointer = AnalogJNI.getPort((byte) channel);
-    m_port = AnalogJNI.initializeAnalogOutputPort(port_pointer);
+    final long portPointer = AnalogJNI.getPort((byte) channel);
+    m_port = AnalogJNI.initializeAnalogOutputPort(portPointer);
 
     LiveWindow.addSensor("AnalogOutput", channel, this);
     UsageReporting.report(tResourceType.kResourceType_AnalogOutput, channel);
@@ -70,45 +70,42 @@ public class AnalogOutput extends SensorBase implements LiveWindowSendable {
   /*
    * Live Window code, only does anything if live window is activated.
    */
+  @Override
   public String getSmartDashboardType() {
     return "Analog Output";
   }
 
   private ITable m_table;
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public void initTable(ITable subtable) {
     m_table = subtable;
     updateTable();
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public void updateTable() {
     if (m_table != null) {
       m_table.putNumber("Value", getVoltage());
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public ITable getTable() {
     return m_table;
   }
 
   /**
-   * Analog Channels don't have to do anything special when entering the
-   * LiveWindow. {@inheritDoc}
+   * Analog Channels don't have to do anything special when entering the LiveWindow. {@inheritDoc}
    */
-  public void startLiveWindowMode() {}
+  @Override
+  public void startLiveWindowMode() {
+  }
 
   /**
-   * Analog Channels don't have to do anything special when exiting the
-   * LiveWindow. {@inheritDoc}
+   * Analog Channels don't have to do anything special when exiting the LiveWindow. {@inheritDoc}
    */
-  public void stopLiveWindowMode() {}
+  @Override
+  public void stopLiveWindowMode() {
+  }
 }

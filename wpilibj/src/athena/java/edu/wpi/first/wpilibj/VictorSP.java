@@ -12,23 +12,22 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
- * VEX Robotics Victor SP Speed Controller
+ * VEX Robotics Victor SP Speed Controller.
  */
 public class VictorSP extends PWMSpeedController {
 
   /**
    * Common initialization code called by all constructors.
    *
-   * Note that the VictorSP uses the following bounds for PWM values. These
-   * values should work reasonably well for most controllers, but if users
-   * experience issues such as asymmetric behavior around the deadband or
-   * inability to saturate the controller in either direction, calibration is
-   * recommended. The calibration procedure can be found in the VictorSP User
-   * Manual available from CTRE.
+   * <p>Note that the VictorSP uses the following bounds for PWM values. These values should work
+   * reasonably well for most controllers, but if users experience issues such as asymmetric
+   * behavior around the deadband or inability to saturate the controller in either direction,
+   * calibration is recommended. The calibration procedure can be found in the VictorSP User Manual
+   * available from CTRE.
    *
-   * - 2.004ms = full "forward" - 1.52ms = the "high end" of the deadband range
-   * - 1.50ms = center of the deadband range (off) - 1.48ms = the "low end" of
-   * the deadband range - .997ms = full "reverse"
+   * <p>- 2.004ms = full "forward" - 1.52ms = the "high end" of the deadband range - 1.50ms =
+   * center of the deadband range (off) - 1.48ms = the "low end" of the deadband range - .997ms =
+   * full "reverse"
    */
   protected void initVictorSP() {
     setBounds(2.004, 1.52, 1.50, 1.48, .997);
@@ -43,8 +42,8 @@ public class VictorSP extends PWMSpeedController {
   /**
    * Constructor.
    *
-   * @param channel The PWM channel that the VictorSP is attached to. 0-9 are
-   *        on-board, 10-19 are on the MXP port
+   * @param channel The PWM channel that the VictorSP is attached to. 0-9 are on-board, 10-19 are on
+   *                the MXP port
    */
   public VictorSP(final int channel) {
     super(channel);

@@ -107,7 +107,7 @@ task wpilibjSources(type: Jar, dependsOn: classes) {
 }
 
 def ntSourcesDependency =
-    project.dependencies.create('edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:sources@jar')
+        project.dependencies.create('edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:sources@jar')
 def ntSourcesConfig = project.configurations.detachedConfiguration(ntSourcesDependency)
 ntSourcesDependency.setTransitive(false)
 def ntSources = ntSourcesConfig.singleFile

@@ -12,11 +12,10 @@ import edu.wpi.first.wpilibj.util.AllocationException;
 import edu.wpi.first.wpilibj.util.CheckedAllocationException;
 
 /**
- * DigitalSource Interface. The DigitalSource represents all the possible inputs
- * for a counter or a quadrature encoder. The source may be either a digital
- * input or an analog input. If the caller just provides a channel, then a
- * digital input will be constructed and freed when finished for the source. The
- * source can either be a digital input or analog trigger but not both.
+ * DigitalSource Interface. The DigitalSource represents all the possible inputs for a counter or a
+ * quadrature encoder. The source may be either a digital input or an analog input. If the caller
+ * just provides a channel, then a digital input will be constructed and freed when finished for the
+ * source. The source can either be a digital input or analog trigger but not both.
  */
 public abstract class DigitalSource extends InterruptableSensorBase {
 
@@ -36,8 +35,8 @@ public abstract class DigitalSource extends InterruptableSensorBase {
       throw new AllocationException("Digital input " + m_channel + " is already allocated");
     }
 
-    long port_pointer = DIOJNI.getPort((byte) channel);
-    m_port = DIOJNI.initializeDigitalPort(port_pointer);
+    long portPointer = DIOJNI.getPort((byte) channel);
+    m_port = DIOJNI.initializeDigitalPort(portPointer);
     DIOJNI.allocateDIO(m_port, input);
   }
 
@@ -51,7 +50,7 @@ public abstract class DigitalSource extends InterruptableSensorBase {
   }
 
   /**
-   * Get the channel routing number
+   * Get the channel routing number.
    *
    * @return channel routing number
    */
@@ -61,7 +60,7 @@ public abstract class DigitalSource extends InterruptableSensorBase {
   }
 
   /**
-   * Get the module routing number
+   * Get the module routing number.
    *
    * @return 0
    */
@@ -71,8 +70,8 @@ public abstract class DigitalSource extends InterruptableSensorBase {
   }
 
   /**
-   * Is this an analog trigger
-   *$
+   * Is this an analog trigger.
+   *
    * @return true if this is an analog trigger
    */
   @Override

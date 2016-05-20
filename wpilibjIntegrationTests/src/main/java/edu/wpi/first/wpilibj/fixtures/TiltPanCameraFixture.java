@@ -14,21 +14,20 @@ import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
- * A class to represent the a physical Camera with two servos (tilt and pan)
- * designed to test to see if the gyroscope is operating normally.
+ * A class to represent the a physical Camera with two servos (tilt and pan) designed to test to see
+ * if the gyroscope is operating normally.
  *
  * @author Jonathan Leitschuh
- *
  */
 public abstract class TiltPanCameraFixture implements ITestFixture {
   public static final Logger logger = Logger.getLogger(TiltPanCameraFixture.class.getName());
 
   public static final double RESET_TIME = 2.0;
-  private AnalogGyro gyro;
-  private AnalogGyro gyroParam;
-  private Servo tilt;
-  private Servo pan;
-  private boolean initialized = false;
+  private AnalogGyro m_gyro;
+  private AnalogGyro m_gyroParam;
+  private Servo m_tilt;
+  private Servo m_pan;
+  private boolean m_initialized = false;
 
 
   protected abstract AnalogGyro giveGyro();
@@ -40,24 +39,25 @@ public abstract class TiltPanCameraFixture implements ITestFixture {
   protected abstract Servo givePan();
 
   /**
-   * Constructs the TiltPanCamera
+   * Constructs the TiltPanCamera.
    */
-  public TiltPanCameraFixture() {}
+  public TiltPanCameraFixture() {
+  }
 
   @Override
   public boolean setup() {
     boolean wasSetup = false;
-    if (!initialized) {
-      initialized = true;
-      tilt = giveTilt();
-      tilt.set(0);
-      pan = givePan();
-      pan.set(0);
+    if (!m_initialized) {
+      m_initialized = true;
+      m_tilt = giveTilt();
+      m_tilt.set(0);
+      m_pan = givePan();
+      m_pan.set(0);
       Timer.delay(RESET_TIME);
 
       logger.fine("Initializing the gyro");
-      gyro = giveGyro();
-      gyro.reset();
+      m_gyro = giveGyro();
+      m_gyro.reset();
       wasSetup = true;
     }
     return wasSetup;
@@ -65,50 +65,52 @@ public abstract class TiltPanCameraFixture implements ITestFixture {
 
   @Override
   public boolean reset() {
-	if(gyro != null)
-    gyro.reset();
+    if (m_gyro != null) {
+      m_gyro.reset();
+    }
     return true;
   }
 
   public Servo getTilt() {
-    return tilt;
+    return m_tilt;
   }
 
   public Servo getPan() {
-    return pan;
+    return m_pan;
   }
 
   public AnalogGyro getGyro() {
-    return gyro;
+    return m_gyro;
   }
 
   public AnalogGyro getGyroParam() {
-    return gyroParam;
+    return m_gyroParam;
   }
 
   // Do not call unless all other instances of Gyro have been deallocated
   public void setupGyroParam(int center, double offset) {
-    gyroParam = giveGyroParam(center, offset);
-    gyroParam.reset();
+    m_gyroParam = giveGyroParam(center, offset);
+    m_gyroParam.reset();
   }
+
   public void freeGyro() {
-    gyro.free();
-    gyro = null;
+    m_gyro.free();
+    m_gyro = null;
   }
 
   @Override
   public boolean teardown() {
-    tilt.free();
-    tilt = null;
-    pan.free();
-    pan = null;
-    if(gyro !=null){//in case not freed during gyro tests
-    	gyro.free();
-    	gyro = null;
+    m_tilt.free();
+    m_tilt = null;
+    m_pan.free();
+    m_pan = null;
+    if (m_gyro != null) { //in case not freed during gyro tests
+      m_gyro.free();
+      m_gyro = null;
     }
-    if(gyroParam != null){//in case gyro tests failed before getting to this point
-    gyroParam.free();
-    gyroParam = null;
+    if (m_gyroParam != null) { //in case gyro tests failed before getting to this point
+      m_gyroParam.free();
+      m_gyroParam = null;
     }
     return true;
   }

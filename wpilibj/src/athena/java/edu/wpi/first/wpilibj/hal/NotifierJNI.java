@@ -7,18 +7,15 @@
 
 package edu.wpi.first.wpilibj.hal;
 
-import java.lang.Runtime;
-
 /**
  * The NotifierJNI class directly wraps the C++ HAL Notifier.
  *
- * This class is not meant for direct use by teams. Instead, the
- * edu.wpi.first.wpilibj.Notifier class, which corresponds to the C++ Notifier
- * class, should be used.
+ * <p>This class is not meant for direct use by teams. Instead, the edu.wpi.first.wpilibj.Notifier
+ * class, which corresponds to the C++ Notifier class, should be used.
  */
 public class NotifierJNI extends JNIWrapper {
   /**
-   * Callback function
+   * Callback function.
    */
   public interface NotifierJNIHandlerFunction {
     void apply(long curTime);

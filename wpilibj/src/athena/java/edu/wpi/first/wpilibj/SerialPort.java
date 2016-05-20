@@ -8,7 +8,6 @@
 package edu.wpi.first.wpilibj;
 
 import java.io.UnsupportedEncodingException;
-
 import java.nio.ByteBuffer;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
@@ -18,14 +17,13 @@ import edu.wpi.first.wpilibj.hal.SerialPortJNI;
 /**
  * Driver for the RS-232 serial port on the RoboRIO.
  *
- * The current implementation uses the VISA formatted I/O mode. This means that
- * all traffic goes through the formatted buffers. This allows the intermingled
- * use of print(), readString(), and the raw buffer accessors read() and
- * write().
+ * <p>The current implementation uses the VISA formatted I/O mode. This means that all traffic goes
+ * through the formatted buffers. This allows the intermingled use of print(), readString(), and the
+ * raw buffer accessors read() and write().
  *
- * More information can be found in the NI-VISA User Manual here:
- * http://www.ni.com/pdf/manuals/370423a.pdf and the NI-VISA Programmer's
- * Reference Manual here: http://www.ni.com/pdf/manuals/370132c.pdf
+ * <p>More information can be found in the NI-VISA User Manual here: http://www.ni
+ * .com/pdf/manuals/370423a.pdf and the NI-VISA Programmer's Reference Manual here:
+ * http://www.ni.com/pdf/manuals/370132c.pdf
  */
 public class SerialPort {
 
@@ -34,25 +32,26 @@ public class SerialPort {
   public enum Port {
     kOnboard(0), kMXP(1), kUSB(2);
 
-    private int value;
+    private int m_value;
 
-    private Port(int value) {
-      this.value = value;
+    Port(int value) {
+      m_value = value;
     }
 
     public int getValue() {
-      return this.value;
+      return m_value;
     }
-  };
+  }
 
   /**
-   * Represents the parity to use for serial communications
+   * Represents the parity to use for serial communications.
    */
   public static class Parity {
 
     /**
-     * The integer value representing this enumeration
+     * The integer value representing this enumeration.
      */
+    @SuppressWarnings("MemberName")
     public final int value;
     static final int kNone_val = 0;
     static final int kOdd_val = 1;
@@ -60,23 +59,23 @@ public class SerialPort {
     static final int kMark_val = 3;
     static final int kSpace_val = 4;
     /**
-     * parity: Use no parity
+     * parity: Use no parity.
      */
     public static final Parity kNone = new Parity(kNone_val);
     /**
-     * parity: Use odd parity
+     * parity: Use odd parity.
      */
     public static final Parity kOdd = new Parity(kOdd_val);
     /**
-     * parity: Use even parity
+     * parity: Use even parity.
      */
     public static final Parity kEven = new Parity(kEven_val);
     /**
-     * parity: Use mark parity
+     * parity: Use mark parity.
      */
     public static final Parity kMark = new Parity(kMark_val);
     /**
-     * parity: Use space parity
+     * parity: Use space parity.
      */
     public static final Parity kSpace = new Parity((kSpace_val));
 
@@ -86,27 +85,28 @@ public class SerialPort {
   }
 
   /**
-   * Represents the number of stop bits to use for Serial Communication
+   * Represents the number of stop bits to use for Serial Communication.
    */
   public static class StopBits {
 
     /**
-     * The integer value representing this enumeration
+     * The integer value representing this enumeration.
      */
+    @SuppressWarnings("MemberName")
     public final int value;
     static final int kOne_val = 10;
     static final int kOnePointFive_val = 15;
     static final int kTwo_val = 20;
     /**
-     * stopBits: use 1
+     * stopBits: use 1.
      */
     public static final StopBits kOne = new StopBits(kOne_val);
     /**
-     * stopBits: use 1.5
+     * stopBits: use 1.5.
      */
     public static final StopBits kOnePointFive = new StopBits(kOnePointFive_val);
     /**
-     * stopBits: use 2
+     * stopBits: use 2.
      */
     public static final StopBits kTwo = new StopBits(kTwo_val);
 
@@ -116,32 +116,33 @@ public class SerialPort {
   }
 
   /**
-   * Represents what type of flow control to use for serial communication
+   * Represents what type of flow control to use for serial communication.
    */
   public static class FlowControl {
 
     /**
-     * The integer value representing this enumeration
+     * The integer value representing this enumeration.
      */
+    @SuppressWarnings("MemberName")
     public final int value;
     static final int kNone_val = 0;
     static final int kXonXoff_val = 1;
     static final int kRtsCts_val = 2;
     static final int kDtrDsr_val = 4;
     /**
-     * flowControl: use none
+     * flowControl: use none.
      */
     public static final FlowControl kNone = new FlowControl(kNone_val);
     /**
-     * flowcontrol: use on/off
+     * flowcontrol: use on/off.
      */
     public static final FlowControl kXonXoff = new FlowControl(kXonXoff_val);
     /**
-     * flowcontrol: use rts cts
+     * flowcontrol: use rts cts.
      */
     public static final FlowControl kRtsCts = new FlowControl(kRtsCts_val);
     /**
-     * flowcontrol: use dts dsr
+     * flowcontrol: use dts dsr.
      */
     public static final FlowControl kDtrDsr = new FlowControl(kDtrDsr_val);
 
@@ -151,22 +152,23 @@ public class SerialPort {
   }
 
   /**
-   * Represents which type of buffer mode to use when writing to a serial port
+   * Represents which type of buffer mode to use when writing to a serial m_port.
    */
   public static class WriteBufferMode {
 
     /**
-     * The integer value representing this enumeration
+     * The integer value representing this enumeration.
      */
+    @SuppressWarnings("MemberName")
     public final int value;
     static final int kFlushOnAccess_val = 1;
     static final int kFlushWhenFull_val = 2;
     /**
-     * Flush on access
+     * Flush on access.
      */
     public static final WriteBufferMode kFlushOnAccess = new WriteBufferMode(kFlushOnAccess_val);
     /**
-     * Flush when full
+     * Flush when full.
      */
     public static final WriteBufferMode kFlushWhenFull = new WriteBufferMode(kFlushWhenFull_val);
 
@@ -179,15 +181,13 @@ public class SerialPort {
    * Create an instance of a Serial Port class.
    *
    * @param baudRate The baud rate to configure the serial port.
-   * @param port The Serial port to use
-   * @param dataBits The number of data bits per transfer. Valid values are
-   *        between 5 and 8 bits.
-   * @param parity Select the type of parity checking to use.
-   * @param stopBits The number of stop bits to use as defined by the enum
-   *        StopBits.
+   * @param port     The Serial port to use
+   * @param dataBits The number of data bits per transfer. Valid values are between 5 and 8 bits.
+   * @param parity   Select the type of parity checking to use.
+   * @param stopBits The number of stop bits to use as defined by the enum StopBits.
    */
   public SerialPort(final int baudRate, Port port, final int dataBits, Parity parity,
-      StopBits stopBits) {
+                    StopBits stopBits) {
     m_port = (byte) port.getValue();
 
     SerialPortJNI.serialInitializePort(m_port);
@@ -214,29 +214,26 @@ public class SerialPort {
    * Create an instance of a Serial Port class. Defaults to one stop bit.
    *
    * @param baudRate The baud rate to configure the serial port.
-   * @param dataBits The number of data bits per transfer. Valid values are
-   *        between 5 and 8 bits.
-   * @param parity Select the type of parity checking to use.
+   * @param dataBits The number of data bits per transfer. Valid values are between 5 and 8 bits.
+   * @param parity   Select the type of parity checking to use.
    */
   public SerialPort(final int baudRate, Port port, final int dataBits, Parity parity) {
     this(baudRate, port, dataBits, parity, StopBits.kOne);
   }
 
   /**
-   * Create an instance of a Serial Port class. Defaults to no parity and one
-   * stop bit.
+   * Create an instance of a Serial Port class. Defaults to no parity and one stop bit.
    *
    * @param baudRate The baud rate to configure the serial port.
-   * @param dataBits The number of data bits per transfer. Valid values are
-   *        between 5 and 8 bits.
+   * @param dataBits The number of data bits per transfer. Valid values are between 5 and 8 bits.
    */
   public SerialPort(final int baudRate, Port port, final int dataBits) {
     this(baudRate, port, dataBits, Parity.kNone, StopBits.kOne);
   }
 
   /**
-   * Create an instance of a Serial Port class. Defaults to 8 databits, no
-   * parity, and one stop bit.
+   * Create an instance of a Serial Port class. Defaults to 8 databits, no parity, and one stop
+   * bit.
    *
    * @param baudRate The baud rate to configure the serial port.
    */
@@ -254,9 +251,9 @@ public class SerialPort {
   /**
    * Set the type of flow control to enable on this port.
    *
-   * By default, flow control is disabled.
-   *$
-   * @param flowControl the FlowControl value to use
+   * <p>By default, flow control is disabled.
+   *
+   * @param flowControl the FlowControl m_value to use
    */
   public void setFlowControl(FlowControl flowControl) {
     SerialPortJNI.serialSetFlowControl(m_port, (byte) flowControl.value);
@@ -265,9 +262,9 @@ public class SerialPort {
   /**
    * Enable termination and specify the termination character.
    *
-   * Termination is currently only implemented for receive. When the the
-   * terminator is received, the read() or readString() will return fewer bytes
-   * than requested, stopping after the terminator.
+   * <p>Termination is currently only implemented for receive. When the the terminator is received,
+   * the read() or readString() will return fewer bytes than requested, stopping after the
+   * terminator.
    *
    * @param terminator The character to use for termination.
    */
@@ -278,14 +275,14 @@ public class SerialPort {
   /**
    * Enable termination with the default terminator '\n'
    *
-   * Termination is currently only implemented for receive. When the the
-   * terminator is received, the read() or readString() will return fewer bytes
-   * than requested, stopping after the terminator.
+   * <p>Termination is currently only implemented for receive. When the the terminator is received,
+   * the read() or readString() will return fewer bytes than requested, stopping after the
+   * terminator.
    *
-   * The default terminator is '\n'
+   * <p>The default terminator is '\n'
    */
   public void enableTermination() {
-    this.enableTermination('\n');
+    enableTermination('\n');
   }
 
   /**
@@ -325,7 +322,7 @@ public class SerialPort {
       return new String(out, 0, out.length, "US-ASCII");
     } catch (UnsupportedEncodingException ex) {
       ex.printStackTrace();
-      return new String();
+      return "";
     }
   }
 
@@ -347,7 +344,7 @@ public class SerialPort {
    * Write raw bytes to the serial port.
    *
    * @param buffer The buffer of bytes to write.
-   * @param count The maximum number of bytes to write.
+   * @param count  The maximum number of bytes to write.
    * @return The number of bytes actually written into the port.
    */
   public int write(byte[] buffer, int count) {
@@ -367,11 +364,10 @@ public class SerialPort {
   }
 
   /**
-   * Configure the timeout of the serial port.
+   * Configure the timeout of the serial m_port.
    *
-   * This defines the timeout for transactions with the hardware. It will affect
-   * reads if less bytes are available than the read buffer size (defaults to 1)
-   * and very large writes.
+   * <p>This defines the timeout for transactions with the hardware. It will affect reads if less
+   * bytes are available than the read buffer size (defaults to 1) and very large writes.
    *
    * @param timeout The number of seconds to to wait for I/O.
    */
@@ -382,12 +378,11 @@ public class SerialPort {
   /**
    * Specify the size of the input buffer.
    *
-   * Specify the amount of data that can be stored before data from the device
-   * is returned to Read. If you want data that is received to be returned
-   * immediately, set this to 1.
+   * <p>Specify the amount of data that can be stored before data from the device is returned to
+   * Read. If you want data that is received to be returned immediately, set this to 1.
    *
-   * It the buffer is not filled before the read timeout expires, all data that
-   * has been received so far will be returned.
+   * <p>It the buffer is not filled before the read timeout expires, all data that has been received
+   * so far will be returned.
    *
    * @param size The read buffer size.
    */
@@ -398,8 +393,7 @@ public class SerialPort {
   /**
    * Specify the size of the output buffer.
    *
-   * Specify the amount of data that can be stored before being transmitted to
-   * the device.
+   * <p>Specify the amount of data that can be stored before being transmitted to the device.
    *
    * @param size The write buffer size.
    */
@@ -410,11 +404,11 @@ public class SerialPort {
   /**
    * Specify the flushing behavior of the output buffer.
    *
-   * When set to kFlushOnAccess, data is synchronously written to the serial
-   * port after each call to either print() or write().
+   * <p>When set to kFlushOnAccess, data is synchronously written to the serial port after each
+   * call to either print() or write().
    *
-   * When set to kFlushWhenFull, data will only be written to the serial port
-   * when the buffer is full or when flush() is called.
+   * <p>When set to kFlushWhenFull, data will only be written to the serial port when the buffer
+   * is full or when flush() is called.
    *
    * @param mode The write buffer mode.
    */
@@ -425,8 +419,8 @@ public class SerialPort {
   /**
    * Force the output buffer to be written to the port.
    *
-   * This is used when setWriteBufferMode() is set to kFlushWhenFull to force a
-   * flush before the buffer is full.
+   * <p>This is used when setWriteBufferMode() is set to kFlushWhenFull to force a flush before the
+   * buffer is full.
    */
   public void flush() {
     SerialPortJNI.serialFlush(m_port);
@@ -435,7 +429,7 @@ public class SerialPort {
   /**
    * Reset the serial port driver to a known state.
    *
-   * Empty the transmit and receive buffers in the device and formatted I/O.
+   * <p>Empty the transmit and receive buffers in the device and formatted I/O.
    */
   public void reset() {
     SerialPortJNI.serialClear(m_port);

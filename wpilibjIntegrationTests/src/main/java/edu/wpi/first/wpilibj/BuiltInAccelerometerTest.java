@@ -7,20 +7,20 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.logging.Logger;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.logging.Logger;
+
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+
+import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class BuiltInAccelerometerTest extends AbstractComsSetup {
@@ -46,7 +46,7 @@ public class BuiltInAccelerometerTest extends AbstractComsSetup {
    */
   @Parameters
   public static Collection<Accelerometer.Range[]> generateData() {
-    return Arrays.asList(new Accelerometer.Range[][] { {Accelerometer.Range.k2G},
+    return Arrays.asList(new Accelerometer.Range[][]{{Accelerometer.Range.k2G},
         {Accelerometer.Range.k4G}, {Accelerometer.Range.k8G},});
   }
 
@@ -56,8 +56,8 @@ public class BuiltInAccelerometerTest extends AbstractComsSetup {
   }
 
   /**
-   * There's not much we can automatically test with the on-board accelerometer,
-   * but checking for gravity is probably good enough to tell that it's working.
+   * There's not much we can automatically test with the on-board accelerometer, but checking for
+   * gravity is probably good enough to tell that it's working.
    */
   @Test
   public void testAccelerometer() {

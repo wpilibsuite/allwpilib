@@ -7,22 +7,15 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 import java.util.logging.Logger;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import edu.wpi.first.wpilibj.mocks.MockCommand;
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
 /**
- * Ported from the old CrioTest Classes
- *$
+ * Ported from the old CrioTest Classes.
+ *
  * @author Mitchell
  * @author Jonathan Leitschuh
  */
@@ -34,38 +27,14 @@ public class CommandParallelGroupTest extends AbstractCommandTest {
   }
 
   /**
-   * @throws java.lang.Exception
-   */
-  @BeforeClass
-  public static void setUpBeforeClass() throws Exception {}
-
-  /**
-   * @throws java.lang.Exception
-   */
-  @AfterClass
-  public static void tearDownAfterClass() throws Exception {}
-
-  /**
-   * @throws java.lang.Exception
-   */
-  @Before
-  public void setUp() throws Exception {}
-
-  /**
-   * @throws java.lang.Exception
-   */
-  @After
-  public void tearDown() throws Exception {}
-
-  /**
-   * Simple Parallel Command Group With 2 commands one command terminates first
+   * Simple Parallel Command Group With 2 commands one command terminates first.
    */
   @Test
   public void testParallelCommandGroupWithTwoCommands() {
-    MockCommand command1 = new MockCommand();
-    MockCommand command2 = new MockCommand();
+    final MockCommand command1 = new MockCommand();
+    final MockCommand command2 = new MockCommand();
 
-    CommandGroup commandGroup = new CommandGroup();
+    final CommandGroup commandGroup = new CommandGroup();
     commandGroup.addParallel(command1);
     commandGroup.addParallel(command2);
 
@@ -97,11 +66,4 @@ public class CommandParallelGroupTest extends AbstractCommandTest {
 
   }
 
-  public void sleep(long time) {
-    try {
-      Thread.sleep(time);
-    } catch (InterruptedException ex) {
-      fail("Sleep Interrupted!?!?!?!?");
-    }
-  }
 }

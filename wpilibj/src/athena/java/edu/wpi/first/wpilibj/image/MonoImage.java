@@ -8,15 +8,15 @@
 package edu.wpi.first.wpilibj.image;
 
 import com.ni.vision.NIVision;
-import com.ni.vision.NIVision.EllipseDescriptor;
 import com.ni.vision.NIVision.CurveOptions;
-import com.ni.vision.NIVision.ShapeDetectionOptions;
-import com.ni.vision.NIVision.ROI;
 import com.ni.vision.NIVision.DetectEllipsesResult;
+import com.ni.vision.NIVision.EllipseDescriptor;
+import com.ni.vision.NIVision.ROI;
+import com.ni.vision.NIVision.ShapeDetectionOptions;
 
 /**
  * A grey scale image represented at a byte per pixel.
- *$
+ *
  * @author dtjones
  */
 public class MonoImage extends ImageBase {
@@ -33,10 +33,11 @@ public class MonoImage extends ImageBase {
   }
 
   public DetectEllipsesResult detectEllipses(EllipseDescriptor ellipseDescriptor,
-      CurveOptions curveOptions, ShapeDetectionOptions shapeDetectionOptions, ROI roi)
-      throws NIVisionException {
-    return NIVision.imaqDetectEllipses(image, ellipseDescriptor, curveOptions,
-        shapeDetectionOptions, roi);
+                                             CurveOptions curveOptions,
+                                             ShapeDetectionOptions shapeDetectionOptions,
+                                             ROI roi) throws NIVisionException {
+    return NIVision
+        .imaqDetectEllipses(image, ellipseDescriptor, curveOptions, shapeDetectionOptions, roi);
   }
 
   public DetectEllipsesResult detectEllipses(EllipseDescriptor ellipseDescriptor)

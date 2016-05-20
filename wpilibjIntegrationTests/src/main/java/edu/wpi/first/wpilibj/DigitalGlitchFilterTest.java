@@ -7,18 +7,13 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 import java.util.logging.Logger;
 
-import org.junit.Test;
-
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Counter;
-import edu.wpi.first.wpilibj.DigitalGlitchFilter;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test for the DigitalGlitchFilter class.
@@ -27,38 +22,37 @@ import edu.wpi.first.wpilibj.DigitalGlitchFilter;
  */
 public class DigitalGlitchFilterTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(
-     DigitalGlitchFilterTest.class.getName());
+      DigitalGlitchFilterTest.class.getName());
 
   protected Logger getClassLogger() {
     return logger;
   }
 
   /**
-   * This is a test to make sure that filters can be created and are consistent.
-   * This assumes that the FPGA implementation to actually implement the filter
-   * has been tested.  It does validate that we are successfully able to set and
-   * get the active filters for ports and makes sure that the FPGA filter is
-   * changed correctly, and does the same for the period.
+   * This is a test to make sure that filters can be created and are consistent. This assumes that
+   * the FPGA implementation to actually implement the filter has been tested.  It does validate
+   * that we are successfully able to set and get the active filters for ports and makes sure that
+   * the FPGA filter is changed correctly, and does the same for the period.
    */
   @Test
   public void testDigitalGlitchFilterBasic() {
-    DigitalInput input1 = new DigitalInput(1);
-    DigitalInput input2 = new DigitalInput(2);
-    DigitalInput input3 = new DigitalInput(3);
-    DigitalInput input4 = new DigitalInput(4);
-    Encoder encoder5 = new Encoder(5, 6);
-    Counter counter7 = new Counter(7);
+    final DigitalInput input1 = new DigitalInput(1);
+    final DigitalInput input2 = new DigitalInput(2);
+    final DigitalInput input3 = new DigitalInput(3);
+    final DigitalInput input4 = new DigitalInput(4);
+    final Encoder encoder5 = new Encoder(5, 6);
+    final Counter counter7 = new Counter(7);
 
-    DigitalGlitchFilter filter1 = new DigitalGlitchFilter();
+    final DigitalGlitchFilter filter1 = new DigitalGlitchFilter();
     filter1.add(input1);
     filter1.setPeriodNanoSeconds(4200);
 
-    DigitalGlitchFilter filter2 = new DigitalGlitchFilter();
+    final DigitalGlitchFilter filter2 = new DigitalGlitchFilter();
     filter2.add(input2);
     filter2.add(input3);
     filter2.setPeriodNanoSeconds(97100);
 
-    DigitalGlitchFilter filter3 = new DigitalGlitchFilter();
+    final DigitalGlitchFilter filter3 = new DigitalGlitchFilter();
     filter3.add(input4);
     filter3.add(encoder5);
     filter3.add(counter7);

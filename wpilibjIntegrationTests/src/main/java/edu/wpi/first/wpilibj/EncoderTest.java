@@ -7,11 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertTrue;
-
-import java.util.Collection;
-import java.util.logging.Logger;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -20,27 +15,31 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import java.util.Collection;
+import java.util.logging.Logger;
+
 import edu.wpi.first.wpilibj.fixtures.FakeEncoderFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
 
+import static org.junit.Assert.assertTrue;
+
 
 /**
- * Test to see if the FPGA properly recognizes a mock Encoder input
- *$
- * @author Jonathan Leitschuh
+ * Test to see if the FPGA properly recognizes a mock Encoder input.
  *
+ * @author Jonathan Leitschuh
  */
 @RunWith(Parameterized.class)
 public class EncoderTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(EncoderTest.class.getName());
   private static FakeEncoderFixture encoder = null;
 
-  private final boolean flip; // Does this test need to flip the inputs
-  private final int inputA;
-  private final int inputB;
-  private final int outputA;
-  private final int outputB;
+  private final boolean m_flip; // Does this test need to flip the inputs
+  private final int m_inputA;
+  private final int m_inputB;
+  private final int m_outputA;
+  private final int m_outputB;
 
   @Override
   protected Logger getClassLogger() {
@@ -48,10 +47,9 @@ public class EncoderTest extends AbstractComsSetup {
   }
 
   /**
-   * Test data generator. This method is called the the JUnit parameterized test
-   * runner and returns a Collection of Arrays. For each Array in the
-   * Collection, each array element corresponds to a parameter in the
-   * constructor.
+   * Test data generator. This method is called the the JUnit parametrized test runner and returns
+   * a Collection of Arrays. For each Array in the Collection, each array element corresponds to a
+   * parameter in the constructor.
    */
   @Parameters
   public static Collection<Integer[]> generateData() {
@@ -59,32 +57,29 @@ public class EncoderTest extends AbstractComsSetup {
   }
 
   /**
-   * Constructs a parameterized Encoder Test
-   *$
-   * @param inputA The port number for inputA
+   * Constructs a parametrized Encoder Test.
+   *
+   * @param inputA  The port number for inputA
    * @param outputA The port number for outputA
-   * @param inputB The port number for inputB
+   * @param inputB  The port number for inputB
    * @param outputB The port number for outputB
-   * @param flip whether or not these set of values require the encoder to be
-   *        reversed (0 or 1)
+   * @param flip    whether or not these set of values require the encoder to be reversed (0 or 1)
    */
   public EncoderTest(int inputA, int outputA, int inputB, int outputB, int flip) {
-    this.inputA = inputA;
-    this.inputB = inputB;
-    this.outputA = outputA;
-    this.outputB = outputB;
+    m_inputA = inputA;
+    m_inputB = inputB;
+    m_outputA = outputA;
+    m_outputB = outputB;
 
     // If the encoder from a previous test is allocated then we must free its
     // members
-    if (encoder != null)
+    if (encoder != null) {
       encoder.teardown();
-    this.flip = flip == 0;
+    }
+    m_flip = flip == 0;
     encoder = new FakeEncoderFixture(inputA, outputA, inputB, outputB);
   }
 
-  /**
-   * @throws java.lang.Exception
-   */
   @AfterClass
   public static void tearDownAfterClass() throws Exception {
     encoder.teardown();
@@ -92,9 +87,7 @@ public class EncoderTest extends AbstractComsSetup {
   }
 
   /**
-   * Sets up the test and verifies that the test was reset to the default state
-   *$
-   * @throws java.lang.Exception
+   * Sets up the test and verifies that the test was reset to the default state.
    */
   @Before
   public void setUp() throws Exception {
@@ -102,16 +95,13 @@ public class EncoderTest extends AbstractComsSetup {
     testDefaultState();
   }
 
-  /**
-   * @throws java.lang.Exception
-   */
   @After
   public void tearDown() throws Exception {
     encoder.reset();
   }
 
   /**
-   * Tests to see if Encoders initialize to zero
+   * Tests to see if Encoders initialize to zero.
    */
   @Test
   public void testDefaultState() {
@@ -120,13 +110,13 @@ public class EncoderTest extends AbstractComsSetup {
   }
 
   /**
-   * Tests to see if Encoders can count up sucsessfully
+   * Tests to see if Encoders can count up successfully.
    */
   @Test
   public void testCountUp() {
     int goal = 100;
     encoder.getFakeEncoderSource().setCount(goal);
-    encoder.getFakeEncoderSource().setForward(flip);
+    encoder.getFakeEncoderSource().setForward(m_flip);
     encoder.getFakeEncoderSource().execute();
     int value = encoder.getEncoder().get();
     assertTrue(errorMessage(goal, value), value == goal);
@@ -134,13 +124,13 @@ public class EncoderTest extends AbstractComsSetup {
   }
 
   /**
-   * Tests to see if Encoders can count down sucsessfully
+   * Tests to see if Encoders can count down successfully.
    */
   @Test
   public void testCountDown() {
     int goal = -100;
     encoder.getFakeEncoderSource().setCount(goal); // Goal has to be positive
-    encoder.getFakeEncoderSource().setForward(!flip);
+    encoder.getFakeEncoderSource().setForward(!m_flip);
     encoder.getFakeEncoderSource().execute();
     int value = encoder.getEncoder().get();
     assertTrue(errorMessage(goal, value), value == goal);
@@ -148,16 +138,14 @@ public class EncoderTest extends AbstractComsSetup {
   }
 
   /**
-   * Creates a simple message with the error that was encounterd for the
-   * Encoders
-   *$
-   * @param goal The goal that was trying to be reached
+   * Creates a simple message with the error that was encountered for the Encoders.
+   *
+   * @param goal      The goal that was trying to be reached
    * @param trueValue The actual value that was reached by the test
-   * @return A fully constructed message with data about where and why the the
-   *         test failed
+   * @return A fully constructed message with data about where and why the the test failed.
    */
   private String errorMessage(int goal, int trueValue) {
-    return "Encoder ({In,Out}): {" + inputA + ", " + outputA + "},{" + inputB + ", " + outputB
-        + "} Returned: " + trueValue + ", Wanted: " + goal;
+    return "Encoder ({In,Out}): {" + m_inputA + ", " + m_outputA + "},{" + m_inputB + ", "
+        + m_outputB + "} Returned: " + trueValue + ", Wanted: " + goal;
   }
 }

@@ -7,25 +7,27 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import gazebo.msgs.GzBool.Bool;
-
 import org.gazebosim.transport.Msgs;
 import org.gazebosim.transport.SubscriberCallback;
 
-public class SimDigitalInput {
-	private boolean value;
-	
-	public SimDigitalInput(String topic) {
-    	MainNode.subscribe(topic, Msgs.Bool(),
-			new SubscriberCallback<Bool>() {
-    			@Override public void callback(Bool msg) {
-    				value = msg.getData();
-    			}
-			}
-		);
-	}
+import gazebo.msgs.GzBool.Bool;
 
-	public boolean get() {
-		return value;
-	}
+public class SimDigitalInput {
+  private boolean m_value;
+
+  @SuppressWarnings("JavadocMethod")
+  public SimDigitalInput(String topic) {
+    MainNode.subscribe(topic, Msgs.Bool(),
+        new SubscriberCallback<Bool>() {
+          @Override
+          public void callback(Bool msg) {
+            m_value = msg.getData();
+          }
+        }
+    );
+  }
+
+  public boolean get() {
+    return m_value;
+  }
 }

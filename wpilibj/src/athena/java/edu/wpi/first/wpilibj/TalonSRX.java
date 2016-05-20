@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
- * Cross the Road Electronics (CTRE) Talon SRX Speed Controller with PWM control
- *$
+ * Cross the Road Electronics (CTRE) Talon SRX Speed Controller with PWM control.
+ *
  * @see CANTalon CANTalon for CAN control of Talon SRX
  */
 public class TalonSRX extends PWMSpeedController {
@@ -21,16 +21,16 @@ public class TalonSRX extends PWMSpeedController {
   /**
    * Common initialization code called by all constructors.
    *
-   * Note that the TalonSRX uses the following bounds for PWM values. These
-   * values should work reasonably well for most controllers, but if users
-   * experience issues such as asymmetric behavior around the deadband or
-   * inability to saturate the controller in either direction, calibration is
-   * recommended. The calibration procedure can be found in the TalonSRX User
-   * Manual available from CTRE.
+   * <p>Note that the TalonSRX uses the following bounds for PWM values. These values should work
+   * reasonably well for most controllers, but if users experience issues such as asymmetric
+   * behavior around the deadband or inability to saturate the controller in either direction,
+   * calibration is recommended. The calibration procedure can be found in the TalonSRX User Manual
+   * available from CTRE.
    *
-   * - 2.0004ms = full "forward" - 1.52ms = the "high end" of the deadband range
-   * - 1.50ms = center of the deadband range (off) - 1.48ms = the "low end" of
-   * the deadband range - .997ms = full "reverse"
+   * <p>- 2.0004ms = full "forward" - 1.52ms = the "high end" of the deadband range - 1.50ms =
+   * center
+   * of the deadband range (off) - 1.48ms = the "low end" of the deadband range - .997ms = full
+   * "reverse"
    */
   protected void initTalonSRX() {
     setBounds(2.004, 1.52, 1.50, 1.48, .997);
@@ -43,10 +43,10 @@ public class TalonSRX extends PWMSpeedController {
   }
 
   /**
-   * Constructor for a TalonSRX connected via PWM
+   * Constructor for a TalonSRX connected via PWM.
    *
-   * @param channel The PWM channel that the TalonSRX is attached to. 0-9 are
-   *        on-board, 10-19 are on the MXP port
+   * @param channel The PWM channel that the TalonSRX is attached to. 0-9 are on-board, 10-19 are on
+   *                the MXP port
    */
   public TalonSRX(final int channel) {
     super(channel);

@@ -10,40 +10,41 @@ package edu.wpi.first.wpilibj;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import edu.wpi.first.wpilibj.DigitalSource;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Counter;
-
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
-
 import edu.wpi.first.wpilibj.hal.DigitalGlitchFilterJNI;
 
 /**
- * Class to enable glitch filtering on a set of digital inputs.
- * This class will manage adding and removing digital inputs from a FPGA glitch
- * filter. The filter lets the user configure the time that an input must remain
- * high or low before it is classified as high or low.
+ * Class to enable glitch filtering on a set of digital inputs. This class will manage adding and
+ * removing digital inputs from a FPGA glitch filter. The filter lets the user configure the time
+ * that an input must remain high or low before it is classified as high or low.
  */
 public class DigitalGlitchFilter extends SensorBase {
+
+  /**
+   * Configures the Digital Glitch Filter to its default settings.
+   */
   public DigitalGlitchFilter() {
-    synchronized(m_mutex) {
-      int i = 0;
-      while (m_filterAllocated[i] != false && i < m_filterAllocated.length) {
-        i++;
+    synchronized (m_mutex) {
+      int index = 0;
+      while (m_filterAllocated[index] != false && index < m_filterAllocated.length) {
+        index++;
       }
-      if (i != m_filterAllocated.length) {
-        m_channelIndex = i;
-        m_filterAllocated[i] = true;
+      if (index != m_filterAllocated.length) {
+        m_channelIndex = index;
+        m_filterAllocated[index] = true;
         UsageReporting.report(tResourceType.kResourceType_DigitalFilter,
-                              m_channelIndex, 0);
+            m_channelIndex, 0);
       }
     }
   }
 
+  /**
+   * Free the resources used by this object.
+   */
   public void free() {
     if (m_channelIndex >= 0) {
-      synchronized(m_mutex) {
+      synchronized (m_mutex) {
         m_filterAllocated[m_channelIndex] = false;
       }
       m_channelIndex = -1;
@@ -121,30 +122,30 @@ public class DigitalGlitchFilter extends SensorBase {
   }
 
   /**
-   * Sets the number of FPGA cycles that the input must hold steady to pass
-   * through this glitch filter.
+   * Sets the number of FPGA cycles that the input must hold steady to pass through this glitch
+   * filter.
    *
-   * @param fpga_cycles The number of FPGA cycles.
+   * @param fpgaCycles The number of FPGA cycles.
    */
-  public void setPeriodCycles(int fpga_cycles) {
-    DigitalGlitchFilterJNI.setFilterPeriod(m_channelIndex, fpga_cycles);
+  public void setPeriodCycles(int fpgaCycles) {
+    DigitalGlitchFilterJNI.setFilterPeriod(m_channelIndex, fpgaCycles);
   }
 
   /**
-   * Sets the number of nanoseconds that the input must hold steady to pass
-   * through this glitch filter.
+   * Sets the number of nanoseconds that the input must hold steady to pass through this glitch
+   * filter.
    *
    * @param nanoseconds The number of nanoseconds.
    */
   public void setPeriodNanoSeconds(long nanoseconds) {
-    int fpga_cycles = (int) (nanoseconds * kSystemClockTicksPerMicrosecond / 4 /
-                             1000);
-    setPeriodCycles(fpga_cycles);
+    int fpgaCycles = (int) (nanoseconds * kSystemClockTicksPerMicrosecond / 4
+        / 1000);
+    setPeriodCycles(fpgaCycles);
   }
 
   /**
-   * Gets the number of FPGA cycles that the input must hold steady to pass
-   * through this glitch filter.
+   * Gets the number of FPGA cycles that the input must hold steady to pass through this glitch
+   * filter.
    *
    * @return The number of cycles.
    */
@@ -153,19 +154,19 @@ public class DigitalGlitchFilter extends SensorBase {
   }
 
   /**
-   * Gets the number of nanoseconds that the input must hold steady to pass
-   * through this glitch filter.
+   * Gets the number of nanoseconds that the input must hold steady to pass through this glitch
+   * filter.
    *
    * @return The number of nanoseconds.
    */
   public long getPeriodNanoSeconds() {
-    int fpga_cycles = getPeriodCycles();
+    int fpgaCycles = getPeriodCycles();
 
-    return (long) fpga_cycles * 1000L /
-           (long) (kSystemClockTicksPerMicrosecond / 4);
+    return (long) fpgaCycles * 1000L
+        / (long) (kSystemClockTicksPerMicrosecond / 4);
   }
 
   private int m_channelIndex = -1;
   private static final Lock m_mutex = new ReentrantLock(true);
   private static final boolean[] m_filterAllocated = new boolean[3];
-};
+}

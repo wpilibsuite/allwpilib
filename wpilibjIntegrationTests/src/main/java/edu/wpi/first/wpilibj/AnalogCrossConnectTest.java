@@ -7,25 +7,25 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.logging.Logger;
-
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.logging.Logger;
+
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
 import edu.wpi.first.wpilibj.test.TestBench;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 /**
- * @author jonathanleitschuh
+ * Test that covers the {@link AnalogCrossConnectFixture}.
  *
+ * @author jonathanleitschuh
  */
 public class AnalogCrossConnectTest extends AbstractInterruptTest {
   private static final Logger logger = Logger.getLogger(AnalogCrossConnectTest.class.getName());
@@ -40,36 +40,22 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
   }
 
 
-  /**
-   * @throws java.lang.Exception
-   */
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
     analogIO = TestBench.getAnalogCrossConnectFixture();
   }
 
-  /**
-   * @throws java.lang.Exception
-   */
   @AfterClass
   public static void tearDownAfterClass() throws Exception {
     analogIO.teardown();
     analogIO = null;
   }
 
-  /**
-   * @throws java.lang.Exception
-   */
   @Before
   public void setUp() throws Exception {
     analogIO.setup();
   }
 
-  /**
-   * @throws java.lang.Exception
-   */
-  @After
-  public void tearDown() throws Exception {}
 
   @Test
   public void testAnalogOuput() {
@@ -155,43 +141,44 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
     analogIO.getInput().getAccumulatorCount();
   }
 
-  private AnalogTrigger interruptTrigger;
-  private AnalogTriggerOutput interruptTriggerOutput;
+  private AnalogTrigger m_interruptTrigger;
+  private AnalogTriggerOutput m_interruptTriggerOutput;
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see
    * edu.wpi.first.wpilibj.AbstractInterruptTest#giveInterruptableSensorBase()
    */
   @Override
   InterruptableSensorBase giveInterruptableSensorBase() {
-    interruptTrigger = new AnalogTrigger(analogIO.getInput());
-    interruptTrigger.setLimitsVoltage(2.0f, 3.0f);
-    interruptTriggerOutput = new AnalogTriggerOutput(interruptTrigger, AnalogTriggerType.kState);
-    return interruptTriggerOutput;
+    m_interruptTrigger = new AnalogTrigger(analogIO.getInput());
+    m_interruptTrigger.setLimitsVoltage(2.0f, 3.0f);
+    m_interruptTriggerOutput = new AnalogTriggerOutput(m_interruptTrigger,
+        AnalogTriggerType.kState);
+    return m_interruptTriggerOutput;
   }
 
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see
    * edu.wpi.first.wpilibj.AbstractInterruptTest#freeInterruptableSensorBase()
    */
   @Override
   void freeInterruptableSensorBase() {
-    interruptTriggerOutput.cancelInterrupts();
-    interruptTriggerOutput.free();
-    interruptTriggerOutput = null;
-    interruptTrigger.free();
-    interruptTrigger = null;
+    m_interruptTriggerOutput.cancelInterrupts();
+    m_interruptTriggerOutput.free();
+    m_interruptTriggerOutput = null;
+    m_interruptTrigger.free();
+    m_interruptTrigger = null;
   }
 
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see edu.wpi.first.wpilibj.AbstractInterruptTest#setInterruptHigh()
    */
   @Override
@@ -202,7 +189,7 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see edu.wpi.first.wpilibj.AbstractInterruptTest#setInterruptLow()
    */
   @Override

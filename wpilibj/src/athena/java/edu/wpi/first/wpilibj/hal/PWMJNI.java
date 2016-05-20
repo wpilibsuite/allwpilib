@@ -7,18 +7,19 @@
 
 package edu.wpi.first.wpilibj.hal;
 
+@SuppressWarnings("AbbreviationAsWordInName")
 public class PWMJNI extends DIOJNI {
-  public static native boolean allocatePWMChannel(long digital_port_pointer);
+  public static native boolean allocatePWMChannel(long digitalPortPointer);
 
-  public static native void freePWMChannel(long digital_port_pointer);
+  public static native void freePWMChannel(long digitalPortPointer);
 
-  public static native void setPWM(long digital_port_pointer, short value);
+  public static native void setPWM(long digitalPortPointer, short value);
 
-  public static native short getPWM(long digital_port_pointer);
+  public static native short getPWM(long digitalPortPointer);
 
-  public static native void latchPWMZero(long digital_port_pointer);
+  public static native void latchPWMZero(long digitalPortPointer);
 
-  public static native void setPWMPeriodScale(long digital_port_pointer, int squelchMask);
+  public static native void setPWMPeriodScale(long digitalPortPointer, int squelchMask);
 
   public static native long allocatePWM();
 

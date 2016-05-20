@@ -10,11 +10,10 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
- * The MotorSafetyHelper object is constructed for every object that wants to
- * implement the Motor Safety protocol. The helper object has the code to
- * actually do the timing and call the motors Stop() method when the timeout
- * expires. The motor object is expected to call the Feed() method whenever the
- * motors value is updated.
+ * The MotorSafetyHelper object is constructed for every object that wants to implement the Motor
+ * Safety protocol. The helper object has the code to actually do the timing and call the motors
+ * Stop() method when the timeout expires. The motor object is expected to call the Feed() method
+ * whenever the motors value is updated.
  *
  * @author brad
  */
@@ -28,14 +27,13 @@ public class MotorSafetyHelper {
   static MotorSafetyHelper m_headHelper = null;
 
   /**
-   * The constructor for a MotorSafetyHelper object. The helper object is
-   * constructed for every object that wants to implement the Motor Safety
-   * protocol. The helper object has the code to actually do the timing and call
-   * the motors Stop() method when the timeout expires. The motor object is
-   * expected to call the Feed() method whenever the motors value is updated.
+   * The constructor for a MotorSafetyHelper object. The helper object is constructed for every
+   * object that wants to implement the Motor Safety protocol. The helper object has the code to
+   * actually do the timing and call the motors Stop() method when the timeout expires. The motor
+   * object is expected to call the Feed() method whenever the motors value is updated.
    *
-   * @param safeObject a pointer to the motor object implementing MotorSafety.
-   *        This is used to call the Stop() method on the motor.
+   * @param safeObject a pointer to the motor object implementing MotorSafety. This is used to call
+   *                   the Stop() method on the motor.
    */
   public MotorSafetyHelper(MotorSafety safeObject) {
     m_safeObject = safeObject;
@@ -47,8 +45,7 @@ public class MotorSafetyHelper {
   }
 
   /**
-   * Feed the motor safety object. Resets the timer on this object that is used
-   * to do the timeouts.
+   * Feed the motor safety object. Resets the timer on this object that is used to do the timeouts.
    */
   public void feed() {
     m_stopTime = Timer.getFPGATimestamp() + m_expiration;
@@ -56,7 +53,7 @@ public class MotorSafetyHelper {
 
   /**
    * Set the expiration time for the corresponding motor safety object.
-   *$
+   *
    * @param expirationTime The timeout value in seconds.
    */
   public void setExpiration(double expirationTime) {
@@ -65,7 +62,7 @@ public class MotorSafetyHelper {
 
   /**
    * Retrieve the timeout value for the corresponding motor safety object.
-   *$
+   *
    * @return the timeout value in seconds.
    */
   public double getExpiration() {
@@ -74,34 +71,33 @@ public class MotorSafetyHelper {
 
   /**
    * Determine of the motor is still operating or has timed out.
-   *$
-   * @return a true value if the motor is still operating normally and hasn't
-   *         timed out.
+   *
+   * @return a true value if the motor is still operating normally and hasn't timed out.
    */
   public boolean isAlive() {
     return !m_enabled || m_stopTime > Timer.getFPGATimestamp();
   }
 
   /**
-   * Check if this motor has exceeded its timeout. This method is called
-   * periodically to determine if this motor has exceeded its timeout value. If
-   * it has, the stop method is called, and the motor is shut down until its
-   * value is updated again.
+   * Check if this motor has exceeded its timeout. This method is called periodically to determine
+   * if this motor has exceeded its timeout value. If it has, the stop method is called, and the
+   * motor is shut down until its value is updated again.
    */
   public void check() {
     if (!m_enabled || RobotState.isDisabled() || RobotState.isTest())
       return;
     if (m_stopTime < Timer.getFPGATimestamp()) {
-      DriverStation.reportError(m_safeObject.getDescription() + "... Output not updated often enough.", false);
+      DriverStation.reportError(m_safeObject.getDescription() + "... Output not updated often " +
+          "enough.", false);
 
       m_safeObject.stopMotor();
     }
   }
 
   /**
-   * Enable/disable motor safety for this device Turn on and off the motor
-   * safety option for this PWM object.
-   *$
+   * Enable/disable motor safety for this device Turn on and off the motor safety option for this
+   * PWM object.
+   *
    * @param enabled True if motor safety is enforced for this object
    */
   public void setSafetyEnabled(boolean enabled) {
@@ -109,9 +105,9 @@ public class MotorSafetyHelper {
   }
 
   /**
-   * Return the state of the motor safety enabled flag Return if the motor
-   * safety is currently enabled for this devicce.
-   *$
+   * Return the state of the motor safety enabled flag Return if the motor safety is currently
+   * enabled for this devicce.
+   *
    * @return True if motor safety is enforced for this device
    */
   public boolean isSafetyEnabled() {
@@ -119,8 +115,8 @@ public class MotorSafetyHelper {
   }
 
   /**
-   * Check the motors to see if any have timed out. This static method is called
-   * periodically to poll all the motors and stop any that have timed out.
+   * Check the motors to see if any have timed out. This static method is called periodically to
+   * poll all the motors and stop any that have timed out.
    */
   // TODO: these should be synchronized with the setting methods in case it's
   // called from a different thread

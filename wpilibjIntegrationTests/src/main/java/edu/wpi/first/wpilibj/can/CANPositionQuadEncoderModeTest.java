@@ -7,21 +7,22 @@
 
 package edu.wpi.first.wpilibj.can;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.Timer;
 
+import static org.junit.Assert.assertEquals;
+
 /**
- * @author jonathanleitschuh
+ * Tests the CAN Motor Encoders in QuadEncoder mode.
  *
+ * @author jonathanleitschuh
  */
 public class CANPositionQuadEncoderModeTest extends AbstractCANTest {
   private static final Logger logger = Logger.getLogger(CANPositionQuadEncoderModeTest.class
@@ -35,7 +36,7 @@ public class CANPositionQuadEncoderModeTest extends AbstractCANTest {
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see edu.wpi.first.wpilibj.can.AbstractCANTest#runMotorForward()
    */
   protected void runMotorForward() {
@@ -46,7 +47,7 @@ public class CANPositionQuadEncoderModeTest extends AbstractCANTest {
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see edu.wpi.first.wpilibj.can.AbstractCANTest#runMotorReverse()
    */
   protected void runMotorReverse() {
@@ -84,8 +85,7 @@ public class CANPositionQuadEncoderModeTest extends AbstractCANTest {
   }
 
   /**
-   * Test if we can set a position and reach that position with PID control on
-   * the Jaguar.
+   * Test if we can set a position and reach that position with PID control on the Jaguar.
    */
   @Test
   public void testEncoderPositionPIDForward() {
@@ -101,8 +101,7 @@ public class CANPositionQuadEncoderModeTest extends AbstractCANTest {
   }
 
   /**
-   * Test if we can set a position and reach that position with PID control on
-   * the Jaguar.
+   * Test if we can set a position and reach that position with PID control on the Jaguar.
    */
   @Test
   public void testEncoderPositionPIDReverse() {

@@ -10,28 +10,31 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 
 /**
- * Contains global utility functions
+ * Contains global utility functions.
  */
-public class Utility {
+public final class Utility {
 
-  private Utility() {}
+  private Utility() {
+  }
 
   /**
    * Return the FPGA Version number. For now, expect this to be 2009.
    *
    * @return FPGA Version number.
    */
+  @SuppressWarnings("AbbreviationAsWordInName")
   int getFPGAVersion() {
     return HALUtil.getFPGAVersion();
   }
 
   /**
-   * Return the FPGA Revision number. The format of the revision is 3 numbers.
-   * The 12 most significant bits are the Major Revision. the next 8 bits are
-   * the Minor Revision. The 12 least significant bits are the Build Number.
+   * Return the FPGA Revision number. The format of the revision is 3 numbers. The 12 most
+   * significant bits are the Major Revision. the next 8 bits are the Minor Revision. The 12 least
+   * significant bits are the Build Number.
    *
    * @return FPGA Revision number.
    */
+  @SuppressWarnings("AbbreviationAsWordInName")
   long getFPGARevision() {
     return (long) HALUtil.getFPGARevision();
   }
@@ -46,8 +49,8 @@ public class Utility {
   }
 
   /**
-   * Get the state of the "USER" button on the RoboRIO
-   *$
+   * Get the state of the "USER" button on the RoboRIO.
+   *
    * @return true if the button is currently pressed down
    */
   public static boolean getUserButton() {

@@ -12,27 +12,27 @@ public class CompressorJNI extends JNIWrapper {
 
   public static native boolean checkCompressorModule(byte module);
 
-  public static native boolean getCompressor(long pcm_pointer);
+  public static native boolean getCompressor(long pcmPointer);
 
-  public static native void setClosedLoopControl(long pcm_pointer, boolean value);
+  public static native void setClosedLoopControl(long pcmPointer, boolean value);
 
-  public static native boolean getClosedLoopControl(long pcm_pointer);
+  public static native boolean getClosedLoopControl(long pcmPointer);
 
-  public static native boolean getPressureSwitch(long pcm_pointer);
+  public static native boolean getPressureSwitch(long pcmPointer);
 
-  public static native float getCompressorCurrent(long pcm_pointer);
+  public static native float getCompressorCurrent(long pcmPointer);
 
-  public static native boolean getCompressorCurrentTooHighFault(long pcm_pointer);
+  public static native boolean getCompressorCurrentTooHighFault(long pcmPointer);
 
-  public static native boolean getCompressorCurrentTooHighStickyFault(long pcm_pointer);
+  public static native boolean getCompressorCurrentTooHighStickyFault(long pcmPointer);
 
-  public static native boolean getCompressorShortedStickyFault(long pcm_pointer);
+  public static native boolean getCompressorShortedStickyFault(long pcmPointer);
 
-  public static native boolean getCompressorShortedFault(long pcm_pointer);
+  public static native boolean getCompressorShortedFault(long pcmPointer);
 
-  public static native boolean getCompressorNotConnectedStickyFault(long pcm_pointer);
+  public static native boolean getCompressorNotConnectedStickyFault(long pcmPointer);
 
-  public static native boolean getCompressorNotConnectedFault(long pcm_pointer);
+  public static native boolean getCompressorNotConnectedFault(long pcmPointer);
 
-  public static native void clearAllPCMStickyFaults(long pcm_pointer);
+  public static native void clearAllPCMStickyFaults(long pcmPointer);
 }

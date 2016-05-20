@@ -8,24 +8,24 @@
 package edu.wpi.first.wpilibj;
 
 /**
- * This is a simple circular buffer so we don't need to "bucket brigade" copy
- * old values.
+ * This is a simple circular buffer so we don't need to "bucket brigade" copy old values.
  */
 public class CircularBuffer {
   private double[] m_data;
   private int m_front = 0;
   private int m_length = 0;
 
+  @SuppressWarnings("JavadocMethod")
   public CircularBuffer(int size) {
     m_data = new double[size];
-    for (double i : m_data) {
-      i = 0.0;
+    for (int i = 0; i < m_data.length; i++) {
+      m_data[i] = 0.0;
     }
   }
 
   /**
-   * Push new value onto front of the buffer. The value at the back is
-   * overwritten if the buffer is full.
+   * Push new value onto front of the buffer. The value at the back is overwritten if the buffer is
+   * full.
    */
   public void pushFront(double value) {
     if (m_data.length == 0) {
@@ -42,8 +42,8 @@ public class CircularBuffer {
   }
 
   /**
-   * Push new value onto back of the buffer. The value at the front is
-   * overwritten if the buffer is full.
+   * Push new value onto back of the buffer. The value at the front is overwritten if the buffer is
+   * full.
    */
   public void pushBack(double value) {
     if (m_data.length == 0) {
@@ -91,6 +91,7 @@ public class CircularBuffer {
     return m_data[(m_front + m_length) % m_data.length];
   }
 
+  @SuppressWarnings("JavadocMethod")
   public void reset() {
     for (double i : m_data) {
       i = 0.0;
@@ -107,14 +108,14 @@ public class CircularBuffer {
   }
 
   /**
-   * Increment an index modulo the length of the m_data buffer
+   * Increment an index modulo the length of the m_data buffer.
    */
   private int moduloInc(int index) {
     return (index + 1) % m_data.length;
   }
 
   /**
-   * Decrement an index modulo the length of the m_data buffer
+   * Decrement an index modulo the length of the m_data buffer.
    */
   private int moduloDec(int index) {
     if (index == 0) {

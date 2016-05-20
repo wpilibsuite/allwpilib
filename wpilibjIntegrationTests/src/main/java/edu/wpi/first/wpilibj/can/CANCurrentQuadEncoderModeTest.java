@@ -7,20 +7,21 @@
 
 package edu.wpi.first.wpilibj.can;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.util.logging.Logger;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.Ignore;
 
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.Timer;
 
+import static org.junit.Assert.assertEquals;
+
 /**
- * @author jonathanleitschuh
+ * Tests the CAN Motor Controller in Current Quad Encoder mode.
  *
+ * @author jonathanleitschuh
  */
 public class CANCurrentQuadEncoderModeTest extends AbstractCANTest {
   private static Logger logger = Logger.getLogger(CANCurrentQuadEncoderModeTest.class.getName());
@@ -29,7 +30,7 @@ public class CANCurrentQuadEncoderModeTest extends AbstractCANTest {
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see edu.wpi.first.wpilibj.can.AbstractCANTest#stopMotor()
    */
   protected void stopMotor() {
@@ -38,7 +39,7 @@ public class CANCurrentQuadEncoderModeTest extends AbstractCANTest {
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see edu.wpi.first.wpilibj.can.AbstractCANTest#runMotorForward()
    */
   protected void runMotorForward() {
@@ -47,7 +48,7 @@ public class CANCurrentQuadEncoderModeTest extends AbstractCANTest {
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see edu.wpi.first.wpilibj.can.AbstractCANTest#runMotorReverse()
    */
   protected void runMotorReverse() {
@@ -96,7 +97,8 @@ public class CANCurrentQuadEncoderModeTest extends AbstractCANTest {
     for (int i = 0; i < 10; i++) {
       setCANJaguar(1.0, setpoint);
 
-      if (Math.abs(getME().getMotor().getOutputCurrent() - Math.abs(setpoint)) <= kCurrentTolerance) {
+      if (Math.abs(getME().getMotor().getOutputCurrent() - Math.abs(setpoint))
+          <= kCurrentTolerance) {
         break;
       }
     }

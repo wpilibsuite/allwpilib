@@ -8,9 +8,8 @@
 package edu.wpi.first.wpilibj.can;
 
 /**
- * Exception indicating that a CAN driver library entry-point was passed an
- * invalid buffer. Typically, this is due to a buffer being too small to include
- * the needed safety token.
+ * Exception indicating that a CAN driver library entry-point was passed an invalid buffer.
+ * Typically, this is due to a buffer being too small to include the needed safety token.
  */
 public class CANInvalidBufferException extends RuntimeException {
   public CANInvalidBufferException() {

@@ -7,19 +7,16 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteOrder;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
+import java.nio.ByteOrder;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.SPIJNI;
 
 /**
+ * Represents a SPI bus port.
  *
- * Represents a SPI bus port
- *$
  * @author koconnor
  */
 public class SPI extends SensorBase {
@@ -27,26 +24,26 @@ public class SPI extends SensorBase {
   public enum Port {
     kOnboardCS0(0), kOnboardCS1(1), kOnboardCS2(2), kOnboardCS3(3), kMXP(4);
 
-    private int value;
+    private int m_value;
 
-    private Port(int value) {
-      this.value = value;
+    Port(int value) {
+      m_value = value;
     }
 
     public int getValue() {
-      return this.value;
+      return m_value;
     }
-  };
+  }
 
   private static int devices = 0;
 
   private byte m_port;
-  private int bitOrder;
-  private int clockPolarity;
-  private int dataOnTrailing;
+  private int m_bitOrder;
+  private int m_clockPolarity;
+  private int m_dataOnTrailing;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param port the physical SPI port
    */
@@ -60,15 +57,15 @@ public class SPI extends SensorBase {
   }
 
   /**
-   * Free the resources used by this object
+   * Free the resources used by this object.
    */
   public void free() {
     SPIJNI.spiClose(m_port);
   }
 
   /**
-   * Configure the rate of the generated clock signal. The default value is
-   * 500,000 Hz. The maximum value is 4,000,000 Hz.
+   * Configure the rate of the generated clock signal. The default value is 500,000 Hz. The maximum
+   * value is 4,000,000 Hz.
    *
    * @param hz The clock rate in Hertz.
    */
@@ -77,57 +74,55 @@ public class SPI extends SensorBase {
   }
 
   /**
-   * Configure the order that bits are sent and received on the wire to be most
-   * significant bit first.
+   * Configure the order that bits are sent and received on the wire to be most significant bit
+   * first.
    */
   public final void setMSBFirst() {
-    this.bitOrder = 1;
-    SPIJNI.spiSetOpts(m_port, this.bitOrder, this.dataOnTrailing, this.clockPolarity);
+    m_bitOrder = 1;
+    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
   }
 
   /**
-   * Configure the order that bits are sent and received on the wire to be least
-   * significant bit first.
+   * Configure the order that bits are sent and received on the wire to be least significant bit
+   * first.
    */
   public final void setLSBFirst() {
-    this.bitOrder = 0;
-    SPIJNI.spiSetOpts(m_port, this.bitOrder, this.dataOnTrailing, this.clockPolarity);
+    m_bitOrder = 0;
+    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
   }
 
   /**
-   * Configure the clock output line to be active low. This is sometimes called
-   * clock polarity high or clock idle high.
+   * Configure the clock output line to be active low. This is sometimes called clock polarity high
+   * or clock idle high.
    */
   public final void setClockActiveLow() {
-    this.clockPolarity = 1;
-    SPIJNI.spiSetOpts(m_port, this.bitOrder, this.dataOnTrailing, this.clockPolarity);
+    m_clockPolarity = 1;
+    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
   }
 
   /**
-   * Configure the clock output line to be active high. This is sometimes called
-   * clock polarity low or clock idle low.
+   * Configure the clock output line to be active high. This is sometimes called clock polarity low
+   * or clock idle low.
    */
   public final void setClockActiveHigh() {
-    this.clockPolarity = 0;
-    SPIJNI.spiSetOpts(m_port, this.bitOrder, this.dataOnTrailing, this.clockPolarity);
+    m_clockPolarity = 0;
+    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
   }
 
   /**
-   * Configure that the data is stable on the falling edge and the data changes
-   * on the rising edge.
+   * Configure that the data is stable on the falling edge and the data changes on the rising edge.
    */
   public final void setSampleDataOnFalling() {
-    this.dataOnTrailing = 1;
-    SPIJNI.spiSetOpts(m_port, this.bitOrder, this.dataOnTrailing, this.clockPolarity);
+    m_dataOnTrailing = 1;
+    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
   }
 
   /**
-   * Configure that the data is stable on the rising edge and the data changes
-   * on the falling edge.
+   * Configure that the data is stable on the rising edge and the data changes on the falling edge.
    */
   public final void setSampleDataOnRising() {
-    this.dataOnTrailing = 0;
-    SPIJNI.spiSetOpts(m_port, this.bitOrder, this.dataOnTrailing, this.clockPolarity);
+    m_dataOnTrailing = 0;
+    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
   }
 
   /**
@@ -145,11 +140,10 @@ public class SPI extends SensorBase {
   }
 
   /**
-   * Write data to the slave device. Blocks until there is space in the output
-   * FIFO.
+   * Write data to the slave device. Blocks until there is space in the output FIFO.
    *
-   * If not running in output only mode, also saves the data received on the
-   * MISO input during the transfer into the receive FIFO.
+   * <p>If not running in output only mode, also saves the data received on the MISO input during
+   * the transfer into the receive FIFO.
    */
   public int write(byte[] dataToSend, int size) {
     ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(size);
@@ -158,43 +152,44 @@ public class SPI extends SensorBase {
   }
 
   /**
-   * Write data to the slave device. Blocks until there is space in the output
-   * FIFO.
+   * Write data to the slave device. Blocks until there is space in the output FIFO.
    *
-   * If not running in output only mode, also saves the data received on the
-   * MISO input during the transfer into the receive FIFO.
+   * <p>If not running in output only mode, also saves the data received on the MISO input during
+   * the transfer into the receive FIFO.
    *
-   * @param dataToSend The buffer containing the data to send. Must be created
-   *        using ByteBuffer.allocateDirect().
+   * @param dataToSend The buffer containing the data to send. Must be created using
+   *                   ByteBuffer.allocateDirect().
    */
   public int write(ByteBuffer dataToSend, int size) {
-    if (!dataToSend.isDirect())
+    if (!dataToSend.isDirect()) {
       throw new IllegalArgumentException("must be a direct buffer");
-    if (dataToSend.capacity() < size)
+    }
+    if (dataToSend.capacity() < size) {
       throw new IllegalArgumentException("buffer is too small, must be at least " + size);
+    }
     return SPIJNI.spiWrite(m_port, dataToSend, (byte) size);
   }
 
   /**
    * Read a word from the receive FIFO.
    *
-   * Waits for the current transfer to complete if the receive FIFO is empty.
+   * <p>Waits for the current transfer to complete if the receive FIFO is empty.
    *
-   * If the receive FIFO is empty, there is no active transfer, and initiate is
-   * false, errors.
+   * <p>If the receive FIFO is empty, there is no active transfer, and initiate is false, errors.
    *
-   * @param initiate If true, this function pushes "0" into the transmit buffer
-   *        and initiates a transfer. If false, this function assumes that data
-   *        is already in the receive FIFO from a previous write.
+   * @param initiate If true, this function pushes "0" into the transmit buffer and initiates a
+   *                 transfer. If false, this function assumes that data is already in the receive
+   *                 FIFO from a previous write.
    */
   public int read(boolean initiate, byte[] dataReceived, int size) {
-    int retVal = 0;
+    final int retVal;
     ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(size);
     ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(size);
-    if (initiate)
+    if (initiate) {
       retVal = SPIJNI.spiTransaction(m_port, dataToSendBuffer, dataReceivedBuffer, (byte) size);
-    else
+    } else {
       retVal = SPIJNI.spiRead(m_port, dataReceivedBuffer, (byte) size);
+    }
     dataReceivedBuffer.get(dataReceived);
     return retVal;
   }
@@ -202,25 +197,24 @@ public class SPI extends SensorBase {
   /**
    * Read a word from the receive FIFO.
    *
-   * Waits for the current transfer to complete if the receive FIFO is empty.
+   * <p>Waits for the current transfer to complete if the receive FIFO is empty.
    *
-   * If the receive FIFO is empty, there is no active transfer, and initiate is
-   * false, errors.
+   * <p>If the receive FIFO is empty, there is no active transfer, and initiate is false, errors.
    *
-   * @param initiate If true, this function pushes "0" into the transmit buffer
-   *        and initiates a transfer. If false, this function assumes that data
-   *        is already in the receive FIFO from a previous write.
-   *
-   * @param dataReceived The buffer to be filled with the received data. Must be
-   *        created using ByteBuffer.allocateDirect().
-   *
-   * @param size The length of the transaction, in bytes
+   * @param initiate     If true, this function pushes "0" into the transmit buffer and initiates
+   *                     a transfer. If false, this function assumes that data is already in the
+   *                     receive FIFO from a previous write.
+   * @param dataReceived The buffer to be filled with the received data. Must be created using
+   *                     ByteBuffer.allocateDirect().
+   * @param size         The length of the transaction, in bytes
    */
   public int read(boolean initiate, ByteBuffer dataReceived, int size) {
-    if (!dataReceived.isDirect())
+    if (!dataReceived.isDirect()) {
       throw new IllegalArgumentException("must be a direct buffer");
-    if (dataReceived.capacity() < size)
+    }
+    if (dataReceived.capacity() < size) {
       throw new IllegalArgumentException("buffer is too small, must be at least " + size);
+    }
     if (initiate) {
       ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(size);
       return SPIJNI.spiTransaction(m_port, dataToSendBuffer, dataReceived, (byte) size);
@@ -229,11 +223,11 @@ public class SPI extends SensorBase {
   }
 
   /**
-   * Perform a simultaneous read/write transaction with the device
+   * Perform a simultaneous read/write transaction with the device.
    *
-   * @param dataToSend The data to be written out to the device
+   * @param dataToSend   The data to be written out to the device
    * @param dataReceived Buffer to receive data from the device
-   * @param size The length of the transaction, in bytes
+   * @param size         The length of the transaction, in bytes
    */
   public int transaction(byte[] dataToSend, byte[] dataReceived, int size) {
     ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(size);
@@ -247,46 +241,48 @@ public class SPI extends SensorBase {
   /**
    * Perform a simultaneous read/write transaction with the device
    *
-   * @param dataToSend The data to be written out to the device. Must be
-   *        created using ByteBuffer.allocateDirect().
-   * @param dataReceived Buffer to receive data from the device. Must be
-   *        created using ByteBuffer.allocateDirect().
-   * @param size The length of the transaction, in bytes
+   * @param dataToSend   The data to be written out to the device. Must be created using
+   *                     ByteBuffer.allocateDirect().
+   * @param dataReceived Buffer to receive data from the device. Must be created using
+   *                     ByteBuffer.allocateDirect().
+   * @param size         The length of the transaction, in bytes
    */
   public int transaction(ByteBuffer dataToSend, ByteBuffer dataReceived, int size) {
-    if (!dataToSend.isDirect())
+    if (!dataToSend.isDirect()) {
       throw new IllegalArgumentException("dataToSend must be a direct buffer");
-    if (dataToSend.capacity() < size)
+    }
+    if (dataToSend.capacity() < size) {
       throw new IllegalArgumentException("dataToSend is too small, must be at least " + size);
-    if (!dataReceived.isDirect())
+    }
+    if (!dataReceived.isDirect()) {
       throw new IllegalArgumentException("dataReceived must be a direct buffer");
-    if (dataReceived.capacity() < size)
+    }
+    if (dataReceived.capacity() < size) {
       throw new IllegalArgumentException("dataReceived is too small, must be at least " + size);
+    }
     return SPIJNI.spiTransaction(m_port, dataToSend, dataReceived, (byte) size);
   }
 
   /**
    * Initialize the accumulator.
    *
-   * @param period Time between reads
-   * @param cmd SPI command to send to request data
-   * @param xfer_size SPI transfer size, in bytes
-   * @param valid_mask Mask to apply to received data for validity checking
-   * @param valid_data After valid_mask is applied, required matching value for
-   *                   validity checking
-   * @param data_shift Bit shift to apply to received data to get actual data
-   *                   value
-   * @param data_size Size (in bits) of data field
-   * @param is_signed Is data field signed?
-   * @param big_endian Is device big endian?
+   * @param period     Time between reads
+   * @param cmd        SPI command to send to request data
+   * @param xferSize   SPI transfer size, in bytes
+   * @param validMask  Mask to apply to received data for validity checking
+   * @param validValue After validMask is applied, required matching value for validity checking
+   * @param dataShift  Bit shift to apply to received data to get actual data value
+   * @param dataSize   Size (in bits) of data field
+   * @param isSigned   Is data field signed?
+   * @param bigEndian  Is device big endian?
    */
-  public void initAccumulator(double period, int cmd, int xfer_size,
-                              int valid_mask, int valid_value,
-                              int data_shift, int data_size,
-                              boolean is_signed, boolean big_endian) {
-    SPIJNI.spiInitAccumulator(m_port, (int)(period * 1.0e6), cmd,
-        (byte)xfer_size, valid_mask, valid_value, (byte)data_shift,
-        (byte)data_size, is_signed, big_endian);
+  public void initAccumulator(double period, int cmd, int xferSize,
+                              int validMask, int validValue,
+                              int dataShift, int dataSize,
+                              boolean isSigned, boolean bigEndian) {
+    SPIJNI.spiInitAccumulator(m_port, (int) (period * 1.0e6), cmd,
+        (byte) xferSize, validMask, validValue, (byte) dataShift,
+        (byte) dataSize, isSigned, bigEndian);
   }
 
   /**
@@ -306,7 +302,7 @@ public class SPI extends SensorBase {
   /**
    * Set the center value of the accumulator.
    *
-   * The center value is subtracted from each value before it is added to the accumulator. This
+   * <p>The center value is subtracted from each value before it is added to the accumulator. This
    * is used for the center value of devices like gyros and accelerometers to make integration work
    * and to take the device offset into account when integrating.
    */
@@ -340,7 +336,7 @@ public class SPI extends SensorBase {
   /**
    * Read the number of accumulated values.
    *
-   * Read the count of the accumulated values since the accumulator was last Reset().
+   * <p>Read the count of the accumulated values since the accumulator was last Reset().
    *
    * @return The number of times samples from the channel were accumulated.
    */
@@ -360,8 +356,7 @@ public class SPI extends SensorBase {
   /**
    * Read the accumulated value and the number of accumulated values atomically.
    *
-   * This function reads the value and count atomically.
-   * This can be used for averaging.
+   * <p>This function reads the value and count atomically. This can be used for averaging.
    *
    * @param result AccumulatorResult object to store the results in.
    */

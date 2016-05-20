@@ -7,51 +7,55 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import gazebo.msgs.GzFloat64.Float64;
-import gazebo.msgs.GzString;
-
 import org.gazebosim.transport.Msgs;
 import org.gazebosim.transport.Publisher;
 import org.gazebosim.transport.SubscriberCallback;
 
+import gazebo.msgs.GzFloat64.Float64;
+import gazebo.msgs.GzString;
+
 public class SimGyro {
-	private double position, velocity;
-	private Publisher<GzString.String> command_pub;
-	
-	public SimGyro(String topic) {
-		command_pub = MainNode.advertise(topic+"/control", Msgs.String());
-		command_pub.setLatchMode(true);
+  private double m_position;
+  private double m_velocity;
+  private Publisher<GzString.String> m_commandPub;
 
-		MainNode.subscribe(topic+"/position", Msgs.Float64(),
-			new SubscriberCallback<Float64>() {
-				@Override public void callback(Float64 msg) {
-					position = msg.getData();
-				}
-			}
-    	);
-    	
-    	MainNode.subscribe(topic+"/velocity", Msgs.Float64(),
-			new SubscriberCallback<Float64>() {
-				@Override public void callback(Float64 msg) {
-					velocity = msg.getData();
-				}
-			}
-		);
-	}
-	
-	public void reset() {
-		sendCommand("reset");
-	}
+  @SuppressWarnings("JavadocMethod")
+  public SimGyro(String topic) {
+    m_commandPub = MainNode.advertise(topic + "/control", Msgs.String());
+    m_commandPub.setLatchMode(true);
 
-	private void sendCommand(String cmd) {
-		command_pub.publish(Msgs.String(cmd));
-	}
+    MainNode.subscribe(topic + "/position", Msgs.Float64(),
+        new SubscriberCallback<Float64>() {
+          @Override
+          public void callback(Float64 msg) {
+            m_position = msg.getData();
+          }
+        }
+    );
 
-	public double getAngle() {
-		return position;
-	}
+    MainNode.subscribe(topic + "/velocity", Msgs.Float64(),
+        new SubscriberCallback<Float64>() {
+          @Override
+          public void callback(Float64 msg) {
+            m_velocity = msg.getData();
+          }
+        }
+    );
+  }
 
-	public double getVelocity() {
-		return velocity;
-	}
+  public void reset() {
+    sendCommand("reset");
+  }
+
+  private void sendCommand(String cmd) {
+    m_commandPub.publish(Msgs.String(cmd));
+  }
+
+  public double getAngle() {
+    return m_position;
+  }
+
+  public double getVelocity() {
+    return m_velocity;
+  }
 }

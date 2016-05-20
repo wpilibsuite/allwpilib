@@ -7,21 +7,16 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 import java.util.logging.Logger;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import edu.wpi.first.wpilibj.mocks.MockCommand;
 
 /**
- * @author jonathanleitschuh
+ * Tests the {@link Command} library.
  *
+ * @author jonathanleitschuh
  */
 public class DefaultCommandTest extends AbstractCommandTest {
   private static final Logger logger = Logger.getLogger(DefaultCommandTest.class.getName());
@@ -30,45 +25,22 @@ public class DefaultCommandTest extends AbstractCommandTest {
     return logger;
   }
 
-  /**
-   * @throws java.lang.Exception
-   */
-  @BeforeClass
-  public static void setUpBeforeClass() throws Exception {}
 
   /**
-   * @throws java.lang.Exception
-   */
-  @AfterClass
-  public static void tearDownAfterClass() throws Exception {}
-
-  /**
-   * @throws java.lang.Exception
-   */
-  @Before
-  public void setUp() throws Exception {}
-
-  /**
-   * @throws java.lang.Exception
-   */
-  @After
-  public void tearDown() throws Exception {}
-
-  /**
-   * Testing of default commands where the interrupting command ends itself
+   * Testing of default commands where the interrupting command ends itself.
    */
   @Test
   public void testDefaultCommandWhereTheInteruptingCommandEndsItself() {
     final ASubsystem subsystem = new ASubsystem();
 
 
-    MockCommand defaultCommand = new MockCommand() {
+    final MockCommand defaultCommand = new MockCommand() {
       {
         requires(subsystem);
       }
     };
 
-    MockCommand anotherCommand = new MockCommand() {
+    final MockCommand anotherCommand = new MockCommand() {
       {
         requires(subsystem);
       }
@@ -112,20 +84,20 @@ public class DefaultCommandTest extends AbstractCommandTest {
 
 
   /**
-   * Testing of default commands where the interrupting command is canceled
+   * Testing of default commands where the interrupting command is canceled.
    */
   @Test
   public void testDefaultCommandsInterruptingCommandCanceled() {
     final ASubsystem subsystem = new ASubsystem();
 
 
-    MockCommand defaultCommand = new MockCommand() {
+    final MockCommand defaultCommand = new MockCommand() {
       {
         requires(subsystem);
       }
     };
 
-    MockCommand anotherCommand = new MockCommand() {
+    final MockCommand anotherCommand = new MockCommand() {
       {
         requires(subsystem);
       }

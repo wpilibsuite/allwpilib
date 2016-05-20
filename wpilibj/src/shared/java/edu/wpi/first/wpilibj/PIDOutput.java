@@ -9,15 +9,16 @@ package edu.wpi.first.wpilibj;
 
 /**
  * This interface allows PIDController to write it's results to its output.
- *$
+ *
  * @author dtjones
  */
+@FunctionalInterface
 public interface PIDOutput {
 
   /**
-   * Set the output to the value calculated by PIDController
-   *$
+   * Set the output to the value calculated by PIDController.
+   *
    * @param output the value calculated by PIDController
    */
-  public void pidWrite(double output);
+  void pidWrite(double output);
 }

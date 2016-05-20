@@ -1,5 +1,7 @@
 from __future__ import print_function
+
 import sys
+
 
 def main():
     for line in sys.stdin:
@@ -9,6 +11,7 @@ def main():
         line = line[14:]
         line = line.replace("#", "")
         print(line)
+
 
 if __name__ == "__main__":
     main()

@@ -11,19 +11,20 @@ import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
- * Simulates an encoder for testing purposes
+ * Simulates an encoder for testing purposes.
+ *
  * @author Ryan O'Meara
  */
 public class FakeCounterSource {
 
   private Thread m_task;
   private int m_count;
-  private int m_mSec;
+  private int m_milliSec;
   private DigitalOutput m_output;
   private boolean m_allocated;
 
   /**
-   * Thread object that allows emulation of an encoder
+   * Thread object that allows emulation of an encoder.
    */
   private class EncoderThread extends Thread {
 
@@ -37,19 +38,20 @@ public class FakeCounterSource {
       m_encoder.m_output.set(false);
       try {
         for (int i = 0; i < m_encoder.m_count; i++) {
-          Thread.sleep(m_encoder.m_mSec);
+          Thread.sleep(m_encoder.m_milliSec);
           m_encoder.m_output.set(true);
-          Thread.sleep(m_encoder.m_mSec);
+          Thread.sleep(m_encoder.m_milliSec);
           m_encoder.m_output.set(false);
         }
-      } catch (InterruptedException e) {
+      } catch (InterruptedException ex) {
+        Thread.currentThread().interrupt();
       }
     }
   }
 
   /**
-   * Create a fake encoder on a given port
-   *$
+   * Create a fake encoder on a given port.
+   *
    * @param output the port to output the given signal to
    */
   public FakeCounterSource(DigitalOutput output) {
@@ -59,8 +61,8 @@ public class FakeCounterSource {
   }
 
   /**
-   * Create a fake encoder on a given port
-   *$
+   * Create a fake encoder on a given port.
+   *
    * @param port The port the encoder is supposed to be on
    */
   public FakeCounterSource(int port) {
@@ -70,7 +72,7 @@ public class FakeCounterSource {
   }
 
   /**
-   * Destroy Object with minimum memory leak
+   * Destroy Object with minimum memory leak.
    */
   public void free() {
     m_task = null;
@@ -82,36 +84,36 @@ public class FakeCounterSource {
   }
 
   /**
-   * Common initailization code
+   * Common initailization code.
    */
   private void initEncoder() {
-    m_mSec = 1;
+    m_milliSec = 1;
     m_task = new EncoderThread(this);
     m_output.set(false);
   }
 
   /**
-   * Starts the thread execution task
+   * Starts the thread execution task.
    */
   public void start() {
     m_task.start();
   }
 
   /**
-   * Waits for the thread to complete
+   * Waits for the thread to complete.
    */
   public void complete() {
     try {
       m_task.join();
-    } catch (InterruptedException e) {
+    } catch (InterruptedException ex) {
+      Thread.currentThread().interrupt();
     }
     m_task = new EncoderThread(this);
     Timer.delay(.01);
   }
 
   /**
-   * Starts and completes a task set - does not return until thred has finished
-   * its operations
+   * Starts and completes a task set - does not return until thred has finished its operations.
    */
   public void execute() {
     start();
@@ -119,8 +121,8 @@ public class FakeCounterSource {
   }
 
   /**
-   * Sets the count to run encoder
-   *$
+   * Sets the count to run encoder.
+   *
    * @param count The count to emulate to the controller
    */
   public void setCount(int count) {
@@ -128,11 +130,11 @@ public class FakeCounterSource {
   }
 
   /**
-   * Specify the rate to send pulses
-   *$
-   * @param mSec The rate to send out pulses at
+   * Specify the rate to send pulses.
+   *
+   * @param milliSec The rate to send out pulses at
    */
-  public void setRate(int mSec) {
-    m_mSec = mSec;
+  public void setRate(int milliSec) {
+    m_milliSec = milliSec;
   }
 }

@@ -12,23 +12,22 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
- * REV Robotics SPARK Speed Controller
+ * REV Robotics SPARK Speed Controller.
  */
 public class Spark extends PWMSpeedController {
 
   /**
    * Common initialization code called by all constructors.
    *
-   * Note that the SPARK uses the following bounds for PWM values. These
-   * values should work reasonably well for most controllers, but if users
-   * experience issues such as asymmetric behavior around the deadband or
-   * inability to saturate the controller in either direction, calibration is
-   * recommended. The calibration procedure can be found in the Spark User
-   * Manual available from REV Robotics.
+   * <p>Note that the SPARK uses the following bounds for PWM values. These values should work
+   * reasonably well for most controllers, but if users experience issues such as asymmetric
+   * behavior around the deadband or inability to saturate the controller in either direction,
+   * calibration is recommended. The calibration procedure can be found in the Spark User Manual
+   * available from REV Robotics.
    *
-   * - 2.003ms = full "forward" - 1.55ms = the "high end" of the deadband range
-   * - 1.50ms = center of the deadband range (off) - 1.46ms = the "low end" of
-   * the deadband range - .999ms = full "reverse"
+   * <p>- 2.003ms = full "forward" - 1.55ms = the "high end" of the deadband range - 1.50ms =
+   * center of the deadband range (off) - 1.46ms = the "low end" of the deadband range - .999ms =
+   * full "reverse"
    */
   protected void initSpark() {
     setBounds(2.003, 1.55, 1.50, 1.46, .999);
@@ -43,8 +42,8 @@ public class Spark extends PWMSpeedController {
   /**
    * Constructor.
    *
-   * @param channel The PWM channel that the SPARK is attached to. 0-9 are
-   *        on-board, 10-19 are on the MXP port
+   * @param channel The PWM channel that the SPARK is attached to. 0-9 are on-board, 10-19 are on
+   *                the MXP port
    */
   public Spark(final int channel) {
     super(channel);

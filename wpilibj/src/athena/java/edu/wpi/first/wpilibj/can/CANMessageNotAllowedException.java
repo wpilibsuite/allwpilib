@@ -8,8 +8,8 @@
 package edu.wpi.first.wpilibj.can;
 
 /**
- * Exception indicating that the Jaguar CAN Driver layer refused to send a
- * restricted message ID to the CAN bus.
+ * Exception indicating that the Jaguar CAN Driver layer refused to send a restricted message ID to
+ * the CAN bus.
  */
 public class CANMessageNotAllowedException extends RuntimeException {
   public CANMessageNotAllowedException(String msg) {

@@ -1,13 +1,15 @@
 from __future__ import print_function
-import sys
+
 import os
-import re
+import sys
+
 try:
     import configparser
 except ImportError:
     import ConfigParser as configparser
 
 from nivision_parse import *
+
 
 class StructSizerEmitter:
     def __init__(self, out, config, hname):
@@ -70,12 +72,15 @@ int main()
             return
 
         print('asm("#STRUCT_SIZER [{name}]\\n");'.format(name=name), file=self.out)
-        print('asm("#STRUCT_SIZER _SIZE_=%0\\n" : : "n"((int)sizeof({name})));'.format(name=name), file=self.out)
+        print('asm("#STRUCT_SIZER _SIZE_=%0\\n" : : "n"((int)sizeof({name})));'.format(name=name),
+              file=self.out)
 
         for fname, ftype, arr, comment in fields:
             if ':' in fname:
-                continue # can't handle bitfields
-            print('asm("#STRUCT_SIZER {field}=%0\\n" : : "n"((int)offsetof({name}, {field})));'.format(name=name, field=fname), file=self.out)
+                continue  # can't handle bitfields
+            print(
+                'asm("#STRUCT_SIZER {field}=%0\\n" : : "n"((int)offsetof({name}, {field})));'.format(
+                    name=name, field=fname), file=self.out)
 
     def struct(self, name, fields):
         self.structunion("Structure", name, fields)
@@ -83,12 +88,13 @@ int main()
     def union(self, name, fields):
         self.structunion("Union", name, fields)
 
+
 def generate(srcdir, configpath=None, hpath=None):
     # read config file
     config = configparser.ConfigParser()
     config.read(configpath)
     block_comment_exclude = set(x.strip() for x in
-            config.get("Block Comment", "exclude").splitlines())
+                                config.get("Block Comment", "exclude").splitlines())
 
     # open input file
     inf = open(hpath)
@@ -102,6 +108,7 @@ def generate(srcdir, configpath=None, hpath=None):
         emit = StructSizerEmitter(out, config, os.path.basename(hpath))
         parse_file(emit, inf, block_comment_exclude)
         emit.finish()
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:

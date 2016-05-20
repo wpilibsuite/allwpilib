@@ -8,9 +8,8 @@
 package edu.wpi.first.wpilibj.can;
 
 /**
- * Exception indicating that a can message is not available from Network
- * Communications. This usually just means we already have the most recent value
- * cached locally.
+ * Exception indicating that a can message is not available from Network Communications. This
+ * usually just means we already have the most recent value cached locally.
  */
 public class CANMessageNotFoundException extends RuntimeException {
   public CANMessageNotFoundException() {

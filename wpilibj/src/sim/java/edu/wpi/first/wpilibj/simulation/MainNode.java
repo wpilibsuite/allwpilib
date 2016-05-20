@@ -7,44 +7,50 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import java.io.IOException;
-import java.util.logging.Logger;
+import com.google.protobuf.Message;
 
 import org.gazebosim.transport.Node;
 import org.gazebosim.transport.Publisher;
 import org.gazebosim.transport.Subscriber;
 import org.gazebosim.transport.SubscriberCallback;
 
-import com.google.protobuf.Message;
+import java.io.IOException;
+import java.util.logging.Logger;
 
 public class MainNode {
 
-	private MainNode() {
-	}
+  private MainNode() {
+  }
 
-	private static final Logger LOG = Logger.getLogger("Simulation MainNode");
-	private static Node mainNode;
+  private static final Logger LOG = Logger.getLogger("Simulation MainNode");
+  private static Node m_mainNode;
 
-	public static synchronized void openGazeboConnection() throws IOException, InterruptedException {
-		if (mainNode != null) {
-			LOG.warning("MainNode.openGazeboConnection() was already called!");
-			return;
-		}
-		mainNode = new Node("frc");
-		mainNode.waitForConnection();
-	}
+  @SuppressWarnings("JavadocMethod")
+  public static synchronized void openGazeboConnection() throws IOException, InterruptedException {
+    if (m_mainNode != null) {
+      LOG.warning("MainNode.openGazeboConnection() was already called!");
+      return;
+    }
+    m_mainNode = new Node("frc");
+    m_mainNode.waitForConnection();
+  }
 
-	public static <T extends Message> Publisher<T> advertise(String topic, T defaultMessage) {
-		if (mainNode == null) {
-			throw new IllegalStateException("MainNode.openGazeboConnection() should have already been called by RobotBase.main()!");
-		}
-		return mainNode.advertise(topic, defaultMessage);
-	}
+  @SuppressWarnings("JavadocMethod")
+  public static <T extends Message> Publisher<T> advertise(String topic, T defaultMessage) {
+    if (m_mainNode == null) {
+      throw new IllegalStateException("MainNode.openGazeboConnection() should have already been "
+          + "called by RobotBase.main()!");
+    }
+    return m_mainNode.advertise(topic, defaultMessage);
+  }
 
-	public static <T extends Message> Subscriber<T> subscribe(String topic, T defaultMessage, SubscriberCallback<T> cb) {
-		if (mainNode == null) {
-			throw new IllegalStateException("MainNode.openGazeboConnection() should have already been called by RobotBase.main()!");
-		}
-		return mainNode.subscribe(topic, defaultMessage, cb);
-	}
+  @SuppressWarnings("JavadocMethod")
+  public static <T extends Message> Subscriber<T> subscribe(String topic, T defaultMessage,
+                                                            SubscriberCallback<T> cb) {
+    if (m_mainNode == null) {
+      throw new IllegalStateException("MainNode.openGazeboConnection() should have already been "
+          + "called by RobotBase.main()!");
+    }
+    return m_mainNode.subscribe(topic, defaultMessage, cb);
+  }
 }

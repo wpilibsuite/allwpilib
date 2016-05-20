@@ -5,12 +5,14 @@
 
 package com.ni.vision;
 
-import java.lang.reflect.*;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+@SuppressWarnings("all")
 public class NIVision {
   private NIVision() {}
 

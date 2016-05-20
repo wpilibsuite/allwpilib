@@ -27,6 +27,12 @@ allprojects {
 subprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
+    apply plugin: 'checkstyle'
+
+    checkstyle {
+        toolVersion = "6.18"
+        configFile = new File(rootDir, "styleguide/checkstyle.xml")
+    }
 
     ext.armBuild = true
 

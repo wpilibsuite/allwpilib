@@ -8,25 +8,25 @@
 package edu.wpi.first.wpilibj.image;
 
 /**
- * Exception class which looks up nivision error codes
- *$
+ * Exception class which looks up nivision error codes.
+ *
  * @author dtjones
  */
+@SuppressWarnings("all")
 public class NIVisionException extends Exception {
 
   /**
    * Create a new NIVisionException.
-   *$
-   * @param msg The message to pass with the exception describing what caused
-   *        it.
+   *
+   * @param msg The message to pass with the exception describing what caused it.
    */
   public NIVisionException(String msg) {
     super(msg);
   }
 
   /**
-   * Create a new vision exception
-   *$
+   * Create a new vision exception.
+   *
    * @param errorCode the bad status code
    */
   public NIVisionException(int errorCode) {

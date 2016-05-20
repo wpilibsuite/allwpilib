@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj.hal;
 
+@SuppressWarnings("AbbreviationAsWordInName")
 public class PDPJNI extends JNIWrapper {
   public static native void initializePDP(int module);
 

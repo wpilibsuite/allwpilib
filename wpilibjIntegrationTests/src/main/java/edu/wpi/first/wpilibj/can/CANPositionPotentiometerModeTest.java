@@ -7,28 +7,29 @@
 
 package edu.wpi.first.wpilibj.can;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
+import com.googlecode.junittoolbox.PollingWait;
+import com.googlecode.junittoolbox.RunnableAssert;
 
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.googlecode.junittoolbox.PollingWait;
-import com.googlecode.junittoolbox.RunnableAssert;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
 /**
- * @author jonathanleitschuh
+ * Tests the CAN Motor controller in Potentiometer Mode.
  *
+ * @author jonathanleitschuh
  */
 public class CANPositionPotentiometerModeTest extends AbstractCANTest {
   private static final Logger logger = Logger.getLogger(CANPositionPotentiometerModeTest.class
@@ -41,7 +42,7 @@ public class CANPositionPotentiometerModeTest extends AbstractCANTest {
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see edu.wpi.first.wpilibj.can.AbstractCANTest#stopMotor()
    */
   protected void stopMotor() {
@@ -50,7 +51,7 @@ public class CANPositionPotentiometerModeTest extends AbstractCANTest {
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see edu.wpi.first.wpilibj.can.AbstractCANTest#runMotorForward()
    */
   protected void runMotorForward() {
@@ -59,7 +60,7 @@ public class CANPositionPotentiometerModeTest extends AbstractCANTest {
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see edu.wpi.first.wpilibj.can.AbstractCANTest#runMotorReverse()
    */
   protected void runMotorReverse() {
@@ -85,13 +86,13 @@ public class CANPositionPotentiometerModeTest extends AbstractCANTest {
 
 
   /**
-   * NOTICE: This is using the {@link MotorEncoderFixture#getEncoder()} instead
-   * of the one built into the CAN Jaguar
+   * NOTICE: This is using the {@link MotorEncoderFixture#getEncoder()} instead of the one built
+   * into the CAN Jaguar.
    */
   @Ignore("Encoder is not yet wired to the FPGA")
   @Test
   public void testRotateForward() {
-    int initialPosition = getME().getEncoder().get();
+    final int initialPosition = getME().getEncoder().get();
     /* Drive the speed controller briefly to move the encoder */
     getME().getMotor().set(kStoppedValue);
     Timer.delay(kMotorTimeSettling);
@@ -104,13 +105,13 @@ public class CANPositionPotentiometerModeTest extends AbstractCANTest {
   }
 
   /**
-   * NOTICE: This is using the {@link MotorEncoderFixture#getEncoder()} instead
-   * of the one built into the CAN Jaguar
+   * NOTICE: This is using the {@link MotorEncoderFixture#getEncoder()} instead of the one built
+   * into the CAN Jaguar.
    */
   @Ignore("Encoder is not yet wired to the FPGA")
   @Test
   public void testRotateReverse() {
-    int initialPosition = getME().getEncoder().get();
+    final int initialPosition = getME().getEncoder().get();
     /* Drive the speed controller briefly to move the encoder */
     getME().getMotor().set(kStoppedValue);
     Timer.delay(kMotorTimeSettling);
@@ -123,8 +124,8 @@ public class CANPositionPotentiometerModeTest extends AbstractCANTest {
   }
 
   /**
-   * Test if we can get a position in potentiometer mode, using an analog output
-   * as a fake potentiometer.
+   * Test if we can get a position in potentiometer mode, using an analog output as a fake
+   * potentiometer.
    */
   @Test
   public void testFakePotentiometerPosition() {
@@ -141,7 +142,8 @@ public class CANPositionPotentiometerModeTest extends AbstractCANTest {
           public void run() throws Exception {
             getME().getMotor().set(0);
             assertEquals(
-                "CAN Jaguar should have returned the potentiometer position set by the analog output",
+                "CAN Jaguar should have returned the potentiometer position set by the analog "
+                    + "output",
                 getME().getFakePot().getVoltage(), getME().getMotor().getPosition() * 3,
                 kPotentiometerPositionTolerance * 3);
           }

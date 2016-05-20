@@ -10,107 +10,106 @@ package edu.wpi.first.wpilibj.mocks;
 import edu.wpi.first.wpilibj.command.Command;
 
 /**
- * A class to simulate a simple command The command keeps track of how many
- * times each method was called
+ * A class to simulate a simple command The command keeps track of how many times each method was
+ * called.
  *
  * @author mwills
  */
 public class MockCommand extends Command {
-  private int initializeCount = 0;
-  private int executeCount = 0;
-  private int isFinishedCount = 0;
-  private boolean hasFinished = false;
-  private int endCount = 0;
-  private int interruptedCount = 0;
+  private int m_initializeCount = 0;
+  private int m_executeCount = 0;
+  private int m_isFinishedCount = 0;
+  private boolean m_hasFinished = false;
+  private int m_endCount = 0;
+  private int m_interruptedCount = 0;
 
   protected void initialize() {
-    ++initializeCount;
+    ++m_initializeCount;
   }
 
   protected void execute() {
-    ++executeCount;
+    ++m_executeCount;
   }
 
   protected boolean isFinished() {
-    ++isFinishedCount;
+    ++m_isFinishedCount;
     return isHasFinished();
   }
 
   protected void end() {
-    ++endCount;
+    ++m_endCount;
   }
 
   protected void interrupted() {
-    ++interruptedCount;
+    ++m_interruptedCount;
   }
 
 
-
   /**
-   * @return how many times the initialize method has been called
+   * How many times the initialize method has been called.
    */
   public int getInitializeCount() {
-    return initializeCount;
+    return m_initializeCount;
   }
 
   /**
-   * @return if the initialize method has been called at least once
+   * If the initialize method has been called at least once.
    */
   public boolean hasInitialized() {
     return getInitializeCount() > 0;
   }
 
   /**
-   * @return how many time the execute method has been called
+   * How many time the execute method has been called.
    */
   public int getExecuteCount() {
-    return executeCount;
+    return m_executeCount;
   }
 
   /**
-   * @return how many times the isFinished method has been called
+   * How many times the isFinished method has been called.
    */
   public int getIsFinishedCount() {
-    return isFinishedCount;
+    return m_isFinishedCount;
   }
 
   /**
-   * @return what value the isFinished method will return
+   * @return what value the isFinished method will return.
    */
   public boolean isHasFinished() {
-    return hasFinished;
+    return m_hasFinished;
   }
 
   /**
-   * @param hasFinished set what value the isFinished method will return
+   * @param hasFinished set what value the isFinished method will return.
    */
   public void setHasFinished(boolean hasFinished) {
-    this.hasFinished = hasFinished;
+    m_hasFinished = hasFinished;
   }
 
   /**
-   * @return how many times the end method has been called
+   * How many times the end method has been called.
    */
   public int getEndCount() {
-    return endCount;
+    return m_endCount;
   }
 
   /**
-   * @return if the end method has been called at least once
+   * If the end method has been called at least once.
    */
   public boolean hasEnd() {
     return getEndCount() > 0;
   }
 
   /**
-   * @return how many times the interrupted method has been called
+   * How many times the interrupted method has been called.
    */
   public int getInterruptedCount() {
-    return interruptedCount;
+    return m_interruptedCount;
   }
 
   /**
-   * @return if the interrupted method has been called at least once
+   * If the interrupted method has been called at least once.
    */
   public boolean hasInterrupted() {
     return getInterruptedCount() > 0;

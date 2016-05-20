@@ -7,18 +7,15 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.lang.Runtime;
 
 import edu.wpi.first.wpilibj.hal.NotifierJNI;
-import edu.wpi.first.wpilibj.Utility;
 
 public class Notifier {
 
   private static class Process implements NotifierJNI.NotifierJNIHandlerFunction {
     // The lock for the process information.
-    private ReentrantLock m_processLock = new ReentrantLock();
+    private final ReentrantLock m_processLock = new ReentrantLock();
     // The C pointer to the notifier object. We don't use it directly, it is
     // just passed to the JNI bindings.
     private long m_notifier;
@@ -37,7 +34,7 @@ public class Notifier {
     // completed. This is only relevant if the handler takes a very long time
     // to complete (or the period is very short) and when everything is being
     // destructed.
-    private ReentrantLock m_handlerLock = new ReentrantLock();
+    private final ReentrantLock m_handlerLock = new ReentrantLock();
 
     public Process(Runnable run) {
       m_handler = run;
@@ -45,10 +42,10 @@ public class Notifier {
     }
 
     @Override
+    @SuppressWarnings("NoFinalizer")
     protected void finalize() {
       NotifierJNI.cleanNotifier(m_notifier);
       m_handlerLock.lock();
-      m_handlerLock = null;
     }
 
     /**
@@ -59,8 +56,8 @@ public class Notifier {
     }
 
     /**
-     * Handler which is called by the HAL library; it handles the subsequent
-     * calling of the user handler.
+     * Handler which is called by the HAL library; it handles the subsequent calling of the user
+     * handler.
      */
     @Override
     public void apply(long time) {
@@ -81,7 +78,7 @@ public class Notifier {
       synchronized (m_processLock) {
         m_periodic = periodic;
         m_period = period;
-        m_expirationTime = Utility.getFPGATime() * 1e-6 + m_period;
+        m_expirationTime = Utility.getFPGATime() * 1e-6 + period;
         updateAlarm();
       }
     }
@@ -101,16 +98,16 @@ public class Notifier {
   /**
    * Create a Notifier for timer event notification.
    *
-   * @param run The handler that is called at the notification time which is set
-   *        using StartSingle or StartPeriodic.
+   * @param run The handler that is called at the notification time which is set using StartSingle
+   *            or StartPeriodic.
    */
   public Notifier(Runnable run) {
     m_process = new Process(run);
   }
 
   /**
-   * Register for single event notification. A timer event is queued for a
-   * single event after the specified delay.
+   * Register for single event notification. A timer event is queued for a single event after the
+   * specified delay.
    *
    * @param delay Seconds to wait before the handler is called.
    */
@@ -119,22 +116,21 @@ public class Notifier {
   }
 
   /**
-   * Register for periodic event notification. A timer event is queued for
-   * periodic event notification. Each time the interrupt occurs, the event will
-   * be immediately requeued for the same time interval.
+   * Register for periodic event notification. A timer event is queued for periodic event
+   * notification. Each time the interrupt occurs, the event will be immediately requeued for the
+   * same time interval.
    *
-   * @param period Period in seconds to call the handler starting one period
-   *        after the call to this method.
+   * @param period Period in seconds to call the handler starting one period after the call to this
+   *               method.
    */
   public void startPeriodic(double period) {
     m_process.start(period, true);
   }
 
   /**
-   * Stop timer events from occuring. Stop any repeating timer events from
-   * occuring. This will also remove any single notification events from the
-   * queue. If a timer-based call to the registered handler is in progress, this
-   * function will block until the handler call is complete.
+   * Stop timer events from occuring. Stop any repeating timer events from occuring. This will also
+   * remove any single notification events from the queue. If a timer-based call to the registered
+   * handler is in progress, this function will block until the handler call is complete.
    */
   public void stop() {
     m_process.stop();

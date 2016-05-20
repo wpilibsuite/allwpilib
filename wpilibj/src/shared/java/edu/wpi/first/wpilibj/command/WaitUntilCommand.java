@@ -10,11 +10,10 @@ package edu.wpi.first.wpilibj.command;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
- * WaitUntilCommand - waits until an absolute game time. This will wait until
- * the game clock reaches some value, then continue to the next command.
- *$
- * @author brad
+ * WaitUntilCommand - waits until an absolute game time. This will wait until the game clock reaches
+ * some value, then continue to the next command.
  *
+ * @author brad
  */
 public class WaitUntilCommand extends Command {
 
@@ -25,9 +24,11 @@ public class WaitUntilCommand extends Command {
     m_time = time;
   }
 
-  public void initialize() {}
+  public void initialize() {
+  }
 
-  public void execute() {}
+  public void execute() {
+  }
 
   /**
    * Check if we've reached the actual finish time.
@@ -36,7 +37,9 @@ public class WaitUntilCommand extends Command {
     return Timer.getMatchTime() >= m_time;
   }
 
-  public void end() {}
+  public void end() {
+  }
 
-  public void interrupted() {}
+  public void interrupted() {
+  }
 }

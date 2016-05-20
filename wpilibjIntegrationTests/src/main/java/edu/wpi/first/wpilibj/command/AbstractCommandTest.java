@@ -7,17 +7,18 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import org.junit.Before;
 
 import edu.wpi.first.wpilibj.mocks.MockCommand;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 /**
- * @author jonathanleitschuh
+ * The basic test for all {@link Command} tests.
  *
+ * @author jonathanleitschuh
  */
 public abstract class AbstractCommandTest extends AbstractComsSetup {
 
@@ -28,21 +29,22 @@ public abstract class AbstractCommandTest extends AbstractComsSetup {
   }
 
   public class ASubsystem extends Subsystem {
-    Command command;
+    Command m_command;
 
     protected void initDefaultCommand() {
-      if (command != null) {
-        setDefaultCommand(command);
+      if (m_command != null) {
+        setDefaultCommand(m_command);
       }
     }
 
     public void init(Command command) {
-      this.command = command;
+      m_command = command;
     }
   }
 
-  public void assertCommandState(MockCommand command, int initialize, int execute, int isFinished,
-      int end, int interrupted) {
+
+  protected void assertCommandState(MockCommand command, int initialize, int execute,
+                                    int isFinished, int end, int interrupted) {
     assertEquals(initialize, command.getInitializeCount());
     assertEquals(execute, command.getExecuteCount());
     assertEquals(isFinished, command.getIsFinishedCount());
@@ -50,7 +52,7 @@ public abstract class AbstractCommandTest extends AbstractComsSetup {
     assertEquals(interrupted, command.getInterruptedCount());
   }
 
-  public void sleep(int time) {
+  protected void sleep(int time) {
     try {
       Thread.sleep(time);
     } catch (InterruptedException ex) {
