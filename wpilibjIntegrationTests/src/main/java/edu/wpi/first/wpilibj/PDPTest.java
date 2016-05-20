@@ -63,7 +63,7 @@ public class PDPTest extends AbstractComsSetup {
     me = mef;
     me.setup();
 
-    this.m_expectedStoppedCurrentDraw = expectedCurrentDraw;
+    m_expectedStoppedCurrentDraw = expectedCurrentDraw;
   }
 
   @Parameters(name = "{index}: {0}, Expected Stopped Current Draw: {1}")

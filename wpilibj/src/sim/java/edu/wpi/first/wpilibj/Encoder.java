@@ -168,7 +168,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * setDistancePerPulse().
    */
   public double getDistance() {
-    return m_distancePerPulse * impl.getM_position();
+    return m_distancePerPulse * impl.getPosition();
   }
 
   /**
@@ -224,7 +224,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @return The current rate of the encoder.
    */
   public double getRate() {
-    return m_distancePerPulse * impl.getM_velocity();
+    return m_distancePerPulse * impl.getVelocity();
   }
 
   /**

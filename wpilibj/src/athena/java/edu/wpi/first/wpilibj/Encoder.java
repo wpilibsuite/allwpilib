@@ -226,7 +226,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
     if (sourceA == null) {
       throw new NullPointerException("Digital Source A was null");
     }
-    this.m_aSource = sourceA;
+    m_aSource = sourceA;
     if (sourceB == null) {
       throw new NullPointerException("Digital Source B was null");
     }
@@ -500,7 +500,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 
   /**
    * Get the distance the robot has driven since the last reset as scaled by the value from {@link
-   * #setdistancePerPulse(double)}.
+   * #setDistancePerPulse(double)}.
    *
    * @return The distance driven since the last reset
    */
@@ -510,7 +510,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 
   /**
    * Get the current rate of the encoder. Units are distance per second as scaled by the value from
-   * setdistancePerPulse().
+   * setDistancePerPulse().
    *
    * @return The current rate of the encoder.
    */
@@ -522,7 +522,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * Set the minimum rate of the device before the hardware reports it stopped.
    *
    * @param minRate The minimum rate. The units are in distance per second as scaled by the value
-   *                from setdistancePerPulse().
+   *                from setDistancePerPulse().
    */
   public void setMinRate(double minRate) {
     setMaxPeriod(m_distancePerPulse / minRate);
@@ -537,7 +537,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    *
    * @param distancePerPulse The scale factor that will be used to convert pulses to useful units.
    */
-  public void setdistancePerPulse(double distancePerPulse) {
+  public void setDistancePerPulse(double distancePerPulse) {
     m_distancePerPulse = distancePerPulse;
   }
 
@@ -631,7 +631,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @param channel A DIO channel to set as the encoder index
    */
   public void setIndexSource(int channel) {
-    this.setIndexSource(channel, IndexingType.kResetOnRisingEdge);
+    setIndexSource(channel, IndexingType.kResetOnRisingEdge);
   }
 
   /**
@@ -641,7 +641,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @param source A digital source to set as the encoder index
    */
   public void setIndexSource(DigitalSource source) {
-    this.setIndexSource(source, IndexingType.kResetOnRisingEdge);
+    setIndexSource(source, IndexingType.kResetOnRisingEdge);
   }
 
   /**

@@ -30,7 +30,7 @@ public class CANCurrentQuadEncoderModeTest extends AbstractCANTest {
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see edu.wpi.first.wpilibj.can.AbstractCANTest#stopMotor()
    */
   protected void stopMotor() {
@@ -39,7 +39,7 @@ public class CANCurrentQuadEncoderModeTest extends AbstractCANTest {
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see edu.wpi.first.wpilibj.can.AbstractCANTest#runMotorForward()
    */
   protected void runMotorForward() {
@@ -48,7 +48,7 @@ public class CANCurrentQuadEncoderModeTest extends AbstractCANTest {
 
   /*
    * (non-Javadoc)
-   *$
+   *
    * @see edu.wpi.first.wpilibj.can.AbstractCANTest#runMotorReverse()
    */
   protected void runMotorReverse() {

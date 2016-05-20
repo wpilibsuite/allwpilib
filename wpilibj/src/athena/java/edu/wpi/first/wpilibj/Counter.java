@@ -84,7 +84,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
 
     setMaxPeriod(.5);
 
-    UsageReporting.report(tResourceType.kResourceType_Counter, this.m_index, mode.value);
+    UsageReporting.report(tResourceType.kResourceType_Counter, m_index, mode.value);
   }
 
   /**

@@ -122,8 +122,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    * <p>Supply the initial duty-cycle to output so as to avoid a glitch when first starting.
    *
    * <p>The resolution of the duty cycle is 8-bit for low frequencies (1kHz or less) but is reduced
-   * the
-   * higher the frequency of the PWM signal is.
+   * the higher the frequency of the PWM signal is.
    *
    * @param initialDutyCycle The duty-cycle to start generating. [0..1]
    */
@@ -146,9 +145,9 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
       return;
     }
     // Disable the output by routing to a dead bit.
-    PWMJNI.setPWMOutputChannel(this.m_pwmGenerator, kDigitalChannels);
-    PWMJNI.freePWM(this.m_pwmGenerator);
-    this.m_pwmGenerator = 0;
+    PWMJNI.setPWMOutputChannel(m_pwmGenerator, kDigitalChannels);
+    PWMJNI.freePWM(m_pwmGenerator);
+    m_pwmGenerator = 0;
   }
 
   /**
@@ -200,19 +199,19 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
 
   @Override
   public void startLiveWindowMode() {
-    this.m_tableListener = new ITableListener() {
+    m_tableListener = new ITableListener() {
       @Override
       public void valueChanged(ITable itable, String key, Object value, boolean bln) {
         set((Boolean) value);
       }
     };
-    this.m_table.addTableListener("Value", m_tableListener, true);
+    m_table.addTableListener("Value", m_tableListener, true);
   }
 
 
   @Override
   public void stopLiveWindowMode() {
     // TODO: Broken, should only remove the listener from "Value" only.
-    this.m_table.removeTableListener(m_tableListener);
+    m_table.removeTableListener(m_tableListener);
   }
 }

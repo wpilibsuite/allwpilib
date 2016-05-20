@@ -246,7 +246,7 @@ public class TestSuite extends AbstractTestSuite {
 
       /**
        * Adds the given result's data to this result.
-       *$
+       *
        * @param result the result to add to this result
        */
       void addResult(Result result) {

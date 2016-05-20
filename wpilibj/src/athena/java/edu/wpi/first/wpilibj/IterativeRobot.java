@@ -140,7 +140,7 @@ public class IterativeRobot extends RobotBase {
   }
 
   /**
-   * Determine if the appropriate next periodic m_function should be called. Call the periodic
+   * Determine if the appropriate next periodic function should be called. Call the periodic
    * functions whenever a packet is received from the Driver Station, or about every 20ms.
    */
   private boolean nextPeriodReady() {

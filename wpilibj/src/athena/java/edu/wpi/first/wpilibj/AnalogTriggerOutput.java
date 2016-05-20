@@ -123,7 +123,7 @@ public class AnalogTriggerOutput extends DigitalSource {
     private final int m_value;
 
     AnalogTriggerType(int value) {
-      this.m_value = value;
+      m_value = value;
     }
   }
 }

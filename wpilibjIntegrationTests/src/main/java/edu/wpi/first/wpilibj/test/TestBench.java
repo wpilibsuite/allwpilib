@@ -233,7 +233,7 @@ public final class TestBench {
 
     /*
      * (non-Javadoc)
-     *$
+     *
      * @see
      * edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture#givePowerCycleRelay
      * ()

@@ -489,7 +489,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
    */
   @Override
   public void setInverted(boolean isInverted) {
-    this.m_isInverted = isInverted;
+    m_isInverted = isInverted;
   }
 
   /**
@@ -499,7 +499,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
    */
   @Override
   public boolean getInverted() {
-    return this.m_isInverted;
+    return m_isInverted;
   }
 
   /**

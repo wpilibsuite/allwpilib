@@ -24,7 +24,7 @@ public class Jaguar extends PWMSpeedController {
   private void initJaguar() {
     /*
      * Input profile defined by Luminary Micro.
-     *$
+     *
      * Full reverse ranges from 0.671325ms to 0.6972211ms Proportional reverse
      * ranges from 0.6972211ms to 1.4482078ms Neutral ranges from 1.4482078ms to
      * 1.5517922ms Proportional forward ranges from 1.5517922ms to 2.3027789ms

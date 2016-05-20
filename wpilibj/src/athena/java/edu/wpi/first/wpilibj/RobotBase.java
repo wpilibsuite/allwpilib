@@ -131,7 +131,7 @@ public abstract class RobotBase {
   /**
    * Indicates if new data is available from the driver station.
    *
-   * @return Has new data arrived over the network since the last time this m_function was called?
+   * @return Has new data arrived over the network since the last time this function was called?
    */
   public boolean isNewDataAvailable() {
     return m_ds.isNewControlData();

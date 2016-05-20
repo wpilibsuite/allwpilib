@@ -287,7 +287,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
   /**
    * Read the accumulated value and the number of accumulated values atomically.
    *
-   * <p>This m_function reads the value and count from the FPGA atomically. This can be used for
+   * <p>This function reads the value and count from the FPGA atomically. This can be used for
    * averaging.
    *
    * @param result AccumulatorResult object to store the results in.
