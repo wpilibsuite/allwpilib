@@ -86,9 +86,11 @@ public class Preferences {
    * Gets the vector of keys.
    * @return a vector of the keys
    */
-  public Vector<String> getKeys() {
-    Vector<String> keys = new Vector<>();
-    keys.addAll(m_table.getKeys());
+  public Vector getKeys() {
+    Vector<String> keys = new Vector<String>();
+    for (String key : m_table.getKeys()) {
+      keys.add(key);
+    }
     return keys;
   }
 
