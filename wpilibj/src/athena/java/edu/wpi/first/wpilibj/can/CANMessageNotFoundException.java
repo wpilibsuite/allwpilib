@@ -15,8 +15,4 @@ public class CANMessageNotFoundException extends RuntimeException {
   public CANMessageNotFoundException() {
     super();
   }
-
-  public CANMessageNotFoundException(String message) {
-    super(message);
-  }
 }
