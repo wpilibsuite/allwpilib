@@ -69,22 +69,22 @@ public class DigitalInput extends DigitalSource implements LiveWindowSendable {
 
   @Override
   public void initTable(ITable subtable) {
-    this.m_table = subtable;
+    m_table = subtable;
     updateTable();
   }
 
 
   @Override
   public void updateTable() {
-    if (this.m_table != null) {
-      this.m_table.putBoolean("Value", get());
+    if (m_table != null) {
+      m_table.putBoolean("Value", get());
     }
   }
 
 
   @Override
   public ITable getTable() {
-    return this.m_table;
+    return m_table;
   }
 
 

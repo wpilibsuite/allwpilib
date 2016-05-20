@@ -500,7 +500,7 @@ public class AxisCamera {
       request += "Authorization: Basic RlJDOkZSQw==\n\n";
 
       try {
-        Socket socket = this.createCameraSocket(request);
+        Socket socket = createCameraSocket(request);
         socket.close();
 
         m_parametersDirty = false;

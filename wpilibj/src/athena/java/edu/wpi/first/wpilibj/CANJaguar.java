@@ -242,10 +242,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController {
         || !receivedFirmwareVersion) {
       /* Free the resource */
       free();
-      throw new CANMessageNotFoundException(String.format("m_receivedStatusMessage0: %b, "
-          + "m_receivedStatusMessage1: %b, m_receivedStatusMessage2: %b, receivedFirmwareVersion: "
-          + "%b", m_receivedStatusMessage0, m_receivedStatusMessage1, m_receivedStatusMessage2,
-          receivedFirmwareVersion));
+      throw new CANMessageNotFoundException();
     }
 
     try {

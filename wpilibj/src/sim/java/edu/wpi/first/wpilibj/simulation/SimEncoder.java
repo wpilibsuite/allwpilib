@@ -69,11 +69,11 @@ public class SimEncoder {
     m_commandPub.publish(Msgs.String(cmd));
   }
 
-  public double getM_position() {
+  public double getPosition() {
     return m_position;
   }
 
-  public double getM_velocity() {
+  public double getVelocity() {
     return m_velocity;
   }
 }

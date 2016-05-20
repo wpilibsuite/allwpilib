@@ -44,7 +44,7 @@ public abstract class Trigger implements Sendable {
   private boolean grab() {
     // FIXME make is connected work?
     return get()
-        || (m_table != null /* && table.isConnected() */ && m_table.getBoolean("pressed", false));
+        || (m_table != null /* && m_table.isConnected() */ && m_table.getBoolean("pressed", false));
 
   }
 

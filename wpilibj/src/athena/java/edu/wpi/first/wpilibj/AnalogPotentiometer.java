@@ -34,8 +34,8 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
    * @param offset    The offset to add to the scaled value for controlling the zero value
    */
   private void initPot(final AnalogInput input, double fullRange, double offset) {
-    this.m_fullRange = fullRange;
-    this.m_offset = offset;
+    m_fullRange = fullRange;
+    m_offset = offset;
     m_analogInput = input;
   }
 

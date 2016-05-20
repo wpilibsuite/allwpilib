@@ -33,10 +33,8 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
     kReverse
   }
 
-  private int m_forwardChannel; // /< The forward channel on the module to
-  // control.
-  private int m_reverseChannel; // /< The reverse channel on the module to
-  // control.
+  private int m_forwardChannel; // /< The forward channel on the module to control.
+  private int m_reverseChannel; // /< The reverse channel on the module to control.
   private byte m_forwardMask; // /< The mask for the forward channel.
   private byte m_reverseMask; // /< The mask for the reverse channel.
 
@@ -76,8 +74,8 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
    */
   public DoubleSolenoid(final int forwardChannel, final int reverseChannel) {
     super(getDefaultSolenoidModule());
-    this.m_forwardChannel = forwardChannel;
-    this.m_reverseChannel = reverseChannel;
+    m_forwardChannel = forwardChannel;
+    m_reverseChannel = reverseChannel;
     initSolenoid();
   }
 
@@ -91,8 +89,8 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
   public DoubleSolenoid(final int moduleNumber, final int forwardChannel,
                         final int reverseChannel) {
     super(moduleNumber);
-    this.m_forwardChannel = forwardChannel;
-    this.m_reverseChannel = reverseChannel;
+    m_forwardChannel = forwardChannel;
+    m_reverseChannel = reverseChannel;
     initSolenoid();
   }
 

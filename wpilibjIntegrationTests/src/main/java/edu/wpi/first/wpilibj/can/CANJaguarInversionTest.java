@@ -59,7 +59,7 @@ public class CANJaguarInversionTest extends AbstractCANTest {
    * @param delayTime the amount of time to delay between starting a motor and checking the encoder
    */
   private void inversionTest(double setPoint, double delayTime) {
-    final CANJaguar jag = this.getME().getMotor();
+    final CANJaguar jag = getME().getMotor();
     jag.enableControl();
     jag.setInverted(false);
     jag.set(setPoint);

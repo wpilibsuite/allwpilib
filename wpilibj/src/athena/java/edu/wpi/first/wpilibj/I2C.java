@@ -26,11 +26,11 @@ public class I2C extends SensorBase {
     private int m_value;
 
     Port(int value) {
-      this.m_value = value;
+      m_value = value;
     }
 
     public int getValue() {
-      return this.m_value;
+      return m_value;
     }
   }
 
@@ -108,16 +108,13 @@ public class I2C extends SensorBase {
   public synchronized boolean transaction(ByteBuffer dataToSend, int sendSize,
                                           ByteBuffer dataReceived, int receiveSize) {
     if (!dataToSend.isDirect()) {
-      throw new IllegalArgumentException(
-          "dataToSend must be a direct buffer");
+      throw new IllegalArgumentException("dataToSend must be a direct buffer");
     }
     if (dataToSend.capacity() < sendSize) {
-      throw new IllegalArgumentException(
-          "dataToSend is too small, must be at least " + sendSize);
+      throw new IllegalArgumentException("dataToSend is too small, must be at least " + sendSize);
     }
     if (!dataReceived.isDirect()) {
-      throw new IllegalArgumentException(
-          "dataReceived must be a direct buffer");
+      throw new IllegalArgumentException("dataReceived must be a direct buffer");
     }
     if (dataReceived.capacity() < receiveSize) {
       throw new IllegalArgumentException(
@@ -193,8 +190,8 @@ public class I2C extends SensorBase {
           "buffer is too small, must be at least " + size);
     }
 
-    return I2CJNI
-        .i2CWrite((byte) m_port.getValue(), (byte) m_deviceAddress, data, (byte) size) < size;
+    return I2CJNI.i2CWrite((byte) m_port.getValue(), (byte) m_deviceAddress,
+        data, (byte) size) < size;
   }
 
   /**
@@ -210,8 +207,7 @@ public class I2C extends SensorBase {
    */
   public boolean read(int registerAddress, int count, byte[] buffer) {
     if (count < 1) {
-      throw new BoundaryException("Value must be at least 1, " + count
-          + " given");
+      throw new BoundaryException("Value must be at least 1, " + count + " given");
     }
 
     if (buffer == null) {
@@ -220,8 +216,7 @@ public class I2C extends SensorBase {
     byte[] registerAddressArray = new byte[1];
     registerAddressArray[0] = (byte) registerAddress;
 
-    return transaction(registerAddressArray, registerAddressArray.length,
-        buffer, count);
+    return transaction(registerAddressArray, registerAddressArray.length, buffer, count);
   }
 
   /**
@@ -238,16 +233,14 @@ public class I2C extends SensorBase {
    */
   public boolean read(int registerAddress, int count, ByteBuffer buffer) {
     if (count < 1) {
-      throw new BoundaryException("Value must be at least 1, " + count
-          + " given");
+      throw new BoundaryException("Value must be at least 1, " + count + " given");
     }
 
     if (!buffer.isDirect()) {
       throw new IllegalArgumentException("must be a direct buffer");
     }
     if (buffer.capacity() < count) {
-      throw new IllegalArgumentException(
-          "buffer is too small, must be at least " + count);
+      throw new IllegalArgumentException("buffer is too small, must be at least " + count);
     }
 
     ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(1);
@@ -267,8 +260,7 @@ public class I2C extends SensorBase {
    */
   public boolean readOnly(byte[] buffer, int count) {
     if (count < 1) {
-      throw new BoundaryException("Value must be at least 1, " + count
-          + " given");
+      throw new BoundaryException("Value must be at least 1, " + count + " given");
     }
 
     if (buffer == null) {
@@ -278,8 +270,8 @@ public class I2C extends SensorBase {
     ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(count);
 
     int retVal = I2CJNI
-        .i2CRead((byte) m_port.getValue(), (byte) m_deviceAddress,
-            dataReceivedBuffer, (byte) count);
+        .i2CRead((byte) m_port.getValue(), (byte) m_deviceAddress, dataReceivedBuffer,
+            (byte) count);
     dataReceivedBuffer.get(buffer);
     return retVal < count;
   }
@@ -304,13 +296,11 @@ public class I2C extends SensorBase {
       throw new IllegalArgumentException("must be a direct buffer");
     }
     if (buffer.capacity() < count) {
-      throw new IllegalArgumentException(
-          "buffer is too small, must be at least " + count);
+      throw new IllegalArgumentException("buffer is too small, must be at least " + count);
     }
 
     return I2CJNI
-        .i2CRead((byte) m_port.getValue(), (byte) m_deviceAddress, buffer,
-            (byte) count) < count;
+        .i2CRead((byte) m_port.getValue(), (byte) m_deviceAddress, buffer, (byte) count) < count;
   }
 
   /**

@@ -35,11 +35,11 @@ public class SerialPort {
     private int m_value;
 
     Port(int value) {
-      this.m_value = value;
+      m_value = value;
     }
 
     public int getValue() {
-      return this.m_value;
+      return m_value;
     }
   }
 
@@ -282,7 +282,7 @@ public class SerialPort {
    * <p>The default terminator is '\n'
    */
   public void enableTermination() {
-    this.enableTermination('\n');
+    enableTermination('\n');
   }
 
   /**

@@ -14,8 +14,7 @@ import java.nio.ByteOrder;
 
 @SuppressWarnings("all")
 public class NIVision {
-  private NIVision() {
-  }
+  private NIVision() {}
 
   private static native void imaqDispose(long addr);
 
@@ -112,16 +111,14 @@ public class NIVision {
 
     @Override
     protected void finalize() throws Throwable {
-      if (owned) {
+      if (owned)
         imaqDispose(getByteBufferAddress(backing));
-      }
       super.finalize();
     }
 
     public long getAddress() {
-      if (backing == null) {
+      if (backing == null)
         return 0;
-      }
       write();
       return getByteBufferAddress(backing);
     }
@@ -161,9 +158,8 @@ public class NIVision {
 
     @Override
     protected void finalize() throws Throwable {
-      if (owned && nativeObj != 0) {
+      if (owned && nativeObj != 0)
         imaqDispose(nativeObj);
-      }
       super.finalize();
     }
 
@@ -200,16 +196,14 @@ public class NIVision {
 
     @Override
     protected void finalize() throws Throwable {
-      if (owned) {
+      if (owned)
         imaqDispose(getByteBufferAddress(buf));
-      }
       super.finalize();
     }
 
     public long getAddress() {
-      if (buf == null) {
+      if (buf == null)
         return 0;
-      }
       return getByteBufferAddress(buf);
     }
 
@@ -218,9 +212,8 @@ public class NIVision {
     }
 
     public void setBuffer(ByteBuffer buf) {
-      if (owned) {
+      if (owned)
         free();
-      }
       this.buf = buf;
     }
   }
@@ -234,27 +227,24 @@ public class NIVision {
   }
 
   private static void putPointer(ByteBuffer bb, int offset, ByteBuffer buf) {
-    if (buf == null) {
+    if (buf == null)
       bb.putInt(offset, 0);
-    } else {
+    else
       bb.putInt(offset, (int) getByteBufferAddress(buf));
-    }
   }
 
   private static void putPointer(ByteBuffer bb, int offset, DisposedStruct struct) {
-    if (struct == null) {
+    if (struct == null)
       bb.putInt(offset, 0);
-    } else {
+    else
       bb.putInt(offset, (int) struct.getAddress());
-    }
   }
 
   private static void putPointer(ByteBuffer bb, int offset, OpaqueStruct struct) {
-    if (struct == null) {
+    if (struct == null)
       bb.putInt(offset, 0);
-    } else {
+    else
       bb.putInt(offset, (int) struct.getAddress());
-    }
   }
 
   /**
@@ -262,8 +252,7 @@ public class NIVision {
    */
 
   public static class CharSet extends OpaqueStruct {
-    private CharSet() {
-    }
+    private CharSet() {}
 
     private CharSet(long nativeObj, boolean owned) {
       super(nativeObj, owned);
@@ -271,8 +260,7 @@ public class NIVision {
   }
 
   public static class ClassifierSession extends OpaqueStruct {
-    private ClassifierSession() {
-    }
+    private ClassifierSession() {}
 
     private ClassifierSession(long nativeObj, boolean owned) {
       super(nativeObj, owned);
@@ -280,8 +268,7 @@ public class NIVision {
   }
 
   public static class Image extends OpaqueStruct {
-    private Image() {
-    }
+    private Image() {}
 
     private Image(long nativeObj, boolean owned) {
       super(nativeObj, owned);
@@ -289,8 +276,7 @@ public class NIVision {
   }
 
   public static class MultipleGeometricPattern extends OpaqueStruct {
-    private MultipleGeometricPattern() {
-    }
+    private MultipleGeometricPattern() {}
 
     private MultipleGeometricPattern(long nativeObj, boolean owned) {
       super(nativeObj, owned);
@@ -298,8 +284,7 @@ public class NIVision {
   }
 
   public static class Overlay extends OpaqueStruct {
-    private Overlay() {
-    }
+    private Overlay() {}
 
     private Overlay(long nativeObj, boolean owned) {
       super(nativeObj, owned);
@@ -307,8 +292,7 @@ public class NIVision {
   }
 
   public static class ROI extends OpaqueStruct {
-    private ROI() {
-    }
+    private ROI() {}
 
     private ROI(long nativeObj, boolean owned) {
       super(nativeObj, owned);
@@ -365,15 +349,15 @@ public class NIVision {
    * Enumerated Types
    */
 
-  public enum PointSymbol {
+  public static enum PointSymbol {
     POINT_AS_PIXEL(0), // A single pixel represents a point in the overlay.
     POINT_AS_CROSS(1), // A cross represents a point in the overlay.
     POINT_USER_DEFINED(2), // The pattern supplied by the user represents a
-    // point in the overlay.
+                           // point in the overlay.
     ;
     private final int value;
 
-    PointSymbol(int value) {
+    private PointSymbol(int value) {
       this.value = value;
     }
 
@@ -390,20 +374,20 @@ public class NIVision {
     }
   }
 
-  public enum MeasurementValue {
+  public static enum MeasurementValue {
     AREA(0), // Surface area of the particle in pixels.
     AREA_CALIBRATED(1), // Surface area of the particle in calibrated units.
     NUM_HOLES(2), // Number of holes in the particle.
     AREA_OF_HOLES(3), // Surface area of the holes in calibrated units.
     TOTAL_AREA(4), // Total surface area (holes and particle) in calibrated
-    // units.
+                   // units.
     IMAGE_AREA(5), // Surface area of the entire image in calibrated units.
     PARTICLE_TO_IMAGE(6), // Ratio, expressed as a percentage, of the surface
-    // area of a particle in relation to the total area of
-    // the particle.
+                          // area of a particle in relation to the total area of
+                          // the particle.
     PARTICLE_TO_TOTAL(7), // Ratio, expressed as a percentage, of the surface
-    // area of a particle in relation to the total area of
-    // the particle.
+                          // area of a particle in relation to the total area of
+                          // the particle.
     CENTER_MASS_X(8), // X-coordinate of the center of mass.
     CENTER_MASS_Y(9), // Y-coordinate of the center of mass.
     LEFT_COLUMN(10), // Left edge of the bounding rectangle.
@@ -414,7 +398,7 @@ public class NIVision {
     HEIGHT(15), // Height of bounding rectangle in calibrated units.
     MAX_SEGMENT_LENGTH(16), // Length of longest horizontal line segment.
     MAX_SEGMENT_LEFT_COLUMN(17), // Leftmost x-coordinate of longest horizontal
-    // line segment.
+                                 // line segment.
     MAX_SEGMENT_TOP_ROW(18), // Y-coordinate of longest horizontal line segment.
     PERIMETER(19), // Outer perimeter of the particle.
     PERIMETER_OF_HOLES(20), // Perimeter of all holes within the particle.
@@ -432,38 +416,38 @@ public class NIVision {
     MEAN_V(32), // Mean length of vertical segments.
     MAX_INTERCEPT(33), // Length of longest segment of the convex hull.
     MEAN_INTERCEPT(34), // Mean length of the chords in an object perpendicular
-    // to its max intercept.
+                        // to its max intercept.
     ORIENTATION(35), // The orientation based on the inertia of the pixels in
-    // the particle.
+                     // the particle.
     EQUIV_ELLIPSE_MINOR(36), // Total length of the axis of the ellipse having
-    // the same area as the particle and a major axis
-    // equal to half the max intercept.
+                             // the same area as the particle and a major axis
+                             // equal to half the max intercept.
     ELLIPSE_MAJOR(37), // Total length of major axis having the same area and
-    // perimeter as the particle in calibrated units.
+                       // perimeter as the particle in calibrated units.
     ELLIPSE_MINOR(38), // Total length of minor axis having the same area and
-    // perimeter as the particle in calibrated units.
+                       // perimeter as the particle in calibrated units.
     ELLIPSE_RATIO(39), // Fraction of major axis to minor axis.
     RECT_LONG_SIDE(40), // Length of the long side of a rectangle having the
-    // same area and perimeter as the particle in calibrated
-    // units.
+                        // same area and perimeter as the particle in calibrated
+                        // units.
     RECT_SHORT_SIDE(41), // Length of the short side of a rectangle having the
-    // same area and perimeter as the particle in
-    // calibrated units.
+                         // same area and perimeter as the particle in
+                         // calibrated units.
     RECT_RATIO(42), // Ratio of rectangle long side to rectangle short side.
     ELONGATION(43), // Max intercept/mean perpendicular intercept.
     COMPACTNESS(44), // Particle area/(height x width).
     HEYWOOD(45), // Particle perimeter/perimeter of the circle having the same
-    // area as the particle.
+                 // area as the particle.
     TYPE_FACTOR(46), // A complex factor relating the surface area to the moment
-    // of inertia.
+                     // of inertia.
     HYDRAULIC(47), // Particle area/particle perimeter.
     WADDLE_DISK(48), // Diameter of the disk having the same area as the
-    // particle in user units.
+                     // particle in user units.
     DIAGONAL(49), // Diagonal of an equivalent rectangle in user units.
     ;
     private final int value;
 
-    MeasurementValue(int value) {
+    private MeasurementValue(int value) {
       this.value = value;
     }
 
@@ -480,14 +464,14 @@ public class NIVision {
     }
   }
 
-  public enum ScalingMode {
+  public static enum ScalingMode {
     SCALE_LARGER(0), // The function duplicates pixels to make the image larger.
     SCALE_SMALLER(1), // The function subsamples pixels to make the image
-    // smaller.
+                      // smaller.
     ;
     private final int value;
 
-    ScalingMode(int value) {
+    private ScalingMode(int value) {
       this.value = value;
     }
 
@@ -504,16 +488,16 @@ public class NIVision {
     }
   }
 
-  public enum ScalingMethod {
+  public static enum ScalingMethod {
     SCALE_TO_PRESERVE_AREA(0), // Correction functions scale the image such that
-    // the features in the corrected image have the
-    // same area as the features in the input image.
+                               // the features in the corrected image have the
+                               // same area as the features in the input image.
     SCALE_TO_FIT(1), // Correction functions scale the image such that the
-    // corrected image is the same size as the input image.
+                     // corrected image is the same size as the input image.
     ;
     private final int value;
 
-    ScalingMethod(int value) {
+    private ScalingMethod(int value) {
       this.value = value;
     }
 
@@ -530,13 +514,13 @@ public class NIVision {
     }
   }
 
-  public enum ReferenceMode {
+  public static enum ReferenceMode {
     COORD_X_Y(0), // This method requires three elements in the points array.
     COORD_ORIGIN_X(1), // This method requires two elements in the points array.
     ;
     private final int value;
 
-    ReferenceMode(int value) {
+    private ReferenceMode(int value) {
       this.value = value;
     }
 
@@ -553,15 +537,15 @@ public class NIVision {
     }
   }
 
-  public enum RectOrientation {
+  public static enum RectOrientation {
     BASE_INSIDE(0), // Specifies that the base of the rectangular image lies
-    // along the inside edge of the annulus.
+                    // along the inside edge of the annulus.
     BASE_OUTSIDE(1), // Specifies that the base of the rectangular image lies
-    // along the outside edge of the annulus.
+                     // along the outside edge of the annulus.
     ;
     private final int value;
 
-    RectOrientation(int value) {
+    private RectOrientation(int value) {
       this.value = value;
     }
 
@@ -578,21 +562,20 @@ public class NIVision {
     }
   }
 
-  public enum ShapeMode {
+  public static enum ShapeMode {
     SHAPE_RECT(1), // The function draws a rectangle.
     SHAPE_OVAL(2), // The function draws an oval.
     ;
     private final int value;
 
-    ShapeMode(int value) {
+    private ShapeMode(int value) {
       this.value = value;
     }
 
     public static ShapeMode fromValue(int val) {
       for (ShapeMode v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -602,21 +585,20 @@ public class NIVision {
     }
   }
 
-  public enum PolarityType {
+  public static enum PolarityType {
     EDGE_RISING(1), // The edge is a rising edge.
     EDGE_FALLING(-1), // The edge is a falling edge.
     ;
     private final int value;
 
-    PolarityType(int value) {
+    private PolarityType(int value) {
       this.value = value;
     }
 
     public static PolarityType fromValue(int val) {
       for (PolarityType v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -626,15 +608,15 @@ public class NIVision {
     }
   }
 
-  public enum SizeType {
+  public static enum SizeType {
     KEEP_LARGE(0), // The function keeps large particles remaining after the
-    // erosion.
+                   // erosion.
     KEEP_SMALL(1), // The function keeps small particles eliminated by the
-    // erosion.
+                   // erosion.
     ;
     private final int value;
 
-    SizeType(int value) {
+    private SizeType(int value) {
       this.value = value;
     }
 
@@ -651,17 +633,17 @@ public class NIVision {
     }
   }
 
-  public enum Plane3D {
+  public static enum Plane3D {
     C3D_REAL(0), // The function shows the real part of complex images.
     C3D_IMAGINARY(1), // The function shows the imaginary part of complex
-    // images.
+                      // images.
     C3D_MAGNITUDE(2), // The function shows the magnitude part of complex
-    // images.
+                      // images.
     C3D_PHASE(3), // The function shows the phase part of complex images.
     ;
     private final int value;
 
-    Plane3D(int value) {
+    private Plane3D(int value) {
       this.value = value;
     }
 
@@ -678,13 +660,13 @@ public class NIVision {
     }
   }
 
-  public enum PhotometricMode {
+  public static enum PhotometricMode {
     WHITE_IS_ZERO(0), // The function interprets zero-value pixels as white.
     BLACK_IS_ZERO(1), // The function interprets zero-value pixels as black.
     ;
     private final int value;
 
-    PhotometricMode(int value) {
+    private PhotometricMode(int value) {
       this.value = value;
     }
 
@@ -701,15 +683,15 @@ public class NIVision {
     }
   }
 
-  public enum ParticleInfoMode {
+  public static enum ParticleInfoMode {
     BASIC_INFO(0), // The function returns only the following elements of each
-    // report: area, calibratedArea, boundingRect.
+                   // report: area, calibratedArea, boundingRect.
     ALL_INFO(1), // The function returns all the information about each
-    // particle.
+                 // particle.
     ;
     private final int value;
 
-    ParticleInfoMode(int value) {
+    private ParticleInfoMode(int value) {
       this.value = value;
     }
 
@@ -726,28 +708,28 @@ public class NIVision {
     }
   }
 
-  public enum OutlineMethod {
+  public static enum OutlineMethod {
     EDGE_DIFFERENCE(0), // The function uses a method that produces continuous
-    // contours by highlighting each pixel where an
-    // intensity variation occurs between itself and its
-    // three upper-left neighbors.
+                        // contours by highlighting each pixel where an
+                        // intensity variation occurs between itself and its
+                        // three upper-left neighbors.
     EDGE_GRADIENT(1), // The function uses a method that outlines contours where
-    // an intensity variation occurs along the vertical axis.
+                      // an intensity variation occurs along the vertical axis.
     EDGE_PREWITT(2), // The function uses a method that extracts the outer
-    // contours of objects.
+                     // contours of objects.
     EDGE_ROBERTS(3), // The function uses a method that outlines the contours
-    // that highlight pixels where an intensity variation
-    // occurs along the diagonal axes.
+                     // that highlight pixels where an intensity variation
+                     // occurs along the diagonal axes.
     EDGE_SIGMA(4), // The function uses a method that outlines contours and
-    // details by setting pixels to the mean value found in their
-    // neighborhood, if their deviation from this value is not
-    // significant.
+                   // details by setting pixels to the mean value found in their
+                   // neighborhood, if their deviation from this value is not
+                   // significant.
     EDGE_SOBEL(5), // The function uses a method that extracts the outer
-    // contours of objects.
+                   // contours of objects.
     ;
     private final int value;
 
-    OutlineMethod(int value) {
+    private OutlineMethod(int value) {
       this.value = value;
     }
 
@@ -764,45 +746,45 @@ public class NIVision {
     }
   }
 
-  public enum MorphologyMethod {
+  public static enum MorphologyMethod {
     AUTOM(0), // The function uses a transformation that generates simpler
-    // particles that contain fewer details.
+              // particles that contain fewer details.
     CLOSE(1), // The function uses a transformation that fills tiny holes and
-    // smooths boundaries.
+              // smooths boundaries.
     DILATE(2), // The function uses a transformation that eliminates tiny holes
-    // isolated in particles and expands the contour of the particles
-    // according to the template defined by the structuring element.
+               // isolated in particles and expands the contour of the particles
+               // according to the template defined by the structuring element.
     ERODE(3), // The function uses a transformation that eliminates pixels
-    // isolated in the background and erodes the contour of particles
-    // according to the template defined by the structuring element.
+              // isolated in the background and erodes the contour of particles
+              // according to the template defined by the structuring element.
     GRADIENT(4), // The function uses a transformation that leaves only the
-    // pixels that would be added by the dilation process or
-    // eliminated by the erosion process.
+                 // pixels that would be added by the dilation process or
+                 // eliminated by the erosion process.
     GRADIENTOUT(5), // The function uses a transformation that leaves only the
-    // pixels that would be added by the dilation process.
+                    // pixels that would be added by the dilation process.
     GRADIENTIN(6), // The function uses a transformation that leaves only the
-    // pixels that would be eliminated by the erosion process.
+                   // pixels that would be eliminated by the erosion process.
     HITMISS(7), // The function uses a transformation that extracts each pixel
-    // located in a neighborhood exactly matching the template
-    // defined by the structuring element.
+                // located in a neighborhood exactly matching the template
+                // defined by the structuring element.
     OPEN(8), // The function uses a transformation that removes small particles
-    // and smooths boundaries.
+             // and smooths boundaries.
     PCLOSE(9), // The function uses a transformation that fills tiny holes and
-    // smooths the inner contour of particles according to the
-    // template defined by the structuring element.
+               // smooths the inner contour of particles according to the
+               // template defined by the structuring element.
     POPEN(10), // The function uses a transformation that removes small
-    // particles and smooths the contour of particles according to
-    // the template defined by the structuring element.
+               // particles and smooths the contour of particles according to
+               // the template defined by the structuring element.
     THICK(11), // The function uses a transformation that adds to an image those
-    // pixels located in a neighborhood that matches a template
-    // specified by the structuring element.
+               // pixels located in a neighborhood that matches a template
+               // specified by the structuring element.
     THIN(12), // The function uses a transformation that eliminates pixels that
-    // are located in a neighborhood matching a template specified by
-    // the structuring element.
+              // are located in a neighborhood matching a template specified by
+              // the structuring element.
     ;
     private final int value;
 
-    MorphologyMethod(int value) {
+    private MorphologyMethod(int value) {
       this.value = value;
     }
 
@@ -819,15 +801,15 @@ public class NIVision {
     }
   }
 
-  public enum MeterArcMode {
+  public static enum MeterArcMode {
     METER_ARC_ROI(0), // The function uses the roi parameter and ignores the
-    // base, start, and end parameters.
+                      // base, start, and end parameters.
     METER_ARC_POINTS(1), // The function uses the base,start, and end parameters
-    // and ignores the roi parameter.
+                         // and ignores the roi parameter.
     ;
     private final int value;
 
-    MeterArcMode(int value) {
+    private MeterArcMode(int value) {
       this.value = value;
     }
 
@@ -844,19 +826,19 @@ public class NIVision {
     }
   }
 
-  public enum RakeDirection {
+  public static enum RakeDirection {
     LEFT_TO_RIGHT(0), // The function searches from the left side of the search
-    // area to the right side of the search area.
+                      // area to the right side of the search area.
     RIGHT_TO_LEFT(1), // The function searches from the right side of the search
-    // area to the left side of the search area.
+                      // area to the left side of the search area.
     TOP_TO_BOTTOM(2), // The function searches from the top side of the search
-    // area to the bottom side of the search area.
+                      // area to the bottom side of the search area.
     BOTTOM_TO_TOP(3), // The function searches from the bottom side of the
-    // search area to the top side of the search area.
+                      // search area to the top side of the search area.
     ;
     private final int value;
 
-    RakeDirection(int value) {
+    private RakeDirection(int value) {
       this.value = value;
     }
 
@@ -873,13 +855,13 @@ public class NIVision {
     }
   }
 
-  public enum TruncateMode {
+  public static enum TruncateMode {
     TRUNCATE_LOW(0), // The function truncates low frequencies.
     TRUNCATE_HIGH(1), // The function truncates high frequencies.
     ;
     private final int value;
 
-    TruncateMode(int value) {
+    private TruncateMode(int value) {
       this.value = value;
     }
 
@@ -896,13 +878,13 @@ public class NIVision {
     }
   }
 
-  public enum AttenuateMode {
+  public static enum AttenuateMode {
     ATTENUATE_LOW(0), // The function attenuates low frequencies.
     ATTENUATE_HIGH(1), // The function attenuates high frequencies.
     ;
     private final int value;
 
-    AttenuateMode(int value) {
+    private AttenuateMode(int value) {
       this.value = value;
     }
 
@@ -919,17 +901,17 @@ public class NIVision {
     }
   }
 
-  public enum WindowThreadPolicy {
+  public static enum WindowThreadPolicy {
     CALLING_THREAD(0), // Using this policy, NI Vision creates windows in the
-    // thread that makes the first display function call for
-    // a given window number.
+                       // thread that makes the first display function call for
+                       // a given window number.
     SEPARATE_THREAD(1), // Using this policy, NI Vision creates windows in a
-    // separate thread and processes messages for the
-    // windows automatically.
+                        // separate thread and processes messages for the
+                        // windows automatically.
     ;
     private final int value;
 
-    WindowThreadPolicy(int value) {
+    private WindowThreadPolicy(int value) {
       this.value = value;
     }
 
@@ -946,24 +928,23 @@ public class NIVision {
     }
   }
 
-  public enum WindowOptions {
+  public static enum WindowOptions {
     WIND_RESIZABLE(1), // When present, the user may resize the window
-    // interactively.
+                       // interactively.
     WIND_TITLEBAR(2), // When present, the title bar on the window is visible.
     WIND_CLOSEABLE(4), // When present, the close box is available.
     WIND_TOPMOST(8), // When present, the window is always on top.
     ;
     private final int value;
 
-    WindowOptions(int value) {
+    private WindowOptions(int value) {
       this.value = value;
     }
 
     public static WindowOptions fromValue(int val) {
       for (WindowOptions v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -973,7 +954,7 @@ public class NIVision {
     }
   }
 
-  public enum WindowEventType {
+  public static enum WindowEventType {
     NO_EVENT(0), // No event occurred since the last call to imaqGetLastEvent().
     CLICK_EVENT(1), // The user clicked on a window.
     DRAW_EVENT(2), // The user drew an ROI in a window.
@@ -986,7 +967,7 @@ public class NIVision {
     ;
     private final int value;
 
-    WindowEventType(int value) {
+    private WindowEventType(int value) {
       this.value = value;
     }
 
@@ -1003,20 +984,20 @@ public class NIVision {
     }
   }
 
-  public enum VisionInfoType {
+  public static enum VisionInfoType {
     ANY_VISION_INFO(0), // The function checks if any extra vision information
-    // is associated with the image.
+                        // is associated with the image.
     PATTERN_MATCHING_INFO(1), // The function checks if any pattern matching
-    // template information is associated with the
-    // image.
+                              // template information is associated with the
+                              // image.
     CALIBRATION_INFO(2), // The function checks if any calibration information
-    // is associated with the image.
+                         // is associated with the image.
     OVERLAY_INFO(3), // The function checks if any overlay information is
-    // associated with the image.
+                     // associated with the image.
     ;
     private final int value;
 
-    VisionInfoType(int value) {
+    private VisionInfoType(int value) {
       this.value = value;
     }
 
@@ -1033,33 +1014,32 @@ public class NIVision {
     }
   }
 
-  public enum SearchStrategy {
+  public static enum SearchStrategy {
     CONSERVATIVE(1), // Instructs the pattern matching algorithm to use the
-    // largest possible amount of information from the image at
-    // the expense of slowing down the speed of the algorithm.
+                     // largest possible amount of information from the image at
+                     // the expense of slowing down the speed of the algorithm.
     BALANCED(2), // Instructs the pattern matching algorithm to balance the
-    // amount of information from the image it uses with the speed
-    // of the algorithm.
+                 // amount of information from the image it uses with the speed
+                 // of the algorithm.
     AGGRESSIVE(3), // Instructs the pattern matching algorithm to use a lower
-    // amount of information from the image, which allows the
-    // algorithm to run quickly but at the expense of accuracy.
+                   // amount of information from the image, which allows the
+                   // algorithm to run quickly but at the expense of accuracy.
     VERY_AGGRESSIVE(4), // Instructs the pattern matching algorithm to use the
-    // smallest possible amount of information from the
-    // image, which allows the algorithm to run at the
-    // highest speed possible but at the expense of
-    // accuracy.
+                        // smallest possible amount of information from the
+                        // image, which allows the algorithm to run at the
+                        // highest speed possible but at the expense of
+                        // accuracy.
     ;
     private final int value;
 
-    SearchStrategy(int value) {
+    private SearchStrategy(int value) {
       this.value = value;
     }
 
     public static SearchStrategy fromValue(int val) {
       for (SearchStrategy v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -1069,24 +1049,24 @@ public class NIVision {
     }
   }
 
-  public enum TwoEdgePolarityType {
+  public static enum TwoEdgePolarityType {
     NONE(0), // The function ignores the polarity of the edges.
     RISING_FALLING(1), // The polarity of the first edge is rising (dark to
-    // light) and the polarity of the second edge is falling
-    // (light to dark).
+                       // light) and the polarity of the second edge is falling
+                       // (light to dark).
     FALLING_RISING(2), // The polarity of the first edge is falling (light to
-    // dark) and the polarity of the second edge is rising
-    // (dark to light).
+                       // dark) and the polarity of the second edge is rising
+                       // (dark to light).
     RISING_RISING(3), // The polarity of the first edge is rising (dark to
-    // light) and the polarity of the second edge is rising
-    // (dark to light).
+                      // light) and the polarity of the second edge is rising
+                      // (dark to light).
     FALLING_FALLING(4), // The polarity of the first edge is falling (light to
-    // dark) and the polarity of the second edge is falling
-    // (light to dark).
+                        // dark) and the polarity of the second edge is falling
+                        // (light to dark).
     ;
     private final int value;
 
-    TwoEdgePolarityType(int value) {
+    private TwoEdgePolarityType(int value) {
       this.value = value;
     }
 
@@ -1103,13 +1083,13 @@ public class NIVision {
     }
   }
 
-  public enum ObjectType {
+  public static enum ObjectType {
     BRIGHT_OBJECTS(0), // The function detects bright objects.
     DARK_OBJECTS(1), // The function detects dark objects.
     ;
     private final int value;
 
-    ObjectType(int value) {
+    private ObjectType(int value) {
       this.value = value;
     }
 
@@ -1126,38 +1106,37 @@ public class NIVision {
     }
   }
 
-  public enum Tool {
+  public static enum Tool {
     NO_TOOL(-1), // No tool is in the selected state.
     SELECTION_TOOL(0), // The selection tool selects an existing ROI in an
-    // image.
+                       // image.
     POINT_TOOL(1), // The point tool draws a point on the image.
     LINE_TOOL(2), // The line tool draws a line on the image.
     RECTANGLE_TOOL(3), // The rectangle tool draws a rectangle on the image.
     OVAL_TOOL(4), // The oval tool draws an oval on the image.
     POLYGON_TOOL(5), // The polygon tool draws a polygon on the image.
     CLOSED_FREEHAND_TOOL(6), // The closed freehand tool draws closed freehand
-    // shapes on the image.
+                             // shapes on the image.
     ANNULUS_TOOL(7), // The annulus tool draws annuluses on the image.
     ZOOM_TOOL(8), // The zoom tool controls the zoom of an image.
     PAN_TOOL(9), // The pan tool shifts the view of the image.
     POLYLINE_TOOL(10), // The polyline tool draws a series of connected straight
-    // lines on the image.
+                       // lines on the image.
     FREEHAND_TOOL(11), // The freehand tool draws freehand lines on the image.
     ROTATED_RECT_TOOL(12), // The rotated rectangle tool draws rotated
-    // rectangles on the image.
+                           // rectangles on the image.
     ZOOM_OUT_TOOL(13), // The zoom out tool controls the zoom of an image.
     ;
     private final int value;
 
-    Tool(int value) {
+    private Tool(int value) {
       this.value = value;
     }
 
     public static Tool fromValue(int val) {
       for (Tool v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -1167,18 +1146,18 @@ public class NIVision {
     }
   }
 
-  public enum TIFFCompressionType {
+  public static enum TIFFCompressionType {
     NO_COMPRESSION(0), // The function does not compress the TIFF file.
     JPEG(1), // The function uses the JPEG compression algorithm to compress the
-    // TIFF file.
+             // TIFF file.
     RUN_LENGTH(2), // The function uses a run length compression algorithm to
-    // compress the TIFF file.
+                   // compress the TIFF file.
     ZIP(3), // The function uses the ZIP compression algorithm to compress the
-    // TIFF file.
+            // TIFF file.
     ;
     private final int value;
 
-    TIFFCompressionType(int value) {
+    private TIFFCompressionType(int value) {
       this.value = value;
     }
 
@@ -1195,25 +1174,25 @@ public class NIVision {
     }
   }
 
-  public enum ThresholdMethod {
+  public static enum ThresholdMethod {
     THRESH_CLUSTERING(0), // The function uses a method that sorts the histogram
-    // of the image within a discrete number of classes
-    // corresponding to the number of phases perceived in
-    // an image.
+                          // of the image within a discrete number of classes
+                          // corresponding to the number of phases perceived in
+                          // an image.
     THRESH_ENTROPY(1), // The function uses a method that is best for detecting
-    // particles that are present in minuscule proportions on
-    // the image.
+                       // particles that are present in minuscule proportions on
+                       // the image.
     THRESH_METRIC(2), // The function uses a method that is well-suited for
-    // images in which classes are not too disproportionate.
+                      // images in which classes are not too disproportionate.
     THRESH_MOMENTS(3), // The function uses a method that is suited for images
-    // that have poor contrast.
+                       // that have poor contrast.
     THRESH_INTERCLASS(4), // The function uses a method that is well-suited for
-    // images in which classes have well separated pixel
-    // value distributions.
+                          // images in which classes have well separated pixel
+                          // value distributions.
     ;
     private final int value;
 
-    ThresholdMethod(int value) {
+    private ThresholdMethod(int value) {
       this.value = value;
     }
 
@@ -1230,14 +1209,14 @@ public class NIVision {
     }
   }
 
-  public enum TextAlignment {
+  public static enum TextAlignment {
     LEFT(0), // Left aligns the text at the reference point.
     CENTER(1), // Centers the text around the reference point.
     RIGHT(2), // Right aligns the text at the reference point.
     ;
     private final int value;
 
-    TextAlignment(int value) {
+    private TextAlignment(int value) {
       this.value = value;
     }
 
@@ -1254,15 +1233,15 @@ public class NIVision {
     }
   }
 
-  public enum SpokeDirection {
+  public static enum SpokeDirection {
     OUTSIDE_TO_INSIDE(0), // The function searches from the outside of the
-    // search area to the inside of the search area.
+                          // search area to the inside of the search area.
     INSIDE_TO_OUTSIDE(1), // The function searches from the inside of the search
-    // area to the outside of the search area.
+                          // area to the outside of the search area.
     ;
     private final int value;
 
-    SpokeDirection(int value) {
+    private SpokeDirection(int value) {
       this.value = value;
     }
 
@@ -1279,17 +1258,17 @@ public class NIVision {
     }
   }
 
-  public enum SkeletonMethod {
+  public static enum SkeletonMethod {
     SKELETON_L(0), // Uses an L-shaped structuring element in the skeleton
-    // function.
+                   // function.
     SKELETON_M(1), // Uses an M-shaped structuring element in the skeleton
-    // function.
+                   // function.
     SKELETON_INVERSE(2), // Uses an L-shaped structuring element on an inverse
-    // of the image in the skeleton function.
+                         // of the image in the skeleton function.
     ;
     private final int value;
 
-    SkeletonMethod(int value) {
+    private SkeletonMethod(int value) {
       this.value = value;
     }
 
@@ -1306,14 +1285,14 @@ public class NIVision {
     }
   }
 
-  public enum VerticalTextAlignment {
+  public static enum VerticalTextAlignment {
     BOTTOM(0), // Aligns the bottom of the text at the reference point.
     TOP(1), // Aligns the top of the text at the reference point.
     BASELINE(2), // Aligns the baseline of the text at the reference point.
     ;
     private final int value;
 
-    VerticalTextAlignment(int value) {
+    private VerticalTextAlignment(int value) {
       this.value = value;
     }
 
@@ -1330,24 +1309,24 @@ public class NIVision {
     }
   }
 
-  public enum CalibrationROI {
+  public static enum CalibrationROI {
     FULL_IMAGE(0), // The correction function corrects the whole image,
-    // regardless of the user-defined or calibration-defined
-    // ROIs.
+                   // regardless of the user-defined or calibration-defined
+                   // ROIs.
     CALIBRATION_ROI(1), // The correction function corrects the area defined by
-    // the calibration ROI.
+                        // the calibration ROI.
     USER_ROI(2), // The correction function corrects the area defined by the
-    // user-defined ROI.
+                 // user-defined ROI.
     CALIBRATION_AND_USER_ROI(3), // The correction function corrects the area
-    // defined by the intersection of the
-    // user-defined ROI and the calibration ROI.
+                                 // defined by the intersection of the
+                                 // user-defined ROI and the calibration ROI.
     CALIBRATION_OR_USER_ROI(4), // The correction function corrects the area
-    // defined by the union of the user-defined ROI
-    // and the calibration ROI.
+                                // defined by the union of the user-defined ROI
+                                // and the calibration ROI.
     ;
     private final int value;
 
-    CalibrationROI(int value) {
+    private CalibrationROI(int value) {
       this.value = value;
     }
 
@@ -1364,22 +1343,22 @@ public class NIVision {
     }
   }
 
-  public enum ContourType {
+  public static enum ContourType {
     EMPTY_CONTOUR(0), // The contour is empty.
     POINT(1), // The contour represents a point.
     LINE(2), // The contour represents a line.
     RECT(3), // The contour represents a rectangle.
     OVAL(4), // The contour represents an oval.
     CLOSED_CONTOUR(5), // The contour represents a series of connected points
-    // where the last point connects to the first.
+                       // where the last point connects to the first.
     OPEN_CONTOUR(6), // The contour represents a series of connected points
-    // where the last point does not connect to the first.
+                     // where the last point does not connect to the first.
     ANNULUS(7), // The contour represents an annulus.
     ROTATED_RECT(8), // The contour represents a rotated rectangle.
     ;
     private final int value;
 
-    ContourType(int value) {
+    private ContourType(int value) {
       this.value = value;
     }
 
@@ -1396,7 +1375,7 @@ public class NIVision {
     }
   }
 
-  public enum MathTransformMethod {
+  public static enum MathTransformMethod {
     TRANSFORM_LINEAR(0), // The function uses linear remapping.
     TRANSFORM_LOG(1), // The function uses logarithmic remapping.
     TRANSFORM_EXP(2), // The function uses exponential remapping.
@@ -1407,7 +1386,7 @@ public class NIVision {
     ;
     private final int value;
 
-    MathTransformMethod(int value) {
+    private MathTransformMethod(int value) {
       this.value = value;
     }
 
@@ -1424,17 +1403,17 @@ public class NIVision {
     }
   }
 
-  public enum ComplexPlane {
+  public static enum ComplexPlane {
     REAL(0), // The function operates on the real plane of the complex image.
     IMAGINARY(1), // The function operates on the imaginary plane of the complex
-    // image.
+                  // image.
     MAGNITUDE(2), // The function operates on the magnitude plane of the complex
-    // image.
+                  // image.
     PHASE(3), // The function operates on the phase plane of the complex image.
     ;
     private final int value;
 
-    ComplexPlane(int value) {
+    private ComplexPlane(int value) {
       this.value = value;
     }
 
@@ -1451,24 +1430,24 @@ public class NIVision {
     }
   }
 
-  public enum PaletteType {
+  public static enum PaletteType {
     PALETTE_GRAY(0), // The function uses a palette that has a gradual
-    // gray-level variation from black to white.
+                     // gray-level variation from black to white.
     PALETTE_BINARY(1), // The function uses a palette of 16 cycles of 16
-    // different colors that is useful with binary images.
+                       // different colors that is useful with binary images.
     PALETTE_GRADIENT(2), // The function uses a palette that has a gradation
-    // from red to white with a prominent range of light
-    // blue in the upper value range.
+                         // from red to white with a prominent range of light
+                         // blue in the upper value range.
     PALETTE_RAINBOW(3), // The function uses a palette that has a gradation from
-    // blue to red with a prominent range of greens in the
-    // middle value range.
+                        // blue to red with a prominent range of greens in the
+                        // middle value range.
     PALETTE_TEMPERATURE(4), // The function uses a palette that has a gradation
-    // from light brown to dark brown.
+                            // from light brown to dark brown.
     PALETTE_USER(5), // The function uses a palette defined by the user.
     ;
     private final int value;
 
-    PaletteType(int value) {
+    private PaletteType(int value) {
       this.value = value;
     }
 
@@ -1485,20 +1464,20 @@ public class NIVision {
     }
   }
 
-  public enum ColorSensitivity {
+  public static enum ColorSensitivity {
     SENSITIVITY_LOW(0), // Instructs the algorithm to divide the hue plane into
-    // a low number of sectors, allowing for simple color
-    // analysis.
+                        // a low number of sectors, allowing for simple color
+                        // analysis.
     SENSITIVITY_MED(1), // Instructs the algorithm to divide the hue plane into
-    // a medium number of sectors, allowing for color
-    // analysis that balances sensitivity and complexity.
+                        // a medium number of sectors, allowing for color
+                        // analysis that balances sensitivity and complexity.
     SENSITIVITY_HIGH(2), // Instructs the algorithm to divide the hue plane into
-    // a high number of sectors, allowing for complex,
-    // sensitive color analysis.
+                         // a high number of sectors, allowing for complex,
+                         // sensitive color analysis.
     ;
     private final int value;
 
-    ColorSensitivity(int value) {
+    private ColorSensitivity(int value) {
       this.value = value;
     }
 
@@ -1515,20 +1494,20 @@ public class NIVision {
     }
   }
 
-  public enum ColorMode {
+  public static enum ColorMode {
     RGB(0), // The function operates in the RGB (Red, Blue, Green) color space.
     HSL(1), // The function operates in the HSL (Hue, Saturation, Luminance)
-    // color space.
+            // color space.
     HSV(2), // The function operates in the HSV (Hue, Saturation, Value) color
-    // space.
+            // space.
     HSI(3), // The function operates in the HSI (Hue, Saturation, Intensity)
-    // color space.
+            // color space.
     CIE(4), // The function operates in the CIE L*a*b* color space.
     CIEXYZ(5), // The function operates in the CIE XYZ color space.
     ;
     private final int value;
 
-    ColorMode(int value) {
+    private ColorMode(int value) {
       this.value = value;
     }
 
@@ -1545,13 +1524,13 @@ public class NIVision {
     }
   }
 
-  public enum DetectionMode {
+  public static enum DetectionMode {
     DETECT_PEAKS(0), // The function detects peaks.
     DETECT_VALLEYS(1), // The function detects valleys.
     ;
     private final int value;
 
-    DetectionMode(int value) {
+    private DetectionMode(int value) {
       this.value = value;
     }
 
@@ -1568,7 +1547,7 @@ public class NIVision {
     }
   }
 
-  public enum CalibrationUnit {
+  public static enum CalibrationUnit {
     UNDEFINED(0), // The image does not have a defined unit of measurement.
     ANGSTROM(1), // The unit of measure for the image is angstroms.
     MICROMETER(2), // The unit of measure for the image is micrometers.
@@ -1585,7 +1564,7 @@ public class NIVision {
     ;
     private final int value;
 
-    CalibrationUnit(int value) {
+    private CalibrationUnit(int value) {
       this.value = value;
     }
 
@@ -1602,15 +1581,15 @@ public class NIVision {
     }
   }
 
-  public enum ConcentricRakeDirection {
+  public static enum ConcentricRakeDirection {
     COUNTER_CLOCKWISE(0), // The function searches the search area in a
-    // counter-clockwise direction.
+                          // counter-clockwise direction.
     CLOCKWISE(1), // The function searches the search area in a clockwise
-    // direction.
+                  // direction.
     ;
     private final int value;
 
-    ConcentricRakeDirection(int value) {
+    private ConcentricRakeDirection(int value) {
       this.value = value;
     }
 
@@ -1627,17 +1606,17 @@ public class NIVision {
     }
   }
 
-  public enum CalibrationMode {
+  public static enum CalibrationMode {
     PERSPECTIVE(0), // Functions correct for distortion caused by the camera's
-    // perspective.
+                    // perspective.
     NONLINEAR(1), // Functions correct for distortion caused by the camera's
-    // lens.
+                  // lens.
     SIMPLE_CALIBRATION(2), // Functions do not correct for distortion.
     CORRECTED_IMAGE(3), // The image is already corrected.
     ;
     private final int value;
 
-    CalibrationMode(int value) {
+    private CalibrationMode(int value) {
       this.value = value;
     }
 
@@ -1654,13 +1633,13 @@ public class NIVision {
     }
   }
 
-  public enum BrowserLocation {
+  public static enum BrowserLocation {
     INSERT_FIRST_FREE(0), // Inserts the thumbnail in the first available cell.
     INSERT_END(1), // Inserts the thumbnail after the last occupied cell.
     ;
     private final int value;
 
-    BrowserLocation(int value) {
+    private BrowserLocation(int value) {
       this.value = value;
     }
 
@@ -1677,7 +1656,7 @@ public class NIVision {
     }
   }
 
-  public enum BrowserFrameStyle {
+  public static enum BrowserFrameStyle {
     RAISED_FRAME(0), // Each thumbnail has a raised frame.
     BEVELLED_FRAME(1), // Each thumbnail has a beveled frame.
     OUTLINE_FRAME(2), // Each thumbnail has an outlined frame.
@@ -1687,7 +1666,7 @@ public class NIVision {
     ;
     private final int value;
 
-    BrowserFrameStyle(int value) {
+    private BrowserFrameStyle(int value) {
       this.value = value;
     }
 
@@ -1704,16 +1683,16 @@ public class NIVision {
     }
   }
 
-  public enum BorderMethod {
+  public static enum BorderMethod {
     BORDER_MIRROR(0), // Symmetrically copies pixel values from the image into
-    // the border.
+                      // the border.
     BORDER_COPY(1), // Copies the value of the pixel closest to the edge of the
-    // image into the border.
+                    // image into the border.
     BORDER_CLEAR(2), // Sets all pixels in the border to 0.
     ;
     private final int value;
 
-    BorderMethod(int value) {
+    private BorderMethod(int value) {
       this.value = value;
     }
 
@@ -1730,7 +1709,7 @@ public class NIVision {
     }
   }
 
-  public enum BarcodeType {
+  public static enum BarcodeType {
     INVALID(-1), // The barcode is not of a type known by NI Vision.
     CODABAR(1), // The barcode is of type Codabar.
     CODE39(2), // The barcode is of type Code 39.
@@ -1746,15 +1725,14 @@ public class NIVision {
     ;
     private final int value;
 
-    BarcodeType(int value) {
+    private BarcodeType(int value) {
       this.value = value;
     }
 
     public static BarcodeType fromValue(int val) {
       for (BarcodeType v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -1764,15 +1742,15 @@ public class NIVision {
     }
   }
 
-  public enum AxisOrientation {
+  public static enum AxisOrientation {
     DIRECT(0), // The y-axis direction corresponds to the y-axis direction of
-    // the Cartesian coordinate system.
+               // the Cartesian coordinate system.
     INDIRECT(1), // The y-axis direction corresponds to the y-axis direction of
-    // an image.
+                 // an image.
     ;
     private final int value;
 
-    AxisOrientation(int value) {
+    private AxisOrientation(int value) {
       this.value = value;
     }
 
@@ -1789,16 +1767,16 @@ public class NIVision {
     }
   }
 
-  public enum ColorIgnoreMode {
+  public static enum ColorIgnoreMode {
     IGNORE_NONE(0), // Specifies that the function does not ignore any pixels.
     IGNORE_BLACK(1), // Specifies that the function ignores black pixels.
     IGNORE_WHITE(2), // Specifies that the function ignores white pixels.
     IGNORE_BLACK_AND_WHITE(3), // Specifies that the function ignores black
-    // pixels and white pixels.
+                               // pixels and white pixels.
     ;
     private final int value;
 
-    ColorIgnoreMode(int value) {
+    private ColorIgnoreMode(int value) {
       this.value = value;
     }
 
@@ -1815,15 +1793,15 @@ public class NIVision {
     }
   }
 
-  public enum LevelType {
+  public static enum LevelType {
     ABSOLUTE(0), // The function evaluates the threshold and hysteresis values
-    // as absolute values.
+                 // as absolute values.
     RELATIVE(1), // The function evaluates the threshold and hysteresis values
-    // relative to the dynamic range of the given path.
+                 // relative to the dynamic range of the given path.
     ;
     private final int value;
 
-    LevelType(int value) {
+    private LevelType(int value) {
       this.value = value;
     }
 
@@ -1840,26 +1818,25 @@ public class NIVision {
     }
   }
 
-  public enum MatchingMode {
+  public static enum MatchingMode {
     MATCH_SHIFT_INVARIANT(1), // Searches for occurrences of the template image
-    // anywhere in the searchRect, assuming that the
-    // pattern is not rotated more than plus or minus
-    // 4 degrees.
+                              // anywhere in the searchRect, assuming that the
+                              // pattern is not rotated more than plus or minus
+                              // 4 degrees.
     MATCH_ROTATION_INVARIANT(2), // Searches for occurrences of the pattern in
-    // the image with no restriction on the
-    // rotation of the pattern.
+                                 // the image with no restriction on the
+                                 // rotation of the pattern.
     ;
     private final int value;
 
-    MatchingMode(int value) {
+    private MatchingMode(int value) {
       this.value = value;
     }
 
     public static MatchingMode fromValue(int val) {
       for (MatchingMode v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -1869,62 +1846,61 @@ public class NIVision {
     }
   }
 
-  public enum MappingMethod {
+  public static enum MappingMethod {
     FULL_DYNAMIC(0), // (Obsolete) When the image bit depth is 0, the function
-    // maps the full dynamic range of the 16-bit image to an
-    // 8-bit scale.
+                     // maps the full dynamic range of the 16-bit image to an
+                     // 8-bit scale.
     DOWNSHIFT(1), // (Obsolete) When the image bit depth is 0, the function
-    // shifts the 16-bit image pixels to the right the number of
-    // times specified by the shiftCount element of the
-    // DisplayMapping structure.
+                  // shifts the 16-bit image pixels to the right the number of
+                  // times specified by the shiftCount element of the
+                  // DisplayMapping structure.
     RANGE(2), // (Obsolete) When the image bit depth is 0, the function maps the
-    // pixel values in the range specified by the minimumValue and
-    // maximumValue elements of the DisplayMapping structure to an
-    // 8-bit scale.
+              // pixel values in the range specified by the minimumValue and
+              // maximumValue elements of the DisplayMapping structure to an
+              // 8-bit scale.
     C90_PCT_DYNAMIC(3), // (Obsolete) When the image bit depth to 0, the
-    // function maps the dynamic range containing the middle
-    // 90 percent of the cumulated histogram of the image to
-    // an 8-bit (256 grayscale values) scale.
+                        // function maps the dynamic range containing the middle
+                        // 90 percent of the cumulated histogram of the image to
+                        // an 8-bit (256 grayscale values) scale.
     PERCENT_RANGE(4), // (Obsolete) When the image bit depth is 0, the function
-    // maps the pixel values in the relative percentage range
-    // (0 to 100) of the cumulated histogram specified by
-    // minimumValue and maximumValue to an 8-bit scale.
+                      // maps the pixel values in the relative percentage range
+                      // (0 to 100) of the cumulated histogram specified by
+                      // minimumValue and maximumValue to an 8-bit scale.
     DEFAULT_MAPPING(10), // If the bit depth is 0, the function maps the 16-bit
-    // image to 8 bits by following the
-    // IMAQ_FULL_DYNAMIC_ALWAYS behavior; otherwise, the
-    // function shifts the image data to the right
-    // according to the IMAQ_MOST_SIGNIFICANT behavior.
+                         // image to 8 bits by following the
+                         // IMAQ_FULL_DYNAMIC_ALWAYS behavior; otherwise, the
+                         // function shifts the image data to the right
+                         // according to the IMAQ_MOST_SIGNIFICANT behavior.
     MOST_SIGNIFICANT(11), // The function shifts the 16-bit image pixels to the
-    // right until the 8 most significant bits of the
-    // image data are remaining.
+                          // right until the 8 most significant bits of the
+                          // image data are remaining.
     FULL_DYNAMIC_ALWAYS(12), // The function maps the full dynamic range of the
-    // 16-bit image to an 8-bit scale.
+                             // 16-bit image to an 8-bit scale.
     DOWNSHIFT_ALWAYS(13), // The function shifts the 16-bit image pixels to the
-    // right the number of times specified by the
-    // shiftCount element of the DisplayMapping structure.
+                          // right the number of times specified by the
+                          // shiftCount element of the DisplayMapping structure.
     RANGE_ALWAYS(14), // The function maps the pixel values in the range
-    // specified by the minimumValue and maximumValue elements
-    // of the DisplayMapping structure to an 8-bit scale.
+                      // specified by the minimumValue and maximumValue elements
+                      // of the DisplayMapping structure to an 8-bit scale.
     C90_PCT_DYNAMIC_ALWAYS(15), // The function maps the dynamic range
-    // containing the middle 90 percent of the
-    // cumulated histogram of the image to an 8-bit
-    // (256 grayscale values) scale.
+                                // containing the middle 90 percent of the
+                                // cumulated histogram of the image to an 8-bit
+                                // (256 grayscale values) scale.
     PERCENT_RANGE_ALWAYS(16), // The function maps the pixel values in the
-    // relative percentage range (0 to 100) of the
-    // cumulated histogram specified by minimumValue
-    // and maximumValue to an 8-bit scale.
+                              // relative percentage range (0 to 100) of the
+                              // cumulated histogram specified by minimumValue
+                              // and maximumValue to an 8-bit scale.
     ;
     private final int value;
 
-    MappingMethod(int value) {
+    private MappingMethod(int value) {
       this.value = value;
     }
 
     public static MappingMethod fromValue(int val) {
       for (MappingMethod v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -1934,23 +1910,23 @@ public class NIVision {
     }
   }
 
-  public enum ComparisonFunction {
+  public static enum ComparisonFunction {
     CLEAR_LESS(0), // The comparison is true if the source pixel value is less
-    // than the comparison image pixel value.
+                   // than the comparison image pixel value.
     CLEAR_LESS_OR_EQUAL(1), // The comparison is true if the source pixel value
-    // is less than or equal to the comparison image
-    // pixel value.
+                            // is less than or equal to the comparison image
+                            // pixel value.
     CLEAR_EQUAL(2), // The comparison is true if the source pixel value is equal
-    // to the comparison image pixel value.
+                    // to the comparison image pixel value.
     CLEAR_GREATER_OR_EQUAL(3), // The comparison is true if the source pixel
-    // value is greater than or equal to the
-    // comparison image pixel value.
+                               // value is greater than or equal to the
+                               // comparison image pixel value.
     CLEAR_GREATER(4), // The comparison is true if the source pixel value is
-    // greater than the comparison image pixel value.
+                      // greater than the comparison image pixel value.
     ;
     private final int value;
 
-    ComparisonFunction(int value) {
+    private ComparisonFunction(int value) {
       this.value = value;
     }
 
@@ -1967,19 +1943,19 @@ public class NIVision {
     }
   }
 
-  public enum LineGaugeMethod {
+  public static enum LineGaugeMethod {
     EDGE_TO_EDGE(0), // Measures from the first edge on the line to the last
-    // edge on the line.
+                     // edge on the line.
     EDGE_TO_POINT(1), // Measures from the first edge on the line to the end
-    // point of the line.
+                      // point of the line.
     POINT_TO_EDGE(2), // Measures from the start point of the line to the first
-    // edge on the line.
+                      // edge on the line.
     POINT_TO_POINT(3), // Measures from the start point of the line to the end
-    // point of the line.
+                       // point of the line.
     ;
     private final int value;
 
-    LineGaugeMethod(int value) {
+    private LineGaugeMethod(int value) {
       this.value = value;
     }
 
@@ -1996,7 +1972,7 @@ public class NIVision {
     }
   }
 
-  public enum Direction3D {
+  public static enum Direction3D {
     C3D_NW(0), // The viewing angle for the 3D image is from the northwest.
     C3D_SW(1), // The viewing angle for the 3D image is from the southwest.
     C3D_SE(2), // The viewing angle for the 3D image is from the southeast.
@@ -2004,7 +1980,7 @@ public class NIVision {
     ;
     private final int value;
 
-    Direction3D(int value) {
+    private Direction3D(int value) {
       this.value = value;
     }
 
@@ -2021,17 +1997,17 @@ public class NIVision {
     }
   }
 
-  public enum LearningMode {
+  public static enum LearningMode {
     LEARN_ALL(0), // The function extracts information for shift- and
-    // rotation-invariant matching.
+                  // rotation-invariant matching.
     LEARN_SHIFT_INFORMATION(1), // The function extracts information for
-    // shift-invariant matching.
+                                // shift-invariant matching.
     LEARN_ROTATION_INFORMATION(2), // The function extracts information for
-    // rotation-invariant matching.
+                                   // rotation-invariant matching.
     ;
     private final int value;
 
-    LearningMode(int value) {
+    private LearningMode(int value) {
       this.value = value;
     }
 
@@ -2048,7 +2024,7 @@ public class NIVision {
     }
   }
 
-  public enum KernelFamily {
+  public static enum KernelFamily {
     GRADIENT_FAMILY(0), // The kernel is in the gradient family.
     LAPLACIAN_FAMILY(1), // The kernel is in the Laplacian family.
     SMOOTHING_FAMILY(2), // The kernel is in the smoothing family.
@@ -2056,7 +2032,7 @@ public class NIVision {
     ;
     private final int value;
 
-    KernelFamily(int value) {
+    private KernelFamily(int value) {
       this.value = value;
     }
 
@@ -2073,27 +2049,27 @@ public class NIVision {
     }
   }
 
-  public enum InterpolationMethod {
+  public static enum InterpolationMethod {
     ZERO_ORDER(0), // The function uses an interpolation method that
-    // interpolates new pixel values using the nearest valid
-    // neighboring pixel.
+                   // interpolates new pixel values using the nearest valid
+                   // neighboring pixel.
     BILINEAR(1), // The function uses an interpolation method that interpolates
-    // new pixel values using a bidirectional average of the
-    // neighboring pixels.
+                 // new pixel values using a bidirectional average of the
+                 // neighboring pixels.
     QUADRATIC(2), // The function uses an interpolation method that interpolates
-    // new pixel values using a quadratic approximating
-    // polynomial.
+                  // new pixel values using a quadratic approximating
+                  // polynomial.
     CUBIC_SPLINE(3), // The function uses an interpolation method that
-    // interpolates new pixel values by fitting them to a cubic
-    // spline curve, where the curve is based on known pixel
-    // values from the image.
+                     // interpolates new pixel values by fitting them to a cubic
+                     // spline curve, where the curve is based on known pixel
+                     // values from the image.
     BILINEAR_FIXED(4), // The function uses an interpolation method that
-    // interpolates new pixel values using a bidirectional
-    // average of the neighboring pixels.
+                       // interpolates new pixel values using a bidirectional
+                       // average of the neighboring pixels.
     ;
     private final int value;
 
-    InterpolationMethod(int value) {
+    private InterpolationMethod(int value) {
       this.value = value;
     }
 
@@ -2110,7 +2086,7 @@ public class NIVision {
     }
   }
 
-  public enum ImageType {
+  public static enum ImageType {
     IMAGE_U8(0), // The image type is 8-bit unsigned integer grayscale.
     IMAGE_U16(7), // The image type is 16-bit unsigned integer grayscale.
     IMAGE_I16(1), // The image type is 16-bit signed integer grayscale.
@@ -2122,15 +2098,14 @@ public class NIVision {
     ;
     private final int value;
 
-    ImageType(int value) {
+    private ImageType(int value) {
       this.value = value;
     }
 
     public static ImageType fromValue(int val) {
       for (ImageType v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -2140,17 +2115,17 @@ public class NIVision {
     }
   }
 
-  public enum ImageFeatureMode {
+  public static enum ImageFeatureMode {
     COLOR_AND_SHAPE_FEATURES(0), // Instructs the function to use the color and
-    // the shape features of the color pattern.
+                                 // the shape features of the color pattern.
     COLOR_FEATURES(1), // Instructs the function to use the color features of
-    // the color pattern.
+                       // the color pattern.
     SHAPE_FEATURES(2), // Instructs the function to use the shape features of
-    // the color pattern.
+                       // the color pattern.
     ;
     private final int value;
 
-    ImageFeatureMode(int value) {
+    private ImageFeatureMode(int value) {
       this.value = value;
     }
 
@@ -2167,7 +2142,7 @@ public class NIVision {
     }
   }
 
-  public enum FontColor {
+  public static enum FontColor {
     WHITE(0), // Draws text in white.
     BLACK(1), // Draws text in black.
     INVERT(2), // Inverts the text pixels.
@@ -2176,7 +2151,7 @@ public class NIVision {
     ;
     private final int value;
 
-    FontColor(int value) {
+    private FontColor(int value) {
       this.value = value;
     }
 
@@ -2193,19 +2168,19 @@ public class NIVision {
     }
   }
 
-  public enum FlipAxis {
+  public static enum FlipAxis {
     HORIZONTAL_AXIS(0), // Flips the image over the central horizontal axis.
     VERTICAL_AXIS(1), // Flips the image over the central vertical axis.
     CENTER_AXIS(2), // Flips the image over both the central vertical and
-    // horizontal axes.
+                    // horizontal axes.
     DIAG_L_TO_R_AXIS(3), // Flips the image over an axis from the upper left
-    // corner to lower right corner.
+                         // corner to lower right corner.
     DIAG_R_TO_L_AXIS(4), // Flips the image over an axis from the upper right
-    // corner to lower left corner.
+                         // corner to lower left corner.
     ;
     private final int value;
 
-    FlipAxis(int value) {
+    private FlipAxis(int value) {
       this.value = value;
     }
 
@@ -2222,7 +2197,7 @@ public class NIVision {
     }
   }
 
-  public enum EdgeProcess {
+  public static enum EdgeProcess {
     FIRST(0), // The function looks for the first edge.
     FIRST_AND_LAST(1), // The function looks for the first and last edge.
     ALL(2), // The function looks for all edges.
@@ -2230,7 +2205,7 @@ public class NIVision {
     ;
     private final int value;
 
-    EdgeProcess(int value) {
+    private EdgeProcess(int value) {
       this.value = value;
     }
 
@@ -2247,26 +2222,25 @@ public class NIVision {
     }
   }
 
-  public enum DrawMode {
+  public static enum DrawMode {
     DRAW_VALUE(0), // Draws the boundary of the object with the specified pixel
-    // value.
+                   // value.
     DRAW_INVERT(2), // Inverts the pixel values of the boundary of the object.
     PAINT_VALUE(1), // Fills the object with the given pixel value.
     PAINT_INVERT(3), // Inverts the pixel values of the object.
     HIGHLIGHT_VALUE(4), // The function fills the object by highlighting the
-    // enclosed pixels with the color of the object.
+                        // enclosed pixels with the color of the object.
     ;
     private final int value;
 
-    DrawMode(int value) {
+    private DrawMode(int value) {
       this.value = value;
     }
 
     public static DrawMode fromValue(int val) {
       for (DrawMode v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -2276,14 +2250,14 @@ public class NIVision {
     }
   }
 
-  public enum NearestNeighborMetric {
+  public static enum NearestNeighborMetric {
     METRIC_MAXIMUM(0), // The maximum metric.
     METRIC_SUM(1), // The sum metric.
     METRIC_EUCLIDEAN(2), // The Euclidean metric.
     ;
     private final int value;
 
-    NearestNeighborMetric(int value) {
+    private NearestNeighborMetric(int value) {
       this.value = value;
     }
 
@@ -2300,17 +2274,17 @@ public class NIVision {
     }
   }
 
-  public enum ReadResolution {
+  public static enum ReadResolution {
     LOW_RESOLUTION(0), // Configures NI Vision to use low resolution during the
-    // read process.
+                       // read process.
     MEDIUM_RESOLUTION(1), // Configures NI Vision to use medium resolution
-    // during the read process.
+                          // during the read process.
     HIGH_RESOLUTION(2), // Configures NI Vision to use high resolution during
-    // the read process.
+                        // the read process.
     ;
     private final int value;
 
-    ReadResolution(int value) {
+    private ReadResolution(int value) {
       this.value = value;
     }
 
@@ -2327,23 +2301,23 @@ public class NIVision {
     }
   }
 
-  public enum ThresholdMode {
+  public static enum ThresholdMode {
     FIXED_RANGE(0), // Performs thresholding using the values you provide in the
-    // lowThreshold and highThreshold elements of
-    // OCRProcessingOptions.
+                    // lowThreshold and highThreshold elements of
+                    // OCRProcessingOptions.
     COMPUTED_UNIFORM(1), // Calculates a single threshold value for the entire
-    // ROI.
+                         // ROI.
     COMPUTED_LINEAR(2), // Calculates a value on the left side of the ROI,
-    // calculates a value on the right side of the ROI, and
-    // linearly fills the middle values from left to right.
+                        // calculates a value on the right side of the ROI, and
+                        // linearly fills the middle values from left to right.
     COMPUTED_NONLINEAR(3), // Divides the ROI into the number of blocks
-    // specified by the blockCount element of
-    // OCRProcessingOptions and calculates a threshold
-    // value for each block.
+                           // specified by the blockCount element of
+                           // OCRProcessingOptions and calculates a threshold
+                           // value for each block.
     ;
     private final int value;
 
-    ThresholdMode(int value) {
+    private ThresholdMode(int value) {
       this.value = value;
     }
 
@@ -2360,16 +2334,16 @@ public class NIVision {
     }
   }
 
-  public enum ReadStrategy {
+  public static enum ReadStrategy {
     READ_AGGRESSIVE(0), // Configures NI Vision to perform fewer checks when
-    // analyzing objects to determine if they match trained
-    // characters.
+                        // analyzing objects to determine if they match trained
+                        // characters.
     READ_CONSERVATIVE(1), // Configures NI Vision to perform more checks to
-    // determine if an object matches a trained character.
+                          // determine if an object matches a trained character.
     ;
     private final int value;
 
-    ReadStrategy(int value) {
+    private ReadStrategy(int value) {
       this.value = value;
     }
 
@@ -2386,171 +2360,171 @@ public class NIVision {
     }
   }
 
-  public enum MeasurementType {
+  public static enum MeasurementType {
     MT_CENTER_OF_MASS_X(0), // X-coordinate of the point representing the
-    // average position of the total particle mass,
-    // assuming every point in the particle has a
-    // constant density.
+                            // average position of the total particle mass,
+                            // assuming every point in the particle has a
+                            // constant density.
     MT_CENTER_OF_MASS_Y(1), // Y-coordinate of the point representing the
-    // average position of the total particle mass,
-    // assuming every point in the particle has a
-    // constant density.
+                            // average position of the total particle mass,
+                            // assuming every point in the particle has a
+                            // constant density.
     MT_FIRST_PIXEL_X(2), // X-coordinate of the highest, leftmost particle
-    // pixel.
+                         // pixel.
     MT_FIRST_PIXEL_Y(3), // Y-coordinate of the highest, leftmost particle
-    // pixel.
+                         // pixel.
     MT_BOUNDING_RECT_LEFT(4), // X-coordinate of the leftmost particle point.
     MT_BOUNDING_RECT_TOP(5), // Y-coordinate of highest particle point.
     MT_BOUNDING_RECT_RIGHT(6), // X-coordinate of the rightmost particle point.
     MT_BOUNDING_RECT_BOTTOM(7), // Y-coordinate of the lowest particle point.
     MT_MAX_FERET_DIAMETER_START_X(8), // X-coordinate of the start of the line
-    // segment connecting the two perimeter
-    // points that are the furthest apart.
+                                      // segment connecting the two perimeter
+                                      // points that are the furthest apart.
     MT_MAX_FERET_DIAMETER_START_Y(9), // Y-coordinate of the start of the line
-    // segment connecting the two perimeter
-    // points that are the furthest apart.
+                                      // segment connecting the two perimeter
+                                      // points that are the furthest apart.
     MT_MAX_FERET_DIAMETER_END_X(10), // X-coordinate of the end of the line
-    // segment connecting the two perimeter
-    // points that are the furthest apart.
+                                     // segment connecting the two perimeter
+                                     // points that are the furthest apart.
     MT_MAX_FERET_DIAMETER_END_Y(11), // Y-coordinate of the end of the line
-    // segment connecting the two perimeter
-    // points that are the furthest apart.
+                                     // segment connecting the two perimeter
+                                     // points that are the furthest apart.
     MT_MAX_HORIZ_SEGMENT_LENGTH_LEFT(12), // X-coordinate of the leftmost pixel
-    // in the longest row of contiguous
-    // pixels in the particle.
+                                          // in the longest row of contiguous
+                                          // pixels in the particle.
     MT_MAX_HORIZ_SEGMENT_LENGTH_RIGHT(13), // X-coordinate of the rightmost
-    // pixel in the longest row of
-    // contiguous pixels in the particle.
+                                           // pixel in the longest row of
+                                           // contiguous pixels in the particle.
     MT_MAX_HORIZ_SEGMENT_LENGTH_ROW(14), // Y-coordinate of all of the pixels in
-    // the longest row of contiguous pixels
-    // in the particle.
+                                         // the longest row of contiguous pixels
+                                         // in the particle.
     MT_BOUNDING_RECT_WIDTH(16), // Distance between the x-coordinate of the
-    // leftmost particle point and the x-coordinate
-    // of the rightmost particle point.
+                                // leftmost particle point and the x-coordinate
+                                // of the rightmost particle point.
     MT_BOUNDING_RECT_HEIGHT(17), // Distance between the y-coordinate of highest
-    // particle point and the y-coordinate of the
-    // lowest particle point.
+                                 // particle point and the y-coordinate of the
+                                 // lowest particle point.
     MT_BOUNDING_RECT_DIAGONAL(18), // Distance between opposite corners of the
-    // bounding rectangle.
+                                   // bounding rectangle.
     MT_PERIMETER(19), // Length of the outer boundary of the particle.
     MT_CONVEX_HULL_PERIMETER(20), // Perimeter of the smallest convex polygon
-    // containing all points in the particle.
+                                  // containing all points in the particle.
     MT_HOLES_PERIMETER(21), // Sum of the perimeters of each hole in the
-    // particle.
+                            // particle.
     MT_MAX_FERET_DIAMETER(22), // Distance between the start and end of the line
-    // segment connecting the two perimeter points
-    // that are the furthest apart.
+                               // segment connecting the two perimeter points
+                               // that are the furthest apart.
     MT_EQUIVALENT_ELLIPSE_MAJOR_AXIS(23), // Length of the major axis of the
-    // ellipse with the same perimeter and
-    // area as the particle.
+                                          // ellipse with the same perimeter and
+                                          // area as the particle.
     MT_EQUIVALENT_ELLIPSE_MINOR_AXIS(24), // Length of the minor axis of the
-    // ellipse with the same perimeter and
-    // area as the particle.
+                                          // ellipse with the same perimeter and
+                                          // area as the particle.
     MT_EQUIVALENT_ELLIPSE_MINOR_AXIS_FERET(25), // Length of the minor axis of
-    // the ellipse with the same
-    // area as the particle, and
-    // Major Axis equal in length to
-    // the Max Feret Diameter.
+                                                // the ellipse with the same
+                                                // area as the particle, and
+                                                // Major Axis equal in length to
+                                                // the Max Feret Diameter.
     MT_EQUIVALENT_RECT_LONG_SIDE(26), // Longest side of the rectangle with the
-    // same perimeter and area as the
-    // particle.
+                                      // same perimeter and area as the
+                                      // particle.
     MT_EQUIVALENT_RECT_SHORT_SIDE(27), // Shortest side of the rectangle with
-    // the same perimeter and area as the
-    // particle.
+                                       // the same perimeter and area as the
+                                       // particle.
     MT_EQUIVALENT_RECT_DIAGONAL(28), // Distance between opposite corners of the
-    // rectangle with the same perimeter and
-    // area as the particle.
+                                     // rectangle with the same perimeter and
+                                     // area as the particle.
     MT_EQUIVALENT_RECT_SHORT_SIDE_FERET(29), // Shortest side of the rectangle
-    // with the same area as the
-    // particle, and longest side equal
-    // in length to the Max Feret
-    // Diameter.
+                                             // with the same area as the
+                                             // particle, and longest side equal
+                                             // in length to the Max Feret
+                                             // Diameter.
     MT_AVERAGE_HORIZ_SEGMENT_LENGTH(30), // Average length of a horizontal
-    // segment in the particle.
+                                         // segment in the particle.
     MT_AVERAGE_VERT_SEGMENT_LENGTH(31), // Average length of a vertical segment
-    // in the particle.
+                                        // in the particle.
     MT_HYDRAULIC_RADIUS(32), // The particle area divided by the particle
-    // perimeter.
+                             // perimeter.
     MT_WADDEL_DISK_DIAMETER(33), // Diameter of a disk with the same area as the
-    // particle.
+                                 // particle.
     MT_AREA(35), // Area of the particle.
     MT_HOLES_AREA(36), // Sum of the areas of each hole in the particle.
     MT_PARTICLE_AND_HOLES_AREA(37), // Area of a particle that completely covers
-    // the image.
+                                    // the image.
     MT_CONVEX_HULL_AREA(38), // Area of the smallest convex polygon containing
-    // all points in the particle.
+                             // all points in the particle.
     MT_IMAGE_AREA(39), // Area of the image.
     MT_NUMBER_OF_HOLES(41), // Number of holes in the particle.
     MT_NUMBER_OF_HORIZ_SEGMENTS(42), // Number of horizontal segments in the
-    // particle.
+                                     // particle.
     MT_NUMBER_OF_VERT_SEGMENTS(43), // Number of vertical segments in the
-    // particle.
+                                    // particle.
     MT_ORIENTATION(45), // The angle of the line that passes through the
-    // particle Center of Mass about which the particle has
-    // the lowest moment of inertia.
+                        // particle Center of Mass about which the particle has
+                        // the lowest moment of inertia.
     MT_MAX_FERET_DIAMETER_ORIENTATION(46), // The angle of the line segment
-    // connecting the two perimeter
-    // points that are the furthest
-    // apart.
+                                           // connecting the two perimeter
+                                           // points that are the furthest
+                                           // apart.
     MT_AREA_BY_IMAGE_AREA(48), // Percentage of the particle Area covering the
-    // Image Area.
+                               // Image Area.
     MT_AREA_BY_PARTICLE_AND_HOLES_AREA(49), // Percentage of the particle Area
-    // in relation to its Particle and
-    // Holes Area.
+                                            // in relation to its Particle and
+                                            // Holes Area.
     MT_RATIO_OF_EQUIVALENT_ELLIPSE_AXES(50), // Equivalent Ellipse Major Axis
-    // divided by Equivalent Ellipse
-    // Minor Axis.
+                                             // divided by Equivalent Ellipse
+                                             // Minor Axis.
     MT_RATIO_OF_EQUIVALENT_RECT_SIDES(51), // Equivalent Rect Long Side divided
-    // by Equivalent Rect Short Side.
+                                           // by Equivalent Rect Short Side.
     MT_ELONGATION_FACTOR(53), // Max Feret Diameter divided by Equivalent Rect
-    // Short Side (Feret).
+                              // Short Side (Feret).
     MT_COMPACTNESS_FACTOR(54), // Area divided by the product of Bounding Rect
-    // Width and Bounding Rect Height.
+                               // Width and Bounding Rect Height.
     MT_HEYWOOD_CIRCULARITY_FACTOR(55), // Perimeter divided by the circumference
-    // of a circle with the same area.
+                                       // of a circle with the same area.
     MT_TYPE_FACTOR(56), // Factor relating area to moment of inertia.
     MT_SUM_X(58), // The sum of all x-coordinates in the particle.
     MT_SUM_Y(59), // The sum of all y-coordinates in the particle.
     MT_SUM_XX(60), // The sum of all x-coordinates squared in the particle.
     MT_SUM_XY(61), // The sum of all x-coordinates times y-coordinates in the
-    // particle.
+                   // particle.
     MT_SUM_YY(62), // The sum of all y-coordinates squared in the particle.
     MT_SUM_XXX(63), // The sum of all x-coordinates cubed in the particle.
     MT_SUM_XXY(64), // The sum of all x-coordinates squared times y-coordinates
-    // in the particle.
+                    // in the particle.
     MT_SUM_XYY(65), // The sum of all x-coordinates times y-coordinates squared
-    // in the particle.
+                    // in the particle.
     MT_SUM_YYY(66), // The sum of all y-coordinates cubed in the particle.
     MT_MOMENT_OF_INERTIA_XX(68), // The moment of inertia in the x-direction
-    // twice.
+                                 // twice.
     MT_MOMENT_OF_INERTIA_XY(69), // The moment of inertia in the x and y
-    // directions.
+                                 // directions.
     MT_MOMENT_OF_INERTIA_YY(70), // The moment of inertia in the y-direction
-    // twice.
+                                 // twice.
     MT_MOMENT_OF_INERTIA_XXX(71), // The moment of inertia in the x-direction
-    // three times.
+                                  // three times.
     MT_MOMENT_OF_INERTIA_XXY(72), // The moment of inertia in the x-direction
-    // twice and the y-direction once.
+                                  // twice and the y-direction once.
     MT_MOMENT_OF_INERTIA_XYY(73), // The moment of inertia in the x-direction
-    // once and the y-direction twice.
+                                  // once and the y-direction twice.
     MT_MOMENT_OF_INERTIA_YYY(74), // The moment of inertia in the y-direction
-    // three times.
+                                  // three times.
     MT_NORM_MOMENT_OF_INERTIA_XX(75), // The normalized moment of inertia in the
-    // x-direction twice.
+                                      // x-direction twice.
     MT_NORM_MOMENT_OF_INERTIA_XY(76), // The normalized moment of inertia in the
-    // x- and y-directions.
+                                      // x- and y-directions.
     MT_NORM_MOMENT_OF_INERTIA_YY(77), // The normalized moment of inertia in the
-    // y-direction twice.
+                                      // y-direction twice.
     MT_NORM_MOMENT_OF_INERTIA_XXX(78), // The normalized moment of inertia in
-    // the x-direction three times.
+                                       // the x-direction three times.
     MT_NORM_MOMENT_OF_INERTIA_XXY(79), // The normalized moment of inertia in
-    // the x-direction twice and the
-    // y-direction once.
+                                       // the x-direction twice and the
+                                       // y-direction once.
     MT_NORM_MOMENT_OF_INERTIA_XYY(80), // The normalized moment of inertia in
-    // the x-direction once and the
-    // y-direction twice.
+                                       // the x-direction once and the
+                                       // y-direction twice.
     MT_NORM_MOMENT_OF_INERTIA_YYY(81), // The normalized moment of inertia in
-    // the y-direction three times.
+                                       // the y-direction three times.
     MT_HU_MOMENT_1(82), // The first Hu moment.
     MT_HU_MOMENT_2(83), // The second Hu moment.
     MT_HU_MOMENT_3(84), // The third Hu moment.
@@ -2561,15 +2535,14 @@ public class NIVision {
     ;
     private final int value;
 
-    MeasurementType(int value) {
+    private MeasurementType(int value) {
       this.value = value;
     }
 
     public static MeasurementType fromValue(int val) {
       for (MeasurementType v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -2579,35 +2552,34 @@ public class NIVision {
     }
   }
 
-  public enum GeometricMatchingMode {
+  public static enum GeometricMatchingMode {
     GEOMETRIC_MATCH_SHIFT_INVARIANT(0), // Searches for occurrences of the
-    // pattern in the image, assuming that
-    // the pattern is not rotated more than
-    // plus or minus 5 degrees.
+                                        // pattern in the image, assuming that
+                                        // the pattern is not rotated more than
+                                        // plus or minus 5 degrees.
     GEOMETRIC_MATCH_ROTATION_INVARIANT(1), // Searches for occurrences of the
-    // pattern in the image with reduced
-    // restriction on the rotation of the
-    // pattern.
+                                           // pattern in the image with reduced
+                                           // restriction on the rotation of the
+                                           // pattern.
     GEOMETRIC_MATCH_SCALE_INVARIANT(2), // Searches for occurrences of the
-    // pattern in the image with reduced
-    // restriction on the size of the
-    // pattern.
+                                        // pattern in the image with reduced
+                                        // restriction on the size of the
+                                        // pattern.
     GEOMETRIC_MATCH_OCCLUSION_INVARIANT(4), // Searches for occurrences of the
-    // pattern in the image, allowing
-    // for a specified percentage of the
-    // pattern to be occluded.
+                                            // pattern in the image, allowing
+                                            // for a specified percentage of the
+                                            // pattern to be occluded.
     ;
     private final int value;
 
-    GeometricMatchingMode(int value) {
+    private GeometricMatchingMode(int value) {
       this.value = value;
     }
 
     public static GeometricMatchingMode fromValue(int val) {
       for (GeometricMatchingMode v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -2617,7 +2589,7 @@ public class NIVision {
     }
   }
 
-  public enum ButtonLabel {
+  public static enum ButtonLabel {
     BUTTON_OK(0), // The label "OK".
     BUTTON_SAVE(1), // The label "Save".
     BUTTON_SELECT(2), // The label "Select".
@@ -2625,7 +2597,7 @@ public class NIVision {
     ;
     private final int value;
 
-    ButtonLabel(int value) {
+    private ButtonLabel(int value) {
       this.value = value;
     }
 
@@ -2642,14 +2614,14 @@ public class NIVision {
     }
   }
 
-  public enum NearestNeighborMethod {
+  public static enum NearestNeighborMethod {
     MINIMUM_MEAN_DISTANCE(0), // The minimum mean distance method.
     K_NEAREST_NEIGHBOR(1), // The k-nearest neighbor method.
     NEAREST_PROTOTYPE(2), // The nearest prototype method.
     ;
     private final int value;
 
-    NearestNeighborMethod(int value) {
+    private NearestNeighborMethod(int value) {
       this.value = value;
     }
 
@@ -2666,25 +2638,24 @@ public class NIVision {
     }
   }
 
-  public enum QRMirrorMode {
+  public static enum QRMirrorMode {
     QR_MIRROR_MODE_AUTO_DETECT(-2), // The function should determine if the QR
-    // code is mirrored.
+                                    // code is mirrored.
     QR_MIRROR_MODE_MIRRORED(1), // The function should expect the QR code to
-    // appear mirrored.
+                                // appear mirrored.
     QR_MIRROR_MODE_NORMAL(0), // The function should expect the QR code to
-    // appear normal.
+                              // appear normal.
     ;
     private final int value;
 
-    QRMirrorMode(int value) {
+    private QRMirrorMode(int value) {
       this.value = value;
     }
 
     public static QRMirrorMode fromValue(int val) {
       for (QRMirrorMode v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -2694,14 +2665,14 @@ public class NIVision {
     }
   }
 
-  public enum ColumnProcessingMode {
+  public static enum ColumnProcessingMode {
     AVERAGE_COLUMNS(0), // Averages the data extracted for edge detection.
     MEDIAN_COLUMNS(1), // Takes the median of the data extracted for edge
-    // detection.
+                       // detection.
     ;
     private final int value;
 
-    ColumnProcessingMode(int value) {
+    private ColumnProcessingMode(int value) {
       this.value = value;
     }
 
@@ -2718,33 +2689,33 @@ public class NIVision {
     }
   }
 
-  public enum FindReferenceDirection {
+  public static enum FindReferenceDirection {
     LEFT_TO_RIGHT_DIRECT(0), // Searches from the left side of the search area
-    // to the right side of the search area for a
-    // direct axis.
+                             // to the right side of the search area for a
+                             // direct axis.
     LEFT_TO_RIGHT_INDIRECT(1), // Searches from the left side of the search area
-    // to the right side of the search area for an
-    // indirect axis.
+                               // to the right side of the search area for an
+                               // indirect axis.
     TOP_TO_BOTTOM_DIRECT(2), // Searches from the top of the search area to the
-    // bottom of the search area for a direct axis.
+                             // bottom of the search area for a direct axis.
     TOP_TO_BOTTOM_INDIRECT(3), // Searches from the top of the search area to
-    // the bottom of the search area for an indirect
-    // axis.
+                               // the bottom of the search area for an indirect
+                               // axis.
     RIGHT_TO_LEFT_DIRECT(4), // Searches from the right side of the search area
-    // to the left side of the search area for a direct
-    // axis.
+                             // to the left side of the search area for a direct
+                             // axis.
     RIGHT_TO_LEFT_INDIRECT(5), // Searches from the right side of the search
-    // area to the left side of the search area for
-    // an indirect axis.
+                               // area to the left side of the search area for
+                               // an indirect axis.
     BOTTOM_TO_TOP_DIRECT(6), // Searches from the bottom of the search area to
-    // the top of the search area for a direct axis.
+                             // the top of the search area for a direct axis.
     BOTTOM_TO_TOP_INDIRECT(7), // Searches from the bottom of the search area to
-    // the top of the search area for an indirect
-    // axis.
+                               // the top of the search area for an indirect
+                               // axis.
     ;
     private final int value;
 
-    FindReferenceDirection(int value) {
+    private FindReferenceDirection(int value) {
       this.value = value;
     }
 
@@ -2761,15 +2732,15 @@ public class NIVision {
     }
   }
 
-  public enum MulticoreOperation {
+  public static enum MulticoreOperation {
     GET_CORES(0), // The number of processor cores NI Vision is currently using.
     SET_CORES(1), // The number of processor cores for NI Vision to use.
     USE_MAX_AVAILABLE(2), // Use the maximum number of available processor
-    // cores.
+                          // cores.
     ;
     private final int value;
 
-    MulticoreOperation(int value) {
+    private MulticoreOperation(int value) {
       this.value = value;
     }
 
@@ -2786,17 +2757,17 @@ public class NIVision {
     }
   }
 
-  public enum GroupBehavior {
+  public static enum GroupBehavior {
     GROUP_CLEAR(0), // Sets the behavior of the overlay group to clear the
-    // current settings when an image is transformed.
+                    // current settings when an image is transformed.
     GROUP_KEEP(1), // Sets the behavior of the overlay group to keep the current
-    // settings when an image is transformed.
+                   // settings when an image is transformed.
     GROUP_TRANSFORM(2), // Sets the behavior of the overlay group to transform
-    // with the image.
+                        // with the image.
     ;
     private final int value;
 
-    GroupBehavior(int value) {
+    private GroupBehavior(int value) {
       this.value = value;
     }
 
@@ -2813,109 +2784,108 @@ public class NIVision {
     }
   }
 
-  public enum QRDimensions {
+  public static enum QRDimensions {
     QR_DIMENSIONS_AUTO_DETECT(0), // The function will automatically determine
-    // the dimensions of the QR code.
+                                  // the dimensions of the QR code.
     QR_DIMENSIONS_11x11(11), // Specifies the dimensions of the QR code as 11 x
-    // 11.
+                             // 11.
     QR_DIMENSIONS_13x13(13), // Specifies the dimensions of the QR code as 13 x
-    // 13.
+                             // 13.
     QR_DIMENSIONS_15x15(15), // Specifies the dimensions of the QR code as 15 x
-    // 15.
+                             // 15.
     QR_DIMENSIONS_17x17(17), // Specifies the dimensions of the QR code as 17 x
-    // 17.
+                             // 17.
     QR_DIMENSIONS_21x21(21), // Specifies the dimensions of the QR code as 21 x
-    // 21.
+                             // 21.
     QR_DIMENSIONS_25x25(25), // Specifies the dimensions of the QR code as 25 x
-    // 25.
+                             // 25.
     QR_DIMENSIONS_29x29(29), // Specifies the dimensions of the QR code as 29 x
-    // 29.
+                             // 29.
     QR_DIMENSIONS_33x33(33), // Specifies the dimensions of the QR code as 33 x
-    // 33.
+                             // 33.
     QR_DIMENSIONS_37x37(37), // Specifies the dimensions of the QR code as 37 x
-    // 37.
+                             // 37.
     QR_DIMENSIONS_41x41(41), // Specifies the dimensions of the QR code as 41 x
-    // 41.
+                             // 41.
     QR_DIMENSIONS_45x45(45), // Specifies the dimensions of the QR code as 45 x
-    // 45.
+                             // 45.
     QR_DIMENSIONS_49x49(49), // Specifies the dimensions of the QR code as 49 x
-    // 49.
+                             // 49.
     QR_DIMENSIONS_53x53(53), // Specifies the dimensions of the QR code as 53 x
-    // 53.
+                             // 53.
     QR_DIMENSIONS_57x57(57), // Specifies the dimensions of the QR code as 57 x
-    // 57.
+                             // 57.
     QR_DIMENSIONS_61x61(61), // Specifies the dimensions of the QR code as 61 x
-    // 61.
+                             // 61.
     QR_DIMENSIONS_65x65(65), // Specifies the dimensions of the QR code as 65 x
-    // 65.
+                             // 65.
     QR_DIMENSIONS_69x69(69), // Specifies the dimensions of the QR code as 69 x
-    // 69.
+                             // 69.
     QR_DIMENSIONS_73x73(73), // Specifies the dimensions of the QR code as 73 x
-    // 73.
+                             // 73.
     QR_DIMENSIONS_77x77(77), // Specifies the dimensions of the QR code as 77 x
-    // 77.
+                             // 77.
     QR_DIMENSIONS_81x81(81), // Specifies the dimensions of the QR code as 81 x
-    // 81.
+                             // 81.
     QR_DIMENSIONS_85x85(85), // Specifies the dimensions of the QR code as 85 x
-    // 85.
+                             // 85.
     QR_DIMENSIONS_89x89(89), // Specifies the dimensions of the QR code as 89 x
-    // 89.
+                             // 89.
     QR_DIMENSIONS_93x93(93), // Specifies the dimensions of the QR code as 93 x
-    // 93.
+                             // 93.
     QR_DIMENSIONS_97x97(97), // Specifies the dimensions of the QR code as 97 x
-    // 97.
+                             // 97.
     QR_DIMENSIONS_101x101(101), // Specifies the dimensions of the QR code as
-    // 101 x 101.
+                                // 101 x 101.
     QR_DIMENSIONS_105x105(105), // Specifies the dimensions of the QR code as
-    // 105 x 105.
+                                // 105 x 105.
     QR_DIMENSIONS_109x109(109), // Specifies the dimensions of the QR code as
-    // 109 x 109.
+                                // 109 x 109.
     QR_DIMENSIONS_113x113(113), // Specifies the dimensions of the QR code as
-    // 113 x 113.
+                                // 113 x 113.
     QR_DIMENSIONS_117x117(117), // Specifies the dimensions of the QR code as
-    // 117 x 117.
+                                // 117 x 117.
     QR_DIMENSIONS_121x121(121), // Specifies the dimensions of the QR code as
-    // 121 x 121.
+                                // 121 x 121.
     QR_DIMENSIONS_125x125(125), // Specifies the dimensions of the QR code as
-    // 125 x 125.
+                                // 125 x 125.
     QR_DIMENSIONS_129x129(129), // Specifies the dimensions of the QR code as
-    // 129 x 129.
+                                // 129 x 129.
     QR_DIMENSIONS_133x133(133), // Specifies the dimensions of the QR code as
-    // 133 x 133.
+                                // 133 x 133.
     QR_DIMENSIONS_137x137(137), // Specifies the dimensions of the QR code as
-    // 137 x 137.
+                                // 137 x 137.
     QR_DIMENSIONS_141x141(141), // Specifies the dimensions of the QR code as
-    // 141 x 141.
+                                // 141 x 141.
     QR_DIMENSIONS_145x145(145), // Specifies the dimensions of the QR code as
-    // 145 x 145.
+                                // 145 x 145.
     QR_DIMENSIONS_149x149(149), // Specifies the dimensions of the QR code as
-    // 149 x 149.
+                                // 149 x 149.
     QR_DIMENSIONS_153x153(153), // Specifies the dimensions of the QR code as
-    // 153 x 153.
+                                // 153 x 153.
     QR_DIMENSIONS_157x157(157), // Specifies the dimensions of the QR code as
-    // 157 x 1537.
+                                // 157 x 1537.
     QR_DIMENSIONS_161x161(161), // Specifies the dimensions of the QR code as
-    // 161 x 161.
+                                // 161 x 161.
     QR_DIMENSIONS_165x165(165), // Specifies the dimensions of the QR code as
-    // 165 x 165.
+                                // 165 x 165.
     QR_DIMENSIONS_169x169(169), // Specifies the dimensions of the QR code as
-    // 169 x 169.
+                                // 169 x 169.
     QR_DIMENSIONS_173x173(173), // Specifies the dimensions of the QR code as
-    // 173 x 173.
+                                // 173 x 173.
     QR_DIMENSIONS_177x177(177), // Specifies the dimensions of the QR code as
-    // 177 x 177.
+                                // 177 x 177.
     ;
     private final int value;
 
-    QRDimensions(int value) {
+    private QRDimensions(int value) {
       this.value = value;
     }
 
     public static QRDimensions fromValue(int val) {
       for (QRDimensions v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -2925,57 +2895,56 @@ public class NIVision {
     }
   }
 
-  public enum QRCellFilterMode {
+  public static enum QRCellFilterMode {
     QR_CELL_FILTER_MODE_AUTO_DETECT(-2), // The function will try all filter
-    // modes and uses the one that decodes
-    // the QR code within the fewest
-    // iterations and utilizing the least
-    // amount of error correction.
+                                         // modes and uses the one that decodes
+                                         // the QR code within the fewest
+                                         // iterations and utilizing the least
+                                         // amount of error correction.
     QR_CELL_FILTER_MODE_AVERAGE(0), // The function sets the pixel value for the
-    // cell to the average of the sampled
-    // pixels.
+                                    // cell to the average of the sampled
+                                    // pixels.
     QR_CELL_FILTER_MODE_MEDIAN(1), // The function sets the pixel value for the
-    // cell to the median of the sampled pixels.
+                                   // cell to the median of the sampled pixels.
     QR_CELL_FILTER_MODE_CENTRAL_AVERAGE(2), // The function sets the pixel value
-    // for the cell to the average of
-    // the pixels in the center of the
-    // cell sample.
+                                            // for the cell to the average of
+                                            // the pixels in the center of the
+                                            // cell sample.
     QR_CELL_FILTER_MODE_HIGH_AVERAGE(3), // The function sets the pixel value
-    // for the cell to the average value of
-    // the half of the sampled pixels with
-    // the highest pixel values.
+                                         // for the cell to the average value of
+                                         // the half of the sampled pixels with
+                                         // the highest pixel values.
     QR_CELL_FILTER_MODE_LOW_AVERAGE(4), // The function sets the pixel value for
-    // the cell to the average value of the
-    // half of the sampled pixels with the
-    // lowest pixel values.
+                                        // the cell to the average value of the
+                                        // half of the sampled pixels with the
+                                        // lowest pixel values.
     QR_CELL_FILTER_MODE_VERY_HIGH_AVERAGE(5), // The function sets the pixel
-    // value for the cell to the
-    // average value of the ninth of
-    // the sampled pixels with the
-    // highest pixel values.
+                                              // value for the cell to the
+                                              // average value of the ninth of
+                                              // the sampled pixels with the
+                                              // highest pixel values.
     QR_CELL_FILTER_MODE_VERY_LOW_AVERAGE(6), // The function sets the pixel
-    // value for the cell to the
-    // average value of the ninth of
-    // the sampled pixels with the
-    // lowest pixel values.
+                                             // value for the cell to the
+                                             // average value of the ninth of
+                                             // the sampled pixels with the
+                                             // lowest pixel values.
     QR_CELL_FILTER_MODE_ALL(8), // The function tries each filter mode, starting
-    // with IMAQ_QR_CELL_FILTER_MODE_AVERAGE and
-    // ending with
-    // IMAQ_QR_CELL_FILTER_MODE_VERY_LOW_AVERAGE,
-    // stopping once a filter mode decodes
-    // correctly.
+                                // with IMAQ_QR_CELL_FILTER_MODE_AVERAGE and
+                                // ending with
+                                // IMAQ_QR_CELL_FILTER_MODE_VERY_LOW_AVERAGE,
+                                // stopping once a filter mode decodes
+                                // correctly.
     ;
     private final int value;
 
-    QRCellFilterMode(int value) {
+    private QRCellFilterMode(int value) {
       this.value = value;
     }
 
     public static QRCellFilterMode fromValue(int val) {
       for (QRCellFilterMode v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -2985,14 +2954,14 @@ public class NIVision {
     }
   }
 
-  public enum RoundingMode {
+  public static enum RoundingMode {
     ROUNDING_MODE_OPTIMIZE(0), // Rounds the result of a division using the best
-    // available method.
+                               // available method.
     ROUNDING_MODE_TRUNCATE(1), // Truncates the result of a division.
     ;
     private final int value;
 
-    RoundingMode(int value) {
+    private RoundingMode(int value) {
       this.value = value;
     }
 
@@ -3009,38 +2978,37 @@ public class NIVision {
     }
   }
 
-  public enum QRDemodulationMode {
+  public static enum QRDemodulationMode {
     QR_DEMODULATION_MODE_AUTO_DETECT(-2), // The function will try each
-    // demodulation mode and use the one
-    // which decodes the QR code within
-    // the fewest iterations and utilizing
-    // the least amount of error
-    // correction.
+                                          // demodulation mode and use the one
+                                          // which decodes the QR code within
+                                          // the fewest iterations and utilizing
+                                          // the least amount of error
+                                          // correction.
     QR_DEMODULATION_MODE_HISTOGRAM(0), // The function uses a histogram of all
-    // of the QR cells to calculate a
-    // threshold.
+                                       // of the QR cells to calculate a
+                                       // threshold.
     QR_DEMODULATION_MODE_LOCAL_CONTRAST(1), // The function examines each of the
-    // cell's neighbors to determine if
-    // the cell is on or off.
+                                            // cell's neighbors to determine if
+                                            // the cell is on or off.
     QR_DEMODULATION_MODE_COMBINED(2), // The function uses the histogram of the
-    // QR code to calculate a threshold.
+                                      // QR code to calculate a threshold.
     QR_DEMODULATION_MODE_ALL(3), // The function tries
-    // IMAQ_QR_DEMODULATION_MODE_HISTOGRAM, then
-    // IMAQ_QR_DEMODULATION_MODE_LOCAL_CONTRAST and
-    // then IMAQ_QR_DEMODULATION_MODE_COMBINED,
-    // stopping once one mode is successful.
+                                 // IMAQ_QR_DEMODULATION_MODE_HISTOGRAM, then
+                                 // IMAQ_QR_DEMODULATION_MODE_LOCAL_CONTRAST and
+                                 // then IMAQ_QR_DEMODULATION_MODE_COMBINED,
+                                 // stopping once one mode is successful.
     ;
     private final int value;
 
-    QRDemodulationMode(int value) {
+    private QRDemodulationMode(int value) {
       this.value = value;
     }
 
     public static QRDemodulationMode fromValue(int val) {
       for (QRDemodulationMode v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -3050,18 +3018,18 @@ public class NIVision {
     }
   }
 
-  public enum ContrastMode {
+  public static enum ContrastMode {
     ORIGINAL_CONTRAST(0), // Instructs the geometric matching algorithm to find
-    // matches with the same contrast as the template.
+                          // matches with the same contrast as the template.
     REVERSED_CONTRAST(1), // Instructs the geometric matching algorithm to find
-    // matches with the inverted contrast of the template.
+                          // matches with the inverted contrast of the template.
     BOTH_CONTRASTS(2), // Instructs the geometric matching algorithm to find
-    // matches with the same and inverted contrast of the
-    // template.
+                       // matches with the same and inverted contrast of the
+                       // template.
     ;
     private final int value;
 
-    ContrastMode(int value) {
+    private ContrastMode(int value) {
       this.value = value;
     }
 
@@ -3078,25 +3046,24 @@ public class NIVision {
     }
   }
 
-  public enum QRPolarities {
+  public static enum QRPolarities {
     QR_POLARITY_AUTO_DETECT(-2), // The function should determine the polarity
-    // of the QR code.
+                                 // of the QR code.
     QR_POLARITY_BLACK_ON_WHITE(0), // The function should search for a QR code
-    // with dark data on a bright background.
+                                   // with dark data on a bright background.
     QR_POLARITY_WHITE_ON_BLACK(1), // The function should search for a QR code
-    // with bright data on a dark background.
+                                   // with bright data on a dark background.
     ;
     private final int value;
 
-    QRPolarities(int value) {
+    private QRPolarities(int value) {
       this.value = value;
     }
 
     public static QRPolarities fromValue(int val) {
       for (QRPolarities v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -3106,21 +3073,21 @@ public class NIVision {
     }
   }
 
-  public enum QRRotationMode {
+  public static enum QRRotationMode {
     QR_ROTATION_MODE_UNLIMITED(0), // The function allows for unlimited
-    // rotation.
+                                   // rotation.
     QR_ROTATION_MODE_0_DEGREES(1), // The function allows for ??? 5 degrees of
-    // rotation.
+                                   // rotation.
     QR_ROTATION_MODE_90_DEGREES(2), // The function allows for between 85 and 95
-    // degrees of rotation.
+                                    // degrees of rotation.
     QR_ROTATION_MODE_180_DEGREES(3), // The function allows for between 175 and
-    // 185 degrees of rotation.
+                                     // 185 degrees of rotation.
     QR_ROTATION_MODE_270_DEGREES(4), // The function allows for between 265 and
-    // 275 degrees of rotation.
+                                     // 275 degrees of rotation.
     ;
     private final int value;
 
-    QRRotationMode(int value) {
+    private QRRotationMode(int value) {
       this.value = value;
     }
 
@@ -3137,13 +3104,13 @@ public class NIVision {
     }
   }
 
-  public enum QRGradingMode {
+  public static enum QRGradingMode {
     QR_NO_GRADING(0), // The function does not make any preparatory
-    // calculations.
+                      // calculations.
     ;
     private final int value;
 
-    QRGradingMode(int value) {
+    private QRGradingMode(int value) {
       this.value = value;
     }
 
@@ -3160,21 +3127,21 @@ public class NIVision {
     }
   }
 
-  public enum StraightEdgeSearchMode {
+  public static enum StraightEdgeSearchMode {
     USE_FIRST_RAKE_EDGES(0), // Fits a straight edge on the first points
-    // detected using a rake.
+                             // detected using a rake.
     USE_BEST_RAKE_EDGES(1), // Fits a straight edge on the best points detected
-    // using a rake.
+                            // using a rake.
     USE_BEST_HOUGH_LINE(2), // Finds the strongest straight edge using all
-    // points detected on a rake.
+                            // points detected on a rake.
     USE_FIRST_PROJECTION_EDGE(3), // Uses the location of the first projected
-    // edge as the straight edge.
+                                  // edge as the straight edge.
     USE_BEST_PROJECTION_EDGE(4), // Finds the strongest projected edge location
-    // to determine the straight edge.
+                                 // to determine the straight edge.
     ;
     private final int value;
 
-    StraightEdgeSearchMode(int value) {
+    private StraightEdgeSearchMode(int value) {
       this.value = value;
     }
 
@@ -3191,23 +3158,23 @@ public class NIVision {
     }
   }
 
-  public enum SearchDirection {
+  public static enum SearchDirection {
     SEARCH_DIRECTION_LEFT_TO_RIGHT(0), // Searches from the left side of the
-    // search area to the right side of the
-    // search area.
+                                       // search area to the right side of the
+                                       // search area.
     SEARCH_DIRECTION_RIGHT_TO_LEFT(1), // Searches from the right side of the
-    // search area to the left side of the
-    // search area.
+                                       // search area to the left side of the
+                                       // search area.
     SEARCH_DIRECTION_TOP_TO_BOTTOM(2), // Searches from the top side of the
-    // search area to the bottom side of the
-    // search area.
+                                       // search area to the bottom side of the
+                                       // search area.
     SEARCH_DIRECTION_BOTTOM_TO_TOP(3), // Searches from the bottom side of the
-    // search area to the top side of the
-    // search area.
+                                       // search area to the top side of the
+                                       // search area.
     ;
     private final int value;
 
-    SearchDirection(int value) {
+    private SearchDirection(int value) {
       this.value = value;
     }
 
@@ -3224,25 +3191,25 @@ public class NIVision {
     }
   }
 
-  public enum QRStreamMode {
+  public static enum QRStreamMode {
     QR_MODE_NUMERIC(0), // Specifies that the data was encoded using numeric
-    // mode.
+                        // mode.
     QR_MODE_ALPHANUMERIC(1), // Specifies that the data was encoded using
-    // alpha-numeric mode.
+                             // alpha-numeric mode.
     QR_MODE_RAW_BYTE(2), // Specifies that the data was not encoded but is only
-    // raw binary bytes, or encoded in JIS-8.
+                         // raw binary bytes, or encoded in JIS-8.
     QR_MODE_EAN128_TOKEN(3), // Specifies that the data has a special meaning
-    // represented by the application ID.
+                             // represented by the application ID.
     QR_MODE_EAN128_DATA(4), // Specifies that the data has a special meaning
-    // represented by the application ID.
+                            // represented by the application ID.
     QR_MODE_ECI(5), // Specifies that the data was meant to be read using the
-    // language represented in the language ID.
+                    // language represented in the language ID.
     QR_MODE_KANJI(6), // Specifies that the data was encoded in Shift-JIS16
-    // Japanese.
+                      // Japanese.
     ;
     private final int value;
 
-    QRStreamMode(int value) {
+    private QRStreamMode(int value) {
       this.value = value;
     }
 
@@ -3259,13 +3226,13 @@ public class NIVision {
     }
   }
 
-  public enum ParticleClassifierType {
+  public static enum ParticleClassifierType {
     PARTICLE_LARGEST(0), // Use only the largest particle in the image.
     PARTICLE_ALL(1), // Use all particles in the image.
     ;
     private final int value;
 
-    ParticleClassifierType(int value) {
+    private ParticleClassifierType(int value) {
       this.value = value;
     }
 
@@ -3282,38 +3249,37 @@ public class NIVision {
     }
   }
 
-  public enum QRCellSampleSize {
+  public static enum QRCellSampleSize {
     QR_CELL_SAMPLE_SIZE_AUTO_DETECT(-2), // The function will try each sample
-    // size and use the one which decodes
-    // the QR code within the fewest
-    // iterations and utilizing the least
-    // amount of error correction.
+                                         // size and use the one which decodes
+                                         // the QR code within the fewest
+                                         // iterations and utilizing the least
+                                         // amount of error correction.
     QR_CELL_SAMPLE_SIZE1X1(1), // The function will use a 1x1 sized sample from
-    // each cell.
+                               // each cell.
     QR_CELL_SAMPLE_SIZE2X2(2), // The function will use a 2x2 sized sample from
-    // each cell.
+                               // each cell.
     QR_CELL_SAMPLE_SIZE3X3(3), // The function will use a 3x3 sized sample from
-    // each cell.
+                               // each cell.
     QR_CELL_SAMPLE_SIZE4X4(4), // The function will use a 4x4 sized sample from
-    // each cell.
+                               // each cell.
     QR_CELL_SAMPLE_SIZE5X5(5), // The function will use a 5x5 sized sample from
-    // each cell.
+                               // each cell.
     QR_CELL_SAMPLE_SIZE6X6(6), // The function will use a 6x6 sized sample from
-    // each cell.
+                               // each cell.
     QR_CELL_SAMPLE_SIZE7X7(7), // The function will use a 7x7 sized sample from
-    // each cell.
+                               // each cell.
     ;
     private final int value;
 
-    QRCellSampleSize(int value) {
+    private QRCellSampleSize(int value) {
       this.value = value;
     }
 
     public static QRCellSampleSize fromValue(int val) {
       for (QRCellSampleSize v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -3323,11 +3289,11 @@ public class NIVision {
     }
   }
 
-  public enum RakeProcessType {
-    GET_FIRST_EDGES(0), GET_FIRST_AND_LAST_EDGES(1), GET_ALL_EDGES(2), GET_BEST_EDGES(3),;
+  public static enum RakeProcessType {
+    GET_FIRST_EDGES(0), GET_FIRST_AND_LAST_EDGES(1), GET_ALL_EDGES(2), GET_BEST_EDGES(3), ;
     private final int value;
 
-    RakeProcessType(int value) {
+    private RakeProcessType(int value) {
       this.value = value;
     }
 
@@ -3344,82 +3310,82 @@ public class NIVision {
     }
   }
 
-  public enum GeometricSetupDataItem {
+  public static enum GeometricSetupDataItem {
     CURVE_EXTRACTION_MODE(0), // Specifies how the function identifies curves in
-    // the image.
+                              // the image.
     CURVE_EDGE_THRSHOLD(1), // Specifies the minimum contrast an edge pixel must
-    // have for it to be considered part of a curve.
+                            // have for it to be considered part of a curve.
     CURVE_EDGE_FILTER(2), // Specifies the width of the edge filter that the
-    // function uses to identify curves in the image.
+                          // function uses to identify curves in the image.
     MINIMUM_CURVE_LENGTH(3), // Specifies the length, in pixels, of the smallest
-    // curve that you want the function to identify.
+                             // curve that you want the function to identify.
     CURVE_ROW_SEARCH_STEP_SIZE(4), // Specifies the distance, in the y
-    // direction, between the image rows that the
-    // algorithm inspects for curve seed points.
+                                   // direction, between the image rows that the
+                                   // algorithm inspects for curve seed points.
     CURVE_COL_SEARCH_STEP_SIZE(5), // Specifies the distance, in the x
-    // direction, between the image columns that
-    // the algorithm inspects for curve seed
-    // points.
+                                   // direction, between the image columns that
+                                   // the algorithm inspects for curve seed
+                                   // points.
     CURVE_MAX_END_POINT_GAP(6), // Specifies the maximum gap, in pixels, between
-    // the endpoints of a curve that the function
-    // identifies as a closed curve.
+                                // the endpoints of a curve that the function
+                                // identifies as a closed curve.
     EXTRACT_CLOSED_CURVES(7), // Specifies whether to identify only closed
-    // curves in the image.
+                              // curves in the image.
     ENABLE_SUBPIXEL_CURVE_EXTRACTION(8), // The function ignores this option.
     ENABLE_CORRELATION_SCORE(9), // Specifies that the function should calculate
-    // the Correlation Score and return it for each
-    // match result.
+                                 // the Correlation Score and return it for each
+                                 // match result.
     ENABLE_SUBPIXEL_ACCURACY(10), // Determines whether to return the match
-    // results with subpixel accuracy.
+                                  // results with subpixel accuracy.
     SUBPIXEL_ITERATIONS(11), // Specifies the maximum number of incremental
-    // improvements used to refine matches using
-    // subpixel information.
+                             // improvements used to refine matches using
+                             // subpixel information.
     SUBPIXEL_TOLERANCE(12), // Specifies the maximum amount of change, in
-    // pixels, between consecutive incremental
-    // improvements in the match position before the
-    // function stops refining the match position.
+                            // pixels, between consecutive incremental
+                            // improvements in the match position before the
+                            // function stops refining the match position.
     INITIAL_MATCH_LIST_LENGTH(13), // Specifies the maximum size of the match
-    // list.
+                                   // list.
     ENABLE_TARGET_TEMPLATE_CURVESCORE(14), // Specifies whether the function
-    // should calculate the match curve
-    // to template curve score and return
-    // it for each match result.
+                                           // should calculate the match curve
+                                           // to template curve score and return
+                                           // it for each match result.
     MINIMUM_MATCH_SEPARATION_DISTANCE(15), // Specifies the minimum separation
-    // distance, in pixels, between the
-    // origins of two matches that have
-    // unique positions.
+                                           // distance, in pixels, between the
+                                           // origins of two matches that have
+                                           // unique positions.
     MINIMUM_MATCH_SEPARATION_ANGLE(16), // Specifies the minimum angular
-    // difference, in degrees, between two
-    // matches that have unique angles.
+                                        // difference, in degrees, between two
+                                        // matches that have unique angles.
     MINIMUM_MATCH_SEPARATION_SCALE(17), // Specifies the minimum difference in
-    // scale, expressed as a percentage,
-    // between two matches that have unique
-    // scales.
+                                        // scale, expressed as a percentage,
+                                        // between two matches that have unique
+                                        // scales.
     MAXIMUM_MATCH_OVERLAP(18), // Specifies whether you want the algorithm to
-    // spend less time accurately estimating the
-    // location of a match.
+                               // spend less time accurately estimating the
+                               // location of a match.
     ENABLE_COARSE_RESULT(19), // Specifies whether you want the algorithm to
-    // spend less time accurately estimating the
-    // location of a match.
+                              // spend less time accurately estimating the
+                              // location of a match.
     ENABLE_CALIBRATION_SUPPORT(20), // Specifies whether or not the algorithm
-    // treat the inspection image as a
-    // calibrated image.
+                                    // treat the inspection image as a
+                                    // calibrated image.
     ENABLE_CONTRAST_REVERSAL(21), // Specifies the contrast of the matches to
-    // search for.
+                                  // search for.
     SEARCH_STRATEGY(22), // Specifies the aggressiveness of the strategy used to
-    // find matches in the image.
+                         // find matches in the image.
     REFINEMENT_MATCH_FACTOR(23), // Specifies the factor applied to the number
-    // of matches requested to determine how many
-    // matches are refined in the pyramid stage.
+                                 // of matches requested to determine how many
+                                 // matches are refined in the pyramid stage.
     SUBPIXEL_MATCH_FACTOR(24), // Specifies the factor applied to the number for
-    // matches requested to determine how many
-    // matches are used for the final (subpixel)
-    // stage.
+                               // matches requested to determine how many
+                               // matches are used for the final (subpixel)
+                               // stage.
     MAX_REFINEMENT_ITERATIONS(25), // Specifies maximum refinement iteration.
     ;
     private final int value;
 
-    GeometricSetupDataItem(int value) {
+    private GeometricSetupDataItem(int value) {
       this.value = value;
     }
 
@@ -3436,22 +3402,21 @@ public class NIVision {
     }
   }
 
-  public enum DistortionModel {
+  public static enum DistortionModel {
     POLYNOMIAL_MODEL(0), // Polynomial model.
     DIVISION_MODEL(1), // Division Model.
     NO_DISTORTION_MODEL(-1), // Not a distortion model.
     ;
     private final int value;
 
-    DistortionModel(int value) {
+    private DistortionModel(int value) {
       this.value = value;
     }
 
     public static DistortionModel fromValue(int val) {
       for (DistortionModel v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -3461,14 +3426,14 @@ public class NIVision {
     }
   }
 
-  public enum CalibrationThumbnailType {
+  public static enum CalibrationThumbnailType {
     CAMARA_MODEL_TYPE(0), // Camara model thumbnail type.
     PERSPECTIVE_TYPE(1), // Perspective thumbnail type.
     MICRO_PLANE_TYPE(2), // Micro Plane thumbnail type.
     ;
     private final int value;
 
-    CalibrationThumbnailType(int value) {
+    private CalibrationThumbnailType(int value) {
       this.value = value;
     }
 
@@ -3485,20 +3450,20 @@ public class NIVision {
     }
   }
 
-  public enum SettingType {
+  public static enum SettingType {
     ROTATION_ANGLE_RANGE(0), // Set a range for this option to specify the
-    // angles at which you expect the Function to find
-    // template matches in the inspection image.
+                             // angles at which you expect the Function to find
+                             // template matches in the inspection image.
     SCALE_RANGE(1), // Set a range for this option to specify the sizes at which
-    // you expect the Function to find template matches in the
-    // inspection image.
+                    // you expect the Function to find template matches in the
+                    // inspection image.
     OCCLUSION_RANGE(2), // Set a range for this option to specify the amount of
-    // occlusion you expect for a match in the inspection
-    // image.
+                        // occlusion you expect for a match in the inspection
+                        // image.
     ;
     private final int value;
 
-    SettingType(int value) {
+    private SettingType(int value) {
       this.value = value;
     }
 
@@ -3515,15 +3480,15 @@ public class NIVision {
     }
   }
 
-  public enum SegmentationDistanceLevel {
+  public static enum SegmentationDistanceLevel {
     SEGMENTATION_LEVEL_CONSERVATIVE(0), // Uses extensive criteria to determine
-    // the Maximum Distance.
+                                        // the Maximum Distance.
     SEGMENTATION_LEVEL_AGGRESSIVE(1), // Uses few criteria to determine the
-    // Maximum Distance.
+                                      // Maximum Distance.
     ;
     private final int value;
 
-    SegmentationDistanceLevel(int value) {
+    private SegmentationDistanceLevel(int value) {
       this.value = value;
     }
 
@@ -3540,15 +3505,15 @@ public class NIVision {
     }
   }
 
-  public enum ExtractContourSelection {
+  public static enum ExtractContourSelection {
     CLOSEST(0), // Selects the curve closest to the ROI.
     LONGEST(1), // Selects the longest curve.
     STRONGEST(2), // Selects the curve with the highest edge strength averaged
-    // from each point on the curve.
+                  // from each point on the curve.
     ;
     private final int value;
 
-    ExtractContourSelection(int value) {
+    private ExtractContourSelection(int value) {
       this.value = value;
     }
 
@@ -3565,13 +3530,13 @@ public class NIVision {
     }
   }
 
-  public enum FindTransformMode {
+  public static enum FindTransformMode {
     FIND_REFERENCE(0), // Update both parts of the coordinate system.
     UPDATE_TRANSFORM(1), // Update only the new reference system.
     ;
     private final int value;
 
-    FindTransformMode(int value) {
+    private FindTransformMode(int value) {
       this.value = value;
     }
 
@@ -3588,21 +3553,21 @@ public class NIVision {
     }
   }
 
-  public enum ExtractContourDirection {
+  public static enum ExtractContourDirection {
     RECT_LEFT_RIGHT(0), // Searches the ROI from left to right.
     RECT_RIGHT_LEFT(1), // Searches the ROI from right to left.
     RECT_TOP_BOTTOM(2), // Searches the ROI from top to bottom.
     RECT_BOTTOM_TOP(3), // Searches the ROI from bottom to top.
     ANNULUS_INNER_OUTER(4), // Searches the ROI from the inner radius to the
-    // outer radius.
+                            // outer radius.
     ANNULUS_OUTER_INNER(5), // Searches the ROI from the outer radius to the
-    // inner radius.
+                            // inner radius.
     ANNULUS_START_STOP(6), // Searches the ROI from start angle to end angle.
     ANNULUS_STOP_START(7), // Searches the ROI from end angle to start angle.
     ;
     private final int value;
 
-    ExtractContourDirection(int value) {
+    private ExtractContourDirection(int value) {
       this.value = value;
     }
 
@@ -3619,14 +3584,14 @@ public class NIVision {
     }
   }
 
-  public enum EdgePolaritySearchMode {
+  public static enum EdgePolaritySearchMode {
     SEARCH_FOR_ALL_EDGES(0), // Searches for all edges.
     SEARCH_FOR_RISING_EDGES(1), // Searches for rising edges only.
     SEARCH_FOR_FALLING_EDGES(2), // Searches for falling edges only.
     ;
     private final int value;
 
-    EdgePolaritySearchMode(int value) {
+    private EdgePolaritySearchMode(int value) {
       this.value = value;
     }
 
@@ -3643,15 +3608,15 @@ public class NIVision {
     }
   }
 
-  public enum Connectivity {
+  public static enum Connectivity {
     FOUR_CONNECTED(0), // Morphological reconstruction is performed in
-    // connectivity mode 4.
+                       // connectivity mode 4.
     EIGHT_CONNECTED(1), // Morphological reconstruction is performed in
-    // connectivity mode 8.
+                        // connectivity mode 8.
     ;
     private final int value;
 
-    Connectivity(int value) {
+    private Connectivity(int value) {
       this.value = value;
     }
 
@@ -3668,13 +3633,13 @@ public class NIVision {
     }
   }
 
-  public enum MorphologyReconstructOperation {
+  public static enum MorphologyReconstructOperation {
     DILATE_RECONSTRUCT(0), // Performs Reconstruction by dilation.
     ERODE_RECONSTRUCT(1), // Performs Reconstruction by erosion.
     ;
     private final int value;
 
-    MorphologyReconstructOperation(int value) {
+    private MorphologyReconstructOperation(int value) {
       this.value = value;
     }
 
@@ -3691,18 +3656,16 @@ public class NIVision {
     }
   }
 
-  public enum WaveletType {
+  public static enum WaveletType {
     DB02(0), DB03(1), DB04(2), // Specifies the Wavelet Type as DB02.
-    DB05(3), DB06(4), DB07(5), DB08(6), DB09(7), DB10(8), DB11(9), DB12(10), DB13(11), DB14(12),
-    HAAR(
+    DB05(3), DB06(4), DB07(5), DB08(6), DB09(7), DB10(8), DB11(9), DB12(10), DB13(11), DB14(12), HAAR(
         13), BIOR1_3(14), BIOR1_5(15), BIOR2_2(16), BIOR2_4(17), BIOR2_6(18), BIOR2_8(19), BIOR3_1(
-        20), BIOR3_3(21), BIOR3_5(22), BIOR3_7(23), BIOR3_9(24), BIOR4_4(25), COIF1(26), COIF2
-        (27), COIF3(
+        20), BIOR3_3(21), BIOR3_5(22), BIOR3_7(23), BIOR3_9(24), BIOR4_4(25), COIF1(26), COIF2(27), COIF3(
         28), COIF4(29), COIF5(30), SYM2(31), SYM3(32), SYM4(33), SYM5(34), SYM6(35), SYM7(36), SYM8(
-        37), BIOR5_5(38), BIOR6_8(39),;
+        37), BIOR5_5(38), BIOR6_8(39), ;
     private final int value;
 
-    WaveletType(int value) {
+    private WaveletType(int value) {
       this.value = value;
     }
 
@@ -3719,17 +3682,17 @@ public class NIVision {
     }
   }
 
-  public enum ParticleClassifierThresholdType {
+  public static enum ParticleClassifierThresholdType {
     THRESHOLD_MANUAL(0), // The classifier performs a manual threshold on the
-    // image during preprocessing.
+                         // image during preprocessing.
     THRESHOLD_AUTO(1), // The classifier performs an auto threshold on the image
-    // during preprocessing.
+                       // during preprocessing.
     THRESHOLD_LOCAL(2), // The classifier performs a local threshold on the
-    // image during preprocessing.
+                        // image during preprocessing.
     ;
     private final int value;
 
-    ParticleClassifierThresholdType(int value) {
+    private ParticleClassifierThresholdType(int value) {
       this.value = value;
     }
 
@@ -3746,18 +3709,18 @@ public class NIVision {
     }
   }
 
-  public enum MeasureParticlesCalibrationMode {
+  public static enum MeasureParticlesCalibrationMode {
     CALIBRATION_MODE_PIXEL(0), // The function takes only pixel measurements on
-    // the particles in the image.
+                               // the particles in the image.
     CALIBRATION_MODE_CALIBRATED(1), // The function takes only calibrated
-    // measurements on the particles in the
-    // image.
+                                    // measurements on the particles in the
+                                    // image.
     CALIBRATION_MODE_BOTH(2), // The function takes both pixel and calibrated
-    // measurements on the particles in the image.
+                              // measurements on the particles in the image.
     ;
     private final int value;
 
-    MeasureParticlesCalibrationMode(int value) {
+    private MeasureParticlesCalibrationMode(int value) {
       this.value = value;
     }
 
@@ -3774,25 +3737,25 @@ public class NIVision {
     }
   }
 
-  public enum GeometricMatchingSearchStrategy {
+  public static enum GeometricMatchingSearchStrategy {
     GEOMETRIC_MATCHING_CONSERVATIVE(0), // Instructs the pattern matching
-    // algorithm to use the largest possible
-    // amount of information from the image
-    // at the expense of slowing down the
-    // speed of the algorithm.
+                                        // algorithm to use the largest possible
+                                        // amount of information from the image
+                                        // at the expense of slowing down the
+                                        // speed of the algorithm.
     GEOMETRIC_MATCHING_BALANCED(1), // Instructs the pattern matching algorithm
-    // to balance the amount of information from
-    // the image it uses with the speed of the
-    // algorithm.
+                                    // to balance the amount of information from
+                                    // the image it uses with the speed of the
+                                    // algorithm.
     GEOMETRIC_MATCHING_AGGRESSIVE(2), // Instructs the pattern matching
-    // algorithm to use a lower amount of
-    // information from the image, which
-    // allows the algorithm to run quickly but
-    // at the expense of accuracy.
+                                      // algorithm to use a lower amount of
+                                      // information from the image, which
+                                      // allows the algorithm to run quickly but
+                                      // at the expense of accuracy.
     ;
     private final int value;
 
-    GeometricMatchingSearchStrategy(int value) {
+    private GeometricMatchingSearchStrategy(int value) {
       this.value = value;
     }
 
@@ -3809,17 +3772,17 @@ public class NIVision {
     }
   }
 
-  public enum ColorClassificationResolution {
+  public static enum ColorClassificationResolution {
     CLASSIFIER_LOW_RESOLUTION(0), // Low resolution version of the color
-    // classifier.
+                                  // classifier.
     CLASSIFIER_MEDIUM_RESOLUTION(1), // Medium resolution version of the color
-    // classifier.
+                                     // classifier.
     CLASSIFIER_HIGH_RESOLUTION(2), // High resolution version of the color
-    // classifier.
+                                   // classifier.
     ;
     private final int value;
 
-    ColorClassificationResolution(int value) {
+    private ColorClassificationResolution(int value) {
       this.value = value;
     }
 
@@ -3836,28 +3799,28 @@ public class NIVision {
     }
   }
 
-  public enum ConnectionConstraintType {
+  public static enum ConnectionConstraintType {
     DISTANCE_CONSTRAINT(0), // Specifies the distance, in pixels, within which
-    // the end points of two curves must lie in order to
-    // be considered part of a contour.
+                            // the end points of two curves must lie in order to
+                            // be considered part of a contour.
     ANGLE_CONSTRAINT(1), // Specifies the range, in degrees, within which the
-    // difference between the angle of two curves, measured
-    // at the end points, must lie in order for the two
-    // curves to be considered part of a contour.
+                         // difference between the angle of two curves, measured
+                         // at the end points, must lie in order for the two
+                         // curves to be considered part of a contour.
     CONNECTIVITY_CONSTRAINT(2), // Specifies the distance, in pixels, within
-    // which a line extended from the end point of a
-    // curve must pass the end point of another
-    // curve in order for the two curves to be
-    // considered part of a contour.
+                                // which a line extended from the end point of a
+                                // curve must pass the end point of another
+                                // curve in order for the two curves to be
+                                // considered part of a contour.
     GRADIENT_CONSTRAINT(3), // Specifies the range, in degrees, within which the
-    // gradient angles of two curves, measured at the
-    // end points, must lie in order for the two curves
-    // to be considered part of a contour.
+                            // gradient angles of two curves, measured at the
+                            // end points, must lie in order for the two curves
+                            // to be considered part of a contour.
     NUM_CONNECTION_CONSTRAINT_TYPES(4), // .
     ;
     private final int value;
 
-    ConnectionConstraintType(int value) {
+    private ConnectionConstraintType(int value) {
       this.value = value;
     }
 
@@ -3874,19 +3837,19 @@ public class NIVision {
     }
   }
 
-  public enum Barcode2DContrast {
+  public static enum Barcode2DContrast {
     ALL_BARCODE_2D_CONTRASTS(0), // The function searches for barcodes of each
-    // contrast type.
+                                 // contrast type.
     BLACK_ON_WHITE_BARCODE_2D(1), // The function searches for 2D barcodes
-    // containing black data on a white
-    // background.
+                                  // containing black data on a white
+                                  // background.
     WHITE_ON_BLACK_BARCODE_2D(2), // The function searches for 2D barcodes
-    // containing white data on a black
-    // background.
+                                  // containing white data on a black
+                                  // background.
     ;
     private final int value;
 
-    Barcode2DContrast(int value) {
+    private Barcode2DContrast(int value) {
       this.value = value;
     }
 
@@ -3903,16 +3866,16 @@ public class NIVision {
     }
   }
 
-  public enum QRModelType {
+  public static enum QRModelType {
     QR_MODELTYPE_AUTO_DETECT(0), // Specifies that the function will auto-detect
-    // the type of QR code.
+                                 // the type of QR code.
     QR_MODELTYPE_MICRO(1), // Specifies the QR code is of a micro type.
     QR_MODELTYPE_MODEL1(2), // Specifies the QR code is of a model1 type.
     QR_MODELTYPE_MODEL2(3), // Specifies the QR code is of a model2 type.
     ;
     private final int value;
 
-    QRModelType(int value) {
+    private QRModelType(int value) {
       this.value = value;
     }
 
@@ -3929,24 +3892,23 @@ public class NIVision {
     }
   }
 
-  public enum WindowBackgroundFillStyle {
+  public static enum WindowBackgroundFillStyle {
     FILL_STYLE_SOLID(0), // Fill the display window with a solid color.
     FILL_STYLE_HATCH(2), // Fill the display window with a pattern defined by
-    // WindowBackgroundHatchStyle.
+                         // WindowBackgroundHatchStyle.
     FILL_STYLE_DEFAULT(3), // Fill the display window with the NI Vision default
-    // pattern.
+                           // pattern.
     ;
     private final int value;
 
-    WindowBackgroundFillStyle(int value) {
+    private WindowBackgroundFillStyle(int value) {
       this.value = value;
     }
 
     public static WindowBackgroundFillStyle fromValue(int val) {
       for (WindowBackgroundFillStyle v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -3956,17 +3918,17 @@ public class NIVision {
     }
   }
 
-  public enum ExtractionMode {
+  public static enum ExtractionMode {
     NORMAL_IMAGE(0), // Specifies that the function makes no assumptions about
-    // the uniformity of objects in the image or the image
-    // background.
+                     // the uniformity of objects in the image or the image
+                     // background.
     UNIFORM_REGIONS(1), // Specifies that the function assumes that either the
-    // objects in the image or the image background consists
-    // of uniform pixel values.
+                        // objects in the image or the image background consists
+                        // of uniform pixel values.
     ;
     private final int value;
 
-    ExtractionMode(int value) {
+    private ExtractionMode(int value) {
       this.value = value;
     }
 
@@ -3983,16 +3945,16 @@ public class NIVision {
     }
   }
 
-  public enum EdgeFilterSize {
+  public static enum EdgeFilterSize {
     FINE(0), // Specifies that the function uses a fine (narrow) edge filter.
     NORMAL(1), // Specifies that the function uses a normal edge filter.
     CONTOUR_TRACING(2), // Sets the Edge Filter Size to contour tracing, which
-    // provides the best results for contour extraction but
-    // increases the time required to process the image.
+                        // provides the best results for contour extraction but
+                        // increases the time required to process the image.
     ;
     private final int value;
 
-    EdgeFilterSize(int value) {
+    private EdgeFilterSize(int value) {
       this.value = value;
     }
 
@@ -4009,20 +3971,20 @@ public class NIVision {
     }
   }
 
-  public enum Barcode2DSearchMode {
+  public static enum Barcode2DSearchMode {
     SEARCH_MULTIPLE(0), // The function searches for multiple 2D barcodes.
     SEARCH_SINGLE_CONSERVATIVE(1), // The function searches for 2D barcodes
-    // using the same searching algorithm as
-    // IMAQ_SEARCH_MULTIPLE but stops searching
-    // after locating one valid barcode.
+                                   // using the same searching algorithm as
+                                   // IMAQ_SEARCH_MULTIPLE but stops searching
+                                   // after locating one valid barcode.
     SEARCH_SINGLE_AGGRESSIVE(2), // The function searches for a single 2D
-    // barcode using a method that assumes the
-    // barcode occupies a majority of the search
-    // region.
+                                 // barcode using a method that assumes the
+                                 // barcode occupies a majority of the search
+                                 // region.
     ;
     private final int value;
 
-    Barcode2DSearchMode(int value) {
+    private Barcode2DSearchMode(int value) {
       this.value = value;
     }
 
@@ -4039,19 +4001,19 @@ public class NIVision {
     }
   }
 
-  public enum DataMatrixSubtype {
+  public static enum DataMatrixSubtype {
     ALL_DATA_MATRIX_SUBTYPES(0), // The function searches for Data Matrix
-    // barcodes of all subtypes.
+                                 // barcodes of all subtypes.
     DATA_MATRIX_SUBTYPES_ECC_000_ECC_140(1), // The function searches for Data
-    // Matrix barcodes of subtypes ECC
-    // 000, ECC 050, ECC 080, ECC 100
-    // and ECC 140.
+                                             // Matrix barcodes of subtypes ECC
+                                             // 000, ECC 050, ECC 080, ECC 100
+                                             // and ECC 140.
     DATA_MATRIX_SUBTYPE_ECC_200(2), // The function searches for Data Matrix ECC
-    // 200 barcodes.
+                                    // 200 barcodes.
     ;
     private final int value;
 
-    DataMatrixSubtype(int value) {
+    private DataMatrixSubtype(int value) {
       this.value = value;
     }
 
@@ -4068,7 +4030,7 @@ public class NIVision {
     }
   }
 
-  public enum FeatureType {
+  public static enum FeatureType {
     NOT_FOUND_FEATURE(0), // Specifies the feature is not found.
     CIRCLE_FEATURE(1), // Specifies the feature is a circle.
     ELLIPSE_FEATURE(2), // Specifies the feature is an ellipse.
@@ -4077,15 +4039,15 @@ public class NIVision {
     LEG_FEATURE(5), // Specifies the feature is a leg.
     CORNER_FEATURE(6), // Specifies the feature is a corner.
     PARALLEL_LINE_PAIR_FEATURE(7), // Specifies the feature is a parallel line
-    // pair.
+                                   // pair.
     PAIR_OF_PARALLEL_LINE_PAIRS_FEATURE(8), // Specifies the feature is a pair
-    // of parallel line pairs.
+                                            // of parallel line pairs.
     LINE_FEATURE(9), // Specifies the feature is a line.
     CLOSED_CURVE_FEATURE(10), // Specifies the feature is a closed curve.
     ;
     private final int value;
 
-    FeatureType(int value) {
+    private FeatureType(int value) {
       this.value = value;
     }
 
@@ -4102,15 +4064,15 @@ public class NIVision {
     }
   }
 
-  public enum Barcode2DCellShape {
+  public static enum Barcode2DCellShape {
     SQUARE_CELLS(0), // The function uses an algorithm for decoding the 2D
-    // barcode that works with square data cells.
+                     // barcode that works with square data cells.
     ROUND_CELLS(1), // The function uses an algorithm for decoding the 2D
-    // barcode that works with round data cells.
+                    // barcode that works with round data cells.
     ;
     private final int value;
 
-    Barcode2DCellShape(int value) {
+    private Barcode2DCellShape(int value) {
       this.value = value;
     }
 
@@ -4127,18 +4089,18 @@ public class NIVision {
     }
   }
 
-  public enum LocalThresholdMethod {
+  public static enum LocalThresholdMethod {
     NIBLACK(0), // The function computes thresholds for each pixel based on its
-    // local statistics using the Niblack local thresholding
-    // algorithm.
+                // local statistics using the Niblack local thresholding
+                // algorithm.
     BACKGROUND_CORRECTION(1), // The function performs background correction
-    // first to eliminate non-uniform lighting
-    // effects, then performs thresholding using the
-    // Otsu thresholding algorithm.
+                              // first to eliminate non-uniform lighting
+                              // effects, then performs thresholding using the
+                              // Otsu thresholding algorithm.
     ;
     private final int value;
 
-    LocalThresholdMethod(int value) {
+    private LocalThresholdMethod(int value) {
       this.value = value;
     }
 
@@ -4155,7 +4117,7 @@ public class NIVision {
     }
   }
 
-  public enum Barcode2DType {
+  public static enum Barcode2DType {
     PDF417(0), // The 2D barcode is of type PDF417.
     DATA_MATRIX_ECC_000(1), // The 2D barcode is of type Data Matrix ECC 000.
     DATA_MATRIX_ECC_050(2), // The 2D barcode is of type Data Matrix ECC 050.
@@ -4166,7 +4128,7 @@ public class NIVision {
     ;
     private final int value;
 
-    Barcode2DType(int value) {
+    private Barcode2DType(int value) {
       this.value = value;
     }
 
@@ -4183,13 +4145,13 @@ public class NIVision {
     }
   }
 
-  public enum ClassifierEngineType {
+  public static enum ClassifierEngineType {
     ENGINE_NONE(0), // No engine has been set on this classifier session.
     ENGINE_NEAREST_NEIGHBOR(1), // Nearest neighbor engine.
-    ENGINE_SUPPORT_VECTOR_MACHINE(2),;
+    ENGINE_SUPPORT_VECTOR_MACHINE(2), ;
     private final int value;
 
-    ClassifierEngineType(int value) {
+    private ClassifierEngineType(int value) {
       this.value = value;
     }
 
@@ -4206,19 +4168,19 @@ public class NIVision {
     }
   }
 
-  public enum ClassifierType {
+  public static enum ClassifierType {
     CLASSIFIER_CUSTOM(0), // The classifier session classifies vectors of
-    // doubles.
+                          // doubles.
     CLASSIFIER_PARTICLE(1), // The classifier session classifies particles in
-    // binary images.
+                            // binary images.
     CLASSIFIER_COLOR(2), // The classifier session classifies an image based on
-    // its color.
+                         // its color.
     CLASSIFIER_TEXTURE(3), // The classifier session classifies an image based
-    // on its texture.
+                           // on its texture.
     ;
     private final int value;
 
-    ClassifierType(int value) {
+    private ClassifierType(int value) {
       this.value = value;
     }
 
@@ -4235,13 +4197,13 @@ public class NIVision {
     }
   }
 
-  public enum ParticleType {
+  public static enum ParticleType {
     PARTICLE_BRIGHT(0), // Bright particles.
     PARTICLE_DARK(1), // Dark particles.
     ;
     private final int value;
 
-    ParticleType(int value) {
+    private ParticleType(int value) {
       this.value = value;
     }
 
@@ -4258,41 +4220,40 @@ public class NIVision {
     }
   }
 
-  public enum VisionInfoType2 {
+  public static enum VisionInfoType2 {
     VISIONINFO_CALIBRATION(0x01), // Used to indicate interaction with the
-    // Calibration information in an image.
+                                  // Calibration information in an image.
     VISIONINFO_OVERLAY(0x02), // Used to indicate interaction with the Overlay
-    // information in an image.
+                              // information in an image.
     VISIONINFO_GRAYTEMPLATE(0x04), // Used to indicate interaction with the
-    // grayscale template information in an
-    // image.
+                                   // grayscale template information in an
+                                   // image.
     VISIONINFO_COLORTEMPLATE(0x08), // Used to indicate interaction with the
-    // color template information in an image.
+                                    // color template information in an image.
     VISIONINFO_GEOMETRICTEMPLATE(0x10), // Used to indicate interaction with the
-    // geometric template information in an
-    // image.
+                                        // geometric template information in an
+                                        // image.
     VISIONINFO_CUSTOMDATA(0x20), // Used to indicate interaction with the binary
-    // or text Custom Data in an image.
+                                 // or text Custom Data in an image.
     VISIONINFO_GOLDENTEMPLATE(0x40), // Used to indicate interaction with the
-    // golden template information in an image.
+                                     // golden template information in an image.
     VISIONINFO_GEOMETRICTEMPLATE2(0x80), // Used to indicate interaction with
-    // the geometric template 2 information
-    // in an image.
+                                         // the geometric template 2 information
+                                         // in an image.
     VISIONINFO_ALL(0xFFFFFFFF), // Removes, checks for, or indicates the
-    // presence of all types of extra information in
-    // an image.
+                                // presence of all types of extra information in
+                                // an image.
     ;
     private final int value;
 
-    VisionInfoType2(int value) {
+    private VisionInfoType2(int value) {
       this.value = value;
     }
 
     public static VisionInfoType2 fromValue(int val) {
       for (VisionInfoType2 v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -4302,16 +4263,16 @@ public class NIVision {
     }
   }
 
-  public enum ReadClassifierFileMode {
+  public static enum ReadClassifierFileMode {
     CLASSIFIER_READ_ALL(0), // Read all information from the classifier file.
     CLASSIFIER_READ_SAMPLES(1), // Read only the samples from the classifier
-    // file.
+                                // file.
     CLASSIFIER_READ_PROPERTIES(2), // Read only the properties from the
-    // classifier file.
+                                   // classifier file.
     ;
     private final int value;
 
-    ReadClassifierFileMode(int value) {
+    private ReadClassifierFileMode(int value) {
       this.value = value;
     }
 
@@ -4328,14 +4289,14 @@ public class NIVision {
     }
   }
 
-  public enum WriteClassifierFileMode {
+  public static enum WriteClassifierFileMode {
     CLASSIFIER_WRITE_ALL(0), // Writes all information to the classifier file.
     CLASSIFIER_WRITE_CLASSIFY_ONLY(1), // Write only the information needed to
-    // classify to the classifier file.
+                                       // classify to the classifier file.
     ;
     private final int value;
 
-    WriteClassifierFileMode(int value) {
+    private WriteClassifierFileMode(int value) {
       this.value = value;
     }
 
@@ -4352,14 +4313,14 @@ public class NIVision {
     }
   }
 
-  public enum Barcode2DShape {
+  public static enum Barcode2DShape {
     SQUARE_BARCODE_2D(0), // The function searches for square 2D barcodes.
     RECTANGULAR_BARCODE_2D(1), // The function searches for rectangular 2D
-    // barcodes.
+                               // barcodes.
     ;
     private final int value;
 
-    Barcode2DShape(int value) {
+    private Barcode2DShape(int value) {
       this.value = value;
     }
 
@@ -4376,20 +4337,20 @@ public class NIVision {
     }
   }
 
-  public enum DataMatrixRotationMode {
+  public static enum DataMatrixRotationMode {
     UNLIMITED_ROTATION(0), // The function allows for unlimited rotation.
     C0_DEGREES(1), // The function allows for between -5 and 5 degrees of
-    // rotation.
+                   // rotation.
     C90_DEGREES(2), // The function allows for between 85 and 95 degrees of
-    // rotation.
+                    // rotation.
     C180_DEGREES(3), // The function allows for between 175 and 185 degrees of
-    // rotation.
+                     // rotation.
     C270_DEGREES(4), // The function allows for between 265 and 275 degrees of
-    // rotation.
+                     // rotation.
     ;
     private final int value;
 
-    DataMatrixRotationMode(int value) {
+    private DataMatrixRotationMode(int value) {
       this.value = value;
     }
 
@@ -4406,7 +4367,7 @@ public class NIVision {
     }
   }
 
-  public enum AIMGrade {
+  public static enum AIMGrade {
     AIM_GRADE_F(0), // The Data Matrix barcode received a grade of F.
     AIM_GRADE_D(1), // The Data Matrix barcode received a grade of D.
     AIM_GRADE_C(2), // The Data Matrix barcode received a grade of C.
@@ -4415,7 +4376,7 @@ public class NIVision {
     ;
     private final int value;
 
-    AIMGrade(int value) {
+    private AIMGrade(int value) {
       this.value = value;
     }
 
@@ -4432,26 +4393,25 @@ public class NIVision {
     }
   }
 
-  public enum DataMatrixCellFillMode {
+  public static enum DataMatrixCellFillMode {
     AUTO_DETECT_CELL_FILL_MODE(-2), // Sets the function to determine the Data
-    // Matrix barcode cell fill percentage
-    // automatically.
+                                    // Matrix barcode cell fill percentage
+                                    // automatically.
     LOW_FILL(0), // Sets the function to read Data Matrix barcodes with a cell
-    // fill percentage of less than 30 percent.
+                 // fill percentage of less than 30 percent.
     NORMAL_FILL(1), // Sets the function to read Data Matrix barcodes with a
-    // cell fill percentage greater than or equal to 30 percent.
+                    // cell fill percentage greater than or equal to 30 percent.
     ;
     private final int value;
 
-    DataMatrixCellFillMode(int value) {
+    private DataMatrixCellFillMode(int value) {
       this.value = value;
     }
 
     public static DataMatrixCellFillMode fromValue(int val) {
       for (DataMatrixCellFillMode v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -4461,34 +4421,33 @@ public class NIVision {
     }
   }
 
-  public enum DataMatrixDemodulationMode {
+  public static enum DataMatrixDemodulationMode {
     AUTO_DETECT_DEMODULATION_MODE(-2), // The function will try each
-    // demodulation mode and use the one
-    // which decodes the Data Matrix barcode
-    // within the fewest iterations and
-    // utilizing the least amount of error
-    // correction.
+                                       // demodulation mode and use the one
+                                       // which decodes the Data Matrix barcode
+                                       // within the fewest iterations and
+                                       // utilizing the least amount of error
+                                       // correction.
     HISTOGRAM(0), // The function uses a histogram of all of the Data Matrix
-    // cells to calculate a threshold.
+                  // cells to calculate a threshold.
     LOCAL_CONTRAST(1), // The function examines each of the cell's neighbors to
-    // determine if the cell is on or off.
+                       // determine if the cell is on or off.
     COMBINED(2), // The function uses the histogram of the Data Matrix barcode
-    // to calculate a threshold.
+                 // to calculate a threshold.
     ALL_DEMODULATION_MODES(3), // The function tries IMAQ_HISTOGRAM, then
-    // IMAQ_LOCAL_CONTRAST and then IMAQ_COMBINATION,
-    // stopping once one mode is successful.
+                               // IMAQ_LOCAL_CONTRAST and then IMAQ_COMBINATION,
+                               // stopping once one mode is successful.
     ;
     private final int value;
 
-    DataMatrixDemodulationMode(int value) {
+    private DataMatrixDemodulationMode(int value) {
       this.value = value;
     }
 
     public static DataMatrixDemodulationMode fromValue(int val) {
       for (DataMatrixDemodulationMode v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -4498,35 +4457,34 @@ public class NIVision {
     }
   }
 
-  public enum DataMatrixECC {
+  public static enum DataMatrixECC {
     AUTO_DETECT_ECC(-2), // Sets the function to determine the Data Matrix
-    // barcode ECC automatically.
+                         // barcode ECC automatically.
     ECC_000(0), // Sets the function to read Data Matrix barcodes of ECC 000
-    // only.
+                // only.
     ECC_050(50), // Sets the function to read Data Matrix barcodes of ECC 050
-    // only.
+                 // only.
     ECC_080(80), // Sets the function to read Data Matrix barcodes of ECC 080
-    // only.
+                 // only.
     ECC_100(100), // Sets the function to read Data Matrix barcodes of ECC 100
-    // only.
+                  // only.
     ECC_140(140), // Sets the function to read Data Matrix barcodes of ECC 140
-    // only.
+                  // only.
     ECC_000_140(190), // Sets the function to read Data Matrix barcodes of ECC
-    // 000, ECC 050, ECC 080, ECC 100, and ECC 140 only.
+                      // 000, ECC 050, ECC 080, ECC 100, and ECC 140 only.
     ECC_200(200), // Sets the function to read Data Matrix barcodes of ECC 200
-    // only.
+                  // only.
     ;
     private final int value;
 
-    DataMatrixECC(int value) {
+    private DataMatrixECC(int value) {
       this.value = value;
     }
 
     public static DataMatrixECC fromValue(int val) {
       for (DataMatrixECC v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -4536,27 +4494,26 @@ public class NIVision {
     }
   }
 
-  public enum DataMatrixPolarity {
+  public static enum DataMatrixPolarity {
     AUTO_DETECT_POLARITY(-2), // Sets the function to determine the Data Matrix
-    // barcode polarity automatically.
+                              // barcode polarity automatically.
     BLACK_DATA_ON_WHITE_BACKGROUND(0), // Sets the function to read Data Matrix
-    // barcodes with dark data on a bright
-    // background.
+                                       // barcodes with dark data on a bright
+                                       // background.
     WHITE_DATA_ON_BLACK_BACKGROUND(1), // Sets the function to read Data Matrix
-    // barcodes with bright data on a dark
-    // background.
+                                       // barcodes with bright data on a dark
+                                       // background.
     ;
     private final int value;
 
-    DataMatrixPolarity(int value) {
+    private DataMatrixPolarity(int value) {
       this.value = value;
     }
 
     public static DataMatrixPolarity fromValue(int val) {
       for (DataMatrixPolarity v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -4566,48 +4523,47 @@ public class NIVision {
     }
   }
 
-  public enum DataMatrixCellFilterMode {
+  public static enum DataMatrixCellFilterMode {
     AUTO_DETECT_CELL_FILTER_MODE(-2), // The function will try all filter modes
-    // and uses the one that decodes the Data
-    // Matrix barcode within the fewest
-    // iterations and utilizing the least
-    // amount of error correction.
+                                      // and uses the one that decodes the Data
+                                      // Matrix barcode within the fewest
+                                      // iterations and utilizing the least
+                                      // amount of error correction.
     AVERAGE_FILTER(0), // The function sets the pixel value for the cell to the
-    // average of the sampled pixels.
+                       // average of the sampled pixels.
     MEDIAN_FILTER(1), // The function sets the pixel value for the cell to the
-    // median of the sampled pixels.
+                      // median of the sampled pixels.
     CENTRAL_AVERAGE_FILTER(2), // The function sets the pixel value for the cell
-    // to the average of the pixels in the center of
-    // the cell sample.
+                               // to the average of the pixels in the center of
+                               // the cell sample.
     HIGH_AVERAGE_FILTER(3), // The function sets the pixel value for the cell to
-    // the average value of the half of the sampled
-    // pixels with the highest pixel values.
+                            // the average value of the half of the sampled
+                            // pixels with the highest pixel values.
     LOW_AVERAGE_FILTER(4), // The function sets the pixel value for the cell to
-    // the average value of the half of the sampled
-    // pixels with the lowest pixel values.
+                           // the average value of the half of the sampled
+                           // pixels with the lowest pixel values.
     VERY_HIGH_AVERAGE_FILTER(5), // The function sets the pixel value for the
-    // cell to the average value of the ninth of
-    // the sampled pixels with the highest pixel
-    // values.
+                                 // cell to the average value of the ninth of
+                                 // the sampled pixels with the highest pixel
+                                 // values.
     VERY_LOW_AVERAGE_FILTER(6), // The function sets the pixel value for the
-    // cell to the average value of the ninth of the
-    // sampled pixels with the lowest pixel values.
+                                // cell to the average value of the ninth of the
+                                // sampled pixels with the lowest pixel values.
     ALL_CELL_FILTERS(8), // The function tries each filter mode, starting with
-    // IMAQ_AVERAGE_FILTER and ending with
-    // IMAQ_VERY_LOW_AVERAGE_FILTER, stopping once a filter
-    // mode decodes correctly.
+                         // IMAQ_AVERAGE_FILTER and ending with
+                         // IMAQ_VERY_LOW_AVERAGE_FILTER, stopping once a filter
+                         // mode decodes correctly.
     ;
     private final int value;
 
-    DataMatrixCellFilterMode(int value) {
+    private DataMatrixCellFilterMode(int value) {
       this.value = value;
     }
 
     public static DataMatrixCellFilterMode fromValue(int val) {
       for (DataMatrixCellFilterMode v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -4617,24 +4573,24 @@ public class NIVision {
     }
   }
 
-  public enum WindowBackgroundHatchStyle {
+  public static enum WindowBackgroundHatchStyle {
     HATCH_STYLE_HORIZONTAL(0), // The background of the display window will be
-    // horizontal bars.
+                               // horizontal bars.
     HATCH_STYLE_VERTICAL(1), // The background of the display window will be
-    // vertical bars.
+                             // vertical bars.
     HATCH_STYLE_FORWARD_DIAGONAL(2), // The background of the display window
-    // will be diagonal bars.
+                                     // will be diagonal bars.
     HATCH_STYLE_BACKWARD_DIAGONAL(3), // The background of the display window
-    // will be diagonal bars.
+                                      // will be diagonal bars.
     HATCH_STYLE_CROSS(4), // The background of the display window will be
-    // intersecting horizontal and vertical bars.
+                          // intersecting horizontal and vertical bars.
     HATCH_STYLE_CROSS_HATCH(5), // The background of the display window will be
-    // intersecting forward and backward diagonal
-    // bars.
+                                // intersecting forward and backward diagonal
+                                // bars.
     ;
     private final int value;
 
-    WindowBackgroundHatchStyle(int value) {
+    private WindowBackgroundHatchStyle(int value) {
       this.value = value;
     }
 
@@ -4651,25 +4607,24 @@ public class NIVision {
     }
   }
 
-  public enum DataMatrixMirrorMode {
+  public static enum DataMatrixMirrorMode {
     AUTO_DETECT_MIRROR(-2), // Specifies that the function should determine if
-    // the Data Matrix barcode is mirrored.
+                            // the Data Matrix barcode is mirrored.
     APPEARS_NORMAL(0), // Specifies that the function should expect the Data
-    // Matrix barcode to appear normal.
+                       // Matrix barcode to appear normal.
     APPEARS_MIRRORED(1), // Specifies that the function should expect the Data
-    // Matrix barcode to appear mirrored.
+                         // Matrix barcode to appear mirrored.
     ;
     private final int value;
 
-    DataMatrixMirrorMode(int value) {
+    private DataMatrixMirrorMode(int value) {
       this.value = value;
     }
 
     public static DataMatrixMirrorMode fromValue(int val) {
       for (DataMatrixMirrorMode v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -4679,18 +4634,18 @@ public class NIVision {
     }
   }
 
-  public enum CalibrationMode2 {
+  public static enum CalibrationMode2 {
     PERSPECTIVE_MODE(0), // Functions correct for distortion caused by the
-    // camera's perspective.
+                         // camera's perspective.
     MICROPLANE_MODE(1), // Functions correct for distortion caused by the
-    // camera's lens.
+                        // camera's lens.
     SIMPLE_CALIBRATION_MODE(2), // Functions do not correct for distortion.
     CORRECTED_IMAGE_MODE(3), // The image is already corrected.
     NO_CALIBRATION_MODE(4), // Image with No calibration.
     ;
     private final int value;
 
-    CalibrationMode2(int value) {
+    private CalibrationMode2(int value) {
       this.value = value;
     }
 
@@ -4707,14 +4662,14 @@ public class NIVision {
     }
   }
 
-  public enum DataMatrixGradingMode {
+  public static enum DataMatrixGradingMode {
     NO_GRADING(0), // The function does not make any preparatory calculations.
     PREPARE_FOR_AIM(1), // The function prepares the image for grading using the
-    // AIM Print Quality metrics.
+                        // AIM Print Quality metrics.
     ;
     private final int value;
 
-    DataMatrixGradingMode(int value) {
+    private DataMatrixGradingMode(int value) {
       this.value = value;
     }
 
@@ -4731,14 +4686,14 @@ public class NIVision {
     }
   }
 
-  public enum WaveletTransformMode {
+  public static enum WaveletTransformMode {
     WAVELET_TRANSFORM_INTEGER(0), // Uses a 5-3 reversible integer transform.
     WAVELET_TRANSFORM_FLOATING_POINT(1), // Performs a 9-7 irreversible
-    // floating-point transform.
+                                         // floating-point transform.
     ;
     private final int value;
 
-    WaveletTransformMode(int value) {
+    private WaveletTransformMode(int value) {
       this.value = value;
     }
 
@@ -4755,18 +4710,18 @@ public class NIVision {
     }
   }
 
-  public enum NormalizationMethod {
+  public static enum NormalizationMethod {
     NORMALIZATION_NONE(0), // No normalization.
     NORMALIZATION_HISTOGRAM_MATCHING(1), // Adjust image so its histogram is
-    // similar to the golden template's
-    // histogram.
+                                         // similar to the golden template's
+                                         // histogram.
     NORMALIZATION_AVERAGE_MATCHING(2), // Adjust image so its mean pixel value
-    // equals the golden template's mean
-    // pixel value.
+                                       // equals the golden template's mean
+                                       // pixel value.
     ;
     private final int value;
 
-    NormalizationMethod(int value) {
+    private NormalizationMethod(int value) {
       this.value = value;
     }
 
@@ -4783,14 +4738,14 @@ public class NIVision {
     }
   }
 
-  public enum RegistrationMethod {
+  public static enum RegistrationMethod {
     REGISTRATION_NONE(0), // No registration.
     REGISTRATION_PERSPECTIVE(1), // Adjust image to correct for minor variations
-    // in alignment or perspective.
+                                 // in alignment or perspective.
     ;
     private final int value;
 
-    RegistrationMethod(int value) {
+    private RegistrationMethod(int value) {
       this.value = value;
     }
 
@@ -4807,33 +4762,32 @@ public class NIVision {
     }
   }
 
-  public enum LinearAveragesMode {
+  public static enum LinearAveragesMode {
     COLUMN_AVERAGES(1), // Specifies that the function calculates the mean pixel
-    // value of each column.
+                        // value of each column.
     ROW_AVERAGES(2), // Specifies that the function calculates the mean pixel
-    // value of each row.
+                     // value of each row.
     RISING_DIAGONAL_AVERAGES(4), // Specifies that the function calculates the
-    // mean pixel value of each diagonal running
-    // from the lower left to the upper right of
-    // the inspected area of the image.
+                                 // mean pixel value of each diagonal running
+                                 // from the lower left to the upper right of
+                                 // the inspected area of the image.
     FALLING_DIAGONAL_AVERAGES(8), // Specifies that the function calculates the
-    // mean pixel value of each diagonal running
-    // from the upper left to the lower right of
-    // the inspected area of the image.
+                                  // mean pixel value of each diagonal running
+                                  // from the upper left to the lower right of
+                                  // the inspected area of the image.
     ALL_LINEAR_AVERAGES(15), // Specifies that the function calculates all four
-    // linear mean pixel values.
+                             // linear mean pixel values.
     ;
     private final int value;
 
-    LinearAveragesMode(int value) {
+    private LinearAveragesMode(int value) {
       this.value = value;
     }
 
     public static LinearAveragesMode fromValue(int val) {
       for (LinearAveragesMode v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -4843,17 +4797,17 @@ public class NIVision {
     }
   }
 
-  public enum CompressionType {
+  public static enum CompressionType {
     COMPRESSION_NONE(0), // Specifies that the function should not compress the
-    // image.
+                         // image.
     COMPRESSION_JPEG(1), // Specifies that the function should use lossy JPEG
-    // compression on the image.
+                         // compression on the image.
     COMPRESSION_PACKED_BINARY(2), // Specifies that the function should use
-    // lossless binary packing on the image.
+                                  // lossless binary packing on the image.
     ;
     private final int value;
 
-    CompressionType(int value) {
+    private CompressionType(int value) {
       this.value = value;
     }
 
@@ -4870,14 +4824,14 @@ public class NIVision {
     }
   }
 
-  public enum FlattenType {
+  public static enum FlattenType {
     FLATTEN_IMAGE(0), // Flattens just the image data.
     FLATTEN_IMAGE_AND_VISION_INFO(1), // Flattens the image data and any Vision
-    // information associated with the image.
+                                      // information associated with the image.
     ;
     private final int value;
 
-    FlattenType(int value) {
+    private FlattenType(int value) {
       this.value = value;
     }
 
@@ -4894,12 +4848,12 @@ public class NIVision {
     }
   }
 
-  public enum DataMatrixCellSampleSize {
+  public static enum DataMatrixCellSampleSize {
     AUTO_DETECT_CELL_SAMPLE_SIZE(-2), // The function will try each sample size
-    // and use the one which decodes the Data
-    // Matrix barcode within the fewest
-    // iterations and utilizing the least
-    // amount of error correction.
+                                      // and use the one which decodes the Data
+                                      // Matrix barcode within the fewest
+                                      // iterations and utilizing the least
+                                      // amount of error correction.
     C1x1(1), // The function will use a 1x1 sized sample from each cell.
     C2x2(2), // The function will use a 2x2 sized sample from each cell.
     C3x3(3), // The function will use a 3x3 sized sample from each cell.
@@ -4910,15 +4864,14 @@ public class NIVision {
     ;
     private final int value;
 
-    DataMatrixCellSampleSize(int value) {
+    private DataMatrixCellSampleSize(int value) {
       this.value = value;
     }
 
     public static DataMatrixCellSampleSize fromValue(int val) {
       for (DataMatrixCellSampleSize v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -5030,11 +4983,11 @@ public class NIVision {
 
   public static class PolyModel extends DisposedStruct {
     public float[] kCoeffs; // The learned radial coefficients of polynomial
-    // model.
+                            // model.
     public float p1; // The P1(learned tangential coefficients of polynomial
-    // model).
+                     // model).
     public float p2; // The P2(learned tangential coefficients of polynomial
-    // model).
+                     // model).
     private ByteBuffer kCoeffs_buf;
 
     private void init() {
@@ -5096,7 +5049,7 @@ public class NIVision {
     public DistortionModel distortionModel; // Type of learned distortion model.
     public PolyModel polyModel; // The learned coefficients of polynomial model.
     public DivisionModel divisionModel; // The learned coefficient of division
-    // model.
+                                        // model.
 
     private void init() {
       polyModel = new PolyModel(backing, 4);
@@ -5109,7 +5062,7 @@ public class NIVision {
     }
 
     public DistortionModelParams(DistortionModel distortionModel, PolyModel polyModel,
-                                 DivisionModel divisionModel) {
+        DivisionModel divisionModel) {
       super(24);
       this.distortionModel = distortionModel;
       this.polyModel = polyModel;
@@ -5137,9 +5090,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (distortionModel != null) {
+      if (distortionModel != null)
         backing.putInt(0, distortionModel.getValue());
-      }
       polyModel.write();
       divisionModel.write();
     }
@@ -5213,7 +5165,7 @@ public class NIVision {
     }
 
     public InternalParameters(byte isInsufficientData, FocalLength focalLength,
-                              PointFloat opticalCenter) {
+        PointFloat opticalCenter) {
       super(20);
       this.isInsufficientData = isInsufficientData;
       this.focalLength = focalLength;
@@ -5349,12 +5301,12 @@ public class NIVision {
 
   public static class CalibrationReferencePoints extends DisposedStruct {
     public PointDouble[] pixelCoords; // Specifies the coordinates of the pixel
-    // reference points.
+                                      // reference points.
     public PointDouble[] realCoords; // Specifies the measuring unit associated
-    // with the image.
+                                     // with the image.
     public CalibrationUnit units; // Specifies the units of X Step and Y Step.
     public ImageSize imageSize; // Specifies the size of calibration template
-    // image.
+                                // image.
     private ByteBuffer pixelCoords_buf;
     private ByteBuffer realCoords_buf;
 
@@ -5370,7 +5322,7 @@ public class NIVision {
     }
 
     public CalibrationReferencePoints(PointDouble[] pixelCoords, PointDouble[] realCoords,
-                                      CalibrationUnit units, ImageSize imageSize) {
+        CalibrationUnit units, ImageSize imageSize) {
       super(28);
       this.pixelCoords = pixelCoords;
       this.realCoords = realCoords;
@@ -5434,9 +5386,8 @@ public class NIVision {
       }
       backing.putInt(12, realCoords.length);
       putPointer(backing, 8, realCoords_buf);
-      if (units != null) {
+      if (units != null)
         backing.putInt(16, units.getValue());
-      }
       imageSize.write();
     }
 
@@ -5450,8 +5401,8 @@ public class NIVision {
     public int projectionMatrixCols; // Number of columns in projection matrix.
     public DistortionModelParams distortion; // Distortion model Coefficients.
     public InternalParameters internalParams; // The learned internal paramters
-    // of camera model such as focal
-    // length and optical center.
+                                              // of camera model such as focal
+                                              // length and optical center.
 
     private void init() {
       distortion = new DistortionModelParams(backing, 12);
@@ -5464,8 +5415,7 @@ public class NIVision {
     }
 
     public GetCameraParametersReport(int projectionMatrixRows, int projectionMatrixCols,
-                                     DistortionModelParams distortion, InternalParameters
-                                         internalParams) {
+        DistortionModelParams distortion, InternalParameters internalParams) {
       super(56);
       this.projectionMatrixRows = projectionMatrixRows;
       this.projectionMatrixCols = projectionMatrixCols;
@@ -5508,13 +5458,13 @@ public class NIVision {
 
   public static class CalibrationAxisInfo extends DisposedStruct {
     public PointFloat center; // The origin of the reference coordinate system,
-    // expressed in pixel units.
+                              // expressed in pixel units.
     public float rotationAngle; // The angle of the x-axis of the real-world
-    // coordinate system, in relation to the
-    // horizontal.
+                                // coordinate system, in relation to the
+                                // horizontal.
     public AxisOrientation axisDirection; // Specifies the direction of the
-    // calibraiton axis which is either
-    // Direct or Indirect.
+                                          // calibraiton axis which is either
+                                          // Direct or Indirect.
 
     private void init() {
       center = new PointFloat(backing, 0);
@@ -5526,7 +5476,7 @@ public class NIVision {
     }
 
     public CalibrationAxisInfo(PointFloat center, double rotationAngle,
-                               AxisOrientation axisDirection) {
+        AxisOrientation axisDirection) {
       super(16);
       this.center = center;
       this.rotationAngle = (float) rotationAngle;
@@ -5556,9 +5506,8 @@ public class NIVision {
     public void write() {
       center.write();
       backing.putFloat(8, rotationAngle);
-      if (axisDirection != null) {
+      if (axisDirection != null)
         backing.putInt(12, axisDirection.getValue());
-      }
     }
 
     public int size() {
@@ -5568,14 +5517,14 @@ public class NIVision {
 
   public static class CalibrationLearnSetupInfo extends DisposedStruct {
     public CalibrationMode2 calibrationMethod; // Type of calibration method
-    // used.
+                                               // used.
     public DistortionModel distortionModel; // Type of learned distortion model.
     public ScalingMethod scaleMode; // The aspect scaling to use when correcting
-    // an image.
+                                    // an image.
     public CalibrationROI roiMode; // The ROI to use when correcting an image.
     public byte learnCorrectionTable; // Set this input to true value if you
-    // want the correction table to be
-    // determined and stored.
+                                      // want the correction table to be
+                                      // determined and stored.
 
     private void init() {
 
@@ -5587,9 +5536,8 @@ public class NIVision {
     }
 
     public CalibrationLearnSetupInfo(CalibrationMode2 calibrationMethod,
-                                     DistortionModel distortionModel, ScalingMethod scaleMode,
-                                     CalibrationROI roiMode,
-                                     byte learnCorrectionTable) {
+        DistortionModel distortionModel, ScalingMethod scaleMode, CalibrationROI roiMode,
+        byte learnCorrectionTable) {
       super(20);
       this.calibrationMethod = calibrationMethod;
       this.distortionModel = distortionModel;
@@ -5621,18 +5569,14 @@ public class NIVision {
     }
 
     public void write() {
-      if (calibrationMethod != null) {
+      if (calibrationMethod != null)
         backing.putInt(0, calibrationMethod.getValue());
-      }
-      if (distortionModel != null) {
+      if (distortionModel != null)
         backing.putInt(4, distortionModel.getValue());
-      }
-      if (scaleMode != null) {
+      if (scaleMode != null)
         backing.putInt(8, scaleMode.getValue());
-      }
-      if (roiMode != null) {
+      if (roiMode != null)
         backing.putInt(12, roiMode.getValue());
-      }
       backing.put(16, learnCorrectionTable);
     }
 
@@ -5643,9 +5587,9 @@ public class NIVision {
 
   public static class GridDescriptor extends DisposedStruct {
     public float xStep; // The distance in the x direction between two adjacent
-    // pixels in units specified by unit.
+                        // pixels in units specified by unit.
     public float yStep; // The distance in the y direction between two adjacent
-    // pixels in units specified by unit.
+                        // pixels in units specified by unit.
     public CalibrationUnit unit; // The unit of measure for the image.
 
     private void init() {
@@ -5687,9 +5631,8 @@ public class NIVision {
     public void write() {
       backing.putFloat(0, xStep);
       backing.putFloat(4, yStep);
-      if (unit != null) {
+      if (unit != null)
         backing.putInt(8, unit.getValue());
-      }
     }
 
     public int size() {
@@ -5701,7 +5644,7 @@ public class NIVision {
     public double mean; // Mean error statistics value.
     public double maximum; // Maximum value of error.
     public double standardDeviation; // The standard deviation error statistiscs
-    // value.
+                                     // value.
     public double distortion; // The distortion error statistics value.
 
     private void init() {
@@ -5713,8 +5656,7 @@ public class NIVision {
       init();
     }
 
-    public ErrorStatistics(double mean, double maximum, double standardDeviation, double
-        distortion) {
+    public ErrorStatistics(double mean, double maximum, double standardDeviation, double distortion) {
       super(32);
       this.mean = mean;
       this.maximum = maximum;
@@ -5757,20 +5699,20 @@ public class NIVision {
 
   public static class GetCalibrationInfoReport extends DisposedStruct {
     public ROI userRoi; // Specifies the ROI the user provided when learning the
-    // calibration.
+                        // calibration.
     public ROI calibrationRoi; // Specifies the ROI that corresponds to the
-    // region of the image where the calibration
-    // information is accurate.
+                               // region of the image where the calibration
+                               // information is accurate.
     public CalibrationAxisInfo axisInfo; // Reference Coordinate System for the
-    // real-world coordinates.
+                                         // real-world coordinates.
     public CalibrationLearnSetupInfo learnSetupInfo; // Calibration learn setup
-    // information.
+                                                     // information.
     public GridDescriptor gridDescriptor; // Specifies scaling constants used to
-    // calibrate the image.
+                                          // calibrate the image.
     public int errorMapRows; // Number of rows in error map.
     public int errorMapCols; // Number of Columns in error map.
     public ErrorStatistics errorStatistics; // Error statistics of the
-    // calibration.
+                                            // calibration.
 
     private void init() {
       axisInfo = new CalibrationAxisInfo(backing, 8);
@@ -5785,9 +5727,8 @@ public class NIVision {
     }
 
     public GetCalibrationInfoReport(ROI userRoi, ROI calibrationRoi, CalibrationAxisInfo axisInfo,
-                                    CalibrationLearnSetupInfo learnSetupInfo, GridDescriptor
-                                        gridDescriptor, int errorMapRows,
-                                    int errorMapCols, ErrorStatistics errorStatistics) {
+        CalibrationLearnSetupInfo learnSetupInfo, GridDescriptor gridDescriptor, int errorMapRows,
+        int errorMapCols, ErrorStatistics errorStatistics) {
       super(104);
       this.userRoi = userRoi;
       this.calibrationRoi = calibrationRoi;
@@ -5815,17 +5756,15 @@ public class NIVision {
 
     public void read() {
       long userRoi_addr = getPointer(backing, 0);
-      if (userRoi_addr == 0) {
+      if (userRoi_addr == 0)
         userRoi = null;
-      } else {
+      else
         userRoi = new ROI(userRoi_addr, false);
-      }
       long calibrationRoi_addr = getPointer(backing, 4);
-      if (calibrationRoi_addr == 0) {
+      if (calibrationRoi_addr == 0)
         calibrationRoi = null;
-      } else {
+      else
         calibrationRoi = new ROI(calibrationRoi_addr, false);
-      }
       axisInfo.read();
       learnSetupInfo.read();
       gridDescriptor.read();
@@ -5889,12 +5828,10 @@ public class NIVision {
     }
 
     public void write() {
-      if (start != null) {
+      if (start != null)
         backing.putInt(0, start.getValue());
-      }
-      if (end != null) {
+      if (end != null)
         backing.putInt(4, end.getValue());
-      }
     }
 
     public int size() {
@@ -6063,7 +6000,7 @@ public class NIVision {
     }
 
     public ClampResults(double distancePix, double distanceRealWorld, double angleAbs,
-                        double angleRelative) {
+        double angleRelative) {
       super(32);
       this.distancePix = distancePix;
       this.distanceRealWorld = distanceRealWorld;
@@ -6106,9 +6043,9 @@ public class NIVision {
 
   public static class ClampPoints extends DisposedStruct {
     public PointDoublePair pixel; // Specifies the pixel world point pair for
-    // clamp.
+                                  // clamp.
     public PointDoublePair realWorld; // Specifies the real world point pair for
-    // clamp.
+                                      // clamp.
 
     private void init() {
       pixel = new PointDoublePair(backing, 0);
@@ -6160,8 +6097,8 @@ public class NIVision {
     public short G; // The green value of the color.
     public short R; // The red value of the color.
     public short alpha; // The alpha value of the color, which represents extra
-    // information about a color image, such as gamma
-    // correction.
+                        // information about a color image, such as gamma
+                        // correction.
 
     private void init() {
 
@@ -6215,24 +6152,24 @@ public class NIVision {
 
   public static class ClampOverlaySettings extends DisposedStruct {
     public int showSearchArea; // If TRUE, the function overlays the search area
-    // on the image.
+                               // on the image.
     public int showCurves; // If TRUE, the function overlays the curves on the
-    // image.
+                           // image.
     public int showClampLocation; // If TRUE, the function overlays the clamp
-    // location on the image.
+                                  // location on the image.
     public int showResult; // If TRUE, the function overlays the hit lines to
-    // the object and the edge used to generate the hit
-    // line on the result image.
+                           // the object and the edge used to generate the hit
+                           // line on the result image.
     public RGBValue searchAreaColor; // Specifies the RGB color value to use to
-    // overlay the search area.
+                                     // overlay the search area.
     public RGBValue curvesColor; // Specifies the RGB color value to use to
-    // overlay the curves.
+                                 // overlay the curves.
     public RGBValue clampLocationsColor; // Specifies the RGB color value to use
-    // to overlay the clamp locations.
+                                         // to overlay the clamp locations.
     public RGBValue resultColor; // Specifies the RGB color value to use to
-    // overlay the results.
+                                 // overlay the results.
     public String overlayGroupName; // Specifies the group overlay name for the
-    // step overlays.
+                                    // step overlays.
     private ByteBuffer overlayGroupName_buf;
 
     private void init() {
@@ -6248,9 +6185,8 @@ public class NIVision {
     }
 
     public ClampOverlaySettings(int showSearchArea, int showCurves, int showClampLocation,
-                                int showResult, RGBValue searchAreaColor, RGBValue curvesColor,
-                                RGBValue clampLocationsColor, RGBValue resultColor, String
-                                    overlayGroupName) {
+        int showResult, RGBValue searchAreaColor, RGBValue curvesColor,
+        RGBValue clampLocationsColor, RGBValue resultColor, String overlayGroupName) {
       super(36);
       this.showSearchArea = showSearchArea;
       this.showCurves = showCurves;
@@ -6287,9 +6223,9 @@ public class NIVision {
       clampLocationsColor.read();
       resultColor.read();
       long overlayGroupName_addr = getPointer(backing, 32);
-      if (overlayGroupName_addr == 0) {
+      if (overlayGroupName_addr == 0)
         overlayGroupName = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(overlayGroupName_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -6335,11 +6271,11 @@ public class NIVision {
 
   public static class ClampMax2Report extends DisposedStruct {
     public ClampResults clampResults; // Specifies the Clamp results information
-    // returned by the function.
+                                      // returned by the function.
     public ClampPoints clampPoints; // Specifies the clamp points information
-    // returned by the function.
+                                    // returned by the function.
     public int calibrationValid; // Specifies if the calibration information is
-    // valid or not.
+                                 // valid or not.
 
     private void init() {
       clampResults = new ClampResults(backing, 0);
@@ -6351,8 +6287,7 @@ public class NIVision {
       init();
     }
 
-    public ClampMax2Report(ClampResults clampResults, ClampPoints clampPoints, int
-        calibrationValid) {
+    public ClampMax2Report(ClampResults clampResults, ClampPoints clampPoints, int calibrationValid) {
       super(104);
       this.clampResults = clampResults;
       this.clampPoints = clampPoints;
@@ -6392,7 +6327,7 @@ public class NIVision {
 
   public static class ContourFitSplineReport extends DisposedStruct {
     public PointDouble[] points; // It returns the points of the best-fit
-    // B-spline curve.
+                                 // B-spline curve.
     private ByteBuffer points_buf;
 
     private void init() {
@@ -6453,7 +6388,7 @@ public class NIVision {
 
   public static class LineFloat extends DisposedStruct {
     public PointFloat start; // The coordinate location of the start of the
-    // line.
+                             // line.
     public PointFloat end; // The coordinate location of the end of the line.
 
     private void init() {
@@ -6555,11 +6490,11 @@ public class NIVision {
 
   public static class ContourFitLineReport extends DisposedStruct {
     public LineFloat lineSegment; // Line Segment represents the intersection of
-    // the line equation and the contour.
+                                  // the line equation and the contour.
     public LineEquation lineEquation; // Line Equation is a structure of three
-    // coefficients A, B, and C of the
-    // equation in the normal form (Ax + By +
-    // C=0) of the best fit line.
+                                      // coefficients A, B, and C of the
+                                      // equation in the normal form (Ax + By +
+                                      // C=0) of the best fit line.
 
     private void init() {
       lineSegment = new LineFloat(backing, 0);
@@ -6608,10 +6543,10 @@ public class NIVision {
 
   public static class ContourFitPolynomialReport extends DisposedStruct {
     public PointDouble[] bestFit; // It returns the points of the best-fit
-    // polynomial.
+                                  // polynomial.
     public double[] polynomialCoefficients; // Polynomial Coefficients returns
-    // the coefficients of the
-    // polynomial equation.
+                                            // the coefficients of the
+                                            // polynomial equation.
     private ByteBuffer bestFit_buf;
     private ByteBuffer polynomialCoefficients_buf;
 
@@ -6747,9 +6682,9 @@ public class NIVision {
     public PointFloat center; // Center of the Ellipse.
     public double angle; // Angle of the ellipse.
     public double majorRadius; // The length of the semi-major axis of the
-    // ellipse.
+                               // ellipse.
     public double minorRadius; // The length of the semi-minor axis of the
-    // ellipse.
+                               // ellipse.
     public double startAngle; // Start angle of the fitted structure.
     public double endAngle; // End angle of the fitted structure.
 
@@ -6763,7 +6698,7 @@ public class NIVision {
     }
 
     public PartialEllipse(PointFloat center, double angle, double majorRadius, double minorRadius,
-                          double startAngle, double endAngle) {
+        double startAngle, double endAngle) {
       super(48);
       this.center = center;
       this.angle = angle;
@@ -6866,12 +6801,12 @@ public class NIVision {
 
   public static class RangeSettingDouble extends DisposedStruct {
     public SettingType settingType; // Match Constraints specifies the match
-    // option whose values you want to constrain
-    // by the given range.
+                                    // option whose values you want to constrain
+                                    // by the given range.
     public double min; // Min is the minimum value of the range for a given
-    // Match Constraint.
+                       // Match Constraint.
     public double max; // Max is the maximum value of the range for a given
-    // Match Constraint.
+                       // Match Constraint.
 
     private void init() {
 
@@ -6910,9 +6845,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (settingType != null) {
+      if (settingType != null)
         backing.putInt(0, settingType.getValue());
-      }
       backing.putDouble(8, min);
       backing.putDouble(16, max);
     }
@@ -6924,9 +6858,9 @@ public class NIVision {
 
   public static class GeometricAdvancedSetupDataOption extends DisposedStruct {
     public GeometricSetupDataItem type; // It determines the option you want to
-    // use during the matching phase.
+                                        // use during the matching phase.
     public double value; // Value is the value for the option you want to use
-    // during the matching phase.
+                         // during the matching phase.
 
     private void init() {
 
@@ -6963,9 +6897,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (type != null) {
+      if (type != null)
         backing.putInt(0, type.getValue());
-      }
       backing.putDouble(8, value);
     }
 
@@ -6976,24 +6909,24 @@ public class NIVision {
 
   public static class ContourInfoReport extends DisposedStruct {
     public PointDouble[] pointsPixel; // Points (pixel) specifies the location
-    // of every point detected on the curve,
-    // in pixels.
+                                      // of every point detected on the curve,
+                                      // in pixels.
     public PointDouble[] pointsReal; // Points (real) specifies the location of
-    // every point detected on the curve, in
-    // calibrated units.
+                                     // every point detected on the curve, in
+                                     // calibrated units.
     public double[] curvaturePixel; // Curvature Pixel displays the curvature
-    // profile for the selected contour, in
-    // pixels.
+                                    // profile for the selected contour, in
+                                    // pixels.
     public double[] curvatureReal; // Curvature Real displays the curvature
-    // profile for the selected contour, in
-    // calibrated units.
+                                   // profile for the selected contour, in
+                                   // calibrated units.
     public double length; // Length (pixel) specifies the length, in pixels, of
-    // the curves in the image.
+                          // the curves in the image.
     public double lengthReal; // Length (real) specifies the length, in
-    // calibrated units, of the curves within the
-    // curvature range.
+                              // calibrated units, of the curves within the
+                              // curvature range.
     public int hasEquation; // Has Equation specifies whether the contour has a
-    // fitted equation.
+                            // fitted equation.
     private ByteBuffer pointsPixel_buf;
     private ByteBuffer pointsReal_buf;
     private ByteBuffer curvaturePixel_buf;
@@ -7012,9 +6945,8 @@ public class NIVision {
     }
 
     public ContourInfoReport(PointDouble[] pointsPixel, PointDouble[] pointsReal,
-                             double[] curvaturePixel, double[] curvatureReal, double length,
-                             double lengthReal,
-                             int hasEquation) {
+        double[] curvaturePixel, double[] curvatureReal, double length, double lengthReal,
+        int hasEquation) {
       super(56);
       this.pointsPixel = pointsPixel;
       this.pointsReal = pointsReal;
@@ -7119,7 +7051,7 @@ public class NIVision {
   public static class ROILabel extends DisposedStruct {
     public String className; // Specifies the classname you want to segment.
     public int label; // Label is the label number associated with the Class
-    // Name.
+                      // Name.
     private ByteBuffer className_buf;
 
     private void init() {
@@ -7153,9 +7085,9 @@ public class NIVision {
 
     public void read() {
       long className_addr = getPointer(backing, 0);
-      if (className_addr == 0) {
+      if (className_addr == 0)
         className = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(className_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -7349,12 +7281,12 @@ public class NIVision {
     public int windowY; // Y is the window size in y direction.
     public int stepSize; // Step Size is the distance between two windows.
     public int minParticleArea; // Min Particle Area is the minimum number of
-    // allowed pixels.
+                                // allowed pixels.
     public int maxParticleArea; // Max Particle Area is the maximum number of
-    // allowed pixels.
+                                // allowed pixels.
     public short isFineSegment; // When enabled, the step processes the boundary
-    // pixels of each segmentation cluster using a
-    // step size of 1.
+                                // pixels of each segmentation cluster using a
+                                // step size of 1.
 
     private void init() {
 
@@ -7366,7 +7298,7 @@ public class NIVision {
     }
 
     public ColorSegmenationOptions(int windowX, int windowY, int stepSize, int minParticleArea,
-                                   int maxParticleArea, int isFineSegment) {
+        int maxParticleArea, int isFineSegment) {
       super(24);
       this.windowX = windowX;
       this.windowY = windowY;
@@ -7415,18 +7347,18 @@ public class NIVision {
 
   public static class ClassifiedCurve extends DisposedStruct {
     public double length; // Specifies the length, in pixels, of the curves
-    // within the curvature range.
+                          // within the curvature range.
     public double lengthReal; // specifies the length, in calibrated units, of
-    // the curves within the curvature range.
+                              // the curves within the curvature range.
     public double maxCurvature; // specifies the maximum curvature, in pixels,
-    // for the selected curvature range.
+                                // for the selected curvature range.
     public double maxCurvatureReal; // specifies the maximum curvature, in
-    // calibrated units, for the selected
-    // curvature range.
+                                    // calibrated units, for the selected
+                                    // curvature range.
     public int label; // specifies the class to which the the sample belongs.
     public PointDouble[] curvePoints; // Curve Points is a point-coordinate
-    // cluster that defines the points of the
-    // curve.
+                                      // cluster that defines the points of the
+                                      // curve.
     private ByteBuffer curvePoints_buf;
 
     private void init() {
@@ -7439,7 +7371,7 @@ public class NIVision {
     }
 
     public ClassifiedCurve(double length, double lengthReal, double maxCurvature,
-                           double maxCurvatureReal, int label, PointDouble[] curvePoints) {
+        double maxCurvatureReal, int label, PointDouble[] curvePoints) {
       super(48);
       this.length = length;
       this.lengthReal = lengthReal;
@@ -7553,7 +7485,7 @@ public class NIVision {
   public static class RangeLabel extends DisposedStruct {
     public RangeDouble range; // Specifies the range of curvature values.
     public int label; // Class Label specifies the class to which the the sample
-    // belongs.
+                      // belongs.
 
     private void init() {
       range = new RangeDouble(backing, 0);
@@ -7661,12 +7593,12 @@ public class NIVision {
 
   public static class Disparity extends DisposedStruct {
     public PointDouble current; // Current is a array of points that defines the
-    // target contour.
+                                // target contour.
     public PointDouble reference; // reference is a array of points that defines
-    // the template contour.
+                                  // the template contour.
     public double distance; // Specifies the distance, in pixels, between the
-    // template contour point and the target contour
-    // point.
+                            // template contour point and the target contour
+                            // point.
 
     private void init() {
       current = new PointDouble(backing, 0);
@@ -7718,10 +7650,10 @@ public class NIVision {
 
   public static class ComputeDistancesReport extends DisposedStruct {
     public Disparity[] distances; // Distances is an array containing the
-    // computed distances.
+                                  // computed distances.
     public Disparity[] distancesReal; // Distances Real is an array containing
-    // the computed distances in calibrated
-    // units.
+                                      // the computed distances in calibrated
+                                      // units.
     private ByteBuffer distances_buf;
     private ByteBuffer distancesReal_buf;
 
@@ -7805,13 +7737,13 @@ public class NIVision {
 
   public static class MatchMode extends DisposedStruct {
     public int rotation; // Rotation When enabled, the Function searches for
-    // occurrences of the template in the inspection image,
-    // allowing for template matches to be rotated.
+                         // occurrences of the template in the inspection image,
+                         // allowing for template matches to be rotated.
     public int scale; // Rotation When enabled, the Function searches for
-    // occurrences of the template in the inspection image,
-    // allowing for template matches to be rotated.
+                      // occurrences of the template in the inspection image,
+                      // allowing for template matches to be rotated.
     public int occlusion; // Occlusion specifies whether or not to search for
-    // occluded versions of the shape.
+                          // occluded versions of the shape.
 
     private void init() {
 
@@ -7862,26 +7794,26 @@ public class NIVision {
 
   public static class ClassifiedDisparity extends DisposedStruct {
     public double length; // Length (pixel) specifies the length, in pixels, of
-    // the curves within the curvature range.
+                          // the curves within the curvature range.
     public double lengthReal; // Length (real) specifies the length, in
-    // calibrated units, of the curves within the
-    // curvature range.
+                              // calibrated units, of the curves within the
+                              // curvature range.
     public double maxDistance; // Maximum Distance (pixel) specifies the maximum
-    // distance, in pixels, between points along the
-    // selected contour and the template contour.
+                               // distance, in pixels, between points along the
+                               // selected contour and the template contour.
     public double maxDistanceReal; // Maximum Distance (real) specifies the
-    // maximum distance, in calibrated units,
-    // between points along the selected contour
-    // and the template contour.
+                                   // maximum distance, in calibrated units,
+                                   // between points along the selected contour
+                                   // and the template contour.
     public int label; // Class Label specifies the class to which the the sample
-    // belongs.
+                      // belongs.
     public PointDouble[] templateSubsection; // Template subsection points is an
-    // array of points that defines the
-    // boundary of the template.
+                                             // array of points that defines the
+                                             // boundary of the template.
     public PointDouble[] targetSubsection; // Current Points(Target subsection
-    // points) is an array of points that
-    // defines the boundary of the
-    // target.
+                                           // points) is an array of points that
+                                           // defines the boundary of the
+                                           // target.
     private ByteBuffer templateSubsection_buf;
     private ByteBuffer targetSubsection_buf;
 
@@ -7896,8 +7828,8 @@ public class NIVision {
     }
 
     public ClassifiedDisparity(double length, double lengthReal, double maxDistance,
-                               double maxDistanceReal, int label, PointDouble[] templateSubsection,
-                               PointDouble[] targetSubsection) {
+        double maxDistanceReal, int label, PointDouble[] templateSubsection,
+        PointDouble[] targetSubsection) {
       super(56);
       this.length = length;
       this.lengthReal = lengthReal;
@@ -7984,8 +7916,8 @@ public class NIVision {
 
   public static class ClassifyDistancesReport extends DisposedStruct {
     public ClassifiedDisparity[] classifiedDistances; // Disparity array
-    // containing the
-    // classified distances.
+                                                      // containing the
+                                                      // classified distances.
     private ByteBuffer classifiedDistances_buf;
 
     private void init() {
@@ -8049,11 +7981,11 @@ public class NIVision {
 
   public static class ContourComputeCurvatureReport extends DisposedStruct {
     public double[] curvaturePixel; // Curvature Pixel displays the curvature
-    // profile for the selected contour, in
-    // pixels.
+                                    // profile for the selected contour, in
+                                    // pixels.
     public double[] curvatureReal; // Curvature Real displays the curvature
-    // profile for the selected contour, in
-    // calibrated units.
+                                   // profile for the selected contour, in
+                                   // calibrated units.
     private ByteBuffer curvaturePixel_buf;
     private ByteBuffer curvatureReal_buf;
 
@@ -8124,12 +8056,12 @@ public class NIVision {
 
   public static class ContourOverlaySettings extends DisposedStruct {
     public int overlay; // Overlay specifies whether to display the overlay on
-    // the image.
+                        // the image.
     public RGBValue color; // Color is the color of the overlay.
     public int width; // Width specifies the width of the overlay in pixels.
     public int maintainWidth; // Maintain Width? specifies whether you want the
-    // overlay measured in screen pixels or image
-    // pixels.
+                              // overlay measured in screen pixels or image
+                              // pixels.
 
     private void init() {
       color = new RGBValue(backing, 4);
@@ -8183,23 +8115,23 @@ public class NIVision {
 
   public static class CurveParameters extends DisposedStruct {
     public ExtractionMode extractionMode; // Specifies the method the function
-    // uses to identify curves in the
-    // image.
+                                          // uses to identify curves in the
+                                          // image.
     public int threshold; // Specifies the minimum contrast a seed point must
-    // have in order to begin a curve.
+                          // have in order to begin a curve.
     public EdgeFilterSize filterSize; // Specifies the width of the edge filter
-    // the function uses to identify curves in
-    // the image.
+                                      // the function uses to identify curves in
+                                      // the image.
     public int minLength; // Specifies the length, in pixels, of the smallest
-    // curve the function will extract.
+                          // curve the function will extract.
     public int searchStep; // Search Step Size specifies the distance, in the y
-    // direction, between the image rows that the
-    // algorithm inspects for curve seed points.
+                           // direction, between the image rows that the
+                           // algorithm inspects for curve seed points.
     public int maxEndPointGap; // Specifies the maximum gap, in pixels, between
-    // the endpoints of a curve that the function
-    // identifies as a closed curve.
+                               // the endpoints of a curve that the function
+                               // identifies as a closed curve.
     public int subpixel; // Subpixel specifies whether to detect curve points
-    // with subpixel accuracy.
+                         // with subpixel accuracy.
 
     private void init() {
 
@@ -8211,7 +8143,7 @@ public class NIVision {
     }
 
     public CurveParameters(ExtractionMode extractionMode, int threshold, EdgeFilterSize filterSize,
-                           int minLength, int searchStep, int maxEndPointGap, int subpixel) {
+        int minLength, int searchStep, int maxEndPointGap, int subpixel) {
       super(28);
       this.extractionMode = extractionMode;
       this.threshold = threshold;
@@ -8247,13 +8179,11 @@ public class NIVision {
     }
 
     public void write() {
-      if (extractionMode != null) {
+      if (extractionMode != null)
         backing.putInt(0, extractionMode.getValue());
-      }
       backing.putInt(4, threshold);
-      if (filterSize != null) {
+      if (filterSize != null)
         backing.putInt(8, filterSize.getValue());
-      }
       backing.putInt(12, minLength);
       backing.putInt(16, searchStep);
       backing.putInt(20, maxEndPointGap);
@@ -8267,10 +8197,10 @@ public class NIVision {
 
   public static class ExtractContourReport extends DisposedStruct {
     public PointDouble[] contourPoints; // Contour Points specifies every point
-    // found on the contour.
+                                        // found on the contour.
     public PointDouble[] sourcePoints; // Source Image Points specifies every
-    // point found on the contour in the
-    // source image.
+                                       // point found on the contour in the
+                                       // source image.
     private ByteBuffer contourPoints_buf;
     private ByteBuffer sourcePoints_buf;
 
@@ -8354,9 +8284,9 @@ public class NIVision {
 
   public static class ConnectionConstraint extends DisposedStruct {
     public ConnectionConstraintType constraintType; // Constraint Type specifies
-    // what criteria to use to
-    // consider two curves part
-    // of a contour.
+                                                    // what criteria to use to
+                                                    // consider two curves part
+                                                    // of a contour.
     public RangeDouble range; // Specifies range for a given Match Constraint.
 
     private void init() {
@@ -8394,9 +8324,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (constraintType != null) {
+      if (constraintType != null)
         backing.putInt(0, constraintType.getValue());
-      }
       range.write();
     }
 
@@ -8407,9 +8336,9 @@ public class NIVision {
 
   public static class ExtractTextureFeaturesReport extends DisposedStruct {
     public int[] waveletBands; // The array having all the Wavelet Banks used
-    // for extraction.
+                               // for extraction.
     public int textureFeaturesRows; // Number of Rows in the Texture Features
-    // array.
+                                    // array.
     public int textureFeaturesCols; // Number of Cols in Texture Features array.
     private ByteBuffer waveletBands_buf;
 
@@ -8423,7 +8352,7 @@ public class NIVision {
     }
 
     public ExtractTextureFeaturesReport(int[] waveletBands, int textureFeaturesRows,
-                                        int textureFeaturesCols) {
+        int textureFeaturesCols) {
       super(20);
       this.waveletBands = waveletBands;
       this.textureFeaturesRows = textureFeaturesRows;
@@ -8525,12 +8454,12 @@ public class NIVision {
 
   public static class CircleFitOptions extends DisposedStruct {
     public int maxRadius; // Specifies the acceptable distance, in pixels, that
-    // a point determined to belong to the circle can be
-    // from the perimeter of the circle.
+                          // a point determined to belong to the circle can be
+                          // from the perimeter of the circle.
     public double stepSize; // Step Size is the angle, in degrees, between each
-    // radial line in the annular region.
+                            // radial line in the annular region.
     public RakeProcessType processType; // Method used to process the data
-    // extracted for edge detection.
+                                        // extracted for edge detection.
 
     private void init() {
 
@@ -8571,9 +8500,8 @@ public class NIVision {
     public void write() {
       backing.putInt(0, maxRadius);
       backing.putDouble(8, stepSize);
-      if (processType != null) {
+      if (processType != null)
         backing.putInt(16, processType.getValue());
-      }
     }
 
     public int size() {
@@ -8583,19 +8511,19 @@ public class NIVision {
 
   public static class EdgeOptions2 extends DisposedStruct {
     public EdgePolaritySearchMode polarity; // Specifies the polarity of the
-    // edges to be found.
+                                            // edges to be found.
     public int kernelSize; // Specifies the size of the edge detection kernel.
     public int width; // Specifies the number of pixels averaged perpendicular
-    // to the search direction to compute the edge profile
-    // strength at each point along the search ROI.
+                      // to the search direction to compute the edge profile
+                      // strength at each point along the search ROI.
     public float minThreshold; // Specifies the minimum edge strength (gradient
-    // magnitude) required for a detected edge.
+                               // magnitude) required for a detected edge.
     public InterpolationMethod interpolationType; // Specifies the interpolation
-    // method used to locate the
-    // edge position.
+                                                  // method used to locate the
+                                                  // edge position.
     public ColumnProcessingMode columnProcessingMode; // Specifies the method
-    // used to find the
-    // straight edge.
+                                                      // used to find the
+                                                      // straight edge.
 
     private void init() {
 
@@ -8607,8 +8535,8 @@ public class NIVision {
     }
 
     public EdgeOptions2(EdgePolaritySearchMode polarity, int kernelSize, int width,
-                        double minThreshold, InterpolationMethod interpolationType,
-                        ColumnProcessingMode columnProcessingMode) {
+        double minThreshold, InterpolationMethod interpolationType,
+        ColumnProcessingMode columnProcessingMode) {
       super(24);
       this.polarity = polarity;
       this.kernelSize = kernelSize;
@@ -8642,18 +8570,15 @@ public class NIVision {
     }
 
     public void write() {
-      if (polarity != null) {
+      if (polarity != null)
         backing.putInt(0, polarity.getValue());
-      }
       backing.putInt(4, kernelSize);
       backing.putInt(8, width);
       backing.putFloat(12, minThreshold);
-      if (interpolationType != null) {
+      if (interpolationType != null)
         backing.putInt(16, interpolationType.getValue());
-      }
-      if (columnProcessingMode != null) {
+      if (columnProcessingMode != null)
         backing.putInt(20, columnProcessingMode.getValue());
-      }
     }
 
     public int size() {
@@ -8663,28 +8588,28 @@ public class NIVision {
 
   public static class FindCircularEdgeOptions extends DisposedStruct {
     public SpokeDirection direction; // Specifies the Spoke direction to search
-    // in the ROI.
+                                     // in the ROI.
     public int showSearchArea; // If TRUE, the function overlays the search area
-    // on the image.
+                               // on the image.
     public int showSearchLines; // If TRUE, the function overlays the search
-    // lines used to locate the edges on the image.
+                                // lines used to locate the edges on the image.
     public int showEdgesFound; // If TRUE, the function overlays the locations
-    // of the edges found on the image.
+                               // of the edges found on the image.
     public int showResult; // If TRUE, the function overlays the hit lines to
-    // the object and the edge used to generate the hit
-    // line on the result image.
+                           // the object and the edge used to generate the hit
+                           // line on the result image.
     public RGBValue searchAreaColor; // Specifies the RGB color value to use to
-    // overlay the search area.
+                                     // overlay the search area.
     public RGBValue searchLinesColor; // Specifies the RGB color value to use to
-    // overlay the search lines.
+                                      // overlay the search lines.
     public RGBValue searchEdgesColor; // Specifies the RGB color value to use to
-    // overlay the search edges.
+                                      // overlay the search edges.
     public RGBValue resultColor; // Specifies the RGB color value to use to
-    // overlay the results.
+                                 // overlay the results.
     public String overlayGroupName; // Specifies the overlay group name to
-    // assign to the overlays.
+                                    // assign to the overlays.
     public EdgeOptions2 edgeOptions; // Specifies the edge detection options
-    // along a single search line.
+                                     // along a single search line.
     private ByteBuffer overlayGroupName_buf;
 
     private void init() {
@@ -8701,11 +8626,9 @@ public class NIVision {
     }
 
     public FindCircularEdgeOptions(SpokeDirection direction, int showSearchArea,
-                                   int showSearchLines, int showEdgesFound, int showResult,
-                                   RGBValue searchAreaColor,
-                                   RGBValue searchLinesColor, RGBValue searchEdgesColor, RGBValue
-                                       resultColor,
-                                   String overlayGroupName, EdgeOptions2 edgeOptions) {
+        int showSearchLines, int showEdgesFound, int showResult, RGBValue searchAreaColor,
+        RGBValue searchLinesColor, RGBValue searchEdgesColor, RGBValue resultColor,
+        String overlayGroupName, EdgeOptions2 edgeOptions) {
       super(64);
       this.direction = direction;
       this.showSearchArea = showSearchArea;
@@ -8745,9 +8668,9 @@ public class NIVision {
       searchEdgesColor.read();
       resultColor.read();
       long overlayGroupName_addr = getPointer(backing, 36);
-      if (overlayGroupName_addr == 0) {
+      if (overlayGroupName_addr == 0)
         overlayGroupName = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(overlayGroupName_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -8764,9 +8687,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (direction != null) {
+      if (direction != null)
         backing.putInt(0, direction.getValue());
-      }
       backing.putInt(4, showSearchArea);
       backing.putInt(8, showSearchLines);
       backing.putInt(12, showEdgesFound);
@@ -8798,28 +8720,28 @@ public class NIVision {
 
   public static class FindConcentricEdgeOptions extends DisposedStruct {
     public ConcentricRakeDirection direction; // Specifies the Concentric Rake
-    // direction.
+                                              // direction.
     public int showSearchArea; // If TRUE, the function overlays the search area
-    // on the image.
+                               // on the image.
     public int showSearchLines; // If TRUE, the function overlays the search
-    // lines used to locate the edges on the image.
+                                // lines used to locate the edges on the image.
     public int showEdgesFound; // If TRUE, the function overlays the locations
-    // of the edges found on the image.
+                               // of the edges found on the image.
     public int showResult; // If TRUE, the function overlays the hit lines to
-    // the object and the edge used to generate the hit
-    // line on the result image.
+                           // the object and the edge used to generate the hit
+                           // line on the result image.
     public RGBValue searchAreaColor; // Specifies the RGB color value to use to
-    // overlay the search area.
+                                     // overlay the search area.
     public RGBValue searchLinesColor; // Specifies the RGB color value to use to
-    // overlay the search lines.
+                                      // overlay the search lines.
     public RGBValue searchEdgesColor; // Specifies the RGB color value to use to
-    // overlay the search edges.
+                                      // overlay the search edges.
     public RGBValue resultColor; // Specifies the RGB color value to use to
-    // overlay the results.
+                                 // overlay the results.
     public String overlayGroupName; // Specifies the overlay group name to
-    // assign to the overlays.
+                                    // assign to the overlays.
     public EdgeOptions2 edgeOptions; // Specifies the edge detection options
-    // along a single search line.
+                                     // along a single search line.
     private ByteBuffer overlayGroupName_buf;
 
     private void init() {
@@ -8836,11 +8758,9 @@ public class NIVision {
     }
 
     public FindConcentricEdgeOptions(ConcentricRakeDirection direction, int showSearchArea,
-                                     int showSearchLines, int showEdgesFound, int showResult,
-                                     RGBValue searchAreaColor,
-                                     RGBValue searchLinesColor, RGBValue searchEdgesColor,
-                                     RGBValue resultColor,
-                                     String overlayGroupName, EdgeOptions2 edgeOptions) {
+        int showSearchLines, int showEdgesFound, int showResult, RGBValue searchAreaColor,
+        RGBValue searchLinesColor, RGBValue searchEdgesColor, RGBValue resultColor,
+        String overlayGroupName, EdgeOptions2 edgeOptions) {
       super(64);
       this.direction = direction;
       this.showSearchArea = showSearchArea;
@@ -8880,9 +8800,9 @@ public class NIVision {
       searchEdgesColor.read();
       resultColor.read();
       long overlayGroupName_addr = getPointer(backing, 36);
-      if (overlayGroupName_addr == 0) {
+      if (overlayGroupName_addr == 0)
         overlayGroupName = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(overlayGroupName_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -8899,9 +8819,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (direction != null) {
+      if (direction != null)
         backing.putInt(0, direction.getValue());
-      }
       backing.putInt(4, showSearchArea);
       backing.putInt(8, showSearchLines);
       backing.putInt(12, showEdgesFound);
@@ -8933,12 +8852,12 @@ public class NIVision {
 
   public static class ConcentricEdgeFitOptions extends DisposedStruct {
     public int maxRadius; // Specifies the acceptable distance, in pixels, that
-    // a point determined to belong to the circle can be
-    // from the perimeter of the circle.
+                          // a point determined to belong to the circle can be
+                          // from the perimeter of the circle.
     public double stepSize; // The sampling factor that determines the gap
-    // between the rake lines.
+                            // between the rake lines.
     public RakeProcessType processType; // Method used to process the data
-    // extracted for edge detection.
+                                        // extracted for edge detection.
 
     private void init() {
 
@@ -8979,9 +8898,8 @@ public class NIVision {
     public void write() {
       backing.putInt(0, maxRadius);
       backing.putDouble(8, stepSize);
-      if (processType != null) {
+      if (processType != null)
         backing.putInt(16, processType.getValue());
-      }
     }
 
     public int size() {
@@ -8991,19 +8909,19 @@ public class NIVision {
 
   public static class FindConcentricEdgeReport extends DisposedStruct {
     public PointFloat startPt; // Pixel Coordinates for starting point of the
-    // edge.
+                               // edge.
     public PointFloat endPt; // Pixel Coordinates for end point of the edge.
     public PointFloat startPtCalibrated; // Real world Coordinates for starting
-    // point of the edge.
+                                         // point of the edge.
     public PointFloat endPtCalibrated; // Real world Coordinates for end point
-    // of the edge.
+                                       // of the edge.
     public double angle; // Angle of the edge found.
     public double angleCalibrated; // Calibrated angle of the edge found.
     public double straightness; // The straightness value of the detected
-    // straight edge.
+                                // straight edge.
     public double avgStrength; // Average strength of the egde found.
     public double avgSNR; // Average SNR(Signal to Noise Ratio) for the edge
-    // found.
+                          // found.
     public int lineFound; // If the edge is found or not.
 
     private void init() {
@@ -9019,11 +8937,9 @@ public class NIVision {
     }
 
     public FindConcentricEdgeReport(PointFloat startPt, PointFloat endPt,
-                                    PointFloat startPtCalibrated, PointFloat endPtCalibrated,
-                                    double angle,
-                                    double angleCalibrated, double straightness, double
-                                        avgStrength, double avgSNR,
-                                    int lineFound) {
+        PointFloat startPtCalibrated, PointFloat endPtCalibrated, double angle,
+        double angleCalibrated, double straightness, double avgStrength, double avgSNR,
+        int lineFound) {
       super(80);
       this.startPt = startPt;
       this.endPt = endPt;
@@ -9085,13 +9001,13 @@ public class NIVision {
   public static class FindCircularEdgeReport extends DisposedStruct {
     public PointFloat centerCalibrated; // Real world Coordinates of the Center.
     public double radiusCalibrated; // Real world radius of the Circular Edge
-    // found.
+                                    // found.
     public PointFloat center; // Pixel Coordinates of the Center.
     public double radius; // Radius in pixels of the Circular Edge found.
     public double roundness; // The roundness of the calculated circular edge.
     public double avgStrength; // Average strength of the egde found.
     public double avgSNR; // Average SNR(Signal to Noise Ratio) for the edge
-    // found.
+                          // found.
     public int circleFound; // If the circlular edge is found or not.
 
     private void init() {
@@ -9105,9 +9021,8 @@ public class NIVision {
     }
 
     public FindCircularEdgeReport(PointFloat centerCalibrated, double radiusCalibrated,
-                                  PointFloat center, double radius, double roundness, double
-                                      avgStrength, double avgSNR,
-                                  int circleFound) {
+        PointFloat center, double radius, double roundness, double avgStrength, double avgSNR,
+        int circleFound) {
       super(64);
       this.centerCalibrated = centerCalibrated;
       this.radiusCalibrated = radiusCalibrated;
@@ -9263,7 +9178,7 @@ public class NIVision {
   public static class WaveletOptions extends DisposedStruct {
     public WaveletType typeOfWavelet; // Type of wavelet(db, bior.
     public float minEnergy; // Minimum Energy in the bands to consider for
-    // texture defect detection.
+                            // texture defect detection.
 
     private void init() {
 
@@ -9300,9 +9215,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (typeOfWavelet != null) {
+      if (typeOfWavelet != null)
         backing.putInt(0, typeOfWavelet.getValue());
-      }
       backing.putFloat(4, minEnergy);
     }
 
@@ -9314,7 +9228,7 @@ public class NIVision {
   public static class CooccurrenceOptions extends DisposedStruct {
     public int level; // Level/size of matrix.
     public DisplacementVector displacement; // Displacemnet between pixels to
-    // accumulate the matrix.
+                                            // accumulate the matrix.
 
     private void init() {
       displacement = new DisplacementVector(backing, 4);
@@ -9362,19 +9276,19 @@ public class NIVision {
 
   public static class ParticleClassifierLocalThresholdOptions extends DisposedStruct {
     public LocalThresholdMethod method; // Specifies the local thresholding
-    // method the function uses.
+                                        // method the function uses.
     public ParticleType particleType; // Specifies what kind of particles to
-    // look for.
+                                      // look for.
     public int windowWidth; // The width of the rectangular window around the
-    // pixel on which the function performs the local
-    // threshold.
+                            // pixel on which the function performs the local
+                            // threshold.
     public int windowHeight; // The height of the rectangular window around the
-    // pixel on which the function performs the local
-    // threshold.
+                             // pixel on which the function performs the local
+                             // threshold.
     public double deviationWeight; // Specifies the k constant used in the
-    // Niblack local thresholding algorithm,
-    // which determines the weight applied to the
-    // variance calculation.
+                                   // Niblack local thresholding algorithm,
+                                   // which determines the weight applied to the
+                                   // variance calculation.
 
     private void init() {
 
@@ -9386,8 +9300,7 @@ public class NIVision {
     }
 
     public ParticleClassifierLocalThresholdOptions(LocalThresholdMethod method,
-                                                   ParticleType particleType, int windowWidth,
-                                                   int windowHeight, double deviationWeight) {
+        ParticleType particleType, int windowWidth, int windowHeight, double deviationWeight) {
       super(24);
       this.method = method;
       this.particleType = particleType;
@@ -9419,12 +9332,10 @@ public class NIVision {
     }
 
     public void write() {
-      if (method != null) {
+      if (method != null)
         backing.putInt(0, method.getValue());
-      }
-      if (particleType != null) {
+      if (particleType != null)
         backing.putInt(4, particleType.getValue());
-      }
       backing.putInt(8, windowWidth);
       backing.putInt(12, windowHeight);
       backing.putDouble(16, deviationWeight);
@@ -9485,9 +9396,9 @@ public class NIVision {
 
   public static class ParticleClassifierAutoThresholdOptions extends DisposedStruct {
     public ThresholdMethod method; // The method for binary thresholding, which
-    // specifies how to calculate the classes.
+                                   // specifies how to calculate the classes.
     public ParticleType particleType; // Specifies what kind of particles to
-    // look for.
+                                      // look for.
     public RangeFloat limits; // The limits on the automatic threshold range.
 
     private void init() {
@@ -9500,7 +9411,7 @@ public class NIVision {
     }
 
     public ParticleClassifierAutoThresholdOptions(ThresholdMethod method,
-                                                  ParticleType particleType, RangeFloat limits) {
+        ParticleType particleType, RangeFloat limits) {
       super(16);
       this.method = method;
       this.particleType = particleType;
@@ -9528,12 +9439,10 @@ public class NIVision {
     }
 
     public void write() {
-      if (method != null) {
+      if (method != null)
         backing.putInt(0, method.getValue());
-      }
-      if (particleType != null) {
+      if (particleType != null)
         backing.putInt(4, particleType.getValue());
-      }
       limits.write();
     }
 
@@ -9544,29 +9453,29 @@ public class NIVision {
 
   public static class ParticleClassifierPreprocessingOptions2 extends DisposedStruct {
     public ParticleClassifierThresholdType thresholdType; // The type of
-    // threshold to
-    // perform on the
-    // image.
+                                                          // threshold to
+                                                          // perform on the
+                                                          // image.
     public RangeFloat manualThresholdRange; // The range of pixels to keep if
-    // manually thresholding the image.
+                                            // manually thresholding the image.
     public ParticleClassifierAutoThresholdOptions autoThresholdOptions; // The
-    // options
-    // used
-    // to
-    // auto
-    // threshold
-    // the
-    // image.
+                                                                        // options
+                                                                        // used
+                                                                        // to
+                                                                        // auto
+                                                                        // threshold
+                                                                        // the
+                                                                        // image.
     public ParticleClassifierLocalThresholdOptions localThresholdOptions; // The
-    // options
-    // used
-    // to
-    // local
-    // threshold
-    // the
-    // image.
+                                                                          // options
+                                                                          // used
+                                                                          // to
+                                                                          // local
+                                                                          // threshold
+                                                                          // the
+                                                                          // image.
     public int rejectBorder; // Set this element to TRUE to reject border
-    // particles.
+                             // particles.
     public int numErosions; // The number of erosions to perform.
 
     private void init() {
@@ -9581,12 +9490,10 @@ public class NIVision {
     }
 
     public ParticleClassifierPreprocessingOptions2(ParticleClassifierThresholdType thresholdType,
-                                                   RangeFloat manualThresholdRange,
-                                                   ParticleClassifierAutoThresholdOptions
-                                                       autoThresholdOptions,
-                                                   ParticleClassifierLocalThresholdOptions
-                                                       localThresholdOptions, int rejectBorder,
-                                                   int numErosions) {
+        RangeFloat manualThresholdRange,
+        ParticleClassifierAutoThresholdOptions autoThresholdOptions,
+        ParticleClassifierLocalThresholdOptions localThresholdOptions, int rejectBorder,
+        int numErosions) {
       super(64);
       this.thresholdType = thresholdType;
       this.manualThresholdRange = manualThresholdRange;
@@ -9620,9 +9527,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (thresholdType != null) {
+      if (thresholdType != null)
         backing.putInt(0, thresholdType.getValue());
-      }
       manualThresholdRange.write();
       autoThresholdOptions.write();
       localThresholdOptions.write();
@@ -9637,7 +9543,7 @@ public class NIVision {
 
   public static class MeasureParticlesReport extends DisposedStruct {
     public int numParticles; // The number of particles on which measurements
-    // were taken.
+                             // were taken.
     public int numMeasurements; // The number of measurements taken.
 
     private void init() {
@@ -9686,50 +9592,48 @@ public class NIVision {
 
   public static class GeometricPatternMatch3 extends DisposedStruct {
     public PointFloat position; // The location of the origin of the template in
-    // the match.
+                                // the match.
     public float rotation; // The rotation of the match relative to the template
-    // image, in degrees.
+                           // image, in degrees.
     public float scale; // The size of the match relative to the size of the
-    // template image, expressed as a percentage.
+                        // template image, expressed as a percentage.
     public float score; // The accuracy of the match.
     public PointFloat[] corner; // An array of four points describing the
-    // rectangle surrounding the template image.
+                                // rectangle surrounding the template image.
     public int inverse; // This element is TRUE if the match is an inverse of
-    // the template image.
+                        // the template image.
     public float occlusion; // The percentage of the match that is occluded.
     public float templateMatchCurveScore; // The accuracy of the match obtained
-    // by comparing the template curves to
-    // the curves in the match region.
+                                          // by comparing the template curves to
+                                          // the curves in the match region.
     public float matchTemplateCurveScore; // The accuracy of the match obtained
-    // by comparing the curves in the
-    // match region to the template
-    // curves.
+                                          // by comparing the curves in the
+                                          // match region to the template
+                                          // curves.
     public float correlationScore; // The accuracy of the match obtained by
-    // comparing the template image to the match
-    // region using a correlation metric that
-    // compares the two regions as a function of
-    // their pixel values.
+                                   // comparing the template image to the match
+                                   // region using a correlation metric that
+                                   // compares the two regions as a function of
+                                   // their pixel values.
     public PointFloat calibratedPosition; // The location of the origin of the
-    // template in the match.
+                                          // template in the match.
     public float calibratedRotation; // The rotation of the match relative to
-    // the template image, in degrees.
+                                     // the template image, in degrees.
     public PointFloat[] calibratedCorner; // An array of four points describing
-    // the rectangle surrounding the
-    // template image.
+                                          // the rectangle surrounding the
+                                          // template image.
 
     private void init() {
       position = new PointFloat(backing, 0);
       corner = new PointFloat[4];
 
-      for (int i = 0, off = 20; i < 4; i++, off += 8) {
+      for (int i = 0, off = 20; i < 4; i++, off += 8)
         corner[i] = new PointFloat(backing, off);
-      }
       calibratedPosition = new PointFloat(backing, 72);
       calibratedCorner = new PointFloat[4];
 
-      for (int i = 0, off = 84; i < 4; i++, off += 8) {
+      for (int i = 0, off = 84; i < 4; i++, off += 8)
         calibratedCorner[i] = new PointFloat(backing, off);
-      }
     }
 
     public GeometricPatternMatch3() {
@@ -9738,11 +9642,9 @@ public class NIVision {
     }
 
     public GeometricPatternMatch3(PointFloat position, double rotation, double scale, double score,
-                                  PointFloat[] corner, int inverse, double occlusion, double
-                                      templateMatchCurveScore,
-                                  double matchTemplateCurveScore, double correlationScore,
-                                  PointFloat calibratedPosition,
-                                  double calibratedRotation, PointFloat[] calibratedCorner) {
+        PointFloat[] corner, int inverse, double occlusion, double templateMatchCurveScore,
+        double matchTemplateCurveScore, double correlationScore, PointFloat calibratedPosition,
+        double calibratedRotation, PointFloat[] calibratedCorner) {
       super(116);
       this.position = position;
       this.rotation = (float) rotation;
@@ -9820,62 +9722,62 @@ public class NIVision {
 
   public static class MatchGeometricPatternAdvancedOptions3 extends DisposedStruct {
     public int subpixelIterations; // Specifies the maximum number of
-    // incremental improvements used to refine
-    // matches with subpixel information.
+                                   // incremental improvements used to refine
+                                   // matches with subpixel information.
     public double subpixelTolerance; // Specifies the maximum amount of change,
-    // in pixels, between consecutive
-    // incremental improvements in the match
-    // position before the function stops
-    // refining the match position.
+                                     // in pixels, between consecutive
+                                     // incremental improvements in the match
+                                     // position before the function stops
+                                     // refining the match position.
     public int initialMatchListLength; // Specifies the maximum size of the
-    // match list.
+                                       // match list.
     public int targetTemplateCurveScore; // Set this element to TRUE to specify
-    // that the function should calculate
-    // the match curve to template curve
-    // score and return it for each match
-    // result.
+                                         // that the function should calculate
+                                         // the match curve to template curve
+                                         // score and return it for each match
+                                         // result.
     public int correlationScore; // Set this element to TRUE to specify that the
-    // function should calculate the correlation
-    // score and return it for each match result.
+                                 // function should calculate the correlation
+                                 // score and return it for each match result.
     public double minMatchSeparationDistance; // Specifies the minimum
-    // separation distance, in pixels,
-    // between the origins of two
-    // matches that have unique
-    // positions.
+                                              // separation distance, in pixels,
+                                              // between the origins of two
+                                              // matches that have unique
+                                              // positions.
     public double minMatchSeparationAngle; // Specifies the minimum angular
-    // difference, in degrees, between
-    // two matches that have unique
-    // angles.
+                                           // difference, in degrees, between
+                                           // two matches that have unique
+                                           // angles.
     public double minMatchSeparationScale; // Specifies the minimum difference
-    // in scale, expressed as a
-    // percentage, between two matches
-    // that have unique scales.
+                                           // in scale, expressed as a
+                                           // percentage, between two matches
+                                           // that have unique scales.
     public double maxMatchOverlap; // Specifies the maximum amount of overlap,
-    // expressed as a percentage, allowed between
-    // the bounding rectangles of two unique
-    // matches.
+                                   // expressed as a percentage, allowed between
+                                   // the bounding rectangles of two unique
+                                   // matches.
     public int coarseResult; // Specifies whether you want the function to spend
-    // less time accurately estimating the location of
-    // a match.
+                             // less time accurately estimating the location of
+                             // a match.
     public int enableCalibrationSupport; // Set this element to TRUE to specify
-    // the algorithm treat the inspection
-    // image as a calibrated image.
+                                         // the algorithm treat the inspection
+                                         // image as a calibrated image.
     public ContrastMode enableContrastReversal; // Use this element to specify
-    // the contrast of the matches
-    // to search for in the image.
+                                                // the contrast of the matches
+                                                // to search for in the image.
     public GeometricMatchingSearchStrategy matchStrategy; // Specifies the
-    // aggressiveness of
-    // the search
-    // strategy.
+                                                          // aggressiveness of
+                                                          // the search
+                                                          // strategy.
     public int refineMatchFactor; // Specifies the factor that is applied to the
-    // number of matches requested by the user to
-    // determine the number of matches that are
-    // refined at the initial matching stage.
+                                  // number of matches requested by the user to
+                                  // determine the number of matches that are
+                                  // refined at the initial matching stage.
     public int subpixelMatchFactor; // Specifies the factor that is applied to
-    // the number of matches requested by the
-    // user to determine the number of matches
-    // that are evaluated at the final subpixel
-    // matching stage.
+                                    // the number of matches requested by the
+                                    // user to determine the number of matches
+                                    // that are evaluated at the final subpixel
+                                    // matching stage.
 
     private void init() {
 
@@ -9887,17 +9789,12 @@ public class NIVision {
     }
 
     public MatchGeometricPatternAdvancedOptions3(int subpixelIterations, double subpixelTolerance,
-                                                 int initialMatchListLength, int
-                                                     targetTemplateCurveScore, int correlationScore,
-                                                 double minMatchSeparationDistance, double
-                                                     minMatchSeparationAngle,
-                                                 double minMatchSeparationScale, double
-                                                     maxMatchOverlap, int coarseResult,
-                                                 int enableCalibrationSupport, ContrastMode
-                                                     enableContrastReversal,
-                                                 GeometricMatchingSearchStrategy matchStrategy,
-                                                 int refineMatchFactor,
-                                                 int subpixelMatchFactor) {
+        int initialMatchListLength, int targetTemplateCurveScore, int correlationScore,
+        double minMatchSeparationDistance, double minMatchSeparationAngle,
+        double minMatchSeparationScale, double maxMatchOverlap, int coarseResult,
+        int enableCalibrationSupport, ContrastMode enableContrastReversal,
+        GeometricMatchingSearchStrategy matchStrategy, int refineMatchFactor,
+        int subpixelMatchFactor) {
       super(88);
       this.subpixelIterations = subpixelIterations;
       this.subpixelTolerance = subpixelTolerance;
@@ -9960,12 +9857,10 @@ public class NIVision {
       backing.putDouble(56, maxMatchOverlap);
       backing.putInt(64, coarseResult);
       backing.putInt(68, enableCalibrationSupport);
-      if (enableContrastReversal != null) {
+      if (enableContrastReversal != null)
         backing.putInt(72, enableContrastReversal.getValue());
-      }
-      if (matchStrategy != null) {
+      if (matchStrategy != null)
         backing.putInt(76, matchStrategy.getValue());
-      }
       backing.putInt(80, refineMatchFactor);
       backing.putInt(84, subpixelMatchFactor);
     }
@@ -9977,14 +9872,14 @@ public class NIVision {
 
   public static class ColorOptions extends DisposedStruct {
     public ColorClassificationResolution colorClassificationResolution; // Specifies
-    // the
-    // color
-    // resolution
-    // of
-    // the
-    // classifier.
+                                                                        // the
+                                                                        // color
+                                                                        // resolution
+                                                                        // of
+                                                                        // the
+                                                                        // classifier.
     public int useLuminance; // Specifies if the luminance band is going to be
-    // used in the feature vector.
+                             // used in the feature vector.
     public ColorMode colorMode; // Specifies the color mode of the classifier.
 
     private void init() {
@@ -9997,7 +9892,7 @@ public class NIVision {
     }
 
     public ColorOptions(ColorClassificationResolution colorClassificationResolution,
-                        int useLuminance, ColorMode colorMode) {
+        int useLuminance, ColorMode colorMode) {
       super(12);
       this.colorClassificationResolution = colorClassificationResolution;
       this.useLuminance = useLuminance;
@@ -10025,13 +9920,11 @@ public class NIVision {
     }
 
     public void write() {
-      if (colorClassificationResolution != null) {
+      if (colorClassificationResolution != null)
         backing.putInt(0, colorClassificationResolution.getValue());
-      }
       backing.putInt(4, useLuminance);
-      if (colorMode != null) {
+      if (colorMode != null)
         backing.putInt(8, colorMode.getValue());
-      }
     }
 
     public int size() {
@@ -10077,9 +9970,9 @@ public class NIVision {
 
     public void read() {
       long className_addr = getPointer(backing, 0);
-      if (className_addr == 0) {
+      if (className_addr == 0)
         className = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(className_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -10121,9 +10014,9 @@ public class NIVision {
   public static class ClassifierReportAdvanced extends DisposedStruct {
     public String bestClassName; // The name of the best class for the sample.
     public float classificationScore; // The similarity of the sample and the
-    // two closest classes in the classifier.
+                                      // two closest classes in the classifier.
     public float identificationScore; // The similarity of the sample and the
-    // assigned class.
+                                      // assigned class.
     public ClassScore[] allScores; // All classes and their scores.
     public SampleScore[] sampleScores; // All samples and their scores.
     private ByteBuffer bestClassName_buf;
@@ -10141,8 +10034,7 @@ public class NIVision {
     }
 
     public ClassifierReportAdvanced(String bestClassName, double classificationScore,
-                                    double identificationScore, ClassScore[] allScores,
-                                    SampleScore[] sampleScores) {
+        double identificationScore, ClassScore[] allScores, SampleScore[] sampleScores) {
       super(28);
       this.bestClassName = bestClassName;
       this.classificationScore = (float) classificationScore;
@@ -10167,9 +10059,9 @@ public class NIVision {
 
     public void read() {
       long bestClassName_addr = getPointer(backing, 0);
-      if (bestClassName_addr == 0) {
+      if (bestClassName_addr == 0)
         bestClassName = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(bestClassName_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -10246,16 +10138,16 @@ public class NIVision {
 
   public static class LearnGeometricPatternAdvancedOptions2 extends DisposedStruct {
     public double minScaleFactor; // Specifies the minimum scale factor that the
-    // template is learned for.
+                                  // template is learned for.
     public double maxScaleFactor; // Specifies the maximum scale factor the
-    // template is learned for.
+                                  // template is learned for.
     public double minRotationAngleValue; // Specifies the minimum rotation angle
-    // the template is learned for.
+                                         // the template is learned for.
     public double maxRotationAngleValue; // Specifies the maximum rotation angle
-    // the template is learned for.
+                                         // the template is learned for.
     public int imageSamplingFactor; // Specifies the factor that is used to
-    // subsample the template and the image for
-    // the initial matching phase.
+                                    // subsample the template and the image for
+                                    // the initial matching phase.
 
     private void init() {
 
@@ -10267,9 +10159,7 @@ public class NIVision {
     }
 
     public LearnGeometricPatternAdvancedOptions2(double minScaleFactor, double maxScaleFactor,
-                                                 double minRotationAngleValue, double
-                                                     maxRotationAngleValue, int
-                                                     imageSamplingFactor) {
+        double minRotationAngleValue, double maxRotationAngleValue, int imageSamplingFactor) {
       super(40);
       this.minScaleFactor = minScaleFactor;
       this.maxScaleFactor = maxScaleFactor;
@@ -10315,15 +10205,15 @@ public class NIVision {
 
   public static class ParticleFilterOptions2 extends DisposedStruct {
     public int rejectMatches; // Set this parameter to TRUE to transfer only
-    // those particles that do not meet all the
-    // criteria.
+                              // those particles that do not meet all the
+                              // criteria.
     public int rejectBorder; // Set this element to TRUE to reject border
-    // particles.
+                             // particles.
     public int fillHoles; // Set this element to TRUE to fill holes in
-    // particles.
+                          // particles.
     public int connectivity8; // Set this parameter to TRUE to use
-    // connectivity-8 to determine whether particles
-    // are touching.
+                              // connectivity-8 to determine whether particles
+                              // are touching.
 
     private void init() {
 
@@ -10335,7 +10225,7 @@ public class NIVision {
     }
 
     public ParticleFilterOptions2(int rejectMatches, int rejectBorder, int fillHoles,
-                                  int connectivity8) {
+        int connectivity8) {
       super(16);
       this.rejectMatches = rejectMatches;
       this.rejectBorder = rejectBorder;
@@ -10379,26 +10269,26 @@ public class NIVision {
   public static class FindEdgeOptions2 extends DisposedStruct {
     public RakeDirection direction; // The direction to search in the ROI.
     public int showSearchArea; // If TRUE, the function overlays the search area
-    // on the image.
+                               // on the image.
     public int showSearchLines; // If TRUE, the function overlays the search
-    // lines used to locate the edges on the image.
+                                // lines used to locate the edges on the image.
     public int showEdgesFound; // If TRUE, the function overlays the locations
-    // of the edges found on the image.
+                               // of the edges found on the image.
     public int showResult; // If TRUE, the function overlays the hit lines to
-    // the object and the edge used to generate the hit
-    // line on the result image.
+                           // the object and the edge used to generate the hit
+                           // line on the result image.
     public RGBValue searchAreaColor; // Specifies the RGB color value to use to
-    // overlay the search area.
+                                     // overlay the search area.
     public RGBValue searchLinesColor; // Specifies the RGB color value to use to
-    // overlay the search lines.
+                                      // overlay the search lines.
     public RGBValue searchEdgesColor; // Specifies the RGB color value to use to
-    // overlay the search edges.
+                                      // overlay the search edges.
     public RGBValue resultColor; // Specifies the RGB color value to use to
-    // overlay the results.
+                                 // overlay the results.
     public String overlayGroupName; // Specifies the overlay group name to
-    // assign to the overlays.
+                                    // assign to the overlays.
     public EdgeOptions2 edgeOptions; // Specifies the edge detection options
-    // along a single search line.
+                                     // along a single search line.
     private ByteBuffer overlayGroupName_buf;
 
     private void init() {
@@ -10415,11 +10305,9 @@ public class NIVision {
     }
 
     public FindEdgeOptions2(RakeDirection direction, int showSearchArea, int showSearchLines,
-                            int showEdgesFound, int showResult, RGBValue searchAreaColor,
-                            RGBValue searchLinesColor,
-                            RGBValue searchEdgesColor, RGBValue resultColor, String
-                                overlayGroupName,
-                            EdgeOptions2 edgeOptions) {
+        int showEdgesFound, int showResult, RGBValue searchAreaColor, RGBValue searchLinesColor,
+        RGBValue searchEdgesColor, RGBValue resultColor, String overlayGroupName,
+        EdgeOptions2 edgeOptions) {
       super(64);
       this.direction = direction;
       this.showSearchArea = showSearchArea;
@@ -10459,9 +10347,9 @@ public class NIVision {
       searchEdgesColor.read();
       resultColor.read();
       long overlayGroupName_addr = getPointer(backing, 36);
-      if (overlayGroupName_addr == 0) {
+      if (overlayGroupName_addr == 0)
         overlayGroupName = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(overlayGroupName_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -10478,9 +10366,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (direction != null) {
+      if (direction != null)
         backing.putInt(0, direction.getValue());
-      }
       backing.putInt(4, showSearchArea);
       backing.putInt(8, showSearchLines);
       backing.putInt(12, showEdgesFound);
@@ -10574,30 +10461,30 @@ public class NIVision {
 
   public static class FindTransformRectOptions2 extends DisposedStruct {
     public FindReferenceDirection direction; // Specifies the direction and
-    // orientation in which the
-    // function searches for the
-    // primary axis.
+                                             // orientation in which the
+                                             // function searches for the
+                                             // primary axis.
     public int showSearchArea; // If TRUE, the function overlays the search area
-    // on the image.
+                               // on the image.
     public int showSearchLines; // If TRUE, the function overlays the search
-    // lines used to locate the edges on the image.
+                                // lines used to locate the edges on the image.
     public int showEdgesFound; // If TRUE, the function overlays the locations
-    // of the edges found on the image.
+                               // of the edges found on the image.
     public int showResult; // If TRUE, the function overlays the hit lines to
-    // the object and the edge used to generate the hit
-    // line on the result image.
+                           // the object and the edge used to generate the hit
+                           // line on the result image.
     public RGBValue searchAreaColor; // Specifies the RGB color value to use to
-    // overlay the search area.
+                                     // overlay the search area.
     public RGBValue searchLinesColor; // Specifies the RGB color value to use to
-    // overlay the search lines.
+                                      // overlay the search lines.
     public RGBValue searchEdgesColor; // Specifies the RGB color value to use to
-    // overlay the search edges.
+                                      // overlay the search edges.
     public RGBValue resultColor; // Specifies the RGB color value to use to
-    // overlay the results.
+                                 // overlay the results.
     public String overlayGroupName; // Specifies the overlay group name to
-    // assign to the overlays.
+                                    // assign to the overlays.
     public EdgeOptions2 edgeOptions; // Specifies the edge detection options
-    // along a single search line.
+                                     // along a single search line.
     private ByteBuffer overlayGroupName_buf;
 
     private void init() {
@@ -10614,11 +10501,9 @@ public class NIVision {
     }
 
     public FindTransformRectOptions2(FindReferenceDirection direction, int showSearchArea,
-                                     int showSearchLines, int showEdgesFound, int showResult,
-                                     RGBValue searchAreaColor,
-                                     RGBValue searchLinesColor, RGBValue searchEdgesColor,
-                                     RGBValue resultColor,
-                                     String overlayGroupName, EdgeOptions2 edgeOptions) {
+        int showSearchLines, int showEdgesFound, int showResult, RGBValue searchAreaColor,
+        RGBValue searchLinesColor, RGBValue searchEdgesColor, RGBValue resultColor,
+        String overlayGroupName, EdgeOptions2 edgeOptions) {
       super(64);
       this.direction = direction;
       this.showSearchArea = showSearchArea;
@@ -10658,9 +10543,9 @@ public class NIVision {
       searchEdgesColor.read();
       resultColor.read();
       long overlayGroupName_addr = getPointer(backing, 36);
-      if (overlayGroupName_addr == 0) {
+      if (overlayGroupName_addr == 0)
         overlayGroupName = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(overlayGroupName_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -10677,9 +10562,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (direction != null) {
+      if (direction != null)
         backing.putInt(0, direction.getValue());
-      }
       backing.putInt(4, showSearchArea);
       backing.putInt(8, showSearchLines);
       backing.putInt(12, showEdgesFound);
@@ -10711,36 +10595,36 @@ public class NIVision {
 
   public static class FindTransformRectsOptions2 extends DisposedStruct {
     public FindReferenceDirection direction; // Specifies the direction and
-    // orientation in which the
-    // function searches for the
-    // primary axis.
+                                             // orientation in which the
+                                             // function searches for the
+                                             // primary axis.
     public int showSearchArea; // If TRUE, the function overlays the search area
-    // on the image.
+                               // on the image.
     public int showSearchLines; // If TRUE, the function overlays the search
-    // lines used to locate the edges on the image.
+                                // lines used to locate the edges on the image.
     public int showEdgesFound; // If TRUE, the function overlays the locations
-    // of the edges found on the image.
+                               // of the edges found on the image.
     public int showResult; // If TRUE, the function overlays the hit lines to
-    // the object and the edge used to generate the hit
-    // line on the result image.
+                           // the object and the edge used to generate the hit
+                           // line on the result image.
     public RGBValue searchAreaColor; // Specifies the RGB color value to use to
-    // overlay the search area.
+                                     // overlay the search area.
     public RGBValue searchLinesColor; // Specifies the RGB color value to use to
-    // overlay the search lines.
+                                      // overlay the search lines.
     public RGBValue searchEdgesColor; // Specifies the RGB color value to use to
-    // overlay the search edges.
+                                      // overlay the search edges.
     public RGBValue resultColor; // Specifies the RGB color value to use to
-    // overlay the results.
+                                 // overlay the results.
     public String overlayGroupName; // Specifies the overlay group name to
-    // assign to the overlays.
+                                    // assign to the overlays.
     public EdgeOptions2 primaryEdgeOptions; // Specifies the parameters used to
-    // compute the edge gradient
-    // information and detect the edges
-    // for the primary ROI.
+                                            // compute the edge gradient
+                                            // information and detect the edges
+                                            // for the primary ROI.
     public EdgeOptions2 secondaryEdgeOptions; // Specifies the parameters used
-    // to compute the edge gradient
-    // information and detect the
-    // edges for the secondary ROI.
+                                              // to compute the edge gradient
+                                              // information and detect the
+                                              // edges for the secondary ROI.
     private ByteBuffer overlayGroupName_buf;
 
     private void init() {
@@ -10758,12 +10642,9 @@ public class NIVision {
     }
 
     public FindTransformRectsOptions2(FindReferenceDirection direction, int showSearchArea,
-                                      int showSearchLines, int showEdgesFound, int showResult,
-                                      RGBValue searchAreaColor,
-                                      RGBValue searchLinesColor, RGBValue searchEdgesColor,
-                                      RGBValue resultColor,
-                                      String overlayGroupName, EdgeOptions2 primaryEdgeOptions,
-                                      EdgeOptions2 secondaryEdgeOptions) {
+        int showSearchLines, int showEdgesFound, int showResult, RGBValue searchAreaColor,
+        RGBValue searchLinesColor, RGBValue searchEdgesColor, RGBValue resultColor,
+        String overlayGroupName, EdgeOptions2 primaryEdgeOptions, EdgeOptions2 secondaryEdgeOptions) {
       super(88);
       this.direction = direction;
       this.showSearchArea = showSearchArea;
@@ -10804,9 +10685,9 @@ public class NIVision {
       searchEdgesColor.read();
       resultColor.read();
       long overlayGroupName_addr = getPointer(backing, 36);
-      if (overlayGroupName_addr == 0) {
+      if (overlayGroupName_addr == 0)
         overlayGroupName = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(overlayGroupName_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -10824,9 +10705,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (direction != null) {
+      if (direction != null)
         backing.putInt(0, direction.getValue());
-      }
       backing.putInt(4, showSearchArea);
       backing.putInt(8, showSearchLines);
       backing.putInt(12, showEdgesFound);
@@ -10860,10 +10740,10 @@ public class NIVision {
   public static class ReadTextReport3 extends DisposedStruct {
     public String readString; // The read string.
     public CharReport3[] characterReport; // An array of reports describing the
-    // properties of each identified
-    // character.
+                                          // properties of each identified
+                                          // character.
     public ROI roiBoundingCharacters; // An array specifying the coordinates of
-    // the character bounding ROI.
+                                      // the character bounding ROI.
     private ByteBuffer readString_buf;
     private ByteBuffer characterReport_buf;
 
@@ -10877,7 +10757,7 @@ public class NIVision {
     }
 
     public ReadTextReport3(String readString, CharReport3[] characterReport,
-                           ROI roiBoundingCharacters) {
+        ROI roiBoundingCharacters) {
       super(16);
       this.readString = readString;
       this.characterReport = characterReport;
@@ -10900,9 +10780,9 @@ public class NIVision {
 
     public void read() {
       long readString_addr = getPointer(backing, 0);
-      if (readString_addr == 0) {
+      if (readString_addr == 0)
         readString = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(readString_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -10927,11 +10807,10 @@ public class NIVision {
         }
       }
       long roiBoundingCharacters_addr = getPointer(backing, 12);
-      if (roiBoundingCharacters_addr == 0) {
+      if (roiBoundingCharacters_addr == 0)
         roiBoundingCharacters = null;
-      } else {
+      else
         roiBoundingCharacters = new ROI(roiBoundingCharacters_addr, false);
-      }
     }
 
     public void write() {
@@ -10965,13 +10844,13 @@ public class NIVision {
 
   public static class CharacterStatistics extends DisposedStruct {
     public int left; // The left offset of the character bounding rectangles in
-    // the current ROI.
+                     // the current ROI.
     public int top; // The top offset of the character bounding rectangles in
-    // the current ROI.
+                    // the current ROI.
     public int width; // The width of each of the characters you trained in the
-    // current ROI.
+                      // current ROI.
     public int height; // The height of each trained character in the current
-    // ROI.
+                       // ROI.
     public int characterSize; // The size of the character in pixels.
 
     private void init() {
@@ -11030,21 +10909,21 @@ public class NIVision {
   public static class CharReport3 extends DisposedStruct {
     public String character; // The character value.
     public int classificationScore; // The degree to which the assigned
-    // character class represents the object
-    // better than the other character classes
-    // in the character set.
+                                    // character class represents the object
+                                    // better than the other character classes
+                                    // in the character set.
     public int verificationScore; // The similarity of the character and the
-    // reference character for the character
-    // class.
+                                  // reference character for the character
+                                  // class.
     public int verified; // This element is TRUE if a reference character was
-    // found for the character class and FALSE if a
-    // reference character was not found.
+                         // found for the character class and FALSE if a
+                         // reference character was not found.
     public int lowThreshold; // The minimum value of the threshold range used
-    // for this character.
+                             // for this character.
     public int highThreshold; // The maximum value of the threshold range used
-    // for this character.
+                              // for this character.
     public CharacterStatistics characterStats; // Describes the characters
-    // segmented in the ROI.
+                                               // segmented in the ROI.
     private ByteBuffer character_buf;
 
     private void init() {
@@ -11057,8 +10936,7 @@ public class NIVision {
     }
 
     public CharReport3(String character, int classificationScore, int verificationScore,
-                       int verified, int lowThreshold, int highThreshold, CharacterStatistics
-                           characterStats) {
+        int verified, int lowThreshold, int highThreshold, CharacterStatistics characterStats) {
       super(44);
       this.character = character;
       this.classificationScore = classificationScore;
@@ -11085,9 +10963,9 @@ public class NIVision {
 
     public void read() {
       long character_addr = getPointer(backing, 0);
-      if (character_addr == 0) {
+      if (character_addr == 0)
         character = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(character_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -11138,9 +11016,9 @@ public class NIVision {
     public PointFloat center; // The center point of the arc.
     public double radius; // The radius of the arc.
     public double startAngle; // The starting angle of the arc, specified
-    // counter-clockwise from the x-axis.
+                              // counter-clockwise from the x-axis.
     public double endAngle; // The ending angle of the arc, specified
-    // counter-clockwise from the x-axis.
+                            // counter-clockwise from the x-axis.
 
     private void init() {
       center = new PointFloat(backing, 0);
@@ -11195,11 +11073,11 @@ public class NIVision {
   public static class EdgeReport2 extends DisposedStruct {
     public EdgeInfo[] edges; // An array of edges detected.
     public double[] gradientInfo; // An array that contains the calculated edge
-    // strengths along the user-defined search
-    // area.
+                                  // strengths along the user-defined search
+                                  // area.
     public int calibrationValid; // Indicates if the calibration data
-    // corresponding to the location of the edges
-    // is correct.
+                                 // corresponding to the location of the edges
+                                 // is correct.
     private ByteBuffer edges_buf;
     private ByteBuffer gradientInfo_buf;
 
@@ -11278,9 +11156,9 @@ public class NIVision {
 
   public static class SearchArcInfo extends DisposedStruct {
     public ArcInfo2 arcCoordinates; // Describes the arc used for edge
-    // detection.
+                                    // detection.
     public EdgeReport2 edgeReport; // Describes the edges found in this search
-    // line.
+                                   // line.
 
     private void init() {
       arcCoordinates = new ArcInfo2(backing, 0);
@@ -11329,12 +11207,12 @@ public class NIVision {
 
   public static class ConcentricRakeReport2 extends DisposedStruct {
     public EdgeInfo[] firstEdges; // The first edge point detected along each
-    // search line in the ROI.
+                                  // search line in the ROI.
     public EdgeInfo[] lastEdges; // The last edge point detected along each
-    // search line in the ROI.
+                                 // search line in the ROI.
     public SearchArcInfo[] searchArcs; // Contains the arcs used for edge
-    // detection and the edge information for
-    // each arc.
+                                       // detection and the edge information for
+                                       // each arc.
     private ByteBuffer firstEdges_buf;
     private ByteBuffer lastEdges_buf;
     private ByteBuffer searchArcs_buf;
@@ -11351,7 +11229,7 @@ public class NIVision {
     }
 
     public ConcentricRakeReport2(EdgeInfo[] firstEdges, EdgeInfo[] lastEdges,
-                                 SearchArcInfo[] searchArcs) {
+        SearchArcInfo[] searchArcs) {
       super(24);
       this.firstEdges = firstEdges;
       this.lastEdges = lastEdges;
@@ -11439,11 +11317,11 @@ public class NIVision {
 
   public static class SpokeReport2 extends DisposedStruct {
     public EdgeInfo[] firstEdges; // The first edge point detected along each
-    // search line in the ROI.
+                                  // search line in the ROI.
     public EdgeInfo[] lastEdges; // The last edge point detected along each
-    // search line in the ROI.
+                                 // search line in the ROI.
     public SearchLineInfo[] searchLines; // The search lines used for edge
-    // detection.
+                                         // detection.
     private ByteBuffer firstEdges_buf;
     private ByteBuffer lastEdges_buf;
     private ByteBuffer searchLines_buf;
@@ -11548,15 +11426,15 @@ public class NIVision {
   public static class EdgeInfo extends DisposedStruct {
     public PointFloat position; // The location of the edge in the image.
     public PointFloat calibratedPosition; // The position of the edge in the
-    // image in real-world coordinates.
+                                          // image in real-world coordinates.
     public double distance; // The location of the edge from the first point
-    // along the boundary of the input ROI.
+                            // along the boundary of the input ROI.
     public double calibratedDistance; // The location of the edge from the first
-    // point along the boundary of the input
-    // ROI in real-world coordinates.
+                                      // point along the boundary of the input
+                                      // ROI in real-world coordinates.
     public double magnitude; // The intensity contrast at the edge.
     public double noisePeak; // The strength of the noise associated with the
-    // current edge.
+                             // current edge.
     public int rising; // Indicates the polarity of the edge.
 
     private void init() {
@@ -11570,7 +11448,7 @@ public class NIVision {
     }
 
     public EdgeInfo(PointFloat position, PointFloat calibratedPosition, double distance,
-                    double calibratedDistance, double magnitude, double noisePeak, int rising) {
+        double calibratedDistance, double magnitude, double noisePeak, int rising) {
       super(56);
       this.position = position;
       this.calibratedPosition = calibratedPosition;
@@ -11623,7 +11501,7 @@ public class NIVision {
   public static class SearchLineInfo extends DisposedStruct {
     public LineFloat lineCoordinates; // The endpoints of the search line.
     public EdgeReport2 edgeReport; // Describes the edges found in this search
-    // line.
+                                   // line.
 
     private void init() {
       lineCoordinates = new LineFloat(backing, 0);
@@ -11672,11 +11550,11 @@ public class NIVision {
 
   public static class RakeReport2 extends DisposedStruct {
     public EdgeInfo[] firstEdges; // The first edge point detected along each
-    // search line in the ROI.
+                                  // search line in the ROI.
     public EdgeInfo[] lastEdges; // The last edge point detected along each
-    // search line in the ROI.
+                                 // search line in the ROI.
     public SearchLineInfo[] searchLines; // The search lines used for edge
-    // detection.
+                                         // detection.
     private ByteBuffer firstEdges_buf;
     private ByteBuffer lastEdges_buf;
     private ByteBuffer searchLines_buf;
@@ -11780,17 +11658,17 @@ public class NIVision {
 
   public static class TransformBehaviors extends DisposedStruct {
     public GroupBehavior ShiftBehavior; // Specifies the behavior of an overlay
-    // group when a shift operation is
-    // applied to an image.
+                                        // group when a shift operation is
+                                        // applied to an image.
     public GroupBehavior ScaleBehavior; // Specifies the behavior of an overlay
-    // group when a scale operation is
-    // applied to an image.
+                                        // group when a scale operation is
+                                        // applied to an image.
     public GroupBehavior RotateBehavior; // Specifies the behavior of an overlay
-    // group when a rotate operation is
-    // applied to an image.
+                                         // group when a rotate operation is
+                                         // applied to an image.
     public GroupBehavior SymmetryBehavior; // Specifies the behavior of an
-    // overlay group when a symmetry
-    // operation is applied to an image.
+                                           // overlay group when a symmetry
+                                           // operation is applied to an image.
 
     private void init() {
 
@@ -11802,7 +11680,7 @@ public class NIVision {
     }
 
     public TransformBehaviors(GroupBehavior ShiftBehavior, GroupBehavior ScaleBehavior,
-                              GroupBehavior RotateBehavior, GroupBehavior SymmetryBehavior) {
+        GroupBehavior RotateBehavior, GroupBehavior SymmetryBehavior) {
       super(16);
       this.ShiftBehavior = ShiftBehavior;
       this.ScaleBehavior = ScaleBehavior;
@@ -11832,18 +11710,14 @@ public class NIVision {
     }
 
     public void write() {
-      if (ShiftBehavior != null) {
+      if (ShiftBehavior != null)
         backing.putInt(0, ShiftBehavior.getValue());
-      }
-      if (ScaleBehavior != null) {
+      if (ScaleBehavior != null)
         backing.putInt(4, ScaleBehavior.getValue());
-      }
-      if (RotateBehavior != null) {
+      if (RotateBehavior != null)
         backing.putInt(8, RotateBehavior.getValue());
-      }
-      if (SymmetryBehavior != null) {
+      if (SymmetryBehavior != null)
         backing.putInt(12, SymmetryBehavior.getValue());
-      }
     }
 
     public int size() {
@@ -11853,9 +11727,9 @@ public class NIVision {
 
   public static class QRCodeDataToken extends DisposedStruct {
     public QRStreamMode mode; // Specifies the stream mode or the format of the
-    // data that is encoded in the QR code.
+                              // data that is encoded in the QR code.
     public int modeData; // Indicates specifiers used by the user to postprocess
-    // the data if it requires it.
+                         // the data if it requires it.
     public byte[] data; // Shows the encoded data in the QR code.
     private ByteBuffer data_buf;
 
@@ -11901,9 +11775,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (mode != null) {
+      if (mode != null)
         backing.putInt(0, mode.getValue());
-      }
       backing.putInt(4, modeData);
       data_buf = ByteBuffer.allocateDirect(data.length);
       putBytes(data_buf, data, 0, data.length);
@@ -11918,13 +11791,13 @@ public class NIVision {
 
   public static class ParticleFilterOptions extends DisposedStruct {
     public int rejectMatches; // Set this parameter to TRUE to transfer only
-    // those particles that do not meet all the
-    // criteria.
+                              // those particles that do not meet all the
+                              // criteria.
     public int rejectBorder; // Set this element to TRUE to reject border
-    // particles.
+                             // particles.
     public int connectivity8; // Set this parameter to TRUE to use
-    // connectivity-8 to determine whether particles
-    // are touching.
+                              // connectivity-8 to determine whether particles
+                              // are touching.
 
     private void init() {
 
@@ -11975,9 +11848,9 @@ public class NIVision {
 
   public static class StraightEdgeReport2 extends DisposedStruct {
     public StraightEdge[] straightEdges; // Contains an array of found straight
-    // edges.
+                                         // edges.
     public SearchLineInfo[] searchLines; // Contains an array of all search
-    // lines used in the detection.
+                                         // lines used in the detection.
     private ByteBuffer straightEdges_buf;
     private ByteBuffer searchLines_buf;
 
@@ -12062,28 +11935,28 @@ public class NIVision {
   public static class StraightEdgeOptions extends DisposedStruct {
     public int numLines; // Specifies the number of straight edges to find.
     public StraightEdgeSearchMode searchMode; // Specifies the method used to
-    // find the straight edge.
+                                              // find the straight edge.
     public double minScore; // Specifies the minimum score of a detected
-    // straight edge.
+                            // straight edge.
     public double maxScore; // Specifies the maximum score of a detected edge.
     public double orientation; // Specifies the angle at which the straight edge
-    // is expected to be found.
+                               // is expected to be found.
     public double angleRange; // Specifies the +/- range around the orientation
-    // within which the straight edge is expected to
-    // be found.
+                              // within which the straight edge is expected to
+                              // be found.
     public double angleTolerance; // Specifies the expected angular accuracy of
-    // the straight edge.
+                                  // the straight edge.
     public int stepSize; // Specifies the gap in pixels between the search lines
-    // used with the rake-based methods.
+                         // used with the rake-based methods.
     public double minSignalToNoiseRatio; // Specifies the minimum signal to
-    // noise ratio (SNR) of the edge points
-    // used to fit the straight edge.
+                                         // noise ratio (SNR) of the edge points
+                                         // used to fit the straight edge.
     public double minCoverage; // Specifies the minimum number of points as a
-    // percentage of the number of search lines that
-    // need to be included in the detected straight
-    // edge.
+                               // percentage of the number of search lines that
+                               // need to be included in the detected straight
+                               // edge.
     public int houghIterations; // Specifies the number of iterations used in
-    // the Hough-based method.
+                                // the Hough-based method.
 
     private void init() {
 
@@ -12095,10 +11968,8 @@ public class NIVision {
     }
 
     public StraightEdgeOptions(int numLines, StraightEdgeSearchMode searchMode, double minScore,
-                               double maxScore, double orientation, double angleRange, double
-                                   angleTolerance,
-                               int stepSize, double minSignalToNoiseRatio, double minCoverage,
-                               int houghIterations) {
+        double maxScore, double orientation, double angleRange, double angleTolerance,
+        int stepSize, double minSignalToNoiseRatio, double minCoverage, int houghIterations) {
       super(80);
       this.numLines = numLines;
       this.searchMode = searchMode;
@@ -12143,9 +12014,8 @@ public class NIVision {
 
     public void write() {
       backing.putInt(0, numLines);
-      if (searchMode != null) {
+      if (searchMode != null)
         backing.putInt(4, searchMode.getValue());
-      }
       backing.putDouble(8, minScore);
       backing.putDouble(16, maxScore);
       backing.putDouble(24, orientation);
@@ -12164,25 +12034,25 @@ public class NIVision {
 
   public static class StraightEdge extends DisposedStruct {
     public LineFloat straightEdgeCoordinates; // End points of the detected
-    // straight edge in pixel
-    // coordinates.
+                                              // straight edge in pixel
+                                              // coordinates.
     public LineFloat calibratedStraightEdgeCoordinates; // End points of the
-    // detected straight
-    // edge in real-world
-    // coordinates.
+                                                        // detected straight
+                                                        // edge in real-world
+                                                        // coordinates.
     public double angle; // Angle of the found edge using the pixel coordinates.
     public double calibratedAngle; // Angle of the found edge using the
-    // real-world coordinates.
+                                   // real-world coordinates.
     public double score; // Describes the score of the detected edge.
     public double straightness; // The straightness value of the detected
-    // straight edge.
+                                // straight edge.
     public double averageSignalToNoiseRatio; // Describes the average signal to
-    // noise ratio (SNR) of the
-    // detected edge.
+                                             // noise ratio (SNR) of the
+                                             // detected edge.
     public int calibrationValid; // Indicates if the calibration data for the
-    // straight edge is valid.
+                                 // straight edge is valid.
     public EdgeInfo[] usedEdges; // An array of edges that were used to
-    // determine this straight line.
+                                 // determine this straight line.
     private ByteBuffer usedEdges_buf;
 
     private void init() {
@@ -12197,11 +12067,9 @@ public class NIVision {
     }
 
     public StraightEdge(LineFloat straightEdgeCoordinates,
-                        LineFloat calibratedStraightEdgeCoordinates, double angle, double
-                            calibratedAngle,
-                        double score, double straightness, double averageSignalToNoiseRatio, int
-                            calibrationValid,
-                        EdgeInfo[] usedEdges) {
+        LineFloat calibratedStraightEdgeCoordinates, double angle, double calibratedAngle,
+        double score, double straightness, double averageSignalToNoiseRatio, int calibrationValid,
+        EdgeInfo[] usedEdges) {
       super(88);
       this.straightEdgeCoordinates = straightEdgeCoordinates;
       this.calibratedStraightEdgeCoordinates = calibratedStraightEdgeCoordinates;
@@ -12275,23 +12143,23 @@ public class NIVision {
 
   public static class QRCodeSearchOptions extends DisposedStruct {
     public QRRotationMode rotationMode; // Specifies the amount of QR code
-    // rotation the function should allow
-    // for.
+                                        // rotation the function should allow
+                                        // for.
     public int skipLocation; // If set to TRUE, specifies that the function
-    // should assume that the QR code occupies the
-    // entire image (or the entire search region).
+                             // should assume that the QR code occupies the
+                             // entire image (or the entire search region).
     public int edgeThreshold; // The strength of the weakest edge the function
-    // uses to find the coarse location of the QR code
-    // in the image.
+                              // uses to find the coarse location of the QR code
+                              // in the image.
     public QRDemodulationMode demodulationMode; // The demodulation mode the
-    // function uses to locate the
-    // QR code.
+                                                // function uses to locate the
+                                                // QR code.
     public QRCellSampleSize cellSampleSize; // The cell sample size the function
-    // uses to locate the QR code.
+                                            // uses to locate the QR code.
     public QRCellFilterMode cellFilterMode; // The cell filter mode the function
-    // uses to locate the QR code.
+                                            // uses to locate the QR code.
     public int skewDegreesAllowed; // Specifies the amount of skew in the QR
-    // code the function should allow for.
+                                   // code the function should allow for.
 
     private void init() {
 
@@ -12303,8 +12171,8 @@ public class NIVision {
     }
 
     public QRCodeSearchOptions(QRRotationMode rotationMode, int skipLocation, int edgeThreshold,
-                               QRDemodulationMode demodulationMode, QRCellSampleSize cellSampleSize,
-                               QRCellFilterMode cellFilterMode, int skewDegreesAllowed) {
+        QRDemodulationMode demodulationMode, QRCellSampleSize cellSampleSize,
+        QRCellFilterMode cellFilterMode, int skewDegreesAllowed) {
       super(48);
       this.rotationMode = rotationMode;
       this.skipLocation = skipLocation;
@@ -12340,20 +12208,16 @@ public class NIVision {
     }
 
     public void write() {
-      if (rotationMode != null) {
+      if (rotationMode != null)
         backing.putInt(0, rotationMode.getValue());
-      }
       backing.putInt(4, skipLocation);
       backing.putInt(8, edgeThreshold);
-      if (demodulationMode != null) {
+      if (demodulationMode != null)
         backing.putInt(16, demodulationMode.getValue());
-      }
-      if (cellSampleSize != null) {
+      if (cellSampleSize != null)
         backing.putInt(24, cellSampleSize.getValue());
-      }
-      if (cellFilterMode != null) {
+      if (cellFilterMode != null)
         backing.putInt(32, cellFilterMode.getValue());
-      }
       backing.putInt(40, skewDegreesAllowed);
     }
 
@@ -12364,9 +12228,9 @@ public class NIVision {
 
   public static class QRCodeSizeOptions extends DisposedStruct {
     public int minSize; // Specifies the minimum size (in pixels) of the QR code
-    // in the image.
+                        // in the image.
     public int maxSize; // Specifies the maximum size (in pixels) of the QR code
-    // in the image.
+                        // in the image.
 
     private void init() {
 
@@ -12414,14 +12278,14 @@ public class NIVision {
 
   public static class QRCodeDescriptionOptions extends DisposedStruct {
     public QRDimensions dimensions; // The number of rows and columns that are
-    // populated for the QR code, measured in
-    // cells.
+                                    // populated for the QR code, measured in
+                                    // cells.
     public QRPolarities polarity; // The polarity of the QR code.
     public QRMirrorMode mirror; // This element is TRUE if the QR code appears
-    // mirrored in the image and FALSE if the QR
-    // code appears normally in the image.
+                                // mirrored in the image and FALSE if the QR
+                                // code appears normally in the image.
     public QRModelType modelType; // This option allows you to specify the type
-    // of QR code.
+                                  // of QR code.
 
     private void init() {
 
@@ -12433,7 +12297,7 @@ public class NIVision {
     }
 
     public QRCodeDescriptionOptions(QRDimensions dimensions, QRPolarities polarity,
-                                    QRMirrorMode mirror, QRModelType modelType) {
+        QRMirrorMode mirror, QRModelType modelType) {
       super(32);
       this.dimensions = dimensions;
       this.polarity = polarity;
@@ -12463,18 +12327,14 @@ public class NIVision {
     }
 
     public void write() {
-      if (dimensions != null) {
+      if (dimensions != null)
         backing.putInt(0, dimensions.getValue());
-      }
-      if (polarity != null) {
+      if (polarity != null)
         backing.putInt(8, polarity.getValue());
-      }
-      if (mirror != null) {
+      if (mirror != null)
         backing.putInt(16, mirror.getValue());
-      }
-      if (modelType != null) {
+      if (modelType != null)
         backing.putInt(24, modelType.getValue());
-      }
     }
 
     public int size() {
@@ -12484,49 +12344,49 @@ public class NIVision {
 
   public static class QRCodeReport extends DisposedStruct {
     public int found; // This element is TRUE if the function located and
-    // decoded a QR code and FALSE if the function failed to
-    // locate and decode a QR code.
+                      // decoded a QR code and FALSE if the function failed to
+                      // locate and decode a QR code.
     public byte[] data; // The data encoded in the QR code.
     public PointFloat[] boundingBox; // An array of four points describing the
-    // rectangle surrounding the QR code.
+                                     // rectangle surrounding the QR code.
     public QRCodeDataToken[] tokenizedData; // Contains the data tokenized in
-    // exactly the way it was encoded in
-    // the code.
+                                            // exactly the way it was encoded in
+                                            // the code.
     public int numErrorsCorrected; // The number of errors the function
-    // corrected when decoding the QR code.
+                                   // corrected when decoding the QR code.
     public int dimensions; // The number of rows and columns that are populated
-    // for the QR code, measured in cells.
+                           // for the QR code, measured in cells.
     public int version; // The version of the QR code.
     public QRModelType modelType; // This option allows you to specify what type
-    // of QR code this is.
+                                  // of QR code this is.
     public QRStreamMode streamMode; // The format of the data encoded in the
-    // stream.
+                                    // stream.
     public QRPolarities matrixPolarity; // The polarity of the QR code.
     public int mirrored; // This element is TRUE if the QR code appears mirrored
-    // in the image and FALSE if the QR code appears
-    // normally in the image.
+                         // in the image and FALSE if the QR code appears
+                         // normally in the image.
     public int positionInAppendStream; // Indicates what position the QR code is
-    // in with respect to the stream of data
-    // in all codes.
+                                       // in with respect to the stream of data
+                                       // in all codes.
     public int sizeOfAppendStream; // Specifies how many QR codes are part of a
-    // larger array of codes.
+                                   // larger array of codes.
     public int firstEAN128ApplicationID; // The first EAN-128 Application ID
-    // encountered in the stream.
+                                         // encountered in the stream.
     public int firstECIDesignator; // The first Regional Language Designator
-    // encountered in the stream.
+                                   // encountered in the stream.
     public int appendStreamIdentifier; // Specifies what stream the QR code is
-    // in relation to when the code is part
-    // of a larger array of codes.
+                                       // in relation to when the code is part
+                                       // of a larger array of codes.
     public int minimumEdgeStrength; // The strength of the weakest edge the
-    // function used to find the coarse location
-    // of the QR code in the image.
+                                    // function used to find the coarse location
+                                    // of the QR code in the image.
     public QRDemodulationMode demodulationMode; // The demodulation mode the
-    // function used to locate the
-    // QR code.
+                                                // function used to locate the
+                                                // QR code.
     public QRCellSampleSize cellSampleSize; // The cell sample size the function
-    // used to locate the QR code.
+                                            // used to locate the QR code.
     public QRCellFilterMode cellFilterMode; // The cell filter mode the function
-    // used to locate the QR code.
+                                            // used to locate the QR code.
     private ByteBuffer data_buf;
     private ByteBuffer tokenizedData_buf;
 
@@ -12534,9 +12394,8 @@ public class NIVision {
       data = new byte[0];
       boundingBox = new PointFloat[4];
 
-      for (int i = 0, off = 12; i < 4; i++, off += 8) {
+      for (int i = 0, off = 12; i < 4; i++, off += 8)
         boundingBox[i] = new PointFloat(backing, off);
-      }
       tokenizedData = new QRCodeDataToken[0];
     }
 
@@ -12546,15 +12405,12 @@ public class NIVision {
     }
 
     public QRCodeReport(int found, byte[] data, PointFloat[] boundingBox,
-                        QRCodeDataToken[] tokenizedData, int numErrorsCorrected, int dimensions,
-                        int version,
-                        QRModelType modelType, QRStreamMode streamMode, QRPolarities
-                            matrixPolarity, int mirrored,
-                        int positionInAppendStream, int sizeOfAppendStream, int
-                            firstEAN128ApplicationID,
-                        int firstECIDesignator, int appendStreamIdentifier, int minimumEdgeStrength,
-                        QRDemodulationMode demodulationMode, QRCellSampleSize cellSampleSize,
-                        QRCellFilterMode cellFilterMode) {
+        QRCodeDataToken[] tokenizedData, int numErrorsCorrected, int dimensions, int version,
+        QRModelType modelType, QRStreamMode streamMode, QRPolarities matrixPolarity, int mirrored,
+        int positionInAppendStream, int sizeOfAppendStream, int firstEAN128ApplicationID,
+        int firstECIDesignator, int appendStreamIdentifier, int minimumEdgeStrength,
+        QRDemodulationMode demodulationMode, QRCellSampleSize cellSampleSize,
+        QRCellFilterMode cellFilterMode) {
       super(136);
       this.found = found;
       this.data = data;
@@ -12652,15 +12508,12 @@ public class NIVision {
       backing.putInt(52, numErrorsCorrected);
       backing.putInt(56, dimensions);
       backing.putInt(60, version);
-      if (modelType != null) {
+      if (modelType != null)
         backing.putInt(64, modelType.getValue());
-      }
-      if (streamMode != null) {
+      if (streamMode != null)
         backing.putInt(68, streamMode.getValue());
-      }
-      if (matrixPolarity != null) {
+      if (matrixPolarity != null)
         backing.putInt(72, matrixPolarity.getValue());
-      }
       backing.putInt(80, mirrored);
       backing.putInt(84, positionInAppendStream);
       backing.putInt(88, sizeOfAppendStream);
@@ -12668,15 +12521,12 @@ public class NIVision {
       backing.putInt(96, firstECIDesignator);
       backing.putInt(100, appendStreamIdentifier);
       backing.putInt(104, minimumEdgeStrength);
-      if (demodulationMode != null) {
+      if (demodulationMode != null)
         backing.putInt(112, demodulationMode.getValue());
-      }
-      if (cellSampleSize != null) {
+      if (cellSampleSize != null)
         backing.putInt(120, cellSampleSize.getValue());
-      }
-      if (cellFilterMode != null) {
+      if (cellFilterMode != null)
         backing.putInt(128, cellFilterMode.getValue());
-      }
     }
 
     public int size() {
@@ -12686,41 +12536,41 @@ public class NIVision {
 
   public static class AIMGradeReport extends DisposedStruct {
     public AIMGrade overallGrade; // The overall letter grade, which is equal to
-    // the lowest of the other five letter grades.
+                                  // the lowest of the other five letter grades.
     public AIMGrade decodingGrade; // The letter grade assigned to a Data Matrix
-    // barcode based on the success of the
-    // function in decoding the Data Matrix
-    // barcode.
+                                   // barcode based on the success of the
+                                   // function in decoding the Data Matrix
+                                   // barcode.
     public AIMGrade symbolContrastGrade; // The letter grade assigned to a Data
-    // Matrix barcode based on the symbol
-    // contrast raw score.
+                                         // Matrix barcode based on the symbol
+                                         // contrast raw score.
     public float symbolContrast; // The symbol contrast raw score representing
-    // the percentage difference between the mean
-    // of the reflectance of the darkest 10 percent
-    // and lightest 10 percent of the Data Matrix
-    // barcode.
+                                 // the percentage difference between the mean
+                                 // of the reflectance of the darkest 10 percent
+                                 // and lightest 10 percent of the Data Matrix
+                                 // barcode.
     public AIMGrade printGrowthGrade; // The print growth letter grade for the
-    // Data Matrix barcode.
+                                      // Data Matrix barcode.
     public float printGrowth; // The print growth raw score for the barcode,
-    // which is based on the extent to which dark or
-    // light markings appropriately fill their module
-    // boundaries.
+                              // which is based on the extent to which dark or
+                              // light markings appropriately fill their module
+                              // boundaries.
     public AIMGrade axialNonuniformityGrade; // The axial nonuniformity grade
-    // for the Data Matrix barcode.
+                                             // for the Data Matrix barcode.
     public float axialNonuniformity; // The axial nonuniformity raw score for
-    // the barcode, which is based on how much
-    // the sampling point spacing differs from
-    // one axis to another.
+                                     // the barcode, which is based on how much
+                                     // the sampling point spacing differs from
+                                     // one axis to another.
     public AIMGrade unusedErrorCorrectionGrade; // The unused error correction
-    // letter grade for the Data
-    // Matrix barcode.
+                                                // letter grade for the Data
+                                                // Matrix barcode.
     public float unusedErrorCorrection; // The unused error correction raw score
-    // for the Data Matrix barcode, which is
-    // based on the extent to which regional
-    // or spot damage in the Data Matrix
-    // barcode has eroded the reading safety
-    // margin provided by the error
-    // correction.
+                                        // for the Data Matrix barcode, which is
+                                        // based on the extent to which regional
+                                        // or spot damage in the Data Matrix
+                                        // barcode has eroded the reading safety
+                                        // margin provided by the error
+                                        // correction.
 
     private void init() {
 
@@ -12732,11 +12582,9 @@ public class NIVision {
     }
 
     public AIMGradeReport(AIMGrade overallGrade, AIMGrade decodingGrade,
-                          AIMGrade symbolContrastGrade, double symbolContrast, AIMGrade
-                              printGrowthGrade,
-                          double printGrowth, AIMGrade axialNonuniformityGrade, double
-                              axialNonuniformity,
-                          AIMGrade unusedErrorCorrectionGrade, double unusedErrorCorrection) {
+        AIMGrade symbolContrastGrade, double symbolContrast, AIMGrade printGrowthGrade,
+        double printGrowth, AIMGrade axialNonuniformityGrade, double axialNonuniformity,
+        AIMGrade unusedErrorCorrectionGrade, double unusedErrorCorrection) {
       super(40);
       this.overallGrade = overallGrade;
       this.decodingGrade = decodingGrade;
@@ -12778,27 +12626,21 @@ public class NIVision {
     }
 
     public void write() {
-      if (overallGrade != null) {
+      if (overallGrade != null)
         backing.putInt(0, overallGrade.getValue());
-      }
-      if (decodingGrade != null) {
+      if (decodingGrade != null)
         backing.putInt(4, decodingGrade.getValue());
-      }
-      if (symbolContrastGrade != null) {
+      if (symbolContrastGrade != null)
         backing.putInt(8, symbolContrastGrade.getValue());
-      }
       backing.putFloat(12, symbolContrast);
-      if (printGrowthGrade != null) {
+      if (printGrowthGrade != null)
         backing.putInt(16, printGrowthGrade.getValue());
-      }
       backing.putFloat(20, printGrowth);
-      if (axialNonuniformityGrade != null) {
+      if (axialNonuniformityGrade != null)
         backing.putInt(24, axialNonuniformityGrade.getValue());
-      }
       backing.putFloat(28, axialNonuniformity);
-      if (unusedErrorCorrectionGrade != null) {
+      if (unusedErrorCorrectionGrade != null)
         backing.putInt(32, unusedErrorCorrectionGrade.getValue());
-      }
       backing.putFloat(36, unusedErrorCorrection);
     }
 
@@ -12809,11 +12651,11 @@ public class NIVision {
 
   public static class DataMatrixSizeOptions extends DisposedStruct {
     public int minSize; // Specifies the minimum size (in pixels) of the Data
-    // Matrix barcode in the image.
+                        // Matrix barcode in the image.
     public int maxSize; // Specifies the maximum size (in pixels) of the Data
-    // Matrix barcode in the image.
+                        // Matrix barcode in the image.
     public int quietZoneWidth; // Specifies the expected minimum size of the
-    // quiet zone, in pixels.
+                               // quiet zone, in pixels.
 
     private void init() {
 
@@ -12864,28 +12706,28 @@ public class NIVision {
 
   public static class DataMatrixDescriptionOptions extends DisposedStruct {
     public float aspectRatio; // Specifies the ratio of the width of each Data
-    // Matrix barcode cell (in pixels) to the height
-    // of the Data Matrix barcode (in pixels).
+                              // Matrix barcode cell (in pixels) to the height
+                              // of the Data Matrix barcode (in pixels).
     public int rows; // Specifies the number of rows in the Data Matrix barcode.
     public int columns; // Specifies the number of columns in the Data Matrix
-    // barcode.
+                        // barcode.
     public int rectangle; // Set this element to TRUE to specify that the Data
-    // Matrix barcode is rectangular.
+                          // Matrix barcode is rectangular.
     public DataMatrixECC ecc; // Specifies the ECC used for this Data Matrix
-    // barcode.
+                              // barcode.
     public DataMatrixPolarity polarity; // Specifies the data-to-background
-    // contrast for the Data Matrix barcode.
+                                        // contrast for the Data Matrix barcode.
     public DataMatrixCellFillMode cellFill; // Specifies the fill percentage for
-    // a cell of the Data Matrix barcode
-    // that is in the "ON" state.
+                                            // a cell of the Data Matrix barcode
+                                            // that is in the "ON" state.
     public float minBorderIntegrity; // Specifies the minimum percentage of the
-    // border (locator pattern and timing
-    // pattern) the function should expect in
-    // the Data Matrix barcode.
+                                     // border (locator pattern and timing
+                                     // pattern) the function should expect in
+                                     // the Data Matrix barcode.
     public DataMatrixMirrorMode mirrorMode; // Specifies if the Data Matrix
-    // barcode appears normally in the
-    // image or if the barcode appears
-    // mirrored in the image.
+                                            // barcode appears normally in the
+                                            // image or if the barcode appears
+                                            // mirrored in the image.
 
     private void init() {
 
@@ -12897,10 +12739,8 @@ public class NIVision {
     }
 
     public DataMatrixDescriptionOptions(double aspectRatio, int rows, int columns, int rectangle,
-                                        DataMatrixECC ecc, DataMatrixPolarity polarity,
-                                        DataMatrixCellFillMode cellFill,
-                                        double minBorderIntegrity, DataMatrixMirrorMode
-                                            mirrorMode) {
+        DataMatrixECC ecc, DataMatrixPolarity polarity, DataMatrixCellFillMode cellFill,
+        double minBorderIntegrity, DataMatrixMirrorMode mirrorMode) {
       super(56);
       this.aspectRatio = (float) aspectRatio;
       this.rows = rows;
@@ -12944,19 +12784,15 @@ public class NIVision {
       backing.putInt(4, rows);
       backing.putInt(8, columns);
       backing.putInt(12, rectangle);
-      if (ecc != null) {
+      if (ecc != null)
         backing.putInt(16, ecc.getValue());
-      }
-      if (polarity != null) {
+      if (polarity != null)
         backing.putInt(24, polarity.getValue());
-      }
-      if (cellFill != null) {
+      if (cellFill != null)
         backing.putInt(32, cellFill.getValue());
-      }
       backing.putFloat(40, minBorderIntegrity);
-      if (mirrorMode != null) {
+      if (mirrorMode != null)
         backing.putInt(48, mirrorMode.getValue());
-      }
     }
 
     public int size() {
@@ -12966,41 +12802,41 @@ public class NIVision {
 
   public static class DataMatrixSearchOptions extends DisposedStruct {
     public DataMatrixRotationMode rotationMode; // Specifies the amount of Data
-    // Matrix barcode rotation the
-    // function should allow for.
+                                                // Matrix barcode rotation the
+                                                // function should allow for.
     public int skipLocation; // If set to TRUE, specifies that the function
-    // should assume that the Data Matrix barcode
-    // occupies the entire image (or the entire search
-    // region).
+                             // should assume that the Data Matrix barcode
+                             // occupies the entire image (or the entire search
+                             // region).
     public int edgeThreshold; // Specifies the minimum contrast a pixel must
-    // have in order to be considered part of a matrix
-    // cell edge.
+                              // have in order to be considered part of a matrix
+                              // cell edge.
     public DataMatrixDemodulationMode demodulationMode; // Specifies the mode
-    // the function should
-    // use to demodulate
-    // (determine which
-    // cells are on and
-    // which cells are off)
-    // the Data Matrix
-    // barcode.
+                                                        // the function should
+                                                        // use to demodulate
+                                                        // (determine which
+                                                        // cells are on and
+                                                        // which cells are off)
+                                                        // the Data Matrix
+                                                        // barcode.
     public DataMatrixCellSampleSize cellSampleSize; // Specifies the sample
-    // size, in pixels, the
-    // function should take to
-    // determine if each cell is
-    // on or off.
+                                                    // size, in pixels, the
+                                                    // function should take to
+                                                    // determine if each cell is
+                                                    // on or off.
     public DataMatrixCellFilterMode cellFilterMode; // Specifies the mode the
-    // function uses to
-    // determine the pixel value
-    // for each cell.
+                                                    // function uses to
+                                                    // determine the pixel value
+                                                    // for each cell.
     public int skewDegreesAllowed; // Specifies the amount of skew in the Data
-    // Matrix barcode the function should allow
-    // for.
+                                   // Matrix barcode the function should allow
+                                   // for.
     public int maxIterations; // Specifies the maximum number of iterations
-    // before the function stops looking for the Data
-    // Matrix barcode.
+                              // before the function stops looking for the Data
+                              // Matrix barcode.
     public int initialSearchVectorWidth; // Specifies the number of pixels the
-    // function should average together to
-    // determine the location of an edge.
+                                         // function should average together to
+                                         // determine the location of an edge.
 
     private void init() {
 
@@ -13012,11 +12848,9 @@ public class NIVision {
     }
 
     public DataMatrixSearchOptions(DataMatrixRotationMode rotationMode, int skipLocation,
-                                   int edgeThreshold, DataMatrixDemodulationMode demodulationMode,
-                                   DataMatrixCellSampleSize cellSampleSize,
-                                   DataMatrixCellFilterMode cellFilterMode,
-                                   int skewDegreesAllowed, int maxIterations, int
-                                       initialSearchVectorWidth) {
+        int edgeThreshold, DataMatrixDemodulationMode demodulationMode,
+        DataMatrixCellSampleSize cellSampleSize, DataMatrixCellFilterMode cellFilterMode,
+        int skewDegreesAllowed, int maxIterations, int initialSearchVectorWidth) {
       super(56);
       this.rotationMode = rotationMode;
       this.skipLocation = skipLocation;
@@ -13056,20 +12890,16 @@ public class NIVision {
     }
 
     public void write() {
-      if (rotationMode != null) {
+      if (rotationMode != null)
         backing.putInt(0, rotationMode.getValue());
-      }
       backing.putInt(4, skipLocation);
       backing.putInt(8, edgeThreshold);
-      if (demodulationMode != null) {
+      if (demodulationMode != null)
         backing.putInt(16, demodulationMode.getValue());
-      }
-      if (cellSampleSize != null) {
+      if (cellSampleSize != null)
         backing.putInt(24, cellSampleSize.getValue());
-      }
-      if (cellFilterMode != null) {
+      if (cellFilterMode != null)
         backing.putInt(32, cellFilterMode.getValue());
-      }
       backing.putInt(40, skewDegreesAllowed);
       backing.putInt(44, maxIterations);
       backing.putInt(48, initialSearchVectorWidth);
@@ -13082,63 +12912,62 @@ public class NIVision {
 
   public static class DataMatrixReport extends DisposedStruct {
     public int found; // This element is TRUE if the function located and
-    // decoded a Data Matrix barcode and FALSE if the function
-    // failed to locate and decode a Data Matrix barcode.
+                      // decoded a Data Matrix barcode and FALSE if the function
+                      // failed to locate and decode a Data Matrix barcode.
     public int binary; // This element is TRUE if the Data Matrix barcode
-    // contains binary data and FALSE if the Data Matrix
-    // barcode contains text data.
+                       // contains binary data and FALSE if the Data Matrix
+                       // barcode contains text data.
     public byte[] data; // The data encoded in the Data Matrix barcode.
     public PointFloat[] boundingBox; // An array of four points describing the
-    // rectangle surrounding the Data Matrix
-    // barcode.
+                                     // rectangle surrounding the Data Matrix
+                                     // barcode.
     public int numErrorsCorrected; // The number of errors the function
-    // corrected when decoding the Data Matrix
-    // barcode.
+                                   // corrected when decoding the Data Matrix
+                                   // barcode.
     public int numErasuresCorrected; // The number of erasures the function
-    // corrected when decoding the Data Matrix
-    // barcode.
+                                     // corrected when decoding the Data Matrix
+                                     // barcode.
     public float aspectRatio; // Specifies the aspect ratio of the Data Matrix
-    // barcode in the image, which equals the ratio of
-    // the width of a Data Matrix barcode cell (in
-    // pixels) to the height of a Data Matrix barcode
-    // cell (in pixels).
+                              // barcode in the image, which equals the ratio of
+                              // the width of a Data Matrix barcode cell (in
+                              // pixels) to the height of a Data Matrix barcode
+                              // cell (in pixels).
     public int rows; // The number of rows in the Data Matrix barcode.
     public int columns; // The number of columns in the Data Matrix barcode.
     public DataMatrixECC ecc; // The Error Correction Code (ECC) used by the
-    // Data Matrix barcode.
+                              // Data Matrix barcode.
     public DataMatrixPolarity polarity; // The polarity of the Data Matrix
-    // barcode.
+                                        // barcode.
     public DataMatrixCellFillMode cellFill; // The cell fill percentage of the
-    // Data Matrix barcode.
+                                            // Data Matrix barcode.
     public float borderIntegrity; // The percentage of the Data Matrix barcode
-    // border that appears correctly in the image.
+                                  // border that appears correctly in the image.
     public int mirrored; // This element is TRUE if the Data Matrix barcode
-    // appears mirrored in the image and FALSE if the Data
-    // Matrix barcode appears normally in the image.
+                         // appears mirrored in the image and FALSE if the Data
+                         // Matrix barcode appears normally in the image.
     public int minimumEdgeStrength; // The strength of the weakest edge the
-    // function used to find the coarse location
-    // of the Data Matrix barcode in the image.
+                                    // function used to find the coarse location
+                                    // of the Data Matrix barcode in the image.
     public DataMatrixDemodulationMode demodulationMode; // The demodulation mode
-    // the function used to
-    // locate the Data
-    // Matrix barcode.
+                                                        // the function used to
+                                                        // locate the Data
+                                                        // Matrix barcode.
     public DataMatrixCellSampleSize cellSampleSize; // The cell sample size the
-    // function used to locate
-    // the Data Matrix barcode.
+                                                    // function used to locate
+                                                    // the Data Matrix barcode.
     public DataMatrixCellFilterMode cellFilterMode; // The cell filter mode the
-    // function used to locate
-    // the Data Matrix barcode.
+                                                    // function used to locate
+                                                    // the Data Matrix barcode.
     public int iterations; // The number of iterations the function took in
-    // attempting to locate the Data Matrix barcode.
+                           // attempting to locate the Data Matrix barcode.
     private ByteBuffer data_buf;
 
     private void init() {
       data = new byte[0];
       boundingBox = new PointFloat[4];
 
-      for (int i = 0, off = 16; i < 4; i++, off += 8) {
+      for (int i = 0, off = 16; i < 4; i++, off += 8)
         boundingBox[i] = new PointFloat(backing, off);
-      }
     }
 
     public DataMatrixReport() {
@@ -13147,14 +12976,12 @@ public class NIVision {
     }
 
     public DataMatrixReport(int found, int binary, byte[] data, PointFloat[] boundingBox,
-                            int numErrorsCorrected, int numErasuresCorrected, double aspectRatio,
-                            int rows,
-                            int columns, DataMatrixECC ecc, DataMatrixPolarity polarity,
-                            DataMatrixCellFillMode cellFill, double borderIntegrity, int mirrored,
-                            int minimumEdgeStrength, DataMatrixDemodulationMode demodulationMode,
-                            DataMatrixCellSampleSize cellSampleSize, DataMatrixCellFilterMode
-                                cellFilterMode,
-                            int iterations) {
+        int numErrorsCorrected, int numErasuresCorrected, double aspectRatio, int rows,
+        int columns, DataMatrixECC ecc, DataMatrixPolarity polarity,
+        DataMatrixCellFillMode cellFill, double borderIntegrity, int mirrored,
+        int minimumEdgeStrength, DataMatrixDemodulationMode demodulationMode,
+        DataMatrixCellSampleSize cellSampleSize, DataMatrixCellFilterMode cellFilterMode,
+        int iterations) {
       super(144);
       this.found = found;
       this.binary = binary;
@@ -13235,27 +13062,21 @@ public class NIVision {
       backing.putFloat(56, aspectRatio);
       backing.putInt(60, rows);
       backing.putInt(64, columns);
-      if (ecc != null) {
+      if (ecc != null)
         backing.putInt(72, ecc.getValue());
-      }
-      if (polarity != null) {
+      if (polarity != null)
         backing.putInt(80, polarity.getValue());
-      }
-      if (cellFill != null) {
+      if (cellFill != null)
         backing.putInt(88, cellFill.getValue());
-      }
       backing.putFloat(96, borderIntegrity);
       backing.putInt(100, mirrored);
       backing.putInt(104, minimumEdgeStrength);
-      if (demodulationMode != null) {
+      if (demodulationMode != null)
         backing.putInt(112, demodulationMode.getValue());
-      }
-      if (cellSampleSize != null) {
+      if (cellSampleSize != null)
         backing.putInt(120, cellSampleSize.getValue());
-      }
-      if (cellFilterMode != null) {
+      if (cellFilterMode != null)
         backing.putInt(128, cellFilterMode.getValue());
-      }
       backing.putInt(136, iterations);
     }
 
@@ -13266,16 +13087,16 @@ public class NIVision {
 
   public static class JPEG2000FileAdvancedOptions extends DisposedStruct {
     public WaveletTransformMode waveletMode; // Determines which wavelet
-    // transform to use when writing
-    // the file.
+                                             // transform to use when writing
+                                             // the file.
     public int useMultiComponentTransform; // Set this parameter to TRUE to use
-    // an additional transform on RGB
-    // images.
+                                           // an additional transform on RGB
+                                           // images.
     public int maxWaveletTransformLevel; // Specifies the maximum allowed level
-    // of wavelet transform.
+                                         // of wavelet transform.
     public float quantizationStepSize; // Specifies the absolute base
-    // quantization step size for derived
-    // quantization mode.
+                                       // quantization step size for derived
+                                       // quantization mode.
 
     private void init() {
 
@@ -13287,8 +13108,7 @@ public class NIVision {
     }
 
     public JPEG2000FileAdvancedOptions(WaveletTransformMode waveletMode,
-                                       int useMultiComponentTransform, int
-                                           maxWaveletTransformLevel, double quantizationStepSize) {
+        int useMultiComponentTransform, int maxWaveletTransformLevel, double quantizationStepSize) {
       super(16);
       this.waveletMode = waveletMode;
       this.useMultiComponentTransform = useMultiComponentTransform;
@@ -13318,9 +13138,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (waveletMode != null) {
+      if (waveletMode != null)
         backing.putInt(0, waveletMode.getValue());
-      }
       backing.putInt(4, useMultiComponentTransform);
       backing.putInt(8, maxWaveletTransformLevel);
       backing.putFloat(12, quantizationStepSize);
@@ -13333,53 +13152,53 @@ public class NIVision {
 
   public static class MatchGeometricPatternAdvancedOptions2 extends DisposedStruct {
     public int minFeaturesUsed; // Specifies the minimum number of features the
-    // function uses when matching.
+                                // function uses when matching.
     public int maxFeaturesUsed; // Specifies the maximum number of features the
-    // function uses when matching.
+                                // function uses when matching.
     public int subpixelIterations; // Specifies the maximum number of
-    // incremental improvements used to refine
-    // matches with subpixel information.
+                                   // incremental improvements used to refine
+                                   // matches with subpixel information.
     public double subpixelTolerance; // Specifies the maximum amount of change,
-    // in pixels, between consecutive
-    // incremental improvements in the match
-    // position before the function stops
-    // refining the match position.
+                                     // in pixels, between consecutive
+                                     // incremental improvements in the match
+                                     // position before the function stops
+                                     // refining the match position.
     public int initialMatchListLength; // Specifies the maximum size of the
-    // match list.
+                                       // match list.
     public float matchTemplateCurveScore; // Set this element to TRUE to specify
-    // that the function should calculate
-    // the match curve to template curve
-    // score and return it for each match
-    // result.
+                                          // that the function should calculate
+                                          // the match curve to template curve
+                                          // score and return it for each match
+                                          // result.
     public int correlationScore; // Set this element to TRUE to specify that the
-    // function should calculate the correlation
-    // score and return it for each match result.
+                                 // function should calculate the correlation
+                                 // score and return it for each match result.
     public double minMatchSeparationDistance; // Specifies the minimum
-    // separation distance, in pixels,
-    // between the origins of two
-    // matches that have unique
-    // positions.
+                                              // separation distance, in pixels,
+                                              // between the origins of two
+                                              // matches that have unique
+                                              // positions.
     public double minMatchSeparationAngle; // Specifies the minimum angular
-    // difference, in degrees, between
-    // two matches that have unique
-    // angles.
+                                           // difference, in degrees, between
+                                           // two matches that have unique
+                                           // angles.
     public double minMatchSeparationScale; // Specifies the minimum difference
-    // in scale, expressed as a
-    // percentage, between two matches
-    // that have unique scales.
+                                           // in scale, expressed as a
+                                           // percentage, between two matches
+                                           // that have unique scales.
     public double maxMatchOverlap; // Specifies the maximum amount of overlap,
-    // expressed as a percentage, allowed between
-    // the bounding rectangles of two unique
-    // matches.
+                                   // expressed as a percentage, allowed between
+                                   // the bounding rectangles of two unique
+                                   // matches.
     public int coarseResult; // Specifies whether you want the function to spend
-    // less time accurately estimating the location of
-    // a match.
+                             // less time accurately estimating the location of
+                             // a match.
     public int smoothContours; // Set this element to TRUE to specify smoothing
-    // be done on the contours of the inspection
-    // image before feature extraction.
+                               // be done on the contours of the inspection
+                               // image before feature extraction.
     public int enableCalibrationSupport; // Set this element to TRUE to specify
-    // the algorithm treat the inspection
-    // image as a calibrated image.
+                                         // the algorithm treat the inspection
+                                         // image as a calibrated image.
 
     private void init() {
 
@@ -13391,16 +13210,10 @@ public class NIVision {
     }
 
     public MatchGeometricPatternAdvancedOptions2(int minFeaturesUsed, int maxFeaturesUsed,
-                                                 int subpixelIterations, double
-                                                     subpixelTolerance, int initialMatchListLength,
-                                                 double matchTemplateCurveScore, int
-                                                     correlationScore, double
-                                                     minMatchSeparationDistance,
-                                                 double minMatchSeparationAngle, double
-                                                     minMatchSeparationScale, double
-                                                     maxMatchOverlap,
-                                                 int coarseResult, int smoothContours, int
-                                                     enableCalibrationSupport) {
+        int subpixelIterations, double subpixelTolerance, int initialMatchListLength,
+        double matchTemplateCurveScore, int correlationScore, double minMatchSeparationDistance,
+        double minMatchSeparationAngle, double minMatchSeparationScale, double maxMatchOverlap,
+        int coarseResult, int smoothContours, int enableCalibrationSupport) {
       super(88);
       this.minFeaturesUsed = minFeaturesUsed;
       this.maxFeaturesUsed = maxFeaturesUsed;
@@ -13473,12 +13286,12 @@ public class NIVision {
 
   public static class InspectionAlignment extends DisposedStruct {
     public PointFloat position; // The location of the center of the golden
-    // template in the image under inspection.
+                                // template in the image under inspection.
     public float rotation; // The rotation of the golden template in the image
-    // under inspection, in degrees.
+                           // under inspection, in degrees.
     public float scale; // The percentage of the size of the area under
-    // inspection compared to the size of the golden
-    // template.
+                        // inspection compared to the size of the golden
+                        // template.
 
     private void init() {
       position = new PointFloat(backing, 0);
@@ -13529,24 +13342,24 @@ public class NIVision {
 
   public static class InspectionOptions extends DisposedStruct {
     public RegistrationMethod registrationMethod; // Specifies how the function
-    // registers the golden
-    // template and the target
-    // image.
+                                                  // registers the golden
+                                                  // template and the target
+                                                  // image.
     public NormalizationMethod normalizationMethod; // Specifies how the
-    // function normalizes the
-    // golden template to the
-    // target image.
+                                                    // function normalizes the
+                                                    // golden template to the
+                                                    // target image.
     public int edgeThicknessToIgnore; // Specifies desired thickness of edges to
-    // be ignored.
+                                      // be ignored.
     public float brightThreshold; // Specifies the threshold for areas where the
-    // target image is brighter than the golden
-    // template.
+                                  // target image is brighter than the golden
+                                  // template.
     public float darkThreshold; // Specifies the threshold for areas where the
-    // target image is darker than the golden
-    // template.
+                                // target image is darker than the golden
+                                // template.
     public int binary; // Specifies whether the function should return a binary
-    // image giving the location of defects, or a grayscale
-    // image giving the intensity of defects.
+                       // image giving the location of defects, or a grayscale
+                       // image giving the intensity of defects.
 
     private void init() {
 
@@ -13558,9 +13371,8 @@ public class NIVision {
     }
 
     public InspectionOptions(RegistrationMethod registrationMethod,
-                             NormalizationMethod normalizationMethod, int edgeThicknessToIgnore,
-                             double brightThreshold,
-                             double darkThreshold, int binary) {
+        NormalizationMethod normalizationMethod, int edgeThicknessToIgnore, double brightThreshold,
+        double darkThreshold, int binary) {
       super(24);
       this.registrationMethod = registrationMethod;
       this.normalizationMethod = normalizationMethod;
@@ -13594,12 +13406,10 @@ public class NIVision {
     }
 
     public void write() {
-      if (registrationMethod != null) {
+      if (registrationMethod != null)
         backing.putInt(0, registrationMethod.getValue());
-      }
-      if (normalizationMethod != null) {
+      if (normalizationMethod != null)
         backing.putInt(4, normalizationMethod.getValue());
-      }
       backing.putInt(8, edgeThicknessToIgnore);
       backing.putFloat(12, brightThreshold);
       backing.putFloat(16, darkThreshold);
@@ -13614,29 +13424,28 @@ public class NIVision {
   public static class CharReport2 extends DisposedStruct {
     public String character; // The character value.
     public PointFloat[] corner; // An array of four points that describes the
-    // rectangle that surrounds the character.
+                                // rectangle that surrounds the character.
     public int lowThreshold; // The minimum value of the threshold range used
-    // for this character.
+                             // for this character.
     public int highThreshold; // The maximum value of the threshold range used
-    // for this character.
+                              // for this character.
     public int classificationScore; // The degree to which the assigned
-    // character class represents the object
-    // better than the other character classes
-    // in the character set.
+                                    // character class represents the object
+                                    // better than the other character classes
+                                    // in the character set.
     public int verificationScore; // The similarity of the character and the
-    // reference character for the character
-    // class.
+                                  // reference character for the character
+                                  // class.
     public int verified; // This element is TRUE if a reference character was
-    // found for the character class and FALSE if a
-    // reference character was not found.
+                         // found for the character class and FALSE if a
+                         // reference character was not found.
     private ByteBuffer character_buf;
 
     private void init() {
       corner = new PointFloat[4];
 
-      for (int i = 0, off = 4; i < 4; i++, off += 8) {
+      for (int i = 0, off = 4; i < 4; i++, off += 8)
         corner[i] = new PointFloat(backing, off);
-      }
     }
 
     public CharReport2() {
@@ -13645,7 +13454,7 @@ public class NIVision {
     }
 
     public CharReport2(String character, PointFloat[] corner, int lowThreshold, int highThreshold,
-                       int classificationScore, int verificationScore, int verified) {
+        int classificationScore, int verificationScore, int verified) {
       super(56);
       this.character = character;
       this.corner = corner;
@@ -13672,9 +13481,9 @@ public class NIVision {
 
     public void read() {
       long character_addr = getPointer(backing, 0);
-      if (character_addr == 0) {
+      if (character_addr == 0)
         character = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(character_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -13727,12 +13536,12 @@ public class NIVision {
 
   public static class CharInfo2 extends DisposedStruct {
     public String charValue; // Retrieves the character value of the
-    // corresponding character in the character set.
+                             // corresponding character in the character set.
     public Image charImage; // The image you used to train this character.
     public Image internalImage; // The internal representation that NI Vision
-    // uses to match objects to this character.
+                                // uses to match objects to this character.
     public int isReferenceChar; // This element is TRUE if the character is the
-    // reference character for the character class.
+                                // reference character for the character class.
     private ByteBuffer charValue_buf;
 
     private void init() {
@@ -13768,9 +13577,9 @@ public class NIVision {
 
     public void read() {
       long charValue_addr = getPointer(backing, 0);
-      if (charValue_addr == 0) {
+      if (charValue_addr == 0)
         charValue = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(charValue_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -13784,17 +13593,15 @@ public class NIVision {
       }
 
       long charImage_addr = getPointer(backing, 4);
-      if (charImage_addr == 0) {
+      if (charImage_addr == 0)
         charImage = null;
-      } else {
+      else
         charImage = new Image(charImage_addr, false);
-      }
       long internalImage_addr = getPointer(backing, 8);
-      if (internalImage_addr == 0) {
+      if (internalImage_addr == 0)
         internalImage = null;
-      } else {
+      else
         internalImage = new Image(internalImage_addr, false);
-      }
       isReferenceChar = backing.getInt(12);
     }
 
@@ -13824,8 +13631,8 @@ public class NIVision {
   public static class ReadTextReport2 extends DisposedStruct {
     public String readString; // The read string.
     public CharReport2[] characterReport; // An array of reports describing the
-    // properties of each identified
-    // character.
+                                          // properties of each identified
+                                          // character.
     private ByteBuffer readString_buf;
     private ByteBuffer characterReport_buf;
 
@@ -13860,9 +13667,9 @@ public class NIVision {
 
     public void read() {
       long readString_addr = getPointer(backing, 0);
-      if (readString_addr == 0) {
+      if (readString_addr == 0)
         readString = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(readString_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -13919,11 +13726,11 @@ public class NIVision {
   public static class EllipseFeature extends DisposedStruct {
     public PointFloat position; // The location of the center of the ellipse.
     public double rotation; // The orientation of the semi-major axis of the
-    // ellipse with respect to the horizontal.
+                            // ellipse with respect to the horizontal.
     public double minorRadius; // The length of the semi-minor axis of the
-    // ellipse.
+                               // ellipse.
     public double majorRadius; // The length of the semi-major axis of the
-    // ellipse.
+                               // ellipse.
 
     private void init() {
       position = new PointFloat(backing, 0);
@@ -13935,7 +13742,7 @@ public class NIVision {
     }
 
     public EllipseFeature(PointFloat position, double rotation, double minorRadius,
-                          double majorRadius) {
+        double majorRadius) {
       super(32);
       this.position = position;
       this.rotation = rotation;
@@ -14026,21 +13833,21 @@ public class NIVision {
 
   public static class ConstCurveFeature extends DisposedStruct {
     public PointFloat position; // The center of the circle that this constant
-    // curve lies upon.
+                                // curve lies upon.
     public double radius; // The radius of the circle that this constant curve
-    // lies upon.
+                          // lies upon.
     public double startAngle; // When traveling along the constant curve from
-    // one endpoint to the next in a counterclockwise
-    // manner, this is the angular component of the
-    // vector originating at the center of the
-    // constant curve and pointing towards the first
-    // endpoint of the constant curve.
+                              // one endpoint to the next in a counterclockwise
+                              // manner, this is the angular component of the
+                              // vector originating at the center of the
+                              // constant curve and pointing towards the first
+                              // endpoint of the constant curve.
     public double endAngle; // When traveling along the constant curve from one
-    // endpoint to the next in a counterclockwise
-    // manner, this is the angular component of the
-    // vector originating at the center of the constant
-    // curve and pointing towards the second endpoint of
-    // the constant curve.
+                            // endpoint to the next in a counterclockwise
+                            // manner, this is the angular component of the
+                            // vector originating at the center of the constant
+                            // curve and pointing towards the second endpoint of
+                            // the constant curve.
 
     private void init() {
       position = new PointFloat(backing, 0);
@@ -14051,8 +13858,7 @@ public class NIVision {
       init();
     }
 
-    public ConstCurveFeature(PointFloat position, double radius, double startAngle, double
-        endAngle) {
+    public ConstCurveFeature(PointFloat position, double radius, double startAngle, double endAngle) {
       super(32);
       this.position = position;
       this.radius = radius;
@@ -14097,7 +13903,7 @@ public class NIVision {
     public PointFloat position; // The center of the rectangle.
     public PointFloat[] corner; // The four corners of the rectangle.
     public double rotation; // The orientation of the rectangle with respect to
-    // the horizontal.
+                            // the horizontal.
     public double width; // The width of the rectangle.
     public double height; // The height of the rectangle.
 
@@ -14105,9 +13911,8 @@ public class NIVision {
       position = new PointFloat(backing, 0);
       corner = new PointFloat[4];
 
-      for (int i = 0, off = 8; i < 4; i++, off += 8) {
+      for (int i = 0, off = 8; i < 4; i++, off += 8)
         corner[i] = new PointFloat(backing, off);
-      }
     }
 
     public RectangleFeature() {
@@ -14116,7 +13921,7 @@ public class NIVision {
     }
 
     public RectangleFeature(PointFloat position, PointFloat[] corner, double rotation,
-                            double width, double height) {
+        double width, double height) {
       super(64);
       this.position = position;
       this.corner = corner;
@@ -14168,7 +13973,7 @@ public class NIVision {
     public PointFloat position; // The location of the leg feature.
     public PointFloat[] corner; // The four corners of the leg feature.
     public double rotation; // The orientation of the leg with respect to the
-    // horizontal.
+                            // horizontal.
     public double width; // The width of the leg.
     public double height; // The height of the leg.
 
@@ -14176,9 +13981,8 @@ public class NIVision {
       position = new PointFloat(backing, 0);
       corner = new PointFloat[4];
 
-      for (int i = 0, off = 8; i < 4; i++, off += 8) {
+      for (int i = 0, off = 8; i < 4; i++, off += 8)
         corner[i] = new PointFloat(backing, off);
-      }
     }
 
     public LegFeature() {
@@ -14187,7 +13991,7 @@ public class NIVision {
     }
 
     public LegFeature(PointFloat position, PointFloat[] corner, double rotation, double width,
-                      double height) {
+        double height) {
       super(64);
       this.position = position;
       this.corner = corner;
@@ -14238,9 +14042,9 @@ public class NIVision {
   public static class CornerFeature extends DisposedStruct {
     public PointFloat position; // The location of the corner feature.
     public double rotation; // The angular component of the vector bisecting the
-    // corner from position.
+                            // corner from position.
     public double enclosedAngle; // The measure of the enclosed angle of the
-    // corner.
+                                 // corner.
     public int isVirtual;
 
     private void init() {
@@ -14252,8 +14056,7 @@ public class NIVision {
       init();
     }
 
-    public CornerFeature(PointFloat position, double rotation, double enclosedAngle, int
-        isVirtual) {
+    public CornerFeature(PointFloat position, double rotation, double enclosedAngle, int isVirtual) {
       super(32);
       this.position = position;
       this.rotation = rotation;
@@ -14298,9 +14101,9 @@ public class NIVision {
     public PointFloat startPoint; // The starting point of the line.
     public PointFloat endPoint; // The ending point of the line.
     public double length; // The length of the line measured in pixels from the
-    // start point to the end point.
+                          // start point to the end point.
     public double rotation; // The orientation of the line with respect to the
-    // horizontal.
+                            // horizontal.
 
     private void init() {
       startPoint = new PointFloat(backing, 0);
@@ -14355,17 +14158,17 @@ public class NIVision {
 
   public static class ParallelLinePairFeature extends DisposedStruct {
     public PointFloat firstStartPoint; // The starting point of the first line
-    // of the pair.
+                                       // of the pair.
     public PointFloat firstEndPoint; // The ending point of the first line of
-    // the pair.
+                                     // the pair.
     public PointFloat secondStartPoint; // The starting point of the second line
-    // of the pair.
+                                        // of the pair.
     public PointFloat secondEndPoint; // The ending point of the second line of
-    // the pair.
+                                      // the pair.
     public double rotation; // The orientation of the feature with respect to
-    // the horizontal.
+                            // the horizontal.
     public double distance; // The distance from the first line to the second
-    // line.
+                            // line.
 
     private void init() {
       firstStartPoint = new PointFloat(backing, 0);
@@ -14380,8 +14183,7 @@ public class NIVision {
     }
 
     public ParallelLinePairFeature(PointFloat firstStartPoint, PointFloat firstEndPoint,
-                                   PointFloat secondStartPoint, PointFloat secondEndPoint, double
-                                       rotation, double distance) {
+        PointFloat secondStartPoint, PointFloat secondEndPoint, double rotation, double distance) {
       super(48);
       this.firstStartPoint = firstStartPoint;
       this.firstEndPoint = firstEndPoint;
@@ -14430,15 +14232,15 @@ public class NIVision {
 
   public static class PairOfParallelLinePairsFeature extends DisposedStruct {
     public ParallelLinePairFeature firstParallelLinePair; // The first parallel
-    // line pair.
+                                                          // line pair.
     public ParallelLinePairFeature secondParallelLinePair; // The second
-    // parallel line
-    // pair.
+                                                           // parallel line
+                                                           // pair.
     public double rotation; // The orientation of the feature with respect to
-    // the horizontal.
+                            // the horizontal.
     public double distance; // The distance from the midline of the first
-    // parallel line pair to the midline of the second
-    // parallel line pair.
+                            // parallel line pair to the midline of the second
+                            // parallel line pair.
 
     private void init() {
       firstParallelLinePair = new ParallelLinePairFeature(backing, 0);
@@ -14451,8 +14253,7 @@ public class NIVision {
     }
 
     public PairOfParallelLinePairsFeature(ParallelLinePairFeature firstParallelLinePair,
-                                          ParallelLinePairFeature secondParallelLinePair, double
-                                              rotation, double distance) {
+        ParallelLinePairFeature secondParallelLinePair, double rotation, double distance) {
       super(112);
       this.firstParallelLinePair = firstParallelLinePair;
       this.secondParallelLinePair = secondParallelLinePair;
@@ -14495,9 +14296,9 @@ public class NIVision {
 
   public static class FeatureData extends DisposedStruct {
     public FeatureType type; // An enumeration representing the type of the
-    // feature.
+                             // feature.
     public PointFloat[] contourPoints; // A set of points describing the contour
-    // of the feature.
+                                       // of the feature.
     public CircleFeature circle; // A pointer to a CircleFeature.
     public EllipseFeature ellipse; // A pointer to an EllipseFeature.
     public ConstCurveFeature constCurve; // A pointer to a ConstCurveFeature.
@@ -14505,10 +14306,10 @@ public class NIVision {
     public LegFeature leg; // A pointer to a LegFeature.
     public CornerFeature corner; // A pointer to a CornerFeature.
     public ParallelLinePairFeature parallelLinePair; // A pointer to a
-    // ParallelLinePairFeature.
+                                                     // ParallelLinePairFeature.
     public PairOfParallelLinePairsFeature pairOfParallelLinePairs; // A pointer
-    // to a
-    // PairOfParallelLinePairsFeature.
+                                                                   // to a
+                                                                   // PairOfParallelLinePairsFeature.
     public LineFeature line; // A pointer to a LineFeature.
     public ClosedCurveFeature closedCurve; // A pointer to a ClosedCurveFeature.
     private ByteBuffer contourPoints_buf;
@@ -14556,91 +14357,80 @@ public class NIVision {
       }
       if (type == FeatureType.CIRCLE_FEATURE) {
         long circle_addr = getPointer(backing, 12);
-        if (circle_addr == 0) {
+        if (circle_addr == 0)
           circle = null;
-        } else {
+        else
           circle = new CircleFeature(circle_addr, false);
-        }
       }
       if (type == FeatureType.ELLIPSE_FEATURE) {
         long ellipse_addr = getPointer(backing, 12);
-        if (ellipse_addr == 0) {
+        if (ellipse_addr == 0)
           ellipse = null;
-        } else {
+        else
           ellipse = new EllipseFeature(ellipse_addr, false);
-        }
       }
       if (type == FeatureType.CONST_CURVE_FEATURE) {
         long constCurve_addr = getPointer(backing, 12);
-        if (constCurve_addr == 0) {
+        if (constCurve_addr == 0)
           constCurve = null;
-        } else {
+        else
           constCurve = new ConstCurveFeature(constCurve_addr, false);
-        }
       }
       if (type == FeatureType.RECTANGLE_FEATURE) {
         long rectangle_addr = getPointer(backing, 12);
-        if (rectangle_addr == 0) {
+        if (rectangle_addr == 0)
           rectangle = null;
-        } else {
+        else
           rectangle = new RectangleFeature(rectangle_addr, false);
-        }
       }
       if (type == FeatureType.LEG_FEATURE) {
         long leg_addr = getPointer(backing, 12);
-        if (leg_addr == 0) {
+        if (leg_addr == 0)
           leg = null;
-        } else {
+        else
           leg = new LegFeature(leg_addr, false);
-        }
       }
       if (type == FeatureType.CORNER_FEATURE) {
         long corner_addr = getPointer(backing, 12);
-        if (corner_addr == 0) {
+        if (corner_addr == 0)
           corner = null;
-        } else {
+        else
           corner = new CornerFeature(corner_addr, false);
-        }
       }
       if (type == FeatureType.PARALLEL_LINE_PAIR_FEATURE) {
         long parallelLinePair_addr = getPointer(backing, 12);
-        if (parallelLinePair_addr == 0) {
+        if (parallelLinePair_addr == 0)
           parallelLinePair = null;
-        } else {
+        else
           parallelLinePair = new ParallelLinePairFeature(parallelLinePair_addr, false);
-        }
       }
       if (type == FeatureType.PAIR_OF_PARALLEL_LINE_PAIRS_FEATURE) {
         long pairOfParallelLinePairs_addr = getPointer(backing, 12);
-        if (pairOfParallelLinePairs_addr == 0) {
+        if (pairOfParallelLinePairs_addr == 0)
           pairOfParallelLinePairs = null;
-        } else {
+        else
           pairOfParallelLinePairs =
               new PairOfParallelLinePairsFeature(pairOfParallelLinePairs_addr, false);
-        }
       }
       if (type == FeatureType.LINE_FEATURE) {
         long line_addr = getPointer(backing, 12);
-        if (line_addr == 0) {
+        if (line_addr == 0)
           line = null;
-        } else {
+        else
           line = new LineFeature(line_addr, false);
-        }
       }
       if (type == FeatureType.CLOSED_CURVE_FEATURE) {
         long closedCurve_addr = getPointer(backing, 12);
-        if (closedCurve_addr == 0) {
+        if (closedCurve_addr == 0)
           closedCurve = null;
-        } else {
+        else
           closedCurve = new ClosedCurveFeature(closedCurve_addr, false);
-        }
       }
     }
 
     public void write() {
-      if (type != null) {
+      if (type != null)
         backing.putInt(0, type.getValue());
-      }
       contourPoints_buf =
           ByteBuffer.allocateDirect(contourPoints.length * 8).order(ByteOrder.nativeOrder());
       for (int i = 0, off = 0; i < contourPoints.length; i++, off += 8) {
@@ -14688,55 +14478,53 @@ public class NIVision {
 
   public static class GeometricPatternMatch2 extends DisposedStruct {
     public PointFloat position; // The location of the origin of the template in
-    // the match.
+                                // the match.
     public float rotation; // The rotation of the match relative to the template
-    // image, in degrees.
+                           // image, in degrees.
     public float scale; // The size of the match relative to the size of the
-    // template image, expressed as a percentage.
+                        // template image, expressed as a percentage.
     public float score; // The accuracy of the match.
     public PointFloat[] corner; // An array of four points describing the
-    // rectangle surrounding the template image.
+                                // rectangle surrounding the template image.
     public int inverse; // This element is TRUE if the match is an inverse of
-    // the template image.
+                        // the template image.
     public float occlusion; // The percentage of the match that is occluded.
     public float templateMatchCurveScore; // The accuracy of the match obtained
-    // by comparing the template curves to
-    // the curves in the match region.
+                                          // by comparing the template curves to
+                                          // the curves in the match region.
     public float matchTemplateCurveScore; // The accuracy of the match obtained
-    // by comparing the curves in the
-    // match region to the template
-    // curves.
+                                          // by comparing the curves in the
+                                          // match region to the template
+                                          // curves.
     public float correlationScore; // The accuracy of the match obtained by
-    // comparing the template image to the match
-    // region using a correlation metric that
-    // compares the two regions as a function of
-    // their pixel values.
+                                   // comparing the template image to the match
+                                   // region using a correlation metric that
+                                   // compares the two regions as a function of
+                                   // their pixel values.
     public String label; // The label corresponding to this match when the match
-    // is returned by imaqMatchMultipleGeometricPatterns().
+                         // is returned by imaqMatchMultipleGeometricPatterns().
     public FeatureData[] featureData; // The features used in this match.
     public PointFloat calibratedPosition; // The location of the origin of the
-    // template in the match.
+                                          // template in the match.
     public float calibratedRotation; // The rotation of the match relative to
-    // the template image, in degrees.
+                                     // the template image, in degrees.
     public PointFloat[] calibratedCorner; // An array of four points describing
-    // the rectangle surrounding the
-    // template image.
+                                          // the rectangle surrounding the
+                                          // template image.
     private ByteBuffer featureData_buf;
 
     private void init() {
       position = new PointFloat(backing, 0);
       corner = new PointFloat[4];
 
-      for (int i = 0, off = 20; i < 4; i++, off += 8) {
+      for (int i = 0, off = 20; i < 4; i++, off += 8)
         corner[i] = new PointFloat(backing, off);
-      }
       featureData = new FeatureData[0];
       calibratedPosition = new PointFloat(backing, 336);
       calibratedCorner = new PointFloat[4];
 
-      for (int i = 0, off = 348; i < 4; i++, off += 8) {
+      for (int i = 0, off = 348; i < 4; i++, off += 8)
         calibratedCorner[i] = new PointFloat(backing, off);
-      }
     }
 
     public GeometricPatternMatch2() {
@@ -14745,13 +14533,10 @@ public class NIVision {
     }
 
     public GeometricPatternMatch2(PointFloat position, double rotation, double scale, double score,
-                                  PointFloat[] corner, int inverse, double occlusion, double
-                                      templateMatchCurveScore,
-                                  double matchTemplateCurveScore, double correlationScore, String
-                                      label,
-                                  FeatureData[] featureData, PointFloat calibratedPosition,
-                                  double calibratedRotation,
-                                  PointFloat[] calibratedCorner) {
+        PointFloat[] corner, int inverse, double occlusion, double templateMatchCurveScore,
+        double matchTemplateCurveScore, double correlationScore, String label,
+        FeatureData[] featureData, PointFloat calibratedPosition, double calibratedRotation,
+        PointFloat[] calibratedCorner) {
       super(380);
       this.position = position;
       this.rotation = (float) rotation;
@@ -14847,9 +14632,8 @@ public class NIVision {
           bytes = new byte[0];
         }
         putBytes(backing, bytes, 72, bytes.length);
-        for (int i = bytes.length; i < 256; i++) {
+        for (int i = bytes.length; i < 256; i++)
           backing.put(i, (byte) 0); // fill with zero
-        }
       }
       featureData_buf =
           ByteBuffer.allocateDirect(featureData.length * 16).order(ByteOrder.nativeOrder());
@@ -14923,7 +14707,7 @@ public class NIVision {
     public PointFloat startPoint; // The starting point of the matched line.
     public PointFloat endPoint; // The ending point of the matched line.
     public double length; // The length of the line measured in pixels from the
-    // start point to the end point.
+                          // start point to the end point.
     public double rotation; // The orientation of the matched line.
     public double score; // The score of the matched line.
 
@@ -14938,7 +14722,7 @@ public class NIVision {
     }
 
     public LineMatch(PointFloat startPoint, PointFloat endPoint, double length, double rotation,
-                     double score) {
+        double score) {
       super(40);
       this.startPoint = startPoint;
       this.endPoint = endPoint;
@@ -14984,9 +14768,9 @@ public class NIVision {
 
   public static class LineDescriptor extends DisposedStruct {
     public double minLength; // Specifies the minimum length of a line the
-    // function will return.
+                             // function will return.
     public double maxLength; // Specifies the maximum length of a line the
-    // function will return.
+                             // function will return.
 
     private void init() {
 
@@ -15034,13 +14818,13 @@ public class NIVision {
 
   public static class RectangleDescriptor extends DisposedStruct {
     public double minWidth; // Specifies the minimum width of a rectangle the
-    // algorithm will return.
+                            // algorithm will return.
     public double maxWidth; // Specifies the maximum width of a rectangle the
-    // algorithm will return.
+                            // algorithm will return.
     public double minHeight; // Specifies the minimum height of a rectangle the
-    // algorithm will return.
+                             // algorithm will return.
     public double maxHeight; // Specifies the maximum height of a rectangle the
-    // algorithm will return.
+                             // algorithm will return.
 
     private void init() {
 
@@ -15051,8 +14835,7 @@ public class NIVision {
       init();
     }
 
-    public RectangleDescriptor(double minWidth, double maxWidth, double minHeight, double
-        maxHeight) {
+    public RectangleDescriptor(double minWidth, double maxWidth, double minHeight, double maxHeight) {
       super(32);
       this.minWidth = minWidth;
       this.maxWidth = maxWidth;
@@ -15103,9 +14886,8 @@ public class NIVision {
     private void init() {
       corner = new PointFloat[4];
 
-      for (int i = 0, off = 0; i < 4; i++, off += 8) {
+      for (int i = 0, off = 0; i < 4; i++, off += 8)
         corner[i] = new PointFloat(backing, off);
-      }
     }
 
     public RectangleMatch() {
@@ -15114,7 +14896,7 @@ public class NIVision {
     }
 
     public RectangleMatch(PointFloat[] corner, double rotation, double width, double height,
-                          double score) {
+        double score) {
       super(64);
       this.corner = corner;
       this.rotation = rotation;
@@ -15164,17 +14946,17 @@ public class NIVision {
 
   public static class EllipseDescriptor extends DisposedStruct {
     public double minMajorRadius; // Specifies the minimum length of the
-    // semi-major axis of an ellipse the function
-    // will return.
+                                  // semi-major axis of an ellipse the function
+                                  // will return.
     public double maxMajorRadius; // Specifies the maximum length of the
-    // semi-major axis of an ellipse the function
-    // will return.
+                                  // semi-major axis of an ellipse the function
+                                  // will return.
     public double minMinorRadius; // Specifies the minimum length of the
-    // semi-minor axis of an ellipse the function
-    // will return.
+                                  // semi-minor axis of an ellipse the function
+                                  // will return.
     public double maxMinorRadius; // Specifies the maximum length of the
-    // semi-minor axis of an ellipse the function
-    // will return.
+                                  // semi-minor axis of an ellipse the function
+                                  // will return.
 
     private void init() {
 
@@ -15186,7 +14968,7 @@ public class NIVision {
     }
 
     public EllipseDescriptor(double minMajorRadius, double maxMajorRadius, double minMinorRadius,
-                             double maxMinorRadius) {
+        double maxMinorRadius) {
       super(32);
       this.minMajorRadius = minMajorRadius;
       this.maxMajorRadius = maxMajorRadius;
@@ -15229,12 +15011,12 @@ public class NIVision {
 
   public static class EllipseMatch extends DisposedStruct {
     public PointFloat position; // The location of the center of the matched
-    // ellipse.
+                                // ellipse.
     public double rotation; // The orientation of the matched ellipse.
     public double majorRadius; // The length of the semi-major axis of the
-    // matched ellipse.
+                               // matched ellipse.
     public double minorRadius; // The length of the semi-minor axis of the
-    // matched ellipse.
+                               // matched ellipse.
     public double score; // The score of the matched ellipse.
 
     private void init() {
@@ -15247,7 +15029,7 @@ public class NIVision {
     }
 
     public EllipseMatch(PointFloat position, double rotation, double majorRadius,
-                        double minorRadius, double score) {
+        double minorRadius, double score) {
       super(40);
       this.position = position;
       this.rotation = rotation;
@@ -15293,7 +15075,7 @@ public class NIVision {
 
   public static class CircleMatch extends DisposedStruct {
     public PointFloat position; // The location of the center of the matched
-    // circle.
+                                // circle.
     public double radius; // The radius of the matched circle.
     public double score; // The score of the matched circle.
 
@@ -15346,9 +15128,9 @@ public class NIVision {
 
   public static class CircleDescriptor extends DisposedStruct {
     public double minRadius; // Specifies the minimum radius of a circle the
-    // function will return.
+                             // function will return.
     public double maxRadius; // Specifies the maximum radius of a circle the
-    // function will return.
+                             // function will return.
 
     private void init() {
 
@@ -15396,17 +15178,17 @@ public class NIVision {
 
   public static class ShapeDetectionOptions extends DisposedStruct {
     public int mode; // Specifies the method used when looking for the shape in
-    // the image.
+                     // the image.
     public RangeFloat[] angleRanges; // An array of angle ranges, in degrees,
-    // where each range specifies how much you
-    // expect the shape to be rotated in the
-    // image.
+                                     // where each range specifies how much you
+                                     // expect the shape to be rotated in the
+                                     // image.
     public RangeFloat scaleRange; // A range that specifies the sizes of the
-    // shapes you expect to be in the image,
-    // expressed as a ratio percentage
-    // representing the size of the pattern in the
-    // image divided by size of the original
-    // pattern multiplied by 100.
+                                  // shapes you expect to be in the image,
+                                  // expressed as a ratio percentage
+                                  // representing the size of the pattern in the
+                                  // image divided by size of the original
+                                  // pattern multiplied by 100.
     public double minMatchScore;
     private ByteBuffer angleRanges_buf;
 
@@ -15421,7 +15203,7 @@ public class NIVision {
     }
 
     public ShapeDetectionOptions(int mode, RangeFloat[] angleRanges, RangeFloat scaleRange,
-                                 double minMatchScore) {
+        double minMatchScore) {
       super(32);
       this.mode = mode;
       this.angleRanges = angleRanges;
@@ -15481,14 +15263,14 @@ public class NIVision {
   public static class Curve extends DisposedStruct {
     public PointFloat[] points; // The points on the curve.
     public int closed; // This element is TRUE if the curve is closed and FALSE
-    // if the curve is open.
+                       // if the curve is open.
     public double curveLength; // The length of the curve.
     public double minEdgeStrength; // The lowest edge strength detected on the
-    // curve.
+                                   // curve.
     public double maxEdgeStrength; // The highest edge strength detected on the
-    // curve.
+                                   // curve.
     public double averageEdgeStrength; // The average of all edge strengths
-    // detected on the curve.
+                                       // detected on the curve.
     private ByteBuffer points_buf;
 
     private void init() {
@@ -15501,7 +15283,7 @@ public class NIVision {
     }
 
     public Curve(PointFloat[] points, int closed, double curveLength, double minEdgeStrength,
-                 double maxEdgeStrength, double averageEdgeStrength) {
+        double maxEdgeStrength, double averageEdgeStrength) {
       super(48);
       this.points = points;
       this.closed = closed;
@@ -15565,32 +15347,32 @@ public class NIVision {
 
   public static class CurveOptions extends DisposedStruct {
     public ExtractionMode extractionMode; // Specifies the method the function
-    // uses to identify curves in the
-    // image.
+                                          // uses to identify curves in the
+                                          // image.
     public int threshold; // Specifies the minimum contrast a seed point must
-    // have in order to begin a curve.
+                          // have in order to begin a curve.
     public EdgeFilterSize filterSize; // Specifies the width of the edge filter
-    // the function uses to identify curves in
-    // the image.
+                                      // the function uses to identify curves in
+                                      // the image.
     public int minLength; // Specifies the length, in pixels, of the smallest
-    // curve the function will extract.
+                          // curve the function will extract.
     public int rowStepSize; // Specifies the distance, in the y direction,
-    // between lines the function inspects for curve
-    // seed points.
+                            // between lines the function inspects for curve
+                            // seed points.
     public int columnStepSize; // Specifies the distance, in the x direction,
-    // between columns the function inspects for
-    // curve seed points.
+                               // between columns the function inspects for
+                               // curve seed points.
     public int maxEndPointGap; // Specifies the maximum gap, in pixels, between
-    // the endpoints of a curve that the function
-    // identifies as a closed curve.
+                               // the endpoints of a curve that the function
+                               // identifies as a closed curve.
     public int onlyClosed; // Set this element to TRUE to specify that the
-    // function should only identify closed curves in the
-    // image.
+                           // function should only identify closed curves in the
+                           // image.
     public int subpixelAccuracy; // Set this element to TRUE to specify that the
-    // function identifies the location of curves
-    // with subpixel accuracy by interpolating
-    // between points to find the crossing of
-    // threshold.
+                                 // function identifies the location of curves
+                                 // with subpixel accuracy by interpolating
+                                 // between points to find the crossing of
+                                 // threshold.
 
     private void init() {
 
@@ -15602,9 +15384,8 @@ public class NIVision {
     }
 
     public CurveOptions(ExtractionMode extractionMode, int threshold, EdgeFilterSize filterSize,
-                        int minLength, int rowStepSize, int columnStepSize, int maxEndPointGap,
-                        int onlyClosed,
-                        int subpixelAccuracy) {
+        int minLength, int rowStepSize, int columnStepSize, int maxEndPointGap, int onlyClosed,
+        int subpixelAccuracy) {
       super(36);
       this.extractionMode = extractionMode;
       this.threshold = threshold;
@@ -15644,13 +15425,11 @@ public class NIVision {
     }
 
     public void write() {
-      if (extractionMode != null) {
+      if (extractionMode != null)
         backing.putInt(0, extractionMode.getValue());
-      }
       backing.putInt(4, threshold);
-      if (filterSize != null) {
+      if (filterSize != null)
         backing.putInt(8, filterSize.getValue());
-      }
       backing.putInt(12, minLength);
       backing.putInt(16, rowStepSize);
       backing.putInt(20, columnStepSize);
@@ -15667,14 +15446,14 @@ public class NIVision {
   public static class Barcode2DInfo extends DisposedStruct {
     public Barcode2DType type; // The type of the 2D barcode.
     public int binary; // This element is TRUE if the 2D barcode contains binary
-    // data and FALSE if the 2D barcode contains text data.
+                       // data and FALSE if the 2D barcode contains text data.
     public byte[] data; // The data encoded in the 2D barcode.
     public PointFloat[] boundingBox; // An array of four points describing the
-    // rectangle surrounding the 2D barcode.
+                                     // rectangle surrounding the 2D barcode.
     public int numErrorsCorrected; // The number of errors the function
-    // corrected when decoding the 2D barcode.
+                                   // corrected when decoding the 2D barcode.
     public int numErasuresCorrected; // The number of erasures the function
-    // corrected when decoding the 2D barcode.
+                                     // corrected when decoding the 2D barcode.
     public int rows; // The number of rows in the 2D barcode.
     public int columns; // The number of columns in the 2D barcode.
     private ByteBuffer data_buf;
@@ -15683,9 +15462,8 @@ public class NIVision {
       data = new byte[0];
       boundingBox = new PointFloat[4];
 
-      for (int i = 0, off = 16; i < 4; i++, off += 8) {
+      for (int i = 0, off = 16; i < 4; i++, off += 8)
         boundingBox[i] = new PointFloat(backing, off);
-      }
     }
 
     public Barcode2DInfo() {
@@ -15694,7 +15472,7 @@ public class NIVision {
     }
 
     public Barcode2DInfo(Barcode2DType type, int binary, byte[] data, PointFloat[] boundingBox,
-                         int numErrorsCorrected, int numErasuresCorrected, int rows, int columns) {
+        int numErrorsCorrected, int numErasuresCorrected, int rows, int columns) {
       super(64);
       this.type = type;
       this.binary = binary;
@@ -15739,9 +15517,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (type != null) {
+      if (type != null)
         backing.putInt(0, type.getValue());
-      }
       backing.putInt(4, binary);
       data_buf = ByteBuffer.allocateDirect(data.length);
       putBytes(data_buf, data, 0, data.length);
@@ -15763,17 +15540,17 @@ public class NIVision {
 
   public static class DataMatrixOptions extends DisposedStruct {
     public Barcode2DSearchMode searchMode; // Specifies the mode the function
-    // uses to search for barcodes.
+                                           // uses to search for barcodes.
     public Barcode2DContrast contrast; // Specifies the contrast of the barcodes
-    // that the function searches for.
+                                       // that the function searches for.
     public Barcode2DCellShape cellShape; // Specifies the shape of the barcode
-    // data cells, which affects how the
-    // function decodes the barcode.
+                                         // data cells, which affects how the
+                                         // function decodes the barcode.
     public Barcode2DShape barcodeShape; // Specifies the shape of the barcodes
-    // that the function searches for.
+                                        // that the function searches for.
     public DataMatrixSubtype subtype; // Specifies the Data Matrix subtypes of
-    // the barcodes that the function searches
-    // for.
+                                      // the barcodes that the function searches
+                                      // for.
 
     private void init() {
 
@@ -15785,8 +15562,7 @@ public class NIVision {
     }
 
     public DataMatrixOptions(Barcode2DSearchMode searchMode, Barcode2DContrast contrast,
-                             Barcode2DCellShape cellShape, Barcode2DShape barcodeShape,
-                             DataMatrixSubtype subtype) {
+        Barcode2DCellShape cellShape, Barcode2DShape barcodeShape, DataMatrixSubtype subtype) {
       super(20);
       this.searchMode = searchMode;
       this.contrast = contrast;
@@ -15818,21 +15594,16 @@ public class NIVision {
     }
 
     public void write() {
-      if (searchMode != null) {
+      if (searchMode != null)
         backing.putInt(0, searchMode.getValue());
-      }
-      if (contrast != null) {
+      if (contrast != null)
         backing.putInt(4, contrast.getValue());
-      }
-      if (cellShape != null) {
+      if (cellShape != null)
         backing.putInt(8, cellShape.getValue());
-      }
-      if (barcodeShape != null) {
+      if (barcodeShape != null)
         backing.putInt(12, barcodeShape.getValue());
-      }
-      if (subtype != null) {
+      if (subtype != null)
         backing.putInt(16, subtype.getValue());
-      }
     }
 
     public int size() {
@@ -15842,13 +15613,13 @@ public class NIVision {
 
   public static class ClassifierAccuracyReport extends DisposedStruct {
     public float accuracy; // The overall accuracy of the classifier, from 0 to
-    // 1000.
+                           // 1000.
     public String[] classNames; // The names of the classes of this classifier.
     public double[] classAccuracy; // An array of size elements that contains
-    // accuracy information for each class.
+                                   // accuracy information for each class.
     public double[] classPredictiveValue; // An array containing size elements
-    // that contains the predictive values
-    // of each class.
+                                          // that contains the predictive values
+                                          // of each class.
     private ByteBuffer classNames_buf;
     private ByteBuffer[] classNames_bufs;
     private ByteBuffer classAccuracy_buf;
@@ -15866,7 +15637,7 @@ public class NIVision {
     }
 
     public ClassifierAccuracyReport(double accuracy, String[] classNames, double[] classAccuracy,
-                                    double[] classPredictiveValue) {
+        double[] classPredictiveValue) {
       super(24);
       this.accuracy = (float) accuracy;
       this.classNames = classNames;
@@ -15897,9 +15668,9 @@ public class NIVision {
         ByteBuffer bb = newDirectByteBuffer(classNames_addr, classNames_size * 4);
         for (int i = 0, off = 0; i < classNames_size; i++, off += 4) {
           long addr = getPointer(bb, off);
-          if (addr == 0) {
+          if (addr == 0)
             classNames[i] = null;
-          } else {
+          else {
             ByteBuffer bb2 = newDirectByteBuffer(addr, 1000); // FIXME
             while (bb2.get() != 0) {
             }
@@ -15935,9 +15706,9 @@ public class NIVision {
       classNames_buf =
           ByteBuffer.allocateDirect(classNames.length * 4).order(ByteOrder.nativeOrder());
       for (int i = 0, off = 0; i < classNames.length; i++, off += 4) {
-        if (classNames[i] == null) {
+        if (classNames[i] == null)
           putPointer(classNames_buf, off, 0);
-        } else {
+        else {
           byte[] bytes;
           try {
             bytes = classNames[i].getBytes("UTF-8");
@@ -15971,7 +15742,7 @@ public class NIVision {
   public static class NearestNeighborClassResult extends DisposedStruct {
     public String className; // The name of the class.
     public float standardDeviation; // The standard deviation of the members of
-    // this class.
+                                    // this class.
     public int count; // The number of samples in this class.
     private ByteBuffer className_buf;
 
@@ -16007,9 +15778,9 @@ public class NIVision {
 
     public void read() {
       long className_addr = getPointer(backing, 0);
-      if (className_addr == 0) {
+      if (className_addr == 0)
         className = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(className_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -16050,7 +15821,7 @@ public class NIVision {
 
   public static class NearestNeighborTrainingReport extends DisposedStruct {
     public NearestNeighborClassResult[] allScores; // All classes and their
-    // scores.
+                                                   // scores.
     private ByteBuffer allScores_buf;
 
     private void init() {
@@ -16112,19 +15883,19 @@ public class NIVision {
 
   public static class ParticleClassifierPreprocessingOptions extends DisposedStruct {
     public int manualThreshold; // Set this element to TRUE to specify the
-    // threshold range manually.
+                                // threshold range manually.
     public RangeFloat manualThresholdRange; // If a manual threshold is being
-    // done, the range of pixels to
-    // keep.
+                                            // done, the range of pixels to
+                                            // keep.
     public ThresholdMethod autoThresholdMethod; // If an automatic threshold is
-    // being done, the method used
-    // to calculate the threshold
-    // range.
+                                                // being done, the method used
+                                                // to calculate the threshold
+                                                // range.
     public RangeFloat limits; // The limits on the automatic threshold range.
     public ParticleType particleType; // Specifies what kind of particles to
-    // look for.
+                                      // look for.
     public int rejectBorder; // Set this element to TRUE to reject border
-    // particles.
+                             // particles.
     public int numErosions; // The number of erosions to perform.
 
     private void init() {
@@ -16138,11 +15909,8 @@ public class NIVision {
     }
 
     public ParticleClassifierPreprocessingOptions(int manualThreshold,
-                                                  RangeFloat manualThresholdRange,
-                                                  ThresholdMethod autoThresholdMethod, RangeFloat
-                                                      limits,
-                                                  ParticleType particleType, int rejectBorder,
-                                                  int numErosions) {
+        RangeFloat manualThresholdRange, ThresholdMethod autoThresholdMethod, RangeFloat limits,
+        ParticleType particleType, int rejectBorder, int numErosions) {
       super(36);
       this.manualThreshold = manualThreshold;
       this.manualThresholdRange = manualThresholdRange;
@@ -16180,13 +15948,11 @@ public class NIVision {
     public void write() {
       backing.putInt(0, manualThreshold);
       manualThresholdRange.write();
-      if (autoThresholdMethod != null) {
+      if (autoThresholdMethod != null)
         backing.putInt(12, autoThresholdMethod.getValue());
-      }
       limits.write();
-      if (particleType != null) {
+      if (particleType != null)
         backing.putInt(24, particleType.getValue());
-      }
       backing.putInt(28, rejectBorder);
       backing.putInt(32, numErosions);
     }
@@ -16199,10 +15965,10 @@ public class NIVision {
   public static class ClassifierSampleInfo extends DisposedStruct {
     public String className; // The name of the class this sample is in.
     public double[] featureVector; // The feature vector of this sample, or NULL
-    // if this is not a custom classifier
-    // session.
+                                   // if this is not a custom classifier
+                                   // session.
     public Image thumbnail; // A thumbnail image of this sample, or NULL if no
-    // image was specified.
+                            // image was specified.
     private ByteBuffer className_buf;
     private ByteBuffer featureVector_buf;
 
@@ -16238,9 +16004,9 @@ public class NIVision {
 
     public void read() {
       long className_addr = getPointer(backing, 0);
-      if (className_addr == 0) {
+      if (className_addr == 0)
         className = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(className_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -16261,11 +16027,10 @@ public class NIVision {
             .asDoubleBuffer().get(featureVector);
       }
       long thumbnail_addr = getPointer(backing, 12);
-      if (thumbnail_addr == 0) {
+      if (thumbnail_addr == 0)
         thumbnail = null;
-      } else {
+      else
         thumbnail = new Image(thumbnail_addr, false);
-      }
     }
 
     public void write() {
@@ -16330,9 +16095,9 @@ public class NIVision {
 
     public void read() {
       long className_addr = getPointer(backing, 0);
-      if (className_addr == 0) {
+      if (className_addr == 0)
         className = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(className_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -16372,9 +16137,9 @@ public class NIVision {
   public static class ClassifierReport extends DisposedStruct {
     public String bestClassName; // The name of the best class for the sample.
     public float classificationScore; // The similarity of the sample and the
-    // two closest classes in the classifier.
+                                      // two closest classes in the classifier.
     public float identificationScore; // The similarity of the sample and the
-    // assigned class.
+                                      // assigned class.
     public ClassScore[] allScores; // All classes and their scores.
     private ByteBuffer bestClassName_buf;
     private ByteBuffer allScores_buf;
@@ -16389,7 +16154,7 @@ public class NIVision {
     }
 
     public ClassifierReport(String bestClassName, double classificationScore,
-                            double identificationScore, ClassScore[] allScores) {
+        double identificationScore, ClassScore[] allScores) {
       super(20);
       this.bestClassName = bestClassName;
       this.classificationScore = (float) classificationScore;
@@ -16413,9 +16178,9 @@ public class NIVision {
 
     public void read() {
       long bestClassName_addr = getPointer(backing, 0);
-      if (bestClassName_addr == 0) {
+      if (bestClassName_addr == 0)
         bestClassName = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(bestClassName_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -16476,7 +16241,7 @@ public class NIVision {
     public NearestNeighborMethod method; // The method to use.
     public NearestNeighborMetric metric; // The metric to use.
     public int k; // The value of k, if the IMAQ_K_NEAREST_NEIGHBOR method is
-    // used.
+                  // used.
 
     private void init() {
 
@@ -16487,8 +16252,7 @@ public class NIVision {
       init();
     }
 
-    public NearestNeighborOptions(NearestNeighborMethod method, NearestNeighborMetric metric, int
-        k) {
+    public NearestNeighborOptions(NearestNeighborMethod method, NearestNeighborMetric metric, int k) {
       super(12);
       this.method = method;
       this.metric = metric;
@@ -16516,12 +16280,10 @@ public class NIVision {
     }
 
     public void write() {
-      if (method != null) {
+      if (method != null)
         backing.putInt(0, method.getValue());
-      }
-      if (metric != null) {
+      if (metric != null)
         backing.putInt(4, metric.getValue());
-      }
       backing.putInt(8, k);
     }
 
@@ -16532,9 +16294,9 @@ public class NIVision {
 
   public static class ParticleClassifierOptions extends DisposedStruct {
     public float scaleDependence; // The relative importance of scale when
-    // classifying particles.
+                                  // classifying particles.
     public float mirrorDependence; // The relative importance of mirror symmetry
-    // when classifying particles.
+                                   // when classifying particles.
 
     private void init() {
 
@@ -16585,8 +16347,8 @@ public class NIVision {
     public int G; // The green value of the color.
     public int R; // The red value of the color.
     public int alpha; // The alpha value of the color, which represents extra
-    // information about a color image, such as gamma
-    // correction.
+                      // information about a color image, such as gamma
+                      // correction.
 
     private void init() {
 
@@ -16620,10 +16382,10 @@ public class NIVision {
     }
 
     public void read() {
-      B = backing.getShort(0) & 0xffff;
-      G = backing.getShort(2) & 0xffff;
-      R = backing.getShort(4) & 0xffff;
-      alpha = backing.getShort(6) & 0xffff;
+      B = (int) (backing.getShort(0) & 0xffff);
+      G = (int) (backing.getShort(2) & 0xffff);
+      R = (int) (backing.getShort(4) & 0xffff);
+      alpha = (int) (backing.getShort(6) & 0xffff);
     }
 
     public void write() {
@@ -16640,37 +16402,36 @@ public class NIVision {
 
   public static class GeometricPatternMatch extends DisposedStruct {
     public PointFloat position; // The location of the origin of the template in
-    // the match.
+                                // the match.
     public float rotation; // The rotation of the match relative to the template
-    // image, in degrees.
+                           // image, in degrees.
     public float scale; // The size of the match relative to the size of the
-    // template image, expressed as a percentage.
+                        // template image, expressed as a percentage.
     public float score; // The accuracy of the match.
     public PointFloat[] corner; // An array of four points describing the
-    // rectangle surrounding the template image.
+                                // rectangle surrounding the template image.
     public int inverse; // This element is TRUE if the match is an inverse of
-    // the template image.
+                        // the template image.
     public float occlusion; // The percentage of the match that is occluded.
     public float templateMatchCurveScore; // The accuracy of the match obtained
-    // by comparing the template curves to
-    // the curves in the match region.
+                                          // by comparing the template curves to
+                                          // the curves in the match region.
     public float matchTemplateCurveScore; // The accuracy of the match obtained
-    // by comparing the curves in the
-    // match region to the template
-    // curves.
+                                          // by comparing the curves in the
+                                          // match region to the template
+                                          // curves.
     public float correlationScore; // The accuracy of the match obtained by
-    // comparing the template image to the match
-    // region using a correlation metric that
-    // compares the two regions as a function of
-    // their pixel values.
+                                   // comparing the template image to the match
+                                   // region using a correlation metric that
+                                   // compares the two regions as a function of
+                                   // their pixel values.
 
     private void init() {
       position = new PointFloat(backing, 0);
       corner = new PointFloat[4];
 
-      for (int i = 0, off = 20; i < 4; i++, off += 8) {
+      for (int i = 0, off = 20; i < 4; i++, off += 8)
         corner[i] = new PointFloat(backing, off);
-      }
     }
 
     public GeometricPatternMatch() {
@@ -16679,9 +16440,8 @@ public class NIVision {
     }
 
     public GeometricPatternMatch(PointFloat position, double rotation, double scale, double score,
-                                 PointFloat[] corner, int inverse, double occlusion, double
-                                     templateMatchCurveScore,
-                                 double matchTemplateCurveScore, double correlationScore) {
+        PointFloat[] corner, int inverse, double occlusion, double templateMatchCurveScore,
+        double matchTemplateCurveScore, double correlationScore) {
       super(72);
       this.position = position;
       this.rotation = (float) rotation;
@@ -16746,47 +16506,47 @@ public class NIVision {
 
   public static class MatchGeometricPatternAdvancedOptions extends DisposedStruct {
     public int minFeaturesUsed; // Specifies the minimum number of features the
-    // function uses when matching.
+                                // function uses when matching.
     public int maxFeaturesUsed; // Specifies the maximum number of features the
-    // function uses when matching.
+                                // function uses when matching.
     public int subpixelIterations; // Specifies the maximum number of
-    // incremental improvements used to refine
-    // matches with subpixel information.
+                                   // incremental improvements used to refine
+                                   // matches with subpixel information.
     public double subpixelTolerance; // Specifies the maximum amount of change,
-    // in pixels, between consecutive
-    // incremental improvements in the match
-    // position before the function stops
-    // refining the match position.
+                                     // in pixels, between consecutive
+                                     // incremental improvements in the match
+                                     // position before the function stops
+                                     // refining the match position.
     public int initialMatchListLength; // Specifies the maximum size of the
-    // match list.
+                                       // match list.
     public int matchTemplateCurveScore; // Set this element to TRUE to specify
-    // that the function should calculate
-    // the match curve to template curve
-    // score and return it for each match
-    // result.
+                                        // that the function should calculate
+                                        // the match curve to template curve
+                                        // score and return it for each match
+                                        // result.
     public int correlationScore; // Set this element to TRUE to specify that the
-    // function should calculate the correlation
-    // score and return it for each match result.
+                                 // function should calculate the correlation
+                                 // score and return it for each match result.
     public double minMatchSeparationDistance; // Specifies the minimum
-    // separation distance, in pixels,
-    // between the origins of two
-    // matches that have unique
-    // positions.
+                                              // separation distance, in pixels,
+                                              // between the origins of two
+                                              // matches that have unique
+                                              // positions.
     public double minMatchSeparationAngle; // Specifies the minimum angular
-    // difference, in degrees, between
-    // two matches that have unique
-    // angles.
+                                           // difference, in degrees, between
+                                           // two matches that have unique
+                                           // angles.
     public double minMatchSeparationScale; // Specifies the minimum difference
-    // in scale, expressed as a
-    // percentage, between two matches
-    // that have unique scales.
+                                           // in scale, expressed as a
+                                           // percentage, between two matches
+                                           // that have unique scales.
     public double maxMatchOverlap; // Specifies the maximum amount of overlap,
-    // expressed as a percentage, allowed between
-    // the bounding rectangles of two unique
-    // matches.
+                                   // expressed as a percentage, allowed between
+                                   // the bounding rectangles of two unique
+                                   // matches.
     public int coarseResult; // Specifies whether you want the function to spend
-    // less time accurately estimating the location of
-    // a match.
+                             // less time accurately estimating the location of
+                             // a match.
 
     private void init() {
 
@@ -16798,14 +16558,10 @@ public class NIVision {
     }
 
     public MatchGeometricPatternAdvancedOptions(int minFeaturesUsed, int maxFeaturesUsed,
-                                                int subpixelIterations, double subpixelTolerance,
-                                                int initialMatchListLength,
-                                                int matchTemplateCurveScore, int
-                                                    correlationScore, double
-                                                    minMatchSeparationDistance,
-                                                double minMatchSeparationAngle, double
-                                                    minMatchSeparationScale, double maxMatchOverlap,
-                                                int coarseResult) {
+        int subpixelIterations, double subpixelTolerance, int initialMatchListLength,
+        int matchTemplateCurveScore, int correlationScore, double minMatchSeparationDistance,
+        double minMatchSeparationAngle, double minMatchSeparationScale, double maxMatchOverlap,
+        int coarseResult) {
       super(80);
       this.minFeaturesUsed = minFeaturesUsed;
       this.maxFeaturesUsed = maxFeaturesUsed;
@@ -16872,26 +16628,26 @@ public class NIVision {
 
   public static class MatchGeometricPatternOptions extends DisposedStruct {
     public int mode; // Specifies the method imaqMatchGeometricPattern() uses
-    // when looking for the pattern in the image.
+                     // when looking for the pattern in the image.
     public int subpixelAccuracy; // Set this element to TRUE to specify that the
-    // function should calculate match locations
-    // with subpixel accuracy.
+                                 // function should calculate match locations
+                                 // with subpixel accuracy.
     public RangeFloat[] angleRanges; // An array of angle ranges, in degrees,
-    // where each range specifies how much you
-    // expect the template to be rotated in the
-    // image.
+                                     // where each range specifies how much you
+                                     // expect the template to be rotated in the
+                                     // image.
     public RangeFloat scaleRange; // A range that specifies the sizes of the
-    // pattern you expect to be in the image,
-    // expressed as a ratio percentage
-    // representing the size of the pattern in the
-    // image divided by size of the original
-    // pattern multiplied by 100.
+                                  // pattern you expect to be in the image,
+                                  // expressed as a ratio percentage
+                                  // representing the size of the pattern in the
+                                  // image divided by size of the original
+                                  // pattern multiplied by 100.
     public RangeFloat occlusionRange; // A range that specifies the percentage
-    // of the pattern you expect to be
-    // occluded in the image.
+                                      // of the pattern you expect to be
+                                      // occluded in the image.
     public int numMatchesRequested; // Number of valid matches expected.
     public float minMatchScore; // The minimum score a match can have for the
-    // function to consider the match valid.
+                                // function to consider the match valid.
     private ByteBuffer angleRanges_buf;
 
     private void init() {
@@ -16906,9 +16662,8 @@ public class NIVision {
     }
 
     public MatchGeometricPatternOptions(int mode, int subpixelAccuracy, RangeFloat[] angleRanges,
-                                        RangeFloat scaleRange, RangeFloat occlusionRange, int
-                                            numMatchesRequested,
-                                        double minMatchScore) {
+        RangeFloat scaleRange, RangeFloat occlusionRange, int numMatchesRequested,
+        double minMatchScore) {
       super(40);
       this.mode = mode;
       this.subpixelAccuracy = subpixelAccuracy;
@@ -16976,22 +16731,22 @@ public class NIVision {
 
   public static class LearnGeometricPatternAdvancedOptions extends DisposedStruct {
     public int minRectLength; // Specifies the minimum length for each side of a
-    // rectangular feature.
+                              // rectangular feature.
     public double minRectAspectRatio; // Specifies the minimum aspect ratio of a
-    // rectangular feature.
+                                      // rectangular feature.
     public int minRadius; // Specifies the minimum radius for a circular
-    // feature.
+                          // feature.
     public int minLineLength; // Specifies the minimum length for a linear
-    // feature.
+                              // feature.
     public double minFeatureStrength; // Specifies the minimum strength for a
-    // feature.
+                                      // feature.
     public int maxFeaturesUsed; // Specifies the maximum number of features the
-    // function uses when learning.
+                                // function uses when learning.
     public int maxPixelDistanceFromLine; // Specifies the maximum number of
-    // pixels between an edge pixel and a
-    // linear feature for the function to
-    // consider that edge pixel as part of
-    // the linear feature.
+                                         // pixels between an edge pixel and a
+                                         // linear feature for the function to
+                                         // consider that edge pixel as part of
+                                         // the linear feature.
 
     private void init() {
 
@@ -17003,9 +16758,8 @@ public class NIVision {
     }
 
     public LearnGeometricPatternAdvancedOptions(int minRectLength, double minRectAspectRatio,
-                                                int minRadius, int minLineLength, double
-                                                    minFeatureStrength, int maxFeaturesUsed,
-                                                int maxPixelDistanceFromLine) {
+        int minRadius, int minLineLength, double minFeatureStrength, int maxFeaturesUsed,
+        int maxPixelDistanceFromLine) {
       super(40);
       this.minRectLength = minRectLength;
       this.minRectAspectRatio = minRectAspectRatio;
@@ -17057,15 +16811,15 @@ public class NIVision {
 
   public static class FitEllipseOptions extends DisposedStruct {
     public int rejectOutliers; // Whether to use every given point or only a
-    // subset of the points to fit the ellipse.
+                               // subset of the points to fit the ellipse.
     public double minScore; // Specifies the required quality of the fitted
-    // ellipse.
+                            // ellipse.
     public double pixelRadius; // The acceptable distance, in pixels, that a
-    // point determined to belong to the ellipse can
-    // be from the circumference of the ellipse.
+                               // point determined to belong to the ellipse can
+                               // be from the circumference of the ellipse.
     public int maxIterations; // Specifies the number of refinement iterations
-    // you allow the function to perform on the
-    // initial subset of points.
+                              // you allow the function to perform on the
+                              // initial subset of points.
 
     private void init() {
 
@@ -17077,7 +16831,7 @@ public class NIVision {
     }
 
     public FitEllipseOptions(int rejectOutliers, double minScore, double pixelRadius,
-                             int maxIterations) {
+        int maxIterations) {
       super(32);
       this.rejectOutliers = rejectOutliers;
       this.minScore = minScore;
@@ -17120,15 +16874,15 @@ public class NIVision {
 
   public static class FitCircleOptions extends DisposedStruct {
     public int rejectOutliers; // Whether to use every given point or only a
-    // subset of the points to fit the circle.
+                               // subset of the points to fit the circle.
     public double minScore; // Specifies the required quality of the fitted
-    // circle.
+                            // circle.
     public double pixelRadius; // The acceptable distance, in pixels, that a
-    // point determined to belong to the circle can
-    // be from the circumference of the circle.
+                               // point determined to belong to the circle can
+                               // be from the circumference of the circle.
     public int maxIterations; // Specifies the number of refinement iterations
-    // you allow the function to perform on the
-    // initial subset of points.
+                              // you allow the function to perform on the
+                              // initial subset of points.
 
     private void init() {
 
@@ -17140,7 +16894,7 @@ public class NIVision {
     }
 
     public FitCircleOptions(int rejectOutliers, double minScore, double pixelRadius,
-                            int maxIterations) {
+        int maxIterations) {
       super(32);
       this.rejectOutliers = rejectOutliers;
       this.minScore = minScore;
@@ -17184,12 +16938,12 @@ public class NIVision {
   public static class ConstructROIOptions2 extends DisposedStruct {
     public int windowNumber; // The window number of the image window.
     public String windowTitle; // Specifies the message string that the function
-    // displays in the title bar of the window.
+                               // displays in the title bar of the window.
     public PaletteType type; // The palette type to use.
     public RGBValue[] palette; // If type is IMAQ_PALETTE_USER, this array is
-    // the palette of colors to use with the window.
+                               // the palette of colors to use with the window.
     public int maxContours; // The maximum number of contours the user will be
-    // able to select.
+                            // able to select.
     private ByteBuffer windowTitle_buf;
     private ByteBuffer palette_buf;
 
@@ -17203,7 +16957,7 @@ public class NIVision {
     }
 
     public ConstructROIOptions2(int windowNumber, String windowTitle, PaletteType type,
-                                RGBValue[] palette, int maxContours) {
+        RGBValue[] palette, int maxContours) {
       super(24);
       this.windowNumber = windowNumber;
       this.windowTitle = windowTitle;
@@ -17229,9 +16983,9 @@ public class NIVision {
     public void read() {
       windowNumber = backing.getInt(0);
       long windowTitle_addr = getPointer(backing, 4);
-      if (windowTitle_addr == 0) {
+      if (windowTitle_addr == 0)
         windowTitle = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(windowTitle_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -17272,9 +17026,8 @@ public class NIVision {
             windowTitle_bytes.length, (byte) 0);
       }
       putPointer(backing, 4, windowTitle == null ? 0 : getByteBufferAddress(windowTitle_buf));
-      if (type != null) {
+      if (type != null)
         backing.putInt(8, type.getValue());
-      }
       palette_buf = ByteBuffer.allocateDirect(palette.length * 4).order(ByteOrder.nativeOrder());
       for (int i = 0, off = 0; i < palette.length; i++, off += 4) {
         palette[i].setBuffer(palette_buf, off);
@@ -17295,8 +17048,8 @@ public class NIVision {
     public short S; // The color saturation.
     public short H; // The color hue.
     public short alpha; // The alpha value of the color, which represents extra
-    // information about a color image, such as gamma
-    // correction.
+                        // information about a color image, such as gamma
+                        // correction.
 
     private void init() {
 
@@ -17353,8 +17106,8 @@ public class NIVision {
     public short S; // The color saturation.
     public short H; // The color hue.
     public short alpha; // The alpha value of the color, which represents extra
-    // information about a color image, such as gamma
-    // correction.
+                        // information about a color image, such as gamma
+                        // correction.
 
     private void init() {
 
@@ -17411,8 +17164,8 @@ public class NIVision {
     public short S; // The color saturation.
     public short H; // The color hue.
     public short alpha; // The alpha value of the color, which represents extra
-    // information about a color image, such as gamma
-    // correction.
+                        // information about a color image, such as gamma
+                        // correction.
 
     private void init() {
 
@@ -17469,8 +17222,8 @@ public class NIVision {
     public double a; // The red/green information of the color.
     public double L; // The color lightness.
     public short alpha; // The alpha value of the color, which represents extra
-    // information about a color image, such as gamma
-    // correction.
+                        // information about a color image, such as gamma
+                        // correction.
 
     private void init() {
 
@@ -17527,8 +17280,8 @@ public class NIVision {
     public double Y; // The color luminance.
     public double X; // The X color information.
     public short alpha; // The alpha value of the color, which represents extra
-    // information about a color image, such as gamma
-    // correction.
+                        // information about a color image, such as gamma
+                        // correction.
 
     private void init() {
 
@@ -17582,26 +17335,26 @@ public class NIVision {
 
   public static class BestEllipse2 extends DisposedStruct {
     public PointFloat center; // The coordinate location of the center of the
-    // ellipse.
+                              // ellipse.
     public PointFloat majorAxisStart; // The coordinate location of the start of
-    // the major axis of the ellipse.
+                                      // the major axis of the ellipse.
     public PointFloat majorAxisEnd; // The coordinate location of the end of the
-    // major axis of the ellipse.
+                                    // major axis of the ellipse.
     public PointFloat minorAxisStart; // The coordinate location of the start of
-    // the minor axis of the ellipse.
+                                      // the minor axis of the ellipse.
     public PointFloat minorAxisEnd; // The coordinate location of the end of the
-    // minor axis of the ellipse.
+                                    // minor axis of the ellipse.
     public double area; // The area of the ellipse.
     public double perimeter; // The length of the perimeter of the ellipse.
     public double error; // Represents the least square error of the fitted
-    // ellipse to the entire set of points.
+                         // ellipse to the entire set of points.
     public int valid; // This element is TRUE if the function achieved the
-    // minimum score within the number of allowed refinement
-    // iterations and FALSE if the function did not achieve
-    // the minimum score.
+                      // minimum score within the number of allowed refinement
+                      // iterations and FALSE if the function did not achieve
+                      // the minimum score.
     public int[] pointsUsed; // An array of the indexes for the points array
-    // indicating which points the function used to fit
-    // the ellipse.
+                             // indicating which points the function used to fit
+                             // the ellipse.
     private ByteBuffer pointsUsed_buf;
 
     private void init() {
@@ -17619,9 +17372,8 @@ public class NIVision {
     }
 
     public BestEllipse2(PointFloat center, PointFloat majorAxisStart, PointFloat majorAxisEnd,
-                        PointFloat minorAxisStart, PointFloat minorAxisEnd, double area, double
-                            perimeter,
-                        double error, int valid, int[] pointsUsed) {
+        PointFloat minorAxisStart, PointFloat minorAxisEnd, double area, double perimeter,
+        double error, int valid, int[] pointsUsed) {
       super(80);
       this.center = center;
       this.majorAxisStart = majorAxisStart;
@@ -17692,21 +17444,21 @@ public class NIVision {
 
   public static class LearnPatternAdvancedOptions extends DisposedStruct {
     public LearnPatternAdvancedShiftOptions shiftOptions; // Use this element to
-    // control the
-    // behavior of
-    // imaqLearnPattern2()
-    // during the
-    // shift-invariant
-    // learning phase.
+                                                          // control the
+                                                          // behavior of
+                                                          // imaqLearnPattern2()
+                                                          // during the
+                                                          // shift-invariant
+                                                          // learning phase.
     public LearnPatternAdvancedRotationOptions rotationOptions; // Use this
-    // element to
-    // control the
-    // behavior of
-    // imaqLearnPattern2()during
-    // the
-    // rotation-invariant
-    // learning
-    // phase.
+                                                                // element to
+                                                                // control the
+                                                                // behavior of
+                                                                // imaqLearnPattern2()during
+                                                                // the
+                                                                // rotation-invariant
+                                                                // learning
+                                                                // phase.
 
     private void init() {
 
@@ -17718,7 +17470,7 @@ public class NIVision {
     }
 
     public LearnPatternAdvancedOptions(LearnPatternAdvancedShiftOptions shiftOptions,
-                                       LearnPatternAdvancedRotationOptions rotationOptions) {
+        LearnPatternAdvancedRotationOptions rotationOptions) {
       super(8);
       this.shiftOptions = shiftOptions;
       this.rotationOptions = rotationOptions;
@@ -17740,17 +17492,15 @@ public class NIVision {
 
     public void read() {
       long shiftOptions_addr = getPointer(backing, 0);
-      if (shiftOptions_addr == 0) {
+      if (shiftOptions_addr == 0)
         shiftOptions = null;
-      } else {
+      else
         shiftOptions = new LearnPatternAdvancedShiftOptions(shiftOptions_addr, false);
-      }
       long rotationOptions_addr = getPointer(backing, 4);
-      if (rotationOptions_addr == 0) {
+      if (rotationOptions_addr == 0)
         rotationOptions = null;
-      } else {
+      else
         rotationOptions = new LearnPatternAdvancedRotationOptions(rotationOptions_addr, false);
-      }
     }
 
     public void write() {
@@ -17769,13 +17519,13 @@ public class NIVision {
     public ImageType imageType; // The type of images this AVI contains.
     public int numFrames; // The number of frames in the AVI.
     public int framesPerSecond; // The number of frames per second this AVI
-    // should be shown at.
+                                // should be shown at.
     public String filterName; // The name of the compression filter used to
-    // create this AVI.
+                              // create this AVI.
     public int hasData; // Specifies whether this AVI has data attached to each
-    // frame or not.
+                        // frame or not.
     public int maxDataSize; // If this AVI has data, the maximum size of the
-    // data in each frame.
+                            // data in each frame.
     private ByteBuffer filterName_buf;
 
     private void init() {
@@ -17788,7 +17538,7 @@ public class NIVision {
     }
 
     public AVIInfo(int width, int height, ImageType imageType, int numFrames, int framesPerSecond,
-                   String filterName, int hasData, int maxDataSize) {
+        String filterName, int hasData, int maxDataSize) {
       super(32);
       this.width = width;
       this.height = height;
@@ -17821,9 +17571,9 @@ public class NIVision {
       numFrames = backing.getInt(12);
       framesPerSecond = backing.getInt(16);
       long filterName_addr = getPointer(backing, 20);
-      if (filterName_addr == 0) {
+      if (filterName_addr == 0)
         filterName = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(filterName_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -17843,9 +17593,8 @@ public class NIVision {
     public void write() {
       backing.putInt(0, width);
       backing.putInt(4, height);
-      if (imageType != null) {
+      if (imageType != null)
         backing.putInt(8, imageType.getValue());
-      }
       backing.putInt(12, numFrames);
       backing.putInt(16, framesPerSecond);
       if (filterName != null) {
@@ -17871,34 +17620,34 @@ public class NIVision {
 
   public static class LearnPatternAdvancedShiftOptions extends DisposedStruct {
     public int initialStepSize; // The largest number of image pixels to shift
-    // the sample across the inspection image during
-    // the initial phase of shift-invariant
-    // matching.
+                                // the sample across the inspection image during
+                                // the initial phase of shift-invariant
+                                // matching.
     public int initialSampleSize; // Specifies the number of template pixels
-    // that you want to include in a sample for
-    // the initial phase of shift-invariant
-    // matching.
+                                  // that you want to include in a sample for
+                                  // the initial phase of shift-invariant
+                                  // matching.
     public double initialSampleSizeFactor; // Specifies the size of the sample
-    // for the initial phase of
-    // shift-invariant matching as a
-    // percent of the template size, in
-    // pixels.
+                                           // for the initial phase of
+                                           // shift-invariant matching as a
+                                           // percent of the template size, in
+                                           // pixels.
     public int finalSampleSize; // Specifies the number of template pixels you
-    // want to add to initialSampleSize for the
-    // final phase of shift-invariant matching.
+                                // want to add to initialSampleSize for the
+                                // final phase of shift-invariant matching.
     public double finalSampleSizeFactor; // Specifies the size of the sample for
-    // the final phase of shift-invariant
-    // matching as a percent of the edge
-    // points in the template, in pixels.
+                                         // the final phase of shift-invariant
+                                         // matching as a percent of the edge
+                                         // points in the template, in pixels.
     public int subpixelSampleSize; // Specifies the number of template pixels
-    // that you want to include in a sample for
-    // the subpixel phase of shift-invariant
-    // matching.
+                                   // that you want to include in a sample for
+                                   // the subpixel phase of shift-invariant
+                                   // matching.
     public double subpixelSampleSizeFactor; // Specifies the size of the sample
-    // for the subpixel phase of
-    // shift-invariant matching as a
-    // percent of the template size, in
-    // pixels.
+                                            // for the subpixel phase of
+                                            // shift-invariant matching as a
+                                            // percent of the template size, in
+                                            // pixels.
 
     private void init() {
 
@@ -17910,10 +17659,8 @@ public class NIVision {
     }
 
     public LearnPatternAdvancedShiftOptions(int initialStepSize, int initialSampleSize,
-                                            double initialSampleSizeFactor, int finalSampleSize,
-                                            double finalSampleSizeFactor,
-                                            int subpixelSampleSize, double
-                                                subpixelSampleSizeFactor) {
+        double initialSampleSizeFactor, int finalSampleSize, double finalSampleSizeFactor,
+        int subpixelSampleSize, double subpixelSampleSizeFactor) {
       super(48);
       this.initialStepSize = initialStepSize;
       this.initialSampleSize = initialSampleSize;
@@ -17965,44 +17712,44 @@ public class NIVision {
 
   public static class LearnPatternAdvancedRotationOptions extends DisposedStruct {
     public SearchStrategy searchStrategySupport; // Specifies the aggressiveness
-    // of the rotation search
-    // strategy available during
-    // the matching phase.
+                                                 // of the rotation search
+                                                 // strategy available during
+                                                 // the matching phase.
     public int initialStepSize; // The largest number of image pixels to shift
-    // the sample across the inspection image during
-    // the initial phase of matching.
+                                // the sample across the inspection image during
+                                // the initial phase of matching.
     public int initialSampleSize; // Specifies the number of template pixels
-    // that you want to include in a sample for
-    // the initial phase of rotation-invariant
-    // matching.
+                                  // that you want to include in a sample for
+                                  // the initial phase of rotation-invariant
+                                  // matching.
     public double initialSampleSizeFactor; // Specifies the size of the sample
-    // for the initial phase of
-    // rotation-invariant matching as a
-    // percent of the template size, in
-    // pixels.
+                                           // for the initial phase of
+                                           // rotation-invariant matching as a
+                                           // percent of the template size, in
+                                           // pixels.
     public int initialAngularAccuracy; // Sets the angle accuracy, in degrees,
-    // to use during the initial phase of
-    // rotation-invariant matching.
+                                       // to use during the initial phase of
+                                       // rotation-invariant matching.
     public int finalSampleSize; // Specifies the number of template pixels you
-    // want to add to initialSampleSize for the
-    // final phase of rotation-invariant matching.
+                                // want to add to initialSampleSize for the
+                                // final phase of rotation-invariant matching.
     public double finalSampleSizeFactor; // Specifies the size of the sample for
-    // the final phase of
-    // rotation-invariant matching as a
-    // percent of the edge points in the
-    // template, in pixels.
+                                         // the final phase of
+                                         // rotation-invariant matching as a
+                                         // percent of the edge points in the
+                                         // template, in pixels.
     public int finalAngularAccuracy; // Sets the angle accuracy, in degrees, to
-    // use during the final phase of the
-    // rotation-invariant matching.
+                                     // use during the final phase of the
+                                     // rotation-invariant matching.
     public int subpixelSampleSize; // Specifies the number of template pixels
-    // that you want to include in a sample for
-    // the subpixel phase of rotation-invariant
-    // matching.
+                                   // that you want to include in a sample for
+                                   // the subpixel phase of rotation-invariant
+                                   // matching.
     public double subpixelSampleSizeFactor; // Specifies the size of the sample
-    // for the subpixel phase of
-    // rotation-invariant matching as a
-    // percent of the template size, in
-    // pixels.
+                                            // for the subpixel phase of
+                                            // rotation-invariant matching as a
+                                            // percent of the template size, in
+                                            // pixels.
 
     private void init() {
 
@@ -18014,12 +17761,9 @@ public class NIVision {
     }
 
     public LearnPatternAdvancedRotationOptions(SearchStrategy searchStrategySupport,
-                                               int initialStepSize, int initialSampleSize, double
-                                                   initialSampleSizeFactor,
-                                               int initialAngularAccuracy, int finalSampleSize,
-                                               double finalSampleSizeFactor,
-                                               int finalAngularAccuracy, int subpixelSampleSize,
-                                               double subpixelSampleSizeFactor) {
+        int initialStepSize, int initialSampleSize, double initialSampleSizeFactor,
+        int initialAngularAccuracy, int finalSampleSize, double finalSampleSizeFactor,
+        int finalAngularAccuracy, int subpixelSampleSize, double subpixelSampleSizeFactor) {
       super(56);
       this.searchStrategySupport = searchStrategySupport;
       this.initialStepSize = initialStepSize;
@@ -18061,9 +17805,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (searchStrategySupport != null) {
+      if (searchStrategySupport != null)
         backing.putInt(0, searchStrategySupport.getValue());
-      }
       backing.putInt(4, initialStepSize);
       backing.putInt(8, initialSampleSize);
       backing.putDouble(16, initialSampleSizeFactor);
@@ -18082,25 +17825,25 @@ public class NIVision {
 
   public static class MatchPatternAdvancedOptions extends DisposedStruct {
     public int subpixelIterations; // Defines the maximum number of incremental
-    // improvements used to refine matching using
-    // subpixel information.
+                                   // improvements used to refine matching using
+                                   // subpixel information.
     public double subpixelTolerance; // Defines the maximum amount of change, in
-    // pixels, between consecutive incremental
-    // improvements in the match position that
-    // you want to trigger the end of the
-    // refinement process.
+                                     // pixels, between consecutive incremental
+                                     // improvements in the match position that
+                                     // you want to trigger the end of the
+                                     // refinement process.
     public int initialMatchListLength; // Specifies the maximum size of the
-    // match list.
+                                       // match list.
     public int matchListReductionFactor; // Specifies the reduction of the match
-    // list as matches are refined.
+                                         // list as matches are refined.
     public int initialStepSize; // Specifies the number of pixels to shift the
-    // sample across the inspection image during the
-    // initial phase of shift-invariant matching.
+                                // sample across the inspection image during the
+                                // initial phase of shift-invariant matching.
     public SearchStrategy searchStrategy; // Specifies the aggressiveness of the
-    // rotation search strategy.
+                                          // rotation search strategy.
     public int intermediateAngularAccuracy; // Specifies the accuracy to use
-    // during the intermediate phase of
-    // rotation-invariant matching.
+                                            // during the intermediate phase of
+                                            // rotation-invariant matching.
 
     private void init() {
 
@@ -18112,10 +17855,8 @@ public class NIVision {
     }
 
     public MatchPatternAdvancedOptions(int subpixelIterations, double subpixelTolerance,
-                                       int initialMatchListLength, int matchListReductionFactor,
-                                       int initialStepSize,
-                                       SearchStrategy searchStrategy, int
-                                           intermediateAngularAccuracy) {
+        int initialMatchListLength, int matchListReductionFactor, int initialStepSize,
+        SearchStrategy searchStrategy, int intermediateAngularAccuracy) {
       super(40);
       this.subpixelIterations = subpixelIterations;
       this.subpixelTolerance = subpixelTolerance;
@@ -18156,9 +17897,8 @@ public class NIVision {
       backing.putInt(16, initialMatchListLength);
       backing.putInt(20, matchListReductionFactor);
       backing.putInt(24, initialStepSize);
-      if (searchStrategy != null) {
+      if (searchStrategy != null)
         backing.putInt(28, searchStrategy.getValue());
-      }
       backing.putInt(32, intermediateAngularAccuracy);
     }
 
@@ -18169,14 +17909,14 @@ public class NIVision {
 
   public static class ParticleFilterCriteria2 extends DisposedStruct {
     public MeasurementType parameter; // The morphological measurement that the
-    // function uses for filtering.
+                                      // function uses for filtering.
     public float lower; // The lower bound of the criteria range.
     public float upper; // The upper bound of the criteria range.
     public int calibrated; // Set this element to TRUE to take calibrated
-    // measurements.
+                           // measurements.
     public int exclude; // Set this element to TRUE to indicate that a match
-    // occurs when the measurement is outside the criteria
-    // range.
+                        // occurs when the measurement is outside the criteria
+                        // range.
 
     private void init() {
 
@@ -18188,7 +17928,7 @@ public class NIVision {
     }
 
     public ParticleFilterCriteria2(MeasurementType parameter, double lower, double upper,
-                                   int calibrated, int exclude) {
+        int calibrated, int exclude) {
       super(20);
       this.parameter = parameter;
       this.lower = (float) lower;
@@ -18220,9 +17960,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (parameter != null) {
+      if (parameter != null)
         backing.putInt(0, parameter.getValue());
-      }
       backing.putFloat(4, lower);
       backing.putFloat(8, upper);
       backing.putInt(12, calibrated);
@@ -18236,19 +17975,19 @@ public class NIVision {
 
   public static class BestCircle2 extends DisposedStruct {
     public PointFloat center; // The coordinate location of the center of the
-    // circle.
+                              // circle.
     public double radius; // The radius of the circle.
     public double area; // The area of the circle.
     public double perimeter; // The length of the perimeter of the circle.
     public double error; // Represents the least square error of the fitted
-    // circle to the entire set of points.
+                         // circle to the entire set of points.
     public int valid; // This element is TRUE if the function achieved the
-    // minimum score within the number of allowed refinement
-    // iterations and FALSE if the function did not achieve
-    // the minimum score.
+                      // minimum score within the number of allowed refinement
+                      // iterations and FALSE if the function did not achieve
+                      // the minimum score.
     public int[] pointsUsed; // An array of the indexes for the points array
-    // indicating which points the function used to fit
-    // the circle.
+                             // indicating which points the function used to fit
+                             // the circle.
     private ByteBuffer pointsUsed_buf;
 
     private void init() {
@@ -18262,7 +18001,7 @@ public class NIVision {
     }
 
     public BestCircle2(PointFloat center, double radius, double area, double perimeter,
-                       double error, int valid, int[] pointsUsed) {
+        double error, int valid, int[] pointsUsed) {
       super(56);
       this.center = center;
       this.radius = radius;
@@ -18324,32 +18063,32 @@ public class NIVision {
 
   public static class OCRSpacingOptions extends DisposedStruct {
     public int minCharSpacing; // The minimum number of pixels that must be
-    // between two characters for NI Vision to train
-    // or read the characters separately.
+                               // between two characters for NI Vision to train
+                               // or read the characters separately.
     public int minCharSize; // The minimum number of pixels required for an
-    // object to be a potentially identifiable
-    // character.
+                            // object to be a potentially identifiable
+                            // character.
     public int maxCharSize; // The maximum number of pixels required for an
-    // object to be a potentially identifiable
-    // character.
+                            // object to be a potentially identifiable
+                            // character.
     public int maxHorizontalElementSpacing; // The maximum horizontal spacing,
-    // in pixels, allowed between
-    // character elements to train or
-    // read the character elements as a
-    // single character.
+                                            // in pixels, allowed between
+                                            // character elements to train or
+                                            // read the character elements as a
+                                            // single character.
     public int maxVerticalElementSpacing; // The maximum vertical element
-    // spacing in pixels.
+                                          // spacing in pixels.
     public int minBoundingRectWidth; // The minimum possible width, in pixels,
-    // for a character bounding rectangle.
+                                     // for a character bounding rectangle.
     public int maxBoundingRectWidth; // The maximum possible width, in pixels,
-    // for a character bounding rectangle.
+                                     // for a character bounding rectangle.
     public int minBoundingRectHeight; // The minimum possible height, in pixels,
-    // for a character bounding rectangle.
+                                      // for a character bounding rectangle.
     public int maxBoundingRectHeight; // The maximum possible height, in pixels,
-    // for a character bounding rectangle.
+                                      // for a character bounding rectangle.
     public int autoSplit; // Set this element to TRUE to automatically adjust
-    // the location of the character bounding rectangle
-    // when characters overlap vertically.
+                          // the location of the character bounding rectangle
+                          // when characters overlap vertically.
 
     private void init() {
 
@@ -18361,11 +18100,9 @@ public class NIVision {
     }
 
     public OCRSpacingOptions(int minCharSpacing, int minCharSize, int maxCharSize,
-                             int maxHorizontalElementSpacing, int maxVerticalElementSpacing, int
-                                 minBoundingRectWidth,
-                             int maxBoundingRectWidth, int minBoundingRectHeight, int
-                                 maxBoundingRectHeight,
-                             int autoSplit) {
+        int maxHorizontalElementSpacing, int maxVerticalElementSpacing, int minBoundingRectWidth,
+        int maxBoundingRectWidth, int minBoundingRectHeight, int maxBoundingRectHeight,
+        int autoSplit) {
       super(40);
       this.minCharSpacing = minCharSpacing;
       this.minCharSize = minCharSize;
@@ -18427,20 +18164,20 @@ public class NIVision {
   public static class OCRProcessingOptions extends DisposedStruct {
     public ThresholdMode mode; // The thresholding mode.
     public int lowThreshold; // The low threshold value when you set mode to
-    // IMAQ_FIXED_RANGE.
+                             // IMAQ_FIXED_RANGE.
     public int highThreshold; // The high threshold value when you set mode to
-    // IMAQ_FIXED_RANGE.
+                              // IMAQ_FIXED_RANGE.
     public int blockCount; // The number of blocks for threshold calculation
-    // algorithms that require blocks.
+                           // algorithms that require blocks.
     public int fastThreshold; // Set this element to TRUE to use a faster, less
-    // accurate threshold calculation algorithm.
+                              // accurate threshold calculation algorithm.
     public int biModalCalculation; // Set this element to TRUE to calculate both
-    // the low and high threshold values when
-    // using the fast thresholding method.
+                                   // the low and high threshold values when
+                                   // using the fast thresholding method.
     public int darkCharacters; // Set this element to TRUE to read or train dark
-    // characters on a light background.
+                               // characters on a light background.
     public int removeParticlesTouchingROI; // Set this element to TRUE to remove
-    // the particles touching the ROI.
+                                           // the particles touching the ROI.
     public int erosionCount; // The number of erosions to perform.
 
     private void init() {
@@ -18453,9 +18190,8 @@ public class NIVision {
     }
 
     public OCRProcessingOptions(ThresholdMode mode, int lowThreshold, int highThreshold,
-                                int blockCount, int fastThreshold, int biModalCalculation, int
-                                    darkCharacters,
-                                int removeParticlesTouchingROI, int erosionCount) {
+        int blockCount, int fastThreshold, int biModalCalculation, int darkCharacters,
+        int removeParticlesTouchingROI, int erosionCount) {
       super(36);
       this.mode = mode;
       this.lowThreshold = lowThreshold;
@@ -18495,9 +18231,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (mode != null) {
+      if (mode != null)
         backing.putInt(0, mode.getValue());
-      }
       backing.putInt(4, lowThreshold);
       backing.putInt(8, highThreshold);
       backing.putInt(12, blockCount);
@@ -18515,23 +18250,23 @@ public class NIVision {
 
   public static class ReadTextOptions extends DisposedStruct {
     public String[] validChars; // An array of strings that specifies the valid
-    // characters.
+                                // characters.
     public byte substitutionChar; // The character to substitute for objects
-    // that the function cannot match with any of
-    // the trained characters.
+                                  // that the function cannot match with any of
+                                  // the trained characters.
     public ReadStrategy readStrategy; // The read strategy, which determines how
-    // closely the function analyzes images in
-    // the reading process to match objects
-    // with trained characters.
+                                      // closely the function analyzes images in
+                                      // the reading process to match objects
+                                      // with trained characters.
     public int acceptanceLevel; // The minimum acceptance level at which an
-    // object is considered a trained character.
+                                // object is considered a trained character.
     public int aspectRatio; // The maximum aspect ratio variance percentage for
-    // valid characters.
+                            // valid characters.
     public ReadResolution readResolution; // The read resolution, which
-    // determines how much of the trained
-    // character data the function uses to
-    // match objects to trained
-    // characters.
+                                          // determines how much of the trained
+                                          // character data the function uses to
+                                          // match objects to trained
+                                          // characters.
     private ByteBuffer validChars_buf;
     private ByteBuffer[] validChars_bufs;
 
@@ -18545,7 +18280,7 @@ public class NIVision {
     }
 
     public ReadTextOptions(String[] validChars, byte substitutionChar, ReadStrategy readStrategy,
-                           int acceptanceLevel, int aspectRatio, ReadResolution readResolution) {
+        int acceptanceLevel, int aspectRatio, ReadResolution readResolution) {
       super(65304);
       this.validChars = validChars;
       this.substitutionChar = substitutionChar;
@@ -18577,9 +18312,9 @@ public class NIVision {
         ByteBuffer bb = newDirectByteBuffer(validChars_addr, validChars_numValidChars * 4);
         for (int i = 0, off = 0; i < validChars_numValidChars; i++, off += 4) {
           long addr = getPointer(bb, off);
-          if (addr == 0) {
+          if (addr == 0)
             validChars[i] = null;
-          } else {
+          else {
             ByteBuffer bb2 = newDirectByteBuffer(addr, 1000); // FIXME
             while (bb2.get() != 0) {
             }
@@ -18605,9 +18340,9 @@ public class NIVision {
       validChars_buf =
           ByteBuffer.allocateDirect(validChars.length * 4).order(ByteOrder.nativeOrder());
       for (int i = 0, off = 0; i < validChars.length; i++, off += 4) {
-        if (validChars[i] == null) {
+        if (validChars[i] == null)
           putPointer(validChars_buf, off, 0);
-        } else {
+        else {
           byte[] bytes;
           try {
             bytes = validChars[i].getBytes("UTF-8");
@@ -18622,14 +18357,12 @@ public class NIVision {
       backing.putInt(65280, validChars.length);
       putPointer(backing, 0, validChars_buf);
       backing.put(65284, substitutionChar);
-      if (readStrategy != null) {
+      if (readStrategy != null)
         backing.putInt(65288, readStrategy.getValue());
-      }
       backing.putInt(65292, acceptanceLevel);
       backing.putInt(65296, aspectRatio);
-      if (readResolution != null) {
+      if (readResolution != null)
         backing.putInt(65300, readResolution.getValue());
-      }
     }
 
     public int size() {
@@ -18639,10 +18372,10 @@ public class NIVision {
 
   public static class CharInfo extends DisposedStruct {
     public String charValue; // Retrieves the character value of the
-    // corresponding character in the character set.
+                             // corresponding character in the character set.
     public Image charImage; // The image you used to train this character.
     public Image internalImage; // The internal representation that NI Vision
-    // uses to match objects to this character.
+                                // uses to match objects to this character.
     private ByteBuffer charValue_buf;
 
     private void init() {
@@ -18677,9 +18410,9 @@ public class NIVision {
 
     public void read() {
       long charValue_addr = getPointer(backing, 0);
-      if (charValue_addr == 0) {
+      if (charValue_addr == 0)
         charValue = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(charValue_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -18693,17 +18426,15 @@ public class NIVision {
       }
 
       long charImage_addr = getPointer(backing, 4);
-      if (charImage_addr == 0) {
+      if (charImage_addr == 0)
         charImage = null;
-      } else {
+      else
         charImage = new Image(charImage_addr, false);
-      }
       long internalImage_addr = getPointer(backing, 8);
-      if (internalImage_addr == 0) {
+      if (internalImage_addr == 0)
         internalImage = null;
-      } else {
+      else
         internalImage = new Image(internalImage_addr, false);
-      }
     }
 
     public void write() {
@@ -18787,20 +18518,19 @@ public class NIVision {
   public static class CharReport extends DisposedStruct {
     public String character; // The character value.
     public PointFloat[] corner; // An array of four points that describes the
-    // rectangle that surrounds the character.
+                                // rectangle that surrounds the character.
     public int reserved; // This element is reserved.
     public int lowThreshold; // The minimum value of the threshold range used
-    // for this character.
+                             // for this character.
     public int highThreshold; // The maximum value of the threshold range used
-    // for this character.
+                              // for this character.
     private ByteBuffer character_buf;
 
     private void init() {
       corner = new PointFloat[4];
 
-      for (int i = 0, off = 4; i < 4; i++, off += 8) {
+      for (int i = 0, off = 4; i < 4; i++, off += 8)
         corner[i] = new PointFloat(backing, off);
-      }
     }
 
     public CharReport() {
@@ -18809,7 +18539,7 @@ public class NIVision {
     }
 
     public CharReport(String character, PointFloat[] corner, int reserved, int lowThreshold,
-                      int highThreshold) {
+        int highThreshold) {
       super(48);
       this.character = character;
       this.corner = corner;
@@ -18834,9 +18564,9 @@ public class NIVision {
 
     public void read() {
       long character_addr = getPointer(backing, 0);
-      if (character_addr == 0) {
+      if (character_addr == 0)
         character = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(character_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -18886,8 +18616,8 @@ public class NIVision {
   public static class ReadTextReport extends DisposedStruct {
     public String readString; // The read string.
     public CharReport[] characterReport; // An array of reports describing the
-    // properties of each identified
-    // character.
+                                         // properties of each identified
+                                         // character.
     private ByteBuffer readString_buf;
     private ByteBuffer characterReport_buf;
 
@@ -18922,9 +18652,9 @@ public class NIVision {
 
     public void read() {
       long readString_addr = getPointer(backing, 0);
-      if (readString_addr == 0) {
+      if (readString_addr == 0)
         readString = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(readString_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -19028,7 +18758,7 @@ public class NIVision {
 
   public static class Annulus extends DisposedStruct {
     public Point center; // The coordinate location of the center of the
-    // annulus.
+                         // annulus.
     public int innerRadius; // The internal radius of the annulus.
     public int outerRadius; // The external radius of the annulus.
     public double startAngle; // The start angle, in degrees, of the annulus.
@@ -19044,7 +18774,7 @@ public class NIVision {
     }
 
     public Annulus(Point center, int innerRadius, int outerRadius, double startAngle,
-                   double endAngle) {
+        double endAngle) {
       super(32);
       this.center = center;
       this.innerRadius = innerRadius;
@@ -19090,7 +18820,7 @@ public class NIVision {
 
   public static class EdgeLocationReport extends DisposedStruct {
     public PointFloat[] edges; // The coordinate location of all edges detected
-    // by the search line.
+                               // by the search line.
     private ByteBuffer edges_buf;
 
     private void init() {
@@ -19151,15 +18881,15 @@ public class NIVision {
 
   public static class EdgeOptions extends DisposedStruct {
     public int threshold; // Specifies the threshold value for the contrast of
-    // the edge.
+                          // the edge.
     public int width; // The number of pixels that the function averages to find
-    // the contrast at either side of the edge.
+                      // the contrast at either side of the edge.
     public int steepness; // The span, in pixels, of the slope of the edge
-    // projected along the path specified by the input
-    // points.
+                          // projected along the path specified by the input
+                          // points.
     public InterpolationMethod subpixelType; // The method for interpolating.
     public int subpixelDivisions; // The number of samples the function obtains
-    // from a pixel.
+                                  // from a pixel.
 
     private void init() {
 
@@ -19171,7 +18901,7 @@ public class NIVision {
     }
 
     public EdgeOptions(int threshold, int width, int steepness, InterpolationMethod subpixelType,
-                       int subpixelDivisions) {
+        int subpixelDivisions) {
       super(20);
       this.threshold = threshold;
       this.width = width;
@@ -19206,9 +18936,8 @@ public class NIVision {
       backing.putInt(0, threshold);
       backing.putInt(4, width);
       backing.putInt(8, steepness);
-      if (subpixelType != null) {
+      if (subpixelType != null)
         backing.putInt(12, subpixelType.getValue());
-      }
       backing.putInt(16, subpixelDivisions);
     }
 
@@ -19219,7 +18948,7 @@ public class NIVision {
 
   public static class EdgeReport extends DisposedStruct {
     public float location; // The location of the edge from the first point in
-    // the points array.
+                           // the points array.
     public float contrast; // The contrast at the edge.
     public PolarityType polarity; // The polarity of the edge.
     public float reserved; // This element is reserved.
@@ -19235,7 +18964,7 @@ public class NIVision {
     }
 
     public EdgeReport(double location, double contrast, PolarityType polarity, double reserved,
-                      PointFloat coordinate) {
+        PointFloat coordinate) {
       super(32);
       this.location = (float) location;
       this.contrast = (float) contrast;
@@ -19269,9 +18998,8 @@ public class NIVision {
     public void write() {
       backing.putFloat(0, location);
       backing.putFloat(4, contrast);
-      if (polarity != null) {
+      if (polarity != null)
         backing.putInt(8, polarity.getValue());
-      }
       backing.putFloat(16, reserved);
       coordinate.write();
     }
@@ -19336,10 +19064,10 @@ public class NIVision {
   public static class FitLineOptions extends DisposedStruct {
     public float minScore; // Specifies the required quality of the fitted line.
     public float pixelRadius; // Specifies the neighborhood pixel relationship
-    // for the initial subset of points being used.
+                              // for the initial subset of points being used.
     public int numRefinements; // Specifies the number of refinement iterations
-    // you allow the function to perform on the
-    // initial subset of points.
+                               // you allow the function to perform on the
+                               // initial subset of points.
 
     private void init() {
 
@@ -19390,14 +19118,14 @@ public class NIVision {
 
   public static class DisplayMapping extends DisposedStruct {
     public MappingMethod method; // Describes the method for converting 16-bit
-    // pixels to 8-bit pixels.
+                                 // pixels to 8-bit pixels.
     public int minimumValue; // When method is IMAQ_RANGE, minimumValue
-    // represents the value that is mapped to 0.
+                             // represents the value that is mapped to 0.
     public int maximumValue; // When method is IMAQ_RANGE, maximumValue
-    // represents the value that is mapped to 255.
+                             // represents the value that is mapped to 255.
     public int shiftCount; // When method is IMAQ_DOWNSHIFT, shiftCount
-    // represents the number of bits the function
-    // right-shifts the 16-bit pixel values.
+                           // represents the number of bits the function
+                           // right-shifts the 16-bit pixel values.
 
     private void init() {
 
@@ -19408,8 +19136,7 @@ public class NIVision {
       init();
     }
 
-    public DisplayMapping(MappingMethod method, int minimumValue, int maximumValue, int
-        shiftCount) {
+    public DisplayMapping(MappingMethod method, int minimumValue, int maximumValue, int shiftCount) {
       super(16);
       this.method = method;
       this.minimumValue = minimumValue;
@@ -19439,9 +19166,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (method != null) {
+      if (method != null)
         backing.putInt(0, method.getValue());
-      }
       backing.putInt(4, minimumValue);
       backing.putInt(8, maximumValue);
       backing.putInt(12, shiftCount);
@@ -19455,7 +19181,7 @@ public class NIVision {
   public static class DetectExtremesOptions extends DisposedStruct {
     public double threshold; // Defines which extremes are too small.
     public int width; // Specifies the number of consecutive data points the
-    // function uses in the quadratic least-squares fit.
+                      // function uses in the quadratic least-squares fit.
 
     private void init() {
 
@@ -19503,28 +19229,28 @@ public class NIVision {
 
   public static class ImageInfo extends DisposedStruct {
     public CalibrationUnit imageUnit; // If you set calibration information with
-    // imaqSetSimpleCalibrationInfo(),
-    // imageUnit is the calibration unit.
+                                      // imaqSetSimpleCalibrationInfo(),
+                                      // imageUnit is the calibration unit.
     public float stepX; // If you set calibration information with
-    // imaqSetCalibrationInfo(), stepX is the distance in
-    // the calibration unit between two pixels in the x
-    // direction.
+                        // imaqSetCalibrationInfo(), stepX is the distance in
+                        // the calibration unit between two pixels in the x
+                        // direction.
     public float stepY; // If you set calibration information with
-    // imaqSetCalibrationInfo(), stepY is the distance in
-    // the calibration unit between two pixels in the y
-    // direction.
+                        // imaqSetCalibrationInfo(), stepY is the distance in
+                        // the calibration unit between two pixels in the y
+                        // direction.
     public ImageType imageType; // The type of the image.
     public int xRes; // The number of columns in the image.
     public int yRes; // The number of rows in the image.
     public int xOffset; // If you set mask offset information with
-    // imaqSetMaskOffset(), xOffset is the offset of the
-    // mask origin in the x direction.
+                        // imaqSetMaskOffset(), xOffset is the offset of the
+                        // mask origin in the x direction.
     public int yOffset; // If you set mask offset information with
-    // imaqSetMaskOffset(), yOffset is the offset of the
-    // mask origin in the y direction.
+                        // imaqSetMaskOffset(), yOffset is the offset of the
+                        // mask origin in the y direction.
     public int border; // The number of border pixels around the image.
     public int pixelsPerLine; // The number of pixels stored for each line of
-    // the image.
+                              // the image.
 
     private void init() {
 
@@ -19536,7 +19262,7 @@ public class NIVision {
     }
 
     public ImageInfo(CalibrationUnit imageUnit, double stepX, double stepY, ImageType imageType,
-                     int xRes, int yRes, int xOffset, int yOffset, int border, int pixelsPerLine) {
+        int xRes, int yRes, int xOffset, int yOffset, int border, int pixelsPerLine) {
       super(52);
       this.imageUnit = imageUnit;
       this.stepX = (float) stepX;
@@ -19578,14 +19304,12 @@ public class NIVision {
     }
 
     public void write() {
-      if (imageUnit != null) {
+      if (imageUnit != null)
         backing.putInt(0, imageUnit.getValue());
-      }
       backing.putFloat(4, stepX);
       backing.putFloat(8, stepY);
-      if (imageType != null) {
+      if (imageType != null)
         backing.putInt(12, imageType.getValue());
-      }
       backing.putInt(16, xRes);
       backing.putInt(20, yRes);
       backing.putInt(24, xOffset);
@@ -19601,12 +19325,12 @@ public class NIVision {
 
   public static class LCDOptions extends DisposedStruct {
     public int litSegments; // Set this parameter to TRUE if the segments are
-    // brighter than the background.
+                            // brighter than the background.
     public float threshold; // Determines whether a segment is ON or OFF.
     public int sign; // Indicates whether the function must read the sign of the
-    // indicator.
+                     // indicator.
     public int decimalPoint; // Determines whether to look for a decimal
-    // separator after each digit.
+                             // separator after each digit.
 
     private void init() {
 
@@ -19661,8 +19385,8 @@ public class NIVision {
   public static class LCDReport extends DisposedStruct {
     public String text; // A string of the characters of the LCD.
     public LCDSegments[] segmentInfo; // An array of LCDSegment structures
-    // describing which segments of each digit
-    // are on.
+                                      // describing which segments of each digit
+                                      // are on.
     private ByteBuffer text_buf;
     private ByteBuffer segmentInfo_buf;
 
@@ -19697,9 +19421,9 @@ public class NIVision {
 
     public void read() {
       long text_addr = getPointer(backing, 0);
-      if (text_addr == 0) {
+      if (text_addr == 0)
         text = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(text_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -19792,16 +19516,16 @@ public class NIVision {
 
   public static class LearnCalibrationOptions extends DisposedStruct {
     public CalibrationMode mode; // Specifies the type of algorithm you want to
-    // use to reduce distortion in your image.
+                                 // use to reduce distortion in your image.
     public ScalingMethod method; // Defines the scaling method correction
-    // functions use to correct the image.
+                                 // functions use to correct the image.
     public CalibrationROI roi; // Specifies the ROI correction functions use
-    // when correcting an image.
+                               // when correcting an image.
     public int learnMap; // Set this element to TRUE if you want the function to
-    // calculate and store an error map during the learning
-    // process.
+                         // calculate and store an error map during the learning
+                         // process.
     public int learnTable; // Set this element to TRUE if you want the function
-    // to calculate and store the correction table.
+                           // to calculate and store the correction table.
 
     private void init() {
 
@@ -19813,7 +19537,7 @@ public class NIVision {
     }
 
     public LearnCalibrationOptions(CalibrationMode mode, ScalingMethod method, CalibrationROI roi,
-                                   int learnMap, int learnTable) {
+        int learnMap, int learnTable) {
       super(20);
       this.mode = mode;
       this.method = method;
@@ -19845,15 +19569,12 @@ public class NIVision {
     }
 
     public void write() {
-      if (mode != null) {
+      if (mode != null)
         backing.putInt(0, mode.getValue());
-      }
-      if (method != null) {
+      if (method != null)
         backing.putInt(4, method.getValue());
-      }
-      if (roi != null) {
+      if (roi != null)
         backing.putInt(8, roi.getValue());
-      }
       backing.putInt(12, learnMap);
       backing.putInt(16, learnTable);
     }
@@ -19865,21 +19586,21 @@ public class NIVision {
 
   public static class LearnColorPatternOptions extends DisposedStruct {
     public LearningMode learnMode; // Specifies the invariance mode the function
-    // uses when learning the pattern.
+                                   // uses when learning the pattern.
     public ImageFeatureMode featureMode; // Specifies the features the function
-    // uses when learning the color
-    // pattern.
+                                         // uses when learning the color
+                                         // pattern.
     public int threshold; // Specifies the saturation threshold the function
-    // uses to distinguish between two colors that have
-    // the same hue values.
+                          // uses to distinguish between two colors that have
+                          // the same hue values.
     public ColorIgnoreMode ignoreMode; // Specifies whether the function
-    // excludes certain colors from the color
-    // features of the template image.
+                                       // excludes certain colors from the color
+                                       // features of the template image.
     public ColorInformation[] colorsToIgnore; // An array of ColorInformation
-    // structures providing a set of
-    // colors to exclude from the
-    // color features of the template
-    // image.
+                                              // structures providing a set of
+                                              // colors to exclude from the
+                                              // color features of the template
+                                              // image.
     private ByteBuffer colorsToIgnore_buf;
 
     private void init() {
@@ -19892,8 +19613,7 @@ public class NIVision {
     }
 
     public LearnColorPatternOptions(LearningMode learnMode, ImageFeatureMode featureMode,
-                                    int threshold, ColorIgnoreMode ignoreMode, ColorInformation[]
-                                        colorsToIgnore) {
+        int threshold, ColorIgnoreMode ignoreMode, ColorInformation[] colorsToIgnore) {
       super(24);
       this.learnMode = learnMode;
       this.featureMode = featureMode;
@@ -19935,16 +19655,13 @@ public class NIVision {
     }
 
     public void write() {
-      if (learnMode != null) {
+      if (learnMode != null)
         backing.putInt(0, learnMode.getValue());
-      }
-      if (featureMode != null) {
+      if (featureMode != null)
         backing.putInt(4, featureMode.getValue());
-      }
       backing.putInt(8, threshold);
-      if (ignoreMode != null) {
+      if (ignoreMode != null)
         backing.putInt(12, ignoreMode.getValue());
-      }
       colorsToIgnore_buf =
           ByteBuffer.allocateDirect(colorsToIgnore.length * 12).order(ByteOrder.nativeOrder());
       for (int i = 0, off = 0; i < colorsToIgnore.length; i++, off += 12) {
@@ -20011,17 +19728,17 @@ public class NIVision {
 
   public static class LinearAverages extends DisposedStruct {
     public float[] columnAverages; // An array containing the mean pixel value
-    // of each column.
+                                   // of each column.
     public float[] rowAverages; // An array containing the mean pixel value of
-    // each row.
+                                // each row.
     public float[] risingDiagAverages; // An array containing the mean pixel
-    // value of each diagonal running from
-    // the lower left to the upper right of
-    // the inspected area of the image.
+                                       // value of each diagonal running from
+                                       // the lower left to the upper right of
+                                       // the inspected area of the image.
     public float[] fallingDiagAverages; // An array containing the mean pixel
-    // value of each diagonal running from
-    // the upper left to the lower right of
-    // the inspected area of the image.
+                                        // value of each diagonal running from
+                                        // the upper left to the lower right of
+                                        // the inspected area of the image.
     private ByteBuffer columnAverages_buf;
     private ByteBuffer rowAverages_buf;
     private ByteBuffer risingDiagAverages_buf;
@@ -20040,7 +19757,7 @@ public class NIVision {
     }
 
     public LinearAverages(float[] columnAverages, float[] rowAverages, float[] risingDiagAverages,
-                          float[] fallingDiagAverages) {
+        float[] fallingDiagAverages) {
       super(32);
       this.columnAverages = columnAverages;
       this.rowAverages = rowAverages;
@@ -20123,7 +19840,7 @@ public class NIVision {
 
   public static class LineProfile extends DisposedStruct {
     public float[] profileData; // An array containing the value of each pixel
-    // in the line.
+                                // in the line.
     public Rect boundingBox; // The bounding rectangle of the line.
     public float min; // The smallest pixel value in the line profile.
     public float max; // The largest pixel value in the line profile.
@@ -20142,7 +19859,7 @@ public class NIVision {
     }
 
     public LineProfile(float[] profileData, Rect boundingBox, double min, double max, double mean,
-                       double stdDev) {
+        double stdDev) {
       super(40);
       this.profileData = profileData;
       this.boundingBox = boundingBox;
@@ -20201,30 +19918,30 @@ public class NIVision {
 
   public static class MatchColorPatternOptions extends DisposedStruct {
     public MatchingMode matchMode; // Specifies the method to use when looking
-    // for the color pattern in the image.
+                                   // for the color pattern in the image.
     public ImageFeatureMode featureMode; // Specifies the features to use when
-    // looking for the color pattern in the
-    // image.
+                                         // looking for the color pattern in the
+                                         // image.
     public int minContrast; // Specifies the minimum contrast expected in the
-    // image.
+                            // image.
     public int subpixelAccuracy; // Set this parameter to TRUE to return areas
-    // in the image that match the pattern area
-    // with subpixel accuracy.
+                                 // in the image that match the pattern area
+                                 // with subpixel accuracy.
     public RotationAngleRange[] angleRanges; // An array of angle ranges, in
-    // degrees, where each range
-    // specifies how much you expect
-    // the pattern to be rotated in the
-    // image.
+                                             // degrees, where each range
+                                             // specifies how much you expect
+                                             // the pattern to be rotated in the
+                                             // image.
     public double colorWeight; // Determines the percent contribution of the
-    // color score to the final color pattern
-    // matching score.
+                               // color score to the final color pattern
+                               // matching score.
     public ColorSensitivity sensitivity; // Specifies the sensitivity of the
-    // color information in the image.
+                                         // color information in the image.
     public SearchStrategy strategy; // Specifies how the color features of the
-    // image are used during the search phase.
+                                    // image are used during the search phase.
     public int numMatchesRequested; // Number of valid matches expected.
     public float minMatchScore; // The minimum score a match can have for the
-    // function to consider the match valid.
+                                // function to consider the match valid.
     private ByteBuffer angleRanges_buf;
 
     private void init() {
@@ -20237,11 +19954,9 @@ public class NIVision {
     }
 
     public MatchColorPatternOptions(MatchingMode matchMode, ImageFeatureMode featureMode,
-                                    int minContrast, int subpixelAccuracy, RotationAngleRange[]
-                                        angleRanges,
-                                    double colorWeight, ColorSensitivity sensitivity,
-                                    SearchStrategy strategy,
-                                    int numMatchesRequested, double minMatchScore) {
+        int minContrast, int subpixelAccuracy, RotationAngleRange[] angleRanges,
+        double colorWeight, ColorSensitivity sensitivity, SearchStrategy strategy,
+        int numMatchesRequested, double minMatchScore) {
       super(48);
       this.matchMode = matchMode;
       this.featureMode = featureMode;
@@ -20292,12 +20007,10 @@ public class NIVision {
     }
 
     public void write() {
-      if (matchMode != null) {
+      if (matchMode != null)
         backing.putInt(0, matchMode.getValue());
-      }
-      if (featureMode != null) {
+      if (featureMode != null)
         backing.putInt(4, featureMode.getValue());
-      }
       backing.putInt(8, minContrast);
       backing.putInt(12, subpixelAccuracy);
       angleRanges_buf =
@@ -20309,12 +20022,10 @@ public class NIVision {
       backing.putInt(20, angleRanges.length);
       putPointer(backing, 16, angleRanges_buf);
       backing.putDouble(24, colorWeight);
-      if (sensitivity != null) {
+      if (sensitivity != null)
         backing.putInt(32, sensitivity.getValue());
-      }
-      if (strategy != null) {
+      if (strategy != null)
         backing.putInt(36, strategy.getValue());
-      }
       backing.putInt(40, numMatchesRequested);
       backing.putFloat(44, minMatchScore);
     }
@@ -20326,16 +20037,16 @@ public class NIVision {
 
   public static class HistogramReport extends DisposedStruct {
     public int[] histogram; // An array describing the number of pixels that
-    // fell into each class.
+                            // fell into each class.
     public float min; // The smallest pixel value that the function classified.
     public float max; // The largest pixel value that the function classified.
     public float start; // The smallest pixel value that fell into the first
-    // class.
+                        // class.
     public float width; // The size of each class.
     public float mean; // The mean value of the pixels that the function
-    // classified.
+                       // classified.
     public float stdDev; // The standard deviation of the pixels that the
-    // function classified.
+                         // function classified.
     public int numPixels; // The number of pixels that the function classified.
     private ByteBuffer histogram_buf;
 
@@ -20349,7 +20060,7 @@ public class NIVision {
     }
 
     public HistogramReport(int[] histogram, double min, double max, double start, double width,
-                           double mean, double stdDev, int numPixels) {
+        double mean, double stdDev, int numPixels) {
       super(36);
       this.histogram = histogram;
       this.min = (float) min;
@@ -20414,11 +20125,11 @@ public class NIVision {
 
   public static class ArcInfo extends DisposedStruct {
     public Rect boundingBox; // The coordinate location of the bounding box of
-    // the arc.
+                             // the arc.
     public double startAngle; // The counterclockwise angle from the x-axis in
-    // degrees to the start of the arc.
+                              // degrees to the start of the arc.
     public double endAngle; // The counterclockwise angle from the x-axis in
-    // degrees to the end of the arc.
+                            // degrees to the end of the arc.
 
     private void init() {
       boundingBox = new Rect(backing, 0);
@@ -20469,17 +20180,17 @@ public class NIVision {
 
   public static class AxisReport extends DisposedStruct {
     public PointFloat origin; // The origin of the coordinate system, which is
-    // the intersection of the two axes of the
-    // coordinate system.
+                              // the intersection of the two axes of the
+                              // coordinate system.
     public PointFloat mainAxisEnd; // The end of the main axis, which is the
-    // result of the computation of the
-    // intersection of the main axis with the
-    // rectangular search area.
+                                   // result of the computation of the
+                                   // intersection of the main axis with the
+                                   // rectangular search area.
     public PointFloat secondaryAxisEnd; // The end of the secondary axis, which
-    // is the result of the computation of
-    // the intersection of the secondary
-    // axis with the rectangular search
-    // area.
+                                        // is the result of the computation of
+                                        // the intersection of the secondary
+                                        // axis with the rectangular search
+                                        // area.
 
     private void init() {
       origin = new PointFloat(backing, 0);
@@ -20534,12 +20245,12 @@ public class NIVision {
     public String outputString; // A string containing the decoded barcode data.
     public int size; // The size of the output string.
     public byte outputChar1; // The contents of this character depend on the
-    // barcode type.
+                             // barcode type.
     public byte outputChar2; // The contents of this character depend on the
-    // barcode type.
+                             // barcode type.
     public double confidenceLevel; // A quality measure of the decoded barcode
-    // ranging from 0 to 100, with 100 being the
-    // best.
+                                   // ranging from 0 to 100, with 100 being the
+                                   // best.
     public BarcodeType type; // The type of barcode.
     private ByteBuffer outputString_buf;
 
@@ -20553,7 +20264,7 @@ public class NIVision {
     }
 
     public BarcodeInfo(String outputString, int size, byte outputChar1, byte outputChar2,
-                       double confidenceLevel, BarcodeType type) {
+        double confidenceLevel, BarcodeType type) {
       super(32);
       this.outputString = outputString;
       this.size = size;
@@ -20579,9 +20290,9 @@ public class NIVision {
 
     public void read() {
       long outputString_addr = getPointer(backing, 0);
-      if (outputString_addr == 0) {
+      if (outputString_addr == 0)
         outputString = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(outputString_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -20618,9 +20329,8 @@ public class NIVision {
       backing.put(8, outputChar1);
       backing.put(9, outputChar2);
       backing.putDouble(16, confidenceLevel);
-      if (type != null) {
+      if (type != null)
         backing.putInt(24, type.getValue());
-      }
     }
 
     public int size() {
@@ -20682,12 +20392,12 @@ public class NIVision {
 
   public static class BestCircle extends DisposedStruct {
     public PointFloat center; // The coordinate location of the center of the
-    // circle.
+                              // circle.
     public double radius; // The radius of the circle.
     public double area; // The area of the circle.
     public double perimeter; // The length of the perimeter of the circle.
     public double error; // Represents the least square error of the fitted
-    // circle to the entire set of points.
+                         // circle to the entire set of points.
 
     private void init() {
       center = new PointFloat(backing, 0);
@@ -20698,8 +20408,7 @@ public class NIVision {
       init();
     }
 
-    public BestCircle(PointFloat center, double radius, double area, double perimeter, double
-        error) {
+    public BestCircle(PointFloat center, double radius, double area, double perimeter, double error) {
       super(40);
       this.center = center;
       this.radius = radius;
@@ -20745,15 +20454,15 @@ public class NIVision {
 
   public static class BestEllipse extends DisposedStruct {
     public PointFloat center; // The coordinate location of the center of the
-    // ellipse.
+                              // ellipse.
     public PointFloat majorAxisStart; // The coordinate location of the start of
-    // the major axis of the ellipse.
+                                      // the major axis of the ellipse.
     public PointFloat majorAxisEnd; // The coordinate location of the end of the
-    // major axis of the ellipse.
+                                    // major axis of the ellipse.
     public PointFloat minorAxisStart; // The coordinate location of the start of
-    // the minor axis of the ellipse.
+                                      // the minor axis of the ellipse.
     public PointFloat minorAxisEnd; // The coordinate location of the end of the
-    // minor axis of the ellipse.
+                                    // minor axis of the ellipse.
     public double area; // The area of the ellipse.
     public double perimeter; // The length of the perimeter of the ellipse.
 
@@ -20771,8 +20480,7 @@ public class NIVision {
     }
 
     public BestEllipse(PointFloat center, PointFloat majorAxisStart, PointFloat majorAxisEnd,
-                       PointFloat minorAxisStart, PointFloat minorAxisEnd, double area, double
-                           perimeter) {
+        PointFloat minorAxisStart, PointFloat minorAxisEnd, double area, double perimeter) {
       super(56);
       this.center = center;
       this.majorAxisStart = majorAxisStart;
@@ -20824,19 +20532,19 @@ public class NIVision {
 
   public static class BestLine extends DisposedStruct {
     public PointFloat start; // The coordinate location of the start of the
-    // line.
+                             // line.
     public PointFloat end; // The coordinate location of the end of the line.
     public LineEquation equation; // Defines the three coefficients of the
-    // equation of the best fit line.
+                                  // equation of the best fit line.
     public int valid; // This element is TRUE if the function achieved the
-    // minimum score within the number of allowed refinement
-    // iterations and FALSE if the function did not achieve
-    // the minimum score.
+                      // minimum score within the number of allowed refinement
+                      // iterations and FALSE if the function did not achieve
+                      // the minimum score.
     public double error; // Represents the least square error of the fitted line
-    // to the entire set of points.
+                         // to the entire set of points.
     public int[] pointsUsed; // An array of the indexes for the points array
-    // indicating which points the function used to fit
-    // the line.
+                             // indicating which points the function used to fit
+                             // the line.
     private ByteBuffer pointsUsed_buf;
 
     private void init() {
@@ -20852,7 +20560,7 @@ public class NIVision {
     }
 
     public BestLine(PointFloat start, PointFloat end, LineEquation equation, int valid,
-                    double error, int[] pointsUsed) {
+        double error, int[] pointsUsed) {
       super(64);
       this.start = start;
       this.end = end;
@@ -20915,11 +20623,11 @@ public class NIVision {
     public int imagesPerLine; // The number of images to place on a single line.
     public RGBValue backgroundColor; // The background color of the browser.
     public int frameSize; // Specifies the number of pixels with which to border
-    // each thumbnail.
+                          // each thumbnail.
     public BrowserFrameStyle style; // The style for the frame around each
-    // thumbnail.
+                                    // thumbnail.
     public float ratio; // Specifies the width to height ratio of each
-    // thumbnail.
+                        // thumbnail.
     public RGBValue focusColor; // The color to use to display focused cells.
 
     private void init() {
@@ -20933,8 +20641,7 @@ public class NIVision {
     }
 
     public BrowserOptions(int width, int height, int imagesPerLine, RGBValue backgroundColor,
-                          int frameSize, BrowserFrameStyle style, double ratio, RGBValue
-                              focusColor) {
+        int frameSize, BrowserFrameStyle style, double ratio, RGBValue focusColor) {
       super(32);
       this.width = width;
       this.height = height;
@@ -20977,9 +20684,8 @@ public class NIVision {
       backing.putInt(8, imagesPerLine);
       backgroundColor.write();
       backing.putInt(16, frameSize);
-      if (style != null) {
+      if (style != null)
         backing.putInt(20, style.getValue());
-      }
       backing.putFloat(24, ratio);
       focusColor.write();
     }
@@ -20992,9 +20698,9 @@ public class NIVision {
   public static class CoordinateSystem extends DisposedStruct {
     public PointFloat origin; // The origin of the coordinate system.
     public float angle; // The angle, in degrees, of the x-axis of the
-    // coordinate system relative to the image x-axis.
+                        // coordinate system relative to the image x-axis.
     public AxisOrientation axisOrientation; // The direction of the y-axis of
-    // the coordinate reference system.
+                                            // the coordinate reference system.
 
     private void init() {
       origin = new PointFloat(backing, 0);
@@ -21035,9 +20741,8 @@ public class NIVision {
     public void write() {
       origin.write();
       backing.putFloat(8, angle);
-      if (axisOrientation != null) {
+      if (axisOrientation != null)
         backing.putInt(12, axisOrientation.getValue());
-      }
     }
 
     public int size() {
@@ -21049,21 +20754,21 @@ public class NIVision {
     public int mapColumns; // The number of columns in the error map.
     public int mapRows; // The number of rows in the error map.
     public ROI userRoi; // Specifies the ROI the user provided when learning the
-    // calibration.
+                        // calibration.
     public ROI calibrationRoi; // Specifies the ROI that corresponds to the
-    // region of the image where the calibration
-    // information is accurate.
+                               // region of the image where the calibration
+                               // information is accurate.
     public LearnCalibrationOptions options; // Specifies the calibration options
-    // the user provided when learning
-    // the calibration.
+                                            // the user provided when learning
+                                            // the calibration.
     public GridDescriptor grid; // Specifies the scaling constants for the
-    // image.
+                                // image.
     public CoordinateSystem system; // Specifies the coordinate system for the
-    // real world coordinates.
+                                    // real world coordinates.
     public RangeFloat range; // The range of the grayscale the function used to
-    // represent the circles in the grid image.
+                             // represent the circles in the grid image.
     public float quality; // The quality score of the learning process, which is
-    // a value between 0-1000.
+                          // a value between 0-1000.
 
     private void init() {
       options = new LearnCalibrationOptions(backing, 20);
@@ -21078,9 +20783,8 @@ public class NIVision {
     }
 
     public CalibrationInfo(int mapColumns, int mapRows, ROI userRoi, ROI calibrationRoi,
-                           LearnCalibrationOptions options, GridDescriptor grid, CoordinateSystem
-                               system,
-                           RangeFloat range, double quality) {
+        LearnCalibrationOptions options, GridDescriptor grid, CoordinateSystem system,
+        RangeFloat range, double quality) {
       super(80);
       this.mapColumns = mapColumns;
       this.mapRows = mapRows;
@@ -21111,17 +20815,15 @@ public class NIVision {
       mapColumns = backing.getInt(4);
       mapRows = backing.getInt(8);
       long userRoi_addr = getPointer(backing, 12);
-      if (userRoi_addr == 0) {
+      if (userRoi_addr == 0)
         userRoi = null;
-      } else {
+      else
         userRoi = new ROI(userRoi_addr, false);
-      }
       long calibrationRoi_addr = getPointer(backing, 16);
-      if (calibrationRoi_addr == 0) {
+      if (calibrationRoi_addr == 0)
         calibrationRoi = null;
-      } else {
+      else
         calibrationRoi = new ROI(calibrationRoi_addr, false);
-      }
       options.read();
       grid.read();
       system.read();
@@ -21149,7 +20851,7 @@ public class NIVision {
   public static class CalibrationPoints extends DisposedStruct {
     public PointFloat[] pixelCoordinates; // The array of pixel coordinates.
     public PointFloat[] realWorldCoordinates; // The array of corresponding
-    // real-world coordinates.
+                                              // real-world coordinates.
     private ByteBuffer pixelCoordinates_buf;
     private ByteBuffer realWorldCoordinates_buf;
 
@@ -21234,10 +20936,10 @@ public class NIVision {
 
   public static class CaliperOptions extends DisposedStruct {
     public TwoEdgePolarityType polarity; // Specifies the edge polarity of the
-    // edge pairs.
+                                         // edge pairs.
     public float separation; // The distance between edge pairs.
     public float separationDeviation; // Sets the range around the separation
-    // value.
+                                      // value.
 
     private void init() {
 
@@ -21249,7 +20951,7 @@ public class NIVision {
     }
 
     public CaliperOptions(TwoEdgePolarityType polarity, double separation,
-                          double separationDeviation) {
+        double separationDeviation) {
       super(12);
       this.polarity = polarity;
       this.separation = (float) separation;
@@ -21277,9 +20979,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (polarity != null) {
+      if (polarity != null)
         backing.putInt(0, polarity.getValue());
-      }
       backing.putFloat(4, separation);
       backing.putFloat(8, separationDeviation);
     }
@@ -21307,7 +21008,7 @@ public class NIVision {
     }
 
     public CaliperReport(double edge1Contrast, PointFloat edge1Coord, double edge2Contrast,
-                         PointFloat edge2Coord, double separation) {
+        PointFloat edge2Coord, double separation) {
       super(32);
       this.edge1Contrast = (float) edge1Contrast;
       this.edge1Coord = edge1Coord;
@@ -21371,7 +21072,7 @@ public class NIVision {
     }
 
     public DrawTextOptions(String fontName, int fontSize, int bold, int italic, int underline,
-                           int strikeout, TextAlignment textAlignment, FontColor fontColor) {
+        int strikeout, TextAlignment textAlignment, FontColor fontColor) {
       super(60);
       this.fontName = fontName;
       this.fontSize = fontSize;
@@ -21428,21 +21129,18 @@ public class NIVision {
           bytes = new byte[0];
         }
         putBytes(backing, bytes, 0, bytes.length);
-        for (int i = bytes.length; i < 32; i++) {
+        for (int i = bytes.length; i < 32; i++)
           backing.put(i, (byte) 0); // fill with zero
-        }
       }
       backing.putInt(32, fontSize);
       backing.putInt(36, bold);
       backing.putInt(40, italic);
       backing.putInt(44, underline);
       backing.putInt(48, strikeout);
-      if (textAlignment != null) {
+      if (textAlignment != null)
         backing.putInt(52, textAlignment.getValue());
-      }
-      if (fontColor != null) {
+      if (fontColor != null)
         backing.putInt(56, fontColor.getValue());
-      }
     }
 
     public int size() {
@@ -21564,7 +21262,7 @@ public class NIVision {
 
   public static class ColorHistogramReport extends DisposedStruct {
     public HistogramReport plane1; // The histogram report of the first color
-    // plane.
+                                   // plane.
     public HistogramReport plane2; // The histogram report of the second plane.
     public HistogramReport plane3; // The histogram report of the third plane.
 
@@ -21580,7 +21278,7 @@ public class NIVision {
     }
 
     public ColorHistogramReport(HistogramReport plane1, HistogramReport plane2,
-                                HistogramReport plane3) {
+        HistogramReport plane3) {
       super(108);
       this.plane1 = plane1;
       this.plane2 = plane2;
@@ -21620,10 +21318,10 @@ public class NIVision {
 
   public static class ColorInformation extends DisposedStruct {
     public int saturation; // The saturation level the function uses to learn
-    // the color information.
+                           // the color information.
     public double[] info; // An array of color information that represents the
-    // color spectrum analysis of a region of an image in
-    // a compact form.
+                          // color spectrum analysis of a region of an image in
+                          // a compact form.
     private ByteBuffer info_buf;
 
     private void init() {
@@ -21728,18 +21426,18 @@ public class NIVision {
 
   public static class ConcentricRakeReport extends DisposedStruct {
     public ArcInfo[] rakeArcs; // An array containing the location of each
-    // concentric arc line used for edge detection.
+                               // concentric arc line used for edge detection.
     public PointFloat[] firstEdges; // The coordinate location of all edges
-    // detected as first edges.
+                                    // detected as first edges.
     public PointFloat[] lastEdges; // The coordinate location of all edges
-    // detected as last edges.
+                                   // detected as last edges.
     public EdgeLocationReport[] allEdges; // An array of reports describing the
-    // location of the edges located by
-    // each concentric rake arc line.
+                                          // location of the edges located by
+                                          // each concentric rake arc line.
     public int[] linesWithEdges; // An array of indices into the rakeArcs array
-    // indicating the concentric rake arc lines on
-    // which the function detected at least one
-    // edge.
+                                 // indicating the concentric rake arc lines on
+                                 // which the function detected at least one
+                                 // edge.
     private ByteBuffer rakeArcs_buf;
     private ByteBuffer firstEdges_buf;
     private ByteBuffer lastEdges_buf;
@@ -21760,8 +21458,7 @@ public class NIVision {
     }
 
     public ConcentricRakeReport(ArcInfo[] rakeArcs, PointFloat[] firstEdges,
-                                PointFloat[] lastEdges, EdgeLocationReport[] allEdges, int[]
-                                    linesWithEdges) {
+        PointFloat[] lastEdges, EdgeLocationReport[] allEdges, int[] linesWithEdges) {
       super(36);
       this.rakeArcs = rakeArcs;
       this.firstEdges = firstEdges;
@@ -21880,10 +21577,10 @@ public class NIVision {
   public static class ConstructROIOptions extends DisposedStruct {
     public int windowNumber; // The window number of the image window.
     public String windowTitle; // Specifies the message string that the function
-    // displays in the title bar of the window.
+                               // displays in the title bar of the window.
     public PaletteType type; // The palette type to use.
     public RGBValue[] palette; // If type is IMAQ_PALETTE_USER, this array is
-    // the palette of colors to use with the window.
+                               // the palette of colors to use with the window.
     private ByteBuffer windowTitle_buf;
     private ByteBuffer palette_buf;
 
@@ -21897,7 +21594,7 @@ public class NIVision {
     }
 
     public ConstructROIOptions(int windowNumber, String windowTitle, PaletteType type,
-                               RGBValue[] palette) {
+        RGBValue[] palette) {
       super(20);
       this.windowNumber = windowNumber;
       this.windowTitle = windowTitle;
@@ -21922,9 +21619,9 @@ public class NIVision {
     public void read() {
       windowNumber = backing.getInt(0);
       long windowTitle_addr = getPointer(backing, 4);
-      if (windowTitle_addr == 0) {
+      if (windowTitle_addr == 0)
         windowTitle = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(windowTitle_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -21964,9 +21661,8 @@ public class NIVision {
             windowTitle_bytes.length, (byte) 0);
       }
       putPointer(backing, 4, windowTitle == null ? 0 : getByteBufferAddress(windowTitle_buf));
-      if (type != null) {
+      if (type != null)
         backing.putInt(8, type.getValue());
-      }
       palette_buf = ByteBuffer.allocateDirect(palette.length * 4).order(ByteOrder.nativeOrder());
       for (int i = 0, off = 0; i < palette.length; i++, off += 4) {
         palette[i].setBuffer(palette_buf, off);
@@ -22034,9 +21730,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (type != null) {
+      if (type != null)
         backing.putInt(0, type.getValue());
-      }
       points_buf = ByteBuffer.allocateDirect(points.length * 8).order(ByteOrder.nativeOrder());
       for (int i = 0, off = 0; i < points.length; i++, off += 8) {
         points[i].setBuffer(points_buf, off);
@@ -22056,19 +21751,19 @@ public class NIVision {
     public ContourType type; // The contour type.
     public RGBValue color; // The contour color.
     public Point point; // Use this member when the contour is of type
-    // IMAQ_POINT.
+                        // IMAQ_POINT.
     public Line line; // Use this member when the contour is of type IMAQ_LINE.
     public Rect rect; // Use this member when the contour is of type IMAQ_RECT.
     public Rect ovalBoundingBox; // Use this member when the contour is of type
-    // IMAQ_OVAL.
+                                 // IMAQ_OVAL.
     public ClosedContour closedContour; // Use this member when the contour is
-    // of type IMAQ_CLOSED_CONTOUR.
+                                        // of type IMAQ_CLOSED_CONTOUR.
     public OpenContour openContour; // Use this member when the contour is of
-    // type IMAQ_OPEN_CONTOUR.
+                                    // type IMAQ_OPEN_CONTOUR.
     public Annulus annulus; // Use this member when the contour is of type
-    // IMAQ_ANNULUS.
+                            // IMAQ_ANNULUS.
     public RotatedRect rotatedRect; // Use this member when the contour is of
-    // type IMAQ_ROTATED_RECT.
+                                    // type IMAQ_ROTATED_RECT.
 
     private void init() {
       color = new RGBValue(backing, 4);
@@ -22104,74 +21799,65 @@ public class NIVision {
       color.read();
       if (type == ContourType.POINT) {
         long point_addr = getPointer(backing, 8);
-        if (point_addr == 0) {
+        if (point_addr == 0)
           point = null;
-        } else {
+        else
           point = new Point(point_addr, false);
-        }
       }
       if (type == ContourType.LINE) {
         long line_addr = getPointer(backing, 8);
-        if (line_addr == 0) {
+        if (line_addr == 0)
           line = null;
-        } else {
+        else
           line = new Line(line_addr, false);
-        }
       }
       if (type == ContourType.RECT) {
         long rect_addr = getPointer(backing, 8);
-        if (rect_addr == 0) {
+        if (rect_addr == 0)
           rect = null;
-        } else {
+        else
           rect = new Rect(rect_addr, false);
-        }
       }
       if (type == ContourType.OVAL) {
         long ovalBoundingBox_addr = getPointer(backing, 8);
-        if (ovalBoundingBox_addr == 0) {
+        if (ovalBoundingBox_addr == 0)
           ovalBoundingBox = null;
-        } else {
+        else
           ovalBoundingBox = new Rect(ovalBoundingBox_addr, false);
-        }
       }
       if (type == ContourType.CLOSED_CONTOUR) {
         long closedContour_addr = getPointer(backing, 8);
-        if (closedContour_addr == 0) {
+        if (closedContour_addr == 0)
           closedContour = null;
-        } else {
+        else
           closedContour = new ClosedContour(closedContour_addr, false);
-        }
       }
       if (type == ContourType.OPEN_CONTOUR) {
         long openContour_addr = getPointer(backing, 8);
-        if (openContour_addr == 0) {
+        if (openContour_addr == 0)
           openContour = null;
-        } else {
+        else
           openContour = new OpenContour(openContour_addr, false);
-        }
       }
       if (type == ContourType.ANNULUS) {
         long annulus_addr = getPointer(backing, 8);
-        if (annulus_addr == 0) {
+        if (annulus_addr == 0)
           annulus = null;
-        } else {
+        else
           annulus = new Annulus(annulus_addr, false);
-        }
       }
       if (type == ContourType.ROTATED_RECT) {
         long rotatedRect_addr = getPointer(backing, 8);
-        if (rotatedRect_addr == 0) {
+        if (rotatedRect_addr == 0)
           rotatedRect = null;
-        } else {
+        else
           rotatedRect = new RotatedRect(rotatedRect_addr, false);
-        }
       }
     }
 
     public void write() {
-      if (type != null) {
+      if (type != null)
         backing.putInt(0, type.getValue());
-      }
       color.write();
       if (type == ContourType.POINT) {
         putPointer(backing, 8, point);
@@ -22208,13 +21894,13 @@ public class NIVision {
     public double x; // The x-coordinate value in the image.
     public double y; // The y-coordinate value in the image.
     public double curvature; // The change in slope at this edge point of the
-    // segment.
+                             // segment.
     public double xDisplacement; // The x displacement of the current edge pixel
-    // from a cubic spline fit of the current edge
-    // segment.
+                                 // from a cubic spline fit of the current edge
+                                 // segment.
     public double yDisplacement; // The y displacement of the current edge pixel
-    // from a cubic spline fit of the current edge
-    // segment.
+                                 // from a cubic spline fit of the current edge
+                                 // segment.
 
     private void init() {
 
@@ -22226,7 +21912,7 @@ public class NIVision {
     }
 
     public ContourPoint(double x, double y, double curvature, double xDisplacement,
-                        double yDisplacement) {
+        double yDisplacement) {
       super(40);
       this.x = x;
       this.y = y;
@@ -22273,12 +21959,12 @@ public class NIVision {
   public static class CoordinateTransform extends DisposedStruct {
     public Point initialOrigin; // The origin of the initial coordinate system.
     public float initialAngle; // The angle, in degrees, of the x-axis of the
-    // initial coordinate system relative to the
-    // image x-axis.
+                               // initial coordinate system relative to the
+                               // image x-axis.
     public Point finalOrigin; // The origin of the final coordinate system.
     public float finalAngle; // The angle, in degrees, of the x-axis of the
-    // final coordinate system relative to the image
-    // x-axis.
+                             // final coordinate system relative to the image
+                             // x-axis.
 
     private void init() {
       initialOrigin = new Point(backing, 0);
@@ -22291,7 +21977,7 @@ public class NIVision {
     }
 
     public CoordinateTransform(Point initialOrigin, double initialAngle, Point finalOrigin,
-                               double finalAngle) {
+        double finalAngle) {
       super(24);
       this.initialOrigin = initialOrigin;
       this.initialAngle = (float) initialAngle;
@@ -22334,10 +22020,10 @@ public class NIVision {
 
   public static class CoordinateTransform2 extends DisposedStruct {
     public CoordinateSystem referenceSystem; // Defines the coordinate system
-    // for input coordinates.
+                                             // for input coordinates.
     public CoordinateSystem measurementSystem; // Defines the coordinate system
-    // in which the function should
-    // perform measurements.
+                                               // in which the function should
+                                               // perform measurements.
 
     private void init() {
       referenceSystem = new CoordinateSystem(backing, 0);
@@ -22349,8 +22035,7 @@ public class NIVision {
       init();
     }
 
-    public CoordinateTransform2(CoordinateSystem referenceSystem, CoordinateSystem
-        measurementSystem) {
+    public CoordinateTransform2(CoordinateSystem referenceSystem, CoordinateSystem measurementSystem) {
       super(32);
       this.referenceSystem = referenceSystem;
       this.measurementSystem = measurementSystem;
@@ -22387,16 +22072,16 @@ public class NIVision {
 
   public static class CannyOptions extends DisposedStruct {
     public float sigma; // The sigma of the Gaussian smoothing filter that the
-    // function applies to the image before edge detection.
+                        // function applies to the image before edge detection.
     public float upperThreshold; // The upper fraction of pixel values in the
-    // image from which the function chooses a seed
-    // or starting point of an edge segment.
+                                 // image from which the function chooses a seed
+                                 // or starting point of an edge segment.
     public float lowerThreshold; // The function multiplies this value by
-    // upperThreshold to determine the lower
-    // threshold for all the pixels in an edge
-    // segment.
+                                 // upperThreshold to determine the lower
+                                 // threshold for all the pixels in an edge
+                                 // segment.
     public int windowSize; // The window size of the Gaussian filter that the
-    // function applies to the image.
+                           // function applies to the image.
 
     private void init() {
 
@@ -22407,8 +22092,7 @@ public class NIVision {
       init();
     }
 
-    public CannyOptions(double sigma, double upperThreshold, double lowerThreshold, int
-        windowSize) {
+    public CannyOptions(double sigma, double upperThreshold, double lowerThreshold, int windowSize) {
       super(16);
       this.sigma = (float) sigma;
       this.upperThreshold = (float) upperThreshold;
@@ -22547,18 +22231,18 @@ public class NIVision {
 
   public static class View3DOptions extends DisposedStruct {
     public int sizeReduction; // A divisor the function uses when determining
-    // the final height and width of the 3D image.
+                              // the final height and width of the 3D image.
     public int maxHeight; // Defines the maximum height of a pixel from the
-    // image source drawn in 3D.
+                          // image source drawn in 3D.
     public Direction3D direction; // Defines the 3D orientation.
     public float alpha; // Determines the angle between the horizontal and the
-    // baseline.
+                        // baseline.
     public float beta; // Determines the angle between the horizontal and the
-    // second baseline.
+                       // second baseline.
     public int border; // Defines the border size.
     public int background; // Defines the background color.
     public Plane3D plane; // Indicates the view a function uses to show complex
-    // images.
+                          // images.
 
     private void init() {
 
@@ -22570,7 +22254,7 @@ public class NIVision {
     }
 
     public View3DOptions(int sizeReduction, int maxHeight, Direction3D direction, double alpha,
-                         double beta, int border, int background, Plane3D plane) {
+        double beta, int border, int background, Plane3D plane) {
       super(32);
       this.sizeReduction = sizeReduction;
       this.maxHeight = maxHeight;
@@ -22610,16 +22294,14 @@ public class NIVision {
     public void write() {
       backing.putInt(0, sizeReduction);
       backing.putInt(4, maxHeight);
-      if (direction != null) {
+      if (direction != null)
         backing.putInt(8, direction.getValue());
-      }
       backing.putFloat(12, alpha);
       backing.putFloat(16, beta);
       backing.putInt(20, border);
       backing.putInt(24, background);
-      if (plane != null) {
+      if (plane != null)
         backing.putInt(28, plane.getValue());
-      }
     }
 
     public int size() {
@@ -22629,22 +22311,22 @@ public class NIVision {
 
   public static class MatchPatternOptions extends DisposedStruct {
     public MatchingMode mode; // Specifies the method to use when looking for
-    // the pattern in the image.
+                              // the pattern in the image.
     public int minContrast; // Specifies the minimum contrast expected in the
-    // image.
+                            // image.
     public int subpixelAccuracy; // Set this element to TRUE to return areas in
-    // the image that match the pattern area with
-    // subpixel accuracy.
+                                 // the image that match the pattern area with
+                                 // subpixel accuracy.
     public RotationAngleRange[] angleRanges; // An array of angle ranges, in
-    // degrees, where each range
-    // specifies how much you expect
-    // the pattern to be rotated in the
-    // image.
+                                             // degrees, where each range
+                                             // specifies how much you expect
+                                             // the pattern to be rotated in the
+                                             // image.
     public int numMatchesRequested; // Number of valid matches expected.
     public int matchFactor; // Controls the number of potential matches that the
-    // function examines.
+                            // function examines.
     public float minMatchScore; // The minimum score a match can have for the
-    // function to consider the match valid.
+                                // function to consider the match valid.
     private ByteBuffer angleRanges_buf;
 
     private void init() {
@@ -22657,9 +22339,8 @@ public class NIVision {
     }
 
     public MatchPatternOptions(MatchingMode mode, int minContrast, int subpixelAccuracy,
-                               RotationAngleRange[] angleRanges, int numMatchesRequested, int
-                                   matchFactor,
-                               double minMatchScore) {
+        RotationAngleRange[] angleRanges, int numMatchesRequested, int matchFactor,
+        double minMatchScore) {
       super(32);
       this.mode = mode;
       this.minContrast = minContrast;
@@ -22704,9 +22385,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (mode != null) {
+      if (mode != null)
         backing.putInt(0, mode.getValue());
-      }
       backing.putInt(4, minContrast);
       backing.putInt(8, subpixelAccuracy);
       angleRanges_buf =
@@ -22729,12 +22409,12 @@ public class NIVision {
 
   public static class TIFFFileOptions extends DisposedStruct {
     public int rowsPerStrip; // Indicates the number of rows that the function
-    // writes per strip.
+                             // writes per strip.
     public PhotometricMode photoInterp; // Designates which photometric
-    // interpretation to use.
+                                        // interpretation to use.
     public TIFFCompressionType compressionType; // Indicates the type of
-    // compression to use on the
-    // TIFF file.
+                                                // compression to use on the
+                                                // TIFF file.
 
     private void init() {
 
@@ -22746,7 +22426,7 @@ public class NIVision {
     }
 
     public TIFFFileOptions(int rowsPerStrip, PhotometricMode photoInterp,
-                           TIFFCompressionType compressionType) {
+        TIFFCompressionType compressionType) {
       super(12);
       this.rowsPerStrip = rowsPerStrip;
       this.photoInterp = photoInterp;
@@ -22775,12 +22455,10 @@ public class NIVision {
 
     public void write() {
       backing.putInt(0, rowsPerStrip);
-      if (photoInterp != null) {
+      if (photoInterp != null)
         backing.putInt(4, photoInterp.getValue());
-      }
-      if (compressionType != null) {
+      if (compressionType != null)
         backing.putInt(8, compressionType.getValue());
-      }
     }
 
     public int size() {
@@ -22856,14 +22534,14 @@ public class NIVision {
     public int underline; // Set this element to TRUE to underline the text.
     public int strikeout; // Set this element to TRUE to strikeout the text.
     public TextAlignment horizontalTextAlignment; // Sets the alignment of the
-    // text.
+                                                  // text.
     public VerticalTextAlignment verticalTextAlignment; // Sets the vertical
-    // alignment for the
-    // text.
+                                                        // alignment for the
+                                                        // text.
     public RGBValue backgroundColor; // Sets the color for the text background
-    // pixels.
+                                     // pixels.
     public double angle; // The counterclockwise angle, in degrees, of the text
-    // relative to the x-axis.
+                         // relative to the x-axis.
     private ByteBuffer fontName_buf;
 
     private void init() {
@@ -22876,9 +22554,8 @@ public class NIVision {
     }
 
     public OverlayTextOptions(String fontName, int fontSize, int bold, int italic, int underline,
-                              int strikeout, TextAlignment horizontalTextAlignment,
-                              VerticalTextAlignment verticalTextAlignment, RGBValue
-                                  backgroundColor, double angle) {
+        int strikeout, TextAlignment horizontalTextAlignment,
+        VerticalTextAlignment verticalTextAlignment, RGBValue backgroundColor, double angle) {
       super(48);
       this.fontName = fontName;
       this.fontSize = fontSize;
@@ -22908,9 +22585,9 @@ public class NIVision {
 
     public void read() {
       long fontName_addr = getPointer(backing, 0);
-      if (fontName_addr == 0) {
+      if (fontName_addr == 0)
         fontName = null;
-      } else {
+      else {
         ByteBuffer bb = newDirectByteBuffer(fontName_addr, 1000); // FIXME
         while (bb.get() != 0) {
         }
@@ -22952,12 +22629,10 @@ public class NIVision {
       backing.putInt(12, italic);
       backing.putInt(16, underline);
       backing.putInt(20, strikeout);
-      if (horizontalTextAlignment != null) {
+      if (horizontalTextAlignment != null)
         backing.putInt(24, horizontalTextAlignment.getValue());
-      }
-      if (verticalTextAlignment != null) {
+      if (verticalTextAlignment != null)
         backing.putInt(28, verticalTextAlignment.getValue());
-      }
       backgroundColor.write();
       backing.putDouble(40, angle);
     }
@@ -22969,11 +22644,11 @@ public class NIVision {
 
   public static class ParticleFilterCriteria extends DisposedStruct {
     public MeasurementValue parameter; // The morphological measurement that the
-    // function uses for filtering.
+                                       // function uses for filtering.
     public float lower; // The lower bound of the criteria range.
     public float upper; // The upper bound of the criteria range.
     public int exclude; // Set this element to TRUE to indicate that a match
-    // occurs when the value is outside the criteria range.
+                        // occurs when the value is outside the criteria range.
 
     private void init() {
 
@@ -22985,7 +22660,7 @@ public class NIVision {
     }
 
     public ParticleFilterCriteria(MeasurementValue parameter, double lower, double upper,
-                                  int exclude) {
+        int exclude) {
       super(16);
       this.parameter = parameter;
       this.lower = (float) lower;
@@ -23015,9 +22690,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (parameter != null) {
+      if (parameter != null)
         backing.putInt(0, parameter.getValue());
-      }
       backing.putFloat(4, lower);
       backing.putFloat(8, upper);
       backing.putInt(12, exclude);
@@ -23031,36 +22705,36 @@ public class NIVision {
   public static class ParticleReport extends DisposedStruct {
     public int area; // The number of pixels in the particle.
     public float calibratedArea; // The size of the particle, calibrated to the
-    // calibration information of the image.
+                                 // calibration information of the image.
     public float perimeter; // The length of the perimeter, calibrated to the
-    // calibration information of the image.
+                            // calibration information of the image.
     public int numHoles; // The number of holes in the particle.
     public int areaOfHoles; // The total surface area, in pixels, of all the
-    // holes in a particle.
+                            // holes in a particle.
     public float perimeterOfHoles; // The length of the perimeter of all the
-    // holes in the particle calibrated to the
-    // calibration information of the image.
+                                   // holes in the particle calibrated to the
+                                   // calibration information of the image.
     public Rect boundingBox; // The smallest rectangle that encloses the
-    // particle.
+                             // particle.
     public float sigmaX; // The sum of the particle pixels on the x-axis.
     public float sigmaY; // The sum of the particle pixels on the y-axis.
     public float sigmaXX; // The sum of the particle pixels on the x-axis,
-    // squared.
+                          // squared.
     public float sigmaYY; // The sum of the particle pixels on the y-axis,
-    // squared.
+                          // squared.
     public float sigmaXY; // The sum of the particle pixels on the x-axis and
-    // y-axis.
+                          // y-axis.
     public int longestLength; // The length of the longest horizontal line
-    // segment.
+                              // segment.
     public Point longestPoint; // The location of the leftmost pixel of the
-    // longest segment in the particle.
+                               // longest segment in the particle.
     public int projectionX; // The length of the particle when projected onto
-    // the x-axis.
+                            // the x-axis.
     public int projectionY; // The length of the particle when projected onto
-    // the y-axis.
+                            // the y-axis.
     public int connect8; // This element is TRUE if the function used
-    // connectivity-8 to determine if particles are
-    // touching.
+                         // connectivity-8 to determine if particles are
+                         // touching.
 
     private void init() {
       boundingBox = new Rect(backing, 24);
@@ -23073,11 +22747,9 @@ public class NIVision {
     }
 
     public ParticleReport(int area, double calibratedArea, double perimeter, int numHoles,
-                          int areaOfHoles, double perimeterOfHoles, Rect boundingBox, double
-                              sigmaX, double sigmaY,
-                          double sigmaXX, double sigmaYY, double sigmaXY, int longestLength,
-                          Point longestPoint,
-                          int projectionX, int projectionY, int connect8) {
+        int areaOfHoles, double perimeterOfHoles, Rect boundingBox, double sigmaX, double sigmaY,
+        double sigmaXX, double sigmaYY, double sigmaXY, int longestLength, Point longestPoint,
+        int projectionX, int projectionY, int connect8) {
       super(84);
       this.area = area;
       this.calibratedArea = (float) calibratedArea;
@@ -23160,20 +22832,19 @@ public class NIVision {
   public static class PatternMatch extends DisposedStruct {
     public PointFloat position; // The location of the center of the match.
     public float rotation; // The rotation of the match relative to the template
-    // image, in degrees.
+                           // image, in degrees.
     public float scale; // The size of the match relative to the size of the
-    // template image, expressed as a percentage.
+                        // template image, expressed as a percentage.
     public float score; // The accuracy of the match.
     public PointFloat[] corner; // An array of four points describing the
-    // rectangle surrounding the template image.
+                                // rectangle surrounding the template image.
 
     private void init() {
       position = new PointFloat(backing, 0);
       corner = new PointFloat[4];
 
-      for (int i = 0, off = 20; i < 4; i++, off += 8) {
+      for (int i = 0, off = 20; i < 4; i++, off += 8)
         corner[i] = new PointFloat(backing, off);
-      }
     }
 
     public PatternMatch() {
@@ -23182,7 +22853,7 @@ public class NIVision {
     }
 
     public PatternMatch(PointFloat position, double rotation, double scale, double score,
-                        PointFloat[] corner) {
+        PointFloat[] corner) {
       super(52);
       this.position = position;
       this.rotation = (float) rotation;
@@ -23236,11 +22907,11 @@ public class NIVision {
     public float min; // The smallest pixel value.
     public float max; // The largest pixel value.
     public float calibratedArea; // The area, calibrated to the calibration
-    // information of the image.
+                                 // information of the image.
     public int pixelArea; // The area, in number of pixels.
     public float relativeSize; // The proportion, expressed as a percentage, of
-    // the associated region relative to the whole
-    // image.
+                               // the associated region relative to the whole
+                               // image.
 
     private void init() {
 
@@ -23252,7 +22923,7 @@ public class NIVision {
     }
 
     public QuantifyData(double mean, double stdDev, double min, double max, double calibratedArea,
-                        int pixelArea, double relativeSize) {
+        int pixelArea, double relativeSize) {
       super(28);
       this.mean = (float) mean;
       this.stdDev = (float) stdDev;
@@ -23305,8 +22976,8 @@ public class NIVision {
   public static class QuantifyReport extends DisposedStruct {
     public QuantifyData global; // Statistical data of the whole image.
     public QuantifyData[] regions; // An array of QuantifyData structures
-    // containing statistical data of each region
-    // of the image.
+                                   // containing statistical data of each region
+                                   // of the image.
     private ByteBuffer regions_buf;
 
     private void init() {
@@ -23371,17 +23042,17 @@ public class NIVision {
 
   public static class RakeOptions extends DisposedStruct {
     public int threshold; // Specifies the threshold value for the contrast of
-    // the edge.
+                          // the edge.
     public int width; // The number of pixels that the function averages to find
-    // the contrast at either side of the edge.
+                      // the contrast at either side of the edge.
     public int steepness; // The span, in pixels, of the slope of the edge
-    // projected along the path specified by the input
-    // points.
+                          // projected along the path specified by the input
+                          // points.
     public int subsamplingRatio; // Specifies the number of pixels that separate
-    // two consecutive search lines.
+                                 // two consecutive search lines.
     public InterpolationMethod subpixelType; // The method for interpolating.
     public int subpixelDivisions; // The number of samples the function obtains
-    // from a pixel.
+                                  // from a pixel.
 
     private void init() {
 
@@ -23393,7 +23064,7 @@ public class NIVision {
     }
 
     public RakeOptions(int threshold, int width, int steepness, int subsamplingRatio,
-                       InterpolationMethod subpixelType, int subpixelDivisions) {
+        InterpolationMethod subpixelType, int subpixelDivisions) {
       super(24);
       this.threshold = threshold;
       this.width = width;
@@ -23431,9 +23102,8 @@ public class NIVision {
       backing.putInt(4, width);
       backing.putInt(8, steepness);
       backing.putInt(12, subsamplingRatio);
-      if (subpixelType != null) {
+      if (subpixelType != null)
         backing.putInt(16, subpixelType.getValue());
-      }
       backing.putInt(20, subpixelDivisions);
     }
 
@@ -23444,17 +23114,17 @@ public class NIVision {
 
   public static class RakeReport extends DisposedStruct {
     public LineFloat[] rakeLines; // The coordinate location of each of the rake
-    // lines used by the function.
+                                  // lines used by the function.
     public PointFloat[] firstEdges; // The coordinate location of all edges
-    // detected as first edges.
+                                    // detected as first edges.
     public PointFloat[] lastEdges; // The coordinate location of all edges
-    // detected as last edges.
+                                   // detected as last edges.
     public EdgeLocationReport[] allEdges; // An array of reports describing the
-    // location of the edges located by
-    // each rake line.
+                                          // location of the edges located by
+                                          // each rake line.
     public int[] linesWithEdges; // An array of indices into the rakeLines array
-    // indicating the rake lines on which the
-    // function detected at least one edge.
+                                 // indicating the rake lines on which the
+                                 // function detected at least one edge.
     private ByteBuffer rakeLines_buf;
     private ByteBuffer firstEdges_buf;
     private ByteBuffer lastEdges_buf;
@@ -23475,7 +23145,7 @@ public class NIVision {
     }
 
     public RakeReport(LineFloat[] rakeLines, PointFloat[] firstEdges, PointFloat[] lastEdges,
-                      EdgeLocationReport[] allEdges, int[] linesWithEdges) {
+        EdgeLocationReport[] allEdges, int[] linesWithEdges) {
       super(36);
       this.rakeLines = rakeLines;
       this.firstEdges = firstEdges;
@@ -23595,10 +23265,10 @@ public class NIVision {
   public static class TransformReport extends DisposedStruct {
     public PointFloat[] points; // An array of transformed coordinates.
     public int[] validPoints; // An array of values that describe the validity
-    // of each of the coordinates according to the
-    // region of interest you calibrated using either
-    // imaqLearnCalibrationGrid() or
-    // imaqLearnCalibrationPoints().
+                              // of each of the coordinates according to the
+                              // region of interest you calibrated using either
+                              // imaqLearnCalibrationGrid() or
+                              // imaqLearnCalibrationPoints().
     private ByteBuffer points_buf;
     private ByteBuffer validPoints_buf;
 
@@ -23675,11 +23345,11 @@ public class NIVision {
   public static class ShapeReport extends DisposedStruct {
     public Rect coordinates; // The bounding rectangle of the object.
     public Point centroid; // The coordinate location of the centroid of the
-    // object.
+                           // object.
     public int size; // The size, in pixels, of the object.
     public double score; // A value ranging between 1 and 1,000 that specifies
-    // how similar the object in the image is to the
-    // template.
+                         // how similar the object in the image is to the
+                         // template.
 
     private void init() {
       coordinates = new Rect(backing, 0);
@@ -23734,11 +23404,11 @@ public class NIVision {
 
   public static class MeterArc extends DisposedStruct {
     public PointFloat needleBase; // The coordinate location of the base of the
-    // meter needle.
+                                  // meter needle.
     public PointFloat[] arcCoordPoints; // An array of points describing the
-    // coordinate location of the meter arc.
+                                        // coordinate location of the meter arc.
     public int needleColor; // This element is TRUE when the meter has a
-    // light-colored needle on a dark background.
+                            // light-colored needle on a dark background.
     private ByteBuffer arcCoordPoints_buf;
 
     private void init() {
@@ -23810,10 +23480,10 @@ public class NIVision {
     public float rangeMin; // The lower boundary of the range to keep.
     public float rangeMax; // The upper boundary of the range to keep.
     public float newValue; // If useNewValue is TRUE, newValue is the
-    // replacement value for pixels within the range.
+                           // replacement value for pixels within the range.
     public int useNewValue; // If TRUE, the function sets pixel values within
-    // [rangeMin, rangeMax] to the value specified in
-    // newValue.
+                            // [rangeMin, rangeMax] to the value specified in
+                            // newValue.
 
     private void init() {
 
@@ -23869,7 +23539,7 @@ public class NIVision {
     public int matrixCols; // Number of columns in the matrix.
     public int matrixRows; // Number of rows in the matrix.
     public int hexa; // Set this element to TRUE if you specify a hexagonal
-    // structuring element in kernel.
+                     // structuring element in kernel.
 
     private void init() {
 
@@ -23920,17 +23590,17 @@ public class NIVision {
 
   public static class SpokeReport extends DisposedStruct {
     public LineFloat[] spokeLines; // The coordinate location of each of the
-    // spoke lines used by the function.
+                                   // spoke lines used by the function.
     public PointFloat[] firstEdges; // The coordinate location of all edges
-    // detected as first edges.
+                                    // detected as first edges.
     public PointFloat[] lastEdges; // The coordinate location of all edges
-    // detected as last edges.
+                                   // detected as last edges.
     public EdgeLocationReport[] allEdges; // An array of reports describing the
-    // location of the edges located by
-    // each spoke line.
+                                          // location of the edges located by
+                                          // each spoke line.
     public int[] linesWithEdges; // An array of indices into the spokeLines
-    // array indicating the rake lines on which the
-    // function detected at least one edge.
+                                 // array indicating the rake lines on which the
+                                 // function detected at least one edge.
     private ByteBuffer spokeLines_buf;
     private ByteBuffer firstEdges_buf;
     private ByteBuffer lastEdges_buf;
@@ -23951,7 +23621,7 @@ public class NIVision {
     }
 
     public SpokeReport(LineFloat[] spokeLines, PointFloat[] firstEdges, PointFloat[] lastEdges,
-                       EdgeLocationReport[] allEdges, int[] linesWithEdges) {
+        EdgeLocationReport[] allEdges, int[] linesWithEdges) {
       super(36);
       this.spokeLines = spokeLines;
       this.firstEdges = firstEdges;
@@ -24070,15 +23740,15 @@ public class NIVision {
 
   public static class SimpleEdgeOptions extends DisposedStruct {
     public LevelType type; // Determines how the function evaluates the
-    // threshold and hysteresis values.
+                           // threshold and hysteresis values.
     public int threshold; // The pixel value at which an edge occurs.
     public int hysteresis; // A value that helps determine edges in noisy
-    // images.
+                           // images.
     public EdgeProcess process; // Determines which edges the function looks
-    // for.
+                                // for.
     public int subpixel; // Set this element to TRUE to find edges with subpixel
-    // accuracy by interpolating between points to find the
-    // crossing of the given threshold.
+                         // accuracy by interpolating between points to find the
+                         // crossing of the given threshold.
 
     private void init() {
 
@@ -24090,7 +23760,7 @@ public class NIVision {
     }
 
     public SimpleEdgeOptions(LevelType type, int threshold, int hysteresis, EdgeProcess process,
-                             int subpixel) {
+        int subpixel) {
       super(20);
       this.type = type;
       this.threshold = threshold;
@@ -24122,14 +23792,12 @@ public class NIVision {
     }
 
     public void write() {
-      if (type != null) {
+      if (type != null)
         backing.putInt(0, type.getValue());
-      }
       backing.putInt(4, threshold);
       backing.putInt(8, hysteresis);
-      if (process != null) {
+      if (process != null)
         backing.putInt(12, process.getValue());
-      }
       backing.putInt(16, subpixel);
     }
 
@@ -24140,7 +23808,7 @@ public class NIVision {
 
   public static class SelectParticleCriteria extends DisposedStruct {
     public MeasurementValue parameter; // The morphological measurement that the
-    // function uses for filtering.
+                                       // function uses for filtering.
     public float lower; // The lower boundary of the criteria range.
     public float upper; // The upper boundary of the criteria range.
 
@@ -24181,9 +23849,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (parameter != null) {
+      if (parameter != null)
         backing.putInt(0, parameter.getValue());
-      }
       backing.putFloat(4, lower);
       backing.putFloat(8, upper);
     }
@@ -24197,7 +23864,7 @@ public class NIVision {
     public int numberOfPoints; // The number of points in the segment.
     public int isOpen; // If TRUE, the contour is open.
     public double weight; // The significance of the edge in terms of the gray
-    // values that constitute the edge.
+                          // values that constitute the edge.
     public ContourPoint points; // The points of the segment.
 
     private void init() {
@@ -24236,11 +23903,10 @@ public class NIVision {
       isOpen = backing.getInt(4);
       weight = backing.getDouble(8);
       long points_addr = getPointer(backing, 16);
-      if (points_addr == 0) {
+      if (points_addr == 0)
         points = null;
-      } else {
+      else
         points = new ContourPoint(points_addr, false);
-      }
     }
 
     public void write() {
@@ -24257,9 +23923,9 @@ public class NIVision {
 
   public static class RotationAngleRange extends DisposedStruct {
     public float lower; // The lowest amount of rotation, in degrees, a valid
-    // pattern can have.
+                        // pattern can have.
     public float upper; // The highest amount of rotation, in degrees, a valid
-    // pattern can have.
+                        // pattern can have.
 
     private void init() {
 
@@ -24307,9 +23973,9 @@ public class NIVision {
 
   public static class RotatedRect extends DisposedStruct {
     public int top; // Location of the top edge of the rectangle before
-    // rotation.
+                    // rotation.
     public int left; // Location of the left edge of the rectangle before
-    // rotation.
+                     // rotation.
     public int height; // Height of the rectangle.
     public int width; // Width of the rectangle.
     public double angle; // The rotation, in degrees, of the rectangle.
@@ -24369,9 +24035,9 @@ public class NIVision {
 
   public static class ROIProfile extends DisposedStruct {
     public LineProfile report; // Quantifying information about the points along
-    // the edge of each contour in the ROI.
+                               // the edge of each contour in the ROI.
     public Point pixels; // An array of the points along the edge of each
-    // contour in the ROI.
+                         // contour in the ROI.
 
     private void init() {
       report = new LineProfile(backing, 0);
@@ -24405,11 +24071,10 @@ public class NIVision {
     public void read() {
       report.read();
       long pixels_addr = getPointer(backing, 40);
-      if (pixels_addr == 0) {
+      if (pixels_addr == 0)
         pixels = null;
-      } else {
+      else
         pixels = new Point(pixels_addr, false);
-      }
     }
 
     public void write() {
@@ -24424,21 +24089,21 @@ public class NIVision {
 
   public static class ToolWindowOptions extends DisposedStruct {
     public int showSelectionTool; // If TRUE, the selection tool becomes
-    // visible.
+                                  // visible.
     public int showZoomTool; // If TRUE, the zoom tool becomes visible.
     public int showPointTool; // If TRUE, the point tool becomes visible.
     public int showLineTool; // If TRUE, the line tool becomes visible.
     public int showRectangleTool; // If TRUE, the rectangle tool becomes
-    // visible.
+                                  // visible.
     public int showOvalTool; // If TRUE, the oval tool becomes visible.
     public int showPolygonTool; // If TRUE, the polygon tool becomes visible.
     public int showClosedFreehandTool; // If TRUE, the closed freehand tool
-    // becomes visible.
+                                       // becomes visible.
     public int showPolyLineTool; // If TRUE, the polyline tool becomes visible.
     public int showFreehandTool; // If TRUE, the freehand tool becomes visible.
     public int showAnnulusTool; // If TRUE, the annulus becomes visible.
     public int showRotatedRectangleTool; // If TRUE, the rotated rectangle tool
-    // becomes visible.
+                                         // becomes visible.
     public int showPanTool; // If TRUE, the pan tool becomes visible.
     public int showZoomOutTool; // If TRUE, the zoom out tool becomes visible.
 
@@ -24452,11 +24117,9 @@ public class NIVision {
     }
 
     public ToolWindowOptions(int showSelectionTool, int showZoomTool, int showPointTool,
-                             int showLineTool, int showRectangleTool, int showOvalTool, int
-                                 showPolygonTool,
-                             int showClosedFreehandTool, int showPolyLineTool, int showFreehandTool,
-                             int showAnnulusTool, int showRotatedRectangleTool, int showPanTool,
-                             int showZoomOutTool) {
+        int showLineTool, int showRectangleTool, int showOvalTool, int showPolygonTool,
+        int showClosedFreehandTool, int showPolyLineTool, int showFreehandTool,
+        int showAnnulusTool, int showRotatedRectangleTool, int showPanTool, int showZoomOutTool) {
       super(68);
       this.showSelectionTool = showSelectionTool;
       this.showZoomTool = showZoomTool;
@@ -24529,17 +24192,17 @@ public class NIVision {
 
   public static class SpokeOptions extends DisposedStruct {
     public int threshold; // Specifies the threshold value for the contrast of
-    // the edge.
+                          // the edge.
     public int width; // The number of pixels that the function averages to find
-    // the contrast at either side of the edge.
+                      // the contrast at either side of the edge.
     public int steepness; // The span, in pixels, of the slope of the edge
-    // projected along the path specified by the input
-    // points.
+                          // projected along the path specified by the input
+                          // points.
     public double subsamplingRatio; // The angle, in degrees, between each
-    // radial search line in the spoke.
+                                    // radial search line in the spoke.
     public InterpolationMethod subpixelType; // The method for interpolating.
     public int subpixelDivisions; // The number of samples the function obtains
-    // from a pixel.
+                                  // from a pixel.
 
     private void init() {
 
@@ -24551,7 +24214,7 @@ public class NIVision {
     }
 
     public SpokeOptions(int threshold, int width, int steepness, double subsamplingRatio,
-                        InterpolationMethod subpixelType, int subpixelDivisions) {
+        InterpolationMethod subpixelType, int subpixelDivisions) {
       super(32);
       this.threshold = threshold;
       this.width = width;
@@ -24589,9 +24252,8 @@ public class NIVision {
       backing.putInt(4, width);
       backing.putInt(8, steepness);
       backing.putDouble(16, subsamplingRatio);
-      if (subpixelType != null) {
+      if (subpixelType != null)
         backing.putInt(24, subpixelType.getValue());
-      }
       backing.putInt(28, subpixelDivisions);
     }
 
@@ -24630,7 +24292,7 @@ public class NIVision {
   private static native void _imaqAnd(long dest, long sourceA, long sourceB);
 
   public static void imaqCompare(Image dest, Image source, Image compareImage,
-                                 ComparisonFunction compare) {
+      ComparisonFunction compare) {
 
     _imaqCompare(dest.getAddress(), source.getAddress(), compareImage.getAddress(),
         compare.getValue());
@@ -24703,7 +24365,7 @@ public class NIVision {
   private static native void _imaqCountParticles(long image, int connectivity8, long numParticles);
 
   public static double imaqMeasureParticle(Image image, int particleNumber, int calibrated,
-                                           MeasurementType measurement) {
+      MeasurementType measurement) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     _imaqMeasureParticle(image.getAddress(), particleNumber, calibrated, measurement.getValue(),
@@ -24714,20 +24376,17 @@ public class NIVision {
   }
 
   private static native void _imaqMeasureParticle(long image, int particleNumber, int calibrated,
-                                                  int measurement, long value);
+      int measurement, long value);
 
   public static MeasureParticlesReport imaqMeasureParticles(Image image,
-                                                            MeasureParticlesCalibrationMode
-                                                                calibrationMode,
-                                                            MeasurementType[] measurements) {
+      MeasureParticlesCalibrationMode calibrationMode, MeasurementType[] measurements) {
     int numMeasurements = measurements.length;
     ByteBuffer measurements_buf = null;
     measurements_buf =
         ByteBuffer.allocateDirect(measurements.length * 4).order(ByteOrder.nativeOrder());
     for (int i = 0, off = 0; i < measurements.length; i++, off += 4) {
-      if (measurements != null) {
+      if (measurements != null)
         measurements_buf.putInt(off, measurements[i].getValue());
-      }
     }
     long jn_rv =
         _imaqMeasureParticles(image.getAddress(), calibrationMode.getValue(),
@@ -24737,11 +24396,10 @@ public class NIVision {
   }
 
   private static native long _imaqMeasureParticles(long image, int calibrationMode,
-                                                   long measurements, int numMeasurements);
+      long measurements, int numMeasurements);
 
   public static int imaqParticleFilter4(Image dest, Image source,
-                                        ParticleFilterCriteria2[] criteria,
-                                        ParticleFilterOptions2 options, ROI roi) {
+      ParticleFilterCriteria2[] criteria, ParticleFilterOptions2 options, ROI roi) {
     int criteriaCount = criteria.length;
     ByteBuffer criteria_buf = null;
     criteria_buf = ByteBuffer.allocateDirect(criteria.length * 20).order(ByteOrder.nativeOrder());
@@ -24760,8 +24418,7 @@ public class NIVision {
   }
 
   private static native void _imaqParticleFilter4(long dest, long source, long criteria,
-                                                  int criteriaCount, long options, long roi, long
-                                                      numParticles);
+      int criteriaCount, long options, long roi, long numParticles);
 
   /**
    * Morphology functions
@@ -24817,7 +24474,7 @@ public class NIVision {
   }
 
   public static FindCirclesResult imaqFindCircles(Image dest, Image source, float minRadius,
-                                                  float maxRadius) {
+      float maxRadius) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     long jn_rv =
@@ -24827,7 +24484,7 @@ public class NIVision {
   }
 
   private static native long _imaqFindCircles(long dest, long source, float minRadius,
-                                              float maxRadius, long numCircles);
+      float maxRadius, long numCircles);
 
   public static int imaqLabel2(Image dest, Image source, int connectivity8) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
@@ -24839,10 +24496,10 @@ public class NIVision {
   }
 
   private static native void _imaqLabel2(long dest, long source, int connectivity8,
-                                         long particleCount);
+      long particleCount);
 
   public static void imaqMorphology(Image dest, Image source, MorphologyMethod method,
-                                    StructuringElement structuringElement) {
+      StructuringElement structuringElement) {
 
     _imaqMorphology(dest.getAddress(), source.getAddress(), method.getValue(),
         structuringElement == null ? 0 : structuringElement.getAddress());
@@ -24850,7 +24507,7 @@ public class NIVision {
   }
 
   private static native void _imaqMorphology(long dest, long source, int method,
-                                             long structuringElement);
+      long structuringElement);
 
   public static void imaqRejectBorder(Image dest, Image source, int connectivity8) {
 
@@ -24869,7 +24526,7 @@ public class NIVision {
   private static native void _imaqSegmentation(long dest, long source);
 
   public static void imaqSeparation(Image dest, Image source, int erosions,
-                                    StructuringElement structuringElement) {
+      StructuringElement structuringElement) {
 
     _imaqSeparation(dest.getAddress(), source.getAddress(), erosions,
         structuringElement == null ? 0 : structuringElement.getAddress());
@@ -24877,10 +24534,10 @@ public class NIVision {
   }
 
   private static native void _imaqSeparation(long dest, long source, int erosions,
-                                             long structuringElement);
+      long structuringElement);
 
   public static void imaqSimpleDistance(Image dest, Image source,
-                                        StructuringElement structuringElement) {
+      StructuringElement structuringElement) {
 
     _imaqSimpleDistance(dest.getAddress(), source.getAddress(), structuringElement == null ? 0
         : structuringElement.getAddress());
@@ -24890,7 +24547,7 @@ public class NIVision {
   private static native void _imaqSimpleDistance(long dest, long source, long structuringElement);
 
   public static void imaqSizeFilter(Image dest, Image source, int connectivity8, int erosions,
-                                    SizeType keepSize, StructuringElement structuringElement) {
+      SizeType keepSize, StructuringElement structuringElement) {
 
     _imaqSizeFilter(dest.getAddress(), source.getAddress(), connectivity8, erosions,
         keepSize.getValue(), structuringElement == null ? 0 : structuringElement.getAddress());
@@ -24898,7 +24555,7 @@ public class NIVision {
   }
 
   private static native void _imaqSizeFilter(long dest, long source, int connectivity8,
-                                             int erosions, int keepSize, long structuringElement);
+      int erosions, int keepSize, long structuringElement);
 
   public static void imaqSkeleton(Image dest, Image source, SkeletonMethod method) {
 
@@ -24940,8 +24597,7 @@ public class NIVision {
 
   private static native void _imaqAverage(long dest, long sourceA, long sourceB);
 
-  public static void imaqDivide2(Image dest, Image sourceA, Image sourceB, RoundingMode
-      roundingMode) {
+  public static void imaqDivide2(Image dest, Image sourceA, Image sourceB, RoundingMode roundingMode) {
 
     _imaqDivide2(dest.getAddress(), sourceA.getAddress(), sourceB.getAddress(),
         roundingMode.getValue());
@@ -25028,8 +24684,7 @@ public class NIVision {
   }
 
   public static CaliperToolResult imaqCaliperTool(Image image, Point[] points,
-                                                  EdgeOptions edgeOptions, CaliperOptions
-                                                      caliperOptions) {
+      EdgeOptions edgeOptions, CaliperOptions caliperOptions) {
     int numPoints = points.length;
     ByteBuffer points_buf = null;
     points_buf = ByteBuffer.allocateDirect(points.length * 8).order(ByteOrder.nativeOrder());
@@ -25047,8 +24702,7 @@ public class NIVision {
   }
 
   private static native long _imaqCaliperTool(long image, long points, int numPoints,
-                                              long edgeOptions, long caliperOptions, long
-                                                  numEdgePairs);
+      long edgeOptions, long caliperOptions, long numEdgePairs);
 
   public static class ConcentricRake2Result {
     public EdgeOptions2 edgeOptions;
@@ -25061,8 +24715,7 @@ public class NIVision {
   }
 
   public static ConcentricRake2Result imaqConcentricRake2(Image image, ROI roi,
-                                                          ConcentricRakeDirection direction,
-                                                          EdgeProcess process, int stepSize) {
+      ConcentricRakeDirection direction, EdgeProcess process, int stepSize) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     long jn_rv =
@@ -25074,7 +24727,7 @@ public class NIVision {
   }
 
   private static native long _imaqConcentricRake2(long image, long roi, int direction, int process,
-                                                  int stepSize, long edgeOptions);
+      int stepSize, long edgeOptions);
 
   public static class DetectExtremesResult {
     public ExtremeReport[] array;
@@ -25102,7 +24755,7 @@ public class NIVision {
   }
 
   public static DetectExtremesResult imaqDetectExtremes(double[] pixels, DetectionMode mode,
-                                                        DetectExtremesOptions options) {
+      DetectExtremesOptions options) {
     int numPixels = pixels.length;
     ByteBuffer pixels_buf = null;
     pixels_buf = ByteBuffer.allocateDirect(pixels.length * 8).order(ByteOrder.nativeOrder());
@@ -25117,11 +24770,10 @@ public class NIVision {
   }
 
   private static native long _imaqDetectExtremes(long pixels, int numPixels, int mode,
-                                                 long options, long numExtremes);
+      long options, long numExtremes);
 
   public static double imaqDetectRotation(Image referenceImage, Image testImage,
-                                          PointFloat referenceCenter, PointFloat testCenter, int
-                                              radius, float precision) {
+      PointFloat referenceCenter, PointFloat testCenter, int radius, float precision) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     _imaqDetectRotation(referenceImage.getAddress(), testImage.getAddress(),
@@ -25132,8 +24784,7 @@ public class NIVision {
   }
 
   private static native void _imaqDetectRotation(long referenceImage, long testImage,
-                                                 long referenceCenter, long testCenter, int
-                                                     radius, float precision, long angle);
+      long referenceCenter, long testCenter, int radius, float precision, long angle);
 
   public static class EdgeTool4Result {
     public EdgeOptions2 edgeOptions;
@@ -25146,7 +24797,7 @@ public class NIVision {
   }
 
   public static EdgeTool4Result imaqEdgeTool4(Image image, ROI roi, EdgeProcess processType,
-                                              int reverseDirection) {
+      int reverseDirection) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     long jn_rv =
@@ -25158,12 +24809,11 @@ public class NIVision {
   }
 
   private static native long _imaqEdgeTool4(long image, long roi, int processType,
-                                            long edgeOptions, int reverseDirection);
+      long edgeOptions, int reverseDirection);
 
   public static FindEdgeReport imaqFindEdge2(Image image, ROI roi, CoordinateSystem baseSystem,
-                                             CoordinateSystem newSystem, FindEdgeOptions2
-                                                 findEdgeOptions,
-                                             StraightEdgeOptions straightEdgeOptions) {
+      CoordinateSystem newSystem, FindEdgeOptions2 findEdgeOptions,
+      StraightEdgeOptions straightEdgeOptions) {
 
     long jn_rv =
         _imaqFindEdge2(image.getAddress(), roi.getAddress(), baseSystem.getAddress(),
@@ -25173,7 +24823,7 @@ public class NIVision {
   }
 
   private static native long _imaqFindEdge2(long image, long roi, long baseSystem, long newSystem,
-                                            long findEdgeOptions, long straightEdgeOptions);
+      long findEdgeOptions, long straightEdgeOptions);
 
   public static class FindTransformRect2Result {
     public CoordinateSystem baseSystem;
@@ -25191,11 +24841,8 @@ public class NIVision {
   }
 
   public static FindTransformRect2Result imaqFindTransformRect2(Image image, ROI roi,
-                                                                FindTransformMode mode,
-                                                                FindTransformRectOptions2
-                                                                    findTransformOptions,
-                                                                StraightEdgeOptions
-                                                                    straightEdgeOptions) {
+      FindTransformMode mode, FindTransformRectOptions2 findTransformOptions,
+      StraightEdgeOptions straightEdgeOptions) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8 + 8 + 8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     _imaqFindTransformRect2(image.getAddress(), roi.getAddress(), mode.getValue(), rv_addr + 0,
@@ -25206,10 +24853,8 @@ public class NIVision {
   }
 
   private static native void _imaqFindTransformRect2(long image, long roi, int mode,
-                                                     long baseSystem, long newSystem, long
-                                                         findTransformOptions, long
-                                                         straightEdgeOptions,
-                                                     long axisReport);
+      long baseSystem, long newSystem, long findTransformOptions, long straightEdgeOptions,
+      long axisReport);
 
   public static class FindTransformRects2Result {
     public CoordinateSystem baseSystem;
@@ -25227,14 +24872,9 @@ public class NIVision {
   }
 
   public static FindTransformRects2Result imaqFindTransformRects2(Image image, ROI primaryROI,
-                                                                  ROI secondaryROI,
-                                                                  FindTransformMode mode,
-                                                                  FindTransformRectsOptions2
-                                                                      findTransformOptions,
-                                                                  StraightEdgeOptions
-                                                                      primaryStraightEdgeOptions,
-                                                                  StraightEdgeOptions
-                                                                      secondaryStraightEdgeOptions) {
+      ROI secondaryROI, FindTransformMode mode, FindTransformRectsOptions2 findTransformOptions,
+      StraightEdgeOptions primaryStraightEdgeOptions,
+      StraightEdgeOptions secondaryStraightEdgeOptions) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8 + 8 + 8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     _imaqFindTransformRects2(image.getAddress(), primaryROI.getAddress(),
@@ -25246,16 +24886,11 @@ public class NIVision {
   }
 
   private static native void _imaqFindTransformRects2(long image, long primaryROI,
-                                                      long secondaryROI, int mode, long
-                                                          baseSystem, long newSystem, long
-                                                          findTransformOptions,
-                                                      long primaryStraightEdgeOptions, long
-                                                          secondaryStraightEdgeOptions, long
-                                                          axisReport);
+      long secondaryROI, int mode, long baseSystem, long newSystem, long findTransformOptions,
+      long primaryStraightEdgeOptions, long secondaryStraightEdgeOptions, long axisReport);
 
   public static float imaqLineGaugeTool2(Image image, Point start, Point end,
-                                         LineGaugeMethod method, EdgeOptions edgeOptions,
-                                         CoordinateTransform2 transform) {
+      LineGaugeMethod method, EdgeOptions edgeOptions, CoordinateTransform2 transform) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     _imaqLineGaugeTool2(image.getAddress(), start.getAddress(), end.getAddress(),
@@ -25266,7 +24901,7 @@ public class NIVision {
   }
 
   private static native void _imaqLineGaugeTool2(long image, long start, long end, int method,
-                                                 long edgeOptions, long transform, long distance);
+      long edgeOptions, long transform, long distance);
 
   public static class Rake2Result {
     public EdgeOptions2 edgeOptions;
@@ -25279,7 +24914,7 @@ public class NIVision {
   }
 
   public static Rake2Result imaqRake2(Image image, ROI roi, RakeDirection direction,
-                                      EdgeProcess process, int stepSize) {
+      EdgeProcess process, int stepSize) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     long jn_rv =
@@ -25291,7 +24926,7 @@ public class NIVision {
   }
 
   private static native long _imaqRake2(long image, long roi, int direction, int process,
-                                        int stepSize, long edgeOptions);
+      int stepSize, long edgeOptions);
 
   public static class SimpleEdgeResult {
     public PointFloat[] array;
@@ -25319,7 +24954,7 @@ public class NIVision {
   }
 
   public static SimpleEdgeResult imaqSimpleEdge(Image image, Point[] points,
-                                                SimpleEdgeOptions options) {
+      SimpleEdgeOptions options) {
     int numPoints = points.length;
     ByteBuffer points_buf = null;
     points_buf = ByteBuffer.allocateDirect(points.length * 8).order(ByteOrder.nativeOrder());
@@ -25337,7 +24972,7 @@ public class NIVision {
   }
 
   private static native long _imaqSimpleEdge(long image, long points, int numPoints, long options,
-                                             long numEdges);
+      long numEdges);
 
   public static class Spoke2Result {
     public EdgeOptions2 edgeOptions;
@@ -25350,7 +24985,7 @@ public class NIVision {
   }
 
   public static Spoke2Result imaqSpoke2(Image image, ROI roi, SpokeDirection direction,
-                                        EdgeProcess process, int stepSize) {
+      EdgeProcess process, int stepSize) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     long jn_rv =
@@ -25362,12 +24997,11 @@ public class NIVision {
   }
 
   private static native long _imaqSpoke2(long image, long roi, int direction, int process,
-                                         int stepSize, long edgeOptions);
+      int stepSize, long edgeOptions);
 
   public static StraightEdgeReport2 imaqStraightEdge(Image image, ROI roi,
-                                                     SearchDirection searchDirection,
-                                                     EdgeOptions2 edgeOptions,
-                                                     StraightEdgeOptions straightEdgeOptions) {
+      SearchDirection searchDirection, EdgeOptions2 edgeOptions,
+      StraightEdgeOptions straightEdgeOptions) {
 
     long jn_rv =
         _imaqStraightEdge(image.getAddress(), roi.getAddress(), searchDirection.getValue(),
@@ -25377,13 +25011,11 @@ public class NIVision {
   }
 
   private static native long _imaqStraightEdge(long image, long roi, int searchDirection,
-                                               long edgeOptions, long straightEdgeOptions);
+      long edgeOptions, long straightEdgeOptions);
 
   public static StraightEdgeReport2 imaqStraightEdge2(Image image, ROI roi,
-                                                      SearchDirection searchDirection,
-                                                      EdgeOptions2 edgeOptions,
-                                                      StraightEdgeOptions straightEdgeOptions,
-                                                      int optimizedMode) {
+      SearchDirection searchDirection, EdgeOptions2 edgeOptions,
+      StraightEdgeOptions straightEdgeOptions, int optimizedMode) {
 
     long jn_rv =
         _imaqStraightEdge2(image.getAddress(), roi.getAddress(), searchDirection.getValue(),
@@ -25393,8 +25025,7 @@ public class NIVision {
   }
 
   private static native long _imaqStraightEdge2(long image, long roi, int searchDirection,
-                                                long edgeOptions, long straightEdgeOptions, int
-                                                    optimizedMode);
+      long edgeOptions, long straightEdgeOptions, int optimizedMode);
 
   /**
    * Spatial Filters functions
@@ -25428,7 +25059,7 @@ public class NIVision {
   private static native void _imaqEdgeFilter(long dest, long source, int method, long mask);
 
   public static void imaqLowPass(Image dest, Image source, int width, int height, float tolerance,
-                                 Image mask) {
+      Image mask) {
 
     _imaqLowPass(dest.getAddress(), source.getAddress(), width, height, tolerance, mask == null ? 0
         : mask.getAddress());
@@ -25436,7 +25067,7 @@ public class NIVision {
   }
 
   private static native void _imaqLowPass(long dest, long source, int width, int height,
-                                          float tolerance, long mask);
+      float tolerance, long mask);
 
   public static void imaqMedianFilter(Image dest, Image source, int width, int height, Image mask) {
 
@@ -25446,10 +25077,10 @@ public class NIVision {
   }
 
   private static native void _imaqMedianFilter(long dest, long source, int width, int height,
-                                               long mask);
+      long mask);
 
   public static void imaqNthOrderFilter(Image dest, Image source, int width, int height, int n,
-                                        Image mask) {
+      Image mask) {
 
     _imaqNthOrderFilter(dest.getAddress(), source.getAddress(), width, height, n, mask == null ? 0
         : mask.getAddress());
@@ -25457,14 +25088,14 @@ public class NIVision {
   }
 
   private static native void _imaqNthOrderFilter(long dest, long source, int width, int height,
-                                                 int n, long mask);
+      int n, long mask);
 
   /**
    * Drawing functions
    */
 
   public static void imaqDrawLineOnImage(Image dest, Image source, DrawMode mode, Point start,
-                                         Point end, float newPixelValue) {
+      Point end, float newPixelValue) {
 
     _imaqDrawLineOnImage(dest.getAddress(), source.getAddress(), mode.getValue(),
         start.getAddress(), end.getAddress(), newPixelValue);
@@ -25472,10 +25103,10 @@ public class NIVision {
   }
 
   private static native void _imaqDrawLineOnImage(long dest, long source, int mode, long start,
-                                                  long end, float newPixelValue);
+      long end, float newPixelValue);
 
   public static void imaqDrawShapeOnImage(Image dest, Image source, Rect rect, DrawMode mode,
-                                          ShapeMode shape, float newPixelValue) {
+      ShapeMode shape, float newPixelValue) {
 
     _imaqDrawShapeOnImage(dest.getAddress(), source.getAddress(), rect.getAddress(),
         mode.getValue(), shape.getValue(), newPixelValue);
@@ -25483,7 +25114,7 @@ public class NIVision {
   }
 
   private static native void _imaqDrawShapeOnImage(long dest, long source, long rect, int mode,
-                                                   int shape, float newPixelValue);
+      int shape, float newPixelValue);
 
   /**
    * Interlacing functions
@@ -25523,9 +25154,9 @@ public class NIVision {
         ByteBuffer bb = newDirectByteBuffer(array_addr, array_size * 4);
         for (int i = 0, off = 0; i < array_size; i++, off += 4) {
           long addr = getPointer(bb, off);
-          if (addr == 0) {
+          if (addr == 0)
             array[i] = null;
-          } else {
+          else {
             ByteBuffer bb2 = newDirectByteBuffer(addr, 1000); // FIXME
             while (bb2.get() != 0) {
             }
@@ -25778,7 +25409,7 @@ public class NIVision {
   private static native void _imaqDuplicate(long dest, long source);
 
   public static RawData imaqFlatten(Image image, FlattenType type, CompressionType compression,
-                                    int quality) {
+      int quality) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     long jn_rv =
@@ -25792,7 +25423,7 @@ public class NIVision {
   }
 
   private static native long _imaqFlatten(long image, int type, int compression, int quality,
-                                          long size);
+      long size);
 
   public static void imaqFlip(Image dest, Image source, FlipAxis axis) {
 
@@ -25811,7 +25442,7 @@ public class NIVision {
   private static native void _imaqMask(long dest, long source, long mask);
 
   public static void imaqResample(Image dest, Image source, int newWidth, int newHeight,
-                                  InterpolationMethod method, Rect rect) {
+      InterpolationMethod method, Rect rect) {
 
     _imaqResample(dest.getAddress(), source.getAddress(), newWidth, newHeight, method.getValue(),
         rect.getAddress());
@@ -25819,10 +25450,10 @@ public class NIVision {
   }
 
   private static native void _imaqResample(long dest, long source, int newWidth, int newHeight,
-                                           int method, long rect);
+      int method, long rect);
 
   public static void imaqScale(Image dest, Image source, int xScale, int yScale,
-                               ScalingMode scaleMode, Rect rect) {
+      ScalingMode scaleMode, Rect rect) {
 
     _imaqScale(dest.getAddress(), source.getAddress(), xScale, yScale, scaleMode.getValue(),
         rect.getAddress());
@@ -25830,7 +25461,7 @@ public class NIVision {
   }
 
   private static native void _imaqScale(long dest, long source, int xScale, int yScale,
-                                        int scaleMode, long rect);
+      int scaleMode, long rect);
 
   public static void imaqTranspose(Image dest, Image source) {
 
@@ -25849,7 +25480,7 @@ public class NIVision {
   private static native void _imaqUnflatten(long image, long data, int size);
 
   public static void imaqUnwrapImage(Image dest, Image source, Annulus annulus,
-                                     RectOrientation orientation, InterpolationMethod method) {
+      RectOrientation orientation, InterpolationMethod method) {
 
     _imaqUnwrapImage(dest.getAddress(), source.getAddress(), annulus.getAddress(),
         orientation.getValue(), method.getValue());
@@ -25857,7 +25488,7 @@ public class NIVision {
   }
 
   private static native void _imaqUnwrapImage(long dest, long source, long annulus,
-                                              int orientation, int method);
+      int orientation, int method);
 
   public static void imaqView3D(Image dest, Image source, View3DOptions options) {
 
@@ -25912,8 +25543,7 @@ public class NIVision {
   }
 
   private static native void _imaqGetFileInfo(long fileName, long calibrationUnit,
-                                              long calibrationX, long calibrationY, long width,
-                                              long height, long imageType);
+      long calibrationX, long calibrationY, long width, long height, long imageType);
 
   public static void imaqReadFile(Image image, String fileName) {
     ByteBuffer fileName_buf;
@@ -25930,7 +25560,7 @@ public class NIVision {
   }
 
   private static native void _imaqReadFile(long image, long fileName, long colorTable,
-                                           long numColors);
+      long numColors);
 
   public static class ReadVisionFileResult {
     public RGBValue colorTable;
@@ -25965,10 +25595,10 @@ public class NIVision {
   }
 
   private static native void _imaqReadVisionFile(long image, long fileName, long colorTable,
-                                                 long numColors);
+      long numColors);
 
   public static void imaqWriteBMPFile(Image image, String fileName, int compress,
-                                      RGBValue colorTable) {
+      RGBValue colorTable) {
     ByteBuffer fileName_buf = null;
     if (fileName != null) {
       byte[] fileName_bytes;
@@ -25988,7 +25618,7 @@ public class NIVision {
   }
 
   private static native void _imaqWriteBMPFile(long image, long fileName, int compress,
-                                               long colorTable);
+      long colorTable);
 
   public static void imaqWriteFile(Image image, String fileName, RGBValue colorTable) {
     ByteBuffer fileName_buf = null;
@@ -26010,8 +25640,7 @@ public class NIVision {
 
   private static native void _imaqWriteFile(long image, long fileName, long colorTable);
 
-  public static void imaqWriteJPEGFile(Image image, String fileName, int quality, RawData
-      colorTable) {
+  public static void imaqWriteJPEGFile(Image image, String fileName, int quality, RawData colorTable) {
     ByteBuffer fileName_buf = null;
     if (fileName != null) {
       byte[] fileName_bytes;
@@ -26025,16 +25654,16 @@ public class NIVision {
           (byte) 0);
     }
     _imaqWriteJPEGFile(image.getAddress(), fileName == null ? 0
-            : getByteBufferAddress(fileName_buf), quality,
+        : getByteBufferAddress(fileName_buf), quality,
         colorTable == null ? 0 : colorTable.getAddress());
 
   }
 
   private static native void _imaqWriteJPEGFile(long image, long fileName, int quality,
-                                                long colorTable);
+      long colorTable);
 
   public static void imaqWritePNGFile2(Image image, String fileName, int compressionSpeed,
-                                       RGBValue colorTable, int useBitDepth) {
+      RGBValue colorTable, int useBitDepth) {
     ByteBuffer fileName_buf = null;
     if (fileName != null) {
       byte[] fileName_bytes;
@@ -26048,16 +25677,16 @@ public class NIVision {
           (byte) 0);
     }
     _imaqWritePNGFile2(image.getAddress(), fileName == null ? 0
-            : getByteBufferAddress(fileName_buf), compressionSpeed,
+        : getByteBufferAddress(fileName_buf), compressionSpeed,
         colorTable == null ? 0 : colorTable.getAddress(), useBitDepth);
 
   }
 
   private static native void _imaqWritePNGFile2(long image, long fileName, int compressionSpeed,
-                                                long colorTable, int useBitDepth);
+      long colorTable, int useBitDepth);
 
   public static void imaqWriteTIFFFile(Image image, String fileName, TIFFFileOptions options,
-                                       RGBValue colorTable) {
+      RGBValue colorTable) {
     ByteBuffer fileName_buf = null;
     if (fileName != null) {
       byte[] fileName_bytes;
@@ -26071,13 +25700,13 @@ public class NIVision {
           (byte) 0);
     }
     _imaqWriteTIFFFile(image.getAddress(), fileName == null ? 0
-            : getByteBufferAddress(fileName_buf), options == null ? 0 : options.getAddress(),
+        : getByteBufferAddress(fileName_buf), options == null ? 0 : options.getAddress(),
         colorTable == null ? 0 : colorTable.getAddress());
 
   }
 
   private static native void _imaqWriteTIFFFile(long image, long fileName, long options,
-                                                long colorTable);
+      long colorTable);
 
   public static void imaqWriteVisionFile(Image image, String fileName, RGBValue colorTable) {
     ByteBuffer fileName_buf = null;
@@ -26104,7 +25733,7 @@ public class NIVision {
    */
 
   public static CoordinateSystem imaqBuildCoordinateSystem(Point points, ReferenceMode mode,
-                                                           AxisOrientation orientation) {
+      AxisOrientation orientation) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     _imaqBuildCoordinateSystem(points.getAddress(), mode.getValue(), orientation.getValue(),
@@ -26116,7 +25745,7 @@ public class NIVision {
   }
 
   private static native void _imaqBuildCoordinateSystem(long points, int mode, int orientation,
-                                                        long system);
+      long system);
 
   public static BestCircle2 imaqFitCircle2(PointFloat[] points, FitCircleOptions options) {
     int numPoints = points.length;
@@ -26165,7 +25794,7 @@ public class NIVision {
   private static native long _imaqFitLine(long points, int numPoints, long options);
 
   public static float imaqGetAngle(PointFloat start1, PointFloat end1, PointFloat start2,
-                                   PointFloat end2) {
+      PointFloat end2) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     _imaqGetAngle(start1.getAddress(), end1.getAddress(), start2.getAddress(), end2.getAddress(),
@@ -26176,7 +25805,7 @@ public class NIVision {
   }
 
   private static native void _imaqGetAngle(long start1, long end1, long start2, long end2,
-                                           long angle);
+      long angle);
 
   public static class GetBisectingLineResult {
     public PointFloat bisectStart;
@@ -26191,7 +25820,7 @@ public class NIVision {
   }
 
   public static GetBisectingLineResult imaqGetBisectingLine(PointFloat start1, PointFloat end1,
-                                                            PointFloat start2, PointFloat end2) {
+      PointFloat start2, PointFloat end2) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8 + 8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     _imaqGetBisectingLine(start1.getAddress(), end1.getAddress(), start2.getAddress(),
@@ -26201,7 +25830,7 @@ public class NIVision {
   }
 
   private static native void _imaqGetBisectingLine(long start1, long end1, long start2, long end2,
-                                                   long bisectStart, long bisectEnd);
+      long bisectStart, long bisectEnd);
 
   public static float imaqGetDistance(PointFloat point1, PointFloat point2) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
@@ -26215,7 +25844,7 @@ public class NIVision {
   private static native void _imaqGetDistance(long point1, long point2, long distance);
 
   public static PointFloat imaqGetIntersection(PointFloat start1, PointFloat end1,
-                                               PointFloat start2, PointFloat end2) {
+      PointFloat start2, PointFloat end2) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     _imaqGetIntersection(start1.getAddress(), end1.getAddress(), start2.getAddress(),
@@ -26227,7 +25856,7 @@ public class NIVision {
   }
 
   private static native void _imaqGetIntersection(long start1, long end1, long start2, long end2,
-                                                  long intersection);
+      long intersection);
 
   public static class GetMidLineResult {
     public PointFloat midLineStart;
@@ -26242,7 +25871,7 @@ public class NIVision {
   }
 
   public static GetMidLineResult imaqGetMidLine(PointFloat refLineStart, PointFloat refLineEnd,
-                                                PointFloat point) {
+      PointFloat point) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8 + 8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     _imaqGetMidLine(refLineStart.getAddress(), refLineEnd.getAddress(), point.getAddress(),
@@ -26252,7 +25881,7 @@ public class NIVision {
   }
 
   private static native void _imaqGetMidLine(long refLineStart, long refLineEnd, long point,
-                                             long midLineStart, long midLineEnd);
+      long midLineStart, long midLineEnd);
 
   public static class GetPerpendicularLineResult {
     public PointFloat perpLineStart;
@@ -26269,8 +25898,7 @@ public class NIVision {
   }
 
   public static GetPerpendicularLineResult imaqGetPerpendicularLine(PointFloat refLineStart,
-                                                                    PointFloat refLineEnd,
-                                                                    PointFloat point) {
+      PointFloat refLineEnd, PointFloat point) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8 + 8 + 8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     _imaqGetPerpendicularLine(refLineStart.getAddress(), refLineEnd.getAddress(),
@@ -26280,8 +25908,7 @@ public class NIVision {
   }
 
   private static native void _imaqGetPerpendicularLine(long refLineStart, long refLineEnd,
-                                                       long point, long perpLineStart, long
-                                                           perpLineEnd, long distance);
+      long point, long perpLineStart, long perpLineEnd, long distance);
 
   public static class GetPointsOnContourResult {
     public SegmentInfo[] array;
@@ -26386,8 +26013,7 @@ public class NIVision {
   }
 
   public static InterpolatePointsResult imaqInterpolatePoints(Image image, Point[] points,
-                                                              InterpolationMethod method, int
-                                                                  subpixel) {
+      InterpolationMethod method, int subpixel) {
     int numPoints = points.length;
     ByteBuffer points_buf = null;
     points_buf = ByteBuffer.allocateDirect(points.length * 8).order(ByteOrder.nativeOrder());
@@ -26405,7 +26031,7 @@ public class NIVision {
   }
 
   private static native long _imaqInterpolatePoints(long image, long points, int numPoints,
-                                                    int method, int subpixel, long interpCount);
+      int method, int subpixel, long interpCount);
 
   /**
    * Clipboard functions
@@ -26468,17 +26094,16 @@ public class NIVision {
    */
 
   public static void imaqColorBCGTransform(Image dest, Image source, BCGOptions redOptions,
-                                           BCGOptions greenOptions, BCGOptions blueOptions, Image
-                                               mask) {
+      BCGOptions greenOptions, BCGOptions blueOptions, Image mask) {
 
     _imaqColorBCGTransform(dest.getAddress(), source.getAddress(), redOptions == null ? 0
-            : redOptions.getAddress(), greenOptions == null ? 0 : greenOptions.getAddress(),
+        : redOptions.getAddress(), greenOptions == null ? 0 : greenOptions.getAddress(),
         blueOptions == null ? 0 : blueOptions.getAddress(), mask == null ? 0 : mask.getAddress());
 
   }
 
   private static native void _imaqColorBCGTransform(long dest, long source, long redOptions,
-                                                    long greenOptions, long blueOptions, long mask);
+      long greenOptions, long blueOptions, long mask);
 
   public static void imaqColorEqualize(Image dest, Image source, int colorEqualization) {
 
@@ -26489,8 +26114,7 @@ public class NIVision {
   private static native void _imaqColorEqualize(long dest, long source, int colorEqualization);
 
   public static ColorHistogramReport imaqColorHistogram2(Image image, int numClasses,
-                                                         ColorMode mode, CIEXYZValue
-                                                             whiteReference, Image mask) {
+      ColorMode mode, CIEXYZValue whiteReference, Image mask) {
 
     long jn_rv =
         _imaqColorHistogram2(image.getAddress(), numClasses, mode.getValue(),
@@ -26500,10 +26124,10 @@ public class NIVision {
   }
 
   private static native long _imaqColorHistogram2(long image, int numClasses, int mode,
-                                                  long whiteReference, long mask);
+      long whiteReference, long mask);
 
   public static void imaqColorThreshold(Image dest, Image source, int replaceValue, ColorMode mode,
-                                        Range plane1Range, Range plane2Range, Range plane3Range) {
+      Range plane1Range, Range plane2Range, Range plane3Range) {
 
     _imaqColorThreshold(dest.getAddress(), source.getAddress(), replaceValue, mode.getValue(),
         plane1Range == null ? 0 : plane1Range.getAddress(),
@@ -26513,8 +26137,7 @@ public class NIVision {
   }
 
   private static native void _imaqColorThreshold(long dest, long source, int replaceValue,
-                                                 int mode, long plane1Range, long plane2Range,
-                                                 long plane3Range);
+      int mode, long plane1Range, long plane2Range, long plane3Range);
 
   public static SupervisedColorSegmentationReport imaqSupervisedColorSegmentation(
       ClassifierSession session, Image labelImage, Image srcImage, ROI roi, ROILabel labelIn,
@@ -26530,15 +26153,11 @@ public class NIVision {
   }
 
   private static native long _imaqSupervisedColorSegmentation(long session, long labelImage,
-                                                              long srcImage, long roi, long
-                                                                  labelIn, int numLabelIn, int
-                                                                  maxDistance,
-                                                              int minIdentificationScore, long
-                                                                  segmentOptions);
+      long srcImage, long roi, long labelIn, int numLabelIn, int maxDistance,
+      int minIdentificationScore, long segmentOptions);
 
   public static int imaqGetColorSegmentationMaxDistance(ClassifierSession session,
-                                                        ColorSegmenationOptions segmentOptions,
-                                                        SegmentationDistanceLevel distLevel) {
+      ColorSegmenationOptions segmentOptions, SegmentationDistanceLevel distLevel) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     _imaqGetColorSegmentationMaxDistance(session.getAddress(), segmentOptions.getAddress(),
@@ -26549,8 +26168,7 @@ public class NIVision {
   }
 
   private static native void _imaqGetColorSegmentationMaxDistance(long session,
-                                                                  long segmentOptions, int
-                                                                      distLevel, long maxDistance);
+      long segmentOptions, int distLevel, long maxDistance);
 
   /**
    * Transform functions
@@ -26583,7 +26201,7 @@ public class NIVision {
   private static native void _imaqInverse(long dest, long source, long mask);
 
   public static void imaqMathTransform(Image dest, Image source, MathTransformMethod method,
-                                       float rangeMin, float rangeMax, float power, Image mask) {
+      float rangeMin, float rangeMax, float power, Image mask) {
 
     _imaqMathTransform(dest.getAddress(), source.getAddress(), method.getValue(), rangeMin,
         rangeMax, power, mask == null ? 0 : mask.getAddress());
@@ -26591,7 +26209,7 @@ public class NIVision {
   }
 
   private static native void _imaqMathTransform(long dest, long source, int method, float rangeMin,
-                                                float rangeMax, float power, long mask);
+      float rangeMax, float power, long mask);
 
   public static int imaqWatershedTransform(Image dest, Image source, int connectivity8) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
@@ -26603,7 +26221,7 @@ public class NIVision {
   }
 
   private static native void _imaqWatershedTransform(long dest, long source, int connectivity8,
-                                                     long zoneCount);
+      long zoneCount);
 
   /**
    * Window Management functions
@@ -26633,7 +26251,7 @@ public class NIVision {
    */
 
   public static MeterArc imaqGetMeterArc(int lightNeedle, MeterArcMode mode, ROI roi,
-                                         PointFloat base, PointFloat start, PointFloat end) {
+      PointFloat base, PointFloat start, PointFloat end) {
 
     long jn_rv =
         _imaqGetMeterArc(lightNeedle, mode.getValue(), roi.getAddress(), base.getAddress(),
@@ -26643,7 +26261,7 @@ public class NIVision {
   }
 
   private static native long _imaqGetMeterArc(int lightNeedle, int mode, long roi, long base,
-                                              long start, long end);
+      long start, long end);
 
   public static class ReadMeterResult {
     public double percentage;
@@ -26665,7 +26283,7 @@ public class NIVision {
   }
 
   private static native void _imaqReadMeter(long image, long arcInfo, long percentage,
-                                            long endOfNeedle);
+      long endOfNeedle);
 
   /**
    * Calibration functions
@@ -26698,9 +26316,8 @@ public class NIVision {
   private static native long _imaqGetCalibrationInfo3(long image, int isGetErrorMap);
 
   public static float imaqLearnCalibrationGrid(Image image, ROI roi,
-                                               LearnCalibrationOptions options, GridDescriptor
-                                                   grid, CoordinateSystem system,
-                                               RangeFloat range) {
+      LearnCalibrationOptions options, GridDescriptor grid, CoordinateSystem system,
+      RangeFloat range) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     _imaqLearnCalibrationGrid(image.getAddress(), roi.getAddress(), options.getAddress(),
@@ -26711,12 +26328,10 @@ public class NIVision {
   }
 
   private static native void _imaqLearnCalibrationGrid(long image, long roi, long options,
-                                                       long grid, long system, long range, long
-                                                           quality);
+      long grid, long system, long range, long quality);
 
   public static float imaqLearnCalibrationPoints(Image image, CalibrationPoints points, ROI roi,
-                                                 LearnCalibrationOptions options, GridDescriptor
-                                                     grid, CoordinateSystem system) {
+      LearnCalibrationOptions options, GridDescriptor grid, CoordinateSystem system) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     _imaqLearnCalibrationPoints(image.getAddress(), points.getAddress(), roi.getAddress(),
@@ -26727,8 +26342,7 @@ public class NIVision {
   }
 
   private static native void _imaqLearnCalibrationPoints(long image, long points, long roi,
-                                                         long options, long grid, long system,
-                                                         long quality);
+      long options, long grid, long system, long quality);
 
   public static void imaqSetCoordinateSystem(Image image, CoordinateSystem system) {
 
@@ -26739,7 +26353,7 @@ public class NIVision {
   private static native void _imaqSetCoordinateSystem(long image, long system);
 
   public static void imaqSetSimpleCalibration(Image image, ScalingMethod method, int learnTable,
-                                              GridDescriptor grid, CoordinateSystem system) {
+      GridDescriptor grid, CoordinateSystem system) {
 
     _imaqSetSimpleCalibration(image.getAddress(), method.getValue(), learnTable, grid.getAddress(),
         system.getAddress());
@@ -26747,10 +26361,10 @@ public class NIVision {
   }
 
   private static native void _imaqSetSimpleCalibration(long image, int method, int learnTable,
-                                                       long grid, long system);
+      long grid, long system);
 
   public static TransformReport imaqTransformPixelToRealWorld(Image image,
-                                                              PointFloat[] pixelCoordinates) {
+      PointFloat[] pixelCoordinates) {
     int numCoordinates = pixelCoordinates.length;
     ByteBuffer pixelCoordinates_buf = null;
     pixelCoordinates_buf =
@@ -26767,10 +26381,10 @@ public class NIVision {
   }
 
   private static native long _imaqTransformPixelToRealWorld(long image, long pixelCoordinates,
-                                                            int numCoordinates);
+      int numCoordinates);
 
   public static TransformReport imaqTransformRealWorldToPixel(Image image,
-                                                              PointFloat[] realWorldCoordinates) {
+      PointFloat[] realWorldCoordinates) {
     int numCoordinates = realWorldCoordinates.length;
     ByteBuffer realWorldCoordinates_buf = null;
     realWorldCoordinates_buf =
@@ -26787,7 +26401,7 @@ public class NIVision {
   }
 
   private static native long _imaqTransformRealWorldToPixel(long image, long realWorldCoordinates,
-                                                            int numCoordinates);
+      int numCoordinates);
 
   public static void imaqSetSimpleCalibration2(Image image, GridDescriptor gridDescriptor) {
 
@@ -26810,7 +26424,7 @@ public class NIVision {
   private static native void _imaqCalibrationSetAxisInfo(long image, long axisInfo);
 
   public static void imaqCalibrationGetThumbnailImage(Image templateImage, Image image,
-                                                      CalibrationThumbnailType type, int index) {
+      CalibrationThumbnailType type, int index) {
 
     _imaqCalibrationGetThumbnailImage(templateImage.getAddress(), image.getAddress(),
         type.getValue(), index);
@@ -26818,10 +26432,10 @@ public class NIVision {
   }
 
   private static native void _imaqCalibrationGetThumbnailImage(long templateImage, long image,
-                                                               int type, int index);
+      int type, int index);
 
   public static GetCalibrationInfoReport imaqCalibrationGetCalibrationInfo(Image image,
-                                                                           int isGetErrorMap) {
+      int isGetErrorMap) {
 
     long jn_rv = _imaqCalibrationGetCalibrationInfo(image.getAddress(), isGetErrorMap);
 
@@ -26852,7 +26466,7 @@ public class NIVision {
    */
 
   public static void imaqExtractColorPlanes(Image image, ColorMode mode, Image plane1,
-                                            Image plane2, Image plane3) {
+      Image plane2, Image plane3) {
 
     _imaqExtractColorPlanes(image.getAddress(), mode.getValue(),
         plane1 == null ? 0 : plane1.getAddress(), plane2 == null ? 0 : plane2.getAddress(),
@@ -26861,7 +26475,7 @@ public class NIVision {
   }
 
   private static native void _imaqExtractColorPlanes(long image, int mode, long plane1,
-                                                     long plane2, long plane3);
+      long plane2, long plane3);
 
   public static void imaqExtractComplexPlane(Image dest, Image source, ComplexPlane plane) {
 
@@ -26872,7 +26486,7 @@ public class NIVision {
   private static native void _imaqExtractComplexPlane(long dest, long source, int plane);
 
   public static void imaqReplaceColorPlanes(Image dest, Image source, ColorMode mode, Image plane1,
-                                            Image plane2, Image plane3) {
+      Image plane2, Image plane3) {
 
     _imaqReplaceColorPlanes(dest.getAddress(), source.getAddress(), mode.getValue(),
         plane1 == null ? 0 : plane1.getAddress(), plane2 == null ? 0 : plane2.getAddress(),
@@ -26881,10 +26495,10 @@ public class NIVision {
   }
 
   private static native void _imaqReplaceColorPlanes(long dest, long source, int mode, long plane1,
-                                                     long plane2, long plane3);
+      long plane2, long plane3);
 
   public static void imaqReplaceComplexPlane(Image dest, Image source, Image newValues,
-                                             ComplexPlane plane) {
+      ComplexPlane plane) {
 
     _imaqReplaceComplexPlane(dest.getAddress(), source.getAddress(), newValues.getAddress(),
         plane.getValue());
@@ -26892,14 +26506,14 @@ public class NIVision {
   }
 
   private static native void _imaqReplaceComplexPlane(long dest, long source, long newValues,
-                                                      int plane);
+      int plane);
 
   /**
    * Color Matching functions
    */
 
   public static ColorInformation imaqLearnColor(Image image, ROI roi, ColorSensitivity sensitivity,
-                                                int saturation) {
+      int saturation) {
 
     long jn_rv =
         _imaqLearnColor(image.getAddress(), roi == null ? 0 : roi.getAddress(),
@@ -26987,8 +26601,7 @@ public class NIVision {
 
   private static native void _imaqInverseFFT(long dest, long source);
 
-  public static void imaqTruncate(Image dest, Image source, TruncateMode highlow, float
-      ratioToKeep) {
+  public static void imaqTruncate(Image dest, Image source, TruncateMode highlow, float ratioToKeep) {
 
     _imaqTruncate(dest.getAddress(), source.getAddress(), highlow.getValue(), ratioToKeep);
 
@@ -27024,12 +26637,8 @@ public class NIVision {
   private static native long _imaqReadBarcode(long image, int type, long roi, int validate);
 
   public static DataMatrixReport imaqReadDataMatrixBarcode2(Image image, ROI roi,
-                                                            DataMatrixGradingMode
-                                                                prepareForGrading,
-                                                            DataMatrixDescriptionOptions
-                                                                descriptionOptions,
-                                                            DataMatrixSizeOptions sizeOptions,
-                                                            DataMatrixSearchOptions searchOptions) {
+      DataMatrixGradingMode prepareForGrading, DataMatrixDescriptionOptions descriptionOptions,
+      DataMatrixSizeOptions sizeOptions, DataMatrixSearchOptions searchOptions) {
 
     long jn_rv =
         _imaqReadDataMatrixBarcode2(image.getAddress(), roi.getAddress(),
@@ -27040,9 +26649,7 @@ public class NIVision {
   }
 
   private static native long _imaqReadDataMatrixBarcode2(long image, long roi,
-                                                         int prepareForGrading, long
-                                                             descriptionOptions, long
-                                                             sizeOptions, long searchOptions);
+      int prepareForGrading, long descriptionOptions, long sizeOptions, long searchOptions);
 
   public static class ReadPDF417BarcodeResult {
     public Barcode2DInfo[] array;
@@ -27070,7 +26677,7 @@ public class NIVision {
   }
 
   public static ReadPDF417BarcodeResult imaqReadPDF417Barcode(Image image, ROI roi,
-                                                              Barcode2DSearchMode searchMode) {
+      Barcode2DSearchMode searchMode) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     long jn_rv =
@@ -27081,12 +26688,11 @@ public class NIVision {
   }
 
   private static native long _imaqReadPDF417Barcode(long image, long roi, int searchMode,
-                                                    long numBarcodes);
+      long numBarcodes);
 
   public static QRCodeReport imaqReadQRCode(Image image, ROI roi, QRGradingMode reserved,
-                                            QRCodeDescriptionOptions descriptionOptions,
-                                            QRCodeSizeOptions sizeOptions,
-                                            QRCodeSearchOptions searchOptions) {
+      QRCodeDescriptionOptions descriptionOptions, QRCodeSizeOptions sizeOptions,
+      QRCodeSearchOptions searchOptions) {
 
     long jn_rv =
         _imaqReadQRCode(image.getAddress(), roi.getAddress(), reserved.getValue(),
@@ -27096,8 +26702,7 @@ public class NIVision {
   }
 
   private static native long _imaqReadQRCode(long image, long roi, int reserved,
-                                             long descriptionOptions, long sizeOptions, long
-                                                 searchOptions);
+      long descriptionOptions, long sizeOptions, long searchOptions);
 
   /**
    * LCD functions
@@ -27153,8 +26758,7 @@ public class NIVision {
   }
 
   public static MatchShapeResult imaqMatchShape(Image dest, Image source, Image templateImage,
-                                                int scaleInvariant, int connectivity8, double
-                                                    tolerance) {
+      int scaleInvariant, int connectivity8, double tolerance) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     long jn_rv =
@@ -27165,8 +26769,7 @@ public class NIVision {
   }
 
   private static native long _imaqMatchShape(long dest, long source, long templateImage,
-                                             int scaleInvariant, int connectivity8, double
-                                                 tolerance, long numMatches);
+      int scaleInvariant, int connectivity8, double tolerance, long numMatches);
 
   /**
    * Contours functions
@@ -27415,7 +27018,7 @@ public class NIVision {
   }
 
   public static ExtractCurvesResult imaqExtractCurves(Image image, ROI roi,
-                                                      CurveOptions curveOptions) {
+      CurveOptions curveOptions) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     long jn_rv =
@@ -27426,10 +27029,10 @@ public class NIVision {
   }
 
   private static native long _imaqExtractCurves(long image, long roi, long curveOptions,
-                                                long numCurves);
+      long numCurves);
 
   public static HistogramReport imaqHistogram(Image image, int numClasses, float min, float max,
-                                              Image mask) {
+      Image mask) {
 
     long jn_rv =
         _imaqHistogram(image.getAddress(), numClasses, min, max,
@@ -27439,10 +27042,9 @@ public class NIVision {
   }
 
   private static native long _imaqHistogram(long image, int numClasses, float min, float max,
-                                            long mask);
+      long mask);
 
-  public static LinearAverages imaqLinearAverages2(Image image, LinearAveragesMode mode, Rect
-      rect) {
+  public static LinearAverages imaqLinearAverages2(Image image, LinearAveragesMode mode, Rect rect) {
 
     long jn_rv = _imaqLinearAverages2(image.getAddress(), mode.getValue(), rect.getAddress());
 
@@ -27474,7 +27076,7 @@ public class NIVision {
    */
 
   public static ThresholdData imaqAutoThreshold2(Image dest, Image source, int numClasses,
-                                                 ThresholdMethod method, Image mask) {
+      ThresholdMethod method, Image mask) {
 
     long jn_rv =
         _imaqAutoThreshold2(dest.getAddress(), source.getAddress(), numClasses, method.getValue(),
@@ -27484,12 +27086,11 @@ public class NIVision {
   }
 
   private static native long _imaqAutoThreshold2(long dest, long source, int numClasses,
-                                                 int method, long mask);
+      int method, long mask);
 
   public static void imaqLocalThreshold(Image dest, Image source, int windowWidth,
-                                        int windowHeight, LocalThresholdMethod method, double
-                                            deviationWeight, ObjectType type,
-                                        float replaceValue) {
+      int windowHeight, LocalThresholdMethod method, double deviationWeight, ObjectType type,
+      float replaceValue) {
 
     _imaqLocalThreshold(dest.getAddress(), source.getAddress(), windowWidth, windowHeight,
         method.getValue(), deviationWeight, type.getValue(), replaceValue);
@@ -27497,11 +27098,10 @@ public class NIVision {
   }
 
   private static native void _imaqLocalThreshold(long dest, long source, int windowWidth,
-                                                 int windowHeight, int method, double
-                                                     deviationWeight, int type, float replaceValue);
+      int windowHeight, int method, double deviationWeight, int type, float replaceValue);
 
   public static void imaqMagicWand(Image dest, Image source, Point coord, float tolerance,
-                                   int connectivity8, float replaceValue) {
+      int connectivity8, float replaceValue) {
 
     _imaqMagicWand(dest.getAddress(), source.getAddress(), coord.getAddress(), tolerance,
         connectivity8, replaceValue);
@@ -27509,7 +27109,7 @@ public class NIVision {
   }
 
   private static native void _imaqMagicWand(long dest, long source, long coord, float tolerance,
-                                            int connectivity8, float replaceValue);
+      int connectivity8, float replaceValue);
 
   public static void imaqMultithreshold(Image dest, Image source, ThresholdData[] ranges) {
     int numRanges = ranges.length;
@@ -27524,11 +27124,10 @@ public class NIVision {
 
   }
 
-  private static native void _imaqMultithreshold(long dest, long source, long ranges, int
-      numRanges);
+  private static native void _imaqMultithreshold(long dest, long source, long ranges, int numRanges);
 
   public static void imaqThreshold(Image dest, Image source, float rangeMin, float rangeMax,
-                                   int useNewValue, float newValue) {
+      int useNewValue, float newValue) {
 
     _imaqThreshold(dest.getAddress(), source.getAddress(), rangeMin, rangeMax, useNewValue,
         newValue);
@@ -27536,7 +27135,7 @@ public class NIVision {
   }
 
   private static native void _imaqThreshold(long dest, long source, float rangeMin, float rangeMax,
-                                            int useNewValue, float newValue);
+      int useNewValue, float newValue);
 
   /**
    * Memory Management functions
@@ -27572,10 +27171,8 @@ public class NIVision {
   }
 
   public static DetectCirclesResult imaqDetectCircles(Image image,
-                                                      CircleDescriptor circleDescriptor,
-                                                      CurveOptions curveOptions,
-                                                      ShapeDetectionOptions
-                                                          shapeDetectionOptions, ROI roi) {
+      CircleDescriptor circleDescriptor, CurveOptions curveOptions,
+      ShapeDetectionOptions shapeDetectionOptions, ROI roi) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     long jn_rv =
@@ -27587,8 +27184,7 @@ public class NIVision {
   }
 
   private static native long _imaqDetectCircles(long image, long circleDescriptor,
-                                                long curveOptions, long shapeDetectionOptions,
-                                                long roi, long numMatchesReturned);
+      long curveOptions, long shapeDetectionOptions, long roi, long numMatchesReturned);
 
   public static class DetectEllipsesResult {
     public EllipseMatch[] array;
@@ -27616,10 +27212,8 @@ public class NIVision {
   }
 
   public static DetectEllipsesResult imaqDetectEllipses(Image image,
-                                                        EllipseDescriptor ellipseDescriptor,
-                                                        CurveOptions curveOptions,
-                                                        ShapeDetectionOptions
-                                                            shapeDetectionOptions, ROI roi) {
+      EllipseDescriptor ellipseDescriptor, CurveOptions curveOptions,
+      ShapeDetectionOptions shapeDetectionOptions, ROI roi) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     long jn_rv =
@@ -27631,8 +27225,7 @@ public class NIVision {
   }
 
   private static native long _imaqDetectEllipses(long image, long ellipseDescriptor,
-                                                 long curveOptions, long shapeDetectionOptions,
-                                                 long roi, long numMatchesReturned);
+      long curveOptions, long shapeDetectionOptions, long roi, long numMatchesReturned);
 
   public static class DetectLinesResult {
     public LineMatch[] array;
@@ -27660,9 +27253,7 @@ public class NIVision {
   }
 
   public static DetectLinesResult imaqDetectLines(Image image, LineDescriptor lineDescriptor,
-                                                  CurveOptions curveOptions,
-                                                  ShapeDetectionOptions shapeDetectionOptions,
-                                                  ROI roi) {
+      CurveOptions curveOptions, ShapeDetectionOptions shapeDetectionOptions, ROI roi) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     long jn_rv =
@@ -27674,8 +27265,7 @@ public class NIVision {
   }
 
   private static native long _imaqDetectLines(long image, long lineDescriptor, long curveOptions,
-                                              long shapeDetectionOptions, long roi, long
-                                                  numMatchesReturned);
+      long shapeDetectionOptions, long roi, long numMatchesReturned);
 
   public static class DetectRectanglesResult {
     public RectangleMatch[] array;
@@ -27703,11 +27293,8 @@ public class NIVision {
   }
 
   public static DetectRectanglesResult imaqDetectRectangles(Image image,
-                                                            RectangleDescriptor
-                                                                rectangleDescriptor, CurveOptions
-                                                                curveOptions,
-                                                            ShapeDetectionOptions
-                                                                shapeDetectionOptions, ROI roi) {
+      RectangleDescriptor rectangleDescriptor, CurveOptions curveOptions,
+      ShapeDetectionOptions shapeDetectionOptions, ROI roi) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     long jn_rv =
@@ -27719,8 +27306,7 @@ public class NIVision {
   }
 
   private static native long _imaqDetectRectangles(long image, long rectangleDescriptor,
-                                                   long curveOptions, long shapeDetectionOptions,
-                                                   long roi, long numMatchesReturned);
+      long curveOptions, long shapeDetectionOptions, long roi, long numMatchesReturned);
 
   public static class GetGeometricFeaturesFromCurvesResult {
     public FeatureData[] array;
@@ -27761,9 +27347,8 @@ public class NIVision {
     featureTypes_buf =
         ByteBuffer.allocateDirect(featureTypes.length * 4).order(ByteOrder.nativeOrder());
     for (int i = 0, off = 0; i < featureTypes.length; i++, off += 4) {
-      if (featureTypes != null) {
+      if (featureTypes != null)
         featureTypes_buf.putInt(off, featureTypes[i].getValue());
-      }
     }
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
@@ -27776,9 +27361,7 @@ public class NIVision {
   }
 
   private static native long _imaqGetGeometricFeaturesFromCurves(long curves, int numCurves,
-                                                                 long featureTypes, int
-                                                                     numFeatureTypes, long
-                                                                     numFeatures);
+      long featureTypes, int numFeatureTypes, long numFeatures);
 
   public static class GetGeometricTemplateFeatureInfoResult {
     public FeatureData[] array;
@@ -27826,10 +27409,8 @@ public class NIVision {
   private static native void _imaqLearnColorPattern(long image, long options);
 
   public static void imaqLearnGeometricPattern(Image image, PointFloat originOffset,
-                                               CurveOptions curveOptions,
-                                               LearnGeometricPatternAdvancedOptions
-                                                   advancedLearnOptions,
-                                               Image mask) {
+      CurveOptions curveOptions, LearnGeometricPatternAdvancedOptions advancedLearnOptions,
+      Image mask) {
 
     _imaqLearnGeometricPattern(image.getAddress(), originOffset.getAddress(),
         curveOptions.getAddress(), advancedLearnOptions.getAddress(), mask.getAddress());
@@ -27837,12 +27418,10 @@ public class NIVision {
   }
 
   private static native void _imaqLearnGeometricPattern(long image, long originOffset,
-                                                        long curveOptions, long
-                                                            advancedLearnOptions, long mask);
+      long curveOptions, long advancedLearnOptions, long mask);
 
   public static LearnPatternAdvancedOptions imaqLearnPattern3(Image image,
-                                                              LearningMode learningMode, Image
-                                                                  mask) {
+      LearningMode learningMode, Image mask) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     _imaqLearnPattern3(image.getAddress(), learningMode.getValue(), rv_addr + 0, mask.getAddress());
@@ -27853,7 +27432,7 @@ public class NIVision {
   }
 
   private static native void _imaqLearnPattern3(long image, int learningMode, long advancedOptions,
-                                                long mask);
+      long mask);
 
   public static class MatchColorPatternResult {
     public PatternMatch[] array;
@@ -27881,8 +27460,7 @@ public class NIVision {
   }
 
   public static MatchColorPatternResult imaqMatchColorPattern(Image image, Image pattern,
-                                                              MatchColorPatternOptions options,
-                                                              Rect searchRect) {
+      MatchColorPatternOptions options, Rect searchRect) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     long jn_rv =
@@ -27893,7 +27471,7 @@ public class NIVision {
   }
 
   private static native long _imaqMatchColorPattern(long image, long pattern, long options,
-                                                    long searchRect, long numMatches);
+      long searchRect, long numMatches);
 
   public static class MatchGeometricPattern2Result {
     public GeometricPatternMatch2[] array;
@@ -27921,10 +27499,8 @@ public class NIVision {
   }
 
   public static MatchGeometricPattern2Result imaqMatchGeometricPattern2(Image image, Image pattern,
-                                                                        CurveOptions
-                                                                            curveOptions,
-                                                                        MatchGeometricPatternOptions matchOptions,
-                                                                        MatchGeometricPatternAdvancedOptions2 advancedMatchOptions, ROI roi) {
+      CurveOptions curveOptions, MatchGeometricPatternOptions matchOptions,
+      MatchGeometricPatternAdvancedOptions2 advancedMatchOptions, ROI roi) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     long jn_rv =
@@ -27936,9 +27512,7 @@ public class NIVision {
   }
 
   private static native long _imaqMatchGeometricPattern2(long image, long pattern,
-                                                         long curveOptions, long matchOptions,
-                                                         long advancedMatchOptions, long roi,
-                                                         long numMatches);
+      long curveOptions, long matchOptions, long advancedMatchOptions, long roi, long numMatches);
 
   public static class MatchMultipleGeometricPatternsResult {
     public GeometricPatternMatch2[] array;
@@ -27978,10 +27552,10 @@ public class NIVision {
   }
 
   private static native long _imaqMatchMultipleGeometricPatterns(long image, long multiplePattern,
-                                                                 long roi, long numMatches);
+      long roi, long numMatches);
 
   public static MultipleGeometricPattern imaqReadMultipleGeometricPatternFile(String fileName,
-                                                                              String description) {
+      String description) {
     ByteBuffer fileName_buf = null;
     if (fileName != null) {
       byte[] fileName_bytes;
@@ -28003,9 +27577,8 @@ public class NIVision {
         bytes = new byte[0];
       }
       putBytes(description_buf, bytes, 0, bytes.length);
-      for (int i = bytes.length; i < 256; i++) {
+      for (int i = bytes.length; i < 256; i++)
         description_buf.put(i, (byte) 0); // fill with zero
-      }
     }
     long jn_rv =
         _imaqReadMultipleGeometricPatternFile(fileName == null ? 0
@@ -28049,7 +27622,7 @@ public class NIVision {
   }
 
   public static RefineMatchesResult imaqRefineMatches(Image image, Image pattern,
-                                                      PatternMatch[] candidatesIn) {
+      PatternMatch[] candidatesIn) {
     int numCandidatesIn = candidatesIn.length;
     ByteBuffer candidatesIn_buf = null;
     candidatesIn_buf =
@@ -28069,8 +27642,7 @@ public class NIVision {
   }
 
   private static native long _imaqRefineMatches(long image, long pattern, long candidatesIn,
-                                                int numCandidatesIn, long options, long
-                                                    advancedOptions, long numCandidatesOut);
+      int numCandidatesIn, long options, long advancedOptions, long numCandidatesOut);
 
   public static void imaqSetMultipleGeometricPatternsOptions(
       MultipleGeometricPattern multiplePattern, String label, CurveOptions curveOptions,
@@ -28088,16 +27660,13 @@ public class NIVision {
       putBytes(label_buf, label_bytes, 0, label_bytes.length).put(label_bytes.length, (byte) 0);
     }
     _imaqSetMultipleGeometricPatternsOptions(multiplePattern.getAddress(), label == null ? 0
-            : getByteBufferAddress(label_buf), curveOptions.getAddress(), matchOptions.getAddress(),
+        : getByteBufferAddress(label_buf), curveOptions.getAddress(), matchOptions.getAddress(),
         advancedMatchOptions.getAddress());
 
   }
 
   private static native void _imaqSetMultipleGeometricPatternsOptions(long multiplePattern,
-                                                                      long label, long
-                                                                          curveOptions, long
-                                                                          matchOptions, long
-                                                                          advancedMatchOptions);
+      long label, long curveOptions, long matchOptions, long advancedMatchOptions);
 
   public static void imaqWriteMultipleGeometricPatternFile(
       MultipleGeometricPattern multiplePattern, String fileName, String description) {
@@ -28132,8 +27701,7 @@ public class NIVision {
   }
 
   private static native void _imaqWriteMultipleGeometricPatternFile(long multiplePattern,
-                                                                    long fileName, long
-                                                                        description);
+      long fileName, long description);
 
   public static class MatchGeometricPattern3Result {
     public GeometricPatternMatch3[] array;
@@ -28161,10 +27729,8 @@ public class NIVision {
   }
 
   public static MatchGeometricPattern3Result imaqMatchGeometricPattern3(Image image, Image pattern,
-                                                                        CurveOptions
-                                                                            curveOptions,
-                                                                        MatchGeometricPatternOptions matchOptions,
-                                                                        MatchGeometricPatternAdvancedOptions3 advancedMatchOptions, ROI roi) {
+      CurveOptions curveOptions, MatchGeometricPatternOptions matchOptions,
+      MatchGeometricPatternAdvancedOptions3 advancedMatchOptions, ROI roi) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     long jn_rv =
@@ -28176,14 +27742,11 @@ public class NIVision {
   }
 
   private static native long _imaqMatchGeometricPattern3(long image, long pattern,
-                                                         long curveOptions, long matchOptions,
-                                                         long advancedMatchOptions, long roi,
-                                                         long numMatches);
+      long curveOptions, long matchOptions, long advancedMatchOptions, long roi, long numMatches);
 
   public static void imaqLearnGeometricPattern2(Image image, PointFloat originOffset,
-                                                double angleOffset, CurveOptions curveOptions,
-                                                LearnGeometricPatternAdvancedOptions2
-                                                    advancedLearnOptions, Image mask) {
+      double angleOffset, CurveOptions curveOptions,
+      LearnGeometricPatternAdvancedOptions2 advancedLearnOptions, Image mask) {
 
     _imaqLearnGeometricPattern2(image.getAddress(), originOffset.getAddress(), angleOffset,
         curveOptions.getAddress(), advancedLearnOptions.getAddress(), mask.getAddress());
@@ -28191,8 +27754,7 @@ public class NIVision {
   }
 
   private static native void _imaqLearnGeometricPattern2(long image, long originOffset,
-                                                         double angleOffset, long curveOptions,
-                                                         long advancedLearnOptions, long mask);
+      double angleOffset, long curveOptions, long advancedLearnOptions, long mask);
 
   public static class MatchPattern3Result {
     public PatternMatch[] array;
@@ -28220,9 +27782,7 @@ public class NIVision {
   }
 
   public static MatchPattern3Result imaqMatchPattern3(Image image, Image pattern,
-                                                      MatchPatternOptions options,
-                                                      MatchPatternAdvancedOptions
-                                                          advancedOptions, ROI roi) {
+      MatchPatternOptions options, MatchPatternAdvancedOptions advancedOptions, ROI roi) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     long jn_rv =
@@ -28234,7 +27794,7 @@ public class NIVision {
   }
 
   private static native long _imaqMatchPattern3(long image, long pattern, long options,
-                                                long advancedOptions, long roi, long numMatches);
+      long advancedOptions, long roi, long numMatches);
 
   /**
    * Overlay functions
@@ -28300,7 +27860,7 @@ public class NIVision {
   }
 
   private static native void _imaqGetOverlayProperties(long image, long group,
-                                                       long transformBehaviors);
+      long transformBehaviors);
 
   public static void imaqMergeOverlay(Image dest, Image source, RGBValue[] palette, String group) {
     int numColors = palette.length;
@@ -28327,10 +27887,10 @@ public class NIVision {
   }
 
   private static native void _imaqMergeOverlay(long dest, long source, long palette, int numColors,
-                                               long group);
+      long group);
 
   public static void imaqOverlayArc(Image image, ArcInfo arc, RGBValue color, DrawMode drawMode,
-                                    String group) {
+      String group) {
     ByteBuffer group_buf = null;
     if (group != null) {
       byte[] group_bytes;
@@ -28348,10 +27908,10 @@ public class NIVision {
   }
 
   private static native void _imaqOverlayArc(long image, long arc, long color, int drawMode,
-                                             long group);
+      long group);
 
   public static void imaqOverlayBitmap(Image image, Point destLoc, RGBValue bitmap, int numCols,
-                                       int numRows, String group) {
+      int numRows, String group) {
     ByteBuffer group_buf = null;
     if (group != null) {
       byte[] group_bytes;
@@ -28369,10 +27929,10 @@ public class NIVision {
   }
 
   private static native void _imaqOverlayBitmap(long image, long destLoc, long bitmap, int numCols,
-                                                int numRows, long group);
+      int numRows, long group);
 
   public static void imaqOverlayClosedContour(Image image, Point[] points, RGBValue color,
-                                              DrawMode drawMode, String group) {
+      DrawMode drawMode, String group) {
     int numPoints = points.length;
     ByteBuffer points_buf = null;
     points_buf = ByteBuffer.allocateDirect(points.length * 8).order(ByteOrder.nativeOrder());
@@ -28398,10 +27958,10 @@ public class NIVision {
   }
 
   private static native void _imaqOverlayClosedContour(long image, long points, int numPoints,
-                                                       long color, int drawMode, long group);
+      long color, int drawMode, long group);
 
   public static void imaqOverlayLine(Image image, Point start, Point end, RGBValue color,
-                                     String group) {
+      String group) {
     ByteBuffer group_buf = null;
     if (group != null) {
       byte[] group_bytes;
@@ -28419,10 +27979,10 @@ public class NIVision {
   }
 
   private static native void _imaqOverlayLine(long image, long start, long end, long color,
-                                              long group);
+      long group);
 
   public static void imaqOverlayOpenContour(Image image, Point[] points, RGBValue color,
-                                            String group) {
+      String group) {
     int numPoints = points.length;
     ByteBuffer points_buf = null;
     points_buf = ByteBuffer.allocateDirect(points.length * 8).order(ByteOrder.nativeOrder());
@@ -28447,10 +28007,10 @@ public class NIVision {
   }
 
   private static native void _imaqOverlayOpenContour(long image, long points, int numPoints,
-                                                     long color, long group);
+      long color, long group);
 
   public static byte imaqOverlayOval(Image image, Rect boundingBox, RGBValue color,
-                                     DrawMode drawMode) {
+      DrawMode drawMode) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     _imaqOverlayOval(image.getAddress(), boundingBox.getAddress(), color.getAddress(),
@@ -28461,11 +28021,10 @@ public class NIVision {
   }
 
   private static native void _imaqOverlayOval(long image, long boundingBox, long color,
-                                              int drawMode, long group);
+      int drawMode, long group);
 
   public static void imaqOverlayPoints(Image image, Point[] points, RGBValue[] colors,
-                                       PointSymbol symbol, UserPointSymbol userSymbol, String
-                                           group) {
+      PointSymbol symbol, UserPointSymbol userSymbol, String group) {
     int numPoints = points.length;
     ByteBuffer points_buf = null;
     points_buf = ByteBuffer.allocateDirect(points.length * 8).order(ByteOrder.nativeOrder());
@@ -28498,11 +28057,10 @@ public class NIVision {
   }
 
   private static native void _imaqOverlayPoints(long image, long points, int numPoints,
-                                                long colors, int numColors, int symbol, long
-                                                    userSymbol, long group);
+      long colors, int numColors, int symbol, long userSymbol, long group);
 
   public static void imaqOverlayRect(Image image, Rect rect, RGBValue color, DrawMode drawMode,
-                                     String group) {
+      String group) {
     ByteBuffer group_buf = null;
     if (group != null) {
       byte[] group_bytes;
@@ -28520,10 +28078,10 @@ public class NIVision {
   }
 
   private static native void _imaqOverlayRect(long image, long rect, long color, int drawMode,
-                                              long group);
+      long group);
 
   public static void imaqOverlayROI(Image image, ROI roi, PointSymbol symbol,
-                                    UserPointSymbol userSymbol, String group) {
+      UserPointSymbol userSymbol, String group) {
     ByteBuffer group_buf = null;
     if (group != null) {
       byte[] group_bytes;
@@ -28541,10 +28099,10 @@ public class NIVision {
   }
 
   private static native void _imaqOverlayROI(long image, long roi, int symbol, long userSymbol,
-                                             long group);
+      long group);
 
   public static void imaqOverlayText(Image image, Point origin, String text, RGBValue color,
-                                     OverlayTextOptions options, String group) {
+      OverlayTextOptions options, String group) {
     ByteBuffer text_buf = null;
     if (text != null) {
       byte[] text_bytes;
@@ -28568,13 +28126,13 @@ public class NIVision {
       putBytes(group_buf, group_bytes, 0, group_bytes.length).put(group_bytes.length, (byte) 0);
     }
     _imaqOverlayText(image.getAddress(), origin.getAddress(), text == null ? 0
-            : getByteBufferAddress(text_buf), color.getAddress(), options.getAddress(),
+        : getByteBufferAddress(text_buf), color.getAddress(), options.getAddress(),
         group == null ? 0 : getByteBufferAddress(group_buf));
 
   }
 
   private static native void _imaqOverlayText(long image, long origin, long text, long color,
-                                              long options, long group);
+      long options, long group);
 
   public static TransformBehaviors imaqSetOverlayProperties(Image image, String group) {
     ByteBuffer group_buf = null;
@@ -28599,7 +28157,7 @@ public class NIVision {
   }
 
   private static native void _imaqSetOverlayProperties(long image, long group,
-                                                       long transformBehaviors);
+      long transformBehaviors);
 
   /**
    * OCR functions
@@ -28655,7 +28213,7 @@ public class NIVision {
   }
 
   public static ReadOCRFileResult imaqReadOCRFile(String fileName, CharSet set,
-                                                  String setDescription) {
+      String setDescription) {
     ByteBuffer fileName_buf = null;
     if (fileName != null) {
       byte[] fileName_bytes;
@@ -28677,9 +28235,8 @@ public class NIVision {
         bytes = new byte[0];
       }
       putBytes(setDescription_buf, bytes, 0, bytes.length);
-      for (int i = bytes.length; i < 256; i++) {
+      for (int i = bytes.length; i < 256; i++)
         setDescription_buf.put(i, (byte) 0); // fill with zero
-      }
     }
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8 + 8 + 8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
@@ -28691,13 +28248,11 @@ public class NIVision {
   }
 
   private static native void _imaqReadOCRFile(long fileName, long set, long setDescription,
-                                              long readOptions, long processingOptions, long
-                                                  spacingOptions);
+      long readOptions, long processingOptions, long spacingOptions);
 
   public static ReadTextReport3 imaqReadText3(Image image, CharSet set, ROI roi,
-                                              ReadTextOptions readOptions, OCRProcessingOptions
-                                                  processingOptions,
-                                              OCRSpacingOptions spacingOptions) {
+      ReadTextOptions readOptions, OCRProcessingOptions processingOptions,
+      OCRSpacingOptions spacingOptions) {
 
     long jn_rv =
         _imaqReadText3(image.getAddress(), set.getAddress(), roi.getAddress(),
@@ -28707,7 +28262,7 @@ public class NIVision {
   }
 
   private static native long _imaqReadText3(long image, long set, long roi, long readOptions,
-                                            long processingOptions, long spacingOptions);
+      long processingOptions, long spacingOptions);
 
   public static void imaqRenameChar(CharSet set, int index, String newCharValue) {
     ByteBuffer newCharValue_buf = null;
@@ -28738,8 +28293,7 @@ public class NIVision {
   private static native void _imaqSetReferenceChar(long set, int index, int isReferenceChar);
 
   public static void imaqTrainChars(Image image, CharSet set, int index, String charValue, ROI roi,
-                                    OCRProcessingOptions processingOptions, OCRSpacingOptions
-                                        spacingOptions) {
+      OCRProcessingOptions processingOptions, OCRSpacingOptions spacingOptions) {
     ByteBuffer charValue_buf = null;
     if (charValue != null) {
       byte[] charValue_bytes;
@@ -28753,13 +28307,13 @@ public class NIVision {
           charValue_bytes.length, (byte) 0);
     }
     _imaqTrainChars(image.getAddress(), set.getAddress(), index, charValue == null ? 0
-            : getByteBufferAddress(charValue_buf), roi.getAddress(), processingOptions.getAddress(),
+        : getByteBufferAddress(charValue_buf), roi.getAddress(), processingOptions.getAddress(),
         spacingOptions.getAddress());
 
   }
 
   private static native void _imaqTrainChars(long image, long set, int index, long charValue,
-                                             long roi, long processingOptions, long spacingOptions);
+      long roi, long processingOptions, long spacingOptions);
 
   public static class VerifyTextResult {
     public int[] array;
@@ -28783,7 +28337,7 @@ public class NIVision {
   }
 
   public static VerifyTextResult imaqVerifyText(Image image, CharSet set, String expectedString,
-                                                ROI roi) {
+      ROI roi) {
     ByteBuffer expectedString_buf = null;
     if (expectedString != null) {
       byte[] expectedString_bytes;
@@ -28806,12 +28360,11 @@ public class NIVision {
   }
 
   private static native long _imaqVerifyText(long image, long set, long expectedString, long roi,
-                                             long numScores);
+      long numScores);
 
   public static void imaqWriteOCRFile(String fileName, CharSet set, String setDescription,
-                                      ReadTextOptions readOptions, OCRProcessingOptions
-                                          processingOptions,
-                                      OCRSpacingOptions spacingOptions) {
+      ReadTextOptions readOptions, OCRProcessingOptions processingOptions,
+      OCRSpacingOptions spacingOptions) {
     ByteBuffer fileName_buf = null;
     if (fileName != null) {
       byte[] fileName_bytes;
@@ -28843,8 +28396,7 @@ public class NIVision {
   }
 
   private static native void _imaqWriteOCRFile(long fileName, long set, long setDescription,
-                                               long readOptions, long processingOptions, long
-                                                   spacingOptions);
+      long readOptions, long processingOptions, long spacingOptions);
 
   /**
    * Geometric Matching functions
@@ -28861,12 +28413,8 @@ public class NIVision {
   }
 
   public static ExtractContourResult imaqExtractContour(Image image, ROI roi,
-                                                        ExtractContourDirection direction,
-                                                        ConnectionConstraint
-                                                            connectionConstraintParams,
-                                                        int numOfConstraints,
-                                                        ExtractContourSelection selection, Image
-                                                            contourImage) {
+      ExtractContourDirection direction, ConnectionConstraint connectionConstraintParams,
+      int numOfConstraints, ExtractContourSelection selection, Image contourImage) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     long jn_rv =
@@ -28879,14 +28427,11 @@ public class NIVision {
   }
 
   private static native long _imaqExtractContour(long image, long roi, int direction,
-                                                 long curveParams, long
-                                                     connectionConstraintParams, int
-                                                     numOfConstraints, int selection,
-                                                 long contourImage);
+      long curveParams, long connectionConstraintParams, int numOfConstraints, int selection,
+      long contourImage);
 
   public static void imaqContourOverlay(Image image, Image contourImage,
-                                        ContourOverlaySettings pointsSettings,
-                                        ContourOverlaySettings eqnSettings, String groupName) {
+      ContourOverlaySettings pointsSettings, ContourOverlaySettings eqnSettings, String groupName) {
     ByteBuffer groupName_buf = null;
     if (groupName != null) {
       byte[] groupName_bytes;
@@ -28905,11 +28450,10 @@ public class NIVision {
   }
 
   private static native void _imaqContourOverlay(long image, long contourImage,
-                                                 long pointsSettings, long eqnSettings, long
-                                                     groupName);
+      long pointsSettings, long eqnSettings, long groupName);
 
   public static ContourComputeCurvatureReport imaqContourComputeCurvature(Image contourImage,
-                                                                          int kernel) {
+      int kernel) {
 
     long jn_rv = _imaqContourComputeCurvature(contourImage.getAddress(), kernel);
 
@@ -28919,8 +28463,7 @@ public class NIVision {
   private static native long _imaqContourComputeCurvature(long contourImage, int kernel);
 
   public static CurvatureAnalysisReport imaqContourClassifyCurvature(Image contourImage,
-                                                                     int kernel, RangeLabel[]
-                                                                         curvatureClasses) {
+      int kernel, RangeLabel[] curvatureClasses) {
     int numCurvatureClasses = curvatureClasses.length;
     ByteBuffer curvatureClasses_buf = null;
     curvatureClasses_buf =
@@ -28937,14 +28480,10 @@ public class NIVision {
   }
 
   private static native long _imaqContourClassifyCurvature(long contourImage, int kernel,
-                                                           long curvatureClasses, int
-                                                               numCurvatureClasses);
+      long curvatureClasses, int numCurvatureClasses);
 
   public static ComputeDistancesReport imaqContourComputeDistances(Image targetImage,
-                                                                   Image templateImage,
-                                                                   SetupMatchPatternData
-                                                                       matchSetupData, int
-                                                                       smoothingKernel) {
+      Image templateImage, SetupMatchPatternData matchSetupData, int smoothingKernel) {
 
     long jn_rv =
         _imaqContourComputeDistances(targetImage.getAddress(), templateImage.getAddress(),
@@ -28954,14 +28493,11 @@ public class NIVision {
   }
 
   private static native long _imaqContourComputeDistances(long targetImage, long templateImage,
-                                                          long matchSetupData, int smoothingKernel);
+      long matchSetupData, int smoothingKernel);
 
   public static ClassifyDistancesReport imaqContourClassifyDistances(Image targetImage,
-                                                                     Image templateImage,
-                                                                     SetupMatchPatternData
-                                                                         matchSetupData, int
-                                                                         smoothingKernel,
-                                                                     RangeLabel[] distanceRanges) {
+      Image templateImage, SetupMatchPatternData matchSetupData, int smoothingKernel,
+      RangeLabel[] distanceRanges) {
     int numDistanceRanges = distanceRanges.length;
     ByteBuffer distanceRanges_buf = null;
     distanceRanges_buf =
@@ -28979,10 +28515,7 @@ public class NIVision {
   }
 
   private static native long _imaqContourClassifyDistances(long targetImage, long templateImage,
-                                                           long matchSetupData, int
-                                                               smoothingKernel, long
-                                                               distanceRanges, int
-                                                               numDistanceRanges);
+      long matchSetupData, int smoothingKernel, long distanceRanges, int numDistanceRanges);
 
   public static ContourInfoReport imaqContourInfo(Image contourImage) {
 
@@ -29027,11 +28560,8 @@ public class NIVision {
   }
 
   private static native long _imaqContourSetupMatchPattern(long matchMode,
-                                                           int enableSubPixelAccuracy, long
-                                                               curveParams, int
-                                                               useLearnCurveParameters,
-                                                           long rangeSettings, int
-                                                               numRangeSettings);
+      int enableSubPixelAccuracy, long curveParams, int useLearnCurveParameters,
+      long rangeSettings, int numRangeSettings);
 
   public static SetupMatchPatternData imaqContourAdvancedSetupMatchPattern(
       GeometricAdvancedSetupDataOption[] geometricOptions) {
@@ -29054,8 +28584,7 @@ public class NIVision {
   }
 
   private static native void _imaqContourAdvancedSetupMatchPattern(long matchSetupData,
-                                                                   long geometricOptions, int
-                                                                       numGeometricOptions);
+      long geometricOptions, int numGeometricOptions);
 
   public static ContourFitLineReport imaqContourFitLine(Image image, double pixelRadius) {
 
@@ -29067,7 +28596,7 @@ public class NIVision {
   private static native long _imaqContourFitLine(long image, double pixelRadius);
 
   public static PartialCircle imaqContourFitCircle(Image image, double pixelRadius,
-                                                   int rejectOutliers) {
+      int rejectOutliers) {
 
     long jn_rv = _imaqContourFitCircle(image.getAddress(), pixelRadius, rejectOutliers);
 
@@ -29075,10 +28604,10 @@ public class NIVision {
   }
 
   private static native long _imaqContourFitCircle(long image, double pixelRadius,
-                                                   int rejectOutliers);
+      int rejectOutliers);
 
   public static PartialEllipse imaqContourFitEllipse(Image image, double pixelRadius,
-                                                     int rejectOutliers) {
+      int rejectOutliers) {
 
     long jn_rv = _imaqContourFitEllipse(image.getAddress(), pixelRadius, rejectOutliers);
 
@@ -29086,18 +28615,17 @@ public class NIVision {
   }
 
   private static native long _imaqContourFitEllipse(long image, double pixelRadius,
-                                                    int rejectOutliers);
+      int rejectOutliers);
 
   public static ContourFitSplineReport imaqContourFitSpline(Image image, int degree,
-                                                            int numberOfControlPoints) {
+      int numberOfControlPoints) {
 
     long jn_rv = _imaqContourFitSpline(image.getAddress(), degree, numberOfControlPoints);
 
     return new ContourFitSplineReport(jn_rv, true);
   }
 
-  private static native long _imaqContourFitSpline(long image, int degree, int
-      numberOfControlPoints);
+  private static native long _imaqContourFitSpline(long image, int degree, int numberOfControlPoints);
 
   public static ContourFitPolynomialReport imaqContourFitPolynomial(Image image, int order) {
 
@@ -29113,10 +28641,8 @@ public class NIVision {
    */
 
   public static FindCircularEdgeReport imaqFindCircularEdge2(Image image, ROI roi,
-                                                             CoordinateSystem baseSystem,
-                                                             CoordinateSystem newSystem,
-                                                             FindCircularEdgeOptions edgeOptions,
-                                                             CircleFitOptions circleFitOptions) {
+      CoordinateSystem baseSystem, CoordinateSystem newSystem, FindCircularEdgeOptions edgeOptions,
+      CircleFitOptions circleFitOptions) {
 
     long jn_rv =
         _imaqFindCircularEdge2(image.getAddress(), roi.getAddress(), baseSystem.getAddress(),
@@ -29126,37 +28652,29 @@ public class NIVision {
   }
 
   private static native long _imaqFindCircularEdge2(long image, long roi, long baseSystem,
-                                                    long newSystem, long edgeOptions, long
-                                                        circleFitOptions);
+      long newSystem, long edgeOptions, long circleFitOptions);
 
   public static FindConcentricEdgeReport imaqFindConcentricEdge2(Image image, ROI roi,
-                                                                 CoordinateSystem baseSystem,
-                                                                 CoordinateSystem newSystem,
-                                                                 FindConcentricEdgeOptions
-                                                                     edgeOptions,
-                                                                 ConcentricEdgeFitOptions
-                                                                     concentricEdgeFitOptions) {
+      CoordinateSystem baseSystem, CoordinateSystem newSystem,
+      FindConcentricEdgeOptions edgeOptions, ConcentricEdgeFitOptions concentricEdgeFitOptions) {
 
     long jn_rv =
         _imaqFindConcentricEdge2(image.getAddress(), roi.getAddress(), baseSystem.getAddress(),
-            newSystem.getAddress(), edgeOptions.getAddress(), concentricEdgeFitOptions.getAddress
-                ());
+            newSystem.getAddress(), edgeOptions.getAddress(), concentricEdgeFitOptions.getAddress());
 
     return new FindConcentricEdgeReport(jn_rv, true);
   }
 
   private static native long _imaqFindConcentricEdge2(long image, long roi, long baseSystem,
-                                                      long newSystem, long edgeOptions, long
-                                                          concentricEdgeFitOptions);
+      long newSystem, long edgeOptions, long concentricEdgeFitOptions);
 
   /**
    * Morphology Reconstruction functions
    */
 
   public static void imaqGrayMorphologyReconstruct(Image dstImage, Image srcImage,
-                                                   Image markerImage, PointFloat[] points,
-                                                   MorphologyReconstructOperation operation,
-                                                   StructuringElement structuringElement, ROI roi) {
+      Image markerImage, PointFloat[] points, MorphologyReconstructOperation operation,
+      StructuringElement structuringElement, ROI roi) {
     int numOfPoints = points.length;
     ByteBuffer points_buf = null;
     points_buf = ByteBuffer.allocateDirect(points.length * 8).order(ByteOrder.nativeOrder());
@@ -29171,16 +28689,12 @@ public class NIVision {
   }
 
   private static native void _imaqGrayMorphologyReconstruct(long dstImage, long srcImage,
-                                                            long markerImage, long points, int
-                                                                numOfPoints, int operation, long
-                                                                structuringElement,
-                                                            long roi);
+      long markerImage, long points, int numOfPoints, int operation, long structuringElement,
+      long roi);
 
   public static void imaqMorphologyReconstruct(Image dstImage, Image srcImage, Image markerImage,
-                                               PointFloat[] points,
-                                               MorphologyReconstructOperation operation,
-                                               Connectivity connectivity,
-                                               ROI roi) {
+      PointFloat[] points, MorphologyReconstructOperation operation, Connectivity connectivity,
+      ROI roi) {
     int numOfPoints = points.length;
     ByteBuffer points_buf = null;
     points_buf = ByteBuffer.allocateDirect(points.length * 8).order(ByteOrder.nativeOrder());
@@ -29195,18 +28709,15 @@ public class NIVision {
   }
 
   private static native void _imaqMorphologyReconstruct(long dstImage, long srcImage,
-                                                        long markerImage, long points, int
-                                                            numOfPoints, int operation, int
-                                                            connectivity, long roi);
+      long markerImage, long points, int numOfPoints, int operation, int connectivity, long roi);
 
   /**
    * Texture functions
    */
 
   public static void imaqDetectTextureDefect(ClassifierSession session, Image destImage,
-                                             Image srcImage, ROI roi, int initialStepSize, int
-                                                 finalStepSize, short defectPixelValue,
-                                             double minClassificationScore) {
+      Image srcImage, ROI roi, int initialStepSize, int finalStepSize, short defectPixelValue,
+      double minClassificationScore) {
 
     _imaqDetectTextureDefect(session.getAddress(), destImage.getAddress(), srcImage.getAddress(),
         roi.getAddress(), initialStepSize, finalStepSize, defectPixelValue, minClassificationScore);
@@ -29214,9 +28725,8 @@ public class NIVision {
   }
 
   private static native void _imaqDetectTextureDefect(long session, long destImage, long srcImage,
-                                                      long roi, int initialStepSize, int
-                                                          finalStepSize, short defectPixelValue,
-                                                      double minClassificationScore);
+      long roi, int initialStepSize, int finalStepSize, short defectPixelValue,
+      double minClassificationScore);
 
   /**
    * Regions of Interest Manipulation functions
@@ -29262,10 +28772,10 @@ public class NIVision {
   }
 
   private static native void _imaqROIToMask(long mask, long roi, int fillValue, long imageModel,
-                                            long inSpace);
+      long inSpace);
 
   public static void imaqTransformROI2(ROI roi, CoordinateSystem baseSystem,
-                                       CoordinateSystem newSystem) {
+      CoordinateSystem newSystem) {
 
     _imaqTransformROI2(roi.getAddress(), baseSystem.getAddress(), newSystem.getAddress());
 
@@ -29274,7 +28784,7 @@ public class NIVision {
   private static native void _imaqTransformROI2(long roi, long baseSystem, long newSystem);
 
   public static LabelToROIReport imaqLabelToROI(Image image, int[] labelsIn, int maxNumVectors,
-                                                int isExternelEdges) {
+      int isExternelEdges) {
     int numLabelsIn = labelsIn.length;
     ByteBuffer labelsIn_buf = null;
     labelsIn_buf = ByteBuffer.allocateDirect(labelsIn.length * 4).order(ByteOrder.nativeOrder());
@@ -29287,14 +28797,14 @@ public class NIVision {
   }
 
   private static native long _imaqLabelToROI(long image, long labelsIn, int numLabelsIn,
-                                             int maxNumVectors, int isExternelEdges);
+      int maxNumVectors, int isExternelEdges);
 
   /**
    * Morphology functions
    */
 
   public static void imaqGrayMorphology(Image dest, Image source, MorphologyMethod method,
-                                        StructuringElement structuringElement) {
+      StructuringElement structuringElement) {
 
     _imaqGrayMorphology(dest.getAddress(), source.getAddress(), method.getValue(),
         structuringElement == null ? 0 : structuringElement.getAddress());
@@ -29302,14 +28812,14 @@ public class NIVision {
   }
 
   private static native void _imaqGrayMorphology(long dest, long source, int method,
-                                                 long structuringElement);
+      long structuringElement);
 
   /**
    * Classification functions
    */
 
   public static void imaqAddClassifierSample(Image image, ClassifierSession session, ROI roi,
-                                             String sampleClass, double[] featureVector) {
+      String sampleClass, double[] featureVector) {
     ByteBuffer sampleClass_buf = null;
     if (sampleClass != null) {
       byte[] sampleClass_bytes;
@@ -29334,12 +28844,10 @@ public class NIVision {
   }
 
   private static native void _imaqAddClassifierSample(long image, long session, long roi,
-                                                      long sampleClass, long featureVector, int
-                                                          vectorSize);
+      long sampleClass, long featureVector, int vectorSize);
 
   public static ClassifierReportAdvanced imaqAdvanceClassify(Image image,
-                                                             ClassifierSession session, ROI roi,
-                                                             double[] featureVector) {
+      ClassifierSession session, ROI roi, double[] featureVector) {
     int vectorSize = featureVector.length;
     ByteBuffer featureVector_buf = null;
     featureVector_buf =
@@ -29353,10 +28861,10 @@ public class NIVision {
   }
 
   private static native long _imaqAdvanceClassify(long image, long session, long roi,
-                                                  long featureVector, int vectorSize);
+      long featureVector, int vectorSize);
 
   public static ClassifierReport imaqClassify(Image image, ClassifierSession session, ROI roi,
-                                              double[] featureVector) {
+      double[] featureVector) {
     int vectorSize = featureVector.length;
     ByteBuffer featureVector_buf = null;
     featureVector_buf =
@@ -29370,7 +28878,7 @@ public class NIVision {
   }
 
   private static native long _imaqClassify(long image, long session, long roi, long featureVector,
-                                           int vectorSize);
+      int vectorSize);
 
   public static ClassifierSession imaqCreateClassifier(ClassifierType type) {
 
@@ -29465,8 +28973,7 @@ public class NIVision {
   }
 
   private static native void _imaqGetParticleClassifierOptions2(long session,
-                                                                long preprocessingOptions, long
-                                                                    options);
+      long preprocessingOptions, long options);
 
   public static class ReadClassifierFileResult {
     public ClassifierType type;
@@ -29480,9 +28987,7 @@ public class NIVision {
   }
 
   public static ReadClassifierFileResult imaqReadClassifierFile(ClassifierSession session,
-                                                                String fileName,
-                                                                ReadClassifierFileMode mode,
-                                                                String description) {
+      String fileName, ReadClassifierFileMode mode, String description) {
     ByteBuffer fileName_buf = null;
     if (fileName != null) {
       byte[] fileName_bytes;
@@ -29504,15 +29009,14 @@ public class NIVision {
         bytes = new byte[0];
       }
       putBytes(description_buf, bytes, 0, bytes.length);
-      for (int i = bytes.length; i < 256; i++) {
+      for (int i = bytes.length; i < 256; i++)
         description_buf.put(i, (byte) 0); // fill with zero
-      }
     }
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8 + 8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     long jn_rv =
         _imaqReadClassifierFile(session.getAddress(), fileName == null ? 0
-                : getByteBufferAddress(fileName_buf), mode.getValue(), rv_addr + 0, rv_addr + 8,
+            : getByteBufferAddress(fileName_buf), mode.getValue(), rv_addr + 0, rv_addr + 8,
             description == null ? 0 : getByteBufferAddress(description_buf));
     ReadClassifierFileResult rv = new ReadClassifierFileResult(rv_buf);
     rv.val = new ClassifierSession(jn_rv, true);
@@ -29520,10 +29024,10 @@ public class NIVision {
   }
 
   private static native long _imaqReadClassifierFile(long session, long fileName, int mode,
-                                                     long type, long engine, long description);
+      long type, long engine, long description);
 
   public static void imaqRelabelClassifierSample(ClassifierSession session, int index,
-                                                 String newClass) {
+      String newClass) {
     ByteBuffer newClass_buf = null;
     if (newClass != null) {
       byte[] newClass_bytes;
@@ -29544,9 +29048,8 @@ public class NIVision {
   private static native void _imaqRelabelClassifierSample(long session, int index, long newClass);
 
   public static void imaqSetParticleClassifierOptions2(ClassifierSession session,
-                                                       ParticleClassifierPreprocessingOptions2
-                                                           preprocessingOptions,
-                                                       ParticleClassifierOptions options) {
+      ParticleClassifierPreprocessingOptions2 preprocessingOptions,
+      ParticleClassifierOptions options) {
 
     _imaqSetParticleClassifierOptions2(session.getAddress(), preprocessingOptions.getAddress(),
         options.getAddress());
@@ -29554,11 +29057,9 @@ public class NIVision {
   }
 
   private static native void _imaqSetParticleClassifierOptions2(long session,
-                                                                long preprocessingOptions, long
-                                                                    options);
+      long preprocessingOptions, long options);
 
-  public static void imaqSetColorClassifierOptions(ClassifierSession session, ColorOptions
-      options) {
+  public static void imaqSetColorClassifierOptions(ClassifierSession session, ColorOptions options) {
 
     _imaqSetColorClassifierOptions(session.getAddress(), options.getAddress());
 
@@ -29577,7 +29078,7 @@ public class NIVision {
   private static native long _imaqTrainNearestNeighborClassifier(long session, long options);
 
   public static void imaqWriteClassifierFile(ClassifierSession session, String fileName,
-                                             WriteClassifierFileMode mode, String description) {
+      WriteClassifierFileMode mode, String description) {
     ByteBuffer fileName_buf = null;
     if (fileName != null) {
       byte[] fileName_bytes;
@@ -29599,9 +29100,8 @@ public class NIVision {
         bytes = new byte[0];
       }
       putBytes(description_buf, bytes, 0, bytes.length);
-      for (int i = bytes.length; i < 256; i++) {
+      for (int i = bytes.length; i < 256; i++)
         description_buf.put(i, (byte) 0); // fill with zero
-      }
     }
     _imaqWriteClassifierFile(session.getAddress(), fileName == null ? 0
         : getByteBufferAddress(fileName_buf), mode.getValue(), description == null ? 0
@@ -29610,16 +29110,15 @@ public class NIVision {
   }
 
   private static native void _imaqWriteClassifierFile(long session, long fileName, int mode,
-                                                      long description);
+      long description);
 
   /**
    * Measure Distances functions
    */
 
   public static ClampMax2Report imaqClampMax2(Image image, ROI roi, CoordinateSystem baseSystem,
-                                              CoordinateSystem newSystem, CurveOptions
-                                                  curveSettings, ClampSettings clampSettings,
-                                              ClampOverlaySettings clampOverlaySettings) {
+      CoordinateSystem newSystem, CurveOptions curveSettings, ClampSettings clampSettings,
+      ClampOverlaySettings clampOverlaySettings) {
 
     long jn_rv =
         _imaqClampMax2(image.getAddress(), roi.getAddress(), baseSystem.getAddress(),
@@ -29630,17 +29129,15 @@ public class NIVision {
   }
 
   private static native long _imaqClampMax2(long image, long roi, long baseSystem, long newSystem,
-                                            long curveSettings, long clampSettings, long
-                                                clampOverlaySettings);
+      long curveSettings, long clampSettings, long clampOverlaySettings);
 
   /**
    * Inspection functions
    */
 
   public static void imaqCompareGoldenTemplate(Image image, Image goldenTemplate,
-                                               Image brightDefects, Image darkDefects,
-                                               InspectionAlignment alignment,
-                                               InspectionOptions options) {
+      Image brightDefects, Image darkDefects, InspectionAlignment alignment,
+      InspectionOptions options) {
 
     _imaqCompareGoldenTemplate(image.getAddress(), goldenTemplate.getAddress(),
         brightDefects.getAddress(), darkDefects.getAddress(), alignment.getAddress(),
@@ -29649,11 +29146,10 @@ public class NIVision {
   }
 
   private static native void _imaqCompareGoldenTemplate(long image, long goldenTemplate,
-                                                        long brightDefects, long darkDefects,
-                                                        long alignment, long options);
+      long brightDefects, long darkDefects, long alignment, long options);
 
   public static void imaqLearnGoldenTemplate(Image goldenTemplate, PointFloat originOffset,
-                                             Image mask) {
+      Image mask) {
 
     _imaqLearnGoldenTemplate(goldenTemplate.getAddress(), originOffset.getAddress(),
         mask.getAddress());
@@ -29661,7 +29157,7 @@ public class NIVision {
   }
 
   private static native void _imaqLearnGoldenTemplate(long goldenTemplate, long originOffset,
-                                                      long mask);
+      long mask);
 
   /**
    * Obsolete functions
@@ -29689,11 +29185,10 @@ public class NIVision {
   }
 
   private static native void _imaqGetParticleClassifierOptions(long session,
-                                                               long preprocessingOptions, long
-                                                                   options);
+      long preprocessingOptions, long options);
 
   public static int imaqParticleFilter3(Image dest, Image source, ParticleFilterCriteria2 criteria,
-                                        int criteriaCount, ParticleFilterOptions options, ROI roi) {
+      int criteriaCount, ParticleFilterOptions options, ROI roi) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     _imaqParticleFilter3(dest.getAddress(), source.getAddress(), criteria.getAddress(),
@@ -29704,11 +29199,9 @@ public class NIVision {
   }
 
   private static native void _imaqParticleFilter3(long dest, long source, long criteria,
-                                                  int criteriaCount, long options, long roi, long
-                                                      numParticles);
+      int criteriaCount, long options, long roi, long numParticles);
 
-  public static LearnPatternAdvancedOptions imaqLearnPattern2(Image image, LearningMode
-      learningMode) {
+  public static LearnPatternAdvancedOptions imaqLearnPattern2(Image image, LearningMode learningMode) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     _imaqLearnPattern2(image.getAddress(), learningMode.getValue(), rv_addr + 0);
@@ -29729,7 +29222,7 @@ public class NIVision {
   private static native void _imaqDivide(long dest, long sourceA, long sourceB);
 
   public static EdgeReport2 imaqEdgeTool3(Image image, ROI roi, EdgeProcess processType,
-                                          EdgeOptions2 edgeOptions) {
+      EdgeOptions2 edgeOptions) {
 
     long jn_rv =
         _imaqEdgeTool3(image.getAddress(), roi.getAddress(), processType.getValue(),
@@ -29738,12 +29231,10 @@ public class NIVision {
     return new EdgeReport2(jn_rv, true);
   }
 
-  private static native long _imaqEdgeTool3(long image, long roi, int processType, long
-      edgeOptions);
+  private static native long _imaqEdgeTool3(long image, long roi, int processType, long edgeOptions);
 
   public static ConcentricRakeReport imaqConcentricRake(Image image, ROI roi,
-                                                        ConcentricRakeDirection direction,
-                                                        EdgeProcess process, RakeOptions options) {
+      ConcentricRakeDirection direction, EdgeProcess process, RakeOptions options) {
 
     long jn_rv =
         _imaqConcentricRake(image.getAddress(), roi.getAddress(), direction.getValue(),
@@ -29753,10 +29244,10 @@ public class NIVision {
   }
 
   private static native long _imaqConcentricRake(long image, long roi, int direction, int process,
-                                                 long options);
+      long options);
 
   public static SpokeReport imaqSpoke(Image image, ROI roi, SpokeDirection direction,
-                                      EdgeProcess process, SpokeOptions options) {
+      EdgeProcess process, SpokeOptions options) {
 
     long jn_rv =
         _imaqSpoke(image.getAddress(), roi.getAddress(), direction.getValue(), process.getValue(),
@@ -29766,7 +29257,7 @@ public class NIVision {
   }
 
   private static native long _imaqSpoke(long image, long roi, int direction, int process,
-                                        long options);
+      long options);
 
   public static class MatchPattern2Result {
     public PatternMatch[] array;
@@ -29794,9 +29285,7 @@ public class NIVision {
   }
 
   public static MatchPattern2Result imaqMatchPattern2(Image image, Image pattern,
-                                                      MatchPatternOptions options,
-                                                      MatchPatternAdvancedOptions
-                                                          advancedOptions, Rect searchRect) {
+      MatchPatternOptions options, MatchPatternAdvancedOptions advancedOptions, Rect searchRect) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     long jn_rv =
@@ -29808,13 +29297,10 @@ public class NIVision {
   }
 
   private static native long _imaqMatchPattern2(long image, long pattern, long options,
-                                                long advancedOptions, long searchRect, long
-                                                    numMatches);
+      long advancedOptions, long searchRect, long numMatches);
 
   public static void imaqSetParticleClassifierOptions(ClassifierSession session,
-                                                      ParticleClassifierPreprocessingOptions
-                                                          preprocessingOptions,
-                                                      ParticleClassifierOptions options) {
+      ParticleClassifierPreprocessingOptions preprocessingOptions, ParticleClassifierOptions options) {
 
     _imaqSetParticleClassifierOptions(session.getAddress(), preprocessingOptions.getAddress(),
         options.getAddress());
@@ -29822,11 +29308,10 @@ public class NIVision {
   }
 
   private static native void _imaqSetParticleClassifierOptions(long session,
-                                                               long preprocessingOptions, long
-                                                                   options);
+      long preprocessingOptions, long options);
 
   public static RakeReport imaqRake(Image image, ROI roi, RakeDirection direction,
-                                    EdgeProcess process, RakeOptions options) {
+      EdgeProcess process, RakeOptions options) {
 
     long jn_rv =
         _imaqRake(image.getAddress(), roi.getAddress(), direction.getValue(), process.getValue(),
@@ -29836,7 +29321,7 @@ public class NIVision {
   }
 
   private static native long _imaqRake(long image, long roi, int direction, int process,
-                                       long options);
+      long options);
 
   public static void Priv_ReadJPEGString_C(Image image, byte[] string) {
     int stringLength = string.length;
@@ -29858,22 +29343,20 @@ public class NIVision {
    * Bus Type Enumeration
    */
 
-  public enum IMAQdxBusType {
-    BusTypeFireWire(0x31333934), BusTypeEthernet(0x69707634), BusTypeSimulator(0x2073696D),
-    BusTypeDirectShow(
+  public static enum IMAQdxBusType {
+    BusTypeFireWire(0x31333934), BusTypeEthernet(0x69707634), BusTypeSimulator(0x2073696D), BusTypeDirectShow(
         0x64736877), BusTypeIP(0x4950636D), BusTypeSmartCam2(0x53436132), BusTypeUSB3Vision(
-        0x55534233), BusTypeUVC(0x55564320), BusTypeGuard(0xFFFFFFFF),;
+        0x55534233), BusTypeUVC(0x55564320), BusTypeGuard(0xFFFFFFFF), ;
     private final int value;
 
-    IMAQdxBusType(int value) {
+    private IMAQdxBusType(int value) {
       this.value = value;
     }
 
     public static IMAQdxBusType fromValue(int val) {
       for (IMAQdxBusType v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -29887,20 +29370,18 @@ public class NIVision {
    * Camera Control Mode Enumeration
    */
 
-  public enum IMAQdxCameraControlMode {
-    CameraControlModeController(0), CameraControlModeListener(1), CameraControlModeGuard
-        (0xFFFFFFFF),;
+  public static enum IMAQdxCameraControlMode {
+    CameraControlModeController(0), CameraControlModeListener(1), CameraControlModeGuard(0xFFFFFFFF), ;
     private final int value;
 
-    IMAQdxCameraControlMode(int value) {
+    private IMAQdxCameraControlMode(int value) {
       this.value = value;
     }
 
     public static IMAQdxCameraControlMode fromValue(int val) {
       for (IMAQdxCameraControlMode v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -29914,21 +29395,19 @@ public class NIVision {
    * Buffer Number Mode Enumeration
    */
 
-  public enum IMAQdxBufferNumberMode {
-    BufferNumberModeNext(0), BufferNumberModeLast(1), BufferNumberModeBufferNumber(2),
-    BufferNumberModeGuard(
-        0xFFFFFFFF),;
+  public static enum IMAQdxBufferNumberMode {
+    BufferNumberModeNext(0), BufferNumberModeLast(1), BufferNumberModeBufferNumber(2), BufferNumberModeGuard(
+        0xFFFFFFFF), ;
     private final int value;
 
-    IMAQdxBufferNumberMode(int value) {
+    private IMAQdxBufferNumberMode(int value) {
       this.value = value;
     }
 
     public static IMAQdxBufferNumberMode fromValue(int val) {
       for (IMAQdxBufferNumberMode v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -29942,20 +29421,19 @@ public class NIVision {
    * Plug n Play Event Enumeration
    */
 
-  public enum IMAQdxPnpEvent {
+  public static enum IMAQdxPnpEvent {
     PnpEventCameraAttached(0), PnpEventCameraDetached(1), PnpEventBusReset(2), PnpEventGuard(
-        0xFFFFFFFF),;
+        0xFFFFFFFF), ;
     private final int value;
 
-    IMAQdxPnpEvent(int value) {
+    private IMAQdxPnpEvent(int value) {
       this.value = value;
     }
 
     public static IMAQdxPnpEvent fromValue(int val) {
       for (IMAQdxPnpEvent v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -29969,21 +29447,19 @@ public class NIVision {
    * Bayer Pattern Enumeration
    */
 
-  public enum IMAQdxBayerPattern {
-    BayerPatternNone(0), BayerPatternGB(1), BayerPatternGR(2), BayerPatternBG(3), BayerPatternRG
-        (4), BayerPatternHardware(
-        5), BayerPatternGuard(0xFFFFFFFF),;
+  public static enum IMAQdxBayerPattern {
+    BayerPatternNone(0), BayerPatternGB(1), BayerPatternGR(2), BayerPatternBG(3), BayerPatternRG(4), BayerPatternHardware(
+        5), BayerPatternGuard(0xFFFFFFFF), ;
     private final int value;
 
-    IMAQdxBayerPattern(int value) {
+    private IMAQdxBayerPattern(int value) {
       this.value = value;
     }
 
     public static IMAQdxBayerPattern fromValue(int val) {
       for (IMAQdxBayerPattern v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -29997,19 +29473,18 @@ public class NIVision {
    * Bayer Decode Algorithm Enumeration
    */
 
-  public enum IMAQdxBayerAlgorithm {
-    BayerAlgorithmBilinear(0), BayerAlgorithmVNG(1), BayerAlgorithmGuard(0xFFFFFFFF),;
+  public static enum IMAQdxBayerAlgorithm {
+    BayerAlgorithmBilinear(0), BayerAlgorithmVNG(1), BayerAlgorithmGuard(0xFFFFFFFF), ;
     private final int value;
 
-    IMAQdxBayerAlgorithm(int value) {
+    private IMAQdxBayerAlgorithm(int value) {
       this.value = value;
     }
 
     public static IMAQdxBayerAlgorithm fromValue(int val) {
       for (IMAQdxBayerAlgorithm v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -30023,21 +29498,19 @@ public class NIVision {
    * Output Image Types -- Values match Vision Development Module image types
    */
 
-  public enum IMAQdxOutputImageType {
-    OutputImageTypeU8(0), OutputImageTypeI16(1), OutputImageTypeU16(7), OutputImageTypeRGB32(4),
-    OutputImageTypeRGB64(
-        6), OutputImageTypeAuto(0x7FFFFFFF), OutputImageTypeGuard(0xFFFFFFFF),;
+  public static enum IMAQdxOutputImageType {
+    OutputImageTypeU8(0), OutputImageTypeI16(1), OutputImageTypeU16(7), OutputImageTypeRGB32(4), OutputImageTypeRGB64(
+        6), OutputImageTypeAuto(0x7FFFFFFF), OutputImageTypeGuard(0xFFFFFFFF), ;
     private final int value;
 
-    IMAQdxOutputImageType(int value) {
+    private IMAQdxOutputImageType(int value) {
       this.value = value;
     }
 
     public static IMAQdxOutputImageType fromValue(int val) {
       for (IMAQdxOutputImageType v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -30051,21 +29524,19 @@ public class NIVision {
    * Controller Destination Mode Enumeration
    */
 
-  public enum IMAQdxDestinationMode {
-    DestinationModeUnicast(0), DestinationModeBroadcast(1), DestinationModeMulticast(2),
-    DestinationModeGuard(
-        0xFFFFFFFF),;
+  public static enum IMAQdxDestinationMode {
+    DestinationModeUnicast(0), DestinationModeBroadcast(1), DestinationModeMulticast(2), DestinationModeGuard(
+        0xFFFFFFFF), ;
     private final int value;
 
-    IMAQdxDestinationMode(int value) {
+    private IMAQdxDestinationMode(int value) {
       this.value = value;
     }
 
     public static IMAQdxDestinationMode fromValue(int val) {
       for (IMAQdxDestinationMode v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -30079,22 +29550,20 @@ public class NIVision {
    * Attribute Type Enumeration
    */
 
-  public enum IMAQdxAttributeType {
-    AttributeTypeU32(0), AttributeTypeI64(1), AttributeTypeF64(2), AttributeTypeString(3),
-    AttributeTypeEnum(
+  public static enum IMAQdxAttributeType {
+    AttributeTypeU32(0), AttributeTypeI64(1), AttributeTypeF64(2), AttributeTypeString(3), AttributeTypeEnum(
         4), AttributeTypeBool(5), AttributeTypeCommand(6), AttributeTypeBlob(7), AttributeTypeGuard(
-        0xFFFFFFFF),;
+        0xFFFFFFFF), ;
     private final int value;
 
-    IMAQdxAttributeType(int value) {
+    private IMAQdxAttributeType(int value) {
       this.value = value;
     }
 
     public static IMAQdxAttributeType fromValue(int val) {
       for (IMAQdxAttributeType v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -30108,21 +29577,19 @@ public class NIVision {
    * Value Type Enumeration
    */
 
-  public enum IMAQdxValueType {
-    ValueTypeU32(0), ValueTypeI64(1), ValueTypeF64(2), ValueTypeString(3), ValueTypeEnumItem(4),
-    ValueTypeBool(
-        5), ValueTypeDisposableString(6), ValueTypeGuard(0xFFFFFFFF),;
+  public static enum IMAQdxValueType {
+    ValueTypeU32(0), ValueTypeI64(1), ValueTypeF64(2), ValueTypeString(3), ValueTypeEnumItem(4), ValueTypeBool(
+        5), ValueTypeDisposableString(6), ValueTypeGuard(0xFFFFFFFF), ;
     private final int value;
 
-    IMAQdxValueType(int value) {
+    private IMAQdxValueType(int value) {
       this.value = value;
     }
 
     public static IMAQdxValueType fromValue(int val) {
       for (IMAQdxValueType v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -30136,20 +29603,19 @@ public class NIVision {
    * Interface File Flags Enumeration
    */
 
-  public enum IMAQdxInterfaceFileFlags {
+  public static enum IMAQdxInterfaceFileFlags {
     InterfaceFileFlagsConnected(0x1), InterfaceFileFlagsDirty(0x2), InterfaceFileFlagsGuard(
-        0xFFFFFFFF),;
+        0xFFFFFFFF), ;
     private final int value;
 
-    IMAQdxInterfaceFileFlags(int value) {
+    private IMAQdxInterfaceFileFlags(int value) {
       this.value = value;
     }
 
     public static IMAQdxInterfaceFileFlags fromValue(int val) {
       for (IMAQdxInterfaceFileFlags v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -30163,21 +29629,19 @@ public class NIVision {
    * Overwrite Mode Enumeration
    */
 
-  public enum IMAQdxOverwriteMode {
-    OverwriteModeGetOldest(0x0), OverwriteModeFail(0x2), OverwriteModeGetNewest(0x3),
-    OverwriteModeGuard(
-        0xFFFFFFFF),;
+  public static enum IMAQdxOverwriteMode {
+    OverwriteModeGetOldest(0x0), OverwriteModeFail(0x2), OverwriteModeGetNewest(0x3), OverwriteModeGuard(
+        0xFFFFFFFF), ;
     private final int value;
 
-    IMAQdxOverwriteMode(int value) {
+    private IMAQdxOverwriteMode(int value) {
       this.value = value;
     }
 
     public static IMAQdxOverwriteMode fromValue(int val) {
       for (IMAQdxOverwriteMode v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -30191,20 +29655,19 @@ public class NIVision {
    * Incomplete Buffer Mode Enumeration
    */
 
-  public enum IMAQdxIncompleteBufferMode {
+  public static enum IMAQdxIncompleteBufferMode {
     IncompleteBufferModeIgnore(0), IncompleteBufferModeFail(1), IncompleteBufferModeGuard(
-        0xFFFFFFFF),;
+        0xFFFFFFFF), ;
     private final int value;
 
-    IMAQdxIncompleteBufferMode(int value) {
+    private IMAQdxIncompleteBufferMode(int value) {
       this.value = value;
     }
 
     public static IMAQdxIncompleteBufferMode fromValue(int val) {
       for (IMAQdxIncompleteBufferMode v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -30218,19 +29681,18 @@ public class NIVision {
    * Lost Packet Mode Enumeration
    */
 
-  public enum IMAQdxLostPacketMode {
-    LostPacketModeIgnore(0), LostPacketModeFail(1), LostPacketModeGuard(0xFFFFFFFF),;
+  public static enum IMAQdxLostPacketMode {
+    LostPacketModeIgnore(0), LostPacketModeFail(1), LostPacketModeGuard(0xFFFFFFFF), ;
     private final int value;
 
-    IMAQdxLostPacketMode(int value) {
+    private IMAQdxLostPacketMode(int value) {
       this.value = value;
     }
 
     public static IMAQdxLostPacketMode fromValue(int val) {
       for (IMAQdxLostPacketMode v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -30244,21 +29706,19 @@ public class NIVision {
    * Attribute Visibility Enumeration
    */
 
-  public enum IMAQdxAttributeVisibility {
-    AttributeVisibilitySimple(0x00001000), AttributeVisibilityIntermediate(0x00002000),
-    AttributeVisibilityAdvanced(
-        0x00004000), AttributeVisibilityGuard(0xFFFFFFFF),;
+  public static enum IMAQdxAttributeVisibility {
+    AttributeVisibilitySimple(0x00001000), AttributeVisibilityIntermediate(0x00002000), AttributeVisibilityAdvanced(
+        0x00004000), AttributeVisibilityGuard(0xFFFFFFFF), ;
     private final int value;
 
-    IMAQdxAttributeVisibility(int value) {
+    private IMAQdxAttributeVisibility(int value) {
       this.value = value;
     }
 
     public static IMAQdxAttributeVisibility fromValue(int val) {
       for (IMAQdxAttributeVisibility v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -30272,19 +29732,18 @@ public class NIVision {
    * Stream Channel Mode Enumeration
    */
 
-  public enum IMAQdxStreamChannelMode {
-    StreamChannelModeAutomatic(0), StreamChannelModeManual(1), StreamChannelModeGuard(0xFFFFFFFF),;
+  public static enum IMAQdxStreamChannelMode {
+    StreamChannelModeAutomatic(0), StreamChannelModeManual(1), StreamChannelModeGuard(0xFFFFFFFF), ;
     private final int value;
 
-    IMAQdxStreamChannelMode(int value) {
+    private IMAQdxStreamChannelMode(int value) {
       this.value = value;
     }
 
     public static IMAQdxStreamChannelMode fromValue(int val) {
       for (IMAQdxStreamChannelMode v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -30298,21 +29757,19 @@ public class NIVision {
    * Pixel Signedness Enumeration
    */
 
-  public enum IMAQdxPixelSignedness {
-    PixelSignednessUnsigned(0), PixelSignednessSigned(1), PixelSignednessHardware(2),
-    PixelSignednessGuard(
-        0xFFFFFFFF),;
+  public static enum IMAQdxPixelSignedness {
+    PixelSignednessUnsigned(0), PixelSignednessSigned(1), PixelSignednessHardware(2), PixelSignednessGuard(
+        0xFFFFFFFF), ;
     private final int value;
 
-    IMAQdxPixelSignedness(int value) {
+    private IMAQdxPixelSignedness(int value) {
       this.value = value;
     }
 
     public static IMAQdxPixelSignedness fromValue(int val) {
       for (IMAQdxPixelSignedness v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -30326,21 +29783,19 @@ public class NIVision {
    * USB Connection Speed Enumeration
    */
 
-  public enum IMAQdxUSBConnectionSpeed {
-    USBConnectionSpeedLow(1), USBConnectionSpeedFull(2), USBConnectionSpeedHigh(4),
-    USBConnectionSpeedSuper(
-        8), USBConnectionSpeedGuard(0xFFFFFFFF),;
+  public static enum IMAQdxUSBConnectionSpeed {
+    USBConnectionSpeedLow(1), USBConnectionSpeedFull(2), USBConnectionSpeedHigh(4), USBConnectionSpeedSuper(
+        8), USBConnectionSpeedGuard(0xFFFFFFFF), ;
     private final int value;
 
-    IMAQdxUSBConnectionSpeed(int value) {
+    private IMAQdxUSBConnectionSpeed(int value) {
       this.value = value;
     }
 
     public static IMAQdxUSBConnectionSpeed fromValue(int val) {
       for (IMAQdxUSBConnectionSpeed v : values()) {
-        if (v.value == val) {
+        if (v.value == val)
           return v;
-        }
       }
       return null;
     }
@@ -30381,10 +29836,8 @@ public class NIVision {
     }
 
     public IMAQdxCameraInformation(int Type, int Version, int Flags, int SerialNumberHi,
-                                   int SerialNumberLo, IMAQdxBusType BusType, String
-                                       InterfaceName, String VendorName,
-                                   String ModelName, String CameraFileName, String
-                                       CameraAttributeURL) {
+        int SerialNumberLo, IMAQdxBusType BusType, String InterfaceName, String VendorName,
+        String ModelName, String CameraFileName, String CameraAttributeURL) {
       super(2584);
       this.Type = Type;
       this.Version = Version;
@@ -30488,9 +29941,8 @@ public class NIVision {
       backing.putInt(8, Flags);
       backing.putInt(12, SerialNumberHi);
       backing.putInt(16, SerialNumberLo);
-      if (BusType != null) {
+      if (BusType != null)
         backing.putInt(20, BusType.getValue());
-      }
       if (InterfaceName != null) {
         byte[] bytes;
         try {
@@ -30499,9 +29951,8 @@ public class NIVision {
           bytes = new byte[0];
         }
         putBytes(backing, bytes, 24, bytes.length);
-        for (int i = bytes.length; i < IMAQDX_MAX_API_STRING_LENGTH; i++) {
+        for (int i = bytes.length; i < IMAQDX_MAX_API_STRING_LENGTH; i++)
           backing.put(i, (byte) 0); // fill with zero
-        }
       }
       if (VendorName != null) {
         byte[] bytes;
@@ -30511,9 +29962,8 @@ public class NIVision {
           bytes = new byte[0];
         }
         putBytes(backing, bytes, 536, bytes.length);
-        for (int i = bytes.length; i < IMAQDX_MAX_API_STRING_LENGTH; i++) {
+        for (int i = bytes.length; i < IMAQDX_MAX_API_STRING_LENGTH; i++)
           backing.put(i, (byte) 0); // fill with zero
-        }
       }
       if (ModelName != null) {
         byte[] bytes;
@@ -30523,9 +29973,8 @@ public class NIVision {
           bytes = new byte[0];
         }
         putBytes(backing, bytes, 1048, bytes.length);
-        for (int i = bytes.length; i < IMAQDX_MAX_API_STRING_LENGTH; i++) {
+        for (int i = bytes.length; i < IMAQDX_MAX_API_STRING_LENGTH; i++)
           backing.put(i, (byte) 0); // fill with zero
-        }
       }
       if (CameraFileName != null) {
         byte[] bytes;
@@ -30535,9 +29984,8 @@ public class NIVision {
           bytes = new byte[0];
         }
         putBytes(backing, bytes, 1560, bytes.length);
-        for (int i = bytes.length; i < IMAQDX_MAX_API_STRING_LENGTH; i++) {
+        for (int i = bytes.length; i < IMAQDX_MAX_API_STRING_LENGTH; i++)
           backing.put(i, (byte) 0); // fill with zero
-        }
       }
       if (CameraAttributeURL != null) {
         byte[] bytes;
@@ -30547,9 +29995,8 @@ public class NIVision {
           bytes = new byte[0];
         }
         putBytes(backing, bytes, 2072, bytes.length);
-        for (int i = bytes.length; i < IMAQDX_MAX_API_STRING_LENGTH; i++) {
+        for (int i = bytes.length; i < IMAQDX_MAX_API_STRING_LENGTH; i++)
           backing.put(i, (byte) 0); // fill with zero
-        }
       }
     }
 
@@ -30625,9 +30072,8 @@ public class NIVision {
           bytes = new byte[0];
         }
         putBytes(backing, bytes, 8, bytes.length);
-        for (int i = bytes.length; i < IMAQDX_MAX_API_STRING_LENGTH; i++) {
+        for (int i = bytes.length; i < IMAQDX_MAX_API_STRING_LENGTH; i++)
           backing.put(i, (byte) 0); // fill with zero
-        }
       }
     }
 
@@ -30656,7 +30102,7 @@ public class NIVision {
     }
 
     public IMAQdxAttributeInformation(IMAQdxAttributeType Type, int Readable, int Writable,
-                                      String Name) {
+        String Name) {
       super(524);
       this.Type = Type;
       this.Readable = Readable;
@@ -30697,9 +30143,8 @@ public class NIVision {
     }
 
     public void write() {
-      if (Type != null) {
+      if (Type != null)
         backing.putInt(0, Type.getValue());
-      }
       backing.putInt(4, Readable);
       backing.putInt(8, Writable);
       if (Name != null) {
@@ -30710,9 +30155,8 @@ public class NIVision {
           bytes = new byte[0];
         }
         putBytes(backing, bytes, 12, bytes.length);
-        for (int i = bytes.length; i < IMAQDX_MAX_API_STRING_LENGTH; i++) {
+        for (int i = bytes.length; i < IMAQDX_MAX_API_STRING_LENGTH; i++)
           backing.put(i, (byte) 0); // fill with zero
-        }
       }
     }
 
@@ -30788,9 +30232,8 @@ public class NIVision {
           bytes = new byte[0];
         }
         putBytes(backing, bytes, 8, bytes.length);
-        for (int i = bytes.length; i < IMAQDX_MAX_API_STRING_LENGTH; i++) {
+        for (int i = bytes.length; i < IMAQDX_MAX_API_STRING_LENGTH; i++)
           backing.put(i, (byte) 0); // fill with zero
-        }
       }
     }
 
@@ -30837,7 +30280,7 @@ public class NIVision {
   }
 
   private static native void _IMAQdxGrab(int id, long image, int waitForNextBuffer,
-                                         long actualBufferNumber);
+      long actualBufferNumber);
 
   public static void IMAQdxDiscoverEthernetCameras(String address, int timeout) {
     ByteBuffer address_buf = null;
@@ -30852,8 +30295,7 @@ public class NIVision {
       putBytes(address_buf, address_bytes, 0, address_bytes.length).put(address_bytes.length,
           (byte) 0);
     }
-    _IMAQdxDiscoverEthernetCameras(address == null ? 0 : getByteBufferAddress(address_buf),
-        timeout);
+    _IMAQdxDiscoverEthernetCameras(address == null ? 0 : getByteBufferAddress(address_buf), timeout);
 
   }
 
@@ -30925,7 +30367,7 @@ public class NIVision {
   private static native void _IMAQdxStartAcquisition(int id);
 
   public static int IMAQdxGetImage(int id, Image image, IMAQdxBufferNumberMode mode,
-                                   int desiredBufferNumber) {
+      int desiredBufferNumber) {
     ByteBuffer rv_buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
     long rv_addr = getByteBufferAddress(rv_buf);
     _IMAQdxGetImage(id, image.getAddress(), mode.getValue(), desiredBufferNumber, rv_addr + 0);
@@ -30935,17 +30377,17 @@ public class NIVision {
   }
 
   private static native void _IMAQdxGetImage(int id, long image, int mode, int desiredBufferNumber,
-                                             long actualBufferNumber);
+      long actualBufferNumber);
 
   public static int IMAQdxGetImageData(int id, ByteBuffer buffer, IMAQdxBufferNumberMode mode,
-                                       int desiredBufferNumber) {
+      int desiredBufferNumber) {
     long buffer_addr = getByteBufferAddress(buffer);
     int buffer_size = buffer.capacity();
     return _IMAQdxGetImageData(id, buffer_addr, buffer_size, mode.getValue(), desiredBufferNumber);
   }
 
   private static native int _IMAQdxGetImageData(int id, long buffer, int bufferSize, int mode,
-                                                int desiredBufferNumber);
+      int desiredBufferNumber);
 
   public static void IMAQdxStopAcquisition(int id) {
 
@@ -30994,7 +30436,7 @@ public class NIVision {
   }
 
   private static native void _IMAQdxEnumerateVideoModes(int id, long videoModeArray, long count,
-                                                        long currentMode);
+      long currentMode);
 
   public static IMAQdxAttributeType IMAQdxGetAttributeType(int id, String name) {
     ByteBuffer name_buf = null;
@@ -31120,7 +30562,7 @@ public class NIVision {
   private static native void _IMAQdxReadAttributes(int id, long filename);
 
   public static void IMAQdxResetEthernetCameraAddress(String name, String address, String subnet,
-                                                      String gateway, int timeout) {
+      String gateway, int timeout) {
     ByteBuffer name_buf = null;
     if (name != null) {
       byte[] name_bytes;
@@ -31175,8 +30617,7 @@ public class NIVision {
   }
 
   private static native void _IMAQdxResetEthernetCameraAddress(long name, long address,
-                                                               long subnet, long gateway, int
-                                                                   timeout);
+      long subnet, long gateway, int timeout);
 
   public static IMAQdxAttributeVisibility IMAQdxGetAttributeVisibility(int id, String name) {
     ByteBuffer name_buf = null;

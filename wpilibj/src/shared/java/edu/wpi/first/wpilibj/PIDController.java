@@ -331,10 +331,9 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    * Calculate the feed forward term.
    *
    * <p>Both of the provided feed forward calculations are velocity feed forwards. If a different
-   * feed
-   * forward calculation is desired, the user can override this function and provide his or her own.
-   * This function  does no synchronization because the PIDController class only calls it in
-   * synchronized code, so be careful if calling it oneself.
+   * feed forward calculation is desired, the user can override this function and provide his or
+   * her own. This function  does no synchronization because the PIDController class only calls it
+   * in synchronized code, so be careful if calling it oneself.
    *
    * <p>If a velocity PID controller is being used, the F term should be set to 1 over the maximum
    * setpoint for the output. If a position PID controller is being used, the F term should be set

@@ -37,8 +37,8 @@ public class USBCamera {
 
   private Pattern m_reMode =
       Pattern
-          .compile("(?<width>[0-9]+)\\s*x\\s*(?<height>[0-9]+)\\s+(?<format>.*?)\\s+(?<fps>[0-9"
-              + ".]+)\\s*fps");
+          .compile("(?<width>[0-9]+)\\s*x\\s*(?<height>[0-9]+)\\s+(?<format>.*?)"
+              + "\\s+(?<fps>[0-9.]+)\\s*fps");
 
   private String m_name = kDefaultCameraName;
   private int m_id = -1;
@@ -151,7 +151,7 @@ public class USBCamera {
         continue;
       }
       double fps = Double.parseDouble(matcher.group("fps"));
-      if (fps < fps) {
+      if (fps < m_fps) {
         continue;
       }
       if (fps > foundFps) {

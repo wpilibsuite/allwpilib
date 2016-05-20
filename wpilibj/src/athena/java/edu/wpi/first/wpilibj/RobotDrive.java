@@ -18,7 +18,7 @@ import static java.util.Objects.requireNonNull;
  * robot drive class handles basic driving for a robot. Currently, 2 and 4 motor tank and mecanum
  * drive trains are supported. In the future other drive types like swerve might be implemented.
  * Motor channel numbers are supplied on creation of the class. Those are used for either the drive
- * m_function (intended for hand created drive code, such as autonomous) or with the Tank/Arcade
+ * function (intended for hand created drive code, such as autonomous) or with the Tank/Arcade
  * functions intended to be used for Operator Control driving.
  */
 public class RobotDrive implements MotorSafety {
@@ -177,7 +177,7 @@ public class RobotDrive implements MotorSafety {
    * <p>The algorithm for steering provides a constant turn radius for any normal speed range, both
    * forward and backward. Increasing sensitivity causes sharper turns for fixed values of curve.
    *
-   * <p>This m_function will most likely be used in an autonomous routine.
+   * <p>This function will most likely be used in an autonomous routine.
    *
    * @param outputMagnitude The speed setting for the outside wheel in a turn, forward or backwards,
    *                        +1 to -1.
@@ -249,7 +249,7 @@ public class RobotDrive implements MotorSafety {
   }
 
   /**
-   * Provide tank steering using the stored robot configuration. This m_function lets you pick the
+   * Provide tank steering using the stored robot configuration. This function lets you pick the
    * axis to be used on each Joystick object for the left and right sides of the robot.
    *
    * @param leftStick  The Joystick object to use for the left side of the robot.
@@ -266,7 +266,7 @@ public class RobotDrive implements MotorSafety {
   }
 
   /**
-   * Provide tank steering using the stored robot configuration. This m_function lets you pick the
+   * Provide tank steering using the stored robot configuration. This function lets you pick the
    * axis to be used on each Joystick object for the left and right sides of the robot.
    *
    * @param leftStick     The Joystick object to use for the left side of the robot.
@@ -284,7 +284,7 @@ public class RobotDrive implements MotorSafety {
   }
 
   /**
-   * Provide tank steering using the stored robot configuration. This m_function lets you directly
+   * Provide tank steering using the stored robot configuration. This function lets you directly
    * provide joystick values from any source.
    *
    * @param leftValue     The value of the left stick.
@@ -319,7 +319,7 @@ public class RobotDrive implements MotorSafety {
   }
 
   /**
-   * Provide tank steering using the stored robot configuration. This m_function lets you directly
+   * Provide tank steering using the stored robot configuration. This function lets you directly
    * provide joystick values from any source.
    *
    * @param leftValue  The value of the left stick.
@@ -353,7 +353,7 @@ public class RobotDrive implements MotorSafety {
    *              for forwards/backwards and the X-axis will be selected for rotation rate.
    */
   public void arcadeDrive(GenericHID stick) {
-    this.arcadeDrive(stick, true);
+    arcadeDrive(stick, true);
   }
 
   /**
@@ -389,7 +389,7 @@ public class RobotDrive implements MotorSafety {
    */
   public void arcadeDrive(GenericHID moveStick, final int moveAxis, GenericHID rotateStick,
                           final int rotateAxis) {
-    this.arcadeDrive(moveStick, moveAxis, rotateStick, rotateAxis, true);
+    arcadeDrive(moveStick, moveAxis, rotateStick, rotateAxis, true);
   }
 
   /**
@@ -458,7 +458,7 @@ public class RobotDrive implements MotorSafety {
    * @param rotateValue The value to use for the rotate right/left
    */
   public void arcadeDrive(double moveValue, double rotateValue) {
-    this.arcadeDrive(moveValue, rotateValue, true);
+    arcadeDrive(moveValue, rotateValue, true);
   }
 
   /**
@@ -556,7 +556,7 @@ public class RobotDrive implements MotorSafety {
     m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft_val] * m_maxOutput, m_syncGroup);
     m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight_val] * m_maxOutput, m_syncGroup);
 
-    if (this.m_syncGroup != 0) {
+    if (m_syncGroup != 0) {
       CANJaguar.updateSyncGroup(m_syncGroup);
     }
 
@@ -582,7 +582,7 @@ public class RobotDrive implements MotorSafety {
 
   /**
    * Set the speed of the right and left motors. This is used once an appropriate drive setup
-   * m_function is called such as twoWheelDrive(). The motors are set to "leftSpeed" and
+   * function is called such as twoWheelDrive(). The motors are set to "leftSpeed" and
    * "rightSpeed" and includes flipping the direction of one side for opposing motors.
    *
    * @param leftOutput  The speed to send to the left side of the robot.
@@ -603,7 +603,7 @@ public class RobotDrive implements MotorSafety {
     }
     m_rearRightMotor.set(-limit(rightOutput) * m_maxOutput, m_syncGroup);
 
-    if (this.m_syncGroup != 0) {
+    if (m_syncGroup != 0) {
       CANJaguar.updateSyncGroup(m_syncGroup);
     }
 

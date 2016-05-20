@@ -28,9 +28,9 @@ public class FakePotentiometerSource {
    * @param defaultPotMaxAngle The default maximum angle the pot supports.
    */
   public FakePotentiometerSource(AnalogOutput output, double defaultPotMaxAngle) {
-    this.m_defaultPotMaxAngle = defaultPotMaxAngle;
+    m_defaultPotMaxAngle = defaultPotMaxAngle;
     m_potMaxAngle = defaultPotMaxAngle;
-    this.m_output = output;
+    m_output = output;
     m_initOutput = false;
   }
 

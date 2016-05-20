@@ -135,6 +135,6 @@ public class FakeCounterSource {
    * @param milliSec The rate to send out pulses at
    */
   public void setRate(int milliSec) {
-    this.m_milliSec = milliSec;
+    m_milliSec = milliSec;
   }
 }

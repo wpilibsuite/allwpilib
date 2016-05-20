@@ -38,7 +38,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
     kMillimeters
   }
 
-  // /< Time (sec) for the
+  // Time (sec) for the ping trigger pulse.
   private static final double kPingTime = 10 * 1e-6;
   // Priority that the ultrasonic round robin task runs.
   private static final int kPriority = 90;
@@ -133,10 +133,10 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
    * @param units       The units returned in either kInches or kMilliMeters
    */
   public Ultrasonic(final int pingChannel, final int echoChannel, Unit units) {
-    this.m_pingChannel = new DigitalOutput(pingChannel);
-    this.m_echoChannel = new DigitalInput(echoChannel);
+    m_pingChannel = new DigitalOutput(pingChannel);
+    m_echoChannel = new DigitalInput(echoChannel);
     m_allocatedChannels = true;
-    this.m_units = units;
+    m_units = units;
     initialize();
   }
 
@@ -169,9 +169,9 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
       throw new NullPointerException("Null Channel Provided");
     }
     m_allocatedChannels = false;
-    this.m_pingChannel = pingChannel;
-    this.m_echoChannel = echoChannel;
-    this.m_units = units;
+    m_pingChannel = pingChannel;
+    m_echoChannel = echoChannel;
+    m_units = units;
     initialize();
   }
 
@@ -257,7 +257,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
         u.m_counter.reset();
       }
 
-      // Start round robin m_task
+      // Start round robin task
       m_task.start();
     } else {
       // Wait for background task to stop running

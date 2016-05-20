@@ -139,8 +139,8 @@ public class CameraServer {
     }
 
     if (buffer.limit() - index - 1 <= 2) {
-      throw new VisionException("data size of flattened image is less than 2. Try another camera!"
-          + " ");
+      throw new VisionException("data size of flattened image is less than 2. Try another "
+          + "camera!");
     }
 
     setImageData(data, index);
