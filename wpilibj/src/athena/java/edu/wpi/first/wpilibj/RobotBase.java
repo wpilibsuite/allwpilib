@@ -165,6 +165,7 @@ public abstract class RobotBase {
 
     // Set some implementations so that the static methods work properly
     Timer.SetImplementation(new HardwareTimer());
+    DriverStation.SetImplementation(new HardwareDriverStation());
     HLUsageReporting.SetImplementation(new HardwareHLUsageReporting());
     RobotState.SetImplementation(DriverStation.getInstance());
   }
