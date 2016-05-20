@@ -675,7 +675,7 @@ public class Preferences {
           synchronized (lock) {
             if (!ImproperPreferenceKeyException.isAcceptable(key) || value.toString().indexOf
                 ('"') != -1) {
-              if (values.contains(key) || keys.contains(key)) {
+              if (values.containsKey(key) || keys.contains(key)) {
                 values.remove(key);
                 keys.removeElement(key);
                 NetworkTable.getTable(TABLE_NAME).putString(key, "\"");

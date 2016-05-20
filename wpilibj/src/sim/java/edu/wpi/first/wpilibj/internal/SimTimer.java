@@ -101,6 +101,7 @@ public class SimTimer implements Timer.StaticInterface {
      * @return Robot running time in milliseconds.
      * @deprecated Use getFPGATimestamp instead.
      */
+    @Deprecated
     private double getMsClock() {
       return (simTime * 1e3);
     }

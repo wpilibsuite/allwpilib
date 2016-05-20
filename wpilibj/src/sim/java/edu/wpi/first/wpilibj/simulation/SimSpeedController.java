@@ -37,6 +37,7 @@ public class SimSpeedController {
    *                  update immediately.
    * @deprecated For compatibility with CANJaguar
    */
+  @Deprecated
   public void set(double speed, byte syncGroup) {
     set(speed);
   }

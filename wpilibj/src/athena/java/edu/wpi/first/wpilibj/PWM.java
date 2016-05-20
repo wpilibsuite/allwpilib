@@ -172,6 +172,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
    * @deprecated Recommended to set bounds in ms using {@link #setBounds(double, double, double,
    * double, double)}
    */
+  @Deprecated
   public void setBounds(final int max, final int deadbandMax, final int center,
                         final int deadbandMin, final int min) {
     m_maxPwm = max;
