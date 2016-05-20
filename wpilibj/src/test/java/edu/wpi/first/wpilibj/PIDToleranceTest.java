@@ -2,21 +2,22 @@ package edu.wpi.first.wpilibj;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.logging.Logger;
-
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class PIDToleranceTest extends AbstractComsSetup {
-  private static final Logger logger = Logger.getLogger(PIDToleranceTest.class.getName());
+public class PIDToleranceTest {
   private PIDController m_pid;
   private final double m_setPoint = 50.0;
   private final double m_tolerance = 10.0;
   private final double m_range = 200;
+
+  @BeforeClass
+  public static void setupClass() {
+    UnitTestUtility.setupMockBase();
+  }
 
   private class FakeInput implements PIDSource {
     public double m_val;
@@ -48,10 +49,6 @@ public class PIDToleranceTest extends AbstractComsSetup {
 
   };
 
-  @Override
-  protected Logger getClassLogger() {
-    return logger;
-  }
 
   @Before
   public void setUp() throws Exception {

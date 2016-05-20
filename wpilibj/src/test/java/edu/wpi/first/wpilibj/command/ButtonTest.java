@@ -10,10 +10,7 @@ package edu.wpi.first.wpilibj.command;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.logging.Logger;
-
 import edu.wpi.first.wpilibj.buttons.InternalButton;
-import edu.wpi.first.wpilibj.mocks.MockCommand;
 
 
 /**
@@ -24,14 +21,8 @@ import edu.wpi.first.wpilibj.mocks.MockCommand;
  * @author jonathanleitschuh
  */
 public class ButtonTest extends AbstractCommandTest {
-  private static final Logger logger = Logger.getLogger(ButtonTest.class.getName());
-
   private InternalButton m_button1;
   private InternalButton m_button2;
-
-  protected Logger getClassLogger() {
-    return logger;
-  }
 
   @Before
   public void setUp() throws Exception {

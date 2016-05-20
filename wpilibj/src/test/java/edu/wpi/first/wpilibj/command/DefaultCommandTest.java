@@ -9,21 +9,12 @@ package edu.wpi.first.wpilibj.command;
 
 import org.junit.Test;
 
-import java.util.logging.Logger;
-
-import edu.wpi.first.wpilibj.mocks.MockCommand;
-
 /**
  * Tests the {@link Command} library.
  *
  * @author jonathanleitschuh
  */
 public class DefaultCommandTest extends AbstractCommandTest {
-  private static final Logger logger = Logger.getLogger(DefaultCommandTest.class.getName());
-
-  protected Logger getClassLogger() {
-    return logger;
-  }
 
 
   /**

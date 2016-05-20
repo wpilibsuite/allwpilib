@@ -29,7 +29,10 @@ dependencies {
     compile 'com.googlecode.junit-toolbox:junit-toolbox:2.0'
     compile 'org.apache.ant:ant:1.9.4'
     compile 'org.apache.ant:ant-junit:1.9.4'
+    compile files(wpilibj.sourceSets.test.output.classesDir)
 }
+
+compileJava.dependsOn tasks.getByPath(':wpilibj:testClasses')
 
 build.dependsOn shadowJar
 
