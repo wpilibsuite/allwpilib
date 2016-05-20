@@ -8,9 +8,7 @@
 package edu.wpi.first.wpilibj.command;
 
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Set;
 import java.util.Vector;
 
 import edu.wpi.first.wpilibj.HLUsageReporting;
@@ -54,7 +52,7 @@ public class Scheduler implements NamedSendable {
   /**
    * The {@link Set} of all {@link Subsystem Subsystems}.
    */
-  private Set<Subsystem> m_subsystems = new HashSet<>();
+  private Set m_subsystems = new Set();
   /**
    * The first {@link Command} in the list.
    */
@@ -219,7 +217,7 @@ public class Scheduler implements NamedSendable {
     m_additions.removeAllElements();
 
     // Add in the defaults
-    Enumeration locks = new Vector<>(m_subsystems).elements();
+    Enumeration locks = m_subsystems.getElements();
     while (locks.hasMoreElements()) {
       Subsystem lock = (Subsystem) locks.nextElement();
       if (lock.getCurrentCommand() == null) {
