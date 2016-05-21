@@ -31,11 +31,11 @@ public class DriverStation implements RobotState.Interface {
   }
 
   private class HALJoystickAxes {
-    public short[] m_axes;
+    public float[] m_axes;
     public byte m_count;
 
     public HALJoystickAxes(int count) {
-      m_axes = new short[count];
+      m_axes = new float[count];
     }
   }
 

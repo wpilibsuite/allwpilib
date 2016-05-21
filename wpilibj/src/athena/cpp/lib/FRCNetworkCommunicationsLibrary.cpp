@@ -146,7 +146,7 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_NativeH
  */
 JNIEXPORT jbyte JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickAxes(
-    JNIEnv * env, jclass, jbyte joystickNum, jshortArray axesArray) {
+    JNIEnv * env, jclass, jbyte joystickNum, jfloatArray axesArray) {
   NETCOMM_LOG(logDEBUG) << "Calling HALJoystickAxes";
   HALJoystickAxes axes;
   HALGetJoystickAxes(joystickNum, &axes);
@@ -157,7 +157,7 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJ
     ThrowIllegalArgumentException(env, "Native array size larger then passed in java array size");
   }
 
-  env->SetShortArrayRegion(axesArray, 0, axes.count, axes.axes);
+  env->SetFloatArrayRegion(axesArray, 0, axes.count, axes.axes);
 
   return axes.count;
 }
