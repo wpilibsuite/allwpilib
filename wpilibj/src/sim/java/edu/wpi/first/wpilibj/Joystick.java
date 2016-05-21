@@ -278,7 +278,7 @@ public class Joystick extends GenericHID {
    * @return The state of the button.
    */
   public boolean getRawButton(final int button) {
-    return m_ds.getStickButton(m_port, button);
+    return m_ds.getStickButton(m_port, (byte) button);
   }
 
   /**
