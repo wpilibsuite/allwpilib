@@ -303,14 +303,8 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis) {
           "Joystick Axis missing, check if all controllers are plugged in");
     return 0.0f;
   }
-
-  int8_t value = m_joystickAxes[stick].axes[axis];
-
-  if (value < 0) {
-    return value / 128.0f;
-  } else {
-    return value / 127.0f;
-  }
+  
+  return m_joystickAxes[stick].axes[axis];
 }
 
 /**

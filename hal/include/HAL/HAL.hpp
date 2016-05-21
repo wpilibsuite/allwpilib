@@ -174,7 +174,7 @@ static const size_t kMaxJoystickPOVs = 12;
 
 struct HALJoystickAxes {
   uint16_t count;
-  int16_t axes[kMaxJoystickAxes];
+  float axes[kMaxJoystickAxes];
 };
 
 struct HALJoystickPOVs {

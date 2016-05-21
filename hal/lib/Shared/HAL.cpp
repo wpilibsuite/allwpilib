@@ -4,6 +4,11 @@
 #include <cstring>
 #include "FRC_NetworkCommunication/FRCComm.h"
 
+struct HALJoystickAxesInt {
+  uint16_t count;
+  int16_t axes[kMaxJoystickAxes];
+};
+
 extern "C" {
 
 int HALGetControlWord(HALControlWord* data) {
@@ -17,9 +22,26 @@ int HALGetAllianceStation(enum HALAllianceStationID* allianceStation) {
       (AllianceStationID_t*)allianceStation);
 }
 
-int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes* axes) {
-  return FRC_NetworkCommunication_getJoystickAxes(
-      joystickNum, (JoystickAxes_t*)axes, kMaxJoystickAxes);
+int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes *axes) {
+  HALJoystickAxesInt axesInt;
+  
+  int retVal = FRC_NetworkCommunication_getJoystickAxes(
+      joystickNum, (JoystickAxes_t*) &axesInt, kMaxJoystickAxes);
+  
+  // copy int values to float values
+  axes->count = axesInt.count;
+  // current scaling is -128 to 127, can easily be patched in the future by 
+  // changing this function.
+  for (unsigned int i = 0; i < axesInt.count; i++) {
+    int8_t value = axesInt.axes[i];
+    if (value < 0) {
+      axes->axes[i] = value / 128.0f;
+    } else {
+      axes->axes[i] = value / 127.0f;
+    }
+  }
+  
+  return retVal;
 }
 
 int HALGetJoystickPOVs(uint8_t joystickNum, HALJoystickPOVs* povs) {

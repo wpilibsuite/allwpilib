@@ -224,8 +224,8 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 
   public static int kMaxJoystickAxes = 12;
   public static int kMaxJoystickPOVs = 12;
-  
-  public static native byte HALGetJoystickAxes(byte joystickNum, short[] axesArray);
+
+  public static native byte HALGetJoystickAxes(byte joystickNum, float[] axesArray);
 
   public static native byte HALGetJoystickPOVs(byte joystickNum, short[] povsArray);
 
