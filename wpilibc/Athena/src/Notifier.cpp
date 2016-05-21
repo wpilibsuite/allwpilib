@@ -6,15 +6,16 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Notifier.h"
+#include "HAL/HAL.hpp"
 #include "Timer.h"
 #include "Utility.h"
 #include "WPIErrors.h"
-#include "HAL/HAL.hpp"
 
 /**
  * Create a Notifier for timer event notification.
+ *
  * @param handler The handler is called at the notification time which is set
- * using StartSingle or StartPeriodic.
+ *                using StartSingle or StartPeriodic.
  */
 Notifier::Notifier(TimerEventHandler handler) {
   if (handler == nullptr)
@@ -52,7 +53,7 @@ void Notifier::UpdateAlarm() {
  * Notify is called by the HAL layer.  We simply need to pass it through to
  * the user handler.
  */
-void Notifier::Notify(uint64_t currentTimeInt, void *param) {
+void Notifier::Notify(uint64_t currentTimeInt, void* param) {
   Notifier* notifier = static_cast<Notifier*>(param);
 
   notifier->m_processMutex.lock();
@@ -72,7 +73,9 @@ void Notifier::Notify(uint64_t currentTimeInt, void *param) {
 
 /**
  * Register for single event notification.
+ *
  * A timer event is queued for a single event after the specified delay.
+ *
  * @param delay Seconds to wait before the handler is called.
  */
 void Notifier::StartSingle(double delay) {
@@ -85,11 +88,13 @@ void Notifier::StartSingle(double delay) {
 
 /**
  * Register for periodic event notification.
+ *
  * A timer event is queued for periodic event notification. Each time the
  * interrupt occurs, the event will be immediately requeued for the same time
  * interval.
- * @param period Period in seconds to call the handler starting one period after
- * the call to this method.
+ *
+ * @param period Period in seconds to call the handler starting one period
+ *               after the call to this method.
  */
 void Notifier::StartPeriodic(double period) {
   std::lock_guard<priority_mutex> sync(m_processMutex);
@@ -101,8 +106,10 @@ void Notifier::StartPeriodic(double period) {
 
 /**
  * Stop timer events from occuring.
+ *
  * Stop any repeating timer events from occuring. This will also remove any
  * single notification events from the queue.
+ *
  * If a timer-based call to the registered handler is in progress, this function
  * will block until the handler call is complete.
  */

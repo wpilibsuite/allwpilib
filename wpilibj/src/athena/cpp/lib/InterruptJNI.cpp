@@ -5,24 +5,26 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <jni.h>
 #include <assert.h>
+#include <jni.h>
 #include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <thread>
 #include "Log.hpp"
 
-#include "edu_wpi_first_wpilibj_hal_InterruptJNI.h"
 #include "HAL/Interrupts.hpp"
 #include "HALUtil.h"
 #include "SafeThread.h"
+#include "edu_wpi_first_wpilibj_hal_InterruptJNI.h"
 
 TLogLevel interruptJNILogLevel = logERROR;
 
-#define INTERRUPTJNI_LOG(level) \
-	if (level > interruptJNILogLevel) ; \
-	else Log().Get(level)
+#define INTERRUPTJNI_LOG(level)     \
+  if (level > interruptJNILogLevel) \
+    ;                               \
+  else                              \
+  Log().Get(level)
 
 // Thread where callbacks are actually performed.
 //
@@ -74,7 +76,7 @@ void InterruptJNI::SetFunc(JNIEnv* env, jobject func, jmethodID mid,
 }
 
 void InterruptThreadJNI::Main() {
-  JNIEnv *env;
+  JNIEnv* env;
   JavaVMAttachArgs args;
   args.version = JNI_VERSION_1_2;
   args.name = const_cast<char*>("Interrupt");
@@ -119,9 +121,9 @@ extern "C" {
  * Method:    initializeInterrupts
  * Signature: (IZ)J
  */
-JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_initializeInterrupts
-  (JNIEnv * env, jclass, jint interruptIndex, jboolean watcher)
-{
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_wpilibj_hal_InterruptJNI_initializeInterrupts(
+    JNIEnv* env, jclass, jint interruptIndex, jboolean watcher) {
   INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI initializeInterrupts";
   INTERRUPTJNI_LOG(logDEBUG) << "interruptIndex = " << interruptIndex;
   INTERRUPTJNI_LOG(logDEBUG) << "watcher = " << (bool)watcher;
@@ -136,15 +138,14 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_initializeIn
   return (jlong)interrupt;
 }
 
-
 /*
  * Class:     edu_wpi_first_wpilibj_hal_InterruptJNI
  * Method:    cleanInterrupts
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_cleanInterrupts
-  (JNIEnv * env, jclass, jlong interrupt_pointer)
-{
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_InterruptJNI_cleanInterrupts(
+    JNIEnv* env, jclass, jlong interrupt_pointer) {
   INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI cleanInterrupts";
   INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << (void*)interrupt_pointer;
 
@@ -161,9 +162,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_cleanInterrup
  * Method:    waitForInterrupt
  * Signature: (JD)V
  */
-JNIEXPORT int JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_waitForInterrupt
-  (JNIEnv * env, jclass, jlong interrupt_pointer, jdouble timeout, jboolean ignorePrevious)
-{
+JNIEXPORT int JNICALL
+Java_edu_wpi_first_wpilibj_hal_InterruptJNI_waitForInterrupt(
+    JNIEnv* env, jclass, jlong interrupt_pointer, jdouble timeout,
+    jboolean ignorePrevious) {
   INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI waitForInterrupt";
   INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << (void*)interrupt_pointer;
 
@@ -182,9 +184,9 @@ JNIEXPORT int JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_waitForInterru
  * Method:    enableInterrupts
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_enableInterrupts
-  (JNIEnv * env, jclass, jlong interrupt_pointer)
-{
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_InterruptJNI_enableInterrupts(
+    JNIEnv* env, jclass, jlong interrupt_pointer) {
   INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI enableInterrupts";
   INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << (void*)interrupt_pointer;
 
@@ -201,9 +203,9 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_enableInterru
  * Method:    disableInterrupts
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_disableInterrupts
-  (JNIEnv * env, jclass, jlong interrupt_pointer)
-{
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_InterruptJNI_disableInterrupts(
+    JNIEnv* env, jclass, jlong interrupt_pointer) {
   INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI disableInterrupts";
   INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << (void*)interrupt_pointer;
 
@@ -220,9 +222,9 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_disableInterr
  * Method:    readRisingTimestamp
  * Signature: (J)D
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readRisingTimestamp
-  (JNIEnv * env, jclass, jlong interrupt_pointer)
-{
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readRisingTimestamp(
+    JNIEnv* env, jclass, jlong interrupt_pointer) {
   INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI readRisingTimestamp";
   INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << (void*)interrupt_pointer;
 
@@ -239,9 +241,9 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readRising
  * Method:    readFallingTimestamp
  * Signature: (J)D
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readFallingTimestamp
-  (JNIEnv * env, jclass, jlong interrupt_pointer)
-{
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readFallingTimestamp(
+    JNIEnv* env, jclass, jlong interrupt_pointer) {
   INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI readFallingTimestamp";
   INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << (void*)interrupt_pointer;
 
@@ -258,14 +260,16 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readFallin
  * Method:    requestInterrupts
  * Signature: (JBIZ)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_requestInterrupts
-  (JNIEnv * env, jclass, jlong interrupt_pointer, jbyte routing_module, jint routing_pin, jboolean routing_analog_trigger)
-{
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_InterruptJNI_requestInterrupts(
+    JNIEnv* env, jclass, jlong interrupt_pointer, jbyte routing_module,
+    jint routing_pin, jboolean routing_analog_trigger) {
   INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI requestInterrupts";
   INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << (void*)interrupt_pointer;
   INTERRUPTJNI_LOG(logDEBUG) << "routing module = " << (jint)routing_module;
   INTERRUPTJNI_LOG(logDEBUG) << "routing pin = " << routing_pin;
-  INTERRUPTJNI_LOG(logDEBUG) << "routing analog trigger = " << (jint)routing_analog_trigger;
+  INTERRUPTJNI_LOG(logDEBUG) << "routing analog trigger = "
+                             << (jint)routing_analog_trigger;
 
   int32_t status = 0;
   requestInterrupts((void*)interrupt_pointer, (uint8_t)routing_module,
@@ -278,11 +282,13 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_requestInterr
 /*
  * Class:     edu_wpi_first_wpilibj_hal_InterruptJNI
  * Method:    attachInterruptHandler
- * Signature: (JLedu/wpi/first/wpilibj/hal/InterruptJNI/InterruptHandlerFunction;Ljava/nio/ByteBuffer;)V
+ * Signature:
+ * (JLedu/wpi/first/wpilibj/hal/InterruptJNI/InterruptHandlerFunction;Ljava/nio/ByteBuffer;)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_attachInterruptHandler
-  (JNIEnv * env, jclass, jlong interrupt_pointer, jobject handler, jobject param)
-{
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_InterruptJNI_attachInterruptHandler(
+    JNIEnv* env, jclass, jlong interrupt_pointer, jobject handler,
+    jobject param) {
   INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI attachInterruptHandler";
   INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << (void*)interrupt_pointer;
 
@@ -320,9 +326,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_attachInterru
  * Method:    setInterruptUpSourceEdge
  * Signature: (JZZ)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_InterruptJNI_setInterruptUpSourceEdge
-  (JNIEnv * env, jclass, jlong interrupt_pointer, jboolean risingEdge, jboolean fallingEdge)
-{
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_InterruptJNI_setInterruptUpSourceEdge(
+    JNIEnv* env, jclass, jlong interrupt_pointer, jboolean risingEdge,
+    jboolean fallingEdge) {
   INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI setInterruptUpSourceEdge";
   INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << (void*)interrupt_pointer;
   INTERRUPTJNI_LOG(logDEBUG) << "Rising Edge = " << (bool)risingEdge;

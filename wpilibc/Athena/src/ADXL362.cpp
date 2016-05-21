@@ -19,13 +19,13 @@ static uint8_t kDataRegister = 0x0E;
 static uint8_t kFilterCtlRegister = 0x2C;
 static uint8_t kPowerCtlRegister = 0x2D;
 
-//static uint8_t kFilterCtl_Range2G = 0x00;
-//static uint8_t kFilterCtl_Range4G = 0x40;
-//static uint8_t kFilterCtl_Range8G = 0x80;
+// static uint8_t kFilterCtl_Range2G = 0x00;
+// static uint8_t kFilterCtl_Range4G = 0x40;
+// static uint8_t kFilterCtl_Range8G = 0x80;
 static uint8_t kFilterCtl_ODR_100Hz = 0x03;
 
 static uint8_t kPowerCtl_UltraLowNoise = 0x20;
-//static uint8_t kPowerCtl_AutoSleep = 0x04;
+// static uint8_t kPowerCtl_AutoSleep = 0x04;
 static uint8_t kPowerCtl_Measure = 0x02;
 
 /**
@@ -38,7 +38,7 @@ ADXL362::ADXL362(Range range) : ADXL362(SPI::Port::kOnboardCS1, range) {}
 /**
  * Constructor.
  *
- * @param port The SPI port the accelerometer is attached to
+ * @param port  The SPI port the accelerometer is attached to
  * @param range The range (+ or -) that the accelerometer will measure.
  */
 ADXL362::ADXL362(SPI::Port port, Range range) : m_spi(port) {
@@ -128,7 +128,7 @@ double ADXL362::GetAcceleration(ADXL362::Axes axis) {
  * Get the acceleration of all axes in Gs.
  *
  * @return An object containing the acceleration measured on each axis of the
- * ADXL362 in Gs.
+ *         ADXL362 in Gs.
  */
 ADXL362::AllAxes ADXL362::GetAccelerations() {
   AllAxes data = AllAxes();

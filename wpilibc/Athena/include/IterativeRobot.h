@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "Timer.h"
 #include "RobotBase.h"
+#include "Timer.h"
 
 /**
  * IterativeRobot implements a specific type of Robot Program framework,
@@ -18,8 +18,7 @@
  * robot program.
  *
  * This class is intended to implement the "old style" default code, by
- * providing
- * the following functions which are called by the main loop,
+ * providing the following functions which are called by the main loop,
  * StartCompetition(), at the appropriate times:
  *
  * RobotInit() -- provide for initialization at robot power-on
@@ -28,19 +27,17 @@
  *                     appropriate mode is entered:
  *  - DisabledInit()   -- called only when first disabled
  *  - AutonomousInit() -- called each and every time autonomous is entered from
- * another mode
+ *                        another mode
  *  - TeleopInit()     -- called each and every time teleop is entered from
- * another mode
+ *                        another mode
  *  - TestInit()       -- called each and every time test is entered from
- * another mode
+ *                        another mode
  *
  * Periodic() functions -- each of these functions is called iteratively at the
  *                         appropriate periodic rate (aka the "slow loop").  The
- * default period of
- *                         the iterative robot is synced to the driver station
- * control packets,
- *                         giving a periodic frequency of about 50Hz (50 times
- * per second).
+ *                         default period of the iterative robot is synced to
+ *                         the driver station control packets, giving a periodic
+ *                         frequency of about 50Hz (50 times per second).
  *   - DisabledPeriodic()
  *   - AutonomousPeriodic()
  *   - TeleopPeriodic()

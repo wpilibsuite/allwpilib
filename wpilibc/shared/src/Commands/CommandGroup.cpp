@@ -12,24 +12,21 @@
  * Creates a new {@link CommandGroup CommandGroup} with the given name.
  * @param name the name for this command group
  */
-CommandGroup::CommandGroup(const std::string &name) : Command(name) {}
+CommandGroup::CommandGroup(const std::string& name) : Command(name) {}
 
 /**
  * Adds a new {@link Command Command} to the group.  The {@link Command Command}
- * will be started after
- * all the previously added {@link Command Commands}.
+ * will be started after all the previously added {@link Command Commands}.
  *
  * <p>Note that any requirements the given {@link Command Command} has will be
- * added to the
- * group.  For this reason, a {@link Command Command's} requirements can not be
- * changed after
- * being added to a group.</p>
+ * added to the group.  For this reason, a {@link Command Command's}
+ * requirements can not be changed after being added to a group.</p>
  *
  * <p>It is recommended that this method be called in the constructor.</p>
  *
  * @param command The {@link Command Command} to be added
  */
-void CommandGroup::AddSequential(Command *command) {
+void CommandGroup::AddSequential(Command* command) {
   if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
     return;
@@ -53,23 +50,19 @@ void CommandGroup::AddSequential(Command *command) {
  * commands.
  *
  * <p>Once the {@link Command Command} is started, it will be run until it
- * finishes or the time
- * expires, whichever is sooner.  Note that the given {@link Command Command}
- * will have no
- * knowledge that it is on a timer.</p>
+ * finishes or the time expires, whichever is sooner.  Note that the given
+ * {@link Command Command} will have no knowledge that it is on a timer.</p>
  *
  * <p>Note that any requirements the given {@link Command Command} has will be
- * added to the
- * group.  For this reason, a {@link Command Command's} requirements can not be
- * changed after
- * being added to a group.</p>
+ * added to the group.  For this reason, a {@link Command Command's}
+ * requirements can not be changed after being added to a group.</p>
  *
  * <p>It is recommended that this method be called in the constructor.</p>
  *
  * @param command The {@link Command Command} to be added
  * @param timeout The timeout (in seconds)
  */
-void CommandGroup::AddSequential(Command *command, double timeout) {
+void CommandGroup::AddSequential(Command* command, double timeout) {
   if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
     return;
@@ -93,30 +86,24 @@ void CommandGroup::AddSequential(Command *command, double timeout) {
 
 /**
  * Adds a new child {@link Command} to the group.  The {@link Command} will be
- * started after
- * all the previously added {@link Command Commands}.
+ * started after all the previously added {@link Command Commands}.
  *
  * <p>Instead of waiting for the child to finish, a {@link CommandGroup} will
- * have it
- * run at the same time as the subsequent {@link Command Commands}.  The child
- * will run until either
- * it finishes, a new child with conflicting requirements is started, or
- * the main sequence runs a {@link Command} with conflicting requirements.  In
- * the latter
- * two cases, the child will be canceled even if it says it can't be
- * interrupted.</p>
+ * have it run at the same time as the subsequent {@link Command Commands}.
+ * The child will run until either it finishes, a new child with conflicting
+ * requirements is started, or the main sequence runs a {@link Command} with
+ * conflicting requirements.  In the latter two cases, the child will be
+ * canceled even if it says it can't be interrupted.</p>
  *
  * <p>Note that any requirements the given {@link Command Command} has will be
- * added to the
- * group.  For this reason, a {@link Command Command's} requirements can not be
- * changed after
- * being added to a group.</p>
+ * added to the group.  For this reason, a {@link Command Command's}
+ * requirements can not be changed after being added to a group.</p>
  *
  * <p>It is recommended that this method be called in the constructor.</p>
  *
  * @param command The command to be added
  */
-void CommandGroup::AddParallel(Command *command) {
+void CommandGroup::AddParallel(Command* command) {
   if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
     return;
@@ -136,38 +123,31 @@ void CommandGroup::AddParallel(Command *command) {
 
 /**
  * Adds a new child {@link Command} to the group with the given timeout.  The
- * {@link Command} will be started after
- * all the previously added {@link Command Commands}.
+ * {@link Command} will be started after all the previously added
+ * {@link Command Commands}.
  *
  * <p>Once the {@link Command Command} is started, it will run until it
- * finishes, is interrupted,
- * or the time expires, whichever is sooner.  Note that the given {@link Command
- * Command} will have no
- * knowledge that it is on a timer.</p>
+ * finishes, is interrupted, or the time expires, whichever is sooner.  Note
+ * that the given {@link Command Command} will have no knowledge that it is on
+ * a timer.</p>
  *
  * <p>Instead of waiting for the child to finish, a {@link CommandGroup} will
- * have it
- * run at the same time as the subsequent {@link Command Commands}.  The child
- * will run until either
- * it finishes, the timeout expires, a new child with conflicting requirements
- * is started, or
- * the main sequence runs a {@link Command} with conflicting requirements.  In
- * the latter
- * two cases, the child will be canceled even if it says it can't be
- * interrupted.</p>
+ * have it run at the same time as the subsequent {@link Command Commands}.
+ * The child will run until either it finishes, the timeout expires, a new
+ * child with conflicting requirements is started, or the main sequence runs a
+ * {@link Command} with conflicting requirements.  In the latter two cases, the
+ * child will be canceled even if it says it can't be interrupted.</p>
  *
  * <p>Note that any requirements the given {@link Command Command} has will be
- * added to the
- * group.  For this reason, a {@link Command Command's} requirements can not be
- * changed after
- * being added to a group.</p>
+ * added to the group.  For this reason, a {@link Command Command's}
+ * requirements can not be changed after being added to a group.</p>
  *
  * <p>It is recommended that this method be called in the constructor.</p>
  *
  * @param command The command to be added
  * @param timeout The timeout (in seconds)
  */
-void CommandGroup::AddParallel(Command *command, double timeout) {
+void CommandGroup::AddParallel(Command* command, double timeout) {
   if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
     return;
@@ -193,7 +173,7 @@ void CommandGroup::_Initialize() { m_currentCommandIndex = -1; }
 
 void CommandGroup::_Execute() {
   CommandGroupEntry entry;
-  Command *cmd = nullptr;
+  Command* cmd = nullptr;
   bool firstRun = false;
 
   if (m_currentCommandIndex == -1) {
@@ -247,7 +227,7 @@ void CommandGroup::_Execute() {
   auto iter = m_children.begin();
   for (; iter != m_children.end();) {
     entry = *iter;
-    Command *child = entry.m_command;
+    Command* child = entry.m_command;
     if (entry.IsTimedOut()) child->_Cancel();
 
     if (!child->Run()) {
@@ -264,14 +244,14 @@ void CommandGroup::_End() {
   // IsFinished method
   if (m_currentCommandIndex != -1 &&
       (unsigned)m_currentCommandIndex < m_commands.size()) {
-    Command *cmd = m_commands[m_currentCommandIndex].m_command;
+    Command* cmd = m_commands[m_currentCommandIndex].m_command;
     cmd->_Cancel();
     cmd->Removed();
   }
 
   auto iter = m_children.begin();
   for (; iter != m_children.end(); iter++) {
-    Command *cmd = iter->m_command;
+    Command* cmd = iter->m_command;
     cmd->_Cancel();
     cmd->Removed();
   }
@@ -302,7 +282,7 @@ bool CommandGroup::IsInterruptible() const {
 
   if (m_currentCommandIndex != -1 &&
       (unsigned)m_currentCommandIndex < m_commands.size()) {
-    Command *cmd = m_commands[m_currentCommandIndex].m_command;
+    Command* cmd = m_commands[m_currentCommandIndex].m_command;
     if (!cmd->IsInterruptible()) return false;
   }
 
@@ -314,10 +294,10 @@ bool CommandGroup::IsInterruptible() const {
   return true;
 }
 
-void CommandGroup::CancelConflicts(Command *command) {
+void CommandGroup::CancelConflicts(Command* command) {
   auto childIter = m_children.begin();
   for (; childIter != m_children.end();) {
-    Command *child = childIter->m_command;
+    Command* child = childIter->m_command;
     bool erased = false;
 
     Command::SubsystemSet requirements = command->GetRequirements();

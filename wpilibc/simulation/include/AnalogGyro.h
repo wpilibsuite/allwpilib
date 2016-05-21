@@ -17,34 +17,35 @@ class AnalogModule;
 
 /**
  * Use a rate gyro to return the robots heading relative to a starting position.
- * The AnalogGyro class tracks the robots heading based on the starting position. As the robot
- * rotates the new heading is computed by integrating the rate of rotation returned
- * by the sensor. When the class is instantiated, it does a short calibration routine
- * where it samples the gyro while at rest to determine the default offset. This is
- * subtracted from each sample to determine the heading. This gyro class must be used
- * with a channel that is assigned one of the Analog accumulators from the FPGA. See
- * AnalogInput for the current accumulator assignments.
+ *
+ * The AnalogGyro class tracks the robots heading based on the starting
+ * position. As the robot rotates the new heading is computed by integrating
+ * the rate of rotation returned by the sensor. When the class is instantiated,
+ * it does a short calibration routine where it samples the gyro while at rest
+ * to determine the default offset. This is subtracted from each sample to
+ * determine the heading. This gyro class must be used with a channel that is
+ * assigned one of the Analog accumulators from the FPGA. See AnalogInput for
+ * the current accumulator assignments.
  */
-class AnalogGyro : public GyroBase
-{
-public:
-	static const uint32_t kOversampleBits;
-	static const uint32_t kAverageBits;
-	static const float kSamplesPerSecond;
-	static const float kCalibrationSampleTime;
-	static const float kDefaultVoltsPerDegreePerSecond;
+class AnalogGyro : public GyroBase {
+ public:
+  static const uint32_t kOversampleBits;
+  static const uint32_t kAverageBits;
+  static const float kSamplesPerSecond;
+  static const float kCalibrationSampleTime;
+  static const float kDefaultVoltsPerDegreePerSecond;
 
-	explicit AnalogGyro(uint32_t channel);
-	virtual ~AnalogGyro() = default;
-	float GetAngle() const;
-	void Calibrate() override;
-	double GetRate() const;
-	void Reset();
+  explicit AnalogGyro(uint32_t channel);
+  virtual ~AnalogGyro() = default;
+  float GetAngle() const;
+  void Calibrate() override;
+  double GetRate() const;
+  void Reset();
 
-private:
-	void InitAnalogGyro(int channel);
+ private:
+  void InitAnalogGyro(int channel);
 
-	SimGyro* impl;
+  SimGyro* impl;
 
-	std::shared_ptr<ITable> m_table;
+  std::shared_ptr<ITable> m_table;
 };

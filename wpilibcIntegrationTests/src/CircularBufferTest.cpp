@@ -6,21 +6,18 @@
 /*----------------------------------------------------------------------------*/
 
 #include <CircularBuffer.h>
-#include "gtest/gtest.h"
 #include <array>
+#include "gtest/gtest.h"
 
-static const std::array<double, 10> values = {751.848, 766.366, 342.657,
-                                              234.252, 716.126, 132.344,
-                                              445.697, 22.727, 421.125,
-                                              799.913};
+static const std::array<double, 10> values = {
+    751.848, 766.366, 342.657, 234.252, 716.126,
+    132.344, 445.697, 22.727,  421.125, 799.913};
 
-static const std::array<double, 8> pushFrontOut = {799.913, 421.125, 22.727,
-                                                   445.697, 132.344, 716.126,
-                                                   234.252, 342.657};
+static const std::array<double, 8> pushFrontOut = {
+    799.913, 421.125, 22.727, 445.697, 132.344, 716.126, 234.252, 342.657};
 
-static const std::array<double, 8> pushBackOut = {342.657, 234.252, 716.126,
-                                                  132.344, 445.697, 22.727,
-                                                  421.125, 799.913};
+static const std::array<double, 8> pushBackOut = {
+    342.657, 234.252, 716.126, 132.344, 445.697, 22.727, 421.125, 799.913};
 
 TEST(CircularBufferTest, PushFrontTest) {
   CircularBuffer<double> queue(8);
@@ -63,27 +60,27 @@ TEST(CircularBufferTest, PushPopTest) {
    * front-most elements.
    */
 
-  queue.PushBack(4.0); // Overwrite 1 with 4
+  queue.PushBack(4.0);  // Overwrite 1 with 4
 
   // The buffer now contains 2, 3 and 4
   EXPECT_EQ(2.0, queue[0]);
   EXPECT_EQ(3.0, queue[1]);
   EXPECT_EQ(4.0, queue[2]);
 
-  queue.PushBack(5.0); // Overwrite 2 with 5
+  queue.PushBack(5.0);  // Overwrite 2 with 5
 
   // The buffer now contains 3, 4 and 5
   EXPECT_EQ(3.0, queue[0]);
   EXPECT_EQ(4.0, queue[1]);
   EXPECT_EQ(5.0, queue[2]);
 
-  EXPECT_EQ(5.0, queue.PopBack()); // 5 is removed
+  EXPECT_EQ(5.0, queue.PopBack());  // 5 is removed
 
   // The buffer now contains 3 and 4
   EXPECT_EQ(3.0, queue[0]);
   EXPECT_EQ(4.0, queue[1]);
 
-  EXPECT_EQ(3.0, queue.PopFront()); // 3 is removed
+  EXPECT_EQ(3.0, queue.PopFront());  // 3 is removed
 
   // Leaving only one element with value == 4
   EXPECT_EQ(4.0, queue[0]);

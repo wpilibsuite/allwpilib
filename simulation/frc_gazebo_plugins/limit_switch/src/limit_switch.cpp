@@ -20,11 +20,12 @@ void LimitSwitch::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   if (sdf->HasElement("topic")) {
     topic = sdf->Get<std::string>("topic");
   } else {
-    topic = "~/"+sdf->GetAttribute("name")->GetAsString();
+    topic = "~/" + sdf->GetAttribute("name")->GetAsString();
   }
   std::string type = sdf->Get<std::string>("type");
 
-  gzmsg << "Initializing limit switch: " << topic << " type=" << type << std::endl;
+  gzmsg << "Initializing limit switch: " << topic << " type=" << type
+        << std::endl;
   if (type == "internal") {
     ls = new InternalLimitSwitch(model, sdf);
   } else if (type == "external") {
@@ -34,7 +35,8 @@ void LimitSwitch::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   }
 
   // Connect to Gazebo transport for messaging
-  std::string scoped_name = model->GetWorld()->GetName()+"::"+model->GetScopedName();
+  std::string scoped_name =
+      model->GetWorld()->GetName() + "::" + model->GetScopedName();
   boost::replace_all(scoped_name, "::", "/");
   node = transport::NodePtr(new transport::Node());
   node->Init(scoped_name);
@@ -42,10 +44,11 @@ void LimitSwitch::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
 
   // Connect to the world update event.
   // This will trigger the Update function every Gazebo iteration
-  updateConn = event::Events::ConnectWorldUpdateBegin(boost::bind(&LimitSwitch::Update, this, _1));
+  updateConn = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&LimitSwitch::Update, this, _1));
 }
 
-void LimitSwitch::Update(const common::UpdateInfo &info) {
+void LimitSwitch::Update(const common::UpdateInfo& info) {
   msgs::Bool msg;
   msg.set_data(ls->Get());
   pub->Publish(msg);

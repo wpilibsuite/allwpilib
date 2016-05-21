@@ -20,18 +20,17 @@ priority_recursive_mutex MotorSafetyHelper::m_listMutex;
 
 /**
  * The constructor for a MotorSafetyHelper object.
+ *
  * The helper object is constructed for every object that wants to implement the
- * Motor
- * Safety protocol. The helper object has the code to actually do the timing and
- * call the
- * motors Stop() method when the timeout expires. The motor object is expected
- * to call the
- * Feed() method whenever the motors value is updated.
+ * Motor Safety protocol. The helper object has the code to actually do the
+ * timing and call the motors Stop() method when the timeout expires. The motor
+ * object is expected to call the Feed() method whenever the motors value is
+ * updated.
+ *
  * @param safeObject a pointer to the motor object implementing MotorSafety.
- * This is used
- * to call the Stop() method on the motor.
+ *                   This is used to call the Stop() method on the motor.
  */
-MotorSafetyHelper::MotorSafetyHelper(MotorSafety *safeObject)
+MotorSafetyHelper::MotorSafetyHelper(MotorSafety* safeObject)
     : m_safeObject(safeObject) {
   m_enabled = false;
   m_expiration = DEFAULT_SAFETY_EXPIRATION;
@@ -48,6 +47,7 @@ MotorSafetyHelper::~MotorSafetyHelper() {
 
 /**
  * Feed the motor safety object.
+ *
  * Resets the timer on this object that is used to do the timeouts.
  */
 void MotorSafetyHelper::Feed() {
@@ -57,6 +57,7 @@ void MotorSafetyHelper::Feed() {
 
 /**
  * Set the expiration time for the corresponding motor safety object.
+ *
  * @param expirationTime The timeout value in seconds.
  */
 void MotorSafetyHelper::SetExpiration(float expirationTime) {
@@ -66,6 +67,7 @@ void MotorSafetyHelper::SetExpiration(float expirationTime) {
 
 /**
  * Retrieve the timeout value for the corresponding motor safety object.
+ *
  * @return the timeout value in seconds.
  */
 float MotorSafetyHelper::GetExpiration() const {
@@ -75,8 +77,9 @@ float MotorSafetyHelper::GetExpiration() const {
 
 /**
  * Determine if the motor is still operating or has timed out.
+ *
  * @return a true value if the motor is still operating normally and hasn't
- * timed out.
+ *         timed out.
  */
 bool MotorSafetyHelper::IsAlive() const {
   std::lock_guard<priority_recursive_mutex> sync(m_syncMutex);
@@ -85,30 +88,30 @@ bool MotorSafetyHelper::IsAlive() const {
 
 /**
  * Check if this motor has exceeded its timeout.
+ *
  * This method is called periodically to determine if this motor has exceeded
- * its timeout
- * value. If it has, the stop method is called, and the motor is shut down until
- * its value is
- * updated again.
+ * its timeout value. If it has, the stop method is called, and the motor is
+ * shut down until its value is updated again.
  */
-void MotorSafetyHelper::Check()
-{
-	DriverStation &ds = DriverStation::GetInstance();
-	if (!m_enabled || ds.IsDisabled() || ds.IsTest()) return;
+void MotorSafetyHelper::Check() {
+  DriverStation& ds = DriverStation::GetInstance();
+  if (!m_enabled || ds.IsDisabled() || ds.IsTest()) return;
 
   std::lock_guard<priority_recursive_mutex> sync(m_syncMutex);
   if (m_stopTime < Timer::GetFPGATimestamp()) {
     std::ostringstream desc;
     m_safeObject->GetDescription(desc);
-    desc <<  "... Output not updated often enough.";
+    desc << "... Output not updated often enough.";
     wpi_setWPIErrorWithContext(Timeout, desc.str().c_str());
     m_safeObject->StopMotor();
   }
 }
 
 /**
- * Enable/disable motor safety for this device
+ * Enable/disable motor safety for this device.
+ *
  * Turn on and off the motor safety option for this PWM object.
+ *
  * @param enabled True if motor safety is enforced for this object
  */
 void MotorSafetyHelper::SetSafetyEnabled(bool enabled) {
@@ -117,8 +120,10 @@ void MotorSafetyHelper::SetSafetyEnabled(bool enabled) {
 }
 
 /**
- * Return the state of the motor safety enabled flag
+ * Return the state of the motor safety enabled flag.
+ *
  * Return if the motor safety is currently enabled for this devicce.
+ *
  * @return True if motor safety is enforced for this device
  */
 bool MotorSafetyHelper::IsSafetyEnabled() const {
@@ -128,9 +133,9 @@ bool MotorSafetyHelper::IsSafetyEnabled() const {
 
 /**
  * Check the motors to see if any have timed out.
- * This static  method is called periodically to poll all the motors and stop
- * any that have
- * timed out.
+ *
+ * This static method is called periodically to poll all the motors and stop
+ * any that have timed out.
  */
 void MotorSafetyHelper::CheckMotors() {
   std::lock_guard<priority_recursive_mutex> sync(m_listMutex);

@@ -9,10 +9,9 @@
 
 #include "simulation/gz_msgs/msgs.h"
 
+#include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/transport.hh>
-#include <gazebo/gazebo.hh>
-
 
 using namespace gazebo;
 
@@ -38,12 +37,14 @@ using namespace gazebo;
  *     </plugin>
  *
  * - `joint`: Name of the joint this encoder is attached to.
- * - `topic`: Optional. Used as the root for subtopics. `topic`/position (gazebo.msgs.Float64),
- *            `topic`/velocity (gazebo.msgs.Float64), `topic`/control (gazebo.msgs.String)
+ * - `topic`: Optional. Used as the root for subtopics. `topic`/position
+ * (gazebo.msgs.Float64),
+ *            `topic`/velocity (gazebo.msgs.Float64), `topic`/control
+ * (gazebo.msgs.String)
  * - `units`: Optional. Defaults to radians.
  */
-class Encoder: public ModelPlugin {
-public:
+class Encoder : public ModelPlugin {
+ public:
   Encoder();
   ~Encoder();
 
@@ -51,9 +52,9 @@ public:
   void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
 
   /// \brief Sends out the encoder reading each timestep.
-  void Update(const common::UpdateInfo &info);
+  void Update(const common::UpdateInfo& info);
 
-private:
+ private:
   /// \brief Root topic for subtopics on this topic.
   std::string topic;
 
@@ -73,7 +74,7 @@ private:
   physics::JointPtr joint;
 
   /// \brief Callback for handling control data
-  void Callback(const msgs::ConstStringPtr &msg);
+  void Callback(const msgs::ConstStringPtr& msg);
 
   /// \brief Gets the current angle, taking into account whether to
   ///        return radians or degrees.
@@ -83,9 +84,10 @@ private:
   ///        return radians/second or degrees/second.
   double GetVelocity();
 
-  physics::ModelPtr model;                  ///< \brief The model that this is attached to.
-  event::ConnectionPtr updateConn;          ///< \brief Pointer to the world update function.
-  transport::NodePtr node;                  ///< \brief The node we're advertising on.
-  transport::SubscriberPtr command_sub;     ///< \brief Subscriber handle.
-  transport::PublisherPtr pos_pub, vel_pub; ///< \brief Publisher handles.
+  physics::ModelPtr model;  ///< \brief The model that this is attached to.
+  event::ConnectionPtr
+      updateConn;           ///< \brief Pointer to the world update function.
+  transport::NodePtr node;  ///< \brief The node we're advertising on.
+  transport::SubscriberPtr command_sub;      ///< \brief Subscriber handle.
+  transport::PublisherPtr pos_pub, vel_pub;  ///< \brief Publisher handles.
 };

@@ -8,14 +8,14 @@
 #ifndef __NETWORK_BUTTON_H__
 #define __NETWORK_BUTTON_H__
 
-#include "Buttons/Button.h"
-#include <string>
 #include <memory>
+#include <string>
+#include "Buttons/Button.h"
 
 class NetworkButton : public Button {
  public:
-  NetworkButton(const std::string &tableName, const std::string &field);
-  NetworkButton(std::shared_ptr<ITable> table, const std::string &field);
+  NetworkButton(const std::string& tableName, const std::string& field);
+  NetworkButton(std::shared_ptr<ITable> table, const std::string& field);
   virtual ~NetworkButton() = default;
 
   virtual bool Get();

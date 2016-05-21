@@ -10,8 +10,10 @@
 
 /**
  * Create a new instance of an ImageBase.
- * Imagebase is the base of all the other image classes. The constructor
+ *
+ * ImageBase is the base of all the other image classes. The constructor
  * creates any type of image and stores the pointer to it in the class.
+ *
  * @param type The type of image to create
  */
 ImageBase::ImageBase(ImageType type) {
@@ -20,6 +22,7 @@ ImageBase::ImageBase(ImageType type) {
 
 /**
  * Frees memory associated with an ImageBase.
+ *
  * Destructor frees the imaq image allocated with the class.
  */
 ImageBase::~ImageBase() {
@@ -28,16 +31,17 @@ ImageBase::~ImageBase() {
 
 /**
  * Writes an image to a file with the given filename.
- * Write the image to a file in the flash on the cRIO.
+ *
  * @param fileName The name of the file to write
  */
-void ImageBase::Write(const char *fileName) {
+void ImageBase::Write(const char* fileName) {
   int success = imaqWriteFile(m_imaqImage, fileName, nullptr);
   wpi_setImaqErrorWithContext(success, "Imaq Image writeFile error");
 }
 
 /**
  * Gets the height of an image.
+ *
  * @return The height of the image in pixels.
  */
 int ImageBase::GetHeight() {
@@ -48,6 +52,7 @@ int ImageBase::GetHeight() {
 
 /**
  * Gets the width of an image.
+ *
  * @return The width of the image in pixels.
  */
 int ImageBase::GetWidth() {
@@ -61,4 +66,4 @@ int ImageBase::GetWidth() {
  *
  * @return A pointer to the internal IMAQ Image data structure.
  */
-Image *ImageBase::GetImaqImage() { return m_imaqImage; }
+Image* ImageBase::GetImaqImage() { return m_imaqImage; }

@@ -6,15 +6,15 @@
 /*----------------------------------------------------------------------------*/
 
 #include "CameraServer.h"
-#include "WPIErrors.h"
 #include "Utility.h"
+#include "WPIErrors.h"
 
-#include <iostream>
-#include <chrono>
-#include <cstring>
+#include <netdb.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <netdb.h>
+#include <chrono>
+#include <cstring>
+#include <iostream>
 
 constexpr uint8_t CameraServer::kMagicNumber[];
 
@@ -210,8 +210,7 @@ void CameraServer::Serve() {
     req.size = ntohl(req.size);
 
     // TODO: Support the SW Compression. The rest of the code below will work as
-    // though this
-    // check isn't here
+    // though this check isn't here
     if (req.compression != kHardwareCompression) {
       wpi_setWPIErrorWithContext(IncompatibleState,
                                  "Choose \"USB Camera HW\" on the dashboard");

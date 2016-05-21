@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/HAL.hpp"
 #include <atomic>
+#include "HAL/HAL.hpp"
 
 /**
  * Create and launch a task.
@@ -24,10 +24,11 @@ Task::Task(const std::string& name, Function&& function, Args&&... args) {
 
   m_thread = std::thread(std::forward<std::decay_t<Function>>(function),
                          std::forward<Args>(args)...);
-  //TODO: lvuser does not currently have permissions to set the priority.
-  //SetPriority(kDefaultPriority);
+  // TODO: lvuser does not currently have permissions to set the priority.
+  // SetPriority(kDefaultPriority);
 
   static std::atomic<int32_t> instances{0};
   instances++;
-  HALReport(HALUsageReporting::kResourceType_Task, instances, 0, m_taskName.c_str());
+  HALReport(HALUsageReporting::kResourceType_Task, instances, 0,
+            m_taskName.c_str());
 }

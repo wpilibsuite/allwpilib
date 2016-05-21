@@ -12,12 +12,14 @@
 /**
  * Instantiates a {@link PIDSubsystem} that will use the given p, i and d
  * values.
+ *
  * @param name the name
- * @param p the proportional value
- * @param i the integral value
- * @param d the derivative value
+ * @param p    the proportional value
+ * @param i    the integral value
+ * @param d    the derivative value
  */
-PIDSubsystem::PIDSubsystem(const std::string &name, double p, double i, double d)
+PIDSubsystem::PIDSubsystem(const std::string& name, double p, double i,
+                           double d)
     : Subsystem(name) {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this);
 }
@@ -25,39 +27,46 @@ PIDSubsystem::PIDSubsystem(const std::string &name, double p, double i, double d
 /**
  * Instantiates a {@link PIDSubsystem} that will use the given p, i and d
  * values.
+ *
  * @param name the name
- * @param p the proportional value
- * @param i the integral value
- * @param d the derivative value
- * @param f the feedforward value
+ * @param p    the proportional value
+ * @param i    the integral value
+ * @param d    the derivative value
+ * @param f    the feedforward value
  */
-PIDSubsystem::PIDSubsystem(const std::string &name, double p, double i, double d,
-                           double f)
+PIDSubsystem::PIDSubsystem(const std::string& name, double p, double i,
+                           double d, double f)
     : Subsystem(name) {
   m_controller = std::make_shared<PIDController>(p, i, d, f, this, this);
 }
 
 /**
  * Instantiates a {@link PIDSubsystem} that will use the given p, i and d
- * values.  It will also space the time
- * between PID loop calculations to be equal to the given period.
- * @param name the name
- * @param p the proportional value
- * @param i the integral value
- * @param d the derivative value
- * @param f the feedfoward value
+ * values.
+ *
+ * It will also space the time between PID loop calculations to be equal to the
+ * given period.
+ *
+ * @param name   the name
+ * @param p      the proportional value
+ * @param i      the integral value
+ * @param d      the derivative value
+ * @param f      the feedfoward value
  * @param period the time (in seconds) between calculations
  */
-PIDSubsystem::PIDSubsystem(const std::string &name, double p, double i, double d,
-                           double f, double period)
+PIDSubsystem::PIDSubsystem(const std::string& name, double p, double i,
+                           double d, double f, double period)
     : Subsystem(name) {
-  m_controller = std::make_shared<PIDController>(p, i, d, f, this, this, period);
+  m_controller =
+      std::make_shared<PIDController>(p, i, d, f, this, this, period);
 }
 
 /**
  * Instantiates a {@link PIDSubsystem} that will use the given p, i and d
  * values.
+ *
  * It will use the class name as its name.
+ *
  * @param p the proportional value
  * @param i the integral value
  * @param d the derivative value
@@ -70,7 +79,9 @@ PIDSubsystem::PIDSubsystem(double p, double i, double d)
 /**
  * Instantiates a {@link PIDSubsystem} that will use the given p, i and d
  * values.
+ *
  * It will use the class name as its name.
+ *
  * @param p the proportional value
  * @param i the integral value
  * @param d the derivative value
@@ -84,33 +95,36 @@ PIDSubsystem::PIDSubsystem(double p, double i, double d, double f)
 /**
  * Instantiates a {@link PIDSubsystem} that will use the given p, i and d
  * values.
- * It will use the class name as its name.
- * It will also space the time
+ *
+ * It will use the class name as its name. It will also space the time
  * between PID loop calculations to be equal to the given period.
- * @param p the proportional value
- * @param i the integral value
- * @param d the derivative value
- * @param f the feedforward value
+ *
+ * @param p      the proportional value
+ * @param i      the integral value
+ * @param d      the derivative value
+ * @param f      the feedforward value
  * @param period the time (in seconds) between calculations
  */
 PIDSubsystem::PIDSubsystem(double p, double i, double d, double f,
                            double period)
     : Subsystem("PIDSubsystem") {
-  m_controller = std::make_shared<PIDController>(p, i, d, f, this, this, period);
+  m_controller =
+      std::make_shared<PIDController>(p, i, d, f, this, this, period);
 }
 
 /**
- * Enables the internal {@link PIDController}
+ * Enables the internal {@link PIDController}.
  */
 void PIDSubsystem::Enable() { m_controller->Enable(); }
 
 /**
-  * Disables the internal {@link PIDController}
+  * Disables the internal {@link PIDController}.
   */
 void PIDSubsystem::Disable() { m_controller->Disable(); }
 
 /**
  * Returns the {@link PIDController} used by this {@link PIDSubsystem}.
+ *
  * Use this if you would like to fine tune the pid loop.
  *
  * @return the {@link PIDController} used by this {@link PIDSubsystem}
@@ -120,11 +134,11 @@ std::shared_ptr<PIDController> PIDSubsystem::GetPIDController() {
 }
 
 /**
- * Sets the setpoint to the given value.  If {@link PIDCommand#SetRange(double,
- * double) SetRange(...)}
- * was called,
- * then the given setpoint
- * will be trimmed to fit within the range.
+ * Sets the setpoint to the given value.
+ *
+ * If {@link PIDCommand#SetRange(double, double) SetRange(...)} was called,
+ * then the given setpoint will be trimmed to fit within the range.
+ *
  * @param setpoint the new setpoint
  */
 void PIDSubsystem::SetSetpoint(double setpoint) {
@@ -133,8 +147,10 @@ void PIDSubsystem::SetSetpoint(double setpoint) {
 
 /**
  * Adds the given value to the setpoint.
+ *
  * If {@link PIDCommand#SetRange(double, double) SetRange(...)} was used,
  * then the bounds will still be honored by this method.
+ *
  * @param deltaSetpoint the change in the setpoint
  */
 void PIDSubsystem::SetSetpointRelative(double deltaSetpoint) {
@@ -142,7 +158,8 @@ void PIDSubsystem::SetSetpointRelative(double deltaSetpoint) {
 }
 
 /**
- * Return the current setpoint
+ * Return the current setpoint.
+ *
  * @return The current setpoint
  */
 double PIDSubsystem::GetSetpoint() { return m_controller->GetSetpoint(); }
@@ -167,49 +184,52 @@ void PIDSubsystem::SetOutputRange(float minimumOutput, float maximumOutput) {
   m_controller->SetOutputRange(minimumOutput, maximumOutput);
 }
 
-/*
+/**
  * Set the absolute error which is considered tolerable for use with
  * OnTarget.
- * @param percentage error which is tolerable
+ *
+ * @param absValue absolute error which is tolerable
  */
 void PIDSubsystem::SetAbsoluteTolerance(float absValue) {
   m_controller->SetAbsoluteTolerance(absValue);
 }
 
-/*
- * Set the percentage error which is considered tolerable for use with
- * OnTarget.
- * @param percentage error which is tolerable
+/**
+ * Set the percentage error which is considered tolerable for use with OnTarget.
+ *
+ * @param percent percentage error which is tolerable
  */
 void PIDSubsystem::SetPercentTolerance(float percent) {
   m_controller->SetPercentTolerance(percent);
 }
 
-/*
+/**
  * Return true if the error is within the percentage of the total input range,
- * determined by SetTolerance. This asssumes that the maximum and minimum input
- * were set using SetInput. Use OnTarget() in the IsFinished() method of
- * commands
- * that use this subsystem.
+ * determined by SetTolerance.
+ *
+ * This asssumes that the maximum and minimum input were set using SetInput.
+ * Use OnTarget() in the IsFinished() method of commands that use this
+ * subsystem.
  *
  * Currently this just reports on target as the actual value passes through the
- * setpoint.
- * Ideally it should be based on being within the tolerance for some period of
- * time.
+ * setpoint. Ideally it should be based on being within the tolerance for some
+ * period of time.
  *
  * @return true if the error is within the percentage tolerance of the input
- * range
+ *         range
  */
 bool PIDSubsystem::OnTarget() const { return m_controller->OnTarget(); }
 
 /**
- * Returns the current position
+ * Returns the current position.
+ *
  * @return the current position
  */
 double PIDSubsystem::GetPosition() { return ReturnPIDInput(); }
 
 /**
- * Returns the current rate
+ * Returns the current rate.
+ *
  * @return the current rate
  */
 double PIDSubsystem::GetRate() { return ReturnPIDInput(); }

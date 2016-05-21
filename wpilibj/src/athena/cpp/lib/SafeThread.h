@@ -13,7 +13,7 @@
 #include <mutex>
 #include <thread>
 
-//namespace nt {
+// namespace nt {
 
 // Base class for SafeThreadOwner threads.
 class SafeThread {

@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "SolenoidBase.h"
 #include "LiveWindow/LiveWindowSendable.h"
+#include "SolenoidBase.h"
 #include "tables/ITableListener.h"
 
 #include <memory>

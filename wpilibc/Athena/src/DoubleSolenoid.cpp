@@ -6,24 +6,27 @@
 /*----------------------------------------------------------------------------*/
 
 #include "DoubleSolenoid.h"
-#include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
+#include "WPIErrors.h"
 
 #include <sstream>
 
 /**
  * Constructor.
- * Uses the default PCM ID of 0
+ *
+ * Uses the default PCM ID of 0.
+ *
  * @param forwardChannel The forward channel number on the PCM (0..7).
  * @param reverseChannel The reverse channel number on the PCM (0..7).
  */
 DoubleSolenoid::DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel)
-    : DoubleSolenoid(GetDefaultSolenoidModule(), forwardChannel, reverseChannel) {}
+    : DoubleSolenoid(GetDefaultSolenoidModule(), forwardChannel,
+                     reverseChannel) {}
 
 /**
  * Constructor.
  *
- * @param moduleNumber The CAN ID of the PCM.
+ * @param moduleNumber   The CAN ID of the PCM.
  * @param forwardChannel The forward channel on the PCM to control (0..7).
  * @param reverseChannel The reverse channel on the PCM to control (0..7).
  */
@@ -48,8 +51,7 @@ DoubleSolenoid::DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel,
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
     return;
   }
-  Resource::CreateResourceObject(
-      m_allocated, m_maxModules * m_maxPorts);
+  Resource::CreateResourceObject(m_allocated, m_maxModules * m_maxPorts);
 
   buf << "Solenoid " << m_forwardChannel << " (Module: " << m_moduleNumber
       << ")";
@@ -129,9 +131,10 @@ DoubleSolenoid::Value DoubleSolenoid::Get() const {
 }
 /**
  * Check if the forward solenoid is blacklisted.
- * 		If a solenoid is shorted, it is added to the blacklist and
- * 		disabled until power cycle, or until faults are cleared.
- * 		@see ClearAllPCMStickyFaults()
+ *
+ * If a solenoid is shorted, it is added to the blacklist and
+ * disabled until power cycle, or until faults are cleared.
+ * @see ClearAllPCMStickyFaults()
  *
  * @return If solenoid is disabled due to short.
  */
@@ -141,9 +144,10 @@ bool DoubleSolenoid::IsFwdSolenoidBlackListed() const {
 }
 /**
  * Check if the reverse solenoid is blacklisted.
- * 		If a solenoid is shorted, it is added to the blacklist and
- * 		disabled until power cycle, or until faults are cleared.
- * 		@see ClearAllPCMStickyFaults()
+ *
+ * If a solenoid is shorted, it is added to the blacklist and
+ * disabled until power cycle, or until faults are cleared.
+ * @see ClearAllPCMStickyFaults()
  *
  * @return If solenoid is disabled due to short.
  */

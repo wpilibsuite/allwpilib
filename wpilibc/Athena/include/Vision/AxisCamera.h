@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <thread>
 #include <string>
+#include <thread>
 #include "HAL/cpp/priority_mutex.h"
 
 #include "ErrorBase.h"
@@ -49,7 +49,7 @@ class AxisCamera : public ErrorBase {
 
   enum Rotation { kRotation_0, kRotation_180 };
 
-  explicit AxisCamera(std::string const &cameraHost);
+  explicit AxisCamera(std::string const& cameraHost);
   virtual ~AxisCamera();
 
   AxisCamera(const AxisCamera&) = delete;
@@ -57,11 +57,11 @@ class AxisCamera : public ErrorBase {
 
   bool IsFreshImage() const;
 
-  int GetImage(Image *image);
-  int GetImage(ColorImage *image);
-  HSLImage *GetImage();
-  int CopyJPEG(char **destImage, unsigned int &destImageSize,
-               unsigned int &destImageBufferSize);
+  int GetImage(Image* image);
+  int GetImage(ColorImage* image);
+  HSLImage* GetImage();
+  int CopyJPEG(char** destImage, unsigned int& destImageSize,
+               unsigned int& destImageBufferSize);
 
   void WriteBrightness(int brightness);
   int GetBrightness();
@@ -119,5 +119,5 @@ class AxisCamera : public ErrorBase {
   void ReadImagesFromCamera();
   bool WriteParameters();
 
-  int CreateCameraSocket(std::string const &requestString, bool setError);
+  int CreateCameraSocket(std::string const& requestString, bool setError);
 };

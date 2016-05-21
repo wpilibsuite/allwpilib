@@ -5,26 +5,28 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <jni.h>
+#include "HAL/Notifier.hpp"
 #include <assert.h>
+#include <jni.h>
+#include <stdio.h>
 #include <atomic>
 #include <condition_variable>
 #include <functional>
 #include <mutex>
 #include <thread>
-#include <stdio.h>
-#include "Log.hpp"
-#include "edu_wpi_first_wpilibj_hal_NotifierJNI.h"
-#include "HAL/Notifier.hpp"
 #include "HALUtil.h"
+#include "Log.hpp"
 #include "SafeThread.h"
+#include "edu_wpi_first_wpilibj_hal_NotifierJNI.h"
 
 // set the logging level
 TLogLevel notifierJNILogLevel = logWARNING;
 
-#define NOTIFIERJNI_LOG(level) \
-    if (level > notifierJNILogLevel) ; \
-    else Log().Get(level)
+#define NOTIFIERJNI_LOG(level)     \
+  if (level > notifierJNILogLevel) \
+    ;                              \
+  else                             \
+  Log().Get(level)
 
 // Thread where callbacks are actually performed.
 //
@@ -50,7 +52,7 @@ class NotifierThreadJNI : public SafeThread {
 
 class NotifierJNI : public SafeThreadOwner<NotifierThreadJNI> {
  public:
-  void SetFunc(JNIEnv* env, jobject func, jmethodID mid);
+  void SetFunc(JNIEnv *env, jobject func, jmethodID mid);
 
   void Notify(uint64_t currentTime) {
     auto thr = GetThread();
@@ -61,7 +63,7 @@ class NotifierJNI : public SafeThreadOwner<NotifierThreadJNI> {
   }
 };
 
-void NotifierJNI::SetFunc(JNIEnv* env, jobject func, jmethodID mid) {
+void NotifierJNI::SetFunc(JNIEnv *env, jobject func, jmethodID mid) {
   auto thr = GetThread();
   if (!thr) return;
   // free global reference
@@ -75,9 +77,9 @@ void NotifierThreadJNI::Main() {
   JNIEnv *env;
   JavaVMAttachArgs args;
   args.version = JNI_VERSION_1_2;
-  args.name = const_cast<char*>("Notifier");
+  args.name = const_cast<char *>("Notifier");
   args.group = nullptr;
-  jint rs = jvm->AttachCurrentThreadAsDaemon((void**)&env, &args);
+  jint rs = jvm->AttachCurrentThreadAsDaemon((void **)&env, &args);
   if (rs != JNI_OK) return;
 
   std::unique_lock<std::mutex> lock(m_mutex);
@@ -104,8 +106,8 @@ void NotifierThreadJNI::Main() {
   jvm->DetachCurrentThread();
 }
 
-void notifierHandler(uint64_t currentTimeInt, void* param) {
-  ((NotifierJNI*)param)->Notify(currentTimeInt);
+void notifierHandler(uint64_t currentTimeInt, void *param) {
+  ((NotifierJNI *)param)->Notify(currentTimeInt);
 }
 
 extern "C" {
@@ -115,9 +117,9 @@ extern "C" {
  * Method:    initializeNotifier
  * Signature: (Ljava/lang/Runnable;)J
  */
-JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNotifier
-  (JNIEnv *env, jclass, jobject func)
-{
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNotifier(
+    JNIEnv *env, jclass, jobject func) {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI initializeNotifier";
 
   jclass cls = env->GetObjectClass(func);
@@ -135,7 +137,7 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNot
 
   // each notifier runs in its own thread; this is so if one takes too long
   // to execute, it doesn't keep the others from running
-  NotifierJNI* notify = new NotifierJNI;
+  NotifierJNI *notify = new NotifierJNI;
   notify->Start();
   notify->SetFunc(env, func, mid);
   int32_t status = 0;
@@ -157,17 +159,16 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNot
  * Method:    cleanNotifier
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_cleanNotifier
-  (JNIEnv *env, jclass, jlong notifierPtr)
-{
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_cleanNotifier(
+    JNIEnv *env, jclass, jlong notifierPtr) {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI cleanNotifier";
 
   NOTIFIERJNI_LOG(logDEBUG) << "Notifier Ptr = " << (void *)notifierPtr;
 
   int32_t status = 0;
-  NotifierJNI* notify =
-      (NotifierJNI*)getNotifierParam((void*)notifierPtr, &status);
-  cleanNotifier((void*)notifierPtr, &status);
+  NotifierJNI *notify =
+      (NotifierJNI *)getNotifierParam((void *)notifierPtr, &status);
+  cleanNotifier((void *)notifierPtr, &status);
   NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
   delete notify;
@@ -178,9 +179,9 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_cleanNotifier
  * Method:    updateNotifierAlarm
  * Signature: (JJ)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_updateNotifierAlarm
-  (JNIEnv *env, jclass cls, jlong notifierPtr, jlong triggerTime)
-{
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_NotifierJNI_updateNotifierAlarm(
+    JNIEnv *env, jclass cls, jlong notifierPtr, jlong triggerTime) {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI updateNotifierAlarm";
 
   NOTIFIERJNI_LOG(logDEBUG) << "Notifier Ptr = " << (void *)notifierPtr;
@@ -188,7 +189,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_updateNotifier
   NOTIFIERJNI_LOG(logDEBUG) << "triggerTime = " << triggerTime;
 
   int32_t status = 0;
-  updateNotifierAlarm((void*)notifierPtr, (uint64_t)triggerTime, &status);
+  updateNotifierAlarm((void *)notifierPtr, (uint64_t)triggerTime, &status);
   NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -198,15 +199,15 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_updateNotifier
  * Method:    stopNotifierAlarm
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_stopNotifierAlarm
-  (JNIEnv *env, jclass cls, jlong notifierPtr)
-{
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_NotifierJNI_stopNotifierAlarm(
+    JNIEnv *env, jclass cls, jlong notifierPtr) {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI stopNotifierAlarm";
 
   NOTIFIERJNI_LOG(logDEBUG) << "Notifier Ptr = " << (void *)notifierPtr;
 
   int32_t status = 0;
-  stopNotifierAlarm((void*)notifierPtr, &status);
+  stopNotifierAlarm((void *)notifierPtr, &status);
   NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }

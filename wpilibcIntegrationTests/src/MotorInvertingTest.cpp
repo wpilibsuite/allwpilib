@@ -10,13 +10,13 @@
 #include <Talon.h>
 #include <Timer.h>
 #include <Victor.h>
-#include "gtest/gtest.h"
 #include "TestBench.h"
+#include "gtest/gtest.h"
 
 enum MotorInvertingTestType { TEST_VICTOR, TEST_JAGUAR, TEST_TALON };
 static const double motorSpeed = 0.15;
 static const double delayTime = 0.5;
-std::ostream &operator<<(std::ostream &os, MotorInvertingTestType const &type) {
+std::ostream& operator<<(std::ostream& os, MotorInvertingTestType const& type) {
   switch (type) {
     case TEST_VICTOR:
       os << "Victor";
@@ -34,8 +34,8 @@ std::ostream &operator<<(std::ostream &os, MotorInvertingTestType const &type) {
 class MotorInvertingTest
     : public testing::TestWithParam<MotorInvertingTestType> {
  protected:
-  SpeedController *m_speedController;
-  Encoder *m_encoder;
+  SpeedController* m_speedController;
+  Encoder* m_encoder;
   virtual void SetUp() override {
     switch (GetParam()) {
       case TEST_VICTOR:

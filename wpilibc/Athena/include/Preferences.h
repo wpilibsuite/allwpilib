@@ -7,25 +7,23 @@
 
 #pragma once
 
-#include "ErrorBase.h"
-#include "Task.h"
 #include <map>
 #include <string>
 #include <vector>
+#include "ErrorBase.h"
 #include "HAL/cpp/Semaphore.hpp"
-#include "tables/ITableListener.h"
+#include "Task.h"
 #include "networktables/NetworkTable.h"
+#include "tables/ITableListener.h"
 
 /**
  * The preferences class provides a relatively simple way to save important
- * values to
- * the RoboRIO to access the next time the RoboRIO is booted.
+ * values to the RoboRIO to access the next time the RoboRIO is booted.
  *
- * <p>This class loads and saves from a file
- * inside the RoboRIO.  The user can not access the file directly, but may
- * modify values at specific
- * fields which will then be automatically periodically saved to the file
- * by the NetworkTable server.</p>
+ * <p>This class loads and saves from a file inside the RoboRIO.  The user can
+ * not access the file directly, but may modify values at specific fields which
+ * will then be automatically periodically saved to the file by the NetworkTable
+ * server.</p>
  *
  * <p>This class is thread safe.</p>
  *
@@ -34,7 +32,7 @@
  */
 class Preferences : public ErrorBase {
  public:
-  static Preferences *GetInstance();
+  static Preferences* GetInstance();
 
   std::vector<std::string> GetKeys();
   std::string GetString(llvm::StringRef key, llvm::StringRef defaultValue = "");

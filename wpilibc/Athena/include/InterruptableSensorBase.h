@@ -8,8 +8,8 @@
 #pragma once
 
 #include "HAL/HAL.hpp"
-#include "SensorBase.h"
 #include "Resource.h"
+#include "SensorBase.h"
 
 #include <memory>
 
@@ -29,23 +29,24 @@ class InterruptableSensorBase : public SensorBase {
   virtual bool GetAnalogTriggerForRouting() const = 0;
   virtual void RequestInterrupts(
       InterruptHandlerFunction handler,
-      void *param);                  ///< Asynchronus handler version.
+      void* param);                  ///< Asynchronus handler version.
   virtual void RequestInterrupts();  ///< Synchronus Wait version.
   virtual void
   CancelInterrupts();  ///< Free up the underlying chipobject functions.
   virtual WaitResult WaitForInterrupt(
-      float timeout, bool ignorePrevious = true);  ///< Synchronus version.
+      float timeout,
+      bool ignorePrevious = true);  ///< Synchronus version.
   virtual void
   EnableInterrupts();  ///< Enable interrupts - after finishing setup.
   virtual void DisableInterrupts();       ///< Disable, but don't deallocate.
   virtual double ReadRisingTimestamp();   ///< Return the timestamp for the
-                                          ///rising interrupt that occurred.
+                                          /// rising interrupt that occurred.
   virtual double ReadFallingTimestamp();  ///< Return the timestamp for the
-                                          ///falling interrupt that occurred.
+                                          /// falling interrupt that occurred.
   virtual void SetUpSourceEdge(bool risingEdge, bool fallingEdge);
 
  protected:
-  void *m_interrupt = nullptr;
+  void* m_interrupt = nullptr;
   uint32_t m_interruptIndex = std::numeric_limits<uint32_t>::max();
   void AllocateInterrupts(bool watcher);
 

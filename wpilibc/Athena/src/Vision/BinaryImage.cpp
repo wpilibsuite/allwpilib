@@ -6,14 +6,15 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Vision/BinaryImage.h"
-#include "WPIErrors.h"
 #include <cstring>
+#include "WPIErrors.h"
 
 using namespace std;
 
 /**
  * Get then number of particles for the image.
- * @returns the number of particles found for the image.
+ *
+ * @return the number of particles found for the image.
  */
 int BinaryImage::GetNumberParticles() {
   int numParticles = 0;
@@ -24,9 +25,11 @@ int BinaryImage::GetNumberParticles() {
 
 /**
  * Get a single particle analysis report.
+ *
  * Get one (of possibly many) particle analysis reports for an image.
+ *
  * @param particleNumber Which particle analysis report to return.
- * @returns the selected particle analysis report
+ * @return the selected particle analysis report
  */
 ParticleAnalysisReport BinaryImage::GetParticleAnalysisReport(
     int particleNumber) {
@@ -37,13 +40,15 @@ ParticleAnalysisReport BinaryImage::GetParticleAnalysisReport(
 
 /**
  * Get a single particle analysis report.
+ *
  * Get one (of possibly many) particle analysis reports for an image.
  * This version could be more efficient when copying many reports.
+ *
  * @param particleNumber Which particle analysis report to return.
- * @param par the selected particle analysis report
+ * @param par            the selected particle analysis report
  */
 void BinaryImage::GetParticleAnalysisReport(int particleNumber,
-                                            ParticleAnalysisReport *par) {
+                                            ParticleAnalysisReport* par) {
   int success;
   int numParticles = 0;
 
@@ -95,13 +100,14 @@ void BinaryImage::GetParticleAnalysisReport(int particleNumber,
 
 /**
  * Get an ordered vector of particles for the image.
+ *
  * Create a vector of particle analysis reports sorted by size for an image.
  * The vector contains the actual report structures.
- * @returns a pointer to the vector of particle analysis reports. The caller
- * must delete the
- * vector when finished using it.
+ *
+ * @return a pointer to the vector of particle analysis reports. The caller
+ *         must delete the vector when finished using it.
  */
-vector<ParticleAnalysisReport> *
+vector<ParticleAnalysisReport>*
 BinaryImage::GetOrderedParticleAnalysisReports() {
   auto particles = new vector<ParticleAnalysisReport>;
   int particleCount = GetNumberParticles();
@@ -118,10 +124,12 @@ BinaryImage::GetOrderedParticleAnalysisReports() {
 
 /**
  * Write a binary image to flash.
+ *
  * Writes the binary image to flash on the cRIO for later inspection.
+ *
  * @param fileName the name of the image file written to the flash.
  */
-void BinaryImage::Write(const char *fileName) {
+void BinaryImage::Write(const char* fileName) {
   RGBValue colorTable[256];
   memset(colorTable, 0, sizeof(colorTable));
   colorTable[0].R = 0;
@@ -134,17 +142,18 @@ void BinaryImage::Write(const char *fileName) {
 
 /**
  * Measure a single parameter for an image.
+ *
  * Get the measurement for a single parameter about an image by calling the
- * imaqMeasureParticle
- * function for the selected parameter.
+ * imaqMeasureParticle function for the selected parameter.
+ *
  * @param particleNumber which particle in the set of particles
- * @param whatToMeasure the imaq MeasurementType (what to measure)
- * @param result the value of the measurement
- * @returns false on failure, true on success
+ * @param whatToMeasure  the imaq MeasurementType (what to measure)
+ * @param result         the value of the measurement
+ * @return false on failure, true on success
  */
 bool BinaryImage::ParticleMeasurement(int particleNumber,
                                       MeasurementType whatToMeasure,
-                                      int *result) {
+                                      int* result) {
   double resultDouble;
   bool success =
       ParticleMeasurement(particleNumber, whatToMeasure, &resultDouble);
@@ -154,17 +163,18 @@ bool BinaryImage::ParticleMeasurement(int particleNumber,
 
 /**
  * Measure a single parameter for an image.
+ *
  * Get the measurement for a single parameter about an image by calling the
- * imaqMeasureParticle
- * function for the selected parameter.
+ * imaqMeasureParticle function for the selected parameter.
+ *
  * @param particleNumber which particle in the set of particles
- * @param whatToMeasure the imaq MeasurementType (what to measure)
- * @param result the value of the measurement
+ * @param whatToMeasure  the imaq MeasurementType (what to measure)
+ * @param result         the value of the measurement
  * @returns true on failure, false on success
  */
 bool BinaryImage::ParticleMeasurement(int particleNumber,
                                       MeasurementType whatToMeasure,
-                                      double *result) {
+                                      double* result) {
   int success;
   success = imaqMeasureParticle(m_imaqImage, particleNumber, 0, whatToMeasure,
                                 result);
@@ -179,8 +189,10 @@ double BinaryImage::NormalizeFromRange(double position, int range) {
 
 /**
  * The compare helper function for sort.
+ *
  * This function compares two particle analysis reports as a helper for the sort
  * function.
+ *
  * @param particle1 The first particle to compare
  * @param particle2 the second particle to compare
  * @returns true if particle1 is greater than particle2
@@ -191,23 +203,25 @@ bool BinaryImage::CompareParticleSizes(ParticleAnalysisReport particle1,
   return particle1.particleToImagePercent > particle2.particleToImagePercent;
 }
 
-BinaryImage *BinaryImage::RemoveSmallObjects(bool connectivity8, int erosions) {
+BinaryImage* BinaryImage::RemoveSmallObjects(bool connectivity8, int erosions) {
   auto result = new BinaryImage();
-  int success = imaqSizeFilter(result->GetImaqImage(), m_imaqImage,
-                               connectivity8, erosions, IMAQ_KEEP_LARGE, nullptr);
+  int success =
+      imaqSizeFilter(result->GetImaqImage(), m_imaqImage, connectivity8,
+                     erosions, IMAQ_KEEP_LARGE, nullptr);
   wpi_setImaqErrorWithContext(success, "Error in RemoveSmallObjects");
   return result;
 }
 
-BinaryImage *BinaryImage::RemoveLargeObjects(bool connectivity8, int erosions) {
+BinaryImage* BinaryImage::RemoveLargeObjects(bool connectivity8, int erosions) {
   auto result = new BinaryImage();
-  int success = imaqSizeFilter(result->GetImaqImage(), m_imaqImage,
-                               connectivity8, erosions, IMAQ_KEEP_SMALL, nullptr);
+  int success =
+      imaqSizeFilter(result->GetImaqImage(), m_imaqImage, connectivity8,
+                     erosions, IMAQ_KEEP_SMALL, nullptr);
   wpi_setImaqErrorWithContext(success, "Error in RemoveLargeObjects");
   return result;
 }
 
-BinaryImage *BinaryImage::ConvexHull(bool connectivity8) {
+BinaryImage* BinaryImage::ConvexHull(bool connectivity8) {
   auto result = new BinaryImage();
   int success =
       imaqConvexHull(result->GetImaqImage(), m_imaqImage, connectivity8);
@@ -215,14 +229,14 @@ BinaryImage *BinaryImage::ConvexHull(bool connectivity8) {
   return result;
 }
 
-BinaryImage *BinaryImage::ParticleFilter(ParticleFilterCriteria2 *criteria,
+BinaryImage* BinaryImage::ParticleFilter(ParticleFilterCriteria2* criteria,
                                          int criteriaCount) {
   auto result = new BinaryImage();
   int numParticles;
   ParticleFilterOptions2 filterOptions = {0, 0, 0, 1};
-  int success =
-      imaqParticleFilter4(result->GetImaqImage(), m_imaqImage, criteria,
-                          criteriaCount, &filterOptions, nullptr, &numParticles);
+  int success = imaqParticleFilter4(result->GetImaqImage(), m_imaqImage,
+                                    criteria, criteriaCount, &filterOptions,
+                                    nullptr, &numParticles);
   wpi_setImaqErrorWithContext(success, "Error in particle filter operation");
   return result;
 }

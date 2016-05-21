@@ -14,9 +14,10 @@ RGBImage::RGBImage() : ColorImage(IMAQ_IMAGE_RGB) {}
 
 /**
  * Create a new image by loading a file.
+ *
  * @param fileName The path of the file to load.
  */
-RGBImage::RGBImage(const char *fileName) : ColorImage(IMAQ_IMAGE_RGB) {
+RGBImage::RGBImage(const char* fileName) : ColorImage(IMAQ_IMAGE_RGB) {
   int success = imaqReadFile(m_imaqImage, fileName, nullptr, nullptr);
   wpi_setImaqErrorWithContext(success, "Imaq ReadFile error");
 }

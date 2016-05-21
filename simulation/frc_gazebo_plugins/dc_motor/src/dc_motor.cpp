@@ -22,7 +22,7 @@ void DCMotor::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   if (sdf->HasElement("topic")) {
     topic = sdf->Get<std::string>("topic");
   } else {
-    topic = "~/"+sdf->GetAttribute("name")->GetAsString();
+    topic = "~/" + sdf->GetAttribute("name")->GetAsString();
   }
 
   if (sdf->HasElement("multiplier")) {
@@ -35,7 +35,8 @@ void DCMotor::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
         << " multiplier=" << multiplier << std::endl;
 
   // Connect to Gazebo transport for messaging
-  std::string scoped_name = model->GetWorld()->GetName()+"::"+model->GetScopedName();
+  std::string scoped_name =
+      model->GetWorld()->GetName() + "::" + model->GetScopedName();
   boost::replace_all(scoped_name, "::", "/");
   node = transport::NodePtr(new transport::Node());
   node->Init(scoped_name);
@@ -43,15 +44,19 @@ void DCMotor::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
 
   // Connect to the world update event.
   // This will trigger the Update function every Gazebo iteration
-  updateConn = event::Events::ConnectWorldUpdateBegin(boost::bind(&DCMotor::Update, this, _1));
+  updateConn = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&DCMotor::Update, this, _1));
 }
 
-void DCMotor::Update(const common::UpdateInfo &info) {
-  joint->SetForce(0, signal*multiplier);
+void DCMotor::Update(const common::UpdateInfo& info) {
+  joint->SetForce(0, signal * multiplier);
 }
 
-void DCMotor::Callback(const msgs::ConstFloat64Ptr &msg) {
+void DCMotor::Callback(const msgs::ConstFloat64Ptr& msg) {
   signal = msg->data();
-  if (signal < -1) { signal = -1; }
-  else if (signal > 1) { signal = 1; }
+  if (signal < -1) {
+    signal = -1;
+  } else if (signal > 1) {
+    signal = 1;
+  }
 }

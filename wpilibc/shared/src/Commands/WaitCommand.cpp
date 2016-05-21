@@ -10,12 +10,12 @@
 
 WaitCommand::WaitCommand(double timeout)
     : Command(
-          ((std::stringstream &)(std::stringstream("Wait(") << timeout << ")"))
+          ((std::stringstream&)(std::stringstream("Wait(") << timeout << ")"))
               .str()
               .c_str(),
           timeout) {}
 
-WaitCommand::WaitCommand(const std::string &name, double timeout)
+WaitCommand::WaitCommand(const std::string& name, double timeout)
     : Command(name, timeout) {}
 
 void WaitCommand::Initialize() {}

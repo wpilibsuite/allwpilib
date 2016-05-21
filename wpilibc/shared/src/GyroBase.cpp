@@ -6,8 +6,8 @@
 /*----------------------------------------------------------------------------*/
 
 #include "GyroBase.h"
-#include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
+#include "WPIErrors.h"
 
 /**
  * Get the PIDOutput for the PIDSource base object. Can be set to return

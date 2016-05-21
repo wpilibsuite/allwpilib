@@ -10,9 +10,10 @@
 #include "LiveWindow/LiveWindow.h"
 
 /**
- * Constructor for a Victor
- * @param channel The PWM channel number that the Victor is attached to. 0-9 are
- * on-board, 10-19 are on the MXP port
+ * Constructor for a Victor.
+ *
+ * @param channel The PWM channel number that the Victor is attached to. 0-9
+ *                are on-board, 10-19 are on the MXP port
  */
 Victor::Victor(uint32_t channel) : PWMSpeedController(channel) {
   /* Note that the Victor uses the following bounds for PWM values.  These

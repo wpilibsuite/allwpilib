@@ -7,8 +7,8 @@
 
 #include <AnalogOutput.h>
 #include <AnalogPotentiometer.h>
-#include <Timer.h>
 #include <ControllerPower.h>
+#include <Timer.h>
 #include "TestBench.h"
 #include "gtest/gtest.h"
 
@@ -17,8 +17,8 @@ static const double kAngle = 180.0;
 
 class AnalogPotentiometerTest : public testing::Test {
  protected:
-  AnalogOutput *m_fakePot;
-  AnalogPotentiometer *m_pot;
+  AnalogOutput* m_fakePot;
+  AnalogPotentiometer* m_pot;
 
   virtual void SetUp() override {
     m_fakePot = new AnalogOutput(TestBench::kAnalogOutputChannel);

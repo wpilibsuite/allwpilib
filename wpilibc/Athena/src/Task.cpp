@@ -7,10 +7,10 @@
 
 #include "Task.h"
 
-#include "WPIErrors.h"
 #include <errno.h>
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
+#include "WPIErrors.h"
 
 #ifndef OK
 #define OK 0
@@ -34,21 +34,13 @@ Task::~Task() {
   }
 }
 
-bool Task::joinable() const noexcept {
-  return m_thread.joinable();
-}
+bool Task::joinable() const noexcept { return m_thread.joinable(); }
 
-void Task::join() {
-  m_thread.join();
-}
+void Task::join() { m_thread.join(); }
 
-void Task::detach() {
-  m_thread.detach();
-}
+void Task::detach() { m_thread.detach(); }
 
-std::thread::id Task::get_id() const noexcept {
-  return m_thread.get_id();
-}
+std::thread::id Task::get_id() const noexcept { return m_thread.get_id(); }
 
 std::thread::native_handle_type Task::native_handle() {
   return m_thread.native_handle();

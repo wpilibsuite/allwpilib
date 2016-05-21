@@ -12,7 +12,7 @@
 
 class StartCommand : public Command {
  public:
-  StartCommand(Command *commandToStart);
+  StartCommand(Command* commandToStart);
   virtual ~StartCommand() = default;
 
  protected:
@@ -23,7 +23,7 @@ class StartCommand : public Command {
   virtual void Interrupted();
 
  private:
-  Command *m_commandToFork;
+  Command* m_commandToFork;
 };
 
 #endif

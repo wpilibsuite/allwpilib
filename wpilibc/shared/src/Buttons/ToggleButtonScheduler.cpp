@@ -10,8 +10,8 @@
 #include "Buttons/Button.h"
 #include "Commands/Command.h"
 
-ToggleButtonScheduler::ToggleButtonScheduler(bool last, Trigger *button,
-                                             Command *orders)
+ToggleButtonScheduler::ToggleButtonScheduler(bool last, Trigger* button,
+                                             Command* orders)
     : ButtonScheduler(last, button, orders) {
   pressedLast = m_button->Grab();
 }

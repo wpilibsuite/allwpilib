@@ -8,26 +8,24 @@
 #pragma once
 
 #include "AnalogInput.h"
-#include "SensorBase.h"
-#include "PIDSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
+#include "PIDSource.h"
+#include "SensorBase.h"
 
 #include <memory>
 
 /**
  * Handle operation of an analog accelerometer.
  * The accelerometer reads acceleration directly through the sensor. Many
- * sensors have
- * multiple axis and can be treated as multiple devices. Each is calibrated by
- * finding
- * the center value over a period of time.
+ * sensors have multiple axis and can be treated as multiple devices. Each is
+ * calibrated by finding the center value over a period of time.
  */
 class AnalogAccelerometer : public SensorBase,
                             public PIDSource,
                             public LiveWindowSendable {
  public:
   explicit AnalogAccelerometer(int32_t channel);
-  explicit AnalogAccelerometer(AnalogInput *channel);
+  explicit AnalogAccelerometer(AnalogInput* channel);
   explicit AnalogAccelerometer(std::shared_ptr<AnalogInput> channel);
   virtual ~AnalogAccelerometer() = default;
 

@@ -10,13 +10,14 @@
 #include "Base.h"
 
 #ifdef _WIN32
-	#include <Windows.h>
-	//Windows.h defines #define GetMessage GetMessageW, which is stupid and we don't want it.
-	#undef GetMessage
+#include <Windows.h>
+// Windows.h defines #define GetMessage GetMessageW, which is stupid and we
+// don't want it.
+#undef GetMessage
 #endif
 
-#include <string>
 #include <stdint.h>
+#include <string>
 #include "llvm/StringRef.h"
 
 //  Forward declarations
@@ -43,9 +44,9 @@ class Error {
   const ErrorBase* GetOriginatingObject() const;
   double GetTimestamp() const;
   void Clear();
-  void Set(Code code, llvm::StringRef contextMessage,
-           llvm::StringRef filename, llvm::StringRef function,
-           uint32_t lineNumber, const ErrorBase* originatingObject);
+  void Set(Code code, llvm::StringRef contextMessage, llvm::StringRef filename,
+           llvm::StringRef function, uint32_t lineNumber,
+           const ErrorBase* originatingObject);
 
  private:
   void Report();

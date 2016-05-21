@@ -8,12 +8,10 @@
 #pragma once
 
 /**
- * Interface for Controllers
+ * Interface for Controllers.
  * Common interface for controllers. Controllers run control loops, the most
- * common
- * are PID controllers and their variants, but this includes anything that is
- * controlling
- * an actuator in a separate thread.
+ * common are PID controllers and their variants, but this includes anything
+ * that is controlling an actuator in a separate thread.
  */
 class Controller {
  public:

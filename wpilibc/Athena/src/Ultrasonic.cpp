@@ -10,10 +10,10 @@
 #include "Counter.h"
 #include "DigitalInput.h"
 #include "DigitalOutput.h"
+#include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 #include "Utility.h"
 #include "WPIErrors.h"
-#include "LiveWindow/LiveWindow.h"
 
 // Time (sec) for the ping trigger pulse.
 constexpr double Ultrasonic::kPingTime;
@@ -29,8 +29,8 @@ std::set<Ultrasonic*> Ultrasonic::m_sensors;
 
 /**
  * Background task that goes through the list of ultrasonic sensors and pings
- * each one in turn. The counter
- * is configured to read the timing of the returned echo pulse.
+ * each one in turn. The counter is configured to read the timing of the
+ * returned echo pulse.
  *
  * DANGER WILL ROBINSON, DANGER WILL ROBINSON:
  * This code runs as a task and assumes that none of the ultrasonic sensors
@@ -43,27 +43,25 @@ void Ultrasonic::UltrasonicChecker() {
       if (!m_automaticEnabled) break;
 
       if (sensor->IsEnabled()) {
-        sensor->m_pingChannel->Pulse(kPingTime); // do the ping
+        sensor->m_pingChannel->Pulse(kPingTime);  // do the ping
       }
 
-      Wait(0.1); // wait for ping to return
+      Wait(0.1);  // wait for ping to return
     }
   }
 }
 
 /**
  * Initialize the Ultrasonic Sensor.
+ *
  * This is the common code that initializes the ultrasonic sensor given that
- * there
- * are two digital I/O channels allocated. If the system was running in
- * automatic mode (round robin)
- * when the new sensor is added, it is stopped, the sensor is added, then
- * automatic mode is
- * restored.
+ * there are two digital I/O channels allocated. If the system was running in
+ * automatic mode (round robin) when the new sensor is added, it is stopped,
+ * the sensor is added, then automatic mode is restored.
  */
 void Ultrasonic::Initialize() {
   bool originalMode = m_automaticEnabled;
-  SetAutomaticMode(false);     // kill task when adding a new sensor
+  SetAutomaticMode(false);  // kill task when adding a new sensor
   // link this instance on the list
   m_sensors.insert(this);
 
@@ -81,16 +79,17 @@ void Ultrasonic::Initialize() {
 }
 
 /**
- * Create an instance of the Ultrasonic Sensor
- * This is designed to supchannel the Daventech SRF04 and Vex ultrasonic
+ * Create an instance of the Ultrasonic Sensor.
+ *
+ * This is designed to support the Daventech SRF04 and Vex ultrasonic
  * sensors.
+ *
  * @param pingChannel The digital output channel that sends the pulse to
- * initiate the sensor sending
- * the ping.
+ *                    initiate the sensor sending the ping.
  * @param echoChannel The digital input channel that receives the echo. The
- * length of time that the
- * echo is high represents the round trip time of the ping, and the distance.
- * @param units The units returned in either kInches or kMilliMeters
+ *                    length of time that the echo is high represents the
+ *                    round trip time of the ping, and the distance.
+ * @param units       The units returned in either kInches or kMilliMeters
  */
 Ultrasonic::Ultrasonic(uint32_t pingChannel, uint32_t echoChannel,
                        DistanceUnit units)
@@ -103,15 +102,15 @@ Ultrasonic::Ultrasonic(uint32_t pingChannel, uint32_t echoChannel,
 
 /**
  * Create an instance of an Ultrasonic Sensor from a DigitalInput for the echo
- * channel and a DigitalOutput
- * for the ping channel.
+ * channel and a DigitalOutput for the ping channel.
+ *
  * @param pingChannel The digital output object that starts the sensor doing a
- * ping. Requires a 10uS pulse to start.
+ *                    ping. Requires a 10uS pulse to start.
  * @param echoChannel The digital input object that times the return pulse to
- * determine the range.
- * @param units The units returned in either kInches or kMilliMeters
+ *                    determine the range.
+ * @param units       The units returned in either kInches or kMilliMeters
  */
-Ultrasonic::Ultrasonic(DigitalOutput *pingChannel, DigitalInput *echoChannel,
+Ultrasonic::Ultrasonic(DigitalOutput* pingChannel, DigitalInput* echoChannel,
                        DistanceUnit units)
     : m_pingChannel(pingChannel, NullDeleter<DigitalOutput>()),
       m_echoChannel(echoChannel, NullDeleter<DigitalInput>()),
@@ -127,15 +126,15 @@ Ultrasonic::Ultrasonic(DigitalOutput *pingChannel, DigitalInput *echoChannel,
 
 /**
  * Create an instance of an Ultrasonic Sensor from a DigitalInput for the echo
- * channel and a DigitalOutput
- * for the ping channel.
+ * channel and a DigitalOutput for the ping channel.
+ *
  * @param pingChannel The digital output object that starts the sensor doing a
- * ping. Requires a 10uS pulse to start.
+ *                    ping. Requires a 10uS pulse to start.
  * @param echoChannel The digital input object that times the return pulse to
- * determine the range.
- * @param units The units returned in either kInches or kMilliMeters
+ *                    determine the range.
+ * @param units       The units returned in either kInches or kMilliMeters
  */
-Ultrasonic::Ultrasonic(DigitalOutput &pingChannel, DigitalInput &echoChannel,
+Ultrasonic::Ultrasonic(DigitalOutput& pingChannel, DigitalInput& echoChannel,
                        DistanceUnit units)
     : m_pingChannel(&pingChannel, NullDeleter<DigitalOutput>()),
       m_echoChannel(&echoChannel, NullDeleter<DigitalInput>()),
@@ -146,13 +145,13 @@ Ultrasonic::Ultrasonic(DigitalOutput &pingChannel, DigitalInput &echoChannel,
 
 /**
  * Create an instance of an Ultrasonic Sensor from a DigitalInput for the echo
- * channel and a DigitalOutput
- * for the ping channel.
+ * channel and a DigitalOutput for the ping channel.
+ *
  * @param pingChannel The digital output object that starts the sensor doing a
- * ping. Requires a 10uS pulse to start.
+ *                    ping. Requires a 10uS pulse to start.
  * @param echoChannel The digital input object that times the return pulse to
- * determine the range.
- * @param units The units returned in either kInches or kMilliMeters
+ *                    determine the range.
+ * @param units       The units returned in either kInches or kMilliMeters
  */
 Ultrasonic::Ultrasonic(std::shared_ptr<DigitalOutput> pingChannel,
                        std::shared_ptr<DigitalInput> echoChannel,
@@ -166,11 +165,11 @@ Ultrasonic::Ultrasonic(std::shared_ptr<DigitalOutput> pingChannel,
 
 /**
  * Destructor for the ultrasonic sensor.
+ *
  * Delete the instance of the ultrasonic sensor by freeing the allocated digital
- * channels.
- * If the system was in automatic mode (round robin), then it is stopped, then
- * started again
- * after this sensor is removed (provided this wasn't the last sensor).
+ * channels. If the system was in automatic mode (round robin), then it is
+ * stopped, then started again after this sensor is removed (provided this
+ * wasn't the last sensor).
  */
 Ultrasonic::~Ultrasonic() {
   bool wasAutomaticMode = m_automaticEnabled;
@@ -186,15 +185,16 @@ Ultrasonic::~Ultrasonic() {
 
 /**
  * Turn Automatic mode on/off.
+ *
  * When in Automatic mode, all sensors will fire in round robin, waiting a set
  * time between each sensor.
+ *
  * @param enabling Set to true if round robin scheduling should start for all
- * the ultrasonic sensors. This
- * scheduling method assures that the sensors are non-interfering because no two
- * sensors fire at the same time.
- * If another scheduling algorithm is prefered, it can be implemented by
- * pinging the sensors manually and waiting
- * for the results to come back.
+ *                 the ultrasonic sensors. This scheduling method assures that
+ *                 the sensors are non-interfering because no two sensors fire
+ *                 at the same time. If another scheduling algorithm is
+ *                 prefered, it can be implemented by pinging the sensors
+ *                 manually and waiting for the results to come back.
  */
 void Ultrasonic::SetAutomaticMode(bool enabling) {
   if (enabling == m_automaticEnabled) return;  // ignore the case of no change
@@ -214,7 +214,7 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
     // TODO: Currently, lvuser does not have permissions to set task priorities.
     // Until that is the case, uncommenting this will break user code that calls
     // Ultrasonic::SetAutomicMode().
-    //m_task.SetPriority(kPriority);
+    // m_task.SetPriority(kPriority);
   } else {
     // Wait for background task to stop running
     m_task.join();
@@ -231,6 +231,7 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
 
 /**
  * Single ping to ultrasonic sensor.
+ *
  * Send out a single ping to the ultrasonic sensor. This only works if automatic
  * (round robin) mode is disabled. A single ping is sent out, and the counter
  * should count the semi-period when it comes in. The counter is reset to make
@@ -245,18 +246,19 @@ void Ultrasonic::Ping() {
 
 /**
  * Check if there is a valid range measurement.
+ *
  * The ranges are accumulated in a counter that will increment on each edge of
- * the echo (return)
- * signal. If the count is not at least 2, then the range has not yet been
- * measured, and is invalid.
+ * the echo (return) signal. If the count is not at least 2, then the range has
+ * not yet been measured, and is invalid.
  */
 bool Ultrasonic::IsRangeValid() const { return m_counter.Get() > 1; }
 
 /**
  * Get the range in inches from the ultrasonic sensor.
+ *
  * @return double Range in inches of the target returned from the ultrasonic
- * sensor. If there is no valid value yet, i.e. at least one measurement hasn't
- * completed, then return 0.
+ *         sensor. If there is no valid value yet, i.e. at least one
+ *         measurement hasn't completed, then return 0.
  */
 double Ultrasonic::GetRangeInches() const {
   if (IsRangeValid())
@@ -267,10 +269,10 @@ double Ultrasonic::GetRangeInches() const {
 
 /**
  * Get the range in millimeters from the ultrasonic sensor.
+ *
  * @return double Range in millimeters of the target returned by the ultrasonic
- * sensor.
- * If there is no valid value yet, i.e. at least one measurement hasn't
- * completed, then return 0.
+ *         sensor. If there is no valid value yet, i.e. at least one
+ *         measurement hasn't completed, then return 0.
  */
 double Ultrasonic::GetRangeMM() const { return GetRangeInches() * 25.4; }
 

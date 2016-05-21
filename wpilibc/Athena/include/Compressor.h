@@ -9,9 +9,9 @@
 #define Compressor_H_
 
 #include "HAL/HAL.hpp"
+#include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 #include "tables/ITableListener.h"
-#include "LiveWindow/LiveWindowSendable.h"
 
 #include <memory>
 
@@ -55,7 +55,7 @@ class Compressor : public SensorBase,
                     std::shared_ptr<nt::Value> value, bool isNew) override;
 
  protected:
-  void *m_pcm_pointer;
+  void* m_pcm_pointer;
 
  private:
   void SetCompressor(bool on);

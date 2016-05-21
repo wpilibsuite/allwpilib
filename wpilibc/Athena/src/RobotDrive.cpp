@@ -7,34 +7,34 @@
 
 #include "RobotDrive.h"
 
+#include <math.h>
 #include "CANJaguar.h"
 #include "GenericHID.h"
 #include "Joystick.h"
 #include "Talon.h"
 #include "Utility.h"
 #include "WPIErrors.h"
-#include <math.h>
 
 #undef max
 #include <algorithm>
 
 const int32_t RobotDrive::kMaxNumberOfMotors;
 
-static auto make_shared_nodelete(SpeedController *ptr) {
+static auto make_shared_nodelete(SpeedController* ptr) {
   return std::shared_ptr<SpeedController>(ptr, NullDeleter<SpeedController>());
 }
 
 /*
  * Driving functions
  * These functions provide an interface to multiple motors that is used for C
- * programming
+ * programming.
  * The Drive(speed, direction) function is the main part of the set that makes
- * it easy
- * to set speeds and direction independently in one call.
+ * it easy to set speeds and direction independently in one call.
  */
 
 /**
  * Common function to initialize all the robot drive constructors.
+ *
  * Create a motor safety object (the real reason for the common code) and
  * initialize all the motor assignments. The default timeout is set for the
  * robot drive.
@@ -46,13 +46,15 @@ void RobotDrive::InitRobotDrive() {
 
 /**
  * Constructor for RobotDrive with 2 motors specified with channel numbers.
+ *
  * Set up parameters for a two wheel drive system where the
  * left and right motor pwm channels are specified in the call.
  * This call assumes Talons for controlling the motors.
- * @param leftMotorChannel The PWM channel number that drives the left motor.
- * 0-9 are on-board, 10-19 are on the MXP port
+ *
+ * @param leftMotorChannel  The PWM channel number that drives the left motor.
+ *                          0-9 are on-board, 10-19 are on the MXP port
  * @param rightMotorChannel The PWM channel number that drives the right motor.
- * 0-9 are on-board, 10-19 are on the MXP port
+ *                          0-9 are on-board, 10-19 are on the MXP port
  */
 RobotDrive::RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel) {
   InitRobotDrive();
@@ -63,17 +65,19 @@ RobotDrive::RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel) {
 
 /**
  * Constructor for RobotDrive with 4 motors specified with channel numbers.
+ *
  * Set up parameters for a four wheel drive system where all four motor
  * pwm channels are specified in the call.
  * This call assumes Talons for controlling the motors.
- * @param frontLeftMotor Front left motor channel number. 0-9 are on-board,
- * 10-19 are on the MXP port
- * @param rearLeftMotor Rear Left motor channel number. 0-9 are on-board, 10-19
- * are on the MXP port
+ *
+ * @param frontLeftMotor  Front left motor channel number. 0-9 are on-board,
+ *                        10-19 are on the MXP port
+ * @param rearLeftMotor   Rear Left motor channel number. 0-9 are on-board,
+ *                        10-19 are on the MXP port
  * @param frontRightMotor Front right motor channel number. 0-9 are on-board,
- * 10-19 are on the MXP port
- * @param rearRightMotor Rear Right motor channel number. 0-9 are on-board,
- * 10-19 are on the MXP port
+ *                        10-19 are on the MXP port
+ * @param rearRightMotor  Rear Right motor channel number. 0-9 are on-board,
+ *                        10-19 are on the MXP port
  */
 RobotDrive::RobotDrive(uint32_t frontLeftMotor, uint32_t rearLeftMotor,
                        uint32_t frontRightMotor, uint32_t rearRightMotor) {
@@ -88,16 +92,17 @@ RobotDrive::RobotDrive(uint32_t frontLeftMotor, uint32_t rearLeftMotor,
 /**
  * Constructor for RobotDrive with 2 motors specified as SpeedController
  * objects.
+ *
  * The SpeedController version of the constructor enables programs to use the
- * RobotDrive classes with
- * subclasses of the SpeedController objects, for example, versions with ramping
- * or reshaping of
- * the curve to suit motor bias or deadband elimination.
- * @param leftMotor The left SpeedController object used to drive the robot.
- * @param rightMotor the right SpeedController object used to drive the robot.
+ * RobotDrive classes with subclasses of the SpeedController objects, for
+ * example, versions with ramping or reshaping of the curve to suit motor bias
+ * or deadband elimination.
+ *
+ * @param leftMotor  The left SpeedController object used to drive the robot.
+ * @param rightMotor The right SpeedController object used to drive the robot.
  */
-RobotDrive::RobotDrive(SpeedController *leftMotor,
-                       SpeedController *rightMotor) {
+RobotDrive::RobotDrive(SpeedController* leftMotor,
+                       SpeedController* rightMotor) {
   InitRobotDrive();
   if (leftMotor == nullptr || rightMotor == nullptr) {
     wpi_setWPIError(NullParameter);
@@ -108,9 +113,9 @@ RobotDrive::RobotDrive(SpeedController *leftMotor,
   m_rearRightMotor = make_shared_nodelete(rightMotor);
 }
 
-//TODO: Change to rvalue references & move syntax.
-RobotDrive::RobotDrive(SpeedController &leftMotor,
-                       SpeedController &rightMotor) {
+// TODO: Change to rvalue references & move syntax.
+RobotDrive::RobotDrive(SpeedController& leftMotor,
+                       SpeedController& rightMotor) {
   InitRobotDrive();
   m_rearLeftMotor = make_shared_nodelete(&leftMotor);
   m_rearRightMotor = make_shared_nodelete(&rightMotor);
@@ -131,20 +136,22 @@ RobotDrive::RobotDrive(std::shared_ptr<SpeedController> leftMotor,
 /**
  * Constructor for RobotDrive with 4 motors specified as SpeedController
  * objects.
+ *
  * Speed controller input version of RobotDrive (see previous comments).
- * @param rearLeftMotor The back left SpeedController object used to drive the
- * robot.
- * @param frontLeftMotor The front left SpeedController object used to drive the
- * robot
- * @param rearRightMotor The back right SpeedController object used to drive the
- * robot.
+ *
+ * @param rearLeftMotor   The back left SpeedController object used to drive
+ *                        the robot.
+ * @param frontLeftMotor  The front left SpeedController object used to drive
+ *                        the robot.
+ * @param rearRightMotor  The back right SpeedController object used to drive
+ *                        the robot.
  * @param frontRightMotor The front right SpeedController object used to drive
- * the robot.
+ *                        the robot.
  */
-RobotDrive::RobotDrive(SpeedController *frontLeftMotor,
-                       SpeedController *rearLeftMotor,
-                       SpeedController *frontRightMotor,
-                       SpeedController *rearRightMotor) {
+RobotDrive::RobotDrive(SpeedController* frontLeftMotor,
+                       SpeedController* rearLeftMotor,
+                       SpeedController* frontRightMotor,
+                       SpeedController* rearRightMotor) {
   InitRobotDrive();
   if (frontLeftMotor == nullptr || rearLeftMotor == nullptr ||
       frontRightMotor == nullptr || rearRightMotor == nullptr) {
@@ -157,10 +164,10 @@ RobotDrive::RobotDrive(SpeedController *frontLeftMotor,
   m_rearRightMotor = make_shared_nodelete(rearRightMotor);
 }
 
-RobotDrive::RobotDrive(SpeedController &frontLeftMotor,
-                       SpeedController &rearLeftMotor,
-                       SpeedController &frontRightMotor,
-                       SpeedController &rearRightMotor) {
+RobotDrive::RobotDrive(SpeedController& frontLeftMotor,
+                       SpeedController& rearLeftMotor,
+                       SpeedController& frontRightMotor,
+                       SpeedController& rearRightMotor) {
   InitRobotDrive();
   m_frontLeftMotor = make_shared_nodelete(&frontLeftMotor);
   m_rearLeftMotor = make_shared_nodelete(&rearLeftMotor);
@@ -197,9 +204,11 @@ RobotDrive::RobotDrive(std::shared_ptr<SpeedController> frontLeftMotor,
  * This function will most likely be used in an autonomous routine.
  *
  * @param outputMagnitude The speed setting for the outside wheel in a turn,
- *        forward or backwards, +1 to -1.
- * @param curve The rate of turn, constant for different forward speeds. Set
- *        curve < 0 for left turn or curve > 0 for right turn.
+ *                        forward or backwards, +1 to -1.
+ * @param curve           The rate of turn, constant for different forward
+ *                        speeds. Set curve < 0 for left turn or curve > 0 for
+ *                        right turn.
+ *
  * Set curve = e^(-r/w) to get a turn radius r for wheelbase w of your robot.
  * Conversely, turn radius r = -ln(curve)*w for a given value of curve and
  * wheelbase w.
@@ -234,12 +243,14 @@ void RobotDrive::Drive(float outputMagnitude, float curve) {
 
 /**
  * Provide tank steering using the stored robot configuration.
+ *
  * Drive the robot using two joystick inputs. The Y-axis will be selected from
  * each Joystick object.
- * @param leftStick The joystick to control the left side of the robot.
+ *
+ * @param leftStick  The joystick to control the left side of the robot.
  * @param rightStick The joystick to control the right side of the robot.
  */
-void RobotDrive::TankDrive(GenericHID *leftStick, GenericHID *rightStick,
+void RobotDrive::TankDrive(GenericHID* leftStick, GenericHID* rightStick,
                            bool squaredInputs) {
   if (leftStick == nullptr || rightStick == nullptr) {
     wpi_setWPIError(NullParameter);
@@ -248,23 +259,25 @@ void RobotDrive::TankDrive(GenericHID *leftStick, GenericHID *rightStick,
   TankDrive(leftStick->GetY(), rightStick->GetY(), squaredInputs);
 }
 
-void RobotDrive::TankDrive(GenericHID &leftStick, GenericHID &rightStick,
+void RobotDrive::TankDrive(GenericHID& leftStick, GenericHID& rightStick,
                            bool squaredInputs) {
   TankDrive(leftStick.GetY(), rightStick.GetY(), squaredInputs);
 }
 
 /**
  * Provide tank steering using the stored robot configuration.
+ *
  * This function lets you pick the axis to be used on each Joystick object for
- * the left
- * and right sides of the robot.
- * @param leftStick The Joystick object to use for the left side of the robot.
- * @param leftAxis The axis to select on the left side Joystick object.
- * @param rightStick The Joystick object to use for the right side of the robot.
- * @param rightAxis The axis to select on the right side Joystick object.
+ * the left and right sides of the robot.
+ *
+ * @param leftStick  The Joystick object to use for the left side of the robot.
+ * @param leftAxis   The axis to select on the left side Joystick object.
+ * @param rightStick The Joystick object to use for the right side of the
+ *                   robot.
+ * @param rightAxis  The axis to select on the right side Joystick object.
  */
-void RobotDrive::TankDrive(GenericHID *leftStick, uint32_t leftAxis,
-                           GenericHID *rightStick, uint32_t rightAxis,
+void RobotDrive::TankDrive(GenericHID* leftStick, uint32_t leftAxis,
+                           GenericHID* rightStick, uint32_t rightAxis,
                            bool squaredInputs) {
   if (leftStick == nullptr || rightStick == nullptr) {
     wpi_setWPIError(NullParameter);
@@ -274,8 +287,8 @@ void RobotDrive::TankDrive(GenericHID *leftStick, uint32_t leftAxis,
             squaredInputs);
 }
 
-void RobotDrive::TankDrive(GenericHID &leftStick, uint32_t leftAxis,
-                           GenericHID &rightStick, uint32_t rightAxis,
+void RobotDrive::TankDrive(GenericHID& leftStick, uint32_t leftAxis,
+                           GenericHID& rightStick, uint32_t rightAxis,
                            bool squaredInputs) {
   TankDrive(leftStick.GetRawAxis(leftAxis), rightStick.GetRawAxis(rightAxis),
             squaredInputs);
@@ -283,8 +296,10 @@ void RobotDrive::TankDrive(GenericHID &leftStick, uint32_t leftAxis,
 
 /**
  * Provide tank steering using the stored robot configuration.
+ *
  * This function lets you directly provide joystick values from any source.
- * @param leftValue The value of the left stick.
+ *
+ * @param leftValue  The value of the left stick.
  * @param rightValue The value of the right stick.
  */
 void RobotDrive::TankDrive(float leftValue, float rightValue,
@@ -318,55 +333,58 @@ void RobotDrive::TankDrive(float leftValue, float rightValue,
 
 /**
  * Arcade drive implements single stick driving.
+ *
  * Given a single Joystick, the class assumes the Y axis for the move value and
- * the X axis
- * for the rotate value.
+ * the X axis for the rotate value.
  * (Should add more information here regarding the way that arcade drive works.)
- * @param stick The joystick to use for Arcade single-stick driving. The Y-axis
- * will be selected
- * for forwards/backwards and the X-axis will be selected for rotation rate.
+ *
+ * @param stick         The joystick to use for Arcade single-stick driving.
+ *                      The Y-axis will be selected for forwards/backwards and
+ *                      the X-axis will be selected for rotation rate.
  * @param squaredInputs If true, the sensitivity will be increased for small
- * values
+ *                      values
  */
-void RobotDrive::ArcadeDrive(GenericHID *stick, bool squaredInputs) {
+void RobotDrive::ArcadeDrive(GenericHID* stick, bool squaredInputs) {
   // simply call the full-featured ArcadeDrive with the appropriate values
   ArcadeDrive(stick->GetY(), stick->GetX(), squaredInputs);
 }
 
 /**
  * Arcade drive implements single stick driving.
+ *
  * Given a single Joystick, the class assumes the Y axis for the move value and
- * the X axis
- * for the rotate value.
+ * the X axis for the rotate value.
  * (Should add more information here regarding the way that arcade drive works.)
- * @param stick The joystick to use for Arcade single-stick driving. The Y-axis
- * will be selected
- * for forwards/backwards and the X-axis will be selected for rotation rate.
+ *
+ * @param stick         The joystick to use for Arcade single-stick driving.
+ *                      The Y-axis will be selected for forwards/backwards and
+ *                      the X-axis will be selected for rotation rate.
  * @param squaredInputs If true, the sensitivity will be increased for small
- * values
+ *                      values
  */
-void RobotDrive::ArcadeDrive(GenericHID &stick, bool squaredInputs) {
+void RobotDrive::ArcadeDrive(GenericHID& stick, bool squaredInputs) {
   // simply call the full-featured ArcadeDrive with the appropriate values
   ArcadeDrive(stick.GetY(), stick.GetX(), squaredInputs);
 }
 
 /**
  * Arcade drive implements single stick driving.
+ *
  * Given two joystick instances and two axis, compute the values to send to
- * either two
- * or four motors.
- * @param moveStick The Joystick object that represents the forward/backward
- * direction
- * @param moveAxis The axis on the moveStick object to use for fowards/backwards
- * (typically Y_AXIS)
- * @param rotateStick The Joystick object that represents the rotation value
- * @param rotateAxis The axis on the rotation object to use for the rotate
- * right/left (typically X_AXIS)
- * @param squaredInputs Setting this parameter to true increases the sensitivity
- * at lower speeds
+ * either two or four motors.
+ *
+ * @param moveStick     The Joystick object that represents the
+ *                      forward/backward direction
+ * @param moveAxis      The axis on the moveStick object to use for
+ *                      forwards/backwards (typically Y_AXIS)
+ * @param rotateStick   The Joystick object that represents the rotation value
+ * @param rotateAxis    The axis on the rotation object to use for the rotate
+ *                      right/left (typically X_AXIS)
+ * @param squaredInputs Setting this parameter to true increases the
+ *                      sensitivity at lower speeds
  */
-void RobotDrive::ArcadeDrive(GenericHID *moveStick, uint32_t moveAxis,
-                             GenericHID *rotateStick, uint32_t rotateAxis,
+void RobotDrive::ArcadeDrive(GenericHID* moveStick, uint32_t moveAxis,
+                             GenericHID* rotateStick, uint32_t rotateAxis,
                              bool squaredInputs) {
   float moveValue = moveStick->GetRawAxis(moveAxis);
   float rotateValue = rotateStick->GetRawAxis(rotateAxis);
@@ -376,22 +394,22 @@ void RobotDrive::ArcadeDrive(GenericHID *moveStick, uint32_t moveAxis,
 
 /**
  * Arcade drive implements single stick driving.
+ *
  * Given two joystick instances and two axis, compute the values to send to
- * either two
- * or four motors.
- * @param moveStick The Joystick object that represents the forward/backward
- * direction
- * @param moveAxis The axis on the moveStick object to use for fowards/backwards
- * (typically Y_AXIS)
- * @param rotateStick The Joystick object that represents the rotation value
- * @param rotateAxis The axis on the rotation object to use for the rotate
- * right/left (typically X_AXIS)
- * @param squaredInputs Setting this parameter to true increases the sensitivity
- * at lower speeds
+ * either two or four motors.
+ *
+ * @param moveStick     The Joystick object that represents the
+ *                      forward/backward direction
+ * @param moveAxis      The axis on the moveStick object to use for
+ *                      forwards/backwards (typically Y_AXIS)
+ * @param rotateStick   The Joystick object that represents the rotation value
+ * @param rotateAxis    The axis on the rotation object to use for the rotate
+ *                      right/left (typically X_AXIS)
+ * @param squaredInputs Setting this parameter to true increases the
+ *                      sensitivity at lower speeds
  */
-
-void RobotDrive::ArcadeDrive(GenericHID &moveStick, uint32_t moveAxis,
-                             GenericHID &rotateStick, uint32_t rotateAxis,
+void RobotDrive::ArcadeDrive(GenericHID& moveStick, uint32_t moveAxis,
+                             GenericHID& rotateStick, uint32_t rotateAxis,
                              bool squaredInputs) {
   float moveValue = moveStick.GetRawAxis(moveAxis);
   float rotateValue = rotateStick.GetRawAxis(rotateAxis);
@@ -401,9 +419,11 @@ void RobotDrive::ArcadeDrive(GenericHID &moveStick, uint32_t moveAxis,
 
 /**
  * Arcade drive implements single stick driving.
+ *
  * This function lets you directly provide joystick values from any source.
- * @param moveValue The value to use for fowards/backwards
- * @param rotateValue The value to use for the rotate right/left
+ *
+ * @param moveValue     The value to use for fowards/backwards
+ * @param rotateValue   The value to use for the rotate right/left
  * @param squaredInputs If set, increases the sensitivity at low speeds
  */
 void RobotDrive::ArcadeDrive(float moveValue, float rotateValue,
@@ -468,16 +488,15 @@ void RobotDrive::ArcadeDrive(float moveValue, float rotateValue,
  *
  * This is designed to be directly driven by joystick axes.
  *
- * @param x The speed that the robot should drive in the X direction.
- * [-1.0..1.0]
- * @param y The speed that the robot should drive in the Y direction.
- * This input is inverted to match the forward == -1.0 that joysticks produce.
- * [-1.0..1.0]
- * @param rotation The rate of rotation for the robot that is completely
- * independent of
- * the translation. [-1.0..1.0]
+ * @param x         The speed that the robot should drive in the X direction.
+ *                  [-1.0..1.0]
+ * @param y         The speed that the robot should drive in the Y direction.
+ *                  This input is inverted to match the forward == -1.0 that
+ *                  joysticks produce. [-1.0..1.0]
+ * @param rotation  The rate of rotation for the robot that is completely
+ *                  independent of the translation. [-1.0..1.0]
  * @param gyroAngle The current angle reading from the gyro.  Use this to
- * implement field-oriented controls.
+ *                  implement field-oriented controls.
  */
 void RobotDrive::MecanumDrive_Cartesian(float x, float y, float rotation,
                                         float gyroAngle) {
@@ -528,13 +547,12 @@ void RobotDrive::MecanumDrive_Cartesian(float x, float y, float rotation,
  * across the robot.
  *
  * @param magnitude The speed that the robot should drive in a given direction.
- * [-1.0..1.0]
+ *                  [-1.0..1.0]
  * @param direction The direction the robot should drive in degrees. The
- * direction and maginitute are
- * independent of the rotation rate.
- * @param rotation The rate of rotation for the robot that is completely
- * independent of
- * the magnitute or direction. [-1.0..1.0]
+ *                  direction and maginitute are independent of the rotation
+ *                  rate.
+ * @param rotation  The rate of rotation for the robot that is completely
+ *                  independent of the magnitute or direction. [-1.0..1.0]
  */
 void RobotDrive::MecanumDrive_Polar(float magnitude, float direction,
                                     float rotation) {
@@ -581,24 +599,25 @@ void RobotDrive::MecanumDrive_Polar(float magnitude, float direction,
  * This is an alias to MecanumDrive_Polar() for backward compatability
  *
  * @param magnitude The speed that the robot should drive in a given direction.
- * [-1.0..1.0]
+ *                  [-1.0..1.0]
  * @param direction The direction the robot should drive. The direction and
- * maginitute are
- * independent of the rotation rate.
- * @param rotation The rate of rotation for the robot that is completely
- * independent of
- * the magnitute or direction.  [-1.0..1.0]
+ *                  magnitude are independent of the rotation rate.
+ * @param rotation  The rate of rotation for the robot that is completely
+ *                  independent of the magnitude or direction.  [-1.0..1.0]
  */
 void RobotDrive::HolonomicDrive(float magnitude, float direction,
                                 float rotation) {
   MecanumDrive_Polar(magnitude, direction, rotation);
 }
 
-/** Set the speed of the right and left motors.
+/**
+ * Set the speed of the right and left motors.
+ *
  * This is used once an appropriate drive setup function is called such as
  * TwoWheelDrive(). The motors are set to "leftOutput" and "rightOutput"
  * and includes flipping the direction of one side for opposing motors.
- * @param leftOutput The speed to send to the left side of the robot.
+ *
+ * @param leftOutput  The speed to send to the left side of the robot.
  * @param rightOutput The speed to send to the right side of the robot.
  */
 void RobotDrive::SetLeftRightMotorOutputs(float leftOutput, float rightOutput) {
@@ -635,7 +654,7 @@ float RobotDrive::Limit(float num) {
 /**
  * Normalize all wheel speeds if the magnitude of any wheel is greater than 1.0.
  */
-void RobotDrive::Normalize(double *wheelSpeeds) {
+void RobotDrive::Normalize(double* wheelSpeeds) {
   double maxMagnitude = fabs(wheelSpeeds[0]);
   int32_t i;
   for (i = 1; i < kMaxNumberOfMotors; i++) {
@@ -652,7 +671,7 @@ void RobotDrive::Normalize(double *wheelSpeeds) {
 /**
  * Rotate a vector in Cartesian space.
  */
-void RobotDrive::RotateVector(double &x, double &y, double angle) {
+void RobotDrive::RotateVector(double& x, double& y, double angle) {
   double cosA = cos(angle * (3.14159 / 180.0));
   double sinA = sin(angle * (3.14159 / 180.0));
   double xOut = x * cosA - y * sinA;
@@ -663,11 +682,12 @@ void RobotDrive::RotateVector(double &x, double &y, double angle) {
 
 /*
  * Invert a motor direction.
+ *
  * This is used when a motor should run in the opposite direction as the drive
  * code would normally run it. Motors that are direct drive would be inverted,
- * the
- * Drive code assumes that the motors are geared with one reversal.
- * @param motor The motor index to invert.
+ * the Drive code assumes that the motors are geared with one reversal.
+ *
+ * @param motor      The motor index to invert.
  * @param isInverted True if the motor should be inverted when operated.
  */
 void RobotDrive::SetInvertedMotor(MotorType motor, bool isInverted) {
@@ -695,8 +715,9 @@ void RobotDrive::SetInvertedMotor(MotorType motor, bool isInverted) {
  * Set the turning sensitivity.
  *
  * This only impacts the Drive() entry-point.
+ *
  * @param sensitivity Effectively sets the turning sensitivity (or turn radius
- * for a given value)
+ *                    for a given value)
  */
 void RobotDrive::SetSensitivity(float sensitivity) {
   m_sensitivity = sensitivity;
@@ -705,16 +726,16 @@ void RobotDrive::SetSensitivity(float sensitivity) {
 /**
  * Configure the scaling factor for using RobotDrive with motor controllers in a
  * mode other than PercentVbus.
+ *
  * @param maxOutput Multiplied with the output percentage computed by the drive
- * functions.
+ *                  functions.
  */
 void RobotDrive::SetMaxOutput(double maxOutput) { m_maxOutput = maxOutput; }
 
 /**
  * Set the number of the sync group for the motor controllers.  If the motor
- * controllers are {@link CANJaguar}s,
- * then they will all be added to this sync group, causing them to update their
- * values at the same time.
+ * controllers are {@link CANJaguar}s, then they will all be added to this sync
+ * group, causing them to update their values at the same time.
  *
  * @param syncGroup the update group to add the motor controllers to
  */

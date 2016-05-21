@@ -6,8 +6,8 @@
 /*----------------------------------------------------------------------------*/
 
 #include "AnalogInput.h"
-#include "interfaces/Potentiometer.h"
 #include "LiveWindow/LiveWindowSendable.h"
+#include "interfaces/Potentiometer.h"
 
 #include <memory>
 
@@ -43,7 +43,7 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
   explicit AnalogPotentiometer(int channel, double fullRange = 1.0,
                                double offset = 0.0);
 
-  explicit AnalogPotentiometer(AnalogInput *input, double fullRange = 1.0,
+  explicit AnalogPotentiometer(AnalogInput* input, double fullRange = 1.0,
                                double offset = 0.0);
 
   explicit AnalogPotentiometer(std::shared_ptr<AnalogInput> input,

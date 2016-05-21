@@ -8,7 +8,7 @@
 #pragma once
 
 class Switch {
-public:
+ public:
   virtual ~Switch() {}
 
   /// \brief Returns true when the switch is triggered.

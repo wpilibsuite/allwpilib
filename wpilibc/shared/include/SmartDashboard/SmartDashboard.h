@@ -8,20 +8,20 @@
 #ifndef __SMART_DASHBOARD_H__
 #define __SMART_DASHBOARD_H__
 
-#include "SensorBase.h"
 #include <map>
 #include <string>
-#include "SmartDashboard/Sendable.h"
+#include "SensorBase.h"
 #include "SmartDashboard/NamedSendable.h"
+#include "SmartDashboard/Sendable.h"
 #include "tables/ITable.h"
 
 class SmartDashboard : public SensorBase {
  public:
   static void init();
 
-  static void PutData(llvm::StringRef key, Sendable *data);
-  static void PutData(NamedSendable *value);
-  static Sendable *GetData(llvm::StringRef keyName);
+  static void PutData(llvm::StringRef key, Sendable* data);
+  static void PutData(NamedSendable* value);
+  static Sendable* GetData(llvm::StringRef keyName);
 
   static void PutBoolean(llvm::StringRef keyName, bool value);
   static bool GetBoolean(llvm::StringRef keyName, bool defaultValue);
@@ -44,11 +44,10 @@ class SmartDashboard : public SensorBase {
   static std::shared_ptr<ITable> m_table;
 
   /**
-   * A map linking tables in the SmartDashboard to the {@link
-   * SmartDashboardData} objects
-   * they came from.
+   * A map linking tables in the SmartDashboard to the
+   * {@link SmartDashboardData} objects they came from.
    */
-  static std::map<std::shared_ptr<ITable> , Sendable *> m_tablesToData;
+  static std::map<std::shared_ptr<ITable>, Sendable*> m_tablesToData;
 };
 
 #endif

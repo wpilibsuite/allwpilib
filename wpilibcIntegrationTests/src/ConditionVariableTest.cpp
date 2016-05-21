@@ -10,12 +10,12 @@
 #include "HAL/cpp/priority_condition_variable.h"
 #include "HAL/cpp/priority_mutex.h"
 
-#include "gtest/gtest.h"
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <mutex>
 #include <thread>
+#include "gtest/gtest.h"
 
 namespace wpilib {
 namespace testing {
@@ -41,7 +41,7 @@ class ConditionVariableTest : public ::testing::Test {
   // Information for when running with predicates.
   std::atomic<bool> m_pred_var{false};
 
-  void ShortSleep(unsigned long time=10) {
+  void ShortSleep(unsigned long time = 10) {
     std::this_thread::sleep_for(std::chrono::milliseconds(time));
   }
 
@@ -58,8 +58,7 @@ class ConditionVariableTest : public ::testing::Test {
     ShortSleep();
     bool locked = m_mutex.try_lock();
     if (locked) m_mutex.unlock();
-    EXPECT_TRUE(locked)
-        << "The condition variable failed to unlock the lock.";
+    EXPECT_TRUE(locked) << "The condition variable failed to unlock the lock.";
   }
 
   void NotifyAll() { m_cond.notify_all(); }
@@ -91,13 +90,12 @@ class ConditionVariableTest : public ::testing::Test {
   // the timeout works properly.
   void WaitTimeTest(bool wait_for) {
     std::atomic<bool> timed_out{true};
-    auto wait_until = [this, &timed_out, wait_for](std::atomic<bool> &done) {
+    auto wait_until = [this, &timed_out, wait_for](std::atomic<bool>& done) {
       priority_lock lock(m_mutex);
       done = false;
       if (wait_for) {
         auto wait_time = std::chrono::milliseconds(100);
-        timed_out =
-            m_cond.wait_for(lock, wait_time) == std::cv_status::timeout;
+        timed_out = m_cond.wait_for(lock, wait_time) == std::cv_status::timeout;
       } else {
         auto wait_time =
             std::chrono::system_clock::now() + std::chrono::milliseconds(100);
@@ -138,8 +136,8 @@ class ConditionVariableTest : public ::testing::Test {
     // false, the return value will be false.
     std::atomic<bool> retval{true};
     auto predicate = [this]() -> bool { return m_pred_var; };
-    auto wait_until =
-        [this, &retval, predicate, wait_for](std::atomic<bool> &done) {
+    auto wait_until = [this, &retval, predicate,
+                       wait_for](std::atomic<bool>& done) {
       priority_lock lock(m_mutex);
       done = false;
       if (wait_for) {
@@ -203,15 +201,19 @@ class ConditionVariableTest : public ::testing::Test {
     // std::terminate is called and all threads are terminated.
     // Detaching is non-optimal, but should allow the rest of the tests to run
     // before anything drastic occurs.
-    if (m_done1) m_watcher1.join();
-    else m_watcher1.detach();
-    if (m_done2) m_watcher2.join();
-    else m_watcher2.detach();
+    if (m_done1)
+      m_watcher1.join();
+    else
+      m_watcher1.detach();
+    if (m_done2)
+      m_watcher2.join();
+    else
+      m_watcher2.detach();
   }
 };
 
 TEST_F(ConditionVariableTest, NotifyAll) {
-  auto wait = [this](std::atomic<bool> &done) {
+  auto wait = [this](std::atomic<bool>& done) {
     priority_lock lock(m_mutex);
     done = false;
     m_cond.wait(lock);
@@ -226,7 +228,7 @@ TEST_F(ConditionVariableTest, NotifyAll) {
 }
 
 TEST_F(ConditionVariableTest, NotifyOne) {
-  auto wait = [this](std::atomic<bool> &done) {
+  auto wait = [this](std::atomic<bool>& done) {
     priority_lock lock(m_mutex);
     done = false;
     m_cond.wait(lock);
@@ -248,7 +250,7 @@ TEST_F(ConditionVariableTest, NotifyOne) {
 
 TEST_F(ConditionVariableTest, WaitWithPredicate) {
   auto predicate = [this]() -> bool { return m_pred_var; };
-  auto wait_predicate = [this, predicate](std::atomic<bool> &done) {
+  auto wait_predicate = [this, predicate](std::atomic<bool>& done) {
     priority_lock lock(m_mutex);
     done = false;
     m_cond.wait(lock, predicate);
@@ -262,24 +264,20 @@ TEST_F(ConditionVariableTest, WaitWithPredicate) {
   PredicateTest();
 }
 
-TEST_F(ConditionVariableTest, WaitUntil) {
-  WaitTimeTest(false);
-}
+TEST_F(ConditionVariableTest, WaitUntil) { WaitTimeTest(false); }
 
 TEST_F(ConditionVariableTest, WaitUntilWithPredicate) {
   WaitTimePredicateTest(false);
 }
 
-TEST_F(ConditionVariableTest, WaitFor) {
-  WaitTimeTest(true);
-}
+TEST_F(ConditionVariableTest, WaitFor) { WaitTimeTest(true); }
 
 TEST_F(ConditionVariableTest, WaitForWithPredicate) {
   WaitTimePredicateTest(true);
 }
 
 TEST_F(ConditionVariableTest, NativeHandle) {
-  auto wait = [this](std::atomic<bool> &done) {
+  auto wait = [this](std::atomic<bool>& done) {
     priority_lock lock(m_mutex);
     done = false;
     m_cond.wait(lock);

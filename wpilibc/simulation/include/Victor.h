@@ -7,21 +7,20 @@
 
 #pragma once
 
+#include "PIDOutput.h"
 #include "SafePWM.h"
 #include "SpeedController.h"
-#include "PIDOutput.h"
 
 /**
- * IFI Victor Speed Controller
+ * IFI Victor Speed Controller.
  */
-class Victor : public SafePWM, public SpeedController
-{
-public:
-	explicit Victor(uint32_t channel);
-	virtual ~Victor() = default;
-	virtual void Set(float value, uint8_t syncGroup = 0);
-	virtual float Get() const;
-	virtual void Disable();
+class Victor : public SafePWM, public SpeedController {
+ public:
+  explicit Victor(uint32_t channel);
+  virtual ~Victor() = default;
+  virtual void Set(float value, uint8_t syncGroup = 0);
+  virtual float Get() const;
+  virtual void Disable();
 
-	virtual void PIDWrite(float output) override;
+  virtual void PIDWrite(float output) override;
 };

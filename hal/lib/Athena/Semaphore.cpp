@@ -12,9 +12,11 @@
 // set the logging level
 TLogLevel semaphoreLogLevel = logDEBUG;
 
-#define SEMAPHORE_LOG(level) \
-    if (level > semaphoreLogLevel) ; \
-    else Log().Get(level)
+#define SEMAPHORE_LOG(level)     \
+  if (level > semaphoreLogLevel) \
+    ;                            \
+  else                           \
+  Log().Get(level)
 
 extern "C" {
 

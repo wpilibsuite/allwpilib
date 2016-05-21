@@ -7,8 +7,8 @@
 
 #include <CANTalon.h>
 #include <Timer.h>
-#include "gtest/gtest.h"
 #include "TestBench.h"
+#include "gtest/gtest.h"
 
 const int deviceId = 0;
 
@@ -71,6 +71,6 @@ TEST(CANTalonTest, DISABLED_PositionModeWorks) {
 
 TEST(CANTalonTest, GetFaults) {
   CANTalon talon(deviceId);
-  EXPECT_EQ(talon.GetFaults(),0);
-  EXPECT_EQ(talon.GetStickyFaults(),0);
+  EXPECT_EQ(talon.GetFaults(), 0);
+  EXPECT_EQ(talon.GetStickyFaults(), 0);
 }

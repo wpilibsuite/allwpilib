@@ -10,8 +10,8 @@
 #include "WPIErrors.h"
 
 #include <errno.h>
-#include <cstring>
 #include <cstdio>
+#include <cstring>
 #include <sstream>
 
 priority_mutex ErrorBase::_globalErrorMutex;
@@ -35,9 +35,9 @@ void ErrorBase::ClearError() const { m_error.Clear(); }
  * error to the "errno" global variable.
  *
  * @param contextMessage A custom message from the code that set the error.
- * @param filename Filename of the error source
- * @param function Function of the error source
- * @param lineNumber Line number of the error source
+ * @param filename       Filename of the error source
+ * @param function       Function of the error source
+ * @param lineNumber     Line number of the error source
  */
 void ErrorBase::SetErrnoError(llvm::StringRef contextMessage,
                               llvm::StringRef filename,
@@ -55,7 +55,7 @@ void ErrorBase::SetErrnoError(llvm::StringRef contextMessage,
     err = buf;
   }
 
-  //  Set the current error information for this object.
+  // Set the current error information for this object.
   m_error.Set(-1, err, filename, function, lineNumber, this);
 
   // Update the global error if there is not one already set.
@@ -69,21 +69,21 @@ void ErrorBase::SetErrnoError(llvm::StringRef contextMessage,
  * @brief Set the current error information associated from the nivision Imaq
  * API.
  *
- * @param success The return from the function
+ * @param success        The return from the function
  * @param contextMessage A custom message from the code that set the error.
- * @param filename Filename of the error source
- * @param function Function of the error source
- * @param lineNumber Line number of the error source
+ * @param filename       Filename of the error source
+ * @param function       Function of the error source
+ * @param lineNumber     Line number of the error source
  */
 void ErrorBase::SetImaqError(int success, llvm::StringRef contextMessage,
                              llvm::StringRef filename, llvm::StringRef function,
                              uint32_t lineNumber) const {
-  //  If there was an error
+  // If there was an error
   if (success <= 0) {
     std::stringstream err;
     err << success << ": " << contextMessage;
 
-    //  Set the current error information for this object.
+    // Set the current error information for this object.
     m_error.Set(success, err.str(), filename, function, lineNumber, this);
 
     // Update the global error if there is not one already set.
@@ -97,11 +97,11 @@ void ErrorBase::SetImaqError(int success, llvm::StringRef contextMessage,
 /**
  * @brief Set the current error information associated with this sensor.
  *
- * @param code The error code
+ * @param code           The error code
  * @param contextMessage A custom message from the code that set the error.
- * @param filename Filename of the error source
- * @param function Function of the error source
- * @param lineNumber Line number of the error source
+ * @param filename       Filename of the error source
+ * @param function       Function of the error source
+ * @param lineNumber     Line number of the error source
  */
 void ErrorBase::SetError(Error::Code code, llvm::StringRef contextMessage,
                          llvm::StringRef filename, llvm::StringRef function,
@@ -122,11 +122,11 @@ void ErrorBase::SetError(Error::Code code, llvm::StringRef contextMessage,
 /**
  * @brief Set the current error information associated with this sensor.
  *
- * @param errorMessage The error message from WPIErrors.h
+ * @param errorMessage   The error message from WPIErrors.h
  * @param contextMessage A custom message from the code that set the error.
- * @param filename Filename of the error source
- * @param function Function of the error source
- * @param lineNumber Line number of the error source
+ * @param filename       Filename of the error source
+ * @param function       Function of the error source
+ * @param lineNumber     Line number of the error source
  */
 void ErrorBase::SetWPIError(llvm::StringRef errorMessage, Error::Code code,
                             llvm::StringRef contextMessage,
@@ -149,20 +149,20 @@ void ErrorBase::CloneError(const ErrorBase& rhs) const {
 }
 
 /**
-@brief Check if the current error code represents a fatal error.
-
-@return true if the current error is fatal.
-*/
+ * @brief Check if the current error code represents a fatal error.
+ *
+ * @return true if the current error is fatal.
+ */
 bool ErrorBase::StatusIsFatal() const { return m_error.GetCode() < 0; }
 
 void ErrorBase::SetGlobalError(Error::Code code, llvm::StringRef contextMessage,
                                llvm::StringRef filename,
                                llvm::StringRef function, uint32_t lineNumber) {
-  //  If there was an error
+  // If there was an error
   if (code != 0) {
     std::lock_guard<priority_mutex> mutex(_globalErrorMutex);
 
-    //  Set the current error information for this object.
+    // Set the current error information for this object.
     _globalError.Set(code, contextMessage, filename, function, lineNumber,
                      nullptr);
   }
@@ -183,8 +183,8 @@ void ErrorBase::SetGlobalWPIError(llvm::StringRef errorMessage,
 }
 
 /**
-  * Retrieve the current global error.
-*/
+ * Retrieve the current global error.
+ */
 Error& ErrorBase::GetGlobalError() {
   std::lock_guard<priority_mutex> mutex(_globalErrorMutex);
   return _globalError;

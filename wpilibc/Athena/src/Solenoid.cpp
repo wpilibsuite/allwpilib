@@ -6,8 +6,8 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Solenoid.h"
-#include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
+#include "WPIErrors.h"
 
 #include <sstream>
 
@@ -23,7 +23,7 @@ Solenoid::Solenoid(uint32_t channel)
  * Constructor.
  *
  * @param moduleNumber The CAN ID of the PCM the solenoid is attached to
- * @param channel The channel on the PCM to control (0..7).
+ * @param channel      The channel on the PCM to control (0..7).
  */
 Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel)
     : SolenoidBase(moduleNumber), m_channel(channel) {
@@ -86,11 +86,14 @@ bool Solenoid::Get() const {
   uint8_t value = GetAll(m_moduleNumber) & (1 << m_channel);
   return (value != 0);
 }
+
 /**
  * Check if solenoid is blacklisted.
- * 		If a solenoid is shorted, it is added to the blacklist and
- * 		disabled until power cycle, or until faults are cleared.
- * 		@see ClearAllPCMStickyFaults()
+ *
+ * If a solenoid is shorted, it is added to the blacklist and
+ * disabled until power cycle, or until faults are cleared.
+ *
+ * @see ClearAllPCMStickyFaults()
  *
  * @return If solenoid is disabled due to short.
  */

@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "HAL/Accelerometer.hpp"
 #include <jni.h>
 #include "edu_wpi_first_wpilibj_hal_AccelerometerJNI.h"
-#include "HAL/Accelerometer.hpp"
 
 extern "C" {
 
@@ -16,10 +16,10 @@ extern "C" {
  * Method:    setAccelerometerActive
  * Signature: (Z)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_setAccelerometerActive
-  (JNIEnv *, jclass, jboolean active)
-{
-	setAccelerometerActive(active);
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_setAccelerometerActive(
+    JNIEnv *, jclass, jboolean active) {
+  setAccelerometerActive(active);
 }
 
 /*
@@ -27,10 +27,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_setAccele
  * Method:    setAccelerometerRange
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_setAccelerometerRange
-  (JNIEnv *, jclass, jint range)
-{
-	setAccelerometerRange((AccelerometerRange)range);
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_setAccelerometerRange(
+    JNIEnv *, jclass, jint range) {
+  setAccelerometerRange((AccelerometerRange)range);
 }
 
 /*
@@ -38,10 +38,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_setAccele
  * Method:    getAccelerometerX
  * Signature: ()D
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerX
-  (JNIEnv *, jclass)
-{
-	return getAccelerometerX();
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerX(
+    JNIEnv *, jclass) {
+  return getAccelerometerX();
 }
 
 /*
@@ -49,10 +49,10 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAcc
  * Method:    getAccelerometerY
  * Signature: ()D
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerY
-  (JNIEnv *, jclass)
-{
-	return getAccelerometerY();
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerY(
+    JNIEnv *, jclass) {
+  return getAccelerometerY();
 }
 
 /*
@@ -60,10 +60,10 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAcc
  * Method:    getAccelerometerZ
  * Signature: ()D
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerZ
-  (JNIEnv *, jclass)
-{
-	return getAccelerometerZ();
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerZ(
+    JNIEnv *, jclass) {
+  return getAccelerometerZ();
 }
 
 }  // extern "C"

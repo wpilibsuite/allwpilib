@@ -9,14 +9,13 @@
 #include "simulation/MainNode.h"
 
 SimDigitalInput::SimDigitalInput(std::string topic) {
-    sub = MainNode::Subscribe("~/simulator/"+topic, &SimDigitalInput::callback, this);
-	std::cout << "Initialized ~/simulator/"+topic << std::endl;
+  sub = MainNode::Subscribe("~/simulator/" + topic, &SimDigitalInput::callback,
+                            this);
+  std::cout << "Initialized ~/simulator/" + topic << std::endl;
 }
 
-bool SimDigitalInput::Get() {
-	return value;
-}
+bool SimDigitalInput::Get() { return value; }
 
-void SimDigitalInput::callback(const msgs::ConstBoolPtr &msg) {
+void SimDigitalInput::callback(const msgs::ConstBoolPtr& msg) {
   value = msg->data();
 }

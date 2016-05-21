@@ -30,7 +30,8 @@ class priority_condition_variable {
   ~priority_condition_variable() = default;
 
   priority_condition_variable(const priority_condition_variable&) = delete;
-  priority_condition_variable& operator=(const priority_condition_variable&) = delete;
+  priority_condition_variable& operator=(const priority_condition_variable&) =
+      delete;
 
   void notify_one() noexcept {
     std::lock_guard<std::mutex> lock(*m_mutex);
@@ -42,7 +43,7 @@ class priority_condition_variable {
     m_cond.notify_all();
   }
 
-  template<typename Lock>
+  template <typename Lock>
   void wait(Lock& _lock) {
     std::shared_ptr<std::mutex> _mutex = m_mutex;
     std::unique_lock<std::mutex> my_lock(*_mutex);
@@ -54,14 +55,16 @@ class priority_condition_variable {
     m_cond.wait(my_lock2);
   }
 
-  template<typename Lock, typename Predicate>
+  template <typename Lock, typename Predicate>
   void wait(Lock& lock, Predicate p) {
-    while (!p()) { wait(lock); }
+    while (!p()) {
+      wait(lock);
+    }
   }
 
-  template<typename Lock, typename Clock, typename Duration>
-  std::cv_status wait_until(Lock& _lock,
-        const std::chrono::time_point<Clock, Duration>& atime) {
+  template <typename Lock, typename Clock, typename Duration>
+  std::cv_status wait_until(
+      Lock& _lock, const std::chrono::time_point<Clock, Duration>& atime) {
     std::shared_ptr<std::mutex> _mutex = m_mutex;
     std::unique_lock<std::mutex> my_lock(*_mutex);
     Unlock<Lock> unlock(_lock);
@@ -72,9 +75,11 @@ class priority_condition_variable {
     return m_cond.wait_until(my_lock2, atime);
   }
 
-  template<typename Lock, typename Clock, typename Duration, typename Predicate>
+  template <typename Lock, typename Clock, typename Duration,
+            typename Predicate>
   bool wait_until(Lock& lock,
-      const std::chrono::time_point<Clock, Duration>& atime, Predicate p) {
+                  const std::chrono::time_point<Clock, Duration>& atime,
+                  Predicate p) {
     while (!p()) {
       if (wait_until(lock, atime) == std::cv_status::timeout) {
         return p();
@@ -83,35 +88,36 @@ class priority_condition_variable {
     return true;
   }
 
-  template<typename Lock, typename Rep, typename Period>
-  std::cv_status wait_for(Lock& lock, const std::chrono::duration<Rep, Period>& rtime) {
+  template <typename Lock, typename Rep, typename Period>
+  std::cv_status wait_for(Lock& lock,
+                          const std::chrono::duration<Rep, Period>& rtime) {
     return wait_until(lock, clock_t::now() + rtime);
   }
 
-  template<typename Lock, typename Rep, typename Period, typename Predicate>
+  template <typename Lock, typename Rep, typename Period, typename Predicate>
   bool wait_for(Lock& lock, const std::chrono::duration<Rep, Period>& rtime,
-      Predicate p) {
+                Predicate p) {
     return wait_until(lock, clock_t::now() + rtime, std::move(p));
   }
 
-  native_handle_type native_handle() {
-    return m_cond.native_handle();
-  }
+  native_handle_type native_handle() { return m_cond.native_handle(); }
 
  private:
   std::condition_variable m_cond;
   std::shared_ptr<std::mutex> m_mutex;
 
   // scoped unlock - unlocks in ctor, re-locks in dtor
-  template<typename Lock>
+  template <typename Lock>
   struct Unlock {
     explicit Unlock(Lock& lk) : m_lock(lk) { lk.unlock(); }
 
     ~Unlock() /*noexcept(false)*/ {
       if (std::uncaught_exception()) {
-        try { m_lock.lock(); } catch(...) {}
-      }
-      else {
+        try {
+          m_lock.lock();
+        } catch (...) {
+        }
+      } else {
         m_lock.lock();
       }
     }

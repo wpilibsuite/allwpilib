@@ -7,13 +7,11 @@
 
 #pragma once
 
-
 #include "simulation/gz_msgs/msgs.h"
 
+#include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/transport.hh>
-#include <gazebo/gazebo.hh>
-
 
 using namespace gazebo;
 
@@ -34,8 +32,8 @@ using namespace gazebo;
  *
  * \todo Make WorldPlugin?
  */
-class Clock: public ModelPlugin {
-public:
+class Clock : public ModelPlugin {
+ public:
   Clock();
   ~Clock();
 
@@ -43,13 +41,13 @@ public:
   void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
 
   /// \brief Sends out time each timestep.
-  void Update(const common::UpdateInfo &info);
+  void Update(const common::UpdateInfo& info);
 
-private:
-  std::string topic;               ///< \brief Publish the time on this topic.
-  physics::ModelPtr model;         ///< \brief The model that this is attached to.
-  event::ConnectionPtr updateConn; ///< \brief Pointer to the world update function.
-  transport::NodePtr node;         ///< \brief The node we're advertising on.
-  transport::PublisherPtr pub;     ///< \brief Publisher handle.
+ private:
+  std::string topic;        ///< \brief Publish the time on this topic.
+  physics::ModelPtr model;  ///< \brief The model that this is attached to.
+  event::ConnectionPtr
+      updateConn;           ///< \brief Pointer to the world update function.
+  transport::NodePtr node;  ///< \brief The node we're advertising on.
+  transport::PublisherPtr pub;  ///< \brief Publisher handle.
 };
-

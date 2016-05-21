@@ -15,7 +15,7 @@ class Command;
 
 class ReleasedButtonScheduler : public ButtonScheduler {
  public:
-  ReleasedButtonScheduler(bool last, Trigger *button, Command *orders);
+  ReleasedButtonScheduler(bool last, Trigger* button, Command* orders);
   virtual ~ReleasedButtonScheduler() = default;
   virtual void Execute();
 };

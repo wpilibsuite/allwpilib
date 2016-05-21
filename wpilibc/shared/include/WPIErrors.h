@@ -11,11 +11,11 @@
 
 #ifdef WPI_ERRORS_DEFINE_STRINGS
 #define S(label, offset, message)            \
-  const char * wpi_error_s_##label = message; \
+  const char* wpi_error_s_##label = message; \
   const int32_t wpi_error_value_##label = offset
 #else
 #define S(label, offset, message)         \
-  extern const char * wpi_error_s_##label; \
+  extern const char* wpi_error_s_##label; \
   const int32_t wpi_error_value_##label = offset
 #endif
 

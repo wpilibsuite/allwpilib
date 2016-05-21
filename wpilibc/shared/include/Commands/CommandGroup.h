@@ -8,25 +8,24 @@
 #ifndef __COMMAND_GROUP_H__
 #define __COMMAND_GROUP_H__
 
-#include "Commands/Command.h"
-#include "Commands/CommandGroupEntry.h"
 #include <list>
 #include <vector>
+#include "Commands/Command.h"
+#include "Commands/CommandGroupEntry.h"
 
 /**
  * A {@link CommandGroup} is a list of commands which are executed in sequence.
  *
  * <p>Commands in a {@link CommandGroup} are added using the {@link
- * CommandGroup#AddSequential(Command) AddSequential(...)} method
- * and are called sequentially.
- * {@link CommandGroup CommandGroups} are themselves {@link Command Commands}
- * and can be given to other {@link CommandGroup CommandGroups}.</p>
+ * CommandGroup#AddSequential(Command) AddSequential(...)} method and are
+ * called sequentially. {@link CommandGroup CommandGroups} are themselves
+ * {@link Command Commands} and can be given to other
+ * {@link CommandGroup CommandGroups}.</p>
  *
  * <p>{@link CommandGroup CommandGroups} will carry all of the requirements of
- * their {@link Command subcommands}.  Additional
- * requirements can be specified by calling {@link
- *CommandGroup#Requires(Subsystem) Requires(...)}
- * normally in the constructor.</P>
+ * their {@link Command subcommands}.  Additional requirements can be specified
+ * by calling {@link CommandGroup#Requires(Subsystem) Requires(...)} normally
+ * in the constructor.</P>
  *
  * <p>CommandGroups can also execute commands in parallel, simply by adding them
  * using {@link CommandGroup#AddParallel(Command) AddParallel(...)}.</p>
@@ -37,13 +36,13 @@
 class CommandGroup : public Command {
  public:
   CommandGroup() = default;
-  CommandGroup(const std::string &name);
+  CommandGroup(const std::string& name);
   virtual ~CommandGroup() = default;
 
-  void AddSequential(Command *command);
-  void AddSequential(Command *command, double timeout);
-  void AddParallel(Command *command);
-  void AddParallel(Command *command, double timeout);
+  void AddSequential(Command* command);
+  void AddSequential(Command* command, double timeout);
+  void AddParallel(Command* command);
+  void AddParallel(Command* command, double timeout);
   bool IsInterruptible() const;
   int GetSize() const;
 
@@ -59,7 +58,7 @@ class CommandGroup : public Command {
   virtual void _End();
 
  private:
-  void CancelConflicts(Command *command);
+  void CancelConflicts(Command* command);
 
   /** The commands in this group (stored in entries) */
   std::vector<CommandGroupEntry> m_commands;

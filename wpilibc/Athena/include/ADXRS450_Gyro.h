@@ -8,9 +8,9 @@
 #pragma once
 
 #include "GyroBase.h"
+#include "HAL/cpp/priority_mutex.h"
 #include "Notifier.h"
 #include "SPI.h"
-#include "HAL/cpp/priority_mutex.h"
 
 #include <memory>
 

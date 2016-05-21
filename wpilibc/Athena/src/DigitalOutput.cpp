@@ -14,15 +14,16 @@
 
 /**
  * Create an instance of a digital output.
+ *
  * Create a digital output given a channel.
  *
  * @param channel The digital channel 0-9 are on-board, 10-25 are on the MXP
- * port
+ *                port
  */
 DigitalOutput::DigitalOutput(uint32_t channel) {
   std::stringstream buf;
 
-  m_pwmGenerator = (void *)std::numeric_limits<uint32_t>::max();
+  m_pwmGenerator = (void*)std::numeric_limits<uint32_t>::max();
   if (!CheckDigitalChannel(channel)) {
     buf << "Digital Channel " << channel;
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
@@ -54,7 +55,9 @@ DigitalOutput::~DigitalOutput() {
 
 /**
  * Set the value of a digital output.
+ *
  * Set the value of a digital output to either one (true) or zero (false).
+ *
  * @param value 1 (true) for high, 0 (false) for disabled
  */
 void DigitalOutput::Set(uint32_t value) {
@@ -72,9 +75,10 @@ uint32_t DigitalOutput::GetChannel() const { return m_channel; }
 
 /**
  * Output a single pulse on the digital output line.
+ *
  * Send a single pulse on the digital output line where the pulse duration is
- * specified in seconds.
- * Maximum pulse length is 0.0016 seconds.
+ * specified in seconds. Maximum pulse length is 0.0016 seconds.
+ *
  * @param length The pulselength in seconds
  */
 void DigitalOutput::Pulse(float length) {
@@ -87,6 +91,7 @@ void DigitalOutput::Pulse(float length) {
 
 /**
  * Determine if the pulse is still going.
+ *
  * Determine if a previously started pulse is still going.
  */
 bool DigitalOutput::IsPulsing() const {
@@ -130,7 +135,7 @@ void DigitalOutput::SetPWMRate(float rate) {
  * @param initialDutyCycle The duty-cycle to start generating. [0..1]
  */
 void DigitalOutput::EnablePWM(float initialDutyCycle) {
-  if (m_pwmGenerator != (void *)std::numeric_limits<uint32_t>::max()) return;
+  if (m_pwmGenerator != (void*)std::numeric_limits<uint32_t>::max()) return;
 
   int32_t status = 0;
 
@@ -154,7 +159,7 @@ void DigitalOutput::EnablePWM(float initialDutyCycle) {
  */
 void DigitalOutput::DisablePWM() {
   if (StatusIsFatal()) return;
-  if (m_pwmGenerator == (void *)std::numeric_limits<uint32_t>::max()) return;
+  if (m_pwmGenerator == (void*)std::numeric_limits<uint32_t>::max()) return;
 
   int32_t status = 0;
 
@@ -165,7 +170,7 @@ void DigitalOutput::DisablePWM() {
   freePWM(m_pwmGenerator, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
-  m_pwmGenerator = (void *)std::numeric_limits<uint32_t>::max();
+  m_pwmGenerator = (void*)std::numeric_limits<uint32_t>::max();
 }
 
 /**

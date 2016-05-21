@@ -9,8 +9,8 @@
 
 #include <array>
 
-#include "HAL/cpp/priority_mutex.h"
 #include "DigitalSource.h"
+#include "HAL/cpp/priority_mutex.h"
 
 class Encoder;
 class Counter;
@@ -26,13 +26,13 @@ class DigitalGlitchFilter : public SensorBase {
   DigitalGlitchFilter();
   ~DigitalGlitchFilter();
 
-  void Add(DigitalSource *input);
-  void Add(Encoder *input);
-  void Add(Counter *input);
+  void Add(DigitalSource* input);
+  void Add(Encoder* input);
+  void Add(Counter* input);
 
-  void Remove(DigitalSource *input);
-  void Remove(Encoder *input);
-  void Remove(Counter *input);
+  void Remove(DigitalSource* input);
+  void Remove(Encoder* input);
+  void Remove(Counter* input);
 
   void SetPeriodCycles(uint32_t fpga_cycles);
   void SetPeriodNanoSeconds(uint64_t nanoseconds);
@@ -44,7 +44,7 @@ class DigitalGlitchFilter : public SensorBase {
   // Sets the filter for the input to be the requested index.  A value of 0
   // disables the filter, and the filter value must be between 1 and 3,
   // inclusive.
-  void DoAdd(DigitalSource *input, int requested_index);
+  void DoAdd(DigitalSource* input, int requested_index);
 
   int m_channelIndex = -1;
   static priority_mutex m_mutex;

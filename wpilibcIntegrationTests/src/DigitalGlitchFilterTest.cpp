@@ -6,9 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include <Counter.h>
+#include <DigitalGlitchFilter.h>
 #include <DigitalInput.h>
 #include <Encoder.h>
-#include <DigitalGlitchFilter.h>
 #include "gtest/gtest.h"
 
 /**

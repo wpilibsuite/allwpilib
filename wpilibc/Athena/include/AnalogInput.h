@@ -8,9 +8,9 @@
 #pragma once
 
 #include "HAL/HAL.hpp"
-#include "SensorBase.h"
-#include "PIDSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
+#include "PIDSource.h"
+#include "SensorBase.h"
 
 #include <memory>
 
@@ -18,16 +18,13 @@
  * Analog input class.
  *
  * Connected to each analog channel is an averaging and oversampling engine.
- * This engine accumulates
- * the specified ( by SetAverageBits() and SetOversampleBits() ) number of
- * samples before returning a new
- * value.  This is not a sliding window average.  The only difference between
- * the oversampled samples and
- * the averaged samples is that the oversampled samples are simply accumulated
- * effectively increasing the
- * resolution, while the averaged samples are divided by the number of samples
- * to retain the resolution,
- * but get more stable values.
+ * This engine accumulates the specified ( by SetAverageBits() and
+ * SetOversampleBits() ) number of samples before returning a new value.  This
+ * is not a sliding window average.  The only difference between the oversampled
+ * samples and the averaged samples is that the oversampled samples are simply
+ * accumulated effectively increasing the resolution, while the averaged samples
+ * are divided by the number of samples to retain the resolution, but get more
+ * stable values.
  */
 class AnalogInput : public SensorBase,
                     public PIDSource,
@@ -64,7 +61,7 @@ class AnalogInput : public SensorBase,
   void SetAccumulatorDeadband(int32_t deadband);
   int64_t GetAccumulatorValue() const;
   uint32_t GetAccumulatorCount() const;
-  void GetAccumulatorOutput(int64_t &value, uint32_t &count) const;
+  void GetAccumulatorOutput(int64_t& value, uint32_t& count) const;
 
   static void SetSampleRate(float samplesPerSecond);
   static float GetSampleRate();
@@ -80,8 +77,8 @@ class AnalogInput : public SensorBase,
 
  private:
   uint32_t m_channel;
-  //TODO: Adjust HAL to avoid use of raw pointers.
-  void *m_port;
+  // TODO: Adjust HAL to avoid use of raw pointers.
+  void* m_port;
   int64_t m_accumulatorOffset;
 
   std::shared_ptr<ITable> m_table;

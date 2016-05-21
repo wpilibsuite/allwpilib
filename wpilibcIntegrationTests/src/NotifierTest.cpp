@@ -7,12 +7,12 @@
 
 #include <Notifier.h>
 #include <Timer.h>
-#include "gtest/gtest.h"
 #include "TestBench.h"
+#include "gtest/gtest.h"
 
 unsigned notifierCounter;
 
-void notifierHandler(void *) { notifierCounter++; }
+void notifierHandler(void*) { notifierCounter++; }
 
 /**
  * Test if the Wait function works

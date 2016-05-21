@@ -6,14 +6,14 @@
 /*----------------------------------------------------------------------------*/
 
 #include "DriverStation.h"
+#include <string.h>
 #include "AnalogInput.h"
-#include "Timer.h"
-#include "NetworkCommunication/FRCComm.h"
+#include "Log.hpp"
 #include "MotorSafetyHelper.h"
+#include "NetworkCommunication/FRCComm.h"
+#include "Timer.h"
 #include "Utility.h"
 #include "WPIErrors.h"
-#include <string.h>
-#include "Log.hpp"
 
 // set the logging level
 TLogLevel dsLogLevel = logDEBUG;
@@ -85,15 +85,17 @@ void DriverStation::Run() {
 
 /**
  * Return a pointer to the singleton DriverStation.
+ *
  * @return Pointer to the DS instance
  */
-DriverStation &DriverStation::GetInstance() {
-  static DriverStation *instance = new DriverStation();
+DriverStation& DriverStation::GetInstance() {
+  static DriverStation* instance = new DriverStation();
   return *instance;
 }
 
 /**
  * Copy data from the DS task for the user.
+ *
  * If no new data exists, it will just be returned, otherwise
  * the data will be copied from the DS polling loop.
  */
@@ -134,8 +136,9 @@ void DriverStation::ReportJoystickUnpluggedError(std::string message) {
 }
 
 /**
- * Reports errors related to unplugged joysticks
- * Throttles the errors so that they don't overwhelm the DS
+ * Reports errors related to unplugged joysticks.
+ *
+ * Throttles the errors so that they don't overwhelm the DS.
  */
 void DriverStation::ReportJoystickUnpluggedWarning(std::string message) {
   double currentTime = Timer::GetFPGATimestamp();
@@ -146,7 +149,7 @@ void DriverStation::ReportJoystickUnpluggedWarning(std::string message) {
 }
 
 /**
- * Returns the number of axes on a given joystick port
+ * Returns the number of axes on a given joystick port.
  *
  * @param stick The joystick port number
  * @return The number of axes on the indicated joystick
@@ -162,7 +165,7 @@ int DriverStation::GetStickAxisCount(uint32_t stick) const {
 }
 
 /**
- * Returns the name of the joystick at the given port
+ * Returns the name of the joystick at the given port.
  *
  * @param stick The joystick port number
  * @return The name of the joystick at the given port
@@ -176,7 +179,7 @@ std::string DriverStation::GetJoystickName(uint32_t stick) const {
 }
 
 /**
- * Returns the type of joystick at a given port
+ * Returns the type of joystick at a given port.
  *
  * @param stick The joystick port number
  * @return The HID type of joystick at the given port
@@ -204,7 +207,7 @@ bool DriverStation::GetJoystickIsXbox(uint32_t stick) const {
 }
 
 /**
- * Returns the types of Axes on a given joystick port
+ * Returns the types of Axes on a given joystick port.
  *
  * @param stick The joystick port number and the target axis
  * @return What type of axis the axis is reporting to be
@@ -218,7 +221,7 @@ int DriverStation::GetJoystickAxisType(uint32_t stick, uint8_t axis) const {
 }
 
 /**
- * Returns the number of POVs on a given joystick port
+ * Returns the number of POVs on a given joystick port.
  *
  * @param stick The joystick port number
  * @return The number of POVs on the indicated joystick
@@ -234,7 +237,7 @@ int DriverStation::GetStickPOVCount(uint32_t stick) const {
 }
 
 /**
- * Returns the number of buttons on a given joystick port
+ * Returns the number of buttons on a given joystick port.
  *
  * @param stick The joystick port number
  * @return The number of buttons on the indicated joystick
@@ -251,10 +254,11 @@ int DriverStation::GetStickButtonCount(uint32_t stick) const {
 
 /**
  * Get the value of the axis on a joystick.
+ *
  * This depends on the mapping of the joystick connected to the specified port.
  *
  * @param stick The joystick to read.
- * @param axis The analog axis value to read from the joystick.
+ * @param axis  The analog axis value to read from the joystick.
  * @return The value of the axis on the joystick.
  */
 float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis) {
@@ -322,7 +326,7 @@ uint32_t DriverStation::GetStickButtons(uint32_t stick) const {
 /**
  * The state of one joystick button. Button indexes begin at 1.
  *
- * @param stick The joystick to read.
+ * @param stick  The joystick to read.
  * @param button The button index, beginning at 1.
  * @return The state of the joystick button.
  */
@@ -346,7 +350,8 @@ bool DriverStation::GetStickButton(uint32_t stick, uint8_t button) {
 }
 
 /**
- * Check if the DS has enabled the robot
+ * Check if the DS has enabled the robot.
+ *
  * @return True if the robot is enabled and the DS is connected
  */
 bool DriverStation::IsEnabled() const {
@@ -357,7 +362,8 @@ bool DriverStation::IsEnabled() const {
 }
 
 /**
- * Check if the robot is disabled
+ * Check if the robot is disabled.
+ *
  * @return True if the robot is explicitly disabled or the DS is not connected
  */
 bool DriverStation::IsDisabled() const {
@@ -368,7 +374,8 @@ bool DriverStation::IsDisabled() const {
 }
 
 /**
- * Check if the DS is commanding autonomous mode
+ * Check if the DS is commanding autonomous mode.
+ *
  * @return True if the robot is being commanded to be in autonomous mode
  */
 bool DriverStation::IsAutonomous() const {
@@ -379,7 +386,8 @@ bool DriverStation::IsAutonomous() const {
 }
 
 /**
- * Check if the DS is commanding teleop mode
+ * Check if the DS is commanding teleop mode.
+ *
  * @return True if the robot is being commanded to be in teleop mode
  */
 bool DriverStation::IsOperatorControl() const {
@@ -390,7 +398,8 @@ bool DriverStation::IsOperatorControl() const {
 }
 
 /**
- * Check if the DS is commanding test mode
+ * Check if the DS is commanding test mode.
+ *
  * @return True if the robot is being commanded to be in test mode
  */
 bool DriverStation::IsTest() const {
@@ -400,7 +409,8 @@ bool DriverStation::IsTest() const {
 }
 
 /**
- * Check if the DS is attached
+ * Check if the DS is attached.
+ *
  * @return True if the DS is connected to the robot
  */
 bool DriverStation::IsDSAttached() const {
@@ -411,9 +421,11 @@ bool DriverStation::IsDSAttached() const {
 }
 
 /**
- * Check if the FPGA outputs are enabled. The outputs may be disabled if the
- * robot is disabled
- * or e-stopped, the watchdog has expired, or if the roboRIO browns out.
+ * Check if the FPGA outputs are enabled.
+ *
+ * The outputs may be disabled if the robot is disabled or e-stopped, the
+ * watchdog has expired, or if the roboRIO browns out.
+ *
  * @return True if the FPGA outputs are enabled.
  */
 bool DriverStation::IsSysActive() const {
@@ -425,6 +437,7 @@ bool DriverStation::IsSysActive() const {
 
 /**
  * Check if the system is browned out.
+ *
  * @return True if the system is browned out
  */
 bool DriverStation::IsSysBrownedOut() const {
@@ -437,8 +450,10 @@ bool DriverStation::IsSysBrownedOut() const {
 /**
  * Has a new control packet from the driver station arrived since the last time
  * this function was called?
+ *
  * Warning: If you call this function from more than one place at the same time,
  * you will not get the get the intended behaviour.
+ *
  * @return True if the control data has been updated since the last call.
  */
 bool DriverStation::IsNewControlData() const {
@@ -447,8 +462,9 @@ bool DriverStation::IsNewControlData() const {
 
 /**
  * Is the driver station attached to a Field Management System?
+ *
  * @return True if the robot is competing on a field being controlled by a Field
- * Management System
+ *         Management System
  */
 bool DriverStation::IsFMSAttached() const {
   HALControlWord controlWord;
@@ -458,7 +474,9 @@ bool DriverStation::IsFMSAttached() const {
 
 /**
  * Return the alliance that the driver station says it is on.
- * This could return kRed or kBlue
+ *
+ * This could return kRed or kBlue.
+ *
  * @return The Alliance enum (kRed, kBlue or kInvalid)
  */
 DriverStation::Alliance DriverStation::GetAlliance() const {
@@ -479,8 +497,10 @@ DriverStation::Alliance DriverStation::GetAlliance() const {
 }
 
 /**
- * Return the driver station location on the field
- * This could return 1, 2, or 3
+ * Return the driver station location on the field.
+ *
+ * This could return 1, 2, or 3.
+ *
  * @return The location of the driver station (1-3, 0 for invalid)
  */
 uint32_t DriverStation::GetLocation() const {
@@ -502,10 +522,12 @@ uint32_t DriverStation::GetLocation() const {
 }
 
 /**
- * Wait until a new packet comes from the driver station
+ * Wait until a new packet comes from the driver station.
+ *
  * This blocks on a semaphore, so the waiting is efficient.
+ *
  * This is a good way to delay processing until there is new driver station data
- * to act on
+ * to act on.
  */
 void DriverStation::WaitForData() {
   std::unique_lock<priority_mutex> lock(m_waitForDataMutex);
@@ -513,16 +535,18 @@ void DriverStation::WaitForData() {
 }
 
 /**
- * Return the approximate match time
+ * Return the approximate match time.
+ *
  * The FMS does not send an official match time to the robots, but does send an
- * approximate match time.
- * The value will count down the time remaining in the current period (auto or
- * teleop).
+ * approximate match time.  The value will count down the time remaining in the
+ * current period (auto or teleop).
+ *
  * Warning: This is not an official time (so it cannot be used to dispute ref
- * calls or guarantee that a function
- * will trigger before the match ends)
+ * calls or guarantee that a function will trigger before the match ends).
+ *
  * The Practice Match function of the DS approximates the behaviour seen on the
  * field.
+ *
  * @return Time remaining in current match period (auto or teleop)
  */
 double DriverStation::GetMatchTime() const {
@@ -533,6 +557,7 @@ double DriverStation::GetMatchTime() const {
 
 /**
  * Report an error to the DriverStation messages window.
+ *
  * The error is also printed to the program console.
  */
 void DriverStation::ReportError(std::string error) {
@@ -541,6 +566,7 @@ void DriverStation::ReportError(std::string error) {
 
 /**
  * Report a warning to the DriverStation messages window.
+ *
  * The warning is also printed to the program console.
  */
 void DriverStation::ReportWarning(std::string error) {
@@ -549,12 +575,13 @@ void DriverStation::ReportWarning(std::string error) {
 
 /**
  * Report an error to the DriverStation messages window.
+ *
  * The error is also printed to the program console.
  */
 void DriverStation::ReportError(bool is_error, int32_t code,
-                                const std::string &error,
-                                const std::string &location,
-                                const std::string &stack) {
+                                const std::string& error,
+                                const std::string& location,
+                                const std::string& stack) {
   HALSendError(is_error, code, 0, error.c_str(), location.c_str(),
                stack.c_str(), 1);
 }

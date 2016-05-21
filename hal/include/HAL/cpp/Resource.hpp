@@ -1,13 +1,14 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+/* Copyright (c) FIRST 2008. All Rights Reserved.
+ */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 #pragma once
 
+#include <stdint.h>
 #include "../Errors.hpp"
 #include "HAL/cpp/priority_mutex.h"
-#include <stdint.h>
 
 #include <vector>
 
@@ -24,23 +25,22 @@ namespace hal {
  * resources; it just tracks which indices were marked in use by
  * Allocate and not yet freed by Free.
  */
-class Resource
-{
-public:
-	Resource(const Resource&) = delete;
-	Resource& operator=(const Resource&) = delete;
-	explicit Resource(uint32_t size);
-	virtual ~Resource() = default;
-	static void CreateResourceObject(Resource **r, uint32_t elements);
-	uint32_t Allocate(const char *resourceDesc);
-	uint32_t Allocate(uint32_t index, const char *resourceDesc);
-	void Free(uint32_t index);
+class Resource {
+ public:
+  Resource(const Resource&) = delete;
+  Resource& operator=(const Resource&) = delete;
+  explicit Resource(uint32_t size);
+  virtual ~Resource() = default;
+  static void CreateResourceObject(Resource** r, uint32_t elements);
+  uint32_t Allocate(const char* resourceDesc);
+  uint32_t Allocate(uint32_t index, const char* resourceDesc);
+  void Free(uint32_t index);
 
-private:
-	std::vector<bool> m_isAllocated;
-	priority_recursive_mutex m_allocateLock;
+ private:
+  std::vector<bool> m_isAllocated;
+  priority_recursive_mutex m_allocateLock;
 
-	static priority_recursive_mutex m_createLock;
+  static priority_recursive_mutex m_createLock;
 };
 
 }  // namespace hal

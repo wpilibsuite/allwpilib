@@ -41,7 +41,7 @@ typedef enum DebugOutputType_enum {
 
 /* debug */
 void SetDebugFlag(DebugOutputType flag);
-void dprintf(const char *tempString, ...); /* Variable argument list */
+void dprintf(const char* tempString, ...); /* Variable argument list */
 
 /* set FRC ranges for drive */
 double RangeToNormalized(double pixel, int range);
@@ -50,18 +50,18 @@ float NormalizeToRange(float normalizedValue, float minRange, float maxRange);
 float NormalizeToRange(float normalizedValue);
 
 /* system utilities */
-void ShowActivity(char *fmt, ...);
+void ShowActivity(char* fmt, ...);
 double ElapsedTime(double startTime);
 
 /* servo panning utilities */
 class Servo;
-double SinPosition(double *period, double sinStart);
+double SinPosition(double* period, double sinStart);
 void panInit();
 void panInit(double period);
-void panForTarget(Servo *panServo);
-void panForTarget(Servo *panServo, double sinStart);
+void panForTarget(Servo* panServo);
+void panForTarget(Servo* panServo, double sinStart);
 
 /* config file read utilities */
-int processFile(char *inputFile, char *outputString, int lineNumber);
-int emptyString(char *string);
-void stripString(char *string);
+int processFile(char* inputFile, char* outputString, int lineNumber);
+int emptyString(char* string);
+void stripString(char* string);

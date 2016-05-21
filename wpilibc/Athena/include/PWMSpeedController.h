@@ -25,8 +25,10 @@ class PWMSpeedController : public SafePWM, public SpeedController {
 
   virtual void SetInverted(bool isInverted) override;
   virtual bool GetInverted() const override;
+
  protected:
   explicit PWMSpeedController(uint32_t channel);
+
  private:
   bool m_isInverted = false;
 };

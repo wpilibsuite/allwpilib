@@ -7,11 +7,11 @@
 
 #include "Error.h"
 
+#include <stdint.h>
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <sstream>
-#include <cstring>
-#include <cstdlib>
-#include <stdint.h>
 
 #include "DriverStation.h"
 #include "Timer.h"
@@ -70,12 +70,13 @@ void Error::Report() {
   locStream << m_function << " [";
 
 #if defined(_WIN32)
-	const int MAX_DIR = 100;
-	char basename[MAX_DIR];
-	_splitpath_s(m_filename.c_str(), NULL, 0, basename, MAX_DIR, NULL, 0, NULL, 0);
-	locStream << basename;
+  const int MAX_DIR = 100;
+  char basename[MAX_DIR];
+  _splitpath_s(m_filename.c_str(), NULL, 0, basename, MAX_DIR, NULL, 0, NULL,
+               0);
+  locStream << basename;
 #else
-	locStream << basename(m_filename.c_str());
+  locStream << basename(m_filename.c_str());
 #endif
   locStream << ":" << m_lineNumber << "]";
 

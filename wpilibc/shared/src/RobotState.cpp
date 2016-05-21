@@ -16,8 +16,7 @@ void RobotState::SetImplementation(RobotStateInterface& i) {
       &i, NullDeleter<RobotStateInterface>());
 }
 
-void RobotState::SetImplementation(
-    std::shared_ptr<RobotStateInterface> i) {
+void RobotState::SetImplementation(std::shared_ptr<RobotStateInterface> i) {
   impl = i;
 }
 

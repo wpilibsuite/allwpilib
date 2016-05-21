@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "interfaces/Accelerometer.h"
-#include "SensorBase.h"
-#include "SPI.h"
 #include "LiveWindow/LiveWindowSendable.h"
+#include "SPI.h"
+#include "SensorBase.h"
+#include "interfaces/Accelerometer.h"
 
 #include <memory>
 

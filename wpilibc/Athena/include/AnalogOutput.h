@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include "HAL/HAL.hpp"
-#include "SensorBase.h"
-#include "LiveWindow/LiveWindowSendable.h"
-#include <memory>
 #include <cstdint>
+#include <memory>
+#include "HAL/HAL.hpp"
+#include "LiveWindow/LiveWindowSendable.h"
+#include "SensorBase.h"
 
 /**
  * MXP analog output class.
@@ -33,7 +33,7 @@ class AnalogOutput : public SensorBase, public LiveWindowSendable {
 
  protected:
   uint32_t m_channel;
-  void *m_port;
+  void* m_port;
 
   std::shared_ptr<ITable> m_table;
 };

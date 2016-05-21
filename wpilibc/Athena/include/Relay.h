@@ -7,11 +7,11 @@
 
 #pragma once
 
+#include "LiveWindow/LiveWindowSendable.h"
 #include "MotorSafety.h"
 #include "SensorBase.h"
-#include "tables/ITableListener.h"
-#include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITable.h"
+#include "tables/ITableListener.h"
 
 #include <memory>
 
@@ -20,16 +20,13 @@ class MotorSafetyHelper;
 /**
  * Class for Spike style relay outputs.
  * Relays are intended to be connected to spikes or similar relays. The relay
- * channels controls
- * a pair of pins that are either both off, one on, the other on, or both on.
- * This translates into
- * two spike outputs at 0v, one at 12v and one at 0v, one at 0v and the other at
- * 12v, or two
- * spike outputs at 12V. This allows off, full forward, or full reverse control
- * of motors without
- * variable speed.  It also allows the two channels (forward and reverse) to be
- * used independently
- * for something that does not care about voltage polatiry (like a solenoid).
+ * channels controls a pair of pins that are either both off, one on, the other
+ * on, or both on. This translates into two spike outputs at 0v, one at 12v and
+ * one at 0v, one at 0v and the other at 12v, or two spike outputs at 12V. This
+ * allows off, full forward, or full reverse control of motors without variable
+ * speed.  It also allows the two channels (forward and reverse) to be used
+ * independently for something that does not care about voltage polarity (like
+ * a solenoid).
  */
 class Relay : public MotorSafety,
               public SensorBase,

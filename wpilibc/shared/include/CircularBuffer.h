@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <vector>
 #include <cstddef>
+#include <vector>
 
 /**
  * This is a simple circular buffer so we don't need to "bucket brigade" copy

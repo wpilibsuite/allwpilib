@@ -6,14 +6,14 @@
 /*----------------------------------------------------------------------------*/
 
 #include <Timer.h>
-#include "gtest/gtest.h"
 #include "TestBench.h"
+#include "gtest/gtest.h"
 
 static const double kWaitTime = 0.5;
 
 class TimerTest : public testing::Test {
  protected:
-  Timer *m_timer;
+  Timer* m_timer;
 
   virtual void SetUp() override { m_timer = new Timer; }
 

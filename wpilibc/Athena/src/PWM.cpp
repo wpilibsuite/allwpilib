@@ -7,10 +7,10 @@
 
 #include "PWM.h"
 
+#include "HAL/HAL.hpp"
 #include "Resource.h"
 #include "Utility.h"
 #include "WPIErrors.h"
-#include "HAL/HAL.hpp"
 
 #include <sstream>
 
@@ -25,8 +25,9 @@ const int32_t PWM::kPwmDisabled;
  * Checks channel value range and allocates the appropriate channel.
  * The allocation is only done to help users ensure that they don't double
  * assign channels.
- * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP
- * port
+ *
+ * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the
+ *                MXP port
  */
 PWM::PWM(uint32_t channel) {
   std::stringstream buf;
@@ -70,11 +71,11 @@ PWM::~PWM() {
 
 /**
  * Optionally eliminate the deadband from a speed controller.
+ *
  * @param eliminateDeadband If true, set the motor curve on the Jaguar to
- * eliminate
- * the deadband in the middle of the range. Otherwise, keep the full range
- * without
- * modifying any values.
+ *                          eliminate the deadband in the middle of the range.
+ *                          Otherwise, keep the full range without modifying
+ *                          any values.
  */
 void PWM::EnableDeadbandElimination(bool eliminateDeadband) {
   if (StatusIsFatal()) return;
@@ -83,14 +84,16 @@ void PWM::EnableDeadbandElimination(bool eliminateDeadband) {
 
 /**
  * Set the bounds on the PWM values.
+ *
  * This sets the bounds on the PWM values for a particular each type of
- * controller. The values
- * determine the upper and lower speeds as well as the deadband bracket.
- * @param max The Minimum pwm value
+ * controller. The values determine the upper and lower speeds as well as the
+ * deadband bracket.
+ *
+ * @param max         The Minimum pwm value
  * @param deadbandMax The high end of the deadband range
- * @param center The center speed (off)
+ * @param center      The center speed (off)
  * @param deadbandMin The low end of the deadband range
- * @param min The minimum pwm value
+ * @param min         The minimum pwm value
  */
 void PWM::SetBounds(int32_t max, int32_t deadbandMax, int32_t center,
                     int32_t deadbandMin, int32_t min) {
@@ -104,14 +107,16 @@ void PWM::SetBounds(int32_t max, int32_t deadbandMax, int32_t center,
 
 /**
  * Set the bounds on the PWM pulse widths.
+ *
  * This sets the bounds on the PWM values for a particular type of controller.
- * The values
- * determine the upper and lower speeds as well as the deadband bracket.
- * @param max The max PWM pulse width in ms
+ * The values determine the upper and lower speeds as well as the deadband
+ * bracket.
+ *
+ * @param max         The max PWM pulse width in ms
  * @param deadbandMax The high end of the deadband range pulse width in ms
- * @param center The center (off) pulse width in ms
+ * @param center      The center (off) pulse width in ms
  * @param deadbandMin The low end of the deadband pulse width in ms
- * @param min The minimum pulse width in ms
+ * @param min         The minimum pulse width in ms
  */
 void PWM::SetBounds(double max, double deadbandMax, double center,
                     double deadbandMin, double min) {
@@ -157,12 +162,12 @@ void PWM::SetPosition(float pos) {
   // converting to int
   unsigned short rawValue =
       (int32_t)((pos * (float)GetFullRangeScaleFactor()) + GetMinNegativePwm());
-  //	printf("MinNegPWM: %d FullRangeScaleFactor: %d Raw value: %5d   Input
-  //value: %4.4f\n", GetMinNegativePwm(), GetFullRangeScaleFactor(), rawValue,
-  //pos);
+  //  printf("MinNegPWM: %d FullRangeScaleFactor: %d Raw value: %5d   Input "
+  // "value: %4.4f\n", GetMinNegativePwm(), GetFullRangeScaleFactor(), rawValue,
+  // pos);
 
-  //	wpi_assert((rawValue >= GetMinNegativePwm()) && (rawValue <=
-  //GetMaxPositivePwm()));
+  // wpi_assert((rawValue >= GetMinNegativePwm()) && (rawValue <=
+  // GetMaxPositivePwm()));
   wpi_assert(rawValue != kPwmDisabled);
 
   // send the computed pwm value to the FPGA

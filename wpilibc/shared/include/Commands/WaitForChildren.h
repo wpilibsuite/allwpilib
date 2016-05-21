@@ -13,7 +13,7 @@
 class WaitForChildren : public Command {
  public:
   WaitForChildren(double timeout);
-  WaitForChildren(const std::string &name, double timeout);
+  WaitForChildren(const std::string& name, double timeout);
   virtual ~WaitForChildren() = default;
 
  protected:

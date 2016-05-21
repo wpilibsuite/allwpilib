@@ -9,18 +9,18 @@
 
 #include "nivision.h"
 
-/*   Constants */
+/* Constants */
 
-#define DEFAULT_BORDER_SIZE 3  // VisionAPI.frcCreateImage
+#define DEFAULT_BORDER_SIZE 3            // VisionAPI.frcCreateImage
 #define DEFAULT_SATURATION_THRESHOLD 40  // TrackAPI.FindColor
 
-/*   Forward Declare Data Structures */
+/* Forward Declare Data Structures */
 typedef struct FindEdgeOptions_struct FindEdgeOptions;
 typedef struct CircularEdgeReport_struct CircularEdgeReport;
 
-/*   Data Structures */
+/* Data Structures */
 
-/**  frcParticleAnalysis returns this structure */
+/** frcParticleAnalysis returns this structure */
 typedef struct ParticleAnalysisReport_struct {
   int imageHeight;
   int imageWidth;
@@ -28,12 +28,14 @@ typedef struct ParticleAnalysisReport_struct {
   int particleIndex;  // the particle index analyzed
   /* X-coordinate of the point representing the average position of the
    * total particle mass, assuming every point in the particle has a constant
-   * density */
+   * density
+   */
   int center_mass_x;  // MeasurementType: IMAQ_MT_CENTER_OF_MASS_X
   /* Y-coordinate of the point representing the average position of the
    * total particle mass, assuming every point in the particle has a constant
-   * density */
-  int center_mass_y;  // MeasurementType: IMAQ_MT_CENTER_OF_MASS_Y
+   * density
+   */
+  int center_mass_y;                // MeasurementType: IMAQ_MT_CENTER_OF_MASS_Y
   double center_mass_x_normalized;  // Center of mass x value normalized to -1.0
                                     // to +1.0 range
   double center_mass_y_normalized;  // Center of mass y value normalized to -1.0
@@ -66,7 +68,7 @@ typedef struct ColorReport_struct {
   float particleLumMean;  // HistogramReport: luminance mean
 } ColorReport;
 
-/*   Image Management functions */
+/* Image Management functions */
 
 /* Create: calls imaqCreateImage. Border size is set to some default value */
 Image* frcCreateImage(ImageType type);
@@ -90,7 +92,7 @@ int frcReadImage(Image* image, const char* fileName);
 /* Write Image : calls imaqWriteFile */
 int frcWriteImage(const Image* image, const char* fileName);
 
-/*   Measure Intensity functions */
+/* Measure Intensity functions */
 
 /* Histogram: calls imaqHistogram */
 HistogramReport* frcHistogram(const Image* image, int numClasses, float min,
@@ -102,7 +104,7 @@ ColorHistogramReport* frcColorHistogram(const Image* image, int numClasses,
 /* Get Pixel Value: calls imaqGetPixel */
 int frcGetPixelValue(const Image* image, Point pixel, PixelValue* value);
 
-/*   Particle Analysis functions */
+/* Particle Analysis functions */
 
 /* Particle Filter: calls imaqParticleFilter3 */
 int frcParticleFilter(Image* dest, Image* source,
@@ -126,7 +128,7 @@ int frcCountParticles(Image* image, int* numParticles);
 int frcParticleAnalysis(Image* image, int particleNumber,
                         ParticleAnalysisReport* par);
 
-/*   Image Enhancement functions */
+/* Image Enhancement functions */
 
 /* Equalize: calls imaqEqualize */
 int frcEqualize(Image* dest, const Image* source, float min, float max);
@@ -137,7 +139,7 @@ int frcEqualize(Image* dest, const Image* source, float min, float max,
 int frcColorEqualize(Image* dest, const Image* source);
 int frcColorEqualize(Image* dest, const Image* source, int colorEqualization);
 
-/*   Image Thresholding & Conversion functions */
+/* Image Thresholding & Conversion functions */
 
 /* Smart Threshold: calls imaqLocalThreshold */
 int frcSmartThreshold(Image* dest, const Image* source,

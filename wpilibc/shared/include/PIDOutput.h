@@ -13,7 +13,7 @@
  * PIDOutput interface is a generic output for the PID class.
  * PWMs use this class.
  * Users implement this interface to allow for a PIDController to
- * read directly from the inputs
+ * read directly from the inputs.
  */
 class PIDOutput {
  public:

@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "nivision.h"
 #include "Vision/FrcError.h"
+#include "nivision.h"
 
 /**
  * Get the error code returned from the NI Vision library
@@ -20,13 +20,15 @@ int GetLastVisionError() {
 }
 
 /**
-* Get the error text for an NI Vision error code.
-* Note: imaqGetErrorText() is not supported on real time system, so
-* so relevant strings are hardcoded here - the maintained version is
-* in the LabWindows/CVI help file.
-* @param errorCode The error code to find the text for.
-* @return The error text
-*/
+ * Get the error text for an NI Vision error code.
+ *
+ * Note: imaqGetErrorText() is not supported on real time system, so
+ * so relevant strings are hardcoded here - the maintained version is
+ * in the LabWindows/CVI help file.
+ *
+ * @param errorCode The error code to find the text for.
+ * @return The error text
+ */
 const char* GetVisionErrorText(int errorCode) {
   const char* errorText;
 

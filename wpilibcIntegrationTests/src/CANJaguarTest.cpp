@@ -6,13 +6,13 @@
 /*----------------------------------------------------------------------------*/
 
 #include <AnalogOutput.h>
-#include <DigitalOutput.h>
 #include <CANJaguar.h>
+#include <DigitalOutput.h>
 #include <Relay.h>
 #include <Timer.h>
 #include <WPIErrors.h>
-#include "gtest/gtest.h"
 #include "TestBench.h"
+#include "gtest/gtest.h"
 
 static constexpr double kSpikeTime = 0.5;
 
@@ -39,10 +39,10 @@ static constexpr double kMotorPercent = 0.5;
 static constexpr double kMotorSpeed = 100;
 class CANJaguarTest : public testing::Test {
  protected:
-  CANJaguar *m_jaguar;
+  CANJaguar* m_jaguar;
   DigitalOutput *m_fakeForwardLimit, *m_fakeReverseLimit;
-  AnalogOutput *m_fakePotentiometer;
-  Relay *m_spike;
+  AnalogOutput* m_fakePotentiometer;
+  Relay* m_spike;
 
   virtual void SetUp() override {
     m_spike = new Relay(TestBench::kCANJaguarRelayChannel, Relay::kForwardOnly);
@@ -110,7 +110,8 @@ class CANJaguarTest : public testing::Test {
     finalSpeed = m_jaguar->GetSpeed();
     EXPECT_FALSE(SignNum(initialSpeed) == SignNum(finalSpeed))
         << "CAN Jaguar did not invert direction negative. Initial displacement "
-           "was: " << initialSpeed << " Final displacement was: " << finalSpeed
+           "was: "
+        << initialSpeed << " Final displacement was: " << finalSpeed
         << " Sign of initial displacement was: " << SignNum(initialSpeed)
         << " Sign of final displacement was: " << SignNum(finalSpeed);
   }
@@ -121,8 +122,7 @@ class CANJaguarTest : public testing::Test {
  * causes a ResourceAlreadyAllocated error.
  */
 TEST_F(CANJaguarTest, AlreadyAllocatedError) {
-  std::cout << "The following errors are expected." << std::endl
-            << std::endl;
+  std::cout << "The following errors are expected." << std::endl << std::endl;
 
   CANJaguar jaguar(TestBench::kCANJaguarID);
   EXPECT_EQ(wpi_error_value_ResourceAlreadyAllocated,
@@ -135,8 +135,7 @@ TEST_F(CANJaguarTest, AlreadyAllocatedError) {
  * out-of-range error.
  */
 TEST_F(CANJaguarTest, 64OutOfRangeError) {
-  std::cout << "The following errors are expected." << std::endl
-            << std::endl;
+  std::cout << "The following errors are expected." << std::endl << std::endl;
 
   CANJaguar jaguar(64);
   EXPECT_EQ(wpi_error_value_ChannelIndexOutOfRange, jaguar.GetError().GetCode())
@@ -148,8 +147,7 @@ TEST_F(CANJaguarTest, 64OutOfRangeError) {
  * error.
  */
 TEST_F(CANJaguarTest, 0OutOfRangeError) {
-  std::cout << "The following errors are expected." << std::endl
-            << std::endl;
+  std::cout << "The following errors are expected." << std::endl << std::endl;
 
   CANJaguar jaguar(0);
   EXPECT_EQ(wpi_error_value_ChannelIndexOutOfRange, jaguar.GetError().GetCode())

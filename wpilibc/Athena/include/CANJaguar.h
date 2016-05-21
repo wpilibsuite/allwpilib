@@ -7,24 +7,24 @@
 
 #pragma once
 
-#include "ErrorBase.h"
-#include "MotorSafety.h"
-#include "Resource.h"
-#include "MotorSafetyHelper.h"
-#include "PIDOutput.h"
-#include "CANSpeedController.h"
-#include "HAL/cpp/Semaphore.hpp"
-#include "HAL/HAL.hpp"
-#include "LiveWindow/LiveWindowSendable.h"
-#include "tables/ITableListener.h"
-#include "NetworkCommunication/CANSessionMux.h"
 #include "CAN/can_proto.h"
+#include "CANSpeedController.h"
+#include "ErrorBase.h"
+#include "HAL/HAL.hpp"
+#include "HAL/cpp/Semaphore.hpp"
+#include "LiveWindow/LiveWindowSendable.h"
+#include "MotorSafety.h"
+#include "MotorSafetyHelper.h"
+#include "NetworkCommunication/CANSessionMux.h"
+#include "PIDOutput.h"
+#include "Resource.h"
+#include "tables/ITableListener.h"
 
 #include <atomic>
-#include "HAL/cpp/priority_mutex.h"
 #include <memory>
-#include <utility>
 #include <sstream>
+#include <utility>
+#include "HAL/cpp/priority_mutex.h"
 
 /**
  * Luminary Micro / Vex Robotics Jaguar Speed Control
@@ -152,23 +152,23 @@ class CANJaguar : public MotorSafety,
   void SetPositionReference(uint8_t reference);
   uint8_t GetPositionReference() const;
 
-  uint8_t packPercentage(uint8_t *buffer, double value);
-  uint8_t packFXP8_8(uint8_t *buffer, double value);
-  uint8_t packFXP16_16(uint8_t *buffer, double value);
-  uint8_t packint16_t(uint8_t *buffer, int16_t value);
-  uint8_t packint32_t(uint8_t *buffer, int32_t value);
-  double unpackPercentage(uint8_t *buffer) const;
-  double unpackFXP8_8(uint8_t *buffer) const;
-  double unpackFXP16_16(uint8_t *buffer) const;
-  int16_t unpackint16_t(uint8_t *buffer) const;
-  int32_t unpackint32_t(uint8_t *buffer) const;
+  uint8_t packPercentage(uint8_t* buffer, double value);
+  uint8_t packFXP8_8(uint8_t* buffer, double value);
+  uint8_t packFXP16_16(uint8_t* buffer, double value);
+  uint8_t packint16_t(uint8_t* buffer, int16_t value);
+  uint8_t packint32_t(uint8_t* buffer, int32_t value);
+  double unpackPercentage(uint8_t* buffer) const;
+  double unpackFXP8_8(uint8_t* buffer) const;
+  double unpackFXP16_16(uint8_t* buffer) const;
+  int16_t unpackint16_t(uint8_t* buffer) const;
+  int32_t unpackint32_t(uint8_t* buffer) const;
 
-  void sendMessage(uint32_t messageID, const uint8_t *data, uint8_t dataSize,
+  void sendMessage(uint32_t messageID, const uint8_t* data, uint8_t dataSize,
                    int32_t period = CAN_SEND_PERIOD_NO_REPEAT);
   void requestMessage(uint32_t messageID,
                       int32_t period = CAN_SEND_PERIOD_NO_REPEAT);
-  bool getMessage(uint32_t messageID, uint32_t mask, uint8_t *data,
-                  uint8_t *dataSize) const;
+  bool getMessage(uint32_t messageID, uint32_t mask, uint8_t* data,
+                  uint8_t* dataSize) const;
 
   void setupPeriodicStatus();
   void updatePeriodicStatus() const;
@@ -196,7 +196,8 @@ class CANJaguar : public MotorSafety,
   float m_faultTime = 0.0f;
 
   // Which parameters have been verified since they were last set?
-  bool m_controlModeVerified = false; // Needs to be verified because it's set in the constructor
+  bool m_controlModeVerified =
+      false;  // Needs to be verified because it's set in the constructor
   bool m_speedRefVerified = true;
   bool m_posRefVerified = true;
   bool m_pVerified = true;

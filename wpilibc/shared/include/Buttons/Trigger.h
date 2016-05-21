@@ -8,8 +8,8 @@
 #ifndef __TRIGGER_H__
 #define __TRIGGER_H__
 
-#include "SmartDashboard/Sendable.h"
 #include <memory>
+#include "SmartDashboard/Sendable.h"
 
 class Command;
 
@@ -36,11 +36,11 @@ class Trigger : public Sendable {
   virtual ~Trigger() = default;
   bool Grab();
   virtual bool Get() = 0;
-  void WhenActive(Command *command);
-  void WhileActive(Command *command);
-  void WhenInactive(Command *command);
-  void CancelWhenActive(Command *command);
-  void ToggleWhenActive(Command *command);
+  void WhenActive(Command* command);
+  void WhileActive(Command* command);
+  void WhenInactive(Command* command);
+  void CancelWhenActive(Command* command);
+  void ToggleWhenActive(Command* command);
 
   virtual void InitTable(std::shared_ptr<ITable> table);
   virtual std::shared_ptr<ITable> GetTable() const;

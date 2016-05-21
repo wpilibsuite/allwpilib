@@ -15,9 +15,9 @@
  * Class:     edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI
  * Method:    setFilterSelect
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_setFilterSelect
-  (JNIEnv* env, jclass, jlong port_pointer, jint filter_index)
-{
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_setFilterSelect(
+    JNIEnv* env, jclass, jlong port_pointer, jint filter_index) {
   int32_t status = 0;
   void* digital_port_pointer = reinterpret_cast<void*>(port_pointer);
 
@@ -29,9 +29,9 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_set
  * Class:     edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI
  * Method:    getFilterSelect
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_getFilterSelect
-  (JNIEnv *env, jclass, jlong port_pointer)
-{
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_getFilterSelect(
+    JNIEnv* env, jclass, jlong port_pointer) {
   int32_t status = 0;
   void* digital_port_pointer = reinterpret_cast<void*>(port_pointer);
 
@@ -44,9 +44,9 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_get
  * Class:     edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI
  * Method:    setFilterPeriod
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_setFilterPeriod
-  (JNIEnv *env, jclass, jint filter_index, jint fpga_cycles)
-{
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_setFilterPeriod(
+    JNIEnv* env, jclass, jint filter_index, jint fpga_cycles) {
   int32_t status = 0;
 
   setFilterPeriod(filter_index, fpga_cycles, &status);
@@ -57,9 +57,9 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_set
  * Class:     edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI
  * Method:    getFilterPeriod
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_getFilterPeriod
-  (JNIEnv *env, jclass, jint filter_index)
-{
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_getFilterPeriod(
+    JNIEnv* env, jclass, jint filter_index) {
   int32_t status = 0;
 
   jint result = getFilterPeriod(filter_index, &status);

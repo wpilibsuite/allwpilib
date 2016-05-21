@@ -14,14 +14,13 @@
  * trigger.
  *
  * Because this class derives from DigitalSource, it can be passed into routing
- * functions
- * for Counter, Encoder, etc.
+ * functions for Counter, Encoder, etc.
  *
- * @param trigger A pointer to the trigger for which this is an output.
+ * @param trigger    A pointer to the trigger for which this is an output.
  * @param outputType An enum that specifies the output on the trigger to
- * represent.
+ *                   represent.
  */
-AnalogTriggerOutput::AnalogTriggerOutput(const AnalogTrigger &trigger,
+AnalogTriggerOutput::AnalogTriggerOutput(const AnalogTrigger& trigger,
                                          AnalogTriggerType outputType)
     : m_trigger(trigger), m_outputType(outputType) {
   HALReport(HALUsageReporting::kResourceType_AnalogTriggerOutput,
@@ -40,6 +39,7 @@ AnalogTriggerOutput::~AnalogTriggerOutput() {
 
 /**
  * Get the state of the analog trigger output.
+ *
  * @return The state of the analog trigger output.
  */
 bool AnalogTriggerOutput::Get() const {

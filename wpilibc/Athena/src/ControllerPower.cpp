@@ -8,12 +8,13 @@
 #include "ControllerPower.h"
 
 #include <stdint.h>
-#include <HAL/Power.hpp>
 #include <HAL/HAL.hpp>
+#include <HAL/Power.hpp>
 #include "ErrorBase.h"
 
 /**
- * Get the input voltage to the robot controller
+ * Get the input voltage to the robot controller.
+ *
  * @return The controller input voltage value in Volts
  */
 double ControllerPower::GetInputVoltage() {
@@ -24,7 +25,8 @@ double ControllerPower::GetInputVoltage() {
 }
 
 /**
- * Get the input current to the robot controller
+ * Get the input current to the robot controller.
+ *
  * @return The controller input current value in Amps
  */
 double ControllerPower::GetInputCurrent() {
@@ -35,7 +37,8 @@ double ControllerPower::GetInputCurrent() {
 }
 
 /**
- * Get the voltage of the 6V rail
+ * Get the voltage of the 6V rail.
+ *
  * @return The controller 6V rail voltage value in Volts
  */
 double ControllerPower::GetVoltage6V() {
@@ -46,7 +49,8 @@ double ControllerPower::GetVoltage6V() {
 }
 
 /**
- * Get the current output of the 6V rail
+ * Get the current output of the 6V rail.
+ *
  * @return The controller 6V rail output current value in Amps
  */
 double ControllerPower::GetCurrent6V() {
@@ -58,8 +62,8 @@ double ControllerPower::GetCurrent6V() {
 
 /**
  * Get the enabled state of the 6V rail. The rail may be disabled due to a
- * controller
- * brownout, a short circuit on the rail, or controller over-voltage
+ * controller brownout, a short circuit on the rail, or controller over-voltage.
+ *
  * @return The controller 6V rail enabled value. True for enabled.
  */
 bool ControllerPower::GetEnabled6V() {
@@ -71,7 +75,8 @@ bool ControllerPower::GetEnabled6V() {
 
 /**
  * Get the count of the total current faults on the 6V rail since the controller
- * has booted
+ * has booted.
+ *
  * @return The number of faults.
  */
 int ControllerPower::GetFaultCount6V() {
@@ -82,7 +87,8 @@ int ControllerPower::GetFaultCount6V() {
 }
 
 /**
- * Get the voltage of the 5V rail
+ * Get the voltage of the 5V rail.
+ *
  * @return The controller 5V rail voltage value in Volts
  */
 double ControllerPower::GetVoltage5V() {
@@ -93,7 +99,8 @@ double ControllerPower::GetVoltage5V() {
 }
 
 /**
- * Get the current output of the 5V rail
+ * Get the current output of the 5V rail.
+ *
  * @return The controller 5V rail output current value in Amps
  */
 double ControllerPower::GetCurrent5V() {
@@ -105,8 +112,8 @@ double ControllerPower::GetCurrent5V() {
 
 /**
  * Get the enabled state of the 5V rail. The rail may be disabled due to a
- * controller
- * brownout, a short circuit on the rail, or controller over-voltage
+ * controller brownout, a short circuit on the rail, or controller over-voltage.
+ *
  * @return The controller 5V rail enabled value. True for enabled.
  */
 bool ControllerPower::GetEnabled5V() {
@@ -118,7 +125,8 @@ bool ControllerPower::GetEnabled5V() {
 
 /**
  * Get the count of the total current faults on the 5V rail since the controller
- * has booted
+ * has booted.
+ *
  * @return The number of faults
  */
 int ControllerPower::GetFaultCount5V() {
@@ -129,7 +137,8 @@ int ControllerPower::GetFaultCount5V() {
 }
 
 /**
- * Get the voltage of the 3.3V rail
+ * Get the voltage of the 3.3V rail.
+ *
  * @return The controller 3.3V rail voltage value in Volts
  */
 double ControllerPower::GetVoltage3V3() {
@@ -140,7 +149,8 @@ double ControllerPower::GetVoltage3V3() {
 }
 
 /**
- * Get the current output of the 3.3V rail
+ * Get the current output of the 3.3V rail.
+ *
  * @return The controller 3.3V rail output current value in Amps
  */
 double ControllerPower::GetCurrent3V3() {
@@ -152,8 +162,8 @@ double ControllerPower::GetCurrent3V3() {
 
 /**
  * Get the enabled state of the 3.3V rail. The rail may be disabled due to a
- * controller
- * brownout, a short circuit on the rail, or controller over-voltage
+ * controller brownout, a short circuit on the rail, or controller over-voltage.
+ *
  * @return The controller 3.3V rail enabled value. True for enabled.
  */
 bool ControllerPower::GetEnabled3V3() {
@@ -165,7 +175,8 @@ bool ControllerPower::GetEnabled3V3() {
 
 /**
  * Get the count of the total current faults on the 3.3V rail since the
- * controller has booted
+ * controller has booted.
+ *
  * @return The number of faults
  */
 int ControllerPower::GetFaultCount3V3() {

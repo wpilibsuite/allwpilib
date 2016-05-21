@@ -7,9 +7,7 @@
 
 #include "Filters/Filter.h"
 
-Filter::Filter(std::shared_ptr<PIDSource> source) {
-  m_source = source;
-}
+Filter::Filter(std::shared_ptr<PIDSource> source) { m_source = source; }
 
 void Filter::SetPIDSourceType(PIDSourceType pidSource) {
   m_source->SetPIDSourceType(pidSource);
@@ -19,6 +17,4 @@ PIDSourceType Filter::GetPIDSourceType() const {
   return m_source->GetPIDSourceType();
 }
 
-double Filter::PIDGetSource() {
-  return m_source->PIDGet();
-}
+double Filter::PIDGetSource() { return m_source->PIDGet(); }

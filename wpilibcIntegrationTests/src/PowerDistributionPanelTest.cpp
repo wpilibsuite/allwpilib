@@ -10,17 +10,17 @@
 #include <Talon.h>
 #include <Timer.h>
 #include <Victor.h>
-#include "gtest/gtest.h"
 #include "TestBench.h"
+#include "gtest/gtest.h"
 
 static const double kMotorTime = 0.25;
 
 class PowerDistributionPanelTest : public testing::Test {
  protected:
-  PowerDistributionPanel *m_pdp;
-  Talon *m_talon;
-  Victor *m_victor;
-  Jaguar *m_jaguar;
+  PowerDistributionPanel* m_pdp;
+  Talon* m_talon;
+  Victor* m_victor;
+  Jaguar* m_jaguar;
 
   virtual void SetUp() override {
     m_pdp = new PowerDistributionPanel();
@@ -55,4 +55,3 @@ TEST_F(PowerDistributionPanelTest, CheckCurrentTalon) {
   ASSERT_GT(m_pdp->GetCurrent(TestBench::kTalonPDPChannel), 0)
       << "The Talon current was not positive";
 }
-

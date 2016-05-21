@@ -10,9 +10,10 @@
 #include "LiveWindow/LiveWindow.h"
 
 /**
- * Construct a TalonSRX connected via PWM
+ * Construct a TalonSRX connected via PWM.
+ *
  * @param channel The PWM channel that the TalonSRX is attached to. 0-9 are
- * on-board, 10-19 are on the MXP port
+ *                on-board, 10-19 are on the MXP port
  */
 TalonSRX::TalonSRX(uint32_t channel) : PWMSpeedController(channel) {
   /* Note that the TalonSRX uses the following bounds for PWM values. These

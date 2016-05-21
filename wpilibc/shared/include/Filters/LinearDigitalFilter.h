@@ -10,8 +10,8 @@
 #include <initializer_list>
 #include <memory>
 #include <vector>
-#include "Filter.h"
 #include "CircularBuffer.h"
+#include "Filter.h"
 
 /**
  * This class implements a linear, digital filter. All types of FIR and IIR
@@ -19,7 +19,8 @@
  * used types of filters.
  *
  * Filters are of the form:
- *  y[n] = (b0*x[n] + b1*x[n-1] + ... + bP*x[n-P) - (a0*y[n-1] + a2*y[n-2] + ... + aQ*y[n-Q])
+ *  y[n] = (b0*x[n] + b1*x[n-1] + ... + bP*x[n-P) - (a0*y[n-1] + a2*y[n-2] + ...
+ * + aQ*y[n-Q])
  *
  * Where:
  *  y[n] is the output at time "n"

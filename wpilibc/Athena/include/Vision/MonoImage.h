@@ -16,9 +16,9 @@ class MonoImage : public ImageBase {
   MonoImage();
   virtual ~MonoImage() = default;
 
-  std::vector<EllipseMatch> *DetectEllipses(
-      EllipseDescriptor *ellipseDescriptor, CurveOptions *curveOptions,
-      ShapeDetectionOptions *shapeDetectionOptions, ROI *roi);
-  std::vector<EllipseMatch> *DetectEllipses(
-      EllipseDescriptor *ellipseDescriptor);
+  std::vector<EllipseMatch>* DetectEllipses(
+      EllipseDescriptor* ellipseDescriptor, CurveOptions* curveOptions,
+      ShapeDetectionOptions* shapeDetectionOptions, ROI* roi);
+  std::vector<EllipseMatch>* DetectEllipses(
+      EllipseDescriptor* ellipseDescriptor);
 };

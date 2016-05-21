@@ -9,19 +9,17 @@
 
 #include <time.h>
 
+#include <iostream>
 #include "HAL/HAL.hpp"
 #include "Utility.h"
-#include <iostream>
 
 /**
  * Pause the task for a specified time.
  *
  * Pause the execution of the program for a specified period of time given in
- * seconds.
- * Motors will continue to run at their last assigned values, and sensors will
- * continue to
- * update. Only the task containing the wait will pause until the wait time is
- * expired.
+ * seconds. Motors will continue to run at their last assigned values, and
+ * sensors will continue to update. Only the task containing the wait will
+ * pause until the wait time is expired.
  *
  * @param seconds Length of time to pause, in seconds.
  */
@@ -40,8 +38,8 @@ double GetClock() { return Timer::GetFPGATimestamp(); }
 /**
  * @brief Gives real-time clock system time with nanosecond resolution
  * @return The time, just in case you want the robot to start autonomous at 8pm
- * on Saturday.
-*/
+ *         on Saturday.
+ */
 double GetTime() {
   struct timespec tp;
 
@@ -51,7 +49,7 @@ double GetTime() {
   return (realTime);
 }
 
-//for compatibility with msvc12--see C2864
+// for compatibility with msvc12--see C2864
 const double Timer::kRolloverTime = (1ll << 32) / 1e6;
 /**
  * Create a new timer object.
@@ -68,10 +66,8 @@ Timer::Timer() {
 
 /**
  * Get the current time from the timer. If the clock is running it is derived
- * from
- * the current system clock the start time stored in the timer class. If the
- * clock
- * is not running, then return the time when it was last stopped.
+ * from the current system clock the start time stored in the timer class. If
+ * the clock is not running, then return the time when it was last stopped.
  *
  * @return Current time value for this timer in seconds
  */
@@ -100,7 +96,7 @@ double Timer::Get() const {
  * Reset the timer by setting the time to 0.
  *
  * Make the timer startTime the current time so new requests will be relative to
- * now
+ * now.
  */
 void Timer::Reset() {
   std::lock_guard<priority_mutex> sync(m_mutex);
@@ -110,6 +106,7 @@ void Timer::Reset() {
 
 /**
  * Start the timer running.
+ *
  * Just set the running flag to true indicating that all time requests should be
  * relative to the system clock.
  */
@@ -123,6 +120,7 @@ void Timer::Start() {
 
 /**
  * Stop the timer.
+ *
  * This computes the time as of now and clears the running flag, causing all
  * subsequent time requests to be read from the accumulated time rather than
  * looking at the system clock.
@@ -160,8 +158,8 @@ bool Timer::HasPeriodPassed(double period) {
  * Return the FPGA system clock time in seconds.
  *
  * Return the time from the FPGA hardware clock in seconds since the FPGA
- * started.
- * Rolls over after 71 minutes.
+ * started. Rolls over after 71 minutes.
+ *
  * @returns Robot running time in seconds.
  */
 double Timer::GetFPGATimestamp() {

@@ -8,12 +8,12 @@
 #ifndef __PRINT_COMMAND_H__
 #define __PRINT_COMMAND_H__
 
-#include "Commands/Command.h"
 #include <string>
+#include "Commands/Command.h"
 
 class PrintCommand : public Command {
  public:
-  PrintCommand(const std::string &message);
+  PrintCommand(const std::string& message);
   virtual ~PrintCommand() = default;
 
  protected:

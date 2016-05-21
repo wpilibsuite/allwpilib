@@ -7,11 +7,11 @@
 
 #include "Buttons/Button.h"
 
+#include "Buttons/CancelButtonScheduler.h"
 #include "Buttons/HeldButtonScheduler.h"
 #include "Buttons/PressedButtonScheduler.h"
 #include "Buttons/ReleasedButtonScheduler.h"
 #include "Buttons/ToggleButtonScheduler.h"
-#include "Buttons/CancelButtonScheduler.h"
 
 bool Trigger::Grab() {
   if (Get())
@@ -25,27 +25,27 @@ bool Trigger::Grab() {
     return false;
 }
 
-void Trigger::WhenActive(Command *command) {
+void Trigger::WhenActive(Command* command) {
   auto pbs = new PressedButtonScheduler(Grab(), this, command);
   pbs->Start();
 }
 
-void Trigger::WhileActive(Command *command) {
+void Trigger::WhileActive(Command* command) {
   auto hbs = new HeldButtonScheduler(Grab(), this, command);
   hbs->Start();
 }
 
-void Trigger::WhenInactive(Command *command) {
+void Trigger::WhenInactive(Command* command) {
   auto rbs = new ReleasedButtonScheduler(Grab(), this, command);
   rbs->Start();
 }
 
-void Trigger::CancelWhenActive(Command *command) {
+void Trigger::CancelWhenActive(Command* command) {
   auto cbs = new CancelButtonScheduler(Grab(), this, command);
   cbs->Start();
 }
 
-void Trigger::ToggleWhenActive(Command *command) {
+void Trigger::ToggleWhenActive(Command* command) {
   auto tbs = new ToggleButtonScheduler(Grab(), this, command);
   tbs->Start();
 }

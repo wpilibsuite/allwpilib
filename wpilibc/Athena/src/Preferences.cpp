@@ -7,14 +7,14 @@
 
 #include "Preferences.h"
 
-#include "WPIErrors.h"
 #include "HAL/HAL.hpp"
+#include "WPIErrors.h"
 
 #include <stdio.h>
 #include <algorithm>
 
 /** The Preferences table name */
-static const char *kTableName = "Preferences";
+static const char* kTableName = "Preferences";
 
 void Preferences::Listener::ValueChanged(ITable* source, llvm::StringRef key,
                                          std::shared_ptr<nt::Value> value,
@@ -31,16 +31,18 @@ Preferences::Preferences() : m_table(NetworkTable::GetTable(kTableName)) {
 }
 
 /**
- * Get the one and only {@link Preferences} object
+ * Get the one and only {@link Preferences} object.
+ *
  * @return pointer to the {@link Preferences}
  */
-Preferences *Preferences::GetInstance() {
+Preferences* Preferences::GetInstance() {
   static Preferences instance;
   return &instance;
 }
 
 /**
- * Returns a vector of all the keys
+ * Returns a vector of all the keys.
+ *
  * @return a vector of the keys
  */
 std::vector<std::string> Preferences::GetKeys() { return m_table->GetKeys(); }
@@ -48,7 +50,8 @@ std::vector<std::string> Preferences::GetKeys() { return m_table->GetKeys(); }
 /**
  * Returns the string at the given key.  If this table does not have a value
  * for that position, then the given defaultValue will be returned.
- * @param key the key
+ *
+ * @param key          the key
  * @param defaultValue the value to return if none exists in the table
  * @return either the value in the table, or the defaultValue
  */
@@ -60,7 +63,8 @@ std::string Preferences::GetString(llvm::StringRef key,
 /**
  * Returns the int at the given key.  If this table does not have a value
  * for that position, then the given defaultValue value will be returned.
- * @param key the key
+ *
+ * @param key          the key
  * @param defaultValue the value to return if none exists in the table
  * @return either the value in the table, or the defaultValue
  */
@@ -71,7 +75,8 @@ int Preferences::GetInt(llvm::StringRef key, int defaultValue) {
 /**
  * Returns the double at the given key.  If this table does not have a value
  * for that position, then the given defaultValue value will be returned.
- * @param key the key
+ *
+ * @param key          the key
  * @param defaultValue the value to return if none exists in the table
  * @return either the value in the table, or the defaultValue
  */
@@ -82,7 +87,8 @@ double Preferences::GetDouble(llvm::StringRef key, double defaultValue) {
 /**
  * Returns the float at the given key.  If this table does not have a value
  * for that position, then the given defaultValue value will be returned.
- * @param key the key
+ *
+ * @param key          the key
  * @param defaultValue the value to return if none exists in the table
  * @return either the value in the table, or the defaultValue
  */
@@ -93,7 +99,8 @@ float Preferences::GetFloat(llvm::StringRef key, float defaultValue) {
 /**
  * Returns the boolean at the given key.  If this table does not have a value
  * for that position, then the given defaultValue value will be returned.
- * @param key the key
+ *
+ * @param key          the key
  * @param defaultValue the value to return if none exists in the table
  * @return either the value in the table, or the defaultValue
  */
@@ -103,9 +110,9 @@ bool Preferences::GetBoolean(llvm::StringRef key, bool defaultValue) {
 
 /**
  * Returns the long (int64_t) at the given key.  If this table does not have a
- * value
- * for that position, then the given defaultValue value will be returned.
- * @param key the key
+ * value for that position, then the given defaultValue value will be returned.
+ *
+ * @param key          the key
  * @param defaultValue the value to return if none exists in the table
  * @return either the value in the table, or the defaultValue
  */
@@ -119,7 +126,7 @@ int64_t Preferences::GetLong(llvm::StringRef key, int64_t defaultValue) {
  * <p>The value may not have quotation marks, nor may the key
  * have any whitespace nor an equals sign</p>
  *
- * @param key the key
+ * @param key   the key
  * @param value the value
  */
 void Preferences::PutString(llvm::StringRef key, llvm::StringRef value) {
@@ -132,7 +139,7 @@ void Preferences::PutString(llvm::StringRef key, llvm::StringRef value) {
  *
  * <p>The key may not have any whitespace nor an equals sign</p>
  *
- * @param key the key
+ * @param key   the key
  * @param value the value
  */
 void Preferences::PutInt(llvm::StringRef key, int value) {
@@ -145,7 +152,7 @@ void Preferences::PutInt(llvm::StringRef key, int value) {
  *
  * <p>The key may not have any whitespace nor an equals sign</p>
  *
- * @param key the key
+ * @param key   the key
  * @param value the value
  */
 void Preferences::PutDouble(llvm::StringRef key, double value) {
@@ -158,7 +165,7 @@ void Preferences::PutDouble(llvm::StringRef key, double value) {
  *
  * <p>The key may not have any whitespace nor an equals sign</p>
  *
- * @param key the key
+ * @param key   the key
  * @param value the value
  */
 void Preferences::PutFloat(llvm::StringRef key, float value) {
@@ -171,7 +178,7 @@ void Preferences::PutFloat(llvm::StringRef key, float value) {
  *
  * <p>The key may not have any whitespace nor an equals sign</p>
  *
- * @param key the key
+ * @param key   the key
  * @param value the value
  */
 void Preferences::PutBoolean(llvm::StringRef key, bool value) {
@@ -184,7 +191,7 @@ void Preferences::PutBoolean(llvm::StringRef key, bool value) {
  *
  * <p>The key may not have any whitespace nor an equals sign</p>
  *
- * @param key the key
+ * @param key   the key
  * @param value the value
  */
 void Preferences::PutLong(llvm::StringRef key, int64_t value) {
@@ -202,6 +209,7 @@ void Preferences::Save() {}
 
 /**
  * Returns whether or not there is a key with the given name.
+ *
  * @param key the key
  * @return if there is a value at the given key
  */
@@ -210,9 +218,8 @@ bool Preferences::ContainsKey(llvm::StringRef key) {
 }
 
 /**
- * Remove a preference
+ * Remove a preference.
+ *
  * @param key the key
  */
-void Preferences::Remove(llvm::StringRef key) {
-  m_table->Delete(key);
-}
+void Preferences::Remove(llvm::StringRef key) { m_table->Delete(key); }

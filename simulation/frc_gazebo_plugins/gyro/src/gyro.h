@@ -9,16 +9,14 @@
 
 #include "simulation/gz_msgs/msgs.h"
 
+#include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/transport.hh>
-#include <gazebo/gazebo.hh>
-
-
 
 using namespace gazebo;
 
 /// \brief The axis about which to measure rotation.
-typedef enum {Roll /*X*/, Pitch /*Y*/, Yaw /*Z*/} ROTATION;
+typedef enum { Roll /*X*/, Pitch /*Y*/, Yaw /*Z*/ } ROTATION;
 
 /**
  * \brief Plugin for reading the speed and relative angle of a link.
@@ -38,12 +36,14 @@ typedef enum {Roll /*X*/, Pitch /*Y*/, Yaw /*Z*/} ROTATION;
  *     </plugin>
  *
  * - `link`: Name of the link this potentiometer is attached to.
- * - `topic`: Optional. Used as the root for subtopics. `topic`/position (gazebo.msgs.Float64),
- *            `topic`/velocity (gazebo.msgs.Float64), `topic`/control (gazebo.msgs.String)
+ * - `topic`: Optional. Used as the root for subtopics. `topic`/position
+ * (gazebo.msgs.Float64),
+ *            `topic`/velocity (gazebo.msgs.Float64), `topic`/control
+ * (gazebo.msgs.String)
  * - `units`; Optional, defaults to radians.
  */
-class Gyro: public ModelPlugin {
-public:
+class Gyro : public ModelPlugin {
+ public:
   Gyro();
   ~Gyro();
 
@@ -51,9 +51,9 @@ public:
   void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
 
   /// \brief Sends out the gyro reading each timestep.
-  void Update(const common::UpdateInfo &info);
+  void Update(const common::UpdateInfo& info);
 
-private:
+ private:
   /// \brief Publish the angle on this topic.
   std::string topic;
 
@@ -70,7 +70,7 @@ private:
   physics::LinkPtr link;
 
   /// \brief Callback for handling control data
-  void Callback(const msgs::ConstStringPtr &msg);
+  void Callback(const msgs::ConstStringPtr& msg);
 
   /// \brief Gets the current angle, taking into account whether to
   ///        return radians or degrees.
@@ -84,9 +84,10 @@ private:
   ///       depending on whether or radians or degrees are being used.
   double Limit(double value);
 
-  physics::ModelPtr model;                  ///< \brief The model that this is attached to.
-  event::ConnectionPtr updateConn;          ///< \brief Pointer to the world update function.
-  transport::NodePtr node;                  ///< \brief The node we're advertising on.
-  transport::SubscriberPtr command_sub;     ///< \brief Subscriber handle.
-  transport::PublisherPtr pos_pub, vel_pub; ///< \brief Publisher handles.
+  physics::ModelPtr model;  ///< \brief The model that this is attached to.
+  event::ConnectionPtr
+      updateConn;           ///< \brief Pointer to the world update function.
+  transport::NodePtr node;  ///< \brief The node we're advertising on.
+  transport::SubscriberPtr command_sub;      ///< \brief Subscriber handle.
+  transport::PublisherPtr pos_pub, vel_pub;  ///< \brief Publisher handles.
 };
