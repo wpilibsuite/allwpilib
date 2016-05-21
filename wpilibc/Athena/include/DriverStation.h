@@ -9,6 +9,7 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <memory>
 #include "HAL/HAL.hpp"
 #include "HAL/cpp/Semaphore.hpp"
 #include "HAL/cpp/priority_condition_variable.h"
@@ -100,10 +101,17 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   void ReportJoystickUnpluggedWarning(std::string message);
   void Run();
 
-  HALJoystickAxes m_joystickAxes[kJoystickPorts];
-  HALJoystickPOVs m_joystickPOVs[kJoystickPorts];
-  HALJoystickButtons m_joystickButtons[kJoystickPorts];
-  HALJoystickDescriptor m_joystickDescriptor[kJoystickPorts];
+  std::unique_ptr<HALJoystickAxes[]> m_joystickAxes;
+  std::unique_ptr<HALJoystickPOVs[]> m_joystickPOVs;
+  std::unique_ptr<HALJoystickButtons[]> m_joystickButtons;
+  std::unique_ptr<HALJoystickDescriptor[]> m_joystickDescriptor;
+
+  // Cached Data
+  std::unique_ptr<HALJoystickAxes[]> m_joystickAxesCache;
+  std::unique_ptr<HALJoystickPOVs[]> m_joystickPOVsCache;
+  std::unique_ptr<HALJoystickButtons[]> m_joystickButtonsCache;
+  std::unique_ptr<HALJoystickDescriptor[]> m_joystickDescriptorCache;
+
   Task m_task;
   std::atomic<bool> m_isRunning{false};
   mutable Semaphore m_newControlData{Semaphore::kEmpty};
@@ -111,6 +119,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   priority_mutex m_packetDataAvailableMutex;
   std::condition_variable_any m_waitForDataCond;
   priority_mutex m_waitForDataMutex;
+  mutable priority_mutex m_joystickDataMutex;
   bool m_userInDisabled = false;
   bool m_userInAutonomous = false;
   bool m_userInTeleop = false;

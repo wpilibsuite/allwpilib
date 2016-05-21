@@ -142,37 +142,47 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_NativeH
 /*
  * Class: edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
  * Method:    HALGetJoystickAxes
- * Signature: (B)[S
+ * Signature: (B[S)B
  */
-JNIEXPORT jshortArray JNICALL
+JNIEXPORT jbyte JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickAxes(
-    JNIEnv *env, jclass, jbyte joystickNum) {
+    JNIEnv * env, jclass, jbyte joystickNum, jshortArray axesArray) {
   NETCOMM_LOG(logDEBUG) << "Calling HALJoystickAxes";
   HALJoystickAxes axes;
   HALGetJoystickAxes(joystickNum, &axes);
 
-  jshortArray axesArray = env->NewShortArray(axes.count);
+  jsize javaSize = env->GetArrayLength(axesArray);
+  if (axes.count > javaSize)
+  {
+    ThrowIllegalArgumentException(env, "Native array size larger then passed in java array size");
+  }
+
   env->SetShortArrayRegion(axesArray, 0, axes.count, axes.axes);
 
-  return axesArray;
+  return axes.count;
 }
 
 /*
  * Class: edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
  * Method:    HALGetJoystickPOVs
- * Signature: (B)[S
+ * Signature: (B[S)B
  */
-JNIEXPORT jshortArray JNICALL
+JNIEXPORT jbyte JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickPOVs(
-    JNIEnv *env, jclass, jbyte joystickNum) {
+    JNIEnv * env, jclass, jbyte joystickNum, jshortArray povsArray) {
   NETCOMM_LOG(logDEBUG) << "Calling HALJoystickPOVs";
   HALJoystickPOVs povs;
   HALGetJoystickPOVs(joystickNum, &povs);
 
-  jshortArray povsArray = env->NewShortArray(povs.count);
+  jsize javaSize = env->GetArrayLength(povsArray);
+  if (povs.count > javaSize)
+  {
+    ThrowIllegalArgumentException(env, "Native array size larger then passed in java array size");
+  }
+
   env->SetShortArrayRegion(povsArray, 0, povs.count, povs.povs);
 
-  return povsArray;
+  return povs.count;
 }
 
 /*
