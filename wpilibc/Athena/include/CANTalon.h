@@ -573,7 +573,11 @@ class CANTalon : public MotorSafety,
 
   // LiveWindow stuff.
   std::shared_ptr<ITable> m_table;
-  bool m_isInverted;
+  /**
+   * Flips the output direction during open-loop modes like percent
+   * voltage, or certain closed loop modes like speed/current mode.
+   */
+  bool m_isInverted = false;
 
   HasBeenMoved m_hasBeenMoved;
 };
