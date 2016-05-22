@@ -112,6 +112,7 @@ class CANTalon : public MotorSafety,
   struct TrajectoryPoint {
     double position;  //!< The position to servo to.
     double velocity;  //!< The velocity to feed-forward.
+
     /**
      * Time in milliseconds to process this point.
      * Value should be between 1ms and 255ms.  If value is zero

@@ -22,15 +22,15 @@ int HALGetAllianceStation(enum HALAllianceStationID* allianceStation) {
       (AllianceStationID_t*)allianceStation);
 }
 
-int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes *axes) {
+int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes* axes) {
   HALJoystickAxesInt axesInt;
-  
+
   int retVal = FRC_NetworkCommunication_getJoystickAxes(
-      joystickNum, (JoystickAxes_t*) &axesInt, kMaxJoystickAxes);
-  
+      joystickNum, (JoystickAxes_t*)&axesInt, kMaxJoystickAxes);
+
   // copy int values to float values
   axes->count = axesInt.count;
-  // current scaling is -128 to 127, can easily be patched in the future by 
+  // current scaling is -128 to 127, can easily be patched in the future by
   // changing this function.
   for (unsigned int i = 0; i < axesInt.count; i++) {
     int8_t value = axesInt.axes[i];
@@ -40,7 +40,7 @@ int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes *axes) {
       axes->axes[i] = value / 127.0f;
     }
   }
-  
+
   return retVal;
 }
 
