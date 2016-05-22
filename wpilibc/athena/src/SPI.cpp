@@ -7,7 +7,7 @@
 
 #include "SPI.h"
 
-#include "HAL/Digital.hpp"
+#include "HAL/Digital.h"
 #include "WPIErrors.h"
 
 #include <string.h>

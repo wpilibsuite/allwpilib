@@ -8,7 +8,7 @@
 #include "PIDController.h"
 #include <math.h>
 #include <vector>
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 #include "Notifier.h"
 #include "PIDOutput.h"
 #include "PIDSource.h"

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "PIDSource.h"
 #include "SensorBase.h"

@@ -7,7 +7,7 @@
 
 #include "Preferences.h"
 
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 #include "WPIErrors.h"
 
 #include <stdio.h>

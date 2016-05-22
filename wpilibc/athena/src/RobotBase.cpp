@@ -10,7 +10,7 @@
 #include <cstdio>
 #include <cstring>
 #include "DriverStation.h"
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 #include "HLUsageReporting.h"
 #include "Internal/HardwareHLReporting.h"
 #include "RobotState.h"

@@ -7,7 +7,7 @@
 
 #include "PWM.h"
 
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 #include "Resource.h"
 #include "Utility.h"
 #include "WPIErrors.h"

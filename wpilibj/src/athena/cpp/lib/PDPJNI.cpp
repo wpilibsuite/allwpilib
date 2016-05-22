@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/PDP.hpp"
+#include "HAL/PDP.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_hal_PDPJNI.h"
 

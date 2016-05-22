@@ -15,7 +15,7 @@
 #include <cstring>
 #include <iostream>
 #include <sstream>
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 #include "Task.h"
 #include "nivision.h"
 

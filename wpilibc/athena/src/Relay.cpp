@@ -7,7 +7,7 @@
 
 #include "Relay.h"
 
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 #include "MotorSafetyHelper.h"
 #include "Resource.h"

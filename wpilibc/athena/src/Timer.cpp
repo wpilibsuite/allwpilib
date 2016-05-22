@@ -10,7 +10,7 @@
 #include <time.h>
 
 #include <iostream>
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 #include "Utility.h"
 
 /**

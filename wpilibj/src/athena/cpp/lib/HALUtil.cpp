@@ -12,8 +12,8 @@
 #include <cstring>
 #include <string>
 #include "FRC_NetworkCommunication/CANSessionMux.h"
-#include "HAL/HAL.hpp"
-#include "Log.hpp"
+#include "HAL/HAL.h"
+#include "Log.h"
 #include "edu_wpi_first_wpilibj_hal_HALUtil.h"
 #include "errno.h"
 

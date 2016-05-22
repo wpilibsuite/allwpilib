@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include <atomic>
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 
 /**
  * Create and launch a task.

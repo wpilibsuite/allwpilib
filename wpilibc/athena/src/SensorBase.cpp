@@ -7,7 +7,7 @@
 
 #include "SensorBase.h"
 
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 #include "HAL/Port.h"
 #include "NetworkCommunication/LoadOut.h"
 #include "WPIErrors.h"

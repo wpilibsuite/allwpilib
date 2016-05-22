@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include <jni.h>
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 #include "HALUtil.h"
 
 #include "edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI.h"

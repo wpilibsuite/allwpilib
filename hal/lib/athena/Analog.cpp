@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Analog.hpp"
+#include "HAL/Analog.h"
 
 #include "ChipObject.h"
 #include "FRC_NetworkCommunication/AICalibration.h"
 #include "FRC_NetworkCommunication/LoadOut.h"
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 #include "HAL/Port.h"
-#include "HAL/cpp/Resource.hpp"
+#include "HAL/cpp/Resource.h"
 #include "HAL/cpp/priority_mutex.h"
 
 static const long kTimebase = 40000000;  ///< 40 MHz clock

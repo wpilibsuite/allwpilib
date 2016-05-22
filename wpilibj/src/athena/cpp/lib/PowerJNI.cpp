@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Power.hpp"
+#include "HAL/Power.h"
 #include <jni.h>
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_hal_PowerJNI.h"

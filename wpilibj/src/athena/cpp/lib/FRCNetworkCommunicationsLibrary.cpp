@@ -7,9 +7,9 @@
 
 #include <assert.h>
 #include <jni.h>
-#include "Log.hpp"
+#include "Log.h"
 
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 #include "edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary.h"
 //#include "NetworkCommunication/FRCComm.h"
 //#include "NetworkCommunication/UsageReporting.h"

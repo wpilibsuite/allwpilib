@@ -11,9 +11,9 @@
 #include <condition_variable>
 #include <mutex>
 #include <thread>
-#include "Log.hpp"
+#include "Log.h"
 
-#include "HAL/Interrupts.hpp"
+#include "HAL/Interrupts.h"
 #include "HALUtil.h"
 #include "SafeThread.h"
 #include "edu_wpi_first_wpilibj_hal_InterruptJNI.h"

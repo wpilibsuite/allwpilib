@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Task.hpp"
+#include "HAL/Task.h"
 
 #ifndef OK
 #define OK 0

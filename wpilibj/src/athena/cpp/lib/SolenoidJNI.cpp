@@ -6,8 +6,8 @@
 /*----------------------------------------------------------------------------*/
 
 #include <jni.h>
-#include "HAL/HAL.hpp"
-#include "Log.hpp"
+#include "HAL/HAL.h"
+#include "Log.h"
 
 #include "edu_wpi_first_wpilibj_hal_SolenoidJNI.h"
 
