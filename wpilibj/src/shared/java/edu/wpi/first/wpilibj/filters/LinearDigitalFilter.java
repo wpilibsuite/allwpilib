@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.PIDSource;
  * This class implements a linear, digital filter. All types of FIR and IIR filters are supported.
  * Static factory methods are provided to create commonly used types of filters.
  *
- * <p>Filters are of the form: y[n] = (b0*x[n] + b1*x[n-1] + ... + bP*x[n-P) - (a0*y[n-1] +
+ * <p>Filters are of the form: y[n] = (b0*x[n] + b1*x[n-1] + ... + bP*x[n-P]) - (a0*y[n-1] +
  * a2*y[n-2] + ... + aQ*y[n-Q])
  *
  * <p>Where: y[n] is the output at time "n" x[n] is the input at time "n" y[n-1] is the output from
