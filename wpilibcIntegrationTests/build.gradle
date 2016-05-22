@@ -3,7 +3,7 @@ apply plugin: 'cpp'
 defineNetworkTablesProperties()
 
 ext.shared = "${project(':wpilibc').projectDir.getAbsolutePath()}/shared"
-ext.athena = "${project(':wpilibc').projectDir.getAbsolutePath()}/Athena"
+ext.athena = "${project(':wpilibc').projectDir.getAbsolutePath()}/athena"
 ext.hal = project(':hal').projectDir.getAbsolutePath()
 
 model {

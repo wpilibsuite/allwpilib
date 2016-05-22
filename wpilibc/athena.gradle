@@ -126,7 +126,7 @@ if (checkDoxygen()) {
         source file("$ntSourceDir/src")
         source file("$ntSourceDir/include")
         source file("$halLocation/shared")
-        source file("$halLocation/Athena")
+        source file("$halLocation/athena")
         source file("$halLocation/include")
         // template file('cpp.doxy')
         exclude 'nivision.h'

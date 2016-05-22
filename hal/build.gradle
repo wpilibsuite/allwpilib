@@ -1,6 +1,6 @@
 // There are two hal libraries that are built
-// - Desktop which is used by simulation (gcc/msvc)
-// - Athena which is used by the roborio (arm)
+// - desktop which is used by simulation (gcc/msvc)
+// - athena which is used by the roborio (arm)
 
 apply plugin: 'cpp'
 
@@ -14,17 +14,17 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs = ["lib/Athena", "lib/Athena/FRC_FPGA_ChipObject", "lib/Shared"]
+                        srcDirs = ["lib/athena", "lib/athena/FRC_FPGA_ChipObject", "lib/shared"]
                         includes = ["**/*.cpp"]
                     }
                     exportedHeaders {
-                        srcDirs = ["include", "lib/Athena", "lib/Athena/FRC_FPGA_ChipObject", "lib/Shared"]
+                        srcDirs = ["include", "lib/athena", "lib/athena/FRC_FPGA_ChipObject", "lib/shared"]
                     }
                 }
             }
         }
 
-//        HALDesktop(NativeLibrarySpec) {
+//        HALSim(NativeLibrarySpec) {
 //            binaries.all {
 //                if (toolChain in Gcc){
 //                    cppCompiler.args "-std=c++1y"
@@ -34,11 +34,11 @@ model {
 //            sources {
 //                cpp {
 //                    source {
-//                        srcDirs = ["lib/Desktop", "lib/Shared"]
+//                        srcDirs = ["lib/sim", "lib/shared"]
 //                        includes = ["**/*.cpp"]
 //                    }
 //                    exportedHeaders {
-//                        srcDirs = ["include", "lib/Desktop", "lib/Shared"]
+//                        srcDirs = ["include", "lib/sim", "lib/shared"]
 //                    }
 //                }
 //            }
