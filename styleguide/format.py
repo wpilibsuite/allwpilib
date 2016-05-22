@@ -43,5 +43,7 @@ if sys.platform.startswith("win32"):
     clangExec += ".exe"
 
 for name in files:
-    print("Processing", name,)
+    # List names of files as they are processed if verbose flag was given
+    if len(sys.argv) > 1 and sys.argv[1] == "-v":
+        print("Processing", name,)
     call([clangExec, "-i", "-style=file", name])
