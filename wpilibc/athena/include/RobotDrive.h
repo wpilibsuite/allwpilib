@@ -87,7 +87,6 @@ class RobotDrive : public MotorSafety, public ErrorBase {
   void SetInvertedMotor(MotorType motor, bool isInverted);
   void SetSensitivity(float sensitivity);
   void SetMaxOutput(double maxOutput);
-  void SetCANJaguarSyncGroup(uint8_t syncGroup);
 
   void SetExpiration(float timeout) override;
   float GetExpiration() const override;
@@ -111,7 +110,6 @@ class RobotDrive : public MotorSafety, public ErrorBase {
   std::shared_ptr<SpeedController> m_rearLeftMotor;
   std::shared_ptr<SpeedController> m_rearRightMotor;
   std::unique_ptr<MotorSafetyHelper> m_safetyHelper;
-  uint8_t m_syncGroup = 0;
 
  private:
   int32_t GetNumMotors() {

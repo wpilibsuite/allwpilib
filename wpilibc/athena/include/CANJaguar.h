@@ -92,9 +92,11 @@ class CANJaguar : public MotorSafety,
   void SetVoltageMode(QuadEncoderStruct, uint16_t codesPerRev);
   void SetVoltageMode(PotentiometerStruct);
 
+  void Set(float value, uint8_t syncGroup);
+
   // CANSpeedController interface
   virtual float Get() const override;
-  virtual void Set(float value, uint8_t syncGroup = 0) override;
+  virtual void Set(float value) override;
   virtual void Disable() override;
   virtual void SetP(double p) override;
   virtual void SetI(double i) override;

@@ -46,22 +46,6 @@ public class Jaguar implements SpeedController, PIDOutput, MotorSafety, LiveWind
   /**
    * Set the PWM value.
    *
-   * @param speed     The speed to set.  Value should be between -1.0 and 1.0.
-   * @param syncGroup The update group to add this Set() to, pending UpdateSyncGroup().  If 0,
-   *                  update immediately.
-   * @deprecated For compatibility with CANJaguar
-   *
-   * The PWM value is set using a range of -1.0 to 1.0, appropriately scaling the value for the
-   * FPGA.
-   */
-  @Deprecated
-  public void set(double speed, byte syncGroup) {
-    impl.set(speed, syncGroup);
-  }
-
-  /**
-   * Set the PWM value.
-   *
    * The PWM value is set using a range of -1.0 to 1.0, appropriately scaling the value for the
    * FPGA.
    *

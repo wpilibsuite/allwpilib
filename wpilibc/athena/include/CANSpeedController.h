@@ -64,7 +64,7 @@ class CANSpeedController : public SpeedController {
   };
 
   virtual float Get() const = 0;
-  virtual void Set(float value, uint8_t syncGroup = 0) = 0;
+  virtual void Set(float value) = 0;
   virtual void StopMotor() = 0;
   virtual void Disable() = 0;
   virtual void SetP(double p) = 0;

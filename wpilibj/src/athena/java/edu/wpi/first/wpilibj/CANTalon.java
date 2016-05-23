@@ -418,17 +418,6 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
   }
 
   /**
-   * Sets the output of the Talon.
-   *
-   * @param outputValue                See set().
-   * @param thisValueDoesNotDoAnything corresponds to syncGroup from Jaguar; not relevant here.
-   */
-  @Override
-  public void set(double outputValue, byte thisValueDoesNotDoAnything) {
-    set(outputValue);
-  }
-
-  /**
    * Sets the appropriate output on the talon, depending on the mode.
    *
    * <p>In PercentVbus, the output is between -1.0 and 1.0, with 0.0 as stopped. In Follower mode,

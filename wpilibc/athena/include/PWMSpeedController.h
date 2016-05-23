@@ -16,7 +16,7 @@
 class PWMSpeedController : public SafePWM, public SpeedController {
  public:
   virtual ~PWMSpeedController() = default;
-  virtual void Set(float value, uint8_t syncGroup = 0) override;
+  virtual void Set(float value) override;
   virtual float Get() const override;
   virtual void Disable() override;
   virtual void StopMotor() override;

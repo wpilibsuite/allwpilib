@@ -40,10 +40,9 @@ Talon::Talon(uint32_t channel) : SafePWM(channel) {
  * The PWM value is set using a range of -1.0 to 1.0, appropriately
  * scaling the value for the FPGA.
  *
- * @param speed     The speed value between -1.0 and 1.0 to set.
- * @param syncGroup Unused interface.
+ * @param speed The speed value between -1.0 and 1.0 to set.
  */
-void Talon::Set(float speed, uint8_t syncGroup) { SetSpeed(speed); }
+void Talon::Set(float speed) { SetSpeed(speed); }
 
 /**
  * Get the recently set value of the PWM.

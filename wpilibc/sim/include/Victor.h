@@ -18,7 +18,7 @@ class Victor : public SafePWM, public SpeedController {
  public:
   explicit Victor(uint32_t channel);
   virtual ~Victor() = default;
-  virtual void Set(float value, uint8_t syncGroup = 0);
+  virtual void Set(float value);
   virtual float Get() const;
   virtual void Disable();
 

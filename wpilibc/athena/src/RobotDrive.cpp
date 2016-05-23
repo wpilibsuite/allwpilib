@@ -8,7 +8,6 @@
 #include "RobotDrive.h"
 
 #include <math.h>
-#include "CANJaguar.h"
 #include "GenericHID.h"
 #include "Joystick.h"
 #include "Talon.h"
@@ -522,17 +521,10 @@ void RobotDrive::MecanumDrive_Cartesian(float x, float y, float rotation,
 
   Normalize(wheelSpeeds);
 
-  m_frontLeftMotor->Set(wheelSpeeds[kFrontLeftMotor] * m_maxOutput,
-                        m_syncGroup);
-  m_frontRightMotor->Set(wheelSpeeds[kFrontRightMotor] * m_maxOutput,
-                         m_syncGroup);
-  m_rearLeftMotor->Set(wheelSpeeds[kRearLeftMotor] * m_maxOutput, m_syncGroup);
-  m_rearRightMotor->Set(wheelSpeeds[kRearRightMotor] * m_maxOutput,
-                        m_syncGroup);
-
-  if (m_syncGroup != 0) {
-    CANJaguar::UpdateSyncGroup(m_syncGroup);
-  }
+  m_frontLeftMotor->Set(wheelSpeeds[kFrontLeftMotor] * m_maxOutput);
+  m_frontRightMotor->Set(wheelSpeeds[kFrontRightMotor] * m_maxOutput);
+  m_rearLeftMotor->Set(wheelSpeeds[kRearLeftMotor] * m_maxOutput);
+  m_rearRightMotor->Set(wheelSpeeds[kRearRightMotor] * m_maxOutput);
 
   m_safetyHelper->Feed();
 }
@@ -578,17 +570,10 @@ void RobotDrive::MecanumDrive_Polar(float magnitude, float direction,
 
   Normalize(wheelSpeeds);
 
-  m_frontLeftMotor->Set(wheelSpeeds[kFrontLeftMotor] * m_maxOutput,
-                        m_syncGroup);
-  m_frontRightMotor->Set(wheelSpeeds[kFrontRightMotor] * m_maxOutput,
-                         m_syncGroup);
-  m_rearLeftMotor->Set(wheelSpeeds[kRearLeftMotor] * m_maxOutput, m_syncGroup);
-  m_rearRightMotor->Set(wheelSpeeds[kRearRightMotor] * m_maxOutput,
-                        m_syncGroup);
-
-  if (m_syncGroup != 0) {
-    CANJaguar::UpdateSyncGroup(m_syncGroup);
-  }
+  m_frontLeftMotor->Set(wheelSpeeds[kFrontLeftMotor] * m_maxOutput);
+  m_frontRightMotor->Set(wheelSpeeds[kFrontRightMotor] * m_maxOutput);
+  m_rearLeftMotor->Set(wheelSpeeds[kRearLeftMotor] * m_maxOutput);
+  m_rearRightMotor->Set(wheelSpeeds[kRearRightMotor] * m_maxOutput);
 
   m_safetyHelper->Feed();
 }
@@ -624,16 +609,12 @@ void RobotDrive::SetLeftRightMotorOutputs(float leftOutput, float rightOutput) {
   wpi_assert(m_rearLeftMotor != nullptr && m_rearRightMotor != nullptr);
 
   if (m_frontLeftMotor != nullptr)
-    m_frontLeftMotor->Set(Limit(leftOutput) * m_maxOutput, m_syncGroup);
-  m_rearLeftMotor->Set(Limit(leftOutput) * m_maxOutput, m_syncGroup);
+    m_frontLeftMotor->Set(Limit(leftOutput) * m_maxOutput);
+  m_rearLeftMotor->Set(Limit(leftOutput) * m_maxOutput);
 
   if (m_frontRightMotor != nullptr)
-    m_frontRightMotor->Set(-Limit(rightOutput) * m_maxOutput, m_syncGroup);
-  m_rearRightMotor->Set(-Limit(rightOutput) * m_maxOutput, m_syncGroup);
-
-  if (m_syncGroup != 0) {
-    CANJaguar::UpdateSyncGroup(m_syncGroup);
-  }
+    m_frontRightMotor->Set(-Limit(rightOutput) * m_maxOutput);
+  m_rearRightMotor->Set(-Limit(rightOutput) * m_maxOutput);
 
   m_safetyHelper->Feed();
 }
@@ -731,17 +712,6 @@ void RobotDrive::SetSensitivity(float sensitivity) {
  *                  functions.
  */
 void RobotDrive::SetMaxOutput(double maxOutput) { m_maxOutput = maxOutput; }
-
-/**
- * Set the number of the sync group for the motor controllers.  If the motor
- * controllers are {@link CANJaguar}s, then they will all be added to this sync
- * group, causing them to update their values at the same time.
- *
- * @param syncGroup the update group to add the motor controllers to
- */
-void RobotDrive::SetCANJaguarSyncGroup(uint8_t syncGroup) {
-  m_syncGroup = syncGroup;
-}
 
 void RobotDrive::SetExpiration(float timeout) {
   m_safetyHelper->SetExpiration(timeout);

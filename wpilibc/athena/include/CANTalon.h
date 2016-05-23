@@ -242,7 +242,7 @@ class CANTalon : public MotorSafety,
 
   // CANSpeedController interface
   virtual float Get() const override;
-  virtual void Set(float value, uint8_t syncGroup = 0) override;
+  virtual void Set(float value) override;
   virtual void Reset() override;
   virtual void SetSetpoint(float value) override;
   virtual void Disable() override;
