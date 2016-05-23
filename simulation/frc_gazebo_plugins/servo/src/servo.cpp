@@ -40,8 +40,8 @@ void Servo::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
     torque = 5;
   }
 
-  gzmsg << "initializing servo: " << topic
-        << " joint=" << joint->GetName() << " torque=" << torque << std::endl;
+  gzmsg << "initializing servo: " << topic << " joint=" << joint->GetName()
+        << " torque=" << torque << std::endl;
 
   // Connect to Gazebo transport for messaging
   std::string scoped_name =

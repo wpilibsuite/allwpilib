@@ -9,10 +9,10 @@
 
 ExternalLimitSwitch::ExternalLimitSwitch(sdf::ElementPtr sdf) {
   sensor = std::dynamic_pointer_cast<sensors::ContactSensor>(
-       sensors::get_sensor(sdf->Get<std::string>("sensor")));
+      sensors::get_sensor(sdf->Get<std::string>("sensor")));
 
   gzmsg << "\texternal limit switch: "
-    << " sensor=" << sensor->Name() << std::endl;
+        << " sensor=" << sensor->Name() << std::endl;
 }
 
 ExternalLimitSwitch::~ExternalLimitSwitch() {}

@@ -35,8 +35,8 @@ void Rangefinder::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
     topic = "~/" + sdf->GetAttribute("name")->GetAsString();
   }
 
-  gzmsg << "Initializing rangefinder: " << topic
-        << " sensor=" << sensor->Name() << std::endl;
+  gzmsg << "Initializing rangefinder: " << topic << " sensor=" << sensor->Name()
+        << std::endl;
 
   // Connect to Gazebo transport for messaging
   std::string scoped_name =
