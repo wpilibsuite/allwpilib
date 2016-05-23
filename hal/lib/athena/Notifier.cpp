@@ -21,12 +21,14 @@ static tAlarm* notifierAlarm = nullptr;
 static tInterruptManager* notifierManager = nullptr;
 static uint64_t closestTrigger = UINT64_MAX;
 struct Notifier {
-  Notifier *prev, *next;
+  Notifier *prev, *next, *freeNext;
+  bool freed;
   void* param;
   void (*process)(uint64_t, void*);
   uint64_t triggerTime = UINT64_MAX;
 };
 static Notifier* notifiers = nullptr;
+static Notifier* notifiersFreeList = nullptr;
 static std::atomic_flag notifierAtexitRegistered = ATOMIC_FLAG_INIT;
 static std::atomic_int notifierRefCount{0};
 
@@ -42,7 +44,7 @@ static void alarmCallback(uint32_t, void*) {
   // process all notifiers
   Notifier* notifier = notifiers;
   while (notifier) {
-    if (notifier->triggerTime != UINT64_MAX) {
+    if (!notifier->freed && notifier->triggerTime != UINT64_MAX) {
       if (currentTime == 0) currentTime = getFPGATime(&status);
       if (notifier->triggerTime < currentTime) {
         notifier->triggerTime = UINT64_MAX;
@@ -57,6 +59,15 @@ static void alarmCallback(uint32_t, void*) {
     }
     notifier = notifier->next;
   }
+
+  // clean up freelist
+  notifier = notifiersFreeList;
+  while (notifier) {
+    Notifier* next = notifier->freeNext;
+    delete notifier;
+    notifier = next;
+  }
+  notifiersFreeList = nullptr;
 }
 
 static void cleanupNotifierAtExit() {
@@ -91,7 +102,9 @@ void* initializeNotifier(void (*process)(uint64_t, void*), void* param,
   Notifier* notifier = new Notifier();
   notifier->prev = nullptr;
   notifier->next = notifiers;
+  notifier->freeNext = nullptr;
   if (notifier->next) notifier->next->prev = notifier;
+  notifier->freed = false;
   notifier->param = param;
   notifier->process = process;
   notifiers = notifier;
@@ -103,11 +116,18 @@ void cleanNotifier(void* notifier_pointer, int32_t* status) {
     std::lock_guard<priority_recursive_mutex> sync(notifierMutex);
     Notifier* notifier = (Notifier*)notifier_pointer;
 
-    // remove from list and delete
+    // ignore double-free
+    if (notifier->freed) return;
+    notifier->freed = true;
+
+    // remove from list
     if (notifier->prev) notifier->prev->next = notifier->next;
     if (notifier->next) notifier->next->prev = notifier->prev;
     if (notifiers == notifier) notifiers = notifier->next;
-    delete notifier;
+
+    // add to freelist
+    notifier->freeNext = notifiersFreeList;
+    notifiersFreeList = notifier;
   }
 
   if (notifierRefCount.fetch_sub(1) == 1) {
@@ -136,6 +156,7 @@ void updateNotifierAlarm(void* notifier_pointer, uint64_t triggerTime,
   std::lock_guard<priority_recursive_mutex> sync(notifierMutex);
 
   Notifier* notifier = (Notifier*)notifier_pointer;
+  if (notifier->freed) return;
   notifier->triggerTime = triggerTime;
   bool wasActive = (closestTrigger != UINT64_MAX);
 
