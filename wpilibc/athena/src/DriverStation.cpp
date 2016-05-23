@@ -33,14 +33,17 @@ const uint32_t DriverStation::kJoystickPorts;
  * This is only called once the first time GetInstance() is called
  */
 DriverStation::DriverStation() {
-  m_joystickAxes = std::make_unique<HALJoystickAxes[]> (kJoystickPorts);
-  m_joystickPOVs = std::make_unique<HALJoystickPOVs[]> (kJoystickPorts);
-  m_joystickButtons = std::make_unique<HALJoystickButtons[]> (kJoystickPorts);
-  m_joystickDescriptor = std::make_unique<HALJoystickDescriptor[]> (kJoystickPorts);
-  m_joystickAxesCache = std::make_unique<HALJoystickAxes[]> (kJoystickPorts);
-  m_joystickPOVsCache = std::make_unique<HALJoystickPOVs[]> (kJoystickPorts);
-  m_joystickButtonsCache = std::make_unique<HALJoystickButtons[]> (kJoystickPorts);
-  m_joystickDescriptorCache = std::make_unique<HALJoystickDescriptor[]> (kJoystickPorts);
+  m_joystickAxes = std::make_unique<HALJoystickAxes[]>(kJoystickPorts);
+  m_joystickPOVs = std::make_unique<HALJoystickPOVs[]>(kJoystickPorts);
+  m_joystickButtons = std::make_unique<HALJoystickButtons[]>(kJoystickPorts);
+  m_joystickDescriptor =
+      std::make_unique<HALJoystickDescriptor[]>(kJoystickPorts);
+  m_joystickAxesCache = std::make_unique<HALJoystickAxes[]>(kJoystickPorts);
+  m_joystickPOVsCache = std::make_unique<HALJoystickPOVs[]>(kJoystickPorts);
+  m_joystickButtonsCache =
+      std::make_unique<HALJoystickButtons[]>(kJoystickPorts);
+  m_joystickDescriptorCache =
+      std::make_unique<HALJoystickDescriptor[]>(kJoystickPorts);
 
   // All joysticks should default to having zero axes, povs and buttons, so
   // uninitialized memory doesn't get sent to speed controllers.
@@ -303,7 +306,7 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis) {
           "Joystick Axis missing, check if all controllers are plugged in");
     return 0.0f;
   }
-  
+
   return m_joystickAxes[stick].axes[axis];
 }
 
