@@ -67,7 +67,6 @@ void Gyro::Callback(const msgs::ConstStringPtr& msg) {
   std::string command = msg->data();
   if (command == "reset") {
     zero = GetAngle();
-    gzmsg << "resetting gyro on port " << topic << std::endl;
   } else {
     gzerr << "WARNING: Gyro got unknown command '" << command << "'."
           << std::endl;

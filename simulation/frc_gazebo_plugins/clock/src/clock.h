@@ -24,7 +24,7 @@ using namespace gazebo;
  * To add a clock to your robot, add the following XML to your robot
  * model:
  *
- *     <plugin name="my_clock" filename="libgz_clock.so">
+ *     <plugin name="my_clock" filename="libclock.so">
  *       <topic>~/my/topic</topic>
  *     </plugin>
  *

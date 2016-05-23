@@ -22,7 +22,7 @@ using namespace gazebo;
  * To add a rangefinder to your robot, add the following XML to your
  * robot model:
  *
- *     <plugin name="my_rangefinder" filename="libgz_rangefinder.so">
+ *     <plugin name="my_rangefinder" filename="librangefinder.so">
  *       <sensor>Sensor Name</sensor>
  *       <topic>~/my/topic</topic>
  *     </plugin>

@@ -30,7 +30,7 @@ using namespace gazebo;
  * To add a encoder to your robot, add the following XML to your
  * robot model:
  *
- *     <plugin name="my_encoder" filename="libgz_encoder.so">
+ *     <plugin name="my_encoder" filename="libencoder.so">
  *       <joint>Joint Name</joint>
  *       <topic>~/my/topic</topic>
  *       <units>{degrees, radians}</units>

@@ -29,7 +29,7 @@ typedef enum { Roll /*X*/, Pitch /*Y*/, Yaw /*Z*/ } ROTATION;
  * To add a gyro to your robot, add the following XML to your robot
  * model:
  *
- *     <plugin name="my_gyro" filename="libgz_gyro.so">
+ *     <plugin name="my_gyro" filename="libgyro.so">
  *       <link>Joint Name</link>
  *       <topic>~/my/topic</topic>
  *       <units>{degrees, radians}</units>

@@ -25,7 +25,7 @@ using namespace gazebo;
  * To add a DC motor to your robot, add the following XML to your
  * robot model:
  *
- *     <plugin name="my_motor" filename="libgz_dc_motor.so">
+ *     <plugin name="my_motor" filename="libdc_motor.so">
  *       <joint>Joint Name</joint>
  *       <topic>~/my/topic</topic>
  *       <multiplier>Number</multiplier>

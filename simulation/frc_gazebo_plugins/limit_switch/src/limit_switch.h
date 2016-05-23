@@ -36,7 +36,7 @@ using namespace gazebo;
  *
  * Internal:
  *
- *     <plugin name="my_limit_switch" filename="libgz_limit_switch.so">
+ *     <plugin name="my_limit_switch" filename="liblimit_switch.so">
  *       <topic>~/my/topic</topic>
  *       <type>internal</type>
  *       <joint>Joint Name</joint>
@@ -47,7 +47,7 @@ using namespace gazebo;
  *
  * External:
  *
- *     <plugin name="my_limit_switch" filename="libgz_limit_switch.so">
+ *     <plugin name="my_limit_switch" filename="liblimit_switch.so">
  *       <topic>~/my/topic</topic>
  *       <type>external</type>
  *       <sensor>Sensor Name</sensor>
