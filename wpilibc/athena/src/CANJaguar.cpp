@@ -10,9 +10,9 @@
 #include <assert.h>
 #include <stdio.h>
 
+#include "FRC_NetworkCommunication/CANSessionMux.h"
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
-#include "NetworkCommunication/CANSessionMux.h"
 #include "Timer.h"
 #include "WPIErrors.h"
 

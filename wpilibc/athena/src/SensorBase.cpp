@@ -7,9 +7,9 @@
 
 #include "SensorBase.h"
 
+#include "FRC_NetworkCommunication/LoadOut.h"
 #include "HAL/HAL.h"
 #include "HAL/Port.h"
-#include "NetworkCommunication/LoadOut.h"
 #include "WPIErrors.h"
 
 const uint32_t SensorBase::kDigitalChannels;
