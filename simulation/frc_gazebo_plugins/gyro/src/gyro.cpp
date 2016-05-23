@@ -75,9 +75,9 @@ void Gyro::Callback(const msgs::ConstStringPtr& msg) {
 
 double Gyro::GetAngle() {
   if (radians) {
-    return link->GetRelativePose().rot.GetAsEuler()[axis];
+    return link->GetWorldCoGPose().rot.GetAsEuler()[axis];
   } else {
-    return link->GetRelativePose().rot.GetAsEuler()[axis] * (180.0 / M_PI);
+    return link->GetWorldCoGPose().rot.GetAsEuler()[axis] * (180.0 / M_PI);
   }
 }
 
