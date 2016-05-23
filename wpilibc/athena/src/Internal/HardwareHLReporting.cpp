@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Internal/HardwareHLReporting.h"
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 
 void HardwareHLReporting::ReportScheduler() {
   HALReport(HALUsageReporting::kResourceType_Command,

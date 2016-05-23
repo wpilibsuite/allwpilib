@@ -8,7 +8,7 @@
 #ifndef Compressor_H_
 #define Compressor_H_
 
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 #include "tables/ITableListener.h"

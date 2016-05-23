@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Compressor.hpp"
+#include "HAL/Compressor.h"
 #include <iostream>
 #include "ctre/PCM.h"
 

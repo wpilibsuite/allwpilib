@@ -7,12 +7,12 @@
 
 #include <assert.h>
 #include <jni.h>
-#include "Log.hpp"
+#include "Log.h"
 
 #include "edu_wpi_first_wpilibj_can_CANJNI.h"
 
 #include "FRC_NetworkCommunication/CANSessionMux.h"
-#include "HAL/CAN.hpp"
+#include "HAL/CAN.h"
 #include "HALUtil.h"
 
 // set the logging level

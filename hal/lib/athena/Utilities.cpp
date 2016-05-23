@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Utilities.hpp"
+#include "HAL/Utilities.h"
 #include <time.h>
 
 const int32_t HAL_NO_WAIT = 0;

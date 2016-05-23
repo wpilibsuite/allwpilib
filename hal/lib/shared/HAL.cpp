@@ -1,6 +1,6 @@
 // This file must compile on ALL PLATFORMS. Be very careful what you put in
 // here.
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 #include <cstring>
 #include "FRC_NetworkCommunication/FRCComm.h"
 

@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Notifier.hpp"
+#include "HAL/Notifier.h"
 #include <assert.h>
 #include <jni.h>
 #include <stdio.h>
@@ -15,7 +15,7 @@
 #include <mutex>
 #include <thread>
 #include "HALUtil.h"
-#include "Log.hpp"
+#include "Log.h"
 #include "SafeThread.h"
 #include "edu_wpi_first_wpilibj_hal_NotifierJNI.h"
 

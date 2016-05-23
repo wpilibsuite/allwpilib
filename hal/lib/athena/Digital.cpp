@@ -5,16 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Digital.hpp"
+#include "HAL/Digital.h"
 
 #include <math.h>
 #include <stdio.h>
 #include <mutex>
 #include "ChipObject.h"
 #include "FRC_NetworkCommunication/LoadOut.h"
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 #include "HAL/Port.h"
-#include "HAL/cpp/Resource.hpp"
+#include "HAL/cpp/Resource.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "i2clib/i2c-lib.h"
 #include "spilib/spi-lib.h"

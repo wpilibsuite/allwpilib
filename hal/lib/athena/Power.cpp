@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Power.hpp"
+#include "HAL/Power.h"
 #include "ChipObject.h"
 
 static tPower* power = NULL;

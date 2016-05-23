@@ -8,7 +8,7 @@
 #include "IterativeRobot.h"
 
 #include "DriverStation.h"
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 #include "SmartDashboard/SmartDashboard.h"
 #include "networktables/NetworkTable.h"

@@ -11,7 +11,7 @@
 #include <string>
 #include <thread>
 #include "ErrorBase.h"
-#include "HAL/Task.hpp"
+#include "HAL/Task.h"
 
 /**
  * Wrapper class around std::thread that allows changing thread priority

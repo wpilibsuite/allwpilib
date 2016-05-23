@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/SerialPort.hpp"
+#include "HAL/SerialPort.h"
 #include "visa/visa.h"
 
 static uint32_t m_resourceManagerHandle;

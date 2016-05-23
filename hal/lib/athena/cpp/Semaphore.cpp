@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/cpp/Semaphore.hpp"
+#include "HAL/cpp/Semaphore.h"
 
 Semaphore::Semaphore(uint32_t count) { m_count = count; }
 

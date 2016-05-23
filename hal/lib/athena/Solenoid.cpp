@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Solenoid.hpp"
+#include "HAL/Solenoid.h"
 
 #include "ChipObject.h"
 #include "FRC_NetworkCommunication/LoadOut.h"
-#include "HAL/Errors.hpp"
+#include "HAL/Errors.h"
 #include "HAL/Port.h"
 #include "ctre/PCM.h"
 

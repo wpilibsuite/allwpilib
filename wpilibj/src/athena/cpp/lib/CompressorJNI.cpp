@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 #include "HALUtil.h"
-#include "Log.hpp"
+#include "Log.h"
 #include "edu_wpi_first_wpilibj_hal_CompressorJNI.h"
 
 extern "C" {

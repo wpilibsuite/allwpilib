@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Accelerometer.hpp"
+#include "HAL/Accelerometer.h"
 #include <jni.h>
 #include "edu_wpi_first_wpilibj_hal_AccelerometerJNI.h"
 

@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Semaphore.hpp"
+#include "HAL/Semaphore.h"
 
-#include "Log.hpp"
+#include "Log.h"
 
 // set the logging level
 TLogLevel semaphoreLogLevel = logDEBUG;

@@ -7,11 +7,11 @@
 
 #include <assert.h>
 #include <jni.h>
-#include "Log.hpp"
+#include "Log.h"
 
 #include "edu_wpi_first_wpilibj_hal_AnalogJNI.h"
 
-#include "HAL/Analog.hpp"
+#include "HAL/Analog.h"
 #include "HALUtil.h"
 
 // set the logging level

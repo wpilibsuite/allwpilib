@@ -7,11 +7,11 @@
 
 #include <assert.h>
 #include <jni.h>
-#include "Log.hpp"
+#include "Log.h"
 
 #include "edu_wpi_first_wpilibj_hal_JNIWrapper.h"
 
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 
 extern "C" {
 

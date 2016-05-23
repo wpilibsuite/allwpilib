@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/cpp/Resource.hpp"
+#include "HAL/cpp/Resource.h"
 #include <cstddef>
-#include "HAL/Errors.hpp"
+#include "HAL/Errors.h"
 #include "HAL/cpp/priority_mutex.h"
 
 namespace hal {

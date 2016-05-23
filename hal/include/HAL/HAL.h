@@ -8,21 +8,21 @@
 #include <stdint.h>
 #include <cmath>
 
-#include "Accelerometer.hpp"
-#include "Analog.hpp"
-#include "Compressor.hpp"
-#include "Digital.hpp"
-#include "Errors.hpp"
-#include "Interrupts.hpp"
-#include "Notifier.hpp"
-#include "PDP.hpp"
-#include "Power.hpp"
-#include "SerialPort.hpp"
-#include "Solenoid.hpp"
+#include "Accelerometer.h"
+#include "Analog.h"
+#include "Compressor.h"
+#include "Digital.h"
+#include "Errors.h"
+#include "Interrupts.h"
+#include "Notifier.h"
+#include "PDP.h"
+#include "Power.h"
+#include "SerialPort.h"
+#include "Solenoid.h"
 
-#include "Semaphore.hpp"
-#include "Task.hpp"
-#include "Utilities.hpp"
+#include "Semaphore.h"
+#include "Task.h"
+#include "Utilities.h"
 
 #define HAL_IO_CONFIG_DATA_SIZE 32
 #define HAL_SYS_STATUS_DATA_SIZE 44

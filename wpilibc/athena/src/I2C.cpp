@@ -6,8 +6,8 @@
 /*----------------------------------------------------------------------------*/
 
 #include "I2C.h"
-#include "HAL/Digital.hpp"
-#include "HAL/HAL.hpp"
+#include "HAL/Digital.h"
+#include "HAL/HAL.h"
 #include "WPIErrors.h"
 
 /**

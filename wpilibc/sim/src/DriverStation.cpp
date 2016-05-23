@@ -10,7 +10,7 @@
 #include "simulation/MainNode.h"
 //#include "MotorSafetyHelper.h"
 #include <string.h>
-#include "Log.hpp"
+#include "Log.h"
 #include "Utility.h"
 #include "WPIErrors.h"
 #include "boost/mem_fn.hpp"

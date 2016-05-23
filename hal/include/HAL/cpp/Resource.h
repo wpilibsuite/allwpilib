@@ -7,7 +7,7 @@
 #pragma once
 
 #include <stdint.h>
-#include "../Errors.hpp"
+#include "../Errors.h"
 #include "HAL/cpp/priority_mutex.h"
 
 #include <vector>

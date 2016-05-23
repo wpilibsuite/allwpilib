@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "PowerDistributionPanel.h"
-#include "HAL/PDP.hpp"
+#include "HAL/PDP.h"
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
 

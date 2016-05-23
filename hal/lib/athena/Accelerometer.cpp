@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Accelerometer.hpp"
+#include "HAL/Accelerometer.h"
 
 #include <assert.h>
 #include <stdint.h>

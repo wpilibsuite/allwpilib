@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Notifier.hpp"
+#include "HAL/Notifier.h"
 #include <atomic>
 #include <cstdlib>
 #include <mutex>
 #include "ChipObject.h"
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 #include "HAL/cpp/priority_mutex.h"
 
 static const uint32_t kTimerInterruptNumber = 28;

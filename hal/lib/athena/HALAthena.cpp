@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 
 #include <signal.h>  // linux for kill
 #include <sys/prctl.h>
@@ -19,7 +19,7 @@
 #include "FRC_NetworkCommunication/FRCComm.h"
 #include "FRC_NetworkCommunication/LoadOut.h"
 #include "FRC_NetworkCommunication/UsageReporting.h"
-#include "HAL/Errors.hpp"
+#include "HAL/Errors.h"
 #include "HAL/Port.h"
 #include "ctre/ctre.h"
 #include "visa/visa.h"

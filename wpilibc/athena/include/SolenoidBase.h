@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 #include "HAL/Port.h"
 #include "Resource.h"
 #include "SensorBase.h"

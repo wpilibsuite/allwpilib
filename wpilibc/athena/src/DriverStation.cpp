@@ -8,7 +8,7 @@
 #include "DriverStation.h"
 #include <string.h>
 #include "AnalogInput.h"
-#include "Log.hpp"
+#include "Log.h"
 #include "MotorSafetyHelper.h"
 #include "NetworkCommunication/FRCComm.h"
 #include "Timer.h"
