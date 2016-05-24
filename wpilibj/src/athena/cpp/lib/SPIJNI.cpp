@@ -11,7 +11,8 @@
 
 #include "edu_wpi_first_wpilibj_hal_SPIJNI.h"
 
-#include "HAL/Digital.h"
+#include "HAL/SPI.h"
+#include "HAL/SPIAccumulator.h"
 #include "HALUtil.h"
 
 // set the logging level

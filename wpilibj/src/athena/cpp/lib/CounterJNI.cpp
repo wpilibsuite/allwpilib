@@ -11,7 +11,7 @@
 
 #include "edu_wpi_first_wpilibj_hal_CounterJNI.h"
 
-#include "HAL/Digital.h"
+#include "HAL/Counter.h"
 #include "HAL/Errors.h"
 #include "HALUtil.h"
 

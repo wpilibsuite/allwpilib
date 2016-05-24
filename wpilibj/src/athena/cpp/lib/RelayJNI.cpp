@@ -11,7 +11,7 @@
 
 #include "edu_wpi_first_wpilibj_hal_RelayJNI.h"
 
-#include "HAL/Digital.h"
+#include "HAL/Relay.h"
 #include "HALUtil.h"
 
 // set the logging level

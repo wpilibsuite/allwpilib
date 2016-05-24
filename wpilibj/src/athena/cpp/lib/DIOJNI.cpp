@@ -11,7 +11,8 @@
 
 #include "edu_wpi_first_wpilibj_hal_DIOJNI.h"
 
-#include "HAL/Digital.h"
+#include "HAL/DIO.h"
+#include "HAL/PWM.h"
 #include "HALUtil.h"
 
 // set the logging level

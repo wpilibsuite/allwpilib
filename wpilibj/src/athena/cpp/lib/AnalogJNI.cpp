@@ -11,7 +11,10 @@
 
 #include "edu_wpi_first_wpilibj_hal_AnalogJNI.h"
 
-#include "HAL/Analog.h"
+#include "HAL/AnalogInput.h"
+#include "HAL/AnalogOutput.h"
+#include "HAL/AnalogAccumulator.h"
+#include "HAL/AnalogTrigger.h"
 #include "HALUtil.h"
 
 // set the logging level

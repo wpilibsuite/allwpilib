@@ -5,7 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Analog.h"
+#include "HAL/AnalogAccumulator.h"
+#include "HAL/AnalogInput.h"
+#include "HAL/AnalogOutput.h"
+#include "HAL/AnalogTrigger.h"
 
 #include "ChipObject.h"
 #include "FRC_NetworkCommunication/AICalibration.h"
