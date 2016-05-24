@@ -1524,6 +1524,23 @@ void CANJaguar::SetVoltageMode(CANJaguar::PotentiometerStruct) {
 }
 
 /**
+ * Sets the output set-point value.
+ *
+ * The scale and the units depend on the mode the Jaguar is in.
+ * <p>In percentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWM
+ * Jaguar).
+ * <p>In voltage Mode, the outputValue is in volts.
+ * <p>In current Mode, the outputValue is in amps.
+ * <p>In speed Mode, the outputValue is in rotations/minute.
+ * <p>In position Mode, the outputValue is in rotations.
+ *
+ * @param outputValue The set-point to sent to the motor controller.
+ */
+void CANJaguar::Set(float outputValue) {
+  Set(outputValue, 0);
+}
+
+/**
  * Used internally. In order to set the control mode see the methods listed
  * below.
  *

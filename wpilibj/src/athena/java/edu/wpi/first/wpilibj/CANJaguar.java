@@ -372,7 +372,6 @@ public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController {
    * @param syncGroup   The update group to add this set() to, pending UpdateSyncGroup(). If 0,
    *                    update immediately.
    */
-  @Override
   public void set(double outputValue, byte syncGroup) {
     int messageID;
     byte[] data = new byte[8];

@@ -504,16 +504,14 @@ public class RobotDrive implements MotorSafety {
 
     normalize(wheelSpeeds);
 
-    byte syncGroup = (byte) 0x80;
-
     m_frontLeftMotor.set(wheelSpeeds[MotorType.kFrontLeft_val] * m_invertedMotors[MotorType
-        .kFrontLeft_val] * m_maxOutput, syncGroup);
+        .kFrontLeft_val] * m_maxOutput);
     m_frontRightMotor.set(wheelSpeeds[MotorType.kFrontRight_val] * m_invertedMotors[MotorType
-        .kFrontRight_val] * m_maxOutput, syncGroup);
+        .kFrontRight_val] * m_maxOutput);
     m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft_val] * m_invertedMotors[MotorType
-        .kRearLeft_val] * m_maxOutput, syncGroup);
+        .kRearLeft_val] * m_maxOutput);
     m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight_val] * m_invertedMotors[MotorType
-        .kRearRight_val] * m_maxOutput, syncGroup);
+        .kRearRight_val] * m_maxOutput);
 
     if (m_safetyHelper != null) m_safetyHelper.feed();
   }
@@ -551,16 +549,14 @@ public class RobotDrive implements MotorSafety {
 
     normalize(wheelSpeeds);
 
-    byte syncGroup = (byte) 0x80;
-
     m_frontLeftMotor.set(wheelSpeeds[MotorType.kFrontLeft_val] * m_invertedMotors[MotorType
-        .kFrontLeft_val] * m_maxOutput, syncGroup);
+        .kFrontLeft_val] * m_maxOutput);
     m_frontRightMotor.set(wheelSpeeds[MotorType.kFrontRight_val] * m_invertedMotors[MotorType
-        .kFrontRight_val] * m_maxOutput, syncGroup);
+        .kFrontRight_val] * m_maxOutput);
     m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft_val] * m_invertedMotors[MotorType
-        .kRearLeft_val] * m_maxOutput, syncGroup);
+        .kRearLeft_val] * m_maxOutput);
     m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight_val] * m_invertedMotors[MotorType
-        .kRearRight_val] * m_maxOutput, syncGroup);
+        .kRearRight_val] * m_maxOutput);
 
     if (m_safetyHelper != null) m_safetyHelper.feed();
   }
@@ -593,21 +589,19 @@ public class RobotDrive implements MotorSafety {
       throw new NullPointerException("Null motor provided");
     }
 
-    byte syncGroup = (byte) 0x80;
-
     if (m_frontLeftMotor != null) {
       m_frontLeftMotor.set(limit(leftOutput) * m_invertedMotors[MotorType.kFrontLeft_val] *
-          m_maxOutput, syncGroup);
+          m_maxOutput);
     }
     m_rearLeftMotor.set(limit(leftOutput) * m_invertedMotors[MotorType.kRearLeft_val] *
-        m_maxOutput, syncGroup);
+        m_maxOutput);
 
     if (m_frontRightMotor != null) {
       m_frontRightMotor.set(-limit(rightOutput) * m_invertedMotors[MotorType.kFrontRight_val] *
-          m_maxOutput, syncGroup);
+          m_maxOutput);
     }
     m_rearRightMotor.set(-limit(rightOutput) * m_invertedMotors[MotorType.kRearRight_val] *
-        m_maxOutput, syncGroup);
+        m_maxOutput);
 
     if (m_safetyHelper != null) m_safetyHelper.feed();
   }

@@ -72,7 +72,6 @@ public class RobotDrive implements MotorSafety {
   protected SpeedController m_rearLeftMotor;
   protected SpeedController m_rearRightMotor;
   protected boolean m_allocatedSpeedControllers;
-  protected byte m_syncGroup = 0;
   protected static boolean kArcadeRatioCurve_Reported = false;
   protected static boolean kTank_Reported = false;
   protected static boolean kArcadeStandard_Reported = false;
@@ -503,14 +502,10 @@ public class RobotDrive implements MotorSafety {
     wheelSpeeds[MotorType.kRearRight_val] = xIn + yIn - rotation;
 
     normalize(wheelSpeeds);
-    m_frontLeftMotor.set(wheelSpeeds[MotorType.kFrontLeft_val] * m_maxOutput, m_syncGroup);
-    m_frontRightMotor.set(wheelSpeeds[MotorType.kFrontRight_val] * m_maxOutput, m_syncGroup);
-    m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft_val] * m_maxOutput, m_syncGroup);
-    m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight_val] * m_maxOutput, m_syncGroup);
-
-    if (m_syncGroup != 0) {
-      CANJaguar.updateSyncGroup(m_syncGroup);
-    }
+    m_frontLeftMotor.set(wheelSpeeds[MotorType.kFrontLeft_val] * m_maxOutput);
+    m_frontRightMotor.set(wheelSpeeds[MotorType.kFrontRight_val] * m_maxOutput);
+    m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft_val] * m_maxOutput);
+    m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight_val] * m_maxOutput);
 
     if (m_safetyHelper != null) {
       m_safetyHelper.feed();
@@ -551,14 +546,10 @@ public class RobotDrive implements MotorSafety {
 
     normalize(wheelSpeeds);
 
-    m_frontLeftMotor.set(wheelSpeeds[MotorType.kFrontLeft_val] * m_maxOutput, m_syncGroup);
-    m_frontRightMotor.set(wheelSpeeds[MotorType.kFrontRight_val] * m_maxOutput, m_syncGroup);
-    m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft_val] * m_maxOutput, m_syncGroup);
-    m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight_val] * m_maxOutput, m_syncGroup);
-
-    if (m_syncGroup != 0) {
-      CANJaguar.updateSyncGroup(m_syncGroup);
-    }
+    m_frontLeftMotor.set(wheelSpeeds[MotorType.kFrontLeft_val] * m_maxOutput);
+    m_frontRightMotor.set(wheelSpeeds[MotorType.kFrontRight_val] * m_maxOutput);
+    m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft_val] * m_maxOutput);
+    m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight_val] * m_maxOutput);
 
     if (m_safetyHelper != null) {
       m_safetyHelper.feed();
@@ -594,18 +585,14 @@ public class RobotDrive implements MotorSafety {
     }
 
     if (m_frontLeftMotor != null) {
-      m_frontLeftMotor.set(limit(leftOutput) * m_maxOutput, m_syncGroup);
+      m_frontLeftMotor.set(limit(leftOutput) * m_maxOutput);
     }
-    m_rearLeftMotor.set(limit(leftOutput) * m_maxOutput, m_syncGroup);
+    m_rearLeftMotor.set(limit(leftOutput) * m_maxOutput);
 
     if (m_frontRightMotor != null) {
-      m_frontRightMotor.set(-limit(rightOutput) * m_maxOutput, m_syncGroup);
+      m_frontRightMotor.set(-limit(rightOutput) * m_maxOutput);
     }
-    m_rearRightMotor.set(-limit(rightOutput) * m_maxOutput, m_syncGroup);
-
-    if (m_syncGroup != 0) {
-      CANJaguar.updateSyncGroup(m_syncGroup);
-    }
+    m_rearRightMotor.set(-limit(rightOutput) * m_maxOutput);
 
     if (m_safetyHelper != null) {
       m_safetyHelper.feed();
@@ -702,17 +689,6 @@ public class RobotDrive implements MotorSafety {
    */
   public void setMaxOutput(double maxOutput) {
     m_maxOutput = maxOutput;
-  }
-
-  /**
-   * Set the number of the sync group for the motor controllers. If the motor controllers are {@link
-   * CANJaguar}s, then they will all be added to this sync group, causing them to update their
-   * values at the same time.
-   *
-   * @param syncGroup the update group to add the motor controllers to
-   */
-  public void setCANJaguarSyncGroup(byte syncGroup) {
-    m_syncGroup = syncGroup;
   }
 
   /**

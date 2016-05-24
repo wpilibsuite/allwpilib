@@ -132,7 +132,7 @@ float CANTalon::Get() const {
  * @param outputValue The setpoint value, as described above.
  * @see SelectProfileSlot to choose between the two sets of gains.
  */
-void CANTalon::Set(float value, uint8_t syncGroup) {
+void CANTalon::Set(float value) {
   /* feed safety helper since caller just updated our output */
   m_safetyHelper->Feed();
 
