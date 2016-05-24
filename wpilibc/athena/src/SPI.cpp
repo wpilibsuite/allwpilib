@@ -6,8 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "SPI.h"
-
-#include "HAL/Digital.h"
+#include "HAL/HAL.h"
 #include "WPIErrors.h"
 
 #include <string.h>

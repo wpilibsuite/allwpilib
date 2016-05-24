@@ -11,7 +11,7 @@
 
 #include "edu_wpi_first_wpilibj_hal_EncoderJNI.h"
 
-#include "HAL/Digital.h"
+#include "HAL/Encoder.h"
 #include "HAL/Errors.h"
 #include "HALUtil.h"
 

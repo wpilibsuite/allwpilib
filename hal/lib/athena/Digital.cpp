@@ -5,7 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Digital.h"
+#include "HAL/Counter.h"
+#include "HAL/DIO.h"
+#include "HAL/Encoder.h"
+#include "HAL/I2C.h"
+#include "HAL/PWM.h"
+#include "HAL/Relay.h"
+#include "HAL/SPI.h"
+#include "HAL/SPIAccumulator.h"
 
 #include <math.h>
 #include <stdio.h>

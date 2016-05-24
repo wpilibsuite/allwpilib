@@ -11,7 +11,7 @@
 
 #include "edu_wpi_first_wpilibj_hal_I2CJNI.h"
 
-#include "HAL/Digital.h"
+#include "HAL/I2C.h"
 #include "HALUtil.h"
 
 // set the logging level
