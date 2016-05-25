@@ -78,7 +78,7 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
 }
 
 PIDController::~PIDController() {
-  //forcefully stopping the notifier so the callback can successfully run. 
+  // forcefully stopping the notifier so the callback can successfully run.
   m_controlLoop->Stop();
   if (m_table != nullptr) m_table->RemoveTableListener(this);
 }

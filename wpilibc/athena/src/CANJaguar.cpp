@@ -1536,9 +1536,7 @@ void CANJaguar::SetVoltageMode(CANJaguar::PotentiometerStruct) {
  *
  * @param outputValue The set-point to sent to the motor controller.
  */
-void CANJaguar::Set(float outputValue) {
-  Set(outputValue, 0);
-}
+void CANJaguar::Set(float outputValue) { Set(outputValue, 0); }
 
 /**
  * Used internally. In order to set the control mode see the methods listed
