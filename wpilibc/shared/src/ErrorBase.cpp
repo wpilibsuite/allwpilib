@@ -8,9 +8,8 @@
 #include "ErrorBase.h"
 
 #include <errno.h>
-#include <stdio.h>
-#include <string.h>
 
+#include <iomanip>
 #include <sstream>
 
 #define WPI_ERRORS_DEFINE_STRINGS
@@ -51,10 +50,10 @@ void ErrorBase::SetErrnoError(llvm::StringRef contextMessage,
     err = "OK: ";
     err += contextMessage;
   } else {
-    char buf[256];
-    snprintf(buf, 256, "%s (0x%08X): %.*s", strerror(errNo), errNo,
-             contextMessage.size(), contextMessage.data());
-    err = buf;
+    std::ostringstream oss;
+    oss << strerror(errNo) << " (0x" << std::setfill('0') << std::hex
+        << std::uppercase << std::setw(8) << errNo << "): " << contextMessage;
+    err = oss.str();
   }
 
   // Set the current error information for this object.
