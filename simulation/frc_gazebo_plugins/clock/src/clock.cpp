@@ -7,6 +7,8 @@
 
 #include "clock.h"
 
+#include <boost/algorithm/string/replace.hpp>
+
 GZ_REGISTER_MODEL_PLUGIN(Clock)
 
 Clock::Clock() {}

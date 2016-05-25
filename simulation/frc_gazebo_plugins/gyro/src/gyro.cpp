@@ -7,6 +7,8 @@
 
 #include "gyro.h"
 
+#include <boost/algorithm/string/replace.hpp>
+
 GZ_REGISTER_MODEL_PLUGIN(Gyro)
 
 Gyro::Gyro() {}

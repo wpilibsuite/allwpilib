@@ -7,6 +7,8 @@
 
 #include "dc_motor.h"
 
+#include <boost/algorithm/string/replace.hpp>
+
 GZ_REGISTER_MODEL_PLUGIN(DCMotor)
 
 DCMotor::DCMotor() {}

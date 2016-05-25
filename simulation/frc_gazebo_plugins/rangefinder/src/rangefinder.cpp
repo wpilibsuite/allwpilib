@@ -13,6 +13,7 @@
 
 #include "rangefinder.h"
 
+#include <boost/algorithm/string/replace.hpp>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/sensors/sensors.hh>
 #include <gazebo/transport/transport.hh>
